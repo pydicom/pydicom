@@ -7,9 +7,11 @@ class Values(unittest.TestCase):
     def testGoodInts(self):
         """Tags can be constructed with 4-byte integers.............."""
         tag = Tag(0x300a00b0)
+        tag = Tag(0xFFFFFFEE)
     def testGoodTuple(self):
         """Tags can be constructed with two-tuple of 2-byte integers."""
         tag = Tag((0x300a, 0x00b0))
+        tag = Tag((0xFFFF, 0xFFee))
     def testBadTuple(self):
         """Tags: if a tuple, must be a 2-tuple......................."""
         self.assertRaises(ValueError, Tag, (1,2,3,4))
