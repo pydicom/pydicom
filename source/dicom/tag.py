@@ -21,7 +21,9 @@ class Tag(long):
     # Simpler to deal with one number and separate to (group, element) when necessary.
     # Also can deal with python differences in handling ints starting in python 2.4,
     #   by forcing all inputs to a proper long where the differences go away
-    def __new__(cls, arg):
+    def __new__(cls, arg, arg2=None):
+        if arg2:
+            arg = (arg, arg2) # act as if was passed a single tuple
         if isinstance(arg, tuple):
             if len(arg) != 2:
                 raise ValueError, "Tag must be an int or a 2-tuple"
