@@ -25,15 +25,23 @@ Dataset(derived class of Python's dict class)
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License (license.txt) for more details
 
+from sys import byteorder
+sys_isLittleEndian = (byteorder == 'little')
 from dicom.dicom_dictionary import DicomDictionary, dictionaryVR
 from dicom.dicom_dictionary import TagForName, AllNamesForTag
 from dicom.tag import Tag
 from dicom.attribute import Attribute
-haveNumeric = 1
+
+haveNumpy = True
+haveNumeric = True
 try:
-    import Numeric as num
+    import Numeric
 except:
-    haveNumeric=0
+    haveNumeric = False
+try:
+    import numpy
+except:
+    haveNumpy = False
 
 class Dataset(dict):
     """A Dataset is a collection (dictionary) of Dicom attribute instances.
@@ -56,8 +64,12 @@ class Dataset(dict):
             to the Numeric typecode.
     """
     indentChars = "   "
+    # In the following, the dictionary key is the number of BitsAllocated for image data
     if haveNumeric:
-        pixelFormats = {8: num.UnsignedInt8, 16:num.Int16, 32:num.Int32}
+        NumericPixelFormats = {8: Numeric.UnsignedInt8, 16:Numeric.Int16, 32:Numeric.Int32}
+    if haveNumpy:
+        NumpyPixelFormats = {8: numpy.uint8, 16:numpy.int16, 32:numpy.int32}
+        
     def Add(self, attribute):
         """Equivalent to dataset[attribute.tag] = attribute."""
         self[attribute.tag] = attribute
@@ -175,41 +187,57 @@ class Dataset(dict):
             return 0
         else:
             return 1
-    def PixelNumericArray(self):
-        """Return a Numeric array of the pixel data.
+    def PixelDataArray(self):
+        """Return a NumPy or Numeric array of the pixel data.
         
-        If the file has PixelData, attempt to return it as a Numeric
-        (http://sf.net/projects/numpy) 2 or 3-dimensional array. Use the
-        tags for Rows, Columns, and GrideFrame information to determine
-        the dimensions.
+        NumPy is the most recent numerical package for python. It is used if available.
+        If not, and Numeric is available, that is used.
+        
+        Return a NumPy 2 or 3-D array object, or Numeric 2 or 3-D array object if NumPy unavailable.
         
         Raise TypeError if no pixel data in this dataset.
+        Raise ImportError if cannot import numpy or Numeric.
         Raise NotImplementedError if SamplesPerPixel > 1. (not sure what to do with this).
         
         """
         if not 'PixelData' in self:
             raise TypeError, "No pixel data found in this dataset."
-        if not haveNumeric:
-            msg = "The Numeric package (http://sf/net/projects/numpy)is required\n"
-            msg += " to use the PixelArray() method. It was not found or could not be loaded."
+
+        if not haveNumeric and not haveNumpy:
+            msg = "Either the Numpy package or Numeric package (http://sf/net/projects/numpy) is required\n"
+            msg += " to use the PixelDataArray() method. Neither could be found on this system."
             raise ImportError, msg
 
         if self.SamplesperPixel != 1:
-            raise NotImplementedError, "This code does not yet handle SamplesPerPixel > 1."
-        # determine the type used for the array
+            raise NotImplementedError, "This code does not handle SamplesPerPixel > 1."
+
+            # determine the type used for the array
         # XXX didn't have images to test all variations. Not sure if will always work.
-        format = self.pixelFormats[self.BitsAllocated]
-        arr = num.fromstring(self.PixelData, format)
+        need_byteswap = (self.isLittleEndian != sys_isLittleEndian)
+
+        if haveNumpy:
+            format = self.NumpyPixelFormats[self.BitsAllocated]
+            arr = numpy.fromstring(self.PixelData, format)
+            # XXX byte swap - may later handle this in ReadFile!!?
+            if need_byteswap:
+                arr.byteswap(True)  # True = swap in-place, don't make a new copy
+            # Note the following reshape operations return a new *view* onto arr, but don't copy the data
+            if 'NumberofFrames' in self and self.NumberofFrames > 1:
+                arr = arr.reshape(self.NumberofFrames, self.Rows, self.Columns)
+            else:
+                arr = arr.reshape(self.Rows, self.Columns)
+            
+        elif haveNumeric:
+            format = self.NumericPixelFormats[self.BitsAllocated]
+            arr = Numeric.fromstring(self.PixelData, format)
         
-        # XXX byte swap - may later handle this in ReadFile!!?
-        from sys import byteorder
-        sys_isLittleEndian = byteorder == 'little'
-        if self.isLittleEndian != sys_isLittleEndian:
-            arr = arr.byteswapped()
-        if 'NumberofFrames' in self and self.NumberofFrames > 1:
-            arr = num.reshape(arr,(self.NumberofFrames, self.Rows, self.Columns))
-        else:
-            arr = num.reshape(arr, (self.Rows, self.Columns))
+            # XXX byte swap - may later handle this in ReadFile!!?
+            if need_byteswap:
+                arr = arr.byteswapped()
+            if 'NumberofFrames' in self and self.NumberofFrames > 1:
+                arr = Numeric.reshape(arr,(self.NumberofFrames, self.Rows, self.Columns))
+            else:
+                arr = Numeric.reshape(arr, (self.Rows, self.Columns))
         return arr
         
     def _PrettyStr(self, indent = 0):
