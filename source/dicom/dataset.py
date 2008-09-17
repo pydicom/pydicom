@@ -239,12 +239,18 @@ class Dataset(dict):
             else:
                 arr = Numeric.reshape(arr, (self.Rows, self.Columns))
         return arr
+
+    def top(self):
+        """Show the DICOM tags, but only the top level; do not recurse into Sequences"""
         
-    def _PrettyStr(self, indent = 0):
+        return self._PrettyStr(topLevelOnly=True)
+        
+    def _PrettyStr(self, indent=0, topLevelOnly=False):
         """Return a string of the attributes in this dataset, with indented levels.
         
-        User code should not use this function directly. It is called by the
-        __str__() method for handling print statements or str(dataset).
+        This private method is called by the __str__() method 
+        for handling print statements or str(dataset), and the __repr__() method.
+        It is also used by top, which is the reason for the topLevelOnly flag.
         This function recurses, with increasing indentation levels.
         
         """
@@ -257,12 +263,14 @@ class Dataset(dict):
             attr = self[k]
             if attr.VR == "SQ":   # a sequence
                 strings.append(indentStr + str(attr.tag) + "  %s   %i item(s) ---- " % ( attr.description(),len(attr.value)))
-                for dataset in attr.value:
-                    strings.append(dataset._PrettyStr(indent+1))
-                    strings.append(nextIndentStr + "---------")
+                if not topLevelOnly:
+                    for dataset in attr.value:
+                        strings.append(dataset._PrettyStr(indent+1))
+                        strings.append(nextIndentStr + "---------")
             else:
                 strings.append(indentStr + repr(attr))
         return "\n".join(strings)
+        
     def RemovePrivateTags(self):
         """Remove all Dicom private tags in this dataset and those contained within."""
         def RemoveCallback(dataset, attribute):
@@ -271,6 +279,7 @@ class Dataset(dict):
                 # can't del self[tag] - won't be right dataset on recursion
                 del dataset[attribute.tag]  
         self.walk(RemoveCallback)
+
     def __setattr__(self, name, value):
         """Intercept any attempts to set a value for an instance attribute.
         
@@ -293,7 +302,6 @@ class Dataset(dict):
             # XXX note if user mis-spells a dicom attribute - no error!!!
             self.__dict__[name] = value  
 
-          
     def __setitem__(self, key, value):
         """Operator for dataset[key]=value."""
         try:
@@ -308,7 +316,7 @@ class Dataset(dict):
 
     def __str__(self):
         """Handle str(dataset)."""
-        return self._PrettyStr(0)
+        return self._PrettyStr()
         
     def update(self, dictionary):
         """Extend dict.update() to handle *named tags*."""
