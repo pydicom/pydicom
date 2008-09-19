@@ -18,7 +18,7 @@ and a value (attribute.value).
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License (license.txt) for more details 
 
-from dicom.dicom_dictionary import dictionaryHasTag, dictionaryDescription
+from dicom.datadict import dictionaryHasTag, dictionaryDescription
 from dicom.tag import Tag
 
 # Helper functions:

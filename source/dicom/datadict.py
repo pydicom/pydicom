@@ -1,6 +1,6 @@
-# dicom_dictionary.py
+# datadict.py
 """Access dicom dictionary information"""
-# Copyright 2004, Darcy Mason
+# Copyright 2008, Darcy Mason
 # This file is part of pydicom.
 #
 # pydicom is free software; you can redistribute it and/or modify
@@ -14,14 +14,21 @@
 # GNU General Public License (license.txt) for more details
 
 # The actual python dict is in _dicom_dictionary.py.
-from dicom._dicom_dictionary import DicomDictionary  # Note leading underscore
-from dicom.tag import Tag
 
-# Add Repeating Group info to dictionary (Dicom standard versions < 3.0)
-from dicom.repeating_group_curves import CurveDictionary
-for k,v in CurveDictionary.items():
-    for group in range(0x5000, 0x5020, 2):
-        DicomDictionary[Tag((group,k))] = v
+from dicom.tag import Tag
+from dicom._dicom_dict import DicomDictionary  # the actual dict of tag: (VR, VM, name, isRetired)
+from dicom._dicom_dict import RepeatersDictionary # those with tags like "(50xx, 0005)"
+
+# Generate mask dict for checking repeating groups etc.
+# Map a true bitwise mask to the DICOM mask with "x"'s in it.
+masks = {}
+for mask_x in RepeatersDictionary:
+    # mask1 is XOR'd to see that all bits are equal (XOR result = 0 if so, except for location of "x"'s where can be different,
+    #      so AND those out with 0 bits at the "we don't care" location using mask2
+    mask1 = long(mask_x.replace("x", "0"),16)
+    mask2 = long("".join(["F0"[c=="x"] for c in mask_x]),16)
+    # masks[long(mask_x.replace("x", "F"),16)] = mask_x
+    masks[mask_x] = (mask1, mask2)
 
 # For shorter naming of dicom member elements, put an entry here
 #   (longer naming can also still be used)
@@ -32,14 +39,39 @@ shortNames = [("BeamLimitingDevice", "BLD"),
               ("Referenced", "Refd")
              ]
 
-
+def mask_match(tag):
+    for mask_x, (mask1, mask2) in masks.items():
+        if (tag ^ mask1) & mask2 == 0:
+            return mask_x
+    return None
+    
+def get_entry(tag):
+    """Return the tuple (VR, VM, name, isRetired) from the DICOM dictionary
+    
+    If the entry is not in the main dictionary, check the masked ones,
+    e.g. repeating groups like 50xx, etc.
+    """
+    tag = Tag(tag)
+    try:
+        return DicomDictionary[tag]
+    except KeyError:
+        mask_x = mask_match(tag)
+        if mask_x:
+            return RepeatersDictionary[mask_x]
+        else:
+            raise KeyError, "Tag %s not found in DICOM dictionary" % Tag(tag)
+        
 def dictionaryDescription(tag):
     """Return the descriptive text for the given dicom tag."""
-    return DicomDictionary[tag][2]
+    return get_entry(tag)[2]
+
+def dictionaryVM(tag):
+    """Return the dicom value multiplicity for the given dicom tag."""
+    return get_entry(tag)[1]
 
 def dictionaryVR(tag):
     """Return the dicom value representation for the given dicom tag."""
-    return DicomDictionary[tag][0]
+    return get_entry(tag)[0]
 
 def dictionaryHasTag(tag):
     """Return True if the dicom dictionary has an entry for the given tag."""
@@ -57,7 +89,7 @@ def CleanName(tag):
     tag = Tag(tag)  # make sure is not an int
     if not DicomDictionary.has_key(tag): # can't name it - not in dictionary
         if tag.element == 0:             #  (unless is implied group length versions < 3)
-            return "Group Length"
+            return "GroupLength"
         else:
             return ""
     s = dictionaryDescription(tag)    # Descriptive name in dictionary

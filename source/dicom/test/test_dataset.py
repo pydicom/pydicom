@@ -81,11 +81,11 @@ class DatasetTests(unittest.TestCase):
         """Dataset: dir() returns sorted list of named attributes........."""
         ds = self.dummy_dataset()
         ds.PatientsName = "name"
-        ds.PatientsID = "id"
+        ds.PatientID = "id"
         ds.NonDicomVariable = "junk"
         ds.AddNew((0x18,0x1151), "IS", 150) # X-ray Tube Current
         ds.AddNew((0x1111, 0x123), "DS", "42.0") # private tag - no name in dir()
-        expected = ['PatientsID', 'PatientsName', 'TreatmentMachineName', 'XrayTubeCurrent']
+        expected = ['PatientID', 'PatientsName', 'TreatmentMachineName', 'XRayTubeCurrent']
         self.assertEqual(ds.dir(), expected, "dir() returned %s, expected %s" % (str(ds.dir()), str(expected)))
         
 if __name__ == "__main__":
