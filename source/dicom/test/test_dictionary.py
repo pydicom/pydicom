@@ -4,7 +4,7 @@
 
 import unittest
 from dicom.tag import Tag
-from dicom.dicom_dictionary import DicomDictionary, CleanName, AllNamesForTag
+from dicom.datadict import DicomDictionary, CleanName, AllNamesForTag, dictionaryDescription
 
 class DictTests(unittest.TestCase):
     def testCleanName(self):
@@ -22,7 +22,11 @@ class DictTests(unittest.TestCase):
         names = AllNamesForTag(Tag(0x300A0120))
         expected = ['BeamLimitingDeviceAngle', 'BLDAngle']
         self.assertEqual(names, expected, "Expected %s, got %s" % (expected, names))
-
+    def testRepeaters(self):
+        """dicom_dictionary: Tags with "x" return correct dict info........"""
+        self.assertEqual(dictionaryDescription(0x280400), 'Transform Label')
+        self.assertEqual(dictionaryDescription(0x280410), 'Rows For Nth Order Coefficients')
+        
         
 
 if __name__ == "__main__":

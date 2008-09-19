@@ -27,8 +27,8 @@ Dataset(derived class of Python's dict class)
 
 from sys import byteorder
 sys_isLittleEndian = (byteorder == 'little')
-from dicom.dicom_dictionary import DicomDictionary, dictionaryVR
-from dicom.dicom_dictionary import TagForName, AllNamesForTag
+from dicom.datadict import DicomDictionary, dictionaryVR
+from dicom.datadict import TagForName, AllNamesForTag
 from dicom.tag import Tag
 from dicom.attribute import Attribute
 

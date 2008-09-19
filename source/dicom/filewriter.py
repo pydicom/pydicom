@@ -17,7 +17,7 @@
 from struct import pack, calcsize
 from UIDs import ExplicitVRLittleEndianTransfer, ImplicitVRLittleEndianTransfer
 from dicom.filebase import DicomFile
-from dicom.dicom_dictionary import dictionaryVR
+from dicom.datadict import dictionaryVR
 from dicom.dataset import Dataset
 from dicom.attribute import Attribute
 from dicom.tag import Tag
