@@ -319,6 +319,7 @@ def ReadFile(fp, has_header=True):
 readers = {'UL':(read_numbers,'L'), 'SL':(read_numbers,'l'),
            'US':(read_numbers,'H'), 'SS':(read_numbers, 'h'),
            'FL':(read_numbers,'f'), 'FD':(read_numbers, 'd'),
+           'OF':(read_numbers,'f'),
            'OB':read_OBvalue, 'UI':read_UI,
            'SH':read_String,  'DA':read_String, 'TM': read_String,
            'CS':read_String,  'PN':read_String, 'LO': read_String,
@@ -331,9 +332,12 @@ readers = {'UL':(read_numbers,'L'), 'SL':(read_numbers,'l'),
            'ST':read_String,
            'OW':read_OWvalue,
            'OW/OB':read_OBvalue,# note OW/OB depends on other items, which we don't know at read time
+           'OB/OW':read_OBvalue,
            'US or SS':read_OWvalue,
            'US or SS or OW':read_OWvalue,
            'US\US or SS\US':read_OWvalue,
+           'DT':read_String,
+           'UT':read_SingleString,          
            } 
 
 
