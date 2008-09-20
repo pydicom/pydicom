@@ -260,6 +260,7 @@ def WriteFile(filename, dataset):
 writers = {'UL':(write_numbers,'L'), 'SL':(write_numbers,'l'),
            'US':(write_numbers,'H'), 'SS':(write_numbers, 'h'),
            'FL':(write_numbers,'f'), 'FD':(write_numbers, 'd'),
+           'OF':(write_numbers,'f'),
            'OB':write_OBvalue, 'UI':write_UI,
            'SH':write_String,  'DA':write_String, 'TM': write_String,
            'CS':write_String,  'PN':write_String, 'LO': write_String,
@@ -272,7 +273,10 @@ writers = {'UL':(write_numbers,'L'), 'SL':(write_numbers,'l'),
            'ST':write_String,
            'OW':write_OWvalue,
            'US or SS':write_OWvalue,
-           'OW/OB':write_OBvalue} # note OW/OB depends on other items, which we don't know at write time
+           'OW/OB':write_OBvalue,
+           'DT':write_String,
+           'UT':write_String,
+           } # note OW/OB depends on other items, which we don't know at write time
 
 def hexdump(data, StartAddress=0, StopAddress=None, showAddress=True):
     """Return a formatted string of hex bytes and characters in data.
