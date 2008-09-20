@@ -13,21 +13,18 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License (license.txt) for more details
 
-# The actual python dict is in _dicom_dictionary.py.
-
 from dicom.tag import Tag
-from dicom._dicom_dict import DicomDictionary  # the actual dict of tag: (VR, VM, name, isRetired)
+from dicom._dicom_dict import DicomDictionary  # the actual dict of {tag: (VR, VM, name, isRetired), tag:...}
 from dicom._dicom_dict import RepeatersDictionary # those with tags like "(50xx, 0005)"
 
 # Generate mask dict for checking repeating groups etc.
 # Map a true bitwise mask to the DICOM mask with "x"'s in it.
 masks = {}
 for mask_x in RepeatersDictionary:
-    # mask1 is XOR'd to see that all bits are equal (XOR result = 0 if so, except for location of "x"'s where can be different,
-    #      so AND those out with 0 bits at the "we don't care" location using mask2
+    # mask1 is XOR'd to see that all non-"x" bits are identical (XOR result = 0 if bits same)
+    #      then AND those out with 0 bits at the "x" ("we don't care") location using mask2
     mask1 = long(mask_x.replace("x", "0"),16)
     mask2 = long("".join(["F0"[c=="x"] for c in mask_x]),16)
-    # masks[long(mask_x.replace("x", "F"),16)] = mask_x
     masks[mask_x] = (mask1, mask2)
 
 # For shorter naming of dicom member elements, put an entry here
