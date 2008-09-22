@@ -15,7 +15,7 @@
 # GNU General Public License (license.txt) for more details 
 
 from struct import pack, calcsize
-from UIDs import ExplicitVRLittleEndianTransfer, ImplicitVRLittleEndianTransfer
+from UIDs import ExplicitVRLittleEndian, ImplicitVRLittleEndian
 from dicom.filebase import DicomFile
 from dicom.datadict import dictionaryVR
 from dicom.dataset import Dataset
@@ -238,9 +238,9 @@ def WriteFile(filename, dataset):
     fp.write(preamble)  # blank 128 byte preamble
     
     if dataset.isLittleEndian and not dataset.isExplicitVR:
-        dataset.AddNew((2, 0x10), 'UI', ImplicitVRLittleEndianTransfer)
+        dataset.AddNew((2, 0x10), 'UI', ImplicitVRLittleEndian)
     elif dataset.isLittleEndian and dataset.isExplicitVR:
-        dataset.AddNew((2, 0x10), 'UI', ExplicitVRLittleEndianTransfer)
+        dataset.AddNew((2, 0x10), 'UI', ExplicitVRLittleEndian)
     else:
         raise NotImplementedError, "pydicom has not been verified for Explict VR or big-endian file writing"
     
@@ -293,7 +293,7 @@ def hexdump(data, StartAddress=0, StopAddress=None, showAddress=True):
             return chr(ordchr)
         else:
             return '.'
-    if StopAddress is None:
+    if not StopAddress:
         StopAddress = len(data) + 1
     fh = StringIO()
     byteslen = 16*3-1 # space taken up if row has a full 16 bytes

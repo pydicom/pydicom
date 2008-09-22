@@ -1,7 +1,7 @@
 # filebase.py - part of dicom package
 """Hold DicomFile class, which does basic I/O for a dicom file."""
 #
-# Copyright 2004, Darcy Mason
+# Copyright 2004, 2008, Darcy Mason
 # This file is part of pydicom.
 #
 # pydicom is free software; you can redistribute it and/or modify
@@ -17,18 +17,17 @@
 from dicom.tag import Tag
 from struct import unpack, pack
 
+from StringIO import StringIO
+
 # Use Boolean values if Python version has them, else make our own
 try:
     True
 except:
     False = 0; True = not False
 
-class DicomFile(file):
+class DicomIO(object):
     """File object which holds transfer syntax info and anything else we need."""
-
-    def __init__(self, name, mode, *args, **kwargs):
-        """Extend file.__init__() to set default values."""
-        file.__init__(self, name, mode, *args, **kwargs)
+    def __init__(self, *args, **kwargs):
         self._ImplicitVR = True   # start with this by default
         
     def read_tag(self):
@@ -111,3 +110,13 @@ class DicomFile(file):
     isImplicitVR =   property(_getImplicitVR, _setImplicitVR)
     isExplicitVR =   property(_getExplicitVR, _setExplicitVR)
 
+class DicomFile(DicomIO, file):
+    def __init__(self, *args, **kwargs):
+        """Extend file.__init__() to set default values."""
+        file.__init__(self, *args, **kwargs)
+        DicomIO.__init__(self, *args, **kwargs)
+
+class DicomStringIO(DicomIO, StringIO):
+    def __init__(self, *args, **kwargs):
+        StringIO.__init__(self, *args, **kwargs)
+        DicomIO.__init__(self, *args, **kwargs)

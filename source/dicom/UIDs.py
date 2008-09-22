@@ -14,12 +14,17 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License (license.txt) for more details 
 
-ExplicitVRLittleEndianTransfer = '1.2.840.10008.1.2.1'
-ImplicitVRLittleEndianTransfer = '1.2.840.10008.1.2'
+ExplicitVRLittleEndian = '1.2.840.10008.1.2.1'
+ImplicitVRLittleEndian = '1.2.840.10008.1.2'
+DeflatedExplicitVRLittleEndian = '1.2.840.10008.1.2.1.99'
 
 # Dictionary of the common Media Storage SOP Class UIDs
 # I typed in part of the table B.5-1 in Dicom Standard part 4. (PS 3.4-2003 p21)
 base = '1.2.840.10008.5.1.4.1.1' # note not all SOP Class UIDS start with all this
+
+from _UID_dict import UID_dictionary
+
+# XXX should be removed. No longer needed after move to full UID_dictionary
 SOP_Class_UIDs = {
     'CR Image'            : base + '.1',
     'CT Image'            : base + '.2',
