@@ -15,8 +15,12 @@
 # GNU General Public License (license.txt) for more details 
 
 from struct import unpack, calcsize
-from UIDs import ExplicitVRLittleEndianTransfer, ImplicitVRLittleEndianTransfer
-from dicom.filebase import DicomFile
+# Need zlib and cStringIO for deflate-compressed file
+import zlib
+from StringIO import StringIO
+
+from UIDs import UID_dictionary, DeflatedExplicitVRLittleEndian, ExplicitVRLittleEndian, ImplicitVRLittleEndian
+from dicom.filebase import DicomFile, DicomStringIO
 from dicom.datadict import dictionaryVR
 from dicom.dataset import Dataset
 from dicom.attribute import Attribute
@@ -127,7 +131,7 @@ def ReadAttribute(fp, length=None):
 
     # Get the length field of the data element
     if fp.isExplicitVR:
-        if VR in ['OB','OW','SQ','UN']:
+        if VR in ['OB','OW','SQ','UN', 'UT']:
             reserved = fp.read(2)
             length = fp.read_UL()
         else:
@@ -287,10 +291,20 @@ def ReadFile(fp, has_header=True):
         FileMetaInfo = _ReadFileMetaInfo(fp)
     
         TransferSyntax = FileMetaInfo.TransferSyntaxUID
-        if TransferSyntax == ExplicitVRLittleEndianTransfer:
+        if TransferSyntax == ExplicitVRLittleEndian:
             fp.isExplicitVR = True
-        elif TransferSyntax == ImplicitVRLittleEndianTransfer:
+        elif TransferSyntax == ImplicitVRLittleEndian:
             fp.isImplicitVR = True
+        elif TransferSyntax == DeflatedExplicitVRLittleEndian:
+            # See PS3.6-2008 A.5 (p 71) -- when written, the entire dataset following 
+            #     the file metadata was prepared the normal way, then "deflate" compression applied.
+            #  All that is needed here is to decompress and then use as normal in a file-like object
+            zipped = fp.read()            
+            # -MAX_WBITS part is from comp.lang.python answer:  http://groups.google.com/group/comp.lang.python/msg/e95b3b38a71e6799
+            unzipped = zlib.decompress(zipped, -zlib.MAX_WBITS)
+            fp = DicomStringIO(unzipped) # a file-like object that usual code can use as normal
+            fp.isExplicitVR = True
+            fp.isLittleEndian = True
         else:
             raise NotImplementedError, "This code can only read Explicit or Implicit VR Little Endian transfer syntax, found %s" % ("'" + FileMetaInfo.TransferSyntaxUID + "'")
     else: # no header -- make assumptions
@@ -362,9 +376,9 @@ if __name__ == "__main__":
     print
     print "Transfer Syntax..:",
     tUID = ds.TransferSyntaxUID
-    if tUID==ExplicitVRLittleEndianTransfer:
+    if tUID==ExplicitVRLittleEndian:
         print "Explicit VR Little Endian"
-    elif tUID==ImplicitVRLittleEndianTransfer:
+    elif tUID==ImplicitVRLittleEndian:
         print "Implicit VR Little Endian"
     else:
         print "Transfer syntax not known to this present program"

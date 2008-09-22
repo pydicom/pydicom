@@ -12,6 +12,10 @@ Created by a commercial radiotherapy treatment planning system and modified:
 plan.dcm       Implicit VR, Little Endian
 dose.dcm       Implicit VR, Little Endian
 
+For testing deflated transfer syntax, from http://www.dclunie.com/images/compressed/:
+report
+report_defl
+
 I couldn't find any public BigEndian files, so BigEndian is untested at present.
 
 If you find files which pydicom cannot read properly, please send them so I can add them
