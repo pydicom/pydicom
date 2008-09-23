@@ -19,7 +19,7 @@ from struct import unpack, calcsize
 import zlib
 from StringIO import StringIO
 
-from UIDs import UID_dictionary, DeflatedExplicitVRLittleEndian, ExplicitVRLittleEndian, ImplicitVRLittleEndian
+from UIDs import UID_dictionary, DeflatedExplicitVRLittleEndian, ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian
 from dicom.filebase import DicomFile, DicomStringIO
 from dicom.datadict import dictionaryVR
 from dicom.dataset import Dataset
@@ -295,6 +295,9 @@ def ReadFile(fp, has_header=True):
             fp.isExplicitVR = True
         elif TransferSyntax == ImplicitVRLittleEndian:
             fp.isImplicitVR = True
+        elif TransferSyntax == ExplicitVRBigEndian:
+            fp.isExplicitVR = True
+            fp.isBigEndian = True
         elif TransferSyntax == DeflatedExplicitVRLittleEndian:
             # See PS3.6-2008 A.5 (p 71) -- when written, the entire dataset following 
             #     the file metadata was prepared the normal way, then "deflate" compression applied.

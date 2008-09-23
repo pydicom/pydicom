@@ -17,6 +17,7 @@
 ExplicitVRLittleEndian = '1.2.840.10008.1.2.1'
 ImplicitVRLittleEndian = '1.2.840.10008.1.2'
 DeflatedExplicitVRLittleEndian = '1.2.840.10008.1.2.1.99'
+ExplicitVRBigEndian = '1.2.840.10008.1.2.2'
 
 # Dictionary of the common Media Storage SOP Class UIDs
 # I typed in part of the table B.5-1 in Dicom Standard part 4. (PS 3.4-2003 p21)

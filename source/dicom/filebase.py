@@ -78,7 +78,7 @@ class DicomIO(object):
     # Set up properties BigEndian, LittleEndian, ImplicitVR, ExplicitVR.
     # Big/Little Endian changes functions to read unsigned short or long, e.g. length fields etc
     def _setLittleEndian(self, value):
-        self._LittleEndian = True
+        self._LittleEndian = value
         if value:  # LittleEndian
             self.read_US = self.read_leUS
             self.read_UL = self.read_leUL
