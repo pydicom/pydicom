@@ -17,7 +17,9 @@
 from struct import unpack, calcsize
 # Need zlib and cStringIO for deflate-compressed file
 import zlib
-from StringIO import StringIO
+from StringIO import StringIO # tried cStringIO but wouldn't let me derive class from it.
+import logging
+logger = logging.getLogger('pydicom')
 
 from UIDs import UID_dictionary, DeflatedExplicitVRLittleEndian, ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian
 from dicom.filebase import DicomFile, DicomStringIO
@@ -61,7 +63,17 @@ def read_numbers(fp, length, format):
         return list(value)  # convert from tuple to a list so can modify if need to
 
 def read_OBvalue(fp, length):
-    return fp.read(length)
+    isUndefinedLength = False
+    # logger.debug("OB start at file position 0x%x", fp.tell())
+    if length == 0xffffffffL: # undefined length. PS3.6-2008 Tbl 7.1-1, then read to Sequence Delimiter Item
+        isUndefinedLength = True
+        length = LengthOfUndefinedLength(fp, 0xfffee0dd)
+    data = fp.read(length)
+    # logger.debug("len(data): %d; length=%d", len(data), length)
+    # logger.debug("OB before absorb: 0x%x", fp.tell())
+    if isUndefinedLength:
+        AbsorbDelimiterItem(fp, Tag(0xfffee0dd))
+    return data
 
 def read_OWvalue(fp, length):
     # NO!:  """Return an "Other word" attribute as a tuple of short integers,
@@ -102,6 +114,7 @@ def read_SingleString(fp, length):
     return val
 
 def ReadAttribute(fp, length=None):
+    attr_tell = fp.tell()
     try:
         tag = fp.read_tag()
     except EOFError:
@@ -151,7 +164,7 @@ def ReadAttribute(fp, length=None):
     if tag == 0x00280103: # This flags whether pixel values are US (val=0) or SS (val = 1)
         fp.isSSpixelRep = value # XXX This is not used anywhere else in code?
     attr = Attribute(tag, VR, value, value_tell)
-    # print attr    # Use for debugging file reading errors
+    logger.debug("pos %4x: %s", attr_tell, str(attr))
     return attr
 
 def ReadDataset(fp, bytelength=None):
@@ -162,7 +175,7 @@ def ReadDataset(fp, bytelength=None):
     """
     ds = Dataset()
     fpStart = fp.tell()
-    while (bytelength is None) or (fp.tell() - fpStart < bytelength):  
+    while (not bytelength) or (fp.tell() - fpStart < bytelength):    # byteslength is None
         attribute = ReadAttribute(fp)
         if not attribute:
            break        # a is None if end-of-file
@@ -175,11 +188,10 @@ def ReadDataset(fp, bytelength=None):
 def ReadSequence(fp, length):
     """Return a Sequence list of Datasets"""
     seq = Sequence()
-    isUndefinedLength = 0
+    isUndefinedLength = False
     if length == 0xffffffffL:
-        isUndefinedLength = 1
+        isUndefinedLength = True
         length = LengthOfUndefinedLength(fp, 0xfffee0dd)
-        # raise NotImplementedError, "This code does not handle delimited sequences yet"
     fpStart = fp.tell()            
     while fp.tell() - fpStart < length:
         seq.append(ReadSequenceItem(fp))
@@ -189,7 +201,8 @@ def ReadSequence(fp, length):
 
 def ReadSequenceItem(fp):
     tag = fp.read_tag()
-    assert tag == (0xfffe, 0xe000), "Expected sequence item with tag (FFFE, E000)"
+    if tag != (0xfffe, 0xe000):
+        logger.warning("Expected sequence item with tag (FFFE, E000) at file position 0x%x", fp.tell()-4)
     length = fp.read_UL()
     isUndefinedLength = 0
     if length == 0xFFFFFFFFL:
@@ -206,11 +219,11 @@ def AbsorbDelimiterItem(fp, delimiter):
     tag = fp.read_tag()
     # added 2006.10.20 DM: problem with XiO plan file not having SQ delimiters
     # Catch the missing delimiter exception and ignore the missing delimiter
-    try:
-        assert tag == delimiter, "Did not find expected delimiter %x, found %s" % (delimiter, str(tag))
-        length = fp.read_UL() # 4 bytes for 'length', all 0's
-    except AssertionError, e: 
+    if tag != delimiter:
+        logger.warn("Did not find expected delimiter %x, instead found %s at file position 0x%x", delimiter, str(tag), fp.tell()-4)    
         fp.seek(fp.tell()-4)
+        return 
+    length = fp.read_UL() # 4 bytes for 'length', all 0's
 
 def LengthOfUndefinedLength(fp, delimiter):
     """Search through the file to find the delimiter, return the length of the data
@@ -224,15 +237,17 @@ def LengthOfUndefinedLength(fp, delimiter):
     while chunk != delimiter:
         chunk = fp.read_tag()
         fp.seek(fp.tell()-3) # move only one byte forward
-    length = fp.tell() - data_start - 4  # subtract off the last 4 we just read
+    length = fp.tell() - data_start - 4 + 3  # subtract off the last 4 we just read but we moved back 3 at end of loop
     fp.seek(data_start)
     return length
 
 def ReadDelimiterItem(fp, delimiter):
     found = fp.read(4)
-    assert found==delimiter, "Expected delimitor %s, got %s" % (Tag(delimiter), Tag(found))
+    if found != delimiter:
+        logger.warn("Expected delimitor %s, got %s at file position 0x%x", Tag(delimiter), Tag(found), fp.tell()-4)
     length = fp.read_UL()
-    assert length==0, "Expected delimiter item to have length 0, got %d" % length
+    if length != 0:
+        logger.warn("Expected delimiter item to have length 0, got %d at file position 0x%x", length, fp.tell()-4)
     
 def read_UN(fp, length):
     """Return a byte string for an Attribute of value 'UN' (unknown)"""
@@ -247,15 +262,20 @@ def read_UN(fp, length):
         return fp.read(length)
 
 def read_ATvalue(fp, length):
-    """Return a attribute tag as the value of the current Dicom attribute being read"""
-    assert length == 4, "Expected length 4 for Dicom attribute of value representation 'AT', got %d" % length
-    return fp.read_tag()
+    """Return an attribute tag as the value of the current Dicom attribute being read"""
+    if length == 4:
+        return fp.read_tag()
+    # length > 4
+    if length % 4 != 0:
+        logger.warn("Expected length to be multiple of 4 for VR 'AT', got length %d at file position 0x%x", length, fp.tell()-4)
+    return MultiValue([fp.read_tag() for i in range(length / 4)])
 
 def _ReadFileMetaInfo(fp):
     """Return the file meta information.
     fp must be set after the 128 byte preamble"""
     magic = fp.read(4)
     if magic != "DICM":
+        logger.info("File does not appear to be a DICOM file; 'DICM' header is missing. Call ReadFile with has_header=False")
         raise IOError, 'File does not appear to be a Dicom file; "DICM" is missing. Try ReadFile with has_header=False'
 
     # File meta info is always LittleEndian, Explicit VR. After will change these
@@ -286,7 +306,9 @@ def ReadFile(fp, has_header=True):
 
     if type(fp) is type(""):
         fp = DicomFile(fp,'rb')
+        logger.info("Reading file '%s'" % fp)
     if has_header:
+        logger.debug("Reading preamble")
         preamble = fp.read(0x80)
         FileMetaInfo = _ReadFileMetaInfo(fp)
     
@@ -309,11 +331,15 @@ def ReadFile(fp, has_header=True):
             fp.isExplicitVR = True
             fp.isLittleEndian = True
         else:
-            raise NotImplementedError, "This code can only read Explicit or Implicit VR Little Endian transfer syntax, found %s" % ("'" + FileMetaInfo.TransferSyntaxUID + "'")
+            # Any other syntax should be Explicit VR Little Endian,
+            #   e.g. all Encapsulated (JPEG etc) are ExplVR-LE by Standard PS 3.5-2008 A.4 (p63)
+            fp.isExplicitVR = True
+            fp.isLittleEndian = True
     else: # no header -- make assumptions
         fp.isLittleEndian = True
         fp.isImplicitVR = True
-        
+    
+    logger.debug("Using %s VR, %s Endian transfer syntax" %(("Explicit", "Implicit")[fp.isImplicitVR], ("Big", "Little")[fp.isLittleEndian]))
     # Return the rest of the file, including what we have already read
     ds = ReadDataset(fp)
     if has_header:
@@ -332,7 +358,7 @@ def ReadFile(fp, has_header=True):
     return ds
         
 # readers map a VR to the function to read the value(s)
-# for read_numbers, the reader maps to a tuple (function, number format (struct module style))
+# for read_numbers, the reader maps to a tuple (function, number format (in python struct module style))
 readers = {'UL':(read_numbers,'L'), 'SL':(read_numbers,'l'),
            'US':(read_numbers,'H'), 'SS':(read_numbers, 'h'),
            'FL':(read_numbers,'f'), 'FD':(read_numbers, 'd'),
@@ -356,41 +382,3 @@ readers = {'UL':(read_numbers,'L'), 'SL':(read_numbers,'l'),
            'DT':read_String,
            'UT':read_SingleString,          
            } 
-
-
-#def RemoveAttribute(filename, attribute, datasetList):
-#    """taglist specifies all the tags (sequences) leading to the item to remove (last in the list).
-#    The attribute will be removed and length fields of 'parent' items adjusted.
-#    The file must be small enough to completely read into memory.
-#    This does NOT handle removing a dataset from a sequence."""
-#    ds = ReadFile(filename)  # read in all attribute tree
-#    attributes = []
-#    lastds = ds
-#    for tag in taglist:
-#        attr = lastds[tag]
-#        attributes.append(attr)
-#        lastds = attr.value  # must be a SQ
-    
-if __name__ == "__main__":
-    import sys, os.path
-    here = os.path.dirname(sys.argv[0])
-    filename = os.path.join(here, "test", "plan.dcm")
-    ds = ReadFile(filename)
-    print
-    print "Transfer Syntax..:",
-    tUID = ds.TransferSyntaxUID
-    if tUID==ExplicitVRLittleEndian:
-        print "Explicit VR Little Endian"
-    elif tUID==ImplicitVRLittleEndian:
-        print "Implicit VR Little Endian"
-    else:
-        print "Transfer syntax not known to this present program"
-
-    print "Modality:", ds.Modality
-    print "Patient's name, id: '%s', '%s'" % (ds.PatientsName, ds.PatientsID)
-    print "Patient's Birth Date:", ds.PatientsBirthDate
-    print "RT Plan Label:", ds.RTPlanLabel
-    print "Number of beams:", len(ds.Beams)
-    beam=ds.Beams[0]
-    print "First beam number: %d, name: '%s'" % (beam.BeamNumber, beam.BeamName)
-    print "Collimator angle of that beam:", beam.ControlPoints[0].BLDAngle
