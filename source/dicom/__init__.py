@@ -1,7 +1,7 @@
 # __init__.py for Dicom package
 """pydicom package -- easily handle DICOM files. See Quick Start below.
 
-Copyright 2004, Darcy Mason
+Copyright 2004, 2008, Darcy Mason
 This file is part of pydicom.
 
 pydicom is free software; you can redistribute it and/or modify
@@ -33,15 +33,28 @@ in particular the capture of an interactive session.
 4. Learn the methods of the Dataset class; that is the one you will
 work with most directly.
 """
-#
-
-# For convenience, import the most common classes and functions into "dicom" namespace.
-#   Thus can use
+# Set up logging system for the whole package. 
+# In each module, set logger=logging.getLogger('pydicom')  and the same instance will be used by all
+# At command line, turn on debugging for all pydicom functions with:
 #        import dicom
-#        dicom.ReadFile("a.dcm")
+#        dicom.debug()
+#  Turn off debugging with
+#       dicom.debug(False)
+import logging
+logger = logging.getLogger('pydicom')
+handler = logging.StreamHandler()
+formatter = logging.Formatter("%(asctime)s %(levelname)s: %(message)s", "%Y-%m-%d %H:%M") #'%(asctime)s %(levelname)s %(message)s'
+handler.setFormatter(formatter)
+logger.addHandler(handler)
 
+# For convenience, import the ReadFile and WriteFile functions (most used)  into the "dicom" namespace.
 from filereader import ReadFile
 from filewriter import WriteFile
-#from dataset import Dataset
-#from attribute import Attribute
-#from tag import Tag
+
+def debug(DebugOn=True):
+    global logger
+    if DebugOn:
+        logger.setLevel(logging.DEBUG)
+    else:
+        logger.setLevel(logging.WARNING)
+        
