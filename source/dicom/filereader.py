@@ -14,7 +14,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License (license.txt) for more details 
 
-from struct import unpack, calcsize
+from struct import unpack, calcsize, pack
 # Need zlib and cStringIO for deflate-compressed file
 import zlib
 from StringIO import StringIO # tried cStringIO but wouldn't let me derive class from it.
@@ -28,6 +28,9 @@ from dicom.dataset import Dataset
 from dicom.attribute import Attribute
 from dicom.tag import Tag
 from dicom.sequence import Sequence
+
+from sys import byteorder
+sys_isLittleEndian = (byteorder == 'little')
 
 # Use Boolean values if Python version has them, else make our own
 try:
@@ -121,10 +124,10 @@ def ReadAttribute(fp, length=None):
         return None
 
     # 2006.10.20 DM: if find SQ delimiter tag, ignore it. Kludge to handle XiO dicom files
-    if tag==Tag((0xfffe, 0xe00d)) or tag==Tag((0xfffe, 0xe000)) or tag==Tag((0xfffe, 0xe0dd)):
-        fp.seek(fp.tell()-4)
-        AbsorbDelimiterItem(fp, tag)
-        return ReadAttribute(fp, length)
+    # if tag==Tag((0xfffe, 0xe00d)) or tag==Tag((0xfffe, 0xe000)) or tag==Tag((0xfffe, 0xe0dd)):
+        # fp.seek(fp.tell()-4)
+        # AbsorbDelimiterItem(fp, tag)
+        # return ReadAttribute(fp, length)
     
     # Get the value representation VR
     if fp.isImplicitVR:
@@ -225,7 +228,43 @@ def AbsorbDelimiterItem(fp, delimiter):
         return 
     length = fp.read_UL() # 4 bytes for 'length', all 0's
 
-def LengthOfUndefinedLength(fp, delimiter):
+def find_bytes(fp, bytes_to_find, read_size=128):
+    data_start = fp.tell()  
+    rewind = len(bytes_to_find)-1
+    
+    found = False
+    while not found:
+        chunk_start = fp.tell()
+        bytes = fp.read(read_size)
+        # print "pos", fp.tell()
+        if not bytes:
+            fp.seek(data_start)
+            return None
+        index = bytes.find(bytes_to_find)
+        if index != -1:
+            found = True
+        else:
+            fp.seek(fp.tell()-rewind) # rewind a bit in case delimiter crossed read_size boundary
+    # if get here then have found the byte string
+    found_at = chunk_start + index
+    fp.seek(data_start)
+    return found_at
+
+def find_delimiter(fp, delimiter, read_size=128):
+    """Return file position where 4-byte delimiter is located.
+    
+    Return None if reach end of file without finding the delimiter.
+    On return, file position will be where it was before this function.
+    
+    """
+    format = "<H"
+    if fp.isBigEndian:
+        format = ">H"
+    delimiter = Tag(delimiter)
+    bytes_to_find = pack(format, delimiter.group) + pack(format, delimiter.elem)
+    return find_bytes(fp, bytes_to_find)            
+    
+def LengthOfUndefinedLength(fp, delimiter, read_size=128):
     """Search through the file to find the delimiter, return the length of the data
     element value that the dicom file writer was too lazy to figure out for us.
     Return the file to the start of the data, ready to read it.
@@ -234,13 +273,10 @@ def LengthOfUndefinedLength(fp, delimiter):
     delimiter must be 4 bytes long"""
     chunk = 0
     data_start = fp.tell()
-    while chunk != delimiter:
-        chunk = fp.read_tag()
-        fp.seek(fp.tell()-3) # move only one byte forward
-    length = fp.tell() - data_start - 4 + 3  # subtract off the last 4 we just read but we moved back 3 at end of loop
-    fp.seek(data_start)
+    delimiter_pos = find_delimiter(fp, delimiter)
+    length = delimiter_pos - data_start
     return length
-
+    
 def ReadDelimiterItem(fp, delimiter):
     found = fp.read(4)
     if found != delimiter:

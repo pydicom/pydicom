@@ -15,7 +15,7 @@
 # GNU General Public License (license.txt) for more details 
 
 from struct import pack, calcsize
-from UIDs import ExplicitVRLittleEndian, ImplicitVRLittleEndian
+from UIDs import ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian
 from dicom.filebase import DicomFile
 from dicom.datadict import dictionaryVR
 from dicom.dataset import Dataset
@@ -170,8 +170,15 @@ def write_UN(fp, attribute):
 
 def write_ATvalue(fp, attribute):
     """Write an attribute tag to a file."""
-    tag = Tag(attribute.value)   # make sure is expressed as a Tag instance
-    fp.write_tag(tag)
+    try:
+        attribute.value[1]  # see if is multi-valued AT 
+    except TypeError:
+        tag = Tag(attribute.value)   # make sure is expressed as a Tag instance
+        fp.write_tag(tag)
+    else:
+        for tag in attribute.value:
+            fp.write_tag(tag)
+            
 
 def _WriteFileMetaInfo(fp, dataset):
     """Write the dicom group 2 dicom storage File Meta Information to the file.
@@ -237,12 +244,15 @@ def WriteFile(filename, dataset):
         preamble = "\0"*128
     fp.write(preamble)  # blank 128 byte preamble
     
-    if dataset.isLittleEndian and not dataset.isExplicitVR:
-        dataset.AddNew((2, 0x10), 'UI', ImplicitVRLittleEndian)
-    elif dataset.isLittleEndian and dataset.isExplicitVR:
-        dataset.AddNew((2, 0x10), 'UI', ExplicitVRLittleEndian)
-    else:
-        raise NotImplementedError, "pydicom has not been verified for Explict VR or big-endian file writing"
+    if 'TransferSyntaxUID' not in dataset:
+        if dataset.isLittleEndian and not dataset.isExplicitVR:
+            dataset.AddNew((2, 0x10), 'UI', ImplicitVRLittleEndian)
+        elif dataset.isLittleEndian and dataset.isExplicitVR:
+            dataset.AddNew((2, 0x10), 'UI', ExplicitVRLittleEndian)
+        elif dataset.isBigEndian and dataset.isExplicitVR:
+            dataset.AddNew((2, 0x10), 'UI', ExplicitVRBigEndian)
+        else:
+            raise NotImplementedError, "pydicom has not been verified for Big Endian with Implicit VR"
     
     _WriteFileMetaInfo(fp, dataset)
     # Set file VR, endian. MUST BE AFTER META INFO (which changes to Explict LittleEndian)
@@ -277,43 +287,6 @@ writers = {'UL':(write_numbers,'L'), 'SL':(write_numbers,'l'),
            'DT':write_String,
            'UT':write_String,
            } # note OW/OB depends on other items, which we don't know at write time
-
-def hexdump(data, StartAddress=0, StopAddress=None, showAddress=True):
-    """Return a formatted string of hex bytes and characters in data.
-    
-    This is a utility function for debugging file writing.
-    
-    data -- String of bytes to display"""
-    # set showAddress=False to use difflib.Differ() to compare sets of lines
-    from cStringIO import StringIO
-
-    def PrintCharacter(ordchr):
-        """Return a printable character, or '.' for non-printable ones."""
-        if 31 < ordchr < 126 and ordchr != 92:
-            return chr(ordchr)
-        else:
-            return '.'
-    if not StopAddress:
-        StopAddress = len(data) + 1
-    fh = StringIO()
-    byteslen = 16*3-1 # space taken up if row has a full 16 bytes
-    blanks = ' ' * byteslen
-    ptr = StartAddress
-    while ptr < len(data) and ptr < StopAddress:
-        row = [ord(x) for x in data[ptr:ptr+16]]  # need ord twice below so convert once
-        if showAddress:
-            fh.write("%04x : " % ptr)  # address at start of line
-
-        bytes = ' '.join(["%02x" % x for x in row])  # string of two digit hex bytes
-        fh.write(bytes)
-        fh.write(blanks[:byteslen-len(bytes)])  # if not 16, pad
-        fh.write('  ')
-        fh.write(''.join([PrintCharacter(x) for x in row]))  # character rep of bytes
-        fh.write("\n")
-
-        ptr += 16
-
-    return fh.getvalue()
 
 def ReplaceAttributeValue(filename, attribute, new_value):
     """Modify a dicom file attribute value 'in-place'.

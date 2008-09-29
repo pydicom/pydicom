@@ -11,10 +11,9 @@ testdir = os.path.dirname(sys.argv[0])
 
 rtplan_name = os.path.join(testdir, "rtplan.dcm")
 rtdose_name = os.path.join(testdir, "rtdose.dcm")
-ct_name     = os.path.join(testdir, "CT1_UNC.dcm")
-mr_name     = os.path.join(testdir, "MR1_UNC.dcm")
-us_name     = os.path.join(testdir, "US1_UNC.dcm")
-
+ct_name     = os.path.join(testdir, "CT_small.dcm")
+mr_name     = os.path.join(testdir, "MR_small.dcm")
+jpeg_name   = os.path.join(testdir, "JPEG2000.dcm")
 
 def isClose(a, b, epsilon=0.000001): # compare within some tolerance, to avoid machine roundoff differences
     try:
@@ -67,10 +66,10 @@ class ReaderTests(unittest.TestCase):
         imagepos = ct.ImagePositionPatient
         self.assert_(isClose(imagepos, [-158.135803, -179.035797, -75.699997]),
                 "ImagePosition(Patient) values not as expected")
-        self.assertEqual(ct.Rows, 512, "Rows not 512")
-        self.assertEqual(ct.Columns, 512, "Columns not 512")
+        self.assertEqual(ct.Rows, 128, "Rows not 128")
+        self.assertEqual(ct.Columns, 128, "Columns not 128")
         self.assertEqual(ct.BitsStored, 16, "Bits Stored not 16")
-        self.assertEqual(len(ct.PixelData), 512*512*2, "Pixel data not expected length")
+        self.assertEqual(len(ct.PixelData), 128*128*2, "Pixel data not expected length")
     def testMR(self):
         """Returns correct values for sample attributes in test MR file"""
         mr = ReadFile(mr_name)
@@ -79,12 +78,17 @@ class ReaderTests(unittest.TestCase):
         self.assertEqual(mr.PatientsName, mr[0x10,0x10].value,
                 "Name does not match value found when accessed by tag number")
         self.assert_(isClose(mr.PixelSpacing, [0.3125, 0.3125]), "Wrong pixel spacing")
-    def testUS(self):
-        """Returns correct values for sample attributes in test US file"""
-        us = ReadFile(us_name)
-        self.assertEqual(us.preamble[:3], "II*", "Preamble doesn't begin with 'II*' as expected")
-        self.assertEqual(us.NumberofStages, 1, "Number of stages not 1")
-        self.assert_(isClose(us.PatientsWeight, 0.0), "Wrong patient weight")
+    def testJPEG2000(self):
+        """Returns correct values for sample attributes in test JPEG2000 file"""
+        jpeg = ReadFile(jpeg_name)
+        expected = [Tag(0x0054, 0x0010), Tag(0x0054, 0x0020)] # XX also tests multiple-valued AT attribute
+        got = jpeg.FrameIncrementPointer
+        self.assertEqual(got, expected, "JPEG2000 file, Frame Increment Pointer: expected %s, got %s" % (expected, got))
+
+        got = jpeg.DerivationCodes[0].CodeMeaning
+        expected = 'Lossy Compression'
+        self.assertEqual(got, expected, "JPEG200 file, Code Meaning got %s, expected %s" % (got, expected))
+
         
 if __name__ == "__main__":
     unittest.main()
