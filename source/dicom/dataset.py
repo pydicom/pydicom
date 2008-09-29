@@ -208,8 +208,8 @@ class Dataset(dict):
             msg += " to use the PixelDataArray() method. Neither could be found on this system."
             raise ImportError, msg
 
-        if self.SamplesperPixel != 1:
-            raise NotImplementedError, "This code does not handle SamplesPerPixel > 1."
+#        if self.SamplesperPixel != 1:
+#            raise NotImplementedError, "This code does not handle SamplesPerPixel > 1."
 
             # determine the type used for the array
         # XXX didn't have images to test all variations. Not sure if will always work.
@@ -223,10 +223,18 @@ class Dataset(dict):
                 arr.byteswap(True)  # True = swap in-place, don't make a new copy
             # Note the following reshape operations return a new *view* onto arr, but don't copy the data
             if 'NumberofFrames' in self and self.NumberofFrames > 1:
-                arr = arr.reshape(self.NumberofFrames, self.Rows, self.Columns)
+                if self.SamplesperPixel > 1:
+                    arr = arr.reshape(self.SamplesperPixel, self.NumberofFrames, self.Rows, self.Columns)
+                else:
+                    arr = arr.reshape(self.NumberofFrames, self.Rows, self.Columns)
             else:
-                arr = arr.reshape(self.Rows, self.Columns)
-            
+                if self.SamplesperPixel > 1:
+                    if self.BitsAllocated == 8:
+                        arr = arr.reshape(self.SamplesperPixel, self.Rows, self.Columns)
+                    else:
+                        raise NotImplementedError, "This code only handles Samples Per Pixel > 1 if Bits Allocated = 8"
+                else:
+                    arr = arr.reshape(self.Rows, self.Columns)
         elif haveNumeric:
             format = self.NumericPixelFormats[self.BitsAllocated]
             arr = Numeric.fromstring(self.PixelData, format)
@@ -350,6 +358,11 @@ class Dataset(dict):
                 sequence = attribute.value
                 for dataset in sequence:
                     dataset.walk(callback)
+    def _getBigEndian(self):
+        return not self.isLittleEndian
+    def _setBigEndian(self, value):
+        self.isLittleEndian = not value
+    isBigEndian = property(_getBigEndian, _setBigEndian)
     
     
     __repr__ = __str__
