@@ -26,12 +26,12 @@ def files_identical(a, b):
     a_bytes = file(a, "rb").read()
     b_bytes = file(b, "rb").read()
     if a_bytes == b_bytes:
-        return 1, 0     # True, dummy argument
+        return True, 0     # True, dummy argument
     else:
         pos = 0
         while a_bytes[pos] == b_bytes[pos]:
             pos += 1
-        return 0, pos   # False (not identical files), position of first difference
+        return False, pos   # False (not identical files), position of first difference
 
 class WriterTests(unittest.TestCase):
     def compare(self, in_, out_):
@@ -54,9 +54,9 @@ class WriterTests(unittest.TestCase):
     def testMR(self):
         """Input file, write back and verify them identical (MR file)....."""
         self.compare(mr_name, mr_out)   
-    # def testJPEG2000(self):
-        # """Input file, write back and verify them identical (JPEG2000 file)....."""
-        # self.compare(jpeg_name, jpeg_out)   
+    def testJPEG2000(self):
+        """Input file, write back and verify them identical (JPEG2000 file)....."""
+        self.compare(jpeg_name, jpeg_out)   
         
 
 if __name__ == "__main__":

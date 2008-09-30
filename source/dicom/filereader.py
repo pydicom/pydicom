@@ -26,17 +26,11 @@ from dicom.filebase import DicomFile, DicomStringIO
 from dicom.datadict import dictionaryVR
 from dicom.dataset import Dataset
 from dicom.attribute import Attribute
-from dicom.tag import Tag
+from dicom.tag import Tag, ItemTag, ItemDelimiterTag, SequenceDelimiterTag
 from dicom.sequence import Sequence
 
 from sys import byteorder
 sys_isLittleEndian = (byteorder == 'little')
-
-# Use Boolean values if Python version has them, else make our own
-try:
-    True
-except:
-    False = 0; True = not False
 
 class MultiValue(list):
     """MutliValue is a special list, derived to overwrite the __str__ method
@@ -70,12 +64,12 @@ def read_OBvalue(fp, length):
     # logger.debug("OB start at file position 0x%x", fp.tell())
     if length == 0xffffffffL: # undefined length. PS3.6-2008 Tbl 7.1-1, then read to Sequence Delimiter Item
         isUndefinedLength = True
-        length = LengthOfUndefinedLength(fp, 0xfffee0dd)
+        length = LengthOfUndefinedLength(fp, SequenceDelimiterTag)
     data = fp.read(length)
     # logger.debug("len(data): %d; length=%d", len(data), length)
     # logger.debug("OB before absorb: 0x%x", fp.tell())
     if isUndefinedLength:
-        AbsorbDelimiterItem(fp, Tag(0xfffee0dd))
+        AbsorbDelimiterItem(fp, Tag(SequenceDelimiterTag))
     return data
 
 def read_OWvalue(fp, length):
@@ -88,7 +82,7 @@ def read_OWvalue(fp, length):
 def read_UI(fp, length):
     value = fp.read(length)
     # Strip off 0-byte padding for even length (if there)
-    if value and value[-1] == '\0':
+    if value and value.endswith('\0'):
         value = value[:-1]
     return MultiString(value)
 
@@ -96,7 +90,7 @@ def MultiString(val):
     """Split a string by delimiters if there are any"""
     # Remove trailing blank used to pad to even length
     # 2005.05.25: also check for trailing 0, error made in PET files we are converting
-    if val and (val[-1] == ' ' or val[-1] == '\x00'):
+    if val and (val.endswith(' ') or val.endswith('\x00')):
         val = val[:-1]
 
     splitup = val.split("\\")
@@ -112,7 +106,7 @@ def read_SingleString(fp, length):
     """Read a single string; the backslash used to separate values in multi-strings
     has no meaning here"""
     val = fp.read(length)
-    if val and val[-1]==' ':
+    if val and val.endswith(' '):
         val = val[:-1]
     return val
 
@@ -155,6 +149,7 @@ def ReadAttribute(fp, length=None):
     else: # Implicit VR
         length = fp.read_UL()
 
+    isUndefinedLength = (length == 0xFFFFFFFFL)
     value_tell = fp.tell() # store file location and size, for programs like anonymizers
     length_original = length
     try:
@@ -167,7 +162,8 @@ def ReadAttribute(fp, length=None):
     if tag == 0x00280103: # This flags whether pixel values are US (val=0) or SS (val = 1)
         fp.isSSpixelRep = value # XXX This is not used anywhere else in code?
     attr = Attribute(tag, VR, value, value_tell)
-    logger.debug("pos %4x: %s", attr_tell, str(attr))
+    attr.isUndefinedLength = isUndefinedLength # store this to write back attribute in same way was read
+    logger.debug("%04x: %s", attr_tell, str(attr))
     return attr
 
 def ReadDataset(fp, bytelength=None):
@@ -191,30 +187,30 @@ def ReadDataset(fp, bytelength=None):
 def ReadSequence(fp, length):
     """Return a Sequence list of Datasets"""
     seq = Sequence()
-    isUndefinedLength = False
+    seq.isUndefinedLength = False
     if length == 0xffffffffL:
-        isUndefinedLength = True
-        length = LengthOfUndefinedLength(fp, 0xfffee0dd)
+        seq.isUndefinedLength = True
+        length = LengthOfUndefinedLength(fp, SequenceDelimiterTag)
     fpStart = fp.tell()            
     while fp.tell() - fpStart < length:
         seq.append(ReadSequenceItem(fp))
-    if isUndefinedLength:
-        AbsorbDelimiterItem(fp, Tag(0xfffee0dd))
+    if seq.isUndefinedLength:
+        AbsorbDelimiterItem(fp, SequenceDelimiterTag)
     return seq
 
 def ReadSequenceItem(fp):
     tag = fp.read_tag()
-    if tag != (0xfffe, 0xe000):
-        logger.warning("Expected sequence item with tag (FFFE, E000) at file position 0x%x", fp.tell()-4)
+    if tag != ItemTag:
+        logger.warning("Expected sequence item with tag %s at file position 0x%x", (ItemTag, fp.tell()-4))
     length = fp.read_UL()
-    isUndefinedLength = 0
+    isUndefinedLength = False
     if length == 0xFFFFFFFFL:
-        isUndefinedLength = 1
-        length = LengthOfUndefinedLength(fp, 0xfffee00d)
-        # raise NotImplementedError, "This code does not handle Undefined Length sequence items"
+        isUndefinedLength = True
+        length = LengthOfUndefinedLength(fp, ItemDelimiterTag)
     ds = ReadDataset(fp, length)
+    ds.isUndefinedLengthSequenceItem = isUndefinedLength
     if isUndefinedLength:
-        AbsorbDelimiterItem(fp, Tag(0xfffee00d))
+        AbsorbDelimiterItem(fp, ItemDelimiterTag)
     return ds
 
 def AbsorbDelimiterItem(fp, delimiter):
@@ -236,7 +232,6 @@ def find_bytes(fp, bytes_to_find, read_size=128):
     while not found:
         chunk_start = fp.tell()
         bytes = fp.read(read_size)
-        # print "pos", fp.tell()
         if not bytes:
             fp.seek(data_start)
             return None

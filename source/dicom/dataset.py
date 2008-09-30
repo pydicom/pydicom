@@ -31,6 +31,7 @@ from dicom.datadict import DicomDictionary, dictionaryVR
 from dicom.datadict import TagForName, AllNamesForTag
 from dicom.tag import Tag
 from dicom.attribute import Attribute
+import dicom # for WriteFile
 
 haveNumpy = True
 haveNumeric = True
@@ -288,6 +289,14 @@ class Dataset(dict):
                 del dataset[attribute.tag]  
         self.walk(RemoveCallback)
 
+    def SaveAs(filename, WriteLikeOriginal=True):
+        """Write the dataset to a file.
+        
+        filename -- full path and filename to save the file to
+        WriteLikeOriginal -- see dicom.filewrite.WriteFile for info on this parameter.
+        """
+        dicom.WriteFile(filename, self, WriteLikeOriginal)
+    
     def __setattr__(self, name, value):
         """Intercept any attempts to set a value for an instance attribute.
         

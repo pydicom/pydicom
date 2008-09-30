@@ -72,20 +72,9 @@ class Tag(long):
         """Private tags have an odd group number"""
         return self.group % 2 == 1
     isPrivate = property(getIsPrivate)
-    
 
-if __name__ == "__main__":
-    print "Basic tests of Tag class"
-    tag = Tag(0x300a00b0)
-    print "Initialized as Tag(0x300a00b0):"
-    print tag, "group:", hex(tag.group), "element:", hex(tag.elem)
-    print
-    tag = Tag((0x300a, 0x00b0))
-    print "Initialized as Tag((0x300a, 0x00b0)):"
-    print tag, "group:", hex(tag.group), "element:", hex(tag.elem)
-    print
-    print "Comparisons:"
-    print "tag==(0x300a, 0x00b0)...:", tag==(0x300a, 0x00b0)
-    print "tag==Tag(0x300a00b0)....:", tag==Tag(0x300a00b0)
-    print "tag==0x300a00b0.........:", tag==0x300a00b0
-    
+# Define some special tags:
+# See PS 3.5-2008 section 7.5 (p.40)
+ItemTag = Tag(0xFFFE, 0xE000) # start of Sequence Item
+ItemDelimiterTag = Tag((0xFFFE, 0xE00D)) # end of Sequence Item
+SequenceDelimiterTag = Tag(0xFFFE,0xE0DD) # end of Sequence of undefined length

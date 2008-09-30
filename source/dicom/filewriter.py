@@ -15,24 +15,17 @@
 # GNU General Public License (license.txt) for more details 
 
 from struct import pack, calcsize
+
+import logging
+logger = logging.getLogger('pydicom')
+
 from UIDs import ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian
 from dicom.filebase import DicomFile
 from dicom.datadict import dictionaryVR
 from dicom.dataset import Dataset
 from dicom.attribute import Attribute
-from dicom.tag import Tag
+from dicom.tag import Tag, ItemTag, ItemDelimiterTag, SequenceDelimiterTag
 from dicom.sequence import Sequence
-
-# Use Boolean values if Python version has them, else make our own
-try:
-    True
-except:
-    False = 0; True = not False
-
-def write_VR(fp, VR):
-    """Write the two character Value Representation string"""
-    if fp.isExplicitVR:
-        fp.write(VR)
 
 def write_numbers(fp, attribute, format):
     """Write a "value" of type format from the dicom file.
@@ -105,7 +98,7 @@ def WriteAttribute(fp, attribute):
 
     VR = attribute.VR
     if fp.isExplicitVR:
-        write_VR(fp, VR)
+        fp.write(VR)
         if VR in ['OB', 'OW', 'OF', 'SQ', 'UT', 'UN']:
             fp.write_US(0)   # reserved 2 bytes
     if VR not in writers:
@@ -115,7 +108,7 @@ def WriteAttribute(fp, attribute):
     if fp.isExplicitVR and VR not in ['OB', 'OW', 'OF', 'SQ', 'UT', 'UN']:
         fp.write_US(0)  # Explicit VR length field is only 2 bytes
     else:
-        fp.write_UL(0)   # will fill in real value later.
+        fp.write_UL(0xFFFFFFFFL)   # will fill in real length value later if not undefined length item
     
     try:
         writers[VR][0] # if writer is a tuple, then need to pass a number format
@@ -124,13 +117,22 @@ def WriteAttribute(fp, attribute):
     else:
         writers[VR][0](fp, attribute, writers[VR][1])
     #  print Attribute(tag, VR, value)
+    
+    isUndefinedLength = False
+    if hasattr(attribute, "isUndefinedLength") and attribute.isUndefinedLength:
+        isUndefinedLength = True
     location = fp.tell()
     fp.seek(length_location)
     if fp.isExplicitVR and VR not in ['OB', 'OW', 'OF', 'SQ', 'UT', 'UN']:
         fp.write_US(location - length_location - 2)  # 2 is length of US
     else:
-        fp.write_UL(location - length_location - 4)  # 4 is length of UL
+        # write the proper length of the attribute back in the length slot, unless is SQ with undefined length.
+        if not isUndefinedLength:
+            fp.write_UL(location - length_location - 4)  # 4 is length of UL
     fp.seek(location)  # ready for next attribute
+    if isUndefinedLength:
+        fp.write_tag(SequenceDelimiterTag)
+        fp.write_UL(0)  # 4-byte 'length' of delimiter data item
     
 def WriteDataset(fp, dataset):
     """Write a Dataset dictionary to the file. Return the total length written."""
@@ -155,14 +157,18 @@ def WriteSequenceItem(fp, dataset):
     """Write an item (dataset) in a dicom Sequence to the dicom file fp."""
     # see Dicom standard Part 5, p. 39 ('03 version)
     # This is similar to writing an attribute, but with a specific tag for Sequence Item
-    fp.write_tag(Tag((0xfffe, 0xe000)))   # marker for Sequence Item
+    fp.write_tag(ItemTag)   # marker for start of Sequence Item
     length_location = fp.tell() # save location for later.
-    fp.write_UL(0)   # will fill in real value later.
+    fp.write_UL(0xffffffffL)   # will fill in real value later if not undefined length
     WriteDataset(fp, dataset)
-    location = fp.tell()
-    fp.seek(length_location)
-    fp.write_UL(location - length_location - 4)  # 4 is length of UL
-    fp.seek(location)  # ready for next attribute
+    if dataset.isUndefinedLengthSequenceItem:
+        fp.write_tag(ItemDelimiterTag)
+        fp.write_UL(0)  # 4-bytes 'length' field for delimiter item
+    else: # we will be nice and set the lengths for the reader of this file
+        location = fp.tell()
+        fp.seek(length_location)
+        fp.write_UL(location - length_location - 4)  # 4 is length of UL
+        fp.seek(location)  # ready for next attribute
 
 def write_UN(fp, attribute):
     """Write a byte string for an Attribute of value 'UN' (unknown)."""
@@ -224,16 +230,25 @@ def _WriteFileMetaInfo(fp, dataset):
     WriteAttribute(fp, group_length)  # write the whole attribute
     fp.seek(location)
 
-def WriteFile(filename, dataset):
+def WriteFile(filename, dataset, WriteLikeOriginal=True):
     """Store a Dataset to the filename specified.
     
     Set dataset.preamble if you want something other than 128 0-bytes.
     If the dataset was read from an existing dicom file, then its preamble
     was stored at read time. It is up to you to ensure the preamble is still
     correct for its purposes.
-    Set dataset.isExplicitVR or .isImplicitVR, and .isLittleEndian or .isBigEndian,
-    to determine the transfer syntax used to write the file.
-    
+    If there is no Transfer Syntax tag in the dataset,
+       Set dataset.isExplicitVR or .isImplicitVR, and .isLittleEndian or .isBigEndian,
+       to determine the transfer syntax used to write the file.
+    WriteLikeOriginal -- True if want to preserve the following for each sequence 
+        within this dataset:
+        - seq.isUndefinedLength -- if original had delimiters, write them now too,
+            instead of the more sensible length characters
+        - dataset.isUndefinedLengthSequenceItem -- for datasets that belong to a 
+            sequence, write the undefined length delimiters if that is 
+            what the original had
+        Set WriteLikeOriginal = False to produce a "nicer" DICOM file for other readers,
+            where all lengths are explicit.
     """
 
     # if type(fp) is type(""):
