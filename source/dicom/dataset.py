@@ -289,7 +289,7 @@ class Dataset(dict):
                 del dataset[attribute.tag]  
         self.walk(RemoveCallback)
 
-    def SaveAs(filename, WriteLikeOriginal=True):
+    def SaveAs(self, filename, WriteLikeOriginal=True):
         """Write the dataset to a file.
         
         filename -- full path and filename to save the file to
