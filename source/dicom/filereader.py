@@ -23,7 +23,7 @@ logger = logging.getLogger('pydicom')
 
 from UIDs import UID_dictionary, DeflatedExplicitVRLittleEndian, ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian
 from dicom.filebase import DicomFile, DicomStringIO
-from dicom.datadict import dictionaryVR
+from dicom.datadict import dictionaryVR, dictionaryDescription
 from dicom.dataset import Dataset
 from dicom.attribute import Attribute
 from dicom.tag import Tag, ItemTag, ItemDelimiterTag, SequenceDelimiterTag
@@ -116,13 +116,15 @@ def ReadAttribute(fp, length=None):
         tag = fp.read_tag()
     except EOFError:
         return None
-
-    # 2006.10.20 DM: if find SQ delimiter tag, ignore it. Kludge to handle XiO dicom files
-    # if tag==Tag((0xfffe, 0xe00d)) or tag==Tag((0xfffe, 0xe000)) or tag==Tag((0xfffe, 0xe0dd)):
-        # fp.seek(fp.tell()-4)
-        # AbsorbDelimiterItem(fp, tag)
-        # return ReadAttribute(fp, length)
     
+    if tag==ItemDelimiterTag or tag==SequenceDelimiterTag:
+        length = fp.read_UL()
+        if length != 0:
+            logger.warning("Expected 0x00000000 after delimiter, found 0x%x, at position 0x%x", length, fp.tell()-4)
+        attr = Attribute(tag, None, None, attr_tell)
+        logger.debug("%04x: %s", attr_tell, str(attr))
+        return attr
+        
     # Get the value representation VR
     if fp.isImplicitVR:
         try:
@@ -152,6 +154,10 @@ def ReadAttribute(fp, length=None):
     isUndefinedLength = (length == 0xFFFFFFFFL)
     value_tell = fp.tell() # store file location and size, for programs like anonymizers
     length_original = length
+    if VR == "SQ":
+        temp_attr = Attribute(tag,VR, Sequence(), attr_tell)
+        logger.debug("%04x: %s", attr_tell, temp_attr)
+        logger.debug("                         -------> SQ is using %s", ["explicit length", "Undefined Length"][isUndefinedLength])
     try:
         readers[VR][0] # if reader is a tuple, then need to pass a number format
     except TypeError:
@@ -163,7 +169,8 @@ def ReadAttribute(fp, length=None):
         fp.isSSpixelRep = value # XXX This is not used anywhere else in code?
     attr = Attribute(tag, VR, value, value_tell)
     attr.isUndefinedLength = isUndefinedLength # store this to write back attribute in same way was read
-    logger.debug("%04x: %s", attr_tell, str(attr))
+    if attr.VR != "SQ":
+        logger.debug("%04x: %s", attr_tell, str(attr))
     return attr
 
 def ReadDataset(fp, bytelength=None):
@@ -174,43 +181,60 @@ def ReadDataset(fp, bytelength=None):
     """
     ds = Dataset()
     fpStart = fp.tell()
-    while (not bytelength) or (fp.tell() - fpStart < bytelength):    # byteslength is None
+    while (not bytelength) or (fp.tell()-fpStart < bytelength):    # byteslength is None
         attribute = ReadAttribute(fp)
         if not attribute:
-           break        # a is None if end-of-file
+            break        # a is None if end-of-file
+        if attribute.tag == ItemDelimiterTag: # dataset is an item in a sequence
+            break
         # print attribute # XXX
         ds.Add(attribute)
     # XXX should test that fp.tell() exactly number of bytes expected?
     return ds
 
 
-def ReadSequence(fp, length):
+def ReadSequence(fp, bytelength):
     """Return a Sequence list of Datasets"""
     seq = Sequence()
+    if bytelength == 0:  # Sequence of length 0 is possible (PS 3.5-2008 7.5.1a (p.40)
+        return seq
     seq.isUndefinedLength = False
-    if length == 0xffffffffL:
+    if bytelength == 0xffffffffL:
         seq.isUndefinedLength = True
-        length = LengthOfUndefinedLength(fp, SequenceDelimiterTag)
+        bytelength = None
+        # length = LengthOfUndefinedLength(fp, SequenceDelimiterTag)
     fpStart = fp.tell()            
-    while fp.tell() - fpStart < length:
-        seq.append(ReadSequenceItem(fp))
-    if seq.isUndefinedLength:
-        AbsorbDelimiterItem(fp, SequenceDelimiterTag)
+    while (not bytelength) or (fp.tell()-fpStart < bytelength):
+        dataset = ReadSequenceItem(fp)
+        if not dataset:  # None is returned if get to Sequence Delimiter
+            break
+        seq.append(dataset)
+    # if seq.isUndefinedLength:
+        # AbsorbDelimiterItem(fp, SequenceDelimiterTag)
     return seq
 
 def ReadSequenceItem(fp):
     tag = fp.read_tag()
+    if tag == SequenceDelimiterTag: # No more items, time for sequence to stop reading
+        attr = Attribute(tag, None, None, fp.tell()-4)
+        logger.debug("%04x: %s", fp.tell()-4, str(attr))
+        length = fp.read_UL()
+        if length != 0:
+            logger.warning("Expected 0x00000000 after delimiter, found 0x%x, at position 0x%x", length, fp.tell()-4)
+        return None
     if tag != ItemTag:
         logger.warning("Expected sequence item with tag %s at file position 0x%x", (ItemTag, fp.tell()-4))
+    else:
+        logger.debug("%04x: Found Item tag (start of item)", fp.tell()-4)
     length = fp.read_UL()
     isUndefinedLength = False
     if length == 0xFFFFFFFFL:
         isUndefinedLength = True
-        length = LengthOfUndefinedLength(fp, ItemDelimiterTag)
+        length = None # LengthOfUndefinedLength(fp, ItemDelimiterTag)
     ds = ReadDataset(fp, length)
     ds.isUndefinedLengthSequenceItem = isUndefinedLength
-    if isUndefinedLength:
-        AbsorbDelimiterItem(fp, ItemDelimiterTag)
+    # if isUndefinedLength:
+        # AbsorbDelimiterItem(fp, ItemDelimiterTag)
     return ds
 
 def AbsorbDelimiterItem(fp, delimiter):
@@ -219,10 +243,15 @@ def AbsorbDelimiterItem(fp, delimiter):
     # added 2006.10.20 DM: problem with XiO plan file not having SQ delimiters
     # Catch the missing delimiter exception and ignore the missing delimiter
     if tag != delimiter:
-        logger.warn("Did not find expected delimiter %x, instead found %s at file position 0x%x", delimiter, str(tag), fp.tell()-4)    
+        logger.warn("Did not find expected delimiter '%s', instead found %s at file position 0x%x", dictionaryDescription(delimiter), str(tag), fp.tell()-4)    
         fp.seek(fp.tell()-4)
         return 
+    logger.debug("%04x: Found Delimiter '%s'", fp.tell()-4, dictionaryDescription(delimiter))
     length = fp.read_UL() # 4 bytes for 'length', all 0's
+    if length == 0:
+        logger.debug("%04x: Read 0 bytes after delimiter", fp.tell()-4)
+    else:
+        logger.debug("%04x: Expected 0x00000000 after delimiter, found 0x%x", fp.tell()-4, length)
 
 def find_bytes(fp, bytes_to_find, read_size=128):
     data_start = fp.tell()  
@@ -327,17 +356,24 @@ def ReadFileMetaInfo(filename):
 def ReadImageFile(fp):
     raise NotImplementedError
 
-def ReadFile(fp, has_header=True):
+def ReadFile(fp):
     """Return a Dataset containing the contents of the Dicom file
     
     fp is either a DicomFile object, or a string containing the file name.
     
-    has_header -- a non-compliant file might skip the 128-byte preamble and 
-    group 2 information. Set this False to not try to read these."""
-
+    """
     if type(fp) is type(""):
         fp = DicomFile(fp,'rb')
         logger.info("Reading file '%s'" % fp)
+    
+    fp.seek(0x80)
+    magic = fp.read(4)
+    has_header = True
+    if magic != "DICM":
+        logger.info("File is not a standard DICOM file; 'DICM' header is missing. Call ReadFile with has_header=False")
+        has_header = False
+    fp.seek(0)
+    
     if has_header:
         logger.debug("Reading preamble")
         preamble = fp.read(0x80)
@@ -373,6 +409,8 @@ def ReadFile(fp, has_header=True):
     logger.debug("Using %s VR, %s Endian transfer syntax" %(("Explicit", "Implicit")[fp.isImplicitVR], ("Big", "Little")[fp.isLittleEndian]))
     # Return the rest of the file, including what we have already read
     ds = ReadDataset(fp)
+    fp.close()
+    
     if has_header:
         ds.update(FileMetaInfo) # put in tags from FileMetaInfo
         # Find the names added to the FileMetaInfo Dataset instance...
@@ -383,9 +421,11 @@ def ReadFile(fp, has_header=True):
             ds.__dict__[namedMember] = FileMetaInfo.__dict__[namedMember]
     ds.isLittleEndian = fp.isLittleEndian
     ds.isExplicitVR = fp.isExplicitVR
+    ds.preamble = None
     if has_header:
         ds.preamble = preamble  # save so can write same preamble if re-write file
-    fp.close()
+    ds.has_header = has_header
+    
     return ds
         
 # readers map a VR to the function to read the value(s)

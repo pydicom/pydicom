@@ -242,22 +242,30 @@ def WriteFile(filename, dataset, WriteLikeOriginal=True):
        to determine the transfer syntax used to write the file.
     WriteLikeOriginal -- True if want to preserve the following for each sequence 
         within this dataset:
+        - preamble -- if no preamble in read file, than not used here
+        - dataset.hasFileMeta -- if writer did not do file meta information,
+            then don't write here either
         - seq.isUndefinedLength -- if original had delimiters, write them now too,
             instead of the more sensible length characters
-        - dataset.isUndefinedLengthSequenceItem -- for datasets that belong to a 
+        - <dataset>.isUndefinedLengthSequenceItem -- for datasets that belong to a 
             sequence, write the undefined length delimiters if that is 
             what the original had
         Set WriteLikeOriginal = False to produce a "nicer" DICOM file for other readers,
             where all lengths are explicit.
     """
 
-    # if type(fp) is type(""):
     fp = DicomFile(filename,'wb')
-    if hasattr(dataset, 'preamble'): # if read from another file, preamble was saved
-        preamble = dataset.preamble  #   or calling code could create it
-    else:   # preamble set to all 0's
+    
+    # Decide whether to write DICOM preamble. Should always do so unless trying to mimic the original file read in
+    if not dataset.preamble and not WriteLikeOriginal:
         preamble = "\0"*128
-    fp.write(preamble)  # blank 128 byte preamble
+    else:
+        preamble = dataset.preamble
+    
+    if preamble:
+        fp.write(preamble)  # blank 128 byte preamble
+    
+    
     
     if 'TransferSyntaxUID' not in dataset:
         if dataset.isLittleEndian and not dataset.isExplicitVR:
@@ -269,7 +277,8 @@ def WriteFile(filename, dataset, WriteLikeOriginal=True):
         else:
             raise NotImplementedError, "pydicom has not been verified for Big Endian with Implicit VR"
     
-    _WriteFileMetaInfo(fp, dataset)
+    if preamble:
+        _WriteFileMetaInfo(fp, dataset)
     # Set file VR, endian. MUST BE AFTER META INFO (which changes to Explict LittleEndian)
     fp.isImplicitVR = not dataset.isExplicitVR
     fp.isLittleEndian = dataset.isLittleEndian
