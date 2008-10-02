@@ -1,23 +1,33 @@
-README for test files:
-April 2004
+Sample images used for testing pydicom and their origins. 
+---------------------------------------------------------
+I obtained images to test the pydicom code, and revised them as follow:
+  * images were often downsized to keep the total file size quite small (typically <50K-ish). I wanted unittests for the code where I could run a number of tests quickly, and with files I could include in the source (and binary) distributions without bloating them too much
+  * In some cases, the original files have been binary edited to replace anything that looks like a real patient name
+  
+I believe there is no restriction on using any of these files in this manner.
 
-Some of the test code uses publicly available dicom files. The origin of these is:
+CT_small.dcm      
+  * CT image, Explicit VR, LittleEndian     
+  * Downsized to 128x128 from 'CT1_UNC', ftp://medical.nema.org/MEDICAL/Dicom/DataSets/WG04/
 
-From ftp://medical.nema.org/MEDICAL/Dicom/DataSets/WG04/compsamples_refanddir.tar.bz2,
-CT1_UNC.dcm    Explicit VR, Little Endian
-MR1_UNC.dcm    Explicit VR, Little Endian
-US1_UNC.dcm    Explicit VR, Little Endian
+MR_small.dcm
+  * MR image, Explicit VR, LittleEndian     
+  * Downsized to 64x64 from 'MR1_UNC', ftp://medical.nema.org/MEDICAL/Dicom/DataSets/WG04/
+
+JPEG2000.dcm      
+  * JPEG 2000 small image
+  * to test JPEG transfer syntax, eventually JPEG decompression
+  * Edited 'NM1_J2KI' from ftp://medical.nema.org/MEDICAL/Dicom/DataSets/WG04
+  
+image_dfl.dcm       
+  * Compressed (using "deflate" zlib compression) after FileMeta
+  * 'image_dfl' from http://www.dclunie.com/images/compressed/
+  
+ExplVR_BigEnd.dcm 
+  * Big Endian test image
+  * Also is Samples Per Pixel of 3 (RGB)
+  * Downsized to 60x80 from 'US-RGB-8-epicard' at http://www.barre.nom.fr/medical/samples/ 
 
 Created by a commercial radiotherapy treatment planning system and modified:
-plan.dcm       Implicit VR, Little Endian
-dose.dcm       Implicit VR, Little Endian
-
-For testing deflated transfer syntax, from http://www.dclunie.com/images/compressed/:
-report
-report_defl
-
-I couldn't find any public BigEndian files, so BigEndian is untested at present.
-
-If you find files which pydicom cannot read properly, please send them so I can add them
-to the test suite. (Please send only files which can be released publicly).
-
+rtplan.dcm       Implicit VR, Little Endian
+rtdose.dcm       Implicit VR, Little Endian

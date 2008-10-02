@@ -14,6 +14,7 @@ rtdose_name = os.path.join(testdir, "rtdose.dcm")
 ct_name     = os.path.join(testdir, "CT_small.dcm")
 mr_name     = os.path.join(testdir, "MR_small.dcm")
 jpeg_name   = os.path.join(testdir, "JPEG2000.dcm")
+deflate_name = os.path.join(testdir, "image_dfl.dcm")
 
 def isClose(a, b, epsilon=0.000001): # compare within some tolerance, to avoid machine roundoff differences
     try:
@@ -88,7 +89,13 @@ class ReaderTests(unittest.TestCase):
         got = jpeg.DerivationCodes[0].CodeMeaning
         expected = 'Lossy Compression'
         self.assertEqual(got, expected, "JPEG200 file, Code Meaning got %s, expected %s" % (got, expected))
-
+    def testDeflate(self):
+        """Can read a DICOM file which uses 'deflate' (zlib) compression"""
+        # Everything after group 2 is compressed. If we can read anything else, the decompression must have been ok.
+        ds = ReadFile(deflate_name)
+        got = ds.ConversionType
+        expected = "WSD"
+        self.assertEqual(got, expected, "Attempted to read attribute Conversion Type, expected '%s', got '%s'" % (expected, got))
         
 if __name__ == "__main__":
     unittest.main()

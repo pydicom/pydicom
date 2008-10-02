@@ -57,7 +57,7 @@ class WriterTests(unittest.TestCase):
     def testJPEG2000(self):
         """Input file, write back and verify them identical (JPEG2000 file)....."""
         self.compare(jpeg_name, jpeg_out)   
-        
+  
 
 if __name__ == "__main__":
     unittest.main()
