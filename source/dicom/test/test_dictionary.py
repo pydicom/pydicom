@@ -1,6 +1,17 @@
 # test_dictionary.py
 """Test suite for dicom_dictionary.py"""
-
+# Copyright 2008, Darcy Mason
+# This file is part of pydicom.
+#
+# pydicom is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# pydicom is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License (license.txt) for more details
 
 import unittest
 from dicom.tag import Tag

@@ -1,21 +1,31 @@
 # test_filewriter.py
 """unittest cases for dicom.filewriter module"""
+# Copyright 2008, Darcy Mason
+# This file is part of pydicom.
+#
+# pydicom is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# pydicom is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License (license.txt) for more details
 
+import sys
 import os.path
 import os
-import sys
 import unittest
 from dicom.filereader import ReadFile
 from dicom.filewriter import WriteFile
 from dicom.tag import Tag
 
-testdir = os.path.dirname(sys.argv[0])
-
-rtplan_name = os.path.join(testdir, "rtplan.dcm")
-rtdose_name = os.path.join(testdir, "rtdose.dcm")
-ct_name     = os.path.join(testdir, "CT_small.dcm")
-mr_name     = os.path.join(testdir, "MR_small.dcm")
-jpeg_name   = os.path.join(testdir, "JPEG2000.dcm")
+rtplan_name = "rtplan.dcm"
+rtdose_name = "rtdose.dcm"
+ct_name     = "CT_small.dcm"
+mr_name     = "MR_small.dcm"
+jpeg_name   = "JPEG2000.dcm"
 
 # Set up replan_out, rtdose_out etc filenames as above, with '2' appended
 for inname in ['rtplan', 'rtdose', 'ct', 'mr', 'jpeg']:
@@ -55,9 +65,16 @@ class WriterTests(unittest.TestCase):
         """Input file, write back and verify them identical (MR file)....."""
         self.compare(mr_name, mr_out)   
     def testJPEG2000(self):
-        """Input file, write back and verify them identical (JPEG2000 file)....."""
+        """Input file, write back and verify them identical (JPEG2K file)."""
         self.compare(jpeg_name, jpeg_out)   
   
 
 if __name__ == "__main__":
+    # This is called if run alone, but not if loaded through run_tests.py
+    # If not run from the directory where the sample images are, then need to switch there
+    dir_name = os.path.dirname(sys.argv[0])
+    save_dir = os.getcwd()
+    if dir_name:
+        os.chdir(dir_name)
     unittest.main()
+    os.chdir(save_dir)
