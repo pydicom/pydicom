@@ -12,7 +12,7 @@ Dataset(derived class of Python's dict class)
    
 """
 #
-# Copyright 2004, Darcy Mason
+# Copyright 2008, Darcy Mason
 # This file is part of pydicom.
 #
 # pydicom is free software; you can redistribute it and/or modify

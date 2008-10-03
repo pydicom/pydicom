@@ -1,20 +1,33 @@
 # test_filereader.py
 """unittest tests for dicom.filereader module"""
+# Copyright 2008, Darcy Mason
+# This file is part of pydicom.
+#
+# pydicom is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# pydicom is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License (license.txt) for more details
 
-import os.path
 import sys
+import os
+import os.path
 import unittest
 from dicom.filereader import ReadFile
 from dicom.tag import Tag
 
-testdir = os.path.dirname(sys.argv[0])
-
-rtplan_name = os.path.join(testdir, "rtplan.dcm")
-rtdose_name = os.path.join(testdir, "rtdose.dcm")
-ct_name     = os.path.join(testdir, "CT_small.dcm")
-mr_name     = os.path.join(testdir, "MR_small.dcm")
-jpeg_name   = os.path.join(testdir, "JPEG2000.dcm")
-deflate_name = os.path.join(testdir, "image_dfl.dcm")
+rtplan_name = "rtplan.dcm"
+rtdose_name = "rtdose.dcm"
+ct_name     = "CT_small.dcm"
+mr_name     = "MR_small.dcm"
+jpeg_name   = "JPEG2000.dcm"
+deflate_name = "image_dfl.dcm"
+dir_name = os.path.dirname(sys.argv[0])
+save_dir = os.getcwd()
 
 def isClose(a, b, epsilon=0.000001): # compare within some tolerance, to avoid machine roundoff differences
     try:
@@ -22,10 +35,12 @@ def isClose(a, b, epsilon=0.000001): # compare within some tolerance, to avoid m
     except: # (is not)
         return abs(a-b) < epsilon
     else:
-        if len(a) != len(b): return 0
+        if len(a) != len(b): 
+            return False
         for ai, bi in zip(a, b):
-            if abs(ai-bi) > epsilon: return 0
-        return 1
+            if abs(ai-bi) > epsilon: 
+                return False
+        return True
 
 class ReaderTests(unittest.TestCase):
     def testRTPlan(self):
@@ -90,12 +105,19 @@ class ReaderTests(unittest.TestCase):
         expected = 'Lossy Compression'
         self.assertEqual(got, expected, "JPEG200 file, Code Meaning got %s, expected %s" % (got, expected))
     def testDeflate(self):
-        """Can read a DICOM file which uses 'deflate' (zlib) compression"""
+        """Returns correct values for sample attributes in test compressed (zlib deflate) file"""
         # Everything after group 2 is compressed. If we can read anything else, the decompression must have been ok.
         ds = ReadFile(deflate_name)
         got = ds.ConversionType
         expected = "WSD"
-        self.assertEqual(got, expected, "Attempted to read attribute Conversion Type, expected '%s', got '%s'" % (expected, got))
+        self.assertEqual(got, expected, "Attempted to read deflated file attribute Conversion Type, expected '%s', got '%s'" % (expected, got))
         
 if __name__ == "__main__":
+    # This is called if run alone, but not if loaded through run_tests.py
+    # If not run from the directory where the sample images are, then need to switch there
+    dir_name = os.path.dirname(sys.argv[0])
+    save_dir = os.getcwd()
+    if dir_name:
+        os.chdir(dir_name)
     unittest.main()
+    os.chdir(save_dir)
