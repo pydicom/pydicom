@@ -7,7 +7,7 @@ import os.path
 import sys
 
 setup(name="pydicom",
-      version="0.91",
+      version="0.9.1",
       description="Read, display, modify, write Dicom files",
       author="Darcy Mason",
       author_email="darcymason@gmail.com",
