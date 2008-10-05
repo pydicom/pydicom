@@ -49,7 +49,7 @@ def read_VR(fp):
 def read_numbers(fp, length, format):
     """Read a "value" of type format from the dicom file. "Value" can be more than one number"""
     endianChar = '><'[fp.isLittleEndian]
-    bytes_per_value = calcsize(format)
+    bytes_per_value = calcsize("="+format) # "=" means use 'standard' size, needed on 64-bit systems.
     data = fp.read(length)
 
     format_string = "%c%u%c" % (endianChar, length/bytes_per_value, format) 

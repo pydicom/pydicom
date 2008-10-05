@@ -14,7 +14,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License (license.txt) for more details 
 
-from struct import pack, calcsize
+from struct import pack
 
 import logging
 logger = logging.getLogger('pydicom')
