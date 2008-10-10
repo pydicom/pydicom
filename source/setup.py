@@ -13,7 +13,7 @@ setup(name="pydicom",
       author_email="darcymason@gmail.com",
       url="http://pydicom.googlecode.com",
       packages=['dicom'],
-	  package_data={'dicom': ['examples/*', 'test/*']},
+	  package_data={'dicom': ['examples/*', 'test/*', 'util/*']},
       license = "Gnu General Public License"
      )
 

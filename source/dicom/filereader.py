@@ -240,8 +240,6 @@ def ReadSequenceItem(fp):
 def AbsorbDelimiterItem(fp, delimiter):
     """Used to read (and ignore) undefined length sequence or item terminators."""
     tag = fp.read_tag()
-    # added 2006.10.20 DM: problem with XiO plan file not having SQ delimiters
-    # Catch the missing delimiter exception and ignore the missing delimiter
     if tag != delimiter:
         logger.warn("Did not find expected delimiter '%s', instead found %s at file position 0x%x", dictionaryDescription(delimiter), str(tag), fp.tell()-4)    
         fp.seek(fp.tell()-4)
@@ -370,7 +368,7 @@ def ReadFile(fp):
     magic = fp.read(4)
     has_header = True
     if magic != "DICM":
-        logger.info("File is not a standard DICOM file; 'DICM' header is missing. Call ReadFile with has_header=False")
+        logger.info("File is not a standard DICOM file; 'DICM' header is missing. Assuming no header and continuing")
         has_header = False
     fp.seek(0)
     
