@@ -3,3 +3,4 @@ include MANIFEST.in
 recursive-include dicom/examples *.txt *.py
 recursive-include dicom/doc *
 recursive-include dicom/test *.dcm *.py *.txt
+recursive-include dicom/util *.dcm *.py *.txt

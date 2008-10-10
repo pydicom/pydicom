@@ -35,10 +35,7 @@ import dicom # for WriteFile
 
 haveNumpy = True
 haveNumeric = True
-try:
-    import Numeric
-except:
-    haveNumeric = False
+
 try:
     import numpy
 except:
@@ -61,16 +58,15 @@ class Dataset(dict):
     ----------
     indentChars -- for string display, the characters used to indent for
             nested attributes (e.g. sequence items). Default is '   '.
-    pixelFormats -- if Numeric module is available, map bits allocated
-            to the Numeric typecode.
+    
+    NumpyPixelFormats -- if NumPy module is available, map bits allocated
+            to the NumPy typecode.
     """
     indentChars = "   "
-    # In the following, the dictionary key is the number of BitsAllocated for image data
-    if haveNumeric:
-        NumericPixelFormats = {8: Numeric.UnsignedInt8, 16:Numeric.Int16, 32:Numeric.Int32}
+    # Map image_dataset.BitsAllocated to NumPy typecode
     if haveNumpy:
         NumpyPixelFormats = {8: numpy.uint8, 16:numpy.int16, 32:numpy.int32}
-        
+                
     def Add(self, attribute):
         """Equivalent to dataset[attribute.tag] = attribute."""
         self[attribute.tag] = attribute
@@ -188,35 +184,29 @@ class Dataset(dict):
             return 0
         else:
             return 1
-    def PixelDataArray(self):
-        """Return a NumPy or Numeric array of the pixel data.
+            
+    def _PixelDataNumpy(self):
+        """Return a NumPy array of the pixel data.
         
         NumPy is the most recent numerical package for python. It is used if available.
-        If not, and Numeric is available, that is used.
-        
-        Return a NumPy 2 or 3-D array object, or Numeric 2 or 3-D array object if NumPy unavailable.
         
         Raise TypeError if no pixel data in this dataset.
-        Raise ImportError if cannot import numpy or Numeric.
-        Raise NotImplementedError if SamplesPerPixel > 1. (not sure what to do with this).
+        Raise ImportError if cannot import numpy.
         
         """
         if not 'PixelData' in self:
             raise TypeError, "No pixel data found in this dataset."
 
-        if not haveNumeric and not haveNumpy:
-            msg = "Either the Numpy package or Numeric package (http://sf/net/projects/numpy) is required\n"
-            msg += " to use the PixelDataArray() method. Neither could be found on this system."
+        if not haveNumpy:
+            msg = "The Numpy package is required to use PixelArray and numpy could not be imported.\n"
             raise ImportError, msg
 
-#        if self.SamplesperPixel != 1:
-#            raise NotImplementedError, "This code does not handle SamplesPerPixel > 1."
-
-            # determine the type used for the array
-        # XXX didn't have images to test all variations. Not sure if will always work.
+        # determine the type used for the array
         need_byteswap = (self.isLittleEndian != sys_isLittleEndian)
 
         if haveNumpy:
+            if self.BitsAllocated not in self.NumpyPixelFormats:
+                raise NotImplementedError, "Do not have NumPy dtype for BitsAllocated=%d, please update Dataset.NumpyPixelFormats" % self.BitsAllocated
             format = self.NumpyPixelFormats[self.BitsAllocated]
             arr = numpy.fromstring(self.PixelData, format)
             # XXX byte swap - may later handle this in ReadFile!!?
@@ -233,25 +223,26 @@ class Dataset(dict):
                     if self.BitsAllocated == 8:
                         arr = arr.reshape(self.SamplesperPixel, self.Rows, self.Columns)
                     else:
-                        raise NotImplementedError, "This code only handles Samples Per Pixel > 1 if Bits Allocated = 8"
+                        raise NotImplementedError, "This code only handles SamplesPerPixel > 1 if Bits Allocated = 8"
                 else:
                     arr = arr.reshape(self.Rows, self.Columns)
-        elif haveNumeric:
-            format = self.NumericPixelFormats[self.BitsAllocated]
-            arr = Numeric.fromstring(self.PixelData, format)
-        
-            # XXX byte swap - may later handle this in ReadFile!!?
-            if need_byteswap:
-                arr = arr.byteswapped()
-            if 'NumberofFrames' in self and self.NumberofFrames > 1:
-                arr = Numeric.reshape(arr,(self.NumberofFrames, self.Rows, self.Columns))
-            else:
-                arr = Numeric.reshape(arr, (self.Rows, self.Columns))
         return arr
-
+    def getPixelArray(self):
+        # Check if already have converted to a NumPy array
+        # Also check if self.PixelData has changed. If so, get new NumPy array
+        alreadyHave = True
+        if not hasattr(self, "_PixelArray"):
+            alreadyHave = False
+        elif self._pixel_id != id(self.PixelData):
+            alreadyHave = False
+        if not alreadyHave:    
+            self._PixelArray = self._PixelDataNumpy()
+            self._pixel_id = id(self.PixelData) # is this guaranteed to work if memory is re-used??
+        return self._PixelArray
+    PixelArray = property(getPixelArray)
+    
     def top(self):
         """Show the DICOM tags, but only the top level; do not recurse into Sequences"""
-        
         return self._PrettyStr(topLevelOnly=True)
         
     def _PrettyStr(self, indent=0, topLevelOnly=False):
@@ -259,7 +250,7 @@ class Dataset(dict):
         
         This private method is called by the __str__() method 
         for handling print statements or str(dataset), and the __repr__() method.
-        It is also used by top, which is the reason for the topLevelOnly flag.
+        It is also used by top(), which is the reason for the topLevelOnly flag.
         This function recurses, with increasing indentation levels.
         
         """

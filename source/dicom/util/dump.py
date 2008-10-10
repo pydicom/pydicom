@@ -57,8 +57,12 @@ def hexdump(file_in, StartAddress=0, StopAddress=None, showAddress=True):
 if __name__ == "__main__":
     import sys
     filename = sys.argv[1]
+    StartAddress = 0
     StopAddress = None
-    if len(sys.argv) > 2:  # then have stop address
-        StopAddress = eval(sys.argv[2])
-    print filedump(filename, 0, StopAddress)
+    if len(sys.argv) > 2:  # then have start address
+        StartAddress = eval(sys.argv[2])
+    if len(sys.argv) > 3:
+        StopAddress = eval(sys.argv[3])
+        
+    print filedump(filename, StartAddress, StopAddress)
     
