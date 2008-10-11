@@ -176,6 +176,14 @@ class Dataset(dict):
     def has_key(self, key):
         """Extend dict.has_key() to handle *named tags*."""
         return self.__contains__(key)
+    
+    # isBigEndian property
+    def _getBigEndian(self):
+        return not self.isLittleEndian
+    def _setBigEndian(self, value):
+        self.isLittleEndian = not value
+    isBigEndian = property(_getBigEndian, _setBigEndian)
+    
     def _isString(self, name):
         """Return True if name is a string."""
         try:
@@ -227,7 +235,16 @@ class Dataset(dict):
                 else:
                     arr = arr.reshape(self.Rows, self.Columns)
         return arr
+    
+    # PixelArray property
     def getPixelArray(self):
+        if self.TransferSyntaxUID not in ['1.2.840.10008.1.2',        
+        # Check if pixel data is in a form we know how to make into an array
+                                          '1.2.840.10008.1.2.1',
+                                          '1.2.840.10008.1.2.1.99',
+                                          '1.2.840.10008.1.2.2']: 
+            raise NotImplementedError, "Pixel Data is compressed in a format pydicom does not yet handle. Cannot return array"
+
         # Check if already have converted to a NumPy array
         # Also check if self.PixelData has changed. If so, get new NumPy array
         alreadyHave = True
@@ -358,11 +375,7 @@ class Dataset(dict):
                 sequence = attribute.value
                 for dataset in sequence:
                     dataset.walk(callback)
-    def _getBigEndian(self):
-        return not self.isLittleEndian
-    def _setBigEndian(self, value):
-        self.isLittleEndian = not value
-    isBigEndian = property(_getBigEndian, _setBigEndian)
+
     
     
     __repr__ = __str__
