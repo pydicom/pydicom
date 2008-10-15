@@ -24,7 +24,9 @@ rtplan_name = "rtplan.dcm"
 rtdose_name = "rtdose.dcm"
 ct_name     = "CT_small.dcm"
 mr_name     = "MR_small.dcm"
-jpeg_name   = "JPEG2000.dcm"
+jpeg2000_name   = "JPEG2000.dcm"
+jpeg_lossy_name   = "JPEG-lossy.dcm"
+jpeg_lossless_name   = "JPEG-LL.dcm"
 deflate_name = "image_dfl.dcm"
 dir_name = os.path.dirname(sys.argv[0])
 save_dir = os.getcwd()
@@ -94,16 +96,6 @@ class ReaderTests(unittest.TestCase):
         self.assertEqual(mr.PatientsName, mr[0x10,0x10].value,
                 "Name does not match value found when accessed by tag number")
         self.assert_(isClose(mr.PixelSpacing, [0.3125, 0.3125]), "Wrong pixel spacing")
-    def testJPEG2000(self):
-        """Returns correct values for sample attributes in test JPEG2000 file"""
-        jpeg = ReadFile(jpeg_name)
-        expected = [Tag(0x0054, 0x0010), Tag(0x0054, 0x0020)] # XX also tests multiple-valued AT attribute
-        got = jpeg.FrameIncrementPointer
-        self.assertEqual(got, expected, "JPEG2000 file, Frame Increment Pointer: expected %s, got %s" % (expected, got))
-
-        got = jpeg.DerivationCodes[0].CodeMeaning
-        expected = 'Lossy Compression'
-        self.assertEqual(got, expected, "JPEG200 file, Code Meaning got %s, expected %s" % (got, expected))
     def testDeflate(self):
         """Returns correct values for sample attributes in test compressed (zlib deflate) file"""
         # Everything after group 2 is compressed. If we can read anything else, the decompression must have been ok.
@@ -111,7 +103,47 @@ class ReaderTests(unittest.TestCase):
         got = ds.ConversionType
         expected = "WSD"
         self.assertEqual(got, expected, "Attempted to read deflated file attribute Conversion Type, expected '%s', got '%s'" % (expected, got))
+
+class JPEG2000Tests(unittest.TestCase):
+    def setUp(self):
+        self.jpeg = ReadFile(jpeg2000_name)
+    def testJPEG2000(self):
+        """JPEG2000: Returns correct values for sample attributes..........."""
+        expected = [Tag(0x0054, 0x0010), Tag(0x0054, 0x0020)] # XX also tests multiple-valued AT attribute
+        got = self.jpeg.FrameIncrementPointer
+        self.assertEqual(got, expected, "JPEG2000 file, Frame Increment Pointer: expected %s, got %s" % (expected, got))
+
+        got = self.jpeg.DerivationCodes[0].CodeMeaning
+        expected = 'Lossy Compression'
+        self.assertEqual(got, expected, "JPEG200 file, Code Meaning got %s, expected %s" % (got, expected))
+    def testJPEG2000PixelArray(self):
+        """JPEG2000: Fails gracefully when uncompressed data is asked for..."""
+        self.assertRaises(NotImplementedError, self.jpeg._getPixelArray)
+    
+class JPEGlossyTests(unittest.TestCase):
+    def setUp(self):
+        self.jpeg = ReadFile(jpeg_lossy_name)
+    def testJPEGlossy(self):
+        """JPEG-lossy: Returns correct values for sample attributes........."""
+        got = self.jpeg.DerivationCodes[0].CodeMeaning
+        expected = 'Lossy Compression'
+        self.assertEqual(got, expected, "JPEG-lossy file, Code Meaning got %s, expected %s" % (got, expected))
+    def testJPEGlossyPixelArray(self):
+        """JPEG-lossy: Fails gracefully when uncompressed data is asked for."""
+        self.assertRaises(NotImplementedError, self.jpeg._getPixelArray)
         
+class JPEGlosslessTests(unittest.TestCase):
+    def setUp(self):
+        self.jpeg = ReadFile(jpeg_lossless_name)
+    def testJPEGlossless(self):
+        """JPEGlossless: Returns correct values for sample attributes..........."""
+        got = self.jpeg.SourceImages[0].PurposeofReferenceCodes[0].CodeMeaning
+        expected = 'Uncompressed predecessor'
+        self.assertEqual(got, expected, "JPEG-lossless file, Code Meaning got %s, expected %s" % (got, expected))
+    def testJPEGlosslessPixelArray(self):
+        """JPEGlossless: Fails gracefully when uncompressed data is asked for..."""
+        self.assertRaises(NotImplementedError, self.jpeg._getPixelArray)        
+
 if __name__ == "__main__":
     # This is called if run alone, but not if loaded through run_tests.py
     # If not run from the directory where the sample images are, then need to switch there

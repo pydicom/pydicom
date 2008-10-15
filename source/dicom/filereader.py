@@ -75,9 +75,18 @@ def read_OBvalue(fp, length):
 def read_OWvalue(fp, length):
     # NO!:  """Return an "Other word" attribute as a tuple of short integers,
     #         with the proper byte swapping done"""
-
     # XXX for now just return the raw bytes and let the caller decide what to do with them
-    return fp.read(length)
+    isUndefinedLength = False
+    # logger.debug("OB start at file position 0x%x", fp.tell())
+    if length == 0xffffffffL: # undefined length. PS3.6-2008 Tbl 7.1-1, then read to Sequence Delimiter Item
+        isUndefinedLength = True
+        length = LengthOfUndefinedLength(fp, SequenceDelimiterTag)
+    data = fp.read(length)
+    # logger.debug("len(data): %d; length=%d", len(data), length)
+    # logger.debug("OB before absorb: 0x%x", fp.tell())
+    if isUndefinedLength:
+        AbsorbDelimiterItem(fp, Tag(SequenceDelimiterTag))
+    return data
 
 def read_UI(fp, length):
     value = fp.read(length)

@@ -237,7 +237,7 @@ class Dataset(dict):
         return arr
     
     # PixelArray property
-    def getPixelArray(self):
+    def _getPixelArray(self):
         if self.TransferSyntaxUID not in ['1.2.840.10008.1.2',        
         # Check if pixel data is in a form we know how to make into an array
                                           '1.2.840.10008.1.2.1',
@@ -256,7 +256,7 @@ class Dataset(dict):
             self._PixelArray = self._PixelDataNumpy()
             self._pixel_id = id(self.PixelData) # is this guaranteed to work if memory is re-used??
         return self._PixelArray
-    PixelArray = property(getPixelArray)
+    PixelArray = property(_getPixelArray)
     
     def top(self):
         """Show the DICOM tags, but only the top level; do not recurse into Sequences"""
