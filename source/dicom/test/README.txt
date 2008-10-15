@@ -27,6 +27,14 @@ ExplVR_BigEnd.dcm
   * Big Endian test image
   * Also is Samples Per Pixel of 3 (RGB)
   * Downsized to 60x80 from 'US-RGB-8-epicard' at http://www.barre.nom.fr/medical/samples/ 
+  
+JPEG-LL.dcm
+  * NM1_JPLL from ftp://medical.nema.org/MEDICAL/Dicom/DataSets/WG04/
+  * Transfer Syntax 1.2.840.10008.1.2.4.70:  JPEG Lossless Default Process 14 [Selection Value 1]
+  
+JPEG-lossy.dcm
+  * NM1_JPLY from ftp://medical.nema.org/MEDICAL/Dicom/DataSets/WG04/
+  * 1.2.840.10008.1.2.4.51 Default Transfer Syntax for Lossy JPEG 12-bit
 
 Created by a commercial radiotherapy treatment planning system and modified:
 rtplan.dcm       Implicit VR, Little Endian
