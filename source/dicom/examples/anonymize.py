@@ -1,7 +1,7 @@
 # anonymize.py
-"""Read a dicom file, "anonymize" it, (replace Person names, patient id,
-optionally remove curves and private tags,
-and write result to a new file"""
+"""Read a dicom file (or directory of files), "anonymize" it (them), 
+    (replace Person names, patient id, optionally remove curves 
+    and private tags, and write result to a new file (directory)"""
 #
 # Copyright 2004, Darcy Mason
 # This file is part of pydicom.
@@ -20,6 +20,8 @@ and write result to a new file"""
 usage = """
 Usage:
 python anonymize.py dicomfile.dcm outputfile.dcm
+OR
+python anonymize.py originalsdirectory anonymizeddirectory
 """
 
 # Use at your own risk!!
@@ -28,7 +30,7 @@ python anonymize.py dicomfile.dcm outputfile.dcm
 import os, os.path
 
 def anonymize(filename, output_filename, PersonName="anonymous",
-              PatientsID="id", RemoveCurves=1, RemovePrivate=1):
+              PatientID="id", RemoveCurves=1, RemovePrivate=1):
     """Replace attributes with VR="PN" with PersonName etc."""
     def PN_callback(ds, attr):
         """Called from the dataset "walk" recursive function for all attributes."""
@@ -44,7 +46,7 @@ def anonymize(filename, output_filename, PersonName="anonymous",
 
     dataset = ReadFile(filename)
     dataset.walk(PN_callback)
-    dataset.PatientsID = PatientsID
+    dataset.PatientID = PatientID
     if RemovePrivate:
         dataset.RemovePrivateTags()
     if RemoveCurves:
@@ -62,17 +64,17 @@ if __name__ == "__main__":
 
     # if a source directory is given, go through all files in directory.
     arg1, arg2 = sys.argv[1:]
+    print arg1, arg2
     if os.path.isdir(arg1):
         filenames = os.listdir(arg1)
-    if not os.path.exists(arg2):
-        os.makedirs(arg2)
-    for filename in filenames:
-        if not os.path.isdir(os.path.join(arg1, filename)):
-            print filename + "...",
-            anonymize(os.path.join(arg1, filename), os.path.join(arg2, filename))
-            print "done\r",
+        if not os.path.exists(arg2):
+            os.makedirs(arg2)
+        for filename in filenames:
+            if not os.path.isdir(os.path.join(arg1, filename)):
+                print filename + "...",
+                anonymize(os.path.join(arg1, filename), os.path.join(arg2, filename))
+                print "done\r",
     else:
         anonymize(arg1, sys.argv[2])
-    
     print
     

@@ -20,6 +20,7 @@ and a value (attribute.value).
 
 from dicom.datadict import dictionaryHasTag, dictionaryDescription
 from dicom.tag import Tag
+from dicom.UID import UID
 
 # Helper functions:
 def isMultiValue(value):
@@ -163,6 +164,8 @@ class Attribute(object):
             repVal = "Array of %d bytes" % len(self.value)
         elif hasattr(self, 'string_value'):
             repVal = repr(self.string_value)
+        elif isinstance(self.value, UID):
+            repVal = self.value.name
         else:
             repVal = repr(self.value)
         if self.showVR:

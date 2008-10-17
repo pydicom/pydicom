@@ -21,7 +21,9 @@ from StringIO import StringIO # tried cStringIO but wouldn't let me derive class
 import logging
 logger = logging.getLogger('pydicom')
 
-from UIDs import UID_dictionary, DeflatedExplicitVRLittleEndian, ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian
+from dicom.UID import UID, UID_dictionary
+from dicom.UID import DeflatedExplicitVRLittleEndian, ExplicitVRLittleEndian
+from dicom.UID import ImplicitVRLittleEndian, ExplicitVRBigEndian
 from dicom.filebase import DicomFile, DicomStringIO
 from dicom.datadict import dictionaryVR, dictionaryDescription
 from dicom.dataset import Dataset
@@ -93,16 +95,20 @@ def read_UI(fp, length):
     # Strip off 0-byte padding for even length (if there)
     if value and value.endswith('\0'):
         value = value[:-1]
-    return MultiString(value)
+    return MultiString(value, UID)
 
-def MultiString(val):
-    """Split a string by delimiters if there are any"""
+def MultiString(val, valtype=str):
+    """Split a string by delimiters if there are any
+    
+    val -- DICOM string to split up
+    valtype -- default str, but can be e.g. UID to overwrite to a specific type
+    """
     # Remove trailing blank used to pad to even length
     # 2005.05.25: also check for trailing 0, error made in PET files we are converting
     if val and (val.endswith(' ') or val.endswith('\x00')):
         val = val[:-1]
 
-    splitup = val.split("\\")
+    splitup = [valtype(x) for x in val.split("\\")]
     if len(splitup) == 1:
         return splitup[0]
     else:

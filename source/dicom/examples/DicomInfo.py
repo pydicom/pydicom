@@ -14,7 +14,6 @@ the image.
 
 import sys
 from dicom.filereader import ReadFile
-from dicom.UIDs import SOP_name
 
 # check command line arguments make sense
 if not 1 < len(sys.argv) < 4:
@@ -36,13 +35,13 @@ if len(sys.argv) == 3:
 # Normal mode:
 print
 print "Filename.........:", filename
-print "Storage type.....:", SOP_name(dataset.SOPClassUID)
+print "Storage type.....:", dataset.SOPClassUID
 print
 
 pat_name = dataset.PatientsName.split("^")
 display_name = ", ".join(pat_name[:2])
-print "Patient name.....:", display_name
-print "Patient id.......:", dataset.PatientsID
+print "Patient's name...:", display_name
+print "Patient id.......:", dataset.PatientID
 print "Modality.........:", dataset.Modality
 print "Study Date.......:", dataset.StudyDate
 

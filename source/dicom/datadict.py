@@ -13,6 +13,8 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License (license.txt) for more details
 
+import logging
+logger = logging.getLogger("pydicom")
 from dicom.tag import Tag
 from dicom._dicom_dict import DicomDictionary  # the actual dict of {tag: (VR, VM, name, isRetired), tag:...}
 from dicom._dicom_dict import RepeatersDictionary # those with tags like "(50xx, 0005)"
@@ -93,13 +95,18 @@ def CleanName(tag):
     # remove blanks and nasty characters
     s = s.translate(normTable, r""" !@#$%^&*(),;:.?\|{}[]+-="'/""")
     if dictionaryVR(tag) == "SQ":
-        if s[-8:] == "Sequence": s = s[:-8]+"s" # e.g. "BeamSequence" becomes "Beams"
-        if s[-2:] == "ss": s = s[:-1]
-        if s[-6:] == "Studys": s = s[:-2]+"ies"
-        if s[-2:] == "xs": s = s[:-1] + "es" # e.g. Boxs -> Boxes
+        if s[-8:] == "Sequence": 
+            s = s[:-8]+"s" # e.g. "BeamSequence" becomes "Beams"
+        if s[-2:] == "ss":
+            s = s[:-1]
+        if s[-6:] == "Studys":
+            s = s[:-2]+"ies"
+        if s[-2:] == "xs":
+            s = s[:-1] + "es" # e.g. Boxs -> Boxes
     return s
 
 # Provide for the 'reverse' lookup. Given clean name, what is the tag?
+logger.debug("Reversing DICOM dictionary so can look up tag from a name...")
 NameDict = dict([(CleanName(tag), Tag(tag)) for tag in DicomDictionary])
 
 def short_name(name):
