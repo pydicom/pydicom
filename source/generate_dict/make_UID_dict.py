@@ -43,6 +43,7 @@ if __name__ == "__main__":
             name, name_info = name.split(":")
         if "&" in name:
             name = name.replace("&", "and")
+        name_info = name_info.strip()  # clear leading (and trailing, if any) whitespace
         attributes.append((UID, name, UIDtype, name_info, isRetired)) # leave Part reference out
               
     py_file = file(pydict_filename, "wb")

@@ -19,7 +19,7 @@ from struct import pack
 import logging
 logger = logging.getLogger('pydicom')
 
-from UIDs import ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian
+from dicom.UID import ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian
 from dicom.filebase import DicomFile
 from dicom.datadict import dictionaryVR
 from dicom.dataset import Dataset

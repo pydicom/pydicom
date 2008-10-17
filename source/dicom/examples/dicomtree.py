@@ -23,7 +23,7 @@ def RunTree(w, filename):
     top = Tix.Frame(w, relief=Tix.RAISED, bd=1)
     tree = Tix.Tree(top)
     tree.pack(expand=1, fill=Tix.BOTH, padx=10, pady=10, side=Tix.LEFT)
-    print tree.hlist.keys()   # use to see the available configure() options
+    # print tree.hlist.keys()   # use to see the available configure() options
     tree.hlist.configure(bg='white', font='Courier 10', indent=30)
     tree.hlist.configure(selectbackground='light yellow', gap=150)
     
