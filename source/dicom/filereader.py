@@ -30,6 +30,7 @@ from dicom.dataset import Dataset
 from dicom.attribute import Attribute
 from dicom.tag import Tag, ItemTag, ItemDelimiterTag, SequenceDelimiterTag
 from dicom.sequence import Sequence
+from dicom.valuerep import PersonName
 
 from sys import byteorder
 sys_isLittleEndian = (byteorder == 'little')
@@ -116,6 +117,9 @@ def MultiString(val, valtype=str):
 
 def read_String(fp, length):
     return MultiString(fp.read(length))
+    
+def read_PN(fp, length):
+    return MultiString(fp.read(length), valtype=PersonName)
 
 def read_SingleString(fp, length):
     """Read a single string; the backslash used to separate values in multi-strings
@@ -449,7 +453,7 @@ readers = {'UL':(read_numbers,'L'), 'SL':(read_numbers,'l'),
            'OF':(read_numbers,'f'),
            'OB':read_OBvalue, 'UI':read_UI,
            'SH':read_String,  'DA':read_String, 'TM': read_String,
-           'CS':read_String,  'PN':read_String, 'LO': read_String,
+           'CS':read_String,  'PN':read_PN,     'LO': read_String,
            'IS':read_String,  'DS':read_String, 'AE': read_String,
            'AS':read_String,
            'LT':read_SingleString,

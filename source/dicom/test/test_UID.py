@@ -1,0 +1,45 @@
+# test_UID.py
+"""Test suite for UID.py"""
+# Copyright 2008, Darcy Mason
+# This file is part of pydicom.
+#
+# pydicom is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# pydicom is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License (license.txt) for more details
+
+import unittest
+from dicom.UID import UID
+
+class UIDtests(unittest.TestCase):
+    def testKnownUID(self):
+        """UID: Known UID properties accessed....................."""
+        uid = UID('1.2.840.10008.1.2') # Implicit VR Little Endian
+        expected = 'Implicit VR Little Endian'
+        got = uid.name
+        self.assertEqual(got, expected, "UID: expected '%s', got '%s' for UID name" % (expected, got))
+        
+        expected = 'Transfer Syntax'
+        got = uid.type
+        self.assertEqual(got, expected, "UID: expected '%s', got '%s' for UID type" % (expected, got))
+        
+        expected = 'Default Transfer Syntax for DICOM'
+        got = uid.info
+        self.assertEqual(got, expected, "UID: expected '%s', got '%s' for UID info" % (expected, got))
+        
+        expected = False
+        got = uid.isRetired
+        self.assertEqual(got, expected, "UID: expected '%s', got '%s' for UID isRetired" % (expected, got))
+    def testComparison(self):
+        """UID: can compare by number or by name.................."""
+        uid = UID('1.2.840.10008.1.2')
+        self.assertEqual(uid, 'Implicit VR Little Endian', "UID equality failed on name")
+        self.assertEqual(uid, '1.2.840.10008.1.2', "UID equality failed on number string")
+        
+if __name__ == "__main__":
+    unittest.main()
