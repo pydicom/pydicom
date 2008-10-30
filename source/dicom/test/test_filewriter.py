@@ -76,5 +76,6 @@ if __name__ == "__main__":
     save_dir = os.getcwd()
     if dir_name:
         os.chdir(dir_name)
+    os.chdir("../testfiles")
     unittest.main()
     os.chdir(save_dir)
