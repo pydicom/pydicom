@@ -381,7 +381,7 @@ def ReadFile(fp):
     """
     if type(fp) is type(""):
         fp = DicomFile(fp,'rb')
-        logger.info("Reading file '%s'" % fp)
+        logger.debug("Reading file '%s'" % fp)
     
     fp.seek(0x80)
     magic = fp.read(4)

@@ -35,5 +35,6 @@ for module in modulenames:
 
 # Run the tests
 runner = unittest.TextTestRunner(verbosity=2)
+os.chdir("../testfiles")
 runner.run(suite)
 os.chdir(save_dir)

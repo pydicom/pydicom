@@ -1,5 +1,5 @@
-Sample images used for testing pydicom and their origins. 
----------------------------------------------------------
+Test Files used for testing pydicom 
+-----------------------------------
 I obtained images to test the pydicom code, and revised them as follow:
   * images were often downsized to keep the total file size quite small (typically <50K-ish). I wanted unittests for the code where I could run a number of tests quickly, and with files I could include in the source (and binary) distributions without bloating them too much
   * In some cases, the original files have been binary edited to replace anything that looks like a real patient name
@@ -39,3 +39,10 @@ JPEG-lossy.dcm
 Created by a commercial radiotherapy treatment planning system and modified:
 rtplan.dcm       Implicit VR, Little Endian
 rtdose.dcm       Implicit VR, Little Endian
+
+
+chr*.dcm
+  * Character set files for testing (0008,0005) Specific Character Set
+  * from http://www.dclunie.com/images/charset/SCS*
+  * downsized to 32x32 since pixel data is irrelevant for these (test pattern only)
+  
