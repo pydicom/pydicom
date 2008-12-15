@@ -76,7 +76,7 @@ def MultiString(val):
     except:
         return val
     else:
-        return "\\".join(val)
+        return "\\".join(val)  # \ is escape chr, so "\\" gives single backslash
 
 def write_String(fp, attribute, padding=' '):
     """Write a single or multivalued string."""
