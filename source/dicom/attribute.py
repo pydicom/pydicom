@@ -160,12 +160,18 @@ class Attribute(object):
             
     def __str__(self):
         """Handle str(attribute)."""
-        if self.VR in ['OB', 'OW', 'OW/OB'] and len(self.value) > self.maxBytesToDisplay:
+        if (self.VR in ['OB', 'OW', 'OW/OB', 'US or SS or OW', 'US or SS'] 
+                  and len(self.value) > self.maxBytesToDisplay):
             repVal = "Array of %d bytes" % len(self.value)
-        elif hasattr(self, 'string_value'):
+        elif hasattr(self, 'string_value'): # for VR of IS or DS 
             repVal = repr(self.string_value)
         elif isinstance(self.value, UID):
             repVal = self.value.name
+        # elif isinstance(self.value, unicode):
+            # try:
+                # repVal = "'%s'" % self.value
+            # except UnicodeEncodeError:
+                # repVal = unicode.__repr__(self.value)
         else:
             repVal = repr(self.value)
         if self.showVR:

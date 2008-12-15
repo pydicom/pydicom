@@ -32,9 +32,9 @@ from dicom.datadict import TagForName, AllNamesForTag
 from dicom.tag import Tag
 from dicom.attribute import Attribute
 import dicom # for WriteFile
+import dicom.charset
 
 haveNumpy = True
-haveNumeric = True
 
 try:
     import numpy
@@ -101,6 +101,25 @@ class Dataset(dict):
             return dict.__contains__(self, tag)
         else:
             return dict.__contains__(self, name) # will no doubt raise an exception
+    def decode(self):
+        """Apply character set decoding to all data elements.
+        
+        See DICOM PS3.5-2008 6.1.1.
+        """
+        # Find specific character set. 'ISO_IR 6' is default
+        # May be multi-valued, but let dicom.charset handle all logic on that
+        dicom_character_set = self.get('SpecificCharacterSet', "ISO_IR 6")
+
+        # shortcut to the decode function in dicom.charset
+        decode_attr = dicom.charset.decode
+
+        # sub-function callback for walk(), to decode the chr strings if necessary
+        # this simply calls the dicom.charset.decode function
+        def decode_callback(ds, attr):
+            decode_attr(attr, dicom_character_set)
+        # Use the walk function to go through all elements in the dataset and convert them
+        self.walk(decode_callback)
+
     def dir(self, *filters):
         """Return a list of some or all attribute names, in alphabetical order.
         

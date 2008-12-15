@@ -30,21 +30,11 @@ from dicom.dataset import Dataset
 from dicom.attribute import Attribute
 from dicom.tag import Tag, ItemTag, ItemDelimiterTag, SequenceDelimiterTag
 from dicom.sequence import Sequence
-from dicom.valuerep import PersonName
+from dicom.valuerep import PersonName, MultiValue, MultiString
 
 from sys import byteorder
 sys_isLittleEndian = (byteorder == 'little')
 
-class MultiValue(list):
-    """MutliValue is a special list, derived to overwrite the __str__ method
-    to display the multi-value list more nicely. Used for Dicom values of
-    multiplicity > 1, i.e. strings with the "\" delimiter inside.
-    """
-    def __str__(self):
-        lines = [str(x) for x in self]
-        return "[" + ", ".join(lines) + "]"
-    __repr__ = __str__
-    
 def read_VR(fp):
     """Return the two character Value Representation string"""
     return unpack("2s", fp.read(2))[0]
@@ -97,23 +87,6 @@ def read_UI(fp, length):
     if value and value.endswith('\0'):
         value = value[:-1]
     return MultiString(value, UID)
-
-def MultiString(val, valtype=str):
-    """Split a string by delimiters if there are any
-    
-    val -- DICOM string to split up
-    valtype -- default str, but can be e.g. UID to overwrite to a specific type
-    """
-    # Remove trailing blank used to pad to even length
-    # 2005.05.25: also check for trailing 0, error made in PET files we are converting
-    if val and (val.endswith(' ') or val.endswith('\x00')):
-        val = val[:-1]
-
-    splitup = [valtype(x) for x in val.split("\\")]
-    if len(splitup) == 1:
-        return splitup[0]
-    else:
-        return MultiValue(splitup)
 
 def read_String(fp, length):
     return MultiString(fp.read(length))
@@ -183,7 +156,6 @@ def ReadAttribute(fp, length=None):
         value = readers[VR](fp, length) # call the function to read that kind of item
     else:
         value = readers[VR][0](fp, length, readers[VR][1])
-    #  print Attribute(tag, VR, value)
     if tag == 0x00280103: # This flags whether pixel values are US (val=0) or SS (val = 1)
         fp.isSSpixelRep = value # XXX This is not used anywhere else in code?
     attr = Attribute(tag, VR, value, value_tell)
@@ -199,14 +171,15 @@ def ReadDataset(fp, bytelength=None):
     value is the Attribute class instance
     """
     ds = Dataset()
+    if bytelength == 0:
+        return ds
     fpStart = fp.tell()
-    while (not bytelength) or (fp.tell()-fpStart < bytelength):    # byteslength is None
+    while (not bytelength) or (fp.tell()-fpStart < bytelength): # byteslength is None
         attribute = ReadAttribute(fp)
         if not attribute:
             break        # a is None if end-of-file
         if attribute.tag == ItemDelimiterTag: # dataset is an item in a sequence
             break
-        # print attribute # XXX
         ds.Add(attribute)
     # XXX should test that fp.tell() exactly number of bytes expected?
     return ds
@@ -221,15 +194,12 @@ def ReadSequence(fp, bytelength):
     if bytelength == 0xffffffffL:
         seq.isUndefinedLength = True
         bytelength = None
-        # length = LengthOfUndefinedLength(fp, SequenceDelimiterTag)
     fpStart = fp.tell()            
     while (not bytelength) or (fp.tell()-fpStart < bytelength):
         dataset = ReadSequenceItem(fp)
-        if not dataset:  # None is returned if get to Sequence Delimiter
+        if dataset is None:  # None is returned if get to Sequence Delimiter
             break
         seq.append(dataset)
-    # if seq.isUndefinedLength:
-        # AbsorbDelimiterItem(fp, SequenceDelimiterTag)
     return seq
 
 def ReadSequenceItem(fp):

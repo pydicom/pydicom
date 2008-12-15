@@ -21,7 +21,7 @@ import Tix
 
 def RunTree(w, filename):
     top = Tix.Frame(w, relief=Tix.RAISED, bd=1)
-    tree = Tix.Tree(top)
+    tree = Tix.Tree(top, options="hlist.columns 2")
     tree.pack(expand=1, fill=Tix.BOTH, padx=10, pady=10, side=Tix.LEFT)
     # print tree.hlist.keys()   # use to see the available configure() options
     tree.hlist.configure(bg='white', font='Courier 10', indent=30)
@@ -38,10 +38,9 @@ def RunTree(w, filename):
 def show_file(filename, tree):
     tree.hlist.add("root", text=filename)
     ds = dicom.ReadFile(sys.argv[1])
+    ds.decode()
     recurse_tree(tree, ds, "root", False)
     tree.autosetmode()
-    
-    
 
 def recurse_tree(tree, ds, parent, hide=False):
     # order the dicom tags
@@ -51,7 +50,10 @@ def recurse_tree(tree, ds, parent, hide=False):
     for k in keylist:
         attr = ds[k]
         node_id = parent + "." + hex(id(attr))
-        tree.hlist.add(node_id, text=str(attr))
+        if type(attr.value) is PersonNameUnicode:
+            tree.hlist.add(node_id, text=attr.value)
+        else:
+            tree.hlist.add(node_id, text=str(attr))
         if hide:
             tree.hlist.hide_entry(node_id)
         if attr.VR == "SQ":   # a sequence
@@ -62,7 +64,6 @@ def recurse_tree(tree, ds, parent, hide=False):
                 tree.hlist.add(item_id, text=item_text)
                 tree.hlist.hide_entry(item_id)
                 recurse_tree(tree, dataset, item_id, hide=True)
-
 
 if __name__ == '__main__':
     import sys
