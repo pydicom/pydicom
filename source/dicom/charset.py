@@ -24,8 +24,14 @@ python_encoding = {
     'ISO_IR 6': 'iso8859',   # alias for latin_1 too
     'ISO_IR 100': 'latin_1',
     'ISO 2022 IR 87': 'iso2022_jp',
-    'ISO 2022 IR 149': 'euc_kr',
-    'ISO_IR 192': 'UTF8'     # from Chinese example, 2008 PS3.5 Annex J p1-4
+    'ISO 2022 IR 13': 'iso2022_jp',  #XXX this mapping does not work on chrH32.dcm test files (but no others do either)
+    'ISO 2022 IR 149': 'euc_kr',   # XXX chrI2.dcm -- does not quite work -- some chrs wrong. Need iso_ir_149 python encoding
+    'ISO_IR 192': 'UTF8',     # from Chinese example, 2008 PS3.5 Annex J p1-4
+    'GB18030': 'GB18030',
+    'ISO_IR 126': 'iso_ir_126',  # Greek
+    'ISO_IR 127': 'iso_ir_127',  # Arab
+    'ISO_IR 138': 'iso_ir_138', # Hebrew
+    'ISO_IR 144': 'iso_ir_144', # Russion
     }
 
 from dicom.valuerep import PersonNameUnicode, PersonName
@@ -70,6 +76,10 @@ def decode(attr, dicom_character_set):
     if attr.VR == "PN": 
         # logger.warn("%s ... type: %s" %(str(attr), type(attr.VR)))
         encodings = [python_encoding[x] for x in dicom_character_set]
+        if len(encodings) == 1:
+            encodings = [encodings[0]]*3
+        if len(encodings) == 2:
+            encodings.append(encodings[1])
         attr.value = PersonNameUnicode(attr.value, encodings)
     if attr.VR in ['SH', 'LO', 'ST', 'LT', 'UT']:
         attr.value = attr.value.decode(python_encoding[dicom_character_set[0]])
