@@ -16,6 +16,7 @@
 # Modeled after Tree.py at http://mail.python.org/pipermail/python-checkins/2001-March/016462.html
 
 usage = "Usage: python dicomtree.py dicom_filename"
+from dicom.valuerep import PersonNameUnicode
 
 import Tix
 
@@ -28,7 +29,7 @@ def RunTree(w, filename):
     tree.hlist.configure(selectbackground='light yellow', gap=150)
     
     box = Tix.ButtonBox(w, orientation=Tix.HORIZONTAL)
-    box.add('ok', text='Ok', underline=0, command=w.destroy, width=6)
+    # box.add('ok', text='Ok', underline=0, command=w.destroy, width=6)
     box.add('exit', text='Exit', underline=0, command=w.destroy, width=6)
     box.pack(side=Tix.BOTTOM, fill=Tix.X)
     top.pack(side=Tix.TOP, fill=Tix.BOTH, expand=1)
@@ -38,7 +39,7 @@ def RunTree(w, filename):
 def show_file(filename, tree):
     tree.hlist.add("root", text=filename)
     ds = dicom.ReadFile(sys.argv[1])
-    ds.decode()
+    ds.decode()  # change strings to unicode
     recurse_tree(tree, ds, "root", False)
     tree.autosetmode()
 
@@ -50,8 +51,8 @@ def recurse_tree(tree, ds, parent, hide=False):
     for k in keylist:
         attr = ds[k]
         node_id = parent + "." + hex(id(attr))
-        if type(attr.value) is PersonNameUnicode:
-            tree.hlist.add(node_id, text=attr.value)
+        if isinstance(attr.value, unicode):
+            tree.hlist.add(node_id, text=unicode(attr))
         else:
             tree.hlist.add(node_id, text=str(attr))
         if hide:

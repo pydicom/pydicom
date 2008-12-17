@@ -159,7 +159,18 @@ class Attribute(object):
                                 % (repr(val), self.VR, self.tag)
             
     def __str__(self):
-        """Handle str(attribute)."""
+        """Return str representation of this attribute"""
+        repVal = self._repVal()
+        if self.showVR:
+            s = "%s %-*s %s: %s" % (str(self.tag), self.descripWidth,
+                            self.description()[:self.descripWidth], self.VR, repVal)
+        else:
+            s = "%s %-*s %s" % (str(self.tag), self.descripWidth,
+                            self.description()[:self.descripWidth], repVal)
+        return s
+        
+    def _repVal(self):
+        """Return a str representation of the current value for use in __str__"""
         if (self.VR in ['OB', 'OW', 'OW/OB', 'US or SS or OW', 'US or SS'] 
                   and len(self.value) > self.maxBytesToDisplay):
             repVal = "Array of %d bytes" % len(self.value)
@@ -167,22 +178,20 @@ class Attribute(object):
             repVal = repr(self.string_value)
         elif isinstance(self.value, UID):
             repVal = self.value.name
-        # elif isinstance(self.value, unicode):
-            # try:
-                # repVal = "'%s'" % self.value
-            # except UnicodeEncodeError:
-                # repVal = unicode.__repr__(self.value)
         else:
-            repVal = repr(self.value)
-        if self.showVR:
-            s = "%s %-*s %s: %s" % (str(self.tag), self.descripWidth,
-                            self.description()[:self.descripWidth], self.VR, repVal)
+            repVal = repr(self.value)  # will tolerate unicode too
+        return repVal
+
+    def __unicode__(self):
+        """Return unicode representation of this attribute"""
+        if isinstance(self.value, unicode):
+            # start with the string rep then replace the value part with the unicode
+            strVal = str(self)
+            uniVal = unicode(strVal.replace(self._repVal(), "")) + self.value
+            return uniVal
         else:
-            s = "%s %-*s %s" % (str(self.tag), self.descripWidth,
-                            self.description()[:self.descripWidth], repVal)
-            
-        return s
-    
+            return unicode(str(self))
+        
     def __getitem__(self, key):
         """Returns the item from my value's Sequence, if it is one."""
         try:

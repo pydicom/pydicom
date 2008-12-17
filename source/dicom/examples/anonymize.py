@@ -1,7 +1,8 @@
 # anonymize.py
-"""Read a dicom file (or directory of files), "anonymize" it (them), 
-    (replace Person names, patient id, optionally remove curves 
-    and private tags, and write result to a new file (directory)"""
+"""Read a dicom file (or directory of files), partially "anonymize" it (them), 
+    by replacing Person names, patient id, optionally remove curves 
+    and private tags, and write result to a new file (directory)
+    This is an example only; use only as a starting point."""
 #
 # Copyright 2004, Darcy Mason
 # This file is part of pydicom.
@@ -25,12 +26,13 @@ python anonymize.py originalsdirectory anonymizeddirectory
 """
 
 # Use at your own risk!!
-# Note that pixel data could have patient data "burned in" - this is not addressed here
+# Many more items need to be addressed for proper anonymizing
+# In particular, note that pixel data could have confidential data "burned in"
 
 import os, os.path
 
 def anonymize(filename, output_filename, PersonName="anonymous",
-              PatientID="id", RemoveCurves=1, RemovePrivate=1):
+              PatientID="id", RemoveCurves=True, RemovePrivate=True):
     """Replace attributes with VR="PN" with PersonName etc."""
     def PN_callback(ds, attr):
         """Called from the dataset "walk" recursive function for all attributes."""
@@ -51,9 +53,7 @@ def anonymize(filename, output_filename, PersonName="anonymous",
         dataset.RemovePrivateTags()
     if RemoveCurves:
         dataset.walk(curves_callback)
-    WriteFile(output_filename, dataset)
-    
-    
+    WriteFile(output_filename, dataset)   
 
 # Can run as a script:
 if __name__ == "__main__":
@@ -61,20 +61,26 @@ if __name__ == "__main__":
     if len(sys.argv) != 3:
         print usage
         sys.exit()
-
-    # if a source directory is given, go through all files in directory.
     arg1, arg2 = sys.argv[1:]
-    print arg1, arg2
+
     if os.path.isdir(arg1):
-        filenames = os.listdir(arg1)
-        if not os.path.exists(arg2):
-            os.makedirs(arg2)
+        in_dir = arg1
+        out_dir = arg2
+        if os.path.exists(out_dir):
+            if not os.path.isdir(out_dir):
+                raise IOError, "Input is directory; output name exists but is not a directory"
+        else: # out_dir does not exist; create it.
+            os.makedirs(out_dir)
+
+        filenames = os.listdir(in_dir)
         for filename in filenames:
-            if not os.path.isdir(os.path.join(arg1, filename)):
+            if not os.path.isdir(os.path.join(in_dir, filename)):
                 print filename + "...",
-                anonymize(os.path.join(arg1, filename), os.path.join(arg2, filename))
+                anonymize(os.path.join(in_dir, filename), os.path.join(out_dir, filename))
                 print "done\r",
-    else:
-        anonymize(arg1, sys.argv[2])
+    else: # first arg not a directory, assume two files given
+        in_filename = arg1
+        out_filename = arg2
+        anonymize(in_filename, out_filename)
     print
     
