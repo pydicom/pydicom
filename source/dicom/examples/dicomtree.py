@@ -43,13 +43,9 @@ def show_file(filename, tree):
     recurse_tree(tree, ds, "root", False)
     tree.autosetmode()
 
-def recurse_tree(tree, ds, parent, hide=False):
+def recurse_tree(tree, dataset, parent, hide=False):
     # order the dicom tags
-    keylist = ds.keys()
-    keylist.sort()
-
-    for k in keylist:
-        attr = ds[k]
+    for attr in dataset:
         node_id = parent + "." + hex(id(attr))
         if isinstance(attr.value, unicode):
             tree.hlist.add(node_id, text=unicode(attr))
