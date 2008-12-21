@@ -211,6 +211,25 @@ class Dataset(dict):
             return 0
         else:
             return 1
+
+    def __iter__(self):
+        """Method to iterate through the dataset, returning attributes.
+        e.g.:
+        for attr in dataset:
+            do_something...
+        The attributes are returned in DICOM order, 
+        i.e. in increasing order by tag value.
+        Sequence items are returned as a single attribute; it is up to the
+           calling code to recurse into the Sequence items if desired
+        """
+        # Note this is different than the underlying dict class, 
+        #        which returns the key of the key:value mapping.
+        #   Here the value is returned (but attr.tag has the key)
+        taglist = self.keys()
+        taglist.sort()
+        for tag in taglist:
+            yield self[tag]
+            
             
     def _PixelDataNumpy(self):
         """Return a NumPy array of the pixel data.
@@ -277,10 +296,6 @@ class Dataset(dict):
         return self._PixelArray
     PixelArray = property(_getPixelArray)
     
-    def top(self):
-        """Show the DICOM tags, but only the top level; do not recurse into Sequences"""
-        return self._PrettyStr(topLevelOnly=True)
-        
     def _PrettyStr(self, indent=0, topLevelOnly=False):
         """Return a string of the attributes in this dataset, with indented levels.
         
@@ -291,12 +306,9 @@ class Dataset(dict):
         
         """
         strings = []
-        keylist = self.keys()
-        keylist.sort()
         indentStr = self.indentChars * indent
         nextIndentStr = self.indentChars *(indent+1)
-        for k in keylist:
-            attr = self[k]
+        for attr in self:
             if attr.VR == "SQ":   # a sequence
                 strings.append(indentStr + str(attr.tag) + "  %s   %i item(s) ---- " % ( attr.description(),len(attr.value)))
                 if not topLevelOnly:
@@ -362,6 +374,10 @@ class Dataset(dict):
         """Handle str(dataset)."""
         return self._PrettyStr()
         
+    def top(self):
+        """Show the DICOM tags, but only the top level; do not recurse into Sequences"""
+        return self._PrettyStr(topLevelOnly=True)
+
     def update(self, dictionary):
         """Extend dict.update() to handle *named tags*."""
         for key, value in dictionary.items():
@@ -369,6 +385,7 @@ class Dataset(dict):
                 setattr(self, key, value)
             else:
                 self[Tag(key)] = value
+                
     def walk(self, callback):
         """Call the given function for all dataset attributes (recurses).
         
@@ -384,17 +401,15 @@ class Dataset(dict):
         within their dataset)
         
         """
-        keylist = self.keys()
-        keylist.sort()
-        for k in keylist:
-            attribute = self[k]
+        taglist = self.keys()
+        taglist.sort()
+        for tag in taglist:
+            attribute = self[tag]
             callback(self, attribute)  # self = this Dataset
-            # 'k in self' below needed in case attribute was deleted in callback
-            if k in self and attribute.VR == "SQ":  
+            # 'tag in self' below needed in case attribute was deleted in callback
+            if tag in self and attribute.VR == "SQ":  
                 sequence = attribute.value
                 for dataset in sequence:
                     dataset.walk(callback)
 
-    
-    
     __repr__ = __str__
