@@ -198,7 +198,11 @@ class Attribute(object):
             return self.value[key]
         except TypeError:
             raise TypeError, "Attribute value is unscriptable (not a Sequence)"
-        
+    
+    def _get_name(self):
+        return self.description()
+    name = property(_get_name)
+    
     def description(self):
         """Return the DICOM dictionary description for this dicom tag."""
         if dictionaryHasTag(self.tag):
