@@ -378,6 +378,13 @@ class Dataset(dict):
         """Show the DICOM tags, but only the top level; do not recurse into Sequences"""
         return self._PrettyStr(topLevelOnly=True)
 
+    def trait_names(self):
+        """Return a list of valid name for auto-completion code
+        Used in IPython, so that named attributes can be found
+        and offered for autocompletion on the IPython command line
+        """
+        return self.dir()
+        
     def update(self, dictionary):
         """Extend dict.update() to handle *named tags*."""
         for key, value in dictionary.items():
