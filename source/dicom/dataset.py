@@ -119,7 +119,10 @@ class Dataset(dict):
             decode_attr(attr, dicom_character_set)
         # Use the walk function to go through all elements in the dataset and convert them
         self.walk(decode_callback)
-
+    
+    def __dir__(self):
+        return self.dir()
+    
     def dir(self, *filters):
         """Return a list of some or all attribute names, in alphabetical order.
         
@@ -383,7 +386,7 @@ class Dataset(dict):
         Used in IPython, so that named attributes can be found
         and offered for autocompletion on the IPython command line
         """
-        return self.dir()
+        return self.dir() # does not list underlying dict properties and methods
         
     def update(self, dictionary):
         """Extend dict.update() to handle *named tags*."""

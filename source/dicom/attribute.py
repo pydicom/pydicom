@@ -103,7 +103,7 @@ class Attribute(object):
         # If so, turn them into a list of separate strings
         if isString(val) and self.VR not in \
            ['UT','ST','LT', 'FL','FD','AT','OB','OW','OF','SL','SQ','SS',
-            'UL','US', 'OW/OB']:
+            'UL','US', 'OW/OB', 'UN']:
             if _backslash in val: 
                 val = val.split(_backslash)  
         self._value = self._convert_value(val)
