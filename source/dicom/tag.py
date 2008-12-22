@@ -35,7 +35,7 @@ class Tag(long):
         else: # given a single number to use as a tag, as if (group, elem) already joined to a long
             long_value = long(hex(arg), 16) # needed in python <2.4 to avoid negative ints
             if long_value > 0xFFFFFFFFL:
-                raise OverflowError, "Tags are limited to 32-bit length"
+                raise OverflowError, "Tags are limited to 32-bit length; tag %r, long value %r" % (arg, long_value)
         # Now have the correct long value, set it using the python long class
         return super(Tag, cls).__new__(cls, long_value)
 

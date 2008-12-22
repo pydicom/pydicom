@@ -400,12 +400,6 @@ def ReadFile(fp):
     
     if has_header:
         ds.update(FileMetaInfo) # put in tags from FileMetaInfo
-        # Find the names added to the FileMetaInfo Dataset instance...
-        #   XXX is this still necessary now that Dataset has its own update() method?
-        metaNamedMembers = [x for x in dir(FileMetaInfo) if x not in dir(Dataset)]
-        # ...and put them into the Dataset instance we will return:
-        for namedMember in metaNamedMembers:
-            ds.__dict__[namedMember] = FileMetaInfo.__dict__[namedMember]
     ds.isLittleEndian = fp.isLittleEndian
     ds.isExplicitVR = fp.isExplicitVR
     ds.preamble = None
