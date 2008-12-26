@@ -26,7 +26,7 @@ class DictTests(unittest.TestCase):
         """dicom_dictionary: CleanName returns blank string for unknown tag"""
         self.assert_(CleanName(0x99991111)=="")
     def testNameFinding(self):
-        """dicom_dictionary: get long and short names for an attribute name"""
+        """dicom_dictionary: get long and short names for a data_element name"""
         names = AllNamesForTag(Tag(0x300a00b2)) # Treatment Machine Name
         expected = ['TreatmentMachineName']
         self.assertEqual(names, expected, "Expected %s, got %s" % (expected, names))

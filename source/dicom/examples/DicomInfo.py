@@ -1,13 +1,13 @@
 # DicomInfo.py
 """
-Read a dicom file and print some or all of its values.
+Read a DICOM file and print some or all of its values.
 
 Usage:  python DicomInfo.py imagefile [-v]
 
--v (optional): Verbose mode, prints all dicom attributes
+-v (optional): Verbose mode, prints all DICOM data elements
 
 Without the -v option, a few of the most common dicom file
-attributes are printed: some info about the patient and about
+data elements are printed: some info about the patient and about
 the image.
 
 """
@@ -49,7 +49,7 @@ print "Study Date.......:", dataset.StudyDate
 #     'name' in dataset
 # or
 #     hasattr(dataset, 'name')
-# to check if an attribute exists
+# to check if a data element exists
 if 'PixelData' in dataset:
     print "Image size.......: %i x %i, %i bytes" % (dataset.Rows, dataset.Columns, len(dataset.PixelData))
     if hasattr(dataset, 'PixelSpacing'):

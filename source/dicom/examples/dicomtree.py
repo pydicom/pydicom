@@ -45,18 +45,18 @@ def show_file(filename, tree):
 
 def recurse_tree(tree, dataset, parent, hide=False):
     # order the dicom tags
-    for attr in dataset:
-        node_id = parent + "." + hex(id(attr))
-        if isinstance(attr.value, unicode):
-            tree.hlist.add(node_id, text=unicode(attr))
+    for data_element in dataset:
+        node_id = parent + "." + hex(id(data_element))
+        if isinstance(data_element.value, unicode):
+            tree.hlist.add(node_id, text=unicode(data_element))
         else:
-            tree.hlist.add(node_id, text=str(attr))
+            tree.hlist.add(node_id, text=str(data_element))
         if hide:
             tree.hlist.hide_entry(node_id)
-        if attr.VR == "SQ":   # a sequence
-            for i, dataset in enumerate(attr.value):
+        if data_element.VR == "SQ":   # a sequence
+            for i, dataset in enumerate(data_element.value):
                 item_id = node_id + "." + str(i+1)
-                sq_item_description = attr.description().replace(" Sequence", "") # XXX not i18n
+                sq_item_description = data_element.description().replace(" Sequence", "") # XXX not i18n
                 item_text = "%s %d" % (sq_item_description, i+1)
                 tree.hlist.add(item_id, text=item_text)
                 tree.hlist.hide_entry(item_id)
