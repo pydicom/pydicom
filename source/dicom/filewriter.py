@@ -23,11 +23,11 @@ from dicom.UID import ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVR
 from dicom.filebase import DicomFile
 from dicom.datadict import dictionaryVR
 from dicom.dataset import Dataset
-from dicom.attribute import Attribute
+from dicom.dataelem import DataElement
 from dicom.tag import Tag, ItemTag, ItemDelimiterTag, SequenceDelimiterTag
 from dicom.sequence import Sequence
 
-def write_numbers(fp, attribute, format):
+def write_numbers(fp, data_element, format):
     """Write a "value" of type format from the dicom file.
     
     "Value" can be more than one number.
@@ -36,7 +36,7 @@ def write_numbers(fp, attribute, format):
     
     """
     endianChar = '><'[fp.isLittleEndian]
-    value = attribute.value
+    value = data_element.value
     if value == "":
         return  # don't need to write anything for empty string
     
@@ -50,24 +50,24 @@ def write_numbers(fp, attribute, format):
             for val in value:
                 fp.write(pack(format_string, val))
     except Exception, e:
-        raise IOError, "%s\nfor attribute:\n%s" % (str(e), str(attribute))
+        raise IOError, "%s\nfor data_element:\n%s" % (str(e), str(data_element))
 
-def write_OBvalue(fp, attribute):
-    """Write an attribute with VR of 'other byte' (OB)."""
-    fp.write(attribute.value)
+def write_OBvalue(fp, data_element):
+    """Write a data_element with VR of 'other byte' (OB)."""
+    fp.write(data_element.value)
 
-def write_OWvalue(fp, attribute):
-    """Write an attribute with VR of 'other word' (OW).
+def write_OWvalue(fp, data_element):
+    """Write a data_element with VR of 'other word' (OW).
     
     Note: This **does not currently do the byte swapping** for Endian state.
     
     """    
     # XXX for now just write the raw bytes without endian swapping
-    fp.write(attribute.value)
+    fp.write(data_element.value)
 
-def write_UI(fp, attribute):
-    """Write an attribute with VR of 'unique identifier' (UI)."""    
-    write_String(fp, attribute, '\0') # pad with 0-byte to even length
+def write_UI(fp, data_element):
+    """Write a data_element with VR of 'unique identifier' (UI)."""    
+    write_String(fp, data_element, '\0') # pad with 0-byte to even length
 
 def MultiString(val):
     """Put a string together with delimiter if has more than one value"""
@@ -78,31 +78,31 @@ def MultiString(val):
     else:
         return "\\".join(val)  # \ is escape chr, so "\\" gives single backslash
 
-def write_String(fp, attribute, padding=' '):
+def write_String(fp, data_element, padding=' '):
     """Write a single or multivalued string."""
-    val = MultiString(attribute.value)
+    val = MultiString(data_element.value)
     if len(val) % 2 != 0:
         val = val + padding   # pad to even length
     fp.write(val)
 
-def write_NumberString(fp, attribute, padding = ' '):
+def write_NumberString(fp, data_element, padding = ' '):
     """Handle IS or DS VR - write a number stored as a string of digits."""
-    val = MultiString(attribute.string_value) # use exact string value from file or set by user
+    val = MultiString(data_element.string_value) # use exact string value from file or set by user
     if len(val) % 2 != 0:
         val = val + padding   # pad to even length
     fp.write(val)
     
-def WriteAttribute(fp, attribute):
-    """Write the attribute to file fp according to dicom media storage rules."""
-    fp.write_tag(attribute.tag)
+def WriteDataElement(fp, data_element):
+    """Write the data_element to file fp according to dicom media storage rules."""
+    fp.write_tag(data_element.tag)
 
-    VR = attribute.VR
+    VR = data_element.VR
     if fp.isExplicitVR:
         fp.write(VR)
         if VR in ['OB', 'OW', 'OF', 'SQ', 'UT', 'UN']:
             fp.write_US(0)   # reserved 2 bytes
     if VR not in writers:
-        raise NotImplementedError, "WriteAttribute: unknown Value Representation '%s'" % VR
+        raise NotImplementedError, "WriteDataElement: unknown Value Representation '%s'" % VR
 
     length_location = fp.tell() # save location for later.
     if fp.isExplicitVR and VR not in ['OB', 'OW', 'OF', 'SQ', 'UT', 'UN']:
@@ -113,23 +113,23 @@ def WriteAttribute(fp, attribute):
     try:
         writers[VR][0] # if writer is a tuple, then need to pass a number format
     except TypeError:
-        writers[VR](fp, attribute) # call the function to write that kind of item
+        writers[VR](fp, data_element) # call the function to write that kind of item
     else:
-        writers[VR][0](fp, attribute, writers[VR][1])
-    #  print Attribute(tag, VR, value)
+        writers[VR][0](fp, data_element, writers[VR][1])
+    #  print DataElement(tag, VR, value)
     
     isUndefinedLength = False
-    if hasattr(attribute, "isUndefinedLength") and attribute.isUndefinedLength:
+    if hasattr(data_element, "isUndefinedLength") and data_element.isUndefinedLength:
         isUndefinedLength = True
     location = fp.tell()
     fp.seek(length_location)
     if fp.isExplicitVR and VR not in ['OB', 'OW', 'OF', 'SQ', 'UT', 'UN']:
         fp.write_US(location - length_location - 2)  # 2 is length of US
     else:
-        # write the proper length of the attribute back in the length slot, unless is SQ with undefined length.
+        # write the proper length of the data_element back in the length slot, unless is SQ with undefined length.
         if not isUndefinedLength:
             fp.write_UL(location - length_location - 4)  # 4 is length of UL
-    fp.seek(location)  # ready for next attribute
+    fp.seek(location)  # ready for next data_element
     if isUndefinedLength:
         fp.write_tag(SequenceDelimiterTag)
         fp.write_UL(0)  # 4-byte 'length' of delimiter data item
@@ -137,26 +137,26 @@ def WriteAttribute(fp, attribute):
 def WriteDataset(fp, dataset):
     """Write a Dataset dictionary to the file. Return the total length written."""
     fpStart = fp.tell()
-    # attributes must be written in tag order
+    # data_elements must be written in tag order
     tags = dataset.keys()
     tags.sort()
     for tag in tags:
-        WriteAttribute(fp, dataset[tag])
+        WriteDataElement(fp, dataset[tag])
 
     return fp.tell() - fpStart
 
-def WriteSequence(fp, attribute):
-    """Write a dicom Sequence contained in attribute to the file fp."""
-    # WriteAttribute has already written the VR='SQ' (if needed) and
+def WriteSequence(fp, data_element):
+    """Write a dicom Sequence contained in data_element to the file fp."""
+    # WriteDataElement has already written the VR='SQ' (if needed) and
     #    a placeholder for length"""
-    sequence = attribute.value
+    sequence = data_element.value
     for dataset in sequence:
         WriteSequenceItem(fp, dataset)
 
 def WriteSequenceItem(fp, dataset):
     """Write an item (dataset) in a dicom Sequence to the dicom file fp."""
     # see Dicom standard Part 5, p. 39 ('03 version)
-    # This is similar to writing an attribute, but with a specific tag for Sequence Item
+    # This is similar to writing a data_element, but with a specific tag for Sequence Item
     fp.write_tag(ItemTag)   # marker for start of Sequence Item
     length_location = fp.tell() # save location for later.
     fp.write_UL(0xffffffffL)   # will fill in real value later if not undefined length
@@ -168,21 +168,21 @@ def WriteSequenceItem(fp, dataset):
         location = fp.tell()
         fp.seek(length_location)
         fp.write_UL(location - length_location - 4)  # 4 is length of UL
-        fp.seek(location)  # ready for next attribute
+        fp.seek(location)  # ready for next data_element
 
-def write_UN(fp, attribute):
-    """Write a byte string for an Attribute of value 'UN' (unknown)."""
-    fp.write(attribute.value)
+def write_UN(fp, data_element):
+    """Write a byte string for an DataElement of value 'UN' (unknown)."""
+    fp.write(data_element.value)
 
-def write_ATvalue(fp, attribute):
-    """Write an attribute tag to a file."""
+def write_ATvalue(fp, data_element):
+    """Write a data_element tag to a file."""
     try:
-        attribute.value[1]  # see if is multi-valued AT 
+        data_element.value[1]  # see if is multi-valued AT 
     except TypeError:
-        tag = Tag(attribute.value)   # make sure is expressed as a Tag instance
+        tag = Tag(data_element.value)   # make sure is expressed as a Tag instance
         fp.write_tag(tag)
     else:
-        for tag in attribute.value:
+        for tag in data_element.value:
             fp.write_tag(tag)
             
 
@@ -190,9 +190,9 @@ def _WriteFileMetaInfo(fp, dataset):
     """Write the dicom group 2 dicom storage File Meta Information to the file.
 
     The file should already be positioned past the 128 byte preamble.
-    Raises ValueError if the required attributes (elements 2,3,0x10,0x12)
+    Raises ValueError if the required data_elements (elements 2,3,0x10,0x12)
     are not in the dataset. If the dataset came from a file read with
-    ReadFile(), then the required attributes should already be there.
+    ReadFile(), then the required data_elements should already be there.
     """
     fp.write('DICM')
 
@@ -205,7 +205,7 @@ def _WriteFileMetaInfo(fp, dataset):
     #   out of the dataset for file meta info
     meta_dataset = Dataset()
     meta_dataset.update(
-        dict([(tag, attr) for tag,attr in dataset.items() if tag.group == 2 and tag.elem != 0])
+        dict([(tag, data_element) for tag,data_element in dataset.items() if tag.group == 2 and tag.elem != 0])
         )
     
     if Tag((2,1)) not in meta_dataset:
@@ -220,14 +220,14 @@ def _WriteFileMetaInfo(fp, dataset):
         raise ValueError, "Missing required tags %s for file meta information" % str(missing)
     
     group_length_tell = fp.tell()
-    group_length = Attribute((2,0), 'UL', 0) # put 0 to start, write again later when length is known
-    WriteAttribute(fp, group_length)  # write that one first - get it out of the way
+    group_length = DataElement((2,0), 'UL', 0) # put 0 to start, write again later when length is known
+    WriteDataElement(fp, group_length)  # write that one first - get it out of the way
 
     length = WriteDataset(fp, meta_dataset)
     location = fp.tell()
     fp.seek(group_length_tell)
-    group_length = Attribute((2,0), 'UL', length) # now have real length
-    WriteAttribute(fp, group_length)  # write the whole attribute
+    group_length = DataElement((2,0), 'UL', length) # now have real length
+    WriteDataElement(fp, group_length)  # write the whole data_element
     fp.seek(location)
 
 def WriteFile(filename, dataset, WriteLikeOriginal=True):
@@ -284,7 +284,7 @@ def WriteFile(filename, dataset, WriteLikeOriginal=True):
     fp.isLittleEndian = dataset.isLittleEndian
     
     no_group2_dataset = Dataset()
-    no_group2_dataset.update(dict([(tag,attr) for tag,attr in dataset.items() if tag.group != 2]))
+    no_group2_dataset.update(dict([(tag,data_element) for tag,data_element in dataset.items() if tag.group != 2]))
     
     WriteDataset(fp, no_group2_dataset)
     fp.close()
@@ -312,24 +312,24 @@ writers = {'UL':(write_numbers,'L'), 'SL':(write_numbers,'l'),
            'UT':write_String,
            } # note OW/OB depends on other items, which we don't know at write time
 
-def ReplaceAttributeValue(filename, attribute, new_value):
-    """Modify a dicom file attribute value 'in-place'.
+def ReplaceDataElementValue(filename, data_element, new_value):
+    """Modify a dicom file data_element value 'in-place'.
     
     This function is no longer needed - instead, read a dicom file,
-    modify attributes, and write the file to a new (or same) filename.
+    modify data_elements, and write the file to a new (or same) filename.
     This is a more primitive function - it modifies the value in-place
     in the file. Therefore the length of new_value must be the same as
-    the existing file attribute value. If not, ValueError is raised.
+    the existing file data_element value. If not, ValueError is raised.
     
     """
     # if a text or byte string value, check if is same length
     #    XXX have I included all the right VRs here?
     #    XXX should use writers dict to write new_value properly
-    if attribute.VR not in ['UL', 'SL', 'US', 'SS', 'FL', 'FD'] and \
-      len(new_value) != len(attribute.value) + (len(attribute.value) % 2):
+    if data_element.VR not in ['UL', 'SL', 'US', 'SS', 'FL', 'FD'] and \
+      len(new_value) != len(data_element.value) + (len(data_element.value) % 2):
         raise ValueError, "New value is not the same length as existing one"
     fp = file(filename, 'r+b')
-    print "File position", hex(attribute.file_tell)
-    fp.seek(attribute.file_tell)  # start of the value field
+    print "File position", hex(data_element.file_tell)
+    fp.seek(data_element.file_tell)  # start of the value field
     fp.write(new_value)
     fp.close()

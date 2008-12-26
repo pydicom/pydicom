@@ -14,7 +14,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License (license.txt) for more details 
 
-from dicom.attribute import Attribute
+from dicom.dataelem import DataElement
 
 class Sequence(list):
     """Slightly modified python list to print nicely"""

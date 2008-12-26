@@ -143,7 +143,7 @@ def TagForName(name):
     return None
 
 def AllNamesForTag(tag):
-    """Return a list of all (long and short) attribute names for the tag"""
+    """Return a list of all (long and short) names for the tag"""
     longname = CleanName(tag)
     shortname = short_name(longname)
     names = [longname]

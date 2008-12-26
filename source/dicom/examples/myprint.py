@@ -14,17 +14,17 @@ def myprint(dataset, indent=0):
     indentStr = "   " * indent
     nextIndentStr = "   " *(indent+1)
     for k in keylist:
-        attr = dataset[k]
-        if attr.VR == "SQ":   # a sequence
-            print indentStr, attr.description()
-            for ds in attr.value:
+        data_element = dataset[k]
+        if data_element.VR == "SQ":   # a sequence
+            print indentStr, data_element.description()
+            for ds in data_element.value:
                 myprint(ds, indent+1)
                 print nextIndentStr + "---------"
         else:
-            if attr.description() in dont_print:
+            if data_element.description() in dont_print:
                 print "   ---- not printed ----   "
             else:            
-                print indentStr, attr.description(), "=", repr(attr.value) # use str(attr.value) here to skip quotes around items, etc.
+                print indentStr, data_element.description(), "=", repr(data_element.value) # use str(data_element.value) here to skip quotes around items, etc.
 
 if __name__ == "__main__":
     import dicom
