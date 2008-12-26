@@ -1,5 +1,5 @@
 # dataset.py
-"""Class Dataset: A dictionary of Attributes, which in turn can have a Sequence of Datasets.
+"""Class Dataset: A dictionary of DataElements, which in turn can have a Sequence of Datasets.
 
 Overview of Dicom object model:
 ------------------------------
@@ -120,12 +120,12 @@ class Dataset(dict):
         dicom_character_set = self.get('SpecificCharacterSet', "ISO_IR 6")
 
         # shortcut to the decode function in dicom.charset
-        decode_attr = dicom.charset.decode
+        decode_data_element = dicom.charset.decode
 
         # sub-function callback for walk(), to decode the chr strings if necessary
         # this simply calls the dicom.charset.decode function
-        def decode_callback(ds, attr):
-            decode_attr(attr, dicom_character_set)
+        def decode_callback(ds, data_element):
+            decode_data_element(data_element, dicom_character_set)
         # Use the walk function to go through all elements in the dataset and convert them
         self.walk(decode_callback)
     
@@ -207,7 +207,7 @@ class Dataset(dict):
         """
         ds = Dataset()
         ds.update(dict(
-            [(tag,attr) for tag,attr in self.items() if tag.group==group]
+            [(tag,data_element) for tag,data_element in self.items() if tag.group==group]
                       ))
         return ds
     def has_key(self, key):
@@ -233,7 +233,7 @@ class Dataset(dict):
     def __iter__(self):
         """Method to iterate through the dataset, returning data_elements.
         e.g.:
-        for attr in dataset:
+        for data_element in dataset:
             do_something...
         The data_elements are returned in DICOM order, 
         i.e. in increasing order by tag value.
@@ -242,7 +242,7 @@ class Dataset(dict):
         """
         # Note this is different than the underlying dict class, 
         #        which returns the key of the key:value mapping.
-        #   Here the value is returned (but attr.tag has the key)
+        #   Here the value is returned (but data_element.tag has the key)
         taglist = self.keys()
         taglist.sort()
         for tag in taglist:
@@ -326,15 +326,15 @@ class Dataset(dict):
         strings = []
         indentStr = self.indentChars * indent
         nextIndentStr = self.indentChars *(indent+1)
-        for attr in self:
-            if attr.VR == "SQ":   # a sequence
-                strings.append(indentStr + str(attr.tag) + "  %s   %i item(s) ---- " % ( attr.description(),len(attr.value)))
+        for data_element in self:
+            if data_element.VR == "SQ":   # a sequence
+                strings.append(indentStr + str(data_element.tag) + "  %s   %i item(s) ---- " % ( data_element.description(),len(data_element.value)))
                 if not topLevelOnly:
-                    for dataset in attr.value:
+                    for dataset in data_element.value:
                         strings.append(dataset._PrettyStr(indent+1))
                         strings.append(nextIndentStr + "---------")
             else:
-                strings.append(indentStr + repr(attr))
+                strings.append(indentStr + repr(data_element))
         return "\n".join(strings)
         
     def RemovePrivateTags(self):
@@ -422,7 +422,7 @@ class Dataset(dict):
         callback -- a callable method which takes two arguments: a dataset, and
                     a data_element belonging to that dataset.
         
-        Attributes will come back in dicom order (by increasing tag number
+        DataElements will come back in dicom order (by increasing tag number
         within their dataset)
         
         """

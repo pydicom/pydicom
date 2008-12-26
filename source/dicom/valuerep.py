@@ -117,7 +117,7 @@ class PersonNameUnicode(PersonNameBase, unicode):
         val -- the PN value to store
         encodings -- a list of python encodings, generally found
                  from dicom.charset.python_encodings mapping
-                 of values in DICOM attribute (0008,0005).
+                 of values in DICOM data element (0008,0005).
         """
         # Make the possible three character encodings explicit:        
         if not isinstance(encodings, list):

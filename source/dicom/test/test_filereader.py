@@ -46,7 +46,7 @@ def isClose(a, b, epsilon=0.000001): # compare within some tolerance, to avoid m
 
 class ReaderTests(unittest.TestCase):
     def testRTPlan(self):
-        """Returns correct values for sample attributes in test RT Plan file"""
+        """Returns correct values for sample data elements in test RT Plan file"""
         plan = ReadFile(rtplan_name)
         beam = plan.Beams[0]
         cp0, cp1 = beam.ControlPoints # if not two controlpoints, then this would raise exception
@@ -62,7 +62,7 @@ class ReaderTests(unittest.TestCase):
         self.assert_(isClose(JawX[0], -100.0) and isClose(JawX[1], 100.0),
                 "X jaws not as expected (control point 0)")
     def testRTDose(self):
-        """Returns correct values for sample attributes in test RT Dose file"""
+        """Returns correct values for sample data elements in test RT Dose file"""
         dose = ReadFile(rtdose_name)
         self.assertEqual(dose.FrameIncrementPointer, Tag((0x3004, 0x000c)),
                 "Frame Increment Pointer not the expected value")
@@ -74,7 +74,7 @@ class ReaderTests(unittest.TestCase):
         beamnum = fract.ReferencedBeams[0].ReferencedBeamNumber
         self.assertEqual(beamnum, 1, "Beam number not the expected value")
     def testCT(self):
-        """Returns correct values for sample attributes in test CT file"""
+        """Returns correct values for sample data elements in test CT file"""
         ct = ReadFile(ct_name)
         self.assertEqual(ct.ImplementationClassUID, '1.3.6.1.4.1.5962.2',
                 "ImplementationClassUID not the expected value")
@@ -89,7 +89,7 @@ class ReaderTests(unittest.TestCase):
         self.assertEqual(ct.BitsStored, 16, "Bits Stored not 16")
         self.assertEqual(len(ct.PixelData), 128*128*2, "Pixel data not expected length")
     def testMR(self):
-        """Returns correct values for sample attributes in test MR file"""
+        """Returns correct values for sample data elements in test MR file"""
         mr = ReadFile(mr_name)
         # (0010, 0010) Patient's Name           'CompressedSamples^MR1'
         self.assertEqual(mr.PatientsName, 'CompressedSamples^MR1', "Wrong patient name")
@@ -97,19 +97,19 @@ class ReaderTests(unittest.TestCase):
                 "Name does not match value found when accessed by tag number")
         self.assert_(isClose(mr.PixelSpacing, [0.3125, 0.3125]), "Wrong pixel spacing")
     def testDeflate(self):
-        """Returns correct values for sample attributes in test compressed (zlib deflate) file"""
+        """Returns correct values for sample data elements in test compressed (zlib deflate) file"""
         # Everything after group 2 is compressed. If we can read anything else, the decompression must have been ok.
         ds = ReadFile(deflate_name)
         got = ds.ConversionType
         expected = "WSD"
-        self.assertEqual(got, expected, "Attempted to read deflated file attribute Conversion Type, expected '%s', got '%s'" % (expected, got))
+        self.assertEqual(got, expected, "Attempted to read deflated file data element Conversion Type, expected '%s', got '%s'" % (expected, got))
 
 class JPEG2000Tests(unittest.TestCase):
     def setUp(self):
         self.jpeg = ReadFile(jpeg2000_name)
     def testJPEG2000(self):
-        """JPEG2000: Returns correct values for sample attributes..........."""
-        expected = [Tag(0x0054, 0x0010), Tag(0x0054, 0x0020)] # XX also tests multiple-valued AT attribute
+        """JPEG2000: Returns correct values for sample data elements..........."""
+        expected = [Tag(0x0054, 0x0010), Tag(0x0054, 0x0020)] # XX also tests multiple-valued AT data element
         got = self.jpeg.FrameIncrementPointer
         self.assertEqual(got, expected, "JPEG2000 file, Frame Increment Pointer: expected %s, got %s" % (expected, got))
 
@@ -124,7 +124,7 @@ class JPEGlossyTests(unittest.TestCase):
     def setUp(self):
         self.jpeg = ReadFile(jpeg_lossy_name)
     def testJPEGlossy(self):
-        """JPEG-lossy: Returns correct values for sample attributes........."""
+        """JPEG-lossy: Returns correct values for sample data elements........."""
         got = self.jpeg.DerivationCodes[0].CodeMeaning
         expected = 'Lossy Compression'
         self.assertEqual(got, expected, "JPEG-lossy file, Code Meaning got %s, expected %s" % (got, expected))
@@ -136,7 +136,7 @@ class JPEGlosslessTests(unittest.TestCase):
     def setUp(self):
         self.jpeg = ReadFile(jpeg_lossless_name)
     def testJPEGlossless(self):
-        """JPEGlossless: Returns correct values for sample attributes..........."""
+        """JPEGlossless: Returns correct values for sample data elements..........."""
         got = self.jpeg.SourceImages[0].PurposeofReferenceCodes[0].CodeMeaning
         expected = 'Uncompressed predecessor'
         self.assertEqual(got, expected, "JPEG-lossless file, Code Meaning got %s, expected %s" % (got, expected))

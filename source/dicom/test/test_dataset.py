@@ -15,7 +15,7 @@
 
 import unittest
 from dicom.dataset import Dataset
-from dicom.attribute import Attribute
+from dicom.dataelem import DataElement
 
 class DatasetTests(unittest.TestCase):
     def dummy_dataset(self):
@@ -24,15 +24,15 @@ class DatasetTests(unittest.TestCase):
         ds.AddNew((0x300a, 0x00b2), "SH", "unit001") # TreatmentMachineName
         return ds
         
-    def testSetNewAttributeByName(self):
-        """Dataset: set new attribute by name............................."""
+    def testSetNewDataElementByName(self):
+        """Dataset: set new data_element by name............................."""
         ds = Dataset()
         ds.TreatmentMachineName = "unit #1"
-        attribute = ds[0x300a, 0x00b2]
-        self.assertEqual(attribute.value, "unit #1", "Unable to set attribute by name")
-        self.assertEqual(attribute.VR, "SH", "attribute not the expected VR")
-    def testSetExistingAttributeByName(self):
-        """Dataset: set existing attribute by name........................"""
+        data_element = ds[0x300a, 0x00b2]
+        self.assertEqual(data_element.value, "unit #1", "Unable to set data_element by name")
+        self.assertEqual(data_element.VR, "SH", "data_element not the expected VR")
+    def testSetExistingDataElementByName(self):
+        """Dataset: set existing data_element by name........................"""
         ds = self.dummy_dataset()
         ds.TreatmentMachineName = "unit999" # change existing value
         self.assertEqual(ds[0x300a, 0x00b2].value, "unit999")
@@ -64,33 +64,33 @@ class DatasetTests(unittest.TestCase):
         self.assertEqual(not_there, "not-there",
                     "dataset.get() did not return default value for non-member")
     def test__setitem__(self):
-        """Dataset: if set an item, it must be an Attribute instance......"""
+        """Dataset: if set an item, it must be an DataElement instance......"""
         def callSet():
-            ds[0x300a, 0xb2]="unit1" # common error - set attribute instead of attr.value
+            ds[0x300a, 0xb2]="unit1" # common error - set data_element instead of data_element.value
             
         ds = Dataset()
         self.assertRaises(TypeError, callSet)
     def test_matching_tags(self):
-        """Dataset: key and attribute.tag mismatch raises ValueError......"""
+        """Dataset: key and data_element.tag mismatch raises ValueError......"""
         def set_wrong_tag():
-            ds[0x10,0x10] = attribute
+            ds[0x10,0x10] = data_element
         ds = Dataset()
-        attribute = Attribute((0x300a, 0x00b2), "SH", "unit001")
+        data_element = DataElement((0x300a, 0x00b2), "SH", "unit001")
         self.assertRaises(ValueError, set_wrong_tag)
     def test_NamedMemberUpdated(self):
-        """Dataset: if set attribute by tag, name also reflects change...."""
+        """Dataset: if set data_element by tag, name also reflects change...."""
         ds = self.dummy_dataset()
         ds[0x300a,0xb2].value = "moon_unit"
         self.assertEqual(ds.TreatmentMachineName, 'moon_unit', "Member not updated")
     def testUpdate(self):
         """Dataset: update() method works with tag or name................"""
         ds = self.dummy_dataset()
-        pat_attr = Attribute((0x10,0x12), 'PN', 'Johnny')
-        ds.update({'PatientsName': 'John', (0x10,0x12): pat_attr})
-        self.assertEqual(ds[0x10,0x10].value, 'John', "named attribute not set")
+        pat_data_element = DataElement((0x10,0x12), 'PN', 'Johnny')
+        ds.update({'PatientsName': 'John', (0x10,0x12): pat_data_element})
+        self.assertEqual(ds[0x10,0x10].value, 'John', "named data_element not set")
         self.assertEqual(ds[0x10,0x12].value, 'Johnny', "set by tag failed")
     def testDir(self):
-        """Dataset: dir() returns sorted list of named attributes........."""
+        """Dataset: dir() returns sorted list of named data_elements........."""
         ds = self.dummy_dataset()
         ds.PatientsName = "name"
         ds.PatientID = "id"

@@ -33,15 +33,15 @@ import os, os.path
 
 def anonymize(filename, output_filename, PersonName="anonymous",
               PatientID="id", RemoveCurves=True, RemovePrivate=True):
-    """Replace attributes with VR="PN" with PersonName etc."""
-    def PN_callback(ds, attr):
-        """Called from the dataset "walk" recursive function for all attributes."""
-        if attr.VR == "PN":
-            attr.value = PersonName
-    def curves_callback(ds, attr):
-        """Called from the dataset "walk" recursive function for all attributes."""
-        if attr.tag.group & 0xFF00 == 0x5000:
-            del ds[attr.tag]
+    """Replace data elements with VR="PN" with PersonName etc."""
+    def PN_callback(ds, data_element):
+        """Called from the dataset "walk" recursive function for all data elements."""
+        if data_element.VR == "PN":
+            data_element.value = PersonName
+    def curves_callback(ds, data_element):
+        """Called from the dataset "walk" recursive function for all data elements."""
+        if data_element.tag.group & 0xFF00 == 0x5000:
+            del ds[data_element.tag]
         
     from dicom.filereader import ReadFile
     from dicom.filewriter import WriteFile    

@@ -103,7 +103,7 @@ def read_SingleString(fp, length):
     return val
 
 def ReadDataElement(fp, length=None):
-    attr_tell = fp.tell()
+    data_element_tell = fp.tell()
     try:
         tag = fp.read_tag()
     except EOFError:
@@ -113,9 +113,9 @@ def ReadDataElement(fp, length=None):
         length = fp.read_UL()
         if length != 0:
             logger.warning("Expected 0x00000000 after delimiter, found 0x%x, at position 0x%x", length, fp.tell()-4)
-        attr = DataElement(tag, None, None, attr_tell)
-        logger.debug("%04x: %s", attr_tell, str(attr))
-        return attr
+        data_element = DataElement(tag, None, None, data_element_tell)
+        logger.debug("%04x: %s", data_element_tell, str(data_element))
+        return data_element
         
     # Get the value representation VR
     if fp.isImplicitVR:
@@ -147,8 +147,8 @@ def ReadDataElement(fp, length=None):
     value_tell = fp.tell() # store file location and size, for programs like anonymizers
     length_original = length
     if VR == "SQ":
-        temp_attr = DataElement(tag,VR, Sequence(), attr_tell)
-        logger.debug("%04x: %s", attr_tell, temp_attr)
+        temp_data_element = DataElement(tag,VR, Sequence(), data_element_tell)
+        logger.debug("%04x: %s", data_element_tell, temp_data_element)
         logger.debug("                         -------> SQ is using %s", ["explicit length", "Undefined Length"][isUndefinedLength])
     try:
         readers[VR][0] # if reader is a tuple, then need to pass a number format
@@ -158,11 +158,11 @@ def ReadDataElement(fp, length=None):
         value = readers[VR][0](fp, length, readers[VR][1])
     if tag == 0x00280103: # This flags whether pixel values are US (val=0) or SS (val = 1)
         fp.isSSpixelRep = value # XXX This is not used anywhere else in code?
-    attr = DataElement(tag, VR, value, value_tell)
-    attr.isUndefinedLength = isUndefinedLength # store this to write back data element in same way was read
-    if attr.VR != "SQ":
-        logger.debug("%04x: %s", attr_tell, str(attr))
-    return attr
+    data_element = DataElement(tag, VR, value, value_tell)
+    data_element.isUndefinedLength = isUndefinedLength # store this to write back data element in same way was read
+    if data_element.VR != "SQ":
+        logger.debug("%04x: %s", data_element_tell, str(data_element))
+    return data_element
 
 def ReadDataset(fp, bytelength=None):
     """Return a Dataset dictionary containing DataElements starting from
@@ -205,8 +205,8 @@ def ReadSequence(fp, bytelength):
 def ReadSequenceItem(fp):
     tag = fp.read_tag()
     if tag == SequenceDelimiterTag: # No more items, time for sequence to stop reading
-        attr = DataElement(tag, None, None, fp.tell()-4)
-        logger.debug("%04x: %s", fp.tell()-4, str(attr))
+        data_element = DataElement(tag, None, None, fp.tell()-4)
+        logger.debug("%04x: %s", fp.tell()-4, str(data_element))
         length = fp.read_UL()
         if length != 0:
             logger.warning("Expected 0x00000000 after delimiter, found 0x%x, at position 0x%x", length, fp.tell()-4)
