@@ -27,7 +27,7 @@ from dicom.UID import ImplicitVRLittleEndian, ExplicitVRBigEndian
 from dicom.filebase import DicomFile, DicomStringIO
 from dicom.datadict import dictionaryVR, dictionaryDescription
 from dicom.dataset import Dataset
-from dicom.attribute import Attribute
+from dicom.dataelem import DataElement
 from dicom.tag import Tag, ItemTag, ItemDelimiterTag, SequenceDelimiterTag
 from dicom.sequence import Sequence
 from dicom.valuerep import PersonName, MultiValue, MultiString
@@ -66,7 +66,7 @@ def read_OBvalue(fp, length):
     return data
 
 def read_OWvalue(fp, length):
-    # NO!:  """Return an "Other word" attribute as a tuple of short integers,
+    # NO!:  """Return an "Other word" data element as a tuple of short integers,
     #         with the proper byte swapping done"""
     # XXX for now just return the raw bytes and let the caller decide what to do with them
     isUndefinedLength = False
@@ -102,7 +102,7 @@ def read_SingleString(fp, length):
         val = val[:-1]
     return val
 
-def ReadAttribute(fp, length=None):
+def ReadDataElement(fp, length=None):
     attr_tell = fp.tell()
     try:
         tag = fp.read_tag()
@@ -113,7 +113,7 @@ def ReadAttribute(fp, length=None):
         length = fp.read_UL()
         if length != 0:
             logger.warning("Expected 0x00000000 after delimiter, found 0x%x, at position 0x%x", length, fp.tell()-4)
-        attr = Attribute(tag, None, None, attr_tell)
+        attr = DataElement(tag, None, None, attr_tell)
         logger.debug("%04x: %s", attr_tell, str(attr))
         return attr
         
@@ -147,7 +147,7 @@ def ReadAttribute(fp, length=None):
     value_tell = fp.tell() # store file location and size, for programs like anonymizers
     length_original = length
     if VR == "SQ":
-        temp_attr = Attribute(tag,VR, Sequence(), attr_tell)
+        temp_attr = DataElement(tag,VR, Sequence(), attr_tell)
         logger.debug("%04x: %s", attr_tell, temp_attr)
         logger.debug("                         -------> SQ is using %s", ["explicit length", "Undefined Length"][isUndefinedLength])
     try:
@@ -158,29 +158,29 @@ def ReadAttribute(fp, length=None):
         value = readers[VR][0](fp, length, readers[VR][1])
     if tag == 0x00280103: # This flags whether pixel values are US (val=0) or SS (val = 1)
         fp.isSSpixelRep = value # XXX This is not used anywhere else in code?
-    attr = Attribute(tag, VR, value, value_tell)
-    attr.isUndefinedLength = isUndefinedLength # store this to write back attribute in same way was read
+    attr = DataElement(tag, VR, value, value_tell)
+    attr.isUndefinedLength = isUndefinedLength # store this to write back data element in same way was read
     if attr.VR != "SQ":
         logger.debug("%04x: %s", attr_tell, str(attr))
     return attr
 
 def ReadDataset(fp, bytelength=None):
-    """Return a Dataset dictionary containing Attributes starting from
+    """Return a Dataset dictionary containing DataElements starting from
     the current file position through the following bytelength bytes
     The dictionary key is the Dicom (group, element) tag, and the dictionary
-    value is the Attribute class instance
+    value is the DataElement class instance
     """
     ds = Dataset()
     if bytelength == 0:
         return ds
     fpStart = fp.tell()
     while (not bytelength) or (fp.tell()-fpStart < bytelength): # byteslength is None
-        attribute = ReadAttribute(fp)
-        if not attribute:
+        data_element = ReadDataElement(fp)
+        if not data_element:
             break        # a is None if end-of-file
-        if attribute.tag == ItemDelimiterTag: # dataset is an item in a sequence
+        if data_element.tag == ItemDelimiterTag: # dataset is an item in a sequence
             break
-        ds.Add(attribute)
+        ds.Add(data_element)
     # XXX should test that fp.tell() exactly number of bytes expected?
     return ds
 
@@ -205,7 +205,7 @@ def ReadSequence(fp, bytelength):
 def ReadSequenceItem(fp):
     tag = fp.read_tag()
     if tag == SequenceDelimiterTag: # No more items, time for sequence to stop reading
-        attr = Attribute(tag, None, None, fp.tell()-4)
+        attr = DataElement(tag, None, None, fp.tell()-4)
         logger.debug("%04x: %s", fp.tell()-4, str(attr))
         length = fp.read_UL()
         if length != 0:
@@ -297,7 +297,7 @@ def ReadDelimiterItem(fp, delimiter):
         logger.warn("Expected delimiter item to have length 0, got %d at file position 0x%x", length, fp.tell()-4)
     
 def read_UN(fp, length):
-    """Return a byte string for an Attribute of value 'UN' (unknown)"""
+    """Return a byte string for an DataElement of value 'UN' (unknown)"""
     if length == 0xFFFFFFFFL:
         raise NotImplementedError, "This code has not been tested for 'UN' with unknown length"
         delimiter = 0xFFFEE00DL
@@ -309,7 +309,7 @@ def read_UN(fp, length):
         return fp.read(length)
 
 def read_ATvalue(fp, length):
-    """Return an attribute tag as the value of the current Dicom attribute being read"""
+    """Return an data_element tag as the value of the current Dicom data_element being read"""
     if length == 4:
         return fp.read_tag()
     # length > 4
@@ -330,7 +330,7 @@ def _ReadFileMetaInfo(fp):
     fp.isLittleEndian = True
     fp.isImplicitVR = False
 
-    GroupLength = ReadAttribute(fp)
+    GroupLength = ReadDataElement(fp)
     return ReadDataset(fp, GroupLength.value)
 
 def ReadFileMetaInfo(filename):

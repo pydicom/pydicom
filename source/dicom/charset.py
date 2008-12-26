@@ -47,10 +47,10 @@ from dicom.valuerep import PersonNameUnicode, PersonName
 #          in Person Name PN, after ^ or =
 # NOTE also that 7.5.3 SEQUENCE INHERITANCE states that if (0008,0005) 
 #       is not present in a sequence item then it is inherited from its parent.
-def decode(attr, dicom_character_set):
-    """Apply the DICOM character encoding to the attribute
+def decode(data_element, dicom_character_set):
+    """Apply the DICOM character encoding to the data element
     
-    attr -- Attribute instance containing a value to convert
+    data_element -- DataElement instance containing a value to convert
     dicom_character_set -- the value of Specific Character Set (0008,0005),
                     which may be a single value,
                     a multiple value (code extension), or
@@ -73,13 +73,13 @@ def decode(attr, dicom_character_set):
         dicom_character_set = [dicom_character_set]
     # decode the string value to unicode
     # PN is special case as may have 3 components with differenct chr sets
-    if attr.VR == "PN": 
-        # logger.warn("%s ... type: %s" %(str(attr), type(attr.VR)))
+    if data_element.VR == "PN": 
+        # logger.warn("%s ... type: %s" %(str(data_element), type(data_element.VR)))
         encodings = [python_encoding[x] for x in dicom_character_set]
         if len(encodings) == 1:
             encodings = [encodings[0]]*3
         if len(encodings) == 2:
             encodings.append(encodings[1])
-        attr.value = PersonNameUnicode(attr.value, encodings)
-    if attr.VR in ['SH', 'LO', 'ST', 'LT', 'UT']:
-        attr.value = attr.value.decode(python_encoding[dicom_character_set[0]])
+        data_element.value = PersonNameUnicode(data_element.value, encodings)
+    if data_element.VR in ['SH', 'LO', 'ST', 'LT', 'UT']:
+        data_element.value = data_element.value.decode(python_encoding[dicom_character_set[0]])
