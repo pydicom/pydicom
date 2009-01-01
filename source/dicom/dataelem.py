@@ -26,28 +26,28 @@ from dicom.UID import UID
 def isMultiValue(value):
     """Helper function: return True if 'value' is 'list-like'."""
     if isString(value):
-        return 0
+        return False
     try:
         value[0]
     except:
-        return 0
-    return 1
+        return False
+    return True
     
 def isString(val):
     """Helper function: return True if val is a string."""
     try:
         val + ""
     except:
-        return 0
-    return 1
+        return False
+    return True
 
 def isStringOrStringList(val):
     """Return true if val consists only of strings. val may be a list/tuple."""
     if isMultiValue(val):
         for item in val:
             if not isString(item):
-                return 0
-        return 1
+                return False
+        return True
     else:  # single value - test for a string
         return isString(val)            
 

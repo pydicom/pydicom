@@ -17,8 +17,9 @@ import sys
 import os
 import os.path
 import unittest
-from dicom.filereader import ReadFile
+from dicom.filereader import ReadFile, DicomStringIO, ReadDataElement
 from dicom.tag import Tag
+from dicom.sequence import Sequence
 
 rtplan_name = "rtplan.dcm"
 rtdose_name = "rtdose.dcm"
@@ -144,6 +145,23 @@ class JPEGlosslessTests(unittest.TestCase):
         """JPEGlossless: Fails gracefully when uncompressed data is asked for..."""
         self.assertRaises(NotImplementedError, self.jpeg._getPixelArray)        
 
+class SequenceTests(unittest.TestCase):
+    def testEmptyItem(self):
+        """Read sequence with a single empty item................................"""
+        # This is fix for issue 27
+        bytes = "\x08\x00\x32\x10\x08\x00\x00\x00\xfe\xff\x00\xe0\x00\x00\x00\x00" # from issue 27, procedure code sequence (0008,1032)
+        bytes += "\x08\x00\x3e\x10\x0c\x00\x00\x00\x52\x20\x41\x44\x44\x20\x56\x49\x45\x57\x53\x20" # data element following
+        # create an in-memory fragment of a DICOM
+        fp = DicomStringIO(bytes) 
+        fp.isLittleEndian = True
+        fp.isImplicitVR = True
+        data_element = ReadDataElement(fp)
+        seq = data_element.value
+        self.assert_(isinstance(seq, Sequence) and len(seq[0])==0, "Expected Sequence with single empty item, got item %s" % repr(seq[0]))
+        elem2 = ReadDataElement(fp)
+        self.assertEqual(elem2.tag, 0x0008103e, "Expected a data element after empty sequence item")
+        
+        
 if __name__ == "__main__":
     # This is called if run alone, but not if loaded through run_tests.py
     # If not run from the directory where the sample images are, then need to switch there
