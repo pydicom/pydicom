@@ -34,7 +34,7 @@ for module in modulenames:
     suite.addTest(test)
 
 # Run the tests
-runner = unittest.TextTestRunner(verbosity=2)
+runner = unittest.TextTestRunner(verbosity=1)
 os.chdir("../testfiles")
 runner.run(suite)
 os.chdir(save_dir)
