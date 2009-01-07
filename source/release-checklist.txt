@@ -1,0 +1,31 @@
+pydicom release checklist
+* write ReleaseNotes by going through revision history
+* review issue list for any other changes that should be in the release
+* run test/all.bat on windows to test all python versions against svn code
+* run test/all.sh on linux/mac to test all python versions against svn code
+* run each example file and clean up any output files created
+* make sure all changes have been committed to repository
+* build the package files
+    * python setup.py bdist_wininst
+    * python setup.py sdist
+* install the package on
+  * windows -- 32-bit  / 64-bit using Windows installer
+  * linux   -- 32-bit  / 64-bit
+  and run the tests in one python version on each system
+* register with pypi -- python setup.py register
+* run easy_install (retrieve from pypi) again on clean system and make sure it works:
+  * with -e option to install source?
+  * as a pure egg
+* verify that source install has _all_ directories and subdirectories included
+* update documentation:
+  * update Release Notes page
+  * special attention to deprecated modules, classes, etc
+  * look for references to specific versions and update
+  * any changes related to version of python itself
+  * read all pages quickly
+* announce on pydicom google group
+* announce to python(x,y)?
+* update info in medphys files
+
+
+

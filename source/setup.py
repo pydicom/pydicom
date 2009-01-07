@@ -7,13 +7,13 @@ import os.path
 import sys
 
 setup(name="pydicom",
-      version="0.9.1",
-      description="Read, display, modify, write Dicom files",
+      version="0.9.2",
+      description="Pure python package for DICOM file reading and writing",
       author="Darcy Mason",
       author_email="darcymason@gmail.com",
       url="http://pydicom.googlecode.com",
       packages=['dicom'],
-	  package_data={'dicom': ['examples/*', 'test/*', 'util/*']},
+	  package_data={'dicom': ['examples/*', 'test/*', 'testfiles/*', 'util/*']},
       license = "Gnu General Public License",
       classifiers = [
         "License :: OSI Approved :: GNU General Public License (GPL)",

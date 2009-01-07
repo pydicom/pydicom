@@ -1,6 +1,8 @@
 include *.txt *.py
 include MANIFEST.in
+exclude release-checklist.txt
 recursive-include dicom/examples *.txt *.py
 recursive-include dicom/doc *
 recursive-include dicom/test *.dcm *.py *.txt
 recursive-include dicom/util *.dcm *.py *.txt
+recursive-include dicom/testfiles *.dcm *.py *.txt
