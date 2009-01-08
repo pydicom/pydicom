@@ -34,7 +34,10 @@ for module in modulenames:
     suite.addTest(test)
 
 # Run the tests
-runner = unittest.TextTestRunner(verbosity=1)
+verbosity = 1
+if len(sys.argv) > 1 and (sys.argv[1]=="-v" or sys.argv[1]=="--verbose"):
+    verbosity = 2
+runner = unittest.TextTestRunner(verbosity=verbosity)
 os.chdir("../testfiles")
 runner.run(suite)
 os.chdir(save_dir)

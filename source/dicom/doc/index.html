@@ -1,60 +1,12 @@
 <html>
 <head>
-<title>Pydicom - Python modules for handling DICOM files</title>
+<title>Pydicom - Pure Python package for DICOM files</title>
 </head>
 <body>
-<h1>Pydicom - a Python package for handling DICOM files</h1>
+<h1>Pydicom - Pure Python package for DICOM files</h1>
 <p>
-Pydicom allows easy reading and writing of 
-<a href="http://medical.nema.org">DICOM</a> files. DICOM is a standard for the transfer
-of medical images and other medical information between different equipment or software.
+Documentation for pydicom is available at the 
+<a href="http://code.google.com/p/pydicom/">pydicom googlecode website</a>
 </p>
-<p>
-Pydicom is released under the terms of the 
-<a href="http://www.gnu.org/licenses/gpl.txt">GNU General Public License</a>. 
-<p>
-<h2>Quick Start</h2>
-<ol>
-<li>Get and install Python (www.python.org). If you are on Windows, try the
-(free) <a href="http://www.activestate.com/Products/ActivePython">ActivePython distribution</a>.</li>
-
-<li>Here is a very simple program to read a dicom file, modify a value, and
-write the result to a new dicom file::
-<pre>
-    import dicom
-    dataset = dicom.ReadFile("file1.dcm")
-    dataset.PatientsName = 'anonymous'
-    dicom.WriteFile("file2.dcm", dataset)
-</pre></li>
-<li>See the files in the <b>examples</b> directory that came with this package,
-in particular the capture of an interactive session. This will quickly show you what
-you can do with this package.</li>
-
-<li>Use <b>pydoc</b> to access a kind of 'reference manual' for this package. See Documentation
-section below.</li>
-</ol>
-<h2>Documentation</h2>
-<h3>pydoc</h3>
-pydoc is a standard module in Python 2.1 and higher. Run it with a command line like:
-<pre>
-    python pydoc.py -w -g dicom
-</pre>
-(The above command may need to be modified to "find" pydoc. For example, on my system:
-<pre>
-    python c:\python23\lib\pydoc.py -w -g dicom
-</pre>
-<p>
-This command will start a browser and allow you to surf through documentation of modules, 
-classes and functions. The first page will contain all kinds of Python modules. Keep
-looking - the dicom link is there somewhere.</p>
-<p>
-pydoc can also be accessed using the help function at the python prompt. For example:
-<pre>
-    >>>from dicom.dataset import Dataset
-    >>>help(Dataset)
-</pre>
-<p>Learn the methods of the Dataset class; that is the one you will
-work with most directly.</p>
-
 </body>
 </html>
