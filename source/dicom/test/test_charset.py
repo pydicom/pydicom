@@ -17,8 +17,8 @@
 import unittest
 import dicom
 
-latin1_file = "charsets/chrFren.dcm"
-jp_file = "charsets/chrH31.dcm"
+latin1_file = "../testcharsetfiles/chrFren.dcm"
+jp_file = "../testcharsetfiles/chrH31.dcm"
 
 class charsetTests(unittest.TestCase):
     def testLatin1(self):

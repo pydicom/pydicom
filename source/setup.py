@@ -13,8 +13,10 @@ setup(name="pydicom",
       author_email="darcymason@gmail.com",
       url="http://pydicom.googlecode.com",
       packages=['dicom'],
-	  package_data={'dicom': ['examples/*', 'test/*', 'testfiles/*', 'util/*']},
+      package_data={'dicom': ['examples/*', 'test/*', 'testcharsetfiles/*', 
+                    'testfiles/*', 'util/*']},
       license = "Gnu General Public License",
+      keywords = "dicom python medical imaging",
       classifiers = [
         "License :: OSI Approved :: GNU General Public License (GPL)",
         "Intended Audience :: Developers",
@@ -29,4 +31,3 @@ setup(name="pydicom",
         ]
 
      )
-
