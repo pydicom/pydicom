@@ -1,5 +1,1 @@
-include *.txt *.py *.htm *.html *.dcm
-exclude MANIFEST.in
-exclude setup.py
-exclude release-checklist.txt
 exclude generate_dict/*

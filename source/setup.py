@@ -1,20 +1,21 @@
 #!/usr/bin/env python
-
-from distutils.core import setup
+import ez_setup
+ez_setup.use_setuptools()
+from setuptools import setup
 import os
 import os.path
 
 import sys
 
 setup(name="pydicom",
+      include_package_data = True,
+      zip_safe = False, # could do it but want users to be able to directly see examples,tests included with package
+      packages = ['dicom'],
       version="0.9.2",
       description="Pure python package for DICOM file reading and writing",
       author="Darcy Mason",
       author_email="darcymason@gmail.com",
       url="http://pydicom.googlecode.com",
-      packages=['dicom'],
-      package_data={'dicom': ['examples/*', 'test/*', 'testcharsetfiles/*', 
-                    'testfiles/*', 'util/*']},
       license = "Gnu General Public License",
       keywords = "dicom python medical imaging",
       classifiers = [
