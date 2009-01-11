@@ -1,1 +1,2 @@
 exclude generate_dict/*
+exclude release-checklist.txt
