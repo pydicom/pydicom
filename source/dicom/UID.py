@@ -57,7 +57,11 @@ ImplicitVRLittleEndian = UID('1.2.840.10008.1.2')
 DeflatedExplicitVRLittleEndian = UID('1.2.840.10008.1.2.1.99')
 ExplicitVRBigEndian = UID('1.2.840.10008.1.2.2')
 
-        
+NotCompressedPixelTransferSyntaxes = [ExplicitVRLittleEndian,
+                                      ImplicitVRLittleEndian,
+                                      DeflatedExplicitVRLittleEndian,
+                                      ExplicitVRBigEndian]
+                                      
 # Many thanks to the Medical Connections for offering free valid UIDs (http://www.medicalconnections.co.uk/FreeUID.html)
 # Their service was used to obtain the following root UID for pydicom:
 root = '1.2.826.0.1.3680043.8.498.'

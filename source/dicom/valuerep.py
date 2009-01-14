@@ -18,6 +18,15 @@ from sys import version_info
 if version_info[0] < 3:
     bytestring = object
 
+def is_stringlike(name):
+    """Return True if name is string-like."""
+    try:
+        name + ""
+    except TypeError:
+        return False
+    else:
+        return True
+
 class MultiValue(list):
     """MutliValue is a special list, derived to overwrite the __str__ method
     to display the multi-value list more nicely. Used for Dicom values of
