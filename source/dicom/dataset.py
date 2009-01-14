@@ -31,6 +31,9 @@ from dicom.datadict import DicomDictionary, dictionaryVR
 from dicom.datadict import TagForName, AllNamesForTag
 from dicom.tag import Tag
 from dicom.dataelem import DataElement
+from dicom.valuerep import is_stringlike
+from dicom.UID import NotCompressedPixelTransferSyntaxes 
+
 import dicom # for WriteFile
 import dicom.charset
 
@@ -81,6 +84,7 @@ class Dataset(dict):
         import warnings
         warnings.warn("Dataset.attribute() is deprecated and will be removed in pydicom 1.0. Use Dataset.data_element() instead", DeprecationWarning)
         return self.data_element(name)
+    
     def data_element(self, name):
         """Return the full data_element instance for the given descriptive name.
         
@@ -98,7 +102,7 @@ class Dataset(dict):
         This is called for code like: ``if 'SliceLocation' in dataset``.
         
         """
-        if self._isString(name):
+        if is_stringlike(name):
             tag = TagForName(name)
         else:
             try:
@@ -175,7 +179,7 @@ class Dataset(dict):
         
     def get(self, key, default=None):
         """Extend dict.get() to handle *named tags*."""
-        if self._isString(key):
+        if is_stringlike(key):
             try:
                 return getattr(self, key)
             except AttributeError:
@@ -221,15 +225,6 @@ class Dataset(dict):
         self.isLittleEndian = not value
     isBigEndian = property(_getBigEndian, _setBigEndian)
     
-    def _isString(self, name):
-        """Return True if name is a string."""
-        try:
-            name + ""
-        except TypeError:
-            return 0
-        else:
-            return 1
-
     def __iter__(self):
         """Method to iterate through the dataset, returning data_elements.
         e.g.:
@@ -294,11 +289,8 @@ class Dataset(dict):
     
     # PixelArray property
     def _getPixelArray(self):
-        if self.TransferSyntaxUID not in ['1.2.840.10008.1.2',        
         # Check if pixel data is in a form we know how to make into an array
-                                          '1.2.840.10008.1.2.1',
-                                          '1.2.840.10008.1.2.1.99',
-                                          '1.2.840.10008.1.2.2']: 
+        if self.TransferSyntaxUID not in NotCompressedPixelTransferSyntaxes :
             raise NotImplementedError, "Pixel Data is compressed in a format pydicom does not yet handle. Cannot return array"
 
         # Check if already have converted to a NumPy array
@@ -314,6 +306,32 @@ class Dataset(dict):
         return self._PixelArray
     PixelArray = property(_getPixelArray)
     
+    # Format strings spec'd according to python string formatting options
+    #    See http://docs.python.org/library/stdtypes.html#string-formatting-operations
+    default_element_format =  "%(tag)s %(name)-35.35s %(VR)s: %(repval)s"
+    default_sequence_element_format = "%(tag)s %(name)-35.35s %(VR)s: %(value)s"
+    def formatted_lines(self, element_format=default_element_format, 
+                        sequence_element_format=default_sequence_element_format,
+                        indent_format=None):
+        """A generator to give back a formatted string representing each line
+        one at a time. Use like:
+            for line in dataset.formatted_lines():
+                print line
+        """
+        for data_element in self:
+            de=data_element
+            elem_dict = dict([(x, getattr(de,x)() if callable(getattr(de,x)) 
+                                    else getattr(de,x)) 
+                                    for x in dir(de) if not x.startswith("_")])
+            if data_element.VR == "SQ":
+                yield sequence_element_format % elem_dict
+                sequence = data_element.value
+                for sequence_item in sequence:
+                    pass
+                    # return sequence.formatted_lines()
+            else:
+                yield element_format % elem_dict
+                
     def _PrettyStr(self, indent=0, topLevelOnly=False):
         """Return a string of the data_elements in this dataset, with indented levels.
         
@@ -406,7 +424,7 @@ class Dataset(dict):
     def update(self, dictionary):
         """Extend dict.update() to handle *named tags*."""
         for key, value in dictionary.items():
-            if self._isString(key):
+            if is_stringlike(key):
                 setattr(self, key, value)
             else:
                 self[Tag(key)] = value

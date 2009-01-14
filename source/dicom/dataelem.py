@@ -160,7 +160,7 @@ class DataElement(object):
             
     def __str__(self):
         """Return str representation of this data_element"""
-        repVal = self._repVal()
+        repVal = self.repval
         if self.showVR:
             s = "%s %-*s %s: %s" % (str(self.tag), self.descripWidth,
                             self.description()[:self.descripWidth], self.VR, repVal)
@@ -169,7 +169,7 @@ class DataElement(object):
                             self.description()[:self.descripWidth], repVal)
         return s
         
-    def _repVal(self):
+    def _get_repval(self):
         """Return a str representation of the current value for use in __str__"""
         if (self.VR in ['OB', 'OW', 'OW/OB', 'US or SS or OW', 'US or SS'] 
                   and len(self.value) > self.maxBytesToDisplay):
@@ -181,13 +181,14 @@ class DataElement(object):
         else:
             repVal = repr(self.value)  # will tolerate unicode too
         return repVal
-
+    repval = property(_get_repval)
+    
     def __unicode__(self):
         """Return unicode representation of this data_element"""
         if isinstance(self.value, unicode):
             # start with the string rep then replace the value part with the unicode
             strVal = str(self)
-            uniVal = unicode(strVal.replace(self._repVal(), "")) + self.value
+            uniVal = unicode(strVal.replace(self.repval, "")) + self.value
             return uniVal
         else:
             return unicode(str(self))
