@@ -57,12 +57,12 @@ def read_OBvalue(fp, length):
     # logger.debug("OB start at file position 0x%x", fp.tell())
     if length == 0xffffffffL: # undefined length. PS3.6-2008 Tbl 7.1-1, then read to Sequence Delimiter Item
         isUndefinedLength = True
-        length = LengthOfUndefinedLength(fp, SequenceDelimiterTag)
+        length = length_of_undefined_length(fp, SequenceDelimiterTag)
     data = fp.read(length)
     # logger.debug("len(data): %d; length=%d", len(data), length)
     # logger.debug("OB before absorb: 0x%x", fp.tell())
     if isUndefinedLength:
-        AbsorbDelimiterItem(fp, Tag(SequenceDelimiterTag))
+        absorb_delimiter_item(fp, Tag(SequenceDelimiterTag))
     return data
 
 def read_OWvalue(fp, length):
@@ -73,12 +73,12 @@ def read_OWvalue(fp, length):
     # logger.debug("OB start at file position 0x%x", fp.tell())
     if length == 0xffffffffL: # undefined length. PS3.6-2008 Tbl 7.1-1, then read to Sequence Delimiter Item
         isUndefinedLength = True
-        length = LengthOfUndefinedLength(fp, SequenceDelimiterTag)
+        length = length_of_undefined_length(fp, SequenceDelimiterTag)
     data = fp.read(length)
     # logger.debug("len(data): %d; length=%d", len(data), length)
     # logger.debug("OB before absorb: 0x%x", fp.tell())
     if isUndefinedLength:
-        AbsorbDelimiterItem(fp, Tag(SequenceDelimiterTag))
+        absorb_delimiter_item(fp, Tag(SequenceDelimiterTag))
     return data
 
 def read_UI(fp, length):
@@ -88,13 +88,13 @@ def read_UI(fp, length):
         value = value[:-1]
     return MultiString(value, UID)
 
-def read_String(fp, length):
+def read_string(fp, length):
     return MultiString(fp.read(length))
     
 def read_PN(fp, length):
     return MultiString(fp.read(length), valtype=PersonName)
 
-def read_SingleString(fp, length):
+def read_single_string(fp, length):
     """Read a single string; the backslash used to separate values in multi-strings
     has no meaning here"""
     val = fp.read(length)
@@ -102,7 +102,7 @@ def read_SingleString(fp, length):
         val = val[:-1]
     return val
 
-def ReadDataElement(fp, length=None):
+def read_data_element(fp, length=None):
     data_element_tell = fp.tell()
     try:
         tag = fp.read_tag()
@@ -164,7 +164,7 @@ def ReadDataElement(fp, length=None):
         logger.debug("%04x: %s", data_element_tell, str(data_element))
     return data_element
 
-def ReadDataset(fp, bytelength=None):
+def read_dataset(fp, bytelength=None):
     """Return a Dataset dictionary containing DataElements starting from
     the current file position through the following bytelength bytes
     The dictionary key is the Dicom (group, element) tag, and the dictionary
@@ -175,7 +175,7 @@ def ReadDataset(fp, bytelength=None):
         return ds
     fpStart = fp.tell()
     while (not bytelength) or (fp.tell()-fpStart < bytelength): # byteslength is None
-        data_element = ReadDataElement(fp)
+        data_element = read_data_element(fp)
         if not data_element:
             break        # a is None if end-of-file
         if data_element.tag == ItemDelimiterTag: # dataset is an item in a sequence
@@ -185,7 +185,7 @@ def ReadDataset(fp, bytelength=None):
     return ds
 
 
-def ReadSequence(fp, bytelength):
+def read_sequence(fp, bytelength):
     """Return a Sequence list of Datasets"""
     seq = Sequence()
     if bytelength == 0:  # Sequence of length 0 is possible (PS 3.5-2008 7.5.1a (p.40)
@@ -196,13 +196,13 @@ def ReadSequence(fp, bytelength):
         bytelength = None
     fpStart = fp.tell()            
     while (not bytelength) or (fp.tell()-fpStart < bytelength):
-        dataset = ReadSequenceItem(fp)
+        dataset = read_sequenceItem(fp)
         if dataset is None:  # None is returned if get to Sequence Delimiter
             break
         seq.append(dataset)
     return seq
 
-def ReadSequenceItem(fp):
+def read_sequenceItem(fp):
     tag = fp.read_tag()
     if tag == SequenceDelimiterTag: # No more items, time for sequence to stop reading
         data_element = DataElement(tag, None, None, fp.tell()-4)
@@ -219,14 +219,14 @@ def ReadSequenceItem(fp):
     isUndefinedLength = False
     if length == 0xFFFFFFFFL:
         isUndefinedLength = True
-        length = None # LengthOfUndefinedLength(fp, ItemDelimiterTag)
-    ds = ReadDataset(fp, length)
+        length = None # length_of_undefined_length(fp, ItemDelimiterTag)
+    ds = read_dataset(fp, length)
     ds.isUndefinedLengthSequenceItem = isUndefinedLength
     # if isUndefinedLength:
-        # AbsorbDelimiterItem(fp, ItemDelimiterTag)
+        # absorb_delimiter_item(fp, ItemDelimiterTag)
     return ds
 
-def AbsorbDelimiterItem(fp, delimiter):
+def absorb_delimiter_item(fp, delimiter):
     """Used to read (and ignore) undefined length sequence or item terminators."""
     tag = fp.read_tag()
     if tag != delimiter:
@@ -275,7 +275,7 @@ def find_delimiter(fp, delimiter, read_size=128):
     bytes_to_find = pack(format, delimiter.group) + pack(format, delimiter.elem)
     return find_bytes(fp, bytes_to_find)            
     
-def LengthOfUndefinedLength(fp, delimiter, read_size=128):
+def length_of_undefined_length(fp, delimiter, read_size=128):
     """Search through the file to find the delimiter, return the length of the data
     element value that the dicom file writer was too lazy to figure out for us.
     Return the file to the start of the data, ready to read it.
@@ -288,7 +288,7 @@ def LengthOfUndefinedLength(fp, delimiter, read_size=128):
     length = delimiter_pos - data_start
     return length
     
-def ReadDelimiterItem(fp, delimiter):
+def read_delimiter_item(fp, delimiter):
     found = fp.read(4)
     if found != delimiter:
         logger.warn("Expected delimitor %s, got %s at file position 0x%x", Tag(delimiter), Tag(found), fp.tell()-4)
@@ -301,9 +301,9 @@ def read_UN(fp, length):
     if length == 0xFFFFFFFFL:
         raise NotImplementedError, "This code has not been tested for 'UN' with unknown length"
         delimiter = 0xFFFEE00DL
-        length = LengthOfUndefinedLength(fp, delimiter)
+        length = length_of_undefined_length(fp, delimiter)
         data_value = fp.read(length)
-        ReadDelimiterItem(fp, delimiter)
+        read_delimiter_item(fp, delimiter)
         return data_value
     else:
         return fp.read(length)
@@ -317,33 +317,30 @@ def read_ATvalue(fp, length):
         logger.warn("Expected length to be multiple of 4 for VR 'AT', got length %d at file position 0x%x", length, fp.tell()-4)
     return MultiValue([fp.read_tag() for i in range(length / 4)])
 
-def _ReadFileMetaInfo(fp):
+def _read_file_meta_info(fp):
     """Return the file meta information.
     fp must be set after the 128 byte preamble"""
     magic = fp.read(4)
     if magic != "DICM":
-        logger.info("File does not appear to be a DICOM file; 'DICM' header is missing. Call ReadFile with has_header=False")
-        raise IOError, 'File does not appear to be a Dicom file; "DICM" is missing. Try ReadFile with has_header=False'
+        logger.info("File does not appear to be a DICOM file; 'DICM' header is missing. Call read_file with has_header=False")
+        raise IOError, 'File does not appear to be a Dicom file; "DICM" is missing. Try read_file with has_header=False'
 
     # File meta info is always LittleEndian, Explicit VR. After will change these
     #    to the transfer syntax values set in the meta info
     fp.isLittleEndian = True
     fp.isImplicitVR = False
 
-    GroupLength = ReadDataElement(fp)
-    return ReadDataset(fp, GroupLength.value)
+    GroupLength = read_data_element(fp)
+    return read_dataset(fp, GroupLength.value)
 
-def ReadFileMetaInfo(filename):
+def read_file_meta_info(filename):
     """Just get the basic file meta information. Useful for going through
     a series of files to find one which is referenced to a particular SOP."""
     fp = DicomFile(filename, 'rb')
     preamble = fp.read(0x80)
-    return _ReadFileMetaInfo(fp)
+    return _read_file_meta_info(fp)
 
-def ReadImageFile(fp):
-    raise NotImplementedError
-
-def ReadFile(fp):
+def read_file(fp):
     """Return a Dataset containing the contents of the Dicom file
     
     fp is either a DicomFile object, or a string containing the file name.
@@ -364,7 +361,7 @@ def ReadFile(fp):
     if has_header:
         logger.debug("Reading preamble")
         preamble = fp.read(0x80)
-        FileMetaInfo = _ReadFileMetaInfo(fp)
+        FileMetaInfo = _read_file_meta_info(fp)
     
         TransferSyntax = FileMetaInfo.TransferSyntaxUID
         if TransferSyntax == ExplicitVRLittleEndian:
@@ -395,7 +392,7 @@ def ReadFile(fp):
     
     logger.debug("Using %s VR, %s Endian transfer syntax" %(("Explicit", "Implicit")[fp.isImplicitVR], ("Big", "Little")[fp.isLittleEndian]))
     # Return the rest of the file, including what we have already read
-    ds = ReadDataset(fp)
+    ds = read_dataset(fp)
     fp.close()
     
     if has_header:
@@ -409,28 +406,32 @@ def ReadFile(fp):
     
     return ds
         
-# readers map a VR to the function to read the value(s)
+
+ReadFile = read_file    # For backwards compatibility pydicom version <=0.9.2
+readfile = read_file    # forgive a missing underscore
+
+# Readers map a VR to the function to read the value(s).
 # for read_numbers, the reader maps to a tuple (function, number format (in python struct module style))
 readers = {'UL':(read_numbers,'L'), 'SL':(read_numbers,'l'),
            'US':(read_numbers,'H'), 'SS':(read_numbers, 'h'),
            'FL':(read_numbers,'f'), 'FD':(read_numbers, 'd'),
            'OF':(read_numbers,'f'),
            'OB':read_OBvalue, 'UI':read_UI,
-           'SH':read_String,  'DA':read_String, 'TM': read_String,
-           'CS':read_String,  'PN':read_PN,     'LO': read_String,
-           'IS':read_String,  'DS':read_String, 'AE': read_String,
-           'AS':read_String,
-           'LT':read_SingleString,
-           'SQ':ReadSequence,
+           'SH':read_string,  'DA':read_string, 'TM': read_string,
+           'CS':read_string,  'PN':read_PN,     'LO': read_string,
+           'IS':read_string,  'DS':read_string, 'AE': read_string,
+           'AS':read_string,
+           'LT':read_single_string,
+           'SQ':read_sequence,
            'UN':read_UN,
            'AT':read_ATvalue,
-           'ST':read_String,
+           'ST':read_string,
            'OW':read_OWvalue,
            'OW/OB':read_OBvalue,# note OW/OB depends on other items, which we don't know at read time
            'OB/OW':read_OBvalue,
            'US or SS':read_OWvalue,
            'US or SS or OW':read_OWvalue,
            'US\US or SS\US':read_OWvalue,
-           'DT':read_String,
-           'UT':read_SingleString,          
+           'DT':read_string,
+           'UT':read_single_string,          
            } 

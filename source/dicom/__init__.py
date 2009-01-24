@@ -47,9 +47,9 @@ formatter = logging.Formatter("%(message)s")
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
-# For convenience, import the ReadFile and WriteFile functions (most used)  into the "dicom" namespace.
-from filereader import ReadFile
-from filewriter import WriteFile
+# For convenience, import the ReadFile and write_file functions (most used)  into the "dicom" namespace.
+from filereader import read_file, ReadFile  # latter one for backwards compatibility; remove later
+from filewriter import write_file, write_file # ditto
 
 def debug(DebugOn=True):
     global logger
