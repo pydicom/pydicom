@@ -23,7 +23,7 @@ jp_file = "../testcharsetfiles/chrH31.dcm"
 class charsetTests(unittest.TestCase):
     def testLatin1(self):
         """charset: can read and decode latin_1 file........................"""
-        ds = dicom.ReadFile(latin1_file)
+        ds = dicom.read_file(latin1_file)
         ds.decode()
         # Make sure don't get unicode encode error on converting to string
         expected = u"Buc^Jérôme"

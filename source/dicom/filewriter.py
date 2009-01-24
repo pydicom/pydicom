@@ -67,9 +67,9 @@ def write_OWvalue(fp, data_element):
 
 def write_UI(fp, data_element):
     """Write a data_element with VR of 'unique identifier' (UI)."""    
-    write_String(fp, data_element, '\0') # pad with 0-byte to even length
+    write_string(fp, data_element, '\0') # pad with 0-byte to even length
 
-def MultiString(val):
+def multi_string(val):
     """Put a string together with delimiter if has more than one value"""
     try:
         val.append  # will work for a list, but not for a string or number value
@@ -78,21 +78,21 @@ def MultiString(val):
     else:
         return "\\".join(val)  # \ is escape chr, so "\\" gives single backslash
 
-def write_String(fp, data_element, padding=' '):
+def write_string(fp, data_element, padding=' '):
     """Write a single or multivalued string."""
-    val = MultiString(data_element.value)
+    val = multi_string(data_element.value)
     if len(val) % 2 != 0:
         val = val + padding   # pad to even length
     fp.write(val)
 
-def write_NumberString(fp, data_element, padding = ' '):
+def write_number_string(fp, data_element, padding = ' '):
     """Handle IS or DS VR - write a number stored as a string of digits."""
-    val = MultiString(data_element.string_value) # use exact string value from file or set by user
+    val = multi_string(data_element.string_value) # use exact string value from file or set by user
     if len(val) % 2 != 0:
         val = val + padding   # pad to even length
     fp.write(val)
     
-def WriteDataElement(fp, data_element):
+def write_data_element(fp, data_element):
     """Write the data_element to file fp according to dicom media storage rules."""
     fp.write_tag(data_element.tag)
 
@@ -102,7 +102,7 @@ def WriteDataElement(fp, data_element):
         if VR in ['OB', 'OW', 'OF', 'SQ', 'UT', 'UN']:
             fp.write_US(0)   # reserved 2 bytes
     if VR not in writers:
-        raise NotImplementedError, "WriteDataElement: unknown Value Representation '%s'" % VR
+        raise NotImplementedError, "write_data_element: unknown Value Representation '%s'" % VR
 
     length_location = fp.tell() # save location for later.
     if fp.isExplicitVR and VR not in ['OB', 'OW', 'OF', 'SQ', 'UT', 'UN']:
@@ -134,33 +134,33 @@ def WriteDataElement(fp, data_element):
         fp.write_tag(SequenceDelimiterTag)
         fp.write_UL(0)  # 4-byte 'length' of delimiter data item
     
-def WriteDataset(fp, dataset):
+def write_dataset(fp, dataset):
     """Write a Dataset dictionary to the file. Return the total length written."""
     fpStart = fp.tell()
     # data_elements must be written in tag order
     tags = dataset.keys()
     tags.sort()
     for tag in tags:
-        WriteDataElement(fp, dataset[tag])
+        write_data_element(fp, dataset[tag])
 
     return fp.tell() - fpStart
 
-def WriteSequence(fp, data_element):
+def write_sequence(fp, data_element):
     """Write a dicom Sequence contained in data_element to the file fp."""
-    # WriteDataElement has already written the VR='SQ' (if needed) and
+    # write_data_element has already written the VR='SQ' (if needed) and
     #    a placeholder for length"""
     sequence = data_element.value
     for dataset in sequence:
-        WriteSequenceItem(fp, dataset)
+        write_sequence_item(fp, dataset)
 
-def WriteSequenceItem(fp, dataset):
+def write_sequence_item(fp, dataset):
     """Write an item (dataset) in a dicom Sequence to the dicom file fp."""
     # see Dicom standard Part 5, p. 39 ('03 version)
     # This is similar to writing a data_element, but with a specific tag for Sequence Item
     fp.write_tag(ItemTag)   # marker for start of Sequence Item
     length_location = fp.tell() # save location for later.
     fp.write_UL(0xffffffffL)   # will fill in real value later if not undefined length
-    WriteDataset(fp, dataset)
+    write_dataset(fp, dataset)
     if dataset.isUndefinedLengthSequenceItem:
         fp.write_tag(ItemDelimiterTag)
         fp.write_UL(0)  # 4-bytes 'length' field for delimiter item
@@ -186,13 +186,13 @@ def write_ATvalue(fp, data_element):
             fp.write_tag(tag)
             
 
-def _WriteFileMetaInfo(fp, dataset):
+def _write_file_meta_info(fp, dataset):
     """Write the dicom group 2 dicom storage File Meta Information to the file.
 
     The file should already be positioned past the 128 byte preamble.
     Raises ValueError if the required data_elements (elements 2,3,0x10,0x12)
     are not in the dataset. If the dataset came from a file read with
-    ReadFile(), then the required data_elements should already be there.
+    read_file(), then the required data_elements should already be there.
     """
     fp.write('DICM')
 
@@ -221,16 +221,16 @@ def _WriteFileMetaInfo(fp, dataset):
     
     group_length_tell = fp.tell()
     group_length = DataElement((2,0), 'UL', 0) # put 0 to start, write again later when length is known
-    WriteDataElement(fp, group_length)  # write that one first - get it out of the way
+    write_data_element(fp, group_length)  # write that one first - get it out of the way
 
-    length = WriteDataset(fp, meta_dataset)
+    length = write_dataset(fp, meta_dataset)
     location = fp.tell()
     fp.seek(group_length_tell)
     group_length = DataElement((2,0), 'UL', length) # now have real length
-    WriteDataElement(fp, group_length)  # write the whole data_element
+    write_data_element(fp, group_length)  # write the whole data_element
     fp.seek(location)
 
-def WriteFile(filename, dataset, WriteLikeOriginal=True):
+def write_file(filename, dataset, WriteLikeOriginal=True):
     """Store a Dataset to the filename specified.
     
     Set dataset.preamble if you want something other than 128 0-bytes.
@@ -278,7 +278,7 @@ def WriteFile(filename, dataset, WriteLikeOriginal=True):
             raise NotImplementedError, "pydicom has not been verified for Big Endian with Implicit VR"
     
     if preamble:
-        _WriteFileMetaInfo(fp, dataset)
+        _write_file_meta_info(fp, dataset)
     # Set file VR, endian. MUST BE AFTER META INFO (which changes to Explict LittleEndian)
     fp.isImplicitVR = not dataset.isExplicitVR
     fp.isLittleEndian = dataset.isLittleEndian
@@ -286,30 +286,34 @@ def WriteFile(filename, dataset, WriteLikeOriginal=True):
     no_group2_dataset = Dataset()
     no_group2_dataset.update(dict([(tag,data_element) for tag,data_element in dataset.items() if tag.group != 2]))
     
-    WriteDataset(fp, no_group2_dataset)
+    write_dataset(fp, no_group2_dataset)
     fp.close()
         
-# Writers map a VR to the function to Write the value(s)
-# for Write_numbers, the Writer maps to a tuple (function, number format (struct module style))
+
+WriteFile = write_file   # for backwards compatibility version <=0.9.2
+writefile = write_file   # forgive user for missing underscore
+        
+# Map each VR to a function which can write it
+# for write_numbers, the Writer maps to a tuple (function, number format (struct module style))
 writers = {'UL':(write_numbers,'L'), 'SL':(write_numbers,'l'),
            'US':(write_numbers,'H'), 'SS':(write_numbers, 'h'),
            'FL':(write_numbers,'f'), 'FD':(write_numbers, 'd'),
            'OF':(write_numbers,'f'),
            'OB':write_OBvalue, 'UI':write_UI,
-           'SH':write_String,  'DA':write_String, 'TM': write_String,
-           'CS':write_String,  'PN':write_String, 'LO': write_String,
-           'IS':write_NumberString,  'DS':write_NumberString, 'AE': write_String,
-           'AS':write_String,
-           'LT':write_String,
-           'SQ':WriteSequence,
+           'SH':write_string,  'DA':write_string, 'TM': write_string,
+           'CS':write_string,  'PN':write_string, 'LO': write_string,
+           'IS':write_number_string,  'DS':write_number_string, 'AE': write_string,
+           'AS':write_string,
+           'LT':write_string,
+           'SQ':write_sequence,
            'UN':write_UN,
            'AT':write_ATvalue,
-           'ST':write_String,
+           'ST':write_string,
            'OW':write_OWvalue,
            'US or SS':write_OWvalue,
            'OW/OB':write_OBvalue,
-           'DT':write_String,
-           'UT':write_String,
+           'DT':write_string,
+           'UT':write_string,
            } # note OW/OB depends on other items, which we don't know at write time
 
 def ReplaceDataElementValue(filename, data_element, new_value):

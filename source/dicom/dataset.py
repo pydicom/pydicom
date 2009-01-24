@@ -34,7 +34,7 @@ from dicom.dataelem import DataElement
 from dicom.valuerep import is_stringlike
 from dicom.UID import NotCompressedPixelTransferSyntaxes 
 
-import dicom # for WriteFile
+import dicom # for write_file
 import dicom.charset
 
 haveNumpy = True
@@ -268,7 +268,7 @@ class Dataset(dict):
                 raise NotImplementedError, "Do not have NumPy dtype for BitsAllocated=%d, please update Dataset.NumpyPixelFormats" % self.BitsAllocated
             format = self.NumpyPixelFormats[self.BitsAllocated]
             arr = numpy.fromstring(self.PixelData, format)
-            # XXX byte swap - may later handle this in ReadFile!!?
+            # XXX byte swap - may later handle this in read_file!!?
             if need_byteswap:
                 arr.byteswap(True)  # True = swap in-place, don't make a new copy
             # Note the following reshape operations return a new *view* onto arr, but don't copy the data
@@ -327,7 +327,8 @@ class Dataset(dict):
                 yield sequence_element_format % elem_dict
                 sequence = data_element.value
                 for sequence_item in sequence:
-                    pass
+                    for item_line in sequence_item.formatted_lines:
+                        yield item_line
                     # return sequence.formatted_lines()
             else:
                 yield element_format % elem_dict
@@ -368,9 +369,9 @@ class Dataset(dict):
         """Write the dataset to a file.
         
         filename -- full path and filename to save the file to
-        WriteLikeOriginal -- see dicom.filewrite.WriteFile for info on this parameter.
+        WriteLikeOriginal -- see dicom.filewrite.write_file for info on this parameter.
         """
-        dicom.WriteFile(filename, self, WriteLikeOriginal)
+        dicom.write_file(filename, self, WriteLikeOriginal)
     
     def __setattr__(self, name, value):
         """Intercept any attempts to set a value for an instance attribute.

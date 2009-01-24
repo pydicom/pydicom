@@ -12,7 +12,7 @@ logger = logging.getLogger('pydicom')
 from dicom.UID import UID, UID_dictionary
 from dicom.UID import DeflatedExplicitVRLittleEndian, ExplicitVRLittleEndian
 from dicom.UID import ImplicitVRLittleEndian, ExplicitVRBigEndian
-from dicom.filereader import ReadDataElement, _ReadFileMetaInfo
+from dicom.filereader import read_data_element, _read_fileMetaInfo
 from dicom.filebase import DicomFile, DicomStringIO
 
 class DicomIter(object):
@@ -47,7 +47,7 @@ class DicomIter(object):
         if self.has_header:
             logger.debug("Reading preamble")
             preamble = self.fp.read(0x80)
-            self.FileMetaInfo = _ReadFileMetaInfo(self.fp)
+            self.FileMetaInfo = _read_fileMetaInfo(self.fp)
         
             TransferSyntax = self.FileMetaInfo.TransferSyntaxUID
             if TransferSyntax == ExplicitVRLittleEndian:
@@ -86,7 +86,7 @@ class DicomIter(object):
         
         data_element = True
         while data_element:
-            data_element = ReadDataElement(self.fp)
+            data_element = read_data_element(self.fp)
             if data_element:
                 yield data_element
  

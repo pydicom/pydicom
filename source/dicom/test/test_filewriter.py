@@ -17,8 +17,8 @@ import sys
 import os.path
 import os
 import unittest
-from dicom.filereader import ReadFile
-from dicom.filewriter import WriteFile
+from dicom.filereader import read_file
+from dicom.filewriter import write_file
 from dicom.tag import Tag
 
 rtplan_name = "rtplan.dcm"
@@ -46,8 +46,8 @@ def files_identical(a, b):
 class WriterTests(unittest.TestCase):
     def compare(self, in_, out_):
         """Read file1, write file2, then compare. Return value as for files_identical"""
-        dataset = ReadFile(in_)
-        WriteFile(out_, dataset)
+        dataset = read_file(in_)
+        write_file(out_, dataset)
         same, pos = files_identical(in_, out_)
         self.assert_(same, "Files are not identical - first difference at 0x%x" % pos)
         if os.path.exists(out_):
