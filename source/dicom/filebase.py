@@ -19,12 +19,6 @@ from struct import unpack, pack
 
 from StringIO import StringIO
 
-# Use Boolean values if Python version has them, else make our own
-try:
-    True
-except:
-    False = 0; True = not False
-
 class DicomIO(object):
     """File object which holds transfer syntax info and anything else we need."""
     def __init__(self, *args, **kwargs):

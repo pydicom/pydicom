@@ -16,7 +16,10 @@
 
 from sys import version_info
 if version_info[0] < 3:
-    bytestring = object
+    namebase = object
+    bytestring = str
+else:
+    namebase = bytestring
 
 def is_stringlike(name):
     """Return True if name is string-like."""
@@ -54,7 +57,7 @@ def MultiString(val, valtype=str):
     else:
         return MultiValue(splitup)
 
-class PersonNameBase(bytestring):
+class PersonNameBase(namebase):
     """Base class for Person Name classes"""
 
     def __init__(self, val):
@@ -146,3 +149,6 @@ class PersonNameUnicode(PersonNameBase, unicode):
     def family_comma_given(self):
         """Return name as 'Family-name, Given-name'"""
         return self.formatted("%(family_name)u, %(given_name)u")
+
+class OtherByte(bytestring):
+    pass

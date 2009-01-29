@@ -53,8 +53,10 @@ def read_numbers(fp, length, format):
         return list(value)  # convert from tuple to a list so can modify if need to
 
 def read_OBvalue(fp, length):
+    """Return the raw bytes from reading an OB value
+    
+    if length is greater than """
     isUndefinedLength = False
-    # logger.debug("OB start at file position 0x%x", fp.tell())
     if length == 0xffffffffL: # undefined length. PS3.6-2008 Tbl 7.1-1, then read to Sequence Delimiter Item
         isUndefinedLength = True
         length = length_of_undefined_length(fp, SequenceDelimiterTag)
@@ -66,20 +68,12 @@ def read_OBvalue(fp, length):
     return data
 
 def read_OWvalue(fp, length):
-    # NO!:  """Return an "Other word" data element as a tuple of short integers,
-    #         with the proper byte swapping done"""
-    # XXX for now just return the raw bytes and let the caller decide what to do with them
-    isUndefinedLength = False
-    # logger.debug("OB start at file position 0x%x", fp.tell())
-    if length == 0xffffffffL: # undefined length. PS3.6-2008 Tbl 7.1-1, then read to Sequence Delimiter Item
-        isUndefinedLength = True
-        length = length_of_undefined_length(fp, SequenceDelimiterTag)
-    data = fp.read(length)
-    # logger.debug("len(data): %d; length=%d", len(data), length)
-    # logger.debug("OB before absorb: 0x%x", fp.tell())
-    if isUndefinedLength:
-        absorb_delimiter_item(fp, Tag(SequenceDelimiterTag))
-    return data
+    """Return the raw bytes from reading an OW value rep
+    
+    Note: pydicom does not do byte swapping if necessary, except in 
+    dataset.PixelArray function
+    """
+    return read_OBvalue(fp, length) # for now, Maybe later will have own routine
 
 def read_UI(fp, length):
     value = fp.read(length)
@@ -171,17 +165,19 @@ def read_dataset(fp, bytelength=None):
     value is the DataElement class instance
     """
     ds = Dataset()
-    if bytelength == 0:
-        return ds
     fpStart = fp.tell()
-    while (not bytelength) or (fp.tell()-fpStart < bytelength): # byteslength is None
+    while (bytelength is None) or (fp.tell()-fpStart < bytelength):
         data_element = read_data_element(fp)
-        if not data_element:
-            break        # a is None if end-of-file
+        if data_element is None: # None if end-of-file
+            break        
         if data_element.tag == ItemDelimiterTag: # dataset is an item in a sequence
             break
         ds.Add(data_element)
-    # XXX should test that fp.tell() exactly number of bytes expected?
+    
+    # Test that got the expected number of bytes if explicit length given
+    bytes_read = fp.tell() - fpStart
+    if bytelength is not None and bytes_read != bytelength:
+        logging.warning("Expected dataset length %d bytes, got %d" % (bytelength, bytes_read))
     return ds
 
 
@@ -196,13 +192,13 @@ def read_sequence(fp, bytelength):
         bytelength = None
     fpStart = fp.tell()            
     while (not bytelength) or (fp.tell()-fpStart < bytelength):
-        dataset = read_sequenceItem(fp)
+        dataset = read_sequence_item(fp)
         if dataset is None:  # None is returned if get to Sequence Delimiter
             break
         seq.append(dataset)
     return seq
 
-def read_sequenceItem(fp):
+def read_sequence_item(fp):
     tag = fp.read_tag()
     if tag == SequenceDelimiterTag: # No more items, time for sequence to stop reading
         data_element = DataElement(tag, None, None, fp.tell()-4)
@@ -391,19 +387,21 @@ def read_file(fp):
         fp.isImplicitVR = True
     
     logger.debug("Using %s VR, %s Endian transfer syntax" %(("Explicit", "Implicit")[fp.isImplicitVR], ("Big", "Little")[fp.isLittleEndian]))
-    # Return the rest of the file, including what we have already read
+    
+    # Read everything after the File Meta
     ds = read_dataset(fp)
     fp.close()
     
+    # Store file info (Big/Little Endian, Expl/Impl VR; preamble) into dataset
+    #    so can be used to rewrite same way if desired
+    ds.preamble = None # default, set to file's if available below
+    ds.has_header = has_header
     if has_header:
-        ds.update(FileMetaInfo) # put in tags from FileMetaInfo
+        ds.preamble = preamble  
+        ds.update(FileMetaInfo) # copy data elements from FileMetaInfo
     ds.isLittleEndian = fp.isLittleEndian
     ds.isExplicitVR = fp.isExplicitVR
-    ds.preamble = None
-    if has_header:
-        ds.preamble = preamble  # save so can write same preamble if re-write file
-    ds.has_header = has_header
-    
+
     return ds
         
 
