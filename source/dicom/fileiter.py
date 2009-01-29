@@ -18,10 +18,10 @@ from dicom.filebase import DicomFile, DicomStringIO
 class DicomIter(object):
     """Parse a DICOM file one Data Element at a time
     Use like:
-    from dicom.readiter import DicomFile
+    from dicom.fileiter import DicomIter
     from dicom.dataset import Dataset
     ds = Dataset()
-    for data_element in DicomFile:
+    for data_element in DicomIter:
         if meets_some_condition(data_element):
             ds.Add(data_element)
         if some_other_condition(data_element):
