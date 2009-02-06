@@ -2,19 +2,10 @@
 """Routines for working with encapsulated (compressed) data
 
 """
-#
-# Copyright (C) 2008, Darcy Mason
-# This file is part of pydicom.
-#
-# pydicom is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-#
-# pydicom is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License (license.txt) for more details 
+# Copyright (c) 2008 Darcy Mason
+# This file is part of pydicom, relased under an MIT license.
+#    See the file license.txt included with this distribution, also
+#    available at http://pydicom.googlecode.com
 
 # Encapsulated Pixel Data --  3.5-2008 A.4
 # Encapsulated Pixel data is in a number of Items (start with Item tag (0xFFFE,E000) and ending ultimately with SQ delimiter and Item Length field of 0 (no value),

@@ -1,7 +1,9 @@
 # myprint.py
 """Example of printing a dataset in your own format"""
 # Copyright (c) 2008 Darcy Mason
-# released under GPL license
+# This file is part of pydicom, relased under an MIT license.
+#    See the file license.txt included with this distribution, also
+#    available at http://pydicom.googlecode.com
 
 def myprint(dataset, indent=0):
     """Go through all item in the dataset and print.

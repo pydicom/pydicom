@@ -1,19 +1,10 @@
 # DicomDiff.py
 """Show the difference between two dicom files.
 """
-#
-# Copyright 2004, Darcy Mason
-# This file is part of pydicom.
-#
-# pydicom is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-#
-# pydicom is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License (license.txt) for more details 
+# Copyright (c) 2008 Darcy Mason
+# This file is part of pydicom, relased under an MIT license.
+#    See the file license.txt included with this distribution, also
+#    available at http://pydicom.googlecode.com
 
 usage = """
 Usage:
@@ -26,9 +17,7 @@ Results printed in python difflib form - indicated by start of each line:
 ('?' lines from difflib removed - no use here)
 """
 
-
 import sys
-
 
 # only used as a script
 if len(sys.argv) != 3:
@@ -52,7 +41,3 @@ diff = difflib.Differ()
 for line in diff.compare(rep[0], rep[1]):
     if line[0] != "?":
         print line
-
-
-
-    

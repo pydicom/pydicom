@@ -1,8 +1,10 @@
 # dump.py
 """Utility functions for seeing contents of files, etc, to debug writing and reading"""
+# Copyright (c) 2008 Darcy Mason
+# This file is part of pydicom, relased under an MIT license.
+#    See the file license.txt included with this distribution, also
+#    available at http://pydicom.googlecode.com
 
-# Copyright 2008, Darcy Mason
-# See pydicom license.txt for license information
 from cStringIO import StringIO
 
 def PrintCharacter(ordchr):

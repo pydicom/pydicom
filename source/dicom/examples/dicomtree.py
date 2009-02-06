@@ -1,19 +1,9 @@
 # dicomtree.py
 """Show a dicom file using a hierarchical tree in a graphical window"""
-# Copyright (c) 2008, Darcy Mason
-# This file is part of pydicom.
-#
-# pydicom is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-#
-# pydicom is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License (license.txt) for more details 
-
-# Modeled after Tree.py at http://mail.python.org/pipermail/python-checkins/2001-March/016462.html
+# Copyright (c) 2008 Darcy Mason
+# This file is part of pydicom, relased under an MIT license.
+#    See the file license.txt included with this distribution, also
+#    available at http://pydicom.googlecode.com
 
 usage = "Usage: python dicomtree.py dicom_filename"
 from dicom.valuerep import PersonNameUnicode

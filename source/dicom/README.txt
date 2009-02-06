@@ -1,6 +1,6 @@
 README for pydicom distribution
 
-pydicom is released under the GPL license. See license.txt.
+pydicom is released under the MIT license. See license.txt.
 
 To install from a source distribution, at a command line in the source directory (where setup.py is located), type:
 python setup.py install

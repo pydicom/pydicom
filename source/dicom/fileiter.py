@@ -1,8 +1,9 @@
 # fileiter.py
 """Read a DICOM file one data element at a time"""
 # Copyright (c) 2008 Darcy Mason
-# Released under Gnu General Public License
-# This file is a rough draft of changes to be made later to pydicom code
+# This file is part of pydicom, relased under an MIT license.
+#    See the file license.txt included with this distribution, also
+#    available at http://pydicom.googlecode.com
 
 import zlib
 from StringIO import StringIO # tried cStringIO but wouldn't let me derive class from it.
