@@ -1,18 +1,9 @@
 # sequence.py
 """Hold the Sequence class, which stores a dicom sequence (list of Datasets)"""
-#
-# Copyright 2004, Darcy Mason
-# This file is part of pydicom.
-#
-# pydicom is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-#
-# pydicom is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License (license.txt) for more details 
+# Copyright (c) 2008 Darcy Mason
+# This file is part of pydicom, relased under an MIT license.
+#    See the file license.txt included with this distribution, also
+#    available at http://pydicom.googlecode.com
 
 from dicom.dataelem import DataElement
 

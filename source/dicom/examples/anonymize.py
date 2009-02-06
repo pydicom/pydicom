@@ -1,22 +1,12 @@
 # anonymize.py
 """Read a dicom file (or directory of files), partially "anonymize" it (them), 
-    by replacing Person names, patient id, optionally remove curves 
-    and private tags, and write result to a new file (directory)
-    This is an example only; use only as a starting point."""
-#
-# Copyright 2004, Darcy Mason
-# This file is part of pydicom.
-#
-# pydicom is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-#
-# pydicom is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License (license.txt) for more details 
-
+by replacing Person names, patient id, optionally remove curves 
+and private tags, and write result to a new file (directory)
+This is an example only; use only as a starting point."""
+# Copyright (c) 2008 Darcy Mason
+# This file is part of pydicom, relased under an MIT license.
+#    See the file license.txt included with this distribution, also
+#    available at http://pydicom.googlecode.com
 
 usage = """
 Usage:
