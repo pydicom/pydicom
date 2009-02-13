@@ -19,6 +19,8 @@ Dataset(derived class of Python's dict class)
 #
 from sys import byteorder
 sys_isLittleEndian = (byteorder == 'little')
+import logging
+logger = logging.getLogger('pydicom')
 from dicom.datadict import DicomDictionary, dictionaryVR
 from dicom.datadict import TagForName, AllNamesForTag
 from dicom.tag import Tag
@@ -100,7 +102,7 @@ class Dataset(dict):
             try:
                 tag = Tag(name)
             except:
-                return 0
+                return False
         if tag:
             return dict.__contains__(self, tag)
         else:

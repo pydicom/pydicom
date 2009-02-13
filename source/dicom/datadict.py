@@ -87,20 +87,24 @@ def CleanName(tag):
     s = dictionaryDescription(tag)    # Descriptive name in dictionary
     # remove blanks and nasty characters
     s = s.translate(normTable, r""" !@#$%^&*(),;:.?\|{}[]+-="'/""")
-    if dictionaryVR(tag) == "SQ":
+    
+    # Take "Sequence" out of name as more natural sounding
+    # e..g "BeamSequence"->"Beams"; "ReferencedImageBoxSequence"->"ReferencedImageBoxes"
+    # 'Other Patient ID' exists as single value AND as sequence so check for it and leave 'Sequence' in
+    if dictionaryVR(tag) == "SQ" and not s.startswith("Other Patient ID"):
         if s[-8:] == "Sequence": 
-            s = s[:-8]+"s" # e.g. "BeamSequence" becomes "Beams"
+            s = s[:-8]+"s"
         if s[-2:] == "ss":
             s = s[:-1]
         if s[-6:] == "Studys":
             s = s[:-2]+"ies"
         if s[-2:] == "xs":
-            s = s[:-1] + "es" # e.g. Boxs -> Boxes
+            s = s[:-1] + "es"
     return s
 
 # Provide for the 'reverse' lookup. Given clean name, what is the tag?
 logger.debug("Reversing DICOM dictionary so can look up tag from a name...")
-NameDict = dict([(CleanName(tag), Tag(tag)) for tag in DicomDictionary])
+NameDict = dict([(CleanName(tag), tag) for tag in DicomDictionary])
 
 def short_name(name):
     """Return a short *named tag* for the corresponding long version.

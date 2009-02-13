@@ -89,10 +89,11 @@ def read_single_string(fp, length):
 
 def read_data_element(fp, length=None):
     data_element_tell = fp.tell()
+
     try:
         tag = fp.read_tag()
-    except EOFError:
-        return None
+    except EOFError: # sometimes don't know are done until read next data element and at end-of-file
+        return None  # don't re-raise the error. Should be okay
     
     if tag==ItemDelimiterTag or tag==SequenceDelimiterTag:
         length = fp.read_UL()
@@ -115,6 +116,7 @@ def read_data_element(fp, length=None):
                 raise KeyError, "Unknown DICOM tag %s - can't look up VR" % str(tag)
     else:
         VR = read_VR(fp)
+
     if VR not in readers:
         raise NotImplementedError, "Unknown Value Representation '%s' in tag %s" % (VR, tag)
 
@@ -135,12 +137,17 @@ def read_data_element(fp, length=None):
         temp_data_element = DataElement(tag,VR, Sequence(), data_element_tell)
         logger.debug("%04x: %s", data_element_tell, temp_data_element)
         logger.debug("                         -------> SQ is using %s", ["explicit length", "Undefined Length"][isUndefinedLength])
-    try:
-        readers[VR][0] # if reader is a tuple, then need to pass a number format
-    except TypeError:
-        value = readers[VR](fp, length) # call the function to read that kind of item
+
+    # Look up and call a reader function to get the data element value
+    # Dispatch two cases: a plain reader, or a number one which needs a format string
+    # Readers are defined in dictionary 'readers' below
+    if isinstance(readers[VR], tuple):
+        reader, num_format = readers[VR]
+        value = reader(fp, length, num_format)
     else:
-        value = readers[VR][0](fp, length, readers[VR][1])
+        reader = readers[VR]
+        value = reader(fp, length)
+
     if tag == 0x00280103: # This flags whether pixel values are US (val=0) or SS (val = 1)
         fp.isSSpixelRep = value # XXX This is not used anywhere else in code?
     data_element = DataElement(tag, VR, value, value_tell)
@@ -158,17 +165,22 @@ def read_dataset(fp, bytelength=None):
     ds = Dataset()
     fpStart = fp.tell()
     while (bytelength is None) or (fp.tell()-fpStart < bytelength):
-        data_element = read_data_element(fp)
+        # Read data elements. Stop on certain errors, but return what was already read
+        try:
+            data_element = read_data_element(fp)
+        except EOFError, details:
+            logger.error(details)
+            break
+        except NotImplementedError, details:
+            logger.error(details)
+            break
+        
         if data_element is None: # None if end-of-file
             break        
         if data_element.tag == ItemDelimiterTag: # dataset is an item in a sequence
             break
         ds.Add(data_element)
     
-    # Test that got the expected number of bytes if explicit length given
-    bytes_read = fp.tell() - fpStart
-    if bytelength is not None and bytes_read != bytelength:
-        logging.warning("Expected dataset length %d bytes, got %d" % (bytelength, bytes_read))
     return ds
 
 
@@ -234,7 +246,7 @@ def find_bytes(fp, bytes_to_find, read_size=128):
     found = False
     while not found:
         chunk_start = fp.tell()
-        bytes = fp.read(read_size)
+        bytes = fp.read(read_size, need_exact_length=False)
         if not bytes:
             fp.seek(data_start)
             return None
