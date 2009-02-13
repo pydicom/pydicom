@@ -9,12 +9,16 @@ from dicom.tag import Tag
 from struct import unpack, pack
 
 from StringIO import StringIO
+import logging
+logger = logging.getLogger('pydicom')
 
 class DicomIO(object):
     """File object which holds transfer syntax info and anything else we need."""
+    
+    max_read_attempts = 3 # number of times to read if don't get requested bytes
+    
     def __init__(self, *args, **kwargs):
         self._ImplicitVR = True   # start with this by default
-        
     def read_tag(self):
         """Read and return a dicom tag (two unsigned shorts) from the file."""
         return Tag((self.read_US(), self.read_US()))
@@ -40,6 +44,25 @@ class DicomIO(object):
     def read_leUL(self):
         """Return an unsigned long read with little endian byte order"""
         return unpack("<L", self.read(4))[0]
+    def read(self, length=None, need_exact_length=True):
+        """Reads the required length, returns EOFError if gets less"""
+        parent_read = super(DicomIO, self).read
+        if length is None:
+            return parent_read()
+        bytes = parent_read(length)
+        if len(bytes) < length and need_exact_length:
+            # Didn't get all the desired bytes. Keep trying to get the rest. If reading across network, might want to add a delay here
+            attempts = 0
+            while attempts < self.max_read_attempts and len(bytes) < length:
+                bytes += parent_read(length-len(bytes))
+                attempts += 1
+            if len(bytes) < length:
+                start_pos = self.tell() - len(bytes)
+                msg = "Unexpected end of file. "
+                msg += "Read %d bytes of %d expected starting at position 0x%x" % (len(bytes), length, start_pos)
+                # logger.error(msg)   # don't need this since raising error anyway
+                raise EOFError, msg
+        return bytes
     def write_leUS(self, val):
         """Write an unsigned short with little endian byte order"""
         self.write(pack("<H", val))
