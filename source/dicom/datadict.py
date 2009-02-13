@@ -91,7 +91,7 @@ def CleanName(tag):
     # Take "Sequence" out of name as more natural sounding
     # e..g "BeamSequence"->"Beams"; "ReferencedImageBoxSequence"->"ReferencedImageBoxes"
     # 'Other Patient ID' exists as single value AND as sequence so check for it and leave 'Sequence' in
-    if dictionaryVR(tag) == "SQ" and not s.startswith("Other Patient ID"):
+    if dictionaryVR(tag) == "SQ" and not s.startswith("OtherPatientIDs"):
         if s[-8:] == "Sequence": 
             s = s[:-8]+"s"
         if s[-2:] == "ss":
