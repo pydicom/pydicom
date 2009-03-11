@@ -1,4 +1,4 @@
-Copyright (c) 2008 Darcy Mason
+Copyright (c) 2008-2009 Darcy Mason
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -17,3 +17,148 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
+
+-- Private dictionary derived file --
+The file _private_dict.py is generated from private.dic, from the mDCM library 
+(http://code.google.com/p/mdcm), which in turn is generated from DCMTK and GDCM.
+The mDCM license (and it's recording of the GDCM and DCMTK licenses) is 
+reproduced below.
+
+mDCM: A C# DICOM library
+
+Copyright (c) 2008  Colby Dillion
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+
+
+---- GDCM private dictionaries (from Copyright.txt) ----
+
+/*=========================================================================
+
+  Program: GDCM (Grassroots DICOM). A DICOM library
+  Module:  $URL$
+
+Copyright (c) 2006-2008 Mathieu Malaterre
+Copyright (c) 1993-2005 CREATIS
+(CREATIS = Centre de Recherche et d'Applications en Traitement de l'Image)
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+ * Redistributions of source code must retain the above copyright notice,
+   this list of conditions and the following disclaimer.
+
+ * Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+ * Neither name of Mathieu Malaterre, or CREATIS, nor the names of any
+   contributors (CNRS, INSERM, UCB, Universite Lyon I), may be used to
+   endorse or promote products derived from this software without specific
+   prior written permission.
+
+ * Modified source versions must be plainly marked as such, and must not be
+   misrepresented as being the original software.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS''
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHORS OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=========================================================================*/
+
+
+
+---- libijg (from DCMTK 3.5.4 COPYRIGHT) ----
+
+Unless otherwise specified, the DCMTK software package has the
+following copyright:
+
+/*
+ *  Copyright (C) 1994-2004, OFFIS
+ *
+ *  This software and supporting documentation were developed by
+ *
+ *    Kuratorium OFFIS e.V.
+ *    Healthcare Information and Communication Systems
+ *    Escherweg 2
+ *    D-26121 Oldenburg, Germany
+ *
+ *  THIS SOFTWARE IS MADE AVAILABLE,  AS IS,  AND OFFIS MAKES NO  WARRANTY
+ *  REGARDING  THE  SOFTWARE,  ITS  PERFORMANCE,  ITS  MERCHANTABILITY  OR
+ *  FITNESS FOR ANY PARTICULAR USE, FREEDOM FROM ANY COMPUTER DISEASES  OR
+ *  ITS CONFORMITY TO ANY SPECIFICATION. THE ENTIRE RISK AS TO QUALITY AND
+ *  PERFORMANCE OF THE SOFTWARE IS WITH THE USER.
+ *
+ *  Copyright of the software  and  supporting  documentation  is,  unless
+ *  otherwise stated, owned by OFFIS, and free access is hereby granted as
+ *  a license to  use  this  software,  copy  this  software  and  prepare
+ *  derivative works based upon this software.  However, any  distribution
+ *  of this software source code or supporting documentation or derivative
+ *  works  (source code and  supporting documentation)  must  include  the
+ *  three paragraphs of this copyright notice.
+ *
+ */
+
+The dcmjpeg sub-package includes an adapted version of the Independent JPEG
+Group Toolkit Version 6b, which is contained in dcmjpeg/libijg8,
+dcmjpeg/libijg12 and dcmjpeg/libijg16.  This toolkit is covered by the
+following copyright.  The original README file for the Independent JPEG
+Group Toolkit is located in dcmjpeg/docs/ijg_readme.txt.
+
+/*
+ *  The authors make NO WARRANTY or representation, either express or implied,
+ *  with respect to this software, its quality, accuracy, merchantability, or
+ *  fitness for a particular purpose.  This software is provided "AS IS", and you,
+ *  its user, assume the entire risk as to its quality and accuracy.
+ *
+ *  This software is copyright (C) 1991-1998, Thomas G. Lane.
+ *  All Rights Reserved except as specified below.
+ *
+ *  Permission is hereby granted to use, copy, modify, and distribute this
+ *  software (or portions thereof) for any purpose, without fee, subject to these
+ *  conditions:
+ *  (1) If any part of the source code for this software is distributed, then this
+ *  README file must be included, with this copyright and no-warranty notice
+ *  unaltered; and any additions, deletions, or changes to the original files
+ *  must be clearly indicated in accompanying documentation.
+ *  (2) If only executable code is distributed, then the accompanying
+ *  documentation must state that "this software is based in part on the work of
+ *  the Independent JPEG Group".
+ *  (3) Permission for use of this software is granted only if the user accepts
+ *  full responsibility for any undesirable consequences; the authors accept
+ *  NO LIABILITY for damages of any kind.
+ *
+ *  These conditions apply to any software derived from or based on the IJG code,
+ *  not just to the unmodified library.  If you use our work, you ought to
+ *  acknowledge us.
+ *
+ *  Permission is NOT granted for the use of any IJG author's name or company name
+ *  in advertising or publicity relating to this software or products derived from
+ *  it.  This software may be referred to only as "the Independent JPEG Group's
+ *  software".
+ *
+ *  We specifically permit and encourage the use of this software as the basis of
+ *  commercial products, provided that all warranty or liability claims are
+ *  assumed by the product vendor.
+ */
