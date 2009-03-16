@@ -20,10 +20,13 @@ python anonymize.py originalsdirectory anonymizeddirectory
 # In particular, note that pixel data could have confidential data "burned in"
 
 import os, os.path
+import dicom
 
 def anonymize(filename, output_filename, PersonName="anonymous",
               PatientID="id", RemoveCurves=True, RemovePrivate=True):
     """Replace data elements with VR="PN" with PersonName etc."""
+
+	# Define call-back functions
     def PN_callback(ds, data_element):
         """Called from the dataset "walk" recursive function for all data elements."""
         if data_element.VR == "PN":
@@ -32,18 +35,36 @@ def anonymize(filename, output_filename, PersonName="anonymous",
         """Called from the dataset "walk" recursive function for all data elements."""
         if data_element.tag.group & 0xFF00 == 0x5000:
             del ds[data_element.tag]
-        
-    from dicom.filereader import ReadFile
-    from dicom.filewriter import WriteFile    
-
-    dataset = ReadFile(filename)
+    
+	# Load the current dicom file to anonymize
+    dataset = dicom.read_file(filename)
+    
+	# Remove patient name and any other names
     dataset.walk(PN_callback)
+    
+	# Change ID
     dataset.PatientID = PatientID
+	
+	# Remove data elements (if DICOM type 3 optional) 
+	# Use general loop so easy to add more later
+    for name in ['OtherPatientIDs']:
+        if name in dataset:
+            tag = dataset.data_element(name).tag
+            del dataset[tag]
+
+	# Same as above but for blanking data elements that are type 2.
+    for name in ['PatientsBirthDate']:
+        if name in dataset:
+            dataset.data_element(name).value = ''
+	
+	# Remove private tags if funcation argument says to do so. Same for curves
     if RemovePrivate:
         dataset.RemovePrivateTags()
     if RemoveCurves:
         dataset.walk(curves_callback)
-    WriteFile(output_filename, dataset)   
+		
+	# write the 'anonymized' DICOM out under the new filename
+    dataset.SaveAs(output_filename)   
 
 # Can run as a script:
 if __name__ == "__main__":
