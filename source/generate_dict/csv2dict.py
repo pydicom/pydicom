@@ -36,9 +36,26 @@ if __name__ == "__main__":
     mask_attributes = []
     for row in csv_reader:
         tag, description, VR, VM, isRetired  = row
+        tag = tag.strip()   # at least one item has extra blank on end
         group, elem = tag[1:-1].split(",")
+        
+        # Handle one case "(0020,3100 to 31FF)" by converting to mask
+        # Do in general way in case others like this come in future standards
+        if " to " in elem:
+            from_elem, to_elem = elem.split(" to ")
+            if from_elem.endswith("00") and to_elem.endswith("FF"):
+                elem = from_elem[:2] + "xx"
+            else:
+                raise NotImplementedError, "Cannot mask '%s'" % elem
+        
         description = description.replace("\x92", "'") # non-ascii apostrophe used 
         description = description.replace("\x96", "-") # non-ascii dash used
+		
+        # If blank (e.g. (0018,9445) and (0028,0020)), then add dummy vals
+        if VR == '' and VM == '' and isRetired:
+            VR = 'OB'
+            VM = '1'
+            description = "Retired-blank"
         
         # Handle retired "repeating group" tags e.g. group "50xx"
         if "x" in group or "x" in elem:
