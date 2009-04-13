@@ -30,6 +30,11 @@ class DictTests(unittest.TestCase):
         self.assertEqual(dictionaryDescription(0x280400), 'Transform Label')
         self.assertEqual(dictionaryDescription(0x280410), 'Rows For Nth Order Coefficients')
         
+class PrivateDictTests(unittest.TestCase):
+    def testPrivate1(self):
+        """private dict: """
+        self.assert_(CleanName(0x00100010) == "PatientsName")
+        self.assert_(CleanName(Tag((0x0010, 0x0010))) == "PatientsName")
         
 
 if __name__ == "__main__":
