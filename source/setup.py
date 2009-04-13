@@ -9,17 +9,17 @@ import sys
 
 setup(name="pydicom",
       include_package_data = True,
-      zip_safe = False, # could do it but want users to be able to directly see examples,tests included with package
+      zip_safe = False, # want users to be able to see included examples,tests
       packages = ['dicom'],
-      version="0.9.2",
-      description="Pure python package for DICOM file reading and writing",
+      version="0.9.3",
+      description="Pure python package for DICOM medical file reading and writing",
       author="Darcy Mason",
       author_email="darcymason@gmail.com",
       url="http://pydicom.googlecode.com",
       license = "Gnu General Public License",
       keywords = "dicom python medical imaging",
       classifiers = [
-        "License :: OSI Approved :: GNU General Public License (GPL)",
+        "License :: OSI Approved :: MIT License",
         "Intended Audience :: Developers",
         "Intended Audience :: Healthcare Industry",
         "Intended Audience :: Science/Research",

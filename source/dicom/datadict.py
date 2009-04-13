@@ -11,6 +11,7 @@ logger = logging.getLogger("pydicom")
 from dicom.tag import Tag
 from dicom._dicom_dict import DicomDictionary  # the actual dict of {tag: (VR, VM, name, isRetired), tag:...}
 from dicom._dicom_dict import RepeatersDictionary # those with tags like "(50xx, 0005)"
+from dicom._private_dict import private_dictionaries
 
 # Generate mask dict for checking repeating groups etc.
 # Map a true bitwise mask to the DICOM mask with "x"'s in it.
@@ -67,7 +68,7 @@ def dictionaryVR(tag):
 
 def dictionaryHasTag(tag):
     """Return True if the dicom dictionary has an entry for the given tag."""
-    return DicomDictionary.has_key(tag)
+    return (tag in DicomDictionary)
 
 import string
 normTable = string.maketrans('','')
@@ -78,9 +79,9 @@ def CleanName(tag):
     Used for e.g. *named tags* of Dataset instances.
     
     """
-    tag = Tag(tag)  # make sure is not an int
-    if not DicomDictionary.has_key(tag): # can't name it - not in dictionary
-        if tag.element == 0:             #  (unless is implied group length versions < 3)
+    tag = Tag(tag)  
+    if tag not in DicomDictionary: 
+        if tag.element == 0:    # 0=implied group length in DICOM versions < 3
             return "GroupLength"
         else:
             return ""
@@ -147,4 +148,29 @@ def AllNamesForTag(tag):
     if shortname:
         names.append(shortname)
     return names
-    
+
+
+# PRIVATE DICTIONARY handling 
+# functions in analogy with those of main DICOM dict
+def get_private_entry(tag, private_creator):
+    """Return the tuple (VR, VM, name, isRetired) from a private dictionary"""
+    tag = Tag(tag)
+    try:
+        private_dict = private_dictionaries[private_creator]
+    except KeyError:
+        raise KeyError, "Private creator '%s' not in private dictionary" % private_creator
+    if tag not in private_dict:
+        raise KeyError, "Tag %s not in private dictionary for private creator '%s'" % (tag, private_creator)
+    return private_dict[tag]
+	
+def private_dictionaryDescription(tag, private_creator):
+    """Return the descriptive text for the given dicom tag."""
+    return get_private_entry(tag, private_creator)[2]
+
+def private_dictionaryVM(tag, private_creator):
+    """Return the dicom value multiplicity for the given dicom tag."""
+    return get_private_entry(tag, private_creator)[1] # but VM blank for private dicts
+
+def private_dictionaryVR(tag, private_creator):
+    """Return the dicom value representation for the given dicom tag."""
+    return get_private_entry(tag, private_creator)[0]

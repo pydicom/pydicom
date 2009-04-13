@@ -14,7 +14,7 @@ from csv2dict import write_dict
 import pprint
 
 in_filename = "mdcm-r52-private.dic"
-pydict_filename = "_private_dict.py"
+pydict_filename = "../dicom/_private_dict.py"
 dict_name = "private_dictionaries"
 
 if __name__ == "__main__":
