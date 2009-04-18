@@ -391,9 +391,7 @@ class Dataset(dict):
 
     def __setitem__(self, key, value):
         """Operator for dataset[key]=value."""
-        try:
-            x = value.VR, value.tag, value.value  # check is an DataElement by its contents
-        except AttributeError:
+        if not isinstance(value, DataElement): # ok if is subclass, e.g. DeferredDataElement
             raise TypeError, "Dataset contents must be DataElement instances.\n" + \
                   "To set a data_element value use data_element.value=val"
         if key != value.tag:
