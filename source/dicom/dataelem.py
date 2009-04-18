@@ -10,9 +10,24 @@ and a value.
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
 #
+import warnings
+import logging
+logger = logging.getLogger('pydicom')
+
 from dicom.datadict import dictionaryHasTag, dictionaryDescription
 from dicom.tag import Tag
 from dicom.UID import UID
+
+# os.stat is only available on Unix and Windows
+# Not sure if on other platforms the import fails, or the call to it??
+stat_available = True
+try:
+    from os import stat
+except:
+    stat_available = False
+import os.path
+
+from dicom.filebase import DicomFile
 
 # Helper functions:
 def isMultiValue(value):
@@ -214,10 +229,83 @@ class DataElement(object):
             return repr(self.value)
         else:
             return str(self)
+
+class DeferredDataElement(DataElement):
+    """Subclass of DataElement where value is not read into memory until needed"""
+    def __init__(self, tag, VR, fp, file_mtime, data_element_tell, length):
+        """Store basic info for the data element but value will be read later
+        
+        fp -- DicomFile object representing the dicom file being read
+        file_mtime -- last modification time on file, used to make sure
+           it has not changed since original read
+        data_element_tell -- file position at start of data element,
+           (not the start of the value part, but start of whole element)
+        """
+        self.tag = Tag(tag)
+        self.VR = VR
+        self._value = None # flag as unread
+        
+        # Check current file object and save info needed for read later
+        if not isinstance(fp, DicomFile):
+            raise NotImplementedError, "Deferred read is only available for DicomFile objects"
+        self.fp_isImplicitVR = fp.isImplicitVR
+        self.fp_isLittleEndian = fp.isLittleEndian
+        self.filepath = fp.name
+        self.file_mtime = file_mtime
+        self.data_element_tell = data_element_tell
+        self.length = length
+    def _get_repval(self):
+        if self._value is None:
+            return "Deferred read: length %d" % self.length
+        else:
+            return DataElement._get_repval(self)
+    repval = property(_get_repval)
     
+    def _getvalue(self):
+        """Get method for 'value' property"""
+        # Must now read the value if haven't already
+        if self._value is None:
+            self.read_value()
+        return DataElement._getvalue(self)
+    def _setvalue(self, val):
+        DataElement._setvalue(self, val)
+    value = property(_getvalue, _setvalue)
+    
+    def read_value(self):
+        """Read the previously deferred value from the file into memory"""
+        # If already read in, don't do again
+        if self._value is not None:
+            return
+        logger.debug("Reading deferred element %s" % str(self.tag))
+        # Check that the file is the same as when originally read
+        if not os.path.exists(self.filepath):
+            raise IOError, "Deferred read -- original file '%s' is missing" % self.filepath
+        if stat_available:
+            statinfo = stat(self.filepath)
+            if statinfo.st_mtime != self.file_mtime:
+                warnings.warn("Deferred read warning -- file modification time has changed.")
+        
+        # Open the file, position to the right place
+        fp = DicomFile(self.filepath, 'rb')
+        fp.defer_size = None
+        fp.isLittleEndian = self.fp_isLittleEndian
+        fp.isImplicitVR = self.fp_isImplicitVR
+        fp.seek(self.data_element_tell)
+        
+        # Read the data element and check matches what was stored before
+        from dicom.filereader import read_data_element
+        data_elem = read_data_element(fp)
+        if data_elem.VR != self.VR:
+            raise ValueError, "Deferred read VR '%s' does not match original '%s'" % (data_elem.VR, self.VR)
+        if data_elem.tag != self.tag:
+            raise ValueError, "Deferred read tag %s does not match original %s" % (str(data_elem.tag), str(self.tag))
+        
+        # Everything is ok, now this object should act like usual DataElement
+        self._value = data_elem._value
+        
+        
 class Attribute(DataElement):
     """Deprecated -- use DataElement instead"""
     def __init__(self, tag, VR, value, file_value_tell=None):
-        import warnings
         warnings.warn("The Attribute class is deprecated and will be removed in pydicom 1.0. Use DataElement", DeprecationWarning)
         DataElement.__init__(self, tag, VR, value, file_value_tell)

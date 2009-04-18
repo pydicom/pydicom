@@ -12,13 +12,21 @@ from StringIO import StringIO # tried cStringIO but wouldn't let me derive class
 import logging
 logger = logging.getLogger('pydicom')
 
+stat_available = True
+try:
+    from os import stat
+except:
+    stat_available = False
+
+from os import SEEK_CUR
+
 from dicom.UID import UID, UID_dictionary
 from dicom.UID import DeflatedExplicitVRLittleEndian, ExplicitVRLittleEndian
 from dicom.UID import ImplicitVRLittleEndian, ExplicitVRBigEndian
 from dicom.filebase import DicomFile, DicomStringIO
 from dicom.datadict import dictionaryVR, dictionaryDescription
 from dicom.dataset import Dataset
-from dicom.dataelem import DataElement
+from dicom.dataelem import DataElement, DeferredDataElement
 from dicom.tag import Tag, ItemTag, ItemDelimiterTag, SequenceDelimiterTag
 from dicom.sequence import Sequence
 from dicom.valuerep import PersonName, MultiValue, MultiString
@@ -43,7 +51,7 @@ def read_numbers(fp, length, format):
     else:        
         return list(value)  # convert from tuple to a list so can modify if need to
 
-def read_OBvalue(fp, length):
+def read_OBvalue(fp, length, format=None):
     """Return the raw bytes from reading an OB value
     
     if length is greater than """
@@ -58,7 +66,7 @@ def read_OBvalue(fp, length):
         absorb_delimiter_item(fp, Tag(SequenceDelimiterTag))
     return data
 
-def read_OWvalue(fp, length):
+def read_OWvalue(fp, length, format=None):
     """Return the raw bytes from reading an OW value rep
     
     Note: pydicom does not do byte swapping if necessary, except in 
@@ -66,20 +74,20 @@ def read_OWvalue(fp, length):
     """
     return read_OBvalue(fp, length) # for now, Maybe later will have own routine
 
-def read_UI(fp, length):
+def read_UI(fp, length, format=None):
     value = fp.read(length)
     # Strip off 0-byte padding for even length (if there)
     if value and value.endswith('\0'):
         value = value[:-1]
     return MultiString(value, UID)
 
-def read_string(fp, length):
+def read_string(fp, length, format=None):
     return MultiString(fp.read(length))
     
-def read_PN(fp, length):
+def read_PN(fp, length, format=None):
     return MultiString(fp.read(length), valtype=PersonName)
 
-def read_single_string(fp, length):
+def read_single_string(fp, length, format=None):
     """Read a single string; the backslash used to separate values in multi-strings
     has no meaning here"""
     val = fp.read(length)
@@ -133,24 +141,44 @@ def read_data_element(fp, length=None):
     isUndefinedLength = (length == 0xFFFFFFFFL)
     value_tell = fp.tell() # store file location and size, for programs like anonymizers
     length_original = length
+    
+    # For debugging only, log info about a sequence element
     if VR == "SQ":
         temp_data_element = DataElement(tag,VR, Sequence(), data_element_tell)
         logger.debug("%04x: %s", data_element_tell, temp_data_element)
         logger.debug("                         -------> SQ is using %s", ["explicit length", "Undefined Length"][isUndefinedLength])
 
-    # Look up and call a reader function to get the data element value
+    # Look up a reader function to get the data element value
     # Dispatch two cases: a plain reader, or a number one which needs a format string
     # Readers are defined in dictionary 'readers' below
     if isinstance(readers[VR], tuple):
         reader, num_format = readers[VR]
-        value = reader(fp, length, num_format)
     else:
         reader = readers[VR]
-        value = reader(fp, length)
+        num_format = None
 
-    if tag == 0x00280103: # This flags whether pixel values are US (val=0) or SS (val = 1)
-        fp.isSSpixelRep = value # XXX This is not used anywhere else in code?
-    data_element = DataElement(tag, VR, value, value_tell)
+    # if tag == 0x00280103: # This flags whether pixel values are US (val=0) or SS (val = 1)
+    #    fp.isSSpixelRep = value # XXX This is not used anywhere else in code?
+    
+    # Call the reader, or delay reading until later if has been requested
+    if fp.defer_size is not None and length > fp.defer_size and VR != "SQ":
+        file_mtime = None
+        if stat_available:
+            file_mtime = stat(fp.name).st_mtime
+        logger.debug("Deferring read for data element %s" % str(tag))
+        
+        # Read to start of next data item
+        if isUndefinedLength:
+            length = length_of_undefined_length(fp, SequenceDelimiterTag, rewind=False)
+        else:
+            fp.seek(length, SEEK_CUR)
+        
+        # Create the deferred data element
+        data_element = DeferredDataElement(tag, VR, fp, file_mtime, data_element_tell, length)
+    else:
+        value = reader(fp, length, num_format)
+        data_element = DataElement(tag, VR, value, value_tell)
+
     data_element.isUndefinedLength = isUndefinedLength # store this to write back data element in same way was read
     if data_element.VR != "SQ":
         logger.debug("%04x: %s", data_element_tell, str(data_element))
@@ -184,7 +212,7 @@ def read_dataset(fp, bytelength=None):
     return ds
 
 
-def read_sequence(fp, bytelength):
+def read_sequence(fp, bytelength, format=None):
     """Return a Sequence list of Datasets"""
     seq = Sequence()
     if bytelength == 0:  # Sequence of length 0 is possible (PS 3.5-2008 7.5.1a (p.40)
@@ -239,32 +267,40 @@ def absorb_delimiter_item(fp, delimiter):
     else:
         logger.debug("%04x: Expected 0x00000000 after delimiter, found 0x%x", fp.tell()-4, length)
 
-def find_bytes(fp, bytes_to_find, read_size=128):
+def find_bytes(fp, bytes_to_find, read_size=128, rewind=True):
     data_start = fp.tell()  
-    rewind = len(bytes_to_find)-1
+    search_rewind = len(bytes_to_find)-1
     
     found = False
     while not found:
         chunk_start = fp.tell()
-        bytes = fp.read(read_size, need_exact_length=False)
+        bytes =""
+        while len(bytes) < read_size:
+            new_bytes = fp.read(read_size-len(bytes), need_exact_length=False)
+            if not new_bytes:
+                break
+            bytes += new_bytes    
         if not bytes:
-            fp.seek(data_start)
+            if rewind:
+                fp.seek(data_start)
             return None
         index = bytes.find(bytes_to_find)
         if index != -1:
             found = True
         else:
-            fp.seek(fp.tell()-rewind) # rewind a bit in case delimiter crossed read_size boundary
+            fp.seek(fp.tell()-search_rewind) # rewind a bit in case delimiter crossed read_size boundary
     # if get here then have found the byte string
     found_at = chunk_start + index
-    fp.seek(data_start)
+    if rewind:
+        fp.seek(data_start)
     return found_at
 
-def find_delimiter(fp, delimiter, read_size=128):
+def find_delimiter(fp, delimiter, read_size=128, rewind=True):
     """Return file position where 4-byte delimiter is located.
     
     Return None if reach end of file without finding the delimiter.
-    On return, file position will be where it was before this function.
+    On return, file position will be where it was before this function,
+    unless rewind argument is False.
     
     """
     format = "<H"
@@ -272,18 +308,21 @@ def find_delimiter(fp, delimiter, read_size=128):
         format = ">H"
     delimiter = Tag(delimiter)
     bytes_to_find = pack(format, delimiter.group) + pack(format, delimiter.elem)
-    return find_bytes(fp, bytes_to_find)            
+    return find_bytes(fp, bytes_to_find, rewind=rewind)            
     
-def length_of_undefined_length(fp, delimiter, read_size=128):
+def length_of_undefined_length(fp, delimiter, read_size=128, rewind=True):
     """Search through the file to find the delimiter, return the length of the data
     element value that the dicom file writer was too lazy to figure out for us.
     Return the file to the start of the data, ready to read it.
     Note the data element that the delimiter starts is not read here, the calling
     routine must handle that.
-    delimiter must be 4 bytes long"""
+    delimiter must be 4 bytes long
+    rewind == if True, file will be returned to position before seeking the bytes
+    
+    """
     chunk = 0
     data_start = fp.tell()
-    delimiter_pos = find_delimiter(fp, delimiter)
+    delimiter_pos = find_delimiter(fp, delimiter, rewind=rewind)
     length = delimiter_pos - data_start
     return length
     
@@ -295,7 +334,7 @@ def read_delimiter_item(fp, delimiter):
     if length != 0:
         logger.warn("Expected delimiter item to have length 0, got %d at file position 0x%x", length, fp.tell()-4)
     
-def read_UN(fp, length):
+def read_UN(fp, length, format=None):
     """Return a byte string for an DataElement of value 'UN' (unknown)"""
     if length == 0xFFFFFFFFL:
         raise NotImplementedError, "This code has not been tested for 'UN' with unknown length"
@@ -307,7 +346,7 @@ def read_UN(fp, length):
     else:
         return fp.read(length)
 
-def read_ATvalue(fp, length):
+def read_ATvalue(fp, length, format=None):
     """Return an data_element tag as the value of the current Dicom data_element being read"""
     if length == 4:
         return fp.read_tag()
@@ -339,15 +378,38 @@ def read_file_meta_info(filename):
     preamble = fp.read(0x80)
     return _read_file_meta_info(fp)
 
-def read_file(fp):
+_size_factors = dict(KB=1024, MB=1024*1024, GB=1024*1024*1024)
+def size_in_bytes(expr):
+    try:
+        return int(expr)
+    except ValueError:
+        unit = expr[-2:].upper()
+        if unit in _size_factors.keys():
+            val = float(expr[:-2]) * _size_factors[unit]
+            return val
+        else:
+            raise ValueError, "Unable to parse length with unit '%s'" % unit
+    
+def read_file(fp, defer_size=None):
     """Return a Dataset containing the contents of the Dicom file
     
-    fp is either a DicomFile object, or a string containing the file name.
+    fp -- either a DicomFile object, or a string containing the file name.
+    defer_size -- if a data element value is larger than defer_size,
+        then the value is not read into memory until it is accessed.
+        Specify an integer (bytes), or a string value with units: e.g. "512 KB", "2 MB".
+        Default None means all elements read into memory.
+        Works only for VR of OB or OW.
     
     """
+    # Open file if not already a file object
     if type(fp) is type(""):
-        fp = DicomFile(fp,'rb')
+        fp = DicomFile(fp, 'rb')
         logger.debug("Reading file '%s'" % fp)
+
+    # Convert size to defer reading into bytes, and store in file object
+    if defer_size is not None:
+        defer_size = size_in_bytes(defer_size)
+    fp.defer_size = defer_size
     
     fp.seek(0x80)
     magic = fp.read(4)

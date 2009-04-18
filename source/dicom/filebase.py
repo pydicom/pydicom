@@ -128,3 +128,4 @@ class DicomStringIO(DicomIO, StringIO):
     def __init__(self, *args, **kwargs):
         StringIO.__init__(self, *args, **kwargs)
         DicomIO.__init__(self, *args, **kwargs)
+        self.defer_size = None
