@@ -9,9 +9,20 @@ import sys
 import os
 import os.path
 import unittest
+
+import shutil
+# os.stat is only available on Unix and Windows
+# Not sure if on other platforms the import fails, or the call to it??
+stat_available = True
+try:
+    from os import stat
+except:
+    stat_available = False
 from dicom.filereader import read_file, DicomStringIO, read_data_element
 from dicom.tag import Tag
 from dicom.sequence import Sequence
+
+from warncheck import assertWarns
 
 rtplan_name = "rtplan.dcm"
 rtdose_name = "rtdose.dcm"
@@ -152,6 +163,42 @@ class SequenceTests(unittest.TestCase):
         self.assert_(isinstance(seq, Sequence) and len(seq[0])==0, "Expected Sequence with single empty item, got item %s" % repr(seq[0]))
         elem2 = read_data_element(fp)
         self.assertEqual(elem2.tag, 0x0008103e, "Expected a data element after empty sequence item")
+
+class DeferredReadTests(unittest.TestCase):
+    """Test that deferred data element reading (for large size)
+    works as expected
+    """
+    # Copy one of test files and use temporarily, then later remove.
+    def setUp(self):
+        self.testfile_name = ct_name + ".tmp"
+        shutil.copyfile(ct_name, self.testfile_name)
+    def testTimeCheck(self):
+        """Deferred read warns if file has been modified..........."""
+        if stat_available:
+            ds = read_file(self.testfile_name, defer_size=2000)
+            from time import sleep
+            sleep(1)
+            open(self.testfile_name, "r+").write('\0') # "touch" the file
+            warning_start = "Deferred read warning -- file modification time "
+            data_elem = ds.data_element('PixelData')
+            assertWarns(self, warning_start, data_elem.read_value)
+    def testFileExists(self):
+        """Deferred read raises error if file no longer exists....."""
+        ds = read_file(self.testfile_name, defer_size=2000)
+        os.remove(self.testfile_name)
+        data_elem = ds.data_element('PixelData')
+        self.assertRaises(IOError, data_elem.read_value)
+    def testValuesIdentical(self):
+        """Deferred values exactly matches normal read..............."""
+        ds_norm = read_file(self.testfile_name)
+        ds_defer = read_file(self.testfile_name, defer_size=2000)
+        for data_elem in ds_norm:
+            tag = data_elem.tag
+            self.assertEqual(data_elem.value, ds_defer[tag].value, "Mismatched value for tag %r" % tag)
+        
+    def tearDown(self):
+        if os.path.exists(self.testfile_name):
+            os.remove(self.testfile_name)
         
         
 if __name__ == "__main__":
