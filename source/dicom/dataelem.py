@@ -10,7 +10,7 @@ and a value.
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
 #
-import warnings
+
 import logging
 logger = logging.getLogger('pydicom')
 
@@ -28,6 +28,7 @@ except:
 import os.path
 
 from dicom.filebase import DicomFile
+import warnings
 
 # Helper functions:
 def isMultiValue(value):
@@ -295,6 +296,7 @@ class DeferredDataElement(DataElement):
         # Read the data element and check matches what was stored before
         from dicom.filereader import read_data_element
         data_elem = read_data_element(fp)
+        fp.close()
         if data_elem.VR != self.VR:
             raise ValueError, "Deferred read VR '%s' does not match original '%s'" % (data_elem.VR, self.VR)
         if data_elem.tag != self.tag:
