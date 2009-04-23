@@ -52,9 +52,7 @@ def read_numbers(fp, length, format):
         return list(value)  # convert from tuple to a list so can modify if need to
 
 def read_OBvalue(fp, length, format=None):
-    """Return the raw bytes from reading an OB value
-    
-    if length is greater than """
+    """Return the raw bytes from reading an OB value"""
     isUndefinedLength = False
     if length == 0xffffffffL: # undefined length. PS3.6-2008 Tbl 7.1-1, then read to Sequence Delimiter Item
         isUndefinedLength = True
