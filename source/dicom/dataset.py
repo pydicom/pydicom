@@ -421,6 +421,20 @@ class Dataset(dict):
                 setattr(self, key, value)
             else:
                 self[Tag(key)] = value
+    
+    def iterall(self):
+        """Iterate through the dataset, yielding all data elements.
+        
+        Unlike Dataset.__iter__, this does recurse into sequences,
+        and so returns all data elements as if the file were "flattened".
+        """
+        for data_element in self:
+            yield data_element
+            if data_element.VR == "SQ":
+                sequence = data_element.value
+                for dataset in sequence:
+                    for elem in dataset.iterall():
+                        yield elem
                 
     def walk(self, callback):
         """Call the given function for all dataset data_elements (recurses).

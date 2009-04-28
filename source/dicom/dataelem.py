@@ -247,8 +247,8 @@ class DeferredDataElement(DataElement):
         self._value = None # flag as unread
         
         # Check current file object and save info needed for read later
-        if not isinstance(fp, DicomFile):
-            raise NotImplementedError, "Deferred read is only available for DicomFile objects"
+        # if not isinstance(fp, DicomFile):
+            # raise NotImplementedError, "Deferred read is only available for DicomFile objects"
         self.fp_isImplicitVR = fp.isImplicitVR
         self.fp_isLittleEndian = fp.isLittleEndian
         self.filepath = fp.name
