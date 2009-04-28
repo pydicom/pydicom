@@ -16,9 +16,12 @@ class DicomIO(object):
     """File object which holds transfer syntax info and anything else we need."""
     
     max_read_attempts = 3 # number of times to read if don't get requested bytes
+    defer_size = None     # default
     
     def __init__(self, *args, **kwargs):
         self._ImplicitVR = True   # start with this by default
+    def __del__(self):
+        self.close()
     def read_tag(self):
         """Read and return a dicom tag (two unsigned shorts) from the file."""
         return Tag((self.read_US(), self.read_US()))
@@ -45,10 +48,13 @@ class DicomIO(object):
         """Return an unsigned long read with little endian byte order"""
         return unpack("<L", self.read(4))[0]
     def read(self, length=None, need_exact_length=True):
-        """Reads the required length, returns EOFError if gets less"""
-        parent_read = super(DicomIO, self).read
+        """Reads the required length, returns EOFError if gets less
+        
+        If length is None, then read all bytes
+        """
+        parent_read = self.parent_read # super(DicomIO, self).read
         if length is None:
-            return parent_read()
+            return parent_read() # get all of it
         bytes = parent_read(length)
         if len(bytes) < length and need_exact_length:
             # Didn't get all the desired bytes. Keep trying to get the rest. If reading across network, might want to add a delay here
@@ -118,14 +124,32 @@ class DicomIO(object):
     isImplicitVR =   property(_getImplicitVR, _setImplicitVR)
     isExplicitVR =   property(_getExplicitVR, _setExplicitVR)
 
-class DicomFile(DicomIO, file):
-    def __init__(self, *args, **kwargs):
-        """Extend file.__init__() to set default values."""
-        file.__init__(self, *args, **kwargs)
-        DicomIO.__init__(self, *args, **kwargs)
+# class DicomFile(DicomIO, file):
+    # def __init__(self, *args, **kwargs):
+        # """Extend file.__init__() to set default values."""
+        # file.__init__(self, *args, **kwargs)
+        # self.parent_read = file.read
+        # DicomIO.__init__(self, *args, **kwargs)
 
-class DicomStringIO(DicomIO, StringIO):
-    def __init__(self, *args, **kwargs):
-        StringIO.__init__(self, *args, **kwargs)
-        DicomIO.__init__(self, *args, **kwargs)
-        self.defer_size = None
+# class DicomStringIO(DicomIO, StringIO):
+    # def __init__(self, *args, **kwargs):
+        # StringIO.__init__(self, *args, **kwargs)
+        # self.parent_read = self.read
+        # DicomIO.__init__(self, *args, **kwargs)
+        # self.defer_size = None
+        
+class DicomFileLike(DicomIO):
+    def __init__(self, file_like_obj):
+        self.parent_read = file_like_obj.read
+        self.write = file_like_obj.write
+        self.seek = file_like_obj.seek
+        self.tell = file_like_obj.tell
+        self.close = file_like_obj.close
+        if hasattr(file_like_obj, 'name'):
+            self.name = file_like_obj.name
+        
+def DicomFile(*args, **kwargs):
+    return DicomFileLike(open(*args, **kwargs))
+
+def DicomStringIO(*args, **kwargs):
+    return DicomFileLike(StringIO(*args, **kwargs))

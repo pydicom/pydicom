@@ -391,12 +391,11 @@ def size_in_bytes(expr):
 def read_file(fp, defer_size=None):
     """Return a Dataset containing the contents of the Dicom file
     
-    fp -- either a DicomFile object, or a string containing the file name.
+    fp -- either a file-like object, or a string containing the file name.
     defer_size -- if a data element value is larger than defer_size,
         then the value is not read into memory until it is accessed.
         Specify an integer (bytes), or a string value with units: e.g. "512 KB", "2 MB".
         Default None means all elements read into memory.
-        Works only for VR of OB or OW.
     
     """
     # Open file if not already a file object
