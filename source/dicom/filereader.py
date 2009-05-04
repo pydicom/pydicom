@@ -445,6 +445,7 @@ def read_file(fp, defer_size=None):
             fp.isExplicitVR = True
             fp.isLittleEndian = True
     else: # no header -- make assumptions
+        TransferSyntaxUID = ImplicitVRLittleEndian
         fp.isLittleEndian = True
         fp.isImplicitVR = True
     
@@ -461,6 +462,8 @@ def read_file(fp, defer_size=None):
     if has_header:
         ds.preamble = preamble  
         ds.update(FileMetaInfo) # copy data elements from FileMetaInfo
+    else:
+        ds.TransferSyntaxUID = TransferSyntaxUID # need to store this for PixelArray checks
     ds.isLittleEndian = fp.isLittleEndian
     ds.isExplicitVR = fp.isExplicitVR
 
