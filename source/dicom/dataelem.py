@@ -15,6 +15,7 @@ import logging
 logger = logging.getLogger('pydicom')
 
 from dicom.datadict import dictionaryHasTag, dictionaryDescription
+from dicom.datadict import private_dictionaryDescription
 from dicom.tag import Tag
 from dicom.UID import UID
 
@@ -217,7 +218,14 @@ class DataElement(object):
         if dictionaryHasTag(self.tag):
             name = dictionaryDescription(self.tag)
         elif self.tag.isPrivate:
-            name = "Private tag data"
+            name = "Private tag data" # default
+            if hasattr(self, 'private_creator'):
+                try:
+                    name = private_dictionaryDescription(self.tag, self.private_creator)
+                except KeyError:
+                    pass                
+            elif self.tag.elem >> 8 == 0:
+                name = "Private Creator"
         elif self.tag.element == 0:  # implied Group Length dicom versions < 3
             name = "Group Length"
         else:
