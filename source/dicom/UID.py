@@ -28,7 +28,7 @@ class UID(str):
             self.name, self.type, self.info, retired = UID_dictionary[self]
             self.isRetired = bool(retired)
         else:
-            self.name = self
+            self.name = str.__str__(self)
             self.type, self.info, isRetired = (None, None, None)
             
     def __str__(self):
