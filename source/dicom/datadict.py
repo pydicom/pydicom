@@ -159,9 +159,21 @@ def get_private_entry(tag, private_creator):
         private_dict = private_dictionaries[private_creator]
     except KeyError:
         raise KeyError, "Private creator '%s' not in private dictionary" % private_creator
-    if tag not in private_dict:
-        raise KeyError, "Tag %s not in private dictionary for private creator '%s'" % (tag, private_creator)
-    return private_dict[tag]
+    
+    # private elements are usually agnostic for "block" (see PS3.5-2008 7.8.1 p44)
+    # Some elements in _private_dict are explicit; most have "xx" for high-byte of element
+    # Try exact key first, but then try with "xx" in block position
+    try:
+        dict_entry = private_dict[tag]
+    except KeyError:
+        #     so here put in the "xx" in the block position for key to look up
+        group_str = "%04x" % tag.group
+        elem_str = "%04x" % tag.elem
+        key = "%sxx%s" % (group_str, elem_str[-2:])
+        if key not in private_dict:
+            raise KeyError, "Tag %s not in private dictionary for private creator '%s'" % (key, private_creator)
+        dict_entry = private_dict[key]
+    return dict_entry
 	
 def private_dictionaryDescription(tag, private_creator):
     """Return the descriptive text for the given dicom tag."""

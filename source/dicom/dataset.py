@@ -197,6 +197,7 @@ class Dataset(dict):
     def __getitem__(self, key):
         """Operator for dataset[key] request."""
         return dict.__getitem__(self, Tag(key))
+        
     def GroupDataset(self, group):
         """Return a Dataset containing only data_elements of a certain group.
         
@@ -264,7 +265,7 @@ class Dataset(dict):
             arr = numpy.fromstring(self.PixelData, format)
             # XXX byte swap - may later handle this in read_file!!?
             if need_byteswap:
-                arr.byteswap(True)  # True = swap in-place, don't make a new copy
+                arr.byteswap(True)  # True means swap in-place, don't make a new copy
             # Note the following reshape operations return a new *view* onto arr, but don't copy the data
             if 'NumberofFrames' in self and self.NumberofFrames > 1:
                 if self.SamplesperPixel > 1:
@@ -359,13 +360,15 @@ class Dataset(dict):
                 del dataset[data_element.tag]  
         self.walk(RemoveCallback)
 
-    def SaveAs(self, filename, WriteLikeOriginal=True):
+    def save_as(self, filename, WriteLikeOriginal=True):
         """Write the dataset to a file.
         
         filename -- full path and filename to save the file to
         WriteLikeOriginal -- see dicom.filewrite.write_file for info on this parameter.
         """
         dicom.write_file(filename, self, WriteLikeOriginal)
+    
+    SaveAs = save_as  # for backwards compatibility
     
     def __setattr__(self, name, value):
         """Intercept any attempts to set a value for an instance attribute.
@@ -390,14 +393,23 @@ class Dataset(dict):
             self.__dict__[name] = value  
 
     def __setitem__(self, key, value):
-        """Operator for dataset[key]=value."""
+        """Operator for dataset[key]=value. Check consistency, and deal with private tags"""
         if not isinstance(value, DataElement): # ok if is subclass, e.g. DeferredDataElement
             raise TypeError, "Dataset contents must be DataElement instances.\n" + \
                   "To set a data_element value use data_element.value=val"
         if key != value.tag:
             raise ValueError, "data_element.tag must match the dictionary key"
-        # Everything is okay - use base class (dict) to store the dicom DataElement
-        dict.__setitem__(self, value.tag, value)
+
+        tag = value.tag
+        data_element = value
+        if tag.isPrivate:
+            # See PS 3.5-2008 section 7.8.1 (p. 44) for how blocks are reserved
+            logging.debug("Setting private tag %r" % tag)
+            private_block = tag.elem >> 8
+            private_creator_tag = Tag(tag.group, private_block)
+            if private_creator_tag in self:
+                data_element.private_creator = self[private_creator_tag].value
+        dict.__setitem__(self, tag, data_element)
 
     def __str__(self):
         """Handle str(dataset)."""
