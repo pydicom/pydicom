@@ -45,4 +45,7 @@ chr*.dcm
   * Character set files for testing (0008,0005) Specific Character Set
   * from http://www.dclunie.com/images/charset/SCS*
   * downsized to 32x32 since pixel data is irrelevant for these (test pattern only)
-  
+
+test_SR.dcm
+  * from ftp://ftp.dcmtk.org/pub/dicom/offis/software/dscope/dscope360/support/srdoc103.zip, file "test.dcm"
+  * Structured Reporting example, many levels of nesting
