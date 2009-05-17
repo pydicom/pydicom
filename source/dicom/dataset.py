@@ -304,27 +304,26 @@ class Dataset(dict):
     # Format strings spec'd according to python string formatting options
     #    See http://docs.python.org/library/stdtypes.html#string-formatting-operations
     default_element_format =  "%(tag)s %(name)-35.35s %(VR)s: %(repval)s"
-    default_sequence_element_format = "%(tag)s %(name)-35.35s %(VR)s: %(value)s"
+    default_sequence_element_format = "%(tag)s %(name)-35.35s %(VR)s: %(repval)s"
     def formatted_lines(self, element_format=default_element_format, 
                         sequence_element_format=default_sequence_element_format,
                         indent_format=None):
         """A generator to give back a formatted string representing each line
-        one at a time. Use like:
-            for line in dataset.formatted_lines():
+        one at a time. Example:
+            for line in dataset.formatted_lines("%(name)s=%(repval)s", "SQ:%(name)s=%(repval)s"):
                 print line
+        See the source code for default values which illustrate some of the names that can be used in the 
+        format strings
+        indent_format -- not used in current version. Placeholder for future functionality.
         """
-        for data_element in self:
-            de=data_element
-            elem_dict = dict([(x, getattr(de,x)() if callable(getattr(de,x)) 
-                                    else getattr(de,x)) 
-                                    for x in dir(de) if not x.startswith("_")])
+        for data_element in self.iterall():
+            # Get all the attributes possible for this data element (e.g. gets descriptive text name() too)
+            # This is the dictionary of names that can be used in the format string
+            elem_dict = dict([(x, getattr(data_element,x)() if callable(getattr(data_element,x)) 
+                                    else getattr(data_element,x)) 
+                                    for x in dir(data_element) if not x.startswith("_")])
             if data_element.VR == "SQ":
                 yield sequence_element_format % elem_dict
-                sequence = data_element.value
-                for sequence_item in sequence:
-                    for item_line in sequence_item.formatted_lines:
-                        yield item_line
-                    # return sequence.formatted_lines()
             else:
                 yield element_format % elem_dict
                 
