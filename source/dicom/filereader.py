@@ -18,8 +18,11 @@ try:
 except:
     stat_available = False
 
-from os import SEEK_CUR
-
+try:
+	from os import SEEK_CUR
+except ImportError: #  SEEK_CUR not available in python < 2.5
+	SEEK_CUR = 1 
+	
 from dicom.UID import UID, UID_dictionary
 from dicom.UID import DeflatedExplicitVRLittleEndian, ExplicitVRLittleEndian
 from dicom.UID import ImplicitVRLittleEndian, ExplicitVRBigEndian
