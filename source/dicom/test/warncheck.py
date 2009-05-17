@@ -3,12 +3,12 @@
 import warnings
 import unittest
 
-def assertWarns(self, warn_startswith, function, *func_args, **func_kwargs):
+def assertWarns(self, warn_msg, function, *func_args, **func_kwargs):
     """
     Check that the function generates the expected warning
     with the arguments given.
     
-    warn_startswith -- the first part of the warning string
+    warn_msg -- part of the warning string, any thrown warnings should contain this
     function -- the function to call (expected to issue a warning)
     func_args -- positional arguments to the function
     func_kwargs -- keyword arguments to the function
@@ -27,8 +27,8 @@ def assertWarns(self, warn_startswith, function, *func_args, **func_kwargs):
         warnings.warn_explicit = saved_warn_explicit
 
     self.assert_(len(all_warnings)==1, "Expected one warning; got %d" % len(all_warnings))
-    self.assert_(all_warnings[0].startswith(warn_startswith), 
-        "Expected warning message '%s...'; got '%s'" % (warn_startswith, all_warnings[0]))
+    self.assert_(warn_msg in all_warnings[0], 
+        "Expected warning message '%s...'; got '%s'" % (warn_msg, all_warnings[0]))
     return result
     
 def test_warning(the_warning):

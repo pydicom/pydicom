@@ -317,11 +317,19 @@ class Dataset(dict):
         indent_format -- not used in current version. Placeholder for future functionality.
         """
         for data_element in self.iterall():
-            # Get all the attributes possible for this data element (e.g. gets descriptive text name() too)
+            # Get all the attributes possible for this data element (e.g. gets descriptive text name too)
             # This is the dictionary of names that can be used in the format string
-            elem_dict = dict([(x, getattr(data_element,x)() if callable(getattr(data_element,x)) 
-                                    else getattr(data_element,x)) 
-                                    for x in dir(data_element) if not x.startswith("_")])
+            elem_dict = dict()
+            for x in dir(data_element):
+                if not x.startswith("_"):
+                    get_x = getattr(data_element, x)
+                    if callable(get_x): 
+                        get_x = get_x()
+                    elem_dict[x] = get_x
+            # Commented out below is much less verbose version of above dict for python >= 2.5
+            # elem_dict = dict([(x, getattr(data_element,x)() if callable(getattr(data_element,x)) 
+                                    # else getattr(data_element,x)) 
+                                    # for x in dir(data_element) if not x.startswith("_")])
             if data_element.VR == "SQ":
                 yield sequence_element_format % elem_dict
             else:
