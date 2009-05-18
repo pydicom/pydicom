@@ -299,7 +299,8 @@ class Dataset(dict):
             self._PixelArray = self._PixelDataNumpy()
             self._pixel_id = id(self.PixelData) # is this guaranteed to work if memory is re-used??
         return self._PixelArray
-    PixelArray = property(_getPixelArray)
+    pixel_array = property(_getPixelArray)
+    PixelArray = pixel_array # for backwards compatibility
     
     # Format strings spec'd according to python string formatting options
     #    See http://docs.python.org/library/stdtypes.html#string-formatting-operations
@@ -358,7 +359,7 @@ class Dataset(dict):
                 strings.append(indentStr + repr(data_element))
         return "\n".join(strings)
         
-    def RemovePrivateTags(self):
+    def remove_private_tags(self):
         """Remove all Dicom private tags in this dataset and those contained within."""
         def RemoveCallback(dataset, data_element):
             """Internal method to use as callback to walk() method."""
@@ -366,12 +367,13 @@ class Dataset(dict):
                 # can't del self[tag] - won't be right dataset on recursion
                 del dataset[data_element.tag]  
         self.walk(RemoveCallback)
-
+    RemovePrivateTags = remove_private_tags # for backwards compatibility
+    
     def save_as(self, filename, WriteLikeOriginal=True):
         """Write the dataset to a file.
         
         filename -- full path and filename to save the file to
-        WriteLikeOriginal -- see dicom.filewrite.write_file for info on this parameter.
+        WriteLikeOriginal -- see dicom.filewriter.write_file for info on this parameter.
         """
         dicom.write_file(filename, self, WriteLikeOriginal)
     

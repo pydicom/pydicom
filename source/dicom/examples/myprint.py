@@ -11,24 +11,31 @@ def myprint(dataset, indent=0):
     """
     dont_print = ['Pixel Data', 'File Meta Information Version']
 
-    keylist = dataset.keys()
-    keylist.sort()
-    indentStr = "   " * indent
-    nextIndentStr = "   " *(indent+1)
-    for k in keylist:
-        data_element = dataset[k]
+    indent_string = "   " * indent
+    next_indent_string = "   " *(indent+1)
+
+    for data_element in dataset:
         if data_element.VR == "SQ":   # a sequence
-            print indentStr, data_element.description()
-            for ds in data_element.value:
-                myprint(ds, indent+1)
-                print nextIndentStr + "---------"
+            print indent_string, data_element.name
+            for sequence_item in data_element.value:
+                myprint(sequence_item, indent+1)
+                print next_indent_string + "---------"
         else:
-            if data_element.description() in dont_print:
-                print "   ---- not printed ----   "
-            else:            
-                print indentStr, data_element.description(), "=", repr(data_element.value) # use str(data_element.value) here to skip quotes around items, etc.
+            if data_element.name in dont_print:
+                print """<item not printed -- in the "don't print" list>"""
+            else:
+                repr_value = repr(data_element.value)
+                if len(repr_value) > 50:
+                    repr_value = repr_value[:50] + "..."
+                print indent_string, data_element.name, "=", repr_value
 
 if __name__ == "__main__":
     import dicom
-    ds = dicom.ReadFile("rtplan.dcm")
+    import sys
+    usage = """Usage: myprint filename"""
+    if len(sys.argv) != 2:
+        print usage
+        sys.exit()
+        
+    ds = dicom.ReadFile(sys.argv[1])
     myprint(ds)

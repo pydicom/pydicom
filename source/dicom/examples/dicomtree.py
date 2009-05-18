@@ -46,7 +46,7 @@ def recurse_tree(tree, dataset, parent, hide=False):
         if data_element.VR == "SQ":   # a sequence
             for i, dataset in enumerate(data_element.value):
                 item_id = node_id + "." + str(i+1)
-                sq_item_description = data_element.description().replace(" Sequence", "") # XXX not i18n
+                sq_item_description = data_element.name.replace(" Sequence", "") # XXX not i18n
                 item_text = "%s %d" % (sq_item_description, i+1)
                 tree.hlist.add(item_id, text=item_text)
                 tree.hlist.hide_entry(item_id)

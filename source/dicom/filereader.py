@@ -17,6 +17,10 @@ try:
     from os import stat
 except:
     stat_available = False
+try:
+    from os import SEEK_CUR
+except ImportError: # SEEK_CUR not available in python < 2.5
+    SEEK_CUR = 1
 
 try:
 	from os import SEEK_CUR
