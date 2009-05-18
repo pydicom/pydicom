@@ -4,34 +4,34 @@ NOTE: This example requires that the Numpy library be installed
 for manipulation of pixel data
 
 >>> import dicom
->>> ds=dicom.ReadFile("MR1_UNC")
->>> data = ds.PixelDataArray()  # numpy required here
+>>> ds = dicom.read_file("mr1_unc.dcm")
+>>> data = ds.pixel_array
 >>> data.shape
 (512, 512)
->>> data2=data[256-32:256+32, 128-32:128+32]
+>>> data2 = data[256-32:256+32, 128-32:128+32]
 >>> data2.shape
 (64, 64)
 >>> ds.PixelData = data2.tostring()
->>> ds.Rows=64
->>> ds.Columns=64
+>>> ds.Rows = 64
+>>> ds.Columns = 64
 >>> ds
 (0002, 0001) File Meta Information Version       OB: '\x00\x01'
-(0002, 0002) Media Storage SOP Class UID         UI: '1.2.840.10008.5.1.4.1.1.4'
-(0002, 0003) Media Storage SOP Instance UID      UI: '1.3.6.1.4.1.5962.1.1.4.1.1.20040826185059.5457'
-(0002, 0010) Transfer Syntax UID                 UI: '1.2.840.10008.1.2.1'
-(0002, 0012) Implementation Class UID            UI: '1.3.6.1.4.1.5962.2'
+(0002, 0002) Media Storage SOP Class UID         UI: MR Image Storage
+(0002, 0003) Media Storage SOP Instance UID      UI: 1.3.6.1.4.1.5962.1.1.4.1.1.20040119072730.12322
+(0002, 0010) Transfer Syntax UID                 UI: Explicit VR Little Endian
+(0002, 0012) Implementation Class UID            UI: 1.3.6.1.4.1.5962.2
 (0002, 0013) Implementation Version Name         SH: 'DCTOOL100'
 (0002, 0016) Source Application Entity Title     AE: 'CLUNIE1'
 (0008, 0008) Image Type                          CS: ['DERIVED', 'SECONDARY', 'OTHER']
-(0008, 0012) Instance Creation Date              DA: '20040826'
-(0008, 0013) Instance Creation Time              TM: '185434'
-(0008, 0014) Instance Creator UID                UI: '1.3.6.1.4.1.5962.3'
-(0008, 0016) SOP Class UID                       UI: '1.2.840.10008.5.1.4.1.1.4'
-(0008, 0018) SOP Instance UID                    UI: '1.3.6.1.4.1.5962.1.1.4.1.1.20040826185059.5457'
-(0008, 0020) Study Date                          DA: '20040826'
+(0008, 0012) Instance Creation Date              DA: '20040119'
+(0008, 0013) Instance Creation Time              TM: '073057'
+(0008, 0014) Instance Creator UID                UI: 1.3.6.1.4.1.5962.3
+(0008, 0016) SOP Class UID                       UI: MR Image Storage
+(0008, 0018) SOP Instance UID                    UI: 1.3.6.1.4.1.5962.1.1.4.1.1.20040119072730.12322
+(0008, 0020) Study Date                          DA: '20040119'
 (0008, 0021) Series Date                         DA: ''
 (0008, 0022) Acquisition Date                    DA: ''
-(0008, 0030) Study Time                          TM: '185059'
+(0008, 0030) Study Time                          TM: '072730'
 (0008, 0031) Series Time                         TM: ''
 (0008, 0032) Acquisition Time                    TM: ''
 (0008, 0050) Accession Number                    SH: ''
@@ -39,7 +39,7 @@ for manipulation of pixel data
 (0008, 0070) Manufacturer                        LO: 'TOSHIBA_MEC'
 (0008, 0080) Institution Name                    LO: 'TOSHIBA'
 (0008, 0090) Referring Physician's Name          PN: ''
-(0008, 0201) Timezone Offset From UTC            SH: '-0400'
+(0008, 0201) Timezone Offset From UTC            SH: '-0500'
 (0008, 1010) Station Name                        SH: '000000000'
 (0008, 1060) Name of  Physician(s) Reading Study PN: '----'
 (0008, 1070) Operators' Name                     PN: '----'
@@ -67,15 +67,15 @@ for manipulation of pixel data
 (0018, 1020) Software Version(s)                 LO: 'V3.51*P25'
 (0018, 1314) Flip Angle                          DS: '90'
 (0018, 5100) Patient Position                    CS: 'HFS'
-(0020, 000d) Study Instance UID                  UI: '1.3.6.1.4.1.5962.1.2.4.20040826185059.5457'
-(0020, 000e) Series Instance UID                 UI: '1.3.6.1.4.1.5962.1.3.4.1.20040826185059.5457'
+(0020, 000d) Study Instance UID                  UI: 1.3.6.1.4.1.5962.1.2.4.20040119072730.12322
+(0020, 000e) Series Instance UID                 UI: 1.3.6.1.4.1.5962.1.3.4.1.20040119072730.12322
 (0020, 0010) Study ID                            SH: '4MR1'
 (0020, 0011) Series Number                       IS: '1'
 (0020, 0012) Acquisition Number                  IS: '0'
 (0020, 0013) Instance Number                     IS: '1'
 (0020, 0032) Image Position (Patient)            DS: ['-83.9063', '-91.2000', '6.6406']
 (0020, 0037) Image Orientation (Patient)         DS: ['1.0000', '0.0000', '0.0000', '0.0000', '1.0000', '0.0000']
-(0020, 0052) Frame of Reference UID              UI: '1.3.6.1.4.1.5962.1.4.4.1.20040826185059.5457'
+(0020, 0052) Frame of Reference UID              UI: 1.3.6.1.4.1.5962.1.4.4.1.20040119072730.12322
 (0020, 0060) Laterality                          CS: ''
 (0020, 1040) Position Reference Indicator        LO: ''
 (0020, 1041) Slice Location                      DS: '0.0000'
@@ -95,6 +95,6 @@ for manipulation of pixel data
 (0028, 1051) Window Width                        DS: '1600'
 (7fe0, 0010) Pixel Data                          OW: Array of 8192 bytes
 (fffc, fffc) Data Set Trailing Padding           OB: Array of 126 bytes
->>> dicom.WriteFile("MR_small.dcm", ds)
->>> ds2=dicom.ReadFile("MR_small.dcm")  # read file back as a check it wrote okay
->>> 
+>>> ds.save_as("MR_small.dcm")
+>>> ds2 = dicom.read_file("MR_small.dcm") # read back to make sure is ok
+>>>

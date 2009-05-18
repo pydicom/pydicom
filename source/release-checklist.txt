@@ -1,5 +1,5 @@
 pydicom release checklist
-* write ReleaseNotes by going through revision history
+* write ReleaseNotes by going through revision history - best seen at Project Home | Updates
 * review issue list for any other changes that should be in the release
 * run test/all.bat on windows to test all python versions against svn code
 * run test/all.sh on linux/mac to test all python versions against svn code
@@ -23,8 +23,7 @@ pydicom release checklist
   * look for references to specific versions and update
   * any changes related to version of python itself
   * read all pages quickly
-* announce on pydicom google group
-* announce to python(x,y)?
+* announce on pydicom google group (python(x,y) maintener on the group too)
 * update info in medphys files
 
 

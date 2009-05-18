@@ -1,36 +1,30 @@
 # ListBeams.py
-"""Given a plan file, list basic info for the beams in it
+"""Given an RTPLAN DICOM file, list basic info for the beams in it
 """
-# Copyright (c) 2008 Darcy Mason
+# Copyright (c) 2008, 2009 Darcy Mason
 # This file is part of pydicom, relased under an MIT license.
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
 
-usage = """Expected a single dicom filename. E.g.:
-   python ListBeams.py rtplan.dcm
-   """
+import dicom
 
+usage = """python ListBeams.py rtplan.dcm"""
 
-def ListBeams(rtplan_filename):
-   import dicom
-   plan = dicom.ReadFile(rtplan_filename)
-   print "%13s %8s %8s %8s" % ("Beam name", "Number", "Gantry", "SSD (cm)")
-   for beam in plan.Beams:
-      name = beam.BeamName
-      num = beam.BeamNumber
-      cp = beam.ControlPoints[0]
-      g = float(cp.GantryAngle)
-      SSD = float(cp.SourcetoSurfaceDistance / 10.0)
-      print "%13s %8s %8.1f %8.1f" % (name, str(num), g, SSD)
-
+def ListBeams(dataset):
+    """Return a string summarizing the RTPLAN beam information in the dataset"""
+    lines = ["%13s %8s %8s %8s" % ("Beam name", "Number", "Gantry", "SSD (cm)")]
+    for beam in plan.Beams:
+        cp0 = beam.ControlPoints[0]
+        SSD = float(cp.SourcetoSurfaceDistance / 10.0)
+        lines.append("%13s %8s %8.1f %8.1f" % (beam.BeamName, str(beam.BeamNumber),
+                                      cp0.GantryAngle, SSD))
+    return "\n".join(lines)
 
 if __name__ == "__main__":
-   import sys
-   if len(sys.argv) != 2:
-      print usage
-      print
-      print
-      sys.exit(-1)
-   ListBeams(sys.argv[1])
-   print
-   print "Done."
+    import sys
+    if len(sys.argv) != 2:
+        print usage
+        sys.exit(-1)
+
+   rtplan = dicom.read_file(sys.argv[1])
+   print ListBeams(rtplan)

@@ -7,43 +7,47 @@ This is an example only; use only as a starting point."""
 # This file is part of pydicom, relased under an MIT license.
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
+# Use at your own risk!!
+# Many more items need to be addressed for proper anonymizing
+# In particular, note that pixel data could have confidential data "burned in"
 
 usage = """
 Usage:
 python anonymize.py dicomfile.dcm outputfile.dcm
 OR
-python anonymize.py originalsdirectory anonymizeddirectory
-"""
+python anonymize.py originals_directory anonymized_directory
 
-# Use at your own risk!!
-# Many more items need to be addressed for proper anonymizing
-# In particular, note that pixel data could have confidential data "burned in"
+Note: Use at your own risk.
+"""
 
 import os, os.path
 import dicom
 
-def anonymize(filename, output_filename, PersonName="anonymous",
-              PatientID="id", RemoveCurves=True, RemovePrivate=True):
-    """Replace data elements with VR="PN" with PersonName etc."""
+def anonymize(filename, output_filename, new_person_name="anonymous",
+              new_patient_id="id", remove_curves=True, remove_private_tags=True):
+    """Replace data element values to partly anonymize a DICOM file.
+    Note: completely anonymizing a DICOM file is very complicated; there
+    are many things this example code does not address. USE AT YOUR OWN RISK.
+    """
 
-	# Define call-back functions
+    # Define call-back functions for the dataset.walk() function
     def PN_callback(ds, data_element):
         """Called from the dataset "walk" recursive function for all data elements."""
         if data_element.VR == "PN":
-            data_element.value = PersonName
+            data_element.value = new_person_name
     def curves_callback(ds, data_element):
         """Called from the dataset "walk" recursive function for all data elements."""
         if data_element.tag.group & 0xFF00 == 0x5000:
             del ds[data_element.tag]
     
-	# Load the current dicom file to anonymize
+	# Load the current dicom file to 'anonymize'
     dataset = dicom.read_file(filename)
     
-	# Remove patient name and any other names
+	# Remove patient name and any other person names
     dataset.walk(PN_callback)
     
 	# Change ID
-    dataset.PatientID = PatientID
+    dataset.PatientID = new_patient_id
 	
 	# Remove data elements (if DICOM type 3 optional) 
 	# Use general loop so easy to add more later
@@ -57,14 +61,14 @@ def anonymize(filename, output_filename, PersonName="anonymous",
         if name in dataset:
             dataset.data_element(name).value = ''
 	
-	# Remove private tags if funcation argument says to do so. Same for curves
-    if RemovePrivate:
-        dataset.RemovePrivateTags()
-    if RemoveCurves:
+	# Remove private tags if function argument says to do so. Same for curves
+    if remove_private_tags:
+        dataset.remove_private_tags()
+    if remove_curves:
         dataset.walk(curves_callback)
 		
 	# write the 'anonymized' DICOM out under the new filename
-    dataset.SaveAs(output_filename)   
+    dataset.save_as(output_filename)   
 
 # Can run as a script:
 if __name__ == "__main__":
