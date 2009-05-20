@@ -58,11 +58,12 @@ class Tag(long):
     elem  = property(getElem)
     element = elem
    
-    # Property isPrivate
-    def getIsPrivate(self):
+    # Property is_private
+    def getis_private(self):
         """Private tags have an odd group number"""
         return self.group % 2 == 1
-    isPrivate = property(getIsPrivate)
+    is_private = property(getis_private)
+    isPrivate = is_private  # for backwards compatibility
 
 # Define some special tags:
 # See PS 3.5-2008 section 7.5 (p.40)

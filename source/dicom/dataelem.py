@@ -217,11 +217,14 @@ class DataElement(object):
         """Return the DICOM dictionary description for this dicom tag."""
         if dictionaryHasTag(self.tag):
             name = dictionaryDescription(self.tag)
-        elif self.tag.isPrivate:
+        elif self.tag.is_private:
             name = "Private tag data" # default
             if hasattr(self, 'private_creator'):
                 try:
-                    name = private_dictionaryDescription(self.tag, self.private_creator)
+                    # If have name from private dictionary, use it, but
+                    #   but put in square brackets so is differentiated,
+                    #   and clear that cannot access it by name
+                    name = "[" + private_dictionaryDescription(self.tag, self.private_creator) + "]"
                 except KeyError:
                     pass                
             elif self.tag.elem >> 8 == 0:
