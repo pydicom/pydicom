@@ -121,7 +121,7 @@ def read_data_element(fp, length=None):
         try:
             VR = dictionaryVR(tag)
         except KeyError:
-            if tag.isPrivate:
+            if tag.is_private:
                 VR = 'OB'  # just read the bytes, no way to know what they mean
             elif tag.element == 0:  # group length tag implied in versions < 3.0
                 VR = 'UL'

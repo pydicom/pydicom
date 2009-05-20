@@ -363,7 +363,7 @@ class Dataset(dict):
         """Remove all Dicom private tags in this dataset and those contained within."""
         def RemoveCallback(dataset, data_element):
             """Internal method to use as callback to walk() method."""
-            if data_element.tag.isPrivate:
+            if data_element.tag.is_private:
                 # can't del self[tag] - won't be right dataset on recursion
                 del dataset[data_element.tag]  
         self.walk(RemoveCallback)
@@ -411,7 +411,7 @@ class Dataset(dict):
 
         tag = value.tag
         data_element = value
-        if tag.isPrivate:
+        if tag.is_private:
             # See PS 3.5-2008 section 7.8.1 (p. 44) for how blocks are reserved
             logging.debug("Setting private tag %r" % tag)
             private_block = tag.elem >> 8
