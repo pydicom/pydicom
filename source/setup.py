@@ -16,7 +16,7 @@ setup(name="pydicom",
       author="Darcy Mason",
       author_email="darcymason@gmail.com",
       url="http://pydicom.googlecode.com",
-      license = "Gnu General Public License",
+      license = "MIT license",
       keywords = "dicom python medical imaging",
       classifiers = [
         "License :: OSI Approved :: MIT License",
