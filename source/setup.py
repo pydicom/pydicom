@@ -29,6 +29,19 @@ setup(name="pydicom",
         "Topic :: Scientific/Engineering :: Medical Science Apps."
         "Topic :: Scientific/Engineering :: Physics",
         "Topic :: Software Development :: Libraries",
-        ]
-
+        ],
+      long_description = """
+      pydicom is a pure python package for working with DICOM files. 
+      DICOM is a standard (http://medical.nema.org) for communicating 
+      medical images and related information such as reports 
+      and radiotherapy objects. 
+      
+      pydicom makes it easy to read these complex files into natural 
+      pythonic structures for easy manipulation. 
+      Modified datasets can be written again to DICOM format files.
+      See the `Getting Started <http://code.google.com/p/pydicom/wiki/GettingStarted>`_ 
+      wiki page for installation and basic information, and the 
+      `Pydicom User Guide <http://code.google.com/p/pydicom/wiki/PydicomUserGuide>`_ page 
+      for an overview of how to use the pydicom library.
+      """
      )
