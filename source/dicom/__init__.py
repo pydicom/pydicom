@@ -11,9 +11,9 @@ Quick Start
 -----------
 1. A simple program to read a dicom file, modify a value, and write to a new file::
     import dicom
-    dataset = dicom.ReadFile("file1.dcm")
+    dataset = dicom.read_file("file1.dcm")
     dataset.PatientsName = 'anonymous'
-    dataset.SaveAs("file2.dcm")
+    dataset.save_as("file2.dcm")
     
 2. See the files in the examples directory that came with this package for more
 examples, including some interactive sessions.
@@ -39,9 +39,11 @@ formatter = logging.Formatter("%(message)s")
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
-# For convenience, import the ReadFile and write_file functions (most used)  into the "dicom" namespace.
+# For convenience, import the read_file and write_file functions (most used)  into the "dicom" namespace.
 from filereader import read_file, ReadFile  # latter one for backwards compatibility; remove later
-from filewriter import write_file, write_file # ditto
+from filewriter import write_file, WriteFile # ditto
+
+__version__ = "0.9.4svn"
 
 def debug(DebugOn=True):
     global logger

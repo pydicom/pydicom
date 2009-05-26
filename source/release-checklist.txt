@@ -1,30 +1,36 @@
 pydicom release checklist
 * write ReleaseNotes by going through revision history - best seen at Project Home | Updates
 * review issue list for any other changes that should be in the release
+* edit __init__.py version number
+* edit setup.py -- version number, description, license if necessary, etc
 * run test/all.bat on windows to test all python versions against svn code
 * run test/all.sh on linux/mac to test all python versions against svn code
 * run each example file and clean up any output files created
 * make sure all changes have been committed to repository
+* loop back to running all tests if any changes to main code made
+* check back out to a clean directory -- that way sure to not include extra files in the build
 * build the package files
-    * python setup.py bdist_wininst
-    * python setup.py sdist
-* install the package on
+    * on windows, python setup.py bdist_wininst --> get windows installer exe in dist directory
+    * on linux, python setup.py sdist  --> get .tar.gz source file (also used by easy_install) in dist directory
+* use the dist files to install the package on
   * windows -- 32-bit  / 64-bit using Windows installer
   * linux   -- 32-bit  / 64-bit
-  and run the tests in one python version on each system
-* register with pypi -- python setup.py register
+  and run the tests in at least one python version on each system
+* upload dist files to googlecode site
 * run easy_install (retrieve from pypi) again on clean system and make sure it works:
-  * with -e option to install source?
-  * as a pure egg
 * verify that source install has _all_ directories and subdirectories included
 * update documentation:
   * update Release Notes page
   * special attention to deprecated modules, classes, etc
-  * look for references to specific versions and update
+  * look for references to specific versions
   * any changes related to version of python itself
   * read all pages quickly
-* announce on pydicom google group (python(x,y) maintener on the group too)
-* update info in medphys files
-
-
-
+* update News page with quick synopsis of major features
+* announce on pydicom google group
+* tag the release -- with TortoiseSvn use Copy (Branch / Tag), 
+           to URL https://pydicom.googlecode.com/svn/tags/release-X.X.X,
+           with Create copy from HEAD, if no changes made since built, else use revision number,
+           and message "Tag version X.X.X release."
+* update info on medphysfiles.com
+* register with pypi -- python setup.py register
+* others -- freshmeat? idoimaging.com? macports?
