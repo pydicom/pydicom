@@ -26,7 +26,7 @@ setup(name="pydicom",
         "Development Status :: 4 - Beta",
         "Programming Language :: Python",
         "Operating System :: OS Independent",
-        "Topic :: Scientific/Engineering :: Medical Science Apps."
+        "Topic :: Scientific/Engineering :: Medical Science Apps.",
         "Topic :: Scientific/Engineering :: Physics",
         "Topic :: Software Development :: Libraries",
         ],
