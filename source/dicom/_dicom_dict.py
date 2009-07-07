@@ -1981,6 +1981,11 @@ DicomDictionary = {
 0x30020040: ('SQ', '1', "Fluence Map Sequence", ''),
 0x30020041: ('CS', '1', "Fluence Data Source", ''),
 0x30020042: ('DS', '1', "Fluence Data Scale", ''),
+# From CP805/916
+0x30020050: ('SQ', '1', "Primary Fluence Mode Sequence", ''),
+0x30020051: ('CS', '1', "Fluence Mode", ''),
+0x30020052: ('SH', '1', "Fluence Mode ID", ''),
+# End from CP805/916
 0x30040001: ('CS', '1', "DVH Type", ''),
 0x30040002: ('CS', '1', "Dose Units", ''),
 0x30040004: ('CS', '1', "Dose Type", ''),
