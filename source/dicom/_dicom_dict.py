@@ -126,6 +126,13 @@ DicomDictionary = {
 0x00081155: ('UI', '1', "Referenced SOP Instance UID", ''),
 0x0008115A: ('UI', '1-n', "SOP Classes Supported", ''),
 0x00081160: ('IS', '1-n', "Referenced Frame Number", ''),
+# From Supp 119
+0x00081161: ('UL', '1-n', "Simple Frame List", ''),
+0x00081162: ('UL', '3-3n', "Calculated Frame List", ''),
+0x00081163: ('FD', '2', "Time Range", ''),
+0x00081164: ('SQ', '1', "Frame Extraction Sequence", ''),
+0x00081167: ('IS', '1', "Multi-Frame Source SOP Instance UID", ''),
+# End From Supp 119
 0x00081195: ('UI', '1', "Transaction UID", ''),
 0x00081197: ('US', '1', "Failure Reason", ''),
 0x00081198: ('SQ', '1', "Failed SOP Sequence", ''),
@@ -1425,15 +1432,36 @@ DicomDictionary = {
 0x00400400: ('LT', '1', "Comments on the Scheduled Procedure Step", ''),
 0x00400440: ('SQ', '1', "Protocol Context Sequence", ''),
 0x00400441: ('SQ', '1', "Content Item Modifier Sequence", ''),
-0x0040050A: ('LO', '1', "Specimen Accession Number", ''),
-0x00400550: ('SQ', '1', "Specimen Sequence", ''),
+# From Supp 122
+0x00400500: ('SQ', '1', "Scheduled Specimen Sequence", ''),
+0x0040050A: ('LO', '1', "Specimen Accession Number", 'Retired'),
+0x00400512: ('LO', '1', "Container Identifier", ''),
+0x00400513: ('SQ', '1', "Issuer of the Container Identifier Sequence", ''),
+0x00400515: ('SQ', '1', "Alternate Container Identifier Sequence", ''),
+0x00400518: ('SQ', '1', "Container Type Code Sequence", ''),
+0x0040051A: ('LO', '1', "Container Description", ''),
+0x00400520: ('SQ', '1', "Container Component Sequence", ''),
+0x00400550: ('SQ', '1', "Specimen Sequence", 'Retired'),
+# End From Supp 122
 0x00400551: ('LO', '1', "Specimen Identifier", ''),
 0x00400552: ('SQ', '1', "Specimen Description Sequence - Trial", 'Retired'),
 0x00400553: ('ST', '1', "Specimen Description - Trial", 'Retired'),
+# From Supp 122
+0x00400554: ('UI', '1', "Specimen UID", ''),
+# End From Supp 122
 0x00400555: ('SQ', '1', "Acquisition Context Sequence", ''),
 0x00400556: ('ST', '1', "Acquisition Context Description", ''),
 0x0040059A: ('SQ', '1', "Specimen Type Code Sequence", ''),
-0x004006FA: ('LO', '1', "Slide Identifier", ''),
+# From Supp 122
+0x00400560: ('SQ', '1', "Specimen Description Sequence", ''),
+0x00400562: ('SQ', '1', "Issuer of the Specimen Identifier Sequence", ''),
+0x00400600: ('LO', '1', "Specimen Short Description", ''),
+0x00400602: ('UT', '1', "Specimen Detailed Description", ''),
+0x00400610: ('SQ', '1', "Specimen Preparation Sequence", ''),
+0x00400612: ('SQ', '1', "Specimen Preparation Step Content Item Sequence", ''),
+0x00400620: ('SQ', '1', "Specimen Localization Content Item Sequence", ''),
+0x004006FA: ('LO', '1', "Slide Identifier", 'Retired'),
+# End From Supp 122
 0x0040071A: ('SQ', '1', "Image Center Point Coordinates Sequence", ''),
 0x0040072A: ('DS', '1', "X offset in Slide Coordinate System", ''),
 0x0040073A: ('DS', '1', "Y offset in Slide Coordinate System", ''),
@@ -1595,11 +1623,25 @@ DicomDictionary = {
 0x00440019: ('SQ', '1', "Substance Administration Parameter Sequence", ''),
 0x00500004: ('CS', '1', "Calibration Image", ''),
 0x00500010: ('SQ', '1', "Device Sequence", ''),
+# From Supp 122
+0x00500012: ('SQ', '1', "Container Component Type Code Sequence", ''),
+0x00500013: ('FD', '1', "Container Component Thickness", ''),
+# End From Supp 122
 0x00500014: ('DS', '1', "Device Length", ''),
+# From Supp 122
+0x00500015: ('FD', '1', "Container Component Width", ''),
+# End From Supp 122
 0x00500016: ('DS', '1', "Device Diameter", ''),
 0x00500017: ('CS', '1', "Device Diameter Units", ''),
 0x00500018: ('DS', '1', "Device Volume", ''),
 0x00500019: ('DS', '1', "Intermarker Distance", ''),
+# From Supp 122
+0x0050001A: ('CS', '1', "Container Component Material", ''),
+0x0050001B: ('LO', '1', "Container Component ID", ''),
+0x0050001C: ('FD', '1', "Container Component Length", ''),
+0x0050001D: ('FD', '1', "Container Component Diameter", ''),
+0x0050001E: ('LO', '1', "Container Component Description", ''),
+# End From Supp 122
 0x00500020: ('LO', '1', "Device Description", ''),
 0x00540010: ('US', '1-n', "Energy Window Vector", ''),
 0x00540011: ('US', '1', "Number of Energy Windows", ''),
