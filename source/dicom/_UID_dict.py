@@ -224,8 +224,8 @@ UID_dictionary = {
 '1.2.840.10008.5.1.4.1.2.3.2': ('Patient/Study Only Query/Retrieve Information Model  - MOVE', 'SOP Class', '', 'Retired'),
 '1.2.840.10008.5.1.4.1.2.3.3': ('Patient/Study Only Query/Retrieve Information Model  - GET', 'SOP Class', '', 'Retired'),
 # From Supp 119
-'1.2.840.10008.5.1.4.1.2.4.2': ('Composite Instance Root Retrieve Ð MOVE', 'SOP Class', '', ''),
-'1.2.840.10008.5.1.4.1.2.4.3': ('Composite Instance Root Retrieve Ð GET', 'SOP Class', '', ''),
+'1.2.840.10008.5.1.4.1.2.4.2': ('Composite Instance Root Retrieve - MOVE', 'SOP Class', '', ''),
+'1.2.840.10008.5.1.4.1.2.4.3': ('Composite Instance Root Retrieve - GET', 'SOP Class', '', ''),
 '1.2.840.10008.5.1.4.1.2.5.3': ('Composite Instance Retrieve Without Bulk Data - GET', 'SOP Class', '', ''),
 # End From Supp 119
 '1.2.840.10008.5.1.4.31': ('Modality Worklist Information Model - FIND', 'SOP Class', '', ''),
