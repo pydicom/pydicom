@@ -131,6 +131,9 @@ UID_dictionary = {
 '1.2.840.10008.5.1.4.1.1.5': ('Nuclear Medicine Image  Storage', 'SOP Class', '', 'Retired'),
 '1.2.840.10008.5.1.4.1.1.6': ('Ultrasound Image Storage', 'SOP Class', '', 'Retired'),
 '1.2.840.10008.5.1.4.1.1.6.1': ('Ultrasound Image Storage', 'SOP Class', '', ''),
+# From Supp 43
+'1.2.840.10008.5.1.4.1.1.6.2': ('Enhanced US Volume Storage', 'SOP Class', '', ''),
+# End From Supp 43
 '1.2.840.10008.5.1.4.1.1.7': ('Secondary Capture Image Storage', 'SOP Class', '', ''),
 '1.2.840.10008.5.1.4.1.1.7.1': ('Multi-frame Single Bit Secondary Capture Image Storage', 'SOP Class', '', ''),
 '1.2.840.10008.5.1.4.1.1.7.2': ('Multi-frame Grayscale Byte Secondary Capture Image Storage', 'SOP Class', '', ''),
@@ -145,6 +148,11 @@ UID_dictionary = {
 '1.2.840.10008.5.1.4.1.1.9.2.1': ('Hemodynamic Waveform Storage', 'SOP Class', '', ''),
 '1.2.840.10008.5.1.4.1.1.9.3.1': ('Cardiac Electrophysiology Waveform Storage', 'SOP Class', '', ''),
 '1.2.840.10008.5.1.4.1.1.9.4.1': ('Basic Voice Audio Waveform Storage', 'SOP Class', '', ''),
+# From Supp 43
+'1.2.840.10008.5.1.4.1.1.9.4.2': ('General Audio Waveform Storage', 'SOP Class', '', ''),
+'1.2.840.10008.5.1.4.1.1.9.5.1': ('Arterial Pulse Waveform Storage', 'SOP Class', '', ''),
+'1.2.840.10008.5.1.4.1.1.9.6.1': ('Respiratory Waveform Storage', 'SOP Class', '', ''),
+# End From Supp 43
 '1.2.840.10008.5.1.4.1.1.10': ('Standalone Modality LUT Storage', 'SOP Class', '', 'Retired'),
 '1.2.840.10008.5.1.4.1.1.11': ('Standalone VOI LUT Storage', 'SOP Class', '', 'Retired'),
 '1.2.840.10008.5.1.4.1.1.11.1': ('Grayscale Softcopy Presentation State Storage SOP Class', 'SOP Class', '', ''),
@@ -194,6 +202,9 @@ UID_dictionary = {
 '1.2.840.10008.5.1.4.1.1.104.2': ('Encapsulated CDA Storage', 'SOP Class', '', ''),
 '1.2.840.10008.5.1.4.1.1.128': ('Positron Emission Tomography Image Storage', 'SOP Class', '', ''),
 '1.2.840.10008.5.1.4.1.1.129': ('Standalone PET Curve Storage', 'SOP Class', '', 'Retired'),
+# From Supp 117
+'1.2.840.10008.5.1.4.1.1.130': ('Enhanced PET Image Storage', 'SOP Class', '', ''),
+# End From Supp 117
 '1.2.840.10008.5.1.4.1.1.481.1': ('RT Image Storage', 'SOP Class', '', ''),
 '1.2.840.10008.5.1.4.1.1.481.2': ('RT Dose Storage', 'SOP Class', '', ''),
 '1.2.840.10008.5.1.4.1.1.481.3': ('RT Structure Set Storage', 'SOP Class', '', ''),
