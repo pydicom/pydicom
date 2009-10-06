@@ -429,7 +429,7 @@ class Dataset(dict):
         return self._PrettyStr(topLevelOnly=True)
 
     def trait_names(self):
-        """Return a list of valid name for auto-completion code
+        """Return a list of valid names for auto-completion code
         Used in IPython, so that data element names can be found
         and offered for autocompletion on the IPython command line
         """
@@ -446,7 +446,7 @@ class Dataset(dict):
     def iterall(self):
         """Iterate through the dataset, yielding all data elements.
         
-        Unlike Dataset.__iter__, this does recurse into sequences,
+        Unlike Dataset.__iter__, this *does* recurse into sequences,
         and so returns all data elements as if the file were "flattened".
         """
         for data_element in self:

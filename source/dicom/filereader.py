@@ -21,11 +21,6 @@ try:
     from os import SEEK_CUR
 except ImportError: # SEEK_CUR not available in python < 2.5
     SEEK_CUR = 1
-
-try:
-	from os import SEEK_CUR
-except ImportError: #  SEEK_CUR not available in python < 2.5
-	SEEK_CUR = 1 
 	
 from dicom.UID import UID, UID_dictionary
 from dicom.UID import DeflatedExplicitVRLittleEndian, ExplicitVRLittleEndian
@@ -406,7 +401,7 @@ def read_file(fp, defer_size=None):
     
     """
     # Open file if not already a file object
-    if type(fp) is type(""):
+    if isinstance(fp, basestring):
         fp = DicomFile(fp, 'rb')
         logger.debug("Reading file '%s'" % fp)
 
