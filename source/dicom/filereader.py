@@ -22,9 +22,7 @@ try:
 except ImportError: # SEEK_CUR not available in python < 2.5
     SEEK_CUR = 1
 	
-from dicom.UID import UID, UID_dictionary
-from dicom.UID import DeflatedExplicitVRLittleEndian, ExplicitVRLittleEndian
-from dicom.UID import ImplicitVRLittleEndian, ExplicitVRBigEndian
+import dicom.UID # for Implicit/Explicit / Little/Big Endian transfer syntax UIDs
 from dicom.filebase import DicomFile, DicomStringIO
 from dicom.datadict import dictionaryVR, dictionaryDescription
 from dicom.dataset import Dataset
@@ -69,33 +67,38 @@ def read_OBvalue(fp, length, format=None):
 def read_OWvalue(fp, length, format=None):
     """Return the raw bytes from reading an OW value rep
     
-    Note: pydicom does not do byte swapping if necessary, except in 
-    dataset.PixelArray function
+    Note: pydicom does NOT do byte swapping, except in 
+    dataset.pixel_array function
     """
     return read_OBvalue(fp, length) # for now, Maybe later will have own routine
 
 def read_UI(fp, length, format=None):
+    """Read and return a UI values or values"""
     value = fp.read(length)
     # Strip off 0-byte padding for even length (if there)
     if value and value.endswith('\0'):
         value = value[:-1]
-    return MultiString(value, UID)
+    return MultiString(value, dicom.UID.UID)
 
 def read_string(fp, length, format=None):
+    """Read and return a string or strings"""
     return MultiString(fp.read(length))
     
 def read_PN(fp, length, format=None):
+    """Read and return string(s) as PersonName instance(s)"""
     return MultiString(fp.read(length), valtype=PersonName)
 
 def read_single_string(fp, length, format=None):
-    """Read a single string; the backslash used to separate values in multi-strings
-    has no meaning here"""
+    """Read and return a single string (backslash character does not split)"""
     val = fp.read(length)
     if val and val.endswith(' '):
         val = val[:-1]
     return val
 
 def read_data_element(fp, length=None):
+    """Read and return the next data element
+	
+	"""
     data_element_tell = fp.tell()
 
     try:
@@ -139,7 +142,7 @@ def read_data_element(fp, length=None):
         length = fp.read_UL()
 
     isUndefinedLength = (length == 0xFFFFFFFFL)
-    value_tell = fp.tell() # store file location and size, for programs like anonymizers
+    value_tell = fp.tell() # store file location and size
     length_original = length
     
     # For debugging only, log info about a sequence element
@@ -148,18 +151,15 @@ def read_data_element(fp, length=None):
         logger.debug("%04x: %s", data_element_tell, temp_data_element)
         logger.debug("                         -------> SQ is using %s", ["explicit length", "Undefined Length"][isUndefinedLength])
 
-    # Look up a reader function to get the data element value
+    # Look up a reader function which will get the data element value
     # Dispatch two cases: a plain reader, or a number one which needs a format string
-    # Readers are defined in dictionary 'readers' below
+    # Readers are defined in dictionary 'readers' at bottom of this file
     if isinstance(readers[VR], tuple):
         reader, num_format = readers[VR]
     else:
         reader = readers[VR]
         num_format = None
 
-    # if tag == 0x00280103: # This flags whether pixel values are US (val=0) or SS (val = 1)
-    #    fp.isSSpixelRep = value # XXX This is not used anywhere else in code?
-    
     # Call the reader, or delay reading until later if has been requested
     if fp.defer_size is not None and length > fp.defer_size and VR != "SQ":
         file_mtime = None
@@ -213,7 +213,7 @@ def read_dataset(fp, bytelength=None):
 
 
 def read_sequence(fp, bytelength, format=None):
-    """Return a Sequence list of Datasets"""
+    """Read and return a Sequence -- i.e. a list of Datasets"""
     seq = Sequence()
     if bytelength == 0:  # Sequence of length 0 is possible (PS 3.5-2008 7.5.1a (p.40)
         return seq
@@ -230,8 +230,9 @@ def read_sequence(fp, bytelength, format=None):
     return seq
 
 def read_sequence_item(fp):
+    """Read and return a single sequence item, i.e. a Dataset"""
     tag = fp.read_tag()
-    if tag == SequenceDelimiterTag: # No more items, time for sequence to stop reading
+    if tag == SequenceDelimiterTag: # No more items, time to stop reading
         data_element = DataElement(tag, None, None, fp.tell()-4)
         logger.debug("%04x: %s", fp.tell()-4, str(data_element))
         length = fp.read_UL()
@@ -249,12 +250,10 @@ def read_sequence_item(fp):
         length = None # length_of_undefined_length(fp, ItemDelimiterTag)
     ds = read_dataset(fp, length)
     ds.isUndefinedLengthSequenceItem = isUndefinedLength
-    # if isUndefinedLength:
-        # absorb_delimiter_item(fp, ItemDelimiterTag)
     return ds
 
 def absorb_delimiter_item(fp, delimiter):
-    """Used to read (and ignore) undefined length sequence or item terminators."""
+    """Read (and ignore) undefined length sequence or item terminators."""
     tag = fp.read_tag()
     if tag != delimiter:
         logger.warn("Did not find expected delimiter '%s', instead found %s at file position 0x%x", dictionaryDescription(delimiter), str(tag), fp.tell()-4)    
@@ -268,6 +267,13 @@ def absorb_delimiter_item(fp, delimiter):
         logger.debug("%04x: Expected 0x00000000 after delimiter, found 0x%x", fp.tell()-4, length)
 
 def find_bytes(fp, bytes_to_find, read_size=128, rewind=True):
+    """Read in the file until a specific byte sequence found
+	
+    bytes_to_find -- a string containing the bytes to find. Must be in correct
+                    endian order already
+    read_size -- number of bytes to read at a time
+	"""
+
     data_start = fp.tell()  
     search_rewind = len(bytes_to_find)-1
     
@@ -327,6 +333,10 @@ def length_of_undefined_length(fp, delimiter, read_size=128, rewind=True):
     return length
     
 def read_delimiter_item(fp, delimiter):
+    """Read and ignore an expected delimiter.
+    
+    If the delimiter is not found or correctly formed, a warning is logged.
+    """
     found = fp.read(4)
     if found != delimiter:
         logger.warn("Expected delimitor %s, got %s at file position 0x%x", Tag(delimiter), Tag(found), fp.tell()-4)
@@ -335,9 +345,13 @@ def read_delimiter_item(fp, delimiter):
         logger.warn("Expected delimiter item to have length 0, got %d at file position 0x%x", length, fp.tell()-4)
     
 def read_UN(fp, length, format=None):
-    """Return a byte string for an DataElement of value 'UN' (unknown)"""
+    """Return a byte string for an DataElement of value 'UN' (unknown)
+    
+    Raise NotImplementedError if length is 'Undefined Length'
+    """
     if length == 0xFFFFFFFFL:
         raise NotImplementedError, "This code has not been tested for 'UN' with unknown length"
+        # Below code is draft attempt to read undefined length
         delimiter = 0xFFFEE00DL
         length = length_of_undefined_length(fp, delimiter)
         data_value = fp.read(length)
@@ -347,7 +361,7 @@ def read_UN(fp, length, format=None):
         return fp.read(length)
 
 def read_ATvalue(fp, length, format=None):
-    """Return an data_element tag as the value of the current Dicom data_element being read"""
+    """Read and return AT (tag) data_element value(s)"""
     if length == 4:
         return fp.read_tag()
     # length > 4
@@ -357,7 +371,8 @@ def read_ATvalue(fp, length, format=None):
 
 def _read_file_meta_info(fp):
     """Return the file meta information.
-    fp must be set after the 128 byte preamble"""
+    fp must be set after the 128 byte preamble
+    """
     magic = fp.read(4)
     if magic != "DICM":
         logger.info("File does not appear to be a DICOM file; 'DICM' header is missing. Call read_file with has_header=False")
@@ -372,14 +387,20 @@ def _read_file_meta_info(fp):
     return read_dataset(fp, GroupLength.value)
 
 def read_file_meta_info(filename):
-    """Just get the basic file meta information. Useful for going through
-    a series of files to find one which is referenced to a particular SOP."""
+    """Read and return the DICOM file meta information only.
+
+    This function is meant to be used in user code, for quickly going through
+    a series of files to find one which is referenced to a particular SOP,
+    without having to read the entire files.
+    """
     fp = DicomFile(filename, 'rb')
     preamble = fp.read(0x80)
     return _read_file_meta_info(fp)
 
 _size_factors = dict(KB=1024, MB=1024*1024, GB=1024*1024*1024)
 def size_in_bytes(expr):
+    """Return the number of bytes for a defer_size argument to read_file()
+    """
     try:
         return int(expr)
     except ValueError:
@@ -395,7 +416,7 @@ def read_file(fp, defer_size=None):
     
     fp -- either a file-like object, or a string containing the file name.
     defer_size -- if a data element value is larger than defer_size,
-        then the value is not read into memory until it is accessed.
+        then the value is not read into memory until it is accessed in code.
         Specify an integer (bytes), or a string value with units: e.g. "512 KB", "2 MB".
         Default None means all elements read into memory.
     
@@ -424,14 +445,14 @@ def read_file(fp, defer_size=None):
         FileMetaInfo = _read_file_meta_info(fp)
     
         TransferSyntax = FileMetaInfo.TransferSyntaxUID
-        if TransferSyntax == ExplicitVRLittleEndian:
+        if TransferSyntax == dicom.UID.ExplicitVRLittleEndian:
             fp.isExplicitVR = True
-        elif TransferSyntax == ImplicitVRLittleEndian:
+        elif TransferSyntax == dicom.UID.ImplicitVRLittleEndian:
             fp.isImplicitVR = True
-        elif TransferSyntax == ExplicitVRBigEndian:
+        elif TransferSyntax == dicom.UID.ExplicitVRBigEndian:
             fp.isExplicitVR = True
             fp.isBigEndian = True
-        elif TransferSyntax == DeflatedExplicitVRLittleEndian:
+        elif TransferSyntax == dicom.UID.DeflatedExplicitVRLittleEndian:
             # See PS3.6-2008 A.5 (p 71) -- when written, the entire dataset following 
             #     the file metadata was prepared the normal way, then "deflate" compression applied.
             #  All that is needed here is to decompress and then use as normal in a file-like object
@@ -447,7 +468,7 @@ def read_file(fp, defer_size=None):
             fp.isExplicitVR = True
             fp.isLittleEndian = True
     else: # no header -- make assumptions
-        TransferSyntaxUID = ImplicitVRLittleEndian
+        TransferSyntaxUID = dicom.UID.ImplicitVRLittleEndian
         fp.isLittleEndian = True
         fp.isImplicitVR = True
     
