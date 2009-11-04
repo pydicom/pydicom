@@ -17,6 +17,7 @@ Dataset(derived class of Python's dict class)
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
 #
+import sys
 from sys import byteorder
 sys_isLittleEndian = (byteorder == 'little')
 import logging
@@ -38,6 +39,10 @@ try:
 except:
     haveNumpy = False
 
+class PropertyError(Exception):
+    """For AttributeErrors caught in a property, so do not go to __getattr__"""
+    pass
+    
 class Dataset(dict):
     """A Dataset is a collection (dictionary) of Dicom DataElement instances.
     
@@ -299,7 +304,14 @@ class Dataset(dict):
             self._PixelArray = self._PixelDataNumpy()
             self._pixel_id = id(self.PixelData) # is this guaranteed to work if memory is re-used??
         return self._PixelArray
-    pixel_array = property(_getPixelArray)
+    def _get_pixel_array(self):
+        try:
+            return self._getPixelArray()
+        except AttributeError:
+            t, e, tb = sys.exc_info()
+            raise PropertyError("AttributeError in pixel_array property: " + \
+                            e.args[0]), None, tb 
+    pixel_array = property(_get_pixel_array)
     PixelArray = pixel_array # for backwards compatibility
     
     # Format strings spec'd according to python string formatting options
