@@ -6,10 +6,46 @@
 #    available at http://pydicom.googlecode.com
 
 import unittest
-from dicom.dataset import Dataset
+from dicom.dataset import Dataset, haveNumpy, PropertyError
 from dicom.dataelem import DataElement
 
 class DatasetTests(unittest.TestCase):
+    def failUnlessRaises(self, excClass, callableObj, *args, **kwargs):
+        """Redefine unittest Exception test to return the exception object"""
+        # from http://stackoverflow.com/questions/88325/how-do-i-unit-test-an-init-method-of-a-python-class-with-assertraises
+        try:
+            callableObj(*args, **kwargs)
+        except excClass, excObj:
+            return excObj # Actually return the exception object
+        else:
+            if hasattr(excClass,'__name__'): excName = excClass.__name__
+            else: excName = str(excClass)
+            raise self.failureException, "%s not raised" % excName
+
+    def failUnlessExceptionArgs(self, start_args, excClass, callableObj):
+        """Check the expected args were returned from an exception
+        start_args -- a string with the start of the expected message
+        """
+        # based on same link as failUnlessRaises override above
+        excObj = self.failUnlessRaises(excClass, callableObj)
+        msg = "\nExpected Exception message:\n" + start_args + "\nGot:\n" + excObj[0]
+        self.failUnless(excObj[0].startswith(start_args), msg)
+
+    def testAttributeErrorInProperty(self):
+        """Dataset: AttributeError in property raises actual error message..."""
+        # This comes from bug fix for issue 42
+        # First, fake enough to try the pixel_array property
+        ds = Dataset()
+        ds.PixelData = 'xyzlmnop'
+        ds.isLittleEndian = True
+#        save_Numpy = haveNumpy
+#        haveNumpy = False
+        attribute_error_msg = "AttributeError in pixel_array property: " + \
+                           "Dataset does not have attribute 'TransferSyntaxUID'"
+        self.failUnlessExceptionArgs(attribute_error_msg,
+                        PropertyError, ds._get_pixel_array)
+        
+        
     def dummy_dataset(self):
         # This dataset is used by many of the tests
         ds = Dataset()
@@ -91,6 +127,7 @@ class DatasetTests(unittest.TestCase):
         ds.AddNew((0x1111, 0x123), "DS", "42.0") # private tag - no name in dir()
         expected = ['PatientID', 'PatientsName', 'TreatmentMachineName', 'XRayTubeCurrent']
         self.assertEqual(ds.dir(), expected, "dir() returned %s, expected %s" % (str(ds.dir()), str(expected)))
+        
         
 if __name__ == "__main__":
     unittest.main()
