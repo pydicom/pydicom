@@ -8,6 +8,7 @@
 import unittest
 from dicom.dataset import Dataset, haveNumpy, PropertyError
 from dicom.dataelem import DataElement
+from dicom.tag import Tag
 
 class DatasetTests(unittest.TestCase):
     def failUnlessRaises(self, excClass, callableObj, *args, **kwargs):
@@ -92,7 +93,7 @@ class DatasetTests(unittest.TestCase):
         self.assertEqual(not_there, "not-there",
                     "dataset.get() did not return default value for non-member")
     def test__setitem__(self):
-        """Dataset: if set an item, it must be an DataElement instance......"""
+        """Dataset: if set an item, it must be a DataElement instance......."""
         def callSet():
             ds[0x300a, 0xb2]="unit1" # common error - set data_element instead of data_element.value
             
@@ -127,7 +128,25 @@ class DatasetTests(unittest.TestCase):
         ds.AddNew((0x1111, 0x123), "DS", "42.0") # private tag - no name in dir()
         expected = ['PatientID', 'PatientsName', 'TreatmentMachineName', 'XRayTubeCurrent']
         self.assertEqual(ds.dir(), expected, "dir() returned %s, expected %s" % (str(ds.dir()), str(expected)))
+    def testDeleteDicomAttr(self):
+        """Dataset: delete DICOM attribute by name..........................."""
+        def testAttribute():
+            ds.TreatmentMachineName
         
-        
+        ds = self.dummy_dataset()
+        del ds.TreatmentMachineName
+        self.assertRaises(AttributeError, testAttribute)        
+    def testDeleteOtherAttr(self):
+        """Dataset: delete non-DICOM attribute by name......................."""
+        ds = self.dummy_dataset()
+        ds.meaningoflife = 42
+        del ds.meaningoflife
+    def testDeleteDicomAttrWeDontHave(self):
+        """Dataset: try delete of missing DICOM attribute...................."""
+        def try_delete():
+            del ds.PatientsName
+        ds = self.dummy_dataset()
+        self.assertRaises(AttributeError, try_delete)
+            
 if __name__ == "__main__":
     unittest.main()

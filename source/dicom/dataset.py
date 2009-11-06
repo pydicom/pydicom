@@ -131,7 +131,27 @@ class Dataset(dict):
             decode_data_element(data_element, dicom_character_set)
         # Use the walk function to go through all elements in the dataset and convert them
         self.walk(decode_callback)
-    
+        
+    def __delattr__(self, name):
+        """Intercept requests to delete an attribute by name, e.g. del ds.name
+        
+        If name is a dicom descriptive string (cleaned with CleanName),
+        then delete the corresponding tag and data_element.
+        Else, delete an instance (python) attribute as any other class would do.
+        
+        """
+        # First check if is a valid DICOM name and if we have that data element
+        tag = TagForName(name)
+        if tag and tag in self:
+            del self[tag]
+        # If not a DICOM name (or we don't have it), check for regular instance name
+        #   can't do delete directly, that will call __delattr__ again!
+        elif name in self.__dict__:
+            del self.__dict__[name]
+        # Not found, raise an error in same style as python does
+        else:
+            raise AttributeError, name
+
     def __dir__(self):
         """___dir__ is used in python >= 2.6 to give a list of attributes
         available in an object, for example used in auto-completion in editors
