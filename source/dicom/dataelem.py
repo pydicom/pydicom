@@ -18,6 +18,7 @@ from dicom.datadict import dictionaryHasTag, dictionaryDescription
 from dicom.datadict import private_dictionaryDescription
 from dicom.tag import Tag
 from dicom.UID import UID
+from dicom.valuerep import PersonName
 
 # os.stat is only available on Unix and Windows
 # Not sure if on other platforms the import fails, or the call to it??
@@ -152,12 +153,18 @@ class DataElement(object):
             return returnvalue
 
     def _convert(self, val):
-        """Take the string from dicom stream and convert to number, etc if possible"""
+        """Take the value and convert to number, etc if possible"""
         try:
             if self.VR in ['IS'] and val:
                 return int(str(val))  # str(val) so does not truncate a float without error
             elif self.VR in ['DS'] and val:
-                return float(val) 
+                return float(val)
+            elif self.VR == "UI":
+	    	    return UID(val)
+            # Later may need this for PersonName as for UI, 
+            #    but needs more thought
+            # elif self.VR == "PN":
+            #    return PersonName(val)
             else: # is either a string or a type 2 optionally blank string
                 return val # this means a "numeric" value could be empty string ""
         except TypeError:

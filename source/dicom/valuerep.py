@@ -102,6 +102,12 @@ class PersonName(PersonNameBase, str):
     name_suffix
     
     """
+    def __new__(cls, val):
+        """Return instance of the new class"""
+        # Check if trying to convert a string that has already been converted 
+        if isinstance(val, PersonName):
+            return val
+        return super(PersonName, cls).__new__(cls, val)
     def family_comma_given(self):
         """Return name as 'Family-name, Given-name'"""
         return self.formatted("%(family_name)s, %(given_name)s")
@@ -123,6 +129,7 @@ class PersonNameUnicode(PersonNameBase, unicode):
                  of values in DICOM data element (0008,0005).
         """
         # Make the possible three character encodings explicit:        
+
         if not isinstance(encodings, list):
             encodings = [encodings]*3
         if len(encodings) == 2:

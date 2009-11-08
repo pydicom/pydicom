@@ -19,6 +19,15 @@ class UID(str):
     String representation (__str__) will be the name,
     __repr__ will be the full 1.2.840....
     """
+    def __new__(cls, val):
+        """Set up new instance of the class"""
+        # Dont' repeat if already a UID class -- then may get the name
+        #     that str(uid) gives rather than the dotted number
+        if isinstance(val, UID):
+            return val
+        else:
+            return super(UID, cls).__new__(cls, val)
+        
     def __init__(self, val):
         """Initialize the UID properties"""
         # Note normally use __new__ on subclassing an immutable, but here we just want 
