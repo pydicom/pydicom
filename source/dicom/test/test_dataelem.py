@@ -10,6 +10,7 @@
 import unittest
 from dicom.dataelem import DataElement
 from dicom.dataset import Dataset
+from dicom.UID import UID
 
 class DataElementTests(unittest.TestCase):
     def setUp(self):
@@ -33,5 +34,15 @@ class DataElementTests(unittest.TestCase):
         data_element = DataElement((1,2), "DS", r"42.1\42.2\42.3") # note r" to avoid \ as escape chr
         self.assertEqual(data_element.VM, 3, "Did not get a mult-valued value")
     
+    def testUID(self):
+	"""DataElement: setting or changing UID results in UID type........."""
+        ds = Dataset()
+        ds.TransferSyntaxUID = "1.2.3"
+        self.assert_(type(ds.TransferSyntaxUID) is UID, "Assignment to UID did not create UID class")
+        ds.TransferSyntaxUID += ".4.5.6"
+        self.assert_(type(ds.TransferSyntaxUID) is UID, "+= to UID did not keep as UID class")
+
+
+
 if __name__ == "__main__":
     unittest.main()
