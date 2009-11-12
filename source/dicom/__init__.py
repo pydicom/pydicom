@@ -43,7 +43,7 @@ logger.addHandler(handler)
 from filereader import read_file, ReadFile  # latter one for backwards compatibility; remove later
 from filewriter import write_file, WriteFile # ditto
 
-__version__ = "0.9.4svn"
+__version__ = "0.9.4hg"
 
 def debug(DebugOn=True):
     global logger
