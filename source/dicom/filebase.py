@@ -1,4 +1,4 @@
-# filebase.py - part of dicom package
+# filebase.py 
 """Hold DicomFile class, which does basic I/O for a dicom file."""
 # Copyright (c) 2008 Darcy Mason
 # This file is part of pydicom, relased under an MIT license.
@@ -123,20 +123,6 @@ class DicomIO(object):
     isBigEndian =    property(_getBigEndian, _setBigEndian)
     isImplicitVR =   property(_getImplicitVR, _setImplicitVR)
     isExplicitVR =   property(_getExplicitVR, _setExplicitVR)
-
-# class DicomFile(DicomIO, file):
-    # def __init__(self, *args, **kwargs):
-        # """Extend file.__init__() to set default values."""
-        # file.__init__(self, *args, **kwargs)
-        # self.parent_read = file.read
-        # DicomIO.__init__(self, *args, **kwargs)
-
-# class DicomStringIO(DicomIO, StringIO):
-    # def __init__(self, *args, **kwargs):
-        # StringIO.__init__(self, *args, **kwargs)
-        # self.parent_read = self.read
-        # DicomIO.__init__(self, *args, **kwargs)
-        # self.defer_size = None
         
 class DicomFileLike(DicomIO):
     def __init__(self, file_like_obj):
