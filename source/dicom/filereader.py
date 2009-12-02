@@ -194,13 +194,8 @@ def read_sequence_item(fp):
     
 def _read_file_meta_info(fp):
     """Return the file meta information.
-    fp must be set after the 128 byte preamble
+    fp must be set after the 128 byte preamble and 'DICM' marker
     """
-    magic = fp.read(4)
-    if magic != "DICM":
-        logger.info("File does not appear to be a DICOM file; 'DICM' header is missing. Call read_file with has_header=False")
-        raise IOError, 'File does not appear to be a Dicom file; "DICM" is missing. Try read_file with has_header=False'
-
     # File meta info is always LittleEndian, Explicit VR. After will change these
     #    to the transfer syntax values set in the meta info
     fp.isLittleEndian = True
@@ -217,9 +212,23 @@ def read_file_meta_info(filename):
     without having to read the entire files.
     """
     fp = DicomFile(filename, 'rb')
-    preamble = fp.read(0x80)
+    preamble = read_preamble(fp)
     return _read_file_meta_info(fp)
-   
+    
+def read_preamble(fp):
+    """Read and return the DICOM preamble and read past the 'DICM' marker. 
+    If 'DICM' does not exist, assume no preamble, return None, and 
+    rewind file to the beginning..
+    """
+    logger.debug("Reading preamble")
+    preamble = fp.read(0x80)
+    magic = fp.read(4)
+    if magic != "DICM":
+        logger.info("File is not a standard DICOM file; 'DICM' header is missing. Assuming no header and continuing")
+        preamble = None
+        fp.seek(0)
+    return preamble
+    
 def read_file(fp, defer_size=None):
     """Return a Dataset containing the contents of the Dicom file
     
@@ -232,27 +241,18 @@ def read_file(fp, defer_size=None):
     """
     # Open file if not already a file object
     if isinstance(fp, basestring):
-        fp = DicomFile(fp, 'rb')
         logger.debug("Reading file '%s'" % fp)
-
+        fp = DicomFile(fp, 'rb')
+        
     # Convert size to defer reading into bytes, and store in file object
     if defer_size is not None:
         defer_size = size_in_bytes(defer_size)
     fp.defer_size = defer_size
-    
-    fp.seek(0x80)
-    magic = fp.read(4)
-    has_header = True
-    if magic != "DICM":
-        logger.info("File is not a standard DICOM file; 'DICM' header is missing. Assuming no header and continuing")
-        has_header = False
-    fp.seek(0)
-    
+        
+    preamble = read_preamble(fp)
+    has_header = (preamble is not None)
     if has_header:
-        logger.debug("Reading preamble")
-        preamble = fp.read(0x80)
-        FileMetaInfo = _read_file_meta_info(fp)
-    
+        FileMetaInfo = _read_file_meta_info(fp)    
         TransferSyntax = FileMetaInfo.TransferSyntaxUID
         if TransferSyntax == dicom.UID.ExplicitVRLittleEndian:
             fp.isExplicitVR = True
@@ -289,10 +289,9 @@ def read_file(fp, defer_size=None):
     
     # Store file info (Big/Little Endian, Expl/Impl VR; preamble) into dataset
     #    so can be used to rewrite same way if desired
-    ds.preamble = None # default, set to file's if available below
+    ds.preamble = preamble
     ds.has_header = has_header
     if has_header:
-        ds.preamble = preamble  
         ds.update(FileMetaInfo) # copy data elements from FileMetaInfo
     else:
         ds.TransferSyntaxUID = TransferSyntaxUID # need to store this for PixelArray checks
