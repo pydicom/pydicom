@@ -34,6 +34,84 @@ from dicom.misc import size_in_bytes
 from sys import byteorder
 sys_isLittleEndian = (byteorder == 'little')
 
+def open_dicom(filename):
+    """Return an iterator for DICOM file data elements.
+    
+    Similar to opening a file using python open() and iterating by line
+    
+    Use like:
+    
+    from dicom.filereader import open_dicom
+    from dicom.dataset import Dataset
+    ds = Dataset()
+    for data_element in open_dicom("CT_small.dcm"):
+        if meets_some_condition(data_element):
+            ds.Add(data_element)
+        if some_other_condition(data_element):
+            break
+    You can generalize this function to examine the elements as they come,
+    or to only read to a certain point and then stop
+    """
+
+    return DicomIter(DicomFile(filename,'rb'))
+    
+class DicomIter(object):
+    """Iterator over DICOM data elements created from a file-like object
+    """
+    def __init__(self, fp):
+        """Read the preambleand meta info, prepare iterator for remainder
+        
+        fp -- an open DicomFileLike object, at start of file
+        
+        Adds flags to fp: Big/Little-endian and Implicit/Explicit VR
+        """
+        self.fp = fp
+        fp.preamble = preamble = read_preamble(fp)
+        fp.has_header = has_header = (preamble is not None)
+        if has_header:
+            self.FileMetaInfo = FileMetaInfo = _read_file_meta_info(fp)    
+            TransferSyntax = FileMetaInfo.TransferSyntaxUID
+            if TransferSyntax == dicom.UID.ExplicitVRLittleEndian:
+                fp.isExplicitVR = True
+            elif TransferSyntax == dicom.UID.ImplicitVRLittleEndian:
+                fp.isImplicitVR = True
+            elif TransferSyntax == dicom.UID.ExplicitVRBigEndian:
+                fp.isExplicitVR = True
+                fp.isBigEndian = True
+            elif TransferSyntax == dicom.UID.DeflatedExplicitVRLittleEndian:
+                # See PS3.6-2008 A.5 (p 71) -- when written, the entire dataset following 
+                #     the file metadata was prepared the normal way, then "deflate" compression applied.
+                #  All that is needed here is to decompress and then use as normal in a file-like object
+                zipped = fp.read()            
+                # -MAX_WBITS part is from comp.lang.python answer:  http://groups.google.com/group/comp.lang.python/msg/e95b3b38a71e6799
+                unzipped = zlib.decompress(zipped, -zlib.MAX_WBITS)
+                fp = DicomStringIO(unzipped) # a file-like object that usual code can use as normal
+                self.fp = fp #point to new object
+                fp.isExplicitVR = True
+                fp.isLittleEndian = True
+            else:
+                # Any other syntax should be Explicit VR Little Endian,
+                #   e.g. all Encapsulated (JPEG etc) are ExplVR-LE by Standard PS 3.5-2008 A.4 (p63)
+                fp.isExplicitVR = True
+                fp.isLittleEndian = True
+        else: # no header -- make assumptions
+            fp.TransferSyntaxUID = dicom.UID.ImplicitVRLittleEndian
+            fp.isLittleEndian = True
+            fp.isImplicitVR = True
+    
+        logger.debug("Using %s VR, %s Endian transfer syntax" %(("Explicit", "Implicit")[fp.isImplicitVR], ("Big", "Little")[fp.isLittleEndian]))
+
+    def __iter__(self):
+        tags = self.FileMetaInfo.keys()
+        tags.sort()
+        for tag in tags:
+            yield self.FileMetaInfo[tag]
+        
+        data_element = True
+        while data_element:
+            data_element = read_data_element(self.fp)
+            if data_element:
+                yield data_element
 
 def read_data_element(fp, length=None):
     """Read and return the next data element"""
@@ -249,52 +327,20 @@ def read_file(fp, defer_size=None):
         defer_size = size_in_bytes(defer_size)
     fp.defer_size = defer_size
         
-    preamble = read_preamble(fp)
-    has_header = (preamble is not None)
-    if has_header:
-        FileMetaInfo = _read_file_meta_info(fp)    
-        TransferSyntax = FileMetaInfo.TransferSyntaxUID
-        if TransferSyntax == dicom.UID.ExplicitVRLittleEndian:
-            fp.isExplicitVR = True
-        elif TransferSyntax == dicom.UID.ImplicitVRLittleEndian:
-            fp.isImplicitVR = True
-        elif TransferSyntax == dicom.UID.ExplicitVRBigEndian:
-            fp.isExplicitVR = True
-            fp.isBigEndian = True
-        elif TransferSyntax == dicom.UID.DeflatedExplicitVRLittleEndian:
-            # See PS3.6-2008 A.5 (p 71) -- when written, the entire dataset following 
-            #     the file metadata was prepared the normal way, then "deflate" compression applied.
-            #  All that is needed here is to decompress and then use as normal in a file-like object
-            zipped = fp.read()            
-            # -MAX_WBITS part is from comp.lang.python answer:  http://groups.google.com/group/comp.lang.python/msg/e95b3b38a71e6799
-            unzipped = zlib.decompress(zipped, -zlib.MAX_WBITS)
-            fp = DicomStringIO(unzipped) # a file-like object that usual code can use as normal
-            fp.isExplicitVR = True
-            fp.isLittleEndian = True
-        else:
-            # Any other syntax should be Explicit VR Little Endian,
-            #   e.g. all Encapsulated (JPEG etc) are ExplVR-LE by Standard PS 3.5-2008 A.4 (p63)
-            fp.isExplicitVR = True
-            fp.isLittleEndian = True
-    else: # no header -- make assumptions
-        TransferSyntaxUID = dicom.UID.ImplicitVRLittleEndian
-        fp.isLittleEndian = True
-        fp.isImplicitVR = True
-    
-    logger.debug("Using %s VR, %s Endian transfer syntax" %(("Explicit", "Implicit")[fp.isImplicitVR], ("Big", "Little")[fp.isLittleEndian]))
-    
-    # Read everything after the File Meta
-    ds = read_dataset(fp)
+    # Iterate through all items and store them all --includes file meta info if present
+    ds = Dataset()
+    for data_element in DicomIter(fp):
+        ds.Add(data_element)
+        
     fp.close()
     
     # Store file info (Big/Little Endian, Expl/Impl VR; preamble) into dataset
     #    so can be used to rewrite same way if desired
-    ds.preamble = preamble
-    ds.has_header = has_header
-    if has_header:
-        ds.update(FileMetaInfo) # copy data elements from FileMetaInfo
-    else:
-        ds.TransferSyntaxUID = TransferSyntaxUID # need to store this for PixelArray checks
+    ds.preamble = fp.preamble
+    ds.has_header = fp.has_header
+
+    if not ds.has_header:
+        ds.TransferSyntaxUID = fp.TransferSyntaxUID # need to store this for PixelArray checks
     ds.isLittleEndian = fp.isLittleEndian
     ds.isExplicitVR = fp.isExplicitVR
 
