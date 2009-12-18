@@ -245,18 +245,11 @@ def write_file(filename, dataset, WriteLikeOriginal=True):
             where all lengths are explicit.
     """
 
-    fp = DicomFile(filename,'wb')
-    
     # Decide whether to write DICOM preamble. Should always do so unless trying to mimic the original file read in
     if not dataset.preamble and not WriteLikeOriginal:
         preamble = "\0"*128
     else:
         preamble = dataset.preamble
-    
-    if preamble:
-        fp.write(preamble)  # blank 128 byte preamble
-    
-    
     
     if 'TransferSyntaxUID' not in dataset:
         if dataset.isLittleEndian and not dataset.isExplicitVR:
@@ -267,18 +260,24 @@ def write_file(filename, dataset, WriteLikeOriginal=True):
             dataset.AddNew((2, 0x10), 'UI', ExplicitVRBigEndian)
         else:
             raise NotImplementedError, "pydicom has not been verified for Big Endian with Implicit VR"
+
+    all_but_group2_dataset = Dataset()
+    all_but_group2_dataset.update(dict([(tag,data_element) for tag,data_element in dataset.items() if tag.group != 2]))
     
-    if preamble:
-        _write_file_meta_info(fp, dataset)
-    # Set file VR, endian. MUST BE AFTER META INFO (which changes to Explict LittleEndian)
-    fp.isImplicitVR = not dataset.isExplicitVR
-    fp.isLittleEndian = dataset.isLittleEndian
-    
-    no_group2_dataset = Dataset()
-    no_group2_dataset.update(dict([(tag,data_element) for tag,data_element in dataset.items() if tag.group != 2]))
-    
-    write_dataset(fp, no_group2_dataset)
-    fp.close()
+        
+    fp = DicomFile(filename,'wb')
+    try:
+        if preamble:
+            fp.write(preamble)  # blank 128 byte preamble
+            _write_file_meta_info(fp, dataset) # pass whole dataset but it only uses group 2
+        
+        # Set file VR, endian. MUST BE AFTER writing META INFO (which changes to Explict LittleEndian)
+        fp.isImplicitVR = not dataset.isExplicitVR
+        fp.isLittleEndian = dataset.isLittleEndian
+        
+        write_dataset(fp, all_but_group2_dataset)
+    finally:
+        fp.close()
         
 
 WriteFile = write_file   # for backwards compatibility version <=0.9.2

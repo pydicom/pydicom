@@ -22,7 +22,8 @@ except ImportError: # SEEK_CUR not available in python < 2.5
     SEEK_CUR = 1
 	
 import dicom.UID # for Implicit/Explicit / Little/Big Endian transfer syntax UIDs
-from dicom.filebase import DicomFile, DicomStringIO
+from dicom.filebase import DicomFile, DicomFileLike
+from dicom.filebase import DicomIO, DicomStringIO
 from dicom.datadict import dictionaryVR
 from dicom.dataset import Dataset
 from dicom.dataelem import DataElement, DeferredDataElement
@@ -213,7 +214,7 @@ def read_dataset(fp, bytelength=None):
         try:
             data_element = read_data_element(fp)
         except EOFError, details:
-            logger.error(details)
+            logger.error(str(details) + " in file " + fp.name) # XXX is this visible enough to user code?
             break
         except NotImplementedError, details:
             logger.error(details)
@@ -318,21 +319,34 @@ def read_file(fp, defer_size=None):
     
     """
     # Open file if not already a file object
+    caller_owns_file = True
     if isinstance(fp, basestring):
+        # caller provided a file name; we own the file handle
+        caller_owns_file = False
         logger.debug("Reading file '%s'" % fp)
         fp = DicomFile(fp, 'rb')
-        
-    # Convert size to defer reading into bytes, and store in file object
-    if defer_size is not None:
-        defer_size = size_in_bytes(defer_size)
-    fp.defer_size = defer_size
-        
-    # Iterate through all items and store them all --includes file meta info if present
-    ds = Dataset()
-    for data_element in DicomIter(fp):
-        ds.Add(data_element)
-        
-    fp.close()
+    elif not isinstance(fp, DicomIO):
+        # convert a "normal" file into DicomFileLike, so handle big/little endian, tag reading, etc
+        if fp.mode[-1] != 'b':
+            raise IOError, "File mode must be opened in binary mode"
+        fp = DicomFileLike(fp)
+    
+    try:
+        # Convert size to defer reading into bytes, and store in file object
+        if defer_size is not None:
+            defer_size = size_in_bytes(defer_size)
+        fp.defer_size = defer_size
+            
+        # Iterate through all items and store them all --includes file meta info if present
+        try:
+            ds = Dataset()
+            for data_element in DicomIter(fp):
+                ds.Add(data_element)
+        except EOFError, e:
+            pass  # error already logged in read_dataset
+    finally: 
+        if not caller_owns_file:
+            fp.close()
     
     # Store file info (Big/Little Endian, Expl/Impl VR; preamble) into dataset
     #    so can be used to rewrite same way if desired
