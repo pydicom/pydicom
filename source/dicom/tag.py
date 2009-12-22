@@ -13,16 +13,20 @@ class Tag(long):
     # Also can deal with python differences in handling ints starting in python 2.4,
     #   by forcing all inputs to a proper long where the differences go away
     def __new__(cls, arg, arg2=None):
-        if arg2:
+        if arg2 is not None:
             arg = (arg, arg2) # act as if was passed a single tuple
-        if isinstance(arg, tuple):
+        if isinstance(arg, (tuple, list)):
             if len(arg) != 2:
                 raise ValueError, "Tag must be an int or a 2-tuple"
+            if isinstance(arg[0], basestring):
+                if not isinstance(arg[1], basestring):
+                    raise ValueError, "Both arguments must be hex strings if one is"
+                arg = (int(arg[0], 16), int(arg[1], 16))
             if arg[0] > 0xFFFF or arg[1] > 0xFFFF:
                 raise OverflowError, "Groups and elements of tags must each be <=2 byte integers"
             long_value = long(arg[0])<<16 | arg[1]  # long needed for python <2.4 where shift could make int negative
         elif isinstance(arg, basestring):
-            raise ValueError, "Tags cannot be instantiated from a string"
+            raise ValueError, "Tags cannot be instantiated from a single string"
         else: # given a single number to use as a tag, as if (group, elem) already joined to a long
             long_value = long(hex(arg), 16) # needed in python <2.4 to avoid negative ints
             if long_value > 0xFFFFFFFFL:
