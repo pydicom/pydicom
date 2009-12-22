@@ -82,6 +82,7 @@ class DatasetTests(unittest.TestCase):
         """Dataset: can test if item present by 'if <tag> in dataset'....."""
         ds = self.dummy_dataset()
         self.assert_((0x300a, 0xb2) in ds, "membership test failed")
+        self.assert_([0x300a, 0xb2] in ds, "membership test failed when list used")
         self.assert_(0x300a00b2 in ds, "membership test failed")
         self.assert_(not (0x10,0x5f) in ds, "non-member tested as member")        
     def testGet(self):

@@ -16,12 +16,20 @@ class Values(unittest.TestCase):
         """Tags can be constructed with two-tuple of 2-byte integers."""
         tag = Tag((0x300a, 0x00b0))
         tag = Tag((0xFFFF, 0xFFee))
+    def testAnyUnpack(self):
+        """Tags can be constructed from list........................."""
+        tag = Tag([2,0])
     def testBadTuple(self):
         """Tags: if a tuple, must be a 2-tuple......................."""
         self.assertRaises(ValueError, Tag, (1,2,3,4))
     def testNonNumber(self):
-        """Tags cannot be instantiated from a string................."""
+        """Tags cannot be instantiated from a non-hex string........."""
         self.assertRaises(ValueError, Tag, "hello")
+    def testHexString(self):
+        """Tags can be instantiated from hex strings................."""
+        tag = Tag('0010', '0002')
+        self.assertEqual(tag.group, 16)
+        self.assertEqual(tag.elem, 2)
     def testStr(self):
         """Tags have (gggg, eeee) string rep........................."""
         self.assert_(str(Tag(0x300a00b0))=="(300a, 00b0)")
@@ -31,7 +39,11 @@ class Values(unittest.TestCase):
         self.assert_(tag.group == 0x300a)
         self.assert_(tag.elem == 0xb0)
         self.assert_(tag.element == 0xb0)
-        
+    def testZeroElem(self):
+        """Tags with arg2=0 ok (was issue 47)........................"""
+        tag = Tag(2, 0)
+        self.assert_(tag.group == 2 and tag.elem==0)
+
     def testBadInts(self):
         """Tags constructed with > 8 bytes gives OverflowError......."""
         self.assertRaises(OverflowError, Tag, 0x123456789)
