@@ -107,6 +107,19 @@ class ReaderTests(unittest.TestCase):
         got = ds.ConversionType
         expected = "WSD"
         self.assertEqual(got, expected, "Attempted to read deflated file data element Conversion Type, expected '%s', got '%s'" % (expected, got))
+    def testNoPixelsRead(self):
+        """Returns all data elements before pixels using stop_before_pixels=False"""
+        # Just check the tags, and a couple of values
+        ctpartial = read_file(ct_name, stop_before_pixels=True)
+        ctpartial_tags = ctpartial.keys()
+        ctpartial_tags.sort()
+        ctfull = read_file(ct_name)
+        ctfull_tags = ctfull.keys()
+        ctfull_tags.sort()
+        msg = "Tag list of partial CT read (except pixel tag and padding) did not match full read"
+        missing = [Tag(0x7fe0, 0x10), Tag(0xfffc, 0xfffc)]
+        self.assertEqual(ctfull_tags, ctpartial_tags+missing, msg)
+
 
 class JPEG2000Tests(unittest.TestCase):
     def setUp(self):

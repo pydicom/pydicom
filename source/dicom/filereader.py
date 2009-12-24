@@ -59,7 +59,7 @@ def open_dicom(filename):
 class DicomIter(object):
     """Iterator over DICOM data elements created from a file-like object
     """
-    def __init__(self, fp):
+    def __init__(self, fp, stop_when=None):
         """Read the preambleand meta info, prepare iterator for remainder
         
         fp -- an open DicomFileLike object, at start of file
@@ -67,6 +67,7 @@ class DicomIter(object):
         Adds flags to fp: Big/Little-endian and Implicit/Explicit VR
         """
         self.fp = fp
+        self.stop_when = stop_when
         fp.preamble = preamble = read_preamble(fp)
         fp.has_header = has_header = (preamble is not None)
         if has_header:
@@ -110,11 +111,11 @@ class DicomIter(object):
         
         data_element = True
         while data_element:
-            data_element = read_data_element(self.fp)
+            data_element = read_data_element(self.fp, stop_when=self.stop_when)
             if data_element:
                 yield data_element
 
-def read_data_element(fp, length=None):
+def read_data_element(fp, length=None, stop_when=None):
     """Read and return the next data element"""
     data_element_tell = fp.tell()
 
@@ -157,7 +158,12 @@ def read_data_element(fp, length=None):
             length = fp.read_US()
     else: # Implicit VR
         length = fp.read_UL()
-
+    
+    # Check if we are doing a partial read of a file and we should stop 
+    if stop_when is not None:
+        if stop_when(tag, VR, length):
+            raise StopIteration
+        
     isUndefinedLength = (length == 0xFFFFFFFFL)
     value_tell = fp.tell() # store file location and size
     length_original = length
@@ -307,8 +313,26 @@ def read_preamble(fp):
         preamble = None
         fp.seek(0)
     return preamble
-    
-def read_file(fp, defer_size=None):
+
+def _at_pixel_data(tag, VR, length):
+    return tag == (0x7fe0, 0x0010)
+
+def read_partial(fileobj, stop_when=None):
+    """Parse a DICOM file until a condition is met; return partial dataset
+    fileobj -- a DicomIO subclass. This function does not close it.
+    stop_when -- a function which takes tag, VR, length, and returns True or False.
+        A True value means read_data_element will raise StopIteration.
+        if None, then the whole file is read.
+    """
+    try:
+        ds = Dataset()
+        for data_element in DicomIter(fileobj, stop_when):
+            ds.Add(data_element)
+    except EOFError, e:
+        pass  # error already logged in read_dataset
+    return ds
+
+def read_file(fp, defer_size=None, stop_before_pixels=False):
     """Return a Dataset containing the contents of the Dicom file
     
     fp -- either a file-like object, or a string containing the file name.
@@ -316,7 +340,8 @@ def read_file(fp, defer_size=None):
         then the value is not read into memory until it is accessed in code.
         Specify an integer (bytes), or a string value with units: e.g. "512 KB", "2 MB".
         Default None means all elements read into memory.
-    
+    stop_before_pixels -- Set False to stop before reading pixels (and anything after them).
+                   If False, a partial dataset will be returned.
     """
     # Open file if not already a file object
     caller_owns_file = True
@@ -331,19 +356,17 @@ def read_file(fp, defer_size=None):
             raise IOError, "File mode must be opened in binary mode"
         fp = DicomFileLike(fp)
     
-    try:
-        # Convert size to defer reading into bytes, and store in file object
-        if defer_size is not None:
-            defer_size = size_in_bytes(defer_size)
-        fp.defer_size = defer_size
+    # Convert size to defer reading into bytes, and store in file object
+    if defer_size is not None:
+        defer_size = size_in_bytes(defer_size)
+    fp.defer_size = defer_size
             
-        # Iterate through all items and store them all --includes file meta info if present
-        try:
-            ds = Dataset()
-            for data_element in DicomIter(fp):
-                ds.Add(data_element)
-        except EOFError, e:
-            pass  # error already logged in read_dataset
+    # Iterate through all items and store them --includes file meta info if present
+    stop_when = None
+    if stop_before_pixels:
+        stop_when = _at_pixel_data
+    try:
+        ds = read_partial(fp, stop_when)
     finally: 
         if not caller_owns_file:
             fp.close()
