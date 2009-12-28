@@ -89,6 +89,10 @@ def write_data_element(fp, data_element):
 
     VR = data_element.VR
     if fp.isExplicitVR:
+        if len(VR) != 2:
+            msg = "Cannot write ambiguous VR of '%s' for data element with tag %r." % (VR, data_element.tag)
+            msg += "\nSet the correct VR before writing, or use an implicit VR transfer syntax"
+            raise ValueError, msg
         fp.write(VR)
         if VR in ['OB', 'OW', 'OF', 'SQ', 'UT', 'UN']:
             fp.write_US(0)   # reserved 2 bytes
