@@ -9,6 +9,8 @@
 import zlib
 from StringIO import StringIO # tried cStringIO but wouldn't let me derive class from it.
 import logging
+from dicom.tag import TupleTag
+
 logger = logging.getLogger('pydicom')
 
 stat_available = True
@@ -25,13 +27,14 @@ import dicom.UID # for Implicit/Explicit / Little/Big Endian transfer syntax UID
 from dicom.filebase import DicomFile, DicomFileLike
 from dicom.filebase import DicomIO, DicomStringIO
 from dicom.datadict import dictionaryVR
-from dicom.dataset import Dataset
+from dicom.dataset import Dataset, FileDataset
 from dicom.dataelem import DataElement, DeferredDataElement
 from dicom.tag import Tag, ItemTag, ItemDelimiterTag, SequenceDelimiterTag
 from dicom.sequence import Sequence
 from dicom.readers import readers, read_VR
 from dicom.misc import size_in_bytes
-
+from dicom.fileutil import absorb_delimiter_item, length_of_undefined_length
+from struct import unpack, Struct
 from sys import byteorder
 sys_isLittleEndian = (byteorder == 'little')
 
@@ -68,19 +71,20 @@ class DicomIter(object):
         """
         self.fp = fp
         self.stop_when = stop_when
-        fp.preamble = preamble = read_preamble(fp)
-        fp.has_header = has_header = (preamble is not None)
+        self.preamble = preamble = read_preamble(fp)
+        self.has_header = has_header = (preamble is not None)
+        self.file_meta_info = {}
         if has_header:
-            self.FileMetaInfo = FileMetaInfo = _read_file_meta_info(fp)    
-            TransferSyntax = FileMetaInfo.TransferSyntaxUID
-            if TransferSyntax == dicom.UID.ExplicitVRLittleEndian:
-                fp.isExplicitVR = True
-            elif TransferSyntax == dicom.UID.ImplicitVRLittleEndian:
-                fp.isImplicitVR = True
-            elif TransferSyntax == dicom.UID.ExplicitVRBigEndian:
-                fp.isExplicitVR = True
-                fp.isBigEndian = True
-            elif TransferSyntax == dicom.UID.DeflatedExplicitVRLittleEndian:
+            self.file_meta_info = file_meta_info = _read_file_meta_info(fp)    
+            transfer_syntax = file_meta_info.TransferSyntaxUID
+            if transfer_syntax == dicom.UID.ExplicitVRLittleEndian:
+                is_explicit_VR = True
+            elif transfer_syntax == dicom.UID.ImplicitVRLittleEndian:
+                is_implicit_VR = True
+            elif transfer_syntax == dicom.UID.ExplicitVRBigEndian:
+                is_explicit_VR = True
+                is_big_endian = True
+            elif transfer_syntax == dicom.UID.DeflatedExplicitVRLittleEndian:
                 # See PS3.6-2008 A.5 (p 71) -- when written, the entire dataset following 
                 #     the file metadata was prepared the normal way, then "deflate" compression applied.
                 #  All that is needed here is to decompress and then use as normal in a file-like object
@@ -89,178 +93,165 @@ class DicomIter(object):
                 unzipped = zlib.decompress(zipped, -zlib.MAX_WBITS)
                 fp = DicomStringIO(unzipped) # a file-like object that usual code can use as normal
                 self.fp = fp #point to new object
-                fp.isExplicitVR = True
-                fp.isLittleEndian = True
+                is_explicit_VR = True
+                is_little_endian = True
             else:
                 # Any other syntax should be Explicit VR Little Endian,
                 #   e.g. all Encapsulated (JPEG etc) are ExplVR-LE by Standard PS 3.5-2008 A.4 (p63)
-                fp.isExplicitVR = True
-                fp.isLittleEndian = True
+                is_explicit_VR = True
+                is_little_endian = True
         else: # no header -- make assumptions
             fp.TransferSyntaxUID = dicom.UID.ImplicitVRLittleEndian
-            fp.isLittleEndian = True
-            fp.isImplicitVR = True
+            is_little_endian = True
+            is_implicit_VR = True
     
-        logger.debug("Using %s VR, %s Endian transfer syntax" %(("Explicit", "Implicit")[fp.isImplicitVR], ("Big", "Little")[fp.isLittleEndian]))
+        logger.debug("Using %s VR, %s Endian transfer syntax" %(("Explicit", "Implicit")[is_implicit_VR], ("Big", "Little")[is_little_endian]))
 
     def __iter__(self):
-        tags = self.FileMetaInfo.keys()
+        tags = self.file_meta_info.keys()
         tags.sort()
         for tag in tags:
-            yield self.FileMetaInfo[tag]
+            yield self.file_meta_info[tag]
         
-        data_element = True
-        while data_element:
-            data_element = read_data_element(self.fp, stop_when=self.stop_when)
-            if data_element:
-                yield data_element
+        for data_element in data_element_generator(self.fp, stop_when=self.stop_when):
+            yield data_element
+                
+def data_element_generator(fp, is_implicit_VR, is_little_endian, stop_when=None):
+    """Create a generator to efficiently return the raw data elements
+    Specifically, returns (tag, (VR, length, value_bytes)), where: 
+    VR -- None if implicit VR, otherwise the VR read from the file
+    length -- the length as in the DICOM data element (could be 
+        DICOM "undefined length" 0xffffffffL),
+    value_bytes -- the raw bytes from the DICOM file (not parsed into python types)
+    """
+    # With a generator, state is stored, so we can break down
+    #    into the individual cases, and not have to check them again for each
+    #    data element
+    
+    # XXX need to handle case of stopping on Sequence Item Delimiter
+    
+    # Make local variables so have faster lookup
+    fp_read = fp.read 
+    fp_tell = fp.tell
+    if is_implicit_VR:
+        VR = None # save time on read -- look it up in dictionary later
+        if is_little_endian:
+            unpack_format = "<HHL" # XXX in python >=2.5, can do struct.Struct to save time 
+        else:
+            unpack_format = ">HHL"
+            
+        while True:
+            bytes = fp_read(8)
+            if len(bytes) == 0:
+                raise StopIteration # at end of file
+            group, elem, length = unpack(unpack_format, bytes)
+            tag = (group, elem)
+            if stop_when is not None: # could move to its own case too
+                if stop_when(tag, VR, length): # XXX Note VR is None here!! Should make stop_when just take tag?
+                    raise StopIteration
+            if length != 0xFFFFFFFFL: # undefined length
+                value = fp_read(length)
+                value_tell = fp_tell()
+                # print "%6x: (%04x, %04x) %4s %04x %30s " % (value_tell, group, elem, VR, length, value[:30])
+                yield tag, (VR, length, value, fp_tell())
+            else:
+                # find length_of_undefined_length and read it
+                raise NotImplementedError, "Need to code undefined length"
+    else: # Explicit VR
+        if is_little_endian:
+            unpack_format = "<HH2s"
+            long_length_format = "<2sL"
+            short_length_format = "<H"
+        else:
+            unpack_format = ">HH2s"
+            long_length_format = ">2sL"
+            short_length_format = ">H"
+        while True:
+            bytes = fp_read(6)
+            if len(bytes) == 0:
+                raise StopIteration # at end of file
+            group, elem, VR = unpack(unpack_format, bytes)
+            value_tell = fp_tell()
+            tag = (group, elem)
+            if VR in ('OB','OW','SQ','UN', 'UT'):
+                reserved, length = unpack(long_length_format, fp_read(6)) 
+            else:
+                length = unpack(short_length_format, fp_read(2))[0]
+            if stop_when is not None: # could move to its own case too
+                if stop_when(tag, VR, length):
+                    raise StopIteration
+            if length != 0xFFFFFFFFL:
+                # print "(%04x, %04x): %r %r" % (group, elem, VR, length)
+                yield tag, (VR, length, fp_read(length), value_tell)
+            else:
+                # find length_of_undefined_length and read it
+                if VR == "SQ":
+                    seq = read_sequence(fp, is_implicit_VR, is_little_endian, length)
+                    yield tag, (VR, length, seq, value_tell)
+                else:        
+                    raise NotImplementedError, "Need to code undefined length data element"        
 
-def read_data_element(fp, length=None, stop_when=None):
-    """Read and return the next data element"""
-    data_element_tell = fp.tell()
+            
+def read_dataset(fp, is_implicit_VR, is_little_endian, bytelength=None, stop_when=None):
+    """Return a dictionary containing raw data elements of the form:
+    tag -> (VR, length, value, value_tell)
+    where length is original length (could be "undefined length")
+    and value_tell is the file position where the value bytes start.
+    """
+    raw_data_elements = dict()
+    fpStart = fp.tell()
 
     try:
-        tag = fp.read_tag()
-    except EOFError: # sometimes don't know are done until read next data element and at end-of-file
-        return None  # don't re-raise the error. Should be okay
-    
-    if tag==ItemDelimiterTag or tag==SequenceDelimiterTag:
-        length = fp.read_UL()
-        if length != 0:
-            logger.warning("Expected 0x00000000 after delimiter, found 0x%x, at position 0x%x", length, fp.tell()-4)
-        data_element = DataElement(tag, None, None, data_element_tell)
-        logger.debug("%04x: %s", data_element_tell, str(data_element))
-        return data_element
-        
-    # Get the value representation VR
-    if fp.isImplicitVR:
-        try:
-            VR = dictionaryVR(tag)
-        except KeyError:
-            if tag.is_private:
-                VR = 'OB'  # just read the bytes, no way to know what they mean
-            elif tag.element == 0:  # group length tag implied in versions < 3.0
-                VR = 'UL'
-            else:
-                raise KeyError, "Unknown DICOM tag %s - can't look up VR" % str(tag)
-    else:
-        VR = read_VR(fp)
+        for tag, raw_data in data_element_generator(fp, is_implicit_VR, is_little_endian, stop_when):
+            if (bytelength is not None) and (fp.tell()-fpStart >= bytelength):
+                break
+            # Read data elements. Stop on certain errors, but return what was already read     
+            if tag == (0xFFFE, 0xE00D): #ItemDelimiterTag --dataset is an item in a sequence
+                break
+            raw_data_elements[TupleTag(tag)] = raw_data   
+            
+    except EOFError, details:
+        logger.error(str(details) + " in file " + 
+                    getattr(fp, "name", "<no filename>")) # XXX is this visible enough to user code?
+    except NotImplementedError, details:
+        logger.error(details)           
+ 
+    return raw_data_elements
 
-    if VR not in readers:
-        raise NotImplementedError, "Unknown Value Representation '%s' in tag %s" % (VR, tag)
-
-    # Get the length field of the data element
-    if fp.isExplicitVR:
-        if VR in ['OB','OW','SQ','UN', 'UT']:
-            reserved = fp.read(2)
-            length = fp.read_UL()
-        else:
-            length = fp.read_US()
-    else: # Implicit VR
-        length = fp.read_UL()
-    
-    # Check if we are doing a partial read of a file and we should stop 
-    if stop_when is not None:
-        if stop_when(tag, VR, length):
-            raise StopIteration
-        
-    isUndefinedLength = (length == 0xFFFFFFFFL)
-    value_tell = fp.tell() # store file location and size
-    length_original = length
-    
-    # For debugging only, log info about a sequence element
-    if VR == "SQ":
-        temp_data_element = DataElement(tag,VR, Sequence(), data_element_tell)
-        logger.debug("%04x: %s", data_element_tell, temp_data_element)
-        logger.debug("                         -------> SQ is using %s", ["explicit length", "Undefined Length"][isUndefinedLength])
-
-    # Look up a reader function which will get the data element value
-    # Dispatch two cases: a plain reader, or a number one which needs a format string
-    # Readers are defined in dictionary 'readers'  in readers.py
-    if isinstance(readers[VR], tuple):
-        reader, num_format = readers[VR]
-    else:
-        reader = readers[VR]
-        num_format = None
-
-    # Call the reader, or delay reading until later if has been requested
-    if fp.defer_size is not None and length > fp.defer_size and VR != "SQ":
-        file_mtime = None
-        if stat_available:
-            file_mtime = stat(fp.name).st_mtime
-        logger.debug("Deferring read for data element %s" % str(tag))
-        
-        # Read to start of next data item
-        if isUndefinedLength:
-            length = length_of_undefined_length(fp, SequenceDelimiterTag, rewind=False)
-        else:
-            fp.seek(length, SEEK_CUR)
-        
-        # Create the deferred data element
-        data_element = DeferredDataElement(tag, VR, fp, file_mtime, data_element_tell, length)
-    else:
-        value = reader(fp, length, num_format)
-        data_element = DataElement(tag, VR, value, value_tell)
-
-    data_element.isUndefinedLength = isUndefinedLength # store this to write back data element in same way was read
-    if data_element.VR != "SQ":
-        logger.debug("%04x: %s", data_element_tell, str(data_element))
-    return data_element
-
-def read_dataset(fp, bytelength=None):
-    """Return a Dataset dictionary containing DataElements starting from
-    the current file position through the following bytelength bytes
-    The dictionary key is the Dicom (group, element) tag, and the dictionary
-    value is the DataElement class instance
-    """
-    ds = Dataset()
-    fpStart = fp.tell()
-    while (bytelength is None) or (fp.tell()-fpStart < bytelength):
-        # Read data elements. Stop on certain errors, but return what was already read
-        try:
-            data_element = read_data_element(fp)
-        except EOFError, details:
-            logger.error(str(details) + " in file " + fp.name) # XXX is this visible enough to user code?
-            break
-        except NotImplementedError, details:
-            logger.error(details)
-            break
-        
-        if data_element is None: # None if end-of-file
-            break        
-        if data_element.tag == ItemDelimiterTag: # dataset is an item in a sequence
-            break
-        ds.Add(data_element)
-    
-    return ds
-
-def read_sequence(fp, bytelength, format=None):
+def read_sequence(fp, is_implicit_VR, is_little_endian, bytelength):
     """Read and return a Sequence -- i.e. a list of Datasets"""
-    seq = Sequence()
-    if bytelength == 0:  # Sequence of length 0 is possible (PS 3.5-2008 7.5.1a (p.40)
-        return seq
-    seq.isUndefinedLength = False
-    if bytelength == 0xffffffffL:
-        seq.isUndefinedLength = True
-        bytelength = None
-    fpStart = fp.tell()            
-    while (not bytelength) or (fp.tell()-fpStart < bytelength):
-        dataset = read_sequence_item(fp)
-        if dataset is None:  # None is returned if get to Sequence Delimiter
-            break
-        seq.append(dataset)
+    seq = [] # use builtin list to start for speed, convert to Sequence at end
+    isUndefinedLength = False
+    if bytelength != 0:  # Sequence of length 0 is possible (PS 3.5-2008 7.5.1a (p.40)        
+        if bytelength == 0xffffffffL:
+            isUndefinedLength = True
+            bytelength = None
+        fp_tell = fp.tell # for speed in loop
+        fpStart = fp_tell()
+        while (not bytelength) or (fp_tell()-fpStart < bytelength):
+            dataset = read_sequence_item(fp, is_implicit_VR, is_little_endian)
+            if dataset is None:  # None is returned if get to Sequence Delimiter
+                break
+            seq.append(dataset)
+    seq = Sequence(seq)
+    seq.isUndefinedLength = isUndefinedLength
     return seq
 
 # Add sequence reader here to avoid circular import of dicom.readers
 readers['SQ'] = read_sequence
 
-def read_sequence_item(fp):
+def read_sequence_item(fp, is_implicit_VR, is_little_endian):
     """Read and return a single sequence item, i.e. a Dataset"""
-    tag = fp.read_tag()
+    if is_little_endian:
+        tag_length_struct = Struct("<HHL")
+    else:
+        tag_length_struct = Struct(">HHL")
+    group, element, length = tag_length_struct.unpack(fp.read(8))
+
+    tag = (group, element)
     if tag == SequenceDelimiterTag: # No more items, time to stop reading
         data_element = DataElement(tag, None, None, fp.tell()-4)
         logger.debug("%04x: %s", fp.tell()-4, str(data_element))
-        length = fp.read_UL()
         if length != 0:
             logger.warning("Expected 0x00000000 after delimiter, found 0x%x, at position 0x%x", length, fp.tell()-4)
         return None
@@ -268,13 +259,12 @@ def read_sequence_item(fp):
         logger.warning("Expected sequence item with tag %s at file position 0x%x", (ItemTag, fp.tell()-4))
     else:
         logger.debug("%04x: Found Item tag (start of item)", fp.tell()-4)
-    length = fp.read_UL()
     isUndefinedLength = False
     if length == 0xFFFFFFFFL:
         isUndefinedLength = True
         length = None # length_of_undefined_length(fp, ItemDelimiterTag)
-    ds = read_dataset(fp, length)
-    ds.isUndefinedLengthSequenceItem = isUndefinedLength
+    ds = read_dataset(fp, is_implicit_VR, is_little_endian, length)
+    # XXX need this back in somewhere -- ds.isUndefinedLengthSequenceItem = isUndefinedLength
     return ds
     
 def _read_file_meta_info(fp):
@@ -283,11 +273,16 @@ def _read_file_meta_info(fp):
     """
     # File meta info is always LittleEndian, Explicit VR. After will change these
     #    to the transfer syntax values set in the meta info
-    fp.isLittleEndian = True
-    fp.isImplicitVR = False
 
-    GroupLength = read_data_element(fp)
-    return read_dataset(fp, GroupLength.value)
+    # Get group length data element, whose value is the length of the meta_info
+    group, elem, VR, length = unpack("<HH2sH", fp.read(8))
+    # print "GROUP LENGTH:", group, elem, VR, length
+    group_length = unpack("<L", fp.read(length)) # XXX should prob check (gp, el), VR before read
+    raw_file_meta = read_dataset(fp, is_implicit_VR=False, 
+                        is_little_endian=True, bytelength=group_length)
+    ds = Dataset(raw_file_meta)
+    # print ds
+    return ds
 
 def read_file_meta_info(filename):
     """Read and return the DICOM file meta information only.
@@ -319,18 +314,46 @@ def _at_pixel_data(tag, VR, length):
 
 def read_partial(fileobj, stop_when=None):
     """Parse a DICOM file until a condition is met; return partial dataset
-    fileobj -- a DicomIO subclass. This function does not close it.
+    fileobj -- a file-like object. This function does not close it.
     stop_when -- a function which takes tag, VR, length, and returns True or False.
         A True value means read_data_element will raise StopIteration.
         if None, then the whole file is read.
     """
+    preamble = read_preamble(fileobj)
+    file_meta_dataset = {}
+    # Assume a transfer syntax, correct it as necessary
+    is_implicit_VR = True
+    is_little_endian = True
+    if preamble:
+        file_meta_dataset = _read_file_meta_info(fileobj)
+        transfer_syntax = file_meta_dataset[(0x0002, 0x0010)] # XXX should make this work with named attribute .TransferSyntaxUID
+        if transfer_syntax == dicom.UID.ExplicitVRLittleEndian:
+            is_implicit_VR = False
+        elif transfer_syntax == dicom.UID.ExplicitVRBigEndian:
+            is_implicit_VR = False
+            is_little_endian = False
+        elif transfer_syntax == dicom.UID.DeflatedExplicitVRLittleEndian:
+            # See PS3.6-2008 A.5 (p 71) -- when written, the entire dataset following 
+            #     the file metadata was prepared the normal way, then "deflate" compression applied.
+            #  All that is needed here is to decompress and then use as normal in a file-like object
+            zipped = fp.read()            
+            # -MAX_WBITS part is from comp.lang.python answer:  http://groups.google.com/group/comp.lang.python/msg/e95b3b38a71e6799
+            unzipped = zlib.decompress(zipped, -zlib.MAX_WBITS)
+            fp = DicomStringIO(unzipped) # a file-like object that usual code can use as normal
+            self.fp = fp #point to new object
+            is_implicit_VR = False
+        else:
+            # Any other syntax should be Explicit VR Little Endian,
+            #   e.g. all Encapsulated (JPEG etc) are ExplVR-LE by Standard PS 3.5-2008 A.4 (p63)
+            is_implicit_VR = False
+    else: # no header -- use the little_endian, implicit assumptions
+        transfer_syntax = dicom.UID.ImplicitVRLittleEndian
+         
     try:
-        ds = Dataset()
-        for data_element in DicomIter(fileobj, stop_when):
-            ds.Add(data_element)
+        raw_dataset = read_dataset(fileobj, is_implicit_VR, is_little_endian, stop_when)
     except EOFError, e:
         pass  # error already logged in read_dataset
-    return ds
+    return raw_dataset
 
 def read_file(fp, defer_size=None, stop_before_pixels=False):
     """Return a Dataset containing the contents of the Dicom file
@@ -349,17 +372,12 @@ def read_file(fp, defer_size=None, stop_before_pixels=False):
         # caller provided a file name; we own the file handle
         caller_owns_file = False
         logger.debug("Reading file '%s'" % fp)
-        fp = DicomFile(fp, 'rb')
-    elif not isinstance(fp, DicomIO):
-        # convert a "normal" file into DicomFileLike, so handle big/little endian, tag reading, etc
-        if fp.mode[-1] != 'b':
-            raise IOError, "File mode must be opened in binary mode"
-        fp = DicomFileLike(fp)
+        fp = open(fp, 'rb')
     
     # Convert size to defer reading into bytes, and store in file object
-    if defer_size is not None:
-        defer_size = size_in_bytes(defer_size)
-    fp.defer_size = defer_size
+    # if defer_size is not None:
+    #    defer_size = size_in_bytes(defer_size)
+    # fp.defer_size = defer_size
             
     # Iterate through all items and store them --includes file meta info if present
     stop_when = None
@@ -373,15 +391,19 @@ def read_file(fp, defer_size=None, stop_before_pixels=False):
     
     # Store file info (Big/Little Endian, Expl/Impl VR; preamble) into dataset
     #    so can be used to rewrite same way if desired
-    ds.preamble = fp.preamble
-    ds.has_header = fp.has_header
+    #ds.preamble = fp.preamble
+    #ds.has_header = fp.has_header
 
-    if not ds.has_header:
-        ds.TransferSyntaxUID = fp.TransferSyntaxUID # need to store this for PixelArray checks
-    ds.isLittleEndian = fp.isLittleEndian
-    ds.isExplicitVR = fp.isExplicitVR
+    
+    #if not ds.has_header:
+    #    ds.TransferSyntaxUID = fp.TransferSyntaxUID # need to store this for PixelArray checks
+    #ds.isLittleEndian = is_little_endian
+    #ds.isExplicitVR = is_explicit_VR
 
     return ds
         
 ReadFile = read_file    # For backwards compatibility pydicom version <=0.9.2
 readfile = read_file    # forgive a missing underscore
+
+if __name__ == "__main__":
+    ds = read_file("testfiles/CT_small.dcm")

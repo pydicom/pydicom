@@ -77,7 +77,11 @@ class Dataset(dict):
         """Create a new DataElement instance and add it to this Dataset."""
         data_element = DataElement(tag, VR, value)
         self[data_element.tag] = data_element   # use data_element.tag since DataElement verified it
-    
+    def AddNewFromRaw(self, tag, VR, value):
+        if VR is None: # will be if raw values read from implicit VR file
+            VR = dictionaryVR(tag)
+        # XXX will need to convert value through VR readers here
+        self[tag] = DataElement(tag, VR, value)
     def attribute(self, name):
         """Deprecated -- use Dataset.data_element()"""
         import warnings
@@ -221,7 +225,13 @@ class Dataset(dict):
             return self[tag].value
     def __getitem__(self, key):
         """Operator for dataset[key] request."""
-        return dict.__getitem__(self, Tag(key))
+        tag = Tag(key)
+        val = dict.__getitem__(self, tag)
+        if isinstance(val, DataElement):
+            return val
+        # Hasn't been converted from raw form read from file yet, so do so now:
+        self.AddNewFromRaw(tag, val[0], val[2])
+        return dict.__getitem__(self, tag)
         
     def GroupDataset(self, group):
         """Return a Dataset containing only data_elements of a certain group.
@@ -516,3 +526,7 @@ class Dataset(dict):
                     dataset.walk(callback)
 
     __repr__ = __str__
+
+class FileDataset(Dataset):
+    pass
+        

@@ -69,4 +69,6 @@ pydicom_UIDs = {
     root + '1': 'ImplementationClassUID',
     
     }
-    
+class TransferSyntax(str):
+    def __init__(self, val):
+        pass

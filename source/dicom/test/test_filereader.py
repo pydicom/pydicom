@@ -18,7 +18,7 @@ try:
     from os import stat
 except:
     stat_available = False
-from dicom.filereader import read_file, DicomStringIO, read_data_element
+from dicom.filereader import read_file, DicomStringIO, data_element_generator
 from dicom.tag import Tag
 from dicom.sequence import Sequence
 
@@ -171,10 +171,11 @@ class SequenceTests(unittest.TestCase):
         fp = DicomStringIO(bytes) 
         fp.isLittleEndian = True
         fp.isImplicitVR = True
-        data_element = read_data_element(fp)
+        gen = data_element_generator(fp, is_implicit_VR=True, is_little_endian=True)
+        data_element = gen.next()
         seq = data_element.value
         self.assert_(isinstance(seq, Sequence) and len(seq[0])==0, "Expected Sequence with single empty item, got item %s" % repr(seq[0]))
-        elem2 = read_data_element(fp)
+        elem2 = gen.next()
         self.assertEqual(elem2.tag, 0x0008103e, "Expected a data element after empty sequence item")
 
 class DeferredReadTests(unittest.TestCase):
