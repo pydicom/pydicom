@@ -25,8 +25,7 @@ locations = [os.path.join(location_base, location) for location in locations]
 import glob
 import dicom
 from dicom.filereader import read_partial, _at_pixel_data
-from dicom.filebase import DicomFileLike    
-from dicom.filebase import DicomStringIO
+from cStringIO import StringIO
 
 from time import time
 import cProfile # python >=2.5
@@ -55,17 +54,17 @@ def test_full_read():
 
 def test_partial():
     rp = read_partial
-    ds = [rp(DicomFileLike(open(fn, 'rb')), stop_when=_at_pixel_data) for fn in filenames2]
+    ds = [rp(open(fn, 'rb'), stop_when=_at_pixel_data) for fn in filenames2]
 
 def test_mem_read_full():
     rf = dicom.read_file
-    str_io = DicomStringIO
+    str_io = StringIO
     memory_files = (str_io(open(fn, 'rb').read()) for fn in filenames3)
     ds = [rf(memory_file) for memory_file in memory_files]
 
 def test_mem_read_small():
     rf = dicom.read_file
-    str_io = DicomStringIO # avoid global lookup, make local instead
+    str_io = StringIO # avoid global lookup, make local instead
     memory_files = (str_io(open(fn, 'rb').read(4000)) for fn in filenames4)
     ds = [rf(memory_file) for memory_file in memory_files]
 
@@ -73,7 +72,8 @@ def test_python_read_files():
     all_files = [open(fn, 'rb').read() for fn in filenames4]
 
 if __name__ == "__main__":
-    for testrun in ['test_full_read()','test_partial()', 
+    for testrun in ['test_full_read()',
+                    'test_partial()', 
                     'test_mem_read_full()',
                     # 'test_mem_read_small()',
                     'test_python_read_files()',
