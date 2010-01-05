@@ -9,6 +9,7 @@ import sys
 import os
 import os.path
 import unittest
+from cStringIO import StringIO
 
 import shutil
 # os.stat is only available on Unix and Windows
@@ -18,7 +19,7 @@ try:
     from os import stat
 except:
     stat_available = False
-from dicom.filereader import read_file, DicomStringIO, data_element_generator
+from dicom.filereader import read_file, data_element_generator
 from dicom.tag import Tag
 from dicom.sequence import Sequence
 
@@ -80,9 +81,10 @@ class ReaderTests(unittest.TestCase):
     def testCT(self):
         """Returns correct values for sample data elements in test CT file"""
         ct = read_file(ct_name)
-        self.assertEqual(ct.ImplementationClassUID, '1.3.6.1.4.1.5962.2',
+        self.assertEqual(ct.file_meta.ImplementationClassUID, '1.3.6.1.4.1.5962.2',
                 "ImplementationClassUID not the expected value")
-        self.assertEqual(ct.ImplementationClassUID, ct[0x2, 0x12].value,
+        self.assertEqual(ct.file_meta.ImplementationClassUID, 
+                        ct.file_meta[0x2, 0x12].value,
                 "ImplementationClassUID does not match the value accessed by tag number")
         # (0020, 0032) Image Position (Patient)  [-158.13580300000001, -179.035797, -75.699996999999996]
         imagepos = ct.ImagePositionPatient
@@ -168,9 +170,7 @@ class SequenceTests(unittest.TestCase):
         bytes = "\x08\x00\x32\x10\x08\x00\x00\x00\xfe\xff\x00\xe0\x00\x00\x00\x00" # from issue 27, procedure code sequence (0008,1032)
         bytes += "\x08\x00\x3e\x10\x0c\x00\x00\x00\x52\x20\x41\x44\x44\x20\x56\x49\x45\x57\x53\x20" # data element following
         # create an in-memory fragment of a DICOM
-        fp = DicomStringIO(bytes) 
-        fp.isLittleEndian = True
-        fp.isImplicitVR = True
+        fp = StringIO(bytes) 
         gen = data_element_generator(fp, is_implicit_VR=True, is_little_endian=True)
         data_element = gen.next()
         seq = data_element.value
