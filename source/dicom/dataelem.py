@@ -82,14 +82,15 @@ class DataElement(object):
     descripWidth = 35  
     maxBytesToDisplay = 16  
     showVR = 1
-    def __init__(self, tag, VR, value, file_value_tell=None):
+    def __init__(self, tag, VR, value, file_value_tell=None, 
+                        is_undefined_length=False):
         """Create a data element instance.
         
         Most user code should instead use 'Named tags' (see Dataset class)
         to create data_elements, for which only the value is supplied,
         and the VR and tag are determined from the dicom dictionary.
         
-        tag -- dicom (group, element) tag in any form accepted by Tag class.
+        tag -- dicom (group, element) tag in any form accepted by Tag().
         VR -- dicom value representation (see DICOM standard part 6)
         value -- the value of the data element. One of the following:
             - a single string value
@@ -98,12 +99,15 @@ class DataElement(object):
             - a multi-value string with backslash separator
         file_value_tell -- used internally by Dataset, to store the write
             position for ReplaceDataElementValue method
+        is_undefined_length -- used internally to store whether the length
+            field in this data element was 0xFFFFFFFFL, i.e. "undefined length"
             
         """
         self.tag = Tag(tag)
         self.VR = VR  # Note!: you must set VR before setting value
         self.value = value
         self.file_tell = file_value_tell
+        self.is_undefined_length = is_undefined_length
     def _getvalue(self):
         """Get method for 'value' property"""
         return self._value

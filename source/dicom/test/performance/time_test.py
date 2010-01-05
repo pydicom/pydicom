@@ -50,8 +50,9 @@ filenames4 = filenames[300:400]
 
 def test_full_read():
     rf = dicom.read_file
-    ds = [rf(fn) for fn in filenames1]
-
+    datasets = [rf(fn) for fn in filenames1]
+    return datasets
+    
 def test_partial():
     rp = read_partial
     ds = [rp(open(fn, 'rb'), stop_when=_at_pixel_data) for fn in filenames2]
@@ -72,8 +73,7 @@ def test_python_read_files():
     all_files = [open(fn, 'rb').read() for fn in filenames4]
 
 if __name__ == "__main__":
-    for testrun in ['test_full_read()',
-                    'test_partial()', 
+    for testrun in ['datasets=test_full_read()','test_partial()', 
                     'test_mem_read_full()',
                     # 'test_mem_read_small()',
                     'test_python_read_files()',
@@ -84,4 +84,10 @@ if __name__ == "__main__":
         print testrun
         print "---------------"
         p.strip_dirs().sort_stats('time').print_stats(5)
-
+    print "Confirming file read worked -- check for data elements near end"
+    try:
+        image_sizes = [len(ds.PixelData) for ds in datasets]
+    except Exception, e:
+        print "Failed to access dataset data for all files\nError:" + str(e)
+    else:
+        print "Reads checked ok."

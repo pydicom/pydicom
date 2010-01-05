@@ -27,6 +27,7 @@ from dicom.datadict import TagForName, AllNamesForTag
 from dicom.tag import Tag
 from dicom.dataelem import DataElement
 from dicom.valuerep import is_stringlike
+from dicom.values import convert_value
 from dicom.UID import NotCompressedPixelTransferSyntaxes 
 
 import dicom # for write_file
@@ -77,11 +78,20 @@ class Dataset(dict):
         """Create a new DataElement instance and add it to this Dataset."""
         data_element = DataElement(tag, VR, value)
         self[data_element.tag] = data_element   # use data_element.tag since DataElement verified it
-    def AddNewFromRaw(self, tag, VR, value):
-        if VR is None: # will be if raw values read from implicit VR file
-            VR = dictionaryVR(tag)
-        # XXX will need to convert value through VR readers here
-        self[tag] = DataElement(tag, VR, value)
+    
+    def AddNewFromRaw(self, tag, VR, length, bytes, value_tell, is_little_endian):
+        """Convert a value from the raw tuples from data_element_generator"""
+        # length still passed as want to store if was undefined length.
+        # if deferred read, then len(bytes) will be 0
+        # XXX still need to handle deferred read case
+        
+        # Convert value through VR readers here
+        try:
+            value = convert_value(VR, bytes, is_little_endian)
+        except NotImplementedError, e:
+            raise NotImplementError, str(e) + " in tag %r" % tag
+        self[tag] = DataElement(tag, VR, value, value_tell, length==0xFFFFFFFFL)
+               
     def attribute(self, name):
         """Deprecated -- use Dataset.data_element()"""
         import warnings
@@ -230,7 +240,7 @@ class Dataset(dict):
         if isinstance(val, DataElement):
             return val
         # Hasn't been converted from raw form read from file yet, so do so now:
-        self.AddNewFromRaw(tag, val[0], val[2])
+        self.AddNewFromRaw(tag, *val)
         return dict.__getitem__(self, tag)
         
     def GroupDataset(self, group):
@@ -320,7 +330,8 @@ class Dataset(dict):
     # PixelArray property
     def _getPixelArray(self):
         # Check if pixel data is in a form we know how to make into an array
-        if self.TransferSyntaxUID not in NotCompressedPixelTransferSyntaxes :
+        # XXX uses file_meta here, should really only be thus for FileDataset
+        if self.file_meta.TransferSyntaxUID not in NotCompressedPixelTransferSyntaxes :
             raise NotImplementedError, "Pixel Data is compressed in a format pydicom does not yet handle. Cannot return array"
 
         # Check if already have converted to a NumPy array
@@ -528,5 +539,15 @@ class Dataset(dict):
     __repr__ = __str__
 
 class FileDataset(Dataset):
-    pass
+    def __init__(self, dataset, file_meta, is_implicit_VR, is_little_endian):
+        """Initialize a dataset read from a DICOM file
+        dataset -- some form of dictionary, usually a Dataset from read_dataset()
+        file_meta -- the file meta info dataset, as returned by _read_file_meta
+        is_implicit_VR, is_little_endian -- the transfer syntax of the file
+        """
+        Dataset.__init__(self, dataset)
+        self.file_meta = file_meta
+        self.is_implicit_VR = is_implicit_VR
+        self.is_little_endian = is_little_endian
+    
         
