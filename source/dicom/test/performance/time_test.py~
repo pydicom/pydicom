@@ -25,14 +25,21 @@ locations = [os.path.join(location_base, location) for location in locations]
 import glob
 import dicom
 from dicom.filereader import read_partial, _at_pixel_data
-from dicom.filebase import DicomFileLike    
-from dicom.filebase import DicomStringIO
+from cStringIO import StringIO
 
 from time import time
 import cProfile # python >=2.5
 import pstats
 import random
 
+def touch_files(file_list):
+    # Yes, I tried "touch" on command line -- it didn't work
+    for fil in file_list:
+        fh = open(fil, 'r+')
+        fh.seek(10)
+        fh.write("\0\0\0\0\0\0\0\1") # overwrite part of header with more zeros
+        fh.close()
+        
 rp = read_partial
 filenames = []
 for location in locations:
@@ -40,7 +47,12 @@ for location in locations:
     filenames.extend((x for x in loc_list if not x.startswith(".")))
 
 assert len(filenames) >= 400, "Need at least 400 files" # unless change slices below
+
+print "'Touching' the files to avoid OS disk caching speed increases\nPlease wait..."
+touch_files(filenames)
+# touch_files(['/Users/darcy/testdicom/dummy.dcm']) # test
 random.shuffle(filenames) # to make sure no bias for any particular file
+
 print "Sampling from %d files" % len(filenames), ". Each test gets 100 distinct files"
 
 # Give each test it's own set of files, to avoid reading something in cache from previous test
@@ -49,23 +61,25 @@ filenames2 = filenames[100:200]
 filenames3 = filenames[200:300]
 filenames4 = filenames[300:400]
 
+
 def test_full_read():
     rf = dicom.read_file
-    ds = [rf(fn) for fn in filenames1]
-
+    datasets = [rf(fn) for fn in filenames1]
+    return datasets
+    
 def test_partial():
     rp = read_partial
-    ds = [rp(DicomFileLike(open(fn, 'rb')), stop_when=_at_pixel_data) for fn in filenames2]
+    ds = [rp(open(fn, 'rb'), stop_when=_at_pixel_data) for fn in filenames2]
 
 def test_mem_read_full():
     rf = dicom.read_file
-    str_io = DicomStringIO
+    str_io = StringIO
     memory_files = (str_io(open(fn, 'rb').read()) for fn in filenames3)
     ds = [rf(memory_file) for memory_file in memory_files]
 
 def test_mem_read_small():
     rf = dicom.read_file
-    str_io = DicomStringIO # avoid global lookup, make local instead
+    str_io = StringIO # avoid global lookup, make local instead
     memory_files = (str_io(open(fn, 'rb').read(4000)) for fn in filenames4)
     ds = [rf(memory_file) for memory_file in memory_files]
 
@@ -73,10 +87,10 @@ def test_python_read_files():
     all_files = [open(fn, 'rb').read() for fn in filenames4]
 
 if __name__ == "__main__":
-    for testrun in ['test_full_read()','test_partial()', 
-                    # 'test_mem_read_full()',
+    for testrun in ['datasets=test_full_read()','test_partial()', 
+                    'test_mem_read_full()',
                     # 'test_mem_read_small()',
-                     'test_python_read_files()',
+                    'test_python_read_files()',
                      ]:
         cProfile.run(testrun, tempfile)
         p = pstats.Stats(tempfile)
@@ -84,4 +98,10 @@ if __name__ == "__main__":
         print testrun
         print "---------------"
         p.strip_dirs().sort_stats('time').print_stats(5)
-
+    print "Confirming file read worked -- check for data elements near end"
+    try:
+        image_sizes = [len(ds.PixelData) for ds in datasets]
+    except Exception, e:
+        print "Failed to access dataset data for all files\nError:" + str(e)
+    else:
+        print "Reads checked ok."

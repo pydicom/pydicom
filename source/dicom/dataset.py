@@ -9,7 +9,7 @@ Dataset(derived class of Python's dict class)
                             or just a regular value like a number, string, etc.,
                             or a list of regular values, e.g. a 3d coordinate
                   --> Sequence's are a list of Datasets
-   
+
 """
 #
 # Copyright (c) 2008 Darcy Mason
@@ -25,10 +25,9 @@ logger = logging.getLogger('pydicom')
 from dicom.datadict import DicomDictionary, dictionaryVR
 from dicom.datadict import TagForName, AllNamesForTag
 from dicom.tag import Tag
-from dicom.dataelem import DataElement
+from dicom.dataelem import DataElement, DataElement_from_raw
 from dicom.valuerep import is_stringlike
-from dicom.values import convert_value
-from dicom.UID import NotCompressedPixelTransferSyntaxes 
+from dicom.UID import NotCompressedPixelTransferSyntaxes
 
 import dicom # for write_file
 import dicom.charset
@@ -43,25 +42,25 @@ except:
 class PropertyError(Exception):
     """For AttributeErrors caught in a property, so do not go to __getattr__"""
     pass
-    
+
 class Dataset(dict):
     """A Dataset is a collection (dictionary) of Dicom DataElement instances.
-    
+
     Example of two ways to retrieve or set values:
     (1) dataset[0x10, 0x10].value --> patient's name
     (2) dataset.PatientsName --> patient's name
-    
+
     Example (2) is referred to as *Named tags* in this documentation.
     PatientsName is not actually a member of the object, but unknown member
     requests are checked against the dicom dictionary. If the name matches a
     DicomDictionary descriptive string, the corresponding tag is used
     to look up or set the Data Element's value.
-    
+
     Class Data
     ----------
     indentChars -- for string display, the characters used to indent for
             nested Data Elements (e.g. sequence items). Default is '   '.
-    
+
     NumpyPixelFormats -- if NumPy module is available, map bits allocated
             to the NumPy typecode.
     """
@@ -69,38 +68,25 @@ class Dataset(dict):
     # Map image_dataset.BitsAllocated to NumPy typecode
     if haveNumpy:
         NumpyPixelFormats = {8: numpy.uint8, 16:numpy.int16, 32:numpy.int32}
-                
+
     def Add(self, data_element):
         """Equivalent to dataset[data_element.tag] = data_element."""
         self[data_element.tag] = data_element
-    
+
     def AddNew(self, tag, VR, value):
         """Create a new DataElement instance and add it to this Dataset."""
         data_element = DataElement(tag, VR, value)
         self[data_element.tag] = data_element   # use data_element.tag since DataElement verified it
-    
-    def AddNewFromRaw(self, tag, VR, length, bytes, value_tell, is_little_endian):
-        """Convert a value from the raw tuples from data_element_generator"""
-        # length still passed as want to store if was undefined length.
-        # if deferred read, then len(bytes) will be 0
-        # XXX still need to handle deferred read case
-        
-        # Convert value through VR readers here
-        try:
-            value = convert_value(VR, bytes, is_little_endian)
-        except NotImplementedError, e:
-            raise NotImplementError, str(e) + " in tag %r" % tag
-        self[tag] = DataElement(tag, VR, value, value_tell, length==0xFFFFFFFFL)
-               
+
     def attribute(self, name):
         """Deprecated -- use Dataset.data_element()"""
         import warnings
         warnings.warn("Dataset.attribute() is deprecated and will be removed in pydicom 1.0. Use Dataset.data_element() instead", DeprecationWarning)
         return self.data_element(name)
-    
+
     def data_element(self, name):
         """Return the full data_element instance for the given descriptive name.
-        
+
         When using *named tags*, only the value is returned. If you want the
         whole data_element object, for example to change the data_element.VR,
         call this function with the name and the data_element instance is returned."""
@@ -108,12 +94,12 @@ class Dataset(dict):
         if tag:
             return self[tag]
         return None
-    
+
     def __contains__(self, name):
         """Extend dict.__contains__() to handle *named tags*.
-        
+
         This is called for code like: ``if 'SliceLocation' in dataset``.
-        
+
         """
         if is_stringlike(name):
             tag = TagForName(name)
@@ -126,10 +112,10 @@ class Dataset(dict):
             return dict.__contains__(self, tag)
         else:
             return dict.__contains__(self, name) # will no doubt raise an exception
-    
+
     def decode(self):
         """Apply character set decoding to all data elements.
-        
+
         See DICOM PS3.5-2008 6.1.1.
         """
         # Find specific character set. 'ISO_IR 6' is default
@@ -145,14 +131,14 @@ class Dataset(dict):
             decode_data_element(data_element, dicom_character_set)
         # Use the walk function to go through all elements in the dataset and convert them
         self.walk(decode_callback)
-        
+
     def __delattr__(self, name):
         """Intercept requests to delete an attribute by name, e.g. del ds.name
-        
+
         If name is a dicom descriptive string (cleaned with CleanName),
         then delete the corresponding tag and data_element.
         Else, delete an instance (python) attribute as any other class would do.
-        
+
         """
         # First check if is a valid DICOM name and if we have that data element
         tag = TagForName(name)
@@ -172,17 +158,17 @@ class Dataset(dict):
         or command-line environments.
         """
         return self.dir()
-    
+
     def dir(self, *filters):
         """Return a list of some or all data_element names, in alphabetical order.
-        
+
         Intended mainly for use in interactive Python sessions.
-        
+
         filters -- 0 or more string arguments to the function
                 if none provided, dir() returns all data_element names in this Dataset.
                 Else dir() will return only those items with one of the strings
                 somewhere in the name (case insensitive).
-        
+
         """
         allnames = []
         for tag, data_element in self.items():
@@ -204,12 +190,12 @@ class Dataset(dict):
 
     def file_metadata(self):
         """Return a Dataset holding only meta information (group 2).
-        
+
         Only makes sense if this dataset is a whole file dataset.
-        
+
         """
         return GroupDataset(2)
-        
+
     def get(self, key, default=None):
         """Extend dict.get() to handle *named tags*."""
         if is_stringlike(key):
@@ -221,15 +207,18 @@ class Dataset(dict):
             return dict.get(self, key, default)
     def __getattr__(self, name):
         """Intercept requests for unknown Dataset python-attribute names.
-        
+
         If the name matches a Dicom dictionary string (without blanks etc),
         then return the value for the data_element with the corresponding tag.
-        
+
         """
         # __getattr__ only called if instance cannot find name in self.__dict__
         # So, if name is not a dicom string, then is an error
         tag = TagForName(name)
-        if not tag or tag not in self:
+        if tag is None:
+            raise AttributeError, "Dataset does not have attribute '%s'." % name
+        tag = Tag(tag)
+        if tag not in self:
             raise AttributeError, "Dataset does not have attribute '%s'." % name
         else:  # do have that dicom data_element
             return self[tag].value
@@ -239,15 +228,16 @@ class Dataset(dict):
         val = dict.__getitem__(self, tag)
         if isinstance(val, DataElement):
             return val
-        # Hasn't been converted from raw form read from file yet, so do so now:
-        self.AddNewFromRaw(tag, *val)
+        elif isinstance(val, tuple):
+            # Hasn't been converted from raw form read from file yet, so do so now:
+            self[tag] = DataElement_from_raw(val)
         return dict.__getitem__(self, tag)
-        
+
     def GroupDataset(self, group):
         """Return a Dataset containing only data_elements of a certain group.
-        
+
         group -- the group part of a dicom (group, element) tag.
-        
+
         """
         ds = Dataset()
         ds.update(dict(
@@ -257,41 +247,41 @@ class Dataset(dict):
     def has_key(self, key):
         """Extend dict.has_key() to handle *named tags*."""
         return self.__contains__(key)
-    
+
     # isBigEndian property
     def _getBigEndian(self):
         return not self.isLittleEndian
     def _setBigEndian(self, value):
         self.isLittleEndian = not value
     isBigEndian = property(_getBigEndian, _setBigEndian)
-    
+
     def __iter__(self):
         """Method to iterate through the dataset, returning data_elements.
         e.g.:
         for data_element in dataset:
             do_something...
-        The data_elements are returned in DICOM order, 
+        The data_elements are returned in DICOM order,
         i.e. in increasing order by tag value.
         Sequence items are returned as a single data_element; it is up to the
            calling code to recurse into the Sequence items if desired
         """
-        # Note this is different than the underlying dict class, 
+        # Note this is different than the underlying dict class,
         #        which returns the key of the key:value mapping.
         #   Here the value is returned (but data_element.tag has the key)
         taglist = self.keys()
         taglist.sort()
         for tag in taglist:
             yield self[tag]
-            
-            
+
+
     def _PixelDataNumpy(self):
         """Return a NumPy array of the pixel data.
-        
+
         NumPy is the most recent numerical package for python. It is used if available.
-        
+
         Raise TypeError if no pixel data in this dataset.
         Raise ImportError if cannot import numpy.
-        
+
         """
         if not 'PixelData' in self:
             raise TypeError, "No pixel data found in this dataset."
@@ -326,7 +316,7 @@ class Dataset(dict):
                 else:
                     arr = arr.reshape(self.Rows, self.Columns)
         return arr
-    
+
     # PixelArray property
     def _getPixelArray(self):
         # Check if pixel data is in a form we know how to make into an array
@@ -341,7 +331,7 @@ class Dataset(dict):
             alreadyHave = False
         elif self._pixel_id != id(self.PixelData):
             alreadyHave = False
-        if not alreadyHave:    
+        if not alreadyHave:
             self._PixelArray = self._PixelDataNumpy()
             self._pixel_id = id(self.PixelData) # is this guaranteed to work if memory is re-used??
         return self._PixelArray
@@ -351,22 +341,22 @@ class Dataset(dict):
         except AttributeError:
             t, e, tb = sys.exc_info()
             raise PropertyError("AttributeError in pixel_array property: " + \
-                            e.args[0]), None, tb 
+                            e.args[0]), None, tb
     pixel_array = property(_get_pixel_array)
     PixelArray = pixel_array # for backwards compatibility
-    
+
     # Format strings spec'd according to python string formatting options
     #    See http://docs.python.org/library/stdtypes.html#string-formatting-operations
     default_element_format =  "%(tag)s %(name)-35.35s %(VR)s: %(repval)s"
     default_sequence_element_format = "%(tag)s %(name)-35.35s %(VR)s: %(repval)s"
-    def formatted_lines(self, element_format=default_element_format, 
+    def formatted_lines(self, element_format=default_element_format,
                         sequence_element_format=default_sequence_element_format,
                         indent_format=None):
         """A generator to give back a formatted string representing each line
         one at a time. Example:
             for line in dataset.formatted_lines("%(name)s=%(repval)s", "SQ:%(name)s=%(repval)s"):
                 print line
-        See the source code for default values which illustrate some of the names that can be used in the 
+        See the source code for default values which illustrate some of the names that can be used in the
         format strings
         indent_format -- not used in current version. Placeholder for future functionality.
         """
@@ -377,26 +367,26 @@ class Dataset(dict):
             for x in dir(data_element):
                 if not x.startswith("_"):
                     get_x = getattr(data_element, x)
-                    if callable(get_x): 
+                    if callable(get_x):
                         get_x = get_x()
                     elem_dict[x] = get_x
             # Commented out below is much less verbose version of above dict for python >= 2.5
-            # elem_dict = dict([(x, getattr(data_element,x)() if callable(getattr(data_element,x)) 
-                                    # else getattr(data_element,x)) 
+            # elem_dict = dict([(x, getattr(data_element,x)() if callable(getattr(data_element,x))
+                                    # else getattr(data_element,x))
                                     # for x in dir(data_element) if not x.startswith("_")])
             if data_element.VR == "SQ":
                 yield sequence_element_format % elem_dict
             else:
                 yield element_format % elem_dict
-                
+
     def _PrettyStr(self, indent=0, topLevelOnly=False):
         """Return a string of the data_elements in this dataset, with indented levels.
-        
-        This private method is called by the __str__() method 
+
+        This private method is called by the __str__() method
         for handling print statements or str(dataset), and the __repr__() method.
         It is also used by top(), which is the reason for the topLevelOnly flag.
         This function recurses, with increasing indentation levels.
-        
+
         """
         strings = []
         indentStr = self.indentChars * indent
@@ -411,37 +401,37 @@ class Dataset(dict):
             else:
                 strings.append(indentStr + repr(data_element))
         return "\n".join(strings)
-        
+
     def remove_private_tags(self):
         """Remove all Dicom private tags in this dataset and those contained within."""
         def RemoveCallback(dataset, data_element):
             """Internal method to use as callback to walk() method."""
             if data_element.tag.is_private:
                 # can't del self[tag] - won't be right dataset on recursion
-                del dataset[data_element.tag]  
+                del dataset[data_element.tag]
         self.walk(RemoveCallback)
     RemovePrivateTags = remove_private_tags # for backwards compatibility
-    
+
     def save_as(self, filename, WriteLikeOriginal=True):
         """Write the dataset to a file.
-        
+
         filename -- full path and filename to save the file to
         WriteLikeOriginal -- see dicom.filewriter.write_file for info on this parameter.
         """
         dicom.write_file(filename, self, WriteLikeOriginal)
-    
+
     SaveAs = save_as  # for backwards compatibility
-    
+
     def __setattr__(self, name, value):
         """Intercept any attempts to set a value for an instance attribute.
-        
+
         If name is a dicom descriptive string (cleaned with CleanName),
         then set the corresponding tag and data_element.
         Else, set an instance (python) attribute as any other class would do.
-        
+
         """
         tag = TagForName(name)
-        if tag:  # successfully mapped name to a tag
+        if tag is not None:  # successfully mapped name to a tag
             if tag not in self:  # don't have this tag yet->create the data_element instance
                 VR = dictionaryVR(tag)
                 data_element = DataElement(tag, VR, value)
@@ -452,7 +442,7 @@ class Dataset(dict):
             self[tag] = data_element
         else:  # name not in dicom dictionary - setting a non-dicom instance attribute
             # XXX note if user mis-spells a dicom data_element - no error!!!
-            self.__dict__[name] = value  
+            self.__dict__[name] = value
 
     def __setitem__(self, key, value):
         """Operator for dataset[key]=value. Check consistency, and deal with private tags"""
@@ -462,7 +452,7 @@ class Dataset(dict):
         if key != value.tag:
             raise ValueError, "data_element.tag must match the dictionary key"
 
-        tag = value.tag
+        tag = Tag(value.tag)
         data_element = value
         if tag.is_private:
             # See PS 3.5-2008 section 7.8.1 (p. 44) for how blocks are reserved
@@ -476,7 +466,7 @@ class Dataset(dict):
     def __str__(self):
         """Handle str(dataset)."""
         return self._PrettyStr()
-        
+
     def top(self):
         """Show the DICOM tags, but only the top level; do not recurse into Sequences"""
         return self._PrettyStr(topLevelOnly=True)
@@ -487,7 +477,7 @@ class Dataset(dict):
         and offered for autocompletion on the IPython command line
         """
         return self.dir() # does not list underlying dict properties and methods
-        
+
     def update(self, dictionary):
         """Extend dict.update() to handle *named tags*."""
         for key, value in dictionary.items():
@@ -495,10 +485,10 @@ class Dataset(dict):
                 setattr(self, key, value)
             else:
                 self[Tag(key)] = value
-    
+
     def iterall(self):
         """Iterate through the dataset, yielding all data elements.
-        
+
         Unlike Dataset.__iter__, this *does* recurse into sequences,
         and so returns all data elements as if the file were "flattened".
         """
@@ -509,10 +499,10 @@ class Dataset(dict):
                 for dataset in sequence:
                     for elem in dataset.iterall():
                         yield elem
-                
+
     def walk(self, callback):
         """Call the given function for all dataset data_elements (recurses).
-        
+
         Go through all data_elements, recursing into sequences and their datasets,
         calling the callback function at each data_element (including the SQ data_element).
         This can be used to perform an operation on certain types of data_elements.
@@ -520,10 +510,10 @@ class Dataset(dict):
 
         callback -- a callable method which takes two arguments: a dataset, and
                     a data_element belonging to that dataset.
-        
+
         DataElements will come back in dicom order (by increasing tag number
         within their dataset)
-        
+
         """
         taglist = self.keys()
         taglist.sort()
@@ -531,7 +521,7 @@ class Dataset(dict):
             data_element = self[tag]
             callback(self, data_element)  # self = this Dataset
             # 'tag in self' below needed in case data_element was deleted in callback
-            if tag in self and data_element.VR == "SQ":  
+            if tag in self and data_element.VR == "SQ":
                 sequence = data_element.value
                 for dataset in sequence:
                     dataset.walk(callback)
@@ -549,5 +539,4 @@ class FileDataset(Dataset):
         self.file_meta = file_meta
         self.is_implicit_VR = is_implicit_VR
         self.is_little_endian = is_little_endian
-    
-        
+
