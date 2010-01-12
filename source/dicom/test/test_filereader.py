@@ -1,6 +1,6 @@
 # test_filereader.py
 """unittest tests for dicom.filereader module"""
-# Copyright (c) 2008 Darcy Mason
+# Copyright (c) 2010 Darcy Mason
 # This file is part of pydicom, relased under an MIT license.
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
@@ -12,7 +12,7 @@ import unittest
 from cStringIO import StringIO
 
 import shutil
-# os.stat is only available on Unix and Windows
+# os.stat is only available on Unix and Windows   XXX Mac?
 # Not sure if on other platforms the import fails, or the call to it??
 stat_available = True
 try:
@@ -42,10 +42,10 @@ def isClose(a, b, epsilon=0.000001): # compare within some tolerance, to avoid m
     except: # (is not)
         return abs(a-b) < epsilon
     else:
-        if len(a) != len(b): 
+        if len(a) != len(b):
             return False
         for ai, bi in zip(a, b):
-            if abs(ai-bi) > epsilon: 
+            if abs(ai-bi) > epsilon:
                 return False
         return True
 
@@ -55,11 +55,11 @@ class ReaderTests(unittest.TestCase):
         plan = read_file(rtplan_name)
         beam = plan.Beams[0]
         cp0, cp1 = beam.ControlPoints # if not two controlpoints, then this would raise exception
-        
+
         self.assertEqual(beam.TreatmentMachineName, "unit001", "Incorrect unit name")
         self.assertEqual(beam.TreatmentMachineName, beam[0x300a, 0x00b2].value,
                 "beam TreatmentMachineName does not match the value accessed by tag number")
-        
+
         cumDoseRef = cp1.ReferencedDoseReferences[0].CumulativeDoseReferenceCoefficient
         self.assert_(isClose(cumDoseRef, 0.9990268),
                 "Cum Dose Ref Coeff not the expected value (CP1, Ref'd Dose Ref")
@@ -73,7 +73,7 @@ class ReaderTests(unittest.TestCase):
                 "Frame Increment Pointer not the expected value")
         self.assertEqual(dose.FrameIncrementPointer, dose[0x28, 9].value,
                 "FrameIncrementPointer does not match the value accessed by tag number")
-        
+
         # try a value that is nested the deepest (so deep I break it into two steps!)
         fract = dose.ReferencedRTPlans[0].ReferencedFractionGroups[0]
         beamnum = fract.ReferencedBeams[0].ReferencedBeamNumber
@@ -83,7 +83,7 @@ class ReaderTests(unittest.TestCase):
         ct = read_file(ct_name)
         self.assertEqual(ct.file_meta.ImplementationClassUID, '1.3.6.1.4.1.5962.2',
                 "ImplementationClassUID not the expected value")
-        self.assertEqual(ct.file_meta.ImplementationClassUID, 
+        self.assertEqual(ct.file_meta.ImplementationClassUID,
                         ct.file_meta[0x2, 0x12].value,
                 "ImplementationClassUID does not match the value accessed by tag number")
         # (0020, 0032) Image Position (Patient)  [-158.13580300000001, -179.035797, -75.699996999999996]
@@ -138,7 +138,7 @@ class JPEG2000Tests(unittest.TestCase):
     def testJPEG2000PixelArray(self):
         """JPEG2000: Fails gracefully when uncompressed data is asked for..."""
         self.assertRaises(NotImplementedError, self.jpeg._getPixelArray)
-    
+
 class JPEGlossyTests(unittest.TestCase):
     def setUp(self):
         self.jpeg = read_file(jpeg_lossy_name)
@@ -150,7 +150,7 @@ class JPEGlossyTests(unittest.TestCase):
     def testJPEGlossyPixelArray(self):
         """JPEG-lossy: Fails gracefully when uncompressed data is asked for."""
         self.assertRaises(NotImplementedError, self.jpeg._getPixelArray)
-        
+
 class JPEGlosslessTests(unittest.TestCase):
     def setUp(self):
         self.jpeg = read_file(jpeg_lossless_name)
@@ -161,7 +161,7 @@ class JPEGlosslessTests(unittest.TestCase):
         self.assertEqual(got, expected, "JPEG-lossless file, Code Meaning got %s, expected %s" % (got, expected))
     def testJPEGlosslessPixelArray(self):
         """JPEGlossless: Fails gracefully when uncompressed data is asked for..."""
-        self.assertRaises(NotImplementedError, self.jpeg._getPixelArray)        
+        self.assertRaises(NotImplementedError, self.jpeg._getPixelArray)
 
 class SequenceTests(unittest.TestCase):
     def testEmptyItem(self):
@@ -170,10 +170,10 @@ class SequenceTests(unittest.TestCase):
         bytes = "\x08\x00\x32\x10\x08\x00\x00\x00\xfe\xff\x00\xe0\x00\x00\x00\x00" # from issue 27, procedure code sequence (0008,1032)
         bytes += "\x08\x00\x3e\x10\x0c\x00\x00\x00\x52\x20\x41\x44\x44\x20\x56\x49\x45\x57\x53\x20" # data element following
         # create an in-memory fragment of a DICOM
-        fp = StringIO(bytes) 
+        fp = StringIO(bytes)
         gen = data_element_generator(fp, is_implicit_VR=True, is_little_endian=True)
         data_element = gen.next()
-        seq = data_element.value
+        seq = data_element[4]
         self.assert_(isinstance(seq, Sequence) and len(seq[0])==0, "Expected Sequence with single empty item, got item %s" % repr(seq[0]))
         elem2 = gen.next()
         self.assertEqual(elem2.tag, 0x0008103e, "Expected a data element after empty sequence item")
@@ -209,12 +209,12 @@ class DeferredReadTests(unittest.TestCase):
         for data_elem in ds_norm:
             tag = data_elem.tag
             self.assertEqual(data_elem.value, ds_defer[tag].value, "Mismatched value for tag %r" % tag)
-        
+
     def tearDown(self):
         if os.path.exists(self.testfile_name):
             os.remove(self.testfile_name)
-        
-        
+
+
 if __name__ == "__main__":
     # This is called if run alone, but not if loaded through run_tests.py
     # If not run from the directory where the sample images are, then need to switch there

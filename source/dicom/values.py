@@ -14,6 +14,8 @@ from dicom.valuerep import PersonName, MultiValue, MultiString
 import dicom.UID
 from dicom.tag import Tag, SequenceDelimiterTag
 from dicom.datadict import dictionaryVR
+from dicom.filereader import read_sequence
+from cStringIO import StringIO
 
 def convert_tag(bytes, is_little_endian, offset=0):
     if is_little_endian:
@@ -26,7 +28,7 @@ def convert_ATvalue(bytes, is_little_endian, format=None):
     """Read and return AT (tag) data_element value(s)"""
     length = len(bytes)
     if length == 4:
-        return convert_tag(bytes)
+        return convert_tag(bytes, is_little_endian)
     # length > 4
     if length % 4 != 0:
         logger.warn("Expected length to be multiple of 4 for VR 'AT', got length %d at file position 0x%x", length, fp.tell()-4)
@@ -70,6 +72,12 @@ def convert_single_string(bytes, is_little_endian, format=None):
         bytes = bytes[:-1]
     return bytes
 
+def convert_SQ(bytes, is_implicit_VR, is_little_endian, length):
+    """Convert a sequence that has been read as bytes but not yet parsed."""
+    fp = StringIO(bytes)
+    seq = read_sequence(fp, is_implicit_VR, is_little_endian, length)
+    return seq
+    
 def convert_UI(bytes, is_little_endian, format=None):
     """Read and return a UI values or values"""
     # Strip off 0-byte padding for even length (if there)
@@ -81,17 +89,9 @@ def convert_UN(bytes, is_little_endian, format=None):
     """Return a byte string for a VR of 'UN' (unknown)"""
     return bytes 
 
-def convert_value(VR, bytes, is_little_endian):
-    if VR is None: # Can be if was implicit VR
-        try:
-            VR = dictionaryVR(tag)
-        except KeyError:
-            if tag.is_private:
-                VR = 'OB'  # just read the bytes, no way to know what they mean
-            elif tag.element == 0:  # group length tag implied in versions < 3.0
-                VR = 'UL'
-            else:
-                raise KeyError, "Unknown DICOM tag %s - can't look up VR" % str(tag)
+def convert_value(VR, raw_data_element):
+    """Return the converted value (from raw bytes) for the given VR"""
+    tag = Tag(raw_data_element.tag)
     if VR not in converters:
         raise NotImplementedError, "Unknown Value Representation '%s'" % VR
 
@@ -102,8 +102,17 @@ def convert_value(VR, bytes, is_little_endian):
     else:
         converter = converters[VR]
         num_format = None
-
-    value = converter(bytes, is_little_endian, num_format)
+    
+    bytes = raw_data_element.value
+    is_little_endian = raw_data_element.is_little_endian
+    is_implicit_VR = raw_data_element.is_implicit_VR
+    
+    # Not only two cases. Also need extra info if is a raw sequence
+    if VR != "SQ":
+        value = converter(bytes, is_little_endian, num_format)
+    else:
+        length = raw_data_element.length
+        value = convert_SQ(bytes, is_implicit_VR, is_little_endian, length)
     return value
 
 # converters map a VR to the function to read the value(s).
@@ -118,7 +127,7 @@ converters = {'UL':(convert_numbers,'L'), 'SL':(convert_numbers,'l'),
            'IS':convert_string,  'DS':convert_string, 'AE': convert_string,
            'AS':convert_string,
            'LT':convert_single_string,
-           # 'SQ': convert_sequence added in filereader.py to avoid circular import
+           'SQ':convert_SQ,
            'UN':convert_UN,
            'AT':convert_ATvalue,
            'ST':convert_string,
@@ -131,3 +140,44 @@ converters = {'UL':(convert_numbers,'L'), 'SL':(convert_numbers,'l'),
            'DT':convert_string,
            'UT':convert_single_string,          
            } 
+if __name__ == "__main__":
+    from dicom.filereader import data_element_generator
+    dicom.debug()
+    def hex2str(hexstr):
+        """Return a bytestring rep of a string of hex rep of bytes separated by spaces"""
+        return "".join((chr(int(x,16)) for x in hexstr.split()))
+
+    bytes = (
+            "0a 30 B0 00"    # (300a, 00b0) Beam Sequence
+            " 40 00 00 00"    # length
+                " fe ff 00 e0"    # (fffe, e000) Item Tag
+                " 18 00 00 00"    # Item (dataset) Length
+                " 0a 30 c0 00"    # (300A, 00C0) Beam Number
+                " 02 00 00 00"    # length
+                " 31 20"          # value '1 '
+                " 0a 30 c2 00"    # (300A, 00C2) Beam Name
+                " 06 00 00 00"    # length
+                " 42 65 61 6d 20 31" # value 'Beam 1'
+                # -------------
+                " fe ff 00 e0"    # (fffe, e000) Item Tag
+                " 18 00 00 00"    # Item (dataset) Length
+                " 0a 30 c0 00"    # (300A, 00C0) Beam Number
+                " 02 00 00 00"    # length
+                " 32 20"          # value '2 '
+                " 0a 30 c2 00"    # (300A, 00C2) Beam Name
+                " 06 00 00 00"    # length
+                " 42 65 61 6d 20 32" # value 'Beam 2'                
+                )
+                
+    infile = StringIO(hex2str(bytes))
+    de_gen = data_element_generator(infile, is_implicit_VR=True, is_little_endian=True)
+    raw_seq = de_gen.next()
+    print "Raw seq", raw_seq
+    seq = convert_value("SQ", raw_seq)
+
+    # The sequence is parsed, but only into raw data elements. 
+    # They will be converted when asked for. Check some:
+    for beam in seq:
+        print "Beam", beam.BeamNumber
+        print "   name:", beam.BeamName
+    

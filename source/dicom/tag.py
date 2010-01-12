@@ -78,6 +78,6 @@ def TupleTag(group_elem):
 
 # Define some special tags:
 # See PS 3.5-2008 section 7.5 (p.40)
-ItemTag = Tag(0xFFFE, 0xE000) # start of Sequence Item
-ItemDelimiterTag = Tag((0xFFFE, 0xE00D)) # end of Sequence Item
-SequenceDelimiterTag = Tag(0xFFFE,0xE0DD) # end of Sequence of undefined length
+ItemTag = TupleTag((0xFFFE, 0xE000)) # start of Sequence Item
+ItemDelimiterTag = TupleTag((0xFFFE, 0xE00D)) # end of Sequence Item
+SequenceDelimiterTag = TupleTag((0xFFFE,0xE0DD)) # end of Sequence of undefined length
