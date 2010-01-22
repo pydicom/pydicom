@@ -9,6 +9,7 @@ from cStringIO import StringIO
 import unittest
 from dicom.filereader import data_element_generator
 from dicom.values import convert_value
+from dicom.sequence import Sequence
 
 def hex2str(hexstr):
     """Return a bytestring rep of a string of hex rep of bytes separated by spaces"""
@@ -87,7 +88,7 @@ class RawReaderImplVRTests(unittest.TestCase):
         bytes3 = " fe ff dd e0 00 00 00 00"          # Sequence Delimiter
         bytes = bytes1 + bytes2 + bytes3
         infile = StringIO(hex2str(bytes))
-        expected = ((0x7fe0,0x10), None, 0xffffffffL, 'ABCDEFGHIJ', 0x8, True, True)
+        expected = ((0x7fe0,0x10), 'OW/OB', 0xffffffffL, 'ABCDEFGHIJ', 0x8, True, True)
         de_gen = data_element_generator(infile, is_implicit_VR=True, is_little_endian=True)
         got = de_gen.next()
         msg_loc = "in read of undefined length Implicit VR ='OB' short value)"
@@ -110,9 +111,35 @@ class RawReaderImplVRTests(unittest.TestCase):
 
 class RawSequenceTests(unittest.TestCase):
     # See DICOM standard PS3.5-2008 section 7.5 for sequence syntax
+    def testEmptyItem(self):
+        """Read sequence with a single empty item..............................."""
+        # This is fix for issue 27
+        bytes = (
+             "08 00 32 10"    # (0008, 1032) SQ "Procedure Code Sequence"
+            " 08 00 00 00"    # length 8
+            " fe ff 00 e0"    # (fffe, e000) Item Tag
+            " 00 00 00 00"    # length = 0
+            ) + (             # --------------- end of Sequence
+            " 08 00 3e 10"    # (0008, 103e) LO "Series Description"
+            " 0c 00 00 00"    # length
+            " 52 20 41 44 44 20 56 49 45 57 53 20"  # value
+            )
+        # "\x08\x00\x32\x10\x08\x00\x00\x00\xfe\xff\x00\xe0\x00\x00\x00\x00" # from issue 27, procedure code sequence (0008,1032)
+        # bytes += "\x08\x00\x3e\x10\x0c\x00\x00\x00\x52\x20\x41\x44\x44\x20\x56\x49\x45\x57\x53\x20" # data element following
+        
+        fp = StringIO(hex2str(bytes))
+        gen = data_element_generator(fp, is_implicit_VR=True, is_little_endian=True)
+        raw_seq = gen.next()
+        seq = convert_value("SQ", raw_seq)
+        
+        self.assert_(isinstance(seq, Sequence), "Did not get Sequence, got type '%s'" % type(seq))
+        self.assert_(len(seq)==1, "Expected Sequence with single (empty) item, got %d item(s)" % len(seq))
+        self.assert_(len(seq[0])==0, "Expected the sequence item (dataset) to be empty")
+        elem2 = gen.next()
+        self.assertEqual(elem2.tag, 0x0008103e, "Expected a data element after empty sequence item")
     
     def testImplVRLittleEndian_ExplicitLengthSeq(self):
-        """Raw read: (converted) SQ with explicit lengths......................."""
+        """Raw read: ImplVR Little Endian SQ with explicit lengths.............."""
         # Create a fictional sequence with bytes directly,
         #    similar to PS 3.5-2008 Table 7.5-1 p42
         bytes = (
@@ -146,7 +173,96 @@ class RawSequenceTests(unittest.TestCase):
         # They will be converted when asked for. Check some:
         got = seq[0].BeamNumber
         self.assert_(got == 1, "Expected Beam Number 1, got %r" % got)
+        got = seq[1].BeamName
+        self.assert_(got == 'Beam 2', "Expected Beam Name 'Beam 2', got %s" % got)
+        
+    def testImplVRBigEndian_ExplicitLengthSeq(self):
+        """Raw read: ImplVR BigEndian SQ with explicit lengths.................."""
+        # Create a fictional sequence with bytes directly,
+        #    similar to PS 3.5-2008 Table 7.5-1 p42
+        bytes = (
+            "30 0a 00 B0"    # (300a, 00b0) Beam Sequence
+            " 00 00 00 40"    # length
+                " ff fe e0 00"    # (fffe, e000) Item Tag
+                " 00 00 00 18"    # Item (dataset) Length
+                " 30 0a 00 c0"    # (300A, 00C0) Beam Number
+                " 00 00 00 02"    # length
+                " 31 20"          # value '1 '
+                " 30 0a 00 c2"    # (300A, 00C2) Beam Name
+                " 00 00 00 06"    # length
+                " 42 65 61 6d 20 31" # value 'Beam 1'
+                # -------------
+                " ff fe e0 00"    # (fffe, e000) Item Tag
+                " 00 00 00 18"    # Item (dataset) Length
+                " 30 0a 00 c0"    # (300A, 00C0) Beam Number
+                " 00 00 00 02"    # length
+                " 32 20"          # value '2 '
+                " 30 0a 00 c2"    # (300A, 00C2) Beam Name
+                " 00 00 00 06"    # length
+                " 42 65 61 6d 20 32" # value 'Beam 2'                
+                )
+                
+        infile = StringIO(hex2str(bytes))
+        de_gen = data_element_generator(infile, is_implicit_VR=True, is_little_endian=False)
+        raw_seq = de_gen.next()
+        seq = convert_value("SQ", raw_seq)
 
+        # The sequence is parsed, but only into raw data elements. 
+        # They will be converted when asked for. Check some:
+        got = seq[0].BeamNumber
+        self.assert_(got == 1, "Expected Beam Number 1, got %r" % got)
+        got = seq[1].BeamName
+        self.assert_(got == 'Beam 2', "Expected Beam Name 'Beam 2', got %s" % got)
+
+    def testExplVRBigEndian_UndefinedLengthSeq(self):
+        """Raw read: ExplVR BigEndian Undefined Length SQ......................."""
+        # Create a fictional sequence with bytes directly,
+        #    similar to PS 3.5-2008 Table 7.5-2 p42
+        item1_value_bytes = "\1"*126
+        item2_value_bytes = "\2"*222
+        bytes = (
+            "30 0a 00 B0"    # (300a, 00b0) Beam Sequence
+            " 53 51"         # SQ
+            " 00 00"         # reserved
+            " ff ff ff ff"    # undefined length
+                " ff fe e0 00"    # (fffe, e000) Item Tag
+                " 00 00 00 18"    # Item (dataset) Length
+                " 30 0a 00 c0"    # (300A, 00C0) Beam Number
+                " 49 53"          # IS
+                " 00 02"          # length
+                " 31 20"          # value '1 '
+                " 30 0a 00 c2"    # (300A, 00C2) Beam Name
+                " 4c 4F"          # LO
+                " 00 06"          # length
+                " 42 65 61 6d 20 31" # value 'Beam 1'
+                # -------------
+                " ff fe e0 00"    # (fffe, e000) Item Tag
+                " 00 00 00 18"    # Item (dataset) Length
+                " 30 0a 00 c0"    # (300A, 00C0) Beam Number
+                " 49 53"          # IS
+                " 00 02"          # length
+                " 32 20"          # value '2 '
+                " 30 0a 00 c2"    # (300A, 00C2) Beam Name
+                " 4C 4F"          # LO
+                " 00 06"          # length
+                " 42 65 61 6d 20 32" # value 'Beam 2'   
+            " ff fe E0 dd"    # SQ delimiter
+            " 00 00 00 00"    # zero length              
+                )
+                
+        infile = StringIO(hex2str(bytes))
+        de_gen = data_element_generator(infile, is_implicit_VR=False, is_little_endian=False)
+        seq = de_gen.next()
+        # Note seq itself is not a raw data element. 
+        #     The parser does parse undefined length SQ
+
+        # The sequence is parsed, but only into raw data elements. 
+        # They will be converted when asked for. Check some:
+        got = seq[0].BeamNumber
+        self.assert_(got == 1, "Expected Beam Number 1, got %r" % got)
+        got = seq[1].BeamName
+        self.assert_(got == 'Beam 2', "Expected Beam Name 'Beam 2', got %s" % got)
+        
 if __name__ == "__main__":
     # import dicom
     # dicom.debug()

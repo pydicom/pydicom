@@ -113,19 +113,19 @@ def write_data_element(fp, data_element):
         writers[VR][0](fp, data_element, writers[VR][1])
     #  print DataElement(tag, VR, value)
     
-    isUndefinedLength = False
-    if hasattr(data_element, "isUndefinedLength") and data_element.isUndefinedLength:
-        isUndefinedLength = True
+    is_undefined_length = False
+    if hasattr(data_element, "is_undefined_length") and data_element.is_undefined_length:
+        is_undefined_length = True
     location = fp.tell()
     fp.seek(length_location)
     if fp.isExplicitVR and VR not in ['OB', 'OW', 'OF', 'SQ', 'UT', 'UN']:
         fp.write_US(location - length_location - 2)  # 2 is length of US
     else:
         # write the proper length of the data_element back in the length slot, unless is SQ with undefined length.
-        if not isUndefinedLength:
+        if not is_undefined_length:
             fp.write_UL(location - length_location - 4)  # 4 is length of UL
     fp.seek(location)  # ready for next data_element
-    if isUndefinedLength:
+    if is_undefined_length:
         fp.write_tag(SequenceDelimiterTag)
         fp.write_UL(0)  # 4-byte 'length' of delimiter data item
     
@@ -156,7 +156,7 @@ def write_sequence_item(fp, dataset):
     length_location = fp.tell() # save location for later.
     fp.write_UL(0xffffffffL)   # will fill in real value later if not undefined length
     write_dataset(fp, dataset)
-    if dataset.isUndefinedLengthSequenceItem:
+    if getattr(dataset, "is_undefined_length_sequence_item", False):
         fp.write_tag(ItemDelimiterTag)
         fp.write_UL(0)  # 4-bytes 'length' field for delimiter item
     else: # we will be nice and set the lengths for the reader of this file
@@ -181,7 +181,7 @@ def write_ATvalue(fp, data_element):
             fp.write_tag(tag)
             
 
-def _write_file_meta_info(fp, dataset):
+def _write_file_meta_info(fp, meta_dataset):
     """Write the dicom group 2 dicom storage File Meta Information to the file.
 
     The file should already be positioned past the 128 byte preamble.
@@ -196,13 +196,6 @@ def _write_file_meta_info(fp, dataset):
     fp.isLittleEndian = True
     fp.isExplicitVR = True
 
-    # Extract only group 2 items (but not elem 0 = group length we need to calc)
-    #   out of the dataset for file meta info
-    meta_dataset = Dataset()
-    meta_dataset.update(
-        dict([(tag, data_element) for tag,data_element in dataset.items() if tag.group == 2 and tag.elem != 0])
-        )
-    
     if Tag((2,1)) not in meta_dataset:
         meta_dataset.AddNew((2,1), 'OB', "\0\1")   # file meta information version
     
@@ -214,16 +207,25 @@ def _write_file_meta_info(fp, dataset):
     if missing:
         raise ValueError, "Missing required tags %s for file meta information" % str(missing)
     
+    # Put in temp number for required group length, save current location to come back
+    meta_dataset[(2,0)] = DataElement((2,0), 'UL', 0) # put 0 to start
+    group_length_data_element_size = 12 # !based on DICOM std ExplVR
     group_length_tell = fp.tell()
-    group_length = DataElement((2,0), 'UL', 0) # put 0 to start, write again later when length is known
-    write_data_element(fp, group_length)  # write that one first - get it out of the way
-
+    
+    # Write the file meta datset, including temp group length
     length = write_dataset(fp, meta_dataset)
-    location = fp.tell()
+    group_length = length - group_length_data_element_size # counts from end of that
+    
+    # Save end of file meta to go back to
+    end_of_file_meta = fp.tell()
+    
+    # Go back and write the actual group length
     fp.seek(group_length_tell)
-    group_length = DataElement((2,0), 'UL', length) # now have real length
-    write_data_element(fp, group_length)  # write the whole data_element
-    fp.seek(location)
+    group_length_data_element = DataElement((2,0), 'UL', group_length)
+    write_data_element(fp, group_length_data_element)
+    
+    # Return to end of file meta, ready to write remainder of the file
+    fp.seek(end_of_file_meta)
 
 def write_file(filename, dataset, WriteLikeOriginal=True):
     """Store a Dataset to the filename specified.
@@ -233,16 +235,16 @@ def write_file(filename, dataset, WriteLikeOriginal=True):
     was stored at read time. It is up to you to ensure the preamble is still
     correct for its purposes.
     If there is no Transfer Syntax tag in the dataset,
-       Set dataset.isExplicitVR or .isImplicitVR, and .isLittleEndian or .isBigEndian,
+       Set dataset.is_implicit_VR, and .is_little_endian
        to determine the transfer syntax used to write the file.
     WriteLikeOriginal -- True if want to preserve the following for each sequence 
         within this dataset:
         - preamble -- if no preamble in read file, than not used here
         - dataset.hasFileMeta -- if writer did not do file meta information,
             then don't write here either
-        - seq.isUndefinedLength -- if original had delimiters, write them now too,
+        - seq.is_undefined_length -- if original had delimiters, write them now too,
             instead of the more sensible length characters
-        - <dataset>.isUndefinedLengthSequenceItem -- for datasets that belong to a 
+        - <dataset>.is_undefined_length_sequence_item -- for datasets that belong to a 
             sequence, write the undefined length delimiters if that is 
             what the original had
         Set WriteLikeOriginal = False to produce a "nicer" DICOM file for other readers,
@@ -255,31 +257,30 @@ def write_file(filename, dataset, WriteLikeOriginal=True):
     else:
         preamble = dataset.preamble
     
-    if 'TransferSyntaxUID' not in dataset:
-        if dataset.isLittleEndian and not dataset.isExplicitVR:
-            dataset.AddNew((2, 0x10), 'UI', ImplicitVRLittleEndian)
-        elif dataset.isLittleEndian and dataset.isExplicitVR:
-            dataset.AddNew((2, 0x10), 'UI', ExplicitVRLittleEndian)
-        elif dataset.isBigEndian and dataset.isExplicitVR:
-            dataset.AddNew((2, 0x10), 'UI', ExplicitVRBigEndian)
+    file_meta = dataset.file_meta
+    if file_meta is None:
+        file_meta = {}
+    if 'TransferSyntaxUID' not in file_meta:
+        if dataset.is_little_endian and dataset.is_implicit_VR:
+            file_meta.AddNew((2, 0x10), 'UI', ImplicitVRLittleEndian)
+        elif dataset.is_little_endian and not dataset.is_implicit_VR:
+            file_meta.AddNew((2, 0x10), 'UI', ExplicitVRLittleEndian)
+        elif dataset.isBigEndian and not dataset.is_implicit_VR:
+            file_meta.AddNew((2, 0x10), 'UI', ExplicitVRBigEndian)
         else:
             raise NotImplementedError, "pydicom has not been verified for Big Endian with Implicit VR"
-
-    all_but_group2_dataset = Dataset()
-    all_but_group2_dataset.update(dict([(tag,data_element) for tag,data_element in dataset.items() if tag.group != 2]))
-    
         
     fp = DicomFile(filename,'wb')
     try:
         if preamble:
             fp.write(preamble)  # blank 128 byte preamble
-            _write_file_meta_info(fp, dataset) # pass whole dataset but it only uses group 2
+            _write_file_meta_info(fp, file_meta) 
         
         # Set file VR, endian. MUST BE AFTER writing META INFO (which changes to Explict LittleEndian)
-        fp.isImplicitVR = not dataset.isExplicitVR
-        fp.isLittleEndian = dataset.isLittleEndian
+        fp.isImplicitVR = dataset.is_implicit_VR
+        fp.isLittleEndian = dataset.is_little_endian
         
-        write_dataset(fp, all_but_group2_dataset)
+        write_dataset(fp, dataset)
     finally:
         fp.close()
         
@@ -309,25 +310,3 @@ writers = {'UL':(write_numbers,'L'), 'SL':(write_numbers,'l'),
            'DT':write_string,
            'UT':write_string,
            } # note OW/OB depends on other items, which we don't know at write time
-
-def ReplaceDataElementValue(filename, data_element, new_value):
-    """Modify a dicom file data_element value 'in-place'.
-    
-    This function is no longer needed - instead, read a dicom file,
-    modify data_elements, and write the file to a new (or same) filename.
-    This is a more primitive function - it modifies the value in-place
-    in the file. Therefore the length of new_value must be the same as
-    the existing file data_element value. If not, ValueError is raised.
-    
-    """
-    # if a text or byte string value, check if is same length
-    #    XXX have I included all the right VRs here?
-    #    XXX should use writers dict to write new_value properly
-    if data_element.VR not in ['UL', 'SL', 'US', 'SS', 'FL', 'FD'] and \
-      len(new_value) != len(data_element.value) + (len(data_element.value) % 2):
-        raise ValueError, "New value is not the same length as existing one"
-    fp = file(filename, 'r+b')
-    print "File position", hex(data_element.file_tell)
-    fp.seek(data_element.file_tell)  # start of the value field
-    fp.write(new_value)
-    fp.close()
