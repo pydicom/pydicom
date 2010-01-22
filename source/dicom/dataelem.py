@@ -299,38 +299,6 @@ class DeferredDataElement(DataElement):
         DataElement._setvalue(self, val)
     value = property(_getvalue, _setvalue)
 
-    def read_value(self):
-        """Read the previously deferred value from the file into memory"""
-        # If already read in, don't do again
-        if self._value is not None:
-            return
-        logger.debug("Reading deferred element %s" % str(self.tag))
-        # Check that the file is the same as when originally read
-        if not os.path.exists(self.filepath):
-            raise IOError, "Deferred read -- original file '%s' is missing" % self.filepath
-        if stat_available:
-            statinfo = stat(self.filepath)
-            if statinfo.st_mtime != self.file_mtime:
-                warnings.warn("Deferred read warning -- file modification time has changed.")
-
-        # Open the file, position to the right place
-        fp = DicomFile(self.filepath, 'rb')
-        fp.defer_size = None
-        fp.isLittleEndian = self.fp_isLittleEndian
-        fp.isImplicitVR = self.fp_isImplicitVR
-        fp.seek(self.data_element_tell)
-
-        # Read the data element and check matches what was stored before
-        from dicom.filereader import read_data_element
-        data_elem = read_data_element(fp)
-        fp.close()
-        if data_elem.VR != self.VR:
-            raise ValueError, "Deferred read VR '%s' does not match original '%s'" % (data_elem.VR, self.VR)
-        if data_elem.tag != self.tag:
-            raise ValueError, "Deferred read tag %s does not match original %s" % (str(data_elem.tag), str(self.tag))
-
-        # Everything is ok, now this object should act like usual DataElement
-        self._value = data_elem._value
 
 RawDataElement = namedtuple('RawDataElement',
                   'tag VR length value value_tell is_implicit_VR is_little_endian')

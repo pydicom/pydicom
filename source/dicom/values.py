@@ -12,7 +12,7 @@ logger = logging.getLogger('pydicom')
 
 from dicom.valuerep import PersonName, MultiValue, MultiString
 import dicom.UID
-from dicom.tag import Tag, SequenceDelimiterTag
+from dicom.tag import Tag, TupleTag, SequenceDelimiterTag
 from dicom.datadict import dictionaryVR
 from dicom.filereader import read_sequence
 from cStringIO import StringIO
@@ -22,7 +22,7 @@ def convert_tag(bytes, is_little_endian, offset=0):
         format = "<HH"
     else:
         format = ">HH"
-    return Tag(unpack(format, bytes[offset:offset+4])[0])
+    return TupleTag(unpack(format, bytes[offset:offset+4]))
     
 def convert_ATvalue(bytes, is_little_endian, format=None):
     """Read and return AT (tag) data_element value(s)"""
@@ -72,10 +72,10 @@ def convert_single_string(bytes, is_little_endian, format=None):
         bytes = bytes[:-1]
     return bytes
 
-def convert_SQ(bytes, is_implicit_VR, is_little_endian, length):
+def convert_SQ(bytes, is_implicit_VR, is_little_endian):
     """Convert a sequence that has been read as bytes but not yet parsed."""
     fp = StringIO(bytes)
-    seq = read_sequence(fp, is_implicit_VR, is_little_endian, length)
+    seq = read_sequence(fp, is_implicit_VR, is_little_endian, len(bytes))
     return seq
     
 def convert_UI(bytes, is_little_endian, format=None):
@@ -111,8 +111,7 @@ def convert_value(VR, raw_data_element):
     if VR != "SQ":
         value = converter(bytes, is_little_endian, num_format)
     else:
-        length = raw_data_element.length
-        value = convert_SQ(bytes, is_implicit_VR, is_little_endian, length)
+        value = convert_SQ(bytes, is_implicit_VR, is_little_endian)
     return value
 
 # converters map a VR to the function to read the value(s).
@@ -141,43 +140,4 @@ converters = {'UL':(convert_numbers,'L'), 'SL':(convert_numbers,'l'),
            'UT':convert_single_string,          
            } 
 if __name__ == "__main__":
-    from dicom.filereader import data_element_generator
-    dicom.debug()
-    def hex2str(hexstr):
-        """Return a bytestring rep of a string of hex rep of bytes separated by spaces"""
-        return "".join((chr(int(x,16)) for x in hexstr.split()))
-
-    bytes = (
-            "0a 30 B0 00"    # (300a, 00b0) Beam Sequence
-            " 40 00 00 00"    # length
-                " fe ff 00 e0"    # (fffe, e000) Item Tag
-                " 18 00 00 00"    # Item (dataset) Length
-                " 0a 30 c0 00"    # (300A, 00C0) Beam Number
-                " 02 00 00 00"    # length
-                " 31 20"          # value '1 '
-                " 0a 30 c2 00"    # (300A, 00C2) Beam Name
-                " 06 00 00 00"    # length
-                " 42 65 61 6d 20 31" # value 'Beam 1'
-                # -------------
-                " fe ff 00 e0"    # (fffe, e000) Item Tag
-                " 18 00 00 00"    # Item (dataset) Length
-                " 0a 30 c0 00"    # (300A, 00C0) Beam Number
-                " 02 00 00 00"    # length
-                " 32 20"          # value '2 '
-                " 0a 30 c2 00"    # (300A, 00C2) Beam Name
-                " 06 00 00 00"    # length
-                " 42 65 61 6d 20 32" # value 'Beam 2'                
-                )
-                
-    infile = StringIO(hex2str(bytes))
-    de_gen = data_element_generator(infile, is_implicit_VR=True, is_little_endian=True)
-    raw_seq = de_gen.next()
-    print "Raw seq", raw_seq
-    seq = convert_value("SQ", raw_seq)
-
-    # The sequence is parsed, but only into raw data elements. 
-    # They will be converted when asked for. Check some:
-    for beam in seq:
-        print "Beam", beam.BeamNumber
-        print "   name:", beam.BeamName
-    
+    pass

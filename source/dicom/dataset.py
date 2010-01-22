@@ -25,9 +25,11 @@ logger = logging.getLogger('pydicom')
 from dicom.datadict import DicomDictionary, dictionaryVR
 from dicom.datadict import TagForName, AllNamesForTag
 from dicom.tag import Tag
-from dicom.dataelem import DataElement, DataElement_from_raw
+from dicom.dataelem import DataElement, DataElement_from_raw, RawDataElement
 from dicom.valuerep import is_stringlike
 from dicom.UID import NotCompressedPixelTransferSyntaxes
+import os.path
+import cStringIO, StringIO
 
 import dicom # for write_file
 import dicom.charset
@@ -38,6 +40,12 @@ try:
     import numpy
 except:
     haveNumpy = False
+
+stat_available = True
+try:
+    from os import stat
+except:
+    stat_available = False
 
 class PropertyError(Exception):
     """For AttributeErrors caught in a property, so do not go to __getattr__"""
@@ -68,7 +76,7 @@ class Dataset(dict):
     # Map image_dataset.BitsAllocated to NumPy typecode
     if haveNumpy:
         NumpyPixelFormats = {8: numpy.uint8, 16:numpy.int16, 32:numpy.int32}
-
+    
     def Add(self, data_element):
         """Equivalent to dataset[data_element.tag] = data_element."""
         self[data_element.tag] = data_element
@@ -225,12 +233,17 @@ class Dataset(dict):
     def __getitem__(self, key):
         """Operator for dataset[key] request."""
         tag = Tag(key)
-        val = dict.__getitem__(self, tag)
-        if isinstance(val, DataElement):
-            return val
-        elif isinstance(val, tuple):
+        data_elem = dict.__getitem__(self, tag)
+        
+        if isinstance(data_elem, DataElement):
+            return data_elem
+        elif isinstance(data_elem, tuple):
+            # If a deferred read, then go get the value now
+            if data_elem.value is None:
+                from dicom.filereader import read_deferred_data_element
+                data_elem = read_deferred_data_element(self.filename, self.timestamp, data_elem)
             # Hasn't been converted from raw form read from file yet, so do so now:
-            self[tag] = DataElement_from_raw(val)
+            self[tag] = DataElement_from_raw(data_elem)
         return dict.__getitem__(self, tag)
 
     def GroupDataset(self, group):
@@ -446,7 +459,7 @@ class Dataset(dict):
 
     def __setitem__(self, key, value):
         """Operator for dataset[key]=value. Check consistency, and deal with private tags"""
-        if not isinstance(value, DataElement): # ok if is subclass, e.g. DeferredDataElement
+        if not isinstance(value, (DataElement, RawDataElement)): # ok if is subclass, e.g. DeferredDataElement
             raise TypeError, "Dataset contents must be DataElement instances.\n" + \
                   "To set a data_element value use data_element.value=val"
         if key != value.tag:
@@ -529,14 +542,29 @@ class Dataset(dict):
     __repr__ = __str__
 
 class FileDataset(Dataset):
-    def __init__(self, dataset, file_meta, is_implicit_VR, is_little_endian):
+    def __init__(self, filename_or_obj, dataset, preamble, file_meta, 
+                        is_implicit_VR, is_little_endian):
         """Initialize a dataset read from a DICOM file
+        filename -- full path and filename to the file. Use None if is a StringIO.
         dataset -- some form of dictionary, usually a Dataset from read_dataset()
-        file_meta -- the file meta info dataset, as returned by _read_file_meta
+        preamble -- the 128-byte DICOM preamble,
+        file_meta -- the file meta info dataset, as returned by _read_file_meta,
+                or an empty dataset if no file meta information is in the file
         is_implicit_VR, is_little_endian -- the transfer syntax of the file
         """
         Dataset.__init__(self, dataset)
+        self.preamble = preamble
         self.file_meta = file_meta
         self.is_implicit_VR = is_implicit_VR
         self.is_little_endian = is_little_endian
-
+        if isinstance(filename_or_obj, basestring):
+            self.filename = filename_or_obj
+        else:
+            try:
+                self.filename = filename_or_obj.name
+            except AttributeError:
+                self.filename = None # e.g. came from StringIO or something file-like
+        self.timestamp = None
+        if stat_available and self.filename and os.path.exists(self.filename):
+            statinfo = stat(self.filename)
+            self.timestamp = statinfo.st_mtime

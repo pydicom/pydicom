@@ -69,7 +69,8 @@ def find_bytes(fp, bytes_to_find, read_size=128, rewind=True):
         fp.seek(data_start)
     return found_at
 
-def read_undefined_length_value(fp, is_little_endian, delimiter_tag, read_size=128):
+def read_undefined_length_value(fp, is_little_endian, delimiter_tag, defer_size=None,
+                                    read_size=128):
     """Read until the delimiter tag found and return the value, ignore the delimiter
 	
     fp -- a file-like object with read(), seek() functions
@@ -92,6 +93,7 @@ def read_undefined_length_value(fp, is_little_endian, delimiter_tag, read_size=1
     found = False
     EOF = False
     value_chunks = []
+    byte_count = 0 # for defer_size checks
     while not found:
         chunk_start = fp.tell()
         bytes = fp.read(read_size) 
@@ -104,7 +106,10 @@ def read_undefined_length_value(fp, is_little_endian, delimiter_tag, read_size=1
         index = bytes.find(bytes_to_find)
         if index != -1:
             found = True
-            value_chunks.append(bytes[:index])
+            new_bytes = bytes[:index]
+            byte_count += len(new_bytes)
+            if defer_size is None or byte_count < defer_size:
+                value_chunks.append(bytes[:index])
             fp.seek(chunk_start + index + 4) # rewind to end of delimiter
             length = fp.read(4)
             if length != "\0\0\0\0":
@@ -116,9 +121,15 @@ def read_undefined_length_value(fp, is_little_endian, delimiter_tag, read_size=1
         else:
             fp.seek(fp.tell()-search_rewind) # rewind a bit in case delimiter crossed read_size boundary
             # accumulate the bytes read (not including the rewind)
-            value_chunks.append(bytes[:-search_rewind])
+            new_bytes = bytes[:-search_rewind]
+            byte_count += len(new_bytes)
+            if defer_size is None or byte_count < defer_size:
+                value_chunks.append(new_bytes)
     # if get here then have found the byte string
-    return "".join(value_chunks)
+    if defer_size is not None and defer_size >= defer_size:
+        return None
+    else:
+        return "".join(value_chunks)
 
 def find_delimiter(fp, delimiter, is_little_endian, read_size=128, rewind=True):
     """Return file position where 4-byte delimiter is located.
