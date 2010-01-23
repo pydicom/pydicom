@@ -1,7 +1,7 @@
 # test_filereader.py
 """unittest tests for dicom.filereader module"""
 # Copyright (c) 2008 Darcy Mason
-# This file is part of pydicom, relased under an MIT license.
+# This file is part of pydicom, released under a modified MIT license.
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
 
@@ -92,6 +92,13 @@ class ReaderTests(unittest.TestCase):
         self.assertEqual(ct.Columns, 128, "Columns not 128")
         self.assertEqual(ct.BitsStored, 16, "Bits Stored not 16")
         self.assertEqual(len(ct.PixelData), 128*128*2, "Pixel data not expected length")
+        
+        # Also test private elements name can be resolved:
+        expected = "[Duration of X-ray on]"
+        got = ct[(0x0043,0x104e)].name
+        msg = "Mismatch in private tag name, expected '%s', got '%s'"
+        self.assertEqual(expected, got, msg % (expected, got))
+        
     def testMR(self):
         """Returns correct values for sample data elements in test MR file"""
         mr = read_file(mr_name)
@@ -167,7 +174,7 @@ class SequenceTests(unittest.TestCase):
         # This is fix for issue 27
         bytes = "\x08\x00\x32\x10\x08\x00\x00\x00\xfe\xff\x00\xe0\x00\x00\x00\x00" # from issue 27, procedure code sequence (0008,1032)
         bytes += "\x08\x00\x3e\x10\x0c\x00\x00\x00\x52\x20\x41\x44\x44\x20\x56\x49\x45\x57\x53\x20" # data element following
-        # create an in-memory fragment of a DICOM
+        # create an in-memory fragment
         fp = DicomStringIO(bytes) 
         fp.isLittleEndian = True
         fp.isImplicitVR = True

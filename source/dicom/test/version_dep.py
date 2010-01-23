@@ -1,7 +1,7 @@
 # version_dep.py
 """Holds test code that is dependent of certain python versions"""
 # Copyright (c) 2009 Darcy Mason
-# This file is part of pydicom, relased under an MIT license.
+# This file is part of pydicom, released under a modified MIT license.
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
 
