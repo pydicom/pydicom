@@ -2,7 +2,7 @@
 """Access dicom dictionary information"""
 #
 # Copyright (c) 2008 Darcy Mason
-# This file is part of pydicom, relased under an MIT license.
+# This file is part of pydicom, released under a modified MIT license.
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
 #
@@ -181,7 +181,7 @@ def private_dictionaryDescription(tag, private_creator):
 
 def private_dictionaryVM(tag, private_creator):
     """Return the dicom value multiplicity for the given dicom tag."""
-    return get_private_entry(tag, private_creator)[1] # but VM blank for private dicts
+    return get_private_entry(tag, private_creator)[1]
 
 def private_dictionaryVR(tag, private_creator):
     """Return the dicom value representation for the given dicom tag."""

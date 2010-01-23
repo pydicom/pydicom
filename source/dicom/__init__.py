@@ -2,7 +2,7 @@
 """pydicom package -- easily handle DICOM files. See Quick Start below.
 
 Copyright (c) 2008 Darcy Mason
-This file is part of pydicom, relased under an MIT license.
+This file is part of pydicom, released under a modified MIT license.
    See the file license.txt included with this distribution, also
    available at http://pydicom.googlecode.com
 
