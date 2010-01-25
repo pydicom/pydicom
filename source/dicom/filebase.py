@@ -8,7 +8,7 @@
 from dicom.tag import Tag
 from struct import unpack, pack
 
-from StringIO import StringIO
+from cStringIO import StringIO
 import logging
 logger = logging.getLogger('pydicom')
 
@@ -22,9 +22,18 @@ class DicomIO(object):
         self._ImplicitVR = True   # start with this by default
     def __del__(self):
         self.close()
-    def read_tag(self):
-        """Read and return a dicom tag (two unsigned shorts) from the file."""
-        return Tag((self.read_US(), self.read_US()))
+    def read_le_tag(self):
+        """Read and return two unsigned shorts (little endian) from the file."""
+        bytes = self.read(4)
+        if len(bytes) < 4:
+            raise EOFError  # needed for reading "next" tag when at end of file
+        return unpack(bytes, "<HH")
+    def read_be_tag(self):
+        """Read and return two unsigned shorts (little endian) from the file."""
+        bytes = self.read(4)
+        if len(bytes) < 4:
+            raise EOFError  # needed for reading "next" tag when at end of file
+        return unpack(bytes, ">HH")
     def write_tag(self, tag):
         """Write a dicom tag (two unsigned shorts) to the file."""
         tag = Tag(tag)  # make sure is an instance of class, not just a tuple or int
@@ -32,17 +41,11 @@ class DicomIO(object):
         self.write_US(tag.element)
     def read_leUS(self):
         """Return an unsigned short from the file with little endian byte order"""
-        bytes = self.read(2)
-        if len(bytes) == 0: # needed for reading "next" tag when at end of file
-            raise EOFError
-        return unpack("<H", bytes)[0]
+        return unpack("<H", self.read(2))[0]
     
     def read_beUS(self):
         """Return an unsigned short from the file with big endian byte order"""
-        bytes = self.read(2)
-        if len(bytes) == 0: # needed for reading "next" tag when at end of file
-            raise EOFError
-        return unpack(">H", bytes)[0]
+        return unpack(">H", self.read(2))[0]
     
     def read_leUL(self):
         """Return an unsigned long read with little endian byte order"""
@@ -98,11 +101,13 @@ class DicomIO(object):
             self.read_UL = self.read_leUL
             self.write_US = self.write_leUS
             self.write_UL = self.write_leUL
+            self.read_tag = self.read_le_tag
         else:      # BigEndian
             self.read_US = self.read_beUS
             self.read_UL = self.read_beUL
             self.write_US = self.write_beUS
             self.write_UL = self.write_beUL
+            self.read_tag = self.read_be_tag
         
     def _getLittleEndian(self):
         return self._LittleEndian
@@ -127,12 +132,15 @@ class DicomIO(object):
 class DicomFileLike(DicomIO):
     def __init__(self, file_like_obj):
         self.parent_read = file_like_obj.read
-        self.write = file_like_obj.write
+        self.write = getattr(file_like_obj, "write", self.no_write)
         self.seek = file_like_obj.seek
         self.tell = file_like_obj.tell
         self.close = file_like_obj.close
         if hasattr(file_like_obj, 'name'):
             self.name = file_like_obj.name
+    def no_write(self, bytes):
+        """Used for file-like objects (e.g. cStringIO), where no write is available"""
+        raise IOError, "This DicomFileLike object cannot write (e.g. cStringIO)"
         
 def DicomFile(*args, **kwargs):
     return DicomFileLike(open(*args, **kwargs))

@@ -5,22 +5,28 @@
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
 
-from struct import pack
-from dicom.tag import Tag
+from struct import pack, unpack
+from dicom.tag import TupleTag, Tag
 from dicom.datadict import dictionaryDescription
 
 import logging
 logger = logging.getLogger('pydicom')
 
-def absorb_delimiter_item(fp, delimiter):
+def absorb_delimiter_item(fp, is_little_endian, delimiter):
     """Read (and ignore) undefined length sequence or item terminators."""
-    tag = fp.read_tag()
+    if is_little_endian:
+        format = "<HHL"
+    else:
+        format = ">HHL"
+    group, elem, length = unpack(format, fp.read(8))
+    tag = TupleTag((group, elem))
     if tag != delimiter:
-        logger.warn("Did not find expected delimiter '%s', instead found %s at file position 0x%x", dictionaryDescription(delimiter), str(tag), fp.tell()-4)    
-        fp.seek(fp.tell()-4)
+        msg = "Did not find expected delimiter '%s'" % dictionaryDescription(delimiter)
+        msg += ", instead found %s at file position 0x%x" %(str(tag), fp.tell()-8)
+        logger.warn(msg)    
+        fp.seek(fp.tell()-8)
         return 
-    logger.debug("%04x: Found Delimiter '%s'", fp.tell()-4, dictionaryDescription(delimiter))
-    length = fp.read_UL() # 4 bytes for 'length', all 0's
+    logger.debug("%04x: Found Delimiter '%s'", fp.tell()-8, dictionaryDescription(delimiter))
     if length == 0:
         logger.debug("%04x: Read 0 bytes after delimiter", fp.tell()-4)
     else:
@@ -38,21 +44,23 @@ def find_bytes(fp, bytes_to_find, read_size=128, rewind=True):
     search_rewind = len(bytes_to_find)-1
     
     found = False
+    EOF = False
     while not found:
         chunk_start = fp.tell()
-        bytes =""
-        while len(bytes) < read_size:
-            new_bytes = fp.read(read_size-len(bytes), need_exact_length=False)
-            if not new_bytes:
-                break
-            bytes += new_bytes    
-        if not bytes:
-            if rewind:
-                fp.seek(data_start)
-            return None
+        bytes = fp.read(read_size) 
+        if len(bytes) < read_size:
+            # try again - if still don't get required amount, this is last block
+            new_bytes = fp.read(read_size - len(bytes))
+            bytes += new_bytes
+            if len(bytes) < read_size:
+                EOF = True # but will still check whatever we did get
         index = bytes.find(bytes_to_find)
         if index != -1:
             found = True
+        elif EOF:
+            if rewind:
+                fp.seek(data_start)
+            return None
         else:
             fp.seek(fp.tell()-search_rewind) # rewind a bit in case delimiter crossed read_size boundary
     # if get here then have found the byte string
@@ -61,7 +69,69 @@ def find_bytes(fp, bytes_to_find, read_size=128, rewind=True):
         fp.seek(data_start)
     return found_at
 
-def find_delimiter(fp, delimiter, read_size=128, rewind=True):
+def read_undefined_length_value(fp, is_little_endian, delimiter_tag, defer_size=None,
+                                    read_size=128):
+    """Read until the delimiter tag found and return the value, ignore the delimiter
+	
+    fp -- a file-like object with read(), seek() functions
+    is_little_endian -- True if file transfer syntax is little endian, else False
+    read_size -- number of bytes to read at one time (default 128)
+    
+    On completion, the file will be set to the first byte after the delimiter and its
+        following four zero bytes.
+    If end-of-file is hit before the delimiter was found, raises EOFError
+	"""
+    data_start = fp.tell()  
+    search_rewind = 3
+    
+    if is_little_endian:
+        bytes_format = "<HH"
+    else:
+        bytes_format = ">HH"
+    bytes_to_find = pack(bytes_format, delimiter_tag.group, delimiter_tag.elem)
+    
+    found = False
+    EOF = False
+    value_chunks = []
+    byte_count = 0 # for defer_size checks
+    while not found:
+        chunk_start = fp.tell()
+        bytes = fp.read(read_size) 
+        if len(bytes) < read_size:
+            # try again - if still don't get required amount, this is last block
+            new_bytes = fp.read(read_size - len(bytes))
+            bytes += new_bytes
+            if len(bytes) < read_size:
+                EOF = True # but will still check whatever we did get
+        index = bytes.find(bytes_to_find)
+        if index != -1:
+            found = True
+            new_bytes = bytes[:index]
+            byte_count += len(new_bytes)
+            if defer_size is None or byte_count < defer_size:
+                value_chunks.append(bytes[:index])
+            fp.seek(chunk_start + index + 4) # rewind to end of delimiter
+            length = fp.read(4)
+            if length != "\0\0\0\0":
+                msg = "Expected 4 zero bytes after undefined length delimiter at pos %x"
+                logger.error(msg % (fp.tell()-4,))
+        elif EOF:
+            fp.seek(data_start)
+            raise EOFError, "End of file reached before delimiter %r found" % delimiter_tag
+        else:
+            fp.seek(fp.tell()-search_rewind) # rewind a bit in case delimiter crossed read_size boundary
+            # accumulate the bytes read (not including the rewind)
+            new_bytes = bytes[:-search_rewind]
+            byte_count += len(new_bytes)
+            if defer_size is None or byte_count < defer_size:
+                value_chunks.append(new_bytes)
+    # if get here then have found the byte string
+    if defer_size is not None and defer_size >= defer_size:
+        return None
+    else:
+        return "".join(value_chunks)
+
+def find_delimiter(fp, delimiter, is_little_endian, read_size=128, rewind=True):
     """Return file position where 4-byte delimiter is located.
     
     Return None if reach end of file without finding the delimiter.
@@ -70,15 +140,15 @@ def find_delimiter(fp, delimiter, read_size=128, rewind=True):
     
     """
     format = "<H"
-    if fp.isBigEndian:
+    if not is_little_endian:
         format = ">H"
     delimiter = Tag(delimiter)
     bytes_to_find = pack(format, delimiter.group) + pack(format, delimiter.elem)
     return find_bytes(fp, bytes_to_find, rewind=rewind)            
     
-def length_of_undefined_length(fp, delimiter, read_size=128, rewind=True):
+def length_of_undefined_length(fp, delimiter, is_little_endian, read_size=128, rewind=True):
     """Search through the file to find the delimiter, return the length of the data
-    element value that the dicom file writer was too lazy to figure out for us.
+    element.
     Return the file to the start of the data, ready to read it.
     Note the data element that the delimiter starts is not read here, the calling
     routine must handle that.
@@ -88,7 +158,7 @@ def length_of_undefined_length(fp, delimiter, read_size=128, rewind=True):
     """
     chunk = 0
     data_start = fp.tell()
-    delimiter_pos = find_delimiter(fp, delimiter, rewind=rewind)
+    delimiter_pos = find_delimiter(fp, delimiter, is_little_endian, rewind=rewind)
     length = delimiter_pos - data_start
     return length
     

@@ -15,10 +15,14 @@ import logging
 logger = logging.getLogger('pydicom')
 
 from dicom.datadict import dictionaryHasTag, dictionaryDescription
-from dicom.datadict import private_dictionaryDescription
+from dicom.datadict import private_dictionaryDescription, dictionaryVR
 from dicom.tag import Tag
 from dicom.UID import UID
 from dicom.valuerep import PersonName
+try:
+    from collections import namedtuple
+except ImportError: # for python <2.6
+    from dicom.util.namedtup import namedtuple
 
 # os.stat is only available on Unix and Windows
 # Not sure if on other platforms the import fails, or the call to it??
@@ -42,7 +46,7 @@ def isMultiValue(value):
     except:
         return False
     return True
-    
+
 def isString(val):
     """Helper function: return True if val is a string."""
     try:
@@ -59,37 +63,38 @@ def isStringOrStringList(val):
                 return False
         return True
     else:  # single value - test for a string
-        return isString(val)            
+        return isString(val)
 
 _backslash = "\\"  # double '\' because it is used as escape chr in Python
 
 class DataElement(object):
     """Contain and manipulate a Dicom data element, having a tag, VR, VM and value.
-    
+
     Most user code will not create data elements using this class directly,
     but rather through 'named tags' in Dataset objects.
     See the Dataset class for a description of how Datasets, Sequences,
     and DataElements work.
-    
+
     Class Data
     ----------
     For string display (via __str__), the following are used:
-    
+
     descripWidth -- maximum width of description field (default 35).
     maxBytesToDisplay -- longer data will display "array of # bytes" (default 16).
     showVR -- True (default) to include the dicom VR just before the value.
     """
-    descripWidth = 35  
-    maxBytesToDisplay = 16  
+    descripWidth = 35
+    maxBytesToDisplay = 16
     showVR = 1
-    def __init__(self, tag, VR, value, file_value_tell=None):
+    def __init__(self, tag, VR, value, file_value_tell=None,
+                        is_undefined_length=False):
         """Create a data element instance.
-        
+
         Most user code should instead use 'Named tags' (see Dataset class)
         to create data_elements, for which only the value is supplied,
         and the VR and tag are determined from the dicom dictionary.
-        
-        tag -- dicom (group, element) tag in any form accepted by Tag class.
+
+        tag -- dicom (group, element) tag in any form accepted by Tag().
         VR -- dicom value representation (see DICOM standard part 6)
         value -- the value of the data element. One of the following:
             - a single string value
@@ -98,12 +103,16 @@ class DataElement(object):
             - a multi-value string with backslash separator
         file_value_tell -- used internally by Dataset, to store the write
             position for ReplaceDataElementValue method
-            
+        is_undefined_length -- used internally to store whether the length
+            field in this data element was 0xFFFFFFFFL, i.e. "undefined length"
+
         """
         self.tag = Tag(tag)
         self.VR = VR  # Note!: you must set VR before setting value
         self.value = value
         self.file_tell = file_value_tell
+        self.is_undefined_length = is_undefined_length
+
     def _getvalue(self):
         """Get method for 'value' property"""
         return self._value
@@ -114,8 +123,8 @@ class DataElement(object):
         if isString(val) and self.VR not in \
            ['UT','ST','LT', 'FL','FD','AT','OB','OW','OF','SL','SQ','SS',
             'UL', 'OW/OB', 'UN'] and 'US' not in self.VR: # latter covers 'US or SS' etc
-            if _backslash in val: 
-                val = val.split(_backslash)  
+            if _backslash in val:
+                val = val.split(_backslash)
         self._value = self._convert_value(val)
         if self.VR in ['IS', 'DS']:  # a number as a text string
             # If IS/DS need to store number but keep string also
@@ -135,7 +144,7 @@ class DataElement(object):
             return 1
     VM = property(_getVM, doc =
             """The number of values in the data_element's 'value'""")
-    
+
     def _convert_value(self, val):
         """Convert Dicom string values if possible to e.g. numbers. Handle the case
         of multiple value data_elements"""
@@ -161,7 +170,7 @@ class DataElement(object):
                 return float(val)
             elif self.VR == "UI":
 	    	    return UID(val)
-            # Later may need this for PersonName as for UI, 
+            # Later may need this for PersonName as for UI,
             #    but needs more thought
             # elif self.VR == "PN":
             #    return PersonName(val)
@@ -173,7 +182,7 @@ class DataElement(object):
         except ValueError:
             print "Could not convert value '%s' to VR '%s' in tag %s" \
                                 % (repr(val), self.VR, self.tag)
-            
+
     def __str__(self):
         """Return str representation of this data_element"""
         repVal = self.repval
@@ -184,13 +193,13 @@ class DataElement(object):
             s = "%s %-*s %s" % (str(self.tag), self.descripWidth,
                             self.description()[:self.descripWidth], repVal)
         return s
-        
+
     def _get_repval(self):
         """Return a str representation of the current value for use in __str__"""
-        if (self.VR in ['OB', 'OW', 'OW/OB', 'US or SS or OW', 'US or SS'] 
+        if (self.VR in ['OB', 'OW', 'OW/OB', 'US or SS or OW', 'US or SS']
                   and len(self.value) > self.maxBytesToDisplay):
             repVal = "Array of %d bytes" % len(self.value)
-        elif hasattr(self, 'string_value'): # for VR of IS or DS 
+        elif hasattr(self, 'string_value'): # for VR of IS or DS
             repVal = repr(self.string_value)
         elif isinstance(self.value, UID):
             repVal = self.value.name
@@ -198,7 +207,7 @@ class DataElement(object):
             repVal = repr(self.value)  # will tolerate unicode too
         return repVal
     repval = property(_get_repval)
-    
+
     def __unicode__(self):
         """Return unicode representation of this data_element"""
         if isinstance(self.value, unicode):
@@ -208,18 +217,18 @@ class DataElement(object):
             return uniVal
         else:
             return unicode(str(self))
-        
+
     def __getitem__(self, key):
         """Returns the item from my value's Sequence, if it is one."""
         try:
             return self.value[key]
         except TypeError:
             raise TypeError, "DataElement value is unscriptable (not a Sequence)"
-    
+
     def _get_name(self):
         return self.description()
     name = property(_get_name)
-    
+
     def description(self):
         """Return the DICOM dictionary description for this dicom tag."""
         if dictionaryHasTag(self.tag):
@@ -233,7 +242,7 @@ class DataElement(object):
                     #   and clear that cannot access it by name
                     name = "[" + private_dictionaryDescription(self.tag, self.private_creator) + "]"
                 except KeyError:
-                    pass                
+                    pass
             elif self.tag.elem >> 8 == 0:
                 name = "Private Creator"
         elif self.tag.element == 0:  # implied Group Length dicom versions < 3
@@ -253,7 +262,7 @@ class DeferredDataElement(DataElement):
     """Subclass of DataElement where value is not read into memory until needed"""
     def __init__(self, tag, VR, fp, file_mtime, data_element_tell, length):
         """Store basic info for the data element but value will be read later
-        
+
         fp -- DicomFile object representing the dicom file being read
         file_mtime -- last modification time on file, used to make sure
            it has not changed since original read
@@ -263,7 +272,7 @@ class DeferredDataElement(DataElement):
         self.tag = Tag(tag)
         self.VR = VR
         self._value = None # flag as unread
-        
+
         # Check current file object and save info needed for read later
         # if not isinstance(fp, DicomFile):
             # raise NotImplementedError, "Deferred read is only available for DicomFile objects"
@@ -279,7 +288,7 @@ class DeferredDataElement(DataElement):
         else:
             return DataElement._get_repval(self)
     repval = property(_get_repval)
-    
+
     def _getvalue(self):
         """Get method for 'value' property"""
         # Must now read the value if haven't already
@@ -289,40 +298,32 @@ class DeferredDataElement(DataElement):
     def _setvalue(self, val):
         DataElement._setvalue(self, val)
     value = property(_getvalue, _setvalue)
+
+
+RawDataElement = namedtuple('RawDataElement',
+                  'tag VR length value value_tell is_implicit_VR is_little_endian')
+
+def DataElement_from_raw(raw_data_element):
+    """Return a DataElement from a RawDataElement"""
+    from dicom.values import convert_value # XXX buried here to avoid circular import filereader->Dataset->convert_value->filereader (for SQ parsing)
+    raw = raw_data_element
+    VR = raw.VR
+    if VR is None: # Can be if was implicit VR
+        try:
+            VR = dictionaryVR(raw.tag)
+        except KeyError:
+            if tag.is_private:
+                VR = 'OB'  # just read the bytes, no way to know what they mean
+            elif tag.element == 0:  # group length tag implied in versions < 3.0
+                VR = 'UL'
+            else:
+                raise KeyError, "Unknown DICOM tag %s - can't look up VR" % str(tag)    
+    try:
+        value = convert_value(VR, raw)
+    except NotImplementedError, e:
+        raise NotImplementedError, "%s in tag %r" % (str(e), raw.tag)
     
-    def read_value(self):
-        """Read the previously deferred value from the file into memory"""
-        # If already read in, don't do again
-        if self._value is not None:
-            return
-        logger.debug("Reading deferred element %s" % str(self.tag))
-        # Check that the file is the same as when originally read
-        if not os.path.exists(self.filepath):
-            raise IOError, "Deferred read -- original file '%s' is missing" % self.filepath
-        if stat_available:
-            statinfo = stat(self.filepath)
-            if statinfo.st_mtime != self.file_mtime:
-                warnings.warn("Deferred read warning -- file modification time has changed.")
-        
-        # Open the file, position to the right place
-        fp = DicomFile(self.filepath, 'rb')
-        fp.defer_size = None
-        fp.isLittleEndian = self.fp_isLittleEndian
-        fp.isImplicitVR = self.fp_isImplicitVR
-        fp.seek(self.data_element_tell)
-        
-        # Read the data element and check matches what was stored before
-        from dicom.filereader import read_data_element
-        data_elem = read_data_element(fp)
-        fp.close()
-        if data_elem.VR != self.VR:
-            raise ValueError, "Deferred read VR '%s' does not match original '%s'" % (data_elem.VR, self.VR)
-        if data_elem.tag != self.tag:
-            raise ValueError, "Deferred read tag %s does not match original %s" % (str(data_elem.tag), str(self.tag))
-        
-        # Everything is ok, now this object should act like usual DataElement
-        self._value = data_elem._value
-        
+    return DataElement(raw.tag, VR, value, raw.value_tell, raw.length==0xFFFFFFFFL)
         
 class Attribute(DataElement):
     """Deprecated -- use DataElement instead"""
