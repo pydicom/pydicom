@@ -37,10 +37,8 @@ class DatasetTests(unittest.TestCase):
         # This comes from bug fix for issue 42
         # First, fake enough to try the pixel_array property
         ds = Dataset()
+        ds.file_meta = Dataset()
         ds.PixelData = 'xyzlmnop'
-        ds.isLittleEndian = True
-#        save_Numpy = haveNumpy
-#        haveNumpy = False
         attribute_error_msg = "AttributeError in pixel_array property: " + \
                            "Dataset does not have attribute 'TransferSyntaxUID'"
         self.failUnlessExceptionArgs(attribute_error_msg,

@@ -5,7 +5,7 @@
 #    available at http://pydicom.googlecode.com
 
 import unittest
-from dicom.tag import Tag
+from dicom.tag import Tag, TupleTag
 
 class Values(unittest.TestCase):
     def testGoodInts(self):
@@ -14,8 +14,10 @@ class Values(unittest.TestCase):
         tag = Tag(0xFFFFFFEE)
     def testGoodTuple(self):
         """Tags can be constructed with two-tuple of 2-byte integers."""
-        tag = Tag((0x300a, 0x00b0))
-        tag = Tag((0xFFFF, 0xFFee))
+        tag = TupleTag((0xFFFF, 0xFFee))
+        tag = TupleTag((0x300a, 0x00b0))
+        self.assertEqual(tag.group, 0x300a, "Expected tag.group 0x300a, got %r" % tag.group)
+        
     def testAnyUnpack(self):
         """Tags can be constructed from list........................."""
         tag = Tag([2,0])
