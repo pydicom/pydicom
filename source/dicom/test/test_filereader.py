@@ -80,7 +80,7 @@ class ReaderTests(unittest.TestCase):
         beamnum = fract.ReferencedBeams[0].ReferencedBeamNumber
         self.assertEqual(beamnum, 1, "Beam number not the expected value")
     def testCT(self):
-        """Returns correct values for sample data elements in test CT file"""
+        """Returns correct values for sample data elements in test CT file...."""
         ct = read_file(ct_name)
         self.assertEqual(ct.file_meta.ImplementationClassUID, '1.3.6.1.4.1.5962.2',
                 "ImplementationClassUID not the expected value")
@@ -103,7 +103,7 @@ class ReaderTests(unittest.TestCase):
         self.assertEqual(expected, got, msg % (expected, got))
         
     def testMR(self):
-        """Returns correct values for sample data elements in test MR file"""
+        """Returns correct values for sample data elements in test MR file...."""
         mr = read_file(mr_name)
         # (0010, 0010) Patient's Name           'CompressedSamples^MR1'
         self.assertEqual(mr.PatientsName, 'CompressedSamples^MR1', "Wrong patient name")
@@ -136,7 +136,7 @@ class JPEG2000Tests(unittest.TestCase):
     def setUp(self):
         self.jpeg = read_file(jpeg2000_name)
     def testJPEG2000(self):
-        """JPEG2000: Returns correct values for sample data elements..........."""
+        """JPEG2000: Returns correct values for sample data elements............"""
         expected = [Tag(0x0054, 0x0010), Tag(0x0054, 0x0020)] # XX also tests multiple-valued AT data element
         got = self.jpeg.FrameIncrementPointer
         self.assertEqual(got, expected, "JPEG2000 file, Frame Increment Pointer: expected %s, got %s" % (expected, got))
@@ -145,26 +145,26 @@ class JPEG2000Tests(unittest.TestCase):
         expected = 'Lossy Compression'
         self.assertEqual(got, expected, "JPEG200 file, Code Meaning got %s, expected %s" % (got, expected))
     def testJPEG2000PixelArray(self):
-        """JPEG2000: Fails gracefully when uncompressed data is asked for..."""
+        """JPEG2000: Fails gracefully when uncompressed data is asked for......."""
         self.assertRaises(NotImplementedError, self.jpeg._getPixelArray)
 
 class JPEGlossyTests(unittest.TestCase):
     def setUp(self):
         self.jpeg = read_file(jpeg_lossy_name)
     def testJPEGlossy(self):
-        """JPEG-lossy: Returns correct values for sample data elements........."""
+        """JPEG-lossy: Returns correct values for sample data elements.........."""
         got = self.jpeg.DerivationCodes[0].CodeMeaning
         expected = 'Lossy Compression'
         self.assertEqual(got, expected, "JPEG-lossy file, Code Meaning got %s, expected %s" % (got, expected))
     def testJPEGlossyPixelArray(self):
-        """JPEG-lossy: Fails gracefully when uncompressed data is asked for."""
+        """JPEG-lossy: Fails gracefully when uncompressed data is asked for....."""
         self.assertRaises(NotImplementedError, self.jpeg._getPixelArray)
 
 class JPEGlosslessTests(unittest.TestCase):
     def setUp(self):
         self.jpeg = read_file(jpeg_lossless_name)
     def testJPEGlossless(self):
-        """JPEGlossless: Returns correct values for sample data elements..........."""
+        """JPEGlossless: Returns correct values for sample data elements........"""
         got = self.jpeg.SourceImages[0].PurposeofReferenceCodes[0].CodeMeaning
         expected = 'Uncompressed predecessor'
         self.assertEqual(got, expected, "JPEG-lossless file, Code Meaning got %s, expected %s" % (got, expected))
@@ -211,6 +211,40 @@ class DeferredReadTests(unittest.TestCase):
         if os.path.exists(self.testfile_name):
             os.remove(self.testfile_name)
 
+class FileLikeTests(unittest.TestCase):
+    """Test that can read DICOM files with file-like object rather than filename"""
+    def testReadFileGivenFileObject(self):
+        """filereader: can read using already opened file............"""
+        f = open(ct_name, 'rb')
+        ct = read_file(f)
+        # Tests here simply repeat testCT -- perhaps should collapse the code together?
+
+        self.assertEqual(ct.file_meta.ImplementationClassUID, '1.3.6.1.4.1.5962.2',
+                "ImplementationClassUID not the expected value")
+        self.assertEqual(ct.file_meta.ImplementationClassUID,
+                        ct.file_meta[0x2, 0x12].value,
+                "ImplementationClassUID does not match the value accessed by tag number")
+        # (0020, 0032) Image Position (Patient)  [-158.13580300000001, -179.035797, -75.699996999999996]
+        imagepos = ct.ImagePositionPatient
+        self.assert_(isClose(imagepos, [-158.135803, -179.035797, -75.699997]),
+                "ImagePosition(Patient) values not as expected")
+        self.assertEqual(ct.Rows, 128, "Rows not 128")
+        self.assertEqual(ct.Columns, 128, "Columns not 128")
+        self.assertEqual(ct.BitsStored, 16, "Bits Stored not 16")
+        self.assertEqual(len(ct.PixelData), 128*128*2, "Pixel data not expected length")
+        # Should also be able to close the file ourselves without exception raised:
+        f.close()
+    def testReadFileGivenFileLikeObject(self):
+        """filereader: can read using a file-like (StringIO) file...."""
+        file_like = StringIO(open(ct_name, 'rb').read())
+        ct = read_file(file_like)
+        # Tests here simply repeat some of testCT test
+        imagepos = ct.ImagePositionPatient
+        self.assert_(isClose(imagepos, [-158.135803, -179.035797, -75.699997]),
+                "ImagePosition(Patient) values not as expected")
+        self.assertEqual(len(ct.PixelData), 128*128*2, "Pixel data not expected length")
+        # Should also be able to close the file ourselves without exception raised:
+        file_like.close()
 
 if __name__ == "__main__":
     # This is called if run alone, but not if loaded through run_tests.py
