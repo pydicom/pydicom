@@ -39,14 +39,14 @@ def namedtuple(typename, field_names, verbose=False, rename=False):
         names = list(field_names)
         seen = set()
         for i, name in enumerate(names):
-            if (not min(c.isalnum() or c=='_' for c in name) or _iskeyword(name)
+            if (not min([c.isalnum() or c=='_' for c in name]) or _iskeyword(name)
                 or not name or name[0].isdigit() or name.startswith('_')
                 or name in seen):
                     names[i] = '_%d' % i
             seen.add(name)
         field_names = tuple(names)
     for name in (typename,) + field_names:
-        if not min(c.isalnum() or c=='_' for c in name):
+        if not min([c.isalnum() or c=='_' for c in name]):
             raise ValueError('Type names and field names can only contain alphanumeric characters and underscores: %r' % name)
         if _iskeyword(name):
             raise ValueError('Type names and field names cannot be a keyword: %r' % name)
@@ -63,7 +63,7 @@ def namedtuple(typename, field_names, verbose=False, rename=False):
     # Create and fill-in the class template
     numfields = len(field_names)
     argtxt = repr(field_names).replace("'", "")[1:-1]   # tuple repr without parens or quotes
-    reprtxt = ', '.join('%s=%%r' % name for name in field_names)
+    reprtxt = ', '.join(['%s=%%r' % name for name in field_names])
     template = '''class %(typename)s(tuple):
         '%(typename)s(%(argtxt)s)' \n
         __slots__ = () \n
@@ -114,39 +114,3 @@ def namedtuple(typename, field_names, verbose=False, rename=False):
         pass
 
     return result
-
-
-
-
-
-
-if __name__ == '__main__':
-    # verify that instances can be pickled
-    from cPickle import loads, dumps
-    Point = namedtuple('Point', 'x, y', True)
-    p = Point(x=10, y=20)
-    assert p == loads(dumps(p, -1))
-
-    # test and demonstrate ability to override methods
-    class Point(namedtuple('Point', 'x y')):
-        @property
-        def hypot(self):
-            return (self.x ** 2 + self.y ** 2) ** 0.5
-        def __str__(self):
-            return 'Point: x=%6.3f y=%6.3f hypot=%6.3f' % (self.x, self.y, self.hypot)
-
-    for p in Point(3,4), Point(14,5), Point(9./7,6):
-        print p
-
-    class Point(namedtuple('Point', 'x y')):
-        'Point class with optimized _make() and _replace() without error-checking'
-        _make = classmethod(tuple.__new__)
-        def _replace(self, _map=map, **kwds):
-            return self._make(_map(kwds.get, ('x', 'y'), self))
-
-    print Point(11, 22)._replace(x=100)
-
-    import doctest
-    TestResults = namedtuple('TestResults', 'failed attempted')
-    print TestResults(*doctest.testmod())
-

@@ -3,8 +3,10 @@ pydicom release checklist
 * review issue list for any other changes that should be in the release
 * edit __init__.py version number
 * edit setup.py -- version number, description, license if necessary, etc
-* run test/all.bat on windows to test all python versions against svn code
-* run test/all.sh on linux/mac to test all python versions against svn code
+* remove extra debug statements (e.g. in data_element_generator) and extra print statements
+* run test/performance/time_test.py to check performance hasn't degraded
+* run test/all.bat on windows to test with all supported python versions
+* run test/all.sh on linux/mac to test all supported python versions
 * run each example file and clean up any output files created
 * make sure all changes have been committed to repository
 * loop back to running all tests if any changes to main code made

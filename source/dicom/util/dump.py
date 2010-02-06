@@ -55,7 +55,30 @@ def hexdump(file_in, StartAddress=0, StopAddress=None, showAddress=True):
         str_out.write("\n")
         
     return str_out.getvalue()
+
+def PrettyPrint(ds, indent=0, indentChars="   "):
+    """Print a dataset directly, with indented levels.
+
+    This is just like Dataset._PrettyStr, but more useful for debugging as it
+    prints each item immediately rather than composing a string, making it 
+    easier to immediately see where an error in processing a dataset starts.
+
+    """
     
+    strings = []
+    indentStr = indentChars * indent
+    nextIndentStr = indentChars *(indent+1)
+    for data_element in ds:
+        if data_element.VR == "SQ":   # a sequence
+            new_str = indentStr + str(data_element.tag) + "  %s   %i item(s) ---- " % ( data_element.name, len(data_element.value))
+            print new_str
+            for dataset in data_element.value:
+                PrettyPrint(dataset, indent+1)
+                print nextIndentStr + "---------"
+        else:
+            print indentStr + repr(data_element)
+
+   
 if __name__ == "__main__":
     import sys
     filename = sys.argv[1]
