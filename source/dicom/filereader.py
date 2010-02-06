@@ -37,7 +37,7 @@ from dicom.sequence import Sequence
 from dicom.misc import size_in_bytes
 from dicom.fileutil import absorb_delimiter_item, read_undefined_length_value
 from dicom.fileutil import length_of_undefined_length
-from struct import unpack, Struct
+from struct import unpack
 from sys import byteorder
 sys_isLittleEndian = (byteorder == 'little')
 
@@ -151,6 +151,7 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian, stop_when=None,
     fp_read = fp.read
     fp_tell = fp.tell
     logger_debug = logger.debug
+    debugging = dicom.debugging
     
     if is_little_endian:
         endian_chr = "<"
@@ -158,7 +159,6 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian, stop_when=None,
         endian_chr = ">"
     if is_implicit_VR:
         unpack_format = endian_chr + "HHL" # XXX in python >=2.5, can do struct.Struct to save time
-        VR = None
     else: # Explicit VR
         unpack_format = endian_chr + "HH2s"
         long_length_format = endian_chr + "2sL"
@@ -167,6 +167,7 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian, stop_when=None,
     while True:
         # Read tag, VR, length, get ready to read value
         if is_implicit_VR:
+            VR = None # must reset each time -- may have looked up on last iteration (e.g. SQ)
             bytes = fp_read(8)
             if len(bytes) < 8:
                 raise StopIteration # at end of file
@@ -176,7 +177,8 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian, stop_when=None,
             if len(bytes) < 6:
                 raise StopIteration # at end of file
             group, elem, VR = unpack(unpack_format, bytes)
-            # logger_debug("%04x: (%04x, %04x) ExplVR='%s'" % (fp_tell()-6, group, elem , VR))
+            if debugging:
+                logger_debug("%04x: (%04x, %04x) ExplVR='%s'" % (fp_tell()-6, group, elem , VR))
             if VR in ('OB','OW','OF','SQ','UN', 'UT'):
                 reserved, length = unpack(long_length_format, fp_read(6))
             else:
@@ -199,7 +201,8 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian, stop_when=None,
                 fp.seek(fp_tell()+length)
             else:
                 value = fp_read(length)
-                # logger_debug("%04x: (%04x, %04x) %4s %04x %30r " % (value_tell, group, elem, VR, length, value[:30]))
+                if debugging:
+                    logger_debug("%04x: (%04x, %04x) %4s %04x %30r " % (value_tell, group, elem, VR, length, value[:30]))
             yield RawDataElement(tag, VR, length, value, value_tell, 
                                      is_implicit_VR, is_little_endian)
 
@@ -211,13 +214,15 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian, stop_when=None,
             if VR is None:
                 VR = dictionaryVR(tag)
             if VR == 'SQ':
-                # logger_debug("%04x: Reading and parsing undefined length sequence"
-                        #        % fp_tell())
+                if debugging:
+                    logger_debug("%04x: Reading and parsing undefined length sequence"
+                                % fp_tell())
                 seq = read_sequence(fp, is_implicit_VR, is_little_endian, length)
                 yield DataElement(tag, VR, seq, value_tell, is_undefined_length=True)
             else:
                 delimiter = SequenceDelimiterTag
-                # logger_debug("Reading undefined length data element")
+                if debugging:
+                    logger_debug("Reading undefined length data element")
                 value = read_undefined_length_value(fp, is_little_endian, delimiter,
                                         defer_size)
                 yield RawDataElement(tag, VR, length, value, value_tell,
@@ -275,15 +280,18 @@ def read_sequence(fp, is_implicit_VR, is_little_endian, bytelength):
 def read_sequence_item(fp, is_implicit_VR, is_little_endian):
     """Read and return a single sequence item, i.e. a Dataset"""
     if is_little_endian:
-        tag_length_struct = Struct("<HHL")
+        tag_length_format = "<HHL"
     else:
-        tag_length_struct = Struct(">HHL")
-    group, element, length = tag_length_struct.unpack(fp.read(8))
+        tag_length_format = ">HHL"
+    try:
+        group, element, length = unpack(tag_length_format, fp.read(8))
+    except:
+        raise IOError, "No tag to read at file position %05x" % fp.tell()
 
     tag = (group, element)
     if tag == SequenceDelimiterTag: # No more items, time to stop reading
         data_element = DataElement(tag, None, None, fp.tell()-4)
-        # logger.debug("%04x: %s" % (fp.tell()-4, str(data_element)))
+        logger.debug("%04x: %s" % (fp.tell()-4, "End of Sequence"))
         if length != 0:
             logger.warning("Expected 0x00000000 after delimiter, found 0x%x, at position 0x%x" % (length, fp.tell()-4))
         return None
@@ -477,17 +485,49 @@ def read_deferred_data_element(filename, timestamp, raw_data_elem):
 if __name__ == "__main__":
     def hex2str(hexstr):
         """Return a bytestring rep of a string of hex rep of bytes separated by spaces"""
-        return "".join((chr(int(x,16)) for x in hexstr.split()))
+        return "".join([chr(int(x,16)) for x in hexstr.split()])  # after python 2.3 can be a () generator rather than a list
     
-    import shutil
-    import os
+    filename = "/Users/darcy/hg/pydicom/source/dicom/testfiles/rtss.dcm"
+    ds = read_file(filename)
+    from dicom.util.dump import PrettyPrint
+    # print ds.items()
+    PrettyPrint(ds)
+    # print ds
+    STOP
+    seq_str = (
+    " 06 30 10 00"   # Referenced Frame of Reference Sequence   1 item(s) ---- 
+    " ff ff ff ff"   #   undefined length
+        " fe ff 00 e0"   # Sequence Item 
+        " ff ff ff ff"  #   of undefined length 
+            " 20 00 52 00"    # (0020, 0052) Frame of Reference UID 
+            " 04 00 00 00"    # length 4
+            " 32 2e 31 36"    # 2.16  -- rest left out to simplify
+            " 06 30 12 00"    # RT Referenced Study Sequence  
+            " ff ff ff ff"      #   undefined length
+                " fe ff 00 e0"  # Sequence Item
+                " ff ff ff ff"  #   of undefined length
+                    " 08 00 50 11"  # (0008, 1150) Referenced SOP Class UID 
+                    " 04 00 00 00"  # length 4
+                    " 31 2e 32 2e"  # 1.2.          
+                    " 08 00 55 11"  # (0008, 1155) Referenced SOP Instance UID 
+                    " 04 00 00 00"  # length 4
+                    " 32 2e 31 36"  # 2.16
+                    " 06 30 14 00"  # (3006, 0014)  RT Referenced Series Sequence
+                    " ff ff ff ff"  # undefined length
+                        " fe ff 00 e0"  # Sequence Item
+                        " ff ff ff ff"  # undefined length
+                            " 20 00 0e 00"  # (0020, 000e) Series Instance UID  
+                            " 04 00 00 00"  # length 4
+                            " 32 2e 31 36"  # 2.16
+                        " fe ff 0d e0 00 00 00 00" # Item Delimiter Tag                     
+                    " fe ff dd e0 00 00 00 00" # Sequence Delimiter Tag
+                " fe ff 0d e0 00 00 00 00" # Item Delimiter Tag
+            " fe ff dd e0 00 00 00 00" # Sequence Delimiter Tag
+        " fe ff 0d e0 00 00 00 00" # Item Delimiter Tag
+    " fe ff dd e0 00 00 00 00"  # Sequence Delimiter Tag
+    )
+    infile = StringIO(hex2str(seq_str))
+    ds = read_file(infile)
+    from dicom.util import PrettyPrint
+    PrettyPrint(ds)
     
-    ct_name = "/Users/darcy/hg/pydicom-newread/source/dicom/testfiles/CT_small.dcm"
-    testfile_name = ct_name + ".tmp"
-    shutil.copyfile(ct_name, testfile_name)
-    try:
-        ds = read_file(testfile_name, defer_size=2000)
-    finally:
-        os.remove(testfile_name)
-    # Should throw an error:
-    data_elem = ds.PixelData

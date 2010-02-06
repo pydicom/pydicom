@@ -43,12 +43,15 @@ logger.addHandler(handler)
 from filereader import read_file, ReadFile  # latter one for backwards compatibility; remove later
 from filewriter import write_file, WriteFile # ditto
 
-__version__ = "0.9.4hg"
+__version__ = "0.9.4"
+debugging = False
 
-def debug(DebugOn=True):
-    global logger
-    if DebugOn:
+def debug(debug_on=True):
+    global logger, debugging
+    if debug_on:
         logger.setLevel(logging.DEBUG)
+        debugging = True
     else:
         logger.setLevel(logging.WARNING)
+        debugging = False
         
