@@ -19,6 +19,12 @@ try:
     from os import stat
 except:
     stat_available = False
+
+have_numpy = True
+try:
+    import numpy
+except:
+    have_numpy = False
 from dicom.filereader import read_file, data_element_generator
 from dicom.values import convert_value
 from dicom.tag import Tag
@@ -34,6 +40,8 @@ jpeg2000_name   = "JPEG2000.dcm"
 jpeg_lossy_name   = "JPEG-lossy.dcm"
 jpeg_lossless_name   = "JPEG-LL.dcm"
 deflate_name = "image_dfl.dcm"
+rtstruct_name = "rtstruct.dcm"
+
 dir_name = os.path.dirname(sys.argv[0])
 save_dir = os.getcwd()
 
@@ -102,8 +110,39 @@ class ReaderTests(unittest.TestCase):
         msg = "Mismatch in private tag name, expected '%s', got '%s'"
         self.assertEqual(expected, got, msg % (expected, got))
         
+        # Check that can read pixels - get last one in array
+        if have_numpy:
+            expected = 909
+            got = ct.pixel_array[-1][-1]
+            msg = "Did not get correct value for last pixel: expected %d, got %r" % (expected, got)
+            self.assertEqual(expected, got, msg)
+        else:
+            print "**Numpy not available -- pixel array test skipped**"
+        
+    def testRTstruct(self):
+        """Returns correct values for sample elements in test RTSTRUCT file...."""
+        # RTSTRUCT test file has complex nested sequences -- see rtstruct.dump file
+        rtss = read_file(rtstruct_name)
+        self.assertEqual(len(rtss.file_meta), 0, "Expected empty file_meta")
+        frame_of_ref = rtss.ReferencedFrameofReferences[0]
+        study = frame_of_ref.RTReferencedStudies[0]
+        uid = study.RTReferencedSeries[0].SeriesInstanceUID
+        expected = "1.2.826.0.1.3680043.8.498.2010020400001.2.1.1"
+        msg = "Expected Reference Series UID '%s', got '%s'" % (expected, uid)
+        self.assertEqual(expected, uid, msg)
+        
+        got = rtss.ROIContours[0].Contours[2].ContourNumber
+        expected = 3
+        msg = "Expected Contour Number %d, got %r" % (expected, got)
+        self.assertEqual(expected, got, msg)
+        
+        got = rtss.RTROIObservations[0].ROIPhysicalProperties[0].ROIPhysicalProperty
+        expected = 'REL_ELEC_DENSITY'
+        msg = "Expected Physical Property '%s', got %r" % (expected, got)
+        self.assertEqual(expected, got, msg)
+        
     def testMR(self):
-        """Returns correct values for sample data elements in test MR file...."""
+        """Returns correct values for sample data elements in test MR file....."""
         mr = read_file(mr_name)
         # (0010, 0010) Patient's Name           'CompressedSamples^MR1'
         self.assertEqual(mr.PatientsName, 'CompressedSamples^MR1', "Wrong patient name")

@@ -7,14 +7,19 @@
 
 import os.path
 import os
+import sys
+on_windows = sys.platform.startswith("win")
 
 # EDIT THIS SECTION --------------------------
 #    to point to local temp directory, and to a set of >400 DICOM files of same size to work on
 # I used images freely available from http://pcir.org
-tempfile = "/tmp/pydicom_stats"
-# I testImages freely available from pcir.org
-location_base = r"/Users/darcy/testdicom/"
-# location_base = r"/Volumes/Disk 1/testdicom/"  # Network disk location
+if on_windows:
+    tempfile = "c:/temp/pydicom_stats"
+    location_base = r"z:/testdicom/"
+else:
+    tempfile = "/tmp/pydicom_stats"
+    location_base = r"/Users/darcy/testdicom/"
+    # location_base = r"/Volumes/Disk 1/testdicom/"  # Network disk location
 locations = ["77654033_19950903/77654033/19950903/CT2/",
              "98890234_20010101/98890234/20010101/CT5/",
              "98890234_20010101/98890234/20010101/CT6/",
@@ -106,7 +111,7 @@ if __name__ == "__main__":
 
     # Clear disk cache for next run?
     import sys
-    if not sys.platform.startswith("win"):
+    if not on_windows:
         prompt= "Run purge command (linux/Mac OS X) to clear disk cache?...(N):"
         answer = raw_input(prompt)
         if answer.lower() == "y":
