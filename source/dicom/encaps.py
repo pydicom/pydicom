@@ -32,7 +32,7 @@ def defragment_data(data):
     
     # Convert data into a memory-mapped file
     fp = DicomStringIO(data)
-    fp.isLittleEndian = True # DICOM standard requires this
+    fp.is_little_endian = True # DICOM standard requires this
     BasicOffsetTable = read_item(fp)
     seq = []
     while True:

@@ -6,7 +6,7 @@
 #    available at http://pydicom.googlecode.com
 
 import unittest
-from dicom.dataset import Dataset, haveNumpy, PropertyError
+from dicom.dataset import Dataset, have_numpy, PropertyError
 from dicom.dataelem import DataElement
 from dicom.tag import Tag
 

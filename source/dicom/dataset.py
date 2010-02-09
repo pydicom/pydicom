@@ -19,7 +19,7 @@ Dataset(derived class of Python's dict class)
 #
 import sys
 from sys import byteorder
-sys_isLittleEndian = (byteorder == 'little')
+sys_is_little_endian = (byteorder == 'little')
 import logging
 logger = logging.getLogger('pydicom')
 from dicom.datadict import DicomDictionary, dictionaryVR
@@ -34,12 +34,12 @@ import cStringIO, StringIO
 import dicom # for write_file
 import dicom.charset
 
-haveNumpy = True
+have_numpy = True
 
 try:
     import numpy
 except:
-    haveNumpy = False
+    have_numpy = False
 
 stat_available = True
 try:
@@ -74,7 +74,7 @@ class Dataset(dict):
     """
     indentChars = "   "
     # Map image_dataset.BitsAllocated to NumPy typecode
-    if haveNumpy:
+    if have_numpy:
         NumpyPixelFormats = {8: numpy.uint8, 16:numpy.int16, 32:numpy.int32}
     
     def Add(self, data_element):
@@ -271,13 +271,13 @@ class Dataset(dict):
         """Extend dict.has_key() to handle *named tags*."""
         return self.__contains__(key)
 
-    # isBigEndian property
+    # is_big_endian property
     def _getBigEndian(self):
-        return not self.isLittleEndian
+        return not self.is_little_endian
     
     def _setBigEndian(self, value):
-        self.isLittleEndian = not value
-    isBigEndian = property(_getBigEndian, _setBigEndian)
+        self.is_little_endian = not value
+    is_big_endian = property(_getBigEndian, _setBigEndian)
 
     def __iter__(self):
         """Method to iterate through the dataset, returning data_elements.
@@ -309,14 +309,14 @@ class Dataset(dict):
         if not 'PixelData' in self:
             raise TypeError, "No pixel data found in this dataset."
 
-        if not haveNumpy:
+        if not have_numpy:
             msg = "The Numpy package is required to use PixelArray and numpy could not be imported.\n"
             raise ImportError, msg
 
         # determine the type used for the array
-        need_byteswap = (self.isLittleEndian != sys_isLittleEndian)
+        need_byteswap = (self.is_little_endian != sys_is_little_endian)
 
-        if haveNumpy:
+        if have_numpy:
             if self.BitsAllocated not in self.NumpyPixelFormats:
                 raise NotImplementedError, "Do not have NumPy dtype for BitsAllocated=%d, please update Dataset.NumpyPixelFormats" % self.BitsAllocated
             format = self.NumpyPixelFormats[self.BitsAllocated]

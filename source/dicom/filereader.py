@@ -39,7 +39,7 @@ from dicom.fileutil import absorb_delimiter_item, read_undefined_length_value
 from dicom.fileutil import length_of_undefined_length
 from struct import unpack
 from sys import byteorder
-sys_isLittleEndian = (byteorder == 'little')
+sys_is_little_endian = (byteorder == 'little')
 
 def open_dicom(filename):
     """Return an iterator for DICOM file data elements.
