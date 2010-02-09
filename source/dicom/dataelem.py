@@ -276,8 +276,8 @@ class DeferredDataElement(DataElement):
         # Check current file object and save info needed for read later
         # if not isinstance(fp, DicomFile):
             # raise NotImplementedError, "Deferred read is only available for DicomFile objects"
-        self.fp_isImplicitVR = fp.isImplicitVR
-        self.fp_isLittleEndian = fp.isLittleEndian
+        self.fp_is_implicit_VR = fp.is_implicit_VR
+        self.fp_is_little_endian = fp.is_little_endian
         self.filepath = fp.name
         self.file_mtime = file_mtime
         self.data_element_tell = data_element_tell

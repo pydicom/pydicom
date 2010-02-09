@@ -112,22 +112,22 @@ class DicomIO(object):
     def _getLittleEndian(self):
         return self._LittleEndian
     def _setBigEndian(self, value):
-        self.isLittleEndian = not value # note: must use self.isLittleEndian not self._LittleEndian
+        self.is_little_endian = not value # note: must use self.is_little_endian not self._LittleEndian
     def _getBigEndian(self):
-        return not self.isLittleEndian
+        return not self.is_little_endian
     def _getImplicitVR(self):
         return self._ImplicitVR
     def _setImplicitVR(self, value):
         self._ImplicitVR = value
     def _setExplicitVR(self, value):
-        self.isImplicitVR = not value
+        self.is_implicit_VR = not value
     def _getExplicitVR(self):
-        return not self.isImplicitVR
+        return not self.is_implicit_VR
     
-    isLittleEndian = property(_getLittleEndian, _setLittleEndian)
-    isBigEndian =    property(_getBigEndian, _setBigEndian)
-    isImplicitVR =   property(_getImplicitVR, _setImplicitVR)
-    isExplicitVR =   property(_getExplicitVR, _setExplicitVR)
+    is_little_endian = property(_getLittleEndian, _setLittleEndian)
+    is_big_endian =    property(_getBigEndian, _setBigEndian)
+    is_implicit_VR =   property(_getImplicitVR, _setImplicitVR)
+    is_explicit_VR =   property(_getExplicitVR, _setExplicitVR)
         
 class DicomFileLike(DicomIO):
     def __init__(self, file_like_obj):
