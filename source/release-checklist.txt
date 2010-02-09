@@ -6,10 +6,14 @@ pydicom release checklist
 * remove extra debug statements (e.g. in data_element_generator) and extra print statements
 * run test/performance/time_test.py to check performance hasn't degraded
 * run test/all.bat on windows to test with all supported python versions
-* run test/all.sh on linux/mac to test all supported python versions
+* run test/shell_all on linux/mac to test all supported python versions
 * run each example file and clean up any output files created
-* make sure all changes have been committed to repository
+
+* hg commit all changes
+* tag the release -- hg tag "release-X.X.X". Auto-commits.
+* hg push to repository
 * loop back to running all tests if any changes to main code made
+   (can hg tag --remove release-X.X.X if needed)
 * check back out to a clean directory -- that way sure to not include extra files in the build
 * build the package files
     * on windows, python setup.py bdist_wininst --> get windows installer exe in dist directory
@@ -19,7 +23,7 @@ pydicom release checklist
   * linux   -- 32-bit  / 64-bit
   and run the tests in at least one python version on each system
 * upload dist files to googlecode site
-* run easy_install (retrieve from pypi) again on clean system and make sure it works:
+* run pip or easy_install (retrieve from pypi) again on clean system and make sure it works:
 * verify that source install has _all_ directories and subdirectories included
 * update documentation:
   * update Release Notes page
@@ -29,10 +33,6 @@ pydicom release checklist
   * read all pages quickly
 * update News page with quick synopsis of major features
 * announce on pydicom google group
-* tag the release -- with TortoiseSvn use Copy (Branch / Tag), 
-           to URL https://pydicom.googlecode.com/svn/tags/release-X.X.X,
-           with Create copy from HEAD, if no changes made since built, else use revision number,
-           and message "Tag version X.X.X release."
 * update info on medphysfiles.com
 * register with pypi -- python setup.py register
 * others -- freshmeat? idoimaging.com? macports?
