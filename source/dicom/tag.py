@@ -32,6 +32,8 @@ def Tag(arg, arg2=None):
 class BaseTag(long):
     """Class for storing the dicom (group, element) tag"""
     # Store the 4 bytes of a dicom tag as a python long (arbitrary length, not like C-language long).
+    # NOTE: logic (in write_AT of filewriter at least) depends on this 
+    #           NOT being a tuple, for checks if a value is a multi-value element
     # Using python int's may be different on different hardware platforms.
     # Simpler to deal with one number and separate to (group, element) when necessary.
     # Also can deal with python differences in handling ints starting in python 2.4,

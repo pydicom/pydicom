@@ -131,16 +131,16 @@ class DicomIO(object):
         
 class DicomFileLike(DicomIO):
     def __init__(self, file_like_obj):
+        self.parent = file_like_obj
         self.parent_read = file_like_obj.read
         self.write = getattr(file_like_obj, "write", self.no_write)
         self.seek = file_like_obj.seek
         self.tell = file_like_obj.tell
         self.close = file_like_obj.close
-        if hasattr(file_like_obj, 'name'):
-            self.name = file_like_obj.name
+        self.name = getattr(file_like_obj, 'name', '<no filename>')
     def no_write(self, bytes):
-        """Used for file-like objects (e.g. cStringIO), where no write is available"""
-        raise IOError, "This DicomFileLike object cannot write (e.g. cStringIO)"
+        """Used for file-like objects where no write is available"""
+        raise IOError, "This DicomFileLike object has no write() method"
         
 def DicomFile(*args, **kwargs):
     return DicomFileLike(open(*args, **kwargs))

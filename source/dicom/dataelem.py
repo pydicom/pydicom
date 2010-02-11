@@ -42,8 +42,8 @@ def isMultiValue(value):
     if isString(value):
         return False
     try:
-        value[0]
-    except:
+        iter(value)
+    except TypeError:
         return False
     return True
 
