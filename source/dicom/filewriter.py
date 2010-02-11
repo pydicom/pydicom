@@ -172,12 +172,13 @@ def write_UN(fp, data_element):
 def write_ATvalue(fp, data_element):
     """Write a data_element tag to a file."""
     try:
-        data_element.value[1]  # see if is multi-valued AT 
+        iter(data_element.value) # see if is multi-valued AT; # Note will fail if Tag ever derived from true tuple rather than being a long 
     except TypeError:
         tag = Tag(data_element.value)   # make sure is expressed as a Tag instance
         fp.write_tag(tag)
     else:
-        for tag in data_element.value:
+        tags = [Tag(tag) for tag in data_element.value]
+        for tag in tags:
             fp.write_tag(tag)
             
 
