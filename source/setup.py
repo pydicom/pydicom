@@ -1,17 +1,19 @@
 #!/usr/bin/env python
-import ez_setup
-ez_setup.use_setuptools()
-from setuptools import setup
+from distribute_setup import use_setuptools
+use_setuptools()
+
+from setuptools import setup, find_packages
 import os
 import os.path
 
 import sys
 
 setup(name="pydicom",
+      packages = find_packages(),
       include_package_data = True,
-      zip_safe = False, # want users to be able to see included examples,tests
-      packages = ['dicom'],
       version="0.9.4",
+      package_data = {'dicom': ['testfiles/*.dcm']},
+      zip_safe = False, # want users to be able to see included examples,tests
       description="Pure python package for DICOM medical file reading and writing",
       author="Darcy Mason",
       author_email="darcymason@gmail.com",

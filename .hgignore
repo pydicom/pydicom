@@ -17,3 +17,8 @@ syntax: glob
 
 # python byte-code files
 *.pyc
+
+# Build/dist files
+source/dist/*
+source/build/*
+source/pydicom.egg-info/*
