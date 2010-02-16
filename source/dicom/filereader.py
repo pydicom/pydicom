@@ -76,7 +76,7 @@ class DicomIter(object):
         self.stop_when = stop_when
         self.preamble = preamble = read_preamble(fp)
         self.has_header = has_header = (preamble is not None)
-        self.file_meta_info = {}
+        self.file_meta_info = Dataset()
         if has_header:
             self.file_meta_info = file_meta_info = _read_file_meta_info(fp)
             transfer_syntax = file_meta_info.TransferSyntaxUID
@@ -359,7 +359,7 @@ def read_partial(fileobj, stop_when=None, defer_size=None):
         if None, then the whole file is read.
     """
     preamble = read_preamble(fileobj)
-    file_meta_dataset = {}
+    file_meta_dataset = Dataset()
     # Assume a transfer syntax, correct it as necessary
     is_implicit_VR = True
     is_little_endian = True

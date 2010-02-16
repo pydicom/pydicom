@@ -260,7 +260,7 @@ def write_file(filename, dataset, WriteLikeOriginal=True):
     
     file_meta = dataset.file_meta
     if file_meta is None:
-        file_meta = {}
+        file_meta = Dataset()
     if 'TransferSyntaxUID' not in file_meta:
         if dataset.is_little_endian and dataset.is_implicit_VR:
             file_meta.AddNew((2, 0x10), 'UI', ImplicitVRLittleEndian)
