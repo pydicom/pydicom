@@ -123,7 +123,10 @@ class ReaderTests(unittest.TestCase):
         """Returns correct values for sample elements in test RTSTRUCT file...."""
         # RTSTRUCT test file has complex nested sequences -- see rtstruct.dump file
         rtss = read_file(rtstruct_name)
-        self.assertEqual(len(rtss.file_meta), 0, "Expected empty file_meta")
+        expected = '1.2.840.10008.1.2' # implVR little endian
+        got = rtss.file_meta.TransferSyntaxUID
+        msg = "Expected transfer syntax %r, got %r" % (expected, got)
+        self.assertEqual(expected, got, msg)
         frame_of_ref = rtss.ReferencedFrameofReferences[0]
         study = frame_of_ref.RTReferencedStudies[0]
         uid = study.RTReferencedSeries[0].SeriesInstanceUID

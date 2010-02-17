@@ -387,7 +387,7 @@ def read_partial(fileobj, stop_when=None, defer_size=None):
             #   e.g. all Encapsulated (JPEG etc) are ExplVR-LE by Standard PS 3.5-2008 A.4 (p63)
             is_implicit_VR = False
     else: # no header -- use the is_little_endian, implicit assumptions
-        transfer_syntax = dicom.UID.ImplicitVRLittleEndian
+        file_meta_dataset.TransferSyntaxUID = dicom.UID.ImplicitVRLittleEndian
 
     try:
         dataset = read_dataset(fileobj, is_implicit_VR, is_little_endian, 
