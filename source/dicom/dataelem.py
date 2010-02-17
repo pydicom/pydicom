@@ -312,9 +312,9 @@ def DataElement_from_raw(raw_data_element):
         try:
             VR = dictionaryVR(raw.tag)
         except KeyError:
-            if tag.is_private:
+            if raw.tag.is_private:
                 VR = 'OB'  # just read the bytes, no way to know what they mean
-            elif tag.element == 0:  # group length tag implied in versions < 3.0
+            elif raw.tag.element == 0:  # group length tag implied in versions < 3.0
                 VR = 'UL'
             else:
                 raise KeyError, "Unknown DICOM tag %s - can't look up VR" % str(tag)    
