@@ -41,7 +41,22 @@ from struct import unpack
 from sys import byteorder
 sys_is_little_endian = (byteorder == 'little')
 
-def open_dicom(filename):
+class InvalidDicomError(Exception):
+    """Exception that is raised when the the file does not seem
+    to be a valid dicom file. This is the case when the three
+    characters "DICM" are not present at position 128 in the file.
+    (According to the dicom specification, each dicom file should 
+    have this.)
+    
+    To force reading the file (because maybe it is a dicom file without
+    a header), use read_file(..., force=True).
+    """
+    def __init__(self, *args):
+        if not args:
+            args = ('The specified file is not a valid DICOM file.',)
+        Exception.__init__(self, *args)
+
+def open_dicom(filename, force=False):
     """Return an iterator for DICOM file data elements.
 
     Similar to opening a file using python open() and iterating by line
@@ -60,12 +75,12 @@ def open_dicom(filename):
     or to only read to a certain point and then stop
     """
 
-    return DicomIter(DicomFile(filename,'rb'))
+    return DicomIter(DicomFile(filename,'rb'), force=force)
 
 class DicomIter(object):
     """Iterator over DICOM data elements created from a file-like object
     """
-    def __init__(self, fp, stop_when=None):
+    def __init__(self, fp, stop_when=None, force=False):
         """Read the preambleand meta info, prepare iterator for remainder
 
         fp -- an open DicomFileLike object, at start of file
@@ -74,7 +89,7 @@ class DicomIter(object):
         """
         self.fp = fp
         self.stop_when = stop_when
-        self.preamble = preamble = read_preamble(fp)
+        self.preamble = preamble = read_preamble(fp, force)
         self.has_header = has_header = (preamble is not None)
         self.file_meta_info = Dataset()
         if has_header:
@@ -331,10 +346,10 @@ def read_file_meta_info(filename):
     without having to read the entire files.
     """
     fp = DicomFile(filename, 'rb')
-    preamble = read_preamble(fp)
+    preamble = read_preamble(fp, False) # if no header, raise exception
     return _read_file_meta_info(fp)
 
-def read_preamble(fp):
+def read_preamble(fp, force):
     """Read and return the DICOM preamble and read past the 'DICM' marker.
     If 'DICM' does not exist, assume no preamble, return None, and
     rewind file to the beginning..
@@ -343,22 +358,25 @@ def read_preamble(fp):
     preamble = fp.read(0x80)
     magic = fp.read(4)
     if magic != "DICM":
-        logger.info("File is not a standard DICOM file; 'DICM' header is missing. Assuming no header and continuing")
-        preamble = None
-        fp.seek(0)
+        if force:
+            logger.info("File is not a standard DICOM file; 'DICM' header is missing. Assuming no header and continuing")
+            preamble = None
+            fp.seek(0)
+        else:
+            raise InvalidDicomError
     return preamble
 
 def _at_pixel_data(tag, VR, length):
     return tag == (0x7fe0, 0x0010)
 
-def read_partial(fileobj, stop_when=None, defer_size=None):
+def read_partial(fileobj, stop_when=None, defer_size=None, force=False):
     """Parse a DICOM file until a condition is met; return partial dataset
     fileobj -- a file-like object. This function does not close it.
     stop_when -- a function which takes tag, VR, length, and returns True or False.
         A True value means read_data_element will raise StopIteration.
         if None, then the whole file is read.
     """
-    preamble = read_preamble(fileobj)
+    preamble = read_preamble(fileobj, force) # raises an exception if force=False
     file_meta_dataset = Dataset()
     # Assume a transfer syntax, correct it as necessary
     is_implicit_VR = True
@@ -397,7 +415,7 @@ def read_partial(fileobj, stop_when=None, defer_size=None):
     return FileDataset(fileobj, dataset, preamble, file_meta_dataset, is_implicit_VR,
                         is_little_endian)
 
-def read_file(fp, defer_size=None, stop_before_pixels=False):
+def read_file(fp, defer_size=None, stop_before_pixels=False, force=False):
     """Return a Dataset containing the contents of the Dicom file
 
     fp -- either a file-like object, or a string containing the file name.
@@ -407,6 +425,8 @@ def read_file(fp, defer_size=None, stop_before_pixels=False):
         Default None means all elements read into memory.
     stop_before_pixels -- Set False to stop before reading pixels (and anything after them).
                    If False, a partial dataset will be returned.
+    force -- Set to True to force reading the file even if no header is found.
+                   If False, a dicom.filereader.InvalidDicomError is raised when the file is not valid DICOM.
     """
     # Open file if not already a file object
     caller_owns_file = True
@@ -426,7 +446,7 @@ def read_file(fp, defer_size=None, stop_before_pixels=False):
     if stop_before_pixels:
         stop_when = _at_pixel_data
     try:
-        dataset = read_partial(fp, stop_when, defer_size=defer_size)
+        dataset = read_partial(fp, stop_when, defer_size=defer_size, force=force)
     finally:
         if not caller_owns_file:
             fp.close()
