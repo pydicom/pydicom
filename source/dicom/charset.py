@@ -23,7 +23,7 @@ python_encoding = {
     'ISO_IR 126': 'iso_ir_126',  # Greek
     'ISO_IR 127': 'iso_ir_127',  # Arab
     'ISO_IR 138': 'iso_ir_138', # Hebrew
-    'ISO_IR 144': 'iso_ir_144', # Russion
+    'ISO_IR 144': 'iso_ir_144', # Russian
     }
 
 from dicom.valuerep import PersonNameUnicode, PersonName
@@ -72,6 +72,16 @@ def decode(data_element, dicom_character_set):
             encodings = [encodings[0]]*3
         if len(encodings) == 2:
             encodings.append(encodings[1])
-        data_element.value = PersonNameUnicode(data_element.value, encodings)
+        if data_element.VM == 1:
+            data_element.value = PersonNameUnicode(data_element.value, encodings)
+        else:
+            data_element.value = [PersonNameUnicode(value, encodings) 
+                                    for value in data_element.value]
     if data_element.VR in ['SH', 'LO', 'ST', 'LT', 'UT']:
-        data_element.value = data_element.value.decode(python_encoding[dicom_character_set[0]])
+        if data_element.VM == 1:
+            data_element.value = data_element.value.decode(
+                                        python_encoding[dicom_character_set[0]])
+        else:
+            data_element.value = [value.decode(
+                                    python_encoding[dicom_character_set[0]]) 
+                                    for value in data_element.value]
