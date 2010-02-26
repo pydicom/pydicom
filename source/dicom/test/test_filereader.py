@@ -25,7 +25,7 @@ try:
     import numpy
 except:
     have_numpy = False
-from dicom.filereader import read_file, data_element_generator
+from dicom.filereader import read_file, data_element_generator, InvalidDicomError
 from dicom.values import convert_value
 from dicom.tag import Tag
 from dicom.sequence import Sequence
@@ -118,11 +118,16 @@ class ReaderTests(unittest.TestCase):
             self.assertEqual(expected, got, msg)
         else:
             print "**Numpy not available -- pixel array test skipped**"
+    def testNoForce(self):
+        """Raises exception if missing DICOM header and force==False..........."""
+        self.assertRaises(InvalidDicomError, read_file, rtstruct_name)
         
     def testRTstruct(self):
         """Returns correct values for sample elements in test RTSTRUCT file...."""
         # RTSTRUCT test file has complex nested sequences -- see rtstruct.dump file
-        rtss = read_file(rtstruct_name)
+        # Also has no DICOM header ... so tests 'force' argument of read_file
+        
+        rtss = read_file(rtstruct_name, force=True)
         expected = '1.2.840.10008.1.2' # implVR little endian
         got = rtss.file_meta.TransferSyntaxUID
         msg = "Expected transfer syntax %r, got %r" % (expected, got)
