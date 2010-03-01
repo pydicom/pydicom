@@ -18,12 +18,12 @@ from dicom.dataelem import DataElement
 from dicom.tag import Tag, ItemTag, ItemDelimiterTag, SequenceDelimiterTag
 from dicom.sequence import Sequence
 
-def write_numbers(fp, data_element, format):
-    """Write a "value" of type format from the dicom file.
+def write_numbers(fp, data_element, struct_format):
+    """Write a "value" of type struct_format from the dicom file.
     
     "Value" can be more than one number.
     
-    format -- the character format as used by the struct module.
+    struct_format -- the character format as used by the struct module.
     
     """
     endianChar = '><'[fp.is_little_endian]
@@ -31,7 +31,7 @@ def write_numbers(fp, data_element, format):
     if value == "":
         return  # don't need to write anything for empty string
     
-    format_string = endianChar + format
+    format_string = endianChar + struct_format
     try:
         try:
             value.append   # works only if list, not if string or number
@@ -133,8 +133,7 @@ def write_dataset(fp, dataset):
     """Write a Dataset dictionary to the file. Return the total length written."""
     fpStart = fp.tell()
     # data_elements must be written in tag order
-    tags = dataset.keys()
-    tags.sort()
+    tags = sorted(dataset.keys())
     for tag in tags:
         write_data_element(fp, dataset[tag])
 
@@ -290,7 +289,8 @@ WriteFile = write_file   # for backwards compatibility version <=0.9.2
 writefile = write_file   # forgive user for missing underscore
         
 # Map each VR to a function which can write it
-# for write_numbers, the Writer maps to a tuple (function, number format (struct module style))
+# for write_numbers, the Writer maps to a tuple (function, struct_format)
+#                                  (struct_format is python's struct module format)
 writers = {'UL':(write_numbers,'L'), 'SL':(write_numbers,'l'),
            'US':(write_numbers,'H'), 'SS':(write_numbers, 'h'),
            'FL':(write_numbers,'f'), 'FD':(write_numbers, 'd'),

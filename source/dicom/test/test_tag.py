@@ -58,11 +58,15 @@ class Comparisons(unittest.TestCase):
         self.t1 = Tag(self.int1)
         self.t2 = Tag(self.tup1)
         self.t3 = Tag(self.tup3)
-    def testCmp(self):
-        """Tags compare correctly (==, <, >)........................."""
-        self.assert_(self.t1==self.int1, "tag != int")
-        self.assert_(self.t1==self.t2, "tag != other tag")
-        self.assert_(self.t1==self.tup1, "tag != tuple")
+    def testCmpEq(self):
+        """Tags compare correctly (==)..............................."""
+        self.assert_(self.t1==self.int1, "tag t1 was not equal to int1")
+        self.assert_(self.t1==self.t2, "tag t1 did not equal other tag")
+        self.assert_(self.t1==self.tup1, "tag t1 did not equal its tuple")
+    def testCmpNotEq(self):
+        self.assert_(self.t1 != self.t3, "Not equal comparison failed")
+    def testCmpLT(self):
+        """Tags compare correctly (<, >)............................."""
         self.assert_(self.t1 < self.int1+1, "tag < failed")
         self.assert_(self.int1+1 > self.t1, "int > tag failed")
         self.assert_(self.t3 > self.t1, "'negative' int tag > other tag failed")

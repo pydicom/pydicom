@@ -17,13 +17,16 @@ from dicom.filebase import DicomStringIO
 from dicom.dataelem import DataElement
 from dicom.util.hexutil import hex2bytes, bytes2hex
 
-rtplan_name = "rtplan.dcm"
-rtdose_name = "rtdose.dcm"
-ct_name     = "CT_small.dcm"
-mr_name     = "MR_small.dcm"
-jpeg_name   = "JPEG2000.dcm"
+from pkg_resources import Requirement, resource_filename
+test_dir = resource_filename(Requirement.parse("pydicom"),"dicom/testfiles")
 
-# Set up replan_out, rtdose_out etc filenames as above, with '2' appended
+rtplan_name = os.path.join(test_dir, "rtplan.dcm")
+rtdose_name = os.path.join(test_dir, "rtdose.dcm")
+ct_name     = os.path.join(test_dir, "CT_small.dcm")
+mr_name     = os.path.join(test_dir, "MR_small.dcm")
+jpeg_name   = os.path.join(test_dir, "JPEG2000.dcm")
+
+# Set up rtplan_out, rtdose_out etc. Filenames as above, with '2' appended
 for inname in ['rtplan', 'rtdose', 'ct', 'mr', 'jpeg']:
     exec(inname + "_out = " + inname + "_name + '2'")
 

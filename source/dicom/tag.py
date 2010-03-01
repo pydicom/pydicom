@@ -1,6 +1,6 @@
 # tag.py
 """Define Tag class to hold a dicom (group, element) tag"""
-# Copyright (c) 2008 Darcy Mason
+# Copyright (c) 2008, 2010 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
@@ -38,17 +38,46 @@ class BaseTag(long):
     # Simpler to deal with one number and separate to (group, element) when necessary.
     # Also can deal with python differences in handling ints starting in python 2.4,
     #   by forcing all inputs to a proper long where the differences go away
-    def __cmp__(self, other):
-        # We allow comparisons to other longs or (group,elem) tuples directly.
-        # So first check if comparing with another Tag object; if not, create a temp one
-        othertag=other
+    
+    # Override comparisons so can convert "other" to Tag as necessary
+    # Changes this from __cmp__ to using __lt__ and __eq__ for python 3.
+    #   See Ordering Comparisons at http://docs.python.org/dev/3.0/whatsnew/3.0.html
+    
+    def __lt__(self, other):
+        # Allow comparisons to other longs or (group,elem) tuples directly.
+        # So check if comparing with another Tag object; if not, create a temp one
         if not isinstance(other, BaseTag):
             try:
-                othertag = Tag(other)
+                other = Tag(other)
             except:
-                raise TypeError, "Cannot compare dicom Tag with non-Tag item"
-        return super(BaseTag, self).__cmp__(othertag)
+                raise TypeError, "Cannot compare Tag with non-Tag item"
+        return long(self) < long(other)
 
+    def __eq__(self, other):
+        # Check if comparing with another Tag object; if not, create a temp one
+        if not isinstance(other, BaseTag):
+            try:
+                other = Tag(other)
+            except:
+                raise TypeError, "Cannot compare Tag with non-Tag item"
+        # print "self %r; other %r" % (long(self), long(other))
+        return long(self) == long(other)
+
+    def __ne__(self, other):
+        # Check if comparing with another Tag object; if not, create a temp one
+        if not isinstance(other, BaseTag):
+            try:
+                other = Tag(other)
+            except:
+                raise TypeError, "Cannot compare Tag with non-Tag item"
+        return long(self) != long(other)
+
+    
+    # For python 3, any override of __cmp__ or __eq__ immutable requires
+    #   explicit redirect of hash function to the parent class 
+    #   See http://docs.python.org/dev/3.0/reference/datamodel.html#object.__hash__
+    __hash__ = long.__hash__
+    
     def __str__(self):
         """String of tag value as (gggg, eeee)"""
         return "(%04x, %04x)" % (self.group, self.elem)
@@ -75,7 +104,8 @@ class BaseTag(long):
 
 def TupleTag(group_elem):
     """Fast factory for BaseTag object with known safe (group, element) tuple"""
-    long_value = long(group_elem[0])<<16 | group_elem[1]  # long needed for python <2.4 where shift could make int negative
+    # long needed for python <2.4 where shift could make int negative
+    long_value = long(group_elem[0])<<16 | group_elem[1]  
     return BaseTag(long_value)
 
 # Define some special tags:

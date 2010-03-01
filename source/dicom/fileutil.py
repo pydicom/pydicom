@@ -15,10 +15,10 @@ logger = logging.getLogger('pydicom')
 def absorb_delimiter_item(fp, is_little_endian, delimiter):
     """Read (and ignore) undefined length sequence or item terminators."""
     if is_little_endian:
-        format = "<HHL"
+        struct_format = "<HHL"
     else:
-        format = ">HHL"
-    group, elem, length = unpack(format, fp.read(8))
+        struct_format = ">HHL"
+    group, elem, length = unpack(struct_format, fp.read(8))
     tag = TupleTag((group, elem))
     if tag != delimiter:
         msg = "Did not find expected delimiter '%s'" % dictionaryDescription(delimiter)
@@ -139,11 +139,11 @@ def find_delimiter(fp, delimiter, is_little_endian, read_size=128, rewind=True):
     unless rewind argument is False.
     
     """
-    format = "<H"
+    struct_format = "<H"
     if not is_little_endian:
-        format = ">H"
+        struct_format = ">H"
     delimiter = Tag(delimiter)
-    bytes_to_find = pack(format, delimiter.group) + pack(format, delimiter.elem)
+    bytes_to_find = pack(struct_format, delimiter.group) + pack(struct_format, delimiter.elem)
     return find_bytes(fp, bytes_to_find, rewind=rewind)            
     
 def length_of_undefined_length(fp, delimiter, is_little_endian, read_size=128, rewind=True):
