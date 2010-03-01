@@ -8,11 +8,18 @@
 
 import unittest
 import dicom
+import os.path
 
-latin1_file = "../testcharsetfiles/chrFren.dcm"
-jp_file = "../testcharsetfiles/chrH31.dcm"
-normal_file = "CT_small.dcm"
-multiPN_file = "../testcharsetfiles/chrFrenMulti.dcm"
+from pkg_resources import Requirement, resource_filename
+testcharset_dir = resource_filename(Requirement.parse("pydicom"),"dicom/testcharsetfiles")
+
+latin1_file = os.path.join(testcharset_dir, "chrFren.dcm")
+jp_file = os.path.join(testcharset_dir, "chrH31.dcm")
+multiPN_file = os.path.join(testcharset_dir, "chrFrenMulti.dcm")
+
+test_dir = resource_filename(Requirement.parse("pydicom"),"dicom/testfiles")
+normal_file = os.path.join(test_dir, "CT_small.dcm")
+
 
 class charsetTests(unittest.TestCase):
     def testLatin1(self):

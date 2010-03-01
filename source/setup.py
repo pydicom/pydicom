@@ -45,5 +45,7 @@ setup(name="pydicom",
       wiki page for installation and basic information, and the 
       `Pydicom User Guide <http://code.google.com/p/pydicom/wiki/PydicomUserGuide>`_ page 
       for an overview of how to use the pydicom library.
-      """
+      """,
+      test_loader = "dicom.test.run_tests:MyTestLoader",
+      test_suite = "dummy_string"
      )

@@ -189,12 +189,10 @@ class Dataset(dict):
             match = [x for x in allnames if x.lower().find(filter) != -1]
             matches.update(dict([(x,1) for x in match]))
         if filters:
-            names = matches.keys()
-            names.sort()
+            names = sorted(matches.keys())
             return names
         else:
-            allnames.sort()
-            return allnames
+            return sorted(allnames)
 
     def file_metadata(self):
         """Return a Dataset holding only meta information (group 2).
@@ -267,6 +265,7 @@ class Dataset(dict):
                       ))
         return ds
     
+    # dict.has_key removed in python 3. But should be ok to keep this.
     def has_key(self, key):
         """Extend dict.has_key() to handle *named tags*."""
         return self.__contains__(key)
@@ -292,8 +291,7 @@ class Dataset(dict):
         # Note this is different than the underlying dict class,
         #        which returns the key of the key:value mapping.
         #   Here the value is returned (but data_element.tag has the key)
-        taglist = self.keys()
-        taglist.sort()
+        taglist = sorted(self.keys())
         for tag in taglist:
             yield self[tag]
 
@@ -319,8 +317,8 @@ class Dataset(dict):
         if have_numpy:
             if self.BitsAllocated not in self.NumpyPixelFormats:
                 raise NotImplementedError, "Do not have NumPy dtype for BitsAllocated=%d, please update Dataset.NumpyPixelFormats" % self.BitsAllocated
-            format = self.NumpyPixelFormats[self.BitsAllocated]
-            arr = numpy.fromstring(self.PixelData, format)
+            numpy_format = self.NumpyPixelFormats[self.BitsAllocated]
+            arr = numpy.fromstring(self.PixelData, numpy_format)
             # XXX byte swap - may later handle this in read_file!!?
             if need_byteswap:
                 arr.byteswap(True)  # True means swap in-place, don't make a new copy
@@ -473,10 +471,10 @@ class Dataset(dict):
         if not isinstance(value, (DataElement, RawDataElement)): # ok if is subclass, e.g. DeferredDataElement
             raise TypeError, "Dataset contents must be DataElement instances.\n" + \
                   "To set a data_element value use data_element.value=val"
-        if key != value.tag:
+        tag = Tag(value.tag)
+        if key != tag:
             raise ValueError, "data_element.tag must match the dictionary key"
 
-        tag = Tag(value.tag)
         data_element = value
         if tag.is_private:
             # See PS 3.5-2008 section 7.8.1 (p. 44) for how blocks are reserved
@@ -539,8 +537,7 @@ class Dataset(dict):
         within their dataset)
 
         """
-        taglist = self.keys()
-        taglist.sort()
+        taglist = sorted(self.keys())
         for tag in taglist:
             data_element = self[tag]
             callback(self, data_element)  # self = this Dataset

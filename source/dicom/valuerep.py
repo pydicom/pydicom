@@ -61,13 +61,13 @@ class PersonNameBase(namebase):
         #   family-name-complex^Given-name-complex^Middle-name^name-prefix^name-suffix
         self.parse()
 
-    def formatted(self, format):
+    def formatted(self, format_str):
         """Return a formatted string according to the format pattern
         
         Use "...%(property)...%(property)..." where property is one of
            family_name, given_name, middle_name, name_prefix, name_suffix
         """
-        return format % self.__dict__
+        return format_str % self.__dict__
     def parse(self):
         """Break down the components and name parts"""
         self.components = self.split("=")

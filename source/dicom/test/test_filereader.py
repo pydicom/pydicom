@@ -32,15 +32,18 @@ from dicom.sequence import Sequence
 
 from warncheck import assertWarns
 
-rtplan_name = "rtplan.dcm"
-rtdose_name = "rtdose.dcm"
-ct_name     = "CT_small.dcm"
-mr_name     = "MR_small.dcm"
-jpeg2000_name   = "JPEG2000.dcm"
-jpeg_lossy_name   = "JPEG-lossy.dcm"
-jpeg_lossless_name   = "JPEG-LL.dcm"
-deflate_name = "image_dfl.dcm"
-rtstruct_name = "rtstruct.dcm"
+from pkg_resources import Requirement, resource_filename
+test_dir = resource_filename(Requirement.parse("pydicom"),"dicom/testfiles")
+
+rtplan_name = os.path.join(test_dir, "rtplan.dcm")
+rtdose_name = os.path.join(test_dir, "rtdose.dcm")
+ct_name     = os.path.join(test_dir, "CT_small.dcm")
+mr_name     = os.path.join(test_dir, "MR_small.dcm")
+jpeg2000_name   = os.path.join(test_dir, "JPEG2000.dcm")
+jpeg_lossy_name   = os.path.join(test_dir, "JPEG-lossy.dcm")
+jpeg_lossless_name   = os.path.join(test_dir, "JPEG-LL.dcm")
+deflate_name = os.path.join(test_dir, "image_dfl.dcm")
+rtstruct_name = os.path.join(test_dir, "rtstruct.dcm")
 
 dir_name = os.path.dirname(sys.argv[0])
 save_dir = os.getcwd()
@@ -168,11 +171,9 @@ class ReaderTests(unittest.TestCase):
         """Returns all data elements before pixels using stop_before_pixels=False"""
         # Just check the tags, and a couple of values
         ctpartial = read_file(ct_name, stop_before_pixels=True)
-        ctpartial_tags = ctpartial.keys()
-        ctpartial_tags.sort()
+        ctpartial_tags = sorted(ctpartial.keys())
         ctfull = read_file(ct_name)
-        ctfull_tags = ctfull.keys()
-        ctfull_tags.sort()
+        ctfull_tags = sorted(ctfull.keys())
         msg = "Tag list of partial CT read (except pixel tag and padding) did not match full read"
         msg += "\nExpected: %r\nGot %r" % (ctfull_tags[:-2], ctpartial_tags)
         missing = [Tag(0x7fe0, 0x10), Tag(0xfffc, 0xfffc)]

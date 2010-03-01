@@ -19,12 +19,12 @@ from cStringIO import StringIO
 
 def convert_tag(bytes, is_little_endian, offset=0):
     if is_little_endian:
-        format = "<HH"
+        struct_format = "<HH"
     else:
-        format = ">HH"
-    return TupleTag(unpack(format, bytes[offset:offset+4]))
+        struct_format = ">HH"
+    return TupleTag(unpack(struct_format, bytes[offset:offset+4]))
     
-def convert_ATvalue(bytes, is_little_endian, format=None):
+def convert_ATvalue(bytes, is_little_endian, struct_format=None):
     """Read and return AT (tag) data_element value(s)"""
     length = len(bytes)
     if length == 4:
@@ -34,23 +34,23 @@ def convert_ATvalue(bytes, is_little_endian, format=None):
         logger.warn("Expected length to be multiple of 4 for VR 'AT', got length %d at file position 0x%x", length, fp.tell()-4)
     return MultiValue([convert_tag(bytes, is_little_endian, offset=x) for x in range(0, length, 4)])
 
-def convert_numbers(bytes, is_little_endian, format):
-    """Read a "value" of type format from the dicom file. "Value" can be more than one number"""
+def convert_numbers(bytes, is_little_endian, struct_format):
+    """Read a "value" of type struct_format from the dicom file. "Value" can be more than one number"""
     endianChar = '><'[is_little_endian]
-    bytes_per_value = calcsize("="+format) # "=" means use 'standard' size, needed on 64-bit systems.
+    bytes_per_value = calcsize("="+struct_format) # "=" means use 'standard' size, needed on 64-bit systems.
     length = len(bytes)
-    format_string = "%c%u%c" % (endianChar, length/bytes_per_value, format) 
+    format_string = "%c%u%c" % (endianChar, length/bytes_per_value, struct_format) 
     value = unpack(format_string, bytes)
     if len(value) == 1:
         return value[0]
     else:        
         return list(value)  # convert from tuple to a list so can modify if need to
 
-def convert_OBvalue(bytes, is_little_endian, format=None):
+def convert_OBvalue(bytes, is_little_endian, struct_format=None):
     """Return the raw bytes from reading an OB value"""
     return bytes
     
-def convert_OWvalue(bytes, is_little_endian, format=None):
+def convert_OWvalue(bytes, is_little_endian, struct_format=None):
     """Return the raw bytes from reading an OW value rep
     
     Note: pydicom does NOT do byte swapping, except in 
@@ -58,15 +58,15 @@ def convert_OWvalue(bytes, is_little_endian, format=None):
     """
     return convert_OBvalue(bytes, is_little_endian) # for now, Maybe later will have own routine
 
-def convert_PN(bytes, is_little_endian, format=None):
+def convert_PN(bytes, is_little_endian, struct_format=None):
     """Read and return string(s) as PersonName instance(s)"""
     return MultiString(bytes, valtype=PersonName)
 
-def convert_string(bytes, is_little_endian, format=None):
+def convert_string(bytes, is_little_endian, struct_format=None):
     """Read and return a string or strings"""
     return MultiString(bytes)
 
-def convert_single_string(bytes, is_little_endian, format=None):
+def convert_single_string(bytes, is_little_endian, struct_format=None):
     """Read and return a single string (backslash character does not split)"""
     if bytes and bytes.endswith(' '):
         bytes = bytes[:-1]
@@ -78,14 +78,14 @@ def convert_SQ(bytes, is_implicit_VR, is_little_endian):
     seq = read_sequence(fp, is_implicit_VR, is_little_endian, len(bytes))
     return seq
     
-def convert_UI(bytes, is_little_endian, format=None):
+def convert_UI(bytes, is_little_endian, struct_format=None):
     """Read and return a UI values or values"""
     # Strip off 0-byte padding for even length (if there)
     if bytes and bytes.endswith('\0'):
         bytes = bytes[:-1]
     return MultiString(bytes, dicom.UID.UID)
 
-def convert_UN(bytes, is_little_endian, format=None):
+def convert_UN(bytes, is_little_endian, struct_format=None):
     """Return a byte string for a VR of 'UN' (unknown)"""
     return bytes 
 
@@ -115,7 +115,8 @@ def convert_value(VR, raw_data_element):
     return value
 
 # converters map a VR to the function to read the value(s).
-# for convert_numbers, the converter maps to a tuple (function, number format (in python struct module style))
+# for convert_numbers, the converter maps to a tuple (function, struct_format)
+#                        (struct_format in python struct module style)
 converters = {'UL':(convert_numbers,'L'), 'SL':(convert_numbers,'l'),
            'US':(convert_numbers,'H'), 'SS':(convert_numbers, 'h'),
            'FL':(convert_numbers,'f'), 'FD':(convert_numbers, 'd'),

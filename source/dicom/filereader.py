@@ -126,8 +126,7 @@ class DicomIter(object):
         logger.debug("Using %s VR, %s Endian transfer syntax" %(("Explicit", "Implicit")[is_implicit_VR], ("Big", "Little")[is_little_endian]))
 
     def __iter__(self):
-        tags = self.file_meta_info.keys()
-        tags.sort()
+        tags = sorted(self.file_meta_info.keys())
         for tag in tags:
             yield self.file_meta_info[tag]
 
