@@ -22,3 +22,11 @@ syntax: glob
 source/dist/*
 source/build/*
 source/pydicom.egg-info/*
+source/distribute*.egg
+source/distribute*.tar.gz
+
+# Docs build
+docs/_build/*
+
+# PyCharm IDE files
+*.idea*

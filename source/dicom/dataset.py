@@ -1,18 +1,21 @@
 # dataset.py
-"""Class Dataset: A dictionary of DataElements, which in turn can have a Sequence of Datasets.
+"""Module for Dataset class
 
 Overview of Dicom object model:
-------------------------------
+
 Dataset(derived class of Python's dict class)
-    ---> contains DataElement instances (DataElement is a class with tag, VR, value)
-             ==> the value can be a Sequence instance (Sequence is derived from Python's list),
+   
+   contains DataElement instances (DataElement is a class with tag, VR, value)
+   
+      the value can be a Sequence instance (Sequence is derived from Python's list),
                             or just a regular value like a number, string, etc.,
                             or a list of regular values, e.g. a 3d coordinate
-                  --> Sequence's are a list of Datasets
+            
+            Sequence's are a list of Datasets (note recursive nature here)
 
 """
 #
-# Copyright (c) 2008 Darcy Mason
+# Copyright (c) 2008-2010 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
@@ -55,8 +58,9 @@ class Dataset(dict):
     """A Dataset is a collection (dictionary) of Dicom DataElement instances.
 
     Example of two ways to retrieve or set values:
-    (1) dataset[0x10, 0x10].value --> patient's name
-    (2) dataset.PatientsName --> patient's name
+        
+    1. dataset[0x10, 0x10].value --> patient's name
+    2. dataset.PatientsName --> patient's name
 
     Example (2) is referred to as *Named tags* in this documentation.
     PatientsName is not actually a member of the object, but unknown member
@@ -64,13 +68,11 @@ class Dataset(dict):
     DicomDictionary descriptive string, the corresponding tag is used
     to look up or set the Data Element's value.
 
-    Class Data
-    ----------
-    indentChars -- for string display, the characters used to indent for
-            nested Data Elements (e.g. sequence items). Default is '   '.
+    :attribute indentChars: for string display, the characters used to indent for
+       nested Data Elements (e.g. sequence items). Default is 3 blank characters.
 
-    NumpyPixelFormats -- if NumPy module is available, map bits allocated
-            to the NumPy typecode.
+    :attribute NumpyPixelFormats: if NumPy module is available, map bits allocated
+       to the NumPy typecode. Defaults to standard 8, 16, 32-bit codes.
     """
     indentChars = "   "
     # Map image_dataset.BitsAllocated to NumPy typecode
@@ -553,12 +555,14 @@ class FileDataset(Dataset):
     def __init__(self, filename_or_obj, dataset, preamble, file_meta, 
                         is_implicit_VR, is_little_endian):
         """Initialize a dataset read from a DICOM file
-        filename -- full path and filename to the file. Use None if is a StringIO.
-        dataset -- some form of dictionary, usually a Dataset from read_dataset()
-        preamble -- the 128-byte DICOM preamble,
-        file_meta -- the file meta info dataset, as returned by _read_file_meta,
+
+        :param filename: full path and filename to the file. Use None if is a StringIO.
+        :param dataset: some form of dictionary, usually a Dataset from read_dataset()
+        :param preamble: the 128-byte DICOM preamble
+        :param file_meta: the file meta info dataset, as returned by _read_file_meta,
                 or an empty dataset if no file meta information is in the file
-        is_implicit_VR, is_little_endian -- the transfer syntax of the file
+        :param is_implicit_VR: True if implicit VR transfer syntax used; False if explicit VR
+        :param is_little_endian: True if little-endian transfer syntax used; False if big-endian
         """
         Dataset.__init__(self, dataset)
         self.preamble = preamble
