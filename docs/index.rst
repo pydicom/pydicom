@@ -15,7 +15,7 @@ Contents:
    pydicom_user_guide.rst
    working_with_pixel_data.rst
    viewing_images.rst
-
+   ref_guide.rst
 
 Indices and tables
 ==================

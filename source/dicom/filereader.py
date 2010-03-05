@@ -57,22 +57,32 @@ class InvalidDicomError(Exception):
         Exception.__init__(self, *args)
 
 def open_dicom(filename, force=False):
-    """Return an iterator for DICOM file data elements.
+    """Iterate over data elements for full control of the reading process.
+    
+    **Note**: This function is possibly unstable, as it uses the DicomFile class,
+    which has been removed in other parts of pydicom in favor of simple files. It
+    needs to be updated (or may be removed in future versions of pydicom).
+    
+    Use ``read_file`` or ``read_partial`` for most purposes. This function 
+    is only needed if finer control of the reading process is required.
+    
+    :param filename: A string containing the file path/name.
+    :returns: an iterator which yields one data element each call.
+        First, the file_meta data elements are returned, then the data elements
+        for the DICOM dataset stored in the file.
 
-    Similar to opening a file using python open() and iterating by line
+    Similar to opening a file using python open() and iterating by line, 
+    for example like this::
 
-    Use like:
-
-    from dicom.filereader import open_dicom
-    from dicom.dataset import Dataset
-    ds = Dataset()
-    for data_element in open_dicom("CT_small.dcm"):
-        if meets_some_condition(data_element):
-            ds.Add(data_element)
-        if some_other_condition(data_element):
-            break
-    You can generalize this function to examine the elements as they come,
-    or to only read to a certain point and then stop
+        from dicom.filereader import open_dicom
+        from dicom.dataset import Dataset
+        ds = Dataset()
+        for data_element in open_dicom("CT_small.dcm"):
+            if meets_some_condition(data_element):
+                ds.Add(data_element)
+            if some_other_condition(data_element):
+                break
+    
     """
 
     return DicomIter(DicomFile(filename,'rb'), force=force)
@@ -369,11 +379,16 @@ def _at_pixel_data(tag, VR, length):
     return tag == (0x7fe0, 0x0010)
 
 def read_partial(fileobj, stop_when=None, defer_size=None, force=False):
-    """Parse a DICOM file until a condition is met; return partial dataset
-    fileobj -- a file-like object. This function does not close it.
-    stop_when -- a function which takes tag, VR, length, and returns True or False.
-        A True value means read_data_element will raise StopIteration.
-        if None, then the whole file is read.
+    """Parse a DICOM file until a condition is met
+
+    ``read_partial`` is normally not called directly. Use ``read_file`` instead, unless
+    you need to stop on some condition other than reaching pixel data.
+    
+    :arg fileobj: a file-like object. This function does not close it.
+    :arg stop_when: a callable which takes tag, VR, length, and returns True or False.
+                    If stop_when returns True, read_data_element will raise StopIteration.
+                    If None (default), then the whole file is read.
+    :returns: a FileDataset instance
     """
     # Read preamble -- raise an exception if missing and force=False
     preamble = read_preamble(fileobj, force) 
@@ -416,17 +431,19 @@ def read_partial(fileobj, stop_when=None, defer_size=None, force=False):
                         is_little_endian)
 
 def read_file(fp, defer_size=None, stop_before_pixels=False, force=False):
-    """Return a Dataset containing the contents of the Dicom file
+    """Read and parse a DICOM file
 
-    fp -- either a file-like object, or a string containing the file name.
-    defer_size -- if a data element value is larger than defer_size,
+    :param fp: either a file-like object, or a string containing the file name.
+          If a file-like object, the caller is responsible for closing it.    
+    :param defer_size: if a data element value is larger than defer_size,
         then the value is not read into memory until it is accessed in code.
         Specify an integer (bytes), or a string value with units: e.g. "512 KB", "2 MB".
         Default None means all elements read into memory.
-    stop_before_pixels -- Set False to stop before reading pixels (and anything after them).
-                   If False, a partial dataset will be returned.
-    force -- Set to True to force reading the file even if no header is found.
+    :param stop_before_pixels: Set True to stop before reading pixels (and anything after them).
+                   If False (default), the full file will be read and parsed.
+    :param force: Set to True to force reading the file even if no header is found.
                    If False, a dicom.filereader.InvalidDicomError is raised when the file is not valid DICOM.
+    :returns: a FileDataset instance
     """
     # Open file if not already a file object
     caller_owns_file = True
