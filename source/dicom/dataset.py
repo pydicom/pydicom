@@ -71,13 +71,8 @@ class Dataset(dict):
     :attribute indentChars: for string display, the characters used to indent for
        nested Data Elements (e.g. sequence items). Default is 3 blank characters.
 
-    :attribute NumpyPixelFormats: if NumPy module is available, map bits allocated
-       to the NumPy typecode. Defaults to standard 8, 16, 32-bit codes.
     """
     indentChars = "   "
-    # Map image_dataset.BitsAllocated to NumPy typecode
-    if have_numpy:
-        NumpyPixelFormats = {8: numpy.uint8, 16:numpy.int16, 32:numpy.int32}
     
     def Add(self, data_element):
         """Equivalent to dataset[data_element.tag] = data_element."""
@@ -302,8 +297,8 @@ class Dataset(dict):
 
         NumPy is the most recent numerical package for python. It is used if available.
 
-        Raise TypeError if no pixel data in this dataset.
-        Raise ImportError if cannot import numpy.
+        :raises TypeError: if no pixel data in this dataset.
+        :raises ImportError: if cannot import numpy.
 
         """
         if not 'PixelData' in self:
@@ -316,28 +311,39 @@ class Dataset(dict):
         # determine the type used for the array
         need_byteswap = (self.is_little_endian != sys_is_little_endian)
 
-        if have_numpy:
-            if self.BitsAllocated not in self.NumpyPixelFormats:
-                raise NotImplementedError, "Do not have NumPy dtype for BitsAllocated=%d, please update Dataset.NumpyPixelFormats" % self.BitsAllocated
-            numpy_format = self.NumpyPixelFormats[self.BitsAllocated]
-            arr = numpy.fromstring(self.PixelData, numpy_format)
-            # XXX byte swap - may later handle this in read_file!!?
-            if need_byteswap:
-                arr.byteswap(True)  # True means swap in-place, don't make a new copy
-            # Note the following reshape operations return a new *view* onto arr, but don't copy the data
-            if 'NumberofFrames' in self and self.NumberofFrames > 1:
-                if self.SamplesperPixel > 1:
-                    arr = arr.reshape(self.SamplesperPixel, self.NumberofFrames, self.Rows, self.Columns)
-                else:
-                    arr = arr.reshape(self.NumberofFrames, self.Rows, self.Columns)
+        # Make NumPy format code, e.g. "uint16", "int32" etc
+        # from two pieces of info:
+        #    self.PixelRepresentation -- 0 for unsigned, 1 for signed; 
+        #    self.BitsAllocated -- 8, 16, or 32
+        format_str = '%sint%d' % (('u', '')[self.PixelRepresentation],
+                                  self.BitsAllocated)
+        try:
+            numpy_format = numpy.dtype(format_str)
+        except TypeError:
+            raise TypeError("Data type not understood by NumPy: "
+                            "format='%s', PixelRepresentation=%d, BitsAllocated=%d" % (
+                            numpy_format, self.PixelRepresentation, self.BitsAllocated))
+        
+        # Have correct Numpy format, so create the NumPy array
+        arr = numpy.fromstring(self.PixelData, numpy_format)
+        
+        # XXX byte swap - may later handle this in read_file!!?
+        if need_byteswap:
+            arr.byteswap(True)  # True means swap in-place, don't make a new copy
+        # Note the following reshape operations return a new *view* onto arr, but don't copy the data
+        if 'NumberofFrames' in self and self.NumberofFrames > 1:
+            if self.SamplesperPixel > 1:
+                arr = arr.reshape(self.SamplesperPixel, self.NumberofFrames, self.Rows, self.Columns)
             else:
-                if self.SamplesperPixel > 1:
-                    if self.BitsAllocated == 8:
-                        arr = arr.reshape(self.SamplesperPixel, self.Rows, self.Columns)
-                    else:
-                        raise NotImplementedError, "This code only handles SamplesPerPixel > 1 if Bits Allocated = 8"
+                arr = arr.reshape(self.NumberofFrames, self.Rows, self.Columns)
+        else:
+            if self.SamplesperPixel > 1:
+                if self.BitsAllocated == 8:
+                    arr = arr.reshape(self.SamplesperPixel, self.Rows, self.Columns)
                 else:
-                    arr = arr.reshape(self.Rows, self.Columns)
+                    raise NotImplementedError, "This code only handles SamplesPerPixel > 1 if Bits Allocated = 8"
+            else:
+                arr = arr.reshape(self.Rows, self.Columns)
         return arr
 
     # PixelArray property
