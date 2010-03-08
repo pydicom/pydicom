@@ -106,12 +106,14 @@ class DicomIter(object):
             self.file_meta_info = file_meta_info = _read_file_meta_info(fp)
             transfer_syntax = file_meta_info.TransferSyntaxUID
             if transfer_syntax == dicom.UID.ExplicitVRLittleEndian:
-                is_explicit_VR = True
+                is_implicit_VR = False
+                is_little_endian = True
             elif transfer_syntax == dicom.UID.ImplicitVRLittleEndian:
                 is_implicit_VR = True
+                is_little_endian = True
             elif transfer_syntax == dicom.UID.ExplicitVRBigEndian:
-                is_explicit_VR = True
-                is_big_endian = True
+                is_implicit_VR = False
+                is_little_endian = False
             elif transfer_syntax == dicom.UID.DeflatedExplicitVRLittleEndian:
                 # See PS3.6-2008 A.5 (p 71) -- when written, the entire dataset following
                 #     the file metadata was prepared the normal way, then "deflate" compression applied.
@@ -121,12 +123,12 @@ class DicomIter(object):
                 unzipped = zlib.decompress(zipped, -zlib.MAX_WBITS)
                 fp = StringIO(unzipped) # a file-like object that usual code can use as normal
                 self.fp = fp #point to new object
-                is_explicit_VR = True
+                is_implicit_VR = False
                 is_little_endian = True
             else:
                 # Any other syntax should be Explicit VR Little Endian,
                 #   e.g. all Encapsulated (JPEG etc) are ExplVR-LE by Standard PS 3.5-2008 A.4 (p63)
-                is_explicit_VR = True
+                is_implicit_VR = False
                 is_little_endian = True
         else: # no header -- make assumptions
             fp.TransferSyntaxUID = dicom.UID.ImplicitVRLittleEndian
