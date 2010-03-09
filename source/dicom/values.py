@@ -68,7 +68,7 @@ def convert_string(bytes, is_little_endian, struct_format=None):
 
 def convert_single_string(bytes, is_little_endian, struct_format=None):
     """Read and return a single string (backslash character does not split)"""
-    if bytes and (bytes.endswith(' ') or bytes.endswith(' ')):
+    if bytes and bytes.endswith(' '):
         bytes = bytes[:-1]
     return bytes
 
