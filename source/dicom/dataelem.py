@@ -169,7 +169,7 @@ class DataElement(object):
             elif self.VR in ['DS'] and val:
                 return float(val)
             elif self.VR == "UI":
-	    	    return UID(val)
+                return UID(val)
             # Later may need this for PersonName as for UI,
             #    but needs more thought
             # elif self.VR == "PN":

@@ -254,7 +254,7 @@ class DeferredReadTests(unittest.TestCase):
         for data_elem in ds_norm:
             tag = data_elem.tag
             self.assertEqual(data_elem.value, ds_defer[tag].value, "Mismatched value for tag %r" % tag)
-
+        
     def tearDown(self):
         if os.path.exists(self.testfile_name):
             os.remove(self.testfile_name)
