@@ -8,7 +8,9 @@ pydicom release checklist
 * run test/all.bat on windows to test with all supported python versions
 * run test/shell_all on linux/mac to test all supported python versions
 * run each example file and clean up any output files created
-
+* run tabnanny to check for bad indentation::
+    python -m tabnanny .
+* run python26 -Qwarn to check for integer division problems.
 * hg commit all changes
 * tag the release -- hg tag "release-X.X.X". Auto-commits.
 * hg push to repository

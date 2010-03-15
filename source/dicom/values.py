@@ -32,14 +32,17 @@ def convert_ATvalue(bytes, is_little_endian, struct_format=None):
     # length > 4
     if length % 4 != 0:
         logger.warn("Expected length to be multiple of 4 for VR 'AT', got length %d at file position 0x%x", length, fp.tell()-4)
-    return MultiValue([convert_tag(bytes, is_little_endian, offset=x) for x in range(0, length, 4)])
+    return MultiValue([convert_tag(bytes, is_little_endian, offset=x) 
+                        for x in range(0, length, 4)])
 
 def convert_numbers(bytes, is_little_endian, struct_format):
     """Read a "value" of type struct_format from the dicom file. "Value" can be more than one number"""
     endianChar = '><'[is_little_endian]
     bytes_per_value = calcsize("="+struct_format) # "=" means use 'standard' size, needed on 64-bit systems.
     length = len(bytes)
-    format_string = "%c%u%c" % (endianChar, length/bytes_per_value, struct_format) 
+    if length % bytes_per_value != 0:
+        logger.warn("Expected length to be even multiple of number size")
+    format_string = "%c%u%c" % (endianChar, length // bytes_per_value, struct_format) 
     value = unpack(format_string, bytes)
     if len(value) == 1:
         return value[0]
