@@ -489,7 +489,7 @@ class Dataset(dict):
             logging.debug("Setting private tag %r" % tag)
             private_block = tag.elem >> 8
             private_creator_tag = Tag(tag.group, private_block)
-            if private_creator_tag in self:
+            if private_creator_tag in self and tag != private_creator_tag:
                 data_element.private_creator = self[private_creator_tag].value
         dict.__setitem__(self, tag, data_element)
 
