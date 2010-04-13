@@ -75,10 +75,10 @@ def convert_single_string(bytes, is_little_endian, struct_format=None):
         bytes = bytes[:-1]
     return bytes
 
-def convert_SQ(bytes, is_implicit_VR, is_little_endian):
+def convert_SQ(bytes, is_implicit_VR, is_little_endian, offset=0):
     """Convert a sequence that has been read as bytes but not yet parsed."""
     fp = StringIO(bytes)
-    seq = read_sequence(fp, is_implicit_VR, is_little_endian, len(bytes))
+    seq = read_sequence(fp, is_implicit_VR, is_little_endian, len(bytes), offset)
     return seq
     
 def convert_UI(bytes, is_little_endian, struct_format=None):
@@ -114,7 +114,7 @@ def convert_value(VR, raw_data_element):
     if VR != "SQ":
         value = converter(bytes, is_little_endian, num_format)
     else:
-        value = convert_SQ(bytes, is_implicit_VR, is_little_endian)
+        value = convert_SQ(bytes, is_implicit_VR, is_little_endian, raw_data_element.value_tell)
     return value
 
 # converters map a VR to the function to read the value(s).
