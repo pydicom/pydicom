@@ -299,9 +299,9 @@ def read_sequence(fp, is_implicit_VR, is_little_endian, bytelength, offset=0):
         while (not bytelength) or (fp_tell()-fpStart < bytelength):
             file_tell = fp.tell()
             dataset = read_sequence_item(fp, is_implicit_VR, is_little_endian)
-            dataset.file_tell = file_tell+offset
             if dataset is None:  # None is returned if get to Sequence Delimiter
                 break
+            dataset.file_tell = file_tell+offset
             seq.append(dataset)
     seq = Sequence(seq)
     seq.is_undefined_length = is_undefined_length
