@@ -558,8 +558,8 @@ class Dataset(dict):
     __repr__ = __str__
 
 class FileDataset(Dataset):
-    def __init__(self, filename_or_obj, dataset, preamble, file_meta, 
-                        is_implicit_VR, is_little_endian):
+    def __init__(self, filename_or_obj, dataset, preamble=None, file_meta=None, 
+                        is_implicit_VR=True, is_little_endian=True):
         """Initialize a dataset read from a DICOM file
 
         :param filename: full path and filename to the file. Use None if is a StringIO.
@@ -567,8 +567,8 @@ class FileDataset(Dataset):
         :param preamble: the 128-byte DICOM preamble
         :param file_meta: the file meta info dataset, as returned by _read_file_meta,
                 or an empty dataset if no file meta information is in the file
-        :param is_implicit_VR: True if implicit VR transfer syntax used; False if explicit VR
-        :param is_little_endian: True if little-endian transfer syntax used; False if big-endian
+        :param is_implicit_VR: True if implicit VR transfer syntax used; False if explicit VR. Default is True.
+        :param is_little_endian: True if little-endian transfer syntax used; False if big-endian. Default is True. 
         """
         Dataset.__init__(self, dataset)
         self.preamble = preamble

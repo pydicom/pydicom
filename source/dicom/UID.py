@@ -64,9 +64,9 @@ NotCompressedPixelTransferSyntaxes = [ExplicitVRLittleEndian,
                                       
 # Many thanks to the Medical Connections for offering free valid UIDs (http://www.medicalconnections.co.uk/FreeUID.html)
 # Their service was used to obtain the following root UID for pydicom:
-root = '1.2.826.0.1.3680043.8.498.'
+pydicom_root_UID = '1.2.826.0.1.3680043.8.498.'
 pydicom_UIDs = {
-    root + '1': 'ImplementationClassUID',
+    pydicom_root_UID + '1': 'ImplementationClassUID',
     
     }
 class TransferSyntax(str):
