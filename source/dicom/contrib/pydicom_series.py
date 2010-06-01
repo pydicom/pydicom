@@ -235,11 +235,67 @@ def _getPixelDataFromDataset(ds):
     dict.__setitem__(ds, pixelDataTag, el)
     del ds._PixelArray
     
-    # Apply scale and offset
+    # Obtain slope and offset
+    slope = 1
+    offset = 0
+    needFloats = False
+    needApplySlopeOffset = False
     if 'RescaleSlope' in ds:
-        data *= int(ds.RescaleSlope) # float goes MUCH slower
+        needApplySlopeOffset = True
+        slope = ds.RescaleSlope
     if 'RescaleIntercept' in ds:
-        data += int(ds.RescaleIntercept)
+        needApplySlopeOffset = True
+        offset = ds.RescaleIntercept
+    if int(slope)!= slope or int(offset) != offset:
+        needFloats = True
+    if not needFloats:
+        slope, offset = int(slope), int(offset)
+    
+    # Apply slope and offset
+    if needApplySlopeOffset:
+        
+        # Maybe we need to change the datatype?
+        if data.dtype in [np.float32, np.float64]:
+            pass
+        elif needFloats:
+            data = data.astype(np.float32)
+        else:
+            # Determine required range
+            minReq, maxReq = data.min(), data.max()
+            minReq = min([minReq, minReq*slope+offset, maxReq*slope+offset])
+            maxReq = max([maxReq, minReq*slope+offset, maxReq*slope+offset])
+            
+            # Determine required datatype from that
+            dtype = None
+            if minReq<0:
+                # Signed integer type
+                maxReq = max([-minReq, maxReq])
+                if maxReq < 2**7:
+                    dtype = np.int8
+                elif maxReq < 2**15:
+                    dtype = np.int16
+                elif maxReq < 2**31:
+                    dtype = np.int32
+                else:
+                    dtype = np.float32
+            else:
+                # Unsigned integer type
+                if maxReq < 2**8:
+                    dtype = np.int8
+                elif maxReq < 2**16:
+                    dtype = np.int16
+                elif maxReq < 2**32:
+                    dtype = np.int32
+                else:
+                    dtype = np.float32
+            
+            # Change datatype
+            if dtype != data.dtype:
+                data = data.astype(dtype)
+        
+        # Apply slope and offset
+        data *= slope
+        data += offset
     
     # Done
     return data
@@ -463,10 +519,9 @@ class DicomSeries(object):
         resulting array is 3D, otherwise it's 2D.
         
         If RescaleSlope and RescaleIntercept are present in the dicom info,
-        the data is rescaled using these parameters.
+        the data is rescaled using these parameters. The data type is chosen
+        depending on the range of the (rescaled) data.
         
-        Depending on the type of data, the dtype is uintX or intX,
-                                                    where X is 8, 16 or 32.
         """
         
         # Can we do this?
