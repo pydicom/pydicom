@@ -48,7 +48,8 @@ rtstruct_name = os.path.join(test_dir, "rtstruct.dcm")
 dir_name = os.path.dirname(sys.argv[0])
 save_dir = os.getcwd()
 
-def isClose(a, b, epsilon=0.000001): # compare within some tolerance, to avoid machine roundoff differences
+def isClose(a, b, epsilon=0.000001):
+    """Compare within some tolerance, to avoid machine roundoff differences"""
     try:
         a.append  # see if is a list
     except: # (is not)

@@ -394,7 +394,7 @@ def read_partial(fileobj, stop_when=None, defer_size=None, force=False):
     :arg stop_when: a callable which takes tag, VR, length, and returns True or False.
                     If stop_when returns True, read_data_element will raise StopIteration.
                     If None (default), then the whole file is read.
-    :returns: a FileDataset instance
+    :returns: a set instance
     """
     # Read preamble -- raise an exception if missing and force=False
     preamble = read_preamble(fileobj, force) 
