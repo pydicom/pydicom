@@ -252,10 +252,9 @@ def write_file(filename, dataset, WriteLikeOriginal=True):
     """
 
     # Decide whether to write DICOM preamble. Should always do so unless trying to mimic the original file read in
-    if not getattr(dataset, "preamble", None) and not WriteLikeOriginal:
+    preamble = getattr(dataset, "preamble", None) 
+    if not preamble and not WriteLikeOriginal:
         preamble = "\0"*128
-    else:
-        preamble = getattr(dataset, "preamble", None)
     
     file_meta = dataset.file_meta
     if file_meta is None:

@@ -12,6 +12,10 @@ import unittest
 from dicom.filereader import read_file
 from dicom.filewriter import write_file, write_data_element
 from dicom.tag import Tag
+from dicom.dataset import Dataset, FileDataset
+from dicom.sequence import Sequence
+from dicom.util.hexutil import hex2bytes, bytes2hex
+
 # from cStringIO import StringIO
 from dicom.filebase import DicomStringIO
 from dicom.dataelem import DataElement
@@ -34,6 +38,10 @@ def files_identical(a, b):
     """Return a tuple (file a == file b, index of first difference)"""
     a_bytes = file(a, "rb").read()
     b_bytes = file(b, "rb").read()
+    return bytes_identical(a_bytes, b_bytes)
+    
+def bytes_identical(a_bytes, b_bytes):
+    """Return a tuple (bytes a == bytes b, index of first difference)"""
     if a_bytes == b_bytes:
         return True, 0     # True, dummy argument
     else:
@@ -68,7 +76,7 @@ class WriteFileTests(unittest.TestCase):
         self.compare(jpeg_name, jpeg_out)
      
 class WriteDataElementTests(unittest.TestCase):
-    """Attempt to data elements has the expected behaviour"""
+    """Attempt to write data elements has the expected behaviour"""
     def setUp(self):
         # Create a dummy (in memory) file to write to
         self.f1 = DicomStringIO()
@@ -90,8 +98,56 @@ class WriteDataElementTests(unittest.TestCase):
         msg = "%r %r" % (type(expected), type(got))
         msg = "'%r' '%r'" % (expected, got)
         self.assertEqual(expected, got, msg)
+
+class ScratchWriteTests(unittest.TestCase):
+    """Simple dataset from scratch, written in all endian/VR combinations"""
+    def setUp(self):
+        # Create simple dataset for all tests
+        ds = Dataset()
+        ds.PatientsName = "Name^Patient"
         
-    
+        # Set up a simple nested sequence
+        # first, the innermost sequence
+        subitem1 = Dataset()
+        subitem1.ContourNumber = 1
+        subitem1.ContourData = [2,4,8,16]
+        subitem2 = Dataset()
+        subitem2.ContourNumber = 2
+        subitem2.ContourData = [32,64,128,196]
+        
+        sub_ds = Dataset()
+        sub_ds.Contours = Sequence((subitem1, subitem2)) # XXX in 0.9.5 will need sub_ds.ContourSequence
+
+        # Now the top-level sequence
+        ds.ROIContours = Sequence((sub_ds,)) # Comma necessary to make it a one-tuple
+        
+        # Store so each test can use it
+        self.ds = ds
+        
+    def compare_write(self, hex_std, file_ds):
+        """Write file and compare with expected byte string
+        
+        :arg hex_std: the bytes which should be written, as space separated hex 
+        :arg file_ds: a FileDataset instance containing the dataset to write
+        """
+        out_filename = "scratch.dcm"
+        write_file(out_filename, file_ds)
+        std = hex2bytes(hex_std)
+        bytes_written = open(out_filename,'rb').read()
+        # print "std    :", bytes2hex(std)
+        # print "written:", bytes2hex(bytes_written)
+        same, pos = bytes_identical(std, bytes_written)
+        self.assert_(same, "Writing from scratch not expected result - first difference at 0x%x" % pos)
+        if os.path.exists(out_filename):
+            os.remove(out_filename)  # get rid of the file
+            
+    def testImpl_LE_deflen_write(self):
+        """Scratch Write for implicit VR little endian, defined length SQ's"""
+        from dicom.test._write_stds import impl_LE_deflen_std_hex as std
+        
+        file_ds = FileDataset("test", self.ds)
+        self.compare_write(std, file_ds)
+        
 if __name__ == "__main__":
     # This is called if run alone, but not if loaded through run_tests.py
     # If not run from the directory where the sample images are, then need to switch there
