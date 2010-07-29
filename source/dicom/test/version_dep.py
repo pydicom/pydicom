@@ -1,10 +1,11 @@
 # version_dep.py
-"""Holds test code that is dependent of certain python versions"""
+"""Holds test code that is dependent on certain python versions"""
 # Copyright (c) 2009 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
 
+from __future__ import with_statement # so will compile under python 2.5 without error
 import warnings
 
 def capture_warnings(function, *func_args, **func_kwargs):

@@ -46,6 +46,7 @@ class WarnTests(unittest.TestCase):
     def testWarn(self):
         """Test that assertWarns works as expected"""
         assertWarns(self, "Look", test_warning, "Look out")
+
 if __name__ == "__main__":
     unittest.main()
     
