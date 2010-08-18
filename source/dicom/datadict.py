@@ -9,7 +9,7 @@
 import logging
 logger = logging.getLogger("pydicom")
 from dicom.tag import Tag
-from dicom._dicom_dict import DicomDictionary  # the actual dict of {tag: (VR, VM, name, isRetired), tag:...}
+from dicom._dicom_dict import DicomDictionary  # the actual dict of {tag: (VR, VM, name, is_retired), tag:...}
 from dicom._dicom_dict import RepeatersDictionary # those with tags like "(50xx, 0005)"
 from dicom._private_dict import private_dictionaries
 
@@ -39,7 +39,7 @@ def mask_match(tag):
     return None
     
 def get_entry(tag):
-    """Return the tuple (VR, VM, name, isRetired) from the DICOM dictionary
+    """Return the tuple (VR, VM, name, is_retired) from the DICOM dictionary
     
     If the entry is not in the main dictionary, check the masked ones,
     e.g. repeating groups like 50xx, etc.
@@ -153,7 +153,7 @@ def AllNamesForTag(tag):
 # PRIVATE DICTIONARY handling 
 # functions in analogy with those of main DICOM dict
 def get_private_entry(tag, private_creator):
-    """Return the tuple (VR, VM, name, isRetired) from a private dictionary"""
+    """Return the tuple (VR, VM, name, is_retired) from a private dictionary"""
     tag = Tag(tag)
     try:
         private_dict = private_dictionaries[private_creator]

@@ -2,7 +2,7 @@
 """Reformat a dicom dictionary csv file (from e.g. standards docs) to Python syntax
 
    Write the DICOM dictionary elements as:
-   tag: (VR, VM, description, isRetired)
+   tag: (VR, VM, description, is_retired)
    in python format
    
    Also write the repeating groups or elements (e.g. group "50xx")
@@ -35,7 +35,7 @@ if __name__ == "__main__":
     main_attributes = []
     mask_attributes = []
     for row in csv_reader:
-        tag, description, VR, VM, isRetired  = row
+        tag, description, VR, VM, is_retired  = row
         tag = tag.strip()   # at least one item has extra blank on end
         group, elem = tag[1:-1].split(",")
         
@@ -52,7 +52,7 @@ if __name__ == "__main__":
         description = description.replace("\x96", "-") # non-ascii dash used
 		
         # If blank (e.g. (0018,9445) and (0028,0020)), then add dummy vals
-        if VR == '' and VM == '' and isRetired:
+        if VR == '' and VM == '' and is_retired:
             VR = 'OB'
             VM = '1'
             description = "Retired-blank"
@@ -60,10 +60,10 @@ if __name__ == "__main__":
         # Handle retired "repeating group" tags e.g. group "50xx"
         if "x" in group or "x" in elem:
             tag = group + elem # simple concatenation
-            mask_attributes.append((tag, VR, VM, description, isRetired))
+            mask_attributes.append((tag, VR, VM, description, is_retired))
         else:
             tag = "0x%s%s" % (group, elem)
-            main_attributes.append((tag, VR, VM, description, isRetired))
+            main_attributes.append((tag, VR, VM, description, is_retired))
 
     py_file = file(pydict_filename, "wb")
     py_file.write("# %s\n" % pydict_filename)

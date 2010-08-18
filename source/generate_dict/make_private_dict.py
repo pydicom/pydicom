@@ -82,7 +82,7 @@ def get_introductory_text(filename, datestring):
                    '# This is a dictionary of DICOM dictionaries.',
                    '# The outer dictionary key is the Private Creator name ("owner"),', 
                    '# the inner dictionary is a map of DICOM tag to ',
-                   '# (VR, type, name, isRetired)',
+                   '# (VR, type, name, is_retired)',
                    '',
                    PRIVATE_DICT_NAME + ' = \\\n'))
     return s
