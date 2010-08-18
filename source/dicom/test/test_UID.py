@@ -25,13 +25,16 @@ class UIDtests(unittest.TestCase):
         self.assertEqual(got, expected, "UID: expected '%s', got '%s' for UID info" % (expected, got))
         
         expected = False
-        got = uid.isRetired
-        self.assertEqual(got, expected, "UID: expected '%s', got '%s' for UID isRetired" % (expected, got))
+        got = uid.is_retired
+        self.assertEqual(got, expected, "UID: expected '%s', got '%s' for UID is_retired" % (expected, got))
     def testComparison(self):
         """UID: can compare by number or by name.................."""
         uid = UID('1.2.840.10008.1.2')
         self.assertEqual(uid, 'Implicit VR Little Endian', "UID equality failed on name")
         self.assertEqual(uid, '1.2.840.10008.1.2', "UID equality failed on number string")
+    def testTransferSyntaxes(self):
+        pass
+        
         
 if __name__ == "__main__":
     unittest.main()
