@@ -411,12 +411,17 @@ def read_files(path, showProgress=False, readPixelData=False):
     
     # Finish all series
     showProgress('Analysing series')
+    series_ = []
     for i in range(len(series)):
-        series[i]._finish()
+        try:
+            series[i]._finish()
+            series_.append(series[i])
+        except Exception:
+            pass # Skip serie (probably report-like file without pixels)
         showProgress(float(i+1)/len(series))
     showProgress(None)
     
-    return series
+    return series_
 
 
 class DicomSeries(object):
