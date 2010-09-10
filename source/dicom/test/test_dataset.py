@@ -7,7 +7,7 @@
 
 import unittest
 from dicom.dataset import Dataset, have_numpy, PropertyError
-from dicom.dataelem import DataElement
+from dicom.dataelem import DataElement, RawDataElement
 from dicom.tag import Tag
 
 class DatasetTests(unittest.TestCase):
@@ -127,6 +127,20 @@ class DatasetTests(unittest.TestCase):
         not_there = ds.get(Tag(0x99999999), "not-there")
         self.assertEqual(not_there, "not-there",
                     "dataset.get() did not return default value for non-member by Tag")
+    def testGetFromRaw(self):
+        """Dataset: get(tag) returns same object as ds[tag] for raw element.."""
+        # This came from issue 88, where get(tag#) returned a RawDataElement, 
+        #     while get(name) converted to a true DataElement
+        test_tag = 0x100010
+        test_elem = RawDataElement(Tag(test_tag), 'PN', 4, 'test', 0, True, True) 
+        ds = Dataset({Tag(test_tag): test_elem})
+        by_get = ds.get(test_tag)
+        by_item = ds[test_tag]
+        
+        # self.assertEqual(type(elem_get), type(name_get), "Dataset.get() returned different type for name vs tag access")
+        msg = "Dataset.get() returned different objects for ds.get(tag) and ds[tag]:\nBy get():%r\nBy ds[tag]:%r\n"
+        self.assertEqual(by_get, by_item, msg % (by_get, by_item))
+
     def test__setitem__(self):
         """Dataset: if set an item, it must be a DataElement instance........"""
         def callSet():

@@ -214,7 +214,11 @@ class Dataset(dict):
                     key = Tag(key)
                 except:
                     raise TypeError("Dataset.get key must be a string or tag")
-        return dict.get(self, key, default)
+        try:
+            return_val = self.__getitem__(key)
+        except KeyError:
+            return_val = default
+        return return_val
     
     def __getattr__(self, name):
         """Intercept requests for unknown Dataset python-attribute names.
