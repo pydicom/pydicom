@@ -11,7 +11,7 @@ import sys
 setup(name="pydicom",
       packages = find_packages(),
       include_package_data = True,
-      version="0.9.4-1",
+      version="0.9.5",
       package_data = {'dicom': ['testfiles/*.dcm']},
       zip_safe = False, # want users to be able to see included examples,tests
       description="Pure python package for DICOM medical file reading and writing",

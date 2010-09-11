@@ -43,8 +43,8 @@ logger.addHandler(handler)
 from filereader import read_file, ReadFile  # latter one for backwards compatibility; remove later
 from filewriter import write_file, WriteFile # ditto
 
-__version__ = "0.9.4-1"
-__version_info__ = (0,9,4,1)
+__version__ = "0.9.5"
+__version_info__ = (0,9,5)
 
 debugging = False
 
