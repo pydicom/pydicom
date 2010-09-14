@@ -1,0 +1,112 @@
+#summary Release notes for pydicom package releases
+----
+
+= Release notes for pydicom 0.9.5 =
+
+pydicom 0.9.5 is primarily a bug-fix release but includes some contrib files also.
+
+== Major fixes in this release ==
+  * fix for incorrect pixel integer types which could lead to numeric errors (issue 79)
+  * By default an InvalidDicomError will be raised when trying to read a non-DICOM
+file (unless read_file keyword arg {{{force}}} is True) (revision fc790f01f5)
+  * fix recursion error on private data elements (issue 81, issue 84)
+
+== Other fixes in this release ==
+  * Fix for unicode decode failing with VM > 1 (issue 78)
+  * fix for fail of DicomIter on files with Explicit VR Transfer Syntax UID (issue 82)
+  * Fix for python 2.5 and 'with' statement (revision 1c32791bf0)
+  * Handle 'OB/OW' VR as well as 'OW/OB' (revision e3ee934bbc)
+  * Fix dataset.get(tag) so returns same as dataset[tag] (issue 88)
+
+== New 'Contrib' files ==
+  * dicom_dao.py by Mike Wallace -- CouchDB storage of DICOM info and binary data
+  * pydicom_series.py by Almar Klein -- Reads files and separates into distinct series.
+
+== Other ==
+  * switch to Distribute for packaging
+  * preliminary work on python 3 compatiblity
+  * preliminary work on using sphinx for documentation
+  * preliminary work on better writing of files from scratch
+
+  
+= Release notes for pydicom 0.9.4 =
+
+*NOTE:* 
+  * there is a *backwards incompatible* change made to storage of file_meta info. See item below.
+  * pydicom 0.9.4 requires python 2.4 or higher (pydicom 0.9.3 can run under python 2.3)
+
+== Major changes/additions in this version ==
+  * file reading code reorganized substantially
+  * significant speed increase for reading DICOM files -- approx 3 times faster than 0.9.3
+  * partial file reading available -- in particular, new optional argument to read_file(), stop_before_pixels, will stop before getting to the pixel data, not reading those into memory. Saves a little time for small images, but could be quite helpful for very large images when the pixel data is not needed.
+  * read_file() now returns a !FileDataset object, instead of a plain Dataset. Most user code will not see much difference (except see next bullet on file meta information) but now the information stored in the object has been made explicit  -- e.g. the endian-ness and whether the file syntax was explicit VR or implicit VR.
+  * file meta info has been separated from the main dataset. Logically, this makes more sense, as the file meta is not really part of the dataset, but is specific to the method of storage. This is a backwards-incompatible change, but is easily fixed by changing any references to file-meta data elements from {{{dataset.<name>}}} to {{{dataset.file_meta.<name>}}}. The file_meta is a dataset like any other, all the usual methods for viewing, changing data elements work on it also.
+  * private dictionaries file now generated from the GDCM library's private dictionary -- code to convert formats contributed by Daniel Nanz.
+  * license has returned to an MIT-based license (with the compatible GDCM also noted for the private dictionary component).
+  * contributed files with example code for viewing using wxPython or Tkinter (and PIL) -- in dicom.contrib folder. Thanks to Dave Witten, Daniel Nanz and Adit Panchal for these contributions.
+  * updates to pydicom's DICOM data dictionary contributed by Adit Panchal: CP805/916; Supp 43 and 117 (and UID dict), Supp 119 and 122
+
+== Other changes and bug fixes ==
+  * Tag is now a factory function; the class is called !BaseTag. This was part of the file reading speed-up process -- a new class !TupleTag was also created, for faster file reading
+  * passing a file object to read_file() now works correctly, and also the file closing works as it should (caller needs to close any files passed in) (issue 73)
+  * Fix for issue 72 : dataset.get() fails when passed type other than string or Tag. Patch contributed by !NikitaTheSpider
+  * Fix for issue 58 : error opening file with unicode. Fix contributed by Pierre Raybaut
+  * Fix for issue 42 : catch !AttributeError in property and give proper error message
+  * Fix for issue 55 : UI type changed with string operations
+  * Tag fixes and enhancements : can create tags with hex string (group, elem). Allow lists as well as tuples (issue 47). Fix arg2=0 bug (issue 64).
+
+
+= Release notes for pydicom 0.9.3 =
+
+== Major changes ==
+  * changed to MIT-style license
+  * option to defer reading of large data element values using read_file()'s new defer_size argument (r102, r103)
+  * dictionary of private tags added -- descriptive text shown when available (issue36, r97, r110)
+  * more conversion to PEP-8 style. Should now use read_file(), save_as(), pixel_array rather than !ReadFile(), !SaveAs(), !PixelArray. Old names kept for now as aliases.
+  
+== Other Enhancements ==
+  * added DicomFileLike class to simplify and generalize access. Any object that has read, write, seek, tell, and close can now be used. (r105)
+  * added dataset.iterall() function to iterate through all items (including inside sequences) (r105)
+  * added dataset.formatted_lines() generator to allow custom formatting (r91, r113)
+  * made reading tolerant of truncated files -- gives a warning, but returns dataset read to that point (r95)
+
+== Bug Fixes ==
+  * fixed issue38, name collision for 'Other Patient Ids' as both data element and sequence name in DICOM standard (r95, r96)
+  * fixed issue40, blank VRs in some DICOM dictionary entries caused NotImplementError on reading (r100)
+  * fixed issue41, reading VRs of 'US or SS' and similar split on backslash character (r104)
+  * fixed bug where TransferSyntaxUID not present when reading file without DICOM header (r109)
+  * fixed print recursion bug when printing a UID (r111)
+  
+== Other ==
+  * many of the example files updated
+  * updated anonymize example file to also deal with 'OtherPatientIDs' and 'PatientsBirthDate' (r98)
+
+= Release notes for pydicom 0.9.2 =
+
+== Major changes ==
+  * Renamed Attribute class and related modules to !DataElement. Old code will continue to work until pydicom 1.0, but with a !DeprecationWarning (issue22, r72, r73)
+  * Added support for character sets through Specific Character Set (0008,0005), using python unicode. Thus foreign languages can display names in Greek, Japanese, Chinese etc characters in environments which support unicode (demonstrated in dicomtree.py example using Tkinter GUI) (r64, r65)
+
+== Other Enhancements ==
+  * Added support for auto-completion of dataset elements in ipython; also all environments using python 2.6 (r69, r70)
+  * Added __iter__() to Dataset so returns data elements in DICOM order with "for data_elem in dataset:" (r68)
+  * Added dicomtree.py example program showing a DICOM file in a GUI window (Tkinter/Tix).
+  * Added !PersonName class to parse components of names more easily (r55)
+  * Added UID class to handle UID values. Name rather than UID number shown, UID_dictionary used (r51).
+  * Code tested under python 2.6
+  * Added !DataElement.name property; synonym for !DataElement.description() function
+
+== Bug Fixes ==
+  * Fixed issue27, sequence with a single empty item read incorrectly
+  * Fixed bug that read_OW did not handle !UndefinedLength (r50)
+  * Fixed bugs in example files anonymize.py, !DicomInfo.py, and dicomtree.py (r51)
+  * Fixed issue33, VR=UN being split on backslash (r70)
+  * Fixed issue18, util directory not installed (r45)
+
+== Other ==
+  * Added example file myprint.py -- shows how to custom format DICOM file information (r67)
+  * Reorganized test files and added various new tests
+  * added preliminary work on encapsulated data (r50)
+  * added some simple files to view or work with pixel data (r46)
+  * Dataset.!PixelDataArray() Numpy array changed to property Dataset.!PixelArray
+  * changed to setuptools for packaging rather than distutils
