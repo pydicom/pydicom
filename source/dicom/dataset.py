@@ -197,7 +197,12 @@ class Dataset(dict):
         Only makes sense if this dataset is a whole file dataset.
 
         """
-        return GroupDataset(2)
+        import warnings
+        msg = ("Dataset.file_metadata() is deprecated and will be removed"
+                " in pydicom 1.0. Use FileDataset and its file_meta"
+                " attribute instead.")
+        warnings.warn(msg, DeprecationWarning) 
+        return self.GroupDataset(2)
 
     def get(self, key, default=None):
         """Extend dict.get() to handle *named tags*."""
