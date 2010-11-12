@@ -79,7 +79,7 @@ def open_dicom(filename, force=False):
         ds = Dataset()
         for data_element in open_dicom("CT_small.dcm"):
             if meets_some_condition(data_element):
-                ds.Add(data_element)
+                ds.add(data_element)
             if some_other_condition(data_element):
                 break
     

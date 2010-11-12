@@ -48,7 +48,7 @@ class DatasetTests(unittest.TestCase):
     def dummy_dataset(self):
         # This dataset is used by many of the tests
         ds = Dataset()
-        ds.AddNew((0x300a, 0x00b2), "SH", "unit001") # TreatmentMachineName
+        ds.add_new((0x300a, 0x00b2), "SH", "unit001") # TreatmentMachineName
         return ds
         
     def testSetNewDataElementByName(self):
@@ -173,8 +173,8 @@ class DatasetTests(unittest.TestCase):
         ds.PatientsName = "name"
         ds.PatientID = "id"
         ds.NonDicomVariable = "junk"
-        ds.AddNew((0x18,0x1151), "IS", 150) # X-ray Tube Current
-        ds.AddNew((0x1111, 0x123), "DS", "42.0") # private tag - no name in dir()
+        ds.add_new((0x18,0x1151), "IS", 150) # X-ray Tube Current
+        ds.add_new((0x1111, 0x123), "DS", "42.0") # private tag - no name in dir()
         expected = ['PatientID', 'PatientsName', 'TreatmentMachineName', 'XRayTubeCurrent']
         self.assertEqual(ds.dir(), expected, "dir() returned %s, expected %s" % (str(ds.dir()), str(expected)))
     def testDeleteDicomAttr(self):
