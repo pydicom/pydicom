@@ -332,10 +332,10 @@ def json2pydicom(jsn):
     dicom_keys = [key for key in jsn.keys() \
                     if key not in ['_rev', '_id', '_attachments', 'file_meta']]
     for key in dicom_keys:
-        dataset.Add(__dicomify(key, jsn[key]))
+        dataset.add(__dicomify(key, jsn[key]))
     file_meta = dicom.dataset.Dataset()
     for key in jsn['file_meta']:
-        file_meta.Add(__dicomify(key, jsn['file_meta'][key]))
+        file_meta.add(__dicomify(key, jsn['file_meta'][key]))
     dataset.file_meta = file_meta
     return dataset
 
@@ -372,7 +372,7 @@ def __make_dataset(data_elements):
     """ Create a Dataset from a list of DataElement objects """
     dataset = dicom.dataset.Dataset()
     for element in data_elements:
-        dataset.Add(element)
+        dataset.add(element)
     return dataset
 
 def __str2tag(key):

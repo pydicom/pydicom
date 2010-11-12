@@ -37,5 +37,5 @@ if __name__ == "__main__":
         print usage
         sys.exit()
         
-    ds = dicom.ReadFile(sys.argv[1])
+    ds = dicom.read_file(sys.argv[1])
     myprint(ds)

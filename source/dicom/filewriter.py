@@ -197,7 +197,7 @@ def _write_file_meta_info(fp, meta_dataset):
     fp.is_explicit_VR = True
 
     if Tag((2,1)) not in meta_dataset:
-        meta_dataset.AddNew((2,1), 'OB', "\0\1")   # file meta information version
+        meta_dataset.add_new((2,1), 'OB', "\0\1")   # file meta information version
     
     # Now check that required meta info tags are present:
     missing = []
@@ -261,11 +261,11 @@ def write_file(filename, dataset, WriteLikeOriginal=True):
         file_meta = Dataset()
     if 'TransferSyntaxUID' not in file_meta:
         if dataset.is_little_endian and dataset.is_implicit_VR:
-            file_meta.AddNew((2, 0x10), 'UI', ImplicitVRLittleEndian)
+            file_meta.add_new((2, 0x10), 'UI', ImplicitVRLittleEndian)
         elif dataset.is_little_endian and not dataset.is_implicit_VR:
-            file_meta.AddNew((2, 0x10), 'UI', ExplicitVRLittleEndian)
+            file_meta.add_new((2, 0x10), 'UI', ExplicitVRLittleEndian)
         elif dataset.is_big_endian and not dataset.is_implicit_VR:
-            file_meta.AddNew((2, 0x10), 'UI', ExplicitVRBigEndian)
+            file_meta.add_new((2, 0x10), 'UI', ExplicitVRBigEndian)
         else:
             raise NotImplementedError, "pydicom has not been verified for Big Endian with Implicit VR"
         

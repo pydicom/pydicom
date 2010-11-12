@@ -36,6 +36,8 @@ import cStringIO, StringIO
 
 import dicom # for write_file
 import dicom.charset
+import warnings
+
 
 have_numpy = True
 
@@ -74,18 +76,30 @@ class Dataset(dict):
     """
     indentChars = "   "
     
-    def Add(self, data_element):
+    def add(self, data_element):
         """Equivalent to dataset[data_element.tag] = data_element."""
         self[data_element.tag] = data_element
-
-    def AddNew(self, tag, VR, value):
+    def Add(self, data_element):
+        """Deprecated -- use add()"""
+        msg = ("Dataset.Add() is deprecated and will be removed in pydicom 1.0."
+               " Use Dataset.add()")
+        warnings.warn(msg, DeprecationWarning)
+        self.add(data_element)
+        
+    def add_new(self, tag, VR, value):
         """Create a new DataElement instance and add it to this Dataset."""
         data_element = DataElement(tag, VR, value)
         self[data_element.tag] = data_element   # use data_element.tag since DataElement verified it
 
+    def AddNew(self, tag, VR, value):
+        """Deprecated -- use add_new()"""
+        msg = ("Dataset.AddNew() is deprecated and will be removed in pydicom 1.0."
+               " Use Dataset.add_new()")
+        warnings.warn(msg, DeprecationWarning)
+        self.add_new(tag, VR, value)
+                
     def attribute(self, name):
         """Deprecated -- use Dataset.data_element()"""
-        import warnings
         warnings.warn("Dataset.attribute() is deprecated and will be removed in pydicom 1.0. Use Dataset.data_element() instead", DeprecationWarning)
         return self.data_element(name)
 
@@ -202,7 +216,7 @@ class Dataset(dict):
                 " in pydicom 1.0. Use FileDataset and its file_meta"
                 " attribute instead.")
         warnings.warn(msg, DeprecationWarning) 
-        return self.GroupDataset(2)
+        return self.group_dataset(2)
 
     def get(self, key, default=None):
         """Extend dict.get() to handle *named tags*."""
@@ -259,7 +273,7 @@ class Dataset(dict):
             self[tag] = DataElement_from_raw(data_elem)
         return dict.__getitem__(self, tag)
 
-    def GroupDataset(self, group):
+    def group_dataset(self, group):
         """Return a Dataset containing only data_elements of a certain group.
 
         group -- the group part of a dicom (group, element) tag.
@@ -270,6 +284,12 @@ class Dataset(dict):
             [(tag,data_element) for tag,data_element in self.items() if tag.group==group]
                       ))
         return ds
+    def GroupDataset(self, group):
+        """Deprecated -- use group_dataset()"""
+        msg = ("Dataset.GroupDataset is deprecated and will be removed in pydicom 1.0."
+               " Use Dataset.group_dataset()")
+        warnings.warn(msg, DeprecationWarning)
+        self.add_new(tag, VR, value)
     
     # dict.has_key removed in python 3. But should be ok to keep this.
     def has_key(self, key):

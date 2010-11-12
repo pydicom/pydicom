@@ -662,7 +662,7 @@ class DicomSeries(object):
         for key in firstDs.keys():
             if key != (0x7fe0, 0x0010):
                 el = firstDs[key]
-                info.AddNew(el.tag, el.VR, el.value)
+                info.add_new(el.tag, el.VR, el.value)
         
         # Finish calculating average distance 
         # (Note that there are len(L)-1 distances)
