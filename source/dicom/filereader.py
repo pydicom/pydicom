@@ -258,10 +258,17 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian, stop_when=None,
 
 def read_dataset(fp, is_implicit_VR, is_little_endian, bytelength=None, 
                     stop_when=None, defer_size=None):
-    """Return a dictionary containing raw data elements of the form:
-    tag -> (VR, length, value, value_tell)
-    where length is original length (could be "undefined length")
-    and value_tell is the file position where the value bytes start.
+    """Return a Dataset instance containing the next dataset in the file. 
+    :param fp: an opened file object
+    :param is_implicit_VR: True if file transfer syntax is implicit VR
+    :param is_little_endian: True if file has little endian transfer syntax
+    :param bytelength: None to read until end of file or ItemDeliterTag, else
+    a fixed number of bytes to read
+    :param stop_when: optional call_back function which can terminate reading. 
+    See help for data_element_generator for details
+    :param defer_size: optional size to avoid loading large elements into memory.
+    See help for data_element_generator for details
+    :returns: a Dataset instance
     """
     raw_data_elements = dict()
     fpStart = fp.tell()
