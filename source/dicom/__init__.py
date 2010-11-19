@@ -49,6 +49,12 @@ __version_info__ = (0,9,6)
 debugging = False
 
 def debug(debug_on=True):
+    """Turn debugging of DICOM file reading and writing on or off.
+    When debugging is on, file location and details about the elements read at
+    that location are logged to the 'pydicom' logger using python's logging module.
+    
+    :param debug_on: True (default) to turn on debugging, False to turn off.
+    """
     global logger, debugging
     if debug_on:
         logger.setLevel(logging.DEBUG)
@@ -56,4 +62,3 @@ def debug(debug_on=True):
     else:
         logger.setLevel(logging.WARNING)
         debugging = False
-        
