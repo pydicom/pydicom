@@ -58,7 +58,7 @@ if __name__ == "__main__":
     print "File saved."
     
     # Write as a different transfer syntax
-    ds.file_meta.TransferSyntaxUID = dicom.UID.ExplicitVRBigEndian #XXX pydicom 0.9.5 bug in filewriter not recognizing transfer syntax
+    ds.file_meta.TransferSyntaxUID = dicom.UID.ExplicitVRBigEndian #XXX shouldn't need this but pydicom 0.9.5 bug not recognizing transfer syntax
     ds.is_little_endian = False
     ds.is_implicit_VR = False
     
