@@ -77,9 +77,9 @@ class UID(str):
         
     def __eq__(self, other):
         """Override string equality so either name or UID number match passes"""
-        if str.__eq__(self, other):
+        if str.__eq__(self, other) is True: # 'is True' needed (issue 96)
             return True
-        if str.__eq__(self.name, other):
+        if str.__eq__(self.name, other) is True: # 'is True' needed (issue 96)
             return True
         return False
 
