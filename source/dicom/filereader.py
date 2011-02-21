@@ -239,8 +239,14 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian, stop_when=None,
         #      undefined length SQs and items of undefined lengths can be nested
         #      and it would be error-prone to read to the correct outer delimiter 
         else:
+            # Try to look up type to see if is a SQ
+            # if private tag, won't be able to look it up in dictionary,
+            #   in which case just ignore it and read the bytes
             if VR is None:
-                VR = dictionaryVR(tag)
+                try:
+                    VR = dictionaryVR(tag)
+                except KeyError: 
+                    pass
             if VR == 'SQ':
                 if debugging:
                     logger_debug("%04x: Reading and parsing undefined length sequence"
