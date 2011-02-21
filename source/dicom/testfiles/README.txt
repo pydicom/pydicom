@@ -49,3 +49,7 @@ chr*.dcm
 test_SR.dcm
   * from ftp://ftp.dcmtk.org/pub/dicom/offis/software/dscope/dscope360/support/srdoc103.zip, file "test.dcm"
   * Structured Reporting example, many levels of nesting
+
+priv_SQ.dcm
+  * a file with an undefined length SQ item in a private tag.
+  * minimal data elements kept from example files in issues 91, 97, 98

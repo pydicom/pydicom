@@ -44,6 +44,7 @@ jpeg_lossy_name   = os.path.join(test_dir, "JPEG-lossy.dcm")
 jpeg_lossless_name   = os.path.join(test_dir, "JPEG-LL.dcm")
 deflate_name = os.path.join(test_dir, "image_dfl.dcm")
 rtstruct_name = os.path.join(test_dir, "rtstruct.dcm")
+priv_SQ_name = os.path.join(test_dir, "priv_SQ.dcm")
 
 dir_name = os.path.dirname(sys.argv[0])
 save_dir = os.getcwd()
@@ -179,7 +180,14 @@ class ReaderTests(unittest.TestCase):
         msg += "\nExpected: %r\nGot %r" % (ctfull_tags[:-2], ctpartial_tags)
         missing = [Tag(0x7fe0, 0x10), Tag(0xfffc, 0xfffc)]
         self.assertEqual(ctfull_tags, ctpartial_tags+missing, msg)
-
+    def testPrivateSQ(self):
+        """Can read private undefined length SQ without error...................."""
+        # From issues 91, 97, 98. Bug introduced by fast reading, due to VR=None
+        #    in raw data elements, then an undefined length private item VR is looked up,
+        #    and there is no such tag, generating an exception
+        
+        # Simply read the file, in 0.9.5 this generated an exception
+        priv_SQ = read_file(priv_SQ_name)
 
 class JPEG2000Tests(unittest.TestCase):
     def setUp(self):
