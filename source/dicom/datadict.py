@@ -52,7 +52,7 @@ def get_entry(tag):
         if mask_x:
             return RepeatersDictionary[mask_x]
         else:
-            raise KeyError, "Tag %s not found in DICOM dictionary" % Tag(tag)
+            raise KeyError, "Tag %s not found in DICOM dictionary" % tag
         
 def dictionaryDescription(tag):
     """Return the descriptive text for the given dicom tag."""
