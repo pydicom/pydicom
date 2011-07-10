@@ -9,6 +9,8 @@
 
 import unittest
 from dicom.dataelem import DataElement
+from dicom.dataelem import RawDataElement, DataElement_from_raw
+from dicom.tag import Tag
 from dicom.dataset import Dataset
 from dicom.UID import UID
 
@@ -41,6 +43,17 @@ class DataElementTests(unittest.TestCase):
         self.assert_(type(ds.TransferSyntaxUID) is UID, "Assignment to UID did not create UID class")
         ds.TransferSyntaxUID += ".4.5.6"
         self.assert_(type(ds.TransferSyntaxUID) is UID, "+= to UID did not keep as UID class")
+
+class RawDataElementTests(unittest.TestCase):
+    def setUp(self):
+        # raw data element -> tag VR length value value_tell is_implicit_VR is_little_endian'
+        # Need unknown (not in DICOM dict), non-private, non-group 0 for this test
+        self.raw1 = RawDataElement(Tag(0x88880002), None, 4, 0x1111, 0, True, True)
+        
+    def testKeyError(self):
+        """RawDataElement: conversion with unknown tag throws KeyError........"""
+        self.assertRaises(KeyError, DataElement_from_raw, self.raw1)
+
 
 if __name__ == "__main__":
     unittest.main()

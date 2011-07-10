@@ -11,13 +11,13 @@ data elements are printed: some info about the patient and about
 the image.
 
 """
-# Copyright (c) 2008 Darcy Mason
-# This file is part of pydicom, relased under an MIT license.
+# Copyright (c) 2008-2011 Darcy Mason
+# This file is part of pydicom, released under an MIT license.
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
 
 import sys
-from dicom.filereader import ReadFile
+import dicom
 
 # check command line arguments make sense
 if not 1 < len(sys.argv) < 4:
@@ -26,7 +26,7 @@ if not 1 < len(sys.argv) < 4:
 
 # read the file
 filename = sys.argv[1]
-dataset = ReadFile(filename)
+dataset = dicom.read_file(filename)
 
 # Verbose mode:
 if len(sys.argv) == 3:
@@ -42,21 +42,16 @@ print "Filename.........:", filename
 print "Storage type.....:", dataset.SOPClassUID
 print
 
-pat_name = dataset.PatientsName.split("^")
-display_name = ", ".join(pat_name[:2])
+pat_name = dataset.PatientsName
+display_name = pat_name.family_name + ", " + pat_name.given_name
 print "Patient's name...:", display_name
 print "Patient id.......:", dataset.PatientID
 print "Modality.........:", dataset.Modality
 print "Study Date.......:", dataset.StudyDate
 
-# use either:
-#     'name' in dataset
-# or
-#     hasattr(dataset, 'name')
-# to check if a data element exists
 if 'PixelData' in dataset:
     print "Image size.......: %i x %i, %i bytes" % (dataset.Rows, dataset.Columns, len(dataset.PixelData))
-    if hasattr(dataset, 'PixelSpacing'):
+    if 'PixelSpacing' in dataset:
         print "Pixel spacing....:", dataset.PixelSpacing
 
 # use .get() if not sure the item exists, and want a default value if missing
