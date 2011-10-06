@@ -137,6 +137,8 @@ converters = {'UL':(convert_numbers,'L'), 'SL':(convert_numbers,'l'),
            'OW':convert_OWvalue,
            'OW/OB':convert_OBvalue,# note OW/OB depends on other items, which we don't know at read time
            'OB/OW':convert_OBvalue,
+           'OW or OB': convert_OBvalue,
+           'OB or OW': convert_OBvalue,
            'US or SS':convert_OWvalue,
            'US or SS or OW':convert_OWvalue,
            'US\US or SS\US':convert_OWvalue,

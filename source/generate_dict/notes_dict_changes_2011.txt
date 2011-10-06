@@ -1,0 +1,35 @@
+Differences in new DICOM dictionary ('11)
+# NOTE: Only recording those which are not Retired in the new dict
+
+Apostrophe character changed
+(0018, 1153), (,8150) and (8151)- micro symbol (old had '?' -- probably just my dict)
+
+Misc changes
+(0028,3006) -- had to remove extra space in 'US or OW', and is changed from 'US or OW or SS)
+(5400,0110) and (,0112): 'OB or OW' instead of 'OB/OW'
+Similarly in other group 5400
+In PixelData (7Fe0, 0010) 'OW or OB' instead of 'OW/OB'
+and in various others (60xx,…)
+
+Name change
+(0008,9237): Ref'd Presentation State Sequence # Had 'GrayScale' in it before
+(0018,0029) Interventional Drug <CODE> sequence # 'Code' added
+(0028,1300) Breast Implant Present # 'Breast' is new
+(0040,0518) Container Type Sequence # was 'Container Type Code Sequence'
+(0040,4005) Scheduled Procedure Step Start DateTime # was '..Date and Time'
+Similarly for (0040,4010 and 4011)
+(0040, B020) 'Waveform Annotation Sequence' # 'Waveform added
+(0074,1000) Procedure Step State # had 'Unified' in front before
+
+Capitalization changed:
+(0x0018,9066) Number of Zero <F>ills
+(0040,0072A etc): X <O>ffset
+(0050,0019) Inter-<M>arker distance
+(0072,0704) Pseudo-<C>olor Type
+ 
+
+Plural change:
+(0x0018, 1016)
+(0x0018, 9195 and 6): 'Chemical Shift…'(was 'Shifts')
+and  …9295, 96
+(0x00286022): Frame of Interest Description # was 'Frames'

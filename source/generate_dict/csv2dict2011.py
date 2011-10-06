@@ -54,6 +54,8 @@ if __name__ == "__main__":
             else:
                 raise NotImplementedError, "Cannot mask '%s'" % elem
         
+        if description.endswith(" "):
+            description = description.rstrip()
         description = description.replace("\x92", "'") # non-ascii apostrophe used 
         description = description.replace("\x96", "-") # non-ascii dash used
 		
@@ -63,6 +65,9 @@ if __name__ == "__main__":
             VM = '1'
             description = "Retired-blank"
         
+        # One odd tag in '11 standard (0028,3006)
+        if VR == 'US  or OW':  # extra space
+           VR = 'US or OW'
         # Handle retired "repeating group" tags e.g. group "50xx"
         if "x" in group or "x" in elem:
             tag = group + elem # simple concatenation
