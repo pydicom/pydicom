@@ -1,4 +1,5 @@
 # datadict.py
+# -*- coding: utf-8 -*-
 """Access dicom dictionary information"""
 #
 # Copyright (c) 2008 Darcy Mason
@@ -87,7 +88,7 @@ def CleanName(tag):
             return ""
     s = dictionaryDescription(tag)    # Descriptive name in dictionary
     # remove blanks and nasty characters
-    s = s.translate(normTable, r""" !@#$%^&*(),;:.?\|{}[]+-="'/""")
+    s = s.translate(normTable, r""" !@#$%^&*(),;:.?\|{}[]+-="'’/""")
     
     # Take "Sequence" out of name as more natural sounding
     # e..g "BeamSequence"->"Beams"; "ReferencedImageBoxSequence"->"ReferencedImageBoxes"

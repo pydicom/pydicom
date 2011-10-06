@@ -308,6 +308,8 @@ writers = {'UL':(write_numbers,'L'), 'SL':(write_numbers,'l'),
            'US or SS':write_OWvalue,
            'OW/OB':write_OBvalue,
            'OB/OW':write_OBvalue,
+           'OB or OW':write_OBvalue,
+           'OW or OB':write_OBvalue,
            'DT':write_string,
            'UT':write_string,
            } # note OW/OB depends on other items, which we don't know at write time

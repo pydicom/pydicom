@@ -88,7 +88,7 @@ class RawReaderImplVRTests(unittest.TestCase):
         bytes3 = " fe ff dd e0 00 00 00 00"          # Sequence Delimiter
         bytes = bytes1 + bytes2 + bytes3
         infile = StringIO(hex2str(bytes))
-        expected = ((0x7fe0,0x10), 'OW/OB', 0xffffffffL, 'ABCDEFGHIJ', 0x8, True, True)
+        expected = ((0x7fe0,0x10), 'OW or OB', 0xffffffffL, 'ABCDEFGHIJ', 0x8, True, True)
         de_gen = data_element_generator(infile, is_implicit_VR=True, is_little_endian=True)
         got = de_gen.next()
         msg_loc = "in read of undefined length Implicit VR ='OB' short value)"
