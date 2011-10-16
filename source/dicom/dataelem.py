@@ -196,7 +196,7 @@ class DataElement(object):
 
     def _get_repval(self):
         """Return a str representation of the current value for use in __str__"""
-        if (self.VR in ['OB', 'OW', 'OW/OB', 'US or SS or OW', 'US or SS']
+        if (self.VR in ['OB', 'OW', 'OW/OB', 'OW or OB', 'OB or OW', 'US or SS or OW', 'US or SS']
                   and len(self.value) > self.maxBytesToDisplay):
             repVal = "Array of %d bytes" % len(self.value)
         elif hasattr(self, 'string_value'): # for VR of IS or DS
