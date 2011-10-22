@@ -2,14 +2,17 @@
 """Read a dicom file (or directory of files), partially "anonymize" it (them), 
 by replacing Person names, patient id, optionally remove curves 
 and private tags, and write result to a new file (directory)
-This is an example only; use only as a starting point."""
-# Copyright (c) 2008 Darcy Mason
+This is an example only; use only as a starting point.
+"""
+# Copyright (c) 2008, 2011 Darcy Mason
 # This file is part of pydicom, relased under an MIT license.
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
 # Use at your own risk!!
-# Many more items need to be addressed for proper anonymizing
+# Many more items need to be addressed for proper de-identifying DICOM data.
 # In particular, note that pixel data could have confidential data "burned in"
+# Annex E of PS3.15-2011 DICOM standard document details what must be done to 
+# fully de-identify DICOM data
 
 usage = """
 Usage:
@@ -17,7 +20,8 @@ python anonymize.py dicomfile.dcm outputfile.dcm
 OR
 python anonymize.py originals_directory anonymized_directory
 
-Note: Use at your own risk.
+Note: Use at your own risk. Does not fully de-identify the DICOM data as per
+the DICOM standard, e.g in Annex E of PS3.15-2011.
 """
 
 import os, os.path
