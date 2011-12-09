@@ -45,6 +45,7 @@ jpeg_lossless_name   = os.path.join(test_dir, "JPEG-LL.dcm")
 deflate_name = os.path.join(test_dir, "image_dfl.dcm")
 rtstruct_name = os.path.join(test_dir, "rtstruct.dcm")
 priv_SQ_name = os.path.join(test_dir, "priv_SQ.dcm")
+no_meta_group_length = os.path.join(test_dir, "no_meta_group_length.dcm")
 
 dir_name = os.path.dirname(sys.argv[0])
 save_dir = os.getcwd()
@@ -188,6 +189,16 @@ class ReaderTests(unittest.TestCase):
         
         # Simply read the file, in 0.9.5 this generated an exception
         priv_SQ = read_file(priv_SQ_name)
+    def testNoMetaGroupLength(self):
+        """Read file with no group length in file meta..........................."""
+        # Issue 108 -- iView example file with no group length (0002,0002)
+        # Originally crashed, now check no exception, but also check one item
+        #     in file_meta, and second one in followinsg dataset
+        ds = read_file(no_meta_group_length)
+        got = ds.InstanceCreationDate
+        expected = "20111130"
+        self.assertEqual(got, expected, "Sample data element after file meta with no group length failed, expected '%s', got '%s'" % (expected, got))
+        
 
 class JPEG2000Tests(unittest.TestCase):
     def setUp(self):
