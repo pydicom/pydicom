@@ -165,7 +165,7 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian, stop_when=None,
     # If Explicit VR:
     #    if OB, OW, OF, SQ, UN, or UT:
     #       tag, VR, 2-bytes reserved (both zero), 4-byte length, value
-    #           for all but UT, the length can be FFFFFFFF (undefined length)*
+    #           For all but UT, the length can be FFFFFFFF (undefined length)*
     #   else: (any other VR)
     #       tag, VR, (2 byte length), value
     # * for undefined length, a Sequence Delimitation Item marks the end
@@ -218,6 +218,10 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian, stop_when=None,
         tag = TupleTag((group, elem))
         if stop_when is not None:
             if stop_when(tag, VR, length): # XXX Note VR may be None here!! Should make stop_when just take tag?
+                rewind_length = 8
+                if not is_implicit_VR and VR in ('OB','OW','OF','SQ','UN', 'UT'): 
+                    rewind_length += 4
+                fp.seek(value_tell-rewind_length)
                 raise StopIteration
 
         # Reading the value
@@ -351,6 +355,9 @@ def read_sequence_item(fp, is_implicit_VR, is_little_endian):
     logger.debug("%04x: Finished sequence item" % fp.tell())
     return ds
 
+def not_group2(tag, VR, length):
+    return (tag.group != 2)
+
 def _read_file_meta_info(fp):
     """Return the file meta information.
     fp must be set after the 128 byte preamble and 'DICM' marker
@@ -359,11 +366,23 @@ def _read_file_meta_info(fp):
     #    to the transfer syntax values set in the meta info
 
     # Get group length data element, whose value is the length of the meta_info
-    group, elem, VR, length = unpack("<HH2sH", fp.read(8))
-    group_length = unpack("<L", fp.read(length))[0] # XXX should prob check (gp, el), VR before read
-    file_meta = read_dataset(fp, is_implicit_VR=False,
+    fp_save = fp.tell() # in case need to rewind
+    group, elem, VR = unpack("<HH2s", fp.read(6))
+    if VR in ('OB','OW','OF','SQ','UN', 'UT'):
+        reserved, length = unpack("<2sL", fp.read(6))
+    else:
+        length = unpack("<H", fp.read(2))[0]
+
+    # If required meta group length exists, use it, else read until not group 2
+    if group == 2 and elem == 0:
+        group_length = unpack("<L", fp.read(length))[0]
+        file_meta = read_dataset(fp, is_implicit_VR=False,
                         is_little_endian=True, bytelength=group_length)
-    # ds = Dataset(raw_file_meta)
+    else:
+        # rewind to read the first data element as part of the file_meta dataset
+        fp.seek(fp_save)          
+        file_meta = read_dataset(fp, is_implicit_VR=False,
+                        is_little_endian=True, stop_when=not_group2)
     return file_meta
 
 def read_file_meta_info(filename):
@@ -391,7 +410,7 @@ def read_preamble(fp, force):
             preamble = None
             fp.seek(0)
         else:
-            raise InvalidDicomError
+            raise InvalidDicomError("File is missing 'DICM' marker. Use force=True to force reading")
     return preamble
 
 def _at_pixel_data(tag, VR, length):
