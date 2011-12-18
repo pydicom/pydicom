@@ -40,6 +40,7 @@ if __name__ == "__main__":
         if tag == '' or tag == "Tag":
             continue 
         tag = tag.strip()   # at least one item has extra blank on end
+        VR = VR.strip()     # similarly, some VRs have extra blank
         group, elem = tag[1:-1].split(",")
         if is_retired.strip() == 'RET':
             is_retired = 'Retired'
