@@ -79,7 +79,7 @@ class Dataset(dict):
     def add(self, data_element):
         """Equivalent to dataset[data_element.tag] = data_element."""
         self[data_element.tag] = data_element
-    def Add(self, data_element):
+    def Add(self, data_element): # remove in v1.0
         """Deprecated -- use add()"""
         msg = ("Dataset.Add() is deprecated and will be removed in pydicom 1.0."
                " Use Dataset.add()")
@@ -91,14 +91,14 @@ class Dataset(dict):
         data_element = DataElement(tag, VR, value)
         self[data_element.tag] = data_element   # use data_element.tag since DataElement verified it
 
-    def AddNew(self, tag, VR, value):
+    def AddNew(self, tag, VR, value): #remove in v1.0
         """Deprecated -- use add_new()"""
         msg = ("Dataset.AddNew() is deprecated and will be removed in pydicom 1.0."
                " Use Dataset.add_new()")
         warnings.warn(msg, DeprecationWarning)
         self.add_new(tag, VR, value)
                 
-    def attribute(self, name):
+    def attribute(self, name): #remove in v1.0
         """Deprecated -- use Dataset.data_element()"""
         warnings.warn("Dataset.attribute() is deprecated and will be removed in pydicom 1.0. Use Dataset.data_element() instead", DeprecationWarning)
         return self.data_element(name)
@@ -176,7 +176,14 @@ class Dataset(dict):
         available in an object, for example used in auto-completion in editors
         or command-line environments.
         """
-        return self.dir()
+        import inspect
+        meths = set(zip(*inspect.getmembers(Dataset,inspect.isroutine))[0])
+        props = set(zip(*inspect.getmembers(Dataset,inspect.isdatadescriptor))[0])
+        deprecated = set(('Add', 'AddNew', 'GroupDataset', 'RemovePrivateTags',
+                          'SaveAs', 'attribute', 'PixelArray'))
+        dicom_names = set(self.dir())
+        alldir=sorted((props|meths|dicom_names)-deprecated)
+        return alldir
 
     def dir(self, *filters):
         """Return a list of some or all data_element names, in alphabetical order.
@@ -205,7 +212,7 @@ class Dataset(dict):
         else:
             return sorted(allnames)
 
-    def file_metadata(self):
+    def file_metadata(self): # remove in v1.0
         """Return a Dataset holding only meta information (group 2).
 
         Only makes sense if this dataset is a whole file dataset.
@@ -284,7 +291,7 @@ class Dataset(dict):
             [(tag,data_element) for tag,data_element in self.items() if tag.group==group]
                       ))
         return ds
-    def GroupDataset(self, group):
+    def GroupDataset(self, group):  # remove in v1.0
         """Deprecated -- use group_dataset()"""
         msg = ("Dataset.GroupDataset is deprecated and will be removed in pydicom 1.0."
                " Use Dataset.group_dataset()")
@@ -401,7 +408,7 @@ class Dataset(dict):
             raise PropertyError("AttributeError in pixel_array property: " + \
                             e.args[0]), None, tb
     pixel_array = property(_get_pixel_array)
-    PixelArray = pixel_array # for backwards compatibility
+    PixelArray = pixel_array # for backwards compatibility -- remove in v1.0
 
     # Format strings spec'd according to python string formatting options
     #    See http://docs.python.org/library/stdtypes.html#string-formatting-operations
@@ -537,7 +544,7 @@ class Dataset(dict):
         Used in IPython, so that data element names can be found
         and offered for autocompletion on the IPython command line
         """
-        return self.dir() # does not list underlying dict properties and methods
+        return self.__dir__() # can't use dir(self) for python <2.6
 
     def update(self, dictionary):
         """Extend dict.update() to handle *named tags*."""
