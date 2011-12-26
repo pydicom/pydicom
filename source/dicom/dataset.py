@@ -341,7 +341,7 @@ class Dataset(dict):
             raise TypeError, "No pixel data found in this dataset."
 
         if not have_numpy:
-            msg = "The Numpy package is required to use PixelArray and numpy could not be imported.\n"
+            msg = "The Numpy package is required to use pixel_array, and numpy could not be imported.\n"
             raise ImportError, msg
 
         # determine the type used for the array
