@@ -13,6 +13,7 @@ from cStringIO import StringIO # tried cStringIO but wouldn't let me derive clas
 import logging
 from dicom.tag import TupleTag
 from dicom.dataelem import RawDataElement
+from dicom.util.hexutil import bytes2hex
 
 logger = logging.getLogger('pydicom')
 
@@ -170,7 +171,9 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian, stop_when=None,
     #       tag, VR, (2 byte length), value
     # * for undefined length, a Sequence Delimitation Item marks the end
     #        of the Value Field.
-
+    # Note, except for the special_VRs, both impl and expl VR use 8 bytes;
+    #    the special VRs follow the 8 bytes with a 4-byte length
+    
     # With a generator, state is stored, so we can break down
     #    into the individual cases, and not have to check them again for each
     #    data element
@@ -188,36 +191,42 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian, stop_when=None,
     if is_implicit_VR:
         unpack_format = endian_chr + "HHL" # XXX in python >=2.5, can do struct.Struct to save time
     else: # Explicit VR
-        unpack_format = endian_chr + "HH2s"
-        long_length_format = endian_chr + "2sL"
-        short_length_format = endian_chr + "H"
-
+        unpack_format = endian_chr + "HH2sH" # tag, VR, 2-byte length (or 0 if special VRs)
+        extra_length_format = endian_chr + "L"  # for special VRs
+        
     while True:
         # Read tag, VR, length, get ready to read value
+        bytes_read = fp_read(8)        
+        if len(bytes_read) < 8:
+            raise StopIteration # at end of file
+        if debugging: debug_msg = "%08x: %s" % (fp.tell()-8, bytes2hex(bytes_read))
+        
         if is_implicit_VR:
             VR = None # must reset each time -- may have looked up on last iteration (e.g. SQ)
-            bytes = fp_read(8)
-            if len(bytes) < 8:
-                raise StopIteration # at end of file
-            group, elem, length = unpack(unpack_format, bytes)
+            group, elem, length = unpack(unpack_format, bytes_read)
         else: # explicit VR
-            bytes = fp_read(6)
-            if len(bytes) < 6:
-                raise StopIteration # at end of file
-            group, elem, VR = unpack(unpack_format, bytes)
-            if debugging:
-                logger_debug("%04x: (%04x, %04x) ExplVR='%s'" % (fp_tell()-6, group, elem , VR))
+            group, elem, VR, length = unpack(unpack_format, bytes_read)
             if VR in ('OB','OW','OF','SQ','UN', 'UT'):
-                reserved, length = unpack(long_length_format, fp_read(6))
+                bytes_read = fp_read(4)
+                length = unpack(extra_length_format, bytes_read)[0]
+                if debugging: debug_msg += " " + bytes2hex(bytes_read)
+        if debugging:
+            debug_msg = "%-47s  (%04x, %04x)" % (debug_msg, group, elem)
+            if not is_implicit_VR: debug_msg += " %s " % VR
+            if length != 0xFFFFFFFFL:
+                debug_msg += "Length: %d" % length
             else:
-                length = unpack(short_length_format, fp_read(2))[0]
+                debug_msg += "Length: Undefined length (FFFFFFFF)"
+            logger_debug(debug_msg)
 
         # Now are positioned to read the value, but may not want to -- check stop_when
         value_tell = fp_tell()
-        # logger.debug("%04x: start of value of length %d" % (value_tell, length))
+        # logger.debug("%08x: start of value of length %d" % (value_tell, length))
         tag = TupleTag((group, elem))
         if stop_when is not None:
-            if stop_when(tag, VR, length): # XXX Note VR may be None here!! Should make stop_when just take tag?
+            if stop_when(tag, VR, length): # XXX VR may be None here!! Should stop_when just take tag?
+                if debugging: 
+                    logger_debug("Reading ended by stop_when callback. Rewinding to start of data element.")
                 rewind_length = 8
                 if not is_implicit_VR and VR in ('OB','OW','OF','SQ','UN', 'UT'): 
                     rewind_length += 4
@@ -230,11 +239,16 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian, stop_when=None,
             if defer_size is not None and length > defer_size:
                 # Flag as deferred read by setting value to None, and skip bytes
                 value = None
+                logger_debug("Defer size exceeded. Skipping forward to next data element.")
                 fp.seek(fp_tell()+length)
             else:
                 value = fp_read(length)
                 if debugging:
-                    logger_debug("%04x: (%04x, %04x) %4s %04x %30r " % (value_tell, group, elem, VR, length, value[:30]))
+                    dotdot = "   "
+                    if length > 12:
+                        dotdot = "..."
+                    logger_debug("%08x: %-34s %s %r %s" % (value_tell, 
+                              bytes2hex(value[:12]), dotdot, value[:12], dotdot))
             yield RawDataElement(tag, VR, length, value, value_tell, 
                                      is_implicit_VR, is_little_endian)
 
@@ -253,7 +267,7 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian, stop_when=None,
                     pass
             if VR == 'SQ':
                 if debugging:
-                    logger_debug("%04x: Reading and parsing undefined length sequence"
+                    logger_debug("%08x: Reading and parsing undefined length sequence"
                                 % fp_tell())
                 seq = read_sequence(fp, is_implicit_VR, is_little_endian, length)
                 yield DataElement(tag, VR, seq, value_tell, is_undefined_length=True)
@@ -331,28 +345,30 @@ def read_sequence_item(fp, is_implicit_VR, is_little_endian):
     else:
         tag_length_format = ">HHL"
     try:
-        group, element, length = unpack(tag_length_format, fp.read(8))
+        bytes_read = fp.read(8)
+        group, element, length = unpack(tag_length_format, bytes_read)
     except:
         raise IOError, "No tag to read at file position %05x" % fp.tell()
 
     tag = (group, element)
     if tag == SequenceDelimiterTag: # No more items, time to stop reading
         data_element = DataElement(tag, None, None, fp.tell()-4)
-        logger.debug("%04x: %s" % (fp.tell()-4, "End of Sequence"))
+        logger.debug("%08x: %s" % (fp.tell()-8, "End of Sequence"))
         if length != 0:
             logger.warning("Expected 0x00000000 after delimiter, found 0x%x, at position 0x%x" % (length, fp.tell()-4))
         return None
     if tag != ItemTag:
         logger.warning("Expected sequence item with tag %s at file position 0x%x" % (ItemTag, fp.tell()-4))
     else:
-        logger.debug("%04x: Found Item tag (start of item)" % (fp.tell()-4,))
+        logger.debug("%08x: %s  Found Item tag (start of item)" % (fp.tell()-4,
+                          bytes2hex(bytes_read)))
     is_undefined_length = False
     if length == 0xFFFFFFFFL:
         ds = read_dataset(fp, is_implicit_VR, is_little_endian, bytelength=None)
         ds.is_undefined_length_sequence_item = True
     else:
         ds = read_dataset(fp, is_implicit_VR, is_little_endian, length)
-    logger.debug("%04x: Finished sequence item" % fp.tell())
+    logger.debug("%08x: Finished sequence item" % fp.tell())
     return ds
 
 def not_group2(tag, VR, length):
@@ -367,22 +383,47 @@ def _read_file_meta_info(fp):
 
     # Get group length data element, whose value is the length of the meta_info
     fp_save = fp.tell() # in case need to rewind
-    group, elem, VR = unpack("<HH2s", fp.read(6))
+    debugging = dicom.debugging
+    if debugging: logger.debug("Try to read group length info...")
+    bytes_read = fp.read(8)
+    group, elem, VR, length = unpack("<HH2sH", bytes_read)
+    if debugging: debug_msg = "%08x: %s" % (fp.tell()-8, bytes2hex(bytes_read))
     if VR in ('OB','OW','OF','SQ','UN', 'UT'):
-        reserved, length = unpack("<2sL", fp.read(6))
-    else:
-        length = unpack("<H", fp.read(2))[0]
-
-    # If required meta group length exists, use it, else read until not group 2
+        bytes_read = fp.read(4)
+        length = unpack("<L", bytes_read)[0]
+        if debugging: debug_msg += " " + bytes2hex(bytes_read)
+    if debugging:
+        debug_msg = "%-47s  (%04x, %04x) %2s Length: %d" % (debug_msg, 
+                    group, elem, VR, length)
+        logger.debug(debug_msg)
+   
+    # If required meta group length exists, store it, and then read until not group 2
     if group == 2 and elem == 0:
-        group_length = unpack("<L", fp.read(length))[0]
-        file_meta = read_dataset(fp, is_implicit_VR=False,
-                        is_little_endian=True, bytelength=group_length)
+        bytes_read = fp.read(length)
+        if debugging: logger.debug("%08x: %s" % (fp.tell()-length, bytes2hex(bytes_read)))
+        group_length = unpack("<L", bytes_read)[0]
+        expected_ds_start = fp.tell() + group_length
+        if debugging: 
+            msg = "value (group length) = %d" % group_length
+            msg += "  regular dataset should start at %08x" % (expected_ds_start)
+            logger.debug(" "*10 + msg)
     else:
-        # rewind to read the first data element as part of the file_meta dataset
-        fp.seek(fp_save)          
-        file_meta = read_dataset(fp, is_implicit_VR=False,
-                        is_little_endian=True, stop_when=not_group2)
+        expected_ds_start = None
+        if debugging: logger.debug(" "*10 + "(0002,0000) Group length not found.")
+    
+    # Changed in pydicom 0.9.7 -- don't trust the group length, just read
+    #    until no longer group 2 data elements. But check the length and
+    #    give a warning if group 2 ends at different location.
+    # Rewind to read the first data element as part of the file_meta dataset
+    if debugging: logger.debug("Rewinding and reading whole dataset including this first data element")    
+    fp.seek(fp_save)          
+    file_meta = read_dataset(fp, is_implicit_VR=False,
+                    is_little_endian=True, stop_when=not_group2)
+    fp_now = fp.tell()
+    if expected_ds_start and fp_now != expected_ds_start:
+        logger.info("*** Group length for file meta dataset did not match end of group 2 data ***")
+    else:
+        if debugging: logger.debug("--- End of file meta data found as expected ---------")
     return file_meta
 
 def read_file_meta_info(filename):
@@ -401,8 +442,11 @@ def read_preamble(fp, force):
     If 'DICM' does not exist, assume no preamble, return None, and
     rewind file to the beginning..
     """
-    logger.debug("Reading preamble")
+    logger.debug("Reading preamble...")
     preamble = fp.read(0x80)
+    if dicom.debugging:
+        sample_bytes = bytes2hex(preamble[:8]) + "..." + bytes2hex(preamble[-8:])  
+        logger.debug("%08x: %s" % (fp.tell()-0x80, sample_bytes))
     magic = fp.read(4)
     if magic != "DICM":
         if force:
@@ -411,6 +455,8 @@ def read_preamble(fp, force):
             fp.seek(0)
         else:
             raise InvalidDicomError("File is missing 'DICM' marker. Use force=True to force reading")
+    else:
+        logger.debug("%08x: 'DICM' marker found" % (fp.tell()-4))
     return preamble
 
 def _at_pixel_data(tag, VR, length):
@@ -490,6 +536,18 @@ def read_file(fp, defer_size=None, stop_before_pixels=False, force=False):
         caller_owns_file = False
         logger.debug("Reading file '%s'" % fp)
         fp = open(fp, 'rb')
+
+    if dicom.debugging:
+        logger.debug("\n"+"-"*80)
+        logger.debug("Call to read_file()")
+        msg = ("filename:'%s', defer_size='%s'"
+               ", stop_before_pixels=%s, force=%s")
+        logger.debug(msg % (fp.name, defer_size, stop_before_pixels, force))
+        if caller_owns_file:
+            logger.debug("Caller passed file object")
+        else:
+            logger.debug("Caller passed file name")
+        logger.debug("-"*80)
 
     # Convert size to defer reading into bytes, and store in file object
     # if defer_size is not None:
