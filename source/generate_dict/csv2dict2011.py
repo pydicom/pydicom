@@ -21,9 +21,9 @@ mask_dict_name = "RepeatersDictionary"
 
 def write_dict(f, dict_name, attributes, tagIsString):
     if tagIsString:
-        entry_format = """'%s': ('%s', '%s', "%s", '%s')"""
+        entry_format = """'%s': ('%s', '%s', "%s", '%s', '%s')"""
     else:
-        entry_format = """%s: ('%s', '%s', "%s", '%s')"""
+        entry_format = """%s: ('%s', '%s', "%s", '%s', '%s')"""
     f.write("\n%s = {\n" % dict_name)
     f.write(",\n".join(entry_format % attribute for attribute in attributes))
     f.write("}\n")
@@ -41,6 +41,7 @@ if __name__ == "__main__":
             continue 
         tag = tag.strip()   # at least one item has extra blank on end
         VR = VR.strip()     # similarly, some VRs have extra blank
+        keyword = keyword.strip()  # just in case
         group, elem = tag[1:-1].split(",")
         if is_retired.strip() == 'RET':
             is_retired = 'Retired'
@@ -75,10 +76,10 @@ if __name__ == "__main__":
         # Handle retired "repeating group" tags e.g. group "50xx"
         if "x" in group or "x" in elem:
             tag = group + elem # simple concatenation
-            mask_attributes.append((tag, VR, VM, description, is_retired))
+            mask_attributes.append((tag, VR, VM, description, is_retired, keyword))
         else:
             tag = "0x%s%s" % (group, elem)
-            main_attributes.append((tag, VR, VM, description, is_retired))
+            main_attributes.append((tag, VR, VM, description, is_retired, keyword))
 
     py_file = file(pydict_filename, "w")
     py_file.write("# %s\n" % pydict_filename)
