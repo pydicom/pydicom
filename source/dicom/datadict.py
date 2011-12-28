@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """Access dicom dictionary information"""
 #
-# Copyright (c) 2008 Darcy Mason
+# Copyright (c) 2008-2011 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
@@ -10,9 +10,10 @@
 import logging
 logger = logging.getLogger("pydicom")
 from dicom.tag import Tag
-from dicom._dicom_dict import DicomDictionary  # the actual dict of {tag: (VR, VM, name, is_retired), tag:...}
+from dicom._dicom_dict import DicomDictionary  # the actual dict of {tag: (VR, VM, name, is_retired, keyword), …}
 from dicom._dicom_dict import RepeatersDictionary # those with tags like "(50xx, 0005)"
 from dicom._private_dict import private_dictionaries
+import warnings
 
 # Generate mask dict for checking repeating groups etc.
 # Map a true bitwise mask to the DICOM mask with "x"'s in it.
@@ -40,7 +41,7 @@ def mask_match(tag):
     return None
     
 def get_entry(tag):
-    """Return the tuple (VR, VM, name, is_retired) from the DICOM dictionary
+    """Return the tuple (VR, VM, name, is_retired, keyword) from the DICOM dictionary
     
     If the entry is not in the main dictionary, check the masked ones,
     e.g. repeating groups like 50xx, etc.
@@ -71,13 +72,18 @@ def dictionaryHasTag(tag):
     """Return True if the dicom dictionary has an entry for the given tag."""
     return (tag in DicomDictionary)
 
+def dictionary_keyword(tag):
+    """Return the official DICOM standard (since 2011) keyword for the tag"""
+    return get_entry(tag)[4]
+
 import string
 normTable = string.maketrans('','')
 
 def CleanName(tag):
     """Return the dictionary descriptive text string but without bad characters.
     
-    Used for e.g. *named tags* of Dataset instances.
+    Used for e.g. *named tags* of Dataset instances (before DICOM keywords were
+    part of the standard)
     
     """
     tag = Tag(tag)  
@@ -94,19 +100,20 @@ def CleanName(tag):
     # e..g "BeamSequence"->"Beams"; "ReferencedImageBoxSequence"->"ReferencedImageBoxes"
     # 'Other Patient ID' exists as single value AND as sequence so check for it and leave 'Sequence' in
     if dictionaryVR(tag) == "SQ" and not s.startswith("OtherPatientIDs"):
-        if s[-8:] == "Sequence": 
+        if s.endswith("Sequence"): 
             s = s[:-8]+"s"
-        if s[-2:] == "ss":
-            s = s[:-1]
-        if s[-6:] == "Studys":
-            s = s[:-2]+"ies"
-        if s[-2:] == "xs":
-            s = s[:-1] + "es"
+            if s.endswith("ss"):
+                s = s[:-1]
+            if s.endswith("xs"):
+                s = s[:-1] + "es"
+            if s.endswith("Studys"):
+                s = s[:-2]+"ies"        
     return s
 
 # Provide for the 'reverse' lookup. Given clean name, what is the tag?
 logger.debug("Reversing DICOM dictionary so can look up tag from a name...")
 NameDict = dict([(CleanName(tag), tag) for tag in DicomDictionary])
+keyword_dict = dict([(dictionary_keyword(tag), tag) for tag in DicomDictionary])
 
 def short_name(name):
     """Return a short *named tag* for the corresponding long version.
@@ -118,6 +125,7 @@ def short_name(name):
         if name.startswith(longname):
             return name.replace(longname, shortname)
     return ""
+
 def long_name(name):
     """Return a long *named tag* for the corresponding short version.
     
@@ -132,8 +140,15 @@ def long_name(name):
 
 def TagForName(name):
     """Return the dicom tag corresponding to name, or None if none exist."""
-    if name in NameDict:  # the usual case
-        return NameDict[name]
+    if name in keyword_dict: # the usual case
+        return keyword_dict[name]
+    # If not an official keyword, check the old style pydicom names
+    if name in NameDict: 
+        tag = NameDict[name] 
+        msg = ("'%s' as tag name has been deprecated; use official DICOM keyword '%s'"
+                % (name, dictionary_keyword(tag)))
+        warnings.warn(msg, DeprecationWarning)
+        return tag
     
     # check if is short-form of a valid name
     longname = long_name(name)
