@@ -202,9 +202,9 @@ class Dataset(dict):
         allnames = [x for x in allnames if x]  # remove blanks - tags without valid names (e.g. private tags)
         # Store found names in a dict, so duplicate names appear only once
         matches = {}
-        for filter in filters:
-            filter = filter.lower()
-            match = [x for x in allnames if x.lower().find(filter) != -1]
+        for filter_ in filters:
+            filter_ = filter_.lower()
+            match = [x for x in allnames if x.lower().find(filter_) != -1]
             matches.update(dict([(x,1) for x in match]))
         if filters:
             names = sorted(matches.keys())
