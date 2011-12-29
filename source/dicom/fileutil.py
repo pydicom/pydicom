@@ -7,7 +7,7 @@
 
 from struct import pack, unpack
 from dicom.tag import TupleTag, Tag
-from dicom.datadict import dictionaryDescription
+from dicom.datadict import dictionary_description
 
 import logging
 logger = logging.getLogger('pydicom')
@@ -21,12 +21,12 @@ def absorb_delimiter_item(fp, is_little_endian, delimiter):
     group, elem, length = unpack(struct_format, fp.read(8))
     tag = TupleTag((group, elem))
     if tag != delimiter:
-        msg = "Did not find expected delimiter '%s'" % dictionaryDescription(delimiter)
+        msg = "Did not find expected delimiter '%s'" % dictionary_description(delimiter)
         msg += ", instead found %s at file position 0x%x" %(str(tag), fp.tell()-8)
         logger.warn(msg)    
         fp.seek(fp.tell()-8)
         return 
-    logger.debug("%04x: Found Delimiter '%s'", fp.tell()-8, dictionaryDescription(delimiter))
+    logger.debug("%04x: Found Delimiter '%s'", fp.tell()-8, dictionary_description(delimiter))
     if length == 0:
         logger.debug("%04x: Read 0 bytes after delimiter", fp.tell()-4)
     else:

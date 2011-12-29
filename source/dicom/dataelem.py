@@ -14,8 +14,8 @@ and a value.
 import logging
 logger = logging.getLogger('pydicom')
 
-from dicom.datadict import dictionaryHasTag, dictionaryDescription
-from dicom.datadict import private_dictionaryDescription, dictionaryVR
+from dicom.datadict import dictionary_has_tag, dictionary_description
+from dicom.datadict import private_dictionary_description, dictionaryVR
 from dicom.tag import Tag
 from dicom.UID import UID
 from dicom.valuerep import PersonName
@@ -231,8 +231,8 @@ class DataElement(object):
 
     def description(self):
         """Return the DICOM dictionary description for this dicom tag."""
-        if dictionaryHasTag(self.tag):
-            name = dictionaryDescription(self.tag)
+        if dictionary_has_tag(self.tag):
+            name = dictionary_description(self.tag)
         elif self.tag.is_private:
             name = "Private tag data" # default
             if hasattr(self, 'private_creator'):
@@ -240,7 +240,7 @@ class DataElement(object):
                     # If have name from private dictionary, use it, but
                     #   but put in square brackets so is differentiated,
                     #   and clear that cannot access it by name
-                    name = "[" + private_dictionaryDescription(self.tag, self.private_creator) + "]"
+                    name = "[" + private_dictionary_description(self.tag, self.private_creator) + "]"
                 except KeyError:
                     pass
             elif self.tag.elem >> 8 == 0:

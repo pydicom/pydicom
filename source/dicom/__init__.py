@@ -12,7 +12,7 @@ Quick Start
 1. A simple program to read a dicom file, modify a value, and write to a new file::
     import dicom
     dataset = dicom.read_file("file1.dcm")
-    dataset.PatientsName = 'anonymous'
+    dataset.PatientName = 'anonymous'
     dataset.save_as("file2.dcm")
     
 2. See the files in the examples directory that came with this package for more

@@ -42,7 +42,7 @@ print "Filename.........:", filename
 print "Storage type.....:", dataset.SOPClassUID
 print
 
-pat_name = dataset.PatientsName
+pat_name = dataset.PatientName
 display_name = pat_name.family_name + ", " + pat_name.given_name
 print "Patient's name...:", display_name
 print "Patient id.......:", dataset.PatientID

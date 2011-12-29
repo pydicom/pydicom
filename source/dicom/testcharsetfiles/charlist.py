@@ -20,7 +20,7 @@ if __name__ == "__main__":
     files_info = []
     for name in names:
         ds = dicom.ReadFile(name)
-        files_info.append((name, ds.SpecificCharacterSet, ds.PatientsName))
+        files_info.append((name, ds.SpecificCharacterSet, ds.PatientName))
     
     # Show the information
     format = "%-16s %-40s %-r" # r in Python >=2.0, uses repr()

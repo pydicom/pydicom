@@ -26,7 +26,7 @@ sys_is_little_endian = (byteorder == 'little')
 import logging
 logger = logging.getLogger('pydicom')
 from dicom.datadict import DicomDictionary, dictionaryVR
-from dicom.datadict import TagForName, AllNamesForTag
+from dicom.datadict import tag_for_name, all_names_for_tag
 from dicom.tag import Tag, BaseTag
 from dicom.dataelem import DataElement, DataElement_from_raw, RawDataElement
 from dicom.valuerep import is_stringlike
@@ -62,10 +62,10 @@ class Dataset(dict):
     Example of two ways to retrieve or set values:
         
     1. dataset[0x10, 0x10].value --> patient's name
-    2. dataset.PatientsName --> patient's name
+    2. dataset.PatientName --> patient's name
 
     Example (2) is referred to as *Named tags* in this documentation.
-    PatientsName is not actually a member of the object, but unknown member
+    PatientName is not actually a member of the object, but unknown member
     requests are checked against the dicom dictionary. If the name matches a
     DicomDictionary descriptive string, the corresponding tag is used
     to look up or set the Data Element's value.
@@ -109,7 +109,7 @@ class Dataset(dict):
         When using *named tags*, only the value is returned. If you want the
         whole data_element object, for example to change the data_element.VR,
         call this function with the name and the data_element instance is returned."""
-        tag = TagForName(name)
+        tag = tag_for_name(name)
         if tag:
             return self[tag]
         return None
@@ -121,7 +121,7 @@ class Dataset(dict):
 
         """
         if is_stringlike(name):
-            tag = TagForName(name)
+            tag = tag_for_name(name)
         else:
             try:
                 tag = Tag(name)
@@ -160,7 +160,7 @@ class Dataset(dict):
 
         """
         # First check if is a valid DICOM name and if we have that data element
-        tag = TagForName(name)
+        tag = tag_for_name(name)
         if tag and tag in self:
             del self[tag]
         # If not a DICOM name (or we don't have it), check for regular instance name
@@ -198,7 +198,7 @@ class Dataset(dict):
         """
         allnames = []
         for tag, data_element in self.items():
-            allnames.extend(AllNamesForTag(tag))
+            allnames.extend(all_names_for_tag(tag))
         allnames = [x for x in allnames if x]  # remove blanks - tags without valid names (e.g. private tags)
         # Store found names in a dict, so duplicate names appear only once
         matches = {}
@@ -255,7 +255,7 @@ class Dataset(dict):
         """
         # __getattr__ only called if instance cannot find name in self.__dict__
         # So, if name is not a dicom string, then is an error
-        tag = TagForName(name)
+        tag = tag_for_name(name)
         if tag is None:
             raise AttributeError, "Dataset does not have attribute '%s'." % name
         tag = Tag(tag)
@@ -496,7 +496,7 @@ class Dataset(dict):
         Else, set an instance (python) attribute as any other class would do.
 
         """
-        tag = TagForName(name)
+        tag = tag_for_name(name)
         if tag is not None:  # successfully mapped name to a tag
             if tag not in self:  # don't have this tag yet->create the data_element instance
                 VR = dictionaryVR(tag)

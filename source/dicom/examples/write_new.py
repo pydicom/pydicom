@@ -46,7 +46,7 @@ if __name__ == "__main__":
     ds = FileDataset(filename, {}, file_meta=file_meta, preamble="\0"*128)
     
     # Add the data elements -- not trying to set all required here. Check DICOM standard
-    ds.PatientsName = "Test^Firstname"
+    ds.PatientName = "Test^Firstname"
     ds.PatientID = "123456"
     
     # Set the transfer syntax

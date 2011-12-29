@@ -164,18 +164,18 @@ class DatasetTests(unittest.TestCase):
         """Dataset: update() method works with tag or name..................."""
         ds = self.dummy_dataset()
         pat_data_element = DataElement((0x10,0x12), 'PN', 'Johnny')
-        ds.update({'PatientsName': 'John', (0x10,0x12): pat_data_element})
+        ds.update({'PatientName': 'John', (0x10,0x12): pat_data_element})
         self.assertEqual(ds[0x10,0x10].value, 'John', "named data_element not set")
         self.assertEqual(ds[0x10,0x12].value, 'Johnny', "set by tag failed")
     def testDir(self):
         """Dataset: dir() returns sorted list of named data_elements........."""
         ds = self.dummy_dataset()
-        ds.PatientsName = "name"
+        ds.PatientName = "name"
         ds.PatientID = "id"
         ds.NonDicomVariable = "junk"
         ds.add_new((0x18,0x1151), "IS", 150) # X-ray Tube Current
         ds.add_new((0x1111, 0x123), "DS", "42.0") # private tag - no name in dir()
-        expected = ['PatientID', 'PatientsName', 'TreatmentMachineName', 'XRayTubeCurrent']
+        expected = ['PatientID', 'PatientName', 'TreatmentMachineName', 'XRayTubeCurrent']
         self.assertEqual(ds.dir(), expected, "dir() returned %s, expected %s" % (str(ds.dir()), str(expected)))
     def testDeleteDicomAttr(self):
         """Dataset: delete DICOM attribute by name..........................."""
@@ -193,7 +193,7 @@ class DatasetTests(unittest.TestCase):
     def testDeleteDicomAttrWeDontHave(self):
         """Dataset: try delete of missing DICOM attribute...................."""
         def try_delete():
-            del ds.PatientsName
+            del ds.PatientName
         ds = self.dummy_dataset()
         self.assertRaises(AttributeError, try_delete)
             

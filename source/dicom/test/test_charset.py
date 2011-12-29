@@ -28,7 +28,7 @@ class charsetTests(unittest.TestCase):
         ds.decode()
         # Make sure don't get unicode encode error on converting to string
         expected = u"Buc^Jérôme"
-        got = ds.PatientsName
+        got = ds.PatientName
         self.assertEqual(expected, got, "Expected %r, got %r" % (expected, got))
     def testStandardFile(self):
         """charset: can read and decode standard file without special char.."""

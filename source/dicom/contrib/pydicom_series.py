@@ -480,7 +480,7 @@ class DicomSeries(object):
     @property
     def description(self):
         """ A description of the dicom series. Used fields are
-        PatientsName, shape of the data, SeriesDescription, 
+        PatientName, shape of the data, SeriesDescription, 
         and ImageComments.
         """
         
@@ -493,8 +493,8 @@ class DicomSeries(object):
         fields = []
         
         # Give patient name
-        if 'PatientsName' in info:
-            fields.append(""+info.PatientsName)
+        if 'PatientName' in info:
+            fields.append(""+info.PatientName)
         
         # Also add dimensions
         if self.shape:
