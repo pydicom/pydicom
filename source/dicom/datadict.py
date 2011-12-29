@@ -56,7 +56,7 @@ def get_entry(tag):
         else:
             raise KeyError, "Tag %s not found in DICOM dictionary" % tag
         
-def dictionaryDescription(tag):
+def dictionary_description(tag):
     """Return the descriptive text for the given dicom tag."""
     return get_entry(tag)[2]
 
@@ -68,7 +68,7 @@ def dictionaryVR(tag):
     """Return the dicom value representation for the given dicom tag."""
     return get_entry(tag)[0]
 
-def dictionaryHasTag(tag):
+def dictionary_has_tag(tag):
     """Return True if the dicom dictionary has an entry for the given tag."""
     return (tag in DicomDictionary)
 
@@ -79,6 +79,18 @@ def dictionary_keyword(tag):
 import string
 normTable = string.maketrans('','')
 
+def keyword_for_tag(tag):
+    """Return the DICOM keyword for the given tag. Replaces old CleanName() 
+    method using the 2011 DICOM standard keywords instead.
+    
+    Will return GroupLength for group length tags,
+    and returns blank ("") if the tag doesn't exist in the dictionary.
+    """
+    try:
+        return dictionary_keyword(tag)
+    except KeyError:
+        return ""
+        
 def CleanName(tag):
     """Return the dictionary descriptive text string but without bad characters.
     
@@ -92,7 +104,7 @@ def CleanName(tag):
             return "GroupLength"
         else:
             return ""
-    s = dictionaryDescription(tag)    # Descriptive name in dictionary
+    s = dictionary_description(tag)    # Descriptive name in dictionary
     # remove blanks and nasty characters
     s = s.translate(normTable, r""" !@#$%^&*(),;:.?\|{}[]+-="'’/""")
     
@@ -138,7 +150,7 @@ def long_name(name):
             return name.replace(shortname, longname)
     return ""
 
-def TagForName(name):
+def tag_for_name(name):
     """Return the dicom tag corresponding to name, or None if none exist."""
     if name in keyword_dict: # the usual case
         return keyword_dict[name]
@@ -156,9 +168,9 @@ def TagForName(name):
         return NameDict.get(longname, None)
     return None
 
-def AllNamesForTag(tag):
+def all_names_for_tag(tag):
     """Return a list of all (long and short) names for the tag"""
-    longname = CleanName(tag)
+    longname = keyword_for_tag(tag)
     shortname = short_name(longname)
     names = [longname]
     if shortname:
@@ -191,7 +203,7 @@ def get_private_entry(tag, private_creator):
         dict_entry = private_dict[key]
     return dict_entry
 	
-def private_dictionaryDescription(tag, private_creator):
+def private_dictionary_description(tag, private_creator):
     """Return the descriptive text for the given dicom tag."""
     return get_private_entry(tag, private_creator)[2]
 

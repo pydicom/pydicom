@@ -104,7 +104,7 @@ class ScratchWriteTests(unittest.TestCase):
     def setUp(self):
         # Create simple dataset for all tests
         ds = Dataset()
-        ds.PatientsName = "Name^Patient"
+        ds.PatientName = "Name^Patient"
         
         # Set up a simple nested sequence
         # first, the innermost sequence
