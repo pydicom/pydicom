@@ -30,7 +30,7 @@ class DatasetTests(unittest.TestCase):
         # based on same link as failUnlessRaises override above
         excObj = self.failUnlessRaises(excClass, callableObj)
         msg = "\nExpected Exception message:\n" + start_args + "\nGot:\n" + excObj[0]
-        self.failUnless(excObj[0].startswith(start_args), msg)
+        self.assertTrue(excObj[0].startswith(start_args), msg)
 
     def testAttributeErrorInProperty(self):
         """Dataset: AttributeError in property raises actual error message..."""

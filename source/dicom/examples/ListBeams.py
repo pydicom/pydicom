@@ -13,8 +13,8 @@ usage = """python ListBeams.py rtplan.dcm"""
 def ListBeams(plan_dataset):
     """Return a string summarizing the RTPLAN beam information in the dataset"""
     lines = ["%13s %8s %8s %8s" % ("Beam name", "Number", "Gantry", "SSD (cm)")]
-    for beam in plan_dataset.Beams:
-        cp0 = beam.ControlPoints[0]
+    for beam in plan_dataset.BeamSequence:
+        cp0 = beam.ControlPointSequence[0]
         SSD = float(cp0.SourcetoSurfaceDistance / 10.0)
         lines.append("%13s %8s %8.1f %8.1f" % (beam.BeamName, str(beam.BeamNumber),
                                       cp0.GantryAngle, SSD))

@@ -367,15 +367,15 @@ class Dataset(dict):
         if need_byteswap:
             arr.byteswap(True)  # True means swap in-place, don't make a new copy
         # Note the following reshape operations return a new *view* onto arr, but don't copy the data
-        if 'NumberofFrames' in self and self.NumberofFrames > 1:
-            if self.SamplesperPixel > 1:
-                arr = arr.reshape(self.SamplesperPixel, self.NumberofFrames, self.Rows, self.Columns)
+        if 'NumberOfFrames' in self and self.NumberOfFrames > 1:
+            if self.SamplesPerPixel > 1:
+                arr = arr.reshape(self.SamplesPerPixel, self.NumberOfFrames, self.Rows, self.Columns)
             else:
-                arr = arr.reshape(self.NumberofFrames, self.Rows, self.Columns)
+                arr = arr.reshape(self.NumberOfFrames, self.Rows, self.Columns)
         else:
-            if self.SamplesperPixel > 1:
+            if self.SamplesPerPixel > 1:
                 if self.BitsAllocated == 8:
-                    arr = arr.reshape(self.SamplesperPixel, self.Rows, self.Columns)
+                    arr = arr.reshape(self.SamplesPerPixel, self.Rows, self.Columns)
                 else:
                     raise NotImplementedError, "This code only handles SamplesPerPixel > 1 if Bits Allocated = 8"
             else:
