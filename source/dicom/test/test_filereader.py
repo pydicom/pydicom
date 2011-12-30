@@ -68,14 +68,14 @@ class ReaderTests(unittest.TestCase):
     def testRTPlan(self):
         """Returns correct values for sample data elements in test RT Plan file"""
         plan = read_file(rtplan_name)
-        beam = plan.Beams[0]
-        cp0, cp1 = beam.ControlPoints # if not two controlpoints, then this would raise exception
+        beam = plan.BeamSequence[0]
+        cp0, cp1 = beam.ControlPointSequence # if not two controlpoints, then this would raise exception
 
         self.assertEqual(beam.TreatmentMachineName, "unit001", "Incorrect unit name")
         self.assertEqual(beam.TreatmentMachineName, beam[0x300a, 0x00b2].value,
                 "beam TreatmentMachineName does not match the value accessed by tag number")
 
-        cumDoseRef = cp1.ReferencedDoseReferences[0].CumulativeDoseReferenceCoefficient
+        cumDoseRef = cp1.ReferencedDoseReferenceSequence[0].CumulativeDoseReferenceCoefficient
         self.assert_(isClose(cumDoseRef, 0.9990268),
                 "Cum Dose Ref Coeff not the expected value (CP1, Ref'd Dose Ref")
         JawX = cp0.BLDPositions[0].LeafJawPositions
@@ -90,8 +90,8 @@ class ReaderTests(unittest.TestCase):
                 "FrameIncrementPointer does not match the value accessed by tag number")
 
         # try a value that is nested the deepest (so deep I break it into two steps!)
-        fract = dose.ReferencedRTPlans[0].ReferencedFractionGroups[0]
-        beamnum = fract.ReferencedBeams[0].ReferencedBeamNumber
+        fract = dose.ReferencedRTPlanSequence[0].ReferencedFractionGroupSequence[0]
+        beamnum = fract.ReferencedBeamSequence[0].ReferencedBeamNumber
         self.assertEqual(beamnum, 1, "Beam number not the expected value")
     def testCT(self):
         """Returns correct values for sample data elements in test CT file...."""
@@ -138,19 +138,20 @@ class ReaderTests(unittest.TestCase):
         got = rtss.file_meta.TransferSyntaxUID
         msg = "Expected transfer syntax %r, got %r" % (expected, got)
         self.assertEqual(expected, got, msg)
-        frame_of_ref = rtss.ReferencedFrameofReferences[0]
-        study = frame_of_ref.RTReferencedStudies[0]
-        uid = study.RTReferencedSeries[0].SeriesInstanceUID
+        frame_of_ref = rtss.ReferencedFrameOfReferenceSequence[0]
+        study = frame_of_ref.RTReferencedStudySequence[0]
+        uid = study.RTReferencedSeriesSequence[0].SeriesInstanceUID
         expected = "1.2.826.0.1.3680043.8.498.2010020400001.2.1.1"
         msg = "Expected Reference Series UID '%s', got '%s'" % (expected, uid)
         self.assertEqual(expected, uid, msg)
         
-        got = rtss.ROIContours[0].Contours[2].ContourNumber
+        got = rtss.ROIContourSequence[0].ContourSequence[2].ContourNumber
         expected = 3
         msg = "Expected Contour Number %d, got %r" % (expected, got)
         self.assertEqual(expected, got, msg)
         
-        got = rtss.RTROIObservations[0].ROIPhysicalProperties[0].ROIPhysicalProperty
+        obs_seq0 = rtss.RTROIObservationsSequence[0] 
+        got = obs_seq0.ROIPhysicalPropertiesSequence[0].ROIPhysicalProperty
         expected = 'REL_ELEC_DENSITY'
         msg = "Expected Physical Property '%s', got %r" % (expected, got)
         self.assertEqual(expected, got, msg)
@@ -169,7 +170,7 @@ class ReaderTests(unittest.TestCase):
             for name in expect_not_in_dir:
                 self.assert_(name not in got_dir, "Unexpected name '%s' in dir()" % name)
             # Now check for some items in dir() of a nested item
-            roi0 = rtss.ROIContours[0]
+            roi0 = rtss.ROIContourSequence[0]
             got_dir = dir(roi0)
             expect_in_dir = ['pixel_array', 'add_new', 'ReferencedROINumber', 
                              'ROIDisplayColor', '__sizeof__']
@@ -229,7 +230,7 @@ class JPEG2000Tests(unittest.TestCase):
         got = self.jpeg.FrameIncrementPointer
         self.assertEqual(got, expected, "JPEG2000 file, Frame Increment Pointer: expected %s, got %s" % (expected, got))
 
-        got = self.jpeg.DerivationCodes[0].CodeMeaning
+        got = self.jpeg.DerivationCodeSequence[0].CodeMeaning
         expected = 'Lossy Compression'
         self.assertEqual(got, expected, "JPEG200 file, Code Meaning got %s, expected %s" % (got, expected))
     def testJPEG2000PixelArray(self):
@@ -241,7 +242,7 @@ class JPEGlossyTests(unittest.TestCase):
         self.jpeg = read_file(jpeg_lossy_name)
     def testJPEGlossy(self):
         """JPEG-lossy: Returns correct values for sample data elements.........."""
-        got = self.jpeg.DerivationCodes[0].CodeMeaning
+        got = self.jpeg.DerivationCodeSequence[0].CodeMeaning
         expected = 'Lossy Compression'
         self.assertEqual(got, expected, "JPEG-lossy file, Code Meaning got %s, expected %s" % (got, expected))
     def testJPEGlossyPixelArray(self):
@@ -253,7 +254,7 @@ class JPEGlosslessTests(unittest.TestCase):
         self.jpeg = read_file(jpeg_lossless_name)
     def testJPEGlossless(self):
         """JPEGlossless: Returns correct values for sample data elements........"""
-        got = self.jpeg.SourceImages[0].PurposeofReferenceCodes[0].CodeMeaning
+        got = self.jpeg.SourceImageSequence[0].PurposeOfReferenceCodeSequence[0].CodeMeaning
         expected = 'Uncompressed predecessor'
         self.assertEqual(got, expected, "JPEG-lossless file, Code Meaning got %s, expected %s" % (got, expected))
     def testJPEGlosslessPixelArray(self):

@@ -116,10 +116,10 @@ class ScratchWriteTests(unittest.TestCase):
         subitem2.ContourData = [32,64,128,196]
         
         sub_ds = Dataset()
-        sub_ds.Contours = Sequence((subitem1, subitem2)) # XXX in 0.9.5 will need sub_ds.ContourSequence
+        sub_ds.ContourSequence = Sequence((subitem1, subitem2)) # XXX in 0.9.5 will need sub_ds.ContourSequence
 
         # Now the top-level sequence
-        ds.ROIContours = Sequence((sub_ds,)) # Comma necessary to make it a one-tuple
+        ds.ROIContourSequence = Sequence((sub_ds,)) # Comma necessary to make it a one-tuple
         
         # Store so each test can use it
         self.ds = ds
