@@ -56,12 +56,12 @@ def anonymize(filename, output_filename, new_person_name="anonymous",
 	# Remove data elements (should only do so if DICOM type 3 optional) 
 	# Use general loop so easy to add more later
 	# Could also have done: del ds.OtherPatientIDs, etc.
-    for name in ['OtherPatientIDs']:
+    for name in ['OtherPatientIDs', 'OtherPatientIDsSequence']:
         if name in dataset:
-            delattr(ds, name)
+            delattr(dataset, name)
 
 	# Same as above but for blanking data elements that are type 2.
-    for name in ['PatientsBirthDate']:
+    for name in ['PatientBirthDate']:
         if name in dataset:
             dataset.data_element(name).value = ''
 	
