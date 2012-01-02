@@ -1,6 +1,6 @@
 # dicomtree.py
 """Show a dicom file using a hierarchical tree in a graphical window"""
-# Copyright (c) 2008 Darcy Mason
+# Copyright (c) 2008-2012 Darcy Mason
 # This file is part of pydicom, relased under an MIT license.
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
@@ -28,7 +28,7 @@ def RunTree(w, filename):
 
 def show_file(filename, tree):
     tree.hlist.add("root", text=filename)
-    ds = dicom.ReadFile(sys.argv[1])
+    ds = dicom.read_file(sys.argv[1])
     ds.decode()  # change strings to unicode
     recurse_tree(tree, ds, "root", False)
     tree.autosetmode()
