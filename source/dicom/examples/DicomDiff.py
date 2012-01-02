@@ -1,7 +1,7 @@
 # DicomDiff.py
 """Show the difference between two dicom files.
 """
-# Copyright (c) 2008 Darcy Mason
+# Copyright (c) 2008-2012 Darcy Mason
 # This file is part of pydicom, relased under an MIT license.
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
@@ -18,15 +18,16 @@ Results printed in python difflib form - indicated by start of each line:
 """
 
 import sys
+import dicom
+import difflib
 
 # only used as a script
 if len(sys.argv) != 3:
     print usage
     sys.exit()
 
-from dicom.filereader import ReadFile
-datasets = ReadFile(sys.argv[1]), \
-           ReadFile(sys.argv[2])
+datasets = dicom.read_file(sys.argv[1]), \
+           dicom.read_file(sys.argv[2])
 
 # diflib compare functions require a list of lines, each terminated with newline character
 # massage the string representation of each dicom dataset into this form:
@@ -36,7 +37,7 @@ for dataset in datasets:
     lines = [line + "\n" for line in lines]  # add the newline to end
     rep.append(lines)
 
-import difflib
+
 diff = difflib.Differ()
 for line in diff.compare(rep[0], rep[1]):
     if line[0] != "?":

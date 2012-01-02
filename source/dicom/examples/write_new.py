@@ -5,7 +5,7 @@ This example does not produce a DICOM standards compliant file as written,
 you will have to change UIDs to valid values and add all required DICOM data
 elements
 """
-# Copyright (c) 2010 Darcy Mason
+# Copyright (c) 2010-2012 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com

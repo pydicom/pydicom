@@ -4,7 +4,7 @@ by replacing Person names, patient id, optionally remove curves
 and private tags, and write result to a new file (directory)
 This is an example only; use only as a starting point.
 """
-# Copyright (c) 2008, 2011 Darcy Mason
+# Copyright (c) 2008-2012 Darcy Mason
 # This file is part of pydicom, relased under an MIT license.
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com

@@ -15,13 +15,6 @@ for manipulation of pixel data
 >>> ds.Rows = 64
 >>> ds.Columns = 64
 >>> ds
-(0002, 0001) File Meta Information Version       OB: '\x00\x01'
-(0002, 0002) Media Storage SOP Class UID         UI: MR Image Storage
-(0002, 0003) Media Storage SOP Instance UID      UI: 1.3.6.1.4.1.5962.1.1.4.1.1.20040119072730.12322
-(0002, 0010) Transfer Syntax UID                 UI: Explicit VR Little Endian
-(0002, 0012) Implementation Class UID            UI: 1.3.6.1.4.1.5962.2
-(0002, 0013) Implementation Version Name         SH: 'DCTOOL100'
-(0002, 0016) Source Application Entity Title     AE: 'CLUNIE1'
 (0008, 0008) Image Type                          CS: ['DERIVED', 'SECONDARY', 'OTHER']
 (0008, 0012) Instance Creation Date              DA: '20040119'
 (0008, 0013) Instance Creation Time              TM: '073057'

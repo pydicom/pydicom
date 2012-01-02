@@ -1,7 +1,7 @@
 # ListBeams.py
 """Given an RTPLAN DICOM file, list basic info for the beams in it
 """
-# Copyright (c) 2008, 2009 Darcy Mason
+# Copyright (c) 2008-2011 Darcy Mason
 # This file is part of pydicom, relased under an MIT license.
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
