@@ -29,6 +29,7 @@ from dicom.filereader import read_file, data_element_generator, InvalidDicomErro
 from dicom.values import convert_value
 from dicom.tag import Tag
 from dicom.sequence import Sequence
+import gzip
 
 from warncheck import assertWarns
 
@@ -46,6 +47,7 @@ deflate_name = os.path.join(test_dir, "image_dfl.dcm")
 rtstruct_name = os.path.join(test_dir, "rtstruct.dcm")
 priv_SQ_name = os.path.join(test_dir, "priv_SQ.dcm")
 no_meta_group_length = os.path.join(test_dir, "no_meta_group_length.dcm")
+gzip_name = os.path.join(test_dir, "zipMR.gz")
 
 dir_name = os.path.dirname(sys.argv[0])
 save_dir = os.getcwd()
@@ -295,6 +297,14 @@ class DeferredReadTests(unittest.TestCase):
         for data_elem in ds_norm:
             tag = data_elem.tag
             self.assertEqual(data_elem.value, ds_defer[tag].value, "Mismatched value for tag %r" % tag)
+    def testZippedDeferred(self):
+        """Deferred values from a gzipped file works.............."""
+        # Arose from issue 103 "Error for defer_size read of gzip file object"
+        fobj = gzip.open(gzip_name)
+        ds = read_file(fobj, defer_size=1)
+        # before the fix, this threw an error as file reading was not in right place,
+        #    it was re-opened as a normal file, not zip file
+        num = ds.InstanceNumber
         
     def tearDown(self):
         if os.path.exists(self.testfile_name):

@@ -580,7 +580,7 @@ def data_element_offset_to_value(is_implicit_VR, VR):
             offset = 8  # tag 4 + 2 VR + 2 length
     return offset
 
-def read_deferred_data_element(filename, timestamp, raw_data_elem):
+def read_deferred_data_element(fileobj_type, filename, timestamp, raw_data_elem):
     """Read the previously deferred value from the file into memory
     and return a raw data element"""
     logger.debug("Reading deferred element %r" % str(raw_data_elem.tag))
@@ -596,7 +596,8 @@ def read_deferred_data_element(filename, timestamp, raw_data_elem):
             warnings.warn("Deferred read warning -- file modification time has changed.")
 
     # Open the file, position to the right place
-    fp = open(filename, 'rb')
+    # fp = self.typefileobj(self.filename, "rb")
+    fp = fileobj_type(filename, 'rb')
     is_implicit_VR = raw_data_elem.is_implicit_VR
     is_little_endian = raw_data_elem.is_little_endian
     offset = data_element_offset_to_value(is_implicit_VR, raw_data_elem.VR)

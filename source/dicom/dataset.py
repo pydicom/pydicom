@@ -275,7 +275,7 @@ class Dataset(dict):
             # If a deferred read, then go get the value now
             if data_elem.value is None:
                 from dicom.filereader import read_deferred_data_element
-                data_elem = read_deferred_data_element(self.filename, self.timestamp, data_elem)
+                data_elem = read_deferred_data_element(self.fileobj_type, self.filename, self.timestamp, data_elem)
             # Hasn't been converted from raw form read from file yet, so do so now:
             self[tag] = DataElement_from_raw(data_elem)
         return dict.__getitem__(self, tag)
@@ -615,10 +615,20 @@ class FileDataset(Dataset):
         self.is_little_endian = is_little_endian
         if isinstance(filename_or_obj, basestring):
             self.filename = filename_or_obj
+            self.fileobj_type = file
         else:
-            try:
-                self.filename = filename_or_obj.name
-            except AttributeError:
+            # Note next line uses __class__ due to gzip using old-style classes 
+            #    until after python2.5 (or 2.6?)
+            # Should move to using type(filename_or_obj) when possible
+            # See http://docs.python.org/reference/datamodel.html: 
+            #   "if x is an instance of an old-style class, then x .__class__ 
+            #   designates the class of x, but type(x) is always <type 'instance'>"
+            self.fileobj_type = filename_or_obj.__class__
+            if getattr(filename_or_obj, "name", False):
+                self.filename = filename_or_obj.name  
+            elif getattr(filename_or_obj, "filename", False): #gzip python <2.7?
+                self.filename = filename_or_obj.filename
+            else:
                 self.filename = None # e.g. came from StringIO or something file-like
         self.timestamp = None
         if stat_available and self.filename and os.path.exists(self.filename):
