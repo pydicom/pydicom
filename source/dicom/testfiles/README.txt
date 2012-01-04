@@ -53,3 +53,8 @@ test_SR.dcm
 priv_SQ.dcm
   * a file with an undefined length SQ item in a private tag.
   * minimal data elements kept from example files in issues 91, 97, 98
+
+zipMR.gz
+  * a gzipped version of MR_small.dcm
+  * used for checking that deferred read reopens as zip again (issue 103)
+
