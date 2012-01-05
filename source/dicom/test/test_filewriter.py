@@ -10,7 +10,7 @@ import os.path
 import os
 import unittest
 from dicom.filereader import read_file
-from dicom.filewriter import write_file, write_data_element
+from dicom.filewriter import write_data_element
 from dicom.tag import Tag
 from dicom.dataset import Dataset, FileDataset
 from dicom.sequence import Sequence
@@ -51,14 +51,14 @@ def bytes_identical(a_bytes, b_bytes):
         return False, pos   # False (not identical files), position of first difference
 
 class WriteFileTests(unittest.TestCase):
-    def compare(self, in_, out_):
+    def compare(self, in_filename, out_filename):
         """Read file1, write file2, then compare. Return value as for files_identical"""
-        dataset = read_file(in_)
-        write_file(out_, dataset)
-        same, pos = files_identical(in_, out_)
+        dataset = read_file(in_filename)
+        dataset.save_as(out_filename)
+        same, pos = files_identical(in_filename, out_filename)
         self.assert_(same, "Files are not identical - first difference at 0x%x" % pos)
-        if os.path.exists(out_):
-            os.remove(out_)  # get rid of the file
+        if os.path.exists(out_filename):
+            os.remove(out_filename)  # get rid of the file
     def testRTPlan(self):
         """Input file, write back and verify them identical (RT Plan file)"""
         self.compare(rtplan_name, rtplan_out)
@@ -74,7 +74,35 @@ class WriteFileTests(unittest.TestCase):
     def testJPEG2000(self):
         """Input file, write back and verify them identical (JPEG2K file)."""
         self.compare(jpeg_name, jpeg_out)
-     
+    def testListItemWriteBack(self):
+        """Change item in a list and confirm it is written to file      .."""
+        DS_expected = 0
+        CS_expected = "new"
+        SS_expected = 999
+        ds = read_file(ct_name)
+        ds.ImagePositionPatient[2] = DS_expected
+        ds.ImageType[1] = CS_expected
+        ds[(0043, 1012)].value[0] = SS_expected
+        ds.save_as(ct_out)
+        # Now read it back in and check that the values were changed
+        ds = read_file(ct_out)
+        self.assert_(ds.ImageType[1] == CS_expected, "Item in a list not written correctly to file (VR=CS)")
+        self.assert_(ds[0x00431012].value[0] == SS_expected, "Item in a list not written correctly to file (VR=SS)")
+        self.assert_(ds.ImagePositionPatient[2] == DS_expected, "Item in a list not written correctly to file (VR=DS)")
+        if os.path.exists(ct_out):
+            os.remove(ct_out)
+    def testListItemWriteBackCS(self):
+        """Change an item in a list and confirm it is written to file (VR=CS).."""
+        expected = 'New'
+        ds = read_file(ct_name)
+        ds.ImagePositionPatient[2] = expected
+        ds.save_as(ct_out)
+        # Now read it back in and check that the value was changed
+        ds = read_file(ct_out)
+        self.assert_(ds.ImagePositionPatient == expected, "Item in a list of DS type was not written to file")
+        if os.path.exists(ct_out):
+            os.remove(ct_out)        
+    
 class WriteDataElementTests(unittest.TestCase):
     """Attempt to write data elements has the expected behaviour"""
     def setUp(self):
@@ -131,7 +159,7 @@ class ScratchWriteTests(unittest.TestCase):
         :arg file_ds: a FileDataset instance containing the dataset to write
         """
         out_filename = "scratch.dcm"
-        write_file(out_filename, file_ds)
+        file_ds.save_as(out_filename)
         std = hex2bytes(hex_std)
         bytes_written = open(out_filename,'rb').read()
         # print "std    :", bytes2hex(std)
