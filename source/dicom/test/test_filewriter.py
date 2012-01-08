@@ -1,6 +1,6 @@
 # test_filewriter.py
 """unittest cases for dicom.filewriter module"""
-# Copyright (c) 2008 Darcy Mason
+# Copyright (c) 2008-2012 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
@@ -82,7 +82,7 @@ class WriteFileTests(unittest.TestCase):
         ds = read_file(ct_name)
         ds.ImagePositionPatient[2] = DS_expected
         ds.ImageType[1] = CS_expected
-        ds[(0043, 1012)].value[0] = SS_expected
+        ds[(0x0043, 0x1012)].value[0] = SS_expected
         ds.save_as(ct_out)
         # Now read it back in and check that the values were changed
         ds = read_file(ct_out)
@@ -91,18 +91,7 @@ class WriteFileTests(unittest.TestCase):
         self.assert_(ds.ImagePositionPatient[2] == DS_expected, "Item in a list not written correctly to file (VR=DS)")
         if os.path.exists(ct_out):
             os.remove(ct_out)
-    def testListItemWriteBackCS(self):
-        """Change an item in a list and confirm it is written to file (VR=CS).."""
-        expected = 'New'
-        ds = read_file(ct_name)
-        ds.ImagePositionPatient[2] = expected
-        ds.save_as(ct_out)
-        # Now read it back in and check that the value was changed
-        ds = read_file(ct_out)
-        self.assert_(ds.ImagePositionPatient == expected, "Item in a list of DS type was not written to file")
-        if os.path.exists(ct_out):
-            os.remove(ct_out)        
-    
+
 class WriteDataElementTests(unittest.TestCase):
     """Attempt to write data elements has the expected behaviour"""
     def setUp(self):
@@ -138,10 +127,10 @@ class ScratchWriteTests(unittest.TestCase):
         # first, the innermost sequence
         subitem1 = Dataset()
         subitem1.ContourNumber = 1
-        subitem1.ContourData = [2,4,8,16]
+        subitem1.ContourData = ['2','4','8','16']
         subitem2 = Dataset()
         subitem2.ContourNumber = 2
-        subitem2.ContourData = [32,64,128,196]
+        subitem2.ContourData = ['32','64','128','196']
         
         sub_ds = Dataset()
         sub_ds.ContourSequence = Sequence((subitem1, subitem2)) # XXX in 0.9.5 will need sub_ds.ContourSequence

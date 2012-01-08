@@ -1,9 +1,12 @@
 # valuerep.py
 """Special classes for DICOM value representations (VR)"""
-# Copyright (c) 2008 Darcy Mason
+# Copyright (c) 2008-2012 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
+
+from decimal import Decimal
+from dicom.config import allow_DS_float
 
 from sys import version_info
 if version_info[0] < 3:
@@ -21,6 +24,81 @@ def is_stringlike(name):
     else:
         return True
 
+class DS_class(Decimal):
+    """Derived class of Decimal. Stores the original string for possible
+    exact rewriting of the string read in from a file.
+    
+    Don't use this directly; the DS() factory function should normally be used.
+    """
+    # e.g. can read '1.23e2' but Decimal will write '123'. 
+    # If coding to make small changes to a file, would rather write back the 
+    # exact same as read. If user changes a data element value, then will get
+    # a different Decimal, as Decimal is immutable.
+    
+    def __init__(self, val):
+        # Decimal has already created the object in its __new__ method.
+        # Here, we simply raise errors, and store the original string if given
+        if isinstance(val, float):
+            from dicom.config import allow_DS_float
+            if not allow_DS_float:
+                msg = ("DS cannot be instantiated with a float value, unless "
+                    "config.allow_DS_float is set to True. Best to convert to a "
+                    "string instead, with the desired number of digits.")
+                raise TypeError, msg
+        self.original_string = val
+    def __repr__(self):
+        if hasattr(self, 'original_string'):
+            return "'" + self.original_string + "'"
+        else:
+            return "'" + Decimal.__str__(self) + "'"
+        
+def DS(value):
+    """Factory function to return a Decimal (through sublass DS_class) 
+    or an empty string '' if a blank value is passed.
+    
+    :param value: a decimal string or int, or float only if config.allow_DS_float
+    is set True (default False). It is preferred to convert a float to
+    string first, thus controlling the number of digits.
+    """
+    if isinstance(value, DS_class): return value
+    if value == '':
+        return value
+    else:
+        return DS_class(value)
+
+class IS_class(int):
+    """Derived class of int. Stores original integer string for exact rewriting 
+    of the string originally read or stored.
+    
+    Don't use this directly; call the IS() factory function instead.
+    """
+    # Unlikely that str(int) will not be the same as the original, but could happen
+    # with leading zeros.
+    def __init__(self, value):
+        # don't need to check is a string. Can pass a float with an int value,
+        #   and convert to string, which will make an int without loss
+        
+        int(str(value)) # raise error if a float was used -- must be int
+
+        # If a string passed, then store it
+        if isinstance(value, basestring):
+            self.original_string = value
+    def __repr__(self):
+        if hasattr(self, 'original_string'):
+            return "'" + self.original_string + "'"
+        else:
+            return "'" + int.__str__(self) + "'"
+            
+def IS(value):
+    """Factory function to return an int (through subclass IS_class) 
+    or empty string if a blank value is passed
+    """
+    if isinstance(value, IS_class): return value
+    if value == '':
+        return value
+    else:
+        return IS_class(value) 
+               
 class MultiValue(list):
     """MutliValue is a special list, derived to overwrite the __str__ method
     to display the multi-value list more nicely. Used for Dicom values of
@@ -42,7 +120,13 @@ def MultiString(val, valtype=str):
     if val and (val.endswith(' ') or val.endswith('\x00')):
         val = val[:-1]
 
-    splitup = [valtype(x) for x in val.split("\\")]
+    # XXX --> simpler version python > 2.4   splitup = [valtype(x) if x else x for x in val.split("\\")]
+    splitup = []
+    for subval in val.split("\\"):
+        if subval:
+            splitup.append(valtype(subval))
+        else:
+            splitup.append(subval)
     if len(splitup) == 1:
         return splitup[0]
     else:

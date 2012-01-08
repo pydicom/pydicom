@@ -5,7 +5,7 @@ DataElements have a DICOM value representation VR, a value multiplicity VM,
 and a value.
 """
 #
-# Copyright (c) 2008 Darcy Mason
+# Copyright (c) 2008-2012 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
@@ -18,7 +18,9 @@ from dicom.datadict import dictionary_has_tag, dictionary_description
 from dicom.datadict import private_dictionary_description, dictionaryVR
 from dicom.tag import Tag
 from dicom.UID import UID
-from dicom.valuerep import PersonName
+from dicom.valuerep import IS, DS, PersonName
+from decimal import Decimal
+
 try:
     from collections import namedtuple
 except ImportError: # for python <2.6
@@ -90,8 +92,8 @@ class DataElement(object):
                         is_undefined_length=False):
         """Create a data element instance.
 
-        Most user code should instead use 'Named tags' (see Dataset class)
-        to create data_elements, for which only the value is supplied,
+        Most user code should instead use DICOM keywords, (formerly 'Named tags'
+        in pydicom) to create data_elements, for which only the value is supplied,
         and the VR and tag are determined from the dicom dictionary.
 
         tag -- dicom (group, element) tag in any form accepted by Tag().
@@ -126,13 +128,7 @@ class DataElement(object):
             if _backslash in val:
                 val = val.split(_backslash)
         self._value = self._convert_value(val)
-        if self.VR in ['IS', 'DS']:  # a number as a text string
-            # If IS/DS need to store number but keep string also
-            # If already a string, str(..) will have not change it
-            if self.VM > 1:
-                self.string_value = [str(x) for x in val]
-            else:
-                self.string_value = str(val)
+
     value = property(_getvalue, _setvalue, doc=
             """The value (possibly multiple values) of this data_element.""")
 
@@ -163,25 +159,24 @@ class DataElement(object):
 
     def _convert(self, val):
         """Take the value and convert to number, etc if possible"""
-        try:
-            if self.VR in ['IS'] and val:
-                return int(str(val))  # str(val) so does not truncate a float without error
-            elif self.VR in ['DS'] and val:
-                return float(val)
-            elif self.VR == "UI":
-                return UID(val)
-            # Later may need this for PersonName as for UI,
-            #    but needs more thought
-            # elif self.VR == "PN":
-            #    return PersonName(val)
-            else: # is either a string or a type 2 optionally blank string
-                return val # this means a "numeric" value could be empty string ""
-        except TypeError:
-            print "Could not convert value '%s' to VR '%s' in tag %s" \
-                                % (repr(val), self.VR, self.tag)
-        except ValueError:
-            print "Could not convert value '%s' to VR '%s' in tag %s" \
-                                % (repr(val), self.VR, self.tag)
+        if self.VR == 'IS':
+            return IS(val)
+        elif self.VR == 'DS':
+            return DS(val)
+        elif self.VR == "UI":
+            return UID(val)
+        # Later may need this for PersonName as for UI,
+        #    but needs more thought
+        # elif self.VR == "PN":
+        #    return PersonName(val)
+        else: # is either a string or a type 2 optionally blank string
+            return val # this means a "numeric" value could be empty string ""
+        #except TypeError:
+            #print "Could not convert value '%s' to VR '%s' in tag %s" \
+                                # % (repr(val), self.VR, self.tag)
+        #except ValueError:
+            #print "Could not convert value '%s' to VR '%s' in tag %s" \
+                               # % (repr(val), self.VR, self.tag)
 
     def __str__(self):
         """Return str representation of this data_element"""
@@ -199,8 +194,10 @@ class DataElement(object):
         if (self.VR in ['OB', 'OW', 'OW/OB', 'OW or OB', 'OB or OW', 'US or SS or OW', 'US or SS']
                   and len(self.value) > self.maxBytesToDisplay):
             repVal = "Array of %d bytes" % len(self.value)
-        elif hasattr(self, 'string_value'): # for VR of IS or DS
-            repVal = repr(self.string_value)
+        elif hasattr(self, 'original_string'): # for VR of IS or DS
+            repVal = repr(self.original_string)
+        elif isinstance(self.value, Decimal):
+            repVal = repr(self.value)
         elif isinstance(self.value, UID):
             repVal = self.value.name
         else:

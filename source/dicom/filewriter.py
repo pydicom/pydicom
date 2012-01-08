@@ -1,6 +1,6 @@
 # filewriter.py
 """Write a dicom media file."""
-# Copyright (c) 2008 Darcy Mason
+# Copyright (c) 2008-2012 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
@@ -62,12 +62,10 @@ def write_UI(fp, data_element):
 
 def multi_string(val):
     """Put a string together with delimiter if has more than one value"""
-    try:
-        val.append  # will work for a list, but not for a string or number value
-    except:
-        return val
-    else:
+    if isinstance(val, (list, tuple)):
         return "\\".join(val)  # \ is escape chr, so "\\" gives single backslash
+    else:
+        return val
 
 def write_string(fp, data_element, padding=' '):
     """Write a single or multivalued string."""
@@ -78,7 +76,25 @@ def write_string(fp, data_element, padding=' '):
 
 def write_number_string(fp, data_element, padding = ' '):
     """Handle IS or DS VR - write a number stored as a string of digits."""
-    val = multi_string(data_element.string_value) # use exact string value from file or set by user
+    # If the DS or IS has an original_string attribute, use that, so that
+    # unchanged data elements are written with exact string as when read from file 
+    val = data_element.value   
+    if isinstance(val, (list, tuple)):
+        # XXX python >2.4 val = "\\".join([x.original_string if hasattr(x, 'original_string')
+                        #  else str(x) for x in val])
+        newval = []
+        for x in val:
+            if hasattr(x, 'original_string'):
+                newval.append(x.original_string)
+            else:
+                newval.append(str(x))
+        val = "\\".join(newval)
+    else:
+        # XXX python>2.4 val = val.original_string if hasattr(val, 'original_string') else str(val)
+        if hasattr(val, 'original_string'):
+            val = val.original_string
+        else:
+            val =  str(val)
     if len(val) % 2 != 0:
         val = val + padding   # pad to even length
     fp.write(val)
