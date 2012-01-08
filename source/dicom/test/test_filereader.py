@@ -1,6 +1,6 @@
 # test_filereader.py
 """unittest tests for dicom.filereader module"""
-# Copyright (c) 2010 Darcy Mason
+# Copyright (c) 2010-2012 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
@@ -10,6 +10,7 @@ import os
 import os.path
 import unittest
 from cStringIO import StringIO
+from decimal import Decimal
 
 import shutil
 # os.stat is only available on Unix and Windows   XXX Mac?
@@ -77,11 +78,12 @@ class ReaderTests(unittest.TestCase):
         self.assertEqual(beam.TreatmentMachineName, beam[0x300a, 0x00b2].value,
                 "beam TreatmentMachineName does not match the value accessed by tag number")
 
-        cumDoseRef = cp1.ReferencedDoseReferenceSequence[0].CumulativeDoseReferenceCoefficient
-        self.assert_(isClose(cumDoseRef, 0.9990268),
+        got = cp1.ReferencedDoseReferenceSequence[0].CumulativeDoseReferenceCoefficient
+        expected = Decimal('0.9990268')
+        self.assert_(got == expected,
                 "Cum Dose Ref Coeff not the expected value (CP1, Ref'd Dose Ref")
-        JawX = cp0.BLDPositions[0].LeafJawPositions
-        self.assert_(isClose(JawX[0], -100.0) and isClose(JawX[1], 100.0),
+        got = cp0.BeamLimitingDevicePositionSequence[0].LeafJawPositions
+        self.assert_(got[0] == Decimal('-100') and got[1] == Decimal('100.0'),
                 "X jaws not as expected (control point 0)")
     def testRTDose(self):
         """Returns correct values for sample data elements in test RT Dose file"""
@@ -104,9 +106,10 @@ class ReaderTests(unittest.TestCase):
                         ct.file_meta[0x2, 0x12].value,
                 "ImplementationClassUID does not match the value accessed by tag number")
         # (0020, 0032) Image Position (Patient)  [-158.13580300000001, -179.035797, -75.699996999999996]
-        imagepos = ct.ImagePositionPatient
-        self.assert_(isClose(imagepos, [-158.135803, -179.035797, -75.699997]),
-                "ImagePosition(Patient) values not as expected")
+        got = ct.ImagePositionPatient
+        expected = [Decimal('-158.135803'), Decimal('-179.035797'), Decimal('-75.699997')]
+        self.assert_(got == expected, "ImagePosition(Patient) values not as expected."
+                        "got %s, expected %s" % (got,expected))
         self.assertEqual(ct.Rows, 128, "Rows not 128")
         self.assertEqual(ct.Columns, 128, "Columns not 128")
         self.assertEqual(ct.BitsStored, 16, "Bits Stored not 16")
@@ -185,7 +188,9 @@ class ReaderTests(unittest.TestCase):
         self.assertEqual(mr.PatientName, 'CompressedSamples^MR1', "Wrong patient name")
         self.assertEqual(mr.PatientName, mr[0x10,0x10].value,
                 "Name does not match value found when accessed by tag number")
-        self.assert_(isClose(mr.PixelSpacing, [0.3125, 0.3125]), "Wrong pixel spacing")
+        got = mr.PixelSpacing
+        expected = [Decimal('0.3125'), Decimal('0.3125')]
+        self.assert_(got == expected, "Wrong pixel spacing")
     def testDeflate(self):
         """Returns correct values for sample data elements in test compressed (zlib deflate) file"""
         # Everything after group 2 is compressed. If we can read anything else, the decompression must have been ok.
@@ -317,16 +322,18 @@ class FileLikeTests(unittest.TestCase):
         f = open(ct_name, 'rb')
         ct = read_file(f)
         # Tests here simply repeat testCT -- perhaps should collapse the code together?
-
+        got = ct.ImagePositionPatient
+        expected = [Decimal('-158.135803'), Decimal('-179.035797'), Decimal('-75.699997')]
+        self.assert_(got == expected, "ImagePosition(Patient) values not as expected")
         self.assertEqual(ct.file_meta.ImplementationClassUID, '1.3.6.1.4.1.5962.2',
                 "ImplementationClassUID not the expected value")
         self.assertEqual(ct.file_meta.ImplementationClassUID,
                         ct.file_meta[0x2, 0x12].value,
                 "ImplementationClassUID does not match the value accessed by tag number")
         # (0020, 0032) Image Position (Patient)  [-158.13580300000001, -179.035797, -75.699996999999996]
-        imagepos = ct.ImagePositionPatient
-        self.assert_(isClose(imagepos, [-158.135803, -179.035797, -75.699997]),
-                "ImagePosition(Patient) values not as expected")
+        got = ct.ImagePositionPatient
+        expected = [Decimal('-158.135803'), Decimal('-179.035797'), Decimal('-75.699997')]
+        self.assert_(got == expected, "ImagePosition(Patient) values not as expected")
         self.assertEqual(ct.Rows, 128, "Rows not 128")
         self.assertEqual(ct.Columns, 128, "Columns not 128")
         self.assertEqual(ct.BitsStored, 16, "Bits Stored not 16")
@@ -338,9 +345,9 @@ class FileLikeTests(unittest.TestCase):
         file_like = StringIO(open(ct_name, 'rb').read())
         ct = read_file(file_like)
         # Tests here simply repeat some of testCT test
-        imagepos = ct.ImagePositionPatient
-        self.assert_(isClose(imagepos, [-158.135803, -179.035797, -75.699997]),
-                "ImagePosition(Patient) values not as expected")
+        got = ct.ImagePositionPatient
+        expected = [Decimal('-158.135803'), Decimal('-179.035797'), Decimal('-75.699997')]
+        self.assert_(got == expected, "ImagePosition(Patient) values not as expected")        
         self.assertEqual(len(ct.PixelData), 128*128*2, "Pixel data not expected length")
         # Should also be able to close the file ourselves without exception raised:
         file_like.close()

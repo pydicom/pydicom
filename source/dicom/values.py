@@ -1,7 +1,7 @@
 # values.py
 """Functions for converting values of DICOM data elements to proper python types
 """
-# Copyright (c) 2010 Darcy Mason
+# Copyright (c) 2010-2012 Darcy Mason
 # This file is part of pydicom, relased under an MIT license.
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
@@ -16,6 +16,7 @@ from dicom.tag import Tag, TupleTag, SequenceDelimiterTag
 from dicom.datadict import dictionaryVR
 from dicom.filereader import read_sequence
 from cStringIO import StringIO
+from dicom.valuerep import DS
 
 def convert_tag(bytes, is_little_endian, offset=0):
     if is_little_endian:
@@ -69,6 +70,10 @@ def convert_string(bytes, is_little_endian, struct_format=None):
     """Read and return a string or strings"""
     return MultiString(bytes)
 
+def convert_number_string(bytes, is_little_endian, struct_format=None):
+    """Read and return a DS or IS value or list of values"""
+    return MultiString(bytes, valtype=DS)
+    
 def convert_single_string(bytes, is_little_endian, struct_format=None):
     """Read and return a single string (backslash character does not split)"""
     if bytes and bytes.endswith(' '):
@@ -127,7 +132,8 @@ converters = {'UL':(convert_numbers,'L'), 'SL':(convert_numbers,'l'),
            'OB':convert_OBvalue, 'UI':convert_UI,
            'SH':convert_string,  'DA':convert_string, 'TM': convert_string,
            'CS':convert_string,  'PN':convert_PN,     'LO': convert_string,
-           'IS':convert_string,  'DS':convert_string, 'AE': convert_string,
+           'IS':convert_number_string,  'DS':convert_number_string,
+           'AE': convert_string,
            'AS':convert_string,
            'LT':convert_single_string,
            'SQ':convert_SQ,
