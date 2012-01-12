@@ -11,3 +11,8 @@ allow_DS_float = False
 """Set allow_float to True to allow DS instances to be created with floats;
 otherwise, they must be explicitly converted to strings, with the user
 explicity setting the precision of digits and rounding. Default: False"""
+
+enforce_valid_values = True
+"""Raise errors if any value is not allowed by DICOM standard, e.g. DS strings
+that are longer than 16 characters; IS strings outside the allowed range.
+"""
