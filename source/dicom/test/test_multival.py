@@ -35,12 +35,14 @@ class MultiValuetests(unittest.TestCase):
         multival = MultiValue(IS, [1, 5, 10])
         multival.append('5')
         self.assert_(isinstance(multival[-1], IS))
+        self.assertEqual(multival[-1], 5, "Item set by append is not correct value")
     
     def testSetIndex(self):
         """MultiValue: Setting list item converts it to required type"""
         multival = MultiValue(IS, [1, 5, 10])
         multival[1] = '7'
         self.assert_(isinstance(multival[1], IS))
+        self.assertEqual(multival[1], 7, "Item set by index is not correct value")
 
     def testExtend(self):
         """MultiValue: Extending a list converts all to required type"""
@@ -48,20 +50,15 @@ class MultiValuetests(unittest.TestCase):
         multival.extend(['7', 42])
         self.assert_(isinstance(multival[-2], IS))
         self.assert_(isinstance(multival[-1], IS))
-
-    def testSetIndex(self):
-        """MultiValue: Inserting item converts it to required type..."""
-        multival = MultiValue(IS, [1, 5, 10])
-        multival.insert(1, '7')
-        self.assert_(isinstance(multival[1], IS))
+        self.assertEqual(multival[-2], 7, "Item set by extend not correct value")
     
     def testSlice(self):
         """MultiValue: Setting slice converts items to required type."""
         multival = MultiValue(IS, range(7))
-        multival[2:7:2] = [2,4,6]
+        multival[2:7:2] = [4,16,36]
         for val in multival:
             self.assert_(isinstance(val,IS), "Slice IS value not correct type")
-        self.assertEqual(multival[4], 4, "Set by slice failed for item 4 of list")
+        self.assertEqual(multival[4], 16, "Set by slice failed for item 4 of list")
         
        
 if __name__ == "__main__":
