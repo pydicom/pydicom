@@ -12,24 +12,35 @@ def Tag(arg, arg2=None):
         arg = (arg, arg2) # act as if was passed a single tuple
     if isinstance(arg, (tuple, list)):
         if len(arg) != 2:
-            raise ValueError, "Tag must be an int or a 2-tuple"
-        if isinstance(arg[0], basestring):
-            if not isinstance(arg[1], basestring):
-                raise ValueError, "Both arguments must be hex strings if one is"
+#PZ http://www.python.org/dev/peps/pep-3109/          
+            raise ValueError( "Tag must be an int or a 2-tuple")
+#PZ no basestring in Py3 use str
+        if isinstance(arg[0], str):
+#PZ no basestring in Py3 use str
+            if not isinstance(arg[1], str):
+#PZ http://www.python.org/dev/peps/pep-3109/              
+                raise ValueError( "Both arguments must be hex strings if one is")
             arg = (int(arg[0], 16), int(arg[1], 16))
         if arg[0] > 0xFFFF or arg[1] > 0xFFFF:
-            raise OverflowError, "Groups and elements of tags must each be <=2 byte integers"
-        long_value = long(arg[0])<<16 | arg[1]  # long needed for python <2.4 where shift could make int negative
-    elif isinstance(arg, basestring):
-        raise ValueError, "Tags cannot be instantiated from a single string"
+#PZ http://www.python.org/dev/peps/pep-3109/          
+            raise OverflowError( "Groups and elements of tags must each be <=2 byte integers")
+#PZ no long in Py3            
+        long_value = int(arg[0])<<16 | arg[1]  # long needed for python <2.4 where shift could make int negative
+#PZ no basestring in Py3 use str        
+    elif isinstance(arg, str):
+#PZ http://www.python.org/dev/peps/pep-3109/      
+        raise ValueError( "Tags cannot be instantiated from a single string")
     else: # given a single number to use as a tag, as if (group, elem) already joined to a long
-        long_value = long(hex(arg), 16) # needed in python <2.4 to avoid negative ints
-        if long_value > 0xFFFFFFFFL:
-            raise OverflowError, "Tags are limited to 32-bit length; tag %r, long value %r" % (arg, long_value)
+#PZ no long in Py3    
+        long_value = int(hex(arg), 16) # needed in python <2.4 to avoid negative ints
+#PZ http://www.python.org/dev/peps/pep-0237/         
+        if long_value > 0xFFFFFFFF:
+#PZ http://www.python.org/dev/peps/pep-3109/          
+            raise OverflowError( "Tags are limited to 32-bit length; tag %r, long value %r" % (arg, long_value))
     return BaseTag(long_value)
     
-  
-class BaseTag(long):
+#PZ no long in 3.0  
+class BaseTag(int):
     """Class for storing the dicom (group, element) tag"""
     # Store the 4 bytes of a dicom tag as a python long (arbitrary length, not like C-language long).
     # NOTE: logic (in write_AT of filewriter at least) depends on this 
@@ -50,8 +61,10 @@ class BaseTag(long):
             try:
                 other = Tag(other)
             except:
-                raise TypeError, "Cannot compare Tag with non-Tag item"
-        return long(self) < long(other)
+#PZ 3109
+                raise TypeError( "Cannot compare Tag with non-Tag item")
+#PZ no long in Py3                
+        return int(self) < int(other)
 
     def __eq__(self, other):
         # Check if comparing with another Tag object; if not, create a temp one
@@ -59,9 +72,11 @@ class BaseTag(long):
             try:
                 other = Tag(other)
             except:
-                raise TypeError, "Cannot compare Tag with non-Tag item"
+#PZ 3109            
+                raise TypeError( "Cannot compare Tag with non-Tag item")
         # print "self %r; other %r" % (long(self), long(other))
-        return long(self) == long(other)
+#PZ no long in Py3        
+        return int(self) == int(other)
 
     def __ne__(self, other):
         # Check if comparing with another Tag object; if not, create a temp one
@@ -69,14 +84,17 @@ class BaseTag(long):
             try:
                 other = Tag(other)
             except:
-                raise TypeError, "Cannot compare Tag with non-Tag item"
-        return long(self) != long(other)
+#PZ 3109            
+                raise TypeError( "Cannot compare Tag with non-Tag item")
+#PZ no long in Py3                
+        return int(self) != int(other)
 
     
     # For python 3, any override of __cmp__ or __eq__ immutable requires
     #   explicit redirect of hash function to the parent class 
     #   See http://docs.python.org/dev/3.0/reference/datamodel.html#object.__hash__
-    __hash__ = long.__hash__
+#PZ no long in Py3    
+    __hash__ = int.__hash__
     
     def __str__(self):
         """String of tag value as (gggg, eeee)"""
@@ -105,7 +123,9 @@ class BaseTag(long):
 def TupleTag(group_elem):
     """Fast factory for BaseTag object with known safe (group, element) tuple"""
     # long needed for python <2.4 where shift could make int negative
-    long_value = long(group_elem[0])<<16 | group_elem[1]  
+#PZ no long in Py3    
+#    long_value = long(group_elem[0])<<16 | group_elem[1]  
+    long_value = group_elem[0]<<16 | group_elem[1]  
     return BaseTag(long_value)
 
 # Define some special tags:

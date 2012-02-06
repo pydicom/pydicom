@@ -1,4 +1,5 @@
 # misc.py 
+#PZ checked 6 Feb 2012
 """Miscellaneous helper functions"""
 # Copyright (c) 2009 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
@@ -17,4 +18,5 @@ def size_in_bytes(expr):
             val = float(expr[:-2]) * _size_factors[unit]
             return val
         else:
-            raise ValueError, "Unable to parse length with unit '%s'" % unit
+#PZ 3109/3110        
+            raise ValueError( "Unable to parse length with unit '%s'" % unit)

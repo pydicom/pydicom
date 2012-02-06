@@ -1,4 +1,5 @@
 # filereader.py
+#PZ downloaded 6 Feb 2012
 """Read a dicom media file"""
 # Copyright (c) 2008-2012 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
@@ -9,7 +10,8 @@
 import os.path
 import warnings
 import zlib
-from cStringIO import StringIO # tried cStringIO but wouldn't let me derive class from it.
+#PZ now in io
+from io import StringIO # tried cStringIO but wouldn't let me derive class from it.
 import logging
 from dicom.tag import TupleTag
 from dicom.dataelem import RawDataElement
@@ -155,7 +157,7 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian, stop_when=None,
     where:
     VR -- None if implicit VR, otherwise the VR read from the file
     length -- the length as in the DICOM data element (could be
-        DICOM "undefined length" 0xffffffffL),
+        DICOM "undefined length" 0xffffffff),
     value_bytes -- the raw bytes from the DICOM file (not parsed into python types)
     is_little_endian -- True if transfer syntax is little endian; else False
     """
@@ -213,7 +215,8 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian, stop_when=None,
         if debugging:
             debug_msg = "%-47s  (%04x, %04x)" % (debug_msg, group, elem)
             if not is_implicit_VR: debug_msg += " %s " % VR
-            if length != 0xFFFFFFFFL:
+#PZ http://www.python.org/dev/peps/pep-0237/            
+            if length != 0xFFFFFFFF:
                 debug_msg += "Length: %d" % length
             else:
                 debug_msg += "Length: Undefined length (FFFFFFFF)"
@@ -235,7 +238,8 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian, stop_when=None,
 
         # Reading the value
         # First case (most common): reading a value with a defined length
-        if length != 0xFFFFFFFFL:
+#PZ http://www.python.org/dev/peps/pep-0237/                    
+        if length != 0xFFFFFFFF:
             if defer_size is not None and length > defer_size:
                 # Flag as deferred read by setting value to None, and skip bytes
                 value = None
@@ -309,10 +313,12 @@ def read_dataset(fp, is_implicit_VR, is_little_endian, bytelength=None,
 
     except StopIteration:
         pass
-    except EOFError, details:
+#PZ http://docs.python.org/release/3.0.1/whatsnew/2.6.html#pep-3110        
+    except EOFError as details:
         logger.error(str(details) + " in file " +
                     getattr(fp, "name", "<no filename>")) # XXX is this visible enough to user code?
-    except NotImplementedError, details:
+#PZ http://docs.python.org/release/3.0.1/whatsnew/2.6.html#pep-3110        
+    except NotImplementedError as details:
         logger.error(details)
 
     return Dataset(raw_data_elements)
@@ -322,7 +328,8 @@ def read_sequence(fp, is_implicit_VR, is_little_endian, bytelength, offset=0):
     seq = [] # use builtin list to start for speed, convert to Sequence at end
     is_undefined_length = False
     if bytelength != 0:  # Sequence of length 0 is possible (PS 3.5-2008 7.5.1a (p.40)
-        if bytelength == 0xffffffffL:
+#PZ http://www.python.org/dev/peps/pep-0237/     
+        if bytelength == 0xffffffff:
             is_undefined_length = True
             bytelength = None
         fp_tell = fp.tell # for speed in loop
@@ -348,7 +355,8 @@ def read_sequence_item(fp, is_implicit_VR, is_little_endian):
         bytes_read = fp.read(8)
         group, element, length = unpack(tag_length_format, bytes_read)
     except:
-        raise IOError, "No tag to read at file position %05x" % fp.tell()
+#PZ http://www.python.org/dev/peps/pep-3109/  
+        raise IOError ( "No tag to read at file position %05x" % fp.tell())
 
     tag = (group, element)
     if tag == SequenceDelimiterTag: # No more items, time to stop reading
@@ -363,7 +371,8 @@ def read_sequence_item(fp, is_implicit_VR, is_little_endian):
         logger.debug("%08x: %s  Found Item tag (start of item)" % (fp.tell()-4,
                           bytes2hex(bytes_read)))
     is_undefined_length = False
-    if length == 0xFFFFFFFFL:
+#PZ http://www.python.org/dev/peps/pep-0237/     
+    if length == 0xFFFFFFFF:
         ds = read_dataset(fp, is_implicit_VR, is_little_endian, bytelength=None)
         ds.is_undefined_length_sequence_item = True
     else:
@@ -509,7 +518,8 @@ def read_partial(fileobj, stop_when=None, defer_size=None, force=False):
     try:
         dataset = read_dataset(fileobj, is_implicit_VR, is_little_endian, 
                             stop_when=stop_when, defer_size=defer_size)
-    except EOFError, e:
+#PZ http://www.python.org/dev/peps/pep-3110/    
+    except EOFError as e:
         pass  # error already logged in read_dataset
     return FileDataset(fileobj, dataset, preamble, file_meta_dataset, is_implicit_VR,
                         is_little_endian)
@@ -586,10 +596,12 @@ def read_deferred_data_element(fileobj_type, filename, timestamp, raw_data_elem)
     logger.debug("Reading deferred element %r" % str(raw_data_elem.tag))
     # If it wasn't read from a file, then return an error
     if filename is None:
-        raise IOError, "Deferred read -- original filename not stored. Cannot re-open"
+#PZ http://www.python.org/dev/peps/pep-3109/     
+        raise IOError("Deferred read -- original filename not stored. Cannot re-open")
     # Check that the file is the same as when originally read
     if not os.path.exists(filename):
-        raise IOError, "Deferred read -- original file '%s' is missing" % filename
+#PZ http://www.python.org/dev/peps/pep-3109/  + format pep-3101
+        raise IOError( "Deferred read -- original file {:s} is missing".format(filename))
     if stat_available and timestamp is not None:
         statinfo = stat(filename)
         if statinfo.st_mtime != timestamp:
@@ -609,9 +621,11 @@ def read_deferred_data_element(fileobj_type, filename, timestamp, raw_data_elem)
     data_elem = elem_gen.next()
     fp.close()
     if data_elem.VR != raw_data_elem.VR:
-        raise ValueError, "Deferred read VR '%s' does not match original '%s'" % (data_elem.VR, raw_data_elem.VR)
+#PZ http://www.python.org/dev/peps/pep-3109/  + format pep-3101   
+        raise ValueError( "Deferred read VR {0:s} does not match original {1:s}".format( data_elem.VR, raw_data_elem.VR))
     if data_elem.tag != raw_data_elem.tag:
-        raise ValueError, "Deferred read tag %r does not match original %r" % (data_elem.tag, raw_data_elem.tag)
+#PZ http://www.python.org/dev/peps/pep-3109/  + format pep-3101   
+        raise ValueError("Deferred read tag {0!r} does not match original {1!r}".format( data_elem.tag, raw_data_elem.tag))
 
     # Everything is ok, now this object should act like usual DataElement
     return data_elem

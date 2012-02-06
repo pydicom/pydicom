@@ -1,11 +1,13 @@
 # UID.py
+#PZ sync 6 Feb 2012
 """Dicom Unique identifiers"""
 # Copyright (c) 2008 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
 
-from _UID_dict import UID_dictionary
+#add dicom
+from dicom._UID_dict import UID_dictionary
 
 class UID(str):
     """Subclass python string so have human-friendly UIDs
@@ -26,10 +28,12 @@ class UID(str):
         if isinstance(val, UID):
             return val
         else:
-            if isinstance(val, basestring):
+#PZ no basestring        
+            if isinstance(val, str):
                 return super(UID, cls).__new__(cls, val.strip())
             else:
-                raise TypeError, "UID must be a string"
+#PZ 3109/3110            
+                raise TypeError( "UID must be a string")
         
     def __init__(self, val):
         """Initialize the UID properties
@@ -41,8 +45,10 @@ class UID(str):
         # Note normally use __new__ on subclassing an immutable, but here we just want 
         #    to do some pre-processing against the UID dictionary.
         #   "My" string can never change (it is a python immutable), so is safe
-        if self in UID_dictionary:
-            self.name, self.type, self.info, retired = UID_dictionary[self]
+#PZ self or val? if self       
+        if val in UID_dictionary:
+#PZ self or val? in  UID_dictionary[val]
+            self.name, self.type, self.info, retired = UID_dictionary[val]
             self.is_retired = bool(retired)
         else:
             self.name = str.__str__(self)
