@@ -1,4 +1,5 @@
 # fileutil.py
+#PZ downloaded 6 Feb 2012
 """Functions for reading to certain bytes, e.g. delimiters"""
 # Copyright (c) 2009 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
@@ -117,7 +118,8 @@ def read_undefined_length_value(fp, is_little_endian, delimiter_tag, defer_size=
                 logger.error(msg % (fp.tell()-4,))
         elif EOF:
             fp.seek(data_start)
-            raise EOFError, "End of file reached before delimiter %r found" % delimiter_tag
+#PZ 3109/3110            
+            raise EOFError( "End of file reached before delimiter %r found" % delimiter_tag)
         else:
             fp.seek(fp.tell()-search_rewind) # rewind a bit in case delimiter crossed read_size boundary
             # accumulate the bytes read (not including the rewind)

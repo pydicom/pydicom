@@ -1,4 +1,5 @@
 # dataelem.py
+#PZ downloaded 6 Feb 2012
 """Define the DataElement class - elements within a dataset.
 
 DataElements have a DICOM value representation VR, a value multiplicity VM,
@@ -220,7 +221,8 @@ class DataElement(object):
         try:
             return self.value[key]
         except TypeError:
-            raise TypeError, "DataElement value is unscriptable (not a Sequence)"
+#PZ 3109        
+            raise TypeError( "DataElement value is unscriptable (not a Sequence)")
 
     def _get_name(self):
         return self.description()
@@ -314,13 +316,16 @@ def DataElement_from_raw(raw_data_element):
             elif raw.tag.element == 0:  # group length tag implied in versions < 3.0
                 VR = 'UL'
             else:
-                raise KeyError, "Unknown DICOM tag %s - can't look up VR" % str(raw.tag)    
+#PZ 3109            
+                raise KeyError( "Unknown DICOM tag {0:s} - can't look up VR".format(str(raw.tag)))
     try:
         value = convert_value(VR, raw)
-    except NotImplementedError, e:
-        raise NotImplementedError, "%s in tag %r" % (str(e), raw.tag)
-    
-    return DataElement(raw.tag, VR, value, raw.value_tell, raw.length==0xFFFFFFFFL)
+#PZ 3110        
+    except NotImplementedError as e:
+#PZ 3109    
+        raise NotImplementedError( "{0:s} in tag {1!r}".format(str(e), raw.tag))
+#PZ 237    
+    return DataElement(raw.tag, VR, value, raw.value_tell, raw.length==0xFFFFFFFF)
         
 class Attribute(DataElement):
     """Deprecated -- use DataElement instead"""

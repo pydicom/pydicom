@@ -1,4 +1,5 @@
 # filebase.py 
+#PZ downloaded 6 Feb 2012
 """Hold DicomFile class, which does basic I/O for a dicom file."""
 # Copyright (c) 2008 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
@@ -8,7 +9,8 @@
 from dicom.tag import Tag
 from struct import unpack, pack
 
-from cStringIO import StringIO
+#PZ now in io
+from io import StringIO
 import logging
 logger = logging.getLogger('pydicom')
 
@@ -70,7 +72,8 @@ class DicomIO(object):
                 msg = "Unexpected end of file. "
                 msg += "Read %d bytes of %d expected starting at position 0x%x" % (len(bytes), length, start_pos)
                 # logger.error(msg)   # don't need this since raising error anyway
-                raise EOFError, msg
+#PZ 3109/3110                
+                raise EOFError(msg)
         return bytes
     def write_leUS(self, val):
         """Write an unsigned short with little endian byte order"""
@@ -140,7 +143,8 @@ class DicomFileLike(DicomIO):
         self.name = getattr(file_like_obj, 'name', '<no filename>')
     def no_write(self, bytes):
         """Used for file-like objects where no write is available"""
-        raise IOError, "This DicomFileLike object has no write() method"
+#PZ 3109/3110        
+        raise IOError("This DicomFileLike object has no write() method")
         
 def DicomFile(*args, **kwargs):
     return DicomFileLike(open(*args, **kwargs))

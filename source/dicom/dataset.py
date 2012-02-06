@@ -1,4 +1,5 @@
 # dataset.py
+#PZ downloaded 6 Feb 2012
 """Module for Dataset class
 
 Overview of Dicom object model:
@@ -32,7 +33,9 @@ from dicom.dataelem import DataElement, DataElement_from_raw, RawDataElement
 from dicom.valuerep import is_stringlike
 from dicom.UID import NotCompressedPixelTransferSyntaxes
 import os.path
-import cStringIO, StringIO
+#PZ now in io
+from io import StringIO
+#import cStringIO, StringIO
 
 import dicom # for write_file
 import dicom.charset
@@ -53,6 +56,7 @@ except:
     stat_available = False
 
 class PropertyError(Exception):
+#PZ http://docs.python.org/release/3.1.3/tutorial/errors.html#tut-userexceptions
     """For AttributeErrors caught in a property, so do not go to __getattr__"""
     pass
 
@@ -169,7 +173,8 @@ class Dataset(dict):
             del self.__dict__[name]
         # Not found, raise an error in same style as python does
         else:
-            raise AttributeError, name
+#PZ 3109/3110        
+            raise AttributeError(name)
 
     def __dir__(self):
         """___dir__ is used in python >= 2.6 to give a list of attributes
@@ -257,10 +262,12 @@ class Dataset(dict):
         # So, if name is not a dicom string, then is an error
         tag = tag_for_name(name)
         if tag is None:
-            raise AttributeError, "Dataset does not have attribute '%s'." % name
+#PZ 3109/3110                    
+            raise AttributeError( "Dataset does not have attribute '%s'." % name)
         tag = Tag(tag)
         if tag not in self:
-            raise AttributeError, "Dataset does not have attribute '%s'." % name
+#PZ 3109/3110                    
+            raise AttributeError( "Dataset does not have attribute '%s'." % name)
         else:  # do have that dicom data_element
             return self[tag].value
     
@@ -338,11 +345,13 @@ class Dataset(dict):
 
         """
         if not 'PixelData' in self:
-            raise TypeError, "No pixel data found in this dataset."
+#PZ 3109/3110                    
+            raise TypeError( "No pixel data found in this dataset.")
 
         if not have_numpy:
             msg = "The Numpy package is required to use pixel_array, and numpy could not be imported.\n"
-            raise ImportError, msg
+#PZ 3109/3110            
+            raise ImportError(msg)
 
         # determine the type used for the array
         need_byteswap = (self.is_little_endian != sys_is_little_endian)
@@ -356,6 +365,7 @@ class Dataset(dict):
         try:
             numpy_format = numpy.dtype(format_str)
         except TypeError:
+#PZ check this one !!!!!!!!!!!!!!!!!!!!!!! Looks good
             raise TypeError("Data type not understood by NumPy: "
                             "format='%s', PixelRepresentation=%d, BitsAllocated=%d" % (
                             numpy_format, self.PixelRepresentation, self.BitsAllocated))
@@ -377,7 +387,8 @@ class Dataset(dict):
                 if self.BitsAllocated == 8:
                     arr = arr.reshape(self.SamplesPerPixel, self.Rows, self.Columns)
                 else:
-                    raise NotImplementedError, "This code only handles SamplesPerPixel > 1 if Bits Allocated = 8"
+#PZ 3109/3110                
+                    raise NotImplementedError("This code only handles SamplesPerPixel > 1 if Bits Allocated = 8")
             else:
                 arr = arr.reshape(self.Rows, self.Columns)
         return arr
@@ -387,7 +398,8 @@ class Dataset(dict):
         # Check if pixel data is in a form we know how to make into an array
         # XXX uses file_meta here, should really only be thus for FileDataset
         if self.file_meta.TransferSyntaxUID not in NotCompressedPixelTransferSyntaxes :
-            raise NotImplementedError, "Pixel Data is compressed in a format pydicom does not yet handle. Cannot return array"
+#PZ 3109/3110        
+            raise NotImplementedError( "Pixel Data is compressed in a format pydicom does not yet handle. Cannot return array")
 
         # Check if already have converted to a NumPy array
         # Also check if self.PixelData has changed. If so, get new NumPy array
@@ -405,8 +417,10 @@ class Dataset(dict):
             return self._getPixelArray()
         except AttributeError:
             t, e, tb = sys.exc_info()
+#PZ check this one !!!!!!!!!!!!!!!!!!!       
+#PZ http://docs.python.org/release/3.1.3/reference/simple_stmts.html#raise     
             raise PropertyError("AttributeError in pixel_array property: " + \
-                            e.args[0]), None, tb
+                            e.args[0]).with_traceback(tb)
     pixel_array = property(_get_pixel_array)
     PixelArray = pixel_array # for backwards compatibility -- remove in v1.0
 
@@ -513,11 +527,13 @@ class Dataset(dict):
     def __setitem__(self, key, value):
         """Operator for dataset[key]=value. Check consistency, and deal with private tags"""
         if not isinstance(value, (DataElement, RawDataElement)): # ok if is subclass, e.g. DeferredDataElement
-            raise TypeError, "Dataset contents must be DataElement instances.\n" + \
-                  "To set a data_element value use data_element.value=val"
+#PZ 3109/3110        
+            raise TypeError("Dataset contents must be DataElement instances.\n" + \
+                  "To set a data_element value use data_element.value=val")
         tag = Tag(value.tag)
         if key != tag:
-            raise ValueError, "data_element.tag must match the dictionary key"
+#PZ 3109/3110        
+            raise ValueError("data_element.tag must match the dictionary key")
 
         data_element = value
         if tag.is_private:

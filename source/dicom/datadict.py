@@ -1,4 +1,5 @@
 # datadict.py
+#PZ downloaded 6 Feb 2012
 # -*- coding: utf-8 -*-
 """Access dicom dictionary information"""
 #
@@ -21,8 +22,9 @@ masks = {}
 for mask_x in RepeatersDictionary:
     # mask1 is XOR'd to see that all non-"x" bits are identical (XOR result = 0 if bits same)
     #      then AND those out with 0 bits at the "x" ("we don't care") location using mask2
-    mask1 = long(mask_x.replace("x", "0"),16)
-    mask2 = long("".join(["F0"[c=="x"] for c in mask_x]),16)
+#PZ no long in Py3    
+    mask1 = int(mask_x.replace("x", "0"),16)
+    mask2 = int("".join(["F0"[c=="x"] for c in mask_x]),16)
     masks[mask_x] = (mask1, mask2)
 
 # For shorter naming of dicom member elements, put an entry here
@@ -54,7 +56,8 @@ def get_entry(tag):
         if mask_x:
             return RepeatersDictionary[mask_x]
         else:
-            raise KeyError, "Tag %s not found in DICOM dictionary" % tag
+#PZ 3109/3110        
+            raise KeyError( "Tag {} not found in DICOM dictionary".format( tag))
         
 def dictionary_description(tag):
     """Return the descriptive text for the given dicom tag."""
@@ -74,10 +77,11 @@ def dictionary_has_tag(tag):
 
 def dictionary_keyword(tag):
     """Return the official DICOM standard (since 2011) keyword for the tag"""
-    return get_entry(tag)[4]
+#PZ typo - should be 3?    
+    return get_entry(tag)[3]
 
-import string
-normTable = string.maketrans('','')
+#PZ built-in, moved deleted characters from 113
+normTable = str.maketrans('','', r""" !@#$%^&*(),;:.?\|{}[]+-="'’/""")
 
 def keyword_for_tag(tag):
     """Return the DICOM keyword for the given tag. Replaces old CleanName() 
@@ -106,7 +110,8 @@ def CleanName(tag):
             return ""
     s = dictionary_description(tag)    # Descriptive name in dictionary
     # remove blanks and nasty characters
-    s = s.translate(normTable, r""" !@#$%^&*(),;:.?\|{}[]+-="'’/""")
+#PZ deleted characters moved to 83
+    s = s.translate(normTable)
     
     # Take "Sequence" out of name as more natural sounding
     # e..g "BeamSequence"->"Beams"; "ReferencedImageBoxSequence"->"ReferencedImageBoxes"
@@ -186,7 +191,8 @@ def get_private_entry(tag, private_creator):
     try:
         private_dict = private_dictionaries[private_creator]
     except KeyError:
-        raise KeyError, "Private creator '%s' not in private dictionary" % private_creator
+#PZ 3109/3110    
+        raise KeyError( "Private creator {} not in private dictionary".format( private_creator))
     
     # private elements are usually agnostic for "block" (see PS3.5-2008 7.8.1 p44)
     # Some elements in _private_dict are explicit; most have "xx" for high-byte of element
@@ -199,7 +205,8 @@ def get_private_entry(tag, private_creator):
         elem_str = "%04x" % tag.elem
         key = "%sxx%s" % (group_str, elem_str[-2:])
         if key not in private_dict:
-            raise KeyError, "Tag %s not in private dictionary for private creator '%s'" % (key, private_creator)
+#PZ 3109/3110        
+            raise KeyError("Tag {0} not in private dictionary for private creator {1}".format(key, private_creator))
         dict_entry = private_dict[key]
     return dict_entry
 	

@@ -1,4 +1,5 @@
 # filewriter.py
+#PZ downloaded 6 Feb 2012
 """Write a dicom media file."""
 # Copyright (c) 2008-2012 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
@@ -40,8 +41,10 @@ def write_numbers(fp, data_element, struct_format):
         else:
             for val in value:
                 fp.write(pack(format_string, val))
-    except Exception, e:
-        raise IOError, "%s\nfor data_element:\n%s" % (str(e), str(data_element))
+#PZ as                
+    except Exception as e:
+#PZ 3109/3110 + format
+        raise IOError( "{0}\nfor data_element:\n{1}". format(str(e), str(data_element)))
 
 def write_OBvalue(fp, data_element):
     """Write a data_element with VR of 'other byte' (OB)."""
@@ -108,18 +111,21 @@ def write_data_element(fp, data_element):
         if len(VR) != 2:
             msg = "Cannot write ambiguous VR of '%s' for data element with tag %r." % (VR, data_element.tag)
             msg += "\nSet the correct VR before writing, or use an implicit VR transfer syntax"
-            raise ValueError, msg
+#PZ 3109/3110            
+            raise ValueError(msg)
         fp.write(VR)
         if VR in ['OB', 'OW', 'OF', 'SQ', 'UT', 'UN']:
             fp.write_US(0)   # reserved 2 bytes
     if VR not in writers:
-        raise NotImplementedError, "write_data_element: unknown Value Representation '%s'" % VR
+#PZ 3109/3110 + format    
+        raise NotImplementedError( "write_data_element: unknown Value Representation '{0}'".format(VR))
 
     length_location = fp.tell() # save location for later.
     if fp.is_explicit_VR and VR not in ['OB', 'OW', 'OF', 'SQ', 'UT', 'UN']:
         fp.write_US(0)  # Explicit VR length field is only 2 bytes
     else:
-        fp.write_UL(0xFFFFFFFFL)   # will fill in real length value later if not undefined length item
+#PZ long by default    
+        fp.write_UL(0xFFFFFFFF)   # will fill in real length value later if not undefined length item
     
     try:
         writers[VR][0] # if writer is a tuple, then need to pass a number format
@@ -169,7 +175,8 @@ def write_sequence_item(fp, dataset):
     # This is similar to writing a data_element, but with a specific tag for Sequence Item
     fp.write_tag(ItemTag)   # marker for start of Sequence Item
     length_location = fp.tell() # save location for later.
-    fp.write_UL(0xffffffffL)   # will fill in real value later if not undefined length
+#PZ long by default    
+    fp.write_UL(0xffffffff)   # will fill in real value later if not undefined length
     write_dataset(fp, dataset)
     if getattr(dataset, "is_undefined_length_sequence_item", False):
         fp.write_tag(ItemDelimiterTag)
@@ -221,7 +228,8 @@ def _write_file_meta_info(fp, meta_dataset):
         if Tag((2, element)) not in meta_dataset:
             missing.append(Tag((2, element)))
     if missing:
-        raise ValueError, "Missing required tags %s for file meta information" % str(missing)
+#PZ 3109/3110  + format
+        raise ValueError( "Missing required tags {} for file meta information".format(str(missing)))
     
     # Put in temp number for required group length, save current location to come back
     meta_dataset[(2,0)] = DataElement((2,0), 'UL', 0) # put 0 to start
@@ -283,7 +291,8 @@ def write_file(filename, dataset, WriteLikeOriginal=True):
         elif dataset.is_big_endian and not dataset.is_implicit_VR:
             file_meta.add_new((2, 0x10), 'UI', ExplicitVRBigEndian)
         else:
-            raise NotImplementedError, "pydicom has not been verified for Big Endian with Implicit VR"
+#PZ 3109/3110        
+            raise NotImplementedError( "pydicom has not been verified for Big Endian with Implicit VR")
         
     fp = DicomFile(filename,'wb')
     try:

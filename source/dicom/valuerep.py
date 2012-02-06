@@ -1,4 +1,5 @@
 # valuerep.py
+#PZ downloaded 6 Feb 2012
 """Special classes for DICOM value representations (VR)"""
 # Copyright (c) 2008-2012 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
@@ -9,6 +10,29 @@ from decimal import Decimal
 import dicom.config
 from dicom.multival import MultiValue
 
+#PZ
+import sys
+#PZ maybe hexversion is better
+if sys.hexversion >= 0x02060000 and sys.hexversion < 0x03000000: 
+    inPy26 = True
+else: 
+    inPy26 = False
+
+if sys.hexversion >= 0x03000000: 
+    inPy3 = True
+else: 
+    inPy3 = False
+#PZ 
+if inPy26:
+    namebase = bytestring
+    strbase = basestring    
+if inPy3:
+    unicode = str
+    namebase = object
+    bytestring = str
+    strbase = str    
+#PZ it cannot work in Py3 sincethere is no bytestring    
+"""
 from sys import version_info
 if version_info[0] < 3:
     namebase = object
@@ -17,6 +41,7 @@ if version_info[0] < 3:
 else:
     namebase = bytestring
     strbase = basestring
+"""
     
 def is_stringlike(name):
     """Return True if name is string-like."""
@@ -46,7 +71,8 @@ class DS(Decimal):
                 "config.allow_DS_float is set to True. It is recommended to "
                 "convert to a string instead, with the desired number of digits, "
                 "or use Decimal.quantize and pass a Decimal instance.")
-            raise TypeError, msg
+#PZ 3109/3110                
+            raise TypeError(msg)
         if not isinstance(val, Decimal):
             val = super(DS, cls).__new__(cls, val)
         if len(str(val)) > 16 and dicom.config.enforce_valid_values:
@@ -54,7 +80,8 @@ class DS(Decimal):
                 "standard. Initialize with a smaller string, or set config.enforce_valid_values "
                 "to False to override, "
                 "or use Decimal.quantize() and initialize with a Decimal instance.")
-            raise OverflowError, msg
+#PZ 3109/3110                
+            raise OverflowError(msg)
         return val
     def __init__(self, val):
         """Store the original string if one given, for exact write-out of same 
@@ -88,11 +115,13 @@ class IS(int):
         # check if a float or Decimal passed in, then could have lost info,
         # and will raise error. E.g. IS(Decimal('1')) is ok, but not IS(1.23)
         if isinstance(val, (float, Decimal)) and newval != val:
-            raise TypeError, "Could not convert value to integer without loss"
+#PZ 3109/3110        
+            raise TypeError( "Could not convert value to integer without loss")
                 # Checks in case underlying int is >32 bits, DICOM does not allow this
         if (newval < -2**31 or newval >= 2**31) and dicom.config.enforce_valid_values:
             message = "Value exceeds DICOM limits of -2**31 to (2**31 - 1) for IS"
-            raise OverflowError, message
+#PZ 3109/3110            
+            raise OverflowError( message)
         return newval
     def __init__(self, val):
         # If a string passed, then store it
@@ -217,7 +246,8 @@ class PersonNameUnicode(PersonNameBase, unicode):
         components = val.split("=")
         unicomponents = [unicode(components[i],encodings[i]) 
                             for i, component in enumerate(components)]
-        new_val = u"=".join(unicomponents)
+#PZ u by default                            
+        new_val = "=".join(unicomponents)
 
         return unicode.__new__(cls, new_val)
     def __init__(self, val, encodings):

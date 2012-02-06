@@ -1,7 +1,7 @@
 # values.py
 """Functions for converting values of DICOM data elements to proper python types
 """
-# Copyright (c) 2010-2012 Darcy Mason
+# Copyright (c) 2010 Darcy Mason
 # This file is part of pydicom, relased under an MIT license.
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
@@ -10,14 +10,12 @@ from struct import unpack, calcsize, pack
 import logging
 logger = logging.getLogger('pydicom')
 
-from dicom.valuerep import PersonName, MultiString
-from dicom.multival import MultiValue
+from dicom.valuerep import PersonName, MultiValue, MultiString
 import dicom.UID
 from dicom.tag import Tag, TupleTag, SequenceDelimiterTag
 from dicom.datadict import dictionaryVR
 from dicom.filereader import read_sequence
 from cStringIO import StringIO
-from dicom.valuerep import DS, IS
 
 def convert_tag(bytes, is_little_endian, offset=0):
     if is_little_endian:
@@ -34,17 +32,9 @@ def convert_ATvalue(bytes, is_little_endian, struct_format=None):
     # length > 4
     if length % 4 != 0:
         logger.warn("Expected length to be multiple of 4 for VR 'AT', got length %d at file position 0x%x", length, fp.tell()-4)
-    return MultiValue(Tag,[convert_tag(bytes, is_little_endian, offset=x) 
+    return MultiValue([convert_tag(bytes, is_little_endian, offset=x) 
                         for x in range(0, length, 4)])
 
-def convert_DS_string(bytes, is_little_endian, struct_format=None):
-    """Read and return a DS value or list of values"""
-    return MultiString(bytes, valtype=DS)
-
-def convert_IS_string(bytes, is_little_endian, struct_format=None):
-    """Read and return an IS value or list of values"""
-    return MultiString(bytes, valtype=IS)
-    
 def convert_numbers(bytes, is_little_endian, struct_format):
     """Read a "value" of type struct_format from the dicom file. "Value" can be more than one number"""
     endianChar = '><'[is_little_endian]
@@ -137,8 +127,7 @@ converters = {'UL':(convert_numbers,'L'), 'SL':(convert_numbers,'l'),
            'OB':convert_OBvalue, 'UI':convert_UI,
            'SH':convert_string,  'DA':convert_string, 'TM': convert_string,
            'CS':convert_string,  'PN':convert_PN,     'LO': convert_string,
-           'IS':convert_IS_string,  'DS':convert_DS_string,
-           'AE': convert_string,
+           'IS':convert_string,  'DS':convert_string, 'AE': convert_string,
            'AS':convert_string,
            'LT':convert_single_string,
            'SQ':convert_SQ,
