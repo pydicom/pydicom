@@ -1,10 +1,12 @@
 # hexutil.py 
+#PZ 6 Feb 2012
+#PZ corrected format bytes2hex
 """Miscellaneous utility routines relating to hex and byte strings"""
 # Copyright (c) 2008 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
-
+    
 def hex2bytes(hex_string):
     """Return bytestring for a string of hex bytes separated by whitespace
     
@@ -24,4 +26,5 @@ def hex2bytes(hex_string):
 
 def bytes2hex(bytes):
     """Return a hex dump of the bytes given"""
-    return " ".join(["%02x" % ord(b) for b in bytes])
+#PZ format
+    return " ".join(["{:02x}".format(b) for b in bytes])     

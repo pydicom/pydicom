@@ -6,6 +6,19 @@
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
 
+#PZ move defines here
+import sys
+if sys.hexversion >= 0x02060000 and sys.hexversion < 0x03000000: 
+    inPy26 = True
+else: 
+    inPy26 = False
+
+if sys.hexversion >= 0x03000000: 
+    inPy3 = True
+    basestring = str
+else: 
+    inPy3 = False
+
 # Need zlib and cStringIO for deflate-compressed file
 import os.path
 import warnings
@@ -201,13 +214,16 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian, stop_when=None,
         bytes_read = fp_read(8)        
         if len(bytes_read) < 8:
             raise StopIteration # at end of file
-        if debugging: debug_msg = "%08x: %s" % (fp.tell()-8, bytes2hex(bytes_read))
+#PZ format            
+        if debugging: debug_msg = "{0:08x}: {1}".format(fp.tell()-8, bytes2hex(bytes_read))
         
         if is_implicit_VR:
             VR = None # must reset each time -- may have looked up on last iteration (e.g. SQ)
             group, elem, length = unpack(unpack_format, bytes_read)
         else: # explicit VR
             group, elem, VR, length = unpack(unpack_format, bytes_read)
+#PZ move VR to unicode            
+            if inPy3: VR = VR.decode()
             if VR in ('OB','OW','OF','SQ','UN', 'UT'):
                 bytes_read = fp_read(4)
                 length = unpack(extra_length_format, bytes_read)[0]
@@ -301,10 +317,11 @@ def read_dataset(fp, is_implicit_VR, is_little_endian, bytelength=None,
     raw_data_elements = dict()
     fpStart = fp.tell()
     de_gen = data_element_generator(fp, is_implicit_VR, is_little_endian, 
-                                    stop_when, defer_size)
+                                    stop_when, defer_size)                                   
     try:
         while (bytelength is None) or (fp.tell()-fpStart < bytelength):
-            raw_data_element = de_gen.next()
+#PZ generator __next__
+            raw_data_element = de_gen.__next__()
             # Read data elements. Stop on certain errors, but return what was already read
             tag = raw_data_element.tag
             if tag == (0xFFFE, 0xE00D): #ItemDelimiterTag --dataset is an item in a sequence
@@ -395,26 +412,34 @@ def _read_file_meta_info(fp):
     debugging = dicom.debugging
     if debugging: logger.debug("Try to read group length info...")
     bytes_read = fp.read(8)
+#PZ Should VR be converted to str? in Py3 or leave it as bytes
     group, elem, VR, length = unpack("<HH2sH", bytes_read)
-    if debugging: debug_msg = "%08x: %s" % (fp.tell()-8, bytes2hex(bytes_read))
+#PZ lets convert to keep the code intact
+    if inPy3: VR=VR.decode()
+#PZ format    
+    if debugging: debug_msg = "{0:08x}: {1}".format(fp.tell()-8, bytes2hex(bytes_read))
+#PZ VR bytesor not
     if VR in ('OB','OW','OF','SQ','UN', 'UT'):
         bytes_read = fp.read(4)
         length = unpack("<L", bytes_read)[0]
         if debugging: debug_msg += " " + bytes2hex(bytes_read)
     if debugging:
-        debug_msg = "%-47s  (%04x, %04x) %2s Length: %d" % (debug_msg, 
+#PZ format    
+        debug_msg = "{0:<47s}  ({1:04x}, {2:04x}) {3:2s} Length: {4:d}".format(debug_msg, 
                     group, elem, VR, length)
         logger.debug(debug_msg)
    
     # If required meta group length exists, store it, and then read until not group 2
     if group == 2 and elem == 0:
         bytes_read = fp.read(length)
-        if debugging: logger.debug("%08x: %s" % (fp.tell()-length, bytes2hex(bytes_read)))
+#PZ format        
+        if debugging: logger.debug("{0:08x}: {1}".format(fp.tell()-length, bytes2hex(bytes_read)))
         group_length = unpack("<L", bytes_read)[0]
         expected_ds_start = fp.tell() + group_length
         if debugging: 
-            msg = "value (group length) = %d" % group_length
-            msg += "  regular dataset should start at %08x" % (expected_ds_start)
+#PZ format        
+            msg = "value (group length) = {:d}".format(group_length)
+            msg += "  regular dataset should start at {0:08x}".format(expected_ds_start)
             logger.debug(" "*10 + msg)
     else:
         expected_ds_start = None
@@ -425,7 +450,8 @@ def _read_file_meta_info(fp):
     #    give a warning if group 2 ends at different location.
     # Rewind to read the first data element as part of the file_meta dataset
     if debugging: logger.debug("Rewinding and reading whole dataset including this first data element")    
-    fp.seek(fp_save)          
+    fp.seek(fp_save) 
+#PZ traceback         
     file_meta = read_dataset(fp, is_implicit_VR=False,
                     is_little_endian=True, stop_when=not_group2)
     fp_now = fp.tell()
@@ -453,11 +479,12 @@ def read_preamble(fp, force):
     """
     logger.debug("Reading preamble...")
     preamble = fp.read(0x80)
-    if dicom.debugging:
+    if dicom.debugging:   
         sample_bytes = bytes2hex(preamble[:8]) + "..." + bytes2hex(preamble[-8:])  
-        logger.debug("%08x: %s" % (fp.tell()-0x80, sample_bytes))
+        logger.debug("{0:08x}: {1}".format (fp.tell()-0x80, sample_bytes))
     magic = fp.read(4)
-    if magic != "DICM":
+#PZ bytes
+    if magic != b"DICM":
         if force:
             logger.info("File is not a standard DICOM file; 'DICM' header is missing. Assuming no header and continuing")
             preamble = None
@@ -465,7 +492,8 @@ def read_preamble(fp, force):
         else:
             raise InvalidDicomError("File is missing 'DICM' marker. Use force=True to force reading")
     else:
-        logger.debug("%08x: 'DICM' marker found" % (fp.tell()-4))
+#PZ format    
+        logger.debug("{:08x}: 'DICM' marker found".format(fp.tell()-4))
     return preamble
 
 def _at_pixel_data(tag, VR, length):
@@ -483,7 +511,7 @@ def read_partial(fileobj, stop_when=None, defer_size=None, force=False):
                     If None (default), then the whole file is read.
     :returns: a set instance
     """
-    # Read preamble -- raise an exception if missing and force=False
+    # Read preamble -- raise an exception if missing and force=False   
     preamble = read_preamble(fileobj, force) 
     file_meta_dataset = Dataset()
     # Assume a transfer syntax, correct it as necessary
@@ -544,15 +572,15 @@ def read_file(fp, defer_size=None, stop_before_pixels=False, force=False):
     if isinstance(fp, basestring):
         # caller provided a file name; we own the file handle
         caller_owns_file = False
-        logger.debug("Reading file '%s'" % fp)
+        logger.debug("Reading file '{}'".format(fp))
         fp = open(fp, 'rb')
 
     if dicom.debugging:
         logger.debug("\n"+"-"*80)
         logger.debug("Call to read_file()")
-        msg = ("filename:'%s', defer_size='%s'"
-               ", stop_before_pixels=%s, force=%s")
-        logger.debug(msg % (fp.name, defer_size, stop_before_pixels, force))
+        msg = ("filename:'{}', defer_size='{}'"
+               ", stop_before_pixels={}, force={}")
+        logger.debug(msg.format(fp.name, defer_size, stop_before_pixels, force))
         if caller_owns_file:
             logger.debug("Caller passed file object")
         else:

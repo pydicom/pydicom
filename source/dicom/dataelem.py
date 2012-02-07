@@ -52,8 +52,10 @@ def isMultiValue(value):
 
 def isString(val):
     """Helper function: return True if val is a string."""
+#PZ similar to def is_stringlike(name):    from value rep but does not raise
     try:
-        val + ""
+#        val + ""
+        val.startswith()
     except:
         return False
     return True

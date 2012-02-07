@@ -29,7 +29,8 @@ if inPy26:
 if inPy3:
     unicode = str
     namebase = object
-    bytestring = str
+    bytestring = bytes
+    basestring = str
     strbase = str    
 #PZ it cannot work in Py3 sincethere is no bytestring    
 """
@@ -45,9 +46,14 @@ else:
     
 def is_stringlike(name):
     """Return True if name is string-like."""
+#PZ similar to isString(val): from dataelem.py
+#PZ Both will fail if passed tag since Basetag implements __str__()
     try:
-        name + ""
-    except TypeError:
+#PZstartswith is be    
+        name.startswith(" ")
+#        name + ""
+#    except TypeError:
+    except:    
         return False
     else:
         return True
@@ -125,7 +131,8 @@ class IS(int):
         return newval
     def __init__(self, val):
         # If a string passed, then store it
-        if isinstance(val, basestring):
+#PZ changed to strbase        
+        if isinstance(val, strbase):
             self.original_string = val
     def __repr__(self):
         if hasattr(self, 'original_string'):
@@ -141,6 +148,8 @@ def MultiString(val, valtype=str):
     """
     # Remove trailing blank used to pad to even length
     # 2005.05.25: also check for trailing 0, error made in PET files we are converting
+#PZ run in unicode or forget about string functions    
+    val = val.decode()
     if val and (val.endswith(' ') or val.endswith('\x00')):
         val = val[:-1]
 
