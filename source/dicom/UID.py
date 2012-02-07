@@ -6,7 +6,18 @@
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
 
-#add dicom
+import sys
+if sys.hexversion >= 0x02060000 and sys.hexversion < 0x03000000: 
+    inPy26 = True
+else: 
+    inPy26 = False
+
+if sys.hexversion >= 0x03000000: 
+    inPy3 = True
+    basestring = str
+else: 
+    inPy3 = False
+#PZadd dicom
 from dicom._UID_dict import UID_dictionary
 
 class UID(str):
@@ -29,7 +40,7 @@ class UID(str):
             return val
         else:
 #PZ no basestring        
-            if isinstance(val, str):
+            if isinstance(val, basestring):
                 return super(UID, cls).__new__(cls, val.strip())
             else:
 #PZ 3109/3110            
@@ -45,13 +56,14 @@ class UID(str):
         # Note normally use __new__ on subclassing an immutable, but here we just want 
         #    to do some pre-processing against the UID dictionary.
         #   "My" string can never change (it is a python immutable), so is safe
-#PZ self or val? if self       
+#PZ self or val? if self 
         if val in UID_dictionary:
 #PZ self or val? in  UID_dictionary[val]
             self.name, self.type, self.info, retired = UID_dictionary[val]
             self.is_retired = bool(retired)
         else:
-            self.name = str.__str__(self)
+#PZ self. or val        
+            self.name = str.__str__(val)
             self.type, self.info, self.is_retired = (None, None, None)
         
         # If the UID represents a transfer syntax, store info about that syntax
@@ -88,7 +100,11 @@ class UID(str):
         if str.__eq__(self.name, other) is True: # 'is True' needed (issue 96)
             return True
         return False
-
+#PZ overriding __eq__ makes object unhashable so it cannot be used in collections
+#PZ http://docs.python.org/release/3.1.3/reference/datamodel.html?highlight=hash
+#PZ either define your own or use from the base class
+    def __hash__(self):
+        return self.name.__hash__()
 
 ExplicitVRLittleEndian = UID('1.2.840.10008.1.2.1')
 ImplicitVRLittleEndian = UID('1.2.840.10008.1.2')

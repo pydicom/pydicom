@@ -1,7 +1,11 @@
 # values.py
+#PZ 7Feb 2012
+#PZ /US is unicode escape character
+#PZ bytes is a misleading name for a variable in Py3, changed to _bytes
+
 """Functions for converting values of DICOM data elements to proper python types
 """
-# Copyright (c) 2010 Darcy Mason
+# Copyright (c) 2010-2012 Darcy Mason
 # This file is part of pydicom, relased under an MIT license.
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
@@ -10,93 +14,105 @@ from struct import unpack, calcsize, pack
 import logging
 logger = logging.getLogger('pydicom')
 
-from dicom.valuerep import PersonName, MultiValue, MultiString
+from dicom.valuerep import PersonName, MultiString
+from dicom.multival import MultiValue
 import dicom.UID
 from dicom.tag import Tag, TupleTag, SequenceDelimiterTag
 from dicom.datadict import dictionaryVR
 from dicom.filereader import read_sequence
-from cStringIO import StringIO
+from io import StringIO
+from dicom.valuerep import DS, IS
 
-def convert_tag(bytes, is_little_endian, offset=0):
+def convert_tag(_bytes, is_little_endian, offset=0):
     if is_little_endian:
         struct_format = "<HH"
     else:
         struct_format = ">HH"
-    return TupleTag(unpack(struct_format, bytes[offset:offset+4]))
+    return TupleTag(unpack(struct_format, _bytes[offset:offset+4]))
     
-def convert_ATvalue(bytes, is_little_endian, struct_format=None):
+def convert_ATvalue(_bytes, is_little_endian, struct_format=None):
     """Read and return AT (tag) data_element value(s)"""
-    length = len(bytes)
+    length = len(_bytes)
     if length == 4:
-        return convert_tag(bytes, is_little_endian)
+        return convert_tag(_bytes, is_little_endian)
     # length > 4
     if length % 4 != 0:
         logger.warn("Expected length to be multiple of 4 for VR 'AT', got length %d at file position 0x%x", length, fp.tell()-4)
-    return MultiValue([convert_tag(bytes, is_little_endian, offset=x) 
+    return MultiValue(Tag,[convert_tag(_bytes, is_little_endian, offset=x) 
                         for x in range(0, length, 4)])
 
-def convert_numbers(bytes, is_little_endian, struct_format):
+def convert_DS_string(_bytes, is_little_endian, struct_format=None):
+    """Read and return a DS value or list of values"""
+    return MultiString(_bytes, valtype=DS)
+
+def convert_IS_string(_bytes, is_little_endian, struct_format=None):
+    """Read and return an IS value or list of values"""
+    return MultiString(_bytes, valtype=IS)
+    
+def convert_numbers(_bytes, is_little_endian, struct_format):
     """Read a "value" of type struct_format from the dicom file. "Value" can be more than one number"""
     endianChar = '><'[is_little_endian]
     bytes_per_value = calcsize("="+struct_format) # "=" means use 'standard' size, needed on 64-bit systems.
-    length = len(bytes)
+    length = len(_bytes)
     if length % bytes_per_value != 0:
         logger.warn("Expected length to be even multiple of number size")
     format_string = "%c%u%c" % (endianChar, length // bytes_per_value, struct_format) 
-    value = unpack(format_string, bytes)
+    value = unpack(format_string, _bytes)
     if len(value) == 1:
         return value[0]
     else:        
         return list(value)  # convert from tuple to a list so can modify if need to
 
-def convert_OBvalue(bytes, is_little_endian, struct_format=None):
+def convert_OBvalue(_bytes, is_little_endian, struct_format=None):
     """Return the raw bytes from reading an OB value"""
-    return bytes
+    return _bytes
     
-def convert_OWvalue(bytes, is_little_endian, struct_format=None):
+def convert_OWvalue(_bytes, is_little_endian, struct_format=None):
     """Return the raw bytes from reading an OW value rep
     
     Note: pydicom does NOT do byte swapping, except in 
     dataset.pixel_array function
     """
-    return convert_OBvalue(bytes, is_little_endian) # for now, Maybe later will have own routine
+    return convert_OBvalue(_bytes, is_little_endian) # for now, Maybe later will have own routine
 
-def convert_PN(bytes, is_little_endian, struct_format=None):
+def convert_PN(_bytes, is_little_endian, struct_format=None):
     """Read and return string(s) as PersonName instance(s)"""
-    return MultiString(bytes, valtype=PersonName)
+    return MultiString(_bytes, valtype=PersonName)
 
-def convert_string(bytes, is_little_endian, struct_format=None):
+def convert_string(_bytes, is_little_endian, struct_format=None):
     """Read and return a string or strings"""
-    return MultiString(bytes)
+    return MultiString(_bytes)
 
-def convert_single_string(bytes, is_little_endian, struct_format=None):
+def convert_single_string(_bytes, is_little_endian, struct_format=None):
     """Read and return a single string (backslash character does not split)"""
-    if bytes and bytes.endswith(' '):
-        bytes = bytes[:-1]
+    if _bytes and _bytes.endswith(b' '):
+        _bytes = _bytes[:-1]
     return bytes
 
-def convert_SQ(bytes, is_implicit_VR, is_little_endian, offset=0):
+def convert_SQ(_bytes, is_implicit_VR, is_little_endian, offset=0):
     """Convert a sequence that has been read as bytes but not yet parsed."""
     fp = StringIO(bytes)
-    seq = read_sequence(fp, is_implicit_VR, is_little_endian, len(bytes), offset)
+    seq = read_sequence(fp, is_implicit_VR, is_little_endian, len(_bytes), offset)
     return seq
     
-def convert_UI(bytes, is_little_endian, struct_format=None):
+def convert_UI(_bytes, is_little_endian, struct_format=None):
     """Read and return a UI values or values"""
     # Strip off 0-byte padding for even length (if there)
-    if bytes and bytes.endswith('\0'):
-        bytes = bytes[:-1]
-    return MultiString(bytes, dicom.UID.UID)
+#PZ b    
+    if _bytes and _bytes.endswith(b'\0'):
+        _bytes = _bytes[:-1]
+    return MultiString(_bytes, dicom.UID.UID)
 
-def convert_UN(bytes, is_little_endian, struct_format=None):
+def convert_UN(_bytes, is_little_endian, struct_format=None):
     """Return a byte string for a VR of 'UN' (unknown)"""
-    return bytes 
+    return _bytes 
 
 def convert_value(VR, raw_data_element):
     """Return the converted value (from raw bytes) for the given VR"""
     tag = Tag(raw_data_element.tag)
     if VR not in converters:
-        raise NotImplementedError, "Unknown Value Representation '%s'" % VR
+#PZ 3109/3110   
+        raise NotImplementedError( "Unknown Value Representation '{}'".format(VR))
 
     # Look up the function to convert that VR
     # Dispatch two cases: a plain converter, or a number one which needs a format string
@@ -106,15 +122,15 @@ def convert_value(VR, raw_data_element):
         converter = converters[VR]
         num_format = None
     
-    bytes = raw_data_element.value
+    _bytes = raw_data_element.value
     is_little_endian = raw_data_element.is_little_endian
     is_implicit_VR = raw_data_element.is_implicit_VR
     
     # Not only two cases. Also need extra info if is a raw sequence
     if VR != "SQ":
-        value = converter(bytes, is_little_endian, num_format)
+        value = converter(_bytes, is_little_endian, num_format)
     else:
-        value = convert_SQ(bytes, is_implicit_VR, is_little_endian, raw_data_element.value_tell)
+        value = convert_SQ(_bytes, is_implicit_VR, is_little_endian, raw_data_element.value_tell)
     return value
 
 # converters map a VR to the function to read the value(s).
@@ -127,7 +143,8 @@ converters = {'UL':(convert_numbers,'L'), 'SL':(convert_numbers,'l'),
            'OB':convert_OBvalue, 'UI':convert_UI,
            'SH':convert_string,  'DA':convert_string, 'TM': convert_string,
            'CS':convert_string,  'PN':convert_PN,     'LO': convert_string,
-           'IS':convert_string,  'DS':convert_string, 'AE': convert_string,
+           'IS':convert_IS_string,  'DS':convert_DS_string,
+           'AE': convert_string,
            'AS':convert_string,
            'LT':convert_single_string,
            'SQ':convert_SQ,
@@ -141,7 +158,8 @@ converters = {'UL':(convert_numbers,'L'), 'SL':(convert_numbers,'l'),
            'OB or OW': convert_OBvalue,
            'US or SS':convert_OWvalue,
            'US or SS or OW':convert_OWvalue,
-           'US\US or SS\US':convert_OWvalue,
+#PZ treated as excape character           
+           'US\\US or SS\\US':convert_OWvalue,
            'DT':convert_string,
            'UT':convert_single_string,          
            } 

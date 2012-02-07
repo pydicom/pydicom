@@ -1,4 +1,5 @@
 # __init__.py for Dicom package
+#PZ as of 6 Feb 2012
 """pydicom package -- easily handle DICOM files. See Quick Start below.
 
 Copyright (c) 2008-2010 Darcy Mason
@@ -12,7 +13,7 @@ Quick Start
 1. A simple program to read a dicom file, modify a value, and write to a new file::
     import dicom
     dataset = dicom.read_file("file1.dcm")
-    dataset.PatientsName = 'anonymous'
+    dataset.PatientName = 'anonymous'
     dataset.save_as("file2.dcm")
     
 2. See the files in the examples directory that came with this package for more
@@ -31,23 +32,8 @@ http://groups.google.com/group/pydicom
 #        dicom.debug()
 #  Turn off debugging with
 #       dicom.debug(False)
+
 import logging
-logger = logging.getLogger('pydicom')
-handler = logging.StreamHandler()
-# formatter = logging.Formatter("%(asctime)s %(levelname)s: %(message)s", "%Y-%m-%d %H:%M") #'%(asctime)s %(levelname)s %(message)s'
-formatter = logging.Formatter("%(message)s")
-handler.setFormatter(formatter)
-logger.addHandler(handler)
-
-# For convenience, import the read_file and write_file functions (most used)  into the "dicom" namespace.
-#PZ added dicom.
-from dicom.filereader import read_file, ReadFile  # latter one for backwards compatibility; remove later
-from dicom.filewriter import write_file, WriteFile # ditto
-
-__version__ = "0.9.6"
-__version_info__ = (0,9,6)
-
-debugging = False
 
 def debug(debug_on=True):
     """Turn debugging of DICOM file reading and writing on or off.
@@ -63,3 +49,21 @@ def debug(debug_on=True):
     else:
         logger.setLevel(logging.WARNING)
         debugging = False
+
+logger = logging.getLogger('pydicom')
+handler = logging.StreamHandler()
+# formatter = logging.Formatter("%(asctime)s %(levelname)s: %(message)s", "%Y-%m-%d %H:%M") #'%(asctime)s %(levelname)s %(message)s'
+formatter = logging.Formatter("%(message)s")
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+debug(False) # force level=WARNING, in case logging default is set differently (issue 102)
+
+# For convenience, import the read_file and write_file functions (most used)  into the "dicom" namespace.
+#PZ add dicom.
+from dicom.filereader import read_file, ReadFile  # latter one for backwards compatibility; remove later
+from dicom.filewriter import write_file, WriteFile # ditto
+
+__version__ = "0.9.6"
+__version_info__ = (0,9,6)
+
+

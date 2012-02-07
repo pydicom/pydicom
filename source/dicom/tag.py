@@ -4,6 +4,20 @@
 # This file is part of pydicom, released under a modified MIT license.
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
+import sys
+if sys.hexversion >= 0x02060000 and sys.hexversion < 0x03000000: 
+    inPy26 = True
+else: 
+    inPy26 = False
+
+if sys.hexversion >= 0x03000000: 
+    inPy3 = True
+    long = int
+    basestring = str
+else: 
+    inPy3 = False
+
+
 
 def Tag(arg, arg2=None):
     """Factory function for creating Tags in more general ways than the (gp, el)
@@ -15,9 +29,9 @@ def Tag(arg, arg2=None):
 #PZ http://www.python.org/dev/peps/pep-3109/          
             raise ValueError( "Tag must be an int or a 2-tuple")
 #PZ no basestring in Py3 use str
-        if isinstance(arg[0], str):
+        if isinstance(arg[0], basestring):
 #PZ no basestring in Py3 use str
-            if not isinstance(arg[1], str):
+            if not isinstance(arg[1], basestring):
 #PZ http://www.python.org/dev/peps/pep-3109/              
                 raise ValueError( "Both arguments must be hex strings if one is")
             arg = (int(arg[0], 16), int(arg[1], 16))
@@ -25,14 +39,14 @@ def Tag(arg, arg2=None):
 #PZ http://www.python.org/dev/peps/pep-3109/          
             raise OverflowError( "Groups and elements of tags must each be <=2 byte integers")
 #PZ no long in Py3            
-        long_value = int(arg[0])<<16 | arg[1]  # long needed for python <2.4 where shift could make int negative
+        long_value = long(arg[0])<<16 | arg[1]  # long needed for python <2.4 where shift could make int negative
 #PZ no basestring in Py3 use str        
-    elif isinstance(arg, str):
+    elif isinstance(arg, basestring):
 #PZ http://www.python.org/dev/peps/pep-3109/      
         raise ValueError( "Tags cannot be instantiated from a single string")
     else: # given a single number to use as a tag, as if (group, elem) already joined to a long
 #PZ no long in Py3    
-        long_value = int(hex(arg), 16) # needed in python <2.4 to avoid negative ints
+        long_value = long(hex(arg), 16) # needed in python <2.4 to avoid negative ints
 #PZ http://www.python.org/dev/peps/pep-0237/         
         if long_value > 0xFFFFFFFF:
 #PZ http://www.python.org/dev/peps/pep-3109/          
@@ -40,7 +54,7 @@ def Tag(arg, arg2=None):
     return BaseTag(long_value)
     
 #PZ no long in 3.0  
-class BaseTag(int):
+class BaseTag(long):
     """Class for storing the dicom (group, element) tag"""
     # Store the 4 bytes of a dicom tag as a python long (arbitrary length, not like C-language long).
     # NOTE: logic (in write_AT of filewriter at least) depends on this 
@@ -64,7 +78,7 @@ class BaseTag(int):
 #PZ 3109
                 raise TypeError( "Cannot compare Tag with non-Tag item")
 #PZ no long in Py3                
-        return int(self) < int(other)
+        return long(self) < long(other)
 
     def __eq__(self, other):
         # Check if comparing with another Tag object; if not, create a temp one
@@ -76,7 +90,7 @@ class BaseTag(int):
                 raise TypeError( "Cannot compare Tag with non-Tag item")
         # print "self %r; other %r" % (long(self), long(other))
 #PZ no long in Py3        
-        return int(self) == int(other)
+        return long(self) == long(other)
 
     def __ne__(self, other):
         # Check if comparing with another Tag object; if not, create a temp one
@@ -87,21 +101,22 @@ class BaseTag(int):
 #PZ 3109            
                 raise TypeError( "Cannot compare Tag with non-Tag item")
 #PZ no long in Py3                
-        return int(self) != int(other)
+        return long(self) != long(other)
 
     
     # For python 3, any override of __cmp__ or __eq__ immutable requires
     #   explicit redirect of hash function to the parent class 
     #   See http://docs.python.org/dev/3.0/reference/datamodel.html#object.__hash__
 #PZ no long in Py3    
-    __hash__ = int.__hash__
-    
+    __hash__ = long.__hash__
+
+#PZimplementing __str()__ makes it pass is_string like or +""     
+#so is_stringlike must be changed
     def __str__(self):
         """String of tag value as (gggg, eeee)"""
-        return "(%04x, %04x)" % (self.group, self.elem)
+        return "({0:04x}, {1:04x})".format(self.group, self.elem)
 
-    __repr__ = __str__
-    
+    __repr__= __str__
     # Property group
     def getGroup(self):
         return self >>16
@@ -124,8 +139,8 @@ def TupleTag(group_elem):
     """Fast factory for BaseTag object with known safe (group, element) tuple"""
     # long needed for python <2.4 where shift could make int negative
 #PZ no long in Py3    
-#    long_value = long(group_elem[0])<<16 | group_elem[1]  
-    long_value = group_elem[0]<<16 | group_elem[1]  
+    long_value = long(group_elem[0])<<16 | group_elem[1]  
+
     return BaseTag(long_value)
 
 # Define some special tags:

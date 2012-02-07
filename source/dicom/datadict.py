@@ -8,6 +8,19 @@
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
 #
+import sys
+if sys.hexversion >= 0x02060000 and sys.hexversion < 0x03000000: 
+    inPy26 = True
+else: 
+    inPy26 = False
+
+if sys.hexversion >= 0x03000000: 
+    inPy3 = True
+#    basestring = str
+    long = int
+else: 
+    inPy3 = False
+
 import logging
 logger = logging.getLogger("pydicom")
 from dicom.tag import Tag
@@ -23,8 +36,8 @@ for mask_x in RepeatersDictionary:
     # mask1 is XOR'd to see that all non-"x" bits are identical (XOR result = 0 if bits same)
     #      then AND those out with 0 bits at the "x" ("we don't care") location using mask2
 #PZ no long in Py3    
-    mask1 = int(mask_x.replace("x", "0"),16)
-    mask2 = int("".join(["F0"[c=="x"] for c in mask_x]),16)
+    mask1 = long(mask_x.replace("x", "0"),16)
+    mask2 = long("".join(["F0"[c=="x"] for c in mask_x]),16)
     masks[mask_x] = (mask1, mask2)
 
 # For shorter naming of dicom member elements, put an entry here
@@ -76,11 +89,11 @@ def dictionary_has_tag(tag):
     return (tag in DicomDictionary)
 
 def dictionary_keyword(tag):
-    """Return the official DICOM standard (since 2011) keyword for the tag"""
-#PZ typo - should be 3?    
-    return get_entry(tag)[3]
+    """Return the official DICOM standard (since 2011) keyword for the tag""" 
+    return get_entry(tag)[4]
 
 #PZ built-in, moved deleted characters from 113
+#PZ should it be bytes? or str?
 normTable = str.maketrans('','', r""" !@#$%^&*(),;:.?\|{}[]+-="'’/""")
 
 def keyword_for_tag(tag):
@@ -149,7 +162,6 @@ def long_name(name):
     Return a blank string if there is no long version of the name.
     
     """
-    
     for longname, shortname in shortNames:
         if name.startswith(shortname):
             return name.replace(shortname, longname)

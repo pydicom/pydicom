@@ -22,6 +22,17 @@ Dataset(derived class of Python's dict class)
 #    available at http://pydicom.googlecode.com
 #
 import sys
+if sys.hexversion >= 0x02060000 and sys.hexversion < 0x03000000: 
+    inPy26 = True
+else: 
+    inPy26 = False
+
+if sys.hexversion >= 0x03000000: 
+    inPy3 = True
+    basestring = str
+else: 
+    inPy3 = False
+
 from sys import byteorder
 sys_is_little_endian = (byteorder == 'little')
 import logging
@@ -124,9 +135,13 @@ class Dataset(dict):
         This is called for code like: ``if 'SliceLocation' in dataset``.
 
         """
+#PZ        print("138 dataset.py contains", name, "type", type(name))
+#PZ is_stringlike from valuerep        
         if is_stringlike(name):
+#PZ         print("141 dataset.py name is stringlike")
             tag = tag_for_name(name)
         else:
+#PZ            print("144 dataset.py name is not stringlike")
             try:
                 tag = Tag(name)
             except:
@@ -232,6 +247,7 @@ class Dataset(dict):
 
     def get(self, key, default=None):
         """Extend dict.get() to handle *named tags*."""
+        print("237 datadict.py get", key)
         if is_stringlike(key):
             try:
                 return getattr(self, key)
@@ -258,6 +274,7 @@ class Dataset(dict):
         then return the value for the data_element with the corresponding tag.
 
         """
+
         # __getattr__ only called if instance cannot find name in self.__dict__
         # So, if name is not a dicom string, then is an error
         tag = tag_for_name(name)
@@ -397,6 +414,7 @@ class Dataset(dict):
     def _getPixelArray(self):
         # Check if pixel data is in a form we know how to make into an array
         # XXX uses file_meta here, should really only be thus for FileDataset
+#PZ        print("414 dataset.py ", self.file_meta.TransferSyntaxUID)
         if self.file_meta.TransferSyntaxUID not in NotCompressedPixelTransferSyntaxes :
 #PZ 3109/3110        
             raise NotImplementedError( "Pixel Data is compressed in a format pydicom does not yet handle. Cannot return array")
@@ -408,6 +426,7 @@ class Dataset(dict):
             alreadyHave = False
         elif self._pixel_id != id(self.PixelData):
             alreadyHave = False
+#PZ        print("426 dataset have ", alreadyHave)            
         if not alreadyHave:
             self._PixelArray = self._PixelDataNumpy()
             self._pixel_id = id(self.PixelData) # is this guaranteed to work if memory is re-used??
@@ -629,6 +648,7 @@ class FileDataset(Dataset):
         self.file_meta = file_meta
         self.is_implicit_VR = is_implicit_VR
         self.is_little_endian = is_little_endian
+#PZ no basestring in Py3        
         if isinstance(filename_or_obj, basestring):
             self.filename = filename_or_obj
             self.fileobj_type = file
