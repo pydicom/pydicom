@@ -55,7 +55,7 @@ def isString(val):
 #PZ similar to def is_stringlike(name):    from value rep but does not raise
     try:
 #        val + ""
-        val.startswith()
+        val.startswith(" ")
     except:
         return False
     return True
