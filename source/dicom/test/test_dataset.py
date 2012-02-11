@@ -9,6 +9,7 @@ import unittest
 from dicom.dataset import Dataset, have_numpy, PropertyError
 from dicom.dataelem import DataElement, RawDataElement
 from dicom.tag import Tag
+from dicom.sequence import Sequence
 
 class DatasetTests(unittest.TestCase):
     def failUnlessRaises(self, excClass, callableObj, *args, **kwargs):
@@ -196,6 +197,23 @@ class DatasetTests(unittest.TestCase):
             del ds.PatientName
         ds = self.dummy_dataset()
         self.assertRaises(AttributeError, try_delete)
-            
+
+class DatasetElementsTests(unittest.TestCase):
+    """Test valid assignments of data elements"""
+    def setUp(self):
+        self.ds = Dataset()
+        self.sub_ds1 = Dataset()
+        self.sub_ds2 = Dataset()
+    def testSequenceAssignment(self):
+        """Assignment to SQ works only if valid Sequence assigned......"""
+        def try_non_Sequence():
+            self.ds.ConceptCodeSequence = [1,2,3]
+        msg = "Assigning a non-sequence to an SQ data element did not raise error"
+        self.assertRaises(TypeError, try_non_Sequence)  
+        # check also that assigning proper sequence *does* work
+        self.ds.ConceptCodeSequence = [self.sub_ds1, self.sub_ds2]
+        self.assert_(isinstance(self.ds.ConceptCodeSequence, Sequence),
+                "Sequence assignment did not result in Sequence type")   
+    
 if __name__ == "__main__":
     unittest.main()
