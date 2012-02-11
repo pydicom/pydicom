@@ -17,6 +17,7 @@ logger = logging.getLogger('pydicom')
 from dicom.datadict import dictionary_has_tag, dictionary_description
 from dicom.datadict import private_dictionary_description, dictionaryVR
 from dicom.tag import Tag
+
 from dicom.UID import UID
 from dicom.valuerep import IS, DS, PersonName
 from decimal import Decimal
@@ -145,7 +146,12 @@ class DataElement(object):
         """Convert Dicom string values if possible to e.g. numbers. Handle the case
         of multiple value data_elements"""
         if self.VR=='SQ': # a sequence - leave it alone
-            return val
+            from dicom.sequence import Sequence
+            if isinstance(val,Sequence):
+                return val
+            else:
+                return Sequence(val)
+
         # if the value is a list, convert each element
         try:
             val.append
