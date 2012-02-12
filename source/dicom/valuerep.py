@@ -27,6 +27,16 @@ def is_stringlike(name):
     else:
         return True
 
+def clean_escseq(element, encodings):
+    """Remove escape sequences that Python does not remove from
+       Korean encoding ISO 2022 IR 149 due to the G1 code element.
+    """
+    if 'euc_kr' in encodings:
+        return element.replace(
+                "\x1b\x24\x29\x43", "").replace("\x1b\x28\x42", "")
+    else:
+        return element
+
 class DS(Decimal):
     """Store values for DICOM VR of DS (Decimal String).
     Note: if constructed by an empty string, returns the empty string,
@@ -213,9 +223,12 @@ class PersonNameUnicode(PersonNameBase, unicode):
             encodings = [encodings]*3
         if len(encodings) == 2:
             encodings.append(encodings[1])
-        # print encodings
         components = val.split("=")
-        unicomponents = [unicode(components[i],encodings[i]) 
+        # Remove the first encoding if only one component is present
+        if (len(components) == 1):
+            del encodings[0]
+        unicomponents = [clean_escseq(
+                        unicode(components[i],encodings[i]), encodings)
                             for i, component in enumerate(components)]
         new_val = u"=".join(unicomponents)
 

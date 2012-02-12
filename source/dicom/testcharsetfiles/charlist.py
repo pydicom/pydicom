@@ -1,6 +1,6 @@
 # charlist.py
 """List summary info for the test files in the charset directory"""
-# Copyright (c) 2008 Darcy Mason
+# Copyright (c) 2008-2012 Darcy Mason
 # This file is part of pydicom, relased under an MIT license.
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
@@ -19,11 +19,12 @@ if __name__ == "__main__":
     # Collect summary information from the files
     files_info = []
     for name in names:
-        ds = dicom.ReadFile(name)
-        files_info.append((name, ds.SpecificCharacterSet, ds.PatientName))
+        ds = dicom.read_file(name)
+        ds.decode()
+        files_info.append((name, ds.SpecificCharacterSet, ds.PatientsName))
     
     # Show the information
-    format = "%-16s %-40s %-r" # r in Python >=2.0, uses repr()
+    format = "%-16s %-40s %s"
     logging.info(format % ("Filename", "Character Sets", "Patient's Name"))
     logging.info(format % ("--------", "--------------", "--------------"))
     for file_info in files_info:

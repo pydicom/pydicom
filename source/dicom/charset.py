@@ -16,8 +16,8 @@ python_encoding = {
     'ISO_IR 6': 'iso8859',   # alias for latin_1 too
     'ISO_IR 100': 'latin_1',
     'ISO 2022 IR 87': 'iso2022_jp',
-    'ISO 2022 IR 13': 'iso2022_jp',  #XXX this mapping does not work on chrH32.dcm test files (but no others do either)
-    'ISO 2022 IR 149': 'euc_kr',   # XXX chrI2.dcm -- does not quite work -- some chrs wrong. Need iso_ir_149 python encoding
+    'ISO 2022 IR 13': 'shift_jis',
+    'ISO 2022 IR 149': 'euc_kr', # needs cleanup via clean_escseq from valuerep
     'ISO_IR 192': 'UTF8',     # from Chinese example, 2008 PS3.5 Annex J p1-4
     'GB18030': 'GB18030',
     'ISO_IR 126': 'iso_ir_126',  # Greek
@@ -26,7 +26,7 @@ python_encoding = {
     'ISO_IR 144': 'iso_ir_144', # Russian
     }
 
-from dicom.valuerep import PersonNameUnicode, PersonName
+from dicom.valuerep import PersonNameUnicode, PersonName, clean_escseq
 
 # PS3.5-2008 6.1.1 (p 18) says:
 #   default is ISO-IR 6 G0, equiv to common chr set of ISO 8859 (PS3.5 6.1.2.1)
@@ -63,25 +63,30 @@ def decode(data_element, dicom_character_set):
             dicom_character_set[0] = "ISO_IR 6"
     else:
         dicom_character_set = [dicom_character_set]
+    encodings = [python_encoding[x] for x in dicom_character_set]
+    if len(encodings) == 1:
+        encodings = [encodings[0]]*3
+    if len(encodings) == 2:
+        encodings.append(encodings[1])
+
     # decode the string value to unicode
     # PN is special case as may have 3 components with differenct chr sets
     if data_element.VR == "PN": 
         # logger.warn("%s ... type: %s" %(str(data_element), type(data_element.VR)))
-        encodings = [python_encoding[x] for x in dicom_character_set]
-        if len(encodings) == 1:
-            encodings = [encodings[0]]*3
-        if len(encodings) == 2:
-            encodings.append(encodings[1])
         if data_element.VM == 1:
             data_element.value = PersonNameUnicode(data_element.value, encodings)
         else:
             data_element.value = [PersonNameUnicode(value, encodings) 
                                     for value in data_element.value]
     if data_element.VR in ['SH', 'LO', 'ST', 'LT', 'UT']:
+        # Remove the first encoding if this is a multi-byte encoding
+        if len(encodings) > 1:
+            del encodings[0]
         if data_element.VM == 1:
-            data_element.value = data_element.value.decode(
-                                        python_encoding[dicom_character_set[0]])
+            data_element.value = clean_escseq(
+                                    data_element.value.decode(
+                                    encodings[0]), encodings)
         else:
-            data_element.value = [value.decode(
-                                    python_encoding[dicom_character_set[0]]) 
+            data_element.value = [clean_escseq(
+                                    value.decode(encodings[0]), encodings)
                                     for value in data_element.value]
