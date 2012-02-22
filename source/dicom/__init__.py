@@ -1,8 +1,8 @@
 # __init__.py for Dicom package
-#PZ as of 6 Feb 2012
+#PZ as of 20Feb 2012
 """pydicom package -- easily handle DICOM files. See Quick Start below.
 
-Copyright (c) 2008-2010 Darcy Mason
+Copyright (c) 2008-2012 Darcy Mason
 This file is part of pydicom, released under a modified MIT license.
    See the file license.txt included with this distribution, also
    available at http://pydicom.googlecode.com
@@ -63,7 +63,7 @@ debug(False) # force level=WARNING, in case logging default is set differently (
 from dicom.filereader import read_file, ReadFile  # latter one for backwards compatibility; remove later
 from dicom.filewriter import write_file, WriteFile # ditto
 
-__version__ = "0.9.6"
-__version_info__ = (0,9,6)
+__version__ = "0.9.7"
+__version_info__ = (0,9,7)
 
 

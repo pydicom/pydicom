@@ -6,6 +6,24 @@
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
 
+import sys
+if sys.hexversion >= 0x02060000 and sys.hexversion < 0x03000000: 
+    inPy26 = True
+    inPy3 = False
+    from cStringIO import StringIO as MyIO
+#PZ PEP0237    
+    _MAXLONG_ = long(b"0xFFFFFFFF",16)
+elif sys.hexversion >= 0x03000000: 
+    inPy26 = False
+    inPy3 = True
+    basestring = str
+#PZ PEP0237        
+    _MAXLONG_ = 0xFFFFFFFF
+    from io import BytesIO as MyIO
+else: 
+#PZ unsupported python version why we are here, should fail earlier
+    pass
+    
 from struct import pack
 
 import logging
@@ -60,19 +78,35 @@ def write_OWvalue(fp, data_element):
     fp.write(data_element.value)
 
 def write_UI(fp, data_element):
-    """Write a data_element with VR of 'unique identifier' (UI)."""    
+    """Write a data_element with VR of 'unique identifier' (UI)."""  
     write_string(fp, data_element, '\0') # pad with 0-byte to even length
 
 def multi_string(val):
     """Put a string together with delimiter if has more than one value"""
+#PZ join bytes or str
     if isinstance(val, (list, tuple)):
-        return "\\".join(val)  # \ is escape chr, so "\\" gives single backslash
+        if isinstance(val[0],bytes):
+            return b"\\".join(val)  # \ is escape chr, so "\\" gives single backslash
+        else:
+            return "\\".join(val)  # \ is escape chr, so "\\" gives single backslash
     else:
         return val
+
 
 def write_string(fp, data_element, padding=' '):
     """Write a single or multivalued string."""
     val = multi_string(data_element.value)
+#PZ encode before writing to file    
+    if inPy3:
+        if isinstance(val,str):
+            val=val.encode('iso8859-1')
+        if isinstance(padding,str):
+        #should be 1 byte
+            padding=padding.encode('iso8859-1')
+    if len(padding)>1:
+        print("PZ filewriter - padding decodes to >1 byte. setting to space")
+        padding = b'\x20'
+    
     if len(val) % 2 != 0:
         val = val + padding   # pad to even length
     fp.write(val)
@@ -90,14 +124,24 @@ def write_number_string(fp, data_element, padding = ' '):
             if hasattr(x, 'original_string'):
                 newval.append(x.original_string)
             else:
-                newval.append(str(x))
-        val = "\\".join(newval)
+#PZ encode            
+                newval.append(str(x).encode('iso8859-1'))
+#PZ encode                
+        val = b"\\".join(newval)
     else:
         # XXX python>2.4 val = val.original_string if hasattr(val, 'original_string') else str(val)
         if hasattr(val, 'original_string'):
             val = val.original_string
         else:
-            val =  str(val)
+#PZ encode after str        
+            val =  str(val).encode('iso8859-1')
+#PZ check and encode            
+    if isinstance(padding, str):
+        padding=padding.encode('iso8859-1')
+    if len(padding)>1:
+        print("PZ filewriter - padding decodes to >1 byte. setting to space")
+        padding = b'\x20'        
+        
     if len(val) % 2 != 0:
         val = val + padding   # pad to even length
     fp.write(val)
@@ -113,7 +157,8 @@ def write_data_element(fp, data_element):
             msg += "\nSet the correct VR before writing, or use an implicit VR transfer syntax"
 #PZ 3109/3110            
             raise ValueError(msg)
-        fp.write(VR)
+#PZ encode            
+        fp.write(VR.encode('iso8859-1'))
         if VR in ['OB', 'OW', 'OF', 'SQ', 'UT', 'UN']:
             fp.write_US(0)   # reserved 2 bytes
     if VR not in writers:
@@ -125,7 +170,7 @@ def write_data_element(fp, data_element):
         fp.write_US(0)  # Explicit VR length field is only 2 bytes
     else:
 #PZ long by default    
-        fp.write_UL(0xFFFFFFFF)   # will fill in real length value later if not undefined length item
+        fp.write_UL(_MAXLONG_)   # will fill in real length value later if not undefined length item
     
     try:
         writers[VR][0] # if writer is a tuple, then need to pass a number format
@@ -176,7 +221,7 @@ def write_sequence_item(fp, dataset):
     fp.write_tag(ItemTag)   # marker for start of Sequence Item
     length_location = fp.tell() # save location for later.
 #PZ long by default    
-    fp.write_UL(0xffffffff)   # will fill in real value later if not undefined length
+    fp.write_UL(_MAXLONG_)   # will fill in real value later if not undefined length
     write_dataset(fp, dataset)
     if getattr(dataset, "is_undefined_length_sequence_item", False):
         fp.write_tag(ItemDelimiterTag)
@@ -189,7 +234,10 @@ def write_sequence_item(fp, dataset):
 
 def write_UN(fp, data_element):
     """Write a byte string for an DataElement of value 'UN' (unknown)."""
-    fp.write(data_element.value)
+    if inPy3 and isinstance(data_element.value, bytes):
+        fp.write(data_element.value)
+    else:
+        print("PZ filewriter write_UN - not bytes, not written", data_element.value)
 
 def write_ATvalue(fp, data_element):
     """Write a data_element tag to a file."""
@@ -212,15 +260,16 @@ def _write_file_meta_info(fp, meta_dataset):
     are not in the dataset. If the dataset came from a file read with
     read_file(), then the required data_elements should already be there.
     """
-    fp.write('DICM')
+#PZ bytes    
+    fp.write(b'DICM')
 
     # File meta info is always LittleEndian, Explicit VR. After will change these
     #    to the transfer syntax values set in the meta info
     fp.is_little_endian = True
     fp.is_explicit_VR = True
-
+#PZ bytes
     if Tag((2,1)) not in meta_dataset:
-        meta_dataset.add_new((2,1), 'OB', "\0\1")   # file meta information version
+        meta_dataset.add_new((2,1), b'OB', b"\0\1")   # file meta information version
     
     # Now check that required meta info tags are present:
     missing = []
@@ -278,8 +327,8 @@ def write_file(filename, dataset, WriteLikeOriginal=True):
     # Decide whether to write DICOM preamble. Should always do so unless trying to mimic the original file read in
     preamble = getattr(dataset, "preamble", None) 
     if not preamble and not WriteLikeOriginal:
-        preamble = "\0"*128
-    
+#PZ bytes    
+        preamble = b"\0"*128
     file_meta = dataset.file_meta
     if file_meta is None:
         file_meta = Dataset()

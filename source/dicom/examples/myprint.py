@@ -1,6 +1,6 @@
 # myprint.py
 """Example of printing a dataset in your own format"""
-# Copyright (c) 2008-2012 Darcy Mason
+# Copyright (c) 2008 Darcy Mason
 # This file is part of pydicom, relased under an MIT license.
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com

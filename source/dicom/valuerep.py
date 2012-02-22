@@ -1,5 +1,5 @@
 # valuerep.py
-#PZ downloaded 6 Feb 2012
+#PZ downloaded 17 Feb 2012
 """Special classes for DICOM value representations (VR)"""
 # Copyright (c) 2008-2012 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
@@ -9,30 +9,27 @@
 from decimal import Decimal
 import dicom.config
 from dicom.multival import MultiValue
+#PZ
+import codecs
 
 #PZ
 import sys
 #PZ maybe hexversion is better
 if sys.hexversion >= 0x02060000 and sys.hexversion < 0x03000000: 
     inPy26 = True
-else: 
+    inPy3 = False    
+    namebase = object
+    strbase = basestring  
+    bytestring = basestring
+elif sys.hexversion >= 0x03000000: 
     inPy26 = False
-
-if sys.hexversion >= 0x03000000: 
-    inPy3 = True
-else: 
-    inPy3 = False
-#PZ 
-if inPy26:
-    namebase = bytestring
-    strbase = basestring    
-if inPy3:
+    inPy3 = True    
     unicode = str
     namebase = object
     bytestring = bytes
-    basestring = str
     strbase = str    
-#PZ it cannot work in Py3 sincethere is no bytestring    
+
+#PZ it cannot work in Py3 since there is no bytestring   
 """
 from sys import version_info
 if version_info[0] < 3:
@@ -43,19 +40,38 @@ else:
     namebase = bytestring
     strbase = basestring
 """
+def clean_escseq(element, encodings):      
+    """Remove escape sequences that Python does not remove from         
+    Korean encoding ISO 2022 IR 149 due to the G1 code element.      """ 
+#PZ 'euc_kr' will be unicode in Py3k, need to convert from bytes earlier
+#PZ gets bytes, returns bytes, gets str return str
+    if ('euc_kr' in encodings):
+        if isinstance(element, bytestring):          
+            return element.replace(b"\x1b\x24\x29\x43", b"").replace(b"\x1b\x28\x42", b"")      
+        elif  isinstance(element, strbase) and inPy3:          
+            return element.replace("\x1b\x24\x29\x43", "").replace("\x1b\x28\x42", "")          
+    else:    
+        return element  
     
 def is_stringlike(name):
     """Return True if name is string-like."""
+#PZ is it supposed to check if it is "str" like or "bytes" like or both?    
 #PZ similar to isString(val): from dataelem.py
-#PZ Both will fail if passed tag since Basetag implements __str__()
+#PZ Both will fail to do the job if passed object that implements __str__()
+#PZ for example Basetag 
+#PZ
+#    print('valuerep 59 isstring', type(name))
     try:
-#PZstartswith is be    
+#PZ startswith is better since it does not involve __str__ but
+#PZ directly calls object method
         name.startswith(" ")
-#        name + ""
-#    except TypeError:
-    except:    
+#PZ        name + ""
+#PZ    except TypeError:
+    except: 
+#        print('valuerep 68 is not string', type(name))   
         return False
     else:
+#        print('valuerep 68 isstring', type(name))   
         return True
 
 class DS(Decimal):
@@ -68,6 +84,9 @@ class DS(Decimal):
         passed in, e.g. from a type 2 DICOM blank value.
         """
         # DICOM allows spaces around the string, but python doesn't, so clean it
+#PZ capture bytes and decode
+        if isinstance(val, bytestring):
+            val=val.decode('iso8859-1')
         if isinstance(val, strbase):
             val=val.strip()
         if val == '':
@@ -96,12 +115,13 @@ class DS(Decimal):
         """ 
         # ... also if user changes a data element value, then will get
         # a different Decimal, as Decimal is immutable.
-        if isinstance(val, strbase):
-            self.original_string = val
+#PZ original is bytes!!!! not basestring        
+        if isinstance(val, bytestring):
+            self.original_string = val         
             
     def __repr__(self):
         if hasattr(self, 'original_string'):
-            return "'" + self.original_string + "'"
+            return "'" + self.original_string.decode('iso8859-1') + "'"
         else:
             return "'" + super(DS,self).__str__() + "'"
         
@@ -115,9 +135,13 @@ class IS(int):
     # with leading zeros.
     def __new__(cls, val):
         """Create instance if new integer string"""
-        if isinstance(val, strbase) and val.strip() == '':
+#PZ capture bytes and convert for stripping but save the original later on
+        newval = val
+        if isinstance(val, bytestring):
+            newval = val.decode("iso8859-1")
+        if isinstance(newval, strbase) and newval.strip() == '':
             return ''
-        newval = super(IS, cls).__new__(cls, val)
+        newval = super(IS, cls).__new__(cls, newval)
         # check if a float or Decimal passed in, then could have lost info,
         # and will raise error. E.g. IS(Decimal('1')) is ok, but not IS(1.23)
         if isinstance(val, (float, Decimal)) and newval != val:
@@ -130,17 +154,19 @@ class IS(int):
             raise OverflowError( message)
         return newval
     def __init__(self, val):
-        # If a string passed, then store it
-#PZ changed to strbase        
-        if isinstance(val, strbase):
-            self.original_string = val
+        # If a bytestring passed, then store it
+#PZ changed to bytestring        
+        if isinstance(val, bytestring):
+            self.original_string = val             
     def __repr__(self):
         if hasattr(self, 'original_string'):
-            return "'" + self.original_string + "'"
+            return "'" + self.original_string.decode("iso8859-1") + "'"
         else:
             return "'" + int.__str__(self) + "'"
-            
-def MultiString(val, valtype=str):
+
+#PZ inPy3 shall we split bytes or str or both
+#def MultiString(val, valtype=str):
+def MultiString(val, valtype=bytestring):
     """Split a string by delimiters if there are any
     
     val -- DICOM string to split up
@@ -148,14 +174,27 @@ def MultiString(val, valtype=str):
     """
     # Remove trailing blank used to pad to even length
     # 2005.05.25: also check for trailing 0, error made in PET files we are converting
-#PZ run in unicode or forget about string functions    
-    val = val.decode()
-    if val and (val.endswith(' ') or val.endswith('\x00')):
-        val = val[:-1]
+
+#PZ *************** CRITICAL in  CONVERSION ****************    
+#    print("PZ 177 in valuerep Multistring", type(val), valtype)
+    _splitchar = "\\"    
+    if inPy3 and isinstance(val,bytestring):
+#Python3 bytes 
+        if val and (val.endswith(b' ') or val.endswith(b'\x00')):
+            val = val[:-1]
+#PZ prepare for split later            
+        _splitchar = b"\\"
+    else:
+#Python3 string or Python2 all cases        
+        if val and (val.endswith(' ') or val.endswith('\x00')):
+            val = val[:-1]
+
+    
 
     # XXX --> simpler version python > 2.4   splitup = [valtype(x) if x else x for x in val.split("\\")]
     splitup = []
-    for subval in val.split("\\"):
+#PZ 
+    for subval in val.split(_splitchar):
         if subval:
             splitup.append(valtype(subval))
         else:
@@ -163,11 +202,12 @@ def MultiString(val, valtype=str):
     if len(splitup) == 1:
         return splitup[0]
     else:
+#PZ here valtype gets bytes, str, PersonName 
+#PZ if string with \ gets here it is sliced!!!!!!!!!
         return MultiValue(valtype, splitup)
 
 class PersonNameBase(namebase):
     """Base class for Person Name classes"""
-
     def __init__(self, val):
         """Initialize the PN properties"""
         # Note normally use __new__ on subclassing an immutable, but here we just want 
@@ -175,18 +215,28 @@ class PersonNameBase(namebase):
         # PS 3.5-2008 section 6.2 (p.28)  and 6.2.1 describes PN. Briefly:
         #  single-byte-characters=ideographic characters=phonetic-characters
         # (each with?):
-        #   family-name-complex^Given-name-complex^Middle-name^name-prefix^name-suffix
+        #   family-name-complex^Given-name-complex^Middle-name^name-prefix^name-suffix 
+#PZ it will be overwritter in can of PersonNameUnicode
+#PZ with correct encodings
+#PZ this is just to hold PersonName                        
+#PZ pass val        
         self.parse()
 
     def formatted(self, format_str):
+#PZ There is an potential issue here in Py2/Py3k conversion 
+#PZ should it return bytes or str?
+#PZ for now return str
         """Return a formatted string according to the format pattern
         
         Use "...%(property)...%(property)..." where property is one of
            family_name, given_name, middle_name, name_prefix, name_suffix
         """
         return format_str % self.__dict__
+        
     def parse(self):
         """Break down the components and name parts"""
+#PZ here we should always have string str, unicode by default in Py3        
+#PZ preserve common representation                 
         self.components = self.split("=")
         nComponents = len(self.components)
         self.single_byte = self.components[0]
@@ -195,8 +245,7 @@ class PersonNameBase(namebase):
         if nComponents > 1:
             self.ideographic = self.components[1]
         if nComponents > 2:
-            self.phonetic = self.components[2]
-        
+            self.phonetic = self.components[2]       
         if self.single_byte:
             name_string = self.single_byte+"^^^^" # in case missing trailing items are left out
             parts = name_string.split("^")[:5]
@@ -207,7 +256,7 @@ class PersonNameBase(namebase):
                 self.name_prefix, self.name_suffix) = ('', '', '', '', '')
 
     
-class PersonName(PersonNameBase, str):
+class PersonName(PersonNameBase, strbase):
     """Human-friendly class to hold VR of Person Name (PN)
 
     Name is parsed into the following properties:
@@ -218,13 +267,54 @@ class PersonName(PersonNameBase, str):
     name_prefix,
     name_suffix
     
-    """
+    """ 
+#PZ does it have to accept both str and bytes? Yes. encode if str
+#PZ shall it return bytes or str? str representation of bytes except single_byte part
+#PZ it should either be called with bytes read from file
+#PZ or get a string read from eg input.
     def __new__(cls, val):
         """Return instance of the new class"""
+#        print("PZ 274 valuerep in PersonName new type, len", type(val), len(val))        
         # Check if trying to convert a string that has already been converted 
         if isinstance(val, PersonName):
-            return val
-        return super(PersonName, cls).__new__(cls, val)
+#PZ New str instance
+            return super(PersonName, cls).__new__(cls, val)
+        if inPy3 and isinstance(val,strbase):
+            valb = val.encode('iso8859-1')
+        else:
+#PZ should have bytes here
+            valb = val             
+
+        components = valb.split(b"=")
+        unicomponents = []
+        for i, component in enumerate(components):
+#            unicomponents[i] = ""
+            if inPy3 and i == 0:
+#PZ DICOM default or shal we use dataset default?
+                unicomponents.append (component.decode('iso8859-1'))
+            else:
+#PZ put the rest here            
+                unicomponents.append(str(component)[2:-1] )
+#PZ u by default
+        new_val = "=".join(unicomponents)
+#PZ since there is no __new__ in PersonBaseName
+#PZ next in PersonName.mro() is basestring and it is called
+        return super(PersonName, cls).__new__(cls, new_val)
+
+    def __init__(self, val):
+#PZ explicitly call init in Base
+        if inPy3 and isinstance(val, strbase):
+            self.byteencoded = val.encode('iso8859')
+            #PZ that means we got str like '\\033$)C\\373\\363^\\033$)C'        
+        elif isinstance(val, PersonName):
+            self.byteencoded = val.byteencoded
+        else:
+#PZ called with bytes            
+            self.byteencoded = val
+
+#PZ pass it on
+        PersonNameBase.__init__(self, self)
+        
     def family_comma_given(self):
         """Return name as 'Family-name, Given-name'"""
         return self.formatted("%(family_name)s, %(given_name)s")
@@ -238,6 +328,7 @@ class PersonName(PersonNameBase, str):
         
 class PersonNameUnicode(PersonNameBase, unicode):
     """Unicode version of Person Name"""
+
     def __new__(cls, val, encodings):
         """Return unicode string after conversion of each part
         val -- the PN value to store
@@ -245,26 +336,63 @@ class PersonNameUnicode(PersonNameBase, unicode):
                  from dicom.charset.python_encodings mapping
                  of values in DICOM data element (0008,0005).
         """
-        # Make the possible three character encodings explicit:        
-
+#        print("PZ 321 valuerep in PersonNameUnicode type,len, encod[]", type(val), len(val), encodings)
+#PZ if called with same type return copy  
+        if isinstance(val, PersonNameUnicode):
+            return unicode.__new__(cls, val)        
+#PZ if called with PersonName init on its byteencoded              
+        if isinstance(val, PersonName):
+            valb = val.byteencoded
+#PZ by default we get bytes like it has been read from file
+#PZ but in case of new entry it will be read eg by input() and we will get unicode string
+#PZ in Py2 val is a bytes instance so pass it through
+#PZ in Python 3 we must encode str to bytes for decoding
+        elif inPy3 and isinstance(val,unicode):
+            valb = val.encode('iso8859-1')
+        else:
+#PZ should have bytes here
+            valb = val 
+        # Make the possible three character encodings explicit:
         if not isinstance(encodings, list):
-            encodings = [encodings]*3
-        if len(encodings) == 2:
+            encodings = [encodings]*3            
+        elif len(encodings) == 2:
             encodings.append(encodings[1])
         # print encodings
-        components = val.split("=")
-        unicomponents = [unicode(components[i],encodings[i]) 
-                            for i, component in enumerate(components)]
-#PZ u by default                            
+#PZ bytes here so have to split with byte '='                
+        components = valb.split(b"=")        
+#PZ they can be bytes if passed from file 
+#PZ or str if taken from dictionary so we have to check 
+        unicomponents = []
+        for i, component in enumerate(components):
+            if inPy3 and isinstance(encodings[i], bytestring):
+                encodings[i] = [encodings[i].decode('iso8859-1')  ]
+            unicomponents.append(clean_escseq(component,encodings[i]).decode(encodings[i]) )
+#PZ u by default
         new_val = "=".join(unicomponents)
-
+#PZ could pass it up in MRO with super but 
+#PZ it does it explicitly
+#PZ after that it will pass to PersonNameUniode.__init__
+#PZ which will pass it for parse to PersonNameBase.__init
         return unicode.__new__(cls, new_val)
+        
     def __init__(self, val, encodings):
         self.encodings = encodings
-        PersonNameBase.__init__(self, val)
+#PZ val is now unicode str
+        PersonNameBase.__init__(self, val)  
+#PZ encode for internal storage, no problem here
+        if inPy3 and isinstance(val, bytestring):
+            self.byteencoded = val
+        else:     
+            self.byteencoded = self.single_byte.encode(self.encodings[0]) + b'='
+            self.byteencoded += self.ideographic.encode(self.encodings[1]) + b'=' 
+            self.byteencoded += self.phonetic.encode(self.encodings[1]) 
+        
     def family_comma_given(self):
         """Return name as 'Family-name, Given-name'"""
-        return self.formatted("%(family_name)u, %(given_name)u")
+        return self.formatted("%(family_name)s, %(given_name)s")
 
 class OtherByte(bytestring):
     pass
+
+#PZ function to translate string of encoded bytes into bytes
+#PZ that means 

@@ -1,4 +1,5 @@
 # test_dataset.py
+#PZ copied 16 Feb 2012
 """unittest cases for dicom.dataset module"""
 # Copyright (c) 2008-2012 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
@@ -9,6 +10,7 @@ import unittest
 from dicom.dataset import Dataset, have_numpy, PropertyError
 from dicom.dataelem import DataElement, RawDataElement
 from dicom.tag import Tag
+from dicom.sequence import Sequence
 
 class DatasetTests(unittest.TestCase):
     def failUnlessRaises(self, excClass, callableObj, *args, **kwargs):
@@ -16,12 +18,14 @@ class DatasetTests(unittest.TestCase):
         # from http://stackoverflow.com/questions/88325/how-do-i-unit-test-an-init-method-of-a-python-class-with-assertraises
         try:
             callableObj(*args, **kwargs)
-        except excClass, excObj:
+#PZ except            
+        except excClass as excObj:
             return excObj # Actually return the exception object
         else:
             if hasattr(excClass,'__name__'): excName = excClass.__name__
             else: excName = str(excClass)
-            raise self.failureException, "%s not raised" % excName
+#PZ raise
+            raise self.failureException ( "%s not raised" % excName)
 
     def failUnlessExceptionArgs(self, start_args, excClass, callableObj):
         """Check the expected args were returned from an exception
@@ -29,8 +33,9 @@ class DatasetTests(unittest.TestCase):
         """
         # based on same link as failUnlessRaises override above
         excObj = self.failUnlessRaises(excClass, callableObj)
-        msg = "\nExpected Exception message:\n" + start_args + "\nGot:\n" + excObj[0]
-        self.assertTrue(excObj[0].startswith(start_args), msg)
+#PZ excObj.args[0]        
+        msg = "\nExpected Exception message:\n" + start_args + "\nGot:\n" + excObj.args[0]
+        self.assertTrue(excObj.args[0].startswith(start_args), msg)
 
     def testAttributeErrorInProperty(self):
         """Dataset: AttributeError in property raises actual error message..."""
@@ -68,21 +73,24 @@ class DatasetTests(unittest.TestCase):
         ds = Dataset()
         ds.SomeVariableName = 42
         has_it = hasattr(ds, 'SomeVariableName')
-        self.assert_(has_it, "Variable did not get created")
+#PZ assertTrue                
+        self.assertTrue(has_it, "Variable did not get created")
         if has_it:
             self.assertEqual(ds.SomeVariableName, 42, "There, but wrong value")
     def testMembership(self):
         """Dataset: can test if item present by 'if <name> in dataset'......."""
         ds = self.dummy_dataset()
-        self.assert_('TreatmentMachineName' in ds, "membership test failed")
-        self.assert_(not 'Dummyname' in ds, "non-member tested as member")
+#PZ assertTrue                
+        self.assertTrue('TreatmentMachineName' in ds, "membership test failed")
+        self.assertTrue(not 'Dummyname' in ds, "non-member tested as member")
     def testContains(self):
         """Dataset: can test if item present by 'if <tag> in dataset'........"""
         ds = self.dummy_dataset()
-        self.assert_((0x300a, 0xb2) in ds, "membership test failed")
-        self.assert_([0x300a, 0xb2] in ds, "membership test failed when list used")
-        self.assert_(0x300a00b2 in ds, "membership test failed")
-        self.assert_(not (0x10,0x5f) in ds, "non-member tested as member")        
+#PZ assertTrue        
+        self.assertTrue((0x300a, 0xb2) in ds, "membership test failed")
+        self.assertTrue([0x300a, 0xb2] in ds, "membership test failed when list used")
+        self.assertTrue(0x300a00b2 in ds, "membership test failed")
+        self.assertTrue(not (0x10,0x5f) in ds, "non-member tested as member")        
     def testGetExists1(self):
         """Dataset: dataset.get() returns an existing item by name..........."""
         ds = self.dummy_dataset()
@@ -196,6 +204,24 @@ class DatasetTests(unittest.TestCase):
             del ds.PatientName
         ds = self.dummy_dataset()
         self.assertRaises(AttributeError, try_delete)
-            
+
+class DatasetElementsTests(unittest.TestCase):
+    """Test valid assignments of data elements"""
+    def setUp(self):
+        self.ds = Dataset()
+        self.sub_ds1 = Dataset()
+        self.sub_ds2 = Dataset()
+    def testSequenceAssignment(self):
+        """Assignment to SQ works only if valid Sequence assigned......"""
+        def try_non_Sequence():
+            self.ds.ConceptCodeSequence = [1,2,3]
+        msg = "Assigning a non-sequence to an SQ data element did not raise error"
+        self.assertRaises(TypeError, try_non_Sequence)  
+        # check also that assigning proper sequence *does* work
+        self.ds.ConceptCodeSequence = [self.sub_ds1, self.sub_ds2]
+#PZ True        
+        self.assertTrue(isinstance(self.ds.ConceptCodeSequence, Sequence),
+                "Sequence assignment did not result in Sequence type")   
+    
 if __name__ == "__main__":
     unittest.main()

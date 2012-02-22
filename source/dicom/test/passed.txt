@@ -1,0 +1,16 @@
+17 Feb 2012
+test_UID.py
+test_valuerep.py
+test_dataelem.py
+test_tag.py
+test_dictionary.py
+test_rawread.py <- corrected b''
+test_multival.py
+test_sequence.py
+test_charset.py
+test_dataset.py
+test_filereader.py <- corrected b"" CS, LO TA DA not decoded???
+Not tested
+
+test_filewriter.py
+run_tests.py

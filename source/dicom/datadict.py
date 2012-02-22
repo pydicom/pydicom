@@ -11,15 +11,14 @@
 import sys
 if sys.hexversion >= 0x02060000 and sys.hexversion < 0x03000000: 
     inPy26 = True
-else: 
+    inPy3 = False
+elif sys.hexversion >= 0x03000000: 
     inPy26 = False
-
-if sys.hexversion >= 0x03000000: 
     inPy3 = True
 #    basestring = str
     long = int
-else: 
-    inPy3 = False
+ 
+
 
 import logging
 logger = logging.getLogger("pydicom")
@@ -169,6 +168,11 @@ def long_name(name):
 
 def tag_for_name(name):
     """Return the dicom tag corresponding to name, or None if none exist."""
+#PZ
+    if inPy3 and isinstance(name,bytes):
+        print("PZ Py3 Warning datadict.py tag_for_name entry -\n undecoded name {} found".format(anme))
+#PZ Potentialy hazardous since we do not know the default charset (0008, 0005)
+        name = name.decode()     
     if name in keyword_dict: # the usual case
         return keyword_dict[name]
     # If not an official keyword, check the old style pydicom names
@@ -199,6 +203,11 @@ def all_names_for_tag(tag):
 # functions in analogy with those of main DICOM dict
 def get_private_entry(tag, private_creator):
     """Return the tuple (VR, VM, name, is_retired) from a private dictionary"""
+#PZ decode private_creator for lookup
+    if inPy3 and isinstance(private_creator, bytes):
+        print("PZ Py3 Warning datadict.py getprivate entry -\n undecoded private_creator {} found".format(private_creator))
+#PZ Potentialy hazardous since we do not know the default charset (0008, 0005)
+        private_creator = private_creator.decode()
     tag = Tag(tag)
     try:
         private_dict = private_dictionaries[private_creator]

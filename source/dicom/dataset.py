@@ -1,5 +1,6 @@
 # dataset.py
 #PZ downloaded 6 Feb 2012
+#PZ updated 17 Feb 2012
 """Module for Dataset class
 
 Overview of Dicom object model:
@@ -21,17 +22,26 @@ Dataset(derived class of Python's dict class)
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
 #
-import sys
+#PZ added gzip for gzip.GzipFile
+import sys, gzip
 if sys.hexversion >= 0x02060000 and sys.hexversion < 0x03000000: 
     inPy26 = True
-else: 
+    inPy3 = False    
+    BUILTIN_FILE_TYPE = file
+    from cStringIO import StringIO as MyIO
+elif sys.hexversion >= 0x03000000: 
     inPy26 = False
-
-if sys.hexversion >= 0x03000000: 
     inPy3 = True
     basestring = str
-else: 
-    inPy3 = False
+#PZ there is no such thing as a built-in file type in Py3
+#PZ check fileno() - file number. If exists file_like
+#PZ if exception is thrown - in memory
+    from io import FileIO as BUILTIN_FILE_TYPE
+    from io import BytesIO as MyIO
+else:
+    pass
+    #unsupported
+
 
 from sys import byteorder
 sys_is_little_endian = (byteorder == 'little')
@@ -44,9 +54,8 @@ from dicom.dataelem import DataElement, DataElement_from_raw, RawDataElement
 from dicom.valuerep import is_stringlike
 from dicom.UID import NotCompressedPixelTransferSyntaxes
 import os.path
-#PZ now in io
-from io import StringIO
-#import cStringIO, StringIO
+
+
 
 import dicom # for write_file
 import dicom.charset
@@ -135,13 +144,10 @@ class Dataset(dict):
         This is called for code like: ``if 'SliceLocation' in dataset``.
 
         """
-#PZ        print("138 dataset.py contains", name, "type", type(name))
 #PZ is_stringlike from valuerep        
         if is_stringlike(name):
-#PZ         print("141 dataset.py name is stringlike")
             tag = tag_for_name(name)
         else:
-#PZ            print("144 dataset.py name is not stringlike")
             try:
                 tag = Tag(name)
             except:
@@ -159,7 +165,6 @@ class Dataset(dict):
         # Find specific character set. 'ISO_IR 6' is default
         # May be multi-valued, but let dicom.charset handle all logic on that
         dicom_character_set = self.get('SpecificCharacterSet', "ISO_IR 6")
-
         # shortcut to the decode function in dicom.charset
         decode_data_element = dicom.charset.decode
 
@@ -197,12 +202,21 @@ class Dataset(dict):
         or command-line environments.
         """
         import inspect
-        meths = set(zip(*inspect.getmembers(Dataset,inspect.isroutine))[0])
-        props = set(zip(*inspect.getmembers(Dataset,inspect.isdatadescriptor))[0])
+        meths = set()
+        props = set()
+#inPy3 zip returns iterator not list
+        if inPy26:
+            meths = set(zip(*inspect.getmembers(Dataset,inspect.isroutine))[0])
+            props = set(zip(*inspect.getmembers(Dataset,inspect.isdatadescriptor))[0])
+        elif inPy3:
+            meths = set(next( zip(*inspect.getmembers(Dataset,inspect.isroutine)))[0])
+            props = set(next(zip(*inspect.getmembers(Dataset,inspect.isdatadescriptor)))[0])
+            pass
+            
         deprecated = set(('Add', 'AddNew', 'GroupDataset', 'RemovePrivateTags',
                           'SaveAs', 'attribute', 'PixelArray'))
         dicom_names = set(self.dir())
-        alldir=sorted((props|meths|dicom_names)-deprecated)
+        alldir=sorted(props|meths|dicom_names - deprecated)
         return alldir
 
     def dir(self, *filters):
@@ -247,7 +261,6 @@ class Dataset(dict):
 
     def get(self, key, default=None):
         """Extend dict.get() to handle *named tags*."""
-        print("237 datadict.py get", key)
         if is_stringlike(key):
             try:
                 return getattr(self, key)
@@ -290,17 +303,18 @@ class Dataset(dict):
     
     def __getitem__(self, key):
         """Operator for dataset[key] request."""
+
         tag = Tag(key)
         data_elem = dict.__getitem__(self, tag)
-        
         if isinstance(data_elem, DataElement):
             return data_elem
         elif isinstance(data_elem, tuple):
             # If a deferred read, then go get the value now
             if data_elem.value is None:
                 from dicom.filereader import read_deferred_data_element
-                data_elem = read_deferred_data_element(self.fileobj_type, self.filename, self.timestamp, data_elem)
-            # Hasn't been converted from raw form read from file yet, so do so now:
+
+                data_elem = read_deferred_data_element(self.fileobj_type, self.filename, self.timestamp, data_elem)               
+            # Hasn't been converted from raw form read from file yet, so do so now: 
             self[tag] = DataElement_from_raw(data_elem)
         return dict.__getitem__(self, tag)
 
@@ -382,7 +396,6 @@ class Dataset(dict):
         try:
             numpy_format = numpy.dtype(format_str)
         except TypeError:
-#PZ check this one !!!!!!!!!!!!!!!!!!!!!!! Looks good
             raise TypeError("Data type not understood by NumPy: "
                             "format='%s', PixelRepresentation=%d, BitsAllocated=%d" % (
                             numpy_format, self.PixelRepresentation, self.BitsAllocated))
@@ -414,7 +427,6 @@ class Dataset(dict):
     def _getPixelArray(self):
         # Check if pixel data is in a form we know how to make into an array
         # XXX uses file_meta here, should really only be thus for FileDataset
-#PZ        print("414 dataset.py ", self.file_meta.TransferSyntaxUID)
         if self.file_meta.TransferSyntaxUID not in NotCompressedPixelTransferSyntaxes :
 #PZ 3109/3110        
             raise NotImplementedError( "Pixel Data is compressed in a format pydicom does not yet handle. Cannot return array")
@@ -435,9 +447,12 @@ class Dataset(dict):
         try:
             return self._getPixelArray()
         except AttributeError:
+#PZ type value traceback       
             t, e, tb = sys.exc_info()
-#PZ check this one !!!!!!!!!!!!!!!!!!!       
+#PZ check this one !!!! with PEP 3109
 #PZ http://docs.python.org/release/3.1.3/reference/simple_stmts.html#raise     
+#           raise PropertyError("AttributeError in pixel_array property: " + \"
+#                               e.args[0]),None, tb            
             raise PropertyError("AttributeError in pixel_array property: " + \
                             e.args[0]).with_traceback(tb)
     pixel_array = property(_get_pixel_array)
@@ -619,8 +634,9 @@ class Dataset(dict):
 
         """
         taglist = sorted(self.keys())
-        for tag in taglist:
+        for tag in taglist:    
             data_element = self[tag]
+
             callback(self, data_element)  # self = this Dataset
             # 'tag in self' below needed in case data_element was deleted in callback
             if tag in self and data_element.VR == "SQ":
@@ -650,8 +666,10 @@ class FileDataset(Dataset):
         self.is_little_endian = is_little_endian
 #PZ no basestring in Py3        
         if isinstance(filename_or_obj, basestring):
+#PZ got filename        
             self.filename = filename_or_obj
-            self.fileobj_type = file
+#PZ no file in Py3 use FileIO           
+            self.fileobj_type = BUILTIN_FILE_TYPE
         else:
             # Note next line uses __class__ due to gzip using old-style classes 
             #    until after python2.5 (or 2.6?)
@@ -659,13 +677,26 @@ class FileDataset(Dataset):
             # See http://docs.python.org/reference/datamodel.html: 
             #   "if x is an instance of an old-style class, then x .__class__ 
             #   designates the class of x, but type(x) is always <type 'instance'>"
-            self.fileobj_type = filename_or_obj.__class__
-            if getattr(filename_or_obj, "name", False):
-                self.filename = filename_or_obj.name  
-            elif getattr(filename_or_obj, "filename", False): #gzip python <2.7?
-                self.filename = filename_or_obj.filename
-            else:
-                self.filename = None # e.g. came from StringIO or something file-like
+#            self.fileobj_type = filename_or_obj.__class__
+#PZ here we have opened file or in memory stream or gzip.GzipFile
+#PZ if from file, will have .fileno()
+            self.filename = None
+            try:
+#PZ file or gzip both have 'name' and fileno()
+#PZ but checking it on memory stream caused an Exception
+                filename_or_obj.fileno()
+                self.filename = filename_or_obj.name  # 
+                if isinstance(filename_or_obj, gzip.GzipFile):
+#PZ gzip   
+                    self.fileobj_type = gzip.GzipFile
+                else:
+                    self.fileobj_type = BUILTIN_FILE_TYPE
+                
+            except: 
+#PZ in memory stream BaseIO, fileno() raises exc and not string
+                self.fileobj_type = MyIO
+                pass                
+                
         self.timestamp = None
         if stat_available and self.filename and os.path.exists(self.filename):
             statinfo = stat(self.filename)

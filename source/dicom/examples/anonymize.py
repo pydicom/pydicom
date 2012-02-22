@@ -4,7 +4,7 @@ by replacing Person names, patient id, optionally remove curves
 and private tags, and write result to a new file (directory)
 This is an example only; use only as a starting point.
 """
-# Copyright (c) 2008-2012 Darcy Mason
+# Copyright (c) 2008, 2011 Darcy Mason
 # This file is part of pydicom, relased under an MIT license.
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
@@ -56,12 +56,12 @@ def anonymize(filename, output_filename, new_person_name="anonymous",
 	# Remove data elements (should only do so if DICOM type 3 optional) 
 	# Use general loop so easy to add more later
 	# Could also have done: del ds.OtherPatientIDs, etc.
-    for name in ['OtherPatientIDs', 'OtherPatientIDsSequence']:
+    for name in ['OtherPatientIDs']:
         if name in dataset:
-            delattr(dataset, name)
+            delattr(ds, name)
 
 	# Same as above but for blanking data elements that are type 2.
-    for name in ['PatientBirthDate']:
+    for name in ['PatientsBirthDate']:
         if name in dataset:
             dataset.data_element(name).value = ''
 	

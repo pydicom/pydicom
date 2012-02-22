@@ -2,8 +2,25 @@
 # 
 import warnings
 import unittest
-from sys import version_info
-
+#PZ this clone ignores everything below 2.5
+# Need to import this separately since syntax (using "with" statement) gives errors in python < 2.6
+from dicom.test.version_dep import capture_warnings
+#from sys import version_info
+import sys
+if sys.hexversion >= 0x02060000 and sys.hexversion < 0x03000000: 
+    inPy26 = True
+    inPy3 = False
+elif sys.hexversion >= 0x03000000: 
+    inPy26 = False
+    inPy3 = True
+#    basestring = str
+#PZ PEP0237        
+#    _MAXLONG_ = 0xFFFFFFFF
+#    from io import BytesIO # tried cStringIO but wouldn't let me derive class from it.    
+else: 
+#PZ unsupported python version why we are here, should fail earlier
+    pass
+    
 def assertWarns(self, warn_msg, function, *func_args, **func_kwargs):
     """
     Check that the function generates the expected warning
@@ -16,26 +33,11 @@ def assertWarns(self, warn_msg, function, *func_args, **func_kwargs):
     
     Return the function return value.
     """
-    if version_info < (2, 6):
-        all_warnings = []
-        def new_warn_explicit(*warn_args):
-            all_warnings.append(warn_args[0]) # save only the message here
-
-        saved_warn_explicit = warnings.warn_explicit
-        try:
-            warnings.warn_explicit = new_warn_explicit
-            result = function(*func_args, **func_kwargs)
-        finally:
-            warnings.warn_explicit = saved_warn_explicit
-
-    else: # python > 2.5
-        # Need to import this separately since syntax (using "with" statement) gives errors in python < 2.6
-        from dicom.test.version_dep import capture_warnings
-        result, all_warnings = capture_warnings(function, *func_args, **func_kwargs)
-        
-    self.assert_(len(all_warnings)==1, "Expected one warning; got %d" % len(all_warnings))
-    self.assert_(warn_msg in all_warnings[0], 
-        "Expected warning message '%s...'; got '%s'" % (warn_msg, all_warnings[0]))
+    result, all_warnings = capture_warnings(function, *func_args, **func_kwargs)
+    
+    self.assertTrue(len(all_warnings)==1, "Expected one warning; got {}".format( len(all_warnings)))
+    self.assertTrue(warn_msg in all_warnings[0], 
+        "Expected warning message '{}...'; got '{}'".format(warn_msg, all_warnings[0]))
     return result
     
 def test_warning(the_warning):

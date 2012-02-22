@@ -10,17 +10,34 @@
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
 
+import sys
+if sys.hexversion >= 0x02060000 and sys.hexversion < 0x03000000: 
+    inPy26 = True
+    inPy3 = False
+    from cStringIO import StringIO as MyIO
+#PZ PEP0237    
+#    _MAXLONG = long(b"0xFFFFFFFF",16)
+elif sys.hexversion >= 0x03000000: 
+    inPy26 = False
+    inPy3 = True
+#PZ PEP0237        
+#    _MAXLONG = 0xFFFFFFFF
+    from io import BytesIO as MyIO
+else: 
+#PZ unsupported python version why we are here, should fail earlier
+    pass
+    
 from struct import unpack, calcsize, pack
 import logging
 logger = logging.getLogger('pydicom')
 
 from dicom.valuerep import PersonName, MultiString
+#PZ MultiString returns MultiValue
 from dicom.multival import MultiValue
 import dicom.UID
 from dicom.tag import Tag, TupleTag, SequenceDelimiterTag
 from dicom.datadict import dictionaryVR
 from dicom.filereader import read_sequence
-from io import StringIO
 from dicom.valuerep import DS, IS
 
 def convert_tag(_bytes, is_little_endian, offset=0):
@@ -81,17 +98,20 @@ def convert_PN(_bytes, is_little_endian, struct_format=None):
 
 def convert_string(_bytes, is_little_endian, struct_format=None):
     """Read and return a string or strings"""
+#PZ do we really want string? or bytes with proper repr?
+#PZ we can always convert with decode(iso8859-1) unless other encoding
     return MultiString(_bytes)
 
 def convert_single_string(_bytes, is_little_endian, struct_format=None):
     """Read and return a single string (backslash character does not split)"""
     if _bytes and _bytes.endswith(b' '):
         _bytes = _bytes[:-1]
-    return bytes
+    return _bytes
 
 def convert_SQ(_bytes, is_implicit_VR, is_little_endian, offset=0):
     """Convert a sequence that has been read as bytes but not yet parsed."""
-    fp = StringIO(bytes)
+#PZ since _bytes are read from raw they are bytes    
+    fp = MyIO(_bytes)
     seq = read_sequence(fp, is_implicit_VR, is_little_endian, len(_bytes), offset)
     return seq
     

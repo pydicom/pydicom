@@ -1,4 +1,5 @@
 # tag.py
+#PZ 16 Feb 2012 no decode or unicode
 """Define Tag class to hold a dicom (group, element) tag"""
 # Copyright (c) 2008, 2010 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
@@ -7,17 +8,12 @@
 import sys
 if sys.hexversion >= 0x02060000 and sys.hexversion < 0x03000000: 
     inPy26 = True
-else: 
+    inPy3 = False
+elif sys.hexversion >= 0x03000000: 
     inPy26 = False
-
-if sys.hexversion >= 0x03000000: 
     inPy3 = True
     long = int
     basestring = str
-else: 
-    inPy3 = False
-
-
 
 def Tag(arg, arg2=None):
     """Factory function for creating Tags in more general ways than the (gp, el)

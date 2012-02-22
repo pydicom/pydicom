@@ -8,9 +8,21 @@
 
 from dicom.tag import Tag
 from struct import unpack, pack
-
-#PZ now in io
-from io import StringIO
+#PZ
+import sys
+if sys.hexversion >= 0x02060000 and sys.hexversion < 0x03000000: 
+    inPy26 = True
+    inPy3 = False
+    from cStringIO import StringIO as MyIO
+#PZ PEP0237    
+elif sys.hexversion >= 0x03000000: 
+    inPy26 = False
+    inPy3 = True
+    from io import BytesIO as MyIO
+else: 
+#PZ unsupported python version why we are here, should fail earlier
+    pass
+    
 import logging
 logger = logging.getLogger('pydicom')
 
@@ -150,4 +162,5 @@ def DicomFile(*args, **kwargs):
     return DicomFileLike(open(*args, **kwargs))
 
 def DicomStringIO(*args, **kwargs):
-    return DicomFileLike(StringIO(*args, **kwargs))
+#PZ MyIO
+    return DicomFileLike(MyIO(*args, **kwargs))

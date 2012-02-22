@@ -1,5 +1,7 @@
 # dataelem.py
 #PZ downloaded 6 Feb 2012
+#PZ updated 17 Feb 2012
+#PZ __unicode__ possibly wrong
 """Define the DataElement class - elements within a dataset.
 
 DataElements have a DICOM value representation VR, a value multiplicity VM,
@@ -125,8 +127,10 @@ class DataElement(object):
         """Set method for 'value' property"""
         # Check if is a string with multiple values separated by '\'
         # If so, turn them into a list of separate strings
+#PZ     print('PZ 130 dataelem set isstring ', val, isString(val), self.VR)
+#PZ we shall not split patients name                
         if isString(val) and self.VR not in \
-           ['UT','ST','LT', 'FL','FD','AT','OB','OW','OF','SL','SQ','SS',
+            ['PN', 'UT','ST','LT', 'FL','FD','AT','OB','OW','OF','SL','SQ','SS',
             'UL', 'OB/OW', 'OW/OB', 'OB or OW', 'OW or OB', 'UN'] and 'US' not in self.VR: # latter covers 'US or SS' etc
             if _backslash in val:
                 val = val.split(_backslash)
@@ -148,7 +152,11 @@ class DataElement(object):
         """Convert Dicom string values if possible to e.g. numbers. Handle the case
         of multiple value data_elements"""
         if self.VR=='SQ': # a sequence - leave it alone
-            return val
+            from dicom.sequence import Sequence   
+            if isinstance(val,Sequence):   
+                return val
+            else:
+                return Sequence(val) 
         # if the value is a list, convert each element
         try:
             val.append
@@ -209,14 +217,17 @@ class DataElement(object):
     repval = property(_get_repval)
 
     def __unicode__(self):
+#PZ possibly wrong
+#PZ what encoding? default?
         """Return unicode representation of this data_element"""
-        if isinstance(self.value, unicode):
+#        if isinstance(self.value, unicode):
             # start with the string rep then replace the value part with the unicode
-            strVal = str(self)
-            uniVal = unicode(strVal.replace(self.repval, "")) + self.value
-            return uniVal
-        else:
-            return unicode(str(self))
+#            strVal = str(self)
+#            uniVal = unicode(strVal.replace(self.repval, "")) + self.value
+#            return uniVal
+#        else:
+#            return unicode(str(self))
+        return str(self)
 
     def __getitem__(self, key):
         """Returns the item from my value's Sequence, if it is one."""
