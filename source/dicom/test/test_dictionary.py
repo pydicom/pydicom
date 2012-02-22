@@ -1,5 +1,6 @@
 # test_dictionary.py
 """Test suite for dicom_dictionary.py"""
+#PZ copied 17 Feb 2012
 # Copyright (c) 2008 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
 #    See the file license.txt included with this distribution, also
@@ -9,14 +10,15 @@ import unittest
 from dicom.tag import Tag
 from dicom.datadict import DicomDictionary, CleanName, all_names_for_tag, dictionary_description
 
+#PZ changed assert_ to asserTrue
 class DictTests(unittest.TestCase):
     def testCleanName(self):
         """dicom_dictionary: CleanName returns correct strings............."""
-        self.assert_(CleanName(0x00100010) == "PatientsName")
-        self.assert_(CleanName(Tag((0x0010, 0x0010))) == "PatientsName")
+        self.assertTrue(CleanName(0x00100010) == "PatientsName")
+        self.assertTrue(CleanName(Tag((0x0010, 0x0010))) == "PatientsName")
     def testTagNotFound(self):
         """dicom_dictionary: CleanName returns blank string for unknown tag"""
-        self.assert_(CleanName(0x99991111)=="")
+        self.assertTrue(CleanName(0x99991111)=="")
     def testNameFinding(self):
         """dicom_dictionary: get long and short names for a data_element name"""
         names = all_names_for_tag(Tag(0x300a00b2)) # Treatment Machine Name
@@ -33,8 +35,8 @@ class DictTests(unittest.TestCase):
 class PrivateDictTests(unittest.TestCase):
     def testPrivate1(self):
         """private dict: """
-        self.assert_(CleanName(0x00100010) == "PatientsName")
-        self.assert_(CleanName(Tag((0x0010, 0x0010))) == "PatientsName")
+        self.assertTrue(CleanName(0x00100010) == "PatientsName")
+        self.assertTrue(CleanName(Tag((0x0010, 0x0010))) == "PatientsName")
         
 
 if __name__ == "__main__":

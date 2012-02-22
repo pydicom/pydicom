@@ -1,5 +1,6 @@
 # test_filewriter.py
 """unittest cases for dicom.filewriter module"""
+#PZ 17 Feb 2012
 # Copyright (c) 2008-2012 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
 #    See the file license.txt included with this distribution, also
@@ -8,6 +9,24 @@
 import sys
 import os.path
 import os
+import sys
+if sys.hexversion >= 0x02060000 and sys.hexversion < 0x03000000: 
+    inPy26 = True
+    inPy3 = False
+    from cStringIO import StringIO as MyIO
+#PZ PEP0237    
+    _MAXLONG_ = long(b"0xFFFFFFFF",16)
+elif sys.hexversion >= 0x03000000: 
+    inPy26 = False
+    inPy3 = True
+    basestring = str
+#PZ PEP0237        
+    _MAXLONG_ = 0xFFFFFFFF
+    from io import BytesIO as MyIO, FileIO
+else: 
+#PZ unsupported python version why we are here, should fail earlier
+    pass
+    
 import unittest
 from dicom.filereader import read_file
 from dicom.filewriter import write_data_element
@@ -21,8 +40,11 @@ from dicom.filebase import DicomStringIO
 from dicom.dataelem import DataElement
 from dicom.util.hexutil import hex2bytes, bytes2hex
 
-from pkg_resources import Requirement, resource_filename
-test_dir = resource_filename(Requirement.parse("pydicom"),"dicom/testfiles")
+#PZ do not need new package
+#from pkg_resources import Requirement, resource_filename
+#test_dir = resource_filename(Requirement.parse("pydicom"),"dicom/testfiles")
+import dicom
+test_dir = os.path.join(os.path.dirname(dicom.__file__), "testfiles")
 
 rtplan_name = os.path.join(test_dir, "rtplan.dcm")
 rtdose_name = os.path.join(test_dir, "rtdose.dcm")
@@ -36,8 +58,14 @@ for inname in ['rtplan', 'rtdose', 'ct', 'mr', 'jpeg']:
 
 def files_identical(a, b):
     """Return a tuple (file a == file b, index of first difference)"""
-    a_bytes = file(a, "rb").read()
-    b_bytes = file(b, "rb").read()
+#PZ warning in Py3/Win about unclosed files    
+    fp = FileIO(a, "rb")
+    a_bytes = fp.read()
+    fp.close()
+    fp = FileIO(b, "rb")
+    b_bytes = fp.read()
+    fp.close()    
+#    b_bytes = FileIO(b, "rb").read()
     return bytes_identical(a_bytes, b_bytes)
     
 def bytes_identical(a_bytes, b_bytes):
@@ -56,7 +84,8 @@ class WriteFileTests(unittest.TestCase):
         dataset = read_file(in_filename)
         dataset.save_as(out_filename)
         same, pos = files_identical(in_filename, out_filename)
-        self.assert_(same, "Files are not identical - first difference at 0x%x" % pos)
+#PZ assertTrue        
+        self.assertTrue(same, "Files are not identical - first difference at 0x%x" % pos)
         if os.path.exists(out_filename):
             os.remove(out_filename)  # get rid of the file
     def testRTPlan(self):
@@ -77,7 +106,8 @@ class WriteFileTests(unittest.TestCase):
     def testListItemWriteBack(self):
         """Change item in a list and confirm it is written to file      .."""
         DS_expected = 0
-        CS_expected = "new"
+#PZ bytes, CS not decoded by default when read        
+        CS_expected = b"new"
         SS_expected = 999
         ds = read_file(ct_name)
         ds.ImagePositionPatient[2] = DS_expected
@@ -86,9 +116,10 @@ class WriteFileTests(unittest.TestCase):
         ds.save_as(ct_out)
         # Now read it back in and check that the values were changed
         ds = read_file(ct_out)
-        self.assert_(ds.ImageType[1] == CS_expected, "Item in a list not written correctly to file (VR=CS)")
-        self.assert_(ds[0x00431012].value[0] == SS_expected, "Item in a list not written correctly to file (VR=SS)")
-        self.assert_(ds.ImagePositionPatient[2] == DS_expected, "Item in a list not written correctly to file (VR=DS)")
+#PZ 3x assertTrue        
+        self.assertTrue(ds.ImageType[1] == CS_expected, "Item in a list not written correctly to file (VR=CS)")
+        self.assertTrue(ds[0x00431012].value[0] == SS_expected, "Item in a list not written correctly to file (VR=SS)")
+        self.assertTrue(ds.ImagePositionPatient[2] == DS_expected, "Item in a list not written correctly to file (VR=DS)")
         if os.path.exists(ct_out):
             os.remove(ct_out)
 
@@ -121,16 +152,16 @@ class ScratchWriteTests(unittest.TestCase):
     def setUp(self):
         # Create simple dataset for all tests
         ds = Dataset()
-        ds.PatientName = "Name^Patient"
+        ds.PatientName = b"Name^Patient"
         
         # Set up a simple nested sequence
         # first, the innermost sequence
         subitem1 = Dataset()
         subitem1.ContourNumber = 1
-        subitem1.ContourData = ['2','4','8','16']
+        subitem1.ContourData = [b'2',b'4',b'8',b'16']
         subitem2 = Dataset()
         subitem2.ContourNumber = 2
-        subitem2.ContourData = ['32','64','128','196']
+        subitem2.ContourData = [b'32',b'64',b'128',b'196']
         
         sub_ds = Dataset()
         sub_ds.ContourSequence = Sequence((subitem1, subitem2)) # XXX in 0.9.5 will need sub_ds.ContourSequence
@@ -140,6 +171,9 @@ class ScratchWriteTests(unittest.TestCase):
         
         # Store so each test can use it
         self.ds = ds
+        print("PZ 174 testwri dir")
+        print(self.ds)
+        print("PZ 174 testwri po dir/n/n/n/n")
         
     def compare_write(self, hex_std, file_ds):
         """Write file and compare with expected byte string
@@ -149,12 +183,18 @@ class ScratchWriteTests(unittest.TestCase):
         """
         out_filename = "scratch.dcm"
         file_ds.save_as(out_filename)
+        ds2 = dicom.read_file(out_filename, force=True)
+        print("meta written", ds2.file_meta)
         std = hex2bytes(hex_std)
-        bytes_written = open(out_filename,'rb').read()
-        # print "std    :", bytes2hex(std)
-        # print "written:", bytes2hex(bytes_written)
+#PZ Py3/Win gives resource warning
+        _fp = open(out_filename,'rb')
+        bytes_written = _fp.read()
+        _fp.close()
+        print ("std    :", bytes2hex(std))
+        print ("written:", bytes2hex(bytes_written))
         same, pos = bytes_identical(std, bytes_written)
-        self.assert_(same, "Writing from scratch not expected result - first difference at 0x%x" % pos)
+#PZ asserttrue       
+        self.assertTrue(same, "Writing from scratch not expected result - first difference at 0x%x" % pos)
         if os.path.exists(out_filename):
             os.remove(out_filename)  # get rid of the file
             

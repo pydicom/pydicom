@@ -10,21 +10,25 @@
 import sys
 if sys.hexversion >= 0x02060000 and sys.hexversion < 0x03000000: 
     inPy26 = True
-else: 
+    inPy3 = False
+    from cStringIO import StringIO as MyIO
+#PZ PEP0237    
+    _MAXLONG_ = long(b"0xFFFFFFFF",16)
+elif sys.hexversion >= 0x03000000: 
     inPy26 = False
-
-if sys.hexversion >= 0x03000000: 
     inPy3 = True
     basestring = str
+#PZ PEP0237        
+    _MAXLONG_ = 0xFFFFFFFF
+    from io import BytesIO as MyIO
 else: 
-    inPy3 = False
+#PZ unsupported python version why we are here, should fail earlier
+    pass
 
 # Need zlib and cStringIO for deflate-compressed file
 import os.path
 import warnings
 import zlib
-#PZ now in io
-from io import StringIO # tried cStringIO but wouldn't let me derive class from it.
 import logging
 from dicom.tag import TupleTag
 from dicom.dataelem import RawDataElement
@@ -137,7 +141,8 @@ class DicomIter(object):
                 zipped = fp.read()
                 # -MAX_WBITS part is from comp.lang.python answer:  http://groups.google.com/group/comp.lang.python/msg/e95b3b38a71e6799
                 unzipped = zlib.decompress(zipped, -zlib.MAX_WBITS)
-                fp = StringIO(unzipped) # a file-like object that usual code can use as normal
+#PZ  MyIO              
+                fp = MyIO(unzipped) # a file-like object that usual code can use as normal
                 self.fp = fp #point to new object
                 self._is_implicit_VR = False
                 self._is_little_endian = True
@@ -222,8 +227,9 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian, stop_when=None,
             group, elem, length = unpack(unpack_format, bytes_read)
         else: # explicit VR
             group, elem, VR, length = unpack(unpack_format, bytes_read)
-#PZ move VR to unicode            
-            if inPy3: VR = VR.decode()
+#PZ move VR to unicode default utf
+#PZ it is checked too often in the code to convert
+            if inPy3: VR = VR.decode('iso-8859-1')
             if VR in ('OB','OW','OF','SQ','UN', 'UT'):
                 bytes_read = fp_read(4)
                 length = unpack(extra_length_format, bytes_read)[0]
@@ -232,7 +238,7 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian, stop_when=None,
             debug_msg = "%-47s  (%04x, %04x)" % (debug_msg, group, elem)
             if not is_implicit_VR: debug_msg += " %s " % VR
 #PZ http://www.python.org/dev/peps/pep-0237/            
-            if length != 0xFFFFFFFF:
+            if length != _MAXLONG_:
                 debug_msg += "Length: %d" % length
             else:
                 debug_msg += "Length: Undefined length (FFFFFFFF)"
@@ -255,7 +261,7 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian, stop_when=None,
         # Reading the value
         # First case (most common): reading a value with a defined length
 #PZ http://www.python.org/dev/peps/pep-0237/                    
-        if length != 0xFFFFFFFF:
+        if length != _MAXLONG_:
             if defer_size is not None and length > defer_size:
                 # Flag as deferred read by setting value to None, and skip bytes
                 value = None
@@ -287,8 +293,8 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian, stop_when=None,
                     pass
             if VR == 'SQ':
                 if debugging:
-                    logger_debug("%08x: Reading and parsing undefined length sequence"
-                                % fp_tell())
+#PZ format                
+                    logger_debug("{0:08x}: Reading and parsing undefined length sequence".format(fp_tell()))
                 seq = read_sequence(fp, is_implicit_VR, is_little_endian, length)
                 yield DataElement(tag, VR, seq, value_tell, is_undefined_length=True)
             else:
@@ -320,8 +326,9 @@ def read_dataset(fp, is_implicit_VR, is_little_endian, bytelength=None,
                                     stop_when, defer_size)                                   
     try:
         while (bytelength is None) or (fp.tell()-fpStart < bytelength):
-#PZ generator __next__
+#PZ generator __next__ should work both with Py3 and 2.6
             raw_data_element = de_gen.__next__()
+#            if inPy26: raw_data_element = de_gen.next()
             # Read data elements. Stop on certain errors, but return what was already read
             tag = raw_data_element.tag
             if tag == (0xFFFE, 0xE00D): #ItemDelimiterTag --dataset is an item in a sequence
@@ -346,7 +353,7 @@ def read_sequence(fp, is_implicit_VR, is_little_endian, bytelength, offset=0):
     is_undefined_length = False
     if bytelength != 0:  # Sequence of length 0 is possible (PS 3.5-2008 7.5.1a (p.40)
 #PZ http://www.python.org/dev/peps/pep-0237/     
-        if bytelength == 0xffffffff:
+        if bytelength == _MAXLONG_:
             is_undefined_length = True
             bytelength = None
         fp_tell = fp.tell # for speed in loop
@@ -378,18 +385,19 @@ def read_sequence_item(fp, is_implicit_VR, is_little_endian):
     tag = (group, element)
     if tag == SequenceDelimiterTag: # No more items, time to stop reading
         data_element = DataElement(tag, None, None, fp.tell()-4)
-        logger.debug("%08x: %s" % (fp.tell()-8, "End of Sequence"))
+#PZ format        
+        logger.debug("{0:08x}: {1}".format(fp.tell()-8, "End of Sequence"))
         if length != 0:
             logger.warning("Expected 0x00000000 after delimiter, found 0x%x, at position 0x%x" % (length, fp.tell()-4))
         return None
     if tag != ItemTag:
         logger.warning("Expected sequence item with tag %s at file position 0x%x" % (ItemTag, fp.tell()-4))
     else:
-        logger.debug("%08x: %s  Found Item tag (start of item)" % (fp.tell()-4,
+        logger.debug("{0:08x}: {1}  Found Item tag (start of item)".format(fp.tell()-4,
                           bytes2hex(bytes_read)))
     is_undefined_length = False
 #PZ http://www.python.org/dev/peps/pep-0237/     
-    if length == 0xFFFFFFFF:
+    if length == _MAXLONG_:
         ds = read_dataset(fp, is_implicit_VR, is_little_endian, bytelength=None)
         ds.is_undefined_length_sequence_item = True
     else:
@@ -414,11 +422,12 @@ def _read_file_meta_info(fp):
     bytes_read = fp.read(8)
 #PZ Should VR be converted to str? in Py3 or leave it as bytes
     group, elem, VR, length = unpack("<HH2sH", bytes_read)
-#PZ lets convert to keep the code intact
+#PZ lets convert to keep majority of the code intact, checked too many times
+#PZdecode VR to string. bytes read from file
     if inPy3: VR=VR.decode()
 #PZ format    
     if debugging: debug_msg = "{0:08x}: {1}".format(fp.tell()-8, bytes2hex(bytes_read))
-#PZ VR bytesor not
+#PZ VR 
     if VR in ('OB','OW','OF','SQ','UN', 'UT'):
         bytes_read = fp.read(4)
         length = unpack("<L", bytes_read)[0]
@@ -451,7 +460,6 @@ def _read_file_meta_info(fp):
     # Rewind to read the first data element as part of the file_meta dataset
     if debugging: logger.debug("Rewinding and reading whole dataset including this first data element")    
     fp.seek(fp_save) 
-#PZ traceback         
     file_meta = read_dataset(fp, is_implicit_VR=False,
                     is_little_endian=True, stop_when=not_group2)
     fp_now = fp.tell()
@@ -534,18 +542,17 @@ def read_partial(fileobj, stop_when=None, defer_size=None, force=False):
             zipped = fileobj.read()
             # -MAX_WBITS part is from comp.lang.python answer:  http://groups.google.com/group/comp.lang.python/msg/e95b3b38a71e6799
             unzipped = zlib.decompress(zipped, -zlib.MAX_WBITS)
-            fileobj = StringIO(unzipped) # a file-like object that usual code can use as normal
+            fileobj = MyIO(unzipped) # a file-like object that usual code can use as normal
             is_implicit_VR = False
         else:
             # Any other syntax should be Explicit VR Little Endian,
             #   e.g. all Encapsulated (JPEG etc) are ExplVR-LE by Standard PS 3.5-2008 A.4 (p63)
             is_implicit_VR = False
     else: # no header -- use the is_little_endian, implicit assumptions
-        file_meta_dataset.TransferSyntaxUID = dicom.UID.ImplicitVRLittleEndian
-
+        file_meta_dataset.TransferSyntaxUID = dicom.UID.ImplicitVRLittleEndian        
     try:
         dataset = read_dataset(fileobj, is_implicit_VR, is_little_endian, 
-                            stop_when=stop_when, defer_size=defer_size)
+                            stop_when=stop_when, defer_size=defer_size)        
 #PZ http://www.python.org/dev/peps/pep-3110/    
     except EOFError as e:
         pass  # error already logged in read_dataset
@@ -572,15 +579,15 @@ def read_file(fp, defer_size=None, stop_before_pixels=False, force=False):
     if isinstance(fp, basestring):
         # caller provided a file name; we own the file handle
         caller_owns_file = False
+#PZ format        
         logger.debug("Reading file '{}'".format(fp))
         fp = open(fp, 'rb')
-
     if dicom.debugging:
         logger.debug("\n"+"-"*80)
         logger.debug("Call to read_file()")
-        msg = ("filename:'{}', defer_size='{}'"
-               ", stop_before_pixels={}, force={}")
-        logger.debug(msg.format(fp.name, defer_size, stop_before_pixels, force))
+        msg = ("filename:'%s', defer_size='%s'"
+                 ", stop_before_pixels=%s, force=%s")
+        logger.debug(msg % (fp.name, defer_size, stop_before_pixels, force))  
         if caller_owns_file:
             logger.debug("Caller passed file object")
         else:
@@ -622,7 +629,7 @@ def read_deferred_data_element(fileobj_type, filename, timestamp, raw_data_elem)
     """Read the previously deferred value from the file into memory
     and return a raw data element"""
     logger.debug("Reading deferred element %r" % str(raw_data_elem.tag))
-    # If it wasn't read from a file, then return an error
+    # If it wasn't read from a file, then return an error     
     if filename is None:
 #PZ http://www.python.org/dev/peps/pep-3109/     
         raise IOError("Deferred read -- original filename not stored. Cannot re-open")
@@ -630,23 +637,29 @@ def read_deferred_data_element(fileobj_type, filename, timestamp, raw_data_elem)
     if not os.path.exists(filename):
 #PZ http://www.python.org/dev/peps/pep-3109/  + format pep-3101
         raise IOError( "Deferred read -- original file {:s} is missing".format(filename))
-    if stat_available and timestamp is not None:
+#PZ () makes it clear        
+    if stat_available and (timestamp is not None):
         statinfo = stat(filename)
-        if statinfo.st_mtime != timestamp:
+        if statinfo.st_mtime != timestamp:                         
             warnings.warn("Deferred read warning -- file modification time has changed.")
 
     # Open the file, position to the right place
     # fp = self.typefileobj(self.filename, "rb")
-    fp = fileobj_type(filename, 'rb')
+#PZ
+#PZ This should either reopen the file with open or bytesIO, gzip.GzipFile
+#PZ BytesIO as file object type
+#PZ
+    fp =  fileobj_type(filename, 'rb')
+        
     is_implicit_VR = raw_data_elem.is_implicit_VR
     is_little_endian = raw_data_elem.is_little_endian
     offset = data_element_offset_to_value(is_implicit_VR, raw_data_elem.VR)
     fp.seek(raw_data_elem.value_tell - offset)
     elem_gen = data_element_generator(fp, is_implicit_VR, is_little_endian, 
                                         defer_size=None)
-
     # Read the data element and check matches what was stored before
-    data_elem = elem_gen.next()
+#PZ    
+    data_elem = elem_gen.__next__()
     fp.close()
     if data_elem.VR != raw_data_elem.VR:
 #PZ http://www.python.org/dev/peps/pep-3109/  + format pep-3101   

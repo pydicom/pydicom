@@ -9,10 +9,13 @@ import os
 import os.path
 import sys
 import unittest
-
+#PZ we do not need pkg_reseurces
 # Get the directory test_dir where the test scripts are
-from pkg_resources import Requirement, resource_filename
-test_dir = resource_filename(Requirement.parse("pydicom"),"dicom/test")
+#from pkg_resources import Requirement, resource_filename
+#test_dir = resource_filename(Requirement.parse("pydicom"),"dicom/test")
+import dicom
+test_dir = os.path.join(os.path.dirname(dicom.__file__), "test")
+
 
 class MyTestLoader(object):
     def loadTestsFromNames(self, *args):
@@ -46,7 +49,9 @@ if __name__ == "__main__":
     
     # Switch directories to test DICOM files, used by many of the tests
     save_dir = os.getcwd()
-    testfiles_dir = resource_filename(Requirement.parse("pydicom"),"dicom/testfiles")
+#PZ removed pkgresourced    
+    testfiles_dir =os.path.join(os.path.dirname(dicom.__file__), "testfiles")    
+#    testfiles_dir = resource_filename(Requirement.parse("pydicom"),"dicom/testfiles")
     os.chdir(testfiles_dir)
     runner.run(suite)
     os.chdir(save_dir)

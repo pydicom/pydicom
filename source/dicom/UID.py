@@ -9,14 +9,12 @@
 import sys
 if sys.hexversion >= 0x02060000 and sys.hexversion < 0x03000000: 
     inPy26 = True
-else: 
-    inPy26 = False
-
-if sys.hexversion >= 0x03000000: 
-    inPy3 = True
-    basestring = str
-else: 
     inPy3 = False
+elif sys.hexversion >= 0x03000000: 
+    inPy26 = False
+    inPy3 = True
+    basestring = str    
+
 #PZadd dicom
 from dicom._UID_dict import UID_dictionary
 
@@ -39,12 +37,15 @@ class UID(str):
         if isinstance(val, UID):
             return val
         else:
-#PZ no basestring        
+#PZ no basestring so map to str
+#PZ if get bytes decode to str first
+            if isinstance(val, bytes): 
+                val = val.decode('iso8859-1')
             if isinstance(val, basestring):
                 return super(UID, cls).__new__(cls, val.strip())
             else:
 #PZ 3109/3110            
-                raise TypeError( "UID must be a string")
+                raise TypeError( "UID must be a string or bytes")
         
     def __init__(self, val):
         """Initialize the UID properties
@@ -57,6 +58,8 @@ class UID(str):
         #    to do some pre-processing against the UID dictionary.
         #   "My" string can never change (it is a python immutable), so is safe
 #PZ self or val? if self 
+        if isinstance(val, bytes): 
+            val = val.decode('iso8859-1')
         if val in UID_dictionary:
 #PZ self or val? in  UID_dictionary[val]
             self.name, self.type, self.info, retired = UID_dictionary[val]

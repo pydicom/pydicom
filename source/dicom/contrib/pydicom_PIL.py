@@ -67,7 +67,7 @@ def show_PIL(dataset):
         raise TypeError, "Cannot show image -- DICOM dataset does not have pixel data"    
     if ('WindowWidth' not in dataset) or ('WindowCenter' not in dataset): # can only apply LUT if these values exist
         bits = dataset.BitsAllocated
-        samples = dataset.SamplesPerPixel
+        samples = dataset.SamplesperPixel
         if bits == 8 and samples == 1:
             mode = "L"
         elif bits == 8 and samples == 3:

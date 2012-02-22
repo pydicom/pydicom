@@ -1,4 +1,5 @@
 # test_UID.py
+#PZ 6Feb2012 test OK
 """Test suite for UID.py"""
 # Copyright (c) 2008 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.

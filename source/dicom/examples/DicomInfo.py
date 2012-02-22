@@ -11,7 +11,7 @@ data elements are printed: some info about the patient and about
 the image.
 
 """
-# Copyright (c) 2008-2012 Darcy Mason
+# Copyright (c) 2008-2011 Darcy Mason
 # This file is part of pydicom, released under an MIT license.
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
@@ -42,7 +42,7 @@ print "Filename.........:", filename
 print "Storage type.....:", dataset.SOPClassUID
 print
 
-pat_name = dataset.PatientName
+pat_name = dataset.PatientsName
 display_name = pat_name.family_name + ", " + pat_name.given_name
 print "Patient's name...:", display_name
 print "Patient id.......:", dataset.PatientID

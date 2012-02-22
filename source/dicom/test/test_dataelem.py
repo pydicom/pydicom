@@ -1,5 +1,6 @@
 # test_dataelem.py
 """unittest cases for dicom.dataelem module"""
+#PZ 17 feb 2012
 # Copyright (c) 2008 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
 #    See the file license.txt included with this distribution, also
@@ -13,7 +14,7 @@ from dicom.dataelem import RawDataElement, DataElement_from_raw
 from dicom.tag import Tag
 from dicom.dataset import Dataset
 from dicom.UID import UID
-
+#PZ assert_ changed to assertTrue
 class DataElementTests(unittest.TestCase):
     def setUp(self):
         self.data_elementSH= DataElement((1,2), "SH", "hello")
@@ -40,9 +41,9 @@ class DataElementTests(unittest.TestCase):
         """DataElement: setting or changing UID results in UID type........."""
         ds = Dataset()
         ds.TransferSyntaxUID = "1.2.3"
-        self.assert_(type(ds.TransferSyntaxUID) is UID, "Assignment to UID did not create UID class")
+        self.assertTrue(type(ds.TransferSyntaxUID) is UID, "Assignment to UID did not create UID class")
         ds.TransferSyntaxUID += ".4.5.6"
-        self.assert_(type(ds.TransferSyntaxUID) is UID, "+= to UID did not keep as UID class")
+        self.assertTrue(type(ds.TransferSyntaxUID) is UID, "+= to UID did not keep as UID class")
 
 class RawDataElementTests(unittest.TestCase):
     def setUp(self):

@@ -15,9 +15,10 @@ See the examples for more details, or the online information at http://pydicom.g
 Unzip dicom source into your site-packages directory
 Create file pydicom-yourversion-py3.2.egg-info
 
+
 Metadata-Version: 1.0
 Name: pydicom
-Version: yourversion
+Version: 0.9.6
 Summary: Pure python package for DICOM medical file reading and writing
 Home-page: http://pydicom.googlecode.com
 Author: Darcy Mason
@@ -36,5 +37,17 @@ Description:
         wiki page for installation and basic information, and the
         `Pydicom User Guide <http://code.google.com/p/pydicom/wiki/PydicomUserGuide>`_ page
         for an overview of how to use the pydicom library.
-
-
+        
+Keywords: dicom python medical imaging
+Platform: UNKNOWN
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Healthcare Industry
+Classifier: Intended Audience :: Science/Research
+Classifier: Development Status :: 4 - Beta
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3.2
+Classifier: Operating System :: OS Independent
+Classifier: Topic :: Scientific/Engineering :: Medical Science Apps.
+Classifier: Topic :: Scientific/Engineering :: Physics
+Classifier: Topic :: Software Development :: Libraries
