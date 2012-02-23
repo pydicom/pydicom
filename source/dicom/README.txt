@@ -10,7 +10,12 @@ import dicom
 
 See the examples for more details, or the online information at http://pydicom.googlecode.com.
 
-#PZ 6th Feb 2012
+#PZ 23th Feb 2012
+p.l.zajdel@gmail.com
+Unofficial Python3 port
+Test run fine on 
+- Python 3.2/32bit WinVista 64bit/ matplotlib
+- Python 3.2/ Fedora 16/64bit/ + matplotlib, which is compiled from source and has some problems. It is better to use TkAgg as the backend (matplotlib embedded in Tk) for now. No problems then.
 
 Unzip dicom source into your site-packages directory
 Create file pydicom-yourversion-py3.2.egg-info
@@ -18,7 +23,7 @@ Create file pydicom-yourversion-py3.2.egg-info
 
 Metadata-Version: 1.0
 Name: pydicom
-Version: 0.9.6
+Version: 0.9.7
 Summary: Pure python package for DICOM medical file reading and writing
 Home-page: http://pydicom.googlecode.com
 Author: Darcy Mason
@@ -36,7 +41,8 @@ Description:
         See the `Getting Started <http://code.google.com/p/pydicom/wiki/GettingStarted>`_
         wiki page for installation and basic information, and the
         `Pydicom User Guide <http://code.google.com/p/pydicom/wiki/PydicomUserGuide>`_ page
-        for an overview of how to use the pydicom library.
+        for an overview of how to use the pydicom library
+
         
 Keywords: dicom python medical imaging
 Platform: UNKNOWN

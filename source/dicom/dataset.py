@@ -209,6 +209,7 @@ class Dataset(dict):
             meths = set(zip(*inspect.getmembers(Dataset,inspect.isroutine))[0])
             props = set(zip(*inspect.getmembers(Dataset,inspect.isdatadescriptor))[0])
         elif inPy3:
+#PZ but still not working            
             meths = set(next( zip(*inspect.getmembers(Dataset,inspect.isroutine)))[0])
             props = set(next(zip(*inspect.getmembers(Dataset,inspect.isdatadescriptor)))[0])
             pass

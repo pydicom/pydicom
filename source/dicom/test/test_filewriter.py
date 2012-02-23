@@ -158,10 +158,10 @@ class ScratchWriteTests(unittest.TestCase):
         # first, the innermost sequence
         subitem1 = Dataset()
         subitem1.ContourNumber = 1
-        subitem1.ContourData = [b'2',b'4',b'8',b'16']
+        subitem1.ContourData = ['2','4','8','16']
         subitem2 = Dataset()
         subitem2.ContourNumber = 2
-        subitem2.ContourData = [b'32',b'64',b'128',b'196']
+        subitem2.ContourData = ['32','64','128','196']
         
         sub_ds = Dataset()
         sub_ds.ContourSequence = Sequence((subitem1, subitem2)) # XXX in 0.9.5 will need sub_ds.ContourSequence
@@ -171,9 +171,6 @@ class ScratchWriteTests(unittest.TestCase):
         
         # Store so each test can use it
         self.ds = ds
-        print("PZ 174 testwri dir")
-        print(self.ds)
-        print("PZ 174 testwri po dir/n/n/n/n")
         
     def compare_write(self, hex_std, file_ds):
         """Write file and compare with expected byte string
@@ -184,14 +181,13 @@ class ScratchWriteTests(unittest.TestCase):
         out_filename = "scratch.dcm"
         file_ds.save_as(out_filename)
         ds2 = dicom.read_file(out_filename, force=True)
-        print("meta written", ds2.file_meta)
         std = hex2bytes(hex_std)
 #PZ Py3/Win gives resource warning
         _fp = open(out_filename,'rb')
         bytes_written = _fp.read()
         _fp.close()
-        print ("std    :", bytes2hex(std))
-        print ("written:", bytes2hex(bytes_written))
+        #print ("std    :", bytes2hex(std))
+        #print ("written:", bytes2hex(bytes_written))
         same, pos = bytes_identical(std, bytes_written)
 #PZ asserttrue       
         self.assertTrue(same, "Writing from scratch not expected result - first difference at 0x%x" % pos)
