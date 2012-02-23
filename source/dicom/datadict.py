@@ -170,9 +170,9 @@ def tag_for_name(name):
     """Return the dicom tag corresponding to name, or None if none exist."""
 #PZ
     if inPy3 and isinstance(name,bytes):
-        print("PZ Py3 Warning datadict.py tag_for_name entry -\n undecoded name {} found".format(anme))
+#        print("PZ Py3 Warning datadict.py tag_for_name entry -\n undecoded name {} found".format(anme))
 #PZ Potentialy hazardous since we do not know the default charset (0008, 0005)
-        name = name.decode()     
+        name = name.decode('iso8859-1')     
     if name in keyword_dict: # the usual case
         return keyword_dict[name]
     # If not an official keyword, check the old style pydicom names
@@ -205,9 +205,9 @@ def get_private_entry(tag, private_creator):
     """Return the tuple (VR, VM, name, is_retired) from a private dictionary"""
 #PZ decode private_creator for lookup
     if inPy3 and isinstance(private_creator, bytes):
-        print("PZ Py3 Warning datadict.py getprivate entry -\n undecoded private_creator {} found".format(private_creator))
+#        print("PZ Py3 Warning datadict.py getprivate entry -\n undecoded private_creator {} found".format(private_creator))
 #PZ Potentialy hazardous since we do not know the default charset (0008, 0005)
-        private_creator = private_creator.decode()
+        private_creator = private_creator.decode('iso8859-1')
     tag = Tag(tag)
     try:
         private_dict = private_dictionaries[private_creator]

@@ -128,9 +128,9 @@ class DataElement(object):
         # Check if is a string with multiple values separated by '\'
         # If so, turn them into a list of separate strings
 #PZ     print('PZ 130 dataelem set isstring ', val, isString(val), self.VR)
-#PZ we shall not split patients name                
+#PZ we shall not split patients name or shall we                
         if isString(val) and self.VR not in \
-            ['PN', 'UT','ST','LT', 'FL','FD','AT','OB','OW','OF','SL','SQ','SS',
+            ['UT','ST','LT', 'FL','FD','AT','OB','OW','OF','SL','SQ','SS',
             'UL', 'OB/OW', 'OW/OB', 'OB or OW', 'OW or OB', 'UN'] and 'US' not in self.VR: # latter covers 'US or SS' etc
             if _backslash in val:
                 val = val.split(_backslash)

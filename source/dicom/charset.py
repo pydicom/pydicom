@@ -49,7 +49,7 @@ from dicom.valuerep import PersonNameUnicode, PersonName, clean_escseq
 # NOTE also that 7.5.3 SEQUENCE INHERITANCE states that if (0008,0005) 
 #       is not present in a sequence item then it is inherited from its parent.
 
-#PZ this is a bit misleading since bytes also have decode
+#PZ name decode is a bit misleading since bytes also have decode
 
 def decode(data_element, dicom_character_set):
     """Apply the DICOM character encoding to the data element
@@ -92,18 +92,21 @@ def decode(data_element, dicom_character_set):
     if data_element.VR == "PN": 
         # logger.warn("%s ... type: %s" %(str(data_element), type(data_element.VR)))
 #        if data_element.VM == 1:
-        if data_element.VM <2 :  
+        if data_element.VM < 2 :  
             data_element.value = PersonNameUnicode(data_element.value, encodings)
         else:
             data_element.value = [PersonNameUnicode(value, encodings) 
-                                    for value in data_element.value]                                   
-    if data_element.VR in ['SH', 'LO', 'ST', 'LT', 'UT']:
+                                    for value in data_element.value]    
+#PZ what about CS, AS, DA, TM
+    if data_element.VR in ['SH', 'LO', 'ST', 'LT', 'UT', 'CS', 'AS', 'DA', 'TM']:
         if len(encodings) > 1:
             del(encodings[0])
-#        if data_element.VM == 1:            
+#PZ         fails for VM == 0 ie empty string
+#PZ        if data_element.VM == 1:            
         if data_element.VM <2 :
-#PZ clean_escsqe must work on bytes - file issue           
-            data_element.value = clean_escseq(data_element.value, encodings).decode(encodings[0])
+#PZ clean_escsqe must work on bytes 
+            if isinstance(data_element.value, bytes):
+                data_element.value = clean_escseq(data_element.value, encodings).decode(encodings[0])
         else:
 #PZ is it correctly converting ?
 #PZ clean_escsqe must work on bytes - file issue
@@ -111,8 +114,11 @@ def decode(data_element, dicom_character_set):
 #            data_element.value = [clean_escseq( value.decode(encodings[0]) ,encodings)
 #                                    for value in data_element.value]
             if isinstance(data_element.value,list):
-
-                data_element.value = [clean_escseq(value ,encodings).decode(encodings[0])
-                                    for value in data_element.value]
+                for i,value in enumerate(data_element.value):
+#PZ it shouldn't happen that they are different but
+#PZ user may set it without even knowing
+                    if isinstance(value, bytes):
+                        data_element.value[i] = clean_escseq(value ,encodings).decode(encodings[0])
             else:
-                data_element.value = clean_escseq(data_element.value ,encodings).decode(encodings[0])
+                if isinstance(data_element.value, bytes):
+                    data_element.value = clean_escseq(data_element.value ,encodings).decode(encodings[0])

@@ -21,9 +21,10 @@ def hex2bytes(hex_string):
         bytes = hex2bytes(hex_string)
     Note in the example that all lines except the first must start with a space,
     alternatively the space could end the previous line.
-    """
+    """    
+    _t = hex_string.strip().split()    
 #PZ encode    
-    return ("".join((chr(int(x,16)) for x in hex_string.strip().split()))).encode()
+    return (bytes([int(_ti,16) for _ti in _t]))
 
 #PZ changed argument name to remove ambiguity with bytes type
 def bytes2hex(mbytes):
