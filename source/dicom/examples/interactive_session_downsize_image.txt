@@ -34,7 +34,7 @@ for manipulation of pixel data
 (0008, 0090) Referring Physician's Name          PN: ''
 (0008, 0201) Timezone Offset From UTC            SH: '-0500'
 (0008, 1010) Station Name                        SH: '000000000'
-(0008, 1060) Name of  Physician(s) Reading Study PN: '----'
+(0008, 1060) Name of Physician(s) Reading Study  PN: '----'
 (0008, 1070) Operators' Name                     PN: '----'
 (0008, 1090) Manufacturer's Model Name           LO: 'MRT50H1'
 (0010, 0010) Patient's Name                      PN: 'CompressedSamples^MR1'
@@ -88,6 +88,6 @@ for manipulation of pixel data
 (0028, 1051) Window Width                        DS: '1600'
 (7fe0, 0010) Pixel Data                          OW: Array of 8192 bytes
 (fffc, fffc) Data Set Trailing Padding           OB: Array of 126 bytes
->>> ds.save_as("MR_small.dcm")
->>> ds2 = dicom.read_file("MR_small.dcm") # read back to make sure is ok
+>>> ds.save_as("MR_small_test.dcm")
+>>> ds2 = dicom.read_file("MR_small_test.dcm") # read back to make sure is ok
 >>>
