@@ -8,6 +8,12 @@ pydicom release checklist
 * run test/all.bat on windows to test with all supported python versions
 * run test/shell_all on linux/mac to test all supported python versions
 * run each example file and clean up any output files created
+* doctest interactive_session.txt and interactive_session_downsize_image.txt::
+    (switch to testfiles directory; cp mr1_unc.dcm from testsuite)
+    >>> import doctest
+    >>> doctest.testfile("interactive_session.txt")
+    >>> doctest.testfile("interactive_session_downsize_image.txt")
+    First can fail on help() function as goes into reader mode needing q to exit
 * run tabnanny to check for bad indentation::
     python -m tabnanny .
 * run python26 -Qwarn to check for integer division problems.

@@ -15,7 +15,7 @@ def ListBeams(plan_dataset):
     lines = ["%13s %8s %8s %8s" % ("Beam name", "Number", "Gantry", "SSD (cm)")]
     for beam in plan_dataset.BeamSequence:
         cp0 = beam.ControlPointSequence[0]
-        SSD = float(cp0.SourcetoSurfaceDistance / 10.0)
+        SSD = float(cp0.SourcetoSurfaceDistance / 10)
         lines.append("%13s %8s %8.1f %8.1f" % (beam.BeamName, str(beam.BeamNumber),
                                       cp0.GantryAngle, SSD))
     return "\n".join(lines)
