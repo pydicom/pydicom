@@ -22,10 +22,7 @@ from dicom.UID import UID
 from dicom.valuerep import IS, DS, PersonName
 from decimal import Decimal
 
-try:
-    from collections import namedtuple
-except ImportError: # for python <2.6
-    from dicom.util.namedtup import namedtuple
+from collections import namedtuple
 
 # os.stat is only available on Unix and Windows
 # Not sure if on other platforms the import fails, or the call to it??

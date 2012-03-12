@@ -172,9 +172,8 @@ class Dataset(dict):
             raise AttributeError, name
 
     def __dir__(self):
-        """___dir__ is used in python >= 2.6 to give a list of attributes
-        available in an object, for example used in auto-completion in editors
-        or command-line environments.
+        """Give a list of attributes available in an object, for example 
+        used in auto-completion in editors or command-line environments.
         """
         import inspect
         meths = set(zip(*inspect.getmembers(Dataset,inspect.isroutine))[0])
@@ -427,19 +426,13 @@ class Dataset(dict):
         indent_format -- not used in current version. Placeholder for future functionality.
         """
         for data_element in self.iterall():
-            # Get all the attributes possible for this data element (e.g. gets descriptive text name too)
+            # Get all the attributes possible for this data element (e.g. 
+            #   gets descriptive text name too)
             # This is the dictionary of names that can be used in the format string
-            elem_dict = dict()
-            for x in dir(data_element):
-                if not x.startswith("_"):
-                    get_x = getattr(data_element, x)
-                    if callable(get_x):
-                        get_x = get_x()
-                    elem_dict[x] = get_x
-            # Commented out below is much less verbose version of above dict for python >= 2.5
-            # elem_dict = dict([(x, getattr(data_element,x)() if callable(getattr(data_element,x))
-                                    # else getattr(data_element,x))
-                                    # for x in dir(data_element) if not x.startswith("_")])
+            elem_dict = dict([(x, getattr(data_element,x)()
+                           if callable(getattr(data_element, x))
+                           else getattr(data_element, x))
+                           for x in dir(data_element) if not x.startswith("_")])
             if data_element.VR == "SQ":
                 yield sequence_element_format % elem_dict
             else:
@@ -544,7 +537,7 @@ class Dataset(dict):
         Used in IPython, so that data element names can be found
         and offered for autocompletion on the IPython command line
         """
-        return self.__dir__() # can't use dir(self) for python <2.6
+        return dir(self) # only valid python >=2.6, else use self.__dir__()
 
     def update(self, dictionary):
         """Extend dict.update() to handle *named tags*."""
@@ -617,13 +610,7 @@ class FileDataset(Dataset):
             self.filename = filename_or_obj
             self.fileobj_type = file
         else:
-            # Note next line uses __class__ due to gzip using old-style classes 
-            #    until after python2.5 (or 2.6?)
-            # Should move to using type(filename_or_obj) when possible
-            # See http://docs.python.org/reference/datamodel.html: 
-            #   "if x is an instance of an old-style class, then x .__class__ 
-            #   designates the class of x, but type(x) is always <type 'instance'>"
-            self.fileobj_type = filename_or_obj.__class__
+            self.fileobj_type = filename_or_obj.__class__ # use __class__ python <2.7?; http://docs.python.org/reference/datamodel.html
             if getattr(filename_or_obj, "name", False):
                 self.filename = filename_or_obj.name  
             elif getattr(filename_or_obj, "filename", False): #gzip python <2.7?

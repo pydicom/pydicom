@@ -10,7 +10,7 @@
    is_retired is 'Retired' if true, else is ''
 """
 #
-# Copyright 2008, Darcy Mason
+# Copyright 2008-2012, Darcy Mason
 # This file is part of pydicom.
 # See the license.txt file for license information.
 
@@ -26,7 +26,7 @@ def write_dict(f, dict_name, attributes):
     f.write("}\n")
 
 if __name__ == "__main__":
-    import csv  # comma-separated value module, python >=2.3
+    import csv  # comma-separated value module
 
     csv_reader = csv.reader(file(csv_filename, 'rb'))
 

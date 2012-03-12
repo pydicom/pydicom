@@ -1,6 +1,6 @@
 # time_test.py
 """Try reading large sets of files, profiling how much time it takes"""
-# Copyright (c) 2008 Darcy Mason
+# Copyright (c) 2008-2012 Darcy Mason
 # This file is part of pydicom, relased under an MIT license.
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
@@ -34,7 +34,7 @@ from dicom.filereader import read_partial, _at_pixel_data
 from cStringIO import StringIO
 
 from time import time
-import cProfile # python >=2.5
+import cProfile 
 import pstats
 import sys
 import random

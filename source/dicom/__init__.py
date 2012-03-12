@@ -32,6 +32,10 @@ http://groups.google.com/group/pydicom
 #  Turn off debugging with
 #       dicom.debug(False)
 
+import sys
+if sys.version_info < (2,6,0):
+    raise ImportError, "pydicom > 0.9.7 requires python 2.6 or later"
+   
 import logging
 
 def debug(debug_on=True):

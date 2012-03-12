@@ -26,7 +26,6 @@ Usage:
 >>> pydicom_Tkinter.show_image(df)
 ''' 
 
-from __future__ import with_statement # for python 2.5
 import Tkinter
 import tempfile
 import os
