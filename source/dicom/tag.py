@@ -19,28 +19,25 @@ def Tag(arg, arg2=None):
             arg = (int(arg[0], 16), int(arg[1], 16))
         if arg[0] > 0xFFFF or arg[1] > 0xFFFF:
             raise OverflowError, "Groups and elements of tags must each be <=2 byte integers"
-        long_value = long(arg[0])<<16 | arg[1]  # long needed for python <2.4 where shift could make int negative
+        long_value = (arg[0] << 16) | arg[1] 
     elif isinstance(arg, basestring):
         raise ValueError, "Tags cannot be instantiated from a single string"
     else: # given a single number to use as a tag, as if (group, elem) already joined to a long
-        long_value = long(hex(arg), 16) # needed in python <2.4 to avoid negative ints
+        long_value = arg
         if long_value > 0xFFFFFFFFL:
-            raise OverflowError, "Tags are limited to 32-bit length; tag %r, long value %r" % (arg, long_value)
+            raise OverflowError, "Tags are limited to 32-bit length; tag %r is not valid" % (arg,)
     return BaseTag(long_value)
     
   
 class BaseTag(long):
     """Class for storing the dicom (group, element) tag"""
-    # Store the 4 bytes of a dicom tag as a python long (arbitrary length, not like C-language long).
+    # Store the 4 bytes of a dicom tag as an arbitary length integer 
+    #      (python "long" in python <3; "int" for python >=3).
     # NOTE: logic (in write_AT of filewriter at least) depends on this 
     #           NOT being a tuple, for checks if a value is a multi-value element
-    # Using python int's may be different on different hardware platforms.
-    # Simpler to deal with one number and separate to (group, element) when necessary.
-    # Also can deal with python differences in handling ints starting in python 2.4,
-    #   by forcing all inputs to a proper long where the differences go away
+    # Deal with one number and separate to (group, element) when necessary.
     
     # Override comparisons so can convert "other" to Tag as necessary
-    # Changes this from __cmp__ to using __lt__ and __eq__ for python 3.
     #   See Ordering Comparisons at http://docs.python.org/dev/3.0/whatsnew/3.0.html
     
     def __lt__(self, other):
@@ -60,7 +57,6 @@ class BaseTag(long):
                 other = Tag(other)
             except:
                 raise TypeError, "Cannot compare Tag with non-Tag item"
-        # print "self %r; other %r" % (long(self), long(other))
         return long(self) == long(other)
 
     def __ne__(self, other):
@@ -71,8 +67,7 @@ class BaseTag(long):
             except:
                 raise TypeError, "Cannot compare Tag with non-Tag item"
         return long(self) != long(other)
-
-    
+   
     # For python 3, any override of __cmp__ or __eq__ immutable requires
     #   explicit redirect of hash function to the parent class 
     #   See http://docs.python.org/dev/3.0/reference/datamodel.html#object.__hash__
@@ -104,8 +99,7 @@ class BaseTag(long):
 
 def TupleTag(group_elem):
     """Fast factory for BaseTag object with known safe (group, element) tuple"""
-    # long needed for python <2.4 where shift could make int negative
-    long_value = long(group_elem[0])<<16 | group_elem[1]  
+    long_value = group_elem[0] << 16 | group_elem[1]  
     return BaseTag(long_value)
 
 # Define some special tags:
