@@ -9,7 +9,7 @@
    as masks that can be tested later for tag lookups that didn't work
 """
 #
-# Copyright 2008, Darcy Mason
+# Copyright 2008-2012, Darcy Mason
 # This file is part of pydicom.
 # See the license.txt file
 
@@ -28,7 +28,7 @@ def write_dict(f, dict_name, attributes, tagIsString):
     f.write("}\n")
 
 if __name__ == "__main__":
-    import csv  # comma-separated value module, python >=2.3
+    import csv  # comma-separated value module
 
     csv_reader = csv.reader(file(csv_filename, 'rb'))
 

@@ -2,10 +2,6 @@
 # all.sh
 echo shell_all
 echo run pydicom test suite on all supported python versions
-echo ------- python 2.4 ------------
-python2.4 run_tests.py
-echo ------- python 2.5 ------------
-python2.5 run_tests.py
 echo ------- python 2.6 ------------
 python2.6 run_tests.py
 echo ------- python 2.7 ------------
@@ -15,10 +11,6 @@ python2.7 run_tests.py
 echo -
 echo -----------------
 echo Check locations, make sure not pointing to old pydicom code:
-echo Python 2.4
-python2.4 -c "import dicom;print dicom.__file__"
-echo Python 2.5
-python2.5 -c "import dicom;print dicom.__file__"
 echo Python 2.6
 python2.6 -c "import dicom;print dicom.__file__"
 echo Python 2.7

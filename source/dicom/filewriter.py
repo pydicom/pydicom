@@ -80,21 +80,10 @@ def write_number_string(fp, data_element, padding = ' '):
     # unchanged data elements are written with exact string as when read from file 
     val = data_element.value   
     if isinstance(val, (list, tuple)):
-        # XXX python >2.4 val = "\\".join([x.original_string if hasattr(x, 'original_string')
-                        #  else str(x) for x in val])
-        newval = []
-        for x in val:
-            if hasattr(x, 'original_string'):
-                newval.append(x.original_string)
-            else:
-                newval.append(str(x))
-        val = "\\".join(newval)
+        val = "\\".join((x.original_string if hasattr(x, 'original_string')
+                                           else str(x) for x in val))
     else:
-        # XXX python>2.4 val = val.original_string if hasattr(val, 'original_string') else str(val)
-        if hasattr(val, 'original_string'):
-            val = val.original_string
-        else:
-            val =  str(val)
+        val = val.original_string if hasattr(val, 'original_string') else str(val)
     if len(val) % 2 != 0:
         val = val + padding   # pad to even length
     fp.write(val)

@@ -22,10 +22,8 @@ try:
     from os import stat
 except:
     stat_available = False
-try:
-    from os import SEEK_CUR
-except ImportError: # SEEK_CUR not available in python < 2.5
-    SEEK_CUR = 1
+
+from os import SEEK_CUR
 
 import dicom.UID # for Implicit/Explicit / Little/Big Endian transfer syntax UIDs
 from dicom.filebase import DicomFile, DicomFileLike

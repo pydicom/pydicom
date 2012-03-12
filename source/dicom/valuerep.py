@@ -125,13 +125,8 @@ def MultiString(val, valtype=str):
     if val and (val.endswith(' ') or val.endswith('\x00')):
         val = val[:-1]
 
-    # XXX --> simpler version python > 2.4   splitup = [valtype(x) if x else x for x in val.split("\\")]
-    splitup = []
-    for subval in val.split("\\"):
-        if subval:
-            splitup.append(valtype(subval))
-        else:
-            splitup.append(subval)
+    splitup = [valtype(x) if x else x for x in val.split("\\")]
+
     if len(splitup) == 1:
         return splitup[0]
     else:
