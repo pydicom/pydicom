@@ -288,10 +288,6 @@ def write_file(filename, dataset, WriteLikeOriginal=True):
     finally:
         fp.close()
         
-
-WriteFile = write_file   # for backwards compatibility version <=0.9.2
-writefile = write_file   # forgive user for missing underscore
-        
 # Map each VR to a function which can write it
 # for write_numbers, the Writer maps to a tuple (function, struct_format)
 #                                  (struct_format is python's struct module format)

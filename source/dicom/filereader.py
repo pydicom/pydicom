@@ -36,13 +36,13 @@ from dicom.sequence import Sequence
 from dicom.misc import size_in_bytes
 from dicom.fileutil import absorb_delimiter_item, read_undefined_length_value
 from dicom.fileutil import length_of_undefined_length
-from struct import unpack
+from struct import Struct, unpack
 from sys import byteorder
 sys_is_little_endian = (byteorder == 'little')
 
 class InvalidDicomError(Exception):
     """Exception that is raised when the the file does not seem
-    to be a valid dicom file. This is the case when the three
+    to be a valid dicom file. This is the case when the four
     characters "DICM" are not present at position 128 in the file.
     (According to the dicom specification, each dicom file should 
     have this.)
@@ -55,42 +55,11 @@ class InvalidDicomError(Exception):
             args = ('The specified file is not a valid DICOM file.',)
         Exception.__init__(self, *args)
 
-def open_dicom(filename, force=False):
-    """Iterate over data elements for full control of the reading process.
-    
-    **Note**: This function is possibly unstable, as it uses the DicomFile class,
-    which has been removed in other parts of pydicom in favor of simple files. It
-    needs to be updated (or may be removed in future versions of pydicom).
-    
-    Use ``read_file`` or ``read_partial`` for most purposes. This function 
-    is only needed if finer control of the reading process is required.
-    
-    :param filename: A string containing the file path/name.
-    :returns: an iterator which yields one data element each call.
-        First, the file_meta data elements are returned, then the data elements
-        for the DICOM dataset stored in the file.
-
-    Similar to opening a file using python open() and iterating by line, 
-    for example like this::
-
-        from dicom.filereader import open_dicom
-        from dicom.dataset import Dataset
-        ds = Dataset()
-        for data_element in open_dicom("CT_small.dcm"):
-            if meets_some_condition(data_element):
-                ds.add(data_element)
-            if some_other_condition(data_element):
-                break
-    
-    """
-
-    return DicomIter(DicomFile(filename,'rb'), force=force)
-
 class DicomIter(object):
     """Iterator over DICOM data elements created from a file-like object
     """
     def __init__(self, fp, stop_when=None, force=False):
-        """Read the preambleand meta info, prepare iterator for remainder
+        """Read the preamble and meta info, prepare iterator for remainder
 
         fp -- an open DicomFileLike object, at start of file
 
@@ -176,22 +145,24 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian, stop_when=None,
     #    into the individual cases, and not have to check them again for each
     #    data element
 
-    # Make local variables so have faster lookup
-    fp_read = fp.read
-    fp_tell = fp.tell
-    logger_debug = logger.debug
-    debugging = dicom.debugging
-    
     if is_little_endian:
         endian_chr = "<"
     else:
         endian_chr = ">"
     if is_implicit_VR:
-        unpack_format = endian_chr + "HHL" # XXX in python >=2.5, can do struct.Struct to save time
+        element_struct = Struct(endian_chr + "HHL")
     else: # Explicit VR
-        unpack_format = endian_chr + "HH2sH" # tag, VR, 2-byte length (or 0 if special VRs)
-        extra_length_format = endian_chr + "L"  # for special VRs
-        
+        element_struct = Struct(endian_chr + "HH2sH")   # tag, VR, 2-byte length (or 0 if special VRs)
+        extra_length_struct = Struct(endian_chr + "L") # for special VRs
+        extra_length_unpack = extra_length_struct.unpack # one less lookup for speed
+
+    # Make local variables so have faster lookup
+    fp_read = fp.read
+    fp_tell = fp.tell
+    logger_debug = logger.debug
+    debugging = dicom.debugging
+    element_struct_unpack = element_struct.unpack
+    
     while True:
         # Read tag, VR, length, get ready to read value
         bytes_read = fp_read(8)        
@@ -201,12 +172,12 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian, stop_when=None,
         
         if is_implicit_VR:
             VR = None # must reset each time -- may have looked up on last iteration (e.g. SQ)
-            group, elem, length = unpack(unpack_format, bytes_read)
+            group, elem, length = element_struct_unpack(bytes_read)
         else: # explicit VR
-            group, elem, VR, length = unpack(unpack_format, bytes_read)
+            group, elem, VR, length = element_struct_unpack(bytes_read)
             if VR in ('OB','OW','OF','SQ','UN', 'UT'):
                 bytes_read = fp_read(4)
-                length = unpack(extra_length_format, bytes_read)[0]
+                length = extra_length_unpack(bytes_read)[0]
                 if debugging: debug_msg += " " + bytes2hex(bytes_read)
         if debugging:
             debug_msg = "%-47s  (%04x, %04x)" % (debug_msg, group, elem)
@@ -563,9 +534,6 @@ def read_file(fp, defer_size=None, stop_before_pixels=False, force=False):
             fp.close()
     # XXX need to store transfer syntax etc.
     return dataset
-
-ReadFile = read_file    # For backwards compatibility pydicom version <=0.9.2
-readfile = read_file    # forgive a missing underscore
 
 def data_element_offset_to_value(is_implicit_VR, VR):
     """Return number of bytes from start of data element to start of value"""
