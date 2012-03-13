@@ -93,7 +93,7 @@ def write_data_element(fp, data_element):
     fp.write_tag(data_element.tag)
 
     VR = data_element.VR
-    if fp.is_explicit_VR:
+    if not fp.is_implicit_VR:
         if len(VR) != 2:
             msg = "Cannot write ambiguous VR of '%s' for data element with tag %r." % (VR, data_element.tag)
             msg += "\nSet the correct VR before writing, or use an implicit VR transfer syntax"
@@ -105,7 +105,7 @@ def write_data_element(fp, data_element):
         raise NotImplementedError, "write_data_element: unknown Value Representation '%s'" % VR
 
     length_location = fp.tell() # save location for later.
-    if fp.is_explicit_VR and VR not in ['OB', 'OW', 'OF', 'SQ', 'UT', 'UN']:
+    if not fp.is_implicit_VR and VR not in ['OB', 'OW', 'OF', 'SQ', 'UT', 'UN']:
         fp.write_US(0)  # Explicit VR length field is only 2 bytes
     else:
         fp.write_UL(0xFFFFFFFFL)   # will fill in real length value later if not undefined length item
@@ -123,7 +123,7 @@ def write_data_element(fp, data_element):
         is_undefined_length = True
     location = fp.tell()
     fp.seek(length_location)
-    if fp.is_explicit_VR and VR not in ['OB', 'OW', 'OF', 'SQ', 'UT', 'UN']:
+    if not fp.is_implicit_VR and VR not in ['OB', 'OW', 'OF', 'SQ', 'UT', 'UN']:
         fp.write_US(location - length_location - 2)  # 2 is length of US
     else:
         # write the proper length of the data_element back in the length slot, unless is SQ with undefined length.
@@ -199,7 +199,7 @@ def _write_file_meta_info(fp, meta_dataset):
     # File meta info is always LittleEndian, Explicit VR. After will change these
     #    to the transfer syntax values set in the meta info
     fp.is_little_endian = True
-    fp.is_explicit_VR = True
+    fp.is_implicit_VR = False
 
     if Tag((2,1)) not in meta_dataset:
         meta_dataset.add_new((2,1), 'OB', "\0\1")   # file meta information version
@@ -269,7 +269,7 @@ def write_file(filename, dataset, WriteLikeOriginal=True):
             file_meta.add_new((2, 0x10), 'UI', ImplicitVRLittleEndian)
         elif dataset.is_little_endian and not dataset.is_implicit_VR:
             file_meta.add_new((2, 0x10), 'UI', ExplicitVRLittleEndian)
-        elif dataset.is_big_endian and not dataset.is_implicit_VR:
+        elif not dataset.is_little_endian and not dataset.is_implicit_VR:
             file_meta.add_new((2, 0x10), 'UI', ExplicitVRBigEndian)
         else:
             raise NotImplementedError, "pydicom has not been verified for Big Endian with Implicit VR"

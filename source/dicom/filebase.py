@@ -19,7 +19,7 @@ class DicomIO(object):
     defer_size = None     # default
     
     def __init__(self, *args, **kwargs):
-        self._ImplicitVR = True   # start with this by default
+        self._implicit_VR = True   # start with this by default
     def __del__(self):
         self.close()
     def read_le_tag(self):
@@ -92,43 +92,36 @@ class DicomIO(object):
         """Return an unsigned long read with big endian byte order"""
         return unpack(">L", self.read(4))[0]
 
-    # Set up properties BigEndian, LittleEndian, ImplicitVR, ExplicitVR.
+    # Set up properties is_little_endian and is_implicit_VR
     # Big/Little Endian changes functions to read unsigned short or long, e.g. length fields etc
-    def _setLittleEndian(self, value):
-        self._LittleEndian = value
-        if value:  # LittleEndian
+    @property    
+    def is_little_endian(self):
+        return self._little_endian
+
+    @is_little_endian.setter 
+    def is_little_endian(self, value):
+        self._little_endian = value
+        if value:  # Little Endian
             self.read_US = self.read_leUS
             self.read_UL = self.read_leUL
             self.write_US = self.write_leUS
             self.write_UL = self.write_leUL
             self.read_tag = self.read_le_tag
-        else:      # BigEndian
+        else:      # Big Endian
             self.read_US = self.read_beUS
             self.read_UL = self.read_beUL
             self.write_US = self.write_beUS
             self.write_UL = self.write_beUL
             self.read_tag = self.read_be_tag
-        
-    def _getLittleEndian(self):
-        return self._LittleEndian
-    def _setBigEndian(self, value):
-        self.is_little_endian = not value # note: must use self.is_little_endian not self._LittleEndian
-    def _getBigEndian(self):
-        return not self.is_little_endian
-    def _getImplicitVR(self):
-        return self._ImplicitVR
-    def _setImplicitVR(self, value):
-        self._ImplicitVR = value
-    def _setExplicitVR(self, value):
-        self.is_implicit_VR = not value
-    def _getExplicitVR(self):
-        return not self.is_implicit_VR
+
+    @property
+    def is_implicit_VR(self):
+        return self._implicit_VR
     
-    is_little_endian = property(_getLittleEndian, _setLittleEndian)
-    is_big_endian =    property(_getBigEndian, _setBigEndian)
-    is_implicit_VR =   property(_getImplicitVR, _setImplicitVR)
-    is_explicit_VR =   property(_getExplicitVR, _setExplicitVR)
-        
+    @is_implicit_VR.setter
+    def is_implicit_VR(self, value):
+        self._implicit_VR = value
+           
 class DicomFileLike(DicomIO):
     def __init__(self, file_like_obj):
         self.parent = file_like_obj
