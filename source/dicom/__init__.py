@@ -61,11 +61,10 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 debug(False) # force level=WARNING, in case logging default is set differently (issue 102)
 
-# For convenience, import the read_file and write_file functions (most used)  into the "dicom" namespace.
-from filereader import read_file, ReadFile  # latter one for backwards compatibility; remove later
-from filewriter import write_file, WriteFile # ditto
+# For convenience, import the read_file and write_file functions (most used)  
+#     into the "dicom" namespace.
+from filereader import read_file
+from filewriter import write_file
 
 __version__ = "1.0a"
 __version_info__ = (1,0,0)
-
-
