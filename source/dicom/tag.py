@@ -79,10 +79,9 @@ class BaseTag(long):
 
     __repr__ = __str__
     
-    # Property group
-    def getGroup(self):
+    @property
+    def group(self):
         return self >>16
-    group = property(getGroup)
 
     # Property elem
     def getElem(self):

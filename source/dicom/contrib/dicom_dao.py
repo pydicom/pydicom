@@ -242,23 +242,22 @@ def _set_meta_info_dcm(dcm):
     """
     TransferSyntax = dcm.file_meta.TransferSyntaxUID
     if TransferSyntax == dicom.UID.ExplicitVRLittleEndian:
-        dcm.is_explicit_vr = True
+        dcm.is_implicit_vr = False
         dcm.is_little_endian = True # This line not in PyDicom
     elif TransferSyntax == dicom.UID.ImplicitVRLittleEndian:
         dcm.is_implicit_vr = True
         dcm.is_little_endian = True
     elif TransferSyntax == dicom.UID.ExplicitVRBigEndian:
-        dcm.is_explicit_vr = True
-        dcm.is_big_endian = True
+        dcm.is_implicit_vr = False
         dcm.is_little_endian = False
     elif TransferSyntax == dicom.UID.DeflatedExplicitVRLittleEndian:
-        dcm.is_explicit_vr = True   # Deleted lines above as it relates
+        dcm.is_implicit_vr = False   # Deleted lines above as it relates
         dcm.is_little_endian = True # to reading compressed file data.
     else:
         # Any other syntax should be Explicit VR Little Endian,
         #   e.g. all Encapsulated (JPEG etc) are ExplVR-LE by 
         #   Standard PS 3.5-2008 A.4 (p63)
-        dcm.is_explicit_vr = True
+        dcm.is_implicit_vr = False
         dcm.is_little_endian = True
 
 def pydicom2json(dcm):

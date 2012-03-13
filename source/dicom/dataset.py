@@ -302,14 +302,6 @@ class Dataset(dict):
         """Extend dict.has_key() to handle *named tags*."""
         return self.__contains__(key)
 
-    # is_big_endian property
-    def _getBigEndian(self):
-        return not self.is_little_endian
-    
-    def _setBigEndian(self, value):
-        self.is_little_endian = not value
-    is_big_endian = property(_getBigEndian, _setBigEndian)
-
     def __iter__(self):
         """Method to iterate through the dataset, returning data_elements.
         e.g.:

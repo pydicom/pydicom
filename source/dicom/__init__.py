@@ -65,7 +65,7 @@ debug(False) # force level=WARNING, in case logging default is set differently (
 from filereader import read_file, ReadFile  # latter one for backwards compatibility; remove later
 from filewriter import write_file, WriteFile # ditto
 
-__version__ = "0.9.7"
-__version_info__ = (0,9,7)
+__version__ = "1.0a"
+__version_info__ = (1,0,0)
 
 

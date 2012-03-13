@@ -113,10 +113,13 @@ class DataElement(object):
         self.file_tell = file_value_tell
         self.is_undefined_length = is_undefined_length
 
-    def _getvalue(self):
-        """Get method for 'value' property"""
+    @property
+    def value(self):
+        """The value (possibly multiple values) of this data_element"""
         return self._value
-    def _setvalue(self, val):
+    
+    @value.setter
+    def value(self, val):
         """Set method for 'value' property"""
         # Check if is a string with multiple values separated by '\'
         # If so, turn them into a list of separate strings
@@ -127,17 +130,13 @@ class DataElement(object):
                 val = val.split(_backslash)
         self._value = self._convert_value(val)
 
-    value = property(_getvalue, _setvalue, doc=
-            """The value (possibly multiple values) of this data_element.""")
-
-    def _getVM(self):
-        """Get method for VM property"""
+    @property
+    def VM(self):
+        """The number of values in the data_element's 'value'"""
         if isMultiValue(self.value):
             return len(self.value)
         else:
             return 1
-    VM = property(_getVM, doc =
-            """The number of values in the data_element's 'value'""")
 
     def _convert_value(self, val):
         """Convert Dicom string values if possible to e.g. numbers. Handle the case
@@ -192,7 +191,8 @@ class DataElement(object):
                             self.description()[:self.descripWidth], repVal)
         return s
 
-    def _get_repval(self):
+    @property
+    def repval(self):
         """Return a str representation of the current value for use in __str__"""
         if (self.VR in ['OB', 'OW', 'OW/OB', 'OW or OB', 'OB or OW', 'US or SS or OW', 'US or SS']
                   and len(self.value) > self.maxBytesToDisplay):
@@ -206,7 +206,6 @@ class DataElement(object):
         else:
             repVal = repr(self.value)  # will tolerate unicode too
         return repVal
-    repval = property(_get_repval)
 
     def __unicode__(self):
         """Return unicode representation of this data_element"""
@@ -225,9 +224,9 @@ class DataElement(object):
         except TypeError:
             raise TypeError, "DataElement value is unscriptable (not a Sequence)"
 
-    def _get_name(self):
+    @property
+    def name(self):
         return self.description()
-    name = property(_get_name)
 
     def description(self):
         """Return the DICOM dictionary description for this dicom tag."""
@@ -282,23 +281,25 @@ class DeferredDataElement(DataElement):
         self.file_mtime = file_mtime
         self.data_element_tell = data_element_tell
         self.length = length
-    def _get_repval(self):
+    
+    @property
+    def repval(self):
         if self._value is None:
             return "Deferred read: length %d" % self.length
         else:
-            return DataElement._get_repval(self)
-    repval = property(_get_repval)
+            return DataElement.repval.fget(self)
 
-    def _getvalue(self):
+    @property
+    def value(self):
         """Get method for 'value' property"""
         # Must now read the value if haven't already
         if self._value is None:
             self.read_value()
-        return DataElement._getvalue(self)
-    def _setvalue(self, val):
-        DataElement._setvalue(self, val)
-    value = property(_getvalue, _setvalue)
+        return DataElement.value.fget(self)
 
+    @value.setter
+    def value(self, val):
+        DataElement.value.fset(self, val)
 
 RawDataElement = namedtuple('RawDataElement',
                   'tag VR length value value_tell is_implicit_VR is_little_endian')
@@ -324,9 +325,3 @@ def DataElement_from_raw(raw_data_element):
         raise NotImplementedError, "%s in tag %r" % (str(e), raw.tag)
     
     return DataElement(raw.tag, VR, value, raw.value_tell, raw.length==0xFFFFFFFFL)
-        
-class Attribute(DataElement):
-    """Deprecated -- use DataElement instead"""
-    def __init__(self, tag, VR, value, file_value_tell=None):
-        warnings.warn("The Attribute class is deprecated and will be removed in pydicom 1.0. Use DataElement", DeprecationWarning)
-        DataElement.__init__(self, tag, VR, value, file_value_tell)
