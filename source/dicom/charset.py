@@ -6,7 +6,7 @@
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
 #
-
+from __future__ import absolute_import
 import logging
 logger = logging.getLogger('pydicom')
 

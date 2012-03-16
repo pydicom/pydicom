@@ -1,6 +1,8 @@
 # datadict.py
 # -*- coding: utf-8 -*-
 """Access dicom dictionary information"""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 #
 # Copyright (c) 2008-2011 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
@@ -77,14 +79,20 @@ def dictionary_keyword(tag):
     return get_entry(tag)[4]
 
 import string
-normTable = string.maketrans('','')
+
+# Set up a translation table for "cleaning" DICOM descriptions
+#    for backwards compatibility pydicom < 0.9.7 (pre-DICOM keywords)
+# Translation is different with unicode - see .translate() at
+#        http://docs.python.org/library/stdtypes.html#string-methods
+chars_to_remove = r""" !@#$%^&*(),;:.?\|{}[]+-="'’/"""
+translate_table = dict((ord(char), None) for char in chars_to_remove)
 
 def keyword_for_tag(tag):
     """Return the DICOM keyword for the given tag. Replaces old CleanName() 
     method using the 2011 DICOM standard keywords instead.
     
     Will return GroupLength for group length tags,
-    and returns blank ("") if the tag doesn't exist in the dictionary.
+    and returns empty string ("") if the tag doesn't exist in the dictionary.
     """
     try:
         return dictionary_keyword(tag)
@@ -106,9 +114,9 @@ def CleanName(tag):
             return ""
     s = dictionary_description(tag)    # Descriptive name in dictionary
     # remove blanks and nasty characters
-    s = s.translate(normTable, r""" !@#$%^&*(),;:.?\|{}[]+-="'’/""")
+    s = s.translate(translate_table)
     
-    # Take "Sequence" out of name as more natural sounding
+    # Take "Sequence" out of name (pydicom < 0.9.7)
     # e..g "BeamSequence"->"Beams"; "ReferencedImageBoxSequence"->"ReferencedImageBoxes"
     # 'Other Patient ID' exists as single value AND as sequence so check for it and leave 'Sequence' in
     if dictionaryVR(tag) == "SQ" and not s.startswith("OtherPatientIDs"):
