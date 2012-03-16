@@ -24,6 +24,9 @@ work with most directly.
 4. Questions/comments etc can be directed to the pydicom google group at
 http://groups.google.com/group/pydicom
 """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 # Set up logging system for the whole package. 
 # In each module, set logger=logging.getLogger('pydicom')  and the same instance will be used by all
 # At command line, turn on debugging for all pydicom functions with:
@@ -63,8 +66,8 @@ debug(False) # force level=WARNING, in case logging default is set differently (
 
 # For convenience, import the read_file and write_file functions (most used)  
 #     into the "dicom" namespace.
-from filereader import read_file
-from filewriter import write_file
+from .filereader import read_file
+from .filewriter import write_file
 
 __version__ = "1.0a"
 __version_info__ = (1,0,0)
