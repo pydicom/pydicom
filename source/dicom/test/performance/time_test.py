@@ -104,7 +104,7 @@ if __name__ == "__main__":
     print "Confirming file read worked -- check for data elements near end"
     try:
         image_sizes = [len(ds.PixelData) for ds in datasets]
-    except Exception, e:
+    except Exception as e:
         print "Failed to access dataset data for all files\nError:" + str(e)
     else:
         print "Reads checked ok."

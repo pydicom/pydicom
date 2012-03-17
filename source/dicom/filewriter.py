@@ -41,7 +41,7 @@ def write_numbers(fp, data_element, struct_format):
         else:
             for val in value:
                 fp.write(pack(format_string, val))
-    except Exception, e:
+    except Exception as e:
         raise IOError, "%s\nfor data_element:\n%s" % (str(e), str(data_element))
 
 def write_OBvalue(fp, data_element):
