@@ -25,7 +25,7 @@ class RawReaderExplVRTests(unittest.TestCase):
         infile = StringIO(hex2str("02 00 01 00 4f 42 00 00 02 00 00 00 00 01"))
         expected = ((2,1), 'OB', 2, '\00\01', 0xc, False, True)
         de_gen = data_element_generator(infile, is_implicit_VR=False, is_little_endian=True)
-        got = de_gen.next()
+        got = next(de_gen)
         msg_loc = "in read of Explicit VR='OB' data element (long length format)"
         self.assertEqual(got, expected, "Expected: %r, got %r in %s" % (expected, got, msg_loc))
         # (0002,0002) OB 2-byte-reserved 4-byte-length, value 0x00 0x01
@@ -35,7 +35,7 @@ class RawReaderExplVRTests(unittest.TestCase):
         infile = StringIO(hex2str("08 00 2a 21 49 53 02 00 31 20"))
         expected = ((8,0x212a), 'IS', 2, '1 ', 0x8, False, True)
         de_gen = data_element_generator(infile, is_implicit_VR=False, is_little_endian=True)
-        got = de_gen.next()
+        got = next(de_gen)
         msg_loc = "in read of Explicit VR='IS' data element (short length format)"
         self.assertEqual(got, expected, "Expected: %r, got %r in %s" % (expected, got, msg_loc))
     def testExplVRLittleEndianUndefLength(self):
@@ -48,7 +48,7 @@ class RawReaderExplVRTests(unittest.TestCase):
         infile = StringIO(hex2str(bytes))
         expected = ((0x7fe0,0x10), 'OB', 0xffffffffL, 'ABCDEFGHIJ', 0xc, False, True)
         de_gen = data_element_generator(infile, is_implicit_VR=False, is_little_endian=True)
-        got = de_gen.next()
+        got = next(de_gen)
         msg_loc = "in read of undefined length Explicit VR ='OB' short value)"
         self.assertEqual(got, expected, "Expected: %r, got %r in %s" % (expected, got, msg_loc))
 
@@ -60,7 +60,7 @@ class RawReaderExplVRTests(unittest.TestCase):
             infile = StringIO(hex2str(bytes))
             expected = len('ABCDEFGHIJ'+'\0'*multiplier)
             de_gen = data_element_generator(infile, is_implicit_VR=False, is_little_endian=True)
-            got = de_gen.next()
+            got = next(de_gen)
             got_len = len(got.value)
             msg_loc = "in read of undefined length Explicit VR ='OB' with 'multiplier' %d" % multiplier
             self.assertEqual(expected, got_len, "Expected value length %d, got %d in %s" % (expected, got_len, msg_loc))
@@ -77,7 +77,7 @@ class RawReaderImplVRTests(unittest.TestCase):
         infile = StringIO(hex2str("08 00 2a 21 02 00 00 00 31 20"))
         expected = ((8,0x212a), None, 2, '1 ', 0x8, True, True)
         de_gen = data_element_generator(infile, is_implicit_VR=True, is_little_endian=True)
-        got = de_gen.next()
+        got = next(de_gen)
         msg_loc = "in read of Implicit VR='IS' data element (short length format)"
         self.assertEqual(got, expected, "Expected: %r, got %r in %s" % (expected, got, msg_loc))
     def testImplVRLittleEndianUndefLength(self):
@@ -90,7 +90,7 @@ class RawReaderImplVRTests(unittest.TestCase):
         infile = StringIO(hex2str(bytes))
         expected = ((0x7fe0,0x10), 'OW or OB', 0xffffffffL, 'ABCDEFGHIJ', 0x8, True, True)
         de_gen = data_element_generator(infile, is_implicit_VR=True, is_little_endian=True)
-        got = de_gen.next()
+        got = next(de_gen)
         msg_loc = "in read of undefined length Implicit VR ='OB' short value)"
         self.assertEqual(got, expected, "Expected: %r, got %r in %s" % (expected, got, msg_loc))
 
@@ -102,7 +102,7 @@ class RawReaderImplVRTests(unittest.TestCase):
             infile = StringIO(hex2str(bytes))
             expected = len('ABCDEFGHIJ'+'\0'*multiplier)
             de_gen = data_element_generator(infile, is_implicit_VR=True, is_little_endian=True)
-            got = de_gen.next()
+            got = next(de_gen)
             got_len = len(got.value)
             msg_loc = "in read of undefined length Implicit VR with 'multiplier' %d" % multiplier
             self.assertEqual(expected, got_len, "Expected value length %d, got %d in %s" % (expected, got_len, msg_loc))
@@ -129,13 +129,13 @@ class RawSequenceTests(unittest.TestCase):
         
         fp = StringIO(hex2str(bytes))
         gen = data_element_generator(fp, is_implicit_VR=True, is_little_endian=True)
-        raw_seq = gen.next()
+        raw_seq = next(gen)
         seq = convert_value("SQ", raw_seq)
         
         self.assert_(isinstance(seq, Sequence), "Did not get Sequence, got type '%s'" % type(seq))
         self.assert_(len(seq)==1, "Expected Sequence with single (empty) item, got %d item(s)" % len(seq))
         self.assert_(len(seq[0])==0, "Expected the sequence item (dataset) to be empty")
-        elem2 = gen.next()
+        elem2 = next(gen)
         self.assertEqual(elem2.tag, 0x0008103e, "Expected a data element after empty sequence item")
     
     def testImplVRLittleEndian_ExplicitLengthSeq(self):
@@ -166,7 +166,7 @@ class RawSequenceTests(unittest.TestCase):
                 
         infile = StringIO(hex2str(bytes))
         de_gen = data_element_generator(infile, is_implicit_VR=True, is_little_endian=True)
-        raw_seq = de_gen.next()
+        raw_seq = next(de_gen)
         seq = convert_value("SQ", raw_seq)
 
         # The sequence is parsed, but only into raw data elements. 
@@ -204,7 +204,7 @@ class RawSequenceTests(unittest.TestCase):
                 
         infile = StringIO(hex2str(bytes))
         de_gen = data_element_generator(infile, is_implicit_VR=True, is_little_endian=False)
-        raw_seq = de_gen.next()
+        raw_seq = next(de_gen)
         seq = convert_value("SQ", raw_seq)
 
         # The sequence is parsed, but only into raw data elements. 
@@ -252,7 +252,7 @@ class RawSequenceTests(unittest.TestCase):
                 
         infile = StringIO(hex2str(bytes))
         de_gen = data_element_generator(infile, is_implicit_VR=False, is_little_endian=False)
-        seq = de_gen.next()
+        seq = next(de_gen)
         # Note seq itself is not a raw data element. 
         #     The parser does parse undefined length SQ
 
