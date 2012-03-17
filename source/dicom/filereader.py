@@ -271,7 +271,7 @@ def read_dataset(fp, is_implicit_VR, is_little_endian, bytelength=None,
                                     stop_when, defer_size)
     try:
         while (bytelength is None) or (fp.tell()-fpStart < bytelength):
-            raw_data_element = de_gen.next()
+            raw_data_element = next(de_gen)
             # Read data elements. Stop on certain errors, but return what was already read
             tag = raw_data_element.tag
             if tag == (0xFFFE, 0xE00D): #ItemDelimiterTag --dataset is an item in a sequence
@@ -574,7 +574,7 @@ def read_deferred_data_element(fileobj_type, filename, timestamp, raw_data_elem)
                                         defer_size=None)
 
     # Read the data element and check matches what was stored before
-    data_elem = elem_gen.next()
+    data_elem = next(elem_gen)
     fp.close()
     if data_elem.VR != raw_data_elem.VR:
         raise ValueError, "Deferred read VR '%s' does not match original '%s'" % (data_elem.VR, raw_data_elem.VR)
