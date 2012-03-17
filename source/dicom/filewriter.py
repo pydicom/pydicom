@@ -17,6 +17,7 @@ from dicom.dataset import Dataset
 from dicom.dataelem import DataElement
 from dicom.tag import Tag, ItemTag, ItemDelimiterTag, SequenceDelimiterTag
 from dicom.sequence import Sequence
+from dicom.valuerep import extra_length_VRs
 
 def write_numbers(fp, data_element, struct_format):
     """Write a "value" of type struct_format from the dicom file.
@@ -99,7 +100,7 @@ def write_data_element(fp, data_element):
             msg += "\nSet the correct VR before writing, or use an implicit VR transfer syntax"
             raise ValueError, msg
         fp.write(VR)
-        if VR in ['OB', 'OW', 'OF', 'SQ', 'UT', 'UN']:
+        if VR in extra_length_VRs:
             fp.write_US(0)   # reserved 2 bytes
     if VR not in writers:
         raise NotImplementedError, "write_data_element: unknown Value Representation '%s'" % VR

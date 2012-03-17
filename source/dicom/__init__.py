@@ -27,6 +27,13 @@ http://groups.google.com/group/pydicom
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import sys
+in_python3 = False
+if sys.version_info < (2,6,0):
+    raise ImportError, "pydicom > 0.9.7 requires python 2.6 or later"
+elif sys.version_info > (3, 0):
+    in_python3 = True
+
 # Set up logging system for the whole package. 
 # In each module, set logger=logging.getLogger('pydicom')  and the same instance will be used by all
 # At command line, turn on debugging for all pydicom functions with:
@@ -34,11 +41,6 @@ from __future__ import unicode_literals
 #        dicom.debug()
 #  Turn off debugging with
 #       dicom.debug(False)
-
-import sys
-if sys.version_info < (2,6,0):
-    raise ImportError, "pydicom > 0.9.7 requires python 2.6 or later"
-   
 import logging
 
 def debug(debug_on=True):

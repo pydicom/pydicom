@@ -40,10 +40,12 @@ class DatasetTests(unittest.TestCase):
         ds = Dataset()
         ds.file_meta = Dataset()
         ds.PixelData = 'xyzlmnop'
+        def callable_pixel_array():
+            ds.pixel_array
         attribute_error_msg = "AttributeError in pixel_array property: " + \
                            "Dataset does not have attribute 'TransferSyntaxUID'"
         self.failUnlessExceptionArgs(attribute_error_msg,
-                        PropertyError, ds._get_pixel_array)
+                        PropertyError, callable_pixel_array)
         
         
     def dummy_dataset(self):

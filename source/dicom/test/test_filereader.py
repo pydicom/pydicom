@@ -242,7 +242,7 @@ class JPEG2000Tests(unittest.TestCase):
         self.assertEqual(got, expected, "JPEG200 file, Code Meaning got %s, expected %s" % (got, expected))
     def testJPEG2000PixelArray(self):
         """JPEG2000: Fails gracefully when uncompressed data is asked for......."""
-        self.assertRaises(NotImplementedError, self.jpeg._getPixelArray)
+        self.assertRaises(NotImplementedError, self.jpeg._get_pixel_array)
 
 class JPEGlossyTests(unittest.TestCase):
     def setUp(self):
@@ -254,7 +254,7 @@ class JPEGlossyTests(unittest.TestCase):
         self.assertEqual(got, expected, "JPEG-lossy file, Code Meaning got %s, expected %s" % (got, expected))
     def testJPEGlossyPixelArray(self):
         """JPEG-lossy: Fails gracefully when uncompressed data is asked for....."""
-        self.assertRaises(NotImplementedError, self.jpeg._getPixelArray)
+        self.assertRaises(NotImplementedError, self.jpeg._get_pixel_array)
 
 class JPEGlosslessTests(unittest.TestCase):
     def setUp(self):
@@ -266,7 +266,7 @@ class JPEGlosslessTests(unittest.TestCase):
         self.assertEqual(got, expected, "JPEG-lossless file, Code Meaning got %s, expected %s" % (got, expected))
     def testJPEGlosslessPixelArray(self):
         """JPEGlossless: Fails gracefully when uncompressed data is asked for..."""
-        self.assertRaises(NotImplementedError, self.jpeg._getPixelArray)
+        self.assertRaises(NotImplementedError, self.jpeg._get_pixel_array)
 
         # create an in-memory fragment
 class DeferredReadTests(unittest.TestCase):
