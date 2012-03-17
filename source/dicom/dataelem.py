@@ -323,7 +323,7 @@ def DataElement_from_raw(raw_data_element):
                 raise KeyError, "Unknown DICOM tag %s - can't look up VR" % str(raw.tag)    
     try:
         value = convert_value(VR, raw)
-    except NotImplementedError, e:
+    except NotImplementedError as e:
         raise NotImplementedError, "%s in tag %r" % (str(e), raw.tag)
     
     return DataElement(raw.tag, VR, value, raw.value_tell, raw.length==0xFFFFFFFFL)

@@ -378,7 +378,7 @@ def read_files(path, showProgress=False, readPixelData=False):
             dcm = dicom.read_file( filename, deferSize )
         except dicom.filereader.InvalidDicomError:
             continue # skip non-dicom file
-        except Exception, why:
+        except Exception as why:
             if showProgress is _progressCallback:
                 _progressBar.PrintMessage(str(why))
             else:

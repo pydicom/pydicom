@@ -280,10 +280,10 @@ def read_dataset(fp, is_implicit_VR, is_little_endian, bytelength=None,
 
     except StopIteration:
         pass
-    except EOFError, details:
+    except EOFError as details:
         logger.error(str(details) + " in file " +
                     getattr(fp, "name", "<no filename>")) # XXX is this visible enough to user code?
-    except NotImplementedError, details:
+    except NotImplementedError as details:
         logger.error(details)
 
     return Dataset(raw_data_elements)
@@ -480,7 +480,7 @@ def read_partial(fileobj, stop_when=None, defer_size=None, force=False):
     try:
         dataset = read_dataset(fileobj, is_implicit_VR, is_little_endian, 
                             stop_when=stop_when, defer_size=defer_size)
-    except EOFError, e:
+    except EOFError as e:
         pass  # error already logged in read_dataset
     return FileDataset(fileobj, dataset, preamble, file_meta_dataset, is_implicit_VR,
                         is_little_endian)

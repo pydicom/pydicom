@@ -120,7 +120,7 @@ class DicomCouch(dict):
         
         try: # Actually write to the db
             self._db[key] = jsn
-        except TypeError, type_error:
+        except TypeError as type_error:
             if str(type_error) == 'string indices must be integers, not str':
                 pass
         

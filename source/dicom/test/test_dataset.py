@@ -17,7 +17,7 @@ class DatasetTests(unittest.TestCase):
         # from http://stackoverflow.com/questions/88325/how-do-i-unit-test-an-init-method-of-a-python-class-with-assertraises
         try:
             callableObj(*args, **kwargs)
-        except excClass, excObj:
+        except excClass as excObj:
             return excObj # Actually return the exception object
         else:
             if hasattr(excClass,'__name__'): excName = excClass.__name__
