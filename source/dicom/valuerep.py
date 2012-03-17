@@ -17,7 +17,10 @@ if version_info[0] < 3:
 else:
     namebase = bytestring
     strbase = basestring
-    
+
+# For reading/writing data elements, these ones have longer format
+extra_length_VRs = (b'OB', b'OW', b'OF', b'SQ', b'UN', b'UT')
+
 def is_stringlike(name):
     """Return True if name is string-like."""
     try:
@@ -85,8 +88,6 @@ class DS(Decimal):
 class IS(int):
     """Derived class of int. Stores original integer string for exact rewriting 
     of the string originally read or stored.
-    
-    Don't use this directly; call the IS() factory function instead.
     """
     # Unlikely that str(int) will not be the same as the original, but could happen
     # with leading zeros.
@@ -213,7 +214,6 @@ class PersonNameUnicode(PersonNameBase, unicode):
                  of values in DICOM data element (0008,0005).
         """
         # Make the possible three character encodings explicit:        
-
         if not isinstance(encodings, list):
             encodings = [encodings]*3
         if len(encodings) == 2:

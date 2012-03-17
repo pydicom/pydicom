@@ -83,18 +83,16 @@ class BaseTag(long):
     def group(self):
         return self >>16
 
-    # Property elem
-    def getElem(self):
+    @property
+    def element(self):
+        """Return the element part of the (group,element) tag"""
         return self & 0xffff
-    elem  = property(getElem)
-    element = elem
+    elem = element # alternate syntax
    
-    # Property is_private
-    def getis_private(self):
-        """Private tags have an odd group number"""
+    @property
+    def is_private(self):
+        """Return a boolean to indicate whether the tag is a private tag (odd group number)"""
         return self.group % 2 == 1
-    is_private = property(getis_private)
-    isPrivate = is_private  # for backwards compatibility
 
 def TupleTag(group_elem):
     """Fast factory for BaseTag object with known safe (group, element) tuple"""

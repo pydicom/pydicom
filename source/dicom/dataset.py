@@ -290,18 +290,7 @@ class Dataset(dict):
             [(tag,data_element) for tag,data_element in self.items() if tag.group==group]
                       ))
         return ds
-    def GroupDataset(self, group):  # remove in v1.0
-        """Deprecated -- use group_dataset()"""
-        msg = ("Dataset.GroupDataset is deprecated and will be removed in pydicom 1.0."
-               " Use Dataset.group_dataset()")
-        warnings.warn(msg, DeprecationWarning)
-        self.add_new(tag, VR, value)
     
-    # dict.has_key removed in python 3. But should be ok to keep this.
-    def has_key(self, key):
-        """Extend dict.has_key() to handle *named tags*."""
-        return self.__contains__(key)
-
     def __iter__(self):
         """Method to iterate through the dataset, returning data_elements.
         e.g.:
@@ -319,7 +308,7 @@ class Dataset(dict):
         for tag in taglist:
             yield self[tag]
 
-    def _PixelDataNumpy(self):
+    def _pixel_data_numpy(self):
         """Return a NumPy array of the pixel data.
 
         NumPy is the most recent numerical package for python. It is used if available.
@@ -373,8 +362,8 @@ class Dataset(dict):
                 arr = arr.reshape(self.Rows, self.Columns)
         return arr
 
-    # PixelArray property
-    def _getPixelArray(self):
+    # Use by pixel_array property
+    def _get_pixel_array(self):
         # Check if pixel data is in a form we know how to make into an array
         # XXX uses file_meta here, should really only be thus for FileDataset
         if self.file_meta.TransferSyntaxUID not in NotCompressedPixelTransferSyntaxes :
@@ -382,24 +371,25 @@ class Dataset(dict):
 
         # Check if already have converted to a NumPy array
         # Also check if self.PixelData has changed. If so, get new NumPy array
-        alreadyHave = True
-        if not hasattr(self, "_PixelArray"):
-            alreadyHave = False
+        already_have = True
+        if not hasattr(self, "_pixel_array"):
+            already_have = False
         elif self._pixel_id != id(self.PixelData):
-            alreadyHave = False
-        if not alreadyHave:
-            self._PixelArray = self._PixelDataNumpy()
+            already_have = False
+        if not already_have:
+            self._pixel_array = self._pixel_data_numpy()
             self._pixel_id = id(self.PixelData) # is this guaranteed to work if memory is re-used??
-        return self._PixelArray
-    def _get_pixel_array(self):
+        return self._pixel_array
+    
+    @property
+    def pixel_array(self):
+        """Return the pixel data as a NumPy array"""
         try:
-            return self._getPixelArray()
+            return self._get_pixel_array()
         except AttributeError:
             t, e, tb = sys.exc_info()
             raise PropertyError("AttributeError in pixel_array property: " + \
                             e.args[0]), None, tb
-    pixel_array = property(_get_pixel_array)
-    PixelArray = pixel_array # for backwards compatibility -- remove in v1.0
 
     # Format strings spec'd according to python string formatting options
     #    See http://docs.python.org/library/stdtypes.html#string-formatting-operations

@@ -10,6 +10,8 @@ and a value.
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
 #
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import logging
 logger = logging.getLogger('pydicom')
@@ -21,6 +23,7 @@ from dicom.tag import Tag
 from dicom.UID import UID
 from dicom.valuerep import IS, DS, PersonName
 from decimal import Decimal
+from dicom import in_python3
 
 from collections import namedtuple
 
@@ -49,11 +52,10 @@ def isMultiValue(value):
 
 def isString(val):
     """Helper function: return True if val is a string."""
-    try:
-        val + ""
-    except:
-        return False
-    return True
+    if in_python3:
+        return isinstance(val, str) or isinstance(val, bytes)
+    else:
+        return isinstance(val, basestring)
 
 def isStringOrStringList(val):
     """Return true if val consists only of strings. val may be a list/tuple."""
@@ -65,7 +67,7 @@ def isStringOrStringList(val):
     else:  # single value - test for a string
         return isString(val)
 
-_backslash = "\\"  # double '\' because it is used as escape chr in Python
+_backslash = b"\\"  # double '\' because it is used as escape chr in Python
 
 class DataElement(object):
     """Contain and manipulate a Dicom data element, having a tag, VR, VM and value.
