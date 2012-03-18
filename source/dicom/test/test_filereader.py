@@ -74,16 +74,16 @@ class ReaderTests(unittest.TestCase):
         beam = plan.BeamSequence[0]
         cp0, cp1 = beam.ControlPointSequence # if not two controlpoints, then this would raise exception
 
-        self.assertEqual(beam.TreatmentMachineName, "unit001", "Incorrect unit name")
+        self.assertEqual(beam.TreatmentMachineName, b"unit001", "Incorrect unit name")
         self.assertEqual(beam.TreatmentMachineName, beam[0x300a, 0x00b2].value,
                 "beam TreatmentMachineName does not match the value accessed by tag number")
 
         got = cp1.ReferencedDoseReferenceSequence[0].CumulativeDoseReferenceCoefficient
-        expected = Decimal('0.9990268')
-        self.assert_(got == expected,
+        expected = Decimal('0.9990268')     
+        self.assertTrue(got == expected,
                 "Cum Dose Ref Coeff not the expected value (CP1, Ref'd Dose Ref")
         got = cp0.BeamLimitingDevicePositionSequence[0].LeafJawPositions
-        self.assert_(got[0] == Decimal('-100') and got[1] == Decimal('100.0'),
+        self.assertTrue(got[0] == Decimal('-100') and got[1] == Decimal('100.0'),
                 "X jaws not as expected (control point 0)")
     def testRTDose(self):
         """Returns correct values for sample data elements in test RT Dose file"""
@@ -107,9 +107,10 @@ class ReaderTests(unittest.TestCase):
                 "ImplementationClassUID does not match the value accessed by tag number")
         # (0020, 0032) Image Position (Patient)  [-158.13580300000001, -179.035797, -75.699996999999996]
         got = ct.ImagePositionPatient
-        expected = [Decimal('-158.135803'), Decimal('-179.035797'), Decimal('-75.699997')]
-        self.assert_(got == expected, "ImagePosition(Patient) values not as expected."
-                        "got %s, expected %s" % (got,expected))
+        expected = [Decimal('-158.135803'), Decimal('-179.035797'), Decimal('-75.699997')]   
+        self.assertTrue(got == expected, "ImagePosition(Patient) values not as expected."
+                        "got {0}, expected {1}".format(got,expected))
+
         self.assertEqual(ct.Rows, 128, "Rows not 128")
         self.assertEqual(ct.Columns, 128, "Columns not 128")
         self.assertEqual(ct.BitsStored, 16, "Bits Stored not 16")
@@ -156,8 +157,8 @@ class ReaderTests(unittest.TestCase):
         self.assertEqual(expected, got, msg)
         
         obs_seq0 = rtss.RTROIObservationsSequence[0] 
-        got = obs_seq0.ROIPhysicalPropertiesSequence[0].ROIPhysicalProperty
-        expected = 'REL_ELEC_DENSITY'
+        got = obs_seq0.ROIPhysicalPropertiesSequence[0].ROIPhysicalProperty      
+        expected = b'REL_ELEC_DENSITY'
         msg = "Expected Physical Property '%s', got %r" % (expected, got)
         self.assertEqual(expected, got, msg)
     def testDir(self):
@@ -190,13 +191,13 @@ class ReaderTests(unittest.TestCase):
                 "Name does not match value found when accessed by tag number")
         got = mr.PixelSpacing
         expected = [Decimal('0.3125'), Decimal('0.3125')]
-        self.assert_(got == expected, "Wrong pixel spacing")
+        self.assertTrue(got == expected, "Wrong pixel spacing")
     def testDeflate(self):
         """Returns correct values for sample data elements in test compressed (zlib deflate) file"""
         # Everything after group 2 is compressed. If we can read anything else, the decompression must have been ok.
         ds = read_file(deflate_name)
         got = ds.ConversionType
-        expected = "WSD"
+        expected = b"WSD"
         self.assertEqual(got, expected, "Attempted to read deflated file data element Conversion Type, expected '%s', got '%s'" % (expected, got))
     def testNoPixelsRead(self):
         """Returns all data elements before pixels using stop_before_pixels=False"""
@@ -224,7 +225,7 @@ class ReaderTests(unittest.TestCase):
         #     in file_meta, and second one in followinsg dataset
         ds = read_file(no_meta_group_length)
         got = ds.InstanceCreationDate
-        expected = "20111130"
+        expected = b"20111130"
         self.assertEqual(got, expected, "Sample data element after file meta with no group length failed, expected '%s', got '%s'" % (expected, got))
         
 
@@ -238,7 +239,7 @@ class JPEG2000Tests(unittest.TestCase):
         self.assertEqual(got, expected, "JPEG2000 file, Frame Increment Pointer: expected %s, got %s" % (expected, got))
 
         got = self.jpeg.DerivationCodeSequence[0].CodeMeaning
-        expected = 'Lossy Compression'
+        expected = b'Lossy Compression'
         self.assertEqual(got, expected, "JPEG200 file, Code Meaning got %s, expected %s" % (got, expected))
     def testJPEG2000PixelArray(self):
         """JPEG2000: Fails gracefully when uncompressed data is asked for......."""
@@ -250,7 +251,7 @@ class JPEGlossyTests(unittest.TestCase):
     def testJPEGlossy(self):
         """JPEG-lossy: Returns correct values for sample data elements.........."""
         got = self.jpeg.DerivationCodeSequence[0].CodeMeaning
-        expected = 'Lossy Compression'
+        expected = b'Lossy Compression'
         self.assertEqual(got, expected, "JPEG-lossy file, Code Meaning got %s, expected %s" % (got, expected))
     def testJPEGlossyPixelArray(self):
         """JPEG-lossy: Fails gracefully when uncompressed data is asked for....."""
@@ -262,7 +263,7 @@ class JPEGlosslessTests(unittest.TestCase):
     def testJPEGlossless(self):
         """JPEGlossless: Returns correct values for sample data elements........"""
         got = self.jpeg.SourceImageSequence[0].PurposeOfReferenceCodeSequence[0].CodeMeaning
-        expected = 'Uncompressed predecessor'
+        expected = b'Uncompressed predecessor'
         self.assertEqual(got, expected, "JPEG-lossless file, Code Meaning got %s, expected %s" % (got, expected))
     def testJPEGlosslessPixelArray(self):
         """JPEGlossless: Fails gracefully when uncompressed data is asked for..."""
@@ -306,7 +307,8 @@ class DeferredReadTests(unittest.TestCase):
         """Deferred values from a gzipped file works.............."""
         # Arose from issue 103 "Error for defer_size read of gzip file object"
         fobj = gzip.open(gzip_name)
-        ds = read_file(fobj, defer_size=1)
+        ds = read_file(fobj, defer_size=1)      
+        fobj.close()       
         # before the fix, this threw an error as file reading was not in right place,
         #    it was re-opened as a normal file, not zip file
         num = ds.InstanceNumber
@@ -332,8 +334,8 @@ class FileLikeTests(unittest.TestCase):
                 "ImplementationClassUID does not match the value accessed by tag number")
         # (0020, 0032) Image Position (Patient)  [-158.13580300000001, -179.035797, -75.699996999999996]
         got = ct.ImagePositionPatient
-        expected = [Decimal('-158.135803'), Decimal('-179.035797'), Decimal('-75.699997')]
-        self.assert_(got == expected, "ImagePosition(Patient) values not as expected")
+        expected = [Decimal('-158.135803'), Decimal('-179.035797'), Decimal('-75.699997')]       
+        self.assertTrue(got == expected, "ImagePosition(Patient) values not as expected")
         self.assertEqual(ct.Rows, 128, "Rows not 128")
         self.assertEqual(ct.Columns, 128, "Columns not 128")
         self.assertEqual(ct.BitsStored, 16, "Bits Stored not 16")
@@ -347,7 +349,7 @@ class FileLikeTests(unittest.TestCase):
         # Tests here simply repeat some of testCT test
         got = ct.ImagePositionPatient
         expected = [Decimal('-158.135803'), Decimal('-179.035797'), Decimal('-75.699997')]
-        self.assert_(got == expected, "ImagePosition(Patient) values not as expected")        
+        self.assertTrue(got == expected, "ImagePosition(Patient) values not as expected")        
         self.assertEqual(len(ct.PixelData), 128*128*2, "Pixel data not expected length")
         # Should also be able to close the file ourselves without exception raised:
         file_like.close()

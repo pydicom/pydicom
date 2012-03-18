@@ -9,14 +9,15 @@ syntax: glob
 .\#*
 
 # Temporary files used by the vim editor.
-.*.swp
-.*.orig
+*.swp
+*.orig
 
 # A hidden file created by the Mac OS X Finder.
 .DS_Store
 
 # python byte-code files
 *.pyc
+*.pyo
 
 # Build/dist files
 source/dist/*

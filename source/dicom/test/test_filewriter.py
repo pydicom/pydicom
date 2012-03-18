@@ -55,8 +55,8 @@ class WriteFileTests(unittest.TestCase):
         """Read file1, write file2, then compare. Return value as for files_identical"""
         dataset = read_file(in_filename)
         dataset.save_as(out_filename)
-        same, pos = files_identical(in_filename, out_filename)
-        self.assert_(same, "Files are not identical - first difference at 0x%x" % pos)
+        same, pos = files_identical(in_filename, out_filename)     
+        self.assertTrue(same, "Files are not identical - first difference at 0x%x" % pos)
         if os.path.exists(out_filename):
             os.remove(out_filename)  # get rid of the file
     def testRTPlan(self):
@@ -76,8 +76,8 @@ class WriteFileTests(unittest.TestCase):
         self.compare(jpeg_name, jpeg_out)
     def testListItemWriteBack(self):
         """Change item in a list and confirm it is written to file      .."""
-        DS_expected = 0
-        CS_expected = "new"
+        DS_expected = 0      
+        CS_expected = b"new"
         SS_expected = 999
         ds = read_file(ct_name)
         ds.ImagePositionPatient[2] = DS_expected
@@ -85,10 +85,10 @@ class WriteFileTests(unittest.TestCase):
         ds[(0x0043, 0x1012)].value[0] = SS_expected
         ds.save_as(ct_out)
         # Now read it back in and check that the values were changed
-        ds = read_file(ct_out)
-        self.assert_(ds.ImageType[1] == CS_expected, "Item in a list not written correctly to file (VR=CS)")
-        self.assert_(ds[0x00431012].value[0] == SS_expected, "Item in a list not written correctly to file (VR=SS)")
-        self.assert_(ds.ImagePositionPatient[2] == DS_expected, "Item in a list not written correctly to file (VR=DS)")
+        ds = read_file(ct_out)     
+        self.assertTrue(ds.ImageType[1] == CS_expected, "Item in a list not written correctly to file (VR=CS)")
+        self.assertTrue(ds[0x00431012].value[0] == SS_expected, "Item in a list not written correctly to file (VR=SS)")
+        self.assertTrue(ds.ImagePositionPatient[2] == DS_expected, "Item in a list not written correctly to file (VR=DS)")
         if os.path.exists(ct_out):
             os.remove(ct_out)
 
@@ -153,8 +153,8 @@ class ScratchWriteTests(unittest.TestCase):
         bytes_written = open(out_filename,'rb').read()
         # print "std    :", bytes2hex(std)
         # print "written:", bytes2hex(bytes_written)
-        same, pos = bytes_identical(std, bytes_written)
-        self.assert_(same, "Writing from scratch not expected result - first difference at 0x%x" % pos)
+        same, pos = bytes_identical(std, bytes_written)      
+        self.assertTrue(same, "Writing from scratch not expected result - first difference at 0x%x" % pos)
         if os.path.exists(out_filename):
             os.remove(out_filename)  # get rid of the file
             

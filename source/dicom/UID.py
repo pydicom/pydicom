@@ -29,7 +29,7 @@ class UID(str):
             if isinstance(val, basestring):
                 return super(UID, cls).__new__(cls, val.strip())
             else:
-                raise TypeError, "UID must be a string"
+                raise TypeError("UID must be a string or bytes")
         
     def __init__(self, val):
         """Initialize the UID properties
@@ -82,7 +82,11 @@ class UID(str):
         if str.__eq__(self.name, other) is True: # 'is True' needed (issue 96)
             return True
         return False
-
+    # For python 3, any override of __cmp__ or __eq__ immutable requires
+    #   explicit redirect of hash function to the parent class 
+    #   See http://docs.python.org/dev/3.0/reference/datamodel.html#object.__hash__    
+    def __hash__(self):
+        return super(UID, self).__hash__()
 
 ExplicitVRLittleEndian = UID('1.2.840.10008.1.2.1')
 ImplicitVRLittleEndian = UID('1.2.840.10008.1.2')

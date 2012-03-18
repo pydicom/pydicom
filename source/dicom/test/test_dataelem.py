@@ -40,9 +40,9 @@ class DataElementTests(unittest.TestCase):
         """DataElement: setting or changing UID results in UID type........."""
         ds = Dataset()
         ds.TransferSyntaxUID = "1.2.3"
-        self.assert_(type(ds.TransferSyntaxUID) is UID, "Assignment to UID did not create UID class")
+        self.assertTrue(isinstance(ds.TransferSyntaxUID, UID), "Assignment to UID did not create UID class")
         ds.TransferSyntaxUID += ".4.5.6"
-        self.assert_(type(ds.TransferSyntaxUID) is UID, "+= to UID did not keep as UID class")
+        self.assertTrue(isinstance(ds.TransferSyntaxUID, UID), "+= to UID did not keep as UID class")
 
 class RawDataElementTests(unittest.TestCase):
     def setUp(self):

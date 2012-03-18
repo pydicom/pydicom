@@ -11,7 +11,7 @@ from dicom.UID import UID
 class UIDtests(unittest.TestCase):
     def testKnownUID(self):
         """UID: Known UID properties accessed....................."""
-        uid = UID('1.2.840.10008.1.2') # Implicit VR Little Endian
+        uid = UID(b'1.2.840.10008.1.2') # Implicit VR Little Endian
         expected = 'Implicit VR Little Endian'
         got = uid.name
         self.assertEqual(got, expected, "UID: expected '%s', got '%s' for UID name" % (expected, got))
@@ -29,18 +29,18 @@ class UIDtests(unittest.TestCase):
         self.assertEqual(got, expected, "UID: expected '%s', got '%s' for UID is_retired" % (expected, got))
     def testComparison(self):
         """UID: can compare by number or by name.................."""
-        uid = UID('1.2.840.10008.1.2')
-        self.assertEqual(uid, 'Implicit VR Little Endian', "UID equality failed on name")
-        self.assertEqual(uid, '1.2.840.10008.1.2', "UID equality failed on number string")
+        uid = UID(b'1.2.840.10008.1.2')
+        self.assertEqual(uid, b'Implicit VR Little Endian', "UID equality failed on name")
+        self.assertEqual(uid, b'1.2.840.10008.1.2', "UID equality failed on number string")
     def testCompareNumber(self):
         """UID: comparing against a number give False............."""
         # From issue 96
-        uid = UID('1.2.3')
+        uid = UID(b'1.2.3')
         self.assertNotEqual(uid, 3, "Comparison against a number returned True")
     def testCompareNone(self):
         """UID: comparing against None give False................."""
         # From issue 96
-        uid = UID('1.2.3')
+        uid = UID(b'1.2.3')
         self.assertNotEqual(uid, None, "Comparison against a number returned True")
     def testTransferSyntaxes(self):
         pass

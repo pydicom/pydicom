@@ -42,7 +42,7 @@ def write_numbers(fp, data_element, struct_format):
             for val in value:
                 fp.write(pack(format_string, val))
     except Exception as e:
-        raise IOError, "%s\nfor data_element:\n%s" % (str(e), str(data_element))
+        raise IOError("{0}\nfor data_element:\n{1}".format(str(e), str(data_elemesnt)))
 
 def write_OBvalue(fp, data_element):
     """Write a data_element with VR of 'other byte' (OB)."""
@@ -58,13 +58,13 @@ def write_OWvalue(fp, data_element):
     fp.write(data_element.value)
 
 def write_UI(fp, data_element):
-    """Write a data_element with VR of 'unique identifier' (UI)."""    
+    """Write a data_element with VR of 'unique identifier' (UI)."""  
     write_string(fp, data_element, '\0') # pad with 0-byte to even length
 
 def multi_string(val):
     """Put a string together with delimiter if has more than one value"""
     if isinstance(val, (list, tuple)):
-        return "\\".join(val)  # \ is escape chr, so "\\" gives single backslash
+        return b"\\".join(val)  # \ is escape chr, so "\\" gives single backslash
     else:
         return val
 
@@ -81,7 +81,7 @@ def write_number_string(fp, data_element, padding = ' '):
     # unchanged data elements are written with exact string as when read from file 
     val = data_element.value   
     if isinstance(val, (list, tuple)):
-        val = "\\".join((x.original_string if hasattr(x, 'original_string')
+        val = b"\\".join((x.original_string if hasattr(x, 'original_string')
                                            else str(x) for x in val))
     else:
         val = val.original_string if hasattr(val, 'original_string') else str(val)
@@ -98,12 +98,12 @@ def write_data_element(fp, data_element):
         if len(VR) != 2:
             msg = "Cannot write ambiguous VR of '%s' for data element with tag %r." % (VR, data_element.tag)
             msg += "\nSet the correct VR before writing, or use an implicit VR transfer syntax"
-            raise ValueError, msg
+            raise ValueError(msg)
         fp.write(VR)
         if VR in extra_length_VRs:
             fp.write_US(0)   # reserved 2 bytes
-    if VR not in writers:
-        raise NotImplementedError, "write_data_element: unknown Value Representation '%s'" % VR
+    if VR not in writers:   
+        raise NotImplementedError("write_data_element: unknown Value Representation '{0}'".format(VR))
 
     length_location = fp.tell() # save location for later.
     if not fp.is_implicit_VR and VR not in ['OB', 'OW', 'OF', 'SQ', 'UT', 'UN']:
@@ -194,8 +194,8 @@ def _write_file_meta_info(fp, meta_dataset):
     Raises ValueError if the required data_elements (elements 2,3,0x10,0x12)
     are not in the dataset. If the dataset came from a file read with
     read_file(), then the required data_elements should already be there.
-    """
-    fp.write('DICM')
+    """    
+    fp.write(b'DICM')
 
     # File meta info is always LittleEndian, Explicit VR. After will change these
     #    to the transfer syntax values set in the meta info
@@ -203,7 +203,7 @@ def _write_file_meta_info(fp, meta_dataset):
     fp.is_implicit_VR = False
 
     if Tag((2,1)) not in meta_dataset:
-        meta_dataset.add_new((2,1), 'OB', "\0\1")   # file meta information version
+        meta_dataset.add_new((2,1), b'OB', b"\0\1")   # file meta information version
     
     # Now check that required meta info tags are present:
     missing = []
@@ -211,7 +211,7 @@ def _write_file_meta_info(fp, meta_dataset):
         if Tag((2, element)) not in meta_dataset:
             missing.append(Tag((2, element)))
     if missing:
-        raise ValueError, "Missing required tags %s for file meta information" % str(missing)
+        raise ValueError("Missing required tags {0} for file meta information".format(str(missing)))
     
     # Put in temp number for required group length, save current location to come back
     meta_dataset[(2,0)] = DataElement((2,0), 'UL', 0) # put 0 to start
@@ -259,9 +259,8 @@ def write_file(filename, dataset, WriteLikeOriginal=True):
 
     # Decide whether to write DICOM preamble. Should always do so unless trying to mimic the original file read in
     preamble = getattr(dataset, "preamble", None) 
-    if not preamble and not WriteLikeOriginal:
-        preamble = "\0"*128
-    
+    if not preamble and not WriteLikeOriginal:   
+        preamble = b"\0"*128
     file_meta = dataset.file_meta
     if file_meta is None:
         file_meta = Dataset()
@@ -272,8 +271,8 @@ def write_file(filename, dataset, WriteLikeOriginal=True):
             file_meta.add_new((2, 0x10), 'UI', ExplicitVRLittleEndian)
         elif not dataset.is_little_endian and not dataset.is_implicit_VR:
             file_meta.add_new((2, 0x10), 'UI', ExplicitVRBigEndian)
-        else:
-            raise NotImplementedError, "pydicom has not been verified for Big Endian with Implicit VR"
+        else:        
+            raise NotImplementedError("pydicom has not been verified for Big Endian with Implicit VR")
         
     fp = DicomFile(filename,'wb')
     try:

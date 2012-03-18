@@ -22,7 +22,7 @@ class DatasetTests(unittest.TestCase):
         else:
             if hasattr(excClass,'__name__'): excName = excClass.__name__
             else: excName = str(excClass)
-            raise self.failureException, "%s not raised" % excName
+            raise self.failureException("{0:s} not raised".format(excName))
 
     def failUnlessExceptionArgs(self, start_args, excClass, callableObj):
         """Check the expected args were returned from an exception
@@ -70,22 +70,22 @@ class DatasetTests(unittest.TestCase):
         """Dataset: can set class instance property (non-dicom).............."""
         ds = Dataset()
         ds.SomeVariableName = 42
-        has_it = hasattr(ds, 'SomeVariableName')
-        self.assert_(has_it, "Variable did not get created")
+        has_it = hasattr(ds, 'SomeVariableName')               
+        self.assertTrue(has_it, "Variable did not get created")
         if has_it:
             self.assertEqual(ds.SomeVariableName, 42, "There, but wrong value")
     def testMembership(self):
         """Dataset: can test if item present by 'if <name> in dataset'......."""
-        ds = self.dummy_dataset()
-        self.assert_('TreatmentMachineName' in ds, "membership test failed")
-        self.assert_(not 'Dummyname' in ds, "non-member tested as member")
+        ds = self.dummy_dataset()                
+        self.assertTrue('TreatmentMachineName' in ds, "membership test failed")
+        self.assertTrue(not 'Dummyname' in ds, "non-member tested as member")
     def testContains(self):
         """Dataset: can test if item present by 'if <tag> in dataset'........"""
-        ds = self.dummy_dataset()
-        self.assert_((0x300a, 0xb2) in ds, "membership test failed")
-        self.assert_([0x300a, 0xb2] in ds, "membership test failed when list used")
-        self.assert_(0x300a00b2 in ds, "membership test failed")
-        self.assert_(not (0x10,0x5f) in ds, "non-member tested as member")        
+        ds = self.dummy_dataset()       
+        self.assertTrue((0x300a, 0xb2) in ds, "membership test failed")
+        self.assertTrue([0x300a, 0xb2] in ds, "membership test failed when list used")
+        self.assertTrue(0x300a00b2 in ds, "membership test failed")
+        self.assertTrue(not (0x10,0x5f) in ds, "non-member tested as member")        
     def testGetExists1(self):
         """Dataset: dataset.get() returns an existing item by name..........."""
         ds = self.dummy_dataset()
@@ -213,8 +213,8 @@ class DatasetElementsTests(unittest.TestCase):
         msg = "Assigning a non-sequence to an SQ data element did not raise error"
         self.assertRaises(TypeError, try_non_Sequence)  
         # check also that assigning proper sequence *does* work
-        self.ds.ConceptCodeSequence = [self.sub_ds1, self.sub_ds2]
-        self.assert_(isinstance(self.ds.ConceptCodeSequence, Sequence),
+        self.ds.ConceptCodeSequence = [self.sub_ds1, self.sub_ds2]        
+        self.assertTrue(isinstance(self.ds.ConceptCodeSequence, Sequence),
                 "Sequence assignment did not result in Sequence type")   
     
 if __name__ == "__main__":
