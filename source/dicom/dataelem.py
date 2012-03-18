@@ -320,10 +320,9 @@ def DataElement_from_raw(raw_data_element):
             elif raw.tag.element == 0:  # group length tag implied in versions < 3.0
                 VR = 'UL'
             else:
-                raise KeyError, "Unknown DICOM tag %s - can't look up VR" % str(raw.tag)    
+                raise KeyError("Unknown DICOM tag {0:s} - can't look up VR".format(str(raw.tag)))
     try:
         value = convert_value(VR, raw)
     except NotImplementedError as e:
-        raise NotImplementedError, "%s in tag %r" % (str(e), raw.tag)
-    
-    return DataElement(raw.tag, VR, value, raw.value_tell, raw.length==0xFFFFFFFFL)
+        raise NotImplementedError("{0:s} in tag {1!r}".format(str(e), raw.tag))
+    return DataElement(raw.tag, VR, value, raw.value_tell, raw.length==0xFFFFFFFF)

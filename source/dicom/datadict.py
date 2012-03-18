@@ -9,10 +9,11 @@ from __future__ import unicode_literals
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
 #
+import sys
 import logging
 logger = logging.getLogger("pydicom")
 from dicom.tag import Tag
-from dicom._dicom_dict import DicomDictionary  # the actual dict of {tag: (VR, VM, name, is_retired, keyword), …}
+from dicom._dicom_dict import DicomDictionary  # the actual dict of {tag: (VR, VM, name, is_retired, keyword), ...}
 from dicom._dicom_dict import RepeatersDictionary # those with tags like "(50xx, 0005)"
 from dicom._private_dict import private_dictionaries
 import warnings
@@ -22,7 +23,7 @@ import warnings
 masks = {}
 for mask_x in RepeatersDictionary:
     # mask1 is XOR'd to see that all non-"x" bits are identical (XOR result = 0 if bits same)
-    #      then AND those out with 0 bits at the "x" ("we don't care") location using mask2
+    #      then AND those out with 0 bits at the "x" ("we don't care") location using mask2  
     mask1 = long(mask_x.replace("x", "0"),16)
     mask2 = long("".join(["F0"[c=="x"] for c in mask_x]),16)
     masks[mask_x] = (mask1, mask2)
@@ -56,7 +57,7 @@ def get_entry(tag):
         if mask_x:
             return RepeatersDictionary[mask_x]
         else:
-            raise KeyError, "Tag %s not found in DICOM dictionary" % tag
+            raise KeyError("Tag {0} not found in DICOM dictionary".format(tag))
         
 def dictionary_description(tag):
     """Return the descriptive text for the given dicom tag."""
@@ -75,10 +76,8 @@ def dictionary_has_tag(tag):
     return (tag in DicomDictionary)
 
 def dictionary_keyword(tag):
-    """Return the official DICOM standard (since 2011) keyword for the tag"""
+    """Return the official DICOM standard (since 2011) keyword for the tag""" 
     return get_entry(tag)[4]
-
-import string
 
 # Set up a translation table for "cleaning" DICOM descriptions
 #    for backwards compatibility pydicom < 0.9.7 (pre-DICOM keywords)
@@ -194,7 +193,7 @@ def get_private_entry(tag, private_creator):
     try:
         private_dict = private_dictionaries[private_creator]
     except KeyError:
-        raise KeyError, "Private creator '%s' not in private dictionary" % private_creator
+        raise KeyError("Private creator {0} not in private dictionary".format(private_creator))
     
     # private elements are usually agnostic for "block" (see PS3.5-2008 7.8.1 p44)
     # Some elements in _private_dict are explicit; most have "xx" for high-byte of element
@@ -207,7 +206,7 @@ def get_private_entry(tag, private_creator):
         elem_str = "%04x" % tag.elem
         key = "%sxx%s" % (group_str, elem_str[-2:])
         if key not in private_dict:
-            raise KeyError, "Tag %s not in private dictionary for private creator '%s'" % (key, private_creator)
+            raise KeyError("Tag {0} not in private dictionary for private creator {1}".format(key, private_creator))
         dict_entry = private_dict[key]
     return dict_entry
 	

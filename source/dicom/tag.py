@@ -12,20 +12,20 @@ def Tag(arg, arg2=None):
         arg = (arg, arg2) # act as if was passed a single tuple
     if isinstance(arg, (tuple, list)):
         if len(arg) != 2:
-            raise ValueError, "Tag must be an int or a 2-tuple"
+            raise ValueError("Tag must be an int or a 2-tuple")
         if isinstance(arg[0], basestring):
             if not isinstance(arg[1], basestring):
-                raise ValueError, "Both arguments must be hex strings if one is"
+                raise ValueError("Both arguments must be hex strings if one is")
             arg = (int(arg[0], 16), int(arg[1], 16))
         if arg[0] > 0xFFFF or arg[1] > 0xFFFF:
-            raise OverflowError, "Groups and elements of tags must each be <=2 byte integers"
+            raise OverflowError("Groups and elements of tags must each be <=2 byte integers")
         long_value = (arg[0] << 16) | arg[1] 
     elif isinstance(arg, basestring):
-        raise ValueError, "Tags cannot be instantiated from a single string"
+        raise ValueError("Tags cannot be instantiated from a single string")
     else: # given a single number to use as a tag, as if (group, elem) already joined to a long
         long_value = arg
         if long_value > 0xFFFFFFFFL:
-            raise OverflowError, "Tags are limited to 32-bit length; tag %r is not valid" % (arg,)
+            raise OverflowError("Tags are limited to 32-bit length; tag {0!r}".format(arg))
     return BaseTag(long_value)
     
   
@@ -47,7 +47,7 @@ class BaseTag(long):
             try:
                 other = Tag(other)
             except:
-                raise TypeError, "Cannot compare Tag with non-Tag item"
+                raise TypeError("Cannot compare Tag with non-Tag item")
         return long(self) < long(other)
 
     def __eq__(self, other):
@@ -56,7 +56,7 @@ class BaseTag(long):
             try:
                 other = Tag(other)
             except:
-                raise TypeError, "Cannot compare Tag with non-Tag item"
+                raise TypeError("Cannot compare Tag with non-Tag item")
         return long(self) == long(other)
 
     def __ne__(self, other):
@@ -65,7 +65,7 @@ class BaseTag(long):
             try:
                 other = Tag(other)
             except:
-                raise TypeError, "Cannot compare Tag with non-Tag item"
+                raise TypeError("Cannot compare Tag with non-Tag item")
         return long(self) != long(other)
    
     # For python 3, any override of __cmp__ or __eq__ immutable requires
@@ -75,7 +75,7 @@ class BaseTag(long):
     
     def __str__(self):
         """String of tag value as (gggg, eeee)"""
-        return "(%04x, %04x)" % (self.group, self.elem)
+        return "({0:04x}, {1:04x})".format(self.group, self.elem)
 
     __repr__ = __str__
     

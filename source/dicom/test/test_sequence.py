@@ -13,7 +13,7 @@ class SequenceTests(unittest.TestCase):
     def testDefaultInitialization(self):
         """Sequence: Ensure a valid Sequence is created"""
         empty = Sequence()
-        self.assert_(len(empty) == 0, "Non-empty Sequence created")
+        self.assertTrue(len(empty) == 0, "Non-empty Sequence created")
 
     def testValidInitialization(self):
         """Sequence: Ensure valid creation of Sequences using Dataset inputs"""
@@ -25,7 +25,7 @@ class SequenceTests(unittest.TestCase):
 
         # Construct the sequence
         seq = Sequence((patientSetups,))
-        self.assert_(isinstance(seq[0], Dataset), 
+        self.assertTrue(isinstance(seq[0], Dataset), 
                       "Dataset modified during Sequence creation")
 
     def testInvalidInitialization(self):

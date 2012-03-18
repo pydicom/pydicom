@@ -170,7 +170,7 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian, stop_when=None,
         bytes_read = fp_read(8)        
         if len(bytes_read) < 8:
             raise StopIteration # at end of file
-        if debugging: debug_msg = "%08x: %s" % (fp.tell()-8, bytes2hex(bytes_read))
+        if debugging: debug_msg = "{0:08x}: {1}".format(fp.tell()-8, bytes2hex(bytes_read))
         
         if is_implicit_VR:
             VR = None # must reset each time -- may have looked up on last iteration (e.g. SQ)
@@ -238,8 +238,7 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian, stop_when=None,
                     pass
             if VR == b'SQ':
                 if debugging:
-                    logger_debug("%08x: Reading and parsing undefined length sequence"
-                                % fp_tell())
+                    logger_debug("{0:08x}: Reading and parsing undefined length sequence".format(fp_tell()))
                 seq = read_sequence(fp, is_implicit_VR, is_little_endian, length)
                 yield DataElement(tag, VR, seq, value_tell, is_undefined_length=True)
             else:
@@ -318,20 +317,19 @@ def read_sequence_item(fp, is_implicit_VR, is_little_endian):
     try:
         bytes_read = fp.read(8)
         group, element, length = unpack(tag_length_format, bytes_read)
-    except:
-        raise IOError, "No tag to read at file position %05x" % fp.tell()
-
+    except:  
+        raise IOError("No tag to read at file position {0:05x}".format(fp.tell()))
     tag = (group, element)
     if tag == SequenceDelimiterTag: # No more items, time to stop reading
         data_element = DataElement(tag, None, None, fp.tell()-4)
-        logger.debug("%08x: %s" % (fp.tell()-8, "End of Sequence"))
+        logger.debug("{0:08x}: {1}".format(fp.tell()-8, "End of Sequence"))
         if length != 0:
             logger.warning("Expected 0x00000000 after delimiter, found 0x%x, at position 0x%x" % (length, fp.tell()-4))
         return None
     if tag != ItemTag:
         logger.warning("Expected sequence item with tag %s at file position 0x%x" % (ItemTag, fp.tell()-4))
     else:
-        logger.debug("%08x: %s  Found Item tag (start of item)" % (fp.tell()-4,
+        logger.debug("{0:08x}: {1}  Found Item tag (start of item)".format(fp.tell()-4,
                           bytes2hex(bytes_read)))
     is_undefined_length = False
     if length == 0xFFFFFFFFL:
@@ -358,25 +356,25 @@ def _read_file_meta_info(fp):
     if debugging: logger.debug("Try to read group length info...")
     bytes_read = fp.read(8)
     group, elem, VR, length = unpack(b"<HH2sH", bytes_read)
-    if debugging: debug_msg = "%08x: %s" % (fp.tell()-8, bytes2hex(bytes_read))
-    if VR in extra_length_VRs:
+    if debugging: debug_msg = "{0:08x}: {1}".format(fp.tell()-8, bytes2hex(bytes_read))
+    if VR in extra_length_VRs:    
         bytes_read = fp.read(4)
         length = unpack(b"<L", bytes_read)[0]
         if debugging: debug_msg += " " + bytes2hex(bytes_read)
     if debugging:
-        debug_msg = "%-47s  (%04x, %04x) %2s Length: %d" % (debug_msg, 
+        debug_msg = "{0:<47s}  ({1:04x}, {2:04x}) {3:2s} Length: {4:d}".format(debug_msg, 
                     group, elem, VR, length)
         logger.debug(debug_msg)
    
     # If required meta group length exists, store it, and then read until not group 2
     if group == 2 and elem == 0:
         bytes_read = fp.read(length)
-        if debugging: logger.debug("%08x: %s" % (fp.tell()-length, bytes2hex(bytes_read)))
+        if debugging: logger.debug("{0:08x}: {1}".format(fp.tell()-length, bytes2hex(bytes_read)))
         group_length = unpack(b"<L", bytes_read)[0]
         expected_ds_start = fp.tell() + group_length
         if debugging: 
-            msg = "value (group length) = %d" % group_length
-            msg += "  regular dataset should start at %08x" % (expected_ds_start)
+            msg = "value (group length) = {0:d}".format(group_length)
+            msg += "  regular dataset should start at {0:08x}".format(expected_ds_start)
             logger.debug(" "*10 + msg)
     else:
         expected_ds_start = None
@@ -387,7 +385,7 @@ def _read_file_meta_info(fp):
     #    give a warning if group 2 ends at different location.
     # Rewind to read the first data element as part of the file_meta dataset
     if debugging: logger.debug("Rewinding and reading whole dataset including this first data element")    
-    fp.seek(fp_save)          
+    fp.seek(fp_save) 
     file_meta = read_dataset(fp, is_implicit_VR=False,
                     is_little_endian=True, stop_when=not_group2)
     fp_now = fp.tell()
@@ -417,7 +415,7 @@ def read_preamble(fp, force):
     preamble = fp.read(0x80)
     if dicom.debugging:
         sample_bytes = bytes2hex(preamble[:8]) + "..." + bytes2hex(preamble[-8:])  
-        logger.debug("%08x: %s" % (fp.tell()-0x80, sample_bytes))
+        logger.debug("{0:08x}: {1}".format (fp.tell()-0x80, sample_bytes))
     magic = fp.read(4)
     if magic != b"DICM":
         if force:
@@ -427,7 +425,7 @@ def read_preamble(fp, force):
         else:
             raise InvalidDicomError("File is missing 'DICM' marker. Use force=True to force reading")
     else:
-        logger.debug("%08x: 'DICM' marker found" % (fp.tell()-4))
+        logger.debug("{0:08x}: 'DICM' marker found".format(fp.tell()-4))
     return preamble
 
 def _at_pixel_data(tag, VR, length):
@@ -505,7 +503,7 @@ def read_file(fp, defer_size=None, stop_before_pixels=False, force=False):
     if isinstance(fp, basestring):
         # caller provided a file name; we own the file handle
         caller_owns_file = False
-        logger.debug("Reading file '%s'" % fp)
+        logger.debug("Reading file '{0}'".format(fp))
         fp = open(fp, 'rb')
 
     if dicom.debugging:
@@ -554,11 +552,11 @@ def read_deferred_data_element(fileobj_type, filename, timestamp, raw_data_elem)
     logger.debug("Reading deferred element %r" % str(raw_data_elem.tag))
     # If it wasn't read from a file, then return an error
     if filename is None:
-        raise IOError, "Deferred read -- original filename not stored. Cannot re-open"
+        raise IOError("Deferred read -- original filename not stored. Cannot re-open")
     # Check that the file is the same as when originally read
     if not os.path.exists(filename):
-        raise IOError, "Deferred read -- original file '%s' is missing" % filename
-    if stat_available and timestamp is not None:
+        raise IOError( "Deferred read -- original file {0:s} is missing".format(filename))
+    if stat_available and (timestamp is not None):
         statinfo = stat(filename)
         if statinfo.st_mtime != timestamp:
             warnings.warn("Deferred read warning -- file modification time has changed.")
@@ -577,9 +575,9 @@ def read_deferred_data_element(fileobj_type, filename, timestamp, raw_data_elem)
     data_elem = next(elem_gen)
     fp.close()
     if data_elem.VR != raw_data_elem.VR:
-        raise ValueError, "Deferred read VR '%s' does not match original '%s'" % (data_elem.VR, raw_data_elem.VR)
+        raise ValueError( "Deferred read VR {0:s} does not match original {1:s}".format(data_elem.VR, raw_data_elem.VR))
     if data_elem.tag != raw_data_elem.tag:
-        raise ValueError, "Deferred read tag %r does not match original %r" % (data_elem.tag, raw_data_elem.tag)
+        raise ValueError("Deferred read tag {0!r} does not match original {1!r}".format(data_elem.tag, raw_data_elem.tag))
 
     # Everything is ok, now this object should act like usual DataElement
     return data_elem

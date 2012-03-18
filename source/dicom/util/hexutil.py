@@ -22,6 +22,6 @@ def hex2bytes(hex_string):
     """
     return "".join((chr(int(x,16)) for x in hex_string.strip().split()))
 
-def bytes2hex(bytes):
+def bytes2hex(byte_string):
     """Return a hex dump of the bytes given"""
-    return " ".join(["%02x" % ord(b) for b in bytes])
+    return " ".join(["{0:02x}".format(ord(b)) for b in byte_string])

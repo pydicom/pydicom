@@ -53,6 +53,7 @@ except:
     stat_available = False
 
 class PropertyError(Exception):
+#   http://docs.python.org/release/3.1.3/tutorial/errors.html#tut-userexceptions
     """For AttributeErrors caught in a property, so do not go to __getattr__"""
     pass
 
@@ -168,8 +169,8 @@ class Dataset(dict):
         elif name in self.__dict__:
             del self.__dict__[name]
         # Not found, raise an error in same style as python does
-        else:
-            raise AttributeError, name
+        else:        
+            raise AttributeError(name)
 
     def __dir__(self):
         """Give a list of attributes available in an object, for example 
@@ -255,11 +256,11 @@ class Dataset(dict):
         # __getattr__ only called if instance cannot find name in self.__dict__
         # So, if name is not a dicom string, then is an error
         tag = tag_for_name(name)
-        if tag is None:
-            raise AttributeError, "Dataset does not have attribute '%s'." % name
+        if tag is None:                  
+            raise AttributeError("Dataset does not have attribute '{0:s}'.".format(name))
         tag = Tag(tag)
-        if tag not in self:
-            raise AttributeError, "Dataset does not have attribute '%s'." % name
+        if tag not in self:                  
+            raise AttributeError("Dataset does not have attribute '{0:s}'.".format(name))
         else:  # do have that dicom data_element
             return self[tag].value
     
@@ -317,12 +318,12 @@ class Dataset(dict):
         :raises ImportError: if cannot import numpy.
 
         """
-        if not 'PixelData' in self:
-            raise TypeError, "No pixel data found in this dataset."
+        if not 'PixelData' in self:                  
+            raise TypeError("No pixel data found in this dataset.")
 
         if not have_numpy:
-            msg = "The Numpy package is required to use pixel_array, and numpy could not be imported.\n"
-            raise ImportError, msg
+            msg = "The Numpy package is required to use pixel_array, and numpy could not be imported.\n"           
+            raise ImportError(msg)
 
         # determine the type used for the array
         need_byteswap = (self.is_little_endian != sys_is_little_endian)
@@ -356,8 +357,8 @@ class Dataset(dict):
             if self.SamplesPerPixel > 1:
                 if self.BitsAllocated == 8:
                     arr = arr.reshape(self.SamplesPerPixel, self.Rows, self.Columns)
-                else:
-                    raise NotImplementedError, "This code only handles SamplesPerPixel > 1 if Bits Allocated = 8"
+                else:             
+                    raise NotImplementedError("This code only handles SamplesPerPixel > 1 if Bits Allocated = 8")
             else:
                 arr = arr.reshape(self.Rows, self.Columns)
         return arr
@@ -366,8 +367,8 @@ class Dataset(dict):
     def _get_pixel_array(self):
         # Check if pixel data is in a form we know how to make into an array
         # XXX uses file_meta here, should really only be thus for FileDataset
-        if self.file_meta.TransferSyntaxUID not in NotCompressedPixelTransferSyntaxes :
-            raise NotImplementedError, "Pixel Data is compressed in a format pydicom does not yet handle. Cannot return array"
+        if self.file_meta.TransferSyntaxUID not in NotCompressedPixelTransferSyntaxes :      
+            raise NotImplementedError( "Pixel Data is compressed in a format pydicom does not yet handle. Cannot return array")
 
         # Check if already have converted to a NumPy array
         # Also check if self.PixelData has changed. If so, get new NumPy array
@@ -487,12 +488,12 @@ class Dataset(dict):
 
     def __setitem__(self, key, value):
         """Operator for dataset[key]=value. Check consistency, and deal with private tags"""
-        if not isinstance(value, (DataElement, RawDataElement)): # ok if is subclass, e.g. DeferredDataElement
-            raise TypeError, "Dataset contents must be DataElement instances.\n" + \
-                  "To set a data_element value use data_element.value=val"
+        if not isinstance(value, (DataElement, RawDataElement)): # ok if is subclass, e.g. DeferredDataElement        
+            raise TypeError("Dataset contents must be DataElement instances.\n" + \
+                  "To set a data_element value use data_element.value=val")
         tag = Tag(value.tag)
-        if key != tag:
-            raise ValueError, "data_element.tag must match the dictionary key"
+        if key != tag:        
+            raise ValueError("data_element.tag must match the dictionary key")
 
         data_element = value
         if tag.is_private:

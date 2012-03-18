@@ -1,6 +1,6 @@
 # test_valuerep.py
 """Test suite for valuerep.py"""
-# Copyright (c) 2008 Darcy Mason
+# Copyright (c) 2008-2012 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
@@ -53,7 +53,7 @@ class PersonNametests(unittest.TestCase):
                [default_encoding,'euc_kr'])
             expected = ("Hong", "Gildong")
             got = (pn.family_name, pn.given_name)
-            self.assertEqual(got, expected, "PN: Expected single_byte name '%s', got '%s'" % (expected, got))
+            self.assertEqual(got, expected, "PN: Expected single_byte name '{0!s}', got '{1!s}'" .format(expected, got))
     def testUnicodeJp(self):
         """PN: 3component in unicode works (Japanese)............................"""
         # Example name from PS3.5-2008 section H  p. 98
@@ -64,7 +64,7 @@ class PersonNametests(unittest.TestCase):
                [default_encoding,'iso2022_jp'])
             expected = ("Yamada", "Tarou")
             got = (pn.family_name, pn.given_name)
-            self.assertEqual(got, expected, "PN: Expected single_byte name '%s', got '%s'" % (expected, got))
+            self.assertEqual(got, expected, "PN: Expected single_byte name '{0!s}', got '{1!s}'".format (expected, got))
         
 if __name__ == "__main__":
     unittest.main()

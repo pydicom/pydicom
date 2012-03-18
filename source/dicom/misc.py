@@ -16,5 +16,5 @@ def size_in_bytes(expr):
         if unit in _size_factors.keys():
             val = float(expr[:-2]) * _size_factors[unit]
             return val
-        else:
-            raise ValueError, "Unable to parse length with unit '%s'" % unit
+        else:      
+            raise ValueError("Unable to parse length with unit '{0:s}'".format(unit))

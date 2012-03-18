@@ -70,9 +70,8 @@ class DicomIO(object):
             if len(bytes_read) < length:
                 start_pos = self.tell() - len(bytes_read)
                 msg = "Unexpected end of file. "
-                msg += "Read %d bytes of %d expected starting at position 0x%x" % (len(bytes_read), length, start_pos)
-                # logger.error(msg)   # don't need this since raising error anyway
-                raise EOFError, msg
+                msg += "Read {0} bytes of {1} expected starting at position 0x{2:x}".format(len(bytes_read), length, start_pos)
+                raise EOFError(msg)                
         return bytes_read
     def write_leUS(self, val):
         """Write an unsigned short with little endian byte order"""
@@ -135,7 +134,7 @@ class DicomFileLike(DicomIO):
         self.name = getattr(file_like_obj, 'name', '<no filename>')
     def no_write(self, bytes_read):
         """Used for file-like objects where no write is available"""
-        raise IOError, "This DicomFileLike object has no write() method"
+        raise IOError("This DicomFileLike object has no write() method")
         
 def DicomFile(*args, **kwargs):
     return DicomFileLike(open(*args, **kwargs))

@@ -58,16 +58,16 @@ class DS(Decimal):
             msg = ("DS cannot be instantiated with a float value, unless "
                 "config.allow_DS_float is set to True. It is recommended to "
                 "convert to a string instead, with the desired number of digits, "
-                "or use Decimal.quantize and pass a Decimal instance.")
-            raise TypeError, msg
+                "or use Decimal.quantize and pass a Decimal instance.")              
+            raise TypeError(msg)
         if not isinstance(val, Decimal):
             val = super(DS, cls).__new__(cls, val)
         if len(str(val)) > 16 and dicom.config.enforce_valid_values:
             msg = ("DS value representation must be <= 16 characters by DICOM "
                 "standard. Initialize with a smaller string, or set config.enforce_valid_values "
                 "to False to override, "
-                "or use Decimal.quantize() and initialize with a Decimal instance.")
-            raise OverflowError, msg
+                "or use Decimal.quantize() and initialize with a Decimal instance.")               
+            raise OverflowError(msg)
         return val
     def __init__(self, val):
         """Store the original string if one given, for exact write-out of same 
@@ -98,12 +98,12 @@ class IS(int):
         newval = super(IS, cls).__new__(cls, val)
         # check if a float or Decimal passed in, then could have lost info,
         # and will raise error. E.g. IS(Decimal('1')) is ok, but not IS(1.23)
-        if isinstance(val, (float, Decimal)) and newval != val:
-            raise TypeError, "Could not convert value to integer without loss"
+        if isinstance(val, (float, Decimal)) and newval != val:        
+            raise TypeError("Could not convert value to integer without loss")
                 # Checks in case underlying int is >32 bits, DICOM does not allow this
         if (newval < -2**31 or newval >= 2**31) and dicom.config.enforce_valid_values:
-            message = "Value exceeds DICOM limits of -2**31 to (2**31 - 1) for IS"
-            raise OverflowError, message
+            message = "Value exceeds DICOM limits of -2**31 to (2**31 - 1) for IS"           
+            raise OverflowError(message)
         return newval
     def __init__(self, val):
         # If a string passed, then store it
@@ -153,6 +153,7 @@ class PersonNameBase(namebase):
            family_name, given_name, middle_name, name_prefix, name_suffix
         """
         return format_str % self.__dict__
+        
     def parse(self):
         """Break down the components and name parts"""
         self.components = self.split("=")
@@ -218,7 +219,7 @@ class PersonNameUnicode(PersonNameBase, unicode):
             encodings = [encodings]*3
         if len(encodings) == 2:
             encodings.append(encodings[1])
-        components = val.split("=")
+        components = val.split(b"=")
         # Remove the first encoding if only one component is present
         if (len(components) == 1):
             del encodings[0]
