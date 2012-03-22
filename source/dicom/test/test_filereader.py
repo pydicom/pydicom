@@ -164,24 +164,23 @@ class ReaderTests(unittest.TestCase):
     def testDir(self):
         """Returns correct dir attributes for both Dataset and DICOM names (python >= 2.6).."""
         # Only python >= 2.6 calls __dir__ for dir() call
-        if sys.version_info >= (2,6):
-            rtss = read_file(rtstruct_name, force=True)        
-            # sample some expected 'dir' values
-            got_dir = dir(rtss)
-            expect_in_dir = ['pixel_array', 'add_new', 'ROIContourSequence', 
-                             'StructureSetDate', '__sizeof__']
-            expect_not_in_dir = ['RemovePrivateTags', 'AddNew', 'GroupDataset'] # remove in v1.0
-            for name in expect_in_dir:
-                self.assert_(name in got_dir, "Expected name '%s' in dir()" % name)
-            for name in expect_not_in_dir:
-                self.assert_(name not in got_dir, "Unexpected name '%s' in dir()" % name)
-            # Now check for some items in dir() of a nested item
-            roi0 = rtss.ROIContourSequence[0]
-            got_dir = dir(roi0)
-            expect_in_dir = ['pixel_array', 'add_new', 'ReferencedROINumber', 
-                             'ROIDisplayColor', '__sizeof__']
-            for name in expect_in_dir:
-                self.assert_(name in got_dir, "Expected name '%s' in dir()" % name)               
+        rtss = read_file(rtstruct_name, force=True)        
+        # sample some expected 'dir' values
+        got_dir = dir(rtss)
+        expect_in_dir = ['pixel_array', 'add_new', 'ROIContourSequence', 
+                            'StructureSetDate', '__sizeof__']
+        expect_not_in_dir = ['RemovePrivateTags', 'AddNew', 'GroupDataset'] # remove in v1.0
+        for name in expect_in_dir:
+            self.assert_(name in got_dir, "Expected name '%s' in dir()" % name)
+        for name in expect_not_in_dir:
+            self.assert_(name not in got_dir, "Unexpected name '%s' in dir()" % name)
+        # Now check for some items in dir() of a nested item
+        roi0 = rtss.ROIContourSequence[0]
+        got_dir = dir(roi0)
+        expect_in_dir = ['pixel_array', 'add_new', 'ReferencedROINumber', 
+                            'ROIDisplayColor', '__sizeof__']
+        for name in expect_in_dir:
+            self.assert_(name in got_dir, "Expected name '%s' in dir()" % name)               
     def testMR(self):
         """Returns correct values for sample data elements in test MR file....."""
         mr = read_file(mr_name)

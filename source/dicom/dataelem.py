@@ -224,7 +224,7 @@ class DataElement(object):
         try:
             return self.value[key]
         except TypeError:
-            raise TypeError, "DataElement value is unscriptable (not a Sequence)"
+            raise TypeError("DataElement value is unscriptable (not a Sequence)")
 
     @property
     def name(self):
@@ -275,8 +275,6 @@ class DeferredDataElement(DataElement):
         self._value = None # flag as unread
 
         # Check current file object and save info needed for read later
-        # if not isinstance(fp, DicomFile):
-            # raise NotImplementedError, "Deferred read is only available for DicomFile objects"
         self.fp_is_implicit_VR = fp.is_implicit_VR
         self.fp_is_little_endian = fp.is_little_endian
         self.filepath = fp.name

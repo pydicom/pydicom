@@ -87,7 +87,7 @@ if __name__ == "__main__":
         out_dir = arg2
         if os.path.exists(out_dir):
             if not os.path.isdir(out_dir):
-                raise IOError, "Input is directory; output name exists but is not a directory"
+                raise IOError("Input is directory; output name exists but is not a directory")
         else: # out_dir does not exist; create it.
             os.makedirs(out_dir)
 

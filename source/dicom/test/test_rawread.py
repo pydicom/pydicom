@@ -44,8 +44,8 @@ class RawReaderExplVRTests(unittest.TestCase):
         bytes1 = "e0 7f 10 00 4f 42 00 00 ff ff ff ff"
         bytes2 = " 41 42 43 44 45 46 47 48 49 4a"  # 'content'
         bytes3 = " fe ff dd e0 00 00 00 00"          # Sequence Delimiter
-        bytes = bytes1 + bytes2 + bytes3
-        infile = StringIO(hex2str(bytes))
+        byte_string = bytes1 + bytes2 + bytes3
+        infile = StringIO(hex2str(byte_string))
         expected = ((0x7fe0,0x10), b'OB', 0xffffffffL, b'ABCDEFGHIJ', 0xc, False, True)
         de_gen = data_element_generator(infile, is_implicit_VR=False, is_little_endian=True)
         got = next(de_gen)
@@ -56,8 +56,8 @@ class RawReaderExplVRTests(unittest.TestCase):
         for multiplier in (116, 117, 118, 120):
             multiplier = 116
             bytes2b = bytes2 + " 00"*multiplier
-            bytes = bytes1 + bytes2b + bytes3
-            infile = StringIO(hex2str(bytes))
+            byte_string = bytes1 + bytes2b + bytes3
+            infile = StringIO(hex2str(byte_string))
             expected = len(b'ABCDEFGHIJ' + b'\0'*multiplier)
             de_gen = data_element_generator(infile, is_implicit_VR=False, is_little_endian=True)
             got = next(de_gen)
@@ -86,8 +86,8 @@ class RawReaderImplVRTests(unittest.TestCase):
         bytes1 = "e0 7f 10 00 ff ff ff ff"
         bytes2 = " 41 42 43 44 45 46 47 48 49 4a"  # 'content'
         bytes3 = " fe ff dd e0 00 00 00 00"          # Sequence Delimiter
-        bytes = bytes1 + bytes2 + bytes3
-        infile = StringIO(hex2str(bytes))
+        byte_string = bytes1 + bytes2 + bytes3
+        infile = StringIO(hex2str(byte_string))
         expected = ((0x7fe0,0x10), b'OW or OB', 0xffffffffL, b'ABCDEFGHIJ', 0x8, True, True)
         de_gen = data_element_generator(infile, is_implicit_VR=True, is_little_endian=True)
         got = next(de_gen)
@@ -98,8 +98,8 @@ class RawReaderImplVRTests(unittest.TestCase):
         for multiplier in (116, 117, 118, 120):
             multiplier = 116
             bytes2b = bytes2 + " 00"*multiplier
-            bytes = bytes1 + bytes2b + bytes3
-            infile = StringIO(hex2str(bytes))
+            byte_string = bytes1 + bytes2b + bytes3
+            infile = StringIO(hex2str(byte_string))
             expected = len(b'ABCDEFGHIJ' + b'\0'*multiplier)
             de_gen = data_element_generator(infile, is_implicit_VR=True, is_little_endian=True)
             got = next(de_gen)
@@ -114,7 +114,7 @@ class RawSequenceTests(unittest.TestCase):
     def testEmptyItem(self):
         """Read sequence with a single empty item..............................."""
         # This is fix for issue 27
-        bytes = (
+        byte_string = (
              "08 00 32 10"    # (0008, 1032) SQ "Procedure Code Sequence"
             " 08 00 00 00"    # length 8
             " fe ff 00 e0"    # (fffe, e000) Item Tag
@@ -125,9 +125,9 @@ class RawSequenceTests(unittest.TestCase):
             " 52 20 41 44 44 20 56 49 45 57 53 20"  # value
             )
         # "\x08\x00\x32\x10\x08\x00\x00\x00\xfe\xff\x00\xe0\x00\x00\x00\x00" # from issue 27, procedure code sequence (0008,1032)
-        # bytes += "\x08\x00\x3e\x10\x0c\x00\x00\x00\x52\x20\x41\x44\x44\x20\x56\x49\x45\x57\x53\x20" # data element following
+        # byte_string += "\x08\x00\x3e\x10\x0c\x00\x00\x00\x52\x20\x41\x44\x44\x20\x56\x49\x45\x57\x53\x20" # data element following
         
-        fp = StringIO(hex2str(bytes))
+        fp = StringIO(hex2str(byte_string))
         gen = data_element_generator(fp, is_implicit_VR=True, is_little_endian=True)
         raw_seq = next(gen)
         seq = convert_value("SQ", raw_seq)
@@ -142,7 +142,7 @@ class RawSequenceTests(unittest.TestCase):
         """Raw read: ImplVR Little Endian SQ with explicit lengths.............."""
         # Create a fictional sequence with bytes directly,
         #    similar to PS 3.5-2008 Table 7.5-1 p42
-        bytes = (
+        byte_string = (
             "0a 30 B0 00"    # (300a, 00b0) Beam Sequence
             " 40 00 00 00"    # length
                 " fe ff 00 e0"    # (fffe, e000) Item Tag
@@ -164,7 +164,7 @@ class RawSequenceTests(unittest.TestCase):
                 " 42 65 61 6d 20 32" # value 'Beam 2'                
                 )
                 
-        infile = StringIO(hex2str(bytes))
+        infile = StringIO(hex2str(byte_string))
         de_gen = data_element_generator(infile, is_implicit_VR=True, is_little_endian=True)
         raw_seq = next(de_gen)
         seq = convert_value("SQ", raw_seq)
@@ -180,7 +180,7 @@ class RawSequenceTests(unittest.TestCase):
         """Raw read: ImplVR BigEndian SQ with explicit lengths.................."""
         # Create a fictional sequence with bytes directly,
         #    similar to PS 3.5-2008 Table 7.5-1 p42
-        bytes = (
+        byte_string = (
             "30 0a 00 B0"    # (300a, 00b0) Beam Sequence
             " 00 00 00 40"    # length
                 " ff fe e0 00"    # (fffe, e000) Item Tag
@@ -202,7 +202,7 @@ class RawSequenceTests(unittest.TestCase):
                 " 42 65 61 6d 20 32" # value 'Beam 2'                
                 )
                 
-        infile = StringIO(hex2str(bytes))
+        infile = StringIO(hex2str(byte_string))
         de_gen = data_element_generator(infile, is_implicit_VR=True, is_little_endian=False)
         raw_seq = next(de_gen)
         seq = convert_value("SQ", raw_seq)
@@ -220,7 +220,7 @@ class RawSequenceTests(unittest.TestCase):
         #    similar to PS 3.5-2008 Table 7.5-2 p42
         item1_value_bytes = "\1"*126
         item2_value_bytes = "\2"*222
-        bytes = (
+        byte_string = (
             "30 0a 00 B0"    # (300a, 00b0) Beam Sequence
             " 53 51"         # SQ
             " 00 00"         # reserved
@@ -250,7 +250,7 @@ class RawSequenceTests(unittest.TestCase):
             " 00 00 00 00"    # zero length              
                 )
                 
-        infile = StringIO(hex2str(bytes))
+        infile = StringIO(hex2str(byte_string))
         de_gen = data_element_generator(infile, is_implicit_VR=False, is_little_endian=False)
         seq = next(de_gen)
         # Note seq itself is not a raw data element. 

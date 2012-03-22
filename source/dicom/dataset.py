@@ -368,7 +368,7 @@ class Dataset(dict):
         # Check if pixel data is in a form we know how to make into an array
         # XXX uses file_meta here, should really only be thus for FileDataset
         if self.file_meta.TransferSyntaxUID not in NotCompressedPixelTransferSyntaxes :      
-            raise NotImplementedError( "Pixel Data is compressed in a format pydicom does not yet handle. Cannot return array")
+            raise NotImplementedError("Pixel Data is compressed in a format pydicom does not yet handle. Cannot return array")
 
         # Check if already have converted to a NumPy array
         # Also check if self.PixelData has changed. If so, get new NumPy array

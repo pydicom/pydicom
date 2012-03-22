@@ -555,7 +555,7 @@ def read_deferred_data_element(fileobj_type, filename, timestamp, raw_data_elem)
         raise IOError("Deferred read -- original filename not stored. Cannot re-open")
     # Check that the file is the same as when originally read
     if not os.path.exists(filename):
-        raise IOError( "Deferred read -- original file {0:s} is missing".format(filename))
+        raise IOError("Deferred read -- original file {0:s} is missing".format(filename))
     if stat_available and (timestamp is not None):
         statinfo = stat(filename)
         if statinfo.st_mtime != timestamp:
@@ -575,7 +575,7 @@ def read_deferred_data_element(fileobj_type, filename, timestamp, raw_data_elem)
     data_elem = next(elem_gen)
     fp.close()
     if data_elem.VR != raw_data_elem.VR:
-        raise ValueError( "Deferred read VR {0:s} does not match original {1:s}".format(data_elem.VR, raw_data_elem.VR))
+        raise ValueError("Deferred read VR {0:s} does not match original {1:s}".format(data_elem.VR, raw_data_elem.VR))
     if data_elem.tag != raw_data_elem.tag:
         raise ValueError("Deferred read tag {0!r} does not match original {1!r}".format(data_elem.tag, raw_data_elem.tag))
 
