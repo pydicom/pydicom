@@ -16,7 +16,7 @@ def hex2bytes(hex_string):
          " 08 00 00 00"    # length 8
          " fe ff 00 e0"    # (fffe, e000) Item Tag
         )
-        bytes = hex2bytes(hex_string)
+        byte_string = hex2bytes(hex_string)
     Note in the example that all lines except the first must start with a space,
     alternatively the space could end the previous line.
     """

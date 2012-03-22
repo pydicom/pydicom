@@ -42,7 +42,7 @@ except:
 def get_LUT_value(data, window, level):
     """Apply the RGB Look-Up Table for the given data and window/level value."""
     if not have_numpy:
-        raise ImportError, "Numpy is not available. See http://numpy.scipy.org/ to download and install"
+        raise ImportError("Numpy is not available. See http://numpy.scipy.org/ to download and install")
 
     return np.piecewise(data, 
         [data <= (level - 0.5 - (window-1)/2),
@@ -52,7 +52,7 @@ def get_LUT_value(data, window, level):
 def get_LUT_value(data, window, level):
     """Apply the RGB Look-Up Table for the given data and window/level value."""
     if not have_numpy:
-        raise ImportError, "Numpy is not available. See http://numpy.scipy.org/ to download and install"
+        raise ImportError("Numpy is not available. See http://numpy.scipy.org/ to download and install")
 
     return np.piecewise(data, 
         [data <= (level - 0.5 - (window-1)/2),
@@ -62,9 +62,9 @@ def get_LUT_value(data, window, level):
 # Display an image using the Python Imaging Library (PIL)
 def show_PIL(dataset):
     if not have_PIL:
-        raise ImportError, "Python Imaging Library is not available. See http://www.pythonware.com/products/pil/ to download and install"
+        raise ImportError("Python Imaging Library is not available. See http://www.pythonware.com/products/pil/ to download and install")
     if ('PixelData' not in dataset):
-        raise TypeError, "Cannot show image -- DICOM dataset does not have pixel data"    
+        raise TypeError("Cannot show image -- DICOM dataset does not have pixel data")
     if ('WindowWidth' not in dataset) or ('WindowCenter' not in dataset): # can only apply LUT if these values exist
         bits = dataset.BitsAllocated
         samples = dataset.SamplesPerPixel
@@ -75,7 +75,7 @@ def show_PIL(dataset):
         elif bits == 16:
             mode = "I;16" # not sure about this -- PIL source says is 'experimental' and no documentation. Also, should bytes swap depending on endian of file and system??
         else:
-            raise TypeError, "Don't know PIL mode for %d BitsAllocated and %d SamplesPerPixel" % (bits, samples)
+            raise TypeError("Don't know PIL mode for %d BitsAllocated and %d SamplesPerPixel" % (bits, samples))
         
         # PIL size = (width, height)
         size = (dataset.Columns, dataset.Rows)

@@ -2,7 +2,7 @@
 """Routines for working with encapsulated (compressed) data
 
 """
-# Copyright (c) 2008 Darcy Mason
+# Copyright (c) 2008-2012 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
@@ -65,6 +65,6 @@ def read_item(fp):
         logger.debug("%04x: Item, length 0x%x", fp.tell()-8, length)
 
     if length == 0xFFFFFFFFL:
-        raise ValueError, "Encapsulated data fragment had Undefined Length at data position 0x%x" % fp.tell()-4
+        raise ValueError("Encapsulated data fragment had Undefined Length at data position 0x%x" % fp.tell()-4)
     item_data = fp.read(length)
     return item_data

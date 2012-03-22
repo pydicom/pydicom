@@ -18,7 +18,7 @@ else:
     namebase = bytestring
     strbase = basestring
 
-# For reading/writing data elements, these ones have longer format
+# For reading/writing data elements, these ones have longer explicit VR format
 extra_length_VRs = (b'OB', b'OW', b'OF', b'SQ', b'UN', b'UT')
 
 def is_stringlike(name):
@@ -123,10 +123,10 @@ def MultiString(val, valtype=str):
     """
     # Remove trailing blank used to pad to even length
     # 2005.05.25: also check for trailing 0, error made in PET files we are converting
-    if val and (val.endswith(' ') or val.endswith('\x00')):
+    if val and (val.endswith(b' ') or val.endswith(b'\x00')):
         val = val[:-1]
 
-    splitup = [valtype(x) if x else x for x in val.split("\\")]
+    splitup = [valtype(x) if x else x for x in val.split(b"\\")]
 
     if len(splitup) == 1:
         return splitup[0]

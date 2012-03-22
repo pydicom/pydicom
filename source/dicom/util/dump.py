@@ -47,9 +47,9 @@ def hexdump(file_in, StartAddress=0, StopAddress=None, showAddress=True):
         if not data:
             break
         row = [ord(x) for x in data]  # need ord twice below so convert once
-        bytes = ' '.join(["%02x" % x for x in row])  # string of two digit hex bytes
-        str_out.write(bytes)
-        str_out.write(blanks[:byteslen-len(bytes)])  # if not 16, pad
+        byte_string = ' '.join(["%02x" % x for x in row])  # string of two digit hex bytes
+        str_out.write(byte_string)
+        str_out.write(blanks[:byteslen-len(byte_string)])  # if not 16, pad
         str_out.write('  ')
         str_out.write(''.join([PrintCharacter(x) for x in row]))  # character rep of bytes
         str_out.write("\n")
