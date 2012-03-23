@@ -1,22 +1,23 @@
 # datadict.py
 # -*- coding: utf-8 -*-
 """Access dicom dictionary information"""
-from __future__ import absolute_import
-from __future__ import unicode_literals
-#
-# Copyright (c) 2008-2011 Darcy Mason
+
+# Copyright (c) 2008-2012 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
 #
+
+from __future__ import absolute_import
 import sys
 import logging
 logger = logging.getLogger("pydicom")
-from dicom.tag import Tag
-from dicom._dicom_dict import DicomDictionary  # the actual dict of {tag: (VR, VM, name, is_retired, keyword), ...}
-from dicom._dicom_dict import RepeatersDictionary # those with tags like "(50xx, 0005)"
-from dicom._private_dict import private_dictionaries
+from .tag import Tag
+from ._dicom_dict import DicomDictionary  # the actual dict of {tag: (VR, VM, name, is_retired, keyword), ...}
+from ._dicom_dict import RepeatersDictionary # those with tags like "(50xx, 0005)"
+from ._private_dict import private_dictionaries
 import warnings
+from dicom import in_py3
 
 # Generate mask dict for checking repeating groups etc.
 # Map a true bitwise mask to the DICOM mask with "x"'s in it.
@@ -80,11 +81,15 @@ def dictionary_keyword(tag):
     return get_entry(tag)[4]
 
 # Set up a translation table for "cleaning" DICOM descriptions
-#    for backwards compatibility pydicom < 0.9.7 (pre-DICOM keywords)
+#    for backwards compatibility pydicom < 0.9.7 (before DICOM keywords)
 # Translation is different with unicode - see .translate() at
 #        http://docs.python.org/library/stdtypes.html#string-methods
 chars_to_remove = r""" !@#$%^&*(),;:.?\|{}[]+-="'’/"""
-translate_table = dict((ord(char), None) for char in chars_to_remove)
+if in_py3: # i.e. unicode strings
+    translate_table = dict((ord(char), None) for char in chars_to_remove)
+else:
+    import string
+    translate_table = string.maketrans('','')
 
 def keyword_for_tag(tag):
     """Return the DICOM keyword for the given tag. Replaces old CleanName() 
@@ -113,7 +118,10 @@ def CleanName(tag):
             return ""
     s = dictionary_description(tag)    # Descriptive name in dictionary
     # remove blanks and nasty characters
-    s = s.translate(translate_table)
+    if in_py3:
+        s = s.translate(translate_table)
+    else:
+        s = s.translate(translate_table, chars_to_remove)
     
     # Take "Sequence" out of name (pydicom < 0.9.7)
     # e..g "BeamSequence"->"Beams"; "ReferencedImageBoxSequence"->"ReferencedImageBoxes"
