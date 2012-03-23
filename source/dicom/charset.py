@@ -7,7 +7,6 @@
 #    available at http://pydicom.googlecode.com
 #
 from __future__ import absolute_import
-from __future__ import unicode_literals
 
 import logging
 logger = logging.getLogger('pydicom')
@@ -28,7 +27,7 @@ python_encoding = {
     b'ISO_IR 144': b'iso_ir_144', # Russian
     }
 
-from dicom.valuerep import PersonNameUnicode, PersonName, clean_escseq
+from .valuerep import PersonNameUnicode, PersonName, clean_escseq
 
 # PS3.5-2008 6.1.1 (p 18) says:
 #   default is ISO-IR 6 G0, equiv to common chr set of ISO 8859 (PS3.5 6.1.2.1)

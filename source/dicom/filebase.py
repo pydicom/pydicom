@@ -1,13 +1,12 @@
 # filebase.py 
 """Hold DicomFile class, which does basic I/O for a dicom file."""
-# Copyright (c) 2008 Darcy Mason
+# Copyright (c) 2008-2012 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
 from __future__ import absolute_import
-from __future__ import unicode_literals
 
-from dicom.tag import Tag
+from .tag import Tag
 from struct import unpack, pack
 
 from cStringIO import StringIO

@@ -5,17 +5,16 @@
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
 from __future__ import absolute_import
-from __future__ import unicode_literals
 # Need zlib and cStringIO for deflate-compressed file
 import os.path
 import warnings
 import zlib
 from cStringIO import StringIO # tried cStringIO but wouldn't let me derive class from it.
 import logging
-from dicom.tag import TupleTag
-from dicom.dataelem import RawDataElement
-from dicom.util.hexutil import bytes2hex
-from dicom.valuerep import extra_length_VRs
+from .tag import TupleTag
+from .dataelem import RawDataElement
+from .util.hexutil import bytes2hex
+from .valuerep import extra_length_VRs
 
 logger = logging.getLogger('pydicom')
 
@@ -28,16 +27,16 @@ except:
 from os import SEEK_CUR
 
 import dicom.UID # for Implicit/Explicit / Little/Big Endian transfer syntax UIDs
-from dicom.filebase import DicomFile, DicomFileLike
-from dicom.filebase import DicomIO, DicomStringIO
-from dicom.dataset import Dataset, FileDataset
-from dicom.datadict import dictionaryVR
-from dicom.dataelem import DataElement, DeferredDataElement
-from dicom.tag import Tag, ItemTag, ItemDelimiterTag, SequenceDelimiterTag
-from dicom.sequence import Sequence
-from dicom.misc import size_in_bytes
-from dicom.fileutil import absorb_delimiter_item, read_undefined_length_value
-from dicom.fileutil import length_of_undefined_length
+from .filebase import DicomFile, DicomFileLike
+from .filebase import DicomIO, DicomStringIO
+from .dataset import Dataset, FileDataset
+from .datadict import dictionaryVR
+from .dataelem import DataElement, DeferredDataElement
+from .tag import Tag, ItemTag, ItemDelimiterTag, SequenceDelimiterTag
+from .sequence import Sequence
+from .misc import size_in_bytes
+from .fileutil import absorb_delimiter_item, read_undefined_length_value
+from .fileutil import length_of_undefined_length
 from struct import Struct, unpack
 from sys import byteorder
 sys_is_little_endian = (byteorder == 'little')

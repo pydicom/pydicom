@@ -4,26 +4,25 @@
 DataElements have a DICOM value representation VR, a value multiplicity VM,
 and a value.
 """
-#
 # Copyright (c) 2008-2012 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
 #
 from __future__ import absolute_import
-from __future__ import unicode_literals
+import sys
+from dicom import in_py3
 
 import logging
 logger = logging.getLogger('pydicom')
 
-from dicom.datadict import dictionary_has_tag, dictionary_description
-from dicom.datadict import private_dictionary_description, dictionaryVR
-from dicom.tag import Tag
+from .datadict import dictionary_has_tag, dictionary_description
+from .datadict import private_dictionary_description, dictionaryVR
+from .tag import Tag
 
-from dicom.UID import UID
-from dicom.valuerep import IS, DS, PersonName
+from .UID import UID
+from .valuerep import IS, DS, PersonName
 from decimal import Decimal
-from dicom import in_python3
 
 from collections import namedtuple
 
@@ -36,7 +35,7 @@ except:
     stat_available = False
 import os.path
 
-from dicom.filebase import DicomFile
+from .filebase import DicomFile
 import warnings
 
 # Helper functions:
@@ -52,7 +51,7 @@ def isMultiValue(value):
 
 def isString(val):
     """Helper function: return True if val is a string."""
-    if in_python3:
+    if in_py3:
         return isinstance(val, str) or isinstance(val, bytes)
     else:
         return isinstance(val, basestring)
@@ -144,7 +143,7 @@ class DataElement(object):
         """Convert Dicom string values if possible to e.g. numbers. Handle the case
         of multiple value data_elements"""
         if self.VR=='SQ': # a sequence - leave it alone
-            from dicom.sequence import Sequence
+            from .sequence import Sequence
             if isinstance(val,Sequence):
                 return val
             else:
@@ -306,7 +305,7 @@ RawDataElement = namedtuple('RawDataElement',
 
 def DataElement_from_raw(raw_data_element):
     """Return a DataElement from a RawDataElement"""
-    from dicom.values import convert_value # XXX buried here to avoid circular import filereader->Dataset->convert_value->filereader (for SQ parsing)
+    from .values import convert_value # XXX buried here to avoid circular import filereader->Dataset->convert_value->filereader (for SQ parsing)
     raw = raw_data_element
     VR = raw.VR
     if VR is None: # Can be if was implicit VR
