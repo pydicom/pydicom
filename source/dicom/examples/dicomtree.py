@@ -14,7 +14,7 @@ def RunTree(w, filename):
     top = Tix.Frame(w, relief=Tix.RAISED, bd=1)
     tree = Tix.Tree(top, options="hlist.columns 2")
     tree.pack(expand=1, fill=Tix.BOTH, padx=10, pady=10, side=Tix.LEFT)
-    # print tree.hlist.keys()   # use to see the available configure() options
+    # print(tree.hlist.keys())   # use to see the available configure() options
     tree.hlist.configure(bg='white', font='Courier 10', indent=30)
     tree.hlist.configure(selectbackground='light yellow', gap=150)
     
@@ -47,7 +47,7 @@ def recurse_tree(tree, dataset, parent, hide=False):
             for i, dataset in enumerate(data_element.value):
                 item_id = node_id + "." + str(i+1)
                 sq_item_description = data_element.name.replace(" Sequence", "") # XXX not i18n
-                item_text = "%s %d" % (sq_item_description, i+1)
+                item_text = "{0:s} {1:d}".format(sq_item_description, i+1)
                 tree.hlist.add(item_id, text=item_text)
                 tree.hlist.hide_entry(item_id)
                 recurse_tree(tree, dataset, item_id, hide=True)
@@ -56,11 +56,11 @@ if __name__ == '__main__':
     import sys
     import dicom
     if len(sys.argv) != 2:
-        print "Please supply a dicom file name:\n"
-        print usage
+        print("Please supply a dicom file name:\n")
+        print(usage)
         sys.exit(-1)
     root = Tix.Tk()
-    root.geometry("%dx%d%+d%+d" % (800, 600, 0, 0))
+    root.geometry("{0:d}x{1:d}+{2:d}+{3:d}".format(800, 600, 0, 0))
     
     RunTree(root, sys.argv[1])
     root.mainloop()

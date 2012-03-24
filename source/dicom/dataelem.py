@@ -16,12 +16,12 @@ from dicom import in_py3
 import logging
 logger = logging.getLogger('pydicom')
 
-from .datadict import dictionary_has_tag, dictionary_description
-from .datadict import private_dictionary_description, dictionaryVR
-from .tag import Tag
+from dicom.datadict import dictionary_has_tag, dictionary_description
+from dicom.datadict import private_dictionary_description, dictionaryVR
+from dicom.tag import Tag
 
-from .UID import UID
-from .valuerep import IS, DS, PersonName
+from dicom.UID import UID
+from dicom.valuerep import IS, DS, PersonName
 from decimal import Decimal
 
 from collections import namedtuple
@@ -35,7 +35,7 @@ except:
     stat_available = False
 import os.path
 
-from .filebase import DicomFile
+from dicom.filebase import DicomFile
 import warnings
 
 # Helper functions:
@@ -143,7 +143,7 @@ class DataElement(object):
         """Convert Dicom string values if possible to e.g. numbers. Handle the case
         of multiple value data_elements"""
         if self.VR=='SQ': # a sequence - leave it alone
-            from .sequence import Sequence
+            from dicom.sequence import Sequence
             if isinstance(val,Sequence):
                 return val
             else:
@@ -305,7 +305,7 @@ RawDataElement = namedtuple('RawDataElement',
 
 def DataElement_from_raw(raw_data_element):
     """Return a DataElement from a RawDataElement"""
-    from .values import convert_value # XXX buried here to avoid circular import filereader->Dataset->convert_value->filereader (for SQ parsing)
+    from dicom.values import convert_value # XXX buried here to avoid circular import filereader->Dataset->convert_value->filereader (for SQ parsing)
     raw = raw_data_element
     VR = raw.VR
     if VR is None: # Can be if was implicit VR

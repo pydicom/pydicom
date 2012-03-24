@@ -6,6 +6,8 @@
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
 
+from __future__ import print_function
+
 usage = """
 Usage:
 python DicomDiff.py file1 file2
@@ -23,7 +25,7 @@ import difflib
 
 # only used as a script
 if len(sys.argv) != 3:
-    print usage
+    print(usage)
     sys.exit()
 
 datasets = dicom.read_file(sys.argv[1]), \
@@ -41,4 +43,4 @@ for dataset in datasets:
 diff = difflib.Differ()
 for line in diff.compare(rep[0], rep[1]):
     if line[0] != "?":
-        print line
+        print(line)

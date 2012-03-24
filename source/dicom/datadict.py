@@ -12,10 +12,10 @@ from __future__ import absolute_import
 import sys
 import logging
 logger = logging.getLogger("pydicom")
-from .tag import Tag
-from ._dicom_dict import DicomDictionary  # the actual dict of {tag: (VR, VM, name, is_retired, keyword), ...}
-from ._dicom_dict import RepeatersDictionary # those with tags like "(50xx, 0005)"
-from ._private_dict import private_dictionaries
+from dicom.tag import Tag
+from dicom._dicom_dict import DicomDictionary  # the actual dict of {tag: (VR, VM, name, is_retired, keyword), ...}
+from dicom._dicom_dict import RepeatersDictionary # those with tags like "(50xx, 0005)"
+from dicom._private_dict import private_dictionaries
 import warnings
 from dicom import in_py3
 
