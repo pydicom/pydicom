@@ -9,26 +9,8 @@ from decimal import Decimal
 import dicom.config
 from dicom.multival import MultiValue
 
-from sys import version_info
-if version_info[0] < 3:
-    namebase = object
-    bytestring = str
-    strbase = str
-else:
-    namebase = bytestring
-    strbase = basestring
-
 # For reading/writing data elements, these ones have longer explicit VR format
 extra_length_VRs = (b'OB', b'OW', b'OF', b'SQ', b'UN', b'UT')
-
-def is_stringlike(name):
-    """Return True if name is string-like."""
-    try:
-        name + ""
-    except TypeError:
-        return False
-    else:
-        return True
 
 def clean_escseq(element, encodings):
     """Remove escape sequences that Python does not remove from
@@ -50,7 +32,7 @@ class DS(Decimal):
         passed in, e.g. from a type 2 DICOM blank value.
         """
         # DICOM allows spaces around the string, but python doesn't, so clean it
-        if isinstance(val, strbase):
+        if isinstance(val, (str, unicode)):
             val=val.strip()
         if val == '':
             return val
@@ -76,7 +58,7 @@ class DS(Decimal):
         """ 
         # ... also if user changes a data element value, then will get
         # a different Decimal, as Decimal is immutable.
-        if isinstance(val, strbase):
+        if isinstance(val, (str, unicode)):
             self.original_string = val
             
     def __repr__(self):
@@ -93,7 +75,7 @@ class IS(int):
     # with leading zeros.
     def __new__(cls, val):
         """Create instance if new integer string"""
-        if isinstance(val, strbase) and val.strip() == '':
+        if isinstance(val, (str, unicode)) and val.strip() == '':
             return ''
         newval = super(IS, cls).__new__(cls, val)
         # check if a float or Decimal passed in, then could have lost info,
@@ -107,7 +89,7 @@ class IS(int):
         return newval
     def __init__(self, val):
         # If a string passed, then store it
-        if isinstance(val, basestring):
+        if isinstance(val, (str, unicode)):
             self.original_string = val
     def __repr__(self):
         if hasattr(self, 'original_string'):
@@ -133,7 +115,7 @@ def MultiString(val, valtype=str):
     else:
         return MultiValue(valtype, splitup)
 
-class PersonNameBase(namebase):
+class PersonNameBase(object):
     """Base class for Person Name classes"""
 
     def __init__(self, val):
@@ -235,6 +217,3 @@ class PersonNameUnicode(PersonNameBase, unicode):
     def family_comma_given(self):
         """Return name as 'Family-name, Given-name'"""
         return self.formatted("%(family_name)u, %(given_name)u")
-
-class OtherByte(bytestring):
-    pass

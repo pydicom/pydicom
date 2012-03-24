@@ -6,25 +6,28 @@
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
 
+from __future__ import print_function
 import dicom
 
 usage = """python ListBeams.py rtplan.dcm"""
 
 def ListBeams(plan_dataset):
     """Return a string summarizing the RTPLAN beam information in the dataset"""
-    lines = ["%13s %8s %8s %8s" % ("Beam name", "Number", "Gantry", "SSD (cm)")]
+    lines = ["{name:^13s} {num:^8s} {gantry:^8s} {ssd:^11s}".format(
+        name="Beam name", num="Number", gantry="Gantry", ssd="SSD (cm)")]
     for beam in plan_dataset.BeamSequence:
         cp0 = beam.ControlPointSequence[0]
         SSD = float(cp0.SourcetoSurfaceDistance / 10)
-        lines.append("%13s %8s %8.1f %8.1f" % (beam.BeamName, str(beam.BeamNumber),
-                                      cp0.GantryAngle, SSD))
+        lines.append("{b.BeamName:^13s} {b.BeamNumber:8d} "
+                    "{gantry:8.1f} {ssd:8.1f}".format(b=beam, 
+                                        gantry=cp0.GantryAngle, ssd=SSD))
     return "\n".join(lines)
 
 if __name__ == "__main__":
     import sys
     if len(sys.argv) != 2:
-        print usage
+        print(usage)
         sys.exit(-1)
 
     rtplan = dicom.read_file(sys.argv[1])
-    print ListBeams(rtplan)
+    print(ListBeams(rtplan))

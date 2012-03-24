@@ -6,7 +6,7 @@
 #    available at http://pydicom.googlecode.com
 from __future__ import absolute_import
 
-from .tag import Tag
+from dicom.tag import Tag
 from struct import unpack, pack
 
 from cStringIO import StringIO

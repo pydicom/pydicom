@@ -14,6 +14,8 @@ This is an example only; use only as a starting point.
 # Annex E of PS3.15-2011 DICOM standard document details what must be done to 
 # fully de-identify DICOM data
 
+from __future__ import print_function
+
 usage = """
 Usage:
 python anonymize.py dicomfile.dcm outputfile.dcm
@@ -78,7 +80,7 @@ def anonymize(filename, output_filename, new_person_name="anonymous",
 if __name__ == "__main__":
     import sys
     if len(sys.argv) != 3:
-        print usage
+        print(usage)
         sys.exit()
     arg1, arg2 = sys.argv[1:]
 
@@ -94,12 +96,11 @@ if __name__ == "__main__":
         filenames = os.listdir(in_dir)
         for filename in filenames:
             if not os.path.isdir(os.path.join(in_dir, filename)):
-                print filename + "...",
+                print(filename + "...", end='')
                 anonymize(os.path.join(in_dir, filename), os.path.join(out_dir, filename))
-                print "done\r",
+                print("done\r")
     else: # first arg not a directory, assume two files given
         in_filename = arg1
         out_filename = arg2
         anonymize(in_filename, out_filename)
-    print
-    
+    print()

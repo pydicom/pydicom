@@ -29,7 +29,6 @@ from dicom.datadict import DicomDictionary, dictionaryVR
 from dicom.datadict import tag_for_name, all_names_for_tag
 from dicom.tag import Tag, BaseTag
 from dicom.dataelem import DataElement, DataElement_from_raw, RawDataElement
-from dicom.valuerep import is_stringlike
 from dicom.UID import NotCompressedPixelTransferSyntaxes
 import os.path
 import cStringIO, StringIO
@@ -121,7 +120,7 @@ class Dataset(dict):
         This is called for code like: ``if 'SliceLocation' in dataset``.
 
         """
-        if is_stringlike(name):
+        if isinstance(name, (str, unicode)):
             tag = tag_for_name(name)
         else:
             try:
@@ -227,7 +226,7 @@ class Dataset(dict):
 
     def get(self, key, default=None):
         """Extend dict.get() to handle *named tags*."""
-        if is_stringlike(key):
+        if isinstance(key, (str, unicode)):
             try:
                 return getattr(self, key)
             except AttributeError:
@@ -403,7 +402,7 @@ class Dataset(dict):
         """A generator to give back a formatted string representing each line
         one at a time. Example:
             for line in dataset.formatted_lines("%(name)s=%(repval)s", "SQ:%(name)s=%(repval)s"):
-                print line
+                print(line)
         See the source code for default values which illustrate some of the names that can be used in the
         format strings
         indent_format -- not used in current version. Placeholder for future functionality.
@@ -525,7 +524,7 @@ class Dataset(dict):
     def update(self, dictionary):
         """Extend dict.update() to handle *named tags*."""
         for key, value in dictionary.items():
-            if is_stringlike(key):
+            if isinstance(key, (str, unicode)):
                 setattr(self, key, value)
             else:
                 self[Tag(key)] = value

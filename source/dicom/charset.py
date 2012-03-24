@@ -27,7 +27,7 @@ python_encoding = {
     b'ISO_IR 144': b'iso_ir_144', # Russian
     }
 
-from .valuerep import PersonNameUnicode, PersonName, clean_escseq
+from dicom.valuerep import PersonNameUnicode, PersonName, clean_escseq
 
 # PS3.5-2008 6.1.1 (p 18) says:
 #   default is ISO-IR 6 G0, equiv to common chr set of ISO 8859 (PS3.5 6.1.2.1)

@@ -35,8 +35,11 @@ def Tag(arg, arg2=None):
             raise OverflowError("Tags are limited to 32-bit length; tag {0!r}".format(arg))
     return BaseTag(long_value)
 
+# py2to3: for some reason, the BaseTag class derived directly from long below 
+#     was not converted by 2to3, but conversion does work with this next line
+BaseTag_base_class = long  # converted to "int" by 2to3
      
-class BaseTag(long):
+class BaseTag(BaseTag_base_class):
     """Class for storing the dicom (group, element) tag"""
     # Override comparisons so can convert "other" to Tag as necessary
     #   See Ordering Comparisons at http://docs.python.org/dev/3.0/whatsnew/3.0.html    
