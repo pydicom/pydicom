@@ -8,19 +8,12 @@
 from decimal import Decimal
 import dicom.config
 from dicom.multival import MultiValue
+from dicom import in_py3
+
+default_encoding = "iso8859" # can't import from charset or get circular import
 
 # For reading/writing data elements, these ones have longer explicit VR format
-extra_length_VRs = (b'OB', b'OW', b'OF', b'SQ', b'UN', b'UT')
-
-def clean_escseq(element, encodings):
-    """Remove escape sequences that Python does not remove from
-       Korean encoding ISO 2022 IR 149 due to the G1 code element.
-    """
-    if 'euc_kr' in encodings:
-        return element.replace(
-                "\x1b\x24\x29\x43", "").replace("\x1b\x28\x42", "")
-    else:
-        return element
+extra_length_VRs = ('OB', 'OW', 'OF', 'SQ', 'UN', 'UT')
 
 class DS(Decimal):
     """Store values for DICOM VR of DS (Decimal String).
@@ -98,17 +91,19 @@ class IS(int):
             return "'" + int.__str__(self) + "'"
             
 def MultiString(val, valtype=str):
-    """Split a string by delimiters if there are any
+    """Split a bytestring by delimiters if there are any
     
-    val -- DICOM string to split up
+    val -- DICOM bytestring to split up
     valtype -- default str, but can be e.g. UID to overwrite to a specific type
     """
     # Remove trailing blank used to pad to even length
     # 2005.05.25: also check for trailing 0, error made in PET files we are converting
+    
     if val and (val.endswith(b' ') or val.endswith(b'\x00')):
         val = val[:-1]
-
-    splitup = [valtype(x) if x else x for x in val.split(b"\\")]
+    if in_py3:
+        val = val.decode(default_encoding)
+    splitup = [valtype(x) if x else x for x in val.split("\\")]
 
     if len(splitup) == 1:
         return splitup[0]
@@ -149,7 +144,7 @@ class PersonNameBase(object):
             self.phonetic = self.components[2]
         
         if self.single_byte:
-            name_string = self.single_byte+"^^^^" # in case missing trailing items are left out
+            name_string = self.single_byte + "^^^^" # in case missing trailing items are left out
             parts = name_string.split("^")[:5]
             (self.family_name, self.given_name, self.middle_name,
                                self.name_prefix, self.name_suffix) = parts
@@ -189,6 +184,7 @@ class PersonName(PersonNameBase, str):
         
 class PersonNameUnicode(PersonNameBase, unicode):
     """Unicode version of Person Name"""
+
     def __new__(cls, val, encodings):
         """Return unicode string after conversion of each part
         val -- the PN value to store
@@ -196,12 +192,13 @@ class PersonNameUnicode(PersonNameBase, unicode):
                  from dicom.charset.python_encodings mapping
                  of values in DICOM data element (0008,0005).
         """
+        from dicom.charset import clean_escseq # in here to avoid circular import
         # Make the possible three character encodings explicit:        
         if not isinstance(encodings, list):
             encodings = [encodings]*3
         if len(encodings) == 2:
             encodings.append(encodings[1])
-        components = val.split(b"=")
+        components = val.split("=")
         # Remove the first encoding if only one component is present
         if (len(components) == 1):
             del encodings[0]

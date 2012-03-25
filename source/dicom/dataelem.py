@@ -66,7 +66,7 @@ def isStringOrStringList(val):
     else:  # single value - test for a string
         return isString(val)
 
-_backslash = b"\\"  # double '\' because it is used as escape chr in Python
+_backslash = "\\"  # double '\' because it is used as escape chr in Python
 
 class DataElement(object):
     """Contain and manipulate a Dicom data element, having a tag, VR, VM and value.

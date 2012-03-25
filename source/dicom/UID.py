@@ -29,7 +29,7 @@ class UID(str):
             if isinstance(val, basestring):
                 return super(UID, cls).__new__(cls, val.strip())
             else:
-                raise TypeError("UID must be a string or bytes")
+                raise TypeError("UID must be a string")
         
     def __init__(self, val):
         """Initialize the UID properties
