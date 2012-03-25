@@ -7,13 +7,20 @@
 
 from cStringIO import StringIO
 import unittest
+from dicom import in_py3
 from dicom.filereader import data_element_generator
 from dicom.values import convert_value
 from dicom.sequence import Sequence
 
-def hex2str(hexstr):
-    """Return a bytestring rep of a string of hex rep of bytes separated by spaces"""
-    return "".join((chr(int(x,16)) for x in hexstr.split()))
+if in_py3:
+    from binascii import a2b_hex
+    def hex2bytes(hexstring):
+        """Return a bytestring for hex bytes separated by spaces"""
+        return a2b_hex(hexstring.replace(" ", ""))
+else:
+    def hex2bytes(hexstring):
+        """Return a bytestring rep of a string of hex rep of bytes separated by spaces"""
+        return "".join((chr(int(x,16)) for x in hexstring.split()))
 
 class RawReaderExplVRTests(unittest.TestCase):
     # See comments in data_element_generator -- summary of DICOM data element formats
@@ -22,8 +29,8 @@ class RawReaderExplVRTests(unittest.TestCase):
     def testExplVRLittleEndianLongLength(self):
         """Raw read: Explicit VR Little Endian long length......................"""
         # (0002,0001) OB 2-byte-reserved 4-byte-length, value 0x00 0x01
-        infile = StringIO(hex2str("02 00 01 00 4f 42 00 00 02 00 00 00 00 01"))
-        expected = ((2,1), b'OB', 2, b'\00\01', 0xc, False, True)
+        infile = StringIO(hex2bytes("02 00 01 00 4f 42 00 00 02 00 00 00 00 01"))
+        expected = ((2,1), 'OB', 2, b'\00\01', 0xc, False, True)
         de_gen = data_element_generator(infile, is_implicit_VR=False, is_little_endian=True)
         got = next(de_gen)
         msg_loc = "in read of Explicit VR='OB' data element (long length format)"
@@ -32,8 +39,8 @@ class RawReaderExplVRTests(unittest.TestCase):
     def testExplVRLittleEndianShortLength(self):
         """Raw read: Explicit VR Little Endian short length....................."""
         # (0008,212a) IS 2-byte-length, value '1 '
-        infile = StringIO(hex2str("08 00 2a 21 49 53 02 00 31 20"))
-        expected = ((8,0x212a), b'IS', 2, b'1 ', 0x8, False, True)
+        infile = StringIO(hex2bytes("08 00 2a 21 49 53 02 00 31 20"))
+        expected = ((8,0x212a), 'IS', 2, '1 ', 0x8, False, True)
         de_gen = data_element_generator(infile, is_implicit_VR=False, is_little_endian=True)
         got = next(de_gen)
         msg_loc = "in read of Explicit VR='IS' data element (short length format)"
@@ -41,12 +48,12 @@ class RawReaderExplVRTests(unittest.TestCase):
     def testExplVRLittleEndianUndefLength(self):
         """Raw read: Expl VR Little Endian with undefined length................"""
         # (7fe0,0010), OB, 2-byte reserved, 4-byte-length (UNDEFINED)
-        bytes1 = "e0 7f 10 00 4f 42 00 00 ff ff ff ff"
-        bytes2 = " 41 42 43 44 45 46 47 48 49 4a"  # 'content'
-        bytes3 = " fe ff dd e0 00 00 00 00"          # Sequence Delimiter
-        byte_string = bytes1 + bytes2 + bytes3
-        infile = StringIO(hex2str(byte_string))
-        expected = ((0x7fe0,0x10), b'OB', 0xffffffffL, b'ABCDEFGHIJ', 0xc, False, True)
+        hexstr1 = "e0 7f 10 00 4f 42 00 00 ff ff ff ff"
+        hexstr2 = " 41 42 43 44 45 46 47 48 49 4a"  # 'content'
+        hexstr3 = " fe ff dd e0 00 00 00 00"          # Sequence Delimiter
+        hexstr = hexstr1 + hexstr2 + hexstr3
+        infile = StringIO(hex2bytes(hexstr))
+        expected = ((0x7fe0,0x10), 'OB', 0xffffffffL, 'ABCDEFGHIJ', 0xc, False, True)
         de_gen = data_element_generator(infile, is_implicit_VR=False, is_little_endian=True)
         got = next(de_gen)
         msg_loc = "in read of undefined length Explicit VR ='OB' short value)"
@@ -55,17 +62,17 @@ class RawReaderExplVRTests(unittest.TestCase):
         # Test again such that delimiter crosses default 128-byte read "chunks", etc
         for multiplier in (116, 117, 118, 120):
             multiplier = 116
-            bytes2b = bytes2 + " 00"*multiplier
-            byte_string = bytes1 + bytes2b + bytes3
-            infile = StringIO(hex2str(byte_string))
-            expected = len(b'ABCDEFGHIJ' + b'\0'*multiplier)
+            hexstr2b = hexstr2 + " 00"*multiplier
+            hexstr = hexstr1 + hexstr2b + hexstr3
+            infile = StringIO(hex2bytes(hexstr))
+            expected = len('ABCDEFGHIJ' + '\0'*multiplier)
             de_gen = data_element_generator(infile, is_implicit_VR=False, is_little_endian=True)
             got = next(de_gen)
             got_len = len(got.value)
             msg_loc = "in read of undefined length Explicit VR ='OB' with 'multiplier' %d" % multiplier
             self.assertEqual(expected, got_len, "Expected value length %d, got %d in %s" % (expected, got_len, msg_loc))
             msg = "Unexpected value start with multiplier %d on Expl VR undefined length" % multiplier      
-            self.assertTrue(got.value.startswith(b'ABCDEFGHIJ\0'), msg)
+            self.assertTrue(got.value.startswith('ABCDEFGHIJ\0'), msg)
             
 class RawReaderImplVRTests(unittest.TestCase):
     # See comments in data_element_generator -- summary of DICOM data element formats
@@ -74,8 +81,8 @@ class RawReaderImplVRTests(unittest.TestCase):
     def testImplVRLittleEndian(self):
         """Raw read: Implicit VR Little Endian.................................."""
         # (0008,212a) {IS} 4-byte-length, value '1 '
-        infile = StringIO(hex2str("08 00 2a 21 02 00 00 00 31 20"))
-        expected = ((8,0x212a), None, 2, b'1 ', 0x8, True, True)
+        infile = StringIO(hex2bytes("08 00 2a 21 02 00 00 00 31 20"))
+        expected = ((8,0x212a), None, 2, '1 ', 0x8, True, True)
         de_gen = data_element_generator(infile, is_implicit_VR=True, is_little_endian=True)
         got = next(de_gen)
         msg_loc = "in read of Implicit VR='IS' data element (short length format)"
@@ -83,12 +90,12 @@ class RawReaderImplVRTests(unittest.TestCase):
     def testImplVRLittleEndianUndefLength(self):
         """Raw read: Impl VR Little Endian with undefined length................"""
         # (7fe0,0010), OB, 2-byte reserved, 4-byte-length (UNDEFINED)
-        bytes1 = "e0 7f 10 00 ff ff ff ff"
-        bytes2 = " 41 42 43 44 45 46 47 48 49 4a"  # 'content'
-        bytes3 = " fe ff dd e0 00 00 00 00"          # Sequence Delimiter
-        byte_string = bytes1 + bytes2 + bytes3
-        infile = StringIO(hex2str(byte_string))
-        expected = ((0x7fe0,0x10), b'OW or OB', 0xffffffffL, b'ABCDEFGHIJ', 0x8, True, True)
+        hexstr1 = "e0 7f 10 00 ff ff ff ff"
+        hexstr2 = " 41 42 43 44 45 46 47 48 49 4a"  # 'content'
+        hexstr3 = " fe ff dd e0 00 00 00 00"          # Sequence Delimiter
+        hexstr = hexstr1 + hexstr2 + hexstr3
+        infile = StringIO(hex2bytes(hexstr))
+        expected = ((0x7fe0,0x10), 'OW or OB', 0xffffffffL, 'ABCDEFGHIJ', 0x8, True, True)
         de_gen = data_element_generator(infile, is_implicit_VR=True, is_little_endian=True)
         got = next(de_gen)
         msg_loc = "in read of undefined length Implicit VR ='OB' short value)"
@@ -97,24 +104,24 @@ class RawReaderImplVRTests(unittest.TestCase):
         # Test again such that delimiter crosses default 128-byte read "chunks", etc
         for multiplier in (116, 117, 118, 120):
             multiplier = 116
-            bytes2b = bytes2 + " 00"*multiplier
-            byte_string = bytes1 + bytes2b + bytes3
-            infile = StringIO(hex2str(byte_string))
-            expected = len(b'ABCDEFGHIJ' + b'\0'*multiplier)
+            hexstr2b = hexstr2 + " 00"*multiplier
+            hexstr = hexstr1 + hexstr2b + hexstr3
+            infile = StringIO(hex2bytes(hexstr))
+            expected = len('ABCDEFGHIJ' + '\0'*multiplier)
             de_gen = data_element_generator(infile, is_implicit_VR=True, is_little_endian=True)
             got = next(de_gen)
             got_len = len(got.value)
             msg_loc = "in read of undefined length Implicit VR with 'multiplier' %d" % multiplier
             self.assertEqual(expected, got_len, "Expected value length %d, got %d in %s" % (expected, got_len, msg_loc))
             msg = "Unexpected value start with multiplier %d on Implicit VR undefined length" % multiplier           
-            self.assertTrue(got.value.startswith(b'ABCDEFGHIJ\0'), msg)
+            self.assertTrue(got.value.startswith('ABCDEFGHIJ\0'), msg)
 
 class RawSequenceTests(unittest.TestCase):
     # See DICOM standard PS3.5-2008 section 7.5 for sequence syntax
     def testEmptyItem(self):
         """Read sequence with a single empty item..............................."""
         # This is fix for issue 27
-        byte_string = (
+        hexstr = (
              "08 00 32 10"    # (0008, 1032) SQ "Procedure Code Sequence"
             " 08 00 00 00"    # length 8
             " fe ff 00 e0"    # (fffe, e000) Item Tag
@@ -125,9 +132,9 @@ class RawSequenceTests(unittest.TestCase):
             " 52 20 41 44 44 20 56 49 45 57 53 20"  # value
             )
         # "\x08\x00\x32\x10\x08\x00\x00\x00\xfe\xff\x00\xe0\x00\x00\x00\x00" # from issue 27, procedure code sequence (0008,1032)
-        # byte_string += "\x08\x00\x3e\x10\x0c\x00\x00\x00\x52\x20\x41\x44\x44\x20\x56\x49\x45\x57\x53\x20" # data element following
+        # hexstr += "\x08\x00\x3e\x10\x0c\x00\x00\x00\x52\x20\x41\x44\x44\x20\x56\x49\x45\x57\x53\x20" # data element following
         
-        fp = StringIO(hex2str(byte_string))
+        fp = StringIO(hex2bytes(hexstr))
         gen = data_element_generator(fp, is_implicit_VR=True, is_little_endian=True)
         raw_seq = next(gen)
         seq = convert_value("SQ", raw_seq)
@@ -142,7 +149,7 @@ class RawSequenceTests(unittest.TestCase):
         """Raw read: ImplVR Little Endian SQ with explicit lengths.............."""
         # Create a fictional sequence with bytes directly,
         #    similar to PS 3.5-2008 Table 7.5-1 p42
-        byte_string = (
+        hexstr = (
             "0a 30 B0 00"    # (300a, 00b0) Beam Sequence
             " 40 00 00 00"    # length
                 " fe ff 00 e0"    # (fffe, e000) Item Tag
@@ -164,7 +171,7 @@ class RawSequenceTests(unittest.TestCase):
                 " 42 65 61 6d 20 32" # value 'Beam 2'                
                 )
                 
-        infile = StringIO(hex2str(byte_string))
+        infile = StringIO(hex2bytes(hexstr))
         de_gen = data_element_generator(infile, is_implicit_VR=True, is_little_endian=True)
         raw_seq = next(de_gen)
         seq = convert_value("SQ", raw_seq)
@@ -180,7 +187,7 @@ class RawSequenceTests(unittest.TestCase):
         """Raw read: ImplVR BigEndian SQ with explicit lengths.................."""
         # Create a fictional sequence with bytes directly,
         #    similar to PS 3.5-2008 Table 7.5-1 p42
-        byte_string = (
+        hexstr = (
             "30 0a 00 B0"    # (300a, 00b0) Beam Sequence
             " 00 00 00 40"    # length
                 " ff fe e0 00"    # (fffe, e000) Item Tag
@@ -202,7 +209,7 @@ class RawSequenceTests(unittest.TestCase):
                 " 42 65 61 6d 20 32" # value 'Beam 2'                
                 )
                 
-        infile = StringIO(hex2str(byte_string))
+        infile = StringIO(hex2bytes(hexstr))
         de_gen = data_element_generator(infile, is_implicit_VR=True, is_little_endian=False)
         raw_seq = next(de_gen)
         seq = convert_value("SQ", raw_seq)
@@ -220,7 +227,7 @@ class RawSequenceTests(unittest.TestCase):
         #    similar to PS 3.5-2008 Table 7.5-2 p42
         item1_value_bytes = "\1"*126
         item2_value_bytes = "\2"*222
-        byte_string = (
+        hexstr = (
             "30 0a 00 B0"    # (300a, 00b0) Beam Sequence
             " 53 51"         # SQ
             " 00 00"         # reserved
@@ -250,7 +257,7 @@ class RawSequenceTests(unittest.TestCase):
             " 00 00 00 00"    # zero length              
                 )
                 
-        infile = StringIO(hex2str(byte_string))
+        infile = StringIO(hex2bytes(hexstr))
         de_gen = data_element_generator(infile, is_implicit_VR=False, is_little_endian=False)
         seq = next(de_gen)
         # Note seq itself is not a raw data element. 

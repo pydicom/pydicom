@@ -6,30 +6,42 @@
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
 #
-from __future__ import absolute_import
 
 import logging
 logger = logging.getLogger('pydicom')
+from dicom.valuerep import PersonNameUnicode
 
 # Map DICOM Specific Character Set to python equivalent
 python_encoding = {
-    b'': b'iso8859',           # default character set for DICOM
-    b'ISO_IR 6': b'iso8859',   # alias for latin_1 too
-    b'ISO_IR 100': b'latin_1',
-    b'ISO 2022 IR 87': b'iso2022_jp',
-    b'ISO 2022 IR 13': b'shift_jis',
-    b'ISO 2022 IR 149': b'euc_kr', # needs cleanup via clean_escseq from valuerep
-    b'ISO_IR 192': b'UTF8',     # from Chinese example, 2008 PS3.5 Annex J p1-4
-    b'GB18030': b'GB18030',
-    b'ISO_IR 126': b'iso_ir_126',  # Greek
-    b'ISO_IR 127': b'iso_ir_127',  # Arab
-    b'ISO_IR 138': b'iso_ir_138', # Hebrew
-    b'ISO_IR 144': b'iso_ir_144', # Russian
+    '': 'iso8859',           # default character set for DICOM
+    'ISO_IR 6': 'iso8859',   # alias for latin_1 too
+    'ISO_IR 100': 'latin_1',
+    'ISO 2022 IR 87': 'iso2022_jp',
+    'ISO 2022 IR 13': 'shift_jis',
+    'ISO 2022 IR 149': 'euc_kr', # needs cleanup via clean_escseq()
+    'ISO_IR 192': 'UTF8',     # from Chinese example, 2008 PS3.5 Annex J p1-4
+    'GB18030': 'GB18030',
+    'ISO_IR 126': 'iso_ir_126',  # Greek
+    'ISO_IR 127': 'iso_ir_127',  # Arab
+    'ISO_IR 138': 'iso_ir_138', # Hebrew
+    'ISO_IR 144': 'iso_ir_144', # Russian
     }
 
-from dicom.valuerep import PersonNameUnicode, PersonName, clean_escseq
+default_encoding = "iso8859"
 
-# PS3.5-2008 6.1.1 (p 18) says:
+def clean_escseq(element, encodings):
+    """Remove escape sequences that Python does not remove from
+       Korean encoding ISO 2022 IR 149 due to the G1 code element.
+    """
+    if 'euc_kr' in encodings:
+        return element.replace(
+                "\x1b\x24\x29\x43", "").replace("\x1b\x28\x42", "")
+    else:
+        return element
+
+
+
+# DICOM PS3.5-2008 6.1.1 (p 18) says:
 #   default is ISO-IR 6 G0, equiv to common chr set of ISO 8859 (PS3.5 6.1.2.1)
 #    (0008,0005)  value 1 can *replace* the default encoding... 
 #           for VRs of SH, LO, ST, LT, PN and UT (PS3.5 6.1.2.3)...
@@ -40,6 +52,7 @@ from dicom.valuerep import PersonNameUnicode, PersonName, clean_escseq
 #          in Person Name PN, after ^ or =
 # NOTE also that 7.5.3 SEQUENCE INHERITANCE states that if (0008,0005) 
 #       is not present in a sequence item then it is inherited from its parent.
+
 def decode(data_element, dicom_character_set):
     """Apply the DICOM character encoding to the data element
     
@@ -52,7 +65,7 @@ def decode(data_element, dicom_character_set):
     
     """
     if not dicom_character_set:
-        dicom_character_set = [b'ISO_IR 6']
+        dicom_character_set = ['ISO_IR 6']
     have_character_set_list = True
     try:
         dicom_character_set.append # check if is list-like object
@@ -61,7 +74,7 @@ def decode(data_element, dicom_character_set):
 
     if have_character_set_list:
         if not dicom_character_set[0]:
-            dicom_character_set[0] = b"ISO_IR 6"
+            dicom_character_set[0] = "ISO_IR 6"
     else:
         dicom_character_set = [dicom_character_set]
     encodings = [python_encoding[x] for x in dicom_character_set]
@@ -72,14 +85,14 @@ def decode(data_element, dicom_character_set):
 
     # decode the string value to unicode
     # PN is special case as may have 3 components with differenct chr sets
-    if data_element.VR == b"PN": 
+    if data_element.VR == "PN": 
         # logger.warn("%s ... type: %s" %(str(data_element), type(data_element.VR)))
         if data_element.VM == 1:
             data_element.value = PersonNameUnicode(data_element.value, encodings)
         else:
             data_element.value = [PersonNameUnicode(value, encodings) 
                                     for value in data_element.value]
-    if data_element.VR in [b'SH', b'LO', b'ST', b'LT', b'UT']:
+    if data_element.VR in ['SH', 'LO', 'ST', 'LT', 'UT']:
         # Remove the first encoding if this is a multi-byte encoding
         if len(encodings) > 1:
             del encodings[0]
@@ -91,3 +104,4 @@ def decode(data_element, dicom_character_set):
             data_element.value = [clean_escseq(
                                     value.decode(encodings[0]), encodings)
                                     for value in data_element.value]
+

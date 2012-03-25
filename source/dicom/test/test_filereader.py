@@ -74,7 +74,7 @@ class ReaderTests(unittest.TestCase):
         beam = plan.BeamSequence[0]
         cp0, cp1 = beam.ControlPointSequence # if not two controlpoints, then this would raise exception
 
-        self.assertEqual(beam.TreatmentMachineName, b"unit001", "Incorrect unit name")
+        self.assertEqual(beam.TreatmentMachineName, "unit001", "Incorrect unit name")
         self.assertEqual(beam.TreatmentMachineName, beam[0x300a, 0x00b2].value,
                 "beam TreatmentMachineName does not match the value accessed by tag number")
 
@@ -158,7 +158,7 @@ class ReaderTests(unittest.TestCase):
         
         obs_seq0 = rtss.RTROIObservationsSequence[0] 
         got = obs_seq0.ROIPhysicalPropertiesSequence[0].ROIPhysicalProperty      
-        expected = b'REL_ELEC_DENSITY'
+        expected = 'REL_ELEC_DENSITY'
         msg = "Expected Physical Property '%s', got %r" % (expected, got)
         self.assertEqual(expected, got, msg)
     def testDir(self):
@@ -196,7 +196,7 @@ class ReaderTests(unittest.TestCase):
         # Everything after group 2 is compressed. If we can read anything else, the decompression must have been ok.
         ds = read_file(deflate_name)
         got = ds.ConversionType
-        expected = b"WSD"
+        expected = "WSD"
         self.assertEqual(got, expected, "Attempted to read deflated file data element Conversion Type, expected '%s', got '%s'" % (expected, got))
     def testNoPixelsRead(self):
         """Returns all data elements before pixels using stop_before_pixels=False"""
@@ -224,7 +224,7 @@ class ReaderTests(unittest.TestCase):
         #     in file_meta, and second one in followinsg dataset
         ds = read_file(no_meta_group_length)
         got = ds.InstanceCreationDate
-        expected = b"20111130"
+        expected = "20111130"
         self.assertEqual(got, expected, "Sample data element after file meta with no group length failed, expected '%s', got '%s'" % (expected, got))
         
 
@@ -238,7 +238,7 @@ class JPEG2000Tests(unittest.TestCase):
         self.assertEqual(got, expected, "JPEG2000 file, Frame Increment Pointer: expected %s, got %s" % (expected, got))
 
         got = self.jpeg.DerivationCodeSequence[0].CodeMeaning
-        expected = b'Lossy Compression'
+        expected = 'Lossy Compression'
         self.assertEqual(got, expected, "JPEG200 file, Code Meaning got %s, expected %s" % (got, expected))
     def testJPEG2000PixelArray(self):
         """JPEG2000: Fails gracefully when uncompressed data is asked for......."""
@@ -250,7 +250,7 @@ class JPEGlossyTests(unittest.TestCase):
     def testJPEGlossy(self):
         """JPEG-lossy: Returns correct values for sample data elements.........."""
         got = self.jpeg.DerivationCodeSequence[0].CodeMeaning
-        expected = b'Lossy Compression'
+        expected = 'Lossy Compression'
         self.assertEqual(got, expected, "JPEG-lossy file, Code Meaning got %s, expected %s" % (got, expected))
     def testJPEGlossyPixelArray(self):
         """JPEG-lossy: Fails gracefully when uncompressed data is asked for....."""
@@ -262,7 +262,7 @@ class JPEGlosslessTests(unittest.TestCase):
     def testJPEGlossless(self):
         """JPEGlossless: Returns correct values for sample data elements........"""
         got = self.jpeg.SourceImageSequence[0].PurposeOfReferenceCodeSequence[0].CodeMeaning
-        expected = b'Uncompressed predecessor'
+        expected = 'Uncompressed predecessor'
         self.assertEqual(got, expected, "JPEG-lossless file, Code Meaning got %s, expected %s" % (got, expected))
     def testJPEGlosslessPixelArray(self):
         """JPEGlossless: Fails gracefully when uncompressed data is asked for..."""

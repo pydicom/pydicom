@@ -15,6 +15,8 @@ from dicom.tag import TupleTag
 from dicom.dataelem import RawDataElement
 from dicom.util.hexutil import bytes2hex
 from dicom.valuerep import extra_length_VRs
+from dicom.charset import default_encoding
+from dicom import in_py3
 
 logger = logging.getLogger('pydicom')
 
@@ -147,14 +149,14 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian, stop_when=None,
     #    data element
 
     if is_little_endian:
-        endian_chr = b"<"
+        endian_chr = "<"
     else:
-        endian_chr = b">"
+        endian_chr = ">"
     if is_implicit_VR:
-        element_struct = Struct(endian_chr + b"HHL")
+        element_struct = Struct(endian_chr + "HHL")
     else: # Explicit VR
-        element_struct = Struct(endian_chr + b"HH2sH")   # tag, VR, 2-byte length (or 0 if special VRs)
-        extra_length_struct = Struct(endian_chr + b"L") # for special VRs
+        element_struct = Struct(endian_chr + "HH2sH")   # tag, VR, 2-byte length (or 0 if special VRs)
+        extra_length_struct = Struct(endian_chr + "L") # for special VRs
         extra_length_unpack = extra_length_struct.unpack # one less lookup for speed
 
     # Make local variables so have faster lookup
@@ -176,6 +178,8 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian, stop_when=None,
             group, elem, length = element_struct_unpack(bytes_read)
         else: # explicit VR
             group, elem, VR, length = element_struct_unpack(bytes_read)
+            if in_py3:
+               VR = VR.decode(default_encoding)
             if VR in extra_length_VRs:
                 bytes_read = fp_read(4)
                 length = extra_length_unpack(bytes_read)[0]
@@ -235,7 +239,7 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian, stop_when=None,
                     VR = dictionaryVR(tag)
                 except KeyError: 
                     pass
-            if VR == b'SQ':
+            if VR == 'SQ':
                 if debugging:
                     logger_debug("{0:08x}: Reading and parsing undefined length sequence".format(fp_tell()))
                 seq = read_sequence(fp, is_implicit_VR, is_little_endian, length)
@@ -310,9 +314,9 @@ def read_sequence(fp, is_implicit_VR, is_little_endian, bytelength, offset=0):
 def read_sequence_item(fp, is_implicit_VR, is_little_endian):
     """Read and return a single sequence item, i.e. a Dataset"""
     if is_little_endian:
-        tag_length_format = b"<HHL"
+        tag_length_format = "<HHL"
     else:
-        tag_length_format = b">HHL"
+        tag_length_format = ">HHL"
     try:
         bytes_read = fp.read(8)
         group, element, length = unpack(tag_length_format, bytes_read)
@@ -354,11 +358,13 @@ def _read_file_meta_info(fp):
     debugging = dicom.debugging
     if debugging: logger.debug("Try to read group length info...")
     bytes_read = fp.read(8)
-    group, elem, VR, length = unpack(b"<HH2sH", bytes_read)
+    group, elem, VR, length = unpack("<HH2sH", bytes_read)
     if debugging: debug_msg = "{0:08x}: {1}".format(fp.tell()-8, bytes2hex(bytes_read))
+    if in_py3:
+        VR = VR.decode(default_encoding)
     if VR in extra_length_VRs:    
         bytes_read = fp.read(4)
-        length = unpack(b"<L", bytes_read)[0]
+        length = unpack("<L", bytes_read)[0]
         if debugging: debug_msg += " " + bytes2hex(bytes_read)
     if debugging:
         debug_msg = "{0:<47s}  ({1:04x}, {2:04x}) {3:2s} Length: {4:d}".format(debug_msg, 
@@ -369,7 +375,7 @@ def _read_file_meta_info(fp):
     if group == 2 and elem == 0:
         bytes_read = fp.read(length)
         if debugging: logger.debug("{0:08x}: {1}".format(fp.tell()-length, bytes2hex(bytes_read)))
-        group_length = unpack(b"<L", bytes_read)[0]
+        group_length = unpack("<L", bytes_read)[0]
         expected_ds_start = fp.tell() + group_length
         if debugging: 
             msg = "value (group length) = {0:d}".format(group_length)
