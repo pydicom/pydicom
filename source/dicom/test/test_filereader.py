@@ -9,7 +9,7 @@ import sys
 import os
 import os.path
 import unittest
-from cStringIO import StringIO
+from io import BytesIO
 from decimal import Decimal
 
 import shutil
@@ -32,7 +32,7 @@ from dicom.tag import Tag
 from dicom.sequence import Sequence
 import gzip
 
-from warncheck import assertWarns
+from dicom.test.warncheck import assertWarns
 
 from pkg_resources import Requirement, resource_filename
 test_dir = resource_filename(Requirement.parse("pydicom"),"dicom/testfiles")
@@ -342,8 +342,8 @@ class FileLikeTests(unittest.TestCase):
         # Should also be able to close the file ourselves without exception raised:
         f.close()
     def testReadFileGivenFileLikeObject(self):
-        """filereader: can read using a file-like (StringIO) file...."""
-        file_like = StringIO(open(ct_name, 'rb').read())
+        """filereader: can read using a file-like (BytesIO) file...."""
+        file_like = BytesIO(open(ct_name, 'rb').read())
         ct = read_file(file_like)
         # Tests here simply repeat some of testCT test
         got = ct.ImagePositionPatient

@@ -14,6 +14,7 @@ default_encoding = "iso8859" # can't import from charset or get circular import
 
 # For reading/writing data elements, these ones have longer explicit VR format
 extra_length_VRs = ('OB', 'OW', 'OF', 'SQ', 'UN', 'UT')
+text_VRs = ('SH', 'LO', 'ST', 'LT', 'UT')
 
 class DS(Decimal):
     """Store values for DICOM VR of DS (Decimal String).

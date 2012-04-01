@@ -16,8 +16,8 @@ from dicom.dataset import Dataset, FileDataset
 from dicom.sequence import Sequence
 from dicom.util.hexutil import hex2bytes, bytes2hex
 
-# from cStringIO import StringIO
-from dicom.filebase import DicomStringIO
+# from io import BytesIO
+from dicom.filebase import DicomBytesIO
 from dicom.dataelem import DataElement
 from dicom.util.hexutil import hex2bytes, bytes2hex
 
@@ -96,7 +96,7 @@ class WriteDataElementTests(unittest.TestCase):
     """Attempt to write data elements has the expected behaviour"""
     def setUp(self):
         # Create a dummy (in memory) file to write to
-        self.f1 = DicomStringIO()
+        self.f1 = DicomBytesIO()
         self.f1.is_little_endian = True
         self.f1.is_implicit_VR = True
         

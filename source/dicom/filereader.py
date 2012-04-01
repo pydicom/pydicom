@@ -5,11 +5,11 @@
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
 from __future__ import absolute_import
-# Need zlib and cStringIO for deflate-compressed file
+# Need zlib and io.BytesIO for deflate-compressed file
 import os.path
 import warnings
 import zlib
-from cStringIO import StringIO # tried cStringIO but wouldn't let me derive class from it.
+from io import BytesIO
 import logging
 from dicom.tag import TupleTag
 from dicom.dataelem import RawDataElement
@@ -30,7 +30,7 @@ from os import SEEK_CUR
 
 import dicom.UID # for Implicit/Explicit / Little/Big Endian transfer syntax UIDs
 from dicom.filebase import DicomFile, DicomFileLike
-from dicom.filebase import DicomIO, DicomStringIO
+from dicom.filebase import DicomIO, DicomBytesIO
 from dicom.dataset import Dataset, FileDataset
 from dicom.datadict import dictionaryVR
 from dicom.dataelem import DataElement, DeferredDataElement
@@ -92,7 +92,7 @@ class DicomIter(object):
                 zipped = fp.read()
                 # -MAX_WBITS part is from comp.lang.python answer:  http://groups.google.com/group/comp.lang.python/msg/e95b3b38a71e6799
                 unzipped = zlib.decompress(zipped, -zlib.MAX_WBITS)
-                fp = StringIO(unzipped) # a file-like object that usual code can use as normal
+                fp = BytesIO(unzipped) # a file-like object that usual code can use as normal
                 self.fp = fp #point to new object
                 self._is_implicit_VR = False
                 self._is_little_endian = True
@@ -471,7 +471,7 @@ def read_partial(fileobj, stop_when=None, defer_size=None, force=False):
             zipped = fileobj.read()
             # -MAX_WBITS part is from comp.lang.python answer:  http://groups.google.com/group/comp.lang.python/msg/e95b3b38a71e6799
             unzipped = zlib.decompress(zipped, -zlib.MAX_WBITS)
-            fileobj = StringIO(unzipped) # a file-like object that usual code can use as normal
+            fileobj = BytesIO(unzipped) # a file-like object that usual code can use as normal
             is_implicit_VR = False
         else:
             # Any other syntax should be Explicit VR Little Endian,

@@ -9,7 +9,7 @@ from __future__ import absolute_import
 from dicom.tag import Tag
 from struct import unpack, pack
 
-from cStringIO import StringIO
+from io import BytesIO
 import logging
 logger = logging.getLogger('pydicom')
 
@@ -138,5 +138,5 @@ class DicomFileLike(DicomIO):
 def DicomFile(*args, **kwargs):
     return DicomFileLike(open(*args, **kwargs))
 
-def DicomStringIO(*args, **kwargs):
-    return DicomFileLike(StringIO(*args, **kwargs))
+def DicomBytesIO(*args, **kwargs):
+    return DicomFileLike(BytesIO(*args, **kwargs))
