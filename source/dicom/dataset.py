@@ -31,7 +31,6 @@ from dicom.tag import Tag, BaseTag
 from dicom.dataelem import DataElement, DataElement_from_raw, RawDataElement
 from dicom.UID import NotCompressedPixelTransferSyntaxes
 import os.path
-import cStringIO, StringIO
 
 import dicom # for write_file
 import dicom.charset
@@ -575,7 +574,7 @@ class FileDataset(Dataset):
                         is_implicit_VR=True, is_little_endian=True):
         """Initialize a dataset read from a DICOM file
 
-        :param filename: full path and filename to the file. Use None if is a StringIO.
+        :param filename: full path and filename to the file. Use None if is a BytesIO.
         :param dataset: some form of dictionary, usually a Dataset from read_dataset()
         :param preamble: the 128-byte DICOM preamble
         :param file_meta: the file meta info dataset, as returned by _read_file_meta,
@@ -598,7 +597,7 @@ class FileDataset(Dataset):
             elif getattr(filename_or_obj, "filename", False): #gzip python <2.7?
                 self.filename = filename_or_obj.filename
             else:
-                self.filename = None # e.g. came from StringIO or something file-like
+                self.filename = None # e.g. came from BytesIO or something file-like
         self.timestamp = None
         if stat_available and self.filename and os.path.exists(self.filename):
             statinfo = stat(self.filename)

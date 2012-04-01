@@ -16,7 +16,7 @@ import dicom.UID
 from dicom.tag import Tag, TupleTag, SequenceDelimiterTag
 from dicom.datadict import dictionaryVR
 from dicom.filereader import read_sequence
-from cStringIO import StringIO
+from io import BytesIO
 from dicom.valuerep import DS, IS
 from dicom.charset import default_encoding
 from dicom import in_py3
@@ -91,7 +91,7 @@ def convert_single_string(byte_string, is_little_endian, struct_format=None):
 
 def convert_SQ(byte_string, is_implicit_VR, is_little_endian, offset=0):
     """Convert a sequence that has been read as bytes but not yet parsed."""
-    fp = StringIO(byte_string)
+    fp = BytesIO(byte_string)
     seq = read_sequence(fp, is_implicit_VR, is_little_endian, len(byte_string), offset)
     return seq
     

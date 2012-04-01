@@ -29,7 +29,7 @@ source, which should allow straightforward testing.
 '''
 
 import urllib2
-import cStringIO
+import io
 import xml.etree.cElementTree as ET
 import sys
 import datetime
@@ -44,10 +44,10 @@ PRIVATE_DICT_NAME = 'private_dictionaries'
 
 
 def get_private_dict_from_GDCM(url=GDCM_URL, retired_field=''):
-    '''open GDCM_URL, read content into StringIO file-like object and parse
+    '''open GDCM_URL, read content into BytesIO file-like object and parse
        into an ElementTree instance
     '''   
-    etree = ET.parse(cStringIO.StringIO(urllib2.urlopen(GDCM_URL).read()))
+    etree = ET.parse(io.BytesIO(urllib2.urlopen(GDCM_URL).read()))
     p_dict = etree.getroot()
     entries = [entry for entry in p_dict.findall('entry')]
 

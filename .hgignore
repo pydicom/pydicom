@@ -30,5 +30,9 @@ py3source
 # Docs build
 docs/_build/*
 
+# coverage.py files
+source/dicom/test/.coverage
+source/dicom/test/htmlcov
+
 # PyCharm IDE files
 *.idea*

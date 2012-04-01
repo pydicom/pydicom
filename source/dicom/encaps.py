@@ -18,7 +18,7 @@
 import logging
 logger = logging.getLogger('pydicom')
 
-from dicom.filebase import DicomStringIO
+from dicom.filebase import DicomBytesIO
 from dicom.tag import ItemTag, SequenceDelimiterTag
 
 def defragment_data(data):
@@ -31,7 +31,7 @@ def defragment_data(data):
     """
     
     # Convert data into a memory-mapped file
-    fp = DicomStringIO(data)
+    fp = DicomBytesIO(data)
     fp.is_little_endian = True # DICOM standard requires this
     BasicOffsetTable = read_item(fp)
     seq = []

@@ -9,7 +9,7 @@
 
 import logging
 logger = logging.getLogger('pydicom')
-from dicom.valuerep import PersonNameUnicode
+from dicom.valuerep import PersonNameUnicode, text_VRs
 
 # Map DICOM Specific Character Set to python equivalent
 python_encoding = {
@@ -92,7 +92,7 @@ def decode(data_element, dicom_character_set):
         else:
             data_element.value = [PersonNameUnicode(value, encodings) 
                                     for value in data_element.value]
-    if data_element.VR in ['SH', 'LO', 'ST', 'LT', 'UT']:
+    if data_element.VR in text_VRs:
         # Remove the first encoding if this is a multi-byte encoding
         if len(encodings) > 1:
             del encodings[0]

@@ -31,7 +31,7 @@ locations = [os.path.join(location_base, location) for location in locations]
 import glob
 import dicom
 from dicom.filereader import read_partial, _at_pixel_data
-from cStringIO import StringIO
+from io import BytesIO
 
 from time import time
 import cProfile 
@@ -73,13 +73,13 @@ def test_partial():
 
 def test_mem_read_full():
     rf = dicom.read_file
-    str_io = StringIO
+    str_io = BytesIO
     memory_files = (str_io(open(fn, 'rb').read()) for fn in filenames3)
     ds = [rf(memory_file) for memory_file in memory_files]
 
 def test_mem_read_small():
     rf = dicom.read_file
-    str_io = StringIO # avoid global lookup, make local instead
+    str_io = BytesIO # avoid global lookup, make local instead
     memory_files = (str_io(open(fn, 'rb').read(4000)) for fn in filenames4)
     ds = [rf(memory_file) for memory_file in memory_files]
 

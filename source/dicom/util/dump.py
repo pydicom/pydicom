@@ -5,7 +5,7 @@
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
 
-from cStringIO import StringIO
+from io import BytesIO
 
 def PrintCharacter(ordchr):
     """Return a printable character, or '.' for non-printable ones."""
@@ -22,7 +22,7 @@ def filedump(filename, StartAddress=0, StopAddress=None):
 
 def datadump(data):
     StopAddress = len(data) + 1
-    fp = StringIO(data)
+    fp = BytesIO(data)
     print hexdump(fp, 0, StopAddress)
     
 def hexdump(file_in, StartAddress=0, StopAddress=None, showAddress=True):
@@ -32,7 +32,7 @@ def hexdump(file_in, StartAddress=0, StopAddress=None, showAddress=True):
     
     file_in -- a file-like object to get the bytes to show from"""
 
-    str_out = StringIO()
+    str_out = BytesIO()
     byteslen = 16*3-1 # space taken up if row has a full 16 bytes
     blanks = ' ' * byteslen
 
