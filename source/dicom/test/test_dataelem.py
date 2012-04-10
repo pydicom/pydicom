@@ -30,12 +30,12 @@ class DataElementTests(unittest.TestCase):
         """DataElement: return correct value multiplicity for VM = 1........"""
         VM = self.data_elementIS.VM
         self.assertEqual(VM, 1, "Wrong Value Multiplicity, expected 1, got %i" % VM)
-    
+
     def testBackslash(self):
         """DataElement: Passing string with '\\' sets multi-valued data_element."""
         data_element = DataElement((1,2), "DS", r"42.1\42.2\42.3") # note r" to avoid \ as escape chr
         self.assertEqual(data_element.VM, 3, "Did not get a mult-valued value")
-    
+
     def testUID(self):
         """DataElement: setting or changing UID results in UID type........."""
         ds = Dataset()
@@ -49,7 +49,7 @@ class RawDataElementTests(unittest.TestCase):
         # raw data element -> tag VR length value value_tell is_implicit_VR is_little_endian'
         # Need unknown (not in DICOM dict), non-private, non-group 0 for this test
         self.raw1 = RawDataElement(Tag(0x88880002), None, 4, 0x1111, 0, True, True)
-        
+
     def testKeyError(self):
         """RawDataElement: conversion with unknown tag throws KeyError........"""
         self.assertRaises(KeyError, DataElement_from_raw, self.raw1)

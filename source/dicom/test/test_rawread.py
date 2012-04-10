@@ -63,9 +63,9 @@ class RawReaderExplVRTests(unittest.TestCase):
             got_len = len(got.value)
             msg_loc = "in read of undefined length Explicit VR ='OB' with 'multiplier' %d" % multiplier
             self.assertEqual(expected, got_len, "Expected value length %d, got %d in %s" % (expected, got_len, msg_loc))
-            msg = "Unexpected value start with multiplier %d on Expl VR undefined length" % multiplier      
+            msg = "Unexpected value start with multiplier %d on Expl VR undefined length" % multiplier
             self.assertTrue(got.value.startswith('ABCDEFGHIJ\0'), msg)
-            
+
 class RawReaderImplVRTests(unittest.TestCase):
     # See comments in data_element_generator -- summary of DICOM data element formats
     # Here we are trying to test all those variations
@@ -105,7 +105,7 @@ class RawReaderImplVRTests(unittest.TestCase):
             got_len = len(got.value)
             msg_loc = "in read of undefined length Implicit VR with 'multiplier' %d" % multiplier
             self.assertEqual(expected, got_len, "Expected value length %d, got %d in %s" % (expected, got_len, msg_loc))
-            msg = "Unexpected value start with multiplier %d on Implicit VR undefined length" % multiplier           
+            msg = "Unexpected value start with multiplier %d on Implicit VR undefined length" % multiplier
             self.assertTrue(got.value.startswith('ABCDEFGHIJ\0'), msg)
 
 class RawSequenceTests(unittest.TestCase):
@@ -125,18 +125,18 @@ class RawSequenceTests(unittest.TestCase):
             )
         # "\x08\x00\x32\x10\x08\x00\x00\x00\xfe\xff\x00\xe0\x00\x00\x00\x00" # from issue 27, procedure code sequence (0008,1032)
         # hexstr += "\x08\x00\x3e\x10\x0c\x00\x00\x00\x52\x20\x41\x44\x44\x20\x56\x49\x45\x57\x53\x20" # data element following
-        
+
         fp = BytesIO(hex2bytes(hexstr))
         gen = data_element_generator(fp, is_implicit_VR=True, is_little_endian=True)
         raw_seq = next(gen)
         seq = convert_value("SQ", raw_seq)
-        
+
         self.assertTrue(isinstance(seq, Sequence), "Did not get Sequence, got type {0:s}".format(type(seq)))
         self.assertTrue(len(seq)==1, "Expected Sequence with single (empty) item, got {0:d} item(s)".format(len(seq)))
         self.assertTrue(len(seq[0])==0, "Expected the sequence item (dataset) to be empty")
         elem2 = next(gen)
         self.assertEqual(elem2.tag, 0x0008103e, "Expected a data element after empty sequence item")
-    
+
     def testImplVRLittleEndian_ExplicitLengthSeq(self):
         """Raw read: ImplVR Little Endian SQ with explicit lengths.............."""
         # Create a fictional sequence with bytes directly,
@@ -160,21 +160,21 @@ class RawSequenceTests(unittest.TestCase):
                 " 32 20"          # value '2 '
                 " 0a 30 c2 00"    # (300A, 00C2) Beam Name
                 " 06 00 00 00"    # length
-                " 42 65 61 6d 20 32" # value 'Beam 2'                
+                " 42 65 61 6d 20 32" # value 'Beam 2'
                 )
-                
+
         infile = BytesIO(hex2bytes(hexstr))
         de_gen = data_element_generator(infile, is_implicit_VR=True, is_little_endian=True)
         raw_seq = next(de_gen)
         seq = convert_value("SQ", raw_seq)
 
-        # The sequence is parsed, but only into raw data elements. 
+        # The sequence is parsed, but only into raw data elements.
         # They will be converted when asked for. Check some:
         got = seq[0].BeamNumber
         self.assertTrue(got == 1, "Expected Beam Number 1, got {0!r}".format(got))
         got = seq[1].BeamName
         self.assert_(got == 'Beam 2', "Expected Beam Name 'Beam 2', got {0:s}".format(got))
-        
+
     def testImplVRBigEndian_ExplicitLengthSeq(self):
         """Raw read: ImplVR BigEndian SQ with explicit lengths.................."""
         # Create a fictional sequence with bytes directly,
@@ -198,15 +198,15 @@ class RawSequenceTests(unittest.TestCase):
                 " 32 20"          # value '2 '
                 " 30 0a 00 c2"    # (300A, 00C2) Beam Name
                 " 00 00 00 06"    # length
-                " 42 65 61 6d 20 32" # value 'Beam 2'                
+                " 42 65 61 6d 20 32" # value 'Beam 2'
                 )
-                
+
         infile = BytesIO(hex2bytes(hexstr))
         de_gen = data_element_generator(infile, is_implicit_VR=True, is_little_endian=False)
         raw_seq = next(de_gen)
         seq = convert_value("SQ", raw_seq)
 
-        # The sequence is parsed, but only into raw data elements. 
+        # The sequence is parsed, but only into raw data elements.
         # They will be converted when asked for. Check some:
         got = seq[0].BeamNumber
         self.assert_(got == 1, "Expected Beam Number 1, got {0!r}".format(got))
@@ -244,24 +244,24 @@ class RawSequenceTests(unittest.TestCase):
                 " 30 0a 00 c2"    # (300A, 00C2) Beam Name
                 " 4C 4F"          # LO
                 " 00 06"          # length
-                " 42 65 61 6d 20 32" # value 'Beam 2'   
+                " 42 65 61 6d 20 32" # value 'Beam 2'
             " ff fe E0 dd"    # SQ delimiter
-            " 00 00 00 00"    # zero length              
+            " 00 00 00 00"    # zero length
                 )
-                
+
         infile = BytesIO(hex2bytes(hexstr))
         de_gen = data_element_generator(infile, is_implicit_VR=False, is_little_endian=False)
         seq = next(de_gen)
-        # Note seq itself is not a raw data element. 
+        # Note seq itself is not a raw data element.
         #     The parser does parse undefined length SQ
 
-        # The sequence is parsed, but only into raw data elements. 
+        # The sequence is parsed, but only into raw data elements.
         # They will be converted when asked for. Check some:
         got = seq[0].BeamNumber
         self.assert_(got == 1, "Expected Beam Number 1, got {0!r}".format(got))
         got = seq[1].BeamName
         self.assert_(got == 'Beam 2', "Expected Beam Name 'Beam 2', got {0:s}".format(got))
-        
+
 if __name__ == "__main__":
     # import dicom
     # dicom.debug()

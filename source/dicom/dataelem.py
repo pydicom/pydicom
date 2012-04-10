@@ -118,7 +118,7 @@ class DataElement(object):
     def value(self):
         """The value (possibly multiple values) of this data_element"""
         return self._value
-    
+
     @value.setter
     def value(self, val):
         """Set method for 'value' property"""
@@ -280,7 +280,7 @@ class DeferredDataElement(DataElement):
         self.file_mtime = file_mtime
         self.data_element_tell = data_element_tell
         self.length = length
-    
+
     @property
     def repval(self):
         if self._value is None:

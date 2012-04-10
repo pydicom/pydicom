@@ -21,7 +21,7 @@ class MyTestLoader(object):
         if test_dir:
             os.chdir(test_dir)
         filenames = os.listdir(".")
-        module_names = [f[:-3] for f in filenames 
+        module_names = [f[:-3] for f in filenames
                        if f.startswith("test") and f.endswith(".py")]
 
         # Load all the tests
@@ -37,13 +37,13 @@ if __name__ == "__main__":
     # Get the tests -- in format used by Distribute library
     #        to run under 'python setup.py test'
     suite = MyTestLoader().loadTestsFromNames()
-    
+
     # Run the tests
     verbosity = 1
     if len(sys.argv) > 1 and (sys.argv[1]=="-v" or sys.argv[1]=="--verbose"):
         verbosity = 2
     runner = unittest.TextTestRunner(verbosity=verbosity)
-    
+
     # Switch directories to test DICOM files, used by many of the tests
     save_dir = os.getcwd()
     testfiles_dir = resource_filename(Requirement.parse("pydicom"),"dicom/testfiles")

@@ -34,11 +34,11 @@ from dicom.filereader import read_partial, _at_pixel_data
 from io import BytesIO
 
 from time import time
-import cProfile 
+import cProfile
 import pstats
 import sys
 import random
-        
+
 rp = read_partial
 filenames = []
 for location in locations:
@@ -66,7 +66,7 @@ def test_full_read():
     rf = dicom.read_file
     datasets = [rf(fn) for fn in filenames1]
     return datasets
-    
+
 def test_partial():
     rp = read_partial
     ds = [rp(open(fn, 'rb'), stop_when=_at_pixel_data) for fn in filenames2]
@@ -88,7 +88,7 @@ def test_python_read_files():
 
 if __name__ == "__main__":
     runs = ['datasets=test_full_read()',
-            # 'test_partial()', 
+            # 'test_partial()',
             # 'test_mem_read_full()',
                     # 'test_mem_read_small()',
             'test_python_read_files()',

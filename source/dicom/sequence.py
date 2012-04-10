@@ -17,10 +17,10 @@ def validate_dataset(elem):
 
 class Sequence(MultiValue):
     """Class to hold multiple Datasets in a list
-    
+
     This class is derived from MultiValue and as such enforces that all items
     added to the list are Dataset instances. In order to due this, a validator
-    is substituted for type_constructor when constructing the MultiValue super 
+    is substituted for type_constructor when constructing the MultiValue super
     class
     """
     def __init__(self, iterable=None):
@@ -31,8 +31,8 @@ class Sequence(MultiValue):
         """
         # We add this extra check to throw a relevant error. Without it, the
         # error will be simply that a Sequence must contain Datasets (since a
-        # Dataset IS iterable). This error, however, doesn't inform the user 
-        # that the actual issue is that their Dataset needs to be INSIDE an 
+        # Dataset IS iterable). This error, however, doesn't inform the user
+        # that the actual issue is that their Dataset needs to be INSIDE an
         # iterable object
         if isinstance(iterable, Dataset):
             raise TypeError('The Sequence constructor requires an iterable')

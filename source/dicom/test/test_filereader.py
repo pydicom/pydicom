@@ -79,7 +79,7 @@ class ReaderTests(unittest.TestCase):
                 "beam TreatmentMachineName does not match the value accessed by tag number")
 
         got = cp1.ReferencedDoseReferenceSequence[0].CumulativeDoseReferenceCoefficient
-        expected = Decimal('0.9990268')     
+        expected = Decimal('0.9990268')
         self.assertTrue(got == expected,
                 "Cum Dose Ref Coeff not the expected value (CP1, Ref'd Dose Ref")
         got = cp0.BeamLimitingDevicePositionSequence[0].LeafJawPositions
@@ -107,7 +107,7 @@ class ReaderTests(unittest.TestCase):
                 "ImplementationClassUID does not match the value accessed by tag number")
         # (0020, 0032) Image Position (Patient)  [-158.13580300000001, -179.035797, -75.699996999999996]
         got = ct.ImagePositionPatient
-        expected = [Decimal('-158.135803'), Decimal('-179.035797'), Decimal('-75.699997')]   
+        expected = [Decimal('-158.135803'), Decimal('-179.035797'), Decimal('-75.699997')]
         self.assertTrue(got == expected, "ImagePosition(Patient) values not as expected."
                         "got {0}, expected {1}".format(got,expected))
 
@@ -115,13 +115,13 @@ class ReaderTests(unittest.TestCase):
         self.assertEqual(ct.Columns, 128, "Columns not 128")
         self.assertEqual(ct.BitsStored, 16, "Bits Stored not 16")
         self.assertEqual(len(ct.PixelData), 128*128*2, "Pixel data not expected length")
-        
+
         # Also test private elements name can be resolved:
         expected = "[Duration of X-ray on]"
         got = ct[(0x0043,0x104e)].name
         msg = "Mismatch in private tag name, expected '%s', got '%s'"
         self.assertEqual(expected, got, msg % (expected, got))
-        
+
         # Check that can read pixels - get last one in array
         if have_numpy:
             expected = 909
@@ -133,12 +133,12 @@ class ReaderTests(unittest.TestCase):
     def testNoForce(self):
         """Raises exception if missing DICOM header and force==False..........."""
         self.assertRaises(InvalidDicomError, read_file, rtstruct_name)
-        
+
     def testRTstruct(self):
         """Returns correct values for sample elements in test RTSTRUCT file...."""
         # RTSTRUCT test file has complex nested sequences -- see rtstruct.dump file
         # Also has no DICOM header ... so tests 'force' argument of read_file
-        
+
         rtss = read_file(rtstruct_name, force=True)
         expected = '1.2.840.10008.1.2' # implVR little endian
         got = rtss.file_meta.TransferSyntaxUID
@@ -150,24 +150,24 @@ class ReaderTests(unittest.TestCase):
         expected = "1.2.826.0.1.3680043.8.498.2010020400001.2.1.1"
         msg = "Expected Reference Series UID '%s', got '%s'" % (expected, uid)
         self.assertEqual(expected, uid, msg)
-        
+
         got = rtss.ROIContourSequence[0].ContourSequence[2].ContourNumber
         expected = 3
         msg = "Expected Contour Number %d, got %r" % (expected, got)
         self.assertEqual(expected, got, msg)
-        
-        obs_seq0 = rtss.RTROIObservationsSequence[0] 
-        got = obs_seq0.ROIPhysicalPropertiesSequence[0].ROIPhysicalProperty      
+
+        obs_seq0 = rtss.RTROIObservationsSequence[0]
+        got = obs_seq0.ROIPhysicalPropertiesSequence[0].ROIPhysicalProperty
         expected = 'REL_ELEC_DENSITY'
         msg = "Expected Physical Property '%s', got %r" % (expected, got)
         self.assertEqual(expected, got, msg)
     def testDir(self):
         """Returns correct dir attributes for both Dataset and DICOM names (python >= 2.6).."""
         # Only python >= 2.6 calls __dir__ for dir() call
-        rtss = read_file(rtstruct_name, force=True)        
+        rtss = read_file(rtstruct_name, force=True)
         # sample some expected 'dir' values
         got_dir = dir(rtss)
-        expect_in_dir = ['pixel_array', 'add_new', 'ROIContourSequence', 
+        expect_in_dir = ['pixel_array', 'add_new', 'ROIContourSequence',
                             'StructureSetDate', '__sizeof__']
         expect_not_in_dir = ['RemovePrivateTags', 'AddNew', 'GroupDataset'] # remove in v1.0
         for name in expect_in_dir:
@@ -177,10 +177,10 @@ class ReaderTests(unittest.TestCase):
         # Now check for some items in dir() of a nested item
         roi0 = rtss.ROIContourSequence[0]
         got_dir = dir(roi0)
-        expect_in_dir = ['pixel_array', 'add_new', 'ReferencedROINumber', 
+        expect_in_dir = ['pixel_array', 'add_new', 'ReferencedROINumber',
                             'ROIDisplayColor', '__sizeof__']
         for name in expect_in_dir:
-            self.assert_(name in got_dir, "Expected name '%s' in dir()" % name)               
+            self.assert_(name in got_dir, "Expected name '%s' in dir()" % name)
     def testMR(self):
         """Returns correct values for sample data elements in test MR file....."""
         mr = read_file(mr_name)
@@ -214,7 +214,7 @@ class ReaderTests(unittest.TestCase):
         # From issues 91, 97, 98. Bug introduced by fast reading, due to VR=None
         #    in raw data elements, then an undefined length private item VR is looked up,
         #    and there is no such tag, generating an exception
-        
+
         # Simply read the file, in 0.9.5 this generated an exception
         priv_SQ = read_file(priv_SQ_name)
     def testNoMetaGroupLength(self):
@@ -226,7 +226,7 @@ class ReaderTests(unittest.TestCase):
         got = ds.InstanceCreationDate
         expected = "20111130"
         self.assertEqual(got, expected, "Sample data element after file meta with no group length failed, expected '%s', got '%s'" % (expected, got))
-        
+
 
 class JPEG2000Tests(unittest.TestCase):
     def setUp(self):
@@ -306,12 +306,12 @@ class DeferredReadTests(unittest.TestCase):
         """Deferred values from a gzipped file works.............."""
         # Arose from issue 103 "Error for defer_size read of gzip file object"
         fobj = gzip.open(gzip_name)
-        ds = read_file(fobj, defer_size=1)      
-        fobj.close()       
+        ds = read_file(fobj, defer_size=1)
+        fobj.close()
         # before the fix, this threw an error as file reading was not in right place,
         #    it was re-opened as a normal file, not zip file
         num = ds.InstanceNumber
-        
+
     def tearDown(self):
         if os.path.exists(self.testfile_name):
             os.remove(self.testfile_name)
@@ -333,7 +333,7 @@ class FileLikeTests(unittest.TestCase):
                 "ImplementationClassUID does not match the value accessed by tag number")
         # (0020, 0032) Image Position (Patient)  [-158.13580300000001, -179.035797, -75.699996999999996]
         got = ct.ImagePositionPatient
-        expected = [Decimal('-158.135803'), Decimal('-179.035797'), Decimal('-75.699997')]       
+        expected = [Decimal('-158.135803'), Decimal('-179.035797'), Decimal('-75.699997')]
         self.assertTrue(got == expected, "ImagePosition(Patient) values not as expected")
         self.assertEqual(ct.Rows, 128, "Rows not 128")
         self.assertEqual(ct.Columns, 128, "Columns not 128")
@@ -348,7 +348,7 @@ class FileLikeTests(unittest.TestCase):
         # Tests here simply repeat some of testCT test
         got = ct.ImagePositionPatient
         expected = [Decimal('-158.135803'), Decimal('-179.035797'), Decimal('-75.699997')]
-        self.assertTrue(got == expected, "ImagePosition(Patient) values not as expected")        
+        self.assertTrue(got == expected, "ImagePosition(Patient) values not as expected")
         self.assertEqual(len(ct.PixelData), 128*128*2, "Pixel data not expected length")
         # Should also be able to close the file ourselves without exception raised:
         file_like.close()

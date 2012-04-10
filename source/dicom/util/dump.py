@@ -24,12 +24,12 @@ def datadump(data):
     StopAddress = len(data) + 1
     fp = BytesIO(data)
     print hexdump(fp, 0, StopAddress)
-    
+
 def hexdump(file_in, StartAddress=0, StopAddress=None, showAddress=True):
     """Return a formatted string of hex bytes and characters in data.
-    
+
     This is a utility function for debugging file writing.
-    
+
     file_in -- a file-like object to get the bytes to show from"""
 
     str_out = BytesIO()
@@ -53,18 +53,18 @@ def hexdump(file_in, StartAddress=0, StopAddress=None, showAddress=True):
         str_out.write('  ')
         str_out.write(''.join([PrintCharacter(x) for x in row]))  # character rep of bytes
         str_out.write("\n")
-        
+
     return str_out.getvalue()
 
 def PrettyPrint(ds, indent=0, indentChars="   "):
     """Print a dataset directly, with indented levels.
 
     This is just like Dataset._PrettyStr, but more useful for debugging as it
-    prints each item immediately rather than composing a string, making it 
+    prints each item immediately rather than composing a string, making it
     easier to immediately see where an error in processing a dataset starts.
 
     """
-    
+
     strings = []
     indentStr = indentChars * indent
     nextIndentStr = indentChars *(indent+1)
@@ -78,7 +78,7 @@ def PrettyPrint(ds, indent=0, indentChars="   "):
         else:
             print indentStr + repr(data_element)
 
-   
+
 if __name__ == "__main__":
     import sys
     filename = sys.argv[1]
@@ -88,6 +88,5 @@ if __name__ == "__main__":
         StartAddress = eval(sys.argv[2])
     if len(sys.argv) > 3:
         StopAddress = eval(sys.argv[3])
-        
+
     print filedump(filename, StartAddress, StopAddress)
-    

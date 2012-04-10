@@ -17,7 +17,7 @@ def RunTree(w, filename):
     # print(tree.hlist.keys())   # use to see the available configure() options
     tree.hlist.configure(bg='white', font='Courier 10', indent=30)
     tree.hlist.configure(selectbackground='light yellow', gap=150)
-    
+
     box = Tix.ButtonBox(w, orientation=Tix.HORIZONTAL)
     # box.add('ok', text='Ok', underline=0, command=w.destroy, width=6)
     box.add('exit', text='Exit', underline=0, command=w.destroy, width=6)
@@ -61,6 +61,6 @@ if __name__ == '__main__':
         sys.exit(-1)
     root = Tix.Tk()
     root.geometry("{0:d}x{1:d}+{2:d}+{3:d}".format(800, 600, 0, 0))
-    
+
     RunTree(root, sys.argv[1])
     root.mainloop()

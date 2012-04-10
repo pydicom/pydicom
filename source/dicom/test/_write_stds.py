@@ -7,7 +7,7 @@ as well as undefined length sequences and items
 # Implicit VR, little endian, SQ's with defined lengths
 impl_LE_deflen_std_hex = (
     "10 00 10 00 "     # (0010, 0010) Patient's Name
-    "0c 00 00 00 "     # length 12 
+    "0c 00 00 00 "     # length 12
     "4e 61 6d 65 5e 50 61 74 69 65 6e 74 "    # "Name^Patient"
     "06 30 39 00 "     # (3006, 0039) ROI Contour Sequence
     "5a 00 00 00 "     # length 90
@@ -39,7 +39,7 @@ impl_LE_deflen_std_hex = (
 #    Will leave this here for now.
 impl_BE_deflen_std_hex = (
     "00 10 00 10 "     # (0010, 0010) Patient's Name
-    "00 00 00 0c "     # length 12 
+    "00 00 00 0c "     # length 12
     "4e 61 6d 65 5e 50 61 74 69 65 6e 74 "    # "Name^Patient"
     "30 06 00 39 "     # (3006, 0039) ROI Contour Sequence
     "00 00 00 5a "     # length 90

@@ -25,7 +25,7 @@ class SequenceTests(unittest.TestCase):
 
         # Construct the sequence
         seq = Sequence((patientSetups,))
-        self.assertTrue(isinstance(seq[0], Dataset), 
+        self.assertTrue(isinstance(seq[0], Dataset),
                       "Dataset modified during Sequence creation")
 
     def testInvalidInitialization(self):
@@ -36,7 +36,7 @@ class SequenceTests(unittest.TestCase):
         self.assertRaises(TypeError, Sequence, 1)
         # Test for invalid iterable contents
         self.assertRaises(TypeError, Sequence, [1,2])
-            
+
     def testInvalidAssignment(self):
         """Sequence: validate exception for invalid assignment"""
         seq = Sequence([Dataset(),])

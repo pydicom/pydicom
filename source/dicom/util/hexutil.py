@@ -1,4 +1,4 @@
-# hexutil.py 
+# hexutil.py
 """Miscellaneous utility routines relating to hex and byte strings"""
 # Copyright (c) 2008-2012 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
@@ -10,7 +10,7 @@ from dicom import in_py3
 
 def hex2bytes(hexstring):
     """Return bytestring for a string of hex bytes separated by whitespace
-    
+
     This is useful for creating specific byte sequences for testing, using
     python's implied concatenation for strings with comments allowed.
     Example:
@@ -24,7 +24,7 @@ def hex2bytes(hexstring):
     alternatively the space could end the previous line.
     """
     return a2b_hex(hexstring.replace(" ", ""))
-    
+
 def bytes2hex(byte_string):
     s = b2a_hex(byte_string)
     if in_py3:

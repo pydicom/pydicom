@@ -8,7 +8,6 @@
 #    available at http://pydicom.googlecode.com
 #
 
-from __future__ import absolute_import
 import sys
 import logging
 logger = logging.getLogger("pydicom")
@@ -24,7 +23,7 @@ from dicom import in_py3
 masks = {}
 for mask_x in RepeatersDictionary:
     # mask1 is XOR'd to see that all non-"x" bits are identical (XOR result = 0 if bits same)
-    #      then AND those out with 0 bits at the "x" ("we don't care") location using mask2  
+    #      then AND those out with 0 bits at the "x" ("we don't care") location using mask2
     mask1 = long(mask_x.replace("x", "0"),16)
     mask2 = long("".join(["F0"[c=="x"] for c in mask_x]),16)
     masks[mask_x] = (mask1, mask2)
@@ -43,10 +42,10 @@ def mask_match(tag):
         if (tag ^ mask1) & mask2 == 0:
             return mask_x
     return None
-    
+
 def get_entry(tag):
     """Return the tuple (VR, VM, name, is_retired, keyword) from the DICOM dictionary
-    
+
     If the entry is not in the main dictionary, check the masked ones,
     e.g. repeating groups like 50xx, etc.
     """
@@ -59,7 +58,7 @@ def get_entry(tag):
             return RepeatersDictionary[mask_x]
         else:
             raise KeyError("Tag {0} not found in DICOM dictionary".format(tag))
-        
+
 def dictionary_description(tag):
     """Return the descriptive text for the given dicom tag."""
     return get_entry(tag)[2]
@@ -77,7 +76,7 @@ def dictionary_has_tag(tag):
     return (tag in DicomDictionary)
 
 def dictionary_keyword(tag):
-    """Return the official DICOM standard (since 2011) keyword for the tag""" 
+    """Return the official DICOM standard (since 2011) keyword for the tag"""
     return get_entry(tag)[4]
 
 # Set up a translation table for "cleaning" DICOM descriptions
@@ -92,9 +91,9 @@ else:
     translate_table = string.maketrans('','')
 
 def keyword_for_tag(tag):
-    """Return the DICOM keyword for the given tag. Replaces old CleanName() 
+    """Return the DICOM keyword for the given tag. Replaces old CleanName()
     method using the 2011 DICOM standard keywords instead.
-    
+
     Will return GroupLength for group length tags,
     and returns empty string ("") if the tag doesn't exist in the dictionary.
     """
@@ -102,16 +101,16 @@ def keyword_for_tag(tag):
         return dictionary_keyword(tag)
     except KeyError:
         return ""
-        
+
 def CleanName(tag):
     """Return the dictionary descriptive text string but without bad characters.
-    
+
     Used for e.g. *named tags* of Dataset instances (before DICOM keywords were
     part of the standard)
-    
+
     """
-    tag = Tag(tag)  
-    if tag not in DicomDictionary: 
+    tag = Tag(tag)
+    if tag not in DicomDictionary:
         if tag.element == 0:    # 0=implied group length in DICOM versions < 3
             return "GroupLength"
         else:
@@ -122,19 +121,19 @@ def CleanName(tag):
         s = s.translate(translate_table)
     else:
         s = s.translate(translate_table, chars_to_remove)
-    
+
     # Take "Sequence" out of name (pydicom < 0.9.7)
     # e..g "BeamSequence"->"Beams"; "ReferencedImageBoxSequence"->"ReferencedImageBoxes"
     # 'Other Patient ID' exists as single value AND as sequence so check for it and leave 'Sequence' in
     if dictionaryVR(tag) == "SQ" and not s.startswith("OtherPatientIDs"):
-        if s.endswith("Sequence"): 
+        if s.endswith("Sequence"):
             s = s[:-8]+"s"
             if s.endswith("ss"):
                 s = s[:-1]
             if s.endswith("xs"):
                 s = s[:-1] + "es"
             if s.endswith("Studys"):
-                s = s[:-2]+"ies"        
+                s = s[:-2]+"ies"
     return s
 
 # Provide for the 'reverse' lookup. Given clean name, what is the tag?
@@ -144,9 +143,9 @@ keyword_dict = dict([(dictionary_keyword(tag), tag) for tag in DicomDictionary])
 
 def short_name(name):
     """Return a short *named tag* for the corresponding long version.
-    
+
     Return a blank string if there is no short version of the name.
-    
+
     """
     for longname, shortname in shortNames:
         if name.startswith(longname):
@@ -155,11 +154,11 @@ def short_name(name):
 
 def long_name(name):
     """Return a long *named tag* for the corresponding short version.
-    
+
     Return a blank string if there is no long version of the name.
-    
+
     """
-    
+
     for longname, shortname in shortNames:
         if name.startswith(shortname):
             return name.replace(shortname, longname)
@@ -170,13 +169,13 @@ def tag_for_name(name):
     if name in keyword_dict: # the usual case
         return keyword_dict[name]
     # If not an official keyword, check the old style pydicom names
-    if name in NameDict: 
-        tag = NameDict[name] 
+    if name in NameDict:
+        tag = NameDict[name]
         msg = ("'%s' as tag name has been deprecated; use official DICOM keyword '%s'"
                 % (name, dictionary_keyword(tag)))
         warnings.warn(msg, DeprecationWarning)
         return tag
-    
+
     # check if is short-form of a valid name
     longname = long_name(name)
     if longname:
@@ -193,7 +192,7 @@ def all_names_for_tag(tag):
     return names
 
 
-# PRIVATE DICTIONARY handling 
+# PRIVATE DICTIONARY handling
 # functions in analogy with those of main DICOM dict
 def get_private_entry(tag, private_creator):
     """Return the tuple (VR, VM, name, is_retired) from a private dictionary"""
@@ -202,7 +201,7 @@ def get_private_entry(tag, private_creator):
         private_dict = private_dictionaries[private_creator]
     except KeyError:
         raise KeyError("Private creator {0} not in private dictionary".format(private_creator))
-    
+
     # private elements are usually agnostic for "block" (see PS3.5-2008 7.8.1 p44)
     # Some elements in _private_dict are explicit; most have "xx" for high-byte of element
     # Try exact key first, but then try with "xx" in block position
@@ -217,7 +216,7 @@ def get_private_entry(tag, private_creator):
             raise KeyError("Tag {0} not in private dictionary for private creator {1}".format(key, private_creator))
         dict_entry = private_dict[key]
     return dict_entry
-	
+
 def private_dictionary_description(tag, private_creator):
     """Return the descriptive text for the given dicom tag."""
     return get_private_entry(tag, private_creator)[2]

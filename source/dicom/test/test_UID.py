@@ -15,15 +15,15 @@ class UIDtests(unittest.TestCase):
         expected = 'Implicit VR Little Endian'
         got = uid.name
         self.assertEqual(got, expected, "UID: expected '%s', got '%s' for UID name" % (expected, got))
-        
+
         expected = 'Transfer Syntax'
         got = uid.type
         self.assertEqual(got, expected, "UID: expected '%s', got '%s' for UID type" % (expected, got))
-        
+
         expected = 'Default Transfer Syntax for DICOM'
         got = uid.info
         self.assertEqual(got, expected, "UID: expected '%s', got '%s' for UID info" % (expected, got))
-        
+
         expected = False
         got = uid.is_retired
         self.assertEqual(got, expected, "UID: expected '%s', got '%s' for UID is_retired" % (expected, got))
@@ -44,7 +44,7 @@ class UIDtests(unittest.TestCase):
         self.assertNotEqual(uid, None, "Comparison against a number returned True")
     def testTransferSyntaxes(self):
         pass
-        
-        
+
+
 if __name__ == "__main__":
     unittest.main()

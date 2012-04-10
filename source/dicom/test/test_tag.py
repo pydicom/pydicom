@@ -17,7 +17,7 @@ class Values(unittest.TestCase):
         tag = TupleTag((0xFFFF, 0xFFee))
         tag = TupleTag((0x300a, 0x00b0))
         self.assertEqual(tag.group, 0x300a, "Expected tag.group 0x300a, got %r" % tag.group)
-        
+
     def testAnyUnpack(self):
         """Tags can be constructed from list........................."""
         tag = Tag([2,0])
@@ -74,6 +74,6 @@ class Comparisons(unittest.TestCase):
         """Tags hash the same as an int.............................."""
         self.assertTrue(hash(self.t1)==hash(self.int1))
         self.assertTrue(hash(self.t2)==hash(self.int1))
-        
+
 if __name__ == "__main__":
     unittest.main()

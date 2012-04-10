@@ -9,13 +9,13 @@ from _UID_dict import UID_dictionary
 
 class UID(str):
     """Subclass python string so have human-friendly UIDs
-    
-    Use like: 
+
+    Use like:
         uid = UID('1.2.840.10008.1.2.4.50')
     then
         uid.name, uid.type, uid.info, and uid.is_retired all return
            values from the UID_dictionary
-           
+
     String representation (__str__) will be the name,
     __repr__ will be the full 1.2.840....
     """
@@ -30,15 +30,15 @@ class UID(str):
                 return super(UID, cls).__new__(cls, val.strip())
             else:
                 raise TypeError("UID must be a string")
-        
+
     def __init__(self, val):
         """Initialize the UID properties
-        
+
         Sets name, type, info, is_retired, and is_transfer_syntax.
         If UID is a transfer syntax, also sets is_little_endian, is_implicit_VR,
             and is_deflated boolean values.
         """
-        # Note normally use __new__ on subclassing an immutable, but here we just want 
+        # Note normally use __new__ on subclassing an immutable, but here we just want
         #    to do some pre-processing against the UID dictionary.
         #   "My" string can never change (it is a python immutable), so is safe
         if self in UID_dictionary:
@@ -47,7 +47,7 @@ class UID(str):
         else:
             self.name = str.__str__(self)
             self.type, self.info, self.is_retired = (None, None, None)
-        
+
         # If the UID represents a transfer syntax, store info about that syntax
         self.is_transfer_syntax = (self.type == "Transfer Syntax")
         if self.is_transfer_syntax:
@@ -55,7 +55,7 @@ class UID(str):
             self.is_implicit_VR = True
             self.is_little_endian = True
             self.is_deflated = False
-            
+
             if val == '1.2.840.10008.1.2': # implicit VR little endian
                 pass
             elif val == '1.2.840.10008.1.2.1': # ExplicitVRLittleEndian
@@ -70,11 +70,11 @@ class UID(str):
                 # Any other syntax should be Explicit VR Little Endian,
                 #   e.g. all Encapsulated (JPEG etc) are ExplVR-LE by Standard PS 3.5-2008 A.4 (p63)
                 self.is_implicit_VR = False
-           
+
     def __str__(self):
         """Return the human-friendly name for this UID"""
         return self.name
-        
+
     def __eq__(self, other):
         """Override string equality so either name or UID number match passes"""
         if str.__eq__(self, other) is True: # 'is True' needed (issue 96)
@@ -83,8 +83,8 @@ class UID(str):
             return True
         return False
     # For python 3, any override of __cmp__ or __eq__ immutable requires
-    #   explicit redirect of hash function to the parent class 
-    #   See http://docs.python.org/dev/3.0/reference/datamodel.html#object.__hash__    
+    #   explicit redirect of hash function to the parent class
+    #   See http://docs.python.org/dev/3.0/reference/datamodel.html#object.__hash__
     def __hash__(self):
         return super(UID, self).__hash__()
 
@@ -97,11 +97,11 @@ NotCompressedPixelTransferSyntaxes = [ExplicitVRLittleEndian,
                                       ImplicitVRLittleEndian,
                                       DeflatedExplicitVRLittleEndian,
                                       ExplicitVRBigEndian]
-                                      
+
 # Many thanks to the Medical Connections for offering free valid UIDs (http://www.medicalconnections.co.uk/FreeUID.html)
 # Their service was used to obtain the following root UID for pydicom:
 pydicom_root_UID = '1.2.826.0.1.3680043.8.498.'
 pydicom_UIDs = {
     pydicom_root_UID + '1': 'ImplementationClassUID',
-    
+
     }

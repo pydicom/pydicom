@@ -4,13 +4,13 @@
 Overview of Dicom object model:
 
 Dataset(derived class of Python's dict class)
-   
+
    contains DataElement instances (DataElement is a class with tag, VR, value)
-   
+
       the value can be a Sequence instance (Sequence is derived from Python's list),
                             or just a regular value like a number, string, etc.,
                             or a list of regular values, e.g. a 3d coordinate
-            
+
             Sequence's are a list of Datasets (note recursive nature here)
 
 """
@@ -59,7 +59,7 @@ class Dataset(dict):
     """A Dataset is a collection (dictionary) of Dicom DataElement instances.
 
     Example of two ways to retrieve or set values:
-        
+
     1. dataset[0x10, 0x10].value --> patient's name
     2. dataset.PatientName --> patient's name
 
@@ -74,7 +74,7 @@ class Dataset(dict):
 
     """
     indentChars = "   "
-    
+
     def add(self, data_element):
         """Equivalent to dataset[data_element.tag] = data_element."""
         self[data_element.tag] = data_element
@@ -84,7 +84,7 @@ class Dataset(dict):
                " Use Dataset.add()")
         warnings.warn(msg, DeprecationWarning)
         self.add(data_element)
-        
+
     def add_new(self, tag, VR, value):
         """Create a new DataElement instance and add it to this Dataset."""
         data_element = DataElement(tag, VR, value)
@@ -96,7 +96,7 @@ class Dataset(dict):
                " Use Dataset.add_new()")
         warnings.warn(msg, DeprecationWarning)
         self.add_new(tag, VR, value)
-                
+
     def attribute(self, name): #remove in v1.0
         """Deprecated -- use Dataset.data_element()"""
         warnings.warn("Dataset.attribute() is deprecated and will be removed in pydicom 1.0. Use Dataset.data_element() instead", DeprecationWarning)
@@ -167,11 +167,11 @@ class Dataset(dict):
         elif name in self.__dict__:
             del self.__dict__[name]
         # Not found, raise an error in same style as python does
-        else:        
+        else:
             raise AttributeError(name)
 
     def __dir__(self):
-        """Give a list of attributes available in an object, for example 
+        """Give a list of attributes available in an object, for example
         used in auto-completion in editors or command-line environments.
         """
         import inspect
@@ -220,7 +220,7 @@ class Dataset(dict):
         msg = ("Dataset.file_metadata() is deprecated and will be removed"
                 " in pydicom 1.0. Use FileDataset and its file_meta"
                 " attribute instead.")
-        warnings.warn(msg, DeprecationWarning) 
+        warnings.warn(msg, DeprecationWarning)
         return self.group_dataset(2)
 
     def get(self, key, default=None):
@@ -230,9 +230,9 @@ class Dataset(dict):
                 return getattr(self, key)
             except AttributeError:
                 return default
-        else: 
-            # is not a string, try to make it into a tag and then hand it 
-            # off to the underlying dict            
+        else:
+            # is not a string, try to make it into a tag and then hand it
+            # off to the underlying dict
             if not isinstance(key, BaseTag):
                 try:
                     key = Tag(key)
@@ -243,7 +243,7 @@ class Dataset(dict):
         except KeyError:
             return_val = default
         return return_val
-    
+
     def __getattr__(self, name):
         """Intercept requests for unknown Dataset python-attribute names.
 
@@ -254,19 +254,19 @@ class Dataset(dict):
         # __getattr__ only called if instance cannot find name in self.__dict__
         # So, if name is not a dicom string, then is an error
         tag = tag_for_name(name)
-        if tag is None:                  
+        if tag is None:
             raise AttributeError("Dataset does not have attribute '{0:s}'.".format(name))
         tag = Tag(tag)
-        if tag not in self:                  
+        if tag not in self:
             raise AttributeError("Dataset does not have attribute '{0:s}'.".format(name))
         else:  # do have that dicom data_element
             return self[tag].value
-    
+
     def __getitem__(self, key):
         """Operator for dataset[key] request."""
         tag = Tag(key)
         data_elem = dict.__getitem__(self, tag)
-        
+
         if isinstance(data_elem, DataElement):
             return data_elem
         elif isinstance(data_elem, tuple):
@@ -289,7 +289,7 @@ class Dataset(dict):
             [(tag,data_element) for tag,data_element in self.items() if tag.group==group]
                       ))
         return ds
-    
+
     def __iter__(self):
         """Method to iterate through the dataset, returning data_elements.
         e.g.:
@@ -316,11 +316,11 @@ class Dataset(dict):
         :raises ImportError: if cannot import numpy.
 
         """
-        if not 'PixelData' in self:                  
+        if not 'PixelData' in self:
             raise TypeError("No pixel data found in this dataset.")
 
         if not have_numpy:
-            msg = "The Numpy package is required to use pixel_array, and numpy could not be imported.\n"           
+            msg = "The Numpy package is required to use pixel_array, and numpy could not be imported.\n"
             raise ImportError(msg)
 
         # determine the type used for the array
@@ -328,7 +328,7 @@ class Dataset(dict):
 
         # Make NumPy format code, e.g. "uint16", "int32" etc
         # from two pieces of info:
-        #    self.PixelRepresentation -- 0 for unsigned, 1 for signed; 
+        #    self.PixelRepresentation -- 0 for unsigned, 1 for signed;
         #    self.BitsAllocated -- 8, 16, or 32
         format_str = '%sint%d' % (('u', '')[self.PixelRepresentation],
                                   self.BitsAllocated)
@@ -338,10 +338,10 @@ class Dataset(dict):
             raise TypeError("Data type not understood by NumPy: "
                             "format='%s', PixelRepresentation=%d, BitsAllocated=%d" % (
                             numpy_format, self.PixelRepresentation, self.BitsAllocated))
-        
+
         # Have correct Numpy format, so create the NumPy array
         arr = numpy.fromstring(self.PixelData, numpy_format)
-        
+
         # XXX byte swap - may later handle this in read_file!!?
         if need_byteswap:
             arr.byteswap(True)  # True means swap in-place, don't make a new copy
@@ -355,7 +355,7 @@ class Dataset(dict):
             if self.SamplesPerPixel > 1:
                 if self.BitsAllocated == 8:
                     arr = arr.reshape(self.SamplesPerPixel, self.Rows, self.Columns)
-                else:             
+                else:
                     raise NotImplementedError("This code only handles SamplesPerPixel > 1 if Bits Allocated = 8")
             else:
                 arr = arr.reshape(self.Rows, self.Columns)
@@ -365,7 +365,7 @@ class Dataset(dict):
     def _get_pixel_array(self):
         # Check if pixel data is in a form we know how to make into an array
         # XXX uses file_meta here, should really only be thus for FileDataset
-        if self.file_meta.TransferSyntaxUID not in NotCompressedPixelTransferSyntaxes :      
+        if self.file_meta.TransferSyntaxUID not in NotCompressedPixelTransferSyntaxes :
             raise NotImplementedError("Pixel Data is compressed in a format pydicom does not yet handle. Cannot return array")
 
         # Check if already have converted to a NumPy array
@@ -379,7 +379,7 @@ class Dataset(dict):
             self._pixel_array = self._pixel_data_numpy()
             self._pixel_id = id(self.PixelData) # is this guaranteed to work if memory is re-used??
         return self._pixel_array
-    
+
     @property
     def pixel_array(self):
         """Return the pixel data as a NumPy array"""
@@ -394,7 +394,7 @@ class Dataset(dict):
     #    See http://docs.python.org/library/stdtypes.html#string-formatting-operations
     default_element_format =  "%(tag)s %(name)-35.35s %(VR)s: %(repval)s"
     default_sequence_element_format = "%(tag)s %(name)-35.35s %(VR)s: %(repval)s"
-    
+
     def formatted_lines(self, element_format=default_element_format,
                         sequence_element_format=default_sequence_element_format,
                         indent_format=None):
@@ -407,7 +407,7 @@ class Dataset(dict):
         indent_format -- not used in current version. Placeholder for future functionality.
         """
         for data_element in self.iterall():
-            # Get all the attributes possible for this data element (e.g. 
+            # Get all the attributes possible for this data element (e.g.
             #   gets descriptive text name too)
             # This is the dictionary of names that can be used in the format string
             elem_dict = dict([(x, getattr(data_element,x)()
@@ -486,11 +486,11 @@ class Dataset(dict):
 
     def __setitem__(self, key, value):
         """Operator for dataset[key]=value. Check consistency, and deal with private tags"""
-        if not isinstance(value, (DataElement, RawDataElement)): # ok if is subclass, e.g. DeferredDataElement        
+        if not isinstance(value, (DataElement, RawDataElement)): # ok if is subclass, e.g. DeferredDataElement
             raise TypeError("Dataset contents must be DataElement instances.\n" + \
                   "To set a data_element value use data_element.value=val")
         tag = Tag(value.tag)
-        if key != tag:        
+        if key != tag:
             raise ValueError("data_element.tag must match the dictionary key")
 
         data_element = value
@@ -570,7 +570,7 @@ class Dataset(dict):
     __repr__ = __str__
 
 class FileDataset(Dataset):
-    def __init__(self, filename_or_obj, dataset, preamble=None, file_meta=None, 
+    def __init__(self, filename_or_obj, dataset, preamble=None, file_meta=None,
                         is_implicit_VR=True, is_little_endian=True):
         """Initialize a dataset read from a DICOM file
 
@@ -580,7 +580,7 @@ class FileDataset(Dataset):
         :param file_meta: the file meta info dataset, as returned by _read_file_meta,
                 or an empty dataset if no file meta information is in the file
         :param is_implicit_VR: True if implicit VR transfer syntax used; False if explicit VR. Default is True.
-        :param is_little_endian: True if little-endian transfer syntax used; False if big-endian. Default is True. 
+        :param is_little_endian: True if little-endian transfer syntax used; False if big-endian. Default is True.
         """
         Dataset.__init__(self, dataset)
         self.preamble = preamble
@@ -593,7 +593,7 @@ class FileDataset(Dataset):
         else:
             self.fileobj_type = filename_or_obj.__class__ # use __class__ python <2.7?; http://docs.python.org/reference/datamodel.html
             if getattr(filename_or_obj, "name", False):
-                self.filename = filename_or_obj.name  
+                self.filename = filename_or_obj.name
             elif getattr(filename_or_obj, "filename", False): #gzip python <2.7?
                 self.filename = filename_or_obj.filename
             else:
