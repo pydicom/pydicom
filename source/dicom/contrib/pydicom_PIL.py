@@ -1,4 +1,4 @@
-# pydicom_PIL.py 
+# pydicom_PIL.py
 """View DICOM images using Python image Library (PIL)
 
 Usage:
@@ -7,8 +7,8 @@ Usage:
 >>> ds = dicom.read_file("filename")
 >>> show_PIL(ds)
 
-Requires Numpy:  http://numpy.scipy.org/ 
-and Python Imaging Library:   http://www.pythonware.com/products/pil/ 
+Requires Numpy:  http://numpy.scipy.org/
+and Python Imaging Library:   http://www.pythonware.com/products/pil/
 
 """
 # Copyright (c) 2009 Darcy Mason, Adit Panchal
@@ -16,10 +16,10 @@ and Python Imaging Library:   http://www.pythonware.com/products/pil/
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
 
-# Based on image.py from pydicom version 0.9.3, 
+# Based on image.py from pydicom version 0.9.3,
 #    LUT code added by Adit Panchal
-# Tested on Python 2.5.4 (32-bit) on Mac OS X 10.6 
-#    using numpy 1.3.0 and PIL 1.1.7b1 
+# Tested on Python 2.5.4 (32-bit) on Mac OS X 10.6
+#    using numpy 1.3.0 and PIL 1.1.7b1
 
 have_PIL=True
 try:
@@ -44,7 +44,7 @@ def get_LUT_value(data, window, level):
     if not have_numpy:
         raise ImportError("Numpy is not available. See http://numpy.scipy.org/ to download and install")
 
-    return np.piecewise(data, 
+    return np.piecewise(data,
         [data <= (level - 0.5 - (window-1)/2),
             data > (level - 0.5 + (window-1)/2)],
             [0, 255, lambda data: ((data - (level - 0.5))/(window-1) + 0.5)*(255-0)])
@@ -54,7 +54,7 @@ def get_LUT_value(data, window, level):
     if not have_numpy:
         raise ImportError("Numpy is not available. See http://numpy.scipy.org/ to download and install")
 
-    return np.piecewise(data, 
+    return np.piecewise(data,
         [data <= (level - 0.5 - (window-1)/2),
             data > (level - 0.5 + (window-1)/2)],
             [0, 255, lambda data: ((data - (level - 0.5))/(window-1) + 0.5)*(255-0)])
@@ -76,10 +76,10 @@ def show_PIL(dataset):
             mode = "I;16" # not sure about this -- PIL source says is 'experimental' and no documentation. Also, should bytes swap depending on endian of file and system??
         else:
             raise TypeError("Don't know PIL mode for %d BitsAllocated and %d SamplesPerPixel" % (bits, samples))
-        
+
         # PIL size = (width, height)
         size = (dataset.Columns, dataset.Rows)
-        
+
         im = PIL.Image.frombuffer(mode, size, dataset.PixelData, "raw", mode, 0, 1) # Recommended to specify all details by http://www.pythonware.com/library/pil/handbook/image.htm
 
     else:
@@ -87,4 +87,3 @@ def show_PIL(dataset):
         im = PIL.Image.fromarray(image).convert('L') # Convert mode to L since LUT has only 256 values: http://www.pythonware.com/library/pil/handbook/image.htm
 
     im.show()
-        

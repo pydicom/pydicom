@@ -7,7 +7,7 @@
 
 # This is a dictionary of DICOM dictionaries.
 # The outer dictionary key is the Private Creator name ("owner"),
-# the inner dictionary is a map of DICOM tag to 
+# the inner dictionary is a map of DICOM tag to
 # (VR, type, name, is_retired)
 
 private_dictionaries = \

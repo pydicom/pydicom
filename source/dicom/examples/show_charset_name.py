@@ -16,7 +16,7 @@ root = Tkinter.Tk()
 person_names = [
     PersonNameUnicode(
         """Yamada^Tarou=\033$B;3ED\033(B^\033$BB@O:\033(B=\033$B$d$^$@\033(B^\033$B$?$m$&\033(B""",
-        [default_encoding, 'iso2022_jp']), # DICOM standard 2008-PS3.5 H.3 p 98 
+        [default_encoding, 'iso2022_jp']), # DICOM standard 2008-PS3.5 H.3 p 98
     PersonNameUnicode(
         """Wang^XiaoDong=\xcd\xf5\x5e\xd0\xa1\xb6\xab=""",
         [default_encoding, 'GB18030']), # DICOM standard 2008-PS3.5 J.3 p 105

@@ -19,7 +19,7 @@ def ListBeams(plan_dataset):
         cp0 = beam.ControlPointSequence[0]
         SSD = float(cp0.SourcetoSurfaceDistance / 10)
         lines.append("{b.BeamName:^13s} {b.BeamNumber:8d} "
-                    "{gantry:8.1f} {ssd:8.1f}".format(b=beam, 
+                    "{gantry:8.1f} {ssd:8.1f}".format(b=beam,
                                         gantry=cp0.GantryAngle, ssd=SSD))
     return "\n".join(lines)
 

@@ -14,7 +14,7 @@ Quick Start
     dataset = dicom.read_file("file1.dcm")
     dataset.PatientName = 'anonymous'
     dataset.save_as("file2.dcm")
-    
+
 2. See the files in the examples directory that came with this package for more
 examples, including some interactive sessions.
 
@@ -30,8 +30,8 @@ if sys.version_info < (2,6,0):
     raise ImportError("pydicom > 0.9.7 requires python 2.6 or later")
 in_py3 = sys.version_info[0] > 2
 
-# Set up logging system for the whole package. 
-# In each module, set logger=logging.getLogger('pydicom')  and the same instance 
+# Set up logging system for the whole package.
+# In each module, set logger=logging.getLogger('pydicom')  and the same instance
 #     will be used by all
 # At command line, turn on debugging for all pydicom functions with:
 #        import dicom
@@ -44,7 +44,7 @@ def debug(debug_on=True):
     """Turn debugging of DICOM file reading and writing on or off.
     When debugging is on, file location and details about the elements read at
     that location are logged to the 'pydicom' logger using python's logging module.
-    
+
     :param debug_on: True (default) to turn on debugging, False to turn off.
     """
     global logger, debugging
@@ -63,7 +63,7 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 debug(False) # force level=WARNING, in case logging default is set differently (issue 102)
 
-# For convenience, import the read_file and write_file functions (most used)  
+# For convenience, import the read_file and write_file functions (most used)
 #     into the "dicom" namespace.
 from dicom.filereader import read_file
 from dicom.filewriter import write_file

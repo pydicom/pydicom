@@ -29,13 +29,13 @@ class DictTests(unittest.TestCase):
         """dicom_dictionary: Tags with "x" return correct dict info........"""
         self.assertEqual(dictionary_description(0x280400), 'Transform Label')
         self.assertEqual(dictionary_description(0x280410), 'Rows For Nth Order Coefficients')
-        
+
 class PrivateDictTests(unittest.TestCase):
     def testPrivate1(self):
         """private dict: """
         self.assertTrue(CleanName(0x00100010) == "PatientsName")
         self.assertTrue(CleanName(Tag((0x0010, 0x0010))) == "PatientsName")
-        
+
 
 if __name__ == "__main__":
     unittest.main()

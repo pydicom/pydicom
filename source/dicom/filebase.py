@@ -1,4 +1,4 @@
-# filebase.py 
+# filebase.py
 """Hold DicomFile class, which does basic I/O for a dicom file."""
 # Copyright (c) 2008-2012 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
@@ -15,10 +15,10 @@ logger = logging.getLogger('pydicom')
 
 class DicomIO(object):
     """File object which holds transfer syntax info and anything else we need."""
-    
+
     max_read_attempts = 3 # number of times to read if don't get requested bytes
     defer_size = None     # default
-    
+
     def __init__(self, *args, **kwargs):
         self._implicit_VR = True   # start with this by default
     def __del__(self):
@@ -43,17 +43,17 @@ class DicomIO(object):
     def read_leUS(self):
         """Return an unsigned short from the file with little endian byte order"""
         return unpack(b"<H", self.read(2))[0]
-    
+
     def read_beUS(self):
         """Return an unsigned short from the file with big endian byte order"""
         return unpack(b">H", self.read(2))[0]
-    
+
     def read_leUL(self):
         """Return an unsigned long read with little endian byte order"""
         return unpack(b"<L", self.read(4))[0]
     def read(self, length=None, need_exact_length=True):
         """Reads the required length, returns EOFError if gets less
-        
+
         If length is None, then read all bytes
         """
         parent_read = self.parent_read # super(DicomIO, self).read
@@ -70,7 +70,7 @@ class DicomIO(object):
                 start_pos = self.tell() - len(bytes_read)
                 msg = "Unexpected end of file. "
                 msg += "Read {0} bytes of {1} expected starting at position 0x{2:x}".format(len(bytes_read), length, start_pos)
-                raise EOFError(msg)                
+                raise EOFError(msg)
         return bytes_read
     def write_leUS(self, val):
         """Write an unsigned short with little endian byte order"""
@@ -87,18 +87,18 @@ class DicomIO(object):
 
     write_US = write_leUS   # XXX should we default to this?
     write_UL = write_leUL   # XXX "
-    
+
     def read_beUL(self):
         """Return an unsigned long read with big endian byte order"""
         return unpack(b">L", self.read(4))[0]
 
     # Set up properties is_little_endian and is_implicit_VR
     # Big/Little Endian changes functions to read unsigned short or long, e.g. length fields etc
-    @property    
+    @property
     def is_little_endian(self):
         return self._little_endian
 
-    @is_little_endian.setter 
+    @is_little_endian.setter
     def is_little_endian(self, value):
         self._little_endian = value
         if value:  # Little Endian
@@ -117,11 +117,11 @@ class DicomIO(object):
     @property
     def is_implicit_VR(self):
         return self._implicit_VR
-    
+
     @is_implicit_VR.setter
     def is_implicit_VR(self, value):
         self._implicit_VR = value
-           
+
 class DicomFileLike(DicomIO):
     def __init__(self, file_like_obj):
         self.parent = file_like_obj
@@ -134,7 +134,7 @@ class DicomFileLike(DicomIO):
     def no_write(self, bytes_read):
         """Used for file-like objects where no write is available"""
         raise IOError("This DicomFileLike object has no write() method")
-        
+
 def DicomFile(*args, **kwargs):
     return DicomFileLike(open(*args, **kwargs))
 

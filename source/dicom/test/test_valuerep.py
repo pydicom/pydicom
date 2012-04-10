@@ -17,19 +17,19 @@ class PersonNametests(unittest.TestCase):
         expected = "Family"
         got = pn.family_name
         self.assertEqual(got, expected, "PN: expected '%s', got '%s' for family name" % (expected, got))
-        
+
         expected = 'Given'
         got = pn.given_name
         self.assertEqual(got, expected, "PN: expected '%s', got '%s' for given name" % (expected, got))
-        
+
         expected = ''
         got = pn.name_suffix
         self.assertEqual(got, expected, "PN: expected '%s', got '%s' for name_suffix" % (expected, got))
-        
+
         expected = ''
         got = pn.phonetic
         self.assertEqual(got, expected, "PN: expected '%s', got '%s' for phonetic component" % (expected, got))
-        
+
     def testThreeComponent(self):
         """PN: 3component (single-byte, ideographic, phonetic characters) works.."""
         # Example name from PS3.5-2008 section I.2 p. 108
@@ -65,6 +65,6 @@ class PersonNametests(unittest.TestCase):
             expected = ("Yamada", "Tarou")
             got = (pn.family_name, pn.given_name)
             self.assertEqual(got, expected, "PN: Expected single_byte name '{0!s}', got '{1!s}'".format (expected, got))
-        
+
 if __name__ == "__main__":
     unittest.main()

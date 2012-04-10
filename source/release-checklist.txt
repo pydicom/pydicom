@@ -14,8 +14,15 @@ pydicom release checklist
     >>> doctest.testfile("interactive_session.txt")
     >>> doctest.testfile("interactive_session_downsize_image.txt")
     First can fail on help() function as goes into reader mode needing q to exit
-* run tabnanny to check for bad indentation::
+* (? is this necessary or just use reindent.py? -- run tabnanny to check for bad indentation::
     python -m tabnanny .
+* run pep8 to fix tab/space indents, etc (pep8 is available on pypi for pip install)
+    cd <'source' directory>
+    pep8 --ignore E501 dicom   # E501 is line length
+    pep8 --select E101 --show-source dicom   # E101 is mixed tab/space
+    etc as above to show source for each kind of error
+* run reindent.py to fix the tab/space mixes, trailing whitespace, etc
+    reindent.py -rv dicom   # use -d for dry-run
 * run python26 -Qwarn to check for integer division problems.
 * hg commit all changes
 * tag the release -- hg tag "release-X.X.X". Auto-commits.

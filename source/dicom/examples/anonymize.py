@@ -1,6 +1,6 @@
 # anonymize.py
-"""Read a dicom file (or directory of files), partially "anonymize" it (them), 
-by replacing Person names, patient id, optionally remove curves 
+"""Read a dicom file (or directory of files), partially "anonymize" it (them),
+by replacing Person names, patient id, optionally remove curves
 and private tags, and write result to a new file (directory)
 This is an example only; use only as a starting point.
 """
@@ -11,7 +11,7 @@ This is an example only; use only as a starting point.
 # Use at your own risk!!
 # Many more items need to be addressed for proper de-identifying DICOM data.
 # In particular, note that pixel data could have confidential data "burned in"
-# Annex E of PS3.15-2011 DICOM standard document details what must be done to 
+# Annex E of PS3.15-2011 DICOM standard document details what must be done to
 # fully de-identify DICOM data
 
 from __future__ import print_function
@@ -45,36 +45,36 @@ def anonymize(filename, output_filename, new_person_name="anonymous",
         """Called from the dataset "walk" recursive function for all data elements."""
         if data_element.tag.group & 0xFF00 == 0x5000:
             del ds[data_element.tag]
-    
-	# Load the current dicom file to 'anonymize'
+
+        # Load the current dicom file to 'anonymize'
     dataset = dicom.read_file(filename)
-    
-	# Remove patient name and any other person names
+
+        # Remove patient name and any other person names
     dataset.walk(PN_callback)
-    
-	# Change ID
+
+        # Change ID
     dataset.PatientID = new_patient_id
-	
-	# Remove data elements (should only do so if DICOM type 3 optional) 
-	# Use general loop so easy to add more later
-	# Could also have done: del ds.OtherPatientIDs, etc.
+
+        # Remove data elements (should only do so if DICOM type 3 optional)
+        # Use general loop so easy to add more later
+        # Could also have done: del ds.OtherPatientIDs, etc.
     for name in ['OtherPatientIDs', 'OtherPatientIDsSequence']:
         if name in dataset:
             delattr(dataset, name)
 
-	# Same as above but for blanking data elements that are type 2.
+        # Same as above but for blanking data elements that are type 2.
     for name in ['PatientBirthDate']:
         if name in dataset:
             dataset.data_element(name).value = ''
-	
-	# Remove private tags if function argument says to do so. Same for curves
+
+        # Remove private tags if function argument says to do so. Same for curves
     if remove_private_tags:
         dataset.remove_private_tags()
     if remove_curves:
         dataset.walk(curves_callback)
-		
-	# write the 'anonymized' DICOM out under the new filename
-    dataset.save_as(output_filename)   
+
+        # write the 'anonymized' DICOM out under the new filename
+    dataset.save_as(output_filename)
 
 # Can run as a script:
 if __name__ == "__main__":

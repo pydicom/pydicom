@@ -23,13 +23,13 @@ from dicom.tag import ItemTag, SequenceDelimiterTag
 
 def defragment_data(data):
     """Read encapsulated data and return one continuous string
-    
+
     data -- string of encapsulated data, typically dataset.PixelData
     Return all fragments concatenated together as a byte string
-    
+
     If PixelData has multiple frames, then should separate out before calling this routine.
     """
-    
+
     # Convert data into a memory-mapped file
     fp = DicomBytesIO(data)
     fp.is_little_endian = True # DICOM standard requires this
@@ -40,8 +40,8 @@ def defragment_data(data):
         if not item:  # None is returned if get to Sequence Delimiter
             break
         seq.append(item)
-    
-    # XXX should 
+
+    # XXX should
     return "".join(seq)
 
 # read_item modeled after filereader.ReadSequenceItem

@@ -27,7 +27,7 @@ def convert_tag(byte_string, is_little_endian, offset=0):
     else:
         struct_format = ">HH"
     return TupleTag(unpack(struct_format, byte_string[offset:offset+4]))
-    
+
 def convert_ATvalue(byte_string, is_little_endian, struct_format=None):
     """Read and return AT (tag) data_element value(s)"""
     length = len(byte_string)
@@ -36,7 +36,7 @@ def convert_ATvalue(byte_string, is_little_endian, struct_format=None):
     # length > 4
     if length % 4 != 0:
         logger.warn("Expected length to be multiple of 4 for VR 'AT', got length %d at file position 0x%x", length, fp.tell()-4)
-    return MultiValue(Tag,[convert_tag(byte_string, is_little_endian, offset=x) 
+    return MultiValue(Tag,[convert_tag(byte_string, is_little_endian, offset=x)
                         for x in range(0, length, 4)])
 
 def convert_DS_string(byte_string, is_little_endian, struct_format=None):
@@ -46,7 +46,7 @@ def convert_DS_string(byte_string, is_little_endian, struct_format=None):
 def convert_IS_string(byte_string, is_little_endian, struct_format=None):
     """Read and return an IS value or list of values"""
     return MultiString(byte_string, valtype=IS)
-    
+
 def convert_numbers(byte_string, is_little_endian, struct_format):
     """Read a "value" of type struct_format from the dicom file. "Value" can be more than one number"""
     endianChar = '><'[is_little_endian]
@@ -54,21 +54,21 @@ def convert_numbers(byte_string, is_little_endian, struct_format):
     length = len(byte_string)
     if length % bytes_per_value != 0:
         logger.warn("Expected length to be even multiple of number size")
-    format_string = "%c%u%c" % (endianChar, length // bytes_per_value, struct_format) 
+    format_string = "%c%u%c" % (endianChar, length // bytes_per_value, struct_format)
     value = unpack(format_string, byte_string)
     if len(value) == 1:
         return value[0]
-    else:        
+    else:
         return list(value)  # convert from tuple to a list so can modify if need to
 
 def convert_OBvalue(byte_string, is_little_endian, struct_format=None):
     """Return the raw bytes from reading an OB value"""
     return byte_string
-    
+
 def convert_OWvalue(byte_string, is_little_endian, struct_format=None):
     """Return the raw bytes from reading an OW value rep
-    
-    Note: pydicom does NOT do byte swapping, except in 
+
+    Note: pydicom does NOT do byte swapping, except in
     dataset.pixel_array function
     """
     return convert_OBvalue(byte_string, is_little_endian) # for now, Maybe later will have own routine
@@ -94,22 +94,22 @@ def convert_SQ(byte_string, is_implicit_VR, is_little_endian, offset=0):
     fp = BytesIO(byte_string)
     seq = read_sequence(fp, is_implicit_VR, is_little_endian, len(byte_string), offset)
     return seq
-    
+
 def convert_UI(byte_string, is_little_endian, struct_format=None):
     """Read and return a UI values or values"""
-    # Strip off 0-byte padding for even length (if there)   
+    # Strip off 0-byte padding for even length (if there)
     if byte_string and byte_string.endswith(b'\0'):
         byte_string = byte_string[:-1]
     return MultiString(byte_string, dicom.UID.UID)
 
 def convert_UN(byte_string, is_little_endian, struct_format=None):
     """Return a byte string for a VR of 'UN' (unknown)"""
-    return byte_string 
+    return byte_string
 
 def convert_value(VR, raw_data_element):
     """Return the converted value (from raw bytes) for the given VR"""
     tag = Tag(raw_data_element.tag)
-    if VR not in converters:  
+    if VR not in converters:
         raise NotImplementedError("Unknown Value Representation '{0}'".format(VR))
 
     # Look up the function to convert that VR
@@ -119,11 +119,11 @@ def convert_value(VR, raw_data_element):
     else:
         converter = converters[VR]
         num_format = None
-    
+
     byte_string = raw_data_element.value
     is_little_endian = raw_data_element.is_little_endian
     is_implicit_VR = raw_data_element.is_implicit_VR
-    
+
     # Not only two cases. Also need extra info if is a raw sequence
     if VR != "SQ":
         value = converter(byte_string, is_little_endian, num_format)
@@ -141,7 +141,7 @@ converters = {'UL': (convert_numbers, 'L'),
             'FL': (convert_numbers, 'f'),
             'FD': (convert_numbers, 'd'),
             'OF': (convert_numbers, 'f'),
-            'OB': convert_OBvalue, 
+            'OB': convert_OBvalue,
             'UI': convert_UI,
             'SH': convert_string,
             'DA': convert_string,
@@ -164,10 +164,10 @@ converters = {'UL': (convert_numbers, 'L'),
             'OW or OB': convert_OBvalue,
             'OB or OW': convert_OBvalue,
             'US or SS': convert_OWvalue,
-            'US or SS or OW': convert_OWvalue,          
+            'US or SS or OW': convert_OWvalue,
             'US\\US or SS\\US': convert_OWvalue,
             'DT': convert_string,
-            'UT': convert_single_string,          
-           } 
+            'UT': convert_single_string,
+           }
 if __name__ == "__main__":
     pass

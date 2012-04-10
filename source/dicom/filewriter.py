@@ -21,17 +21,17 @@ from dicom.valuerep import extra_length_VRs
 
 def write_numbers(fp, data_element, struct_format):
     """Write a "value" of type struct_format from the dicom file.
-    
+
     "Value" can be more than one number.
-    
+
     struct_format -- the character format as used by the struct module.
-    
+
     """
     endianChar = '><'[fp.is_little_endian]
     value = data_element.value
     if value == "":
         return  # don't need to write anything for empty string
-    
+
     format_string = endianChar + struct_format
     try:
         try:
@@ -50,15 +50,15 @@ def write_OBvalue(fp, data_element):
 
 def write_OWvalue(fp, data_element):
     """Write a data_element with VR of 'other word' (OW).
-    
+
     Note: This **does not currently do the byte swapping** for Endian state.
-    
-    """    
+
+    """
     # XXX for now just write the raw bytes without endian swapping
     fp.write(data_element.value)
 
 def write_UI(fp, data_element):
-    """Write a data_element with VR of 'unique identifier' (UI)."""  
+    """Write a data_element with VR of 'unique identifier' (UI)."""
     write_string(fp, data_element, '\0') # pad with 0-byte to even length
 
 def multi_string(val):
@@ -78,8 +78,8 @@ def write_string(fp, data_element, padding=' '):
 def write_number_string(fp, data_element, padding = ' '):
     """Handle IS or DS VR - write a number stored as a string of digits."""
     # If the DS or IS has an original_string attribute, use that, so that
-    # unchanged data elements are written with exact string as when read from file 
-    val = data_element.value   
+    # unchanged data elements are written with exact string as when read from file
+    val = data_element.value
     if isinstance(val, (list, tuple)):
         val = b"\\".join((x.original_string if hasattr(x, 'original_string')
                                            else str(x) for x in val))
@@ -88,7 +88,7 @@ def write_number_string(fp, data_element, padding = ' '):
     if len(val) % 2 != 0:
         val = val + padding   # pad to even length
     fp.write(val)
-    
+
 def write_data_element(fp, data_element):
     """Write the data_element to file fp according to dicom media storage rules."""
     fp.write_tag(data_element.tag)
@@ -102,7 +102,7 @@ def write_data_element(fp, data_element):
         fp.write(VR)
         if VR in extra_length_VRs:
             fp.write_US(0)   # reserved 2 bytes
-    if VR not in writers:   
+    if VR not in writers:
         raise NotImplementedError("write_data_element: unknown Value Representation '{0}'".format(VR))
 
     length_location = fp.tell() # save location for later.
@@ -110,7 +110,7 @@ def write_data_element(fp, data_element):
         fp.write_US(0)  # Explicit VR length field is only 2 bytes
     else:
         fp.write_UL(0xFFFFFFFFL)   # will fill in real length value later if not undefined length item
-    
+
     try:
         writers[VR][0] # if writer is a tuple, then need to pass a number format
     except TypeError:
@@ -118,7 +118,7 @@ def write_data_element(fp, data_element):
     else:
         writers[VR][0](fp, data_element, writers[VR][1])
     #  print DataElement(tag, VR, value)
-    
+
     is_undefined_length = False
     if hasattr(data_element, "is_undefined_length") and data_element.is_undefined_length:
         is_undefined_length = True
@@ -134,7 +134,7 @@ def write_data_element(fp, data_element):
     if is_undefined_length:
         fp.write_tag(SequenceDelimiterTag)
         fp.write_UL(0)  # 4-byte 'length' of delimiter data item
-    
+
 def write_dataset(fp, dataset):
     """Write a Dataset dictionary to the file. Return the total length written."""
     fpStart = fp.tell()
@@ -177,7 +177,7 @@ def write_UN(fp, data_element):
 def write_ATvalue(fp, data_element):
     """Write a data_element tag to a file."""
     try:
-        iter(data_element.value) # see if is multi-valued AT; # Note will fail if Tag ever derived from true tuple rather than being a long 
+        iter(data_element.value) # see if is multi-valued AT; # Note will fail if Tag ever derived from true tuple rather than being a long
     except TypeError:
         tag = Tag(data_element.value)   # make sure is expressed as a Tag instance
         fp.write_tag(tag)
@@ -185,7 +185,7 @@ def write_ATvalue(fp, data_element):
         tags = [Tag(tag) for tag in data_element.value]
         for tag in tags:
             fp.write_tag(tag)
-            
+
 
 def _write_file_meta_info(fp, meta_dataset):
     """Write the dicom group 2 dicom storage File Meta Information to the file.
@@ -194,7 +194,7 @@ def _write_file_meta_info(fp, meta_dataset):
     Raises ValueError if the required data_elements (elements 2,3,0x10,0x12)
     are not in the dataset. If the dataset came from a file read with
     read_file(), then the required data_elements should already be there.
-    """    
+    """
     fp.write(b'DICM')
 
     # File meta info is always LittleEndian, Explicit VR. After will change these
@@ -204,7 +204,7 @@ def _write_file_meta_info(fp, meta_dataset):
 
     if Tag((2,1)) not in meta_dataset:
         meta_dataset.add_new((2,1), b'OB', b"\0\1")   # file meta information version
-    
+
     # Now check that required meta info tags are present:
     missing = []
     for element in [2, 3, 0x10, 0x12]:
@@ -212,30 +212,30 @@ def _write_file_meta_info(fp, meta_dataset):
             missing.append(Tag((2, element)))
     if missing:
         raise ValueError("Missing required tags {0} for file meta information".format(str(missing)))
-    
+
     # Put in temp number for required group length, save current location to come back
     meta_dataset[(2,0)] = DataElement((2,0), 'UL', 0) # put 0 to start
     group_length_data_element_size = 12 # !based on DICOM std ExplVR
     group_length_tell = fp.tell()
-    
+
     # Write the file meta datset, including temp group length
     length = write_dataset(fp, meta_dataset)
     group_length = length - group_length_data_element_size # counts from end of that
-    
+
     # Save end of file meta to go back to
     end_of_file_meta = fp.tell()
-    
+
     # Go back and write the actual group length
     fp.seek(group_length_tell)
     group_length_data_element = DataElement((2,0), 'UL', group_length)
     write_data_element(fp, group_length_data_element)
-    
+
     # Return to end of file meta, ready to write remainder of the file
     fp.seek(end_of_file_meta)
 
 def write_file(filename, dataset, WriteLikeOriginal=True):
     """Store a Dataset to the filename specified.
-    
+
     Set dataset.preamble if you want something other than 128 0-bytes.
     If the dataset was read from an existing dicom file, then its preamble
     was stored at read time. It is up to you to ensure the preamble is still
@@ -243,23 +243,23 @@ def write_file(filename, dataset, WriteLikeOriginal=True):
     If there is no Transfer Syntax tag in the dataset,
        Set dataset.is_implicit_VR, and .is_little_endian
        to determine the transfer syntax used to write the file.
-    WriteLikeOriginal -- True if want to preserve the following for each sequence 
+    WriteLikeOriginal -- True if want to preserve the following for each sequence
         within this dataset:
         - preamble -- if no preamble in read file, than not used here
         - dataset.hasFileMeta -- if writer did not do file meta information,
             then don't write here either
         - seq.is_undefined_length -- if original had delimiters, write them now too,
             instead of the more sensible length characters
-        - <dataset>.is_undefined_length_sequence_item -- for datasets that belong to a 
-            sequence, write the undefined length delimiters if that is 
+        - <dataset>.is_undefined_length_sequence_item -- for datasets that belong to a
+            sequence, write the undefined length delimiters if that is
             what the original had
         Set WriteLikeOriginal = False to produce a "nicer" DICOM file for other readers,
             where all lengths are explicit.
     """
 
     # Decide whether to write DICOM preamble. Should always do so unless trying to mimic the original file read in
-    preamble = getattr(dataset, "preamble", None) 
-    if not preamble and not WriteLikeOriginal:   
+    preamble = getattr(dataset, "preamble", None)
+    if not preamble and not WriteLikeOriginal:
         preamble = b"\0"*128
     file_meta = dataset.file_meta
     if file_meta is None:
@@ -271,23 +271,23 @@ def write_file(filename, dataset, WriteLikeOriginal=True):
             file_meta.add_new((2, 0x10), 'UI', ExplicitVRLittleEndian)
         elif not dataset.is_little_endian and not dataset.is_implicit_VR:
             file_meta.add_new((2, 0x10), 'UI', ExplicitVRBigEndian)
-        else:        
+        else:
             raise NotImplementedError("pydicom has not been verified for Big Endian with Implicit VR")
-        
+
     fp = DicomFile(filename,'wb')
     try:
         if preamble:
             fp.write(preamble)  # blank 128 byte preamble
-            _write_file_meta_info(fp, file_meta) 
-        
+            _write_file_meta_info(fp, file_meta)
+
         # Set file VR, endian. MUST BE AFTER writing META INFO (which changes to Explict LittleEndian)
         fp.is_implicit_VR = dataset.is_implicit_VR
         fp.is_little_endian = dataset.is_little_endian
-        
+
         write_dataset(fp, dataset)
     finally:
         fp.close()
-        
+
 # Map each VR to a function which can write it
 # for write_numbers, the Writer maps to a tuple (function, struct_format)
 #                                  (struct_format is python's struct module format)

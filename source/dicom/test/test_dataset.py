@@ -46,14 +46,14 @@ class DatasetTests(unittest.TestCase):
                            "Dataset does not have attribute 'TransferSyntaxUID'"
         self.failUnlessExceptionArgs(attribute_error_msg,
                         PropertyError, callable_pixel_array)
-        
-        
+
+
     def dummy_dataset(self):
         # This dataset is used by many of the tests
         ds = Dataset()
         ds.add_new((0x300a, 0x00b2), "SH", "unit001") # TreatmentMachineName
         return ds
-        
+
     def testSetNewDataElementByName(self):
         """Dataset: set new data_element by name............................."""
         ds = Dataset()
@@ -70,22 +70,22 @@ class DatasetTests(unittest.TestCase):
         """Dataset: can set class instance property (non-dicom).............."""
         ds = Dataset()
         ds.SomeVariableName = 42
-        has_it = hasattr(ds, 'SomeVariableName')               
+        has_it = hasattr(ds, 'SomeVariableName')
         self.assertTrue(has_it, "Variable did not get created")
         if has_it:
             self.assertEqual(ds.SomeVariableName, 42, "There, but wrong value")
     def testMembership(self):
         """Dataset: can test if item present by 'if <name> in dataset'......."""
-        ds = self.dummy_dataset()                
+        ds = self.dummy_dataset()
         self.assertTrue('TreatmentMachineName' in ds, "membership test failed")
         self.assertTrue(not 'Dummyname' in ds, "non-member tested as member")
     def testContains(self):
         """Dataset: can test if item present by 'if <tag> in dataset'........"""
-        ds = self.dummy_dataset()       
+        ds = self.dummy_dataset()
         self.assertTrue((0x300a, 0xb2) in ds, "membership test failed")
         self.assertTrue([0x300a, 0xb2] in ds, "membership test failed when list used")
         self.assertTrue(0x300a00b2 in ds, "membership test failed")
-        self.assertTrue(not (0x10,0x5f) in ds, "non-member tested as member")        
+        self.assertTrue(not (0x10,0x5f) in ds, "non-member tested as member")
     def testGetExists1(self):
         """Dataset: dataset.get() returns an existing item by name..........."""
         ds = self.dummy_dataset()
@@ -93,19 +93,19 @@ class DatasetTests(unittest.TestCase):
         self.assertEqual(unit, 'unit001', "dataset.get() did not return existing member by name")
     def testGetExists2(self):
         """Dataset: dataset.get() returns an existing item by long tag......."""
-        ds = self.dummy_dataset()    
+        ds = self.dummy_dataset()
         unit = ds.get(0x300A00B2, None).value
         self.assertEqual(unit, 'unit001', "dataset.get() did not return existing member by long tag")
     def testGetExists3(self):
         """Dataset: dataset.get() returns an existing item by tuple tag......"""
-        ds = self.dummy_dataset()        
+        ds = self.dummy_dataset()
         unit = ds.get((0x300A, 0x00B2), None).value
         self.assertEqual(unit, 'unit001', "dataset.get() did not return existing member by tuple tag")
     def testGetExists4(self):
         """Dataset: dataset.get() returns an existing item by Tag............"""
-        ds = self.dummy_dataset()        
+        ds = self.dummy_dataset()
         unit = ds.get(Tag(0x300A00B2), None).value
-        self.assertEqual(unit, 'unit001', "dataset.get() did not return existing member by tuple tag")     
+        self.assertEqual(unit, 'unit001', "dataset.get() did not return existing member by tuple tag")
     def testGetDefault1(self):
         """Dataset: dataset.get() returns default for non-existing name ....."""
         ds = self.dummy_dataset()
@@ -114,32 +114,32 @@ class DatasetTests(unittest.TestCase):
                     "dataset.get() did not return default value for non-member by name")
     def testGetDefault2(self):
         """Dataset: dataset.get() returns default for non-existing tuple tag."""
-        ds = self.dummy_dataset()                    
+        ds = self.dummy_dataset()
         not_there = ds.get((0x9999, 0x9999), "not-there")
         self.assertEqual(not_there, "not-there",
                     "dataset.get() did not return default value for non-member by tuple tag")
     def testGetDefault3(self):
         """Dataset: dataset.get() returns default for non-existing long tag.."""
-        ds = self.dummy_dataset()                    
+        ds = self.dummy_dataset()
         not_there = ds.get(0x99999999, "not-there")
         self.assertEqual(not_there, "not-there",
                     "dataset.get() did not return default value for non-member by long tag")
     def testGetDefault4(self):
         """Dataset: dataset.get() returns default for non-existing Tag......."""
-        ds = self.dummy_dataset()                    
+        ds = self.dummy_dataset()
         not_there = ds.get(Tag(0x99999999), "not-there")
         self.assertEqual(not_there, "not-there",
                     "dataset.get() did not return default value for non-member by Tag")
     def testGetFromRaw(self):
         """Dataset: get(tag) returns same object as ds[tag] for raw element.."""
-        # This came from issue 88, where get(tag#) returned a RawDataElement, 
+        # This came from issue 88, where get(tag#) returned a RawDataElement,
         #     while get(name) converted to a true DataElement
         test_tag = 0x100010
-        test_elem = RawDataElement(Tag(test_tag), 'PN', 4, 'test', 0, True, True) 
+        test_elem = RawDataElement(Tag(test_tag), 'PN', 4, 'test', 0, True, True)
         ds = Dataset({Tag(test_tag): test_elem})
         by_get = ds.get(test_tag)
         by_item = ds[test_tag]
-        
+
         # self.assertEqual(type(elem_get), type(name_get), "Dataset.get() returned different type for name vs tag access")
         msg = "Dataset.get() returned different objects for ds.get(tag) and ds[tag]:\nBy get():%r\nBy ds[tag]:%r\n"
         self.assertEqual(by_get, by_item, msg % (by_get, by_item))
@@ -148,7 +148,7 @@ class DatasetTests(unittest.TestCase):
         """Dataset: if set an item, it must be a DataElement instance........"""
         def callSet():
             ds[0x300a, 0xb2]="unit1" # common error - set data_element instead of data_element.value
-            
+
         ds = Dataset()
         self.assertRaises(TypeError, callSet)
     def test_matching_tags(self):
@@ -184,10 +184,10 @@ class DatasetTests(unittest.TestCase):
         """Dataset: delete DICOM attribute by name..........................."""
         def testAttribute():
             ds.TreatmentMachineName
-        
+
         ds = self.dummy_dataset()
         del ds.TreatmentMachineName
-        self.assertRaises(AttributeError, testAttribute)        
+        self.assertRaises(AttributeError, testAttribute)
     def testDeleteOtherAttr(self):
         """Dataset: delete non-DICOM attribute by name......................."""
         ds = self.dummy_dataset()
@@ -211,11 +211,11 @@ class DatasetElementsTests(unittest.TestCase):
         def try_non_Sequence():
             self.ds.ConceptCodeSequence = [1,2,3]
         msg = "Assigning a non-sequence to an SQ data element did not raise error"
-        self.assertRaises(TypeError, try_non_Sequence)  
+        self.assertRaises(TypeError, try_non_Sequence)
         # check also that assigning proper sequence *does* work
-        self.ds.ConceptCodeSequence = [self.sub_ds1, self.sub_ds2]        
+        self.ds.ConceptCodeSequence = [self.sub_ds1, self.sub_ds2]
         self.assertTrue(isinstance(self.ds.ConceptCodeSequence, Sequence),
-                "Sequence assignment did not result in Sequence type")   
-    
+                "Sequence assignment did not result in Sequence type")
+
 if __name__ == "__main__":
     unittest.main()
