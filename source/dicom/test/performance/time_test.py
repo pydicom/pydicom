@@ -45,18 +45,18 @@ for location in locations:
     loc_list = glob.glob(os.path.join(location, "*"))
     filenames.extend((x for x in loc_list if not x.startswith(".")))
 
-assert len(filenames) >= 400, "Need at least 400 files" # unless change slices below
+assert len(filenames) >= 400, "Need at least 400 files"  # unless change slices below
 
 
 print
-random.shuffle(filenames) # to make sure no bias for any particular file
+random.shuffle(filenames)  # to make sure no bias for any particular file
 
 
 print "Sampling from %d files" % len(filenames), ". Each test gets 100 distinct files"
 print "Test order is randomized too..."
 
 # Give each test it's own set of files, to avoid reading something in cache from previous test
-filenames1 = filenames[:100] # keep the time to a reasonable amount (~2-25 sec)
+filenames1 = filenames[:100]  # keep the time to a reasonable amount (~2-25 sec)
 filenames2 = filenames[100:200]
 filenames3 = filenames[200:300]
 filenames4 = filenames[300:400]
@@ -67,9 +67,11 @@ def test_full_read():
     datasets = [rf(fn) for fn in filenames1]
     return datasets
 
+
 def test_partial():
     rp = read_partial
     ds = [rp(open(fn, 'rb'), stop_when=_at_pixel_data) for fn in filenames2]
+
 
 def test_mem_read_full():
     rf = dicom.read_file
@@ -77,14 +79,17 @@ def test_mem_read_full():
     memory_files = (str_io(open(fn, 'rb').read()) for fn in filenames3)
     ds = [rf(memory_file) for memory_file in memory_files]
 
+
 def test_mem_read_small():
     rf = dicom.read_file
-    str_io = BytesIO # avoid global lookup, make local instead
+    str_io = BytesIO  # avoid global lookup, make local instead
     memory_files = (str_io(open(fn, 'rb').read(4000)) for fn in filenames4)
     ds = [rf(memory_file) for memory_file in memory_files]
 
+
 def test_python_read_files():
     all_files = [open(fn, 'rb').read() for fn in filenames4]
+
 
 if __name__ == "__main__":
     runs = ['datasets=test_full_read()',
@@ -112,7 +117,7 @@ if __name__ == "__main__":
     # Clear disk cache for next run?
     import sys
     if not on_windows:
-        prompt= "Run purge command (linux/Mac OS X) to clear disk cache?...(N):"
+        prompt = "Run purge command (linux/Mac OS X) to clear disk cache?...(N):"
         answer = raw_input(prompt)
         if answer.lower() == "y":
             print "Running 'purge'. Please wait..."
