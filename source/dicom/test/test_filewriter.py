@@ -22,23 +22,25 @@ from dicom.dataelem import DataElement
 from dicom.util.hexutil import hex2bytes, bytes2hex
 
 from pkg_resources import Requirement, resource_filename
-test_dir = resource_filename(Requirement.parse("pydicom"),"dicom/testfiles")
+test_dir = resource_filename(Requirement.parse("pydicom"), "dicom/testfiles")
 
 rtplan_name = os.path.join(test_dir, "rtplan.dcm")
 rtdose_name = os.path.join(test_dir, "rtdose.dcm")
-ct_name     = os.path.join(test_dir, "CT_small.dcm")
-mr_name     = os.path.join(test_dir, "MR_small.dcm")
-jpeg_name   = os.path.join(test_dir, "JPEG2000.dcm")
+ct_name = os.path.join(test_dir, "CT_small.dcm")
+mr_name = os.path.join(test_dir, "MR_small.dcm")
+jpeg_name = os.path.join(test_dir, "JPEG2000.dcm")
 
 # Set up rtplan_out, rtdose_out etc. Filenames as above, with '2' appended
 for inname in ['rtplan', 'rtdose', 'ct', 'mr', 'jpeg']:
     exec(inname + "_out = " + inname + "_name + '2'")
+
 
 def files_identical(a, b):
     """Return a tuple (file a == file b, index of first difference)"""
     a_bytes = file(a, "rb").read()
     b_bytes = file(b, "rb").read()
     return bytes_identical(a_bytes, b_bytes)
+
 
 def bytes_identical(a_bytes, b_bytes):
     """Return a tuple (bytes a == bytes b, index of first difference)"""
@@ -48,32 +50,42 @@ def bytes_identical(a_bytes, b_bytes):
         pos = 0
         while a_bytes[pos] == b_bytes[pos]:
             pos += 1
-        return False, pos   # False (not identical files), position of first difference
+        return False, pos   # False if not identical, position of 1st diff
+
 
 class WriteFileTests(unittest.TestCase):
     def compare(self, in_filename, out_filename):
-        """Read file1, write file2, then compare. Return value as for files_identical"""
+        """Read file1, write file2, then compare.
+        Return value as for files_identical.
+        """
         dataset = read_file(in_filename)
         dataset.save_as(out_filename)
         same, pos = files_identical(in_filename, out_filename)
-        self.assertTrue(same, "Files are not identical - first difference at 0x%x" % pos)
+        self.assertTrue(same,
+            "Files are not identical - first difference at 0x%x" % pos)
         if os.path.exists(out_filename):
             os.remove(out_filename)  # get rid of the file
+
     def testRTPlan(self):
         """Input file, write back and verify them identical (RT Plan file)"""
         self.compare(rtplan_name, rtplan_out)
+
     def testRTDose(self):
         """Input file, write back and verify them identical (RT Dose file)"""
         self.compare(rtdose_name, rtdose_out)
+
     def testCT(self):
         """Input file, write back and verify them identical (CT file)....."""
         self.compare(ct_name, ct_out)
+
     def testMR(self):
         """Input file, write back and verify them identical (MR file)....."""
         self.compare(mr_name, mr_out)
+
     def testJPEG2000(self):
         """Input file, write back and verify them identical (JPEG2K file)."""
         self.compare(jpeg_name, jpeg_out)
+
     def testListItemWriteBack(self):
         """Change item in a list and confirm it is written to file      .."""
         DS_expected = 0
@@ -86,11 +98,15 @@ class WriteFileTests(unittest.TestCase):
         ds.save_as(ct_out)
         # Now read it back in and check that the values were changed
         ds = read_file(ct_out)
-        self.assertTrue(ds.ImageType[1] == CS_expected, "Item in a list not written correctly to file (VR=CS)")
-        self.assertTrue(ds[0x00431012].value[0] == SS_expected, "Item in a list not written correctly to file (VR=SS)")
-        self.assertTrue(ds.ImagePositionPatient[2] == DS_expected, "Item in a list not written correctly to file (VR=DS)")
+        self.assertTrue(ds.ImageType[1] == CS_expected,
+                "Item in a list not written correctly to file (VR=CS)")
+        self.assertTrue(ds[0x00431012].value[0] == SS_expected,
+                "Item in a list not written correctly to file (VR=SS)")
+        self.assertTrue(ds.ImagePositionPatient[2] == DS_expected,
+                "Item in a list not written correctly to file (VR=DS)")
         if os.path.exists(ct_out):
             os.remove(ct_out)
+
 
 class WriteDataElementTests(unittest.TestCase):
     """Attempt to write data elements has the expected behaviour"""
@@ -116,6 +132,7 @@ class WriteDataElementTests(unittest.TestCase):
         msg = "'%r' '%r'" % (expected, got)
         self.assertEqual(expected, got, msg)
 
+
 class ScratchWriteTests(unittest.TestCase):
     """Simple dataset from scratch, written in all endian/VR combinations"""
     def setUp(self):
@@ -127,16 +144,16 @@ class ScratchWriteTests(unittest.TestCase):
         # first, the innermost sequence
         subitem1 = Dataset()
         subitem1.ContourNumber = 1
-        subitem1.ContourData = ['2','4','8','16']
+        subitem1.ContourData = ['2', '4', '8', '16']
         subitem2 = Dataset()
         subitem2.ContourNumber = 2
-        subitem2.ContourData = ['32','64','128','196']
+        subitem2.ContourData = ['32', '64', '128', '196']
 
         sub_ds = Dataset()
-        sub_ds.ContourSequence = Sequence((subitem1, subitem2)) # XXX in 0.9.5 will need sub_ds.ContourSequence
+        sub_ds.ContourSequence = Sequence((subitem1, subitem2))
 
         # Now the top-level sequence
-        ds.ROIContourSequence = Sequence((sub_ds,)) # Comma necessary to make it a one-tuple
+        ds.ROIContourSequence = Sequence((sub_ds,))  # Comma to make one-tuple
 
         # Store so each test can use it
         self.ds = ds
@@ -150,11 +167,12 @@ class ScratchWriteTests(unittest.TestCase):
         out_filename = "scratch.dcm"
         file_ds.save_as(out_filename)
         std = hex2bytes(hex_std)
-        bytes_written = open(out_filename,'rb').read()
+        bytes_written = open(out_filename, 'rb').read()
         # print "std    :", bytes2hex(std)
         # print "written:", bytes2hex(bytes_written)
         same, pos = bytes_identical(std, bytes_written)
-        self.assertTrue(same, "Writing from scratch not expected result - first difference at 0x%x" % pos)
+        self.assertTrue(same,
+            "Writing from scratch unexpected result - 1st diff at 0x%x" % pos)
         if os.path.exists(out_filename):
             os.remove(out_filename)  # get rid of the file
 
@@ -165,9 +183,11 @@ class ScratchWriteTests(unittest.TestCase):
         file_ds = FileDataset("test", self.ds)
         self.compare_write(std, file_ds)
 
+
 if __name__ == "__main__":
     # This is called if run alone, but not if loaded through run_tests.py
-    # If not run from the directory where the sample images are, then need to switch there
+    # If not run from the directory where the sample images are,
+    #    then need to switch there
     dir_name = os.path.dirname(sys.argv[0])
     save_dir = os.getcwd()
     if dir_name:

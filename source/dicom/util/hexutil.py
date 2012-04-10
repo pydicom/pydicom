@@ -8,6 +8,7 @@
 from binascii import a2b_hex, b2a_hex
 from dicom import in_py3
 
+
 def hex2bytes(hexstring):
     """Return bytestring for a string of hex bytes separated by whitespace
 
@@ -24,6 +25,7 @@ def hex2bytes(hexstring):
     alternatively the space could end the previous line.
     """
     return a2b_hex(hexstring.replace(" ", ""))
+
 
 def bytes2hex(byte_string):
     s = b2a_hex(byte_string)

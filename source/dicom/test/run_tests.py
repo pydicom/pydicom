@@ -1,5 +1,5 @@
 # run_tests.py
-"""Call all the unit test files - all files in test directory starting with 'test'"""
+"""Call all the unit test files in the test directory starting with 'test'"""
 # Copyright (c) 2008-2012 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
 #    See the file license.txt included with this distribution, also
@@ -12,7 +12,8 @@ import unittest
 
 # Get the directory test_dir where the test scripts are
 from pkg_resources import Requirement, resource_filename
-test_dir = resource_filename(Requirement.parse("pydicom"),"dicom/test")
+test_dir = resource_filename(Requirement.parse("pydicom"), "dicom/test")
+
 
 class MyTestLoader(object):
     def loadTestsFromNames(self, *args):
@@ -28,7 +29,8 @@ class MyTestLoader(object):
         suite = unittest.TestSuite()
         for module_name in module_names:
             module_dotted_name = "dicom.test." + module_name
-            test = unittest.defaultTestLoader.loadTestsFromName(module_dotted_name)
+            test = unittest.defaultTestLoader.loadTestsFromName(
+                                                            module_dotted_name)
             suite.addTest(test)
         os.chdir(save_dir)
         return suite
@@ -40,13 +42,15 @@ if __name__ == "__main__":
 
     # Run the tests
     verbosity = 1
-    if len(sys.argv) > 1 and (sys.argv[1]=="-v" or sys.argv[1]=="--verbose"):
+    args = sys.argv
+    if len(args) > 1 and (args[1] == "-v" or args[1] == "--verbose"):
         verbosity = 2
     runner = unittest.TextTestRunner(verbosity=verbosity)
 
     # Switch directories to test DICOM files, used by many of the tests
     save_dir = os.getcwd()
-    testfiles_dir = resource_filename(Requirement.parse("pydicom"),"dicom/testfiles")
+    testfiles_dir = resource_filename(Requirement.parse("pydicom"),
+                                                            "dicom/testfiles")
     os.chdir(testfiles_dir)
     runner.run(suite)
     os.chdir(save_dir)

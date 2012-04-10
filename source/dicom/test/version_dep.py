@@ -7,6 +7,7 @@
 
 import warnings
 
+
 def capture_warnings(function, *func_args, **func_kwargs):
     """Capture function result and warnings.
     """
