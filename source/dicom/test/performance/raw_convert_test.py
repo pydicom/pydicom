@@ -53,7 +53,7 @@ if __name__ == "__main__":
     # Clear disk cache for next run?
 #    import sys
 #    if not on_windows:
-#        prompt= "Run purge command (linux/Mac OS X) to clear disk cache?...(N):"
+#        prompt= "Run purge command (linux/Mac OS X) to clear disk cache?(N):"
 #        answer = raw_input(prompt)
 #        if answer.lower() == "y":
 #            print "Running 'purge'. Please wait..."
