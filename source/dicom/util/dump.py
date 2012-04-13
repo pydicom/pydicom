@@ -1,13 +1,15 @@
 # dump.py
-"""Utility functions for seeing contents of files, etc, to debug writing and reading"""
-# Copyright (c) 2008 Darcy Mason
+"""Utility functions used in debugging writing and reading"""
+# Copyright (c) 2008-2012 Darcy Mason
 # This file is part of pydicom, relased under an MIT license.
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
 
+from __future__ import print_function
 from io import BytesIO
 
-def PrintCharacter(ordchr):
+
+def print_character(ordchr):
     """Return a printable character, or '.' for non-printable ones."""
     if 31 < ordchr < 126 and ordchr != 92:
         return chr(ordchr)
@@ -15,17 +17,19 @@ def PrintCharacter(ordchr):
         return '.'
 
 
-def filedump(filename, StartAddress=0, StopAddress=None):
+def filedump(filename, start_address=0, stop_address=None):
     """Dump out the contents of a file to a standard hex dump 16 bytes wide"""
     fp = file(filename, 'rb')
-    return hexdump(fp, StartAddress, StopAddress)
+    return hexdump(fp, start_address, stop_address)
+
 
 def datadump(data):
-    StopAddress = len(data) + 1
+    stop_address = len(data) + 1
     fp = BytesIO(data)
-    print hexdump(fp, 0, StopAddress)
+    print(hexdump(fp, 0, stop_address))
 
-def hexdump(file_in, StartAddress=0, StopAddress=None, showAddress=True):
+
+def hexdump(file_in, start_address=0, stop_address=None, showAddress=True):
     """Return a formatted string of hex bytes and characters in data.
 
     This is a utility function for debugging file writing.
@@ -36,10 +40,10 @@ def hexdump(file_in, StartAddress=0, StopAddress=None, showAddress=True):
     byteslen = 16*3-1 # space taken up if row has a full 16 bytes
     blanks = ' ' * byteslen
 
-    file_in.seek(StartAddress)
+    file_in.seek(start_address)
     data = True   # dummy to start the loop
     while data:
-        if StopAddress and file_in.tell() > StopAddress:
+        if stop_address and file_in.tell() > stop_address:
             break
         if showAddress:
             str_out.write("%04x : " % file_in.tell())  # address at start of line
@@ -51,42 +55,45 @@ def hexdump(file_in, StartAddress=0, StopAddress=None, showAddress=True):
         str_out.write(byte_string)
         str_out.write(blanks[:byteslen-len(byte_string)])  # if not 16, pad
         str_out.write('  ')
-        str_out.write(''.join([PrintCharacter(x) for x in row]))  # character rep of bytes
+        str_out.write(''.join([print_character(x) for x in row]))  # character rep of bytes
         str_out.write("\n")
 
     return str_out.getvalue()
 
-def PrettyPrint(ds, indent=0, indentChars="   "):
+
+def pretty_print(ds, indent=0, indent_chars="   "):
     """Print a dataset directly, with indented levels.
 
-    This is just like Dataset._PrettyStr, but more useful for debugging as it
+    This is just like Dataset._pretty_str, but more useful for debugging as it
     prints each item immediately rather than composing a string, making it
     easier to immediately see where an error in processing a dataset starts.
 
     """
 
     strings = []
-    indentStr = indentChars * indent
-    nextIndentStr = indentChars *(indent+1)
+    indentStr = indent_chars * indent
+    nextIndentStr = indent_chars * (indent+1)
     for data_element in ds:
         if data_element.VR == "SQ":   # a sequence
-            new_str = indentStr + str(data_element.tag) + "  %s   %i item(s) ---- " % ( data_element.name, len(data_element.value))
-            print new_str
+            fmt_str = "{0:s}{1:s} {2:s}  {3:d} item(s) ---"
+            new_str = fmt_str.format(indentStr, str(data_element.tag), 
+                                data_element.name, len(data_element.value))
+            print(new_str)
             for dataset in data_element.value:
-                PrettyPrint(dataset, indent+1)
-                print nextIndentStr + "---------"
+                pretty_print(dataset, indent+1)
+                print(nextIndentStr + "---------")
         else:
-            print indentStr + repr(data_element)
+            print(indentStr + repr(data_element))
 
 
 if __name__ == "__main__":
     import sys
     filename = sys.argv[1]
-    StartAddress = 0
-    StopAddress = None
+    start_address = 0
+    stop_address = None
     if len(sys.argv) > 2:  # then have start address
-        StartAddress = eval(sys.argv[2])
+        start_address = eval(sys.argv[2])
     if len(sys.argv) > 3:
-        StopAddress = eval(sys.argv[3])
+        stop_address = eval(sys.argv[3])
 
-    print filedump(filename, StartAddress, StopAddress)
+    print(filedump(filename, start_address, stop_address))

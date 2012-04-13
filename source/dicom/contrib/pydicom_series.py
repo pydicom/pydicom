@@ -229,11 +229,11 @@ def _getPixelDataFromDataset(ds):
     el = dict.__getitem__(ds, pixelDataTag)
 
     # Get data
-    data = ds.PixelArray
+    data = ds.pixel_array
 
     # Remove data (mark as deferred)
     dict.__setitem__(ds, pixelDataTag, el)
-    del ds._PixelArray
+    del ds._pixel_array
 
     # Obtain slope and offset
     slope = 1

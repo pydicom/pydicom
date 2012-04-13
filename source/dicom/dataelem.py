@@ -38,6 +38,7 @@ import os.path
 from dicom.filebase import DicomFile
 import warnings
 
+
 # Helper functions:
 def isMultiValue(value):
     """Helper function: return True if 'value' is 'list-like'."""
@@ -49,12 +50,14 @@ def isMultiValue(value):
         return False
     return True
 
+
 def isString(val):
     """Helper function: return True if val is a string."""
     if in_py3:
         return isinstance(val, str) or isinstance(val, bytes)
     else:
         return isinstance(val, basestring)
+
 
 def isStringOrStringList(val):
     """Return true if val consists only of strings. val may be a list/tuple."""
@@ -67,6 +70,7 @@ def isStringOrStringList(val):
         return isString(val)
 
 _backslash = "\\"  # double '\' because it is used as escape chr in Python
+
 
 class DataElement(object):
     """Contain and manipulate a Dicom data element, having a tag, VR, VM and value.
@@ -258,6 +262,7 @@ class DataElement(object):
         else:
             return str(self)
 
+
 class DeferredDataElement(DataElement):
     """Subclass of DataElement where value is not read into memory until needed"""
     def __init__(self, tag, VR, fp, file_mtime, data_element_tell, length):
@@ -300,8 +305,10 @@ class DeferredDataElement(DataElement):
     def value(self, val):
         DataElement.value.fset(self, val)
 
+
 RawDataElement = namedtuple('RawDataElement',
                   'tag VR length value value_tell is_implicit_VR is_little_endian')
+
 
 def DataElement_from_raw(raw_data_element):
     """Return a DataElement from a RawDataElement"""
