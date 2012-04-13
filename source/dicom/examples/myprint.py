@@ -8,13 +8,14 @@
 from __future__ import print_function
 
 def myprint(dataset, indent=0):
-    """Go through all item in the dataset and print.
-    Modelled after Dataset._PrettyStr()
+    """Go through all items in the dataset and print them with custom format
+    
+    Modelled after Dataset._pretty_str()
     """
     dont_print = ['Pixel Data', 'File Meta Information Version']
 
     indent_string = "   " * indent
-    next_indent_string = "   " *(indent+1)
+    next_indent_string = "   " * (indent+1)
 
     for data_element in dataset:
         if data_element.VR == "SQ":   # a sequence
