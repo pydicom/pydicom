@@ -55,7 +55,6 @@ except Exception:
 ## Helper functions and classes
 
 
-
 class ProgressBar:
     """ To print progress to the screen.
     """
@@ -116,6 +115,8 @@ def _dummyProgressCallback(progress):
     pass
 
 _progressBar = ProgressBar()
+
+
 def _progressCallback(progress):
     """ The default callback for displaying progress. """
     if isinstance(progress, basestring):
@@ -126,8 +127,6 @@ def _progressCallback(progress):
         _progressBar.Finish('%2.2f seconds' % dt)
     else:
         _progressBar.Update(progress)
-
-
 
 
 def _listFiles(files, path):
@@ -218,6 +217,7 @@ def _splitSerieIfRequired(serie, series):
 
 
 pixelDataTag = dicom.tag.Tag(0x7fe0, 0x0010)
+
 
 def _getPixelDataFromDataset(ds):
     """ Get the pixel data from the given dataset. If the data
@@ -544,7 +544,7 @@ class DicomSeries(object):
 
         # Check info
         if self.info is None:
-            raise RuntimeError("Cannot return volume if serie is not finished.")
+            raise RuntimeError("Cannot return volume if series not finished.")
 
         # Set callback to update progress
         showProgress = self._showProgress
@@ -670,7 +670,8 @@ class DicomSeries(object):
 
         # Store information that is specific for the serie
         self._shape = [len(L), ds2.Rows, ds2.Columns]
-        self._sampling = [distance_mean, ds2.PixelSpacing[0], ds2.PixelSpacing[1]]
+        self._sampling = [distance_mean, ds2.PixelSpacing[0], 
+                               ds2.PixelSpacing[1]]
 
         # Store
         self._info = info

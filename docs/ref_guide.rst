@@ -22,8 +22,6 @@ All are documented below:
 
 .. autofunction:: dicom.filereader.read_partial
 
-.. autofunction:: dicom.filereader.open_dicom
-
 Dataset
 =======
 

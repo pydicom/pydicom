@@ -9,7 +9,8 @@ Getting Started with pydicom
 Introduction
 ==============
 
-pydicom is a pure python package for working with `DICOM <http://dicom.nema.org>`_
+pydicom is a pure python package for working with 
+`DICOM <http://en.wikipedia.org/wiki/DICOM>`_
 files such as medical images, reports, and radiotherapy objects.
 
 pydicom makes it easy to read these complex files into natural pythonic 
@@ -18,20 +19,23 @@ DICOM format files.
 
 Here is a simple example of using pydicom in an interactive session, to read
 a radiotherapy plan file, change the patient setup from head-first-supine to 
-head-first-prone, and save to a new file::
+head-first-prone, and save to a new file:
 
-    >>> import dicom
-    >>> plan = dicom.read_file("rtplan.dcm")
-    >>> plan.PatientsName
-    'Last^First^mid^pre'
-    >>> plan.dir("setup")    # get a list of tags with "setup" somewhere in the name
-    ['PatientSetups']
-    >>> plan.PatientSetups[0]
-    (0018, 5100) Patient Position                    CS: 'HFS'
-    (300a, 0182) Patient Setup Number                IS: '1'
-    (300a, 01b2) Setup TechniqueDescription          ST: ''
-    >>> plan.PatientSetups[0].PatientPosition = "HFP"
-    >>> plan.save_as("rtplan2.dcm")
+>>> import dicom
+>>> plan = dicom.read_file("rtplan.dcm")
+>>> plan.PatientName
+'Last^First^mid^pre'
+>>> plan.dir("setup")    # get a list of tags with "setup" somewhere in the name
+['PatientSetupSequence']
+>>> plan.PatientSetupSequence[0]
+(0018, 5100) Patient Position                    CS: 'HFS'
+(300a, 0182) Patient Setup Number                IS: '1'
+(300a, 01b2) Setup Technique Description         ST: ''
+>>> plan.PatientSetupSequence[0].PatientPosition = "HFP"
+>>> plan.save_as("rtplan2.dcm")
+
+
+pydicom is not a DICOM server [#]_, and is not primarily about viewing images. It is designed to let you manipulate data elements in DICOM files with python code.
 
 pydicom is easy to install and use, and because it is a pure 
 python package, it should run anywhere python runs. 
@@ -52,13 +56,13 @@ based on the MIT license.
 Installing
 ==========
 
-As a pure python package, pydicom is quite easy to install and has no
+As a pure python package, pydicom is easy to install and has no
 requirements other than python itself (the NumPy library is recommended, 
 but is only required if manipulating pixel data).
 
 Note: in addition to the instructions below, pydicom can also be installed 
 through the `Python(x,y) <http://www.pythonxy.com/>`_ distribution, which can 
-install python and a number of packages [#f1]_ (including pydicom) at once.
+install python and a number of packages [#]_ (including pydicom) at once.
 
 Prerequisites
 -------------
@@ -151,6 +155,7 @@ To start learning how to use pydicom, see the :doc:`pydicom_user_guide`.
 
 .. rubric: Footnotes::
 
-.. [#f1] If using python(x,y), other packages you might be interested in include IPython 
+.. [#] For DICOM network capabilities, see the `pynetdicom <http://pynetdicom.googlecode.com>`_ project.
+.. [#] If using python(x,y), other packages you might be interested in include IPython 
    (an indispensable interactive shell with auto-completion, history etc), 
    Numpy (optionally used by pydicom for pixel data), and ITK/VTK or PIL (image processing and visualization).
