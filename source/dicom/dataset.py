@@ -469,7 +469,7 @@ class Dataset(dict):
         data_element = value
         if tag.is_private:
             # See PS 3.5-2008 section 7.8.1 (p. 44) for how blocks are reserved
-            logging.debug("Setting private tag %r" % tag)
+            logger.debug("Setting private tag %r" % tag)
             private_block = tag.elem >> 8
             private_creator_tag = Tag(tag.group, private_block)
             if private_creator_tag in self and tag != private_creator_tag:
