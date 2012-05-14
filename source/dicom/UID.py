@@ -5,6 +5,11 @@
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
 
+import os
+import uuid
+import time, datetime
+from math import fabs
+
 from _UID_dict import UID_dictionary
 
 class UID(str):
@@ -103,5 +108,42 @@ NotCompressedPixelTransferSyntaxes = [ExplicitVRLittleEndian,
 pydicom_root_UID = '1.2.826.0.1.3680043.8.498.'
 pydicom_UIDs = {
     pydicom_root_UID + '1': 'ImplementationClassUID',
-
     }
+
+def generate_uid(prefix=pydicom_root_UID):
+    '''
+    Generate a dicom unique identifier based on host id, process id and current
+    time. The max lenght of the generated UID is 64 caracters.
+
+    If the given prefix is ``None``, the UID is generated following the method
+    described on `David Clunie website
+    <http://www.dclunie.com/medical-image-faq/html/part2.html#UID>`_
+
+    Usage example::
+
+        >>> dicom.UID.generate_uid()
+        1.2.826.0.1.3680043.8.498.2913212949509824014974371514
+        >>> dicom.UID.generate_uid(None)
+        2.25.31215762025423160614120088028604965760
+
+    This method is inspired from the work of `DCMTK
+    <http://dicom.offis.de/dcmtk.php.en>`_.
+
+    :param prefix: The site root UID. Default to pydicom root UID.
+    '''
+    dicom_uid = None
+    max_uid_len = 64
+
+    if prefix is None:
+        dicom_uid = ('2.25.%d' % uuid.uuid1().int)[:max_uid_len]
+    else:
+        uid_info = [uuid.getnode(),
+            fabs(os.getpid()),
+            datetime.datetime.today().second,
+            datetime.datetime.today().microsecond]
+
+        suffix = ''.join([str(long(x)) for x in uid_info])
+        dicom_uid = ''.join([prefix, suffix])[:max_uid_len]
+
+    return dicom_uid
+
