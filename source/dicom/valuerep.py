@@ -28,9 +28,17 @@ class DS(Decimal):
         """Create an instance of DS object, or return a blank string if one is
         passed in, e.g. from a type 2 DICOM blank value.
         """
+        # Store this value here so that if the input string is actually a valid
+        # string but decimal.Decimal transforms it to an invalid string it will
+        # still be initialized properly
+        enforce_length = dicom.config.enforce_valid_values
         # DICOM allows spaces around the string, but python doesn't, so clean it
         if isinstance(val, (str, unicode)):
             val=val.strip()
+            # If the input string is actually invalid that we relax the valid
+            # value constraint for this particular instance
+            if len(val) <= 16:
+                enforce_length = False;
         if val == '':
             return val
         if isinstance(val, float) and not dicom.config.allow_DS_float:
@@ -41,7 +49,7 @@ class DS(Decimal):
             raise TypeError(msg)
         if not isinstance(val, Decimal):
             val = super(DS, cls).__new__(cls, val)
-        if len(str(val)) > 16 and dicom.config.enforce_valid_values:
+        if len(str(val)) > 16 and enforce_length:
             msg = ("DS value representation must be <= 16 characters by DICOM "
                 "standard. Initialize with a smaller string, or set config.enforce_valid_values "
                 "to False to override, "
@@ -58,11 +66,14 @@ class DS(Decimal):
         if isinstance(val, (str, unicode)):
             self.original_string = val
 
-    def __repr__(self):
-        if hasattr(self, 'original_string'):
-            return "'" + self.original_string + "'"
+    def __str__(self):
+        if hasattr(self,'original_string') and len(self.original_string) <= 16:
+            return self.original_string
         else:
-            return "'" + super(DS,self).__str__() + "'"
+            return super(DS,self).__str__()
+
+    def __repr__(self):
+        return "'" + str(self) + "'"
 
 class IS(int):
     """Derived class of int. Stores original integer string for exact rewriting
