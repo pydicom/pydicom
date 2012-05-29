@@ -67,6 +67,8 @@ def find_bytes(fp, bytes_to_find, read_size=128, rewind=True):
     found_at = chunk_start + index
     if rewind:
         fp.seek(data_start)
+    else:
+        fp.seek(found_at + len(bytes_to_find))
     return found_at
 
 def read_undefined_length_value(fp, is_little_endian, delimiter_tag, defer_size=None,
