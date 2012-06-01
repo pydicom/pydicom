@@ -1,6 +1,6 @@
 >>> import dicom
 >>> ds = dicom.read_file("rtplan.dcm") # (rtplan.dcm is in the testfiles directory)
->>> print "\n".join(repr(ds).split("\n")[:8]) # NOTE: modified from User Guide page
+>>> ds    #doctest: +ELLIPSIS
 (0008, 0012) Instance Creation Date              DA: '20030903'
 (0008, 0013) Instance Creation Time              TM: '150031'
 (0008, 0016) SOP Class UID                       UI: RT Plan Storage
@@ -9,13 +9,8 @@
 (0008, 0030) Study Time                          TM: '153557'
 (0008, 0050) Accession Number                    SH: ''
 (0008, 0060) Modality                            CS: 'RTPLAN'
->>> ds.file_meta
-(0002, 0000) File Meta Information Group Length  UL: 156
-(0002, 0001) File Meta Information Version       OB: '\x00\x01'
-(0002, 0002) Media Storage SOP Class UID         UI: RT Plan Storage
-(0002, 0003) Media Storage SOP Instance UID      UI: 1.2.999.999.99.9.9999.9999.20030903150023
-(0002, 0010) Transfer Syntax UID                 UI: Implicit VR Little Endian
-(0002, 0012) Implementation Class UID            UI: 1.2.888.888.88.8.8.8
+...
+
 >>> ds.PatientName
 'Last^First^mid^pre'
 >>> ds[0x10,0x10].value
