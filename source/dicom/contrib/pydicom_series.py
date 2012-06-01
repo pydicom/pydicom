@@ -172,8 +172,8 @@ def _splitSerieIfRequired(serie, series):
         ds2 = L[index]
 
         # Get positions
-        pos1 = ds1.ImagePositionPatient[2]
-        pos2 = ds2.ImagePositionPatient[2]
+        pos1 = float(ds1.ImagePositionPatient[2])
+        pos2 = float(ds2.ImagePositionPatient[2])
 
         # Get distances
         newDist = abs(pos1 - pos2)
@@ -611,7 +611,7 @@ class DicomSeries(object):
             ds = self._datasets[0]
             self._info = self._datasets[0]
             self._shape = [ds.Rows, ds.Columns]
-            self._sampling = [ds.PixelSpacing[0], ds.PixelSpacing[1]]
+            self._sampling = [float(ds.PixelSpacing[0]), float(ds.PixelSpacing[1])]
             return
 
         # Get previous
@@ -622,7 +622,7 @@ class DicomSeries(object):
 
         # Init measures to check (these are in 2D)
         dimensions = ds1.Rows, ds1.Columns
-        sampling = ds1.PixelSpacing[0], ds1.PixelSpacing[1] # row, column
+        sampling = float(ds1.PixelSpacing[0]), float(ds1.PixelSpacing[1]) # row, column
 
 
         for index in range(len(L)):
@@ -633,15 +633,15 @@ class DicomSeries(object):
             ds2 = L[index]
 
             # Get positions
-            pos1 = ds1.ImagePositionPatient[2]
-            pos2 = ds2.ImagePositionPatient[2]
+            pos1 = float(ds1.ImagePositionPatient[2])
+            pos2 = float(ds2.ImagePositionPatient[2])
 
             # Update distance_sum to calculate distance later
             distance_sum += abs(pos1 - pos2)
 
             # Test measures
             dimensions2 = ds2.Rows, ds2.Columns
-            sampling2 = ds2.PixelSpacing[0], ds2.PixelSpacing[1]
+            sampling2 = float(ds2.PixelSpacing[0]), float(ds2.PixelSpacing[1])
             if dimensions != dimensions2:
                 # We cannot produce a volume if the dimensions match
                 raise ValueError('Dimensions of slices does not match.')
@@ -670,8 +670,8 @@ class DicomSeries(object):
 
         # Store information that is specific for the serie
         self._shape = [len(L), ds2.Rows, ds2.Columns]
-        self._sampling = [distance_mean, ds2.PixelSpacing[0], 
-                               ds2.PixelSpacing[1]]
+        self._sampling = [distance_mean, float(ds2.PixelSpacing[0]), 
+                               float(ds2.PixelSpacing[1])]
 
         # Store
         self._info = info
