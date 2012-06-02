@@ -86,7 +86,7 @@ def convert_single_string(byte_string, is_little_endian, struct_format=None):
     if byte_string and byte_string.endswith(b' '):
         byte_string = byte_string[:-1]
     if in_py3:
-        bytestring = bytestring.decode(default_encoding)
+        byte_string = byte_string.decode(default_encoding)
     return byte_string
 
 def convert_SQ(byte_string, is_implicit_VR, is_little_endian, offset=0):
