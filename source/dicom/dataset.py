@@ -32,6 +32,8 @@ from dicom.dataelem import DataElement, DataElement_from_raw, RawDataElement
 from dicom.UID import NotCompressedPixelTransferSyntaxes
 import os.path
 
+import io
+
 import dicom # for write_file
 import dicom.charset
 import warnings
@@ -162,9 +164,12 @@ class Dataset(dict):
         List of attributes is used, for example, in auto-completion in editors
            or command-line environments.
         """
-        meths = set(zip(*inspect.getmembers(Dataset, inspect.isroutine))[0])
-        props = set(zip(
-                    *inspect.getmembers(Dataset, inspect.isdatadescriptor))[0])
+        # Force zip object into a list in case of python3. Also backwards
+        # compatible
+        meths = set(list(zip(
+                    *inspect.getmembers(Dataset, inspect.isroutine)))[0])
+        props = set(list(zip(
+                    *inspect.getmembers(Dataset, inspect.isdatadescriptor)))[0])
         dicom_names = set(self.dir())
         alldir=sorted(props | meths | dicom_names)
         return alldir
@@ -565,6 +570,10 @@ class FileDataset(Dataset):
         if isinstance(filename_or_obj, basestring):
             self.filename = filename_or_obj
             self.fileobj_type = file
+        elif isinstance(filename_or_obj, io.BufferedReader):
+            self.filename = filename_or_obj.name
+            # This is the appropriate constructor for io.BufferedReader
+            self.fileobj_type = open
         else:
             self.fileobj_type = filename_or_obj.__class__ # use __class__ python <2.7?; http://docs.python.org/reference/datamodel.html
             if getattr(filename_or_obj, "name", False):
