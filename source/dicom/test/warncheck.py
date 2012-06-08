@@ -22,9 +22,9 @@ def assertWarns(self, warn_msg, function, *func_args, **func_kwargs):
                                                      **func_kwargs)
 
     msg = "Expected one warning; got {0:d}"
-    self.assert_(len(all_warnings) == 1, msg.format(len(all_warnings)))
+    self.assertTrue(len(all_warnings) == 1, msg.format(len(all_warnings)))
     msg = "Expected warning message '{0:s}...'; got '{1:s}'"
-    self.assert_(warn_msg in all_warnings[0],
+    self.assertTrue(warn_msg in all_warnings[0],
                     msg.format(warn_msg, all_warnings[0]))
     return result
 
