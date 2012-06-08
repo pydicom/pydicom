@@ -181,7 +181,7 @@ class RawSequenceTests(unittest.TestCase):
         got = seq[0].BeamNumber
         self.assertTrue(got == 1, "Expected Beam Number 1, got {0!r}".format(got))
         got = seq[1].BeamName
-        self.assert_(got == 'Beam 2', "Expected Beam Name 'Beam 2', got {0:s}".format(got))
+        self.assertTrue(got == 'Beam 2', "Expected Beam Name 'Beam 2', got {0:s}".format(got))
 
     def testImplVRBigEndian_ExplicitLengthSeq(self):
         """Raw read: ImplVR BigEndian SQ with explicit lengths.................."""
@@ -217,9 +217,9 @@ class RawSequenceTests(unittest.TestCase):
         # The sequence is parsed, but only into raw data elements.
         # They will be converted when asked for. Check some:
         got = seq[0].BeamNumber
-        self.assert_(got == 1, "Expected Beam Number 1, got {0!r}".format(got))
+        self.assertTrue(got == 1, "Expected Beam Number 1, got {0!r}".format(got))
         got = seq[1].BeamName
-        self.assert_(got == 'Beam 2', "Expected Beam Name 'Beam 2', got {0:s}".format(got))
+        self.assertTrue(got == 'Beam 2', "Expected Beam Name 'Beam 2', got {0:s}".format(got))
 
     def testExplVRBigEndian_UndefinedLengthSeq(self):
         """Raw read: ExplVR BigEndian Undefined Length SQ......................."""
@@ -266,9 +266,9 @@ class RawSequenceTests(unittest.TestCase):
         # The sequence is parsed, but only into raw data elements.
         # They will be converted when asked for. Check some:
         got = seq[0].BeamNumber
-        self.assert_(got == 1, "Expected Beam Number 1, got {0!r}".format(got))
+        self.assertTrue(got == 1, "Expected Beam Number 1, got {0!r}".format(got))
         got = seq[1].BeamName
-        self.assert_(got == 'Beam 2', "Expected Beam Name 'Beam 2', got {0:s}".format(got))
+        self.assertTrue(got == 'Beam 2', "Expected Beam Name 'Beam 2', got {0:s}".format(got))
 
 
 if __name__ == "__main__":
