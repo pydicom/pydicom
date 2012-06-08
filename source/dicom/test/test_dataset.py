@@ -166,7 +166,7 @@ class DatasetTests(unittest.TestCase):
         # This came from issue 88, where get(tag#) returned a RawDataElement,
         #     while get(name) converted to a true DataElement
         test_tag = 0x100010
-        test_elem = RawDataElement(Tag(test_tag), 'PN', 4, 'test',
+        test_elem = RawDataElement(Tag(test_tag), 'PN', 4, b'test',
                                                                 0, True, True)
         ds = Dataset({Tag(test_tag): test_elem})
         by_get = ds.get(test_tag)
