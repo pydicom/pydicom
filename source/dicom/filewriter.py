@@ -10,6 +10,8 @@ from struct import pack
 import logging
 logger = logging.getLogger('pydicom')
 
+from dicom import in_py3
+from dicom.charset import default_encoding
 from dicom.UID import ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian
 from dicom.filebase import DicomFile
 from dicom.datadict import dictionaryVR
@@ -64,7 +66,7 @@ def write_UI(fp, data_element):
 def multi_string(val):
     """Put a string together with delimiter if has more than one value"""
     if isinstance(val, (list, tuple)):
-        return b"\\".join(val)  # \ is escape chr, so "\\" gives single backslash
+        return "\\".join(val)  # \ is escape chr, so "\\" gives single backslash
     else:
         return val
 
@@ -73,6 +75,10 @@ def write_string(fp, data_element, padding=' '):
     val = multi_string(data_element.value)
     if len(val) % 2 != 0:
         val = val + padding   # pad to even length
+
+    if in_py3:
+        val = bytes(val,default_encoding)
+
     fp.write(val)
 
 def write_number_string(fp, data_element, padding = ' '):
@@ -81,12 +87,16 @@ def write_number_string(fp, data_element, padding = ' '):
     # unchanged data elements are written with exact string as when read from file
     val = data_element.value
     if isinstance(val, (list, tuple)):
-        val = b"\\".join((x.original_string if hasattr(x, 'original_string')
+        val = "\\".join((x.original_string if hasattr(x, 'original_string')
                                            else str(x) for x in val))
     else:
         val = val.original_string if hasattr(val, 'original_string') else str(val)
     if len(val) % 2 != 0:
         val = val + padding   # pad to even length
+
+    if in_py3:
+        val = bytes(val,default_encoding);
+
     fp.write(val)
 
 def write_data_element(fp, data_element):
@@ -99,7 +109,10 @@ def write_data_element(fp, data_element):
             msg = "Cannot write ambiguous VR of '%s' for data element with tag %r." % (VR, data_element.tag)
             msg += "\nSet the correct VR before writing, or use an implicit VR transfer syntax"
             raise ValueError(msg)
-        fp.write(VR)
+        if in_py3:
+            fp.write(bytes(VR,default_encoding))
+        else:
+            fp.write(VR)
         if VR in extra_length_VRs:
             fp.write_US(0)   # reserved 2 bytes
     if VR not in writers:
