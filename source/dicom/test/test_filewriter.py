@@ -37,8 +37,8 @@ for inname in ['rtplan', 'rtdose', 'ct', 'mr', 'jpeg']:
 
 def files_identical(a, b):
     """Return a tuple (file a == file b, index of first difference)"""
-    a_bytes = file(a, "rb").read()
-    b_bytes = file(b, "rb").read()
+    a_bytes = open(a, "rb").read()
+    b_bytes = open(b, "rb").read()
     return bytes_identical(a_bytes, b_bytes)
 
 
@@ -89,7 +89,7 @@ class WriteFileTests(unittest.TestCase):
     def testListItemWriteBack(self):
         """Change item in a list and confirm it is written to file      .."""
         DS_expected = 0
-        CS_expected = b"new"
+        CS_expected = "new"
         SS_expected = 999
         ds = read_file(ct_name)
         ds.ImagePositionPatient[2] = DS_expected
