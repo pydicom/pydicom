@@ -177,16 +177,16 @@ class ReaderTests(unittest.TestCase):
                             'StructureSetDate', '__sizeof__']
         expect_not_in_dir = ['RemovePrivateTags', 'AddNew', 'GroupDataset']  # remove in v1.0
         for name in expect_in_dir:
-            self.assert_(name in got_dir, "Expected name '%s' in dir()" % name)
+            self.assertTrue(name in got_dir, "Expected name '%s' in dir()" % name)
         for name in expect_not_in_dir:
-            self.assert_(name not in got_dir, "Unexpected name '%s' in dir()" % name)
+            self.assertTrue(name not in got_dir, "Unexpected name '%s' in dir()" % name)
         # Now check for some items in dir() of a nested item
         roi0 = rtss.ROIContourSequence[0]
         got_dir = dir(roi0)
         expect_in_dir = ['pixel_array', 'add_new', 'ReferencedROINumber',
                             'ROIDisplayColor', '__sizeof__']
         for name in expect_in_dir:
-            self.assert_(name in got_dir, "Expected name '%s' in dir()" % name)
+            self.assertTrue(name in got_dir, "Expected name '%s' in dir()" % name)
 
     def testMR(self):
         """Returns correct values for sample data elements in test MR file....."""
@@ -356,7 +356,7 @@ class FileLikeTests(unittest.TestCase):
         # Tests here simply repeat testCT -- perhaps should collapse the code together?
         got = ct.ImagePositionPatient
         expected = [Decimal('-158.135803'), Decimal('-179.035797'), Decimal('-75.699997')]
-        self.assert_(got == expected, "ImagePosition(Patient) values not as expected")
+        self.assertTrue(got == expected, "ImagePosition(Patient) values not as expected")
         self.assertEqual(ct.file_meta.ImplementationClassUID, '1.3.6.1.4.1.5962.2',
                 "ImplementationClassUID not the expected value")
         self.assertEqual(ct.file_meta.ImplementationClassUID,
