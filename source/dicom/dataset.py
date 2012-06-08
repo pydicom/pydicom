@@ -569,7 +569,7 @@ class FileDataset(Dataset):
         self.is_little_endian = is_little_endian
         if isinstance(filename_or_obj, basestring):
             self.filename = filename_or_obj
-            self.fileobj_type = file
+            self.fileobj_type = open
         elif isinstance(filename_or_obj, io.BufferedReader):
             self.filename = filename_or_obj.name
             # This is the appropriate constructor for io.BufferedReader

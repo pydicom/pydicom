@@ -208,12 +208,17 @@ class PersonNameUnicode(PersonNameBase, unicode):
                  of values in DICOM data element (0008,0005).
         """
         from dicom.charset import clean_escseq # in here to avoid circular import
+       
+        # XXX At this point we should allow unicode or bytes as input, but if
+        # it is in unicode we will have to convert it to re-encode it later
+        if in_py3 and isinstance(val,str):
+            val = bytes(val,default_encoding)
         # Make the possible three character encodings explicit:
         if not isinstance(encodings, list):
             encodings = [encodings]*3
         if len(encodings) == 2:
             encodings.append(encodings[1])
-        components = val.split("=")
+        components = val.split(b"=")
         # Remove the first encoding if only one component is present
         if (len(components) == 1):
             del encodings[0]
