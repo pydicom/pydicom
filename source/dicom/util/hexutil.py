@@ -7,6 +7,7 @@
 
 from binascii import a2b_hex, b2a_hex
 from dicom import in_py3
+from dicom.charset import default_encoding
 
 
 def hex2bytes(hexstring):
@@ -24,8 +25,12 @@ def hex2bytes(hexstring):
     Note in the example that all lines except the first must start with a space,
     alternatively the space could end the previous line.
     """
-    return a2b_hex(hexstring.replace(" ", ""))
-
+    # This works in both 3.x and 2.x because the first conditional evaluates to
+    # true in 2.x so the difference in bytes constructor doesn't matter
+    if isinstance(hexstring,bytes):
+        return a2b_hex(hexstring.replace(b" ", b""))
+    else:
+        return a2b_hex(bytes(hexstring.replace(" ", ""),default_encoding))
 
 def bytes2hex(byte_string):
     s = b2a_hex(byte_string)
