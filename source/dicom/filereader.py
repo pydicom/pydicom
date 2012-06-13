@@ -249,12 +249,19 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian,
         else:
             # Try to look up type to see if is a SQ
             # if private tag, won't be able to look it up in dictionary,
-            #   in which case just ignore it and read the bytes
+            #   in which case just ignore it and read the bytes unless it is
+            #   identified as a Sequence
             if VR is None:
                 try:
                     VR = dictionaryVR(tag)
                 except KeyError:
-                    pass
+                    # Look ahead to see if it consists of items and is thus a SQ
+                    next_tag = TupleTag(unpack(endian_chr+"HH",fp_read(4)))
+                    # Rewind the file
+                    fp.seek(fp_tell()-4)
+                    if next_tag == ItemTag:
+                        VR = 'SQ'
+
             if VR == 'SQ':
                 if debugging:
                     msg = "{0:08x}: Reading/parsing undefined length sequence"
