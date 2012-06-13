@@ -28,7 +28,7 @@ except:
     have_numpy = False
 from dicom.filereader import read_file, data_element_generator, InvalidDicomError
 from dicom.values import convert_value
-from dicom.tag import Tag
+from dicom.tag import Tag, TupleTag
 from dicom.sequence import Sequence
 import gzip
 
@@ -47,6 +47,7 @@ jpeg_lossless_name = os.path.join(test_dir, "JPEG-LL.dcm")
 deflate_name = os.path.join(test_dir, "image_dfl.dcm")
 rtstruct_name = os.path.join(test_dir, "rtstruct.dcm")
 priv_SQ_name = os.path.join(test_dir, "priv_SQ.dcm")
+nested_priv_SQ_name = os.path.join(test_dir, "nested_priv_SQ.dcm")
 no_meta_group_length = os.path.join(test_dir, "no_meta_group_length.dcm")
 gzip_name = os.path.join(test_dir, "zipMR.gz")
 
@@ -227,6 +228,38 @@ class ReaderTests(unittest.TestCase):
 
         # Simply read the file, in 0.9.5 this generated an exception
         priv_SQ = read_file(priv_SQ_name)
+
+    def testNestedPrivateSQ(self):
+        """Can successfully read a private SQ which contains additional SQ's....."""
+        # From issue 113. When a private SQ of undefined length is used, the
+        #   sequence is read in and the length of the SQ is determined upon
+        #   identification of the SQ termination sequence. When using nested
+        #   Sequences, the first termination sequence encountered actually
+        #   belongs to the nested Sequence not the parent, therefore the
+        #   remainder of the file is not read in properly
+        ds = read_file(nested_priv_SQ_name)
+
+        # Make sure that the entire dataset was read in
+        pixel_data_tag = TupleTag((0x7fe0,0x10))
+        self.assertTrue(ds.has_key(pixel_data_tag),"Entire dataset was not parsed properly. PixelData is not present")
+
+        # Check that the DataElement is indeed a Sequence
+        tag = TupleTag((0x01,0x01));
+        seq0 = ds[tag]
+        self.assertEqual(seq0.VR,'SQ',"First level sequence not parsed properly")
+
+        # Now verify the presence of the nested private SQ
+        seq1 = seq0[0][tag]
+        self.assertEqual(seq1.VR,'SQ',"Second level sequence not parsed properly")
+
+        # Now make sure the values that are parsed are correct
+        got = seq1[0][tag].value
+        expected = b'Double Nested SQ'
+        self.assertEqual(got,expected,"Expected a value of %s, got %s'" % (expected,got))
+
+        got = seq0[0][0x01,0x02].value
+        expected = b'Nested SQ'
+        self.assertEqual(got,expected,"Expected a value of %s, got %s'" % (expected,got))
 
     def testNoMetaGroupLength(self):
         """Read file with no group length in file meta..........................."""
