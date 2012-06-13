@@ -5,7 +5,26 @@
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
 
+import os
+import uuid
+import time, datetime
+from math import fabs
+
 from _UID_dict import UID_dictionary
+
+class InvalidUID(Exception):
+    '''
+    Throw when DICOM UID is invalid
+
+    Example of invalid UID::
+
+        >>> uid = '1.2.123.'
+    '''
+    def __init__(self, value):
+        self.value = value
+
+    def __str__(self):
+        return repr(self.value)
 
 class UID(str):
     """Subclass python string so have human-friendly UIDs
@@ -82,6 +101,22 @@ class UID(str):
         if str.__eq__(self.name, other) is True: # 'is True' needed (issue 96)
             return True
         return False
+
+    def is_valid(self):
+        '''
+        Raise an exception is the UID is invalid
+
+        Usage example::
+
+            >>> invalid_uid = dicom.UID.UID('1.2.345.')
+            >>> invalid_uid.is_valid(invalid_uid)
+            InvalidUID: 'Trailing dot at the end of the UID'
+            >>> valid_uid = dicom.UID.UID('1.2.123')
+
+        '''
+        if self[-1] == '.':
+            raise InvalidUID('Trailing dot at the end of the UID')
+
     # For python 3, any override of __cmp__ or __eq__ immutable requires
     #   explicit redirect of hash function to the parent class
     #   See http://docs.python.org/dev/3.0/reference/datamodel.html#object.__hash__
@@ -103,5 +138,49 @@ NotCompressedPixelTransferSyntaxes = [ExplicitVRLittleEndian,
 pydicom_root_UID = '1.2.826.0.1.3680043.8.498.'
 pydicom_UIDs = {
     pydicom_root_UID + '1': 'ImplementationClassUID',
-
     }
+
+def generate_uid(prefix=pydicom_root_UID, truncate=False):
+    '''
+    Generate a dicom unique identifier based on host id, process id and current
+    time. The max lenght of the generated UID is 64 caracters.
+
+    If the given prefix is ``None``, the UID is generated following the method
+    described on `David Clunie website
+    <http://www.dclunie.com/medical-image-faq/html/part2.html#UID>`_
+
+    Usage example::
+
+        >>> dicom.UID.generate_uid()
+        1.2.826.0.1.3680043.8.498.2913212949509824014974371514
+        >>> dicom.UID.generate_uid(None)
+        2.25.31215762025423160614120088028604965760
+
+    This method is inspired from the work of `DCMTK
+    <http://dicom.offis.de/dcmtk.php.en>`_.
+
+    :param prefix: The site root UID. Default to pydicom root UID.
+    '''
+    max_uid_len = 64
+
+    if prefix is None:
+        dicom_uid = '2.25.{0}'.format(uuid.uuid1().int)
+    else:
+        uid_info = [uuid.getnode(),
+            fabs(os.getpid()),
+            datetime.datetime.today().second,
+            datetime.datetime.today().microsecond]
+
+        suffix = ''.join([str(long(x)) for x in uid_info])
+        dicom_uid = ''.join([prefix, suffix])
+
+    if truncate:
+        dicom_uid = dicom_uid[:max_uid_len]
+
+    dicom_uid = UID(dicom_uid)
+
+    #This will raise an exception if the UID is invalid
+    dicom_uid.is_valid()
+
+    return dicom_uid
+
