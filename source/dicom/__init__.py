@@ -26,7 +26,7 @@ http://groups.google.com/group/pydicom
 """
 
 import sys
-if sys.version_info < (2,6,0):
+if sys.version_info < (2, 6, 0):
     raise ImportError("pydicom > 0.9.7 requires python 2.6 or later")
 in_py3 = sys.version_info[0] > 2
 
@@ -39,6 +39,7 @@ in_py3 = sys.version_info[0] > 2
 #  Turn off debugging with
 #       dicom.debug(False)
 import logging
+
 
 def debug(debug_on=True):
     """Turn debugging of DICOM file reading and writing on or off.
@@ -61,7 +62,7 @@ handler = logging.StreamHandler()
 formatter = logging.Formatter("%(message)s")
 handler.setFormatter(formatter)
 logger.addHandler(handler)
-debug(False) # force level=WARNING, in case logging default is set differently (issue 102)
+debug(False)  # force level=WARNING, in case logging default is set differently (issue 102)
 
 # For convenience, import the read_file and write_file functions (most used)
 #     into the "dicom" namespace.
@@ -69,4 +70,4 @@ from dicom.filereader import read_file
 from dicom.filewriter import write_file
 
 __version__ = "1.0a"
-__version_info__ = (1,0,0)
+__version_info__ = (1, 0, 0)

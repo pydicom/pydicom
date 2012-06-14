@@ -8,12 +8,14 @@
 from dicom.dataset import Dataset
 from dicom.multival import MultiValue
 
+
 def validate_dataset(elem):
     """Ensures that the value is a Dataset instance"""
     if not isinstance(elem, Dataset):
         raise TypeError('Sequence contents must be a Dataset instance')
 
     return elem
+
 
 class Sequence(MultiValue):
     """Class to hold multiple Datasets in a list
@@ -39,7 +41,7 @@ class Sequence(MultiValue):
 
         # If no inputs are provided, we create an empty Sequence
         if not iterable:
-            iterable = list();
+            iterable = list()
 
         # validate_dataset is used as a pseudo type_constructor
         super(Sequence, self).__init__(validate_dataset, iterable)
@@ -51,4 +53,5 @@ class Sequence(MultiValue):
     def __repr__(self):
         """Sequence-specific string representation"""
         formatstr = "<%(classname)s, length %(count)d, at %(id)X>"
-        return   formatstr % {'classname':self.__class__.__name__, 'id':id(self), 'count':len(self)}
+        return   formatstr % {'classname': self.__class__.__name__,
+                              'id': id(self), 'count': len(self)}

@@ -10,14 +10,15 @@ import dicom.config
 from dicom.multival import MultiValue
 from dicom import in_py3
 
-default_encoding = "iso8859" # can't import from charset or get circular import
+default_encoding = "iso8859"  # can't import from charset or get circular import
 
 # For reading/writing data elements, these ones have longer explicit VR format
 extra_length_VRs = ('OB', 'OW', 'OF', 'SQ', 'UN', 'UT')
 
 # VRs that can be affected by character repertoire in (0008,0005) Specific Character Set
 # See PS-3.5 (2011), section 6.1.2 Graphic Characters
-text_VRs = ('SH', 'LO', 'ST', 'LT', 'UT') # and PN, but it is handled separately.
+text_VRs = ('SH', 'LO', 'ST', 'LT', 'UT')  # and PN, but it is handled separately.
+
 
 class DS(Decimal):
     """Store values for DICOM VR of DS (Decimal String).
@@ -34,11 +35,11 @@ class DS(Decimal):
         enforce_length = dicom.config.enforce_valid_values
         # DICOM allows spaces around the string, but python doesn't, so clean it
         if isinstance(val, (str, unicode)):
-            val=val.strip()
+            val = val.strip()
             # If the input string is actually invalid that we relax the valid
             # value constraint for this particular instance
             if len(val) <= 16:
-                enforce_length = False;
+                enforce_length = False
         if val == '':
             return val
         if isinstance(val, float) and not dicom.config.allow_DS_float:
@@ -56,6 +57,7 @@ class DS(Decimal):
                 "or use Decimal.quantize() and initialize with a Decimal instance.")
             raise OverflowError(msg)
         return val
+
     def __init__(self, val):
         """Store the original string if one given, for exact write-out of same
         value later. E.g. if set '1.23e2', Decimal would write '123', but DS
@@ -67,13 +69,14 @@ class DS(Decimal):
             self.original_string = val
 
     def __str__(self):
-        if hasattr(self,'original_string') and len(self.original_string) <= 16:
+        if hasattr(self, 'original_string') and len(self.original_string) <= 16:
             return self.original_string
         else:
-            return super(DS,self).__str__()
+            return super(DS, self).__str__()
 
     def __repr__(self):
         return "'" + str(self) + "'"
+
 
 class IS(int):
     """Derived class of int. Stores original integer string for exact rewriting
@@ -91,19 +94,22 @@ class IS(int):
         if isinstance(val, (float, Decimal)) and newval != val:
             raise TypeError("Could not convert value to integer without loss")
                 # Checks in case underlying int is >32 bits, DICOM does not allow this
-        if (newval < -2**31 or newval >= 2**31) and dicom.config.enforce_valid_values:
+        if (newval < -2 ** 31 or newval >= 2 ** 31) and dicom.config.enforce_valid_values:
             message = "Value exceeds DICOM limits of -2**31 to (2**31 - 1) for IS"
             raise OverflowError(message)
         return newval
+
     def __init__(self, val):
         # If a string passed, then store it
         if isinstance(val, (str, unicode)):
             self.original_string = val
+
     def __repr__(self):
         if hasattr(self, 'original_string'):
             return "'" + self.original_string + "'"
         else:
             return "'" + int.__str__(self) + "'"
+
 
 def MultiString(val, valtype=str):
     """Split a bytestring by delimiters if there are any
@@ -124,6 +130,7 @@ def MultiString(val, valtype=str):
         return splitup[0]
     else:
         return MultiValue(valtype, splitup)
+
 
 class PersonNameBase(object):
     """Base class for Person Name classes"""
@@ -159,7 +166,7 @@ class PersonNameBase(object):
             self.phonetic = self.components[2]
 
         if self.single_byte:
-            name_string = self.single_byte + "^^^^" # in case missing trailing items are left out
+            name_string = self.single_byte + "^^^^"  # in case missing trailing items are left out
             parts = name_string.split("^")[:5]
             (self.family_name, self.given_name, self.middle_name,
                                self.name_prefix, self.name_suffix) = parts
@@ -186,6 +193,7 @@ class PersonName(PersonNameBase, str):
         if isinstance(val, PersonName):
             return val
         return super(PersonName, cls).__new__(cls, val)
+
     def family_comma_given(self):
         """Return name as 'Family-name, Given-name'"""
         return self.formatted("%(family_name)s, %(given_name)s")
@@ -194,7 +202,6 @@ class PersonName(PersonNameBase, str):
         # XXX need to process the ideographic or phonetic components?
     # def __len__(self):
         # return len(self.byte_string)
-
 
 
 class PersonNameUnicode(PersonNameBase, unicode):
@@ -207,15 +214,15 @@ class PersonNameUnicode(PersonNameBase, unicode):
                  from dicom.charset.python_encodings mapping
                  of values in DICOM data element (0008,0005).
         """
-        from dicom.charset import clean_escseq # in here to avoid circular import
-       
+        from dicom.charset import clean_escseq  # in here to avoid circular import
+
         # XXX At this point we should allow unicode or bytes as input, but if
         # it is in unicode we will have to convert it to re-encode it later
-        if in_py3 and isinstance(val,str):
-            val = bytes(val,default_encoding)
+        if in_py3 and isinstance(val, str):
+            val = bytes(val, default_encoding)
         # Make the possible three character encodings explicit:
         if not isinstance(encodings, list):
-            encodings = [encodings]*3
+            encodings = [encodings] * 3
         if len(encodings) == 2:
             encodings.append(encodings[1])
         components = val.split(b"=")
@@ -223,14 +230,16 @@ class PersonNameUnicode(PersonNameBase, unicode):
         if (len(components) == 1):
             del encodings[0]
         unicomponents = [clean_escseq(
-                        unicode(components[i],encodings[i]), encodings)
+                        unicode(components[i], encodings[i]), encodings)
                             for i, component in enumerate(components)]
         new_val = u"=".join(unicomponents)
 
         return unicode.__new__(cls, new_val)
+
     def __init__(self, val, encodings):
         self.encodings = encodings
         PersonNameBase.__init__(self, val)
+
     def family_comma_given(self):
         """Return name as 'Family-name, Given-name'"""
         return self.formatted("%(family_name)u, %(given_name)u")

@@ -27,13 +27,14 @@ def hex2bytes(hexstring):
     """
     # This works in both 3.x and 2.x because the first conditional evaluates to
     # true in 2.x so the difference in bytes constructor doesn't matter
-    if isinstance(hexstring,bytes):
+    if isinstance(hexstring, bytes):
         return a2b_hex(hexstring.replace(b" ", b""))
     else:
-        return a2b_hex(bytes(hexstring.replace(" ", ""),default_encoding))
+        return a2b_hex(bytes(hexstring.replace(" ", ""), default_encoding))
+
 
 def bytes2hex(byte_string):
     s = b2a_hex(byte_string)
     if in_py3:
         s = s.decode()
-    return " ".join(s[i:i+2] for i in range(0, len(s), 2))
+    return " ".join(s[i:i + 2] for i in range(0, len(s), 2))

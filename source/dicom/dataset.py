@@ -5,7 +5,7 @@ Overview of Dicom object model:
 
 Dataset(derived class of Python's dict class)
    contains DataElement instances (DataElement is a class with tag, VR, value)
-     the value can be a Sequence instance 
+     the value can be a Sequence instance
         (Sequence is derived from Python's list),
      or just a regular value like a number, string, etc.,
      or a list of regular values, e.g. a 3d coordinate
@@ -34,7 +34,7 @@ import os.path
 
 import io
 
-import dicom # for write_file
+import dicom  # for write_file
 import dicom.charset
 import warnings
 
@@ -117,7 +117,7 @@ class Dataset(dict):
         if tag:
             return dict.__contains__(self, tag)
         else:
-            return dict.__contains__(self, name) # will no doubt raise an exception
+            return dict.__contains__(self, name)  # will no doubt raise an exception
 
     def decode(self):
         """Apply character set decoding to all data elements.
@@ -160,7 +160,7 @@ class Dataset(dict):
 
     def __dir__(self):
         """Give a list of attributes available in the dataset
-        
+
         List of attributes is used, for example, in auto-completion in editors
            or command-line environments.
         """
@@ -171,7 +171,7 @@ class Dataset(dict):
         props = set(list(zip(
                     *inspect.getmembers(Dataset, inspect.isdatadescriptor)))[0])
         dicom_names = set(self.dir())
-        alldir=sorted(props | meths | dicom_names)
+        alldir = sorted(props | meths | dicom_names)
         return alldir
 
     def dir(self, *filters):
@@ -193,7 +193,7 @@ class Dataset(dict):
         for filter_ in filters:
             filter_ = filter_.lower()
             match = [x for x in allnames if x.lower().find(filter_) != -1]
-            matches.update(dict([(x,1) for x in match]))
+            matches.update(dict([(x, 1) for x in match]))
         if filters:
             names = sorted(matches.keys())
             return names
@@ -264,11 +264,10 @@ class Dataset(dict):
         :param group:  the group part of a dicom (group, element) tag.
         :returns:  a dataset instance containing data elements of the group
                     specified
-        
         """
         ds = Dataset()
-        ds.update(dict([(tag,data_element) for tag,data_element in self.items() 
-                                if tag.group==group]))
+        ds.update(dict([(tag, data_element) for tag, data_element in self.items()
+                                if tag.group == group]))
         return ds
 
     def __iter__(self):
@@ -346,7 +345,7 @@ class Dataset(dict):
     def _get_pixel_array(self):
         # Check if pixel data is in a form we know how to make into an array
         # XXX uses file_meta here, should really only be thus for FileDataset
-        if self.file_meta.TransferSyntaxUID not in NotCompressedPixelTransferSyntaxes :
+        if self.file_meta.TransferSyntaxUID not in NotCompressedPixelTransferSyntaxes:
             raise NotImplementedError("Pixel Data is compressed in a format pydicom does not yet handle. Cannot return array")
 
         # Check if already have converted to a NumPy array
@@ -358,7 +357,7 @@ class Dataset(dict):
             already_have = False
         if not already_have:
             self._pixel_array = self._pixel_data_numpy()
-            self._pixel_id = id(self.PixelData) # is this guaranteed to work if memory is re-used??
+            self._pixel_id = id(self.PixelData)  # is this guaranteed to work if memory is re-used??
         return self._pixel_array
 
     @property
@@ -373,7 +372,7 @@ class Dataset(dict):
 
     # Format strings spec'd according to python string formatting options
     #    See http://docs.python.org/library/stdtypes.html#string-formatting-operations
-    default_element_format =  "%(tag)s %(name)-35.35s %(VR)s: %(repval)s"
+    default_element_format = "%(tag)s %(name)-35.35s %(VR)s: %(repval)s"
     default_sequence_element_format = "%(tag)s %(name)-35.35s %(VR)s: %(repval)s"
 
     def formatted_lines(self, element_format=default_element_format,
@@ -391,7 +390,7 @@ class Dataset(dict):
             # Get all the attributes possible for this data element (e.g.
             #   gets descriptive text name too)
             # This is the dictionary of names that can be used in the format string
-            elem_dict = dict([(x, getattr(data_element,x)()
+            elem_dict = dict([(x, getattr(data_element, x)()
                            if callable(getattr(data_element, x))
                            else getattr(data_element, x))
                            for x in dir(data_element) if not x.startswith("_")])
@@ -411,13 +410,13 @@ class Dataset(dict):
         """
         strings = []
         indentStr = self.indent_chars * indent
-        nextIndentStr = self.indent_chars *(indent+1)
+        nextIndentStr = self.indent_chars * (indent + 1)
         for data_element in self:
             if data_element.VR == "SQ":   # a sequence
-                strings.append(indentStr + str(data_element.tag) + "  %s   %i item(s) ---- " % ( data_element.description(),len(data_element.value)))
+                strings.append(indentStr + str(data_element.tag) + "  %s   %i item(s) ---- " % (data_element.description(), len(data_element.value)))
                 if not topLevelOnly:
                     for dataset in data_element.value:
-                        strings.append(dataset._pretty_str(indent+1))
+                        strings.append(dataset._pretty_str(indent + 1))
                         strings.append(nextIndentStr + "---------")
             else:
                 strings.append(indentStr + repr(data_element))
@@ -464,7 +463,7 @@ class Dataset(dict):
 
     def __setitem__(self, key, value):
         """Operator for dataset[key]=value. Check consistency, and deal with private tags"""
-        if not isinstance(value, (DataElement, RawDataElement)): # ok if is subclass, e.g. DeferredDataElement
+        if not isinstance(value, (DataElement, RawDataElement)):  # ok if is subclass, e.g. DeferredDataElement
             raise TypeError("Dataset contents must be DataElement instances.\n" + \
                   "To set a data_element value use data_element.value=val")
         tag = Tag(value.tag)
@@ -496,7 +495,7 @@ class Dataset(dict):
         Used in IPython, so that data element names can be found
         and offered for autocompletion on the IPython command line
         """
-        return dir(self) # only valid python >=2.6, else use self.__dir__()
+        return dir(self)  # only valid python >=2.6, else use self.__dir__()
 
     def update(self, dictionary):
         """Extend dict.update() to handle DICOM keywords."""
@@ -575,13 +574,13 @@ class FileDataset(Dataset):
             # This is the appropriate constructor for io.BufferedReader
             self.fileobj_type = open
         else:
-            self.fileobj_type = filename_or_obj.__class__ # use __class__ python <2.7?; http://docs.python.org/reference/datamodel.html
+            self.fileobj_type = filename_or_obj.__class__  # use __class__ python <2.7?; http://docs.python.org/reference/datamodel.html
             if getattr(filename_or_obj, "name", False):
                 self.filename = filename_or_obj.name
-            elif getattr(filename_or_obj, "filename", False): #gzip python <2.7?
+            elif getattr(filename_or_obj, "filename", False):  # gzip python <2.7?
                 self.filename = filename_or_obj.filename
             else:
-                self.filename = None # e.g. came from BytesIO or something file-like
+                self.filename = None  # e.g. came from BytesIO or something file-like
         self.timestamp = None
         if stat_available and self.filename and os.path.exists(self.filename):
             statinfo = stat(self.filename)

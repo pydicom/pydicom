@@ -26,8 +26,10 @@ Note: Use at your own risk. Does not fully de-identify the DICOM data as per
 the DICOM standard, e.g in Annex E of PS3.15-2011.
 """
 
-import os, os.path
+import os
+import os.path
 import dicom
+
 
 def anonymize(filename, output_filename, new_person_name="anonymous",
               new_patient_id="id", remove_curves=True, remove_private_tags=True):
@@ -41,6 +43,7 @@ def anonymize(filename, output_filename, new_person_name="anonymous",
         """Called from the dataset "walk" recursive function for all data elements."""
         if data_element.VR == "PN":
             data_element.value = new_person_name
+
     def curves_callback(ds, data_element):
         """Called from the dataset "walk" recursive function for all data elements."""
         if data_element.tag.group & 0xFF00 == 0x5000:
@@ -90,7 +93,7 @@ if __name__ == "__main__":
         if os.path.exists(out_dir):
             if not os.path.isdir(out_dir):
                 raise IOError("Input is directory; output name exists but is not a directory")
-        else: # out_dir does not exist; create it.
+        else:  # out_dir does not exist; create it.
             os.makedirs(out_dir)
 
         filenames = os.listdir(in_dir)
@@ -99,7 +102,7 @@ if __name__ == "__main__":
                 print(filename + "...", end='')
                 anonymize(os.path.join(in_dir, filename), os.path.join(out_dir, filename))
                 print("done\r")
-    else: # first arg not a directory, assume two files given
+    else:  # first arg not a directory, assume two files given
         in_filename = arg1
         out_filename = arg2
         anonymize(in_filename, out_filename)

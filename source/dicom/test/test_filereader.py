@@ -240,26 +240,31 @@ class ReaderTests(unittest.TestCase):
         ds = read_file(nested_priv_SQ_name)
 
         # Make sure that the entire dataset was read in
-        pixel_data_tag = TupleTag((0x7fe0,0x10))
-        self.assertTrue(ds.has_key(pixel_data_tag),"Entire dataset was not parsed properly. PixelData is not present")
+        pixel_data_tag = TupleTag((0x7fe0, 0x10))
+        self.assertTrue(pixel_data_tag in ds,
+                "Entire dataset was not parsed properly. PixelData is not present")
 
         # Check that the DataElement is indeed a Sequence
-        tag = TupleTag((0x01,0x01));
+        tag = TupleTag((0x01, 0x01))
         seq0 = ds[tag]
-        self.assertEqual(seq0.VR,'SQ',"First level sequence not parsed properly")
+        self.assertEqual(seq0.VR, 'SQ',
+                "First level sequence not parsed properly")
 
         # Now verify the presence of the nested private SQ
         seq1 = seq0[0][tag]
-        self.assertEqual(seq1.VR,'SQ',"Second level sequence not parsed properly")
+        self.assertEqual(seq1.VR, 'SQ',
+                "Second level sequence not parsed properly")
 
         # Now make sure the values that are parsed are correct
         got = seq1[0][tag].value
         expected = b'Double Nested SQ'
-        self.assertEqual(got,expected,"Expected a value of %s, got %s'" % (expected,got))
+        self.assertEqual(got, expected,
+                "Expected a value of %s, got %s'" % (expected, got))
 
-        got = seq0[0][0x01,0x02].value
+        got = seq0[0][0x01, 0x02].value
         expected = b'Nested SQ'
-        self.assertEqual(got,expected,"Expected a value of %s, got %s'" % (expected,got))
+        self.assertEqual(got, expected,
+                "Expected a value of %s, got %s'" % (expected, got))
 
     def testNoMetaGroupLength(self):
         """Read file with no group length in file meta..........................."""

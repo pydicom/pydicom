@@ -91,6 +91,7 @@ class DataElement(object):
     descripWidth = 35
     maxBytesToDisplay = 16
     showVR = 1
+
     def __init__(self, tag, VR, value, file_value_tell=None,
                         is_undefined_length=False):
         """Create a data element instance.
@@ -129,8 +130,8 @@ class DataElement(object):
         # Check if is a string with multiple values separated by '\'
         # If so, turn them into a list of separate strings
         if isString(val) and self.VR not in \
-           ['UT','ST','LT', 'FL','FD','AT','OB','OW','OF','SL','SQ','SS',
-            'UL', 'OB/OW', 'OW/OB', 'OB or OW', 'OW or OB', 'UN'] and 'US' not in self.VR: # latter covers 'US or SS' etc
+           ['UT', 'ST', 'LT', 'FL', 'FD', 'AT', 'OB', 'OW', 'OF', 'SL', 'SQ', 'SS',
+            'UL', 'OB/OW', 'OW/OB', 'OB or OW', 'OW or OB', 'UN'] and 'US' not in self.VR:  # latter covers 'US or SS' etc
             if _backslash in val:
                 val = val.split(_backslash)
         self._value = self._convert_value(val)
@@ -146,9 +147,9 @@ class DataElement(object):
     def _convert_value(self, val):
         """Convert Dicom string values if possible to e.g. numbers. Handle the case
         of multiple value data_elements"""
-        if self.VR=='SQ': # a sequence - leave it alone
+        if self.VR == 'SQ':  # a sequence - leave it alone
             from dicom.sequence import Sequence
-            if isinstance(val,Sequence):
+            if isinstance(val, Sequence):
                 return val
             else:
                 return Sequence(val)
@@ -156,7 +157,7 @@ class DataElement(object):
         # if the value is a list, convert each element
         try:
             val.append
-        except AttributeError: # not a list
+        except AttributeError:  # not a list
             return self._convert(val)
         else:
             returnvalue = []
@@ -176,8 +177,8 @@ class DataElement(object):
         #    but needs more thought
         # elif self.VR == "PN":
         #    return PersonName(val)
-        else: # is either a string or a type 2 optionally blank string
-            return val # this means a "numeric" value could be empty string ""
+        else:  # is either a string or a type 2 optionally blank string
+            return val  # this means a "numeric" value could be empty string ""
         #except TypeError:
             #print "Could not convert value '%s' to VR '%s' in tag %s" \
                                 # % (repr(val), self.VR, self.tag)
@@ -202,7 +203,7 @@ class DataElement(object):
         if (self.VR in ['OB', 'OW', 'OW/OB', 'OW or OB', 'OB or OW', 'US or SS or OW', 'US or SS']
                   and len(self.value) > self.maxBytesToDisplay):
             repVal = "Array of %d bytes" % len(self.value)
-        elif hasattr(self, 'original_string'): # for VR of IS or DS
+        elif hasattr(self, 'original_string'):  # for VR of IS or DS
             repVal = repr(self.original_string)
         elif isinstance(self.value, Decimal):
             repVal = repr(self.value)
@@ -238,7 +239,7 @@ class DataElement(object):
         if dictionary_has_tag(self.tag):
             name = dictionary_description(self.tag)
         elif self.tag.is_private:
-            name = "Private tag data" # default
+            name = "Private tag data"  # default
             if hasattr(self, 'private_creator'):
                 try:
                     # If have name from private dictionary, use it, but
@@ -276,7 +277,7 @@ class DeferredDataElement(DataElement):
         """
         self.tag = Tag(tag)
         self.VR = VR
-        self._value = None # flag as unread
+        self._value = None  # flag as unread
 
         # Check current file object and save info needed for read later
         self.fp_is_implicit_VR = fp.is_implicit_VR
@@ -312,10 +313,10 @@ RawDataElement = namedtuple('RawDataElement',
 
 def DataElement_from_raw(raw_data_element):
     """Return a DataElement from a RawDataElement"""
-    from dicom.values import convert_value # XXX buried here to avoid circular import filereader->Dataset->convert_value->filereader (for SQ parsing)
+    from dicom.values import convert_value  # XXX buried here to avoid circular import filereader->Dataset->convert_value->filereader (for SQ parsing)
     raw = raw_data_element
     VR = raw.VR
-    if VR is None: # Can be if was implicit VR
+    if VR is None:  # Can be if was implicit VR
         try:
             VR = dictionaryVR(raw.tag)
         except KeyError:
@@ -329,4 +330,4 @@ def DataElement_from_raw(raw_data_element):
         value = convert_value(VR, raw)
     except NotImplementedError as e:
         raise NotImplementedError("{0:s} in tag {1!r}".format(str(e), raw.tag))
-    return DataElement(raw.tag, VR, value, raw.value_tell, raw.length==0xFFFFFFFF)
+    return DataElement(raw.tag, VR, value, raw.value_tell, raw.length == 0xFFFFFFFF)

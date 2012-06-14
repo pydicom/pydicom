@@ -10,6 +10,7 @@ from dicom.valuerep import PersonNameUnicode
 
 import Tix
 
+
 def RunTree(w, filename):
     top = Tix.Frame(w, relief=Tix.RAISED, bd=1)
     tree = Tix.Tree(top, options="hlist.columns 2")
@@ -26,12 +27,14 @@ def RunTree(w, filename):
 
     show_file(filename, tree)
 
+
 def show_file(filename, tree):
     tree.hlist.add("root", text=filename)
     ds = dicom.read_file(sys.argv[1])
     ds.decode()  # change strings to unicode
     recurse_tree(tree, ds, "root", False)
     tree.autosetmode()
+
 
 def recurse_tree(tree, dataset, parent, hide=False):
     # order the dicom tags
@@ -45,9 +48,9 @@ def recurse_tree(tree, dataset, parent, hide=False):
             tree.hlist.hide_entry(node_id)
         if data_element.VR == "SQ":   # a sequence
             for i, dataset in enumerate(data_element.value):
-                item_id = node_id + "." + str(i+1)
-                sq_item_description = data_element.name.replace(" Sequence", "") # XXX not i18n
-                item_text = "{0:s} {1:d}".format(sq_item_description, i+1)
+                item_id = node_id + "." + str(i + 1)
+                sq_item_description = data_element.name.replace(" Sequence", "")  # XXX not i18n
+                item_text = "{0:s} {1:d}".format(sq_item_description, i + 1)
                 tree.hlist.add(item_id, text=item_text)
                 tree.hlist.hide_entry(item_id)
                 recurse_tree(tree, dataset, item_id, hide=True)

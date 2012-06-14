@@ -21,6 +21,7 @@ logger = logging.getLogger('pydicom')
 from dicom.filebase import DicomBytesIO
 from dicom.tag import ItemTag, SequenceDelimiterTag
 
+
 def defragment_data(data):
     """Read encapsulated data and return one continuous string
 
@@ -32,7 +33,7 @@ def defragment_data(data):
 
     # Convert data into a memory-mapped file
     fp = DicomBytesIO(data)
-    fp.is_little_endian = True # DICOM standard requires this
+    fp.is_little_endian = True  # DICOM standard requires this
     BasicOffsetTable = read_item(fp)
     seq = []
     while True:
@@ -44,27 +45,28 @@ def defragment_data(data):
     # XXX should
     return "".join(seq)
 
+
 # read_item modeled after filereader.ReadSequenceItem
 def read_item(fp):
     """Read and return a single Item in the fragmented data stream"""
     try:
         tag = fp.read_tag()
-    except EOFError: # already read delimiter before passing data here, so should just run out
+    except EOFError:  # already read delimiter before passing data here, so should just run out
         return None
-    if tag == SequenceDelimiterTag: # No more items, time for sequence to stop reading
+    if tag == SequenceDelimiterTag:  # No more items, time for sequence to stop reading
         length = fp.read_UL()
-        logger.debug("%04x: Sequence Delimiter, length 0x%x", fp.tell()-8, length)
+        logger.debug("%04x: Sequence Delimiter, length 0x%x", fp.tell() - 8, length)
         if length != 0:
-            logger.warning("Expected 0x00000000 after delimiter, found 0x%x, at data position 0x%x", length, fp.tell()-4)
+            logger.warning("Expected 0x00000000 after delimiter, found 0x%x, at data position 0x%x", length, fp.tell() - 4)
         return None
     if tag != ItemTag:
-        logger.warning("Expected Item with tag %s at data position 0x%x", ItemTag, fp.tell()-4)
+        logger.warning("Expected Item with tag %s at data position 0x%x", ItemTag, fp.tell() - 4)
         length = fp.read_UL()
     else:
         length = fp.read_UL()
-        logger.debug("%04x: Item, length 0x%x", fp.tell()-8, length)
+        logger.debug("%04x: Item, length 0x%x", fp.tell() - 8, length)
 
     if length == 0xFFFFFFFFL:
-        raise ValueError("Encapsulated data fragment had Undefined Length at data position 0x%x" % fp.tell()-4)
+        raise ValueError("Encapsulated data fragment had Undefined Length at data position 0x%x" % fp.tell() - 4)
     item_data = fp.read(length)
     return item_data
