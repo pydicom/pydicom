@@ -32,9 +32,9 @@ dataset = dicom.read_file(filename)
 
 # Verbose mode:
 if len(sys.argv) == 3:
-    if sys.argv[2]=="-v": #user asked for all info
+    if sys.argv[2] == "-v":  # user asked for all info
         print(dataset)
-    else: # unknown command argument
+    else:  # unknown command argument
         print(__doc__)
     sys.exit()
 

@@ -13,33 +13,39 @@ from io import BytesIO
 import logging
 logger = logging.getLogger('pydicom')
 
+
 class DicomIO(object):
     """File object which holds transfer syntax info and anything else we need."""
 
-    max_read_attempts = 3 # number of times to read if don't get requested bytes
-    defer_size = None     # default
+    max_read_attempts = 3  # number of times to read if don't get requested bytes
+    defer_size = None      # default
 
     def __init__(self, *args, **kwargs):
         self._implicit_VR = True   # start with this by default
+
     def __del__(self):
         self.close()
+
     def read_le_tag(self):
         """Read and return two unsigned shorts (little endian) from the file."""
         bytes_read = self.read(4)
         if len(bytes_read) < 4:
             raise EOFError  # needed for reading "next" tag when at end of file
         return unpack(bytes_read, b"<HH")
+
     def read_be_tag(self):
         """Read and return two unsigned shorts (little endian) from the file."""
         bytes_read = self.read(4)
         if len(bytes_read) < 4:
             raise EOFError  # needed for reading "next" tag when at end of file
         return unpack(bytes_read, b">HH")
+
     def write_tag(self, tag):
         """Write a dicom tag (two unsigned shorts) to the file."""
         tag = Tag(tag)  # make sure is an instance of class, not just a tuple or int
         self.write_US(tag.group)
         self.write_US(tag.element)
+
     def read_leUS(self):
         """Return an unsigned short from the file with little endian byte order"""
         return unpack(b"<H", self.read(2))[0]
@@ -51,20 +57,21 @@ class DicomIO(object):
     def read_leUL(self):
         """Return an unsigned long read with little endian byte order"""
         return unpack(b"<L", self.read(4))[0]
+
     def read(self, length=None, need_exact_length=True):
         """Reads the required length, returns EOFError if gets less
 
         If length is None, then read all bytes
         """
-        parent_read = self.parent_read # super(DicomIO, self).read
+        parent_read = self.parent_read  # super(DicomIO, self).read
         if length is None:
-            return parent_read() # get all of it
+            return parent_read()  # get all of it
         bytes_read = parent_read(length)
         if len(bytes_read) < length and need_exact_length:
             # Didn't get all the desired bytes. Keep trying to get the rest. If reading across network, might want to add a delay here
             attempts = 0
             while attempts < self.max_read_attempts and len(bytes_read) < length:
-                bytes_read += parent_read(length-len(bytes_read))
+                bytes_read += parent_read(length - len(bytes_read))
                 attempts += 1
             if len(bytes_read) < length:
                 start_pos = self.tell() - len(bytes_read)
@@ -72,15 +79,19 @@ class DicomIO(object):
                 msg += "Read {0} bytes of {1} expected starting at position 0x{2:x}".format(len(bytes_read), length, start_pos)
                 raise EOFError(msg)
         return bytes_read
+
     def write_leUS(self, val):
         """Write an unsigned short with little endian byte order"""
         self.write(pack(b"<H", val))
+
     def write_leUL(self, val):
         """Write an unsigned long with little endian byte order"""
         self.write(pack(b"<L", val))
+
     def write_beUS(self, val):
         """Write an unsigned short with big endian byte order"""
         self.write(pack(b">H", val))
+
     def write_beUL(self, val):
         """Write an unsigned long with big endian byte order"""
         self.write(pack(b">L", val))
@@ -122,7 +133,9 @@ class DicomIO(object):
     def is_implicit_VR(self, value):
         self._implicit_VR = value
 
+
 class DicomFileLike(DicomIO):
+
     def __init__(self, file_like_obj):
         self.parent = file_like_obj
         self.parent_read = file_like_obj.read
@@ -131,12 +144,15 @@ class DicomFileLike(DicomIO):
         self.tell = file_like_obj.tell
         self.close = file_like_obj.close
         self.name = getattr(file_like_obj, 'name', '<no filename>')
+
     def no_write(self, bytes_read):
         """Used for file-like objects where no write is available"""
         raise IOError("This DicomFileLike object has no write() method")
 
+
 def DicomFile(*args, **kwargs):
     return DicomFileLike(open(*args, **kwargs))
+
 
 def DicomBytesIO(*args, **kwargs):
     return DicomFileLike(BytesIO(*args, **kwargs))

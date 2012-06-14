@@ -21,6 +21,7 @@ from dicom.tag import Tag, ItemTag, ItemDelimiterTag, SequenceDelimiterTag
 from dicom.sequence import Sequence
 from dicom.valuerep import extra_length_VRs
 
+
 def write_numbers(fp, data_element, struct_format):
     """Write a "value" of type struct_format from the dicom file.
 
@@ -38,7 +39,7 @@ def write_numbers(fp, data_element, struct_format):
     try:
         try:
             value.append   # works only if list, not if string or number
-        except: # is a single value - the usual case
+        except:  # is a single value - the usual case
             fp.write(pack(format_string, value))
         else:
             for val in value:
@@ -46,9 +47,11 @@ def write_numbers(fp, data_element, struct_format):
     except Exception as e:
         raise IOError("{0}\nfor data_element:\n{1}".format(str(e), str(data_elemesnt)))
 
+
 def write_OBvalue(fp, data_element):
     """Write a data_element with VR of 'other byte' (OB)."""
     fp.write(data_element.value)
+
 
 def write_OWvalue(fp, data_element):
     """Write a data_element with VR of 'other word' (OW).
@@ -59,9 +62,11 @@ def write_OWvalue(fp, data_element):
     # XXX for now just write the raw bytes without endian swapping
     fp.write(data_element.value)
 
+
 def write_UI(fp, data_element):
     """Write a data_element with VR of 'unique identifier' (UI)."""
-    write_string(fp, data_element, '\0') # pad with 0-byte to even length
+    write_string(fp, data_element, '\0')  # pad with 0-byte to even length
+
 
 def multi_string(val):
     """Put a string together with delimiter if has more than one value"""
@@ -70,6 +75,7 @@ def multi_string(val):
     else:
         return val
 
+
 def write_string(fp, data_element, padding=' '):
     """Write a single or multivalued string."""
     val = multi_string(data_element.value)
@@ -77,11 +83,12 @@ def write_string(fp, data_element, padding=' '):
         val = val + padding   # pad to even length
 
     if in_py3:
-        val = bytes(val,default_encoding)
+        val = bytes(val, default_encoding)
 
     fp.write(val)
 
-def write_number_string(fp, data_element, padding = ' '):
+
+def write_number_string(fp, data_element, padding=' '):
     """Handle IS or DS VR - write a number stored as a string of digits."""
     # If the DS or IS has an original_string attribute, use that, so that
     # unchanged data elements are written with exact string as when read from file
@@ -95,9 +102,10 @@ def write_number_string(fp, data_element, padding = ' '):
         val = val + padding   # pad to even length
 
     if in_py3:
-        val = bytes(val,default_encoding);
+        val = bytes(val, default_encoding)
 
     fp.write(val)
+
 
 def write_data_element(fp, data_element):
     """Write the data_element to file fp according to dicom media storage rules."""
@@ -110,7 +118,7 @@ def write_data_element(fp, data_element):
             msg += "\nSet the correct VR before writing, or use an implicit VR transfer syntax"
             raise ValueError(msg)
         if in_py3:
-            fp.write(bytes(VR,default_encoding))
+            fp.write(bytes(VR, default_encoding))
         else:
             fp.write(VR)
         if VR in extra_length_VRs:
@@ -118,16 +126,16 @@ def write_data_element(fp, data_element):
     if VR not in writers:
         raise NotImplementedError("write_data_element: unknown Value Representation '{0}'".format(VR))
 
-    length_location = fp.tell() # save location for later.
+    length_location = fp.tell()  # save location for later.
     if not fp.is_implicit_VR and VR not in ['OB', 'OW', 'OF', 'SQ', 'UT', 'UN']:
         fp.write_US(0)  # Explicit VR length field is only 2 bytes
     else:
         fp.write_UL(0xFFFFFFFFL)   # will fill in real length value later if not undefined length item
 
     try:
-        writers[VR][0] # if writer is a tuple, then need to pass a number format
+        writers[VR][0]  # if writer is a tuple, then need to pass a number format
     except TypeError:
-        writers[VR](fp, data_element) # call the function to write that kind of item
+        writers[VR](fp, data_element)  # call the function to write that kind of item
     else:
         writers[VR][0](fp, data_element, writers[VR][1])
     #  print DataElement(tag, VR, value)
@@ -148,6 +156,7 @@ def write_data_element(fp, data_element):
         fp.write_tag(SequenceDelimiterTag)
         fp.write_UL(0)  # 4-byte 'length' of delimiter data item
 
+
 def write_dataset(fp, dataset):
     """Write a Dataset dictionary to the file. Return the total length written."""
     fpStart = fp.tell()
@@ -158,6 +167,7 @@ def write_dataset(fp, dataset):
 
     return fp.tell() - fpStart
 
+
 def write_sequence(fp, data_element):
     """Write a dicom Sequence contained in data_element to the file fp."""
     # write_data_element has already written the VR='SQ' (if needed) and
@@ -166,31 +176,34 @@ def write_sequence(fp, data_element):
     for dataset in sequence:
         write_sequence_item(fp, dataset)
 
+
 def write_sequence_item(fp, dataset):
     """Write an item (dataset) in a dicom Sequence to the dicom file fp."""
     # see Dicom standard Part 5, p. 39 ('03 version)
     # This is similar to writing a data_element, but with a specific tag for Sequence Item
     fp.write_tag(ItemTag)   # marker for start of Sequence Item
-    length_location = fp.tell() # save location for later.
+    length_location = fp.tell()  # save location for later.
     fp.write_UL(0xffffffffL)   # will fill in real value later if not undefined length
     write_dataset(fp, dataset)
     if getattr(dataset, "is_undefined_length_sequence_item", False):
         fp.write_tag(ItemDelimiterTag)
         fp.write_UL(0)  # 4-bytes 'length' field for delimiter item
-    else: # we will be nice and set the lengths for the reader of this file
+    else:  # we will be nice and set the lengths for the reader of this file
         location = fp.tell()
         fp.seek(length_location)
         fp.write_UL(location - length_location - 4)  # 4 is length of UL
         fp.seek(location)  # ready for next data_element
 
+
 def write_UN(fp, data_element):
     """Write a byte string for an DataElement of value 'UN' (unknown)."""
     fp.write(data_element.value)
 
+
 def write_ATvalue(fp, data_element):
     """Write a data_element tag to a file."""
     try:
-        iter(data_element.value) # see if is multi-valued AT; # Note will fail if Tag ever derived from true tuple rather than being a long
+        iter(data_element.value)  # see if is multi-valued AT;  # Note will fail if Tag ever derived from true tuple rather than being a long
     except TypeError:
         tag = Tag(data_element.value)   # make sure is expressed as a Tag instance
         fp.write_tag(tag)
@@ -215,8 +228,8 @@ def _write_file_meta_info(fp, meta_dataset):
     fp.is_little_endian = True
     fp.is_implicit_VR = False
 
-    if Tag((2,1)) not in meta_dataset:
-        meta_dataset.add_new((2,1), b'OB', b"\0\1")   # file meta information version
+    if Tag((2, 1)) not in meta_dataset:
+        meta_dataset.add_new((2, 1), b'OB', b"\0\1")   # file meta information version
 
     # Now check that required meta info tags are present:
     missing = []
@@ -227,24 +240,25 @@ def _write_file_meta_info(fp, meta_dataset):
         raise ValueError("Missing required tags {0} for file meta information".format(str(missing)))
 
     # Put in temp number for required group length, save current location to come back
-    meta_dataset[(2,0)] = DataElement((2,0), 'UL', 0) # put 0 to start
-    group_length_data_element_size = 12 # !based on DICOM std ExplVR
+    meta_dataset[(2, 0)] = DataElement((2, 0), 'UL', 0)  # put 0 to start
+    group_length_data_element_size = 12  # !based on DICOM std ExplVR
     group_length_tell = fp.tell()
 
     # Write the file meta datset, including temp group length
     length = write_dataset(fp, meta_dataset)
-    group_length = length - group_length_data_element_size # counts from end of that
+    group_length = length - group_length_data_element_size  # counts from end of that
 
     # Save end of file meta to go back to
     end_of_file_meta = fp.tell()
 
     # Go back and write the actual group length
     fp.seek(group_length_tell)
-    group_length_data_element = DataElement((2,0), 'UL', group_length)
+    group_length_data_element = DataElement((2, 0), 'UL', group_length)
     write_data_element(fp, group_length_data_element)
 
     # Return to end of file meta, ready to write remainder of the file
     fp.seek(end_of_file_meta)
+
 
 def write_file(filename, dataset, WriteLikeOriginal=True):
     """Store a Dataset to the filename specified.
@@ -273,7 +287,7 @@ def write_file(filename, dataset, WriteLikeOriginal=True):
     # Decide whether to write DICOM preamble. Should always do so unless trying to mimic the original file read in
     preamble = getattr(dataset, "preamble", None)
     if not preamble and not WriteLikeOriginal:
-        preamble = b"\0"*128
+        preamble = b"\0" * 128
     file_meta = dataset.file_meta
     if file_meta is None:
         file_meta = Dataset()
@@ -287,7 +301,7 @@ def write_file(filename, dataset, WriteLikeOriginal=True):
         else:
             raise NotImplementedError("pydicom has not been verified for Big Endian with Implicit VR")
 
-    fp = DicomFile(filename,'wb')
+    fp = DicomFile(filename, 'wb')
     try:
         if preamble:
             fp.write(preamble)  # blank 128 byte preamble
@@ -304,26 +318,26 @@ def write_file(filename, dataset, WriteLikeOriginal=True):
 # Map each VR to a function which can write it
 # for write_numbers, the Writer maps to a tuple (function, struct_format)
 #                                  (struct_format is python's struct module format)
-writers = {'UL':(write_numbers,'L'), 'SL':(write_numbers,'l'),
-           'US':(write_numbers,'H'), 'SS':(write_numbers, 'h'),
-           'FL':(write_numbers,'f'), 'FD':(write_numbers, 'd'),
-           'OF':(write_numbers,'f'),
-           'OB':write_OBvalue, 'UI':write_UI,
-           'SH':write_string,  'DA':write_string, 'TM': write_string,
-           'CS':write_string,  'PN':write_string, 'LO': write_string,
-           'IS':write_number_string,  'DS':write_number_string, 'AE': write_string,
-           'AS':write_string,
-           'LT':write_string,
-           'SQ':write_sequence,
-           'UN':write_UN,
-           'AT':write_ATvalue,
-           'ST':write_string,
-           'OW':write_OWvalue,
-           'US or SS':write_OWvalue,
-           'OW/OB':write_OBvalue,
-           'OB/OW':write_OBvalue,
-           'OB or OW':write_OBvalue,
-           'OW or OB':write_OBvalue,
-           'DT':write_string,
-           'UT':write_string,
-           } # note OW/OB depends on other items, which we don't know at write time
+writers = {'UL': (write_numbers, 'L'), 'SL': (write_numbers, 'l'),
+           'US': (write_numbers, 'H'), 'SS': (write_numbers, 'h'),
+           'FL': (write_numbers, 'f'), 'FD': (write_numbers, 'd'),
+           'OF': (write_numbers, 'f'),
+           'OB': write_OBvalue, 'UI': write_UI,
+           'SH': write_string, 'DA': write_string, 'TM': write_string,
+           'CS': write_string, 'PN': write_string, 'LO': write_string,
+           'IS': write_number_string, 'DS': write_number_string, 'AE': write_string,
+           'AS': write_string,
+           'LT': write_string,
+           'SQ': write_sequence,
+           'UN': write_UN,
+           'AT': write_ATvalue,
+           'ST': write_string,
+           'OW': write_OWvalue,
+           'US or SS': write_OWvalue,
+           'OW/OB': write_OBvalue,
+           'OB/OW': write_OBvalue,
+           'OB or OW': write_OBvalue,
+           'OW or OB': write_OBvalue,
+           'DT': write_string,
+           'UT': write_string,
+           }  # note OW/OB depends on other items, which we don't know at write time

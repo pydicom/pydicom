@@ -13,7 +13,7 @@ import logging
 logger = logging.getLogger("pydicom")
 from dicom.tag import Tag
 from dicom._dicom_dict import DicomDictionary  # the actual dict of {tag: (VR, VM, name, is_retired, keyword), ...}
-from dicom._dicom_dict import RepeatersDictionary # those with tags like "(50xx, 0005)"
+from dicom._dicom_dict import RepeatersDictionary  # those with tags like "(50xx, 0005)"
 from dicom._private_dict import private_dictionaries
 import warnings
 from dicom import in_py3
@@ -24,8 +24,8 @@ masks = {}
 for mask_x in RepeatersDictionary:
     # mask1 is XOR'd to see that all non-"x" bits are identical (XOR result = 0 if bits same)
     #      then AND those out with 0 bits at the "x" ("we don't care") location using mask2
-    mask1 = long(mask_x.replace("x", "0"),16)
-    mask2 = long("".join(["F0"[c=="x"] for c in mask_x]),16)
+    mask1 = long(mask_x.replace("x", "0"), 16)
+    mask2 = long("".join(["F0"[c == "x"] for c in mask_x]), 16)
     masks[mask_x] = (mask1, mask2)
 
 # For shorter naming of dicom member elements, put an entry here
@@ -37,11 +37,13 @@ shortNames = [("BeamLimitingDevice", "BLD"),
               ("Referenced", "Refd")
              ]
 
+
 def mask_match(tag):
     for mask_x, (mask1, mask2) in masks.items():
         if (tag ^ mask1) & mask2 == 0:
             return mask_x
     return None
+
 
 def get_entry(tag):
     """Return the tuple (VR, VM, name, is_retired, keyword) from the DICOM dictionary
@@ -59,21 +61,26 @@ def get_entry(tag):
         else:
             raise KeyError("Tag {0} not found in DICOM dictionary".format(tag))
 
+
 def dictionary_description(tag):
     """Return the descriptive text for the given dicom tag."""
     return get_entry(tag)[2]
+
 
 def dictionaryVM(tag):
     """Return the dicom value multiplicity for the given dicom tag."""
     return get_entry(tag)[1]
 
+
 def dictionaryVR(tag):
     """Return the dicom value representation for the given dicom tag."""
     return get_entry(tag)[0]
 
+
 def dictionary_has_tag(tag):
     """Return True if the dicom dictionary has an entry for the given tag."""
     return (tag in DicomDictionary)
+
 
 def dictionary_keyword(tag):
     """Return the official DICOM standard (since 2011) keyword for the tag"""
@@ -84,11 +91,12 @@ def dictionary_keyword(tag):
 # Translation is different with unicode - see .translate() at
 #        http://docs.python.org/library/stdtypes.html#string-methods
 chars_to_remove = r""" !@#$%^&*(),;:.?\|{}[]+-="'’/"""
-if in_py3: # i.e. unicode strings
+if in_py3:  # i.e. unicode strings
     translate_table = dict((ord(char), None) for char in chars_to_remove)
 else:
     import string
-    translate_table = string.maketrans('','')
+    translate_table = string.maketrans('', '')
+
 
 def keyword_for_tag(tag):
     """Return the DICOM keyword for the given tag. Replaces old CleanName()
@@ -101,6 +109,7 @@ def keyword_for_tag(tag):
         return dictionary_keyword(tag)
     except KeyError:
         return ""
+
 
 def CleanName(tag):
     """Return the dictionary descriptive text string but without bad characters.
@@ -127,19 +136,20 @@ def CleanName(tag):
     # 'Other Patient ID' exists as single value AND as sequence so check for it and leave 'Sequence' in
     if dictionaryVR(tag) == "SQ" and not s.startswith("OtherPatientIDs"):
         if s.endswith("Sequence"):
-            s = s[:-8]+"s"
+            s = s[:-8] + "s"
             if s.endswith("ss"):
                 s = s[:-1]
             if s.endswith("xs"):
                 s = s[:-1] + "es"
             if s.endswith("Studys"):
-                s = s[:-2]+"ies"
+                s = s[:-2] + "ies"
     return s
 
 # Provide for the 'reverse' lookup. Given clean name, what is the tag?
 logger.debug("Reversing DICOM dictionary so can look up tag from a name...")
 NameDict = dict([(CleanName(tag), tag) for tag in DicomDictionary])
 keyword_dict = dict([(dictionary_keyword(tag), tag) for tag in DicomDictionary])
+
 
 def short_name(name):
     """Return a short *named tag* for the corresponding long version.
@@ -151,6 +161,7 @@ def short_name(name):
         if name.startswith(longname):
             return name.replace(longname, shortname)
     return ""
+
 
 def long_name(name):
     """Return a long *named tag* for the corresponding short version.
@@ -164,9 +175,10 @@ def long_name(name):
             return name.replace(shortname, longname)
     return ""
 
+
 def tag_for_name(name):
     """Return the dicom tag corresponding to name, or None if none exist."""
-    if name in keyword_dict: # the usual case
+    if name in keyword_dict:  # the usual case
         return keyword_dict[name]
     # If not an official keyword, check the old style pydicom names
     if name in NameDict:
@@ -181,6 +193,7 @@ def tag_for_name(name):
     if longname:
         return NameDict.get(longname, None)
     return None
+
 
 def all_names_for_tag(tag):
     """Return a list of all (long and short) names for the tag"""
@@ -217,13 +230,16 @@ def get_private_entry(tag, private_creator):
         dict_entry = private_dict[key]
     return dict_entry
 
+
 def private_dictionary_description(tag, private_creator):
     """Return the descriptive text for the given dicom tag."""
     return get_private_entry(tag, private_creator)[2]
 
+
 def private_dictionaryVM(tag, private_creator):
     """Return the dicom value multiplicity for the given dicom tag."""
     return get_private_entry(tag, private_creator)[1]
+
 
 def private_dictionaryVR(tag, private_creator):
     """Return the dicom value representation for the given dicom tag."""

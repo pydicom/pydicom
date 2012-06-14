@@ -8,6 +8,7 @@ must all be the same type.
 #    available at http://pydicom.googlecode.com
 #
 
+
 class MultiValue(list):
     """Class to hold any multi-valued DICOM value, or any list of items
     that are all of the same type.

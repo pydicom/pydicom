@@ -11,6 +11,7 @@ import dicom
 
 usage = """python ListBeams.py rtplan.dcm"""
 
+
 def ListBeams(plan_dataset):
     """Return a string summarizing the RTPLAN beam information in the dataset"""
     lines = ["{name:^13s} {num:^8s} {gantry:^8s} {ssd:^11s}".format(

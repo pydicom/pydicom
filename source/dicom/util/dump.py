@@ -37,7 +37,7 @@ def hexdump(file_in, start_address=0, stop_address=None, showAddress=True):
     file_in -- a file-like object to get the bytes to show from"""
 
     str_out = BytesIO()
-    byteslen = 16*3-1 # space taken up if row has a full 16 bytes
+    byteslen = 16 * 3 - 1  # space taken up if row has a full 16 bytes
     blanks = ' ' * byteslen
 
     file_in.seek(start_address)
@@ -53,7 +53,7 @@ def hexdump(file_in, start_address=0, stop_address=None, showAddress=True):
         row = [ord(x) for x in data]  # need ord twice below so convert once
         byte_string = ' '.join(["%02x" % x for x in row])  # string of two digit hex bytes
         str_out.write(byte_string)
-        str_out.write(blanks[:byteslen-len(byte_string)])  # if not 16, pad
+        str_out.write(blanks[:byteslen - len(byte_string)])  # if not 16, pad
         str_out.write('  ')
         str_out.write(''.join([print_character(x) for x in row]))  # character rep of bytes
         str_out.write("\n")
@@ -72,15 +72,15 @@ def pretty_print(ds, indent=0, indent_chars="   "):
 
     strings = []
     indentStr = indent_chars * indent
-    nextIndentStr = indent_chars * (indent+1)
+    nextIndentStr = indent_chars * (indent + 1)
     for data_element in ds:
         if data_element.VR == "SQ":   # a sequence
             fmt_str = "{0:s}{1:s} {2:s}  {3:d} item(s) ---"
-            new_str = fmt_str.format(indentStr, str(data_element.tag), 
+            new_str = fmt_str.format(indentStr, str(data_element.tag),
                                 data_element.name, len(data_element.value))
             print(new_str)
             for dataset in data_element.value:
-                pretty_print(dataset, indent+1)
+                pretty_print(dataset, indent + 1)
                 print(nextIndentStr + "---------")
         else:
             print(indentStr + repr(data_element))

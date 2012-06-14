@@ -12,6 +12,7 @@ from math import fabs
 
 from _UID_dict import UID_dictionary
 
+
 class InvalidUID(Exception):
     '''
     Throw when DICOM UID is invalid
@@ -25,6 +26,7 @@ class InvalidUID(Exception):
 
     def __str__(self):
         return repr(self.value)
+
 
 class UID(str):
     """Subclass python string so have human-friendly UIDs
@@ -54,11 +56,11 @@ class UID(str):
         """Initialize the UID properties
 
         Sets name, type, info, is_retired, and is_transfer_syntax.
-        If UID is a transfer syntax, also sets is_little_endian, is_implicit_VR,
-            and is_deflated boolean values.
+        If UID is a transfer syntax, also sets is_little_endian,
+            is_implicit_VR, and is_deflated boolean values.
         """
-        # Note normally use __new__ on subclassing an immutable, but here we just want
-        #    to do some pre-processing against the UID dictionary.
+        # Note normally use __new__ on subclassing an immutable, but here we
+        #   just want to do some pre-processing against the UID dictionary.
         #   "My" string can never change (it is a python immutable), so is safe
         if self in UID_dictionary:
             self.name, self.type, self.info, retired = UID_dictionary[self]
@@ -75,11 +77,11 @@ class UID(str):
             self.is_little_endian = True
             self.is_deflated = False
 
-            if val == '1.2.840.10008.1.2': # implicit VR little endian
+            if val == '1.2.840.10008.1.2':  # implicit VR little endian
                 pass
-            elif val == '1.2.840.10008.1.2.1': # ExplicitVRLittleEndian
+            elif val == '1.2.840.10008.1.2.1':  # ExplicitVRLittleEndian
                 self.is_implicit_VR = False
-            elif val == '1.2.840.10008.1.2.2': # ExplicitVRBigEndian
+            elif val == '1.2.840.10008.1.2.2':  # ExplicitVRBigEndian
                 self.is_implicit_VR = False
                 self.is_little_endian = False
             elif val == '1.2.840.10008.1.2.1.99':  # DeflatedExplicitVRLittleEndian:
@@ -96,9 +98,9 @@ class UID(str):
 
     def __eq__(self, other):
         """Override string equality so either name or UID number match passes"""
-        if str.__eq__(self, other) is True: # 'is True' needed (issue 96)
+        if str.__eq__(self, other) is True:  # 'is True' needed (issue 96)
             return True
-        if str.__eq__(self.name, other) is True: # 'is True' needed (issue 96)
+        if str.__eq__(self.name, other) is True:  # 'is True' needed (issue 96)
             return True
         return False
 
@@ -120,6 +122,7 @@ class UID(str):
     # For python 3, any override of __cmp__ or __eq__ immutable requires
     #   explicit redirect of hash function to the parent class
     #   See http://docs.python.org/dev/3.0/reference/datamodel.html#object.__hash__
+
     def __hash__(self):
         return super(UID, self).__hash__()
 

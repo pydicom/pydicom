@@ -5,7 +5,9 @@
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
 
-_size_factors = dict(KB=1024, MB=1024*1024, GB=1024*1024*1024)
+_size_factors = dict(KB=1024, MB=1024 * 1024, GB=1024 * 1024 * 1024)
+
+
 def size_in_bytes(expr):
     """Return the number of bytes for a defer_size argument to read_file()
     """
