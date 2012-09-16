@@ -8,6 +8,10 @@ import os.path
 
 import sys
 
+extra = {}
+if sys.version_info >= (3,):
+    extra['use_2to3'] = True
+
 setup(name="pydicom",
       packages = find_packages(),
       include_package_data = True,
@@ -29,6 +33,9 @@ setup(name="pydicom",
         "Programming Language :: Python",
         "Programming Language :: Python :: 2.6",
         "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3.0",
+        "Programming Language :: Python :: 3.1",
+        "Programming Language :: Python :: 3.2",
         "Operating System :: OS Independent",
         "Topic :: Scientific/Engineering :: Medical Science Apps.",
         "Topic :: Scientific/Engineering :: Physics",
@@ -49,5 +56,6 @@ setup(name="pydicom",
       for an overview of how to use the pydicom library.
       """,
       test_loader = "dicom.test.run_tests:MyTestLoader",
-      test_suite = "dummy_string"
+      test_suite = "dummy_string",
+      **extra
      )
