@@ -308,7 +308,7 @@ RawDataElement = namedtuple('RawDataElement',
                   'tag VR length value value_tell is_implicit_VR is_little_endian')
 
 
-def DataElement_from_raw(raw_data_element):
+def DataElement_from_raw(raw_data_element, encoding=None):
     """Return a DataElement from a RawDataElement"""
     from dicom.values import convert_value  # XXX buried here to avoid circular import filereader->Dataset->convert_value->filereader (for SQ parsing)
     raw = raw_data_element
@@ -324,7 +324,7 @@ def DataElement_from_raw(raw_data_element):
             else:
                 raise KeyError("Unknown DICOM tag {0:s} - can't look up VR".format(str(raw.tag)))
     try:
-        value = convert_value(VR, raw)
+        value = convert_value(VR, raw, encoding)
     except NotImplementedError as e:
         raise NotImplementedError("{0:s} in tag {1!r}".format(str(e), raw.tag))
     return DataElement(raw.tag, VR, value, raw.value_tell, raw.length == 0xFFFFFFFF)
