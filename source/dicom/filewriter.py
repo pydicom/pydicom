@@ -11,7 +11,7 @@ import logging
 logger = logging.getLogger('pydicom')
 
 from dicom import in_py3
-from dicom.charset import default_encoding
+from dicom.charset import default_encoding, text_VRs
 from dicom.UID import ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian
 from dicom.filebase import DicomFile
 from dicom.datadict import dictionaryVR
@@ -75,15 +75,30 @@ def multi_string(val):
     else:
         return val
 
+def write_PN(fp, data_element, padding=b' ', encoding=None):
+    if not encoding:
+        encoding = [default_encoding]*3
 
-def write_string(fp, data_element, padding=' '):
+    val = multi_string(data_element.value)
+
+    if in_py3:
+        val = data_element.value.encode(encoding)
+    else:
+        val = data_element.value
+
+    if len(val) % 2 != 0:
+        val = val + padding
+
+    fp.write(val)
+
+def write_string(fp, data_element, padding=' ', encoding=default_encoding):
     """Write a single or multivalued string."""
     val = multi_string(data_element.value)
     if len(val) % 2 != 0:
         val = val + padding   # pad to even length
 
     if in_py3:
-        val = bytes(val, default_encoding)
+        val = bytes(val, encoding)
 
     fp.write(val)
 
@@ -107,7 +122,7 @@ def write_number_string(fp, data_element, padding=' '):
     fp.write(val)
 
 
-def write_data_element(fp, data_element):
+def write_data_element(fp, data_element, encoding=default_encoding):
     """Write the data_element to file fp according to dicom media storage rules."""
     fp.write_tag(data_element.tag)
 
@@ -132,12 +147,20 @@ def write_data_element(fp, data_element):
     else:
         fp.write_UL(0xFFFFFFFFL)   # will fill in real length value later if not undefined length item
 
-    try:
-        writers[VR][0]  # if writer is a tuple, then need to pass a number format
-    except TypeError:
-        writers[VR](fp, data_element)  # call the function to write that kind of item
+    if isinstance(encoding, basestring):
+        encoding = [encoding]*3
+
+    if VR in text_VRs:
+        writers[VR](fp, data_element, encoding=encoding[1])
+    elif VR in ('PN','SQ'):
+        writers[VR](fp, data_element, encoding=encoding)
     else:
-        writers[VR][0](fp, data_element, writers[VR][1])
+        try:
+            writers[VR][0]  # if writer is a tuple, then need to pass a number format
+        except TypeError:
+            writers[VR](fp, data_element)  # call the function to write that kind of item
+        else:
+            writers[VR][0](fp, data_element, writers[VR][1])
     #  print DataElement(tag, VR, value)
 
     is_undefined_length = False
@@ -157,34 +180,37 @@ def write_data_element(fp, data_element):
         fp.write_UL(0)  # 4-byte 'length' of delimiter data item
 
 
-def write_dataset(fp, dataset):
+def write_dataset(fp, dataset, parent_encoding=default_encoding):
     """Write a Dataset dictionary to the file. Return the total length written."""
+
+    parent_encoding = dataset.get('SpecificCharacterSet',parent_encoding);
+
     fpStart = fp.tell()
     # data_elements must be written in tag order
     tags = sorted(dataset.keys())
     for tag in tags:
-        write_data_element(fp, dataset[tag])
+        write_data_element(fp, dataset[tag], parent_encoding)
 
     return fp.tell() - fpStart
 
 
-def write_sequence(fp, data_element):
+def write_sequence(fp, data_element, encoding):
     """Write a dicom Sequence contained in data_element to the file fp."""
     # write_data_element has already written the VR='SQ' (if needed) and
     #    a placeholder for length"""
     sequence = data_element.value
     for dataset in sequence:
-        write_sequence_item(fp, dataset)
+        write_sequence_item(fp, dataset, encoding)
 
 
-def write_sequence_item(fp, dataset):
+def write_sequence_item(fp, dataset, encoding):
     """Write an item (dataset) in a dicom Sequence to the dicom file fp."""
     # see Dicom standard Part 5, p. 39 ('03 version)
     # This is similar to writing a data_element, but with a specific tag for Sequence Item
     fp.write_tag(ItemTag)   # marker for start of Sequence Item
     length_location = fp.tell()  # save location for later.
     fp.write_UL(0xffffffffL)   # will fill in real value later if not undefined length
-    write_dataset(fp, dataset)
+    write_dataset(fp, dataset, parent_encoding = encoding)
     if getattr(dataset, "is_undefined_length_sequence_item", False):
         fp.write_tag(ItemDelimiterTag)
         fp.write_UL(0)  # 4-bytes 'length' field for delimiter item
@@ -324,7 +350,7 @@ writers = {'UL': (write_numbers, 'L'), 'SL': (write_numbers, 'l'),
            'OF': (write_numbers, 'f'),
            'OB': write_OBvalue, 'UI': write_UI,
            'SH': write_string, 'DA': write_string, 'TM': write_string,
-           'CS': write_string, 'PN': write_string, 'LO': write_string,
+           'CS': write_string, 'PN': write_PN, 'LO': write_string,
            'IS': write_number_string, 'DS': write_number_string, 'AE': write_string,
            'AS': write_string,
            'LT': write_string,
