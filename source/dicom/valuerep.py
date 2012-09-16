@@ -19,6 +19,22 @@ extra_length_VRs = ('OB', 'OW', 'OF', 'SQ', 'UN', 'UT')
 # See PS-3.5 (2011), section 6.1.2 Graphic Characters
 text_VRs = ('SH', 'LO', 'ST', 'LT', 'UT')  # and PN, but it is handled separately.
 
+import re
+
+match_string = b''.join([
+    b'(?P<single_byte>',
+    b'(?P<family_name>[^=\^]*)',
+    b'\^?(?P<given_name>[^=\^]*)',
+    b'\^?(?P<middle_name>[^=\^]*)',
+    b'\^?(?P<name_prefix>[^=\^]*)',
+    b'\^?(?P<name_suffix>[^=\^]*)',
+    b')',
+    b'=?(?P<ideographic>[^=]*)',
+    b'=?(?P<phonetic>[^=]*)$'])
+
+match_string_uni = re.compile(match_string.decode('iso8859'))
+match_string_bytes = re.compile(match_string)
+
 
 class DS(Decimal):
     """Store values for DICOM VR of DS (Decimal String).
@@ -129,6 +145,88 @@ def MultiString(val, valtype=str):
     else:
         return MultiValue(valtype, splitup)
 
+class PersonName3(object):
+    def __init__(self, val, encodings=default_encoding):
+        if isinstance(val, PersonName3):
+            val = val.original_string
+
+        self.original_string = val
+
+        self.encodings = self._verify_encodings(encodings)
+        self.parse(val)
+
+    def parse(self, val):
+        if isinstance(val, bytes):
+            matchstr = match_string_bytes
+        else:
+            matchstr = match_string_uni
+
+        matchobj = re.match(matchstr,val)
+
+        self.__dict__.update(matchobj.groupdict())
+
+        groups = matchobj.groups()
+        self.components = [groups[i] for i in (0,-2,-1)]
+
+    def __eq__(self, other):
+        return self.original_string == other
+
+    def __str__(self):
+        return self.original_string.__str__()
+
+    def __repr__(self):
+        return self.original_string.__repr__()
+
+    def decode(self, encodings=None):
+        encodings = self._verify_encodings(encodings)
+
+        from dicom.charset import clean_escseq
+        if not isinstance(self.components[0], bytes):
+            comps = self.components
+        else:
+            comps = [clean_escseq(comp.decode(enc),encodings)
+                        for comp,enc in zip(self.components, encodings)]
+
+        while len(comps) and not comps[-1]:
+            comps.pop()
+
+        return PersonName3('='.join(comps), encodings)
+
+    def encode(self, encodings=None):
+        encodings = self._verify_encodings(encodings)
+
+        if isinstance(self.components[0], bytes):
+            comps = self.components
+        else:
+            comps = [C.encode(enc) for C,enc in zip(self.components, encodings)]
+
+        # Remove empty elements from the end
+        while len(comps) and not comps[-1]:
+            comps.pop()
+
+        return b'='.join(comps)
+
+    def family_comma_given(self):
+        return self.formatted('%(family_name)s, %(given_name)s')
+
+    def formatted(self, format_str):
+        if isinstance(self.original_string, bytes):
+            return format_str % self.decode(default_encoding).__dict__
+        else:
+            return format_str % self.__dict__
+
+    def _verify_encodings(self, encodings):
+        if encodings == None:
+            return self.encodings
+
+        if not isinstance(encodings, list):
+            encodings = [encodings]*3
+
+        if len(encodings) == 2:
+            encodings.append(encodings[1])
+
+        return encodings
+
 
 class PersonNameBase(object):
     """Base class for Person Name classes"""
@@ -173,7 +271,7 @@ class PersonNameBase(object):
                 self.name_prefix, self.name_suffix) = ('', '', '', '', '')
 
 
-class PersonName(PersonNameBase, str):
+class PersonName(PersonNameBase, bytes):
     """Human-friendly class to hold VR of Person Name (PN)
 
     Name is parsed into the following properties:
@@ -213,9 +311,6 @@ class PersonNameUnicode(PersonNameBase, unicode):
                  of values in DICOM data element (0008,0005).
         """
         from dicom.charset import clean_escseq  # in here to avoid circular import
-
-        if isinstance(val, unicode):
-            return val
 
         # Make the possible three character encodings explicit:
         if not isinstance(encodings, list):
