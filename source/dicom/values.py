@@ -10,7 +10,7 @@ from struct import unpack, calcsize, pack
 import logging
 logger = logging.getLogger('pydicom')
 
-from dicom.valuerep import PersonName, MultiString
+from dicom.valuerep import PersonName, MultiString, PersonNameUnicode
 from dicom.multival import MultiValue
 import dicom.UID
 from dicom.tag import Tag, TupleTag, SequenceDelimiterTag
@@ -18,7 +18,7 @@ from dicom.datadict import dictionaryVR
 from dicom.filereader import read_sequence
 from io import BytesIO
 from dicom.valuerep import DS, IS
-from dicom.charset import default_encoding
+from dicom.charset import default_encoding, text_VRs
 from dicom import in_py3
 
 
@@ -44,11 +44,15 @@ def convert_ATvalue(byte_string, is_little_endian, struct_format=None):
 
 def convert_DS_string(byte_string, is_little_endian, struct_format=None):
     """Read and return a DS value or list of values"""
+    if in_py3:
+        byte_string = byte_string.decode(default_encoding)
     return MultiString(byte_string, valtype=DS)
 
 
 def convert_IS_string(byte_string, is_little_endian, struct_format=None):
     """Read and return an IS value or list of values"""
+    if in_py3:
+        byte_string = byte_string.decode(default_encoding)
     return MultiString(byte_string, valtype=IS)
 
 
@@ -81,22 +85,39 @@ def convert_OWvalue(byte_string, is_little_endian, struct_format=None):
     return convert_OBvalue(byte_string, is_little_endian)  # for now, Maybe later will have own routine
 
 
-def convert_PN(byte_string, is_little_endian, struct_format=None):
+def convert_PN(byte_string, is_little_endian, struct_format=None, encoding=None):
     """Read and return string(s) as PersonName instance(s)"""
-    return MultiString(byte_string, valtype=PersonName)
 
+    # XXX - We have to replicate MultiString functionality here because we can't decode
+    # easily here since that is performed in PersonNameUnicode
+    if byte_string and (byte_string.endswith(b' ') or byte_string.endswith(b'\x00')):
+        byte_string = byte_string[:-1]
 
-def convert_string(byte_string, is_little_endian, struct_format=None):
+    if not(in_py3) or encoding == None:
+        splitup = [PersonName(x) if x else x for x in byte_string.split(b"\\")]
+    else:   # This is py3 and we provided encodings, we want unicode
+        import pdb
+        pdb.set_trace()
+        splitup = [PersonNameUnicode(x,encoding) if x else x for x in byte_string.split(b"\\")]
+
+    if len(splitup) == 1:
+        return splitup[0]
+    else:
+        return MultiValue(PersonName, splitup)
+
+def convert_string(byte_string, is_little_endian, struct_format=None, encoding=default_encoding):
     """Read and return a string or strings"""
+    if in_py3:
+        byte_string = byte_string.decode(encoding)
     return MultiString(byte_string)
 
 
-def convert_single_string(byte_string, is_little_endian, struct_format=None):
+def convert_single_string(byte_string, is_little_endian, struct_format=None, encoding=default_encoding):
     """Read and return a single string (backslash character does not split)"""
-    if byte_string and byte_string.endswith(b' '):
-        byte_string = byte_string[:-1]
     if in_py3:
-        byte_string = byte_string.decode(default_encoding)
+        byte_string = byte_string.decode(encoding)
+    if byte_string and byte_string.endswith(' '):
+        byte_string = byte_string[:-1]
     return byte_string
 
 
@@ -110,7 +131,9 @@ def convert_SQ(byte_string, is_implicit_VR, is_little_endian, offset=0):
 def convert_UI(byte_string, is_little_endian, struct_format=None):
     """Read and return a UI values or values"""
     # Strip off 0-byte padding for even length (if there)
-    if byte_string and byte_string.endswith(b'\0'):
+    if in_py3:
+        byte_string = byte_string.decode(default_encoding)
+    if byte_string and byte_string.endswith('\0'):
         byte_string = byte_string[:-1]
     return MultiString(byte_string, dicom.UID.UID)
 
@@ -120,7 +143,7 @@ def convert_UN(byte_string, is_little_endian, struct_format=None):
     return byte_string
 
 
-def convert_value(VR, raw_data_element):
+def convert_value(VR, raw_data_element, encoding=default_encoding):
     """Return the converted value (from raw bytes) for the given VR"""
     tag = Tag(raw_data_element.tag)
     if VR not in converters:
@@ -134,12 +157,22 @@ def convert_value(VR, raw_data_element):
         converter = converters[VR]
         num_format = None
 
+    # Ensure that encoding is in the proper 3-element format
+    if isinstance(encoding, basestring):
+        encoding = [encoding,]*3
+
     byte_string = raw_data_element.value
     is_little_endian = raw_data_element.is_little_endian
     is_implicit_VR = raw_data_element.is_implicit_VR
 
     # Not only two cases. Also need extra info if is a raw sequence
-    if VR != "SQ":
+    # Pass the encoding to the converter if it is a specific VR
+    if VR == 'PN':
+        value = converter(byte_string, is_little_endian, encoding=encoding)
+    elif VR in text_VRs:
+        # Text VRs use the 2nd specified encoding
+        value = converter(byte_string, is_little_endian, encoding=encoding[1])
+    elif VR != "SQ":
         value = converter(byte_string, is_little_endian, num_format)
     else:
         value = convert_SQ(byte_string, is_implicit_VR, is_little_endian, raw_data_element.value_tell)
