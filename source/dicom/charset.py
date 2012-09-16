@@ -52,6 +52,26 @@ def clean_escseq(element, encodings):
 # NOTE also that 7.5.3 SEQUENCE INHERITANCE states that if (0008,0005)
 #       is not present in a sequence item then it is inherited from its parent.
 
+def convert_encodings(encodings):
+    """Converts DICOM encodings into corresponding python encodings"""
+
+    # If a list if passed, we don't want to modify the list in place so copy it
+    encodings = encodings[:]
+
+    if isinstance(encodings, basestring):
+        encodings = [encodings]
+    elif not encodings[0]:
+        encodings[0] = 'ISO_IR 6'
+
+    encodings = [python_encoding[x] for x in encodings]
+
+    if len(encodings) == 1:
+        encodings = [encodings[0]] * 3
+    elif len(encodings) == 2:
+        encodings.append(encodings[1])
+
+    return encodings
+
 
 def decode(data_element, dicom_character_set):
     """Apply the DICOM character encoding to the data element
@@ -66,22 +86,8 @@ def decode(data_element, dicom_character_set):
     """
     if not dicom_character_set:
         dicom_character_set = ['ISO_IR 6']
-    have_character_set_list = True
-    try:
-        dicom_character_set.append  # check if is list-like object
-    except AttributeError:
-        have_character_set_list = False
 
-    if have_character_set_list:
-        if not dicom_character_set[0]:
-            dicom_character_set[0] = "ISO_IR 6"
-    else:
-        dicom_character_set = [dicom_character_set]
-    encodings = [python_encoding[x] for x in dicom_character_set]
-    if len(encodings) == 1:
-        encodings = [encodings[0]] * 3
-    if len(encodings) == 2:
-        encodings.append(encodings[1])
+    encodings = convert_encodings(dicom_character_set)
 
     # decode the string value to unicode
     # PN is special case as may have 3 components with differenct chr sets
@@ -96,11 +102,22 @@ def decode(data_element, dicom_character_set):
         # Remove the first encoding if this is a multi-byte encoding
         if len(encodings) > 1:
             del encodings[0]
+
+        # You can't re-decode unicode (string literals in py3)
         if data_element.VM == 1:
+            if isinstance(data_element.value, unicode):
+                return
             data_element.value = clean_escseq(
                                     data_element.value.decode(
                                     encodings[0]), encodings)
         else:
-            data_element.value = [clean_escseq(
-                                    value.decode(encodings[0]), encodings)
-                                    for value in data_element.value]
+
+            output = list()
+
+            for value in data_element.value:
+                if isinstance(value, unicode):
+                    output.append(value)
+                else:
+                    output.append(clean_escseq(value.decode(encodings[0]), encodings))
+
+            data_element.value = output
