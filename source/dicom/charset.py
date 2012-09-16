@@ -10,6 +10,7 @@
 import logging
 logger = logging.getLogger('pydicom')
 from dicom.valuerep import PersonNameUnicode, text_VRs
+from dicom import in_py3
 
 # Map DICOM Specific Character Set to python equivalent
 python_encoding = {
@@ -93,11 +94,17 @@ def decode(data_element, dicom_character_set):
     # PN is special case as may have 3 components with differenct chr sets
     if data_element.VR == "PN":
         # logger.warn("%s ... type: %s" %(str(data_element), type(data_element.VR)))
-        if data_element.VM == 1:
-            data_element.value = PersonNameUnicode(data_element.value, encodings)
+        if in_py3:
+            if data_element.VM == 1:
+                data_element.value = data_element.value.decode(encodings)
+            else:
+                data_element.value = [val.decode(encodings) for val in data_element.value]
         else:
-            data_element.value = [PersonNameUnicode(value, encodings)
-                                    for value in data_element.value]
+            if data_element.VM == 1:
+                data_element.value = PersonNameUnicode(data_element.value, encodings)
+            else:
+                data_element.value = [PersonNameUnicode(value, encodings)
+                                        for value in data_element.value]
     if data_element.VR in text_VRs:
         # Remove the first encoding if this is a multi-byte encoding
         if len(encodings) > 1:

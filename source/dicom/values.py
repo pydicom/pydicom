@@ -10,7 +10,7 @@ from struct import unpack, calcsize, pack
 import logging
 logger = logging.getLogger('pydicom')
 
-from dicom.valuerep import PersonName, MultiString, PersonNameUnicode
+from dicom.valuerep import PersonName, MultiString, PersonNameUnicode, PersonName3
 from dicom.multival import MultiValue
 import dicom.UID
 from dicom.tag import Tag, TupleTag, SequenceDelimiterTag
@@ -93,15 +93,20 @@ def convert_PN(byte_string, is_little_endian, struct_format=None, encoding=None)
     if byte_string and (byte_string.endswith(b' ') or byte_string.endswith(b'\x00')):
         byte_string = byte_string[:-1]
 
-    if not(in_py3) or encoding == None:
-        splitup = [PersonName(x) if x else x for x in byte_string.split(b"\\")]
-    else:   # This is py3 and we provided encodings, we want unicode
-        splitup = [PersonNameUnicode(x,encoding) if x else x for x in byte_string.split(b"\\")]
+    if in_py3:
+        if not encoding:
+            valtype = PersonName3
+        else:
+            valtype = lambda x: PersonName3(x,encoding)
+    else:
+        valtype = PersonName
+
+    splitup = [valtype(x) if x else x for x in byte_string.split(b"\\")]
 
     if len(splitup) == 1:
         return splitup[0]
     else:
-        return MultiValue(PersonName, splitup)
+        return MultiValue(valtype, splitup)
 
 def convert_string(byte_string, is_little_endian, struct_format=None, encoding=default_encoding):
     """Read and return a string or strings"""
