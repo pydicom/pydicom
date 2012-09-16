@@ -25,6 +25,7 @@ import logging
 logger = logging.getLogger('pydicom')
 import inspect  # for __dir__
 
+from dicom.charset import default_encoding, convert_encodings
 from dicom.datadict import DicomDictionary, dictionaryVR
 from dicom.datadict import tag_for_name, all_names_for_tag
 from dicom.tag import Tag, BaseTag
@@ -78,6 +79,9 @@ class Dataset(dict):
 
     """
     indent_chars = "   "
+    def __init__(self, *args, **kwargs):
+        self._parent_encoding = kwargs.get('parent_encoding',default_encoding)
+        dict.__init__(self, *args)
 
     def add(self, data_element):
         """Equivalent to dataset[data_element.tag] = data_element."""
@@ -241,6 +245,20 @@ class Dataset(dict):
         else:  # do have that dicom data_element
             return self[tag].value
 
+    @property
+    def _character_set(self):
+        """
+        :return:
+        """
+        char_set = self.get('SpecificCharacterSet', None)
+
+        if not char_set:
+            char_set = self._parent_encoding
+        else:
+            char_set = convert_encodings(char_set)
+
+        return char_set
+
     def __getitem__(self, key):
         """Operator for dataset[key] request."""
         tag = Tag(key)
@@ -254,8 +272,13 @@ class Dataset(dict):
                 from dicom.filereader import read_deferred_data_element
                 data_elem = read_deferred_data_element(self.fileobj_type,
                                     self.filename, self.timestamp, data_elem)
+
+            if tag != (0x08,0x05):
+                character_set = self._character_set
+            else:
+                character_set = default_encoding
             # Not converted from raw form read from file yet; do so now
-            self[tag] = DataElement_from_raw(data_elem)
+            self[tag] = DataElement_from_raw(data_elem, character_set)
         return dict.__getitem__(self, tag)
 
     def group_dataset(self, group):
@@ -478,7 +501,7 @@ class Dataset(dict):
             private_creator_tag = Tag(tag.group, private_block)
             if private_creator_tag in self and tag != private_creator_tag:
                 if isinstance(data_element, RawDataElement):
-                    data_element = DataElement_from_raw(data_element)
+                    data_element = DataElement_from_raw(data_element, self._character_set)
                 data_element.private_creator = self[private_creator_tag].value
         dict.__setitem__(self, tag, data_element)
 
