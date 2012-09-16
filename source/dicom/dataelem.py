@@ -21,7 +21,14 @@ from dicom.datadict import private_dictionary_description, dictionaryVR
 from dicom.tag import Tag
 
 from dicom.UID import UID
-from dicom.valuerep import IS, DS, PersonName
+from dicom.valuerep import IS, DS, PersonName, PersonNameUnicode
+
+from dicom import in_py3
+
+if in_py3:
+    from dicom.valuerep import PersonName3 as PersonNameUnicode
+    PersonName = PersonNameUnicode
+
 from decimal import Decimal
 
 from collections import namedtuple
@@ -170,6 +177,8 @@ class DataElement(object):
             return DS(val)
         elif self.VR == "UI":
             return UID(val)
+        elif in_py3 and self.VR == "PN":
+            return PersonName(val)
         # Later may need this for PersonName as for UI,
         #    but needs more thought
         # elif self.VR == "PN":
