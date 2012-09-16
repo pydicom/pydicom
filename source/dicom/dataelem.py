@@ -42,7 +42,7 @@ import warnings
 # Helper functions:
 def isMultiValue(value):
     """Helper function: return True if 'value' is 'list-like'."""
-    if isString(value):
+    if isString(value) or isinstance(value, bytes):
         return False
     try:
         iter(value)
@@ -53,10 +53,7 @@ def isMultiValue(value):
 
 def isString(val):
     """Helper function: return True if val is a string."""
-    if in_py3:
-        return isinstance(val, str) or isinstance(val, bytes)
-    else:
-        return isinstance(val, basestring)
+    return isinstance(val, basestring)
 
 
 def isStringOrStringList(val):
