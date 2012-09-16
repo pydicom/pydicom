@@ -15,7 +15,7 @@ from dicom.tag import TupleTag
 from dicom.dataelem import RawDataElement
 from dicom.util.hexutil import bytes2hex
 from dicom.valuerep import extra_length_VRs
-from dicom.charset import default_encoding
+from dicom.charset import default_encoding, convert_encodings
 from dicom import in_py3
 
 logger = logging.getLogger('pydicom')
@@ -129,7 +129,7 @@ class DicomIter(object):
 
 
 def data_element_generator(fp, is_implicit_VR, is_little_endian,
-                                    stop_when=None, defer_size=None):
+                                    stop_when=None, defer_size=None, encoding=default_encoding):
     """Create a generator to efficiently return the raw data elements
     Returns (VR, length, raw_bytes, value_tell, is_little_endian),
     where:
@@ -242,6 +242,14 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian,
                         dotdot = "..."
                     logger_debug("%08x: %-34s %s %r %s" % (value_tell,
                            bytes2hex(value[:12]), dotdot, value[:12], dotdot))
+
+            # If the tag is (0008,0005) Specific Character Set, then store it
+            if tag == (0x08,0x05):
+                from dicom.values import convert_string
+                encoding = convert_string(value, is_little_endian, encoding=default_encoding)
+                # Store the encoding value in the generator for use with future elements (SQs)
+                encoding = convert_encodings(encoding)
+
             yield RawDataElement(tag, VR, length, value, value_tell,
                                      is_implicit_VR, is_little_endian)
 
@@ -270,7 +278,7 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian,
                     msg = "{0:08x}: Reading/parsing undefined length sequence"
                     logger_debug(msg.format(fp_tell()))
                 seq = read_sequence(fp, is_implicit_VR,
-                                                    is_little_endian, length)
+                                                    is_little_endian, length, encoding)
                 yield DataElement(tag, VR, seq, value_tell,
                                                     is_undefined_length=True)
             else:
@@ -279,12 +287,20 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian,
                     logger_debug("Reading undefined length data element")
                 value = read_undefined_length_value(fp, is_little_endian,
                                                 delimiter, defer_size)
+
+                # If the tag is (0008,0005) Specific Character Set, then store it
+                if tag == (0x08,0x05):
+                    from dicom.values import convert_string
+                    encoding = convert_string(value, is_little_endian, encoding=default_encoding)
+                    # Store the encoding value in the generator for use with future elements (SQs)
+                    encoding = convert_encodings(encoding)
+
                 yield RawDataElement(tag, VR, length, value, value_tell,
                                 is_implicit_VR, is_little_endian)
 
 
 def read_dataset(fp, is_implicit_VR, is_little_endian, bytelength=None,
-                    stop_when=None, defer_size=None):
+                    stop_when=None, defer_size=None, parent_encoding=default_encoding):
     """Return a Dataset instance containing the next dataset in the file.
     :param fp: an opened file object
     :param is_implicit_VR: True if file transfer syntax is implicit VR
@@ -295,12 +311,14 @@ def read_dataset(fp, is_implicit_VR, is_little_endian, bytelength=None,
     See help for data_element_generator for details
     :param defer_size: optional size to avoid loading large elements in memory.
     See help for data_element_generator for details
+    :param parent_encoding: optional encoding to use as a default in case
+    a Specific Character Set (0008,0005) isn't specified
     :returns: a Dataset instance
     """
     raw_data_elements = dict()
     fpStart = fp.tell()
     de_gen = data_element_generator(fp, is_implicit_VR, is_little_endian,
-                                    stop_when, defer_size)
+                                    stop_when, defer_size, parent_encoding)
     try:
         while (bytelength is None) or (fp.tell() - fpStart < bytelength):
             raw_data_element = next(de_gen)
@@ -322,7 +340,7 @@ def read_dataset(fp, is_implicit_VR, is_little_endian, bytelength=None,
     return Dataset(raw_data_elements)
 
 
-def read_sequence(fp, is_implicit_VR, is_little_endian, bytelength, offset=0):
+def read_sequence(fp, is_implicit_VR, is_little_endian, bytelength, encoding, offset=0):
     """Read and return a Sequence -- i.e. a list of Datasets"""
     seq = []  # use builtin list to start for speed, convert to Sequence at end
     is_undefined_length = False
@@ -334,7 +352,7 @@ def read_sequence(fp, is_implicit_VR, is_little_endian, bytelength, offset=0):
         fpStart = fp_tell()
         while (not bytelength) or (fp_tell() - fpStart < bytelength):
             file_tell = fp.tell()
-            dataset = read_sequence_item(fp, is_implicit_VR, is_little_endian)
+            dataset = read_sequence_item(fp, is_implicit_VR, is_little_endian, encoding)
             if dataset is None:  # None is returned if hit Sequence Delimiter
                 break
             dataset.file_tell = file_tell + offset
@@ -344,7 +362,7 @@ def read_sequence(fp, is_implicit_VR, is_little_endian, bytelength, offset=0):
     return seq
 
 
-def read_sequence_item(fp, is_implicit_VR, is_little_endian):
+def read_sequence_item(fp, is_implicit_VR, is_little_endian, encoding):
     """Read and return a single sequence item, i.e. a Dataset"""
     if is_little_endian:
         tag_length_format = "<HHL"
@@ -373,10 +391,10 @@ def read_sequence_item(fp, is_implicit_VR, is_little_endian):
     is_undefined_length = False
     if length == 0xFFFFFFFFL:
         ds = read_dataset(fp, is_implicit_VR, is_little_endian,
-                                bytelength=None)
+                                bytelength=None, parent_encoding = encoding)
         ds.is_undefined_length_sequence_item = True
     else:
-        ds = read_dataset(fp, is_implicit_VR, is_little_endian, length)
+        ds = read_dataset(fp, is_implicit_VR, is_little_endian, length, parent_encoding = encoding)
     logger.debug("%08x: Finished sequence item" % fp.tell())
     return ds
 
