@@ -6,7 +6,12 @@
 #    available at http://pydicom.googlecode.com
 
 import unittest
+from dicom import in_py3
 from dicom.valuerep import DS, PersonName, PersonNameUnicode
+if in_py3:
+    from dicom.valuerep import PersonName3 as PersonNameUnicode
+    PersonName = PersonNameUnicode
+
 
 default_encoding = 'iso8859'
 

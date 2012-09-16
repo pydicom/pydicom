@@ -193,6 +193,7 @@ class ReaderTests(unittest.TestCase):
         """Returns correct values for sample data elements in test MR file....."""
         mr = read_file(mr_name)
         # (0010, 0010) Patient's Name           'CompressedSamples^MR1'
+        mr.decode()
         self.assertEqual(mr.PatientName, 'CompressedSamples^MR1', "Wrong patient name")
         self.assertEqual(mr.PatientName, mr[0x10, 0x10].value,
                 "Name does not match value found when accessed by tag number")
