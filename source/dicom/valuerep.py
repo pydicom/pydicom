@@ -120,10 +120,8 @@ def MultiString(val, valtype=str):
     # Remove trailing blank used to pad to even length
     # 2005.05.25: also check for trailing 0, error made in PET files we are converting
 
-    if val and (val.endswith(b' ') or val.endswith(b'\x00')):
+    if val and (val.endswith(' ') or val.endswith('\x00')):
         val = val[:-1]
-    if in_py3 and isinstance(val, bytes):
-        val = val.decode(default_encoding)
     splitup = [valtype(x) if x else x for x in val.split("\\")]
 
     if len(splitup) == 1:
@@ -216,10 +214,9 @@ class PersonNameUnicode(PersonNameBase, unicode):
         """
         from dicom.charset import clean_escseq  # in here to avoid circular import
 
-        # XXX At this point we should allow unicode or bytes as input, but if
-        # it is in unicode we will have to convert it to re-encode it later
-        if in_py3 and isinstance(val, str):
-            val = bytes(val, default_encoding)
+        if isinstance(val, unicode):
+            return val
+
         # Make the possible three character encodings explicit:
         if not isinstance(encodings, list):
             encodings = [encodings] * 3
