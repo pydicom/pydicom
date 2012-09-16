@@ -96,8 +96,6 @@ def convert_PN(byte_string, is_little_endian, struct_format=None, encoding=None)
     if not(in_py3) or encoding == None:
         splitup = [PersonName(x) if x else x for x in byte_string.split(b"\\")]
     else:   # This is py3 and we provided encodings, we want unicode
-        import pdb
-        pdb.set_trace()
         splitup = [PersonNameUnicode(x,encoding) if x else x for x in byte_string.split(b"\\")]
 
     if len(splitup) == 1:
