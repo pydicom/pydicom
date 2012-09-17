@@ -17,6 +17,7 @@ testcharset_dir = resource_filename(Requirement.parse("pydicom"),
 latin1_file = os.path.join(testcharset_dir, "chrFren.dcm")
 jp_file = os.path.join(testcharset_dir, "chrH31.dcm")
 multiPN_file = os.path.join(testcharset_dir, "chrFrenMulti.dcm")
+sq_encoding_file = os.path.join(testcharset_dir, "chrSQEncoding.dcm")
 
 test_dir = resource_filename(Requirement.parse("pydicom"), "dicom/testfiles")
 normal_file = os.path.join(test_dir, "CT_small.dcm")
@@ -28,8 +29,20 @@ class charsetTests(unittest.TestCase):
         ds = dicom.read_file(latin1_file)
         ds.decode()
         # Make sure don't get unicode encode error on converting to string
-        expected = u"Buc^Jérôme"
+        expected = u'Buc^J\xe9r\xf4me'
         got = ds.PatientName
+        self.assertEqual(expected, got,
+                                "Expected %r, got %r" % (expected, got))
+
+    def testNestedCharacterSets(self):
+        """charset: can read and decode SQ with different encodings........."""
+        ds = dicom.read_file(sq_encoding_file)
+        ds.decode()
+        # These datasets inside of the SQ cannot be decoded with default_encoding
+        # OR UTF-8 (the parent dataset's encoding). Instead, we make sure that it
+        # is decoded using the (0008,0005) tag of the dataset
+        expected = u'\uff94\uff8f\uff80\uff9e^\uff80\uff9b\uff73=\u5c71\u7530^\u592a\u90ce=\u3084\u307e\u3060^\u305f\u308d\u3046'
+        got = ds[0x32,0x1064][0].PatientName
         self.assertEqual(expected, got,
                                 "Expected %r, got %r" % (expected, got))
 
