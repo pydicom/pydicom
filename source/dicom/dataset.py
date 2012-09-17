@@ -130,7 +130,7 @@ class Dataset(dict):
         """
         # Find specific character set. 'ISO_IR 6' is default
         # May be multi-valued, but let dicom.charset handle all logic on that
-        dicom_character_set = self.get('SpecificCharacterSet', "ISO_IR 6")
+        dicom_character_set = self._character_set
 
         # Shortcut to the decode function in dicom.charset
         decode_data_element = dicom.charset.decode
@@ -138,9 +138,12 @@ class Dataset(dict):
         # Callback for walk(), to decode the chr strings if necessary
         # This simply calls the dicom.charset.decode function
         def decode_callback(ds, data_element):
-            decode_data_element(data_element, dicom_character_set)
-        # Use the walk function to go through all elements and convert them
-        self.walk(decode_callback)
+            if data_element.VR == 'SQ':
+                [dset.decode() for dset in data_element.value]
+            else:
+                decode_data_element(data_element, dicom_character_set)
+
+        self.walk(decode_callback, recursive=False)
 
     def __delattr__(self, name):
         """Intercept requests to delete an attribute by name, e.g. del ds.name
@@ -542,10 +545,10 @@ class Dataset(dict):
                     for elem in dataset.iterall():
                         yield elem
 
-    def walk(self, callback):
+    def walk(self, callback, recursive=True):
         """Call the given function for all dataset data_elements (recurses).
 
-        Visit all data_elements, recurse into sequences and their datasets,
+        Visit all data_elements, recurse into sequences and their datasets (if specified),
         The callback function is called for each data_element
             (including SQ element).
         Can be used to perform an operation on certain types of data_elements.
@@ -553,6 +556,7 @@ class Dataset(dict):
 
         :param callback: a callable taking two arguments: a dataset, and
                          a data_element belonging to that dataset.
+        :param recursive: a boolean indicating whether to recurse into Sequences
 
         `DataElement`s will come back in DICOM order (by increasing tag number
         within their dataset)
@@ -563,7 +567,7 @@ class Dataset(dict):
             data_element = self[tag]
             callback(self, data_element)  # self = this Dataset
             # 'tag in self' below needed in case callback deleted data_element
-            if tag in self and data_element.VR == "SQ":
+            if recursive and tag in self and data_element.VR == "SQ":
                 sequence = data_element.value
                 for dataset in sequence:
                     dataset.walk(callback)
