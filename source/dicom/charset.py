@@ -64,7 +64,10 @@ def convert_encodings(encodings):
     elif not encodings[0]:
         encodings[0] = 'ISO_IR 6'
 
-    encodings = [python_encoding[x] for x in encodings]
+    try:
+        encodings = [python_encoding[x] for x in encodings]
+    except KeyError:  # Assume that it is already the python encoding (is there a way to check this?)
+        pass
 
     if len(encodings) == 1:
         encodings = [encodings[0]] * 3
