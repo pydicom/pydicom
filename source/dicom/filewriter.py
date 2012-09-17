@@ -11,7 +11,7 @@ import logging
 logger = logging.getLogger('pydicom')
 
 from dicom import in_py3
-from dicom.charset import default_encoding, text_VRs
+from dicom.charset import default_encoding, text_VRs, convert_encodings
 from dicom.UID import ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian
 from dicom.filebase import DicomFile
 from dicom.datadict import dictionaryVR
@@ -147,8 +147,7 @@ def write_data_element(fp, data_element, encoding=default_encoding):
     else:
         fp.write_UL(0xFFFFFFFFL)   # will fill in real length value later if not undefined length item
 
-    if isinstance(encoding, basestring):
-        encoding = [encoding]*3
+    encoding = convert_encodings(encoding)
 
     if VR in text_VRs:
         writers[VR](fp, data_element, encoding=encoding[1])
