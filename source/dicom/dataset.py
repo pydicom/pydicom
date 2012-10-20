@@ -98,7 +98,7 @@ class Dataset(dict):
 
         :param name: a DICOM keyword
         :returns: a DataElement instance in this dataset with the given name
-                if the tag for that name is not found, returns None
+                If the tag for that name is not found, returns None
         """
         tag = tag_for_name(name)
         if tag:
@@ -148,12 +148,12 @@ class Dataset(dict):
     def __delattr__(self, name):
         """Intercept requests to delete an attribute by name, e.g. del ds.name
 
-        If name is a dicom descriptive string (cleaned with CleanName),
-        then delete the corresponding tag and data_element.
-        Else, delete an instance (python) attribute as any other class would do
+        If name is a DICOM keyword, then delete the corresponding tag 
+           and data_element. Else, delete an instance (python) attribute 
+           as any other class would do
 
         """
-        # First check if is a valid DICOM name and if we have that data element
+        # First check if a valid DICOM keyword and if we have that data element
         tag = tag_for_name(name)
         if tag and tag in self:
             del self[tag]

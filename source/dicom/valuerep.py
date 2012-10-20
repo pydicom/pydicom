@@ -35,8 +35,36 @@ match_string = b''.join([
 match_string_uni = re.compile(match_string.decode('iso8859'))
 match_string_bytes = re.compile(match_string)
 
+class DSbase:
+    """Base class for different DS classes"""
+    pass
 
-class DS(Decimal):
+class DSfloat(float, DSbase):
+    """Store values for DICOM VR of DS (Decimal String) as a float.
+    
+    If constructed from an empty string, return the empty string,
+    not an instance of this class.
+    
+    """
+    # __new__ needs override to handle empty string:
+    def __new__(cls, val):
+        if isinstance(val, (str, unicode)):
+            val = val.strip()
+        if val == '':
+            return val
+        return float.__new__(cls, val)
+    
+    def __init__(self, val):
+        """Store the original string if one given, for exact write-out of same
+        value later.
+        """
+        # ... also if user changes a data element value, then will get
+        # a different object, becuase float is immutable.
+        if isinstance(val, (str, unicode)):
+            self.original_string = val
+
+        
+class DSdecimal(Decimal, DSbase):
     """Store values for DICOM VR of DS (Decimal String).
     Note: if constructed by an empty string, returns the empty string,
     not an instance of this class.
@@ -65,7 +93,7 @@ class DS(Decimal):
                 "or use Decimal.quantize and pass a Decimal instance.")
             raise TypeError(msg)
         if not isinstance(val, Decimal):
-            val = super(DS, cls).__new__(cls, val)
+            val = super(DSdecimal, cls).__new__(cls, val)
         if len(str(val)) > 16 and enforce_length:
             msg = ("DS value representation must be <= 16 characters by DICOM "
                 "standard. Initialize with a smaller string, or set config.enforce_valid_values "
@@ -94,6 +122,13 @@ class DS(Decimal):
         return "'" + str(self) + "'"
 
 
+# CHOOSE TYPE OF DS
+if dicom.config.use_DS_decimal:
+    DS = DSdecimal
+else:
+    DS = DSfloat
+
+    
 class IS(int):
     """Derived class of int. Stores original integer string for exact rewriting
     of the string originally read or stored.
