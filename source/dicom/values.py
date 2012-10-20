@@ -10,6 +10,9 @@ from struct import unpack, calcsize, pack
 import logging
 logger = logging.getLogger('pydicom')
 
+# Because DS can be based on float or decimal, import whole module, not DS
+#    directly, so it can be changed in user code and be updated here also
+import dicom.valuerep
 from dicom.valuerep import PersonName, MultiString, PersonNameUnicode, PersonName3
 from dicom.multival import MultiValue
 import dicom.UID
@@ -17,7 +20,6 @@ from dicom.tag import Tag, TupleTag, SequenceDelimiterTag
 from dicom.datadict import dictionaryVR
 from dicom.filereader import read_sequence
 from io import BytesIO
-from dicom.valuerep import DS, IS
 from dicom.charset import default_encoding, text_VRs
 from dicom import in_py3
 
@@ -46,14 +48,14 @@ def convert_DS_string(byte_string, is_little_endian, struct_format=None):
     """Read and return a DS value or list of values"""
     if in_py3:
         byte_string = byte_string.decode(default_encoding)
-    return MultiString(byte_string, valtype=DS)
+    return MultiString(byte_string, valtype=dicom.valuerep.DS)
 
 
 def convert_IS_string(byte_string, is_little_endian, struct_format=None):
     """Read and return an IS value or list of values"""
     if in_py3:
         byte_string = byte_string.decode(default_encoding)
-    return MultiString(byte_string, valtype=IS)
+    return MultiString(byte_string, valtype=dicom.valuerep.IS)
 
 
 def convert_numbers(byte_string, is_little_endian, struct_format):

@@ -7,6 +7,23 @@
 
 # doc strings following items are picked up by sphinx for documentation
 
+# Set the type used to hold DS values
+
+use_DS_decimal = False   #  default False; was decimal-based in pydicom 0.9.7
+
+def DS_decimal(use_Decimal_boolean=True):
+    """Set DS class to be derived from Decimal (True) or from float (False)
+    If this function is never called, the default in pydicom >= 0.9.8
+    is for DS to be based on float.
+    """
+    use_DS_decimal = use_Decimal_boolean
+    import dicom.valuerep
+    if use_DS_decimal:
+        dicom.valuerep.DS = dicom.valuerep.DSdecimal
+    else:
+        dicom.valuerep.DS = dicom.valuerep.DSfloat
+
+
 allow_DS_float = False
 """Set allow_float to True to allow DS instances to be created with floats;
 otherwise, they must be explicitly converted to strings, with the user

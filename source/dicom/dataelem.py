@@ -21,8 +21,8 @@ from dicom.datadict import private_dictionary_description, dictionaryVR
 from dicom.tag import Tag
 
 from dicom.UID import UID
-from dicom.valuerep import IS, DS, PersonName, PersonNameUnicode
-
+from dicom.valuerep import PersonName, PersonNameUnicode
+import dicom.valuerep  # for DS, IS so they can be changed if desired
 from dicom import in_py3
 
 if in_py3:
@@ -80,7 +80,7 @@ class DataElement(object):
     """Contain and manipulate a Dicom data element, having a tag, VR, VM and value.
 
     Most user code will not create data elements using this class directly,
-    but rather through 'named tags' in Dataset objects.
+    but rather through DICOM keywords in Dataset objects.
     See the Dataset class for a description of how Datasets, Sequences,
     and DataElements work.
 
@@ -100,8 +100,8 @@ class DataElement(object):
                         is_undefined_length=False):
         """Create a data element instance.
 
-        Most user code should instead use DICOM keywords, (formerly 'Named tags'
-        in pydicom) to create data_elements, for which only the value is supplied,
+        Most user code should instead use DICOM keywords 
+        to create data_elements, for which only the value is supplied,
         and the VR and tag are determined from the dicom dictionary.
 
         tag -- dicom (group, element) tag in any form accepted by Tag().
@@ -172,9 +172,9 @@ class DataElement(object):
     def _convert(self, val):
         """Take the value and convert to number, etc if possible"""
         if self.VR == 'IS':
-            return IS(val)
+            return dicom.valuerep.IS(val)
         elif self.VR == 'DS':
-            return DS(val)
+            return dicom.valuerep.DS(val)
         elif self.VR == "UI":
             return UID(val)
         elif in_py3 and self.VR == "PN":

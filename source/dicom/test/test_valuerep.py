@@ -7,7 +7,9 @@
 
 import unittest
 from dicom import in_py3
-from dicom.valuerep import DS, PersonName, PersonNameUnicode
+from dicom.valuerep import PersonName, PersonNameUnicode
+import dicom.config
+
 if in_py3:
     from dicom.valuerep import PersonName3 as PersonNameUnicode
     PersonName = PersonNameUnicode
@@ -17,6 +19,14 @@ default_encoding = 'iso8859'
 
 
 class DecimalStringtests(unittest.TestCase):
+    """Unit tests unique to the use of DS class derived from python Decimal"""
+    
+    def setUp(self):
+        dicom.config.use_DS_decimal = True
+        
+    def tearDown(self):
+        dicom.config.use_DS_decimal = False
+            
     def testValidDecimalStrings(self):
         # Ensures that decimal.Decimal doesn't cause a valid string to become
         # invalid
