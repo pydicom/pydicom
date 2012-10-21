@@ -182,13 +182,13 @@ def write_data_element(fp, data_element, encoding=default_encoding):
 def write_dataset(fp, dataset, parent_encoding=default_encoding):
     """Write a Dataset dictionary to the file. Return the total length written."""
 
-    parent_encoding = dataset.get('SpecificCharacterSet',parent_encoding);
+    dataset_encoding = dataset.get('SpecificCharacterSet',parent_encoding);
 
     fpStart = fp.tell()
     # data_elements must be written in tag order
     tags = sorted(dataset.keys())
     for tag in tags:
-        write_data_element(fp, dataset[tag], parent_encoding)
+        write_data_element(fp, dataset[tag], dataset_encoding)
 
     return fp.tell() - fpStart
 

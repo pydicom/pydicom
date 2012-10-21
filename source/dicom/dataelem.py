@@ -21,15 +21,14 @@ from dicom.datadict import private_dictionary_description, dictionaryVR
 from dicom.tag import Tag
 
 from dicom.UID import UID
-from dicom.valuerep import PersonName, PersonNameUnicode
-import dicom.valuerep  # for DS, IS so they can be changed if desired
+from dicom.valuerep import PersonName, PersonNameUnicode, DSbase
+import dicom.valuerep  # don't import DS directly as can be changed by config
 from dicom import in_py3
 
 if in_py3:
     from dicom.valuerep import PersonName3 as PersonNameUnicode
     PersonName = PersonNameUnicode
 
-from decimal import Decimal
 
 from collections import namedtuple
 
@@ -211,7 +210,7 @@ class DataElement(object):
             repVal = "Array of %d bytes" % len(self.value)
         elif hasattr(self, 'original_string'):  # for VR of IS or DS
             repVal = repr(self.original_string)
-        elif isinstance(self.value, Decimal):
+        elif isinstance(self.value, DSbase):
             repVal = repr(self.value)
         elif isinstance(self.value, UID):
             repVal = self.value.name

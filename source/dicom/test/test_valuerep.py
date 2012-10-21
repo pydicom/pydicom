@@ -22,30 +22,30 @@ class DecimalStringtests(unittest.TestCase):
     """Unit tests unique to the use of DS class derived from python Decimal"""
     
     def setUp(self):
-        dicom.config.use_DS_decimal = True
+        dicom.config.DS_decimal(True)
         
     def tearDown(self):
-        dicom.config.use_DS_decimal = False
+        dicom.config.DS_decimal(False)
             
     def testValidDecimalStrings(self):
         # Ensures that decimal.Decimal doesn't cause a valid string to become
         # invalid
         valid_str = '-9.81338674e-006'
-        ds = DS(valid_str)
+        ds = dicom.valuerep.DS(valid_str)
         L = len(str(ds))
         self.assertTrue(L <= 16, "DS: expected a string of length 16 but got %d" % (L,))
 
         # Now the input string is too long but decimal.Decimal can convert it
         # to a valid 16-character string
         long_str = '-0.000000981338674'
-        ds = DS(long_str)
+        ds = dicom.valuerep.DS(long_str)
         L = len(str(ds))
         self.assertTrue(L <= 16, "DS: expected a string of length 16 but got %d" % (L,))
 
     def testInvalidDecimalStrings(self):
         # Now the input string truly is invalid
         invalid_string = '-9.813386743e-006'
-        self.assertRaises(OverflowError, DS, invalid_string)
+        self.assertRaises(OverflowError, dicom.valuerep.DS, invalid_string)
 
 
 class PersonNametests(unittest.TestCase):
