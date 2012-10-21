@@ -10,7 +10,6 @@ import os
 import os.path
 import unittest
 from io import BytesIO
-from decimal import Decimal
 
 import shutil
 # os.stat is only available on Unix and Windows   XXX Mac?
@@ -30,6 +29,7 @@ from dicom.filereader import read_file, data_element_generator, InvalidDicomErro
 from dicom.values import convert_value
 from dicom.tag import Tag, TupleTag
 from dicom.sequence import Sequence
+import dicom.valuerep
 import gzip
 
 from dicom.test.warncheck import assertWarns
@@ -82,11 +82,12 @@ class ReaderTests(unittest.TestCase):
                 "beam TreatmentMachineName does not match the value accessed by tag number")
 
         got = cp1.ReferencedDoseReferenceSequence[0].CumulativeDoseReferenceCoefficient
-        expected = Decimal('0.9990268')
+        DS = dicom.valuerep.DS
+        expected = DS('0.9990268')
         self.assertTrue(got == expected,
                 "Cum Dose Ref Coeff not the expected value (CP1, Ref'd Dose Ref")
         got = cp0.BeamLimitingDevicePositionSequence[0].LeafJawPositions
-        self.assertTrue(got[0] == Decimal('-100') and got[1] == Decimal('100.0'),
+        self.assertTrue(got[0] == DS('-100') and got[1] == DS('100.0'),
                 "X jaws not as expected (control point 0)")
 
     def testRTDose(self):
@@ -112,7 +113,8 @@ class ReaderTests(unittest.TestCase):
                 "ImplementationClassUID does not match the value accessed by tag number")
         # (0020, 0032) Image Position (Patient)  [-158.13580300000001, -179.035797, -75.699996999999996]
         got = ct.ImagePositionPatient
-        expected = [Decimal('-158.135803'), Decimal('-179.035797'), Decimal('-75.699997')]
+        DS = dicom.valuerep.DS
+        expected = [DS('-158.135803'), DS('-179.035797'), DS('-75.699997')]
         self.assertTrue(got == expected, "ImagePosition(Patient) values not as expected."
                         "got {0}, expected {1}".format(got, expected))
 
@@ -198,7 +200,8 @@ class ReaderTests(unittest.TestCase):
         self.assertEqual(mr.PatientName, mr[0x10, 0x10].value,
                 "Name does not match value found when accessed by tag number")
         got = mr.PixelSpacing
-        expected = [Decimal('0.3125'), Decimal('0.3125')]
+        DS = dicom.valuerep.DS
+        expected = [DS('0.3125'), DS('0.3125')]
         self.assertTrue(got == expected, "Wrong pixel spacing")
 
     def testDeflate(self):
@@ -394,7 +397,8 @@ class FileLikeTests(unittest.TestCase):
         ct = read_file(f)
         # Tests here simply repeat testCT -- perhaps should collapse the code together?
         got = ct.ImagePositionPatient
-        expected = [Decimal('-158.135803'), Decimal('-179.035797'), Decimal('-75.699997')]
+        DS = dicom.valuerep.DS
+        expected = [DS('-158.135803'), DS('-179.035797'), DS('-75.699997')]
         self.assertTrue(got == expected, "ImagePosition(Patient) values not as expected")
         self.assertEqual(ct.file_meta.ImplementationClassUID, '1.3.6.1.4.1.5962.2',
                 "ImplementationClassUID not the expected value")
@@ -403,7 +407,7 @@ class FileLikeTests(unittest.TestCase):
                 "ImplementationClassUID does not match the value accessed by tag number")
         # (0020, 0032) Image Position (Patient)  [-158.13580300000001, -179.035797, -75.699996999999996]
         got = ct.ImagePositionPatient
-        expected = [Decimal('-158.135803'), Decimal('-179.035797'), Decimal('-75.699997')]
+        expected = [DS('-158.135803'), DS('-179.035797'), DS('-75.699997')]
         self.assertTrue(got == expected, "ImagePosition(Patient) values not as expected")
         self.assertEqual(ct.Rows, 128, "Rows not 128")
         self.assertEqual(ct.Columns, 128, "Columns not 128")
@@ -418,7 +422,8 @@ class FileLikeTests(unittest.TestCase):
         ct = read_file(file_like)
         # Tests here simply repeat some of testCT test
         got = ct.ImagePositionPatient
-        expected = [Decimal('-158.135803'), Decimal('-179.035797'), Decimal('-75.699997')]
+        DS = dicom.valuerep.DS
+        expected = [DS('-158.135803'), DS('-179.035797'), DS('-75.699997')]
         self.assertTrue(got == expected, "ImagePosition(Patient) values not as expected")
         self.assertEqual(len(ct.PixelData), 128 * 128 * 2, "Pixel data not expected length")
         # Should also be able to close the file ourselves without exception raised:

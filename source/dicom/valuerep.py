@@ -10,6 +10,9 @@ import dicom.config
 from dicom.multival import MultiValue
 from dicom import in_py3
 
+import logging
+logger = logging.getLogger('pydicom')
+
 default_encoding = "iso8859"  # can't import from charset or get circular import
 
 # For reading/writing data elements, these ones have longer explicit VR format
@@ -38,6 +41,7 @@ match_string_bytes = re.compile(match_string)
 class DSbase:
     """Base class for different DS classes"""
     pass
+            
 
 class DSfloat(float, DSbase):
     """Store values for DICOM VR of DS (Decimal String) as a float.
@@ -52,7 +56,7 @@ class DSfloat(float, DSbase):
             val = val.strip()
         if val == '':
             return val
-        return float.__new__(cls, val)
+        return super(DSfloat, cls).__new__(cls, val)
     
     def __init__(self, val):
         """Store the original string if one given, for exact write-out of same
@@ -60,8 +64,20 @@ class DSfloat(float, DSbase):
         """
         # ... also if user changes a data element value, then will get
         # a different object, becuase float is immutable.
+
         if isinstance(val, (str, unicode)):
             self.original_string = val
+        elif isinstance(val, DSbase) and hasattr(val, 'original_string'):
+            self.original_string = val.original_string
+
+    def __str__(self):
+        if hasattr(self, 'original_string'):
+            return self.original_string
+        else:
+            return super(DSfloat, self).__str__()
+
+    def __repr__(self):
+        return "'" + str(self) + "'"
 
         
 class DSdecimal(Decimal, DSbase):
@@ -111,12 +127,14 @@ class DSdecimal(Decimal, DSbase):
         # a different Decimal, as Decimal is immutable.
         if isinstance(val, (str, unicode)):
             self.original_string = val
+        elif isinstance(val, DSbase) and hasattr(val, 'original_string'):
+            self.original_string = val.original_string
 
     def __str__(self):
         if hasattr(self, 'original_string') and len(self.original_string) <= 16:
             return self.original_string
         else:
-            return super(DS, self).__str__()
+            return super(DSdecimal, self).__str__()
 
     def __repr__(self):
         return "'" + str(self) + "'"
@@ -154,6 +172,8 @@ class IS(int):
         # If a string passed, then store it
         if isinstance(val, (str, unicode)):
             self.original_string = val
+        elif isinstance(val, IS) and hasattr(val, 'original_string'):
+            self.original_string = val.original_string
 
     def __repr__(self):
         if hasattr(self, 'original_string'):
