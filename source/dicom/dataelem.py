@@ -96,7 +96,7 @@ class DataElement(object):
     showVR = 1
 
     def __init__(self, tag, VR, value, file_value_tell=None,
-                        is_undefined_length=False):
+                        is_undefined_length=False, already_converted=False):
         """Create a data element instance.
 
         Most user code should instead use DICOM keywords 
@@ -118,7 +118,10 @@ class DataElement(object):
         """
         self.tag = Tag(tag)
         self.VR = VR  # Note!: you must set VR before setting value
-        self.value = value
+        if already_converted:
+            self._value = value
+        else:
+            self.value = value  # calls property setter which will convert
         self.file_tell = file_value_tell
         self.is_undefined_length = is_undefined_length
 
@@ -335,4 +338,5 @@ def DataElement_from_raw(raw_data_element, encoding=None):
         value = convert_value(VR, raw, encoding)
     except NotImplementedError as e:
         raise NotImplementedError("{0:s} in tag {1!r}".format(str(e), raw.tag))
-    return DataElement(raw.tag, VR, value, raw.value_tell, raw.length == 0xFFFFFFFF)
+    return DataElement(raw.tag, VR, value, raw.value_tell, 
+                    raw.length == 0xFFFFFFFF, already_converted=True)
