@@ -145,7 +145,6 @@ if dicom.config.use_DS_decimal:
     DS = DSdecimal
 else:
     DS = DSfloat
-
     
 class IS(int):
     """Derived class of int. Stores original integer string for exact rewriting
@@ -193,10 +192,11 @@ def MultiString(val, valtype=str):
 
     if val and (val.endswith(' ') or val.endswith('\x00')):
         val = val[:-1]
-    splitup = [valtype(x) if x else x for x in val.split("\\")]
+    splitup = val.split("\\")
 
     if len(splitup) == 1:
-        return splitup[0]
+        val = splitup[0]
+        return valtype(val) if val else val
     else:
         return MultiValue(valtype, splitup)
 
