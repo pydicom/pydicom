@@ -5,6 +5,9 @@
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
 
+# import sys
+# sys.modules["decimal"] = __import__("cdecimal")
+
 import os.path
 import os
 import sys
@@ -48,7 +51,7 @@ if __name__ == "__main__":
         print "---------------"
         print testrun
         print "---------------"
-        p.strip_dirs().sort_stats('time').print_stats(8)
+        p.strip_dirs().sort_stats('time').print_stats(12)
 
     # Clear disk cache for next run?
 #    import sys

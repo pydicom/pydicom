@@ -19,9 +19,9 @@ def DS_decimal(use_Decimal_boolean=True):
     use_DS_decimal = use_Decimal_boolean
     import dicom.valuerep
     if use_DS_decimal:
-        dicom.valuerep.DS = dicom.valuerep.DSdecimal
+        dicom.valuerep.DSclass = dicom.valuerep.DSdecimal
     else:
-        dicom.valuerep.DS = dicom.valuerep.DSfloat
+        dicom.valuerep.DSclass = dicom.valuerep.DSfloat
 
 
 allow_DS_float = False
