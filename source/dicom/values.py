@@ -48,7 +48,9 @@ def convert_DS_string(byte_string, is_little_endian, struct_format=None):
     """Read and return a DS value or list of values"""
     if in_py3:
         byte_string = byte_string.decode(default_encoding)
-    return MultiString(byte_string, valtype=dicom.valuerep.DS)
+    # Below, go directly to DS class instance rather than factory DS,
+    # but need to ensure last string doesn't have blank padding (use strip())
+    return MultiString(byte_string.strip(), valtype=dicom.valuerep.DSclass)
 
 
 def convert_IS_string(byte_string, is_little_endian, struct_format=None):
