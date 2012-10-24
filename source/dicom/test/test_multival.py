@@ -7,7 +7,7 @@
 
 import unittest
 from dicom.multival import MultiValue
-from dicom.valuerep import DS, DSbase, IS
+from dicom.valuerep import DS, DSfloat, DSdecimal, IS
 import dicom.config
 
 import sys
@@ -19,7 +19,7 @@ class MultiValuetests(unittest.TestCase):
         """MultiValue: Multi-valued data elements can be created........"""
         multival = MultiValue(DS, ['11.1', '22.2', '33.3'])
         for val in multival:
-            self.assertTrue(isinstance(val, DSbase), 
+            self.assertTrue(isinstance(val, (DSfloat, DSdecimal)), 
                             "Multi-value DS item not converted to DS")
 
     def testLimits(self):

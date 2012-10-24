@@ -21,7 +21,7 @@ from dicom.datadict import private_dictionary_description, dictionaryVR
 from dicom.tag import Tag
 
 from dicom.UID import UID
-from dicom.valuerep import PersonName, PersonNameUnicode, DSbase
+from dicom.valuerep import PersonName, PersonNameUnicode, DSfloat, DSdecimal
 import dicom.valuerep  # don't import DS directly as can be changed by config
 from dicom import in_py3
 
@@ -213,7 +213,7 @@ class DataElement(object):
             repVal = "Array of %d bytes" % len(self.value)
         elif hasattr(self, 'original_string'):  # for VR of IS or DS
             repVal = repr(self.original_string)
-        elif isinstance(self.value, DSbase):
+        elif isinstance(self.value, (DSfloat, DSdecimal)):
             repVal = repr(self.value)
         elif isinstance(self.value, UID):
             repVal = self.value.name

@@ -37,26 +37,16 @@ match_string = b''.join([
 
 match_string_uni = re.compile(match_string.decode('iso8859'))
 match_string_bytes = re.compile(match_string)
+  
 
-class DSbase:
-    """Base class for different DS classes"""
-    pass
-            
-
-class DSfloat(float, DSbase):
+class DSfloat(float):
     """Store values for DICOM VR of DS (Decimal String) as a float.
     
     If constructed from an empty string, return the empty string,
     not an instance of this class.
     
     """
-    # __new__ needs override to handle empty string:
-    def __new__(cls, val):
-        if isinstance(val, (str, unicode)):
-            val = val.strip()
-        if val == '':
-            return val
-        return super(DSfloat, cls).__new__(cls, val)
+    __slots__ = 'original_string'
     
     def __init__(self, val):
         """Store the original string if one given, for exact write-out of same
@@ -67,7 +57,7 @@ class DSfloat(float, DSbase):
 
         if isinstance(val, (str, unicode)):
             self.original_string = val
-        elif isinstance(val, DSbase) and hasattr(val, 'original_string'):
+        elif isinstance(val, (DSfloat, DSdecimal)) and hasattr(val, 'original_string'):
             self.original_string = val.original_string
 
     def __str__(self):
@@ -80,14 +70,19 @@ class DSfloat(float, DSbase):
         return "'" + str(self) + "'"
 
         
-class DSdecimal(Decimal, DSbase):
+class DSdecimal(Decimal):
     """Store values for DICOM VR of DS (Decimal String).
     Note: if constructed by an empty string, returns the empty string,
     not an instance of this class.
     """
+    __slots__ = 'original_string'
+    
     def __new__(cls, val):
         """Create an instance of DS object, or return a blank string if one is
         passed in, e.g. from a type 2 DICOM blank value.
+        
+        :param val: val must be a string or a number type which can be
+                   converted to a decimal
         """
         # Store this value here so that if the input string is actually a valid
         # string but decimal.Decimal transforms it to an invalid string it will
@@ -139,17 +134,32 @@ class DSdecimal(Decimal, DSbase):
     def __repr__(self):
         return "'" + str(self) + "'"
 
-
 # CHOOSE TYPE OF DS
 if dicom.config.use_DS_decimal:
-    DS = DSdecimal
+    DSclass = DSdecimal
 else:
-    DS = DSfloat
+    DSclass = DSfloat
+
+def DS(val):
+    """Factory function for creating DS class instances.
+    Checks for blank string; if so, return that. Else calls DSfloat or DSdecimal
+    to create the class instance. This avoids overriding __new__ in DSfloat
+    (which carries a time penalty for large arrays of DS).
+    Similarly the string clean and check can be avoided and DSfloat called
+    directly if a string has already been processed.
+    """
+    if isinstance(val, (str, unicode)):
+        val = val.strip()
+    if val == '':
+        return val
+    return DSclass(val)
+
     
 class IS(int):
     """Derived class of int. Stores original integer string for exact rewriting
     of the string originally read or stored.
     """
+    __slots__ = 'original_string'
     # Unlikely that str(int) will not be the same as the original, but could happen
     # with leading zeros.
     def __new__(cls, val):
