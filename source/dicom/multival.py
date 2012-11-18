@@ -17,11 +17,11 @@ class MultiValue(list):
     by calling the constructor on any items that are added. Therefore, the
     constructor must behave nicely if passed an object that is already its type.
     The constructor should raise TypeError if the item cannot be converted.
-    
+
     Note, however, that DS and IS types can be a blank string '' rather
     than an instance of their classes.
     """
-    
+
     def __init__(self, type_constructor, iterable):
         """Initialize the list of values
 
@@ -35,7 +35,7 @@ class MultiValue(list):
         from dicom.valuerep import DSfloat, DSdecimal, IS
         self.type_constructor = type_constructor
         if isinstance(type_constructor, (DSfloat, IS, DSdecimal)):
-            converted_list = [type_constructor(x) if x != '' 
+            converted_list = [type_constructor(x) if x != ''
                                         else x for x in iterable]
         else:
             converted_list = [type_constructor(x) for x in iterable]

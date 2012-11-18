@@ -37,17 +37,17 @@ match_string = b''.join([
 
 match_string_uni = re.compile(match_string.decode('iso8859'))
 match_string_bytes = re.compile(match_string)
-  
+
 
 class DSfloat(float):
     """Store values for DICOM VR of DS (Decimal String) as a float.
-    
+
     If constructed from an empty string, return the empty string,
     not an instance of this class.
-    
+
     """
     __slots__ = 'original_string'
-    
+
     def __init__(self, val):
         """Store the original string if one given, for exact write-out of same
         value later.
@@ -69,18 +69,18 @@ class DSfloat(float):
     def __repr__(self):
         return "'" + str(self) + "'"
 
-        
+
 class DSdecimal(Decimal):
     """Store values for DICOM VR of DS (Decimal String).
     Note: if constructed by an empty string, returns the empty string,
     not an instance of this class.
     """
     __slots__ = 'original_string'
-    
+
     def __new__(cls, val):
         """Create an instance of DS object, or return a blank string if one is
         passed in, e.g. from a type 2 DICOM blank value.
-        
+
         :param val: val must be a string or a number type which can be
                    converted to a decimal
         """
@@ -140,6 +140,7 @@ if dicom.config.use_DS_decimal:
 else:
     DSclass = DSfloat
 
+
 def DS(val):
     """Factory function for creating DS class instances.
     Checks for blank string; if so, return that. Else calls DSfloat or DSdecimal
@@ -154,7 +155,7 @@ def DS(val):
         return val
     return DSclass(val)
 
-    
+
 class IS(int):
     """Derived class of int. Stores original integer string for exact rewriting
     of the string originally read or stored.
@@ -162,6 +163,7 @@ class IS(int):
     __slots__ = 'original_string'
     # Unlikely that str(int) will not be the same as the original, but could happen
     # with leading zeros.
+
     def __new__(cls, val):
         """Create instance if new integer string"""
         if isinstance(val, (str, unicode)) and val.strip() == '':
@@ -210,6 +212,7 @@ def MultiString(val, valtype=str):
     else:
         return MultiValue(valtype, splitup)
 
+
 class PersonName3(object):
     def __init__(self, val, encodings=default_encoding):
         if isinstance(val, PersonName3):
@@ -226,12 +229,12 @@ class PersonName3(object):
         else:
             matchstr = match_string_uni
 
-        matchobj = re.match(matchstr,val)
+        matchobj = re.match(matchstr, val)
 
         self.__dict__.update(matchobj.groupdict())
 
         groups = matchobj.groups()
-        self.components = [groups[i] for i in (0,-2,-1)]
+        self.components = [groups[i] for i in (0, -2, -1)]
 
     def __eq__(self, other):
         return self.original_string == other
@@ -249,8 +252,8 @@ class PersonName3(object):
         if not isinstance(self.components[0], bytes):
             comps = self.components
         else:
-            comps = [clean_escseq(comp.decode(enc),encodings)
-                        for comp,enc in zip(self.components, encodings)]
+            comps = [clean_escseq(comp.decode(enc), encodings)
+                        for comp, enc in zip(self.components, encodings)]
 
         while len(comps) and not comps[-1]:
             comps.pop()
@@ -263,7 +266,7 @@ class PersonName3(object):
         if isinstance(self.components[0], bytes):
             comps = self.components
         else:
-            comps = [C.encode(enc) for C,enc in zip(self.components, encodings)]
+            comps = [C.encode(enc) for C, enc in zip(self.components, encodings)]
 
         # Remove empty elements from the end
         while len(comps) and not comps[-1]:
@@ -285,7 +288,7 @@ class PersonName3(object):
             return self.encodings
 
         if not isinstance(encodings, list):
-            encodings = [encodings]*3
+            encodings = [encodings] * 3
 
         if len(encodings) == 2:
             encodings.append(encodings[1])

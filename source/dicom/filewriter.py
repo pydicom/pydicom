@@ -75,9 +75,10 @@ def multi_string(val):
     else:
         return val
 
+
 def write_PN(fp, data_element, padding=b' ', encoding=None):
     if not encoding:
-        encoding = [default_encoding]*3
+        encoding = [default_encoding] * 3
 
     val = multi_string(data_element.value)
 
@@ -90,6 +91,7 @@ def write_PN(fp, data_element, padding=b' ', encoding=None):
         val = val + padding
 
     fp.write(val)
+
 
 def write_string(fp, data_element, padding=' ', encoding=default_encoding):
     """Write a single or multivalued string."""
@@ -151,7 +153,7 @@ def write_data_element(fp, data_element, encoding=default_encoding):
 
     if VR in text_VRs:
         writers[VR](fp, data_element, encoding=encoding[1])
-    elif VR in ('PN','SQ'):
+    elif VR in ('PN', 'SQ'):
         writers[VR](fp, data_element, encoding=encoding)
     else:
         try:
@@ -182,7 +184,7 @@ def write_data_element(fp, data_element, encoding=default_encoding):
 def write_dataset(fp, dataset, parent_encoding=default_encoding):
     """Write a Dataset dictionary to the file. Return the total length written."""
 
-    dataset_encoding = dataset.get('SpecificCharacterSet',parent_encoding);
+    dataset_encoding = dataset.get('SpecificCharacterSet', parent_encoding)
 
     fpStart = fp.tell()
     # data_elements must be written in tag order
@@ -209,7 +211,7 @@ def write_sequence_item(fp, dataset, encoding):
     fp.write_tag(ItemTag)   # marker for start of Sequence Item
     length_location = fp.tell()  # save location for later.
     fp.write_UL(0xffffffffL)   # will fill in real value later if not undefined length
-    write_dataset(fp, dataset, parent_encoding = encoding)
+    write_dataset(fp, dataset, parent_encoding=encoding)
     if getattr(dataset, "is_undefined_length_sequence_item", False):
         fp.write_tag(ItemDelimiterTag)
         fp.write_UL(0)  # 4-bytes 'length' field for delimiter item

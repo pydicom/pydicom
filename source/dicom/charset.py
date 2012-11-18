@@ -53,6 +53,7 @@ def clean_escseq(element, encodings):
 # NOTE also that 7.5.3 SEQUENCE INHERITANCE states that if (0008,0005)
 #       is not present in a sequence item then it is inherited from its parent.
 
+
 def convert_encodings(encodings):
     """Converts DICOM encodings into corresponding python encodings"""
 

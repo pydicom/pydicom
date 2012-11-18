@@ -244,7 +244,7 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian,
                            bytes2hex(value[:12]), dotdot, value[:12], dotdot))
 
             # If the tag is (0008,0005) Specific Character Set, then store it
-            if tag == (0x08,0x05):
+            if tag == (0x08, 0x05):
                 from dicom.values import convert_string
                 encoding = convert_string(value, is_little_endian, encoding=default_encoding)
                 # Store the encoding value in the generator for use with future elements (SQs)
@@ -289,7 +289,7 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian,
                                                 delimiter, defer_size)
 
                 # If the tag is (0008,0005) Specific Character Set, then store it
-                if tag == (0x08,0x05):
+                if tag == (0x08, 0x05):
                     from dicom.values import convert_string
                     encoding = convert_string(value, is_little_endian, encoding=default_encoding)
                     # Store the encoding value in the generator for use with future elements (SQs)
@@ -391,10 +391,11 @@ def read_sequence_item(fp, is_implicit_VR, is_little_endian, encoding):
     is_undefined_length = False
     if length == 0xFFFFFFFFL:
         ds = read_dataset(fp, is_implicit_VR, is_little_endian,
-                                bytelength=None, parent_encoding = encoding)
+                                bytelength=None, parent_encoding=encoding)
         ds.is_undefined_length_sequence_item = True
     else:
-        ds = read_dataset(fp, is_implicit_VR, is_little_endian, length, parent_encoding = encoding)
+        ds = read_dataset(fp, is_implicit_VR, is_little_endian, length,
+                            parent_encoding=encoding)
     logger.debug("%08x: Finished sequence item" % fp.tell())
     return ds
 

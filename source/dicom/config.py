@@ -9,7 +9,8 @@
 
 # Set the type used to hold DS values
 
-use_DS_decimal = False   #  default False; was decimal-based in pydicom 0.9.7
+use_DS_decimal = False  # default False; was decimal-based in pydicom 0.9.7
+
 
 def DS_decimal(use_Decimal_boolean=True):
     """Set DS class to be derived from Decimal (True) or from float (False)

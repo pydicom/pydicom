@@ -40,6 +40,7 @@ import simplejson
 import couchdb
 import dicom
 
+
 def uid2str(uid):
     """ Convert PyDicom uid to a string """
     return repr(uid).strip("'")
@@ -49,6 +50,7 @@ def uid2str(uid):
 # treat it as binary and will continue to until either pydicom works it out
 # for us, or we figure out a test.
 BINARY_VR_VALUES = ['OW', 'OB', 'OW/OB', 'US or SS']
+
 
 class DicomCouch(dict):
     """ A Data Access Object for persisting PyDicom objects into CouchDB
@@ -106,11 +108,11 @@ class DicomCouch(dict):
         try:
             dcm.PixelData = dcm.pixel_array.tostring()
         except AttributeError:
-            pass # Silently ignore errors due to pixel_array not existing
+            pass  # Silently ignore errors due to pixel_array not existing
         except NotImplementedError:
-            pass # Silently ignore attempts to modify compressed pixel data
+            pass  # Silently ignore attempts to modify compressed pixel data
         except TypeError:
-            pass # Silently ignore errors due to PixelData not existing
+            pass  # Silently ignore errors due to PixelData not existing
 
         jsn, binary_elements, file_meta_binary_elements = pydicom2json(dcm)
         _strip_elements(jsn, binary_elements)
@@ -118,7 +120,7 @@ class DicomCouch(dict):
         if dcm.SeriesInstanceUID in self._meta:
             self.__set_meta_info_jsn(jsn, dcm)
 
-        try: # Actually write to the db
+        try:  # Actually write to the db
             self._db[key] = jsn
         except TypeError as type_error:
             if str(type_error) == 'string indices must be integers, not str':
@@ -187,7 +189,7 @@ class DicomCouch(dict):
         try:
             hashes = self._meta[dcm.SeriesInstanceUID]['hashes']
         except KeyError:
-            return True # If no hashes dict then attachments do not exist
+            return True  # If no hashes dict then attachments do not exist
 
         if id not in hashes or hashes[id].digest() != \
                                     hashlib.md5(binary_element.value).digest():
@@ -209,9 +211,11 @@ def _add_element(dcm, tagstack, value):
     vr = dicom.datadict.dictionaryVR(tag)
     current_node[tag] = dicom.dataelem.DataElement(tag, vr, value)
 
+
 def _tagstack2id(tagstack):
     """ Convert a list of tags to a unique (within document) attachment id """
     return string.join([str(tag) for tag in tagstack], ':')
+
 
 def _strip_elements(jsn, elements):
     """ Remove supplied elements from the dict object
@@ -230,6 +234,7 @@ def _strip_elements(jsn, elements):
                 current_node = current_node[tag]
             current_node.pop(element.tag)
 
+
 def _set_meta_info_dcm(dcm):
     """ Set the file metadata DataSet attributes
 
@@ -243,7 +248,7 @@ def _set_meta_info_dcm(dcm):
     TransferSyntax = dcm.file_meta.TransferSyntaxUID
     if TransferSyntax == dicom.UID.ExplicitVRLittleEndian:
         dcm.is_implicit_vr = False
-        dcm.is_little_endian = True # This line not in PyDicom
+        dcm.is_little_endian = True  # This line not in PyDicom
     elif TransferSyntax == dicom.UID.ImplicitVRLittleEndian:
         dcm.is_implicit_vr = True
         dcm.is_little_endian = True
@@ -252,13 +257,14 @@ def _set_meta_info_dcm(dcm):
         dcm.is_little_endian = False
     elif TransferSyntax == dicom.UID.DeflatedExplicitVRLittleEndian:
         dcm.is_implicit_vr = False   # Deleted lines above as it relates
-        dcm.is_little_endian = True # to reading compressed file data.
+        dcm.is_little_endian = True  # to reading compressed file data.
     else:
         # Any other syntax should be Explicit VR Little Endian,
         #   e.g. all Encapsulated (JPEG etc) are ExplVR-LE by
         #   Standard PS 3.5-2008 A.4 (p63)
         dcm.is_implicit_vr = False
         dcm.is_little_endian = True
+
 
 def pydicom2json(dcm):
     """ Convert the supplied PyDicom object into a json-serializable dict
@@ -274,8 +280,8 @@ def pydicom2json(dcm):
     the tree.
 
     """
-    dcm.remove_private_tags() # No support for now
-    dcm.decode()              # Convert to unicode
+    dcm.remove_private_tags()  # No support for now
+    dcm.decode()               # Convert to unicode
     binary_elements = []
     tagstack = []
     jsn = dict((key, __jsonify(dcm[key], binary_elements, tagstack))
@@ -315,6 +321,7 @@ def __jsonify(element, binary_elements, tagstack):
     else:
         return __typemap(value)
 
+
 def __typemap(value):
     """ Map PyDicom types that won't serialise to JSON types """
     if type(value) == dicom.UID.UID:
@@ -323,6 +330,7 @@ def __typemap(value):
         return long(value)
     else:
         return value
+
 
 def json2pydicom(jsn):
     """ Convert the supplied json dict into a PyDicom object """
@@ -338,16 +346,17 @@ def json2pydicom(jsn):
     dataset.file_meta = file_meta
     return dataset
 
+
 def __dicomify(key, value):
     """ Convert a json key, value to a PyDicom DataElement """
     tag = __str2tag(key)
-    if tag.element == 0: # 0 tag implies group length (filreader.py pydicom)
+    if tag.element == 0:  # 0 tag implies group length (filreader.py pydicom)
         vr = 'UL'
     else:
         vr = dicom.datadict.dictionaryVR(tag)
 
-    if vr == 'OW/OB': # Always write pixel data as bytes
-        vr = 'OB'     # rather than words
+    if vr == 'OW/OB':  # Always write pixel data as bytes
+        vr = 'OB'      # rather than words
 
     if vr == 'US or SS':    # US or SS is up to us as the data is already
         if value < 0:       # decoded. We therefore choose US, unless we
@@ -355,7 +364,7 @@ def __dicomify(key, value):
         else:
             vr = 'US'
 
-    if vr == 'SQ': # We have a sequence of datasets, so we recurse
+    if vr == 'SQ':  # We have a sequence of datasets, so we recurse
         return dicom.dataelem.DataElement(tag, vr,
                 dicom.sequence.Sequence([
                     __make_dataset(
@@ -367,6 +376,7 @@ def __dicomify(key, value):
     else:
         return dicom.dataelem.DataElement(tag, vr, value)
 
+
 def __make_dataset(data_elements):
     """ Create a Dataset from a list of DataElement objects """
     dataset = dicom.dataset.Dataset()
@@ -374,9 +384,11 @@ def __make_dataset(data_elements):
         dataset.add(element)
     return dataset
 
+
 def __str2tag(key):
     """ Convert string representation of a tag into a Tag """
     return dicom.tag.Tag((int(key[1:5], 16), int(key[7:-1], 16)))
+
 
 if __name__ == '__main__':
     TESTDB = 'dicom_test'
@@ -386,14 +398,14 @@ if __name__ == '__main__':
     try:
         couch.delete(TESTDB)
     except couchdb.client.ResourceNotFound:
-        pass # Don't worry if it didn't exist
+        pass  # Don't worry if it didn't exist
 
     db = DicomCouch(SERVER, TESTDB)
 
     testfiles_dir = '../testfiles'
     testfiles = os.listdir('../testfiles')
-    testfiles = filter(lambda x:x.endswith('dcm'), testfiles)
-    testfiles = map(lambda x:os.path.join('../testfiles', x), testfiles)
+    testfiles = filter(lambda x: x.endswith('dcm'), testfiles)
+    testfiles = map(lambda x: os.path.join('../testfiles', x), testfiles)
 
     for dcmfile in testfiles:
         dcm = dicom.read_file(dcmfile)

@@ -20,13 +20,13 @@ default_encoding = 'iso8859'
 
 class DecimalStringtests(unittest.TestCase):
     """Unit tests unique to the use of DS class derived from python Decimal"""
-    
+
     def setUp(self):
         dicom.config.DS_decimal(True)
-        
+
     def tearDown(self):
         dicom.config.DS_decimal(False)
-            
+
     def testValidDecimalStrings(self):
         # Ensures that decimal.Decimal doesn't cause a valid string to become
         # invalid

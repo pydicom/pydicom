@@ -670,7 +670,7 @@ class DicomSeries(object):
 
         # Store information that is specific for the serie
         self._shape = [len(L), ds2.Rows, ds2.Columns]
-        self._sampling = [distance_mean, float(ds2.PixelSpacing[0]), 
+        self._sampling = [distance_mean, float(ds2.PixelSpacing[0]),
                                float(ds2.PixelSpacing[1])]
 
         # Store

@@ -79,8 +79,9 @@ class Dataset(dict):
 
     """
     indent_chars = "   "
+
     def __init__(self, *args, **kwargs):
-        self._parent_encoding = kwargs.get('parent_encoding',default_encoding)
+        self._parent_encoding = kwargs.get('parent_encoding', default_encoding)
         dict.__init__(self, *args)
 
     def add(self, data_element):
@@ -148,8 +149,8 @@ class Dataset(dict):
     def __delattr__(self, name):
         """Intercept requests to delete an attribute by name, e.g. del ds.name
 
-        If name is a DICOM keyword, then delete the corresponding tag 
-           and data_element. Else, delete an instance (python) attribute 
+        If name is a DICOM keyword, then delete the corresponding tag
+           and data_element. Else, delete an instance (python) attribute
            as any other class would do
 
         """
@@ -276,7 +277,7 @@ class Dataset(dict):
                 data_elem = read_deferred_data_element(self.fileobj_type,
                                     self.filename, self.timestamp, data_elem)
 
-            if tag != (0x08,0x05):
+            if tag != (0x08, 0x05):
                 character_set = self._character_set
             else:
                 character_set = default_encoding

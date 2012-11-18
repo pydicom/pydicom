@@ -101,7 +101,7 @@ def convert_PN(byte_string, is_little_endian, struct_format=None, encoding=None)
         if not encoding:
             valtype = PersonName3
         else:
-            valtype = lambda x: PersonName3(x,encoding)
+            valtype = lambda x: PersonName3(x, encoding)
     else:
         valtype = PersonName
 
@@ -111,6 +111,7 @@ def convert_PN(byte_string, is_little_endian, struct_format=None, encoding=None)
         return splitup[0]
     else:
         return MultiValue(valtype, splitup)
+
 
 def convert_string(byte_string, is_little_endian, struct_format=None, encoding=default_encoding):
     """Read and return a string or strings"""
@@ -166,7 +167,7 @@ def convert_value(VR, raw_data_element, encoding=default_encoding):
 
     # Ensure that encoding is in the proper 3-element format
     if isinstance(encoding, basestring):
-        encoding = [encoding,]*3
+        encoding = [encoding, ] * 3
 
     byte_string = raw_data_element.value
     is_little_endian = raw_data_element.is_little_endian
