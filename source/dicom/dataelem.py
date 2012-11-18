@@ -99,7 +99,7 @@ class DataElement(object):
                         is_undefined_length=False, already_converted=False):
         """Create a data element instance.
 
-        Most user code should instead use DICOM keywords 
+        Most user code should instead use DICOM keywords
         to create data_elements, for which only the value is supplied,
         and the VR and tag are determined from the dicom dictionary.
 
@@ -338,5 +338,5 @@ def DataElement_from_raw(raw_data_element, encoding=None):
         value = convert_value(VR, raw, encoding)
     except NotImplementedError as e:
         raise NotImplementedError("{0:s} in tag {1!r}".format(str(e), raw.tag))
-    return DataElement(raw.tag, VR, value, raw.value_tell, 
+    return DataElement(raw.tag, VR, value, raw.value_tell,
                     raw.length == 0xFFFFFFFF, already_converted=True)

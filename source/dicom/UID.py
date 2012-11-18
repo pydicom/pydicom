@@ -7,7 +7,8 @@
 
 import os
 import uuid
-import time, datetime
+import time
+import datetime
 from math import fabs
 
 from _UID_dict import UID_dictionary
@@ -143,6 +144,7 @@ pydicom_UIDs = {
     pydicom_root_UID + '1': 'ImplementationClassUID',
     }
 
+
 def generate_uid(prefix=pydicom_root_UID, truncate=False):
     '''
     Generate a dicom unique identifier based on host id, process id and current
@@ -186,4 +188,3 @@ def generate_uid(prefix=pydicom_root_UID, truncate=False):
     dicom_uid.is_valid()
 
     return dicom_uid
-
