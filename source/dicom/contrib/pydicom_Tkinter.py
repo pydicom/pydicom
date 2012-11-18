@@ -1,4 +1,4 @@
-#pydicom_Tkinter.py
+# pydicom_Tkinter.py
 #
 # Copyright (c) 2009 Daniel Nanz
 # This file is released under the pydicom (http://code.google.com/p/pydicom/)
@@ -96,10 +96,13 @@ def get_PGM_from_numpy_arr(arr, window_center, window_width,
     to_scale = (arr > minval) & (arr < maxval)
     max_mask = (arr >= maxval)
 
-    if min_mask.any(): arr[min_mask] = lut_min
-    if to_scale.any(): arr[to_scale] = ((arr[to_scale] - (wc - 0.5)) /
+    if min_mask.any():
+        arr[min_mask] = lut_min
+    if to_scale.any():
+        arr[to_scale] = ((arr[to_scale] - (wc - 0.5)) /
                                         (ww - 1.0) + 0.5) * lut_range + lut_min
-    if max_mask.any(): arr[max_mask] = lut_max
+    if max_mask.any():
+        arr[max_mask] = lut_max
 
     # round to next integer values and convert to unsigned int
     arr = np.rint(arr).astype(np.uint8)
@@ -128,7 +131,7 @@ def get_tkinter_photoimage_from_pydicom_image(data):
     # -> do rescaling if possible.
     if ('RescaleIntercept' in data) and ('RescaleSlope' in data):
         intercept = data.RescaleIntercept  # single value
-        slope = data.RescaleSlope          #
+        slope = data.RescaleSlope
         arr = slope * arr + intercept
 
     # get default window_center and window_width values
@@ -205,5 +208,5 @@ def show_image(data, block=True, master=None):
     label.grid()
     frame.grid()
 
-    if block==True:
+    if block == True:
         frame.mainloop()

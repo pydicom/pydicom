@@ -38,7 +38,10 @@ instance is created for each 3D volume.
 # - Deferred loading of data, warm: 3 sec
 
 
-import os, sys, time, gc
+import os
+import sys
+import time
+import gc
 import dicom
 from dicom.sequence import Sequence
 
@@ -51,10 +54,7 @@ except Exception:
     have_numpy = False
 
 
-
 ## Helper functions and classes
-
-
 class ProgressBar:
     """ To print progress to the screen.
     """
@@ -75,30 +75,30 @@ class ProgressBar:
         self.what = what
         self.progress = 0.0
         self.nbits = 0
-        sys.stdout.write(what+" [")
+        sys.stdout.write(what + " [")
 
     def Stop(self, message=""):
         """ Stop the progress bar where it is now.
         Optionally print a message behind it."""
         delta = int(self.length - self.nbits)
-        sys.stdout.write( " "*delta + "] " + message + "\n")
+        sys.stdout.write(" " * delta + "] " + message + "\n")
 
     def Finish(self, message=""):
         """ Finish the progress bar, setting it to 100% if it
         was not already. Optionally print a message behind the bar.
         """
-        delta = int(self.length-self.nbits)
-        sys.stdout.write( self.char*delta + "] " + message + "\n")
+        delta = int(self.length - self.nbits)
+        sys.stdout.write(self.char * delta + "] " + message + "\n")
 
     def Update(self, newProgress):
         """ Update progress. Progress is given as a number
         between 0 and 1.
         """
         self.progress = newProgress
-        required = self.length*(newProgress)
-        delta = int(required-self.nbits)
-        if delta>0:
-            sys.stdout.write(self.char*delta)
+        required = self.length * (newProgress)
+        delta = int(required - self.nbits)
+        if delta > 0:
+            sys.stdout.write(self.char * delta)
             self.nbits += delta
 
     def PrintMessage(self, message):
@@ -134,7 +134,7 @@ def _listFiles(files, path):
 
     for item in os.listdir(path):
         item = os.path.join(path, item)
-        if os.path.isdir( item ):
+        if os.path.isdir(item):
             _listFiles(files, item)
         else:
             files.append(item)
@@ -166,7 +166,7 @@ def _splitSerieIfRequired(serie, series):
     # Init slice distance estimate
     distance = 0
 
-    for index in range(1,len(L)):
+    for index in range(1, len(L)):
 
         # Get current slice
         ds2 = L[index]
@@ -181,21 +181,20 @@ def _splitSerieIfRequired(serie, series):
 
         # If the distance deviates more than 2x from what we've seen,
         # we can agree it's a new dataset.
-        if distance and newDist > 2.1*distance:
+        if distance and newDist > 2.1 * distance:
             L2.append([])
             distance = 0
         else:
             # Test missing file
-            if distance and newDist > 1.5*distance:
+            if distance and newDist > 1.5 * distance:
                 print 'Warning: missing file after "%s"' % ds1.filename
             distance = newDist
 
         # Add to last list
-        L2[-1].append( ds2 )
+        L2[-1].append(ds2)
 
         # Store previous
         ds1 = ds2
-
 
     # Split if we should
     if len(L2) > 1:
@@ -246,7 +245,7 @@ def _getPixelDataFromDataset(ds):
     if 'RescaleIntercept' in ds:
         needApplySlopeOffset = True
         offset = ds.RescaleIntercept
-    if int(slope)!= slope or int(offset) != offset:
+    if int(slope) != slope or int(offset) != offset:
         needFloats = True
     if not needFloats:
         slope, offset = int(slope), int(offset)
@@ -262,29 +261,29 @@ def _getPixelDataFromDataset(ds):
         else:
             # Determine required range
             minReq, maxReq = data.min(), data.max()
-            minReq = min([minReq, minReq*slope+offset, maxReq*slope+offset])
-            maxReq = max([maxReq, minReq*slope+offset, maxReq*slope+offset])
+            minReq = min([minReq, minReq * slope + offset, maxReq * slope + offset])
+            maxReq = max([maxReq, minReq * slope + offset, maxReq * slope + offset])
 
             # Determine required datatype from that
             dtype = None
-            if minReq<0:
+            if minReq < 0:
                 # Signed integer type
                 maxReq = max([-minReq, maxReq])
-                if maxReq < 2**7:
+                if maxReq < 2 ** 7:
                     dtype = np.int8
-                elif maxReq < 2**15:
+                elif maxReq < 2 ** 15:
                     dtype = np.int16
-                elif maxReq < 2**31:
+                elif maxReq < 2 ** 31:
                     dtype = np.int32
                 else:
                     dtype = np.float32
             else:
                 # Unsigned integer type
-                if maxReq < 2**8:
+                if maxReq < 2 ** 8:
                     dtype = np.int8
-                elif maxReq < 2**16:
+                elif maxReq < 2 ** 16:
                     dtype = np.int16
-                elif maxReq < 2**32:
+                elif maxReq < 2 ** 32:
                     dtype = np.int32
                 else:
                     dtype = np.float32
@@ -350,16 +349,14 @@ def read_files(path, showProgress=False, readPixelData=False):
     else:
         raise ValueError('The path argument must be a string or list.')
 
-
     # Set default progress callback?
     if showProgress is True:
         showProgress = _progressCallback
     if not hasattr(showProgress, '__call__'):
         showProgress = _dummyProgressCallback
 
-
     # Set defer size
-    deferSize = 16383 # 128**2-1
+    deferSize = 16383  # 128**2-1
     if readPixelData:
         deferSize = None
 
@@ -369,15 +366,15 @@ def read_files(path, showProgress=False, readPixelData=False):
     showProgress('Loading series information:')
     for filename in files:
 
-        # Skip DICOMDIR files
+         # Skip DICOMDIR files
         if filename.count("DICOMDIR"):
             continue
 
         # Try loading dicom ...
         try:
-            dcm = dicom.read_file( filename, deferSize )
+            dcm = dicom.read_file(filename, deferSize)
         except dicom.filereader.InvalidDicomError:
-            continue # skip non-dicom file
+            continue  # skip non-dicom file
         except Exception as why:
             if showProgress is _progressCallback:
                 _progressBar.PrintMessage(str(why))
@@ -389,21 +386,21 @@ def read_files(path, showProgress=False, readPixelData=False):
         try:
             suid = dcm.SeriesInstanceUID
         except AttributeError:
-            continue # some other kind of dicom file
+            continue  # some other kind of dicom file
         if suid not in series:
             series[suid] = DicomSeries(suid, showProgress)
         series[suid]._append(dcm)
 
         # Show progress (note that we always start with a 0.0)
-        showProgress( float(count) / len(files) )
+        showProgress(float(count) / len(files))
         count += 1
 
     # Finish progress
-    showProgress( None )
+    showProgress(None)
 
     # Make a list and sort, so that the order is deterministic
     series = series.values()
-    series.sort(key=lambda x:x.suid)
+    series.sort(key=lambda x: x.suid)
 
     # Split series if necessary
     for serie in reversed([serie for serie in series]):
@@ -417,8 +414,8 @@ def read_files(path, showProgress=False, readPixelData=False):
             series[i]._finish()
             series_.append(series[i])
         except Exception:
-            pass # Skip serie (probably report-like file without pixels)
-        showProgress(float(i+1)/len(series))
+            pass  # Skip serie (probably report-like file without pixels)
+        showProgress(float(i + 1) / len(series))
     showProgress(None)
 
     return series_
@@ -449,12 +446,10 @@ class DicomSeries(object):
         self._shape = None
         self._sampling = None
 
-
     @property
     def suid(self):
         """ The Series Instance UID. """
         return self._suid
-
 
     @property
     def shape(self):
@@ -462,20 +457,17 @@ class DicomSeries(object):
         If None, the serie contains a single dicom file. """
         return self._shape
 
-
     @property
     def sampling(self):
         """ The sampling (voxel distances) of the data (dz, dy, dx).
         If None, the serie contains a single dicom file. """
         return self._sampling
 
-
     @property
     def info(self):
         """ A DataSet instance containing the information as present in the
         first dicomfile of this serie. """
         return self._info
-
 
     @property
     def description(self):
@@ -494,27 +486,25 @@ class DicomSeries(object):
 
         # Give patient name
         if 'PatientName' in info:
-            fields.append(""+info.PatientName)
+            fields.append("" + info.PatientName)
 
         # Also add dimensions
         if self.shape:
             tmp = [str(d) for d in self.shape]
-            fields.append( 'x'.join(tmp) )
+            fields.append('x'.join(tmp))
 
         # Try adding more fields
         if 'SeriesDescription' in info:
-            fields.append("'"+info.SeriesDescription+"'")
+            fields.append("'" + info.SeriesDescription + "'")
         if 'ImageComments' in info:
-            fields.append("'"+info.ImageComments+"'")
+            fields.append("'" + info.ImageComments + "'")
 
         # Combine
         return ' '.join(fields)
 
-
     def __repr__(self):
         adr = hex(id(self)).upper()
         return "<DicomSeries with %i images at %s>" % (len(self._datasets), adr)
-
 
     def get_pixel_array(self):
         """ get_pixel_array()
@@ -535,11 +525,11 @@ class DicomSeries(object):
             raise ImportError(msg)
 
         # It's easy if no file or if just a single file
-        if len(self._datasets)==0:
+        if len(self._datasets) == 0:
             raise ValueError('Serie does not contain any files.')
-        elif len(self._datasets)==1:
+        elif len(self._datasets) == 1:
             ds = self._datasets[0]
-            slice = _getPixelDataFromDataset( ds )
+            slice = _getPixelDataFromDataset(ds)
             return slice
 
         # Check info
@@ -551,7 +541,7 @@ class DicomSeries(object):
 
         # Init data (using what the dicom packaged produces as a reference)
         ds = self._datasets[0]
-        slice = _getPixelDataFromDataset( ds )
+        slice = _getPixelDataFromDataset(ds)
         #vol = Aarray(self.shape, self.sampling, fill=0, dtype=slice.dtype)
         vol = np.zeros(self.shape, dtype=slice.dtype)
         vol[0] = slice
@@ -559,10 +549,10 @@ class DicomSeries(object):
         # Fill volume
         showProgress('Loading data:')
         ll = self.shape[0]
-        for z in range(1,ll):
+        for z in range(1, ll):
             ds = self._datasets[z]
             vol[z] = _getPixelDataFromDataset(ds)
-            showProgress(float(z)/ll)
+            showProgress(float(z) / ll)
 
         # Finish
         showProgress(None)
@@ -571,20 +561,17 @@ class DicomSeries(object):
         gc.collect()
         return vol
 
-
     def _append(self, dcm):
         """ _append(dcm)
         Append a dicomfile (as a dicom.dataset.FileDataset) to the series.
         """
         self._datasets.append(dcm)
 
-
     def _sort(self):
         """ sort()
         Sort the datasets by instance number.
         """
         self._datasets.sort(key=lambda k: k.InstanceNumber)
-
 
     def _finish(self):
         """ _finish()
@@ -604,7 +591,7 @@ class DicomSeries(object):
 
         # The datasets list should be sorted by instance number
         L = self._datasets
-        if len(L)==0:
+        if len(L) == 0:
             return
         elif len(L) < 2:
             # Set attributes
@@ -622,8 +609,7 @@ class DicomSeries(object):
 
         # Init measures to check (these are in 2D)
         dimensions = ds1.Rows, ds1.Columns
-        sampling = float(ds1.PixelSpacing[0]), float(ds1.PixelSpacing[1]) # row, column
-
+        sampling = float(ds1.PixelSpacing[0]), float(ds1.PixelSpacing[1])  # row, column
 
         for index in range(len(L)):
             # The first round ds1 and ds2 will be the same, for the
@@ -655,7 +641,6 @@ class DicomSeries(object):
             # Store previous
             ds1 = ds2
 
-
         # Create new dataset by making a deep copy of the first
         info = dicom.dataset.Dataset()
         firstDs = self._datasets[0]
@@ -666,7 +651,7 @@ class DicomSeries(object):
 
         # Finish calculating average distance
         # (Note that there are len(L)-1 distances)
-        distance_mean = distance_sum / (len(L)-1)
+        distance_mean = distance_sum / (len(L) - 1)
 
         # Store information that is specific for the serie
         self._shape = [len(L), ds2.Rows, ds2.Columns]
