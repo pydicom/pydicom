@@ -60,5 +60,5 @@ class MultiValue(list):
 
     def __str__(self):
         lines = [str(x) for x in self]
-        return "[" + ", ".join(lines) + "]"
+        return "['" + "', '".join(lines) + "']"
     __repr__ = __str__
