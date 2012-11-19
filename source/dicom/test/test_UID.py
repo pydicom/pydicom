@@ -69,13 +69,13 @@ class UIDtests(unittest.TestCase):
         self.assertEqual(uid[:5], '2.25.')
 
         #Test invalid UID truncation (trailing dot)
-        invalid_prefix=\
+        invalid_prefix = \
             '1.2.33333333333333333333333333333333333333333333333333333333333.333.'
         self.assertRaises(InvalidUID,
              lambda: generate_uid(prefix=invalid_prefix, truncate=True))
 
         #Test standard UID with truncate=True
-        prefix='1.2.3.444444'
+        prefix = '1.2.3.444444'
         uid = generate_uid(prefix=prefix, truncate=True)
         self.assertEqual(uid[:12], prefix)
 

@@ -42,7 +42,7 @@ class charsetTests(unittest.TestCase):
         # OR UTF-8 (the parent dataset's encoding). Instead, we make sure that it
         # is decoded using the (0008,0005) tag of the dataset
         expected = u'\uff94\uff8f\uff80\uff9e^\uff80\uff9b\uff73=\u5c71\u7530^\u592a\u90ce=\u3084\u307e\u3060^\u305f\u308d\u3046'
-        got = ds[0x32,0x1064][0].PatientName
+        got = ds[0x32, 0x1064][0].PatientName
         self.assertEqual(expected, got,
                                 "Expected %r, got %r" % (expected, got))
 
