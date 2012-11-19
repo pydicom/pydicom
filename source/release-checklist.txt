@@ -5,15 +5,7 @@ pydicom release checklist
 * edit setup.py -- version number, description, license if necessary, etc
 * remove extra debug statements (e.g. in data_element_generator) and extra print statements
 * run test/performance/time_test.py to check performance hasn't degraded
-* run test/all.bat on windows to test with all supported python versions
-* run test/shell_all on linux/mac to test all supported python versions
-* run each example file and clean up any output files created
-* doctest interactive_session.txt and interactive_session_downsize_image.txt::
-    (switch to testfiles directory; cp mr1_unc.dcm from testsuite)
-    >>> import doctest
-    >>> doctest.testfile("interactive_session.txt")
-    >>> doctest.testfile("interactive_session_downsize_image.txt")
-    First can fail on help() function as goes into reader mode needing q to exit
+
 * (? is this necessary or just use reindent.py? -- run tabnanny to check for bad indentation::
     python -m tabnanny .
 * run reindent.py to fix the tab/space mixes, trailing whitespace, etc
@@ -21,9 +13,21 @@ pydicom release checklist
 * run pep8 to warn of PEP-8 style issues (pep8 is available on pypi for pip install)
     cd <'source' directory>
     pep8 --ignore E501 dicom   # E501 is line length, eventually fix that too
-    pep8 --select E101 --show-source dicom   # E101 is mixed tab/space
-    etc as above to show source for each kind of error
+    To see source for particular problems:
+    pep8 --select E101 --show-source dicom   # e.g. E101 is mixed tab/space
+          etc as above to show source for each  kind of error
+
+* run each example file and clean up any output files created
+* doctest interactive_session.txt and interactive_session_downsize_image.txt::
+    (switch to testfiles directory; cp mr1_unc.dcm from testsuite)
+    >>> import doctest
+    >>> doctest.testfile("interactive_session.txt")
+    >>> doctest.testfile("interactive_session_downsize_image.txt")
+    First can fail on help() function as goes into reader mode needing q to exit
 * run python26 -Qwarn to check for integer division problems.
+* run test/all.bat on windows to test with all supported python versions
+* run test/shell_all on linux/mac to test all supported python versions
+
 * hg commit all changes
 * tag the release -- hg tag "release-X.X.X". Auto-commits.
 * hg push to repository
