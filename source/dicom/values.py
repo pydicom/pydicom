@@ -13,7 +13,13 @@ logger = logging.getLogger('pydicom')
 # Because DS can be based on float or decimal, import whole module, not DS
 #    directly, so it can be changed in user code and be updated here also
 import dicom.valuerep
-from dicom.valuerep import PersonName, MultiString, PersonNameUnicode, PersonName3
+from dicom.valuerep import MultiString
+
+if in_py3:
+    from dicom.valuerep import PersonName3 as PersonName
+else:
+    from dicom.valuerep import PersonName
+
 from dicom.multival import MultiValue
 import dicom.UID
 from dicom.tag import Tag, TupleTag, SequenceDelimiterTag
@@ -97,18 +103,21 @@ def convert_PN(byte_string, is_little_endian, struct_format=None, encoding=None)
     if byte_string and (byte_string.endswith(b' ') or byte_string.endswith(b'\x00')):
         byte_string = byte_string[:-1]
 
-    if in_py3:
-        if not encoding:
-            valtype = PersonName3
-        else:
-            valtype = lambda x: PersonName3(x, encoding)
-    else:
-        valtype = PersonName
+    splitup = byte_string.split(b"\\")
 
-    splitup = [valtype(x) if x else x for x in byte_string.split(b"\\")]
+    if encoding and in_py3:
+        args = (encoding,)
+    else:
+        args = ()
+
+    # We would like to return string literals
+    if in_py3:
+        valtype = lambda x: PersonName(x, *args).decode()
+    else:
+        valtype = lambda x: PersonName(x, *args)
 
     if len(splitup) == 1:
-        return splitup[0]
+        return valtype(splitup[0])
     else:
         return MultiValue(valtype, splitup)
 
