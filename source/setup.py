@@ -9,8 +9,10 @@ import os.path
 import sys
 
 extra = {}
-if sys.version_info >= (3,):
-    extra['use_2to3'] = True
+
+# Uncomment the following two lines to test in python 3
+#if sys.version_info >= (3,):
+#    extra['use_2to3'] = True
 
 setup(name="pydicom",
       packages = find_packages(),
@@ -33,9 +35,10 @@ setup(name="pydicom",
         "Programming Language :: Python",
         "Programming Language :: Python :: 2.6",
         "Programming Language :: Python :: 2.7",
-        "Programming Language :: Python :: 3.0",
-        "Programming Language :: Python :: 3.1",
-        "Programming Language :: Python :: 3.2",
+        #"Programming Language :: Python :: 3.0",
+        #"Programming Language :: Python :: 3.1",
+        #"Programming Language :: Python :: 3.2",
+        #"Programming Language :: Python :: 3.3",
         "Operating System :: OS Independent",
         "Topic :: Scientific/Engineering :: Medical Science Apps.",
         "Topic :: Scientific/Engineering :: Physics",
