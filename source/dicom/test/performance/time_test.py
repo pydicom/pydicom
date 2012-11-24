@@ -48,12 +48,12 @@ for location in locations:
 assert len(filenames) >= 400, "Need at least 400 files"  # unless change slices below
 
 
-print
+print()
 random.shuffle(filenames)  # to make sure no bias for any particular file
 
 
-print "Sampling from %d files" % len(filenames), ". Each test gets 100 distinct files"
-print "Test order is randomized too..."
+print("Sampling from %d files. Each test gets 100 distinct files" % len(filenames))
+print("Test order is randomized too...")
 
 # Give each test it's own set of files, to avoid reading something in cache from previous test
 filenames1 = filenames[:100]  # keep the time to a reasonable amount (~2-25 sec)
@@ -102,23 +102,26 @@ if __name__ == "__main__":
     for testrun in runs:
         cProfile.run(testrun, tempfile)
         p = pstats.Stats(tempfile)
-        print "---------------"
-        print testrun
-        print "---------------"
+        print("---------------")
+        print(testrun)
+        print("---------------")
         p.strip_dirs().sort_stats('time').print_stats(5)
-    print "Confirming file read worked -- check for data elements near end"
+    print("Confirming file read worked -- check for data elements near end")
     try:
         image_sizes = [len(ds.PixelData) for ds in datasets]
     except Exception as e:
-        print "Failed to access dataset data for all files\nError:" + str(e)
+        print("Failed to access dataset data for all files\nError:" + str(e))
     else:
-        print "Reads checked ok."
+        print("Reads checked ok.")
 
     # Clear disk cache for next run?
     import sys
     if not on_windows:
         prompt = "Run purge command (linux/Mac OS X) to clear disk cache?...(N):"
-        answer = raw_input(prompt)
+        if sys.version_info[0] > 2:
+            answer = input(prompt)
+        else:
+            answer = raw_input(prompt)
         if answer.lower() == "y":
-            print "Running 'purge'. Please wait..."
+            print("Running 'purge'. Please wait...")
             os.system("purge")
