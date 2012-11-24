@@ -160,7 +160,8 @@ class IS(int):
     """Derived class of int. Stores original integer string for exact rewriting
     of the string originally read or stored.
     """
-    __slots__ = 'original_string'
+    if not in_py3:
+        __slots__ = 'original_string'
     # Unlikely that str(int) will not be the same as the original, but could happen
     # with leading zeros.
 
