@@ -53,9 +53,9 @@ if __name__ == "__main__":
     for testrun in runs:
         cProfile.run(testrun, tempfile)
         p = pstats.Stats(tempfile)
-        print "---------------"
-        print testrun
-        print "---------------"
+        print("---------------")
+        print(testrun)
+        print("---------------")
         p.strip_dirs().sort_stats('time').print_stats(12)
 
     # Clear disk cache for next run?
