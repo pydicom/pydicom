@@ -6,6 +6,7 @@
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
 
+from dicom import in_py3
 from struct import unpack, calcsize, pack
 import logging
 logger = logging.getLogger('pydicom')
@@ -27,7 +28,6 @@ from dicom.datadict import dictionaryVR
 from dicom.filereader import read_sequence
 from io import BytesIO
 from dicom.charset import default_encoding, text_VRs
-from dicom import in_py3
 
 
 def convert_tag(byte_string, is_little_endian, offset=0):
