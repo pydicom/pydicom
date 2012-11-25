@@ -80,12 +80,15 @@ def write_PN(fp, data_element, padding=b' ', encoding=None):
     if not encoding:
         encoding = [default_encoding] * 3
 
-    val = multi_string(data_element.value)
-
-    if in_py3:
-        val = data_element.value.encode(encoding)
+    if data_element.VM == 1:
+        val = [data_element.value, ]
     else:
         val = data_element.value
+
+    if isinstance(val[0], unicode) or in_py3:
+        val = [elem.encode(encoding) for elem in val]
+
+    val = b'\\'.join(val)
 
     if len(val) % 2 != 0:
         val = val + padding
@@ -99,8 +102,8 @@ def write_string(fp, data_element, padding=' ', encoding=default_encoding):
     if len(val) % 2 != 0:
         val = val + padding   # pad to even length
 
-    if in_py3:
-        val = bytes(val, encoding)
+    if isinstance(val, unicode):
+        val = val.encode(encoding)
 
     fp.write(val)
 
