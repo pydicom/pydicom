@@ -23,6 +23,8 @@ from dicom.util.hexutil import hex2bytes, bytes2hex
 
 from pkg_resources import Requirement, resource_filename
 test_dir = resource_filename(Requirement.parse("pydicom"), "dicom/testfiles")
+testcharset_dir = resource_filename(Requirement.parse("pydicom"),
+                                                    "dicom/testcharsetfiles")
 
 rtplan_name = os.path.join(test_dir, "rtplan.dcm")
 rtdose_name = os.path.join(test_dir, "rtdose.dcm")
@@ -30,8 +32,11 @@ ct_name = os.path.join(test_dir, "CT_small.dcm")
 mr_name = os.path.join(test_dir, "MR_small.dcm")
 jpeg_name = os.path.join(test_dir, "JPEG2000.dcm")
 
+unicode_name = os.path.join(testcharset_dir, "chrH31.dcm")
+multiPN_name = os.path.join(testcharset_dir, "chrFrenMulti.dcm")
+
 # Set up rtplan_out, rtdose_out etc. Filenames as above, with '2' appended
-for inname in ['rtplan', 'rtdose', 'ct', 'mr', 'jpeg']:
+for inname in ['rtplan', 'rtdose', 'ct', 'mr', 'jpeg', 'unicode', 'multiPN']:
     exec(inname + "_out = " + inname + "_name + '2'")
 
 
@@ -54,11 +59,14 @@ def bytes_identical(a_bytes, b_bytes):
 
 
 class WriteFileTests(unittest.TestCase):
-    def compare(self, in_filename, out_filename):
+    def compare(self, in_filename, out_filename, decode=False):
         """Read file1, write file2, then compare.
         Return value as for files_identical.
         """
         dataset = read_file(in_filename)
+        if decode:
+            dataset.decode()
+
         dataset.save_as(out_filename)
         same, pos = files_identical(in_filename, out_filename)
         self.assertTrue(same,
@@ -81,6 +89,14 @@ class WriteFileTests(unittest.TestCase):
     def testMR(self):
         """Input file, write back and verify them identical (MR file)....."""
         self.compare(mr_name, mr_out)
+
+    def testUnicode(self):
+        """Ensure decoded string DataElements are written to file properly"""
+        self.compare(unicode_name, unicode_out, decode=True)
+
+    def testMultiPN(self):
+        """Ensure multiple Person Names are written to the file correctly."""
+        self.compare(multiPN_name, multiPN_out, decode=True)
 
     def testJPEG2000(self):
         """Input file, write back and verify them identical (JPEG2K file)."""
