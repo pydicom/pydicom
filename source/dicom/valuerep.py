@@ -285,7 +285,7 @@ class PersonName3(object):
             return format_str % self.__dict__
 
     def _verify_encodings(self, encodings):
-        if encodings == None:
+        if encodings is None:
             return self.encodings
 
         if not isinstance(encodings, list):
@@ -359,6 +359,12 @@ class PersonName(PersonNameBase, bytes):
             return val
         return super(PersonName, cls).__new__(cls, val)
 
+    def encode(self, *args):
+        """Dummy method to mimic py2 str behavior in py3 bytes subclass"""
+        # This greatly simplifies the write process so all objects have the
+        # "encode" method
+        return self
+
     def family_comma_given(self):
         """Return name as 'Family-name, Given-name'"""
         return self.formatted("%(family_name)s, %(given_name)s")
@@ -390,16 +396,43 @@ class PersonNameUnicode(PersonNameBase, unicode):
         # Remove the first encoding if only one component is present
         if (len(components) == 1):
             del encodings[0]
-        unicomponents = [clean_escseq(
-                        unicode(components[i], encodings[i]), encodings)
-                            for i, component in enumerate(components)]
-        new_val = u"=".join(unicomponents)
+
+        comps = [clean_escseq(C.decode(enc), encodings)
+                    for C, enc in zip(components, encodings)]
+        new_val = u"=".join(comps)
 
         return unicode.__new__(cls, new_val)
 
     def __init__(self, val, encodings):
-        self.encodings = encodings
+        self.encodings = self._verify_encodings(encodings)
         PersonNameBase.__init__(self, val)
+
+    def _verify_encodings(self, encodings):
+        """Checks the encoding to ensure proper format"""
+        if encodings is None:
+            return self.encodings
+
+        if not isinstance(encodings, list):
+            encodings = [encodings] * 3
+
+        if len(encodings) == 2:
+            encodings.append(encodings[1])
+
+        return encodings
+
+    def encode(self, encodings):
+        """Encode the unicode using the specified encoding"""
+        encodings = self._verify_encodings(encodings)
+
+        components = self.split('=')
+
+        comps = [C.encode(enc) for C, enc in zip(components, encodings)]
+
+        # Remove empty elements from the end
+        while len(comps) and not comps[-1]:
+            comps.pop()
+
+        return '='.join(comps)
 
     def family_comma_given(self):
         """Return name as 'Family-name, Given-name'"""
