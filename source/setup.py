@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 from distribute_setup import use_setuptools
-use_setuptools()
+use_setuptools(version="0.6.17")
 
 from setuptools import setup, find_packages
 import os
@@ -45,17 +45,17 @@ setup(name="pydicom",
         "Topic :: Software Development :: Libraries",
         ],
       long_description = """
-      pydicom is a pure python package for parsing DICOM files. 
-      DICOM is a standard (http://medical.nema.org) for communicating 
-      medical images and related information such as reports 
-      and radiotherapy objects. 
-      
-      pydicom makes it easy to read these complex files into natural 
-      pythonic structures for easy manipulation. 
+      pydicom is a pure python package for parsing DICOM files.
+      DICOM is a standard (http://medical.nema.org) for communicating
+      medical images and related information such as reports
+      and radiotherapy objects.
+
+      pydicom makes it easy to read these complex files into natural
+      pythonic structures for easy manipulation.
       Modified datasets can be written again to DICOM format files.
-      See the `Getting Started <http://code.google.com/p/pydicom/wiki/GettingStarted>`_ 
-      wiki page for installation and basic information, and the 
-      `Pydicom User Guide <http://code.google.com/p/pydicom/wiki/PydicomUserGuide>`_ page 
+      See the `Getting Started <http://code.google.com/p/pydicom/wiki/GettingStarted>`_
+      wiki page for installation and basic information, and the
+      `Pydicom User Guide <http://code.google.com/p/pydicom/wiki/PydicomUserGuide>`_ page
       for an overview of how to use the pydicom library.
       """,
       test_loader = "dicom.test.run_tests:MyTestLoader",
