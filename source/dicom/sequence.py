@@ -53,5 +53,5 @@ class Sequence(MultiValue):
     def __repr__(self):
         """Sequence-specific string representation"""
         formatstr = "<%(classname)s, length %(count)d, at %(id)X>"
-        return   formatstr % {'classname': self.__class__.__name__,
+        return formatstr % {'classname': self.__class__.__name__,
                               'id': id(self), 'count': len(self)}

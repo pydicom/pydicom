@@ -208,5 +208,5 @@ def show_image(data, block=True, master=None):
     label.grid()
     frame.grid()
 
-    if block == True:
+    if block:
         frame.mainloop()
