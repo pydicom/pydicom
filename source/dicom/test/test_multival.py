@@ -27,9 +27,6 @@ class MultiValuetests(unittest.TestCase):
         original_flag = dicom.config.enforce_valid_values
         dicom.config.enforce_valid_values = True
         self.assertRaises(OverflowError, MultiValue, IS, [1, -2 ** 31 - 1])  # Overflow error not raised for IS out of DICOM valid range
-        if python_version >= (2, 7):  # will overflow anyway for python < 2.7
-            dicom.config.enforce_valid_values = False
-            i = MultiValue(IS, [1, -2 ** 31 - 1])  # config enforce=False so should not raise error
         dicom.config.enforce_valid_values = original_flag
 
     def testAppend(self):

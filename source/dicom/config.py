@@ -26,7 +26,7 @@ def DS_decimal(use_Decimal_boolean=True):
 
 
 allow_DS_float = False
-"""Set allow_float to True to allow DS instances to be created with floats;
+"""Set allow_float to True to allow DSdecimal instances to be created with floats;
 otherwise, they must be explicitly converted to strings, with the user
 explicity setting the precision of digits and rounding. Default: False"""
 
