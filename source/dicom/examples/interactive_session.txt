@@ -64,16 +64,16 @@ array([[175, 180, 166, ..., 203, 207, 216],
    (300a, 010c) Cumulative Dose Reference Coefficie DS: '0.0'
    (300c, 0051) Referenced Dose Reference Number    IS: '2'
    ---------
+>>> # NOTE: the <BLANKLINE> lines below are for running this through doctest
 >>> help(plan.save_as)
 Help on method save_as in module dicom.dataset:
-
-save_as(self, filename, WriteLikeOriginal=True) method of dicom.dataset.Dataset instance
+<BLANKLINE>
+save_as(self, filename, WriteLikeOriginal=True) method of dicom.dataset.FileDataset instance
     Write the dataset to a file.
-
+<BLANKLINE>
     filename -- full path and filename to save the file to
-    WriteLikeOriginal -- see dicom.filewriter.write_file for info on this paramet
-er.
-   
+    WriteLikeOriginal -- see dicom.filewriter.write_file for info on this parameter.
+<BLANKLINE>  
 >>> plan.save_as("rtplan_gantry90.dcm")
 >>> plan_g90 = dicom.read_file("rtplan_gantry90.dcm")
 >>> plan_g90.BeamSequence[0].ControlPointSequence[0].GantryAngle
