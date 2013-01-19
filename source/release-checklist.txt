@@ -12,18 +12,25 @@ pydicom release checklist
     reindent.py -rv dicom   # use -d for dry-run
 * run pep8 to warn of PEP-8 style issues (pep8 is available on pypi for pip install)
     cd <'source' directory>
-    pep8 --ignore E501 dicom   # E501 is line length, eventually fix that too
+    pep8 dicom   # various ignores in .pep8 config file, should fix most of those eventually
     To see source for particular problems:
     pep8 --select E101 --show-source dicom   # e.g. E101 is mixed tab/space
           etc as above to show source for each  kind of error
 
 * run each example file and clean up any output files created
 * doctest interactive_session.txt and interactive_session_downsize_image.txt::
-    (switch to testfiles directory; cp mr1_unc.dcm from testsuite)
+    First, temporarily edit interactive_session.txt and add <BLANKLINE> in the help blank lines,
+    if you want to ensure no errors.
+    (switch to testfiles directory; cp mr1_unc.dcm from external testsuite for downsize example)
+    python
     >>> import doctest
-    >>> doctest.testfile("interactive_session.txt")
-    >>> doctest.testfile("interactive_session_downsize_image.txt")
-    First can fail on help() function as goes into reader mode needing q to exit
+    >>> doctest.testfile("../examples/interactive_session.txt")  # , verbose=True if desired
+    >>> doctest.testfile("../examples/interactive_session_downsize_image.txt")
+    >>> doctest.testfile("../examples/simple_interactive_example.txt")
+    >>> doctest.testfile("../examples/user_guide_doctest.txt")
+    >>> doctest.testfile("../examples/working_with_sequences_doctest.txt")
+    
+    First can fail if help() function as goes into reader mode needing q to exit
 * run python26 -Qwarn to check for integer division problems.
 * run test/all.bat on windows to test with all supported python versions
 * run test/shell_all on linux/mac to test all supported python versions

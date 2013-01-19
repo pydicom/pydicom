@@ -8,9 +8,10 @@ syntax: glob
 # Lock files used by the Emacs editor.
 .\#*
 
-# Temporary files used by the vim editor.
+# Temporary files used by editors.
 *.swp
 *.orig
+*.bak
 
 # A hidden file created by the Mac OS X Finder.
 .DS_Store
