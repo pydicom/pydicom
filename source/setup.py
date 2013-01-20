@@ -11,7 +11,7 @@ import sys
 extra = {}
 
 # Uncomment the following two lines to test in python 3
-#if sys.version_info >= (3,):
+# if sys.version_info >= (3,):
 #    extra['use_2to3'] = True
 
 setup(
