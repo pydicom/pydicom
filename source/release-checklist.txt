@@ -1,5 +1,6 @@
 pydicom release checklist
 * write ReleaseNotes by going through revision history - best seen at Source tab summary of committed changesets
+   * update the docs/release-notes.txt file
 * review issue list for any other changes that should be in the release
 * edit __init__.py version number
 * edit setup.py -- version number, description, license if necessary, etc
