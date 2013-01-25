@@ -1,6 +1,7 @@
 import dicom
 import sys
 from PySide import QtGui,QtCore 
+import collections
 
 class DicomTree:
 
@@ -38,7 +39,7 @@ class DicomTree:
         return array 
 
     def recurse_dic_to_item(self,dic,parent):
-        for k in sorted(dic):
+        for k in dic:
             v = dic[k]
             if isinstance(v, dict):
                 item = QtGui.QStandardItem(k+':'+str(v))
@@ -53,9 +54,9 @@ class DicomTree:
         return dataset
 
     def data_element_to_dic(self,data_element):
-        dic={}
+        dic=collections.OrderedDict()
         if data_element.VR == "SQ":
-            items = {}
+            items = collections.OrderedDict() 
             dic[data_element.name] = items 
             i=0
             for dataset_item in data_element:
@@ -66,7 +67,7 @@ class DicomTree:
         return dic
 
     def dataset_to_dic(self,dataset):
-        dic={}
+        dic=collections.OrderedDict()
         for data_element in dataset:
             dic.update(self.data_element_to_dic(data_element)) 
         return dic
