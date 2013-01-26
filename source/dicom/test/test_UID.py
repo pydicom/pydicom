@@ -37,9 +37,9 @@ class UIDtests(unittest.TestCase):
         """UID: can compare by number or by name.................."""
         uid = UID('1.2.840.10008.1.2')
         self.assertEqual(uid, 'Implicit VR Little Endian',
-                                    "UID equality failed on name")
+                        "UID equality failed on name")
         self.assertEqual(uid, '1.2.840.10008.1.2',
-                                    "UID equality failed on number string")
+                        "UID equality failed on number string")
 
     def testCompareNumber(self):
         """UID: comparing against a number give False............."""

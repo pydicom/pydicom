@@ -50,7 +50,7 @@ class DatasetTests(unittest.TestCase):
             ds.pixel_array
 
         attribute_error_msg = "AttributeError in pixel_array property: " + \
-                          "Dataset does not have attribute 'TransferSyntaxUID'"
+            "Dataset does not have attribute 'TransferSyntaxUID'"
         self.failUnlessExceptionArgs(attribute_error_msg,
                         PropertyError, callable_pixel_array)
 
@@ -66,9 +66,9 @@ class DatasetTests(unittest.TestCase):
         ds.TreatmentMachineName = "unit #1"
         data_element = ds[0x300a, 0x00b2]
         self.assertEqual(data_element.value, "unit #1",
-                                        "Unable to set data_element by name")
+                        "Unable to set data_element by name")
         self.assertEqual(data_element.VR, "SH",
-                                        "data_element not the expected VR")
+                        "data_element not the expected VR")
 
     def testSetExistingDataElementByName(self):
         """Dataset: set existing data_element by name......................."""
@@ -96,7 +96,7 @@ class DatasetTests(unittest.TestCase):
         ds = self.dummy_dataset()
         self.assertTrue((0x300a, 0xb2) in ds, "membership test failed")
         self.assertTrue([0x300a, 0xb2] in ds,
-                                    "membership test failed when list used")
+                       "membership test failed when list used")
         self.assertTrue(0x300a00b2 in ds, "membership test failed")
         self.assertTrue(not (0x10, 0x5f) in ds, "non-member tested as member")
 
@@ -133,7 +133,7 @@ class DatasetTests(unittest.TestCase):
         ds = self.dummy_dataset()
         not_there = ds.get('NotAMember', "not-there")
         msg = ("dataset.get() did not return default value "
-                                     "for non-member by name")
+              "for non-member by name")
 
         self.assertEqual(not_there, "not-there", msg)
 
@@ -142,7 +142,7 @@ class DatasetTests(unittest.TestCase):
         ds = self.dummy_dataset()
         not_there = ds.get((0x9999, 0x9999), "not-there")
         msg = ("dataset.get() did not return default value"
-                                        " for non-member by tuple tag")
+              " for non-member by tuple tag")
         self.assertEqual(not_there, "not-there", msg)
 
     def testGetDefault3(self):
@@ -150,7 +150,7 @@ class DatasetTests(unittest.TestCase):
         ds = self.dummy_dataset()
         not_there = ds.get(0x99999999, "not-there")
         msg = ("dataset.get() did not return default value"
-                                        " for non-member by long tag")
+              " for non-member by long tag")
         self.assertEqual(not_there, "not-there", msg)
 
     def testGetDefault4(self):
@@ -158,7 +158,7 @@ class DatasetTests(unittest.TestCase):
         ds = self.dummy_dataset()
         not_there = ds.get(Tag(0x99999999), "not-there")
         msg = ("dataset.get() did not return default value"
-                                         " for non-member by Tag")
+              " for non-member by Tag")
         self.assertEqual(not_there, "not-there", msg)
 
     def testGetFromRaw(self):
@@ -167,13 +167,13 @@ class DatasetTests(unittest.TestCase):
         #     while get(name) converted to a true DataElement
         test_tag = 0x100010
         test_elem = RawDataElement(Tag(test_tag), 'PN', 4, b'test',
-                                                                0, True, True)
+                                  0, True, True)
         ds = Dataset({Tag(test_tag): test_elem})
         by_get = ds.get(test_tag)
         by_item = ds[test_tag]
 
         msg = ("Dataset.get() returned different objects for ds.get(tag) "
-                        "and ds[tag]:\nBy get():%r\nBy ds[tag]:%r\n")
+              "and ds[tag]:\nBy get():%r\nBy ds[tag]:%r\n")
         self.assertEqual(by_get, by_item, msg % (by_get, by_item))
 
     def test__setitem__(self):
@@ -198,7 +198,7 @@ class DatasetTests(unittest.TestCase):
         ds = self.dummy_dataset()
         ds[0x300a, 0xb2].value = "moon_unit"
         self.assertEqual(ds.TreatmentMachineName, 'moon_unit',
-                                                        "Member not updated")
+                        "Member not updated")
 
     def testUpdate(self):
         """Dataset: update() method works with tag or name.................."""
@@ -206,7 +206,7 @@ class DatasetTests(unittest.TestCase):
         pat_data_element = DataElement((0x10, 0x12), 'PN', 'Johnny')
         ds.update({'PatientName': 'John', (0x10, 0x12): pat_data_element})
         self.assertEqual(ds[0x10, 0x10].value, 'John',
-                                                "named data_element not set")
+                        "named data_element not set")
         self.assertEqual(ds[0x10, 0x12].value, 'Johnny', "set by tag failed")
 
     def testDir(self):
@@ -218,7 +218,7 @@ class DatasetTests(unittest.TestCase):
         ds.add_new((0x18, 0x1151), "IS", 150)  # X-ray Tube Current
         ds.add_new((0x1111, 0x123), "DS", "42.0")  # private - no name in dir()
         expected = ['PatientID', 'PatientName', 'TreatmentMachineName',
-                                                            'XRayTubeCurrent']
+                   'XRayTubeCurrent']
         self.assertEqual(ds.dir(), expected,
             "dir() returned %s, expected %s" % (str(ds.dir()), str(expected)))
 

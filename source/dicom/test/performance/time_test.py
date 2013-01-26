@@ -95,7 +95,7 @@ if __name__ == "__main__":
     runs = ['datasets=test_full_read()',
             # 'test_partial()',
             # 'test_mem_read_full()',
-                    # 'test_mem_read_small()',
+            # 'test_mem_read_small()',
             'test_python_read_files()',
             ]
     random.shuffle(runs)

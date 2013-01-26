@@ -108,7 +108,7 @@ def decode(data_element, dicom_character_set):
                 data_element.value = PersonNameUnicode(data_element.value, encodings)
             else:
                 data_element.value = [PersonNameUnicode(value, encodings)
-                                        for value in data_element.value]
+                                      for value in data_element.value]
     if data_element.VR in text_VRs:
         # Remove the first encoding if this is a multi-byte encoding
         if len(encodings) > 1:
