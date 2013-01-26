@@ -135,7 +135,7 @@ To work with pixel data, the raw bytes are available through the usual tag::
     >>> pixel_bytes = ds.PixelData
 
 but to work with them in a more intelligent way, use ``pixel_array`` 
-(requires the [http://numpy.scipy.org/ NumPy] library)::
+(requires the `NumPy library <http://numpy.org>`_)::
 
     >>> pix = ds.pixel_array
 
