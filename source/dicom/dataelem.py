@@ -136,8 +136,8 @@ class DataElement(object):
         # Check if is a string with multiple values separated by '\'
         # If so, turn them into a list of separate strings
         if isString(val) and self.VR not in \
-           ['UT', 'ST', 'LT', 'FL', 'FD', 'AT', 'OB', 'OW', 'OF', 'SL', 'SQ', 'SS',
-            'UL', 'OB/OW', 'OW/OB', 'OB or OW', 'OW or OB', 'UN'] and 'US' not in self.VR:  # latter covers 'US or SS' etc
+                ['UT', 'ST', 'LT', 'FL', 'FD', 'AT', 'OB', 'OW', 'OF', 'SL', 'SQ', 'SS',
+                'UL', 'OB/OW', 'OW/OB', 'OB or OW', 'OW or OB', 'UN'] and 'US' not in self.VR:  # latter covers 'US or SS' etc
             if _backslash in val:
                 val = val.split(_backslash)
         self._value = self._convert_value(val)
