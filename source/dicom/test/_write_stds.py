@@ -32,7 +32,7 @@ impl_LE_deflen_std_hex = (
                     "0e 00 00 00 "     # length 14
                     "33 32 5c 36 34 5c 31 32 38 5c 31 39 36 20 "
                                                             # "32\64\128\196 "
-                )
+)
 
 # Implicit VR, big endian, SQ's with defined lengths
 # Realized after coding this that there is no Impl VR big endian in DICOM std;
@@ -65,4 +65,4 @@ impl_BE_deflen_std_hex = (
                     "00 00 00 0e "     # length 14
                     "33 32 5c 36 34 5c 31 32 38 5c 31 39 36 20 "
                                                         # "32\64\128\196 "
-                )
+)

@@ -26,7 +26,7 @@ person_names = [
     PersonNameUnicode(
         """Hong^Gildong=\033$)C\373\363^\033$)C\321\316\324\327=\033$)C\310\253^\033$)C\261\346\265\277""",
         [default_encoding, 'euc_kr']),  # DICOM standard 2008-PS3.5 I.2 p 101
-               ]
+]
 for person_name in person_names:
     label = Tkinter.Label(text=person_name)
     label.pack()

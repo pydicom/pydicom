@@ -35,4 +35,4 @@ if __name__ == "__main__":
         logging.info(
             "chrFrenMulti.dcm is a modified version of chrFren.dcm"
             " with multi-valued PN and LO for testing decoding"
-           )
+        )
