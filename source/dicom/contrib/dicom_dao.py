@@ -162,10 +162,11 @@ class DicomCouch(dict):
 
     def __put_attachments(self, dcm, binary_elements, jsn):
         """ Upload all new and modified attachments """
-        elements_to_update = \
-                [(tagstack, item) for tagstack, item in binary_elements \
-                if self.__attachment_update_needed(\
-                                dcm, _tagstack2id(tagstack + [item.tag]), item)]
+        elements_to_update = [
+            (tagstack, item) for tagstack, item in binary_elements \
+            if self.__attachment_update_needed(
+                dcm, _tagstack2id(tagstack + [item.tag]), item)
+        ]
         for tagstack, element in elements_to_update:
             id = _tagstack2id(tagstack + [element.tag])
             self._db.put_attachment(jsn, element.value, id)

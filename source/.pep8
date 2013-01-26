@@ -1,4 +1,4 @@
 [pep8]
-ignore = E126,E127,E128,E501,E502
+ignore = E127,E128,E501,E502
 # exclude = _*.py
 max-line-length = 160

@@ -55,7 +55,7 @@ if 'PixelData' in dataset:
     rows = int(dataset.Rows)
     cols = int(dataset.Columns)
     print("Image size.......: {rows:d} x {cols:d}, {size:d} bytes".format(
-                    rows=rows, cols=cols, size=len(dataset.PixelData)))
+        rows=rows, cols=cols, size=len(dataset.PixelData)))
     if 'PixelSpacing' in dataset:
         print("Pixel spacing....:", dataset.PixelSpacing)
 

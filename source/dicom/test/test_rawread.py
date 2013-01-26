@@ -152,23 +152,23 @@ class RawSequenceTests(unittest.TestCase):
         hexstr = (
             "0a 30 B0 00"    # (300a, 00b0) Beam Sequence
             " 40 00 00 00"    # length
-                " fe ff 00 e0"    # (fffe, e000) Item Tag
-                " 18 00 00 00"    # Item (dataset) Length
-                " 0a 30 c0 00"    # (300A, 00C0) Beam Number
-                " 02 00 00 00"    # length
-                " 31 20"          # value '1 '
-                " 0a 30 c2 00"    # (300A, 00C2) Beam Name
-                " 06 00 00 00"    # length
-                " 42 65 61 6d 20 31"  # value 'Beam 1'
-                # -------------
-                " fe ff 00 e0"    # (fffe, e000) Item Tag
-                " 18 00 00 00"    # Item (dataset) Length
-                " 0a 30 c0 00"    # (300A, 00C0) Beam Number
-                " 02 00 00 00"    # length
-                " 32 20"          # value '2 '
-                " 0a 30 c2 00"    # (300A, 00C2) Beam Name
-                " 06 00 00 00"    # length
-                " 42 65 61 6d 20 32"  # value 'Beam 2'
+            " fe ff 00 e0"    # (fffe, e000) Item Tag
+            " 18 00 00 00"    # Item (dataset) Length
+            " 0a 30 c0 00"    # (300A, 00C0) Beam Number
+            " 02 00 00 00"    # length
+            " 31 20"          # value '1 '
+            " 0a 30 c2 00"    # (300A, 00C2) Beam Name
+            " 06 00 00 00"    # length
+            " 42 65 61 6d 20 31"  # value 'Beam 1'
+            # -------------
+            " fe ff 00 e0"    # (fffe, e000) Item Tag
+            " 18 00 00 00"    # Item (dataset) Length
+            " 0a 30 c0 00"    # (300A, 00C0) Beam Number
+            " 02 00 00 00"    # length
+            " 32 20"          # value '2 '
+            " 0a 30 c2 00"    # (300A, 00C2) Beam Name
+            " 06 00 00 00"    # length
+            " 42 65 61 6d 20 32"  # value 'Beam 2'
         )
 
         infile = BytesIO(hex2bytes(hexstr))
@@ -190,23 +190,23 @@ class RawSequenceTests(unittest.TestCase):
         hexstr = (
             "30 0a 00 B0"    # (300a, 00b0) Beam Sequence
             " 00 00 00 40"    # length
-                " ff fe e0 00"    # (fffe, e000) Item Tag
-                " 00 00 00 18"    # Item (dataset) Length
-                " 30 0a 00 c0"    # (300A, 00C0) Beam Number
-                " 00 00 00 02"    # length
-                " 31 20"          # value '1 '
-                " 30 0a 00 c2"    # (300A, 00C2) Beam Name
-                " 00 00 00 06"    # length
-                " 42 65 61 6d 20 31"  # value 'Beam 1'
-                # -------------
-                " ff fe e0 00"    # (fffe, e000) Item Tag
-                " 00 00 00 18"    # Item (dataset) Length
-                " 30 0a 00 c0"    # (300A, 00C0) Beam Number
-                " 00 00 00 02"    # length
-                " 32 20"          # value '2 '
-                " 30 0a 00 c2"    # (300A, 00C2) Beam Name
-                " 00 00 00 06"    # length
-                " 42 65 61 6d 20 32"  # value 'Beam 2'
+            " ff fe e0 00"    # (fffe, e000) Item Tag
+            " 00 00 00 18"    # Item (dataset) Length
+            " 30 0a 00 c0"    # (300A, 00C0) Beam Number
+            " 00 00 00 02"    # length
+            " 31 20"          # value '1 '
+            " 30 0a 00 c2"    # (300A, 00C2) Beam Name
+            " 00 00 00 06"    # length
+            " 42 65 61 6d 20 31"  # value 'Beam 1'
+            # -------------
+            " ff fe e0 00"    # (fffe, e000) Item Tag
+            " 00 00 00 18"    # Item (dataset) Length
+            " 30 0a 00 c0"    # (300A, 00C0) Beam Number
+            " 00 00 00 02"    # length
+            " 32 20"          # value '2 '
+            " 30 0a 00 c2"    # (300A, 00C2) Beam Name
+            " 00 00 00 06"    # length
+            " 42 65 61 6d 20 32"  # value 'Beam 2'
         )
 
         infile = BytesIO(hex2bytes(hexstr))
@@ -232,27 +232,27 @@ class RawSequenceTests(unittest.TestCase):
             " 53 51"         # SQ
             " 00 00"         # reserved
             " ff ff ff ff"    # undefined length
-                " ff fe e0 00"    # (fffe, e000) Item Tag
-                " 00 00 00 18"    # Item (dataset) Length
-                " 30 0a 00 c0"    # (300A, 00C0) Beam Number
-                " 49 53"          # IS
-                " 00 02"          # length
-                " 31 20"          # value '1 '
-                " 30 0a 00 c2"    # (300A, 00C2) Beam Name
-                " 4c 4F"          # LO
-                " 00 06"          # length
-                " 42 65 61 6d 20 31"  # value 'Beam 1'
-                # -------------
-                " ff fe e0 00"    # (fffe, e000) Item Tag
-                " 00 00 00 18"    # Item (dataset) Length
-                " 30 0a 00 c0"    # (300A, 00C0) Beam Number
-                " 49 53"          # IS
-                " 00 02"          # length
-                " 32 20"          # value '2 '
-                " 30 0a 00 c2"    # (300A, 00C2) Beam Name
-                " 4C 4F"          # LO
-                " 00 06"          # length
-                " 42 65 61 6d 20 32"  # value 'Beam 2'
+            " ff fe e0 00"    # (fffe, e000) Item Tag
+            " 00 00 00 18"    # Item (dataset) Length
+            " 30 0a 00 c0"    # (300A, 00C0) Beam Number
+            " 49 53"          # IS
+            " 00 02"          # length
+            " 31 20"          # value '1 '
+            " 30 0a 00 c2"    # (300A, 00C2) Beam Name
+            " 4c 4F"          # LO
+            " 00 06"          # length
+            " 42 65 61 6d 20 31"  # value 'Beam 1'
+            # -------------
+            " ff fe e0 00"    # (fffe, e000) Item Tag
+            " 00 00 00 18"    # Item (dataset) Length
+            " 30 0a 00 c0"    # (300A, 00C0) Beam Number
+            " 49 53"          # IS
+            " 00 02"          # length
+            " 32 20"          # value '2 '
+            " 30 0a 00 c2"    # (300A, 00C2) Beam Name
+            " 4C 4F"          # LO
+            " 00 06"          # length
+            " 42 65 61 6d 20 32"  # value 'Beam 2'
             " ff fe E0 dd"    # SQ delimiter
             " 00 00 00 00"    # zero length
         )
