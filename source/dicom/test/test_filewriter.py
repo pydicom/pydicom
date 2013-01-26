@@ -139,7 +139,7 @@ class WriteDataElementTests(unittest.TestCase):
         expected = hex2bytes((
             " 28 00 09 00"   # (0028,0009) Frame Increment Pointer
             " 00 00 00 00"   # length 0
-            ))
+        ))
         write_data_element(self.f1, data_elem)
         got = self.f1.parent.getvalue()
         msg = ("Did not write zero-length AT value correctly. "

@@ -126,11 +126,11 @@ class RawSequenceTests(unittest.TestCase):
             " 08 00 00 00"    # length 8
             " fe ff 00 e0"    # (fffe, e000) Item Tag
             " 00 00 00 00"    # length = 0
-            ) + (             # --------------- end of Sequence
-            " 08 00 3e 10"    # (0008, 103e) LO "Series Description"
-            " 0c 00 00 00"    # length
-            " 52 20 41 44 44 20 56 49 45 57 53 20"  # value
-            )
+        ) + (             # --------------- end of Sequence
+            " 08 00 3e 10"    # (0008, 103e) LO "Series Description"  nopep8
+            " 0c 00 00 00"    # length     nopep8
+            " 52 20 41 44 44 20 56 49 45 57 53 20"  # value     nopep8
+        )
         # "\x08\x00\x32\x10\x08\x00\x00\x00\xfe\xff\x00\xe0\x00\x00\x00\x00" # from issue 27, procedure code sequence (0008,1032)
         # hexstr += "\x08\x00\x3e\x10\x0c\x00\x00\x00\x52\x20\x41\x44\x44\x20\x56\x49\x45\x57\x53\x20" # data element following
 
@@ -169,7 +169,7 @@ class RawSequenceTests(unittest.TestCase):
                 " 0a 30 c2 00"    # (300A, 00C2) Beam Name
                 " 06 00 00 00"    # length
                 " 42 65 61 6d 20 32"  # value 'Beam 2'
-                )
+        )
 
         infile = BytesIO(hex2bytes(hexstr))
         de_gen = data_element_generator(infile, is_implicit_VR=True, is_little_endian=True)
@@ -207,7 +207,7 @@ class RawSequenceTests(unittest.TestCase):
                 " 30 0a 00 c2"    # (300A, 00C2) Beam Name
                 " 00 00 00 06"    # length
                 " 42 65 61 6d 20 32"  # value 'Beam 2'
-                )
+        )
 
         infile = BytesIO(hex2bytes(hexstr))
         de_gen = data_element_generator(infile, is_implicit_VR=True, is_little_endian=False)
@@ -255,7 +255,7 @@ class RawSequenceTests(unittest.TestCase):
                 " 42 65 61 6d 20 32"  # value 'Beam 2'
             " ff fe E0 dd"    # SQ delimiter
             " 00 00 00 00"    # zero length
-                )
+        )
 
         infile = BytesIO(hex2bytes(hexstr))
         de_gen = data_element_generator(infile, is_implicit_VR=False, is_little_endian=False)

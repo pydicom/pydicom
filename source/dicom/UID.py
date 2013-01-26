@@ -142,7 +142,7 @@ NotCompressedPixelTransferSyntaxes = [ExplicitVRLittleEndian,
 pydicom_root_UID = '1.2.826.0.1.3680043.8.498.'
 pydicom_UIDs = {
     pydicom_root_UID + '1': 'ImplementationClassUID',
-    }
+}
 
 
 def generate_uid(prefix=pydicom_root_UID, truncate=False):

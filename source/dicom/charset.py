@@ -26,7 +26,7 @@ python_encoding = {
     'ISO_IR 127': 'iso_ir_127',  # Arab
     'ISO_IR 138': 'iso_ir_138',  # Hebrew
     'ISO_IR 144': 'iso_ir_144',  # Russian
-    }
+}
 
 default_encoding = "iso8859"
 
@@ -120,7 +120,7 @@ def decode(data_element, dicom_character_set):
                 return
             data_element.value = clean_escseq(
                                     data_element.value.decode(
-                                    encodings[0]), encodings)
+                                        encodings[0]), encodings)
         else:
 
             output = list()
