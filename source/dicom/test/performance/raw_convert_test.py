@@ -49,7 +49,7 @@ if __name__ == "__main__":
     runs = ['ds=test_full_read(read_filename)',
             'test_convert_from_raw(ds)',
             'test_write_file(ds, write_filename)',
-           ]
+            ]
     for testrun in runs:
         cProfile.run(testrun, tempfile)
         p = pstats.Stats(tempfile)

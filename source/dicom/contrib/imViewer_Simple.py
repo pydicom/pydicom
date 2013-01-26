@@ -228,7 +228,7 @@ class ImFrame(wx.Frame):
                             [data <= (level - 0.5 - (window - 1) / 2),
                              data > (level - 0.5 + (window - 1) / 2)],
                             [0, 255, lambda data: ((data - (level - 0.5)) / (window - 1) + 0.5) * (255 - 0)]
-                           )
+                            )
 
     #-----------------------------------------------------------
     # ImFrame.loadPIL_LUT(dataset)
