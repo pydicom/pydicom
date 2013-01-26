@@ -24,7 +24,7 @@ from dicom.util.hexutil import hex2bytes, bytes2hex
 from pkg_resources import Requirement, resource_filename
 test_dir = resource_filename(Requirement.parse("pydicom"), "dicom/testfiles")
 testcharset_dir = resource_filename(Requirement.parse("pydicom"),
-                                                    "dicom/testcharsetfiles")
+                                   "dicom/testcharsetfiles")
 
 rtplan_name = os.path.join(test_dir, "rtplan.dcm")
 rtdose_name = os.path.join(test_dir, "rtdose.dcm")
