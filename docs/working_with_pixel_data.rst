@@ -31,7 +31,7 @@ pixel_array
 ===========
 
 A property of Dataset called ``pixel_array`` provides more useful pixel data
-for uncompressed images. The `NumPy <http://numpy.scipy.org/>`_ 
+for uncompressed images. The `NumPy <http://numpy.org/>`_ 
 numerical package must be installed on your system to use this property, 
 because ``pixel_array`` returns a NumPy array::
 

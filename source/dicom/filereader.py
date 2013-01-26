@@ -516,15 +516,14 @@ def read_partial(fileobj, stop_when=None, defer_size=None, force=False):
     """Parse a DICOM file until a condition is met
 
     ``read_partial`` is normally not called directly. Use ``read_file``
-        instead, unless you need to stop on some condition
-        other than reaching pixel data.
+    instead, unless you need to stop on some condition
+    other than reaching pixel data.
 
     :arg fileobj: a file-like object. This function does not close it.
     :arg stop_when: a callable which takes tag, VR, length,
-                    and returns True or False.
-                    If stop_when returns True,
-                        read_data_element will raise StopIteration.
-                    If None (default), then the whole file is read.
+        and returns True or False. If stop_when returns True,
+        read_data_element will raise StopIteration.
+        If None (default), then the whole file is read.
     :returns: a set instance
     """
     # Read preamble -- raise an exception if missing and force=False
@@ -577,18 +576,17 @@ def read_file(fp, defer_size=None, stop_before_pixels=False, force=False):
     """Read and parse a DICOM file
 
     :param fp: either a file-like object, or a string containing the file name.
-          If a file-like object, the caller is responsible for closing it.
+            If a file-like object, the caller is responsible for closing it.
     :param defer_size: if a data element value is larger than defer_size,
-        then the value is not read into memory until it is accessed in code.
-        Specify an integer (bytes), or a string value with units:
-                e.g. "512 KB", "2 MB".
-        Default None means all elements read into memory.
+            then the value is not read into memory until it is accessed in code.
+            Specify an integer (bytes), or a string value with units, e.g.
+            "512 KB", "2 MB". Default None means all elements read into memory.
     :param stop_before_pixels: Set True to stop before reading pixels
-                    (and anything after them).
-                   If False (default), the full file will be read and parsed.
+        (and anything after them).
+        If False (default), the full file will be read and parsed.
     :param force: Set to True to force reading even if no header is found.
                   If False, a dicom.filereader.InvalidDicomError is raised
-                    when the file is not valid DICOM.
+                  when the file is not valid DICOM.
     :returns: a FileDataset instance
     """
     # Open file if not already a file object
