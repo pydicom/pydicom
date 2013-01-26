@@ -60,21 +60,21 @@ class UIDtests(unittest.TestCase):
         '''
         Test UID generator
         '''
-        #Test standard UID generation with pydicom prefix
+        # Test standard UID generation with pydicom prefix
         uid = generate_uid()
         self.assertEqual(uid[:26], pydicom_root_UID)
 
-        #Test standard UID generation with no prefix
+        # Test standard UID generation with no prefix
         uid = generate_uid(None)
         self.assertEqual(uid[:5], '2.25.')
 
-        #Test invalid UID truncation (trailing dot)
+        # Test invalid UID truncation (trailing dot)
         invalid_prefix = \
             '1.2.33333333333333333333333333333333333333333333333333333333333.333.'
         self.assertRaises(InvalidUID,
              lambda: generate_uid(prefix=invalid_prefix, truncate=True))
 
-        #Test standard UID with truncate=True
+        # Test standard UID with truncate=True
         prefix = '1.2.3.444444'
         uid = generate_uid(prefix=prefix, truncate=True)
         self.assertEqual(uid[:12], prefix)

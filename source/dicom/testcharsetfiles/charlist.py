@@ -33,6 +33,6 @@ if __name__ == "__main__":
     if "chrFrenMulti.dcm" in names:
         logging.info("\nOther\n=====")
         logging.info(
-           "chrFrenMulti.dcm is a modified version of chrFren.dcm"
-           " with multi-valued PN and LO for testing decoding"
+            "chrFrenMulti.dcm is a modified version of chrFren.dcm"
+            " with multi-valued PN and LO for testing decoding"
            )

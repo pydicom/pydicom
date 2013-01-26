@@ -163,7 +163,7 @@ class ImFrame(wx.Frame):
         if dlg.ShowModal() == wx.ID_OK:
             fullPath = dlg.GetPath()
             imageFile = dlg.GetFilename()
-            #checkDICMHeader()
+            # checkDICMHeader()
             self.show_file(imageFile, fullPath)
 
     def OnPaint(self, event):

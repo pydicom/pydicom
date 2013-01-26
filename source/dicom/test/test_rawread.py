@@ -122,7 +122,7 @@ class RawSequenceTests(unittest.TestCase):
         """Read sequence with a single empty item..............................."""
         # This is fix for issue 27
         hexstr = (
-             "08 00 32 10"    # (0008, 1032) SQ "Procedure Code Sequence"
+            "08 00 32 10"    # (0008, 1032) SQ "Procedure Code Sequence"
             " 08 00 00 00"    # length 8
             " fe ff 00 e0"    # (fffe, e000) Item Tag
             " 00 00 00 00"    # length = 0
