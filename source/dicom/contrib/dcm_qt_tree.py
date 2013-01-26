@@ -10,10 +10,11 @@ import sys
 from PySide import QtGui, QtCore
 import collections
 
+
 class DicomTree:
 
     def __init__(self, filename):
-                self.filename = filename
+        self.filename = filename
 
     def show_tree(self):
         ds = self.dicom_to_dataset(self.filename)
@@ -63,7 +64,7 @@ class DicomTree:
     def data_element_to_dic(self, data_element):
         dic = collections.OrderedDict()
         if data_element.VR == "SQ":
-            items = collections.OrderedDict() 
+            items = collections.OrderedDict()
             dic[data_element.name] = items
             i = 0
             for dataset_item in data_element:

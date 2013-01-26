@@ -184,7 +184,7 @@ def generate_uid(prefix=pydicom_root_UID, truncate=False):
 
     dicom_uid = UID(dicom_uid)
 
-    #This will raise an exception if the UID is invalid
+    # This will raise an exception if the UID is invalid
     dicom_uid.is_valid()
 
     return dicom_uid

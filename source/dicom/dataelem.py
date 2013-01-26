@@ -187,11 +187,11 @@ class DataElement(object):
         #    return PersonName(val)
         else:  # is either a string or a type 2 optionally blank string
             return val  # this means a "numeric" value could be empty string ""
-        #except TypeError:
-            #print "Could not convert value '%s' to VR '%s' in tag %s" \
+        # except TypeError:
+            # print "Could not convert value '%s' to VR '%s' in tag %s" \
                                 # % (repr(val), self.VR, self.tag)
-        #except ValueError:
-            #print "Could not convert value '%s' to VR '%s' in tag %s" \
+        # except ValueError:
+            # print "Could not convert value '%s' to VR '%s' in tag %s" \
                                # % (repr(val), self.VR, self.tag)
 
     def __str__(self):
