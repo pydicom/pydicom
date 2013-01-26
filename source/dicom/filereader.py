@@ -115,7 +115,7 @@ class DicomIter(object):
         impl_expl = ("Explicit", "Implicit")[self._is_implicit_VR]
         big_little = ("Big", "Little")[self._is_little_endian]
         logger.debug("Using {0:s} VR, {1:s} Endian transfer syntax".format(
-                            impl_expl, big_little))
+            impl_expl, big_little))
 
     def __iter__(self):
         tags = sorted(self.file_meta_info.keys())
@@ -387,7 +387,7 @@ def read_sequence_item(fp, is_implicit_VR, is_little_endian, encoding):
                         "0x%x" % (ItemTag, fp.tell() - 4))
     else:
         logger.debug("{0:08x}: {1}  Found Item tag (start of item)".format(
-                                    fp.tell() - 4, bytes2hex(bytes_read)))
+            fp.tell() - 4, bytes2hex(bytes_read)))
     is_undefined_length = False
     if length == 0xFFFFFFFFL:
         ds = read_dataset(fp, is_implicit_VR, is_little_endian,
@@ -429,7 +429,7 @@ def _read_file_meta_info(fp):
             debug_msg += " " + bytes2hex(bytes_read)
     if debugging:
         debug_msg = "{0:<47s}  ({1:04x}, {2:04x}) {3:2s} Length: {4:d}".format(
-                                        debug_msg, group, elem, VR, length)
+            debug_msg, group, elem, VR, length)
         logger.debug(debug_msg)
 
     # Store meta group length if it exists, then read until not group 2
@@ -443,7 +443,7 @@ def _read_file_meta_info(fp):
         if debugging:
             msg = "value (group length) = {0:d}".format(group_length)
             msg += "  regular dataset should start at {0:08x}".format(
-                                                            expected_ds_start)
+                expected_ds_start)
             logger.debug(" " * 10 + msg)
     else:
         expected_ds_start = None

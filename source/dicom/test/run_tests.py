@@ -30,7 +30,7 @@ class MyTestLoader(object):
         for module_name in module_names:
             module_dotted_name = "dicom.test." + module_name
             test = unittest.defaultTestLoader.loadTestsFromName(
-                                                            module_dotted_name)
+                module_dotted_name)
             suite.addTest(test)
         os.chdir(save_dir)
         return suite

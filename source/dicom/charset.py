@@ -37,7 +37,7 @@ def clean_escseq(element, encodings):
     """
     if 'euc_kr' in encodings:
         return element.replace(
-                "\x1b\x24\x29\x43", "").replace("\x1b\x28\x42", "")
+            "\x1b\x24\x29\x43", "").replace("\x1b\x28\x42", "")
     else:
         return element
 
@@ -119,8 +119,7 @@ def decode(data_element, dicom_character_set):
             if isinstance(data_element.value, unicode):
                 return
             data_element.value = clean_escseq(
-                                    data_element.value.decode(
-                                        encodings[0]), encodings)
+                data_element.value.decode(encodings[0]), encodings)
         else:
 
             output = list()
