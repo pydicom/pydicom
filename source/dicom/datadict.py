@@ -31,11 +31,12 @@ for mask_x in RepeatersDictionary:
 # For shorter naming of dicom member elements, put an entry here
 #   (longer naming can also still be used)
 # The descriptive name must start with the long version (not replaced if internal)
-shortNames = [("BeamLimitingDevice", "BLD"),
-              ("RTBeamLimitingDevice", "RTBLD"),
-              ("ControlPoint", "CP"),
-              ("Referenced", "Refd")
-             ]
+shortNames = [
+    ("BeamLimitingDevice", "BLD"),
+    ("RTBeamLimitingDevice", "RTBLD"),
+    ("ControlPoint", "CP"),
+    ("Referenced", "Refd")
+]
 
 
 def mask_match(tag):

@@ -20,12 +20,12 @@ else:
     tempfile = "/tmp/pydicom_stats"
     location_base = r"/Users/darcy/testdicom/"
     # location_base = r"/Volumes/Disk 1/testdicom/"  # Network disk location
-locations = ["77654033_19950903/77654033/19950903/CT2/",
-             "98890234_20010101/98890234/20010101/CT5/",
-             "98890234_20010101/98890234/20010101/CT6/",
-             "98890234_20010101/98890234/20010101/CT7/",
-
-            ]
+locations = [
+    "77654033_19950903/77654033/19950903/CT2/",
+    "98890234_20010101/98890234/20010101/CT5/",
+    "98890234_20010101/98890234/20010101/CT6/",
+    "98890234_20010101/98890234/20010101/CT7/",
+]
 locations = [os.path.join(location_base, location) for location in locations]
 # -------------------------------------------------------
 import glob
@@ -97,7 +97,7 @@ if __name__ == "__main__":
             # 'test_mem_read_full()',
                     # 'test_mem_read_small()',
             'test_python_read_files()',
-           ]
+            ]
     random.shuffle(runs)
     for testrun in runs:
         cProfile.run(testrun, tempfile)

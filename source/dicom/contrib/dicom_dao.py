@@ -370,7 +370,7 @@ def __dicomify(key, value):
                     __make_dataset(
                         [__dicomify(subkey, listvalue[subkey])
                             for subkey in listvalue.keys()
-                        ])
+                         ])
                     for listvalue in value
                 ]))
     else:
