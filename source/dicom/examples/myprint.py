@@ -32,7 +32,7 @@ def myprint(dataset, indent=0):
                 if len(repr_value) > 50:
                     repr_value = repr_value[:50] + "..."
                 print("{0:s} {1:s} = {2:s}".format(indent_string,
-                                        data_element.name, repr_value))
+                                                   data_element.name, repr_value))
 
 if __name__ == "__main__":
     import dicom

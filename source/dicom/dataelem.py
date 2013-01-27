@@ -96,7 +96,7 @@ class DataElement(object):
     showVR = 1
 
     def __init__(self, tag, VR, value, file_value_tell=None,
-                is_undefined_length=False, already_converted=False):
+                 is_undefined_length=False, already_converted=False):
         """Create a data element instance.
 
         Most user code should instead use DICOM keywords
@@ -137,7 +137,7 @@ class DataElement(object):
         # If so, turn them into a list of separate strings
         if isString(val) and self.VR not in \
                 ['UT', 'ST', 'LT', 'FL', 'FD', 'AT', 'OB', 'OW', 'OF', 'SL', 'SQ', 'SS',
-                'UL', 'OB/OW', 'OW/OB', 'OB or OW', 'OW or OB', 'UN'] and 'US' not in self.VR:  # latter covers 'US or SS' etc
+                 'UL', 'OB/OW', 'OW/OB', 'OB or OW', 'OW or OB', 'UN'] and 'US' not in self.VR:  # latter covers 'US or SS' etc
             if _backslash in val:
                 val = val.split(_backslash)
         self._value = self._convert_value(val)
@@ -199,17 +199,17 @@ class DataElement(object):
         repVal = self.repval
         if self.showVR:
             s = "%s %-*s %s: %s" % (str(self.tag), self.descripWidth,
-                            self.description()[:self.descripWidth], self.VR, repVal)
+                                    self.description()[:self.descripWidth], self.VR, repVal)
         else:
             s = "%s %-*s %s" % (str(self.tag), self.descripWidth,
-                            self.description()[:self.descripWidth], repVal)
+                                self.description()[:self.descripWidth], repVal)
         return s
 
     @property
     def repval(self):
         """Return a str representation of the current value for use in __str__"""
-        if (self.VR in ['OB', 'OW', 'OW/OB', 'OW or OB', 'OB or OW', 'US or SS or OW', 'US or SS']
-           and len(self.value) > self.maxBytesToDisplay):
+        byte_VRs = ['OB', 'OW', 'OW/OB', 'OW or OB', 'OB or OW', 'US or SS or OW', 'US or SS']
+        if (self.VR in byte_VRs and len(self.value) > self.maxBytesToDisplay):
             repVal = "Array of %d bytes" % len(self.value)
         elif hasattr(self, 'original_string'):  # for VR of IS or DS
             repVal = repr(self.original_string)
@@ -316,7 +316,7 @@ class DeferredDataElement(DataElement):
 
 
 RawDataElement = namedtuple('RawDataElement',
-                  'tag VR length value value_tell is_implicit_VR is_little_endian')
+                            'tag VR length value value_tell is_implicit_VR is_little_endian')
 
 
 def DataElement_from_raw(raw_data_element, encoding=None):
@@ -339,4 +339,4 @@ def DataElement_from_raw(raw_data_element, encoding=None):
     except NotImplementedError as e:
         raise NotImplementedError("{0:s} in tag {1!r}".format(str(e), raw.tag))
     return DataElement(raw.tag, VR, value, raw.value_tell,
-                    raw.length == 0xFFFFFFFF, already_converted=True)
+                       raw.length == 0xFFFFFFFF, already_converted=True)

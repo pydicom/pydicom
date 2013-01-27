@@ -286,7 +286,7 @@ def pydicom2json(dcm):
     binary_elements = []
     tagstack = []
     jsn = dict((key, __jsonify(dcm[key], binary_elements, tagstack))
-              for key in dcm.keys())
+               for key in dcm.keys())
     file_meta_binary_elements = []
     jsn['file_meta'] = dict((key, __jsonify(dcm.file_meta[key],
                             file_meta_binary_elements, tagstack))
@@ -338,7 +338,7 @@ def json2pydicom(jsn):
     dataset = dicom.dataset.Dataset()
     # Don't try to convert couch specific tags
     dicom_keys = [key for key in jsn.keys() \
-        if key not in ['_rev', '_id', '_attachments', 'file_meta']]
+                  if key not in ['_rev', '_id', '_attachments', 'file_meta']]
     for key in dicom_keys:
         dataset.add(__dicomify(key, jsn[key]))
     file_meta = dicom.dataset.Dataset()
@@ -366,14 +366,12 @@ def __dicomify(key, value):
             vr = 'US'
 
     if vr == 'SQ':  # We have a sequence of datasets, so we recurse
-        return dicom.dataelem.DataElement(tag, vr,
-                dicom.sequence.Sequence([
-                    __make_dataset(
-                        [__dicomify(subkey, listvalue[subkey])
-                            for subkey in listvalue.keys()
-                         ])
+        seq_list = [__make_dataset([__dicomify(subkey, listvalue[subkey])
+                                    for subkey in listvalue.keys()])
                     for listvalue in value
-                ]))
+                    ]
+        seq = dicom.sequence.Sequence(seq_list)
+        return dicom.dataelem.DataElement(tag, vr, seq)
     else:
         return dicom.dataelem.DataElement(tag, vr, value)
 

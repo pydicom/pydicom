@@ -31,15 +31,15 @@ class UIDtests(unittest.TestCase):
         expected = False
         got = uid.is_retired
         self.assertEqual(got, expected,
-                     msg.format("is_retired", str(expected), str(got)))
+                         msg.format("is_retired", str(expected), str(got)))
 
     def testComparison(self):
         """UID: can compare by number or by name.................."""
         uid = UID('1.2.840.10008.1.2')
         self.assertEqual(uid, 'Implicit VR Little Endian',
-                        "UID equality failed on name")
+                         "UID equality failed on name")
         self.assertEqual(uid, '1.2.840.10008.1.2',
-                        "UID equality failed on number string")
+                         "UID equality failed on number string")
 
     def testCompareNumber(self):
         """UID: comparing against a number give False............."""
@@ -72,7 +72,7 @@ class UIDtests(unittest.TestCase):
         invalid_prefix = \
             '1.2.33333333333333333333333333333333333333333333333333333333333.333.'
         self.assertRaises(InvalidUID,
-             lambda: generate_uid(prefix=invalid_prefix, truncate=True))
+                          lambda: generate_uid(prefix=invalid_prefix, truncate=True))
 
         # Test standard UID with truncate=True
         prefix = '1.2.3.444444'
