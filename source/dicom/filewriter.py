@@ -115,7 +115,7 @@ def write_number_string(fp, data_element, padding=' '):
     val = data_element.value
     if isinstance(val, (list, tuple)):
         val = "\\".join((x.original_string if hasattr(x, 'original_string')
-                                           else str(x) for x in val))
+                       else str(x) for x in val))
     else:
         val = val.original_string if hasattr(val, 'original_string') else str(val)
     if len(val) % 2 != 0:

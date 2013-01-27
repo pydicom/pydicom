@@ -54,4 +54,4 @@ class Sequence(MultiValue):
         """Sequence-specific string representation"""
         formatstr = "<%(classname)s, length %(count)d, at %(id)X>"
         return formatstr % {'classname': self.__class__.__name__,
-                              'id': id(self), 'count': len(self)}
+                           'id': id(self), 'count': len(self)}

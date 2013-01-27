@@ -254,7 +254,7 @@ class PersonName3(object):
             comps = self.components
         else:
             comps = [clean_escseq(comp.decode(enc), encodings)
-                        for comp, enc in zip(self.components, encodings)]
+                    for comp, enc in zip(self.components, encodings)]
 
         while len(comps) and not comps[-1]:
             comps.pop()
@@ -333,8 +333,8 @@ class PersonNameBase(object):
         if self.single_byte:
             name_string = self.single_byte + "^^^^"  # in case missing trailing items are left out
             parts = name_string.split("^")[:5]
-            (self.family_name, self.given_name, self.middle_name,
-                               self.name_prefix, self.name_suffix) = parts
+            self.family_name, self.given_name, self.middle_name = parts[:3]
+            self.name_prefix, self.name_suffix = parts[3:]
         else:
             (self.family_name, self.given_name, self.middle_name,
                 self.name_prefix, self.name_suffix) = ('', '', '', '', '')
@@ -398,7 +398,7 @@ class PersonNameUnicode(PersonNameBase, unicode):
             del encodings[0]
 
         comps = [clean_escseq(C.decode(enc), encodings)
-                    for C, enc in zip(components, encodings)]
+                 for C, enc in zip(components, encodings)]
         new_val = u"=".join(comps)
 
         return unicode.__new__(cls, new_val)
