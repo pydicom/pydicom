@@ -16,19 +16,17 @@ import shutil
 # Not sure if on other platforms the import fails, or the call to it??
 stat_available = True
 try:
-    from os import stat
+    from os import stat  # NOQA
 except:
     stat_available = False
 
 have_numpy = True
 try:
-    import numpy
+    import numpy  # NOQA
 except:
     have_numpy = False
-from dicom.filereader import read_file, data_element_generator, InvalidDicomError
-from dicom.values import convert_value
+from dicom.filereader import read_file, InvalidDicomError
 from dicom.tag import Tag, TupleTag
-from dicom.sequence import Sequence
 import dicom.valuerep
 import gzip
 
@@ -231,7 +229,7 @@ class ReaderTests(unittest.TestCase):
         #    and there is no such tag, generating an exception
 
         # Simply read the file, in 0.9.5 this generated an exception
-        priv_SQ = read_file(priv_SQ_name)
+        read_file(priv_SQ_name)
 
     def testNestedPrivateSQ(self):
         """Can successfully read a private SQ which contains additional SQ's....."""
@@ -352,7 +350,7 @@ class DeferredReadTests(unittest.TestCase):
             warning_start = "Deferred read warning -- file modification time "
 
             def read_value():
-                data_elem = ds.PixelData
+                ds.PixelData
 
             assertWarns(self, warning_start, read_value)
 
@@ -362,7 +360,7 @@ class DeferredReadTests(unittest.TestCase):
         os.remove(self.testfile_name)
 
         def read_value():
-            data_elem = ds.PixelData
+            ds.PixelData
 
         self.assertRaises(IOError, read_value)
 
@@ -382,7 +380,7 @@ class DeferredReadTests(unittest.TestCase):
         fobj.close()
         # before the fix, this threw an error as file reading was not in right place,
         #    it was re-opened as a normal file, not zip file
-        num = ds.InstanceNumber
+        ds.InstanceNumber
 
     def tearDown(self):
         if os.path.exists(self.testfile_name):

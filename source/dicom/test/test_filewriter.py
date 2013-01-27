@@ -11,7 +11,6 @@ import os
 import unittest
 from dicom.filereader import read_file
 from dicom.filewriter import write_data_element
-from dicom.tag import Tag
 from dicom.dataset import Dataset, FileDataset
 from dicom.sequence import Sequence
 from dicom.util.hexutil import hex2bytes, bytes2hex
@@ -19,7 +18,6 @@ from dicom.util.hexutil import hex2bytes, bytes2hex
 # from io import BytesIO
 from dicom.filebase import DicomBytesIO
 from dicom.dataelem import DataElement
-from dicom.util.hexutil import hex2bytes, bytes2hex
 
 from pkg_resources import Requirement, resource_filename
 test_dir = resource_filename(Requirement.parse("pydicom"), "dicom/testfiles")
@@ -36,8 +34,13 @@ unicode_name = os.path.join(testcharset_dir, "chrH31.dcm")
 multiPN_name = os.path.join(testcharset_dir, "chrFrenMulti.dcm")
 
 # Set up rtplan_out, rtdose_out etc. Filenames as above, with '2' appended
-for inname in ['rtplan', 'rtdose', 'ct', 'mr', 'jpeg', 'unicode', 'multiPN']:
-    exec(inname + "_out = " + inname + "_name + '2'")
+rtplan_out = rtplan_name + '2'
+rtdose_out = rtdose_name + '2'
+ct_out = ct_name + '2'
+mr_out = mr_name + '2'
+jpeg_out = jpeg_name + '2'
+unicode_out = unicode_name + '2'
+multiPN_out = multiPN_name + '2'
 
 
 def files_identical(a, b):

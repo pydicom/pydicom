@@ -70,7 +70,6 @@ def pretty_print(ds, indent=0, indent_chars="   "):
 
     """
 
-    strings = []
     indentStr = indent_chars * indent
     nextIndentStr = indent_chars * (indent + 1)
     for data_element in ds:

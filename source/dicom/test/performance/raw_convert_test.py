@@ -5,13 +5,6 @@
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
 
-# import sys
-# sys.modules["decimal"] = __import__("cdecimal")
-
-import os.path
-import os
-import sys
-
 # EDIT THIS SECTION --------------------------
 #    to point to local temp directory
 
@@ -20,11 +13,8 @@ read_filename = r"/Users/darcy/hg/pydicom/source/dicom/testfiles/RStest.dcm"
 write_filename = "/tmp/write_test.dcm"
 
 import dicom
-from io import BytesIO
-
 import cProfile
 import pstats
-import sys
 
 
 def test_full_read(filename):
@@ -33,7 +23,7 @@ def test_full_read(filename):
 
 
 def walkval(dataset, dataelem):
-    val = dataelem.value
+    dataelem.value
 
 
 def test_convert_from_raw(dataset):

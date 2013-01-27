@@ -7,7 +7,6 @@
 
 from io import BytesIO
 import unittest
-from dicom import in_py3
 from dicom.filereader import data_element_generator
 from dicom.values import convert_value
 from dicom.sequence import Sequence
@@ -225,8 +224,6 @@ class RawSequenceTests(unittest.TestCase):
         """Raw read: ExplVR BigEndian Undefined Length SQ......................."""
         # Create a fictional sequence with bytes directly,
         #    similar to PS 3.5-2008 Table 7.5-2 p42
-        item1_value_bytes = "\1" * 126
-        item2_value_bytes = "\2" * 222
         hexstr = (
             "30 0a 00 B0"    # (300a, 00b0) Beam Sequence
             " 53 51"         # SQ

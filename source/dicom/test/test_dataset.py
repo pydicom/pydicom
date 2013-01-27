@@ -6,7 +6,7 @@
 #    available at http://pydicom.googlecode.com
 
 import unittest
-from dicom.dataset import Dataset, have_numpy, PropertyError
+from dicom.dataset import Dataset, PropertyError
 from dicom.dataelem import DataElement, RawDataElement
 from dicom.tag import Tag
 from dicom.sequence import Sequence
@@ -257,7 +257,7 @@ class DatasetElementsTests(unittest.TestCase):
         def try_non_Sequence():
             self.ds.ConceptCodeSequence = [1, 2, 3]
         msg = "Assigning non-sequence to SQ data element did not raise error"
-        self.assertRaises(TypeError, try_non_Sequence)
+        self.assertRaises(TypeError, try_non_Sequence, msg=msg)
         # check also that assigning proper sequence *does* work
         self.ds.ConceptCodeSequence = [self.sub_ds1, self.sub_ds2]
         self.assertTrue(isinstance(self.ds.ConceptCodeSequence, Sequence),
