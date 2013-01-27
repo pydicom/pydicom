@@ -77,7 +77,7 @@ def pretty_print(ds, indent=0, indent_chars="   "):
         if data_element.VR == "SQ":   # a sequence
             fmt_str = "{0:s}{1:s} {2:s}  {3:d} item(s) ---"
             new_str = fmt_str.format(indentStr, str(data_element.tag),
-                                data_element.name, len(data_element.value))
+                                     data_element.name, len(data_element.value))
             print(new_str)
             for dataset in data_element.value:
                 pretty_print(dataset, indent + 1)

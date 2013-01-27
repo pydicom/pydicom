@@ -47,7 +47,7 @@ def convert_ATvalue(byte_string, is_little_endian, struct_format=None):
     if length % 4 != 0:
         logger.warn("Expected length to be multiple of 4 for VR 'AT', got length %d at file position 0x%x", length, fp.tell() - 4)
     return MultiValue(Tag, [convert_tag(byte_string, is_little_endian, offset=x)
-                        for x in range(0, length, 4)])
+                            for x in range(0, length, 4)])
 
 
 def convert_DS_string(byte_string, is_little_endian, struct_format=None):

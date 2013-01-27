@@ -172,9 +172,9 @@ def generate_uid(prefix=pydicom_root_UID, truncate=False):
         dicom_uid = '2.25.{0}'.format(uuid.uuid1().int)
     else:
         uid_info = [uuid.getnode(),
-            fabs(os.getpid()),
-            datetime.datetime.today().second,
-            datetime.datetime.today().microsecond]
+                    fabs(os.getpid()),
+                    datetime.datetime.today().second,
+                    datetime.datetime.today().microsecond]  # nopep8
 
         suffix = ''.join([str(long(x)) for x in uid_info])
         dicom_uid = ''.join([prefix, suffix])

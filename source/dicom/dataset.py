@@ -241,11 +241,11 @@ class Dataset(dict):
         tag = tag_for_name(name)
         if tag is None:
             raise AttributeError("Dataset does not have attribute "
-                                "'{0:s}'.".format(name))
+                                 "'{0:s}'.".format(name))
         tag = Tag(tag)
         if tag not in self:
             raise AttributeError("Dataset does not have attribute "
-                                "'{0:s}'.".format(name))
+                                 "'{0:s}'.".format(name))
         else:  # do have that dicom data_element
             return self[tag].value
 
@@ -275,7 +275,7 @@ class Dataset(dict):
             if data_elem.value is None:
                 from dicom.filereader import read_deferred_data_element
                 data_elem = read_deferred_data_element(self.fileobj_type,
-                                    self.filename, self.timestamp, data_elem)
+                                                       self.filename, self.timestamp, data_elem)
 
             if tag != (0x08, 0x05):
                 character_set = self._character_set
@@ -294,7 +294,7 @@ class Dataset(dict):
         """
         ds = Dataset()
         ds.update(dict([(tag, data_element) for tag, data_element in self.items()
-                 if tag.group == group]))
+                        if tag.group == group]))
         return ds
 
     def __iter__(self):
@@ -395,7 +395,7 @@ class Dataset(dict):
         except AttributeError:
             t, e, tb = sys.exc_info()
             raise PropertyError("AttributeError in pixel_array property: " + \
-                            e.args[0]), None, tb
+                                e.args[0]), None, tb
 
     # Format strings spec'd according to python string formatting options
     #    See http://docs.python.org/library/stdtypes.html#string-formatting-operations
@@ -418,9 +418,9 @@ class Dataset(dict):
             #   gets descriptive text name too)
             # This is the dictionary of names that can be used in the format string
             elem_dict = dict([(x, getattr(data_element, x)()
-                           if callable(getattr(data_element, x))
-                           else getattr(data_element, x))
-                           for x in dir(data_element) if not x.startswith("_")])
+                               if callable(getattr(data_element, x))
+                               else getattr(data_element, x))
+                              for x in dir(data_element) if not x.startswith("_")])
             if data_element.VR == "SQ":
                 yield sequence_element_format % elem_dict
             else:
@@ -492,7 +492,7 @@ class Dataset(dict):
         """Operator for dataset[key]=value. Check consistency, and deal with private tags"""
         if not isinstance(value, (DataElement, RawDataElement)):  # ok if is subclass, e.g. DeferredDataElement
             raise TypeError("Dataset contents must be DataElement instances.\n" + \
-                  "To set a data_element value use data_element.value=val")
+                            "To set a data_element value use data_element.value=val")
         tag = Tag(value.tag)
         if key != tag:
             raise ValueError("data_element.tag must match the dictionary key")
@@ -578,7 +578,7 @@ class Dataset(dict):
 
 class FileDataset(Dataset):
     def __init__(self, filename_or_obj, dataset, preamble=None, file_meta=None,
-                is_implicit_VR=True, is_little_endian=True):
+                 is_implicit_VR=True, is_little_endian=True):
         """Initialize a dataset read from a DICOM file
 
         :param filename: full path and filename to the file. Use None if is a BytesIO.

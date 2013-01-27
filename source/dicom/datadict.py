@@ -185,7 +185,7 @@ def tag_for_name(name):
     if name in NameDict:
         tag = NameDict[name]
         msg = ("'%s' as tag name has been deprecated; use official DICOM keyword '%s'"
-              % (name, dictionary_keyword(tag)))
+               % (name, dictionary_keyword(tag)))
         warnings.warn(msg, DeprecationWarning)
         return tag
 

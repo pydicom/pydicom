@@ -27,7 +27,7 @@ class SequenceTests(unittest.TestCase):
         # Construct the sequence
         seq = Sequence((patientSetups,))
         self.assertTrue(isinstance(seq[0], Dataset),
-                      "Dataset modified during Sequence creation")
+                        "Dataset modified during Sequence creation")
 
     def testInvalidInitialization(self):
         """Sequence: Raise error if inputs are not iterables or Datasets"""

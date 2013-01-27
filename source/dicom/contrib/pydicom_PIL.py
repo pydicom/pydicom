@@ -46,9 +46,9 @@ def get_LUT_value(data, window, level):
         raise ImportError("Numpy is not available. See http://numpy.scipy.org/ to download and install")
 
     return np.piecewise(data,
-        [data <= (level - 0.5 - (window - 1) / 2),
-            data > (level - 0.5 + (window - 1) / 2)],
-        [0, 255, lambda data: ((data - (level - 0.5)) / (window - 1) + 0.5) * (255 - 0)])
+                        [data <= (level - 0.5 - (window - 1) / 2),
+                         data > (level - 0.5 + (window - 1) / 2)],
+                        [0, 255, lambda data: ((data - (level - 0.5)) / (window - 1) + 0.5) * (255 - 0)])
 
 
 def get_LUT_value(data, window, level):
@@ -57,9 +57,9 @@ def get_LUT_value(data, window, level):
         raise ImportError("Numpy is not available. See http://numpy.scipy.org/ to download and install")
 
     return np.piecewise(data,
-        [data <= (level - 0.5 - (window - 1) / 2),
-            data > (level - 0.5 + (window - 1) / 2)],
-        [0, 255, lambda data: ((data - (level - 0.5)) / (window - 1) + 0.5) * (255 - 0)])
+                        [data <= (level - 0.5 - (window - 1) / 2),
+                         data > (level - 0.5 + (window - 1) / 2)],
+                        [0, 255, lambda data: ((data - (level - 0.5)) / (window - 1) + 0.5) * (255 - 0)])
 
 
 # Display an image using the Python Imaging Library (PIL)

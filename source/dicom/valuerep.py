@@ -99,17 +99,17 @@ class DSdecimal(Decimal):
             return val
         if isinstance(val, float) and not dicom.config.allow_DS_float:
             msg = ("DS cannot be instantiated with a float value, unless "
-                "config.allow_DS_float is set to True. It is recommended to "
-                "convert to a string instead, with the desired number of digits, "
-                "or use Decimal.quantize and pass a Decimal instance.")
+                   "config.allow_DS_float is set to True. It is recommended to "
+                   "convert to a string instead, with the desired number of digits, "
+                   "or use Decimal.quantize and pass a Decimal instance.")
             raise TypeError(msg)
         if not isinstance(val, Decimal):
             val = super(DSdecimal, cls).__new__(cls, val)
         if len(str(val)) > 16 and enforce_length:
             msg = ("DS value representation must be <= 16 characters by DICOM "
-                "standard. Initialize with a smaller string, or set config.enforce_valid_values "
-                "to False to override, "
-                "or use Decimal.quantize() and initialize with a Decimal instance.")
+                   "standard. Initialize with a smaller string, or set config.enforce_valid_values "
+                   "to False to override, "
+                   "or use Decimal.quantize() and initialize with a Decimal instance.")
             raise OverflowError(msg)
         return val
 
@@ -254,7 +254,7 @@ class PersonName3(object):
             comps = self.components
         else:
             comps = [clean_escseq(comp.decode(enc), encodings)
-                    for comp, enc in zip(self.components, encodings)]
+                     for comp, enc in zip(self.components, encodings)]
 
         while len(comps) and not comps[-1]:
             comps.pop()

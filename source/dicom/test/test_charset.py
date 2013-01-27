@@ -12,7 +12,7 @@ import os.path
 
 from pkg_resources import Requirement, resource_filename
 testcharset_dir = resource_filename(Requirement.parse("pydicom"),
-                                   "dicom/testcharsetfiles")
+                                    "dicom/testcharsetfiles")
 
 latin1_file = os.path.join(testcharset_dir, "chrFren.dcm")
 jp_file = os.path.join(testcharset_dir, "chrH31.dcm")
@@ -32,7 +32,7 @@ class charsetTests(unittest.TestCase):
         expected = u'Buc^J\xe9r\xf4me'
         got = ds.PatientName
         self.assertEqual(expected, got,
-                        "Expected %r, got %r" % (expected, got))
+                         "Expected %r, got %r" % (expected, got))
 
     def testNestedCharacterSets(self):
         """charset: can read and decode SQ with different encodings........."""
@@ -44,7 +44,7 @@ class charsetTests(unittest.TestCase):
         expected = u'\uff94\uff8f\uff80\uff9e^\uff80\uff9b\uff73=\u5c71\u7530^\u592a\u90ce=\u3084\u307e\u3060^\u305f\u308d\u3046'
         got = ds[0x32, 0x1064][0].PatientName
         self.assertEqual(expected, got,
-                        "Expected %r, got %r" % (expected, got))
+                         "Expected %r, got %r" % (expected, got))
 
     def testStandardFile(self):
         """charset: can read and decode standard file without special char.."""
