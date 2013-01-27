@@ -36,7 +36,7 @@ class MultiValue(list):
         self.type_constructor = type_constructor
         if isinstance(type_constructor, (DSfloat, IS, DSdecimal)):
             converted_list = [type_constructor(x) if x != ''
-                                        else x for x in iterable]
+                              else x for x in iterable]
         else:
             converted_list = [type_constructor(x) for x in iterable]
         super(MultiValue, self).__init__(converted_list)

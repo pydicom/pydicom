@@ -241,11 +241,11 @@ class Dataset(dict):
         tag = tag_for_name(name)
         if tag is None:
             raise AttributeError("Dataset does not have attribute "
-                                    "'{0:s}'.".format(name))
+                                "'{0:s}'.".format(name))
         tag = Tag(tag)
         if tag not in self:
             raise AttributeError("Dataset does not have attribute "
-                                    "'{0:s}'.".format(name))
+                                "'{0:s}'.".format(name))
         else:  # do have that dicom data_element
             return self[tag].value
 
@@ -294,7 +294,7 @@ class Dataset(dict):
         """
         ds = Dataset()
         ds.update(dict([(tag, data_element) for tag, data_element in self.items()
-                                if tag.group == group]))
+                 if tag.group == group]))
         return ds
 
     def __iter__(self):
@@ -578,7 +578,7 @@ class Dataset(dict):
 
 class FileDataset(Dataset):
     def __init__(self, filename_or_obj, dataset, preamble=None, file_meta=None,
-                        is_implicit_VR=True, is_little_endian=True):
+                is_implicit_VR=True, is_little_endian=True):
         """Initialize a dataset read from a DICOM file
 
         :param filename: full path and filename to the file. Use None if is a BytesIO.

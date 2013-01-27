@@ -138,7 +138,7 @@ class DicomCouch(dict):
         # I don't really like the extra HTTP GET and I think we can generate
         # what we need without doing it. Don't have time to work out how yet.
         self._meta[dcm.SeriesInstanceUID]['doc'] = \
-                                                self._db[dcm.SeriesInstanceUID]
+            self._db[dcm.SeriesInstanceUID]
 
     def __str__(self):
         """ Return the string representation of the couchdb client """
@@ -171,7 +171,7 @@ class DicomCouch(dict):
             id = _tagstack2id(tagstack + [element.tag])
             self._db.put_attachment(jsn, element.value, id)
             self._meta[dcm.SeriesInstanceUID]['hashes'][id] = \
-                                            hashlib.md5(element.value)
+                hashlib.md5(element.value)
 
     def delete(self, dcm):
         """ Delete from database and remove meta info from the DAO """
@@ -183,7 +183,7 @@ class DicomCouch(dict):
         jsn['_rev'] = self._meta[dcm.SeriesInstanceUID]['doc']['_rev']
         if '_attachments' in self._meta[dcm.SeriesInstanceUID]['doc']:
             jsn['_attachments'] = \
-                    self._meta[dcm.SeriesInstanceUID]['doc']['_attachments']
+                self._meta[dcm.SeriesInstanceUID]['doc']['_attachments']
 
     def __attachment_update_needed(self, dcm, id, binary_element):
         """ Compare hashes for binary element and return true if different """
@@ -193,7 +193,7 @@ class DicomCouch(dict):
             return True  # If no hashes dict then attachments do not exist
 
         if id not in hashes or hashes[id].digest() != \
-                                    hashlib.md5(binary_element.value).digest():
+                hashlib.md5(binary_element.value).digest():
             return True
         else:
             return False
@@ -286,7 +286,7 @@ def pydicom2json(dcm):
     binary_elements = []
     tagstack = []
     jsn = dict((key, __jsonify(dcm[key], binary_elements, tagstack))
-                                                for key in dcm.keys())
+              for key in dcm.keys())
     file_meta_binary_elements = []
     jsn['file_meta'] = dict((key, __jsonify(dcm.file_meta[key],
                             file_meta_binary_elements, tagstack))
@@ -338,7 +338,7 @@ def json2pydicom(jsn):
     dataset = dicom.dataset.Dataset()
     # Don't try to convert couch specific tags
     dicom_keys = [key for key in jsn.keys() \
-                    if key not in ['_rev', '_id', '_attachments', 'file_meta']]
+        if key not in ['_rev', '_id', '_attachments', 'file_meta']]
     for key in dicom_keys:
         dataset.add(__dicomify(key, jsn[key]))
     file_meta = dicom.dataset.Dataset()

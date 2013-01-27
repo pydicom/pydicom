@@ -96,7 +96,7 @@ class DataElement(object):
     showVR = 1
 
     def __init__(self, tag, VR, value, file_value_tell=None,
-                        is_undefined_length=False, already_converted=False):
+                is_undefined_length=False, already_converted=False):
         """Create a data element instance.
 
         Most user code should instead use DICOM keywords
@@ -209,7 +209,7 @@ class DataElement(object):
     def repval(self):
         """Return a str representation of the current value for use in __str__"""
         if (self.VR in ['OB', 'OW', 'OW/OB', 'OW or OB', 'OB or OW', 'US or SS or OW', 'US or SS']
-                  and len(self.value) > self.maxBytesToDisplay):
+           and len(self.value) > self.maxBytesToDisplay):
             repVal = "Array of %d bytes" % len(self.value)
         elif hasattr(self, 'original_string'):  # for VR of IS or DS
             repVal = repr(self.original_string)

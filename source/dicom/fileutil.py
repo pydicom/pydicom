@@ -75,7 +75,7 @@ def find_bytes(fp, bytes_to_find, read_size=128, rewind=True):
 
 
 def read_undefined_length_value(fp, is_little_endian, delimiter_tag, defer_size=None,
-                                    read_size=128):
+                               read_size=128):
     """Read until the delimiter tag found and return the value, ignore the delimiter
 
     fp -- a file-like object with read(), seek() functions
