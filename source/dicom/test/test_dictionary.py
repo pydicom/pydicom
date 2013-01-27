@@ -7,7 +7,7 @@
 
 import unittest
 from dicom.tag import Tag
-from dicom.datadict import DicomDictionary, CleanName, all_names_for_tag, dictionary_description
+from dicom.datadict import CleanName, all_names_for_tag, dictionary_description
 
 
 class DictTests(unittest.TestCase):

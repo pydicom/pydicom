@@ -10,8 +10,6 @@ and a value.
 #    available at http://pydicom.googlecode.com
 #
 from __future__ import absolute_import
-import sys
-from dicom import in_py3
 
 import logging
 logger = logging.getLogger('pydicom')
@@ -21,24 +19,18 @@ from dicom.datadict import private_dictionary_description, dictionaryVR
 from dicom.tag import Tag
 
 from dicom.UID import UID
-from dicom.valuerep import PersonName, PersonNameUnicode, DSfloat, DSdecimal
 import dicom.valuerep  # don't import DS directly as can be changed by config
 from dicom import in_py3
 
 if in_py3:
     from dicom.valuerep import PersonName3 as PersonNameUnicode
     PersonName = PersonNameUnicode
+else:
+    from dicom.valuerep import DSfloat, DSdecimal
 
 
 from collections import namedtuple
 
-# os.stat is only available on Unix and Windows
-# Not sure if on other platforms the import fails, or the call to it??
-stat_available = True
-try:
-    from os import stat
-except:
-    stat_available = False
 import os.path
 
 from dicom.filebase import DicomFile

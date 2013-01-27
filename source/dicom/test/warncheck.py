@@ -2,7 +2,6 @@
 #
 import warnings
 import unittest
-from sys import version_info
 from dicom.test.version_dep import capture_warnings
 
 

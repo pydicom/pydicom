@@ -33,7 +33,6 @@ import dicom
 from dicom.filereader import read_partial, _at_pixel_data
 from io import BytesIO
 
-from time import time
 import cProfile
 import pstats
 import sys
@@ -70,25 +69,25 @@ def test_full_read():
 
 def test_partial():
     rp = read_partial
-    ds = [rp(open(fn, 'rb'), stop_when=_at_pixel_data) for fn in filenames2]
+    [rp(open(fn, 'rb'), stop_when=_at_pixel_data) for fn in filenames2]
 
 
 def test_mem_read_full():
     rf = dicom.read_file
     str_io = BytesIO
     memory_files = (str_io(open(fn, 'rb').read()) for fn in filenames3)
-    ds = [rf(memory_file) for memory_file in memory_files]
+    [rf(memory_file) for memory_file in memory_files]
 
 
 def test_mem_read_small():
     rf = dicom.read_file
     str_io = BytesIO  # avoid global lookup, make local instead
     memory_files = (str_io(open(fn, 'rb').read(4000)) for fn in filenames4)
-    ds = [rf(memory_file) for memory_file in memory_files]
+    [rf(memory_file) for memory_file in memory_files]
 
 
 def test_python_read_files():
-    all_files = [open(fn, 'rb').read() for fn in filenames4]
+    [open(fn, 'rb').read() for fn in filenames4]
 
 
 if __name__ == "__main__":
@@ -108,14 +107,13 @@ if __name__ == "__main__":
         p.strip_dirs().sort_stats('time').print_stats(5)
     print("Confirming file read worked -- check for data elements near end")
     try:
-        image_sizes = [len(ds.PixelData) for ds in datasets]
+        image_sizes = [len(ds.PixelData) for ds in datasets]  # NOQA
     except Exception as e:
         print("Failed to access dataset data for all files\nError:" + str(e))
     else:
         print("Reads checked ok.")
 
     # Clear disk cache for next run?
-    import sys
     if not on_windows:
         prompt = "Run purge command (linux/Mac OS X) to clear disk cache?...(N):"
         if sys.version_info[0] > 2:
