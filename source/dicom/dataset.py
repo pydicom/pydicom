@@ -13,7 +13,7 @@ Dataset(derived class of Python's dict class)
 
 """
 #
-# Copyright (c) 2008-2012 Darcy Mason
+# Copyright (c) 2008-2013 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
@@ -426,27 +426,27 @@ class Dataset(dict):
             else:
                 yield element_format % elem_dict
 
-    def _pretty_str(self, indent=0, topLevelOnly=False):
+    def _pretty_str(self, indent=0, top_level_only=False):
         """Return a string of the data_elements in this dataset, with indented levels.
 
         This private method is called by the __str__() method
         for handling print statements or str(dataset), and the __repr__() method.
-        It is also used by top(), which is the reason for the topLevelOnly flag.
+        It is also used by top(), which is the reason for the top_level_only flag.
         This function recurses, with increasing indentation levels.
 
         """
         strings = []
-        indentStr = self.indent_chars * indent
-        nextIndentStr = self.indent_chars * (indent + 1)
+        indent_str = self.indent_chars * indent
+        nextindent_str = self.indent_chars * (indent + 1)
         for data_element in self:
             if data_element.VR == "SQ":   # a sequence
-                strings.append(indentStr + str(data_element.tag) + "  %s   %i item(s) ---- " % (data_element.description(), len(data_element.value)))
-                if not topLevelOnly:
+                strings.append(indent_str + str(data_element.tag) + "  %s   %i item(s) ---- " % (data_element.description(), len(data_element.value)))
+                if not top_level_only:
                     for dataset in data_element.value:
                         strings.append(dataset._pretty_str(indent + 1))
-                        strings.append(nextIndentStr + "---------")
+                        strings.append(nextindent_str + "---------")
             else:
-                strings.append(indentStr + repr(data_element))
+                strings.append(indent_str + repr(data_element))
         return "\n".join(strings)
 
     def remove_private_tags(self):
@@ -458,13 +458,13 @@ class Dataset(dict):
                 del dataset[data_element.tag]
         self.walk(RemoveCallback)
 
-    def save_as(self, filename, WriteLikeOriginal=True):
+    def save_as(self, filename, write_like_original=True):
         """Write the dataset to a file.
 
-        filename -- full path and filename to save the file to
-        WriteLikeOriginal -- see dicom.filewriter.write_file for info on this parameter.
+        :param filename: full path and filename to save the file to
+        :write_like_original: see dicom.filewriter.write_file for info on this parameter.
         """
-        dicom.write_file(filename, self, WriteLikeOriginal)
+        dicom.write_file(filename, self, write_like_original)
 
     def __setattr__(self, name, value):
         """Intercept any attempts to set a value for an instance attribute.
@@ -515,7 +515,7 @@ class Dataset(dict):
 
     def top(self):
         """Show the DICOM tags, but only the top level; do not recurse into Sequences"""
-        return self._pretty_str(topLevelOnly=True)
+        return self._pretty_str(top_level_only=True)
 
     def trait_names(self):
         """Return a list of valid names for auto-completion code

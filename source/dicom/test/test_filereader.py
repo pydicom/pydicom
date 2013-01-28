@@ -25,7 +25,8 @@ try:
     import numpy  # NOQA
 except:
     have_numpy = False
-from dicom.filereader import read_file, InvalidDicomError
+from dicom.filereader import read_file
+from dicom.errors import InvalidDicomError
 from dicom.tag import Tag, TupleTag
 import dicom.valuerep
 import gzip
