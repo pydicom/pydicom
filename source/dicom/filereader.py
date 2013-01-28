@@ -28,10 +28,12 @@ except:
 
 from os import SEEK_CUR
 
+from dicom.errors import InvalidDicomError
 import dicom.UID  # for Implicit/Explicit/Little/Big Endian transfer syntax UIDs
 from dicom.filebase import DicomFile, DicomFileLike
 from dicom.filebase import DicomIO, DicomBytesIO
 from dicom.dataset import Dataset, FileDataset
+from dicom.dicomdir import DicomDir
 from dicom.datadict import dictionaryVR
 from dicom.dataelem import DataElement, DeferredDataElement
 from dicom.tag import Tag, ItemTag, ItemDelimiterTag, SequenceDelimiterTag
@@ -42,22 +44,6 @@ from dicom.fileutil import length_of_undefined_length
 from struct import Struct, unpack
 from sys import byteorder
 sys_is_little_endian = (byteorder == 'little')
-
-
-class InvalidDicomError(Exception):
-    """Exception that is raised when the the file does not seem
-    to be a valid dicom file. This is the case when the four
-    characters "DICM" are not present at position 128 in the file.
-    (According to the dicom specification, each dicom file should
-    have this.)
-
-    To force reading the file (because maybe it is a dicom file without
-    a header), use read_file(..., force=True).
-    """
-    def __init__(self, *args):
-        if not args:
-            args = ('The specified file is not a valid DICOM file.',)
-        Exception.__init__(self, *args)
 
 
 class DicomIter(object):
@@ -364,6 +350,7 @@ def read_sequence(fp, is_implicit_VR, is_little_endian, bytelength, encoding, of
 
 def read_sequence_item(fp, is_implicit_VR, is_little_endian, encoding):
     """Read and return a single sequence item, i.e. a Dataset"""
+    data_set_tell = fp.tell()
     if is_little_endian:
         tag_length_format = "<HHL"
     else:
@@ -397,6 +384,8 @@ def read_sequence_item(fp, is_implicit_VR, is_little_endian, encoding):
         ds = read_dataset(fp, is_implicit_VR, is_little_endian, length,
                           parent_encoding=encoding)
     logger.debug("%08x: Finished sequence item" % fp.tell())
+    
+    ds.file_tell = data_set_tell
     return ds
 
 
@@ -524,7 +513,7 @@ def read_partial(fileobj, stop_when=None, defer_size=None, force=False):
         and returns True or False. If stop_when returns True,
         read_data_element will raise StopIteration.
         If None (default), then the whole file is read.
-    :returns: a set instance
+    :returns: a FileDataset instance, or if a DICOMDIR, a DicomDir instance.
     """
     # Read preamble -- raise an exception if missing and force=False
     preamble = read_preamble(fileobj, force)
@@ -568,8 +557,14 @@ def read_partial(fileobj, stop_when=None, defer_size=None, force=False):
                                stop_when=stop_when, defer_size=defer_size)
     except EOFError as e:
         pass  # error already logged in read_dataset
-    return FileDataset(fileobj, dataset, preamble, file_meta_dataset,
-                       is_implicit_VR, is_little_endian)
+    
+    class_uid = file_meta_dataset.get("MediaStorageSOPClassUID", None)
+    if class_uid and class_uid == "Media Storage Directory Storage":
+        return DicomDir(fileobj, dataset, preamble, file_meta_dataset,
+                        is_implicit_VR, is_little_endian)
+    else:
+        return FileDataset(fileobj, dataset, preamble, file_meta_dataset,
+                           is_implicit_VR, is_little_endian)
 
 
 def read_file(fp, defer_size=None, stop_before_pixels=False, force=False):
@@ -626,6 +621,24 @@ def read_file(fp, defer_size=None, stop_before_pixels=False, force=False):
             fp.close()
     # XXX need to store transfer syntax etc.
     return dataset
+
+
+def read_dicomdir(filename="DICOMDIR"):
+    """Read a DICOMDIR file and return a DicomDir instance
+    This is just a wrapper around read_file, which gives a default file name
+    
+    :param filename: full path and name to DICOMDIR file to open
+    :return: a DicomDir instance
+    :raise: InvalidDicomError is raised if file is not a DICOMDIR file.
+    """
+    # Read the file as usual.
+    # read_file will return a DicomDir instance if file is one.
+    # Here, check that it is in fact DicomDir
+    ds = read_file(filename)
+    if not isinstance(ds, DicomDir):
+        msg = "File '{0}' is not a Media Storage Directory file".format(filename)
+        raise InvalidDicomError(msg)
+    return ds
 
 
 def data_element_offset_to_value(is_implicit_VR, VR):

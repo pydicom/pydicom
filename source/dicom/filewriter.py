@@ -290,7 +290,7 @@ def _write_file_meta_info(fp, meta_dataset):
     fp.seek(end_of_file_meta)
 
 
-def write_file(filename, dataset, WriteLikeOriginal=True):
+def write_file(filename, dataset, write_like_original=True):
     """Store a Dataset to the filename specified.
 
     Set dataset.preamble if you want something other than 128 0-bytes.
@@ -300,7 +300,7 @@ def write_file(filename, dataset, WriteLikeOriginal=True):
     If there is no Transfer Syntax tag in the dataset,
        Set dataset.is_implicit_VR, and .is_little_endian
        to determine the transfer syntax used to write the file.
-    WriteLikeOriginal -- True if want to preserve the following for each sequence
+    write_like_original -- True if want to preserve the following for each sequence
         within this dataset:
         - preamble -- if no preamble in read file, than not used here
         - dataset.hasFileMeta -- if writer did not do file meta information,
@@ -310,13 +310,13 @@ def write_file(filename, dataset, WriteLikeOriginal=True):
         - <dataset>.is_undefined_length_sequence_item -- for datasets that belong to a
             sequence, write the undefined length delimiters if that is
             what the original had
-        Set WriteLikeOriginal = False to produce a "nicer" DICOM file for other readers,
+        Set write_like_original = False to produce a "nicer" DICOM file for other readers,
             where all lengths are explicit.
     """
 
     # Decide whether to write DICOM preamble. Should always do so unless trying to mimic the original file read in
     preamble = getattr(dataset, "preamble", None)
-    if not preamble and not WriteLikeOriginal:
+    if not preamble and not write_like_original:
         preamble = b"\0" * 128
     file_meta = dataset.file_meta
     if file_meta is None:
