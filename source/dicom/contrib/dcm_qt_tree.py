@@ -7,7 +7,7 @@
 
 import dicom
 import sys
-from PySide import QtGui, QtCore
+from PySide import QtGui
 import collections
 
 
@@ -32,7 +32,8 @@ class DicomTree:
                 self.recurse_dic_to_item(value, parentItem)
             else:
                 item = QtGui.QStandardItem(tag + str(value))
-                parent.appendRow(item)
+                parentItem.appendRow(item)
+        return parentItem
 
     def dic_to_model(self, dic):
         model = QtGui.QStandardItemModel()
@@ -50,7 +51,7 @@ class DicomTree:
         for k in dic:
             v = dic[k]
             if isinstance(v, dict):
-                item = QtGui.QStandardItem(k + ':' + str(v))
+                item = QtGqui.QStandardItem(k + ':' + str(v))
                 parent.appendRow(self.recurse_dic_to_item(v, item))
             else:
                 item = QtGui.QStandardItem(k + ': ' + str(v))
@@ -81,7 +82,6 @@ class DicomTree:
         return dic
 
     def display(self, model):
-        # check if QApplication already exists
         app = QtGui.QApplication.instance()
         if not app:  # create QApplication if it doesnt exist
             app = QtGui.QApplication(sys.argv)
