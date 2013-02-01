@@ -33,23 +33,6 @@ try:
 except:
     have_numpy = False
 
-have_numpy = True
-try:
-    import numpy as np
-except:
-    have_numpy = False
-
-
-def get_LUT_value(data, window, level):
-    """Apply the RGB Look-Up Table for the given data and window/level value."""
-    if not have_numpy:
-        raise ImportError("Numpy is not available. See http://numpy.scipy.org/ to download and install")
-
-    return np.piecewise(data,
-                        [data <= (level - 0.5 - (window - 1) / 2),
-                         data > (level - 0.5 + (window - 1) / 2)],
-                        [0, 255, lambda data: ((data - (level - 0.5)) / (window - 1) + 0.5) * (255 - 0)])
-
 
 def get_LUT_value(data, window, level):
     """Apply the RGB Look-Up Table for the given data and window/level value."""

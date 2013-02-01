@@ -51,7 +51,7 @@ class DicomTree:
         for k in dic:
             v = dic[k]
             if isinstance(v, dict):
-                item = QtGqui.QStandardItem(k + ':' + str(v))
+                item = QtGui.QStandardItem(k + ':' + str(v))
                 parent.appendRow(self.recurse_dic_to_item(v, item))
             else:
                 item = QtGui.QStandardItem(k + ': ' + str(v))

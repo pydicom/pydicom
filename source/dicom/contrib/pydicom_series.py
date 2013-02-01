@@ -39,7 +39,6 @@ instance is created for each 3D volume.
 
 
 import os
-import sys
 import time
 import gc
 import dicom
@@ -50,7 +49,7 @@ try:
     import numpy as np
     have_numpy = True
 except Exception:
-    np = None
+    np = None  # NOQA
     have_numpy = False
 
 
