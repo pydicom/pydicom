@@ -27,9 +27,6 @@
 #
 # Dave Witten:  Nov. 11, 2009
 #==========================================================================
-import os
-import os.path
-import sys
 import dicom
 import wx
 have_PIL = True
@@ -196,7 +193,7 @@ class ImFrame(wx.Frame):
         height = bmp.GetHeight()
         im = wx.EmptyImage(width, height)
         im.fromarray("RGBA", (width, height), bmp.GetData())
-        return img
+        return im
 
     #------------------------------------------------------------
     #  ImFrame.ConvertPILToWX()
@@ -284,7 +281,7 @@ class App(wx.App):
 
     def OnInit(self):
         """Create the Image Application."""
-        frame = ImFrame(None, 'wxImage Example')
+        ImFrame(None, 'wxImage Example')
         return True
 
 #---------------------------------------------------------------------

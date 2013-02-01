@@ -6,7 +6,7 @@
 #    available at http://pydicom.googlecode.com
 
 import Tkinter
-from dicom.valuerep import PersonName, PersonNameUnicode
+from dicom.valuerep import PersonNameUnicode
 
 default_encoding = 'iso8859'
 

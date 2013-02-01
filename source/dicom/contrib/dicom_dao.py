@@ -17,13 +17,11 @@ TODO:
 Dependencies:
  - PyDicom
  - python-couchdb
- - simplejson
 
 Tested with:
  - PyDicom 0.9.4-1
  - python-couchdb 0.6
  - couchdb 0.10.1
- - simplejson 2.0.9
 
 """
 #
@@ -36,7 +34,6 @@ Tested with:
 import hashlib
 import os
 import string
-import simplejson
 import couchdb
 import dicom
 

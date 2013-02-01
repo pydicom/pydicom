@@ -6,7 +6,6 @@
 #    available at http://pydicom.googlecode.com
 
 usage = "Usage: python dicomtree.py dicom_filename"
-from dicom.valuerep import PersonNameUnicode
 
 import Tix
 
