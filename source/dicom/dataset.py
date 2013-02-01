@@ -26,7 +26,7 @@ logger = logging.getLogger('pydicom')
 import inspect  # for __dir__
 
 from dicom.charset import default_encoding, convert_encodings
-from dicom.datadict import DicomDictionary, dictionaryVR
+from dicom.datadict import dictionaryVR
 from dicom.datadict import tag_for_name, all_names_for_tag
 from dicom.tag import Tag, BaseTag
 from dicom.dataelem import DataElement, DataElement_from_raw, RawDataElement
@@ -37,11 +37,8 @@ import io
 
 import dicom  # for write_file
 import dicom.charset
-import warnings
-
 
 have_numpy = True
-
 try:
     import numpy
 except:

@@ -26,21 +26,16 @@ try:
 except:
     stat_available = False
 
-from os import SEEK_CUR
-
 from dicom.errors import InvalidDicomError
 import dicom.UID  # for Implicit/Explicit/Little/Big Endian transfer syntax UIDs
-from dicom.filebase import DicomFile, DicomFileLike
-from dicom.filebase import DicomIO, DicomBytesIO
+from dicom.filebase import DicomFile 
 from dicom.dataset import Dataset, FileDataset
 from dicom.dicomdir import DicomDir
 from dicom.datadict import dictionaryVR
-from dicom.dataelem import DataElement, DeferredDataElement
-from dicom.tag import Tag, ItemTag, ItemDelimiterTag, SequenceDelimiterTag
+from dicom.dataelem import DataElement
+from dicom.tag import ItemTag, SequenceDelimiterTag
 from dicom.sequence import Sequence
-from dicom.misc import size_in_bytes
-from dicom.fileutil import absorb_delimiter_item, read_undefined_length_value
-from dicom.fileutil import length_of_undefined_length
+from dicom.fileutil import read_undefined_length_value
 from struct import Struct, unpack
 from sys import byteorder
 sys_is_little_endian = (byteorder == 'little')
@@ -363,7 +358,6 @@ def read_sequence_item(fp, is_implicit_VR, is_little_endian, encoding):
                       "{0:05x}".format(fp.tell()))
     tag = (group, element)
     if tag == SequenceDelimiterTag:  # No more items, time to stop reading
-        data_element = DataElement(tag, None, None, fp.tell() - 4)
         logger.debug("{0:08x}: {1}".format(fp.tell() - 8, "End of Sequence"))
         if length != 0:
             logger.warning("Expected 0x00000000 after delimiter, found 0x%x,"
@@ -383,8 +377,7 @@ def read_sequence_item(fp, is_implicit_VR, is_little_endian, encoding):
     else:
         ds = read_dataset(fp, is_implicit_VR, is_little_endian, length,
                           parent_encoding=encoding)
-    logger.debug("%08x: Finished sequence item" % fp.tell())
-    
+        logger.debug("%08x: Finished sequence item" % fp.tell())
     ds.file_tell = data_set_tell
     return ds
 
@@ -557,7 +550,7 @@ def read_partial(fileobj, stop_when=None, defer_size=None, force=False):
                                stop_when=stop_when, defer_size=defer_size)
     except EOFError as e:
         pass  # error already logged in read_dataset
-    
+
     class_uid = file_meta_dataset.get("MediaStorageSOPClassUID", None)
     if class_uid and class_uid == "Media Storage Directory Storage":
         return DicomDir(fileobj, dataset, preamble, file_meta_dataset,
@@ -626,7 +619,7 @@ def read_file(fp, defer_size=None, stop_before_pixels=False, force=False):
 def read_dicomdir(filename="DICOMDIR"):
     """Read a DICOMDIR file and return a DicomDir instance
     This is just a wrapper around read_file, which gives a default file name
-    
+
     :param filename: full path and name to DICOMDIR file to open
     :return: a DicomDir instance
     :raise: InvalidDicomError is raised if file is not a DICOMDIR file.
