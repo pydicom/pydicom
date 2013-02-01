@@ -8,7 +8,6 @@
 #    available at http://pydicom.googlecode.com
 #
 
-import sys
 import logging
 logger = logging.getLogger("pydicom")
 from dicom.tag import Tag

@@ -28,13 +28,7 @@ if in_py3:
 else:
     from dicom.valuerep import DSfloat, DSdecimal
 
-
 from collections import namedtuple
-
-import os.path
-
-from dicom.filebase import DicomFile
-import warnings
 
 
 # Helper functions:

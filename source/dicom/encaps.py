@@ -34,7 +34,7 @@ def defragment_data(data):
     # Convert data into a memory-mapped file
     fp = DicomBytesIO(data)
     fp.is_little_endian = True  # DICOM standard requires this
-    BasicOffsetTable = read_item(fp)
+    BasicOffsetTable = read_item(fp)  # NOQA
     seq = []
     while True:
         item = read_item(fp)
