@@ -163,7 +163,6 @@ def length_of_undefined_length(fp, delimiter, is_little_endian, read_size=128, r
     rewind == if True, file will be returned to position before seeking the bytes
 
     """
-    chunk = 0
     data_start = fp.tell()
     delimiter_pos = find_delimiter(fp, delimiter, is_little_endian, rewind=rewind)
     length = delimiter_pos - data_start

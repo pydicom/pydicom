@@ -7,7 +7,7 @@
 #    available at http://pydicom.googlecode.com
 
 from dicom import in_py3
-from struct import unpack, calcsize, pack
+from struct import unpack, calcsize
 import logging
 logger = logging.getLogger('pydicom')
 
@@ -19,12 +19,11 @@ from dicom.valuerep import MultiString
 if in_py3:
     from dicom.valuerep import PersonName3 as PersonName
 else:
-    from dicom.valuerep import PersonName
+    from dicom.valuerep import PersonName  # NOQA
 
 from dicom.multival import MultiValue
 import dicom.UID
-from dicom.tag import Tag, TupleTag, SequenceDelimiterTag
-from dicom.datadict import dictionaryVR
+from dicom.tag import Tag, TupleTag
 from dicom.filereader import read_sequence
 from io import BytesIO
 from dicom.charset import default_encoding, text_VRs
@@ -45,7 +44,8 @@ def convert_ATvalue(byte_string, is_little_endian, struct_format=None):
         return convert_tag(byte_string, is_little_endian)
     # length > 4
     if length % 4 != 0:
-        logger.warn("Expected length to be multiple of 4 for VR 'AT', got length %d at file position 0x%x", length, fp.tell() - 4)
+        logger.warn("Expected length to be multiple of 4 for VR 'AT',"
+                    "got length %d", length)
     return MultiValue(Tag, [convert_tag(byte_string, is_little_endian, offset=x)
                             for x in range(0, length, 4)])
 
@@ -162,7 +162,6 @@ def convert_UN(byte_string, is_little_endian, struct_format=None):
 
 def convert_value(VR, raw_data_element, encoding=default_encoding):
     """Return the converted value (from raw bytes) for the given VR"""
-    tag = Tag(raw_data_element.tag)
     if VR not in converters:
         raise NotImplementedError("Unknown Value Representation '{0}'".format(VR))
 
