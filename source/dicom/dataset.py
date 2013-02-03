@@ -391,7 +391,7 @@ class Dataset(dict):
             return self._get_pixel_array()
         except AttributeError:
             t, e, tb = sys.exc_info()
-            raise PropertyError("AttributeError in pixel_array property: " + \
+            raise PropertyError("AttributeError in pixel_array property: " +
                                 e.args[0]), None, tb
 
     # Format strings spec'd according to python string formatting options
@@ -488,7 +488,7 @@ class Dataset(dict):
     def __setitem__(self, key, value):
         """Operator for dataset[key]=value. Check consistency, and deal with private tags"""
         if not isinstance(value, (DataElement, RawDataElement)):  # ok if is subclass, e.g. DeferredDataElement
-            raise TypeError("Dataset contents must be DataElement instances.\n" + \
+            raise TypeError("Dataset contents must be DataElement instances.\n"
                             "To set a data_element value use data_element.value=val")
         tag = Tag(value.tag)
         if key != tag:
