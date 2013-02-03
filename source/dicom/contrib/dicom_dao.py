@@ -159,11 +159,12 @@ class DicomCouch(dict):
 
     def __put_attachments(self, dcm, binary_elements, jsn):
         """ Upload all new and modified attachments """
-        elements_to_update = [
-            (tagstack, item) for tagstack, item in binary_elements \
-            if self.__attachment_update_needed(
-                dcm, _tagstack2id(tagstack + [item.tag]), item)
-        ]
+        elements_to_update = \
+            [(tagstack, item)
+             for tagstack, item in binary_elements
+             if self.__attachment_update_needed(dcm,
+                                                _tagstack2id(tagstack + [item.tag]), item)
+            ]  # nopep8
         for tagstack, element in elements_to_update:
             id = _tagstack2id(tagstack + [element.tag])
             self._db.put_attachment(jsn, element.value, id)
@@ -310,7 +311,7 @@ def __jsonify(element, binary_elements, tagstack):
         nested_data = []
         for i in range(0, len(value)):
             tagstack.append(i)
-            nested_data.append(dict(\
+            nested_data.append(dict(
                 (subkey, __jsonify(value[i][subkey], binary_elements, tagstack))
                 for subkey in value[i].keys()))
             tagstack.pop()
@@ -334,7 +335,7 @@ def json2pydicom(jsn):
     """ Convert the supplied json dict into a PyDicom object """
     dataset = dicom.dataset.Dataset()
     # Don't try to convert couch specific tags
-    dicom_keys = [key for key in jsn.keys() \
+    dicom_keys = [key for key in jsn.keys()
                   if key not in ['_rev', '_id', '_attachments', 'file_meta']]
     for key in dicom_keys:
         dataset.add(__dicomify(key, jsn[key]))
