@@ -14,11 +14,9 @@ from dicom import in_py3
 from dicom.charset import default_encoding, text_VRs, convert_encodings
 from dicom.UID import ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian
 from dicom.filebase import DicomFile
-from dicom.datadict import dictionaryVR
 from dicom.dataset import Dataset
 from dicom.dataelem import DataElement
 from dicom.tag import Tag, ItemTag, ItemDelimiterTag, SequenceDelimiterTag
-from dicom.sequence import Sequence
 from dicom.valuerep import extra_length_VRs
 
 
@@ -45,7 +43,7 @@ def write_numbers(fp, data_element, struct_format):
             for val in value:
                 fp.write(pack(format_string, val))
     except Exception as e:
-        raise IOError("{0}\nfor data_element:\n{1}".format(str(e), str(data_elemesnt)))
+        raise IOError("{0}\nfor data_element:\n{1}".format(str(e), str(data_element)))
 
 
 def write_OBvalue(fp, data_element):

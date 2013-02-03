@@ -122,7 +122,7 @@ class DSdecimal(Decimal):
         # a different Decimal, as Decimal is immutable.
         if isinstance(val, (str, unicode)):
             self.original_string = val
-        elif isinstance(val, DSbase) and hasattr(val, 'original_string'):
+        elif isinstance(val, (DSfloat, DSdecimal)) and hasattr(val, 'original_string'):
             self.original_string = val.original_string
 
     def __str__(self):

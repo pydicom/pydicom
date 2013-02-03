@@ -28,7 +28,7 @@ except:
 
 from dicom.errors import InvalidDicomError
 import dicom.UID  # for Implicit/Explicit/Little/Big Endian transfer syntax UIDs
-from dicom.filebase import DicomFile 
+from dicom.filebase import DicomFile
 from dicom.dataset import Dataset, FileDataset
 from dicom.dicomdir import DicomDir
 from dicom.datadict import dictionaryVR
@@ -369,7 +369,6 @@ def read_sequence_item(fp, is_implicit_VR, is_little_endian, encoding):
     else:
         logger.debug("{0:08x}: {1}  Found Item tag (start of item)".format(
             fp.tell() - 4, bytes2hex(bytes_read)))
-    is_undefined_length = False
     if length == 0xFFFFFFFFL:
         ds = read_dataset(fp, is_implicit_VR, is_little_endian,
                           bytelength=None, parent_encoding=encoding)
@@ -377,6 +376,7 @@ def read_sequence_item(fp, is_implicit_VR, is_little_endian, encoding):
     else:
         ds = read_dataset(fp, is_implicit_VR, is_little_endian, length,
                           parent_encoding=encoding)
+        ds.is_undefined_length_sequence_item = False
         logger.debug("%08x: Finished sequence item" % fp.tell())
     ds.file_tell = data_set_tell
     return ds
@@ -461,7 +461,7 @@ def read_file_meta_info(filename):
     without having to read the entire files.
     """
     fp = DicomFile(filename, 'rb')
-    preamble = read_preamble(fp, False)  # if no header, raise exception
+    read_preamble(fp, False)  # if no header, raise exception
     return _read_file_meta_info(fp)
 
 
@@ -548,7 +548,7 @@ def read_partial(fileobj, stop_when=None, defer_size=None, force=False):
     try:
         dataset = read_dataset(fileobj, is_implicit_VR, is_little_endian,
                                stop_when=stop_when, defer_size=defer_size)
-    except EOFError as e:
+    except EOFError:
         pass  # error already logged in read_dataset
 
     class_uid = file_meta_dataset.get("MediaStorageSOPClassUID", None)
