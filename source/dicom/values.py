@@ -129,7 +129,8 @@ def convert_string(byte_string, is_little_endian, struct_format=None, encoding=d
     return MultiString(byte_string)
 
 
-def convert_single_string(byte_string, is_little_endian, struct_format=None, encoding=default_encoding):
+def convert_single_string(byte_string, is_little_endian, struct_format=None,
+                          encoding=default_encoding):
     """Read and return a single string (backslash character does not split)"""
     if in_py3:
         byte_string = byte_string.decode(encoding)
@@ -138,10 +139,12 @@ def convert_single_string(byte_string, is_little_endian, struct_format=None, enc
     return byte_string
 
 
-def convert_SQ(byte_string, is_implicit_VR, is_little_endian, offset=0):
+def convert_SQ(byte_string, is_implicit_VR, is_little_endian,
+               encoding=default_encoding, offset=0):
     """Convert a sequence that has been read as bytes but not yet parsed."""
     fp = BytesIO(byte_string)
-    seq = read_sequence(fp, is_implicit_VR, is_little_endian, len(byte_string), offset)
+    seq = read_sequence(fp, is_implicit_VR, is_little_endian, len(byte_string),
+                        encoding, offset)
     return seq
 
 
@@ -191,7 +194,8 @@ def convert_value(VR, raw_data_element, encoding=default_encoding):
     elif VR != "SQ":
         value = converter(byte_string, is_little_endian, num_format)
     else:
-        value = convert_SQ(byte_string, is_implicit_VR, is_little_endian, raw_data_element.value_tell)
+        value = convert_SQ(byte_string, is_implicit_VR, is_little_endian,
+                           encoding, raw_data_element.value_tell)
     return value
 
 # converters map a VR to the function to read the value(s).
