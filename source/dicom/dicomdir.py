@@ -71,8 +71,9 @@ class DicomDir(FileDataset):
         records = self.DirectoryRecordSequence
         map_offset_to_record = {}
         for record in records:
-            offset = record.file_tell
+            offset = record.seq_item_tell
             map_offset_to_record[offset] = record
+        # logging.debug("Record offsets: " + map_offset_to_record.keys())
 
         # Find the children of each record
         for record in records:

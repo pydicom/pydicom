@@ -321,8 +321,10 @@ def read_dataset(fp, is_implicit_VR, is_little_endian, bytelength=None,
     return Dataset(raw_data_elements)
 
 
-def read_sequence(fp, is_implicit_VR, is_little_endian, bytelength, encoding, offset=0):
+def read_sequence(fp, is_implicit_VR, is_little_endian, bytelength, encoding,
+                  offset=0):
     """Read and return a Sequence -- i.e. a list of Datasets"""
+
     seq = []  # use builtin list to start for speed, convert to Sequence at end
     is_undefined_length = False
     if bytelength != 0:  # SQ of length 0 possible (PS 3.5-2008 7.5.1a (p.40)
@@ -333,7 +335,8 @@ def read_sequence(fp, is_implicit_VR, is_little_endian, bytelength, encoding, of
         fpStart = fp_tell()
         while (not bytelength) or (fp_tell() - fpStart < bytelength):
             file_tell = fp.tell()
-            dataset = read_sequence_item(fp, is_implicit_VR, is_little_endian, encoding)
+            dataset = read_sequence_item(fp, is_implicit_VR, is_little_endian,
+                                         encoding, offset)
             if dataset is None:  # None is returned if hit Sequence Delimiter
                 break
             dataset.file_tell = file_tell + offset
@@ -343,9 +346,9 @@ def read_sequence(fp, is_implicit_VR, is_little_endian, bytelength, encoding, of
     return seq
 
 
-def read_sequence_item(fp, is_implicit_VR, is_little_endian, encoding):
+def read_sequence_item(fp, is_implicit_VR, is_little_endian, encoding, offset=0):
     """Read and return a single sequence item, i.e. a Dataset"""
-    data_set_tell = fp.tell()
+    seq_item_tell = fp.tell() + offset
     if is_little_endian:
         tag_length_format = "<HHL"
     else:
@@ -355,20 +358,20 @@ def read_sequence_item(fp, is_implicit_VR, is_little_endian, encoding):
         group, element, length = unpack(tag_length_format, bytes_read)
     except:
         raise IOError("No tag to read at file position "
-                      "{0:05x}".format(fp.tell()))
+                      "{0:05x}".format(fp.tell() + offset))
     tag = (group, element)
     if tag == SequenceDelimiterTag:  # No more items, time to stop reading
-        logger.debug("{0:08x}: {1}".format(fp.tell() - 8, "End of Sequence"))
+        logger.debug("{0:08x}: {1}".format(fp.tell() - 8 + offset, "End of Sequence"))
         if length != 0:
             logger.warning("Expected 0x00000000 after delimiter, found 0x%x,"
-                           " at position 0x%x" % (length, fp.tell() - 4))
+                           " at position 0x%x" % (length, fp.tell() - 4 + offset))
         return None
     if tag != ItemTag:
         logger.warning("Expected sequence item with tag %s at file position "
-                       "0x%x" % (ItemTag, fp.tell() - 4))
+                       "0x%x" % (ItemTag, fp.tell() - 4 + offset))
     else:
         logger.debug("{0:08x}: {1}  Found Item tag (start of item)".format(
-            fp.tell() - 4, bytes2hex(bytes_read)))
+            fp.tell() - 4 + offset, bytes2hex(bytes_read)))
     if length == 0xFFFFFFFFL:
         ds = read_dataset(fp, is_implicit_VR, is_little_endian,
                           bytelength=None, parent_encoding=encoding)
@@ -377,8 +380,8 @@ def read_sequence_item(fp, is_implicit_VR, is_little_endian, encoding):
         ds = read_dataset(fp, is_implicit_VR, is_little_endian, length,
                           parent_encoding=encoding)
         ds.is_undefined_length_sequence_item = False
-        logger.debug("%08x: Finished sequence item" % fp.tell())
-    ds.file_tell = data_set_tell
+        logger.debug("%08x: Finished sequence item" % (fp.tell() + offset,))
+    ds.seq_item_tell = seq_item_tell
     return ds
 
 

@@ -42,6 +42,10 @@ if __name__ == "__main__":
                 plural = ('', 's')[image_count > 1]
 
                 # Write basic series info and image count
+                 
+                # Put N/A in if no Series Description
+                if not 'SeriesDescription' in series:
+                    series.SeriesDescription = "N/A"
                 print (" " * 8 + "Series {0.SeriesNumber}:  {0.Modality}: {0.SeriesDescription}"
                        " ({1} image{2})".format(series, image_count, plural))
 
