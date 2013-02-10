@@ -10,6 +10,7 @@
 import sys
 import dicom
 import os.path
+from pprint import pprint
 # dicom.debug()
 
 
@@ -42,7 +43,7 @@ if __name__ == "__main__":
                 plural = ('', 's')[image_count > 1]
 
                 # Write basic series info and image count
-                 
+
                 # Put N/A in if no Series Description
                 if not 'SeriesDescription' in series:
                     series.SeriesDescription = "N/A"
@@ -55,7 +56,27 @@ if __name__ == "__main__":
                 image_records = series.children
                 image_filenames = [os.path.join(base_dir, *image_rec.ReferencedFileID)
                                    for image_rec in image_records]
-                slice_locations = [dicom.read_file(image_filename).SliceLocation
-                                   for image_filename in image_filenames]
-                print (" " * 12 + "Slice Locations from "
-                       "{0} to {1}".format(min(slice_locations), max(slice_locations)))
+                
+                # slice_locations = [dicom.read_file(image_filename).SliceLocation
+                #                   for image_filename in image_filenames]
+                
+                datasets = [dicom.read_file(image_filename)
+                            for image_filename in image_filenames]
+                
+                patient_names = set(ds.PatientName for ds in datasets)
+                patient_IDs = set(ds.PatientID for ds in datasets)
+                
+                # List the image filenames
+                print "\n" + " " * 12 + "Image filenames:"
+                print " " * 12,
+                pprint(image_filenames, indent=12) 
+                
+                # Expect all images to have same patient name, id
+                # Show the set of all names, IDs found (should each have one)
+                print (" " * 12 + "Patient Names in images..: "
+                       "{0:s}".format(patient_names))
+                print (" " * 12 + "Patient IDs in images..:"
+                       "{0:s}".format(patient_IDs))
+                
+                # print (" " * 12 + "Slice Locations from "
+                #       "{0} to {1}".format(min(slice_locations), max(slice_locations)))

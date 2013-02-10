@@ -10,15 +10,15 @@ import sys
 
 extra = {}
 
-# Uncomment the following two lines to test in python 3
-# if sys.version_info >= (3,):
-#    extra['use_2to3'] = True
+
+if sys.version_info >= (3,):
+    extra['use_2to3'] = True
 
 setup(
     name="pydicom",
     packages=find_packages(),
     include_package_data=True,
-    version="0.9.8",
+    version="1.0.0a",
     package_data={'dicom': ['testfiles/*.dcm']},
     zip_safe=False,  # want users to be able to see included examples,tests
     description="Pure python package for DICOM medical file reading and writing",
@@ -32,14 +32,14 @@ setup(
         "Intended Audience :: Developers",
         "Intended Audience :: Healthcare Industry",
         "Intended Audience :: Science/Research",
-        "Development Status :: 4 - Beta",
+        "Development Status :: 5 - Production/Stable",
         "Programming Language :: Python",
         "Programming Language :: Python :: 2.6",
         "Programming Language :: Python :: 2.7",
-        #"Programming Language :: Python :: 3.0",
-        #"Programming Language :: Python :: 3.1",
-        #"Programming Language :: Python :: 3.2",
-        #"Programming Language :: Python :: 3.3",
+        "Programming Language :: Python :: 3.0",
+        "Programming Language :: Python :: 3.1",
+        "Programming Language :: Python :: 3.2",
+        "Programming Language :: Python :: 3.3",
         "Operating System :: OS Independent",
         "Topic :: Scientific/Engineering :: Medical Science Apps.",
         "Topic :: Scientific/Engineering :: Physics",
