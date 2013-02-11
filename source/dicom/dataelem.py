@@ -25,8 +25,6 @@ from dicom import in_py3
 if in_py3:
     from dicom.valuerep import PersonName3 as PersonNameUnicode
     PersonName = PersonNameUnicode
-else:
-    from dicom.valuerep import DSfloat, DSdecimal
 
 from collections import namedtuple
 
@@ -199,8 +197,6 @@ class DataElement(object):
             repVal = "Array of %d bytes" % len(self.value)
         elif hasattr(self, 'original_string'):  # for VR of IS or DS
             repVal = repr(self.original_string)
-        elif isinstance(self.value, (DSfloat, DSdecimal)):
-            repVal = repr(self.value)
         elif isinstance(self.value, UID):
             repVal = self.value.name
         else:
