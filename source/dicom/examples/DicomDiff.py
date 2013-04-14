@@ -28,8 +28,8 @@ if len(sys.argv) != 3:
     print(usage)
     sys.exit()
 
-datasets = dicom.read_file(sys.argv[1]), \
-    dicom.read_file(sys.argv[2])
+datasets = (dicom.read_file(sys.argv[1], force=True),
+            dicom.read_file(sys.argv[2], force=True))
 
 # diflib compare functions require a list of lines, each terminated with newline character
 # massage the string representation of each dicom dataset into this form:
