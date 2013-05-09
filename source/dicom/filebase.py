@@ -31,14 +31,14 @@ class DicomIO(object):
         bytes_read = self.read(4)
         if len(bytes_read) < 4:
             raise EOFError  # needed for reading "next" tag when at end of file
-        return unpack(bytes_read, b"<HH")
+        return unpack(b"<HH", bytes_read)
 
     def read_be_tag(self):
         """Read and return two unsigned shorts (little endian) from the file."""
         bytes_read = self.read(4)
         if len(bytes_read) < 4:
             raise EOFError  # needed for reading "next" tag when at end of file
-        return unpack(bytes_read, b">HH")
+        return unpack(b">HH", bytes_read)
 
     def write_tag(self, tag):
         """Write a dicom tag (two unsigned shorts) to the file."""
