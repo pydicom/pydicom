@@ -244,6 +244,22 @@ class DatasetTests(unittest.TestCase):
         ds = self.dummy_dataset()
         self.assertRaises(AttributeError, try_delete)
 
+    def testDeleteItemLong(self):
+        """Dataset: delete item by tag number (long)..................."""
+        ds = self.dummy_dataset()
+        del ds[0x300a00b2]
+
+    def testDeleteItemTuple(self):
+        """Dataset: delete item by tag number (tuple).................."""
+        ds = self.dummy_dataset()
+        del ds[0x300a, 0x00b2]
+
+    def testDeleteNonExistingItem(self):
+        """Dataset: raise KeyError for non-existing item delete........"""
+        ds = self.dummy_dataset()
+        def try_delete():
+            del ds[0x10, 0x10]
+        self.assertRaises(KeyError, try_delete)
 
 class DatasetElementsTests(unittest.TestCase):
     """Test valid assignments of data elements"""
