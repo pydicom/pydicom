@@ -154,7 +154,7 @@ class Dataset(dict):
         # First check if a valid DICOM keyword and if we have that data element
         tag = tag_for_name(name)
         if tag and tag in self:
-            del self[tag]
+            dict.__delitem__(self, tag)  # direct to dict as we know we have key
         # If not a DICOM name in this dataset, check for regular instance name
         #   can't do delete directly, that will call __delattr__ again
         elif name in self.__dict__:
@@ -162,6 +162,16 @@ class Dataset(dict):
         # Not found, raise an error in same style as python does
         else:
             raise AttributeError(name)
+    
+    def __delitem__(self, key):
+        """Intercept requests to delete an attribute by key, e.g. del ds[tag]"""
+        # Assume is a standard tag (for speed in common case)
+        try:
+            dict.__delitem__(self, key)
+        # If not a standard tag, than convert to Tag and try again
+        except KeyError:
+            tag = Tag(key)
+            dict.__delitem__(self, tag)
 
     def __dir__(self):
         """Give a list of attributes available in the dataset
