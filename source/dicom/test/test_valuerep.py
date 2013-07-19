@@ -104,6 +104,14 @@ class PersonNametests(unittest.TestCase):
         got = (pn.family_name, pn.given_name)
         self.assertEqual(got, expected, "PN: Expected single_byte name '{0!s}', got '{1!s}'".format(expected, got))
 
+    def testNotEqual(self):
+        """PN3: Not equal works correctly (issue 121)..........................."""
+        # Meant to only be used in python 3 but doing simple check here
+        from dicom.valuerep import PersonName3
+        pn = PersonName3("John^Doe")
+        msg = "PersonName3 not equal comparison did not work correctly"
+        self.assertFalse(pn != "John^Doe", msg)
+
 
 if __name__ == "__main__":
     unittest.main()

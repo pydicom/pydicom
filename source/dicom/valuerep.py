@@ -240,6 +240,9 @@ class PersonName3(object):
     def __eq__(self, other):
         return self.original_string == other
 
+    def __ne__(self, other):
+        return not self == other
+
     def __str__(self):
         return self.original_string.__str__()
 
