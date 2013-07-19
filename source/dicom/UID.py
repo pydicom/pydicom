@@ -103,7 +103,9 @@ class UID(str):
         if str.__eq__(self.name, other) is True:  # 'is True' needed (issue 96)
             return True
         return False
-
+    def __ne__(self, other):
+        return not self == other
+        
     def is_valid(self):
         '''
         Raise an exception is the UID is invalid

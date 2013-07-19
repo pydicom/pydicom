@@ -47,6 +47,13 @@ class UIDtests(unittest.TestCase):
         uid = UID('1.2.3')
         self.assertNotEqual(uid, 3, "Comparison to a number returned True")
 
+    def testCompareNotEqualByName(self):
+        """UID: comparing not equal by name......................."""
+        # from Issue 121
+        ct_image_storage = UID('1.2.840.10008.5.1.4.1.1.2')
+        msg = "UID not equal comparison by name was not correct"
+        self.assertFalse(ct_image_storage != 'CT Image Storage', msg)
+        
     def testCompareNone(self):
         """UID: comparing against None give False................."""
         # From issue 96
