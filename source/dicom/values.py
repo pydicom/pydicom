@@ -232,6 +232,7 @@ converters = {
     'OW or OB': convert_OBvalue,
     'OB or OW': convert_OBvalue,
     'US or SS': convert_OWvalue,
+    'US or OW': convert_OWvalue,
     'US or SS or OW': convert_OWvalue,
     'US\\US or SS\\US': convert_OWvalue,
     'DT': convert_string,
