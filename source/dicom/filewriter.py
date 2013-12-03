@@ -28,6 +28,7 @@ def write_numbers(fp, data_element, struct_format):
     struct_format -- the character format as used by the struct module.
 
     """
+    convert = int if struct_format in 'HhIiLlqQ' else float
     endianChar = '><'[fp.is_little_endian]
     value = data_element.value
     if value == "":
@@ -38,10 +39,10 @@ def write_numbers(fp, data_element, struct_format):
         try:
             value.append   # works only if list, not if string or number
         except:  # is a single value - the usual case
-            fp.write(pack(format_string, value))
+            fp.write(pack(format_string, convert(value)))
         else:
             for val in value:
-                fp.write(pack(format_string, val))
+                fp.write(pack(format_string, convert(val)))
     except Exception as e:
         raise IOError("{0}\nfor data_element:\n{1}".format(str(e), str(data_element)))
 
