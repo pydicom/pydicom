@@ -20,5 +20,6 @@ if __name__ == "__main__":
             lines.append("        '{key}': {val:s},".format(key=key, val=current_dict[key]))
         lines.append("    },")
     lines.append("}")
-    print "\n".join(lines)
+    outfile.write("\n".join(lines))
+    outfile.close()
     

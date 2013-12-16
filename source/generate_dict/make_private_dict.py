@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from __future__ import with_statement
 
 # file "make_private_dict.py"
@@ -37,8 +39,8 @@ import os
 import pprint
 
 
-GDCM_URL = ''.join(('http://gdcm.svn.sf.net/viewvc/gdcm/trunk',
-                    '/Source/DataDictionary/privatedicts.xml'))
+GDCM_URL = 'https://raw.github.com/malaterre/GDCM/master/' \
+           'Source/DataDictionary/privatedicts.xml'
 UNKNOWN_NAME = 'Unknown'
 PRIVATE_DICT_NAME = 'private_dictionaries'
 
