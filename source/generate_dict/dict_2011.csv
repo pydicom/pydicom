@@ -1,4 +1,52 @@
 "Tag","Name","Keyword","VR","VM",
+"(0000,0000)","Command Group Length","CommandGroupLength","UL",1,
+"(0000,0001)","Command Length to End","CommandLengthToEnd","UL","1","RET"
+"(0000,0002)","Affected SOP Class UID","AffectedSOPClassUID","UI",1,
+"(0000,0003)","Requested SOP Class UID","RequestedSOPClassUID","UI",1,
+"(0000,0010)","Command Recognition Code","CommandRecognitionCode","SH","1","RET"
+"(0000,0100)","Command Field","CommandField","US",1,
+"(0000,0110)","Message ID","MessageID","US",1,
+"(0000,0120)","Message ID Being Responded To","MessageIDBeingRespondedTo","US",1,
+"(0000,0200)","Initiator","Initiator","AE","1","RET"
+"(0000,0300)","Receiver","Receiver","AE","1","RET"
+"(0000,0400)","Find Location","FindLocation","AE","1","RET"
+"(0000,0600)","Move Destination","MoveDestination","AE",1,
+"(0000,0700)","Priority","Priority","US",1,
+"(0000,0800)","Command Data Set Type","CommandDataSetType","US",1,
+"(0000,0850)","Number of Matches","NumberOfMatches","US","1","RET"
+"(0000,0860)","Response Sequence Number","ResponseSequenceNumber","US","1","RET"
+"(0000,0900)","Status","Status","US",1,
+"(0000,0901)","Offending Element","OffendingElement","AT","1-n",
+"(0000,0902)","Error Comment","ErrorComment","LO",1,
+"(0000,0903)","Error ID","ErrorID","US",1,
+"(0000,1000)","Affected SOP Instance UID","AffectedSOPInstanceUID","UI",1,
+"(0000,1001)","Requested SOP Instance UID","RequestedSOPInstanceUID","UI",1,
+"(0000,1002)","Event Type ID","EventTypeID","US",1,
+"(0000,1005)","Attribute Identifier List","AttributeIdentifierList","AT","1-n",
+"(0000,1008)","Action Type ID","ActionTypeID","US",1,
+"(0000,1020)","Number of Remaining Sub-operations","NumberOfRemainingSuboperations","US",1,
+"(0000,1021)","Number of Completed Sub-operations","NumberOfCompletedSuboperations","US",1,
+"(0000,1022)","Number of Failed Sub-operations","NumberOfFailedSuboperations","US",1,
+"(0000,1023)","Number of Warning Sub-operations","NumberOfWarningSuboperations","US",1,
+"(0000,1030)","Move Originator Application Entity Title","MoveOriginatorApplicationEntityTitle","AE",1,
+"(0000,1031)","Move Originator Message ID","MoveOriginatorMessageID","US",1,
+"(0000,4000)","Dialog Receiver","DialogReceiver","LT","1","RET"
+"(0000,4010)","Terminal Type","TerminalType","LT","1","RET"
+"(0000,5010)","Message Set ID","MessageSetID","SH","1","RET"
+"(0000,5020)","End Message ID","EndMessageID","SH","1","RET"
+"(0000,5110)","Display Format","DisplayFormat","LT","1","RET"
+"(0000,5120)","Page Position ID","PagePositionID","LT","1","RET"
+"(0000,5130)","Text Format ID","TextFormatID","CS","1","RET"
+"(0000,5140)","Normal/Reverse","NormalReverse","CS","1","RET"
+"(0000,5150)","Add Gray Scale","AddGrayScale","CS","1","RET"
+"(0000,5160)","Borders","Borders","CS","1","RET"
+"(0000,5170)","Copies","Copies","IS","1","RET"
+"(0000,5180)","Command Magnification Type","CommandMagnificationType","CS","1","RET"
+"(0000,5190)","Erase","Erase","CS","1","RET"
+"(0000,51A0)","Print","Print","CS","1","RET"
+"(0000,51B0)","Overlays","Overlays","US","1-n","RET"
+,,,,,
+"Tag","Name","Keyword","VR","VM",
 "(0002,0000)","File Meta Information Group Length","FileMetaInformationGroupLength","UL",1,
 "(0002,0001)","File Meta Information Version","FileMetaInformationVersion","OB",1,
 "(0002,0002)","Media Storage SOP Class UID","MediaStorageSOPClassUID","UI",1,
@@ -2022,13 +2070,13 @@
 "(0040,E008)","Document Class Code Sequence","DocumentClassCodeSequence","SQ",1,
 "(0040,E010)","Retrieve URI ","RetrieveURI","UT",1,
 "(0040,E011)","Retrieve Location UID","RetrieveLocationUID","UI",1,
-"(,E020)","Type of Instances","TypeOfInstances","CS",1,
-"(,E021)","DICOM Retrieval Sequence","DICOMRetrievalSequence","SQ",1,
-"(,E022)","DICOM Media Retrieval Sequence","DICOMMediaRetrievalSequence","SQ",1,
-"(,E023)","WADO Retrieval Sequence","WADORetrievalSequence","SQ",1,
-"(,E024)","XDS Retrieval Sequence","XDSRetrievalSequence","SQ",1,
-"(,E030)","Repository Unique ID","RepositoryUniqueID","UI",1,
-"(,E031)","Home Community ID","HomeCommunityID","UI",1,
+"(0040,E020)","Type of Instances","TypeOfInstances","CS",1,
+"(0040,E021)","DICOM Retrieval Sequence","DICOMRetrievalSequence","SQ",1,
+"(0040,E022)","DICOM Media Retrieval Sequence","DICOMMediaRetrievalSequence","SQ",1,
+"(0040,E023)","WADO Retrieval Sequence","WADORetrievalSequence","SQ",1,
+"(0040,E024)","XDS Retrieval Sequence","XDSRetrievalSequence","SQ",1,
+"(0040,E030)","Repository Unique ID","RepositoryUniqueID","UI",1,
+"(0040,E031)","Home Community ID","HomeCommunityID","UI",1,
 ,,,,,
 "Tag","Name","Keyword","VR","VM",
 "(0042,0010)","Document Title","DocumentTitle","ST",1,
