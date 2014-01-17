@@ -585,7 +585,7 @@ def read_file(fp, defer_size=None, stop_before_pixels=False, force=False):
     if isinstance(fp, basestring):
         # caller provided a file name; we own the file handle
         caller_owns_file = False
-        logger.debug("Reading file '{0}'".format(fp))
+        logger.debug(u"Reading file '{0}'".format(fp))
         fp = open(fp, 'rb')
 
     if dicom.debugging:
@@ -632,7 +632,7 @@ def read_dicomdir(filename="DICOMDIR"):
     # Here, check that it is in fact DicomDir
     ds = read_file(filename)
     if not isinstance(ds, DicomDir):
-        msg = "File '{0}' is not a Media Storage Directory file".format(filename)
+        msg = u"File '{0}' is not a Media Storage Directory file".format(filename)
         raise InvalidDicomError(msg)
     return ds
 
@@ -660,7 +660,7 @@ def read_deferred_data_element(fileobj_type, filename, timestamp,
                       "Cannot re-open")
     # Check that the file is the same as when originally read
     if not os.path.exists(filename):
-        raise IOError("Deferred read -- original file "
+        raise IOError(u"Deferred read -- original file "
                       "{0:s} is missing".format(filename))
     if stat_available and (timestamp is not None):
         statinfo = stat(filename)
