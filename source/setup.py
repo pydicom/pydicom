@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 from distribute_setup import use_setuptools
-use_setuptools(version="0.6.17")
+use_setuptools(version="0.6.49")
 
 from setuptools import setup, find_packages
 import os
@@ -40,6 +40,7 @@ setup(
         "Programming Language :: Python :: 3.1",
         "Programming Language :: Python :: 3.2",
         "Programming Language :: Python :: 3.3",
+        "Programming Language :: Python :: 3.4",
         "Operating System :: OS Independent",
         "Topic :: Scientific/Engineering :: Medical Science Apps.",
         "Topic :: Scientific/Engineering :: Physics",
