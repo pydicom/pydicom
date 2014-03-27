@@ -138,7 +138,7 @@ class RawSequenceTests(unittest.TestCase):
         raw_seq = next(gen)
         seq = convert_value("SQ", raw_seq)
 
-        self.assertTrue(isinstance(seq, Sequence), "Did not get Sequence, got type {0:s}".format(type(seq)))
+        self.assertTrue(isinstance(seq, Sequence), "Did not get Sequence, got type {0}".format(str(type(seq))))
         self.assertTrue(len(seq) == 1, "Expected Sequence with single (empty) item, got {0:d} item(s)".format(len(seq)))
         self.assertTrue(len(seq[0]) == 0, "Expected the sequence item (dataset) to be empty")
         elem2 = next(gen)

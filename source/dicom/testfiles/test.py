@@ -15,7 +15,7 @@ import dicom
 if __name__ == "__main__":
     dcmdir = dicom.read_dicomdir()
     for patrec in dcmdir.patient_records:
-        print "Patient: {0.PatientID}: {0.PatientsName}".format(patrec)
+        print("Patient: {0.PatientID}: {0.PatientsName}".format(patrec))
         studies = patrec.children
         for study in studies:
             print ("    Study {0.StudyID}: {0.StudyDate}:"
