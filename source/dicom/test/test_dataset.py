@@ -10,6 +10,7 @@ from dicom.dataset import Dataset, PropertyError
 from dicom.dataelem import DataElement, RawDataElement
 from dicom.tag import Tag
 from dicom.sequence import Sequence
+from dicom import in_py3
 
 
 class DatasetTests(unittest.TestCase):
@@ -32,8 +33,14 @@ class DatasetTests(unittest.TestCase):
         """Check the expected args were returned from an exception
         start_args -- a string with the start of the expected message
         """
-        # based on same link as failUnlessRaises override above
-        excObj = self.failUnlessRaises(excClass, callableObj)
+        if in_py3:
+            with self.assertRaises(excClass) as cm:
+                callableObj()
+
+            excObj = cm.exception
+        else:
+            excObj = self.failUnlessRaises(excClass, callableObj)
+
         msg = "\nExpected Exception message:\n" + start_args
         msg += "\nGot:\n" + excObj.args[0]
         self.assertTrue(excObj.args[0].startswith(start_args), msg)
