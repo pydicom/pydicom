@@ -45,8 +45,11 @@ multiPN_out = multiPN_name + '2'
 
 def files_identical(a, b):
     """Return a tuple (file a == file b, index of first difference)"""
-    a_bytes = open(a, "rb").read()
-    b_bytes = open(b, "rb").read()
+    with open(a, "rb") as A:
+        with open(b, "rb") as B:
+            a_bytes = A.read()
+            b_bytes = B.read()
+
     return bytes_identical(a_bytes, b_bytes)
 
 
@@ -186,7 +189,8 @@ class ScratchWriteTests(unittest.TestCase):
         out_filename = "scratch.dcm"
         file_ds.save_as(out_filename)
         std = hex2bytes(hex_std)
-        bytes_written = open(out_filename, 'rb').read()
+        with open(out_filename, 'rb') as f:
+            bytes_written = f.read()
         # print "std    :", bytes2hex(std)
         # print "written:", bytes2hex(bytes_written)
         same, pos = bytes_identical(std, bytes_written)

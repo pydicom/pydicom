@@ -347,7 +347,8 @@ class DeferredReadTests(unittest.TestCase):
             ds = read_file(self.testfile_name, defer_size=2000)
             from time import sleep
             sleep(1)
-            open(self.testfile_name, "r+").write('\0')  # "touch" the file
+            with open(self.testfile_name, "r+") as f:
+                f.write('\0')  # "touch" the file
             warning_start = "Deferred read warning -- file modification time "
 
             def read_value():
@@ -417,7 +418,8 @@ class FileLikeTests(unittest.TestCase):
 
     def testReadFileGivenFileLikeObject(self):
         """filereader: can read using a file-like (BytesIO) file...."""
-        file_like = BytesIO(open(ct_name, 'rb').read())
+        with open(ct_name, 'rb') as f:
+            file_like = BytesIO(f.read())
         ct = read_file(file_like)
         # Tests here simply repeat some of testCT test
         got = ct.ImagePositionPatient
