@@ -257,7 +257,7 @@ def _write_file_meta_info(fp, meta_dataset):
     fp.is_implicit_VR = False
 
     if Tag((2, 1)) not in meta_dataset:
-        meta_dataset.add_new((2, 1), b'OB', b"\0\1")   # file meta information version
+        meta_dataset.add_new((2, 1), 'OB', b"\0\1")   # file meta information version
 
     # Now check that required meta info tags are present:
     missing = []
