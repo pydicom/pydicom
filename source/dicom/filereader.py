@@ -212,7 +212,7 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian,
             if defer_size is not None and length > defer_size:
                 # Flag as deferred by setting value to None, and skip bytes
                 value = None
-                logger_debug("Defer size exceeded."
+                logger_debug("Defer size exceeded. "
                              "Skipping forward to next data element.")
                 fp.seek(fp_tell() + length)
             else:
@@ -363,8 +363,8 @@ def read_sequence_item(fp, is_implicit_VR, is_little_endian, encoding, offset=0)
     if tag == SequenceDelimiterTag:  # No more items, time to stop reading
         logger.debug("{0:08x}: {1}".format(fp.tell() - 8 + offset, "End of Sequence"))
         if length != 0:
-            logger.warning("Expected 0x00000000 after delimiter, found 0x%x,"
-                           " at position 0x%x" % (length, fp.tell() - 4 + offset))
+            logger.warning("Expected 0x00000000 after delimiter, found 0x%x, "
+                           "at position 0x%x" % (length, fp.tell() - 4 + offset))
         return None
     if tag != ItemTag:
         logger.warning("Expected sequence item with tag %s at file position "
@@ -591,8 +591,8 @@ def read_file(fp, defer_size=None, stop_before_pixels=False, force=False):
     if dicom.debugging:
         logger.debug("\n" + "-" * 80)
         logger.debug("Call to read_file()")
-        msg = ("filename:'%s', defer_size='%s'"
-               ", stop_before_pixels=%s, force=%s")
+        msg = ("filename:'%s', defer_size='%s', "
+               "stop_before_pixels=%s, force=%s")
         logger.debug(msg % (fp.name, defer_size, stop_before_pixels, force))
         if caller_owns_file:
             logger.debug("Caller passed file object")
