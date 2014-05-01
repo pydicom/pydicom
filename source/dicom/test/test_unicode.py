@@ -4,6 +4,7 @@
 import dicom
 import unittest
 
+
 class UnicodeFilenames(unittest.TestCase):
     def testRead(self):
         """Unicode: Can read a file with unicode characters in name................"""
@@ -15,8 +16,7 @@ class UnicodeFilenames(unittest.TestCase):
         # ignore file doesn't exist error
         except IOError:
             pass
-            
+
 
 if __name__ == "__main__":
     unittest.main()
-

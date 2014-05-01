@@ -162,7 +162,7 @@ class Dataset(dict):
         # Not found, raise an error in same style as python does
         else:
             raise AttributeError(name)
-    
+
     def __delitem__(self, key):
         """Intercept requests to delete an attribute by key, e.g. del ds[tag]"""
         # Assume is a standard tag (for speed in common case)
@@ -330,7 +330,7 @@ class Dataset(dict):
         :raises ImportError: if cannot import numpy.
 
         """
-        if not 'PixelData' in self:
+        if 'PixelData' not in self:
             raise TypeError("No pixel data found in this dataset.")
 
         if not have_numpy:

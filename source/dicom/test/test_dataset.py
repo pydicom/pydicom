@@ -96,7 +96,7 @@ class DatasetTests(unittest.TestCase):
         """Dataset: can test if item present by 'if <name> in dataset'......"""
         ds = self.dummy_dataset()
         self.assertTrue('TreatmentMachineName' in ds, "membership test failed")
-        self.assertTrue(not 'Dummyname' in ds, "non-member tested as member")
+        self.assertTrue('Dummyname' not in ds, "non-member tested as member")
 
     def testContains(self):
         """Dataset: can test if item present by 'if <tag> in dataset'......."""
@@ -267,6 +267,7 @@ class DatasetTests(unittest.TestCase):
         def try_delete():
             del ds[0x10, 0x10]
         self.assertRaises(KeyError, try_delete)
+
 
 class DatasetElementsTests(unittest.TestCase):
     """Test valid assignments of data elements"""

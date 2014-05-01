@@ -156,7 +156,7 @@ def _splitSerieIfRequired(serie, series):
     ds1 = L[0]
 
     # Check whether we can do this
-    if not "ImagePositionPatient" in ds1:
+    if "ImagePositionPatient" not in ds1:
         return
 
     # Initialize a list of new lists
@@ -365,7 +365,7 @@ def read_files(path, showProgress=False, readPixelData=False):
     showProgress('Loading series information:')
     for filename in files:
 
-         # Skip DICOMDIR files
+        # Skip DICOMDIR files
         if filename.count("DICOMDIR"):
             continue
 
