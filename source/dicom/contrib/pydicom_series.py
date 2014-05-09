@@ -301,7 +301,7 @@ def _getPixelDataFromDataset(ds):
 
 ## The public functions and classes
 
-def read_files(path, showProgress=False, readPixelData=False):
+def read_files(path, showProgress=False, readPixelData=False, force=False):
     """ read_files(path, showProgress=False, readPixelData=False)
 
     Reads dicom files and returns a list of DicomSeries objects, which
@@ -371,7 +371,7 @@ def read_files(path, showProgress=False, readPixelData=False):
 
         # Try loading dicom ...
         try:
-            dcm = dicom.read_file(filename, deferSize)
+            dcm = dicom.read_file(filename, deferSize, force=force)
         except dicom.filereader.InvalidDicomError:
             continue  # skip non-dicom file
         except Exception as why:
