@@ -152,17 +152,18 @@ def write_data_element(fp, data_element, encoding=default_encoding):
 
     encoding = convert_encodings(encoding)
 
+    writer_function, writer_param = writers[VR]
     if VR in text_VRs:
-        writers[VR](fp, data_element, encoding=encoding[1])
+        writer_function(fp, data_element, encoding=encoding[1])
     elif VR in ('PN', 'SQ'):
-        writers[VR](fp, data_element, encoding=encoding)
+        writer_function(fp, data_element, encoding=encoding)
     else:
-        try:
-            writers[VR][0]  # if writer is a tuple, then need to pass a number format
-        except TypeError:
-            writers[VR](fp, data_element)  # call the function to write that kind of item
+        # Many numeric types use the same writer but with numeric format parameter
+        if writer_param is not None:
+            writer_function(fp, data_element, writer_param)
         else:
-            writers[VR][0](fp, data_element, writers[VR][1])
+            writer_function(fp, data_element)
+            
     #  print DataElement(tag, VR, value)
 
     is_undefined_length = False
@@ -335,7 +336,7 @@ def write_file(filename, dataset, write_like_original=True):
             fp.write(preamble)  # blank 128 byte preamble
             _write_file_meta_info(fp, file_meta)
 
-        # Set file VR, endian. MUST BE AFTER writing META INFO (which changes to Explict LittleEndian)
+        # Set file VR, endian. MUST BE AFTER writing META INFO (which changes to Explicit LittleEndian)
         fp.is_implicit_VR = dataset.is_implicit_VR
         fp.is_little_endian = dataset.is_little_endian
 
@@ -346,28 +347,38 @@ def write_file(filename, dataset, write_like_original=True):
 # Map each VR to a function which can write it
 # for write_numbers, the Writer maps to a tuple (function, struct_format)
 #                                  (struct_format is python's struct module format)
-writers = {'UL': (write_numbers, 'L'), 'SL': (write_numbers, 'l'),
-           'US': (write_numbers, 'H'), 'SS': (write_numbers, 'h'),
-           'FL': (write_numbers, 'f'), 'FD': (write_numbers, 'd'),
+writers = {'UL': (write_numbers, 'L'),
+           'SL': (write_numbers, 'l'),
+           'US': (write_numbers, 'H'),
+           'SS': (write_numbers, 'h'),
+           'FL': (write_numbers, 'f'),
+           'FD': (write_numbers, 'd'),
            'OF': (write_numbers, 'f'),
-           'OB': write_OBvalue, 'UI': write_UI,
-           'SH': write_string, 'DA': write_string, 'TM': write_string,
-           'CS': write_string, 'PN': write_PN, 'LO': write_string,
-           'IS': write_number_string, 'DS': write_number_string, 'AE': write_string,
-           'AS': write_string,
-           'LT': write_string,
-           'SQ': write_sequence,
-           'UN': write_UN,
-           'AT': write_ATvalue,
-           'ST': write_string,
-           'OW': write_OWvalue,
-           'US or SS': write_OWvalue,
-           'US or OW': write_OWvalue,
-           'US or SS or OW': write_OWvalue,
-           'OW/OB': write_OBvalue,
-           'OB/OW': write_OBvalue,
-           'OB or OW': write_OBvalue,
-           'OW or OB': write_OBvalue,
-           'DT': write_string,
-           'UT': write_string,
+           'OB': (write_OBvalue, None),
+           'UI': (write_UI, None),
+           'SH': (write_string, None),
+           'DA': (write_string, None),
+           'TM': (write_string, None),
+           'CS': (write_string, None),
+           'PN': (write_PN, None),
+           'LO': (write_string, None),
+           'IS': (write_number_string, None),
+           'DS': (write_number_string, None),
+           'AE': (write_string, None),
+           'AS': (write_string, None),
+           'LT': (write_string, None),
+           'SQ': (write_sequence, None),
+           'UN': (write_UN, None),
+           'AT': (write_ATvalue, None),
+           'ST': (write_string, None),
+           'OW': (write_OWvalue, None),
+           'US or SS': (write_OWvalue, None),
+           'US or OW': (write_OWvalue, None),
+           'US or SS or OW': (write_OWvalue, None),
+           'OW/OB': (write_OBvalue, None),
+           'OB/OW': (write_OBvalue, None),
+           'OB or OW': (write_OBvalue, None),
+           'OW or OB': (write_OBvalue, None),
+           'DT': (write_string, None),
+           'UT': (write_string, None),
            }  # note OW/OB depends on other items, which we don't know at write time
