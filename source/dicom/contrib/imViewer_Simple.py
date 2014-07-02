@@ -1,4 +1,4 @@
-#==========================================================================
+# ==========================================================================
 # imViewer-Simple.py
 #
 #    An example program that opens uncompressed DICOM images and
@@ -26,7 +26,7 @@
 #               and PIL 1.1.7b1, Python 2.6.4, and wxPython 2.8.10.1
 #
 # Dave Witten:  Nov. 11, 2009
-#==========================================================================
+# ==========================================================================
 import dicom
 import wx
 have_PIL = True
@@ -40,9 +40,9 @@ try:
 except:
     have_numpy = False
 
-#----------------------------------------------------------------
+# ----------------------------------------------------------------
 #  Initialize image capabilities.
-#----------------------------------------------------------------
+# ----------------------------------------------------------------
 wx.InitAllImageHandlers()
 
 
@@ -64,9 +64,9 @@ class ImFrame(wx.Frame):
                           size=wx.Size(w=1024, h=768),
                           style=wx.DEFAULT_FRAME_STYLE | wx.SUNKEN_BORDER | wx.CLIP_CHILDREN)
 
-        #--------------------------------------------------------
+        # --------------------------------------------------------
         # Set up the menubar.
-        #--------------------------------------------------------
+        # --------------------------------------------------------
         self.mainmenu = wx.MenuBar()
 
         # Make the 'File' menu.
@@ -80,34 +80,34 @@ class ImFrame(wx.Frame):
         # Attach the menu bar to the window.
         self.SetMenuBar(self.mainmenu)
 
-        #--------------------------------------------------------
+        # --------------------------------------------------------
         # Set up the main splitter window.
-        #--------------------------------------------------------
+        # --------------------------------------------------------
         self.mainSplitter = wx.SplitterWindow(self, style=wx.NO_3D | wx.SP_3D)
         self.mainSplitter.SetMinimumPaneSize(1)
 
-        #-------------------------------------------------------------
+        # -------------------------------------------------------------
         # Create the folderTreeView on the left.
-        #-------------------------------------------------------------
+        # -------------------------------------------------------------
         self.dsTreeView = wx.TreeCtrl(self.mainSplitter, style=wx.TR_LINES_AT_ROOT | wx.TR_HAS_BUTTONS)
 
-        #--------------------------------------------------------
+        # --------------------------------------------------------
         # Create the ImageView on the right pane.
-        #--------------------------------------------------------
+        # --------------------------------------------------------
         self.imView = wx.Panel(self.mainSplitter, style=wx.VSCROLL | wx.HSCROLL | wx.CLIP_CHILDREN)
         self.imView.Bind(wx.EVT_PAINT, self.OnPaint)
         self.imView.Bind(wx.EVT_ERASE_BACKGROUND, self.OnEraseBackground)
         self.imView.Bind(wx.EVT_SIZE, self.OnSize)
 
-        #--------------------------------------------------------
+        # --------------------------------------------------------
         # Install the splitter panes.
-        #--------------------------------------------------------
+        # --------------------------------------------------------
         self.mainSplitter.SplitVertically(self.dsTreeView, self.imView)
         self.mainSplitter.SetSashPosition(300, True)
 
-        #--------------------------------------------------------
+        # --------------------------------------------------------
         # Initialize some values
-        #--------------------------------------------------------
+        # --------------------------------------------------------
         self.dcmdsRoot = False
         self.foldersRoot = False
         self.loadCentered = True
@@ -152,7 +152,7 @@ class ImFrame(wx.Frame):
                     parentNodeID = self.dsTreeView.AppendItem(ip, text=item_text.rjust(128))
                     self.recurse_tree(ds, parentNodeID)
 
-## --- Most of what is important happens below this line ---------------------
+# --- Most of what is important happens below this line ---------------------
 
     def OnFileOpen(self, event):
         """Opens a selected file."""
@@ -182,11 +182,11 @@ class ImFrame(wx.Frame):
                 bmpY0 = (windowsize[1] - self.bitmap.Height) / 2
             dc.DrawBitmap(self.bitmap, bmpX0, bmpY0, False)
 
-    #------------------------------------------------------------
+    # ------------------------------------------------------------
     #  ImFrame.ConvertWXToPIL()
     #  Expropriated from Andrea Gavana's
     #  ShapedButton.py in the wxPython dist
-    #------------------------------------------------------------
+    # ------------------------------------------------------------
     def ConvertWXToPIL(self, bmp):
         """ Convert wx.Image Into PIL Image. """
         width = bmp.GetWidth()
@@ -195,11 +195,11 @@ class ImFrame(wx.Frame):
         im.fromarray("RGBA", (width, height), bmp.GetData())
         return im
 
-    #------------------------------------------------------------
+    # ------------------------------------------------------------
     #  ImFrame.ConvertPILToWX()
     #  Expropriated from Andrea Gavana's
     #  ShapedButton.py in the wxPython dist
-    #------------------------------------------------------------
+    # ------------------------------------------------------------
     def ConvertPILToWX(self, pil, alpha=True):
         """ Convert PIL Image Into wx.Image. """
         if alpha:
@@ -227,10 +227,10 @@ class ImFrame(wx.Frame):
                             [0, 255, lambda data: ((data - (level - 0.5)) / (window - 1) + 0.5) * (255 - 0)]
                             )
 
-    #-----------------------------------------------------------
+    # -----------------------------------------------------------
     # ImFrame.loadPIL_LUT(dataset)
     # Display an image using the Python Imaging Library (PIL)
-    #-----------------------------------------------------------
+    # -----------------------------------------------------------
     def loadPIL_LUT(self, dataset):
         if not have_PIL:
             raise ImportError("Python Imaging Library is not available. See http://www.pythonware.com/products/pil/ to download and install")
@@ -270,12 +270,12 @@ class ImFrame(wx.Frame):
                 self.bitmap = wx.BitmapFromImage(tmpImage)
                 self.Refresh()
 
-##------ This is just the initialization of the App  -------------------------
+# ------ This is just the initialization of the App  -------------------------
 
 
-#=======================================================
+# =======================================================
 # The main App Class.
-#=======================================================
+# =======================================================
 class App(wx.App):
     """Image Application."""
 
@@ -284,9 +284,9 @@ class App(wx.App):
         ImFrame(None, 'wxImage Example')
         return True
 
-#---------------------------------------------------------------------
+# ---------------------------------------------------------------------
 # If this file is running as main or a standalone test, begin execution here.
-#---------------------------------------------------------------------
+# ---------------------------------------------------------------------
 if __name__ == '__main__':
     app = App(0)
     app.MainLoop()

@@ -35,8 +35,8 @@ if __name__ == "__main__":
         print "Patient: {0.PatientID}: {0.PatientsName}".format(patrec)
         studies = patrec.children
         for study in studies:
-            print ("    Study {0.StudyID}: {0.StudyDate}:"
-                   " {0.StudyDescription}".format(study))
+            print("    Study {0.StudyID}: {0.StudyDate}:"
+                  " {0.StudyDescription}".format(study))
             all_series = study.children
             for series in all_series:
                 image_count = len(series.children)
@@ -47,8 +47,8 @@ if __name__ == "__main__":
                 # Put N/A in if no Series Description
                 if 'SeriesDescription' not in series:
                     series.SeriesDescription = "N/A"
-                print (" " * 8 + "Series {0.SeriesNumber}:  {0.Modality}: {0.SeriesDescription}"
-                       " ({1} image{2})".format(series, image_count, plural))
+                print(" " * 8 + "Series {0.SeriesNumber}:  {0.Modality}: {0.SeriesDescription}"
+                      " ({1} image{2})".format(series, image_count, plural))
 
                 # Open and read something from each image, for demonstration purposes
                 # For simple quick overview of DICOMDIR, leave the following out
@@ -73,10 +73,10 @@ if __name__ == "__main__":
 
                 # Expect all images to have same patient name, id
                 # Show the set of all names, IDs found (should each have one)
-                print (" " * 12 + "Patient Names in images..: "
-                       "{0:s}".format(patient_names))
-                print (" " * 12 + "Patient IDs in images..:"
-                       "{0:s}".format(patient_IDs))
+                print(" " * 12 + "Patient Names in images..: "
+                      "{0:s}".format(patient_names))
+                print(" " * 12 + "Patient IDs in images..:"
+                      "{0:s}".format(patient_IDs))
 
                 # print (" " * 12 + "Slice Locations from "
                 #       "{0} to {1}".format(min(slice_locations), max(slice_locations)))

@@ -264,6 +264,7 @@ class DatasetTests(unittest.TestCase):
     def testDeleteNonExistingItem(self):
         """Dataset: raise KeyError for non-existing item delete........"""
         ds = self.dummy_dataset()
+
         def try_delete():
             del ds[0x10, 0x10]
         self.assertRaises(KeyError, try_delete)

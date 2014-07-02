@@ -18,11 +18,11 @@ if __name__ == "__main__":
         print("Patient: {0.PatientID}: {0.PatientsName}".format(patrec))
         studies = patrec.children
         for study in studies:
-            print ("    Study {0.StudyID}: {0.StudyDate}:"
-                   " {0.StudyDescription}".format(study))
+            print("    Study {0.StudyID}: {0.StudyDate}:"
+                  " {0.StudyDescription}".format(study))
             all_series = study.children
             for series in all_series:
                 image_count = len(series.children)
                 plural = ('', 's')[image_count > 1]
-                print (" " * 8 + "Series {0.SeriesNumber}: {0.SeriesDescription}"
-                       " ({1} image{2})".format(series, image_count, plural))
+                print(" " * 8 + "Series {0.SeriesNumber}: {0.SeriesDescription}"
+                      " ({1} image{2})".format(series, image_count, plural))

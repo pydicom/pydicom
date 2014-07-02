@@ -53,7 +53,7 @@ except Exception:
     have_numpy = False
 
 
-## Helper functions and classes
+# Helper functions and classes
 class ProgressBar:
     """ To print progress to the screen.
     """
@@ -299,7 +299,7 @@ def _getPixelDataFromDataset(ds):
     return data
 
 
-## The public functions and classes
+# The public functions and classes
 
 def read_files(path, showProgress=False, readPixelData=False, force=False):
     """ read_files(path, showProgress=False, readPixelData=False)

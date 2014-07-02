@@ -173,10 +173,10 @@ class DataElement(object):
             return val  # this means a "numeric" value could be empty string ""
         # except TypeError:
             # print "Could not convert value '%s' to VR '%s' in tag %s" \
-                                # % (repr(val), self.VR, self.tag)
+            # % (repr(val), self.VR, self.tag)
         # except ValueError:
             # print "Could not convert value '%s' to VR '%s' in tag %s" \
-                               # % (repr(val), self.VR, self.tag)
+            # % (repr(val), self.VR, self.tag)
 
     def __str__(self):
         """Return str representation of this data_element"""

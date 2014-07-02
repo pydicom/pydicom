@@ -100,7 +100,7 @@ def get_PGM_from_numpy_arr(arr, window_center, window_width,
         arr[min_mask] = lut_min
     if to_scale.any():
         arr[to_scale] = ((arr[to_scale] - (wc - 0.5)) /
-                        (ww - 1.0) + 0.5) * lut_range + lut_min
+                         (ww - 1.0) + 0.5) * lut_range + lut_min
     if max_mask.any():
         arr[max_mask] = lut_max
 

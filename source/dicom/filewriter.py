@@ -126,7 +126,8 @@ def write_number_string(fp, data_element, padding=' '):
 
 
 def write_data_element(fp, data_element, encoding=default_encoding):
-    """Write the data_element to file fp according to dicom media storage rules."""
+    """Write the data_element to file fp according to dicom media storage rules.
+    """
     fp.write_tag(data_element.tag)
 
     VR = data_element.VR
@@ -163,7 +164,7 @@ def write_data_element(fp, data_element, encoding=default_encoding):
             writer_function(fp, data_element, writer_param)
         else:
             writer_function(fp, data_element)
-            
+
     #  print DataElement(tag, VR, value)
 
     is_undefined_length = False
@@ -191,7 +192,9 @@ def write_dataset(fp, dataset, parent_encoding=default_encoding):
     fpStart = fp.tell()
     # data_elements must be written in tag order
     tags = sorted(dataset.keys())
+
     for tag in tags:
+        # write_data_element(fp, dataset.get_item(tag), dataset_encoding)  XXX for writing raw tags without converting to DataElement
         write_data_element(fp, dataset[tag], dataset_encoding)
 
     return fp.tell() - fpStart

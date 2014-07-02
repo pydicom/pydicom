@@ -18,11 +18,11 @@ setup(
     name="pydicom",
     packages=find_packages(),
     include_package_data=True,
-    version="1.0.0a",
+    version="0.9.9",
     package_data={'dicom': ['testfiles/*.dcm']},
     zip_safe=False,  # want users to be able to see included examples,tests
     description="Pure python package for DICOM medical file reading and writing",
-    author="Darcy Mason",
+    author="Darcy Mason and contributors",
     author_email="darcymason@gmail.com",
     url="http://pydicom.googlecode.com",
     license="MIT license",
