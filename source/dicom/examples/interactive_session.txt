@@ -1,6 +1,8 @@
 Below is the captured text of a session at an interactive python prompt.
 I've tidied up some wrapped lines. pixel_array requires the Numpy library
 Assumed is started in the 'testfiles' directory
+Note: "<BLANKLINE>" is inserted here to match doctest testing of this code.
+If used in interactive session, you will simply see a blank line at those places.
 >>> import dicom
 >>> ct = dicom.read_file("CT_small.dcm")
 >>> ct.remove_private_tags()
@@ -20,8 +22,6 @@ array([[175, 180, 166, ..., 203, 207, 216],
        [906, 910, 923, ..., 922, 929, 927],
        [914, 954, 938, ..., 942, 925, 905],
        [959, 955, 916, ..., 911, 904, 909]], dtype=int16)
-
-       
 >>> plan = dicom.read_file("rtplan.dcm")
 >>> len(plan.BeamSequence)
 1
@@ -68,11 +68,11 @@ array([[175, 180, 166, ..., 203, 207, 216],
 >>> help(plan.save_as)
 Help on method save_as in module dicom.dataset:
 <BLANKLINE>
-save_as(self, filename, WriteLikeOriginal=True) method of dicom.dataset.FileDataset instance
+save_as(self, filename, write_like_original=True) method of dicom.dataset.FileDataset instance
     Write the dataset to a file.
 <BLANKLINE>
-    filename -- full path and filename to save the file to
-    WriteLikeOriginal -- see dicom.filewriter.write_file for info on this parameter.
+    :param filename: full path and filename to save the file to
+    :write_like_original: see dicom.filewriter.write_file for info on this parameter.
 <BLANKLINE>  
 >>> plan.save_as("rtplan_gantry90.dcm")
 >>> plan_g90 = dicom.read_file("rtplan_gantry90.dcm")

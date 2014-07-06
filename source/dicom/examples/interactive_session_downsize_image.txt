@@ -1,16 +1,19 @@
 Below is an example interactive session using pydicom to downsize an MR image
-from 512x512 to 64x64, and write it back to a file for pydicom unit tests
+from 512x512 to 64x64 (taking central section, not averaging pixels),
+and write it back to a file for pydicom unit tests
 NOTE: This example requires that the Numpy library be installed
 for manipulation of pixel data
-
+Note: "<BLANKLINE>" is inserted here to match doctest testing of this code.
+If used in interactive session, you will simply see a blank line at those places.
+Test in python: Anaconda 2.0.1 (64-bit)
 >>> import dicom
 >>> ds = dicom.read_file("mr1_unc.dcm")
 >>> data = ds.pixel_array
 >>> data.shape
-(512, 512)
+(512L, 512L)
 >>> data2 = data[256-32:256+32, 128-32:128+32]
 >>> data2.shape
-(64, 64)
+(64L, 64L)
 >>> ds.PixelData = data2.tostring()
 >>> ds.Rows = 64
 >>> ds.Columns = 64
