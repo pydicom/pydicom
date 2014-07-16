@@ -57,6 +57,8 @@ priv_SQ_name = os.path.join(test_files, "priv_SQ.dcm")
 nested_priv_SQ_name = os.path.join(test_files, "nested_priv_SQ.dcm")
 no_meta_group_length = os.path.join(test_files, "no_meta_group_length.dcm")
 gzip_name = os.path.join(test_files, "zipMR.gz")
+color_px_name = os.path.join(test_files, "color-px.dcm")
+color_pl_name = os.path.join(test_files, "color-pl.dcm")
 
 dir_name = os.path.dirname(sys.argv[0])
 save_dir = os.getcwd()
@@ -285,6 +287,11 @@ class ReaderTests(unittest.TestCase):
         expected = "20111130"
         self.assertEqual(got, expected, "Sample data element after file meta with no group length failed, expected '%s', got '%s'" % (expected, got))
 
+    def testPlanarConfig(self):
+        if have_numpy:
+            px_data = read_file(color_px_name).pixel_array
+            pl_data = read_file(color_pl_name).pixel_array
+            self.assertTrue(numpy.all(px_data == pl_data))
 
 class JPEG2000Tests(unittest.TestCase):
     def setUp(self):
