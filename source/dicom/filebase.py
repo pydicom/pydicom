@@ -138,9 +138,9 @@ class DicomFileLike(DicomIO):
 
     def __init__(self, file_like_obj):
         self.parent = file_like_obj
-        self.parent_read = file_like_obj.read
+        self.parent_read = getattr(file_like_obj, "read", self.no_read)
         self.write = getattr(file_like_obj, "write", self.no_write)
-        self.seek = file_like_obj.seek
+        self.seek = getattr(file_like_obj, "seek", self.no_seek)
         self.tell = file_like_obj.tell
         self.close = file_like_obj.close
         self.name = getattr(file_like_obj, 'name', '<no filename>')
@@ -148,6 +148,14 @@ class DicomFileLike(DicomIO):
     def no_write(self, bytes_read):
         """Used for file-like objects where no write is available"""
         raise IOError("This DicomFileLike object has no write() method")
+
+    def no_read(self, bytes_read):
+        """Used for file-like objects where no read is available"""
+        raise IOError("This DicomFileLike object has no read() method")
+
+    def no_seek(offset, from_what):
+        """Used for file-like objects where no seek is available"""
+        raise IOError("This DicomFileLike object has no seek() method")
 
 
 def DicomFile(*args, **kwargs):
