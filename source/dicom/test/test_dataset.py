@@ -61,6 +61,31 @@ class DatasetTests(unittest.TestCase):
         self.failUnlessExceptionArgs(attribute_error_msg,
                                      PropertyError, callable_pixel_array)
 
+    def testTagExceptionPrint(self):
+        # When printing datasets, a tag number should appear in error
+        # messages
+        ds = Dataset()
+        ds.PatientID = "123456" # Valid value
+        ds.SmallestImagePixelValue = 0 # Invalid value
+
+        expected_msg = "Invalid tag (0028, 0106): object of type 'int' has no len()"
+
+        self.failUnlessExceptionArgs(expected_msg, TypeError, lambda: str(ds))
+
+    def testTagExceptionWalk(self):
+        # When recursing through dataset, a tag number should appear in
+        # error messages
+        ds = Dataset()
+        ds.PatientID = "123456" # Valid value
+        ds.SmallestImagePixelValue = 0 # Invalid value
+
+        expected_msg = "Invalid tag (0028, 0106): object of type 'int' has no len()"
+
+        callback = lambda dataset, data_element: str(data_element)
+        func = lambda: ds.walk(callback)
+
+        self.failUnlessExceptionArgs(expected_msg, TypeError, func)
+
     def dummy_dataset(self):
         # This dataset is used by many of the tests
         ds = Dataset()
