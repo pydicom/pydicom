@@ -31,6 +31,7 @@ from dicom.datadict import tag_for_name, all_names_for_tag
 from dicom.tag import Tag, BaseTag
 from dicom.dataelem import DataElement, DataElement_from_raw, RawDataElement
 from dicom.UID import NotCompressedPixelTransferSyntaxes
+from dicom.tagtools import tag_in_exception
 import os.path
 
 import io
@@ -461,14 +462,15 @@ class Dataset(dict):
         indent_str = self.indent_chars * indent
         nextindent_str = self.indent_chars * (indent + 1)
         for data_element in self:
-            if data_element.VR == "SQ":   # a sequence
-                strings.append(indent_str + str(data_element.tag) + "  %s   %i item(s) ---- " % (data_element.description(), len(data_element.value)))
-                if not top_level_only:
-                    for dataset in data_element.value:
-                        strings.append(dataset._pretty_str(indent + 1))
-                        strings.append(nextindent_str + "---------")
-            else:
-                strings.append(indent_str + repr(data_element))
+            with tag_in_exception(data_element.tag):
+                if data_element.VR == "SQ":   # a sequence
+                    strings.append(indent_str + str(data_element.tag) + "  %s   %i item(s) ---- " % (data_element.description(), len(data_element.value)))
+                    if not top_level_only:
+                        for dataset in data_element.value:
+                            strings.append(dataset._pretty_str(indent + 1))
+                            strings.append(nextindent_str + "---------")
+                else:
+                    strings.append(indent_str + repr(data_element))
         return "\n".join(strings)
 
     def remove_private_tags(self):
@@ -587,8 +589,10 @@ class Dataset(dict):
         """
         taglist = sorted(self.keys())
         for tag in taglist:
-            data_element = self[tag]
-            callback(self, data_element)  # self = this Dataset
+
+            with tag_in_exception(tag):
+                data_element = self[tag]
+                callback(self, data_element)  # self = this Dataset
             # 'tag in self' below needed in case callback deleted data_element
             if recursive and tag in self and data_element.VR == "SQ":
                 sequence = data_element.value

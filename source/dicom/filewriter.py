@@ -18,6 +18,7 @@ from dicom.dataset import Dataset
 from dicom.dataelem import DataElement
 from dicom.tag import Tag, ItemTag, ItemDelimiterTag, SequenceDelimiterTag
 from dicom.valuerep import extra_length_VRs
+from dicom.tagtools import tag_in_exception
 
 
 def write_numbers(fp, data_element, struct_format):
@@ -194,8 +195,9 @@ def write_dataset(fp, dataset, parent_encoding=default_encoding):
     tags = sorted(dataset.keys())
 
     for tag in tags:
-        # write_data_element(fp, dataset.get_item(tag), dataset_encoding)  XXX for writing raw tags without converting to DataElement
-        write_data_element(fp, dataset[tag], dataset_encoding)
+        with tag_in_exception(tag):
+            # write_data_element(fp, dataset.get_item(tag), dataset_encoding)  XXX for writing raw tags without converting to DataElement
+            write_data_element(fp, dataset[tag], dataset_encoding)
 
     return fp.tell() - fpStart
 
