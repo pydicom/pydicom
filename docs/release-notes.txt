@@ -11,6 +11,7 @@ New features include DICOMDIR handling, and a utility module which produces pyth
   * Ability to work with DICOMDIR:  read_dicomdir() function and DicomDir class. Example file show_dicomdir.py file added to examples subdirectory.
   * codify.py: Produce python/pydicom source code from a dicom file.
   * a number of python 3 compatibility enhancements
+  * setup.py uses ez_setup only if setuptools not already installed
 
 == Contrib file changes ==
   * pydicom_series:  force parameter added (Nil Goyette)
@@ -18,7 +19,7 @@ New features include DICOMDIR handling, and a utility module which produces pyth
 
 == Other Contributors ==
 Other than Jonathan and myself, other contributors were: 
-Rickard Holmberg, Julien Lamy, Yaroslav Halchenko, Mark White, Dimitri Papadopoulos, ...(sorry if I've missed anyone).
+Rickard Holmberg, Julien Lamy, Yaroslav Halchenko, Mark White, Matthew Brett, Dimitri Papadopoulos, videan42 ...(sorry if I've missed anyone).
 
 
 = Release Notes pydicom 0.9.8 =
@@ -39,7 +40,7 @@ It also reverts the change to using Decimal for VR of DS (in pydicom 0.9.7), due
 
 
 == Enhancements ==
-  * UID generator added (Félix C. Morency) (revisions 0197b5846bb5 and 3678b1be6aca, tests in f1ae573d9de5, 0411bab7c985)
+  * UID generator added (FÃ©lix C. Morency) (revisions 0197b5846bb5 and 3678b1be6aca, tests in f1ae573d9de5, 0411bab7c985)
   * new PersonName3 class for python 3: (revision 9b92b336e7d4)
 
 == Contrib file changes ==
