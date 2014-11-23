@@ -1,7 +1,7 @@
 pydicom
 =======
 
-pydicom is a pure python package for working with [DICOM](http://http://medical.nema.org/) files. 
+pydicom is a pure python package for working with [DICOM](http://medical.nema.org/) files. 
 It was made for inspecting and modifying DICOM data in an easy "pythonic" way.
 The modifications can be written again to a new file.  
 
