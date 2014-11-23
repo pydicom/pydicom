@@ -12,7 +12,8 @@ New features include DICOMDIR handling, and a utility module which produces pyth
   * codify.py: Produce python/pydicom source code from a dicom file.
   * a number of python 3 compatibility enhancements
   * setup.py uses ez_setup only if setuptools not already installed
-
+  * exceptions carry tag info with them, to aid in debugging
+  
 == Contrib file changes ==
   * pydicom_series:  force parameter added (Nil Goyette)
   * dcm_qt_tree: switch to OrderedDict to preserve ordering of tags (Padraig Looney)
