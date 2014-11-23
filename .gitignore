@@ -1,6 +1,4 @@
-# .hgignore file
-#
-syntax: glob
+# .gitignore file
  
 # Backup files
 *~
