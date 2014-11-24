@@ -41,8 +41,8 @@ instance is created for each 3D volume.
 import os
 import time
 import gc
-import dicom
-from dicom.sequence import Sequence
+import pydicom
+from pydicom.sequence import Sequence
 
 # Try importing numpy
 try:

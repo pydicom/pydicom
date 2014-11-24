@@ -14,9 +14,9 @@ from __future__ import print_function
 
 import sys
 import os.path
-import dicom
-from dicom.dataset import Dataset, FileDataset
-import dicom.UID
+import pydicom
+from pydicom.dataset import Dataset, FileDataset
+import pydicom.UID
 
 if __name__ == "__main__":
     print("---------------------------- ")

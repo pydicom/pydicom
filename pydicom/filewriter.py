@@ -10,15 +10,15 @@ from struct import pack
 import logging
 logger = logging.getLogger('pydicom')
 
-from dicom import in_py3
-from dicom.charset import default_encoding, text_VRs, convert_encodings
-from dicom.UID import ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian
-from dicom.filebase import DicomFile, DicomFileLike
-from dicom.dataset import Dataset
-from dicom.dataelem import DataElement
-from dicom.tag import Tag, ItemTag, ItemDelimiterTag, SequenceDelimiterTag
-from dicom.valuerep import extra_length_VRs
-from dicom.tagtools import tag_in_exception
+from pydicom import in_py3
+from pydicom.charset import default_encoding, text_VRs, convert_encodings
+from pydicom.UID import ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian
+from pydicom.filebase import DicomFile, DicomFileLike
+from pydicom.dataset import Dataset
+from pydicom.dataelem import DataElement
+from pydicom.tag import Tag, ItemTag, ItemDelimiterTag, SequenceDelimiterTag
+from pydicom.valuerep import extra_length_VRs
+from pydicom.tagtools import tag_in_exception
 
 
 def write_numbers(fp, data_element, struct_format):

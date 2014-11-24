@@ -8,11 +8,11 @@
 # Many tests of DataElement class are implied in test_dataset also
 
 import unittest
-from dicom.dataelem import DataElement
-from dicom.dataelem import RawDataElement, DataElement_from_raw
-from dicom.tag import Tag
-from dicom.dataset import Dataset
-from dicom.UID import UID
+from pydicom.dataelem import DataElement
+from pydicom.dataelem import RawDataElement, DataElement_from_raw
+from pydicom.tag import Tag
+from pydicom.dataset import Dataset
+from pydicom.UID import UID
 
 
 class DataElementTests(unittest.TestCase):

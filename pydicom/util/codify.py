@@ -18,8 +18,8 @@ or import and use specific functions to provide code for pydicom DICOM classes
 # to create a DICOM file from scratch
 
 import sys
-import dicom
-from dicom.datadict import dictionary_keyword
+import pydicom
+from pydicom.datadict import dictionary_keyword
 
 import re
 
@@ -70,9 +70,9 @@ def code_imports():
     :return: a string of import statement lines
 
     """
-    line1 = "import dicom"
-    line2 = "from dicom.dataset import Dataset"
-    line3 = "from dicom.sequence import Sequence"
+    line1 = "import pydicom"
+    line2 = "from pydicom.dataset import Dataset"
+    line3 = "from pydicom.sequence import Sequence"
     return line_term.join((line1, line2, line3))
 
 

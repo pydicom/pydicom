@@ -6,8 +6,8 @@
 #    available at http://pydicom.googlecode.com
 
 import unittest
-from dicom.tag import Tag
-from dicom.datadict import CleanName, all_names_for_tag, dictionary_description
+from pydicom.tag import Tag
+from pydicom.datadict import CleanName, all_names_for_tag, dictionary_description
 
 
 class DictTests(unittest.TestCase):

@@ -6,8 +6,8 @@
 #    available at http://pydicom.googlecode.com
 
 from struct import pack, unpack
-from dicom.tag import TupleTag, Tag
-from dicom.datadict import dictionary_description
+from pydicom.tag import TupleTag, Tag
+from pydicom.datadict import dictionary_description
 
 import logging
 logger = logging.getLogger('pydicom')

@@ -8,7 +8,7 @@
 #
 
 import sys
-import dicom
+import pydicom
 import os.path
 from pprint import pprint
 # dicom.debug()

@@ -6,14 +6,14 @@
 #    available at http://pydicom.googlecode.com
 
 import unittest
-from dicom import in_py3
-import dicom.config
+from pydicom import in_py3
+import pydicom.config
 
 if in_py3:
-    from dicom.valuerep import PersonName3 as PersonNameUnicode
+    from pydicom.valuerep import PersonName3 as PersonNameUnicode
     PersonName = PersonNameUnicode
 else:
-    from dicom.valuerep import PersonName, PersonNameUnicode
+    from pydicom.valuerep import PersonName, PersonNameUnicode
 
 
 default_encoding = 'iso8859'
@@ -107,7 +107,7 @@ class PersonNametests(unittest.TestCase):
     def testNotEqual(self):
         """PN3: Not equal works correctly (issue 121)..........................."""
         # Meant to only be used in python 3 but doing simple check here
-        from dicom.valuerep import PersonName3
+        from pydicom.valuerep import PersonName3
         pn = PersonName3("John^Doe")
         msg = "PersonName3 not equal comparison did not work correctly"
         self.assertFalse(pn != "John^Doe", msg)

@@ -7,10 +7,10 @@
 
 from io import BytesIO
 import unittest
-from dicom.filereader import data_element_generator
-from dicom.values import convert_value
-from dicom.sequence import Sequence
-from dicom.util.hexutil import hex2bytes
+from pydicom.filereader import data_element_generator
+from pydicom.values import convert_value
+from pydicom.sequence import Sequence
+from pydicom.util.hexutil import hex2bytes
 
 
 class RawReaderExplVRTests(unittest.TestCase):
@@ -269,6 +269,6 @@ class RawSequenceTests(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    # import dicom
+    # import pydicom
     # dicom.debug()
     unittest.main()

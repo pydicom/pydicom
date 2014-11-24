@@ -27,7 +27,7 @@
 #
 # Dave Witten:  Nov. 11, 2009
 # ==========================================================================
-import dicom
+import pydicom
 import wx
 have_PIL = True
 try:

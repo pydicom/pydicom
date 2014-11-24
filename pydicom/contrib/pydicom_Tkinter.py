@@ -19,8 +19,8 @@ requires numpy:  http://numpy.scipy.org/
 
 Usage:
 ------
->>> import dicom              # pydicom
->>> import dicom.contrib.pydicom_Tkinter as pydicom_Tkinter    # this module
+>>> import pydicom              # pydicom
+>>> import pydicom.contrib.pydicom_Tkinter as pydicom_Tkinter    # this module
 
 >>> df = dicom.read_file(filename)
 >>> pydicom_Tkinter.show_image(df)

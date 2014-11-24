@@ -6,8 +6,8 @@
 #    available at http://pydicom.googlecode.com
 
 import unittest
-from dicom.dataset import Dataset
-from dicom.sequence import Sequence
+from pydicom.dataset import Dataset
+from pydicom.sequence import Sequence
 
 
 class SequenceTests(unittest.TestCase):

@@ -14,20 +14,17 @@ import sys
 extra = {}
 
 
-if sys.version_info >= (3,):
-    extra['use_2to3'] = True
-
 setup(
     name="pydicom",
     packages=find_packages(),
     include_package_data=True,
-    version="0.9.9",
-    package_data={'dicom': ['testfiles/*.dcm']},
+    version="1.0.0",
+    package_data={'pydicom': ['testfiles/*.dcm']},
     zip_safe=False,  # want users to be able to see included examples,tests
     description="Pure python package for DICOM medical file reading and writing",
     author="Darcy Mason and contributors",
     author_email="darcymason@gmail.com",
-    url="http://pydicom.googlecode.com",
+    url="http://github.com/darcymason/pydicom",
     license="MIT license",
     keywords="dicom python medical imaging",
     classifiers=[
@@ -62,7 +59,7 @@ setup(
     `Pydicom User Guide <http://code.google.com/p/pydicom/wiki/PydicomUserGuide>`_ page
     for an overview of how to use the pydicom library.
     """,
-    test_loader="dicom.test.run_tests:MyTestLoader",
+    test_loader="test.run_tests:MyTestLoader",
     test_suite="dummy_string",
     **extra
 )

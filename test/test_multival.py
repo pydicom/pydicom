@@ -6,9 +6,9 @@
 #    available at http://pydicom.googlecode.com
 
 import unittest
-from dicom.multival import MultiValue
-from dicom.valuerep import DS, DSfloat, DSdecimal, IS
-import dicom.config
+from pydicom.multival import MultiValue
+from pydicom.valuerep import DS, DSfloat, DSdecimal, IS
+import pydicom.config
 
 import sys
 python_version = sys.version_info

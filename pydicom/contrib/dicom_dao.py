@@ -35,7 +35,7 @@ import hashlib
 import os
 import string
 import couchdb
-import dicom
+import pydicom
 
 
 def uid2str(uid):

@@ -9,8 +9,8 @@
 
 import logging
 logger = logging.getLogger('pydicom')
-from dicom.valuerep import PersonNameUnicode, text_VRs
-from dicom import in_py3
+from pydicom.valuerep import PersonNameUnicode, text_VRs
+from pydicom import in_py3
 
 # Map DICOM Specific Character Set to python equivalent
 python_encoding = {

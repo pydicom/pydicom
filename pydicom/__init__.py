@@ -10,7 +10,7 @@ This file is part of pydicom, released under a modified MIT license.
 Quick Start
 -----------
 1. A simple program to read a dicom file, modify a value, and write to a new file::
-    import dicom
+    import pydicom
     dataset = dicom.read_file("file1.dcm")
     dataset.PatientName = 'anonymous'
     dataset.save_as("file2.dcm")
@@ -34,7 +34,7 @@ in_py3 = sys.version_info[0] > 2
 # In each module, set logger=logging.getLogger('pydicom')  and the same instance
 #     will be used by all
 # At command line, turn on debugging for all pydicom functions with:
-#        import dicom
+#        import pydicom
 #        dicom.debug()
 #  Turn off debugging with
 #       dicom.debug(False)
@@ -66,8 +66,8 @@ debug(False)  # force level=WARNING, in case logging default is set differently 
 
 # For convenience, import the read_file and write_file functions (most used)
 #     into the "dicom" namespace.
-from dicom.filereader import read_file, read_dicomdir  # noQA
-from dicom.filewriter import write_file  # noQA
+from pydicom.filereader import read_file, read_dicomdir  # noQA
+from pydicom.filewriter import write_file  # noQA
 
 __version__ = "0.9.9"
 __version_info__ = (0, 9, 9)

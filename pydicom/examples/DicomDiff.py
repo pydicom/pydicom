@@ -20,7 +20,7 @@ Results printed in python difflib form - indicated by start of each line:
 """
 
 import sys
-import dicom
+import pydicom
 import difflib
 
 # only used as a script

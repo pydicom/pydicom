@@ -12,7 +12,7 @@ tempfile = "/tmp/pydicom_stats"
 read_filename = r"/Users/darcy/hg/pydicom/source/dicom/testfiles/RStest.dcm"
 write_filename = "/tmp/write_test.dcm"
 
-import dicom
+import pydicom
 import cProfile
 import pstats
 

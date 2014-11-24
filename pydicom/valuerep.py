@@ -6,9 +6,9 @@
 #    available at http://pydicom.googlecode.com
 
 from decimal import Decimal
-import dicom.config
-from dicom.multival import MultiValue
-from dicom import in_py3
+import pydicom.config
+from pydicom.multival import MultiValue
+from pydicom import in_py3
 
 import logging
 logger = logging.getLogger('pydicom')
@@ -252,7 +252,7 @@ class PersonName3(object):
     def decode(self, encodings=None):
         encodings = self._verify_encodings(encodings)
 
-        from dicom.charset import clean_escseq
+        from pydicom.charset import clean_escseq
         if not isinstance(self.components[0], bytes):
             comps = self.components
         else:
@@ -385,10 +385,10 @@ class PersonNameUnicode(PersonNameBase, unicode):
         """Return unicode string after conversion of each part
         val -- the PN value to store
         encodings -- a list of python encodings, generally found
-                 from dicom.charset.python_encodings mapping
+                 from pydicom.charset.python_encodings mapping
                  of values in DICOM data element (0008,0005).
         """
-        from dicom.charset import clean_escseq  # in here to avoid circular import
+        from pydicom.charset import clean_escseq  # in here to avoid circular import
 
         # Make the possible three character encodings explicit:
         if not isinstance(encodings, list):

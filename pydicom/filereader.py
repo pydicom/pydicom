@@ -11,12 +11,12 @@ import warnings
 import zlib
 from io import BytesIO
 import logging
-from dicom.tag import TupleTag
-from dicom.dataelem import RawDataElement
-from dicom.util.hexutil import bytes2hex
-from dicom.valuerep import extra_length_VRs
-from dicom.charset import default_encoding, convert_encodings
-from dicom import in_py3
+from pydicom.tag import TupleTag
+from pydicom.dataelem import RawDataElement
+from pydicom.util.hexutil import bytes2hex
+from pydicom.valuerep import extra_length_VRs
+from pydicom.charset import default_encoding, convert_encodings
+from pydicom import in_py3
 
 logger = logging.getLogger('pydicom')
 
@@ -26,16 +26,16 @@ try:
 except:
     stat_available = False
 
-from dicom.errors import InvalidDicomError
-import dicom.UID  # for Implicit/Explicit/Little/Big Endian transfer syntax UIDs
-from dicom.filebase import DicomFile
-from dicom.dataset import Dataset, FileDataset
-from dicom.dicomdir import DicomDir
-from dicom.datadict import dictionaryVR
-from dicom.dataelem import DataElement
-from dicom.tag import ItemTag, SequenceDelimiterTag
-from dicom.sequence import Sequence
-from dicom.fileutil import read_undefined_length_value
+from pydicom.errors import InvalidDicomError
+import pydicom.UID  # for Implicit/Explicit/Little/Big Endian transfer syntax UIDs
+from pydicom.filebase import DicomFile
+from pydicom.dataset import Dataset, FileDataset
+from pydicom.dicomdir import DicomDir
+from pydicom.datadict import dictionaryVR
+from pydicom.dataelem import DataElement
+from pydicom.tag import ItemTag, SequenceDelimiterTag
+from pydicom.sequence import Sequence
+from pydicom.fileutil import read_undefined_length_value
 from struct import Struct, unpack
 from sys import byteorder
 sys_is_little_endian = (byteorder == 'little')
@@ -226,7 +226,7 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian,
 
             # If the tag is (0008,0005) Specific Character Set, then store it
             if tag == (0x08, 0x05):
-                from dicom.values import convert_string
+                from pydicom.values import convert_string
                 encoding = convert_string(value, is_little_endian, encoding=default_encoding)
                 # Store the encoding value in the generator for use with future elements (SQs)
                 encoding = convert_encodings(encoding)
@@ -271,7 +271,7 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian,
 
                 # If the tag is (0008,0005) Specific Character Set, then store it
                 if tag == (0x08, 0x05):
-                    from dicom.values import convert_string
+                    from pydicom.values import convert_string
                     encoding = convert_string(value, is_little_endian, encoding=default_encoding)
                     # Store the encoding value in the generator for use with future elements (SQs)
                     encoding = convert_encodings(encoding)

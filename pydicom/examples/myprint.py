@@ -35,7 +35,7 @@ def myprint(dataset, indent=0):
                                                    data_element.name, repr_value))
 
 if __name__ == "__main__":
-    import dicom
+    import pydicom
     import sys
     usage = """Usage: myprint filename"""
     if len(sys.argv) != 2:

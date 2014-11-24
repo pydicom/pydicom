@@ -25,19 +25,19 @@ import logging
 logger = logging.getLogger('pydicom')
 import inspect  # for __dir__
 
-from dicom.charset import default_encoding, convert_encodings
-from dicom.datadict import dictionaryVR
-from dicom.datadict import tag_for_name, all_names_for_tag
-from dicom.tag import Tag, BaseTag
-from dicom.dataelem import DataElement, DataElement_from_raw, RawDataElement
-from dicom.UID import NotCompressedPixelTransferSyntaxes
-from dicom.tagtools import tag_in_exception
+from pydicom.charset import default_encoding, convert_encodings
+from pydicom.datadict import dictionaryVR
+from pydicom.datadict import tag_for_name, all_names_for_tag
+from pydicom.tag import Tag, BaseTag
+from pydicom.dataelem import DataElement, DataElement_from_raw, RawDataElement
+from pydicom.UID import NotCompressedPixelTransferSyntaxes
+from pydicom.tagtools import tag_in_exception
 import os.path
 
 import io
 
-import dicom  # for write_file
-import dicom.charset
+import pydicom  # for write_file
+import pydicom.charset
 
 have_numpy = True
 try:
@@ -281,7 +281,7 @@ class Dataset(dict):
         elif isinstance(data_elem, tuple):
             # If a deferred read, then go get the value now
             if data_elem.value is None:
-                from dicom.filereader import read_deferred_data_element
+                from pydicom.filereader import read_deferred_data_element
                 data_elem = read_deferred_data_element(self.fileobj_type,
                                                        self.filename, self.timestamp, data_elem)
 

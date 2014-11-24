@@ -18,8 +18,8 @@
 import logging
 logger = logging.getLogger('pydicom')
 
-from dicom.filebase import DicomBytesIO
-from dicom.tag import ItemTag, SequenceDelimiterTag
+from pydicom.filebase import DicomBytesIO
+from pydicom.tag import ItemTag, SequenceDelimiterTag
 
 
 def defragment_data(data):

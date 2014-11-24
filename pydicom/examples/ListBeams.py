@@ -7,7 +7,7 @@
 #    available at http://pydicom.googlecode.com
 
 from __future__ import print_function
-import dicom
+import pydicom
 
 usage = """python ListBeams.py rtplan.dcm"""
 

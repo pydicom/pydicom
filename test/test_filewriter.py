@@ -9,15 +9,15 @@ import sys
 import os.path
 import os
 import unittest
-from dicom.filereader import read_file
-from dicom.filewriter import write_data_element
-from dicom.dataset import Dataset, FileDataset
-from dicom.sequence import Sequence
-from dicom.util.hexutil import hex2bytes, bytes2hex
+from pydicom.filereader import read_file
+from pydicom.filewriter import write_data_element
+from pydicom.dataset import Dataset, FileDataset
+from pydicom.sequence import Sequence
+from pydicom.util.hexutil import hex2bytes, bytes2hex
 
 # from io import BytesIO
-from dicom.filebase import DicomBytesIO
-from dicom.dataelem import DataElement
+from pydicom.filebase import DicomBytesIO
+from pydicom.dataelem import DataElement
 
 from pkg_resources import Requirement, resource_filename
 test_dir = resource_filename(Requirement.parse("pydicom"), "dicom/testfiles")
@@ -201,7 +201,7 @@ class ScratchWriteTests(unittest.TestCase):
 
     def testImpl_LE_deflen_write(self):
         """Scratch Write for implicit VR little endian, defined length SQ's"""
-        from dicom.test._write_stds import impl_LE_deflen_std_hex as std
+        from pydicom.test._write_stds import impl_LE_deflen_std_hex as std
 
         file_ds = FileDataset("test", self.ds)
         self.compare_write(std, file_ds)

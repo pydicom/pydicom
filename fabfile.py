@@ -5,7 +5,7 @@ from fabric.api import local, settings, abort
 from fabric.contrib.console import confirm
 
 import os.path
-import dicom
+import pydicom
 pydicompath = dicom.__path__[0]
 tox_ini = os.path.join(pydicompath, "../tox.ini")
 

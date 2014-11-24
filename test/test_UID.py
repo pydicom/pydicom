@@ -6,7 +6,7 @@
 #    available at http://pydicom.googlecode.com
 
 import unittest
-from dicom.UID import UID, generate_uid, pydicom_root_UID, InvalidUID
+from pydicom.UID import UID, generate_uid, pydicom_root_UID, InvalidUID
 
 
 class UIDtests(unittest.TestCase):

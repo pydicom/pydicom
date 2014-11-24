@@ -7,8 +7,8 @@
 #    available at http://pydicom.googlecode.com
 #
 
-from dicom.errors import InvalidDicomError
-from dicom.dataset import FileDataset
+from pydicom.errors import InvalidDicomError
+from pydicom.dataset import FileDataset
 
 
 class DicomDir(FileDataset):

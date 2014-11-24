@@ -28,7 +28,7 @@ the DICOM standard, e.g in Annex E of PS3.15-2011.
 
 import os
 import os.path
-import dicom
+import pydicom
 
 
 def anonymize(filename, output_filename, new_person_name="anonymous",

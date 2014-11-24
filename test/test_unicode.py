@@ -1,7 +1,7 @@
 # test_unicode.py
 # -*- coding: utf-8 -*-
 
-import dicom
+import pydicom
 import unittest
 
 

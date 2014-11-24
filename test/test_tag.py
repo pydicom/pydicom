@@ -5,7 +5,7 @@
 #    available at http://pydicom.googlecode.com
 
 import unittest
-from dicom.tag import Tag, TupleTag
+from pydicom.tag import Tag, TupleTag
 
 
 class Values(unittest.TestCase):

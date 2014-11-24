@@ -7,7 +7,7 @@
 #    available at http://pydicom.googlecode.com
 
 import unittest
-import dicom
+import pydicom
 import os.path
 
 from pkg_resources import Requirement, resource_filename

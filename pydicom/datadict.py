@@ -10,12 +10,12 @@
 
 import logging
 logger = logging.getLogger("pydicom")
-from dicom.tag import Tag
-from dicom._dicom_dict import DicomDictionary  # the actual dict of {tag: (VR, VM, name, is_retired, keyword), ...}
-from dicom._dicom_dict import RepeatersDictionary  # those with tags like "(50xx, 0005)"
-from dicom._private_dict import private_dictionaries
+from pydicom.tag import Tag
+from pydicom._dicom_dict import DicomDictionary  # the actual dict of {tag: (VR, VM, name, is_retired, keyword), ...}
+from pydicom._dicom_dict import RepeatersDictionary  # those with tags like "(50xx, 0005)"
+from pydicom._private_dict import private_dictionaries
 import warnings
-from dicom import in_py3
+from pydicom import in_py3
 
 # Generate mask dict for checking repeating groups etc.
 # Map a true bitwise mask to the DICOM mask with "x"'s in it.

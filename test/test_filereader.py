@@ -25,13 +25,13 @@ try:
     import numpy  # NOQA
 except:
     have_numpy = False
-from dicom.filereader import read_file
-from dicom.errors import InvalidDicomError
-from dicom.tag import Tag, TupleTag
-import dicom.valuerep
+from pydicom.filereader import read_file
+from pydicom.errors import InvalidDicomError
+from pydicom.tag import Tag, TupleTag
+import pydicom.valuerep
 import gzip
 
-from dicom.test.warncheck import assertWarns
+from pydicom.test.warncheck import assertWarns
 
 from pkg_resources import Requirement, resource_filename
 test_dir = resource_filename(Requirement.parse("pydicom"), "dicom/testfiles")

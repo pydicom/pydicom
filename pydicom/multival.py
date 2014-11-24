@@ -32,7 +32,7 @@ class MultiValue(list):
         :param iterable: an iterable (e.g. list, tuple) of items to initialize
                         the MultiValue list
         """
-        from dicom.valuerep import DSfloat, DSdecimal, IS
+        from pydicom.valuerep import DSfloat, DSdecimal, IS
         self.type_constructor = type_constructor
         if isinstance(type_constructor, (DSfloat, IS, DSdecimal)):
             converted_list = [type_constructor(x) if x != ''

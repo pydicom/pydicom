@@ -56,7 +56,7 @@ def recurse_tree(tree, dataset, parent, hide=False):
 
 if __name__ == '__main__':
     import sys
-    import dicom
+    import pydicom
     if len(sys.argv) != 2:
         print("Please supply a dicom file name:\n")
         print(usage)

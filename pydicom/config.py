@@ -18,7 +18,7 @@ def DS_decimal(use_Decimal_boolean=True):
     is for DS to be based on float.
     """
     use_DS_decimal = use_Decimal_boolean
-    import dicom.valuerep
+    import pydicom.valuerep
     if use_DS_decimal:
         dicom.valuerep.DSclass = dicom.valuerep.DSdecimal
     else:

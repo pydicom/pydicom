@@ -5,7 +5,7 @@
 # license, see the file license.txt available at
 # (http://code.google.com/p/pydicom/)
 
-import dicom
+import pydicom
 import sys
 from PySide import QtGui
 import collections

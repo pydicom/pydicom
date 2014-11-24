@@ -6,11 +6,11 @@
 #    available at http://pydicom.googlecode.com
 
 import unittest
-from dicom.dataset import Dataset, PropertyError
-from dicom.dataelem import DataElement, RawDataElement
-from dicom.tag import Tag
-from dicom.sequence import Sequence
-from dicom import in_py3
+from pydicom.dataset import Dataset, PropertyError
+from pydicom.dataelem import DataElement, RawDataElement
+from pydicom.tag import Tag
+from pydicom.sequence import Sequence
+from pydicom import in_py3
 
 
 class DatasetTests(unittest.TestCase):

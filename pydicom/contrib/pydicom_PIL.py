@@ -2,8 +2,8 @@
 """View DICOM images using Python image Library (PIL)
 
 Usage:
->>> import dicom
->>> from dicom.contrib.pydicom_PIL import show_PIL
+>>> import pydicom
+>>> from pydicom.contrib.pydicom_PIL import show_PIL
 >>> ds = dicom.read_file("filename")
 >>> show_PIL(ds)
 

@@ -8,7 +8,7 @@ as test various things
 #    available at http://pydicom.googlecode.com
 #
 
-import dicom
+import pydicom
 # dicom.debug()
 
 

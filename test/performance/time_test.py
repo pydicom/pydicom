@@ -29,8 +29,8 @@ locations = [
 locations = [os.path.join(location_base, location) for location in locations]
 # -------------------------------------------------------
 import glob
-import dicom
-from dicom.filereader import read_partial, _at_pixel_data
+import pydicom
+from pydicom.filereader import read_partial, _at_pixel_data
 from io import BytesIO
 
 import cProfile

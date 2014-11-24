@@ -11,7 +11,7 @@ logging.basicConfig(level=logging.INFO,
 
 if __name__ == "__main__":
     from glob import glob
-    import dicom
+    import pydicom
 
     # Get list of all DICOM files
     names = glob("*.dcm")

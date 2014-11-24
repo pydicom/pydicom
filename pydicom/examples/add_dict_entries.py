@@ -11,8 +11,8 @@ where a block is reserved etc as specified in the DICOM standards.
 """
 
 # D. Mason, 2013-01
-from dicom.datadict import DicomDictionary, NameDict, CleanName
-from dicom.dataset import Dataset
+from pydicom.datadict import DicomDictionary, NameDict, CleanName
+from pydicom.dataset import Dataset
 
 # Define items as (VR, VM, description, is_retired flag, keyword)
 #   Leave is_retired flag blank.

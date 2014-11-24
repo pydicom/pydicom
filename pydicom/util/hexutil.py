@@ -6,8 +6,8 @@
 #    available at http://pydicom.googlecode.com
 
 from binascii import a2b_hex, b2a_hex
-from dicom import in_py3
-from dicom.charset import default_encoding
+from pydicom import in_py3
+from pydicom.charset import default_encoding
 
 
 def hex2bytes(hexstring):

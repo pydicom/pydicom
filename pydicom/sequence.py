@@ -5,8 +5,8 @@
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
 
-from dicom.dataset import Dataset
-from dicom.multival import MultiValue
+from pydicom.dataset import Dataset
+from pydicom.multival import MultiValue
 
 
 def validate_dataset(elem):

@@ -6,27 +6,27 @@
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
 
-from dicom import in_py3
+from pydicom import in_py3
 from struct import unpack, calcsize
 import logging
 logger = logging.getLogger('pydicom')
 
 # Because DS can be based on float or decimal, import whole module, not DS
 #    directly, so it can be changed in user code and be updated here also
-import dicom.valuerep
-from dicom.valuerep import MultiString
+import pydicom.valuerep
+from pydicom.valuerep import MultiString
 
 if in_py3:
-    from dicom.valuerep import PersonName3 as PersonName
+    from pydicom.valuerep import PersonName3 as PersonName
 else:
-    from dicom.valuerep import PersonName  # NOQA
+    from pydicom.valuerep import PersonName  # NOQA
 
-from dicom.multival import MultiValue
-import dicom.UID
-from dicom.tag import Tag, TupleTag
-from dicom.filereader import read_sequence
+from pydicom.multival import MultiValue
+import pydicom.UID
+from pydicom.tag import Tag, TupleTag
+from pydicom.filereader import read_sequence
 from io import BytesIO
-from dicom.charset import default_encoding, text_VRs
+from pydicom.charset import default_encoding, text_VRs
 
 
 def convert_tag(byte_string, is_little_endian, offset=0):

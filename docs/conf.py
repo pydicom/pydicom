@@ -194,7 +194,7 @@ latex_documents = [
 #latex_use_modindex = True
 
 doctest_global_setup = """
-import dicom
+import pydicom
 import os, os.path
 testfile_path = os.path.join(dicom.__path__[0], 'testfiles')
 save_dir = os.getcwd()
