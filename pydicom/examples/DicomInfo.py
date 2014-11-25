@@ -28,7 +28,7 @@ if not 1 < len(sys.argv) < 4:
 
 # read the file
 filename = sys.argv[1]
-dataset = dicom.read_file(filename)
+dataset = pydicom.read_file(filename)
 
 # Verbose mode:
 if len(sys.argv) == 3:

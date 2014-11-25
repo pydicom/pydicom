@@ -53,7 +53,7 @@ class DicomCouch(dict):
     """ A Data Access Object for persisting PyDicom objects into CouchDB
 
     We follow the same pattern as the python-couchdb library for getting and
-    setting documents, for example storing dicom.dataset.Dataset object dcm:
+    setting documents, for example storing pydicom.dataset.Dataset object dcm:
         db = DicomCouch('http://localhost:5984/', 'dbname')
         db[dcm.SeriesInstanceUID] = dcm
 
@@ -204,11 +204,11 @@ def _add_element(dcm, tagstack, value):
         try:
             address = int(item)
         except ValueError:
-            address = dicom.tag.Tag(__str2tag(item))
+            address = pydicom.tag.Tag(__str2tag(item))
         current_node = current_node[address]
     tag = __str2tag(tagstack[-1])
-    vr = dicom.datadict.dictionaryVR(tag)
-    current_node[tag] = dicom.dataelem.DataElement(tag, vr, value)
+    vr = pydicom.datadict.dictionaryVR(tag)
+    current_node[tag] = pydicom.dataelem.DataElement(tag, vr, value)
 
 
 def _tagstack2id(tagstack):
@@ -237,24 +237,24 @@ def _strip_elements(jsn, elements):
 def _set_meta_info_dcm(dcm):
     """ Set the file metadata DataSet attributes
 
-    This is done by PyDicom when we dicom.read_file(foo) but we need to do it
+    This is done by PyDicom when we pydicom.read_file(foo) but we need to do it
     ourselves when creating a DataSet from scratch, otherwise we cannot use
-    foo.pixel_array or dicom.write_file(foo).
+    foo.pixel_array or pydicom.write_file(foo).
 
     This code is lifted from PyDicom.
 
     """
     TransferSyntax = dcm.file_meta.TransferSyntaxUID
-    if TransferSyntax == dicom.UID.ExplicitVRLittleEndian:
+    if TransferSyntax == pydicom.UID.ExplicitVRLittleEndian:
         dcm.is_implicit_vr = False
         dcm.is_little_endian = True  # This line not in PyDicom
-    elif TransferSyntax == dicom.UID.ImplicitVRLittleEndian:
+    elif TransferSyntax == pydicom.UID.ImplicitVRLittleEndian:
         dcm.is_implicit_vr = True
         dcm.is_little_endian = True
-    elif TransferSyntax == dicom.UID.ExplicitVRBigEndian:
+    elif TransferSyntax == pydicom.UID.ExplicitVRBigEndian:
         dcm.is_implicit_vr = False
         dcm.is_little_endian = False
-    elif TransferSyntax == dicom.UID.DeflatedExplicitVRLittleEndian:
+    elif TransferSyntax == pydicom.UID.DeflatedExplicitVRLittleEndian:
         dcm.is_implicit_vr = False   # Deleted lines above as it relates
         dcm.is_little_endian = True  # to reading compressed file data.
     else:
@@ -270,7 +270,7 @@ def pydicom2json(dcm):
 
     Binary elements cannot be represented in json so we return these as
     as separate list of the tuple (tagstack, element), where:
-     - element  = dicom.dataelem.DataElement
+     - element  = pydicom.dataelem.DataElement
      - tagstack = list of tags/sequence IDs that address the element
 
     The tagstack variable means we know the absolute address of each binary
@@ -306,7 +306,7 @@ def __jsonify(element, binary_elements, tagstack):
     elif type(value) == list:
         new_list = [__typemap(listvalue) for listvalue in value]
         return new_list
-    elif type(value) == dicom.sequence.Sequence:
+    elif type(value) == pydicom.sequence.Sequence:
         tagstack.append(element.tag)
         nested_data = []
         for i in range(0, len(value)):
@@ -323,9 +323,9 @@ def __jsonify(element, binary_elements, tagstack):
 
 def __typemap(value):
     """ Map PyDicom types that won't serialise to JSON types """
-    if type(value) == dicom.UID.UID:
+    if type(value) == pydicom.UID.UID:
         return uid2str(value)
-    elif isinstance(value, dicom.tag.BaseTag):
+    elif isinstance(value, pydicom.tag.BaseTag):
         return long(value)
     else:
         return value
@@ -333,13 +333,13 @@ def __typemap(value):
 
 def json2pydicom(jsn):
     """ Convert the supplied json dict into a PyDicom object """
-    dataset = dicom.dataset.Dataset()
+    dataset = pydicom.dataset.Dataset()
     # Don't try to convert couch specific tags
     dicom_keys = [key for key in jsn.keys()
                   if key not in ['_rev', '_id', '_attachments', 'file_meta']]
     for key in dicom_keys:
         dataset.add(__dicomify(key, jsn[key]))
-    file_meta = dicom.dataset.Dataset()
+    file_meta = pydicom.dataset.Dataset()
     for key in jsn['file_meta']:
         file_meta.add(__dicomify(key, jsn['file_meta'][key]))
     dataset.file_meta = file_meta
@@ -352,7 +352,7 @@ def __dicomify(key, value):
     if tag.element == 0:  # 0 tag implies group length (filreader.py pydicom)
         vr = 'UL'
     else:
-        vr = dicom.datadict.dictionaryVR(tag)
+        vr = pydicom.datadict.dictionaryVR(tag)
 
     if vr == 'OW/OB':  # Always write pixel data as bytes
         vr = 'OB'      # rather than words
@@ -368,15 +368,15 @@ def __dicomify(key, value):
                                     for subkey in listvalue.keys()])
                     for listvalue in value
                     ]
-        seq = dicom.sequence.Sequence(seq_list)
-        return dicom.dataelem.DataElement(tag, vr, seq)
+        seq = pydicom.sequence.Sequence(seq_list)
+        return pydicom.dataelem.DataElement(tag, vr, seq)
     else:
-        return dicom.dataelem.DataElement(tag, vr, value)
+        return pydicom.dataelem.DataElement(tag, vr, value)
 
 
 def __make_dataset(data_elements):
     """ Create a Dataset from a list of DataElement objects """
-    dataset = dicom.dataset.Dataset()
+    dataset = pydicom.dataset.Dataset()
     for element in data_elements:
         dataset.add(element)
     return dataset
@@ -384,7 +384,7 @@ def __make_dataset(data_elements):
 
 def __str2tag(key):
     """ Convert string representation of a tag into a Tag """
-    return dicom.tag.Tag((int(key[1:5], 16), int(key[7:-1], 16)))
+    return pydicom.tag.Tag((int(key[1:5], 16), int(key[7:-1], 16)))
 
 
 if __name__ == '__main__':
@@ -405,5 +405,5 @@ if __name__ == '__main__':
     testfiles = map(lambda x: os.path.join('../testfiles', x), testfiles)
 
     for dcmfile in testfiles:
-        dcm = dicom.read_file(dcmfile)
+        dcm = pydicom.read_file(dcmfile)
         db[dcm.SeriesInstanceUID] = dcm

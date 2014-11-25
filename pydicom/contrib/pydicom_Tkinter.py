@@ -22,7 +22,7 @@ Usage:
 >>> import pydicom              # pydicom
 >>> import pydicom.contrib.pydicom_Tkinter as pydicom_Tkinter    # this module
 
->>> df = dicom.read_file(filename)
+>>> df = pydicom.read_file(filename)
 >>> pydicom_Tkinter.show_image(df)
 '''
 

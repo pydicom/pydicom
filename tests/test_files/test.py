@@ -9,11 +9,11 @@ as test various things
 #
 
 import pydicom
-# dicom.debug()
+# pydicom.debug()
 
 
 if __name__ == "__main__":
-    dcmdir = dicom.read_dicomdir()
+    dcmdir = pydicom.read_dicomdir()
     for patrec in dcmdir.patient_records:
         print("Patient: {0.PatientID}: {0.PatientsName}".format(patrec))
         studies = patrec.children

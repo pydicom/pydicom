@@ -1,5 +1,5 @@
->>> from dicom.sequence import Sequence 
->>> from dicom.dataset import Dataset 
+>>> from pydicom.sequence import Sequence 
+>>> from pydicom.dataset import Dataset 
 
 >>> block_ds1 = Dataset() 
 >>> block_ds1.BlockType = "APERTURE" 

@@ -3,8 +3,8 @@ I've tidied up some wrapped lines. pixel_array requires the Numpy library
 Assumed is started in the 'testfiles' directory
 Note: "<BLANKLINE>" is inserted here to match doctest testing of this code.
 If used in interactive session, you will simply see a blank line at those places.
->>> import dicom
->>> ct = dicom.read_file("CT_small.dcm")
+>>> import pydicom
+>>> ct = pydicom.read_file("CT_small.dcm")
 >>> ct.remove_private_tags()
 >>> ct.dir("image")
 ['ImageComments', 'ImageOrientationPatient', 'ImagePositionPatient', 'ImageType']
@@ -22,7 +22,7 @@ array([[175, 180, 166, ..., 203, 207, 216],
        [906, 910, 923, ..., 922, 929, 927],
        [914, 954, 938, ..., 942, 925, 905],
        [959, 955, 916, ..., 911, 904, 909]], dtype=int16)
->>> plan = dicom.read_file("rtplan.dcm")
+>>> plan = pydicom.read_file("rtplan.dcm")
 >>> len(plan.BeamSequence)
 1
 >>> beam = plan.BeamSequence[0]
@@ -66,16 +66,16 @@ array([[175, 180, 166, ..., 203, 207, 216],
    ---------
 >>> # NOTE: the <BLANKLINE> lines below are for running this through doctest
 >>> help(plan.save_as)
-Help on method save_as in module dicom.dataset:
+Help on method save_as in module pydicom.dataset:
 <BLANKLINE>
-save_as(self, filename, write_like_original=True) method of dicom.dataset.FileDataset instance
+save_as(self, filename, write_like_original=True) method of pydicom.dataset.FileDataset instance
     Write the dataset to a file.
 <BLANKLINE>
     :param filename: full path and filename to save the file to
-    :write_like_original: see dicom.filewriter.write_file for info on this parameter.
+    :write_like_original: see pydicom.filewriter.write_file for info on this parameter.
 <BLANKLINE>  
 >>> plan.save_as("rtplan_gantry90.dcm")
->>> plan_g90 = dicom.read_file("rtplan_gantry90.dcm")
+>>> plan_g90 = pydicom.read_file("rtplan_gantry90.dcm")
 >>> plan_g90.BeamSequence[0].ControlPointSequence[0].GantryAngle
 '90.0'
 >>>

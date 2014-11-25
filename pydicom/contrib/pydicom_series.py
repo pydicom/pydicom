@@ -4,7 +4,7 @@ By calling the function read_files with a directory name or list
 of files as an argument, a list of DicomSeries instances can be
 obtained. A DicomSeries object has some attributes that give
 information about the serie (such as shape, sampling, suid) and
-has an info attribute, which is a dicom.DataSet instance containing
+has an info attribute, which is a pydicom.DataSet instance containing
 information about the first dicom file in the serie. The data can
 be obtained using the get_pixel_array() method, which produces a
 3D numpy array if there a multiple files in the serie.
@@ -214,7 +214,7 @@ def _splitSerieIfRequired(serie, series):
         series.remove(serie)
 
 
-pixelDataTag = dicom.tag.Tag(0x7fe0, 0x0010)
+pixelDataTag = pydicom.tag.Tag(0x7fe0, 0x0010)
 
 
 def _getPixelDataFromDataset(ds):
@@ -371,8 +371,8 @@ def read_files(path, showProgress=False, readPixelData=False, force=False):
 
         # Try loading dicom ...
         try:
-            dcm = dicom.read_file(filename, deferSize, force=force)
-        except dicom.filereader.InvalidDicomError:
+            dcm = pydicom.read_file(filename, deferSize, force=force)
+        except pydicom.filereader.InvalidDicomError:
             continue  # skip non-dicom file
         except Exception as why:
             if showProgress is _progressCallback:
@@ -562,7 +562,7 @@ class DicomSeries(object):
 
     def _append(self, dcm):
         """ _append(dcm)
-        Append a dicomfile (as a dicom.dataset.FileDataset) to the series.
+        Append a dicomfile (as a pydicom.dataset.FileDataset) to the series.
         """
         self._datasets.append(dcm)
 
@@ -641,7 +641,7 @@ class DicomSeries(object):
             ds1 = ds2
 
         # Create new dataset by making a deep copy of the first
-        info = dicom.dataset.Dataset()
+        info = pydicom.dataset.Dataset()
         firstDs = self._datasets[0]
         for key in firstDs.keys():
             if key != (0x7fe0, 0x0010):

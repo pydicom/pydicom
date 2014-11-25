@@ -11,7 +11,7 @@ Quick Start
 -----------
 1. A simple program to read a dicom file, modify a value, and write to a new file::
     import pydicom
-    dataset = dicom.read_file("file1.dcm")
+    dataset = pydicom.read_file("file1.dcm")
     dataset.PatientName = 'anonymous'
     dataset.save_as("file2.dcm")
 
@@ -35,9 +35,9 @@ in_py3 = sys.version_info[0] > 2
 #     will be used by all
 # At command line, turn on debugging for all pydicom functions with:
 #        import pydicom
-#        dicom.debug()
+#        pydicom.debug()
 #  Turn off debugging with
-#       dicom.debug(False)
+#       pydicom.debug(False)
 import logging
 
 

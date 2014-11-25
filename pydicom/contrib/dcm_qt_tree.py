@@ -59,7 +59,7 @@ class DicomTree:
         return parent
 
     def dicom_to_dataset(self, filename):
-        dataset = dicom.read_file(filename, force=True)
+        dataset = pydicom.read_file(filename, force=True)
         return dataset
 
     def data_element_to_dic(self, data_element):

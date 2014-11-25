@@ -1,5 +1,5 @@
->>> import dicom
->>> plan=dicom.read_file("rtplan.dcm")
+>>> import pydicom
+>>> plan=pydicom.read_file("rtplan.dcm")
 >>> plan.PatientName
 'Last^First^mid^pre'
 >>> plan.dir("setup")    # get a list of tags with "setup" somewhere in the name

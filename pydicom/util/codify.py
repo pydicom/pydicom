@@ -237,7 +237,7 @@ def code_file(filename, exclude_size=None, include_private=False):
     """
     lines = []
 
-    ds = dicom.read_file(filename, force=True)
+    ds = pydicom.read_file(filename, force=True)
 
     # Code a nice header for the python file
     lines.append("# Coded version of DICOM file '{0}'".format(filename))

@@ -50,7 +50,7 @@ def anonymize(filename, output_filename, new_person_name="anonymous",
             del ds[data_element.tag]
 
     # Load the current dicom file to 'anonymize'
-    dataset = dicom.read_file(filename)
+    dataset = pydicom.read_file(filename)
 
     # Remove patient name and any other person names
     dataset.walk(PN_callback)

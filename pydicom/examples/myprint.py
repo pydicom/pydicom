@@ -42,5 +42,5 @@ if __name__ == "__main__":
         print(usage)
         sys.exit()
 
-    ds = dicom.read_file(sys.argv[1])
+    ds = pydicom.read_file(sys.argv[1])
     myprint(ds)

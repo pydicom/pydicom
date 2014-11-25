@@ -30,5 +30,5 @@ if __name__ == "__main__":
         print(usage)
         sys.exit(-1)
 
-    rtplan = dicom.read_file(sys.argv[1])
+    rtplan = pydicom.read_file(sys.argv[1])
     print(ListBeams(rtplan))

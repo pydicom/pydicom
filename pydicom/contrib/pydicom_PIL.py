@@ -4,7 +4,7 @@
 Usage:
 >>> import pydicom
 >>> from pydicom.contrib.pydicom_PIL import show_PIL
->>> ds = dicom.read_file("filename")
+>>> ds = pydicom.read_file("filename")
 >>> show_PIL(ds)
 
 Requires Numpy:  http://numpy.scipy.org/

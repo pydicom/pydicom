@@ -260,7 +260,7 @@ class ImFrame(wx.Frame):
         careful not to pass a unicode string to read_file or it will
         give you 'fp object does not have a defer_size attribute,
         or some such."""
-        ds = dicom.read_file(str(fullPath))
+        ds = pydicom.read_file(str(fullPath))
         ds.decode()                                         # change strings to unicode
         self.populateTree(ds)
         if 'PixelData' in ds:

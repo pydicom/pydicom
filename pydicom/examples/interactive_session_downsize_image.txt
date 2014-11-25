@@ -6,8 +6,8 @@ for manipulation of pixel data
 Note: "<BLANKLINE>" is inserted here to match doctest testing of this code.
 If used in interactive session, you will simply see a blank line at those places.
 Test in python: Anaconda 2.0.1 (64-bit)
->>> import dicom
->>> ds = dicom.read_file("mr1_unc.dcm")
+>>> import pydicom
+>>> ds = pydicom.read_file("mr1_unc.dcm")
 >>> data = ds.pixel_array
 >>> data.shape
 (512L, 512L)
@@ -92,5 +92,5 @@ Test in python: Anaconda 2.0.1 (64-bit)
 (7fe0, 0010) Pixel Data                          OW: Array of 8192 bytes
 (fffc, fffc) Data Set Trailing Padding           OB: Array of 126 bytes
 >>> ds.save_as("MR_small_test.dcm")
->>> ds2 = dicom.read_file("MR_small_test.dcm") # read back to make sure is ok
+>>> ds2 = pydicom.read_file("MR_small_test.dcm") # read back to make sure is ok
 >>>

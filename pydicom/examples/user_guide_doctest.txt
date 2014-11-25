@@ -1,5 +1,5 @@
->>> import dicom
->>> ds = dicom.read_file("rtplan.dcm") # (rtplan.dcm is in the testfiles directory)
+>>> import pydicom
+>>> ds = pydicom.read_file("rtplan.dcm") # (rtplan.dcm is in the testfiles directory)
 >>> ds    #doctest: +ELLIPSIS
 (0008, 0012) Instance Creation Date              DA: '20030903'
 (0008, 0013) Instance Creation Time              TM: '150031'
@@ -41,11 +41,11 @@ True
 >>> del ds.InstitutionName
 >>> # OR del ds[0x0008,0x0080]
 
->>> ds = dicom.read_file("CT_small.dcm")
+>>> ds = pydicom.read_file("CT_small.dcm")
 >>> pixel_bytes = ds.PixelData
 >>> pix = ds.pixel_array
 
->>> from dicom.tag import Tag
+>>> from pydicom.tag import Tag
 >>> t1=Tag(0x00100010) # all of these are equivalent
 >>> t2=Tag(0x10,0x10)
 >>> t3=Tag((0x10, 0x10))

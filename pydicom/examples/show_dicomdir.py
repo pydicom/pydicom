@@ -11,7 +11,7 @@ import sys
 import pydicom
 import os.path
 from pprint import pprint
-# dicom.debug()
+# pydicom.debug()
 
 
 if __name__ == "__main__":
@@ -24,11 +24,11 @@ if __name__ == "__main__":
         filepath = sys.argv[1]
         if os.path.isdir(filepath):  # only gave directory, add standard name
             filepath = os.path.join(filepath, "DICOMDIR")
-        dcmdir = dicom.read_dicomdir(filepath)
+        dcmdir = pydicom.read_dicomdir(filepath)
         base_dir = os.path.dirname(filepath)
     else:
         # Read standard "DICOMDIR" filename from current directory
-        dcmdir = dicom.read_dicomdir()
+        dcmdir = pydicom.read_dicomdir()
         base_dir = "."
 
     for patrec in dcmdir.patient_records:
@@ -57,10 +57,10 @@ if __name__ == "__main__":
                 image_filenames = [os.path.join(base_dir, *image_rec.ReferencedFileID)
                                    for image_rec in image_records]
 
-                # slice_locations = [dicom.read_file(image_filename).SliceLocation
+                # slice_locations = [pydicom.read_file(image_filename).SliceLocation
                 #                   for image_filename in image_filenames]
 
-                datasets = [dicom.read_file(image_filename)
+                datasets = [pydicom.read_file(image_filename)
                             for image_filename in image_filenames]
 
                 patient_names = set(ds.PatientName for ds in datasets)
