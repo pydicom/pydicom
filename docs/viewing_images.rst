@@ -29,7 +29,7 @@ matplotlib is available at http://matplotlib.sourceforge.net/. It
 can take 2-d image information from ``Dataset.pixel_array`` and display it. 
 Here is an example::
 
-    >>> import dicom
+    >>> import pydicom
     >>> import pylab
     >>> ds=pydicom.read_file("CT_small.dcm")
     >>> pylab.imshow(ds.pixel_array, cmap=pylab.cm.bone)

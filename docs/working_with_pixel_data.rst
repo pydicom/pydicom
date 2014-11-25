@@ -14,7 +14,7 @@ pydicom tends to be "lazy" in interpreting DICOM data. For example,
 by default it doesn't do anything with pixel data 
 except read in the raw bytes::
 
-    >>> import dicom
+    >>> import pydicom
     >>> ds=pydicom.read_file("MR_small.dcm")
     >>> ds.PixelData
     '\x89\x03\xfb\x03\xcb\x04\xeb\x04\xf9\x02\x94\x01\x7f ...

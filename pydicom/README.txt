@@ -6,6 +6,6 @@ To install from a source distribution, at a command line in the source directory
 python setup.py install
 
 To use the code from python, type:
-import dicom
+import pydicom
 
 See the examples for more details, or the online information at http://pydicom.googlecode.com.

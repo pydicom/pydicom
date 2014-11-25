@@ -131,8 +131,7 @@ Using pydicom
 =============
 
 Once installed, the package can be imported at a python command line or used 
-in your own python program with ``import dicom`` (note the package name is 
-``dicom``, not ``pydicom`` when used in code. 
+in your own python program with ``import pydicom`` 
 See the `examples directory 
 <http://code.google.com/p/pydicom/source/browse/#hg/source/dicom/examples>`_ 
 for both kinds of uses. Also see the :doc:`User Guide </pydicom_user_guide>` 
