@@ -1,6 +1,2 @@
-include dicom/testfiles/*
-include dicom/testcharsetfiles/*
-include dicom/test/all.bat
-include dicom/test/shell_all
-include dicom/doc/*
-include distribute_setup.py
+include pydicom/*
+include ez_setup.py
