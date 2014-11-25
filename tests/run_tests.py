@@ -12,8 +12,7 @@ import unittest
 import glob
 
 # Get the directory test_dir where the test scripts are
-from pkg_resources import Requirement, resource_filename
-test_dir = resource_filename(Requirement.parse("pydicom"), "tests")
+test_dir = os.path.dirname(__file__)
 
 
 class MyTestLoader(object):
@@ -45,6 +44,5 @@ if __name__ == "__main__":
     runner = unittest.TextTestRunner(verbosity=verbosity)
 
     # Switch directories to test DICOM files, used by many of the tests
-    testfiles_dir = resource_filename(Requirement.parse("pydicom"),
-                                      "tests/test_files")
+    testfiles_dir = os.path.join(test_dir, 'test_files')
     runner.run(suite)
