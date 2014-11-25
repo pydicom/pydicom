@@ -10,17 +10,16 @@ import unittest
 import pydicom
 import os.path
 
-from pkg_resources import Requirement, resource_filename
-testcharset_dir = resource_filename(Requirement.parse("pydicom"),
-                                    "tests/charset_files")
+test_dir = os.path.dirname(__file__)
+testcharset_dir = os.path.join(test_dir, 'charset_files')
 
 latin1_file = os.path.join(testcharset_dir, "chrFren.dcm")
 jp_file = os.path.join(testcharset_dir, "chrH31.dcm")
 multiPN_file = os.path.join(testcharset_dir, "chrFrenMulti.dcm")
 sq_encoding_file = os.path.join(testcharset_dir, "chrSQEncoding.dcm")
 
-test_dir = resource_filename(Requirement.parse("pydicom"), "tests/test_files")
-normal_file = os.path.join(test_dir, "CT_small.dcm")
+test_files = os.path.join(test_dir, 'test_files')
+normal_file = os.path.join(test_files, "CT_small.dcm")
 
 
 class charsetTests(unittest.TestCase):
@@ -61,13 +60,4 @@ if __name__ == "__main__":
     # This is called if run alone, but not if loaded through run_tests.py
     # If not run from the directory where the sample images are,
     #   then need to switch there
-    import sys
-    import os
-    import os.path
-    dir_name = os.path.dirname(sys.argv[0])
-    save_dir = os.getcwd()
-    if dir_name:
-        os.chdir(dir_name)
-    os.chdir("../testfiles")
     unittest.main()
-    os.chdir(save_dir)

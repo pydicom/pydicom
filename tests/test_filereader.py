@@ -33,22 +33,22 @@ import gzip
 
 from tests.warncheck import assertWarns
 
-from pkg_resources import Requirement, resource_filename
-test_dir = resource_filename(Requirement.parse("pydicom"), "tests/test_files")
+test_dir = os.path.dirname(__file__)
+test_files = os.path.join(test_dir, 'test_files')
 
-rtplan_name = os.path.join(test_dir, "rtplan.dcm")
-rtdose_name = os.path.join(test_dir, "rtdose.dcm")
-ct_name = os.path.join(test_dir, "CT_small.dcm")
-mr_name = os.path.join(test_dir, "MR_small.dcm")
-jpeg2000_name = os.path.join(test_dir, "JPEG2000.dcm")
-jpeg_lossy_name = os.path.join(test_dir, "JPEG-lossy.dcm")
-jpeg_lossless_name = os.path.join(test_dir, "JPEG-LL.dcm")
-deflate_name = os.path.join(test_dir, "image_dfl.dcm")
-rtstruct_name = os.path.join(test_dir, "rtstruct.dcm")
-priv_SQ_name = os.path.join(test_dir, "priv_SQ.dcm")
-nested_priv_SQ_name = os.path.join(test_dir, "nested_priv_SQ.dcm")
-no_meta_group_length = os.path.join(test_dir, "no_meta_group_length.dcm")
-gzip_name = os.path.join(test_dir, "zipMR.gz")
+rtplan_name = os.path.join(test_files, "rtplan.dcm")
+rtdose_name = os.path.join(test_files, "rtdose.dcm")
+ct_name = os.path.join(test_files, "CT_small.dcm")
+mr_name = os.path.join(test_files, "MR_small.dcm")
+jpeg2000_name = os.path.join(test_files, "JPEG2000.dcm")
+jpeg_lossy_name = os.path.join(test_files, "JPEG-lossy.dcm")
+jpeg_lossless_name = os.path.join(test_files, "JPEG-LL.dcm")
+deflate_name = os.path.join(test_files, "image_dfl.dcm")
+rtstruct_name = os.path.join(test_files, "rtstruct.dcm")
+priv_SQ_name = os.path.join(test_files, "priv_SQ.dcm")
+nested_priv_SQ_name = os.path.join(test_files, "nested_priv_SQ.dcm")
+no_meta_group_length = os.path.join(test_files, "no_meta_group_length.dcm")
+gzip_name = os.path.join(test_files, "zipMR.gz")
 
 dir_name = os.path.dirname(sys.argv[0])
 save_dir = os.getcwd()
@@ -434,10 +434,4 @@ class FileLikeTests(unittest.TestCase):
 if __name__ == "__main__":
     # This is called if run alone, but not if loaded through run_tests.py
     # If not run from the directory where the sample images are, then need to switch there
-    dir_name = os.path.dirname(sys.argv[0])
-    save_dir = os.getcwd()
-    if dir_name:
-        os.chdir(dir_name)
-    os.chdir("../testfiles")
     unittest.main()
-    os.chdir(save_dir)
