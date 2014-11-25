@@ -31,8 +31,7 @@ py3source
 docs/_build/*
 
 # coverage.py files
-pydicom/test/.coverage
-pydicom/test/htmlcov
+.coverage
 
 # PyCharm IDE files
 *.idea*
