@@ -2,7 +2,7 @@
 #
 import warnings
 import unittest
-from pydicom.test.version_dep import capture_warnings
+from tests.version_dep import capture_warnings
 
 
 def assertWarns(self, warn_msg, function, *func_args, **func_kwargs):

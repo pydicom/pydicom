@@ -1,5 +1,5 @@
 # test_filereader.py
-"""unittest tests for dicom.filereader module"""
+"""unittest tests for pydicom.filereader module"""
 # Copyright (c) 2010-2012 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
 #    See the file license.txt included with this distribution, also
@@ -31,10 +31,10 @@ from pydicom.tag import Tag, TupleTag
 import pydicom.valuerep
 import gzip
 
-from pydicom.test.warncheck import assertWarns
+from tests.warncheck import assertWarns
 
 from pkg_resources import Requirement, resource_filename
-test_dir = resource_filename(Requirement.parse("pydicom"), "dicom/testfiles")
+test_dir = resource_filename(Requirement.parse("pydicom"), "tests/test_files")
 
 rtplan_name = os.path.join(test_dir, "rtplan.dcm")
 rtdose_name = os.path.join(test_dir, "rtdose.dcm")
@@ -81,7 +81,7 @@ class ReaderTests(unittest.TestCase):
                          "beam TreatmentMachineName does not match the value accessed by tag number")
 
         got = cp1.ReferencedDoseReferenceSequence[0].CumulativeDoseReferenceCoefficient
-        DS = dicom.valuerep.DS
+        DS = pydicom.valuerep.DS
         expected = DS('0.9990268')
         self.assertTrue(got == expected,
                         "Cum Dose Ref Coeff not the expected value (CP1, Ref'd Dose Ref")
@@ -112,7 +112,7 @@ class ReaderTests(unittest.TestCase):
                          "ImplementationClassUID does not match the value accessed by tag number")
         # (0020, 0032) Image Position (Patient)  [-158.13580300000001, -179.035797, -75.699996999999996]
         got = ct.ImagePositionPatient
-        DS = dicom.valuerep.DS
+        DS = pydicom.valuerep.DS
         expected = [DS('-158.135803'), DS('-179.035797'), DS('-75.699997')]
         self.assertTrue(got == expected, "ImagePosition(Patient) values not as expected."
                         "got {0}, expected {1}".format(got, expected))
@@ -199,7 +199,7 @@ class ReaderTests(unittest.TestCase):
         self.assertEqual(mr.PatientName, mr[0x10, 0x10].value,
                          "Name does not match value found when accessed by tag number")
         got = mr.PixelSpacing
-        DS = dicom.valuerep.DS
+        DS = pydicom.valuerep.DS
         expected = [DS('0.3125'), DS('0.3125')]
         self.assertTrue(got == expected, "Wrong pixel spacing")
 
@@ -397,7 +397,7 @@ class FileLikeTests(unittest.TestCase):
         ct = read_file(f)
         # Tests here simply repeat testCT -- perhaps should collapse the code together?
         got = ct.ImagePositionPatient
-        DS = dicom.valuerep.DS
+        DS = pydicom.valuerep.DS
         expected = [DS('-158.135803'), DS('-179.035797'), DS('-75.699997')]
         self.assertTrue(got == expected, "ImagePosition(Patient) values not as expected")
         self.assertEqual(ct.file_meta.ImplementationClassUID, '1.3.6.1.4.1.5962.2',
@@ -423,7 +423,7 @@ class FileLikeTests(unittest.TestCase):
         ct = read_file(file_like)
         # Tests here simply repeat some of testCT test
         got = ct.ImagePositionPatient
-        DS = dicom.valuerep.DS
+        DS = pydicom.valuerep.DS
         expected = [DS('-158.135803'), DS('-179.035797'), DS('-75.699997')]
         self.assertTrue(got == expected, "ImagePosition(Patient) values not as expected")
         self.assertEqual(len(ct.PixelData), 128 * 128 * 2, "Pixel data not expected length")

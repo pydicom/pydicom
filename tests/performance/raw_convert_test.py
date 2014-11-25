@@ -18,7 +18,7 @@ import pstats
 
 
 def test_full_read(filename):
-    dataset = dicom.read_file(filename)
+    dataset = pydicom.read_file(filename)
     return dataset
 
 

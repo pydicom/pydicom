@@ -1,5 +1,5 @@
 # test_rawread.py
-"""unittest tests for dicom.filereader module -- simple raw data elements"""
+"""unittest tests for pydicom.filereader module -- simple raw data elements"""
 # Copyright (c) 2010-2012 Darcy Mason
 # This file is part of pydicom, relased under an MIT license.
 #    See the file license.txt included with this distribution, also
@@ -270,5 +270,5 @@ class RawSequenceTests(unittest.TestCase):
 
 if __name__ == "__main__":
     # import pydicom
-    # dicom.debug()
+    # pydicom.debug()
     unittest.main()

@@ -1,5 +1,5 @@
 # test_filewriter.py
-"""unittest cases for dicom.filewriter module"""
+"""unittest cases for pydicom.filewriter module"""
 # Copyright (c) 2008-2012 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
 #    See the file license.txt included with this distribution, also
@@ -20,9 +20,9 @@ from pydicom.filebase import DicomBytesIO
 from pydicom.dataelem import DataElement
 
 from pkg_resources import Requirement, resource_filename
-test_dir = resource_filename(Requirement.parse("pydicom"), "dicom/testfiles")
+test_dir = resource_filename(Requirement.parse("pydicom"), "tests/test_files")
 testcharset_dir = resource_filename(Requirement.parse("pydicom"),
-                                    "dicom/testcharsetfiles")
+                                    "tests/charset_files")
 
 rtplan_name = os.path.join(test_dir, "rtplan.dcm")
 rtdose_name = os.path.join(test_dir, "rtdose.dcm")
@@ -201,7 +201,7 @@ class ScratchWriteTests(unittest.TestCase):
 
     def testImpl_LE_deflen_write(self):
         """Scratch Write for implicit VR little endian, defined length SQ's"""
-        from pydicom.test._write_stds import impl_LE_deflen_std_hex as std
+        from tests._write_stds import impl_LE_deflen_std_hex as std
 
         file_ds = FileDataset("test", self.ds)
         self.compare_write(std, file_ds)

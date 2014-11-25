@@ -1,6 +1,6 @@
 # -*- coding: latin_1 -*-
 # test_charset.py
-"""unittest cases for dicom.charset module"""
+"""unittest cases for pydicom.charset module"""
 # Copyright (c) 2008 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
 #    See the file license.txt included with this distribution, also
@@ -12,21 +12,21 @@ import os.path
 
 from pkg_resources import Requirement, resource_filename
 testcharset_dir = resource_filename(Requirement.parse("pydicom"),
-                                    "dicom/testcharsetfiles")
+                                    "tests/charset_files")
 
 latin1_file = os.path.join(testcharset_dir, "chrFren.dcm")
 jp_file = os.path.join(testcharset_dir, "chrH31.dcm")
 multiPN_file = os.path.join(testcharset_dir, "chrFrenMulti.dcm")
 sq_encoding_file = os.path.join(testcharset_dir, "chrSQEncoding.dcm")
 
-test_dir = resource_filename(Requirement.parse("pydicom"), "dicom/testfiles")
+test_dir = resource_filename(Requirement.parse("pydicom"), "tests/test_files")
 normal_file = os.path.join(test_dir, "CT_small.dcm")
 
 
 class charsetTests(unittest.TestCase):
     def testLatin1(self):
         """charset: can read and decode latin_1 file........................"""
-        ds = dicom.read_file(latin1_file)
+        ds = pydicom.read_file(latin1_file)
         ds.decode()
         # Make sure don't get unicode encode error on converting to string
         expected = u'Buc^J\xe9r\xf4me'
@@ -36,7 +36,7 @@ class charsetTests(unittest.TestCase):
 
     def testNestedCharacterSets(self):
         """charset: can read and decode SQ with different encodings........."""
-        ds = dicom.read_file(sq_encoding_file)
+        ds = pydicom.read_file(sq_encoding_file)
         ds.decode()
         # These datasets inside of the SQ cannot be decoded with default_encoding
         # OR UTF-8 (the parent dataset's encoding). Instead, we make sure that it
@@ -48,12 +48,12 @@ class charsetTests(unittest.TestCase):
 
     def testStandardFile(self):
         """charset: can read and decode standard file without special char.."""
-        ds = dicom.read_file(normal_file)
+        ds = pydicom.read_file(normal_file)
         ds.decode()
 
     def testMultiPN(self):
         """charset: can decode file with multi-valued data elements........."""
-        ds = dicom.read_file(multiPN_file)
+        ds = pydicom.read_file(multiPN_file)
         ds.decode()
 
 

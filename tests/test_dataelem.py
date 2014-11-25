@@ -1,5 +1,5 @@
 # test_dataelem.py
-"""unittest cases for dicom.dataelem module"""
+"""unittest cases for pydicom.dataelem module"""
 # Copyright (c) 2008 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
 #    See the file license.txt included with this distribution, also

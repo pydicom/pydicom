@@ -1,5 +1,5 @@
 # test_dataset.py
-"""unittest cases for dicom.dataset module"""
+"""unittest cases for pydicom.dataset module"""
 # Copyright (c) 2008-2012 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
 #    See the file license.txt included with this distribution, also

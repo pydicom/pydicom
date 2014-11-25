@@ -24,10 +24,10 @@ class MultiValuetests(unittest.TestCase):
 
     def testLimits(self):
         """MultiValue: Raise error if any item outside DICOM limits...."""
-        original_flag = dicom.config.enforce_valid_values
-        dicom.config.enforce_valid_values = True
+        original_flag = pydicom.config.enforce_valid_values
+        pydicom.config.enforce_valid_values = True
         self.assertRaises(OverflowError, MultiValue, IS, [1, -2 ** 31 - 1])  # Overflow error not raised for IS out of DICOM valid range
-        dicom.config.enforce_valid_values = original_flag
+        pydicom.config.enforce_valid_values = original_flag
 
     def testAppend(self):
         """MultiValue: Append of item converts it to required type..."""

@@ -12,6 +12,6 @@ echo -
 echo -----------------
 echo Check locations, make sure not pointing to old pydicom code:
 echo Python 2.6
-python2.6 -c "import dicom;print dicom.__file__"
+python2.6 -c "import pydicom;print pydicom.__file__"
 echo Python 2.7
-python2.7 -c "import dicom;print dicom.__file__"
+python2.7 -c "import pydicom;print pydicom.__file__"

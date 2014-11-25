@@ -10,7 +10,7 @@ class UnicodeFilenames(unittest.TestCase):
         """Unicode: Can read a file with unicode characters in name................"""
         uni_name = u'test°'
         try:
-            dicom.read_file(uni_name)
+            pydicom.read_file(uni_name)
         except UnicodeEncodeError:
             self.fail("UnicodeEncodeError generated for unicode name")
         # ignore file doesn't exist error
