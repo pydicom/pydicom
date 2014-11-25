@@ -21,8 +21,8 @@ Here is a simple example of using pydicom in an interactive session, to read
 a radiotherapy plan file, change the patient setup from head-first-supine to 
 head-first-prone, and save to a new file:
 
->>> import dicom
->>> plan = dicom.read_file("rtplan.dcm")
+>>> import pydicom
+>>> plan = pydicom.read_file("rtplan.dcm")
 >>> plan.PatientName
 'Last^First^mid^pre'
 >>> plan.dir("setup")    # get a list of tags with "setup" somewhere in the name

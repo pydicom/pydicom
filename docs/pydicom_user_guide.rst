@@ -30,8 +30,8 @@ described below), and the value is a DataElement instance
 A dataset could be created directly, but you will usually get one by reading 
 an existing DICOM file::
 
-    >>> import dicom
-    >>> ds = dicom.read_file("rtplan.dcm") # (rtplan.dcm is in the testfiles directory)
+    >>> import pydicom
+    >>> ds = pydicom.read_file("rtplan.dcm") # (rtplan.dcm is in the testfiles directory)
 
 
 You can display the entire dataset by simply printing its string 
@@ -167,7 +167,7 @@ a number with some extra behaviour:
   * a Tag instance can be created from a long or from a tuple containing 
     the (group,element) separately::
 
-        >>> from dicom.tag import Tag
+        >>> from pydicom.tag import Tag
         >>> t1=Tag(0x00100010) # all of these are equivalent
         >>> t2=Tag(0x10,0x10)
         >>> t3=Tag((0x10, 0x10))

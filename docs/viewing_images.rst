@@ -31,7 +31,7 @@ Here is an example::
 
     >>> import dicom
     >>> import pylab
-    >>> ds=dicom.read_file("CT_small.dcm")
+    >>> ds=pydicom.read_file("CT_small.dcm")
     >>> pylab.imshow(ds.pixel_array, cmap=pylab.cm.bone)
     <matplotlib.image.AxesImage object at 0x0162A530>
     >>> pylab.show()
