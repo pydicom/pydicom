@@ -2,7 +2,7 @@
 #
 import warnings
 import unittest
-from tests.version_dep import capture_warnings
+from version_dep import capture_warnings
 
 
 def assertWarns(self, warn_msg, function, *func_args, **func_kwargs):

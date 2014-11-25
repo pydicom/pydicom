@@ -31,7 +31,7 @@ from pydicom.tag import Tag, TupleTag
 import pydicom.valuerep
 import gzip
 
-from tests.warncheck import assertWarns
+from warncheck import assertWarns
 
 test_dir = os.path.dirname(__file__)
 test_files = os.path.join(test_dir, 'test_files')
