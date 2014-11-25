@@ -1,25 +1,20 @@
 #!/usr/bin/env python
 try:
-    from setuptools import setup, find_packages
+    from setuptools import setup
 except:
     from ez_setup import use_setuptools
     use_setuptools()
-    from setuptools import setup, find_packages
-
-import os
-import os.path
-
-import sys
 
 extra = {}
 
-
 setup(
     name="pydicom",
-    packages=find_packages(),
+    packages=['pydicom',
+              'pydicom.contrib',
+              'pydicom.examples',
+              'pydicom.util'],
     include_package_data=True,
     version="1.0.0",
-    package_data={'pydicom': ['testfiles/*.dcm']},
     zip_safe=False,  # want users to be able to see included examples,tests
     description="Pure python package for DICOM medical file reading and writing",
     author="Darcy Mason and contributors",
