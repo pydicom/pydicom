@@ -128,14 +128,14 @@ class Dataset(dict):
         See DICOM PS3.5-2008 6.1.1.
         """
         # Find specific character set. 'ISO_IR 6' is default
-        # May be multi-valued, but let dicom.charset handle all logic on that
+        # May be multi-valued, but let pydicom.charset handle all logic on that
         dicom_character_set = self._character_set
 
-        # Shortcut to the decode function in dicom.charset
-        decode_data_element = dicom.charset.decode
+        # Shortcut to the decode function in pydicom.charset
+        decode_data_element = pydicom.charset.decode
 
         # Callback for walk(), to decode the chr strings if necessary
-        # This simply calls the dicom.charset.decode function
+        # This simply calls the pydicom.charset.decode function
         def decode_callback(ds, data_element):
             if data_element.VR == 'SQ':
                 [dset.decode() for dset in data_element.value]
@@ -486,9 +486,9 @@ class Dataset(dict):
         """Write the dataset to a file.
 
         :param filename: full path and filename to save the file to
-        :write_like_original: see dicom.filewriter.write_file for info on this parameter.
+        :write_like_original: see pydicom.filewriter.write_file for info on this parameter.
         """
-        dicom.write_file(filename, self, write_like_original)
+        pydicom.write_file(filename, self, write_like_original)
 
     def __setattr__(self, name, value):
         """Intercept any attempts to set a value for an instance attribute.

@@ -158,9 +158,9 @@ class DataElement(object):
     def _convert(self, val):
         """Take the value and convert to number, etc if possible"""
         if self.VR == 'IS':
-            return dicom.valuerep.IS(val)
+            return pydicom.valuerep.IS(val)
         elif self.VR == 'DS':
-            return dicom.valuerep.DS(val)
+            return pydicom.valuerep.DS(val)
         elif self.VR == "UI":
             return UID(val)
         elif in_py3 and self.VR == "PN":

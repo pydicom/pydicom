@@ -87,7 +87,7 @@ class DSdecimal(Decimal):
         # Store this value here so that if the input string is actually a valid
         # string but decimal.Decimal transforms it to an invalid string it will
         # still be initialized properly
-        enforce_length = dicom.config.enforce_valid_values
+        enforce_length = pydicom.config.enforce_valid_values
         # DICOM allows spaces around the string, but python doesn't, so clean it
         if isinstance(val, (str, unicode)):
             val = val.strip()
@@ -97,7 +97,7 @@ class DSdecimal(Decimal):
                 enforce_length = False
         if val == '':
             return val
-        if isinstance(val, float) and not dicom.config.allow_DS_float:
+        if isinstance(val, float) and not pydicom.config.allow_DS_float:
             msg = ("DS cannot be instantiated with a float value, unless "
                    "config.allow_DS_float is set to True. It is recommended to "
                    "convert to a string instead, with the desired number of digits, "
@@ -135,7 +135,7 @@ class DSdecimal(Decimal):
         return "'" + str(self) + "'"
 
 # CHOOSE TYPE OF DS
-if dicom.config.use_DS_decimal:
+if pydicom.config.use_DS_decimal:
     DSclass = DSdecimal
 else:
     DSclass = DSfloat
@@ -175,7 +175,7 @@ class IS(int):
         if isinstance(val, (float, Decimal)) and newval != val:
             raise TypeError("Could not convert value to integer without loss")
         # Checks in case underlying int is >32 bits, DICOM does not allow this
-        if (newval < -2 ** 31 or newval >= 2 ** 31) and dicom.config.enforce_valid_values:
+        if (newval < -2 ** 31 or newval >= 2 ** 31) and pydicom.config.enforce_valid_values:
             message = "Value exceeds DICOM limits of -2**31 to (2**31 - 1) for IS"
             raise OverflowError(message)
         return newval

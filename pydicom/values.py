@@ -56,14 +56,14 @@ def convert_DS_string(byte_string, is_little_endian, struct_format=None):
         byte_string = byte_string.decode(default_encoding)
     # Below, go directly to DS class instance rather than factory DS,
     # but need to ensure last string doesn't have blank padding (use strip())
-    return MultiString(byte_string.strip(), valtype=dicom.valuerep.DSclass)
+    return MultiString(byte_string.strip(), valtype=pydicom.valuerep.DSclass)
 
 
 def convert_IS_string(byte_string, is_little_endian, struct_format=None):
     """Read and return an IS value or list of values"""
     if in_py3:
         byte_string = byte_string.decode(default_encoding)
-    return MultiString(byte_string, valtype=dicom.valuerep.IS)
+    return MultiString(byte_string, valtype=pydicom.valuerep.IS)
 
 
 def convert_numbers(byte_string, is_little_endian, struct_format):
@@ -155,7 +155,7 @@ def convert_UI(byte_string, is_little_endian, struct_format=None):
         byte_string = byte_string.decode(default_encoding)
     if byte_string and byte_string.endswith('\0'):
         byte_string = byte_string[:-1]
-    return MultiString(byte_string, dicom.UID.UID)
+    return MultiString(byte_string, pydicom.UID.UID)
 
 
 def convert_UN(byte_string, is_little_endian, struct_format=None):

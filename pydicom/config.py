@@ -20,9 +20,9 @@ def DS_decimal(use_Decimal_boolean=True):
     use_DS_decimal = use_Decimal_boolean
     import pydicom.valuerep
     if use_DS_decimal:
-        dicom.valuerep.DSclass = dicom.valuerep.DSdecimal
+        pydicom.valuerep.DSclass = pydicom.valuerep.DSdecimal
     else:
-        dicom.valuerep.DSclass = dicom.valuerep.DSfloat
+        pydicom.valuerep.DSclass = pydicom.valuerep.DSfloat
 
 
 allow_DS_float = False

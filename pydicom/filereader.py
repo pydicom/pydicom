@@ -59,16 +59,16 @@ class DicomIter(object):
         if has_header:
             self.file_meta_info = file_meta_info = _read_file_meta_info(fp)
             transfer_syntax = file_meta_info.TransferSyntaxUID
-            if transfer_syntax == dicom.UID.ExplicitVRLittleEndian:
+            if transfer_syntax == pydicom.UID.ExplicitVRLittleEndian:
                 self._is_implicit_VR = False
                 self._is_little_endian = True
-            elif transfer_syntax == dicom.UID.ImplicitVRLittleEndian:
+            elif transfer_syntax == pydicom.UID.ImplicitVRLittleEndian:
                 self._is_implicit_VR = True
                 self._is_little_endian = True
-            elif transfer_syntax == dicom.UID.ExplicitVRBigEndian:
+            elif transfer_syntax == pydicom.UID.ExplicitVRBigEndian:
                 self._is_implicit_VR = False
                 self._is_little_endian = False
-            elif transfer_syntax == dicom.UID.DeflatedExplicitVRLittleEndian:
+            elif transfer_syntax == pydicom.UID.DeflatedExplicitVRLittleEndian:
                 # See PS3.6-2008 A.5 (p 71) -- when written, the entire dataset
                 #   following the file metadata was prepared the normal way,
                 #   then "deflate" compression applied.
@@ -89,7 +89,7 @@ class DicomIter(object):
                 self._is_implicit_VR = False
                 self._is_little_endian = True
         else:  # no header -- make assumptions
-            fp.TransferSyntaxUID = dicom.UID.ImplicitVRLittleEndian
+            fp.TransferSyntaxUID = pydicom.UID.ImplicitVRLittleEndian
             self._is_little_endian = True
             self._is_implicit_VR = True
 
@@ -156,7 +156,7 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian,
     fp_read = fp.read
     fp_tell = fp.tell
     logger_debug = logger.debug
-    debugging = dicom.debugging
+    debugging = pydicom.debugging
     element_struct_unpack = element_struct.unpack
 
     while True:
@@ -398,7 +398,7 @@ def _read_file_meta_info(fp):
 
     # Get group length data element, whose value is the length of the meta_info
     fp_save = fp.tell()  # in case need to rewind
-    debugging = dicom.debugging
+    debugging = pydicom.debugging
     if debugging:
         logger.debug("Try to read group length info...")
     bytes_read = fp.read(8)
@@ -475,7 +475,7 @@ def read_preamble(fp, force):
     """
     logger.debug("Reading preamble...")
     preamble = fp.read(0x80)
-    if dicom.debugging:
+    if pydicom.debugging:
         sample = bytes2hex(preamble[:8]) + "..." + bytes2hex(preamble[-8:])
         logger.debug("{0:08x}: {1}".format(fp.tell() - 0x80, sample))
     magic = fp.read(4)
@@ -520,14 +520,14 @@ def read_partial(fileobj, stop_when=None, defer_size=None, force=False):
     if preamble:
         file_meta_dataset = _read_file_meta_info(fileobj)
         transfer_syntax = file_meta_dataset.TransferSyntaxUID
-        if transfer_syntax == dicom.UID.ImplicitVRLittleEndian:
+        if transfer_syntax == pydicom.UID.ImplicitVRLittleEndian:
             pass
-        elif transfer_syntax == dicom.UID.ExplicitVRLittleEndian:
+        elif transfer_syntax == pydicom.UID.ExplicitVRLittleEndian:
             is_implicit_VR = False
-        elif transfer_syntax == dicom.UID.ExplicitVRBigEndian:
+        elif transfer_syntax == pydicom.UID.ExplicitVRBigEndian:
             is_implicit_VR = False
             is_little_endian = False
-        elif transfer_syntax == dicom.UID.DeflatedExplicitVRLittleEndian:
+        elif transfer_syntax == pydicom.UID.DeflatedExplicitVRLittleEndian:
             # See PS3.6-2008 A.5 (p 71)
             # when written, the entire dataset following
             #     the file metadata was prepared the normal way,
@@ -546,7 +546,7 @@ def read_partial(fileobj, stop_when=None, defer_size=None, force=False):
             #        by Standard PS 3.5-2008 A.4 (p63)
             is_implicit_VR = False
     else:  # no header -- use the is_little_endian, implicit assumptions
-        file_meta_dataset.TransferSyntaxUID = dicom.UID.ImplicitVRLittleEndian
+        file_meta_dataset.TransferSyntaxUID = pydicom.UID.ImplicitVRLittleEndian
 
     try:
         dataset = read_dataset(fileobj, is_implicit_VR, is_little_endian,
@@ -576,7 +576,7 @@ def read_file(fp, defer_size=None, stop_before_pixels=False, force=False):
         (and anything after them).
         If False (default), the full file will be read and parsed.
     :param force: Set to True to force reading even if no header is found.
-                  If False, a dicom.filereader.InvalidDicomError is raised
+                  If False, a pydicom.filereader.InvalidDicomError is raised
                   when the file is not valid DICOM.
     :returns: a FileDataset instance
     """
@@ -588,7 +588,7 @@ def read_file(fp, defer_size=None, stop_before_pixels=False, force=False):
         logger.debug(u"Reading file '{0}'".format(fp))
         fp = open(fp, 'rb')
 
-    if dicom.debugging:
+    if pydicom.debugging:
         logger.debug("\n" + "-" * 80)
         logger.debug("Call to read_file()")
         msg = ("filename:'%s', defer_size='%s', "
