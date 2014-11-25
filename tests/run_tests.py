@@ -17,18 +17,13 @@ test_dir = os.path.dirname(__file__)
 
 class MyTestLoader(object):
     def loadTestsFromNames(self, *args):
-        # Simplest to change to directory where test_xxx.py files are
-        filenames = glob.glob(os.path.join(test_dir, 'test*.py'))
-        filenames = [os.path.basename(fname) for fname in filenames]
-        module_names = [os.path.splitext(fname)[0] for fname in filenames]
-
-        # Load all the tests
         suite = unittest.TestSuite()
-        for module_name in module_names:
-            module_dotted_name = "tests." + module_name
-            test = unittest.defaultTestLoader.loadTestsFromName(
-                module_dotted_name)
-            suite.addTest(test)
+        try:
+            suite.addTests(unittest.defaultTestLoader.discover(test_dir))
+        except AttributeError:
+            import unittest2
+            suite.addTests(unittest2.defaultTestLoader.discover(test_dir))
+
         return suite
 
 if __name__ == "__main__":
