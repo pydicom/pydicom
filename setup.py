@@ -59,7 +59,7 @@ setup(
     `Pydicom User Guide <http://code.google.com/p/pydicom/wiki/PydicomUserGuide>`_ page
     for an overview of how to use the pydicom library.
     """,
-    test_loader="test.run_tests:MyTestLoader",
+    test_loader="tests.run_tests:MyTestLoader",
     test_suite="dummy_string",
     **extra
 )
