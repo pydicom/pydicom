@@ -20,6 +20,8 @@ Dataset(derived class of Python's dict class)
 #
 import sys
 from sys import byteorder
+import six
+from six.moves import zip
 sys_is_little_endian = (byteorder == 'little')
 import logging
 logger = logging.getLogger('pydicom')
@@ -110,7 +112,7 @@ class Dataset(dict):
         This is called for code like: ``if 'SliceLocation' in dataset``.
 
         """
-        if isinstance(name, (str, unicode)):
+        if isinstance(name, (str, six.text_type)):
             tag = tag_for_name(name)
         else:
             try:
@@ -218,7 +220,7 @@ class Dataset(dict):
 
     def get(self, key, default=None):
         """Extend dict.get() to handle DICOM keywords"""
-        if isinstance(key, (str, unicode)):
+        if isinstance(key, (str, six.text_type)):
             try:
                 return getattr(self, key)
             except AttributeError:
@@ -417,8 +419,8 @@ class Dataset(dict):
             return self._get_pixel_array()
         except AttributeError:
             t, e, tb = sys.exc_info()
-            raise PropertyError("AttributeError in pixel_array property: " +
-                                e.args[0]), None, tb
+            six.reraise(PropertyError("AttributeError in pixel_array property: " +
+                                e.args[0]), None, tb)
 
     # Format strings spec'd according to python string formatting options
     #    See http://docs.python.org/library/stdtypes.html#string-formatting-operations
@@ -550,8 +552,8 @@ class Dataset(dict):
 
     def update(self, dictionary):
         """Extend dict.update() to handle DICOM keywords."""
-        for key, value in dictionary.items():
-            if isinstance(key, (str, unicode)):
+        for key, value in list(dictionary.items()):
+            if isinstance(key, (str, six.text_type)):
                 setattr(self, key, value)
             else:
                 self[Tag(key)] = value

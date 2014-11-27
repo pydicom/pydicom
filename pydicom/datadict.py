@@ -23,8 +23,8 @@ masks = {}
 for mask_x in RepeatersDictionary:
     # mask1 is XOR'd to see that all non-"x" bits are identical (XOR result = 0 if bits same)
     #      then AND those out with 0 bits at the "x" ("we don't care") location using mask2
-    mask1 = long(mask_x.replace("x", "0"), 16)
-    mask2 = long("".join(["F0"[c == "x"] for c in mask_x]), 16)
+    mask1 = int(mask_x.replace("x", "0"), 16)
+    mask2 = int("".join(["F0"[c == "x"] for c in mask_x]), 16)
     masks[mask_x] = (mask1, mask2)
 
 # For shorter naming of dicom member elements, put an entry here

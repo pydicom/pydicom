@@ -1,5 +1,6 @@
 # filewriter.py
 """Write a dicom media file."""
+from __future__ import absolute_import
 # Copyright (c) 2008-2012 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
 #    See the file license.txt included with this distribution, also
@@ -8,6 +9,7 @@
 from struct import pack
 
 import logging
+import six
 logger = logging.getLogger('pydicom')
 
 from pydicom import in_py3
@@ -84,7 +86,7 @@ def write_PN(fp, data_element, padding=b' ', encoding=None):
     else:
         val = data_element.value
 
-    if isinstance(val[0], unicode) or in_py3:
+    if isinstance(val[0], six.text_type) or in_py3:
         val = [elem.encode(encoding) for elem in val]
 
     val = b'\\'.join(val)
@@ -101,7 +103,7 @@ def write_string(fp, data_element, padding=' ', encoding=default_encoding):
     if len(val) % 2 != 0:
         val = val + padding   # pad to even length
 
-    if isinstance(val, unicode):
+    if isinstance(val, six.text_type):
         val = val.encode(encoding)
 
     fp.write(val)
@@ -150,7 +152,7 @@ def write_data_element(fp, data_element, encoding=default_encoding):
     if not fp.is_implicit_VR and VR not in ['OB', 'OW', 'OF', 'SQ', 'UT', 'UN']:
         fp.write_US(0)  # Explicit VR length field is only 2 bytes
     else:
-        fp.write_UL(0xFFFFFFFFL)   # will fill in real length value later if not undefined length item
+        fp.write_UL(0xFFFFFFFF)   # will fill in real length value later if not undefined length item
 
     encoding = convert_encodings(encoding)
 
@@ -217,7 +219,7 @@ def write_sequence_item(fp, dataset, encoding):
     # This is similar to writing a data_element, but with a specific tag for Sequence Item
     fp.write_tag(ItemTag)   # marker for start of Sequence Item
     length_location = fp.tell()  # save location for later.
-    fp.write_UL(0xffffffffL)   # will fill in real value later if not undefined length
+    fp.write_UL(0xffffffff)   # will fill in real value later if not undefined length
     write_dataset(fp, dataset, parent_encoding=encoding)
     if getattr(dataset, "is_undefined_length_sequence_item", False):
         fp.write_tag(ItemDelimiterTag)
@@ -337,7 +339,7 @@ def write_file(filename, dataset, write_like_original=True):
 
     caller_owns_file = True
     # Open file if not already a file object
-    if isinstance(filename, basestring):
+    if isinstance(filename, six.string_types):
         fp = DicomFile(filename, 'wb')
         # caller provided a file name; we own the file handle
         caller_owns_file = False

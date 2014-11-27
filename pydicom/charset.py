@@ -8,6 +8,7 @@
 #
 
 import logging
+import six
 logger = logging.getLogger('pydicom')
 from pydicom.valuerep import PersonNameUnicode, text_VRs
 from pydicom import in_py3
@@ -60,7 +61,7 @@ def convert_encodings(encodings):
     # If a list if passed, we don't want to modify the list in place so copy it
     encodings = encodings[:]
 
-    if isinstance(encodings, basestring):
+    if isinstance(encodings, six.string_types):
         encodings = [encodings]
     elif not encodings[0]:
         encodings[0] = 'ISO_IR 6'
@@ -116,7 +117,7 @@ def decode(data_element, dicom_character_set):
 
         # You can't re-decode unicode (string literals in py3)
         if data_element.VM == 1:
-            if isinstance(data_element.value, unicode):
+            if isinstance(data_element.value, six.text_type):
                 return
             data_element.value = clean_escseq(
                 data_element.value.decode(encodings[0]), encodings)
@@ -125,7 +126,7 @@ def decode(data_element, dicom_character_set):
             output = list()
 
             for value in data_element.value:
-                if isinstance(value, unicode):
+                if isinstance(value, six.text_type):
                     output.append(value)
                 else:
                     output.append(clean_escseq(value.decode(encodings[0]), encodings))

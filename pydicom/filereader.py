@@ -17,6 +17,7 @@ from pydicom.util.hexutil import bytes2hex
 from pydicom.valuerep import extra_length_VRs
 from pydicom.charset import default_encoding, convert_encodings
 from pydicom import in_py3
+import six
 
 logger = logging.getLogger('pydicom')
 
@@ -185,7 +186,7 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian,
             debug_msg = "%-47s  (%04x, %04x)" % (debug_msg, group, elem)
             if not is_implicit_VR:
                 debug_msg += " %s " % VR
-            if length != 0xFFFFFFFFL:
+            if length != 0xFFFFFFFF:
                 debug_msg += "Length: %d" % length
             else:
                 debug_msg += "Length: Undefined length (FFFFFFFF)"
@@ -208,7 +209,7 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian,
 
         # Reading the value
         # First case (most common): reading a value with a defined length
-        if length != 0xFFFFFFFFL:
+        if length != 0xFFFFFFFF:
             if defer_size is not None and length > defer_size:
                 # Flag as deferred by setting value to None, and skip bytes
                 value = None
@@ -328,7 +329,7 @@ def read_sequence(fp, is_implicit_VR, is_little_endian, bytelength, encoding,
     seq = []  # use builtin list to start for speed, convert to Sequence at end
     is_undefined_length = False
     if bytelength != 0:  # SQ of length 0 possible (PS 3.5-2008 7.5.1a (p.40)
-        if bytelength == 0xffffffffL:
+        if bytelength == 0xffffffff:
             is_undefined_length = True
             bytelength = None
         fp_tell = fp.tell  # for speed in loop
@@ -372,7 +373,7 @@ def read_sequence_item(fp, is_implicit_VR, is_little_endian, encoding, offset=0)
     else:
         logger.debug("{0:08x}: {1}  Found Item tag (start of item)".format(
             fp.tell() - 4 + offset, bytes2hex(bytes_read)))
-    if length == 0xFFFFFFFFL:
+    if length == 0xFFFFFFFF:
         ds = read_dataset(fp, is_implicit_VR, is_little_endian,
                           bytelength=None, parent_encoding=encoding)
         ds.is_undefined_length_sequence_item = True
@@ -582,7 +583,7 @@ def read_file(fp, defer_size=None, stop_before_pixels=False, force=False):
     """
     # Open file if not already a file object
     caller_owns_file = True
-    if isinstance(fp, basestring):
+    if isinstance(fp, six.string_types):
         # caller provided a file name; we own the file handle
         caller_owns_file = False
         logger.debug(u"Reading file '{0}'".format(fp))
