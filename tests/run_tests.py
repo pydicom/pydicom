@@ -21,8 +21,13 @@ class MyTestLoader(object):
         try:
             suite.addTests(unittest.defaultTestLoader.discover(test_dir))
         except AttributeError:
-            import unittest2
-            suite.addTests(unittest2.defaultTestLoader.discover(test_dir))
+            try:
+                import unittest2
+            except ImportError:
+                print("Unittest2 is needed for test discovery with python 2.6")
+                raise
+            else:
+                suite.addTests(unittest2.defaultTestLoader.discover(test_dir))
 
         return suite
 
