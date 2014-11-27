@@ -1,6 +1,6 @@
 # UID.py
 """Dicom Unique identifiers"""
-# Copyright (c) 2008 Darcy Mason
+# Copyright (c) 2008-2014 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
@@ -11,6 +11,7 @@ import datetime
 from math import fabs
 
 from _UID_dict import UID_dictionary
+import six
 
 
 class InvalidUID(Exception):
@@ -47,7 +48,7 @@ class UID(str):
         if isinstance(val, UID):
             return val
         else:
-            if isinstance(val, basestring):
+            if isinstance(val, six.string_types):
                 return super(UID, cls).__new__(cls, val.strip())
             else:
                 raise TypeError("UID must be a string")
@@ -178,7 +179,7 @@ def generate_uid(prefix=pydicom_root_UID, truncate=False):
                     datetime.datetime.today().second,
                     datetime.datetime.today().microsecond]  # nopep8
 
-        suffix = ''.join([str(long(x)) for x in uid_info])
+        suffix = ''.join([str(int(x)) for x in uid_info])
         dicom_uid = ''.join([prefix, suffix])
 
     if truncate:
