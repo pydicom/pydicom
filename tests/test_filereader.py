@@ -128,14 +128,14 @@ class ReaderTests(unittest.TestCase):
         msg = "Mismatch in private tag name, expected '%s', got '%s'"
         self.assertEqual(expected, got, msg % (expected, got))
 
-        # Check that can read pixels - get last one in array
-        if have_numpy:
-            expected = 909
-            got = ct.pixel_array[-1][-1]
-            msg = "Did not get correct value for last pixel: expected %d, got %r" % (expected, got)
-            self.assertEqual(expected, got, msg)
-        else:
-            print "**Numpy not available -- pixel array test skipped**"
+    @unittest.skipUnless(have_numpy, "Numpy not installed")
+    def testCTPixelData(self):
+        """Check that we can read pixel data. Tests that we get last one in array."""
+        ct = read_file(ct_name)
+        expected = 909
+        got = ct.pixel_array[-1][-1]
+        msg = "Did not get correct value for last pixel: expected %d, got %r" % (expected, got)
+        self.assertEqual(expected, got, msg)
 
     def testNoForce(self):
         """Raises exception if missing DICOM header and force==False..........."""
