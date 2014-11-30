@@ -295,27 +295,46 @@ def _write_file_meta_info(fp, meta_dataset):
 
 
 def write_file(filename, dataset, write_like_original=True):
-    """Store a Dataset to the filename specified.
+    """Store a FileDataset to the filename specified.
 
+    Parameters
+    ----------
+    filename : str
+        Name of file to save new DICOM file to.
+    dataset : FileDataset
+        Dataset holding the DICOM information; e.g. an object
+        read with read_file().
+    write_like_original : boolean
+        If True (default), preserves the following information from
+        the dataset:
+        -preamble -- if no preamble in read file, than not used here
+        -hasFileMeta -- if writer did not do file meta information,
+            then don't write here either
+        -seq.is_undefined_length -- if original had delimiters, write them now too,
+            instead of the more sensible length characters
+        - is_undefined_length_sequence_item -- for datasets that belong to a
+            sequence, write the undefined length delimiters if that is
+            what the original had.
+        If False, produces a "nicer" DICOM file for other readers,
+            where all lengths are explicit.
+
+    See Also
+    --------
+    pydicom.dataset.FileDataset
+        Dataset class with relevant attrs and information.
+    pydicom.dataset.Dataset.save_as
+        Write a DICOM file from a dataset that was read in with read_file().
+
+    Notes
+    -----
     Set dataset.preamble if you want something other than 128 0-bytes.
     If the dataset was read from an existing dicom file, then its preamble
-    was stored at read time. It is up to you to ensure the preamble is still
+    was stored at read time. It is up to the user to ensure the preamble is still
     correct for its purposes.
-    If there is no Transfer Syntax tag in the dataset,
-       Set dataset.is_implicit_VR, and .is_little_endian
-       to determine the transfer syntax used to write the file.
-    write_like_original -- True if want to preserve the following for each sequence
-        within this dataset:
-        - preamble -- if no preamble in read file, than not used here
-        - dataset.hasFileMeta -- if writer did not do file meta information,
-            then don't write here either
-        - seq.is_undefined_length -- if original had delimiters, write them now too,
-            instead of the more sensible length characters
-        - <dataset>.is_undefined_length_sequence_item -- for datasets that belong to a
-            sequence, write the undefined length delimiters if that is
-            what the original had
-        Set write_like_original = False to produce a "nicer" DICOM file for other readers,
-            where all lengths are explicit.
+
+    If there is no Transfer Syntax tag in the dataset, then set
+    dataset.is_implicit_VR and dataset.is_little_endian
+    to determine the transfer syntax used to write the file.
     """
 
     # Decide whether to write DICOM preamble. Should always do so unless trying to mimic the original file read in
