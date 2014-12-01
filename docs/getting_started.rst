@@ -6,6 +6,7 @@ Getting Started with pydicom
 
 .. rubric:: Brief overview of pydicom and how to install.
 
+
 Introduction
 ==============
 
@@ -48,9 +49,9 @@ easily be modified.
 
 License
 =======
-pydicom has a `license 
-<http://code.google.com/p/pydicom/source/browse/source/dicom/license.txt>`_ 
-based on the MIT license.
+
+pydicom has an MIT-based `license
+<https://github.com/darcymason/pydicom/blob/master/source/dicom/license.txt>`_.
 
 
 Installing
@@ -60,59 +61,59 @@ As a pure python package, pydicom is easy to install and has no
 requirements other than python itself (the NumPy library is recommended, 
 but is only required if manipulating pixel data).
 
-Note: in addition to the instructions below, pydicom can also be installed 
-through the `Python(x,y) <http://www.pythonxy.com/>`_ distribution, which can 
-install python and a number of packages [#]_ (including pydicom) at once.
+.. note::
+    In addition to the instructions below, pydicom can also be installed
+    through the `Python(x,y) <http://www.pythonxy.com/>`_ distribution, which can
+    install python and a number of packages [#]_ (including pydicom) at once.
+
 
 Prerequisites
 -------------
-  * python 2.4 through 2.6 (or python 2.3 can be used for pydicom < 0.9.4)
-  * [ NumPy (http://numpy.scipy.org/) ] -- optional, only needed 
+
+  * python 2.4+/3.x (python 2.3 can be used for pydicom < 0.9.4)
+  * `NumPy <http://numpy.scipy.org/>`_ -- optional, only needed
     if manipulating pixel data
+
+.. note::
+    To run unit tests when using python <=2.6, `Unittest2 <https://pypi.python.org/pypi/unittest2>`_
+    is required.
 
 Python installers can be found at the python web site 
 (http://python.org/download/). On Windows, the `Activepython 
 <http://activestate.com/activepython>`_ distributions are also quite good.
 
-
-Installing on Windows
----------------------
-
-On Windows, pydicom can be installed using the executable installer from the 
-`Downloads <http://code.google.com/p/pydicom/downloads/list>`_ tab.
-
-Alternatively, pydicom can be installed with easy_install, pip, or 
-from source, as described in the sections below.
-
-
 Installing using easy_install or pip (all platforms)
 ----------------------------------------------------
 
 if you have `setuptools <http://pypi.python.org/pypi/setuptools>`_ installed, 
-just use easy_install at the command line (you may need ``sudo`` on linux)::
+use easy_install at the command line (you may need ``sudo`` on linux)::
     
-   easy_install pydicom
+    easy_install pydicom
+
+or use `pip <https://pypi.python.org/pypi/pip>`_::
+
+    pip pydicom
 
 Depending on your python version, there may be some warning messages, 
 but the install should still be ok.
 
-`pip <http://http://pip.openplans.org/>`_ is a newer install tool that works
-quite similarly to easy_install and can also be used.
+.. note::
+    Setuptools and Pip come pre-installed with Python 3.x.
 
 
 Installing from source (all platforms)
 --------------------------------------
-  * download the source code from the 
-    `Downloads tab <http://code.google.com/p/pydicom/downloads/list>`_ or 
-    `checkout the mercurial repository source 
-    <http://code.google.com/p/pydicom/source/checkout>`_
-  * at a command line, change to the directory with the setup.py file
-  * with admin privileges, run ``python setup.py install``
+  * `Download <https://github.com/darcymason/pydicom/archive/master.zip>`_ the source code directly, or
+    `clone <github-windows://openRepo/https://github.com/darcymason/pydicom>`_ the repo with
+    Github's desktop application.
+  * In a command terminal, move to the directory with the setup.py file
+  * With admin privileges, run ``python setup.py install``
 
-    * with some linux variants, for example, use ``sudo python setup.py install``
-    * with other linux variants you may have to ``su`` before running the command.
+    * With some linux variants, for example, use ``sudo python setup.py install``
+    * With other linux variants you may have to ``su`` before running the command.
 
-  * for python < 2.6, you may get a syntax error message when the python files 
+.. warning::
+    For python < 2.6, you may get a syntax error message when the python files
     are "built" -- this is due to some python 2.6 specific code in one unit 
     test file. The installation seems to still be ok.
 
@@ -131,9 +132,9 @@ Using pydicom
 =============
 
 Once installed, the package can be imported at a python command line or used 
-in your own python program with ``import pydicom`` 
+in your own python program with ``import pydicom``.
 See the `examples directory 
-<http://code.google.com/p/pydicom/source/browse/#hg/source/dicom/examples>`_ 
+<https://github.com/darcymason/pydicom/tree/dev/pydicom/examples>`_
 for both kinds of uses. Also see the :doc:`User Guide </pydicom_user_guide>` 
 for more details of how to use the package.
 
@@ -142,9 +143,12 @@ Support
 =======
 
 Please join the `pydicom discussion group <http://groups.google.com/group/pydicom>`_ 
-to ask questions, give feedback, post example code for others -- in other words 
-for any discussion about the pydicom code. New versions, major bug fixes, etc. 
-will also be announced through the group.
+to ask questions or give feedback.
+Bugs can be submitted through the `issue tracker <https://github.com/darcymason/pydicom/issues>`_.
+Besides the example directory, cookbook recipes are encouraged to be posted on the
+`wiki page <https://github.com/darcymason/pydicom/wiki>`_
+
+New versions, major bug fixes, etc. will also be announced through the group.
 
 
 Next Steps
@@ -152,7 +156,7 @@ Next Steps
 
 To start learning how to use pydicom, see the :doc:`pydicom_user_guide`.
 
-.. rubric: Footnotes::
+.. rubric:: Footnotes::
 
 .. [#] For DICOM network capabilities, see the `pynetdicom <http://pynetdicom.googlecode.com>`_ project.
 .. [#] If using python(x,y), other packages you might be interested in include IPython 

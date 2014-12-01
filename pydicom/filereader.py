@@ -565,21 +565,51 @@ def read_partial(fileobj, stop_when=None, defer_size=None, force=False):
 
 
 def read_file(fp, defer_size=None, stop_before_pixels=False, force=False):
-    """Read and parse a DICOM file
+    """Read and parse a DICOM file.
 
-    :param fp: either a file-like object, or a string containing the file name.
-            If a file-like object, the caller is responsible for closing it.
-    :param defer_size: if a data element value is larger than defer_size,
-            then the value is not read into memory until it is accessed in code.
-            Specify an integer (bytes), or a string value with units, e.g.
-            "512 KB", "2 MB". Default None means all elements read into memory.
-    :param stop_before_pixels: Set True to stop before reading pixels
-        (and anything after them).
+    Parameters
+    ----------
+    fp : file-like object, str
+        Either a file-like object, or a string containing the file name.
+        If a file-like object, the caller is responsible for closing it.
+    defer_size : int, str, optional
+        If None (default), all elements read into memory.
+        If specified, if a data element value is larger than defer_size,
+        then the value is not read into memory until it is accessed in code.
+        Specify an integer (bytes), or a string value with units, e.g.
+        "512 KB", "2 MB".
+    stop_before_pixels : boolean, optional
         If False (default), the full file will be read and parsed.
-    :param force: Set to True to force reading even if no header is found.
-                  If False, a pydicom.filereader.InvalidDicomError is raised
-                  when the file is not valid DICOM.
-    :returns: a FileDataset instance
+        Set True to stop before reading pixels (and anything after them).
+    force : boolean, optional
+        If False (default), raises an InvalidDicomError if the file
+        is not valid DICOM.
+        Set to True to force reading even if no header is found.
+
+    Returns
+    -------
+    FileDataset
+        An instance of FileDataset that represents a parsed DICOM file.
+
+    Raises
+    ------
+    InvalidDicomError
+        If the force flag is True and the file is not a valid DICOM file.
+
+    See Also
+    --------
+    pydicom.dataset.FileDataset
+        Data class that is returned.
+
+    Examples
+    --------
+    Read file and return file dataset:
+    >>> rtplan = pydicom.read_file("rtplan.dcm")
+    >>> rtplan.PatientName
+
+    Use within a context manager:
+    >>> with pydicom.read_file("rtplan.dcm") as rtplan:
+    >>>     rtplan.PatientName
     """
     # Open file if not already a file object
     caller_owns_file = True
@@ -621,17 +651,29 @@ def read_file(fp, defer_size=None, stop_before_pixels=False, force=False):
 
 
 def read_dicomdir(filename="DICOMDIR"):
-    """Read a DICOMDIR file and return a DicomDir instance
-    This is just a wrapper around read_file, which gives a default file name
+    """Read a DICOMDIR file and return a DicomDir instance.
 
-    :param filename: full path and name to DICOMDIR file to open
-    :return: a DicomDir instance
-    :raise: InvalidDicomError is raised if file is not a DICOMDIR file.
+    This is a wrapper around read_file, which gives a default file name.
+
+    Parameters
+    ----------
+    filename : str, optional
+        Full path and name to DICOMDIR file to open
+
+    Returns
+    -------
+    DicomDir
+
+    Raises
+    ------
+    InvalidDicomError
+        Raised if filename is not a DICOMDIR file.
     """
-    # Read the file as usual.
     # read_file will return a DicomDir instance if file is one.
-    # Here, check that it is in fact DicomDir
+
+    # Read the file as usual.
     ds = read_file(filename)
+    # Here, check that it is in fact DicomDir
     if not isinstance(ds, DicomDir):
         msg = u"File '{0}' is not a Media Storage Directory file".format(filename)
         raise InvalidDicomError(msg)
