@@ -5,7 +5,7 @@
 # Copyright (c) 2008-2012 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
 #    See the file license.txt included with this distribution, also
-#    available at http://pydicom.googlecode.com
+#    available at https://github.com/darcymason/pydicom
 
 # Encapsulated Pixel Data --  3.5-2008 A.4
 # Encapsulated Pixel data is in a number of Items (start with Item tag (0xFFFE,E000) and ending ultimately with SQ delimiter and Item Length field of 0 (no value),
