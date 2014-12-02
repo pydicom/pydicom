@@ -4,7 +4,7 @@ from __future__ import absolute_import
 # Copyright (c) 2008-2012 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
 #    See the file license.txt included with this distribution, also
-#    available at http://pydicom.googlecode.com
+#    available at https://github.com/darcymason/pydicom
 
 from struct import pack
 
@@ -326,6 +326,7 @@ def write_file(filename, dataset, write_like_original=True):
         Dataset class with relevant attrs and information.
     pydicom.dataset.Dataset.save_as
         Write a DICOM file from a dataset that was read in with read_file().
+        save_as wraps write_file.
 
     Notes
     -----
