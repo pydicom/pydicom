@@ -9,6 +9,8 @@
 from pydicom import in_py3
 from struct import unpack, calcsize
 import logging
+import six
+from six.moves import range
 logger = logging.getLogger('pydicom')
 
 # Because DS can be based on float or decimal, import whole module, not DS
@@ -177,7 +179,7 @@ def convert_value(VR, raw_data_element, encoding=default_encoding):
         num_format = None
 
     # Ensure that encoding is in the proper 3-element format
-    if isinstance(encoding, basestring):
+    if isinstance(encoding, six.string_types):
         encoding = [encoding, ] * 3
 
     byte_string = raw_data_element.value
