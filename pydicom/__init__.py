@@ -21,8 +21,11 @@ examples, including some interactive sessions.
 3. Learn the methods of the Dataset class; that is the one you will
 work with most directly.
 
-4. Questions/comments etc can be directed to the pydicom google group at
+4. Questions and comments can be directed to the pydicom google group:
 http://groups.google.com/group/pydicom
+
+5. Bugs and other issues can be reported in the issue tracker:
+https://github.com/darcymason/pydicom/issues
 """
 
 import sys

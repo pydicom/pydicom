@@ -485,8 +485,39 @@ class Dataset(dict):
     def save_as(self, filename, write_like_original=True):
         """Write the dataset to a file.
 
-        :param filename: full path and filename to save the file to
-        :write_like_original: see pydicom.filewriter.write_file for info on this parameter.
+        Parameters
+        ----------
+        filename : str
+            Name of file to save new DICOM file to.
+        write_like_original : boolean
+            If True (default), preserves the following information from
+            the dataset:
+            -preamble -- if no preamble in read file, than not used here
+            -hasFileMeta -- if writer did not do file meta information,
+                then don't write here either
+            -seq.is_undefined_length -- if original had delimiters, write them now too,
+                instead of the more sensible length characters
+            - is_undefined_length_sequence_item -- for datasets that belong to a
+                sequence, write the undefined length delimiters if that is
+                what the original had.
+            If False, produces a "nicer" DICOM file for other readers,
+                where all lengths are explicit.
+
+        See Also
+        --------
+        pydicom.filewriter.write_file
+            Write a DICOM file from a FileDataset instance.
+
+        Notes
+        -----
+        Set dataset.preamble if you want something other than 128 0-bytes.
+        If the dataset was read from an existing dicom file, then its preamble
+        was stored at read time. It is up to the user to ensure the preamble is still
+        correct for its purposes.
+
+        If there is no Transfer Syntax tag in the dataset, then set
+        dataset.is_implicit_VR and dataset.is_little_endian
+        to determine the transfer syntax used to write the file.
         """
         pydicom.write_file(filename, self, write_like_original)
 
@@ -605,15 +636,23 @@ class Dataset(dict):
 class FileDataset(Dataset):
     def __init__(self, filename_or_obj, dataset, preamble=None, file_meta=None,
                  is_implicit_VR=True, is_little_endian=True):
-        """Initialize a dataset read from a DICOM file
+        """Initialize a dataset read from a DICOM file.
 
-        :param filename: full path and filename to the file. Use None if is a BytesIO.
-        :param dataset: some form of dictionary, usually a Dataset from read_dataset()
-        :param preamble: the 128-byte DICOM preamble
-        :param file_meta: the file meta info dataset, as returned by _read_file_meta,
-                or an empty dataset if no file meta information is in the file
-        :param is_implicit_VR: True if implicit VR transfer syntax used; False if explicit VR. Default is True.
-        :param is_little_endian: True if little-endian transfer syntax used; False if big-endian. Default is True.
+        Parameters
+        ----------
+        filename_or_obj : str, None
+            Full path and filename to the file. Use None if is a BytesIO.
+        dataset : Dataset, dict
+            Some form of dictionary, usually a Dataset from read_dataset()
+        preamble : None, optional
+            The 128-byte DICOM preamble
+        file_meta : None, optional
+            The file meta info dataset, as returned by _read_file_meta,
+            or an empty dataset if no file meta information is in the file.
+        is_implicit_VR : boolean, optional
+            True (default) if implicit VR transfer syntax used; False if explicit VR.
+        is_little_endian : boolean
+            True (default) if little-endian transfer syntax used; False if big-endian.
         """
         Dataset.__init__(self, dataset)
         self.preamble = preamble

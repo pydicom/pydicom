@@ -324,6 +324,7 @@ def write_file(filename, dataset, write_like_original=True):
         Dataset class with relevant attrs and information.
     pydicom.dataset.Dataset.save_as
         Write a DICOM file from a dataset that was read in with read_file().
+        save_as wraps write_file.
 
     Notes
     -----
