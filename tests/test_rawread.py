@@ -49,7 +49,7 @@ class RawReaderExplVRTests(unittest.TestCase):
         hexstr3 = " fe ff dd e0 00 00 00 00"          # Sequence Delimiter
         hexstr = hexstr1 + hexstr2 + hexstr3
         infile = BytesIO(hex2bytes(hexstr))
-        expected = ((0x7fe0, 0x10), 'OB', 0xffffffffL, b'ABCDEFGHIJ', 0xc, False, True)
+        expected = ((0x7fe0, 0x10), 'OB', 0xffffffff, b'ABCDEFGHIJ', 0xc, False, True)
         de_gen = data_element_generator(infile, is_implicit_VR=False, is_little_endian=True)
         got = next(de_gen)
         msg_loc = "in read of undefined length Explicit VR ='OB' short value)"
@@ -93,7 +93,7 @@ class RawReaderImplVRTests(unittest.TestCase):
         hexstr3 = " fe ff dd e0 00 00 00 00"          # Sequence Delimiter
         hexstr = hexstr1 + hexstr2 + hexstr3
         infile = BytesIO(hex2bytes(hexstr))
-        expected = ((0x7fe0, 0x10), 'OB or OW', 0xffffffffL, b'ABCDEFGHIJ', 0x8, True, True)
+        expected = ((0x7fe0, 0x10), 'OB or OW', 0xffffffff, b'ABCDEFGHIJ', 0x8, True, True)
         de_gen = data_element_generator(infile, is_implicit_VR=True, is_little_endian=True)
         got = next(de_gen)
         msg_loc = "in read of undefined length Implicit VR ='OB' short value)"

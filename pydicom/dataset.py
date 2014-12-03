@@ -419,8 +419,9 @@ class Dataset(dict):
             return self._get_pixel_array()
         except AttributeError:
             t, e, tb = sys.exc_info()
-            six.reraise(PropertyError("AttributeError in pixel_array property: " +
-                                e.args[0]), None, tb)
+            val = PropertyError("AttributeError in pixel_array property: " +
+                                e.args[0])
+            six.reraise(PropertyError, val, tb)
 
     # Format strings spec'd according to python string formatting options
     #    See http://docs.python.org/library/stdtypes.html#string-formatting-operations
@@ -622,7 +623,7 @@ class FileDataset(Dataset):
         self.file_meta = file_meta
         self.is_implicit_VR = is_implicit_VR
         self.is_little_endian = is_little_endian
-        if isinstance(filename_or_obj, basestring):
+        if isinstance(filename_or_obj, six.string_types):
             self.filename = filename_or_obj
             self.fileobj_type = open
         elif isinstance(filename_or_obj, io.BufferedReader):
