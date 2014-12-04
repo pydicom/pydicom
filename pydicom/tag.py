@@ -1,5 +1,6 @@
 # tag.py
 """Define Tag class to hold a dicom (group, element) tag"""
+import six
 # Copyright (c) 2008-2012 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
 #    See the file license.txt included with this distribution, also
@@ -21,25 +22,28 @@ def Tag(arg, arg2=None):
     if isinstance(arg, (tuple, list)):
         if len(arg) != 2:
             raise ValueError("Tag must be an int or a 2-tuple")
-        if isinstance(arg[0], (str, unicode)):  # py2to3: unicode not needed in py3
-            if not isinstance(arg[1], (str, unicode)):  # py3: ditto
+        if isinstance(arg[0], (str, six.text_type)):  # py2to3: unicode not needed in py3
+            if not isinstance(arg[1], (str, six.text_type)):  # py3: ditto
                 raise ValueError("Both arguments must be hex strings if one is")
             arg = (int(arg[0], 16), int(arg[1], 16))
         if arg[0] > 0xFFFF or arg[1] > 0xFFFF:
             raise OverflowError("Groups and elements of tags must each be <=2 byte integers")
         long_value = (arg[0] << 16) | arg[1]
-    elif isinstance(arg, (str, unicode)):  # py2to3: unicode not needed in pure py3
+    elif isinstance(arg, (str, six.text_type)):  # py2to3: unicode not needed in pure py3
         raise ValueError("Tags cannot be instantiated from a single string")
     else:  # given a single number to use as a tag, as if (group, elem) already joined to a long
         long_value = arg
-        if long_value > 0xFFFFFFFFL:
+        if long_value > 0xFFFFFFFF:
             raise OverflowError("Tags are limited to 32-bit length; tag {0!r}".format(arg))
     return BaseTag(long_value)
 
-# py2to3: for some reason, the BaseTag class derived directly from long below
-#     was not converted by 2to3, but conversion does work with this next line
-BaseTag_base_class = long  # converted to "int" by 2to3
 
+if six.PY2:
+    # In python 2.6, int is shorter and 0xFFFF << 16 gets converted to long,
+    #   causing Overflow error in TupleTag
+    BaseTag_base_class = long  
+else:
+    BaseTag_base_class = int  # converted to "int" by 2to3
 
 class BaseTag(BaseTag_base_class):
     """Class for storing the dicom (group, element) tag"""
@@ -53,7 +57,7 @@ class BaseTag(BaseTag_base_class):
                 other = Tag(other)
             except:
                 raise TypeError("Cannot compare Tag with non-Tag item")
-        return long(self) < long(other)
+        return BaseTag_base_class(self) < BaseTag_base_class(other)
 
     def __eq__(self, other):
         # Check if comparing with another Tag object; if not, create a temp one
@@ -62,7 +66,7 @@ class BaseTag(BaseTag_base_class):
                 other = Tag(other)
             except:
                 raise TypeError("Cannot compare Tag with non-Tag item")
-        return long(self) == long(other)
+        return BaseTag_base_class(self) == BaseTag_base_class(other)
 
     def __ne__(self, other):
         # Check if comparing with another Tag object; if not, create a temp one
@@ -71,12 +75,12 @@ class BaseTag(BaseTag_base_class):
                 other = Tag(other)
             except:
                 raise TypeError("Cannot compare Tag with non-Tag item")
-        return long(self) != long(other)
+        return BaseTag_base_class(self) != BaseTag_base_class(other)
 
     # For python 3, any override of __cmp__ or __eq__ immutable requires
     #   explicit redirect of hash function to the parent class
     #   See http://docs.python.org/dev/3.0/reference/datamodel.html#object.__hash__
-    __hash__ = long.__hash__
+    __hash__ = BaseTag_base_class.__hash__
 
     def __str__(self):
         """String of tag value as (gggg, eeee)"""

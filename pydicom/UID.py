@@ -10,7 +10,7 @@ import uuid
 import datetime
 from math import fabs
 
-from _UID_dict import UID_dictionary
+from pydicom._UID_dict import UID_dictionary
 import six
 
 
