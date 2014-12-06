@@ -46,7 +46,7 @@ if __name__ == "__main__":
     print("Setting dataset values...")
 
     # Create the FileDataset instance (initially no data elements, but file_meta supplied)
-    ds = FileDataset(filename, {}, file_meta=file_meta, preamble="\0" * 128)
+    ds = FileDataset(filename, {}, file_meta=file_meta, preamble=b"\0" * 128)
 
     # Add the data elements -- not trying to set all required here. Check DICOM standard
     ds.PatientName = "Test^Firstname"

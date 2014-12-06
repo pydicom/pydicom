@@ -1,5 +1,8 @@
 # dicomtree.py
 """Show a dicom file using a hierarchical tree in a graphical window"""
+from __future__ import print_function
+from __future__ import absolute_import
+import six
 # Copyright (c) 2008-2012 Darcy Mason
 # This file is part of pydicom, relased under an MIT license.
 #    See the file license.txt included with this distribution, also
@@ -7,22 +10,22 @@
 
 usage = "Usage: python dicomtree.py dicom_filename"
 
-import Tix
+import six.moves.tkinter_tix
 
 
 def RunTree(w, filename):
-    top = Tix.Frame(w, relief=Tix.RAISED, bd=1)
-    tree = Tix.Tree(top, options="hlist.columns 2")
-    tree.pack(expand=1, fill=Tix.BOTH, padx=10, pady=10, side=Tix.LEFT)
+    top = six.moves.tkinter_tix.Frame(w, relief=six.moves.tkinter_tix.RAISED, bd=1)
+    tree = six.moves.tkinter_tix.Tree(top, options="hlist.columns 2")
+    tree.pack(expand=1, fill=six.moves.tkinter_tix.BOTH, padx=10, pady=10, side=six.moves.tkinter_tix.LEFT)
     # print(tree.hlist.keys())   # use to see the available configure() options
     tree.hlist.configure(bg='white', font='Courier 10', indent=30)
     tree.hlist.configure(selectbackground='light yellow', gap=150)
 
-    box = Tix.ButtonBox(w, orientation=Tix.HORIZONTAL)
+    box = six.moves.tkinter_tix.ButtonBox(w, orientation=six.moves.tkinter_tix.HORIZONTAL)
     # box.add('ok', text='Ok', underline=0, command=w.destroy, width=6)
     box.add('exit', text='Exit', underline=0, command=w.destroy, width=6)
-    box.pack(side=Tix.BOTTOM, fill=Tix.X)
-    top.pack(side=Tix.TOP, fill=Tix.BOTH, expand=1)
+    box.pack(side=six.moves.tkinter_tix.BOTTOM, fill=six.moves.tkinter_tix.X)
+    top.pack(side=six.moves.tkinter_tix.TOP, fill=six.moves.tkinter_tix.BOTH, expand=1)
 
     show_file(filename, tree)
 
@@ -39,8 +42,8 @@ def recurse_tree(tree, dataset, parent, hide=False):
     # order the dicom tags
     for data_element in dataset:
         node_id = parent + "." + hex(id(data_element))
-        if isinstance(data_element.value, unicode):
-            tree.hlist.add(node_id, text=unicode(data_element))
+        if isinstance(data_element.value, six.text_type):
+            tree.hlist.add(node_id, text=six.text_type(data_element))
         else:
             tree.hlist.add(node_id, text=str(data_element))
         if hide:
@@ -61,7 +64,7 @@ if __name__ == '__main__':
         print("Please supply a dicom file name:\n")
         print(usage)
         sys.exit(-1)
-    root = Tix.Tk()
+    root = six.moves.tkinter_tix.Tk()
     root.geometry("{0:d}x{1:d}+{2:d}+{3:d}".format(800, 600, 0, 0))
 
     RunTree(root, sys.argv[1])

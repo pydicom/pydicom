@@ -36,6 +36,7 @@ import os
 import string
 import couchdb
 import pydicom
+from six.moves import range
 
 
 def uid2str(uid):
@@ -326,7 +327,7 @@ def __typemap(value):
     if type(value) == pydicom.UID.UID:
         return uid2str(value)
     elif isinstance(value, pydicom.tag.BaseTag):
-        return long(value)
+        return int(value)
     else:
         return value
 
@@ -401,8 +402,8 @@ if __name__ == '__main__':
 
     testfiles_dir = '../testfiles'
     testfiles = os.listdir('../testfiles')
-    testfiles = filter(lambda x: x.endswith('dcm'), testfiles)
-    testfiles = map(lambda x: os.path.join('../testfiles', x), testfiles)
+    testfiles = [x for x in testfiles if x.endswith('dcm')]
+    testfiles = [os.path.join('../testfiles', x) for x in testfiles]
 
     for dcmfile in testfiles:
         dcm = pydicom.read_file(dcmfile)

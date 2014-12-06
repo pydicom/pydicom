@@ -13,6 +13,7 @@ This module can deal with gated data, in which case a DicomSeries
 instance is created for each 3D volume.
 
 """
+from __future__ import print_function
 #
 # Copyright (c) 2010 Almar Klein
 # This file is released under the pydicom license.
@@ -43,6 +44,8 @@ import time
 import gc
 import pydicom
 from pydicom.sequence import Sequence
+import six
+from six.moves import range
 
 # Try importing numpy
 try:
@@ -118,7 +121,7 @@ _progressBar = ProgressBar()
 
 def _progressCallback(progress):
     """ The default callback for displaying progress. """
-    if isinstance(progress, basestring):
+    if isinstance(progress, six.string_types):
         _progressBar.Start(progress)
         _progressBar._t0 = time.time()
     elif progress is None:
@@ -186,7 +189,7 @@ def _splitSerieIfRequired(serie, series):
         else:
             # Test missing file
             if distance and newDist > 1.5 * distance:
-                print 'Warning: missing file after "%s"' % ds1.filename
+                print('Warning: missing file after "%s"' % ds1.filename)
             distance = newDist
 
         # Add to last list
@@ -327,7 +330,7 @@ def read_files(path, showProgress=False, readPixelData=False, force=False):
     files = []
 
     # Obtain data from the given path
-    if isinstance(path, basestring):
+    if isinstance(path, six.string_types):
         # Make dir nice
         basedir = os.path.abspath(path)
         # Check whether it exists
@@ -344,7 +347,7 @@ def read_files(path, showProgress=False, readPixelData=False, force=False):
             elif os.path.isfile(p):
                 files.append(p)
             else:
-                print "Warning, the path '%s' is not valid." % p
+                print("Warning, the path '%s' is not valid." % p)
     else:
         raise ValueError('The path argument must be a string or list.')
 
@@ -378,7 +381,7 @@ def read_files(path, showProgress=False, readPixelData=False, force=False):
             if showProgress is _progressCallback:
                 _progressBar.PrintMessage(str(why))
             else:
-                print 'Warning:', why
+                print('Warning:', why)
             continue
 
         # Get SUID and register the file with an existing or new series object
@@ -398,7 +401,7 @@ def read_files(path, showProgress=False, readPixelData=False, force=False):
     showProgress(None)
 
     # Make a list and sort, so that the order is deterministic
-    series = series.values()
+    series = list(series.values())
     series.sort(key=lambda x: x.suid)
 
     # Split series if necessary
@@ -636,7 +639,7 @@ class DicomSeries(object):
                 if self._showProgress is _progressCallback:
                     _progressBar.PrintMessage(msg)
                 else:
-                    print msg
+                    print(msg)
             # Store previous
             ds1 = ds2
 
@@ -665,11 +668,11 @@ if __name__ == '__main__':
     import sys
 
     if len(sys.argv) != 2:
-        print "Expected a single argument: a directory with dicom files in it"
+        print("Expected a single argument: a directory with dicom files in it")
     else:
         adir = sys.argv[1]
         t0 = time.time()
         all_series = read_files(adir, None, False)
-        print "Summary of each series:"
+        print("Summary of each series:")
         for series in all_series:
-            print series.description
+            print(series.description)
