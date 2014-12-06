@@ -29,6 +29,7 @@
 # ==========================================================================
 import pydicom
 import wx
+import six
 have_PIL = True
 try:
     import PIL.Image
@@ -140,8 +141,8 @@ class ImFrame(wx.Frame):
     def recurse_tree(self, ds, parent, hide=False):
         """ order the dicom tags """
         for data_element in ds:
-            if isinstance(data_element.value, unicode):
-                ip = self.dsTreeView.AppendItem(parent, text=unicode(data_element))
+            if isinstance(data_element.value, six.text_type):
+                ip = self.dsTreeView.AppendItem(parent, text=six.text_type(data_element))
             else:
                 ip = self.dsTreeView.AppendItem(parent, text=str(data_element))
 
@@ -203,7 +204,7 @@ class ImFrame(wx.Frame):
     def ConvertPILToWX(self, pil, alpha=True):
         """ Convert PIL Image Into wx.Image. """
         if alpha:
-            image = apply(wx.EmptyImage, pil.size)
+            image = wx.EmptyImage(*pil.size)
             image.SetData(pil.convert("RGB").tostring())
             image.SetAlphaData(pil.convert("RGBA").tostring()[3::4])
         else:
