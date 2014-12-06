@@ -9,6 +9,7 @@ from pydicom's DICOM dictionaries.
 For private items, the proper way would be similar to ones in _private_dict.py,
 where a block is reserved etc as specified in the DICOM standards.
 """
+from __future__ import print_function
 
 # D. Mason, 2013-01
 from pydicom.datadict import DicomDictionary, NameDict, CleanName
@@ -37,4 +38,4 @@ ds.TestOne = 42
 ds.TestTwo = '12345'
 ds.TestThree = '1.2.3.4.5'
 
-print ds.top()
+print(ds.top())

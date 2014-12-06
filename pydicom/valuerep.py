@@ -251,6 +251,11 @@ class PersonName3(object):
     def __repr__(self):
         return self.original_string.__repr__()
 
+    # For python 3, any override of __cmp__ or __eq__ immutable requires
+    #   explicit redirect of hash function to the parent class
+    #   See http://docs.python.org/dev/3.0/reference/datamodel.html#object.__hash__
+    __hash__ = object.__hash__
+
     def decode(self, encodings=None):
         encodings = self._verify_encodings(encodings)
 

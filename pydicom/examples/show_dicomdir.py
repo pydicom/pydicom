@@ -1,6 +1,7 @@
 # show_dicomdir.py
 """Example file to show use of read_dicomdir()
 """
+from __future__ import print_function
 # Copyright (c) 2013 Darcy Mason
 # This file is part of pydicom, relased under an MIT-style license.
 #    See the file license.txt included with this distribution, also
@@ -15,11 +16,11 @@ from pprint import pprint
 
 
 if __name__ == "__main__":
-    print "------------------------------------------------------------"
-    print "Example program showing DICOMDIR contents, assuming standard"
-    print "Patient -> Study -> Series -> Images hierarchy"
-    print "------------------------------------------------------------"
-    print
+    print("------------------------------------------------------------")
+    print("Example program showing DICOMDIR contents, assuming standard")
+    print("Patient -> Study -> Series -> Images hierarchy")
+    print("------------------------------------------------------------")
+    print()
     if len(sys.argv) > 1:
         filepath = sys.argv[1]
         if os.path.isdir(filepath):  # only gave directory, add standard name
@@ -32,7 +33,7 @@ if __name__ == "__main__":
         base_dir = "."
 
     for patrec in dcmdir.patient_records:
-        print "Patient: {0.PatientID}: {0.PatientsName}".format(patrec)
+        print("Patient: {0.PatientID}: {0.PatientsName}".format(patrec))
         studies = patrec.children
         for study in studies:
             print("    Study {0.StudyID}: {0.StudyDate}:"
@@ -52,7 +53,7 @@ if __name__ == "__main__":
 
                 # Open and read something from each image, for demonstration purposes
                 # For simple quick overview of DICOMDIR, leave the following out
-                print " " * 12 + "Reading images..."
+                print(" " * 12 + "Reading images...")
                 image_records = series.children
                 image_filenames = [os.path.join(base_dir, *image_rec.ReferencedFileID)
                                    for image_rec in image_records]
@@ -67,16 +68,17 @@ if __name__ == "__main__":
                 patient_IDs = set(ds.PatientID for ds in datasets)
 
                 # List the image filenames
-                print "\n" + " " * 12 + "Image filenames:"
-                print " " * 12,
+                print("\n" + " " * 12 + "Image filenames:")
+                print(" " * 12, end=' ')
                 pprint(image_filenames, indent=12)
 
                 # Expect all images to have same patient name, id
                 # Show the set of all names, IDs found (should each have one)
+                # In python3.4+, must make conversion to str explicit
                 print(" " * 12 + "Patient Names in images..: "
-                      "{0:s}".format(patient_names))
+                      "{0:s}".format(str(patient_names)))
                 print(" " * 12 + "Patient IDs in images..:"
-                      "{0:s}".format(patient_IDs))
+                      "{0:s}".format(str(patient_IDs)))
 
                 # print (" " * 12 + "Slice Locations from "
                 #       "{0} to {1}".format(min(slice_locations), max(slice_locations)))
