@@ -44,7 +44,7 @@ def isMultiValue(value):
 
 def isString(val):
     """Helper function: return True if val is a string."""
-    return isinstance(val, six.string_types)
+    return isinstance(val, compat.string_types)
 
 
 def isStringOrStringList(val):

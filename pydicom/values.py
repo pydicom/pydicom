@@ -179,7 +179,7 @@ def convert_value(VR, raw_data_element, encoding=default_encoding):
         num_format = None
 
     # Ensure that encoding is in the proper 3-element format
-    if isinstance(encoding, six.string_types):
+    if isinstance(encoding, compat.string_types):
         encoding = [encoding, ] * 3
 
     byte_string = raw_data_element.value

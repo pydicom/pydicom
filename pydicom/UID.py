@@ -48,7 +48,7 @@ class UID(str):
         if isinstance(val, UID):
             return val
         else:
-            if isinstance(val, six.string_types):
+            if isinstance(val, compat.string_types):
                 return super(UID, cls).__new__(cls, val.strip())
             else:
                 raise TypeError("UID must be a string")

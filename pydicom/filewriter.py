@@ -339,7 +339,7 @@ def write_file(filename, dataset, write_like_original=True):
 
     caller_owns_file = True
     # Open file if not already a file object
-    if isinstance(filename, six.string_types):
+    if isinstance(filename, compat.string_types):
         fp = DicomFile(filename, 'wb')
         # caller provided a file name; we own the file handle
         caller_owns_file = False

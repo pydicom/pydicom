@@ -623,7 +623,7 @@ class FileDataset(Dataset):
         self.file_meta = file_meta
         self.is_implicit_VR = is_implicit_VR
         self.is_little_endian = is_little_endian
-        if isinstance(filename_or_obj, six.string_types):
+        if isinstance(filename_or_obj, compat.string_types):
             self.filename = filename_or_obj
             self.fileobj_type = open
         elif isinstance(filename_or_obj, io.BufferedReader):

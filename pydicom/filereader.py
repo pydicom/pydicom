@@ -583,7 +583,7 @@ def read_file(fp, defer_size=None, stop_before_pixels=False, force=False):
     """
     # Open file if not already a file object
     caller_owns_file = True
-    if isinstance(fp, six.string_types):
+    if isinstance(fp, compat.string_types):
         # caller provided a file name; we own the file handle
         caller_owns_file = False
         logger.debug(u"Reading file '{0}'".format(fp))

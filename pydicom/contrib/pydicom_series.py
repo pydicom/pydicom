@@ -121,7 +121,7 @@ _progressBar = ProgressBar()
 
 def _progressCallback(progress):
     """ The default callback for displaying progress. """
-    if isinstance(progress, six.string_types):
+    if isinstance(progress, compat.string_types):
         _progressBar.Start(progress)
         _progressBar._t0 = time.time()
     elif progress is None:
@@ -330,7 +330,7 @@ def read_files(path, showProgress=False, readPixelData=False, force=False):
     files = []
 
     # Obtain data from the given path
-    if isinstance(path, six.string_types):
+    if isinstance(path, compat.string_types):
         # Make dir nice
         basedir = os.path.abspath(path)
         # Check whether it exists
