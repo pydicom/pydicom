@@ -46,9 +46,13 @@ class DicomIter(object):
     """Iterator over DICOM data elements created from a file-like object
     """
     def __init__(self, fp, stop_when=None, force=False):
-        """Read the preamble and meta info, prepare iterator for remainder
+        """Read the preamble and meta info and prepare iterator for remainder of file.
 
-        fp -- an open DicomFileLike object, at start of file
+        Parameters
+        ----------
+        fp : an open DicomFileLike object, at start of file
+        force : boolean
+            Force reading of data. See ``read_file`` for more parameter info.
 
         Adds flags to fp: Big/Little-endian and Implicit/Explicit VR
         """
@@ -112,15 +116,34 @@ class DicomIter(object):
 
 def data_element_generator(fp, is_implicit_VR, is_little_endian,
                            stop_when=None, defer_size=None, encoding=default_encoding):
-    """Create a generator to efficiently return the raw data elements
-    Returns (VR, length, raw_bytes, value_tell, is_little_endian),
-    where:
-    VR -- None if implicit VR, otherwise the VR read from the file
-    length -- the length as in the DICOM data element (could be
-        DICOM "undefined length" 0xffffffffL),
-    value_bytes -- the raw bytes from the DICOM file
-                    (not parsed into python types)
-    is_little_endian -- True if transfer syntax is little endian; else False
+    """Create a generator to efficiently return the raw data elements.
+
+    Parameters
+    ----------
+    fp : file-like object
+    is_implicit_VR : boolean
+    is_little_endian : boolean
+    stop_when : None, callable, optional
+        If None (default), then the whole file is read.
+        A callable which takes tag, VR, length,
+        and returns True or False. If it returns True,
+        read_data_element will raise StopIteration.
+    defer_size : int, str, None, optional
+        See ``read_file`` for parameter info.
+    encoding :
+        Encoding scheme
+
+    Returns
+    -------
+    VR : None if implicit VR, otherwise the VR read from the file
+    length :
+        the length as in the DICOM data element (could be
+        DICOM "undefined length" 0xffffffffL)
+    value_bytes :
+        the raw bytes from the DICOM file
+        (not parsed into python types)
+    is_little_endian : boolean
+        True if transfer syntax is little endian; else False.
     """
     # Summary of DICOM standard PS3.5-2008 chapter 7:
     # If Implicit VR, data element is:
@@ -284,18 +307,35 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian,
 def read_dataset(fp, is_implicit_VR, is_little_endian, bytelength=None,
                  stop_when=None, defer_size=None, parent_encoding=default_encoding):
     """Return a Dataset instance containing the next dataset in the file.
-    :param fp: an opened file object
-    :param is_implicit_VR: True if file transfer syntax is implicit VR
-    :param is_little_endian: True if file has little endian transfer syntax
-    :param bytelength: None to read until end of file or ItemDeliterTag, else
-    a fixed number of bytes to read
-    :param stop_when: optional call_back function which can terminate reading.
-    See help for data_element_generator for details
-    :param defer_size: optional size to avoid loading large elements in memory.
-    See help for data_element_generator for details
-    :param parent_encoding: optional encoding to use as a default in case
-    a Specific Character Set (0008,0005) isn't specified
-    :returns: a Dataset instance
+
+    Parameters
+    ----------
+    fp : an opened file object
+    is_implicit_VR : boolean
+        True if file transfer syntax is implicit VR.
+    is_little_endian : boolean
+        True if file has little endian transfer syntax.
+    bytelength : int, None, optional
+        None to read until end of file or ItemDeliterTag, else
+        a fixed number of bytes to read
+    stop_when : None, optional
+        optional call_back function which can terminate reading.
+        See help for data_element_generator for details
+    defer_size : int, None, optional
+        Size to avoid loading large elements in memory.
+        See ``read_file`` for more parameter info.
+    parent_encoding :
+        optional encoding to use as a default in case
+        a Specific Character Set (0008,0005) isn't specified
+
+    Returns
+    -------
+    a Dataset instance
+
+    See Also
+    --------
+    pydicom.dataset.Dataset
+        A collection (dictionary) of Dicom `DataElement` instances.
     """
     raw_data_elements = dict()
     fpStart = fp.tell()
@@ -470,9 +510,31 @@ def read_file_meta_info(filename):
 
 
 def read_preamble(fp, force):
-    """Read and return the DICOM preamble and read past the 'DICM' marker.
-    If 'DICM' does not exist, assume no preamble, return None, and
-    rewind file to the beginning..
+    """Read and return the DICOM preamble.
+
+    Parameters
+    ----------
+    fp : file-like object
+    force : boolean
+        Flag to force reading of a file even if no header is found.
+
+    Returns
+    -------
+    preamble : DICOM preamble, None
+        The DICOM preamble will be returned if appropriate
+        header ('DICM') is found. Returns None if no header
+        is found.
+
+    Raises
+    ------
+    InvalidDicomError
+        If force flag is false and no appropriate header information
+        found.
+
+    Notes
+    -----
+    Also reads past the 'DICM' marker. Rewinds file to the beginning if
+    no header found.
     """
     logger.debug("Reading preamble...")
     preamble = fp.read(0x80)
@@ -499,18 +561,32 @@ def _at_pixel_data(tag, VR, length):
 
 
 def read_partial(fileobj, stop_when=None, defer_size=None, force=False):
-    """Parse a DICOM file until a condition is met
+    """Parse a DICOM file until a condition is met.
 
-    ``read_partial`` is normally not called directly. Use ``read_file``
-    instead, unless you need to stop on some condition
+    Parameters
+    ----------
+    fileobj : a file-like object
+        Note that the file will not close when the function returns.
+    stop_when :
+        Stop condition. See ``read_dataset`` for more info.
+    defer_size : int, str, None, optional
+        See ``read_file`` for parameter info.
+    force : boolean
+        See ``read_file`` for parameter info.
+
+    Notes
+    -----
+    Use ``read_file`` unless you need to stop on some condition
     other than reaching pixel data.
 
-    :arg fileobj: a file-like object. This function does not close it.
-    :arg stop_when: a callable which takes tag, VR, length,
-        and returns True or False. If stop_when returns True,
-        read_data_element will raise StopIteration.
-        If None (default), then the whole file is read.
-    :returns: a FileDataset instance, or if a DICOMDIR, a DicomDir instance.
+    Returns
+    -------
+    FileDataset instance or DicomDir instance.
+
+    See Also
+    --------
+    read_file
+        More generic file reading function.
     """
     # Read preamble -- raise an exception if missing and force=False
     preamble = read_preamble(fileobj, force)
@@ -572,7 +648,7 @@ def read_file(fp, defer_size=None, stop_before_pixels=False, force=False):
     fp : file-like object, str
         Either a file-like object, or a string containing the file name.
         If a file-like object, the caller is responsible for closing it.
-    defer_size : int, str, optional
+    defer_size : int, str, None, optional
         If None (default), all elements read into memory.
         If specified, if a data element value is larger than defer_size,
         then the value is not read into memory until it is accessed in code.
@@ -600,6 +676,8 @@ def read_file(fp, defer_size=None, stop_before_pixels=False, force=False):
     --------
     pydicom.dataset.FileDataset
         Data class that is returned.
+    pydicom.filereader.read_partial
+        Only read part of a DICOM file, stopping on given conditions.
 
     Examples
     --------

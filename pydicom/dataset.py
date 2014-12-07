@@ -95,11 +95,18 @@ class Dataset(dict):
         self[data_element.tag] = data_element
 
     def data_element(self, name):
-        """Return the full data_element instance for the given descriptive name
+        """Return the full data_element instance for the given descriptive name.
 
-        :param name: a DICOM keyword
-        :returns: a DataElement instance in this dataset with the given name
-                If the tag for that name is not found, returns None
+        Parameters
+        ----------
+        name: str
+            A DICOM keyword
+
+        Returns
+        -------
+        DataElement instance or None
+            Returns a DataElement instance in this dataset with the given name.
+            If the tag for that name is not found, returns None.
         """
         tag = tag_for_name(name)
         if tag:
@@ -196,10 +203,17 @@ class Dataset(dict):
         """Return an alphabetical list of data_element keywords in the dataset.
 
         Intended mainly for use in interactive Python sessions.
-        :param filters: zero or more string arguments to the function. Used for
-                        case-insensitive match to any part of the DICOM name.
-        :returns: All data_element names in this dataset matching the filters.
-                If no filters, return all DICOM keywords in the dataset
+
+        Parameters
+        ----------
+        filters : str
+            Zero or more string arguments to the function. Used for
+            case-insensitive match to any part of the DICOM name.
+
+        Returns
+        -------
+        All data_element names in this dataset matching the filters.
+        If no filters, return all DICOM keywords in the dataset.
         """
         allnames = []
         for tag, data_element in self.items():
@@ -261,9 +275,6 @@ class Dataset(dict):
 
     @property
     def _character_set(self):
-        """
-        :return:
-        """
         char_set = self.get('SpecificCharacterSet', None)
 
         if not char_set:
@@ -312,9 +323,13 @@ class Dataset(dict):
     def group_dataset(self, group):
         """Return a Dataset containing only data_elements of a certain group.
 
-        :param group:  the group part of a dicom (group, element) tag.
-        :returns:  a dataset instance containing data elements of the group
-                    specified
+        Parameters
+        ----------
+        group : the group part of a dicom (group, element) tag.
+
+        Returns
+        -------
+        A dataset instance containing data elements of the group specified.
         """
         ds = Dataset()
         ds.update(dict([(tag, data_element) for tag, data_element in self.items()
@@ -339,13 +354,18 @@ class Dataset(dict):
             yield self[tag]
 
     def _pixel_data_numpy(self):
-        """Return a NumPy array of the pixel data.
+        """Return a NumPy array of the pixel data if NumPy is available.
 
-        NumPy is a numerical package for python. It is used if available.
+        Raises
+        ------
+        TypeError
+            If there is no pixel data or not a NumPy data type
+        ImportError
+            If NumPy isn't found.
 
-        :raises TypeError: if no pixel data in this dataset.
-        :raises ImportError: if cannot import numpy.
-
+        Returns
+        -------
+        NumPy array
         """
         if 'PixelData' not in self:
             raise TypeError("No pixel data found in this dataset.")
@@ -605,21 +625,22 @@ class Dataset(dict):
                         yield elem
 
     def walk(self, callback, recursive=True):
-        """Call the given function for all dataset data_elements (recurses).
+        """Walk over given function for all dataset data_elements.
 
-        Visit all data_elements, recurse into sequences and their datasets (if specified),
+        Visit all data_elements, possibly recursing into sequences and their datasets,
         The callback function is called for each data_element
-            (including SQ element).
+        (including SQ element).
         Can be used to perform an operation on certain types of data_elements.
         E.g., `remove_private_tags`() finds all private tags and deletes them.
-
-        :param callback: a callable taking two arguments: a dataset, and
-                         a data_element belonging to that dataset.
-        :param recursive: a boolean indicating whether to recurse into Sequences
-
         `DataElement`s will come back in DICOM order (by increasing tag number
         within their dataset)
 
+        Parameters
+        ----------
+        callback: a callable that takes two arguments: a dataset, and
+                  a data_element belonging to that dataset.
+        recursive : boolean
+            Flag to indicate whether to recurse into Sequences
         """
         taglist = sorted(self.keys())
         for tag in taglist:
