@@ -8,7 +8,7 @@
 from decimal import Decimal
 import pydicom.config
 from pydicom.multival import MultiValue
-from pydicom import in_py3
+from pydicom.compat import in_py2
 
 import logging
 import six
@@ -162,7 +162,7 @@ class IS(int):
     """Derived class of int. Stores original integer string for exact rewriting
     of the string originally read or stored.
     """
-    if not in_py3:
+    if in_py2:
         __slots__ = 'original_string'
     # Unlikely that str(int) will not be the same as the original, but could happen
     # with leading zeros.

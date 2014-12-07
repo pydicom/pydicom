@@ -10,7 +10,7 @@ from pydicom.dataset import Dataset, PropertyError
 from pydicom.dataelem import DataElement, RawDataElement
 from pydicom.tag import Tag
 from pydicom.sequence import Sequence
-from pydicom import in_py3
+from pydicom.compat import in_py2
 
 
 class DatasetTests(unittest.TestCase):
@@ -33,7 +33,7 @@ class DatasetTests(unittest.TestCase):
         """Check the expected args were returned from an exception
         start_args -- a string with the start of the expected message
         """
-        if in_py3:
+        if not in_py2:
             with self.assertRaises(excClass) as cm:
                 callableObj()
 

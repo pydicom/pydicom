@@ -6,7 +6,7 @@
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
 
-from pydicom import in_py3
+from pydicom.compat import in_py2
 from struct import unpack, calcsize
 import logging
 import six
@@ -18,7 +18,7 @@ logger = logging.getLogger('pydicom')
 import pydicom.valuerep
 from pydicom.valuerep import MultiString
 
-if in_py3:
+if not in_py2:
     from pydicom.valuerep import PersonName3 as PersonName
 else:
     from pydicom.valuerep import PersonName  # NOQA
@@ -54,7 +54,7 @@ def convert_ATvalue(byte_string, is_little_endian, struct_format=None):
 
 def convert_DS_string(byte_string, is_little_endian, struct_format=None):
     """Read and return a DS value or list of values"""
-    if in_py3:
+    if not in_py2:
         byte_string = byte_string.decode(default_encoding)
     # Below, go directly to DS class instance rather than factory DS,
     # but need to ensure last string doesn't have blank padding (use strip())
@@ -63,7 +63,7 @@ def convert_DS_string(byte_string, is_little_endian, struct_format=None):
 
 def convert_IS_string(byte_string, is_little_endian, struct_format=None):
     """Read and return an IS value or list of values"""
-    if in_py3:
+    if not in_py2:
         byte_string = byte_string.decode(default_encoding)
     return MultiString(byte_string, valtype=pydicom.valuerep.IS)
 
@@ -107,13 +107,13 @@ def convert_PN(byte_string, is_little_endian, struct_format=None, encoding=None)
 
     splitup = byte_string.split(b"\\")
 
-    if encoding and in_py3:
+    if encoding and not in_py2:
         args = (encoding,)
     else:
         args = ()
 
     # We would like to return string literals
-    if in_py3:
+    if not in_py2:
         valtype = lambda x: PersonName(x, *args).decode()
     else:
         valtype = lambda x: PersonName(x, *args)
@@ -126,7 +126,7 @@ def convert_PN(byte_string, is_little_endian, struct_format=None, encoding=None)
 
 def convert_string(byte_string, is_little_endian, struct_format=None, encoding=default_encoding):
     """Read and return a string or strings"""
-    if in_py3:
+    if not in_py2:
         byte_string = byte_string.decode(encoding)
     return MultiString(byte_string)
 
@@ -134,7 +134,7 @@ def convert_string(byte_string, is_little_endian, struct_format=None, encoding=d
 def convert_single_string(byte_string, is_little_endian, struct_format=None,
                           encoding=default_encoding):
     """Read and return a single string (backslash character does not split)"""
-    if in_py3:
+    if not in_py2:
         byte_string = byte_string.decode(encoding)
     if byte_string and byte_string.endswith(' '):
         byte_string = byte_string[:-1]
@@ -153,7 +153,7 @@ def convert_SQ(byte_string, is_implicit_VR, is_little_endian,
 def convert_UI(byte_string, is_little_endian, struct_format=None):
     """Read and return a UI values or values"""
     # Strip off 0-byte padding for even length (if there)
-    if in_py3:
+    if not in_py2:
         byte_string = byte_string.decode(default_encoding)
     if byte_string and byte_string.endswith('\0'):
         byte_string = byte_string[:-1]

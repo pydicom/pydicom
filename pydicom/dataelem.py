@@ -21,9 +21,9 @@ from pydicom.tag import Tag
 
 from pydicom.UID import UID
 import pydicom.valuerep  # don't import DS directly as can be changed by config
-from pydicom import in_py3
+from pydicom.compat import in_py2
 
-if in_py3:
+if not in_py2:
     from pydicom.valuerep import PersonName3 as PersonNameUnicode
     PersonName = PersonNameUnicode
 
@@ -164,7 +164,7 @@ class DataElement(object):
             return pydicom.valuerep.DS(val)
         elif self.VR == "UI":
             return UID(val)
-        elif in_py3 and self.VR == "PN":
+        elif not in_py2 and self.VR == "PN":
             return PersonName(val)
         # Later may need this for PersonName as for UI,
         #    but needs more thought

@@ -12,7 +12,7 @@ import logging
 import six
 logger = logging.getLogger('pydicom')
 
-from pydicom import in_py3
+from pydicom.compat import in_py2
 from pydicom.charset import default_encoding, text_VRs, convert_encodings
 from pydicom.UID import ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian
 from pydicom.filebase import DicomFile, DicomFileLike
@@ -86,7 +86,7 @@ def write_PN(fp, data_element, padding=b' ', encoding=None):
     else:
         val = data_element.value
 
-    if isinstance(val[0], six.text_type) or in_py3:
+    if isinstance(val[0], six.text_type) or not in_py2:
         val = [elem.encode(encoding) for elem in val]
 
     val = b'\\'.join(val)
@@ -122,7 +122,7 @@ def write_number_string(fp, data_element, padding=' '):
     if len(val) % 2 != 0:
         val = val + padding   # pad to even length
 
-    if in_py3:
+    if not in_py2:
         val = bytes(val, default_encoding)
 
     fp.write(val)
@@ -139,7 +139,7 @@ def write_data_element(fp, data_element, encoding=default_encoding):
             msg = "Cannot write ambiguous VR of '%s' for data element with tag %r." % (VR, data_element.tag)
             msg += "\nSet the correct VR before writing, or use an implicit VR transfer syntax"
             raise ValueError(msg)
-        if in_py3:
+        if not in_py2:
             fp.write(bytes(VR, default_encoding))
         else:
             fp.write(VR)

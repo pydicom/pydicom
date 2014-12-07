@@ -28,7 +28,7 @@ http://groups.google.com/group/pydicom
 import sys
 if sys.version_info < (2, 6, 0):
     raise ImportError("pydicom > 0.9.7 requires python 2.6 or later")
-in_py3 = sys.version_info[0] > 2
+
 
 # Set up logging system for the whole package.
 # In each module, set logger=logging.getLogger('pydicom')  and the same instance

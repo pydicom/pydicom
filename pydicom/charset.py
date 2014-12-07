@@ -11,7 +11,7 @@ import logging
 import six
 logger = logging.getLogger('pydicom')
 from pydicom.valuerep import PersonNameUnicode, text_VRs
-from pydicom import in_py3
+from pydicom.compat import in_py2
 
 # Map DICOM Specific Character Set to python equivalent
 python_encoding = {
@@ -99,7 +99,7 @@ def decode(data_element, dicom_character_set):
     # PN is special case as may have 3 components with differenct chr sets
     if data_element.VR == "PN":
         # logger.warn("%s ... type: %s" %(str(data_element), type(data_element.VR)))
-        if in_py3:
+        if not in_py2:
             if data_element.VM == 1:
                 data_element.value = data_element.value.decode(encodings)
             else:

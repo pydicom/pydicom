@@ -16,7 +16,7 @@ from pydicom.dataelem import RawDataElement
 from pydicom.util.hexutil import bytes2hex
 from pydicom.valuerep import extra_length_VRs
 from pydicom.charset import default_encoding, convert_encodings
-from pydicom import in_py3
+from pydicom.compat import in_py2
 import six
 
 logger = logging.getLogger('pydicom')
@@ -175,7 +175,7 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian,
             group, elem, length = element_struct_unpack(bytes_read)
         else:  # explicit VR
             group, elem, VR, length = element_struct_unpack(bytes_read)
-            if in_py3:
+            if not in_py2:
                 VR = VR.decode(default_encoding)
             if VR in extra_length_VRs:
                 bytes_read = fp_read(4)
@@ -406,7 +406,7 @@ def _read_file_meta_info(fp):
     group, elem, VR, length = unpack("<HH2sH", bytes_read)
     if debugging:
         debug_msg = "{0:08x}: {1}".format(fp.tell() - 8, bytes2hex(bytes_read))
-    if in_py3:
+    if not in_py2:
         VR = VR.decode(default_encoding)
     if VR in extra_length_VRs:
         bytes_read = fp.read(4)

@@ -6,10 +6,10 @@
 #    available at http://pydicom.googlecode.com
 
 import unittest
-from pydicom import in_py3
+from pydicom.compat import in_py2
 import pydicom.config
 
-if in_py3:
+if not in_py2:
     from pydicom.valuerep import PersonName3 as PersonNameUnicode
     PersonName = PersonNameUnicode
 else:

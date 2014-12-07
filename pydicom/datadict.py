@@ -15,7 +15,7 @@ from pydicom._dicom_dict import DicomDictionary  # the actual dict of {tag: (VR,
 from pydicom._dicom_dict import RepeatersDictionary  # those with tags like "(50xx, 0005)"
 from pydicom._private_dict import private_dictionaries
 import warnings
-from pydicom import in_py3
+from pydicom.compat import in_py2
 
 # Generate mask dict for checking repeating groups etc.
 # Map a true bitwise mask to the DICOM mask with "x"'s in it.
@@ -91,7 +91,7 @@ def dictionary_keyword(tag):
 # Translation is different with unicode - see .translate() at
 #        http://docs.python.org/library/stdtypes.html#string-methods
 chars_to_remove = r""" !@#$%^&*(),;:.?\|{}[]+-="'’/"""
-if in_py3:  # i.e. unicode strings
+if not in_py2:  # i.e. unicode strings
     translate_table = dict((ord(char), None) for char in chars_to_remove)
 else:
     import string
@@ -126,7 +126,7 @@ def CleanName(tag):
             return ""
     s = dictionary_description(tag)    # Descriptive name in dictionary
     # remove blanks and nasty characters
-    if in_py3:
+    if not in_py2:
         s = s.translate(translate_table)
     else:
         s = s.translate(translate_table, chars_to_remove)
