@@ -8,7 +8,7 @@
 #
 
 import logging
-import six
+from pydicom import compat; import six
 logger = logging.getLogger('pydicom')
 from pydicom.valuerep import PersonNameUnicode, text_VRs
 from pydicom.compat import in_py2
@@ -117,7 +117,7 @@ def decode(data_element, dicom_character_set):
 
         # You can't re-decode unicode (string literals in py3)
         if data_element.VM == 1:
-            if isinstance(data_element.value, six.text_type):
+            if isinstance(data_element.value, compat.text_type):
                 return
             data_element.value = clean_escseq(
                 data_element.value.decode(encodings[0]), encodings)
@@ -126,7 +126,7 @@ def decode(data_element, dicom_character_set):
             output = list()
 
             for value in data_element.value:
-                if isinstance(value, six.text_type):
+                if isinstance(value, compat.text_type):
                     output.append(value)
                 else:
                     output.append(clean_escseq(value.decode(encodings[0]), encodings))

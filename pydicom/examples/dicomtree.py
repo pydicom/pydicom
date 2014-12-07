@@ -2,7 +2,7 @@
 """Show a dicom file using a hierarchical tree in a graphical window"""
 from __future__ import print_function
 from __future__ import absolute_import
-import six
+from pydicom import compat; import six
 # Copyright (c) 2008-2012 Darcy Mason
 # This file is part of pydicom, relased under an MIT license.
 #    See the file license.txt included with this distribution, also
@@ -42,8 +42,8 @@ def recurse_tree(tree, dataset, parent, hide=False):
     # order the dicom tags
     for data_element in dataset:
         node_id = parent + "." + hex(id(data_element))
-        if isinstance(data_element.value, six.text_type):
-            tree.hlist.add(node_id, text=six.text_type(data_element))
+        if isinstance(data_element.value, compat.text_type):
+            tree.hlist.add(node_id, text=compat.text_type(data_element))
         else:
             tree.hlist.add(node_id, text=str(data_element))
         if hide:

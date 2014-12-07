@@ -9,7 +9,7 @@ from __future__ import absolute_import
 from struct import pack
 
 import logging
-import six
+from pydicom import compat; import six
 logger = logging.getLogger('pydicom')
 
 from pydicom.compat import in_py2
@@ -86,7 +86,7 @@ def write_PN(fp, data_element, padding=b' ', encoding=None):
     else:
         val = data_element.value
 
-    if isinstance(val[0], six.text_type) or not in_py2:
+    if isinstance(val[0], compat.text_type) or not in_py2:
         val = [elem.encode(encoding) for elem in val]
 
     val = b'\\'.join(val)
@@ -103,7 +103,7 @@ def write_string(fp, data_element, padding=' ', encoding=default_encoding):
     if len(val) % 2 != 0:
         val = val + padding   # pad to even length
 
-    if isinstance(val, six.text_type):
+    if isinstance(val, compat.text_type):
         val = val.encode(encoding)
 
     fp.write(val)

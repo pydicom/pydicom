@@ -11,7 +11,7 @@ from pydicom.multival import MultiValue
 from pydicom.compat import in_py2
 
 import logging
-import six
+from pydicom import compat; import six
 from six.moves import zip
 logger = logging.getLogger('pydicom')
 
@@ -57,7 +57,7 @@ class DSfloat(float):
         # ... also if user changes a data element value, then will get
         # a different object, becuase float is immutable.
 
-        if isinstance(val, (str, six.text_type)):
+        if isinstance(val, (str, compat.text_type)):
             self.original_string = val
         elif isinstance(val, (DSfloat, DSdecimal)) and hasattr(val, 'original_string'):
             self.original_string = val.original_string
@@ -91,7 +91,7 @@ class DSdecimal(Decimal):
         # still be initialized properly
         enforce_length = pydicom.config.enforce_valid_values
         # DICOM allows spaces around the string, but python doesn't, so clean it
-        if isinstance(val, (str, six.text_type)):
+        if isinstance(val, (str, compat.text_type)):
             val = val.strip()
             # If the input string is actually invalid that we relax the valid
             # value constraint for this particular instance
@@ -122,7 +122,7 @@ class DSdecimal(Decimal):
         """
         # ... also if user changes a data element value, then will get
         # a different Decimal, as Decimal is immutable.
-        if isinstance(val, (str, six.text_type)):
+        if isinstance(val, (str, compat.text_type)):
             self.original_string = val
         elif isinstance(val, (DSfloat, DSdecimal)) and hasattr(val, 'original_string'):
             self.original_string = val.original_string
@@ -151,7 +151,7 @@ def DS(val):
     Similarly the string clean and check can be avoided and DSfloat called
     directly if a string has already been processed.
     """
-    if isinstance(val, (str, six.text_type)):
+    if isinstance(val, (str, compat.text_type)):
         val = val.strip()
     if val == '':
         return val
@@ -169,7 +169,7 @@ class IS(int):
 
     def __new__(cls, val):
         """Create instance if new integer string"""
-        if isinstance(val, (str, six.text_type)) and val.strip() == '':
+        if isinstance(val, (str, compat.text_type)) and val.strip() == '':
             return ''
         newval = super(IS, cls).__new__(cls, val)
         # check if a float or Decimal passed in, then could have lost info,
@@ -184,7 +184,7 @@ class IS(int):
 
     def __init__(self, val):
         # If a string passed, then store it
-        if isinstance(val, (str, six.text_type)):
+        if isinstance(val, (str, compat.text_type)):
             self.original_string = val
         elif isinstance(val, IS) and hasattr(val, 'original_string'):
             self.original_string = val.original_string
@@ -385,7 +385,7 @@ class PersonName(PersonNameBase, bytes):
         # return len(self.byte_string)
 
 
-class PersonNameUnicode(PersonNameBase, six.text_type):
+class PersonNameUnicode(PersonNameBase, compat.text_type):
     """Unicode version of Person Name"""
 
     def __new__(cls, val, encodings):
@@ -411,7 +411,7 @@ class PersonNameUnicode(PersonNameBase, six.text_type):
                  for C, enc in zip(components, encodings)]
         new_val = u"=".join(comps)
 
-        return six.text_type.__new__(cls, new_val)
+        return compat.text_type.__new__(cls, new_val)
 
     def __init__(self, val, encodings):
         self.encodings = self._verify_encodings(encodings)

@@ -20,7 +20,7 @@ Dataset(derived class of Python's dict class)
 #
 import sys
 from sys import byteorder
-import six
+from pydicom import compat; import six
 from six.moves import zip
 sys_is_little_endian = (byteorder == 'little')
 import logging
@@ -112,7 +112,7 @@ class Dataset(dict):
         This is called for code like: ``if 'SliceLocation' in dataset``.
 
         """
-        if isinstance(name, (str, six.text_type)):
+        if isinstance(name, (str, compat.text_type)):
             tag = tag_for_name(name)
         else:
             try:
@@ -220,7 +220,7 @@ class Dataset(dict):
 
     def get(self, key, default=None):
         """Extend dict.get() to handle DICOM keywords"""
-        if isinstance(key, (str, six.text_type)):
+        if isinstance(key, (str, compat.text_type)):
             try:
                 return getattr(self, key)
             except AttributeError:
@@ -554,7 +554,7 @@ class Dataset(dict):
     def update(self, dictionary):
         """Extend dict.update() to handle DICOM keywords."""
         for key, value in list(dictionary.items()):
-            if isinstance(key, (str, six.text_type)):
+            if isinstance(key, (str, compat.text_type)):
                 setattr(self, key, value)
             else:
                 self[Tag(key)] = value

@@ -9,7 +9,7 @@
 from pydicom.compat import in_py2
 from struct import unpack, calcsize
 import logging
-import six
+from pydicom import compat; import six
 from six.moves import range
 logger = logging.getLogger('pydicom')
 

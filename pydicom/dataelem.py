@@ -12,7 +12,7 @@ and a value.
 from __future__ import absolute_import
 
 import logging
-import six
+from pydicom import compat; import six
 logger = logging.getLogger('pydicom')
 
 from pydicom.datadict import dictionary_has_tag, dictionary_description
@@ -206,13 +206,13 @@ class DataElement(object):
 
     def __unicode__(self):
         """Return unicode representation of this data_element"""
-        if isinstance(self.value, six.text_type):
+        if isinstance(self.value, compat.text_type):
             # start with the string rep then replace the value part with the unicode
             strVal = str(self)
-            uniVal = six.text_type(strVal.replace(self.repval, "")) + self.value
+            uniVal = compat.text_type(strVal.replace(self.repval, "")) + self.value
             return uniVal
         else:
-            return six.text_type(str(self))
+            return compat.text_type(str(self))
 
     def __getitem__(self, key):
         """Returns the item from my value's Sequence, if it is one."""

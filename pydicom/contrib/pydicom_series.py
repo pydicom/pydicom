@@ -44,7 +44,7 @@ import time
 import gc
 import pydicom
 from pydicom.sequence import Sequence
-import six
+from pydicom import compat; import six
 from six.moves import range
 
 # Try importing numpy

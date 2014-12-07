@@ -29,7 +29,7 @@
 # ==========================================================================
 import pydicom
 import wx
-import six
+from pydicom import compat; import six
 have_PIL = True
 try:
     import PIL.Image
@@ -141,8 +141,8 @@ class ImFrame(wx.Frame):
     def recurse_tree(self, ds, parent, hide=False):
         """ order the dicom tags """
         for data_element in ds:
-            if isinstance(data_element.value, six.text_type):
-                ip = self.dsTreeView.AppendItem(parent, text=six.text_type(data_element))
+            if isinstance(data_element.value, compat.text_type):
+                ip = self.dsTreeView.AppendItem(parent, text=compat.text_type(data_element))
             else:
                 ip = self.dsTreeView.AppendItem(parent, text=str(data_element))
 

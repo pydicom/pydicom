@@ -5,7 +5,7 @@
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
 
-import six.moves.tkinter
+from pydicom import compat; import six.moves.tkinter
 from pydicom.valuerep import PersonNameUnicode
 
 default_encoding = 'iso8859'

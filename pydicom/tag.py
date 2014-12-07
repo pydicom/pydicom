@@ -1,6 +1,6 @@
 # tag.py
 """Define Tag class to hold a dicom (group, element) tag"""
-import six
+from pydicom import compat; import six
 # Copyright (c) 2008-2012 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
 #    See the file license.txt included with this distribution, also
@@ -22,14 +22,14 @@ def Tag(arg, arg2=None):
     if isinstance(arg, (tuple, list)):
         if len(arg) != 2:
             raise ValueError("Tag must be an int or a 2-tuple")
-        if isinstance(arg[0], (str, six.text_type)):  # py2to3: unicode not needed in py3
-            if not isinstance(arg[1], (str, six.text_type)):  # py3: ditto
+        if isinstance(arg[0], (str, compat.text_type)):  # py2to3: unicode not needed in py3
+            if not isinstance(arg[1], (str, compat.text_type)):  # py3: ditto
                 raise ValueError("Both arguments must be hex strings if one is")
             arg = (int(arg[0], 16), int(arg[1], 16))
         if arg[0] > 0xFFFF or arg[1] > 0xFFFF:
             raise OverflowError("Groups and elements of tags must each be <=2 byte integers")
         long_value = (arg[0] << 16) | arg[1]
-    elif isinstance(arg, (str, six.text_type)):  # py2to3: unicode not needed in pure py3
+    elif isinstance(arg, (str, compat.text_type)):  # py2to3: unicode not needed in pure py3
         raise ValueError("Tags cannot be instantiated from a single string")
     else:  # given a single number to use as a tag, as if (group, elem) already joined to a long
         long_value = arg
