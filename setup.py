@@ -49,9 +49,9 @@ setup(
     pydicom makes it easy to read these complex files into natural
     pythonic structures for easy manipulation.
     Modified datasets can be written again to DICOM format files.
-    See the `Getting Started <http://code.google.com/p/pydicom/wiki/GettingStarted>`_
-    wiki page for installation and basic information, and the
-    `Pydicom User Guide <http://code.google.com/p/pydicom/wiki/PydicomUserGuide>`_ page
+    See the `Getting Started <http://pydicom.readthedocs.org/en/latest/getting_started.html>`_
+    page for installation and basic information, and the
+    `Pydicom User Guide <http://pydicom.readthedocs.org/en/latest/pydicom_user_guide.html>`_ page
     for an overview of how to use the pydicom library.
     """,
     test_loader="tests.run_tests:MyTestLoader",

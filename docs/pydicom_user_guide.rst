@@ -47,9 +47,10 @@ You can display the entire dataset by simply printing its string
     (0008, 0050) Accession Number                    SH: ''
     (0008, 0060) Modality                            CS: 'RTPLAN'
 
-Note: you can also view DICOM files in a collapsible tree using 
-the example program `dicomtree.py 
-<http://code.google.com/p/pydicom/source/browse/source/dicom/examples/dicomtree.py>`_.
+.. note::
+    You can also view DICOM files in a collapsible tree using
+    the example program `dcm_qt_tree.py
+    <https://github.com/darcymason/pydicom/blob/dev/pydicom/contrib/dcm_qt_tree.py>`_.
 
 You can access specific data elements by name or by DICOM tag number::
 
@@ -79,8 +80,7 @@ from the dictionary name with "sequence" removed, and the normal English
 plural added. So "Beam Sequence" becomes "Beams", 
 "Referenced Film Box Sequence" becomes "ReferencedFilmBoxes". 
 Items in the sequence are referenced by number, beginning at index 0 as per 
-python convention.
-::
+python convention.::
 
     >>> ds.Beams[0].BeamName
     'Field 1'
@@ -93,7 +93,7 @@ python convention.
     ('Field 1', 'Field 1')
 
 
-Since you may not always remember the exact name, Dataset provides 
+If you don't remember or know the exact tag name, Dataset provides
 a handy `dir()` method, useful during interactive sessions 
 at the python prompt::
 
@@ -101,8 +101,11 @@ at the python prompt::
     ['PatientSetups', 'PatientsBirthDate', 'PatientsID', 'PatientsName', 'PatientsSex']
 
 ``dir`` will return any DICOM tag names in the dataset that have 
-the specified string anywhere in the name (case insensitive). 
-Calling `dir` with no string will list all tag names available in the dataset. 
+the specified string anywhere in the name (case insensitive).
+
+.. note::
+    Calling `dir` with no string will list all tag names available in the dataset.
+
 You can also see all the names that pydicom knows about by viewing the 
 `_dicom_dict.py` file. You could modify that file to add tags 
 that pydicom doesn't already know about.
@@ -156,15 +159,16 @@ DataElement is a simple object which stores the following things:
     the DataElement class keeps track of it based on value.
   * value -- the actual value. A regular value like a number or string 
     (or list of them), or a Sequence.
- 
+
+
 Tag
 ===
 
-The Tag class is derived from python's ``long``, so in effect, it is just 
+The Tag class is derived from python's ``int``, so in effect, it is just
 a number with some extra behaviour:
 
   * Tag enforces that the DICOM tag fits in the expected 4-byte (group,element)
-  * a Tag instance can be created from a long or from a tuple containing 
+  * A Tag instance can be created from an int or from a tuple containing
     the (group,element) separately::
 
         >>> from pydicom.tag import Tag
@@ -177,7 +181,7 @@ a number with some extra behaviour:
         (True, True)
 
   * Tag has properties group and element (or elem) to return the group and element portions
-  * the ``is_private`` property checks whether the tag represents 
+  * The ``is_private`` property checks whether the tag represents
     a private tag (i.e. if group number is odd).
   
 Sequence

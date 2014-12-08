@@ -30,10 +30,12 @@ if you need to work with them...
 pixel_array
 ===========
 
+.. warning::
+    To work with the pixel_array property `NumPy <http://numpy.org/>`_
+    must be installed on your system.
+
 A property of Dataset called ``pixel_array`` provides more useful pixel data
-for uncompressed images. The `NumPy <http://numpy.org/>`_ 
-numerical package must be installed on your system to use this property, 
-because ``pixel_array`` returns a NumPy array::
+for uncompressed images. The ``pixel_array`` property returns a NumPy array::
 
     >>> import dicom
     >>> ds=pydicom.read_file("MR_small.dcm")
