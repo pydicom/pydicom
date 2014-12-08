@@ -35,11 +35,22 @@ def absorb_delimiter_item(fp, is_little_endian, delimiter):
 
 
 def find_bytes(fp, bytes_to_find, read_size=128, rewind=True):
-    """Read in the file until a specific byte sequence found
+    """Read in the file until a specific byte sequence found.
 
-    bytes_to_find -- a string containing the bytes to find. Must be in correct
-                    endian order already
-    read_size -- number of bytes to read at a time
+    Parameters
+    ----------
+    bytes_to_find : str
+        Contains the bytes to find. Must be in correct
+        endian order already.
+    read_size : int
+        Number of bytes to read at a time.
+    rewind : boolean
+        Flag to rewind file reading position.
+
+    Returns
+    -------
+    found_at : byte, None
+        Position where byte sequence was found, else None.
     """
 
     data_start = fp.tell()
@@ -76,16 +87,29 @@ def find_bytes(fp, bytes_to_find, read_size=128, rewind=True):
 
 def read_undefined_length_value(fp, is_little_endian, delimiter_tag, defer_size=None,
                                 read_size=128):
-    """Read until the delimiter tag found and return the value, ignore the delimiter
-
-    fp -- a file-like object with read(), seek() functions
-    is_little_endian -- True if file transfer syntax is little endian, else False
-    read_size -- number of bytes to read at one time (default 128)
+    """Read until the delimiter tag found and return the value; ignore the delimiter.
 
     On completion, the file will be set to the first byte after the delimiter and its
-        following four zero bytes.
-    If end-of-file is hit before the delimiter was found, raises EOFError
-        """
+    following four zero bytes.
+
+    Parameters
+    ----------
+    fp : a file-like object
+    is_little_endian : boolean
+        True if file transfer syntax is little endian, else False.
+    read_size : int
+        Number of bytes to read at one time.
+
+    Returns
+    -------
+    delimiter : str, None
+        The file delimiter
+
+    Raises
+    ------
+    EOFError
+        If EOF is reached before delimiter found.
+    """
     data_start = fp.tell()
     search_rewind = 3
 
@@ -140,28 +164,51 @@ def read_undefined_length_value(fp, is_little_endian, delimiter_tag, defer_size=
 def find_delimiter(fp, delimiter, is_little_endian, read_size=128, rewind=True):
     """Return file position where 4-byte delimiter is located.
 
-    Return None if reach end of file without finding the delimiter.
-    On return, file position will be where it was before this function,
-    unless rewind argument is False.
+    Parameters
+    ----------
+    delimiter :
+    is_little_endian : boolean
+    read_size : int
+        See ``find_bytes`` for parameter info.
+    rewind : boolean
+        Flag to rewind to initial position after searching.
 
+    Returns
+    -------
+    file position of delimiter, None
+        Returns None if end of file is reached without finding the delimiter.
     """
     struct_format = "<H"
     if not is_little_endian:
         struct_format = ">H"
     delimiter = Tag(delimiter)
     bytes_to_find = pack(struct_format, delimiter.group) + pack(struct_format, delimiter.elem)
-    return find_bytes(fp, bytes_to_find, rewind=rewind)
+    return find_bytes(fp, bytes_to_find, read_size=read_size, rewind=rewind)
 
 
 def length_of_undefined_length(fp, delimiter, is_little_endian, read_size=128, rewind=True):
-    """Search through the file to find the delimiter, return the length of the data
+    """Search through the file to find the delimiter and return the length of the data
     element.
-    Return the file to the start of the data, ready to read it.
-    Note the data element that the delimiter starts is not read here, the calling
-    routine must handle that.
-    delimiter must be 4 bytes long
-    rewind == if True, file will be returned to position before seeking the bytes
 
+    Parameters
+    ----------
+    fp : file-like object
+    delimiter :
+        See ``find_delimiter`` for parameter info.
+    is_little_endian : boolean
+    read_size : int
+        See ``find_bytes`` for parameter info.
+    rewind : boolean
+        Flag to rewind to initial position after searching.
+
+    Returns
+    -------
+    length to delimiter
+
+    Notes
+    -----
+    Note the data element that the delimiter starts is not read here, the calling
+    routine must handle that. Delimiter must be 4 bytes long.
     """
     data_start = fp.tell()
     delimiter_pos = find_delimiter(fp, delimiter, is_little_endian, rewind=rewind)
