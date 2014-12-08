@@ -36,7 +36,6 @@ import os
 import string
 import couchdb
 import pydicom
-from six.moves import range
 
 
 def uid2str(uid):

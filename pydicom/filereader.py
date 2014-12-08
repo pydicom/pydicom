@@ -17,7 +17,7 @@ from pydicom.util.hexutil import bytes2hex
 from pydicom.valuerep import extra_length_VRs
 from pydicom.charset import default_encoding, convert_encodings
 from pydicom.compat import in_py2
-from pydicom import compat; import six
+from pydicom import compat
 
 logger = logging.getLogger('pydicom')
 

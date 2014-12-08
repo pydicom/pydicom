@@ -5,12 +5,17 @@
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
 
-from pydicom import compat; import six.moves.tkinter
+from pydicom import compat
 from pydicom.valuerep import PersonNameUnicode
 
+if compat.in_py2:
+    import Tkinter as tkinter
+else:   
+    import tkinter
+    
 default_encoding = 'iso8859'
 
-root = six.moves.tkinter.Tk()
+root = tkinter.Tk()
 # root.geometry("%dx%d%+d%+d" % (800, 600, 0, 0))
 
 person_names = [
@@ -30,6 +35,6 @@ person_names = [
         [default_encoding, 'euc_kr']),  # DICOM standard 2008-PS3.5 I.2 p 101
 ]
 for person_name in person_names:
-    label = six.moves.tkinter.Label(text=person_name)
+    label = tkinter.Label(text=person_name)
     label.pack()
 root.mainloop()

@@ -12,7 +12,7 @@ and a value.
 from __future__ import absolute_import
 
 import logging
-from pydicom import compat; import six
+from pydicom import compat
 logger = logging.getLogger('pydicom')
 
 from pydicom.datadict import dictionary_has_tag, dictionary_description

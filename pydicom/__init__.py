@@ -65,9 +65,9 @@ logger.addHandler(handler)
 debug(False)  # force level=WARNING, in case logging default is set differently (issue 102)
 
 # For convenience, import the read_file and write_file functions (most used)
-#     into the "dicom" namespace.
+#     into the "dicom" namespace.    
 from pydicom.filereader import read_file, read_dicomdir  # noQA
 from pydicom.filewriter import write_file  # noQA
 
-__version__ = "0.9.9"
-__version_info__ = (0, 9, 9)
+__version__ = "1.0.0"
+__version_info__ = (1, 0, 0)

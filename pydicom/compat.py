@@ -12,9 +12,19 @@ import sys
 
 in_py2 = sys.version_info[0] == 2
 
+# Text types
+# In py3+, the native text type ('str') is unicode
+# In py2, str can be either bytes or text.
 if in_py2:
     text_type = unicode
-    string_types = (str, unicode)
+    string_types = (str, unicode)    
 else:
     text_type = str
     string_types = (str,)
+
+if in_py2:
+    # Have to run through exec as the code is a syntax error in py 3
+    exec('def reraise(tp, value, tb):\n raise tp, value, tb')
+else:
+    def reraise(tp, value, tb):
+        raise value.with_traceback(tb)

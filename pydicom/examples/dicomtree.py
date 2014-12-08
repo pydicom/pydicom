@@ -1,8 +1,6 @@
 # dicomtree.py
 """Show a dicom file using a hierarchical tree in a graphical window"""
 from __future__ import print_function
-from __future__ import absolute_import
-from pydicom import compat; import six
 # Copyright (c) 2008-2012 Darcy Mason
 # This file is part of pydicom, relased under an MIT license.
 #    See the file license.txt included with this distribution, also
@@ -10,22 +8,27 @@ from pydicom import compat; import six
 
 usage = "Usage: python dicomtree.py dicom_filename"
 
-import six.moves.tkinter_tix
+from pydicom import compat
 
-
+if compat.in_py2:
+    import Tix as tkinter_tix
+else:
+    import tkinter.tix as tkinter_tix
+    
 def RunTree(w, filename):
-    top = six.moves.tkinter_tix.Frame(w, relief=six.moves.tkinter_tix.RAISED, bd=1)
-    tree = six.moves.tkinter_tix.Tree(top, options="hlist.columns 2")
-    tree.pack(expand=1, fill=six.moves.tkinter_tix.BOTH, padx=10, pady=10, side=six.moves.tkinter_tix.LEFT)
+    top = tkinter_tix.Frame(w, relief=tkinter_tix.RAISED, bd=1)
+    tree = tkinter_tix.Tree(top, options="hlist.columns 2")
+    tree.pack(expand=1, fill=tkinter_tix.BOTH, padx=10, pady=10, 
+              side=tkinter_tix.LEFT)
     # print(tree.hlist.keys())   # use to see the available configure() options
     tree.hlist.configure(bg='white', font='Courier 10', indent=30)
     tree.hlist.configure(selectbackground='light yellow', gap=150)
 
-    box = six.moves.tkinter_tix.ButtonBox(w, orientation=six.moves.tkinter_tix.HORIZONTAL)
+    box = tkinter_tix.ButtonBox(w, orientation=tkinter_tix.HORIZONTAL)
     # box.add('ok', text='Ok', underline=0, command=w.destroy, width=6)
     box.add('exit', text='Exit', underline=0, command=w.destroy, width=6)
-    box.pack(side=six.moves.tkinter_tix.BOTTOM, fill=six.moves.tkinter_tix.X)
-    top.pack(side=six.moves.tkinter_tix.TOP, fill=six.moves.tkinter_tix.BOTH, expand=1)
+    box.pack(side=tkinter_tix.BOTTOM, fill=tkinter_tix.X)
+    top.pack(side=tkinter_tix.TOP, fill=tkinter_tix.BOTH, expand=1)
 
     show_file(filename, tree)
 
@@ -64,7 +67,7 @@ if __name__ == '__main__':
         print("Please supply a dicom file name:\n")
         print(usage)
         sys.exit(-1)
-    root = six.moves.tkinter_tix.Tk()
+    root = tkinter_tix.Tk()
     root.geometry("{0:d}x{1:d}+{2:d}+{3:d}".format(800, 600, 0, 0))
 
     RunTree(root, sys.argv[1])

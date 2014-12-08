@@ -1,6 +1,5 @@
 # tag.py
 """Define Tag class to hold a dicom (group, element) tag"""
-from pydicom import compat; import six
 # Copyright (c) 2008-2012 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
 #    See the file license.txt included with this distribution, also
@@ -12,6 +11,7 @@ from pydicom import compat; import six
 #       (e.g. in write_AT of filewriter) checks if a value is a multi-value element
 # So, represent as a single number and separate to (group, element) when necessary.
 
+from pydicom import compat
 
 def Tag(arg, arg2=None):
     """General function for creating a Tag in any of the standard forms:
@@ -38,12 +38,12 @@ def Tag(arg, arg2=None):
     return BaseTag(long_value)
 
 
-if six.PY2:
+if compat.in_py2:
     # In python 2.6, int is shorter and 0xFFFF << 16 gets converted to long,
     #   causing Overflow error in TupleTag
     BaseTag_base_class = long  
 else:
-    BaseTag_base_class = int  # converted to "int" by 2to3
+    BaseTag_base_class = int
 
 class BaseTag(BaseTag_base_class):
     """Class for storing the dicom (group, element) tag"""

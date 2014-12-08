@@ -6,17 +6,17 @@
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
 
-from pydicom.compat import in_py2
-from struct import unpack, calcsize
 import logging
-from pydicom import compat; import six
-from six.moves import range
-logger = logging.getLogger('pydicom')
+from struct import unpack, calcsize
 
+from pydicom.compat import in_py2
+from pydicom import compat
 # Because DS can be based on float or decimal, import whole module, not DS
 #    directly, so it can be changed in user code and be updated here also
 import pydicom.valuerep
 from pydicom.valuerep import MultiString
+
+logger = logging.getLogger('pydicom')
 
 if not in_py2:
     from pydicom.valuerep import PersonName3 as PersonName

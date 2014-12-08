@@ -11,7 +11,7 @@ import datetime
 from math import fabs
 
 from pydicom._UID_dict import UID_dictionary
-from pydicom import compat; import six
+from pydicom import compat
 
 
 class InvalidUID(Exception):

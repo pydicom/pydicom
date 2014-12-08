@@ -42,10 +42,10 @@ from __future__ import print_function
 import os
 import time
 import gc
+
 import pydicom
 from pydicom.sequence import Sequence
-from pydicom import compat; import six
-from six.moves import range
+from pydicom import compat
 
 # Try importing numpy
 try:

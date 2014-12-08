@@ -26,10 +26,12 @@ Usage:
 >>> pydicom_Tkinter.show_image(df)
 '''
 
-import six.moves.tkinter
 import tempfile
 import os
-from six.moves import map
+
+from pydicom.compat import in_py2
+if in_py2:
+    import Tkinter as tkinter
 
 have_numpy = True
 try:
@@ -53,7 +55,7 @@ def get_PGM_bytedata_string(arr):
         raise ValueError
 
     # array.shape is (#rows, #cols) tuple; PGM input needs this reversed
-    col_row_string = ' '.join(reversed(map(str, arr.shape)))
+    col_row_string = ' '.join(reversed([str(x) for x in arr.shape]))
 
     bytedata_string = '\n'.join(('P5',
                                  col_row_string,
@@ -172,7 +174,7 @@ def get_tkinter_photoimage_from_pydicom_image(data):
     with open(abs_path, 'wb') as fd:
         fd.write(pgm)
 
-    photo_image = six.moves.tkinter.PhotoImage(file=abs_path, gamma=1.0)
+    photo_image = tkinter.PhotoImage(file=abs_path, gamma=1.0)
 
     # close and remove temporary file on disk
     # os.close is needed under windows for os.remove not to fail
@@ -195,7 +197,7 @@ def show_image(data, block=True, master=None):
 
     side effects: may leave a temporary .pgm file on disk
     '''
-    frame = six.moves.tkinter.Frame(master=master, background='#000')
+    frame = tkinter.Frame(master=master, background='#000')
     if 'SeriesDescription' in data and 'InstanceNumber' in data:
         title = ', '.join(('Ser: ' + data.SeriesDescription,
                            'Img: ' + str(data.InstanceNumber)))
@@ -203,7 +205,7 @@ def show_image(data, block=True, master=None):
         title = 'pydicom image'
     frame.master.title(title)
     photo_image = get_tkinter_photoimage_from_pydicom_image(data)
-    label = six.moves.tkinter.Label(frame, image=photo_image, background='#000')
+    label = tkinter.Label(frame, image=photo_image, background='#000')
     # keep a reference to avoid disappearance upon garbage collection
     label.photo_reference = photo_image
     label.grid()

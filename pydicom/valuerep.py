@@ -5,14 +5,14 @@
 #    See the file license.txt included with this distribution, also
 #    available at http://pydicom.googlecode.com
 
-from decimal import Decimal
-import pydicom.config
-from pydicom.multival import MultiValue
-from pydicom.compat import in_py2
-
 import logging
-from pydicom import compat; import six
-from six.moves import zip
+from decimal import Decimal
+
+import pydicom.config
+from pydicom import compat
+from pydicom.multival import MultiValue
+
+
 logger = logging.getLogger('pydicom')
 
 default_encoding = "iso8859"  # can't import from charset or get circular import
@@ -162,7 +162,7 @@ class IS(int):
     """Derived class of int. Stores original integer string for exact rewriting
     of the string originally read or stored.
     """
-    if in_py2:
+    if compat.in_py2:
         __slots__ = 'original_string'
     # Unlikely that str(int) will not be the same as the original, but could happen
     # with leading zeros.

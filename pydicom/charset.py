@@ -8,7 +8,7 @@
 #
 
 import logging
-from pydicom import compat; import six
+from pydicom import compat
 logger = logging.getLogger('pydicom')
 from pydicom.valuerep import PersonNameUnicode, text_VRs
 from pydicom.compat import in_py2

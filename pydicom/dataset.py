@@ -19,14 +19,12 @@ Dataset(derived class of Python's dict class)
 #    available at http://pydicom.googlecode.com
 #
 import sys
-from sys import byteorder
-from pydicom import compat; import six
-from six.moves import zip
-sys_is_little_endian = (byteorder == 'little')
 import logging
-logger = logging.getLogger('pydicom')
 import inspect  # for __dir__
+import os.path
+import io
 
+from pydicom import compat
 from pydicom.charset import default_encoding, convert_encodings
 from pydicom.datadict import dictionaryVR
 from pydicom.datadict import tag_for_name, all_names_for_tag
@@ -34,12 +32,11 @@ from pydicom.tag import Tag, BaseTag
 from pydicom.dataelem import DataElement, DataElement_from_raw, RawDataElement
 from pydicom.UID import NotCompressedPixelTransferSyntaxes
 from pydicom.tagtools import tag_in_exception
-import os.path
-
-import io
-
 import pydicom  # for write_file
 import pydicom.charset
+
+sys_is_little_endian = (sys.byteorder == 'little')
+logger = logging.getLogger('pydicom')
 
 have_numpy = True
 try:
@@ -421,7 +418,7 @@ class Dataset(dict):
             t, e, tb = sys.exc_info()
             val = PropertyError("AttributeError in pixel_array property: " +
                                 e.args[0])
-            six.reraise(PropertyError, val, tb)
+            compat.reraise(PropertyError, val, tb)
 
     # Format strings spec'd according to python string formatting options
     #    See http://docs.python.org/library/stdtypes.html#string-formatting-operations

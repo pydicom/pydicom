@@ -29,7 +29,7 @@
 # ==========================================================================
 import pydicom
 import wx
-from pydicom import compat; import six
+from pydicom import compat
 have_PIL = True
 try:
     import PIL.Image
