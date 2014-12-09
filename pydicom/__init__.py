@@ -67,10 +67,25 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 debug(False)  # force level=WARNING, in case logging default is set differently (issue 102)
 
-# For convenience, import the read_file and write_file functions (most used)
-#     into the "dicom" namespace.    
-from pydicom.filereader import read_file, read_dicomdir  # noQA
-from pydicom.filewriter import write_file  # noQA
+# pre-pydicom 1.0, read_file and write_file were imported here.
+# Continue to do so, but with deprecation warning
+def read_file(*args, **kwargs):
+    global read_file
+    from pydicom.dicomio import read_file
+    import warnings
+    msg = ("The read_file function has moved to pydicom.dicomio. "
+           "Please use 'from pydicom import dicomio; dicomio.read_file(...)'")
+    warnings.warn(msg, DeprecationWarning)
+    return read_file(*args, **kwargs)
+
+def write_file(*args, **kwargs):
+    global write_file
+    from pydicom.dicomio import write_file
+    import warnings
+    msg = ("The write_file function has moved to pydicom.dicomio. "
+           "Please use 'from pydicom import dicomio; dicomio.write_file(...)'")
+    warnings.warn(msg, DeprecationWarning)
+    return write_file(*args, **kwargs)
 
 __version__ = "1.0.0"
 __version_info__ = (1, 0, 0)
