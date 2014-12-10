@@ -114,10 +114,10 @@ class UID(str):
 
         Usage example::
 
-            >>> invalid_uid = pydicom.UID.UID('1.2.345.')
+            >>> invalid_uid = pydicom.uid.UID('1.2.345.')
             >>> invalid_uid.is_valid(invalid_uid)
             InvalidUID: 'Trailing dot at the end of the UID'
-            >>> valid_uid = pydicom.UID.UID('1.2.123')
+            >>> valid_uid = pydicom.uid.UID('1.2.123')
 
         '''
         if self[-1] == '.':
@@ -143,7 +143,7 @@ NotCompressedPixelTransferSyntaxes = [ExplicitVRLittleEndian,
 # Many thanks to the Medical Connections for offering free valid UIDs (http://www.medicalconnections.co.uk/FreeUID.html)
 # Their service was used to obtain the following root UID for pydicom:
 pydicom_root_UID = '1.2.826.0.1.3680043.8.498.'
-pydicom_UIDs = {
+pydicom_uids = {
     pydicom_root_UID + '1': 'ImplementationClassUID',
 }
 
@@ -159,9 +159,9 @@ def generate_uid(prefix=pydicom_root_UID, truncate=False):
 
     Usage example::
 
-        >>> pydicom.UID.generate_uid()
+        >>> pydicom.uid.generate_uid()
         1.2.826.0.1.3680043.8.498.2913212949509824014974371514
-        >>> pydicom.UID.generate_uid(None)
+        >>> pydicom.uid.generate_uid(None)
         2.25.31215762025423160614120088028604965760
 
     This method is inspired from the work of `DCMTK

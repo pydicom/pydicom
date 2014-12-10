@@ -1,12 +1,12 @@
-# test_UID.py
-"""Test suite for UID.py"""
+# test_uid.py
+"""Test suite for uid.py"""
 # Copyright (c) 2008-2012 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
 #    See the file license.txt included with this distribution, also
 #    available at https://github.com/darcymason/pydicom
 
 import unittest
-from pydicom.UID import UID, generate_uid, pydicom_root_UID, InvalidUID
+from pydicom.uid import UID, generate_uid, pydicom_root_UID, InvalidUID
 
 
 class UIDtests(unittest.TestCase):

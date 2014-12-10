@@ -19,7 +19,7 @@ from pydicom.datadict import dictionary_has_tag, dictionary_description
 from pydicom.datadict import private_dictionary_description, dictionaryVR
 from pydicom.tag import Tag
 
-from pydicom.UID import UID
+from pydicom.uid import UID
 import pydicom.valuerep  # don't import DS directly as can be changed by config
 from pydicom.compat import in_py2
 

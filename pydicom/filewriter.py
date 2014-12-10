@@ -14,7 +14,7 @@ logger = logging.getLogger('pydicom')
 
 from pydicom.compat import in_py2
 from pydicom.charset import default_encoding, text_VRs, convert_encodings
-from pydicom.UID import ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian
+from pydicom.uid import ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian
 from pydicom.filebase import DicomFile, DicomFileLike
 from pydicom.dataset import Dataset
 from pydicom.dataelem import DataElement

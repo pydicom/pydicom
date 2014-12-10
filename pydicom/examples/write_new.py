@@ -16,7 +16,7 @@ import sys
 import os.path
 import pydicom
 from pydicom.dataset import Dataset, FileDataset
-import pydicom.UID
+import pydicom.uid
 
 if __name__ == "__main__":
     print("---------------------------- ")
@@ -61,7 +61,7 @@ if __name__ == "__main__":
     print("File saved.")
 
     # Write as a different transfer syntax
-    ds.file_meta.TransferSyntaxUID = pydicom.UID.ExplicitVRBigEndian  # XXX shouldn't need this but pydicom 0.9.5 bug not recognizing transfer syntax
+    ds.file_meta.TransferSyntaxUID = pydicom.uid.ExplicitVRBigEndian  # XXX shouldn't need this but pydicom 0.9.5 bug not recognizing transfer syntax
     ds.is_little_endian = False
     ds.is_implicit_VR = False
 

@@ -245,16 +245,16 @@ def _set_meta_info_dcm(dcm):
 
     """
     TransferSyntax = dcm.file_meta.TransferSyntaxUID
-    if TransferSyntax == pydicom.UID.ExplicitVRLittleEndian:
+    if TransferSyntax == pydicom.uid.ExplicitVRLittleEndian:
         dcm.is_implicit_vr = False
         dcm.is_little_endian = True  # This line not in PyDicom
-    elif TransferSyntax == pydicom.UID.ImplicitVRLittleEndian:
+    elif TransferSyntax == pydicom.uid.ImplicitVRLittleEndian:
         dcm.is_implicit_vr = True
         dcm.is_little_endian = True
-    elif TransferSyntax == pydicom.UID.ExplicitVRBigEndian:
+    elif TransferSyntax == pydicom.uid.ExplicitVRBigEndian:
         dcm.is_implicit_vr = False
         dcm.is_little_endian = False
-    elif TransferSyntax == pydicom.UID.DeflatedExplicitVRLittleEndian:
+    elif TransferSyntax == pydicom.uid.DeflatedExplicitVRLittleEndian:
         dcm.is_implicit_vr = False   # Deleted lines above as it relates
         dcm.is_little_endian = True  # to reading compressed file data.
     else:
@@ -323,7 +323,7 @@ def __jsonify(element, binary_elements, tagstack):
 
 def __typemap(value):
     """ Map PyDicom types that won't serialise to JSON types """
-    if type(value) == pydicom.UID.UID:
+    if type(value) == pydicom.uid.UID:
         return uid2str(value)
     elif isinstance(value, pydicom.tag.BaseTag):
         return int(value)

@@ -30,7 +30,7 @@ from pydicom.datadict import dictionaryVR
 from pydicom.datadict import tag_for_name, all_names_for_tag
 from pydicom.tag import Tag, BaseTag
 from pydicom.dataelem import DataElement, DataElement_from_raw, RawDataElement
-from pydicom.UID import NotCompressedPixelTransferSyntaxes
+from pydicom.uid import NotCompressedPixelTransferSyntaxes
 from pydicom.tagtools import tag_in_exception
 import pydicom  # for write_file
 import pydicom.charset

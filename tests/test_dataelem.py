@@ -12,7 +12,7 @@ from pydicom.dataelem import DataElement
 from pydicom.dataelem import RawDataElement, DataElement_from_raw
 from pydicom.tag import Tag
 from pydicom.dataset import Dataset
-from pydicom.UID import UID
+from pydicom.uid import UID
 
 
 class DataElementTests(unittest.TestCase):

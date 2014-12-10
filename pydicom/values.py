@@ -24,7 +24,7 @@ else:
     from pydicom.valuerep import PersonName  # NOQA
 
 from pydicom.multival import MultiValue
-import pydicom.UID
+import pydicom.uid
 from pydicom.tag import Tag, TupleTag
 from pydicom.filereader import read_sequence
 from io import BytesIO
@@ -157,7 +157,7 @@ def convert_UI(byte_string, is_little_endian, struct_format=None):
         byte_string = byte_string.decode(default_encoding)
     if byte_string and byte_string.endswith('\0'):
         byte_string = byte_string[:-1]
-    return MultiString(byte_string, pydicom.UID.UID)
+    return MultiString(byte_string, pydicom.uid.UID)
 
 
 def convert_UN(byte_string, is_little_endian, struct_format=None):
