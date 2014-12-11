@@ -1,4 +1,4 @@
-# _UID_dict.py
+# _uid_dict.py
 """
 Dictionary of UID: (name, type, name_info, is_retired)
 
