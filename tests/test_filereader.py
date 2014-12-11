@@ -11,6 +11,14 @@ import os.path
 import unittest
 from io import BytesIO
 
+try:
+    unittest.skipUnless
+except AttributeError:
+    try:
+        import unittest2 as unittest
+    except ImportError:
+        print("unittest2 is required for testing in python2.6")
+
 import shutil
 # os.stat is only available on Unix and Windows   XXX Mac?
 # Not sure if on other platforms the import fails, or the call to it??
