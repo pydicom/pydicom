@@ -6,7 +6,6 @@
 #    See the file license.txt included with this distribution, also
 #    available at https://github.com/darcymason/pydicom
 
-import logging
 from struct import unpack, calcsize
 
 from pydicom.compat import in_py2
@@ -16,7 +15,7 @@ from pydicom import compat
 import pydicom.valuerep
 from pydicom.valuerep import MultiString
 
-logger = logging.getLogger('pydicom')
+from pydicom.config import logger
 
 if not in_py2:
     from pydicom.valuerep import PersonName3 as PersonName

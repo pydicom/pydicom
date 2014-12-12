@@ -15,8 +15,7 @@
 # First item is an Offset Table. It can have 0 length and no value, or it can have a table of US pointers to first byte of the Item tag starting each *Frame*,
 #    where 0 of pointer is at first Item tag following the Offset table
 # If a single frame, it may be 0 length/no value, or it may have a single pointer (0).
-import logging
-logger = logging.getLogger('pydicom')
+from pydicom.config import logger
 
 from pydicom.filebase import DicomBytesIO
 from pydicom.tag import ItemTag, SequenceDelimiterTag

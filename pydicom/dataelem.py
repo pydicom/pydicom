@@ -11,9 +11,8 @@ and a value.
 #
 from __future__ import absolute_import
 
-import logging
 from pydicom import compat
-logger = logging.getLogger('pydicom')
+from pydicom.config import logger
 
 from pydicom.datadict import dictionary_has_tag, dictionary_description
 from pydicom.datadict import private_dictionary_description, dictionaryVR

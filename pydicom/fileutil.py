@@ -9,8 +9,7 @@ from struct import pack, unpack
 from pydicom.tag import TupleTag, Tag
 from pydicom.datadict import dictionary_description
 
-import logging
-logger = logging.getLogger('pydicom')
+from pydicom.config import logger
 
 
 def absorb_delimiter_item(fp, is_little_endian, delimiter):

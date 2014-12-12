@@ -7,9 +7,8 @@
 #    available at https://github.com/darcymason/pydicom
 #
 
-import logging
 from pydicom import compat
-logger = logging.getLogger('pydicom')
+from pydicom.config import logger
 from pydicom.valuerep import PersonNameUnicode, text_VRs
 from pydicom.compat import in_py2
 

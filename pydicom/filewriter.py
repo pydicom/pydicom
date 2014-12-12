@@ -8,9 +8,8 @@ from __future__ import absolute_import
 
 from struct import pack
 
-import logging
 from pydicom import compat
-logger = logging.getLogger('pydicom')
+from pydicom.config import logger
 
 from pydicom.compat import in_py2
 from pydicom.charset import default_encoding, text_VRs, convert_encodings

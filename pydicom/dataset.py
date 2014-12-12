@@ -19,7 +19,6 @@ Dataset(derived class of Python's dict class)
 #    available at https://github.com/darcymason/pydicom
 #
 import sys
-import logging
 import inspect  # for __dir__
 import os.path
 import io
@@ -36,7 +35,7 @@ import pydicom  # for write_file
 import pydicom.charset
 
 sys_is_little_endian = (sys.byteorder == 'little')
-logger = logging.getLogger('pydicom')
+from pydicom.config import logger
 
 have_numpy = True
 try:

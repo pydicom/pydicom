@@ -10,8 +10,7 @@ from pydicom.tag import Tag
 from struct import unpack, pack
 
 from io import BytesIO
-import logging
-logger = logging.getLogger('pydicom')
+from pydicom.config import logger
 
 
 class DicomIO(object):

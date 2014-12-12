@@ -5,7 +5,6 @@
 #    See the file license.txt included with this distribution, also
 #    available at https://github.com/darcymason/pydicom
 
-import logging
 from decimal import Decimal
 
 import pydicom.config
@@ -13,7 +12,7 @@ from pydicom import compat
 from pydicom.multival import MultiValue
 
 
-logger = logging.getLogger('pydicom')
+from pydicom.config import logger
 
 default_encoding = "iso8859"  # can't import from charset or get circular import
 

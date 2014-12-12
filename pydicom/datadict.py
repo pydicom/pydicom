@@ -8,8 +8,7 @@
 #    available at https://github.com/darcymason/pydicom
 #
 
-import logging
-logger = logging.getLogger("pydicom")
+from pydicom.config import logger
 from pydicom.tag import Tag
 from pydicom._dicom_dict import DicomDictionary  # the actual dict of {tag: (VR, VM, name, is_retired, keyword), ...}
 from pydicom._dicom_dict import RepeatersDictionary  # those with tags like "(50xx, 0005)"
