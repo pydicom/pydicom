@@ -20,7 +20,7 @@ from pydicom.compat import in_py2
 from pydicom import compat
 
 from pydicom.config import logger
-import pydicom.config
+from pydicom import config
 
 stat_available = True
 try:
@@ -181,7 +181,7 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian,
     fp_read = fp.read
     fp_tell = fp.tell
     logger_debug = logger.debug
-    debugging = pydicom.config.debugging
+    debugging = config.debugging
     element_struct_unpack = element_struct.unpack
 
     while True:
@@ -440,7 +440,7 @@ def _read_file_meta_info(fp):
 
     # Get group length data element, whose value is the length of the meta_info
     fp_save = fp.tell()  # in case need to rewind
-    debugging = pydicom.config.debugging
+    debugging = config.debugging
     if debugging:
         logger.debug("Try to read group length info...")
     bytes_read = fp.read(8)
@@ -539,7 +539,7 @@ def read_preamble(fp, force):
     """
     logger.debug("Reading preamble...")
     preamble = fp.read(0x80)
-    if pydicom.config.debugging:
+    if config.debugging:
         sample = bytes2hex(preamble[:8]) + "..." + bytes2hex(preamble[-8:])
         logger.debug("{0:08x}: {1}".format(fp.tell() - 0x80, sample))
     magic = fp.read(4)
@@ -698,7 +698,7 @@ def read_file(fp, defer_size=None, stop_before_pixels=False, force=False):
         logger.debug(u"Reading file '{0}'".format(fp))
         fp = open(fp, 'rb')
 
-    if pydicom.config.debugging:
+    if config.debugging:
         logger.debug("\n" + "-" * 80)
         logger.debug("Call to read_file()")
         msg = ("filename:'%s', defer_size='%s', "

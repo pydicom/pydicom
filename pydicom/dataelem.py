@@ -12,6 +12,7 @@ and a value.
 from __future__ import absolute_import
 
 from pydicom import compat
+from pydicom import config
 from pydicom.config import logger
 
 from pydicom.datadict import dictionary_has_tag, dictionary_description
@@ -306,6 +307,12 @@ def DataElement_from_raw(raw_data_element, encoding=None):
     from pydicom.values import convert_value  # XXX buried here to avoid circular import filereader->Dataset->convert_value->filereader (for SQ parsing)
     raw = raw_data_element
     VR = raw.VR
+    
+    # If user has hooked into conversion of raw values, call his/her routine
+    import pydicom.config
+    if pydicom.config.data_element_callback:
+        raw = config.data_element_callback(raw_data_element,
+                                          **config.data_element_callback_kwargs)
     if VR is None:  # Can be if was implicit VR
         try:
             VR = dictionaryVR(raw.tag)

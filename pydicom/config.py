@@ -14,6 +14,22 @@ import logging
 #    default False; was decimal-based in pydicom 0.9.7
 use_DS_decimal = False  
 
+data_element_callback = None
+"""Set data_element_callback to a function to be called from read_dataset
+every time a RawDataElement has been returned, before it is added 
+to the dataset.
+"""
+
+data_element_callback_kwargs = {}
+"""Set this to use as keyword arguments passed to the data_element_callback
+function"""
+
+def reset_data_element_callback():
+    global data_element_callback
+    global data_element_callback_kwargs
+    data_element_callback = None
+    data_element_callback_kwargs = {}
+
 
 def DS_decimal(use_Decimal_boolean=True):
     """Set DS class to be derived from Decimal (True) or from float (False)

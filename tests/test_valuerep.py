@@ -6,8 +6,10 @@
 #    available at https://github.com/darcymason/pydicom
 
 import unittest
+
 from pydicom.compat import in_py2
-import pydicom.config
+from pydicom import config
+from pydicom import valuerep
 
 if not in_py2:
     from pydicom.valuerep import PersonName3 as PersonNameUnicode
@@ -23,30 +25,30 @@ class DecimalStringtests(unittest.TestCase):
     """Unit tests unique to the use of DS class derived from python Decimal"""
 
     def setUp(self):
-        pydicom.config.DS_decimal(True)
+        config.DS_decimal(True)
 
     def tearDown(self):
-        pydicom.config.DS_decimal(False)
+        config.DS_decimal(False)
 
     def testValidDecimalStrings(self):
         # Ensures that decimal.Decimal doesn't cause a valid string to become
         # invalid
         valid_str = '-9.81338674e-006'
-        ds = pydicom.valuerep.DS(valid_str)
+        ds = valuerep.DS(valid_str)
         L = len(str(ds))
         self.assertTrue(L <= 16, "DS: expected a string of length 16 but got %d" % (L,))
 
         # Now the input string is too long but decimal.Decimal can convert it
         # to a valid 16-character string
         long_str = '-0.000000981338674'
-        ds = pydicom.valuerep.DS(long_str)
+        ds = valuerep.DS(long_str)
         L = len(str(ds))
         self.assertTrue(L <= 16, "DS: expected a string of length 16 but got %d" % (L,))
 
     def testInvalidDecimalStrings(self):
         # Now the input string truly is invalid
         invalid_string = '-9.813386743e-006'
-        self.assertRaises(OverflowError, pydicom.valuerep.DS, invalid_string)
+        self.assertRaises(OverflowError, valuerep.DS, invalid_string)
 
 
 class PersonNametests(unittest.TestCase):
