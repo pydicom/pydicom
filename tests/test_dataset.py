@@ -10,7 +10,7 @@ from pydicom.dataset import Dataset, PropertyError
 from pydicom.dataelem import DataElement, RawDataElement
 from pydicom.tag import Tag
 from pydicom.sequence import Sequence
-from pydicom.compat import in_py2
+from pydicom import compat
 
 
 class DatasetTests(unittest.TestCase):
@@ -33,7 +33,7 @@ class DatasetTests(unittest.TestCase):
         """Check the expected args were returned from an exception
         start_args -- a string with the start of the expected message
         """
-        if not in_py2:
+        if not compat.in_py2:
             with self.assertRaises(excClass) as cm:
                 callableObj()
 
@@ -67,9 +67,13 @@ class DatasetTests(unittest.TestCase):
         ds = Dataset()
         ds.PatientID = "123456" # Valid value
         ds.SmallestImagePixelValue = 0 # Invalid value
-
-        expected_msg = "Invalid tag (0028, 0106): object of type 'int' has no len()"
-
+        
+        if compat.in_PyPy:
+            expected_msg = "Invalid tag (0028, 0106): 'int' has no length"
+        else:
+            expected_msg = ("Invalid tag (0028, 0106): object of type 'int' "
+                            "has no len()")
+        
         self.failUnlessExceptionArgs(expected_msg, TypeError, lambda: str(ds))
 
     def testTagExceptionWalk(self):
@@ -79,7 +83,11 @@ class DatasetTests(unittest.TestCase):
         ds.PatientID = "123456" # Valid value
         ds.SmallestImagePixelValue = 0 # Invalid value
 
-        expected_msg = "Invalid tag (0028, 0106): object of type 'int' has no len()"
+        if compat.in_PyPy:
+            expected_msg = "Invalid tag (0028, 0106): 'int' has no length"
+        else:
+            expected_msg = ("Invalid tag (0028, 0106): object of type 'int' "
+                            "has no len()")
 
         callback = lambda dataset, data_element: str(data_element)
         func = lambda: ds.walk(callback)

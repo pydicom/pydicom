@@ -11,6 +11,7 @@
 import sys
 
 in_py2 = sys.version_info[0] == 2
+in_PyPy = 'PyPy' in sys.version
 
 # Text types
 # In py3+, the native text type ('str') is unicode

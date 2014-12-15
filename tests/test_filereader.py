@@ -184,17 +184,15 @@ class ReaderTests(unittest.TestCase):
         # sample some expected 'dir' values
         got_dir = dir(rtss)
         expect_in_dir = ['pixel_array', 'add_new', 'ROIContourSequence',
-                         'StructureSetDate', '__sizeof__']
-        expect_not_in_dir = ['RemovePrivateTags', 'AddNew', 'GroupDataset']  # remove in v1.0
+                         'StructureSetDate']
         for name in expect_in_dir:
             self.assertTrue(name in got_dir, "Expected name '%s' in dir()" % name)
-        for name in expect_not_in_dir:
-            self.assertTrue(name not in got_dir, "Unexpected name '%s' in dir()" % name)
+
         # Now check for some items in dir() of a nested item
         roi0 = rtss.ROIContourSequence[0]
         got_dir = dir(roi0)
         expect_in_dir = ['pixel_array', 'add_new', 'ReferencedROINumber',
-                         'ROIDisplayColor', '__sizeof__']
+                         'ROIDisplayColor']
         for name in expect_in_dir:
             self.assertTrue(name in got_dir, "Expected name '%s' in dir()" % name)
 
