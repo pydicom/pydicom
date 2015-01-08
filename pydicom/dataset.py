@@ -80,6 +80,12 @@ class Dataset(dict):
         self._parent_encoding = kwargs.get('parent_encoding', default_encoding)
         dict.__init__(self, *args)
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        return False
+
     def add(self, data_element):
         """Equivalent to dataset[data_element.tag] = data_element."""
         self[data_element.tag] = data_element
@@ -698,3 +704,4 @@ class FileDataset(Dataset):
         if stat_available and self.filename and os.path.exists(self.filename):
             statinfo = stat(self.filename)
             self.timestamp = statinfo.st_mtime
+
