@@ -100,7 +100,7 @@ def write_string(fp, data_element, padding=' ', encoding=default_encoding):
     """Write a single or multivalued string."""
     val = multi_string(data_element.value)
     if len(val) % 2 != 0:
-        val = val + padding   # pad to even length
+        val = val + padding  # pad to even length
 
     if isinstance(val, compat.text_type):
         val = val.encode(encoding)
@@ -119,12 +119,72 @@ def write_number_string(fp, data_element, padding=' '):
     else:
         val = val.original_string if hasattr(val, 'original_string') else str(val)
     if len(val) % 2 != 0:
-        val = val + padding   # pad to even length
+        val = val + padding  # pad to even length
 
     if not in_py2:
         val = bytes(val, default_encoding)
 
     fp.write(val)
+
+
+def write_DA(fp, data_element, padding=' '):
+    val = data_element.value
+    if isinstance(val, (str, unicode)):
+        write_string(fp, data_element, padding)
+    else:
+        if hasattr(val, 'original_string'):
+            val = val.original_string
+        else:
+            val = val.strftime("%Y%m%d")
+        if len(val) % 2 != 0:
+            val = val + padding  # pad to even length
+
+        if isinstance(val, unicode):
+            val = val.encode(default_encoding)
+
+        fp.write(val)
+
+
+def write_DT(fp, data_element, padding=' '):
+    val = data_element.value
+    if isinstance(val, (str, unicode)):
+        write_string(fp, data_element, padding)
+    else:
+        if hasattr(val, 'original_string'):
+            val = val.original_string
+        else:
+            if val.microsecond > 0:
+                val = val.strftime("%Y%m%d%H%M%S.%f%z")
+            else:
+                val = val.strftime("%Y%m%d%H%M%S%z")
+        if len(val) % 2 != 0:
+            val = val + padding  # pad to even length
+
+        if isinstance(val, unicode):
+            val = val.encode(default_encoding)
+
+        fp.write(val)
+
+
+def write_TM(fp, data_element, padding=' '):
+    val = data_element.value
+    if isinstance(val, (str, unicode)):
+        write_string(fp, data_element, padding)
+    else:
+        if hasattr(val, 'original_string'):
+            val = val.original_string
+        else:
+            if val.microsecond > 0:
+                val = val.strftime("%H%M%S.%f")
+            else:
+                val = val.strftime("%H%M%S")
+        if len(val) % 2 != 0:
+            val = val + padding  # pad to even length
+
+        if isinstance(val, unicode):
+            val = val.encode(default_encoding)
+
+        fp.write(val)
 
 
 def write_data_element(fp, data_element, encoding=default_encoding):
@@ -392,8 +452,8 @@ writers = {'UL': (write_numbers, 'L'),
            'OB': (write_OBvalue, None),
            'UI': (write_UI, None),
            'SH': (write_string, None),
-           'DA': (write_string, None),
-           'TM': (write_string, None),
+           'DA': (write_DA, None),
+           'TM': (write_TM, None),
            'CS': (write_string, None),
            'PN': (write_PN, None),
            'LO': (write_string, None),
@@ -414,6 +474,6 @@ writers = {'UL': (write_numbers, 'L'),
            'OB/OW': (write_OBvalue, None),
            'OB or OW': (write_OBvalue, None),
            'OW or OB': (write_OBvalue, None),
-           'DT': (write_string, None),
+           'DT': (write_DT, None),
            'UT': (write_string, None),
            }  # note OW/OB depends on other items, which we don't know at write time

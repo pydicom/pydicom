@@ -21,6 +21,7 @@ from pydicom.tag import Tag
 
 from pydicom.uid import UID
 import pydicom.valuerep  # don't import DS directly as can be changed by config
+import pydicom.config
 from pydicom.compat import in_py2
 
 if not in_py2:
@@ -160,8 +161,14 @@ class DataElement(object):
         """Take the value and convert to number, etc if possible"""
         if self.VR == 'IS':
             return pydicom.valuerep.IS(val)
+        elif self.VR == 'DA' and pydicom.config.datetime_conversion:
+            return pydicom.valuerep.DA(val)
         elif self.VR == 'DS':
             return pydicom.valuerep.DS(val)
+        elif self.VR == 'DT' and pydicom.config.datetime_conversion:
+            return pydicom.valuerep.DT(val)
+        elif self.VR == 'TM' and pydicom.config.datetime_conversion:
+            return pydicom.valuerep.TM(val)
         elif self.VR == "UI":
             return UID(val)
         elif not in_py2 and self.VR == "PN":
