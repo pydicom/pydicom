@@ -10,6 +10,9 @@ from decimal import Decimal
 import pydicom.config
 from pydicom import compat
 from pydicom.multival import MultiValue
+from datetime import date, datetime, time
+from dateutil.tz import tzoffset
+import re
 
 
 from pydicom.config import logger
@@ -38,6 +41,194 @@ match_string = b''.join([
 
 match_string_uni = re.compile(match_string.decode('iso8859'))
 match_string_bytes = re.compile(match_string)
+
+
+class DA(date):
+    """Store value for DICOM VR of DA (Date) as datetime.date.
+
+    Note that the datetime.date base class is immutable.
+
+    """
+    __slots__ = 'original_string'
+
+    def __new__(cls, val):
+        """Create an instance of DA object from a string.
+
+        Raise an exception if the string cannot be parsed.
+
+        :param val: val must be a string conformant to the DA definition
+        in the DICOM Standard PS 3.5-2011
+        """
+        if isinstance(val, (str, unicode)):
+            if val.isdigit() and len(val) == 8:
+                year = int(val[0:4])
+                month = int(val[4:6])
+                day = int(val[6:8])
+                val = super(DA, cls).__new__(cls, year, month, day)
+            else:
+                raise ValueError("Could not convert value to date")
+        elif isinstance(val, date):
+            val = super(DA, cls).__new__(cls, val.year, val.month, val.day)
+        else:
+            val = super(DA, cls).__new__(cls, val)
+        return val
+
+    def __init__(self, val):
+        if isinstance(val, (str, unicode)):
+            self.original_string = val
+        elif isinstance(val, DA) and hasattr(val, 'original_string'):
+            self.original_string = val.original_string
+
+    def __str__(self):
+        if hasattr(self, 'original_string'):
+            return self.original_string
+        else:
+            return super(DA, self).__str__()
+        super(DA, cls).__init__
+
+
+class DT(datetime):
+    """Store value for DICOM VR of DT (DateTime) as datetime.datetime.
+
+    Note that the datetime.datetime base class is immutable.
+
+    """
+    __slots__ = 'original_string'
+    _regex_dt = re.compile(r"((\d{4,14})(\.(\d{1,6}))?)([+-]\d{4})?")
+
+    def __new__(cls, val):
+        """Create an instance of DT object from a string.
+
+        Raise an exception if the string cannot be parsed.
+
+        :param val: val must be a string conformant to the DT definition
+        in the DICOM Standard PS 3.5-2011
+        """
+        if isinstance(val, (str, unicode)):
+            match = DT._regex_dt.match(val)
+            if match and len(val) <= 26:
+                dt_match = match.group(2)
+                year = int(dt_match[0:4])
+                if len(dt_match) < 6:
+                    month = 1
+                else:
+                    month = int(dt_match[4:6])
+                if len(dt_match) < 8:
+                    day = 1
+                else:
+                    day = int(dt_match[6:8])
+                if len(dt_match) < 10:
+                    hour = 0
+                else:
+                    hour = int(dt_match[8:10])
+                if len(dt_match) < 12:
+                    minute = 0
+                else:
+                    minute = int(dt_match[10:12])
+                if len(dt_match) < 14:
+                    second = 0
+                    microsecond = 0
+                else:
+                    second = int(dt_match[12:14])
+                    ms_match = match.group(4)
+                    if ms_match:
+                        microsecond = int(ms_match.rstrip().ljust(6, '0'))
+                    else:
+                        microsecond = 0
+                tz_match = match.group(5)
+                if tz_match:
+                    offset = (int(tz_match[1:3]) * 60 + int(tz_match[3:5])) * 60
+                    if tz_match[0] == '-':
+                        offset = -offset
+                    tzinfo = tzoffset(tz_match, offset)
+                else:
+                    tzinfo = None
+                val = super(DT, cls).__new__(cls, year, month, day,
+                                             hour, minute, second,
+                                             microsecond, tzinfo)
+            else:
+                raise ValueError("Could not convert value to datetime")
+        elif isinstance(val, datetime):
+            val = super(DT, cls).__new__(cls, val.year, val.month, val.day,
+                                         val.hour, val.minute, val.second,
+                                         val.microsecond, val.tzinfo)
+        else:
+            val = super(DT, cls).__new__(cls, val)
+        return val
+
+    def __init__(self, val):
+        if isinstance(val, (str, unicode)):
+            self.original_string = val
+        elif isinstance(val, DT) and hasattr(val, 'original_string'):
+            self.original_string = val.original_string
+
+    def __str__(self):
+        if hasattr(self, 'original_string'):
+            return self.original_string
+        else:
+            return super(DT, self).__str__()
+        super(DT, cls).__init__
+
+
+class TM(time):
+    """Store value for DICOM VR of TM (Time) as datetime.time.
+
+    Note that the datetime.time base class is immutable.
+
+    """
+    __slots__ = 'original_string'
+    _regex_tm = re.compile(r"(\d{2,6})(\.(\d{1,6}))?")
+
+    def __new__(cls, val):
+        """Create an instance of TM object from a string.
+
+        Raise an exception if the string cannot be parsed.
+
+        :param val: val must be a string conformant to the TM definition
+        in the DICOM Standard PS 3.5-2011
+        """
+        if isinstance(val, (str, unicode)):
+            match = TM._regex_tm.match(val)
+            if match and len(val) <= 16:
+                tm_match = match.group(1)
+                hour = int(tm_match[0:2])
+                if len(tm_match) < 4:
+                    minute = 0
+                else:
+                    minute = int(tm_match[2:4])
+                if len(tm_match) < 6:
+                    second = 0
+                    microsecond = 0
+                else:
+                    second = int(tm_match[4:6])
+                    ms_match = match.group(3)
+                    if ms_match:
+                        microsecond = int(ms_match.rstrip().ljust(6, '0'))
+                    else:
+                        microsecond = 0
+                val = super(TM, cls).__new__(cls, hour, minute, second,
+                                             microsecond)
+            else:
+                raise ValueError("Could not convert value to time")
+        elif isinstance(val, time):
+            val = super(TM, cls).__new__(cls, val.hour, val.minute, val.second,
+                                         val.microsecond)
+        else:
+            val = super(TM, cls).__new__(cls, val)
+        return val
+
+    def __init__(self, val):
+        if isinstance(val, (str, unicode)):
+            self.original_string = val
+        elif isinstance(val, TM) and hasattr(val, 'original_string'):
+            self.original_string = val.original_string
+
+    def __str__(self):
+        if hasattr(self, 'original_string'):
+            return self.original_string
+        else:
+            return super(TM, self).__str__()
+        super(TM, cls).__init__
 
 
 class DSfloat(float):

@@ -15,6 +15,7 @@ setup(
               'pydicom.util'],
     include_package_data=True,
     version="1.0.0",
+    install_requires=['python-dateutil'],
     zip_safe=False,  # want users to be able to see included examples,tests
     description="Pure python package for DICOM medical file reading and writing",
     author="Darcy Mason and contributors",

@@ -13,9 +13,9 @@ from pydicom import compat
 # Because DS can be based on float or decimal, import whole module, not DS
 #    directly, so it can be changed in user code and be updated here also
 import pydicom.valuerep
-from pydicom.valuerep import MultiString
+from pydicom.valuerep import MultiString, DA, DT, TM
 
-from pydicom.config import logger
+from pydicom.config import logger, datetime_conversion
 
 if not in_py2:
     from pydicom.valuerep import PersonName3 as PersonName
@@ -51,6 +51,19 @@ def convert_ATvalue(byte_string, is_little_endian, struct_format=None):
                             for x in range(0, length, 4)])
 
 
+def convert_DA_string(byte_string, is_little_endian, struct_format=None):
+    """Read and return a DA value"""
+    if datetime_conversion:
+        if not in_py2:
+            byte_string = byte_string.decode(encoding)
+        length = len(byte_string)
+        if length != 8:
+            logger.warn("Expected length to be 8, got length %d", length)
+        return DA(byte_string)
+    else:
+        return convert_string(byte_string, is_little_endian, struct_format)
+
+
 def convert_DS_string(byte_string, is_little_endian, struct_format=None):
     """Read and return a DS value or list of values"""
     if not in_py2:
@@ -58,6 +71,19 @@ def convert_DS_string(byte_string, is_little_endian, struct_format=None):
     # Below, go directly to DS class instance rather than factory DS,
     # but need to ensure last string doesn't have blank padding (use strip())
     return MultiString(byte_string.strip(), valtype=pydicom.valuerep.DSclass)
+
+
+def convert_DT_string(byte_string, is_little_endian, struct_format=None):
+    """Read and return a DT value"""
+    if datetime_conversion:
+        if not in_py2:
+            byte_string = byte_string.decode(encoding)
+        length = len(byte_string)
+        if length < 14 or length > 26:
+            logger.warn("Expected length between 14 and 26, got length %d", length)
+        return DT(byte_string)
+    else:
+        return convert_string(byte_string, is_little_endian, struct_format)
 
 
 def convert_IS_string(byte_string, is_little_endian, struct_format=None):
@@ -149,6 +175,19 @@ def convert_SQ(byte_string, is_implicit_VR, is_little_endian,
     return seq
 
 
+def convert_TM_string(byte_string, is_little_endian, struct_format=None):
+    """Read and return a TM value"""
+    if datetime_conversion:
+        if not in_py2:
+            byte_string = byte_string.decode(encoding)
+        length = len(byte_string)
+        if length < 2 or length > 16:
+            logger.warn("Expected length between 2 and 16, got length %d", length)
+        return TM(byte_string)
+    else:
+        return convert_string(byte_string, is_little_endian, struct_format)
+
+
 def convert_UI(byte_string, is_little_endian, struct_format=None):
     """Read and return a UI values or values"""
     # Strip off 0-byte padding for even length (if there)
@@ -213,8 +252,8 @@ converters = {
     'OB': convert_OBvalue,
     'UI': convert_UI,
     'SH': convert_string,
-    'DA': convert_string,
-    'TM': convert_string,
+    'DA': convert_DA_string,
+    'TM': convert_TM_string,
     'CS': convert_string,
     'PN': convert_PN,
     'LO': convert_string,
@@ -236,7 +275,7 @@ converters = {
     'US or OW': convert_OWvalue,
     'US or SS or OW': convert_OWvalue,
     'US\\US or SS\\US': convert_OWvalue,
-    'DT': convert_string,
+    'DT': convert_DT_string,
     'UT': convert_single_string,
 }
 if __name__ == "__main__":
