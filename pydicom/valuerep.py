@@ -59,7 +59,7 @@ class DA(date):
         :param val: val must be a string conformant to the DA definition
         in the DICOM Standard PS 3.5-2011
         """
-        if isinstance(val, (str, unicode)):
+        if isinstance(val, (str, compat.string_types)):
             if val.isdigit() and len(val) == 8:
                 year = int(val[0:4])
                 month = int(val[4:6])
@@ -74,7 +74,7 @@ class DA(date):
         return val
 
     def __init__(self, val):
-        if isinstance(val, (str, unicode)):
+        if isinstance(val, (str, compat.string_types)):
             self.original_string = val
         elif isinstance(val, DA) and hasattr(val, 'original_string'):
             self.original_string = val.original_string
@@ -104,7 +104,7 @@ class DT(datetime):
         :param val: val must be a string conformant to the DT definition
         in the DICOM Standard PS 3.5-2011
         """
-        if isinstance(val, (str, unicode)):
+        if isinstance(val, (str, compat.string_types)):
             match = DT._regex_dt.match(val)
             if match and len(val) <= 26:
                 dt_match = match.group(2)
@@ -157,7 +157,7 @@ class DT(datetime):
         return val
 
     def __init__(self, val):
-        if isinstance(val, (str, unicode)):
+        if isinstance(val, (str, compat.string_types)):
             self.original_string = val
         elif isinstance(val, DT) and hasattr(val, 'original_string'):
             self.original_string = val.original_string
@@ -187,7 +187,7 @@ class TM(time):
         :param val: val must be a string conformant to the TM definition
         in the DICOM Standard PS 3.5-2011
         """
-        if isinstance(val, (str, unicode)):
+        if isinstance(val, (str, compat.string_types)):
             match = TM._regex_tm.match(val)
             if match and len(val) <= 16:
                 tm_match = match.group(1)
@@ -218,7 +218,7 @@ class TM(time):
         return val
 
     def __init__(self, val):
-        if isinstance(val, (str, unicode)):
+        if isinstance(val, (str, compat.string_types)):
             self.original_string = val
         elif isinstance(val, TM) and hasattr(val, 'original_string'):
             self.original_string = val.original_string

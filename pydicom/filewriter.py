@@ -129,7 +129,7 @@ def write_number_string(fp, data_element, padding=' '):
 
 def write_DA(fp, data_element, padding=' '):
     val = data_element.value
-    if isinstance(val, (str, unicode)):
+    if isinstance(val, (str, compat.string_types)):
         write_string(fp, data_element, padding)
     else:
         if hasattr(val, 'original_string'):
@@ -139,7 +139,7 @@ def write_DA(fp, data_element, padding=' '):
         if len(val) % 2 != 0:
             val = val + padding  # pad to even length
 
-        if isinstance(val, unicode):
+        if isinstance(val, compat.string_types):
             val = val.encode(default_encoding)
 
         fp.write(val)
@@ -147,7 +147,7 @@ def write_DA(fp, data_element, padding=' '):
 
 def write_DT(fp, data_element, padding=' '):
     val = data_element.value
-    if isinstance(val, (str, unicode)):
+    if isinstance(val, (str, compat.string_types)):
         write_string(fp, data_element, padding)
     else:
         if hasattr(val, 'original_string'):
@@ -160,7 +160,7 @@ def write_DT(fp, data_element, padding=' '):
         if len(val) % 2 != 0:
             val = val + padding  # pad to even length
 
-        if isinstance(val, unicode):
+        if isinstance(val, compat.string_types):
             val = val.encode(default_encoding)
 
         fp.write(val)
@@ -168,7 +168,7 @@ def write_DT(fp, data_element, padding=' '):
 
 def write_TM(fp, data_element, padding=' '):
     val = data_element.value
-    if isinstance(val, (str, unicode)):
+    if isinstance(val, (str, compat.string_types)):
         write_string(fp, data_element, padding)
     else:
         if hasattr(val, 'original_string'):
@@ -181,7 +181,7 @@ def write_TM(fp, data_element, padding=' '):
         if len(val) % 2 != 0:
             val = val + padding  # pad to even length
 
-        if isinstance(val, unicode):
+        if isinstance(val, compat.string_types):
             val = val.encode(default_encoding)
 
         fp.write(val)
