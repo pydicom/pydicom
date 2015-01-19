@@ -34,6 +34,7 @@ class DecimalStringtests(unittest.TestCase):
         # Ensures that decimal.Decimal doesn't cause a valid string to become
         # invalid
         valid_str = '-9.81338674e-006'
+        b = a;
         ds = valuerep.DS(valid_str)
         L = len(str(ds))
         self.assertTrue(L <= 16, "DS: expected a string of length 16 but got %d" % (L,))
