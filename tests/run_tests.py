@@ -45,4 +45,7 @@ if __name__ == "__main__":
 
     # Switch directories to test DICOM files, used by many of the tests
     testfiles_dir = os.path.join(test_dir, 'test_files')
-    runner.run(suite)
+    result = runner.run(suite)
+
+    # Return an exit code corresponding to the number of issues found
+    sys.exit(len(result.failures) + len(result.errors))
