@@ -288,9 +288,12 @@ class ReaderTests(unittest.TestCase):
         self.assertEqual(got, expected, "Sample data element after file meta with no group length failed, expected '%s', got '%s'" % (expected, got))
 
     def testPlanarConfig(self):
+        px_data_ds = read_file(color_px_name)
+        pl_data_ds = read_file(color_pl_name)
+        assert px_data_ds.PlanarConfiguration != pl_data_ds.PlanarConfiguration
         if have_numpy:
-            px_data = read_file(color_px_name).pixel_array
-            pl_data = read_file(color_pl_name).pixel_array
+            px_data = px_data_ds.pixel_array
+            pl_data = pl_data_ds.pixel_array
             self.assertTrue(numpy.all(px_data == pl_data))
 
 class JPEG2000Tests(unittest.TestCase):
