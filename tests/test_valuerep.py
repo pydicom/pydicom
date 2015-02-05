@@ -17,6 +17,9 @@ if not in_py2:
 else:
     from pydicom.valuerep import PersonName, PersonNameUnicode
 
+from datetime import datetime, date, time, timedelta
+from dateutil.tz import tzoffset
+
 
 default_encoding = 'iso8859'
 
@@ -113,6 +116,63 @@ class PersonNametests(unittest.TestCase):
         pn = PersonName3("John^Doe")
         msg = "PersonName3 not equal comparison did not work correctly"
         self.assertFalse(pn != "John^Doe", msg)
+
+
+class DateTimeTests(unittest.TestCase):
+    """Unit tests for DA, DT, TM conversion to datetime objects"""
+
+    def setUp(self):
+        config.datetime_conversion = True
+
+    def tearDown(self):
+        config.datetime_conversion = False
+
+    def testDate(self):
+        """DA conversion to datetime.date ......................................."""
+        dicom_date = "19610804"
+        da = valuerep.DA(dicom_date)
+        datetime_date = date(1961, 8, 4)
+        self.assertEqual(da, datetime_date,
+                         "DA {0} not equal to date {1}".format(dicom_date, datetime_date))
+
+    def testDateTime(self):
+        """DT conversion to datetime.datetime ..................................."""
+        dicom_datetime = "1961"
+        dt = valuerep.DT(dicom_datetime)
+        datetime_datetime = datetime(1961, 1, 1)
+        self.assertEqual(dt, datetime_datetime,
+                         "DT {0} not equal to datetime {1}".format(dicom_datetime, datetime_datetime))
+        dicom_datetime = "19610804"
+        dt = valuerep.DT(dicom_datetime)
+        datetime_datetime = datetime(1961, 8, 4)
+        self.assertEqual(dt, datetime_datetime,
+                         "DT {0} not equal to datetime {1}".format(dicom_datetime, datetime_datetime))
+        dicom_datetime = "19610804192430.123"
+        dt = valuerep.DT(dicom_datetime)
+        datetime_datetime = datetime(1961, 8, 4, 19, 24, 30, 123000)
+        self.assertEqual(dt, datetime_datetime,
+                         "DT {0} not equal to datetime {1}".format(dicom_datetime, datetime_datetime))
+        dicom_datetime = "196108041924-1000"
+        dt = valuerep.DT(dicom_datetime)
+        datetime_datetime = datetime(1961, 8, 4, 19, 24, 0, 0,
+                                     tzoffset(None, -10 * 3600))
+        self.assertEqual(dt, datetime_datetime,
+                         "DT {0} not equal to datetime {1}".format(dicom_datetime, datetime_datetime))
+        self.assertEqual(dt.utcoffset(), timedelta(0, 0, 0, 0, 0, -10),
+                         "DT offset did not compare correctly to timedelta")
+
+    def testTime(self):
+        """TM conversion to datetime.time ......................................."""
+        dicom_time = "2359"
+        tm = valuerep.TM(dicom_time)
+        datetime_time = time(23, 59)
+        self.assertEqual(tm, datetime_time,
+                         "TM {0} not equal to time {1}".format(dicom_time, datetime_time))
+        dicom_time = "235900.123"
+        tm = valuerep.TM(dicom_time)
+        datetime_time = time(23, 59, 00, 123000)
+        self.assertEqual(tm, datetime_time,
+                         "TM {0} not equal to time {1}".format(dicom_time, datetime_time))
 
 
 if __name__ == "__main__":

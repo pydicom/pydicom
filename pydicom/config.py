@@ -54,6 +54,11 @@ enforce_valid_values = True
 that are longer than 16 characters; IS strings outside the allowed range.
 """
 
+datetime_conversion = False
+"""Set datetime_conversion to convert DA, DT and TM data elements to
+datetime.date, datetime.datetime and datetime.time respectively. Default: False
+"""
+
 
 # Logging system and debug function to change logging level
 logger = logging.getLogger('pydicom')
