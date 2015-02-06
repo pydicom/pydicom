@@ -151,8 +151,8 @@ def DS(val):
     """
     if isinstance(val, (str, unicode)):
         val = val.strip()
-    if val == '':
-        return val
+    if val == '' or val is None:
+        return ''
     return DSclass(val)
 
 
@@ -167,6 +167,8 @@ class IS(int):
 
     def __new__(cls, val):
         """Create instance if new integer string"""
+        if val is None:
+            return ''
         if isinstance(val, (str, unicode)) and val.strip() == '':
             return ''
         newval = super(IS, cls).__new__(cls, val)
