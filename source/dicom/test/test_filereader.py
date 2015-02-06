@@ -41,6 +41,7 @@ rtdose_name = os.path.join(test_dir, "rtdose.dcm")
 ct_name = os.path.join(test_dir, "CT_small.dcm")
 mr_name = os.path.join(test_dir, "MR_small.dcm")
 jpeg2000_name = os.path.join(test_dir, "JPEG2000.dcm")
+jpeg2000_lossless_name = os.path.join(test_dir, "MR_small_jp2klossless.dcm")
 jpeg_lossy_name = os.path.join(test_dir, "JPEG-lossy.dcm")
 jpeg_lossless_name = os.path.join(test_dir, "JPEG-LL.dcm")
 deflate_name = os.path.join(test_dir, "image_dfl.dcm")
@@ -283,6 +284,8 @@ class ReaderTests(unittest.TestCase):
 class JPEG2000Tests(unittest.TestCase):
     def setUp(self):
         self.jpeg = read_file(jpeg2000_name)
+        self.jpegls = read_file(jpeg2000_lossless_name)
+        self.mr_small = read_file(mr_name)
 
     def testJPEG2000(self):
         """JPEG2000: Returns correct values for sample data elements............"""
@@ -295,8 +298,12 @@ class JPEG2000Tests(unittest.TestCase):
         self.assertEqual(got, expected, "JPEG200 file, Code Meaning got %s, expected %s" % (got, expected))
 
     def testJPEG2000PixelArray(self):
-        """JPEG2000: Fails gracefully when uncompressed data is asked for......."""
-        self.assertRaises(NotImplementedError, self.jpeg._get_pixel_array)
+        """JPEG2000: Now works"""
+        if have_numpy:
+            a = self.jpegls.pixel_array
+            b = self.mr_small.pixel_array
+            self.assertEqual(a.mean(), b.mean(),
+                             "Decoded pixel data is not all {} (mean == {})".format(b.mean(), a.mean()))
 
 
 class JPEGlossyTests(unittest.TestCase):
