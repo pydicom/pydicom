@@ -8,6 +8,8 @@
 import unittest
 from dicom import in_py3
 import dicom.config
+import os
+import dicom
 
 if in_py3:
     from dicom.valuerep import PersonName3 as PersonNameUnicode
@@ -15,8 +17,21 @@ if in_py3:
 else:
     from dicom.valuerep import PersonName, PersonNameUnicode
 
-
+from pkg_resources import Requirement, resource_filename
+test_dir = resource_filename(Requirement.parse("pydicom"), "dicom/testfiles")
+badvr_name = os.path.join(test_dir, "badVR.dcm")
 default_encoding = 'iso8859'
+
+
+class BadValueReadtests(unittest.TestCase):
+    """Unit tests unique to the use of DS class derived from python Decimal"""
+
+    def testReadBadValueInVR(self):
+        # Check that invalid values are read
+        # and converted to some semi-useful type
+
+        dataset = dicom.read_file(badvr_name)
+        self.assertTrue(dataset.NumberOfFrames == '1A')
 
 
 class DecimalStringtests(unittest.TestCase):
