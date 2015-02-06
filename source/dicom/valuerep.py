@@ -47,7 +47,17 @@ class DSfloat(float):
 
     """
     __slots__ = 'original_string'
+    def __getstate__(self):
+        return dict(
+            (slot, getattr(self, slot))
+            for slot in self.__slots__
+            if hasattr(self, slot)
+        )
 
+    def __setstate__(self, state):
+        for slot, value in state.items():
+            setattr(self, slot, value)
+            
     def __init__(self, val):
         """Store the original string if one given, for exact write-out of same
         value later.
@@ -76,7 +86,17 @@ class DSdecimal(Decimal):
     not an instance of this class.
     """
     __slots__ = 'original_string'
+    def __getstate__(self):
+        return dict(
+            (slot, getattr(self, slot))
+            for slot in self.__slots__
+            if hasattr(self, slot)
+        )
 
+    def __setstate__(self, state):
+        for slot, value in state.items():
+            setattr(self, slot, value)
+            
     def __new__(cls, val):
         """Create an instance of DS object, or return a blank string if one is
         passed in, e.g. from a type 2 DICOM blank value.
@@ -164,7 +184,17 @@ class IS(int):
         __slots__ = 'original_string'
     # Unlikely that str(int) will not be the same as the original, but could happen
     # with leading zeros.
+    def __getstate__(self):
+        return dict(
+            (slot, getattr(self, slot))
+            for slot in self.__slots__
+            if hasattr(self, slot)
+        )
 
+    def __setstate__(self, state):
+        for slot, value in state.items():
+            setattr(self, slot, value)
+            
     def __new__(cls, val):
         """Create instance if new integer string"""
         if val is None:
