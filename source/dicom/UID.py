@@ -141,11 +141,15 @@ JPEGLSLossy = UID('1.2.840.10008.1.2.4.81')
 JPEG2000Lossless = UID('1.2.840.10008.1.2.4.90')
 JPEG2000Lossy = UID('1.2.840.10008.1.2.4.91')
 
+NotCompressedPixelTransferSyntaxes = [ExplicitVRLittleEndian,
+                                      ImplicitVRLittleEndian,
+                                      DeflatedExplicitVRLittleEndian,
+                                      ExplicitVRBigEndian]
+
 UncompressedPixelTransferSyntaxes = [ExplicitVRLittleEndian,
                                      ImplicitVRLittleEndian,
                                      DeflatedExplicitVRLittleEndian,
-                                     ExplicitVRBigEndian
-                                     ]
+                                     ExplicitVRBigEndian]
 
 JPEGLSSupportedCompressedPixelTransferSyntaxes = [JPEGLSLossless,
                                                   JPEGLSLossy,
@@ -155,14 +159,13 @@ PILSupportedCompressedPixelTransferSyntaxes = [JPEGBaseLineLossy8bit,
                                                JPEGLossless,
                                                JPEGBaseLineLossy12bit,
                                                JPEG2000Lossless,
-                                               JPEG2000Lossy,
-                                               ]
+                                               JPEG2000Lossy]
+
 JPEG2000CompressedPixelTransferSyntaxes = [JPEG2000Lossless,
-                                           JPEG2000Lossy,
-                                           ]
+                                           JPEG2000Lossy]
+
 JPEGLossyCompressedPixelTransferSyntaxes = [JPEGBaseLineLossy8bit,
-                                            JPEGBaseLineLossy12bit,
-                                            ]
+                                            JPEGBaseLineLossy12bit]
 
 
 # Many thanks to the Medical Connections for offering free valid UIDs (http://www.medicalconnections.co.uk/FreeUID.html)

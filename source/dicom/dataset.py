@@ -55,7 +55,12 @@ have_pillow = True
 try:
     from PIL import Image as PILImg
 except:
-    have_pillow = False
+    # If that failed, try the alternate import syntax for PIL.
+    try:
+        import Image as PILImg
+    except ImportError as err:
+        # Neither worked, so it's likely not installed.
+        have_pillow = False
 
 
 stat_available = True
