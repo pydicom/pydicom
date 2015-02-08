@@ -3,7 +3,7 @@
 # Copyright (c) 2012 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
 #    See the file license.txt included with this distribution, also
-#    available at http://pydicom.googlecode.com
+#    available at https://github.com/mmattes/pydicom.git
 
 # doc strings following items are picked up by sphinx for documentation
 

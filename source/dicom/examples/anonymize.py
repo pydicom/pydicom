@@ -7,7 +7,7 @@ This is an example only; use only as a starting point.
 # Copyright (c) 2008-2012 Darcy Mason
 # This file is part of pydicom, relased under an MIT license.
 #    See the file license.txt included with this distribution, also
-#    available at http://pydicom.googlecode.com
+#    available at https://github.com/mmattes/pydicom.git
 # Use at your own risk!!
 # Many more items need to be addressed for proper de-identifying DICOM data.
 # In particular, note that pixel data could have confidential data "burned in"

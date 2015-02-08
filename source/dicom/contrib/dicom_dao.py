@@ -28,7 +28,7 @@ Tested with:
 # Copyright (c) 2010 Michael Wallace
 # This file is released under the pydicom license.
 #    See the file license.txt included with the pydicom distribution, also
-#    available at http://pydicom.googlecode.com
+#    available at https://github.com/mmattes/pydicom.git
 #
 
 import hashlib
