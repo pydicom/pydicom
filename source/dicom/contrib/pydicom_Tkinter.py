@@ -1,9 +1,9 @@
 # pydicom_Tkinter.py
 #
 # Copyright (c) 2009 Daniel Nanz
-# This file is released under the pydicom (http://code.google.com/p/pydicom/)
+# This file is released under the pydicom (https://github.com/darcymason/pydicom)
 # license, see the file license.txt available at
-# (http://code.google.com/p/pydicom/)
+# (https://github.com/darcymason/pydicom)
 #
 # revision history:
 # Dec-08-2009: version 0.1

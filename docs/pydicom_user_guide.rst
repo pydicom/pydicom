@@ -49,7 +49,7 @@ You can display the entire dataset by simply printing its string
 
 Note: you can also view DICOM files in a collapsible tree using 
 the example program `dicomtree.py 
-<http://code.google.com/p/pydicom/source/browse/source/dicom/examples/dicomtree.py>`_.
+<https://github.com/darcymason/pydicom/tree/master/source/dicom/examples/dicomtree.py>`_.
 
 You can access specific data elements by name or by DICOM tag number::
 

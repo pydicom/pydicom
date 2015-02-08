@@ -4,7 +4,7 @@
 # Copyright (c) 2013 Darcy Mason
 # This file is part of pydicom, relased under an MIT-style license.
 #    See the file license.txt included with this distribution, also
-#    available at http://pydicom.googlecode.com
+#    available at https://github.com/mmattes/pydicom.git
 #
 
 import sys
