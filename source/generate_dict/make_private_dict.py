@@ -7,7 +7,7 @@ from __future__ import with_statement
 # This file is released under the pydicom (https://github.com/darcymason/pydicom) 
 # license.
 # See the file license.txt included with the pydicom distribution, also
-#    available at https://github.com/mmattes/pydicom.git
+#    available at https://github.com/darcymason/pydicom
 
 '''
 -- Usage ------------------ (>= python 2.5, <3)---

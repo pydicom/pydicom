@@ -3,7 +3,7 @@
 # Copyright (c) 2012 Darcy Mason
 # This file is part of pydicom, relased under an MIT license.
 #    See the file license.txt included with this distribution, also
-#    available at https://github.com/mmattes/pydicom.git
+#    available at https://github.com/darcymason/pydicom
 
 # EDIT THIS SECTION --------------------------
 #    to point to local temp directory

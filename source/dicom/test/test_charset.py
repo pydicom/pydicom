@@ -4,7 +4,7 @@
 # Copyright (c) 2008 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
 #    See the file license.txt included with this distribution, also
-#    available at https://github.com/mmattes/pydicom.git
+#    available at https://github.com/darcymason/pydicom
 
 import unittest
 import dicom
