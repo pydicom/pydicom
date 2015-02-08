@@ -49,7 +49,7 @@ easily be modified.
 License
 =======
 pydicom has a `license 
-<http://code.google.com/p/pydicom/source/browse/source/dicom/license.txt>`_ 
+<https://github.com/darcymason/pydicom/tree/master/source/dicom/license.txt>`_ 
 based on the MIT license.
 
 
@@ -103,9 +103,9 @@ quite similarly to easy_install and can also be used.
 Installing from source (all platforms)
 --------------------------------------
   * download the source code from the 
-    `Downloads tab <http://code.google.com/p/pydicom/downloads/list>`_ or 
-    `checkout the mercurial repository source 
-    <http://code.google.com/p/pydicom/source/checkout>`_
+    `Website <http://www.pydicom.org/>`_ or 
+    `checkout the github repository source 
+    <https://github.com/darcymason/pydicom.git>`_
   * at a command line, change to the directory with the setup.py file
   * with admin privileges, run ``python setup.py install``
 
@@ -134,7 +134,7 @@ Once installed, the package can be imported at a python command line or used
 in your own python program with ``import dicom`` (note the package name is 
 ``dicom``, not ``pydicom`` when used in code. 
 See the `examples directory 
-<http://code.google.com/p/pydicom/source/browse/#hg/source/dicom/examples>`_ 
+<https://github.com/darcymason/pydicom/tree/master/source/dicom/examples>`_ 
 for both kinds of uses. Also see the :doc:`User Guide </pydicom_user_guide>` 
 for more details of how to use the package.
 

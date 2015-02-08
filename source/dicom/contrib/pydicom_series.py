@@ -17,7 +17,7 @@ instance is created for each 3D volume.
 # Copyright (c) 2010 Almar Klein
 # This file is released under the pydicom license.
 #    See the file license.txt included with the pydicom distribution, also
-#    available at http://pydicom.googlecode.com
+#    available at https://github.com/darcymason/pydicom
 #
 
 

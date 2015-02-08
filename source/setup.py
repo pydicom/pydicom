@@ -27,7 +27,7 @@ setup(
     description="Pure python package for DICOM medical file reading and writing",
     author="Darcy Mason and contributors",
     author_email="darcymason@gmail.com",
-    url="http://pydicom.googlecode.com",
+    url="http://www.pydicom.org",
     license="MIT license",
     keywords="dicom python medical imaging",
     classifiers=[

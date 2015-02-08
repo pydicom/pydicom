@@ -4,10 +4,10 @@ from __future__ import with_statement
 
 # file "make_private_dict.py"
 # Copyright (c) 2009 Daniel Nanz
-# This file is released under the pydicom (http://code.google.com/p/pydicom/) 
+# This file is released under the pydicom (https://github.com/darcymason/pydicom) 
 # license.
 # See the file license.txt included with the pydicom distribution, also
-#    available at http://pydicom.googlecode.com
+#    available at https://github.com/darcymason/pydicom
 
 '''
 -- Usage ------------------ (>= python 2.5, <3)---

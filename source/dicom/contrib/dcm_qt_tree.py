@@ -1,9 +1,9 @@
 # dcm_qt_tree.py
 """View DICOM files in a tree using Qt and PySide"""
 # Copyright (c) 2013 Padraig Looney
-# This file is released under the pydicom (http://code.google.com/p/pydicom/)
+# This file is released under the pydicom (https://github.com/darcymason/pydicom)
 # license, see the file license.txt available at
-# (http://code.google.com/p/pydicom/)
+# (https://github.com/darcymason/pydicom)
 
 import dicom
 import sys

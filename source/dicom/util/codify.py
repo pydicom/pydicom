@@ -8,7 +8,7 @@ or import and use specific functions to provide code for pydicom DICOM classes
 # Copyright (c) 2013 Darcy Mason
 # This file is part of pydicom, released under an MIT license.
 #    See the file license.txt included with this distribution, also
-#    available at http://pydicom.googlecode.com
+#    available at https://github.com/darcymason/pydicom
 
 # Run this from the same directory as a "base" dicom file and
 # this code will output to screen the dicom parameters like:
