@@ -10,6 +10,8 @@ from dicom import in_py3
 import dicom.config
 import os
 import dicom
+import cPickle as pickle
+
 
 if in_py3:
     from dicom.valuerep import PersonName3 as PersonNameUnicode
@@ -21,6 +23,46 @@ from pkg_resources import Requirement, resource_filename
 test_dir = resource_filename(Requirement.parse("pydicom"), "dicom/testfiles")
 badvr_name = os.path.join(test_dir, "badVR.dcm")
 default_encoding = 'iso8859'
+
+class DSfloatPickleTest(unittest.TestCase):
+    """Unit tests unique to the use of DS class derived from python Decimal"""
+
+    def testPickling(self):
+        # Check that a pickled DSFloat is read back properly
+        x = dicom.valuerep.DSfloat(9.0)
+        x.original_string = 'hello'
+        data1_string = pickle.dumps(x)
+        x2 = pickle.loads(data1_string)        
+        self.assertTrue(x.real == x2.real)
+        self.assertTrue(x.original_string == x2.original_string)
+
+
+class DSdecimalPickleTest(unittest.TestCase):
+    """Unit tests unique to the use of DS class derived from python Decimal"""
+
+    def testPickling(self):
+        # Check that a pickled DSdecimal is read back properly
+        # DSdecimal actually prefers original_string when 
+        # reading back
+        x = dicom.valuerep.DSdecimal(19)
+        x.original_string = '19'
+        data1_string = pickle.dumps(x)
+        x2 = pickle.loads(data1_string)        
+        self.assertTrue(x.real == x2.real)
+        self.assertTrue(x.original_string == x2.original_string)
+
+
+class ISPickleTest(unittest.TestCase):
+    """Unit tests unique to the use of DS class derived from python Decimal"""
+
+    def testPickling(self):
+        # Check that a pickled IS is read back properly
+        x = dicom.valuerep.IS(921)
+        x.original_string = 'hello'
+        data1_string = pickle.dumps(x)
+        x2 = pickle.loads(data1_string)        
+        self.assertTrue(x.real == x2.real)
+        self.assertTrue(x.original_string == x2.original_string)
 
 
 class BadValueReadtests(unittest.TestCase):
