@@ -306,7 +306,8 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian,
 
 
 def read_dataset(fp, is_implicit_VR, is_little_endian, bytelength=None,
-                 stop_when=None, defer_size=None, parent_encoding=default_encoding):
+                 stop_when=None, defer_size=None, force=False,
+                 parent_encoding=default_encoding):
     """Return a Dataset instance containing the next dataset in the file.
 
     Parameters
@@ -360,7 +361,7 @@ def read_dataset(fp, is_implicit_VR, is_little_endian, bytelength=None,
     except NotImplementedError as details:
         logger.error(details)
 
-    return Dataset(raw_data_elements)
+    return Dataset(raw_data_elements, force=force)
 
 
 def read_sequence(fp, is_implicit_VR, is_little_endian, bytelength, encoding,
@@ -638,7 +639,7 @@ def read_partial(fileobj, stop_when=None, defer_size=None, force=False):
                         is_implicit_VR, is_little_endian)
     else:
         return FileDataset(fileobj, dataset, preamble, file_meta_dataset,
-                           is_implicit_VR, is_little_endian)
+                           is_implicit_VR, is_little_endian, force=force)
 
 
 def read_file(fp, defer_size=None, stop_before_pixels=False, force=False):
@@ -662,6 +663,8 @@ def read_file(fp, defer_size=None, stop_before_pixels=False, force=False):
         If False (default), raises an InvalidDicomError if the file
         is not valid DICOM.
         Set to True to force reading even if no header is found.
+        Also force converting tags that contain invalid values, for example
+        an `IS`-type tag with value `12.3`).
 
     Returns
     -------
