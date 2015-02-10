@@ -76,9 +76,9 @@ class Dataset(dict):
     """
     indent_chars = "   "
 
-    def __init__(self, *args, force=False, **kwargs):
+    def __init__(self, *args, **kwargs):
         self._parent_encoding = kwargs.get('parent_encoding', default_encoding)
-        self._force = force
+        self._force = kwargs.get('force', False)
         dict.__init__(self, *args)
 
     def __enter__(self):
