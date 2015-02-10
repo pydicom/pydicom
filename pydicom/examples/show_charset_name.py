@@ -3,7 +3,7 @@
 # Copyright (c) 2008-2012 Darcy Mason
 # This file is part of pydicom, relased under an MIT license.
 #    See the file license.txt included with this distribution, also
-#    available at http://pydicom.googlecode.com
+#    available at https://github.com/darcymason/pydicom
 
 from pydicom import compat
 from pydicom.valuerep import PersonNameUnicode
