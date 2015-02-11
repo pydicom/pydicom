@@ -75,7 +75,9 @@ def convert_numbers(byte_string, is_little_endian, struct_format):
         logger.warn("Expected length to be even multiple of number size")
     format_string = "%c%u%c" % (endianChar, length // bytes_per_value, struct_format)
     value = unpack(format_string, byte_string)
-    if len(value) == 1:
+    if len(value) == 0:  # if the number is empty, then return the empty string rather than empty list
+        return ''
+    elif len(value) == 1:
         return value[0]
     else:
         return list(value)  # convert from tuple to a list so can modify if need to

@@ -36,6 +36,7 @@ from dicom.test.warncheck import assertWarns
 from pkg_resources import Requirement, resource_filename
 test_dir = resource_filename(Requirement.parse("pydicom"), "dicom/testfiles")
 
+empty_float_tag_name = os.path.join(test_dir, "reportsi_withemptyFLtag.dcm")
 rtplan_name = os.path.join(test_dir, "rtplan.dcm")
 rtdose_name = os.path.join(test_dir, "rtdose.dcm")
 ct_name = os.path.join(test_dir, "CT_small.dcm")
@@ -71,6 +72,12 @@ def isClose(a, b, epsilon=0.000001):
 
 
 class ReaderTests(unittest.TestCase):
+    def testEmptyFloatTag(self):
+        """Tests that an empty float tag reads as an empty string"""
+        empty_float_tag_ds = read_file(empty_float_tag_name)
+        ebt = empty_float_tag_ds.ExaminedBodyThickness
+        self.assertEqual(ebt, '')
+
     def testRTPlan(self):
         """Returns correct values for sample data elements in test RT Plan file"""
         plan = read_file(rtplan_name)
