@@ -488,7 +488,7 @@ class Dataset(dict):
                 raise
         elif self.file_meta.TransferSyntaxUID in dicom.UID.JPEGLSSupportedCompressedPixelTransferSyntaxes:
             if not have_jpeg_ls:
-                msg = "The jpeg_ls package is required to use pixel_array for this transfer syntax {}, and jpeg_ls could not be imported.\n".format(self.file_meta.TransferSyntaxUID)
+                msg = "The jpeg_ls package is required to use pixel_array for this transfer syntax {}, and jpeg_ls could not be imported.".format(self.file_meta.TransferSyntaxUID)
                 raise ImportError(msg)
             # decompress here
             UncompressedPixelData = ''

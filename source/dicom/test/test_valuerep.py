@@ -24,6 +24,7 @@ test_dir = resource_filename(Requirement.parse("pydicom"), "dicom/testfiles")
 badvr_name = os.path.join(test_dir, "badVR.dcm")
 default_encoding = 'iso8859'
 
+
 class DSfloatPickleTest(unittest.TestCase):
     """Unit test for pickling of DSfloat"""
 
@@ -32,7 +33,7 @@ class DSfloatPickleTest(unittest.TestCase):
         x = dicom.valuerep.DSfloat(9.0)
         x.original_string = 'hello'
         data1_string = pickle.dumps(x)
-        x2 = pickle.loads(data1_string)        
+        x2 = pickle.loads(data1_string)
         self.assertTrue(x.real == x2.real)
         self.assertTrue(x.original_string == x2.original_string)
 
@@ -42,12 +43,12 @@ class DSdecimalPickleTest(unittest.TestCase):
 
     def testPickling(self):
         # Check that a pickled DSdecimal is read back properly
-        # DSdecimal actually prefers original_string when 
+        # DSdecimal actually prefers original_string when
         # reading back
         x = dicom.valuerep.DSdecimal(19)
         x.original_string = '19'
         data1_string = pickle.dumps(x)
-        x2 = pickle.loads(data1_string)        
+        x2 = pickle.loads(data1_string)
         self.assertTrue(x.real == x2.real)
         self.assertTrue(x.original_string == x2.original_string)
 
@@ -60,7 +61,7 @@ class ISPickleTest(unittest.TestCase):
         x = dicom.valuerep.IS(921)
         x.original_string = 'hello'
         data1_string = pickle.dumps(x)
-        x2 = pickle.loads(data1_string)        
+        x2 = pickle.loads(data1_string)
         self.assertTrue(x.real == x2.real)
         self.assertTrue(x.original_string == x2.original_string)
 

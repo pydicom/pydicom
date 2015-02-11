@@ -211,7 +211,7 @@ def convert_value(VR, raw_data_element, encoding=default_encoding):
                 pass
             else:
                 logger.debug('converted tag %s with VR %s' % (raw_data_element.tag, vr))
-            value = raw_data_element.value                           
+            value = raw_data_element.value
     return value
 
 # converters map a VR to the function to read the value(s).

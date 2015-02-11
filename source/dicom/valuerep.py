@@ -49,7 +49,8 @@ class DSfloat(float):
     __slots__ = 'original_string'
 
     def __getstate__(self):
-        if type(self.__slots__) is str and hasattr(self, self.__slots__):
+        """ support for pickling objects """
+        if isinstance(self.__slots__, str) and hasattr(self, self.__slots__):
             return dict([(self.__slots__, getattr(self, self. __slots__))])
         else:
             return dict(
@@ -59,6 +60,7 @@ class DSfloat(float):
             )
 
     def __setstate__(self, state):
+        """ support for pickling objects """
         for slot, value in state.items():
             setattr(self, slot, value)
 
@@ -92,7 +94,8 @@ class DSdecimal(Decimal):
     __slots__ = 'original_string'
 
     def __getstate__(self):
-        if type(self.__slots__) is str and hasattr(self, self.__slots__):
+        """ support for pickling objects """
+        if isinstance(self.__slots__, str) and hasattr(self, self.__slots__):
             return dict([(self.__slots__, getattr(self, self. __slots__))])
         else:
             return dict(
@@ -102,6 +105,7 @@ class DSdecimal(Decimal):
             )
 
     def __setstate__(self, state):
+        """ support for pickling objects """
         for slot, value in state.items():
             setattr(self, slot, value)
 
@@ -190,22 +194,25 @@ class IS(int):
     """
     if not in_py3:
         __slots__ = 'original_string'
+
+        def __getstate__(self):
+            """ support for pickling objects """
+            if isinstance(self.__slots__, str) and hasattr(self, self.__slots__):
+                return dict([(self.__slots__, getattr(self, self. __slots__))])
+            else:
+                return dict(
+                    (slot, getattr(self, slot))
+                    for slot in self.__slots__
+                    if hasattr(self, slot)
+                )
+
+        def __setstate__(self, state):
+            """ support for pickling objects """
+            for slot, value in state.items():
+                setattr(self, slot, value)
+
     # Unlikely that str(int) will not be the same as the original, but could happen
     # with leading zeros.
-
-    def __getstate__(self):
-        if type(self.__slots__) is str and hasattr(self, self.__slots__):
-            return dict([(self.__slots__, getattr(self, self. __slots__))])
-        else:
-            return dict(
-                (slot, getattr(self, slot))
-                for slot in self.__slots__
-                if hasattr(self, slot)
-            )
-
-    def __setstate__(self, state):
-        for slot, value in state.items():
-            setattr(self, slot, value)
 
     def __new__(cls, val):
         """Create instance if new integer string"""
