@@ -25,7 +25,7 @@ badvr_name = os.path.join(test_dir, "badVR.dcm")
 default_encoding = 'iso8859'
 
 class DSfloatPickleTest(unittest.TestCase):
-    """Unit tests unique to the use of DS class derived from python Decimal"""
+    """Unit test for pickling of DSfloat"""
 
     def testPickling(self):
         # Check that a pickled DSFloat is read back properly
@@ -38,7 +38,7 @@ class DSfloatPickleTest(unittest.TestCase):
 
 
 class DSdecimalPickleTest(unittest.TestCase):
-    """Unit tests unique to the use of DS class derived from python Decimal"""
+    """Unit test for pickling of DSdecimal"""
 
     def testPickling(self):
         # Check that a pickled DSdecimal is read back properly
@@ -53,7 +53,7 @@ class DSdecimalPickleTest(unittest.TestCase):
 
 
 class ISPickleTest(unittest.TestCase):
-    """Unit tests unique to the use of DS class derived from python Decimal"""
+    """Unit test for pickling of IS"""
 
     def testPickling(self):
         # Check that a pickled IS is read back properly
@@ -66,7 +66,7 @@ class ISPickleTest(unittest.TestCase):
 
 
 class BadValueReadtests(unittest.TestCase):
-    """Unit tests unique to the use of DS class derived from python Decimal"""
+    """Unit tests for handling a bad value for a VR (a string in a number VR here)"""
 
     def testReadBadValueInVR(self):
         # Check that invalid values are read
