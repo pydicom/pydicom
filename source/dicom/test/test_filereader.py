@@ -36,7 +36,7 @@ from dicom.test.warncheck import assertWarns
 from pkg_resources import Requirement, resource_filename
 test_dir = resource_filename(Requirement.parse("pydicom"), "dicom/testfiles")
 
-empty_float_tag_name = os.path.join(test_dir, "reportsi_withemptyFLtag.dcm")
+empty_number_tags_name = os.path.join(test_dir, "reportsi_with_empty_number_tags.dcm")
 rtplan_name = os.path.join(test_dir, "rtplan.dcm")
 rtdose_name = os.path.join(test_dir, "rtdose.dcm")
 ct_name = os.path.join(test_dir, "CT_small.dcm")
@@ -72,11 +72,16 @@ def isClose(a, b, epsilon=0.000001):
 
 
 class ReaderTests(unittest.TestCase):
-    def testEmptyFloatTag(self):
-        """Tests that an empty float tag reads as an empty string"""
-        empty_float_tag_ds = read_file(empty_float_tag_name)
-        ebt = empty_float_tag_ds.ExaminedBodyThickness
-        self.assertEqual(ebt, '')
+    def testEmptyNumbersTag(self):
+        """Tests that an empty tag with a number VR (FL, UL, SL, US, SS, FL, FD, OF) reads as an empty string"""
+        empty_number_tags_ds = read_file(empty_number_tags_name)
+        self.assertEqual(empty_number_tags_ds.ExaminedBodyThickness, '')
+        self.assertEqual(empty_number_tags_ds.SimpleFrameList, '')
+        self.assertEqual(empty_number_tags_ds.ReferencePixelX0, '')
+        self.assertEqual(empty_number_tags_ds.PhysicalUnitsXDirection, '')
+        self.assertEqual(empty_number_tags_ds.TagAngleSecondAxis, '')
+        self.assertEqual(empty_number_tags_ds.TagSpacingSecondDimension, '')
+        self.assertEqual(empty_number_tags_ds.VectorGridData, '')
 
     def testRTPlan(self):
         """Returns correct values for sample data elements in test RT Plan file"""
