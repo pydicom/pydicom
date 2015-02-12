@@ -25,6 +25,24 @@ try:
     import numpy  # NOQA
 except:
     have_numpy = False
+
+have_jpeg_ls = True
+try:
+    import jpeg_ls
+except ImportError:
+    have_jpeg_ls = False
+
+have_pillow = True
+try:
+    from PIL import Image as PILImg
+except ImportError:
+    # If that failed, try the alternate import syntax for PIL.
+    try:
+        import Image as PILImg
+    except ImportError:
+        # Neither worked, so it's likely not installed.
+        have_pillow = False
+
 from dicom.filereader import read_file
 from dicom.errors import InvalidDicomError
 from dicom.tag import Tag, TupleTag
@@ -43,6 +61,7 @@ ct_name = os.path.join(test_dir, "CT_small.dcm")
 mr_name = os.path.join(test_dir, "MR_small.dcm")
 jpeg2000_name = os.path.join(test_dir, "JPEG2000.dcm")
 jpeg2000_lossless_name = os.path.join(test_dir, "MR_small_jp2klossless.dcm")
+jpeg_ls_lossless_name = os.path.join(test_dir, "MR_small_jpeg_ls_lossless.dcm")
 jpeg_lossy_name = os.path.join(test_dir, "JPEG-lossy.dcm")
 jpeg_lossless_name = os.path.join(test_dir, "JPEG-LL.dcm")
 deflate_name = os.path.join(test_dir, "image_dfl.dcm")
@@ -293,6 +312,22 @@ class ReaderTests(unittest.TestCase):
         self.assertEqual(got, expected, "Sample data element after file meta with no group length failed, expected '%s', got '%s'" % (expected, got))
 
 
+class JPEG_LS_Tests(unittest.TestCase):
+    def setUp(self):
+        self.jpeg_ls_lossless = read_file(jpeg_ls_lossless_name)
+        self.mr_small = read_file(mr_name)
+
+    def testJPEG_LS_PixelArray(self):
+        """JPEG LS Lossless: Now works"""
+        if have_numpy and have_jpeg_ls:
+            a = self.jpeg_ls_lossless.pixel_array
+            b = self.mr_small.pixel_array
+            self.assertEqual(a.mean(), b.mean(),
+                             "Decoded pixel data is not all {} (mean == {})".format(b.mean(), a.mean()))
+        else:
+            self.assertRaises(NotImplementedError, self.jpeg_ls_lossless._get_pixel_array)
+
+
 class JPEG2000Tests(unittest.TestCase):
     def setUp(self):
         self.jpeg = read_file(jpeg2000_name)
@@ -311,11 +346,13 @@ class JPEG2000Tests(unittest.TestCase):
 
     def testJPEG2000PixelArray(self):
         """JPEG2000: Now works"""
-        if have_numpy:
+        if have_numpy and have_pillow:
             a = self.jpegls.pixel_array
             b = self.mr_small.pixel_array
             self.assertEqual(a.mean(), b.mean(),
                              "Decoded pixel data is not all {} (mean == {})".format(b.mean(), a.mean()))
+        else:
+            self.assertRaises(NotImplementedError, self.jpeg._get_pixel_array)
 
 
 class JPEGlossyTests(unittest.TestCase):

@@ -384,7 +384,7 @@ class Dataset(dict):
         except TypeError:
             msg = ("Data type not understood by NumPy: "
                    "format='%s', PixelRepresentation=%d, BitsAllocated=%d")
-            raise TypeError(msg % (numpy_format, self.PixelRepresentation,
+            raise TypeError(msg % (format_str, self.PixelRepresentation,
                             self.BitsAllocated))
 
         # Have correct Numpy format, so create the NumPy array
@@ -439,71 +439,14 @@ class Dataset(dict):
         except TypeError:
             msg = ("Data type not understood by NumPy: "
                    "format='%s', PixelRepresentation=%d, BitsAllocated=%d")
-            raise TypeError(msg % (numpy_format, self.PixelRepresentation,
+            raise TypeError(msg % (format_str, self.PixelRepresentation,
                             self.BitsAllocated))
         if self.file_meta.TransferSyntaxUID in dicom.UID.PILSupportedCompressedPixelTransferSyntaxes:
-            if not have_pillow:
-                msg = "The pillow package is required to use pixel_array for this transfer syntax {}, and pillow could not be imported.\n".format(self.file_meta.TransferSyntaxUID)
-                raise ImportError(msg)
-            # decompress here
-            if self.file_meta.TransferSyntaxUID in dicom.UID.JPEGLossyCompressedPixelTransferSyntaxes:
-                if self.BitsAllocated > 8:
-                    raise NotImplementedError("JPEG Lossy only supported if Bits Allocated = 8")
-                generic_jpeg_file_header = '\xff\xd8\xff\xe0\x00\x10JFIF\x00\x01\x01\x01\x00\x01\x00\x01\x00\x00'
-                frame_start_from = 2
-            elif self.file_meta.TransferSyntaxUID in dicom.UID.JPEG2000CompressedPixelTransferSyntaxes:
-                generic_jpeg_file_header = ''
-                # generic_jpeg_file_header = '\x00\x00\x00\x0C\x6A\x50\x20\x20\x0D\x0A\x87\x0A'
-                frame_start_from = 0
-            else:
-                generic_jpeg_file_header = ''
-                frame_start_from = 0
-            try:
-                UncompressedPixelData = ''
-                if 'NumberOfFrames' in self and self.NumberOfFrames > 1:
-                    # multiple compressed frames
-                    CompressedPixelDataSeq = dicom.encaps.decode_data_sequence(self.PixelData)
-                    for frame in CompressedPixelDataSeq:
-                        data = generic_jpeg_file_header + frame[frame_start_from:]
-                        fio = io.BytesIO(data)
-                        try:
-                            decompressed_image = PILImg.open(fio)
-                        except IOError as e:
-                            raise NotImplementedError(e.message)
-                        UncompressedPixelData += decompressed_image.tostring()
-                else:
-                    # single compressed frame
-                    UncompressedPixelData = dicom.encaps.defragment_data(self.PixelData)
-                    UncompressedPixelData = generic_jpeg_file_header + UncompressedPixelData[frame_start_from:]
-                    # print repr(UncompressedPixelData[0:256])
-                    # print self.file_meta.TransferSyntaxUID
-                    try:
-                        fio = io.BytesIO(UncompressedPixelData)
-                        decompressed_image = PILImg.open(fio)
-                    except IOError as e:
-                        raise NotImplementedError(e.message)
-                    # print repr(decompressed_image.tostring()[0:256])
-                    UncompressedPixelData = decompressed_image.tostring()
-            except:
-                raise
+            UncompressedPixelData = self._get_PIL_supported_compressed_pixeldata()
+
         elif self.file_meta.TransferSyntaxUID in dicom.UID.JPEGLSSupportedCompressedPixelTransferSyntaxes:
-            if not have_jpeg_ls:
-                msg = "The jpeg_ls package is required to use pixel_array for this transfer syntax {}, and jpeg_ls could not be imported.".format(self.file_meta.TransferSyntaxUID)
-                raise ImportError(msg)
-            # decompress here
-            UncompressedPixelData = ''
-            if 'NumberOfFrames' in self and self.NumberOfFrames > 1:
-                # multiple compressed frames
-                CompressedPixelDataSeq = dicom.encaps.decode_data_sequence(self.PixelData)
-                # print len(CompressedPixelDataSeq)
-                for frame in CompressedPixelDataSeq:
-                    decompressed_image = jpeg_ls.decode(numpy.fromstring(frame, dtype=numpy.uint8))
-                    UncompressedPixelData += decompressed_image.tostring()
-            else:
-                # single compressed frame
-                CompressedPixelData = dicom.encaps.defragment_data(self.PixelData)
-                decompressed_image = jpeg_ls.decode(numpy.fromstring(CompressedPixelData, dtype=numpy.uint8))
-                UncompressedPixelData = decompressed_image.tostring()
+            UncompressedPixelData = self._get_jpeg_ls_supported_compressed_pixeldata()
+
         else:
             msg = "The transfer syntax {} is not currently supported.\n".format(self.file_meta.TransferSyntaxUID)
             raise NotImplementedError(msg)
@@ -532,6 +475,70 @@ class Dataset(dict):
             # WHY IS THIS EVEN NECESSARY??
             arr &= 0x7FFF
         return arr
+
+    def _get_PIL_supported_compressed_pixeldata(self):
+        if not have_pillow:
+            msg = "The pillow package is required to use pixel_array for this transfer syntax {}, and pillow could not be imported.\n".format(self.file_meta.TransferSyntaxUID)
+            raise ImportError(msg)
+        # decompress here
+        if self.file_meta.TransferSyntaxUID in dicom.UID.JPEGLossyCompressedPixelTransferSyntaxes:
+            if self.BitsAllocated > 8:
+                raise NotImplementedError("JPEG Lossy only supported if Bits Allocated = 8")
+            generic_jpeg_file_header = '\xff\xd8\xff\xe0\x00\x10JFIF\x00\x01\x01\x01\x00\x01\x00\x01\x00\x00'
+            frame_start_from = 2
+        elif self.file_meta.TransferSyntaxUID in dicom.UID.JPEG2000CompressedPixelTransferSyntaxes:
+            generic_jpeg_file_header = ''
+            # generic_jpeg_file_header = '\x00\x00\x00\x0C\x6A\x50\x20\x20\x0D\x0A\x87\x0A'
+            frame_start_from = 0
+        else:
+            generic_jpeg_file_header = ''
+            frame_start_from = 0
+        try:
+            UncompressedPixelData = ''
+            if 'NumberOfFrames' in self and self.NumberOfFrames > 1:
+                # multiple compressed frames
+                CompressedPixelDataSeq = dicom.encaps.decode_data_sequence(self.PixelData)
+                for frame in CompressedPixelDataSeq:
+                    data = generic_jpeg_file_header + frame[frame_start_from:]
+                    fio = io.BytesIO(data)
+                    try:
+                        decompressed_image = PILImg.open(fio)
+                    except IOError as e:
+                        raise NotImplementedError(e.message)
+                    UncompressedPixelData += decompressed_image.tostring()
+            else:
+                # single compressed frame
+                UncompressedPixelData = dicom.encaps.defragment_data(self.PixelData)
+                UncompressedPixelData = generic_jpeg_file_header + UncompressedPixelData[frame_start_from:]
+                try:
+                    fio = io.BytesIO(UncompressedPixelData)
+                    decompressed_image = PILImg.open(fio)
+                except IOError as e:
+                    raise NotImplementedError(e.message)
+                UncompressedPixelData = decompressed_image.tostring()
+        except:
+            raise
+        return UncompressedPixelData
+
+    def _get_jpeg_ls_supported_compressed_pixeldata(self):
+        if not have_jpeg_ls:
+            msg = "The jpeg_ls package is required to use pixel_array for this transfer syntax {}, and jpeg_ls could not be imported.".format(self.file_meta.TransferSyntaxUID)
+            raise ImportError(msg)
+        # decompress here
+        UncompressedPixelData = ''
+        if 'NumberOfFrames' in self and self.NumberOfFrames > 1:
+            # multiple compressed frames
+            CompressedPixelDataSeq = dicom.encaps.decode_data_sequence(self.PixelData)
+            # print len(CompressedPixelDataSeq)
+            for frame in CompressedPixelDataSeq:
+                decompressed_image = jpeg_ls.decode(numpy.fromstring(frame, dtype=numpy.uint8))
+                UncompressedPixelData += decompressed_image.tostring()
+        else:
+            # single compressed frame
+            CompressedPixelData = dicom.encaps.defragment_data(self.PixelData)
+            decompressed_image = jpeg_ls.decode(numpy.fromstring(CompressedPixelData, dtype=numpy.uint8))
+            UncompressedPixelData = decompressed_image.tostring()
+        return UncompressedPixelData
 
     # Use by pixel_array property
     def _get_pixel_array(self):
