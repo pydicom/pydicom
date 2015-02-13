@@ -70,6 +70,11 @@ priv_SQ_name = os.path.join(test_dir, "priv_SQ.dcm")
 nested_priv_SQ_name = os.path.join(test_dir, "nested_priv_SQ.dcm")
 no_meta_group_length = os.path.join(test_dir, "no_meta_group_length.dcm")
 gzip_name = os.path.join(test_dir, "zipMR.gz")
+emri_name = os.path.join(test_dir, "emri_small.dcm")
+emri_jpeg_ls_lossless = os.path.join(test_dir, "emri_small_jpeg_ls_lossless.dcm")
+emri_jpeg_2k_lossless = os.path.join(test_dir, "emri_small_jpeg_2k_lossless.dcm")
+
+
 
 dir_name = os.path.dirname(sys.argv[0])
 save_dir = os.getcwd()
@@ -316,7 +321,9 @@ class JPEG_LS_Tests(unittest.TestCase):
     def setUp(self):
         self.jpeg_ls_lossless = read_file(jpeg_ls_lossless_name)
         self.mr_small = read_file(mr_name)
-
+        self.emri_jpeg_ls_lossless = read_file(emri_jpeg_ls_lossless)
+        self.emri_small = read_file(emri_name)
+        
     def testJPEG_LS_PixelArray(self):
         """JPEG LS Lossless: Now works"""
         if have_numpy and have_jpeg_ls:
@@ -327,13 +334,25 @@ class JPEG_LS_Tests(unittest.TestCase):
         else:
             self.assertRaises(NotImplementedError, self.jpeg_ls_lossless._get_pixel_array)
 
+    def test_emri_JPEG_LS_PixelArray(self):
+        """JPEG LS Lossless: Now works"""
+        if have_numpy and have_jpeg_ls:
+            a = self.emri_jpeg_ls_lossless.pixel_array
+            b = self.emri_small.pixel_array
+            self.assertEqual(a.mean(), b.mean(),
+                             "Decoded pixel data is not all {} (mean == {})".format(b.mean(), a.mean()))
+        else:
+            self.assertRaises(NotImplementedError, self.emri_jpeg_ls_lossless._get_pixel_array)
+
 
 class JPEG2000Tests(unittest.TestCase):
     def setUp(self):
         self.jpeg = read_file(jpeg2000_name)
         self.jpegls = read_file(jpeg2000_lossless_name)
         self.mr_small = read_file(mr_name)
-
+        self.emri_jpeg_2k_lossless = read_file(emri_jpeg_2k_lossless)
+        self.emri_small = read_file(emri_name)
+        
     def testJPEG2000(self):
         """JPEG2000: Returns correct values for sample data elements............"""
         expected = [Tag(0x0054, 0x0010), Tag(0x0054, 0x0020)]  # XX also tests multiple-valued AT data element
@@ -352,7 +371,17 @@ class JPEG2000Tests(unittest.TestCase):
             self.assertEqual(a.mean(), b.mean(),
                              "Decoded pixel data is not all {} (mean == {})".format(b.mean(), a.mean()))
         else:
-            self.assertRaises(NotImplementedError, self.jpeg._get_pixel_array)
+            self.assertRaises(NotImplementedError, self.jpegls._get_pixel_array)
+
+    def test_emri_JPEG2000PixelArray(self):
+        """JPEG2000: Now works"""
+        if have_numpy and have_pillow:
+            a = self.emri_jpeg_2k_lossless.pixel_array
+            b = self.emri_small.pixel_array
+            self.assertEqual(a.mean(), b.mean(),
+                             "Decoded pixel data is not all {} (mean == {})".format(b.mean(), a.mean()))
+        else:
+            self.assertRaises(NotImplementedError, self.emri_jpeg_2k_lossless._get_pixel_array)
 
 
 class JPEGlossyTests(unittest.TestCase):
