@@ -174,7 +174,7 @@ def generate_uid(prefix=pydicom_root_UID, truncate=True):
 
     suffix = uuid.uuid1().int
 
-    dicom_uid = ''.join([prefix, str(suffix).lstrip("0")])
+    dicom_uid = ''.join([prefix, str(suffix)])
 
     if truncate:
         dicom_uid = dicom_uid[:max_uid_len]
