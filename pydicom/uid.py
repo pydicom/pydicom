@@ -5,10 +5,7 @@
 #    See the file license.txt included with this distribution, also
 #    available at https://github.com/darcymason/pydicom
 
-import os
 import uuid
-import datetime
-from math import fabs
 
 from pydicom._uid_dict import UID_dictionary
 from pydicom import compat
@@ -140,7 +137,8 @@ NotCompressedPixelTransferSyntaxes = [ExplicitVRLittleEndian,
                                       DeflatedExplicitVRLittleEndian,
                                       ExplicitVRBigEndian]
 
-# Many thanks to the Medical Connections for offering free valid UIDs (http://www.medicalconnections.co.uk/FreeUID.html)
+# Many thanks to the Medical Connections for offering free valid UIDs
+# (http://www.medicalconnections.co.uk/FreeUID.html)
 # Their service was used to obtain the following root UID for pydicom:
 pydicom_root_UID = '1.2.826.0.1.3680043.8.498.'
 pydicom_uids = {
@@ -148,7 +146,7 @@ pydicom_uids = {
 }
 
 
-def generate_uid(prefix=pydicom_root_UID, truncate=False):
+def generate_uid(prefix=pydicom_root_UID, truncate=True):
     '''
     Generate a dicom unique identifier based on host id, process id and current
     time. The max lenght of the generated UID is 64 caracters.
@@ -172,15 +170,11 @@ def generate_uid(prefix=pydicom_root_UID, truncate=False):
     max_uid_len = 64
 
     if prefix is None:
-        dicom_uid = '2.25.{0}'.format(uuid.uuid1().int)
-    else:
-        uid_info = [uuid.getnode(),
-                    fabs(os.getpid()),
-                    datetime.datetime.today().second,
-                    datetime.datetime.today().microsecond]  # nopep8
+        prefix = '2.25.'
 
-        suffix = ''.join([str(int(x)) for x in uid_info])
-        dicom_uid = ''.join([prefix, suffix])
+    suffix = uuid.uuid1().int
+
+    dicom_uid = ''.join([prefix, str(suffix).lstrip("0")])
 
     if truncate:
         dicom_uid = dicom_uid[:max_uid_len]
