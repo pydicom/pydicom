@@ -1,4 +1,5 @@
 # test_filereader.py
+# -*- coding: utf-8 -*-
 """unittest tests for dicom.filereader module"""
 # Copyright (c) 2010-2012 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
@@ -57,6 +58,7 @@ test_dir = resource_filename(Requirement.parse("pydicom"), "dicom/testfiles")
 empty_number_tags_name = os.path.join(test_dir, "reportsi_with_empty_number_tags.dcm")
 rtplan_name = os.path.join(test_dir, "rtplan.dcm")
 rtdose_name = os.path.join(test_dir, "rtdose.dcm")
+rtdose_with_utf8_mbcs_name = os.path.join(test_dir, "rtdose_with_thai_ฅฆ_characters.dcm")
 ct_name = os.path.join(test_dir, "CT_small.dcm")
 mr_name = os.path.join(test_dir, "MR_small.dcm")
 jpeg2000_name = os.path.join(test_dir, "JPEG2000.dcm")
@@ -247,6 +249,10 @@ class ReaderTests(unittest.TestCase):
         got = ds.ConversionType
         expected = "WSD"
         self.assertEqual(got, expected, "Attempted to read deflated file data element Conversion Type, expected '%s', got '%s'" % (expected, got))
+
+    def testUTF8FileName(self):
+        ds = read_file(rtdose_with_utf8_mbcs_name)
+        self.assertTrue(ds is not None)
 
     def testNoPixelsRead(self):
         """Returns all data elements before pixels using stop_before_pixels=False"""

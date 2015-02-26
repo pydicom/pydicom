@@ -585,7 +585,13 @@ def read_file(fp, defer_size=None, stop_before_pixels=False, force=False):
     if isinstance(fp, basestring):
         # caller provided a file name; we own the file handle
         caller_owns_file = False
-        logger.debug(u"Reading file '{0}'".format(fp))
+        try:
+            logger.debug(u"Reading file '{0}'".format(fp))
+        except UnicodeDecodeError as e:
+            try:
+                logger.debug("Reading file '{0}'".format(fp))
+            except Exception:
+                pass
         fp = open(fp, 'rb')
 
     if dicom.debugging:
