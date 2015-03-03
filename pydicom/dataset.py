@@ -78,6 +78,7 @@ class Dataset(dict):
 
     def __init__(self, *args, **kwargs):
         self._parent_encoding = kwargs.get('parent_encoding', default_encoding)
+        self._force = kwargs.get('force', False)
         dict.__init__(self, *args)
 
     def __enter__(self):
@@ -305,7 +306,8 @@ class Dataset(dict):
             else:
                 character_set = default_encoding
             # Not converted from raw form read from file yet; do so now
-            self[tag] = DataElement_from_raw(data_elem, character_set)
+            self[tag] = DataElement_from_raw(data_elem, character_set,
+                                             force=self._force)
         return dict.__getitem__(self, tag)
 
     def get_item(self, key):
@@ -667,7 +669,7 @@ class Dataset(dict):
 
 class FileDataset(Dataset):
     def __init__(self, filename_or_obj, dataset, preamble=None, file_meta=None,
-                 is_implicit_VR=True, is_little_endian=True):
+                 is_implicit_VR=True, is_little_endian=True, force=False):
         """Initialize a dataset read from a DICOM file.
 
         Parameters
@@ -686,7 +688,7 @@ class FileDataset(Dataset):
         is_little_endian : boolean
             True (default) if little-endian transfer syntax used; False if big-endian.
         """
-        Dataset.__init__(self, dataset)
+        Dataset.__init__(self, dataset, force=force)
         self.preamble = preamble
         self.file_meta = file_meta
         self.is_implicit_VR = is_implicit_VR

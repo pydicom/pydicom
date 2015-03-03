@@ -309,12 +309,12 @@ RawDataElement = namedtuple('RawDataElement',
                             'tag VR length value value_tell is_implicit_VR is_little_endian')
 
 
-def DataElement_from_raw(raw_data_element, encoding=None):
+def DataElement_from_raw(raw_data_element, encoding=None, force=False):
     """Return a DataElement from a RawDataElement"""
     from pydicom.values import convert_value  # XXX buried here to avoid circular import filereader->Dataset->convert_value->filereader (for SQ parsing)
     raw = raw_data_element
     VR = raw.VR
-    
+
     # If user has hooked into conversion of raw values, call his/her routine
     import pydicom.config
     if pydicom.config.data_element_callback:
@@ -334,5 +334,15 @@ def DataElement_from_raw(raw_data_element, encoding=None):
         value = convert_value(VR, raw, encoding)
     except NotImplementedError as e:
         raise NotImplementedError("{0:s} in tag {1!r}".format(str(e), raw.tag))
+    except ValueError as e:
+        # normal convert failed, if `force` then try to read as "OB" at least
+        if force:
+            import warnings
+            warnings.warn("Falling back to VR='OB' for {0} because: {1}".
+                          format(raw.tag, e))
+            VR = 'OB'
+            value = convert_value(VR, raw, encoding)
+        else:
+            raise e
     return DataElement(raw.tag, VR, value, raw.value_tell,
                        raw.length == 0xFFFFFFFF, already_converted=True)
