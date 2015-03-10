@@ -8,6 +8,7 @@
 
 from pydicom import config
 from pydicom import datadict
+from pydicom import values
 
 def fix_separator_callback(raw_elem, **kwargs):
     """Used by fix_separator as the callback function from read_dataset
@@ -63,4 +64,39 @@ def fix_separator(invalid_separator, for_VRs=["DS", "IS"],
         'invalid_separator': invalid_separator,
         'for_VRs': for_VRs
         }
-    
+
+
+def fix_mismatch_callback(raw_elem, **kwargs):
+    try:
+        values.convert_value(raw_elem.VR, raw_elem)
+    except ValueError:
+        for vr in kwargs['with_VRs']:
+            try:
+                values.convert_value(vr, raw_elem)
+            except ValueError:
+                pass
+            else:
+               raw_elem = raw_elem._replace(VR=vr)
+    return raw_elem
+
+
+def fix_mismatch(with_VRs=['DS', 'IS', 'PN']):
+    """A callback function to check that RawDataElements are translatable
+    with their provided VRs.  If not, re-attempt translation using
+    some other translators.
+
+    Parameters
+    ----------
+    with_VRs : list, [['PN', 'DS', 'IS']]
+        A list of VR strings to attempt if the raw data element value cannot
+        be translated with the raw data element's VR.
+
+    Returns
+    -------
+    No return value.  The callback function will return either
+    the original RawDataElement instance, or one with a fixed VR.
+    """
+    config.data_element_callback = fix_mismatch_callback
+    config.data_element_callback_kwargs = {
+        'with_VRs': with_VRs,
+        }
