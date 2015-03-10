@@ -80,7 +80,7 @@ def fix_mismatch_callback(raw_elem, **kwargs):
     return raw_elem
 
 
-def fix_mismatch(with_VRs=['DS', 'IS', 'PN']):
+def fix_mismatch(with_VRs=['PN', 'DS', 'IS']):
     """A callback function to check that RawDataElements are translatable
     with their provided VRs.  If not, re-attempt translation using
     some other translators.
