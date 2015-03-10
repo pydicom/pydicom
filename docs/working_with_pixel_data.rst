@@ -14,8 +14,8 @@ pydicom tends to be "lazy" in interpreting DICOM data. For example,
 by default it doesn't do anything with pixel data 
 except read in the raw bytes::
 
-    >>> import dicom
-    >>> ds=dicom.read_file("MR_small.dcm")
+    >>> import pydicom
+    >>> ds=pydicom.read_file("MR_small.dcm")
     >>> ds.PixelData
     '\x89\x03\xfb\x03\xcb\x04\xeb\x04\xf9\x02\x94\x01\x7f ...
     ...
@@ -30,13 +30,15 @@ if you need to work with them...
 pixel_array
 ===========
 
+.. warning::
+    To work with the pixel_array property `NumPy <http://numpy.org/>`_
+    must be installed on your system.
+
 A property of Dataset called ``pixel_array`` provides more useful pixel data
-for uncompressed images. The `NumPy <http://numpy.org/>`_ 
-numerical package must be installed on your system to use this property, 
-because ``pixel_array`` returns a NumPy array::
+for uncompressed images. The ``pixel_array`` property returns a NumPy array::
 
     >>> import dicom
-    >>> ds=dicom.read_file("MR_small.dcm")
+    >>> ds=pydicom.read_file("MR_small.dcm")
     >>> ds.pixel_array
     array([[ 905, 1019, 1227, ...,  302,  304,  328],
            [ 628,  770,  907, ...,  298,  331,  355],

@@ -1,0 +1,55 @@
+>>> import pydicom
+>>> ds = pydicom.read_file("rtplan.dcm") # (rtplan.dcm is in the testfiles directory)
+>>> ds    #doctest: +ELLIPSIS
+(0008, 0012) Instance Creation Date              DA: '20030903'
+(0008, 0013) Instance Creation Time              TM: '150031'
+(0008, 0016) SOP Class UID                       UI: RT Plan Storage
+(0008, 0018) SOP Instance UID                    UI: 1.2.777.777.77.7.7777.7777.20030903150023
+(0008, 0020) Study Date                          DA: '20030716'
+(0008, 0030) Study Time                          TM: '153557'
+(0008, 0050) Accession Number                    SH: ''
+(0008, 0060) Modality                            CS: 'RTPLAN'
+...
+
+>>> ds.PatientName
+'Last^First^mid^pre'
+>>> ds[0x10,0x10].value
+'Last^First^mid^pre'
+>>> ds.PatientID = "12345"
+>>> ds.SeriesNumber = 5
+>>> ds[0x10,0x10].value = 'TestName'
+>>> ds.BeamSequence[0].BeamName
+'Field 1'
+>>> # Same thing with tag numbers (not as pretty!):
+>>> ds[0x300a,0xb0][0][0x300a,0xc2].value
+'Field 1'
+>>> # yet another way, using another variable
+>>> beam1 = ds.BeamSequence[0]
+>>> beam1.BeamName, beam1[0x300a,0xc2].value
+('Field 1', 'Field 1')
+
+>>> ds.dir("pat")
+['PatientBirthDate', 'PatientID', 'PatientName', 'PatientSetupSequence', 'PatientSex']
+
+>>> data_element = ds.data_element("PatientName")  # or data_element = ds[0x10,0x10]
+>>> data_element.VR, data_element.value
+('PN', 'TestName')
+
+>>> "PatientName" in ds
+True
+
+>>> del ds.InstitutionName
+>>> # OR del ds[0x0008,0x0080]
+
+>>> ds = pydicom.read_file("CT_small.dcm")
+>>> pixel_bytes = ds.PixelData
+>>> pix = ds.pixel_array
+
+>>> from pydicom.tag import Tag
+>>> t1=Tag(0x00100010) # all of these are equivalent
+>>> t2=Tag(0x10,0x10)
+>>> t3=Tag((0x10, 0x10))
+>>> t1
+(0010, 0010)
+>>> t1==t2, t1==t3
+(True, True)

@@ -1,0 +1,13 @@
+>>> import pydicom
+>>> plan=pydicom.read_file("rtplan.dcm")
+>>> plan.PatientName
+'Last^First^mid^pre'
+>>> plan.dir("setup")    # get a list of tags with "setup" somewhere in the name
+['PatientSetupSequence']
+>>> plan.PatientSetupSequence[0]
+(0018, 5100) Patient Position                    CS: 'HFS'
+(300a, 0182) Patient Setup Number                IS: '1'
+(300a, 01b2) Setup Technique Description         ST: ''
+>>> plan.PatientSetupSequence[0].PatientPosition = "HFP"
+>>> plan.save_as("rtplan2.dcm")
+

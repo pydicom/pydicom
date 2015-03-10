@@ -1,0 +1,81 @@
+Below is the captured text of a session at an interactive python prompt.
+I've tidied up some wrapped lines. pixel_array requires the Numpy library
+Assumed is started in the 'testfiles' directory
+Note: "<BLANKLINE>" is inserted here to match doctest testing of this code.
+If used in interactive session, you will simply see a blank line at those places.
+>>> import pydicom
+>>> ct = pydicom.read_file("CT_small.dcm")
+>>> ct.remove_private_tags()
+>>> ct.dir("image")
+['ImageComments', 'ImageOrientationPatient', 'ImagePositionPatient', 'ImageType']
+>>> ct.ImageType
+['ORIGINAL', 'PRIMARY', 'AXIAL']
+>>> ct.Rows, ct.Columns
+(128, 128)
+>>> len(ct.PixelData)
+32768
+>>> ct.pixel_array
+array([[175, 180, 166, ..., 203, 207, 216],
+       [186, 183, 157, ..., 181, 190, 239],
+       [184, 180, 171, ..., 152, 164, 235],
+       ..., 
+       [906, 910, 923, ..., 922, 929, 927],
+       [914, 954, 938, ..., 942, 925, 905],
+       [959, 955, 916, ..., 911, 904, 909]], dtype=int16)
+>>> plan = pydicom.read_file("rtplan.dcm")
+>>> len(plan.BeamSequence)
+1
+>>> beam = plan.BeamSequence[0]
+>>> len(beam.ControlPointSequence)
+2
+>>> cp0, cp1 = beam.ControlPointSequence
+>>> cp0.GantryAngle
+'0.0'
+>>> cp0.GantryAngle = '90.0' # use string for Decimal (VR of DS)
+>>> cp0
+(300a, 0112) Control Point Index                 IS: '0'
+(300a, 0114) Nominal Beam Energy                 DS: '6.00000000000000'
+(300a, 0115) Dose Rate Set                       DS: '650.000000000000'
+(300a, 011a)  Beam Limiting Device Position Sequence   2 item(s) ---- 
+   (300a, 00b8) RT Beam Limiting Device Type        CS: 'X'
+   (300a, 011c) Leaf/Jaw Positions                  DS: ['-100.00000000000', '100.000000000000']
+   ---------
+   (300a, 00b8) RT Beam Limiting Device Type        CS: 'Y'
+   (300a, 011c) Leaf/Jaw Positions                  DS: ['-100.00000000000', '100.000000000000']
+   ---------
+(300a, 011e) Gantry Angle                        DS: '90.0'
+(300a, 011f) Gantry Rotation Direction           CS: 'NONE'
+(300a, 0120) Beam Limiting Device Angle          DS: '0.0'
+(300a, 0121) Beam Limiting Device Rotation Direc CS: 'NONE'
+(300a, 0122) Patient Support Angle               DS: '0.0'
+(300a, 0123) Patient Support Rotation Direction  CS: 'NONE'
+(300a, 0125) Table Top Eccentric Angle           DS: '0.0'
+(300a, 0126) Table Top Eccentric Rotation Direct CS: 'NONE'
+(300a, 0128) Table Top Vertical Position         DS: ''
+(300a, 0129) Table Top Longitudinal Position     DS: ''
+(300a, 012a) Table Top Lateral Position          DS: ''
+(300a, 012c) Isocenter Position                  DS: ['235.711172833292', '244.135437110782', '-724.97815409918']
+(300a, 0130) Source to Surface Distance          DS: '898.429664831309'
+(300a, 0134) Cumulative Meterset Weight          DS: '0.0'
+(300c, 0050)  Referenced Dose Reference Sequence   2 item(s) ---- 
+   (300a, 010c) Cumulative Dose Reference Coefficie DS: '0.0'
+   (300c, 0051) Referenced Dose Reference Number    IS: '1'
+   ---------
+   (300a, 010c) Cumulative Dose Reference Coefficie DS: '0.0'
+   (300c, 0051) Referenced Dose Reference Number    IS: '2'
+   ---------
+>>> # NOTE: the <BLANKLINE> lines below are for running this through doctest
+>>> help(plan.save_as)
+Help on method save_as in module pydicom.dataset:
+<BLANKLINE>
+save_as(self, filename, write_like_original=True) method of pydicom.dataset.FileDataset instance
+    Write the dataset to a file.
+<BLANKLINE>
+    :param filename: full path and filename to save the file to
+    :write_like_original: see pydicom.filewriter.write_file for info on this parameter.
+<BLANKLINE>  
+>>> plan.save_as("rtplan_gantry90.dcm")
+>>> plan_g90 = pydicom.read_file("rtplan_gantry90.dcm")
+>>> plan_g90.BeamSequence[0].ControlPointSequence[0].GantryAngle
+'90.0'
+>>>

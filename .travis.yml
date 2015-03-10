@@ -1,0 +1,27 @@
+language: python
+python:
+    - 2.6
+    - 2.7
+#    - 3.2
+    - 3.3
+    - 3.4
+    - pypy
+
+env:
+    # Ensure that pydicom functions with/without numpy
+    - DEPS=true
+    - DEPS=false
+
+install:
+    # always install unittest2 on py26
+    - if [[ $TRAVIS_PYTHON_VERSION == '2.6' ]]; then pip install unittest2; fi
+    - if [[ $DEPS == true ]] && [[ $TRAVIS_PYTHON_VERSION != 'pypy' ]]; then pip install numpy; fi
+    - pip install coveralls
+    - pip install coverage
+    - python setup.py install
+
+script:
+    - coverage run -m tests.run_tests
+
+after_success:
+    - coveralls
