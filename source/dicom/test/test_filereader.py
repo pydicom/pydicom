@@ -13,6 +13,7 @@ import unittest
 from io import BytesIO
 
 import shutil
+import tempfile
 # os.stat is only available on Unix and Windows   XXX Mac?
 # Not sure if on other platforms the import fails, or the call to it??
 stat_available = True
@@ -251,7 +252,9 @@ class ReaderTests(unittest.TestCase):
         self.assertEqual(got, expected, "Attempted to read deflated file data element Conversion Type, expected '%s', got '%s'" % (expected, got))
 
     def testUTF8FileName(self):
-        ds = read_file(rtdose_with_utf8_mbcs_name)
+        shutil.copyfile(rtdose_name, os.path.join(tempfile.gettempdir(),rtdose_with_utf8_mbcs_name))
+        ds = read_file(os.path.join(tempfile.gettempdir(),rtdose_with_utf8_mbcs_name))
+        os.remove(os.path.join(tempfile.gettempdir(),rtdose_with_utf8_mbcs_name))
         self.assertTrue(ds is not None)
 
     def testNoPixelsRead(self):
