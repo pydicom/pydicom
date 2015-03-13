@@ -8,6 +8,10 @@
 import unittest
 from dicom import in_py3
 import dicom.config
+import os
+import dicom
+import cPickle as pickle
+
 
 if in_py3:
     from dicom.valuerep import PersonName3 as PersonNameUnicode
@@ -15,8 +19,62 @@ if in_py3:
 else:
     from dicom.valuerep import PersonName, PersonNameUnicode
 
-
+from pkg_resources import Requirement, resource_filename
+test_dir = resource_filename(Requirement.parse("pydicom"), "dicom/testfiles")
+badvr_name = os.path.join(test_dir, "badVR.dcm")
 default_encoding = 'iso8859'
+
+
+class DSfloatPickleTest(unittest.TestCase):
+    """Unit test for pickling of DSfloat"""
+
+    def testPickling(self):
+        # Check that a pickled DSFloat is read back properly
+        x = dicom.valuerep.DSfloat(9.0)
+        x.original_string = 'hello'
+        data1_string = pickle.dumps(x)
+        x2 = pickle.loads(data1_string)
+        self.assertTrue(x.real == x2.real)
+        self.assertTrue(x.original_string == x2.original_string)
+
+
+class DSdecimalPickleTest(unittest.TestCase):
+    """Unit test for pickling of DSdecimal"""
+
+    def testPickling(self):
+        # Check that a pickled DSdecimal is read back properly
+        # DSdecimal actually prefers original_string when
+        # reading back
+        x = dicom.valuerep.DSdecimal(19)
+        x.original_string = '19'
+        data1_string = pickle.dumps(x)
+        x2 = pickle.loads(data1_string)
+        self.assertTrue(x.real == x2.real)
+        self.assertTrue(x.original_string == x2.original_string)
+
+
+class ISPickleTest(unittest.TestCase):
+    """Unit test for pickling of IS"""
+
+    def testPickling(self):
+        # Check that a pickled IS is read back properly
+        x = dicom.valuerep.IS(921)
+        x.original_string = 'hello'
+        data1_string = pickle.dumps(x)
+        x2 = pickle.loads(data1_string)
+        self.assertTrue(x.real == x2.real)
+        self.assertTrue(x.original_string == x2.original_string)
+
+
+class BadValueReadtests(unittest.TestCase):
+    """Unit tests for handling a bad value for a VR (a string in a number VR here)"""
+
+    def testReadBadValueInVR(self):
+        # Check that invalid values are read
+        # and converted to some semi-useful type
+
+        dataset = dicom.read_file(badvr_name)
+        self.assertTrue(dataset.NumberOfFrames == '1A')
 
 
 class DecimalStringtests(unittest.TestCase):

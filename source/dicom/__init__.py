@@ -69,5 +69,6 @@ debug(False)  # force level=WARNING, in case logging default is set differently 
 from dicom.filereader import read_file, read_dicomdir  # noQA
 from dicom.filewriter import write_file  # noQA
 
-__version__ = "0.9.9"
-__version_info__ = (0, 9, 9)
+__version__ = "1.0.1"
+__version_info__ = (1, 0, 1)
+__version_info__ = (1, 0, 1)

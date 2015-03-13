@@ -75,7 +75,9 @@ def convert_numbers(byte_string, is_little_endian, struct_format):
         logger.warn("Expected length to be even multiple of number size")
     format_string = "%c%u%c" % (endianChar, length // bytes_per_value, struct_format)
     value = unpack(format_string, byte_string)
-    if len(value) == 1:
+    if len(value) == 0:  # if the number is empty, then return the empty string rather than empty list
+        return ''
+    elif len(value) == 1:
         return value[0]
     else:
         return list(value)  # convert from tuple to a list so can modify if need to
@@ -186,16 +188,30 @@ def convert_value(VR, raw_data_element, encoding=default_encoding):
 
     # Not only two cases. Also need extra info if is a raw sequence
     # Pass the encoding to the converter if it is a specific VR
-    if VR == 'PN':
-        value = converter(byte_string, is_little_endian, encoding=encoding)
-    elif VR in text_VRs:
-        # Text VRs use the 2nd specified encoding
-        value = converter(byte_string, is_little_endian, encoding=encoding[1])
-    elif VR != "SQ":
-        value = converter(byte_string, is_little_endian, num_format)
-    else:
-        value = convert_SQ(byte_string, is_implicit_VR, is_little_endian,
-                           encoding, raw_data_element.value_tell)
+    try:
+        if VR == 'PN':
+            value = converter(byte_string, is_little_endian, encoding=encoding)
+        elif VR in text_VRs:
+            # Text VRs use the 2nd specified encoding
+            value = converter(byte_string, is_little_endian, encoding=encoding[1])
+        elif VR != "SQ":
+            value = converter(byte_string, is_little_endian, num_format)
+        else:
+            value = convert_SQ(byte_string, is_implicit_VR, is_little_endian,
+                               encoding, raw_data_element.value_tell)
+    except ValueError as e:
+        logger.debug('unable to translate tag %s with VR %s' % (raw_data_element.tag, VR))
+        for vr, converter in converters.iteritems():
+            if vr == VR:
+                continue
+            try:
+                value = convert_value(vr, raw_data_element, encoding)
+                break
+            except Exception:
+                pass
+            else:
+                logger.debug('converted tag %s with VR %s' % (raw_data_element.tag, vr))
+            value = raw_data_element.value
     return value
 
 # converters map a VR to the function to read the value(s).

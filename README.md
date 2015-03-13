@@ -12,5 +12,7 @@ pydicom is not a DICOM server, and is not primarily about viewing images. It is 
 manipulate data elements in DICOM files with python code.
 
 Limitations -- the main limitation of the current version is that _compressed_ pixel data (e.g. JPEG) 
-cannot be altered in an intelligent way as it can for uncompressed pixels. 
-Files can always be read and saved, but compressed pixel data cannot easily be modified.
+cannot be _written_ in an intelligent way as it can for uncompressed pixels. Compressed pixel data 
+may be read in a format supported by Pillow or jpeg_ls (in particular, lossless JPEG2000 and lossless
+JPEG-LS). If you want to write compressed pixel data, you need to compress the pixel data before
+writing it to the PixelArray property

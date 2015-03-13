@@ -31,6 +31,8 @@ def write_numbers(fp, data_element, struct_format):
     """
     endianChar = '><'[fp.is_little_endian]
     value = data_element.value
+    if value is None:
+        value = ''
     if value == "":
         return  # don't need to write anything for empty string
 
@@ -98,6 +100,14 @@ def write_PN(fp, data_element, padding=b' ', encoding=None):
 def write_string(fp, data_element, padding=' ', encoding=default_encoding):
     """Write a single or multivalued string."""
     val = multi_string(data_element.value)
+    if val is None:
+        val = ''
+    else:
+        try:
+            len(val)
+        except:
+            val = str(val)
+
     if len(val) % 2 != 0:
         val = val + padding   # pad to even length
 

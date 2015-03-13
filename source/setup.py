@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 try:
     from setuptools import setup, find_packages
 except:
@@ -21,7 +22,7 @@ setup(
     name="pydicom",
     packages=find_packages(),
     include_package_data=True,
-    version="0.9.9",
+    version="1.0.1",
     package_data={'dicom': ['testfiles/*.dcm']},
     zip_safe=False,  # want users to be able to see included examples,tests
     description="Pure python package for DICOM medical file reading and writing",
