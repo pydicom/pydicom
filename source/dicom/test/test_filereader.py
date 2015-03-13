@@ -14,6 +14,14 @@ from io import BytesIO
 
 import shutil
 import tempfile
+from dicom.filereader import read_file
+from dicom.errors import InvalidDicomError
+from dicom.tag import Tag, TupleTag
+import dicom.valuerep
+import gzip
+from dicom.test.warncheck import assertWarns
+
+from pkg_resources import Requirement, resource_filename
 # os.stat is only available on Unix and Windows   XXX Mac?
 # Not sure if on other platforms the import fails, or the call to it??
 stat_available = True
@@ -45,15 +53,7 @@ except ImportError:
         # Neither worked, so it's likely not installed.
         have_pillow = False
 
-from dicom.filereader import read_file
-from dicom.errors import InvalidDicomError
-from dicom.tag import Tag, TupleTag
-import dicom.valuerep
-import gzip
 
-from dicom.test.warncheck import assertWarns
-
-from pkg_resources import Requirement, resource_filename
 test_dir = resource_filename(Requirement.parse("pydicom"), "dicom/testfiles")
 
 empty_number_tags_name = os.path.join(test_dir, "reportsi_with_empty_number_tags.dcm")
@@ -76,7 +76,6 @@ gzip_name = os.path.join(test_dir, "zipMR.gz")
 emri_name = os.path.join(test_dir, "emri_small.dcm")
 emri_jpeg_ls_lossless = os.path.join(test_dir, "emri_small_jpeg_ls_lossless.dcm")
 emri_jpeg_2k_lossless = os.path.join(test_dir, "emri_small_jpeg_2k_lossless.dcm")
-
 
 
 dir_name = os.path.dirname(sys.argv[0])
@@ -252,9 +251,9 @@ class ReaderTests(unittest.TestCase):
         self.assertEqual(got, expected, "Attempted to read deflated file data element Conversion Type, expected '%s', got '%s'" % (expected, got))
 
     def testUTF8FileName(self):
-        shutil.copyfile(rtdose_name, os.path.join(tempfile.gettempdir(),rtdose_with_utf8_mbcs_name))
-        ds = read_file(os.path.join(tempfile.gettempdir(),rtdose_with_utf8_mbcs_name))
-        os.remove(os.path.join(tempfile.gettempdir(),rtdose_with_utf8_mbcs_name))
+        shutil.copyfile(rtdose_name, os.path.join(tempfile.gettempdir(), rtdose_with_utf8_mbcs_name))
+        ds = read_file(os.path.join(tempfile.gettempdir(), rtdose_with_utf8_mbcs_name))
+        os.remove(os.path.join(tempfile.gettempdir(), rtdose_with_utf8_mbcs_name))
         self.assertTrue(ds is not None)
 
     def testNoPixelsRead(self):
@@ -332,7 +331,7 @@ class JPEG_LS_Tests(unittest.TestCase):
         self.mr_small = read_file(mr_name)
         self.emri_jpeg_ls_lossless = read_file(emri_jpeg_ls_lossless)
         self.emri_small = read_file(emri_name)
-        
+
     def testJPEG_LS_PixelArray(self):
         """JPEG LS Lossless: Now works"""
         if have_numpy and have_jpeg_ls:
@@ -361,7 +360,7 @@ class JPEG2000Tests(unittest.TestCase):
         self.mr_small = read_file(mr_name)
         self.emri_jpeg_2k_lossless = read_file(emri_jpeg_2k_lossless)
         self.emri_small = read_file(emri_name)
-        
+
     def testJPEG2000(self):
         """JPEG2000: Returns correct values for sample data elements............"""
         expected = [Tag(0x0054, 0x0010), Tag(0x0054, 0x0020)]  # XX also tests multiple-valued AT data element
@@ -373,8 +372,8 @@ class JPEG2000Tests(unittest.TestCase):
         self.assertEqual(got, expected, "JPEG200 file, Code Meaning got %s, expected %s" % (got, expected))
 
     def testJPEG2000PixelArray(self):
-        """JPEG2000: Now works"""
-        if have_numpy and have_pillow:
+        """JPEG2000: Now works - but not on mac os See Pillow issue #767"""
+        if have_numpy and have_pillow and dicom.UID.JPEG2000Lossless in dicom.UID.PILSupportedCompressedPixelTransferSyntaxes:
             a = self.jpegls.pixel_array
             b = self.mr_small.pixel_array
             self.assertEqual(a.mean(), b.mean(),
@@ -383,8 +382,8 @@ class JPEG2000Tests(unittest.TestCase):
             self.assertRaises(NotImplementedError, self.jpegls._get_pixel_array)
 
     def test_emri_JPEG2000PixelArray(self):
-        """JPEG2000: Now works"""
-        if have_numpy and have_pillow:
+        """JPEG2000: Now works - but not on mac os See Pillow issue #767"""
+        if have_numpy and have_pillow and dicom.UID.JPEG2000Lossless in dicom.UID.PILSupportedCompressedPixelTransferSyntaxes:
             a = self.emri_jpeg_2k_lossless.pixel_array
             b = self.emri_small.pixel_array
             self.assertEqual(a.mean(), b.mean(),
