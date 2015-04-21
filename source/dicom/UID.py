@@ -16,11 +16,11 @@ from math import fabs
 from _UID_dict import UID_dictionary
 
 
-valid_uid_re = '^[1-9][0-9]*(\.(0|[1-9][0-9]*))*$'
+valid_uid_re = '^(0|[1-9][0-9]*)(\.(0|[1-9][0-9]*))*$'
 '''Regular expression that matches valid UIDs. Does not enforce 64 char limit.
 '''
 
-valid_prefix_re = '^[1-9][0-9]*(\.(0|[1-9][0-9]*))*\.$'
+valid_prefix_re = '^(0|[1-9][0-9]*)(\.(0|[1-9][0-9]*))*\.$'
 '''Regular expression that matches valid UID prefixes. Does not enforce length
 constraints.
 '''
@@ -134,7 +134,7 @@ class UID(str):
         if len(self) > 64:
             raise InvalidUID('UID is more than 64 chars long')
         if not re.match(valid_uid_re, self):
-            raise InvalidUID('UID is a valid format: %s' % self)
+            raise InvalidUID('UID is not a valid format: %s' % self)
 
     # For python 3, any override of __cmp__ or __eq__ immutable requires
     #   explicit redirect of hash function to the parent class
