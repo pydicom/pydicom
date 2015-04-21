@@ -77,37 +77,52 @@ class UIDtests(unittest.TestCase):
         self.assertEqual(uid[:5], '2.25.')
         self.assertEqual(len(uid), 64)
 
-        # Test invalid UID prefix
+        # Test invalid UID prefixes
         for invalid_prefix in (('1' * 63) + '.',
                                '',
-                               '.'
-                               '0',
+                               '.',
                                '1',
                                '1.2',
                                '1.2..3.',
                                '1.a.2.',
-                               '1.01.1.'
+                               '1.01.1.',
                               ):
             self.assertRaises(ValueError,
                               lambda: generate_uid(prefix=invalid_prefix))
 
-        # Make sure custom prefix survives
-        prefix = '1.2.3.444444.'
-        uid = generate_uid(prefix=prefix)
-        self.assertEqual(uid[:13], prefix)
-        self.assertEqual(len(uid), 64)
+        # Test some valid prefixes and make sure they survive
+        for valid_prefix in ('0.',
+                             '1.',
+                             '1.23.',
+                             '1.0.23.',
+                             ('1' * 62) + '.',
+                             '1.2.3.444444.',
+                            ):
+            uid = generate_uid(prefix=valid_prefix)
+            self.assertEqual(uid[:len(valid_prefix)], valid_prefix)
+            self.assertEqual(len(uid), 64)
 
     def testIsValid(self):
         for invalid_uid in ('1' * 65,
+                            '1.' + ('2' * 63),
                             '',
                             '.',
-                            '0',
-                            '1.'
+                            '1.',
                             '1.01',
                             '1.a.2',
                            ):
             self.assertRaises(InvalidUID,
                               lambda: UID(invalid_uid).is_valid())
+
+        for valid_uid in ('0',
+                          '1',
+                          '0.1',
+                          '1' * 64,
+                          '1.' + ('2' * 62),
+                          '1.0.23',
+                         ):
+            UID(valid_uid).is_valid() # Shouldn't raise
+
 
 if __name__ == "__main__":
     unittest.main()
