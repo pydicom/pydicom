@@ -10,10 +10,20 @@ import uuid
 import datetime
 import random
 import hashlib
+import re
 from math import fabs
 
 from _UID_dict import UID_dictionary
 
+
+valid_uid_re = '^[1-9][0-9]*(\.(0|[1-9][0-9]*))*$'
+'''Regular expression that matches valid UIDs. Does not enforce 64 char limit.
+'''
+
+valid_prefix_re = '^[1-9][0-9]*(\.(0|[1-9][0-9]*))*\.$'
+'''Regular expression that matches valid UID prefixes. Does not enforce length
+constraints.
+'''
 
 class InvalidUID(Exception):
     '''
@@ -117,12 +127,14 @@ class UID(str):
 
             >>> invalid_uid = dicom.UID.UID('1.2.345.')
             >>> invalid_uid.is_valid(invalid_uid)
-            InvalidUID: 'Trailing dot at the end of the UID'
+            InvalidUID: 'UID is a valid format: 1.2.345.'
             >>> valid_uid = dicom.UID.UID('1.2.123')
 
         '''
-        if self[-1] == '.':
-            raise InvalidUID('Trailing dot at the end of the UID')
+        if len(self) > 64:
+            raise InvalidUID('UID is more than 64 chars long')
+        if not re.match(valid_uid_re, self):
+            raise InvalidUID('UID is a valid format: %s' % self)
 
     # For python 3, any override of __cmp__ or __eq__ immutable requires
     #   explicit redirect of hash function to the parent class
@@ -182,10 +194,12 @@ def generate_uid(prefix=pydicom_root_UID, entropy_srcs=None):
 
     if prefix is None:
         prefix = '2.25.'
+    else:
+        if len(prefix) > max_uid_len - 1:
+            raise ValueError("The prefix must be less than 63 chars")
+        if not re.match(valid_prefix_re, prefix):
+            raise ValueError("The prefix is not in a valid format")
     avail_digits = max_uid_len - len(prefix)
-    if avail_digits < 1 or len(prefix) < 2 or prefix[-1] != '.':
-        raise ValueError("The prefix must be 2 to 63 chars long and end in a "
-                         "period")
 
     if entropy_srcs is None:
         entropy_srcs = [str(uuid.uuid1()), # 128-bit from MAC/time/randomness

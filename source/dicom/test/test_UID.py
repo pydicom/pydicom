@@ -78,7 +78,16 @@ class UIDtests(unittest.TestCase):
         self.assertEqual(len(uid), 64)
 
         # Test invalid UID prefix
-        for invalid_prefix in (('1' * 63) + '.', '', '1', '1.2.3'):
+        for invalid_prefix in (('1' * 63) + '.',
+                               '',
+                               '.'
+                               '0',
+                               '1',
+                               '1.2',
+                               '1.2..3.',
+                               '1.a.2.',
+                               '1.01.1.'
+                              ):
             self.assertRaises(ValueError,
                               lambda: generate_uid(prefix=invalid_prefix))
 
@@ -87,6 +96,18 @@ class UIDtests(unittest.TestCase):
         uid = generate_uid(prefix=prefix)
         self.assertEqual(uid[:13], prefix)
         self.assertEqual(len(uid), 64)
+
+    def testIsValid(self):
+        for invalid_uid in ('1' * 65,
+                            '',
+                            '.',
+                            '0',
+                            '1.'
+                            '1.01',
+                            '1.a.2',
+                           ):
+            self.assertRaises(InvalidUID,
+                              lambda: UID(invalid_uid).is_valid())
 
 if __name__ == "__main__":
     unittest.main()
