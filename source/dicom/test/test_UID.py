@@ -70,21 +70,23 @@ class UIDtests(unittest.TestCase):
         # Test standard UID generation with pydicom prefix
         uid = generate_uid()
         self.assertEqual(uid[:26], pydicom_root_UID)
+        self.assertEqual(len(uid), 64)
 
         # Test standard UID generation with no prefix
         uid = generate_uid(None)
         self.assertEqual(uid[:5], '2.25.')
+        self.assertEqual(len(uid), 64)
 
-        # Test invalid UID truncation (trailing dot)
-        invalid_prefix = \
-            '1.2.33333333333333333333333333333333333333333333333333333333333.333.'
-        self.assertRaises(InvalidUID,
-                          lambda: generate_uid(prefix=invalid_prefix, truncate=True))
+        # Test invalid UID prefix
+        for invalid_prefix in (('1' * 63) + '.', '', '1', '1.2.3'):
+            self.assertRaises(ValueError,
+                              lambda: generate_uid(prefix=invalid_prefix))
 
-        # Test standard UID with truncate=True
-        prefix = '1.2.3.444444'
-        uid = generate_uid(prefix=prefix, truncate=True)
-        self.assertEqual(uid[:12], prefix)
+        # Make sure custom prefix survives
+        prefix = '1.2.3.444444.'
+        uid = generate_uid(prefix=prefix)
+        self.assertEqual(uid[:13], prefix)
+        self.assertEqual(len(uid), 64)
 
 if __name__ == "__main__":
     unittest.main()
