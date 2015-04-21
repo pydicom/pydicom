@@ -8,6 +8,8 @@
 import os
 import uuid
 import datetime
+import random
+import hashlib
 from math import fabs
 
 from pydicom._uid_dict import UID_dictionary
@@ -148,14 +150,20 @@ pydicom_uids = {
 }
 
 
-def generate_uid(prefix=pydicom_root_UID, truncate=False):
+def generate_uid(prefix=pydicom_root_UID, entropy_srcs=None):
     '''
-    Generate a dicom unique identifier based on host id, process id and current
-    time. The max lenght of the generated UID is 64 caracters.
+    Generate a dicom unique identifier by joining the `prefix` and the result
+    from hashing the list of strings `entropy_srcs` and truncating the result
+    to 64 characters.
 
-    If the given prefix is ``None``, the UID is generated following the method
-    described on `David Clunie website
-    <http://www.dclunie.com/medical-image-faq/html/part2.html#UID>`_
+    If the `prefix` is ``None`` it will be set to the generic prefix '2.25.' as
+    described on `David Clunie's website
+    <http://www.dclunie.com/medical-image-faq/html/part2.html#UID>`_. If the
+    `entropy_srcs` are ``None`` random data will be used, otherwise the result
+    is deterministic (providing the same values will result in the same UID).
+
+    The SHA512 hash function that is used should make the `entropy_srcs`
+    unrecoverable from the resulting UID.
 
     Usage example::
 
@@ -168,26 +176,26 @@ def generate_uid(prefix=pydicom_root_UID, truncate=False):
     <http://dicom.offis.de/dcmtk.php.en>`_.
 
     :param prefix: The site root UID. Default to pydicom root UID.
+    :param entropy_srcs: A list of one of more strings that are hashed to
+    generate the suffix
     '''
     max_uid_len = 64
 
     if prefix is None:
-        dicom_uid = '2.25.{0}'.format(uuid.uuid1().int)
-    else:
-        uid_info = [uuid.getnode(),
-                    fabs(os.getpid()),
-                    datetime.datetime.today().second,
-                    datetime.datetime.today().microsecond]  # nopep8
+        prefix = '2.25.'
+    avail_digits = max_uid_len - len(prefix)
+    if avail_digits < 1 or len(prefix) < 2 or prefix[-1] != '.':
+        raise ValueError("The prefix must be 2 to 63 chars long and end in a "
+                         "period")
 
-        suffix = ''.join([str(int(x)) for x in uid_info])
-        dicom_uid = ''.join([prefix, suffix])
+    if entropy_srcs is None:
+        entropy_srcs = [str(uuid.uuid1()), # 128-bit from MAC/time/randomness
+                        str(os.getpid()), # Current process ID
+                        hex(random.getrandbits(64)) # 64 bits randomness
+                       ]
+    hash_val = hashlib.sha512(''.join(entropy_srcs))
 
-    if truncate:
-        dicom_uid = dicom_uid[:max_uid_len]
+    # Convert this to an int with the maximum available digits
+    dicom_uid = prefix  + str(int(hash_val.hexdigest(), 16))[:avail_digits]
 
-    dicom_uid = UID(dicom_uid)
-
-    # This will raise an exception if the UID is invalid
-    dicom_uid.is_valid()
-
-    return dicom_uid
+    return UID(dicom_uid)
