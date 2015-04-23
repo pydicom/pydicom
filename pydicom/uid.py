@@ -207,7 +207,7 @@ def generate_uid(prefix=pydicom_root_UID, entropy_srcs=None):
                         str(os.getpid()), # Current process ID
                         hex(random.getrandbits(64)) # 64 bits randomness
                        ]
-    hash_val = hashlib.sha512(''.join(entropy_srcs))
+    hash_val = hashlib.sha512(''.join(entropy_srcs).encode('utf-8'))
 
     # Convert this to an int with the maximum available digits
     dicom_uid = prefix  + str(int(hash_val.hexdigest(), 16))[:avail_digits]
