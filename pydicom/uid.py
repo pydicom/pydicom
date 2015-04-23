@@ -129,7 +129,7 @@ class UID(str):
             >>> invalid_uid = pydicom.uid.UID('1.2.345.')
             >>> invalid_uid.is_valid(invalid_uid)
             InvalidUID: 'UID is a valid format: 1.2.345.'
-            >>> valid_uid = dicom.UID.UID('1.2.123')
+            >>> valid_uid = pydicom.UID.UID('1.2.123')
 
         '''
         if len(self) > 64:
