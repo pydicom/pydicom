@@ -70,12 +70,12 @@ class UIDtests(unittest.TestCase):
         # Test standard UID generation with pydicom prefix
         uid = generate_uid()
         self.assertEqual(uid[:26], pydicom_root_UID)
-        self.assertEqual(len(uid), 64)
+        self.assertTrue(len(uid) <= 64)
 
         # Test standard UID generation with no prefix
         uid = generate_uid(None)
         self.assertEqual(uid[:5], '2.25.')
-        self.assertEqual(len(uid), 64)
+        self.assertTrue(len(uid) <= 64)
 
         # Test invalid UID prefixes
         for invalid_prefix in (('1' * 63) + '.',
@@ -100,7 +100,7 @@ class UIDtests(unittest.TestCase):
                             ):
             uid = generate_uid(prefix=valid_prefix)
             self.assertEqual(uid[:len(valid_prefix)], valid_prefix)
-            self.assertEqual(len(uid), 64)
+            self.assertTrue(len(uid) <= 64)
 
     def testIsValid(self):
         for invalid_uid in ('1' * 65,
