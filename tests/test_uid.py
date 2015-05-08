@@ -70,21 +70,59 @@ class UIDtests(unittest.TestCase):
         # Test standard UID generation with pydicom prefix
         uid = generate_uid()
         self.assertEqual(uid[:26], pydicom_root_UID)
+        self.assertTrue(len(uid) <= 64)
 
         # Test standard UID generation with no prefix
         uid = generate_uid(None)
         self.assertEqual(uid[:5], '2.25.')
+        self.assertTrue(len(uid) <= 64)
 
-        # Test invalid UID truncation (trailing dot)
-        invalid_prefix = \
-            '1.2.33333333333333333333333333333333333333333333333333333333333.333.'
-        self.assertRaises(InvalidUID,
-                          lambda: generate_uid(prefix=invalid_prefix, truncate=True))
+        # Test invalid UID prefixes
+        for invalid_prefix in (('1' * 63) + '.',
+                               '',
+                               '.',
+                               '1',
+                               '1.2',
+                               '1.2..3.',
+                               '1.a.2.',
+                               '1.01.1.',
+                              ):
+            self.assertRaises(ValueError,
+                              lambda: generate_uid(prefix=invalid_prefix))
 
-        # Test standard UID with truncate=True
-        prefix = '1.2.3.444444'
-        uid = generate_uid(prefix=prefix, truncate=True)
-        self.assertEqual(uid[:12], prefix)
+        # Test some valid prefixes and make sure they survive
+        for valid_prefix in ('0.',
+                             '1.',
+                             '1.23.',
+                             '1.0.23.',
+                             ('1' * 62) + '.',
+                             '1.2.3.444444.',
+                            ):
+            uid = generate_uid(prefix=valid_prefix)
+            self.assertEqual(uid[:len(valid_prefix)], valid_prefix)
+            self.assertTrue(len(uid) <= 64)
+
+    def testIsValid(self):
+        for invalid_uid in ('1' * 65,
+                            '1.' + ('2' * 63),
+                            '',
+                            '.',
+                            '1.',
+                            '1.01',
+                            '1.a.2',
+                           ):
+            self.assertRaises(InvalidUID,
+                              lambda: UID(invalid_uid).is_valid())
+
+        for valid_uid in ('0',
+                          '1',
+                          '0.1',
+                          '1' * 64,
+                          '1.' + ('2' * 62),
+                          '1.0.23',
+                         ):
+            UID(valid_uid).is_valid() # Shouldn't raise
+
 
 if __name__ == "__main__":
     unittest.main()
