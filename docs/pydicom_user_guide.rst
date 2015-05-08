@@ -9,18 +9,7 @@ Pydicom User Guide
 Dataset
 =======
 
-Dataset is the base object in pydicom's object model.
-The relationship between Dataset and other objects is:
-
-Dataset (derived from python's `dict`)
-   ---> contains DataElement instances
-      --> the value of the data element can be one of:
-           * a regular value like a number, string, etc.
-           * a list of regular values (e.g. a 3-D coordinate)
-           * a Sequence instance
-              --> a Sequence is a list of Datasets (and so we come full circle)
-
-Dataset is the main object you will work with directly. Dataset is derived 
+``Dataset`` is the main object you will work with directly. Dataset is derived 
 from python's ``dict``, so it inherits (and overrides some of) the methods 
 of ``dict``. In other words it is a collection of key:value pairs, where 
 the key value is the DICOM (group,element) tag (as a Tag object, 
@@ -32,7 +21,6 @@ an existing DICOM file::
 
     >>> import pydicom
     >>> ds = pydicom.read_file("rtplan.dcm") # (rtplan.dcm is in the testfiles directory)
-
 
 You can display the entire dataset by simply printing its string 
 (str or repr) value::
@@ -52,9 +40,9 @@ You can display the entire dataset by simply printing its string
     the example program `dcm_qt_tree.py
     <https://github.com/darcymason/pydicom/blob/dev/pydicom/contrib/dcm_qt_tree.py>`_.
 
-You can access specific data elements by name or by DICOM tag number::
+You can access specific data elements by name (DICOM 'keyword') or by DICOM tag number::
 
-    >>> ds.PatientsName
+    >>> ds.PatientName
     'Last^First^mid^pre'
     >>> ds[0x10,0x10].value
     'Last^First^mid^pre'
@@ -62,7 +50,7 @@ You can access specific data elements by name or by DICOM tag number::
 In the latter case (using the tag number directly) a DataElement instance 
 is returned, so the ``.value`` must be used to get the value.
 
-You can also set values by name or tag number::
+You can also set values by name (DICOM keyword) or tag number::
 
     >>> ds.PatientID = "12345"
     >>> ds.SeriesNumber = 5
@@ -70,20 +58,28 @@ You can also set values by name or tag number::
 
 The use of names is possible because pydicom intercepts requests for 
 member variables, and checks if they are in the DICOM dictionary. 
-It translates the name to a (group,element) number and returns 
-the corresponding value for that key if it exists. The names are the 
-descriptive text from the dictionary with spaces and apostrophes, 
-etc. removed. 
+It translates the keyword to a (group,element) number and returns 
+the corresponding value for that key if it exists.
 
-DICOM Sequences are turned into python ``list`` s. For these, the name is 
-from the dictionary name with "sequence" removed, and the normal English 
-plural added. So "Beam Sequence" becomes "Beams", 
-"Referenced Film Box Sequence" becomes "ReferencedFilmBoxes". 
+.. note:: 
+To understand using Sequences in pydicom, please refer to this object model:
+    Dataset (derived from python's `dict`)
+       ---> contains DataElement instances
+          --> the value of the data element can be one of:
+               * a regular value like a number, string, etc.
+               * a list of regular values (e.g. a 3-D coordinate)
+               * a Sequence instance
+                  --> a Sequence is a list of Datasets (and so we come full circle)
+
+DICOM Sequences are turned into python ``list`` s. 
 Items in the sequence are referenced by number, beginning at index 0 as per 
 python convention.::
 
-    >>> ds.Beams[0].BeamName
+    >>> ds.BeamSequence[0].BeamName
     'Field 1'
+
+Using DICOM keywords is the recommended way to access data elements, but you can also use the tag numbers directly, such as:
+
     >>> # Same thing with tag numbers:
     >>> ds[0x300a,0xb0][0][0x300a,0xc2].value
     'Field 1'
@@ -98,7 +94,7 @@ a handy `dir()` method, useful during interactive sessions
 at the python prompt::
 
     >>> ds.dir("pat")
-    ['PatientSetups', 'PatientsBirthDate', 'PatientsID', 'PatientsName', 'PatientsSex']
+    ['PatientBirthDate', 'PatientID', 'PatientName', 'PatientSetupSequence', 'PatientSex']
 
 ``dir`` will return any DICOM tag names in the dataset that have 
 the specified string anywhere in the name (case insensitive).
@@ -111,7 +107,7 @@ You can also see all the names that pydicom knows about by viewing the
 that pydicom doesn't already know about.
 
 Under the hood, Dataset stores a DataElement object for each item, 
-but when accessed by name (e.g. ``ds.PatientsName``) only the `value` 
+but when accessed by name (e.g. ``ds.PatientName``) only the `value` 
 of that DataElement is returned. If you need the whole DataElement 
 (see the DataElement class discussion), you can use Dataset's data_element() 
 method or access the item using the tag number::
@@ -123,15 +119,12 @@ method or access the item using the tag number::
 To check for the existence of a particular tag before using it, 
 use the `in` keyword::
 
-    >>> "PatientsName" in ds
+    >>> "PatientName" in ds
     True
 
 To remove a data element from the dataset,  use ``del``::
 
-    >>> del ds[0x10,0x1000]
-    >>> # OR
-    >>> tag = ds.data_element("OtherPatientIDs").tag
-    >>> del ds[tag]
+    >>> del ds.SoftwareVersions   # or del ds[0x0018, 0x1020]
 
 To work with pixel data, the raw bytes are available through the usual tag::
 
