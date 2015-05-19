@@ -15,7 +15,7 @@ import urllib2
 import xml.etree.ElementTree as ET
 import os
 
-pydict_filename = '_UID_dict.py'
+pydict_filename = '../dicom/_UID_dict.py'
 dict_name = 'UID_dictionary'
 
 def write_dict(f, dict_name, attributes):
@@ -74,6 +74,7 @@ def parse_docbook_table(book_root, caption, empty_field_name="Retired"):
                         else:
                             cell_values.append("")
                 
+                cell_values[3] = ''
                 cell_values.append('')
                 
                 if '(Retired)' in cell_values[1]:
@@ -102,8 +103,7 @@ root = tree.getroot()
 attrs += parse_docbook_table(root, "UID Values")
 
 for attr in attrs:
-    attr['UID Name'] = attr['UID Name'].replace('&', ' and ')
-    attr['UID Name'] = attr['UID Name'].replace('@', 'at')
+    attr['UID Name'] = attr['UID Name'].replace('&', 'and')
     attr['UID Value'] = attr['UID Value'].replace(u'\u00ad', '')
 
 py_file = file(pydict_filename, "wb")
