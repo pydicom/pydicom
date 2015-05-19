@@ -130,14 +130,14 @@ def parse_docbook_table(book_root, caption, empty_field_name="Retired"):
 
 attrs = []
 
-tree = ET.parse('../standard/2015b/part06.xml')
+tree = ET.parse('standard/2015b/part06.xml')
 root = tree.getroot()
 
 attrs += parse_docbook_table(root, "Registry of DICOM Data Elements")
 attrs += parse_docbook_table(root, "Registry of DICOM File Meta Elements")
 attrs += parse_docbook_table(root, "Registry of DICOM Directory Structuring Elements")
 
-tree = ET.parse('../standard/2015b/part07.xml')
+tree = ET.parse('standard/2015b/part07.xml')
 root = tree.getroot()
 
 command_attrs = parse_docbook_table(root, "Command Fields") # Changed from 2013 standard
@@ -172,8 +172,8 @@ for attr in attrs:
     if attr['Retired'] in ['RET', 'RET - See Note']:
         attr['Retired'] = 'Retired'
     
-    # e.g. (0008,0102) and (0014,0025)
-    if attr['Retired'] in ['DICOS', 'DICONDE']:
+    # e.g. (0008,0102), (0014,0025), (0040, A170)
+    if attr['Retired'] in ['DICOS', 'DICONDE', 'See Note']:
         attr['Retired'] = ''
     
     # e.g. (0028,1200)

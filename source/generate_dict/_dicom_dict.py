@@ -2181,7 +2181,7 @@ DicomDictionary = {
     0x0040A167: ('SQ', '1', "Observation Category Code Sequence (Trial)", 'Retired', 'ObservationCategoryCodeSequenceTrial'),
     0x0040A168: ('SQ', '1', "Concept Code Sequence", '', 'ConceptCodeSequence'),
     0x0040A16A: ('ST', '1', "Bibliographic Citation (Trial)", 'Retired', 'BibliographicCitationTrial'),
-    0x0040A170: ('SQ', '1', "Purpose of Reference Code Sequence", 'See Note', 'PurposeOfReferenceCodeSequence'),
+    0x0040A170: ('SQ', '1', "Purpose of Reference Code Sequence", '', 'PurposeOfReferenceCodeSequence'),
     0x0040A171: ('UI', '1', "Observation UID", '', 'ObservationUID'),
     0x0040A172: ('UI', '1', "Referenced Observation UID (Trial)", 'Retired', 'ReferencedObservationUIDTrial'),
     0x0040A173: ('CS', '1', "Referenced Observation Class (Trial)", 'Retired', 'ReferencedObservationClassTrial'),
