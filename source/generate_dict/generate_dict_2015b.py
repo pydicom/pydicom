@@ -30,6 +30,7 @@
 # http://code.google.com/r/rickardholmberg-pydicom/
 # but rewritten for not using bs4 (and slight change for standard v2015b)
 
+import urllib2
 import xml.etree.ElementTree as ET
 import os
 
@@ -130,14 +131,18 @@ def parse_docbook_table(book_root, caption, empty_field_name="Retired"):
 
 attrs = []
 
-tree = ET.parse('standard/2015b/part06.xml')
+url = 'http://medical.nema.org/medical/dicom/current/source/docbook/part06/part06.xml'
+response = urllib2.urlopen(url)
+tree = ET.parse(response)
 root = tree.getroot()
 
 attrs += parse_docbook_table(root, "Registry of DICOM Data Elements")
 attrs += parse_docbook_table(root, "Registry of DICOM File Meta Elements")
 attrs += parse_docbook_table(root, "Registry of DICOM Directory Structuring Elements")
 
-tree = ET.parse('standard/2015b/part07.xml')
+url = 'http://medical.nema.org/medical/dicom/current/source/docbook/part07/part07.xml'
+response = urllib2.urlopen(url)
+tree = ET.parse(response)
 root = tree.getroot()
 
 command_attrs = parse_docbook_table(root, "Command Fields") # Changed from 2013 standard
