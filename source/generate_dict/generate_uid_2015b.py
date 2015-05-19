@@ -16,7 +16,7 @@ import xml.etree.ElementTree as ET
 import os
 
 pydict_filename = '_UID_dict.py'
-dict_name = 'UID_Dictionary'
+dict_name = 'UID_dictionary'
 
 def write_dict(f, dict_name, attributes):
     entry_format = """'{UID Value}': ('{UID Name}', '{UID Type}', '{UID Info}', '{Retired}')"""
@@ -101,7 +101,10 @@ root = tree.getroot()
 
 attrs += parse_docbook_table(root, "UID Values")
 
-attrs = sorted(attrs, key=lambda x: x["UID Value"])
+for attr in attrs:
+    attr['UID Name'] = attr['UID Name'].replace('&', ' and ')
+    attr['UID Name'] = attr['UID Name'].replace('@', 'at')
+    attr['UID Value'] = attr['UID Value'].replace(u'\u00ad', '')
 
 py_file = file(pydict_filename, "wb")
 py_file.write("# %s\n" % pydict_filename)
