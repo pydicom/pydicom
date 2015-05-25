@@ -416,7 +416,7 @@ class Dataset(dict):
         try:
             return self._get_pixel_array()
         except AttributeError:
-            t, e, tb = sys.exc_info()
+            e, tb = sys.exc_info()[1:2]
             raise PropertyError("AttributeError in pixel_array property: " +
                                 e.args[0]), None, tb
 
