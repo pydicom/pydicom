@@ -57,10 +57,10 @@ def MsgDlg(window, string, caption='OFAImage', style=wx.YES_NO | wx.CANCEL):
 class ImFrame(wx.Frame):
     """Class for main window."""
 
-    def __init__(self, parent, title):
+    def __init__(self, parent, title=""):
         """Create the pydicom image example's main frame window."""
 
-        wx.Frame.__init__(self, parent, id=-1, title="", pos=wx.DefaultPosition,
+        wx.Frame.__init__(self, parent, id=-1, title=title, pos=wx.DefaultPosition,
                           size=wx.Size(w=1024, h=768),
                           style=wx.DEFAULT_FRAME_STYLE | wx.SUNKEN_BORDER | wx.CLIP_CHILDREN)
 
