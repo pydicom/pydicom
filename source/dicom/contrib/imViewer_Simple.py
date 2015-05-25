@@ -159,9 +159,8 @@ class ImFrame(wx.Frame):
         dlg = wx.FileDialog(self, 'Choose a file to add.', '', '', '*.*', wx.OPEN)
         if dlg.ShowModal() == wx.ID_OK:
             fullPath = dlg.GetPath()
-            imageFile = dlg.GetFilename()
             # checkDICMHeader()
-            self.show_file(imageFile, fullPath)
+            self.show_file(fullPath)
 
     def OnPaint(self, event):
         "Window 'paint' event."
