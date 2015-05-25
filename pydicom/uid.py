@@ -6,10 +6,24 @@
 #    available at https://github.com/darcymason/pydicom
 
 import uuid
+import datetime
+import random
+import hashlib
+import re
+from math import fabs
 
 from pydicom._uid_dict import UID_dictionary
 from pydicom import compat
 
+
+valid_uid_re = '^(0|[1-9][0-9]*)(\.(0|[1-9][0-9]*))*$'
+'''Regular expression that matches valid UIDs. Does not enforce 64 char limit.
+'''
+
+valid_prefix_re = '^(0|[1-9][0-9]*)(\.(0|[1-9][0-9]*))*\.$'
+'''Regular expression that matches valid UID prefixes. Does not enforce length
+constraints.
+'''
 
 class InvalidUID(Exception):
     '''
@@ -113,12 +127,14 @@ class UID(str):
 
             >>> invalid_uid = pydicom.uid.UID('1.2.345.')
             >>> invalid_uid.is_valid(invalid_uid)
-            InvalidUID: 'Trailing dot at the end of the UID'
-            >>> valid_uid = pydicom.uid.UID('1.2.123')
+            InvalidUID: 'UID is a valid format: 1.2.345.'
+            >>> valid_uid = pydicom.UID.UID('1.2.123')
 
         '''
-        if self[-1] == '.':
-            raise InvalidUID('Trailing dot at the end of the UID')
+        if len(self) > 64:
+            raise InvalidUID('UID is more than 64 chars long')
+        if not re.match(valid_uid_re, self):
+            raise InvalidUID('UID is not a valid format: %s' % self)
 
     # For python 3, any override of __cmp__ or __eq__ immutable requires
     #   explicit redirect of hash function to the parent class
@@ -146,14 +162,20 @@ pydicom_uids = {
 }
 
 
-def generate_uid(prefix=pydicom_root_UID, truncate=True):
+def generate_uid(prefix=pydicom_root_UID, entropy_srcs=None):
     '''
-    Generate a dicom unique identifier based on host id, process id and current
-    time. The max lenght of the generated UID is 64 caracters.
+    Generate a dicom unique identifier by joining the `prefix` and the result
+    from hashing the list of strings `entropy_srcs` and truncating the result
+    to 64 characters.
 
-    If the given prefix is ``None``, the UID is generated following the method
-    described on `David Clunie website
-    <http://www.dclunie.com/medical-image-faq/html/part2.html#UID>`_
+    If the `prefix` is ``None`` it will be set to the generic prefix '2.25.' as
+    described on `David Clunie's website
+    <http://www.dclunie.com/medical-image-faq/html/part2.html#UID>`_. If the
+    `entropy_srcs` are ``None`` random data will be used, otherwise the result
+    is deterministic (providing the same values will result in the same UID).
+
+    The SHA512 hash function that is used should make the `entropy_srcs`
+    unrecoverable from the resulting UID.
 
     Usage example::
 
@@ -166,22 +188,28 @@ def generate_uid(prefix=pydicom_root_UID, truncate=True):
     <http://dicom.offis.de/dcmtk.php.en>`_.
 
     :param prefix: The site root UID. Default to pydicom root UID.
+    :param entropy_srcs: A list of one of more strings that are hashed to
+    generate the suffix
     '''
     max_uid_len = 64
 
     if prefix is None:
         prefix = '2.25.'
+    else:
+        if len(prefix) > max_uid_len - 1:
+            raise ValueError("The prefix must be less than 63 chars")
+        if not re.match(valid_prefix_re, prefix):
+            raise ValueError("The prefix is not in a valid format")
+    avail_digits = max_uid_len - len(prefix)
 
-    suffix = uuid.uuid1().int
+    if entropy_srcs is None:
+        entropy_srcs = [str(uuid.uuid1()), # 128-bit from MAC/time/randomness
+                        str(os.getpid()), # Current process ID
+                        hex(random.getrandbits(64)) # 64 bits randomness
+                       ]
+    hash_val = hashlib.sha512(''.join(entropy_srcs).encode('utf-8'))
 
-    dicom_uid = ''.join([prefix, str(suffix)])
+    # Convert this to an int with the maximum available digits
+    dicom_uid = prefix  + str(int(hash_val.hexdigest(), 16))[:avail_digits]
 
-    if truncate:
-        dicom_uid = dicom_uid[:max_uid_len]
-
-    dicom_uid = UID(dicom_uid)
-
-    # This will raise an exception if the UID is invalid
-    dicom_uid.is_valid()
-
-    return dicom_uid
+    return UID(dicom_uid)

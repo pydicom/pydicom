@@ -22,18 +22,18 @@ Here is a simple example of using pydicom in an interactive session, to read
 a radiotherapy plan file, change the patient setup from head-first-supine to 
 head-first-prone, and save to a new file:
 
->>> import pydicom
->>> plan = pydicom.read_file("rtplan.dcm")
->>> plan.PatientName
+>>> from pydicom import dicomio
+>>> ds = dicomio.read_file("rtplan.dcm")  # plan dataset
+>>> ds.PatientName
 'Last^First^mid^pre'
->>> plan.dir("setup")    # get a list of tags with "setup" somewhere in the name
+>>> ds.dir("setup")    # get a list of tags with "setup" somewhere in the name
 ['PatientSetupSequence']
->>> plan.PatientSetupSequence[0]
+>>> ds.PatientSetupSequence[0]
 (0018, 5100) Patient Position                    CS: 'HFS'
 (300a, 0182) Patient Setup Number                IS: '1'
 (300a, 01b2) Setup Technique Description         ST: ''
->>> plan.PatientSetupSequence[0].PatientPosition = "HFP"
->>> plan.save_as("rtplan2.dcm")
+>>> ds.PatientSetupSequence[0].PatientPosition = "HFP"
+>>> ds.save_as("rtplan2.dcm")
 
 
 pydicom is not a DICOM server [#]_, and is not primarily about viewing images. It is designed to let you manipulate data elements in DICOM files with python code.
@@ -70,27 +70,21 @@ but is only required if manipulating pixel data).
 Prerequisites
 -------------
 
-  * python 2.4+/3.x (python 2.3 can be used for pydicom < 0.9.4)
+  * python 2.6, 2.7, 3.3 or later
   * `NumPy <http://numpy.scipy.org/>`_ -- optional, only needed
     if manipulating pixel data
 
 .. note::
-    To run unit tests when using python <=2.6, `Unittest2 <https://pypi.python.org/pypi/unittest2>`_
+    To run unit tests when using python 2.6, `Unittest2 <https://pypi.python.org/pypi/unittest2>`_
     is required.
 
 Python installers can be found at the python web site 
 (http://python.org/download/). On Windows, the `Activepython 
 <http://activestate.com/activepython>`_ distributions are also quite good.
 
-Installing using easy_install or pip (all platforms)
+Installing using pip (all platforms)
 ----------------------------------------------------
-
-if you have `setuptools <http://pypi.python.org/pypi/setuptools>`_ installed, 
-use easy_install at the command line (you may need ``sudo`` on linux)::
-    
-    easy_install pydicom
-
-or use `pip <https://pypi.python.org/pypi/pip>`_::
+The easiest way to install pydicom is using `pip <https://pypi.python.org/pypi/pip>`_::
 
     pip pydicom
 
@@ -98,7 +92,7 @@ Depending on your python version, there may be some warning messages,
 but the install should still be ok.
 
 .. note::
-    Setuptools and Pip come pre-installed with Python 3.x.
+    Pip comes pre-installed with Python 3.x.
 
 
 Installing from source (all platforms)
@@ -112,18 +106,12 @@ Installing from source (all platforms)
     * With some linux variants, for example, use ``sudo python setup.py install``
     * With other linux variants you may have to ``su`` before running the command.
 
-.. warning::
-    For python < 2.6, you may get a syntax error message when the python files
-    are "built" -- this is due to some python 2.6 specific code in one unit 
-    test file. The installation seems to still be ok.
 
 Installing on Mac
 -----------------
 
-The instructions above for easy_install or installing from source 
-will work on Mac OS. There is also a MacPorts portfile (py25-pydicom) 
-available at 
-http://trac.macports.org/browser/trunk/dports/python/py25-pydicom. 
+Using pip as described above is recommended.  However, there was previously a 
+`MacPorts portfile <https://www.macports.org/ports.php?by=library&substr=py27-pydicom>`_. 
 This is maintained by other users and may not immediately be up to 
 the latest release.
 

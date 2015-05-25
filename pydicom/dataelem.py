@@ -313,13 +313,13 @@ def DataElement_from_raw(raw_data_element, encoding=None):
     """Return a DataElement from a RawDataElement"""
     from pydicom.values import convert_value  # XXX buried here to avoid circular import filereader->Dataset->convert_value->filereader (for SQ parsing)
     raw = raw_data_element
-    VR = raw.VR
     
     # If user has hooked into conversion of raw values, call his/her routine
     import pydicom.config
     if pydicom.config.data_element_callback:
         raw = config.data_element_callback(raw_data_element,
                                           **config.data_element_callback_kwargs)
+    VR = raw.VR
     if VR is None:  # Can be if was implicit VR
         try:
             VR = dictionaryVR(raw.tag)
