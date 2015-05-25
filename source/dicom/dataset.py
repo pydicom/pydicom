@@ -200,7 +200,7 @@ class Dataset(dict):
                 If no filters, return all DICOM keywords in the dataset
         """
         allnames = []
-        for tag, data_element in self.items():
+        for tag in self.items()[0]:
             allnames.extend(all_names_for_tag(tag))
         # remove blanks - tags without valid names (e.g. private tags)
         allnames = [x for x in allnames if x]
