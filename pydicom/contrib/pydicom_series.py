@@ -57,7 +57,7 @@ except Exception:
 
 
 # Helper functions and classes
-class ProgressBar:
+class ProgressBar(object):
     """ To print progress to the screen.
     """
     def __init__(self, char='-', length=20):
