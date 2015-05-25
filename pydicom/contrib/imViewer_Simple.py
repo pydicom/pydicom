@@ -255,7 +255,7 @@ class ImFrame(wx.Frame):
             im = PIL.Image.fromarray(image).convert('L')  # Convert mode to L since LUT has only 256 values: http://www.pythonware.com/library/pil/handbook/image.htm
         return im
 
-    def show_file(self, imageFile, fullPath):
+    def show_file(self, fullPath):
         """ Load the DICOM file, make sure it contains at least one
         image, and set it up for display by OnPaint().  ** be
         careful not to pass a unicode string to read_file or it will
