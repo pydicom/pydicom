@@ -19,6 +19,7 @@ python_encoding = {
     'ISO_IR 100': 'latin_1',
     'ISO 2022 IR 87': 'iso2022_jp',
     'ISO 2022 IR 13': 'shift_jis',
+    'ISO 2022 IR 100': 'latin_1',
     'ISO 2022 IR 149': 'euc_kr',  # needs cleanup via clean_escseq()
     'ISO_IR 192': 'UTF8',     # from Chinese example, 2008 PS3.5 Annex J p1-4
     'GB18030': 'GB18030',
