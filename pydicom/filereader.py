@@ -625,6 +625,29 @@ def read_partial(fileobj, stop_when=None, defer_size=None, force=False):
             is_implicit_VR = False
     else:  # no header -- use the is_little_endian, implicit assumptions
         file_meta_dataset.TransferSyntaxUID = pydicom.uid.ImplicitVRLittleEndian
+        if is_little_endian:
+            endian_chr = "<"
+        else:
+            endian_chr = ">"
+        if not is_implicit_VR:
+            element_struct = Struct(endian_chr + "HHL")
+        else:  # Explicit VR
+            # tag, VR, 2-byte length (or 0 if special VRs)
+            element_struct = Struct(endian_chr + "HH2sH")
+        # Try reading first 8 bytes
+        group, elem, VR, length = element_struct.unpack(fileobj.read(8))
+        # Rewind file object
+        fileobj.seek(0)
+        # If the VR is a valid VR, assume Explicit VR transfer systax
+        from pydicom.values import converters
+        if VR in converters.keys():
+            is_implicit_VR = False
+            # Determine if group in low numbered range (Little vs Big Endian)
+            if group < 2000:
+                file_meta_dataset.TransferSyntaxUID = pydicom.uid.ExplicitVRLittleEndian
+            else:
+                file_meta_dataset.TransferSyntaxUID = pydicom.uid.ExplicitVRBigEndian
+                is_little_endian = False
 
     try:
         dataset = read_dataset(fileobj, is_implicit_VR, is_little_endian,

@@ -59,6 +59,8 @@ no_meta_group_length = os.path.join(test_files, "no_meta_group_length.dcm")
 gzip_name = os.path.join(test_files, "zipMR.gz")
 color_px_name = os.path.join(test_files, "color-px.dcm")
 color_pl_name = os.path.join(test_files, "color-pl.dcm")
+explicit_vr_le_no_meta = os.path.join(test_files, "ExplVR_LitEndNoMeta.dcm")
+explicit_vr_be_no_meta = os.path.join(test_files, "ExplVR_BigEndNoMeta.dcm")
 
 dir_name = os.path.dirname(sys.argv[0])
 save_dir = os.getcwd()
@@ -286,6 +288,24 @@ class ReaderTests(unittest.TestCase):
         got = ds.InstanceCreationDate
         expected = "20111130"
         self.assertEqual(got, expected, "Sample data element after file meta with no group length failed, expected '%s', got '%s'" % (expected, got))
+
+    def testExplicitVRLittleEndianNoMeta(self):
+        """Read file without file meta with Little Endian Explicit VR dataset...."""
+        # Example file from CMS XiO 5.0 and above
+        # Still need to force read data since there is no 'DICM' marker present
+        ds = read_file(explicit_vr_le_no_meta, force=True)
+        got = ds.InstanceCreationDate
+        expected = "20150529"
+        self.assertEqual(got, expected, "Sample data element from dataset failed, expected '%s', got '%s'" % (expected, got))
+
+    def testExplicitVRBigEndianNoMeta(self):
+        """Read file without file meta with Big Endian Explicit VR dataset......."""
+        # Example file from CMS XiO 5.0 and above
+        # Still need to force read data since there is no 'DICM' marker present
+        ds = read_file(explicit_vr_be_no_meta, force=True)
+        got = ds.InstanceCreationDate
+        expected = "20150529"
+        self.assertEqual(got, expected, "Sample data element from dataset failed, expected '%s', got '%s'" % (expected, got))
 
     def testPlanarConfig(self):
         px_data_ds = read_file(color_px_name)
