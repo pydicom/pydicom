@@ -640,6 +640,8 @@ def read_partial(fileobj, stop_when=None, defer_size=None, force=False):
         fileobj.seek(0)
         # If the VR is a valid VR, assume Explicit VR transfer systax
         from pydicom.values import converters
+        if not in_py2:
+            VR = VR.decode(default_encoding)
         if VR in converters.keys():
             is_implicit_VR = False
             # Determine if group in low numbered range (Little vs Big Endian)
