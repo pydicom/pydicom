@@ -14,3 +14,10 @@ manipulate data elements in DICOM files with python code.
 Limitations -- the main limitation of the current version is that _compressed_ pixel data (e.g. JPEG) 
 cannot be altered in an intelligent way as it can for uncompressed pixels. 
 Files can always be read and saved, but compressed pixel data cannot easily be modified.
+
+Documentation
+-------------
+
+pydicom [documentation](https://pydicom.readthedocs.org/en/latest/) is available on Read The Docs.
+
+See [Getting Started](https://pydicom.readthedocs.org/en/latest/getting_started.html) for installation and basic information, and the [User Guide](https://pydicom.readthedocs.org/en/latest/pydicom_user_guide.html) for an overview of how to use the pydicom library.
