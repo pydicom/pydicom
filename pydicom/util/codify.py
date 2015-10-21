@@ -275,9 +275,9 @@ if __name__ == "__main__":
     try:
         import argparse
     except ImportError:
-        print "The argparse module is required to run this script"
-        print "argparse is standard in python >= 2.7,"
-        print "   or can be installed with 'pip install argparse'"
+        print ("The argparse module is required to run this script")
+        print ("argparse is standard in python >= 2.7,")
+        print ("   or can be installed with 'pip install argparse'")
         sys.exit(-1)
 
     parser = argparse.ArgumentParser(
