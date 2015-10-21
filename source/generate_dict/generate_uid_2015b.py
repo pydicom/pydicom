@@ -121,5 +121,5 @@ write_dict(py_file, dict_name, attrs)
 
 py_file.close()
 
-print "Finished creating python file %s containing the UID dictionary" % pydict_filename
-print "Wrote %d UIDs" % len(attrs)
+print ("Finished creating python file %s containing the UID dictionary" % pydict_filename)
+print ("Wrote %d UIDs" % len(attrs))
