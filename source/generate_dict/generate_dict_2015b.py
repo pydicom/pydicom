@@ -209,5 +209,5 @@ write_dict(py_file, mask_dict_name, mask_attributes, tagIsString=True)
 
 py_file.close()
 
-print "Finished creating python file %s containing the dicom dictionary" % pydict_filename
-print "Wrote %d tags" % (len(main_attributes) + len(mask_attributes))
+print ("Finished creating python file %s containing the dicom dictionary" % pydict_filename)
+print ("Wrote %d tags" % (len(main_attributes) + len(mask_attributes)))
