@@ -642,7 +642,7 @@ def read_partial(fileobj, stop_when=None, defer_size=None, force=False):
                 # XX could use similar to http://www.dclunie.com/medical-image-faq/html/part2.html code example
                 msg =  ("Not able to guess transfer syntax when first item "
                         "is group length")
-                raise(NotImplemented, msg)
+                raise NotImplementedError(msg)
             if group < 2000:
                 file_meta_dataset.TransferSyntaxUID = pydicom.uid.ExplicitVRLittleEndian
             else:
