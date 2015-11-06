@@ -86,7 +86,7 @@ Installing using pip (all platforms)
 ----------------------------------------------------
 The easiest way to install pydicom is using `pip <https://pypi.python.org/pypi/pip>`_::
 
-    pip pydicom
+    pip install pydicom
 
 Depending on your python version, there may be some warning messages, 
 but the install should still be ok.
