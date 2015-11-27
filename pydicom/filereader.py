@@ -241,7 +241,28 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian,
                              "Skipping forward to next data element.")
                 fp.seek(fp_tell() + length)
             else:
-                value = fp_read(length)
+                # Instead of readng all data at once, read in 1Gb chuncks.
+                # For some reason the reads don't work correctly for data 
+                # elements greater than 4Gb but this might be an underlying issue
+                # in system specific python implementations.
+                # This is a fix for large data elements whihc should have
+                # no performance implications for "normal" data.
+                buf_size = 1073741824
+                value = ''
+                if length > buf_size:
+     
+                    value = fp_read(buf_size)
+                    len_to_read = length - buf_size
+                    while len_to_read > 0 : 
+                        if len_to_read > buf_size:
+                            value = value + fp_read(buf_size)
+                            len_to_read = len_to_read - buf_size
+                        else:
+                            value = value + fp_read(len_to_read)
+                            break
+                else:
+                    value = fp_read(length)                
+                
                 if debugging:
                     dotdot = "   "
                     if length > 12:
