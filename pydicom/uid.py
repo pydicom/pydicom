@@ -7,11 +7,9 @@
 
 import os
 import uuid
-import datetime
 import random
 import hashlib
 import re
-from math import fabs
 
 from pydicom._uid_dict import UID_dictionary
 from pydicom import compat

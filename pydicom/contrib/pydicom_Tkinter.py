@@ -36,7 +36,7 @@ if in_py2:
 have_numpy = True
 try:
     import numpy as np
-except:
+except ImportError:
     # will not work...
     have_numpy = False
 

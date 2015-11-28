@@ -51,13 +51,13 @@ from pydicom import compat
 try:
     import numpy as np
     have_numpy = True
-except Exception:
+except ImportError:
     np = None  # NOQA
     have_numpy = False
 
 
 # Helper functions and classes
-class ProgressBar:
+class ProgressBar(object):
     """ To print progress to the screen.
     """
     def __init__(self, char='-', length=20):

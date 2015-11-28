@@ -40,13 +40,13 @@ from pydicom.config import logger
 have_numpy = True
 try:
     import numpy
-except:
+except ImportError:
     have_numpy = False
 
 stat_available = True
 try:
     from os import stat
-except:
+except ImportError:
     stat_available = False
 
 
