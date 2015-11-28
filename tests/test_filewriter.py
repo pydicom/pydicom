@@ -14,7 +14,7 @@ from pydicom.filewriter import write_data_element
 from pydicom.dataset import Dataset, FileDataset
 from pydicom.sequence import Sequence
 from pydicom.util.hexutil import hex2bytes, bytes2hex
-from pydicom.config import datetime_conversion
+from pydicom import config
 
 # from io import BytesIO
 from pydicom.filebase import DicomBytesIO
@@ -133,10 +133,10 @@ class WriteFileTests(unittest.TestCase):
 class ScratchWriteDateTimeTests(WriteFileTests):
     """Simple dataset from scratch, with datetime_conversion enabled"""
     def setUp(self):
-        datetime_conversion = True
+        config.datetime_conversion = True
 
     def tearDown(self):
-        datetime_conversion = False
+        config.datetime_conversion = False
 
 
 class WriteDataElementTests(unittest.TestCase):

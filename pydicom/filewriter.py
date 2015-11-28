@@ -132,7 +132,9 @@ def write_DA(fp, data_element, padding=' '):
     if isinstance(val, (str, compat.string_types)):
         write_string(fp, data_element, padding)
     else:
-        if hasattr(val, 'original_string'):
+        if val is None:
+            val = ''
+        elif hasattr(val, 'original_string'):
             val = val.original_string
         else:
             val = val.strftime("%Y%m%d")
@@ -171,7 +173,9 @@ def write_TM(fp, data_element, padding=' '):
     if isinstance(val, (str, compat.string_types)):
         write_string(fp, data_element, padding)
     else:
-        if hasattr(val, 'original_string'):
+        if val is None:
+            val = ''
+        elif hasattr(val, 'original_string'):
             val = val.original_string
         else:
             if val.microsecond > 0:

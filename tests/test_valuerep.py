@@ -134,6 +134,9 @@ class DateTimeTests(unittest.TestCase):
         datetime_date = date(1961, 8, 4)
         self.assertEqual(da, datetime_date,
                          "DA {0} not equal to date {1}".format(dicom_date, datetime_date))
+        dicom_date = ""
+        da = valuerep.DA(dicom_date)
+        self.assertEqual(da, None, "DA {0} not None".format(dicom_date))
 
     def testDateTime(self):
         """DT conversion to datetime.datetime ..................................."""
@@ -173,6 +176,9 @@ class DateTimeTests(unittest.TestCase):
         datetime_time = time(23, 59, 00, 123000)
         self.assertEqual(tm, datetime_time,
                          "TM {0} not equal to time {1}".format(dicom_time, datetime_time))
+        dicom_time = ""
+        tm = valuerep.TM(dicom_time)
+        self.assertEqual(tm, None, "DT {0} not None".format(dicom_time))
 
 
 if __name__ == "__main__":

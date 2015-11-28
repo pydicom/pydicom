@@ -57,7 +57,7 @@ def convert_DA_string(byte_string, is_little_endian, struct_format=None):
         if not in_py2:
             byte_string = byte_string.decode(encoding)
         length = len(byte_string)
-        if length != 8:
+        if length != 8 and length != 0:
             logger.warn("Expected length to be 8, got length %d", length)
         return DA(byte_string)
     else:
@@ -181,7 +181,7 @@ def convert_TM_string(byte_string, is_little_endian, struct_format=None):
         if not in_py2:
             byte_string = byte_string.decode(encoding)
         length = len(byte_string)
-        if length < 2 or length > 16:
+        if (length < 2 or length > 16) and length != 0:
             logger.warn("Expected length between 2 and 16, got length %d", length)
         return TM(byte_string)
     else:

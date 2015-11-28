@@ -65,8 +65,10 @@ class DA(date):
                 month = int(val[4:6])
                 day = int(val[6:8])
                 val = super(DA, cls).__new__(cls, year, month, day)
+            elif val == '':
+                val = None  # empty date
             else:
-                raise ValueError("Could not convert value to date")
+                raise ValueError("Cannot convert to date: '" + val + "'")
         elif isinstance(val, date):
             val = super(DA, cls).__new__(cls, val.year, val.month, val.day)
         else:
@@ -147,7 +149,7 @@ class DT(datetime):
                                              hour, minute, second,
                                              microsecond, tzinfo)
             else:
-                raise ValueError("Could not convert value to datetime")
+                raise ValueError("Cannot convert to datetime: '" + val + "'")
         elif isinstance(val, datetime):
             val = super(DT, cls).__new__(cls, val.year, val.month, val.day,
                                          val.hour, val.minute, val.second,
@@ -208,8 +210,10 @@ class TM(time):
                         microsecond = 0
                 val = super(TM, cls).__new__(cls, hour, minute, second,
                                              microsecond)
+            elif val == '':
+                val = None  # empty time
             else:
-                raise ValueError("Could not convert value to time")
+                raise ValueError("Cannot convert to time: '" + val + "'")
         elif isinstance(val, time):
             val = super(TM, cls).__new__(cls, val.hour, val.minute, val.second,
                                          val.microsecond)
