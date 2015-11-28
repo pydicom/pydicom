@@ -55,7 +55,7 @@ def convert_DA_string(byte_string, is_little_endian, struct_format=None):
     """Read and return a DA value"""
     if datetime_conversion:
         if not in_py2:
-            byte_string = byte_string.decode(encoding)
+            byte_string = byte_string.decode(default_encoding)
         length = len(byte_string)
         if length != 8:
             logger.warn("Expected length to be 8, got length %d", length)
@@ -77,7 +77,7 @@ def convert_DT_string(byte_string, is_little_endian, struct_format=None):
     """Read and return a DT value"""
     if datetime_conversion:
         if not in_py2:
-            byte_string = byte_string.decode(encoding)
+            byte_string = byte_string.decode(default_encoding)
         length = len(byte_string)
         if length < 14 or length > 26:
             logger.warn("Expected length between 14 and 26, got length %d", length)
@@ -179,7 +179,7 @@ def convert_TM_string(byte_string, is_little_endian, struct_format=None):
     """Read and return a TM value"""
     if datetime_conversion:
         if not in_py2:
-            byte_string = byte_string.decode(encoding)
+            byte_string = byte_string.decode(default_encoding)
         length = len(byte_string)
         if length < 2 or length > 16:
             logger.warn("Expected length between 2 and 16, got length %d", length)

@@ -21,7 +21,6 @@ from pydicom.tag import Tag
 
 from pydicom.uid import UID
 import pydicom.valuerep  # don't import DS directly as can be changed by config
-import pydicom.config
 from pydicom.compat import in_py2
 
 if not in_py2:
@@ -315,8 +314,7 @@ def DataElement_from_raw(raw_data_element, encoding=None):
     raw = raw_data_element
     
     # If user has hooked into conversion of raw values, call his/her routine
-    import pydicom.config
-    if pydicom.config.data_element_callback:
+    if config.data_element_callback:
         raw = config.data_element_callback(raw_data_element,
                                           **config.data_element_callback_kwargs)
     VR = raw.VR
