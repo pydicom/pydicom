@@ -18,7 +18,7 @@ in_PyPy = 'PyPy' in sys.version
 # In py2, str can be either bytes or text.
 if in_py2:
     text_type = unicode
-    string_types = (str, unicode)    
+    string_types = (str, unicode)
 else:
     text_type = str
     string_types = (str,)

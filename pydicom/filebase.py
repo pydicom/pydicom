@@ -152,7 +152,7 @@ class DicomFileLike(DicomIO):
         """Used for file-like objects where no read is available"""
         raise IOError("This DicomFileLike object has no read() method")
 
-    def no_seek(offset, from_what):
+    def no_seek(self, offset, from_what):
         """Used for file-like objects where no seek is available"""
         raise IOError("This DicomFileLike object has no seek() method")
 

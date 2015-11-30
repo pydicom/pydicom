@@ -10,12 +10,13 @@ from pydicom import config
 from pydicom import datadict
 from pydicom import values
 
+
 def fix_separator_callback(raw_elem, **kwargs):
     """Used by fix_separator as the callback function from read_dataset
     """
     return_val = raw_elem
     try_replace = False
-    
+
     # If elements are implicit VR, attempt to determine the VR
     if raw_elem.VR is None:
         try:
@@ -27,7 +28,7 @@ def fix_separator_callback(raw_elem, **kwargs):
             try_replace = VR in kwargs['for_VRs']
     else:
         try_replace = raw_elem.VR in kwargs['for_VRs']
-    
+
     if try_replace:
         # Note value has not been decoded yet when this function called,
         #    so need to replace backslash as bytes
@@ -39,9 +40,9 @@ def fix_separator_callback(raw_elem, **kwargs):
 
 def fix_separator(invalid_separator, for_VRs=["DS", "IS"],
                   process_unknown_VRs=True):
-    """A callback function to fix RawDataElement values using 
+    """A callback function to fix RawDataElement values using
     some other separator than the dicom standard backslash character
-    
+
     Parameters
     ----------
     invalid_separator : bytes
@@ -51,9 +52,9 @@ def fix_separator(invalid_separator, for_VRs=["DS", "IS"],
         A list of VRs for which the replacement will be done.
         If the VR is unknown (for example, if a private element),
         then process_unknown_VR is used to determine whether to replace or not.
-    process_unknown_VRs: boolean, optional 
+    process_unknown_VRs: boolean, optional
         If True (default) then attempt the fix even if the VR is not known.
-    
+
     Returns
     -------
     No return value.  However, the callback function will return either
@@ -76,7 +77,7 @@ def fix_mismatch_callback(raw_elem, **kwargs):
             except ValueError:
                 pass
             else:
-               raw_elem = raw_elem._replace(VR=vr)
+                raw_elem = raw_elem._replace(VR=vr)
     return raw_elem
 
 
