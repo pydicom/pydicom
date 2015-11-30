@@ -5,7 +5,14 @@
 #    See the file license.txt included with this distribution, also
 #    available at https://github.com/darcymason/pydicom
 
-import unittest2 as unittest
+import unittest
+try:
+    unittest.TestCase.assertRaises
+except AttributeError:
+    try:
+        import unittest2 as unittest
+    except ImportError:
+        print("unittest2 is required for testing in python2.6")
 
 from pydicom.compat import in_py2
 from pydicom import config

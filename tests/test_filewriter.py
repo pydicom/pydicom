@@ -10,7 +10,15 @@ import os.path
 import os
 from datetime import date, datetime, time
 from dateutil.tz import tzoffset
-import unittest2 as unittest
+import unittest
+try:
+    unittest.TestCase.assertSequenceEqual
+except AttributeError:
+    try:
+        import unittest2 as unittest
+    except ImportError:
+        print("unittest2 is required for testing in python2.6")
+
 from pydicom.filereader import read_file
 from pydicom.filewriter import write_data_element
 from pydicom.dataset import Dataset, FileDataset
