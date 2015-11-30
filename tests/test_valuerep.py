@@ -5,7 +5,7 @@
 #    See the file license.txt included with this distribution, also
 #    available at https://github.com/darcymason/pydicom
 
-import unittest
+import unittest2 as unittest
 
 from pydicom.compat import in_py2
 from pydicom import config
@@ -144,6 +144,10 @@ class DateTimeTests(unittest.TestCase):
         dicom_date = ""
         da = valuerep.DA(dicom_date)
         self.assertEqual(da, None, "DA {0} not None".format(dicom_date))
+
+        dicom_datetime = "1961"
+        with self.assertRaises(ValueError):
+            dt = valuerep.DA(dicom_datetime)
 
     def testDateTime(self):
         """DT conversion to datetime.datetime ..................................."""
