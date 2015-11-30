@@ -145,10 +145,6 @@ class DateTimeTests(unittest.TestCase):
         da = valuerep.DA(dicom_date)
         self.assertEqual(da, None, "DA {0} not None".format(dicom_date))
 
-        dicom_datetime = "1961"
-        with self.assertRaises(ValueError):
-                dt = valuerep.DA(dicom_datetime)
-
     def testDateTime(self):
         """DT conversion to datetime.datetime ..................................."""
         dicom_datetime = "1961"
