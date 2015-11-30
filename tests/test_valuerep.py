@@ -6,13 +6,6 @@
 #    available at https://github.com/darcymason/pydicom
 
 import unittest
-try:
-    unittest.TestCase.assertRaises
-except AttributeError:
-    try:
-        import unittest2 as unittest
-    except ImportError:
-        print("unittest2 is required for testing in python2.6")
 
 from pydicom.compat import in_py2
 from pydicom import config
@@ -151,10 +144,6 @@ class DateTimeTests(unittest.TestCase):
         dicom_date = ""
         da = valuerep.DA(dicom_date)
         self.assertEqual(da, None, "DA {0} not None".format(dicom_date))
-
-        dicom_datetime = "1961"
-        with self.assertRaises(ValueError):
-            dt = valuerep.DA(dicom_datetime)
 
     def testDateTime(self):
         """DT conversion to datetime.datetime ..................................."""
