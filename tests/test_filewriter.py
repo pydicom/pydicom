@@ -8,11 +8,15 @@
 import sys
 import os.path
 import os
+from datetime import date, datetime, time
+from dateutil.tz import tzoffset
 import unittest
 from pydicom.filereader import read_file
 from pydicom.filewriter import write_data_element
 from pydicom.dataset import Dataset, FileDataset
 from pydicom.sequence import Sequence
+from pydicom.multival import MultiValue
+from pydicom.valuerep import DA, DT, TM
 from pydicom.util.hexutil import hex2bytes, bytes2hex
 from pydicom import config
 
@@ -29,6 +33,7 @@ rtdose_name = os.path.join(test_files, "rtdose.dcm")
 ct_name = os.path.join(test_files, "CT_small.dcm")
 mr_name = os.path.join(test_files, "MR_small.dcm")
 jpeg_name = os.path.join(test_files, "JPEG2000.dcm")
+datetime_name = mr_name
 
 unicode_name = os.path.join(testcharset_dir, "chrH31.dcm")
 multiPN_name = os.path.join(testcharset_dir, "chrFrenMulti.dcm")
@@ -39,6 +44,8 @@ rtdose_out = rtdose_name + '2'
 ct_out = ct_name + '2'
 mr_out = mr_name + '2'
 jpeg_out = jpeg_name + '2'
+datetime_out = datetime_name + '2'
+
 unicode_out = unicode_name + '2'
 multiPN_out = multiPN_name + '2'
 
@@ -131,12 +138,40 @@ class WriteFileTests(unittest.TestCase):
 
 
 class ScratchWriteDateTimeTests(WriteFileTests):
-    """Simple dataset from scratch, with datetime_conversion enabled"""
+    """Write and reread simple or multi-value DA/DT/TM data elements"""
     def setUp(self):
         config.datetime_conversion = True
 
     def tearDown(self):
         config.datetime_conversion = False
+
+    def test_multivalue_DA(self):
+        """Write DA/DT/TM data elements.........."""
+        multi_DA_expected = (date(1961, 8, 4), date(1963, 11, 22))
+        DA_expected = date(1961, 8, 4)
+        tzinfo = tzoffset('-0600', -21600)
+        multi_DT_expected = (datetime(1961, 8, 4),
+                             datetime(1963, 11, 22, 12, 30, 0, 0,
+                                      tzoffset('-0600', -21600)))
+        multi_TM_expected = (time(1, 23, 45), time(11, 11, 11))
+        TM_expected = time(11, 11, 11, 1)
+        ds = read_file(datetime_name)
+        # Add date/time data elements
+        ds.CalibrationDate = MultiValue(DA, multi_DA_expected)
+        ds.DateOfLastCalibration = DA(DA_expected)
+        ds.ReferencedDateTime = MultiValue(DT, multi_DT_expected)
+        ds.CalibrationTime = MultiValue(TM, multi_TM_expected)
+        ds.TimeOfLastCalibration = TM(TM_expected)
+        ds.save_as(datetime_out)
+        # Now read it back in and check the values are as expected
+        ds = read_file(datetime_out)
+        self.assertSequenceEqual(multi_DA_expected, ds.CalibrationDate, "Multiple dates not written correctly (VR=DA)")
+        self.assertEqual(DA_expected, ds.DateOfLastCalibration, "Date not written correctly (VR=DA)")
+        self.assertSequenceEqual(multi_DT_expected, ds.ReferencedDateTime, "Multiple datetimes not written correctly (VR=DT)")
+        self.assertSequenceEqual(multi_TM_expected, ds.CalibrationTime, "Multiple times not written correctly (VR=TM)")
+        self.assertEqual(TM_expected, ds.TimeOfLastCalibration, "Time not written correctly (VR=DA)")
+        if os.path.exists(datetime_out):
+            os.remove(datetime_out)  # get rid of the file
 
 
 class WriteDataElementTests(unittest.TestCase):

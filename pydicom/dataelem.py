@@ -11,19 +11,15 @@ and a value.
 #
 from __future__ import absolute_import
 
+from pydicom import config  # don't import datetime_conversion directly
 from pydicom import compat
-from pydicom import config
 from pydicom.config import logger
-
 from pydicom.datadict import dictionary_has_tag, dictionary_description
 from pydicom.datadict import private_dictionary_description, dictionaryVR
 from pydicom.tag import Tag
-
 from pydicom.uid import UID
 import pydicom.valuerep  # don't import DS directly as can be changed by config
-import pydicom.config
 from pydicom.compat import in_py2
-
 if not in_py2:
     from pydicom.valuerep import PersonName3 as PersonNameUnicode
     PersonName = PersonNameUnicode
@@ -161,13 +157,13 @@ class DataElement(object):
         """Take the value and convert to number, etc if possible"""
         if self.VR == 'IS':
             return pydicom.valuerep.IS(val)
-        elif self.VR == 'DA' and pydicom.config.datetime_conversion:
+        elif self.VR == 'DA' and config.datetime_conversion:
             return pydicom.valuerep.DA(val)
         elif self.VR == 'DS':
             return pydicom.valuerep.DS(val)
-        elif self.VR == 'DT' and pydicom.config.datetime_conversion:
+        elif self.VR == 'DT' and config.datetime_conversion:
             return pydicom.valuerep.DT(val)
-        elif self.VR == 'TM' and pydicom.config.datetime_conversion:
+        elif self.VR == 'TM' and config.datetime_conversion:
             return pydicom.valuerep.TM(val)
         elif self.VR == "UI":
             return UID(val)
@@ -315,8 +311,7 @@ def DataElement_from_raw(raw_data_element, encoding=None):
     raw = raw_data_element
     
     # If user has hooked into conversion of raw values, call his/her routine
-    import pydicom.config
-    if pydicom.config.data_element_callback:
+    if config.data_element_callback:
         raw = config.data_element_callback(raw_data_element,
                                           **config.data_element_callback_kwargs)
     VR = raw.VR
