@@ -147,28 +147,29 @@ class ScratchWriteDateTimeTests(WriteFileTests):
 
     def test_multivalue_DA(self):
         """Write DA/DT/TM data elements.........."""
-        multi_DA_expected = (date(1961, 8, 4), date(1963, 11, 22))
-        DA_expected = date(1961, 8, 4)
-        tzinfo = tzoffset('-0600', -21600)
-        multi_DT_expected = (datetime(1961, 8, 4),
-                             datetime(1963, 11, 22, 12, 30, 0, 0,
-                                      tzoffset('-0600', -21600)))
-        multi_TM_expected = (time(1, 23, 45), time(11, 11, 11))
-        TM_expected = time(11, 11, 11, 1)
+        multi_DA_expected = MultiValue(DA, (date(1961, 8, 4),
+                                            date(1963, 11, 22)))
+        DA_expected = DA(date(1961, 8, 4))
+        multi_DT_expected = MultiValue(DT, (datetime(1961, 8, 4),
+                                            datetime(1963, 11, 22, 12, 30, 0, 0,
+                                                     tzoffset('-0600', -21600))))
+        multi_TM_expected = MultiValue(TM, (time(1, 23, 45),
+                                            time(11, 11, 11)))
+        TM_expected = TM(time(11, 11, 11, 1))
         ds = read_file(datetime_name)
         # Add date/time data elements
-        ds.CalibrationDate = MultiValue(DA, multi_DA_expected)
-        ds.DateOfLastCalibration = DA(DA_expected)
-        ds.ReferencedDateTime = MultiValue(DT, multi_DT_expected)
-        ds.CalibrationTime = MultiValue(TM, multi_TM_expected)
-        ds.TimeOfLastCalibration = TM(TM_expected)
+        ds.CalibrationDate = multi_DA_expected
+        ds.DateOfLastCalibration = DA_expected
+        ds.ReferencedDateTime = multi_DT_expected
+        ds.CalibrationTime = multi_TM_expected
+        ds.TimeOfLastCalibration = TM_expected
         ds.save_as(datetime_out)
         # Now read it back in and check the values are as expected
         ds = read_file(datetime_out)
-        self.assertSequenceEqual(multi_DA_expected, ds.CalibrationDate, "Multiple dates not written correctly (VR=DA)")
+        self.assertEqual(multi_DA_expected, ds.CalibrationDate, "Multiple dates not written correctly (VR=DA)")
         self.assertEqual(DA_expected, ds.DateOfLastCalibration, "Date not written correctly (VR=DA)")
-        self.assertSequenceEqual(multi_DT_expected, ds.ReferencedDateTime, "Multiple datetimes not written correctly (VR=DT)")
-        self.assertSequenceEqual(multi_TM_expected, ds.CalibrationTime, "Multiple times not written correctly (VR=TM)")
+        self.assertEqual(multi_DT_expected, ds.ReferencedDateTime, "Multiple datetimes not written correctly (VR=DT)")
+        self.assertEqual(multi_TM_expected, ds.CalibrationTime, "Multiple times not written correctly (VR=TM)")
         self.assertEqual(TM_expected, ds.TimeOfLastCalibration, "Time not written correctly (VR=DA)")
         if os.path.exists(datetime_out):
             os.remove(datetime_out)  # get rid of the file
