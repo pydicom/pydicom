@@ -8,8 +8,8 @@
 import unittest
 from datetime import date
 from pydicom.multival import MultiValue
-from pydicom.valuerep import DS, DSfloat, DSdecimal, IS, DA
-from pydicom import config  # don't import datetime_conversion directly
+from pydicom.valuerep import DS, DSfloat, DSdecimal, IS
+from pydicom import config
 
 import sys
 python_version = sys.version_info
