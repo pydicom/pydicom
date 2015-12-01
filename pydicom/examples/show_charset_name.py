@@ -12,7 +12,7 @@ if compat.in_py2:
     import Tkinter as tkinter
 else:   
     import tkinter
-    
+
 default_encoding = 'iso8859'
 
 root = tkinter.Tk()

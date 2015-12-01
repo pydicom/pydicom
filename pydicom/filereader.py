@@ -637,10 +637,10 @@ def read_partial(fileobj, stop_when=None, defer_size=None, force=False):
         if VR in converters.keys():
             is_implicit_VR = False
             # Determine if group in low numbered range (Little vs Big Endian)
-            if group == 0: # got (0,0) group length. Not helpful.
+            if group == 0:  # got (0,0) group length. Not helpful.
                 # XX could use similar to http://www.dclunie.com/medical-image-faq/html/part2.html code example
-                msg =  ("Not able to guess transfer syntax when first item "
-                        "is group length")
+                msg = ("Not able to guess transfer syntax when first item "
+                       "is group length")
                 raise NotImplementedError(msg)
             if group < 2000:
                 file_meta_dataset.TransferSyntaxUID = pydicom.uid.ExplicitVRLittleEndian
