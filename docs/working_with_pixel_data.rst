@@ -10,8 +10,8 @@ Working with Pixel Data
 Introduction
 ============
 
-pydicom tends to be "lazy" in interpreting DICOM data. For example, 
-by default it doesn't do anything with pixel data 
+pydicom tends to be "lazy" in interpreting DICOM data. For example,
+by default it doesn't do anything with pixel data
 except read in the raw bytes::
 
     >>> import pydicom
@@ -20,11 +20,11 @@ except read in the raw bytes::
     '\x89\x03\xfb\x03\xcb\x04\xeb\x04\xf9\x02\x94\x01\x7f ...
     ...
 
-``PixelData`` contains the raw bytes exactly as found in the file. 
-If the image is JPEG compressed, these bytes will be the compressed 
-pixel data, not the expanded, uncompressed image. Whether the image is 
-e.g. 16-bit or 8-bit, multiple frames or not, ``PixelData`` contains the same 
-raw bytes. But there is a function that can shape the pixels more sensibly 
+``PixelData`` contains the raw bytes exactly as found in the file.
+If the image is JPEG compressed, these bytes will be the compressed
+pixel data, not the expanded, uncompressed image. Whether the image is
+e.g. 16-bit or 8-bit, multiple frames or not, ``PixelData`` contains the same
+raw bytes. But there is a function that can shape the pixels more sensibly
 if you need to work with them...
 
 pixel_array
@@ -50,7 +50,7 @@ for uncompressed images. The ``pixel_array`` property returns a NumPy array::
     >>> ds.pixel_array.shape
     (64, 64)
 
-NumPy can be used to modify the pixels, but if the changes are to be saved, 
+NumPy can be used to modify the pixels, but if the changes are to be saved,
 they must be written back to the ``PixelData`` attribute::
 
     >>> for n,val in enumerate(ds.pixel_array.flat): # example: zero anything < 300
@@ -59,7 +59,7 @@ they must be written back to the ``PixelData`` attribute::
     >>> ds.PixelData = ds.pixel_array.tostring()
     >>> ds.save_as("newfilename.dcm")
 
-Some changes may require other DICOM tags to be modified. For example, 
+Some changes may require other DICOM tags to be modified. For example,
 if the pixel data is reduced (e.g. a 512x512 image is collapsed to 256x256)
 then ``ds.Rows`` and ``ds.Columns`` should be set appropriately.
 You must explicitly set these yourself; pydicom does not do so automatically.

@@ -33,9 +33,9 @@ from pydicom.uid import NotCompressedPixelTransferSyntaxes
 from pydicom.tagtools import tag_in_exception
 import pydicom  # for write_file
 import pydicom.charset
+from pydicom.config import logger
 
 sys_is_little_endian = (sys.byteorder == 'little')
-from pydicom.config import logger
 
 have_numpy = True
 try:
@@ -403,7 +403,7 @@ class Dataset(dict):
         if 'NumberOfFrames' in self and self.NumberOfFrames > 1:
             if self.SamplesPerPixel > 1:
                 #TODO: Handle Planar Configuration attribute
-                assert self.PlanarConfiguration==0
+                assert self.PlanarConfiguration == 0
                 arr = arr.reshape(self.NumberOfFrames, self.Rows, self.Columns, self.SamplesPerPixel)
             else:
                 arr = arr.reshape(self.NumberOfFrames, self.Rows, self.Columns)

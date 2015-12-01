@@ -67,13 +67,13 @@ class DatasetTests(unittest.TestCase):
         ds = Dataset()
         ds.PatientID = "123456" # Valid value
         ds.SmallestImagePixelValue = 0 # Invalid value
-        
+
         if compat.in_PyPy:
             expected_msg = "Invalid tag (0028, 0106): 'int' has no length"
         else:
             expected_msg = ("Invalid tag (0028, 0106): object of type 'int' "
                             "has no len()")
-        
+
         self.failUnlessExceptionArgs(expected_msg, TypeError, lambda: str(ds))
 
     def testTagExceptionWalk(self):

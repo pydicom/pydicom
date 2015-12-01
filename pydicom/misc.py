@@ -22,6 +22,7 @@ def size_in_bytes(expr):
         else:
             raise ValueError("Unable to parse length with unit '{0:s}'".format(unit))
 
+
 def is_dicom(file):
     """Boolean specifying if file is a proper DICOM file.
 

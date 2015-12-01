@@ -57,7 +57,7 @@ def show_PIL(dataset):
         raise TypeError("Cannot show image -- DICOM dataset does not have "
                         "pixel data")
     # can only apply LUT if these window info exists
-    if ('WindowWidth' not in dataset) or ('WindowCenter' not in dataset):  
+    if ('WindowWidth' not in dataset) or ('WindowCenter' not in dataset):
         bits = dataset.BitsAllocated
         samples = dataset.SamplesPerPixel
         if bits == 8 and samples == 1:
@@ -76,16 +76,16 @@ def show_PIL(dataset):
         # PIL size = (width, height)
         size = (dataset.Columns, dataset.Rows)
 
-        # Recommended to specify all details 
+        # Recommended to specify all details
         # by http://www.pythonware.com/library/pil/handbook/image.htm
-        im = PIL.Image.frombuffer(mode, size, dataset.PixelData, 
+        im = PIL.Image.frombuffer(mode, size, dataset.PixelData,
                                   "raw", mode, 0, 1)
 
     else:
-        image = get_LUT_value(dataset.pixel_array, dataset.WindowWidth, 
+        image = get_LUT_value(dataset.pixel_array, dataset.WindowWidth,
                               dataset.WindowCenter)
-        # Convert mode to L since LUT has only 256 values: 
+        # Convert mode to L since LUT has only 256 values:
         #   http://www.pythonware.com/library/pil/handbook/image.htm
-        im = PIL.Image.fromarray(image).convert('L')  
+        im = PIL.Image.fromarray(image).convert('L')
 
     im.show()

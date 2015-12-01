@@ -13,6 +13,7 @@
 
 from pydicom import compat
 
+
 def Tag(arg, arg2=None):
     """General function for creating a Tag in any of the standard forms:
     e.g.  Tag(0x00100010), Tag(0x10,0x10), Tag((0x10, 0x10))
@@ -41,9 +42,10 @@ def Tag(arg, arg2=None):
 if compat.in_py2:
     # In python 2.6, int is shorter and 0xFFFF << 16 gets converted to long,
     #   causing Overflow error in TupleTag
-    BaseTag_base_class = long  
+    BaseTag_base_class = long
 else:
     BaseTag_base_class = int
+
 
 class BaseTag(BaseTag_base_class):
     """Class for storing the dicom (group, element) tag"""

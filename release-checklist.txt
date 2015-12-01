@@ -30,7 +30,7 @@ pydicom release checklist
     >>> doctest.testfile("../examples/simple_interactive_example.txt")
     >>> doctest.testfile("../examples/user_guide_doctest.txt")
     >>> doctest.testfile("../examples/working_with_sequences_doctest.txt")
-    
+
     First can fail if help() function as goes into reader mode needing q to exit
 * run python26 -Qwarn to check for integer division problems.
 * run test/all.bat on windows to test with all supported python versions
