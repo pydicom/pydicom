@@ -19,6 +19,7 @@ SequenceDelimiterTag = 0xFFFEE0DD  # end of Sequence of undefined length
 
 from struct import Struct, unpack
 
+
 class dicomfile(object):
     """Context-manager based DICOM file object with data element iteration"""
 

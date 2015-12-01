@@ -15,6 +15,7 @@ if compat.in_py2:
 else:
     import tkinter.tix as tkinter_tix
 
+
 def RunTree(w, filename):
     top = tkinter_tix.Frame(w, relief=tkinter_tix.RAISED, bd=1)
     tree = tkinter_tix.Tree(top, options="hlist.columns 2")

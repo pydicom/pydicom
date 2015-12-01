@@ -127,15 +127,25 @@ def write_number_string(fp, data_element, padding=' '):
     fp.write(val)
 
 
+def _format_DA(val):
+    if val is None:
+        return ''
+    elif hasattr(val, 'original_string'):
+        return val.original_string
+    else:
+        return val.strftime("%Y%m%d")
+
+
 def write_DA(fp, data_element, padding=' '):
     val = data_element.value
     if isinstance(val, (str, compat.string_types)):
         write_string(fp, data_element, padding)
     else:
-        if hasattr(val, 'original_string'):
-            val = val.original_string
+        if isinstance(val, (list, tuple)):
+            val = "\\".join((x if isinstance(x, (str, compat.string_types))
+                             else _format_DA(x) for x in val))
         else:
-            val = val.strftime("%Y%m%d")
+            val = _format_DA(val)
         if len(val) % 2 != 0:
             val = val + padding  # pad to even length
 
@@ -143,6 +153,15 @@ def write_DA(fp, data_element, padding=' '):
             val = val.encode(default_encoding)
 
         fp.write(val)
+
+
+def _format_DT(val):
+    if hasattr(val, 'original_string'):
+        return val.original_string
+    elif val.microsecond > 0:
+        return val.strftime("%Y%m%d%H%M%S.%f%z")
+    else:
+        return val.strftime("%Y%m%d%H%M%S%z")
 
 
 def write_DT(fp, data_element, padding=' '):
@@ -150,13 +169,11 @@ def write_DT(fp, data_element, padding=' '):
     if isinstance(val, (str, compat.string_types)):
         write_string(fp, data_element, padding)
     else:
-        if hasattr(val, 'original_string'):
-            val = val.original_string
+        if isinstance(val, (list, tuple)):
+            val = "\\".join((x if isinstance(x, (str, compat.string_types))
+                             else _format_DT(x) for x in val))
         else:
-            if val.microsecond > 0:
-                val = val.strftime("%Y%m%d%H%M%S.%f%z")
-            else:
-                val = val.strftime("%Y%m%d%H%M%S%z")
+            val = _format_DT(val)
         if len(val) % 2 != 0:
             val = val + padding  # pad to even length
 
@@ -166,18 +183,27 @@ def write_DT(fp, data_element, padding=' '):
         fp.write(val)
 
 
+def _format_TM(val):
+    if val is None:
+        return ''
+    elif hasattr(val, 'original_string'):
+        return val.original_string
+    elif val.microsecond > 0:
+        return val.strftime("%H%M%S.%f")
+    else:
+        return val.strftime("%H%M%S")
+
+
 def write_TM(fp, data_element, padding=' '):
     val = data_element.value
     if isinstance(val, (str, compat.string_types)):
         write_string(fp, data_element, padding)
     else:
-        if hasattr(val, 'original_string'):
-            val = val.original_string
+        if isinstance(val, (list, tuple)):
+            val = "\\".join((x if isinstance(x, (str, compat.string_types))
+                             else _format_TM(x) for x in val))
         else:
-            if val.microsecond > 0:
-                val = val.strftime("%H%M%S.%f")
-            else:
-                val = val.strftime("%H%M%S")
+            val = _format_TM(val)
         if len(val) % 2 != 0:
             val = val + padding  # pad to even length
 

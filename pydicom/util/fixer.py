@@ -10,6 +10,7 @@ from pydicom import config
 from pydicom import datadict
 from pydicom import values
 
+
 def fix_separator_callback(raw_elem, **kwargs):
     """Used by fix_separator as the callback function from read_dataset
     """

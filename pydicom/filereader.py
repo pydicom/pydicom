@@ -18,9 +18,8 @@ from pydicom.valuerep import extra_length_VRs
 from pydicom.charset import default_encoding, convert_encodings
 from pydicom.compat import in_py2
 from pydicom import compat
-
+from pydicom import config  # don't import datetime_conversion directly
 from pydicom.config import logger
-from pydicom import config
 
 stat_available = True
 try:
