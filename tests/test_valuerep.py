@@ -135,6 +135,16 @@ class DateTimeTests(unittest.TestCase):
         self.assertEqual(da, datetime_date,
                          "DA {0} not equal to date {1}".format(dicom_date, datetime_date))
 
+        dicom_date = "1961.08.04"  # ACR-NEMA Standard 300
+        da = valuerep.DA(dicom_date)
+        datetime_date = date(1961, 8, 4)
+        self.assertEqual(da, datetime_date,
+                         "DA {0} not equal to date {1}".format(dicom_date, datetime_date))
+
+        dicom_date = ""
+        da = valuerep.DA(dicom_date)
+        self.assertEqual(da, None, "DA {0} not None".format(dicom_date))
+
     def testDateTime(self):
         """DT conversion to datetime.datetime ..................................."""
         dicom_datetime = "1961"
@@ -142,16 +152,19 @@ class DateTimeTests(unittest.TestCase):
         datetime_datetime = datetime(1961, 1, 1)
         self.assertEqual(dt, datetime_datetime,
                          "DT {0} not equal to datetime {1}".format(dicom_datetime, datetime_datetime))
+
         dicom_datetime = "19610804"
         dt = valuerep.DT(dicom_datetime)
         datetime_datetime = datetime(1961, 8, 4)
         self.assertEqual(dt, datetime_datetime,
                          "DT {0} not equal to datetime {1}".format(dicom_datetime, datetime_datetime))
+
         dicom_datetime = "19610804192430.123"
         dt = valuerep.DT(dicom_datetime)
         datetime_datetime = datetime(1961, 8, 4, 19, 24, 30, 123000)
         self.assertEqual(dt, datetime_datetime,
                          "DT {0} not equal to datetime {1}".format(dicom_datetime, datetime_datetime))
+
         dicom_datetime = "196108041924-1000"
         dt = valuerep.DT(dicom_datetime)
         datetime_datetime = datetime(1961, 8, 4, 19, 24, 0, 0,
@@ -168,11 +181,16 @@ class DateTimeTests(unittest.TestCase):
         datetime_time = time(23, 59)
         self.assertEqual(tm, datetime_time,
                          "TM {0} not equal to time {1}".format(dicom_time, datetime_time))
+
         dicom_time = "235900.123"
         tm = valuerep.TM(dicom_time)
         datetime_time = time(23, 59, 00, 123000)
         self.assertEqual(tm, datetime_time,
                          "TM {0} not equal to time {1}".format(dicom_time, datetime_time))
+
+        dicom_time = ""
+        tm = valuerep.TM(dicom_time)
+        self.assertEqual(tm, None, "TM {0} not None".format(dicom_time))
 
 
 if __name__ == "__main__":
