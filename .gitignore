@@ -35,3 +35,8 @@ docs/_build/*
 
 # PyCharm IDE files
 *.idea*
+
+
+# jupyter notebooks
+*.ipynb
+.ipynb_checkpoints/*

@@ -35,6 +35,7 @@ JPEG-LL.dcm
 JPEG-lossy.dcm
   * NM1_JPLY from ftp://medical.nema.org/MEDICAL/Dicom/DataSets/WG04/
   * 1.2.840.10008.1.2.4.51 Default Transfer Syntax for Lossy JPEG 12-bit
+  * GDCM prints when reading this file: "Unsupported JPEG data precision 12" and "Invalid SOS parameters for sequential JPEG", although it does appear to be read properly
 
 Created by a commercial radiotherapy treatment planning system and modified:
 rtplan.dcm       Implicit VR, Little Endian
@@ -53,6 +54,12 @@ test_SR.dcm
 priv_SQ.dcm
   * a file with an undefined length SQ item in a private tag.
   * minimal data elements kept from example files in issues 91, 97, 98
+
+OBXXXX1A.dcm
+  * a file with a Photometric Interpretation of PALETTE COLOR
+  * used to check if to pixel_array is interpreted correctly for such a case
+  * taken from https://github.com/darcymason/pydicom/issues/205#issuecomment-103329677
+  * supposedly from a Philips machine
 
 zipMR.gz
   * a gzipped version of MR_small.dcm
