@@ -388,8 +388,9 @@ class Dataset(dict):
         # result container
         pixel_array = None
         
-        if self._is_supported_transfer_syntax():
-            # for supported transfer syntaxes, we can parse the pixel data using numpy
+        # FIXME: should we always use GDCM if it is available? Or only as a fallback?
+        if self._is_supported_transfer_syntax(): # and not have_gdcm
+            # for supported transfer syntaxes, we can parse the pixel data using numpy only
             if 'PixelData' not in self:
                 raise TypeError("No pixel data found in this dataset.")
         
@@ -451,13 +452,19 @@ class Dataset(dict):
             gdcm_raw_data_buffer = None
             
             # in the case of a lookup table try to apply it
-            if gdcm_image.GetPhotometricInterpretation() == gdcm.PhotometricInterpretation.PALETTE_COLOR:
+            if gdcm_image.GetPhotometricInterpretation().GetType() == gdcm.PhotometricInterpretation.PALETTE_COLOR:
+                gdcm_buf_len = gdcm_image.GetBufferLength()
                 # apply lookup table if possible
                 gdcm_lutfilt = gdcm.ImageApplyLookupTable();
                 gdcm_lutfilt.SetInput(gdcm_image);
                 if not gdcm_lutfilt.Apply():
                     warnings.warn("GDCM failed to apply LUT")
-                gdcm_raw_data_buffer = gdcm_lutfilt.GetOutputAsPixmap().GetBuffer()
+                gdcm_lutfiltered_pixmap = gdcm_lutfilt.GetOutputAsPixmap()
+                gdcm_raw_data_buffer = gdcm_lutfiltered_pixmap.GetBuffer()
+                
+                # amount of samples per pixel can change
+                self.SamplesPerPixel = gdcm_lutfiltered_pixmap.GetBufferLength() / gdcm_buf_len
+                self.PlanarConfiguration = 0
             
             # if we haven't gotten the buffer yet, just get it directly
             if gdcm_raw_data_buffer is None:
@@ -470,7 +477,18 @@ class Dataset(dict):
             # GDCM returns char* as type str. In the case of Python 3 this needs to be encoded back into a byte array.
             # This is no problem in Python 3 as strings are byte strings by default there.
             if sys.version_info >= (3, 0):
-                gdcm_raw_data_buffer = gdcm_raw_data_buffer.encode(sys.getfilesystemencoding(), "surrogateescape")
+                def encode_gdcm_buffer_as_bytearray(gdcm_buffer, encoding=None):
+                    return gdcm_buffer.encode(encoding if encoding is not None else sys.getfilesystemencoding(), "surrogateescape")
+                try:
+                    gdcm_raw_data_buffer = encode_gdcm_buffer_as_bytearray(gdcm_raw_data_buffer)
+                except UnicodeEncodeError:
+                    try:
+                        gdcm_raw_data_buffer = encode_gdcm_buffer_as_bytearray(gdcm_raw_data_buffer, encoding='utf-8')
+                    except UnicodeEncodeError:
+                        try:
+                            gdcm_raw_data_buffer = encode_gdcm_buffer_as_bytearray(gdcm_raw_data_buffer, encoding='mbcs')
+                        except UnicodeEncodeError:
+                            raise TypeError("Could not encode the image unicode string returned by GDCM back to a byte array")
 
             # convert to numpy array
             pixel_array = numpy.frombuffer(gdcm_raw_data_buffer, dtype=numpy_dtype)
