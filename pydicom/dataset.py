@@ -385,15 +385,13 @@ class Dataset(dict):
             msg = "The Numpy package is required to use pixel_array, and numpy could not be imported.\n"
             raise ImportError(msg)
         
+        if 'PixelData' not in self:
+            raise TypeError("No pixel data found in this dataset.")
+        
         # result container
         pixel_array = None
         
-        # FIXME: should we always use GDCM if it is available? Or only as a fallback?
-        if self._is_supported_transfer_syntax(): # and not have_gdcm
-            # for supported transfer syntaxes, we can parse the pixel data using numpy only
-            if 'PixelData' not in self:
-                raise TypeError("No pixel data found in this dataset.")
-        
+        if self._is_supported_transfer_syntax():
             # Make NumPy format code, e.g. "uint16", "int32" etc
             # from two pieces of info:
             #    self.PixelRepresentation -- 0 for unsigned, 1 for signed;
@@ -416,12 +414,13 @@ class Dataset(dict):
             pixel_array = numpy.fromstring(self.PixelData, numpy_format)
             
         else:
-            # if the transfer syntax is not supported, we try to fall back to GDCM
+            # if the transfer syntax is not supported, we fall back to GDCM
             if not have_gdcm:
                 msg = "The GDCM package is required to use pixel_array for transfer syntaxes that pydicom does not support natively, and GDCM could not be imported.\n"
                 raise ImportError(msg)
+                
             if not self.filename:
-                msg = "GDCM needs the filename to read."
+                msg = "GDCM is only supported when the dataset has been created with a filename."
                 raise TypeError(msg)
             
             # read the file using GDCM
@@ -449,26 +448,23 @@ class Dataset(dict):
                 raise TypeError('{} is not a GDCM supported pixel format'.format(gdcm_pixel_format))
             
             # get the raw data buffer (decompressed, decoded)
-            gdcm_raw_data_buffer = None
+            gdcm_raw_data_buffer = gdcm_image.GetBuffer()
             
+            # ideally this will be factored out 
             # in the case of a lookup table try to apply it
-            if gdcm_image.GetPhotometricInterpretation().GetType() == gdcm.PhotometricInterpretation.PALETTE_COLOR:
-                gdcm_buf_len = gdcm_image.GetBufferLength()
-                # apply lookup table if possible
-                gdcm_lutfilt = gdcm.ImageApplyLookupTable();
-                gdcm_lutfilt.SetInput(gdcm_image);
-                if not gdcm_lutfilt.Apply():
-                    warnings.warn("GDCM failed to apply LUT")
-                gdcm_lutfiltered_pixmap = gdcm_lutfilt.GetOutputAsPixmap()
-                gdcm_raw_data_buffer = gdcm_lutfiltered_pixmap.GetBuffer()
-                
-                # amount of samples per pixel can change
-                self.SamplesPerPixel = gdcm_lutfiltered_pixmap.GetBufferLength() / gdcm_buf_len
-                self.PlanarConfiguration = 0
-            
-            # if we haven't gotten the buffer yet, just get it directly
-            if gdcm_raw_data_buffer is None:
-                gdcm_raw_data_buffer = gdcm_image.GetBuffer()
+            # if gdcm_image.GetPhotometricInterpretation().GetType() == gdcm.PhotometricInterpretation.PALETTE_COLOR:
+            #     gdcm_buf_len = gdcm_image.GetBufferLength()
+            #     # apply lookup table if possible
+            #     gdcm_lutfilt = gdcm.ImageApplyLookupTable();
+            #     gdcm_lutfilt.SetInput(gdcm_image);
+            #     if not gdcm_lutfilt.Apply():
+            #         warnings.warn("GDCM failed to apply LUT")
+            #     gdcm_lutfiltered_pixmap = gdcm_lutfilt.GetOutputAsPixmap()
+            #     gdcm_raw_data_buffer = gdcm_lutfiltered_pixmap.GetBuffer()
+            #     
+            #     # amount of samples per pixel can change
+            #     self.SamplesPerPixel = gdcm_lutfiltered_pixmap.GetBufferLength() / gdcm_buf_len
+            #     self.PlanarConfiguration = 0
             
             # if GDCM indicates that a byte swap is in order, make sure to inform numpy as well
             if gdcm_image.GetNeedByteSwap():
@@ -477,18 +473,16 @@ class Dataset(dict):
             # GDCM returns char* as type str. In the case of Python 3 this needs to be encoded back into a byte array.
             # This is no problem in Python 3 as strings are byte strings by default there.
             if sys.version_info >= (3, 0):
-                def encode_gdcm_buffer_as_bytearray(gdcm_buffer, encoding=None):
-                    return gdcm_buffer.encode(encoding if encoding is not None else sys.getfilesystemencoding(), "surrogateescape")
-                try:
-                    gdcm_raw_data_buffer = encode_gdcm_buffer_as_bytearray(gdcm_raw_data_buffer)
-                except UnicodeEncodeError:
+                py3_encoding_succeeded = False
+                for encoding in ["utf-8", "mbcs", sys.getfilesystemencoding()]:
                     try:
-                        gdcm_raw_data_buffer = encode_gdcm_buffer_as_bytearray(gdcm_raw_data_buffer, encoding='utf-8')
+                        gdcm_raw_data_buffer = gdcm_raw_data_buffer.encode(encoding, "surrogateescape")
+                        py3_encoding_succeeded = True
+                        break
                     except UnicodeEncodeError:
-                        try:
-                            gdcm_raw_data_buffer = encode_gdcm_buffer_as_bytearray(gdcm_raw_data_buffer, encoding='mbcs')
-                        except UnicodeEncodeError:
-                            raise TypeError("Could not encode the image unicode string returned by GDCM back to a byte array")
+                        pass
+                if not py3_encoding_succeeded:
+                    raise TypeError("Could not encode the image unicode string returned by GDCM back to a byte array")
 
             # convert to numpy array
             pixel_array = numpy.frombuffer(gdcm_raw_data_buffer, dtype=numpy_dtype)
