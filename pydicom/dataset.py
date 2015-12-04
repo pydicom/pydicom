@@ -424,6 +424,8 @@ class Dataset(dict):
                 raise TypeError(msg)
             
             # read the file using GDCM
+            # FIXME this should just use self.PixelData instead of self.filename
+            #       but it is unclear how this should be achieved using GDCM
             gdcm_image_reader = gdcm.ImageReader()
             gdcm_image_reader.SetFileName(self.filename)
             if not gdcm_image_reader.Read():
@@ -470,8 +472,10 @@ class Dataset(dict):
             if gdcm_image.GetNeedByteSwap():
                 numpy_dtype.newbyteorder('S')
 
+            # FIXME 
             # GDCM returns char* as type str. In the case of Python 3 this needs to be encoded back into a byte array.
             # This is no problem in Python 3 as strings are byte strings by default there.
+            # if we use self.PixelData directly as the FIXME above indicates this will no longer be an issue
             if sys.version_info >= (3, 0):
                 py3_encoding_succeeded = False
                 for encoding in ["utf-8", "mbcs", sys.getfilesystemencoding()]:
