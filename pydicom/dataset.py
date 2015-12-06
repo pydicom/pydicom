@@ -362,7 +362,7 @@ class Dataset(dict):
         for tag in taglist:
             yield self[tag]
 
-    def _is_supported_transfer_syntax(self):
+    def _is_uncompressed_transfer_syntax(self):
         # XXX uses file_meta here, should really only be thus for FileDataset
         return self.file_meta.TransferSyntaxUID in NotCompressedPixelTransferSyntaxes
 
@@ -384,14 +384,11 @@ class Dataset(dict):
         if not have_numpy:
             msg = "The Numpy package is required to use pixel_array, and numpy could not be imported.\n"
             raise ImportError(msg)
-        
         if 'PixelData' not in self:
             raise TypeError("No pixel data found in this dataset.")
         
-        # result container
         pixel_array = None
-        
-        if self._is_supported_transfer_syntax():
+        if self._is_uncompressed_transfer_syntax():
             # Make NumPy format code, e.g. "uint16", "int32" etc
             # from two pieces of info:
             #    self.PixelRepresentation -- 0 for unsigned, 1 for signed;
@@ -406,21 +403,16 @@ class Dataset(dict):
                 raise TypeError(msg % (numpy_format, self.PixelRepresentation,
                                 self.BitsAllocated))
         
-            # determine the type used for the array
             if self.is_little_endian != sys_is_little_endian:
                 numpy_format.newbyteorder('S')
 
-            # Have correct Numpy format, so create the NumPy array
             pixel_array = numpy.fromstring(self.PixelData, numpy_format)
             
         else:
-            # if the transfer syntax is not supported, we fall back to GDCM
-            if not have_gdcm:
-                msg = "The GDCM package is required to use pixel_array for transfer syntaxes that pydicom does not support natively, and GDCM could not be imported.\n"
-                raise ImportError(msg)
-                
+            # if the transfer syntax is not supported, we can fall back to GDCM
             if not self.filename:
                 msg = "GDCM is only supported when the dataset has been created with a filename."
+                # FIXME it would be really nice if someone knew how to use GDCM with self.PixelData directly
                 raise TypeError(msg)
             
             # read the file using GDCM
@@ -449,46 +441,24 @@ class Dataset(dict):
             else:
                 raise TypeError('{} is not a GDCM supported pixel format'.format(gdcm_pixel_format))
             
-            # get the raw data buffer (decompressed, decoded)
+            # get the raw data buffer (decompression occurs here because gdcm_image knows how to handle it)
             gdcm_raw_data_buffer = gdcm_image.GetBuffer()
-            
-            # ideally this will be factored out 
-            # in the case of a lookup table try to apply it
-            # if gdcm_image.GetPhotometricInterpretation().GetType() == gdcm.PhotometricInterpretation.PALETTE_COLOR:
-            #     gdcm_buf_len = gdcm_image.GetBufferLength()
-            #     # apply lookup table if possible
-            #     gdcm_lutfilt = gdcm.ImageApplyLookupTable();
-            #     gdcm_lutfilt.SetInput(gdcm_image);
-            #     if not gdcm_lutfilt.Apply():
-            #         warnings.warn("GDCM failed to apply LUT")
-            #     gdcm_lutfiltered_pixmap = gdcm_lutfilt.GetOutputAsPixmap()
-            #     gdcm_raw_data_buffer = gdcm_lutfiltered_pixmap.GetBuffer()
-            #     
-            #     # amount of samples per pixel can change
-            #     self.SamplesPerPixel = gdcm_lutfiltered_pixmap.GetBufferLength() / gdcm_buf_len
-            #     self.PlanarConfiguration = 0
             
             # if GDCM indicates that a byte swap is in order, make sure to inform numpy as well
             if gdcm_image.GetNeedByteSwap():
                 numpy_dtype.newbyteorder('S')
 
-            # FIXME 
-            # GDCM returns char* as type str. In the case of Python 3 this needs to be encoded back into a byte array.
-            # This is no problem in Python 3 as strings are byte strings by default there.
-            # if we use self.PixelData directly as the FIXME above indicates this will no longer be an issue
+            # GDCM returns char* as type str. Under Python 2 `str` are 
+            # byte arrays by default. Python 3 decodes this to 
+            # unicode strings by default.
+            # The SWIG docs mention that they always decode byte streams 
+            # as utf-8 strings for Python 3, with the `surrogateescape` 
+            # error handler configured.
+            # Therefore, we can encode them back to their original bytearray
+            # representation on Python 3 by using the same parameters.
             if sys.version_info >= (3, 0):
-                py3_encoding_succeeded = False
-                for encoding in ["utf-8", "mbcs", sys.getfilesystemencoding()]:
-                    try:
-                        gdcm_raw_data_buffer = gdcm_raw_data_buffer.encode(encoding, "surrogateescape")
-                        py3_encoding_succeeded = True
-                        break
-                    except UnicodeEncodeError:
-                        pass
-                if not py3_encoding_succeeded:
-                    raise TypeError("Could not encode the image unicode string returned by GDCM back to a byte array")
+                gdcm_raw_data_buffer = gdcm_raw_data_buffer.encode("utf-8", "surrogateescape")
 
-            # convert to numpy array
             pixel_array = numpy.frombuffer(gdcm_raw_data_buffer, dtype=numpy_dtype)
 
         # Note the following reshape operations return a new *view* onto pixel_array, but don't copy the data
@@ -516,7 +486,7 @@ class Dataset(dict):
     # Use by pixel_array property
     def _get_pixel_array(self):
         # Check if pixel data is in a form we know how to make into an array
-        if not self._is_supported_transfer_syntax() and not have_gdcm:
+        if not self._is_uncompressed_transfer_syntax() and not have_gdcm:
             raise NotImplementedError("Pixel Data is compressed in a format pydicom does not yet handle. Cannot return array. Pydicom might be able to convert the pixel data using GDCM if it is installed.")
 
         # Check if already have converted to a NumPy array
@@ -528,7 +498,7 @@ class Dataset(dict):
             already_have = False
         if not already_have:
             self._pixel_array = self._pixel_data_numpy()
-            self._pixel_id = id(self.PixelData)  # is this guaranteed to work if memory is re-used??
+            self._pixel_id = id(self.PixelData)  # FIXME is this guaranteed to work if memory is re-used??
         return self._pixel_array
 
     @property
