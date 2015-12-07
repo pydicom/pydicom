@@ -61,6 +61,11 @@ OBXXXX1A.dcm
   * taken from https://github.com/darcymason/pydicom/issues/205#issuecomment-103329677
   * supposedly from a Philips machine
 
+OT-PAL-8-face.dcm
+  * a file with a Photometric Interpretation of PALETTE COLOR
+  * used to check if to pixel_array is interpreted correctly for such a case
+  * taken from http://www.barre.nom.fr/medical/samples/
+
 zipMR.gz
   * a gzipped version of MR_small.dcm
   * used for checking that deferred read reopens as zip again (issue 103)

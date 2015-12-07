@@ -22,7 +22,6 @@ import sys
 import inspect  # for __dir__
 import os.path
 import io
-import warnings
 
 from pydicom import compat
 from pydicom.charset import default_encoding, convert_encodings
@@ -387,7 +386,6 @@ class Dataset(dict):
         if 'PixelData' not in self:
             raise TypeError("No pixel data found in this dataset.")
         
-        pixel_array = None
         if self._is_uncompressed_transfer_syntax():
             # Make NumPy format code, e.g. "uint16", "int32" etc
             # from two pieces of info:
@@ -396,25 +394,23 @@ class Dataset(dict):
             format_str = '%sint%d' % (('u', '')[self.PixelRepresentation],
                                       self.BitsAllocated)
             try:
-                numpy_format = numpy.dtype(format_str)
+                numpy_dtype = numpy.dtype(format_str)
             except TypeError:
                 msg = ("Data type not understood by NumPy: "
                        "format='%s', PixelRepresentation=%d, BitsAllocated=%d")
-                raise TypeError(msg % (numpy_format, self.PixelRepresentation,
+                raise TypeError(msg % (numpy_dtype, self.PixelRepresentation,
                                 self.BitsAllocated))
         
             if self.is_little_endian != sys_is_little_endian:
-                numpy_format.newbyteorder('S')
-
-            pixel_array = numpy.fromstring(self.PixelData, numpy_format)
+                numpy_dtype.newbyteorder('S')
             
+            pixel_bytearray = self.PixelData
         else:
             # if the transfer syntax is not supported, we can fall back to GDCM
             if not self.filename:
                 msg = "GDCM is only supported when the dataset has been created with a filename."
                 # FIXME it would be really nice if someone knew how to use GDCM with self.PixelData directly
                 raise TypeError(msg)
-            
             # read the file using GDCM
             # FIXME this should just use self.PixelData instead of self.filename
             #       but it is unclear how this should be achieved using GDCM
@@ -441,13 +437,6 @@ class Dataset(dict):
             else:
                 raise TypeError('{} is not a GDCM supported pixel format'.format(gdcm_pixel_format))
             
-            # get the raw data buffer (decompression occurs here because gdcm_image knows how to handle it)
-            gdcm_raw_data_buffer = gdcm_image.GetBuffer()
-            
-            # if GDCM indicates that a byte swap is in order, make sure to inform numpy as well
-            if gdcm_image.GetNeedByteSwap():
-                numpy_dtype.newbyteorder('S')
-
             # GDCM returns char* as type str. Under Python 2 `str` are 
             # byte arrays by default. Python 3 decodes this to 
             # unicode strings by default.
@@ -456,10 +445,15 @@ class Dataset(dict):
             # error handler configured.
             # Therefore, we can encode them back to their original bytearray
             # representation on Python 3 by using the same parameters.
+            pixel_bytearray = gdcm_image.GetBuffer()
             if sys.version_info >= (3, 0):
-                gdcm_raw_data_buffer = gdcm_raw_data_buffer.encode("utf-8", "surrogateescape")
+                pixel_bytearray = pixel_bytearray.encode("utf-8", "surrogateescape")
+            
+            # if GDCM indicates that a byte swap is in order, make sure to inform numpy as well
+            if gdcm_image.GetNeedByteSwap():
+                numpy_dtype.newbyteorder('S')
 
-            pixel_array = numpy.frombuffer(gdcm_raw_data_buffer, dtype=numpy_dtype)
+        pixel_array = numpy.fromstring(pixel_bytearray, dtype=numpy_dtype)
 
         # Note the following reshape operations return a new *view* onto pixel_array, but don't copy the data
         if 'NumberOfFrames' in self and self.NumberOfFrames > 1:
