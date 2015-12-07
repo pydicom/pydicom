@@ -43,6 +43,12 @@ try:
 except:
     have_numpy = False
 
+have_gdcm = True
+try:
+    import gdcm
+except:
+    have_gdcm = False
+
 stat_available = True
 try:
     from os import stat
@@ -355,79 +361,127 @@ class Dataset(dict):
         for tag in taglist:
             yield self[tag]
 
+    def _is_uncompressed_transfer_syntax(self):
+        # FIXME uses file_meta here, should really only be thus for FileDataset
+        return self.file_meta.TransferSyntaxUID in NotCompressedPixelTransferSyntaxes
+
     def _pixel_data_numpy(self):
         """Return a NumPy array of the pixel data if NumPy is available.
+        Falls back to GDCM in case of unsupported transfer syntaxes.
 
         Raises
         ------
         TypeError
-            If there is no pixel data or not a NumPy data type
+            If there is no pixel data or not a supported data type
         ImportError
-            If NumPy isn't found.
+            If NumPy isn't found, or in the case of fallback, if GDCM isn't found.
 
         Returns
         -------
         NumPy array
         """
-        if 'PixelData' not in self:
-            raise TypeError("No pixel data found in this dataset.")
-
+        if not self._is_uncompressed_transfer_syntax():
+            if not have_gdcm:
+                raise NotImplementedError("Pixel Data is compressed in a format pydicom does not yet handle. Cannot return array. Pydicom might be able to convert the pixel data using GDCM if it is installed.")
+            elif not self.filename:
+                raise NotImplementedError("GDCM is only supported when the dataset has been created with a filename.")
         if not have_numpy:
             msg = "The Numpy package is required to use pixel_array, and numpy could not be imported.\n"
             raise ImportError(msg)
+        if 'PixelData' not in self:
+            raise TypeError("No pixel data found in this dataset.")
+        
+        # There are two cases:
+        # 1) uncompressed PixelData -> use numpy
+        # 2) compressed PixelData, filename is available and GDCM is available -> use GDCM
+        if self._is_uncompressed_transfer_syntax():
+            # Make NumPy format code, e.g. "uint16", "int32" etc
+            # from two pieces of info:
+            #    self.PixelRepresentation -- 0 for unsigned, 1 for signed;
+            #    self.BitsAllocated -- 8, 16, or 32
+            format_str = '%sint%d' % (('u', '')[self.PixelRepresentation],
+                                      self.BitsAllocated)
+            try:
+                numpy_dtype = numpy.dtype(format_str)
+            except TypeError:
+                msg = ("Data type not understood by NumPy: "
+                       "format='%s', PixelRepresentation=%d, BitsAllocated=%d")
+                raise TypeError(msg % (numpy_dtype, self.PixelRepresentation,
+                                self.BitsAllocated))
+        
+            if self.is_little_endian != sys_is_little_endian:
+                numpy_dtype.newbyteorder('S')
+            
+            pixel_bytearray = self.PixelData
+        elif have_gdcm and self.filename:
+            # read the file using GDCM
+            # FIXME this should just use self.PixelData instead of self.filename
+            #       but it is unclear how this should be achieved using GDCM
+            gdcm_image_reader = gdcm.ImageReader()
+            gdcm_image_reader.SetFileName(self.filename)
+            if not gdcm_image_reader.Read():
+                raise TypeError("GDCM could not read DICOM image")
+            gdcm_image = gdcm_image_reader.GetImage()
+            
+            # determine the correct numpy datatype
+            gdcm_numpy_typemap = {
+                gdcm.PixelFormat.INT8:     numpy.int8,
+                gdcm.PixelFormat.UINT8:    numpy.uint8,
+                gdcm.PixelFormat.UINT16:   numpy.uint16,
+                gdcm.PixelFormat.INT16:    numpy.int16,
+                gdcm.PixelFormat.UINT32:   numpy.uint32,
+                gdcm.PixelFormat.INT32:    numpy.int32,
+                gdcm.PixelFormat.FLOAT32:  numpy.float32,
+                gdcm.PixelFormat.FLOAT64:  numpy.float64
+            }
+            gdcm_pixel_format = gdcm_image.GetPixelFormat().GetScalarType()
+            if gdcm_pixel_format in gdcm_numpy_typemap:
+                numpy_dtype = gdcm_numpy_typemap[gdcm_pixel_format]
+            else:
+                raise TypeError('{} is not a GDCM supported pixel format'.format(gdcm_pixel_format))
+            
+            # GDCM returns char* as type str. Under Python 2 `str` are 
+            # byte arrays by default. Python 3 decodes this to 
+            # unicode strings by default.
+            # The SWIG docs mention that they always decode byte streams 
+            # as utf-8 strings for Python 3, with the `surrogateescape` 
+            # error handler configured.
+            # Therefore, we can encode them back to their original bytearray
+            # representation on Python 3 by using the same parameters.
+            pixel_bytearray = gdcm_image.GetBuffer()
+            if sys.version_info >= (3, 0):
+                pixel_bytearray = pixel_bytearray.encode("utf-8", "surrogateescape")
+            
+            # if GDCM indicates that a byte swap is in order, make sure to inform numpy as well
+            if gdcm_image.GetNeedByteSwap():
+                numpy_dtype.newbyteorder('S')
 
-        # determine the type used for the array
-        need_byteswap = (self.is_little_endian != sys_is_little_endian)
+        pixel_array = numpy.fromstring(pixel_bytearray, dtype=numpy_dtype)
 
-        # Make NumPy format code, e.g. "uint16", "int32" etc
-        # from two pieces of info:
-        #    self.PixelRepresentation -- 0 for unsigned, 1 for signed;
-        #    self.BitsAllocated -- 8, 16, or 32
-        format_str = '%sint%d' % (('u', '')[self.PixelRepresentation],
-                                  self.BitsAllocated)
-        try:
-            numpy_format = numpy.dtype(format_str)
-        except TypeError:
-            msg = ("Data type not understood by NumPy: "
-                   "format='%s', PixelRepresentation=%d, BitsAllocated=%d")
-            raise TypeError(msg % (numpy_format, self.PixelRepresentation,
-                            self.BitsAllocated))
-
-        # Have correct Numpy format, so create the NumPy array
-        arr = numpy.fromstring(self.PixelData, numpy_format)
-
-        # XXX byte swap - may later handle this in read_file!!?
-        if need_byteswap:
-            arr.byteswap(True)  # True means swap in-place, don't make a new copy
-        # Note the following reshape operations return a new *view* onto arr, but don't copy the data
+        # Note the following reshape operations return a new *view* onto pixel_array, but don't copy the data
         if 'NumberOfFrames' in self and self.NumberOfFrames > 1:
             if self.SamplesPerPixel > 1:
                 #TODO: Handle Planar Configuration attribute
                 assert self.PlanarConfiguration == 0
-                arr = arr.reshape(self.NumberOfFrames, self.Rows, self.Columns, self.SamplesPerPixel)
+                pixel_array = pixel_array.reshape(self.NumberOfFrames, self.Rows, self.Columns, self.SamplesPerPixel)
             else:
-                arr = arr.reshape(self.NumberOfFrames, self.Rows, self.Columns)
+                pixel_array = pixel_array.reshape(self.NumberOfFrames, self.Rows, self.Columns)
         else:
             if self.SamplesPerPixel > 1:
                 if self.BitsAllocated == 8:
                     if self.PlanarConfiguration == 0:
-                        arr = arr.reshape(self.Rows, self.Columns, self.SamplesPerPixel)
+                        pixel_array = pixel_array.reshape(self.Rows, self.Columns, self.SamplesPerPixel)
                     else:
-                        arr = arr.reshape(self.SamplesPerPixel, self.Rows, self.Columns)
-                        arr = arr.transpose(1, 2, 0)
+                        pixel_array = pixel_array.reshape(self.SamplesPerPixel, self.Rows, self.Columns)
+                        pixel_array = pixel_array.transpose(1, 2, 0)
                 else:
                     raise NotImplementedError("This code only handles SamplesPerPixel > 1 if Bits Allocated = 8")
             else:
-                arr = arr.reshape(self.Rows, self.Columns)
-        return arr
+                pixel_array = pixel_array.reshape(self.Rows, self.Columns)
+        return pixel_array
 
     # Use by pixel_array property
     def _get_pixel_array(self):
-        # Check if pixel data is in a form we know how to make into an array
-        # XXX uses file_meta here, should really only be thus for FileDataset
-        if self.file_meta.TransferSyntaxUID not in NotCompressedPixelTransferSyntaxes:
-            raise NotImplementedError("Pixel Data is compressed in a format pydicom does not yet handle. Cannot return array")
-
         # Check if already have converted to a NumPy array
         # Also check if self.PixelData has changed. If so, get new NumPy array
         already_have = True
@@ -437,7 +491,7 @@ class Dataset(dict):
             already_have = False
         if not already_have:
             self._pixel_array = self._pixel_data_numpy()
-            self._pixel_id = id(self.PixelData)  # is this guaranteed to work if memory is re-used??
+            self._pixel_id = id(self.PixelData)  # FIXME is this guaranteed to work if memory is re-used??
         return self._pixel_array
 
     @property
