@@ -362,7 +362,7 @@ class Dataset(dict):
             yield self[tag]
 
     def _is_uncompressed_transfer_syntax(self):
-        # XXX uses file_meta here, should really only be thus for FileDataset
+        # FIXME uses file_meta here, should really only be thus for FileDataset
         return self.file_meta.TransferSyntaxUID in NotCompressedPixelTransferSyntaxes
 
     def _pixel_data_numpy(self):
@@ -386,6 +386,10 @@ class Dataset(dict):
         if 'PixelData' not in self:
             raise TypeError("No pixel data found in this dataset.")
         
+        # There are three cases:
+        # 1) uncompressed PixelData -> use numpy
+        # 2) compressed PixelData, filename is available and GDCM is available -> use GDCM
+        # 3) throw
         if self._is_uncompressed_transfer_syntax():
             # Make NumPy format code, e.g. "uint16", "int32" etc
             # from two pieces of info:
@@ -405,12 +409,7 @@ class Dataset(dict):
                 numpy_dtype.newbyteorder('S')
             
             pixel_bytearray = self.PixelData
-        else:
-            # if the transfer syntax is not supported, we can fall back to GDCM
-            if not self.filename:
-                msg = "GDCM is only supported when the dataset has been created with a filename."
-                # FIXME it would be really nice if someone knew how to use GDCM with self.PixelData directly
-                raise TypeError(msg)
+        elif have_gdcm and self.filename:
             # read the file using GDCM
             # FIXME this should just use self.PixelData instead of self.filename
             #       but it is unclear how this should be achieved using GDCM
@@ -452,6 +451,11 @@ class Dataset(dict):
             # if GDCM indicates that a byte swap is in order, make sure to inform numpy as well
             if gdcm_image.GetNeedByteSwap():
                 numpy_dtype.newbyteorder('S')
+        else:
+            if have_gdcm and not self.filename:
+                raise NotImplementedError("GDCM is only supported when the dataset has been created with a filename.")
+            else:
+                raise NotImplementedError("Pixel Data is compressed in a format pydicom does not yet handle. Cannot return array. Pydicom might be able to convert the pixel data using GDCM if it is installed.")
 
         pixel_array = numpy.fromstring(pixel_bytearray, dtype=numpy_dtype)
 
@@ -479,10 +483,6 @@ class Dataset(dict):
 
     # Use by pixel_array property
     def _get_pixel_array(self):
-        # Check if pixel data is in a form we know how to make into an array
-        if not self._is_uncompressed_transfer_syntax() and not have_gdcm:
-            raise NotImplementedError("Pixel Data is compressed in a format pydicom does not yet handle. Cannot return array. Pydicom might be able to convert the pixel data using GDCM if it is installed.")
-
         # Check if already have converted to a NumPy array
         # Also check if self.PixelData has changed. If so, get new NumPy array
         already_have = True
