@@ -406,7 +406,7 @@ class Dataset(dict):
             except TypeError:
                 msg = ("Data type not understood by NumPy: "
                        "format='%s', PixelRepresentation=%d, BitsAllocated=%d")
-                raise TypeError(msg % (numpy_dtype, self.PixelRepresentation,
+                raise TypeError(msg % (format_str, self.PixelRepresentation,
                                 self.BitsAllocated))
         
             if self.is_little_endian != sys_is_little_endian:
