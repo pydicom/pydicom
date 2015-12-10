@@ -40,7 +40,7 @@ sys_is_little_endian = (sys.byteorder == 'little')
 have_numpy = True
 try:
     import numpy
-except:
+except ImportError:
     have_numpy = False
 
 have_gdcm = True
@@ -52,7 +52,7 @@ except:
 stat_available = True
 try:
     from os import stat
-except:
+except ImportError:
     stat_available = False
 
 

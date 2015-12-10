@@ -39,7 +39,7 @@ def write_numbers(fp, data_element, struct_format):
     try:
         try:
             value.append   # works only if list, not if string or number
-        except:  # is a single value - the usual case
+        except AttributeError:  # is a single value - the usual case
             fp.write(pack(format_string, value))
         else:
             for val in value:

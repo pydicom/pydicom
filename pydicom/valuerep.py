@@ -16,6 +16,8 @@ from datetime import date, datetime, time
 from dateutil.tz import tzoffset
 import re
 
+from pydicom.config import logger
+
 default_encoding = "iso8859"  # can't import from charset or get circular import
 
 # For reading/writing data elements, these ones have longer explicit VR format
@@ -24,8 +26,6 @@ extra_length_VRs = ('OB', 'OW', 'OF', 'SQ', 'UN', 'UT')
 # VRs that can be affected by character repertoire in (0008,0005) Specific Character Set
 # See PS-3.5 (2011), section 6.1.2 Graphic Characters
 text_VRs = ('SH', 'LO', 'ST', 'LT', 'UT')  # and PN, but it is handled separately.
-
-import re
 
 match_string = b''.join([
     b'(?P<single_byte>',

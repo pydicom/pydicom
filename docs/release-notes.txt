@@ -2,7 +2,7 @@
 ----
 = Release Notes pydicom 0.9.9 =
 
-In addition to bug fixes, pydicom 0.9.9 contains updates for all dicom dictionaries. 
+In addition to bug fixes, pydicom 0.9.9 contains updates for all dicom dictionaries.
 New features include DICOMDIR handling, and a utility module which produces python/pydicom source code to recreate a dicom file.
 
 == Major changes / enhancements ==
@@ -13,13 +13,13 @@ New features include DICOMDIR handling, and a utility module which produces pyth
   * a number of python 3 compatibility enhancements
   * setup.py uses ez_setup only if setuptools not already installed
   * exceptions carry tag info with them, to aid in debugging
-  
+
 == Contrib file changes ==
   * pydicom_series:  force parameter added (Nil Goyette)
   * dcm_qt_tree: switch to OrderedDict to preserve ordering of tags (Padraig Looney)
 
 == Other Contributors ==
-Other than Jonathan and myself, other contributors were: 
+Other than Jonathan and myself, other contributors were:
 Rickard Holmberg, Julien Lamy, Yaroslav Halchenko, Mark White, Matthew Brett, Dimitri Papadopoulos, videan42 ...(sorry if I've missed anyone).
 
 
@@ -54,7 +54,7 @@ Special acknowledgement to Jonathan Suever who contributed most of the python 3 
 = Release notes for pydicom 0.9.7 =
 
 pydicom 0.9.7 resolves some remaining bugs before moving to python 3 compatibility.
-** It is the last version which will run with python < 2.6 ** (it will run with 
+** It is the last version which will run with python < 2.6 ** (it will run with
 python2.4 to python2.7)
 
 == Major changes ==
@@ -63,7 +63,7 @@ python2.4 to python2.7)
   For example:
     * SamplesperPixel becomes SamplesPerPixel (capital 'P' on 'Per')
     * Beams becomes BeamSequence (and similar for all sequences)
-  * Decimal and integer strings handled much better (revisions 4ed698a7bfbe and c313d2befb08). 
+  * Decimal and integer strings handled much better (revisions 4ed698a7bfbe and c313d2befb08).
     * New classes for VR of types DS and IS (DS is derived from python Decimal)
     * New MultiValue class, enforcing all values of same type
     * New config.py file with user-definable parameters:
@@ -72,8 +72,8 @@ python2.4 to python2.7)
       * enforce_valid_values (default True) for ensuring IS, DS meet DICOM standard limits
       To change these, use 'import dicom.config, then dicom.config.<parameter>={True|False}'
       before setting values of data elements
-    
-Users are encouraged to switch to the official DICOM keywords, as these are now part of 
+
+Users are encouraged to switch to the official DICOM keywords, as these are now part of
 the standard, and promote consistency across programming languages and libraries.
 
 == Bug fixes ==
@@ -84,7 +84,7 @@ the standard, and promote consistency across programming languages and libraries
   * Force logging level to warning on 'import dicom' (issue 102)
   * Deferred read fixed to work with gzipped files (issue 103)
   * Setting individual items in a DS or IS list now saves to file correctly
-  * Japanese and Korean encoding fixes (issue 110) 
+  * Japanese and Korean encoding fixes (issue 110)
 
 == Other Enhancements ==
   * New Sequence class which verifies items are Datasets (issue 52)
@@ -93,27 +93,28 @@ the standard, and promote consistency across programming languages and libraries
   * Added much more debugging info and simplified reading of data elements (revision b6b3658f3b14)
   * updated example files to DICOM 2011 keywords; fixed bugs
 
-Many of the bug fixes/enhancements were submitted by users. Many thanks to 
+Many of the bug fixes/enhancements were submitted by users. Many thanks to
 those who contributed.
+
 
 = Release notes for pydicom 0.9.6 =
 
 pydicom 0.9.6 updates the dictionary to the DICOM 2011 standard, and has a number of bug fixes
 
-== Major changes == 
+== Major changes ==
   * updated the dictionary to the DICOM 2011 standard's dictionary.
-  
+
 == Bug fixes ==
   * Fixed bug in Dataset.file_metadata() and deprecated in favor of FileDataset (issue 93)
   * Fixed UID comparisons against non-string values (issue 96)
   * catch exceptions on reading undefined length private data elements (issue 91, issue 97)
   * Fixed bug in raising exception for unknown tag
-  
+
 == Other ==
   * added example file write_new.py to show how to create DICOM files from scratch
   * updated other example files
   * more PEP-8 style changes
-  
+
 
 = Release notes for pydicom 0.9.5 =
 
@@ -142,10 +143,10 @@ file (unless read_file keyword arg {{{force}}} is True) (revision fc790f01f5)
   * preliminary work on using sphinx for documentation
   * preliminary work on better writing of files from scratch
 
-  
+
 = Release notes for pydicom 0.9.4 =
 
-*NOTE:* 
+*NOTE:*
   * there is a *backwards incompatible* change made to storage of file_meta info. See item below.
   * pydicom 0.9.4 requires python 2.4 or higher (pydicom 0.9.3 can run under python 2.3)
 
@@ -177,7 +178,7 @@ file (unless read_file keyword arg {{{force}}} is True) (revision fc790f01f5)
   * option to defer reading of large data element values using read_file()'s new defer_size argument (r102, r103)
   * dictionary of private tags added -- descriptive text shown when available (issue36, r97, r110)
   * more conversion to PEP-8 style. Should now use read_file(), save_as(), pixel_array rather than !ReadFile(), !SaveAs(), !PixelArray. Old names kept for now as aliases.
-  
+
 == Other Enhancements ==
   * added DicomFileLike class to simplify and generalize access. Any object that has read, write, seek, tell, and close can now be used. (r105)
   * added dataset.iterall() function to iterate through all items (including inside sequences) (r105)
@@ -190,10 +191,11 @@ file (unless read_file keyword arg {{{force}}} is True) (revision fc790f01f5)
   * fixed issue41, reading VRs of 'US or SS' and similar split on backslash character (r104)
   * fixed bug where TransferSyntaxUID not present when reading file without DICOM header (r109)
   * fixed print recursion bug when printing a UID (r111)
-  
+
 == Other ==
   * many of the example files updated
   * updated anonymize example file to also deal with 'OtherPatientIDs' and 'PatientsBirthDate' (r98)
+
 
 = Release notes for pydicom 0.9.2 =
 

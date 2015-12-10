@@ -11,7 +11,7 @@ from PySide import QtGui
 import collections
 
 
-class DicomTree:
+class DicomTree(object):
 
     def __init__(self, filename):
         self.filename = filename

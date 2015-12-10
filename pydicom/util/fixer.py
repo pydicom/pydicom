@@ -36,7 +36,7 @@ def fix_separator_callback(raw_elem, **kwargs):
         return_val = raw_elem._replace(value=new_value)
 
     return return_val
-    
+
 
 def fix_separator(invalid_separator, for_VRs=["DS", "IS"],
                   process_unknown_VRs=True):

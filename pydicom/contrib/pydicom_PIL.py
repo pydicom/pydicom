@@ -24,13 +24,13 @@ and Python Imaging Library:   http://www.pythonware.com/products/pil/
 have_PIL = True
 try:
     import PIL.Image
-except:
+except ImportError:
     have_PIL = False
 
 have_numpy = True
 try:
     import numpy as np
-except:
+except ImportError:
     have_numpy = False
 
 

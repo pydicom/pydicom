@@ -73,7 +73,7 @@ save_as(self, filename, write_like_original=True) method of pydicom.dataset.File
 <BLANKLINE>
     :param filename: full path and filename to save the file to
     :write_like_original: see pydicom.filewriter.write_file for info on this parameter.
-<BLANKLINE>  
+<BLANKLINE>
 >>> plan.save_as("rtplan_gantry90.dcm")
 >>> plan_g90 = pydicom.read_file("rtplan_gantry90.dcm")
 >>> plan_g90.BeamSequence[0].ControlPointSequence[0].GantryAngle

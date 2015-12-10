@@ -24,7 +24,7 @@ from pydicom.config import logger
 stat_available = True
 try:
     from os import stat
-except:
+except ImportError:
     stat_available = False
 
 from pydicom.errors import InvalidDicomError

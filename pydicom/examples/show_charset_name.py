@@ -10,7 +10,7 @@ from pydicom.valuerep import PersonNameUnicode
 
 if compat.in_py2:
     import Tkinter as tkinter
-else:   
+else:
     import tkinter
 
 default_encoding = 'iso8859'

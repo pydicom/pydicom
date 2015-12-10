@@ -38,21 +38,21 @@ class dicomfile(object):
 
     def __exit__(self, exc_type, exc_value, traceback):
         self.fobj.close()
-    
+
     def __iter__(self):
         # Need the transfer_syntax later
         transfer_syntax_uid = None
 
         # Yield the file meta info elements
         file_meta_gen = data_element_generator(self.fobj, is_implicit_VR=False,
-                             is_little_endian=True, 
+                             is_little_endian=True,
                              stop_when=lambda gp, elem: gp != 2)
         for data_elem in file_meta_gen:
             if data_elem[0] == (0x0002, 0x0010):
                 transfer_syntax_uid = data_elem[3]
             yield data_elem
 
-        # Continue to yield elements from the main data        
+        # Continue to yield elements from the main data
         if transfer_syntax_uid:
             if transfer_syntax_uid.endswith(b' ') or \
                          transfer_syntax_uid.endswith(b'\0'):
@@ -64,7 +64,7 @@ class dicomfile(object):
 
         ds_gen = data_element_generator(self.fobj, is_implicit_VR, is_little_endian)
         for data_elem in ds_gen:
-            yield data_elem        
+            yield data_elem
 
         raise StopIteration
 
@@ -86,7 +86,7 @@ def transfer_syntax(uid):
     elif uid == DeflatedExplicitVRLittleEndian:
         raise NotImplementedError("This reader does not handle deflate files")
     else:
-        # PS 3.5-2008 A.4 (p63): other syntax (e.g all compressed) 
+        # PS 3.5-2008 A.4 (p63): other syntax (e.g all compressed)
         #    should be Explicit VR Little Endian,
         is_implicit_VR = False
     return is_implicit_VR, is_little_endian
@@ -176,7 +176,7 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian,
             if VR == b'SQ':
                 yield ((group, elem), VR, length, None, value_tell)
                 # seq = read_sequence(fp, is_implicit_VR,
-                #                    is_little_endian, length, encoding)
+                #                     is_little_endian, length, encoding)
                 # yield DataElement(tag, VR, seq, value_tell,
                 #                   is_undefined_length=True)
             else:

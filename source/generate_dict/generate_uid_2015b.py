@@ -5,10 +5,10 @@
 
 """
     Reformat the UID list (Table A-1 PS3.6-2015b) from the PS3.6 docbook file to Python syntax
-    
+
     Write the dict element as:
     UID: (name, type, info, is_retired)
-    
+
     info is extra information extracted from very long names, e.g.
         which bit size a particular transfer syntax is default for
     is_retired is 'Retired' if true, else ''
@@ -27,44 +27,44 @@ dict_name = 'UID_dictionary'
 
 def write_dict(f, dict_name, attributes):
     entry_format = """'{UID Value}': ('{UID Name}', '{UID Type}', '{UID Info}', '{Retired}')"""
-        
+
     f.write("\n%s = {\n    " % dict_name)
     f.write(",\n    ".join(entry_format.format(**attr) for attr in attributes))
     f.write("\n}\n")
 
 def parse_docbook_table(book_root, caption, empty_field_name="Retired"):
-    """ Parses the given XML book_root for the table with caption matching caption for DICOM Element data 
-    
+    """ Parses the given XML book_root for the table with caption matching caption for DICOM Element data
+
     Returns a list of dicts with each dict representing the data for an Element from the table
     """
-    
+
     br = '{http://docbook.org/ns/docbook}' # Shorthand variable
-    
+
     # Find the table in book_root with caption
     for table in book_root.iter('%stable' %br):
         if table.find('%scaption' %br).text == caption:
-            
+
             def parse_row(column_names, row):
-                """ Parses the table's tbody tr row, row, for the DICOM Element data 
-                
+                """ Parses the table's tbody tr row, row, for the DICOM Element data
+
                 Returns a list of dicts {header1 : val1, header2 : val2, ...} with each list an Element
                 """
-                
+
                 cell_values = []
-                
+
                 # The row should be <tbody><tr>...</tr></tbody>
                 # Which leaves the following:
                 #   <td><para>Value 1</para></td>
                 #   <td><para>Value 2</para></td>
                 #   etc...
-                # Some rows are 
+                # Some rows are
                 #   <td><para><emphasis>Value 1</emphasis></para></td>
                 #   <td><para><emphasis>Value 2</emphasis></para></td>
                 #   etc...
                 # There are also some without text values
                 #   <td><para/></td>
                 #   <td><para><emphasis/></para></td>
-                
+
                 for cell in row.iter('%spara' %br):
                     # If we have an emphasis tag under the para tag
                     emph_value = cell.find('%semphasis' %br)
@@ -80,20 +80,20 @@ def parse_docbook_table(book_root, caption, empty_field_name="Retired"):
                             cell_values.append(cell.text.strip().replace(u"\u200b", ""))
                         else:
                             cell_values.append("")
-                
+
                 cell_values[3] = ''
                 cell_values.append('')
-                
+
                 if '(Retired)' in cell_values[1]:
                     cell_values[4] = 'Retired'
                     cell_values[1] = cell_values[1].replace('(Retired)', '').strip()
-                
+
                 if ':' in cell_values[1]:
                     cell_values[3] = cell_values[1].split(':')[-1].strip()
                     cell_values[1] = cell_values[1].split(':')[0].strip()
-                
+
                 return {key : value for key, value in zip(column_names, cell_values)}
-            
+
             # Get all the Element data from the table
             column_names = ['UID Value', 'UID Name', 'UID Type', 'UID Info', 'Retired']
             attrs = [parse_row(column_names, row) for row in table.find('%stbody' %br).iter('%str' %br)]
