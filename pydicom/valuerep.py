@@ -269,7 +269,7 @@ class DSfloat(float):
             return super(DSfloat, self).__str__()
 
     def __repr__(self):
-        return "'" + str(self) + "'"
+        return "\"" + str(self) + "\""
 
 
 class DSdecimal(Decimal):
@@ -334,7 +334,7 @@ class DSdecimal(Decimal):
             return super(DSdecimal, self).__str__()
 
     def __repr__(self):
-        return "'" + str(self) + "'"
+        return "\"" + str(self) + "\""
 
 # CHOOSE TYPE OF DS
 if config.use_DS_decimal:
@@ -393,7 +393,7 @@ class IS(int):
         if hasattr(self, 'original_string'):
             return "'" + self.original_string + "'"
         else:
-            return "'" + int.__str__(self) + "'"
+            return "\"" + int.__str__(self) + "\""
 
 
 def MultiString(val, valtype=str):
