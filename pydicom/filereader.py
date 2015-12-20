@@ -127,7 +127,7 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian,
         If None (default), then the whole file is read.
         A callable which takes tag, VR, length,
         and returns True or False. If it returns True,
-        read_data_element will raise StopIteration.
+        read_data_element will just return.
     defer_size : int, str, None, optional
         See ``read_file`` for parameter info.
     encoding :
@@ -187,7 +187,7 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian,
         # Read tag, VR, length, get ready to read value
         bytes_read = fp_read(8)
         if len(bytes_read) < 8:
-            raise StopIteration  # at end of file
+            return  # at end of file
         if debugging:
             debug_msg = "{0:08x}: {1}".format(fp.tell() - 8,
                                               bytes2hex(bytes_read))
@@ -228,7 +228,7 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian,
                 if not is_implicit_VR and VR in extra_length_VRs:
                     rewind_length += 4
                 fp.seek(value_tell - rewind_length)
-                raise StopIteration
+                return
 
         # Reading the value
         # First case (most common): reading a value with a defined length
