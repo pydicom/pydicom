@@ -15,7 +15,7 @@ from pydicom import config  # don't import datetime_conversion directly
 from pydicom import compat
 from pydicom.config import logger
 from pydicom.datadict import dictionary_has_tag, dictionary_description
-from pydicom.datadict import private_dictionary_description, dictionaryVR
+from pydicom.datadict import private_dictionary_description, dictionary_VR
 from pydicom.tag import Tag
 from pydicom.uid import UID
 import pydicom.valuerep  # don't import DS directly as can be changed by config
@@ -317,7 +317,7 @@ def DataElement_from_raw(raw_data_element, encoding=None):
     VR = raw.VR
     if VR is None:  # Can be if was implicit VR
         try:
-            VR = dictionaryVR(raw.tag)
+            VR = dictionary_VR(raw.tag)
         except KeyError:
             if raw.tag.is_private:
                 VR = 'OB'  # just read the bytes, no way to know what they mean

@@ -7,39 +7,40 @@
 
 import unittest
 from pydicom.tag import Tag
-from pydicom.datadict import CleanName, all_names_for_tag, dictionary_description
+from pydicom.dataset import Dataset
+from pydicom.datadict import keyword_for_tag
+from pydicom.datadict import dictionary_description
+from pydicom.datadict import add_dict_entry, add_dict_entries
 
 
 class DictTests(unittest.TestCase):
-    def testCleanName(self):
-        """dicom_dictionary: CleanName returns correct strings............."""
-        self.assertTrue(CleanName(0x00100010) == "PatientsName")
-        self.assertTrue(CleanName(Tag((0x0010, 0x0010))) == "PatientsName")
-
     def testTagNotFound(self):
-        """dicom_dictionary: CleanName returns blank string for unknown tag"""
-        self.assertTrue(CleanName(0x99991111) == "")
-
-    def testNameFinding(self):
-        """dicom_dictionary: get long and short names for a data_element name"""
-        names = all_names_for_tag(Tag(0x300a00b2))  # Treatment Machine Name
-        expected = ['TreatmentMachineName']
-        self.assertEqual(names, expected, "Expected %s, got %s" % (expected, names))
-        names = all_names_for_tag(Tag(0x300A0120))
-        expected = ['BeamLimitingDeviceAngle', 'BLDAngle']
-        self.assertEqual(names, expected, "Expected %s, got %s" % (expected, names))
+        """dicom_dictionary: keyword_for_tag returns a blank string for unknown tag"""
+        self.assertTrue(keyword_for_tag(0x99991111) == "")
 
     def testRepeaters(self):
         """dicom_dictionary: Tags with "x" return correct dict info........"""
         self.assertEqual(dictionary_description(0x280400), 'Transform Label')
         self.assertEqual(dictionary_description(0x280410), 'Rows For Nth Order Coefficients')
 
+    def testAddEntry(self):
+        """dicom_dictionary: Can add and use a single dictionary entry....."""
+        add_dict_entry(0x10011001, "UL", "TestOne", "Test One")
+        add_dict_entry(0x10011002, "DS", "TestTwo", "Test Two", VM='3')
+        ds = Dataset()
+        ds.TestOne = 'test'
+        ds.TestTwo = ['1', '2', '3']
 
-class PrivateDictTests(unittest.TestCase):
-    def testPrivate1(self):
-        """private dict: """
-        self.assertTrue(CleanName(0x00100010) == "PatientsName")
-        self.assertTrue(CleanName(Tag((0x0010, 0x0010))) == "PatientsName")
+    def testAddEntries(self):
+        """dicom_dictionary: Can add and use a dict of new dictionary entries..."""
+        new_dict_items = {
+            0x10011001: ('UL', '1', "Test One", '', 'TestOne'),
+            0x10011002: ('DS', '3', "Test Two", '', 'TestTwo'),
+            }
+        add_dict_entries(new_dict_items)
+        ds = Dataset()
+        ds.TestOne = 'test'
+        ds.TestTwo = ['1', '2', '3']
 
 
 if __name__ == "__main__":
