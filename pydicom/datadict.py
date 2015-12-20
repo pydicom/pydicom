@@ -34,6 +34,91 @@ def mask_match(tag):
     return None
 
 
+def add_dict_entry(tag, VR, keyword, description, VM='1', is_retired=''):
+    """Update pydicom's DICOM dictionary with a new entry.
+
+    Notes
+    ----
+    Dose not permanently update the dictionary, but only during run-time.
+    Will replace an existing entry if the tag already exists in the dictionary.
+    
+    Parameters
+    ----------
+    tag : int
+        The tag number for the new dictionary entry
+    VR : str
+        DICOM value representation
+    description : str
+        The descriptive name used in printing the entry.
+        Often the same as the keyword, but with spaces between words.
+    VM : str, optional
+        DICOM value multiplicity. If not specified, then '1' is used.
+    is_retired : str, optional
+        Usually leave as blank string (default).
+        Set to 'Retired' if is a retired data element.
+
+
+    See Also
+    --------
+    pydicom.examples.add_dict_entry
+        Example file which shows how to use this function
+    add_dict_entries
+        Update multiple values at once.
+    
+    Examples
+    --------
+    >>> add_dict_entry(0x10011001, "UL", "TestOne", "Test One")
+    >>> add_dict_entry(0x10011002, "DS", "TestTwo", "Test Two", VM='3')
+    >>> ds = Dataset()
+    >>> ds.TestOne = 'test'
+    >>> ds.TestTwo = ['1', '2', '3']
+    
+    """
+    new_dict_val = (VR, VM, description, is_retired, keyword)
+    add_dict_entries({tag: new_dict_val})
+
+
+def add_dict_entries(new_entries_dict):
+    """Update pydicom's DICOM dictionary with new entries.
+
+    Parameters
+    ----------
+    new_entries_dict : dict
+        Dictionary of form:
+        {tag: (VR, VM, description, is_retired, keyword),...}
+        where parameters are as described in add_dict_entry
+    
+    See Also
+    --------
+    add_dict_entry
+        Simpler function to add a single entry to the dictionary.
+
+    Examples
+    --------
+    >>> new_dict_items = {
+            0x10011001: ('UL', '1', "Test One", '', 'TestOne'),
+            0x10011002: ('DS', '3', "Test Two", '', 'TestTwo'),
+            }
+    >>> add_dict_entries(new_dict_items)
+    >>> ds = Dataset()
+    >>> ds.TestOne = 'test'
+    >>> ds.TestTwo = ['1', '2', '3']
+    
+}
+    add_dict_entry(0x10011001, "UL", "TestOne", "Test One")
+    >>> ds = Dataset()
+    >>> ds.TestOne = 'test'
+    
+    """
+    # Update the dictionary itself
+    DicomDictionary.update(new_entries_dict)
+
+    # Update the reverse mapping from name to tag
+    new_names_dict = dict([(val[4], tag) for tag, val in
+                       new_entries_dict.items()])
+    keyword_dict.update(new_names_dict)
+
+
 def get_entry(tag):
     """Return the tuple (VR, VM, name, is_retired, keyword) from the DICOM dictionary
 
