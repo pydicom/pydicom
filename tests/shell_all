@@ -6,7 +6,10 @@ echo ------- python 2.6 ------------
 python2.6 run_tests.py
 echo ------- python 2.7 ------------
 python2.7 run_tests.py
-
+echo ----------
+echo python 3.4 
+echo ----------
+python3.4 run_tests.py
 # Check location for each version -- to make sure are not running old pydicom versions
 echo -
 echo -----------------
@@ -15,3 +18,5 @@ echo Python 2.6
 python2.6 -c "import pydicom;print pydicom.__file__"
 echo Python 2.7
 python2.7 -c "import pydicom;print pydicom.__file__"
+echo Python 3.4
+python3.4 -c "import pydicom;print(pydicom.__file__)"
