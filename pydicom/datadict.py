@@ -26,17 +26,7 @@ for mask_x in RepeatersDictionary:
     mask2 = int("".join(["F0"[c == "x"] for c in mask_x]), 16)
     masks[mask_x] = (mask1, mask2)
 
-# For shorter naming of dicom member elements, put an entry here
-#   (longer naming can also still be used)
-# The descriptive name must start with the long version (not replaced if internal)
-shortNames = [
-    ("BeamLimitingDevice", "BLD"),
-    ("RTBeamLimitingDevice", "RTBLD"),
-    ("ControlPoint", "CP"),
-    ("Referenced", "Refd")
-]
-
-
+    
 def mask_match(tag):
     for mask_x, (mask1, mask2) in masks.items():
         if (tag ^ mask1) & mask2 == 0:
@@ -50,6 +40,10 @@ def get_entry(tag):
     If the entry is not in the main dictionary, check the masked ones,
     e.g. repeating groups like 50xx, etc.
     """
+    # Note: tried the lookup with 'if tag in DicomDictionary' 
+    #    and with DicomDictionary.get, instead of try/except
+    #    Try/except was fastest using timeit if tag is valid (usual case)
+    #    My test had 5.2 usec vs 8.2 for 'contains' test, vs 5.32 for dict.get
     tag = Tag(tag)
     try:
         return DicomDictionary[tag]
@@ -61,19 +55,24 @@ def get_entry(tag):
             raise KeyError("Tag {0} not found in DICOM dictionary".format(tag))
 
 
+def dictionary_VR(tag):
+    """Return the dicom value representation for the given dicom tag."""
+    return get_entry(tag)[0]
+
+
+def dictionary_VM(tag):
+    """Return the dicom value multiplicity for the given dicom tag."""
+    return get_entry(tag)[1]
+
+
 def dictionary_description(tag):
     """Return the descriptive text for the given dicom tag."""
     return get_entry(tag)[2]
 
 
-def dictionaryVM(tag):
-    """Return the dicom value multiplicity for the given dicom tag."""
-    return get_entry(tag)[1]
-
-
-def dictionaryVR(tag):
-    """Return the dicom value representation for the given dicom tag."""
-    return get_entry(tag)[0]
+def dictionary_keyword(tag):
+    """Return the official DICOM standard (since 2011) keyword for the tag"""
+    return get_entry(tag)[4]
 
 
 def dictionary_has_tag(tag):
@@ -81,25 +80,8 @@ def dictionary_has_tag(tag):
     return (tag in DicomDictionary)
 
 
-def dictionary_keyword(tag):
-    """Return the official DICOM standard (since 2011) keyword for the tag"""
-    return get_entry(tag)[4]
-
-# Set up a translation table for "cleaning" DICOM descriptions
-#    for backwards compatibility pydicom < 0.9.7 (before DICOM keywords)
-# Translation is different with unicode - see .translate() at
-#        http://docs.python.org/library/stdtypes.html#string-methods
-chars_to_remove = r""" !@#$%^&*(),;:.?\|{}[]+-="'’/"""
-if not in_py2:  # i.e. unicode strings
-    translate_table = dict((ord(char), None) for char in chars_to_remove)
-else:
-    import string
-    translate_table = string.maketrans('', '')
-
-
 def keyword_for_tag(tag):
-    """Return the DICOM keyword for the given tag. Replaces old CleanName()
-    method using the 2011 DICOM standard keywords instead.
+    """Return the DICOM keyword for the given tag. 
 
     Will return GroupLength for group length tags,
     and returns empty string ("") if the tag doesn't exist in the dictionary.
@@ -109,99 +91,14 @@ def keyword_for_tag(tag):
     except KeyError:
         return ""
 
-
-def CleanName(tag):
-    """Return the dictionary descriptive text string but without bad characters.
-
-    Used for e.g. *named tags* of Dataset instances (before DICOM keywords were
-    part of the standard)
-
-    """
-    tag = Tag(tag)
-    if tag not in DicomDictionary:
-        if tag.element == 0:    # 0=implied group length in DICOM versions < 3
-            return "GroupLength"
-        else:
-            return ""
-    s = dictionary_description(tag)    # Descriptive name in dictionary
-    # remove blanks and nasty characters
-    if not in_py2:
-        s = s.translate(translate_table)
-    else:
-        s = s.translate(translate_table, chars_to_remove)
-
-    # Take "Sequence" out of name (pydicom < 0.9.7)
-    # e..g "BeamSequence"->"Beams"; "ReferencedImageBoxSequence"->"ReferencedImageBoxes"
-    # 'Other Patient ID' exists as single value AND as sequence so check for it and leave 'Sequence' in
-    if dictionaryVR(tag) == "SQ" and not s.startswith("OtherPatientIDs"):
-        if s.endswith("Sequence"):
-            s = s[:-8] + "s"
-            if s.endswith("ss"):
-                s = s[:-1]
-            if s.endswith("xs"):
-                s = s[:-1] + "es"
-            if s.endswith("Studys"):
-                s = s[:-2] + "ies"
-    return s
-
-# Provide for the 'reverse' lookup. Given clean name, what is the tag?
-logger.debug("Reversing DICOM dictionary so can look up tag from a name...")
-NameDict = dict([(CleanName(tag), tag) for tag in DicomDictionary])
+# Provide for the 'reverse' lookup. Given the keyword, what is the tag?
+logger.debug("Reversing DICOM dictionary so can look up tag from a keyword...")
 keyword_dict = dict([(dictionary_keyword(tag), tag) for tag in DicomDictionary])
 
 
-def short_name(name):
-    """Return a short *named tag* for the corresponding long version.
-
-    Return a blank string if there is no short version of the name.
-
-    """
-    for longname, shortname in shortNames:
-        if name.startswith(longname):
-            return name.replace(longname, shortname)
-    return ""
-
-
-def long_name(name):
-    """Return a long *named tag* for the corresponding short version.
-
-    Return a blank string if there is no long version of the name.
-
-    """
-
-    for longname, shortname in shortNames:
-        if name.startswith(shortname):
-            return name.replace(shortname, longname)
-    return ""
-
-
-def tag_for_name(name):
-    """Return the dicom tag corresponding to name, or None if none exist."""
-    if name in keyword_dict:  # the usual case
-        return keyword_dict[name]
-    # If not an official keyword, check the old style pydicom names
-    if name in NameDict:
-        tag = NameDict[name]
-        msg = ("'%s' as tag name has been deprecated; use official DICOM keyword '%s'"
-               % (name, dictionary_keyword(tag)))
-        warnings.warn(msg, DeprecationWarning)
-        return tag
-
-    # check if is short-form of a valid name
-    longname = long_name(name)
-    if longname:
-        return NameDict.get(longname, None)
-    return None
-
-
-def all_names_for_tag(tag):
-    """Return a list of all (long and short) names for the tag"""
-    longname = keyword_for_tag(tag)
-    shortname = short_name(longname)
-    names = [longname]
-    if shortname:
-        names.append(shortname)
-    return names
+def tag_for_keyword(keyword):
+    """Return the dicom tag corresponding to keyword, or None if none exist."""
+    return keyword_dict.get(keyword)
 
 
 # PRIVATE DICTIONARY handling
@@ -230,16 +127,18 @@ def get_private_entry(tag, private_creator):
     return dict_entry
 
 
+def private_dictionary_VR(tag, private_creator):
+    """Return the dicom value representation for the given dicom tag."""
+    return get_private_entry(tag, private_creator)[0]
+
+
+def private_dictionary_VM(tag, private_creator):
+    """Return the dicom value multiplicity for the given dicom tag."""
+    return get_private_entry(tag, private_creator)[1]
+
+
 def private_dictionary_description(tag, private_creator):
     """Return the descriptive text for the given dicom tag."""
     return get_private_entry(tag, private_creator)[2]
 
 
-def private_dictionaryVM(tag, private_creator):
-    """Return the dicom value multiplicity for the given dicom tag."""
-    return get_private_entry(tag, private_creator)[1]
-
-
-def private_dictionaryVR(tag, private_creator):
-    """Return the dicom value representation for the given dicom tag."""
-    return get_private_entry(tag, private_creator)[0]

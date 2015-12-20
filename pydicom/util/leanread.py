@@ -164,7 +164,7 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian,
             #   identified as a Sequence
             if VR is None:
                 try:
-                    VR = dictionaryVR(tag)
+                    VR = dictionary_VR(tag)
                 except KeyError:
                     # Look ahead to see if it consists of items and is thus a SQ
                     next_tag = TupleTag(unpack(endian_chr + "HH", fp_read(4)))

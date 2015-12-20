@@ -20,7 +20,7 @@ def fix_separator_callback(raw_elem, **kwargs):
     # If elements are implicit VR, attempt to determine the VR
     if raw_elem.VR is None:
         try:
-            VR = datadict.dictionaryVR(raw_elem.tag)
+            VR = datadict.dictionary_VR(raw_elem.tag)
         # Not in the dictionary, process if flag says to do so
         except KeyError:
             try_replace = kwargs['process_unkown_VR']
