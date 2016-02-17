@@ -60,7 +60,7 @@ class DicomDir(FileDataset):
             sibling_list = [record]
             current_record = record
             while current_record.OffsetOfTheNextDirectoryRecord:
-                offset_of_next = current_record.OffsetoftheNextDirectoryRecord
+                offset_of_next = current_record.OffsetOfTheNextDirectoryRecord
                 sibling = map_offset_to_record[offset_of_next]
                 sibling_list.append(sibling)
                 current_record = sibling
