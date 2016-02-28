@@ -21,7 +21,7 @@ except AttributeError:
 
 from pydicom.filereader import read_file
 from pydicom.filewriter import write_data_element
-from pydicom.dataset import Dataset, FileDataset
+from pydicom.dataset import Dataset, FileDataset, have_numpy
 from pydicom.sequence import Sequence
 from pydicom.multival import MultiValue
 from pydicom.valuerep import DA, DT, TM
@@ -106,6 +106,21 @@ class WriteFileTests(unittest.TestCase):
     def testCT(self):
         """Input file, write back and verify them identical (CT file)....."""
         self.compare(ct_name, ct_out)
+
+    @unittest.skipUnless(have_numpy, "Numpy not installed for write test")    
+    def testCTnumpy(self):
+        """Write a file with PixelData set to a numpy array..............."""
+        # Repeat the compare() code but convert pixel array to numpy ndarray
+        in_filename = ct_name
+        out_filename = ct_out
+        dataset = read_file(in_filename)
+        dataset.PixelData = dataset.pixel_array  
+        dataset.save_as(out_filename)
+        same, pos = files_identical(in_filename, out_filename)
+        self.assertTrue(same,
+                        "Files are not identical - first difference at 0x%x" % pos)
+        if os.path.exists(out_filename):
+            os.remove(out_filename)  # get rid of the file        
 
     def testMR(self):
         """Input file, write back and verify them identical (MR file)....."""

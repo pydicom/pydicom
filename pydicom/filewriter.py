@@ -12,15 +12,17 @@ from pydicom import compat
 from pydicom.config import logger
 
 from pydicom.compat import in_py2
-from pydicom.charset import default_encoding, text_VRs, convert_encodings
+from pydicom.charset import default_encoding, convert_encodings
 from pydicom.uid import ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian
 from pydicom.filebase import DicomFile, DicomFileLike
-from pydicom.dataset import Dataset
+from pydicom.dataset import Dataset, have_numpy
 from pydicom.dataelem import DataElement
 from pydicom.tag import Tag, ItemTag, ItemDelimiterTag, SequenceDelimiterTag
-from pydicom.valuerep import extra_length_VRs
+from pydicom.valuerep import text_VRs, extra_length_VRs
 from pydicom.tagtools import tag_in_exception
 
+if have_numpy:
+    import numpy
 
 def write_numbers(fp, data_element, struct_format):
     """Write a "value" of type struct_format from the dicom file.
@@ -49,8 +51,19 @@ def write_numbers(fp, data_element, struct_format):
 
 
 def write_OBvalue(fp, data_element):
-    """Write a data_element with VR of 'other byte' (OB)."""
-    fp.write(data_element.value)
+    """Write a data_element with VR of 'other byte' (OB).
+    
+    Other VR refer here also, such as 'OB or OW' for pixel data.
+    """
+    # Store 'value' generically, may convert pixel data if it exists,
+    #  and don't want to change data element
+    value = data_element.value
+    
+    # Special case pixel data, convert from numpy array if needed    
+    if data_element.tag == 0x7fe00010 and have_numpy:
+        if isinstance(value, numpy.ndarray):
+            value = value.tostring()
+    fp.write(value)
 
 
 def write_OWvalue(fp, data_element):
@@ -217,7 +230,7 @@ def write_data_element(fp, data_element, encoding=default_encoding):
     """Write the data_element to file fp according to dicom media storage rules.
     """
     fp.write_tag(data_element.tag)
-
+    
     VR = data_element.VR
     if not fp.is_implicit_VR:
         if len(VR) != 2:
@@ -231,7 +244,8 @@ def write_data_element(fp, data_element, encoding=default_encoding):
         if VR in extra_length_VRs:
             fp.write_US(0)   # reserved 2 bytes
     if VR not in writers:
-        raise NotImplementedError("write_data_element: unknown Value Representation '{0}'".format(VR))
+        msg = "write_data_element: unknown Value Representation '{0}'"
+        raise NotImplementedError(msg.format(VR))
 
     length_location = fp.tell()  # save location for later.
     if not fp.is_implicit_VR and VR not in ['OB', 'OW', 'OF', 'SQ', 'UT', 'UN']:
