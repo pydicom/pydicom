@@ -132,7 +132,10 @@ class ReaderTests(unittest.TestCase):
         self.assertEqual(ct.Rows, 128, "Rows not 128")
         self.assertEqual(ct.Columns, 128, "Columns not 128")
         self.assertEqual(ct.BitsStored, 16, "Bits Stored not 16")
-        self.assertEqual(len(ct.PixelData), 128 * 128 * 2, "Pixel data not expected length")
+        # in pydicom v >= 1.0, pixel data auto-converted to numpy.
+        #    Avoid autoconversion using get_item 
+        got = len(ct.get_item(0x7fe00010).value)
+        self.assertEqual(got, 128 * 128 * 2, "Pixel data not expected length")
 
         # Also test private elements name can be resolved:
         expected = "[Duration of X-ray on]"
@@ -145,7 +148,7 @@ class ReaderTests(unittest.TestCase):
         """Check that we can read pixel data. Tests that we get last one in array."""
         ct = read_file(ct_name)
         expected = 909
-        got = ct.pixel_array[-1][-1]
+        got = ct.PixelData[-1][-1]
         msg = "Did not get correct value for last pixel: expected %d, got %r" % (expected, got)
         self.assertEqual(expected, got, msg)
 
@@ -312,8 +315,8 @@ class ReaderTests(unittest.TestCase):
         pl_data_ds = read_file(color_pl_name)
         assert px_data_ds.PlanarConfiguration != pl_data_ds.PlanarConfiguration
         if have_numpy:
-            px_data = px_data_ds.pixel_array
-            pl_data = pl_data_ds.pixel_array
+            px_data = px_data_ds.PixelData
+            pl_data = pl_data_ds.PixelData
             self.assertTrue(numpy.all(px_data == pl_data))
 
 class JPEG2000Tests(unittest.TestCase):
@@ -406,9 +409,17 @@ class DeferredReadTests(unittest.TestCase):
         """Deferred values exactly matches normal read..............."""
         ds_norm = read_file(self.testfile_name)
         ds_defer = read_file(self.testfile_name, defer_size=2000)
-        for data_elem in ds_norm:
-            tag = data_elem.tag
-            self.assertEqual(data_elem.value, ds_defer[tag].value, "Mismatched value for tag %r" % tag)
+
+        for tag in ds_norm.keys():
+            # If pixel data, avoid conversion to numpy array for this test
+            # However, deferred read is always converted when accessed
+            if tag == 0x7fe00010:
+                val1 = ds_norm.get_item(tag).value
+                val2 = ds_defer.PixelData.tostring()
+            else:
+                val1 = ds_norm[tag].value
+                val2 = ds_defer[tag].value
+            self.assertEqual(val1, val2, "Mismatched value for tag %r" % tag)
 
     def testZippedDeferred(self):
         """Deferred values from a gzipped file works.............."""
@@ -448,7 +459,9 @@ class FileLikeTests(unittest.TestCase):
         self.assertEqual(ct.Rows, 128, "Rows not 128")
         self.assertEqual(ct.Columns, 128, "Columns not 128")
         self.assertEqual(ct.BitsStored, 16, "Bits Stored not 16")
-        self.assertEqual(len(ct.PixelData), 128 * 128 * 2, "Pixel data not expected length")
+        got = len(ct.get_item(0x7fe00010).value)  # avoid numpy conversion with get_item
+        self.assertEqual(got, 128 * 128 * 2, "Pixel data not expected length")
+
         # Should also be able to close the file ourselves without exception raised:
         f.close()
 
@@ -462,7 +475,8 @@ class FileLikeTests(unittest.TestCase):
         DS = pydicom.valuerep.DS
         expected = [DS('-158.135803'), DS('-179.035797'), DS('-75.699997')]
         self.assertTrue(got == expected, "ImagePosition(Patient) values not as expected")
-        self.assertEqual(len(ct.PixelData), 128 * 128 * 2, "Pixel data not expected length")
+        got = len(ct.get_item(0x7fe00010).value)  # avoid numpy conversion with get_item
+        self.assertEqual(got, 128 * 128 * 2, "Pixel data not expected length")
         # Should also be able to close the file ourselves without exception raised:
         file_like.close()
 

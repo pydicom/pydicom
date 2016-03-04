@@ -16,7 +16,7 @@ from pydicom.charset import default_encoding, convert_encodings
 from pydicom.uid import ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian
 from pydicom.filebase import DicomFile, DicomFileLike
 from pydicom.dataset import Dataset, have_numpy
-from pydicom.dataelem import DataElement
+from pydicom.dataelem import DataElement, RawDataElement
 from pydicom.tag import Tag, ItemTag, ItemDelimiterTag, SequenceDelimiterTag
 from pydicom.valuerep import text_VRs, extra_length_VRs
 from pydicom.tagtools import tag_in_exception
@@ -256,7 +256,11 @@ def write_data_element(fp, data_element, encoding=default_encoding):
     encoding = convert_encodings(encoding)
 
     writer_function, writer_param = writers[VR]
-    if VR in text_VRs:
+    
+    # If still raw data element, it was never changed.  Write original bytes
+    if isinstance(data_element, RawDataElement):
+        fp.write(data_element.value)
+    elif VR in text_VRs:
         writer_function(fp, data_element, encoding=encoding[1])
     elif VR in ('PN', 'SQ'):
         writer_function(fp, data_element, encoding=encoding)
@@ -296,9 +300,10 @@ def write_dataset(fp, dataset, parent_encoding=default_encoding):
     tags = sorted(dataset.keys())
 
     for tag in tags:
+        # writing raw tags without converting to DataElement if not already done
         with tag_in_exception(tag):
-            # write_data_element(fp, dataset.get_item(tag), dataset_encoding)  XXX for writing raw tags without converting to DataElement
-            write_data_element(fp, dataset[tag], dataset_encoding)
+            write_data_element(fp, dataset.get_item(tag), dataset_encoding)  
+            # write_data_element(fp, dataset[tag], dataset_encoding)
 
     return fp.tell() - fpStart
 

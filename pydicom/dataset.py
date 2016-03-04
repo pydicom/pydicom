@@ -312,6 +312,11 @@ class Dataset(dict):
                 character_set = default_encoding
             # Not converted from raw form read from file yet; do so now
             self[tag] = DataElement_from_raw(data_elem, character_set)
+            
+            # If pixel data, convert value to numpy array before returning
+            # This only happens in this block when converting from raw data elem
+            if tag == 0x7fe00010:
+                self[tag].value = self.pixel_array
         return dict.__getitem__(self, tag)
 
     def get_item(self, key):
@@ -412,7 +417,9 @@ class Dataset(dict):
             if self.is_little_endian != sys_is_little_endian:
                 numpy_dtype.newbyteorder('S')
             
-            pixel_bytearray = self.PixelData
+            # Read pixel data directly to avoid recursion on first converting
+            #     to numpy array
+            pixel_bytearray = self.get_item(0x7fe00010).value  # PixelData
         elif have_gdcm and self.filename:
             # read the file using GDCM
             # FIXME this should just use self.PixelData instead of self.filename
@@ -458,7 +465,8 @@ class Dataset(dict):
 
         pixel_array = numpy.fromstring(pixel_bytearray, dtype=numpy_dtype)
 
-        # Note the following reshape operations return a new *view* onto pixel_array, but don't copy the data
+        # Note the following reshape operations return a new *view* 
+        #   onto pixel_array, but don't copy the data
         if 'NumberOfFrames' in self and self.NumberOfFrames > 1:
             if self.SamplesPerPixel > 1:
                 #TODO: Handle Planar Configuration attribute
@@ -484,14 +492,17 @@ class Dataset(dict):
     def _get_pixel_array(self):
         # Check if already have converted to a NumPy array
         # Also check if self.PixelData has changed. If so, get new NumPy array
-        already_have = True
-        if not hasattr(self, "_pixel_array"):
-            already_have = False
-        elif self._pixel_id != id(self.PixelData):
-            already_have = False
-        if not already_have:
-            self._pixel_array = self._pixel_data_numpy()
-            self._pixel_id = id(self.PixelData)  # FIXME is this guaranteed to work if memory is re-used??
+        if not have_numpy:
+            msg = "The Numpy package is required to use pixel_array, and numpy could not be imported.\n"
+            raise ImportError(msg)
+        
+        # Need access to pixel data without conversion,
+        #   also need to check if already converted, for pydicom < 1.0,
+        #   in which users might use pixel_array directly
+        pix = self.get_item(0x7fe00010).value
+        if isinstance(pix, numpy.ndarray):
+            return pix
+        self._pixel_array = self._pixel_data_numpy()
         return self._pixel_array
 
     @property
