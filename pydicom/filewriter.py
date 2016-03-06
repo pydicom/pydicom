@@ -18,7 +18,7 @@ from pydicom.filebase import DicomFile, DicomFileLike
 from pydicom.dataset import Dataset, have_numpy
 from pydicom.dataelem import DataElement, RawDataElement
 from pydicom.tag import Tag, ItemTag, ItemDelimiterTag, SequenceDelimiterTag
-from pydicom.valuerep import text_VRs, extra_length_VRs
+from pydicom.valuerep import text_VRs, extra_length_VRs, conversion_VR
 from pydicom.tagtools import tag_in_exception
 
 if have_numpy:
@@ -232,6 +232,9 @@ def write_data_element(fp, data_element, encoding=default_encoding):
     fp.write_tag(data_element.tag)
     
     VR = data_element.VR
+    if VR is None:
+        VR = conversion_VR(data_element.tag)
+    
     if not fp.is_implicit_VR:
         if len(VR) != 2:
             msg = "Cannot write ambiguous VR of '%s' for data element with tag %r." % (VR, data_element.tag)
@@ -274,7 +277,9 @@ def write_data_element(fp, data_element, encoding=default_encoding):
     #  print DataElement(tag, VR, value)
 
     is_undefined_length = False
-    if hasattr(data_element, "is_undefined_length") and data_element.is_undefined_length:
+    if isinstance(data_element, RawDataElement):
+        is_undefined_length = (data_element.length == 0xFFFFFFFF)
+    elif hasattr(data_element, "is_undefined_length") and data_element.is_undefined_length:
         is_undefined_length = True
     location = fp.tell()
     fp.seek(length_location)

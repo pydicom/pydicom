@@ -385,16 +385,18 @@ class Dataset(dict):
         -------
         NumPy array
         """
+        if not have_numpy:
+            msg = ("The Numpy package is required to use pixel_array," 
+                    " and numpy could not be imported.\n")
+            raise ImportError(msg)
+        if 'PixelData' not in self:
+            raise TypeError("No pixel data found in this dataset.")
+
         if not self._is_uncompressed_transfer_syntax():
             if not have_gdcm:
                 raise NotImplementedError("Pixel Data is compressed in a format pydicom does not yet handle. Cannot return array. Pydicom might be able to convert the pixel data using GDCM if it is installed.")
             elif not self.filename:
                 raise NotImplementedError("GDCM is only supported when the dataset has been created with a filename.")
-        if not have_numpy:
-            msg = "The Numpy package is required to use pixel_array, and numpy could not be imported.\n"
-            raise ImportError(msg)
-        if 'PixelData' not in self:
-            raise TypeError("No pixel data found in this dataset.")
         
         # There are two cases:
         # 1) uncompressed PixelData -> use numpy

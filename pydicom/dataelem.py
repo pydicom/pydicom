@@ -15,10 +15,11 @@ from pydicom import config  # don't import datetime_conversion directly
 from pydicom import compat
 from pydicom.config import logger
 from pydicom.datadict import dictionary_has_tag, dictionary_description
-from pydicom.datadict import private_dictionary_description, dictionary_VR
+from pydicom.datadict import private_dictionary_description
 from pydicom.tag import Tag
 from pydicom.uid import UID
 import pydicom.valuerep  # don't import DS directly as can be changed by config
+from pydicom.valuerep import conversion_VR
 from pydicom.compat import in_py2
 if not in_py2:
     from pydicom.valuerep import PersonName3 as PersonNameUnicode
@@ -316,15 +317,8 @@ def DataElement_from_raw(raw_data_element, encoding=None):
                                            **config.data_element_callback_kwargs)
     VR = raw.VR
     if VR is None:  # Can be if was implicit VR
-        try:
-            VR = dictionary_VR(raw.tag)
-        except KeyError:
-            if raw.tag.is_private:
-                VR = 'OB'  # just read the bytes, no way to know what they mean
-            elif raw.tag.element == 0:  # group length tag implied in versions < 3.0
-                VR = 'UL'
-            else:
-                raise KeyError("Unknown DICOM tag {0:s} - can't look up VR".format(str(raw.tag)))
+        VR = conversion_VR(raw.tag)
+
     try:
         value = convert_value(VR, raw, encoding)
     except NotImplementedError as e:

@@ -9,8 +9,10 @@ from decimal import Decimal
 
 from pydicom import config  # don't import datetime_conversion directly
 from pydicom import compat
+from pydicom.datadict import dictionary_VR
 from pydicom.multival import MultiValue
 from pydicom.config import logger
+from pydicom.tag import Tag
 
 from datetime import date, datetime, time
 from dateutil.tz import tzoffset
@@ -40,6 +42,40 @@ match_string = b''.join([
 
 match_string_uni = re.compile(match_string.decode('iso8859'))
 match_string_bytes = re.compile(match_string)
+
+
+def conversion_VR(tag):
+    """Look up VR, or if not available, assume a reasonable one
+    
+    Parameters
+    ---------
+    tag : Tag
+        dicom tag for which to look up VR
+        
+    Returns
+    -------
+    VR : str
+        The two-byte VR value
+        Returns 'OB' for a private tag,
+        Returns 'UL' if the tag is a group length tag
+    
+    Raises
+    ------
+    Keyerror
+        If tag not in dictionary, and it is not a private or group length tag
+    
+    """
+    tag = Tag(tag)
+    try:
+        VR = dictionary_VR(tag)
+    except KeyError:
+        if tag.is_private:
+            VR = 'OB'  # just read the bytes, no way to know what they mean
+        elif tag.element == 0:  # group length tag implied in versions < 3.0
+            VR = 'UL'
+        else:
+            raise KeyError("Unknown DICOM tag {0:s} - can't look up VR".format(str(tag)))
+    return VR
 
 
 class DA(date):
