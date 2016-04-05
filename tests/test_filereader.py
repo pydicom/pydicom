@@ -46,6 +46,7 @@ from warncheck import assertWarns
 test_dir = os.path.dirname(__file__)
 test_files = os.path.join(test_dir, 'test_files')
 
+empty_number_tags_name = os.path.join(test_files, "reportsi_with_empty_number_tags.dcm")
 rtplan_name = os.path.join(test_files, "rtplan.dcm")
 rtdose_name = os.path.join(test_files, "rtdose.dcm")
 ct_name = os.path.join(test_files, "CT_small.dcm")
@@ -84,6 +85,17 @@ def isClose(a, b, epsilon=0.000001):
 
 
 class ReaderTests(unittest.TestCase):
+    def testEmptyNumbersTag(self):
+        """Tests that an empty tag with a number VR (FL, UL, SL, US, SS, FL, FD, OF) reads as an empty string"""
+        empty_number_tags_ds = read_file(empty_number_tags_name)
+        self.assertEqual(empty_number_tags_ds.ExaminedBodyThickness, '')
+        self.assertEqual(empty_number_tags_ds.SimpleFrameList, '')
+        self.assertEqual(empty_number_tags_ds.ReferencePixelX0, '')
+        self.assertEqual(empty_number_tags_ds.PhysicalUnitsXDirection, '')
+        self.assertEqual(empty_number_tags_ds.TagAngleSecondAxis, '')
+        self.assertEqual(empty_number_tags_ds.TagSpacingSecondDimension, '')
+        self.assertEqual(empty_number_tags_ds.VectorGridData, '')
+
     def testUTF8FileName(self):
         utf8_filename = os.path.join(tempfile.gettempdir(), "ДИКОМ.dcm")
         shutil.copyfile(rtdose_name, utf8_filename)
