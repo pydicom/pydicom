@@ -212,6 +212,7 @@ class ScratchWriteTests(unittest.TestCase):
         # Create simple dataset for all tests
         ds = Dataset()
         ds.PatientName = "Name^Patient"
+        ds.InstanceNumber = None
 
         # Set up a simple nested sequence
         # first, the innermost sequence
