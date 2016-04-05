@@ -1,4 +1,5 @@
 # test_filereader.py
+# -*- coding: utf-8 -*-
 """unittest tests for pydicom.filereader module"""
 # Copyright (c) 2010-2012 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
@@ -10,6 +11,7 @@ import os
 import os.path
 import unittest
 from io import BytesIO
+import tempfile
 
 try:
     unittest.skipUnless
@@ -82,6 +84,13 @@ def isClose(a, b, epsilon=0.000001):
 
 
 class ReaderTests(unittest.TestCase):
+    def testUTF8FileName(self):
+        utf8_filename = os.path.join(tempfile.gettempdir(), "ДИКОМ.dcm")
+        shutil.copyfile(rtdose_name, utf8_filename)
+        ds = read_file(utf8_filename)
+        os.remove(utf8_filename)
+        self.assertTrue(ds is not None)
+
     def testRTPlan(self):
         """Returns correct values for sample data elements in test RT Plan file"""
         plan = read_file(rtplan_name)
