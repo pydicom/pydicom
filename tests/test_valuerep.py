@@ -23,7 +23,9 @@ import pydicom
 import cPickle as pickle
 import os
 
-
+from pkg_resources import Requirement, resource_filename
+test_dir = resource_filename(Requirement.parse("pydicom"), "dicom/testfiles")
+badvr_name = os.path.join(test_dir, "badVR.dcm")
 default_encoding = 'iso8859'
 
 
@@ -110,6 +112,16 @@ class ISPickleTest(unittest.TestCase):
         self.assertEqual(x.real, x2.real)
         self.assertEqual(x.original_string, x2.original_string)
 
+
+class BadValueReadtests(unittest.TestCase):
+    """Unit tests for handling a bad value for a VR (a string in a number VR here)"""
+
+    def testReadBadValueInVR(self):
+        # Check that invalid values are read
+        # and converted to some semi-useful type
+
+        dataset = pydicom.read_file(badvr_name)
+        self.assertTrue(dataset.NumberOfFrames == '1A')
 
 
 class DecimalStringtests(unittest.TestCase):
