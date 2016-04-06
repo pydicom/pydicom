@@ -717,7 +717,10 @@ def read_file(fp, defer_size=None, stop_before_pixels=False, force=False):
     if isinstance(fp, compat.string_types):
         # caller provided a file name; we own the file handle
         caller_owns_file = False
-        logger.debug("Reading file '{0}'".format(fp))
+        try:
+            logger.debug(u"Reading file '{0}'".format(fp))
+        except Exception:
+            logger.debug("Reading file '{0}'".format(fp))
         fp = open(fp, 'rb')
 
     if config.debugging:
