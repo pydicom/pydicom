@@ -19,9 +19,97 @@ else:
 
 from datetime import datetime, date, time, timedelta
 from dateutil.tz import tzoffset
+import pydicom
+import cPickle as pickle
+import os
 
 
 default_encoding = 'iso8859'
+
+
+class TMPickleTest(unittest.TestCase):
+    """Unit tests for pickling TM"""
+
+    def testPickling(self):
+        # Check that a pickled TM is read back properly
+        x = pydicom.valuerep.TM("212223")
+        x.original_string = 'hello'
+        self.assertEqual(x.original_string, 'hello')
+        self.assertEqual(x, time(21, 22, 23))
+        data1_string = pickle.dumps(x)
+        x2 = pickle.loads(data1_string)
+        self.assertEqual(x, x2)
+        self.assertEqual(x.original_string, x2.original_string)
+        self.assertEqual(str(x), str(x2))
+
+class DTPickleTest(unittest.TestCase):
+    """Unit tests for pickling DT"""
+
+    def testPickling(self):
+        # Check that a pickled DT is read back properly
+        x = pydicom.valuerep.DT("19111213212123")
+        x.original_string = 'hello'
+        data1_string = pickle.dumps(x)
+        x2 = pickle.loads(data1_string)
+        self.assertEqual(x, x2)
+        self.assertEqual(x.original_string, x2.original_string)
+        self.assertEqual(str(x), str(x2))
+
+
+class DAPickleTest(unittest.TestCase):
+    """Unit tests for pickling DA"""
+
+    def testPickling(self):
+        # Check that a pickled DA is read back properly
+        x = pydicom.valuerep.DA("19111213")
+        x.original_string = 'hello'
+        data1_string = pickle.dumps(x)
+        x2 = pickle.loads(data1_string)
+        self.assertEqual(x, x2)
+        self.assertEqual(x.original_string, x2.original_string)
+        self.assertEqual(str(x), str(x2))
+
+
+class DSfloatPickleTest(unittest.TestCase):
+    """Unit tests for pickling DSfloat"""
+
+    def testPickling(self):
+        # Check that a pickled DSFloat is read back properly
+        x = pydicom.valuerep.DSfloat(9.0)
+        x.original_string = 'hello'
+        data1_string = pickle.dumps(x)
+        x2 = pickle.loads(data1_string)
+        self.assertEqual(x.real, x2.real)
+        self.assertEqual(x.original_string, x2.original_string)
+
+
+class DSdecimalPickleTest(unittest.TestCase):
+    """Unit tests for pickling DSdecimal"""
+
+    def testPickling(self):
+        # Check that a pickled DSdecimal is read back properly
+        # DSdecimal actually prefers original_string when
+        # reading back
+        x = pydicom.valuerep.DSdecimal(19)
+        x.original_string = '19'
+        data1_string = pickle.dumps(x)
+        x2 = pickle.loads(data1_string)
+        self.assertEqual(x.real, x2.real)
+        self.assertEqual(x.original_string, x2.original_string)
+
+
+class ISPickleTest(unittest.TestCase):
+    """Unit tests for pickling IS"""
+
+    def testPickling(self):
+        # Check that a pickled IS is read back properly
+        x = pydicom.valuerep.IS(921)
+        x.original_string = 'hello'
+        data1_string = pickle.dumps(x)
+        x2 = pickle.loads(data1_string)
+        self.assertEqual(x.real, x2.real)
+        self.assertEqual(x.original_string, x2.original_string)
+
 
 
 class DecimalStringtests(unittest.TestCase):
