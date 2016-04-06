@@ -129,9 +129,11 @@ class DecimalStringtests(unittest.TestCase):
 
     def setUp(self):
         config.DS_decimal(True)
+        config.enforce_valid_values = True
 
     def tearDown(self):
         config.DS_decimal(False)
+        config.enforce_valid_values = False
 
     def testValidDecimalStrings(self):
         # Ensures that decimal.Decimal doesn't cause a valid string to become
