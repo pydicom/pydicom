@@ -48,7 +48,20 @@ class DA(date):
     Note that the datetime.date base class is immutable.
 
     """
-    __slots__ = 'original_string'
+    __slots__ = ['original_string']
+    def __getstate__(self):
+        return dict(
+            (slot, getattr(self, slot))
+            for slot in self.__slots__
+            if hasattr(self, slot)
+        )
+
+    def __setstate__(self, state):
+        for slot, value in state.items():
+            setattr(self, slot, value)
+
+    def __reduce__(self):
+        return super(DA, self).__reduce__() + (self.__getstate__(),)
 
     def __new__(cls, val):
         """Create an instance of DA object.
@@ -75,7 +88,10 @@ class DA(date):
             elif val == '':
                 val = None  # empty date
             else:
-                raise ValueError("Cannot convert to date: '" + val + "'")
+                try:
+                    val = super(DA, cls).__new__(cls, val)
+                except TypeError as e:
+                    raise ValueError("Cannot convert to datetime: '" + val + "'")
         elif isinstance(val, date):
             val = super(DA, cls).__new__(cls, val.year, val.month, val.day)
         else:
@@ -101,8 +117,21 @@ class DT(datetime):
     Note that the datetime.datetime base class is immutable.
 
     """
-    __slots__ = 'original_string'
+    __slots__ = ['original_string']
     _regex_dt = re.compile(r"((\d{4,14})(\.(\d{1,6}))?)([+-]\d{4})?")
+    def __getstate__(self):
+        return dict(
+            (slot, getattr(self, slot))
+            for slot in self.__slots__
+            if hasattr(self, slot)
+        )
+
+    def __setstate__(self, state):
+        for slot, value in state.items():
+            setattr(self, slot, value)
+
+    def __reduce__(self):
+        return super(DT, self).__reduce__() + (self.__getstate__(),)
 
     def __new__(cls, val):
         """Create an instance of DT object.
@@ -156,7 +185,10 @@ class DT(datetime):
                                              hour, minute, second,
                                              microsecond, tzinfo)
             else:
-                raise ValueError("Cannot convert to datetime: '" + val + "'")
+                try:
+                    val = super(DT, cls).__new__(cls, val)
+                except TypeError as e:
+                    raise ValueError("Cannot convert to datetime: '" + val + "'")
         elif isinstance(val, datetime):
             val = super(DT, cls).__new__(cls, val.year, val.month, val.day,
                                          val.hour, val.minute, val.second,
@@ -184,8 +216,21 @@ class TM(time):
     Note that the datetime.time base class is immutable.
 
     """
-    __slots__ = 'original_string'
+    __slots__ = ['original_string']
     _regex_tm = re.compile(r"(\d{2,6})(\.(\d{1,6}))?")
+    def __getstate__(self):
+        return dict(
+            (slot, getattr(self, slot))
+            for slot in self.__slots__
+            if hasattr(self, slot)
+        )
+
+    def __setstate__(self, state):
+        for slot, value in state.items():
+            setattr(self, slot, value)
+
+    def __reduce__(self):
+        return super(TM, self).__reduce__() + (self.__getstate__(),)
 
     def __new__(cls, val):
         """Create an instance of TM object from a string.
@@ -220,7 +265,10 @@ class TM(time):
             elif val == '':
                 val = None  # empty time
             else:
-                raise ValueError("Cannot convert to time: '" + val + "'")
+                try:
+                    val = super(TM, cls).__new__(cls, val)
+                except TypeError as e:
+                    raise ValueError("Cannot convert to datetime: '" + val + "'")
         elif isinstance(val, time):
             val = super(TM, cls).__new__(cls, val.hour, val.minute, val.second,
                                          val.microsecond)
@@ -248,7 +296,18 @@ class DSfloat(float):
     not an instance of this class.
 
     """
-    __slots__ = 'original_string'
+    __slots__ = ['original_string']
+    def __getstate__(self):
+        return dict(
+            (slot, getattr(self, slot))
+            for slot in self.__slots__
+            if hasattr(self, slot)
+        )
+
+    def __setstate__(self, state):
+        for slot, value in state.items():
+            setattr(self, slot, value)
+
 
     def __init__(self, val):
         """Store the original string if one given, for exact write-out of same
@@ -277,7 +336,17 @@ class DSdecimal(Decimal):
     Note: if constructed by an empty string, returns the empty string,
     not an instance of this class.
     """
-    __slots__ = 'original_string'
+    __slots__ = ['original_string']
+    def __getstate__(self):
+        return dict(
+            (slot, getattr(self, slot))
+            for slot in self.__slots__
+            if hasattr(self, slot)
+        )
+
+    def __setstate__(self, state):
+        for slot, value in state.items():
+            setattr(self, slot, value)
 
     def __new__(cls, val):
         """Create an instance of DS object, or return a blank string if one is
@@ -363,9 +432,19 @@ class IS(int):
     of the string originally read or stored.
     """
     if compat.in_py2:
-        __slots__ = 'original_string'
-    # Unlikely that str(int) will not be the same as the original, but could happen
-    # with leading zeros.
+        __slots__ = ['original_string']
+        # Unlikely that str(int) will not be the same as the original, but could happen
+        # with leading zeros.
+        def __getstate__(self):
+            return dict(
+                (slot, getattr(self, slot))
+                for slot in self.__slots__
+                if hasattr(self, slot)
+            )
+
+        def __setstate__(self, state):
+            for slot, value in state.items():
+                setattr(self, slot, value)
 
     def __new__(cls, val):
         """Create instance if new integer string"""
