@@ -11,6 +11,7 @@ import os
 import os.path
 import unittest
 from io import BytesIO
+import shutil
 import tempfile
 
 try:
@@ -40,7 +41,22 @@ from pydicom.errors import InvalidDicomError
 from pydicom.tag import Tag, TupleTag
 import pydicom.valuerep
 import gzip
+have_jpeg_ls = True
+try:
+    import jpeg_ls
+except ImportError:
+    have_jpeg_ls = False
 
+have_pillow = True
+try:
+    from PIL import Image as PILImg
+except ImportError:
+    # If that failed, try the alternate import syntax for PIL.
+    try:
+        import Image as PILImg
+    except ImportError:
+        # Neither worked, so it's likely not installed.
+        have_pillow = Fals
 from warncheck import assertWarns
 
 test_dir = os.path.dirname(__file__)
@@ -52,6 +68,8 @@ rtdose_name = os.path.join(test_files, "rtdose.dcm")
 ct_name = os.path.join(test_files, "CT_small.dcm")
 mr_name = os.path.join(test_files, "MR_small.dcm")
 jpeg2000_name = os.path.join(test_files, "JPEG2000.dcm")
+jpeg2000_lossless_name = os.path.join(test_files, "MR_small_jp2klossless.dcm")
+jpeg_ls_lossless_name = os.path.join(test_files, "MR_small_jpeg_ls_lossless.dcm")
 jpeg_lossy_name = os.path.join(test_files, "JPEG-lossy.dcm")
 jpeg_lossless_name = os.path.join(test_files, "JPEG-LL.dcm")
 deflate_name = os.path.join(test_files, "image_dfl.dcm")
@@ -64,7 +82,9 @@ color_px_name = os.path.join(test_files, "color-px.dcm")
 color_pl_name = os.path.join(test_files, "color-pl.dcm")
 explicit_vr_le_no_meta = os.path.join(test_files, "ExplVR_LitEndNoMeta.dcm")
 explicit_vr_be_no_meta = os.path.join(test_files, "ExplVR_BigEndNoMeta.dcm")
-
+emri_name = os.path.join(test_files, "emri_small.dcm")
+emri_jpeg_ls_lossless = os.path.join(test_files, "emri_small_jpeg_ls_lossless.dcm")
+emri_jpeg_2k_lossless = os.path.join(test_files, "emri_small_jpeg_2k_lossless.dcm")
 dir_name = os.path.dirname(sys.argv[0])
 save_dir = os.getcwd()
 
@@ -337,9 +357,41 @@ class ReaderTests(unittest.TestCase):
             pl_data = pl_data_ds.pixel_array
             self.assertTrue(numpy.all(px_data == pl_data))
 
+class JPEG_LS_Tests(unittest.TestCase):
+    def setUp(self):
+        self.jpeg_ls_lossless = read_file(jpeg_ls_lossless_name)
+        self.mr_small = read_file(mr_name)
+        self.emri_jpeg_ls_lossless = read_file(emri_jpeg_ls_lossless)
+        self.emri_small = read_file(emri_name)
+
+    def testJPEG_LS_PixelArray(self):
+        """JPEG LS Lossless: Now works"""
+        if have_numpy and have_jpeg_ls:
+            a = self.jpeg_ls_lossless.pixel_array
+            b = self.mr_small.pixel_array
+            self.assertEqual(a.mean(), b.mean(),
+                            "Decoded pixel data is not all {} (mean == {})".format(b.mean(), a.mean()))
+        else:
+            self.assertRaises(NotImplementedError, self.jpeg_ls_lossless._get_pixel_array)
+    def test_emri_JPEG_LS_PixelArray(self):
+        """JPEG LS Lossless: Now works"""
+        if have_numpy and have_jpeg_ls:
+            a = self.emri_jpeg_ls_lossless.pixel_array
+            b = self.emri_small.pixel_array
+            self.assertEqual(a.mean(), b.mean(),
+                "Decoded pixel data is not all {} (mean == {})".format(b.mean(), a.mean()))
+        else:
+            self.assertRaises(NotImplementedError, self.emri_jpeg_ls_lossless._get_pixel_array)
+
+
 class JPEG2000Tests(unittest.TestCase):
     def setUp(self):
         self.jpeg = read_file(jpeg2000_name)
+        self.jpegls = read_file(jpeg2000_lossless_name)
+        self.mr_small = read_file(mr_name)
+        self.emri_jpeg_2k_lossless = read_file(emri_jpeg_2k_lossless)
+        self.emri_small = read_file(emri_name)
+
 
     def testJPEG2000(self):
         """JPEG2000: Returns correct values for sample data elements............"""
@@ -352,8 +404,24 @@ class JPEG2000Tests(unittest.TestCase):
         self.assertEqual(got, expected, "JPEG200 file, Code Meaning got %s, expected %s" % (got, expected))
 
     def testJPEG2000PixelArray(self):
-        """JPEG2000: Fails gracefully when uncompressed data is asked for......."""
-        self.assertRaises(NotImplementedError, self.jpeg._get_pixel_array)
+        """JPEG2000: Now works"""
+        if have_numpy and have_pillow:
+            a = self.jpegls.pixel_array
+            b = self.mr_small.pixel_array
+            self.assertEqual(a.mean(), b.mean(),
+                "Decoded pixel data is not all {} (mean == {})".format(b.mean(), a.mean()))
+        else:
+            self.assertRaises(NotImplementedError, self.jpegls._get_pixel_array)
+
+    def test_emri_JPEG2000PixelArray(self):
+        """JPEG2000: Now works"""
+        if have_numpy and have_pillow:
+            a = self.emri_jpeg_2k_lossless.pixel_array
+            b = self.emri_small.pixel_array
+            self.assertEqual(a.mean(), b.mean(),
+                                        "Decoded pixel data is not all {} (mean == {})".format(b.mean(), a.mean()))
+        else:
+            self.assertRaises(NotImplementedError, self.emri_jpeg_2k_lossless._get_pixel_array)
 
 
 class JPEGlossyTests(unittest.TestCase):
