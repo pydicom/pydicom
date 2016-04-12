@@ -272,6 +272,7 @@ class DataElement(object):
         
     @property
     def keyword(self):
+        """The data_element's keyword (if known)"""
         if dictionary_has_tag(self.tag):
             return dictionary_keyword(self.tag)
         else:
