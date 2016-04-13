@@ -15,7 +15,7 @@ from pydicom import config  # don't import datetime_conversion directly
 from pydicom import compat
 from pydicom.config import logger
 from pydicom.datadict import dictionary_has_tag, dictionary_description, \
-    dictionary_keyword
+    dictionary_keyword, dictionary_is_retired
 from pydicom.datadict import private_dictionary_description, dictionaryVR
 from pydicom.tag import Tag
 from pydicom.uid import UID
@@ -76,6 +76,10 @@ class DataElement(object):
     
     Attributes
     ----------
+    is_retired : bool
+        For officially registered DICOM Data Elements this will be True if the 
+        retired status as given in PS3.6 Table 6-1 is 'RET'. For private of 
+        unknown Elements this will always be False
     keyword : str
         For officially registered DICOM Data Elements this will be the Keyword
         as given in PS3.6 Table 6-1. For private or unknown Elements this will
@@ -269,7 +273,15 @@ class DataElement(object):
         else:
             name = ""
         return name
-        
+    
+    @property
+    def is_retired(self):
+        """The data_element's retired status"""
+        if dictionary_has_tag(self.tag):
+            return dictionary_is_retired(tag)
+        else:
+            return False
+    
     @property
     def keyword(self):
         """The data_element's keyword (if known)"""
