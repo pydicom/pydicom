@@ -278,7 +278,7 @@ class DataElement(object):
     def is_retired(self):
         """The data_element's retired status"""
         if dictionary_has_tag(self.tag):
-            return dictionary_is_retired(tag)
+            return dictionary_is_retired(self.tag)
         else:
             return False
     
