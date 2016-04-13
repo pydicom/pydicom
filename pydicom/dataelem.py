@@ -78,7 +78,7 @@ class DataElement(object):
     ----------
     is_retired : bool
         For officially registered DICOM Data Elements this will be True if the 
-        retired status as given in PS3.6 Table 6-1 is 'RET'. For private of 
+        retired status as given in PS3.6 Table 6-1 is 'RET'. For private or 
         unknown Elements this will always be False
     keyword : str
         For officially registered DICOM Data Elements this will be the Keyword
