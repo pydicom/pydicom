@@ -270,7 +270,17 @@ class DatasetTests(unittest.TestCase):
         ds = self.dummy_dataset()
         del ds.TreatmentMachineName
         self.assertRaises(AttributeError, testAttribute)
-
+        
+    def testDeleteDicomCommandGroupLength(self):
+        """Dataset: delete CommandGroupLength doesn't raise AttributeError.."""
+        def testAttribute():
+            ds.CommandGroupLength
+        
+        ds = self.dummy_dataset()
+        ds.CommandGroupLength = 100 # (0x0000, 0x0000)
+        del ds.CommandGroupLength
+        self.assertRaises(AttributeError, testAttribute)
+    
     def testDeleteOtherAttr(self):
         """Dataset: delete non-DICOM attribute by name......................"""
         ds = self.dummy_dataset()
