@@ -22,6 +22,9 @@ class DataElementTests(unittest.TestCase):
         self.data_elementDS = DataElement((1, 2), "DS", "42.00001")
         self.data_elementMulti = DataElement((1, 2), "DS",
                                              ['42.1', '42.2', '42.3'])
+        self.data_elementCommand = DataElement(0x00000000, 'UL', 100)
+        self.data_elementPrivate = DataElement(0x00090000, 'UL', 101)
+        self.data_elementRetired = DataElement(0x00080010, 'SH', 102)
 
     def testVM1(self):
         """DataElement: return correct value multiplicity for VM > 1........"""
@@ -49,6 +52,17 @@ class DataElementTests(unittest.TestCase):
         ds.TransferSyntaxUID += ".4.5.6"
         self.assertTrue(isinstance(ds.TransferSyntaxUID, UID),
                         "+= to UID did not keep as UID class")
+                        
+    def testKeyword(self):
+        """DataElement: return correct keyword"""
+        self.assertEqual(self.data_elementCommand.keyword, 'CommandGroupLength')
+        self.assertEqual(self.data_elementPrivate.keyword, '')
+    
+    def testRetired(self):
+        """DataElement: return correct is_retired"""
+        self.assertEqual(self.data_elementCommand.is_retired, False)
+        self.assertEqual(self.data_elementRetired.is_retired, True)
+        self.assertEqual(self.data_elementPrivate.is_retired, False)
 
 
 class RawDataElementTests(unittest.TestCase):

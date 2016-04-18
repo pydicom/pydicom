@@ -190,7 +190,7 @@ class Dataset(dict):
         """
         # First check if a valid DICOM keyword and if we have that data element
         tag = tag_for_name(name)
-        if tag and tag in self:
+        if tag is not None and tag in self:
             dict.__delitem__(self, tag)  # direct to dict as we know we have key
         # If not a DICOM name in this dataset, check for regular instance name
         #   can't do delete directly, that will call __delattr__ again

@@ -14,7 +14,8 @@ from __future__ import absolute_import
 from pydicom import config  # don't import datetime_conversion directly
 from pydicom import compat
 from pydicom.config import logger
-from pydicom.datadict import dictionary_has_tag, dictionary_description
+from pydicom.datadict import dictionary_has_tag, dictionary_description, \
+    dictionary_keyword, dictionary_is_retired
 from pydicom.datadict import private_dictionary_description, dictionaryVR
 from pydicom.tag import Tag
 from pydicom.uid import UID
@@ -72,6 +73,29 @@ class DataElement(object):
     descripWidth -- maximum width of description field (default 35).
     maxBytesToDisplay -- longer data will display "array of # bytes" (default 16).
     showVR -- True (default) to include the dicom VR just before the value.
+    
+    Attributes
+    ----------
+    is_retired : bool
+        For officially registered DICOM Data Elements this will be True if the 
+        retired status as given in PS3.6 Table 6-1 is 'RET'. For private or 
+        unknown Elements this will always be False
+    keyword : str
+        For officially registered DICOM Data Elements this will be the Keyword
+        as given in PS3.6 Table 6-1. For private or unknown Elements this will
+        return an empty string.
+    name : str
+        For officially registered DICOM Data Elements this will be the Name 
+        as given in PS3.6 Table 6-1. For private Elements known to pydicom this 
+        will be the Name in the format '[name]'. For unknown private Elements
+        this will be 'Private Creator'. For unknown Elements this will return
+        an empty string.
+    tag : pydicom.tag.Tag
+        The DICOM Tag for the Data Element
+    value
+        The Data Element's stored value(s)
+    VM : int
+        The Value Multiplicity of the Data Element's stored value(s)
     """
     descripWidth = 35
     maxBytesToDisplay = 16
@@ -249,7 +273,23 @@ class DataElement(object):
         else:
             name = ""
         return name
-
+    
+    @property
+    def is_retired(self):
+        """The data_element's retired status"""
+        if dictionary_has_tag(self.tag):
+            return dictionary_is_retired(self.tag)
+        else:
+            return False
+    
+    @property
+    def keyword(self):
+        """The data_element's keyword (if known)"""
+        if dictionary_has_tag(self.tag):
+            return dictionary_keyword(self.tag)
+        else:
+            return ''
+    
     def __repr__(self):
         """Handle repr(data_element)"""
         if self.VR == "SQ":
