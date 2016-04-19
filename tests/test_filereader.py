@@ -56,7 +56,7 @@ except ImportError:
         import Image as PILImg
     except ImportError:
         # Neither worked, so it's likely not installed.
-        have_pillow = Fals
+        have_pillow = False
 from warncheck import assertWarns
 
 test_dir = os.path.dirname(__file__)
