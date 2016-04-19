@@ -23,9 +23,9 @@ import pydicom
 import cPickle as pickle
 import os
 
-from pkg_resources import Requirement, resource_filename
-test_dir = resource_filename(Requirement.parse("pydicom"), "dicom/testfiles")
-badvr_name = os.path.join(test_dir, "badVR.dcm")
+test_dir = os.path.dirname(__file__)
+test_files = os.path.join(test_dir, 'test_files')
+badvr_name = os.path.join(test_files, "badVR.dcm")
 default_encoding = 'iso8859'
 
 
