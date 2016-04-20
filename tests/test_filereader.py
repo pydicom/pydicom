@@ -456,7 +456,7 @@ class JPEGlosslessTests(unittest.TestCase):
 
     def testJPEGlosslessPixelArray(self):
         """JPEGlossless: Fails gracefully when uncompressed data is asked for..."""
-        self.assertRaises(NotImplementedError, self.jpeg._get_pixel_array)
+        self.assertRaises(ImportError, self.jpeg._get_pixel_array)
 
         # create an in-memory fragment
 
