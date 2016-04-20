@@ -20,6 +20,7 @@ else:
 from datetime import datetime, date, time, timedelta
 from dateutil.tz import tzoffset
 import pydicom
+import platform
 try:
     import cPickle as pickle
 except ImportError:
@@ -31,7 +32,7 @@ test_files = os.path.join(test_dir, 'test_files')
 badvr_name = os.path.join(test_files, "badVR.dcm")
 default_encoding = 'iso8859'
 
-
+@unittest.skipIf(platform.python_implementation() == 'PyPy', "PyPy has trouble with this pickle")
 class TMPickleTest(unittest.TestCase):
     """Unit tests for pickling TM"""
 
@@ -124,7 +125,7 @@ class BadValueReadtests(unittest.TestCase):
         # and converted to some semi-useful type
 
         dataset = pydicom.read_file(badvr_name)
-        self.assertEqual(dataset.NumberOfFrames, '1A')
+        self.assertIn(dataset.NumberOfFrames, [b'1A', '1A'])
 
 
 class DecimalStringtests(unittest.TestCase):
