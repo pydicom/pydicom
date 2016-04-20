@@ -405,11 +405,11 @@ class Dataset(dict):
             elif not self.filename:
                 raise NotImplementedError("GDCM is only supported when the dataset has been created with a filename.")
         if not have_numpy:
-            msg = "The Numpy package is required to use pixel_array, and numpy could not be imported.\n"
+            msg = "The Numpy package is required to use pixel_array, and numpy could not be imported."
             raise ImportError(msg)
         if 'PixelData' not in self:
             raise TypeError("No pixel data found in this dataset.")
-        
+
         # There are two cases:
         # 1) uncompressed PixelData -> use numpy
         # 2) compressed PixelData, filename is available and GDCM is available -> use GDCM
@@ -427,10 +427,10 @@ class Dataset(dict):
                        "format='%s', PixelRepresentation=%d, BitsAllocated=%d")
                 raise TypeError(msg % (format_str, self.PixelRepresentation,
                                 self.BitsAllocated))
-        
+
             if self.is_little_endian != sys_is_little_endian:
                 numpy_dtype.newbyteorder('S')
-            
+
             pixel_bytearray = self.PixelData
         elif have_gdcm and self.filename:
             # read the file using GDCM
@@ -441,7 +441,7 @@ class Dataset(dict):
             if not gdcm_image_reader.Read():
                 raise TypeError("GDCM could not read DICOM image")
             gdcm_image = gdcm_image_reader.GetImage()
-            
+
             # determine the correct numpy datatype
             gdcm_numpy_typemap = {
                 gdcm.PixelFormat.INT8:     numpy.int8,
@@ -458,19 +458,19 @@ class Dataset(dict):
                 numpy_dtype = gdcm_numpy_typemap[gdcm_pixel_format]
             else:
                 raise TypeError('{} is not a GDCM supported pixel format'.format(gdcm_pixel_format))
-            
-            # GDCM returns char* as type str. Under Python 2 `str` are 
-            # byte arrays by default. Python 3 decodes this to 
+
+            # GDCM returns char* as type str. Under Python 2 `str` are
+            # byte arrays by default. Python 3 decodes this to
             # unicode strings by default.
-            # The SWIG docs mention that they always decode byte streams 
-            # as utf-8 strings for Python 3, with the `surrogateescape` 
+            # The SWIG docs mention that they always decode byte streams
+            # as utf-8 strings for Python 3, with the `surrogateescape`
             # error handler configured.
             # Therefore, we can encode them back to their original bytearray
             # representation on Python 3 by using the same parameters.
             pixel_bytearray = gdcm_image.GetBuffer()
             if sys.version_info >= (3, 0):
                 pixel_bytearray = pixel_bytearray.encode("utf-8", "surrogateescape")
-            
+
             # if GDCM indicates that a byte swap is in order, make sure to inform numpy as well
             if gdcm_image.GetNeedByteSwap():
                 numpy_dtype.newbyteorder('S')
@@ -512,7 +512,7 @@ class Dataset(dict):
             raise TypeError("No pixel data found in this dataset.")
 
         if not have_numpy:
-            msg = "The Numpy package is required to use pixel_array, and numpy could not be imported.\n"
+            msg = "The Numpy package is required to use pixel_array, and numpy could not be imported."
             raise ImportError(msg)
 
         # determine the type used for the array
@@ -536,7 +536,7 @@ class Dataset(dict):
         elif self.file_meta.TransferSyntaxUID in pydicom.uid.JPEGLSSupportedCompressedPixelTransferSyntaxes:
             UncompressedPixelData = self._get_jpeg_ls_supported_compressed_pixeldata()
         else:
-            msg = "The transfer syntax {} is not currently supported.\n".format(self.file_meta.TransferSyntaxUID)
+            msg = "The transfer syntax {} is not currently supported.".format(self.file_meta.TransferSyntaxUID)
             raise NotImplementedError(msg)
 
         # Have correct Numpy format, so create the NumPy array
@@ -566,7 +566,7 @@ class Dataset(dict):
 
     def _get_PIL_supported_compressed_pixeldata(self):
         if not have_pillow:
-            msg = "The pillow package is required to use pixel_array for this transfer syntax {}, and pillow could not be imported.\n".format(self.file_meta.TransferSyntaxUID)
+            msg = "The pillow package is required to use pixel_array for this transfer syntax {}, and pillow could not be imported.".format(self.file_meta.TransferSyntaxUID)
             raise ImportError(msg)
         # decompress here
         if self.file_meta.TransferSyntaxUID in pydicom.uid.JPEGLossyCompressedPixelTransferSyntaxes:

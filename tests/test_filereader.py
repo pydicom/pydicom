@@ -372,7 +372,8 @@ class JPEG_LS_Tests(unittest.TestCase):
             self.assertEqual(a.mean(), b.mean(),
                             "Decoded pixel data is not all {} (mean == {})".format(b.mean(), a.mean()))
         else:
-            self.assertRaises(NotImplementedError, self.jpeg_ls_lossless._get_pixel_array)
+            self.assertRaises(ImportError, self.jpeg_ls_lossless._get_pixel_array)
+
     def test_emri_JPEG_LS_PixelArray(self):
         """JPEG LS Lossless: Now works"""
         if have_numpy and have_jpeg_ls:
@@ -381,7 +382,7 @@ class JPEG_LS_Tests(unittest.TestCase):
             self.assertEqual(a.mean(), b.mean(),
                 "Decoded pixel data is not all {} (mean == {})".format(b.mean(), a.mean()))
         else:
-            self.assertRaises(NotImplementedError, self.emri_jpeg_ls_lossless._get_pixel_array)
+            self.assertRaises(ImportError, self.emri_jpeg_ls_lossless._get_pixel_array)
 
 
 class JPEG2000Tests(unittest.TestCase):
@@ -411,7 +412,7 @@ class JPEG2000Tests(unittest.TestCase):
             self.assertEqual(a.mean(), b.mean(),
                 "Decoded pixel data is not all {} (mean == {})".format(b.mean(), a.mean()))
         else:
-            self.assertRaises(NotImplementedError, self.jpegls._get_pixel_array)
+            self.assertRaises(ImportError, self.jpegls._get_pixel_array)
 
     def test_emri_JPEG2000PixelArray(self):
         """JPEG2000: Now works"""
@@ -421,7 +422,7 @@ class JPEG2000Tests(unittest.TestCase):
             self.assertEqual(a.mean(), b.mean(),
                                         "Decoded pixel data is not all {} (mean == {})".format(b.mean(), a.mean()))
         else:
-            self.assertRaises(NotImplementedError, self.emri_jpeg_2k_lossless._get_pixel_array)
+            self.assertRaises(ImportError, self.emri_jpeg_2k_lossless._get_pixel_array)
 
 
 class JPEGlossyTests(unittest.TestCase):
@@ -437,7 +438,10 @@ class JPEGlossyTests(unittest.TestCase):
 
     def testJPEGlossyPixelArray(self):
         """JPEG-lossy: Fails gracefully when uncompressed data is asked for....."""
-        self.assertRaises(NotImplementedError, self.jpeg._get_pixel_array)
+        if have_pillow and have_numpy:
+            self.assertRaises(NotImplementedError, self.jpeg._get_pixel_array)
+        else:
+            self.assertRaises(ImportError, self.jpeg._get_pixel_array)
 
 
 class JPEGlosslessTests(unittest.TestCase):
