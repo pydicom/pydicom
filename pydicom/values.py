@@ -268,7 +268,9 @@ def convert_value(VR, raw_data_element, encoding=default_encoding):
             # The user really wants an exception here
             raise
         logger.debug('unable to translate tag %s with VR %s' % (raw_data_element.tag, VR))
-        for vr, converter in converters.items():
+        for convert_vr in convert_retry_VR_order:
+            vr = convert_vr
+            converter = converters[vr]
             if vr == VR:
                 continue
             try:
@@ -280,7 +282,9 @@ def convert_value(VR, raw_data_element, encoding=default_encoding):
                 logger.debug('converted tag %s with VR %s' % (raw_data_element.tag, vr))
                 value = raw_data_element.value
     return value
-
+convert_retry_VR_order = [
+    'SH', 'UL', 'SL', 'US', 'SS', 'FL', 'FD', 'OF', 'OB', 'UI', 'DA', 'TM',
+    'PN', 'IS', 'DS', 'LT', 'SQ', 'UN', 'AT', 'OW', 'DT', 'UT', ]
 # converters map a VR to the function to read the value(s).
 # for convert_numbers, the converter maps to a tuple (function, struct_format)
 #                        (struct_format in python struct module style)

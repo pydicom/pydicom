@@ -4,8 +4,14 @@
 # This file is part of pydicom, released under a modified MIT license.
 #    See the file license.txt included with this distribution, also
 #    available at https://github.com/darcymason/pydicom
-
 import unittest
+try:
+    unittest.skipIf
+except AttributeError:
+    try:
+        import unittest2 as unittest
+    except ImportError:
+        print("unittest2 is required for testing in python2.6")
 
 from pydicom.compat import in_py2
 from pydicom import config
@@ -125,7 +131,7 @@ class BadValueReadtests(unittest.TestCase):
         # and converted to some semi-useful type
 
         dataset = pydicom.read_file(badvr_name)
-        self.assertIn(dataset.NumberOfFrames, [b'1A', '1A'])
+        self.assertIn(dataset.NumberOfFrames, ['1A', ])
 
 
 class DecimalStringtests(unittest.TestCase):
