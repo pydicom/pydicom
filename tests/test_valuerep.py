@@ -124,7 +124,7 @@ class BadValueReadtests(unittest.TestCase):
         # and converted to some semi-useful type
 
         dataset = pydicom.read_file(badvr_name)
-        self.assertTrue(dataset.NumberOfFrames == '1A')
+        self.assertEqual(dataset.NumberOfFrames, '1A')
 
 
 class DecimalStringtests(unittest.TestCase):
