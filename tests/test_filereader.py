@@ -456,9 +456,21 @@ class JPEGlosslessTests(unittest.TestCase):
 
     def testJPEGlosslessPixelArray(self):
         """JPEGlossless: Fails gracefully when uncompressed data is asked for..."""
-        self.assertRaises(ImportError, self.jpeg._get_pixel_array)
-
-        # create an in-memory fragment
+        # This test passes if the call raises either an
+        # ImportError when there is no Pillow module
+        # Or
+        # NotImplementedError when there is a Pillow module
+        #    but it lacks JPEG Lossless Dll's
+        # Or
+        # the call does not raise any Exceptions
+        # This test fails if any other exception is raised
+        with self.assertRaises((ImportError, NotImplementedError)):
+            try:
+                _x = self.jpeg._get_pixel_array()
+            except Exception:
+                raise
+            else:
+                raise ImportError()
 
 
 class DeferredReadTests(unittest.TestCase):
