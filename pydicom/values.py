@@ -268,7 +268,7 @@ def convert_value(VR, raw_data_element, encoding=default_encoding):
             # The user really wants an exception here
             raise
         logger.debug('unable to translate tag %s with VR %s' % (raw_data_element.tag, VR))
-        for vr, converter in converters.iteritems():
+        for vr, converter in converters.items():
             if vr == VR:
                 continue
             try:
