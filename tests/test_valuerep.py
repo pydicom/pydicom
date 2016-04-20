@@ -20,7 +20,10 @@ else:
 from datetime import datetime, date, time, timedelta
 from dateutil.tz import tzoffset
 import pydicom
-import cPickle as pickle
+try:
+    import cPickle as pickle
+except ImportError:
+    import pickle
 import os
 
 test_dir = os.path.dirname(__file__)
