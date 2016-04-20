@@ -457,7 +457,7 @@ class Dataset(dict):
             if gdcm_pixel_format in gdcm_numpy_typemap:
                 numpy_dtype = gdcm_numpy_typemap[gdcm_pixel_format]
             else:
-                raise TypeError('{} is not a GDCM supported pixel format'.format(gdcm_pixel_format))
+                raise TypeError('{0} is not a GDCM supported pixel format'.format(gdcm_pixel_format))
 
             # GDCM returns char* as type str. Under Python 2 `str` are
             # byte arrays by default. Python 3 decodes this to
@@ -536,7 +536,7 @@ class Dataset(dict):
         elif self.file_meta.TransferSyntaxUID in pydicom.uid.JPEGLSSupportedCompressedPixelTransferSyntaxes:
             UncompressedPixelData = self._get_jpeg_ls_supported_compressed_pixeldata()
         else:
-            msg = "The transfer syntax {} is not currently supported.".format(self.file_meta.TransferSyntaxUID)
+            msg = "The transfer syntax {0} is not currently supported.".format(self.file_meta.TransferSyntaxUID)
             raise NotImplementedError(msg)
 
         # Have correct Numpy format, so create the NumPy array
@@ -566,7 +566,7 @@ class Dataset(dict):
 
     def _get_PIL_supported_compressed_pixeldata(self):
         if not have_pillow:
-            msg = "The pillow package is required to use pixel_array for this transfer syntax {}, and pillow could not be imported.".format(self.file_meta.TransferSyntaxUID)
+            msg = "The pillow package is required to use pixel_array for this transfer syntax {0}, and pillow could not be imported.".format(self.file_meta.TransferSyntaxUID)
             raise ImportError(msg)
         # decompress here
         if self.file_meta.TransferSyntaxUID in pydicom.uid.JPEGLossyCompressedPixelTransferSyntaxes:
@@ -610,7 +610,7 @@ class Dataset(dict):
 
     def _get_jpeg_ls_supported_compressed_pixeldata(self):
         if not have_jpeg_ls:
-            msg = "The jpeg_ls package is required to use pixel_array for this transfer syntax {}, and jpeg_ls could not be imported.".format(self.file_meta.TransferSyntaxUID)
+            msg = "The jpeg_ls package is required to use pixel_array for this transfer syntax {0}, and jpeg_ls could not be imported.".format(self.file_meta.TransferSyntaxUID)
             raise ImportError(msg)
         # decompress here
         UncompressedPixelData = ''
