@@ -19,6 +19,7 @@ or import and use specific functions to provide code for pydicom DICOM classes
 
 import sys
 import pydicom
+from pydicom import compat
 from pydicom.datadict import dictionary_keyword
 
 import re
@@ -272,6 +273,15 @@ def code_file(filename, exclude_size=None, include_private=False):
 if __name__ == "__main__":
     default_exclude_size = 100  # bytes
 
+    
+if compat.in_py2:
+    # In python 2.6, int is shorter and 0xFFFF << 16 gets converted to long,
+    #   causing Overflow error in TupleTag
+    long_type = long
+else:
+    long_type = int
+    
+    
     try:
         import argparse
     except ImportError:
@@ -293,7 +303,7 @@ if __name__ == "__main__":
                         help="Filename to write python code to. "
                         "If not specified, code is written to stdout",
                         default=sys.stdout)
-    parser.add_argument('-e', '--exclude-size', type=long,
+    parser.add_argument('-e', '--exclude-size', type=long_type,
                         default=default_exclude_size,
                         help='Exclude binary data larger than specified (bytes)'
                         '. Default is %d bytes' % default_exclude_size)

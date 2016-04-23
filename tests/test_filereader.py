@@ -33,6 +33,14 @@ try:
     import numpy  # NOQA
 except:
     have_numpy = False
+    
+have_gdcm = True
+try:
+    import gdcm  # NOQA
+except:
+    have_gdcm = False
+    
+    
 from pydicom.filereader import read_file
 from pydicom.errors import InvalidDicomError
 from pydicom.tag import Tag, TupleTag
@@ -333,6 +341,7 @@ class JPEG2000Tests(unittest.TestCase):
         expected = 'Lossy Compression'
         self.assertEqual(got, expected, "JPEG200 file, Code Meaning got %s, expected %s" % (got, expected))
 
+    @unittest.skipUnless(not have_gdcm, "GDCM not installed")
     def testJPEG2000PixelArray(self):
         """JPEG2000: Fails gracefully when uncompressed data is asked for......."""
         self.assertRaises(NotImplementedError, self.jpeg._get_pixel_array)
@@ -349,6 +358,7 @@ class JPEGlossyTests(unittest.TestCase):
         expected = 'Lossy Compression'
         self.assertEqual(got, expected, "JPEG-lossy file, Code Meaning got %s, expected %s" % (got, expected))
 
+    @unittest.skipUnless(not have_gdcm, "GDCM not installed")
     def testJPEGlossyPixelArray(self):
         """JPEG-lossy: Fails gracefully when uncompressed data is asked for....."""
         self.assertRaises(NotImplementedError, self.jpeg._get_pixel_array)
@@ -358,12 +368,14 @@ class JPEGlosslessTests(unittest.TestCase):
     def setUp(self):
         self.jpeg = read_file(jpeg_lossless_name)
 
+    @unittest.skipUnless(not have_gdcm, "GDCM not installed")
     def testJPEGlossless(self):
         """JPEGlossless: Returns correct values for sample data elements........"""
         got = self.jpeg.SourceImageSequence[0].PurposeOfReferenceCodeSequence[0].CodeMeaning
         expected = 'Uncompressed predecessor'
         self.assertEqual(got, expected, "JPEG-lossless file, Code Meaning got %s, expected %s" % (got, expected))
 
+    @unittest.skipUnless(not have_gdcm, "GDCM not installed")
     def testJPEGlosslessPixelArray(self):
         """JPEGlossless: Fails gracefully when uncompressed data is asked for..."""
         self.assertRaises(NotImplementedError, self.jpeg._get_pixel_array)

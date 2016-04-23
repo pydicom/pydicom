@@ -27,6 +27,11 @@ if not in_py2:
 
 from collections import namedtuple
 
+have_numpy = True
+try:
+    import numpy
+except ImportError:
+    have_numpy = False
 
 # Helper functions:
 def isMultiValue(value):
@@ -198,6 +203,8 @@ class DataElement(object):
     def repval(self):
         """Return a str representation of the current value for use in __str__"""
         byte_VRs = ['OB', 'OW', 'OW/OB', 'OW or OB', 'OB or OW', 'US or SS or OW', 'US or SS']
+        if self.tag == 0x7fe00010:
+            repVal = "Array of %d bytes" % len(self.value)
         if (self.VR in byte_VRs and len(self.value) > self.maxBytesToDisplay):
             repVal = "Array of %d bytes" % len(self.value)
         elif hasattr(self, 'original_string'):  # for VR of IS or DS
