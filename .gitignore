@@ -40,3 +40,4 @@ docs/_build/*
 # jupyter notebooks
 *.ipynb
 .ipynb_checkpoints/*
+tests/test_pixel.py
