@@ -918,6 +918,6 @@ class FileDataset(Dataset):
                 self.filename = None  # e.g. came from BytesIO or something file-like
         self.timestamp = None
         if stat_available and self.filename and os.path.exists(self.filename):
-            statinfo = stat(self.filename)
+            statinfo = os.stat(self.filename)
             self.timestamp = statinfo.st_mtime
 

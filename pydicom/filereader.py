@@ -810,7 +810,7 @@ def read_deferred_data_element(fileobj_type, filename, timestamp,
         raise IOError(u"Deferred read -- original file "
                       "{0:s} is missing".format(filename))
     if stat_available and (timestamp is not None):
-        statinfo = stat(filename)
+        statinfo = os.stat(filename)
         if statinfo.st_mtime != timestamp:
             warnings.warn("Deferred read warning -- file modification time "
                           "has changed.")
