@@ -596,8 +596,10 @@ def read_partial(fileobj, stop_when=None, defer_size=None, force=False):
     is_little_endian = True
     if preamble:
         file_meta_dataset = _read_file_meta_info(fileobj)
-        transfer_syntax = file_meta_dataset.TransferSyntaxUID
-        if transfer_syntax == pydicom.uid.ImplicitVRLittleEndian:
+        transfer_syntax = file_meta_dataset.get("TransferSyntaxUID")
+        if transfer_syntax is None:  # issue 258
+            pass
+        elif transfer_syntax == pydicom.uid.ImplicitVRLittleEndian:
             pass
         elif transfer_syntax == pydicom.uid.ExplicitVRLittleEndian:
             is_implicit_VR = False

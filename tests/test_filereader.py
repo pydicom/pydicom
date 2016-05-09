@@ -55,6 +55,7 @@ deflate_name = os.path.join(test_files, "image_dfl.dcm")
 rtstruct_name = os.path.join(test_files, "rtstruct.dcm")
 priv_SQ_name = os.path.join(test_files, "priv_SQ.dcm")
 nested_priv_SQ_name = os.path.join(test_files, "nested_priv_SQ.dcm")
+meta_missing_tsyntax_name = os.path.join(test_files, "meta_missing_tsyntax.dcm")
 no_meta_group_length = os.path.join(test_files, "no_meta_group_length.dcm")
 gzip_name = os.path.join(test_files, "zipMR.gz")
 color_px_name = os.path.join(test_files, "color-px.dcm")
@@ -288,6 +289,18 @@ class ReaderTests(unittest.TestCase):
         got = ds.InstanceCreationDate
         expected = "20111130"
         self.assertEqual(got, expected, "Sample data element after file meta with no group length failed, expected '%s', got '%s'" % (expected, got))
+
+    def testNoTransferSyntaxInMeta(self):
+        """Read file with file_meta, but has no TransferSyntaxUID in it............"""
+        # From issue 258: if file has file_meta but no TransferSyntaxUID in it,
+        #   should assume default transfer syntax
+        ds = read_file(meta_missing_tsyntax_name)  # is dicom default transfer syntax
+        
+        # Repeat one test from nested private sequence test to maker sure 
+        #    file was read correctly
+        pixel_data_tag = TupleTag((0x7fe0, 0x10))
+        self.assertTrue(pixel_data_tag in ds,
+                        "Failed to properly read a file with no Transfer Syntax in file_meta")
 
     def testExplicitVRLittleEndianNoMeta(self):
         """Read file without file meta with Little Endian Explicit VR dataset...."""
