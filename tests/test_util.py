@@ -25,6 +25,7 @@ raw_hex_code = open(raw_hex_module, "rb").read()
 class DataElementCallbackTests(unittest.TestCase):
     def setUp(self):
         # Set up a dataset with commas in one item instead of backslash
+        config.enforce_valid_values = True
         namespace = {}
         exec(raw_hex_code, {}, namespace)
         ds_bytes = hexutil.hex2bytes(namespace['impl_LE_deflen_std_hex'])
@@ -33,6 +34,9 @@ class DataElementCallbackTests(unittest.TestCase):
                                     b"\x32\x2c\x34\x2c\x38\x2c\x31\x36")
 
         self.bytesio = BytesIO(ds_bytes)
+
+    def tearDown(self):
+        config.enforce_valid_values = False
 
     def testBadSeparator(self):
         """Ensure that unchanged bad separator does raise an error..........."""

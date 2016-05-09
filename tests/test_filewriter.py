@@ -144,6 +144,15 @@ class WriteFileTests(unittest.TestCase):
         if os.path.exists(ct_out):
             os.remove(ct_out)
 
+    def testwrite_short_uid(self):
+        ds = read_file(rtplan_name)
+        ds.SOPInstanceUID = "1.2"
+        ds.save_as(rtplan_out)
+        ds = read_file(rtplan_out)
+        ds.save_as(rtplan_out)
+        self.assertEqual(ds.SOPInstanceUID, "1.2")
+        if os.path.exists(rtplan_out):
+            os.remove(rtplan_out)  # get rid of the file
 
 class ScratchWriteDateTimeTests(WriteFileTests):
     """Write and reread simple or multi-value DA/DT/TM data elements"""
@@ -212,6 +221,7 @@ class ScratchWriteTests(unittest.TestCase):
         # Create simple dataset for all tests
         ds = Dataset()
         ds.PatientName = "Name^Patient"
+        ds.InstanceNumber = None
 
         # Set up a simple nested sequence
         # first, the innermost sequence

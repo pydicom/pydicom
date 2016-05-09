@@ -21,13 +21,10 @@ from pydicom.filebase import DicomBytesIO
 from pydicom.tag import ItemTag, SequenceDelimiterTag
 
 
-def defragment_data(data):
-    """Read encapsulated data and return one continuous string
-
+def decode_data_sequence(data):
+    """Read encapsulated data and return a list of strings
     data -- string of encapsulated data, typically dataset.PixelData
-    Return all fragments concatenated together as a byte string
-
-    If PixelData has multiple frames, then should separate out before calling this routine.
+    Return all fragments in a list of byte strings
     """
 
     # Convert data into a memory-mapped file
@@ -42,7 +39,16 @@ def defragment_data(data):
         seq.append(item)
 
     # XXX should
-    return "".join(seq)
+    return seq
+
+
+def defragment_data(data):
+    """Read encapsulated data and return one continuous string
+    data -- string of encapsulated data, typically dataset.PixelData
+    Return all fragments concatenated together as a byte string
+    If PixelData has multiple frames, then should separate out before calling this routine.
+    """
+    return "".join(decode_data_sequence(data))
 
 
 # read_item modeled after filereader.ReadSequenceItem

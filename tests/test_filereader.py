@@ -1,4 +1,5 @@
 # test_filereader.py
+# -*- coding: utf-8 -*-
 """unittest tests for pydicom.filereader module"""
 # Copyright (c) 2010-2012 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
@@ -10,6 +11,8 @@ import os
 import os.path
 import unittest
 from io import BytesIO
+import shutil
+import tempfile
 
 try:
     unittest.skipUnless
@@ -38,17 +41,35 @@ from pydicom.errors import InvalidDicomError
 from pydicom.tag import Tag, TupleTag
 import pydicom.valuerep
 import gzip
+have_jpeg_ls = True
+try:
+    import jpeg_ls
+except ImportError:
+    have_jpeg_ls = False
 
+have_pillow = True
+try:
+    from PIL import Image as PILImg
+except ImportError:
+    # If that failed, try the alternate import syntax for PIL.
+    try:
+        import Image as PILImg
+    except ImportError:
+        # Neither worked, so it's likely not installed.
+        have_pillow = False
 from warncheck import assertWarns
 
 test_dir = os.path.dirname(__file__)
 test_files = os.path.join(test_dir, 'test_files')
 
+empty_number_tags_name = os.path.join(test_files, "reportsi_with_empty_number_tags.dcm")
 rtplan_name = os.path.join(test_files, "rtplan.dcm")
 rtdose_name = os.path.join(test_files, "rtdose.dcm")
 ct_name = os.path.join(test_files, "CT_small.dcm")
 mr_name = os.path.join(test_files, "MR_small.dcm")
 jpeg2000_name = os.path.join(test_files, "JPEG2000.dcm")
+jpeg2000_lossless_name = os.path.join(test_files, "MR_small_jp2klossless.dcm")
+jpeg_ls_lossless_name = os.path.join(test_files, "MR_small_jpeg_ls_lossless.dcm")
 jpeg_lossy_name = os.path.join(test_files, "JPEG-lossy.dcm")
 jpeg_lossless_name = os.path.join(test_files, "JPEG-LL.dcm")
 deflate_name = os.path.join(test_files, "image_dfl.dcm")
@@ -62,7 +83,9 @@ color_px_name = os.path.join(test_files, "color-px.dcm")
 color_pl_name = os.path.join(test_files, "color-pl.dcm")
 explicit_vr_le_no_meta = os.path.join(test_files, "ExplVR_LitEndNoMeta.dcm")
 explicit_vr_be_no_meta = os.path.join(test_files, "ExplVR_BigEndNoMeta.dcm")
-
+emri_name = os.path.join(test_files, "emri_small.dcm")
+emri_jpeg_ls_lossless = os.path.join(test_files, "emri_small_jpeg_ls_lossless.dcm")
+emri_jpeg_2k_lossless = os.path.join(test_files, "emri_small_jpeg_2k_lossless.dcm")
 dir_name = os.path.dirname(sys.argv[0])
 save_dir = os.getcwd()
 
@@ -83,6 +106,24 @@ def isClose(a, b, epsilon=0.000001):
 
 
 class ReaderTests(unittest.TestCase):
+    def testEmptyNumbersTag(self):
+        """Tests that an empty tag with a number VR (FL, UL, SL, US, SS, FL, FD, OF) reads as an empty string"""
+        empty_number_tags_ds = read_file(empty_number_tags_name)
+        self.assertEqual(empty_number_tags_ds.ExaminedBodyThickness, '')
+        self.assertEqual(empty_number_tags_ds.SimpleFrameList, '')
+        self.assertEqual(empty_number_tags_ds.ReferencePixelX0, '')
+        self.assertEqual(empty_number_tags_ds.PhysicalUnitsXDirection, '')
+        self.assertEqual(empty_number_tags_ds.TagAngleSecondAxis, '')
+        self.assertEqual(empty_number_tags_ds.TagSpacingSecondDimension, '')
+        self.assertEqual(empty_number_tags_ds.VectorGridData, '')
+
+    def testUTF8FileName(self):
+        utf8_filename = os.path.join(tempfile.gettempdir(), "ДИКОМ.dcm")
+        shutil.copyfile(rtdose_name, utf8_filename)
+        ds = read_file(utf8_filename)
+        os.remove(utf8_filename)
+        self.assertTrue(ds is not None)
+
     def testRTPlan(self):
         """Returns correct values for sample data elements in test RT Plan file"""
         plan = read_file(rtplan_name)
@@ -329,9 +370,42 @@ class ReaderTests(unittest.TestCase):
             pl_data = pl_data_ds.pixel_array
             self.assertTrue(numpy.all(px_data == pl_data))
 
+class JPEG_LS_Tests(unittest.TestCase):
+    def setUp(self):
+        self.jpeg_ls_lossless = read_file(jpeg_ls_lossless_name)
+        self.mr_small = read_file(mr_name)
+        self.emri_jpeg_ls_lossless = read_file(emri_jpeg_ls_lossless)
+        self.emri_small = read_file(emri_name)
+
+    def testJPEG_LS_PixelArray(self):
+        """JPEG LS Lossless: Now works"""
+        if have_numpy and have_jpeg_ls:
+            a = self.jpeg_ls_lossless.pixel_array
+            b = self.mr_small.pixel_array
+            self.assertEqual(a.mean(), b.mean(),
+                            "Decoded pixel data is not all {} (mean == {})".format(b.mean(), a.mean()))
+        else:
+            self.assertRaises(ImportError, self.jpeg_ls_lossless._get_pixel_array)
+
+    def test_emri_JPEG_LS_PixelArray(self):
+        """JPEG LS Lossless: Now works"""
+        if have_numpy and have_jpeg_ls:
+            a = self.emri_jpeg_ls_lossless.pixel_array
+            b = self.emri_small.pixel_array
+            self.assertEqual(a.mean(), b.mean(),
+                "Decoded pixel data is not all {} (mean == {})".format(b.mean(), a.mean()))
+        else:
+            self.assertRaises(ImportError, self.emri_jpeg_ls_lossless._get_pixel_array)
+
+
 class JPEG2000Tests(unittest.TestCase):
     def setUp(self):
         self.jpeg = read_file(jpeg2000_name)
+        self.jpegls = read_file(jpeg2000_lossless_name)
+        self.mr_small = read_file(mr_name)
+        self.emri_jpeg_2k_lossless = read_file(emri_jpeg_2k_lossless)
+        self.emri_small = read_file(emri_name)
+
 
     def testJPEG2000(self):
         """JPEG2000: Returns correct values for sample data elements............"""
@@ -344,8 +418,24 @@ class JPEG2000Tests(unittest.TestCase):
         self.assertEqual(got, expected, "JPEG200 file, Code Meaning got %s, expected %s" % (got, expected))
 
     def testJPEG2000PixelArray(self):
-        """JPEG2000: Fails gracefully when uncompressed data is asked for......."""
-        self.assertRaises(NotImplementedError, self.jpeg._get_pixel_array)
+        """JPEG2000: Now works"""
+        if have_numpy and have_pillow:
+            a = self.jpegls.pixel_array
+            b = self.mr_small.pixel_array
+            self.assertEqual(a.mean(), b.mean(),
+                "Decoded pixel data is not all {} (mean == {})".format(b.mean(), a.mean()))
+        else:
+            self.assertRaises(ImportError, self.jpegls._get_pixel_array)
+
+    def test_emri_JPEG2000PixelArray(self):
+        """JPEG2000: Now works"""
+        if have_numpy and have_pillow:
+            a = self.emri_jpeg_2k_lossless.pixel_array
+            b = self.emri_small.pixel_array
+            self.assertEqual(a.mean(), b.mean(),
+                                        "Decoded pixel data is not all {} (mean == {})".format(b.mean(), a.mean()))
+        else:
+            self.assertRaises(ImportError, self.emri_jpeg_2k_lossless._get_pixel_array)
 
 
 class JPEGlossyTests(unittest.TestCase):
@@ -361,7 +451,10 @@ class JPEGlossyTests(unittest.TestCase):
 
     def testJPEGlossyPixelArray(self):
         """JPEG-lossy: Fails gracefully when uncompressed data is asked for....."""
-        self.assertRaises(NotImplementedError, self.jpeg._get_pixel_array)
+        if have_pillow and have_numpy:
+            self.assertRaises(NotImplementedError, self.jpeg._get_pixel_array)
+        else:
+            self.assertRaises(ImportError, self.jpeg._get_pixel_array)
 
 
 class JPEGlosslessTests(unittest.TestCase):
@@ -376,9 +469,21 @@ class JPEGlosslessTests(unittest.TestCase):
 
     def testJPEGlosslessPixelArray(self):
         """JPEGlossless: Fails gracefully when uncompressed data is asked for..."""
-        self.assertRaises(NotImplementedError, self.jpeg._get_pixel_array)
-
-        # create an in-memory fragment
+        # This test passes if the call raises either an
+        # ImportError when there is no Pillow module
+        # Or
+        # NotImplementedError when there is a Pillow module
+        #    but it lacks JPEG Lossless Dll's
+        # Or
+        # the call does not raise any Exceptions
+        # This test fails if any other exception is raised
+        with self.assertRaises((ImportError, NotImplementedError)):
+            try:
+                _x = self.jpeg._get_pixel_array()
+            except Exception:
+                raise
+            else:
+                raise ImportError()
 
 
 class DeferredReadTests(unittest.TestCase):

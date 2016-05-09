@@ -719,7 +719,10 @@ def read_file(fp, defer_size=None, stop_before_pixels=False, force=False):
     if isinstance(fp, compat.string_types):
         # caller provided a file name; we own the file handle
         caller_owns_file = False
-        logger.debug(u"Reading file '{0}'".format(fp))
+        try:
+            logger.debug(u"Reading file '{0}'".format(fp))
+        except Exception:
+            logger.debug("Reading file '{0}'".format(fp))
         fp = open(fp, 'rb')
 
     if config.debugging:
@@ -809,7 +812,7 @@ def read_deferred_data_element(fileobj_type, filename, timestamp,
         raise IOError(u"Deferred read -- original file "
                       "{0:s} is missing".format(filename))
     if stat_available and (timestamp is not None):
-        statinfo = stat(filename)
+        statinfo = os.stat(filename)
         if statinfo.st_mtime != timestamp:
             warnings.warn("Deferred read warning -- file modification time "
                           "has changed.")
