@@ -55,6 +55,12 @@ class MultiValuetests(unittest.TestCase):
         self.assertTrue(isinstance(multival[-1], IS))
         self.assertEqual(multival[-2], 7, "Item set by extend not correct value")
 
+    def testExtendSelf(self):
+        """MultiValue: Extending a MultiValue with itself does not cause infinite loop and result is correct."""
+        multival = MultiValue(IS, [1, 2, 3])
+        multival.extend(multival)
+        self.assertEqual(multival, MultiValue(IS, [1, 2, 3, 1, 2, 3]), "Item set by extend self not correct value")
+
     def testSlice(self):
         """MultiValue: Setting slice converts items to required type."""
         multival = MultiValue(IS, range(7))

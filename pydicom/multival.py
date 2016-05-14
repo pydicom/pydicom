@@ -48,7 +48,7 @@ class MultiValue(list):
         return MultiValue(self.type_constructor, self)
         
     def extend(self, list_of_vals):
-        super(MultiValue, self).extend((self.type_constructor(x) for x in list_of_vals))
+        super(MultiValue, self).extend([self.type_constructor(x) for x in list_of_vals])
 
     def insert(self, position, val):
         super(MultiValue, self).insert(position, self.type_constructor(val))
