@@ -548,13 +548,17 @@ class Dataset(dict):
         # Note the following reshape operations return a new *view* onto arr, but don't copy the data
         if 'NumberOfFrames' in self and self.NumberOfFrames > 1:
             if self.SamplesPerPixel > 1:
-                arr = arr.reshape(self.SamplesPerPixel, self.NumberOfFrames, self.Rows, self.Columns)
+                arr = arr.reshape(self.NumberOfFrames, self.Rows, self.Columns,  self.SamplesPerPixel)
             else:
                 arr = arr.reshape(self.NumberOfFrames, self.Rows, self.Columns)
         else:
             if self.SamplesPerPixel > 1:
                 if self.BitsAllocated == 8:
-                    arr = arr.reshape(self.SamplesPerPixel, self.Rows, self.Columns)
+                    if self.PlanarConfiguration == 0:
+                        arr = arr.reshape(self.Rows, self.Columns, self.SamplesPerPixel)
+                    else:
+                        arr = arr.reshape(self.SamplesPerPixel, self.Rows, self.Columns)
+                        arr = arr.transpose(1, 2, 0)
                 else:
                     raise NotImplementedError("This code only handles SamplesPerPixel > 1 if Bits Allocated = 8")
             else:
