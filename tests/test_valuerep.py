@@ -24,7 +24,13 @@ else:
     from pydicom.valuerep import PersonName, PersonNameUnicode
 
 from datetime import datetime, date, time, timedelta
-from dateutil.tz import tzoffset
+
+have_dateutil = True
+try:
+    from dateutil.tz import tzoffset
+except ImportError:
+    have_dateutil = False
+
 import pydicom
 import platform
 try:
@@ -230,6 +236,7 @@ class PersonNametests(unittest.TestCase):
         self.assertFalse(pn != "John^Doe", msg)
 
 
+@unittest.skipIf(not have_dateutil, "Need python-dateutil installed for these tests")
 class DateTimeTests(unittest.TestCase):
     """Unit tests for DA, DT, TM conversion to datetime objects"""
 

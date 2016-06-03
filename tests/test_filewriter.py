@@ -9,7 +9,11 @@ import sys
 import os.path
 import os
 from datetime import date, datetime, time
-from dateutil.tz import tzoffset
+have_dateutil = True
+try:
+    from dateutil.tz import tzoffset
+except ImportError:
+    have_dateutil = False
 import unittest
 try:
     unittest.TestCase.assertSequenceEqual
@@ -154,6 +158,8 @@ class WriteFileTests(unittest.TestCase):
         if os.path.exists(rtplan_out):
             os.remove(rtplan_out)  # get rid of the file
 
+            
+@unittest.skipIf(not have_dateutil, "Need python-dateutil installed for these tests")
 class ScratchWriteDateTimeTests(WriteFileTests):
     """Write and reread simple or multi-value DA/DT/TM data elements"""
     def setUp(self):

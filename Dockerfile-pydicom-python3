@@ -3,5 +3,5 @@ COPY . /pydicom/
 WORKDIR /pydicom
 RUN pip install --no-dependencies .
 WORKDIR /pydicom/tests
-CMD ["run_tests.py"]
+CMD ["run_tests.py -v"]
 ENTRYPOINT ["python"] 

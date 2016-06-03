@@ -13,7 +13,13 @@ from pydicom.multival import MultiValue
 from pydicom.config import logger
 
 from datetime import date, datetime, time
-from dateutil.tz import tzoffset
+
+have_dateutil = True
+try:
+    from dateutil.tz import tzoffset
+except ImportError:
+    have_dateutil = False
+    
 import re
 
 from pydicom.config import logger
@@ -178,6 +184,10 @@ class DT(datetime):
                     offset = (int(tz_match[1:3]) * 60 + int(tz_match[3:5])) * 60
                     if tz_match[0] == '-':
                         offset = -offset
+                    if not have_dateutil:
+                        msg = "The python-dateutil package is required to convert dates/times to datetime objects"
+                        msg += "\nPlease install python-dateutil or set pydicom.config.datetime_conversion = False"
+                        raise ImportError(msg)
                     tzinfo = tzoffset(tz_match, offset)
                 else:
                     tzinfo = None
