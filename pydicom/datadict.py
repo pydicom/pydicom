@@ -85,6 +85,7 @@ def dictionary_keyword(tag):
     """Return the official DICOM standard (since 2011) keyword for the tag"""
     return get_entry(tag)[4]
 
+
 def dictionary_is_retired(tag):
     """Return True if the dicom retired status is 'Retired' for the given tag"""
     if 'retired' in get_entry(tag)[3].lower():

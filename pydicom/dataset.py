@@ -480,7 +480,7 @@ class Dataset(dict):
         # Note the following reshape operations return a new *view* onto pixel_array, but don't copy the data
         if 'NumberOfFrames' in self and self.NumberOfFrames > 1:
             if self.SamplesPerPixel > 1:
-                #TODO: Handle Planar Configuration attribute
+                # TODO: Handle Planar Configuration attribute
                 assert self.PlanarConfiguration == 0
                 pixel_array = pixel_array.reshape(self.NumberOfFrames, self.Rows, self.Columns, self.SamplesPerPixel)
             else:
