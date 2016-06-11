@@ -19,7 +19,7 @@ try:
     from dateutil.tz import tzoffset
 except ImportError:
     have_dateutil = False
-    
+
 import re
 
 from pydicom.config import logger

@@ -920,4 +920,3 @@ class FileDataset(Dataset):
         if stat_available and self.filename and os.path.exists(self.filename):
             statinfo = os.stat(self.filename)
             self.timestamp = statinfo.st_mtime
-
