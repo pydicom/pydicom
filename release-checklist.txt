@@ -25,14 +25,14 @@ pydicom release checklist
     (switch to testfiles directory; cp mr1_unc.dcm from external testsuite for downsize example)
     python
     >>> import doctest
-    >>> doctest.testfile("../examples/interactive_session.txt")  # , verbose=True if desired
-    >>> doctest.testfile("../examples/interactive_session_downsize_image.txt")
-    >>> doctest.testfile("../examples/simple_interactive_example.txt")
-    >>> doctest.testfile("../examples/user_guide_doctest.txt")
-    >>> doctest.testfile("../examples/working_with_sequences_doctest.txt")
+    >>> doctest.testfile("../../pydicom/examples/interactive_session.txt")  # , verbose=True if desired
+    >>> doctest.testfile("../../pydicom/examples/interactive_session_downsize_image.txt")
+    >>> doctest.testfile("../../pydicom/examples/simple_interactive_example.txt")
+    >>> doctest.testfile("../../pydicom/examples/user_guide_doctest.txt")
+    >>> doctest.testfile("../../pydicom/examples/working_with_sequences_doctest.txt")
 
     First can fail if help() function as goes into reader mode needing q to exit
-* run python26 -Qwarn to check for integer division problems.
+* run python27 -Qwarn to check for integer division problems.
 * run test/all.bat on windows to test with all supported python versions
 * run test/shell_all on linux/mac to test all supported python versions
 
