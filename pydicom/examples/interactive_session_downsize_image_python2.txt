@@ -10,10 +10,10 @@ Test in python: Anaconda 2.0.1 (64-bit)
 >>> ds = pydicom.read_file("MR1_UNC")
 >>> data = ds.pixel_array
 >>> data.shape
-(512, 512)
+(512L, 512L)
 >>> data2 = data[256-32:256+32, 128-32:128+32]
 >>> data2.shape
-(64, 64)
+(64L, 64L)
 >>> ds.PixelData = data2.tostring()
 >>> ds.Rows = 64
 >>> ds.Columns = 64

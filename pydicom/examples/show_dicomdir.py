@@ -31,7 +31,7 @@ if __name__ == "__main__":
         base_dir = os.path.dirname(filepath)
     else:
         # Read standard "DICOMDIR" filename from current directory
-        dcmdir = pydicom.read_dicomdir()
+        dcmdir = read_dicomdir()
         base_dir = "."
 
     for patrec in dcmdir.patient_records:

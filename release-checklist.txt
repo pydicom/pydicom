@@ -24,6 +24,7 @@ pydicom release checklist
     if you want to ensure no errors.
     (switch to testfiles directory; cp mr1_unc.dcm from external testsuite for downsize example)
     python
+    USING a PYTHON3 version with **Numpy installed:
     >>> import doctest
     >>> doctest.testfile("../../pydicom/examples/interactive_session.txt")  # , verbose=True if desired
     >>> doctest.testfile("../../pydicom/examples/interactive_session_downsize_image.txt")
@@ -45,12 +46,13 @@ pydicom release checklist
 * build the package files
     * on windows, python setup.py bdist_wininst --> get windows installer exe in dist directory
     * on linux, python setup.py sdist  --> get .tar.gz source file (also used by easy_install) in dist directory
+    * for all platforms, python setup.py bdist_wheel --universal  (pure python with code that runs in python2 and python3)
 * use the dist files to install the package on
   * windows -- 32-bit  / 64-bit using Windows installer
   * linux   -- 32-bit  / 64-bit
   and run the tests in at least one python version on each system
-* upload dist files to googlecode site
-* run pip or easy_install (retrieve from pypi) again on clean system and make sure it works:
+* upload dist files to github
+* run pip or easy_install (retrieve from pypi) again on new environment and make sure it works:
 * verify that source install has _all_ directories and subdirectories included
 * update documentation:
   * update Release Notes page
@@ -61,5 +63,11 @@ pydicom release checklist
 * update News page with quick synopsis of major features
 * announce on pydicom google group
 * update info on medphysfiles.com
-* register with pypi -- python setup.py register
-* others -- freshmeat? idoimaging.com? macports?
+* register with pypi:
+    1.  Use the form on the PyPI website, to upload your PKG-INFO info located in your local project tree 
+    at myproject.egg-info/PKG-INFO. If you don’t have that file or directory, 
+    then run python setup.py egg_info to have it generated.
+ OR 2. Run twine register dist/*, and twine will register your project based on the package metadata 
+       in the specified files. Your ~/.pypirc must already be appropriately configured for twine to work.   
+* twine upload dist/*
+* others --  idoimaging.com? macports?

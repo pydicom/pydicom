@@ -17,7 +17,7 @@
 >>> plan_ds.BeamSequence[0].NumberOfBlocks = 2
 
 >>> beam0 = plan_ds.BeamSequence[0]  # just for less typing
->>> print(len(beam0.BlockSequence))
+>>> print len(beam0.BlockSequence)
 2
 >>> block_ds3 = Dataset()  # new Dataset
 >>> # ... add data elements to it as above
