@@ -86,6 +86,7 @@ explicit_vr_be_no_meta = os.path.join(test_files, "ExplVR_BigEndNoMeta.dcm")
 emri_name = os.path.join(test_files, "emri_small.dcm")
 emri_jpeg_ls_lossless = os.path.join(test_files, "emri_small_jpeg_ls_lossless.dcm")
 emri_jpeg_2k_lossless = os.path.join(test_files, "emri_small_jpeg_2k_lossless.dcm")
+color_3d_jpeg_baseline = os.path.join(test_files, "color3d_jpeg_baseline.dcm")
 dir_name = os.path.dirname(sys.argv[0])
 save_dir = os.getcwd()
 
@@ -336,8 +337,8 @@ class ReaderTests(unittest.TestCase):
         # From issue 258: if file has file_meta but no TransferSyntaxUID in it,
         #   should assume default transfer syntax
         ds = read_file(meta_missing_tsyntax_name)  # is dicom default transfer syntax
-        
-        # Repeat one test from nested private sequence test to maker sure 
+
+        # Repeat one test from nested private sequence test to maker sure
         #    file was read correctly
         pixel_data_tag = TupleTag((0x7fe0, 0x10))
         self.assertTrue(pixel_data_tag in ds,
@@ -442,7 +443,7 @@ class JPEGlossyTests(unittest.TestCase):
 
     def setUp(self):
         self.jpeg = read_file(jpeg_lossy_name)
-
+        self.color_3d_jpeg = read_file(color_3d_jpeg_baseline)
     def testJPEGlossy(self):
         """JPEG-lossy: Returns correct values for sample data elements.........."""
         got = self.jpeg.DerivationCodeSequence[0].CodeMeaning
@@ -455,6 +456,16 @@ class JPEGlossyTests(unittest.TestCase):
             self.assertRaises(NotImplementedError, self.jpeg._get_pixel_array)
         else:
             self.assertRaises(ImportError, self.jpeg._get_pixel_array)
+
+    def testJPEGBaselineColor3DPixelArray(self):
+        if have_pillow and have_numpy:
+            a = self.color_3d_jpeg.pixel_array
+            self.assertEqual(a.shape, (120, 480, 640, 3))
+            # this test points were manually identified in Osirix viewer
+            self.assertEqual(tuple(a[3, 159, 290, :]), (41, 41, 41))
+            self.assertEqual(tuple(a[3, 169, 290, :]), (57, 57, 57))
+        else:
+            self.assertRaises(ImportError, self.color_3d_jpeg._get_pixel_array)
 
 
 class JPEGlosslessTests(unittest.TestCase):
