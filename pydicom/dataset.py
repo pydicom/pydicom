@@ -485,7 +485,7 @@ class Dataset(dict):
 
             # We make sure that all the bytes after are in fact zeros
             padding = pixel_bytearray[n_bytes:]
-            if padding.count(b'\x00') == len(padding):
+            if sum(padding) == 0:
                 pixel_bytearray = pixel_bytearray[:n_bytes]
             else:
                 # We revert to the old behavior which should then result in a
