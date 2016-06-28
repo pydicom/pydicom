@@ -478,9 +478,19 @@ class Dataset(dict):
         # Here we need to be careful because in some cases, GDCM reads a
         # buffer that is too large, so we need to make sure we only include
         # the first n_rows * n_columns * dtype_size bytes.
+
         n_bytes = self.Rows * self.Columns * numpy.dtype(numpy_dtype).itemsize
+
         if len(pixel_bytearray) > n_bytes:
-            pixel_bytearray = pixel_bytearray[:n_bytes]
+
+            # We make sure that all the bytes after are in fact zeros
+            padding = pixel_bytearray[n_bytes:]
+            if padding.count(b'\x00') == len(padding):
+                pixel_bytearray = pixel_bytearray[:n_bytes]
+            else:
+                # We revert to the old behavior which should then result in a
+                # Numpy error later on.
+                pass
 
         pixel_array = numpy.fromstring(pixel_bytearray, dtype=numpy_dtype)
 
