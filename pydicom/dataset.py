@@ -475,6 +475,13 @@ class Dataset(dict):
             if gdcm_image.GetNeedByteSwap():
                 numpy_dtype.newbyteorder('S')
 
+        # Here we need to be careful because in some cases, GDCM reads a
+        # buffer that is too large, so we need to make sure we only include
+        # the first n_rows * n_columns * dtype_size bytes.
+        n_bytes = self.Rows * self.Columns * numpy.dtype(numpy_dtype).itemsize
+        if len(pixel_bytearray) > n_bytes:
+            pixel_bytearray = pixel_bytearray[:n_bytes]
+
         pixel_array = numpy.fromstring(pixel_bytearray, dtype=numpy_dtype)
 
         # Note the following reshape operations return a new *view* onto pixel_array, but don't copy the data
