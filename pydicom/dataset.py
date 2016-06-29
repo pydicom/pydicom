@@ -576,14 +576,14 @@ class Dataset(dict):
         if self.file_meta.TransferSyntaxUID in pydicom.uid.JPEGLossyCompressedPixelTransferSyntaxes:
             if self.BitsAllocated > 8:
                 raise NotImplementedError("JPEG Lossy only supported if Bits Allocated = 8")
-            generic_jpeg_file_header = '\xff\xd8\xff\xe0\x00\x10JFIF\x00\x01\x01\x01\x00\x01\x00\x01\x00\x00'
+            generic_jpeg_file_header = b'\xff\xd8\xff\xe0\x00\x10JFIF\x00\x01\x01\x01\x00\x01\x00\x01\x00\x00'
             frame_start_from = 2
         elif self.file_meta.TransferSyntaxUID in pydicom.uid.JPEG2000CompressedPixelTransferSyntaxes:
-            generic_jpeg_file_header = ''
-            # generic_jpeg_file_header = '\x00\x00\x00\x0C\x6A\x50\x20\x20\x0D\x0A\x87\x0A'
+            generic_jpeg_file_header = b''
+            # generic_jpeg_file_header = b'\x00\x00\x00\x0C\x6A\x50\x20\x20\x0D\x0A\x87\x0A'
             frame_start_from = 0
         else:
-            generic_jpeg_file_header = ''
+            generic_jpeg_file_header = b''
             frame_start_from = 0
         try:
             UncompressedPixelData = ''

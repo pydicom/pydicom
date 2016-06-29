@@ -48,7 +48,7 @@ def defragment_data(data):
     Return all fragments concatenated together as a byte string
     If PixelData has multiple frames, then should separate out before calling this routine.
     """
-    return "".join(decode_data_sequence(data))
+    return b"".join(decode_data_sequence(data))
 
 
 # read_item modeled after filereader.ReadSequenceItem
