@@ -22,7 +22,6 @@ except AttributeError:
     except ImportError:
         print("unittest2 is required for testing in python2.6")
 
-import shutil
 # os.stat is only available on Unix and Windows   XXX Mac?
 # Not sure if on other platforms the import fails, or the call to it??
 stat_available = True
@@ -84,6 +83,7 @@ color_pl_name = os.path.join(test_files, "color-pl.dcm")
 explicit_vr_le_no_meta = os.path.join(test_files, "ExplVR_LitEndNoMeta.dcm")
 explicit_vr_be_no_meta = os.path.join(test_files, "ExplVR_BigEndNoMeta.dcm")
 emri_name = os.path.join(test_files, "emri_small.dcm")
+emri_big_endian_name = os.path.join(test_files, "emri_small_big_endian.dcm")
 emri_jpeg_ls_lossless = os.path.join(test_files, "emri_small_jpeg_ls_lossless.dcm")
 emri_jpeg_2k_lossless = os.path.join(test_files, "emri_small_jpeg_2k_lossless.dcm")
 color_3d_jpeg_baseline = os.path.join(test_files, "color3d_jpeg_baseline.dcm")
@@ -371,6 +371,7 @@ class ReaderTests(unittest.TestCase):
             pl_data = pl_data_ds.pixel_array
             self.assertTrue(numpy.all(px_data == pl_data))
 
+
 class JPEG_LS_Tests(unittest.TestCase):
     def setUp(self):
         self.jpeg_ls_lossless = read_file(jpeg_ls_lossless_name)
@@ -384,7 +385,7 @@ class JPEG_LS_Tests(unittest.TestCase):
             a = self.jpeg_ls_lossless.pixel_array
             b = self.mr_small.pixel_array
             self.assertEqual(a.mean(), b.mean(),
-                            "Decoded pixel data is not all {} (mean == {})".format(b.mean(), a.mean()))
+                             "Decoded pixel data is not all {} (mean == {})".format(b.mean(), a.mean()))
         else:
             self.assertRaises(ImportError, self.jpeg_ls_lossless._get_pixel_array)
 
@@ -394,9 +395,25 @@ class JPEG_LS_Tests(unittest.TestCase):
             a = self.emri_jpeg_ls_lossless.pixel_array
             b = self.emri_small.pixel_array
             self.assertEqual(a.mean(), b.mean(),
-                "Decoded pixel data is not all {} (mean == {})".format(b.mean(), a.mean()))
+                             "Decoded pixel data is not all {} (mean == {})".format(b.mean(), a.mean()))
         else:
             self.assertRaises(ImportError, self.emri_jpeg_ls_lossless._get_pixel_array)
+
+
+class BigEndian_Tests(unittest.TestCase):
+    def setUp(self):
+        self.emri_big_endian = read_file(emri_big_endian_name)
+        self.emri_small = read_file(emri_name)
+
+    def test_big_endian_PixelArray(self):
+        """Test big endian pixel data vs little endian"""
+        if have_numpy:
+            a = self.emri_big_endian.pixel_array
+            b = self.emri_small.pixel_array
+            self.assertEqual(a.mean(), b.mean(),
+                             "Decoded big endian pixel data is not all {} (mean == {})".format(b.mean(), a.mean()))
+        else:
+            self.assertRaises(ImportError, self.emri_big_endian._get_pixel_array)
 
 
 class JPEG2000Tests(unittest.TestCase):
@@ -406,7 +423,6 @@ class JPEG2000Tests(unittest.TestCase):
         self.mr_small = read_file(mr_name)
         self.emri_jpeg_2k_lossless = read_file(emri_jpeg_2k_lossless)
         self.emri_small = read_file(emri_name)
-
 
     def testJPEG2000(self):
         """JPEG2000: Returns correct values for sample data elements............"""
@@ -424,7 +440,7 @@ class JPEG2000Tests(unittest.TestCase):
             a = self.jpegls.pixel_array
             b = self.mr_small.pixel_array
             self.assertEqual(a.mean(), b.mean(),
-                "Decoded pixel data is not all {} (mean == {})".format(b.mean(), a.mean()))
+                             "Decoded pixel data is not all {} (mean == {})".format(b.mean(), a.mean()))
         else:
             self.assertRaises(ImportError, self.jpegls._get_pixel_array)
 
@@ -434,7 +450,7 @@ class JPEG2000Tests(unittest.TestCase):
             a = self.emri_jpeg_2k_lossless.pixel_array
             b = self.emri_small.pixel_array
             self.assertEqual(a.mean(), b.mean(),
-                                        "Decoded pixel data is not all {} (mean == {})".format(b.mean(), a.mean()))
+                             "Decoded pixel data is not all {} (mean == {})".format(b.mean(), a.mean()))
         else:
             self.assertRaises(ImportError, self.emri_jpeg_2k_lossless._get_pixel_array)
 
@@ -444,6 +460,7 @@ class JPEGlossyTests(unittest.TestCase):
     def setUp(self):
         self.jpeg = read_file(jpeg_lossy_name)
         self.color_3d_jpeg = read_file(color_3d_jpeg_baseline)
+
     def testJPEGlossy(self):
         """JPEG-lossy: Returns correct values for sample data elements.........."""
         got = self.jpeg.DerivationCodeSequence[0].CodeMeaning
