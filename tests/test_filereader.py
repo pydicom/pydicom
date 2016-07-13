@@ -385,7 +385,7 @@ class JPEG_LS_Tests(unittest.TestCase):
             a = self.jpeg_ls_lossless.pixel_array
             b = self.mr_small.pixel_array
             self.assertEqual(a.mean(), b.mean(),
-                             "Decoded pixel data is not all {} (mean == {})".format(b.mean(), a.mean()))
+                             "Decoded pixel data is not all {0} (mean == {1})".format(b.mean(), a.mean()))
         else:
             self.assertRaises(ImportError, self.jpeg_ls_lossless._get_pixel_array)
 
@@ -395,7 +395,7 @@ class JPEG_LS_Tests(unittest.TestCase):
             a = self.emri_jpeg_ls_lossless.pixel_array
             b = self.emri_small.pixel_array
             self.assertEqual(a.mean(), b.mean(),
-                             "Decoded pixel data is not all {} (mean == {})".format(b.mean(), a.mean()))
+                             "Decoded pixel data is not all {0} (mean == {1})".format(b.mean(), a.mean()))
         else:
             self.assertRaises(ImportError, self.emri_jpeg_ls_lossless._get_pixel_array)
 
@@ -411,7 +411,7 @@ class BigEndian_Tests(unittest.TestCase):
             a = self.emri_big_endian.pixel_array
             b = self.emri_small.pixel_array
             self.assertEqual(a.mean(), b.mean(),
-                             "Decoded big endian pixel data is not all {} (mean == {})".format(b.mean(), a.mean()))
+                             "Decoded big endian pixel data is not all {0} (mean == {1})".format(b.mean(), a.mean()))
         else:
             self.assertRaises(ImportError, self.emri_big_endian._get_pixel_array)
 
@@ -440,7 +440,7 @@ class JPEG2000Tests(unittest.TestCase):
             a = self.jpegls.pixel_array
             b = self.mr_small.pixel_array
             self.assertEqual(a.mean(), b.mean(),
-                             "Decoded pixel data is not all {} (mean == {})".format(b.mean(), a.mean()))
+                             "Decoded pixel data is not all {0} (mean == {1})".format(b.mean(), a.mean()))
         else:
             self.assertRaises(ImportError, self.jpegls._get_pixel_array)
 
@@ -450,7 +450,7 @@ class JPEG2000Tests(unittest.TestCase):
             a = self.emri_jpeg_2k_lossless.pixel_array
             b = self.emri_small.pixel_array
             self.assertEqual(a.mean(), b.mean(),
-                             "Decoded pixel data is not all {} (mean == {})".format(b.mean(), a.mean()))
+                             "Decoded pixel data is not all {0} (mean == {1})".format(b.mean(), a.mean()))
         else:
             self.assertRaises(ImportError, self.emri_jpeg_2k_lossless._get_pixel_array)
 
