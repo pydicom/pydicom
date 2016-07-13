@@ -429,7 +429,7 @@ class Dataset(dict):
                                 self.BitsAllocated))
 
             if self.is_little_endian != sys_is_little_endian:
-                numpy_dtype.newbyteorder('S')
+                numpy_dtype = numpy_dtype.newbyteorder('S')
 
             pixel_bytearray = self.PixelData
         elif have_gdcm and self.filename:
@@ -473,7 +473,7 @@ class Dataset(dict):
 
             # if GDCM indicates that a byte swap is in order, make sure to inform numpy as well
             if gdcm_image.GetNeedByteSwap():
-                numpy_dtype.newbyteorder('S')
+                numpy_dtype = numpy_dtype.newbyteorder('S')
 
             # Here we need to be careful because in some cases, GDCM reads a
             # buffer that is too large, so we need to make sure we only include
