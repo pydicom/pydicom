@@ -17,6 +17,7 @@ latin1_file = os.path.join(testcharset_dir, "chrFren.dcm")
 jp_file = os.path.join(testcharset_dir, "chrH31.dcm")
 multiPN_file = os.path.join(testcharset_dir, "chrFrenMulti.dcm")
 sq_encoding_file = os.path.join(testcharset_dir, "chrSQEncoding.dcm")
+explicit_ir6_file = os.path.join(testcharset_dir, "chrJapMultiExplicitIR6.dcm")
 
 test_files = os.path.join(test_dir, 'test_files')
 normal_file = os.path.join(test_files, "CT_small.dcm")
@@ -49,6 +50,12 @@ class charsetTests(unittest.TestCase):
         """charset: can read and decode standard file without special char.."""
         ds = dicomio.read_file(normal_file)
         ds.decode()
+
+    def testExplicitISO2022_IR6(self):
+        """charset: can decode file with multi-valued data elements........."""
+        ds = dicomio.read_file(explicit_ir6_file)
+        ds.decode()
+
 
     def testMultiPN(self):
         """charset: can decode file with multi-valued data elements........."""
