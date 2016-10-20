@@ -321,6 +321,10 @@ class DatasetTests(unittest.TestCase):
         e.SOPInstanceUID = '1.2.3.4'
         
         self.assertTrue(d == e)
+        
+        e.SOPInstanceUID = '1.2.3.5'
+        
+        self.assertFalse(d == e)
     
     def testEqualitySequence(self):
         """Dataset: __eq__ returns True if same elements/values........"""
@@ -339,9 +343,14 @@ class DatasetTests(unittest.TestCase):
         d.BeamSequence.append(beam_seq)
         
         self.assertTrue(d == e)
+        
+        d.BeamSequence.PatientName = 'ANONY'
+        
+        self.assertFalse(d == e)
+
     
     def testInequalityNoSequence(self):
-        """Dataset: __eq__ returns False if differing elements/values.."""
+        """Dataset: __ne__ returns correct value for simple dataset...."""
         d = Dataset()
         d.SOPInstanceUID = '1.2.3.4'
         
@@ -349,9 +358,14 @@ class DatasetTests(unittest.TestCase):
         e.SOPInstanceUID = '1.2.3.5'
         
         self.assertTrue(d != e)
+        
+        e.SOPInstanceUID = '1.2.3.4'
+        
+        self.assertFalse(d != e)
+    
     
     def testInequalitySequence(self):
-        """Dataset: __eq__ returns False if differing elements/values.."""
+        """Dataset: __ne__ returns correct value for sequence dataset.."""
         d = Dataset()
         d.SOPInstanceUID = '1.2.3.4'
         d.BeamSequence = []
@@ -364,9 +378,13 @@ class DatasetTests(unittest.TestCase):
         e.BeamSequence = []
         beam_seq = Dataset()
         beam_seq.PatientName = 'ANONY'
-        d.BeamSequence.append(beam_seq)
+        e.BeamSequence.append(beam_seq)
         
         self.assertTrue(d != e)
+        
+        e.BeamSequence.PatientName = 'ANON'
+        
+        self.assertFalse(d != e)
 
 
 class DatasetElementsTests(unittest.TestCase):
