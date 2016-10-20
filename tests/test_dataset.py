@@ -311,21 +311,56 @@ class DatasetTests(unittest.TestCase):
         def try_delete():
             del ds[0x10, 0x10]
         self.assertRaises(KeyError, try_delete)
-        
+
     def testEqualityNoSequence(self):
         """Dataset: __eq__ returns True if same elements/values........"""
         d = Dataset()
         d.SOPInstanceUID = '1.2.3.4'
-        
+
         e = Dataset()
         e.SOPInstanceUID = '1.2.3.4'
-        
         self.assertTrue(d == e)
-        
+
         e.SOPInstanceUID = '1.2.3.5'
-        
         self.assertFalse(d == e)
-    
+
+        # Check VR
+        del e.SOPInstanceUID
+        e.add(DataElement(0x00080018, 'PN', '1.2.3.4'))
+        self.assertFalse(d == e)
+
+        # Check Tag
+        del e.SOPInstanceUID
+        e.StudyInstanceUID = '1.2.3.4'
+        self.assertFalse(d == e)
+
+        # Check missing Element in self
+        e.SOPInstanceUID = '1.2.3.4'
+        self.assertFalse(d == e)
+
+        # Check missing Element in other
+        d = Dataset()
+        d.SOPInstanceUID = '1.2.3.4'
+        d.StudyInstanceUID = '1.2.3.4.5'
+
+        e = Dataset()
+        e.SOPInstanceUID = '1.2.3.4'
+        self.assertFalse(d == e)
+
+    def testEqualityPrivate(self):
+        """Dataset: __eq__ returns correct value for private elements.."""
+        d = Dataset()
+        d_elem = DataElement(0x01110001, 'PN', 'Private')
+        d.add(d_elem)
+
+        e = Dataset()
+        e_elem = DataElement(0x01110001, 'PN', 'Private')
+        e.add(e_elem)
+        self.assertTrue(d == e)
+
+        e[0x01110001].value = 'Public'
+        self.assertFalse(d == e)
+
     def testEqualitySequence(self):
         """Dataset: __eq__ returns True if same elements/values........"""
         d = Dataset()
@@ -334,36 +369,50 @@ class DatasetTests(unittest.TestCase):
         beam_seq = Dataset()
         beam_seq.PatientName = 'ANON'
         d.BeamSequence.append(beam_seq)
-        
+
         e = Dataset()
         e.SOPInstanceUID = '1.2.3.4'
         e.BeamSequence = []
         beam_seq = Dataset()
         beam_seq.PatientName = 'ANON'
-        d.BeamSequence.append(beam_seq)
-        
+        e.BeamSequence.append(beam_seq)
         self.assertTrue(d == e)
-        
-        d.BeamSequence.PatientName = 'ANONY'
-        
+
+        e.BeamSequence[0].PatientName = 'ANONY'
         self.assertFalse(d == e)
 
-    
+    def testEqualityNotDataset(self):
+        """Dataset: equality returns correct value when not a dataset"""
+        d = Dataset()
+        d.SOPInstanceUID = '1.2.3.4'
+        self.assertFalse(d == {'SOPInstanceUID' : '1.2.3.4'})
+
     def testInequalityNoSequence(self):
         """Dataset: __ne__ returns correct value for simple dataset...."""
         d = Dataset()
         d.SOPInstanceUID = '1.2.3.4'
-        
+
         e = Dataset()
         e.SOPInstanceUID = '1.2.3.5'
-        
         self.assertTrue(d != e)
-        
+
         e.SOPInstanceUID = '1.2.3.4'
-        
         self.assertFalse(d != e)
-    
-    
+
+    def testInequalityPrivate(self):
+        """Dataset: __ne__ returns correct value for private elements.."""
+        d = Dataset()
+        d_elem = DataElement(0x01110001, 'PN', 'Private')
+        d.add(d_elem)
+
+        e = Dataset()
+        e_elem = DataElement(0x01110001, 'PN', 'Public')
+        e.add(e_elem)
+        self.assertTrue(d != e)
+
+        e[0x01110001].value = 'Private'
+        self.assertFalse(d != e)
+
     def testInequalitySequence(self):
         """Dataset: __ne__ returns correct value for sequence dataset.."""
         d = Dataset()
@@ -372,19 +421,23 @@ class DatasetTests(unittest.TestCase):
         beam_seq = Dataset()
         beam_seq.PatientName = 'ANON'
         d.BeamSequence.append(beam_seq)
-        
+
         e = Dataset()
         e.SOPInstanceUID = '1.2.3.4'
         e.BeamSequence = []
         beam_seq = Dataset()
         beam_seq.PatientName = 'ANONY'
         e.BeamSequence.append(beam_seq)
-        
         self.assertTrue(d != e)
-        
-        e.BeamSequence.PatientName = 'ANON'
-        
+
+        e.BeamSequence[0].PatientName = 'ANON'
         self.assertFalse(d != e)
+
+    def testInequalityNotDataset(self):
+        """Dataset: inequality returns correct value when not a dataset"""
+        d = Dataset()
+        d.SOPInstanceUID = '1.2.3.4'
+        self.assertTrue(d != {'SOPInstanceUID' : '1.2.3.4'})
 
 
 class DatasetElementsTests(unittest.TestCase):

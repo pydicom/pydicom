@@ -96,6 +96,8 @@ class DataElement(object):
         The Data Element's stored value(s)
     VM : int
         The Value Multiplicity of the Data Element's stored value(s)
+    VR : str
+        The Data Element's Value Representation value
     """
     descripWidth = 35
     maxBytesToDisplay = 16
@@ -205,6 +207,21 @@ class DataElement(object):
         # except ValueError:
             # print "Could not convert value '%s' to VR '%s' in tag %s" \
             # % (repr(val), self.VR, self.tag)
+
+    def __eq__(self, other):
+        """ Test if two objects are both DataElements with the same values """
+        try:
+            if (self.tag == other.tag) and (self.value == other.value) and \
+               (self.VR == other.VR):
+                return True
+        except:
+            pass
+
+        return False
+
+    def __ne__(self, other):
+        """ Test if two objects are not the same """
+        return not (self == other)
 
     def __str__(self):
         """Return str representation of this data_element"""

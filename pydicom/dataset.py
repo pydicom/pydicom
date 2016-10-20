@@ -258,6 +258,52 @@ class Dataset(dict):
             return names
         else:
             return sorted(allnames)
+    
+    def __eq__(self, other):
+        """ 
+        Go through the Elements in `self` and `other` and check that they match
+
+        Parameters
+        ----------
+        self : pydicom.dataset.Dataset
+            The dataset we are checking
+        other : pydicom.dataset.Dataset
+            The dataset to check against
+        """
+        try:
+            self_taglist = sorted(self.keys())
+            other_taglist = sorted(other.keys())
+            
+            if len(self_taglist) != len(other_taglist):
+                return False
+
+            for self_tag, other_tag in zip(self_taglist, other_taglist):
+                # Check tags match
+                if self_tag != other_tag:
+                    return False
+
+                with tag_in_exception(self_tag):
+                    self_elem = self[self_tag]
+                    other_elem = other[other_tag]
+                    # Check elements match
+                    if self_elem != other_elem:
+                        return False
+
+                    # Iterate through any sequences
+                    if self_tag in self and self_elem.VR == 'SQ':
+                        self_seq = self_elem.value
+                        other_seq = other_elem.value
+
+                        for self_ds, other_ds in zip(self_seq, other_seq):
+                            return (self_ds == other_ds)
+
+            # If we got to this point with returning then all elements in 
+            #   current dataset must match
+            return True
+        except:
+            pass
+
+        return False
 
     def get(self, key, default=None):
         """Extend dict.get() to handle DICOM keywords"""
@@ -383,6 +429,9 @@ class Dataset(dict):
     def _is_uncompressed_transfer_syntax(self):
         # FIXME uses file_meta here, should really only be thus for FileDataset
         return self.file_meta.TransferSyntaxUID in NotCompressedPixelTransferSyntaxes
+
+    def __ne__(self, other):
+        return not (self == other)
 
     def _pixel_data_numpy(self):
         """Return a NumPy array of the pixel data if NumPy is available.
