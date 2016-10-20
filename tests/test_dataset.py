@@ -311,6 +311,62 @@ class DatasetTests(unittest.TestCase):
         def try_delete():
             del ds[0x10, 0x10]
         self.assertRaises(KeyError, try_delete)
+        
+    def testEqualityNoSequence(self):
+        """Dataset: __eq__ returns True if same elements/values........"""
+        d = Dataset()
+        d.SOPInstanceUID = '1.2.3.4'
+        
+        e = Dataset()
+        e.SOPInstanceUID = '1.2.3.4'
+        
+        self.assertTrue(d == e)
+    
+    def testEqualitySequence(self):
+        """Dataset: __eq__ returns True if same elements/values........"""
+        d = Dataset()
+        d.SOPInstanceUID = '1.2.3.4'
+        d.BeamSequence = []
+        beam_seq = Dataset()
+        beam_seq.PatientName = 'ANON'
+        d.BeamSequence.append(beam_seq)
+        
+        e = Dataset()
+        e.SOPInstanceUID = '1.2.3.4'
+        e.BeamSequence = []
+        beam_seq = Dataset()
+        beam_seq.PatientName = 'ANON'
+        d.BeamSequence.append(beam_seq)
+        
+        self.assertTrue(d == e)
+    
+    def testInequalityNoSequence(self):
+        """Dataset: __eq__ returns False if differing elements/values.."""
+        d = Dataset()
+        d.SOPInstanceUID = '1.2.3.4'
+        
+        e = Dataset()
+        e.SOPInstanceUID = '1.2.3.5'
+        
+        self.assertTrue(d != e)
+    
+    def testInequalitySequence(self):
+        """Dataset: __eq__ returns False if differing elements/values.."""
+        d = Dataset()
+        d.SOPInstanceUID = '1.2.3.4'
+        d.BeamSequence = []
+        beam_seq = Dataset()
+        beam_seq.PatientName = 'ANON'
+        d.BeamSequence.append(beam_seq)
+        
+        e = Dataset()
+        e.SOPInstanceUID = '1.2.3.4'
+        e.BeamSequence = []
+        beam_seq = Dataset()
+        beam_seq.PatientName = 'ANONY'
+        d.BeamSequence.append(beam_seq)
+        
+        self.assertTrue(d != e)
 
 
 class DatasetElementsTests(unittest.TestCase):
