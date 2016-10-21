@@ -210,12 +210,8 @@ class DataElement(object):
 
     def __eq__(self, other):
         """ Test if two objects are both DataElements with the same values """
-        try:
-            if (self.tag == other.tag) and (self.value == other.value) and \
-               (self.VR == other.VR):
-                return True
-        except:
-            pass
+        if isinstance(other, self.__class__):
+            return self.__dict__ == other.__dict__
 
         return False
 

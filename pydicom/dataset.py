@@ -270,38 +270,10 @@ class Dataset(dict):
         other : pydicom.dataset.Dataset
             The dataset to check against
         """
-        try:
-            self_taglist = sorted(self.keys())
-            other_taglist = sorted(other.keys())
-            
-            if len(self_taglist) != len(other_taglist):
-                return False
-
-            for self_tag, other_tag in zip(self_taglist, other_taglist):
-                # Check tags match
-                if self_tag != other_tag:
-                    return False
-
-                with tag_in_exception(self_tag):
-                    self_elem = self[self_tag]
-                    other_elem = other[other_tag]
-                    # Check elements match
-                    if self_elem != other_elem:
-                        return False
-
-                    # Iterate through any sequences
-                    if self_tag in self and self_elem.VR == 'SQ':
-                        self_seq = self_elem.value
-                        other_seq = other_elem.value
-
-                        for self_ds, other_ds in zip(self_seq, other_seq):
-                            return (self_ds == other_ds)
-
-            # If we got to this point with returning then all elements in 
-            #   current dataset must match
-            return True
-        except:
-            pass
+        if isinstance(other, self.__class__):
+            # Check regular Elements using values() and unknown Elements using __dict__
+            if (self.values() == other.values()) and (self.__dict__ == other.__dict__):
+                return True
 
         return False
 
