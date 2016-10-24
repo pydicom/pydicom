@@ -439,10 +439,13 @@ class DatasetTests(unittest.TestCase):
 
     def testHash(self):
         """DataElement: hash returns TypeError"""
-        d = Dataset()
-        d.PatientName = 'ANON'
-        with self.assertRaises(TypeError):
+
+        def test_hash():
+            d = Dataset()
+            d.PatientName = 'ANON'
             hash(d)
+
+        self.assertRaises(TypeError, test_hash)
 
 
 class DatasetElementsTests(unittest.TestCase):

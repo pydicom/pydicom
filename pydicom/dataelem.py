@@ -233,7 +233,7 @@ class DataElement(object):
         return NotImplemented
 
     def __ne__(self, other):
-        """ Test if two objects are not the same """
+        """ Compare `self` and `other` for inequality """
         return not (self == other)
 
     def __str__(self):

@@ -411,6 +411,7 @@ class Dataset(dict):
         return self.file_meta.TransferSyntaxUID in NotCompressedPixelTransferSyntaxes
 
     def __ne__(self, other):
+        """ Compare `self` and `other` for inequality """
         return not (self == other)
 
     def _pixel_data_numpy(self):

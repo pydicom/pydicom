@@ -176,8 +176,10 @@ class DataElementTests(unittest.TestCase):
         """DataElement: hash returns TypeErrpr"""
         dd = DataElement(0x00100010, 'PN', 'ANON')
 
-        with self.assertRaises(TypeError):
+        def test_hash():
             hash(dd)
+
+        self.assertRaises(TypeError, test_hash)
 
 
 class RawDataElementTests(unittest.TestCase):
