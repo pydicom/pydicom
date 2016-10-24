@@ -10,22 +10,22 @@ and a value.
 #    available at https://github.com/darcymason/pydicom
 #
 from __future__ import absolute_import
+from collections import namedtuple
 
 from pydicom import config  # don't import datetime_conversion directly
 from pydicom import compat
 from pydicom.config import logger
 from pydicom.datadict import dictionary_has_tag, dictionary_description, \
-    dictionary_keyword, dictionary_is_retired
+                             dictionary_keyword, dictionary_is_retired
 from pydicom.datadict import private_dictionary_description, dictionaryVR
 from pydicom.tag import Tag
 from pydicom.uid import UID
 import pydicom.valuerep  # don't import DS directly as can be changed by config
 from pydicom.compat import in_py2
+
 if not in_py2:
     from pydicom.valuerep import PersonName3 as PersonNameUnicode
     PersonName = PersonNameUnicode
-
-from collections import namedtuple
 
 
 # Helper functions:
@@ -102,6 +102,9 @@ class DataElement(object):
     descripWidth = 35
     maxBytesToDisplay = 16
     showVR = 1
+
+    # Python 2: Classes which define __eq__ should flag themselves as unhashable
+    __hash__ = None
 
     def __init__(self, tag, VR, value, file_value_tell=None,
                  is_undefined_length=False, already_converted=False):
@@ -209,11 +212,25 @@ class DataElement(object):
             # % (repr(val), self.VR, self.tag)
 
     def __eq__(self, other):
-        """ Test if two objects are both DataElements with the same values """
+        """
+        Compare `self` and `other` for equality
+
+        Returns
+        -------
+        bool
+            The result if `self` and `other` are the same class
+        NotImplemented
+            If `other` is not the same class as `self` then returning
+            NotImplemented delegates the result to superclass.__eq__(subclass)
+        """
+        # Faster result if same object
+        if other is self:
+            return True
+
         if isinstance(other, self.__class__):
             return self.__dict__ == other.__dict__
 
-        return False
+        return NotImplemented
 
     def __ne__(self, other):
         """ Test if two objects are not the same """

@@ -316,9 +316,10 @@ class DatasetTests(unittest.TestCase):
         self.assertRaises(KeyError, try_delete)
 
     def testEqualityNoSequence(self):
-        """Dataset: __eq__ returns True if same elements/values........"""
+        """Dataset: equality returns correct value with simple dataset"""
         d = Dataset()
         d.SOPInstanceUID = '1.2.3.4'
+        self.assertTrue(d == d)
 
         e = Dataset()
         e.SOPInstanceUID = '1.2.3.4'
@@ -351,9 +352,10 @@ class DatasetTests(unittest.TestCase):
         self.assertFalse(d == e)
 
     def testEqualityPrivate(self):
-        """Dataset: __eq__ returns correct value for private elements.."""
+        """Dataset: equality returns correct value when dataset has private elements"""
         d = Dataset()
         d_elem = DataElement(0x01110001, 'PN', 'Private')
+        self.assertTrue(d == d)
         d.add(d_elem)
 
         e = Dataset()
@@ -365,13 +367,15 @@ class DatasetTests(unittest.TestCase):
         self.assertFalse(d == e)
 
     def testEqualitySequence(self):
-        """Dataset: __eq__ returns True if same elements/values........"""
+        """Dataset: equality returns correct value when dataset has sequences"""
+        # Test even sequences
         d = Dataset()
         d.SOPInstanceUID = '1.2.3.4'
         d.BeamSequence = []
         beam_seq = Dataset()
         beam_seq.PatientName = 'ANON'
         d.BeamSequence.append(beam_seq)
+        self.assertTrue(d == d)
 
         e = Dataset()
         e.SOPInstanceUID = '1.2.3.4'
@@ -384,16 +388,29 @@ class DatasetTests(unittest.TestCase):
         e.BeamSequence[0].PatientName = 'ANONY'
         self.assertFalse(d == e)
 
+        # Test uneven sequences
+        e.BeamSequence[0].PatientName = 'ANON'
+        self.assertTrue(d == e)
+
+        e.BeamSequence.append(beam_seq)
+        self.assertFalse(d == e)
+
+        d.BeamSequence.append(beam_seq)
+        self.assertTrue(d == e)
+        d.BeamSequence.append(beam_seq)
+        self.assertFalse(d == e)
+
     def testEqualityNotDataset(self):
-        """Dataset: equality returns correct value when not a dataset"""
+        """Dataset: equality returns correct value when not the same class"""
         d = Dataset()
         d.SOPInstanceUID = '1.2.3.4'
         self.assertFalse(d == {'SOPInstanceUID' : '1.2.3.4'})
 
     def testEqualityUnknown(self):
-        """Dataset: __eq__ returns True if same elements/values........"""
+        """Dataset: equality returns correct value with extra members """
         d = Dataset()
         d.SOPEustaceUID = '1.2.3.4'
+        self.assertTrue(d == d)
 
         e = Dataset()
         e.SOPEustaceUID = '1.2.3.4'
@@ -401,6 +418,31 @@ class DatasetTests(unittest.TestCase):
 
         e.SOPEustaceUID = '1.2.3.5'
         self.assertFalse(d == e)
+
+    def testEqualityInheritance(self):
+        """Dataset: equality returns correct value for subclass """
+
+        class DatasetPlus(Dataset):
+            pass
+
+        d = Dataset()
+        d.PatientName = 'ANON'
+        e = DatasetPlus()
+        e.PatientName = 'ANON'
+        self.assertTrue(d == e)
+        self.assertTrue(e == d)
+        self.assertTrue(e == e)
+
+        e.PatientName = 'ANONY'
+        self.assertFalse(d == e)
+        self.assertFalse(e == d)
+
+    def testHash(self):
+        """DataElement: hash returns TypeError"""
+        d = Dataset()
+        d.PatientName = 'ANON'
+        with self.assertRaises(TypeError):
+            hash(d)
 
 
 class DatasetElementsTests(unittest.TestCase):
@@ -428,7 +470,7 @@ class FileDatasetTests(unittest.TestCase):
         self.test_file = os.path.join(test_dir, 'test_files', 'CT_small.dcm')
 
     def testEqualityFileMeta(self):
-        """Dataset: __eq__ returns True if same metadata........"""
+        """Dataset: equality returns correct value if with metadata"""
         d = read_file(self.test_file)
         e = read_file(self.test_file)
         self.assertTrue(d == e)
@@ -444,93 +486,6 @@ class FileDatasetTests(unittest.TestCase):
         e.is_little_endian = not e.is_little_endian
         self.assertTrue(d == e)
         e.filename = 'test_filename.dcm'
-        self.assertFalse(d == e)
-
-    def testEqualityNoSequence(self):
-        """Dataset: __eq__ returns True if same elements/values........"""
-        d = read_file(self.test_file)
-        d.SOPInstanceUID = '1.2.3.4'
-
-        e = read_file(self.test_file)
-        e.SOPInstanceUID = '1.2.3.4'
-        self.assertTrue(d == e)
-
-        e.SOPInstanceUID = '1.2.3.5'
-        self.assertFalse(d == e)
-
-        # Check VR
-        del e.SOPInstanceUID
-        e.add(DataElement(0x00080018, 'PN', '1.2.3.4'))
-        self.assertFalse(d == e)
-
-        # Check Tag
-        del e.SOPInstanceUID
-        e.StudyInstanceUID = '1.2.3.4'
-        self.assertFalse(d == e)
-
-        # Check missing Element in self
-        e.SOPInstanceUID = '1.2.3.4'
-        self.assertFalse(d == e)
-
-        # Check missing Element in other
-        d = read_file(self.test_file)
-        d.SOPInstanceUID = '1.2.3.4'
-        d.StudyInstanceUID = '1.2.3.4.5'
-
-        e = read_file(self.test_file)
-        e.SOPInstanceUID = '1.2.3.4'
-        self.assertFalse(d == e)
-
-    def testEqualityPrivate(self):
-        """Dataset: __eq__ returns correct value for private elements.."""
-        d = read_file(self.test_file)
-        d_elem = DataElement(0x01110001, 'PN', 'Private')
-        d.add(d_elem)
-
-        e = read_file(self.test_file)
-        e_elem = DataElement(0x01110001, 'PN', 'Private')
-        e.add(e_elem)
-        self.assertTrue(d == e)
-
-        e[0x01110001].value = 'Public'
-        self.assertFalse(d == e)
-
-    def testEqualitySequence(self):
-        """Dataset: __eq__ returns True if same elements/values........"""
-        d = read_file(self.test_file)
-        d.SOPInstanceUID = '1.2.3.4'
-        d.BeamSequence = []
-        beam_seq = Dataset()
-        beam_seq.PatientName = 'ANON'
-        d.BeamSequence.append(beam_seq)
-
-        e = read_file(self.test_file)
-        e.SOPInstanceUID = '1.2.3.4'
-        e.BeamSequence = []
-        beam_seq = Dataset()
-        beam_seq.PatientName = 'ANON'
-        e.BeamSequence.append(beam_seq)
-        self.assertTrue(d == e)
-
-        e.BeamSequence[0].PatientName = 'ANONY'
-        self.assertFalse(d == e)
-
-    def testEqualityNotDataset(self):
-        """Dataset: equality returns correct value when not a dataset"""
-        d = read_file(self.test_file)
-        d.SOPInstanceUID = '1.2.3.4'
-        self.assertFalse(d == {'SOPInstanceUID' : '1.2.3.4'})
-
-    def testEqualityUnknown(self):
-        """Dataset: __eq__ returns True if same elements/values........"""
-        d = read_file(self.test_file)
-        d.SOPEustaceUID = '1.2.3.4'
-
-        e = read_file(self.test_file)
-        e.SOPEustaceUID = '1.2.3.4'
-        self.assertTrue(d == e)
-
-        e.SOPEustaceUID = '1.2.3.5'
         self.assertFalse(d == e)
 
 

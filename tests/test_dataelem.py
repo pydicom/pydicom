@@ -66,8 +66,9 @@ class DataElementTests(unittest.TestCase):
         self.assertEqual(self.data_elementPrivate.is_retired, False)
 
     def testEqualityStandardElement(self):
-        """DataElemen: return correct value for equality with standard Element"""
+        """DataElement: equality returns correct value for simple elements"""
         dd = DataElement(0x00100010, 'PN', 'ANON')
+        self.assertTrue(dd == dd)
         ee = DataElement(0x00100010, 'PN', 'ANON')
         self.assertTrue(dd == ee)
 
@@ -82,7 +83,7 @@ class DataElementTests(unittest.TestCase):
         # Check VR
         ee = DataElement(0x00100010, 'SH', 'ANON')
         self.assertFalse(dd == ee)
-        
+
         dd = DataElement(0x00080018, 'UI', '1.2.3.4')
         ee = DataElement(0x00080018, 'UI', '1.2.3.4')
         self.assertTrue(dd == ee)
@@ -91,8 +92,9 @@ class DataElementTests(unittest.TestCase):
         self.assertFalse(dd == ee)
 
     def testEqualityPrivateElement(self):
-        """DataElemen: return correct value for equality with private Element"""
+        """DataElement: equality returns correct value for private elements"""
         dd = DataElement(0x01110001, 'PN', 'ANON')
+        self.assertTrue(dd == dd)
         ee = DataElement(0x01110001, 'PN', 'ANON')
         self.assertTrue(dd == ee)
 
@@ -109,15 +111,16 @@ class DataElementTests(unittest.TestCase):
         self.assertFalse(dd == ee)
 
     def testEqualitySequenceElement(self):
-        """DataElemen: return correct value for equality with sequence Element"""
+        """DataElement: equality returns correct value for sequence elements"""
         dd = DataElement(0x300A00B0, 'SQ', [])
+        self.assertTrue(dd == dd)
         ee = DataElement(0x300A00B0, 'SQ', [])
         self.assertTrue(dd == ee)
 
         # Check value
-        d = Dataset()
-        d.PatientName = 'ANON'
-        ee.value = [d]
+        e = Dataset()
+        e.PatientName = 'ANON'
+        ee.value = [e]
         self.assertFalse(dd == ee)
 
         # Check tag
@@ -126,75 +129,55 @@ class DataElementTests(unittest.TestCase):
 
         # Check VR
         ee = DataElement(0x300A00B0, 'SH', [])
+        self.assertFalse(dd == ee)
+
+        # Check with dataset
+        dd = DataElement(0x300A00B0, 'SQ', [Dataset()])
+        dd.value[0].PatientName = 'ANON'
+        ee = DataElement(0x300A00B0, 'SQ', [Dataset()])
+        ee.value[0].PatientName = 'ANON'
+        self.assertTrue(dd == ee)
+
+        # Check uneven sequences
+        dd.value.append(Dataset())
+        dd.value[1].PatientName = 'ANON'
+        self.assertFalse(dd == ee)
+
+        ee.value.append(Dataset())
+        ee.value[1].PatientName = 'ANON'
+        self.assertTrue(dd == ee)
+        ee.value.append(Dataset())
+        ee.value[2].PatientName = 'ANON'
         self.assertFalse(dd == ee)
 
     def testEqualityNotElement(self):
-        """DataElemen: return correct value for equality with non-Element"""
+        """DataElement: equality returns correct value when not same class"""
         dd = DataElement(0x00100010, 'PN', 'ANON')
         ee = {'0x00100010' : 'ANON'}
         self.assertFalse(dd == ee)
 
-    def testInequalityStandardElement(self):
-        """DataElemen: return correct value for inequality with standard Element"""
+    def testEqualityInheritance(self):
+        """DataElement: equality returns correct value for subclasses"""
+
+        class DataElementPlus(DataElement):
+            pass
+
         dd = DataElement(0x00100010, 'PN', 'ANON')
-        ee = DataElement(0x00100010, 'PN', 'ANON')
-        self.assertFalse(dd != ee)
+        ee = DataElementPlus(0x00100010, 'PN', 'ANON')
+        self.assertTrue(ee == ee)
+        self.assertTrue(dd == ee)
+        self.assertTrue(ee == dd)
 
-        # Check value
-        ee.value = 'ANAN'
-        self.assertTrue(dd != ee)
+        ee = DataElementPlus(0x00100010, 'PN', 'ANONY')
+        self.assertFalse(dd == ee)
+        self.assertFalse(ee == dd)
 
-        # Check tag
-        ee = DataElement(0x00100011, 'PN', 'ANON')
-        self.assertTrue(dd != ee)
-
-        # Check VR
-        ee = DataElement(0x00100010, 'SH', 'ANON')
-        self.assertTrue(dd != ee)
-
-    def testInequalityPrivateElement(self):
-        """DataElemen: return correct value for inequality with private Element"""
-        dd = DataElement(0x01110001, 'PN', 'ANON')
-        ee = DataElement(0x01110001, 'PN', 'ANON')
-        self.assertFalse(dd != ee)
-
-        # Check value
-        ee.value = 'ANAN'
-        self.assertTrue(dd != ee)
-
-        # Check tag
-        ee = DataElement(0x01110002, 'PN', 'ANON')
-        self.assertTrue(dd != ee)
-
-        # Check VR
-        ee = DataElement(0x01110001, 'SH', 'ANON')
-        self.assertTrue(dd != ee)
-
-    def testInequalitySequenceElement(self):
-        """DataElemen: return correct value for inequality with sequence Element"""
-        dd = DataElement(0x300A00B0, 'SQ', [])
-        ee = DataElement(0x300A00B0, 'SQ', [])
-        self.assertFalse(dd != ee)
-
-        # Check value
-        d = Dataset()
-        d.PatientName = 'ANON'
-        ee.value = [d]
-        self.assertTrue(dd != ee)
-
-        # Check tag
-        ee = DataElement(0x01110002, 'SQ', [])
-        self.assertTrue(dd != ee)
-
-        # Check VR
-        ee = DataElement(0x300A00B0, 'SH', [])
-        self.assertTrue(dd != ee)
-
-    def testInequalityNotElement(self):
-        """DataElemen: return correct value for inequality with non-Element"""
+    def testHash(self):
+        """DataElement: hash returns TypeErrpr"""
         dd = DataElement(0x00100010, 'PN', 'ANON')
-        ee = {'0x00100010' : 'ANON'}
-        self.assertTrue(dd != ee)
+
+        with self.assertRaises(TypeError):
+            hash(dd)
 
 
 class RawDataElementTests(unittest.TestCase):

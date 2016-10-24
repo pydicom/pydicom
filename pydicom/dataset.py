@@ -101,6 +101,9 @@ class Dataset(dict):
     """
     indent_chars = "   "
 
+    # Python 2: Classes which define __eq__ should flag themselves as unhashable
+    __hash__ = None
+
     def __init__(self, *args, **kwargs):
         self._parent_encoding = kwargs.get('parent_encoding', default_encoding)
         dict.__init__(self, *args)
@@ -261,21 +264,26 @@ class Dataset(dict):
     
     def __eq__(self, other):
         """ 
-        Go through the Elements in `self` and `other` and check that they match
+        Compare `self` and `other` for equality
 
-        Parameters
-        ----------
-        self : pydicom.dataset.Dataset
-            The dataset we are checking
-        other : pydicom.dataset.Dataset
-            The dataset to check against
+        Returns
+        -------
+        bool
+            The result if `self` and `other` are the same class
+        NotImplemented
+            If `other` is not the same class as `self` then returning
+            NotImplemented delegates the result to superclass.__eq__(subclass)
         """
-        if isinstance(other, self.__class__):
-            # Check regular Elements using values() and unknown Elements using __dict__
-            if (self.values() == other.values()) and (self.__dict__ == other.__dict__):
-                return True
+        # When comparing against self this will be faster
+        if other is self:
+            return True
 
-        return False
+        if isinstance(other, self.__class__):
+            # Compare Elements using values() and class variables using __dict__
+            # Convert values() to a list for compatibility between python 2 and 3
+            return (list(self.values()) == list(other.values())) and (self.__dict__ == other.__dict__)
+
+        return NotImplemented
 
     def get(self, key, default=None):
         """Extend dict.get() to handle DICOM keywords"""
