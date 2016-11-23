@@ -47,8 +47,8 @@ def get_LUT_value(data, window, level):
                          (window - 1) + 0.5) * (255 - 0)])
 
 
-# Display an image using the Python Imaging Library (PIL)
-def show_PIL(dataset):
+def get_PIL_image(dataset):
+    """Get Image object from Python Imaging Library(PIL)"""
     if not have_PIL:
         raise ImportError("Python Imaging Library is not available. "
                           "See http://www.pythonware.com/products/pil/ "
@@ -87,5 +87,11 @@ def show_PIL(dataset):
         # Convert mode to L since LUT has only 256 values:
         #   http://www.pythonware.com/library/pil/handbook/image.htm
         im = PIL.Image.fromarray(image).convert('L')
+        
+    return im
 
+
+def show_PIL(dataset):
+    """Display an image using the Python Imaging Library (PIL)"""
+    im = get_PIL_image(dataset)
     im.show()
