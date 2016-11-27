@@ -56,6 +56,12 @@ if __name__ == "__main__":
     ds.is_little_endian = True
     ds.is_implicit_VR = True
 
+    # Set creation date/time
+    dt = datetime.datetime.now()
+    ds.ContentDate = dt.strftime('%Y%m%d')
+    timeStr = dt.strftime('%H%M%S.%f') if microSeconds else dt.strftime('%H%M%S')
+    ds.ContentTime = timeStr
+    
     print("Writing test file", filename)
     ds.save_as(filename)
     print("File saved.")
