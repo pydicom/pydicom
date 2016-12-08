@@ -101,6 +101,9 @@ class Dataset(dict):
     """
     indent_chars = "   "
 
+    # Python 2: Classes which define __eq__ should flag themselves as unhashable
+    __hash__ = None
+
     def __init__(self, *args, **kwargs):
         self._parent_encoding = kwargs.get('parent_encoding', default_encoding)
         dict.__init__(self, *args)
@@ -258,6 +261,29 @@ class Dataset(dict):
             return names
         else:
             return sorted(allnames)
+    
+    def __eq__(self, other):
+        """ 
+        Compare `self` and `other` for equality
+
+        Returns
+        -------
+        bool
+            The result if `self` and `other` are the same class
+        NotImplemented
+            If `other` is not the same class as `self` then returning
+            NotImplemented delegates the result to superclass.__eq__(subclass)
+        """
+        # When comparing against self this will be faster
+        if other is self:
+            return True
+
+        if isinstance(other, self.__class__):
+            # Compare Elements using values() and class variables using __dict__
+            # Convert values() to a list for compatibility between python 2 and 3
+            return (list(self.values()) == list(other.values())) and (self.__dict__ == other.__dict__)
+
+        return NotImplemented
 
     def get(self, key, default=None):
         """Extend dict.get() to handle DICOM keywords"""
@@ -383,6 +409,10 @@ class Dataset(dict):
     def _is_uncompressed_transfer_syntax(self):
         # FIXME uses file_meta here, should really only be thus for FileDataset
         return self.file_meta.TransferSyntaxUID in NotCompressedPixelTransferSyntaxes
+
+    def __ne__(self, other):
+        """ Compare `self` and `other` for inequality """
+        return not (self == other)
 
     def _pixel_data_numpy(self):
         """Return a NumPy array of the pixel data if NumPy is available.

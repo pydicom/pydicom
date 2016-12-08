@@ -5,9 +5,12 @@
 #    See the file license.txt included with this distribution, also
 #    available at https://github.com/darcymason/pydicom
 
+import os
 import unittest
+
 from pydicom.dataset import Dataset, PropertyError
 from pydicom.dataelem import DataElement, RawDataElement
+from pydicom.dicomio import read_file
 from pydicom.tag import Tag
 from pydicom.sequence import Sequence
 from pydicom import compat
@@ -312,6 +315,138 @@ class DatasetTests(unittest.TestCase):
             del ds[0x10, 0x10]
         self.assertRaises(KeyError, try_delete)
 
+    def testEqualityNoSequence(self):
+        """Dataset: equality returns correct value with simple dataset"""
+        d = Dataset()
+        d.SOPInstanceUID = '1.2.3.4'
+        self.assertTrue(d == d)
+
+        e = Dataset()
+        e.SOPInstanceUID = '1.2.3.4'
+        self.assertTrue(d == e)
+
+        e.SOPInstanceUID = '1.2.3.5'
+        self.assertFalse(d == e)
+
+        # Check VR
+        del e.SOPInstanceUID
+        e.add(DataElement(0x00080018, 'PN', '1.2.3.4'))
+        self.assertFalse(d == e)
+
+        # Check Tag
+        del e.SOPInstanceUID
+        e.StudyInstanceUID = '1.2.3.4'
+        self.assertFalse(d == e)
+
+        # Check missing Element in self
+        e.SOPInstanceUID = '1.2.3.4'
+        self.assertFalse(d == e)
+
+        # Check missing Element in other
+        d = Dataset()
+        d.SOPInstanceUID = '1.2.3.4'
+        d.StudyInstanceUID = '1.2.3.4.5'
+
+        e = Dataset()
+        e.SOPInstanceUID = '1.2.3.4'
+        self.assertFalse(d == e)
+
+    def testEqualityPrivate(self):
+        """Dataset: equality returns correct value when dataset has private elements"""
+        d = Dataset()
+        d_elem = DataElement(0x01110001, 'PN', 'Private')
+        self.assertTrue(d == d)
+        d.add(d_elem)
+
+        e = Dataset()
+        e_elem = DataElement(0x01110001, 'PN', 'Private')
+        e.add(e_elem)
+        self.assertTrue(d == e)
+
+        e[0x01110001].value = 'Public'
+        self.assertFalse(d == e)
+
+    def testEqualitySequence(self):
+        """Dataset: equality returns correct value when dataset has sequences"""
+        # Test even sequences
+        d = Dataset()
+        d.SOPInstanceUID = '1.2.3.4'
+        d.BeamSequence = []
+        beam_seq = Dataset()
+        beam_seq.PatientName = 'ANON'
+        d.BeamSequence.append(beam_seq)
+        self.assertTrue(d == d)
+
+        e = Dataset()
+        e.SOPInstanceUID = '1.2.3.4'
+        e.BeamSequence = []
+        beam_seq = Dataset()
+        beam_seq.PatientName = 'ANON'
+        e.BeamSequence.append(beam_seq)
+        self.assertTrue(d == e)
+
+        e.BeamSequence[0].PatientName = 'ANONY'
+        self.assertFalse(d == e)
+
+        # Test uneven sequences
+        e.BeamSequence[0].PatientName = 'ANON'
+        self.assertTrue(d == e)
+
+        e.BeamSequence.append(beam_seq)
+        self.assertFalse(d == e)
+
+        d.BeamSequence.append(beam_seq)
+        self.assertTrue(d == e)
+        d.BeamSequence.append(beam_seq)
+        self.assertFalse(d == e)
+
+    def testEqualityNotDataset(self):
+        """Dataset: equality returns correct value when not the same class"""
+        d = Dataset()
+        d.SOPInstanceUID = '1.2.3.4'
+        self.assertFalse(d == {'SOPInstanceUID' : '1.2.3.4'})
+
+    def testEqualityUnknown(self):
+        """Dataset: equality returns correct value with extra members """
+        d = Dataset()
+        d.SOPEustaceUID = '1.2.3.4'
+        self.assertTrue(d == d)
+
+        e = Dataset()
+        e.SOPEustaceUID = '1.2.3.4'
+        self.assertTrue(d == e)
+
+        e.SOPEustaceUID = '1.2.3.5'
+        self.assertFalse(d == e)
+
+    def testEqualityInheritance(self):
+        """Dataset: equality returns correct value for subclass """
+
+        class DatasetPlus(Dataset):
+            pass
+
+        d = Dataset()
+        d.PatientName = 'ANON'
+        e = DatasetPlus()
+        e.PatientName = 'ANON'
+        self.assertTrue(d == e)
+        self.assertTrue(e == d)
+        self.assertTrue(e == e)
+
+        e.PatientName = 'ANONY'
+        self.assertFalse(d == e)
+        self.assertFalse(e == d)
+
+    def testHash(self):
+        """DataElement: hash returns TypeError"""
+
+        def test_hash():
+            d = Dataset()
+            d.PatientName = 'ANON'
+            hash(d)
+
+        self.assertRaises(TypeError, test_hash)
+
 
 class DatasetElementsTests(unittest.TestCase):
     """Test valid assignments of data elements"""
@@ -330,6 +465,31 @@ class DatasetElementsTests(unittest.TestCase):
         self.ds.ConceptCodeSequence = [self.sub_ds1, self.sub_ds2]
         self.assertTrue(isinstance(self.ds.ConceptCodeSequence, Sequence),
                         "Sequence assignment did not result in Sequence type")
+
+
+class FileDatasetTests(unittest.TestCase):
+    def setUp(self):
+        test_dir = os.path.dirname(__file__)
+        self.test_file = os.path.join(test_dir, 'test_files', 'CT_small.dcm')
+
+    def testEqualityFileMeta(self):
+        """Dataset: equality returns correct value if with metadata"""
+        d = read_file(self.test_file)
+        e = read_file(self.test_file)
+        self.assertTrue(d == e)
+
+        e.is_implicit_VR = not e.is_implicit_VR
+        self.assertFalse(d == e)
+
+        e.is_implicit_VR = not e.is_implicit_VR
+        self.assertTrue(d == e)
+        e.is_little_endian = not e.is_little_endian
+        self.assertFalse(d == e)
+
+        e.is_little_endian = not e.is_little_endian
+        self.assertTrue(d == e)
+        e.filename = 'test_filename.dcm'
+        self.assertFalse(d == e)
 
 
 if __name__ == "__main__":
