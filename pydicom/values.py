@@ -311,6 +311,7 @@ converters = {
     'LT': convert_single_string,
     'SQ': convert_SQ,
     'UN': convert_UN,
+    'UR': convert_string,
     'AT': convert_ATvalue,
     'ST': convert_string,
     'OW': convert_OWvalue,

@@ -6,13 +6,15 @@
 #    See the file license.txt included with this distribution, also
 #    available at https://github.com/darcymason/pydicom
 
-import sys
+import gzip
+from io import BytesIO
 import os
 import os.path
-import unittest
-from io import BytesIO
 import shutil
+import sys
 import tempfile
+import unittest
+from warncheck import assertWarns
 
 try:
     unittest.skipUnless
@@ -35,11 +37,15 @@ try:
     import numpy  # NOQA
 except:
     have_numpy = False
-from pydicom.filereader import read_file
+
+from pydicom.dataset import Dataset, FileDataset
+from pydicom.dataelem import DataElement
+from pydicom.filebase import DicomBytesIO
+from pydicom.filereader import read_file, data_element_generator
 from pydicom.errors import InvalidDicomError
 from pydicom.tag import Tag, TupleTag
 import pydicom.valuerep
-import gzip
+
 have_jpeg_ls = True
 try:
     import jpeg_ls
@@ -56,7 +62,7 @@ except ImportError:
     except ImportError:
         # Neither worked, so it's likely not installed.
         have_pillow = False
-from warncheck import assertWarns
+
 
 test_dir = os.path.dirname(__file__)
 test_files = os.path.join(test_dir, 'test_files')
@@ -370,6 +376,35 @@ class ReaderTests(unittest.TestCase):
             px_data = px_data_ds.pixel_array
             pl_data = pl_data_ds.pixel_array
             self.assertTrue(numpy.all(px_data == pl_data))
+
+
+class ReadDataElementTests(unittest.TestCase):
+    def setUp(self):
+        ds = Dataset()
+        #ds.DoubleFloatPixelData = FIXME # VR of OD
+        # No element in _dicom_dict.py has a VR of OL
+        #ds.LongCodeValue = FIXME # VR of UC
+        ds.URNCodeValue = 'http://test.com' # VR of UR
+        self.fp = BytesIO()
+
+        file_ds = FileDataset(self.fp, ds)
+        file_ds.is_implicit_VR = True
+        file_ds.is_little_endian = True
+        file_ds.save_as(self.fp)
+
+    def test_read_UR(self):
+        """Check creation of DataElement from byte data works correctly."""
+        ds = read_file(self.fp, force=True)
+        ref_elem = ds.get(0x00080120)
+        ref_elem.file_tell = None # Workaround for Issue #294
+        elem = DataElement(0x00080120, 'UR', 'http://test.com')
+        #for member in ds.get(0x00080120).__dict__:
+        #    print(member, getattr(ds.get(0x00080120), member))
+        #for member in elem.__dict__:
+        #    print(member, getattr(elem, member))
+        #print(ds.get(0x00080120))
+        #print(elem)
+        self.assertEqual(ds.get(0x00080120), elem)
 
 
 class JPEG_LS_Tests(unittest.TestCase):
