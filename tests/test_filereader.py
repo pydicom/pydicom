@@ -398,12 +398,6 @@ class ReadDataElementTests(unittest.TestCase):
         ref_elem = ds.get(0x00080120)
         ref_elem.file_tell = None # Workaround for Issue #294
         elem = DataElement(0x00080120, 'UR', 'http://test.com')
-        #for member in ds.get(0x00080120).__dict__:
-        #    print(member, getattr(ds.get(0x00080120), member))
-        #for member in elem.__dict__:
-        #    print(member, getattr(elem, member))
-        #print(ds.get(0x00080120))
-        #print(elem)
         self.assertEqual(ds.get(0x00080120), elem)
 
 

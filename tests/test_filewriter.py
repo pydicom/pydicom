@@ -207,7 +207,7 @@ class WriteDataElementTests(unittest.TestCase):
 
     @staticmethod
     def encode_element(elem, is_implicit_VR=True, is_little_endian=True):
-        """Return the encoded `elem` using little endian implicit.
+        """Return the encoded `elem`.
         
         Parameters
         ----------
@@ -278,7 +278,6 @@ class WriteDataElementTests(unittest.TestCase):
         elem.value = ''
         encoded_elem = self.encode_element(elem)
         self.assertEqual(encoded_elem, b'\x08\x00\x20\x01\x00\x00\x00\x00')
-        #print('\\x' + '\\x'.join(format(byte, '02x') for byte in encoded_elem))
 
 
 class ScratchWriteTests(unittest.TestCase):
