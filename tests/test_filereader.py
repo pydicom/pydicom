@@ -385,6 +385,7 @@ class ReadDataElementTests(unittest.TestCase):
         # No element in _dicom_dict.py has a VR of OL
         #ds.LongCodeValue = FIXME # VR of UC
         ds.URNCodeValue = 'http://test.com' # VR of UR
+        ds.RetrieveURL = 'ftp://test.com  ' # Test trailing spaces ignored
         self.fp = BytesIO()
 
         file_ds = FileDataset(self.fp, ds)
@@ -395,10 +396,16 @@ class ReadDataElementTests(unittest.TestCase):
     def test_read_UR(self):
         """Check creation of DataElement from byte data works correctly."""
         ds = read_file(self.fp, force=True)
-        ref_elem = ds.get(0x00080120)
+        ref_elem = ds.get(0x00080120) # URNCodeValue
         ref_elem.file_tell = None # Workaround for Issue #294
         elem = DataElement(0x00080120, 'UR', 'http://test.com')
-        self.assertEqual(ds.get(0x00080120), elem)
+        self.assertEqual(ref_elem, elem)
+
+        # Test trailing spaces ignored
+        ref_elem = ds.get(0x00081190) # RetrieveURL
+        ref_elem.file_tell = None # Workaround for Issue #294
+        elem = DataElement(0x00081190, 'UR', 'ftp://test.com')
+        self.assertEqual(ref_elem, elem)
 
 
 class JPEG_LS_Tests(unittest.TestCase):
