@@ -172,6 +172,16 @@ class DataElementTests(unittest.TestCase):
         self.assertFalse(dd == ee)
         self.assertFalse(ee == dd)
 
+    def test_equality_class_members(self):
+        """Test equality is correct when ignored class members differ."""
+        dd = DataElement(0x00100010, 'PN', 'ANON')
+        dd.showVR = False
+        dd.file_tell = 10
+        dd.maxBytesToDisplay = 0
+        dd.descripWidth = 0
+        ee = DataElement(0x00100010, 'PN', 'ANON')
+        self.assertTrue(dd == ee)
+
     def testHash(self):
         """DataElement: hash returns TypeErrpr"""
         dd = DataElement(0x00100010, 'PN', 'ANON')

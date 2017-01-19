@@ -228,7 +228,9 @@ class DataElement(object):
             return True
 
         if isinstance(other, self.__class__):
-            return self.__dict__ == other.__dict__
+            if self.tag == other.tag and self.VR == other.VR \
+                    and self.value == other.value:
+                return True
 
         return NotImplemented
 
