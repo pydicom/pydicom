@@ -5,10 +5,12 @@
 #    See the file license.txt included with this distribution, also
 #    available at https://github.com/darcymason/pydicom
 
+# from io import BytesIO
 import sys
 import os.path
 import os
 from datetime import date, datetime, time
+
 have_dateutil = True
 try:
     from dateutil.tz import tzoffset
@@ -23,18 +25,16 @@ except AttributeError:
     except ImportError:
         print("unittest2 is required for testing in python2.6")
 
+from pydicom import config
+from pydicom.dataset import Dataset, FileDataset
+from pydicom.dataelem import DataElement
+from pydicom.filebase import DicomBytesIO
 from pydicom.filereader import read_file
 from pydicom.filewriter import write_data_element
-from pydicom.dataset import Dataset, FileDataset
-from pydicom.sequence import Sequence
 from pydicom.multival import MultiValue
-from pydicom.valuerep import DA, DT, TM
+from pydicom.sequence import Sequence
 from pydicom.util.hexutil import hex2bytes, bytes2hex
-from pydicom import config
-
-# from io import BytesIO
-from pydicom.filebase import DicomBytesIO
-from pydicom.dataelem import DataElement
+from pydicom.valuerep import DA, DT, TM
 
 test_dir = os.path.dirname(__file__)
 test_files = os.path.join(test_dir, 'test_files')
@@ -158,7 +158,7 @@ class WriteFileTests(unittest.TestCase):
         if os.path.exists(rtplan_out):
             os.remove(rtplan_out)  # get rid of the file
 
-            
+
 @unittest.skipIf(not have_dateutil, "Need python-dateutil installed for these tests")
 class ScratchWriteDateTimeTests(WriteFileTests):
     """Write and reread simple or multi-value DA/DT/TM data elements"""
@@ -196,6 +196,7 @@ class ScratchWriteDateTimeTests(WriteFileTests):
         if os.path.exists(datetime_out):
             os.remove(datetime_out)  # get rid of the file
 
+
 class WriteDataElementTests(unittest.TestCase):
     """Attempt to write data elements has the expected behaviour"""
     def setUp(self):
@@ -203,6 +204,32 @@ class WriteDataElementTests(unittest.TestCase):
         self.f1 = DicomBytesIO()
         self.f1.is_little_endian = True
         self.f1.is_implicit_VR = True
+
+    @staticmethod
+    def encode_element(elem, is_implicit_VR=True, is_little_endian=True):
+        """Return the encoded `elem`.
+        
+        Parameters
+        ----------
+        elem : pydicom.dataelem.DataElement
+            The element to encode
+        is_implicit_VR : bool
+            Encode using implicit VR, default True
+        is_little_endian : bool
+            Encode using little endian, default True
+
+        Returns
+        -------
+        str or bytes
+            The encoded element as str (python2) or bytes (python3)
+        """
+        fp = DicomBytesIO()
+        fp.is_implicit_VR = is_implicit_VR
+        fp.is_little_endian = is_little_endian
+        write_data_element(fp, elem)
+        byte_string = fp.parent.getvalue()
+        fp.close()
+        return byte_string
 
     def test_empty_AT(self):
         """Write empty AT correctly.........."""
@@ -219,6 +246,38 @@ class WriteDataElementTests(unittest.TestCase):
         msg = "%r %r" % (type(expected), type(got))
         msg = "'%r' '%r'" % (expected, got)
         self.assertEqual(expected, got, msg)
+
+    def test_write_UR(self):
+        """Test writing elements with VR of UR works correctly."""
+        # Even length URL
+        elem = DataElement(0x00080120, 'UR',
+                           'http://github.com/darcymason/pydicom')
+        encoded_elem = self.encode_element(elem)
+        # Tag pair (0008, 2001): 08 00 20 01
+        # Length (36): 24 00 00 00
+        # Value: 68 to 6d
+        ref_bytes = b'\x08\x00\x20\x01\x24\x00\x00\x00\x68\x74' \
+                    b'\x74\x70\x3a\x2f\x2f\x67\x69\x74\x68\x75' \
+                    b'\x62\x2e\x63\x6f\x6d\x2f\x64\x61\x72\x63' \
+                    b'\x79\x6d\x61\x73\x6f\x6e\x2f\x70\x79\x64' \
+                    b'\x69\x63\x6f\x6d'
+        self.assertEqual(encoded_elem, ref_bytes)
+
+        # Odd length URL has trailing \x20 (SPACE) padding
+        elem.value = '../test/test.py'
+        encoded_elem = self.encode_element(elem)
+        # Tag pair (0008, 2001): 08 00 20 01
+        # Length (16): 10 00 00 00
+        # Value: 2e to 20
+        ref_bytes = b'\x08\x00\x20\x01\x10\x00\x00\x00\x2e\x2e' \
+                    b'\x2f\x74\x65\x73\x74\x2f\x74\x65\x73\x74' \
+                    b'\x2e\x70\x79\x20'
+        self.assertEqual(encoded_elem, ref_bytes)
+
+        # Empty value
+        elem.value = ''
+        encoded_elem = self.encode_element(elem)
+        self.assertEqual(encoded_elem, b'\x08\x00\x20\x01\x00\x00\x00\x00')
 
 
 class ScratchWriteTests(unittest.TestCase):

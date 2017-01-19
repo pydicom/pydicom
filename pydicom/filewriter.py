@@ -10,7 +10,6 @@ from struct import pack
 
 from pydicom import compat
 from pydicom.config import logger
-
 from pydicom.compat import in_py2
 from pydicom.charset import default_encoding, text_VRs, convert_encodings
 from pydicom.uid import ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian
@@ -490,6 +489,7 @@ writers = {'UL': (write_numbers, 'L'),
            'LT': (write_string, None),
            'SQ': (write_sequence, None),
            'UN': (write_UN, None),
+           'UR': (write_string, None),
            'AT': (write_ATvalue, None),
            'ST': (write_string, None),
            'OW': (write_OWvalue, None),

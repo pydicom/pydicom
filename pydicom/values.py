@@ -228,6 +228,17 @@ def convert_UN(byte_string, is_little_endian, struct_format=None):
     """Return a byte string for a VR of 'UN' (unknown)"""
     return byte_string
 
+def convert_UR_string(byte_string, is_little_endian, struct_format=None,
+                      encoding=default_encoding):
+    """Read a byte string for a VR of 'UR'
+
+    Elements with VR of 'UR' shall not be multi-valued and trailing spaces shall
+    be ignored.
+    """
+    if not in_py2:
+        byte_string = byte_string.decode(encoding)
+    byte_string = byte_string.rstrip()
+    return byte_string
 
 def convert_value(VR, raw_data_element, encoding=default_encoding):
     """Return the converted value (from raw bytes) for the given VR"""
@@ -282,6 +293,7 @@ def convert_value(VR, raw_data_element, encoding=default_encoding):
                 logger.debug('converted tag %s with VR %s' % (raw_data_element.tag, vr))
                 value = raw_data_element.value
     return value
+
 convert_retry_VR_order = [
     'SH', 'UL', 'SL', 'US', 'SS', 'FL', 'FD', 'OF', 'OB', 'UI', 'DA', 'TM',
     'PN', 'IS', 'DS', 'LT', 'SQ', 'UN', 'AT', 'OW', 'DT', 'UT', ]
@@ -311,6 +323,7 @@ converters = {
     'LT': convert_single_string,
     'SQ': convert_SQ,
     'UN': convert_UN,
+    'UR': convert_UR_string,
     'AT': convert_ATvalue,
     'ST': convert_string,
     'OW': convert_OWvalue,
