@@ -69,9 +69,9 @@ def write_dict(fp, dict_name, attributes, tag_is_string):
         If the tag is a string (as it is for the RepeatersDictionary)
     """
     if tag_is_string:
-        entry_format = """'{Tag}' : ('{VR}', '{VM}', "{Name}", '{Retired}', '{Keyword}')"""
+        entry_format = """'{Tag}': ('{VR}', '{VM}', "{Name}", '{Retired}', '{Keyword}')"""
     else:
-        entry_format = """{Tag} : ('{VR}', '{VM}', "{Name}", '{Retired}', '{Keyword}')"""
+        entry_format = """{Tag}: ('{VR}', '{VM}', "{Name}", '{Retired}', '{Keyword}')"""
 
     fp.write("\n%s = {\n    " % dict_name)
     fp.write(",\n    ".join(entry_format.format(**attr) for attr in attributes))

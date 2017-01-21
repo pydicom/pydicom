@@ -39,7 +39,7 @@ def write_dict(fp, dict_name, attributes):
     attributes : list of str
         List of attributes of the dict entries.
     """
-    entry_format = """'{UID Value}' : ('{UID Name}', '{UID Type}', '{UID Info}', '{Retired}')"""
+    entry_format = """'{UID Value}': ('{UID Name}', '{UID Type}', '{UID Info}', '{Retired}')"""
 
     fp.write("\n%s = {\n    " % dict_name)
     fp.write(",\n    ".join(entry_format.format(**attr) for attr in attributes))
