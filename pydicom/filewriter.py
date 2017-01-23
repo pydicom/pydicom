@@ -25,12 +25,12 @@ from pydicom.tagtools import tag_in_exception
 def correct_ambiguous_vr(ds, is_little_endian):
     """Iterate through `ds` correcting ambiguous VR elements (if possible).
 
-    When it's not possible to correct the VR, the element will be return
+    When it's not possible to correct the VR, the element will be returned
     unchanged. Currently the only ambiguous VR elements not corrected for are
     all retired or part of DICONDE, except for (60xx,3000) Overlay Data.
 
-    If the VR is corrected then the value will be updated using the
-    pydicom.values.convert_numbers() method if the VR is 'US' or 'SS'.
+    If the VR is corrected and is 'US' or 'SS then the value will be updated
+    using the pydicom.values.convert_numbers() method.
 
     Parameters
     ----------
@@ -55,9 +55,8 @@ def correct_ambiguous_vr(ds, is_little_endian):
             # OB or OW: 7fe0,0010 PixelData
             if elem.tag == 0x7fe00010:
                 # If BitsAllocated is > 8 then OW, else may be OB or OW
-                #   As per PS3.5 Annex A.2. Use OB for BitsAllocated < 8.
-                #   Test the size of the each pixel to see if its written in
-                #   OW or OB
+                #   As per PS3.5 Annex A.2. For BitsAllocated < 8 test the size
+                #   of each pixel to see if its written in OW or OB
                 try:
                     if ds.BitsAllocated > 8:
                         elem.VR = 'OW'
@@ -118,13 +117,12 @@ def correct_ambiguous_vr(ds, is_little_endian):
             # OB or OW: 5400,1010 WaveformData
             elif elem.tag in [0x54000100, 0x54000112, 0x5400100A,
                               0x54001010]:
-                # OB if WaveformBitsAllocated is < 8, OW otherwise
+                # If WaveformBitsAllocated is > 8 then OW, otherwise may be
+                #   OB or OW, however not sure how to handle this.
                 #   See PS3.3 C.10.9.1.
                 if 'WaveformBitsAllocated' in ds:
                     if ds.WaveformBitsAllocated > 8:
                         elem.VR = 'OW'
-                    #else:
-                    #   elem.VR = 'OB'
 
             # US or OW: 0028,3006 LUTData
             elif elem.tag in [0x00283006]:
