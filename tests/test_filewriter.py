@@ -6,10 +6,10 @@
 #    available at https://github.com/darcymason/pydicom
 
 # from io import BytesIO
-import sys
-import os.path
-import os
 from datetime import date, datetime, time
+import os
+import os.path
+import sys
 
 have_dateutil = True
 try:
@@ -30,7 +30,7 @@ from pydicom.dataset import Dataset, FileDataset
 from pydicom.dataelem import DataElement
 from pydicom.filebase import DicomBytesIO
 from pydicom.filereader import read_file
-from pydicom.filewriter import write_data_element
+from pydicom.filewriter import write_data_element, write_dataset
 from pydicom.multival import MultiValue
 from pydicom.sequence import Sequence
 from pydicom.util.hexutil import hex2bytes, bytes2hex
@@ -278,6 +278,25 @@ class WriteDataElementTests(unittest.TestCase):
         elem.value = ''
         encoded_elem = self.encode_element(elem)
         self.assertEqual(encoded_elem, b'\x08\x00\x20\x01\x00\x00\x00\x00')
+
+
+class WriteAmbiguousVRTests(unittest.TestCase):
+    """Attempt to write data elements with ambiguous VR."""
+    def setUp(self):
+        # Create a dummy (in memory) file to write to
+        self.fp = DicomBytesIO()
+        self.fp.is_implicit_VR = False
+        self.fp.is_little_endian = True
+
+        # Create a dataset containing elements with ambiguous VRs
+        test_dir = os.path.dirname(__file__)
+        test_file = os.path.join(test_dir, 'test_files', 'ambiguous_vr.dcm')
+        self.ds = read_file(test_file)
+    
+    def test_write_explicit_vr_little_endian(self):
+        """Test writing explicit little data for ambiguous elements."""
+        write_dataset(self.fp, self.ds)
+        
 
 
 class ScratchWriteTests(unittest.TestCase):
