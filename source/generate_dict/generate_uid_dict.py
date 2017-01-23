@@ -24,7 +24,7 @@ except ImportError:
     import urllib.request as urllib2 # python3
 import xml.etree.ElementTree as ET
 
-PYDICOM_DICT_FILENAME = '../../pydicom/_UID_dict.py'
+PYDICOM_DICT_FILENAME = '../../pydicom/_uid_dict.py'
 DICT_NAME = 'UID_dictionary'
 
 def write_dict(fp, dict_name, attributes):
