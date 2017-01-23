@@ -398,12 +398,13 @@ class TestCorrectAmbiguousVR(unittest.TestCase):
         self.assertEqual(ds.WaveformData, b'\x00\x01')
         self.assertEqual(ds[0x54001010].VR, 'OW')
 
-        # If WaveformBitsAllocated <= 8 then VR is OB
+        # If WaveformBitsAllocated <= 8 then VR is OB or OW, but not sure which
+        #   so leave VR unchanged
         ref_ds.WaveformBitsAllocated = 8
-        ref_ds.WaveformData = b'\x01'
+        ref_ds.WaveformData = b'\x01\x02'
         ds = correct_ambiguous_vr(deepcopy(ref_ds), True)
-        self.assertEqual(ds.WaveformData, b'\x01')
-        self.assertEqual(ds[0x54001010].VR, 'OB')
+        self.assertEqual(ds.WaveformData, b'\x01\x02')
+        self.assertEqual(ds[0x54001010].VR, 'OB or OW')
 
         # If no WaveformBitsAllocated then VR should be unchanged
         ref_ds = Dataset()

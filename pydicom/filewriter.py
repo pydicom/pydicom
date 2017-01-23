@@ -64,7 +64,7 @@ def correct_ambiguous_vr(ds, is_little_endian):
                     else:
                         if len(ds.PixelData) / (ds.Rows * ds.Columns) == 2:
                             elem.VR = 'OW'
-                        else:
+                        elif len(ds.PixelData) / (ds.Rows * ds.Columns) == 1:
                             elem.VR = 'OB'
                 except AttributeError:
                     pass
@@ -119,12 +119,12 @@ def correct_ambiguous_vr(ds, is_little_endian):
             elif elem.tag in [0x54000100, 0x54000112, 0x5400100A,
                               0x54001010]:
                 # OB if WaveformBitsAllocated is < 8, OW otherwise
-                #   See PS3.3 C.10.9.1
+                #   See PS3.3 C.10.9.1.
                 if 'WaveformBitsAllocated' in ds:
                     if ds.WaveformBitsAllocated > 8:
                         elem.VR = 'OW'
-                    else:
-                        elem.VR = 'OB'
+                    #else:
+                    #   elem.VR = 'OB'
 
             # US or OW: 0028,3006 LUTData
             elif elem.tag in [0x00283006]:
