@@ -39,7 +39,18 @@ in_py3 = sys.version_info[0] > 2
 #  Turn off debugging with
 #       dicom.debug(False)
 import logging
+import warnings
 
+# Warning specific to pydicom 0.9.9-1, a version released for pypi 'dicom' project, 
+#   to point people to new pydicom 1.0
+msg = """
+This code is using an older version of pydicom, which is no longer 
+maintained as of Jan 2017.  You can access the new pydicom features and API 
+by installing `pydicom` from PyPI.
+See 'Transitioning to pydicom 1.x' section at pydicom.readthedocs.org 
+for more information.
+"""
+warnings.warn(msg)
 
 def debug(debug_on=True):
     """Turn debugging of DICOM file reading and writing on or off.
@@ -69,5 +80,5 @@ debug(False)  # force level=WARNING, in case logging default is set differently 
 from dicom.filereader import read_file, read_dicomdir  # noQA
 from dicom.filewriter import write_file  # noQA
 
-__version__ = "0.9.9"
+__version__ = "0.9.9-1"
 __version_info__ = (0, 9, 9)

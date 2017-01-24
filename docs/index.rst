@@ -13,6 +13,7 @@ Contents:
    
    getting_started.rst
    pydicom_user_guide.rst
+   transition_to_pydicom1.rst
    working_with_pixel_data.rst
    viewing_images.rst
    ref_guide.rst
