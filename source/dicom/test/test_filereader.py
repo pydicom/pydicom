@@ -34,7 +34,7 @@ import gzip
 from dicom.test.warncheck import assertWarns
 
 from pkg_resources import Requirement, resource_filename
-test_dir = resource_filename(Requirement.parse("pydicom"), "dicom/testfiles")
+test_dir = resource_filename(Requirement.parse("dicom"), "dicom/testfiles")
 
 rtplan_name = os.path.join(test_dir, "rtplan.dcm")
 rtdose_name = os.path.join(test_dir, "rtdose.dcm")

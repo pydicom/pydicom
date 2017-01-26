@@ -12,7 +12,7 @@ import unittest
 
 # Get the directory test_dir where the test scripts are
 from pkg_resources import Requirement, resource_filename
-test_dir = resource_filename(Requirement.parse("pydicom"), "dicom/test")
+test_dir = resource_filename(Requirement.parse("dicom"), "dicom/test")
 
 
 class MyTestLoader(object):
@@ -49,7 +49,7 @@ if __name__ == "__main__":
 
     # Switch directories to test DICOM files, used by many of the tests
     save_dir = os.getcwd()
-    testfiles_dir = resource_filename(Requirement.parse("pydicom"),
+    testfiles_dir = resource_filename(Requirement.parse("dicom"),
                                       "dicom/testfiles")
     os.chdir(testfiles_dir)
     runner.run(suite)

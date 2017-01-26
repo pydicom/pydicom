@@ -11,7 +11,7 @@ import dicom
 import os.path
 
 from pkg_resources import Requirement, resource_filename
-testcharset_dir = resource_filename(Requirement.parse("pydicom"),
+testcharset_dir = resource_filename(Requirement.parse("dicom"),
                                     "dicom/testcharsetfiles")
 
 latin1_file = os.path.join(testcharset_dir, "chrFren.dcm")
@@ -19,7 +19,7 @@ jp_file = os.path.join(testcharset_dir, "chrH31.dcm")
 multiPN_file = os.path.join(testcharset_dir, "chrFrenMulti.dcm")
 sq_encoding_file = os.path.join(testcharset_dir, "chrSQEncoding.dcm")
 
-test_dir = resource_filename(Requirement.parse("pydicom"), "dicom/testfiles")
+test_dir = resource_filename(Requirement.parse("dicom"), "dicom/testfiles")
 normal_file = os.path.join(test_dir, "CT_small.dcm")
 
 

@@ -20,8 +20,8 @@ from dicom.filebase import DicomBytesIO
 from dicom.dataelem import DataElement
 
 from pkg_resources import Requirement, resource_filename
-test_dir = resource_filename(Requirement.parse("pydicom"), "dicom/testfiles")
-testcharset_dir = resource_filename(Requirement.parse("pydicom"),
+test_dir = resource_filename(Requirement.parse("dicom"), "dicom/testfiles")
+testcharset_dir = resource_filename(Requirement.parse("dicom"),
                                     "dicom/testcharsetfiles")
 
 rtplan_name = os.path.join(test_dir, "rtplan.dcm")
