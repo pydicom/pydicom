@@ -386,6 +386,7 @@ class ReadDataElementTests(unittest.TestCase):
         #ds.LongCodeValue = FIXME # VR of UC
         ds.URNCodeValue = 'http://test.com' # VR of UR
         ds.RetrieveURL = 'ftp://test.com  ' # Test trailing spaces ignored
+        ds.DestinationAE = '    TEST  12    ' # 16 characters max for AE
         self.fp = BytesIO()
 
         file_ds = FileDataset(self.fp, ds)
@@ -406,6 +407,11 @@ class ReadDataElementTests(unittest.TestCase):
         ref_elem.file_tell = None # Workaround for Issue #294
         elem = DataElement(0x00081190, 'UR', 'ftp://test.com')
         self.assertEqual(ref_elem, elem)
+
+    def test_read_AE(self):
+        """Check creation of AE DataElement from byte data works correctly."""
+        ds = read_file(self.fp, force=True)
+        self.assertEqual(ds.DestinationAE, 'TEST  12')
 
 
 class JPEG_LS_Tests(unittest.TestCase):
