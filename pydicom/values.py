@@ -34,6 +34,16 @@ def convert_tag(byte_string, is_little_endian, offset=0):
         struct_format = ">HH"
     return TupleTag(unpack(struct_format, byte_string[offset:offset + 4]))
 
+def convert_AE_string(byte_string, is_little_endian, struct_format=None,
+                      encoding=default_encoding):
+    """Read a byte string for a VR of 'AE'.
+
+    Elements with VR of 'AE' have non-significant leading and trailing spaces.
+    """
+    if not in_py2:
+        byte_string = byte_string.decode(encoding)
+    byte_string = byte_string.strip()
+    return byte_string
 
 def convert_ATvalue(byte_string, is_little_endian, struct_format=None):
     """Read and return AT (tag) data_element value(s)"""
@@ -318,7 +328,7 @@ converters = {
     'LO': convert_string,
     'IS': convert_IS_string,
     'DS': convert_DS_string,
-    'AE': convert_string,
+    'AE': convert_AE_string,
     'AS': convert_string,
     'LT': convert_single_string,
     'SQ': convert_SQ,
