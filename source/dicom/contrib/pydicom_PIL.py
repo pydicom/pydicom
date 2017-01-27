@@ -14,7 +14,7 @@ and Python Imaging Library:   http://www.pythonware.com/products/pil/
 # Copyright (c) 2009 Darcy Mason, Adit Panchal
 # This file is part of pydicom, relased under an MIT license.
 #    See the file license.txt included with this distribution, also
-#    available at http://pydicom.googlecode.com
+#    available at https://github.com/darcymason/pydicom
 
 # Based on image.py from pydicom version 0.9.3,
 #    LUT code added by Adit Panchal
