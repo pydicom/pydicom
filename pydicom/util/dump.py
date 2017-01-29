@@ -19,7 +19,7 @@ def print_character(ordchr):
 
 def filedump(filename, start_address=0, stop_address=None):
     """Dump out the contents of a file to a standard hex dump 16 bytes wide"""
-    fp = file(filename, 'rb')
+    fp = open(filename, 'rb')
     return hexdump(fp, start_address, stop_address)
 
 

@@ -284,7 +284,7 @@ def convert_value(VR, raw_data_element, encoding=default_encoding):
         else:
             value = convert_SQ(byte_string, is_implicit_VR, is_little_endian,
                                encoding, raw_data_element.value_tell)
-    except ValueError as e:
+    except ValueError:
         if config.enforce_valid_values:
             # The user really wants an exception here
             raise

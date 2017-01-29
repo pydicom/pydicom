@@ -177,7 +177,8 @@ class Dataset(dict):
         # This simply calls the pydicom.charset.decode function
         def decode_callback(ds, data_element):
             if data_element.VR == 'SQ':
-                [dset.decode() for dset in data_element.value]
+                for dset in data_element.value:
+                    dset.decode()
             else:
                 decode_data_element(data_element, dicom_character_set)
 
@@ -694,7 +695,7 @@ class Dataset(dict):
                 self._pixel_array = self._compressed_pixel_data_numpy()
                 self._pixel_id = id(self.PixelData)  # is this guaranteed to work if memory is re-used??
                 return self._pixel_array
-            except IOError as I:
+            except IOError:
                 logger.info("Pillow or JPLS did not support this transfer syntax")
         if not already_have:
             self._pixel_array = self._pixel_data_numpy()
