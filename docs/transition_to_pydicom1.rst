@@ -19,36 +19,33 @@ Backwards-compatible changes post 1.0
   * short-form names such as ``Beams`` are no longer allowed;  use the full keyword e.g. ``BeamSequence``
   * some less-used modules within pydicom have been renamed, e.g. ``dicom.UID`` is now ``pydicom.uid``
   
-Why was the package name changed?  Yes, this will cause some confusion for a while, and I apologize for this, but it
-will fade over time.  There are several reasons for this change:
+Why was the package name changed?  There are several reasons for this change:
 
   * it is standard python practice for the package and the installed library to have the same name
-  * first time users expect to be able to type ``import pydicom`` rather than ``import dicom``, which has caused confusion
+  * first-time users expect to be able to type ``import pydicom`` rather than ``import dicom``, which has caused confusion
   * it makes sense for search engines - with the correct name it is much easier to find relevant questions and example code online
   
 The decision wasn't taken lightly, but with a great deal of discussion on the github issues list.  Having made the leap,
 the rest of this guide should help smooth the way...
 
 For authors of packages requiring pydicom < 1.0
-========================================================
-If you have authored code targeting the "old" dicom library, you have three options (at least):
+===============================================
+The old pydicom releases have been split off into their own package, called ``dicom``, which is now hosted on PyPI. This allows the old library ``dicom`` to co-exist alongside the new library ``pydicom``.
 
-  # update the code base to target pydicom >1.0
-  # update your dependencies to point to package ``dicom`` rather than ``pydicom``
-  # update dependencies to explictly target pydicom < 1, e.g. pydicom=0.9.9
-  
-The first option can be relatively simple for most projects.  If you only use
-basic pydicom features, e.g. to read and write files, simply changing ``import dicom``
-to ``import pydicom`` everywhere may be all that is needed.
+The main things to do, to ensure your old pydicom code will remain functional, are:
+   
+   (a) you should ``pip uninstall pydicom`` and ``pip install dicom`` in your existing pydicom installs
+   (b) If you have ``requirements.txt`` files, change the pydicom line from "pydicom" to "dicom"
+     e.g. 
+       ``pydicom==0.9.9``
+     becomes
+       ``dicom==0.9.9``
+   (c) Change your instructions to users to ``pip install dicom`` rather than ``pip install pydicom``
 
-The second and third options will get the same library installed.  The second is preferred,
-as this will point to a repository explicit to the old ``dicom`` code.  This makes it clear
-that your code has not been updated for pydicom 1, and allows people to install ``pydicom`` and ``dicom``
-completely independently.
 
 Error messages relating to the pydicom transition
 =================================================
-This section is here in the hopes of people getting redirected to this page on searches.  If that's you,
+This section is here in the hopes of people getting directed to this page on searches.  If that's you,
 then welcome!  Hopefully the information here can get things going quickly for you.
 
 For those with pydicom < 1.0 installed, on trying to import pydicom, they will get an ImportError message:
