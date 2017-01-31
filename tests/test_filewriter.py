@@ -287,7 +287,7 @@ class WriteDataElementTests(unittest.TestCase):
         """Test writing elements with VR of UC works correctly.
 
         Elements with a VR of 'UC' use the newer explicit VR
-        encoded (see PS3.5 Section 7.1.2).
+        encoding (see PS3.5 Section 7.1.2).
         """
         # VM 1, even data
         elem = DataElement(0x00189908, 'UC', 'Test')
@@ -370,8 +370,6 @@ class WriteDataElementTests(unittest.TestCase):
         elem = DataElement(0x00080120, 'UR', 'ftp://bits')
         encoded_elem = self.encode_element(elem, False, True)
         # Tag pair (0008, 2001): 08 00 20 01
-        # Length (36): 24 00 00 00
-        # Value: 68 to 6d
         # VR (UR): \x55\x52
         # Reserved: \x00\x00
         # Length (4): \x0a\x00\x00\x00
@@ -383,9 +381,6 @@ class WriteDataElementTests(unittest.TestCase):
         # Odd length URL has trailing \x20 (SPACE) padding
         elem.value = 'ftp://bit'
         encoded_elem = self.encode_element(elem, False, True)
-        # Tag pair (0008, 2001): 08 00 20 01
-        # Length (16): 10 00 00 00
-        # Value: 2e to 20
         ref_bytes = b'\x08\x00\x20\x01\x55\x52\x00\x00\x0a\x00\x00\x00' \
                     b'\x66\x74\x70\x3a\x2f\x2f\x62\x69\x74\x20'
         self.assertEqual(encoded_elem, ref_bytes)
