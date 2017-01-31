@@ -87,7 +87,7 @@ def get_PIL_image(dataset):
         # Convert mode to L since LUT has only 256 values:
         #   http://www.pythonware.com/library/pil/handbook/image.htm
         im = PIL.Image.fromarray(image).convert('L')
-        
+
     return im
 
 

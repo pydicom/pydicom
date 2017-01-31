@@ -62,7 +62,7 @@ if __name__ == "__main__":
     ds.ContentDate = dt.strftime('%Y%m%d')
     timeStr = dt.strftime('%H%M%S.%f') # long format with micro seconds
     ds.ContentTime = timeStr
-    
+
     print("Writing test file", filename)
     ds.save_as(filename)
     print("File saved.")

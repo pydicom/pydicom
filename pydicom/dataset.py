@@ -262,9 +262,9 @@ class Dataset(dict):
             return names
         else:
             return sorted(allnames)
-    
+
     def __eq__(self, other):
-        """ 
+        """
         Compare `self` and `other` for equality
 
         Returns

@@ -56,7 +56,7 @@ class dicomfile(object):
         if transfer_syntax_uid:
             if transfer_syntax_uid.endswith(b' ') or \
                 transfer_syntax_uid.endswith(b'\0'):
-                    transfer_syntax_uid = transfer_syntax_uid[:-1]
+                transfer_syntax_uid = transfer_syntax_uid[:-1]
             is_implicit_VR, is_little_endian = transfer_syntax(transfer_syntax_uid)
             # print is_implicit_VR
         else:
