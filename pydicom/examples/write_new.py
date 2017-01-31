@@ -60,7 +60,7 @@ if __name__ == "__main__":
     # Set creation date/time
     dt = datetime.datetime.now()
     ds.ContentDate = dt.strftime('%Y%m%d')
-    timeStr = dt.strftime('%H%M%S.%f') # long format with micro seconds
+    timeStr = dt.strftime('%H%M%S.%f')  # long format with micro seconds
     ds.ContentTime = timeStr
 
     print("Writing test file", filename)

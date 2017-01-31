@@ -93,10 +93,10 @@ def correct_ambiguous_vr(ds, is_little_endian):
             # 0060,3004 HistogramFirstBinValue
             # 0060,3006 HistogramLastBinValue
             elif elem.tag in [0x00189810, 0x00221452, 0x00280104, 0x00280105,
-                               0x00280106, 0x00280107, 0x00280108, 0x00280108,
-                               0x00280110, 0x00280111, 0x00280120, 0x00280121,
-                               0x00281101, 0x00281102, 0x00281103, 0x00283002,
-                               0x00409211, 0x00409216, 0x00603004, 0x00603006]:
+                              0x00280106, 0x00280107, 0x00280108, 0x00280108,
+                              0x00280110, 0x00280111, 0x00280120, 0x00280121,
+                              0x00281101, 0x00281102, 0x00281103, 0x00283002,
+                              0x00409211, 0x00409216, 0x00603004, 0x00603006]:
                 # US if PixelRepresenation value is 0x0000, else SS
                 #   For references, see the list at
                 #   https://github.com/scaramallion/pynetdicom3/issues/3
@@ -139,6 +139,7 @@ def correct_ambiguous_vr(ds, is_little_endian):
                         elem.VR = 'OW'
 
     return ds
+
 
 def write_numbers(fp, data_element, struct_format):
     """Write a "value" of type struct_format from the dicom file.

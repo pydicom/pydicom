@@ -34,6 +34,7 @@ def convert_tag(byte_string, is_little_endian, offset=0):
         struct_format = ">HH"
     return TupleTag(unpack(struct_format, byte_string[offset:offset + 4]))
 
+
 def convert_AE_string(byte_string, is_little_endian, struct_format=None,
                       encoding=default_encoding):
     """Read a byte string for a VR of 'AE'.
@@ -44,6 +45,7 @@ def convert_AE_string(byte_string, is_little_endian, struct_format=None,
         byte_string = byte_string.decode(encoding)
     byte_string = byte_string.strip()
     return byte_string
+
 
 def convert_ATvalue(byte_string, is_little_endian, struct_format=None):
     """Read and return AT (tag) data_element value(s)"""
@@ -238,6 +240,7 @@ def convert_UN(byte_string, is_little_endian, struct_format=None):
     """Return a byte string for a VR of 'UN' (unknown)"""
     return byte_string
 
+
 def convert_UR_string(byte_string, is_little_endian, struct_format=None,
                       encoding=default_encoding):
     """Read a byte string for a VR of 'UR'
@@ -249,6 +252,7 @@ def convert_UR_string(byte_string, is_little_endian, struct_format=None,
         byte_string = byte_string.decode(encoding)
     byte_string = byte_string.rstrip()
     return byte_string
+
 
 def convert_value(VR, raw_data_element, encoding=default_encoding):
     """Return the converted value (from raw bytes) for the given VR"""
