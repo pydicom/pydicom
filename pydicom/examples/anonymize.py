@@ -29,6 +29,7 @@ the DICOM standard, e.g in Annex E of PS3.15-2011.
 import os
 import os.path
 import pydicom
+from pydicom.errors import InvalidDicomError
 
 
 def anonymize(filename, output_filename, new_person_name="anonymous",
@@ -100,8 +101,12 @@ if __name__ == "__main__":
         for filename in filenames:
             if not os.path.isdir(os.path.join(in_dir, filename)):
                 print(filename + "...", end='')
-                anonymize(os.path.join(in_dir, filename), os.path.join(out_dir, filename))
-                print("done\r")
+                try:
+                    anonymize(os.path.join(in_dir, filename), os.path.join(out_dir, filename))
+                except InvalidDicomError:
+                    print("Not a valid dicom file, may need force=True on read_file\r")
+                else:
+                    print("done\r")
     else:  # first arg not a directory, assume two files given
         in_filename = arg1
         out_filename = arg2
