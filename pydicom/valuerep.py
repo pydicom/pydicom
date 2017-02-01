@@ -24,11 +24,13 @@ import re
 default_encoding = "iso8859"  # can't import from charset or get circular import
 
 # For reading/writing data elements, these ones have longer explicit VR format
-extra_length_VRs = ('OB', 'OW', 'OF', 'SQ', 'UN', 'UT')
+# Taken from PS3.5 Section 7.1.2
+extra_length_VRs = ('OB', 'OD', 'OF', 'OL', 'OW', 'SQ', 'UC', 'UN',
+                    'UR', 'UT')
 
 # VRs that can be affected by character repertoire in (0008,0005) Specific Character Set
 # See PS-3.5 (2011), section 6.1.2 Graphic Characters
-text_VRs = ('SH', 'LO', 'ST', 'LT',  'UR', 'UT')  # and PN, but it is handled separately.
+text_VRs = ('SH', 'LO', 'ST', 'LT',  'UC', 'UR', 'UT')  # and PN, but it is handled separately.
 
 match_string = b''.join([
     b'(?P<single_byte>',

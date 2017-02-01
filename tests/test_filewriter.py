@@ -73,7 +73,6 @@ def files_identical(a, b):
 
     return bytes_identical(a_bytes, b_bytes)
 
-
 def bytes_identical(a_bytes, b_bytes):
     """Return a tuple (bytes a == bytes b, index of first difference)"""
     if a_bytes == b_bytes:
@@ -210,7 +209,7 @@ class WriteDataElementTests(unittest.TestCase):
     @staticmethod
     def encode_element(elem, is_implicit_VR=True, is_little_endian=True):
         """Return the encoded `elem`.
-        
+
         Parameters
         ----------
         elem : pydicom.dataelem.DataElement
@@ -249,7 +248,87 @@ class WriteDataElementTests(unittest.TestCase):
         msg = "'%r' '%r'" % (expected, got)
         self.assertEqual(expected, got, msg)
 
-    def test_write_UR(self):
+    def test_write_UC_implicit_little(self):
+        """Test writing elements with VR of UC works correctly."""
+        # VM 1, even data
+        elem = DataElement(0x00189908, 'UC', 'Test')
+        encoded_elem = self.encode_element(elem)
+        # Tag pair (0018, 9908): 08 00 20 01
+        # Length (4): 04 00 00 00
+        # Value: \x54\x65\x73\x74
+        ref_bytes = b'\x18\x00\x08\x99\x04\x00\x00\x00\x54\x65\x73\x74'
+        self.assertEqual(encoded_elem, ref_bytes)
+
+        # VM 1, odd data - padded to even length
+        elem.value = 'Test.'
+        encoded_elem = self.encode_element(elem)
+        ref_bytes = b'\x18\x00\x08\x99\x06\x00\x00\x00\x54\x65\x73\x74\x2e\x20'
+        self.assertEqual(encoded_elem, ref_bytes)
+
+        # VM 3, even data
+        elem.value = ['Aa', 'B', 'C']
+        encoded_elem = self.encode_element(elem)
+        ref_bytes = b'\x18\x00\x08\x99\x06\x00\x00\x00\x41\x61\x5c\x42\x5c\x43'
+        self.assertEqual(encoded_elem, ref_bytes)
+
+        # VM 3, odd data - padded to even length
+        elem.value = ['A', 'B', 'C']
+        encoded_elem = self.encode_element(elem)
+        ref_bytes = b'\x18\x00\x08\x99\x06\x00\x00\x00\x41\x5c\x42\x5c\x43\x20'
+        self.assertEqual(encoded_elem, ref_bytes)
+
+        # Empty data
+        elem.value = ''
+        encoded_elem = self.encode_element(elem)
+        ref_bytes = b'\x18\x00\x08\x99\x00\x00\x00\x00'
+        self.assertEqual(encoded_elem, ref_bytes)
+
+    def test_write_UC_explicit_little(self):
+        """Test writing elements with VR of UC works correctly.
+
+        Elements with a VR of 'UC' use the newer explicit VR
+        encoding (see PS3.5 Section 7.1.2).
+        """
+        # VM 1, even data
+        elem = DataElement(0x00189908, 'UC', 'Test')
+        encoded_elem = self.encode_element(elem, False, True)
+        # Tag pair (0018, 9908): 08 00 20 01
+        # VR (UC): \x55\x43
+        # Reserved: \x00\x00
+        # Length (4): \x04\x00\x00\x00
+        # Value: \x54\x65\x73\x74
+        ref_bytes = b'\x18\x00\x08\x99\x55\x43\x00\x00\x04\x00\x00\x00' \
+                    b'\x54\x65\x73\x74'
+        self.assertEqual(encoded_elem, ref_bytes)
+
+        # VM 1, odd data - padded to even length
+        elem.value = 'Test.'
+        encoded_elem = self.encode_element(elem, False, True)
+        ref_bytes = b'\x18\x00\x08\x99\x55\x43\x00\x00\x06\x00\x00\x00' \
+                    b'\x54\x65\x73\x74\x2e\x20'
+        self.assertEqual(encoded_elem, ref_bytes)
+
+        # VM 3, even data
+        elem.value = ['Aa', 'B', 'C']
+        encoded_elem = self.encode_element(elem, False, True)
+        ref_bytes = b'\x18\x00\x08\x99\x55\x43\x00\x00\x06\x00\x00\x00' \
+                    b'\x41\x61\x5c\x42\x5c\x43'
+        self.assertEqual(encoded_elem, ref_bytes)
+
+        # VM 3, odd data - padded to even length
+        elem.value = ['A', 'B', 'C']
+        encoded_elem = self.encode_element(elem, False, True)
+        ref_bytes = b'\x18\x00\x08\x99\x55\x43\x00\x00\x06\x00\x00\x00' \
+                    b'\x41\x5c\x42\x5c\x43\x20'
+        self.assertEqual(encoded_elem, ref_bytes)
+
+        # Empty data
+        elem.value = ''
+        encoded_elem = self.encode_element(elem, False, True)
+        ref_bytes = b'\x18\x00\x08\x99\x55\x43\x00\x00\x00\x00\x00\x00'
+        self.assertEqual(encoded_elem, ref_bytes)
+
+    def test_write_UR_implicit_little(self):
         """Test writing elements with VR of UR works correctly."""
         # Even length URL
         elem = DataElement(0x00080120, 'UR',
@@ -280,6 +359,37 @@ class WriteDataElementTests(unittest.TestCase):
         elem.value = ''
         encoded_elem = self.encode_element(elem)
         self.assertEqual(encoded_elem, b'\x08\x00\x20\x01\x00\x00\x00\x00')
+
+    def test_write_UR_explicit_little(self):
+        """Test writing elements with VR of UR works correctly.
+
+        Elements with a VR of 'UR' use the newer explicit VR
+        encoded (see PS3.5 Section 7.1.2).
+        """
+        # Even length URL
+        elem = DataElement(0x00080120, 'UR', 'ftp://bits')
+        encoded_elem = self.encode_element(elem, False, True)
+        # Tag pair (0008, 2001): 08 00 20 01
+        # VR (UR): \x55\x52
+        # Reserved: \x00\x00
+        # Length (4): \x0a\x00\x00\x00
+        # Value: \x66\x74\x70\x3a\x2f\x2f\x62\x69\x74\x73
+        ref_bytes = b'\x08\x00\x20\x01\x55\x52\x00\x00\x0a\x00\x00\x00' \
+                    b'\x66\x74\x70\x3a\x2f\x2f\x62\x69\x74\x73'
+        self.assertEqual(encoded_elem, ref_bytes)
+
+        # Odd length URL has trailing \x20 (SPACE) padding
+        elem.value = 'ftp://bit'
+        encoded_elem = self.encode_element(elem, False, True)
+        ref_bytes = b'\x08\x00\x20\x01\x55\x52\x00\x00\x0a\x00\x00\x00' \
+                    b'\x66\x74\x70\x3a\x2f\x2f\x62\x69\x74\x20'
+        self.assertEqual(encoded_elem, ref_bytes)
+
+        # Empty value
+        elem.value = ''
+        encoded_elem = self.encode_element(elem, False, True)
+        ref_bytes = b'\x08\x00\x20\x01\x55\x52\x00\x00\x00\x00\x00\x00'
+        self.assertEqual(encoded_elem, ref_bytes)
 
 
 class TestCorrectAmbiguousVR(unittest.TestCase):

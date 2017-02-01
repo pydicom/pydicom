@@ -383,28 +383,69 @@ class ReadDataElementTests(unittest.TestCase):
         ds = Dataset()
         #ds.DoubleFloatPixelData = FIXME # VR of OD
         # No element in _dicom_dict.py has a VR of OL
-        #ds.LongCodeValue = FIXME # VR of UC
+        ds.PotentialReasonsForProcedure = ['A', 'B', 'C'] # VR of UC, odd length
+        ds.StrainDescription = 'Test' # Even length
         ds.URNCodeValue = 'http://test.com' # VR of UR
         ds.RetrieveURL = 'ftp://test.com  ' # Test trailing spaces ignored
         ds.DestinationAE = '    TEST  12    ' # 16 characters max for AE
-        self.fp = BytesIO()
 
+        self.fp = BytesIO() # Implicit little
         file_ds = FileDataset(self.fp, ds)
         file_ds.is_implicit_VR = True
         file_ds.is_little_endian = True
         file_ds.save_as(self.fp)
 
-    def test_read_UR(self):
+        self.fp_ex = BytesIO() # Explicit little
+        file_ds = FileDataset(self.fp_ex, ds)
+        file_ds.is_implicit_VR = False
+        file_ds.is_little_endian = True
+        file_ds.save_as(self.fp_ex)
+
+    def test_read_UC_implicit_little(self):
+        """Check creation of DataElement from byte data works correctly."""
+        ds = read_file(self.fp, force=True)
+        ref_elem = ds.get(0x00189908)
+        elem = DataElement(0x00189908, 'UC', ['A', 'B', 'C'])
+        self.assertEqual(ref_elem, elem)
+
+        ds = read_file(self.fp, force=True)
+        ref_elem = ds.get(0x00100212)
+        elem = DataElement(0x00100212, 'UC', 'Test')
+        self.assertEqual(ref_elem, elem)
+
+    def test_read_UC_explicit_little(self):
+        """Check creation of DataElement from byte data works correctly."""
+        ds = read_file(self.fp_ex, force=True)
+        ref_elem = ds.get(0x00189908)
+        elem = DataElement(0x00189908, 'UC', ['A', 'B', 'C'])
+        self.assertEqual(ref_elem, elem)
+
+        ds = read_file(self.fp_ex, force=True)
+        ref_elem = ds.get(0x00100212)
+        elem = DataElement(0x00100212, 'UC', 'Test')
+        self.assertEqual(ref_elem, elem)
+
+    def test_read_UR_implicit_little(self):
         """Check creation of DataElement from byte data works correctly."""
         ds = read_file(self.fp, force=True)
         ref_elem = ds.get(0x00080120) # URNCodeValue
-        ref_elem.file_tell = None # Workaround for Issue #294
         elem = DataElement(0x00080120, 'UR', 'http://test.com')
         self.assertEqual(ref_elem, elem)
 
         # Test trailing spaces ignored
         ref_elem = ds.get(0x00081190) # RetrieveURL
-        ref_elem.file_tell = None # Workaround for Issue #294
+        elem = DataElement(0x00081190, 'UR', 'ftp://test.com')
+        self.assertEqual(ref_elem, elem)
+
+    def test_read_UR_explicit_little(self):
+        """Check creation of DataElement from byte data works correctly."""
+        ds = read_file(self.fp_ex, force=True)
+        ref_elem = ds.get(0x00080120) # URNCodeValue
+        elem = DataElement(0x00080120, 'UR', 'http://test.com')
+        self.assertEqual(ref_elem, elem)
+
+        # Test trailing spaces ignored
+        ref_elem = ds.get(0x00081190) # RetrieveURL
         elem = DataElement(0x00081190, 'UR', 'ftp://test.com')
         self.assertEqual(ref_elem, elem)
 
