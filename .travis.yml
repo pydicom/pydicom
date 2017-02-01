@@ -6,7 +6,9 @@ python:
     - 3.3
     - 3.4
     - 3.5
+    - 3.6
     - pypy
+    - pypy3
 
 env:
     # Ensure that pydicom functions with/without numpy
