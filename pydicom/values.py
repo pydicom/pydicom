@@ -336,6 +336,7 @@ converters = {
     'AS': convert_string,
     'LT': convert_single_string,
     'SQ': convert_SQ,
+    'UC': convert_string,
     'UN': convert_UN,
     'UR': convert_UR_string,
     'AT': convert_ATvalue,

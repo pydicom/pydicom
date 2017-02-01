@@ -335,8 +335,10 @@ def write_TM(fp, data_element, padding=' '):
 def write_data_element(fp, data_element, encoding=default_encoding):
     """Write the data_element to file fp according to dicom media storage rules.
     """
+    # Write element's tag
     fp.write_tag(data_element.tag)
 
+    # If explicit VR, write the VR
     VR = data_element.VR
     if not fp.is_implicit_VR:
         if len(VR) != 2:
@@ -353,7 +355,7 @@ def write_data_element(fp, data_element, encoding=default_encoding):
         raise NotImplementedError("write_data_element: unknown Value Representation '{0}'".format(VR))
 
     length_location = fp.tell()  # save location for later.
-    if not fp.is_implicit_VR and VR not in ['OB', 'OW', 'OF', 'SQ', 'UT', 'UN']:
+    if not fp.is_implicit_VR and VR not in extra_length_VRs:
         fp.write_US(0)  # Explicit VR length field is only 2 bytes
     else:
         fp.write_UL(0xFFFFFFFF)   # will fill in real length value later if not undefined length item
@@ -379,7 +381,7 @@ def write_data_element(fp, data_element, encoding=default_encoding):
         is_undefined_length = True
     location = fp.tell()
     fp.seek(length_location)
-    if not fp.is_implicit_VR and VR not in ['OB', 'OW', 'OF', 'SQ', 'UT', 'UN']:
+    if not fp.is_implicit_VR and VR not in extra_length_VRs:
         fp.write_US(location - length_location - 2)  # 2 is length of US
     else:
         # write the proper length of the data_element back in the length slot, unless is SQ with undefined length.
@@ -612,6 +614,7 @@ writers = {'UL': (write_numbers, 'L'),
            'AS': (write_string, None),
            'LT': (write_string, None),
            'SQ': (write_sequence, None),
+           'UC': (write_string, None),
            'UN': (write_UN, None),
            'UR': (write_string, None),
            'AT': (write_ATvalue, None),
