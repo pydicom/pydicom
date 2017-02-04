@@ -176,7 +176,6 @@ def write_OWvalue(fp, data_element):
     """Write a data_element with VR of 'other word' (OW).
 
     Note: This **does not currently do the byte swapping** for Endian state.
-
     """
     # XXX for now just write the raw bytes without endian swapping
     fp.write(data_element.value)
@@ -601,6 +600,8 @@ writers = {'UL': (write_numbers, 'L'),
            'FD': (write_numbers, 'd'),
            'OF': (write_numbers, 'f'),
            'OB': (write_OBvalue, None),
+           'OD': (write_OWvalue, None),
+           'OL': (write_OWvalue, None),
            'UI': (write_UI, None),
            'SH': (write_string, None),
            'DA': (write_DA, None),

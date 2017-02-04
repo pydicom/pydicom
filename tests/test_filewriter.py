@@ -248,6 +248,94 @@ class WriteDataElementTests(unittest.TestCase):
         msg = "'%r' '%r'" % (expected, got)
         self.assertEqual(expected, got, msg)
 
+    def test_write_OD_implicit_little(self):
+        """Test writing elements with VR of OD works correctly."""
+        # VolumetricCurvePoints
+        bytestring = b'\x00\x01\x02\x03\x04\x05\x06\x07' \
+                     b'\x01\x01\x02\x03\x04\x05\x06\x07'
+        elem = DataElement(0x0070150d, 'OD', bytestring)
+        encoded_elem = self.encode_element(elem)
+        # Tag pair (0070, 150d): 70 00 0d 15
+        # Length (16): 10 00 00 00
+        #             | Tag          |   Length      |    Value ->
+        ref_bytes = b'\x70\x00\x0d\x15\x10\x00\x00\x00' + bytestring
+        self.assertEqual(encoded_elem, ref_bytes)
+
+        # Empty data
+        elem.value = b''
+        encoded_elem = self.encode_element(elem)
+        ref_bytes = b'\x70\x00\x0d\x15\x00\x00\x00\x00'
+        self.assertEqual(encoded_elem, ref_bytes)
+
+    def test_write_OD_explicit_little(self):
+        """Test writing elements with VR of OD works correctly.
+
+        Elements with a VR of 'OD' use the newer explicit VR
+        encoding (see PS3.5 Section 7.1.2).
+        """
+        # VolumetricCurvePoints
+        bytestring = b'\x00\x01\x02\x03\x04\x05\x06\x07' \
+                     b'\x01\x01\x02\x03\x04\x05\x06\x07'
+        elem = DataElement(0x0070150d, 'OD', bytestring)
+        encoded_elem = self.encode_element(elem, False, True)
+        # Tag pair (0070, 150d): 70 00 0d 15
+        # VR (OD): \x4f\x44
+        # Reserved: \x00\x00
+        # Length (16): \x10\x00\x00\x00
+        #             | Tag          | VR    | Rsrvd |   Length      |    Value ->
+        ref_bytes = b'\x70\x00\x0d\x15\x4f\x44\x00\x00\x10\x00\x00\x00' + bytestring
+        self.assertEqual(encoded_elem, ref_bytes)
+
+        # Empty data
+        elem.value = b''
+        encoded_elem = self.encode_element(elem, False, True)
+        ref_bytes = b'\x70\x00\x0d\x15\x4f\x44\x00\x00\x00\x00\x00\x00'
+        self.assertEqual(encoded_elem, ref_bytes)
+        
+    def test_write_OL_implicit_little(self):
+        """Test writing elements with VR of OL works correctly."""
+        # TrackPointIndexList
+        bytestring = b'\x00\x01\x02\x03\x04\x05\x06\x07' \
+                     b'\x01\x01\x02\x03'
+        elem = DataElement(0x00660129, 'OL', bytestring)
+        encoded_elem = self.encode_element(elem)
+        # Tag pair (0066, 0129): 66 00 29 01
+        # Length (12): 0c 00 00 00
+        #             | Tag          |   Length      |    Value ->
+        ref_bytes = b'\x66\x00\x29\x01\x0c\x00\x00\x00' + bytestring
+        self.assertEqual(encoded_elem, ref_bytes)
+
+        # Empty data
+        elem.value = b''
+        encoded_elem = self.encode_element(elem)
+        ref_bytes = b'\x66\x00\x29\x01\x00\x00\x00\x00'
+        self.assertEqual(encoded_elem, ref_bytes)
+
+    def test_write_OL_explicit_little(self):
+        """Test writing elements with VR of OL works correctly.
+
+        Elements with a VR of 'OL' use the newer explicit VR
+        encoding (see PS3.5 Section 7.1.2).
+        """
+        # TrackPointIndexList
+        bytestring = b'\x00\x01\x02\x03\x04\x05\x06\x07' \
+                     b'\x01\x01\x02\x03'
+        elem = DataElement(0x00660129, 'OL', bytestring)
+        encoded_elem = self.encode_element(elem, False, True)
+        # Tag pair (0066, 0129): 66 00 29 01
+        # VR (OL): \x4f\x4c
+        # Reserved: \x00\x00
+        # Length (12): 0c 00 00 00
+        #             | Tag          | VR    | Rsrvd |   Length      |    Value ->
+        ref_bytes = b'\x66\x00\x29\x01\x4f\x4c\x00\x00\x0c\x00\x00\x00' + bytestring
+        self.assertEqual(encoded_elem, ref_bytes)
+
+        # Empty data
+        elem.value = b''
+        encoded_elem = self.encode_element(elem, False, True)
+        ref_bytes = b'\x66\x00\x29\x01\x4f\x4c\x00\x00\x00\x00\x00\x00'
+        self.assertEqual(encoded_elem, ref_bytes)
+
     def test_write_UC_implicit_little(self):
         """Test writing elements with VR of UC works correctly."""
         # VM 1, even data
