@@ -127,7 +127,7 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian,
         If None (default), then the whole file is read.
         A callable which takes tag, VR, length,
         and returns True or False. If it returns True,
-        read_data_element will raise StopIteration.
+        read_data_element will just return.
     defer_size : int, str, None, optional
         See ``read_file`` for parameter info.
     encoding :
@@ -187,7 +187,7 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian,
         # Read tag, VR, length, get ready to read value
         bytes_read = fp_read(8)
         if len(bytes_read) < 8:
-            raise StopIteration  # at end of file
+            return  # at end of file
         if debugging:
             debug_msg = "{0:08x}: {1}".format(fp.tell() - 8,
                                               bytes2hex(bytes_read))
@@ -228,7 +228,7 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian,
                 if not is_implicit_VR and VR in extra_length_VRs:
                     rewind_length += 4
                 fp.seek(value_tell - rewind_length)
-                raise StopIteration
+                return
 
         # Reading the value
         # First case (most common): reading a value with a defined length
@@ -596,8 +596,10 @@ def read_partial(fileobj, stop_when=None, defer_size=None, force=False):
     is_little_endian = True
     if preamble:
         file_meta_dataset = _read_file_meta_info(fileobj)
-        transfer_syntax = file_meta_dataset.TransferSyntaxUID
-        if transfer_syntax == pydicom.uid.ImplicitVRLittleEndian:
+        transfer_syntax = file_meta_dataset.get("TransferSyntaxUID")
+        if transfer_syntax is None:  # issue 258
+            pass
+        elif transfer_syntax == pydicom.uid.ImplicitVRLittleEndian:
             pass
         elif transfer_syntax == pydicom.uid.ExplicitVRLittleEndian:
             is_implicit_VR = False
@@ -717,7 +719,10 @@ def read_file(fp, defer_size=None, stop_before_pixels=False, force=False):
     if isinstance(fp, compat.string_types):
         # caller provided a file name; we own the file handle
         caller_owns_file = False
-        logger.debug(u"Reading file '{0}'".format(fp))
+        try:
+            logger.debug(u"Reading file '{0}'".format(fp))
+        except Exception:
+            logger.debug("Reading file '{0}'".format(fp))
         fp = open(fp, 'rb')
 
     if config.debugging:
@@ -807,7 +812,7 @@ def read_deferred_data_element(fileobj_type, filename, timestamp,
         raise IOError(u"Deferred read -- original file "
                       "{0:s} is missing".format(filename))
     if stat_available and (timestamp is not None):
-        statinfo = stat(filename)
+        statinfo = os.stat(filename)
         if statinfo.st_mtime != timestamp:
             warnings.warn("Deferred read warning -- file modification time "
                           "has changed.")

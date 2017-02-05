@@ -10,22 +10,22 @@ and a value.
 #    available at https://github.com/darcymason/pydicom
 #
 from __future__ import absolute_import
+from collections import namedtuple
 
 from pydicom import config  # don't import datetime_conversion directly
 from pydicom import compat
 from pydicom.config import logger
 from pydicom.datadict import dictionary_has_tag, dictionary_description
-from pydicom.datadict import private_dictionary_description
+from pydicom.datadict import dictionary_keyword, dictionary_is_retired
 from pydicom.tag import Tag
 from pydicom.uid import UID
 import pydicom.valuerep  # don't import DS directly as can be changed by config
 from pydicom.valuerep import conversion_VR
 from pydicom.compat import in_py2
+
 if not in_py2:
     from pydicom.valuerep import PersonName3 as PersonNameUnicode
     PersonName = PersonNameUnicode
-
-from collections import namedtuple
 
 have_numpy = True
 try:
@@ -78,10 +78,38 @@ class DataElement(object):
     descripWidth -- maximum width of description field (default 35).
     maxBytesToDisplay -- longer data will display "array of # bytes" (default 16).
     showVR -- True (default) to include the dicom VR just before the value.
+
+    Attributes
+    ----------
+    is_retired : bool
+        For officially registered DICOM Data Elements this will be True if the
+        retired status as given in PS3.6 Table 6-1 is 'RET'. For private or
+        unknown Elements this will always be False
+    keyword : str
+        For officially registered DICOM Data Elements this will be the Keyword
+        as given in PS3.6 Table 6-1. For private or unknown Elements this will
+        return an empty string.
+    name : str
+        For officially registered DICOM Data Elements this will be the Name
+        as given in PS3.6 Table 6-1. For private Elements known to pydicom this
+        will be the Name in the format '[name]'. For unknown private Elements
+        this will be 'Private Creator'. For unknown Elements this will return
+        an empty string.
+    tag : pydicom.tag.Tag
+        The DICOM Tag for the Data Element
+    value
+        The Data Element's stored value(s)
+    VM : int
+        The Value Multiplicity of the Data Element's stored value(s)
+    VR : str
+        The Data Element's Value Representation value
     """
     descripWidth = 35
     maxBytesToDisplay = 16
     showVR = 1
+
+    # Python 2: Classes which define __eq__ should flag themselves as unhashable
+    __hash__ = None
 
     def __init__(self, tag, VR, value, file_value_tell=None,
                  is_undefined_length=False, already_converted=False):
@@ -188,6 +216,33 @@ class DataElement(object):
             # print "Could not convert value '%s' to VR '%s' in tag %s" \
             # % (repr(val), self.VR, self.tag)
 
+    def __eq__(self, other):
+        """
+        Compare `self` and `other` for equality
+
+        Returns
+        -------
+        bool
+            The result if `self` and `other` are the same class
+        NotImplemented
+            If `other` is not the same class as `self` then returning
+            NotImplemented delegates the result to superclass.__eq__(subclass)
+        """
+        # Faster result if same object
+        if other is self:
+            return True
+
+        if isinstance(other, self.__class__):
+            if self.tag == other.tag and self.VR == other.VR \
+                    and self.value == other.value:
+                return True
+
+        return NotImplemented
+
+    def __ne__(self, other):
+        """ Compare `self` and `other` for inequality """
+        return not (self == other)
+
     def __str__(self):
         """Return str representation of this data_element"""
         repVal = self.repval
@@ -257,6 +312,22 @@ class DataElement(object):
         else:
             name = ""
         return name
+
+    @property
+    def is_retired(self):
+        """The data_element's retired status"""
+        if dictionary_has_tag(self.tag):
+            return dictionary_is_retired(self.tag)
+        else:
+            return False
+
+    @property
+    def keyword(self):
+        """The data_element's keyword (if known)"""
+        if dictionary_has_tag(self.tag):
+            return dictionary_keyword(self.tag)
+        else:
+            return ''
 
     def __repr__(self):
         """Handle repr(data_element)"""

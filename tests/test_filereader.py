@@ -1,15 +1,20 @@
 # test_filereader.py
+# -*- coding: utf-8 -*-
 """unittest tests for pydicom.filereader module"""
 # Copyright (c) 2010-2012 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
 #    See the file license.txt included with this distribution, also
 #    available at https://github.com/darcymason/pydicom
 
-import sys
+import gzip
+from io import BytesIO
 import os
 import os.path
+import shutil
+import sys
+import tempfile
 import unittest
-from io import BytesIO
+from warncheck import assertWarns
 
 try:
     unittest.skipUnless
@@ -19,7 +24,6 @@ except AttributeError:
     except ImportError:
         print("unittest2 is required for testing in python2.6")
 
-import shutil
 # os.stat is only available on Unix and Windows   XXX Mac?
 # Not sure if on other platforms the import fails, or the call to it??
 stat_available = True
@@ -38,6 +42,11 @@ have_gdcm = True
 try:
     import gdcm  # NOQA
 except:
+
+from pydicom.dataset import Dataset, FileDataset
+from pydicom.dataelem import DataElement
+from pydicom.filebase import DicomBytesIO
+from pydicom.filereader import read_file, data_element_generator
     have_gdcm = False
     
     
@@ -52,24 +61,32 @@ from warncheck import assertWarns
 test_dir = os.path.dirname(__file__)
 test_files = os.path.join(test_dir, 'test_files')
 
+empty_number_tags_name = os.path.join(test_files, "reportsi_with_empty_number_tags.dcm")
 rtplan_name = os.path.join(test_files, "rtplan.dcm")
 rtdose_name = os.path.join(test_files, "rtdose.dcm")
 ct_name = os.path.join(test_files, "CT_small.dcm")
 mr_name = os.path.join(test_files, "MR_small.dcm")
 jpeg2000_name = os.path.join(test_files, "JPEG2000.dcm")
+jpeg2000_lossless_name = os.path.join(test_files, "MR_small_jp2klossless.dcm")
+jpeg_ls_lossless_name = os.path.join(test_files, "MR_small_jpeg_ls_lossless.dcm")
 jpeg_lossy_name = os.path.join(test_files, "JPEG-lossy.dcm")
 jpeg_lossless_name = os.path.join(test_files, "JPEG-LL.dcm")
 deflate_name = os.path.join(test_files, "image_dfl.dcm")
 rtstruct_name = os.path.join(test_files, "rtstruct.dcm")
 priv_SQ_name = os.path.join(test_files, "priv_SQ.dcm")
 nested_priv_SQ_name = os.path.join(test_files, "nested_priv_SQ.dcm")
+meta_missing_tsyntax_name = os.path.join(test_files, "meta_missing_tsyntax.dcm")
 no_meta_group_length = os.path.join(test_files, "no_meta_group_length.dcm")
 gzip_name = os.path.join(test_files, "zipMR.gz")
 color_px_name = os.path.join(test_files, "color-px.dcm")
 color_pl_name = os.path.join(test_files, "color-pl.dcm")
 explicit_vr_le_no_meta = os.path.join(test_files, "ExplVR_LitEndNoMeta.dcm")
 explicit_vr_be_no_meta = os.path.join(test_files, "ExplVR_BigEndNoMeta.dcm")
-
+emri_name = os.path.join(test_files, "emri_small.dcm")
+emri_big_endian_name = os.path.join(test_files, "emri_small_big_endian.dcm")
+emri_jpeg_ls_lossless = os.path.join(test_files, "emri_small_jpeg_ls_lossless.dcm")
+emri_jpeg_2k_lossless = os.path.join(test_files, "emri_small_jpeg_2k_lossless.dcm")
+color_3d_jpeg_baseline = os.path.join(test_files, "color3d_jpeg_baseline.dcm")
 dir_name = os.path.dirname(sys.argv[0])
 save_dir = os.getcwd()
 
@@ -90,6 +107,24 @@ def isClose(a, b, epsilon=0.000001):
 
 
 class ReaderTests(unittest.TestCase):
+    def testEmptyNumbersTag(self):
+        """Tests that an empty tag with a number VR (FL, UL, SL, US, SS, FL, FD, OF) reads as an empty string"""
+        empty_number_tags_ds = read_file(empty_number_tags_name)
+        self.assertEqual(empty_number_tags_ds.ExaminedBodyThickness, '')
+        self.assertEqual(empty_number_tags_ds.SimpleFrameList, '')
+        self.assertEqual(empty_number_tags_ds.ReferencePixelX0, '')
+        self.assertEqual(empty_number_tags_ds.PhysicalUnitsXDirection, '')
+        self.assertEqual(empty_number_tags_ds.TagAngleSecondAxis, '')
+        self.assertEqual(empty_number_tags_ds.TagSpacingSecondDimension, '')
+        self.assertEqual(empty_number_tags_ds.VectorGridData, '')
+
+    def testUTF8FileName(self):
+        utf8_filename = os.path.join(tempfile.gettempdir(), "ДИКОМ.dcm")
+        shutil.copyfile(rtdose_name, utf8_filename)
+        ds = read_file(utf8_filename)
+        os.remove(utf8_filename)
+        self.assertTrue(ds is not None)
+
     def testRTPlan(self):
         """Returns correct values for sample data elements in test RT Plan file"""
         plan = read_file(rtplan_name)
@@ -300,6 +335,18 @@ class ReaderTests(unittest.TestCase):
         expected = "20111130"
         self.assertEqual(got, expected, "Sample data element after file meta with no group length failed, expected '%s', got '%s'" % (expected, got))
 
+    def testNoTransferSyntaxInMeta(self):
+        """Read file with file_meta, but has no TransferSyntaxUID in it............"""
+        # From issue 258: if file has file_meta but no TransferSyntaxUID in it,
+        #   should assume default transfer syntax
+        ds = read_file(meta_missing_tsyntax_name)  # is dicom default transfer syntax
+
+        # Repeat one test from nested private sequence test to maker sure
+        #    file was read correctly
+        pixel_data_tag = TupleTag((0x7fe0, 0x10))
+        self.assertTrue(pixel_data_tag in ds,
+                        "Failed to properly read a file with no Transfer Syntax in file_meta")
+
     def testExplicitVRLittleEndianNoMeta(self):
         """Read file without file meta with Little Endian Explicit VR dataset...."""
         # Example file from CMS XiO 5.0 and above
@@ -327,9 +374,135 @@ class ReaderTests(unittest.TestCase):
             pl_data = pl_data_ds.PixelData
             self.assertTrue(numpy.all(px_data == pl_data))
 
+
+class ReadDataElementTests(unittest.TestCase):
+    def setUp(self):
+        ds = Dataset()
+        #ds.DoubleFloatPixelData = FIXME # VR of OD
+        # No element in _dicom_dict.py has a VR of OL
+        ds.PotentialReasonsForProcedure = ['A', 'B', 'C'] # VR of UC, odd length
+        ds.StrainDescription = 'Test' # Even length
+        ds.URNCodeValue = 'http://test.com' # VR of UR
+        ds.RetrieveURL = 'ftp://test.com  ' # Test trailing spaces ignored
+        ds.DestinationAE = '    TEST  12    ' # 16 characters max for AE
+
+        self.fp = BytesIO() # Implicit little
+        file_ds = FileDataset(self.fp, ds)
+        file_ds.is_implicit_VR = True
+        file_ds.is_little_endian = True
+        file_ds.save_as(self.fp)
+
+        self.fp_ex = BytesIO() # Explicit little
+        file_ds = FileDataset(self.fp_ex, ds)
+        file_ds.is_implicit_VR = False
+        file_ds.is_little_endian = True
+        file_ds.save_as(self.fp_ex)
+
+    def test_read_UC_implicit_little(self):
+        """Check creation of DataElement from byte data works correctly."""
+        ds = read_file(self.fp, force=True)
+        ref_elem = ds.get(0x00189908)
+        elem = DataElement(0x00189908, 'UC', ['A', 'B', 'C'])
+        self.assertEqual(ref_elem, elem)
+
+        ds = read_file(self.fp, force=True)
+        ref_elem = ds.get(0x00100212)
+        elem = DataElement(0x00100212, 'UC', 'Test')
+        self.assertEqual(ref_elem, elem)
+
+    def test_read_UC_explicit_little(self):
+        """Check creation of DataElement from byte data works correctly."""
+        ds = read_file(self.fp_ex, force=True)
+        ref_elem = ds.get(0x00189908)
+        elem = DataElement(0x00189908, 'UC', ['A', 'B', 'C'])
+        self.assertEqual(ref_elem, elem)
+
+        ds = read_file(self.fp_ex, force=True)
+        ref_elem = ds.get(0x00100212)
+        elem = DataElement(0x00100212, 'UC', 'Test')
+        self.assertEqual(ref_elem, elem)
+
+    def test_read_UR_implicit_little(self):
+        """Check creation of DataElement from byte data works correctly."""
+        ds = read_file(self.fp, force=True)
+        ref_elem = ds.get(0x00080120) # URNCodeValue
+        elem = DataElement(0x00080120, 'UR', 'http://test.com')
+        self.assertEqual(ref_elem, elem)
+
+        # Test trailing spaces ignored
+        ref_elem = ds.get(0x00081190) # RetrieveURL
+        elem = DataElement(0x00081190, 'UR', 'ftp://test.com')
+        self.assertEqual(ref_elem, elem)
+
+    def test_read_UR_explicit_little(self):
+        """Check creation of DataElement from byte data works correctly."""
+        ds = read_file(self.fp_ex, force=True)
+        ref_elem = ds.get(0x00080120) # URNCodeValue
+        elem = DataElement(0x00080120, 'UR', 'http://test.com')
+        self.assertEqual(ref_elem, elem)
+
+        # Test trailing spaces ignored
+        ref_elem = ds.get(0x00081190) # RetrieveURL
+        elem = DataElement(0x00081190, 'UR', 'ftp://test.com')
+        self.assertEqual(ref_elem, elem)
+
+    def test_read_AE(self):
+        """Check creation of AE DataElement from byte data works correctly."""
+        ds = read_file(self.fp, force=True)
+        self.assertEqual(ds.DestinationAE, 'TEST  12')
+
+
+class JPEG_LS_Tests(unittest.TestCase):
+    def setUp(self):
+        self.jpeg_ls_lossless = read_file(jpeg_ls_lossless_name)
+        self.mr_small = read_file(mr_name)
+        self.emri_jpeg_ls_lossless = read_file(emri_jpeg_ls_lossless)
+        self.emri_small = read_file(emri_name)
+
+    def testJPEG_LS_PixelArray(self):
+        """JPEG LS Lossless: Now works"""
+        if have_numpy and have_jpeg_ls:
+            a = self.jpeg_ls_lossless.pixel_array
+            b = self.mr_small.pixel_array
+            self.assertEqual(a.mean(), b.mean(),
+                             "Decoded pixel data is not all {0} (mean == {1})".format(b.mean(), a.mean()))
+        else:
+            self.assertRaises(ImportError, self.jpeg_ls_lossless._get_pixel_array)
+
+    def test_emri_JPEG_LS_PixelArray(self):
+        """JPEG LS Lossless: Now works"""
+        if have_numpy and have_jpeg_ls:
+            a = self.emri_jpeg_ls_lossless.pixel_array
+            b = self.emri_small.pixel_array
+            self.assertEqual(a.mean(), b.mean(),
+                             "Decoded pixel data is not all {0} (mean == {1})".format(b.mean(), a.mean()))
+        else:
+            self.assertRaises(ImportError, self.emri_jpeg_ls_lossless._get_pixel_array)
+
+
+class BigEndian_Tests(unittest.TestCase):
+    def setUp(self):
+        self.emri_big_endian = read_file(emri_big_endian_name)
+        self.emri_small = read_file(emri_name)
+
+    def test_big_endian_PixelArray(self):
+        """Test big endian pixel data vs little endian"""
+        if have_numpy:
+            a = self.emri_big_endian.pixel_array
+            b = self.emri_small.pixel_array
+            self.assertEqual(a.mean(), b.mean(),
+                             "Decoded big endian pixel data is not all {0} (mean == {1})".format(b.mean(), a.mean()))
+        else:
+            self.assertRaises(ImportError, self.emri_big_endian._get_pixel_array)
+
+
 class JPEG2000Tests(unittest.TestCase):
     def setUp(self):
         self.jpeg = read_file(jpeg2000_name)
+        self.jpegls = read_file(jpeg2000_lossless_name)
+        self.mr_small = read_file(mr_name)
+        self.emri_jpeg_2k_lossless = read_file(emri_jpeg_2k_lossless)
+        self.emri_small = read_file(emri_name)
 
     def testJPEG2000(self):
         """JPEG2000: Returns correct values for sample data elements............"""
@@ -343,14 +516,31 @@ class JPEG2000Tests(unittest.TestCase):
 
     @unittest.skipUnless(not have_gdcm, "GDCM not installed")
     def testJPEG2000PixelArray(self):
-        """JPEG2000: Fails gracefully when uncompressed data is asked for......."""
-        self.assertRaises(NotImplementedError, self.jpeg._get_pixel_array)
+        """JPEG2000: Now works"""
+        if have_numpy and have_pillow:
+            a = self.jpegls.pixel_array
+            b = self.mr_small.pixel_array
+            self.assertEqual(a.mean(), b.mean(),
+                             "Decoded pixel data is not all {0} (mean == {1})".format(b.mean(), a.mean()))
+        else:
+            self.assertRaises(ImportError, self.jpegls._get_pixel_array)
+
+    def test_emri_JPEG2000PixelArray(self):
+        """JPEG2000: Now works"""
+        if have_numpy and have_pillow:
+            a = self.emri_jpeg_2k_lossless.pixel_array
+            b = self.emri_small.pixel_array
+            self.assertEqual(a.mean(), b.mean(),
+                             "Decoded pixel data is not all {0} (mean == {1})".format(b.mean(), a.mean()))
+        else:
+            self.assertRaises(ImportError, self.emri_jpeg_2k_lossless._get_pixel_array)
 
 
 class JPEGlossyTests(unittest.TestCase):
 
     def setUp(self):
         self.jpeg = read_file(jpeg_lossy_name)
+        self.color_3d_jpeg = read_file(color_3d_jpeg_baseline)
 
     def testJPEGlossy(self):
         """JPEG-lossy: Returns correct values for sample data elements.........."""
@@ -361,7 +551,20 @@ class JPEGlossyTests(unittest.TestCase):
     @unittest.skipUnless(not have_gdcm, "GDCM not installed")
     def testJPEGlossyPixelArray(self):
         """JPEG-lossy: Fails gracefully when uncompressed data is asked for....."""
-        self.assertRaises(NotImplementedError, self.jpeg._get_pixel_array)
+        if have_pillow and have_numpy:
+            self.assertRaises(NotImplementedError, self.jpeg._get_pixel_array)
+        else:
+            self.assertRaises(ImportError, self.jpeg._get_pixel_array)
+
+    def testJPEGBaselineColor3DPixelArray(self):
+        if have_pillow and have_numpy:
+            a = self.color_3d_jpeg.pixel_array
+            self.assertEqual(a.shape, (120, 480, 640, 3))
+            # this test points were manually identified in Osirix viewer
+            self.assertEqual(tuple(a[3, 159, 290, :]), (41, 41, 41))
+            self.assertEqual(tuple(a[3, 169, 290, :]), (57, 57, 57))
+        else:
+            self.assertRaises(ImportError, self.color_3d_jpeg._get_pixel_array)
 
 
 class JPEGlosslessTests(unittest.TestCase):
@@ -378,9 +581,21 @@ class JPEGlosslessTests(unittest.TestCase):
     @unittest.skipUnless(not have_gdcm, "GDCM not installed")
     def testJPEGlosslessPixelArray(self):
         """JPEGlossless: Fails gracefully when uncompressed data is asked for..."""
-        self.assertRaises(NotImplementedError, self.jpeg._get_pixel_array)
-
-        # create an in-memory fragment
+        # This test passes if the call raises either an
+        # ImportError when there is no Pillow module
+        # Or
+        # NotImplementedError when there is a Pillow module
+        #    but it lacks JPEG Lossless Dll's
+        # Or
+        # the call does not raise any Exceptions
+        # This test fails if any other exception is raised
+        with self.assertRaises((ImportError, NotImplementedError)):
+            try:
+                _x = self.jpeg._get_pixel_array()
+            except Exception:
+                raise
+            else:
+                raise ImportError()
 
 
 class DeferredReadTests(unittest.TestCase):

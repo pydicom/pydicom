@@ -1,0 +1,96 @@
+Below is an example interactive session using pydicom to downsize an MR image
+from 512x512 to 64x64 (taking central section, not averaging pixels),
+and write it back to a file for pydicom unit tests
+NOTE: This example requires that the Numpy library be installed
+for manipulation of pixel data
+Note: "<BLANKLINE>" is inserted here to match doctest testing of this code.
+If used in interactive session, you will simply see a blank line at those places.
+Test in python: Anaconda 2.0.1 (64-bit)
+>>> import pydicom
+>>> ds = pydicom.read_file("MR1_UNC")
+>>> data = ds.pixel_array
+>>> data.shape
+(512L, 512L)
+>>> data2 = data[256-32:256+32, 128-32:128+32]
+>>> data2.shape
+(64L, 64L)
+>>> ds.PixelData = data2.tostring()
+>>> ds.Rows = 64
+>>> ds.Columns = 64
+>>> ds
+(0008, 0008) Image Type                          CS: ['DERIVED', 'SECONDARY', 'OTHER']
+(0008, 0012) Instance Creation Date              DA: '20040826'
+(0008, 0013) Instance Creation Time              TM: '185434'
+(0008, 0014) Instance Creator UID                UI: 1.3.6.1.4.1.5962.3
+(0008, 0016) SOP Class UID                       UI: MR Image Storage
+(0008, 0018) SOP Instance UID                    UI: 1.3.6.1.4.1.5962.1.1.4.1.1.20040826185059.5457
+(0008, 0020) Study Date                          DA: '20040826'
+(0008, 0021) Series Date                         DA: ''
+(0008, 0022) Acquisition Date                    DA: ''
+(0008, 0030) Study Time                          TM: '185059'
+(0008, 0031) Series Time                         TM: ''
+(0008, 0032) Acquisition Time                    TM: ''
+(0008, 0050) Accession Number                    SH: ''
+(0008, 0060) Modality                            CS: 'MR'
+(0008, 0070) Manufacturer                        LO: 'TOSHIBA_MEC'
+(0008, 0080) Institution Name                    LO: 'TOSHIBA'
+(0008, 0090) Referring Physician's Name          PN: ''
+(0008, 0201) Timezone Offset From UTC            SH: '-0400'
+(0008, 1010) Station Name                        SH: '000000000'
+(0008, 1060) Name of Physician(s) Reading Study  PN: '----'
+(0008, 1070) Operators' Name                     PN: '----'
+(0008, 1090) Manufacturer's Model Name           LO: 'MRT50H1'
+(0010, 0010) Patient's Name                      PN: 'CompressedSamples^MR1'
+(0010, 0020) Patient ID                          LO: '4MR1'
+(0010, 0030) Patient's Birth Date                DA: ''
+(0010, 0040) Patient's Sex                       CS: 'F'
+(0010, 1020) Patient's Size                      DS: ''
+(0010, 1030) Patient's Weight                    DS: "80.0000"
+(0018, 0010) Contrast/Bolus Agent                LO: ''
+(0018, 0020) Scanning Sequence                   CS: 'SE'
+(0018, 0021) Sequence Variant                    CS: 'NONE'
+(0018, 0022) Scan Options                        CS: ''
+(0018, 0023) MR Acquisition Type                 CS: '3D'
+(0018, 0050) Slice Thickness                     DS: "0.8000"
+(0018, 0080) Repetition Time                     DS: "4000.0000"
+(0018, 0081) Echo Time                           DS: "240.0000"
+(0018, 0083) Number of Averages                  DS: "1.0000"
+(0018, 0084) Imaging Frequency                   DS: "63.92433900"
+(0018, 0085) Imaged Nucleus                      SH: 'H'
+(0018, 0086) Echo Number(s)                      IS: '1'
+(0018, 0091) Echo Train Length                   IS: ''
+(0018, 1000) Device Serial Number                LO: '-0000200'
+(0018, 1020) Software Version(s)                 LO: 'V3.51*P25'
+(0018, 1314) Flip Angle                          DS: "90"
+(0018, 5100) Patient Position                    CS: 'HFS'
+(0020, 000d) Study Instance UID                  UI: 1.3.6.1.4.1.5962.1.2.4.20040826185059.5457
+(0020, 000e) Series Instance UID                 UI: 1.3.6.1.4.1.5962.1.3.4.1.20040826185059.5457
+(0020, 0010) Study ID                            SH: '4MR1'
+(0020, 0011) Series Number                       IS: '1'
+(0020, 0012) Acquisition Number                  IS: '0'
+(0020, 0013) Instance Number                     IS: '1'
+(0020, 0032) Image Position (Patient)            DS: ['-83.9063', '-91.2000', '6.6406']
+(0020, 0037) Image Orientation (Patient)         DS: ['1.0000', '0.0000', '0.0000', '0.0000', '1.0000', '0.0000']
+(0020, 0052) Frame of Reference UID              UI: 1.3.6.1.4.1.5962.1.4.4.1.20040826185059.5457
+(0020, 0060) Laterality                          CS: ''
+(0020, 1040) Position Reference Indicator        LO: ''
+(0020, 1041) Slice Location                      DS: "0.0000"
+(0020, 4000) Image Comments                      LT: 'Uncompressed'
+(0028, 0002) Samples per Pixel                   US: 1
+(0028, 0004) Photometric Interpretation          CS: 'MONOCHROME2'
+(0028, 0010) Rows                                US: 64
+(0028, 0011) Columns                             US: 64
+(0028, 0030) Pixel Spacing                       DS: ['0.3125', '0.3125']
+(0028, 0100) Bits Allocated                      US: 16
+(0028, 0101) Bits Stored                         US: 16
+(0028, 0102) High Bit                            US: 15
+(0028, 0103) Pixel Representation                US: 1
+(0028, 0106) Smallest Image Pixel Value          SS: 0
+(0028, 0107) Largest Image Pixel Value           SS: 4000
+(0028, 1050) Window Center                       DS: "600"
+(0028, 1051) Window Width                        DS: "1600"
+(7fe0, 0010) Pixel Data                          OW: Array of 8192 bytes
+(fffc, fffc) Data Set Trailing Padding           OB: Array of 126 bytes
+>>> ds.save_as("MR_small_test.dcm")
+>>> ds2 = pydicom.read_file("MR_small_test.dcm") # read back to make sure is ok
+>>>

@@ -9,9 +9,11 @@ from __future__ import print_function
 #
 
 import sys
-import pydicom
 import os.path
 from pprint import pprint
+
+import pydicom
+from pydicom.filereader import read_dicomdir
 # pydicom.debug()
 
 
@@ -25,15 +27,16 @@ if __name__ == "__main__":
         filepath = sys.argv[1]
         if os.path.isdir(filepath):  # only gave directory, add standard name
             filepath = os.path.join(filepath, "DICOMDIR")
-        dcmdir = pydicom.read_dicomdir(filepath)
+        dcmdir = read_dicomdir(filepath)
         base_dir = os.path.dirname(filepath)
     else:
         # Read standard "DICOMDIR" filename from current directory
-        dcmdir = pydicom.read_dicomdir()
+        dcmdir = read_dicomdir()
         base_dir = "."
 
     for patrec in dcmdir.patient_records:
-        print("Patient: {0.PatientID}: {0.PatientsName}".format(patrec))
+        if hasattr(patrec, 'PatientID') and hasattr(patrec, 'PatientsName'):
+            print("Patient: {0.PatientID}: {0.PatientsName}".format(patrec))
         studies = patrec.children
         for study in studies:
             print("    Study {0.StudyID}: {0.StudyDate}:"

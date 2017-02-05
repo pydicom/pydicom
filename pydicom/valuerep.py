@@ -11,23 +11,28 @@ from pydicom import config  # don't import datetime_conversion directly
 from pydicom import compat
 from pydicom.datadict import dictionary_VR
 from pydicom.multival import MultiValue
-from pydicom.config import logger
 from pydicom.tag import Tag
 
 from datetime import date, datetime, time
-from dateutil.tz import tzoffset
-import re
 
-from pydicom.config import logger
+have_dateutil = True
+try:
+    from dateutil.tz import tzoffset
+except ImportError:
+    have_dateutil = False
+
+import re
 
 default_encoding = "iso8859"  # can't import from charset or get circular import
 
 # For reading/writing data elements, these ones have longer explicit VR format
-extra_length_VRs = ('OB', 'OW', 'OF', 'SQ', 'UN', 'UT')
+# Taken from PS3.5 Section 7.1.2
+extra_length_VRs = ('OB', 'OD', 'OF', 'OL', 'OW', 'SQ', 'UC', 'UN',
+                    'UR', 'UT')
 
 # VRs that can be affected by character repertoire in (0008,0005) Specific Character Set
 # See PS-3.5 (2011), section 6.1.2 Graphic Characters
-text_VRs = ('SH', 'LO', 'ST', 'LT', 'UT')  # and PN, but it is handled separately.
+text_VRs = ('SH', 'LO', 'ST', 'LT',  'UC', 'UR', 'UT')  # and PN, but it is handled separately.
 
 match_string = b''.join([
     b'(?P<single_byte>',
@@ -84,7 +89,21 @@ class DA(date):
     Note that the datetime.date base class is immutable.
 
     """
-    __slots__ = 'original_string'
+    __slots__ = ['original_string']
+
+    def __getstate__(self):
+        return dict(
+            (slot, getattr(self, slot))
+            for slot in self.__slots__
+            if hasattr(self, slot)
+        )
+
+    def __setstate__(self, state):
+        for slot, value in state.items():
+            setattr(self, slot, value)
+
+    def __reduce__(self):
+        return super(DA, self).__reduce__() + (self.__getstate__(),)
 
     def __new__(cls, val):
         """Create an instance of DA object.
@@ -111,7 +130,10 @@ class DA(date):
             elif val == '':
                 val = None  # empty date
             else:
-                raise ValueError("Cannot convert to date: '" + val + "'")
+                try:
+                    val = super(DA, cls).__new__(cls, val)
+                except TypeError:
+                    raise ValueError("Cannot convert to datetime: '" + val + "'")
         elif isinstance(val, date):
             val = super(DA, cls).__new__(cls, val.year, val.month, val.day)
         else:
@@ -137,8 +159,22 @@ class DT(datetime):
     Note that the datetime.datetime base class is immutable.
 
     """
-    __slots__ = 'original_string'
+    __slots__ = ['original_string']
     _regex_dt = re.compile(r"((\d{4,14})(\.(\d{1,6}))?)([+-]\d{4})?")
+
+    def __getstate__(self):
+        return dict(
+            (slot, getattr(self, slot))
+            for slot in self.__slots__
+            if hasattr(self, slot)
+        )
+
+    def __setstate__(self, state):
+        for slot, value in state.items():
+            setattr(self, slot, value)
+
+    def __reduce__(self):
+        return super(DT, self).__reduce__() + (self.__getstate__(),)
 
     def __new__(cls, val):
         """Create an instance of DT object.
@@ -185,6 +221,10 @@ class DT(datetime):
                     offset = (int(tz_match[1:3]) * 60 + int(tz_match[3:5])) * 60
                     if tz_match[0] == '-':
                         offset = -offset
+                    if not have_dateutil:
+                        msg = "The python-dateutil package is required to convert dates/times to datetime objects"
+                        msg += "\nPlease install python-dateutil or set pydicom.config.datetime_conversion = False"
+                        raise ImportError(msg)
                     tzinfo = tzoffset(tz_match, offset)
                 else:
                     tzinfo = None
@@ -192,7 +232,10 @@ class DT(datetime):
                                              hour, minute, second,
                                              microsecond, tzinfo)
             else:
-                raise ValueError("Cannot convert to datetime: '" + val + "'")
+                try:
+                    val = super(DT, cls).__new__(cls, val)
+                except TypeError:
+                    raise ValueError("Cannot convert to datetime: '" + val + "'")
         elif isinstance(val, datetime):
             val = super(DT, cls).__new__(cls, val.year, val.month, val.day,
                                          val.hour, val.minute, val.second,
@@ -220,8 +263,22 @@ class TM(time):
     Note that the datetime.time base class is immutable.
 
     """
-    __slots__ = 'original_string'
+    __slots__ = ['original_string']
     _regex_tm = re.compile(r"(\d{2,6})(\.(\d{1,6}))?")
+
+    def __getstate__(self):
+        return dict(
+            (slot, getattr(self, slot))
+            for slot in self.__slots__
+            if hasattr(self, slot)
+        )
+
+    def __setstate__(self, state):
+        for slot, value in state.items():
+            setattr(self, slot, value)
+
+    def __reduce__(self):
+        return super(TM, self).__reduce__() + (self.__getstate__(),)
 
     def __new__(cls, val):
         """Create an instance of TM object from a string.
@@ -256,7 +313,10 @@ class TM(time):
             elif val == '':
                 val = None  # empty time
             else:
-                raise ValueError("Cannot convert to time: '" + val + "'")
+                try:
+                    val = super(TM, cls).__new__(cls, val)
+                except TypeError:
+                    raise ValueError("Cannot convert to datetime: '" + val + "'")
         elif isinstance(val, time):
             val = super(TM, cls).__new__(cls, val.hour, val.minute, val.second,
                                          val.microsecond)
@@ -284,7 +344,18 @@ class DSfloat(float):
     not an instance of this class.
 
     """
-    __slots__ = 'original_string'
+    __slots__ = ['original_string']
+
+    def __getstate__(self):
+        return dict(
+            (slot, getattr(self, slot))
+            for slot in self.__slots__
+            if hasattr(self, slot)
+        )
+
+    def __setstate__(self, state):
+        for slot, value in state.items():
+            setattr(self, slot, value)
 
     def __init__(self, val):
         """Store the original string if one given, for exact write-out of same
@@ -313,7 +384,18 @@ class DSdecimal(Decimal):
     Note: if constructed by an empty string, returns the empty string,
     not an instance of this class.
     """
-    __slots__ = 'original_string'
+    __slots__ = ['original_string']
+
+    def __getstate__(self):
+        return dict(
+            (slot, getattr(self, slot))
+            for slot in self.__slots__
+            if hasattr(self, slot)
+        )
+
+    def __setstate__(self, state):
+        for slot, value in state.items():
+            setattr(self, slot, value)
 
     def __new__(cls, val):
         """Create an instance of DS object, or return a blank string if one is
@@ -389,8 +471,8 @@ def DS(val):
     """
     if isinstance(val, (str, compat.text_type)):
         val = val.strip()
-    if val == '':
-        return val
+    if val == '' or val is None:
+        return ''
     return DSclass(val)
 
 
@@ -399,12 +481,25 @@ class IS(int):
     of the string originally read or stored.
     """
     if compat.in_py2:
-        __slots__ = 'original_string'
-    # Unlikely that str(int) will not be the same as the original, but could happen
-    # with leading zeros.
+        __slots__ = ['original_string']
+        # Unlikely that str(int) will not be the same as the original, but could happen
+        # with leading zeros.
+
+        def __getstate__(self):
+            return dict(
+                (slot, getattr(self, slot))
+                for slot in self.__slots__
+                if hasattr(self, slot)
+            )
+
+        def __setstate__(self, state):
+            for slot, value in state.items():
+                setattr(self, slot, value)
 
     def __new__(cls, val):
         """Create instance if new integer string"""
+        if val is None:
+            return ''
         if isinstance(val, (str, compat.text_type)) and val.strip() == '':
             return ''
         newval = super(IS, cls).__new__(cls, val)

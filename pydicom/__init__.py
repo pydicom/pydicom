@@ -39,20 +39,12 @@ if sys.version_info < (2, 6, 0):
 def read_file(*args, **kwargs):
     global read_file
     from pydicom.dicomio import read_file
-    import warnings
-    msg = ("The read_file function has moved to pydicom.dicomio. "
-           "Please use 'from pydicom import dicomio; dicomio.read_file(...)'")
-    warnings.warn(msg, DeprecationWarning)
     return read_file(*args, **kwargs)
 
 def write_file(*args, **kwargs):
     global write_file
     from pydicom.dicomio import write_file
-    import warnings
-    msg = ("The write_file function has moved to pydicom.dicomio. "
-           "Please use 'from pydicom import dicomio; dicomio.write_file(...)'")
-    warnings.warn(msg, DeprecationWarning)
     return write_file(*args, **kwargs)
 
-__version__ = "1.0.0"
-__version_info__ = (1, 0, 0)
+__version__ = "1.0.0a1"
+__version_info__ = (1, 0, 0, 'alpha', 0)

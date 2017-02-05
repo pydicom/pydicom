@@ -3,7 +3,7 @@
 
 import sys
 import unittest
-import pydicom
+from pydicom import dicomio
 
 
 class UnicodeFilenames(unittest.TestCase):
@@ -19,7 +19,7 @@ class UnicodeFilenames(unittest.TestCase):
             return
 
         try:
-            pydicom.read_file(uni_name)
+            dicomio.read_file(uni_name)
         except UnicodeEncodeError:
             self.fail("UnicodeEncodeError generated for unicode name")
         # ignore file doesn't exist error

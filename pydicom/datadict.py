@@ -140,6 +140,13 @@ def get_entry(tag):
             raise KeyError("Tag {0} not found in DICOM dictionary".format(tag))
 
 
+def dictionary_is_retired(tag):
+    """Return True if the dicom retired status is 'Retired' for the given tag"""
+    if 'retired' in get_entry(tag)[3].lower():
+        return True
+    return False
+    
+    
 def dictionary_VR(tag):
     """Return the dicom value representation for the given dicom tag."""
     return get_entry(tag)[0]

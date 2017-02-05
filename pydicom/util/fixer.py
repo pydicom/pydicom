@@ -64,7 +64,7 @@ def fix_separator(invalid_separator, for_VRs=["DS", "IS"],
     config.data_element_callback_kwargs = {
         'invalid_separator': invalid_separator,
         'for_VRs': for_VRs
-        }
+    }
 
 
 def fix_mismatch_callback(raw_elem, **kwargs):
@@ -100,4 +100,4 @@ def fix_mismatch(with_VRs=['PN', 'DS', 'IS']):
     config.data_element_callback = fix_mismatch_callback
     config.data_element_callback_kwargs = {
         'with_VRs': with_VRs,
-        }
+    }

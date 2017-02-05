@@ -13,6 +13,7 @@ elements
 from __future__ import print_function
 
 import sys
+import datetime
 import os.path
 import pydicom
 from pydicom.dataset import Dataset, FileDataset
@@ -55,6 +56,12 @@ if __name__ == "__main__":
     # Set the transfer syntax
     ds.is_little_endian = True
     ds.is_implicit_VR = True
+
+    # Set creation date/time
+    dt = datetime.datetime.now()
+    ds.ContentDate = dt.strftime('%Y%m%d')
+    timeStr = dt.strftime('%H%M%S.%f')  # long format with micro seconds
+    ds.ContentTime = timeStr
 
     print("Writing test file", filename)
     ds.save_as(filename)

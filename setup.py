@@ -14,8 +14,8 @@ setup(
               'pydicom.examples',
               'pydicom.util'],
     include_package_data=True,
-    version="1.0.0",
-    install_requires=['python-dateutil'],
+    version="1.0.0a1",
+    install_requires=[],
     zip_safe=False,  # want users to be able to see included examples,tests
     description="Pure python package for DICOM medical file reading and writing",
     author="Darcy Mason and contributors",
@@ -36,6 +36,7 @@ setup(
         "Programming Language :: Python :: 3.2",
         "Programming Language :: Python :: 3.3",
         "Programming Language :: Python :: 3.4",
+        "Programming Language :: Python :: 3.5",
         "Operating System :: OS Independent",
         "Topic :: Scientific/Engineering :: Medical Science Apps.",
         "Topic :: Scientific/Engineering :: Physics",

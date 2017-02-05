@@ -147,7 +147,31 @@ ExplicitVRLittleEndian = UID('1.2.840.10008.1.2.1')
 ImplicitVRLittleEndian = UID('1.2.840.10008.1.2')
 DeflatedExplicitVRLittleEndian = UID('1.2.840.10008.1.2.1.99')
 ExplicitVRBigEndian = UID('1.2.840.10008.1.2.2')
+JPEGBaseLineLossy8bit = UID('1.2.840.10008.1.2.4.50')
+JPEGBaseLineLossy12bit = UID('1.2.840.10008.1.2.4.51')
+JPEGLossless = UID('1.2.840.10008.1.2.4.70')
+JPEGLSLossless = UID('1.2.840.10008.1.2.4.80')
+JPEGLSLossy = UID('1.2.840.10008.1.2.4.81')
+JPEG2000Lossless = UID('1.2.840.10008.1.2.4.90')
+JPEG2000Lossy = UID('1.2.840.10008.1.2.4.91')
 
+UncompressedPixelTransferSyntaxes = [ExplicitVRLittleEndian,
+                                     ImplicitVRLittleEndian,
+                                     DeflatedExplicitVRLittleEndian,
+                                     ExplicitVRBigEndian, ]
+
+JPEGLSSupportedCompressedPixelTransferSyntaxes = [JPEGLSLossless,
+                                                  JPEGLSLossy, ]
+
+PILSupportedCompressedPixelTransferSyntaxes = [JPEGBaseLineLossy8bit,
+                                               JPEGLossless,
+                                               JPEGBaseLineLossy12bit,
+                                               JPEG2000Lossless,
+                                               JPEG2000Lossy, ]
+JPEG2000CompressedPixelTransferSyntaxes = [JPEG2000Lossless,
+                                           JPEG2000Lossy, ]
+JPEGLossyCompressedPixelTransferSyntaxes = [JPEGBaseLineLossy8bit,
+                                            JPEGBaseLineLossy12bit, ]
 NotCompressedPixelTransferSyntaxes = [ExplicitVRLittleEndian,
                                       ImplicitVRLittleEndian,
                                       DeflatedExplicitVRLittleEndian,
@@ -205,7 +229,7 @@ def generate_uid(prefix=pydicom_root_UID, entropy_srcs=None):
         entropy_srcs = [str(uuid.uuid1()),  # 128-bit from MAC/time/randomness
                         str(os.getpid()),  # Current process ID
                         hex(random.getrandbits(64))  # 64 bits randomness
-                       ]
+                        ]
     hash_val = hashlib.sha512(''.join(entropy_srcs).encode('utf-8'))
 
     # Convert this to an int with the maximum available digits

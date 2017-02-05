@@ -46,7 +46,7 @@ class MultiValue(list):
 
     def __deepcopy__(self, memo):
         return MultiValue(self.type_constructor, self)
-        
+
     def extend(self, list_of_vals):
         super(MultiValue, self).extend([self.type_constructor(x) for x in list_of_vals])
 

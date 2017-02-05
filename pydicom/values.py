@@ -35,6 +35,18 @@ def convert_tag(byte_string, is_little_endian, offset=0):
     return TupleTag(unpack(struct_format, byte_string[offset:offset + 4]))
 
 
+def convert_AE_string(byte_string, is_little_endian, struct_format=None,
+                      encoding=default_encoding):
+    """Read a byte string for a VR of 'AE'.
+
+    Elements with VR of 'AE' have non-significant leading and trailing spaces.
+    """
+    if not in_py2:
+        byte_string = byte_string.decode(encoding)
+    byte_string = byte_string.strip()
+    return byte_string
+
+
 def convert_ATvalue(byte_string, is_little_endian, struct_format=None):
     """Read and return AT (tag) data_element value(s)"""
     length = len(byte_string)
@@ -117,7 +129,9 @@ def convert_numbers(byte_string, is_little_endian, struct_format):
         logger.warn("Expected length to be even multiple of number size")
     format_string = "%c%u%c" % (endianChar, length // bytes_per_value, struct_format)
     value = unpack(format_string, byte_string)
-    if len(value) == 1:
+    if len(value) == 0:  # if the number is empty, then return the empty string rather than empty list
+        return ''
+    elif len(value) == 1:
         return value[0]
     else:
         return list(value)  # convert from tuple to a list so can modify if need to
@@ -227,6 +241,19 @@ def convert_UN(byte_string, is_little_endian, struct_format=None):
     return byte_string
 
 
+def convert_UR_string(byte_string, is_little_endian, struct_format=None,
+                      encoding=default_encoding):
+    """Read a byte string for a VR of 'UR'
+
+    Elements with VR of 'UR' shall not be multi-valued and trailing spaces shall
+    be ignored.
+    """
+    if not in_py2:
+        byte_string = byte_string.decode(encoding)
+    byte_string = byte_string.rstrip()
+    return byte_string
+
+
 def convert_value(VR, raw_data_element, encoding=default_encoding):
     """Return the converted value (from raw bytes) for the given VR"""
     if VR not in converters:
@@ -250,18 +277,40 @@ def convert_value(VR, raw_data_element, encoding=default_encoding):
 
     # Not only two cases. Also need extra info if is a raw sequence
     # Pass the encoding to the converter if it is a specific VR
-    if VR == 'PN':
-        value = converter(byte_string, is_little_endian, encoding=encoding)
-    elif VR in text_VRs:
-        # Text VRs use the 2nd specified encoding
-        value = converter(byte_string, is_little_endian, encoding=encoding[1])
-    elif VR != "SQ":
-        value = converter(byte_string, is_little_endian, num_format)
-    else:
-        value = convert_SQ(byte_string, is_implicit_VR, is_little_endian,
-                           encoding, raw_data_element.value_tell)
+    try:
+        if VR == 'PN':
+            value = converter(byte_string, is_little_endian, encoding=encoding)
+        elif VR in text_VRs:
+            # Text VRs use the 2nd specified encoding
+            value = converter(byte_string, is_little_endian, encoding=encoding[1])
+        elif VR != "SQ":
+            value = converter(byte_string, is_little_endian, num_format)
+        else:
+            value = convert_SQ(byte_string, is_implicit_VR, is_little_endian,
+                               encoding, raw_data_element.value_tell)
+    except ValueError:
+        if config.enforce_valid_values:
+            # The user really wants an exception here
+            raise
+        logger.debug('unable to translate tag %s with VR %s' % (raw_data_element.tag, VR))
+        for convert_vr in convert_retry_VR_order:
+            vr = convert_vr
+            converter = converters[vr]
+            if vr == VR:
+                continue
+            try:
+                value = convert_value(vr, raw_data_element, encoding)
+                break
+            except Exception:
+                pass
+            else:
+                logger.debug('converted tag %s with VR %s' % (raw_data_element.tag, vr))
+                value = raw_data_element.value
     return value
 
+convert_retry_VR_order = [
+    'SH', 'UL', 'SL', 'US', 'SS', 'FL', 'FD', 'OF', 'OB', 'UI', 'DA', 'TM',
+    'PN', 'IS', 'DS', 'LT', 'SQ', 'UN', 'AT', 'OW', 'DT', 'UT', ]
 # converters map a VR to the function to read the value(s).
 # for convert_numbers, the converter maps to a tuple (function, struct_format)
 #                        (struct_format in python struct module style)
@@ -283,11 +332,13 @@ converters = {
     'LO': convert_string,
     'IS': convert_IS_string,
     'DS': convert_DS_string,
-    'AE': convert_string,
+    'AE': convert_AE_string,
     'AS': convert_string,
     'LT': convert_single_string,
     'SQ': convert_SQ,
+    'UC': convert_string,
     'UN': convert_UN,
+    'UR': convert_UR_string,
     'AT': convert_ATvalue,
     'ST': convert_string,
     'OW': convert_OWvalue,

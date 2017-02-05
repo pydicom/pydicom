@@ -1,0 +1,26 @@
+>>> from pydicom.sequence import Sequence
+>>> from pydicom.dataset import Dataset
+
+>>> block_ds1 = Dataset()
+>>> block_ds1.BlockType = "APERTURE"
+>>> block_ds1.BlockName = "Block1"
+
+>>> block_ds2 = Dataset()
+>>> block_ds2.BlockType = "APERTURE"
+>>> block_ds2.BlockName = "Block2"
+
+>>> beam = Dataset()
+>>> # ... add beam data elements like BeamName, etc; these are skipped in this example
+>>> plan_ds = Dataset()  # or read one in from a file, etc
+>>> plan_ds.BeamSequence = Sequence([beam])  # starting from scratch here; will already exist if read from file
+>>> plan_ds.BeamSequence[0].Blocks = Sequence([block_ds1, block_ds2])
+>>> plan_ds.BeamSequence[0].NumberOfBlocks = 2
+
+>>> beam0 = plan_ds.BeamSequence[0]  # just for less typing
+>>> print len(beam0.BlockSequence)
+2
+>>> block_ds3 = Dataset()  # new Dataset
+>>> # ... add data elements to it as above
+>>> beam0.BlockSequence.append(block_ds3)  # don't forget to update Number of Blocks data element
+
+>>> del plan_ds.BeamSequence[0].BlockSequence[1]

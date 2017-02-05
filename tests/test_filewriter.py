@@ -5,11 +5,18 @@
 #    See the file license.txt included with this distribution, also
 #    available at https://github.com/darcymason/pydicom
 
-import sys
-import os.path
-import os
+from copy import deepcopy
 from datetime import date, datetime, time
-from dateutil.tz import tzoffset
+from io import BytesIO
+import os
+import os.path
+import sys
+
+have_dateutil = True
+try:
+    from dateutil.tz import tzoffset
+except ImportError:
+    have_dateutil = False
 import unittest
 try:
     unittest.TestCase.assertSequenceEqual
@@ -19,18 +26,17 @@ except AttributeError:
     except ImportError:
         print("unittest2 is required for testing in python2.6")
 
-from pydicom.filereader import read_file
-from pydicom.filewriter import write_data_element
-from pydicom.dataset import Dataset, FileDataset, have_numpy
-from pydicom.sequence import Sequence
-from pydicom.multival import MultiValue
-from pydicom.valuerep import DA, DT, TM
-from pydicom.util.hexutil import hex2bytes, bytes2hex
 from pydicom import config
-
-# from io import BytesIO
-from pydicom.filebase import DicomBytesIO
+from pydicom.dataset import Dataset, FileDataset, have_numpy
 from pydicom.dataelem import DataElement
+from pydicom.filebase import DicomBytesIO
+from pydicom.filereader import read_file, read_dataset
+from pydicom.filewriter import write_data_element, write_dataset, \
+                               correct_ambiguous_vr
+from pydicom.multival import MultiValue
+from pydicom.sequence import Sequence
+from pydicom.util.hexutil import hex2bytes, bytes2hex
+from pydicom.valuerep import DA, DT, TM
 
 test_dir = os.path.dirname(__file__)
 test_files = os.path.join(test_dir, 'test_files')
@@ -66,7 +72,6 @@ def files_identical(a, b):
             b_bytes = B.read()
 
     return bytes_identical(a_bytes, b_bytes)
-
 
 def bytes_identical(a_bytes, b_bytes):
     """Return a tuple (bytes a == bytes b, index of first difference)"""
@@ -159,7 +164,18 @@ class WriteFileTests(unittest.TestCase):
         if os.path.exists(ct_out):
             os.remove(ct_out)
 
+    def testwrite_short_uid(self):
+        ds = read_file(rtplan_name)
+        ds.SOPInstanceUID = "1.2"
+        ds.save_as(rtplan_out)
+        ds = read_file(rtplan_out)
+        ds.save_as(rtplan_out)
+        self.assertEqual(ds.SOPInstanceUID, "1.2")
+        if os.path.exists(rtplan_out):
+            os.remove(rtplan_out)  # get rid of the file
 
+
+@unittest.skipIf(not have_dateutil, "Need python-dateutil installed for these tests")
 class ScratchWriteDateTimeTests(WriteFileTests):
     """Write and reread simple or multi-value DA/DT/TM data elements"""
     def setUp(self):
@@ -196,6 +212,7 @@ class ScratchWriteDateTimeTests(WriteFileTests):
         if os.path.exists(datetime_out):
             os.remove(datetime_out)  # get rid of the file
 
+
 class WriteDataElementTests(unittest.TestCase):
     """Attempt to write data elements has the expected behaviour"""
     def setUp(self):
@@ -203,6 +220,32 @@ class WriteDataElementTests(unittest.TestCase):
         self.f1 = DicomBytesIO()
         self.f1.is_little_endian = True
         self.f1.is_implicit_VR = True
+
+    @staticmethod
+    def encode_element(elem, is_implicit_VR=True, is_little_endian=True):
+        """Return the encoded `elem`.
+
+        Parameters
+        ----------
+        elem : pydicom.dataelem.DataElement
+            The element to encode
+        is_implicit_VR : bool
+            Encode using implicit VR, default True
+        is_little_endian : bool
+            Encode using little endian, default True
+
+        Returns
+        -------
+        str or bytes
+            The encoded element as str (python2) or bytes (python3)
+        """
+        fp = DicomBytesIO()
+        fp.is_implicit_VR = is_implicit_VR
+        fp.is_little_endian = is_little_endian
+        write_data_element(fp, elem)
+        byte_string = fp.parent.getvalue()
+        fp.close()
+        return byte_string
 
     def test_empty_AT(self):
         """Write empty AT correctly.........."""
@@ -220,6 +263,382 @@ class WriteDataElementTests(unittest.TestCase):
         msg = "'%r' '%r'" % (expected, got)
         self.assertEqual(expected, got, msg)
 
+    def test_write_UC_implicit_little(self):
+        """Test writing elements with VR of UC works correctly."""
+        # VM 1, even data
+        elem = DataElement(0x00189908, 'UC', 'Test')
+        encoded_elem = self.encode_element(elem)
+        # Tag pair (0018, 9908): 08 00 20 01
+        # Length (4): 04 00 00 00
+        # Value: \x54\x65\x73\x74
+        ref_bytes = b'\x18\x00\x08\x99\x04\x00\x00\x00\x54\x65\x73\x74'
+        self.assertEqual(encoded_elem, ref_bytes)
+
+        # VM 1, odd data - padded to even length
+        elem.value = 'Test.'
+        encoded_elem = self.encode_element(elem)
+        ref_bytes = b'\x18\x00\x08\x99\x06\x00\x00\x00\x54\x65\x73\x74\x2e\x20'
+        self.assertEqual(encoded_elem, ref_bytes)
+
+        # VM 3, even data
+        elem.value = ['Aa', 'B', 'C']
+        encoded_elem = self.encode_element(elem)
+        ref_bytes = b'\x18\x00\x08\x99\x06\x00\x00\x00\x41\x61\x5c\x42\x5c\x43'
+        self.assertEqual(encoded_elem, ref_bytes)
+
+        # VM 3, odd data - padded to even length
+        elem.value = ['A', 'B', 'C']
+        encoded_elem = self.encode_element(elem)
+        ref_bytes = b'\x18\x00\x08\x99\x06\x00\x00\x00\x41\x5c\x42\x5c\x43\x20'
+        self.assertEqual(encoded_elem, ref_bytes)
+
+        # Empty data
+        elem.value = ''
+        encoded_elem = self.encode_element(elem)
+        ref_bytes = b'\x18\x00\x08\x99\x00\x00\x00\x00'
+        self.assertEqual(encoded_elem, ref_bytes)
+
+    def test_write_UC_explicit_little(self):
+        """Test writing elements with VR of UC works correctly.
+
+        Elements with a VR of 'UC' use the newer explicit VR
+        encoding (see PS3.5 Section 7.1.2).
+        """
+        # VM 1, even data
+        elem = DataElement(0x00189908, 'UC', 'Test')
+        encoded_elem = self.encode_element(elem, False, True)
+        # Tag pair (0018, 9908): 08 00 20 01
+        # VR (UC): \x55\x43
+        # Reserved: \x00\x00
+        # Length (4): \x04\x00\x00\x00
+        # Value: \x54\x65\x73\x74
+        ref_bytes = b'\x18\x00\x08\x99\x55\x43\x00\x00\x04\x00\x00\x00' \
+                    b'\x54\x65\x73\x74'
+        self.assertEqual(encoded_elem, ref_bytes)
+
+        # VM 1, odd data - padded to even length
+        elem.value = 'Test.'
+        encoded_elem = self.encode_element(elem, False, True)
+        ref_bytes = b'\x18\x00\x08\x99\x55\x43\x00\x00\x06\x00\x00\x00' \
+                    b'\x54\x65\x73\x74\x2e\x20'
+        self.assertEqual(encoded_elem, ref_bytes)
+
+        # VM 3, even data
+        elem.value = ['Aa', 'B', 'C']
+        encoded_elem = self.encode_element(elem, False, True)
+        ref_bytes = b'\x18\x00\x08\x99\x55\x43\x00\x00\x06\x00\x00\x00' \
+                    b'\x41\x61\x5c\x42\x5c\x43'
+        self.assertEqual(encoded_elem, ref_bytes)
+
+        # VM 3, odd data - padded to even length
+        elem.value = ['A', 'B', 'C']
+        encoded_elem = self.encode_element(elem, False, True)
+        ref_bytes = b'\x18\x00\x08\x99\x55\x43\x00\x00\x06\x00\x00\x00' \
+                    b'\x41\x5c\x42\x5c\x43\x20'
+        self.assertEqual(encoded_elem, ref_bytes)
+
+        # Empty data
+        elem.value = ''
+        encoded_elem = self.encode_element(elem, False, True)
+        ref_bytes = b'\x18\x00\x08\x99\x55\x43\x00\x00\x00\x00\x00\x00'
+        self.assertEqual(encoded_elem, ref_bytes)
+
+    def test_write_UR_implicit_little(self):
+        """Test writing elements with VR of UR works correctly."""
+        # Even length URL
+        elem = DataElement(0x00080120, 'UR',
+                           'http://github.com/darcymason/pydicom')
+        encoded_elem = self.encode_element(elem)
+        # Tag pair (0008, 2001): 08 00 20 01
+        # Length (36): 24 00 00 00
+        # Value: 68 to 6d
+        ref_bytes = b'\x08\x00\x20\x01\x24\x00\x00\x00\x68\x74' \
+                    b'\x74\x70\x3a\x2f\x2f\x67\x69\x74\x68\x75' \
+                    b'\x62\x2e\x63\x6f\x6d\x2f\x64\x61\x72\x63' \
+                    b'\x79\x6d\x61\x73\x6f\x6e\x2f\x70\x79\x64' \
+                    b'\x69\x63\x6f\x6d'
+        self.assertEqual(encoded_elem, ref_bytes)
+
+        # Odd length URL has trailing \x20 (SPACE) padding
+        elem.value = '../test/test.py'
+        encoded_elem = self.encode_element(elem)
+        # Tag pair (0008, 2001): 08 00 20 01
+        # Length (16): 10 00 00 00
+        # Value: 2e to 20
+        ref_bytes = b'\x08\x00\x20\x01\x10\x00\x00\x00\x2e\x2e' \
+                    b'\x2f\x74\x65\x73\x74\x2f\x74\x65\x73\x74' \
+                    b'\x2e\x70\x79\x20'
+        self.assertEqual(encoded_elem, ref_bytes)
+
+        # Empty value
+        elem.value = ''
+        encoded_elem = self.encode_element(elem)
+        self.assertEqual(encoded_elem, b'\x08\x00\x20\x01\x00\x00\x00\x00')
+
+    def test_write_UR_explicit_little(self):
+        """Test writing elements with VR of UR works correctly.
+
+        Elements with a VR of 'UR' use the newer explicit VR
+        encoded (see PS3.5 Section 7.1.2).
+        """
+        # Even length URL
+        elem = DataElement(0x00080120, 'UR', 'ftp://bits')
+        encoded_elem = self.encode_element(elem, False, True)
+        # Tag pair (0008, 2001): 08 00 20 01
+        # VR (UR): \x55\x52
+        # Reserved: \x00\x00
+        # Length (4): \x0a\x00\x00\x00
+        # Value: \x66\x74\x70\x3a\x2f\x2f\x62\x69\x74\x73
+        ref_bytes = b'\x08\x00\x20\x01\x55\x52\x00\x00\x0a\x00\x00\x00' \
+                    b'\x66\x74\x70\x3a\x2f\x2f\x62\x69\x74\x73'
+        self.assertEqual(encoded_elem, ref_bytes)
+
+        # Odd length URL has trailing \x20 (SPACE) padding
+        elem.value = 'ftp://bit'
+        encoded_elem = self.encode_element(elem, False, True)
+        ref_bytes = b'\x08\x00\x20\x01\x55\x52\x00\x00\x0a\x00\x00\x00' \
+                    b'\x66\x74\x70\x3a\x2f\x2f\x62\x69\x74\x20'
+        self.assertEqual(encoded_elem, ref_bytes)
+
+        # Empty value
+        elem.value = ''
+        encoded_elem = self.encode_element(elem, False, True)
+        ref_bytes = b'\x08\x00\x20\x01\x55\x52\x00\x00\x00\x00\x00\x00'
+        self.assertEqual(encoded_elem, ref_bytes)
+
+
+class TestCorrectAmbiguousVR(unittest.TestCase):
+    """Test correct_ambiguous_vr."""
+    def test_pixel_representation_vm_one(self):
+        """Test correcting VM 1 elements which require PixelRepresentation."""
+        ref_ds = Dataset()
+
+        # If PixelRepresentation is 0 then VR should be US
+        ref_ds.PixelRepresentation = 0
+        ref_ds.SmallestValidPixelValue = b'\x00\x01' # Little endian 256
+        ds = correct_ambiguous_vr(deepcopy(ref_ds), True)
+        self.assertEqual(ds.SmallestValidPixelValue, 256)
+        self.assertEqual(ds[0x00280104].VR, 'US')
+
+        # If PixelRepresentation is 1 then VR should be SS
+        ref_ds.PixelRepresentation = 1
+        ref_ds.SmallestValidPixelValue = b'\x00\x01' # Big endian 1
+        ds = correct_ambiguous_vr(deepcopy(ref_ds), False)
+        self.assertEqual(ds.SmallestValidPixelValue, 1)
+        self.assertEqual(ds[0x00280104].VR, 'SS')
+
+        # If no PixelRepresentation then should be unchanged
+        ref_ds = Dataset()
+        ref_ds.SmallestValidPixelValue = b'\x00\x01' # Big endian 1
+        ds = correct_ambiguous_vr(deepcopy(ref_ds), True)
+        self.assertEqual(ds.SmallestValidPixelValue, b'\x00\x01')
+        self.assertEqual(ds[0x00280104].VR, 'US or SS')
+
+    def test_pixel_representation_vm_three(self):
+        """Test correcting VM 3 elements which require PixelRepresentation."""
+        ref_ds = Dataset()
+
+        # If PixelRepresentation is 0 then VR should be US - Little endian
+        ref_ds.PixelRepresentation = 0
+        ref_ds.LUTDescriptor = b'\x01\x00\x00\x01\x10\x00' # 1\256\16
+        ds = correct_ambiguous_vr(deepcopy(ref_ds), True)
+        self.assertEqual(ds.LUTDescriptor, [1, 256, 16])
+        self.assertEqual(ds[0x00283002].VR, 'US')
+
+        # If PixelRepresentation is 1 then VR should be SS
+        ref_ds.PixelRepresentation = 1
+        ref_ds.LUTDescriptor = b'\x01\x00\x00\x01\x00\x10'
+        ds = correct_ambiguous_vr(deepcopy(ref_ds), False)
+        self.assertEqual(ds.LUTDescriptor, [256, 1, 16])
+        self.assertEqual(ds[0x00283002].VR, 'SS')
+
+        # If no PixelRepresentation then should be unchanged
+        ref_ds = Dataset()
+        ref_ds.LUTDescriptor = b'\x01\x00\x00\x01\x00\x10'
+        ds = correct_ambiguous_vr(deepcopy(ref_ds), False)
+        self.assertEqual(ds.LUTDescriptor, b'\x01\x00\x00\x01\x00\x10')
+        self.assertEqual(ds[0x00283002].VR, 'US or SS')
+
+    def test_pixel_data(self):
+        """Test correcting PixelData."""
+        ref_ds = Dataset()
+
+        # If BitsAllocated  > 8 then VR must be OW
+        ref_ds.BitsAllocated = 16
+        ref_ds.PixelData = b'\x00\x01' # Little endian 256
+        ds = correct_ambiguous_vr(deepcopy(ref_ds), True) # Little endian
+        self.assertEqual(ds.PixelData, b'\x00\x01')
+        self.assertEqual(ds[0x7fe00010].VR, 'OW')
+        ds = correct_ambiguous_vr(deepcopy(ref_ds), False) # Big endian
+        self.assertEqual(ds.PixelData, b'\x00\x01')
+        self.assertEqual(ds[0x7fe00010].VR, 'OW')
+
+        # If BitsAllocated <= 8 then VR can be OB or OW: OW
+        ref_ds = Dataset()
+        ref_ds.BitsAllocated = 8
+        ref_ds.Rows = 2
+        ref_ds.Columns = 2
+        ref_ds.PixelData = b'\x01\x00\x02\x00\x03\x00\x04\x00'
+        ds = correct_ambiguous_vr(deepcopy(ref_ds), True)
+        self.assertEqual(ds.PixelData, b'\x01\x00\x02\x00\x03\x00\x04\x00')
+        self.assertEqual(ds[0x7fe00010].VR, 'OW')
+
+        # If BitsAllocated <= 8 then VR can be OB or OW: OB
+        ref_ds = Dataset()
+        ref_ds.BitsAllocated = 8
+        ref_ds.Rows = 2
+        ref_ds.Columns = 2
+        ref_ds.PixelData = b'\x01\x02\x03\x04'
+        ds = correct_ambiguous_vr(deepcopy(ref_ds), True)
+        self.assertEqual(ds.PixelData, b'\x01\x02\x03\x04')
+        self.assertEqual(ds[0x7fe00010].VR, 'OB')
+
+        # If no BitsAllocated then VR should be unchanged
+        ref_ds = Dataset()
+        ref_ds.PixelData = b'\x00\x01' # Big endian 1
+        ds = correct_ambiguous_vr(deepcopy(ref_ds), True)
+        self.assertEqual(ds.PixelData, b'\x00\x01')
+        self.assertEqual(ds[0x7fe00010].VR, 'OB or OW')
+
+        # If required elements missing then VR should be unchanged
+        ref_ds = Dataset()
+        ref_ds.BitsAllocated = 8
+        ref_ds.Rows = 2
+        ref_ds.PixelData = b'\x01\x02\x03\x04'
+        ds = correct_ambiguous_vr(deepcopy(ref_ds), True)
+        self.assertEqual(ds.PixelData, b'\x01\x02\x03\x04')
+        self.assertEqual(ds[0x7fe00010].VR, 'OB or OW')
+
+    def test_waveform_bits_allocated(self):
+        """Test correcting elements which require WaveformBitsAllocated."""
+        ref_ds = Dataset()
+
+        # If WaveformBitsAllocated  > 8 then VR must be OW
+        ref_ds.WaveformBitsAllocated = 16
+        ref_ds.WaveformData = b'\x00\x01' # Little endian 256
+        ds = correct_ambiguous_vr(deepcopy(ref_ds), True) # Little endian
+        self.assertEqual(ds.WaveformData, b'\x00\x01')
+        self.assertEqual(ds[0x54001010].VR, 'OW')
+        ds = correct_ambiguous_vr(deepcopy(ref_ds), False) # Big endian
+        self.assertEqual(ds.WaveformData, b'\x00\x01')
+        self.assertEqual(ds[0x54001010].VR, 'OW')
+
+        # If WaveformBitsAllocated <= 8 then VR is OB or OW, but not sure which
+        #   so leave VR unchanged
+        ref_ds.WaveformBitsAllocated = 8
+        ref_ds.WaveformData = b'\x01\x02'
+        ds = correct_ambiguous_vr(deepcopy(ref_ds), True)
+        self.assertEqual(ds.WaveformData, b'\x01\x02')
+        self.assertEqual(ds[0x54001010].VR, 'OB or OW')
+
+        # If no WaveformBitsAllocated then VR should be unchanged
+        ref_ds = Dataset()
+        ref_ds.WaveformData = b'\x00\x01' # Big endian 1
+        ds = correct_ambiguous_vr(deepcopy(ref_ds), True)
+        self.assertEqual(ds.WaveformData, b'\x00\x01')
+        self.assertEqual(ds[0x54001010].VR, 'OB or OW')
+
+    def test_lut_descriptor(self):
+        """Test correcting elements which require LUTDescriptor."""
+        ref_ds = Dataset()
+        ref_ds.PixelRepresentation = 0
+
+        # If LUTDescriptor[0] is 1 then LUTData VR is 'US'
+        ref_ds.LUTDescriptor = b'\x01\x00\x00\x01\x10\x00' # 1\256\16
+        ref_ds.LUTData = b'\x00\x01' # Little endian 256
+        ds = correct_ambiguous_vr(deepcopy(ref_ds), True) # Little endian
+        self.assertEqual(ds.LUTDescriptor[0], 1)
+        self.assertEqual(ds[0x00283002].VR, 'US')
+        self.assertEqual(ds.LUTData, 256)
+        self.assertEqual(ds[0x00283006].VR, 'US')
+
+        # If LUTDescriptor[0] is not 1 then LUTData VR is 'OW'
+        ref_ds.LUTDescriptor = b'\x02\x00\x00\x01\x10\x00' # 2\256\16
+        ref_ds.LUTData = b'\x00\x01\x00\x02'
+        ds = correct_ambiguous_vr(deepcopy(ref_ds), True) # Little endian
+        self.assertEqual(ds.LUTDescriptor[0], 2)
+        self.assertEqual(ds[0x00283002].VR, 'US')
+        self.assertEqual(ds.LUTData, b'\x00\x01\x00\x02')
+        self.assertEqual(ds[0x00283006].VR, 'OW')
+
+        # If no LUTDescriptor then VR should be unchanged
+        ref_ds = Dataset()
+        ref_ds.LUTData = b'\x00\x01'
+        ds = correct_ambiguous_vr(deepcopy(ref_ds), True)
+        self.assertEqual(ds.LUTData, b'\x00\x01')
+        self.assertEqual(ds[0x00283006].VR, 'US or OW')
+
+    def test_sequence(self):
+        """Test correcting elements in a sequence."""
+        ref_ds = Dataset()
+        ref_ds.BeamSequence = [Dataset()]
+        ref_ds.BeamSequence[0].PixelRepresentation = 0
+        ref_ds.BeamSequence[0].SmallestValidPixelValue = b'\x00\x01'
+        ref_ds.BeamSequence[0].BeamSequence = [Dataset()]
+        ref_ds.BeamSequence[0].BeamSequence[0].PixelRepresentation = 0
+        ref_ds.BeamSequence[0].BeamSequence[0].SmallestValidPixelValue = b'\x00\x01'
+
+        ds = correct_ambiguous_vr(deepcopy(ref_ds), True)
+        self.assertEqual(ds.BeamSequence[0].SmallestValidPixelValue, 256)
+        self.assertEqual(ds.BeamSequence[0][0x00280104].VR, 'US')
+        self.assertEqual(ds.BeamSequence[0].BeamSequence[0].SmallestValidPixelValue, 256)
+        self.assertEqual(ds.BeamSequence[0].BeamSequence[0][0x00280104].VR, 'US')
+
+
+class WriteAmbiguousVRTests(unittest.TestCase):
+    """Attempt to write data elements with ambiguous VR."""
+    def setUp(self):
+        # Create a dummy (in memory) file to write to
+        self.fp = DicomBytesIO()
+        self.fp.is_implicit_VR = False
+        self.fp.is_little_endian = True
+
+    def test_write_explicit_vr_raises(self):
+        """Test writing explicit vr raises exception if unsolved element."""
+        ds = Dataset()
+        ds.PerimeterValue = b'\x00\x01'
+
+        def test():
+            write_dataset(self.fp, ds)
+
+        self.assertRaises(ValueError, test)
+
+    def test_write_explicit_vr_little_endian(self):
+        """Test writing explicit little data for ambiguous elements."""
+        # Create a dataset containing element with ambiguous VRs
+        ref_ds = Dataset()
+        ref_ds.PixelRepresentation = 0
+        ref_ds.SmallestValidPixelValue = b'\x00\x01' # Little endian 256
+
+        fp = BytesIO()
+        file_ds = FileDataset(fp, ref_ds)
+        file_ds.is_implicit_VR = False
+        file_ds.is_little_endian = True
+        file_ds.save_as(fp)
+        fp.seek(0)
+
+        ds = read_dataset(fp, False, True)
+        self.assertEqual(ds.SmallestValidPixelValue, 256)
+        self.assertEqual(ds[0x00280104].VR, 'US')
+
+    def test_write_explicit_vr_big_endian(self):
+        """Test writing explicit big data for ambiguous elements."""
+        # Create a dataset containing element with ambiguous VRs
+        ref_ds = Dataset()
+        ref_ds.PixelRepresentation = 1
+        ref_ds.SmallestValidPixelValue = b'\x00\x01' # Big endian 1
+
+        fp = BytesIO()
+        file_ds = FileDataset(fp, ref_ds)
+        file_ds.is_implicit_VR = False
+        file_ds.is_little_endian = False
+        file_ds.save_as(fp)
+        fp.seek(0)
+
+        ds = read_dataset(fp, False, False)
+        self.assertEqual(ds.SmallestValidPixelValue, 1)
+        self.assertEqual(ds[0x00280104].VR, 'SS')
+
 
 class ScratchWriteTests(unittest.TestCase):
     """Simple dataset from scratch, written in all endian/VR combinations"""
@@ -227,6 +646,7 @@ class ScratchWriteTests(unittest.TestCase):
         # Create simple dataset for all tests
         ds = Dataset()
         ds.PatientName = "Name^Patient"
+        ds.InstanceNumber = None
 
         # Set up a simple nested sequence
         # first, the innermost sequence

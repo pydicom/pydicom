@@ -6,6 +6,33 @@ I obtained images to test the pydicom code, and revised them as follow:
 
 I believe there is no restriction on using any of these files in this manner.
 
+First, which transfer syntax the files are:
+ExplVR_BigEnd.dcm       : Expl VR Big Endian
+ExplVR_BigEndNoMeta.dcm : Expl VR Big Endian
+
+color-pl.dcm            : Expl VR Little Endian
+color-px.dcm            : Expl VR Little Endian
+CT_small.dcm            : Expl VR Little Endian
+ExplVR_LitEndNoMeta.dcm : Expl VR Little Endian
+image_dfl.dcm           : Expl VR Little Endian
+JPEG-LL.dcm             : Expl VR Little Endian
+JPEG-lossy.dcm          : Expl VR Little Endian
+JPEG2000.dcm            : Expl VR Little Endian
+MR_small.dcm            : Expl VR Little Endian
+OBXXXX1A.dcm            : Expl VR Little Endian
+reportsi.dcm            : Expl VR Little Endian
+test-SR.dcm             : Expl VR Little Endian
+
+nested_priv_SQ.dcm      : Impl VR Little Endian
+no_meta_group_length.dcm: Impl VR Little Endian
+OT-PAL-8-face.dcm       : Impl VR Little Endian
+priv_SQ.dcm             : Impl VR Little Endian
+rtdose.dcm              : Impl VR Little Endian
+rtplan.dcm              : Impl VR Little Endian
+rtplan_truncated.dcm    : Impl VR Little Endian
+rtstruct.dcm            : Impl VR Little Endian
+
+
 CT_small.dcm
   * CT image, Explicit VR, LittleEndian
   * Downsized to 128x128 from 'CT1_UNC', ftp://medical.nema.org/MEDICAL/Dicom/DataSets/WG04/

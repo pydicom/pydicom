@@ -9,6 +9,8 @@ impl_LE_deflen_std_hex = (
     b"10 00 10 00 "     # (0010, 0010) Patient's Name
     b"0c 00 00 00 "     # length 12
     b"4e 61 6d 65 5e 50 61 74 69 65 6e 74 "    # "Name^Patient"
+    b"20 00 13 00 "     # instance number with no value
+    b"00 00 00 00 "     # length 0
     b"06 30 39 00 "     # (3006, 0039) ROI Contour Sequence
     b"5a 00 00 00 "     # length 90
         b"fe ff 00 e0 "     # (fffe, e000) Item Tag
