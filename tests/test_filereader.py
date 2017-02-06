@@ -383,14 +383,13 @@ class ReaderTests(unittest.TestCase):
         ds.PixelRepresentation = 0
         ds.add(DataElement(0x00280108, 'US', 10))
         ds.add(DataElement(0x00280109, 'US', 500))
-        
 
         fp = BytesIO()
         file_ds = FileDataset(fp, ds)
         file_ds.is_implicit_VR = True
         file_ds.is_little_endian = True
         file_ds.save_as(fp)
-        
+
         ds = read_file(fp, force=True)
         self.assertEqual(ds[0x00280108].VR, 'US')
         self.assertEqual(ds.SmallestPixelValueInSeries, 10)
