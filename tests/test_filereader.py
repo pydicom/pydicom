@@ -42,21 +42,37 @@ have_gdcm = True
 try:
     import gdcm  # NOQA
 except:
+    have_gdcm = False
 
 from pydicom.dataset import Dataset, FileDataset
 from pydicom.dataelem import DataElement
 from pydicom.filebase import DicomBytesIO
-from pydicom.filereader import read_file, data_element_generator
-    have_gdcm = False
-    
-    
-from pydicom.filereader import read_file
+from pydicom.filereader import read_file, data_element_generator    
 from pydicom.errors import InvalidDicomError
 from pydicom.tag import Tag, TupleTag
 import pydicom.valuerep
 import gzip
 
 from warncheck import assertWarns
+
+have_jpeg_ls = True
+try:
+    import jpeg_ls
+except ImportError:
+    have_jpeg_ls = False
+
+have_pillow = True
+try:
+    from PIL import Image as PILImg
+except ImportError:
+    # If that failed, try the alternate import syntax for PIL.
+    try:
+        import Image as PILImg
+    except ImportError:
+        # Neither worked, so it's likely not installed.
+        have_pillow = False
+
+
 
 test_dir = os.path.dirname(__file__)
 test_files = os.path.join(test_dir, 'test_files')

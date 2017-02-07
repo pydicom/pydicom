@@ -703,9 +703,6 @@ class Dataset(dict):
         pix = self.get_item(0x7fe00010).value
         if isinstance(pix, numpy.ndarray):
             return pix
-                return self._pixel_array
-            except IOError:
-                logger.info("Pillow or JPLS did not support this transfer syntax")
         self._pixel_array = self._pixel_data_numpy()
         return self._pixel_array
 
