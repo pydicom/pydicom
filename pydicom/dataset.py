@@ -358,7 +358,7 @@ class Dataset(dict):
                 character_set = default_encoding
             # Not converted from raw form read from file yet; do so now
             self[tag] = DataElement_from_raw(data_elem, character_set)
-            
+
             # Try to correct
             if isinstance(self, FileDataset) and 'or' in self[tag].VR:
                 from pydicom.filewriter import correct_ambiguous_vr_element

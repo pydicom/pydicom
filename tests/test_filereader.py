@@ -393,9 +393,6 @@ class ReaderTests(unittest.TestCase):
         ds = read_file(fp, force=True)
         self.assertEqual(ds[0x00280108].VR, 'US')
         self.assertEqual(ds.SmallestPixelValueInSeries, 10)
-        
-        print(ds)
-        print(ds)
 
 
 class ReadDataElementTests(unittest.TestCase):
