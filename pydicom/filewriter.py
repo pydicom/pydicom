@@ -22,6 +22,94 @@ from pydicom.values import convert_numbers
 from pydicom.tagtools import tag_in_exception
 
 
+def correct_ambiguous_vr_element(elem, ds, is_little_endian):
+    """Attempt to correct the ambiguous VR element `elem`.
+
+    When it's not possible to correct the VR, the element will be returned
+    unchanged. Currently the only ambiguous VR elements not corrected for are
+    all retired or part of DICONDE, except for (60xx,3000) Overlay Data.
+
+    If the VR is corrected and is 'US' or 'SS then the value will be updated
+    using the pydicom.values.convert_numbers() method.
+
+    Parameters
+    ----------
+    elem : pydicom.dataelem.DataElement
+        The element with an ambiguous VR.
+    ds : pydicom.dataset.Dataset
+        The dataset containing `elem`.
+    is_little_endian : bool
+        The byte ordering of the values in the dataset.
+
+    Returns
+    -------
+    ds : pydicom.dataset.Dataset
+        The corrected dataset
+    """
+    if ' or ' in elem.VR:
+        # OB or OW: 7fe0,0010 PixelData
+        if elem.tag == 0x7fe00010:
+            # If BitsAllocated is > 8 then OW, else may be OB or OW
+            #   As per PS3.5 Annex A.2. For BitsAllocated < 8 test the size
+            #   of each pixel to see if its written in OW or OB
+            try:
+                if ds.BitsAllocated > 8:
+                    elem.VR = 'OW'
+                else:
+                    if len(ds.PixelData) / (ds.Rows * ds.Columns) == 2:
+                        elem.VR = 'OW'
+                    elif len(ds.PixelData) / (ds.Rows * ds.Columns) == 1:
+                        elem.VR = 'OB'
+            except AttributeError:
+                pass
+
+        # 'US or SS' and dependent on PixelRepresentation
+        # See correct_ambiguous_vr for the element descriptions
+        elif elem.tag in [0x00189810, 0x00221452, 0x00280104, 0x00280105,
+                          0x00280106, 0x00280107, 0x00280108, 0x00280108,
+                          0x00280110, 0x00280111, 0x00280120, 0x00280121,
+                          0x00281101, 0x00281102, 0x00281103, 0x00283002,
+                          0x00409211, 0x00409216, 0x00603004, 0x00603006]:
+            # US if PixelRepresenation value is 0x0000, else SS
+            #   For references, see the list at
+            #   https://github.com/darcymase/pydicom/pull/298
+            if 'PixelRepresentation' in ds:
+                if ds.PixelRepresentation == 0:
+                    elem.VR = 'US'
+                    byte_type = 'H'
+                else:
+                    elem.VR = 'SS'
+                    byte_type = 'h'
+                elem.value = convert_numbers(elem.value, is_little_endian,
+                                             byte_type)
+
+        # 'OB or OW' and dependent on WaveformBitsAllocated
+        # See correct_ambiguous_vr for the element descriptions
+        elif elem.tag in [0x54000100, 0x54000112, 0x5400100A,
+                          0x54001010]:
+            # If WaveformBitsAllocated is > 8 then OW, otherwise may be
+            #   OB or OW, however not sure how to handle this.
+            #   See PS3.3 C.10.9.1.
+            if 'WaveformBitsAllocated' in ds:
+                if ds.WaveformBitsAllocated > 8:
+                    elem.VR = 'OW'
+
+        # US or OW: 0028,3006 LUTData
+        elif elem.tag in [0x00283006]:
+            if 'LUTDescriptor' in ds:
+                # First value in LUT Descriptor is how many values in
+                #   LUTData, if there's only one value then must be US
+                # As per PS3.3 C.11.1.1.1
+                if ds.LUTDescriptor[0] == 1:
+                    elem.VR = 'US'
+                    elem.value = convert_numbers(elem.value,
+                                                 is_little_endian,
+                                                 'H')
+                else:
+                    elem.VR = 'OW'
+
+    return elem
+
 def correct_ambiguous_vr(ds, is_little_endian):
     """Iterate through `ds` correcting ambiguous VR elements (if possible).
 
@@ -50,93 +138,8 @@ def correct_ambiguous_vr(ds, is_little_endian):
         if elem.VR == 'SQ':
             for item in elem:
                 item = correct_ambiguous_vr(item, is_little_endian)
-
-        if ' or ' in elem.VR:
-            # OB or OW: 7fe0,0010 PixelData
-            if elem.tag == 0x7fe00010:
-                # If BitsAllocated is > 8 then OW, else may be OB or OW
-                #   As per PS3.5 Annex A.2. For BitsAllocated < 8 test the size
-                #   of each pixel to see if its written in OW or OB
-                try:
-                    if ds.BitsAllocated > 8:
-                        elem.VR = 'OW'
-                    else:
-                        if len(ds.PixelData) / (ds.Rows * ds.Columns) == 2:
-                            elem.VR = 'OW'
-                        elif len(ds.PixelData) / (ds.Rows * ds.Columns) == 1:
-                            elem.VR = 'OB'
-                except AttributeError:
-                    pass
-
-            # These are all 'US or SS'
-            # 0018,9810 ZeroVelocityPixelValue
-            # 0022,1452 MappedPixelValue
-            # 0028,0104 SmallestValidPixelValue (Retired)
-            # 0028,0105 LargestValidPixelValue (Retired)
-            # 0028,0106 SmallestImagePixelValue
-            # 0028,0107 LargestImagePixelValue
-            # 0028,0108 SmallestPixelValueInSeries
-            # 0028,0109 LargestPixelValueInSeries
-            # 0028,0110 SmallestImagePixelValueInPlane (Retired)
-            # 0028,0111 LargestImagePixelValueInPlane (Retired)
-            # 0028,0120 PixelPaddingValue
-            # 0028,0121 PixelPaddingRangeLimit
-            # 0028,1101 RedPaletteColorLookupTableDescriptor
-            # 0028,1102 BluePaletteColorLookupTableDescriptor
-            # 0028,1103 GreenPaletteColorLookupTableDescriptor
-            # 0028,1111 LargeRedPaletteColorLookupTableDescriptor (Retired)
-            # 0028,1112 LargeBluePaletteColorLookupTableDescriptor (Retired)
-            # 0028,1113 LargeGreenPaletteColorLookupTableDescriptor (Retired)
-            # 0028,3002 LUTDescriptor
-            # 0040,9211 RealWorldValueLastValueMapped
-            # 0040,9216 RealWorldValueFirstValueMapped
-            # 0060,3004 HistogramFirstBinValue
-            # 0060,3006 HistogramLastBinValue
-            elif elem.tag in [0x00189810, 0x00221452, 0x00280104, 0x00280105,
-                              0x00280106, 0x00280107, 0x00280108, 0x00280108,
-                              0x00280110, 0x00280111, 0x00280120, 0x00280121,
-                              0x00281101, 0x00281102, 0x00281103, 0x00283002,
-                              0x00409211, 0x00409216, 0x00603004, 0x00603006]:
-                # US if PixelRepresenation value is 0x0000, else SS
-                #   For references, see the list at
-                #   https://github.com/scaramallion/pynetdicom3/issues/3
-                if 'PixelRepresentation' in ds:
-                    if ds.PixelRepresentation == 0:
-                        elem.VR = 'US'
-                        byte_type = 'H'
-                    else:
-                        elem.VR = 'SS'
-                        byte_type = 'h'
-                    elem.value = convert_numbers(elem.value,
-                                                 is_little_endian,
-                                                 byte_type)
-
-            # OB or OW: 5400,0110 ChannelMinimumValue
-            # OB or OW: 5400,0112 ChannelMaximumValue
-            # OB or OW: 5400,100A WaveformPaddingValue
-            # OB or OW: 5400,1010 WaveformData
-            elif elem.tag in [0x54000100, 0x54000112, 0x5400100A,
-                              0x54001010]:
-                # If WaveformBitsAllocated is > 8 then OW, otherwise may be
-                #   OB or OW, however not sure how to handle this.
-                #   See PS3.3 C.10.9.1.
-                if 'WaveformBitsAllocated' in ds:
-                    if ds.WaveformBitsAllocated > 8:
-                        elem.VR = 'OW'
-
-            # US or OW: 0028,3006 LUTData
-            elif elem.tag in [0x00283006]:
-                if 'LUTDescriptor' in ds:
-                    # First value in LUT Descriptor is how many values in
-                    #   LUTData, if there's only one value then must be US
-                    # As per PS3.3 C.11.1.1.1
-                    if ds.LUTDescriptor[0] == 1:
-                        elem.VR = 'US'
-                        elem.value = convert_numbers(elem.value,
-                                                     is_little_endian,
-                                                     'H')
-                    else:
-                        elem.VR = 'OW'
+        else:
+            elem = correct_ambiguous_vr_element(elem, ds, is_little_endian)
 
     return ds
 

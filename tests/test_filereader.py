@@ -377,6 +377,26 @@ class ReaderTests(unittest.TestCase):
             pl_data = pl_data_ds.pixel_array
             self.assertTrue(numpy.all(px_data == pl_data))
 
+    def test_correct_ambiguous_vr(self):
+        """Test correcting ambiguous VR elements read from file"""
+        ds = Dataset()
+        ds.PixelRepresentation = 0
+        ds.add(DataElement(0x00280108, 'US', 10))
+        ds.add(DataElement(0x00280109, 'US', 500))
+
+        fp = BytesIO()
+        file_ds = FileDataset(fp, ds)
+        file_ds.is_implicit_VR = True
+        file_ds.is_little_endian = True
+        file_ds.save_as(fp)
+
+        ds = read_file(fp, force=True)
+        self.assertEqual(ds[0x00280108].VR, 'US')
+        self.assertEqual(ds.SmallestPixelValueInSeries, 10)
+        
+        print(ds)
+        print(ds)
+
 
 class ReadDataElementTests(unittest.TestCase):
     def setUp(self):
