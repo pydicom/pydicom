@@ -47,7 +47,7 @@ def correct_ambiguous_vr_element(elem, ds, is_little_endian):
         The corrected dataset
     """
     if ' or ' in elem.VR:
-        # OB or OW: 7fe0,0010 PixelData
+        # 'OB or OW': 7fe0,0010 PixelData
         if elem.tag == 0x7fe00010:
             # If BitsAllocated is > 8 then OW, else may be OB or OW
             #   As per PS3.5 Annex A.2. For BitsAllocated < 8 test the size
@@ -64,7 +64,6 @@ def correct_ambiguous_vr_element(elem, ds, is_little_endian):
                 pass
 
         # 'US or SS' and dependent on PixelRepresentation
-        # See correct_ambiguous_vr for the element descriptions
         elif elem.tag in [0x00189810, 0x00221452, 0x00280104, 0x00280105,
                           0x00280106, 0x00280107, 0x00280108, 0x00280108,
                           0x00280110, 0x00280111, 0x00280120, 0x00280121,
@@ -84,7 +83,6 @@ def correct_ambiguous_vr_element(elem, ds, is_little_endian):
                                              byte_type)
 
         # 'OB or OW' and dependent on WaveformBitsAllocated
-        # See correct_ambiguous_vr for the element descriptions
         elif elem.tag in [0x54000100, 0x54000112, 0x5400100A,
                           0x54001010]:
             # If WaveformBitsAllocated is > 8 then OW, otherwise may be
@@ -94,7 +92,7 @@ def correct_ambiguous_vr_element(elem, ds, is_little_endian):
                 if ds.WaveformBitsAllocated > 8:
                     elem.VR = 'OW'
 
-        # US or OW: 0028,3006 LUTData
+        # 'US or OW': 0028,3006 LUTData
         elif elem.tag in [0x00283006]:
             if 'LUTDescriptor' in ds:
                 # First value in LUT Descriptor is how many values in
