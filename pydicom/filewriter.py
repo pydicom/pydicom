@@ -46,7 +46,7 @@ def correct_ambiguous_vr_element(elem, ds, is_little_endian):
     ds : pydicom.dataset.Dataset
         The corrected dataset
     """
-    if ' or ' in elem.VR:
+    if 'or' in elem.VR:
         # 'OB or OW': 7fe0,0010 PixelData
         if elem.tag == 0x7fe00010:
             # If BitsAllocated is > 8 then OW, else may be OB or OW
@@ -136,7 +136,7 @@ def correct_ambiguous_vr(ds, is_little_endian):
         if elem.VR == 'SQ':
             for item in elem:
                 item = correct_ambiguous_vr(item, is_little_endian)
-        else:
+        elif 'or' in elem.VR:
             elem = correct_ambiguous_vr_element(elem, ds, is_little_endian)
 
     return ds
