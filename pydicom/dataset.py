@@ -577,7 +577,7 @@ class Dataset(dict):
         except TypeError:
             msg = ("Data type not understood by NumPy: "
                    "format='%s', PixelRepresentation=%d, BitsAllocated=%d")
-            raise TypeError(msg % (numpy_format, self.PixelRepresentation,
+            raise TypeError(msg % (format_str, self.PixelRepresentation,
                             self.BitsAllocated))
         if self.file_meta.TransferSyntaxUID in pydicom.uid.PILSupportedCompressedPixelTransferSyntaxes:
             UncompressedPixelData = self._get_PIL_supported_compressed_pixeldata()
