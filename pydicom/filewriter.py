@@ -65,7 +65,7 @@ def correct_ambiguous_vr_element(elem, ds, is_little_endian):
 
         # 'US or SS' and dependent on PixelRepresentation
         elif elem.tag in [0x00189810, 0x00221452, 0x00280104, 0x00280105,
-                          0x00280106, 0x00280107, 0x00280108, 0x00280108,
+                          0x00280106, 0x00280107, 0x00280108, 0x00280109,
                           0x00280110, 0x00280111, 0x00280120, 0x00280121,
                           0x00281101, 0x00281102, 0x00281103, 0x00283002,
                           0x00409211, 0x00409216, 0x00603004, 0x00603006]:
