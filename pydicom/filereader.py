@@ -359,7 +359,21 @@ def read_dataset(fp, is_implicit_VR, is_little_endian, bytelength=None,
     except NotImplementedError as details:
         logger.error(details)
 
-    return Dataset(raw_data_elements)
+    ds = Dataset(raw_data_elements)
+
+    # Attempt to correct elements with ambiguous VR - can only do this with a 
+    #   fully read dataset
+    if defer_size is None:
+        from pydicom.filewriter import correct_ambiguous_vr # avoid circular
+        # Correcting ambiguous VR requires iterating through the raw dataset
+        #   elements, so any bad elements will appear for the first time.
+        #   If that happens then stop trying to correct.
+        try:
+            ds = correct_ambiguous_vr(ds, is_little_endian)
+        except ValueError:
+            pass
+
+    return ds
 
 
 def read_sequence(fp, is_implicit_VR, is_little_endian, bytelength, encoding,
