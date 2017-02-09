@@ -360,10 +360,10 @@ class Dataset(dict):
             self[tag] = DataElement_from_raw(data_elem, character_set)
 
             # If the Element has an ambiguous VR, try to correct it
-            if isinstance(self, FileDataset) and 'or' in self[tag].VR:
+            if 'or' in self[tag].VR:
                 from pydicom.filewriter import correct_ambiguous_vr_element
                 self[tag] = correct_ambiguous_vr_element(self[tag], self, 
-                                                         self.is_little_endian)
+                                                         data_elem[6])
 
         return dict.__getitem__(self, tag)
 
