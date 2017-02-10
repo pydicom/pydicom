@@ -358,6 +358,13 @@ class Dataset(dict):
                 character_set = default_encoding
             # Not converted from raw form read from file yet; do so now
             self[tag] = DataElement_from_raw(data_elem, character_set)
+
+            # If the Element has an ambiguous VR, try to correct it
+            if 'or' in self[tag].VR:
+                from pydicom.filewriter import correct_ambiguous_vr_element
+                self[tag] = correct_ambiguous_vr_element(self[tag], self, 
+                                                         data_elem[6])
+
         return dict.__getitem__(self, tag)
 
     def get_item(self, key):
