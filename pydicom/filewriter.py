@@ -49,17 +49,25 @@ def correct_ambiguous_vr_element(elem, ds, is_little_endian):
     if 'or' in elem.VR:
         # 'OB or OW': 7fe0,0010 PixelData
         if elem.tag == 0x7fe00010:
-            # If BitsAllocated is > 8 then OW, else may be OB or OW
-            #   As per PS3.5 Annex A.2. For BitsAllocated < 8 test the size
-            #   of each pixel to see if its written in OW or OB
+
             try:
-                if ds.BitsAllocated > 8:
-                    elem.VR = 'OW'
+                # Compressed Pixel Data
+                # PS3.5 Annex A.4
+                #   If encapsulated, VR is OB and length is undefined
+                if elem.is_undefined_length:
+                    elem.VR = 'OB'
                 else:
-                    if len(ds.PixelData) / (ds.Rows * ds.Columns) == 2:
+                    # Non-compressed Pixel Data
+                    # If BitsAllocated is > 8 then OW, else may be OB or OW
+                    #   as per PS3.5 Annex A.2. For BitsAllocated < 8 test the
+                    #    size of each pixel to see if its written in OW or OB
+                    if ds.BitsAllocated > 8:
                         elem.VR = 'OW'
-                    elif len(ds.PixelData) / (ds.Rows * ds.Columns) == 1:
-                        elem.VR = 'OB'
+                    else:
+                        if len(ds.PixelData) / (ds.Rows * ds.Columns) == 2:
+                            elem.VR = 'OW'
+                        elif len(ds.PixelData) / (ds.Rows * ds.Columns) == 1:
+                            elem.VR = 'OB'
             except AttributeError:
                 pass
 
