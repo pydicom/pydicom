@@ -405,7 +405,6 @@ class ReaderTests(unittest.TestCase):
         file_ds.save_as(fp)
 
         ds = read_file(fp, force=True)
-        elem = ds[0x7fe00010]
         self.assertEqual(ds[0x7fe00010].VR, 'OB')
 
 
