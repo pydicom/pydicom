@@ -28,18 +28,18 @@ def decode_data_sequence(data):
     """
 
     # Convert data into a memory-mapped file
-    fp = DicomBytesIO(data)
-    fp.is_little_endian = True  # DICOM standard requires this
-    BasicOffsetTable = read_item(fp)  # NOQA
-    seq = []
-    while True:
-        item = read_item(fp)
-        if not item:  # None is returned if get to Sequence Delimiter
-            break
-        seq.append(item)
+    with DicomBytesIO(data) as fp:
+        fp.is_little_endian = True  # DICOM standard requires this
+        BasicOffsetTable = read_item(fp)  # NOQA
+        seq = []
+        while True:
+            item = read_item(fp)
+            if not item:  # None is returned if get to Sequence Delimiter
+                break
+            seq.append(item)
 
-    # XXX should
-    return seq
+        # XXX should
+        return seq
 
 
 def defragment_data(data):

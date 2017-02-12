@@ -156,6 +156,12 @@ class DicomFileLike(DicomIO):
         """Used for file-like objects where no seek is available"""
         raise IOError("This DicomFileLike object has no seek() method")
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc_info):
+        self.close()
+
 
 def DicomFile(*args, **kwargs):
     return DicomFileLike(open(*args, **kwargs))

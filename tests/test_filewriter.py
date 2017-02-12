@@ -224,13 +224,11 @@ class WriteDataElementTests(unittest.TestCase):
         str or bytes
             The encoded element as str (python2) or bytes (python3)
         """
-        fp = DicomBytesIO()
-        fp.is_implicit_VR = is_implicit_VR
-        fp.is_little_endian = is_little_endian
-        write_data_element(fp, elem)
-        byte_string = fp.parent.getvalue()
-        fp.close()
-        return byte_string
+        with DicomBytesIO() as fp:
+            fp.is_implicit_VR = is_implicit_VR
+            fp.is_little_endian = is_little_endian
+            write_data_element(fp, elem)
+            return fp.parent.getvalue()
 
     def test_empty_AT(self):
         """Write empty AT correctly.........."""
@@ -291,7 +289,7 @@ class WriteDataElementTests(unittest.TestCase):
         encoded_elem = self.encode_element(elem, False, True)
         ref_bytes = b'\x70\x00\x0d\x15\x4f\x44\x00\x00\x00\x00\x00\x00'
         self.assertEqual(encoded_elem, ref_bytes)
-        
+
     def test_write_OL_implicit_little(self):
         """Test writing elements with VR of OL works correctly."""
         # TrackPointIndexList
