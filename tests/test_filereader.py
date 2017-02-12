@@ -181,7 +181,10 @@ class ReaderTests(unittest.TestCase):
         self.assertEqual(ct.Rows, 128, "Rows not 128")
         self.assertEqual(ct.Columns, 128, "Columns not 128")
         self.assertEqual(ct.BitsStored, 16, "Bits Stored not 16")
-        self.assertEqual(len(ct.PixelData), 128 * 128 * 2, "Pixel data not expected length")
+        # in pydicom v >= 1.0, pixel data auto-converted to numpy.
+        #    Avoid autoconversion using get_item
+        got = len(ct.get_item(0x7fe00010).value)
+        self.assertEqual(got, 128 * 128 * 2, "Pixel data not expected length")
 
         # Also test private elements name can be resolved:
         expected = "[Duration of X-ray on]"
@@ -432,7 +435,7 @@ class ReadDataElementTests(unittest.TestCase):
         file_ds.is_implicit_VR = False
         file_ds.is_little_endian = True
         file_ds.save_as(self.fp_ex)
-        
+
     def test_read_OD_implicit_little(self):
         """Check creation of OD DataElement from byte data works correctly."""
         ds = read_file(self.fp, force=True)

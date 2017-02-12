@@ -161,5 +161,6 @@ def DicomFile(*args, **kwargs):
     return DicomFileLike(open(*args, **kwargs))
 
 
-def DicomBytesIO(*args, **kwargs):
-    return DicomFileLike(BytesIO(*args, **kwargs))
+class DicomBytesIO(DicomFileLike):
+    def __init__(self, *args, **kwargs):
+        super(DicomBytesIO, self).__init__(BytesIO(*args, **kwargs))
