@@ -181,10 +181,7 @@ class ReaderTests(unittest.TestCase):
         self.assertEqual(ct.Rows, 128, "Rows not 128")
         self.assertEqual(ct.Columns, 128, "Columns not 128")
         self.assertEqual(ct.BitsStored, 16, "Bits Stored not 16")
-        # in pydicom v >= 1.0, pixel data auto-converted to numpy.
-        #    Avoid autoconversion using get_item
-        got = len(ct.get_item(0x7fe00010).value)
-        self.assertEqual(got, 128 * 128 * 2, "Pixel data not expected length")
+        self.assertEqual(len(ct.PixelData), 128 * 128 * 2, "Pixel data not expected length")
 
         # Also test private elements name can be resolved:
         expected = "[Duration of X-ray on]"
