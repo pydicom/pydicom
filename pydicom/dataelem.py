@@ -408,7 +408,7 @@ def DataElement_from_raw(raw_data_element, encoding=None):
     Parameters
     ----------
     raw_data_element : namedtuple
-        The RawDataElement data to convert to a DataElement
+        The raw data to convert to a DataElement
     encoding : str
         The encoding of the raw data
 
