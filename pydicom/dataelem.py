@@ -403,7 +403,19 @@ RawDataElement = namedtuple('RawDataElement',
 
 
 def DataElement_from_raw(raw_data_element, encoding=None):
-    """Return a DataElement from a RawDataElement"""
+    """Return a DataElement from a RawDataElement.
+
+    Parameters
+    ----------
+    raw_data_element : namedtuple
+        The RawDataElement data to convert to a DataElement
+    encoding : str
+        The encoding of the raw data
+
+    Returns
+    -------
+    pydicom.dataelem.DataElement
+    """
     from pydicom.values import convert_value  # XXX buried here to avoid circular import filereader->Dataset->convert_value->filereader (for SQ parsing)
     raw = raw_data_element
 
