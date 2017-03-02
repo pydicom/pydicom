@@ -190,7 +190,7 @@ class Dataset(dict):
     def add(self, data_element):
         """Add a DataElement to the Dataset.
 
-        Equivalent to ds[data_element.tag] = data_element.
+        Equivalent to ds[data_element.tag] = data_element
 
         Parameters
         ----------
@@ -245,14 +245,13 @@ class Dataset(dict):
         """Extend dict.__contains__() to handle DICOM keywords.
 
         This is called for code like:
-        >> ds.SliceLocation = -100
-        >> 'SliceLocation' in ds
+        >>> 'SliceLocation' in ds
         True
 
         Parameters
         ----------
-        name : str
-            The Element keyword to search for.
+        name : str or int or 2-tuple
+            The Element keyword or tag to search for.
 
         Returns
         -------
@@ -300,11 +299,9 @@ class Dataset(dict):
 
         If `name` is a DICOM keyword:
             Delete the corresponding DataElement from the Dataset.
-            >>> ds.PatientName = "CITIZEN^John"
             >>> del ds.PatientName
         Else:
             Delete the class attribute as any other class would do.
-            >>> ds._is_some_attribute = True
             >>> del ds._is_some_attribute
 
         Parameters
@@ -327,7 +324,6 @@ class Dataset(dict):
     def __delitem__(self, key):
         """Intercept requests to delete an attribute by key.
 
-        >>> ds.PatientName = "CITIZEN^Joan"
         >>> del ds[0x00100010]
 
         Parameters
@@ -778,13 +774,21 @@ class Dataset(dict):
         return pixel_array
 
     def _compressed_pixel_data_numpy(self):
-        """Return a NumPy array of the pixel data.
+        """Return a NumPy array of the Pixel Data.
 
         NumPy is a numerical package for python. It is used if available.
 
-        :raises TypeError: if no pixel data in this dataset.
-        :raises ImportError: if cannot import numpy.
+        Returns
+        -------
+        numpy.ndarray
+            The Pixel Data as an array.
 
+        Raises
+        ------
+        TypeError
+            If no Pixel Data element in the dataset.
+        ImportError
+            If cannot import numpy.
         """
         if 'PixelData' not in self:
             raise TypeError("No pixel data found in this dataset.")
@@ -853,13 +857,30 @@ class Dataset(dict):
         return arr
 
     def _get_PIL_supported_compressed_pixeldata(self):
+        """Use PIL to decompress compressed Pixel Data.
+
+        Returns
+        -------
+        bytes or str
+            The decompressed Pixel Data
+
+        Raises
+        ------
+        ImportError
+            If PIL is not available.
+        NotImplementedError
+            If unable to decompress the Pixel Data.
+        """
         if not have_pillow:
-            msg = "The pillow package is required to use pixel_array for this transfer syntax {0}, and pillow could not be imported.".format(self.file_meta.TransferSyntaxUID)
+            msg = "The pillow package is required to use pixel_array for " \
+                  "this transfer syntax {0}, and pillow could not be " \
+                  "imported.".format(self.file_meta.TransferSyntaxUID)
             raise ImportError(msg)
         # decompress here
         if self.file_meta.TransferSyntaxUID in pydicom.uid.JPEGLossyCompressedPixelTransferSyntaxes:
             if self.BitsAllocated > 8:
-                raise NotImplementedError("JPEG Lossy only supported if Bits Allocated = 8")
+                raise NotImplementedError("JPEG Lossy only supported if Bits "
+                                          "Allocated = 8")
             generic_jpeg_file_header = b'\xff\xd8\xff\xe0\x00\x10JFIF\x00\x01\x01\x01\x00\x01\x00\x01\x00\x00'
             frame_start_from = 2
         elif self.file_meta.TransferSyntaxUID in pydicom.uid.JPEG2000CompressedPixelTransferSyntaxes:
@@ -897,8 +918,22 @@ class Dataset(dict):
         return UncompressedPixelData
 
     def _get_jpeg_ls_supported_compressed_pixeldata(self):
+        """Use jpeg_ls to decompress compressed Pixel Data.
+
+        Returns
+        -------
+        bytes or str
+            The decompressed Pixel Data
+
+        Raises
+        ------
+        ImportError
+            If jpeg_ls is not available.
+        """
         if not have_jpeg_ls:
-            msg = "The jpeg_ls package is required to use pixel_array for this transfer syntax {0}, and jpeg_ls could not be imported.".format(self.file_meta.TransferSyntaxUID)
+            msg = "The jpeg_ls package is required to use pixel_array for " \
+                  "this transfer syntax {0}, and jpeg_ls could not be " \
+                  "imported.".format(self.file_meta.TransferSyntaxUID)
             raise ImportError(msg)
         # decompress here
         UncompressedPixelData = ''
@@ -918,6 +953,13 @@ class Dataset(dict):
 
     # Use by pixel_array property
     def _get_pixel_array(self):
+        """Convert the Pixel Data to a numpy array.
+
+        Returns
+        -------
+        numpy.ndarray
+            The array containing the Pixel Data.
+        """
         # Check if already have converted to a NumPy array
         # Also check if self.PixelData has changed. If so, get new NumPy array
         already_have = True
