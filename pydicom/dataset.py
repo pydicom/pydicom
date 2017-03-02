@@ -358,7 +358,12 @@ class Dataset(dict):
                 character_set = default_encoding
             # Not converted from raw form read from file yet; do so now
             self[tag] = DataElement_from_raw(data_elem, character_set)
-            
+
+            # If the Element has an ambiguous VR, try to correct it
+            if 'or' in self[tag].VR:
+                from pydicom.filewriter import correct_ambiguous_vr_element
+                self[tag] = correct_ambiguous_vr_element(self[tag], self, 
+                                                         data_elem[6])
             # If pixel data, convert value to numpy array before returning
             # This only happens in this block when converting from raw data elem
             # if tag == 0x7fe00010:
@@ -586,7 +591,7 @@ class Dataset(dict):
         except TypeError:
             msg = ("Data type not understood by NumPy: "
                    "format='%s', PixelRepresentation=%d, BitsAllocated=%d")
-            raise TypeError(msg % (numpy_format, self.PixelRepresentation,
+            raise TypeError(msg % (format_str, self.PixelRepresentation,
                             self.BitsAllocated))
         if self.file_meta.TransferSyntaxUID in pydicom.uid.PILSupportedCompressedPixelTransferSyntaxes:
             UncompressedPixelData = self._get_PIL_supported_compressed_pixeldata()

@@ -121,7 +121,31 @@ def convert_IS_string(byte_string, is_little_endian, struct_format=None):
 
 
 def convert_numbers(byte_string, is_little_endian, struct_format):
-    """Read a "value" of type struct_format from the dicom file. "Value" can be more than one number"""
+    """Convert `byte_string` to a value, depending on `struct_format`.
+
+    Given an encoded DICOM Element value, use `struct_format` and the endianness
+    of the data to decode it.
+
+    Parameters
+    ----------
+    byte_string : bytes
+        The raw byte data to decode.
+    is_little_endian : bool
+        The encoding of `byte_string`.
+    struct_format : str
+        The type of data encoded in `byte_string`.
+
+    Returns
+    -------
+    str
+        If there is no encoded data in `byte_string` then an empty string will
+        be returned.
+    value
+        If `byte_string` encodes a single value then it will be returned.
+    list
+        If `byte_string` encodes multiple values then a list of the decoded
+        values will be returned.
+    """
     endianChar = '><'[is_little_endian]
     bytes_per_value = calcsize("=" + struct_format)  # "=" means use 'standard' size, needed on 64-bit systems.
     length = len(byte_string)
@@ -323,6 +347,8 @@ converters = {
     'FD': (convert_numbers, 'd'),
     'OF': (convert_numbers, 'f'),
     'OB': convert_OBvalue,
+    'OD': convert_OBvalue,
+    'OL': convert_OBvalue,
     'UI': convert_UI,
     'SH': convert_string,
     'DA': convert_DA_string,

@@ -390,12 +390,44 @@ class ReaderTests(unittest.TestCase):
             pl_data = pl_data_ds.PixelData
             self.assertTrue(numpy.all(px_data == pl_data))
 
+    def test_correct_ambiguous_vr(self):
+        """Test correcting ambiguous VR elements read from file"""
+        ds = Dataset()
+        ds.PixelRepresentation = 0
+        ds.add(DataElement(0x00280108, 'US', 10))
+        ds.add(DataElement(0x00280109, 'US', 500))
+
+        fp = BytesIO()
+        file_ds = FileDataset(fp, ds)
+        file_ds.is_implicit_VR = True
+        file_ds.is_little_endian = True
+        file_ds.save_as(fp)
+
+        ds = read_file(fp, force=True)
+        self.assertEqual(ds[0x00280108].VR, 'US')
+        self.assertEqual(ds.SmallestPixelValueInSeries, 10)
+
+    def test_correct_ambiguous_vr_compressed(self):
+        """Test correcting compressed Pixel Data read from file"""
+        # Create an implicit VR compressed dataset
+        ds = read_file(jpeg_lossless_name)
+        fp = BytesIO()
+        file_ds = FileDataset(fp, ds)
+        file_ds.is_implicit_VR = True
+        file_ds.is_little_endian = True
+        file_ds.save_as(fp)
+
+        ds = read_file(fp, force=True)
+        self.assertEqual(ds[0x7fe00010].VR, 'OB')
+
 
 class ReadDataElementTests(unittest.TestCase):
     def setUp(self):
         ds = Dataset()
-        #ds.DoubleFloatPixelData = FIXME # VR of OD
-        # No element in _dicom_dict.py has a VR of OL
+        ds.DoubleFloatPixelData = b'\x00\x01\x02\x03\x04\x05\x06\x07' \
+                                  b'\x01\x01\x02\x03\x04\x05\x06\x07' # VR of OD
+        ds.SelectorOLValue = b'\x00\x01\x02\x03\x04\x05\x06\x07' \
+                             b'\x01\x01\x02\x03' # VR of OL
         ds.PotentialReasonsForProcedure = ['A', 'B', 'C'] # VR of UC, odd length
         ds.StrainDescription = 'Test' # Even length
         ds.URNCodeValue = 'http://test.com' # VR of UR
@@ -413,6 +445,38 @@ class ReadDataElementTests(unittest.TestCase):
         file_ds.is_implicit_VR = False
         file_ds.is_little_endian = True
         file_ds.save_as(self.fp_ex)
+        
+    def test_read_OD_implicit_little(self):
+        """Check creation of OD DataElement from byte data works correctly."""
+        ds = read_file(self.fp, force=True)
+        ref_elem = ds.get(0x7fe00009)
+        elem = DataElement(0x7fe00009, 'OD', b'\x00\x01\x02\x03\x04\x05\x06\x07' \
+                                             b'\x01\x01\x02\x03\x04\x05\x06\x07')
+        self.assertEqual(ref_elem, elem)
+
+    def test_read_OD_explicit_little(self):
+        """Check creation of OD DataElement from byte data works correctly."""
+        ds = read_file(self.fp_ex, force=True)
+        ref_elem = ds.get(0x7fe00009)
+        elem = DataElement(0x7fe00009, 'OD', b'\x00\x01\x02\x03\x04\x05\x06\x07' \
+                                             b'\x01\x01\x02\x03\x04\x05\x06\x07')
+        self.assertEqual(ref_elem, elem)
+
+    def test_read_OL_implicit_little(self):
+        """Check creation of OL DataElement from byte data works correctly."""
+        ds = read_file(self.fp, force=True)
+        ref_elem = ds.get(0x00720075)
+        elem = DataElement(0x00720075, 'OL', b'\x00\x01\x02\x03\x04\x05\x06\x07' \
+                                             b'\x01\x01\x02\x03')
+        self.assertEqual(ref_elem, elem)
+
+    def test_read_OL_explicit_little(self):
+        """Check creation of OL DataElement from byte data works correctly."""
+        ds = read_file(self.fp_ex, force=True)
+        ref_elem = ds.get(0x00720075)
+        elem = DataElement(0x00720075, 'OL', b'\x00\x01\x02\x03\x04\x05\x06\x07' \
+                                             b'\x01\x01\x02\x03')
+        self.assertEqual(ref_elem, elem)
 
     def test_read_UC_implicit_little(self):
         """Check creation of DataElement from byte data works correctly."""
