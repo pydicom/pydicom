@@ -302,7 +302,7 @@ class DataElement(object):
             return self.value[key]
         except TypeError:
             raise TypeError("DataElement value is unscriptable "
-                              "(not a Sequence)")
+                            "(not a Sequence)")
 
     @property
     def name(self):

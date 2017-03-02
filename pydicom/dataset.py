@@ -251,6 +251,7 @@ class Dataset(dict):
         # Callback for walk(), to decode the chr strings if necessary
         # This simply calls the pydicom.charset.decode function
         def decode_callback(ds, data_element):
+            """Callback to decode `data_element`."""
             if data_element.VR == 'SQ':
                 for dset in data_element.value:
                     dset.decode()
@@ -379,7 +380,7 @@ class Dataset(dict):
             # Convert values() to a list for compatibility between
             #   python 2 and 3
             return (list(self.values()) == list(other.values()) and
-                                            self.__dict__ == other.__dict__)
+                    self.__dict__ == other.__dict__)
 
         return NotImplemented
 
@@ -506,7 +507,7 @@ class Dataset(dict):
             # If the Element has an ambiguous VR, try to correct it
             if 'or' in self[tag].VR:
                 from pydicom.filewriter import correct_ambiguous_vr_element
-                self[tag] = correct_ambiguous_vr_element(self[tag], self, 
+                self[tag] = correct_ambiguous_vr_element(self[tag], self,
                                                          data_elem[6])
 
         return dict.__getitem__(self, tag)
@@ -638,7 +639,7 @@ class Dataset(dict):
                 msg = ("Data type not understood by NumPy: "
                        "format='%s', PixelRepresentation=%d, BitsAllocated=%d")
                 raise TypeError(msg % (format_str, self.PixelRepresentation,
-                                self.BitsAllocated))
+                                       self.BitsAllocated))
 
             if self.is_little_endian != sys_is_little_endian:
                 numpy_dtype = numpy_dtype.newbyteorder('S')
@@ -670,7 +671,7 @@ class Dataset(dict):
                 numpy_dtype = gdcm_numpy_typemap[gdcm_pixel_format]
             else:
                 raise TypeError('{0} is not a GDCM supported '
-                                  'pixel format'.format(gdcm_pixel_format))
+                                'pixel format'.format(gdcm_pixel_format))
 
             # GDCM returns char* as type str. Under Python 2 `str` are
             # byte arrays by default. Python 3 decodes this to
@@ -685,7 +686,7 @@ class Dataset(dict):
                 pixel_bytearray = pixel_bytearray.encode("utf-8",
                                                          "surrogateescape")
 
-            # if GDCM indicates that a byte swap is in order, make 
+            # if GDCM indicates that a byte swap is in order, make
             #   sure to inform numpy as well
             if gdcm_image.GetNeedByteSwap():
                 numpy_dtype = numpy_dtype.newbyteorder('S')
@@ -709,7 +710,7 @@ class Dataset(dict):
 
         pixel_array = numpy.fromstring(pixel_bytearray, dtype=numpy_dtype)
 
-        # Note the following reshape operations return a new *view* onto 
+        # Note the following reshape operations return a new *view* onto
         #   pixel_array, but don't copy the data
         if 'NumberOfFrames' in self and self.NumberOfFrames > 1:
             if self.SamplesPerPixel > 1:
@@ -773,7 +774,7 @@ class Dataset(dict):
             msg = ("Data type not understood by NumPy: "
                    "format='%s', PixelRepresentation=%d, BitsAllocated=%d")
             raise TypeError(msg % (format_str, self.PixelRepresentation,
-                            self.BitsAllocated))
+                                   self.BitsAllocated))
         if self.file_meta.TransferSyntaxUID in pydicom.uid.PILSupportedCompressedPixelTransferSyntaxes:
             UncompressedPixelData = self._get_PIL_supported_compressed_pixeldata()
         elif self.file_meta.TransferSyntaxUID in pydicom.uid.JPEGLSSupportedCompressedPixelTransferSyntaxes:
@@ -791,19 +792,24 @@ class Dataset(dict):
         # Note the following reshape operations return a new *view* onto arr, but don't copy the data
         if 'NumberOfFrames' in self and self.NumberOfFrames > 1:
             if self.SamplesPerPixel > 1:
-                arr = arr.reshape(self.NumberOfFrames, self.Rows, self.Columns,  self.SamplesPerPixel)
+                arr = arr.reshape(self.NumberOfFrames, self.Rows, self.Columns,
+                                  self.SamplesPerPixel)
             else:
                 arr = arr.reshape(self.NumberOfFrames, self.Rows, self.Columns)
         else:
             if self.SamplesPerPixel > 1:
                 if self.BitsAllocated == 8:
                     if self.PlanarConfiguration == 0:
-                        arr = arr.reshape(self.Rows, self.Columns, self.SamplesPerPixel)
+                        arr = arr.reshape(self.Rows, self.Columns,
+                                          self.SamplesPerPixel)
                     else:
-                        arr = arr.reshape(self.SamplesPerPixel, self.Rows, self.Columns)
+                        arr = arr.reshape(self.SamplesPerPixel, self.Rows,
+                                          self.Columns)
                         arr = arr.transpose(1, 2, 0)
                 else:
-                    raise NotImplementedError("This code only handles SamplesPerPixel > 1 if Bits Allocated = 8")
+                    raise NotImplementedError("This code only handles "
+                                              "SamplesPerPixel > 1 if Bits "
+                                              "Allocated = 8")
             else:
                 arr = arr.reshape(self.Rows, self.Columns)
         if (self.file_meta.TransferSyntaxUID in pydicom.uid.JPEG2000CompressedPixelTransferSyntaxes and self.BitsStored == 16):
@@ -982,9 +988,9 @@ class Dataset(dict):
         for data_element in self:
             with tag_in_exception(data_element.tag):
                 if data_element.VR == "SQ":   # a sequence
-                    strings.append(indent_str + str(data_element.tag) + 
-                                   "  %s   %i item(s) ---- " 
-                                   %(data_element.description(), 
+                    strings.append(indent_str + str(data_element.tag) +
+                                   "  %s   %i item(s) ---- "
+                                   %(data_element.description(),
                                      len(data_element.value)))
                     if not top_level_only:
                         for dataset in data_element.value:
@@ -1006,6 +1012,14 @@ class Dataset(dict):
     def save_as(self, filename, write_like_original=True):
         """Write the Dataset to a file.
 
+        When saving a new Dataset, you need to add the following attributes:
+        -file_meta : Dataset or None
+        -is_implicit_VR : bool
+        -is_little_endian : bool
+        -preamble : bytes (optional)
+        When saving a FileDataset that has been read from file these attributes
+        should already be present.
+
         Parameters
         ----------
         filename : str
@@ -1014,11 +1028,11 @@ class Dataset(dict):
             If True (default), preserves the following information from
             the Dataset:
             -preamble -- if no preamble in read file, than not used here
-            -hasFileMeta -- if writer did not do file meta information,
+            -file_meta -- if writer did not do file meta information,
                 then don't write here either
-            -seq.is_undefined_length -- if original had delimiters, write them now too,
-                instead of the more sensible length characters
-            - is_undefined_length_sequence_item -- for datasets that belong to a
+            -seq.is_undefined_length -- if original had delimiters, write them
+                now too, instead of the more sensible length characters.
+            -is_undefined_length_sequence_item -- for datasets that belong to a
                 sequence, write the undefined length delimiters if that is
                 what the original had.
             If False, produces a "nicer" DICOM file for other readers,
@@ -1032,13 +1046,14 @@ class Dataset(dict):
         Notes
         -----
         Set Dataset.preamble if you want something other than 128 0-bytes.
-        If the dataset was read from an existing dicom file, then its preamble
-        was stored at read time. It is up to the user to ensure the preamble is still
-        correct for its purposes.
+        If the dataset was read from an existing DICOM file, then its preamble
+        was stored at read time. It is up to the user to ensure the preamble is
+        still correct for its purposes.
 
-        If there is no Transfer Syntax tag in the dataset, then set
-        Dataset.is_implicit_VR and Dataset.is_little_endian
-        to determine the transfer syntax used to write the file.
+        If there is no 'Transfer Syntax UID' element in the file_meta Dataset,
+        then set Dataset.is_implicit_VR (bool) and Dataset.is_little_endian
+        (bool) to automatically determine the transfer syntax used to write the
+        file.
         """
         pydicom.write_file(filename, self, write_like_original)
 
@@ -1087,7 +1102,7 @@ class Dataset(dict):
         Raises
         ------
         ValueError
-            If the `key` value doesn't match the DataElement.tag.
+            If the `key` value doesn't match DataElement.tag.
         """
         # OK if is subclass, e.g. DeferredDataElement
         if not isinstance(value, (DataElement, RawDataElement)):
@@ -1189,25 +1204,50 @@ class Dataset(dict):
 
 
 class FileDataset(Dataset):
+    """An extension of Dataset to make reading and writing to file-like easier.
+
+    Attributes
+    ----------
+    preamble : str or bytes or None
+        The optional DICOM preamble prepended to the dataset, if available.
+    file_meta : pydicom.dataset.Dataset or None
+        The Dataset's file meta information as a Dataset, if available (None if
+        not present). Consists of group 0002 elements.
+    filename : str or None
+        The filename that the dataset was read from (if read from file) or None
+        if the filename is not available (if read from a BytesIO or similar).
+    fileobj_type
+        The object type of the file-like the Dataset was read from.
+    is_implicit_VR : bool
+        True if the dataset encoding is implicit VR, False otherwise.
+    is_little_endian : bool
+        True if the dataset encoding is little endian byte ordering, False
+        otherwise.
+    timestamp : float or None
+        The modification time of the file the dataset was read from, None if
+        the modification time is not available.
+    """
     def __init__(self, filename_or_obj, dataset, preamble=None, file_meta=None,
                  is_implicit_VR=True, is_little_endian=True):
-        """Initialize a dataset read from a DICOM file.
+        """Initialize a Dataset read from a DICOM file.
 
         Parameters
         ----------
-        filename_or_obj : str, None
+        filename_or_obj : str or None
             Full path and filename to the file. Use None if is a BytesIO.
-        dataset : Dataset, dict
-            Some form of dictionary, usually a Dataset from read_dataset()
-        preamble : None, optional
-            The 128-byte DICOM preamble
-        file_meta : None, optional
+        dataset : Dataset or dict
+            Some form of dictionary, usually a Dataset from read_dataset().
+        preamble : bytes or str, optional
+            The 128-byte DICOM preamble.
+        file_meta : Dataset, optional
             The file meta info dataset, as returned by _read_file_meta,
             or an empty dataset if no file meta information is in the file.
-        is_implicit_VR : boolean, optional
-            True (default) if implicit VR transfer syntax used; False if explicit VR.
+        is_implicit_VR : bool, optional
+            True (default) if implicit VR transfer syntax used; False if
+            explicit VR.
         is_little_endian : boolean
-            True (default) if little-endian transfer syntax used; False if big-endian.
+            True (default) if little-endian transfer syntax used; False if
+            big-endian.
         """
         Dataset.__init__(self, dataset)
         self.preamble = preamble
