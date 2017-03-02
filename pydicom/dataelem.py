@@ -297,7 +297,7 @@ class DataElement(object):
             return compat.text_type(str(self))
 
     def __getitem__(self, key):
-        """Return the value at 'key' if the element's `value` is indexable."""
+        """Return the value at `key` if the element's `value` is indexable."""
         try:
             return self.value[key]
         except TypeError:
@@ -403,11 +403,11 @@ RawDataElement = namedtuple('RawDataElement',
 
 
 def DataElement_from_raw(raw_data_element, encoding=None):
-    """Return a DataElement from a RawDataElement.
+    """Return a DataElement created from the data in `raw_data_element`.
 
     Parameters
     ----------
-    raw_data_element : namedtuple
+    raw_data_element : RawDataElement namedtuple
         The raw data to convert to a DataElement
     encoding : str
         The encoding of the raw data

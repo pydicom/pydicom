@@ -8,8 +8,8 @@ Overview of DICOM object model
 Dataset (dict subclass)
   Contains DataElement instances, each of which has a tag, VR, VM and value.
     The DataElement value can be:
-        * A single value, such as a number, string, etc.
-        * A list of numbers, strings, etc. (ie VM > 1)
+        * A single value, such as a number, string, etc. (i.e. VM = 1)
+        * A list of numbers, strings, etc. (i.e. VM > 1)
         * A Sequence (list subclass), where each item is a Dataset which
             contains its own DataElements, and so on in a recursive manner.
 """
@@ -90,46 +90,79 @@ class Dataset(dict):
     --------
     Add DataElements to the Dataset (for elements in the DICOM dictionary).
     >>> ds = Dataset()
-    >>> ds[0x10, 0x10].value = "CITIZEN^Joan"
     >>> ds.PatientName = "CITIZEN^Joan"
+    >>> ds.PatientID = '12345'
+    >>> ds[0x0010, 0x0030] = DataElement(0x00100030, 'DA', '20010101')
 
     Add Sequence DataElement to the Dataset
-    >>> ds = Dataset()
     >>> ds.BeamSequence = [Dataset(), Dataset()]
-    >>> ds.BeamSequence[0].PatientName = "CITIZEN^Joan"
-    >>> ds.BeamSequence[1].PatientID = "1234567"
+    >>> ds.BeamSequence[0].Manufacturer = "Linac, co."
+    >>> ds.BeamSequence[1].Manufacturer = "Linac and Sons, co."
 
-    Add DataElements to the Dataset (for elements not in the DICOM dictionary)
-    >>> ds = Dataset()
+    Add private DataElements to the Dataset
     >>> ds.add(DataElement(0x0043102b, 'SS', [4, 4, 0, 0]))
-    >>> ds.add_new(0x00100010, 'PN', 'CITIZEN^Joan')
+    >>> ds.add_new(0x0043102b, 'SS', [4, 4, 0, 0])
+    >>> ds[0x0043, 0x102b] = DataElement(0x0043102b, 'SS', [4, 4, 0, 0])
 
-    Updating DataElement values
+    Updating and retrieving DataElement values
     >>> ds.PatientName = "CITIZEN^Joan"
+    >>> ds.PatientName
+    'CITIZEN^Joan"
     >>> ds.PatientName = "CITIZEN^John"
-
-    Retrieving a DataElement's value
     >>> ds.PatientName
     'CITIZEN^John'
 
     Retrieving DataElements
     >>> elem = ds[0x00100010]
     >>> elem = ds.data_element('PatientName')
+    >>> elem
+    (0010, 0010) Patient's Name                      PN: 'CITIZEN^Joan'
 
-    Iterating through the Dataset, including Sequences
+    Iterating through the top level of a Dataset only (excluding Sequences)
+    >>> for elem in ds:
+    >>>    print(elem)
+
+    Iterating through the entire Dataset (including Sequences)
     >>> for elem in ds.iterall():
     >>>     print(elem)
 
-    Retrieving DataElements from Sequences
+    Recursively iterate through a Dataset (including Sequences)
+    >>> def recurse(ds):
+    >>>     for elem in ds:
+    >>>         if elem.VR == 'SQ':
+    >>>             [recurse(item) for item in elem]
+    >>>         else:
+    >>>             # Do something useful with each DataElement
+
+    Retrieving a DataElement's value from a Sequence
     >>> ds.BeamSequence[0].Manufacturer
-    'Linac co.'
+    'Linac, co.'
+    >>> ds.BeamSequence[1].Manufacturer
+    'Linac and Sons, co.'
+
+    Deleting a DataElement from the Dataset
+    >>> del ds.PatientID
+    >>> del ds.BeamSequence[1].Manufacturer
+
+    Deleting a private DataElement from the Dataset
+    >>> del ds[0x0043, 0x102b]
+
+    Determining if a DataElement is present in the Dataset
+    >>> 'PatientName' in ds
+    True
+    >>> 'PatientID' in ds
+    False
+    >>> 0x00100030 in ds
+    True
+    >>> 'Manufacturer' in ds.BeamSequence[0]
+    True
 
     Attributes
     ----------
     default_element_format : str
-        The default formatting for string display
+        The default formatting for string display.
     default_sequence_element_format : str
-        The default formatting for string display of sequences
+        The default formatting for string display of sequences.
     indent_chars : str
         For string display, the characters used to indent nested Sequences.
         Default is "   ".
@@ -1090,7 +1123,7 @@ class Dataset(dict):
     def __setitem__(self, key, value):
         """Operator for Dataset[key] = value.
 
-        Check consistency, and deal with private tags
+        Check consistency, and deal with private tags.
 
         Parameters
         ----------
@@ -1106,9 +1139,7 @@ class Dataset(dict):
         """
         # OK if is subclass, e.g. DeferredDataElement
         if not isinstance(value, (DataElement, RawDataElement)):
-            raise TypeError("Dataset contents must be DataElement "
-                            "instances.\nTo set a DataElement value use "
-                            "DataElement.value = val")
+            raise TypeError("Dataset contents must be DataElement instances.")
         tag = Tag(value.tag)
         if key != tag:
             raise ValueError("DataElement.tag must match the dictionary key")
