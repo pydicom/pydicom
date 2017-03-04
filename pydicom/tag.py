@@ -50,9 +50,14 @@ else:
 class BaseTag(BaseTag_base_class):
     """Class for storing the dicom (group, element) tag"""
     # Override comparisons so can convert "other" to Tag as necessary
-    #   See Ordering Comparisons at http://docs.python.org/dev/3.0/whatsnew/3.0.html
+    #   See Ordering Comparisons at:
+    #   http://docs.python.org/dev/3.0/whatsnew/3.0.html
+    def __le__(self, other):
+        """Less than or equal to comparison for `self` and `other`."""
+        return (self == other or self < other)
 
     def __lt__(self, other):
+        """Less than comparison for `self` and `other`."""
         # Check if comparing with another Tag object; if not, create a temp one
         if not isinstance(other, BaseTag):
             try:
@@ -61,7 +66,16 @@ class BaseTag(BaseTag_base_class):
                 raise TypeError("Cannot compare Tag with non-Tag item")
         return BaseTag_base_class(self) < BaseTag_base_class(other)
 
+    def __ge__(self, other):
+        """Greater than or equal to comparison for `self` and `other`."""
+        return (self == other or self > other)
+
+    def __gt__(self, other):
+        """Greater than comparison for `self` and `other`."""
+        return not (self == other or self < other)
+
     def __eq__(self, other):
+        """Equality comparison for `self` and `other`."""
         # Check if comparing with another Tag object; if not, create a temp one
         if not isinstance(other, BaseTag):
             try:
@@ -71,13 +85,8 @@ class BaseTag(BaseTag_base_class):
         return BaseTag_base_class(self) == BaseTag_base_class(other)
 
     def __ne__(self, other):
-        # Check if comparing with another Tag object; if not, create a temp one
-        if not isinstance(other, BaseTag):
-            try:
-                other = Tag(other)
-            except:
-                raise TypeError("Cannot compare Tag with non-Tag item")
-        return BaseTag_base_class(self) != BaseTag_base_class(other)
+        """Inequality comparison for `self` and `other`."""
+        return not (self == other)
 
     # For python 3, any override of __cmp__ or __eq__ immutable requires
     #   explicit redirect of hash function to the parent class

@@ -5,7 +5,219 @@
 #    available at https://github.com/darcymason/pydicom
 
 import unittest
-from pydicom.tag import Tag, TupleTag
+from pydicom.tag import BaseTag, Tag, TupleTag
+
+
+class TestBaseTag(unittest.TestCase):
+    """Test the BaseTag class."""
+    def test_le_same_class(self):
+        """Test __le__ of two classes with same type."""
+        self.assertTrue(BaseTag(0x00000000) <= BaseTag(0x00000001))
+        self.assertTrue(BaseTag(0x00000001) <= BaseTag(0x00000001))
+        self.assertFalse(BaseTag(0x00000001) <= BaseTag(0x00000000))
+
+    def test_le_diff_class(self):
+        """Test __le__ of two classes with different type."""
+        self.assertTrue(BaseTag(0x00000000) <= 1)
+        self.assertTrue(BaseTag(0x00000001) <= 1)
+        self.assertFalse(BaseTag(0x00000001) <= 0)
+
+    def test_le_subclass(self):
+        """Test __le__ of two classes with one as a subclass."""
+        class BaseTagPlus(BaseTag): pass
+        self.assertTrue(BaseTagPlus(0x00000000) <= BaseTag(0x00000001))
+        self.assertTrue(BaseTagPlus(0x00000001) <= BaseTag(0x00000001))
+        self.assertFalse(BaseTagPlus(0x00000001) <= BaseTag(0x00000000))
+
+    def test_le_tuple(self):
+        """Test __le__ of tuple with BaseTag."""
+        self.assertTrue(BaseTag(0x00010001) <= (0x0001, 0x0002))
+        self.assertTrue(BaseTag(0x00010002) <= (0x0001, 0x0002))
+        self.assertFalse(BaseTag(0x00010002) <= (0x0001, 0x0001))
+
+    def test_le_raises(self):
+        """Test __le__ raises TypeError when comparing to non numeric."""
+        def test_raise():
+            BaseTag(0x00010002) <= '0x00010002'
+        self.assertRaises(TypeError, test_raise)
+
+    def test_lt_same_class(self):
+        """Test __lt__ of two classes with same type."""
+        self.assertTrue(BaseTag(0x00000000) < BaseTag(0x00000001))
+        self.assertFalse(BaseTag(0x00000001) < BaseTag(0x00000001))
+        self.assertFalse(BaseTag(0x00000001) < BaseTag(0x00000000))
+
+    def test_lt_diff_class(self):
+        """Test __lt__ of two classes with different type."""
+        self.assertTrue(BaseTag(0x00000000) < 1)
+        self.assertFalse(BaseTag(0x00000001) < 1)
+        self.assertFalse(BaseTag(0x00000001) < 0)
+
+    def test_lt_subclass(self):
+        """Test __lt__ of two classes with one as a subclass."""
+        class BaseTagPlus(BaseTag): pass
+        self.assertTrue(BaseTagPlus(0x00000000) < BaseTag(0x00000001))
+        self.assertFalse(BaseTagPlus(0x00000001) < BaseTag(0x00000001))
+        self.assertFalse(BaseTagPlus(0x00000001) < BaseTag(0x00000000))
+
+    def test_lt_tuple(self):
+        """Test __lt__ of tuple with BaseTag."""
+        self.assertTrue(BaseTag(0x00010001) < (0x0001, 0x0002))
+        self.assertFalse(BaseTag(0x00010002) < (0x0001, 0x0002))
+        self.assertFalse(BaseTag(0x00010002) < (0x0001, 0x0001))
+
+    def test_lt_raises(self):
+        """Test __lt__ raises TypeError when comparing to non numeric."""
+        def test_raise():
+            BaseTag(0x00010002) < '0x00010002'
+        self.assertRaises(TypeError, test_raise)
+
+    def test_ge_same_class(self):
+        """Test __ge__ of two classes with same type."""
+        self.assertFalse(BaseTag(0x00000000) >= BaseTag(0x00000001))
+        self.assertTrue(BaseTag(0x00000001) >= BaseTag(0x00000001))
+        self.assertTrue(BaseTag(0x00000001) >= BaseTag(0x00000000))
+
+    def test_ge_diff_class(self):
+        """Test __ge__ of two classes with different type."""
+        self.assertFalse(BaseTag(0x00000000) >= 1)
+        self.assertTrue(BaseTag(0x00000001) >= 1)
+        self.assertTrue(BaseTag(0x00000001) >= 0)
+
+    def test_ge_subclass(self):
+        """Test __ge__ of two classes with one as a subclass."""
+        class BaseTagPlus(BaseTag): pass
+        self.assertFalse(BaseTagPlus(0x00000000) >= BaseTag(0x00000001))
+        self.assertTrue(BaseTagPlus(0x00000001) >= BaseTag(0x00000001))
+        self.assertTrue(BaseTagPlus(0x00000001) >= BaseTag(0x00000000))
+
+    def test_ge_tuple(self):
+        """Test __ge__ of tuple with BaseTag."""
+        self.assertFalse(BaseTag(0x00010001) >= (0x0001, 0x0002))
+        self.assertTrue(BaseTag(0x00010002) >= (0x0001, 0x0002))
+        self.assertTrue(BaseTag(0x00010002) >= (0x0001, 0x0001))
+
+    def test_ge_raises(self):
+        """Test __ge__ raises TypeError when comparing to non numeric."""
+        def test_raise():
+            BaseTag(0x00010002) >= '0x00010002'
+        self.assertRaises(TypeError, test_raise)
+
+    def test_gt_same_class(self):
+        """Test __gt__ of two classes with same type."""
+        self.assertFalse(BaseTag(0x00000000) > BaseTag(0x00000001))
+        self.assertFalse(BaseTag(0x00000001) > BaseTag(0x00000001))
+        self.assertTrue(BaseTag(0x00000001) > BaseTag(0x00000000))
+
+    def test_gt_diff_class(self):
+        """Test __gt__ of two classes with different type."""
+        self.assertFalse(BaseTag(0x00000000) > 1)
+        self.assertFalse(BaseTag(0x00000001) > 1)
+        self.assertTrue(BaseTag(0x00000001) > 0)
+
+    def test_gt_subclass(self):
+        """Test __gt__ of two classes with one as a subclass."""
+        class BaseTagPlus(BaseTag): pass
+        self.assertFalse(BaseTagPlus(0x00000000) > BaseTag(0x00000001))
+        self.assertFalse(BaseTagPlus(0x00000001) > BaseTag(0x00000001))
+        self.assertTrue(BaseTagPlus(0x00000001) > BaseTag(0x00000000))
+
+    def test_gt_tuple(self):
+        """Test __gt__ of tuple with BaseTag."""
+        self.assertFalse(BaseTag(0x00010001) > (0x0001, 0x0002))
+        self.assertFalse(BaseTag(0x00010002) > (0x0001, 0x0002))
+        self.assertTrue(BaseTag(0x00010002) > (0x0001, 0x0001))
+
+    def test_gt_raises(self):
+        """Test __gt__ raises TypeError when comparing to non numeric."""
+        def test_raise():
+            BaseTag(0x00010002) > '0x00010002'
+        self.assertRaises(TypeError, test_raise)
+
+    def test_eq_same_class(self):
+        """Test __eq__ of two classes with same type."""
+        self.assertTrue(BaseTag(0x00000000) == BaseTag(0x00000000))
+        self.assertFalse(BaseTag(0x00000001) == BaseTag(0x00000000))
+
+    def test_eq_diff_class(self):
+        """Test __eq__ of two classes with different type."""
+        self.assertTrue(BaseTag(0x00000000) == 0)
+        self.assertFalse(BaseTag(0x00000001) == 0)
+
+    def test_eq_subclass(self):
+        """Test __eq__ of two classes with one as a subclass."""
+        class BaseTagPlus(BaseTag): pass
+        self.assertTrue(BaseTagPlus(0x00000000) == BaseTag(0x00000000))
+        self.assertFalse(BaseTagPlus(0x00000001) == BaseTag(0x00000000))
+
+    def test_eq_tuple(self):
+        """Test __eq__ of tuple with BaseTag."""
+        self.assertTrue(BaseTag(0x00010002) == (0x0001, 0x0002))
+        self.assertFalse(BaseTag(0x00010001) == (0x0001, 0x0002))
+
+    def test_eq_raises(self):
+        """Test __eq__ raises TypeError when comparing to non numeric."""
+        def test_raise():
+            BaseTag(0x00010002) == '0x00010002'
+        self.assertRaises(TypeError, test_raise)
+
+    def test_ne_same_class(self):
+        """Test __ne__ of two classes with same type."""
+        self.assertFalse(BaseTag(0x00000000) != BaseTag(0x00000000))
+        self.assertTrue(BaseTag(0x00000001) != BaseTag(0x00000000))
+
+    def test_ne_diff_class(self):
+        """Test __ne__ of two classes with different type."""
+        self.assertFalse(BaseTag(0x00000000) != 0)
+        self.assertTrue(BaseTag(0x00000001) != 0)
+
+    def test_ne_subclass(self):
+        """Test __ne__ of two classes with one as a subclass."""
+        class BaseTagPlus(BaseTag): pass
+        self.assertFalse(BaseTagPlus(0x00000000) != BaseTag(0x00000000))
+        self.assertTrue(BaseTagPlus(0x00000001) != BaseTag(0x00000000))
+
+    def test_ne_tuple(self):
+        """Test __ne__ of tuple with BaseTag."""
+        self.assertFalse(BaseTag(0x00010002) != (0x0001, 0x0002))
+        self.assertTrue(BaseTag(0x00010001) != (0x0001, 0x0002))
+
+    def test_ne_raises(self):
+        """Test __ne__ raises TypeError when comparing to non numeric."""
+        def test_raise():
+            BaseTag(0x00010002) != '0x00010002'
+        self.assertRaises(TypeError, test_raise)
+
+    def test_hash(self):
+        """Test hash of BaseTag class."""
+        self.assertEqual(hash(BaseTag(0x00010001)), hash(BaseTag(0x00010001)))
+        self.assertNotEqual(hash(BaseTag(0x00010001)), hash(BaseTag(0x00010002)))
+        self.assertNotEqual(hash(BaseTag(0x00020001)), hash(BaseTag(0x00010002)))
+
+    def test_str(self):
+        """Test str(BaseTag) produces correct value."""
+        self.assertEqual(str(BaseTag(0x00000000)), '(0000, 0000)')
+        self.assertEqual(str(BaseTag(0x00010002)), '(0001, 0002)')
+        self.assertEqual(str(BaseTag(0x10002000)), '(1000, 2000)')
+        self.assertEqual(str(BaseTag(0xFFFFFFFE)), '(ffff, fffe)')
+
+    def test_group(self):
+        """Test BaseTag.group returns correct values."""
+        self.assertEqual(BaseTag(0x00000001).group, 0x0000)
+        self.assertEqual(BaseTag(0x00020001).group, 0x0002)
+        self.assertEqual(BaseTag(0xFFFF0001).group, 0xFFFF)
+
+    def test_element(self):
+        """Test BaseTag.element returns correct values."""
+        self.assertEqual(BaseTag(0x00010000).element, 0x0000)
+        self.assertEqual(BaseTag(0x00010002).element, 0x0002)
+        self.assertEqual(BaseTag(0x0001FFFF).element, 0xFFFF)
+
+    def test_private(self):
+        """Test BaseTag.is_private returns correct values."""
+        self.assertTrue(BaseTag(0x00010001).is_private) # Odd groups private
+        self.assertFalse(BaseTag(0x00020001).is_private) # Even groups not private
+        self.assertFalse(BaseTag(0x00000001).is_private) # Group 0 not private
 
 
 class Values(unittest.TestCase):
@@ -57,36 +269,6 @@ class Values(unittest.TestCase):
     def testBadInts(self):
         """Tags constructed with > 8 bytes gives OverflowError......."""
         self.assertRaises(OverflowError, Tag, 0x123456789)
-
-
-class Comparisons(unittest.TestCase):
-    def setUp(self):
-        self.int1 = 0x300a00b0
-        self.tup1 = (0x300a, 0xb0)
-        self.tup3 = (0xFFFE, 0xFFFC)
-        self.t1 = Tag(self.int1)
-        self.t2 = Tag(self.tup1)
-        self.t3 = Tag(self.tup3)
-
-    def testCmpEq(self):
-        """Tags compare correctly (==)..............................."""
-        self.assertTrue(self.t1 == self.int1, "tag t1 was not equal to int1")
-        self.assertTrue(self.t1 == self.t2, "tag t1 did not equal other tag")
-        self.assertTrue(self.t1 == self.tup1, "tag t1 did not equal its tuple")
-
-    def testCmpNotEq(self):
-        self.assertTrue(self.t1 != self.t3, "Not equal comparison failed")
-
-    def testCmpLT(self):
-        """Tags compare correctly (<, >)............................."""
-        self.assertTrue(self.t1 < self.int1 + 1, "tag < failed")
-        self.assertTrue(self.int1 + 1 > self.t1, "int > tag failed")
-        self.assertTrue(self.t3 > self.t1, "'negative' int tag > other tag failed")
-
-    def testHash(self):
-        """Tags hash the same as an int.............................."""
-        self.assertTrue(hash(self.t1) == hash(self.int1))
-        self.assertTrue(hash(self.t2) == hash(self.int1))
 
 
 if __name__ == "__main__":
