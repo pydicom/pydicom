@@ -38,7 +38,7 @@ class TestBaseTag(unittest.TestCase):
     def test_le_raises(self):
         """Test __le__ raises TypeError when comparing to non numeric."""
         def test_raise():
-            BaseTag(0x00010002) <= '0x00010002'
+            BaseTag(0x00010002) <= 'Something'
         self.assertRaises(TypeError, test_raise)
 
     def test_lt_same_class(self):
@@ -69,7 +69,7 @@ class TestBaseTag(unittest.TestCase):
     def test_lt_raises(self):
         """Test __lt__ raises TypeError when comparing to non numeric."""
         def test_raise():
-            BaseTag(0x00010002) < '0x00010002'
+            BaseTag(0x00010002) < 'Somethin'
         self.assertRaises(TypeError, test_raise)
 
     def test_ge_same_class(self):
@@ -100,7 +100,7 @@ class TestBaseTag(unittest.TestCase):
     def test_ge_raises(self):
         """Test __ge__ raises TypeError when comparing to non numeric."""
         def test_raise():
-            BaseTag(0x00010002) >= '0x00010002'
+            BaseTag(0x00010002) >= 'AGHIJJJJ'
         self.assertRaises(TypeError, test_raise)
 
     def test_gt_same_class(self):
@@ -131,7 +131,7 @@ class TestBaseTag(unittest.TestCase):
     def test_gt_raises(self):
         """Test __gt__ raises TypeError when comparing to non numeric."""
         def test_raise():
-            BaseTag(0x00010002) > '0x00010002'
+            BaseTag(0x00010002) > 'BLUH'
         self.assertRaises(TypeError, test_raise)
 
     def test_eq_same_class(self):
@@ -158,7 +158,7 @@ class TestBaseTag(unittest.TestCase):
     def test_eq_raises(self):
         """Test __eq__ raises TypeError when comparing to non numeric."""
         def test_raise():
-            BaseTag(0x00010002) == '0x00010002'
+            BaseTag(0x00010002) == 'eraa'
         self.assertRaises(TypeError, test_raise)
 
     def test_ne_same_class(self):
@@ -185,7 +185,7 @@ class TestBaseTag(unittest.TestCase):
     def test_ne_raises(self):
         """Test __ne__ raises TypeError when comparing to non numeric."""
         def test_raise():
-            BaseTag(0x00010002) != '0x00010002'
+            BaseTag(0x00010002) != 'aaag'
         self.assertRaises(TypeError, test_raise)
 
     def test_hash(self):
@@ -220,55 +220,107 @@ class TestBaseTag(unittest.TestCase):
         self.assertFalse(BaseTag(0x00000001).is_private) # Group 0 not private
 
 
-class Values(unittest.TestCase):
-    def testGoodInts(self):
-        """Tags can be constructed with 4-byte integers.............."""
-        Tag(0x300a00b0)
-        Tag(0xFFFFFFEE)
+class TestTag(unittest.TestCase):
+    """Test the Tag method."""
+    def test_tag_single_int(self):
+        """Test creating a Tag from a single int."""
+        self.assertEqual(Tag(0x0000), BaseTag(0x00000000))
+        self.assertEqual(Tag(10), BaseTag(0x0000000A))
+        self.assertEqual(Tag(0xFFFF), BaseTag(0x0000FFFF))
+        self.assertEqual(Tag(0x00010002), BaseTag(0x00010002))
 
-    def testGoodTuple(self):
-        """Tags can be constructed with two-tuple of 2-byte integers."""
-        TupleTag((0xFFFF, 0xFFee))
-        tag = TupleTag((0x300a, 0x00b0))
-        self.assertEqual(tag.group, 0x300a, "Expected tag.group 0x300a, got %r" % tag.group)
+        # Must be 32-bit
+        self.assertRaises(OverflowError, Tag, 0xFFFFFFFF1)
+        # Must be positive
+        self.assertRaises(ValueError, Tag, -1)
 
-    def testAnyUnpack(self):
-        """Tags can be constructed from list........................."""
-        Tag([2, 0])
+    def test_tag_single_tuple(self):
+        """Test creating a Tag from a single tuple."""
+        self.assertEqual(Tag((0x0000, 0x0000)), BaseTag(0x00000000))
+        self.assertEqual(Tag((0x22, 0xFF)), BaseTag(0x002200FF))
+        self.assertEqual(Tag((14, 0xF)), BaseTag(0x000E000F))
+        self.assertEqual(Tag((0x1000, 0x2000)), BaseTag(0x10002000))
 
-    def testBadTuple(self):
-        """Tags: if a tuple, must be a 2-tuple......................."""
-        self.assertRaises(ValueError, Tag, (1, 2, 3, 4))
+        # Must be 2 tuple
+        self.assertRaises(ValueError, Tag, (0x1000, 0x2000, 0x0030))
+        # Must be 32-bit
+        self.assertRaises(OverflowError, Tag, (0xFFFF, 0xFFFF1))
+        # Must be positive
+        self.assertRaises(ValueError, Tag, (-1, 0))
+        self.assertRaises(ValueError, Tag, (0, -1))
 
-    def testNonNumber(self):
-        """Tags cannot be instantiated from a non-hex string........."""
-        self.assertRaises(ValueError, Tag, "hello")
+    def test_tag_single_list(self):
+        """Test creating a Tag from a single list."""
+        self.assertEqual(Tag([0x0000, 0x0000]), BaseTag(0x00000000))
+        self.assertEqual(Tag([0x99, 0xFE]), BaseTag(0x009900FE))
+        self.assertEqual(Tag([15, 0xE]), BaseTag(0x000F000E))
+        self.assertEqual(Tag([0x1000, 0x2000]), BaseTag(0x10002000))
 
-    def testHexString(self):
-        """Tags can be instantiated from hex strings................."""
-        tag = Tag('0010', '0002')
-        self.assertEqual(tag.group, 16)
-        self.assertEqual(tag.elem, 2)
+        # Must be 2 list
+        self.assertRaises(ValueError, Tag, [0x1000, 0x2000, 0x0030])
+        self.assertRaises(ValueError, Tag, [0x1000])
+        # Must be 32-bit
+        self.assertRaises(OverflowError, Tag, [65536, 0])
+        self.assertRaises(OverflowError, Tag, [0, 65536])
+        # Must be positive
+        self.assertRaises(ValueError, Tag, [-1, 0])
+        self.assertRaises(ValueError, Tag, [0, -1])
 
-    def testStr(self):
-        """Tags have (gggg, eeee) string rep........................."""
-        self.assertTrue(str(Tag(0x300a00b0)) == "(300a, 00b0)")
+    def test_tag_single_str(self):
+        """Test creating a Tag from a single str raises."""
+        self.assertEqual(Tag('0x10002000'), BaseTag(0x10002000))
+        self.assertEqual(Tag('0x2000'), BaseTag(0x00002000))
+        self.assertEqual(Tag('15'), BaseTag(0x00000015))
+        self.assertEqual(Tag('0xF'), BaseTag(0x0000000F))
 
-    def testGroup(self):
-        """Tags' group and elem portions extracted properly.........."""
-        tag = Tag(0x300a00b0)
-        self.assertTrue(tag.group == 0x300a)
-        self.assertTrue(tag.elem == 0xb0)
-        self.assertTrue(tag.element == 0xb0)
+        # Must be 32-bit
+        self.assertRaises(OverflowError, Tag, '0xFFFFFFFF1')
+        # Must be positive
+        self.assertRaises(ValueError, Tag, '-0x01')
+        # Must be numeric str
+        self.assertRaises(ValueError, Tag, 'hello')
 
-    def testZeroElem(self):
-        """Tags with arg2=0 ok (was issue 47)........................"""
-        tag = Tag(2, 0)
-        self.assertTrue(tag.group == 2 and tag.elem == 0)
+    def test_tag_double_str(self):
+        """Test creating a Tag from two str."""
+        self.assertEqual(Tag('0x1000', '0x2000'), BaseTag(0x10002000))
+        self.assertEqual(Tag('0x10', '0x20'), BaseTag(0x00100020))
+        self.assertEqual(Tag('15', '0'), BaseTag(0x00150000))
+        self.assertEqual(Tag('0xF', '0'), BaseTag(0x000F0000))
 
-    def testBadInts(self):
-        """Tags constructed with > 8 bytes gives OverflowError......."""
-        self.assertRaises(OverflowError, Tag, 0x123456789)
+        # Must be 32-bit
+        self.assertRaises(OverflowError, Tag, '0xFFFF1', '0')
+        self.assertRaises(OverflowError, Tag, '0', '0xFFFF1')
+        # Must be positive
+        self.assertRaises(ValueError, Tag, '-0x01', '0')
+        self.assertRaises(ValueError, Tag, '0', '-0x01')
+        self.assertRaises(ValueError, Tag, '-1', '-0x01')
+        # Must both be str
+        self.assertRaises(ValueError, Tag, '0x01', 0)
+        self.assertRaises(ValueError, Tag, 0, '0x01')
+
+    def test_tag_double_int(self):
+        """Test creating a Tag from a two ints."""
+        self.assertEqual(Tag(0x0000, 0x0000), BaseTag(0x00000000))
+        self.assertEqual(Tag(2, 0), BaseTag(0x00020000)) # Issue #47
+        self.assertTrue(Tag(2, 0).elem == 0x0000)
+        self.assertEqual(Tag(0x99, 0xFE), BaseTag(0x009900FE))
+        self.assertEqual(Tag(15, 14), BaseTag(0x000F000E))
+        self.assertEqual(Tag(0x1000, 0x2000), BaseTag(0x10002000))
+
+        # Must be 32-bit
+        self.assertRaises(OverflowError, Tag, 65536, 0)
+        self.assertRaises(OverflowError, Tag, 0, 65536)
+        # Must be positive
+        self.assertRaises(ValueError, Tag, -1, 0)
+        self.assertRaises(ValueError, Tag, 0, -1)
+        self.assertRaises(ValueError, Tag, -65535, -1)
+
+
+class TestTupleTag(unittest.TestCase):
+    """Test the TupleTag method."""
+    def test_tuple_tag(self):
+        """Test quick tag construction with TupleTag."""
+        self.assertTrue(TupleTag((0xFFFF, 0xFFee)), BaseTag(0xFFFFFFEE))
 
 
 if __name__ == "__main__":
