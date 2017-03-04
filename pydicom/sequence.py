@@ -1,5 +1,7 @@
-# sequence.py
-"""Hold the Sequence class, which stores a dicom sequence (list of Datasets)"""
+"""Define the Sequence class, which contains a sequence DataElement's items.
+
+Sequence is a list of pydicom Dataset objects.
+"""
 # Copyright (c) 2008-2012 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
 #    See the file license.txt included with this distribution, also
@@ -10,15 +12,15 @@ from pydicom.multival import MultiValue
 
 
 def validate_dataset(elem):
-    """Ensures that the value is a Dataset instance"""
+    """Check that `elem` is a Dataset instance."""
     if not isinstance(elem, Dataset):
-        raise TypeError('Sequence contents must be a Dataset instance')
+        raise TypeError('Sequence contents must be Dataset instances.')
 
     return elem
 
 
 class Sequence(MultiValue):
-    """Class to hold multiple Datasets in a list
+    """Class to hold multiple Datasets in a list.
 
     This class is derived from MultiValue and as such enforces that all items
     added to the list are Dataset instances. In order to due this, a validator
@@ -26,10 +28,13 @@ class Sequence(MultiValue):
     class
     """
     def __init__(self, iterable=None):
-        """Initialize a list of Datasets
+        """Initialize a list of Datasets.
 
-        :param iterable: an iterable (e.g. list, tuple) of Datasets. If no
-                        value is provided, an empty Sequence is generated
+        Parameters
+        ----------
+        iterable : list-like of pydicom.dataset.Dataset, optional
+            An iterable object (e.g. list, tuple) containing Datasets. If not
+            used then an empty Sequence is generated.
         """
         # We add this extra check to throw a relevant error. Without it, the
         # error will be simply that a Sequence must contain Datasets (since a
@@ -47,11 +52,12 @@ class Sequence(MultiValue):
         super(Sequence, self).__init__(validate_dataset, iterable)
 
     def __str__(self):
+        """String description of the Sequence."""
         lines = [str(x) for x in self]
         return "[" + "".join(lines) + "]"
 
     def __repr__(self):
-        """Sequence-specific string representation"""
+        """String representation of the Sequence."""
         formatstr = "<%(classname)s, length %(count)d, at %(id)X>"
         return formatstr % {'classname': self.__class__.__name__,
                             'id': id(self), 'count': len(self)}
