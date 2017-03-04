@@ -51,7 +51,7 @@ def Tag(arg, arg2=None):
         # Check argument types aren't mixed (i.e. str and int)
         arg_types = set([type(arg[0]), type(arg[1])])
         if len(arg_types) != 1:
-            raise ValueError("Both arguments must be the same type.")
+            raise ValueError("Both arguments for Tag must be the same type.")
 
         # Double str parameters
         if isinstance(arg[0], (str, compat.text_type)):
