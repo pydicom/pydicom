@@ -22,6 +22,7 @@ def Tag(arg, arg2=None):
     * Tag(0x00100015)
     * Tag('0x00100015')
     * Tag((0x10, 0x50))
+    * Tag(('0x10', '0x50'))
     * Tag(0x0010, 0x0015)
     * Tag(0x10, 0x15)
     * Tag(2341, 0x10)
@@ -32,7 +33,7 @@ def Tag(arg, arg2=None):
     arg : int or str or 2-tuple/list
         If int or str, then either the group or the combined group/element
         number of the DICOM tag. If 2-tuple/list then the (group, element)
-        numbers.
+        numbers as int or str.
     arg2 : int or str, optional
         The element number of the DICOM tag, required when `arg` only contains
         the group number of the tag.

@@ -240,14 +240,24 @@ class TestTag(unittest.TestCase):
         self.assertEqual(Tag((0x22, 0xFF)), BaseTag(0x002200FF))
         self.assertEqual(Tag((14, 0xF)), BaseTag(0x000E000F))
         self.assertEqual(Tag((0x1000, 0x2000)), BaseTag(0x10002000))
+        self.assertEqual(Tag(('0x01', '0x02')), BaseTag(0x00010002))
 
         # Must be 2 tuple
         self.assertRaises(ValueError, Tag, (0x1000, 0x2000, 0x0030))
+        self.assertRaises(ValueError, Tag, ('0x10', '0x20', '0x03'))
         # Must be 32-bit
         self.assertRaises(OverflowError, Tag, (0xFFFF, 0xFFFF1))
+        self.assertRaises(OverflowError, Tag, ('0xFFFF', '0xFFFF1'))
         # Must be positive
         self.assertRaises(ValueError, Tag, (-1, 0))
         self.assertRaises(ValueError, Tag, (0, -1))
+        self.assertRaises(ValueError, Tag, ('0x0', '-0x1'))
+        self.assertRaises(ValueError, Tag, ('-0x1', '0x0'))
+        # Can't have second parameter
+        self.assertRaises(ValueError, Tag, (0x01, 0x02), 0x01)
+        self.assertRaises(ValueError, Tag, (0x01, 0x02), '0x01')
+        self.assertRaises(ValueError, Tag, ('0x01', '0x02'), '0x01')
+        self.assertRaises(ValueError, Tag, ('0x01', '0x02'), 0x01)
 
     def test_tag_single_list(self):
         """Test creating a Tag from a single list."""
@@ -255,16 +265,27 @@ class TestTag(unittest.TestCase):
         self.assertEqual(Tag([0x99, 0xFE]), BaseTag(0x009900FE))
         self.assertEqual(Tag([15, 0xE]), BaseTag(0x000F000E))
         self.assertEqual(Tag([0x1000, 0x2000]), BaseTag(0x10002000))
+        self.assertEqual(Tag(['0x01', '0x02']), BaseTag(0x00010002))
 
         # Must be 2 list
         self.assertRaises(ValueError, Tag, [0x1000, 0x2000, 0x0030])
+        self.assertRaises(ValueError, Tag, ['0x10', '0x20', '0x03'])
         self.assertRaises(ValueError, Tag, [0x1000])
+        self.assertRaises(ValueError, Tag, ['0x10'])
         # Must be 32-bit
         self.assertRaises(OverflowError, Tag, [65536, 0])
         self.assertRaises(OverflowError, Tag, [0, 65536])
+        self.assertRaises(OverflowError, Tag, ('0xFFFF', '0xFFFF1'))
         # Must be positive
         self.assertRaises(ValueError, Tag, [-1, 0])
         self.assertRaises(ValueError, Tag, [0, -1])
+        self.assertRaises(ValueError, Tag, ('0x0', '-0x1'))
+        self.assertRaises(ValueError, Tag, ('-0x1', '0x0'))
+        # Can't have second parameter
+        self.assertRaises(ValueError, Tag, [0x01, 0x02], 0x01)
+        self.assertRaises(ValueError, Tag, [0x01, 0x02], '0x01')
+        self.assertRaises(ValueError, Tag, ['0x01', '0x02'], '0x01')
+        self.assertRaises(ValueError, Tag, ['0x01', '0x02'], 0x01)
 
     def test_tag_single_str(self):
         """Test creating a Tag from a single str raises."""

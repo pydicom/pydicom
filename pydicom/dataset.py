@@ -213,10 +213,10 @@ class Dataset(dict):
             5, Section 6.2).
         value
             The value of the data element. One of the following:
-            * a single string value
-            * a number
+            * a single string or number
             * a list or tuple with all strings or all numbers
             * a multi-value string with backslash separator
+            * for a sequence DataElement, an empty list or list of Dataset
         """
         data_element = DataElement(tag, VR, value)
         # use data_element.tag since DataElement verified it
@@ -234,7 +234,7 @@ class Dataset(dict):
         -------
         pydicom.dataelem.DataElement or None
             For the given DICOM element `keyword`, return the corresponding
-            Dataset Dataelement if present, None otherwise.
+            Dataset DataElement if present, None otherwise.
         """
         tag = tag_for_name(name)
         if tag:
@@ -459,7 +459,7 @@ class Dataset(dict):
     def __getattr__(self, name):
         """Intercept requests for unknown Dataset attribute names.
 
-        If the name matches a Dicom keyword, return the value for the
+        If the name matches a DICOM keyword, return the value for the
         DataElement with the corresponding tag.
 
         Parameters
@@ -587,14 +587,14 @@ class Dataset(dict):
         return ds
 
     def __iter__(self):
-        """Iterate through the Dataset, yielding DataElements.
+        """Iterate through the top-level of the Dataset, yielding DataElements.
 
         >>> for elem in ds:
         >>>     print(elem)
 
-        The data_elements are returned in DICOM order, i.e. in increasing order
-        by tag value. Sequence items are returned as a single DataElement, so it
-        is up to the calling code to recurse into the Sequence items if desired.
+        The DataElements are returned in increasing tag value order.
+        Sequence items are returned as a single DataElement, so it is up to the
+        calling code to recurse into the Sequence items if desired.
 
         Yields
         ------
@@ -1137,8 +1137,8 @@ class Dataset(dict):
     def __setattr__(self, name, value):
         """Intercept any attempts to set a value for an instance attribute.
 
-        If name is a dicom descriptive string (cleaned with CleanName), then
-        set the corresponding tag and data_element.
+        If name is a DICOM descriptive string (cleaned with CleanName), then
+        set the corresponding tag and DataElement.
         Else, set an instance (python) attribute as any other class would do.
 
         Parameters
@@ -1226,7 +1226,7 @@ class Dataset(dict):
                 self[Tag(key)] = value
 
     def iterall(self):
-        """Iterate through the dataset, yielding all data elements.
+        """Iterate through the Dataset, yielding all DataElements.
 
         Unlike Dataset.__iter__, this *does* recurse into sequences,
         and so returns all data elements as if the file were "flattened".
@@ -1246,13 +1246,12 @@ class Dataset(dict):
     def walk(self, callback, recursive=True):
         """Iterate through the DataElements and run `callback` on each.
 
-        Visit all data_elements, possibly recursing into sequences and their datasets,
-        The callback function is called for each data_element
-        (including SQ element).
-        Can be used to perform an operation on certain types of data_elements.
-        E.g., `remove_private_tags`() finds all private tags and deletes them.
-        `DataElement`s will come back in DICOM order (by increasing tag number
-        within their dataset)
+        Visit all DataElements, possibly recursing into sequences and their
+        datasets. The callback function is called for each DataElement
+        (including SQ element). Can be used to perform an operation on certain
+        types of DataElements. E.g., `remove_private_tags`() finds all private
+        tags and deletes them. DataElement`s will come back in DICOM order (by
+        increasing tag number within their dataset).
 
         Parameters
         ----------
