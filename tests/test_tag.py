@@ -341,7 +341,7 @@ class TestTupleTag(unittest.TestCase):
     """Test the TupleTag method."""
     def test_tuple_tag(self):
         """Test quick tag construction with TupleTag."""
-        self.assertTrue(TupleTag((0xFFFF, 0xFFee)), BaseTag(0xFFFFFFEE))
+        self.assertEqual(TupleTag((0xFFFF, 0xFFee)), BaseTag(0xFFFFFFEE))
 
 
 if __name__ == "__main__":
