@@ -19,18 +19,21 @@ def Tag(arg, arg2=None):
     """Create a Tag.
 
     General function for creating a Tag in any of the standard forms:
-    * Tag(0x00100010)
-    * Tag(0x0010, 0x0010)
-    * Tag(0x10, 0x10)
-    * Tag('0x0010', '0x0010')
-    * Tag((0x10, 0x10))
+    * Tag(0x00100015)
+    * Tag('0x00100015')
+    * Tag((0x10, 0x50))
+    * Tag(('0x10', '0x50'))
+    * Tag(0x0010, 0x0015)
+    * Tag(0x10, 0x15)
+    * Tag(2341, 0x10)
+    * Tag('0xFE', '0x0010')
 
     Parameters
     ----------
-    arg : int or str or 2-tuple
-        If int, then either the group or the combined group/element number of
-        the DICOM tag. If str, only the group number should be provided. If
-        2-tuple then the (group, element) numbers.
+    arg : int or str or 2-tuple/list
+        If int or str, then either the group or the combined group/element
+        number of the DICOM tag. If 2-tuple/list then the (group, element)
+        numbers as int or str.
     arg2 : int or str, optional
         The element number of the DICOM tag, required when `arg` only contains
         the group number of the tag.
@@ -46,23 +49,38 @@ def Tag(arg, arg2=None):
         if len(arg) != 2:
             raise ValueError("Tag must be an int or a 2-tuple")
 
-        if isinstance(arg[0], (str, compat.text_type)):  # py2to3: unicode not needed in py3
-            if not isinstance(arg[1], (str, compat.text_type)):  # py3: ditto
-                raise ValueError("Both arguments must be hex strings if one is")
+        # Check argument types aren't mixed (i.e. str and int)
+        arg_types = set([type(arg[0]), type(arg[1])])
+        if len(arg_types) != 1:
+            raise ValueError("Both arguments for Tag must be the same type.")
+
+        # Double str parameters
+        if isinstance(arg[0], (str, compat.text_type)):
             arg = (int(arg[0], 16), int(arg[1], 16))
 
         if arg[0] > 0xFFFF or arg[1] > 0xFFFF:
-            raise OverflowError("Groups and elements of tags must each be <=2 byte integers")
+            raise OverflowError("Groups and elements of tags must each "
+                                "be <=2 byte integers")
 
         long_value = (arg[0] << 16) | arg[1]
 
-    elif isinstance(arg, (str, compat.text_type)):  # py2to3: unicode not needed in pure py3
-        raise ValueError("Tags cannot be instantiated from a single string")
-
-    else:  # given a single number to use as a tag, as if (group, elem) already joined to a long
+    # Single str parameter
+    elif isinstance(arg, (str, compat.text_type)):
+        arg = int(arg, 16)
         long_value = arg
         if long_value > 0xFFFFFFFF:
-            raise OverflowError("Tags are limited to 32-bit length; tag {0!r}".format(arg))
+            raise OverflowError("Tags are limited to 32-bit length; tag {0!r}"
+                                .format(arg))
+
+    # Single int parameter
+    else:
+        long_value = arg
+        if long_value > 0xFFFFFFFF:
+            raise OverflowError("Tags are limited to 32-bit length; tag {0!r}"
+                                .format(arg))
+
+    if long_value < 0:
+        raise ValueError("Tags must be positive.")
 
     return BaseTag(long_value)
 
@@ -88,10 +106,14 @@ class BaseTag(BaseTag_base_class):
         Returns True if the corresponding element is private, False otherwise.
     """
     # Override comparisons so can convert "other" to Tag as necessary
-    #   See Ordering Comparisons at http://docs.python.org/dev/3.0/whatsnew/3.0.html
+    #   See Ordering Comparisons at:
+    #   http://docs.python.org/dev/3.0/whatsnew/3.0.html
+    def __le__(self, other):
+        """Return True if `self`  is less than or equal to `other`."""
+        return (self == other or self < other)
 
     def __lt__(self, other):
-        """Returns True if `self` is less than `other`."""
+        """Return True if `self` is less than `other`."""
         # Check if comparing with another Tag object; if not, create a temp one
         if not isinstance(other, BaseTag):
             try:
@@ -100,8 +122,16 @@ class BaseTag(BaseTag_base_class):
                 raise TypeError("Cannot compare Tag with non-Tag item")
         return BaseTag_base_class(self) < BaseTag_base_class(other)
 
+    def __ge__(self, other):
+        """Return True if `self` is greater than or equal to `other`."""
+        return (self == other or self > other)
+
+    def __gt__(self, other):
+        """Return True if `self` is greater than `other`."""
+        return not (self == other or self < other)
+
     def __eq__(self, other):
-        """Compare `self` and `other` for equality."""
+        """Return True if `self` equals `other`."""
         # Check if comparing with another Tag object; if not, create a temp one
         if not isinstance(other, BaseTag):
             try:
@@ -111,14 +141,8 @@ class BaseTag(BaseTag_base_class):
         return BaseTag_base_class(self) == BaseTag_base_class(other)
 
     def __ne__(self, other):
-        """Compare `self` and `other` for inequality."""
-        # Check if comparing with another Tag object; if not, create a temp one
-        if not isinstance(other, BaseTag):
-            try:
-                other = Tag(other)
-            except:
-                raise TypeError("Cannot compare Tag with non-Tag item")
-        return BaseTag_base_class(self) != BaseTag_base_class(other)
+        """Return True if `self` does not equal `other`."""
+        return not (self == other)
 
     # For python 3, any override of __cmp__ or __eq__ immutable requires
     #   explicit redirect of hash function to the parent class
@@ -140,6 +164,7 @@ class BaseTag(BaseTag_base_class):
     def element(self):
         """Return the tag's element number."""
         return self & 0xffff
+
     elem = element  # alternate syntax
 
     @property
