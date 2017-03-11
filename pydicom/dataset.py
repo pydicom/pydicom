@@ -1162,7 +1162,7 @@ class Dataset(dict):
             self[tag] = data_element
         else:  # name not in dicom dictionary - setting a non-dicom instance attribute
             # XXX note if user mis-spells a dicom data_element - no error!!!
-            self.__dict__[name] = value
+            super(dict, self).__setattr__(name, value)
 
     def __setitem__(self, key, value):
         """Operator for Dataset[key] = value.
