@@ -1,7 +1,6 @@
-# dataelem.py
-"""Define the DataElement class - elements within a dataset.
+"""Define the DataElement class.
 
-DataElements have a DICOM value representation VR, a value multiplicity VM,
+A DataElement has a tag, a value representation (VR), a value multiplicity (VM)
 and a value.
 """
 # Copyright (c) 2008-2012 Darcy Mason
@@ -15,9 +14,9 @@ from collections import namedtuple
 from pydicom import config  # don't import datetime_conversion directly
 from pydicom import compat
 from pydicom.config import logger
-from pydicom.datadict import dictionary_has_tag, dictionary_description
-from pydicom.datadict import dictionary_keyword, dictionary_is_retired
-from pydicom.datadict import private_dictionary_description
+from pydicom.datadict import (dictionary_has_tag, dictionary_description,
+                              dictionary_keyword, dictionary_is_retired,
+                              private_dictionary_description, dictionaryVR)
 from pydicom.tag import Tag
 from pydicom.uid import UID
 import pydicom.valuerep  # don't import DS directly as can be changed by config
@@ -36,7 +35,7 @@ except ImportError:
 
 # Helper functions:
 def isMultiValue(value):
-    """Helper function: return True if 'value' is 'list-like'."""
+    """Return True if `value` is list-like (iterable), False otherwise."""
     if isString(value) or isinstance(value, bytes):
         return False
     try:
@@ -45,14 +44,12 @@ def isMultiValue(value):
         return False
     return True
 
-
 def isString(val):
-    """Helper function: return True if val is a string."""
+    """Return True if `val` is string-like, False otherwise."""
     return isinstance(val, compat.string_types)
 
-
 def isStringOrStringList(val):
-    """Return true if val consists only of strings. val may be a list/tuple."""
+    """Return True if `val` is a str or an iterable containing only strings."""
     if isMultiValue(val):
         for item in val:
             if not isString(item):
@@ -65,37 +62,48 @@ _backslash = "\\"  # double '\' because it is used as escape chr in Python
 
 
 class DataElement(object):
-    """Contain and manipulate a Dicom data element, having a tag, VR, VM and value.
+    """Contain and manipulate a DICOM Element.
 
-    Most user code will not create data elements using this class directly,
-    but rather through DICOM keywords in Dataset objects.
-    See the Dataset class for a description of how Datasets, Sequences,
-    and DataElements work.
+    While its possible to create a new DataElement directly and add it to a
+    Dataset:
+    >>> elem = DataElement(0x00100010, 'PN', 'CITIZEN^Joan')
+    >>> ds = Dataset()
+    >>> ds.add(elem)
 
-    Class Data
-    ----------
-    For string display (via __str__), the following are used:
-
-    descripWidth -- maximum width of description field (default 35).
-    maxBytesToDisplay -- longer data will display "array of # bytes" (default 16).
-    showVR -- True (default) to include the dicom VR just before the value.
+    Its far more convenient to use a Dataset to add a new DataElement, as the VR
+    and tag are determined automatically from the DICOM dictionary:
+    >>> ds = Dataset()
+    >>> ds.PatientName = 'CITIZEN^Joan'
 
     Attributes
     ----------
+    descripWidth : int
+        For string display, this is the maximum width of the description field
+        (default 35 characters).
+    file_tell : int or None
     is_retired : bool
         For officially registered DICOM Data Elements this will be True if the
         retired status as given in PS3.6 Table 6-1 is 'RET'. For private or
         unknown Elements this will always be False
+    is_undefined_length : bool
+        Indicates whether the length field for the element was 0xFFFFFFFFL (ie
+        undefined).
     keyword : str
         For officially registered DICOM Data Elements this will be the Keyword
         as given in PS3.6 Table 6-1. For private or unknown Elements this will
         return an empty string.
+    maxBytesToDisplay : int
+        For string display, elements with values containing data which is longer
+        than this value will display "array of # bytes" (default 16 bytes).
     name : str
         For officially registered DICOM Data Elements this will be the Name
         as given in PS3.6 Table 6-1. For private Elements known to pydicom this
         will be the Name in the format '[name]'. For unknown private Elements
         this will be 'Private Creator'. For unknown Elements this will return
         an empty string.
+    showVR : bool
+        For string display, include the Element's VR just before it's `value`
+        (default True)
     tag : pydicom.tag.Tag
         The DICOM Tag for the Data Element
     value
@@ -107,31 +115,39 @@ class DataElement(object):
     """
     descripWidth = 35
     maxBytesToDisplay = 16
-    showVR = 1
+    showVR = True
 
     # Python 2: Classes which define __eq__ should flag themselves as unhashable
     __hash__ = None
 
     def __init__(self, tag, VR, value, file_value_tell=None,
                  is_undefined_length=False, already_converted=False):
-        """Create a data element instance.
+        """Create a new DataElement.
 
-        Most user code should instead use DICOM keywords
-        to create data_elements, for which only the value is supplied,
-        and the VR and tag are determined from the dicom dictionary.
-
-        tag -- dicom (group, element) tag in any form accepted by Tag().
-        VR -- dicom value representation (see DICOM standard part 6)
-        value -- the value of the data element. One of the following:
-            - a single string value
-            - a number
-            - a list or tuple with all strings or all numbers
-            - a multi-value string with backslash separator
-        file_value_tell -- used internally by Dataset, to store the write
-            position for ReplaceDataElementValue method
-        is_undefined_length -- used internally to store whether the length
-            field in this data element was 0xFFFFFFFFL, i.e. "undefined length"
-
+        Parameters
+        ----------
+        tag
+            The DICOM (group, element) tag in any form accepted by
+            pydicom.tag.Tag such as [0x0010, 0x0010], (0x10, 0x10), 0x00100010,
+            etc.
+        VR : str
+            The 2 character DICOM value representation (see DICOM standard part
+            5, Section 6.2).
+        value
+            The value of the data element. One of the following:
+            * a single string value
+            * a number
+            * a list or tuple with all strings or all numbers
+            * a multi-value string with backslash separator
+        file_value_tell : int or None
+            Used internally by Dataset to store the write position for the
+            ReplaceDataElementValue() method. Default is None.
+        is_undefined_length : bool
+            Used internally to store whether the length field for this element
+            was 0xFFFFFFFFL, i.e. 'undefined length'. Default is False.
+        already_converted : bool
+            Used to determine whether or not `value` requires conversion to a
+            value with VM > 1. Default is False.
         """
         self.tag = Tag(tag)
         self.VR = VR  # Note!: you must set VR before setting value
@@ -144,32 +160,37 @@ class DataElement(object):
 
     @property
     def value(self):
-        """The value (possibly multiple values) of this data_element"""
+        """Return the element's `value`."""
         return self._value
 
     @value.setter
     def value(self, val):
-        """Set method for 'value' property"""
+        """Convert (if necessary) and set the `value` of the element."""
         # Check if is a string with multiple values separated by '\'
         # If so, turn them into a list of separate strings
+        #  Last condition covers 'US or SS' etc
         if isString(val) and self.VR not in \
-                ['UT', 'ST', 'LT', 'FL', 'FD', 'AT', 'OB', 'OW', 'OF', 'SL', 'SQ', 'SS',
-                 'UL', 'OB/OW', 'OW/OB', 'OB or OW', 'OW or OB', 'UN'] and 'US' not in self.VR:  # latter covers 'US or SS' etc
+                ['UT', 'ST', 'LT', 'FL', 'FD', 'AT', 'OB', 'OW', 'OF', 'SL',
+                 'SQ', 'SS', 'UL', 'OB/OW', 'OW/OB', 'OB or OW',
+                 'OW or OB', 'UN'] and 'US' not in self.VR:
             if _backslash in val:
                 val = val.split(_backslash)
         self._value = self._convert_value(val)
 
     @property
     def VM(self):
-        """The number of values in the data_element's 'value'"""
+        """Return the value multiplicity (as an int) of the element."""
         if isMultiValue(self.value):
             return len(self.value)
         else:
             return 1
 
     def _convert_value(self, val):
-        """Convert Dicom string values if possible to e.g. numbers. Handle the case
-        of multiple value data_elements"""
+        """Convert `val` to an appropriate type and return the result.
+
+        Uses the element's VR in order to determine the conversion method and
+        resulting type.
+        """
         if self.VR == 'SQ':  # a sequence - leave it alone
             from pydicom.sequence import Sequence
             if isinstance(val, Sequence):
@@ -189,7 +210,7 @@ class DataElement(object):
             return returnvalue
 
     def _convert(self, val):
-        """Take the value and convert to number, etc if possible"""
+        """Convert `val` to an appropriate type for the element's VR."""
         if self.VR == 'IS':
             return pydicom.valuerep.IS(val)
         elif self.VR == 'DA' and config.datetime_conversion:
@@ -218,8 +239,7 @@ class DataElement(object):
             # % (repr(val), self.VR, self.tag)
 
     def __eq__(self, other):
-        """
-        Compare `self` and `other` for equality
+        """Compare `self` and `other` for equality.
 
         Returns
         -------
@@ -241,15 +261,16 @@ class DataElement(object):
         return NotImplemented
 
     def __ne__(self, other):
-        """ Compare `self` and `other` for inequality """
+        """Compare `self` and `other` for inequality."""
         return not (self == other)
 
     def __str__(self):
-        """Return str representation of this data_element"""
+        """Return str representation of the element."""
         repVal = self.repval
         if self.showVR:
             s = "%s %-*s %s: %s" % (str(self.tag), self.descripWidth,
-                                    self.description()[:self.descripWidth], self.VR, repVal)
+                                    self.description()[:self.descripWidth],
+                                    self.VR, repVal)
         else:
             s = "%s %-*s %s" % (str(self.tag), self.descripWidth,
                                 self.description()[:self.descripWidth], repVal)
@@ -257,9 +278,9 @@ class DataElement(object):
 
     @property
     def repval(self):
-        """Return a str representation of the current value for use in __str__"""
-        byte_VRs = ['OB', 'OW', 'OW/OB', 'OW or OB', 'OB or OW', 'US or SS or OW', 'US or SS']
-        if self.tag == 0x7fe00010:
+        """Return a str representation of the element's `value`."""
+        byte_VRs = ['OB', 'OW', 'OW/OB', 'OW or OB', 'OB or OW',
+                    'US or SS or OW', 'US or SS']
             repVal = "Array of %d bytes" % len(self.value)
         if (self.VR in byte_VRs and len(self.value) > self.maxBytesToDisplay):
             repVal = "Array of %d bytes" % len(self.value)
@@ -272,9 +293,10 @@ class DataElement(object):
         return repVal
 
     def __unicode__(self):
-        """Return unicode representation of this data_element"""
+        """Return unicode representation of the element."""
         if isinstance(self.value, compat.text_type):
-            # start with the string rep then replace the value part with the unicode
+            # start with the string rep then replace the value part
+            #   with the unicode
             strVal = str(self)
             uniVal = compat.text_type(strVal.replace(self.repval, "")) + self.value
             return uniVal
@@ -282,18 +304,20 @@ class DataElement(object):
             return compat.text_type(str(self))
 
     def __getitem__(self, key):
-        """Returns the item from my value's Sequence, if it is one."""
+        """Return the value at `key` if the element's `value` is indexable."""
         try:
             return self.value[key]
         except TypeError:
-            raise TypeError("DataElement value is unscriptable (not a Sequence)")
+            raise TypeError("DataElement value is unscriptable "
+                            "(not a Sequence)")
 
     @property
     def name(self):
+        """Return the DICOM dictionary name for the element."""
         return self.description()
 
     def description(self):
-        """Return the DICOM dictionary description for this dicom tag."""
+        """Return the DICOM dictionary name for the element."""
         if dictionary_has_tag(self.tag):
             name = dictionary_description(self.tag)
         elif self.tag.is_private:
@@ -316,7 +340,7 @@ class DataElement(object):
 
     @property
     def is_retired(self):
-        """The data_element's retired status"""
+        """The element's retired status."""
         if dictionary_has_tag(self.tag):
             return dictionary_is_retired(self.tag)
         else:
@@ -324,14 +348,14 @@ class DataElement(object):
 
     @property
     def keyword(self):
-        """The data_element's keyword (if known)"""
+        """The element's keyword (if known)."""
         if dictionary_has_tag(self.tag):
             return dictionary_keyword(self.tag)
         else:
             return ''
 
     def __repr__(self):
-        """Handle repr(data_element)"""
+        """Return the representation of the element."""
         if self.VR == "SQ":
             return repr(self.value)
         else:
@@ -386,7 +410,19 @@ RawDataElement = namedtuple('RawDataElement',
 
 
 def DataElement_from_raw(raw_data_element, encoding=None):
-    """Return a DataElement from a RawDataElement"""
+    """Return a DataElement created from the data in `raw_data_element`.
+
+    Parameters
+    ----------
+    raw_data_element : RawDataElement namedtuple
+        The raw data to convert to a DataElement
+    encoding : str
+        The encoding of the raw data
+
+    Returns
+    -------
+    pydicom.dataelem.DataElement
+    """
     from pydicom.values import convert_value  # XXX buried here to avoid circular import filereader->Dataset->convert_value->filereader (for SQ parsing)
     raw = raw_data_element
 
