@@ -17,6 +17,7 @@ from pydicom import compat
 from pydicom.config import logger
 from pydicom.datadict import dictionary_has_tag, dictionary_description
 from pydicom.datadict import dictionary_keyword, dictionary_is_retired
+from pydicom.datadict import private_dictionary_description
 from pydicom.tag import Tag
 from pydicom.uid import UID
 import pydicom.valuerep  # don't import DS directly as can be changed by config
