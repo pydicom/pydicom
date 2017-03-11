@@ -41,3 +41,4 @@ docs/_build/*
 *.ipynb
 .ipynb_checkpoints/*
 tests/test_pixel.py
+tests/xxtest.py
