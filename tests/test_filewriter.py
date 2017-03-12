@@ -31,8 +31,8 @@ from pydicom.dataset import Dataset, FileDataset
 from pydicom.dataelem import DataElement
 from pydicom.filebase import DicomBytesIO
 from pydicom.filereader import read_file, read_dataset
-from pydicom.filewriter import write_data_element, write_dataset, \
-                               correct_ambiguous_vr
+from pydicom.filewriter import (write_data_element, write_dataset,
+                                correct_ambiguous_vr, _write_file_meta_info)
 from pydicom.multival import MultiValue
 from pydicom.sequence import Sequence
 from pydicom.util.hexutil import hex2bytes, bytes2hex
@@ -291,7 +291,7 @@ class WriteDataElementTests(unittest.TestCase):
         encoded_elem = self.encode_element(elem, False, True)
         ref_bytes = b'\x70\x00\x0d\x15\x4f\x44\x00\x00\x00\x00\x00\x00'
         self.assertEqual(encoded_elem, ref_bytes)
-        
+
     def test_write_OL_implicit_little(self):
         """Test writing elements with VR of OL works correctly."""
         # TrackPointIndexList
@@ -764,6 +764,124 @@ class ScratchWriteTests(unittest.TestCase):
 
         file_ds = FileDataset("test", self.ds)
         self.compare_write(std, file_ds)
+
+
+class TestWriteFileMetaInfo(unittest.TestCase):
+    """Unit tests for _write_file_meta_info."""
+    def setUp(self):
+        """Create an empty file-like for use in testing."""
+        self.fp = DicomBytesIO()
+
+    def test_bad_elements(self):
+        """Test that non-group 2 elements aren't written to the file meta."""
+        meta = Dataset()
+        meta.PatientID = '12345678'
+        meta.MediaStorageSOPClassUID = '1.1'
+        meta.MediaStorageSOPInstanceUID = '1.2'
+        meta.TransferSyntaxUID = '1.3'
+        meta.ImplementationClassUID = '1.4'
+        self.assertRaises(ValueError, _write_file_meta_info, self.fp, meta)
+
+    def test_missing_elements(self):
+        """Test that missing required elements raises ValueError."""
+        meta = Dataset()
+        self.assertRaises(ValueError, _write_file_meta_info, self.fp, meta)
+        meta.MediaStorageSOPClassUID = '1.1'
+        self.assertRaises(ValueError, _write_file_meta_info, self.fp, meta)
+        meta.MediaStorageSOPInstanceUID = '1.2'
+        self.assertRaises(ValueError, _write_file_meta_info, self.fp, meta)
+        meta.TransferSyntaxUID = '1.3'
+        self.assertRaises(ValueError, _write_file_meta_info, self.fp, meta)
+        meta.ImplementationClassUID = '1.4'
+        _write_file_meta_info(self.fp, meta)
+
+    def test_prefix(self):
+        """Test that the 'DICM' prefix is present."""
+        meta = Dataset()
+        meta.MediaStorageSOPClassUID = '1.1'
+        meta.MediaStorageSOPInstanceUID = '1.2'
+        meta.TransferSyntaxUID = '1.3'
+        meta.ImplementationClassUID = '1.4'
+        _write_file_meta_info(self.fp, meta)
+
+        self.fp.seek(0)
+        prefix = self.fp.read(4)
+        self.assertEqual(prefix, b'DICM')
+
+    def test_group_length(self):
+        """Test that the value for FileMetaInformationGroupLength is OK."""
+        meta = Dataset()
+        meta.MediaStorageSOPClassUID = '1.1'
+        meta.MediaStorageSOPInstanceUID = '1.2'
+        meta.TransferSyntaxUID = '1.3'
+        meta.ImplementationClassUID = '1.4'
+        _write_file_meta_info(self.fp, meta)
+
+        # 78 in total, - 4 for prefix, - 12 for group length = 62
+        self.fp.seek(12)
+        self.assertEqual(self.fp.read(4), b'\x3E\x00\x00\x00')
+
+    def test_group_length_updated(self):
+        """Test that FileMetaInformationGroupLength gets updated if present."""
+        meta = Dataset()
+        meta.FileMetaInformationGroupLength = 100 # Actual length
+        meta.MediaStorageSOPClassUID = '1.1'
+        meta.MediaStorageSOPInstanceUID = '1.2'
+        meta.TransferSyntaxUID = '1.3'
+        meta.ImplementationClassUID = '1.4'
+        _write_file_meta_info(self.fp, meta)
+
+        self.fp.seek(12)
+        self.assertEqual(self.fp.read(4), b'\x3E\x00\x00\x00')
+        # Check original file meta is unchanged/updated
+        self.assertEqual(meta.FileMetaInformationGroupLength, 62)
+        self.assertEqual(meta.FileMetaInformationVersion, b'\x00\x01')
+        self.assertEqual(meta.MediaStorageSOPClassUID, '1.1')
+        self.assertEqual(meta.MediaStorageSOPInstanceUID, '1.2')
+        self.assertEqual(meta.TransferSyntaxUID, '1.3')
+        self.assertEqual(meta.ImplementationClassUID, '1.4')
+
+    def test_version(self):
+        """Test that the value for FileMetaInformationVersion is OK."""
+        meta = Dataset()
+        meta.MediaStorageSOPClassUID = '1.1'
+        meta.MediaStorageSOPInstanceUID = '1.2'
+        meta.TransferSyntaxUID = '1.3'
+        meta.ImplementationClassUID = '1.4'
+        _write_file_meta_info(self.fp, meta)
+
+        self.fp.seek(16 + 12)
+        self.assertEqual(self.fp.read(2), b'\x00\x01')
+
+    def test_filelike_position(self):
+        """Test that the file-like's ending position is OK."""
+        # 4 bytes prefix
+        # 8 + 4 bytes FileMetaInformationGroupLength
+        # 12 + 2 bytes FileMetaInformationVersion
+        # 8 + 4 bytes MediaStorageSOPClassUID
+        # 8 + 4 bytes MediaStorageSOPInstanceUID
+        # 8 + 4 bytes TransferSyntaxUID
+        # 8 + 4 bytes ImplementationClassUID
+        # 78 bytes total
+        meta = Dataset()
+        meta.MediaStorageSOPClassUID = '1.1'
+        meta.MediaStorageSOPInstanceUID = '1.2'
+        meta.TransferSyntaxUID = '1.3'
+        meta.ImplementationClassUID = '1.4'
+        _write_file_meta_info(self.fp, meta)
+        self.assertEqual(self.fp.tell(), 78)
+
+        # 8 + 6 bytes ImplementationClassUID
+        # 80 bytes total, group length 64
+        self.fp.seek(0)
+        meta.ImplementationClassUID = '1.4.1'
+        _write_file_meta_info(self.fp, meta)
+        # Check File Meta length
+        self.assertEqual(self.fp.tell(), 80)
+        # Check Group Length
+        self.fp.seek(12)
+        self.assertEqual(self.fp.read(4), b'\x40\x00\x00\x00')
+        _write_file_meta_info(self.fp, meta)
 
 
 if __name__ == "__main__":
