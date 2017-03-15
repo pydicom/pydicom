@@ -407,6 +407,20 @@ class ReaderTests(unittest.TestCase):
         ds = read_file(fp, force=True)
         self.assertEqual(ds[0x7fe00010].VR, 'OB')
 
+    def test_long_specific_char_set(self):
+        """Test that specific character set is read even if it is longer than defer_size"""
+        ds = Dataset()
+
+        long_specific_char_set_value = ['ISO 2022IR 100'] * 9
+        ds.add(DataElement(0x00080005, 'CS', long_specific_char_set_value))
+
+        fp = BytesIO()
+        file_ds = FileDataset(fp, ds)
+        file_ds.save_as(fp)
+
+        ds = read_file(fp, defer_size=65, force=True)
+        self.assertEqual(ds[0x00080005].value, long_specific_char_set_value)
+
 
 class ReadDataElementTests(unittest.TestCase):
     def setUp(self):
