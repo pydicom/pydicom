@@ -506,9 +506,9 @@ def read_file_meta_info(filename):
     a series of files to find one which is referenced to a particular SOP,
     without having to read the entire files.
     """
-    fp = DicomFile(filename, 'rb')
-    read_preamble(fp, False)  # if no header, raise exception
-    return _read_file_meta_info(fp)
+    with DicomFile(filename, 'rb') as fp:
+        read_preamble(fp, False)  # if no header, raise exception
+        return _read_file_meta_info(fp)
 
 
 def read_preamble(fp, force):

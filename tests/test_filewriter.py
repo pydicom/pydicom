@@ -224,13 +224,11 @@ class WriteDataElementTests(unittest.TestCase):
         str or bytes
             The encoded element as str (python2) or bytes (python3)
         """
-        fp = DicomBytesIO()
-        fp.is_implicit_VR = is_implicit_VR
-        fp.is_little_endian = is_little_endian
-        write_data_element(fp, elem)
-        byte_string = fp.getvalue()
-        fp.close()
-        return byte_string
+        with DicomBytesIO() as fp:
+            fp.is_implicit_VR = is_implicit_VR
+            fp.is_little_endian = is_little_endian
+            write_data_element(fp, elem)
+            return fp.parent.getvalue()
 
     def test_empty_AT(self):
         """Write empty AT correctly.........."""
