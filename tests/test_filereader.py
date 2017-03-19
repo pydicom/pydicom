@@ -446,7 +446,7 @@ class ReadDataElementTests(unittest.TestCase):
         file_ds.is_implicit_VR = False
         file_ds.is_little_endian = True
         file_ds.save_as(self.fp_ex)
-        
+
     def test_read_OD_implicit_little(self):
         """Check creation of OD DataElement from byte data works correctly."""
         ds = read_file(self.fp, force=True)

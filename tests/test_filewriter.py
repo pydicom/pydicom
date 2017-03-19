@@ -228,7 +228,7 @@ class WriteDataElementTests(unittest.TestCase):
         fp.is_implicit_VR = is_implicit_VR
         fp.is_little_endian = is_little_endian
         write_data_element(fp, elem)
-        byte_string = fp.parent.getvalue()
+        byte_string = fp.getvalue()
         fp.close()
         return byte_string
 
@@ -241,7 +241,7 @@ class WriteDataElementTests(unittest.TestCase):
             " 00 00 00 00"   # length 0
         ))
         write_data_element(self.f1, data_elem)
-        got = self.f1.parent.getvalue()
+        got = self.f1.getvalue()
         msg = ("Did not write zero-length AT value correctly. "
                "Expected %r, got %r") % (bytes2hex(expected), bytes2hex(got))
         msg = "%r %r" % (type(expected), type(got))
