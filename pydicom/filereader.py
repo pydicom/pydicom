@@ -233,7 +233,9 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian,
         # Reading the value
         # First case (most common): reading a value with a defined length
         if length != 0xFFFFFFFF:
-            if defer_size is not None and length > defer_size:
+            # don't defer loading of Specific Character Set value as it is needed
+            # immediately to get the character encoding for other tags
+            if defer_size is not None and length > defer_size and tag != (0x08, 0x05):
                 # Flag as deferred by setting value to None, and skip bytes
                 value = None
                 logger_debug("Defer size exceeded. "
