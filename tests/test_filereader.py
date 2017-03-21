@@ -6,13 +6,15 @@
 #    See the file license.txt included with this distribution, also
 #    available at https://github.com/darcymason/pydicom
 
-import sys
+import gzip
+from io import BytesIO
 import os
 import os.path
-import unittest
-from io import BytesIO
 import shutil
+import sys
 import tempfile
+import unittest
+from warncheck import assertWarns
 
 try:
     unittest.skipUnless
@@ -35,12 +37,16 @@ try:
     import numpy  # NOQA
 except:
     have_numpy = False
-from pydicom.filereader import read_file
+
+from pydicom.dataset import Dataset, FileDataset
+from pydicom.dataelem import DataElement
+from pydicom.filebase import DicomBytesIO
+from pydicom.filereader import read_file, data_element_generator
 from pydicom.errors import InvalidDicomError
 from pydicom.dataset import PropertyError
 from pydicom.tag import Tag, TupleTag
 import pydicom.valuerep
-import gzip
+
 have_jpeg_ls = True
 try:
     import jpeg_ls
@@ -57,7 +63,7 @@ except ImportError:
     except ImportError:
         # Neither worked, so it's likely not installed.
         have_pillow = False
-from warncheck import assertWarns
+
 
 test_dir = os.path.dirname(__file__)
 test_files = os.path.join(test_dir, 'test_files')
@@ -372,6 +378,161 @@ class ReaderTests(unittest.TestCase):
             px_data = px_data_ds.pixel_array
             pl_data = pl_data_ds.pixel_array
             self.assertTrue(numpy.all(px_data == pl_data))
+
+    def test_correct_ambiguous_vr(self):
+        """Test correcting ambiguous VR elements read from file"""
+        ds = Dataset()
+        ds.PixelRepresentation = 0
+        ds.add(DataElement(0x00280108, 'US', 10))
+        ds.add(DataElement(0x00280109, 'US', 500))
+
+        fp = BytesIO()
+        file_ds = FileDataset(fp, ds)
+        file_ds.is_implicit_VR = True
+        file_ds.is_little_endian = True
+        file_ds.save_as(fp)
+
+        ds = read_file(fp, force=True)
+        self.assertEqual(ds[0x00280108].VR, 'US')
+        self.assertEqual(ds.SmallestPixelValueInSeries, 10)
+
+    def test_correct_ambiguous_vr_compressed(self):
+        """Test correcting compressed Pixel Data read from file"""
+        # Create an implicit VR compressed dataset
+        ds = read_file(jpeg_lossless_name)
+        fp = BytesIO()
+        file_ds = FileDataset(fp, ds)
+        file_ds.is_implicit_VR = True
+        file_ds.is_little_endian = True
+        file_ds.save_as(fp)
+
+        ds = read_file(fp, force=True)
+        self.assertEqual(ds[0x7fe00010].VR, 'OB')
+
+    def test_long_specific_char_set(self):
+        """Test that specific character set is read even if it is longer than defer_size"""
+        ds = Dataset()
+
+        long_specific_char_set_value = ['ISO 2022IR 100'] * 9
+        ds.add(DataElement(0x00080005, 'CS', long_specific_char_set_value))
+
+        fp = BytesIO()
+        file_ds = FileDataset(fp, ds)
+        file_ds.save_as(fp)
+
+        ds = read_file(fp, defer_size=65, force=True)
+        self.assertEqual(ds[0x00080005].value, long_specific_char_set_value)
+
+
+class ReadDataElementTests(unittest.TestCase):
+    def setUp(self):
+        ds = Dataset()
+        ds.DoubleFloatPixelData = b'\x00\x01\x02\x03\x04\x05\x06\x07' \
+                                  b'\x01\x01\x02\x03\x04\x05\x06\x07' # VR of OD
+        ds.SelectorOLValue = b'\x00\x01\x02\x03\x04\x05\x06\x07' \
+                             b'\x01\x01\x02\x03' # VR of OL
+        ds.PotentialReasonsForProcedure = ['A', 'B', 'C'] # VR of UC, odd length
+        ds.StrainDescription = 'Test' # Even length
+        ds.URNCodeValue = 'http://test.com' # VR of UR
+        ds.RetrieveURL = 'ftp://test.com  ' # Test trailing spaces ignored
+        ds.DestinationAE = '    TEST  12    ' # 16 characters max for AE
+
+        self.fp = BytesIO() # Implicit little
+        file_ds = FileDataset(self.fp, ds)
+        file_ds.is_implicit_VR = True
+        file_ds.is_little_endian = True
+        file_ds.save_as(self.fp)
+
+        self.fp_ex = BytesIO() # Explicit little
+        file_ds = FileDataset(self.fp_ex, ds)
+        file_ds.is_implicit_VR = False
+        file_ds.is_little_endian = True
+        file_ds.save_as(self.fp_ex)
+
+    def test_read_OD_implicit_little(self):
+        """Check creation of OD DataElement from byte data works correctly."""
+        ds = read_file(self.fp, force=True)
+        ref_elem = ds.get(0x7fe00009)
+        elem = DataElement(0x7fe00009, 'OD', b'\x00\x01\x02\x03\x04\x05\x06\x07' \
+                                             b'\x01\x01\x02\x03\x04\x05\x06\x07')
+        self.assertEqual(ref_elem, elem)
+
+    def test_read_OD_explicit_little(self):
+        """Check creation of OD DataElement from byte data works correctly."""
+        ds = read_file(self.fp_ex, force=True)
+        ref_elem = ds.get(0x7fe00009)
+        elem = DataElement(0x7fe00009, 'OD', b'\x00\x01\x02\x03\x04\x05\x06\x07' \
+                                             b'\x01\x01\x02\x03\x04\x05\x06\x07')
+        self.assertEqual(ref_elem, elem)
+
+    def test_read_OL_implicit_little(self):
+        """Check creation of OL DataElement from byte data works correctly."""
+        ds = read_file(self.fp, force=True)
+        ref_elem = ds.get(0x00720075)
+        elem = DataElement(0x00720075, 'OL', b'\x00\x01\x02\x03\x04\x05\x06\x07' \
+                                             b'\x01\x01\x02\x03')
+        self.assertEqual(ref_elem, elem)
+
+    def test_read_OL_explicit_little(self):
+        """Check creation of OL DataElement from byte data works correctly."""
+        ds = read_file(self.fp_ex, force=True)
+        ref_elem = ds.get(0x00720075)
+        elem = DataElement(0x00720075, 'OL', b'\x00\x01\x02\x03\x04\x05\x06\x07' \
+                                             b'\x01\x01\x02\x03')
+        self.assertEqual(ref_elem, elem)
+
+    def test_read_UC_implicit_little(self):
+        """Check creation of DataElement from byte data works correctly."""
+        ds = read_file(self.fp, force=True)
+        ref_elem = ds.get(0x00189908)
+        elem = DataElement(0x00189908, 'UC', ['A', 'B', 'C'])
+        self.assertEqual(ref_elem, elem)
+
+        ds = read_file(self.fp, force=True)
+        ref_elem = ds.get(0x00100212)
+        elem = DataElement(0x00100212, 'UC', 'Test')
+        self.assertEqual(ref_elem, elem)
+
+    def test_read_UC_explicit_little(self):
+        """Check creation of DataElement from byte data works correctly."""
+        ds = read_file(self.fp_ex, force=True)
+        ref_elem = ds.get(0x00189908)
+        elem = DataElement(0x00189908, 'UC', ['A', 'B', 'C'])
+        self.assertEqual(ref_elem, elem)
+
+        ds = read_file(self.fp_ex, force=True)
+        ref_elem = ds.get(0x00100212)
+        elem = DataElement(0x00100212, 'UC', 'Test')
+        self.assertEqual(ref_elem, elem)
+
+    def test_read_UR_implicit_little(self):
+        """Check creation of DataElement from byte data works correctly."""
+        ds = read_file(self.fp, force=True)
+        ref_elem = ds.get(0x00080120) # URNCodeValue
+        elem = DataElement(0x00080120, 'UR', 'http://test.com')
+        self.assertEqual(ref_elem, elem)
+
+        # Test trailing spaces ignored
+        ref_elem = ds.get(0x00081190) # RetrieveURL
+        elem = DataElement(0x00081190, 'UR', 'ftp://test.com')
+        self.assertEqual(ref_elem, elem)
+
+    def test_read_UR_explicit_little(self):
+        """Check creation of DataElement from byte data works correctly."""
+        ds = read_file(self.fp_ex, force=True)
+        ref_elem = ds.get(0x00080120) # URNCodeValue
+        elem = DataElement(0x00080120, 'UR', 'http://test.com')
+        self.assertEqual(ref_elem, elem)
+
+        # Test trailing spaces ignored
+        ref_elem = ds.get(0x00081190) # RetrieveURL
+        elem = DataElement(0x00081190, 'UR', 'ftp://test.com')
+        self.assertEqual(ref_elem, elem)
+
+    def test_read_AE(self):
+        """Check creation of AE DataElement from byte data works correctly."""
+        ds = read_file(self.fp, force=True)
+        self.assertEqual(ds.DestinationAE, 'TEST  12')
 
 
 class JPEG_LS_Tests(unittest.TestCase):

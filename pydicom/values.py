@@ -35,6 +35,18 @@ def convert_tag(byte_string, is_little_endian, offset=0):
     return TupleTag(unpack(struct_format, byte_string[offset:offset + 4]))
 
 
+def convert_AE_string(byte_string, is_little_endian, struct_format=None,
+                      encoding=default_encoding):
+    """Read a byte string for a VR of 'AE'.
+
+    Elements with VR of 'AE' have non-significant leading and trailing spaces.
+    """
+    if not in_py2:
+        byte_string = byte_string.decode(encoding)
+    byte_string = byte_string.strip()
+    return byte_string
+
+
 def convert_ATvalue(byte_string, is_little_endian, struct_format=None):
     """Read and return AT (tag) data_element value(s)"""
     length = len(byte_string)
@@ -109,7 +121,31 @@ def convert_IS_string(byte_string, is_little_endian, struct_format=None):
 
 
 def convert_numbers(byte_string, is_little_endian, struct_format):
-    """Read a "value" of type struct_format from the dicom file. "Value" can be more than one number"""
+    """Convert `byte_string` to a value, depending on `struct_format`.
+
+    Given an encoded DICOM Element value, use `struct_format` and the endianness
+    of the data to decode it.
+
+    Parameters
+    ----------
+    byte_string : bytes
+        The raw byte data to decode.
+    is_little_endian : bool
+        The encoding of `byte_string`.
+    struct_format : str
+        The type of data encoded in `byte_string`.
+
+    Returns
+    -------
+    str
+        If there is no encoded data in `byte_string` then an empty string will
+        be returned.
+    value
+        If `byte_string` encodes a single value then it will be returned.
+    list
+        If `byte_string` encodes multiple values then a list of the decoded
+        values will be returned.
+    """
     endianChar = '><'[is_little_endian]
     bytes_per_value = calcsize("=" + struct_format)  # "=" means use 'standard' size, needed on 64-bit systems.
     length = len(byte_string)
@@ -229,6 +265,19 @@ def convert_UN(byte_string, is_little_endian, struct_format=None):
     return byte_string
 
 
+def convert_UR_string(byte_string, is_little_endian, struct_format=None,
+                      encoding=default_encoding):
+    """Read a byte string for a VR of 'UR'
+
+    Elements with VR of 'UR' shall not be multi-valued and trailing spaces shall
+    be ignored.
+    """
+    if not in_py2:
+        byte_string = byte_string.decode(encoding)
+    byte_string = byte_string.rstrip()
+    return byte_string
+
+
 def convert_value(VR, raw_data_element, encoding=default_encoding):
     """Return the converted value (from raw bytes) for the given VR"""
     if VR not in converters:
@@ -263,7 +312,7 @@ def convert_value(VR, raw_data_element, encoding=default_encoding):
         else:
             value = convert_SQ(byte_string, is_implicit_VR, is_little_endian,
                                encoding, raw_data_element.value_tell)
-    except ValueError as e:
+    except ValueError:
         if config.enforce_valid_values:
             # The user really wants an exception here
             raise
@@ -282,6 +331,7 @@ def convert_value(VR, raw_data_element, encoding=default_encoding):
                 logger.debug('converted tag %s with VR %s' % (raw_data_element.tag, vr))
                 value = raw_data_element.value
     return value
+
 convert_retry_VR_order = [
     'SH', 'UL', 'SL', 'US', 'SS', 'FL', 'FD', 'OF', 'OB', 'UI', 'DA', 'TM',
     'PN', 'IS', 'DS', 'LT', 'SQ', 'UN', 'AT', 'OW', 'DT', 'UT', ]
@@ -297,6 +347,8 @@ converters = {
     'FD': (convert_numbers, 'd'),
     'OF': (convert_numbers, 'f'),
     'OB': convert_OBvalue,
+    'OD': convert_OBvalue,
+    'OL': convert_OBvalue,
     'UI': convert_UI,
     'SH': convert_string,
     'DA': convert_DA_string,
@@ -306,11 +358,13 @@ converters = {
     'LO': convert_string,
     'IS': convert_IS_string,
     'DS': convert_DS_string,
-    'AE': convert_string,
+    'AE': convert_AE_string,
     'AS': convert_string,
     'LT': convert_single_string,
     'SQ': convert_SQ,
+    'UC': convert_string,
     'UN': convert_UN,
+    'UR': convert_UR_string,
     'AT': convert_ATvalue,
     'ST': convert_string,
     'OW': convert_OWvalue,

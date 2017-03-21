@@ -156,10 +156,20 @@ class DicomFileLike(DicomIO):
         """Used for file-like objects where no seek is available"""
         raise IOError("This DicomFileLike object has no seek() method")
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc_info):
+        self.close()
+
 
 def DicomFile(*args, **kwargs):
     return DicomFileLike(open(*args, **kwargs))
 
 
-def DicomBytesIO(*args, **kwargs):
-    return DicomFileLike(BytesIO(*args, **kwargs))
+class DicomBytesIO(DicomFileLike):
+    def __init__(self, *args, **kwargs):
+        super(DicomBytesIO, self).__init__(BytesIO(*args, **kwargs))
+
+    def getvalue(self):
+        return self.parent.getvalue()

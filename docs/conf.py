@@ -38,7 +38,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'pydicom'
-copyright = u'2008-2012, Darcy Mason and pydicom contributors'
+copyright = u'2008-2017, Darcy Mason and pydicom contributors'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -196,7 +196,7 @@ latex_documents = [
 doctest_global_setup = """
 import pydicom
 import os, os.path
-testfile_path = os.path.join(pydicom.__path__[0], 'testfiles')
+testfile_path = os.path.join(pydicom.__path__[0], '../tests/test_files')
 save_dir = os.getcwd()
 os.chdir(testfile_path)
 """
