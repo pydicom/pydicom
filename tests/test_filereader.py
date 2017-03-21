@@ -37,6 +37,7 @@ except:
     have_numpy = False
 from pydicom.filereader import read_file
 from pydicom.errors import InvalidDicomError
+from pydicom.dataset import PropertyError
 from pydicom.tag import Tag, TupleTag
 import pydicom.valuerep
 import gzip
@@ -66,6 +67,7 @@ rtplan_name = os.path.join(test_files, "rtplan.dcm")
 rtdose_name = os.path.join(test_files, "rtdose.dcm")
 ct_name = os.path.join(test_files, "CT_small.dcm")
 mr_name = os.path.join(test_files, "MR_small.dcm")
+truncated_mr_name = os.path.join(test_files, "MR_truncated.dcm")
 jpeg2000_name = os.path.join(test_files, "JPEG2000.dcm")
 jpeg2000_lossless_name = os.path.join(test_files, "MR_small_jp2klossless.dcm")
 jpeg_ls_lossless_name = os.path.join(test_files, "MR_small_jpeg_ls_lossless.dcm")
@@ -569,6 +571,21 @@ class DeferredReadTests(unittest.TestCase):
     def tearDown(self):
         if os.path.exists(self.testfile_name):
             os.remove(self.testfile_name)
+
+
+class ReadTruncatedFileTests(unittest.TestCase):
+    def testReadFileWithMissingPixelData(self):
+        mr = read_file(truncated_mr_name)
+        mr.decode()
+        self.assertEqual(mr.PatientName, 'CompressedSamples^MR1', "Wrong patient name")
+        self.assertEqual(mr.PatientName, mr[0x10, 0x10].value,
+                         "Name does not match value found when accessed by tag number")
+        got = mr.PixelSpacing
+        DS = pydicom.valuerep.DS
+        expected = [DS('0.3125'), DS('0.3125')]
+        self.assertTrue(got == expected, "Wrong pixel spacing")
+        with self.assertRaisesRegexp(PropertyError, "Amount of pixel data.*does not match the expected data"):
+            mr.pixel_array
 
 
 class FileLikeTests(unittest.TestCase):
