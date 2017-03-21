@@ -911,7 +911,14 @@ class Dataset(dict):
                     try:
                         decompressed_image = PILImg.open(fio)
                     except IOError as e:
-                        raise NotImplementedError(e.message)
+                        try:
+                            message = str(e)
+                        except:
+                            try:
+                                message = unicode(e)
+                            except:
+                                message = ''
+                        raise NotImplementedError(message)
                     UncompressedPixelData += decompressed_image.tobytes()
             else:
                 # single compressed frame
@@ -921,7 +928,14 @@ class Dataset(dict):
                     fio = io.BytesIO(UncompressedPixelData)
                     decompressed_image = PILImg.open(fio)
                 except IOError as e:
-                    raise NotImplementedError(e.message)
+                    try:
+                        message = str(e)
+                    except:
+                        try:
+                            message = unicode(e)
+                        except:
+                            message = ''
+                    raise NotImplementedError(message)
                 UncompressedPixelData = decompressed_image.tobytes()
         except:
             raise
