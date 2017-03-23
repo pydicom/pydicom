@@ -456,34 +456,42 @@ class Dataset(dict):
             return_val = default
         return return_val
 
-    def __getattr__(self, name):
+    def __getattribute__(self, attr):
         """Intercept requests for unknown Dataset attribute names.
 
-        If the name matches a DICOM keyword, return the value for the
+        If `attr` matches a DICOM keyword, return the value for the
         DataElement with the corresponding tag.
 
         Parameters
         ----------
-        name
+        attr
             A DataElement keyword or tag or a class attribute name.
 
         Returns
         -------
         value
-            The corresponding DataElement's value.
+            If `attr` matches a DICOM keyword, returns the corresponding
+            DataElement's value. Otherwise returns the class attribute's value
+            (if present).
         """
-        # __getattr__ only called if instance cannot find name in self.__dict__
-        # So, if name is not a dicom string, then is an error
-        tag = tag_for_name(name)
-        if tag is None:
-            raise AttributeError("Dataset does not have attribute "
-                                 "'{0:s}'.".format(name))
-        tag = Tag(tag)
-        if tag not in self:
-            raise AttributeError("Dataset does not have attribute "
-                                 "'{0:s}'.".format(name))
-        else:  # do have that dicom data_element
-            return self[tag].value
+        try:
+            return super(Dataset, self).__getattribute__(attr)
+        except AttributeError:
+            info = sys.exc_info()
+            try:
+                tag = tag_for_name(attr)
+                if tag is None:
+                    raise AttributeError("Dataset does not have attribute "
+                                         "'{0:s}'.".format(attr))
+                tag = Tag(tag)
+                if tag not in self:
+                    raise AttributeError("Dataset does not have attribute "
+                                         "'{0:s}'.".format(attr))
+                else:  # do have that dicom data_element
+                    return self[tag].value
+
+            except AttributeError:
+                compat.reraise(info[0], info[1], info[2].tb_next)
 
     @property
     def _character_set(self):

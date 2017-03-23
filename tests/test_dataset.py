@@ -60,9 +60,25 @@ class DatasetTests(unittest.TestCase):
             ds.pixel_array
 
         attribute_error_msg = "AttributeError in pixel_array property: " + \
-            "Dataset does not have attribute 'TransferSyntaxUID'"
+            "'Dataset' object has no attribute 'TransferSyntaxUID'"
         self.failUnlessExceptionArgs(attribute_error_msg,
                                      PropertyError, callable_pixel_array)
+
+    def test_attribute_error_in_property_correct_debug(self):
+        """Test AttributeError in property raises correctly."""
+        class Foo(Dataset):
+            @property
+            def bar(self): return self._barr()
+
+            def _bar(self): return 'OK'
+
+        def test():
+            ds = Foo()
+            ds.bar
+
+        self.assertRaises(AttributeError, test)
+        msg = "'Foo' object has no attribute '_barr'"
+        self.failUnlessExceptionArgs(msg, AttributeError, test)
 
     def testTagExceptionPrint(self):
         # When printing datasets, a tag number should appear in error
