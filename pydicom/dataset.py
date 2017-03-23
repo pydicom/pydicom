@@ -459,18 +459,20 @@ class Dataset(dict):
     def __getattribute__(self, attr):
         """Intercept requests for unknown Dataset attribute names.
 
-        If the name matches a DICOM keyword, return the value for the
+        If `attr` matches a DICOM keyword, return the value for the
         DataElement with the corresponding tag.
 
         Parameters
         ----------
-        name
+        attr
             A DataElement keyword or tag or a class attribute name.
 
         Returns
         -------
         value
-            The corresponding DataElement's value.
+            If `attr` matches a DICOM keyword, returns the corresponding
+            DataElement's value. Otherwise returns the class attribute's value
+            (if present).
         """
         try:
             return super(Dataset, self).__getattribute__(attr)
