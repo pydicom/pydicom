@@ -457,9 +457,9 @@ class Dataset(dict):
         return return_val
 
     def __getattr__(self, name):
-        """Intercept requests for unknown Dataset attribute names.
+        """Intercept requests for Dataset attribute names.
 
-        If the name matches a DICOM keyword, return the value for the
+        If `name` matches a DICOM keyword, return the value for the
         DataElement with the corresponding tag.
 
         Parameters
@@ -470,20 +470,22 @@ class Dataset(dict):
         Returns
         -------
         value
-            The corresponding DataElement's value.
+              If `name` matches a DICOM keyword, returns the corresponding
+              DataElement's value. Otherwise returns the class attribute's value
+              (if present).
         """
-        # __getattr__ only called if instance cannot find name in self.__dict__
-        # So, if name is not a dicom string, then is an error
-        tag = tag_for_name(name)
-        if tag is None:
-            raise AttributeError("Dataset does not have attribute "
-                                 "'{0:s}'.".format(name))
-        tag = Tag(tag)
-        if tag not in self:
-            raise AttributeError("Dataset does not have attribute "
-                                 "'{0:s}'.".format(name))
-        else:  # do have that dicom data_element
-            return self[tag].value
+        try:
+            tag = tag_for_name(name)
+            if tag is None: # `name` isn't a DICOM element keyword
+                raise AttributeError
+            tag = Tag(tag)
+            if tag not in self: # DICOM DataElement not in the Dataset
+                raise AttributeError
+            else:
+                return self[tag].value
+        except AttributeError:
+            # Try the base class attribute getter (fix for issue 332)
+            return super(Dataset, self).__getattribute__(name)
 
     @property
     def _character_set(self):
