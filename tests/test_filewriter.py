@@ -639,6 +639,28 @@ class TestCorrectAmbiguousVR(unittest.TestCase):
         self.assertEqual(ds.LUTData, b'\x00\x01')
         self.assertEqual(ds[0x00283006].VR, 'US or OW')
 
+    def test_overlay(self):
+        """Test correcting OverlayData"""
+        # Implicit VR must be 'OW'
+        ref_ds = Dataset()
+        ref_ds.is_implicit_VR = True
+        ref_ds.add(DataElement(0x60003000, 'OB or OW', b'\x00'))
+        ds = correct_ambiguous_vr(deepcopy(ref_ds), True)
+        self.assertTrue(ds[0x60003000].VR == 'OW')
+        self.assertTrue(ref_ds[0x60003000].VR == 'OB or OW')
+
+        # Explicit VR may be 'OB' or 'OW' (leave unchanged)
+        ref_ds.is_implicit_VR = False
+        ds = correct_ambiguous_vr(deepcopy(ref_ds), True)
+        self.assertTrue(ds[0x60003000].VR == 'OB or OW')
+        self.assertTrue(ref_ds[0x60003000].VR == 'OB or OW')
+
+        # Missing is_implicit_VR (leave unchanged)
+        del ref_ds.is_implicit_VR
+        ds = correct_ambiguous_vr(deepcopy(ref_ds), True)
+        self.assertTrue(ds[0x60003000].VR == 'OB or OW')
+        self.assertTrue(ref_ds[0x60003000].VR == 'OB or OW')
+
     def test_sequence(self):
         """Test correcting elements in a sequence."""
         ref_ds = Dataset()
