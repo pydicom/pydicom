@@ -16,7 +16,8 @@ from pydicom import compat
 from pydicom.config import logger
 from pydicom.datadict import (dictionary_has_tag, dictionary_description,
                               dictionary_keyword, dictionary_is_retired,
-                              private_dictionary_description, dictionaryVR)
+                              private_dictionary_description, dictionaryVR,
+                              repeater_has_tag)
 from pydicom.tag import Tag
 from pydicom.uid import UID
 import pydicom.valuerep  # don't import DS directly as can be changed by config
@@ -312,6 +313,8 @@ class DataElement(object):
     def description(self):
         """Return the DICOM dictionary name for the element."""
         if dictionary_has_tag(self.tag):
+            name = dictionary_description(self.tag)
+        elif repeater_has_tag(self.tag):
             name = dictionary_description(self.tag)
         elif self.tag.is_private:
             name = "Private tag data"  # default
