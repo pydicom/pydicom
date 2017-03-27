@@ -29,7 +29,7 @@ def correct_ambiguous_vr_element(elem, ds, is_little_endian):
     unchanged. Currently the only ambiguous VR elements not corrected for are
     all retired or part of DICONDE.
 
-    If the VR is corrected and is 'US' or 'SS then the value will be updated
+    If the VR is corrected and is 'US or SS'then the value will be updated
     using the pydicom.values.convert_numbers() method.
 
     Parameters
@@ -43,8 +43,8 @@ def correct_ambiguous_vr_element(elem, ds, is_little_endian):
 
     Returns
     -------
-    ds : pydicom.dataset.Dataset
-        The corrected dataset
+    elem : pydicom.dataelem.DataElement
+        The corrected element
     """
     if 'or' in elem.VR:
         # 'OB or OW': 7fe0,0010 PixelData
@@ -131,7 +131,7 @@ def correct_ambiguous_vr(ds, is_little_endian):
     unchanged. Currently the only ambiguous VR elements not corrected for are
     all retired or part of DICONDE.
 
-    If the VR is corrected and is 'US' or 'SS then the value will be updated
+    If the VR is corrected and is 'US or SS' then the value will be updated
     using the pydicom.values.convert_numbers() method.
 
     Parameters
