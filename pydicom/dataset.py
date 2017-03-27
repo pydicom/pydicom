@@ -1164,8 +1164,8 @@ class Dataset(dict):
             self[tag] = data_element
         elif repeater_has_keyword(name): # Check if `name` is repeaters element
             raise ValueError('{} is a DICOM repeating group element and must '
-                               'be added using the add_element() method.'
-                               .format(name))
+                             'be added using the add() or add_new() methods.'
+                             .format(name))
         else:  # name not in dicom dictionary - setting a non-dicom instance attribute
             # XXX note if user mis-spells a dicom data_element - no error!!!
             super(Dataset, self).__setattr__(name, value)

@@ -312,9 +312,7 @@ class DataElement(object):
 
     def description(self):
         """Return the DICOM dictionary name for the element."""
-        if dictionary_has_tag(self.tag):
-            name = dictionary_description(self.tag)
-        elif repeater_has_tag(self.tag):
+        if dictionary_has_tag(self.tag) or repeater_has_tag(self.tag):
             name = dictionary_description(self.tag)
         elif self.tag.is_private:
             name = "Private tag data"  # default
