@@ -7,7 +7,8 @@
 
 import unittest
 from pydicom.tag import Tag
-from pydicom.datadict import CleanName, all_names_for_tag, dictionary_description
+from pydicom.datadict import (CleanName, all_names_for_tag,
+                              dictionary_description, dictionary_has_tag)
 
 
 class DictTests(unittest.TestCase):
@@ -33,6 +34,16 @@ class DictTests(unittest.TestCase):
         """dicom_dictionary: Tags with "x" return correct dict info........"""
         self.assertEqual(dictionary_description(0x280400), 'Transform Label')
         self.assertEqual(dictionary_description(0x280410), 'Rows For Nth Order Coefficients')
+
+    def test_dict_has_tag(self):
+        """Test dictionary_has_tag"""
+        func = dictionary_has_tag
+        # Main dictionary
+        self.assertTrue(func(0x00100010))
+        self.assertFalse(func(0x11110010))
+        # Repeater dictioanry
+        self.assertTrue(func(0x60000010))
+        self.assertTrue(func(0x60020010))
 
 
 class PrivateDictTests(unittest.TestCase):

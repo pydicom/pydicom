@@ -78,7 +78,7 @@ def dictionaryVR(tag):
 
 def dictionary_has_tag(tag):
     """Return True if the dicom dictionary has an entry for the given tag."""
-    return (tag in DicomDictionary)
+    return (tag in DicomDictionary or mask_match(tag) in RepeatersDictionary)
 
 
 def dictionary_keyword(tag):
