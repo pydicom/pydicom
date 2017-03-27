@@ -27,7 +27,7 @@ def correct_ambiguous_vr_element(elem, ds, is_little_endian):
 
     When it's not possible to correct the VR, the element will be returned
     unchanged. Currently the only ambiguous VR elements not corrected for are
-    all retired or part of DICONDE, except for (60xx,3000) Overlay Data.
+    all retired or part of DICONDE.
 
     If the VR is corrected and is 'US' or 'SS then the value will be updated
     using the pydicom.values.convert_numbers() method.
@@ -128,7 +128,7 @@ def correct_ambiguous_vr(ds, is_little_endian):
 
     When it's not possible to correct the VR, the element will be returned
     unchanged. Currently the only ambiguous VR elements not corrected for are
-    all retired or part of DICONDE, except for (60xx,3000) Overlay Data.
+    all retired or part of DICONDE.
 
     If the VR is corrected and is 'US' or 'SS then the value will be updated
     using the pydicom.values.convert_numbers() method.
