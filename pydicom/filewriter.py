@@ -113,6 +113,12 @@ def correct_ambiguous_vr_element(elem, ds, is_little_endian):
                                                  'H')
                 else:
                     elem.VR = 'OW'
+        # 'OB or OW': 60xx,3000 OverlayData and dependent on Transfer Syntax
+        elif elem.tag.group in range(0x6000, 0x601E, 2) and elem.tag.elem == 0x3000:
+            # Implicit VR must be OW, explicit VR may be OB or OW
+            #   as per PS3.5 Section 8.1.2 and Annex A
+            if hasattr(ds, 'is_implicit_VR') and ds.is_implicit_VR:
+                elem.VR = 'OW'
 
     return elem
 
