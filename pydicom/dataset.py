@@ -28,7 +28,7 @@ import sys
 from pydicom import compat
 from pydicom.charset import default_encoding, convert_encodings
 from pydicom.datadict import dictionaryVR
-from pydicom.datadict import tag_for_name, all_names_for_tag
+from pydicom.datadict import tag_for_name, all_names_for_tag, repeater_has_keyword
 from pydicom.tag import Tag, BaseTag
 from pydicom.dataelem import DataElement, DataElement_from_raw, RawDataElement
 from pydicom.uid import NotCompressedPixelTransferSyntaxes, UncompressedPixelTransferSyntaxes
@@ -1162,6 +1162,10 @@ class Dataset(dict):
                 data_element.value = value
             # Now have data_element - store it in this dict
             self[tag] = data_element
+        elif repeater_has_keyword(name): # Check if `name` is repeaters element
+            raise ValueError('{} is a DICOM repeating group element and must '
+                               'be added using the add_element() method.'
+                               .format(name))
         else:  # name not in dicom dictionary - setting a non-dicom instance attribute
             # XXX note if user mis-spells a dicom data_element - no error!!!
             super(Dataset, self).__setattr__(name, value)

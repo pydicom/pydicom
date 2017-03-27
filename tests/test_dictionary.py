@@ -9,7 +9,7 @@ import unittest
 from pydicom.tag import Tag
 from pydicom.datadict import (CleanName, all_names_for_tag,
                               dictionary_description, dictionary_has_tag,
-                              repeater_has_tag)
+                              repeater_has_tag, repeater_has_keyword)
 
 
 class DictTests(unittest.TestCase):
@@ -46,6 +46,11 @@ class DictTests(unittest.TestCase):
         self.assertTrue(repeater_has_tag(0x60000010))
         self.assertTrue(repeater_has_tag(0x60020010))
         self.assertFalse(repeater_has_tag(0x00100010))
+
+    def test_repeater_has_keyword(self):
+        """Test repeater_has_keyword"""
+        self.assertTrue(repeater_has_keyword('OverlayData'))
+        self.assertFalse(repeater_has_keyword('PixelData'))
 
 
 class PrivateDictTests(unittest.TestCase):

@@ -80,10 +80,6 @@ def dictionary_has_tag(tag):
     """Return True if the dicom dictionary has an entry for the given tag."""
     return (tag in DicomDictionary)
 
-def repeater_has_tag(tag):
-    """Return True if the DICOM repeaters dictionary has an entry for `tag`."""
-    return (mask_match(tag) in RepeatersDictionary)
-
 
 def dictionary_keyword(tag):
     """Return the official DICOM standard (since 2011) keyword for the tag"""
@@ -214,6 +210,14 @@ def all_names_for_tag(tag):
         names.append(shortname)
     return names
 
+def repeater_has_tag(tag):
+    """Return True if the DICOM repeaters dictionary has an entry for `tag`."""
+    return (mask_match(tag) in RepeatersDictionary)
+
+def repeater_has_keyword(keyword):
+    """Return True if the DICOM repeaters element exists with `keyword`."""
+    repeater_keywords = [val[4] for val in RepeatersDictionary.values()]
+    return (keyword in repeater_keywords)
 
 # PRIVATE DICTIONARY handling
 # functions in analogy with those of main DICOM dict
