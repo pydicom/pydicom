@@ -477,6 +477,13 @@ class DatasetTests(unittest.TestCase):
         dsp.test = 'ABCD'
         self.assertEqual(dsp.test, 'ABCD')
 
+    def test_add_repeater_elem_by_keyword(self):
+        """Repeater using keyword to add repeater group elements raises ValueError."""
+        ds = Dataset()
+        def test():
+            ds.OverlayData = b'\x00'
+        self.assertRaises(ValueError, test)
+
 
 class DatasetElementsTests(unittest.TestCase):
     """Test valid assignments of data elements"""
