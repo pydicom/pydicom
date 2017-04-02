@@ -29,7 +29,7 @@ import sys
 from pydicom import compat
 from pydicom.charset import default_encoding, convert_encodings
 from pydicom.datadict import dictionary_VR
-from pydicom.datadict import tag_for_keyword, keyword_for_tag
+from pydicom.datadict import tag_for_keyword, keyword_for_tag, all_names_for_tag, repeater_has_keyword
 from pydicom.tag import Tag, BaseTag
 from pydicom.dataelem import DataElement, DataElement_from_raw, RawDataElement
 from pydicom.uid import NotCompressedPixelTransferSyntaxes, UncompressedPixelTransferSyntaxes
@@ -456,9 +456,9 @@ class Dataset(dict):
         return return_val
 
     def __getattr__(self, name):
-        """Intercept requests for unknown Dataset attribute names.
+        """Intercept requests for Dataset attribute names.
 
-        If the name matches a DICOM keyword, return the value for the
+        If `name` matches a DICOM keyword, return the value for the
         DataElement with the corresponding tag.
 
         Parameters
@@ -469,22 +469,24 @@ class Dataset(dict):
         Returns
         -------
         value
-            The corresponding DataElement's value.
+              If `name` matches a DICOM keyword, returns the corresponding
+              DataElement's value. Otherwise returns the class attribute's value
+              (if present).
         """
-        # __getattr__ only called if instance cannot find name in self.__dict__
-        # So, if name is not a dicom string, then is an error
+        try:
         tag = tag_for_keyword(name)
-        if tag is None:
-            raise AttributeError("Dataset does not have attribute "
-                                 "'{0:s}'.".format(name))
+            if tag is None: # `name` isn't a DICOM element keyword
+                raise AttributeError
         
         # Is a valid DICOM keyword, check if it is in this dataset
-        tag = Tag(tag)
-        if tag not in self:
-            raise AttributeError("Dataset does not have attribute "
-                                 "'{0:s}'.".format(name))
-        else:  # do have that dicom data_element
-            return self[tag].value
+            tag = Tag(tag)
+            if tag not in self: # DICOM DataElement not in the Dataset
+                raise AttributeError
+            else:
+                return self[tag].value
+        except AttributeError:
+            # Try the base class attribute getter (fix for issue 332)
+            return super(Dataset, self).__getattribute__(name)
 
     @property
     def _character_set(self):
@@ -1160,9 +1162,13 @@ class Dataset(dict):
                 data_element.value = value
             # Now have data_element - store it in this dict
             self[tag] = data_element
+        elif repeater_has_keyword(name): # Check if `name` is repeaters element
+            raise ValueError('{} is a DICOM repeating group element and must '
+                             'be added using the add() or add_new() methods.'
+                             .format(name))
         else:  # name not in dicom dictionary - setting a non-dicom instance attribute
             # XXX note if user mis-spells a dicom data_element - no error!!!
-            self.__dict__[name] = value
+            super(Dataset, self).__setattr__(name, value)
 
     def __setitem__(self, key, value):
         """Operator for Dataset[key] = value.

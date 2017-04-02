@@ -191,6 +191,11 @@ class DataElementTests(unittest.TestCase):
 
         self.assertRaises(TypeError, test_hash)
 
+    def test_repeater_str(self):
+        """Test a repeater group element displays the element name."""
+        elem = DataElement(0x60023000, 'OB', b'\x00')
+        self.assertTrue('Overlay Data' in elem.__str__())
+
 
 class RawDataElementTests(unittest.TestCase):
     def setUp(self):

@@ -29,9 +29,9 @@ def correct_ambiguous_vr_element(elem, ds, is_little_endian):
 
     When it's not possible to correct the VR, the element will be returned
     unchanged. Currently the only ambiguous VR elements not corrected for are
-    all retired or part of DICONDE, except for (60xx,3000) Overlay Data.
+    all retired or part of DICONDE.
 
-    If the VR is corrected and is 'US' or 'SS then the value will be updated
+    If the VR is corrected and is 'US' or 'SS' then the value will be updated
     using the pydicom.values.convert_numbers() method.
 
     Parameters
@@ -45,8 +45,8 @@ def correct_ambiguous_vr_element(elem, ds, is_little_endian):
 
     Returns
     -------
-    ds : pydicom.dataset.Dataset
-        The corrected dataset
+    elem : pydicom.dataelem.DataElement
+        The corrected element
     """
     if 'or' in elem.VR:
         # 'OB or OW': 7fe0,0010 PixelData
@@ -116,6 +116,14 @@ def correct_ambiguous_vr_element(elem, ds, is_little_endian):
                 else:
                     elem.VR = 'OW'
 
+        # 'OB or OW': 60xx,3000 OverlayData and dependent on Transfer Syntax
+        elif elem.tag.group in range(0x6000, 0x601F, 2) and \
+                                                    elem.tag.elem == 0x3000:
+            # Implicit VR must be OW, explicit VR may be OB or OW
+            #   as per PS3.5 Section 8.1.2 and Annex A
+            if hasattr(ds, 'is_implicit_VR') and ds.is_implicit_VR:
+                elem.VR = 'OW'
+
     return elem
 
 def correct_ambiguous_vr(ds, is_little_endian):
@@ -123,9 +131,9 @@ def correct_ambiguous_vr(ds, is_little_endian):
 
     When it's not possible to correct the VR, the element will be returned
     unchanged. Currently the only ambiguous VR elements not corrected for are
-    all retired or part of DICONDE, except for (60xx,3000) Overlay Data.
+    all retired or part of DICONDE.
 
-    If the VR is corrected and is 'US' or 'SS then the value will be updated
+    If the VR is corrected and is 'US' or 'SS' then the value will be updated
     using the pydicom.values.convert_numbers() method.
 
     Parameters
@@ -492,51 +500,105 @@ def write_ATvalue(fp, data_element):
 
 
 def _write_file_meta_info(fp, meta_dataset):
-    """Write the dicom group 2 dicom storage File Meta Information to the file.
+    """Write the File Meta Information in `meta_dataset` to `fp`.
 
-    The file should already be positioned past the 128 byte preamble.
-    Raises ValueError if the required data_elements (elements 2,3,0x10,0x12)
-    are not in the dataset. If the dataset came from a file read with
-    read_file(), then the required data_elements should already be there.
+    The file-like `fp` should be positioned past the 128 byte preamble (which
+    should already have been written).
+
+    DICOM File Meta Information
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    From the DICOM standard, Part 10 Section 7.1, any DICOM file shall contain
+    a 128-byte preamble, a 4-byte DICOM prefix 'DICM' and (at a minimum) the
+    following Type 1 DICOM Elements (from Table 7.1-1):
+        * (0002,0000) FileMetaInformationGroupLength, UL, 4
+        * (0002,0001) FileMetaInformationVersion, OB, 2
+        * (0002,0002) MediaStorageSOPClassUID, UI, N
+        * (0002,0003) MediaStorageSOPInstanceUID, UI, N
+        * (0002,0010) TransferSyntaxUID, UI, N
+        * (0002,0012) ImplementationClassUID, UI, N
+
+    Of these (0002,0000) will be added/updated and (0002,0001) will be added
+    if not already present.
+
+    The following Type 3/1C Elements may also be present:
+        * (0002,0013) ImplementationVersionName, SH, N
+        * (0002,0016) SourceApplicationEntityTitle, AE, N
+        * (0002,0017) SendingApplicationEntityTitle, AE, N
+        * (0002,0018) ReceivingApplicationEntityTitle, AE, N
+        * (0002,0100) PrivateInformationCreatorUID, UI, N
+        * (0002,0102) PrivateInformation, OB, N
+
+    Encoding
+    ~~~~~~~~
+    The encoding of the File Meta Information shall be ExplicitVRLittleEndian.
+
+    Parameters
+    ----------
+    fp : file-like
+        The file-like to write the File Meta Information to.
+    meta_dataset : pydicom.dataset.Dataset
+        The File Meta Information DataElements.
+
+    Raises
+    ------
+    ValueError
+        If any of the required File Meta Information Elements are missing
+        from `meta_dataset`, with the exception of (0002,0000) and (0002,0001).
+    ValueError
+        If any non-Group 2 Elements are present in `meta_dataset`.
     """
     fp.write(b'DICM')
 
-    # File meta info is always LittleEndian, Explicit VR. After will change these
-    #    to the transfer syntax values set in the meta info
+    # File Meta Info is always Explicit VR Little Endian. The 'is_little_endian'
+    #   and 'is_implicit_VR' attributes will need to be set correctly after
+    #   the File Meta Info has been written.
     fp.is_little_endian = True
     fp.is_implicit_VR = False
 
-    if Tag((2, 1)) not in meta_dataset:
-        meta_dataset.add_new((2, 1), 'OB', b"\0\1")   # file meta information version
+    # Set a default value that will be updated later once we know the length
+    meta_dataset.FileMetaInformationGroupLength = 0
 
-    # Now check that required meta info tags are present:
+    if 'FileMetaInformationVersion' not in meta_dataset:
+        meta_dataset.FileMetaInformationVersion = b"\0\1"
+
+    # Check that no non-Group 2 Elements are present
+    for elem in meta_dataset:
+        if elem.tag.group != 0x0002:
+            raise ValueError("File meta information can only contain group 2 "
+                             "elements.")
+
+    # Check that required Elements are present
     missing = []
-    for element in [2, 3, 0x10, 0x12]:
-        if Tag((2, element)) not in meta_dataset:
-            missing.append(Tag((2, element)))
+    for element in [0x0002, 0x0003, 0x0010, 0x0012]:
+        if Tag(0x0002, element) not in meta_dataset:
+            missing.append(Tag(0x0002, element))
     if missing:
-        raise ValueError("Missing required tags {0} for file meta information".format(str(missing)))
+        raise ValueError("Missing required tags {0} for file meta "
+                         "information".format(str(missing)))
 
-    # Put in temp number for required group length, save current location to come back
-    meta_dataset[(2, 0)] = DataElement((2, 0), 'UL', 0)  # put 0 to start
-    group_length_data_element_size = 12  # !based on DICOM std ExplVR
-    group_length_tell = fp.tell()
-
-    # Write the file meta datset, including temp group length
-    length = write_dataset(fp, meta_dataset)
-    group_length = length - group_length_data_element_size  # counts from end of that
+    ## Write the File Meta Information elements to `fp`
+    #
+    # The first element is FileMetaInformationGroupLength and is always
+    #   required. It has a VR of 'UL' and so has a value that is
+    #   4 bytes fixed. The total length of this Element when encoded as
+    #   Explicit VR must therefore be 12 bytes.
+    end_group_length_elem = fp.tell() + 12
+    write_dataset(fp, meta_dataset)
 
     # Save end of file meta to go back to
     end_of_file_meta = fp.tell()
 
-    # Go back and write the actual group length
-    fp.seek(group_length_tell)
-    group_length_data_element = DataElement((2, 0), 'UL', group_length)
-    write_data_element(fp, group_length_data_element)
+    # Go back and write the FileMetaInformationGroupLength element with the
+    #   correct Group Length value, which is the number of bytes from the end
+    #   of the FileMetaInformationGroupLength element to the end of the
+    #   the File Meta Information elements
+    meta_dataset.FileMetaInformationGroupLength = \
+                                    end_of_file_meta - end_group_length_elem
+    fp.seek(end_group_length_elem - 12)
+    write_data_element(fp, meta_dataset[0x00020000])
 
-    # Return to end of file meta, ready to write remainder of the file
+    # Return to end of the file meta, ready to write remainder of the file
     fp.seek(end_of_file_meta)
-
 
 def write_file(filename, dataset, write_like_original=True):
     """Store a FileDataset to the filename specified.

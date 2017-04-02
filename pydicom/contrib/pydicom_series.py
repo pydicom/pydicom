@@ -282,11 +282,11 @@ def _getPixelDataFromDataset(ds):
             else:
                 # Unsigned integer type
                 if maxReq < 2 ** 8:
-                    dtype = np.int8
+                    dtype = np.uint8
                 elif maxReq < 2 ** 16:
-                    dtype = np.int16
+                    dtype = np.uint16
                 elif maxReq < 2 ** 32:
-                    dtype = np.int32
+                    dtype = np.uint32
                 else:
                     dtype = np.float32
 

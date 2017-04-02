@@ -59,10 +59,25 @@ class DatasetTests(unittest.TestCase):
         def callable_pixel_array():
             ds.pixel_array
 
-        attribute_error_msg = "AttributeError in pixel_array property: " + \
-            "Dataset does not have attribute 'TransferSyntaxUID'"
-        self.failUnlessExceptionArgs(attribute_error_msg,
-                                     PropertyError, callable_pixel_array)
+        msg = "AttributeError in pixel_array property: " + \
+            "'Dataset' object has no attribute 'TransferSyntaxUID'"
+        self.failUnlessExceptionArgs(msg, PropertyError, callable_pixel_array)
+
+    def test_attribute_error_in_property_correct_debug(self):
+        """Test AttributeError in property raises correctly."""
+        class Foo(Dataset):
+            @property
+            def bar(self): return self._barr()
+
+            def _bar(self): return 'OK'
+
+        def test():
+            ds = Foo()
+            ds.bar
+
+        self.assertRaises(AttributeError, test)
+        msg = "'Foo' object has no attribute '_barr'"
+        self.failUnlessExceptionArgs(msg, AttributeError, test)
 
     def testTagExceptionPrint(self):
         # When printing datasets, a tag number should appear in error
@@ -273,17 +288,17 @@ class DatasetTests(unittest.TestCase):
         ds = self.dummy_dataset()
         del ds.TreatmentMachineName
         self.assertRaises(AttributeError, testAttribute)
-        
+
     def testDeleteDicomCommandGroupLength(self):
         """Dataset: delete CommandGroupLength doesn't raise AttributeError.."""
         def testAttribute():
             ds.CommandGroupLength
-        
+
         ds = self.dummy_dataset()
         ds.CommandGroupLength = 100 # (0x0000, 0x0000)
         del ds.CommandGroupLength
         self.assertRaises(AttributeError, testAttribute)
-    
+
     def testDeleteOtherAttr(self):
         """Dataset: delete non-DICOM attribute by name......................"""
         ds = self.dummy_dataset()
@@ -446,6 +461,28 @@ class DatasetTests(unittest.TestCase):
             hash(d)
 
         self.assertRaises(TypeError, test_hash)
+
+    def test_property(self):
+        """Test properties work OK."""
+        class DSPlus(Dataset):
+            @property
+            def test(self):
+                return self._test
+
+            @test.setter
+            def test(self, value):
+                self._test = value
+
+        dsp = DSPlus()
+        dsp.test = 'ABCD'
+        self.assertEqual(dsp.test, 'ABCD')
+
+    def test_add_repeater_elem_by_keyword(self):
+        """Repeater using keyword to add repeater group elements raises ValueError."""
+        ds = Dataset()
+        def test():
+            ds.OverlayData = b'\x00'
+        self.assertRaises(ValueError, test)
 
 
 class DatasetElementsTests(unittest.TestCase):
