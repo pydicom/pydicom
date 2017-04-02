@@ -207,7 +207,7 @@ def _add_element(dcm, tagstack, value):
             address = pydicom.tag.Tag(__str2tag(item))
         current_node = current_node[address]
     tag = __str2tag(tagstack[-1])
-    vr = pydicom.datadict.dictionaryVR(tag)
+    vr = pydicom.datadict.dictionary_VR(tag)
     current_node[tag] = pydicom.dataelem.DataElement(tag, vr, value)
 
 
@@ -352,7 +352,7 @@ def __dicomify(key, value):
     if tag.element == 0:  # 0 tag implies group length (filreader.py pydicom)
         vr = 'UL'
     else:
-        vr = pydicom.datadict.dictionaryVR(tag)
+        vr = pydicom.datadict.dictionary_VR(tag)
 
     if vr == 'OW/OB':  # Always write pixel data as bytes
         vr = 'OB'      # rather than words

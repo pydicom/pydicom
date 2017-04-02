@@ -27,8 +27,8 @@ import sys
 
 from pydicom import compat
 from pydicom.charset import default_encoding, convert_encodings
-from pydicom.datadict import dictionaryVR
-from pydicom.datadict import tag_for_name, all_names_for_tag, repeater_has_keyword
+from pydicom.datadict import dictionary_VR
+from pydicom.datadict import tag_for_keyword, keyword_for_tag, repeater_has_keyword
 from pydicom.tag import Tag, BaseTag
 from pydicom.dataelem import DataElement, DataElement_from_raw, RawDataElement
 from pydicom.uid import NotCompressedPixelTransferSyntaxes, UncompressedPixelTransferSyntaxes
@@ -236,7 +236,7 @@ class Dataset(dict):
             For the given DICOM element `keyword`, return the corresponding
             Dataset DataElement if present, None otherwise.
         """
-        tag = tag_for_name(name)
+        tag = tag_for_keyword(name)
         if tag:
             return self[tag]
         return None
@@ -259,7 +259,7 @@ class Dataset(dict):
             True if the DataElement is in the Dataset, False otherwise.
         """
         if isinstance(name, (str, compat.text_type)):
-            tag = tag_for_name(name)
+            tag = tag_for_keyword(name)
         else:
             try:
                 tag = Tag(name)
@@ -310,7 +310,7 @@ class Dataset(dict):
             The keyword for the DICOM element or the class attribute to delete.
         """
         # First check if a valid DICOM keyword and if we have that data element
-        tag = tag_for_name(name)
+        tag = tag_for_keyword(name)
         if tag is not None and tag in self:
             dict.__delitem__(self, tag)  # direct to dict as we know we have key
         # If not a DICOM name in this dataset, check for regular instance name
@@ -374,9 +374,7 @@ class Dataset(dict):
             The matching DataElement keywords in the dataset. If no filters are
             used then all DataElement keywords are returned.
         """
-        allnames = []
-        for tag, data_element in self.items():
-            allnames.extend(all_names_for_tag(tag))
+        allnames = [keyword_for_tag(tag) for tag in self.keys()]
         # remove blanks - tags without valid names (e.g. private tags)
         allnames = [x for x in allnames if x]
         # Store found names in a dict, so duplicate names appear only once
@@ -475,7 +473,7 @@ class Dataset(dict):
               (if present).
         """
         try:
-            tag = tag_for_name(name)
+            tag = tag_for_keyword(name)
             if tag is None: # `name` isn't a DICOM element keyword
                 raise AttributeError
             tag = Tag(tag)
@@ -1139,8 +1137,7 @@ class Dataset(dict):
     def __setattr__(self, name, value):
         """Intercept any attempts to set a value for an instance attribute.
 
-        If name is a DICOM descriptive string (cleaned with CleanName), then
-        set the corresponding tag and DataElement.
+        If name is a DICOM keyword, set the corresponding tag and DataElement.
         Else, set an instance (python) attribute as any other class would do.
 
         Parameters
@@ -1152,10 +1149,10 @@ class Dataset(dict):
         value
             The value for the attribute to be added/changed.
         """
-        tag = tag_for_name(name)
+        tag = tag_for_keyword(name)
         if tag is not None:  # successfully mapped name to a tag
             if tag not in self:  # don't have this tag yet->create the data_element instance
-                VR = dictionaryVR(tag)
+                VR = dictionary_VR(tag)
                 data_element = DataElement(tag, VR, value)
             else:  # already have this data_element, just changing its value
                 data_element = self[tag]
