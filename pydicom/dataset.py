@@ -1,3 +1,4 @@
+# dataset.py
 """Define the Dataset and FileDataset classes.
 
 The Dataset class represents the DICOM Dataset while the FileDataset class
@@ -14,7 +15,7 @@ Dataset (dict subclass)
             contains its own DataElements, and so on in a recursive manner.
 """
 #
-# Copyright (c) 2008-2013 Darcy Mason
+# Copyright (c) 2008-2017 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
 #    See the file license.txt included with this distribution, also
 #    available at https://github.com/darcymason/pydicom
