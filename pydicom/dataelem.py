@@ -16,7 +16,7 @@ from pydicom import compat
 from pydicom.config import logger
 from pydicom.datadict import (dictionary_has_tag, dictionary_description,
                               dictionary_keyword, dictionary_is_retired,
-                              private_dictionary_description, dictionaryVR,
+                              private_dictionary_description, dictionary_VR,
                               repeater_has_tag)
 from pydicom.tag import Tag
 from pydicom.uid import UID
@@ -427,7 +427,7 @@ def DataElement_from_raw(raw_data_element, encoding=None):
     VR = raw.VR
     if VR is None:  # Can be if was implicit VR
         try:
-            VR = dictionaryVR(raw.tag)
+            VR = dictionary_VR(raw.tag)
         except KeyError:
             if raw.tag.is_private:
                 VR = 'OB'  # just read the bytes, no way to know what they mean

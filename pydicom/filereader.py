@@ -32,7 +32,7 @@ import pydicom.uid  # for Implicit/Explicit/Little/Big Endian transfer syntax UI
 from pydicom.filebase import DicomFile
 from pydicom.dataset import Dataset, FileDataset
 from pydicom.dicomdir import DicomDir
-from pydicom.datadict import dictionaryVR
+from pydicom.datadict import dictionary_VR
 from pydicom.dataelem import DataElement
 from pydicom.tag import ItemTag, SequenceDelimiterTag
 from pydicom.sequence import Sequence
@@ -271,7 +271,7 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian,
             #   identified as a Sequence
             if VR is None:
                 try:
-                    VR = dictionaryVR(tag)
+                    VR = dictionary_VR(tag)
                 except KeyError:
                     # Look ahead to see if it consists of items and is thus a SQ
                     next_tag = TupleTag(unpack(endian_chr + "HH", fp_read(4)))

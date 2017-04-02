@@ -12,7 +12,7 @@ where a block is reserved etc as specified in the DICOM standards.
 from __future__ import print_function
 
 # D. Mason, 2013-01
-from pydicom.datadict import DicomDictionary, NameDict, CleanName
+from pydicom.datadict import DicomDictionary, keyword_dict, CleanName
 from pydicom.dataset import Dataset
 
 # Define items as (VR, VM, description, is_retired flag, keyword)
@@ -27,9 +27,9 @@ new_dict_items = {
 DicomDictionary.update(new_dict_items)
 
 # Update the reverse mapping from name to tag
-new_names_dict = dict([(CleanName(tag), tag) for tag in
-                       new_dict_items])
-NameDict.update(new_names_dict)
+new_names_dict = dict([(val[4], tag) for tag, val in
+                       new_dict_items.items()])
+keyword_dict.update(new_names_dict)
 
 # Test that it is working
 ds = Dataset()  # or could get one from read_file, etc
