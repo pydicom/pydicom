@@ -6,10 +6,11 @@
 #    available at https://github.com/darcymason/pydicom
 
 import unittest
+from pydicom.dataset import Dataset
 from pydicom.tag import Tag
-from pydicom.datadict import (CleanName, all_names_for_tag,
-                              dictionary_description, dictionary_has_tag,
-                              repeater_has_tag, repeater_has_keyword)
+from pydicom.datadict import (keyword_for_tag, dictionary_description,
+                              dictionary_has_tag, repeater_has_tag,
+                              repeater_has_keyword)
 from pydicom.datadict import add_dict_entry, add_dict_entries
 
 

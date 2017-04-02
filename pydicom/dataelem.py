@@ -17,7 +17,7 @@ from pydicom import compat
 from pydicom.config import logger
 from pydicom.datadict import (dictionary_has_tag, dictionary_description,
                               dictionary_keyword, dictionary_is_retired,
-                              private_dictionary_description, dictionaryVR,
+                              private_dictionary_description, dictionary_VR,
                               repeater_has_tag)
 from pydicom.tag import Tag
 from pydicom.uid import UID
@@ -283,7 +283,7 @@ class DataElement(object):
         """Return a str representation of the element's `value`."""
         byte_VRs = ['OB', 'OW', 'OW/OB', 'OW or OB', 'OB or OW',
                     'US or SS or OW', 'US or SS']
-            repVal = "Array of %d bytes" % len(self.value)
+        repVal = "Array of %d bytes" % len(self.value)
         if (self.VR in byte_VRs and len(self.value) > self.maxBytesToDisplay):
             repVal = "Array of %d bytes" % len(self.value)
         elif hasattr(self, 'original_string'):  # for VR of IS or DS

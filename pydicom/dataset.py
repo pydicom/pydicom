@@ -29,7 +29,7 @@ import sys
 from pydicom import compat
 from pydicom.charset import default_encoding, convert_encodings
 from pydicom.datadict import dictionary_VR
-from pydicom.datadict import tag_for_keyword, keyword_for_tag, all_names_for_tag, repeater_has_keyword
+from pydicom.datadict import tag_for_keyword, keyword_for_tag, repeater_has_keyword
 from pydicom.tag import Tag, BaseTag
 from pydicom.dataelem import DataElement, DataElement_from_raw, RawDataElement
 from pydicom.uid import NotCompressedPixelTransferSyntaxes, UncompressedPixelTransferSyntaxes
@@ -474,7 +474,7 @@ class Dataset(dict):
               (if present).
         """
         try:
-        tag = tag_for_keyword(name)
+            tag = tag_for_keyword(name)
             if tag is None: # `name` isn't a DICOM element keyword
                 raise AttributeError
         
