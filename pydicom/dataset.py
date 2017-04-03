@@ -472,18 +472,17 @@ class Dataset(dict):
               DataElement's value. Otherwise returns the class attribute's value
               (if present).
         """
-        try:
-            tag = tag_for_keyword(name)
-            if tag is None: # `name` isn't a DICOM element keyword
-                raise AttributeError
-            tag = Tag(tag)
-            if tag not in self: # DICOM DataElement not in the Dataset
-                raise AttributeError
-            else:
-                return self[tag].value
-        except AttributeError:
+        tag = tag_for_keyword(name)
+        if tag is None: # `name` isn't a DICOM element keyword
             # Try the base class attribute getter (fix for issue 332)
             return super(Dataset, self).__getattribute__(name)
+        tag = Tag(tag)
+        if tag not in self: # DICOM DataElement not in the Dataset
+            # Try the base class attribute getter (fix for issue 332)
+            return super(Dataset, self).__getattribute__(name)
+        else:
+            return self[tag].value
+            
 
     @property
     def _character_set(self):
@@ -989,13 +988,7 @@ class Dataset(dict):
         numpy.ndarray
             The Pixel Data (7FE0,0010) as a NumPy ndarray.
         """
-        try:
-            return self._get_pixel_array()
-        except AttributeError:
-            t, e, tb = sys.exc_info()
-            val = PropertyError("AttributeError in pixel_array property: " +
-                                e.args[0])
-            compat.reraise(PropertyError, val, tb)
+        return self._get_pixel_array()
 
     # Format strings spec'd according to python string formatting options
     #    See http://docs.python.org/library/stdtypes.html#string-formatting-operations
