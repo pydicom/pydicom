@@ -478,8 +478,18 @@ def _read_file_meta_info(fp):
         """Return True if the tag is not in group 0x0002, False otherwise."""
         return (tag.group != 2)
 
+    start_file_meta = fp.tell()
     file_meta = read_dataset(fp, is_implicit_VR=False, is_little_endian=True,
                              stop_when=_not_group_0002)
+    # Log if the Group Length doesn't match actual length
+    if 'FileMetaInformationGroupLength' in file_meta:
+        # FileMetaInformationGroupLength must be 12 bytes long and its value
+        #   counts from the beginning of the next element to the end of the
+        #   file meta elements
+        length_file_meta = fp.tell() - (start_file_meta + 12)
+        if file_meta.FileMetaInformationGroupLength != length_file_meta:
+            logger.info("*** Group length for file meta dataset "
+                        "did not match end of group 2 data ***")
     return file_meta
 
 
