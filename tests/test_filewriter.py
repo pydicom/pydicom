@@ -102,6 +102,12 @@ class WriteFileTests(unittest.TestCase):
         if os.path.exists(out_filename):
             os.remove(out_filename)  # get rid of the file
 
+    def compare_bytes(self, bytes_in, bytes_out):
+        """Compare two bytestreams for equality"""
+        same, pos = bytes_identical(bytes_in, bytes_out)
+        self.assertTrue(same, "Files are not identical - first difference at "
+                        "0x%x" %pos)
+
     def testRTPlan(self):
         """Input file, write back and verify them identical (RT Plan file)"""
         self.compare(rtplan_name, rtplan_out)
@@ -168,7 +174,10 @@ class WriteFileTests(unittest.TestCase):
         ds = read_file(no_ts)
         ds.save_as(written_file, write_like_original=True)
         written_file.seek(0)
-        self.compare(no_ts, written_file)
+        with open(no_ts, 'rb') as ref_file:
+            written_bytes = written_file.read()
+            read_bytes = ref_file.read()
+            self.compare_bytes(read_bytes, written_bytes)
 
 
 @unittest.skipIf(not have_dateutil, "Need python-dateutil installed for these tests")
