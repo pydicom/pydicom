@@ -421,6 +421,39 @@ class ReaderTests(unittest.TestCase):
         ds = read_file(fp, defer_size=65, force=True)
         self.assertEqual(ds[0x00080005].value, long_specific_char_set_value)
 
+    def test_no_preamble_file_meta(self):
+        """Test correct read of group 2 elements with no file meta."""
+        bytestream = b'\x02\x00\x02\x00\x55\x49\x16\x00\x31\x2e\x32\x2e\x38\x34\x30\x2e\x31' \
+                     b'\x30\x30\x30\x38\x2e\x35\x2e\x31\x2e\x31\x2e\x39\x00\x02\x00\x10\x00' \
+                     b'\x55\x49\x12\x00\x31\x2e\x32\x2e\x38\x34\x30\x2e\x31\x30\x30\x30\x38' \
+                     b'\x2e\x31\x2e\x32\x00\x20\x20\x10\x00\x02\x00\x00\x00\x01\x00\x20\x20' \
+                     b'\x20\x00\x06\x00\x00\x00\x4e\x4f\x52\x4d\x41\x4c'
+
+        fp = BytesIO(bytestream)
+        ds = read_file(fp, force=True)
+        self.assertTrue('MediaStorageSOPClassUID' in ds.file_meta)
+        self.assertEqual(ds.file_meta.TransferSyntaxUID, ImplicitVRLittleEndian)
+        self.assertEqual(ds.Polarity, 'NORMAL')
+        self.assertEqual(ds.ImageBoxPosition, 1)
+
+    def test_no_preamble_command_group(self):
+        """Test correct read of group 0 and 2 elements with no file meta."""
+        bytestream = b'\x00\x00\x10\x01\x02\x00\x00\x00\x03\x00' \
+                     b'\x02\x00\x02\x00\x55\x49\x16\x00\x31\x2e\x32\x2e\x38\x34\x30\x2e\x31' \
+                     b'\x30\x30\x30\x38\x2e\x35\x2e\x31\x2e\x31\x2e\x39\x00\x02\x00\x10\x00' \
+                     b'\x55\x49\x12\x00\x31\x2e\x32\x2e\x38\x34\x30\x2e\x31\x30\x30\x30\x38' \
+                     b'\x2e\x31\x2e\x32\x00' \
+                     b'\x20\x20\x10\x00\x02\x00\x00\x00\x01\x00\x20\x20' \
+                     b'\x20\x00\x06\x00\x00\x00\x4e\x4f\x52\x4d\x41\x4c'
+
+        fp = BytesIO(bytestream)
+        ds = read_file(fp, force=True)
+        self.assertTrue('MediaStorageSOPClassUID' in ds.file_meta)
+        self.assertEqual(ds.file_meta.TransferSyntaxUID, ImplicitVRLittleEndian)
+        self.assertEqual(ds.Polarity, 'NORMAL')
+        self.assertEqual(ds.ImageBoxPosition, 1)
+        self.assertEqual(ds.MessageID, 3)
+
 
 class ReadDataElementTests(unittest.TestCase):
     def setUp(self):
