@@ -209,10 +209,6 @@ class ReaderTests(unittest.TestCase):
         # Also has no DICOM header ... so tests 'force' argument of read_file
 
         rtss = read_file(rtstruct_name, force=True)
-        #expected = '1.2.840.10008.1.2'  # implVR little endian
-        #got = rtss.file_meta.TransferSyntaxUID
-        #msg = "Expected transfer syntax %r, got %r" % (expected, got)
-        #self.assertEqual(expected, got, msg)
         frame_of_ref = rtss.ReferencedFrameOfReferenceSequence[0]
         study = frame_of_ref.RTReferencedStudySequence[0]
         uid = study.RTReferencedSeriesSequence[0].SeriesInstanceUID

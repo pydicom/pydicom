@@ -456,7 +456,7 @@ def _read_command_set_elements(fp):
 
 
 def _read_file_meta_info(fp):
-    """Return a Dataset containing any File  Meta (0002,eeee) elements in `fp`.
+    """Return a Dataset containing any File Meta (0002,eeee) elements in `fp`.
 
     File Meta elements are always Explicit VR Little Endian (as per PS3.10
     Section 7). Once any File Meta elements are read `fp` will be positioned
@@ -507,11 +507,12 @@ def read_file_meta_info(filename):
 
 
 def read_preamble(fp, force):
-    """Return the 128-byte DICOM preamble if present, None otherwise.
+    """Return the 128-byte DICOM preamble in `fp` if present.
 
     Parameters
     ----------
     fp : file-like object
+        The file-like to read the preamble from.
     force : bool
         Flag to force reading of a file even if no header is found.
 
@@ -520,13 +521,12 @@ def read_preamble(fp, force):
     preamble : str/bytes or None
         The 128-byte DICOM preamble will be returned if the appropriate prefix
         ('DICM') is found at byte offset 128. Returns None if the 'DICM' prefix
-        is not found.
+        is not found and `force` is True.
 
     Raises
     ------
     InvalidDicomError
-        If force flag is false and no appropriate header information
-        found.
+        If `force` is False and no appropriate header information found.
 
     Notes
     -----
@@ -650,6 +650,8 @@ def read_partial(fileobj, stop_when=None, defer_size=None, force=False):
         is_implicit_VR = False
 
     # Try and decode the dataset
+    #   By this point we should be at the start of the dataset and have
+    #   the transfer syntax (whether read from the file meta or guessed at)
     try:
         dataset = read_dataset(fileobj, is_implicit_VR, is_little_endian,
                                stop_when=stop_when, defer_size=defer_size)
