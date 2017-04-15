@@ -44,6 +44,7 @@ from pydicom.filebase import DicomBytesIO
 from pydicom.filereader import read_file, data_element_generator
 from pydicom.errors import InvalidDicomError
 from pydicom.tag import Tag, TupleTag
+from pydicom.uid import ImplicitVRLittleEndian
 import pydicom.valuerep
 
 have_jpeg_ls = True
@@ -208,10 +209,6 @@ class ReaderTests(unittest.TestCase):
         # Also has no DICOM header ... so tests 'force' argument of read_file
 
         rtss = read_file(rtstruct_name, force=True)
-        expected = '1.2.840.10008.1.2'  # implVR little endian
-        got = rtss.file_meta.TransferSyntaxUID
-        msg = "Expected transfer syntax %r, got %r" % (expected, got)
-        self.assertEqual(expected, got, msg)
         frame_of_ref = rtss.ReferencedFrameOfReferenceSequence[0]
         study = frame_of_ref.RTReferencedStudySequence[0]
         uid = study.RTReferencedSeriesSequence[0].SeriesInstanceUID
@@ -420,6 +417,57 @@ class ReaderTests(unittest.TestCase):
 
         ds = read_file(fp, defer_size=65, force=True)
         self.assertEqual(ds[0x00080005].value, long_specific_char_set_value)
+
+    def test_no_preamble_file_meta(self):
+        """Test correct read of group 2 elements with no preamble."""
+        bytestream = b'\x02\x00\x02\x00\x55\x49\x16\x00\x31\x2e\x32\x2e\x38\x34\x30\x2e\x31' \
+                     b'\x30\x30\x30\x38\x2e\x35\x2e\x31\x2e\x31\x2e\x39\x00\x02\x00\x10\x00' \
+                     b'\x55\x49\x12\x00\x31\x2e\x32\x2e\x38\x34\x30\x2e\x31\x30\x30\x30\x38' \
+                     b'\x2e\x31\x2e\x32\x00\x20\x20\x10\x00\x02\x00\x00\x00\x01\x00\x20\x20' \
+                     b'\x20\x00\x06\x00\x00\x00\x4e\x4f\x52\x4d\x41\x4c'
+
+        fp = BytesIO(bytestream)
+        ds = read_file(fp, force=True)
+        self.assertTrue('MediaStorageSOPClassUID' in ds.file_meta)
+        self.assertEqual(ds.file_meta.TransferSyntaxUID, ImplicitVRLittleEndian)
+        self.assertEqual(ds.Polarity, 'NORMAL')
+        self.assertEqual(ds.ImageBoxPosition, 1)
+
+    def test_no_preamble_command_group(self):
+        """Test correct read of group 0 and 2 elements with no preamble."""
+        bytestream = b'\x00\x00\x10\x01\x02\x00\x00\x00\x03\x00' \
+                     b'\x02\x00\x02\x00\x55\x49\x16\x00\x31\x2e\x32\x2e\x38\x34\x30\x2e\x31' \
+                     b'\x30\x30\x30\x38\x2e\x35\x2e\x31\x2e\x31\x2e\x39\x00\x02\x00\x10\x00' \
+                     b'\x55\x49\x12\x00\x31\x2e\x32\x2e\x38\x34\x30\x2e\x31\x30\x30\x30\x38' \
+                     b'\x2e\x31\x2e\x32\x00' \
+                     b'\x20\x20\x10\x00\x02\x00\x00\x00\x01\x00\x20\x20' \
+                     b'\x20\x00\x06\x00\x00\x00\x4e\x4f\x52\x4d\x41\x4c'
+
+        fp = BytesIO(bytestream)
+        ds = read_file(fp, force=True)
+        self.assertTrue('MediaStorageSOPClassUID' in ds.file_meta)
+        self.assertEqual(ds.file_meta.TransferSyntaxUID, ImplicitVRLittleEndian)
+        self.assertEqual(ds.Polarity, 'NORMAL')
+        self.assertEqual(ds.ImageBoxPosition, 1)
+        self.assertEqual(ds.MessageID, 3)
+
+    def test_group_length_wrong(self):
+        """Test file is read correctly even if FileMetaInformationGroupLength is incorrect."""
+        bytestream = b'\x02\x00\x00\x00\x55\x4C\x04\x00\x0A\x00\x00\x00' \
+                     b'\x02\x00\x02\x00\x55\x49\x16\x00\x31\x2e\x32\x2e\x38\x34\x30\x2e\x31' \
+                     b'\x30\x30\x30\x38\x2e\x35\x2e\x31\x2e\x31\x2e\x39\x00\x02\x00\x10\x00' \
+                     b'\x55\x49\x12\x00\x31\x2e\x32\x2e\x38\x34\x30\x2e\x31\x30\x30\x30\x38' \
+                     b'\x2e\x31\x2e\x32\x00' \
+                     b'\x20\x20\x10\x00\x02\x00\x00\x00\x01\x00\x20\x20' \
+                     b'\x20\x00\x06\x00\x00\x00\x4e\x4f\x52\x4d\x41\x4c'
+        fp = BytesIO(bytestream)
+        ds = read_file(fp, force=True)
+        self.assertFalse(len(bytestream) - 12 == ds.file_meta.FileMetaInformationGroupLength)
+        self.assertTrue(ds.file_meta.FileMetaInformationGroupLength == 10)
+        self.assertTrue('MediaStorageSOPClassUID' in ds.file_meta)
+        self.assertEqual(ds.file_meta.TransferSyntaxUID, ImplicitVRLittleEndian)
+        self.assertEqual(ds.Polarity, 'NORMAL')
+        self.assertEqual(ds.ImageBoxPosition, 1)
 
 
 class ReadDataElementTests(unittest.TestCase):
