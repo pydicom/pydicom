@@ -177,7 +177,8 @@ NotCompressedPixelTransferSyntaxes = [ExplicitVRLittleEndian,
                                       DeflatedExplicitVRLittleEndian,
                                       ExplicitVRBigEndian]
 
-# Many thanks to the Medical Connections for offering free valid UIDs (http://www.medicalconnections.co.uk/FreeUID.html)
+# Many thanks to the Medical Connections for offering free valid UIDs
+# (http://www.medicalconnections.co.uk/FreeUID.html)
 # Their service was used to obtain the following root UID for pydicom:
 pydicom_root_UID = '1.2.826.0.1.3680043.8.498.'
 pydicom_uids = {

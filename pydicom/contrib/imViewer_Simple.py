@@ -58,10 +58,10 @@ def MsgDlg(window, string, caption='OFAImage', style=wx.YES_NO | wx.CANCEL):
 class ImFrame(wx.Frame):
     """Class for main window."""
 
-    def __init__(self, parent, title):
+    def __init__(self, parent, title=""):
         """Create the pydicom image example's main frame window."""
 
-        wx.Frame.__init__(self, parent, id=-1, title="", pos=wx.DefaultPosition,
+        wx.Frame.__init__(self, parent, id=-1, title=title, pos=wx.DefaultPosition,
                           size=wx.Size(w=1024, h=768),
                           style=wx.DEFAULT_FRAME_STYLE | wx.SUNKEN_BORDER | wx.CLIP_CHILDREN)
 
@@ -255,7 +255,7 @@ class ImFrame(wx.Frame):
             im = PIL.Image.fromarray(image).convert('L')  # Convert mode to L since LUT has only 256 values: http://www.pythonware.com/library/pil/handbook/image.htm
         return im
 
-    def show_file(self, imageFile, fullPath):
+    def show_file(self, fullPath):
         """ Load the DICOM file, make sure it contains at least one
         image, and set it up for display by OnPaint().  ** be
         careful not to pass a unicode string to read_file or it will
