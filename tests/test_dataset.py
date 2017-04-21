@@ -483,6 +483,44 @@ class DatasetTests(unittest.TestCase):
             ds.OverlayData = b'\x00'
         self.assertRaises(ValueError, test)
 
+    def test_get_slice(self):
+        """Test Dataset[(gggg,eeee):(gggg,eeee)]"""
+        ds = Dataset()
+        ds.CommandGroupLength = 120 # 0000,0000
+        ds.CommandGroupLengthToEnd = 111 # 0000,0001
+        ds.Overlays = 12 # 0000,51B0
+        ds.LengthToEnd = 12 # 0008,0001
+        ds.add_new(0x00080002, 'PN', 'CITIZEN^2')
+        ds.add_new(0x00080003, 'PN', 'CITIZEN^3')
+        ds.add_new(0x00080004, 'PN', 'CITIZEN^4')
+        ds.add_new(0x00080005, 'PN', 'CITIZEN^5')
+        ds.add_new(0x00080006, 'PN', 'CITIZEN^6')
+        ds.add_new(0x00080007, 'PN', 'CITIZEN^7')
+        ds.add_new(0x00080008, 'PN', 'CITIZEN^8')
+        ds.add_new(0x00080009, 'PN', 'CITIZEN^9')
+        ds.add_new(0x00080010, 'PN', 'CITIZEN^10')
+        ds.SOPInstanceUID = '1.2.3.4' # 0008,0018
+        ds.SkipFrameRangeFlag = 'TEST' # 0008,9460
+        ds.PatientName = 'CITIZEN^Jan' # 0010,0010
+        ds.PatientID = '12345' # 0010,0010
+        ds.ExaminedBodyThickness = 1.223 # 0010,9431
+        ds.BeamSequence = [Dataset()] # 300A,00B0
+        ds.BeamSequence[0].PatientName = 'ANON'
+        #self.assertEqual(ds[:], ds)
+
+        print(ds[0x00010000:]) # All non group 0x0000
+
+        self.assertEqual(ds[0x00080000:0x0008FFFF], ds.group_dataset(0x0008)) # All group 0x0008
+        ref_ds = Dataset()
+        ref_ds.PatientName = 'CITIZEN^Jan'
+        self.assertEqual(ds[0x00100010:0x00100020], ref_ds) # Dataset with PatientName element only
+
+        print(ds[0x00080000:0x00100000:2]) # Every 2nd element in group 0x0008
+        print(ds[:0x00080000]) # < group 0x0008
+        print(ds[:0x0008FFFF:2]) # <= group 0x0008, step 2
+
+        print(ds[(0x0010,0000):])
+
 
 class DatasetElementsTests(unittest.TestCase):
     """Test valid assignments of data elements"""

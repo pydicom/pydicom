@@ -324,20 +324,43 @@ class Dataset(dict):
     def __delitem__(self, key):
         """Intercept requests to delete an attribute by key.
 
-        >>> del ds[0x00100010]
+        Examples
+        --------
+        Indexing
+        >>> ds = Dataset()
+        >>> ds.CommandGroupLength = 100
+        >>> ds.PatientName = 'CITIZEN^Jan'
+        >>> del ds[0x00000000]
+        >>> ds
+        (0010, 0010) Patient's Name                      PN: 'CITIZEN^Jan'
+
+        Slicing
+        >>> ds = Dataset()
+        >>> ds.CommandGroupLength = 100
+        >>> ds.SOPInstanceUID = '1.2.3'
+        >>> ds.PatientName = 'CITIZEN^Jan'
+        >>> del ds[:0x00100000]
+        >>> ds
+        (0010, 0010) Patient's Name                      PN: 'CITIZEN^Jan'
 
         Parameters
         ----------
         key
-            The key for the attribute to be deleted.
+            The key for the attribute to be deleted. If a slice is used then
+            the tags matching the slice conditions will be deleted.
         """
-        # Assume is a standard tag (for speed in common case)
-        try:
-            dict.__delitem__(self, key)
-        # If not a standard tag, than convert to Tag and try again
-        except KeyError:
-            tag = Tag(key)
-            dict.__delitem__(self, tag)
+        # If passed a slice, delete the corresponding DataElements
+        if isinstance(key, slice):
+            for tag in self._slice_dataset(key.start, key.stop, key.step):
+                del self[tag]
+        else:
+            # Assume is a standard tag (for speed in common case)
+            try:
+                dict.__delitem__(self, key)
+            # If not a standard tag, than convert to Tag and try again
+            except KeyError:
+                tag = Tag(key)
+                dict.__delitem__(self, tag)
 
     def __dir__(self):
         """Give a list of attributes available in the Dataset.
@@ -482,7 +505,6 @@ class Dataset(dict):
             return super(Dataset, self).__getattribute__(name)
         else:
             return self[tag].value
-            
 
     @property
     def _character_set(self):
@@ -502,17 +524,50 @@ class Dataset(dict):
         Any deferred data elements will be read in and an attempt will be made
         to correct any elements with ambiguous VRs.
 
+        Examples
+        --------
+        >>> ds = Dataset()
+        >>> ds.SOPInstanceUID = '1.2.3'
+        >>> ds.PatientName = 'CITIZEN^Jan'
+        >>> ds.PatientID = '12345'
+        >>> ds[0x00100010]
+        'CITIZEN^Jan'
+
+        Slicing
+        ~~~~~~~
+        All group 0x0010 elements
+        >>> ds[0x00100000:0x0011000]
+        (0010, 0010) Patient's Name                      PN: 'CITIZEN^Jan'
+        (0010, 0020) Patient ID                          LO: '12345'
+
+        All group 0x0002 DataElements
+        >>> ds[(0x0002,0x0000):(0x0003,0x0000)]
+
+        All even tag DataElements
+        >>> ds[::2]
+
         Parameters
         ----------
         key
             The DICOM (group, element) tag in any form accepted by
             pydicom.tag.Tag such as [0x0010, 0x0010], (0x10, 0x10), 0x00100010,
-            etc.
+            etc. May also be a slice made up of DICOM tags.
 
         Returns
         -------
-        pydicom.dataelem.DataElement
+        pydicom.dataelem.DataElement or pydicom.dataset.Dataset
+            If a single DICOM element tag is used then returns the corresponding
+            DataElement. If a slice is used then returns a Dataset object
+            containing the corresponding DataElements.
         """
+        # If passed a slice, return a Dataset containing the corresponding
+        #   DataElements
+        if isinstance(key, slice):
+            ds = Dataset()
+            for tag in self._slice_dataset(key.start, key.stop, key.step):
+                ds.add(self[tag])
+            return ds
+
         tag = Tag(key)
         data_elem = dict.__getitem__(self, tag)
 
@@ -573,17 +628,14 @@ class Dataset(dict):
         Parameters
         ----------
         group : int
-            The group part of a dicom (group, element) tag.
+            The group part of a DICOM (group, element) tag.
 
         Returns
         -------
         pydicom.dataset.Dataset
             A dataset instance containing elements of the group specified.
         """
-        ds = Dataset()
-        ds.update(dict([(tag, data_element) for tag, data_element in self.items()
-                        if tag.group == group]))
-        return ds
+        return self[(group, 0x0000):(group + 1, 0x0000)]
 
     def __iter__(self):
         """Iterate through the top-level of the Dataset, yielding DataElements.
@@ -1196,6 +1248,36 @@ class Dataset(dict):
                                                         self._character_set)
                 data_element.private_creator = self[private_creator_tag].value
         dict.__setitem__(self, tag, data_element)
+
+    def _slice_dataset(self, start, stop, step):
+        """Yield the element tags in the Dataset that match the slice.
+
+        Parameters
+        ----------
+        start : int or None
+            The slice's starting element tag value.
+        stop : int or None
+            The slice's stopping element tag value.
+        step : int or None
+            The slice's step size.
+
+        Yields
+        ------
+        pydicom.tag.Tag
+            The tags in the Dataset that meet the conditions of the slice.
+        """
+        all_tags = sorted(self.keys())
+        if start is None:
+            start = all_tags[0]
+        if stop is None:
+            stop = all_tags[-1] + 1
+
+        for tag in all_tags:
+            if Tag(start) <= tag < Tag(stop):
+                if step is not None and tag % step == 0:
+                    yield tag
+                elif step is None:
+                    yield tag
 
     def __str__(self):
         """Handle str(dataset)."""
