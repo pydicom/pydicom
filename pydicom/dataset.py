@@ -482,7 +482,6 @@ class Dataset(dict):
             return super(Dataset, self).__getattribute__(name)
         else:
             return self[tag].value
-            
 
     @property
     def _character_set(self):

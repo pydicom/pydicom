@@ -483,6 +483,10 @@ class DatasetTests(unittest.TestCase):
             ds.OverlayData = b'\x00'
         self.assertRaises(ValueError, test)
 
+    def test_not_group_dataset(self):
+        """Test the Dataset.not_group_dataset() function"""
+        pass
+
 
 class DatasetElementsTests(unittest.TestCase):
     """Test valid assignments of data elements"""

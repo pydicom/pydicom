@@ -808,7 +808,7 @@ class ScratchWriteTests(unittest.TestCase):
         self.compare_write(std, file_ds)
 
 
-class TestWriteStandard(unittest.TestCase):
+class TestWriteToStandard(unittest.TestCase):
     """Unit tests for writing datasets to the DICOM Standard"""
     def setUp(self):
         """Create an empty file-like for use in testing."""
@@ -885,8 +885,13 @@ class TestWriteStandard(unittest.TestCase):
         self.assertRaises(ValueError, test)
         self.assertFalse('TransferSyntaxUID' in ds.file_meta)
 
+    def test_raise_no_file_meta(self):
+        """Test exception is raised if trying to write a dataset with no file_meta"""
+        ds = read_file(rtplan_name)
+        del ds.file_meta
+        self.assertRaises(ValueError, ds.save_as, self.fp, write_like_original=False)
 
-class TestWriteStandardFileMetaInfo(unittest.TestCase):
+class TestWriteFileMetaInfoToStandard(unittest.TestCase):
     """Unit tests for writing File Meta Info to the DICOM Standard."""
     def setUp(self):
         """Create an empty file-like for use in testing."""
@@ -1026,7 +1031,7 @@ class TestWriteNonStandard(unittest.TestCase):
         self.assertEqual(ds.file_meta, Dataset())
 
 
-class TestWriteNonStandardFileMetaInfo(unittest.TestCase):
+class TestWriteFileMetaInfoNonStandard(unittest.TestCase):
     """Unit tests for writing File Meta Info not to the DICOM Standard."""
     def setUp(self):
         """Create an empty file-like for use in testing."""
