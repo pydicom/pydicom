@@ -265,7 +265,8 @@ class Dataset(dict):
                 tag = Tag(name)
             except:
                 return False
-        if tag:
+        # Test against None as (0000,0000) is a possible tag
+        if tag is not None:
             return dict.__contains__(self, tag)
         else:
             return dict.__contains__(self, name)  # will no doubt raise an exception
@@ -431,6 +432,8 @@ class Dataset(dict):
             # Compare Elements using values() and class variables using __dict__
             # Convert values() to a list for compatibility between
             #   python 2 and 3
+            #print('vals', list(self.values()) == list(other.values()))
+            #print('dict', self.__dict__ == other.__dict__)
             return (list(self.values()) == list(other.values()) and
                     self.__dict__ == other.__dict__)
 
@@ -535,15 +538,15 @@ class Dataset(dict):
 
         Slicing
         ~~~~~~~
-        All group 0x0010 elements
+        All group 0x0010 elements in the dataset
         >>> ds[0x00100000:0x0011000]
         (0010, 0010) Patient's Name                      PN: 'CITIZEN^Jan'
         (0010, 0020) Patient ID                          LO: '12345'
 
-        All group 0x0002 DataElements
+        All group 0x0002 elements in the dataset
         >>> ds[(0x0002,0x0000):(0x0003,0x0000)]
 
-        All even tag DataElements
+        All even tag elements in the dataset
         >>> ds[::2]
 
         Parameters
@@ -565,6 +568,7 @@ class Dataset(dict):
         if isinstance(key, slice):
             ds = Dataset()
             for tag in self._slice_dataset(key.start, key.stop, key.step):
+            #for tag in self._slice_dataset(key):
                 ds.add(self[tag])
             return ds
 
@@ -1250,7 +1254,7 @@ class Dataset(dict):
         dict.__setitem__(self, tag, data_element)
 
     def _slice_dataset(self, start, stop, step):
-        """Yield the element tags in the Dataset that match the slice.
+        """Return the element tags in the Dataset that match the slice.
 
         Parameters
         ----------
@@ -1261,23 +1265,23 @@ class Dataset(dict):
         step : int or None
             The slice's step size.
 
-        Yields
+        Returns
         ------
-        pydicom.tag.Tag
+        list of pydicom.tag.Tag
             The tags in the Dataset that meet the conditions of the slice.
         """
+        if (start and start < 0) or (stop and stop < 0):
+            raise ValueError('Dataset slicing requires valid DICOM tags.')
+
         all_tags = sorted(self.keys())
+
         if start is None:
             start = all_tags[0]
         if stop is None:
             stop = all_tags[-1] + 1
 
-        for tag in all_tags:
-            if Tag(start) <= tag < Tag(stop):
-                if step is not None and tag % step == 0:
-                    yield tag
-                elif step is None:
-                    yield tag
+        slice_tags = [tag for tag in all_tags if Tag(start) <= tag < Tag(stop)]
+        return slice_tags[::step]
 
     def __str__(self):
         """Handle str(dataset)."""

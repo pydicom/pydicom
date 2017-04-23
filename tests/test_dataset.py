@@ -151,11 +151,13 @@ class DatasetTests(unittest.TestCase):
     def testContains(self):
         """Dataset: can test if item present by 'if <tag> in dataset'......."""
         ds = self.dummy_dataset()
+        ds.CommandGroupLength = 100 # (0000,0000)
         self.assertTrue((0x300a, 0xb2) in ds, "membership test failed")
         self.assertTrue([0x300a, 0xb2] in ds,
                         "membership test failed when list used")
         self.assertTrue(0x300a00b2 in ds, "membership test failed")
         self.assertTrue(not (0x10, 0x5f) in ds, "non-member tested as member")
+        self.assertTrue('CommandGroupLength' in ds)
 
     def testGetExists1(self):
         """Dataset: dataset.get() returns an existing item by name.........."""
@@ -483,33 +485,75 @@ class DatasetTests(unittest.TestCase):
             ds.OverlayData = b'\x00'
         self.assertRaises(ValueError, test)
 
-    def test_get_slice(self):
-        """Test Dataset[(gggg,eeee):(gggg,eeee)]"""
+    def test_getitem_slice_raises(self):
+        """Test Dataset.__getitem__ raises if slice Tags invalid."""
+        self.assertRaises(ValueError, ds.__getitem__, slice(None,-1))
+        self.assertRaises(ValueError, ds.__getitem__, slice(-1, -1))
+        self.assertRaises(ValueError, ds.__getitem__, slice(-1))
+
+    def test_getitem_slice(self):
+        """Test Dataset.__getitem__ using slices."""
         ds = Dataset()
         ds.CommandGroupLength = 120 # 0000,0000
-        ds.CommandGroupLengthToEnd = 111 # 0000,0001
+        ds.CommandLengthToEnd = 111 # 0000,0001
         ds.Overlays = 12 # 0000,51B0
         ds.LengthToEnd = 12 # 0008,0001
-        ds.add_new(0x00080002, 'PN', 'CITIZEN^2')
-        ds.add_new(0x00080003, 'PN', 'CITIZEN^3')
-        ds.add_new(0x00080004, 'PN', 'CITIZEN^4')
-        ds.add_new(0x00080005, 'PN', 'CITIZEN^5')
-        ds.add_new(0x00080006, 'PN', 'CITIZEN^6')
-        ds.add_new(0x00080007, 'PN', 'CITIZEN^7')
-        ds.add_new(0x00080008, 'PN', 'CITIZEN^8')
-        ds.add_new(0x00080009, 'PN', 'CITIZEN^9')
-        ds.add_new(0x00080010, 'PN', 'CITIZEN^10')
         ds.SOPInstanceUID = '1.2.3.4' # 0008,0018
         ds.SkipFrameRangeFlag = 'TEST' # 0008,9460
+        ds.add_new(0x00090001, 'PN', 'CITIZEN^1')
+        ds.add_new(0x00090002, 'PN', 'CITIZEN^2')
+        ds.add_new(0x00090003, 'PN', 'CITIZEN^3')
+        ds.add_new(0x00090004, 'PN', 'CITIZEN^4')
+        ds.add_new(0x00090005, 'PN', 'CITIZEN^5')
+        ds.add_new(0x00090006, 'PN', 'CITIZEN^6')
+        ds.add_new(0x00090007, 'PN', 'CITIZEN^7')
+        ds.add_new(0x00090008, 'PN', 'CITIZEN^8')
+        ds.add_new(0x00090009, 'PN', 'CITIZEN^9')
+        ds.add_new(0x00090010, 'PN', 'CITIZEN^10')
         ds.PatientName = 'CITIZEN^Jan' # 0010,0010
         ds.PatientID = '12345' # 0010,0010
         ds.ExaminedBodyThickness = 1.223 # 0010,9431
         ds.BeamSequence = [Dataset()] # 300A,00B0
         ds.BeamSequence[0].PatientName = 'ANON'
-        #self.assertEqual(ds[:], ds)
 
-        print(ds[0x00010000:]) # All non group 0x0000
+        # Slice all items - should return original dataset
+        self.assertEqual(ds[:], ds)
 
+        # Slice starting from and including (0008,0001)
+        test_ds = ds[0x00080001:]
+        self.assertFalse('CommandGroupLength' in test_ds)
+        self.assertFalse('CommandLengthToEnd' in test_ds)
+        self.assertFalse('Overlays' in test_ds)
+        self.assertTrue('LengthToEnd' in test_ds)
+        self.assertTrue('BeamSequence' in test_ds)
+
+        # Slice ending at and not including (0009,0002)
+        test_ds = ds[:0x00090002]
+        self.assertTrue('CommandGroupLength' in test_ds)
+        self.assertTrue('CommandLengthToEnd' in test_ds)
+        self.assertTrue('Overlays' in test_ds)
+        self.assertTrue('LengthToEnd' in test_ds)
+        self.assertTrue(0x00090001 in test_ds)
+        self.assertFalse(0x00090002 in test_ds)
+        self.assertFalse('BeamSequence' in test_ds)
+
+        # Slice with a step - every second tag
+        # Should return zeroth tag, then second, fourth, etc...
+        test_ds = ds[::2]
+        self.assertTrue('CommandGroupLength' in test_ds)
+        self.assertFalse('CommandLengthToEnd' in test_ds)
+        self.assertTrue(0x00090001 in test_ds)
+        self.assertFalse(0x00090002 in test_ds)
+
+        # Slice starting at and including (0008,0018) and ending at and not
+        #   including (0009,0008)
+        test_ds = ds[0x00080018:0x00090008]
+        self.assertTrue('SOPInstanceUID' in test_ds)
+        self.assertTrue(0x00090007 in test_ds)
+        self.assertFalse(0x00090008 in test_ds)
+
+        #
+        return
         self.assertEqual(ds[0x00080000:0x0008FFFF], ds.group_dataset(0x0008)) # All group 0x0008
         ref_ds = Dataset()
         ref_ds.PatientName = 'CITIZEN^Jan'
