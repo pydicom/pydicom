@@ -237,6 +237,7 @@ class Dataset(dict):
             Dataset DataElement if present, None otherwise.
         """
         tag = tag_for_keyword(name)
+        # Test against None as (0000,0000) is a possible tag
         if tag is not None:
             return self[tag]
         return None
@@ -327,7 +328,7 @@ class Dataset(dict):
 
         Examples
         --------
-        Indexing
+        Indexing using DataElement tag
         >>> ds = Dataset()
         >>> ds.CommandGroupLength = 100
         >>> ds.PatientName = 'CITIZEN^Jan'
@@ -335,7 +336,7 @@ class Dataset(dict):
         >>> ds
         (0010, 0010) Patient's Name                      PN: 'CITIZEN^Jan'
 
-        Slicing
+        Slicing using DataElement tag
         >>> ds = Dataset()
         >>> ds.CommandGroupLength = 100
         >>> ds.SOPInstanceUID = '1.2.3'
@@ -371,10 +372,10 @@ class Dataset(dict):
         """
         # Force zip object into a list in case of python3. Also backwards
         # compatible
-        meths = set(list(zip(
-                    *inspect.getmembers(Dataset, inspect.isroutine)))[0])
-        props = set(list(zip(
-                    *inspect.getmembers(Dataset, inspect.isdatadescriptor)))[0])
+        meths = set(list(zip(*inspect.getmembers(Dataset,
+                                                 inspect.isroutine)))[0])
+        props = set(list(zip(*inspect.getmembers(Dataset,
+                                                 inspect.isdatadescriptor)))[0])
         dicom_names = set(self.dir())
         alldir = sorted(props | meths | dicom_names)
         return alldir
@@ -432,8 +433,6 @@ class Dataset(dict):
             # Compare Elements using values() and class variables using __dict__
             # Convert values() to a list for compatibility between
             #   python 2 and 3
-            #print('vals', list(self.values()) == list(other.values()))
-            #print('dict', self.__dict__ == other.__dict__)
             return (list(self.values()) == list(other.values()) and
                     self.__dict__ == other.__dict__)
 
@@ -529,6 +528,7 @@ class Dataset(dict):
 
         Examples
         --------
+        Indexing using DataElement tag
         >>> ds = Dataset()
         >>> ds.SOPInstanceUID = '1.2.3'
         >>> ds.PatientName = 'CITIZEN^Jan'
@@ -536,8 +536,7 @@ class Dataset(dict):
         >>> ds[0x00100010]
         'CITIZEN^Jan'
 
-        Slicing
-        ~~~~~~~
+        Slicing using DataElement tag
         All group 0x0010 elements in the dataset
         >>> ds[0x00100000:0x0011000]
         (0010, 0010) Patient's Name                      PN: 'CITIZEN^Jan'
@@ -1226,13 +1225,15 @@ class Dataset(dict):
 
         Raises
         ------
+        NotImplementedError
+            If `key` is a slice.
         ValueError
             If the `key` value doesn't match DataElement.tag.
         """
         if isinstance(key, slice):
             raise NotImplementedError('Slicing is not supported for setting '
                                       'Dataset elements.')
-        
+
         # OK if is subclass, e.g. DeferredDataElement
         if not isinstance(value, (DataElement, RawDataElement)):
             raise TypeError("Dataset contents must be DataElement instances.")
