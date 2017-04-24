@@ -611,6 +611,34 @@ class DatasetTests(unittest.TestCase):
         self.assertFalse(0x00090010 in ds)
         self.assertTrue('PatientName' in ds)
 
+    def test_group_dataset(self):
+        """Test Dataset.group_dataset"""
+        ds = Dataset()
+        ds.CommandGroupLength = 120 # 0000,0000
+        ds.CommandLengthToEnd = 111 # 0000,0001
+        ds.Overlays = 12 # 0000,51B0
+        ds.LengthToEnd = 12 # 0008,0001
+        ds.SOPInstanceUID = '1.2.3.4' # 0008,0018
+        ds.SkipFrameRangeFlag = 'TEST' # 0008,9460
+
+        # Test getting group 0x0000
+        group0000 = ds.group_dataset(0x0000)
+        self.assertTrue('CommandGroupLength' in group0000)
+        self.assertTrue('CommandLengthToEnd' in group0000)
+        self.assertTrue('Overlays' in group0000)
+        self.assertFalse('LengthToEnd' in group0000)
+        self.assertFalse('SOPInstanceUID' in group0000)
+        self.assertFalse('SkipFrameRangeFlag' in group0000)
+
+        # Test getting group 0x0008
+        group0000 = ds.group_dataset(0x0008)
+        self.assertFalse('CommandGroupLength' in group0000)
+        self.assertFalse('CommandLengthToEnd' in group0000)
+        self.assertFalse('Overlays' in group0000)
+        self.assertTrue('LengthToEnd' in group0000)
+        self.assertTrue('SOPInstanceUID' in group0000)
+        self.assertTrue('SkipFrameRangeFlag' in group0000)
+
 
 class DatasetElementsTests(unittest.TestCase):
     """Test valid assignments of data elements"""
