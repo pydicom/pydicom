@@ -1270,11 +1270,18 @@ class Dataset(dict):
         list of pydicom.tag.Tag
             The tags in the Dataset that meet the conditions of the slice.
         """
-        if (start and Tag(start) < 0) or (stop and Tag(stop) < 0):
-            raise ValueError('Dataset slicing requires valid DICOM tags.')
+        # Check the starting/stopping Tags are valid
+        if start and Tag(start):
+            pass
+        if stop and Tag(stop):
+            pass
 
+        # If the Dataset is empty, return an empty list
         all_tags = sorted(self.keys())
+        if not all_tags:
+            return []
 
+        # Ensure we have valid Tags when start/stop are None
         if start is None:
             start = all_tags[0]
         if stop is None:

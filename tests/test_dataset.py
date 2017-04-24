@@ -453,6 +453,16 @@ class DatasetTests(unittest.TestCase):
         self.assertFalse(d == e)
         self.assertFalse(e == d)
 
+    def test_inequality(self):
+        """Test inequality operator"""
+        d = Dataset()
+        d.SOPInstanceUID = '1.2.3.4'
+        self.assertFalse(d != d)
+
+        e = Dataset()
+        e.SOPInstanceUID = '1.2.3.5'
+        self.assertTrue(d != e)
+
     def testHash(self):
         """DataElement: hash returns TypeError"""
 
@@ -497,6 +507,17 @@ class DatasetTests(unittest.TestCase):
         self.assertRaises(ValueError, ds.__getitem__, slice(None,-1))
         self.assertRaises(ValueError, ds.__getitem__, slice(-1, -1))
         self.assertRaises(ValueError, ds.__getitem__, slice(-1))
+
+    def test_empty_slice(self):
+        """Tests Dataset slicing with empty Dataset"""
+        ds = Dataset()
+        self.assertEqual(ds[:], Dataset())
+        self.assertRaises(ValueError, ds.__getitem__, slice(None,-1))
+        self.assertRaises(ValueError, ds.__getitem__, slice(-1, -1))
+        self.assertRaises(ValueError, ds.__getitem__, slice(-1))
+        self.assertRaises(NotImplementedError, ds.__setitem__,
+                          slice(None), Dataset())
+        
 
     def test_getitem_slice(self):
         """Test Dataset.__getitem__ using slices."""
@@ -638,6 +659,34 @@ class DatasetTests(unittest.TestCase):
         self.assertTrue('LengthToEnd' in group0000)
         self.assertTrue('SOPInstanceUID' in group0000)
         self.assertTrue('SkipFrameRangeFlag' in group0000)
+
+    def test_get_item(self):
+        """Test Dataset.get_item"""
+        # TODO: Add test for deferred read
+        ds = Dataset()
+        ds.CommandGroupLength = 120 # 0000,0000
+        ds.SOPInstanceUID = '1.2.3.4' # 0008,0018
+
+        # Test non-deferred read
+        self.assertEqual(ds.get_item(0x00000000), ds[0x00000000])
+        self.assertEqual(ds.get_item(0x00000000).value, 120)
+        self.assertEqual(ds.get_item(0x00080018), ds[0x00080018])
+        self.assertEqual(ds.get_item(0x00080018).value, '1.2.3.4')
+
+    def test_remove_private_tags(self):
+        """Test Dataset.remove_private_tags"""
+        ds = Dataset()
+        ds.CommandGroupLength = 120 # 0000,0000
+        ds.SkipFrameRangeFlag = 'TEST' # 0008,9460
+        ds.add_new(0x00090001, 'PN', 'CITIZEN^1')
+        ds.add_new(0x00090010, 'PN', 'CITIZEN^10')
+        ds.PatientName = 'CITIZEN^Jan' # 0010,0010
+
+        ds.remove_private_tags()
+        self.assertEqual(ds[0x00090000:0x00100000], Dataset())
+        self.assertTrue('CommandGroupLength' in ds)
+        self.assertTrue('SkipFrameRangeFlag' in ds)
+        self.assertTrue('PatientName' in ds)
 
 
 class DatasetElementsTests(unittest.TestCase):
