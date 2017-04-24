@@ -1270,7 +1270,7 @@ class Dataset(dict):
         list of pydicom.tag.Tag
             The tags in the Dataset that meet the conditions of the slice.
         """
-        if (start and start < 0) or (stop and stop < 0):
+        if (start and Tag(start) < 0) or (stop and Tag(stop) < 0):
             raise ValueError('Dataset slicing requires valid DICOM tags.')
 
         all_tags = sorted(self.keys())
