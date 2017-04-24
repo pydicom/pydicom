@@ -237,7 +237,7 @@ class Dataset(dict):
             Dataset DataElement if present, None otherwise.
         """
         tag = tag_for_keyword(name)
-        if tag:
+        if tag is not None:
             return self[tag]
         return None
 
@@ -1270,14 +1270,14 @@ class Dataset(dict):
         list of pydicom.tag.Tag
             The tags in the Dataset that meet the conditions of the slice.
         """
-        # Check the starting/stopping Tags are valid
+        # Check the starting/stopping Tags are valid when used
         if start and Tag(start):
             pass
         if stop and Tag(stop):
             pass
 
-        # If the Dataset is empty, return an empty list
         all_tags = sorted(self.keys())
+        # If the Dataset is empty, return an empty list
         if not all_tags:
             return []
 

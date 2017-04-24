@@ -509,7 +509,7 @@ class DatasetTests(unittest.TestCase):
         self.assertRaises(ValueError, ds.__getitem__, slice(-1))
 
     def test_empty_slice(self):
-        """Tests Dataset slicing with empty Dataset"""
+        """Test Dataset slicing with empty Dataset."""
         ds = Dataset()
         self.assertEqual(ds[:], Dataset())
         self.assertRaises(ValueError, ds.__getitem__, slice(None,-1))
@@ -517,7 +517,6 @@ class DatasetTests(unittest.TestCase):
         self.assertRaises(ValueError, ds.__getitem__, slice(-1))
         self.assertRaises(NotImplementedError, ds.__setitem__,
                           slice(None), Dataset())
-        
 
     def test_getitem_slice(self):
         """Test Dataset.__getitem__ using slices."""
@@ -687,6 +686,32 @@ class DatasetTests(unittest.TestCase):
         self.assertTrue('CommandGroupLength' in ds)
         self.assertTrue('SkipFrameRangeFlag' in ds)
         self.assertTrue('PatientName' in ds)
+
+    def test_data_element(self):
+        """Test Dataset.data_element."""
+        ds = Dataset()
+        ds.CommandGroupLength = 120
+        ds.SkipFrameRangeFlag = 'TEST'
+        ds.add_new(0x00090001, 'PN', 'CITIZEN^1')
+        ds.BeamSequence = [Dataset()]
+        ds.BeamSequence[0].PatientName = 'ANON'
+        self.assertEqual(ds.data_element('CommandGroupLength'), ds[0x00000000])
+        self.assertEqual(ds.data_element('BeamSequence'), ds[0x300A00B0])
+
+    def test_iterall(self):
+        """Test Dataset.iterall"""
+        ds = Dataset()
+        ds.CommandGroupLength = 120
+        ds.SkipFrameRangeFlag = 'TEST'
+        ds.add_new(0x00090001, 'PN', 'CITIZEN^1')
+        ds.BeamSequence = [Dataset()]
+        ds.BeamSequence[0].PatientName = 'ANON'
+        elem_gen = ds.iterall()
+        self.assertEqual(ds.data_element('CommandGroupLength'), next(elem_gen))
+        self.assertEqual(ds.data_element('SkipFrameRangeFlag'), next(elem_gen))
+        self.assertEqual(ds[0x00090001], next(elem_gen))
+        self.assertEqual(ds.data_element('BeamSequence'), next(elem_gen))
+        self.assertEqual(ds.BeamSequence[0].data_element('PatientName'), next(elem_gen))
 
 
 class DatasetElementsTests(unittest.TestCase):
