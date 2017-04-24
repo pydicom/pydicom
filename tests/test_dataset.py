@@ -485,8 +485,15 @@ class DatasetTests(unittest.TestCase):
             ds.OverlayData = b'\x00'
         self.assertRaises(ValueError, test)
 
+    def test_setitem_slice_raises(self):
+        """Test Dataset.__setitem__ raises if slicing used."""
+        ds = Dataset()
+        self.assertRaises(NotImplementedError, ds.__setitem__,
+                          slice(None), Dataset())
+
     def test_getitem_slice_raises(self):
         """Test Dataset.__getitem__ raises if slice Tags invalid."""
+        ds = Dataset()
         self.assertRaises(ValueError, ds.__getitem__, slice(None,-1))
         self.assertRaises(ValueError, ds.__getitem__, slice(-1, -1))
         self.assertRaises(ValueError, ds.__getitem__, slice(-1))
@@ -552,18 +559,57 @@ class DatasetTests(unittest.TestCase):
         self.assertTrue(0x00090007 in test_ds)
         self.assertFalse(0x00090008 in test_ds)
 
-        #
-        return
-        self.assertEqual(ds[0x00080000:0x0008FFFF], ds.group_dataset(0x0008)) # All group 0x0008
-        ref_ds = Dataset()
-        ref_ds.PatientName = 'CITIZEN^Jan'
-        self.assertEqual(ds[0x00100010:0x00100020], ref_ds) # Dataset with PatientName element only
+        # Slice starting at and including (0008,0018) and ending at and not
+        #   including (0009,0008), every third element
+        test_ds = ds[0x00080018:0x00090008:3]
+        self.assertTrue('SOPInstanceUID' in test_ds)
+        self.assertFalse(0x00090001 in test_ds)
+        self.assertTrue(0x00090002 in test_ds)
+        self.assertFalse(0x00090003 in test_ds)
+        self.assertFalse(0x00090004 in test_ds)
+        self.assertTrue(0x00090005 in test_ds)
+        self.assertFalse(0x00090006 in test_ds)
+        self.assertFalse(0x00090008 in test_ds)
 
-        print(ds[0x00080000:0x00100000:2]) # Every 2nd element in group 0x0008
-        print(ds[:0x00080000]) # < group 0x0008
-        print(ds[:0x0008FFFF:2]) # <= group 0x0008, step 2
+        # Slice starting and ending (and not including) (0008,0018)
+        self.assertEqual(ds[(0x0008,0x0018):(0x0008,0x0018)], Dataset())
 
-        print(ds[(0x0010,0000):])
+        # Test slicing using other acceptable Tag initialisations
+        self.assertTrue('SOPInstanceUID' in ds[(0x00080018):(0x00080019)])
+        self.assertTrue('SOPInstanceUID' in ds[(0x0008,0x0018):(0x0008,0x0019)])
+        self.assertTrue('SOPInstanceUID' in ds['0x00080018':'0x00080019'])
+
+    def test_delitem_slice(self):
+        """Test Dataset.__delitem__ using slices."""
+        ds = Dataset()
+        ds.CommandGroupLength = 120 # 0000,0000
+        ds.CommandLengthToEnd = 111 # 0000,0001
+        ds.Overlays = 12 # 0000,51B0
+        ds.LengthToEnd = 12 # 0008,0001
+        ds.SOPInstanceUID = '1.2.3.4' # 0008,0018
+        ds.SkipFrameRangeFlag = 'TEST' # 0008,9460
+        ds.add_new(0x00090001, 'PN', 'CITIZEN^1')
+        ds.add_new(0x00090002, 'PN', 'CITIZEN^2')
+        ds.add_new(0x00090003, 'PN', 'CITIZEN^3')
+        ds.add_new(0x00090004, 'PN', 'CITIZEN^4')
+        ds.add_new(0x00090005, 'PN', 'CITIZEN^5')
+        ds.add_new(0x00090006, 'PN', 'CITIZEN^6')
+        ds.add_new(0x00090007, 'PN', 'CITIZEN^7')
+        ds.add_new(0x00090008, 'PN', 'CITIZEN^8')
+        ds.add_new(0x00090009, 'PN', 'CITIZEN^9')
+        ds.add_new(0x00090010, 'PN', 'CITIZEN^10')
+        ds.PatientName = 'CITIZEN^Jan' # 0010,0010
+        ds.PatientID = '12345' # 0010,0010
+        ds.ExaminedBodyThickness = 1.223 # 0010,9431
+        ds.BeamSequence = [Dataset()] # 300A,00B0
+        ds.BeamSequence[0].PatientName = 'ANON'
+
+        # Delete the 0x0009 group
+        del ds[0x00090000:0x00100000]
+        self.assertTrue('SkipFrameRangeFlag' in ds)
+        self.assertFalse(0x00090001 in ds)
+        self.assertFalse(0x00090010 in ds)
+        self.assertTrue('PatientName' in ds)
 
 
 class DatasetElementsTests(unittest.TestCase):

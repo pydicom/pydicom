@@ -544,10 +544,7 @@ class Dataset(dict):
         (0010, 0020) Patient ID                          LO: '12345'
 
         All group 0x0002 elements in the dataset
-        >>> ds[(0x0002,0x0000):(0x0003,0x0000)]
-
-        All even tag elements in the dataset
-        >>> ds[::2]
+        >>> ds[(0x0002, 0x0000):(0x0003, 0x0000)]
 
         Parameters
         ----------
@@ -568,7 +565,6 @@ class Dataset(dict):
         if isinstance(key, slice):
             ds = Dataset()
             for tag in self._slice_dataset(key.start, key.stop, key.step):
-            #for tag in self._slice_dataset(key):
                 ds.add(self[tag])
             return ds
 
@@ -1233,6 +1229,10 @@ class Dataset(dict):
         ValueError
             If the `key` value doesn't match DataElement.tag.
         """
+        if isinstance(key, slice):
+            raise NotImplementedError('Slicing is not supported for setting '
+                                      'Dataset elements.')
+        
         # OK if is subclass, e.g. DeferredDataElement
         if not isinstance(value, (DataElement, RawDataElement)):
             raise TypeError("Dataset contents must be DataElement instances.")
