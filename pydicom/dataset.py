@@ -138,7 +138,7 @@ class Dataset(dict):
     True
     >>> 'PatientID' in ds
     False
-    >>> 0x00100030 in ds
+    >>> (0x0010, 0x0030) in ds
     True
     >>> 'Manufacturer' in ds.BeamSequence[0]
     True
