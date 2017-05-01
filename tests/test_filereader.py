@@ -793,7 +793,7 @@ class ReadTruncatedFileTests(unittest.TestCase):
         DS = pydicom.valuerep.DS
         expected = [DS('0.3125'), DS('0.3125')]
         self.assertTrue(got == expected, "Wrong pixel spacing")
-        with self.assertRaisesRegexp(PropertyError, "Amount of pixel data.*does not match the expected data"):
+        with self.assertRaisesRegexp(AttributeError, "Amount of pixel data.*does not match the expected data"):
             mr.pixel_array
 
 
