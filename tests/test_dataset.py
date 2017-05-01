@@ -59,10 +59,24 @@ class DatasetTests(unittest.TestCase):
         def callable_pixel_array():
             ds.pixel_array
 
-        attribute_error_msg = "AttributeError in pixel_array property: " + \
-            "Dataset does not have attribute 'TransferSyntaxUID'"
-        self.failUnlessExceptionArgs(attribute_error_msg,
-                                     PropertyError, callable_pixel_array)
+        msg = "'Dataset' object has no attribute 'TransferSyntaxUID'"
+        self.failUnlessExceptionArgs(msg, AttributeError, callable_pixel_array)
+
+    def test_attribute_error_in_property_correct_debug(self):
+        """Test AttributeError in property raises correctly."""
+        class Foo(Dataset):
+            @property
+            def bar(self): return self._barr()
+
+            def _bar(self): return 'OK'
+
+        def test():
+            ds = Foo()
+            ds.bar
+
+        self.assertRaises(AttributeError, test)
+        msg = "'Foo' object has no attribute '_barr'"
+        self.failUnlessExceptionArgs(msg, AttributeError, test)
 
     def testTagExceptionPrint(self):
         # When printing datasets, a tag number should appear in error
@@ -461,6 +475,13 @@ class DatasetTests(unittest.TestCase):
         dsp = DSPlus()
         dsp.test = 'ABCD'
         self.assertEqual(dsp.test, 'ABCD')
+
+    def test_add_repeater_elem_by_keyword(self):
+        """Repeater using keyword to add repeater group elements raises ValueError."""
+        ds = Dataset()
+        def test():
+            ds.OverlayData = b'\x00'
+        self.assertRaises(ValueError, test)
 
 
 class DatasetElementsTests(unittest.TestCase):

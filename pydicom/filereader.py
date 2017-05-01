@@ -32,7 +32,7 @@ import pydicom.uid  # for Implicit/Explicit/Little/Big Endian transfer syntax UI
 from pydicom.filebase import DicomFile
 from pydicom.dataset import Dataset, FileDataset
 from pydicom.dicomdir import DicomDir
-from pydicom.datadict import dictionaryVR
+from pydicom.datadict import dictionary_VR
 from pydicom.dataelem import DataElement
 from pydicom.tag import ItemTag, SequenceDelimiterTag
 from pydicom.sequence import Sequence
@@ -271,7 +271,7 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian,
             #   identified as a Sequence
             if VR is None:
                 try:
-                    VR = dictionaryVR(tag)
+                    VR = dictionary_VR(tag)
                 except KeyError:
                     # Look ahead to see if it consists of items and is thus a SQ
                     next_tag = TupleTag(unpack(endian_chr + "HH", fp_read(4)))
@@ -428,74 +428,68 @@ def read_sequence_item(fp, is_implicit_VR, is_little_endian, encoding, offset=0)
     return ds
 
 
-def not_group2(tag, VR, length):
-    return (tag.group != 2)
+def _read_command_set_elements(fp):
+    """Return a Dataset containing any Command Set (0000,eeee) elements in `fp`.
+
+    Command Set elements are always Implicit VR Little Endian (as per PS3.7
+    Section 6.3). Once any Command Set elements are read `fp` will be positioned
+    at the start of the next group of elements.
+
+    Parameters
+    ----------
+    fp : file-like
+        The file-like positioned at the start of any command set elements.
+
+    Returns
+    -------
+    pydicom.dataset.Dataset
+        The command set elements as a Dataset instance. May be empty if no
+        command set elements are present.
+    """
+    def _not_group_0000(tag, VR, length):
+        """Return True if the tag is not in group 0x0000, False otherwise."""
+        return (tag.group != 0)
+
+    command_set = read_dataset(fp, is_implicit_VR=True, is_little_endian=True,
+                               stop_when=_not_group_0000)
+    return command_set
 
 
 def _read_file_meta_info(fp):
-    """Return the file meta information.
-    fp must be set after the 128 byte preamble and 'DICM' marker
+    """Return a Dataset containing any File Meta (0002,eeee) elements in `fp`.
+
+    File Meta elements are always Explicit VR Little Endian (as per PS3.10
+    Section 7). Once any File Meta elements are read `fp` will be positioned
+    at the start of the next group of elements.
+
+    Parameters
+    ----------
+    fp : file-like
+        The file-like positioned at the start of any File Meta Information
+        group elements.
+
+    Returns
+    -------
+    pydicom.dataset.Dataset
+        The File Meta elements as a Dataset instance. May be empty if no
+        File Meta are present.
     """
-    # File meta info always LittleEndian, Explicit VR. After will change these
-    #    to the transfer syntax values set in the meta info
+    def _not_group_0002(tag, VR, length):
+        """Return True if the tag is not in group 0x0002, False otherwise."""
+        return (tag.group != 2)
 
-    # Get group length data element, whose value is the length of the meta_info
-    fp_save = fp.tell()  # in case need to rewind
-    debugging = config.debugging
-    if debugging:
-        logger.debug("Try to read group length info...")
-    bytes_read = fp.read(8)
-    group, elem, VR, length = unpack("<HH2sH", bytes_read)
-    if debugging:
-        debug_msg = "{0:08x}: {1}".format(fp.tell() - 8, bytes2hex(bytes_read))
-    if not in_py2:
-        VR = VR.decode(default_encoding)
-    if VR in extra_length_VRs:
-        bytes_read = fp.read(4)
-        length = unpack("<L", bytes_read)[0]
-        if debugging:
-            debug_msg += " " + bytes2hex(bytes_read)
-    if debugging:
-        debug_msg = "{0:<47s}  ({1:04x}, {2:04x}) {3:2s} Length: {4:d}".format(
-            debug_msg, group, elem, VR, length)
-        logger.debug(debug_msg)
-
-    # Store meta group length if it exists, then read until not group 2
-    if group == 2 and elem == 0:
-        bytes_read = fp.read(length)
-        if debugging:
-            logger.debug("{0:08x}: {1}".format(fp.tell() - length,
-                                               bytes2hex(bytes_read)))
-        group_length = unpack("<L", bytes_read)[0]
-        expected_ds_start = fp.tell() + group_length
-        if debugging:
-            msg = "value (group length) = {0:d}".format(group_length)
-            msg += "  regular dataset should start at {0:08x}".format(
-                expected_ds_start)
-            logger.debug(" " * 10 + msg)
-    else:
-        expected_ds_start = None
-        if debugging:
-            logger.debug(" " * 10 + "(0002,0000) Group length not found.")
-
-    # Changed in pydicom 0.9.7 -- don't trust the group length, just read
-    #    until no longer group 2 data elements. But check the length and
-    #    give a warning if group 2 ends at different location.
-    # Rewind to read the first data element as part of the file_meta dataset
-    if debugging:
-        logger.debug("Rewinding and reading whole dataset "
-                     "including this first data element")
-    fp.seek(fp_save)
-    file_meta = read_dataset(fp, is_implicit_VR=False,
-                             is_little_endian=True, stop_when=not_group2)
-    fp_now = fp.tell()
-    if expected_ds_start and fp_now != expected_ds_start:
-        logger.info("*** Group length for file meta dataset "
-                    "did not match end of group 2 data ***")
-    else:
-        if debugging:
-            logger.debug("--- End of file meta data found "
-                         "as expected ---------")
+    start_file_meta = fp.tell()
+    file_meta = read_dataset(fp, is_implicit_VR=False, is_little_endian=True,
+                             stop_when=_not_group_0002)
+    # Log if the Group Length doesn't match actual length
+    if 'FileMetaInformationGroupLength' in file_meta:
+        # FileMetaInformationGroupLength must be 12 bytes long and its value
+        #   counts from the beginning of the next element to the end of the
+        #   file meta elements
+        length_file_meta = fp.tell() - (start_file_meta + 12)
+        if file_meta.FileMetaInformationGroupLength != length_file_meta:
+            logger.info("*** Group length for file meta dataset "
+                        "did not match end of group 2 data ***")
     return file_meta
 
 
@@ -508,30 +502,31 @@ def read_file_meta_info(filename):
     """
     with DicomFile(filename, 'rb') as fp:
         read_preamble(fp, False)  # if no header, raise exception
+        _read_command_set_elements(fp) # May contain Command Set elements
         return _read_file_meta_info(fp)
 
 
 def read_preamble(fp, force):
-    """Read and return the DICOM preamble.
+    """Return the 128-byte DICOM preamble in `fp` if present.
 
     Parameters
     ----------
     fp : file-like object
-    force : boolean
+        The file-like to read the preamble from.
+    force : bool
         Flag to force reading of a file even if no header is found.
 
     Returns
     -------
-    preamble : DICOM preamble, None
-        The DICOM preamble will be returned if appropriate
-        header ('DICM') is found. Returns None if no header
-        is found.
+    preamble : str/bytes or None
+        The 128-byte DICOM preamble will be returned if the appropriate prefix
+        ('DICM') is found at byte offset 128. Returns None if the 'DICM' prefix
+        is not found and `force` is True.
 
     Raises
     ------
     InvalidDicomError
-        If force flag is false and no appropriate header information
-        found.
+        If `force` is False and no appropriate header information found.
 
     Notes
     -----
@@ -546,15 +541,17 @@ def read_preamble(fp, force):
     magic = fp.read(4)
     if magic != b"DICM":
         if force:
-            logger.info("File is not a standard DICOM file; 'DICM' header is "
-                        "missing. Assuming no header and continuing")
+            logger.info("File is not a conformant DICOM file; 'DICM' prefix is "
+                        "missing from the file header or the header is "
+                        "missing. Assuming no header and continuing.")
             preamble = None
             fp.seek(0)
         else:
-            raise InvalidDicomError("File is missing 'DICM' marker. "
-                                    "Use force=True to force reading")
+            raise InvalidDicomError("File is missing DICOM header or 'DICM' "
+                                    "prefix is missing from the header. Use "
+                                    "force=True to force reading.")
     else:
-        logger.debug("{0:08x}: 'DICM' marker found".format(fp.tell() - 4))
+        logger.debug("{0:08x}: 'DICM' prefix found".format(fp.tell() - 4))
     return preamble
 
 
@@ -578,8 +575,8 @@ def read_partial(fileobj, stop_when=None, defer_size=None, force=False):
 
     Notes
     -----
-    Use ``read_file`` unless you need to stop on some condition
-    other than reaching pixel data.
+    Use ``read_file`` unless you need to stop on some condition other than
+    reaching pixel data.
 
     Returns
     -------
@@ -590,73 +587,79 @@ def read_partial(fileobj, stop_when=None, defer_size=None, force=False):
     read_file
         More generic file reading function.
     """
-    # Read preamble -- raise an exception if missing and force=False
+    # Read preamble (if present)
     preamble = read_preamble(fileobj, force)
-    file_meta_dataset = Dataset()
-    # Assume a transfer syntax, correct it as necessary
+    # Read any Command Set group (0000,eeee) elements (if present)
+    command_set = _read_command_set_elements(fileobj)
+    # Read any File Meta Information group (0002,eeee) elements (if present)
+    file_meta_dataset = _read_file_meta_info(fileobj)
+
+    # `filobj` should be positioned at the start of the dataset by this point,
+    # Ensure we have appropriate values for `is_implicit_VR` and
+    #   `is_little_endian` before we try decoding. We assume an initial
+    #   transfer syntax of implicit VR little endian and correct it as necessary
     is_implicit_VR = True
     is_little_endian = True
-    if preamble:
-        file_meta_dataset = _read_file_meta_info(fileobj)
-        transfer_syntax = file_meta_dataset.get("TransferSyntaxUID")
-        if transfer_syntax is None:  # issue 258
-            pass
-        elif transfer_syntax == pydicom.uid.ImplicitVRLittleEndian:
-            pass
-        elif transfer_syntax == pydicom.uid.ExplicitVRLittleEndian:
-            is_implicit_VR = False
-        elif transfer_syntax == pydicom.uid.ExplicitVRBigEndian:
-            is_implicit_VR = False
-            is_little_endian = False
-        elif transfer_syntax == pydicom.uid.DeflatedExplicitVRLittleEndian:
-            # See PS3.6-2008 A.5 (p 71)
-            # when written, the entire dataset following
-            #     the file metadata was prepared the normal way,
-            #     then "deflate" compression applied.
-            #  All that is needed here is to decompress and then
-            #     use as normal in a file-like object
-            zipped = fileobj.read()
-            # -MAX_WBITS part is from comp.lang.python answer:
-            # groups.google.com/group/comp.lang.python/msg/e95b3b38a71e6799
-            unzipped = zlib.decompress(zipped, -zlib.MAX_WBITS)
-            fileobj = BytesIO(unzipped)  # a file-like object
-            is_implicit_VR = False
-        else:
-            # Any other syntax should be Explicit VR Little Endian,
-            #   e.g. all Encapsulated (JPEG etc) are ExplVR-LE
-            #        by Standard PS 3.5-2008 A.4 (p63)
-            is_implicit_VR = False
-    else:  # no header -- use the is_little_endian, implicit assumptions
-        file_meta_dataset.TransferSyntaxUID = pydicom.uid.ImplicitVRLittleEndian
-        endian_chr = "<"
-        element_struct = Struct(endian_chr + "HH2sH")
-        # Try reading first 8 bytes
-        group, elem, VR, length = element_struct.unpack(fileobj.read(8))
-        # Rewind file object
-        fileobj.seek(0)
-        # If the VR is a valid VR, assume Explicit VR transfer systax
+    transfer_syntax = file_meta_dataset.get("TransferSyntaxUID")
+    if transfer_syntax is None:  # issue 258
+        # If no TransferSyntaxUID element then we have to try and figure out
+        #   the correct values for `is_little_endian` and `is_implicit_VR`.
+        # Peek at the first 6 bytes to get the first element's tag group and
+        #   (possibly) VR
+        group, _, VR = unpack("<HH2s", fileobj.read(6))
+        fileobj.seek(-6, 1)
+
+        # Test the VR to see if it's valid, and if so then assume explicit VR
         from pydicom.values import converters
         if not in_py2:
             VR = VR.decode(default_encoding)
         if VR in converters.keys():
             is_implicit_VR = False
-            # Determine if group in low numbered range (Little vs Big Endian)
-            if group == 0:  # got (0,0) group length. Not helpful.
-                # XX could use similar to http://www.dclunie.com/medical-image-faq/html/part2.html code example
-                msg = ("Not able to guess transfer syntax when first item "
-                       "is group length")
-                raise NotImplementedError(msg)
-            if group < 2000:
-                file_meta_dataset.TransferSyntaxUID = pydicom.uid.ExplicitVRLittleEndian
-            else:
-                file_meta_dataset.TransferSyntaxUID = pydicom.uid.ExplicitVRBigEndian
+            # Big endian encoding can only be explicit VR
+            #   Big endian 0x0004 decoded as little endian will be 1024
+            #   Big endian 0x0100 decoded as little endian will be 1
+            # Therefore works for big endian tag groups up to 0x00FF after
+            #   which it will fail, in which case we leave it as little endian
+            #   and hope for the best (big endian is retired anyway)
+            if group >= 1024:
                 is_little_endian = False
+    elif transfer_syntax == pydicom.uid.ImplicitVRLittleEndian:
+        pass
+    elif transfer_syntax == pydicom.uid.ExplicitVRLittleEndian:
+        is_implicit_VR = False
+    elif transfer_syntax == pydicom.uid.ExplicitVRBigEndian:
+        is_implicit_VR = False
+        is_little_endian = False
+    elif transfer_syntax == pydicom.uid.DeflatedExplicitVRLittleEndian:
+        # See PS3.6-2008 A.5 (p 71)
+        # when written, the entire dataset following
+        #     the file metadata was prepared the normal way,
+        #     then "deflate" compression applied.
+        #  All that is needed here is to decompress and then
+        #     use as normal in a file-like object
+        zipped = fileobj.read()
+        # -MAX_WBITS part is from comp.lang.python answer:
+        # groups.google.com/group/comp.lang.python/msg/e95b3b38a71e6799
+        unzipped = zlib.decompress(zipped, -zlib.MAX_WBITS)
+        fileobj = BytesIO(unzipped)  # a file-like object
+        is_implicit_VR = False
+    else:
+        # Any other syntax should be Explicit VR Little Endian,
+        #   e.g. all Encapsulated (JPEG etc) are ExplVR-LE
+        #        by Standard PS 3.5-2008 A.4 (p63)
+        is_implicit_VR = False
 
+    # Try and decode the dataset
+    #   By this point we should be at the start of the dataset and have
+    #   the transfer syntax (whether read from the file meta or guessed at)
     try:
         dataset = read_dataset(fileobj, is_implicit_VR, is_little_endian,
                                stop_when=stop_when, defer_size=defer_size)
     except EOFError:
         pass  # error already logged in read_dataset
+
+    # Add the command set elements to the dataset (if any)
+    dataset.update(command_set)
 
     class_uid = file_meta_dataset.get("MediaStorageSOPClassUID", None)
     if class_uid and class_uid == "Media Storage Directory Storage":

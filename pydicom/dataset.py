@@ -27,8 +27,8 @@ import sys
 
 from pydicom import compat
 from pydicom.charset import default_encoding, convert_encodings
-from pydicom.datadict import dictionaryVR
-from pydicom.datadict import tag_for_name, all_names_for_tag
+from pydicom.datadict import dictionary_VR
+from pydicom.datadict import tag_for_keyword, keyword_for_tag, repeater_has_keyword
 from pydicom.tag import Tag, BaseTag
 from pydicom.dataelem import DataElement, DataElement_from_raw, RawDataElement
 from pydicom.uid import NotCompressedPixelTransferSyntaxes, UncompressedPixelTransferSyntaxes
@@ -236,7 +236,7 @@ class Dataset(dict):
             For the given DICOM element `keyword`, return the corresponding
             Dataset DataElement if present, None otherwise.
         """
-        tag = tag_for_name(name)
+        tag = tag_for_keyword(name)
         if tag:
             return self[tag]
         return None
@@ -259,7 +259,7 @@ class Dataset(dict):
             True if the DataElement is in the Dataset, False otherwise.
         """
         if isinstance(name, (str, compat.text_type)):
-            tag = tag_for_name(name)
+            tag = tag_for_keyword(name)
         else:
             try:
                 tag = Tag(name)
@@ -310,7 +310,7 @@ class Dataset(dict):
             The keyword for the DICOM element or the class attribute to delete.
         """
         # First check if a valid DICOM keyword and if we have that data element
-        tag = tag_for_name(name)
+        tag = tag_for_keyword(name)
         if tag is not None and tag in self:
             dict.__delitem__(self, tag)  # direct to dict as we know we have key
         # If not a DICOM name in this dataset, check for regular instance name
@@ -374,9 +374,7 @@ class Dataset(dict):
             The matching DataElement keywords in the dataset. If no filters are
             used then all DataElement keywords are returned.
         """
-        allnames = []
-        for tag, data_element in self.items():
-            allnames.extend(all_names_for_tag(tag))
+        allnames = [keyword_for_tag(tag) for tag in self.keys()]
         # remove blanks - tags without valid names (e.g. private tags)
         allnames = [x for x in allnames if x]
         # Store found names in a dict, so duplicate names appear only once
@@ -457,9 +455,9 @@ class Dataset(dict):
         return return_val
 
     def __getattr__(self, name):
-        """Intercept requests for unknown Dataset attribute names.
+        """Intercept requests for Dataset attribute names.
 
-        If the name matches a DICOM keyword, return the value for the
+        If `name` matches a DICOM keyword, return the value for the
         DataElement with the corresponding tag.
 
         Parameters
@@ -470,20 +468,21 @@ class Dataset(dict):
         Returns
         -------
         value
-            The corresponding DataElement's value.
+              If `name` matches a DICOM keyword, returns the corresponding
+              DataElement's value. Otherwise returns the class attribute's value
+              (if present).
         """
-        # __getattr__ only called if instance cannot find name in self.__dict__
-        # So, if name is not a dicom string, then is an error
-        tag = tag_for_name(name)
-        if tag is None:
-            raise AttributeError("Dataset does not have attribute "
-                                 "'{0:s}'.".format(name))
+        tag = tag_for_keyword(name)
+        if tag is None: # `name` isn't a DICOM element keyword
+            # Try the base class attribute getter (fix for issue 332)
+            return super(Dataset, self).__getattribute__(name)
         tag = Tag(tag)
-        if tag not in self:
-            raise AttributeError("Dataset does not have attribute "
-                                 "'{0:s}'.".format(name))
-        else:  # do have that dicom data_element
+        if tag not in self: # DICOM DataElement not in the Dataset
+            # Try the base class attribute getter (fix for issue 332)
+            return super(Dataset, self).__getattribute__(name)
+        else:
             return self[tag].value
+            
 
     @property
     def _character_set(self):
@@ -1013,13 +1012,7 @@ class Dataset(dict):
         numpy.ndarray
             The Pixel Data (7FE0,0010) as a NumPy ndarray.
         """
-        try:
-            return self._get_pixel_array()
-        except AttributeError:
-            t, e, tb = sys.exc_info()
-            val = PropertyError("AttributeError in pixel_array property: " +
-                                e.args[0])
-            compat.reraise(PropertyError, val, tb)
+        return self._get_pixel_array()
 
     # Format strings spec'd according to python string formatting options
     #    See http://docs.python.org/library/stdtypes.html#string-formatting-operations
@@ -1161,8 +1154,7 @@ class Dataset(dict):
     def __setattr__(self, name, value):
         """Intercept any attempts to set a value for an instance attribute.
 
-        If name is a DICOM descriptive string (cleaned with CleanName), then
-        set the corresponding tag and DataElement.
+        If name is a DICOM keyword, set the corresponding tag and DataElement.
         Else, set an instance (python) attribute as any other class would do.
 
         Parameters
@@ -1174,16 +1166,20 @@ class Dataset(dict):
         value
             The value for the attribute to be added/changed.
         """
-        tag = tag_for_name(name)
+        tag = tag_for_keyword(name)
         if tag is not None:  # successfully mapped name to a tag
             if tag not in self:  # don't have this tag yet->create the data_element instance
-                VR = dictionaryVR(tag)
+                VR = dictionary_VR(tag)
                 data_element = DataElement(tag, VR, value)
             else:  # already have this data_element, just changing its value
                 data_element = self[tag]
                 data_element.value = value
             # Now have data_element - store it in this dict
             self[tag] = data_element
+        elif repeater_has_keyword(name): # Check if `name` is repeaters element
+            raise ValueError('{} is a DICOM repeating group element and must '
+                             'be added using the add() or add_new() methods.'
+                             .format(name))
         else:  # name not in dicom dictionary - setting a non-dicom instance attribute
             # XXX note if user mis-spells a dicom data_element - no error!!!
             super(Dataset, self).__setattr__(name, value)

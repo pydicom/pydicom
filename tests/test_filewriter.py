@@ -11,6 +11,7 @@ from io import BytesIO
 import os
 import os.path
 import sys
+from tempfile import TemporaryFile
 
 have_dateutil = True
 try:
@@ -47,6 +48,7 @@ rtdose_name = os.path.join(test_files, "rtdose.dcm")
 ct_name = os.path.join(test_files, "CT_small.dcm")
 mr_name = os.path.join(test_files, "MR_small.dcm")
 jpeg_name = os.path.join(test_files, "JPEG2000.dcm")
+no_ts = os.path.join(test_files, "meta_missing_tsyntax.dcm")
 datetime_name = mr_name
 
 unicode_name = os.path.join(testcharset_dir, "chrH31.dcm")
@@ -99,6 +101,12 @@ class WriteFileTests(unittest.TestCase):
                         "Files are not identical - first difference at 0x%x" % pos)
         if os.path.exists(out_filename):
             os.remove(out_filename)  # get rid of the file
+
+    def compare_bytes(self, bytes_in, bytes_out):
+        """Compare two bytestreams for equality"""
+        same, pos = bytes_identical(bytes_in, bytes_out)
+        self.assertTrue(same, "Files are not identical - first difference at "
+                        "0x%x" %pos)
 
     def testRTPlan(self):
         """Input file, write back and verify them identical (RT Plan file)"""
@@ -158,6 +166,18 @@ class WriteFileTests(unittest.TestCase):
         self.assertEqual(ds.SOPInstanceUID, "1.2")
         if os.path.exists(rtplan_out):
             os.remove(rtplan_out)  # get rid of the file
+
+    @unittest.skip('Fails due to TransferSyntaxUID being added by write_file')
+    def test_write_no_ts(self):
+        """Test reading a file with no ts and writing it out identically."""
+        written_file = TemporaryFile('w+b')
+        ds = read_file(no_ts)
+        ds.save_as(written_file, write_like_original=True)
+        written_file.seek(0)
+        with open(no_ts, 'rb') as ref_file:
+            written_bytes = written_file.read()
+            read_bytes = ref_file.read()
+            self.compare_bytes(read_bytes, written_bytes)
 
 
 @unittest.skipIf(not have_dateutil, "Need python-dateutil installed for these tests")
@@ -638,6 +658,31 @@ class TestCorrectAmbiguousVR(unittest.TestCase):
         ds = correct_ambiguous_vr(deepcopy(ref_ds), True)
         self.assertEqual(ds.LUTData, b'\x00\x01')
         self.assertEqual(ds[0x00283006].VR, 'US or OW')
+
+    def test_overlay(self):
+        """Test correcting OverlayData"""
+        # Implicit VR must be 'OW'
+        ref_ds = Dataset()
+        ref_ds.is_implicit_VR = True
+        ref_ds.add(DataElement(0x60003000, 'OB or OW', b'\x00'))
+        ref_ds.add(DataElement(0x601E3000, 'OB or OW', b'\x00'))
+        ds = correct_ambiguous_vr(deepcopy(ref_ds), True)
+        self.assertTrue(ds[0x60003000].VR == 'OW')
+        self.assertTrue(ds[0x601E3000].VR == 'OW')
+        self.assertTrue(ref_ds[0x60003000].VR == 'OB or OW')
+        self.assertTrue(ref_ds[0x601E3000].VR == 'OB or OW')
+
+        # Explicit VR may be 'OB' or 'OW' (leave unchanged)
+        ref_ds.is_implicit_VR = False
+        ds = correct_ambiguous_vr(deepcopy(ref_ds), True)
+        self.assertTrue(ds[0x60003000].VR == 'OB or OW')
+        self.assertTrue(ref_ds[0x60003000].VR == 'OB or OW')
+
+        # Missing is_implicit_VR (leave unchanged)
+        del ref_ds.is_implicit_VR
+        ds = correct_ambiguous_vr(deepcopy(ref_ds), True)
+        self.assertTrue(ds[0x60003000].VR == 'OB or OW')
+        self.assertTrue(ref_ds[0x60003000].VR == 'OB or OW')
 
     def test_sequence(self):
         """Test correcting elements in a sequence."""
