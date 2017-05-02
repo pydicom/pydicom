@@ -8,6 +8,7 @@
 import os.path
 import os
 import sys
+import pytest
 on_windows = sys.platform.startswith("win")
 
 # EDIT THIS SECTION --------------------------
@@ -44,7 +45,7 @@ for location in locations:
     loc_list = glob.glob(os.path.join(location, "*"))
     filenames.extend((x for x in loc_list if not x.startswith(".")))
 
-assert len(filenames) >= 400, "Need at least 400 files"  # unless change slices below
+# assert len(filenames) >= 400, "Need at least 400 files"  # unless change slices below
 
 
 print()
@@ -60,18 +61,20 @@ filenames2 = filenames[100:200]
 filenames3 = filenames[200:300]
 filenames4 = filenames[300:400]
 
-
+@pytest.mark.skipif(len(filenames) < 400, reason="Not doing time tests - Need at least 400 files in %s" % str(locations))
 def test_full_read():
     rf = pydicom.read_file
     datasets = [rf(fn) for fn in filenames1]
     return datasets
 
 
+@pytest.mark.skipif(len(filenames) < 400, reason="Not doing time tests - Need at least 400 files in %s" % str(locations))
 def test_partial():
     rp = read_partial
     [rp(open(fn, 'rb'), stop_when=_at_pixel_data) for fn in filenames2]
 
 
+@pytest.mark.skipif(len(filenames) < 400, reason="Not doing time tests - Need at least 400 files in %s" % str(locations))
 def test_mem_read_full():
     rf = pydicom.read_file
     str_io = BytesIO
@@ -79,6 +82,7 @@ def test_mem_read_full():
     [rf(memory_file) for memory_file in memory_files]
 
 
+@pytest.mark.skipif(len(filenames) < 400, reason="Not doing time tests - Need at least 400 files in %s" % str(locations))
 def test_mem_read_small():
     rf = pydicom.read_file
     str_io = BytesIO  # avoid global lookup, make local instead
@@ -86,6 +90,7 @@ def test_mem_read_small():
     [rf(memory_file) for memory_file in memory_files]
 
 
+@pytest.mark.skipif(len(filenames) < 400, reason="Not doing time tests - Need at least 400 files in %s" % str(locations))
 def test_python_read_files():
     [open(fn, 'rb').read() for fn in filenames4]
 
