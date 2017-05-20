@@ -46,6 +46,7 @@ python_encoding = {
 
     'ISO_IR 192': 'UTF8',     # from Chinese example, 2008 PS3.5 Annex J p1-4
     'GB18030': 'GB18030',
+    'ISO 2022 GBK':'GBK',
 
 }
 
