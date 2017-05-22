@@ -39,7 +39,7 @@ class charsetTests(unittest.TestCase):
         test_string = u'Hello World'
         for x in pydicom.charset.python_encoding.items():
             try:
-                test_string.encode(encoding=x[1])
+                test_string.encode(x[1])
             except LookupError as e:
                 self.fail(msg="DICOM term '%s' does not have a valid python encoding (was '%s')" % (x[0], x[1]))
 
