@@ -667,30 +667,6 @@ class Dataset(dict):
         """Compare `self` and `other` for inequality."""
         return not (self == other)
 
-    def not_group_dataset(self, exclude_groups):
-        """Return a Dataset containing elements not in `exclude_groups`.
-
-        Parameters
-        ----------
-        groups : int or list of int
-            The Element tag group number(s) to exclude from the returned
-            Dataset.
-
-        Returns
-        -------
-        pydicom.dataset.Dataset
-            The Dataset containing the non-excluded DataElements.
-        """
-        if isinstance(exclude_groups, int):
-            exclude_groups = [exclude_groups]
-        ds = Dataset()
-        unique_groups = list(set([elem.tag.group for elem in self]))
-        for group in unique_groups:
-            if group not in exclude_groups:
-                ds.update(self.group_dataset(group))
-
-        return ds
-
     def _pixel_data_numpy(self):
         """If NumPy is available, return an ndarray of the Pixel Data.
 
