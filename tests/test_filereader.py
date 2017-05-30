@@ -420,7 +420,7 @@ class ReaderTests(unittest.TestCase):
         ds = read_file(fp, defer_size=65, force=True)
         self.assertEqual(ds[0x00080005].value, long_specific_char_set_value)
 
-    def test_no_preamble_file_meta(self):
+    def test_no_preamble_file_meta_dataset(self):
         """Test correct read of group 2 elements with no preamble."""
         bytestream = b'\x02\x00\x02\x00\x55\x49\x16\x00\x31\x2e\x32\x2e\x38\x34\x30\x2e\x31' \
                      b'\x30\x30\x30\x38\x2e\x35\x2e\x31\x2e\x31\x2e\x39\x00\x02\x00\x10\x00' \
@@ -435,7 +435,7 @@ class ReaderTests(unittest.TestCase):
         self.assertEqual(ds.Polarity, 'NORMAL')
         self.assertEqual(ds.ImageBoxPosition, 1)
 
-    def test_no_preamble_command_group(self):
+    def test_no_preamble_command_group_dataset(self):
         """Test correct read of group 0 and 2 elements with no preamble."""
         bytestream = b'\x00\x00\x10\x01\x02\x00\x00\x00\x03\x00' \
                      b'\x02\x00\x02\x00\x55\x49\x16\x00\x31\x2e\x32\x2e\x38\x34\x30\x2e\x31' \
@@ -470,6 +470,100 @@ class ReaderTests(unittest.TestCase):
         self.assertEqual(ds.file_meta.TransferSyntaxUID, ImplicitVRLittleEndian)
         self.assertEqual(ds.Polarity, 'NORMAL')
         self.assertEqual(ds.ImageBoxPosition, 1)
+
+    def test_preamble_command_meta_no_dataset(self):
+        """Test reading only preamble, command and meta elements"""
+        preamble = b'\x00' * 128
+        prefix = b'DICM'
+        command = b'\x00\x00\x00\x00\x04\x00\x00\x00\x38' \
+                  b'\x00\x00\x00\x00\x00\x02\x00\x12\x00\x00' \
+                  b'\x00\x31\x2e\x32\x2e\x38\x34\x30\x2e\x31' \
+                  b'\x30\x30\x30\x38\x2e\x31\x2e\x31\x00\x00' \
+                  b'\x00\x00\x01\x02\x00\x00\x00\x30\x00\x00' \
+                  b'\x00\x10\x01\x02\x00\x00\x00\x07\x00\x00' \
+                  b'\x00\x00\x08\x02\x00\x00\x00\x01\x01'
+        meta = b'\x02\x00\x00\x00\x55\x4C\x04\x00\x0A\x00\x00\x00' \
+               b'\x02\x00\x02\x00\x55\x49\x16\x00\x31\x2e\x32\x2e\x38\x34\x30\x2e\x31' \
+               b'\x30\x30\x30\x38\x2e\x35\x2e\x31\x2e\x31\x2e\x39\x00\x02\x00\x10\x00' \
+               b'\x55\x49\x12\x00\x31\x2e\x32\x2e\x38\x34\x30\x2e\x31\x30\x30\x30\x38' \
+               b'\x2e\x31\x2e\x32\x00'
+
+        bytestream = preamble + prefix + command + meta
+        fp = BytesIO(bytestream)
+        ds = read_file(fp, force=True)
+        self.assertTrue('TransferSyntaxUID' in ds.file_meta)
+        self.assertTrue('MessageID' in ds)
+
+    def test_preamble_meta_no_dataset(self):
+        """Test reading only preamble and meta elements"""
+        preamble = b'\x00' * 128
+        prefix = b'DICM'
+        meta = b'\x02\x00\x00\x00\x55\x4C\x04\x00\x0A\x00\x00\x00' \
+               b'\x02\x00\x02\x00\x55\x49\x16\x00\x31\x2e\x32\x2e\x38\x34\x30\x2e\x31' \
+               b'\x30\x30\x30\x38\x2e\x35\x2e\x31\x2e\x31\x2e\x39\x00\x02\x00\x10\x00' \
+               b'\x55\x49\x12\x00\x31\x2e\x32\x2e\x38\x34\x30\x2e\x31\x30\x30\x30\x38' \
+               b'\x2e\x31\x2e\x32\x00'
+
+        bytestream = preamble + prefix + meta
+        fp = BytesIO(bytestream)
+        ds = read_file(fp, force=True)
+        self.assertEqual(ds.preamble, b'\x00' * 128)
+        self.assertTrue('TransferSyntaxUID' in ds.file_meta)
+        self.assertEqual(ds[:], Dataset())
+
+    def test_preamble_commandset_no_dataset(self):
+        """Test reading only preamble and command set"""
+        preamble = b'\x00' * 128
+        prefix = b'DICM'
+        command = b'\x00\x00\x00\x00\x04\x00\x00\x00\x38' \
+                  b'\x00\x00\x00\x00\x00\x02\x00\x12\x00\x00' \
+                  b'\x00\x31\x2e\x32\x2e\x38\x34\x30\x2e\x31' \
+                  b'\x30\x30\x30\x38\x2e\x31\x2e\x31\x00\x00' \
+                  b'\x00\x00\x01\x02\x00\x00\x00\x30\x00\x00' \
+                  b'\x00\x10\x01\x02\x00\x00\x00\x07\x00\x00' \
+                  b'\x00\x00\x08\x02\x00\x00\x00\x01\x01'
+        bytestream = preamble + prefix + command
+
+        fp = BytesIO(bytestream)
+        ds = read_file(fp, force=True)
+        self.assertTrue('MessageID' in ds)
+        self.assertEqual(ds.file_meta, Dataset())
+
+    def test_meta_no_dataset(self):
+        """Test reading only meta elements"""
+        bytestream = b'\x02\x00\x00\x00\x55\x4C\x04\x00\x0A\x00\x00\x00' \
+                     b'\x02\x00\x02\x00\x55\x49\x16\x00\x31\x2e\x32\x2e\x38\x34\x30\x2e\x31' \
+                     b'\x30\x30\x30\x38\x2e\x35\x2e\x31\x2e\x31\x2e\x39\x00\x02\x00\x10\x00' \
+                     b'\x55\x49\x12\x00\x31\x2e\x32\x2e\x38\x34\x30\x2e\x31\x30\x30\x30\x38' \
+                     b'\x2e\x31\x2e\x32\x00'
+        fp = BytesIO(bytestream)
+        ds = read_file(fp, force=True)
+        self.assertTrue('TransferSyntaxUID' in ds.file_meta)
+        self.assertEqual(ds[:], Dataset())
+
+    def test_commandset_no_dataset(self):
+        """Test reading only command set elements"""
+        bytestream = b'\x00\x00\x00\x00\x04\x00\x00\x00\x38' \
+                     b'\x00\x00\x00\x00\x00\x02\x00\x12\x00\x00' \
+                     b'\x00\x31\x2e\x32\x2e\x38\x34\x30\x2e\x31' \
+                     b'\x30\x30\x30\x38\x2e\x31\x2e\x31\x00\x00' \
+                     b'\x00\x00\x01\x02\x00\x00\x00\x30\x00\x00' \
+                     b'\x00\x10\x01\x02\x00\x00\x00\x07\x00\x00' \
+                     b'\x00\x00\x08\x02\x00\x00\x00\x01\x01'
+        fp = BytesIO(bytestream)
+        ds = read_file(fp, force=True)
+        self.assertTrue('MessageID' in ds)
+        self.assertTrue(ds.preamble is None)
+        self.assertEqual(ds.file_meta, Dataset())
+
+    def test_no_dataset(self):
+        """Test reading no elements or preamble produces empty Dataset"""
+        bytestream = b''
+        fp = BytesIO(bytestream)
+        ds = read_file(fp, force=True)
+        self.assertTrue(ds.preamble is None)
+        self.assertEqual(ds.file_meta, Dataset())
+        self.assertEqual(ds[:], Dataset())
 
 
 class ReadDataElementTests(unittest.TestCase):
