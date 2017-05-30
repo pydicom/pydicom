@@ -598,6 +598,10 @@ def read_partial(fileobj, stop_when=None, defer_size=None, force=False):
     # Read any File Meta Information group (0002,eeee) elements (if present)
     file_meta_dataset = _read_file_meta_info(fileobj)
 
+    # Check to see if there's anything left to read
+    peek = fileobj.read(1)
+    fileobj.seek(-1, 1)
+
     # `filobj` should be positioned at the start of the dataset by this point,
     # Ensure we have appropriate values for `is_implicit_VR` and
     #   `is_little_endian` before we try decoding. We assume an initial
@@ -605,7 +609,9 @@ def read_partial(fileobj, stop_when=None, defer_size=None, force=False):
     is_implicit_VR = True
     is_little_endian = True
     transfer_syntax = file_meta_dataset.get("TransferSyntaxUID")
-    if transfer_syntax is None:  # issue 258
+    if peek == b'': # EOF
+        pass
+    elif transfer_syntax is None:  # issue 258
         # If no TransferSyntaxUID element then we have to try and figure out
         #   the correct values for `is_little_endian` and `is_implicit_VR`.
         # Peek at the first 6 bytes to get the first element's tag group and
