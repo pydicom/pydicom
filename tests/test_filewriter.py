@@ -1038,44 +1038,114 @@ class TestWriteFileMetaInfoNonStandard(unittest.TestCase):
         """Create an empty file-like for use in testing."""
         self.fp = DicomBytesIO()
 
-    def test_no_preamble_fm(self):
-        """Test file meta written with missing preamble"""
+    def test_no_preamble(self):
+        """Test file meta written OK if preamble absent."""
+        ds = read_file(ct_name)
+        del ds.preamble
+        ds.save_as(self.fp, write_like_original=True)
+        self.fp.seek(0)
+        self.assertNotEqual(self.fp.read(128), b'\x00' * 128)
+        self.fp.seek(0)
+        self.assertNotEqual(self.fp.read(4), b'DICM')
+
+        fp = BytesIO(self.fp.getvalue()) # Workaround to avoid #358
+        ds_out = read_file(fp, force=True)
+        self.assertTrue('ImplementationClassUID' in ds_out.file_meta)
+
+    def test_preamble_file_meta(self):
+        """Test non-standard file meta written with preamble OK"""
+        ds = read_file(ct_name)
+        preamble = ds.preamble[:]
+        del ds.file_meta.MediaStorageSOPClassUID
+        ds.save_as(self.fp, write_like_original=True)
+        self.fp.seek(0)
+        self.assertEqual(self.fp.read(128), preamble)
+        self.assertEqual(self.fp.read(4), b'DICM')
+
+        fp = BytesIO(self.fp.getvalue()) # Workaround to avoid #358
+        ds_out = read_file(fp, force=True)
+        self.assertEqual(ds.file_meta[:], ds_out.file_meta[:])
+        self.assertFalse('MediaStorageSOPClassUID' in ds_out.file_meta[:])
+        self.assertTrue('TransferSyntaxUID' in ds_out.file_meta[:])
+
+    def test_no_preamble_no_file_meta(self):
+        """Test dataset written OK with no preamble or file meta"""
+        ds = read_file(ct_name)
+        del ds.preamble
+        del ds.file_meta
+        ds.save_as(self.fp, write_like_original=True)
+        self.fp.seek(0)
+        self.assertNotEqual(self.fp.read(128), b'\x00' * 128)
+        self.fp.seek(0)
+        self.assertNotEqual(self.fp.read(4), b'DICM')
+
+        fp = BytesIO(self.fp.getvalue()) # Workaround to avoid #358
+        ds_out = read_file(fp, force=True)
+        self.assertEqual(ds_out.file_meta, Dataset())
+        self.assertTrue('PatientID' in ds_out)
+
+    def test_preamble_no_file_meta(self):
+        """Test dataset written OK with no file meta"""
+        ds = read_file(ct_name)
+        del ds.file_meta
+        preamble = ds.preamble[:]
+        ds.save_as(self.fp, write_like_original=True)
+        self.fp.seek(0)
+        self.assertEqual(self.fp.read(128), preamble)
+        self.assertEqual(self.fp.read(4), b'DICM')
+
+        fp = BytesIO(self.fp.getvalue()) # Workaround to avoid #358
+        ds_out = read_file(fp, force=True)
+        self.assertEqual(ds_out.file_meta, Dataset())
+        self.assertTrue('PatientID' in ds_out)
+
+    def test_preamble_commandset_file_meta(self):
+        """Test dataset written OK with preamble/command set/file meta"""
         pass
 
-    def test_preamble_fm(self):
-        """Test non-standard file meta written with preamble"""
+    def test_preamble_commandset_no_file_meta(self):
+        """Test dataset written OK with preamble/command set and no file meta"""
         pass
 
-    def test_no_preamble_no_fm(self):
-        """Test no file meta written with no preamble"""
+    def test_no_preamble_commandset_file_meta(self):
+        """Test dataset written OK with command set/file meta and no preamble"""
         pass
 
-    def test_preamble_no_fm(self):
-        """Test no file meta written with preamble"""
-        pass
+    def test_no_preamble_commandset_no_file_meta(self):
+        """Test dataset written OK with only command set"""
+        ds = read_file(ct_name)
+        del ds[:]
+        del ds.preamble
+        del ds.file_meta
+        ds.is_little_endian = True
+        ds.is_implicit_VR = True
+        ds.CommandGroupLength = 12
+        ds.MessageID = 1
+        ds.MoveDestination = 'SOME_SCP'
+        ds.Status = 0x0000
+        ds.save_as(self.fp, write_like_original=True)
+        self.fp.seek(0)
+        self.assertRaises(EOFError, self.fp.read, 128)
+        self.fp.seek(0)
+        self.assertNotEqual(self.fp.read(4), b'DICM')
+        print(len(self.fp.getvalue()))
 
-    def test_preamble_commandset_fm(self):
-        """Test preamble/command set/file meta written"""
-        pass
-
-    def test_preamble_commandset_no_fm(self):
-        """Test preamble/command set written"""
-        pass
-
-    def test_no_preamble_commandset_fm(self):
-        """Test command set/file meta written"""
-        pass
-
-    def test_no_preamble_commandset_no_fm(self):
-        """Test command set written"""
-        pass
+        fp = BytesIO(self.fp.getvalue()) # Workaround to avoid #358
+        ds_out = read_file(fp, force=True)
+        self.assertEqual(ds_out.file_meta, Dataset())
+        self.assertTrue('Status' in ds_out)
 
     def test_transfer_syntax_not_added(self):
         """Test that the TransferSyntaxUID isn't added if missing"""
-        written_file = TemporaryFile('w+b')
         ds = read_file(no_ts)
-        ds.save_as(written_file, write_like_original=True)
+        _write_file_meta_info(self.fp, ds.file_meta, enforce_standard=False)
         self.assertFalse('TransferSyntaxUID' in ds.file_meta)
+
+        # Check written meta dataset doesn't contain TransferSyntaxUID
+        fp = BytesIO(self.fp.getvalue()) # Workaround to avoid #358
+        written_meta = read_dataset(fp, is_implicit_VR=False, is_little_endian=True)
+        self.assertTrue('ImplementationClassUID' in written_meta)
+        self.assertFalse('TransferSyntaxUID' in written_meta)
 
     def test_bad_elements(self):
         """Test that non-group 2 elements aren't written to the file meta."""
@@ -1101,8 +1171,8 @@ class TestWriteFileMetaInfoNonStandard(unittest.TestCase):
         meta.ImplementationClassUID = '1.4'
         _write_file_meta_info(self.fp, meta, enforce_standard=False)
 
-    def test_group_length(self):
-        """Test FileMetaInformationGroupLength gets updated if present."""
+    def test_group_length_updated(self):
+        """Test that FileMetaInformationGroupLength gets updated if present."""
         meta = Dataset()
         meta.FileMetaInformationGroupLength = 100
         meta.MediaStorageSOPClassUID = '1.1'
@@ -1117,19 +1187,6 @@ class TestWriteFileMetaInfoNonStandard(unittest.TestCase):
         # 8 + 4 bytes TransferSyntaxUID
         # 8 + 4 bytes ImplementationClassUID
         # 60 bytes total, - 12 for group length = 48
-        self.fp.seek(8)
-        self.assertEqual(self.fp.read(4), b'\x30\x00\x00\x00')
-
-    def test_group_length_updated(self):
-        """Test that FileMetaInformationGroupLength gets updated if present."""
-        meta = Dataset()
-        meta.FileMetaInformationGroupLength = 100
-        meta.MediaStorageSOPClassUID = '1.1'
-        meta.MediaStorageSOPInstanceUID = '1.2'
-        meta.TransferSyntaxUID = '1.3'
-        meta.ImplementationClassUID = '1.4'
-        _write_file_meta_info(self.fp, meta, enforce_standard=False)
-
         self.fp.seek(8)
         self.assertEqual(self.fp.read(4), b'\x30\x00\x00\x00')
         # Check original file meta is unchanged/updated

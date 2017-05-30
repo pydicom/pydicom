@@ -507,7 +507,7 @@ def _write_file_meta_info(fp, meta_dataset, enforce_standard=True):
 
     Encoding
     ~~~~~~~~
-    The encoding of the File Meta Information shall be ExplicitVRLittleEndian.
+    The encoding of the File Meta Information shall be Explicit VR Little Endian
 
     Parameters
     ----------
