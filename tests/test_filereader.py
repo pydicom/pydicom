@@ -43,6 +43,7 @@ from pydicom.dataelem import DataElement
 from pydicom.filebase import DicomBytesIO
 from pydicom.filereader import read_file, data_element_generator
 from pydicom.errors import InvalidDicomError
+from pydicom.dataset import PropertyError
 from pydicom.tag import Tag, TupleTag
 from pydicom.uid import ImplicitVRLittleEndian
 import pydicom.valuerep
@@ -73,6 +74,7 @@ rtplan_name = os.path.join(test_files, "rtplan.dcm")
 rtdose_name = os.path.join(test_files, "rtdose.dcm")
 ct_name = os.path.join(test_files, "CT_small.dcm")
 mr_name = os.path.join(test_files, "MR_small.dcm")
+truncated_mr_name = os.path.join(test_files, "MR_truncated.dcm")
 jpeg2000_name = os.path.join(test_files, "JPEG2000.dcm")
 jpeg2000_lossless_name = os.path.join(test_files, "MR_small_jp2klossless.dcm")
 jpeg_ls_lossless_name = os.path.join(test_files, "MR_small_jpeg_ls_lossless.dcm")
@@ -596,7 +598,7 @@ class JPEG_LS_Tests(unittest.TestCase):
             self.assertEqual(a.mean(), b.mean(),
                              "Decoded pixel data is not all {0} (mean == {1})".format(b.mean(), a.mean()))
         else:
-            self.assertRaises(ImportError, self.jpeg_ls_lossless._get_pixel_array)
+            self.assertRaises(NotImplementedError, self.jpeg_ls_lossless._get_pixel_array)
 
     def test_emri_JPEG_LS_PixelArray(self):
         """JPEG LS Lossless: Now works"""
@@ -606,7 +608,7 @@ class JPEG_LS_Tests(unittest.TestCase):
             self.assertEqual(a.mean(), b.mean(),
                              "Decoded pixel data is not all {0} (mean == {1})".format(b.mean(), a.mean()))
         else:
-            self.assertRaises(ImportError, self.emri_jpeg_ls_lossless._get_pixel_array)
+            self.assertRaises(NotImplementedError, self.emri_jpeg_ls_lossless._get_pixel_array)
 
 
 class BigEndian_Tests(unittest.TestCase):
@@ -651,7 +653,7 @@ class JPEG2000Tests(unittest.TestCase):
             self.assertEqual(a.mean(), b.mean(),
                              "Decoded pixel data is not all {0} (mean == {1})".format(b.mean(), a.mean()))
         else:
-            self.assertRaises(ImportError, self.jpegls._get_pixel_array)
+            self.assertRaises(NotImplementedError, self.jpegls._get_pixel_array)
 
     def test_emri_JPEG2000PixelArray(self):
         """JPEG2000: Now works"""
@@ -661,7 +663,7 @@ class JPEG2000Tests(unittest.TestCase):
             self.assertEqual(a.mean(), b.mean(),
                              "Decoded pixel data is not all {0} (mean == {1})".format(b.mean(), a.mean()))
         else:
-            self.assertRaises(ImportError, self.emri_jpeg_2k_lossless._get_pixel_array)
+            self.assertRaises(NotImplementedError, self.emri_jpeg_2k_lossless._get_pixel_array)
 
 
 class JPEGlossyTests(unittest.TestCase):
@@ -681,7 +683,7 @@ class JPEGlossyTests(unittest.TestCase):
         if have_pillow and have_numpy:
             self.assertRaises(NotImplementedError, self.jpeg._get_pixel_array)
         else:
-            self.assertRaises(ImportError, self.jpeg._get_pixel_array)
+            self.assertRaises(NotImplementedError, self.jpeg._get_pixel_array)
 
     def testJPEGBaselineColor3DPixelArray(self):
         if have_pillow and have_numpy:
@@ -691,7 +693,7 @@ class JPEGlossyTests(unittest.TestCase):
             self.assertEqual(tuple(a[3, 159, 290, :]), (41, 41, 41))
             self.assertEqual(tuple(a[3, 169, 290, :]), (57, 57, 57))
         else:
-            self.assertRaises(ImportError, self.color_3d_jpeg._get_pixel_array)
+            self.assertRaises(NotImplementedError, self.color_3d_jpeg._get_pixel_array)
 
 
 class JPEGlosslessTests(unittest.TestCase):
@@ -778,6 +780,21 @@ class DeferredReadTests(unittest.TestCase):
     def tearDown(self):
         if os.path.exists(self.testfile_name):
             os.remove(self.testfile_name)
+
+
+class ReadTruncatedFileTests(unittest.TestCase):
+    def testReadFileWithMissingPixelData(self):
+        mr = read_file(truncated_mr_name)
+        mr.decode()
+        self.assertEqual(mr.PatientName, 'CompressedSamples^MR1', "Wrong patient name")
+        self.assertEqual(mr.PatientName, mr[0x10, 0x10].value,
+                         "Name does not match value found when accessed by tag number")
+        got = mr.PixelSpacing
+        DS = pydicom.valuerep.DS
+        expected = [DS('0.3125'), DS('0.3125')]
+        self.assertTrue(got == expected, "Wrong pixel spacing")
+        with self.assertRaisesRegexp(AttributeError, "Amount of pixel data.*does not match the expected data"):
+            mr.pixel_array
 
 
 class FileLikeTests(unittest.TestCase):

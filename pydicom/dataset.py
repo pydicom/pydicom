@@ -237,7 +237,8 @@ class Dataset(dict):
             Dataset DataElement if present, None otherwise.
         """
         tag = tag_for_keyword(name)
-        if tag:
+        # Test against None as (0000,0000) is a possible tag
+        if tag is not None:
             return self[tag]
         return None
 
@@ -265,7 +266,8 @@ class Dataset(dict):
                 tag = Tag(name)
             except:
                 return False
-        if tag:
+        # Test against None as (0000,0000) is a possible tag
+        if tag is not None:
             return dict.__contains__(self, tag)
         else:
             return dict.__contains__(self, name)  # will no doubt raise an exception
@@ -324,20 +326,43 @@ class Dataset(dict):
     def __delitem__(self, key):
         """Intercept requests to delete an attribute by key.
 
-        >>> del ds[0x00100010]
+        Examples
+        --------
+        Indexing using DataElement tag
+        >>> ds = Dataset()
+        >>> ds.CommandGroupLength = 100
+        >>> ds.PatientName = 'CITIZEN^Jan'
+        >>> del ds[0x00000000]
+        >>> ds
+        (0010, 0010) Patient's Name                      PN: 'CITIZEN^Jan'
+
+        Slicing using DataElement tag
+        >>> ds = Dataset()
+        >>> ds.CommandGroupLength = 100
+        >>> ds.SOPInstanceUID = '1.2.3'
+        >>> ds.PatientName = 'CITIZEN^Jan'
+        >>> del ds[:0x00100000]
+        >>> ds
+        (0010, 0010) Patient's Name                      PN: 'CITIZEN^Jan'
 
         Parameters
         ----------
         key
-            The key for the attribute to be deleted.
+            The key for the attribute to be deleted. If a slice is used then
+            the tags matching the slice conditions will be deleted.
         """
-        # Assume is a standard tag (for speed in common case)
-        try:
-            dict.__delitem__(self, key)
-        # If not a standard tag, than convert to Tag and try again
-        except KeyError:
-            tag = Tag(key)
-            dict.__delitem__(self, tag)
+        # If passed a slice, delete the corresponding DataElements
+        if isinstance(key, slice):
+            for tag in self._slice_dataset(key.start, key.stop, key.step):
+                del self[tag]
+        else:
+            # Assume is a standard tag (for speed in common case)
+            try:
+                dict.__delitem__(self, key)
+            # If not a standard tag, than convert to Tag and try again
+            except KeyError:
+                tag = Tag(key)
+                dict.__delitem__(self, tag)
 
     def __dir__(self):
         """Give a list of attributes available in the Dataset.
@@ -347,10 +372,10 @@ class Dataset(dict):
         """
         # Force zip object into a list in case of python3. Also backwards
         # compatible
-        meths = set(list(zip(
-                    *inspect.getmembers(Dataset, inspect.isroutine)))[0])
-        props = set(list(zip(
-                    *inspect.getmembers(Dataset, inspect.isdatadescriptor)))[0])
+        meths = set(list(zip(*inspect.getmembers(Dataset,
+                                                 inspect.isroutine)))[0])
+        props = set(list(zip(*inspect.getmembers(Dataset,
+                                                 inspect.isdatadescriptor)))[0])
         dicom_names = set(self.dir())
         alldir = sorted(props | meths | dicom_names)
         return alldir
@@ -501,17 +526,47 @@ class Dataset(dict):
         Any deferred data elements will be read in and an attempt will be made
         to correct any elements with ambiguous VRs.
 
+        Examples
+        --------
+        Indexing using DataElement tag
+        >>> ds = Dataset()
+        >>> ds.SOPInstanceUID = '1.2.3'
+        >>> ds.PatientName = 'CITIZEN^Jan'
+        >>> ds.PatientID = '12345'
+        >>> ds[0x00100010]
+        'CITIZEN^Jan'
+
+        Slicing using DataElement tag
+        All group 0x0010 elements in the dataset
+        >>> ds[0x00100000:0x0011000]
+        (0010, 0010) Patient's Name                      PN: 'CITIZEN^Jan'
+        (0010, 0020) Patient ID                          LO: '12345'
+
+        All group 0x0002 elements in the dataset
+        >>> ds[(0x0002, 0x0000):(0x0003, 0x0000)]
+
         Parameters
         ----------
         key
             The DICOM (group, element) tag in any form accepted by
             pydicom.tag.Tag such as [0x0010, 0x0010], (0x10, 0x10), 0x00100010,
-            etc.
+            etc. May also be a slice made up of DICOM tags.
 
         Returns
         -------
-        pydicom.dataelem.DataElement
+        pydicom.dataelem.DataElement or pydicom.dataset.Dataset
+            If a single DICOM element tag is used then returns the corresponding
+            DataElement. If a slice is used then returns a Dataset object
+            containing the corresponding DataElements.
         """
+        # If passed a slice, return a Dataset containing the corresponding
+        #   DataElements
+        if isinstance(key, slice):
+            ds = Dataset()
+            for tag in self._slice_dataset(key.start, key.stop, key.step):
+                ds.add(self[tag])
+            return ds
+
         tag = Tag(key)
         data_elem = dict.__getitem__(self, tag)
 
@@ -572,17 +627,14 @@ class Dataset(dict):
         Parameters
         ----------
         group : int
-            The group part of a dicom (group, element) tag.
+            The group part of a DICOM (group, element) tag.
 
         Returns
         -------
         pydicom.dataset.Dataset
             A dataset instance containing elements of the group specified.
         """
-        ds = Dataset()
-        ds.update(dict([(tag, data_element) for tag, data_element in self.items()
-                        if tag.group == group]))
-        return ds
+        return self[(group, 0x0000):(group + 1, 0x0000)]
 
     def __iter__(self):
         """Iterate through the top-level of the Dataset, yielding DataElements.
@@ -762,6 +814,16 @@ class Dataset(dict):
                     pass
 
         pixel_array = numpy.fromstring(pixel_bytearray, dtype=numpy_dtype)
+        length_of_pixel_array = pixel_array.nbytes
+        expected_length = self.Rows * self.Columns
+        if 'NumberOfFrames' in self and self.NumberOfFrames > 1:
+            expected_length *= self.NumberOfFrames
+        if 'SamplesPerPixel' in self and self.SamplesPerPixel > 1:
+            expected_length *= self.SamplesPerPixel
+        if self.BitsAllocated > 8:
+            expected_length *= (self.BitsAllocated // 8)
+        if length_of_pixel_array != expected_length:
+            raise AttributeError("Amount of pixel data %d does not match the expected data %d" % (length_of_pixel_array, expected_length))
 
         # Note the following reshape operations return a new *view* onto
         #   pixel_array, but don't copy the data
@@ -873,7 +935,7 @@ class Dataset(dict):
                                               "Allocated = 8")
             else:
                 arr = arr.reshape(self.Rows, self.Columns)
-        if (self.file_meta.TransferSyntaxUID in pydicom.uid.JPEG2000CompressedPixelTransferSyntaxes and self.BitsStored == 16):
+        if self.file_meta.TransferSyntaxUID in pydicom.uid.JPEG2000CompressedPixelTransferSyntaxes and self.BitsStored == 16:
             # WHY IS THIS EVEN NECESSARY??
             arr &= 0x7FFF
         return arr
@@ -923,7 +985,14 @@ class Dataset(dict):
                     try:
                         decompressed_image = PILImg.open(fio)
                     except IOError as e:
-                        raise NotImplementedError(e.message)
+                        try:
+                            message = str(e)
+                        except:
+                            try:
+                                message = unicode(e)
+                            except:
+                                message = ''
+                        raise NotImplementedError(message)
                     UncompressedPixelData += decompressed_image.tobytes()
             else:
                 # single compressed frame
@@ -933,7 +1002,14 @@ class Dataset(dict):
                     fio = io.BytesIO(UncompressedPixelData)
                     decompressed_image = PILImg.open(fio)
                 except IOError as e:
-                    raise NotImplementedError(e.message)
+                    try:
+                        message = str(e)
+                    except:
+                        try:
+                            message = unicode(e)
+                        except:
+                            message = ''
+                    raise NotImplementedError(message)
                 UncompressedPixelData = decompressed_image.tobytes()
         except:
             raise
@@ -995,7 +1071,7 @@ class Dataset(dict):
                 self._pixel_array = self._compressed_pixel_data_numpy()
                 self._pixel_id = id(self.PixelData)  # is this guaranteed to work if memory is re-used??
                 return self._pixel_array
-            except IOError:
+            except Exception as I:
                 logger.info("Pillow or JPLS did not support this transfer syntax")
         if not already_have:
             self._pixel_array = self._pixel_data_numpy()
@@ -1197,9 +1273,15 @@ class Dataset(dict):
 
         Raises
         ------
+        NotImplementedError
+            If `key` is a slice.
         ValueError
             If the `key` value doesn't match DataElement.tag.
         """
+        if isinstance(key, slice):
+            raise NotImplementedError('Slicing is not supported for setting '
+                                      'Dataset elements.')
+
         # OK if is subclass, e.g. DeferredDataElement
         if not isinstance(value, (DataElement, RawDataElement)):
             raise TypeError("Dataset contents must be DataElement instances.")
@@ -1219,6 +1301,43 @@ class Dataset(dict):
                                                         self._character_set)
                 data_element.private_creator = self[private_creator_tag].value
         dict.__setitem__(self, tag, data_element)
+
+    def _slice_dataset(self, start, stop, step):
+        """Return the element tags in the Dataset that match the slice.
+
+        Parameters
+        ----------
+        start : int or None
+            The slice's starting element tag value.
+        stop : int or None
+            The slice's stopping element tag value.
+        step : int or None
+            The slice's step size.
+
+        Returns
+        ------
+        list of pydicom.tag.Tag
+            The tags in the Dataset that meet the conditions of the slice.
+        """
+        # Check the starting/stopping Tags are valid when used
+        if start and Tag(start):
+            pass
+        if stop and Tag(stop):
+            pass
+
+        all_tags = sorted(self.keys())
+        # If the Dataset is empty, return an empty list
+        if not all_tags:
+            return []
+
+        # Ensure we have valid Tags when start/stop are None
+        if start is None:
+            start = all_tags[0]
+        if stop is None:
+            stop = all_tags[-1] + 1
+
+        slice_tags = [tag for tag in all_tags if Tag(start) <= tag < Tag(stop)]
+        return slice_tags[::step]
 
     def __str__(self):
         """Handle str(dataset)."""

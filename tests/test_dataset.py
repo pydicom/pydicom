@@ -151,11 +151,13 @@ class DatasetTests(unittest.TestCase):
     def testContains(self):
         """Dataset: can test if item present by 'if <tag> in dataset'......."""
         ds = self.dummy_dataset()
+        ds.CommandGroupLength = 100 # (0000,0000)
         self.assertTrue((0x300a, 0xb2) in ds, "membership test failed")
         self.assertTrue([0x300a, 0xb2] in ds,
                         "membership test failed when list used")
         self.assertTrue(0x300a00b2 in ds, "membership test failed")
         self.assertTrue(not (0x10, 0x5f) in ds, "non-member tested as member")
+        self.assertTrue('CommandGroupLength' in ds)
 
     def testGetExists1(self):
         """Dataset: dataset.get() returns an existing item by name.........."""
@@ -451,6 +453,16 @@ class DatasetTests(unittest.TestCase):
         self.assertFalse(d == e)
         self.assertFalse(e == d)
 
+    def test_inequality(self):
+        """Test inequality operator"""
+        d = Dataset()
+        d.SOPInstanceUID = '1.2.3.4'
+        self.assertFalse(d != d)
+
+        e = Dataset()
+        e.SOPInstanceUID = '1.2.3.5'
+        self.assertTrue(d != e)
+
     def testHash(self):
         """DataElement: hash returns TypeError"""
 
@@ -483,9 +495,223 @@ class DatasetTests(unittest.TestCase):
             ds.OverlayData = b'\x00'
         self.assertRaises(ValueError, test)
 
-    def test_not_group_dataset(self):
-        """Test the Dataset.not_group_dataset() function"""
-        pass
+    def test_setitem_slice_raises(self):
+        """Test Dataset.__setitem__ raises if slicing used."""
+        ds = Dataset()
+        self.assertRaises(NotImplementedError, ds.__setitem__,
+                          slice(None), Dataset())
+
+    def test_getitem_slice_raises(self):
+        """Test Dataset.__getitem__ raises if slice Tags invalid."""
+        ds = Dataset()
+        self.assertRaises(ValueError, ds.__getitem__, slice(None,-1))
+        self.assertRaises(ValueError, ds.__getitem__, slice(-1, -1))
+        self.assertRaises(ValueError, ds.__getitem__, slice(-1))
+
+    def test_empty_slice(self):
+        """Test Dataset slicing with empty Dataset."""
+        ds = Dataset()
+        self.assertEqual(ds[:], Dataset())
+        self.assertRaises(ValueError, ds.__getitem__, slice(None,-1))
+        self.assertRaises(ValueError, ds.__getitem__, slice(-1, -1))
+        self.assertRaises(ValueError, ds.__getitem__, slice(-1))
+        self.assertRaises(NotImplementedError, ds.__setitem__,
+                          slice(None), Dataset())
+
+    def test_getitem_slice(self):
+        """Test Dataset.__getitem__ using slices."""
+        ds = Dataset()
+        ds.CommandGroupLength = 120 # 0000,0000
+        ds.CommandLengthToEnd = 111 # 0000,0001
+        ds.Overlays = 12 # 0000,51B0
+        ds.LengthToEnd = 12 # 0008,0001
+        ds.SOPInstanceUID = '1.2.3.4' # 0008,0018
+        ds.SkipFrameRangeFlag = 'TEST' # 0008,9460
+        ds.add_new(0x00090001, 'PN', 'CITIZEN^1')
+        ds.add_new(0x00090002, 'PN', 'CITIZEN^2')
+        ds.add_new(0x00090003, 'PN', 'CITIZEN^3')
+        ds.add_new(0x00090004, 'PN', 'CITIZEN^4')
+        ds.add_new(0x00090005, 'PN', 'CITIZEN^5')
+        ds.add_new(0x00090006, 'PN', 'CITIZEN^6')
+        ds.add_new(0x00090007, 'PN', 'CITIZEN^7')
+        ds.add_new(0x00090008, 'PN', 'CITIZEN^8')
+        ds.add_new(0x00090009, 'PN', 'CITIZEN^9')
+        ds.add_new(0x00090010, 'PN', 'CITIZEN^10')
+        ds.PatientName = 'CITIZEN^Jan' # 0010,0010
+        ds.PatientID = '12345' # 0010,0010
+        ds.ExaminedBodyThickness = 1.223 # 0010,9431
+        ds.BeamSequence = [Dataset()] # 300A,00B0
+        ds.BeamSequence[0].PatientName = 'ANON'
+
+        # Slice all items - should return original dataset
+        self.assertEqual(ds[:], ds)
+
+        # Slice starting from and including (0008,0001)
+        test_ds = ds[0x00080001:]
+        self.assertFalse('CommandGroupLength' in test_ds)
+        self.assertFalse('CommandLengthToEnd' in test_ds)
+        self.assertFalse('Overlays' in test_ds)
+        self.assertTrue('LengthToEnd' in test_ds)
+        self.assertTrue('BeamSequence' in test_ds)
+
+        # Slice ending at and not including (0009,0002)
+        test_ds = ds[:0x00090002]
+        self.assertTrue('CommandGroupLength' in test_ds)
+        self.assertTrue('CommandLengthToEnd' in test_ds)
+        self.assertTrue('Overlays' in test_ds)
+        self.assertTrue('LengthToEnd' in test_ds)
+        self.assertTrue(0x00090001 in test_ds)
+        self.assertFalse(0x00090002 in test_ds)
+        self.assertFalse('BeamSequence' in test_ds)
+
+        # Slice with a step - every second tag
+        # Should return zeroth tag, then second, fourth, etc...
+        test_ds = ds[::2]
+        self.assertTrue('CommandGroupLength' in test_ds)
+        self.assertFalse('CommandLengthToEnd' in test_ds)
+        self.assertTrue(0x00090001 in test_ds)
+        self.assertFalse(0x00090002 in test_ds)
+
+        # Slice starting at and including (0008,0018) and ending at and not
+        #   including (0009,0008)
+        test_ds = ds[0x00080018:0x00090008]
+        self.assertTrue('SOPInstanceUID' in test_ds)
+        self.assertTrue(0x00090007 in test_ds)
+        self.assertFalse(0x00090008 in test_ds)
+
+        # Slice starting at and including (0008,0018) and ending at and not
+        #   including (0009,0008), every third element
+        test_ds = ds[0x00080018:0x00090008:3]
+        self.assertTrue('SOPInstanceUID' in test_ds)
+        self.assertFalse(0x00090001 in test_ds)
+        self.assertTrue(0x00090002 in test_ds)
+        self.assertFalse(0x00090003 in test_ds)
+        self.assertFalse(0x00090004 in test_ds)
+        self.assertTrue(0x00090005 in test_ds)
+        self.assertFalse(0x00090006 in test_ds)
+        self.assertFalse(0x00090008 in test_ds)
+
+        # Slice starting and ending (and not including) (0008,0018)
+        self.assertEqual(ds[(0x0008,0x0018):(0x0008,0x0018)], Dataset())
+
+        # Test slicing using other acceptable Tag initialisations
+        self.assertTrue('SOPInstanceUID' in ds[(0x00080018):(0x00080019)])
+        self.assertTrue('SOPInstanceUID' in ds[(0x0008,0x0018):(0x0008,0x0019)])
+        self.assertTrue('SOPInstanceUID' in ds['0x00080018':'0x00080019'])
+
+    def test_delitem_slice(self):
+        """Test Dataset.__delitem__ using slices."""
+        ds = Dataset()
+        ds.CommandGroupLength = 120 # 0000,0000
+        ds.CommandLengthToEnd = 111 # 0000,0001
+        ds.Overlays = 12 # 0000,51B0
+        ds.LengthToEnd = 12 # 0008,0001
+        ds.SOPInstanceUID = '1.2.3.4' # 0008,0018
+        ds.SkipFrameRangeFlag = 'TEST' # 0008,9460
+        ds.add_new(0x00090001, 'PN', 'CITIZEN^1')
+        ds.add_new(0x00090002, 'PN', 'CITIZEN^2')
+        ds.add_new(0x00090003, 'PN', 'CITIZEN^3')
+        ds.add_new(0x00090004, 'PN', 'CITIZEN^4')
+        ds.add_new(0x00090005, 'PN', 'CITIZEN^5')
+        ds.add_new(0x00090006, 'PN', 'CITIZEN^6')
+        ds.add_new(0x00090007, 'PN', 'CITIZEN^7')
+        ds.add_new(0x00090008, 'PN', 'CITIZEN^8')
+        ds.add_new(0x00090009, 'PN', 'CITIZEN^9')
+        ds.add_new(0x00090010, 'PN', 'CITIZEN^10')
+        ds.PatientName = 'CITIZEN^Jan' # 0010,0010
+        ds.PatientID = '12345' # 0010,0010
+        ds.ExaminedBodyThickness = 1.223 # 0010,9431
+        ds.BeamSequence = [Dataset()] # 300A,00B0
+        ds.BeamSequence[0].PatientName = 'ANON'
+
+        # Delete the 0x0009 group
+        del ds[0x00090000:0x00100000]
+        self.assertTrue('SkipFrameRangeFlag' in ds)
+        self.assertFalse(0x00090001 in ds)
+        self.assertFalse(0x00090010 in ds)
+        self.assertTrue('PatientName' in ds)
+
+    def test_group_dataset(self):
+        """Test Dataset.group_dataset"""
+        ds = Dataset()
+        ds.CommandGroupLength = 120 # 0000,0000
+        ds.CommandLengthToEnd = 111 # 0000,0001
+        ds.Overlays = 12 # 0000,51B0
+        ds.LengthToEnd = 12 # 0008,0001
+        ds.SOPInstanceUID = '1.2.3.4' # 0008,0018
+        ds.SkipFrameRangeFlag = 'TEST' # 0008,9460
+
+        # Test getting group 0x0000
+        group0000 = ds.group_dataset(0x0000)
+        self.assertTrue('CommandGroupLength' in group0000)
+        self.assertTrue('CommandLengthToEnd' in group0000)
+        self.assertTrue('Overlays' in group0000)
+        self.assertFalse('LengthToEnd' in group0000)
+        self.assertFalse('SOPInstanceUID' in group0000)
+        self.assertFalse('SkipFrameRangeFlag' in group0000)
+
+        # Test getting group 0x0008
+        group0000 = ds.group_dataset(0x0008)
+        self.assertFalse('CommandGroupLength' in group0000)
+        self.assertFalse('CommandLengthToEnd' in group0000)
+        self.assertFalse('Overlays' in group0000)
+        self.assertTrue('LengthToEnd' in group0000)
+        self.assertTrue('SOPInstanceUID' in group0000)
+        self.assertTrue('SkipFrameRangeFlag' in group0000)
+
+    def test_get_item(self):
+        """Test Dataset.get_item"""
+        # TODO: Add test for deferred read
+        ds = Dataset()
+        ds.CommandGroupLength = 120 # 0000,0000
+        ds.SOPInstanceUID = '1.2.3.4' # 0008,0018
+
+        # Test non-deferred read
+        self.assertEqual(ds.get_item(0x00000000), ds[0x00000000])
+        self.assertEqual(ds.get_item(0x00000000).value, 120)
+        self.assertEqual(ds.get_item(0x00080018), ds[0x00080018])
+        self.assertEqual(ds.get_item(0x00080018).value, '1.2.3.4')
+
+    def test_remove_private_tags(self):
+        """Test Dataset.remove_private_tags"""
+        ds = Dataset()
+        ds.CommandGroupLength = 120 # 0000,0000
+        ds.SkipFrameRangeFlag = 'TEST' # 0008,9460
+        ds.add_new(0x00090001, 'PN', 'CITIZEN^1')
+        ds.add_new(0x00090010, 'PN', 'CITIZEN^10')
+        ds.PatientName = 'CITIZEN^Jan' # 0010,0010
+
+        ds.remove_private_tags()
+        self.assertEqual(ds[0x00090000:0x00100000], Dataset())
+        self.assertTrue('CommandGroupLength' in ds)
+        self.assertTrue('SkipFrameRangeFlag' in ds)
+        self.assertTrue('PatientName' in ds)
+
+    def test_data_element(self):
+        """Test Dataset.data_element."""
+        ds = Dataset()
+        ds.CommandGroupLength = 120
+        ds.SkipFrameRangeFlag = 'TEST'
+        ds.add_new(0x00090001, 'PN', 'CITIZEN^1')
+        ds.BeamSequence = [Dataset()]
+        ds.BeamSequence[0].PatientName = 'ANON'
+        self.assertEqual(ds.data_element('CommandGroupLength'), ds[0x00000000])
+        self.assertEqual(ds.data_element('BeamSequence'), ds[0x300A00B0])
+
+    def test_iterall(self):
+        """Test Dataset.iterall"""
+        ds = Dataset()
+        ds.CommandGroupLength = 120
+        ds.SkipFrameRangeFlag = 'TEST'
+        ds.add_new(0x00090001, 'PN', 'CITIZEN^1')
+        ds.BeamSequence = [Dataset()]
+        ds.BeamSequence[0].PatientName = 'ANON'
+        elem_gen = ds.iterall()
+        self.assertEqual(ds.data_element('CommandGroupLength'), next(elem_gen))
+        self.assertEqual(ds.data_element('SkipFrameRangeFlag'), next(elem_gen))
+        self.assertEqual(ds[0x00090001], next(elem_gen))
+        self.assertEqual(ds.data_element('BeamSequence'), next(elem_gen))
+        self.assertEqual(ds.BeamSequence[0].data_element('PatientName'), next(elem_gen))
 
 
 class DatasetElementsTests(unittest.TestCase):

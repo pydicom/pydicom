@@ -15,8 +15,9 @@ write_filename = "/tmp/write_test.dcm"
 import pydicom
 import cProfile
 import pstats
+import pytest
 
-
+@pytest.mark.skip(reason="This is not an actual pytest test")
 def test_full_read(filename):
     dataset = pydicom.read_file(filename)
     return dataset
@@ -26,11 +27,13 @@ def walkval(dataset, dataelem):
     dataelem.value
 
 
+@pytest.mark.skip(reason="This is not an actual pytest test")
 def test_convert_from_raw(dataset):
     # s = str(dataset)
     dataset.walk(walkval)
 
 
+@pytest.mark.skip(reason="This is not an actual pytest test")
 def test_write_file(dataset, write_filename):
     dataset.save_as(write_filename)
 
