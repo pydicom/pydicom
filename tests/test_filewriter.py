@@ -891,6 +891,7 @@ class TestWriteToStandard(unittest.TestCase):
         del ds.file_meta
         self.assertRaises(ValueError, ds.save_as, self.fp, write_like_original=False)
 
+
 class TestWriteFileMetaInfoToStandard(unittest.TestCase):
     """Unit tests for writing File Meta Info to the DICOM Standard."""
     def setUp(self):

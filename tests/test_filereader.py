@@ -793,6 +793,11 @@ class ReadTruncatedFileTests(unittest.TestCase):
         DS = pydicom.valuerep.DS
         expected = [DS('0.3125'), DS('0.3125')]
         self.assertTrue(got == expected, "Wrong pixel spacing")
+
+    @unittest.skipUnless(have_numpy, "Numpy not installed")
+    def test_read_file_with_missing_pixel_data_array(self):
+        mr = read_file(truncated_mr_name)
+        mr.decode()
         with self.assertRaisesRegexp(AttributeError, "Amount of pixel data.*does not match the expected data"):
             mr.pixel_array
 
