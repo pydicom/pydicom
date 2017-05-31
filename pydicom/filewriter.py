@@ -599,19 +599,22 @@ def write_file(filename, dataset, write_like_original=True):
     dataset : FileDataset
         Dataset holding the DICOM information; e.g. an object
         read with read_file().
-    write_like_original : boolean
+    write_like_original : bool
         If True (default), preserves the following information from
-        the dataset:
-        -preamble -- if no preamble in read file, than not used here
-        -hasFileMeta -- if writer did not do file meta information,
-            then don't write here either
-        -seq.is_undefined_length -- if original had delimiters, write them now
+        the Dataset (and may result in a non-conformant file):
+        - preamble -- if the original file has no preamble then none will be
+            written.
+        - file_meta -- if the original file has missing required File Meta
+            Information Group elements then they will not be added or written.
+            If FileMetaInformationGroupLength is present then it may have its
+            value updated.
+        - seq.is_undefined_length -- if original had delimiters, write them now
             too, instead of the more sensible length characters
         - is_undefined_length_sequence_item -- for datasets that belong to a
             sequence, write the undefined length delimiters if that is
             what the original had.
-        If False, produces a "nicer" DICOM file for other readers,
-            where all lengths are explicit.
+        If False, produces a DICOM standards conformant file with explicit
+        lengths for all elements.
 
     See Also
     --------
@@ -632,14 +635,16 @@ def write_file(filename, dataset, write_like_original=True):
     `Dataset.is_implicit_VR` and `Dataset.is_little_endian`
     to determine the transfer syntax used to write the file.
     """
-    # A preamble is required under the DICOM Standard, however if
+    # A preamble is required under the DICOM standard, however if
     #   `write_like_original` is True we treat it as optional
     preamble = getattr(dataset, 'preamble', None)
+    if preamble and len(preamble) != 128:
+        raise ValueError("'Dataset.preamble' must be 128-bytes long.")
     if not preamble and not write_like_original:
         # The default preamble is 128 0x00 bytes.
         preamble = b'\x00' * 128
 
-    # File Meta Information is required under the DICOM Standard, however if
+    # File Meta Information is required under the DICOM standard, however if
     #   `write_like_original` is True we treat it as optional
     file_meta = getattr(dataset, 'file_meta', None)
     if not file_meta and not write_like_original:
@@ -661,13 +666,15 @@ def write_file(filename, dataset, write_like_original=True):
             fp.write(b'DICM')
 
         # Write any Command Set elements now as elements must be in tag order
+        #   Mixing Command Set with other elements is non-conformant so we
+        #   require `write_like_original` to be True
         command_set = dataset[0x00000000:0x00010000]
-        if command_set:
+        if command_set and write_like_original:
             fp.is_implicit_VR = True
             fp.is_little_endian = True
             write_dataset(fp, command_set)
 
-        if file_meta is not None:
+        if file_meta is not None: # May be an empty Dataset
             # If we want to `write_like_original`, don't enforce_standard
             _write_file_meta_info(fp, file_meta, not write_like_original)
 

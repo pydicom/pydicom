@@ -77,7 +77,9 @@ def files_identical(a, b):
 
 def bytes_identical(a_bytes, b_bytes):
     """Return a tuple (bytes a == bytes b, index of first difference)"""
-    if a_bytes == b_bytes:
+    if len(a_bytes) != len(b_bytes):
+        return False, min([len(a_bytes), len(b_bytes)])
+    elif a_bytes == b_bytes:
         return True, 0     # True, dummy argument
     else:
         pos = 0
@@ -809,7 +811,7 @@ class ScratchWriteTests(unittest.TestCase):
 
 
 class TestWriteToStandard(unittest.TestCase):
-    """Unit tests for writing datasets to the DICOM Standard"""
+    """Unit tests for writing datasets to the DICOM standard"""
     def setUp(self):
         """Create an empty file-like for use in testing."""
         self.fp = DicomBytesIO()
@@ -817,7 +819,7 @@ class TestWriteToStandard(unittest.TestCase):
         self.fp.is_implicit_VR = True
 
     def test_preamble(self):
-        """Test that the preamble is written correctly when present"""
+        """Test that the preamble is written correctly when present."""
         # Test writing a default preamble
         ds = read_file(ct_name)
         ds.preamble = b'\x00' * 128
@@ -833,7 +835,7 @@ class TestWriteToStandard(unittest.TestCase):
         self.assertEqual(self.fp.read(128), b'\x01\x02\x03\x04' + b'\x00' * 124)
 
     def test_no_preamble(self):
-        """Test that the preamble is written correctly when absent"""
+        """Test that a default preamble is written when absent."""
         # No `preamble` attribute
         ds = read_file(ct_name)
         del ds.preamble
@@ -848,6 +850,14 @@ class TestWriteToStandard(unittest.TestCase):
         ds.save_as(self.fp, write_like_original=False)
         self.fp.seek(0)
         self.assertEqual(self.fp.read(128), b'\x00' * 128)
+
+    def test_bad_preamble(self):
+        """Test that ValueError is raised when preamble is bad."""
+        ds = read_file(ct_name)
+        ds.preamble = b'\x00' * 127
+        self.assertRaises(ValueError, ds.save_as, self.fp, write_like_original=False)
+        ds.preamble = b'\x00' * 129
+        self.assertRaises(ValueError, ds.save_as, self.fp, write_like_original=False)
 
     def test_prefix(self):
         """Test that the 'DICM' prefix is written."""
@@ -880,20 +890,53 @@ class TestWriteToStandard(unittest.TestCase):
         """Test TransferSyntaxUID isn't added if missing."""
         ds = read_file(rtplan_name)
         del ds.file_meta.TransferSyntaxUID
-        def test():
-            ds.save_as(self.fp, write_like_original=False)
-        self.assertRaises(ValueError, test)
+        self.assertRaises(ValueError, ds.save_as, self.fp, write_like_original=False)
         self.assertFalse('TransferSyntaxUID' in ds.file_meta)
 
     def test_raise_no_file_meta(self):
         """Test exception is raised if trying to write a dataset with no file_meta"""
         ds = read_file(rtplan_name)
+        ds.file_meta = Dataset()
+        self.assertRaises(ValueError, ds.save_as, self.fp, write_like_original=False)
         del ds.file_meta
         self.assertRaises(ValueError, ds.save_as, self.fp, write_like_original=False)
 
+    def test_standard(self):
+        """Test preamble + file_meta + dataset written OK."""
+        ds = read_file(ct_name)
+        preamble = ds.preamble[:]
+        ds.save_as(self.fp, write_like_original=False)
+        self.fp.seek(0)
+        self.assertEqual(self.fp.read(128), preamble)
+        self.assertEqual(self.fp.read(4), b'DICM')
+
+        fp = BytesIO(self.fp.getvalue()) # Workaround to avoid #358
+        ds_out = read_file(fp)
+        self.assertEqual(ds_out.preamble, preamble)
+        self.assertTrue('PatientID' in ds_out)
+        self.assertTrue('TransferSyntaxUID' in ds_out.file_meta)
+
+    def test_commandset_no_written(self):
+        """Test that Command Set elements are not written when writing to standard"""
+        ds = read_file(ct_name)
+        preamble = ds.preamble[:]
+        ds.MessageID = 3
+        ds.save_as(self.fp, write_like_original=False)
+        self.fp.seek(0)
+        self.assertEqual(self.fp.read(128), preamble)
+        self.assertEqual(self.fp.read(4), b'DICM')
+        self.assertTrue('MessageID' in ds)
+
+        fp = BytesIO(self.fp.getvalue()) # Workaround to avoid #358
+        ds_out = read_file(fp)
+        self.assertEqual(ds_out.preamble, preamble)
+        self.assertTrue('PatientID' in ds_out)
+        self.assertTrue('TransferSyntaxUID' in ds_out.file_meta)
+        self.assertFalse('MessageID' in ds_out)
+
 
 class TestWriteFileMetaInfoToStandard(unittest.TestCase):
-    """Unit tests for writing File Meta Info to the DICOM Standard."""
+    """Unit tests for writing File Meta Info to the DICOM standard."""
     def setUp(self):
         """Create an empty file-like for use in testing."""
         self.fp = DicomBytesIO()
@@ -997,20 +1040,45 @@ class TestWriteFileMetaInfoToStandard(unittest.TestCase):
 
 
 class TestWriteNonStandard(unittest.TestCase):
-    """Unit tests for writing datasets not to the DICOM Standard."""
+    """Unit tests for writing datasets not to the DICOM standard."""
     def setUp(self):
         """Create an empty file-like for use in testing."""
         self.fp = DicomBytesIO()
         self.fp.is_little_endian = True
         self.fp.is_implicit_VR = True
 
+    def compare_bytes(self, bytes_in, bytes_out):
+        """Compare two bytestreams for equality"""
+        same, pos = bytes_identical(bytes_in, bytes_out)
+        self.assertTrue(same, "Bytestreams are not identical - first "
+                        "difference at 0x%x" %pos)
+
+    def test_preamble(self):
+        """Test that the preamble is written correctly when present."""
+        # Test writing a default preamble
+        ds = read_file(ct_name)
+        ds.preamble = b'\x00' * 128
+        ds.save_as(self.fp, write_like_original=True)
+        self.fp.seek(0)
+        self.assertEqual(self.fp.read(128), b'\x00' * 128)
+
+        # Test writing a custom preamble
+        ds.preamble = b'\x01\x02\x03\x04' + b'\x00' * 124
+        self.fp.seek(0)
+        ds.save_as(self.fp, write_like_original=True)
+        self.fp.seek(0)
+        self.assertEqual(self.fp.read(128), b'\x01\x02\x03\x04' + b'\x00' * 124)
+
     def test_no_preamble(self):
         """Test no preamble or prefix is written if preamble absent."""
         ds = read_file(ct_name)
+        preamble = ds.preamble[:]
         del ds.preamble
         ds.save_as(self.fp, write_like_original=True)
         self.fp.seek(0)
         self.assertNotEqual(self.fp.read(128), b'\x00' * 128)
+        self.fp.seek(0)
+        self.assertNotEqual(self.fp.read(128), preamble)
         self.fp.seek(0)
         self.assertNotEqual(self.fp.read(4), b'DICM')
 
@@ -1031,44 +1099,7 @@ class TestWriteNonStandard(unittest.TestCase):
         ds.save_as(self.fp, write_like_original=True)
         self.assertEqual(ds.file_meta, Dataset())
 
-
-class TestWriteFileMetaInfoNonStandard(unittest.TestCase):
-    """Unit tests for writing File Meta Info not to the DICOM Standard."""
-    def setUp(self):
-        """Create an empty file-like for use in testing."""
-        self.fp = DicomBytesIO()
-
-    def test_no_preamble(self):
-        """Test file meta written OK if preamble absent."""
-        ds = read_file(ct_name)
-        del ds.preamble
-        ds.save_as(self.fp, write_like_original=True)
-        self.fp.seek(0)
-        self.assertNotEqual(self.fp.read(128), b'\x00' * 128)
-        self.fp.seek(0)
-        self.assertNotEqual(self.fp.read(4), b'DICM')
-
-        fp = BytesIO(self.fp.getvalue()) # Workaround to avoid #358
-        ds_out = read_file(fp, force=True)
-        self.assertTrue('ImplementationClassUID' in ds_out.file_meta)
-
-    def test_preamble_file_meta(self):
-        """Test non-standard file meta written with preamble OK"""
-        ds = read_file(ct_name)
-        preamble = ds.preamble[:]
-        del ds.file_meta.MediaStorageSOPClassUID
-        ds.save_as(self.fp, write_like_original=True)
-        self.fp.seek(0)
-        self.assertEqual(self.fp.read(128), preamble)
-        self.assertEqual(self.fp.read(4), b'DICM')
-
-        fp = BytesIO(self.fp.getvalue()) # Workaround to avoid #358
-        ds_out = read_file(fp, force=True)
-        self.assertEqual(ds.file_meta[:], ds_out.file_meta[:])
-        self.assertFalse('MediaStorageSOPClassUID' in ds_out.file_meta[:])
-        self.assertTrue('TransferSyntaxUID' in ds_out.file_meta[:])
-
-    def test_no_preamble_no_file_meta(self):
+    def test_dataset(self):
         """Test dataset written OK with no preamble or file meta"""
         ds = read_file(ct_name)
         del ds.preamble
@@ -1081,10 +1112,11 @@ class TestWriteFileMetaInfoNonStandard(unittest.TestCase):
 
         fp = BytesIO(self.fp.getvalue()) # Workaround to avoid #358
         ds_out = read_file(fp, force=True)
+        self.assertEqual(ds_out.preamble, None)
         self.assertEqual(ds_out.file_meta, Dataset())
         self.assertTrue('PatientID' in ds_out)
 
-    def test_preamble_no_file_meta(self):
+    def test_preamble_dataset(self):
         """Test dataset written OK with no file meta"""
         ds = read_file(ct_name)
         del ds.file_meta
@@ -1099,27 +1131,146 @@ class TestWriteFileMetaInfoNonStandard(unittest.TestCase):
         self.assertEqual(ds_out.file_meta, Dataset())
         self.assertTrue('PatientID' in ds_out)
 
-    def test_preamble_commandset_file_meta(self):
-        """Test dataset written OK with preamble/command set/file meta"""
-        pass
-
-    def test_preamble_commandset_no_file_meta(self):
-        """Test dataset written OK with preamble/command set and no file meta"""
-        pass
-
-    def test_no_preamble_commandset_file_meta(self):
-        """Test dataset written OK with command set/file meta and no preamble"""
-        pass
-
-    def test_no_preamble_commandset_no_file_meta(self):
-        """Test dataset written OK with only command set"""
+    def test_filemeta_dataset(self):
+        """Test file meta written OK if preamble absent."""
         ds = read_file(ct_name)
-        del ds[:]
+        preamble = ds.preamble[:]
+        del ds.preamble
+        ds.save_as(self.fp, write_like_original=True)
+        self.fp.seek(0)
+        self.assertNotEqual(self.fp.read(128), b'\x00' * 128)
+        self.fp.seek(0)
+        self.assertNotEqual(self.fp.read(128), preamble)
+        self.fp.seek(0)
+        self.assertNotEqual(self.fp.read(4), b'DICM')
+
+        fp = BytesIO(self.fp.getvalue()) # Workaround to avoid #358
+        ds_out = read_file(fp, force=True)
+        self.assertTrue('ImplementationClassUID' in ds_out.file_meta)
+        self.assertEqual(ds_out.preamble, None)
+        self.assertTrue('PatientID' in ds_out)
+
+    def test_preamble_filemeta_dataset(self):
+        """Test non-standard file meta written with preamble OK"""
+        ds = read_file(ct_name)
+        preamble = ds.preamble[:]
+        ds.save_as(self.fp, write_like_original=True)
+        self.fp.seek(0)
+        self.assertEqual(self.fp.read(128), preamble)
+        self.assertEqual(self.fp.read(4), b'DICM')
+
+        fp = BytesIO(self.fp.getvalue()) # Workaround to avoid #358
+        ds_out = read_file(fp, force=True)
+        self.assertEqual(ds.file_meta[:], ds_out.file_meta[:])
+        self.assertTrue('TransferSyntaxUID' in ds_out.file_meta[:])
+        self.assertEqual(ds_out.preamble, preamble)
+        self.assertTrue('PatientID' in ds_out)
+
+    def test_commandset_dataset(self):
+        """Test written OK with command set/dataset"""
+        ds = read_file(ct_name)
+        preamble = ds.preamble[:]
         del ds.preamble
         del ds.file_meta
         ds.is_little_endian = True
         ds.is_implicit_VR = True
-        ds.CommandGroupLength = 12
+        ds.CommandGroupLength = 8
+        ds.MessageID = 1
+        ds.MoveDestination = 'SOME_SCP'
+        ds.Status = 0x0000
+        ds.save_as(self.fp, write_like_original=True)
+        self.fp.seek(0)
+        self.assertNotEqual(self.fp.read(128), preamble)
+        self.fp.seek(0)
+        self.assertNotEqual(self.fp.read(128), b'\x00' * 128)
+        self.fp.seek(0)
+        self.assertNotEqual(self.fp.read(4), b'DICM')
+        # Ensure Command Set Elements written as little endian implicit VRe
+        self.fp.seek(0)
+        self.assertEqual(self.fp.read(12), b'\x00\x00\x00\x00\x04\x00\x00\x00\x08\x00\x00\x00')
+
+        fp = BytesIO(self.fp.getvalue()) # Workaround to avoid #358
+        ds_out = read_file(fp, force=True)
+        self.assertEqual(ds_out.file_meta, Dataset())
+        self.assertTrue('Status' in ds_out)
+        self.assertTrue('PatientID' in ds_out)
+
+    def test_preamble_commandset_dataset(self):
+        """Test written OK with preamble/command set/dataset"""
+        ds = read_file(ct_name)
+        preamble = ds.preamble[:]
+        del ds.file_meta
+        ds.CommandGroupLength = 8
+        ds.MessageID = 1
+        ds.MoveDestination = 'SOME_SCP'
+        ds.Status = 0x0000
+        ds.save_as(self.fp, write_like_original=True)
+        self.fp.seek(0)
+        self.assertEqual(self.fp.read(128), preamble)
+        self.assertEqual(self.fp.read(4), b'DICM')
+        # Ensure Command Set Elements written as little endian implicit VR
+        self.assertEqual(self.fp.read(12), b'\x00\x00\x00\x00\x04\x00\x00\x00\x08\x00\x00\x00')
+
+        fp = BytesIO(self.fp.getvalue()) # Workaround to avoid #358
+        ds_out = read_file(fp, force=True)
+        self.assertEqual(ds_out.file_meta, Dataset())
+        self.assertTrue('Status' in ds_out)
+        self.assertTrue('PatientID' in ds_out)
+
+    def test_preamble_commandset_filemeta_dataset(self):
+        """Test written OK with preamble/command set/file meta/dataset"""
+        ds = read_file(ct_name)
+        preamble = ds.preamble[:]
+        ds.CommandGroupLength = 8
+        ds.MessageID = 1
+        ds.MoveDestination = 'SOME_SCP'
+        ds.Status = 0x0000
+        ds.save_as(self.fp, write_like_original=True)
+        self.fp.seek(0)
+        self.assertEqual(self.fp.read(128), preamble)
+        self.assertEqual(self.fp.read(4), b'DICM')
+        # Ensure Command Set Elements written as little endian implicit VR
+        self.assertEqual(self.fp.read(12), b'\x00\x00\x00\x00\x04\x00\x00\x00\x08\x00\x00\x00')
+
+        fp = BytesIO(self.fp.getvalue()) # Workaround to avoid #358
+        ds_out = read_file(fp, force=True)
+        self.assertTrue('TransferSyntaxUID' in ds_out.file_meta)
+        self.assertTrue('Status' in ds_out)
+        self.assertTrue('PatientID' in ds_out)
+
+    def test_commandset_filemeta_dataset(self):
+        """Test written OK with command set/file meta/dataset"""
+        ds = read_file(ct_name)
+        preamble = ds.preamble[:]
+        del ds.preamble
+        ds.CommandGroupLength = 8
+        ds.MessageID = 1
+        ds.MoveDestination = 'SOME_SCP'
+        ds.Status = 0x0000
+        ds.save_as(self.fp, write_like_original=True)
+        self.fp.seek(0)
+        self.assertNotEqual(self.fp.read(128), preamble)
+        self.fp.seek(0)
+        self.assertNotEqual(self.fp.read(128), b'\x00' * 128)
+        self.fp.seek(0)
+        self.assertNotEqual(self.fp.read(4), b'DICM')
+        # Ensure Command Set Elements written as little endian implicit VR
+        self.fp.seek(0)
+        self.assertEqual(self.fp.read(12), b'\x00\x00\x00\x00\x04\x00\x00\x00\x08\x00\x00\x00')
+
+        fp = BytesIO(self.fp.getvalue()) # Workaround to avoid #358
+        ds_out = read_file(fp, force=True)
+        self.assertTrue('TransferSyntaxUID' in ds_out.file_meta)
+        self.assertTrue('Status' in ds_out)
+        self.assertTrue('PatientID' in ds_out)
+
+    def test_commandset(self):
+        """Test written OK with command set"""
+        ds = read_file(ct_name)
+        del ds[:]
+        del ds.preamble
+        del ds.file_meta
+        ds.CommandGroupLength = 8
         ds.MessageID = 1
         ds.MoveDestination = 'SOME_SCP'
         ds.Status = 0x0000
@@ -1128,24 +1279,117 @@ class TestWriteFileMetaInfoNonStandard(unittest.TestCase):
         self.assertRaises(EOFError, self.fp.read, 128)
         self.fp.seek(0)
         self.assertNotEqual(self.fp.read(4), b'DICM')
-        print(len(self.fp.getvalue()))
+        # Ensure Command Set Elements written as little endian implicit VR
+        self.fp.seek(0)
+        self.assertEqual(self.fp.read(12), b'\x00\x00\x00\x00\x04\x00\x00\x00\x08\x00\x00\x00')
 
         fp = BytesIO(self.fp.getvalue()) # Workaround to avoid #358
         ds_out = read_file(fp, force=True)
         self.assertEqual(ds_out.file_meta, Dataset())
         self.assertTrue('Status' in ds_out)
+        self.assertFalse('PatientID' in ds_out)
+        self.assertEqual(ds_out[0x00010000:], Dataset())
+
+    def test_commandset_filemeta(self):
+        """Test dataset written OK with command set/file meta"""
+        ds = read_file(ct_name)
+        preamble = ds.preamble[:]
+        del ds[:]
+        del ds.preamble
+        ds.CommandGroupLength = 8
+        ds.MessageID = 1
+        ds.MoveDestination = 'SOME_SCP'
+        ds.Status = 0x0000
+        ds.save_as(self.fp, write_like_original=True)
+        self.fp.seek(0)
+        self.assertNotEqual(self.fp.read(128), preamble)
+        self.fp.seek(0)
+        self.assertNotEqual(self.fp.read(4), b'DICM')
+        # Ensure Command Set Elements written as little endian implicit VR
+        self.fp.seek(0)
+        self.assertEqual(self.fp.read(12), b'\x00\x00\x00\x00\x04\x00\x00\x00\x08\x00\x00\x00')
+
+        fp = BytesIO(self.fp.getvalue()) # Workaround to avoid #358
+        ds_out = read_file(fp, force=True)
+        self.assertTrue('TransferSyntaxUID' in ds_out.file_meta)
+        self.assertTrue('Status' in ds_out)
+        self.assertFalse('PatientID' in ds_out)
+        self.assertEqual(ds_out[0x00010000:], Dataset())
+
+    def test_preamble_commandset(self):
+        """Test written OK with preamble/command set"""
+        ds = read_file(ct_name)
+        del ds[:]
+        del ds.file_meta
+        ds.CommandGroupLength = 8
+        ds.MessageID = 1
+        ds.MoveDestination = 'SOME_SCP'
+        ds.Status = 0x0000
+        ds.save_as(self.fp, write_like_original=True)
+        self.fp.seek(0)
+        self.assertEqual(self.fp.read(128), ds.preamble)
+        self.assertEqual(self.fp.read(4), b'DICM')
+        # Ensure Command Set Elements written as little endian implicit VR
+        self.assertEqual(self.fp.read(12), b'\x00\x00\x00\x00\x04\x00\x00\x00\x08\x00\x00\x00')
+
+        fp = BytesIO(self.fp.getvalue()) # Workaround to avoid #358
+        ds_out = read_file(fp, force=True)
+        self.assertEqual(ds_out.file_meta, Dataset())
+        self.assertTrue('Status' in ds_out)
+        self.assertFalse('PatientID' in ds_out)
+        self.assertEqual(ds_out[0x00010000:], Dataset())
+
+    def test_preamble_commandset_filemeta(self):
+        """Test written OK with preamble/command set/file meta"""
+        ds = read_file(ct_name)
+        del ds[:]
+        ds.CommandGroupLength = 8
+        ds.MessageID = 1
+        ds.MoveDestination = 'SOME_SCP'
+        ds.Status = 0x0000
+        ds.save_as(self.fp, write_like_original=True)
+        self.fp.seek(0)
+        self.assertEqual(self.fp.read(128), ds.preamble)
+        self.assertEqual(self.fp.read(4), b'DICM')
+        # Ensure Command Set Elements written as little endian implicit VR
+        self.assertEqual(self.fp.read(12), b'\x00\x00\x00\x00\x04\x00\x00\x00\x08\x00\x00\x00')
+
+        fp = BytesIO(self.fp.getvalue()) # Workaround to avoid #358
+        ds_out = read_file(fp, force=True)
+        self.assertTrue('Status' in ds_out)
+        self.assertTrue('TransferSyntaxUID' in ds_out.file_meta)
+        self.assertFalse('PatientID' in ds_out)
+        self.assertEqual(ds_out[0x00010000:], Dataset())
+
+    def test_read_write_identical(self):
+        """Test the written bytes matches the read bytes."""
+        for dcm_in in [rtplan_name, rtdose_name, ct_name, mr_name, jpeg_name,
+                        no_ts, unicode_name, multiPN_name]:
+            with BytesIO(open(dcm_in, 'rb').read()) as bytes_in:
+                ds_in = read_file(bytes_in)
+                bytes_out = BytesIO()
+                ds_in.save_as(bytes_out, write_like_original=True)
+                self.compare_bytes(bytes_in.getvalue(), bytes_out.getvalue())
+
+
+class TestWriteFileMetaInfoNonStandard(unittest.TestCase):
+    """Unit tests for writing File Meta Info not to the DICOM standard."""
+    def setUp(self):
+        """Create an empty file-like for use in testing."""
+        self.fp = DicomBytesIO()
 
     def test_transfer_syntax_not_added(self):
         """Test that the TransferSyntaxUID isn't added if missing"""
         ds = read_file(no_ts)
         _write_file_meta_info(self.fp, ds.file_meta, enforce_standard=False)
         self.assertFalse('TransferSyntaxUID' in ds.file_meta)
+        self.assertTrue('ImplementationClassUID' in ds.file_meta)
 
         # Check written meta dataset doesn't contain TransferSyntaxUID
         fp = BytesIO(self.fp.getvalue()) # Workaround to avoid #358
-        written_meta = read_dataset(fp, is_implicit_VR=False, is_little_endian=True)
-        self.assertTrue('ImplementationClassUID' in written_meta)
-        self.assertFalse('TransferSyntaxUID' in written_meta)
+        written_ds = read_file(fp, force=True)
+        self.assertTrue('ImplementationClassUID' in written_ds.file_meta)
+        self.assertFalse('TransferSyntaxUID' in written_ds.file_meta)
 
     def test_bad_elements(self):
         """Test that non-group 2 elements aren't written to the file meta."""
