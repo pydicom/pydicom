@@ -1490,6 +1490,11 @@ class TestWriteFileMetaInfoNonStandard(unittest.TestCase):
         self.assertEqual(meta, ref_meta)
 
 
+class TestWriteEncoding(unittest.TestCase):
+    """Test that the correct transfer syntax is used when writing"""
+    pass
+
+
 if __name__ == "__main__":
     # This is called if run alone, but not if loaded through run_tests.py
     # If not run from the directory where the sample images are,

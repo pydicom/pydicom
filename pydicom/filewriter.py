@@ -479,8 +479,9 @@ def write_ATvalue(fp, data_element):
 def _write_file_meta_info(fp, meta_dataset, enforce_standard=True):
     """Write the File Meta Information elements in `meta_dataset` to `fp`.
 
-    The file-like `fp` should be positioned past the 128 byte preamble + 4 byte
-    prefix (which should already have been written).
+    If `enforce_standard` is True then the file-like `fp` should be positioned
+    past the 128 byte preamble + 4 byte prefix (which should already have been
+    written).
 
     DICOM File Meta Information
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -494,8 +495,10 @@ def _write_file_meta_info(fp, meta_dataset, enforce_standard=True):
         * (0002,0010) TransferSyntaxUID, UI, N
         * (0002,0012) ImplementationClassUID, UI, N
 
-    Of these (0002,0000) will be added/updated and (0002,0001) will be added
-    if not already present and `enforce_standard` is True.
+    If `enforce_standard` is True then (0002,0000) will be added/updated,
+    (0002,0001) will be added if not already present and the other required
+    elements will checked to see if they exist. If `enforce_standard` is
+    False then the `meta_dataset` will be written with no checking done.
 
     The following Type 3/1C Elements may also be present:
         * (0002,0013) ImplementationVersionName, SH, N
@@ -589,6 +592,7 @@ def _write_file_meta_info(fp, meta_dataset, enforce_standard=True):
         # Return to end of the file meta, ready to write remainder of the file
         fp.seek(end_of_file_meta)
 
+
 def write_file(filename, dataset, write_like_original=True):
     """Store a FileDataset to the filename specified.
 
@@ -679,13 +683,14 @@ def write_file(filename, dataset, write_like_original=True):
             _write_file_meta_info(fp, file_meta, not write_like_original)
 
         # Set file VR, endian. MUST BE AFTER writing META INFO (which
-        #   changes to Explicit LittleEndian)
+        #   requires Explicit VR Little Endian)
         fp.is_implicit_VR = dataset.is_implicit_VR
         fp.is_little_endian = dataset.is_little_endian
 
-        # Write non-Command Set (0000,eeee) elements as those were written
-        #   earlier
-        write_dataset(fp, dataset[0x00010000:])
+        # Write non-Command Set/File Meta elements now
+        #   Note that if the user adds File Meta elements to the Dataset
+        #   then these will be ignored in favour of those in file_meta
+        write_dataset(fp, dataset[0x00030000:])
     finally:
         if not caller_owns_file:
             fp.close()
