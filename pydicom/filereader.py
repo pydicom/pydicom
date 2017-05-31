@@ -535,10 +535,6 @@ def read_preamble(fp, force):
     """
     logger.debug("Reading preamble...")
     preamble = fp.read(0x80)
-    if len(preamble) < 0x80:
-        fp.seek(0)
-        return None
-
     if config.debugging:
         sample = bytes2hex(preamble[:8]) + "..." + bytes2hex(preamble[-8:])
         logger.debug("{0:08x}: {1}".format(fp.tell() - 0x80, sample))

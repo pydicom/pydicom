@@ -814,9 +814,7 @@ class TestWriteToStandard(unittest.TestCase):
     """Unit tests for writing datasets to the DICOM standard"""
     def setUp(self):
         """Create an empty file-like for use in testing."""
-        self.fp = DicomBytesIO()
-        self.fp.is_little_endian = True
-        self.fp.is_implicit_VR = True
+        self.fp = BytesIO()
 
     def test_preamble(self):
         """Test that the preamble is written correctly when present."""
@@ -836,15 +834,12 @@ class TestWriteToStandard(unittest.TestCase):
 
     def test_no_preamble(self):
         """Test that a default preamble is written when absent."""
-        # No `preamble` attribute
         ds = read_file(ct_name)
         del ds.preamble
         ds.save_as(self.fp, write_like_original=False)
         self.fp.seek(0)
         self.assertEqual(self.fp.read(128), b'\x00' * 128)
 
-        # `preamble` is None
-        ds = read_file(ct_name)
         ds.preamble = None
         self.fp.seek(0)
         ds.save_as(self.fp, write_like_original=False)
@@ -1365,7 +1360,8 @@ class TestWriteNonStandard(unittest.TestCase):
         """Test the written bytes matches the read bytes."""
         for dcm_in in [rtplan_name, rtdose_name, ct_name, mr_name, jpeg_name,
                         no_ts, unicode_name, multiPN_name]:
-            with BytesIO(open(dcm_in, 'rb').read()) as bytes_in:
+            with open(dcm_in, 'rb') as f:
+                bytes_in = BytesIO(f.read())
                 ds_in = read_file(bytes_in)
                 bytes_out = BytesIO()
                 ds_in.save_as(bytes_out, write_like_original=True)
