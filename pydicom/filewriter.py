@@ -640,7 +640,7 @@ def write_file(filename, dataset, write_like_original=True):
     to determine the transfer syntax used to write the file.
     """
     # Check that dataset's group 0x0002 elements are only present in the
-    #   file_meta Dataset
+    #   file_meta Dataset - user may have added them to the wrong place
     if dataset.group_dataset(0x0002) != Dataset():
         raise ValueError("File Meta Information Group Elements (0002,eeee) "
                          "must only be in the 'Dataset.file_meta' dataset.")

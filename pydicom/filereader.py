@@ -488,8 +488,11 @@ def _read_file_meta_info(fp):
         #   file meta elements
         length_file_meta = fp.tell() - (start_file_meta + 12)
         if file_meta.FileMetaInformationGroupLength != length_file_meta:
-            logger.info("*** Group length for file meta dataset "
-                        "did not match end of group 2 data ***")
+            logger.info("_read_file_meta_info: File Meta Information Group "
+                        "Length value doesn't match the actual File Meta "
+                        "Information length ({0} vs {1} bytes).".format(
+                        file_meta.FileMetaInformationGroupLength,
+                        length_file_meta))
     return file_meta
 
 
