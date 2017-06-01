@@ -639,6 +639,12 @@ def write_file(filename, dataset, write_like_original=True):
     `Dataset.is_implicit_VR` and `Dataset.is_little_endian`
     to determine the transfer syntax used to write the file.
     """
+    # Check that dataset's group 0x0002 elements are only present in the
+    #   file_meta Dataset
+    if dataset.group_dataset(0x0002) != Dataset():
+        raise ValueError("File Meta Information Group Elements (0002,eeee) "
+                         "must only be in the 'Dataset.file_meta' dataset.")
+
     # A preamble is required under the DICOM standard, however if
     #   `write_like_original` is True we treat it as optional
     preamble = getattr(dataset, 'preamble', None)
@@ -664,11 +670,19 @@ def write_file(filename, dataset, write_like_original=True):
         fp = DicomFileLike(filename)
 
     try:
+        ## WRITE FILE META INFORMATION
         if preamble:
             # Write the 'DICM' prefix if and only if we write the preamble
             fp.write(preamble)
             fp.write(b'DICM')
 
+        if file_meta is not None: # May be an empty Dataset
+            # If we want to `write_like_original`, don't enforce_standard
+            _write_file_meta_info(fp, file_meta, not write_like_original)
+
+        ## WRITE DATASET
+        # The transfer syntax used to encode the dataset can't be changed within
+        #   the dataset
         # Write any Command Set elements now as elements must be in tag order
         #   Mixing Command Set with other elements is non-conformant so we
         #   require `write_like_original` to be True
@@ -678,19 +692,15 @@ def write_file(filename, dataset, write_like_original=True):
             fp.is_little_endian = True
             write_dataset(fp, command_set)
 
-        if file_meta is not None: # May be an empty Dataset
-            # If we want to `write_like_original`, don't enforce_standard
-            _write_file_meta_info(fp, file_meta, not write_like_original)
-
         # Set file VR, endian. MUST BE AFTER writing META INFO (which
         #   requires Explicit VR Little Endian)
         fp.is_implicit_VR = dataset.is_implicit_VR
         fp.is_little_endian = dataset.is_little_endian
 
-        # Write non-Command Set/File Meta elements now
+        # Write non-Command Set elements now
         #   Note that if the user adds File Meta elements to the Dataset
-        #   then these will be ignored in favour of those in file_meta
-        write_dataset(fp, dataset[0x00030000:])
+        #   then these will be added too
+        write_dataset(fp, dataset[0x00010000:])
     finally:
         if not caller_owns_file:
             fp.close()

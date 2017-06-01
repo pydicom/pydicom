@@ -589,10 +589,10 @@ def read_partial(fileobj, stop_when=None, defer_size=None, force=False):
     """
     # Read preamble (if present)
     preamble = read_preamble(fileobj, force)
-    # Read any Command Set group (0000,eeee) elements (if present)
-    command_set = _read_command_set_elements(fileobj)
     # Read any File Meta Information group (0002,eeee) elements (if present)
     file_meta_dataset = _read_file_meta_info(fileobj)
+    # Read any Command Set group (0000,eeee) elements (if present)
+    command_set = _read_command_set_elements(fileobj)
 
     # Check to see if there's anything left to read
     peek = fileobj.read(1)
