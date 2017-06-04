@@ -537,15 +537,16 @@ def read_preamble(fp, force):
     no header found.
     """
     logger.debug("Reading preamble...")
-    preamble = fp.read(0x80)
+    preamble = fp.read(128)
     if config.debugging:
         sample = bytes2hex(preamble[:8]) + "..." + bytes2hex(preamble[-8:])
-        logger.debug("{0:08x}: {1}".format(fp.tell() - 0x80, sample))
+        logger.debug("{0:08x}: {1}".format(fp.tell() - 128, sample))
+
     magic = fp.read(4)
     if magic != b"DICM":
         if force:
             logger.info("File is not a conformant DICOM file; 'DICM' prefix is "
-                        "missing from the file header or the header is "
+                        "missing from the file header or the header itself is "
                         "missing. Assuming no header and continuing.")
             preamble = None
             fp.seek(0)

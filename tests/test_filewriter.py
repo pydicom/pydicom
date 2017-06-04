@@ -33,7 +33,7 @@ from pydicom.dataelem import DataElement
 from pydicom.filebase import DicomBytesIO
 from pydicom.filereader import read_file, read_dataset
 from pydicom.filewriter import (write_data_element, write_dataset,
-                                correct_ambiguous_vr, _write_file_meta_info)
+                                correct_ambiguous_vr, write_file_meta_info)
 from pydicom.multival import MultiValue
 from pydicom.sequence import Sequence
 from pydicom.util.hexutil import hex2bytes, bytes2hex
@@ -936,21 +936,21 @@ class TestWriteFileMetaInfoToStandard(unittest.TestCase):
         meta.MediaStorageSOPInstanceUID = '1.2'
         meta.TransferSyntaxUID = '1.3'
         meta.ImplementationClassUID = '1.4'
-        self.assertRaises(ValueError, _write_file_meta_info, self.fp, meta,
+        self.assertRaises(ValueError, write_file_meta_info, self.fp, meta,
                           enforce_standard=True)
 
     def test_missing_elements(self):
         """Test that missing required elements raises ValueError."""
         meta = Dataset()
-        self.assertRaises(ValueError, _write_file_meta_info, self.fp, meta)
+        self.assertRaises(ValueError, write_file_meta_info, self.fp, meta)
         meta.MediaStorageSOPClassUID = '1.1'
-        self.assertRaises(ValueError, _write_file_meta_info, self.fp, meta)
+        self.assertRaises(ValueError, write_file_meta_info, self.fp, meta)
         meta.MediaStorageSOPInstanceUID = '1.2'
-        self.assertRaises(ValueError, _write_file_meta_info, self.fp, meta)
+        self.assertRaises(ValueError, write_file_meta_info, self.fp, meta)
         meta.TransferSyntaxUID = '1.3'
-        self.assertRaises(ValueError, _write_file_meta_info, self.fp, meta)
+        self.assertRaises(ValueError, write_file_meta_info, self.fp, meta)
         meta.ImplementationClassUID = '1.4'
-        _write_file_meta_info(self.fp, meta, enforce_standard=True)
+        write_file_meta_info(self.fp, meta, enforce_standard=True)
 
     def test_group_length(self):
         """Test that the value for FileMetaInformationGroupLength is OK."""
@@ -959,7 +959,7 @@ class TestWriteFileMetaInfoToStandard(unittest.TestCase):
         meta.MediaStorageSOPInstanceUID = '1.2'
         meta.TransferSyntaxUID = '1.3'
         meta.ImplementationClassUID = '1.4'
-        _write_file_meta_info(self.fp, meta, enforce_standard=True)
+        write_file_meta_info(self.fp, meta, enforce_standard=True)
 
         # 74 in total, - 12 for group length = 62
         self.fp.seek(8)
@@ -973,7 +973,7 @@ class TestWriteFileMetaInfoToStandard(unittest.TestCase):
         meta.MediaStorageSOPInstanceUID = '1.2'
         meta.TransferSyntaxUID = '1.3'
         meta.ImplementationClassUID = '1.4'
-        _write_file_meta_info(self.fp, meta, enforce_standard=True)
+        write_file_meta_info(self.fp, meta, enforce_standard=True)
 
         self.fp.seek(8)
         self.assertEqual(self.fp.read(4), b'\x3E\x00\x00\x00')
@@ -992,7 +992,7 @@ class TestWriteFileMetaInfoToStandard(unittest.TestCase):
         meta.MediaStorageSOPInstanceUID = '1.2'
         meta.TransferSyntaxUID = '1.3'
         meta.ImplementationClassUID = '1.4'
-        _write_file_meta_info(self.fp, meta, enforce_standard=True)
+        write_file_meta_info(self.fp, meta, enforce_standard=True)
 
         self.fp.seek(12 + 12)
         self.assertEqual(self.fp.read(2), b'\x00\x01')
@@ -1011,14 +1011,14 @@ class TestWriteFileMetaInfoToStandard(unittest.TestCase):
         meta.MediaStorageSOPInstanceUID = '1.2'
         meta.TransferSyntaxUID = '1.3'
         meta.ImplementationClassUID = '1.4'
-        _write_file_meta_info(self.fp, meta, enforce_standard=True)
+        write_file_meta_info(self.fp, meta, enforce_standard=True)
         self.assertEqual(self.fp.tell(), 74)
 
         # 8 + 6 bytes ImplementationClassUID
         # 76 bytes total, group length 64
         self.fp.seek(0)
         meta.ImplementationClassUID = '1.4.1'
-        _write_file_meta_info(self.fp, meta, enforce_standard=True)
+        write_file_meta_info(self.fp, meta, enforce_standard=True)
         # Check File Meta length
         self.assertEqual(self.fp.tell(), 76)
         # Check Group Length
@@ -1369,7 +1369,7 @@ class TestWriteFileMetaInfoNonStandard(unittest.TestCase):
     def test_transfer_syntax_not_added(self):
         """Test that the TransferSyntaxUID isn't added if missing"""
         ds = read_file(no_ts)
-        _write_file_meta_info(self.fp, ds.file_meta, enforce_standard=False)
+        write_file_meta_info(self.fp, ds.file_meta, enforce_standard=False)
         self.assertFalse('TransferSyntaxUID' in ds.file_meta)
         self.assertTrue('ImplementationClassUID' in ds.file_meta)
 
@@ -1387,21 +1387,21 @@ class TestWriteFileMetaInfoNonStandard(unittest.TestCase):
         meta.MediaStorageSOPInstanceUID = '1.2'
         meta.TransferSyntaxUID = '1.3'
         meta.ImplementationClassUID = '1.4'
-        self.assertRaises(ValueError, _write_file_meta_info, self.fp, meta,
+        self.assertRaises(ValueError, write_file_meta_info, self.fp, meta,
                           enforce_standard=False)
 
     def test_missing_elements(self):
         """Test that missing required elements doesn't raise ValueError."""
         meta = Dataset()
-        _write_file_meta_info(self.fp, meta, enforce_standard=False)
+        write_file_meta_info(self.fp, meta, enforce_standard=False)
         meta.MediaStorageSOPClassUID = '1.1'
-        _write_file_meta_info(self.fp, meta, enforce_standard=False)
+        write_file_meta_info(self.fp, meta, enforce_standard=False)
         meta.MediaStorageSOPInstanceUID = '1.2'
-        _write_file_meta_info(self.fp, meta, enforce_standard=False)
+        write_file_meta_info(self.fp, meta, enforce_standard=False)
         meta.TransferSyntaxUID = '1.3'
-        _write_file_meta_info(self.fp, meta, enforce_standard=False)
+        write_file_meta_info(self.fp, meta, enforce_standard=False)
         meta.ImplementationClassUID = '1.4'
-        _write_file_meta_info(self.fp, meta, enforce_standard=False)
+        write_file_meta_info(self.fp, meta, enforce_standard=False)
 
     def test_group_length_updated(self):
         """Test that FileMetaInformationGroupLength gets updated if present."""
@@ -1411,7 +1411,7 @@ class TestWriteFileMetaInfoNonStandard(unittest.TestCase):
         meta.MediaStorageSOPInstanceUID = '1.2'
         meta.TransferSyntaxUID = '1.3'
         meta.ImplementationClassUID = '1.4'
-        _write_file_meta_info(self.fp, meta, enforce_standard=False)
+        write_file_meta_info(self.fp, meta, enforce_standard=False)
 
         # 8 + 4 bytes FileMetaInformationGroupLength
         # 8 + 4 bytes MediaStorageSOPClassUID
@@ -1441,14 +1441,14 @@ class TestWriteFileMetaInfoNonStandard(unittest.TestCase):
         meta.MediaStorageSOPInstanceUID = '1.2'
         meta.TransferSyntaxUID = '1.3'
         meta.ImplementationClassUID = '1.4'
-        _write_file_meta_info(self.fp, meta, enforce_standard=False)
+        write_file_meta_info(self.fp, meta, enforce_standard=False)
         self.assertEqual(self.fp.tell(), 48)
 
         # 8 + 6 bytes ImplementationClassUID
         # 50 bytes total
         self.fp.seek(0)
         meta.ImplementationClassUID = '1.4.1'
-        _write_file_meta_info(self.fp, meta, enforce_standard=False)
+        write_file_meta_info(self.fp, meta, enforce_standard=False)
         # Check File Meta length
         self.assertEqual(self.fp.tell(), 50)
 
@@ -1456,7 +1456,7 @@ class TestWriteFileMetaInfoNonStandard(unittest.TestCase):
         """Test that the meta dataset doesn't change when writing it"""
         # Empty
         meta = Dataset()
-        _write_file_meta_info(self.fp, meta, enforce_standard=False)
+        write_file_meta_info(self.fp, meta, enforce_standard=False)
         self.assertEqual(meta, Dataset())
 
         # Incomplete
@@ -1466,7 +1466,7 @@ class TestWriteFileMetaInfoNonStandard(unittest.TestCase):
         meta.TransferSyntaxUID = '1.3'
         meta.ImplementationClassUID = '1.4'
         ref_meta = deepcopy(meta)
-        _write_file_meta_info(self.fp, meta, enforce_standard=False)
+        write_file_meta_info(self.fp, meta, enforce_standard=False)
         self.assertEqual(meta, ref_meta)
 
         # Conformant
@@ -1478,7 +1478,7 @@ class TestWriteFileMetaInfoNonStandard(unittest.TestCase):
         meta.TransferSyntaxUID = '1.3'
         meta.ImplementationClassUID = '1.4'
         ref_meta = deepcopy(meta)
-        _write_file_meta_info(self.fp, meta, enforce_standard=False)
+        write_file_meta_info(self.fp, meta, enforce_standard=False)
         self.assertEqual(meta, ref_meta)
 
 
