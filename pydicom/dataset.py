@@ -24,6 +24,7 @@ import inspect  # for __dir__
 import io
 import os.path
 import sys
+import warnings
 
 from pydicom import compat
 from pydicom.charset import default_encoding, convert_encodings
@@ -1207,6 +1208,31 @@ class Dataset(dict):
         pydicom.filewriter.write_file
             Write a DICOM file from a FileDataset instance.
         """
+        # Ensure is_little_endian and is_implicit_VR exist
+        if getattr(self, 'is_little_endian', None) is None or \
+                            getattr(self, 'is_implicit_VR', None) is None:
+            raise AttributeError("'Dataset.is_little_endian' and "
+                                 "'Dataset.is_implicit_VR' must exist and be "
+                                 "set appropriately before saving.")
+
+        # If Transfer Syntax UID is present in the File Meta Information check
+        #   to ensure its value is consistent with is_little_endian and
+        #   is_implicit_VR
+        if getattr(self, 'file_meta', None) is not None and \
+                                    'TransferSyntaxUID' in self.file_meta:
+            syntax = self.file_meta.TransferSyntaxUID
+            if syntax.is_little_endian != self.is_little_endian or \
+                            syntax.is_implicit_VR != self.is_implicit_VR:
+                msg = "A Transfer Syntax of {0} is inconsistent with " \
+                      "'Dataset.is_implicit_VR' = {2} and " \
+                      "`Dataset.is_little_endian` = {1}." \
+                      .format(syntax, self.is_little_endian,
+                              self.is_implicit_VR)
+                if write_like_original:
+                    warnings.warn(msg)
+                else:
+                    raise ValueError(msg)
+
         pydicom.write_file(filename, self, write_like_original)
 
     def __setattr__(self, name, value):
