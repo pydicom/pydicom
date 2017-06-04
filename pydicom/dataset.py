@@ -1155,50 +1155,57 @@ class Dataset(dict):
         self.walk(RemoveCallback)
 
     def save_as(self, filename, write_like_original=True):
-        """Write the Dataset to a file.
+        """Write the Dataset to `filename`.
 
-        When saving a new Dataset, you need to add the following attributes:
-        -file_meta : Dataset or None
-        -is_implicit_VR : bool
-        -is_little_endian : bool
-        -preamble : bytes (optional)
-        When saving a FileDataset that has been read from file these attributes
-        should already be present.
+        Saving a Dataset requires that the Dataset.is_implicit_VR and
+        Dataset.is_little_endian attributes exist and are set appropriately. If
+        Dataset.file_meta.TransferSyntaxUID is present then it should be set to
+        a consistent value to ensure conformance.
+
+        Conformance with DICOM File Format
+        ----------------------------------
+        If `write_like_original` is False, the Dataset will be stored in the
+        DICOM File Format in accordance with DICOM Standard Part 10 Section 7.
+        To do so requires that the `Dataset.file_meta` attribute exists and
+        contains a Dataset with the required (Type 1) File Meta Information
+        Group elements (see pydicom.filewriter.write_file and
+        pydicom.filewriter.write_file_meta_info for more information).
+
+        If `write_like_original` is True then the Dataset will be written as is
+        (after minimal validation checking) and may or may not contain all or
+        parts of the File Meta Information (and hence may or may not be
+        conformant with the DICOM File Format).
 
         Parameters
         ----------
-        filename : str
-            Name of file to save new DICOM file to.
+        filename : str or file-like
+            Name of file or the file-like to write the new DICOM file to.
         write_like_original : bool
             If True (default), preserves the following information from
-            the Dataset:
-            -preamble -- if no preamble in read file, than not used here
-            -file_meta -- if writer did not do file meta information,
-                then don't write here either
-            -seq.is_undefined_length -- if original had delimiters, write them
-                now too, instead of the more sensible length characters.
-            -is_undefined_length_sequence_item -- for datasets that belong to a
+            the Dataset (and may result in a non-conformant file):
+            - preamble -- if the original file has no preamble then none will be
+                written.
+            - file_meta -- if the original file was missing any required File
+                Meta Information Group elements then they will not be added or
+                written.
+                If (0002,0000) 'File Meta Information Group Length' is present
+                then it may have its value updated.
+            - seq.is_undefined_length -- if original had delimiters, write them
+                now too, instead of the more sensible length characters
+            - is_undefined_length_sequence_item -- for datasets that belong to a
                 sequence, write the undefined length delimiters if that is
                 what the original had.
-            If False, produces a "nicer" DICOM file for other readers,
-                where all lengths are explicit.
+            If False, produces a file conformant with the DICOM File Format,
+            with explicit lengths for all elements.
 
         See Also
         --------
+        pydicom.filewriter.write_dataset
+            Write a DICOM Dataset to a file.
+        pydicom.filewriter.write_file_meta_info
+            Write the DICOM File Meta Information Group elements to a file.
         pydicom.filewriter.write_file
             Write a DICOM file from a FileDataset instance.
-
-        Notes
-        -----
-        Set Dataset.preamble if you want something other than 128 0-bytes.
-        If the dataset was read from an existing DICOM file, then its preamble
-        was stored at read time. It is up to the user to ensure the preamble is
-        still correct for its purposes.
-
-        If there is no 'Transfer Syntax UID' element in the file_meta Dataset,
-        then set Dataset.is_implicit_VR (bool) and Dataset.is_little_endian
-        (bool) to automatically determine the transfer syntax used to write the
-        file.
         """
         pydicom.write_file(filename, self, write_like_original)
 
