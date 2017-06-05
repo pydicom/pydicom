@@ -853,7 +853,7 @@ class TestWriteToStandard(unittest.TestCase):
         self.assertRaises(ValueError, ds.save_as, self.fp, write_like_original=False)
 
     def test_prefix(self):
-        """Test that the 'DICM' prefix is written."""
+        """Test that the 'DICM' prefix is written with preamble."""
         # Has preamble
         ds = read_file(ct_name)
         ds.preamble = b'\x00' * 128
@@ -861,7 +861,8 @@ class TestWriteToStandard(unittest.TestCase):
         self.fp.seek(128)
         self.assertEqual(self.fp.read(4), b'DICM')
 
-        # No preamble
+    def test_prefix_none(self):
+        """Test the 'DICM' prefix is written when preamble is None"""
         ds = read_file(ct_name)
         ds.preamble = None
         ds.save_as(self.fp, write_like_original=False)
@@ -1512,11 +1513,6 @@ class TestWriteFileMetaInfoNonStandard(unittest.TestCase):
         ref_meta = deepcopy(meta)
         write_file_meta_info(self.fp, meta, enforce_standard=False)
         self.assertEqual(meta, ref_meta)
-
-
-class TestWriteEncoding(unittest.TestCase):
-    """Test that the correct transfer syntax is used when writing"""
-    pass
 
 
 if __name__ == "__main__":
