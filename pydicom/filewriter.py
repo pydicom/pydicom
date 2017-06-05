@@ -708,7 +708,7 @@ def write_file(filename, dataset, write_like_original=True):
     if dataset.group_dataset(0x0002) != Dataset():
         raise ValueError("File Meta Information Group Elements (0002,eeee) "
                          "should be in their own Dataset object in the "
-                         "'dataset.file_meta' attribute.")
+                         "'Dataset.file_meta' attribute.")
 
     # A preamble is required under the DICOM standard, however if
     #   `write_like_original` is True we treat it as optional
