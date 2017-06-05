@@ -1210,9 +1210,10 @@ class Dataset(dict):
         # Ensure is_little_endian and is_implicit_VR exist
         if not (hasattr(self, 'is_little_endian') and
                 hasattr(self, 'is_implicit_VR')):
-            raise AttributeError("'Dataset.is_little_endian' and "
-                                 "'Dataset.is_implicit_VR' must exist and be "
-                                 "set appropriately before saving.")
+            raise AttributeError("'{0}.is_little_endian' and "
+                                 "'{0}.is_implicit_VR' must exist and be "
+                                 "set appropriately before "
+                                 "saving.".format(self.__class__.__name__))
 
         pydicom.write_file(filename, self, write_like_original)
 
