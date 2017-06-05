@@ -1071,16 +1071,16 @@ class TestWriteNonStandard(unittest.TestCase):
         self.assertTrue(same, "Bytestreams are not identical - first "
                         "difference at 0x%x" %pos)
 
-    def test_preamble(self):
-        """Test that the preamble is written correctly when present."""
-        # Test writing a default preamble
+    def test_preamble_default(self):
+        """Test that the default preamble is written correctly when present."""
         ds = read_file(ct_name)
         ds.preamble = b'\x00' * 128
         ds.save_as(self.fp, write_like_original=True)
         self.fp.seek(0)
         self.assertEqual(self.fp.read(128), b'\x00' * 128)
 
-        # Test writing a custom preamble
+    def test_preamble_custom(self):
+        """Test that a custom preamble is written correctly when present."""
         ds.preamble = b'\x01\x02\x03\x04' + b'\x00' * 124
         self.fp.seek(0)
         ds.save_as(self.fp, write_like_original=True)
