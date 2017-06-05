@@ -812,18 +812,18 @@ class TestWriteToStandard(unittest.TestCase):
         """Create an empty file-like for use in testing."""
         self.fp = BytesIO()
 
-    def test_preamble(self):
-        """Test that the preamble is written correctly when present."""
-        # Test writing a default preamble
+    def test_preamble_default(self):
+        """Test that the default preamble is written correctly when present."""
         ds = read_file(ct_name)
         ds.preamble = b'\x00' * 128
         ds.save_as(self.fp, write_like_original=False)
         self.fp.seek(0)
         self.assertEqual(self.fp.read(128), b'\x00' * 128)
 
-        # Test writing a custom preamble
+    def test_preamble_custom(self):
+        """Test that a custom preamble is written correctly when present."""
+        ds = read_file(ct_name)
         ds.preamble = b'\x01\x02\x03\x04' + b'\x00' * 124
-        self.fp.seek(0)
         ds.save_as(self.fp, write_like_original=False)
         self.fp.seek(0)
         self.assertEqual(self.fp.read(128), b'\x01\x02\x03\x04' + b'\x00' * 124)
@@ -836,8 +836,10 @@ class TestWriteToStandard(unittest.TestCase):
         self.fp.seek(0)
         self.assertEqual(self.fp.read(128), b'\x00' * 128)
 
+    def test_none_preamble(self):
+        """Test that a default preamble is written when None."""
+        ds = read_file(ct_name)
         ds.preamble = None
-        self.fp.seek(0)
         ds.save_as(self.fp, write_like_original=False)
         self.fp.seek(0)
         self.assertEqual(self.fp.read(128), b'\x00' * 128)

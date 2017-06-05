@@ -7,7 +7,6 @@
 
 import os
 import unittest
-import warnings
 
 from pydicom.dataset import Dataset, PropertyError
 from pydicom.dataelem import DataElement, RawDataElement
