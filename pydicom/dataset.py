@@ -24,7 +24,6 @@ import inspect  # for __dir__
 import io
 import os.path
 import sys
-import warnings
 
 from pydicom import compat
 from pydicom.charset import default_encoding, convert_encodings
