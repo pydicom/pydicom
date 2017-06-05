@@ -11,6 +11,7 @@ import unittest
 from pydicom.dataset import Dataset, PropertyError
 from pydicom.dataelem import DataElement, RawDataElement
 from pydicom.dicomio import read_file
+from pydicom.filebase import DicomBytesIO
 from pydicom.tag import Tag
 from pydicom.sequence import Sequence
 from pydicom import compat
@@ -712,6 +713,26 @@ class DatasetTests(unittest.TestCase):
         self.assertEqual(ds[0x00090001], next(elem_gen))
         self.assertEqual(ds.data_element('BeamSequence'), next(elem_gen))
         self.assertEqual(ds.BeamSequence[0].data_element('PatientName'), next(elem_gen))
+
+    def test_save_as(self):
+        """Test Dataset.save_as"""
+        fp = DicomBytesIO()
+        ds = Dataset()
+        ds.PatientName = 'CITIZEN'
+        # Raise AttributeError if is_implicit_VR or is_little_endian missing
+        self.assertRaises(AttributeError, ds.save_as, fp, write_like_original=False)
+        ds.is_implicit_VR = True
+        self.assertRaises(AttributeError, ds.save_as, fp, write_like_original=False)
+        ds.is_little_endian = True
+        del ds.is_implicit_VR
+        self.assertRaises(AttributeError, ds.save_as, fp, write_like_original=False)
+        ds.is_implicit_VR = True
+        ds.file_meta = Dataset()
+        ds.file_meta.MediaStorageSOPClassUID = '1.1'
+        ds.file_meta.MediaStorageSOPInstanceUID = '1.2'
+        ds.file_meta.TransferSyntaxUID = '1.3'
+        ds.file_meta.ImplementationClassUID = '1.4'
+        ds.save_as(fp, write_like_original=False)
 
 
 class DatasetElementsTests(unittest.TestCase):
