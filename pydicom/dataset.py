@@ -1208,8 +1208,8 @@ class Dataset(dict):
             Write a DICOM file from a FileDataset instance.
         """
         # Ensure is_little_endian and is_implicit_VR exist
-        if getattr(self, 'is_little_endian', None) is None or \
-                            getattr(self, 'is_implicit_VR', None) is None:
+        if not (hasattr(self, 'is_little_endian') and
+                hasattr(self, 'is_implicit_VR')):
             raise AttributeError("'Dataset.is_little_endian' and "
                                  "'Dataset.is_implicit_VR' must exist and be "
                                  "set appropriately before saving.")
