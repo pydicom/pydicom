@@ -58,8 +58,9 @@ multiPN_name = os.path.join(testcharset_dir, "chrFrenMulti.dcm")
 def files_identical(a, b):
     """Return a tuple (file a == file b, index of first difference)"""
     with open(a, "rb") as A:
-        a_bytes = A.read()
-        b_bytes = b.read()
+        with open(b, "rb") as B:
+            a_bytes = A.read()
+            b_bytes = B.read()
 
     return bytes_identical(a_bytes, b_bytes)
 
@@ -81,18 +82,20 @@ class WriteFileTests(unittest.TestCase):
         self.file_out = TemporaryFile('w+b')
 
     def compare(self, in_filename, decode=False):
-        """Read file1, write file2, then compare.
-        Return value as for files_identical.
-        """
-        dataset = read_file(in_filename)
-        if decode:
-            dataset.decode()
+        """Read Dataset from `in_filename`, write Dataset to file, then compare."""
+        with open(in_filename, 'rb') as f:
+            bytes_in = BytesIO(f.read())
+            bytes_in.seek(0)
 
-        dataset.save_as(self.file_out)
+        ds = read_file(bytes_in)
+        ds.save_as(self.file_out)
         self.file_out.seek(0)
-        same, pos = files_identical(in_filename, self.file_out)
-        self.assertTrue(same,
-                        "Files are not identical - first difference at 0x%x" % pos)
+        bytes_out = BytesIO(self.file_out.read())
+        bytes_in.seek(0)
+        bytes_out.seek(0)
+        same, pos = bytes_identical(bytes_in.getvalue(), bytes_out.getvalue())
+        self.assertTrue(same, "Read bytes is not identical to written bytes - "
+                              "first difference at 0x%x" % pos)
 
     def compare_bytes(self, bytes_in, bytes_out):
         """Compare two bytestreams for equality"""

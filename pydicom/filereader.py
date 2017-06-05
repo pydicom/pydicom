@@ -488,9 +488,10 @@ def _read_file_meta_info(fp):
         #   file meta elements
         length_file_meta = fp.tell() - (start_file_meta + 12)
         if file_meta.FileMetaInformationGroupLength != length_file_meta:
-            logger.info("_read_file_meta_info: File Meta Information Group "
-                        "Length value doesn't match the actual File Meta "
-                        "Information length ({0} vs {1} bytes).".format(
+            logger.info("_read_file_meta_info: (0002,0000) 'File Meta "
+                        "Information Group Length' value doesn't match the "
+                        "actual File Meta Information length ({0} vs {1} "
+                        "bytes).".format(
                         file_meta.FileMetaInformationGroupLength,
                         length_file_meta))
     return file_meta
@@ -511,6 +512,12 @@ def read_file_meta_info(filename):
 
 def read_preamble(fp, force):
     """Return the 128-byte DICOM preamble in `fp` if present.
+
+    `fp` should be positioned at the start of the file-like. If the preamble and
+    prefix are found then after reading `fp` will be positioned at the first
+    byte after the prefix (byte offset 133). If either the preamble or prefix
+    are missing and `force` is True then after reading `fp` will be positioned
+    at the start of the file-like.
 
     Parameters
     ----------
@@ -536,24 +543,25 @@ def read_preamble(fp, force):
     Also reads past the 'DICM' marker. Rewinds file to the beginning if
     no header found.
     """
-    logger.debug("Reading preamble...")
+    logger.debug("Reading File Meta Information preamble...")
     preamble = fp.read(128)
     if config.debugging:
         sample = bytes2hex(preamble[:8]) + "..." + bytes2hex(preamble[-8:])
         logger.debug("{0:08x}: {1}".format(fp.tell() - 128, sample))
 
+    logger.debug("Reading File Meta Information prefix...")
     magic = fp.read(4)
-    if magic != b"DICM":
-        if force:
-            logger.info("File is not a conformant DICOM file; 'DICM' prefix is "
-                        "missing from the file header or the header itself is "
-                        "missing. Assuming no header and continuing.")
-            preamble = None
-            fp.seek(0)
-        else:
-            raise InvalidDicomError("File is missing DICOM header or 'DICM' "
-                                    "prefix is missing from the header. Use "
-                                    "force=True to force reading.")
+    if magic != b"DICM" and force:
+        logger.info("File is not conformant with the DICOM File Format: 'DICM' "
+                    "prefix is missing from the File Meta Information header "
+                    "or the header itself is missing. Assuming no header and "
+                    "continuing.")
+        preamble = None
+        fp.seek(0)
+    elif magic != b"DICM" and not force:
+        raise InvalidDicomError("File is missing DICOM File Meta Information"
+                                "header or the 'DICM' prefix is missing from "
+                                "the header. Use force=True to force reading.")
     else:
         logger.debug("{0:08x}: 'DICM' prefix found".format(fp.tell() - 4))
     return preamble
@@ -591,10 +599,13 @@ def read_partial(fileobj, stop_when=None, defer_size=None, force=False):
     read_file
         More generic file reading function.
     """
+    ## Read File Meta Information
     # Read preamble (if present)
     preamble = read_preamble(fileobj, force)
     # Read any File Meta Information group (0002,eeee) elements (if present)
     file_meta_dataset = _read_file_meta_info(fileobj)
+
+    ## Read Dataset
     # Read any Command Set group (0000,eeee) elements (if present)
     command_set = _read_command_set_elements(fileobj)
 
@@ -681,26 +692,31 @@ def read_partial(fileobj, stop_when=None, defer_size=None, force=False):
 
 
 def read_file(fp, defer_size=None, stop_before_pixels=False, force=False):
-    """Read and parse a DICOM file.
+    """Read and parse a DICOM dataset stored in the DICOM File Format.
+
+    Read a DICOM dataset stored in accordance with the DICOM File Format (DICOM
+    Standard Part 10 Section 7). If the dataset is not stored in accordance
+    with the File Format (i.e. the preamble and prefix are missing, there are
+    missing required Type 1 File Meta Information Group elements or the entire
+    File Meta Information is missing) then you will have to set `force` to True.
 
     Parameters
     ----------
-    fp : file-like object, str
-        Either a file-like object, or a string containing the file name.
-        If a file-like object, the caller is responsible for closing it.
-    defer_size : int, str, None, optional
-        If None (default), all elements read into memory.
-        If specified, if a data element value is larger than defer_size,
-        then the value is not read into memory until it is accessed in code.
-        Specify an integer (bytes), or a string value with units, e.g.
-        "512 KB", "2 MB".
-    stop_before_pixels : boolean, optional
-        If False (default), the full file will be read and parsed.
-        Set True to stop before reading pixels (and anything after them).
-    force : boolean, optional
-        If False (default), raises an InvalidDicomError if the file
-        is not valid DICOM.
-        Set to True to force reading even if no header is found.
+    fp : str or file-like
+        Either a file-like object, or a string containing the file name. If a
+        file-like object, the caller is responsible for closing it.
+    defer_size : int or str or None
+        If None (default), all elements read into memory. If specified, then if
+        a data element's stored value is larger than `defer_size`, the value is
+        not read into memory until it is accessed in code. Specify an integer
+        (bytes), or a string value with units, e.g. "512 KB", "2 MB".
+    stop_before_pixels : bool
+        If False (default), the full file will be read and parsed. Set True to
+        stop before reading pixels (and anything after them).
+    force : bool
+        If False (default), raises an InvalidDicomError if the file is missing
+        the File Meta Information header. Set to True to force reading even if
+        no File Meta Information header is found.
 
     Returns
     -------
@@ -710,7 +726,7 @@ def read_file(fp, defer_size=None, stop_before_pixels=False, force=False):
     Raises
     ------
     InvalidDicomError
-        If the force flag is True and the file is not a valid DICOM file.
+        If `force` is True and the file is not a valid DICOM file.
 
     See Also
     --------
@@ -721,13 +737,17 @@ def read_file(fp, defer_size=None, stop_before_pixels=False, force=False):
 
     Examples
     --------
-    Read file and return file dataset:
-    >>> rtplan = pydicom.read_file("rtplan.dcm")
-    >>> rtplan.PatientName
+    Read and return a dataset stored in accordance with the DICOM File Format
+    >>> ds = pydicom.read_file("rtplan.dcm")
+    >>> ds.PatientName
+
+    Read and return a dataset not in accordance with the DICOM File Format
+    >>> ds = pydicom.read_file("rtplan.dcm", force=True)
+    >>> ds.PatientName
 
     Use within a context manager:
-    >>> with pydicom.read_file("rtplan.dcm") as rtplan:
-    >>>     rtplan.PatientName
+    >>> with pydicom.read_file("rtplan.dcm") as ds:
+    >>>     ds.PatientName
     """
     # Open file if not already a file object
     caller_owns_file = True

@@ -498,7 +498,7 @@ def write_file_meta_info(fp, file_meta, enforce_standard=True):
     If `enforce_standard` is True then (0002,0000) will be added/updated,
     (0002,0001) will be added if not already present and the other required
     elements will checked to see if they exist. If `enforce_standard` is
-    False then `file_meta` will be written with no checking done.
+    False then `file_meta` will be written after minimal validation checking.
 
     The following Type 3/1C Elements may also be present:
         * (0002,0013) ImplementationVersionName, SH, N
