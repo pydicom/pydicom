@@ -498,7 +498,8 @@ def write_file_meta_info(fp, file_meta, enforce_standard=True):
     If `enforce_standard` is True then (0002,0000) will be added/updated,
     (0002,0001) will be added if not already present and the other required
     elements will checked to see if they exist. If `enforce_standard` is
-    False then `file_meta` will be written after minimal validation checking.
+    False then `file_meta` will be written as is after minimal validation
+    checking.
 
     The following Type 3/1C Elements may also be present:
         * (0002,0013) ImplementationVersionName, SH, N
@@ -723,6 +724,19 @@ def write_file(filename, dataset, write_like_original=True):
     file_meta = getattr(dataset, 'file_meta', None)
     if not file_meta and not write_like_original:
         file_meta = Dataset()
+
+    # If enforcing the standard, correct the TransferSyntaxUID where possible,
+    #   noting that the transfer syntax for is_implicit_VR = False and
+    #   is_little_endian = True is ambiguous as it may be an encapsulated
+    #   transfer syntax
+    if not write_like_original:
+        if dataset.is_little_endian and dataset.is_implicit_VR:
+            file_meta.TransferSyntaxUID = ImplicitVRLittleEndian
+        elif not dataset.is_little_endian and not dataset.is_implicit_VR:
+            file_meta.TransferSyntaxUID = ExplicitVRBigEndian
+        elif not dataset.is_little_endian and dataset.is_implicit_VR:
+            raise NotImplementedError("Implicit VR Big Endian is not a"
+                                      "supported Transfer Syntax.")
 
     caller_owns_file = True
     # Open file if not already a file object

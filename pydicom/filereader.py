@@ -506,7 +506,6 @@ def read_file_meta_info(filename):
     """
     with DicomFile(filename, 'rb') as fp:
         read_preamble(fp, False)  # if no header, raise exception
-        _read_command_set_elements(fp) # May contain Command Set elements
         return _read_file_meta_info(fp)
 
 
@@ -712,7 +711,8 @@ def read_file(fp, defer_size=None, stop_before_pixels=False, force=False):
         (bytes), or a string value with units, e.g. "512 KB", "2 MB".
     stop_before_pixels : bool
         If False (default), the full file will be read and parsed. Set True to
-        stop before reading pixels (and anything after them).
+        stop before reading (7FE0,0010) 'Pixel Data' (and all subsequent
+        elements).
     force : bool
         If False (default), raises an InvalidDicomError if the file is missing
         the File Meta Information header. Set to True to force reading even if

@@ -36,6 +36,7 @@ from pydicom.filewriter import (write_data_element, write_dataset,
                                 correct_ambiguous_vr, write_file_meta_info)
 from pydicom.multival import MultiValue
 from pydicom.sequence import Sequence
+from pydicom.uid import ImplicitVRLittleEndian, ExplicitVRBigEndian
 from pydicom.util.hexutil import hex2bytes, bytes2hex
 from pydicom.valuerep import DA, DT, TM
 
@@ -876,12 +877,37 @@ class TestWriteToStandard(unittest.TestCase):
         self.assertTrue(ref_ds.file_meta == ds.file_meta)
         self.assertTrue(ref_ds == ds)
 
+    def test_transfer_syntax_added(self):
+        """Test TransferSyntaxUID is added/updated if possible."""
+        # Only done for ImplVR LE and ExplVR BE
+        # Added
+        ds = read_file(rtplan_name)
+        ds.is_implicit_VR = True
+        ds.is_little_endian = True
+        ds.save_as(self.fp, write_like_original=False)
+        self.assertEqual(ds.file_meta.TransferSyntaxUID, ImplicitVRLittleEndian)
+
+        # Updated
+        ds.is_implicit_VR = False
+        ds.is_little_endian = False
+        ds.save_as(self.fp, write_like_original=False)
+        self.assertEqual(ds.file_meta.TransferSyntaxUID, ExplicitVRBigEndian)
+
     def test_transfer_syntax_not_added(self):
-        """Test TransferSyntaxUID isn't added if missing."""
+        """Test TransferSyntaxUID is not added if ExplVRLE."""
         ds = read_file(rtplan_name)
         del ds.file_meta.TransferSyntaxUID
+        ds.is_implicit_VR = False
+        ds.is_little_endian = True
         self.assertRaises(ValueError, ds.save_as, self.fp, write_like_original=False)
         self.assertFalse('TransferSyntaxUID' in ds.file_meta)
+
+    def test_transfer_syntax_raises(self):
+        """Test TransferSyntaxUID is raises NotImplementedError if ImplVRBE."""
+        ds = read_file(rtplan_name)
+        ds.is_implicit_VR = True
+        ds.is_little_endian = False
+        self.assertRaises(NotImplementedError, ds.save_as, self.fp, write_like_original=False)
 
     def test_raise_no_file_meta(self):
         """Test exception is raised if trying to write a dataset with no file_meta"""
