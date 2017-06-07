@@ -2,9 +2,8 @@
 
 Data generated from GDCM project's private dictionary.
 
-The outer dictionary key is the Private Creator name ("owner"),
-The inner dictionary key is a map of DICOM tag to
-(VR, VM, name, is_retired)
+The outer dictionary key is the Private Creator name ("owner"), while the inner
+dictionary key is a map of DICOM tag to (VR, VM, name, is_retired).
 """
 
 private_dictionaries = {
