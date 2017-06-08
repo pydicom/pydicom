@@ -648,8 +648,8 @@ def write_file(filename, dataset, write_like_original=True):
     If (0002,0010) 'Transfer Syntax UID' is included then the user must ensure
     it's value is compatible with the values for the `dataset.is_little_endian`
     and `dataset.is_implicit_VR` attributes. For example, if is_little_endian
-    is True and is_implicit_VR is False then the Transfer Syntax UID must be
-    1.2.840.10008.1.2.1 'Explicit VR Little Endian'. See the DICOM standard
+    and is_implicit_VR are both True then the Transfer Syntax UID must be
+    1.2.840.10008.1.2 'Implicit VR Little Endian'. See the DICOM standard
     Part 5 Section 10 for more information on Transfer Syntaxes.
 
     Encoding
@@ -708,13 +708,15 @@ def write_file(filename, dataset, write_like_original=True):
     if dataset.group_dataset(0x0002) != Dataset():
         raise ValueError("File Meta Information Group Elements (0002,eeee) "
                          "should be in their own Dataset object in the "
-                         "'Dataset.file_meta' attribute.")
+                         "'{0}.file_meta' "
+                         "attribute.".format(dataset.__class__.__name__))
 
     # A preamble is required under the DICOM standard, however if
     #   `write_like_original` is True we treat it as optional
     preamble = getattr(dataset, 'preamble', None)
     if preamble and len(preamble) != 128:
-        raise ValueError("'Dataset.preamble' must be 128-bytes long.")
+        raise ValueError("'{0}.preamble' must be 128-bytes "
+                         "long.".format(dataset.__class__.__name__))
     if not preamble and not write_like_original:
         # The default preamble is 128 0x00 bytes.
         preamble = b'\x00' * 128
