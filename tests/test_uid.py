@@ -123,6 +123,13 @@ class UIDtests(unittest.TestCase):
                          ):
             UID(valid_uid).is_valid() # Shouldn't raise
 
+    def test_is_private(self):
+        """Test the is_private property"""
+        uid = UID('1.2.840.10008.1.2')
+        private_uid = UID('1.2.840.10009.1.2')
+        self.assertTrue(private_uid.is_private)
+        self.assertFalse(uid.is_private)
+
 
 if __name__ == "__main__":
     unittest.main()
