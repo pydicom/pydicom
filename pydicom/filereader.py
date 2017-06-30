@@ -9,6 +9,7 @@ from __future__ import absolute_import
 import os.path
 import warnings
 import zlib
+from importlib import import_module
 from io import BytesIO
 
 from pydicom.tag import TupleTag
@@ -723,7 +724,22 @@ def read_file(fp, defer_size=None, stop_before_pixels=False, force=False):
             logger.debug(u"Reading file '{0}'".format(fp))
         except Exception:
             logger.debug("Reading file '{0}'".format(fp))
-        fp = open(fp, 'rb')
+        # try opening compressed stream before falling back to uncompressed
+        zip_module_names = "gzip", "bz2"
+        fallback_module_name = "builtins"
+        open_module_names = zip_module_names + (fallback_module_name,)
+        for open_module_name in open_module_names:
+            try:
+                open_module = import_module(open_module_name)
+                tmp_fp = open_module.open(fp, "rb")
+                tmp_fp.read(1)
+            except (OSError, ImportError) as e:
+                if open_module_name is fallback_module_name:
+                    raise(e)
+            else:
+                tmp_fp.seek(0)
+                fp = tmp_fp
+                break
 
     if config.debugging:
         logger.debug("\n" + "-" * 80)
