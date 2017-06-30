@@ -733,7 +733,7 @@ def read_file(fp, defer_size=None, stop_before_pixels=False, force=False):
                 open_module = import_module(open_module_name)
                 tmp_fp = open_module.open(fp, "rb")
                 tmp_fp.read(1)
-            except (OSError, IOError, ImportError) as e:
+            except (OSError, IOError, AttributeError, ImportError) as e:
                 if open_module_name is fallback_module_name:
                     raise(e)
             else:
