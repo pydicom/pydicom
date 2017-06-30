@@ -86,7 +86,7 @@ def _auto_open(filepath, *args, **kwargs):
             file = zip_module.open(filepath, *args, **kwargs)
             file.read(1)
         except (OSError, IOError, AttributeError, ImportError) as e:
-            pass
+            file = None
         else:
             file.seek(0)
             break
