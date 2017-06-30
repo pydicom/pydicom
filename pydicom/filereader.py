@@ -9,7 +9,6 @@ from __future__ import absolute_import
 import os.path
 import warnings
 import zlib
-from importlib import import_module
 from io import BytesIO
 
 from pydicom.tag import TupleTag
@@ -41,6 +40,59 @@ from pydicom.fileutil import read_undefined_length_value
 from struct import Struct, unpack
 from sys import byteorder
 sys_is_little_endian = (byteorder == 'little')
+
+
+def _auto_open(filepath, *args, **kwargs):
+    """Auto-magically (transparently) open a compressed file.
+
+    Supports `gzip` and `bzip2`.
+
+    Note: all compressed files should be opened as binary.
+    Opening in text mode is not supported.
+
+    Parameters
+    ----------
+    filepath : str
+        The file path.
+    *args : iterable
+        Positional arguments passed to `open()`.
+    **kwargs : dict
+        Keyword arguments passed to `open()`.
+
+    Returns
+    -------
+    file
+        A file object.
+
+    Raises
+    ------
+    IOError
+        on failure.
+
+    See Also
+    --------
+    open(), gzip.open(), bz2.open()
+    """
+    try:
+        from importlib import import_module
+    except ImportError:
+        import_module = __import__
+
+    zip_module_names = 'gzip', 'bz2'
+    file = None
+    for zip_module_name in zip_module_names:
+        try:
+            zip_module = import_module(zip_module_name)
+            file = zip_module.open(filepath, *args, **kwargs)
+            file.read(1)
+        except (OSError, IOError, AttributeError, ImportError) as e:
+            pass
+        else:
+            file.seek(0)
+            break
+    if not file:
+        file = open(filepath, *args, **kwargs)
+    return file
 
 
 class DicomIter(object):
@@ -724,22 +776,7 @@ def read_file(fp, defer_size=None, stop_before_pixels=False, force=False):
             logger.debug(u"Reading file '{0}'".format(fp))
         except Exception:
             logger.debug("Reading file '{0}'".format(fp))
-        # try opening compressed stream before falling back to uncompressed
-        zip_module_names = "gzip", "bz2"
-        fallback_module_name = "builtins"
-        open_module_names = zip_module_names + (fallback_module_name,)
-        for open_module_name in open_module_names:
-            try:
-                open_module = import_module(open_module_name)
-                tmp_fp = open_module.open(fp, "rb")
-                tmp_fp.read(1)
-            except (OSError, IOError, AttributeError, ImportError) as e:
-                if open_module_name is fallback_module_name:
-                    raise(e)
-            else:
-                tmp_fp.seek(0)
-                fp = tmp_fp
-                break
+        fp = _auto_open(fp, "rb")
 
     if config.debugging:
         logger.debug("\n" + "-" * 80)
