@@ -79,20 +79,20 @@ def _auto_open(filepath, *args, **kwargs):
         import_module = __import__
 
     zip_module_names = 'gzip', 'bz2'
-    fp = None
+    file_obj = None
     for zip_module_name in zip_module_names:
         try:
             zip_module = import_module(zip_module_name)
-            fp = zip_module.open(filepath, *args, **kwargs)
-            fp.read(1)
-        except (OSError, IOError, AttributeError, ImportError) as e:
-            fp = None
+            file_obj = zip_module.open(filepath, *args, **kwargs)
+            file_obj.read(1)
+        except (OSError, IOError, AttributeError, ImportError):
+            file_obj = None
         else:
-            fp.seek(0)
+            file_obj.seek(0)
             break
-    if not fp:
-        fp = open(filepath, *args, **kwargs)
-    return fp
+    if not file_obj:
+        file_obj = open(filepath, *args, **kwargs)
+    return file_obj
 
 
 class DicomIter(object):
@@ -723,24 +723,24 @@ def read_file(fp, defer_size=None, stop_before_pixels=False, force=False):
 
     Parameters
     ----------
-    fp : file-like object, str
-        Either a file-like object, or a string containing the file name.
-        If a file name is provided, `gzip` or `bzip2` compressed files
-        are read transparently.
-        If a file-like object, the caller is responsible for closing it.
-    defer_size : int, str, None, optional
-        If None (default), all elements read into memory.
-        If specified, if a data element value is larger than defer_size,
-        then the value is not read into memory until it is accessed in code.
-        Specify an integer (bytes), or a string value with units, e.g.
-        "512 KB", "2 MB".
-    stop_before_pixels : boolean, optional
-        If False (default), the full file will be read and parsed.
-        Set True to stop before reading pixels (and anything after them).
-    force : boolean, optional
-        If False (default), raises an InvalidDicomError if the file
-        is not valid DICOM.
-        Set to True to force reading even if no header is found.
+    fp : str or file-like
+        Either a file-like object, or a string containing the file name. If a
+        file name is provided, `gzip` or `bzip2` compressed files are read
+        transparently. If a file-like object, the caller is responsible for
+        closing it.
+    defer_size : int or str or None
+        If None (default), all elements read into memory. If specified, then if
+        a data element's stored value is larger than `defer_size`, the value is
+        not read into memory until it is accessed in code. Specify an integer
+        (bytes), or a string value with units, e.g. "512 KB", "2 MB".
+    stop_before_pixels : bool
+        If False (default), the full file will be read and parsed. Set True to
+        stop before reading (7FE0,0010) 'Pixel Data' (and all subsequent
+        elements).
+    force : bool
+        If False (default), raises an InvalidDicomError if the file is missing
+        the File Meta Information header. Set to True to force reading even if
+        no File Meta Information header is found.
 
     Returns
     -------
