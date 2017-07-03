@@ -79,20 +79,20 @@ def _auto_open(filepath, *args, **kwargs):
         import_module = __import__
 
     zip_module_names = 'gzip', 'bz2'
-    file = None
+    fp = None
     for zip_module_name in zip_module_names:
         try:
             zip_module = import_module(zip_module_name)
-            file = zip_module.open(filepath, *args, **kwargs)
-            file.read(1)
+            fp = zip_module.open(filepath, *args, **kwargs)
+            fp.read(1)
         except (OSError, IOError, AttributeError, ImportError) as e:
-            file = None
+            fp = None
         else:
-            file.seek(0)
+            fp.seek(0)
             break
-    if not file:
-        file = open(filepath, *args, **kwargs)
-    return file
+    if not fp:
+        fp = open(filepath, *args, **kwargs)
+    return fp
 
 
 class DicomIter(object):
@@ -725,6 +725,8 @@ def read_file(fp, defer_size=None, stop_before_pixels=False, force=False):
     ----------
     fp : file-like object, str
         Either a file-like object, or a string containing the file name.
+        If a file name is provided, `gzip` or `bzip2` compressed files
+        are read transparently.
         If a file-like object, the caller is responsible for closing it.
     defer_size : int, str, None, optional
         If None (default), all elements read into memory.
