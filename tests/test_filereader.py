@@ -59,34 +59,40 @@ except ImportError:
 from warncheck import assertWarns
 
 test_dir = os.path.dirname(__file__)
-test_files = os.path.join(test_dir, 'test_files')
+test_path = os.path.join(test_dir, 'test_files')
+# populate a dictionary with all dicom files, perhaps tests needs refactoring?
+dicom_filepaths = {
+    os.path.splitext(filename)[0]: os.path.join(test_path, filename)
+    for filename in os.listdir(test_path)
+    if os.path.splitext(filename)[1].endswith('dcm')
+}
 
-empty_number_tags_name = os.path.join(test_files, "reportsi_with_empty_number_tags.dcm")
-rtplan_name = os.path.join(test_files, "rtplan.dcm")
-rtdose_name = os.path.join(test_files, "rtdose.dcm")
-ct_name = os.path.join(test_files, "CT_small.dcm")
-mr_name = os.path.join(test_files, "MR_small.dcm")
-jpeg2000_name = os.path.join(test_files, "JPEG2000.dcm")
-jpeg2000_lossless_name = os.path.join(test_files, "MR_small_jp2klossless.dcm")
-jpeg_ls_lossless_name = os.path.join(test_files, "MR_small_jpeg_ls_lossless.dcm")
-jpeg_lossy_name = os.path.join(test_files, "JPEG-lossy.dcm")
-jpeg_lossless_name = os.path.join(test_files, "JPEG-LL.dcm")
-deflate_name = os.path.join(test_files, "image_dfl.dcm")
-rtstruct_name = os.path.join(test_files, "rtstruct.dcm")
-priv_SQ_name = os.path.join(test_files, "priv_SQ.dcm")
-nested_priv_SQ_name = os.path.join(test_files, "nested_priv_SQ.dcm")
-meta_missing_tsyntax_name = os.path.join(test_files, "meta_missing_tsyntax.dcm")
-no_meta_group_length = os.path.join(test_files, "no_meta_group_length.dcm")
-gzip_name = os.path.join(test_files, "zipMR.gz")
-color_px_name = os.path.join(test_files, "color-px.dcm")
-color_pl_name = os.path.join(test_files, "color-pl.dcm")
-explicit_vr_le_no_meta = os.path.join(test_files, "ExplVR_LitEndNoMeta.dcm")
-explicit_vr_be_no_meta = os.path.join(test_files, "ExplVR_BigEndNoMeta.dcm")
-emri_name = os.path.join(test_files, "emri_small.dcm")
-emri_big_endian_name = os.path.join(test_files, "emri_small_big_endian.dcm")
-emri_jpeg_ls_lossless = os.path.join(test_files, "emri_small_jpeg_ls_lossless.dcm")
-emri_jpeg_2k_lossless = os.path.join(test_files, "emri_small_jpeg_2k_lossless.dcm")
-color_3d_jpeg_baseline = os.path.join(test_files, "color3d_jpeg_baseline.dcm")
+empty_number_tags_name = os.path.join(test_path, "reportsi_with_empty_number_tags.dcm")
+rtplan_name = os.path.join(test_path, "rtplan.dcm")
+rtdose_name = os.path.join(test_path, "rtdose.dcm")
+ct_name = os.path.join(test_path, "CT_small.dcm")
+mr_name = os.path.join(test_path, "MR_small.dcm")
+jpeg2000_name = os.path.join(test_path, "JPEG2000.dcm")
+jpeg2000_lossless_name = os.path.join(test_path, "MR_small_jp2klossless.dcm")
+jpeg_ls_lossless_name = os.path.join(test_path, "MR_small_jpeg_ls_lossless.dcm")
+jpeg_lossy_name = os.path.join(test_path, "JPEG-lossy.dcm")
+jpeg_lossless_name = os.path.join(test_path, "JPEG-LL.dcm")
+deflate_name = os.path.join(test_path, "image_dfl.dcm")
+rtstruct_name = os.path.join(test_path, "rtstruct.dcm")
+priv_SQ_name = os.path.join(test_path, "priv_SQ.dcm")
+nested_priv_SQ_name = os.path.join(test_path, "nested_priv_SQ.dcm")
+meta_missing_tsyntax_name = os.path.join(test_path, "meta_missing_tsyntax.dcm")
+no_meta_group_length = os.path.join(test_path, "no_meta_group_length.dcm")
+gzip_name = os.path.join(test_path, "zipMR.gz")
+color_px_name = os.path.join(test_path, "color-px.dcm")
+color_pl_name = os.path.join(test_path, "color-pl.dcm")
+explicit_vr_le_no_meta = os.path.join(test_path, "ExplVR_LitEndNoMeta.dcm")
+explicit_vr_be_no_meta = os.path.join(test_path, "ExplVR_BigEndNoMeta.dcm")
+emri_name = os.path.join(test_path, "emri_small.dcm")
+emri_big_endian_name = os.path.join(test_path, "emri_small_big_endian.dcm")
+emri_jpeg_ls_lossless = os.path.join(test_path, "emri_small_jpeg_ls_lossless.dcm")
+emri_jpeg_2k_lossless = os.path.join(test_path, "emri_small_jpeg_2k_lossless.dcm")
+color_3d_jpeg_baseline = os.path.join(test_path, "color3d_jpeg_baseline.dcm")
 dir_name = os.path.dirname(sys.argv[0])
 save_dir = os.getcwd()
 
@@ -611,6 +617,26 @@ class FileLikeTests(unittest.TestCase):
         self.assertEqual(len(ct.PixelData), 128 * 128 * 2, "Pixel data not expected length")
         # Should also be able to close the file ourselves without exception raised:
         file_like.close()
+
+
+class CompressedFiles(unittest.TestCase):
+    def testReadCompressed(self):
+        # : blacklisted because plain and compressed differ (but where?)
+        blacklist = (
+            'rtstruct', 'JPEG2000', 'meta_missing_tsyntax', 'JPEG-lossy',
+            'OBXXXX1A', 'reportsi', 'nested_priv_SQ', 'priv_SQ', 'JPEG-LL')
+        zip_exts = 'gz', 'bz2'
+        for zip_ext in zip_exts:
+            for name, filepath in dicom_filepaths.items():
+                zip_filepath = filepath + '.' + zip_ext
+                if os.path.isfile(zip_filepath) and name not in blacklist:
+                    dicom = read_file(filepath, force=True)
+                    dicomz = read_file(zip_filepath, force=True)
+                    if not dicom == dicomz:
+                        self.assertEqual(
+                            dicom, dicomz,
+                            'Plain and {}-compressed were not equal'.format(
+                                zip_exp))
 
 
 if __name__ == "__main__":
