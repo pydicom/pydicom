@@ -346,6 +346,7 @@ class ReaderTests(unittest.TestCase):
               "" \
               "" \
               "" \
+              "" \
               "not match full read"
         msg += "\nExpected: %r\nGot %r" % (ctfull_tags[:-2], ctpartial_tags)
         missing = [Tag(0x7fe0, 0x10), Tag(0xfffc, 0xfffc)]
@@ -1125,10 +1126,10 @@ class CompressedFiles(unittest.TestCase):
                         if v != dicomz.__dict__[k] and k not in blacklist_attr:
                             equal_content = False
                             break
+                    print(name, zip_ext)
                     self.assertTrue(
                         equal_content,
-                        '{}: Plain and {}-compressed were not equal'.format(
-                            name, zip_ext))
+                        str(name) + ': Plain and ' + str(zip_ext) + '-compressed were not equal')
 
 
 if __name__ == "__main__":
