@@ -9,6 +9,8 @@ from __future__ import absolute_import
 import os.path
 import warnings
 import zlib
+import gzip
+import bz2
 from io import BytesIO
 
 from pydicom.tag import TupleTag
@@ -40,59 +42,6 @@ from pydicom.fileutil import read_undefined_length_value
 from struct import Struct, unpack
 from sys import byteorder
 sys_is_little_endian = (byteorder == 'little')
-
-
-def _auto_open(filepath, *args, **kwargs):
-    """Auto-magically (transparently) open a compressed file.
-
-    Supports `gzip` and `bzip2`.
-
-    Note: all compressed files should be opened as binary.
-    Opening in text mode is not supported.
-
-    Parameters
-    ----------
-    filepath : str
-        The file path.
-    *args : iterable
-        Positional arguments passed to `open()`.
-    **kwargs : dict
-        Keyword arguments passed to `open()`.
-
-    Returns
-    -------
-    file
-        A file object.
-
-    Raises
-    ------
-    IOError
-        on failure.
-
-    See Also
-    --------
-    open(), gzip.open(), bz2.open()
-    """
-    try:
-        from importlib import import_module
-    except ImportError:
-        import_module = __import__
-
-    zip_module_names = 'gzip', 'bz2'
-    fp = None
-    for zip_module_name in zip_module_names:
-        try:
-            zip_module = import_module(zip_module_name)
-            fp = zip_module.open(filepath, *args, **kwargs)
-            fp.read(1)
-        except (OSError, IOError, AttributeError, ImportError) as e:
-            fp = None
-        else:
-            fp.seek(0)
-            break
-    if not fp:
-        fp = open(filepath, *args, **kwargs)
-    return fp
 
 
 class DicomIter(object):
@@ -778,7 +727,20 @@ def read_file(fp, defer_size=None, stop_before_pixels=False, force=False):
             logger.debug(u"Reading file '{0}'".format(fp))
         except Exception:
             logger.debug("Reading file '{0}'".format(fp))
-        fp = _auto_open(fp, "rb")
+        fp = open(fp, 'rb')
+        # gzip case
+        if fp.read(2) == b'\x1f\x8b':
+            fp.seek(0)
+            return gzip.GzipFile(fileobj=fp)
+        else:
+            fp.seek(0)
+
+        # bzip case
+        if fp.read(2) == b'BZ':
+            fp.seek(0)
+            return bz2.BZ2File(filename=fp)
+        else:
+            fp.seek(0)
 
     if config.debugging:
         logger.debug("\n" + "-" * 80)
