@@ -68,8 +68,12 @@ dicom_filepaths = {
     if os.path.splitext(filename)[1].endswith('dcm')
 }
 
+<<<<<<< HEAD
 empty_number_tags_name = os.path.join(test_path,
                                       "reportsi_with_empty_number_tags.dcm")
+=======
+empty_number_tags_name = os.path.join(test_path, "reportsi_with_empty_number_tags.dcm")
+>>>>>>> b53e90c46c15632f3f94af8ee146b2eaaa798980
 rtplan_name = os.path.join(test_path, "rtplan.dcm")
 rtdose_name = os.path.join(test_path, "rtdose.dcm")
 ct_name = os.path.join(test_path, "CT_small.dcm")
@@ -92,10 +96,15 @@ explicit_vr_le_no_meta = os.path.join(test_path, "ExplVR_LitEndNoMeta.dcm")
 explicit_vr_be_no_meta = os.path.join(test_path, "ExplVR_BigEndNoMeta.dcm")
 emri_name = os.path.join(test_path, "emri_small.dcm")
 emri_big_endian_name = os.path.join(test_path, "emri_small_big_endian.dcm")
+<<<<<<< HEAD
 emri_jpeg_ls_lossless = os.path.join(test_path,
                                      "emri_small_jpeg_ls_lossless.dcm")
 emri_jpeg_2k_lossless = os.path.join(test_path,
                                      "emri_small_jpeg_2k_lossless.dcm")
+=======
+emri_jpeg_ls_lossless = os.path.join(test_path, "emri_small_jpeg_ls_lossless.dcm")
+emri_jpeg_2k_lossless = os.path.join(test_path, "emri_small_jpeg_2k_lossless.dcm")
+>>>>>>> b53e90c46c15632f3f94af8ee146b2eaaa798980
 color_3d_jpeg_baseline = os.path.join(test_path, "color3d_jpeg_baseline.dcm")
 dir_name = os.path.dirname(sys.argv[0])
 save_dir = os.getcwd()

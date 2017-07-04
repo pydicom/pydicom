@@ -672,24 +672,24 @@ def read_file(fp, defer_size=None, stop_before_pixels=False, force=False):
 
     Parameters
     ----------
-    fp : file-like object, str
-        Either a file-like object, or a string containing the file name.
-        If a file name is provided, `gzip` or `bzip2` compressed files
-        are read transparently.
-        If a file-like object, the caller is responsible for closing it.
-    defer_size : int, str, None, optional
-        If None (default), all elements read into memory.
-        If specified, if a data element value is larger than defer_size,
-        then the value is not read into memory until it is accessed in code.
-        Specify an integer (bytes), or a string value with units, e.g.
-        "512 KB", "2 MB".
-    stop_before_pixels : boolean, optional
-        If False (default), the full file will be read and parsed.
-        Set True to stop before reading pixels (and anything after them).
-    force : boolean, optional
-        If False (default), raises an InvalidDicomError if the file
-        is not valid DICOM.
-        Set to True to force reading even if no header is found.
+    fp : str or file-like
+        Either a file-like object, or a string containing the file name. If a
+        file name is provided, `gzip` or `bzip2` compressed files are read
+        transparently. If a file-like object, the caller is responsible for
+        closing it.
+    defer_size : int or str or None
+        If None (default), all elements read into memory. If specified, then if
+        a data element's stored value is larger than `defer_size`, the value is
+        not read into memory until it is accessed in code. Specify an integer
+        (bytes), or a string value with units, e.g. "512 KB", "2 MB".
+    stop_before_pixels : bool
+        If False (default), the full file will be read and parsed. Set True to
+        stop before reading (7FE0,0010) 'Pixel Data' (and all subsequent
+        elements).
+    force : bool
+        If False (default), raises an InvalidDicomError if the file is missing
+        the File Meta Information header. Set to True to force reading even if
+        no File Meta Information header is found.
 
     Returns
     -------
