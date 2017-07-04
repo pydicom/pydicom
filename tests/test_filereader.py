@@ -73,7 +73,7 @@ test_path = os.path.join(test_dir, 'test_files')
 # populate a dictionary with all dicom files, perhaps tests needs refactoring?
 
 dicom_filepaths = {}
-for filename in os.listdir(test_path):
+for filename in sorted(os.listdir(test_path)):
     if os.path.splitext(filename)[1].endswith('dcm'):
         dicom_filepaths[os.path.splitext(filename)[0]] = \
             os.path.join(test_path, filename)
@@ -326,6 +326,7 @@ class ReaderTests(unittest.TestCase):
         ctfull = read_file(ct_name)
         ctfull_tags = sorted(ctfull.keys())
         msg = "Tag list of partial CT read (except pixel tag and padding) did " \
+              "" \
               "" \
               "" \
               "" \
@@ -1107,22 +1108,24 @@ class FileLikeTests(unittest.TestCase):
 
 class CompressedFiles(unittest.TestCase):
     def testReadCompressed(self):
-        # : blacklisted because plain and compressed differ (but where?)
-        blacklist = (
-            'rtstruct', 'JPEG2000', 'meta_missing_tsyntax', 'JPEG-lossy',
-            'OBXXXX1A', 'reportsi', 'nested_priv_SQ', 'priv_SQ', 'JPEG-LL')
+        # : blacklisted attributes
+        blacklist = ('filename', 'fileobj_type', 'timestamp')
         zip_exts = 'gz', 'bz2'
         for zip_ext in zip_exts:
             for name, filepath in dicom_filepaths.items():
                 zip_filepath = filepath + '.' + zip_ext
-                if os.path.isfile(zip_filepath) and name not in blacklist:
+                if os.path.isfile(zip_filepath):
                     dicom = read_file(filepath, force=True)
                     dicomz = read_file(zip_filepath, force=True)
-                    if not dicom == dicomz:
-                        self.assertEqual(
-                            dicom, dicomz,
-                            'Plain and {}-compressed were not equal'.format(
-                                zip_ext))
+                    equal_content = True
+                    for k, v in dicom.__dict__.items():
+                        if v != dicomz.__dict__[k] and k not in blacklist:
+                            equal_content = False
+                            break
+                    self.assertTrue(
+                        equal_content,
+                        '{}: Plain and {}-compressed were not equal'.format(
+                            name, zip_ext))
 
 
 if __name__ == "__main__":

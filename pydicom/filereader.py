@@ -30,7 +30,8 @@ except ImportError:
     stat_available = False
 
 from pydicom.errors import InvalidDicomError
-import pydicom.uid  # for Implicit/Explicit/Little/Big Endian transfer syntax UIDs
+import \
+    pydicom.uid  # for Implicit/Explicit/Little/Big Endian transfer syntax UIDs
 from pydicom.filebase import DicomFile
 from pydicom.dataset import Dataset, FileDataset
 from pydicom.dicomdir import DicomDir
@@ -41,14 +42,17 @@ from pydicom.sequence import Sequence
 from pydicom.fileutil import read_undefined_length_value
 from struct import Struct, unpack
 from sys import byteorder
+
 sys_is_little_endian = (byteorder == 'little')
 
 
 class DicomIter(object):
     """Iterator over DICOM data elements created from a file-like object
     """
+
     def __init__(self, fp, stop_when=None, force=False):
-        """Read the preamble and meta info and prepare iterator for remainder of file.
+        """Read the preamble and meta info and prepare iterator for remainder
+        of file.
 
         Parameters
         ----------
@@ -111,13 +115,14 @@ class DicomIter(object):
             yield self.file_meta_info[tag]
 
         for data_element in data_element_generator(self.fp,
-                                                   self._is_implicit_VR, self._is_little_endian,
+                                                   self._is_implicit_VR,
+                                                   self._is_little_endian,
                                                    stop_when=self.stop_when):
             yield data_element
 
 
 def data_element_generator(fp, is_implicit_VR, is_little_endian,
-                           stop_when=None, defer_size=None, encoding=default_encoding):
+        stop_when=None, defer_size=None, encoding=default_encoding):
     """Create a generator to efficiently return the raw data elements.
 
     Parameters
@@ -235,9 +240,11 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian,
         # Reading the value
         # First case (most common): reading a value with a defined length
         if length != 0xFFFFFFFF:
-            # don't defer loading of Specific Character Set value as it is needed
+            # don't defer loading of Specific Character Set value as it is
+            # needed
             # immediately to get the character encoding for other tags
-            if defer_size is not None and length > defer_size and tag != (0x08, 0x05):
+            if defer_size is not None and length > defer_size and tag != (
+            0x08, 0x05):
                 # Flag as deferred by setting value to None, and skip bytes
                 value = None
                 logger_debug("Defer size exceeded. "
@@ -250,13 +257,18 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian,
                     if length > 12:
                         dotdot = "..."
                     logger_debug("%08x: %-34s %s %r %s" % (value_tell,
-                                                           bytes2hex(value[:12]), dotdot, value[:12], dotdot))
+                                                           bytes2hex(
+                                                               value[:12]),
+                                                           dotdot, value[:12],
+                                                           dotdot))
 
             # If the tag is (0008,0005) Specific Character Set, then store it
             if tag == (0x08, 0x05):
                 from pydicom.values import convert_string
-                encoding = convert_string(value, is_little_endian, encoding=default_encoding)
-                # Store the encoding value in the generator for use with future elements (SQs)
+                encoding = convert_string(value, is_little_endian,
+                                          encoding=default_encoding)
+                # Store the encoding value in the generator for use with
+                # future elements (SQs)
                 encoding = convert_encodings(encoding)
 
             yield RawDataElement(tag, VR, length, value, value_tell,
@@ -297,11 +309,14 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian,
                 value = read_undefined_length_value(fp, is_little_endian,
                                                     delimiter, defer_size)
 
-                # If the tag is (0008,0005) Specific Character Set, then store it
+                # If the tag is (0008,0005) Specific Character Set,
+                # then store it
                 if tag == (0x08, 0x05):
                     from pydicom.values import convert_string
-                    encoding = convert_string(value, is_little_endian, encoding=default_encoding)
-                    # Store the encoding value in the generator for use with future elements (SQs)
+                    encoding = convert_string(value, is_little_endian,
+                                              encoding=default_encoding)
+                    # Store the encoding value in the generator for use with
+                    # future elements (SQs)
                     encoding = convert_encodings(encoding)
 
                 yield RawDataElement(tag, VR, length, value, value_tell,
@@ -309,7 +324,7 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian,
 
 
 def read_dataset(fp, is_implicit_VR, is_little_endian, bytelength=None,
-                 stop_when=None, defer_size=None, parent_encoding=default_encoding):
+        stop_when=None, defer_size=None, parent_encoding=default_encoding):
     """Return a Dataset instance containing the next dataset in the file.
 
     Parameters
@@ -367,7 +382,7 @@ def read_dataset(fp, is_implicit_VR, is_little_endian, bytelength=None,
 
 
 def read_sequence(fp, is_implicit_VR, is_little_endian, bytelength, encoding,
-                  offset=0):
+        offset=0):
     """Read and return a Sequence -- i.e. a list of Datasets"""
 
     seq = []  # use builtin list to start for speed, convert to Sequence at end
@@ -391,7 +406,8 @@ def read_sequence(fp, is_implicit_VR, is_little_endian, bytelength, encoding,
     return seq
 
 
-def read_sequence_item(fp, is_implicit_VR, is_little_endian, encoding, offset=0):
+def read_sequence_item(fp, is_implicit_VR, is_little_endian, encoding,
+        offset=0):
     """Read and return a single sequence item, i.e. a Dataset"""
     seq_item_tell = fp.tell() + offset
     if is_little_endian:
@@ -406,10 +422,12 @@ def read_sequence_item(fp, is_implicit_VR, is_little_endian, encoding, offset=0)
                       "{0:05x}".format(fp.tell() + offset))
     tag = (group, element)
     if tag == SequenceDelimiterTag:  # No more items, time to stop reading
-        logger.debug("{0:08x}: {1}".format(fp.tell() - 8 + offset, "End of Sequence"))
+        logger.debug(
+            "{0:08x}: {1}".format(fp.tell() - 8 + offset, "End of Sequence"))
         if length != 0:
             logger.warning("Expected 0x00000000 after delimiter, found 0x%x, "
-                           "at position 0x%x" % (length, fp.tell() - 4 + offset))
+                           "at position 0x%x" % (
+                           length, fp.tell() - 4 + offset))
         return None
     if tag != ItemTag:
         logger.warning("Expected sequence item with tag %s at file position "
@@ -448,6 +466,7 @@ def _read_command_set_elements(fp):
         The command set elements as a Dataset instance. May be empty if no
         command set elements are present.
     """
+
     def _not_group_0000(tag, VR, length):
         """Return True if the tag is not in group 0x0000, False otherwise."""
         return (tag.group != 0)
@@ -476,6 +495,7 @@ def _read_file_meta_info(fp):
         The File Meta elements as a Dataset instance. May be empty if no
         File Meta are present.
     """
+
     def _not_group_0002(tag, VR, length):
         """Return True if the tag is not in group 0x0002, False otherwise."""
         return (tag.group != 2)
@@ -494,8 +514,8 @@ def _read_file_meta_info(fp):
                         "Information Group Length' value doesn't match the "
                         "actual File Meta Information length ({0} vs {1} "
                         "bytes).".format(
-                        file_meta.FileMetaInformationGroupLength,
-                        length_file_meta))
+                file_meta.FileMetaInformationGroupLength,
+                length_file_meta))
     return file_meta
 
 
@@ -621,7 +641,7 @@ def read_partial(fileobj, stop_when=None, defer_size=None, force=False):
     is_implicit_VR = True
     is_little_endian = True
     transfer_syntax = file_meta_dataset.get("TransferSyntaxUID")
-    if peek == b'': # EOF
+    if peek == b'':  # EOF
         pass
     elif transfer_syntax is None:  # issue 258
         # If no TransferSyntaxUID element then we have to try and figure out
@@ -766,14 +786,14 @@ def read_file(fp, defer_size=None, stop_before_pixels=False, force=False):
         # gzip case
         if fp.read(2) == b'\x1f\x8b':
             fp.seek(0)
-            return gzip.GzipFile(fileobj=fp)
+            fp = gzip.GzipFile(fileobj=fp)
         else:
             fp.seek(0)
 
         # bzip case
         if fp.read(2) == b'BZ':
             fp.seek(0)
-            return bz2.BZ2File(filename=fp)
+            fp = bz2.BZ2File(filename=fp)
         else:
             fp.seek(0)
 
@@ -833,7 +853,8 @@ def read_dicomdir(filename="DICOMDIR"):
     ds = read_file(filename)
     # Here, check that it is in fact DicomDir
     if not isinstance(ds, DicomDir):
-        msg = u"File '{0}' is not a Media Storage Directory file".format(filename)
+        msg = u"File '{0}' is not a Media Storage Directory file".format(
+            filename)
         raise InvalidDicomError(msg)
     return ds
 
@@ -841,7 +862,7 @@ def read_dicomdir(filename="DICOMDIR"):
 def data_element_offset_to_value(is_implicit_VR, VR):
     """Return number of bytes from start of data element to start of value"""
     if is_implicit_VR:
-        offset = 8   # tag of 4 plus 4-byte length
+        offset = 8  # tag of 4 plus 4-byte length
     else:
         if VR in extra_length_VRs:
             offset = 12  # tag 4 + 2 VR + 2 reserved + 4 length
@@ -851,7 +872,7 @@ def data_element_offset_to_value(is_implicit_VR, VR):
 
 
 def read_deferred_data_element(fileobj_type, filename, timestamp,
-                               raw_data_elem):
+        raw_data_elem):
     """Read the previously deferred value from the file into memory
     and return a raw data element"""
     logger.debug("Reading deferred element %r" % str(raw_data_elem.tag))
@@ -884,10 +905,12 @@ def read_deferred_data_element(fileobj_type, filename, timestamp,
     fp.close()
     if data_elem.VR != raw_data_elem.VR:
         raise ValueError("Deferred read VR {0:s} does not match "
-                         "original {1:s}".format(data_elem.VR, raw_data_elem.VR))
+                         "original {1:s}".format(data_elem.VR,
+                                                 raw_data_elem.VR))
     if data_elem.tag != raw_data_elem.tag:
         raise ValueError("Deferred read tag {0!r} does not match "
-                         "original {1!r}".format(data_elem.tag, raw_data_elem.tag))
+                         "original {1!r}".format(data_elem.tag,
+                                                 raw_data_elem.tag))
 
     # Everything is ok, now this object should act like usual DataElement
     return data_elem
