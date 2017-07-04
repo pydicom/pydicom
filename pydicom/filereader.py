@@ -782,6 +782,7 @@ def read_file(fp, defer_size=None, stop_before_pixels=False, force=False):
             logger.debug(u"Reading file '{0}'".format(fp))
         except Exception:
             logger.debug("Reading file '{0}'".format(fp))
+        filename = fp
         fp = open(fp, 'rb')
         # gzip case
         if fp.read(2) == b'\x1f\x8b':
@@ -792,8 +793,8 @@ def read_file(fp, defer_size=None, stop_before_pixels=False, force=False):
 
         # bzip case
         if fp.read(2) == b'BZ':
-            fp.seek(0)
-            fp = bz2.BZ2File(filename=fp)
+            fp.close()
+            fp = bz2.BZ2File(filename, 'rb')
         else:
             fp.seek(0)
 

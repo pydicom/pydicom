@@ -6,6 +6,8 @@
 #    See the file license.txt included with this distribution, also
 #    available at https://github.com/darcymason/pydicom
 
+from __future__ import print_function
+
 import gzip
 from io import BytesIO
 import os
@@ -1109,17 +1111,18 @@ class FileLikeTests(unittest.TestCase):
 class CompressedFiles(unittest.TestCase):
     def testReadCompressed(self):
         # : blacklisted attributes
-        blacklist = ('filename', 'fileobj_type', 'timestamp')
+        blacklist_attr = ('filename', 'fileobj_type', 'timestamp')
+        blacklist_files = ('color3d_jpeg_baseline',)
         zip_exts = 'gz', 'bz2'
         for zip_ext in zip_exts:
             for name, filepath in dicom_filepaths.items():
                 zip_filepath = filepath + '.' + zip_ext
-                if os.path.isfile(zip_filepath):
+                if os.path.isfile(zip_filepath) and name not in blacklist_files:
                     dicom = read_file(filepath, force=True)
                     dicomz = read_file(zip_filepath, force=True)
                     equal_content = True
                     for k, v in dicom.__dict__.items():
-                        if v != dicomz.__dict__[k] and k not in blacklist:
+                        if v != dicomz.__dict__[k] and k not in blacklist_attr:
                             equal_content = False
                             break
                     self.assertTrue(
