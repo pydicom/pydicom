@@ -5,9 +5,13 @@
 #    See the file license.txt included with this distribution, also
 #    available at https://github.com/darcymason/pydicom
 
+import os
 import unittest
+
 from pydicom.dataset import Dataset, PropertyError
 from pydicom.dataelem import DataElement, RawDataElement
+from pydicom.dicomio import read_file
+from pydicom.filebase import DicomBytesIO
 from pydicom.tag import Tag
 from pydicom.sequence import Sequence
 from pydicom import compat
@@ -56,10 +60,24 @@ class DatasetTests(unittest.TestCase):
         def callable_pixel_array():
             ds.pixel_array
 
-        attribute_error_msg = "AttributeError in pixel_array property: " + \
-            "Dataset does not have attribute 'TransferSyntaxUID'"
-        self.failUnlessExceptionArgs(attribute_error_msg,
-                                     PropertyError, callable_pixel_array)
+        msg = "'Dataset' object has no attribute 'TransferSyntaxUID'"
+        self.failUnlessExceptionArgs(msg, AttributeError, callable_pixel_array)
+
+    def test_attribute_error_in_property_correct_debug(self):
+        """Test AttributeError in property raises correctly."""
+        class Foo(Dataset):
+            @property
+            def bar(self): return self._barr()
+
+            def _bar(self): return 'OK'
+
+        def test():
+            ds = Foo()
+            ds.bar
+
+        self.assertRaises(AttributeError, test)
+        msg = "'Foo' object has no attribute '_barr'"
+        self.failUnlessExceptionArgs(msg, AttributeError, test)
 
     def testTagExceptionPrint(self):
         # When printing datasets, a tag number should appear in error
@@ -134,11 +152,13 @@ class DatasetTests(unittest.TestCase):
     def testContains(self):
         """Dataset: can test if item present by 'if <tag> in dataset'......."""
         ds = self.dummy_dataset()
+        ds.CommandGroupLength = 100 # (0000,0000)
         self.assertTrue((0x300a, 0xb2) in ds, "membership test failed")
         self.assertTrue([0x300a, 0xb2] in ds,
                         "membership test failed when list used")
         self.assertTrue(0x300a00b2 in ds, "membership test failed")
         self.assertTrue(not (0x10, 0x5f) in ds, "non-member tested as member")
+        self.assertTrue('CommandGroupLength' in ds)
 
     def testGetExists1(self):
         """Dataset: dataset.get() returns an existing item by name.........."""
@@ -270,17 +290,17 @@ class DatasetTests(unittest.TestCase):
         ds = self.dummy_dataset()
         del ds.TreatmentMachineName
         self.assertRaises(AttributeError, testAttribute)
-        
+
     def testDeleteDicomCommandGroupLength(self):
         """Dataset: delete CommandGroupLength doesn't raise AttributeError.."""
         def testAttribute():
             ds.CommandGroupLength
-        
+
         ds = self.dummy_dataset()
         ds.CommandGroupLength = 100 # (0x0000, 0x0000)
         del ds.CommandGroupLength
         self.assertRaises(AttributeError, testAttribute)
-    
+
     def testDeleteOtherAttr(self):
         """Dataset: delete non-DICOM attribute by name......................"""
         ds = self.dummy_dataset()
@@ -312,6 +332,408 @@ class DatasetTests(unittest.TestCase):
             del ds[0x10, 0x10]
         self.assertRaises(KeyError, try_delete)
 
+    def testEqualityNoSequence(self):
+        """Dataset: equality returns correct value with simple dataset"""
+        d = Dataset()
+        d.SOPInstanceUID = '1.2.3.4'
+        self.assertTrue(d == d)
+
+        e = Dataset()
+        e.SOPInstanceUID = '1.2.3.4'
+        self.assertTrue(d == e)
+
+        e.SOPInstanceUID = '1.2.3.5'
+        self.assertFalse(d == e)
+
+        # Check VR
+        del e.SOPInstanceUID
+        e.add(DataElement(0x00080018, 'PN', '1.2.3.4'))
+        self.assertFalse(d == e)
+
+        # Check Tag
+        del e.SOPInstanceUID
+        e.StudyInstanceUID = '1.2.3.4'
+        self.assertFalse(d == e)
+
+        # Check missing Element in self
+        e.SOPInstanceUID = '1.2.3.4'
+        self.assertFalse(d == e)
+
+        # Check missing Element in other
+        d = Dataset()
+        d.SOPInstanceUID = '1.2.3.4'
+        d.StudyInstanceUID = '1.2.3.4.5'
+
+        e = Dataset()
+        e.SOPInstanceUID = '1.2.3.4'
+        self.assertFalse(d == e)
+
+    def testEqualityPrivate(self):
+        """Dataset: equality returns correct value when dataset has private elements"""
+        d = Dataset()
+        d_elem = DataElement(0x01110001, 'PN', 'Private')
+        self.assertTrue(d == d)
+        d.add(d_elem)
+
+        e = Dataset()
+        e_elem = DataElement(0x01110001, 'PN', 'Private')
+        e.add(e_elem)
+        self.assertTrue(d == e)
+
+        e[0x01110001].value = 'Public'
+        self.assertFalse(d == e)
+
+    def testEqualitySequence(self):
+        """Dataset: equality returns correct value when dataset has sequences"""
+        # Test even sequences
+        d = Dataset()
+        d.SOPInstanceUID = '1.2.3.4'
+        d.BeamSequence = []
+        beam_seq = Dataset()
+        beam_seq.PatientName = 'ANON'
+        d.BeamSequence.append(beam_seq)
+        self.assertTrue(d == d)
+
+        e = Dataset()
+        e.SOPInstanceUID = '1.2.3.4'
+        e.BeamSequence = []
+        beam_seq = Dataset()
+        beam_seq.PatientName = 'ANON'
+        e.BeamSequence.append(beam_seq)
+        self.assertTrue(d == e)
+
+        e.BeamSequence[0].PatientName = 'ANONY'
+        self.assertFalse(d == e)
+
+        # Test uneven sequences
+        e.BeamSequence[0].PatientName = 'ANON'
+        self.assertTrue(d == e)
+
+        e.BeamSequence.append(beam_seq)
+        self.assertFalse(d == e)
+
+        d.BeamSequence.append(beam_seq)
+        self.assertTrue(d == e)
+        d.BeamSequence.append(beam_seq)
+        self.assertFalse(d == e)
+
+    def testEqualityNotDataset(self):
+        """Dataset: equality returns correct value when not the same class"""
+        d = Dataset()
+        d.SOPInstanceUID = '1.2.3.4'
+        self.assertFalse(d == {'SOPInstanceUID' : '1.2.3.4'})
+
+    def testEqualityUnknown(self):
+        """Dataset: equality returns correct value with extra members """
+        d = Dataset()
+        d.SOPEustaceUID = '1.2.3.4'
+        self.assertTrue(d == d)
+
+        e = Dataset()
+        e.SOPEustaceUID = '1.2.3.4'
+        self.assertTrue(d == e)
+
+        e.SOPEustaceUID = '1.2.3.5'
+        self.assertFalse(d == e)
+
+    def testEqualityInheritance(self):
+        """Dataset: equality returns correct value for subclass """
+
+        class DatasetPlus(Dataset):
+            pass
+
+        d = Dataset()
+        d.PatientName = 'ANON'
+        e = DatasetPlus()
+        e.PatientName = 'ANON'
+        self.assertTrue(d == e)
+        self.assertTrue(e == d)
+        self.assertTrue(e == e)
+
+        e.PatientName = 'ANONY'
+        self.assertFalse(d == e)
+        self.assertFalse(e == d)
+
+    def test_inequality(self):
+        """Test inequality operator"""
+        d = Dataset()
+        d.SOPInstanceUID = '1.2.3.4'
+        self.assertFalse(d != d)
+
+        e = Dataset()
+        e.SOPInstanceUID = '1.2.3.5'
+        self.assertTrue(d != e)
+
+    def testHash(self):
+        """DataElement: hash returns TypeError"""
+
+        def test_hash():
+            d = Dataset()
+            d.PatientName = 'ANON'
+            hash(d)
+
+        self.assertRaises(TypeError, test_hash)
+
+    def test_property(self):
+        """Test properties work OK."""
+        class DSPlus(Dataset):
+            @property
+            def test(self):
+                return self._test
+
+            @test.setter
+            def test(self, value):
+                self._test = value
+
+        dsp = DSPlus()
+        dsp.test = 'ABCD'
+        self.assertEqual(dsp.test, 'ABCD')
+
+    def test_add_repeater_elem_by_keyword(self):
+        """Repeater using keyword to add repeater group elements raises ValueError."""
+        ds = Dataset()
+        def test():
+            ds.OverlayData = b'\x00'
+        self.assertRaises(ValueError, test)
+
+    def test_setitem_slice_raises(self):
+        """Test Dataset.__setitem__ raises if slicing used."""
+        ds = Dataset()
+        self.assertRaises(NotImplementedError, ds.__setitem__,
+                          slice(None), Dataset())
+
+    def test_getitem_slice_raises(self):
+        """Test Dataset.__getitem__ raises if slice Tags invalid."""
+        ds = Dataset()
+        self.assertRaises(ValueError, ds.__getitem__, slice(None,-1))
+        self.assertRaises(ValueError, ds.__getitem__, slice(-1, -1))
+        self.assertRaises(ValueError, ds.__getitem__, slice(-1))
+
+    def test_empty_slice(self):
+        """Test Dataset slicing with empty Dataset."""
+        ds = Dataset()
+        self.assertEqual(ds[:], Dataset())
+        self.assertRaises(ValueError, ds.__getitem__, slice(None,-1))
+        self.assertRaises(ValueError, ds.__getitem__, slice(-1, -1))
+        self.assertRaises(ValueError, ds.__getitem__, slice(-1))
+        self.assertRaises(NotImplementedError, ds.__setitem__,
+                          slice(None), Dataset())
+
+    def test_getitem_slice(self):
+        """Test Dataset.__getitem__ using slices."""
+        ds = Dataset()
+        ds.CommandGroupLength = 120 # 0000,0000
+        ds.CommandLengthToEnd = 111 # 0000,0001
+        ds.Overlays = 12 # 0000,51B0
+        ds.LengthToEnd = 12 # 0008,0001
+        ds.SOPInstanceUID = '1.2.3.4' # 0008,0018
+        ds.SkipFrameRangeFlag = 'TEST' # 0008,9460
+        ds.add_new(0x00090001, 'PN', 'CITIZEN^1')
+        ds.add_new(0x00090002, 'PN', 'CITIZEN^2')
+        ds.add_new(0x00090003, 'PN', 'CITIZEN^3')
+        ds.add_new(0x00090004, 'PN', 'CITIZEN^4')
+        ds.add_new(0x00090005, 'PN', 'CITIZEN^5')
+        ds.add_new(0x00090006, 'PN', 'CITIZEN^6')
+        ds.add_new(0x00090007, 'PN', 'CITIZEN^7')
+        ds.add_new(0x00090008, 'PN', 'CITIZEN^8')
+        ds.add_new(0x00090009, 'PN', 'CITIZEN^9')
+        ds.add_new(0x00090010, 'PN', 'CITIZEN^10')
+        ds.PatientName = 'CITIZEN^Jan' # 0010,0010
+        ds.PatientID = '12345' # 0010,0010
+        ds.ExaminedBodyThickness = 1.223 # 0010,9431
+        ds.BeamSequence = [Dataset()] # 300A,00B0
+        ds.BeamSequence[0].PatientName = 'ANON'
+
+        # Slice all items - should return original dataset
+        self.assertEqual(ds[:], ds)
+
+        # Slice starting from and including (0008,0001)
+        test_ds = ds[0x00080001:]
+        self.assertFalse('CommandGroupLength' in test_ds)
+        self.assertFalse('CommandLengthToEnd' in test_ds)
+        self.assertFalse('Overlays' in test_ds)
+        self.assertTrue('LengthToEnd' in test_ds)
+        self.assertTrue('BeamSequence' in test_ds)
+
+        # Slice ending at and not including (0009,0002)
+        test_ds = ds[:0x00090002]
+        self.assertTrue('CommandGroupLength' in test_ds)
+        self.assertTrue('CommandLengthToEnd' in test_ds)
+        self.assertTrue('Overlays' in test_ds)
+        self.assertTrue('LengthToEnd' in test_ds)
+        self.assertTrue(0x00090001 in test_ds)
+        self.assertFalse(0x00090002 in test_ds)
+        self.assertFalse('BeamSequence' in test_ds)
+
+        # Slice with a step - every second tag
+        # Should return zeroth tag, then second, fourth, etc...
+        test_ds = ds[::2]
+        self.assertTrue('CommandGroupLength' in test_ds)
+        self.assertFalse('CommandLengthToEnd' in test_ds)
+        self.assertTrue(0x00090001 in test_ds)
+        self.assertFalse(0x00090002 in test_ds)
+
+        # Slice starting at and including (0008,0018) and ending at and not
+        #   including (0009,0008)
+        test_ds = ds[0x00080018:0x00090008]
+        self.assertTrue('SOPInstanceUID' in test_ds)
+        self.assertTrue(0x00090007 in test_ds)
+        self.assertFalse(0x00090008 in test_ds)
+
+        # Slice starting at and including (0008,0018) and ending at and not
+        #   including (0009,0008), every third element
+        test_ds = ds[0x00080018:0x00090008:3]
+        self.assertTrue('SOPInstanceUID' in test_ds)
+        self.assertFalse(0x00090001 in test_ds)
+        self.assertTrue(0x00090002 in test_ds)
+        self.assertFalse(0x00090003 in test_ds)
+        self.assertFalse(0x00090004 in test_ds)
+        self.assertTrue(0x00090005 in test_ds)
+        self.assertFalse(0x00090006 in test_ds)
+        self.assertFalse(0x00090008 in test_ds)
+
+        # Slice starting and ending (and not including) (0008,0018)
+        self.assertEqual(ds[(0x0008,0x0018):(0x0008,0x0018)], Dataset())
+
+        # Test slicing using other acceptable Tag initialisations
+        self.assertTrue('SOPInstanceUID' in ds[(0x00080018):(0x00080019)])
+        self.assertTrue('SOPInstanceUID' in ds[(0x0008,0x0018):(0x0008,0x0019)])
+        self.assertTrue('SOPInstanceUID' in ds['0x00080018':'0x00080019'])
+
+    def test_delitem_slice(self):
+        """Test Dataset.__delitem__ using slices."""
+        ds = Dataset()
+        ds.CommandGroupLength = 120 # 0000,0000
+        ds.CommandLengthToEnd = 111 # 0000,0001
+        ds.Overlays = 12 # 0000,51B0
+        ds.LengthToEnd = 12 # 0008,0001
+        ds.SOPInstanceUID = '1.2.3.4' # 0008,0018
+        ds.SkipFrameRangeFlag = 'TEST' # 0008,9460
+        ds.add_new(0x00090001, 'PN', 'CITIZEN^1')
+        ds.add_new(0x00090002, 'PN', 'CITIZEN^2')
+        ds.add_new(0x00090003, 'PN', 'CITIZEN^3')
+        ds.add_new(0x00090004, 'PN', 'CITIZEN^4')
+        ds.add_new(0x00090005, 'PN', 'CITIZEN^5')
+        ds.add_new(0x00090006, 'PN', 'CITIZEN^6')
+        ds.add_new(0x00090007, 'PN', 'CITIZEN^7')
+        ds.add_new(0x00090008, 'PN', 'CITIZEN^8')
+        ds.add_new(0x00090009, 'PN', 'CITIZEN^9')
+        ds.add_new(0x00090010, 'PN', 'CITIZEN^10')
+        ds.PatientName = 'CITIZEN^Jan' # 0010,0010
+        ds.PatientID = '12345' # 0010,0010
+        ds.ExaminedBodyThickness = 1.223 # 0010,9431
+        ds.BeamSequence = [Dataset()] # 300A,00B0
+        ds.BeamSequence[0].PatientName = 'ANON'
+
+        # Delete the 0x0009 group
+        del ds[0x00090000:0x00100000]
+        self.assertTrue('SkipFrameRangeFlag' in ds)
+        self.assertFalse(0x00090001 in ds)
+        self.assertFalse(0x00090010 in ds)
+        self.assertTrue('PatientName' in ds)
+
+    def test_group_dataset(self):
+        """Test Dataset.group_dataset"""
+        ds = Dataset()
+        ds.CommandGroupLength = 120 # 0000,0000
+        ds.CommandLengthToEnd = 111 # 0000,0001
+        ds.Overlays = 12 # 0000,51B0
+        ds.LengthToEnd = 12 # 0008,0001
+        ds.SOPInstanceUID = '1.2.3.4' # 0008,0018
+        ds.SkipFrameRangeFlag = 'TEST' # 0008,9460
+
+        # Test getting group 0x0000
+        group0000 = ds.group_dataset(0x0000)
+        self.assertTrue('CommandGroupLength' in group0000)
+        self.assertTrue('CommandLengthToEnd' in group0000)
+        self.assertTrue('Overlays' in group0000)
+        self.assertFalse('LengthToEnd' in group0000)
+        self.assertFalse('SOPInstanceUID' in group0000)
+        self.assertFalse('SkipFrameRangeFlag' in group0000)
+
+        # Test getting group 0x0008
+        group0000 = ds.group_dataset(0x0008)
+        self.assertFalse('CommandGroupLength' in group0000)
+        self.assertFalse('CommandLengthToEnd' in group0000)
+        self.assertFalse('Overlays' in group0000)
+        self.assertTrue('LengthToEnd' in group0000)
+        self.assertTrue('SOPInstanceUID' in group0000)
+        self.assertTrue('SkipFrameRangeFlag' in group0000)
+
+    def test_get_item(self):
+        """Test Dataset.get_item"""
+        # TODO: Add test for deferred read
+        ds = Dataset()
+        ds.CommandGroupLength = 120 # 0000,0000
+        ds.SOPInstanceUID = '1.2.3.4' # 0008,0018
+
+        # Test non-deferred read
+        self.assertEqual(ds.get_item(0x00000000), ds[0x00000000])
+        self.assertEqual(ds.get_item(0x00000000).value, 120)
+        self.assertEqual(ds.get_item(0x00080018), ds[0x00080018])
+        self.assertEqual(ds.get_item(0x00080018).value, '1.2.3.4')
+
+    def test_remove_private_tags(self):
+        """Test Dataset.remove_private_tags"""
+        ds = Dataset()
+        ds.CommandGroupLength = 120 # 0000,0000
+        ds.SkipFrameRangeFlag = 'TEST' # 0008,9460
+        ds.add_new(0x00090001, 'PN', 'CITIZEN^1')
+        ds.add_new(0x00090010, 'PN', 'CITIZEN^10')
+        ds.PatientName = 'CITIZEN^Jan' # 0010,0010
+
+        ds.remove_private_tags()
+        self.assertEqual(ds[0x00090000:0x00100000], Dataset())
+        self.assertTrue('CommandGroupLength' in ds)
+        self.assertTrue('SkipFrameRangeFlag' in ds)
+        self.assertTrue('PatientName' in ds)
+
+    def test_data_element(self):
+        """Test Dataset.data_element."""
+        ds = Dataset()
+        ds.CommandGroupLength = 120
+        ds.SkipFrameRangeFlag = 'TEST'
+        ds.add_new(0x00090001, 'PN', 'CITIZEN^1')
+        ds.BeamSequence = [Dataset()]
+        ds.BeamSequence[0].PatientName = 'ANON'
+        self.assertEqual(ds.data_element('CommandGroupLength'), ds[0x00000000])
+        self.assertEqual(ds.data_element('BeamSequence'), ds[0x300A00B0])
+
+    def test_iterall(self):
+        """Test Dataset.iterall"""
+        ds = Dataset()
+        ds.CommandGroupLength = 120
+        ds.SkipFrameRangeFlag = 'TEST'
+        ds.add_new(0x00090001, 'PN', 'CITIZEN^1')
+        ds.BeamSequence = [Dataset()]
+        ds.BeamSequence[0].PatientName = 'ANON'
+        elem_gen = ds.iterall()
+        self.assertEqual(ds.data_element('CommandGroupLength'), next(elem_gen))
+        self.assertEqual(ds.data_element('SkipFrameRangeFlag'), next(elem_gen))
+        self.assertEqual(ds[0x00090001], next(elem_gen))
+        self.assertEqual(ds.data_element('BeamSequence'), next(elem_gen))
+        self.assertEqual(ds.BeamSequence[0].data_element('PatientName'), next(elem_gen))
+
+    def test_save_as(self):
+        """Test Dataset.save_as"""
+        fp = DicomBytesIO()
+        ds = Dataset()
+        ds.PatientName = 'CITIZEN'
+        # Raise AttributeError if is_implicit_VR or is_little_endian missing
+        self.assertRaises(AttributeError, ds.save_as, fp, write_like_original=False)
+        ds.is_implicit_VR = True
+        self.assertRaises(AttributeError, ds.save_as, fp, write_like_original=False)
+        ds.is_little_endian = True
+        del ds.is_implicit_VR
+        self.assertRaises(AttributeError, ds.save_as, fp, write_like_original=False)
+        ds.is_implicit_VR = True
+        ds.file_meta = Dataset()
+        ds.file_meta.MediaStorageSOPClassUID = '1.1'
+        ds.file_meta.MediaStorageSOPInstanceUID = '1.2'
+        ds.file_meta.TransferSyntaxUID = '1.3'
+        ds.file_meta.ImplementationClassUID = '1.4'
+        ds.save_as(fp, write_like_original=False)
+
 
 class DatasetElementsTests(unittest.TestCase):
     """Test valid assignments of data elements"""
@@ -330,6 +752,31 @@ class DatasetElementsTests(unittest.TestCase):
         self.ds.ConceptCodeSequence = [self.sub_ds1, self.sub_ds2]
         self.assertTrue(isinstance(self.ds.ConceptCodeSequence, Sequence),
                         "Sequence assignment did not result in Sequence type")
+
+
+class FileDatasetTests(unittest.TestCase):
+    def setUp(self):
+        test_dir = os.path.dirname(__file__)
+        self.test_file = os.path.join(test_dir, 'test_files', 'CT_small.dcm')
+
+    def testEqualityFileMeta(self):
+        """Dataset: equality returns correct value if with metadata"""
+        d = read_file(self.test_file)
+        e = read_file(self.test_file)
+        self.assertTrue(d == e)
+
+        e.is_implicit_VR = not e.is_implicit_VR
+        self.assertFalse(d == e)
+
+        e.is_implicit_VR = not e.is_implicit_VR
+        self.assertTrue(d == e)
+        e.is_little_endian = not e.is_little_endian
+        self.assertFalse(d == e)
+
+        e.is_little_endian = not e.is_little_endian
+        self.assertTrue(d == e)
+        e.filename = 'test_filename.dcm'
+        self.assertFalse(d == e)
 
 
 if __name__ == "__main__":

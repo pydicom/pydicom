@@ -10,7 +10,6 @@ from decimal import Decimal
 from pydicom import config  # don't import datetime_conversion directly
 from pydicom import compat
 from pydicom.multival import MultiValue
-from pydicom.config import logger
 
 from datetime import date, datetime, time
 
@@ -22,16 +21,16 @@ except ImportError:
 
 import re
 
-from pydicom.config import logger
-
 default_encoding = "iso8859"  # can't import from charset or get circular import
 
 # For reading/writing data elements, these ones have longer explicit VR format
-extra_length_VRs = ('OB', 'OW', 'OF', 'SQ', 'UN', 'UT')
+# Taken from PS3.5 Section 7.1.2
+extra_length_VRs = ('OB', 'OD', 'OF', 'OL', 'OW', 'SQ', 'UC', 'UN',
+                    'UR', 'UT')
 
 # VRs that can be affected by character repertoire in (0008,0005) Specific Character Set
 # See PS-3.5 (2011), section 6.1.2 Graphic Characters
-text_VRs = ('SH', 'LO', 'ST', 'LT', 'UT')  # and PN, but it is handled separately.
+text_VRs = ('SH', 'LO', 'ST', 'LT',  'UC', 'UR', 'UT')  # and PN, but it is handled separately.
 
 match_string = b''.join([
     b'(?P<single_byte>',
@@ -97,7 +96,7 @@ class DA(date):
             else:
                 try:
                     val = super(DA, cls).__new__(cls, val)
-                except TypeError as e:
+                except TypeError:
                     raise ValueError("Cannot convert to datetime: '" + val + "'")
         elif isinstance(val, date):
             val = super(DA, cls).__new__(cls, val.year, val.month, val.day)
@@ -199,7 +198,7 @@ class DT(datetime):
             else:
                 try:
                     val = super(DT, cls).__new__(cls, val)
-                except TypeError as e:
+                except TypeError:
                     raise ValueError("Cannot convert to datetime: '" + val + "'")
         elif isinstance(val, datetime):
             val = super(DT, cls).__new__(cls, val.year, val.month, val.day,
@@ -280,7 +279,7 @@ class TM(time):
             else:
                 try:
                     val = super(TM, cls).__new__(cls, val)
-                except TypeError as e:
+                except TypeError:
                     raise ValueError("Cannot convert to datetime: '" + val + "'")
         elif isinstance(val, time):
             val = super(TM, cls).__new__(cls, val.hour, val.minute, val.second,

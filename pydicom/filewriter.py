@@ -6,20 +6,157 @@ from __future__ import absolute_import
 #    See the file license.txt included with this distribution, also
 #    available at https://github.com/darcymason/pydicom
 
-from struct import pack
+from struct import pack, unpack
 
 from pydicom import compat
 from pydicom.config import logger
-
 from pydicom.compat import in_py2
 from pydicom.charset import default_encoding, text_VRs, convert_encodings
 from pydicom.uid import ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian
 from pydicom.filebase import DicomFile, DicomFileLike
+from pydicom.datadict import keyword_for_tag
 from pydicom.dataset import Dataset
 from pydicom.dataelem import DataElement
 from pydicom.tag import Tag, ItemTag, ItemDelimiterTag, SequenceDelimiterTag
 from pydicom.valuerep import extra_length_VRs
+from pydicom.values import convert_numbers
 from pydicom.tagtools import tag_in_exception
+
+
+def correct_ambiguous_vr_element(elem, ds, is_little_endian):
+    """Attempt to correct the ambiguous VR element `elem`.
+
+    When it's not possible to correct the VR, the element will be returned
+    unchanged. Currently the only ambiguous VR elements not corrected for are
+    all retired or part of DICONDE.
+
+    If the VR is corrected and is 'US' or 'SS' then the value will be updated
+    using the pydicom.values.convert_numbers() method.
+
+    Parameters
+    ----------
+    elem : pydicom.dataelem.DataElement
+        The element with an ambiguous VR.
+    ds : pydicom.dataset.Dataset
+        The dataset containing `elem`.
+    is_little_endian : bool
+        The byte ordering of the values in the dataset.
+
+    Returns
+    -------
+    elem : pydicom.dataelem.DataElement
+        The corrected element
+    """
+    if 'or' in elem.VR:
+        # 'OB or OW': 7fe0,0010 PixelData
+        if elem.tag == 0x7fe00010:
+
+            try:
+                # Compressed Pixel Data
+                # PS3.5 Annex A.4
+                #   If encapsulated, VR is OB and length is undefined
+                if elem.is_undefined_length:
+                    elem.VR = 'OB'
+                else:
+                    # Non-compressed Pixel Data
+                    # If BitsAllocated is > 8 then OW, else may be OB or OW
+                    #   as per PS3.5 Annex A.2. For BitsAllocated < 8 test the
+                    #    size of each pixel to see if its written in OW or OB
+                    if ds.BitsAllocated > 8:
+                        elem.VR = 'OW'
+                    else:
+                        if len(ds.PixelData) / (ds.Rows * ds.Columns) == 2:
+                            elem.VR = 'OW'
+                        elif len(ds.PixelData) / (ds.Rows * ds.Columns) == 1:
+                            elem.VR = 'OB'
+            except AttributeError:
+                pass
+
+        # 'US or SS' and dependent on PixelRepresentation
+        elif elem.tag in [0x00189810, 0x00221452, 0x00280104, 0x00280105,
+                          0x00280106, 0x00280107, 0x00280108, 0x00280109,
+                          0x00280110, 0x00280111, 0x00280120, 0x00280121,
+                          0x00281101, 0x00281102, 0x00281103, 0x00283002,
+                          0x00409211, 0x00409216, 0x00603004, 0x00603006]:
+            # US if PixelRepresenation value is 0x0000, else SS
+            #   For references, see the list at
+            #   https://github.com/darcymason/pydicom/pull/298
+            if 'PixelRepresentation' in ds:
+                if ds.PixelRepresentation == 0:
+                    elem.VR = 'US'
+                    byte_type = 'H'
+                else:
+                    elem.VR = 'SS'
+                    byte_type = 'h'
+                elem.value = convert_numbers(elem.value, is_little_endian,
+                                             byte_type)
+
+        # 'OB or OW' and dependent on WaveformBitsAllocated
+        elif elem.tag in [0x54000100, 0x54000112, 0x5400100A,
+                          0x54001010]:
+            # If WaveformBitsAllocated is > 8 then OW, otherwise may be
+            #   OB or OW, however not sure how to handle this.
+            #   See PS3.3 C.10.9.1.
+            if 'WaveformBitsAllocated' in ds:
+                if ds.WaveformBitsAllocated > 8:
+                    elem.VR = 'OW'
+
+        # 'US or OW': 0028,3006 LUTData
+        elif elem.tag in [0x00283006]:
+            if 'LUTDescriptor' in ds:
+                # First value in LUT Descriptor is how many values in
+                #   LUTData, if there's only one value then must be US
+                # As per PS3.3 C.11.1.1.1
+                if ds.LUTDescriptor[0] == 1:
+                    elem.VR = 'US'
+                    elem.value = convert_numbers(elem.value,
+                                                 is_little_endian,
+                                                 'H')
+                else:
+                    elem.VR = 'OW'
+
+        # 'OB or OW': 60xx,3000 OverlayData and dependent on Transfer Syntax
+        elif elem.tag.group in range(0x6000, 0x601F, 2) and \
+                                                    elem.tag.elem == 0x3000:
+            # Implicit VR must be OW, explicit VR may be OB or OW
+            #   as per PS3.5 Section 8.1.2 and Annex A
+            if hasattr(ds, 'is_implicit_VR') and ds.is_implicit_VR:
+                elem.VR = 'OW'
+
+    return elem
+
+def correct_ambiguous_vr(ds, is_little_endian):
+    """Iterate through `ds` correcting ambiguous VR elements (if possible).
+
+    When it's not possible to correct the VR, the element will be returned
+    unchanged. Currently the only ambiguous VR elements not corrected for are
+    all retired or part of DICONDE.
+
+    If the VR is corrected and is 'US' or 'SS' then the value will be updated
+    using the pydicom.values.convert_numbers() method.
+
+    Parameters
+    ----------
+    ds : pydicom.dataset.Dataset
+        The dataset containing ambiguous VR elements.
+    is_little_endian : bool
+        The byte ordering of the values in the dataset.
+
+    Returns
+    -------
+    ds : pydicom.dataset.Dataset
+        The corrected dataset
+    """
+    # Iterate through the elements
+    for elem in ds:
+        # Iterate the correction through any sequences
+        if elem.VR == 'SQ':
+            for item in elem:
+                item = correct_ambiguous_vr(item, is_little_endian)
+        elif 'or' in elem.VR:
+            elem = correct_ambiguous_vr_element(elem, ds, is_little_endian)
+
+    return ds
 
 
 def write_numbers(fp, data_element, struct_format):
@@ -57,7 +194,6 @@ def write_OWvalue(fp, data_element):
     """Write a data_element with VR of 'other word' (OW).
 
     Note: This **does not currently do the byte swapping** for Endian state.
-
     """
     # XXX for now just write the raw bytes without endian swapping
     fp.write(data_element.value)
@@ -216,8 +352,10 @@ def write_TM(fp, data_element, padding=' '):
 def write_data_element(fp, data_element, encoding=default_encoding):
     """Write the data_element to file fp according to dicom media storage rules.
     """
+    # Write element's tag
     fp.write_tag(data_element.tag)
 
+    # If explicit VR, write the VR
     VR = data_element.VR
     if not fp.is_implicit_VR:
         if len(VR) != 2:
@@ -234,7 +372,7 @@ def write_data_element(fp, data_element, encoding=default_encoding):
         raise NotImplementedError("write_data_element: unknown Value Representation '{0}'".format(VR))
 
     length_location = fp.tell()  # save location for later.
-    if not fp.is_implicit_VR and VR not in ['OB', 'OW', 'OF', 'SQ', 'UT', 'UN']:
+    if not fp.is_implicit_VR and VR not in extra_length_VRs:
         fp.write_US(0)  # Explicit VR length field is only 2 bytes
     else:
         fp.write_UL(0xFFFFFFFF)   # will fill in real length value later if not undefined length item
@@ -260,7 +398,7 @@ def write_data_element(fp, data_element, encoding=default_encoding):
         is_undefined_length = True
     location = fp.tell()
     fp.seek(length_location)
-    if not fp.is_implicit_VR and VR not in ['OB', 'OW', 'OF', 'SQ', 'UT', 'UN']:
+    if not fp.is_implicit_VR and VR not in extra_length_VRs:
         fp.write_US(location - length_location - 2)  # 2 is length of US
     else:
         # write the proper length of the data_element back in the length slot, unless is SQ with undefined length.
@@ -274,6 +412,10 @@ def write_data_element(fp, data_element, encoding=default_encoding):
 
 def write_dataset(fp, dataset, parent_encoding=default_encoding):
     """Write a Dataset dictionary to the file. Return the total length written."""
+    # Attempt to correct ambiguous VR elements when explicit little/big encoding
+    #   Elements that can't be corrected will be returned unchanged.
+    if not fp.is_implicit_VR:
+        dataset = correct_ambiguous_vr(dataset, fp.is_little_endian)
 
     dataset_encoding = dataset.get('SpecificCharacterSet', parent_encoding)
 
@@ -334,113 +476,269 @@ def write_ATvalue(fp, data_element):
             fp.write_tag(tag)
 
 
-def _write_file_meta_info(fp, meta_dataset):
-    """Write the dicom group 2 dicom storage File Meta Information to the file.
+def write_file_meta_info(fp, file_meta, enforce_standard=True):
+    """Write the File Meta Information elements in `file_meta` to `fp`.
 
-    The file should already be positioned past the 128 byte preamble.
-    Raises ValueError if the required data_elements (elements 2,3,0x10,0x12)
-    are not in the dataset. If the dataset came from a file read with
-    read_file(), then the required data_elements should already be there.
-    """
-    fp.write(b'DICM')
+    If `enforce_standard` is True then the file-like `fp` should be positioned
+    past the 128 byte preamble + 4 byte prefix (which should already have been
+    written).
 
-    # File meta info is always LittleEndian, Explicit VR. After will change these
-    #    to the transfer syntax values set in the meta info
-    fp.is_little_endian = True
-    fp.is_implicit_VR = False
+    DICOM File Meta Information Group Elements
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    From the DICOM standard, Part 10 Section 7.1, any DICOM file shall contain
+    a 128-byte preamble, a 4-byte DICOM prefix 'DICM' and (at a minimum) the
+    following Type 1 DICOM Elements (from Table 7.1-1):
+        * (0002,0000) FileMetaInformationGroupLength, UL, 4
+        * (0002,0001) FileMetaInformationVersion, OB, 2
+        * (0002,0002) MediaStorageSOPClassUID, UI, N
+        * (0002,0003) MediaStorageSOPInstanceUID, UI, N
+        * (0002,0010) TransferSyntaxUID, UI, N
+        * (0002,0012) ImplementationClassUID, UI, N
 
-    if Tag((2, 1)) not in meta_dataset:
-        meta_dataset.add_new((2, 1), 'OB', b"\0\1")   # file meta information version
+    If `enforce_standard` is True then (0002,0000) will be added/updated,
+    (0002,0001) will be added if not already present and the other required
+    elements will checked to see if they exist. If `enforce_standard` is
+    False then `file_meta` will be written as is after minimal validation
+    checking.
 
-    # Now check that required meta info tags are present:
-    missing = []
-    for element in [2, 3, 0x10, 0x12]:
-        if Tag((2, element)) not in meta_dataset:
-            missing.append(Tag((2, element)))
-    if missing:
-        raise ValueError("Missing required tags {0} for file meta information".format(str(missing)))
+    The following Type 3/1C Elements may also be present:
+        * (0002,0013) ImplementationVersionName, SH, N
+        * (0002,0016) SourceApplicationEntityTitle, AE, N
+        * (0002,0017) SendingApplicationEntityTitle, AE, N
+        * (0002,0018) ReceivingApplicationEntityTitle, AE, N
+        * (0002,0100) PrivateInformationCreatorUID, UI, N
+        * (0002,0102) PrivateInformation, OB, N
 
-    # Put in temp number for required group length, save current location to come back
-    meta_dataset[(2, 0)] = DataElement((2, 0), 'UL', 0)  # put 0 to start
-    group_length_data_element_size = 12  # !based on DICOM std ExplVR
-    group_length_tell = fp.tell()
-
-    # Write the file meta datset, including temp group length
-    length = write_dataset(fp, meta_dataset)
-    group_length = length - group_length_data_element_size  # counts from end of that
-
-    # Save end of file meta to go back to
-    end_of_file_meta = fp.tell()
-
-    # Go back and write the actual group length
-    fp.seek(group_length_tell)
-    group_length_data_element = DataElement((2, 0), 'UL', group_length)
-    write_data_element(fp, group_length_data_element)
-
-    # Return to end of file meta, ready to write remainder of the file
-    fp.seek(end_of_file_meta)
-
-
-def write_file(filename, dataset, write_like_original=True):
-    """Store a FileDataset to the filename specified.
+    Encoding
+    ~~~~~~~~
+    The encoding of the File Meta Information shall be Explicit VR Little Endian
 
     Parameters
     ----------
-    filename : str
-        Name of file to save new DICOM file to.
-    dataset : FileDataset
-        Dataset holding the DICOM information; e.g. an object
-        read with read_file().
-    write_like_original : boolean
+    fp : file-like
+        The file-like to write the File Meta Information to.
+    file_meta : pydicom.dataset.Dataset
+        The File Meta Information DataElements.
+    enforce_standard : bool
+        If False, then only the File Meta Information elements already in
+        `file_meta` will be written to `fp`. If True (default) then a DICOM
+        Standards conformant File Meta will be written to `fp`.
+
+    Raises
+    ------
+    ValueError
+        If `enforce_standard` is True and any of the required File Meta
+        Information elements are missing from `file_meta`, with the
+        exception of (0002,0000) and (0002,0001).
+    ValueError
+        If any non-Group 2 Elements are present in `file_meta`.
+    """
+    # Check that no non-Group 2 Elements are present
+    for elem in file_meta:
+        if elem.tag.group != 0x0002:
+            raise ValueError("Only File Meta Information Group (0002,eeee) "
+                             "elements must be present in 'file_meta'.")
+
+    # The Type 1 File Meta Elements are only required when `enforce_standard`
+    #   is True, except for FileMetaInformationGroupLength and
+    #   FileMetaInformationVersion, which may or may not be present
+    if enforce_standard:
+        # Will be updated with the actual length later
+        if 'FileMetaInformationGroupLength' not in file_meta:
+            file_meta.FileMetaInformationGroupLength = 0
+
+        if 'FileMetaInformationVersion' not in file_meta:
+            file_meta.FileMetaInformationVersion = b'\x00\x01'
+
+        # Check that required File Meta Elements are present
+        missing = []
+        for element in [0x0002, 0x0003, 0x0010, 0x0012]:
+            if Tag(0x0002, element) not in file_meta:
+                missing.append(Tag(0x0002, element))
+        if missing:
+            msg = "Missing required File Meta Information elements from " \
+                  "'file_meta':\n"
+            for tag in missing:
+                msg += '\t{0} {1}\n'.format(tag, keyword_for_tag(tag))
+            raise ValueError(msg[:-1]) # Remove final newline
+
+    # Only used if FileMetaInformationGroupLength is present.
+    #   FileMetaInformationGroupLength has a VR of 'UL' and so has a value that
+    #   is 4 bytes fixed. The total length of when encoded as Explicit VR must
+    #   therefore be 12 bytes.
+    end_group_length_elem = fp.tell() + 12
+
+    # The 'is_little_endian' and 'is_implicit_VR' attributes will need to be set
+    #   correctly after the File Meta Info has been written.
+    fp.is_little_endian = True
+    fp.is_implicit_VR = False
+
+    # Write the File Meta Information Group elements to `fp`
+    write_dataset(fp, file_meta)
+
+    # If FileMetaInformationGroupLength is present it will be the first written
+    #   element and we must update its value to the correct length.
+    if 'FileMetaInformationGroupLength' in file_meta:
+        # Save end of file meta to go back to
+        end_of_file_meta = fp.tell()
+
+        # Update the FileMetaInformationGroupLength value, which is the number
+        #   of bytes from the end of the FileMetaInformationGroupLength element
+        #   to the end of all the File Meta Information elements
+        file_meta.FileMetaInformationGroupLength = \
+                                int(end_of_file_meta - end_group_length_elem)
+        fp.seek(end_group_length_elem - 12)
+        write_data_element(fp, file_meta[0x00020000])
+
+        # Return to end of the file meta, ready to write remainder of the file
+        fp.seek(end_of_file_meta)
+
+
+def write_file(filename, dataset, write_like_original=True):
+    """Write `dataset` to the `filename` specified.
+
+    If `write_like_original` is True then `dataset` will be written as is (after
+    minimal validation checking) and may or may not contain all or parts of the
+    File Meta Information (and hence may or may not be conformant with the DICOM
+    File Format).
+    If `write_like_original` is False, `dataset` will be stored in the DICOM
+    File Format in accordance with DICOM Standard Part 10 Section 7. The byte
+    stream of the `dataset` will be placed into the file after the DICOM File
+    Meta Information.
+
+    File Meta Information
+    ---------------------
+    The File Meta Information consists of a 128-byte preamble, followed by a 4
+    byte DICOM prefix, followed by the File Meta Information Group elements.
+
+    Preamble and Prefix
+    ~~~~~~~~~~~~~~~~~~~
+    The `dataset.preamble` attribute shall be 128-bytes long or None and is
+    available for use as defined by the Application Profile or specific
+    implementations. If the preamble is not used by an Application Profile or
+    specific implementation then all 128 bytes should be set to 0x00. The actual
+    preamble written depends on `write_like_original` and `dataset.preamble`
+    (see the table below).
+
+    +------------------+------------------------------+
+    |                  | write_like_original          |
+    +------------------+-------------+----------------+
+    | dataset.preamble | True        | False          |
+    +==================+=============+================+
+    | None             | no preamble | 128 0x00 bytes |
+    +------------------+------------------------------+
+    | 128 bytes        | dataset.preamble             |
+    +------------------+------------------------------+
+
+    The prefix shall be the string 'DICM' and will be written if and only if
+    the preamble is present.
+
+    File Meta Information Group Elements
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    The preamble and prefix are followed by a set of DICOM Elements from the
+    (0002,eeee) group. Some of these elements are required (Type 1) while others
+    are optional (Type 3/1C). If `write_like_original` is True then the File
+    Meta Information Group elements are all optional. See
+    pydicom.filewriter.write_file_meta_info for more information on which
+    elements are required.
+
+    The File Meta Information Group elements should be included within their
+    own Dataset in the `dataset.file_meta` attribute.
+
+    If (0002,0010) 'Transfer Syntax UID' is included then the user must ensure
+    it's value is compatible with the values for the `dataset.is_little_endian`
+    and `dataset.is_implicit_VR` attributes. For example, if is_little_endian
+    and is_implicit_VR are both True then the Transfer Syntax UID must be
+    1.2.840.10008.1.2 'Implicit VR Little Endian'. See the DICOM standard
+    Part 5 Section 10 for more information on Transfer Syntaxes.
+
+    Encoding
+    ~~~~~~~~
+    The preamble and prefix are encoding independent. The File Meta Elements
+    are encoded as Explicit VR Little Endian as required by the DICOM standard.
+
+    Dataset
+    -------
+    A DICOM Dataset representing a SOP Instance related to a DICOM Information
+    Object Definition. It is up to the user to ensure the `dataset` conforms
+    to the DICOM standard.
+
+    Encoding
+    ~~~~~~~~
+    The `dataset` will be encoded as specified by the `dataset.is_little_endian`
+    and `dataset.is_implicit_VR` attributes. It's up to the user to ensure
+    these attributes are set correctly (as well as setting an appropriate value
+    for `dataset.file_meta.TransferSyntaxUID` if present).
+
+    Parameters
+    ----------
+    filename : str or file-like
+        Name of file or the file-like to write the new DICOM file to.
+    dataset : pydicom.dataset.FileDataset
+        Dataset holding the DICOM information; e.g. an object read with
+        pydicom.read_file().
+    write_like_original : bool
         If True (default), preserves the following information from
-        the dataset:
-        -preamble -- if no preamble in read file, than not used here
-        -hasFileMeta -- if writer did not do file meta information,
-            then don't write here either
-        -seq.is_undefined_length -- if original had delimiters, write them now too,
-            instead of the more sensible length characters
+        the Dataset (and may result in a non-conformant file):
+        - preamble -- if the original file has no preamble then none will be
+            written.
+        - file_meta -- if the original file was missing any required File Meta
+            Information Group elements then they will not be added or written.
+            If (0002,0000) 'File Meta Information Group Length' is present then
+            it may have its value updated.
+        - seq.is_undefined_length -- if original had delimiters, write them now
+            too, instead of the more sensible length characters
         - is_undefined_length_sequence_item -- for datasets that belong to a
             sequence, write the undefined length delimiters if that is
             what the original had.
-        If False, produces a "nicer" DICOM file for other readers,
-            where all lengths are explicit.
+        If False, produces a file conformant with the DICOM File Format, with
+        explicit lengths for all elements.
 
     See Also
     --------
     pydicom.dataset.FileDataset
-        Dataset class with relevant attrs and information.
+        Dataset class with relevant attributes and information.
     pydicom.dataset.Dataset.save_as
         Write a DICOM file from a dataset that was read in with read_file().
         save_as wraps write_file.
-
-    Notes
-    -----
-    Set dataset.preamble if you want something other than 128 0-bytes.
-    If the dataset was read from an existing dicom file, then its preamble
-    was stored at read time. It is up to the user to ensure the preamble is still
-    correct for its purposes.
-
-    If there is no Transfer Syntax tag in the dataset, then set
-    dataset.is_implicit_VR and dataset.is_little_endian
-    to determine the transfer syntax used to write the file.
     """
+    # Check that dataset's group 0x0002 elements are only present in the
+    #   `dataset.file_meta` Dataset - user may have added them to the wrong
+    #   place
+    if dataset.group_dataset(0x0002) != Dataset():
+        raise ValueError("File Meta Information Group Elements (0002,eeee) "
+                         "should be in their own Dataset object in the "
+                         "'{0}.file_meta' "
+                         "attribute.".format(dataset.__class__.__name__))
 
-    # Decide whether to write DICOM preamble. Should always do so unless trying to mimic the original file read in
-    preamble = getattr(dataset, "preamble", None)
+    # A preamble is required under the DICOM standard, however if
+    #   `write_like_original` is True we treat it as optional
+    preamble = getattr(dataset, 'preamble', None)
+    if preamble and len(preamble) != 128:
+        raise ValueError("'{0}.preamble' must be 128-bytes "
+                         "long.".format(dataset.__class__.__name__))
     if not preamble and not write_like_original:
-        preamble = b"\0" * 128
-    file_meta = dataset.file_meta
-    if file_meta is None:
+        # The default preamble is 128 0x00 bytes.
+        preamble = b'\x00' * 128
+
+    # File Meta Information is required under the DICOM standard, however if
+    #   `write_like_original` is True we treat it as optional
+    file_meta = getattr(dataset, 'file_meta', None)
+    if not file_meta and not write_like_original:
         file_meta = Dataset()
-    if 'TransferSyntaxUID' not in file_meta:
+
+    # If enforcing the standard, correct the TransferSyntaxUID where possible,
+    #   noting that the transfer syntax for is_implicit_VR = False and
+    #   is_little_endian = True is ambiguous as it may be an encapsulated
+    #   transfer syntax
+    if not write_like_original:
         if dataset.is_little_endian and dataset.is_implicit_VR:
-            file_meta.add_new((2, 0x10), 'UI', ImplicitVRLittleEndian)
-        elif dataset.is_little_endian and not dataset.is_implicit_VR:
-            file_meta.add_new((2, 0x10), 'UI', ExplicitVRLittleEndian)
+            file_meta.TransferSyntaxUID = ImplicitVRLittleEndian
         elif not dataset.is_little_endian and not dataset.is_implicit_VR:
-            file_meta.add_new((2, 0x10), 'UI', ExplicitVRBigEndian)
-        else:
-            raise NotImplementedError("pydicom has not been verified for Big Endian with Implicit VR")
+            file_meta.TransferSyntaxUID = ExplicitVRBigEndian
+        elif not dataset.is_little_endian and dataset.is_implicit_VR:
+            raise NotImplementedError("Implicit VR Big Endian is not a"
+                                      "supported Transfer Syntax.")
 
     caller_owns_file = True
     # Open file if not already a file object
@@ -452,15 +750,36 @@ def write_file(filename, dataset, write_like_original=True):
         fp = DicomFileLike(filename)
 
     try:
+        ## WRITE FILE META INFORMATION
         if preamble:
-            fp.write(preamble)  # blank 128 byte preamble
-            _write_file_meta_info(fp, file_meta)
+            # Write the 'DICM' prefix if and only if we write the preamble
+            fp.write(preamble)
+            fp.write(b'DICM')
 
-        # Set file VR, endian. MUST BE AFTER writing META INFO (which changes to Explicit LittleEndian)
+        if file_meta is not None: # May be an empty Dataset
+            # If we want to `write_like_original`, don't enforce_standard
+            write_file_meta_info(fp, file_meta, not write_like_original)
+
+        ## WRITE DATASET
+        # The transfer syntax used to encode the dataset can't be changed within
+        #   the dataset
+        # Write any Command Set elements now as elements must be in tag order
+        #   Mixing Command Set with other elements is non-conformant so we
+        #   require `write_like_original` to be True
+        command_set = dataset[0x00000000:0x00010000]
+        if command_set and write_like_original:
+            fp.is_implicit_VR = True
+            fp.is_little_endian = True
+            write_dataset(fp, command_set)
+
+        # Set file VR and endianness. MUST BE AFTER writing META INFO (which
+        #   requires Explicit VR Little Endian) and COMMAND SET (which requires
+        #   Implicit VR Little Endian)
         fp.is_implicit_VR = dataset.is_implicit_VR
         fp.is_little_endian = dataset.is_little_endian
 
-        write_dataset(fp, dataset)
+        # Write non-Command Set elements now
+        write_dataset(fp, dataset[0x00010000:])
     finally:
         if not caller_owns_file:
             fp.close()
@@ -476,6 +795,8 @@ writers = {'UL': (write_numbers, 'L'),
            'FD': (write_numbers, 'd'),
            'OF': (write_numbers, 'f'),
            'OB': (write_OBvalue, None),
+           'OD': (write_OWvalue, None),
+           'OL': (write_OWvalue, None),
            'UI': (write_UI, None),
            'SH': (write_string, None),
            'DA': (write_DA, None),
@@ -489,7 +810,9 @@ writers = {'UL': (write_numbers, 'L'),
            'AS': (write_string, None),
            'LT': (write_string, None),
            'SQ': (write_sequence, None),
+           'UC': (write_string, None),
            'UN': (write_UN, None),
+           'UR': (write_string, None),
            'AT': (write_ATvalue, None),
            'ST': (write_string, None),
            'OW': (write_OWvalue, None),

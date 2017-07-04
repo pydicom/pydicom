@@ -9,6 +9,7 @@
 import unittest
 from pydicom import dicomio
 import os.path
+import pydicom.charset
 
 test_dir = os.path.dirname(__file__)
 testcharset_dir = os.path.join(test_dir, 'charset_files')
@@ -33,6 +34,14 @@ class charsetTests(unittest.TestCase):
         got = ds.PatientName
         self.assertEqual(expected, got,
                          "Expected %r, got %r" % (expected, got))
+
+    def testEncodings(self):
+        test_string = u'Hello World'
+        for x in pydicom.charset.python_encoding.items():
+            try:
+                test_string.encode(x[1])
+            except LookupError as e:
+                self.fail(msg="DICOM term '%s' does not have a valid python encoding (was '%s')" % (x[0], x[1]))
 
     def testNestedCharacterSets(self):
         """charset: can read and decode SQ with different encodings........."""

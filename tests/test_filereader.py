@@ -6,13 +6,15 @@
 #    See the file license.txt included with this distribution, also
 #    available at https://github.com/darcymason/pydicom
 
-import sys
+import gzip
+from io import BytesIO
 import os
 import os.path
-import unittest
-from io import BytesIO
 import shutil
+import sys
 import tempfile
+import unittest
+from warncheck import assertWarns
 
 try:
     unittest.skipUnless
@@ -35,9 +37,15 @@ try:
     import numpy  # NOQA
 except:
     have_numpy = False
-from pydicom.filereader import read_file
+
+from pydicom.dataset import Dataset, FileDataset
+from pydicom.dataelem import DataElement
+from pydicom.filebase import DicomBytesIO
+from pydicom.filereader import read_file, data_element_generator
 from pydicom.errors import InvalidDicomError
+from pydicom.dataset import PropertyError
 from pydicom.tag import Tag, TupleTag
+from pydicom.uid import ImplicitVRLittleEndian
 import pydicom.valuerep
 import gzip
 
@@ -57,24 +65,26 @@ except ImportError:
     except ImportError:
         # Neither worked, so it's likely not installed.
         have_pillow = False
-# from warncheck import assertWarns
+
+    from warncheck import assertWarns
 
 test_dir = os.path.dirname(__file__)
 test_path = os.path.join(test_dir, 'test_files')
 # populate a dictionary with all dicom files, perhaps tests needs refactoring?
-dicom_filepaths = {
-    os.path.splitext(filename)[0]: os.path.join(test_path, filename)
-    for filename in os.listdir(test_path)
-    if os.path.splitext(filename)[1].endswith('dcm')
-}
+
+dicom_filepaths = {}
+for filename in os.listdir(test_path):
+    if os.path.splitext(filename)[1].endswith('dcm'):
+        dicom_filepaths[os.path.splitext(filename)[0]] = \
+            os.path.join(test_path, filename)
 
 empty_number_tags_name = os.path.join(
     test_path, "reportsi_with_empty_number_tags.dcm")
-
 rtplan_name = os.path.join(test_path, "rtplan.dcm")
 rtdose_name = os.path.join(test_path, "rtdose.dcm")
 ct_name = os.path.join(test_path, "CT_small.dcm")
 mr_name = os.path.join(test_path, "MR_small.dcm")
+truncated_mr_name = os.path.join(test_path, "MR_truncated.dcm")
 jpeg2000_name = os.path.join(test_path, "JPEG2000.dcm")
 jpeg2000_lossless_name = os.path.join(test_path, "MR_small_jp2klossless.dcm")
 jpeg_ls_lossless_name = os.path.join(test_path, "MR_small_jpeg_ls_lossless.dcm")
@@ -93,12 +103,13 @@ explicit_vr_le_no_meta = os.path.join(test_path, "ExplVR_LitEndNoMeta.dcm")
 explicit_vr_be_no_meta = os.path.join(test_path, "ExplVR_BigEndNoMeta.dcm")
 emri_name = os.path.join(test_path, "emri_small.dcm")
 emri_big_endian_name = os.path.join(test_path, "emri_small_big_endian.dcm")
-emri_jpeg_2k_lossless = os.path.join(test_path,
-                                     "emri_small_jpeg_2k_lossless.dcm")
-emri_jpeg_2k_lossless = os.path.join(test_path,
-                                     "emri_small_jpeg_2k_lossless.dcm")
+emri_jpeg_ls_lossless = os.path.join(
+    test_path, "emri_small_jpeg_ls_lossless.dcm")
+emri_jpeg_2k_lossless = os.path.join(
+    test_path, "emri_small_jpeg_2k_lossless.dcm")
 
 color_3d_jpeg_baseline = os.path.join(test_path, "color3d_jpeg_baseline.dcm")
+
 dir_name = os.path.dirname(sys.argv[0])
 save_dir = os.getcwd()
 
@@ -237,10 +248,6 @@ class ReaderTests(unittest.TestCase):
         # Also has no DICOM header ... so tests 'force' argument of read_file
 
         rtss = read_file(rtstruct_name, force=True)
-        expected = '1.2.840.10008.1.2'  # implVR little endian
-        got = rtss.file_meta.TransferSyntaxUID
-        msg = "Expected transfer syntax %r, got %r" % (expected, got)
-        self.assertEqual(expected, got, msg)
         frame_of_ref = rtss.ReferencedFrameOfReferenceSequence[0]
         study = frame_of_ref.RTReferencedStudySequence[0]
         uid = study.RTReferencedSeriesSequence[0].SeriesInstanceUID
@@ -319,6 +326,16 @@ class ReaderTests(unittest.TestCase):
         ctfull = read_file(ct_name)
         ctfull_tags = sorted(ctfull.keys())
         msg = "Tag list of partial CT read (except pixel tag and padding) did " \
+              "" \
+              "" \
+              "" \
+              "" \
+              "" \
+              "" \
+              "" \
+              "" \
+              "" \
+              "" \
               "" \
               "" \
               "" \
@@ -445,6 +462,334 @@ class ReaderTests(unittest.TestCase):
             pl_data = pl_data_ds.pixel_array
             self.assertTrue(numpy.all(px_data == pl_data))
 
+    def test_correct_ambiguous_vr(self):
+        """Test correcting ambiguous VR elements read from file"""
+        ds = Dataset()
+        ds.PixelRepresentation = 0
+        ds.add(DataElement(0x00280108, 'US', 10))
+        ds.add(DataElement(0x00280109, 'US', 500))
+
+        fp = BytesIO()
+        file_ds = FileDataset(fp, ds)
+        file_ds.is_implicit_VR = True
+        file_ds.is_little_endian = True
+        file_ds.save_as(fp)
+
+        ds = read_file(fp, force=True)
+        self.assertEqual(ds[0x00280108].VR, 'US')
+        self.assertEqual(ds.SmallestPixelValueInSeries, 10)
+
+    def test_correct_ambiguous_vr_compressed(self):
+        """Test correcting compressed Pixel Data read from file"""
+        # Create an implicit VR compressed dataset
+        ds = read_file(jpeg_lossless_name)
+        fp = BytesIO()
+        file_ds = FileDataset(fp, ds)
+        file_ds.is_implicit_VR = True
+        file_ds.is_little_endian = True
+        file_ds.save_as(fp)
+
+        ds = read_file(fp, force=True)
+        self.assertEqual(ds[0x7fe00010].VR, 'OB')
+
+    def test_long_specific_char_set(self):
+        """Test that specific character set is read even if it is longer than
+        defer_size"""
+        ds = Dataset()
+
+        long_specific_char_set_value = ['ISO 2022IR 100'] * 9
+        ds.add(DataElement(0x00080005, 'CS', long_specific_char_set_value))
+
+        fp = BytesIO()
+        file_ds = FileDataset(fp, ds)
+        file_ds.save_as(fp)
+
+        ds = read_file(fp, defer_size=65, force=True)
+        self.assertEqual(ds[0x00080005].value, long_specific_char_set_value)
+
+    def test_no_preamble_file_meta_dataset(self):
+        """Test correct read of group 2 elements with no preamble."""
+        bytestream = b'\x02\x00\x02\x00\x55\x49\x16\x00\x31\x2e\x32\x2e\x38' \
+                     b'\x34\x30\x2e\x31' \
+                     b'\x30\x30\x30\x38\x2e\x35\x2e\x31\x2e\x31\x2e\x39\x00' \
+                     b'\x02\x00\x10\x00' \
+                     b'\x55\x49\x12\x00\x31\x2e\x32\x2e\x38\x34\x30\x2e\x31' \
+                     b'\x30\x30\x30\x38' \
+                     b'\x2e\x31\x2e\x32\x00\x20\x20\x10\x00\x02\x00\x00\x00' \
+                     b'\x01\x00\x20\x20' \
+                     b'\x20\x00\x06\x00\x00\x00\x4e\x4f\x52\x4d\x41\x4c'
+
+        fp = BytesIO(bytestream)
+        ds = read_file(fp, force=True)
+        self.assertTrue('MediaStorageSOPClassUID' in ds.file_meta)
+        self.assertEqual(ds.file_meta.TransferSyntaxUID, ImplicitVRLittleEndian)
+        self.assertEqual(ds.Polarity, 'NORMAL')
+        self.assertEqual(ds.ImageBoxPosition, 1)
+
+    def test_no_preamble_command_group_dataset(self):
+        """Test correct read of group 0 and 2 elements with no preamble."""
+        bytestream = b'\x02\x00\x02\x00\x55\x49\x16\x00\x31\x2e\x32\x2e\x38' \
+                     b'\x34\x30\x2e\x31' \
+                     b'\x30\x30\x30\x38\x2e\x35\x2e\x31\x2e\x31\x2e\x39\x00' \
+                     b'\x02\x00\x10\x00' \
+                     b'\x55\x49\x12\x00\x31\x2e\x32\x2e\x38\x34\x30\x2e\x31' \
+                     b'\x30\x30\x30\x38' \
+                     b'\x2e\x31\x2e\x32\x00' \
+                     b'\x20\x20\x10\x00\x02\x00\x00\x00\x01\x00\x20\x20' \
+                     b'\x20\x00\x06\x00\x00\x00\x4e\x4f\x52\x4d\x41\x4c' \
+                     b'\x00\x00\x10\x01\x02\x00\x00\x00\x03\x00'
+
+        fp = BytesIO(bytestream)
+        ds = read_file(fp, force=True)
+        self.assertTrue('MediaStorageSOPClassUID' in ds.file_meta)
+        self.assertEqual(ds.file_meta.TransferSyntaxUID, ImplicitVRLittleEndian)
+        self.assertEqual(ds.Polarity, 'NORMAL')
+        self.assertEqual(ds.ImageBoxPosition, 1)
+        self.assertEqual(ds.MessageID, 3)
+
+    def test_group_length_wrong(self):
+        """Test file is read correctly even if FileMetaInformationGroupLength
+        is incorrect."""
+        bytestream = b'\x02\x00\x00\x00\x55\x4C\x04\x00\x0A\x00\x00\x00' \
+                     b'\x02\x00\x02\x00\x55\x49\x16\x00\x31\x2e\x32\x2e\x38' \
+                     b'\x34\x30\x2e\x31' \
+                     b'\x30\x30\x30\x38\x2e\x35\x2e\x31\x2e\x31\x2e\x39\x00' \
+                     b'\x02\x00\x10\x00' \
+                     b'\x55\x49\x12\x00\x31\x2e\x32\x2e\x38\x34\x30\x2e\x31' \
+                     b'\x30\x30\x30\x38' \
+                     b'\x2e\x31\x2e\x32\x00' \
+                     b'\x20\x20\x10\x00\x02\x00\x00\x00\x01\x00\x20\x20' \
+                     b'\x20\x00\x06\x00\x00\x00\x4e\x4f\x52\x4d\x41\x4c'
+        fp = BytesIO(bytestream)
+        ds = read_file(fp, force=True)
+        self.assertFalse(
+            len(bytestream) - 12 == ds.file_meta.FileMetaInformationGroupLength)
+        self.assertTrue(ds.file_meta.FileMetaInformationGroupLength == 10)
+        self.assertTrue('MediaStorageSOPClassUID' in ds.file_meta)
+        self.assertEqual(ds.file_meta.TransferSyntaxUID, ImplicitVRLittleEndian)
+        self.assertEqual(ds.Polarity, 'NORMAL')
+        self.assertEqual(ds.ImageBoxPosition, 1)
+
+    def test_preamble_command_meta_no_dataset(self):
+        """Test reading only preamble, command and meta elements"""
+        preamble = b'\x00' * 128
+        prefix = b'DICM'
+        command = b'\x00\x00\x00\x00\x04\x00\x00\x00\x38' \
+                  b'\x00\x00\x00\x00\x00\x02\x00\x12\x00\x00' \
+                  b'\x00\x31\x2e\x32\x2e\x38\x34\x30\x2e\x31' \
+                  b'\x30\x30\x30\x38\x2e\x31\x2e\x31\x00\x00' \
+                  b'\x00\x00\x01\x02\x00\x00\x00\x30\x00\x00' \
+                  b'\x00\x10\x01\x02\x00\x00\x00\x07\x00\x00' \
+                  b'\x00\x00\x08\x02\x00\x00\x00\x01\x01'
+        meta = b'\x02\x00\x00\x00\x55\x4C\x04\x00\x0A\x00\x00\x00' \
+               b'\x02\x00\x02\x00\x55\x49\x16\x00\x31\x2e\x32\x2e\x38\x34\x30' \
+               b'\x2e\x31' \
+               b'\x30\x30\x30\x38\x2e\x35\x2e\x31\x2e\x31\x2e\x39\x00\x02\x00' \
+               b'\x10\x00' \
+               b'\x55\x49\x12\x00\x31\x2e\x32\x2e\x38\x34\x30\x2e\x31\x30\x30' \
+               b'\x30\x38' \
+               b'\x2e\x31\x2e\x32\x00'
+
+        bytestream = preamble + prefix + meta + command
+        fp = BytesIO(bytestream)
+        ds = read_file(fp, force=True)
+        self.assertTrue('TransferSyntaxUID' in ds.file_meta)
+        self.assertTrue('MessageID' in ds)
+
+    def test_preamble_meta_no_dataset(self):
+        """Test reading only preamble and meta elements"""
+        preamble = b'\x00' * 128
+        prefix = b'DICM'
+        meta = b'\x02\x00\x00\x00\x55\x4C\x04\x00\x0A\x00\x00\x00' \
+               b'\x02\x00\x02\x00\x55\x49\x16\x00\x31\x2e\x32\x2e\x38\x34\x30' \
+               b'\x2e\x31' \
+               b'\x30\x30\x30\x38\x2e\x35\x2e\x31\x2e\x31\x2e\x39\x00\x02\x00' \
+               b'\x10\x00' \
+               b'\x55\x49\x12\x00\x31\x2e\x32\x2e\x38\x34\x30\x2e\x31\x30\x30' \
+               b'\x30\x38' \
+               b'\x2e\x31\x2e\x32\x00'
+
+        bytestream = preamble + prefix + meta
+        fp = BytesIO(bytestream)
+        ds = read_file(fp, force=True)
+        self.assertEqual(ds.preamble, b'\x00' * 128)
+        self.assertTrue('TransferSyntaxUID' in ds.file_meta)
+        self.assertEqual(ds[:], Dataset())
+
+    def test_preamble_commandset_no_dataset(self):
+        """Test reading only preamble and command set"""
+        preamble = b'\x00' * 128
+        prefix = b'DICM'
+        command = b'\x00\x00\x00\x00\x04\x00\x00\x00\x38' \
+                  b'\x00\x00\x00\x00\x00\x02\x00\x12\x00\x00' \
+                  b'\x00\x31\x2e\x32\x2e\x38\x34\x30\x2e\x31' \
+                  b'\x30\x30\x30\x38\x2e\x31\x2e\x31\x00\x00' \
+                  b'\x00\x00\x01\x02\x00\x00\x00\x30\x00\x00' \
+                  b'\x00\x10\x01\x02\x00\x00\x00\x07\x00\x00' \
+                  b'\x00\x00\x08\x02\x00\x00\x00\x01\x01'
+        bytestream = preamble + prefix + command
+
+        fp = BytesIO(bytestream)
+        ds = read_file(fp, force=True)
+        self.assertTrue('MessageID' in ds)
+        self.assertEqual(ds.file_meta, Dataset())
+
+    def test_meta_no_dataset(self):
+        """Test reading only meta elements"""
+        bytestream = b'\x02\x00\x00\x00\x55\x4C\x04\x00\x0A\x00\x00\x00' \
+                     b'\x02\x00\x02\x00\x55\x49\x16\x00\x31\x2e\x32\x2e\x38' \
+                     b'\x34\x30\x2e\x31' \
+                     b'\x30\x30\x30\x38\x2e\x35\x2e\x31\x2e\x31\x2e\x39\x00' \
+                     b'\x02\x00\x10\x00' \
+                     b'\x55\x49\x12\x00\x31\x2e\x32\x2e\x38\x34\x30\x2e\x31' \
+                     b'\x30\x30\x30\x38' \
+                     b'\x2e\x31\x2e\x32\x00'
+        fp = BytesIO(bytestream)
+        ds = read_file(fp, force=True)
+        self.assertTrue('TransferSyntaxUID' in ds.file_meta)
+        self.assertEqual(ds[:], Dataset())
+
+    def test_commandset_no_dataset(self):
+        """Test reading only command set elements"""
+        bytestream = b'\x00\x00\x00\x00\x04\x00\x00\x00\x38' \
+                     b'\x00\x00\x00\x00\x00\x02\x00\x12\x00\x00' \
+                     b'\x00\x31\x2e\x32\x2e\x38\x34\x30\x2e\x31' \
+                     b'\x30\x30\x30\x38\x2e\x31\x2e\x31\x00\x00' \
+                     b'\x00\x00\x01\x02\x00\x00\x00\x30\x00\x00' \
+                     b'\x00\x10\x01\x02\x00\x00\x00\x07\x00\x00' \
+                     b'\x00\x00\x08\x02\x00\x00\x00\x01\x01'
+        fp = BytesIO(bytestream)
+        ds = read_file(fp, force=True)
+        self.assertTrue('MessageID' in ds)
+        self.assertTrue(ds.preamble is None)
+        self.assertEqual(ds.file_meta, Dataset())
+
+    def test_no_dataset(self):
+        """Test reading no elements or preamble produces empty Dataset"""
+        bytestream = b''
+        fp = BytesIO(bytestream)
+        ds = read_file(fp, force=True)
+        self.assertTrue(ds.preamble is None)
+        self.assertEqual(ds.file_meta, Dataset())
+        self.assertEqual(ds[:], Dataset())
+
+
+class ReadDataElementTests(unittest.TestCase):
+    def setUp(self):
+        ds = Dataset()
+        ds.DoubleFloatPixelData = b'\x00\x01\x02\x03\x04\x05\x06\x07' \
+                                  b'\x01\x01\x02\x03\x04\x05\x06\x07'  # VR
+        # of OD
+        ds.SelectorOLValue = b'\x00\x01\x02\x03\x04\x05\x06\x07' \
+                             b'\x01\x01\x02\x03'  # VR of OL
+        ds.PotentialReasonsForProcedure = ['A', 'B',
+                                           'C']  # VR of UC, odd length
+        ds.StrainDescription = 'Test'  # Even length
+        ds.URNCodeValue = 'http://test.com'  # VR of UR
+        ds.RetrieveURL = 'ftp://test.com  '  # Test trailing spaces ignored
+        ds.DestinationAE = '    TEST  12    '  # 16 characters max for AE
+
+        self.fp = BytesIO()  # Implicit little
+        file_ds = FileDataset(self.fp, ds)
+        file_ds.is_implicit_VR = True
+        file_ds.is_little_endian = True
+        file_ds.save_as(self.fp)
+
+        self.fp_ex = BytesIO()  # Explicit little
+        file_ds = FileDataset(self.fp_ex, ds)
+        file_ds.is_implicit_VR = False
+        file_ds.is_little_endian = True
+        file_ds.save_as(self.fp_ex)
+
+    def test_read_OD_implicit_little(self):
+        """Check creation of OD DataElement from byte data works correctly."""
+        ds = read_file(self.fp, force=True)
+        ref_elem = ds.get(0x7fe00009)
+        elem = DataElement(0x7fe00009, 'OD',
+                           b'\x00\x01\x02\x03\x04\x05\x06\x07' \
+                           b'\x01\x01\x02\x03\x04\x05\x06\x07')
+        self.assertEqual(ref_elem, elem)
+
+    def test_read_OD_explicit_little(self):
+        """Check creation of OD DataElement from byte data works correctly."""
+        ds = read_file(self.fp_ex, force=True)
+        ref_elem = ds.get(0x7fe00009)
+        elem = DataElement(0x7fe00009, 'OD',
+                           b'\x00\x01\x02\x03\x04\x05\x06\x07' \
+                           b'\x01\x01\x02\x03\x04\x05\x06\x07')
+        self.assertEqual(ref_elem, elem)
+
+    def test_read_OL_implicit_little(self):
+        """Check creation of OL DataElement from byte data works correctly."""
+        ds = read_file(self.fp, force=True)
+        ref_elem = ds.get(0x00720075)
+        elem = DataElement(0x00720075, 'OL',
+                           b'\x00\x01\x02\x03\x04\x05\x06\x07' \
+                           b'\x01\x01\x02\x03')
+        self.assertEqual(ref_elem, elem)
+
+    def test_read_OL_explicit_little(self):
+        """Check creation of OL DataElement from byte data works correctly."""
+        ds = read_file(self.fp_ex, force=True)
+        ref_elem = ds.get(0x00720075)
+        elem = DataElement(0x00720075, 'OL',
+                           b'\x00\x01\x02\x03\x04\x05\x06\x07' \
+                           b'\x01\x01\x02\x03')
+        self.assertEqual(ref_elem, elem)
+
+    def test_read_UC_implicit_little(self):
+        """Check creation of DataElement from byte data works correctly."""
+        ds = read_file(self.fp, force=True)
+        ref_elem = ds.get(0x00189908)
+        elem = DataElement(0x00189908, 'UC', ['A', 'B', 'C'])
+        self.assertEqual(ref_elem, elem)
+
+        ds = read_file(self.fp, force=True)
+        ref_elem = ds.get(0x00100212)
+        elem = DataElement(0x00100212, 'UC', 'Test')
+        self.assertEqual(ref_elem, elem)
+
+    def test_read_UC_explicit_little(self):
+        """Check creation of DataElement from byte data works correctly."""
+        ds = read_file(self.fp_ex, force=True)
+        ref_elem = ds.get(0x00189908)
+        elem = DataElement(0x00189908, 'UC', ['A', 'B', 'C'])
+        self.assertEqual(ref_elem, elem)
+
+        ds = read_file(self.fp_ex, force=True)
+        ref_elem = ds.get(0x00100212)
+        elem = DataElement(0x00100212, 'UC', 'Test')
+        self.assertEqual(ref_elem, elem)
+
+    def test_read_UR_implicit_little(self):
+        """Check creation of DataElement from byte data works correctly."""
+        ds = read_file(self.fp, force=True)
+        ref_elem = ds.get(0x00080120)  # URNCodeValue
+        elem = DataElement(0x00080120, 'UR', 'http://test.com')
+        self.assertEqual(ref_elem, elem)
+
+        # Test trailing spaces ignored
+        ref_elem = ds.get(0x00081190)  # RetrieveURL
+        elem = DataElement(0x00081190, 'UR', 'ftp://test.com')
+        self.assertEqual(ref_elem, elem)
+
+    def test_read_UR_explicit_little(self):
+        """Check creation of DataElement from byte data works correctly."""
+        ds = read_file(self.fp_ex, force=True)
+        ref_elem = ds.get(0x00080120)  # URNCodeValue
+        elem = DataElement(0x00080120, 'UR', 'http://test.com')
+        self.assertEqual(ref_elem, elem)
+
+        # Test trailing spaces ignored
+        ref_elem = ds.get(0x00081190)  # RetrieveURL
+        elem = DataElement(0x00081190, 'UR', 'ftp://test.com')
+        self.assertEqual(ref_elem, elem)
+
+    def test_read_AE(self):
+        """Check creation of AE DataElement from byte data works correctly."""
+        ds = read_file(self.fp, force=True)
+        self.assertEqual(ds.DestinationAE, 'TEST  12')
+
 
 class JPEG_LS_Tests(unittest.TestCase):
     def setUp(self):
@@ -463,8 +808,8 @@ class JPEG_LS_Tests(unittest.TestCase):
                              "1})".format(
                                  b.mean(), a.mean()))
         else:
-            self.assertRaises(ImportError,
-                              self.jpeg_ls_lossless._get_pixel_array)
+            self.assertRaises(
+                NotImplementedError, self.jpeg_ls_lossless._get_pixel_array)
 
     def test_emri_JPEG_LS_PixelArray(self):
         """JPEG LS Lossless: Now works"""
@@ -476,8 +821,9 @@ class JPEG_LS_Tests(unittest.TestCase):
                              "1})".format(
                                  b.mean(), a.mean()))
         else:
-            self.assertRaises(ImportError,
-                              self.emri_jpeg_ls_lossless._get_pixel_array)
+            self.assertRaises(
+                NotImplementedError,
+                self.emri_jpeg_ls_lossless._get_pixel_array)
 
 
 class BigEndian_Tests(unittest.TestCase):
@@ -510,45 +856,45 @@ class JPEG2000Tests(unittest.TestCase):
     def testJPEG2000(self):
         """JPEG2000: Returns correct values for sample data
         elements............"""
-        expected = [Tag(0x0054, 0x0010), Tag(0x0054,
-                                             0x0020)]  # XX also tests
+        expected = [Tag(0x0054, 0x0010), Tag(0x0054, 0x0020)]  # XX also tests
         # multiple-valued AT data element
         got = self.jpeg.FrameIncrementPointer
-        self.assertEqual(got, expected,
-                         "JPEG2000 file, Frame Increment Pointer: expected "
-                         "%s, got %s" % (
-                             expected, got))
+        self.assertEqual(
+            got, expected,
+            "JPEG2000 file, Frame Increment Pointer: expected %s, got %s" % (
+                expected, got))
 
         got = self.jpeg.DerivationCodeSequence[0].CodeMeaning
         expected = 'Lossy Compression'
-        self.assertEqual(got, expected,
-                         "JPEG200 file, Code Meaning got %s, expected %s" % (
-                             got, expected))
+        self.assertEqual(
+            got, expected,
+            "JPEG200 file, Code Meaning got %s, expected %s" % (got, expected))
 
     def testJPEG2000PixelArray(self):
         """JPEG2000: Now works"""
         if have_numpy and have_pillow:
             a = self.jpegls.pixel_array
             b = self.mr_small.pixel_array
-            self.assertEqual(a.mean(), b.mean(),
-                             "Decoded pixel data is not all {0} (mean == {"
-                             "1})".format(
-                                 b.mean(), a.mean()))
+            self.assertEqual(
+                a.mean(), b.mean(),
+                "Decoded pixel data is not all {0} (mean == {1})".format(
+                    b.mean(), a.mean()))
         else:
-            self.assertRaises(ImportError, self.jpegls._get_pixel_array)
+            self.assertRaises(NotImplementedError, self.jpegls._get_pixel_array)
 
     def test_emri_JPEG2000PixelArray(self):
         """JPEG2000: Now works"""
         if have_numpy and have_pillow:
             a = self.emri_jpeg_2k_lossless.pixel_array
             b = self.emri_small.pixel_array
-            self.assertEqual(a.mean(), b.mean(),
-                             "Decoded pixel data is not all {0} (mean == {"
-                             "1})".format(
-                                 b.mean(), a.mean()))
+            self.assertEqual(
+                a.mean(), b.mean(),
+                "Decoded pixel data is not all {0} (mean == {1})".format(
+                    b.mean(), a.mean()))
         else:
-            self.assertRaises(ImportError,
-                              self.emri_jpeg_2k_lossless._get_pixel_array)
+            self.assertRaises(
+                NotImplementedError,
+                self.emri_jpeg_2k_lossless._get_pixel_array)
 
 
 class JPEGlossyTests(unittest.TestCase):
@@ -571,7 +917,7 @@ class JPEGlossyTests(unittest.TestCase):
         if have_pillow and have_numpy:
             self.assertRaises(NotImplementedError, self.jpeg._get_pixel_array)
         else:
-            self.assertRaises(ImportError, self.jpeg._get_pixel_array)
+            self.assertRaises(NotImplementedError, self.jpeg._get_pixel_array)
 
     def testJPEGBaselineColor3DPixelArray(self):
         if have_pillow and have_numpy:
@@ -581,7 +927,8 @@ class JPEGlossyTests(unittest.TestCase):
             self.assertEqual(tuple(a[3, 159, 290, :]), (41, 41, 41))
             self.assertEqual(tuple(a[3, 169, 290, :]), (57, 57, 57))
         else:
-            self.assertRaises(ImportError, self.color_3d_jpeg._get_pixel_array)
+            self.assertRaises(NotImplementedError,
+                              self.color_3d_jpeg._get_pixel_array)
 
 
 class JPEGlosslessTests(unittest.TestCase):
@@ -677,6 +1024,30 @@ class DeferredReadTests(unittest.TestCase):
     def tearDown(self):
         if os.path.exists(self.testfile_name):
             os.remove(self.testfile_name)
+
+
+class ReadTruncatedFileTests(unittest.TestCase):
+    def testReadFileWithMissingPixelData(self):
+        mr = read_file(truncated_mr_name)
+        mr.decode()
+        self.assertEqual(mr.PatientName, 'CompressedSamples^MR1',
+                         "Wrong patient name")
+        self.assertEqual(mr.PatientName, mr[0x10, 0x10].value,
+                         "Name does not match value found when accessed by "
+                         "tag number")
+        got = mr.PixelSpacing
+        DS = pydicom.valuerep.DS
+        expected = [DS('0.3125'), DS('0.3125')]
+        self.assertTrue(got == expected, "Wrong pixel spacing")
+
+    @unittest.skipUnless(have_numpy, "Numpy not installed")
+    def testReadFileWithMissingPixelDataArray(self):
+        mr = read_file(truncated_mr_name)
+        mr.decode()
+        with self.assertRaisesRegexp(
+                AttributeError,
+                "Amount of pixel data.*does not match the expected data"):
+            mr.pixel_array
 
 
 class FileLikeTests(unittest.TestCase):

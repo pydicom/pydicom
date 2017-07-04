@@ -8,10 +8,11 @@
 # Many tests of DataElement class are implied in test_dataset also
 
 import unittest
+
 from pydicom.dataelem import DataElement
 from pydicom.dataelem import RawDataElement, DataElement_from_raw
-from pydicom.tag import Tag
 from pydicom.dataset import Dataset
+from pydicom.tag import Tag
 from pydicom.uid import UID
 
 
@@ -52,17 +53,148 @@ class DataElementTests(unittest.TestCase):
         ds.TransferSyntaxUID += ".4.5.6"
         self.assertTrue(isinstance(ds.TransferSyntaxUID, UID),
                         "+= to UID did not keep as UID class")
-                        
+
     def testKeyword(self):
         """DataElement: return correct keyword"""
         self.assertEqual(self.data_elementCommand.keyword, 'CommandGroupLength')
         self.assertEqual(self.data_elementPrivate.keyword, '')
-    
+
     def testRetired(self):
         """DataElement: return correct is_retired"""
         self.assertEqual(self.data_elementCommand.is_retired, False)
         self.assertEqual(self.data_elementRetired.is_retired, True)
         self.assertEqual(self.data_elementPrivate.is_retired, False)
+
+    def testEqualityStandardElement(self):
+        """DataElement: equality returns correct value for simple elements"""
+        dd = DataElement(0x00100010, 'PN', 'ANON')
+        self.assertTrue(dd == dd)
+        ee = DataElement(0x00100010, 'PN', 'ANON')
+        self.assertTrue(dd == ee)
+
+        # Check value
+        ee.value = 'ANAN'
+        self.assertFalse(dd == ee)
+
+        # Check tag
+        ee = DataElement(0x00100011, 'PN', 'ANON')
+        self.assertFalse(dd == ee)
+
+        # Check VR
+        ee = DataElement(0x00100010, 'SH', 'ANON')
+        self.assertFalse(dd == ee)
+
+        dd = DataElement(0x00080018, 'UI', '1.2.3.4')
+        ee = DataElement(0x00080018, 'UI', '1.2.3.4')
+        self.assertTrue(dd == ee)
+
+        ee = DataElement(0x00080018, 'PN', '1.2.3.4')
+        self.assertFalse(dd == ee)
+
+    def testEqualityPrivateElement(self):
+        """DataElement: equality returns correct value for private elements"""
+        dd = DataElement(0x01110001, 'PN', 'ANON')
+        self.assertTrue(dd == dd)
+        ee = DataElement(0x01110001, 'PN', 'ANON')
+        self.assertTrue(dd == ee)
+
+        # Check value
+        ee.value = 'ANAN'
+        self.assertFalse(dd == ee)
+
+        # Check tag
+        ee = DataElement(0x01110002, 'PN', 'ANON')
+        self.assertFalse(dd == ee)
+
+        # Check VR
+        ee = DataElement(0x01110001, 'SH', 'ANON')
+        self.assertFalse(dd == ee)
+
+    def testEqualitySequenceElement(self):
+        """DataElement: equality returns correct value for sequence elements"""
+        dd = DataElement(0x300A00B0, 'SQ', [])
+        self.assertTrue(dd == dd)
+        ee = DataElement(0x300A00B0, 'SQ', [])
+        self.assertTrue(dd == ee)
+
+        # Check value
+        e = Dataset()
+        e.PatientName = 'ANON'
+        ee.value = [e]
+        self.assertFalse(dd == ee)
+
+        # Check tag
+        ee = DataElement(0x01110002, 'SQ', [])
+        self.assertFalse(dd == ee)
+
+        # Check VR
+        ee = DataElement(0x300A00B0, 'SH', [])
+        self.assertFalse(dd == ee)
+
+        # Check with dataset
+        dd = DataElement(0x300A00B0, 'SQ', [Dataset()])
+        dd.value[0].PatientName = 'ANON'
+        ee = DataElement(0x300A00B0, 'SQ', [Dataset()])
+        ee.value[0].PatientName = 'ANON'
+        self.assertTrue(dd == ee)
+
+        # Check uneven sequences
+        dd.value.append(Dataset())
+        dd.value[1].PatientName = 'ANON'
+        self.assertFalse(dd == ee)
+
+        ee.value.append(Dataset())
+        ee.value[1].PatientName = 'ANON'
+        self.assertTrue(dd == ee)
+        ee.value.append(Dataset())
+        ee.value[2].PatientName = 'ANON'
+        self.assertFalse(dd == ee)
+
+    def testEqualityNotElement(self):
+        """DataElement: equality returns correct value when not same class"""
+        dd = DataElement(0x00100010, 'PN', 'ANON')
+        ee = {'0x00100010' : 'ANON'}
+        self.assertFalse(dd == ee)
+
+    def testEqualityInheritance(self):
+        """DataElement: equality returns correct value for subclasses"""
+
+        class DataElementPlus(DataElement):
+            pass
+
+        dd = DataElement(0x00100010, 'PN', 'ANON')
+        ee = DataElementPlus(0x00100010, 'PN', 'ANON')
+        self.assertTrue(ee == ee)
+        self.assertTrue(dd == ee)
+        self.assertTrue(ee == dd)
+
+        ee = DataElementPlus(0x00100010, 'PN', 'ANONY')
+        self.assertFalse(dd == ee)
+        self.assertFalse(ee == dd)
+
+    def test_equality_class_members(self):
+        """Test equality is correct when ignored class members differ."""
+        dd = DataElement(0x00100010, 'PN', 'ANON')
+        dd.showVR = False
+        dd.file_tell = 10
+        dd.maxBytesToDisplay = 0
+        dd.descripWidth = 0
+        ee = DataElement(0x00100010, 'PN', 'ANON')
+        self.assertTrue(dd == ee)
+
+    def testHash(self):
+        """DataElement: hash returns TypeErrpr"""
+        dd = DataElement(0x00100010, 'PN', 'ANON')
+
+        def test_hash():
+            hash(dd)
+
+        self.assertRaises(TypeError, test_hash)
+
+    def test_repeater_str(self):
+        """Test a repeater group element displays the element name."""
+        elem = DataElement(0x60023000, 'OB', b'\x00')
+        self.assertTrue('Overlay Data' in elem.__str__())
 
 
 class RawDataElementTests(unittest.TestCase):

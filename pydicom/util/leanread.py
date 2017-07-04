@@ -55,8 +55,8 @@ class dicomfile(object):
         # Continue to yield elements from the main data
         if transfer_syntax_uid:
             if transfer_syntax_uid.endswith(b' ') or \
-                transfer_syntax_uid.endswith(b'\0'):
-                    transfer_syntax_uid = transfer_syntax_uid[:-1]
+                    transfer_syntax_uid.endswith(b'\0'):
+                transfer_syntax_uid = transfer_syntax_uid[:-1]
             is_implicit_VR, is_little_endian = transfer_syntax(transfer_syntax_uid)
             # print is_implicit_VR
         else:
@@ -164,7 +164,7 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian,
             #   identified as a Sequence
             if VR is None:
                 try:
-                    VR = dictionaryVR(tag)
+                    VR = dictionary_VR(tag)
                 except KeyError:
                     # Look ahead to see if it consists of items and is thus a SQ
                     next_tag = TupleTag(unpack(endian_chr + "HH", fp_read(4)))
