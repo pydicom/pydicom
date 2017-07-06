@@ -14,7 +14,7 @@ import shutil
 import sys
 import tempfile
 import unittest
-from warncheck import assertWarns
+from .warncheck import assertWarns
 
 try:
     unittest.skipUnless
