@@ -800,7 +800,7 @@ class ScratchWriteTests(unittest.TestCase):
 
     def testImpl_LE_deflen_write(self):
         """Scratch Write for implicit VR little endian, defined length SQ's"""
-        from _write_stds import impl_LE_deflen_std_hex as std
+        from ._write_stds import impl_LE_deflen_std_hex as std
 
         file_ds = FileDataset("test", self.ds)
         self.compare_write(std, file_ds)
