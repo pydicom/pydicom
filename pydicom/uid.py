@@ -119,6 +119,14 @@ class UID(str):
     def __ne__(self, other):
         return not self == other
 
+    @property
+    def is_private(self):
+        """Return True if the UID isn't an officially registered DICOM UID."""
+        if '1.2.840.10008' == self[:13]:
+            return False
+
+        return True
+
     def is_valid(self):
         '''
         Raise an exception is the UID is invalid

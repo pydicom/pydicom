@@ -22,9 +22,6 @@ class DicomIO(object):
     def __init__(self, *args, **kwargs):
         self._implicit_VR = True   # start with this by default
 
-    def __del__(self):
-        self.close()
-
     def read_le_tag(self):
         """Read and return two unsigned shorts (little endian) from the file."""
         bytes_read = self.read(4)
