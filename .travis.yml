@@ -1,15 +1,7 @@
 language: python
 python:
-    - 2.6
-    - 2.7
-#    - 3.2
-    - 3.3
-    - 3.4
-    - 3.5
-    - 3.6
-    - 3.6.0b2
-    - pypy
-    - pypy3.3-5.2-alpha1
+    # - 2.7
+    - 3.6.1
 
 env:
     # Ensure that pydicom functions with/without numpy
@@ -25,7 +17,8 @@ install:
     - python setup.py install
 
 script:
-    - coverage run -m tests.run_tests
+    # - coverage run -m tests.run_tests
+    pytest
 
 after_success:
     - coveralls
