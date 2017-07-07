@@ -66,8 +66,8 @@ except ImportError:
         have_pillow = False
 
 
-test_dir = os.path.dirname(__file__)
-test_files = os.path.join(test_dir, 'test_files')
+test_dir, _ = os.path.split(os.path.dirname(__file__))
+test_files = os.path.join(test_dir, 'datasets/data/')
 
 empty_number_tags_name = os.path.join(test_files, "reportsi_with_empty_number_tags.dcm")
 rtplan_name = os.path.join(test_files, "rtplan.dcm")
@@ -861,6 +861,7 @@ class DeferredReadTests(unittest.TestCase):
             tag = data_elem.tag
             self.assertEqual(data_elem.value, ds_defer[tag].value, "Mismatched value for tag %r" % tag)
 
+    # @pytest.mark.skip(reason="unifinished refactoring")
     def testZippedDeferred(self):
         """Deferred values from a gzipped file works.............."""
         # Arose from issue 103 "Error for defer_size read of gzip file object"

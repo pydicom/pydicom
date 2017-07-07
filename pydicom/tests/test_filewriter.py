@@ -40,9 +40,9 @@ from pydicom.uid import ImplicitVRLittleEndian, ExplicitVRBigEndian
 from pydicom.util.hexutil import hex2bytes, bytes2hex
 from pydicom.valuerep import DA, DT, TM
 
-test_dir = os.path.dirname(__file__)
-test_files = os.path.join(test_dir, 'test_files')
-testcharset_dir = os.path.join(test_dir, 'charset_files')
+test_dir, _ = os.path.split(os.path.dirname(__file__))
+test_files = os.path.join(test_dir, 'datasets/data/')
+testcharset_dir = os.path.join(test_dir, 'tests/charset_files')
 
 rtplan_name = os.path.join(test_files, "rtplan.dcm")
 rtdose_name = os.path.join(test_files, "rtdose.dcm")

@@ -756,8 +756,9 @@ class DatasetElementsTests(unittest.TestCase):
 
 class FileDatasetTests(unittest.TestCase):
     def setUp(self):
-        test_dir = os.path.dirname(__file__)
-        self.test_file = os.path.join(test_dir, 'test_files', 'CT_small.dcm')
+        test_dir, _ = os.path.split(os.path.dirname(__file__))
+        test_files = os.path.join(test_dir, 'datasets/data/')
+        self.test_file = os.path.join(test_files, 'CT_small.dcm')
 
     def testEqualityFileMeta(self):
         """Dataset: equality returns correct value if with metadata"""
