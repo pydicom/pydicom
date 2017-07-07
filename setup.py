@@ -11,7 +11,6 @@ setup(
     name="pydicom",
     packages=['pydicom',
               'pydicom.contrib',
-              'pydicom.examples',
               'pydicom.util'],
     include_package_data=True,
     version="1.0.0a1",
