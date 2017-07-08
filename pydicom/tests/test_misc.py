@@ -5,7 +5,10 @@ import os.path as osp
 
 from pydicom.misc import is_dicom
 
-test_file = osp.join(osp.dirname(osp.abspath(__file__)), 'test_files', 'CT_small.dcm')
+
+test_dir, _ = osp.split(osp.dirname(__file__))
+test_files = osp.join(test_dir, 'datasets/data/')
+test_file = osp.join(test_files, 'CT_small.dcm')
 
 class Test_Misc(unittest.TestCase):
 

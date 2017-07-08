@@ -40,9 +40,9 @@ from pydicom.uid import ImplicitVRLittleEndian, ExplicitVRBigEndian
 from pydicom.util.hexutil import hex2bytes, bytes2hex
 from pydicom.valuerep import DA, DT, TM
 
-test_dir = os.path.dirname(__file__)
-test_files = os.path.join(test_dir, 'test_files')
-testcharset_dir = os.path.join(test_dir, 'charset_files')
+test_dir, _ = os.path.split(os.path.dirname(__file__))
+test_files = os.path.join(test_dir, 'datasets/data/')
+testcharset_dir = os.path.join(test_dir, 'tests/charset_files')
 
 rtplan_name = os.path.join(test_files, "rtplan.dcm")
 rtdose_name = os.path.join(test_files, "rtdose.dcm")
@@ -800,7 +800,7 @@ class ScratchWriteTests(unittest.TestCase):
 
     def testImpl_LE_deflen_write(self):
         """Scratch Write for implicit VR little endian, defined length SQ's"""
-        from _write_stds import impl_LE_deflen_std_hex as std
+        from ._write_stds import impl_LE_deflen_std_hex as std
 
         file_ds = FileDataset("test", self.ds)
         self.compare_write(std, file_ds)

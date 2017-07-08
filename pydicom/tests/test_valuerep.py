@@ -42,8 +42,8 @@ except ImportError:
     import pickle
 import os
 
-test_dir = os.path.dirname(__file__)
-test_files = os.path.join(test_dir, 'test_files')
+test_dir, _ = os.path.split(os.path.dirname(__file__))
+test_files = os.path.join(test_dir, 'datasets/data/')
 badvr_name = os.path.join(test_files, "badVR.dcm")
 default_encoding = 'iso8859'
 
