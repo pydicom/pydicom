@@ -5,7 +5,7 @@ machine:
     USERNAME: "glemaitre"
 
     # The repository where the documentation will be hosted
-    DOC_REPO: "pydicom"
+    DOC_REPO: "pydicom.github.io"
 
     # The base URL for the Github page where the documentation will be hosted
     DOC_URL: ""
