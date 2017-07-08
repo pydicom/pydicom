@@ -1,0 +1,176 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Working with Pixel Data &#8212; pydicom 1.0a documentation</title>
+    
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0a',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Viewing Images" href="viewing_images.html" />
+    <link rel="prev" title="Transition to pydicom 1.x" href="transition_to_pydicom1.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="viewing_images.html" title="Viewing Images"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="transition_to_pydicom1.html" title="Transition to pydicom 1.x"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">pydicom 1.0a documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="working-with-pixel-data">
+<span id="id1"></span><h1>Working with Pixel Data<a class="headerlink" href="#working-with-pixel-data" title="Permalink to this headline">¶</a></h1>
+<p class="rubric">How to work with pixel data in pydicom.</p>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>pydicom tends to be &#8220;lazy&#8221; in interpreting DICOM data. For example,
+by default it doesn&#8217;t do anything with pixel data
+except read in the raw bytes:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">dicom</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">=</span><span class="n">dicom</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="s2">&quot;MR_small.dcm&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span>
+<span class="go">&#39;\x89\x03\xfb\x03\xcb\x04\xeb\x04\xf9\x02\x94\x01\x7f ...</span>
+<span class="gp">...</span>
+</pre></div>
+</div>
+<p><code class="docutils literal"><span class="pre">PixelData</span></code> contains the raw bytes exactly as found in the file.
+If the image is JPEG compressed, these bytes will be the compressed
+pixel data, not the expanded, uncompressed image. Whether the image is
+e.g. 16-bit or 8-bit, multiple frames or not, <code class="docutils literal"><span class="pre">PixelData</span></code> contains the same
+raw bytes. But there is a function that can shape the pixels more sensibly
+if you need to work with them...</p>
+</div>
+<div class="section" id="pixel-array">
+<h2>pixel_array<a class="headerlink" href="#pixel-array" title="Permalink to this headline">¶</a></h2>
+<p>A property of Dataset called <code class="docutils literal"><span class="pre">pixel_array</span></code> provides more useful pixel data
+for uncompressed images. The <a class="reference external" href="http://numpy.org/">NumPy</a>
+numerical package must be installed on your system to use this property,
+because <code class="docutils literal"><span class="pre">pixel_array</span></code> returns a NumPy array:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">dicom</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">=</span><span class="n">dicom</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="s2">&quot;MR_small.dcm&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">pixel_array</span>
+<span class="go">array([[ 905, 1019, 1227, ...,  302,  304,  328],</span>
+<span class="go">       [ 628,  770,  907, ...,  298,  331,  355],</span>
+<span class="go">       [ 498,  566,  706, ...,  280,  285,  320],</span>
+<span class="go">       ...,</span>
+<span class="go">       [ 334,  400,  431, ..., 1094, 1068, 1083],</span>
+<span class="go">       [ 339,  377,  413, ..., 1318, 1346, 1336],</span>
+<span class="go">       [ 378,  374,  422, ..., 1369, 1129,  862]], dtype=int16)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">pixel_array</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(64, 64)</span>
+</pre></div>
+</div>
+<p>NumPy can be used to modify the pixels, but if the changes are to be saved,
+they must be written back to the <code class="docutils literal"><span class="pre">PixelData</span></code> attribute:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">n</span><span class="p">,</span><span class="n">val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">pixel_array</span><span class="o">.</span><span class="n">flat</span><span class="p">):</span> <span class="c1"># example: zero anything &lt; 300</span>
+<span class="gp">... </span>    <span class="k">if</span> <span class="n">val</span> <span class="o">&lt;</span> <span class="mi">300</span><span class="p">:</span>
+<span class="gp">... </span>        <span class="n">ds</span><span class="o">.</span><span class="n">pixel_array</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">=</span><span class="mi">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">pixel_array</span><span class="o">.</span><span class="n">tostring</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><span class="s2">&quot;newfilename.dcm&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Some changes may require other DICOM tags to be modified. For example,
+if the pixel data is reduced (e.g. a 512x512 image is collapsed to 256x256)
+then <code class="docutils literal"><span class="pre">ds.Rows</span></code> and <code class="docutils literal"><span class="pre">ds.Columns</span></code> should be set appropriately.
+You must explicitly set these yourself; pydicom does not do so automatically.</p>
+<p><code class="docutils literal"><span class="pre">pixel_array</span></code> can also be used to pass image data to graphics libraries
+for viewing. See <a class="reference internal" href="viewing_images.html"><span class="doc">Viewing Images</span></a> for details.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Working with Pixel Data</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a></li>
+<li><a class="reference internal" href="#pixel-array">pixel_array</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="transition_to_pydicom1.html"
+                        title="previous chapter">Transition to pydicom 1.x</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="viewing_images.html"
+                        title="next chapter">Viewing Images</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/working_with_pixel_data.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="viewing_images.html" title="Viewing Images"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="transition_to_pydicom1.html" title="Transition to pydicom 1.x"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">pydicom 1.0a documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2008-2012, Darcy Mason and pydicom contributors.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.6.
+    </div>
+  </body>
+</html>

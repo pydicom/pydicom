@@ -1,0 +1,305 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Viewing Images &mdash; pydicom 1.0a documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/pydicom.css" type="text/css" />
+  
+
+  
+    <link rel="stylesheet" href="_static/gallery.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="pydicom 1.0a documentation" href="index.html"/>
+        <link rel="next" title="Pydicom Reference Guide" href="ref_guide.html"/>
+        <link rel="prev" title="Working with Pixel Data" href="working_with_pixel_data.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> pydicom
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started with pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pydicom_user_guide.html">Pydicom User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transition_to_pydicom1.html">Transition to pydicom 1.x</a></li>
+<li class="toctree-l1"><a class="reference internal" href="working_with_pixel_data.html">Working with Pixel Data</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Viewing Images</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#using-pydicom-with-matplotlib">Using pydicom with matplotlib</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#using-pydicom-with-tkinter">Using pydicom with Tkinter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#using-pydicom-with-python-imaging-library-pil">Using pydicom with Python Imaging Library (PIL)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#using-pydicom-with-wxpython">Using pydicom with wxPython</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ref_guide.html">Pydicom Reference Guide</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Tutorial - Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html">General examples</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">pydicom</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Viewing Images</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/viewing_images.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="viewing-images">
+<span id="id1"></span><h1>Viewing Images<a class="headerlink" href="#viewing-images" title="Permalink to this headline">¶</a></h1>
+<p class="rubric">How to use other packages with pydicom to view DICOM images</p>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>pydicom is mainly concerned with getting at the DICOM data elements in files,
+but it is often desirable to view pixel data as an image.
+There are several options:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Use any of the many <a class="reference external" href="http://www.dclunie.com/medical-image-faq/html/part8.html#DICOMFileConvertorsAndViewers">DICOM viewer</a>
+programs available</li>
+<li>use pydicom with <a class="reference external" href="http://matplotlib.sourceforge.net/">matplotlib</a></li>
+<li>use pydicom with python&#8217;s stdlib <a class="reference external" href="https://docs.python.org/3.4/library/tkinter.html">Tkinter</a> module.</li>
+<li>use pydicom with the <a class="reference external" href="http://www.pythonware.com/products/pil/">Python Imaging Library (PIL)</a></li>
+<li>use pydicom with <a class="reference external" href="http://www.wxpython.org/">wxPython</a></li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="using-pydicom-with-matplotlib">
+<h2>Using pydicom with matplotlib<a class="headerlink" href="#using-pydicom-with-matplotlib" title="Permalink to this headline">¶</a></h2>
+<p>matplotlib is available at <a class="reference external" href="http://matplotlib.sourceforge.net/">http://matplotlib.sourceforge.net/</a>. It
+can take 2-d image information from <code class="docutils literal"><span class="pre">Dataset.pixel_array</span></code> and display it.
+Here is an example:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pydicom</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pylab</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">=</span><span class="n">pydicom</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="s2">&quot;CT_small.dcm&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pylab</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">pixel_array</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">pylab</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">bone</span><span class="p">)</span>
+<span class="go">&lt;matplotlib.image.AxesImage object at 0x0162A530&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pylab</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="go">&gt;&gt;&gt;</span>
+</pre></div>
+</div>
+<p>Thanks to Roy Keyes for pointing out how to do this.</p>
+</div>
+<div class="section" id="using-pydicom-with-tkinter">
+<h2>Using pydicom with Tkinter<a class="headerlink" href="#using-pydicom-with-tkinter" title="Permalink to this headline">¶</a></h2>
+<p>The program <a class="reference external" href="https://github.com/darcymason/pydicom/blob/dev/pydicom/contrib/pydicom_Tkinter.py">pydicom_Tkinter.py</a>
+in the <code class="docutils literal"><span class="pre">contrib</span></code> folder demonstrates how to show an image using the
+Tkinter graphics system, which comes standard with most python installs.
+It creates a Tkinter PhotoImage in a Label widget or a user-supplied widget.</p>
+</div>
+<div class="section" id="using-pydicom-with-python-imaging-library-pil">
+<h2>Using pydicom with Python Imaging Library (PIL)<a class="headerlink" href="#using-pydicom-with-python-imaging-library-pil" title="Permalink to this headline">¶</a></h2>
+<p>The module <a class="reference external" href="https://github.com/darcymason/pydicom/blob/dev/pydicom/contrib/pydicom_PIL.py">pydicom_PIL.py</a>
+in the <code class="docutils literal"><span class="pre">contrib</span></code> folder
+uses PIL&#8217;s <code class="docutils literal"><span class="pre">Image.show()</span></code> method after creating an Image instance
+from the pixel data and some basic information about it (bit depth, LUTs, etc)</p>
+</div>
+<div class="section" id="using-pydicom-with-wxpython">
+<h2>Using pydicom with wxPython<a class="headerlink" href="#using-pydicom-with-wxpython" title="Permalink to this headline">¶</a></h2>
+<p>The module <a class="reference external" href="https://github.com/darcymason/pydicom/blob/dev/pydicom/contrib/imViewer_Simple.py">imViewer-Simple.py</a>
+in the <code class="docutils literal"><span class="pre">contrib</span></code> folder uses wxPython (also PIL, but it notes that it
+may not be strictly necessary) to display an image from a pydicom dataset.</p>
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="ref_guide.html" class="btn btn-neutral float-right" title="Pydicom Reference Guide" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="working_with_pixel_data.html" class="btn btn-neutral" title="Working with Pixel Data" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2017, Darcy Mason and pydicom contributors.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'1.0a',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
