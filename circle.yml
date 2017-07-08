@@ -23,11 +23,11 @@ dependencies:
     - sudo apt-get install build-essential python-dev python-setuptools
     # install numpy first as it is a compile time dependency for other packages
     - pip install --upgrade numpy
-    - pip install --upgrade scipy matplotlib setuptools nose coverage pillow sphinx-gallery sphinx_rtd_theme sphinx==1.5.6
+    - pip install --upgrade scipy matplotlib setuptools pillow python-dateutil
+    - pip install --upgrade sphinx sphinx-gallery sphinx_rtd_theme numpydoc
     # Installing required packages for `make -C doc check command` to work.
     - sudo -E apt-get -yq update
     - sudo -E apt-get -yq --no-install-suggests --no-install-recommends --force-yes install dvipng texlive-latex-base texlive-latex-extra
-    - pip install --upgrade numpydoc python-dateutil
 
   # The --user is needed to let sphinx see the source and the binaries
   # The pipefail is requested to propagate exit code
