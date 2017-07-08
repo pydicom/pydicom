@@ -1,0 +1,312 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Pydicom User Guide &#8212; pydicom 1.0a documentation</title>
+    
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0a',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Transition to pydicom 1.x" href="transition_to_pydicom1.html" />
+    <link rel="prev" title="Getting Started with pydicom" href="getting_started.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="transition_to_pydicom1.html" title="Transition to pydicom 1.x"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="getting_started.html" title="Getting Started with pydicom"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">pydicom 1.0a documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="pydicom-user-guide">
+<span id="id1"></span><h1>Pydicom User Guide<a class="headerlink" href="#pydicom-user-guide" title="Permalink to this headline">¶</a></h1>
+<p class="rubric">pydicom object model, description of classes, examples</p>
+<div class="section" id="dataset">
+<h2>Dataset<a class="headerlink" href="#dataset" title="Permalink to this headline">¶</a></h2>
+<p>Dataset is the base object in pydicom&#8217;s object model.
+The relationship between Dataset and other objects is:</p>
+<dl class="docutils">
+<dt>Dataset (derived from python&#8217;s <cite>dict</cite>)</dt>
+<dd><dl class="first last docutils">
+<dt>&#8212;&gt; contains DataElement instances</dt>
+<dd><dl class="first last docutils">
+<dt>&#8211;&gt; the value of the data element can be one of:</dt>
+<dd><ul class="first last simple">
+<li>a regular value like a number, string, etc.</li>
+<li>a list of regular values (e.g. a 3-D coordinate)</li>
+<li><dl class="first docutils">
+<dt>a Sequence instance</dt>
+<dd>&#8211;&gt; a Sequence is a list of Datasets (and so we come full circle)</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+<p>Dataset is the main object you will work with directly. Dataset is derived
+from python&#8217;s <code class="docutils literal"><span class="pre">dict</span></code>, so it inherits (and overrides some of) the methods
+of <code class="docutils literal"><span class="pre">dict</span></code>. In other words it is a collection of key:value pairs, where
+the key value is the DICOM (group,element) tag (as a Tag object,
+described below), and the value is a DataElement instance
+(also described below).</p>
+<p>A dataset could be created directly, but you will usually get one by reading
+an existing DICOM file:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">dicom</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">dicom</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="s2">&quot;rtplan.dcm&quot;</span><span class="p">)</span> <span class="c1"># (rtplan.dcm is in the testfiles directory)</span>
+</pre></div>
+</div>
+<p>You can display the entire dataset by simply printing its string
+(str or repr) value:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span>
+<span class="go">(0008, 0012) Instance Creation Date              DA: &#39;20030903&#39;</span>
+<span class="go">(0008, 0013) Instance Creation Time              TM: &#39;150031&#39;</span>
+<span class="go">(0008, 0016) SOP Class UID                       UI: RT Plan Storage</span>
+<span class="go">(0008, 0018) SOP Instance UID                    UI: 1.2.777.777.77.7.7777.7777.20030903150023</span>
+<span class="go">(0008, 0020) Study Date                          DA: &#39;20030716&#39;</span>
+<span class="go">(0008, 0030) Study Time                          TM: &#39;153557&#39;</span>
+<span class="go">(0008, 0050) Accession Number                    SH: &#39;&#39;</span>
+<span class="go">(0008, 0060) Modality                            CS: &#39;RTPLAN&#39;</span>
+</pre></div>
+</div>
+<p>Note: you can also view DICOM files in a collapsible tree using
+the example program <a class="reference external" href="http://code.google.com/p/pydicom/source/browse/source/dicom/examples/dicomtree.py">dicomtree.py</a>.</p>
+<p>You can access specific data elements by name or by DICOM tag number:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">PatientsName</span>
+<span class="go">&#39;Last^First^mid^pre&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">[</span><span class="mh">0x10</span><span class="p">,</span><span class="mh">0x10</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+<span class="go">&#39;Last^First^mid^pre&#39;</span>
+</pre></div>
+</div>
+<p>In the latter case (using the tag number directly) a DataElement instance
+is returned, so the <code class="docutils literal"><span class="pre">.value</span></code> must be used to get the value.</p>
+<p>You can also set values by name or tag number:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">PatientID</span> <span class="o">=</span> <span class="s2">&quot;12345&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">SeriesNumber</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">[</span><span class="mh">0x10</span><span class="p">,</span><span class="mh">0x10</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s1">&#39;Test&#39;</span>
+</pre></div>
+</div>
+<p>The use of names is possible because pydicom intercepts requests for
+member variables, and checks if they are in the DICOM dictionary.
+It translates the name to a (group,element) number and returns
+the corresponding value for that key if it exists. The names are the
+descriptive text from the dictionary with spaces and apostrophes,
+etc. removed.</p>
+<p>DICOM Sequences are turned into python <code class="docutils literal"><span class="pre">list</span></code> s. For these, the name is
+from the dictionary name with &#8220;sequence&#8221; removed, and the normal English
+plural added. So &#8220;Beam Sequence&#8221; becomes &#8220;Beams&#8221;,
+&#8220;Referenced Film Box Sequence&#8221; becomes &#8220;ReferencedFilmBoxes&#8221;.
+Items in the sequence are referenced by number, beginning at index 0 as per
+python convention.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">Beams</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">BeamName</span>
+<span class="go">&#39;Field 1&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Same thing with tag numbers:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">[</span><span class="mh">0x300a</span><span class="p">,</span><span class="mh">0xb0</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mh">0x300a</span><span class="p">,</span><span class="mh">0xc2</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+<span class="go">&#39;Field 1&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># yet another way, using another variable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">beam1</span><span class="o">=</span><span class="n">ds</span><span class="p">[</span><span class="mh">0x300a</span><span class="p">,</span><span class="mh">0xb0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">beam1</span><span class="o">.</span><span class="n">BeamName</span><span class="p">,</span> <span class="n">beam1</span><span class="p">[</span><span class="mh">0x300a</span><span class="p">,</span><span class="mh">0xc2</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+<span class="go">(&#39;Field 1&#39;, &#39;Field 1&#39;)</span>
+</pre></div>
+</div>
+<p>Since you may not always remember the exact name, Dataset provides
+a handy <cite>dir()</cite> method, useful during interactive sessions
+at the python prompt:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">dir</span><span class="p">(</span><span class="s2">&quot;pat&quot;</span><span class="p">)</span>
+<span class="go">[&#39;PatientSetups&#39;, &#39;PatientsBirthDate&#39;, &#39;PatientsID&#39;, &#39;PatientsName&#39;, &#39;PatientsSex&#39;]</span>
+</pre></div>
+</div>
+<p><code class="docutils literal"><span class="pre">dir</span></code> will return any DICOM tag names in the dataset that have
+the specified string anywhere in the name (case insensitive).
+Calling <cite>dir</cite> with no string will list all tag names available in the dataset.
+You can also see all the names that pydicom knows about by viewing the
+<cite>_dicom_dict.py</cite> file. You could modify that file to add tags
+that pydicom doesn&#8217;t already know about.</p>
+<p>Under the hood, Dataset stores a DataElement object for each item,
+but when accessed by name (e.g. <code class="docutils literal"><span class="pre">ds.PatientsName</span></code>) only the <cite>value</cite>
+of that DataElement is returned. If you need the whole DataElement
+(see the DataElement class discussion), you can use Dataset&#8217;s data_element()
+method or access the item using the tag number:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data_element</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">data_element</span><span class="p">(</span><span class="s2">&quot;PatientsName&quot;</span><span class="p">)</span>  <span class="c1"># or data_element = ds[0x10,0x10]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data_element</span><span class="o">.</span><span class="n">VR</span><span class="p">,</span> <span class="n">data_element</span><span class="o">.</span><span class="n">value</span>
+<span class="go">(&#39;PN&#39;, &#39;Last^First^mid^pre&#39;)</span>
+</pre></div>
+</div>
+<p>To check for the existence of a particular tag before using it,
+use the <cite>in</cite> keyword:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="s2">&quot;PatientsName&quot;</span> <span class="ow">in</span> <span class="n">ds</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>To remove a data element from the dataset,  use <code class="docutils literal"><span class="pre">del</span></code>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">del</span> <span class="n">ds</span><span class="p">[</span><span class="mh">0x10</span><span class="p">,</span><span class="mh">0x1000</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># OR</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tag</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">data_element</span><span class="p">(</span><span class="s2">&quot;OtherPatientIDs&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">tag</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">del</span> <span class="n">ds</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>To work with pixel data, the raw bytes are available through the usual tag:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pixel_bytes</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span>
+</pre></div>
+</div>
+<p>but to work with them in a more intelligent way, use <code class="docutils literal"><span class="pre">pixel_array</span></code>
+(requires the <a class="reference external" href="http://numpy.org">NumPy library</a>):</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pix</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">pixel_array</span>
+</pre></div>
+</div>
+<p>For more details, see <a class="reference internal" href="working_with_pixel_data.html"><span class="doc">Working with Pixel Data</span></a>.</p>
+</div>
+<div class="section" id="dataelement">
+<h2>DataElement<a class="headerlink" href="#dataelement" title="Permalink to this headline">¶</a></h2>
+<p>The DataElement class is not usually used directly in user code,
+but is used extensively by Dataset.
+DataElement is a simple object which stores the following things:</p>
+<blockquote>
+<div><ul class="simple">
+<li>tag &#8211; a DICOM tag (as a Tag object)</li>
+<li>VR &#8211; DICOM value representation &#8211; various number and string formats, etc</li>
+<li>VM &#8211; value multiplicity. This is 1 for most DICOM tags, but
+can be multiple, e.g. for coordinates. You do not have to specify this,
+the DataElement class keeps track of it based on value.</li>
+<li>value &#8211; the actual value. A regular value like a number or string
+(or list of them), or a Sequence.</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="tag">
+<h2>Tag<a class="headerlink" href="#tag" title="Permalink to this headline">¶</a></h2>
+<p>The Tag class is derived from python&#8217;s <code class="docutils literal"><span class="pre">long</span></code>, so in effect, it is just
+a number with some extra behaviour:</p>
+<blockquote>
+<div><ul>
+<li><p class="first">Tag enforces that the DICOM tag fits in the expected 4-byte (group,element)</p>
+</li>
+<li><p class="first">a Tag instance can be created from a long or from a tuple containing
+the (group,element) separately:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">dicom.tag</span> <span class="k">import</span> <span class="n">Tag</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t1</span><span class="o">=</span><span class="n">Tag</span><span class="p">(</span><span class="mh">0x00100010</span><span class="p">)</span> <span class="c1"># all of these are equivalent</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t2</span><span class="o">=</span><span class="n">Tag</span><span class="p">(</span><span class="mh">0x10</span><span class="p">,</span><span class="mh">0x10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t3</span><span class="o">=</span><span class="n">Tag</span><span class="p">((</span><span class="mh">0x10</span><span class="p">,</span> <span class="mh">0x10</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t1</span>
+<span class="go">(0010, 0010)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t1</span><span class="o">==</span><span class="n">t2</span><span class="p">,</span> <span class="n">t1</span><span class="o">==</span><span class="n">t3</span>
+<span class="go">(True, True)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Tag has properties group and element (or elem) to return the group and element portions</p>
+</li>
+<li><p class="first">the <code class="docutils literal"><span class="pre">is_private</span></code> property checks whether the tag represents
+a private tag (i.e. if group number is odd).</p>
+</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="sequence">
+<h2>Sequence<a class="headerlink" href="#sequence" title="Permalink to this headline">¶</a></h2>
+<p>Sequence is derived from python&#8217;s <code class="docutils literal"><span class="pre">list</span></code>. The only added functionality is
+to make string representations prettier. Otherwise all the usual methods of
+<code class="docutils literal"><span class="pre">list</span></code> like item selection, append, etc. are available.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Pydicom User Guide</a><ul>
+<li><a class="reference internal" href="#dataset">Dataset</a></li>
+<li><a class="reference internal" href="#dataelement">DataElement</a></li>
+<li><a class="reference internal" href="#tag">Tag</a></li>
+<li><a class="reference internal" href="#sequence">Sequence</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="getting_started.html"
+                        title="previous chapter">Getting Started with pydicom</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="transition_to_pydicom1.html"
+                        title="next chapter">Transition to pydicom 1.x</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/pydicom_user_guide.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="transition_to_pydicom1.html" title="Transition to pydicom 1.x"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="getting_started.html" title="Getting Started with pydicom"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">pydicom 1.0a documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2008-2012, Darcy Mason and pydicom contributors.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.6.
+    </div>
+  </body>
+</html>
