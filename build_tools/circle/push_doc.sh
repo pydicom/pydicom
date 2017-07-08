@@ -22,8 +22,8 @@ fi
 cd $DOC_REPO
 git config core.sparseCheckout true
 echo $dir > .git/info/sparse-checkout
-git checkout $CIRCLE_BRANCH
-git reset --hard origin/$CIRCLE_BRANCH
+git checkout gh-pages
+git reset --hard origin/gh-pages
 git rm -rf $dir/ && rm -rf $dir/
 cp -R $HOME/pydicom/doc/_build/html/stable $dir
 git config --global user.email $EMAIL
