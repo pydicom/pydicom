@@ -178,7 +178,7 @@
 <div class="section" id="dataset">
 <h2>Dataset<a class="headerlink" href="#dataset" title="Permalink to this headline">¶</a></h2>
 <p><code class="docutils literal"><span class="pre">Dataset</span></code> is the main object you will work with directly. Dataset is derived
-from python&#8217;s <code class="docutils literal"><span class="pre">dict</span></code>, so it inherits (and overrides some of) the methods
+from python’s <code class="docutils literal"><span class="pre">dict</span></code>, so it inherits (and overrides some of) the methods
 of <code class="docutils literal"><span class="pre">dict</span></code>. In other words it is a collection of key:value pairs, where
 the key value is the DICOM (group,element) tag (as a Tag object,
 described below), and the value is a DataElement instance
@@ -207,7 +207,7 @@ an existing DICOM file:</p>
 <p class="last">You can also view DICOM files in a collapsible tree using
 the example program <a class="reference external" href="https://github.com/darcymason/pydicom/blob/dev/pydicom/contrib/dcm_qt_tree.py">dcm_qt_tree.py</a>.</p>
 </div>
-<p>You can access specific data elements by name (DICOM &#8216;keyword&#8217;) or by DICOM tag number:</p>
+<p>You can access specific data elements by name (DICOM ‘keyword’) or by DICOM tag number:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">PatientName</span>
 <span class="go">&#39;Last^First^mid^pre&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">[</span><span class="mh">0x10</span><span class="p">,</span><span class="mh">0x10</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
@@ -229,17 +229,17 @@ the corresponding value for that key if it exists.</p>
 <dl class="docutils">
 <dt>To understand using Sequences in pydicom, please refer to this object model:</dt>
 <dd><dl class="first last docutils">
-<dt>Dataset (derived from python&#8217;s <cite>dict</cite>)</dt>
+<dt>Dataset (derived from python’s <cite>dict</cite>)</dt>
 <dd><dl class="first last docutils">
-<dt>&#8212;&gt; contains DataElement instances</dt>
+<dt>—&gt; contains DataElement instances</dt>
 <dd><dl class="first last docutils">
-<dt>&#8211;&gt; the value of the data element can be one of:</dt>
+<dt>–&gt; the value of the data element can be one of:</dt>
 <dd><ul class="first last simple">
 <li>a regular value like a number, string, etc.</li>
 <li>a list of regular values (e.g. a 3-D coordinate)</li>
 <li><dl class="first docutils">
 <dt>a Sequence instance</dt>
-<dd>&#8211;&gt; a Sequence is a list of Datasets (and so we come full circle)</dd>
+<dd>–&gt; a Sequence is a list of Datasets (and so we come full circle)</dd>
 </dl>
 </li>
 </ul>
@@ -268,7 +268,7 @@ python convention.:</p>
 <span class="go">(&#39;Field 1&#39;, &#39;Field 1&#39;)</span>
 </pre></div>
 </div>
-<p>If you don&#8217;t remember or know the exact tag name, Dataset provides
+<p>If you don’t remember or know the exact tag name, Dataset provides
 a handy <cite>dir()</cite> method, useful during interactive sessions
 at the python prompt:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">dir</span><span class="p">(</span><span class="s2">&quot;pat&quot;</span><span class="p">)</span>
@@ -283,11 +283,11 @@ the specified string anywhere in the name (case insensitive).</p>
 </div>
 <p>You can also see all the names that pydicom knows about by viewing the
 <cite>_dicom_dict.py</cite> file. You could modify that file to add tags
-that pydicom doesn&#8217;t already know about.</p>
+that pydicom doesn’t already know about.</p>
 <p>Under the hood, Dataset stores a DataElement object for each item,
 but when accessed by name (e.g. <code class="docutils literal"><span class="pre">ds.PatientName</span></code>) only the <cite>value</cite>
 of that DataElement is returned. If you need the whole DataElement
-(see the DataElement class discussion), you can use Dataset&#8217;s data_element()
+(see the DataElement class discussion), you can use Dataset’s data_element()
 method or access the item using the tag number:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data_element</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">data_element</span><span class="p">(</span><span class="s2">&quot;PatientsName&quot;</span><span class="p">)</span>  <span class="c1"># or data_element = ds[0x10,0x10]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">data_element</span><span class="o">.</span><span class="n">VR</span><span class="p">,</span> <span class="n">data_element</span><span class="o">.</span><span class="n">value</span>
@@ -322,19 +322,19 @@ but is used extensively by Dataset.
 DataElement is a simple object which stores the following things:</p>
 <blockquote>
 <div><ul class="simple">
-<li>tag &#8211; a DICOM tag (as a Tag object)</li>
-<li>VR &#8211; DICOM value representation &#8211; various number and string formats, etc</li>
-<li>VM &#8211; value multiplicity. This is 1 for most DICOM tags, but
+<li>tag – a DICOM tag (as a Tag object)</li>
+<li>VR – DICOM value representation – various number and string formats, etc</li>
+<li>VM – value multiplicity. This is 1 for most DICOM tags, but
 can be multiple, e.g. for coordinates. You do not have to specify this,
 the DataElement class keeps track of it based on value.</li>
-<li>value &#8211; the actual value. A regular value like a number or string
+<li>value – the actual value. A regular value like a number or string
 (or list of them), or a Sequence.</li>
 </ul>
 </div></blockquote>
 </div>
 <div class="section" id="tag">
 <h2>Tag<a class="headerlink" href="#tag" title="Permalink to this headline">¶</a></h2>
-<p>The Tag class is derived from python&#8217;s <code class="docutils literal"><span class="pre">int</span></code>, so in effect, it is just
+<p>The Tag class is derived from python’s <code class="docutils literal"><span class="pre">int</span></code>, so in effect, it is just
 a number with some extra behaviour:</p>
 <blockquote>
 <div><ul>
@@ -363,7 +363,7 @@ a private tag (i.e. if group number is odd).</p>
 </div>
 <div class="section" id="sequence">
 <h2>Sequence<a class="headerlink" href="#sequence" title="Permalink to this headline">¶</a></h2>
-<p>Sequence is derived from python&#8217;s <code class="docutils literal"><span class="pre">list</span></code>. The only added functionality is
+<p>Sequence is derived from python’s <code class="docutils literal"><span class="pre">list</span></code>. The only added functionality is
 to make string representations prettier. Otherwise all the usual methods of
 <code class="docutils literal"><span class="pre">list</span></code> like item selection, append, etc. are available.</p>
 </div>

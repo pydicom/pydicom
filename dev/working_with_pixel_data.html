@@ -175,8 +175,8 @@
 <p class="rubric">How to work with pixel data in pydicom.</p>
 <div class="section" id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
-<p>pydicom tends to be &#8220;lazy&#8221; in interpreting DICOM data. For example,
-by default it doesn&#8217;t do anything with pixel data
+<p>pydicom tends to be “lazy” in interpreting DICOM data. For example,
+by default it doesn’t do anything with pixel data
 except read in the raw bytes:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pydicom</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">=</span><span class="n">pydicom</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="s2">&quot;MR_small.dcm&quot;</span><span class="p">)</span>
@@ -190,7 +190,7 @@ If the image is JPEG compressed, these bytes will be the compressed
 pixel data, not the expanded, uncompressed image. Whether the image is
 e.g. 16-bit or 8-bit, multiple frames or not, <code class="docutils literal"><span class="pre">PixelData</span></code> contains the same
 raw bytes. But there is a function that can shape the pixels more sensibly
-if you need to work with them...</p>
+if you need to work with them…</p>
 </div>
 <div class="section" id="pixel-array">
 <h2>pixel_array<a class="headerlink" href="#pixel-array" title="Permalink to this headline">¶</a></h2>
