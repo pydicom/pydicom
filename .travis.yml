@@ -1,13 +1,9 @@
 language: python
 python:
-    - 2.6
     - 2.7
-#    - 3.2
-    - 3.3
     - 3.4
     - 3.5
     - 3.6
-    - 3.6.0b2
     - pypy
     - pypy3.3-5.2-alpha1
 
@@ -17,8 +13,6 @@ env:
     - DEPS=false
 
 install:
-    # always install unittest2 on py26
-    - if [[ $TRAVIS_PYTHON_VERSION == '2.6' ]]; then pip install unittest2; fi
     - if [[ $DEPS == true ]] && [[ $TRAVIS_PYTHON_VERSION != 'pypy' ]] && [[ $TRAVIS_PYTHON_VERSION != 'pypy3' ]]; then pip install numpy; fi
     - pip install coveralls
     - pip install coverage
