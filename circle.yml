@@ -4,6 +4,9 @@ machine:
     # project and documentation.
     USERNAME: "glemaitre"
 
+    # The name of the organization which host the repositories
+    ORGANIZATION: "pydicom"
+
     # The repository where the documentation will be hosted
     DOC_REPO: "pydicom"
 
