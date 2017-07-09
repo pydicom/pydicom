@@ -29,13 +29,10 @@ setup(
         "Intended Audience :: Science/Research",
         "Development Status :: 5 - Production/Stable",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 2.6",
         "Programming Language :: Python :: 2.7",
-        "Programming Language :: Python :: 3.0",
-        "Programming Language :: Python :: 3.2",
-        "Programming Language :: Python :: 3.3",
         "Programming Language :: Python :: 3.4",
         "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6",
         "Operating System :: OS Independent",
         "Topic :: Scientific/Engineering :: Medical Science Apps.",
         "Topic :: Scientific/Engineering :: Physics",
@@ -55,7 +52,5 @@ setup(
     `Pydicom User Guide <http://pydicom.readthedocs.org/en/latest/pydicom_user_guide.html>`_ page
     for an overview of how to use the pydicom library.
     """,
-    test_loader="tests.run_tests:MyTestLoader",
-    test_suite="dummy_string",
     **extra
 )
