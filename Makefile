@@ -14,10 +14,10 @@ test-coverage:
 
 test: test-code test-doc
 
-doc: inplace
+doc:
 	make -C doc html
 
-doc-noplot: inplace
+doc-noplot:
 	make -C doc html-noplot
 
 code-analysis:
