@@ -1,9 +1,9 @@
 
-Contributing to pyDICOM
-============================
+Contributing to pydicom
+=======================
 
-This is summary for contributing code, documentation, testing, and filing
-issues.Please read it carefully to help make the code review process go as
+This is the summary for contributing code, documentation, testing, and filing
+issues. Please read it carefully to help making the code review process go as
 smoothly as possible and maximize the likelihood of your contribution being
 merged.
 
@@ -56,14 +56,14 @@ to create a pull request from your fork. This will send an email to the committe
 Pull Request Checklist
 ----------------------
 
-We recommended that your contribution complies with the
-following rules before you submit a pull request:
+We recommend that your contribution complies with the following rules before you
+submit a pull request:
 
 -  Follow the
    [coding-guidelines](http://pydicom.org/dev/developers/contributing.html#coding-guidelines).
 
 -  Use, when applicable, the validation tools and scripts in the
-   `sklearn.utils` submodule.  A list of utility routines available
+   `pydicom.utils` submodule.  A list of utility routines available
    for developers can be found in the
    [Utilities for Developers](http://pydicom.org/dev/developers/utilities.html#developers-utils)
    page.
@@ -71,30 +71,25 @@ following rules before you submit a pull request:
 -  If your pull request addresses an issue, please use the pull request title to
    describe the issue and mention the issue number in the pull request
    description. This will make sure a link back to the original issue is
-   created.
+   created. Use "closes #PR-NUM" or "fixes #PR-NUM" to indicate github to
+   automatically close the related issue. Use any other keyword (i.e: works on,
+   related) to avoid github to close the referenced issue.
 
 -  All public methods should have informative docstrings with sample
    usage presented as doctests when appropriate.
 
--  Please prefix the title of your pull request with `[MRG]` (Ready for
-   Merge), if the contribution is complete and ready for a detailed review.
-   Two core developers will review your code and change the prefix of the pull
-   request to `[MRG + 1]` and `[MRG + 2]` on approval, making it eligible
-   for merging. An incomplete contribution -- where you expect to do more work before
-   receiving a full review -- should be prefixed `[WIP]` (to indicate a work
-   in progress) and changed to `[MRG]` when it matures. WIPs may be useful
-   to: indicate you are working on something to avoid duplicated work,
-   request broad review of functionality or API, or seek collaborators.
-   WIPs often benefit from the inclusion of a
+-  Please prefix the title of your pull request with `[MRG]` (Ready for Merge),
+   if the contribution is complete and ready for a detailed review. Two core
+   developers will review your code and change the prefix of the pull request to
+   `[MRG + 1]` on approval, making it eligible for merging. An incomplete
+   contribution -- where you expect to do more work before receiving a full
+   review -- should be prefixed `[WIP]` (to indicate a work in progress) and
+   changed to `[MRG]` when it matures. WIPs may be useful to: indicate you are
+   working on something to avoid duplicated work, request broad review of
+   functionality or API, or seek collaborators. WIPs often benefit from the
+   inclusion of a
    [task list](https://github.com/blog/1375-task-lists-in-gfm-issues-pulls-comments)
    in the PR description.
-
--  All other tests pass when everything is rebuilt from scratch. On
-   Unix-like systems, check with (from the toplevel source folder):
-
-      ```bash
-      $ make
-      ```
 
 -  When adding additional functionality, provide at least one
    example script in the ``examples/`` folder. Have a look at other
@@ -111,11 +106,6 @@ following rules before you submit a pull request:
    For the Bug-fixes case, at the time of the PR, this tests should fail for
    the code base in master and pass for the PR code.
 
-
--  At least one paragraph of narrative documentation with links to
-   references in the literature (with PDF links when possible) and
-   the example.
-
 -  The documentation should also include expected time and space
    complexity of the algorithm and scalability, e.g. "this algorithm
    can scale to a large number of samples > 100000, but does not
@@ -128,8 +118,8 @@ tools:
 -  Code with good unittest **coverage** (at least 80%), check with:
 
   ```bash
-  $ pip install nose coverage
-  $ nosetests --with-coverage path/to/tests_for_package
+  $ pip install pytest pytest-cov
+  $ py.test --cov=pydicom path/to/test_for_package
   ```
 
 -  No pyflakes warnings, check with:
@@ -174,12 +164,14 @@ following rules before submitting:
    See [Creating and highlighting code blocks](https://help.github.com/articles/creating-and-highlighting-code-blocks).
 
 -  Please include your operating system type and version number, as well
-   as your Python, pydicom, numpy, and scipy versions. This information
+   as your Python, pydicom and numpy versions. This information
    can be found by running the following code snippet:
 
   ```python
   import platform; print(platform.platform())
   import sys; print("Python", sys.version)
+  import numpy; print("numpy", numpy.__version__)
+  import pydicom; print("pydicom", pydicom.__version__)
   ```
 
 -  please include a [reproducible](http://stackoverflow.com/help/mcve) code
@@ -205,10 +197,10 @@ Documentation
 We are glad to accept any sort of documentation: function docstrings,
 reStructuredText documents (like this one), tutorials, etc.
 reStructuredText documents live in the source code repository under the
-doc/ directory.
+``doc/`` directory.
 
 You can edit the documentation using any text editor and then generate
-the HTML output by typing ``make html`` from the doc/ directory.
+the HTML output by typing ``make html`` from the ``doc/`` directory.
 Alternatively, ``make`` can be used to quickly generate the
 documentation without the example gallery. The resulting HTML files will
 be placed in ``_build/html/`` and are viewable in a web browser. See the
@@ -216,12 +208,12 @@ be placed in ``_build/html/`` and are viewable in a web browser. See the
 
 For building the documentation, you will need
 [sphinx](http://sphinx.pocoo.org/),
+[numpy](http://numpy.org/),
 [matplotlib](http://matplotlib.org/), and
 [pillow](http://pillow.readthedocs.io/en/latest/).
 
-When you are writing documentation, it is important to keep a good
-compromise between mathematical and algorithmic details, and give
-intuition to the reader on what the algorithm does. It is best to always
-start with a small paragraph with a hand-waving explanation of what the
-method does to the data and a figure (coming from an example)
-illustrating it.
+When you are writing documentation, it is important to reference the related
+part of the DICOM standard, and give give intuition to the reader on what the
+method does. It is best to always start with a small paragraph with a
+hand-waving explanation of what the method does to the data and a figure (coming
+from an example) illustrating it.
