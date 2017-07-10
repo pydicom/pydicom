@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 try:
-    from setuptools import setup
+    from setuptools import setup, find_packages
 except:
     from ez_setup import use_setuptools
     use_setuptools()
@@ -9,10 +9,9 @@ extra = {}
 
 setup(
     name="pydicom",
-    packages=['pydicom',
-              'pydicom.contrib',
-              'pydicom.util'],
+    packages=find_packages(),
     include_package_data=True,
+    # package_data={'pydicom': ['../tests/tests_files/*']},
     version="1.0.0a1",
     install_requires=[],
     zip_safe=False,  # want users to be able to see included examples,tests

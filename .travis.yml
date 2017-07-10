@@ -14,14 +14,11 @@ env:
 
 install:
     - if [[ $DEPS == true ]] && [[ $TRAVIS_PYTHON_VERSION != 'pypy' ]] && [[ $TRAVIS_PYTHON_VERSION != 'pypy3' ]]; then pip install numpy; fi
-    - pip install coveralls
-    - pip install coverage
-    - pip install pytest
-    - pip install pytest-cov
+    - pip install pytest pytest-cov codecov
     - python setup.py install
 
 script:
-    - py.test --cov=pydicom 
+    - py.test --cov=pydicom
 
 after_success:
-    - coveralls
+    - codecov
