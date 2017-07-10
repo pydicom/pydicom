@@ -34,8 +34,6 @@ except ImportError:
 import pydicom
 import platform
 
-IS_PYTHON36 = (platform.python_version_tuple()[:2] == ('3', '6'))
-
 try:
     import cPickle as pickle
 except ImportError:
@@ -47,10 +45,10 @@ test_files = os.path.join(test_dir, 'test_files')
 badvr_name = os.path.join(test_files, "badVR.dcm")
 default_encoding = 'iso8859'
 
+
 @unittest.skipIf(platform.python_implementation() == 'PyPy', "PyPy has trouble with this pickle")
 class TMPickleTest(unittest.TestCase):
     """Unit tests for pickling TM"""
-    @unittest.skipIf(IS_PYTHON36, 'Test fails with python 3.6.0')
     def testPickling(self):
         # Check that a pickled TM is read back properly
         x = pydicom.valuerep.TM("212223")
@@ -63,9 +61,9 @@ class TMPickleTest(unittest.TestCase):
         self.assertEqual(x.original_string, x2.original_string)
         self.assertEqual(str(x), str(x2))
 
+
 class DTPickleTest(unittest.TestCase):
     """Unit tests for pickling DT"""
-    @unittest.skipIf(IS_PYTHON36, 'Test fails with python 3.6.0')
     def testPickling(self):
         # Check that a pickled DT is read back properly
         x = pydicom.valuerep.DT("19111213212123")
@@ -79,7 +77,6 @@ class DTPickleTest(unittest.TestCase):
 
 class DAPickleTest(unittest.TestCase):
     """Unit tests for pickling DA"""
-
     def testPickling(self):
         # Check that a pickled DA is read back properly
         x = pydicom.valuerep.DA("19111213")

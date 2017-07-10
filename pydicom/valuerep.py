@@ -69,6 +69,9 @@ class DA(date):
     def __reduce__(self):
         return super(DA, self).__reduce__() + (self.__getstate__(),)
 
+    def __reduce_ex__(self, protocol):
+        return super(DA, self).__reduce__() + (self.__getstate__(),)
+
     def __new__(cls, val):
         """Create an instance of DA object.
 
@@ -138,6 +141,9 @@ class DT(datetime):
             setattr(self, slot, value)
 
     def __reduce__(self):
+        return super(DT, self).__reduce__() + (self.__getstate__(),)
+
+    def __reduce_ex__(self, protocol):
         return super(DT, self).__reduce__() + (self.__getstate__(),)
 
     def __new__(cls, val):
@@ -242,6 +248,9 @@ class TM(time):
             setattr(self, slot, value)
 
     def __reduce__(self):
+        return super(TM, self).__reduce__() + (self.__getstate__(),)
+
+    def __reduce_ex__(self, protocol):
         return super(TM, self).__reduce__() + (self.__getstate__(),)
 
     def __new__(cls, val):
