@@ -74,13 +74,18 @@ elif [[ "$DISTRIB" == "pypy" ]]; then
     else
         ln -s "$BIN_PATH/pypy3" "$BIN_PATH/python"
     fi
+    # add the binary to the path
     export PATH="$BIN_PATH:$PATH"
+    # install pip
     python -m ensurepip
     pip install -U pip wheel
-    if [[ "$DEPS" == "true" ]]; then
+    if [[ "$DEPS" == "true" ]] && [[ "$PYTHON_VERSION" == "2.7" ]]; then
         python -m pip install git+https://bitbucket.org/pypy/numpy.git
+    # numpypy does not work with pypy3 so fall back on numpy
+    elif [[ "$DEPS" == "true" ]]; then
+        python -m pip install cython numpy
     fi
-    pip install nose nose-timer pytest pytest-cov codecov
+    python -m pip install nose nose-timer pytest pytest-cov codecov
 fi
 
 python --version
