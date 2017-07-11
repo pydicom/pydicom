@@ -6,10 +6,7 @@
 
 # License: 3-clause BSD
 
-# Travis clone scikit-learn/scikit-learn repository in to a local repository.
-# We use a cached directory with three scikit-learn repositories (one for each
-# matrix entry) from which we pull from local Travis repository. This allows
-# us to keep build artefact for gcc + cython, and gain time
+# Travis clone pydicom/pydicom repository in to a local repository.
 
 set -e
 
@@ -59,6 +56,8 @@ elif [[ "$DISTRIB" == "ubuntu" ]]; then
     pip install nose nose-timer pytest pytest-cov codecov
 
 elif [[ "$DISTRIB" == "pypy" ]]; then
+    # This is to see if we are supporting pypy. With pypy3, numpypy is not
+    # supported. Therefore, we fallback on the install of numpy.
     deactivate
     if [[ "$PYTHON_VERSION" == "2.7" ]]; then
         PYPY_TAR=pypy2-v5.8.0-linux64
@@ -67,6 +66,7 @@ elif [[ "$DISTRIB" == "pypy" ]]; then
     fi
     wget "https://bitbucket.org/pypy/pypy/downloads/"$PYPY_TAR".tar.bz2"
     tar -xvjf $PYPY_TAR".tar.bz2"
+    # setup the path to get pypy by default
     CURRENT_PATH=$(pwd)
     BIN_PATH="$CURRENT_PATH/$PYPY_TAR/bin"
     if [[ "$PYTHON_VERSION" == "2.7" ]]; then
