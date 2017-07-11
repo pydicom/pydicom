@@ -1,0 +1,6 @@
+pycodestyle:
+    max-line-length: 79  # Default is 79 in PEP8
+    ignore:  # Errors and warnings to ignore
+        - E501 # line too long
+        - E402 # module level import not at top of file
+        - E241 # multiple spaces after ‘,’ (removed from the standard checks in v.0.5.0)
