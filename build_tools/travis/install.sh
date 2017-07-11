@@ -39,16 +39,12 @@ if [[ "$DISTRIB" == "conda" ]]; then
 
     # Configure the conda environment and put it in the path using the
     # provided versions
-    if [[ "$DEPS" == "true" ]]; then
-        conda create -n testenv --yes python=$PYTHON_VERSION pip nose pytest \
-            pytest-cov numpy
-
-    else
-        conda create -n testenv --yes python=$PYTHON_VERSION pip nose pytest \
-              pytest-cov
-    fi
+    conda create -n testenv --yes python=$PYTHON_VERSION pip
     source activate testenv
-
+    conda install --yes nose pytest pytest-cov
+    if [[ "$DEPS" == "true" ]]; then
+        conda install --yes numpy
+    fi
     # Install nose-timer via pip
     pip install nose-timer codecov
 
@@ -58,14 +54,37 @@ elif [[ "$DISTRIB" == "ubuntu" ]]; then
     # install.
     deactivate
     # Create a new virtualenv using system site packages for python, numpy
-    # and scipy
     virtualenv --system-site-packages testvenv
     source testvenv/bin/activate
     pip install nose nose-timer pytest pytest-cov codecov
+
+elif [[ "$DISTRIB" == "pypy" ]]; then
+    deactivate
+    if [[ "$PYTHON_VERSION" == "2.7" ]]; then
+        PYPY_TAR=pypy2-v5.8.0-linux64
+    else
+        PYPY_TAR=pypy3-v5.8.0-linux64
+    fi
+    wget "https://bitbucket.org/pypy/pypy/downloads/"$PYPY_TAR".tar.bz2"
+    tar -xvjf $PYPY_TAR".tar.bz2"
+    CURRENT_PATH=$(pwd)
+    export PATH="$CURRENT_PATH/$PYPY_TAR:$PATH"
+    BIN_PATH="$CURRENT_PATH/$PYPY_TAR/bin"
+    if [[ "$PYTHON_VERSION" == "2.7" ]]; then
+        ln -s "$BIN_PATH/pypy2" "$BIN_PATH/python"
+    else
+        ln -s "$BIN_PATH/pypy3" "$BIN_PATH/python"
+    fi
+    python --version
+    if [[ "$DEPS" == "true" ]]; then
+        python -m pip install git+https://bitbucket.org/pypy/numpy.git
+    fi
 fi
 
 python --version
-python -c "import numpy; print('numpy %s' % numpy.__version__)"
+if [[ "$DEPS" == "true" ]]; then
+    python -c "import numpy; print('numpy %s' % numpy.__version__)"
+fi
 
 python setup.py develop
 ccache --show-stats
