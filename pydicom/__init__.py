@@ -29,9 +29,13 @@ https://github.com/darcymason/pydicom/issues
 """
 
 import sys
+from ._version import __version__
+from ._version import __version_info__
+
+__all__ = ['__version__', '__version_info__']
+
 if sys.version_info < (2, 6, 0):
     raise ImportError("pydicom > 0.9.7 requires python 2.6 or later")
-
 
 
 # pre-pydicom 1.0, read_file and write_file were imported here.
@@ -41,10 +45,8 @@ def read_file(*args, **kwargs):
     from pydicom.dicomio import read_file
     return read_file(*args, **kwargs)
 
+
 def write_file(*args, **kwargs):
     global write_file
     from pydicom.dicomio import write_file
     return write_file(*args, **kwargs)
-
-__version__ = "1.0.0a1"
-__version_info__ = (1, 0, 0, 'alpha', 0)

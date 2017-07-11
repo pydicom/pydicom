@@ -1,24 +1,31 @@
+dist: trusty
+sudo: false
+
 language: python
-python:
-    - 2.7
-    - 3.4
-    - 3.5
-    - 3.6
-    - pypy
-    - pypy3.3-5.2-alpha1
 
-env:
-    # Ensure that pydicom functions with/without numpy
-    - DEPS=true
-    - DEPS=false
+cache:
+  apt: true
+  directories:
+  - $HOME/.cache/pip
+  - $HOME/.ccache
 
-install:
-    - if [[ $DEPS == true ]] && [[ $TRAVIS_PYTHON_VERSION != 'pypy' ]] && [[ $TRAVIS_PYTHON_VERSION != 'pypy3' ]]; then pip install numpy; fi
-    - pip install pytest pytest-cov codecov
-    - python setup.py install
+matrix:
+  include:
+    - env: DISTRIB="ubuntu" PYTHON_VERSION="2.7" DEPS=true
+    - env: DISTRIB="conda" PYTHON_VERSION="2.7" DEPS=true
+    - env: DISTRIB="conda" PYTHON_VERSION="3.4" DEPS=true
+    - env: DISTRIB="conda" PYTHON_VERSION="3.5" DEPS=true
+    - env: DISTRIB="conda" PYTHON_VERSION="3.6" DEPS=true
+    - env: DISTRIB="conda" PYTHON_VERSION="2.7" DEPS=false
+    - env: DISTRIB="conda" PYTHON_VERSION="3.4" DEPS=false
+    - env: DISTRIB="conda" PYTHON_VERSION="3.5" DEPS=false
+    - env: DISTRIB="conda" PYTHON_VERSION="3.6" DEPS=false
+
+
+install: source build_tools/travis/install.sh
 
 script:
-    - py.test --cov=pydicom
+  - py.test --cov=pydicom
 
 after_success:
-    - codecov
+  - codecov
