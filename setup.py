@@ -43,7 +43,7 @@ KEYWORDS = "dicom python medical imaging"
 
 NAME = "pydicom"
 AUTHOR = "Darcy Mason and contributors"
-AUTHOR_EMAIL = "cdsupsay@gmail.com"
+AUTHOR_EMAIL = "darcymason@gmail.com"
 MAINTAINER = "Darcy Mason and contributors"
 MAINTAINER_EMAIL = "darcymason@gmail.com"
 DESCRIPTION = description
