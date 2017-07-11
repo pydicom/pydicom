@@ -9,7 +9,9 @@ This file is part of pydicom, released under a modified MIT license.
 -----------
 Quick Start
 -----------
-1. A simple program to read a dicom file, modify a value, and write to a new file::
+1. A simple program to read a dicom file, modify a value, and write to a new
+   file::
+
     from pydicom import dicomio
     dataset = dicomio.read_file("file1.dcm")
     dataset.PatientName = 'anonymous'
