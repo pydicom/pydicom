@@ -68,14 +68,16 @@ elif [[ "$DISTRIB" == "pypy" ]]; then
     wget "https://bitbucket.org/pypy/pypy/downloads/"$PYPY_TAR".tar.bz2"
     tar -xvjf $PYPY_TAR".tar.bz2"
     CURRENT_PATH=$(pwd)
-    export PATH="$CURRENT_PATH/$PYPY_TAR:$PATH"
     BIN_PATH="$CURRENT_PATH/$PYPY_TAR/bin"
     if [[ "$PYTHON_VERSION" == "2.7" ]]; then
-        ln -s "$BIN_PATH/pypy2" "$BIN_PATH/python"
+        ln -s "$BIN_PATH/pypy" "$BIN_PATH/python"
     else
         ln -s "$BIN_PATH/pypy3" "$BIN_PATH/python"
     fi
-    python --version
+    ls $BIN_PATH
+    export PATH="$BIN_PATH:$PATH"
+    pypy -m ensurepip
+    pip install -U pip wheel
     if [[ "$DEPS" == "true" ]]; then
         python -m pip install git+https://bitbucket.org/pypy/numpy.git
     fi
