@@ -9,10 +9,14 @@
 
 
 import logging
+import os
 
 # Set the type used to hold DS values
 #    default False; was decimal-based in pydicom 0.9.7
 use_DS_decimal = False
+
+force_pillow_decompression = os.environ.get("PYDCM_FPD")
+force_gdcm_decompression = os.environ.get("PYDCM_FGD")
 
 data_element_callback = None
 """Set data_element_callback to a function to be called from read_dataset

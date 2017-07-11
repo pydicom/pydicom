@@ -37,6 +37,7 @@ import pydicom  # for write_file
 import pydicom.charset
 from pydicom.config import logger
 import pydicom.encaps
+import pydicom.config
 
 sys_is_little_endian = (sys.byteorder == 'little')
 
@@ -498,11 +499,11 @@ class Dataset(dict):
               (if present).
         """
         tag = tag_for_keyword(name)
-        if tag is None: # `name` isn't a DICOM element keyword
+        if tag is None:  # `name` isn't a DICOM element keyword
             # Try the base class attribute getter (fix for issue 332)
             return super(Dataset, self).__getattribute__(name)
         tag = Tag(tag)
-        if tag not in self: # DICOM DataElement not in the Dataset
+        if tag not in self:  # DICOM DataElement not in the Dataset
             # Try the base class attribute getter (fix for issue 332)
             return super(Dataset, self).__getattribute__(name)
         else:
@@ -726,69 +727,12 @@ class Dataset(dict):
                 numpy_dtype = numpy_dtype.newbyteorder('S')
 
             pixel_bytearray = self.PixelData
-        elif have_gdcm and self.filename:
-            # read the file using GDCM
-            # FIXME this should just use self.PixelData instead of self.filename
-            #       but it is unclear how this should be achieved using GDCM
-            gdcm_image_reader = gdcm.ImageReader()
-            gdcm_image_reader.SetFileName(self.filename)
-            if not gdcm_image_reader.Read():
-                raise TypeError("GDCM could not read DICOM image")
-            gdcm_image = gdcm_image_reader.GetImage()
-
-            # determine the correct numpy datatype
-            gdcm_numpy_typemap = {
-                gdcm.PixelFormat.INT8:     numpy.int8,
-                gdcm.PixelFormat.UINT8:    numpy.uint8,
-                gdcm.PixelFormat.UINT16:   numpy.uint16,
-                gdcm.PixelFormat.INT16:    numpy.int16,
-                gdcm.PixelFormat.UINT32:   numpy.uint32,
-                gdcm.PixelFormat.INT32:    numpy.int32,
-                gdcm.PixelFormat.FLOAT32:  numpy.float32,
-                gdcm.PixelFormat.FLOAT64:  numpy.float64
-            }
-            gdcm_pixel_format = gdcm_image.GetPixelFormat().GetScalarType()
-            if gdcm_pixel_format in gdcm_numpy_typemap:
-                numpy_dtype = gdcm_numpy_typemap[gdcm_pixel_format]
-            else:
-                raise TypeError('{0} is not a GDCM supported '
-                                'pixel format'.format(gdcm_pixel_format))
-
-            # GDCM returns char* as type str. Under Python 2 `str` are
-            # byte arrays by default. Python 3 decodes this to
-            # unicode strings by default.
-            # The SWIG docs mention that they always decode byte streams
-            # as utf-8 strings for Python 3, with the `surrogateescape`
-            # error handler configured.
-            # Therefore, we can encode them back to their original bytearray
-            # representation on Python 3 by using the same parameters.
-            pixel_bytearray = gdcm_image.GetBuffer()
-            if sys.version_info >= (3, 0):
-                pixel_bytearray = pixel_bytearray.encode("utf-8",
-                                                         "surrogateescape")
-
-            # if GDCM indicates that a byte swap is in order, make
-            #   sure to inform numpy as well
-            if gdcm_image.GetNeedByteSwap():
-                numpy_dtype = numpy_dtype.newbyteorder('S')
-
-            # Here we need to be careful because in some cases, GDCM reads a
-            # buffer that is too large, so we need to make sure we only include
-            # the first n_rows * n_columns * dtype_size bytes.
-
-            n_bytes = self.Rows * self.Columns * numpy.dtype(numpy_dtype).itemsize
-
-            if len(pixel_bytearray) > n_bytes:
-
-                # We make sure that all the bytes after are in fact zeros
-                padding = pixel_bytearray[n_bytes:]
-                if numpy.any(numpy.fromstring(padding, numpy.byte)):
-                    pixel_bytearray = pixel_bytearray[:n_bytes]
-                else:
-                    # We revert to the old behavior which should then result
-                    #   in a Numpy error later on.
-                    pass
-
+        else:
+            raise NotImplementedError("Pixel Data is compressed in a "
+                                      "format pydicom does not yet handle. "
+                                      "Cannot return array. Pydicom might "
+                                      "be able to convert the pixel data "
+                                      "using GDCM if it is installed.")
         pixel_array = numpy.fromstring(pixel_bytearray, dtype=numpy_dtype)
         length_of_pixel_array = pixel_array.nbytes
         expected_length = self.Rows * self.Columns
@@ -874,13 +818,32 @@ class Dataset(dict):
                    "format='%s', PixelRepresentation=%d, BitsAllocated=%d")
             raise TypeError(msg % (format_str, self.PixelRepresentation,
                                    self.BitsAllocated))
-        if self.file_meta.TransferSyntaxUID in pydicom.uid.PILSupportedCompressedPixelTransferSyntaxes:
-            UncompressedPixelData = self._get_PIL_supported_compressed_pixeldata()
-        elif self.file_meta.TransferSyntaxUID in pydicom.uid.JPEGLSSupportedCompressedPixelTransferSyntaxes:
-            UncompressedPixelData = self._get_jpeg_ls_supported_compressed_pixeldata()
+        if pydicom.config.force_pillow_decompression:
+            # use pillow or jpeg_ls or throw exception
+            if self.file_meta.TransferSyntaxUID in pydicom.uid.PILSupportedCompressedPixelTransferSyntaxes:
+                UncompressedPixelData = self._get_PIL_supported_compressed_pixeldata()
+            elif self.file_meta.TransferSyntaxUID in pydicom.uid.JPEGLSSupportedCompressedPixelTransferSyntaxes:
+                UncompressedPixelData = self._get_jpeg_ls_supported_compressed_pixeldata()
+            else:
+                msg = "The transfer syntax {0} is not currently supported.".format(self.file_meta.TransferSyntaxUID)
+                raise NotImplementedError(msg)
+        elif pydicom.config.force_gdcm_decompression:
+            if not self._is_uncompressed_transfer_syntax():
+                UncompressedPixelData = self._get_GDCM_supported_compressed_pixeldata()
+            else:
+                msg = "The transfer syntax {0} is not currently supported.".format(self.file_meta.TransferSyntaxUID)
+                raise NotImplementedError(msg)
         else:
-            msg = "The transfer syntax {0} is not currently supported.".format(self.file_meta.TransferSyntaxUID)
-            raise NotImplementedError(msg)
+            # neither is forced, so try pillow then gdcm
+            if self.file_meta.TransferSyntaxUID in pydicom.uid.PILSupportedCompressedPixelTransferSyntaxes:
+                UncompressedPixelData = self._get_PIL_supported_compressed_pixeldata()
+            elif self.file_meta.TransferSyntaxUID in pydicom.uid.JPEGLSSupportedCompressedPixelTransferSyntaxes:
+                UncompressedPixelData = self._get_jpeg_ls_supported_compressed_pixeldata()
+            elif not self._is_uncompressed_transfer_syntax():
+                UncompressedPixelData = self._get_GDCM_supported_compressed_pixeldata()
+            else:
+                msg = "The transfer syntax {0} is not currently supported.".format(self.file_meta.TransferSyntaxUID)
+                raise NotImplementedError(msg)
 
         # Have correct Numpy format, so create the NumPy array
         arr = numpy.fromstring(UncompressedPixelData, numpy_format)
@@ -915,6 +878,70 @@ class Dataset(dict):
             # WHY IS THIS EVEN NECESSARY??
             arr &= 0x7FFF
         return arr
+
+    def _get_GDCM_supported_compressed_pixeldata(self):
+        # read the file using GDCM
+        # FIXME this should just use self.PixelData instead of self.filename
+        #       but it is unclear how this should be achieved using GDCM
+        gdcm_image_reader = gdcm.ImageReader()
+        gdcm_image_reader.SetFileName(self.filename)
+        if not gdcm_image_reader.Read():
+            raise TypeError("GDCM could not read DICOM image")
+        gdcm_image = gdcm_image_reader.GetImage()
+
+        # determine the correct numpy datatype
+        gdcm_numpy_typemap = {
+            gdcm.PixelFormat.INT8:     numpy.int8,
+            gdcm.PixelFormat.UINT8:    numpy.uint8,
+            gdcm.PixelFormat.UINT16:   numpy.uint16,
+            gdcm.PixelFormat.INT16:    numpy.int16,
+            gdcm.PixelFormat.UINT32:   numpy.uint32,
+            gdcm.PixelFormat.INT32:    numpy.int32,
+            gdcm.PixelFormat.FLOAT32:  numpy.float32,
+            gdcm.PixelFormat.FLOAT64:  numpy.float64
+        }
+        gdcm_pixel_format = gdcm_image.GetPixelFormat().GetScalarType()
+        if gdcm_pixel_format in gdcm_numpy_typemap:
+            numpy_dtype = gdcm_numpy_typemap[gdcm_pixel_format]
+        else:
+            raise TypeError('{0} is not a GDCM supported '
+                            'pixel format'.format(gdcm_pixel_format))
+
+        # GDCM returns char* as type str. Under Python 2 `str` are
+        # byte arrays by default. Python 3 decodes this to
+        # unicode strings by default.
+        # The SWIG docs mention that they always decode byte streams
+        # as utf-8 strings for Python 3, with the `surrogateescape`
+        # error handler configured.
+        # Therefore, we can encode them back to their original bytearray
+        # representation on Python 3 by using the same parameters.
+        pixel_bytearray = gdcm_image.GetBuffer()
+        if sys.version_info >= (3, 0):
+            pixel_bytearray = pixel_bytearray.encode("utf-8",
+                                                     "surrogateescape")
+
+        # if GDCM indicates that a byte swap is in order, make
+        #   sure to inform numpy as well
+        if gdcm_image.GetNeedByteSwap():
+            numpy_dtype = numpy_dtype.newbyteorder('S')
+
+        # Here we need to be careful because in some cases, GDCM reads a
+        # buffer that is too large, so we need to make sure we only include
+        # the first n_rows * n_columns * dtype_size bytes.
+
+        n_bytes = self.Rows * self.Columns * numpy.dtype(numpy_dtype).itemsize
+
+        if len(pixel_bytearray) > n_bytes:
+
+            # We make sure that all the bytes after are in fact zeros
+            padding = pixel_bytearray[n_bytes:]
+            if numpy.any(numpy.fromstring(padding, numpy.byte)):
+                pixel_bytearray = pixel_bytearray[:n_bytes]
+            else:
+                # We revert to the old behavior which should then result
+                #   in a Numpy error later on.
+                pass
+        return pixel_bytearray
 
     def _get_PIL_supported_compressed_pixeldata(self):
         """Use PIL to decompress compressed Pixel Data.
@@ -1135,7 +1162,7 @@ class Dataset(dict):
                 if data_element.VR == "SQ":   # a sequence
                     strings.append(indent_str + str(data_element.tag) +
                                    "  %s   %i item(s) ---- "
-                                   %(data_element.description(),
+                                   % (data_element.description(),
                                      len(data_element.value)))
                     if not top_level_only:
                         for dataset in data_element.value:
@@ -1242,7 +1269,7 @@ class Dataset(dict):
                 data_element.value = value
             # Now have data_element - store it in this dict
             self[tag] = data_element
-        elif repeater_has_keyword(name): # Check if `name` is repeaters element
+        elif repeater_has_keyword(name):  # Check if `name` is repeaters element
             raise ValueError('{} is a DICOM repeating group element and must '
                              'be added using the add() or add_new() methods.'
                              .format(name))

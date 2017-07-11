@@ -15,7 +15,16 @@ import sys
 import tempfile
 import unittest
 from pydicom.util.testing.warncheck import assertWarns
-
+from pydicom.dataset import Dataset, FileDataset
+from pydicom.dataelem import DataElement
+from pydicom.filebase import DicomBytesIO
+from pydicom.filereader import read_file, data_element_generator
+from pydicom.errors import InvalidDicomError
+from pydicom.dataset import PropertyError
+from pydicom.tag import Tag, TupleTag
+from pydicom.uid import ImplicitVRLittleEndian
+import pydicom.valuerep
+import pydicom.config
 try:
     unittest.skipUnless
 except AttributeError:
@@ -37,16 +46,6 @@ try:
     import numpy  # NOQA
 except:
     have_numpy = False
-
-from pydicom.dataset import Dataset, FileDataset
-from pydicom.dataelem import DataElement
-from pydicom.filebase import DicomBytesIO
-from pydicom.filereader import read_file, data_element_generator
-from pydicom.errors import InvalidDicomError
-from pydicom.dataset import PropertyError
-from pydicom.tag import Tag, TupleTag
-from pydicom.uid import ImplicitVRLittleEndian
-import pydicom.valuerep
 
 have_jpeg_ls = True
 try:
@@ -570,22 +569,22 @@ class ReadDataElementTests(unittest.TestCase):
     def setUp(self):
         ds = Dataset()
         ds.DoubleFloatPixelData = b'\x00\x01\x02\x03\x04\x05\x06\x07' \
-                                  b'\x01\x01\x02\x03\x04\x05\x06\x07' # VR of OD
+                                  b'\x01\x01\x02\x03\x04\x05\x06\x07'  # VR of OD
         ds.SelectorOLValue = b'\x00\x01\x02\x03\x04\x05\x06\x07' \
-                             b'\x01\x01\x02\x03' # VR of OL
-        ds.PotentialReasonsForProcedure = ['A', 'B', 'C'] # VR of UC, odd length
-        ds.StrainDescription = 'Test' # Even length
-        ds.URNCodeValue = 'http://test.com' # VR of UR
-        ds.RetrieveURL = 'ftp://test.com  ' # Test trailing spaces ignored
-        ds.DestinationAE = '    TEST  12    ' # 16 characters max for AE
+                             b'\x01\x01\x02\x03'  # VR of OL
+        ds.PotentialReasonsForProcedure = ['A', 'B', 'C']  # VR of UC, odd length
+        ds.StrainDescription = 'Test'  # Even length
+        ds.URNCodeValue = 'http://test.com'  # VR of UR
+        ds.RetrieveURL = 'ftp://test.com  '  # Test trailing spaces ignored
+        ds.DestinationAE = '    TEST  12    '  # 16 characters max for AE
 
-        self.fp = BytesIO() # Implicit little
+        self.fp = BytesIO()  # Implicit little
         file_ds = FileDataset(self.fp, ds)
         file_ds.is_implicit_VR = True
         file_ds.is_little_endian = True
         file_ds.save_as(self.fp)
 
-        self.fp_ex = BytesIO() # Explicit little
+        self.fp_ex = BytesIO()  # Explicit little
         file_ds = FileDataset(self.fp_ex, ds)
         file_ds.is_implicit_VR = False
         file_ds.is_little_endian = True
@@ -684,15 +683,26 @@ class JPEG_LS_Tests(unittest.TestCase):
         self.emri_jpeg_ls_lossless = read_file(emri_jpeg_ls_lossless)
         self.emri_small = read_file(emri_name)
 
-    def testJPEG_LS_PixelArray(self):
+    def tearDown(self):
+        pydicom.config.force_gdcm_decompression = False
+        pydicom.config.force_pillow_decompression = False
+
+    def testGDCM_JPEG_LS_PixelArray(self):
         """JPEG LS Lossless: Now works"""
-        if have_numpy and have_jpeg_ls:
-            a = self.jpeg_ls_lossless.pixel_array
-            b = self.mr_small.pixel_array
-            self.assertEqual(a.mean(), b.mean(),
-                             "Decoded pixel data is not all {0} (mean == {1})".format(b.mean(), a.mean()))
-        else:
-            self.assertRaises(NotImplementedError, self.jpeg_ls_lossless._get_pixel_array)
+        pydicom.config.force_gdcm_decompression = True
+        pydicom.config.force_pillow_decompression = False
+        a = self.jpeg_ls_lossless.pixel_array
+        b = self.mr_small.pixel_array
+        self.assertEqual(a.mean(), b.mean(),
+                         "using GDCM Decoded pixel data is not all {0} (mean == {1})".format(b.mean(), a.mean()))
+
+    def testPillow_JPEG_LS_PixelArray(self):
+        pydicom.config.force_gdcm_decompression = False
+        pydicom.config.force_pillow_decompression = True
+        a = self.jpeg_ls_lossless.pixel_array
+        b = self.mr_small.pixel_array
+        self.assertEqual(a.mean(), b.mean(),
+                         "using Pillow Decoded pixel data is not all {0} (mean == {1})".format(b.mean(), a.mean()))
 
     def test_emri_JPEG_LS_PixelArray(self):
         """JPEG LS Lossless: Now works"""
