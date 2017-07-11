@@ -32,7 +32,8 @@ install:
   - "python -c \"import struct; print(struct.calcsize('P') * 8)\""
 
   # Installed prebuilt dependencies from conda
-  - "conda install pip pytest wheel matplotlib -y -q"
+  - "conda install pip numpy nose wheel matplotlib -y -q"
+  - "pip install nose-timer nose-exclude"
 
   # Install other pydicom dependencies
   - "python setup.py bdist_wheel"
@@ -47,12 +48,10 @@ build: false
 test_script:
   # Change to a non-source folder to make sure we run the tests on the
   # installed library.
-  - "cd C:\\"
-  - "python -c \"import nose; nose.main()\" -v -s --with-timer --timer-top-n 50 pydicom"
+  # TODO: Once the tests will be moved we have to revert this part
+  # - "cd C:\\"
+  - "python -c \"import nose; nose.main()\" -v -s --with-timer --timer-top-n 50 --exclude-dir=tests/performance tests"
 
 artifacts:
   # Archive the generated packages in the ci.appveyor.com build report.
   - path: dist\*
-
-#on_success:
-#  - TODO: upload the content of dist/*.whl to a public wheelhouse

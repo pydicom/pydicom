@@ -3,14 +3,14 @@
 # caution: testing won't work on windows
 
 test-code:
-	py.test --pyargs pydicom
+	py.test tests
 
 test-doc:
-	pytest --pyargs doc/*.rst
+	pytest  doc/*.rst
 
 test-coverage:
 	rm -rf coverage .coverage
-	py.test --pyargs pydicom --cov-report term-missing --cov=pydicom
+	py.test tests --cov-report term-missing --cov=pydicom
 
 test: test-code test-doc
 
@@ -19,6 +19,18 @@ doc:
 
 doc-noplot:
 	make -C doc html-noplot
+
+clean:
+	find . -name "*.so" -o -name "*.pyc" -o -name "*.md5" -o -name "*.pyd" -o -name "*~" | xargs rm -f
+	find . -name "*.pyx" -exec ./tools/rm_pyx_c_file.sh {} \;
+	rm -rf .cache
+	rm -rf .coverage
+	rm -rf dist
+	rm -rf build
+	rm -rf doc/auto_examples
+	rm -rf doc/generated
+	rm -rf doc/modules
+	rm -rf examples/.ipynb_checkpoints
 
 code-analysis:
 	flake8 pydicom | grep -v __init__ | grep -v external
