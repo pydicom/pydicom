@@ -74,13 +74,13 @@ elif [[ "$DISTRIB" == "pypy" ]]; then
     else
         ln -s "$BIN_PATH/pypy3" "$BIN_PATH/python"
     fi
-    ls $BIN_PATH
     export PATH="$BIN_PATH:$PATH"
-    pypy -m ensurepip
+    python -m ensurepip
     pip install -U pip wheel
     if [[ "$DEPS" == "true" ]]; then
         python -m pip install git+https://bitbucket.org/pypy/numpy.git
     fi
+    pip install nose nose-timer pytest pytest-cov codecov
 fi
 
 python --version

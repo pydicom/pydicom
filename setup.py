@@ -53,7 +53,7 @@ DOWNLOAD_URL = "https://github.com/pydicom/pydicom/archive/master.zip"
 LICENSE = "MIT"
 VERSION = __version__
 # PACKAGE_DATA = {'pydicom': ['../tests/tests_files/*']}
-REQUIRES = ["numpy", "matplotlib"]
+REQUIRES = ["numpy"]
 
 opts = dict(name=NAME,
             version=__version__,
