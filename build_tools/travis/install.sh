@@ -41,6 +41,8 @@ if [[ "$DISTRIB" == "conda" ]]; then
     conda install --yes nose pytest pytest-cov
     if [[ "$DEPS" == "true" ]]; then
         conda install --yes numpy
+    elif [[ "$DEPS" == "all" ]]; then
+        conda install --yes numpy pillow jpeg
     fi
     # Install nose-timer via pip
     pip install nose-timer codecov

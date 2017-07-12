@@ -11,6 +11,7 @@ cache:
 
 matrix:
   include:
+    - env: DISTRIB="conda" PYTHON_VERSION="3.6" DEPS="all"
     - env: DISTRIB="ubuntu" PYTHON_VERSION="2.7" DEPS=true
       addons:
         apt:
