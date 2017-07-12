@@ -23,7 +23,6 @@ except AttributeError:
         import unittest2 as unittest
     except ImportError:
         print("unittest2 is required for testing in python2.6")
-
 # os.stat is only available on Unix and Windows   XXX Mac?
 # Not sure if on other platforms the import fails, or the call to it??
 stat_available = True
@@ -47,7 +46,6 @@ from pydicom.dataset import PropertyError
 from pydicom.tag import Tag, TupleTag
 from pydicom.uid import ImplicitVRLittleEndian
 import pydicom.valuerep
-
 have_jpeg_ls = True
 try:
     import jpeg_ls
@@ -64,8 +62,6 @@ except ImportError:
     except ImportError:
         # Neither worked, so it's likely not installed.
         have_pillow = False
-
-
 test_dir = os.path.dirname(__file__)
 test_files = os.path.join(test_dir, 'test_files')
 
@@ -113,8 +109,6 @@ def isClose(a, b, epsilon=0.000001):
             if abs(ai - bi) > epsilon:
                 return False
         return True
-
-
 class ReaderTests(unittest.TestCase):
     def testEmptyNumbersTag(self):
         """Tests that an empty tag with a number VR (FL, UL, SL, US, SS, FL, FD, OF) reads as an empty string"""
@@ -135,6 +129,8 @@ class ReaderTests(unittest.TestCase):
         self.assertTrue(ds is not None)
 
     def testRTPlan(self):
+
+
         """Returns correct values for sample data elements in test RT Plan file"""
         plan = read_file(rtplan_name)
         beam = plan.BeamSequence[0]
@@ -437,13 +433,7 @@ class ReaderTests(unittest.TestCase):
 
     def test_no_preamble_command_group_dataset(self):
         """Test correct read of group 0 and 2 elements with no preamble."""
-        bytestream = b'\x02\x00\x02\x00\x55\x49\x16\x00\x31\x2e\x32\x2e\x38\x34\x30\x2e\x31' \
-                     b'\x30\x30\x30\x38\x2e\x35\x2e\x31\x2e\x31\x2e\x39\x00\x02\x00\x10\x00' \
-                     b'\x55\x49\x12\x00\x31\x2e\x32\x2e\x38\x34\x30\x2e\x31\x30\x30\x30\x38' \
-                     b'\x2e\x31\x2e\x32\x00' \
-                     b'\x20\x20\x10\x00\x02\x00\x00\x00\x01\x00\x20\x20' \
-                     b'\x20\x00\x06\x00\x00\x00\x4e\x4f\x52\x4d\x41\x4c' \
-                     b'\x00\x00\x10\x01\x02\x00\x00\x00\x03\x00'
+        bytestream = b'\x02\x00\x02\x00\x55\x49\x16\x00\x31\x2e\x32\x2e\x38\x34\x30\x2e\x31 \x30\x30\x30\x38\x2e\x35\x2e\x31\x2e\x31\x2e\x39\x00\x02\x00\x10\x00 \x55\x49\x12\x00\x31\x2e\x32\x2e\x38\x34\x30\x2e\x31\x30\x30\x30\x38 \x2e\x31\x2e\x32\x00 \x20\x20\x10\x00\x02\x00\x00\x00\x01\x00\x20\x20 \x20\x00\x06\x00\x00\x00\x4e\x4f\x52\x4d\x41\x4c \x00\x00\x10\x01\x02\x00\x00\x00\x03\x00'
 
         fp = BytesIO(bytestream)
         ds = read_file(fp, force=True)
