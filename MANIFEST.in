@@ -1,2 +1,8 @@
+
+recursive-include doc *
+recursive-include examples *
 include pydicom/*
-include ez_setup.py
+include tests/*
+include CONTRIBUTING.md
+include LICENSE
+include README.md

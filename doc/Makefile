@@ -183,3 +183,5 @@ pseudoxml:
 	$(SPHINXBUILD) -b pseudoxml $(ALLSPHINXOPTS) $(BUILDDIR)/pseudoxml
 	@echo
 	@echo "Build finished. The pseudo-XML files are in $(BUILDDIR)/pseudoxml."
+
+dist: html #latexpdf cp _build/latex/user_guide.pdf _build/html/_downloads/pydicom-docs.pdf
