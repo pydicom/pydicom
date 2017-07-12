@@ -265,7 +265,7 @@ class Dataset(dict):
         else:
             try:
                 tag = Tag(name)
-            except:
+            except Exception:
                 return False
         # Test against None as (0000,0000) is a possible tag
         if tag is not None:
@@ -472,7 +472,7 @@ class Dataset(dict):
             if not isinstance(key, BaseTag):
                 try:
                     key = Tag(key)
-                except:
+                except Exception:
                     raise TypeError("Dataset.get key must be a string or tag")
         try:
             return_val = self.__getitem__(key)
@@ -990,10 +990,10 @@ class Dataset(dict):
                     except IOError as e:
                         try:
                             message = str(e)
-                        except:
+                        except Exception:
                             try:
                                 message = unicode(e)
-                            except:
+                            except Exception:
                                 message = ''
                         raise NotImplementedError(message)
                     UncompressedPixelData += decompressed_image.tobytes()
@@ -1007,14 +1007,14 @@ class Dataset(dict):
                 except IOError as e:
                     try:
                         message = str(e)
-                    except:
+                    except Exception:
                         try:
                             message = unicode(e)
-                        except:
+                        except Exception:
                             message = ''
                     raise NotImplementedError(message)
                 UncompressedPixelData = decompressed_image.tobytes()
-        except:
+        except Exception:
             raise
         return UncompressedPixelData
 
@@ -1074,7 +1074,7 @@ class Dataset(dict):
                 self._pixel_array = self._compressed_pixel_data_numpy()
                 self._pixel_id = id(self.PixelData)  # is this guaranteed to work if memory is re-used??
                 return self._pixel_array
-            except Exception as I:
+            except Exception:
                 logger.info("Pillow or JPLS did not support this transfer syntax")
         if not already_have:
             self._pixel_array = self._pixel_data_numpy()
@@ -1163,7 +1163,7 @@ class Dataset(dict):
                     strings.append(indent_str + str(data_element.tag) +
                                    "  %s   %i item(s) ---- "
                                    % (data_element.description(),
-                                     len(data_element.value)))
+                                      len(data_element.value)))
                     if not top_level_only:
                         for dataset in data_element.value:
                             strings.append(dataset._pretty_str(indent + 1))

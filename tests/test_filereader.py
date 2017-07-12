@@ -38,13 +38,13 @@ except AttributeError:
 stat_available = True
 try:
     from os import stat  # NOQA
-except:
+except ImportError:
     stat_available = False
 
 have_numpy = True
 try:
     import numpy  # NOQA
-except:
+except ImportError:
     have_numpy = False
 
 have_jpeg_ls = True
@@ -103,7 +103,7 @@ def isClose(a, b, epsilon=0.000001):
     """Compare within some tolerance, to avoid machine roundoff differences"""
     try:
         a.append  # see if is a list
-    except:  # (is not)
+    except Exception:  # (is not)
         return abs(a - b) < epsilon
     else:
         if len(a) != len(b):
@@ -594,7 +594,7 @@ class ReadDataElementTests(unittest.TestCase):
         """Check creation of OD DataElement from byte data works correctly."""
         ds = read_file(self.fp, force=True)
         ref_elem = ds.get(0x7fe00009)
-        elem = DataElement(0x7fe00009, 'OD', b'\x00\x01\x02\x03\x04\x05\x06\x07' \
+        elem = DataElement(0x7fe00009, 'OD', b'\x00\x01\x02\x03\x04\x05\x06\x07'
                                              b'\x01\x01\x02\x03\x04\x05\x06\x07')
         self.assertEqual(ref_elem, elem)
 
@@ -602,7 +602,7 @@ class ReadDataElementTests(unittest.TestCase):
         """Check creation of OD DataElement from byte data works correctly."""
         ds = read_file(self.fp_ex, force=True)
         ref_elem = ds.get(0x7fe00009)
-        elem = DataElement(0x7fe00009, 'OD', b'\x00\x01\x02\x03\x04\x05\x06\x07' \
+        elem = DataElement(0x7fe00009, 'OD', b'\x00\x01\x02\x03\x04\x05\x06\x07'
                                              b'\x01\x01\x02\x03\x04\x05\x06\x07')
         self.assertEqual(ref_elem, elem)
 
@@ -610,7 +610,7 @@ class ReadDataElementTests(unittest.TestCase):
         """Check creation of OL DataElement from byte data works correctly."""
         ds = read_file(self.fp, force=True)
         ref_elem = ds.get(0x00720075)
-        elem = DataElement(0x00720075, 'OL', b'\x00\x01\x02\x03\x04\x05\x06\x07' \
+        elem = DataElement(0x00720075, 'OL', b'\x00\x01\x02\x03\x04\x05\x06\x07'
                                              b'\x01\x01\x02\x03')
         self.assertEqual(ref_elem, elem)
 
@@ -618,7 +618,7 @@ class ReadDataElementTests(unittest.TestCase):
         """Check creation of OL DataElement from byte data works correctly."""
         ds = read_file(self.fp_ex, force=True)
         ref_elem = ds.get(0x00720075)
-        elem = DataElement(0x00720075, 'OL', b'\x00\x01\x02\x03\x04\x05\x06\x07' \
+        elem = DataElement(0x00720075, 'OL', b'\x00\x01\x02\x03\x04\x05\x06\x07'
                                              b'\x01\x01\x02\x03')
         self.assertEqual(ref_elem, elem)
 
@@ -649,24 +649,24 @@ class ReadDataElementTests(unittest.TestCase):
     def test_read_UR_implicit_little(self):
         """Check creation of DataElement from byte data works correctly."""
         ds = read_file(self.fp, force=True)
-        ref_elem = ds.get(0x00080120) # URNCodeValue
+        ref_elem = ds.get(0x00080120)  # URNCodeValue
         elem = DataElement(0x00080120, 'UR', 'http://test.com')
         self.assertEqual(ref_elem, elem)
 
         # Test trailing spaces ignored
-        ref_elem = ds.get(0x00081190) # RetrieveURL
+        ref_elem = ds.get(0x00081190)  # RetrieveURL
         elem = DataElement(0x00081190, 'UR', 'ftp://test.com')
         self.assertEqual(ref_elem, elem)
 
     def test_read_UR_explicit_little(self):
         """Check creation of DataElement from byte data works correctly."""
         ds = read_file(self.fp_ex, force=True)
-        ref_elem = ds.get(0x00080120) # URNCodeValue
+        ref_elem = ds.get(0x00080120)  # URNCodeValue
         elem = DataElement(0x00080120, 'UR', 'http://test.com')
         self.assertEqual(ref_elem, elem)
 
         # Test trailing spaces ignored
-        ref_elem = ds.get(0x00081190) # RetrieveURL
+        ref_elem = ds.get(0x00081190)  # RetrieveURL
         elem = DataElement(0x00081190, 'UR', 'ftp://test.com')
         self.assertEqual(ref_elem, elem)
 

@@ -48,6 +48,7 @@ def DS_decimal(use_Decimal_boolean=True):
     else:
         pydicom.valuerep.DSclass = pydicom.valuerep.DSfloat
 
+
 # Configuration flags
 allow_DS_float = False
 """Set allow_float to True to allow DSdecimal instances to be created with floats;
@@ -87,6 +88,7 @@ def debug(debug_on=True):
     else:
         logger.setLevel(logging.WARNING)
         debugging = False
+
 
 # force level=WARNING, in case logging default is set differently (issue 103)
 debug(False)
