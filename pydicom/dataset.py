@@ -41,42 +41,11 @@ import pydicom.config
 
 sys_is_little_endian = (sys.byteorder == 'little')
 
-have_numpy = True
-try:
-    import numpy
-except ImportError:
-    have_numpy = False
-
-have_gdcm = True
-try:
-    import gdcm
-except ImportError:
-    have_gdcm = False
-
 stat_available = True
 try:
     from os import stat
 except ImportError:
     stat_available = False
-have_jpeg_ls = True
-
-try:
-    import jpeg_ls
-except ImportError:
-    have_jpeg_ls = False
-
-have_pillow = True
-try:
-    from PIL import Image as PILImg
-except ImportError:
-    have_pillow = False
-    # If that failed, try the alternate import syntax for PIL.
-    try:
-        import Image as PILImg
-    except ImportError:
-        # Neither worked, so it's likely not installed.
-        have_pillow = False
-
 
 class PropertyError(Exception):
     """For AttributeErrors caught in a property, so do not go to __getattr__"""
@@ -668,115 +637,6 @@ class Dataset(dict):
         """Compare `self` and `other` for inequality."""
         return not (self == other)
 
-    def _pixel_data_numpy(self):
-        """If NumPy is available, return an ndarray of the Pixel Data.
-
-        Falls back to GDCM in case of unsupported transfer syntaxes.
-
-        Raises
-        ------
-        TypeError
-            If there is no Pixel Data or not a supported data type.
-        ImportError
-            If NumPy isn't found, or in the case of fallback, if GDCM isn't
-            found.
-
-        Returns
-        -------
-        numpy.ndarray
-            The contents of the Pixel Data element (7FE0,0010) as an ndarray.
-        """
-        if not self._is_uncompressed_transfer_syntax():
-            if not have_gdcm:
-                raise NotImplementedError("Pixel Data is compressed in a "
-                                          "format pydicom does not yet handle. "
-                                          "Cannot return array. Pydicom might "
-                                          "be able to convert the pixel data "
-                                          "using GDCM if it is installed.")
-            elif not self.filename:
-                raise NotImplementedError("GDCM is only supported when the "
-                                          "dataset has been created with a "
-                                          "filename.")
-        if not have_numpy:
-            msg = "The Numpy package is required to use pixel_array, and " \
-                  "numpy could not be imported."
-            raise ImportError(msg)
-        if 'PixelData' not in self:
-            raise TypeError("No pixel data found in this dataset.")
-
-        # There are two cases:
-        # 1) uncompressed PixelData -> use numpy
-        # 2) compressed PixelData, filename is available and GDCM is
-        #    available -> use GDCM
-        if self._is_uncompressed_transfer_syntax():
-            # Make NumPy format code, e.g. "uint16", "int32" etc
-            # from two pieces of info:
-            #    self.PixelRepresentation -- 0 for unsigned, 1 for signed;
-            #    self.BitsAllocated -- 8, 16, or 32
-            format_str = '%sint%d' % (('u', '')[self.PixelRepresentation],
-                                      self.BitsAllocated)
-            try:
-                numpy_dtype = numpy.dtype(format_str)
-            except TypeError:
-                msg = ("Data type not understood by NumPy: "
-                       "format='%s', PixelRepresentation=%d, BitsAllocated=%d")
-                raise TypeError(msg % (format_str, self.PixelRepresentation,
-                                       self.BitsAllocated))
-
-            if self.is_little_endian != sys_is_little_endian:
-                numpy_dtype = numpy_dtype.newbyteorder('S')
-
-            pixel_bytearray = self.PixelData
-        else:
-            raise NotImplementedError("Pixel Data is compressed in a "
-                                      "format pydicom does not yet handle. "
-                                      "Cannot return array. Pydicom might "
-                                      "be able to convert the pixel data "
-                                      "using GDCM if it is installed.")
-        pixel_array = numpy.fromstring(pixel_bytearray, dtype=numpy_dtype)
-        length_of_pixel_array = pixel_array.nbytes
-        expected_length = self.Rows * self.Columns
-        if 'NumberOfFrames' in self and self.NumberOfFrames > 1:
-            expected_length *= self.NumberOfFrames
-        if 'SamplesPerPixel' in self and self.SamplesPerPixel > 1:
-            expected_length *= self.SamplesPerPixel
-        if self.BitsAllocated > 8:
-            expected_length *= (self.BitsAllocated // 8)
-        if length_of_pixel_array != expected_length:
-            raise AttributeError("Amount of pixel data %d does not match the expected data %d" % (length_of_pixel_array, expected_length))
-
-        # Note the following reshape operations return a new *view* onto
-        #   pixel_array, but don't copy the data
-        if 'NumberOfFrames' in self and self.NumberOfFrames > 1:
-            if self.SamplesPerPixel > 1:
-                # TODO: Handle Planar Configuration attribute
-                assert self.PlanarConfiguration == 0
-                pixel_array = pixel_array.reshape(self.NumberOfFrames,
-                                                  self.Rows, self.Columns,
-                                                  self.SamplesPerPixel)
-            else:
-                pixel_array = pixel_array.reshape(self.NumberOfFrames,
-                                                  self.Rows, self.Columns)
-        else:
-            if self.SamplesPerPixel > 1:
-                if self.BitsAllocated == 8:
-                    if self.PlanarConfiguration == 0:
-                        pixel_array = pixel_array.reshape(self.Rows,
-                                                          self.Columns,
-                                                          self.SamplesPerPixel)
-                    else:
-                        pixel_array = pixel_array.reshape(self.SamplesPerPixel,
-                                                          self.Rows,
-                                                          self.Columns)
-                        pixel_array = pixel_array.transpose(1, 2, 0)
-                else:
-                    raise NotImplementedError("This code only handles "
-                                              "SamplesPerPixel > 1 if Bits "
-                                              "Allocated = 8")
-            else:
-                pixel_array = pixel_array.reshape(self.Rows, self.Columns)
-        return pixel_array
-
     def _compressed_pixel_data_numpy(self):
         """Return a NumPy array of the Pixel Data.
 
@@ -879,178 +739,40 @@ class Dataset(dict):
             arr &= 0x7FFF
         return arr
 
-    def _get_GDCM_supported_compressed_pixeldata(self):
-        # read the file using GDCM
-        # FIXME this should just use self.PixelData instead of self.filename
-        #       but it is unclear how this should be achieved using GDCM
-        gdcm_image_reader = gdcm.ImageReader()
-        gdcm_image_reader.SetFileName(self.filename)
-        if not gdcm_image_reader.Read():
-            raise TypeError("GDCM could not read DICOM image")
-        gdcm_image = gdcm_image_reader.GetImage()
+    def _reshape_pixel_array(self, pixel_array):
 
-        # determine the correct numpy datatype
-        gdcm_numpy_typemap = {
-            gdcm.PixelFormat.INT8:     numpy.int8,
-            gdcm.PixelFormat.UINT8:    numpy.uint8,
-            gdcm.PixelFormat.UINT16:   numpy.uint16,
-            gdcm.PixelFormat.INT16:    numpy.int16,
-            gdcm.PixelFormat.UINT32:   numpy.uint32,
-            gdcm.PixelFormat.INT32:    numpy.int32,
-            gdcm.PixelFormat.FLOAT32:  numpy.float32,
-            gdcm.PixelFormat.FLOAT64:  numpy.float64
-        }
-        gdcm_pixel_format = gdcm_image.GetPixelFormat().GetScalarType()
-        if gdcm_pixel_format in gdcm_numpy_typemap:
-            numpy_dtype = gdcm_numpy_typemap[gdcm_pixel_format]
-        else:
-            raise TypeError('{0} is not a GDCM supported '
-                            'pixel format'.format(gdcm_pixel_format))
-
-        # GDCM returns char* as type str. Under Python 2 `str` are
-        # byte arrays by default. Python 3 decodes this to
-        # unicode strings by default.
-        # The SWIG docs mention that they always decode byte streams
-        # as utf-8 strings for Python 3, with the `surrogateescape`
-        # error handler configured.
-        # Therefore, we can encode them back to their original bytearray
-        # representation on Python 3 by using the same parameters.
-        pixel_bytearray = gdcm_image.GetBuffer()
-        if sys.version_info >= (3, 0):
-            pixel_bytearray = pixel_bytearray.encode("utf-8",
-                                                     "surrogateescape")
-
-        # if GDCM indicates that a byte swap is in order, make
-        #   sure to inform numpy as well
-        if gdcm_image.GetNeedByteSwap():
-            numpy_dtype = numpy_dtype.newbyteorder('S')
-
-        # Here we need to be careful because in some cases, GDCM reads a
-        # buffer that is too large, so we need to make sure we only include
-        # the first n_rows * n_columns * dtype_size bytes.
-
-        n_bytes = self.Rows * self.Columns * numpy.dtype(numpy_dtype).itemsize
-
-        if len(pixel_bytearray) > n_bytes:
-
-            # We make sure that all the bytes after are in fact zeros
-            padding = pixel_bytearray[n_bytes:]
-            if numpy.any(numpy.fromstring(padding, numpy.byte)):
-                pixel_bytearray = pixel_bytearray[:n_bytes]
-            else:
-                # We revert to the old behavior which should then result
-                #   in a Numpy error later on.
-                pass
-        return pixel_bytearray
-
-    def _get_PIL_supported_compressed_pixeldata(self):
-        """Use PIL to decompress compressed Pixel Data.
-
-        Returns
-        -------
-        bytes or str
-            The decompressed Pixel Data
-
-        Raises
-        ------
-        ImportError
-            If PIL is not available.
-        NotImplementedError
-            If unable to decompress the Pixel Data.
-        """
-        if not have_pillow:
-            msg = "The pillow package is required to use pixel_array for " \
-                  "this transfer syntax {0}, and pillow could not be " \
-                  "imported.".format(self.file_meta.TransferSyntaxUID)
-            raise ImportError(msg)
-        # decompress here
-        if self.file_meta.TransferSyntaxUID in pydicom.uid.JPEGLossyCompressedPixelTransferSyntaxes:
-            if self.BitsAllocated > 8:
-                raise NotImplementedError("JPEG Lossy only supported if Bits "
-                                          "Allocated = 8")
-            generic_jpeg_file_header = b'\xff\xd8\xff\xe0\x00\x10JFIF\x00\x01\x01\x01\x00\x01\x00\x01\x00\x00'
-            frame_start_from = 2
-        elif self.file_meta.TransferSyntaxUID in pydicom.uid.JPEG2000CompressedPixelTransferSyntaxes:
-            generic_jpeg_file_header = b''
-            # generic_jpeg_file_header = b'\x00\x00\x00\x0C\x6A\x50\x20\x20\x0D\x0A\x87\x0A'
-            frame_start_from = 0
-        else:
-            generic_jpeg_file_header = b''
-            frame_start_from = 0
-        try:
-            UncompressedPixelData = ''
-            if 'NumberOfFrames' in self and self.NumberOfFrames > 1:
-                # multiple compressed frames
-                CompressedPixelDataSeq = pydicom.encaps.decode_data_sequence(self.PixelData)
-                for frame in CompressedPixelDataSeq:
-                    data = generic_jpeg_file_header + frame[frame_start_from:]
-                    fio = io.BytesIO(data)
-                    try:
-                        decompressed_image = PILImg.open(fio)
-                    except IOError as e:
-                        try:
-                            message = str(e)
-                        except Exception:
-                            try:
-                                message = unicode(e)
-                            except Exception:
-                                message = ''
-                        raise NotImplementedError(message)
-                    UncompressedPixelData += decompressed_image.tobytes()
-            else:
-                # single compressed frame
-                UncompressedPixelData = pydicom.encaps.defragment_data(self.PixelData)
-                UncompressedPixelData = generic_jpeg_file_header + UncompressedPixelData[frame_start_from:]
-                try:
-                    fio = io.BytesIO(UncompressedPixelData)
-                    decompressed_image = PILImg.open(fio)
-                except IOError as e:
-                    try:
-                        message = str(e)
-                    except Exception:
-                        try:
-                            message = unicode(e)
-                        except Exception:
-                            message = ''
-                    raise NotImplementedError(message)
-                UncompressedPixelData = decompressed_image.tobytes()
-        except Exception:
-            raise
-        return UncompressedPixelData
-
-    def _get_jpeg_ls_supported_compressed_pixeldata(self):
-        """Use jpeg_ls to decompress compressed Pixel Data.
-
-        Returns
-        -------
-        bytes or str
-            The decompressed Pixel Data
-
-        Raises
-        ------
-        ImportError
-            If jpeg_ls is not available.
-        """
-        if not have_jpeg_ls:
-            msg = "The jpeg_ls package is required to use pixel_array for " \
-                  "this transfer syntax {0}, and jpeg_ls could not be " \
-                  "imported.".format(self.file_meta.TransferSyntaxUID)
-            raise ImportError(msg)
-        # decompress here
-        UncompressedPixelData = ''
+        # Note the following reshape operations return a new *view* onto
+        #   pixel_array, but don't copy the data
         if 'NumberOfFrames' in self and self.NumberOfFrames > 1:
-            # multiple compressed frames
-            CompressedPixelDataSeq = pydicom.encaps.decode_data_sequence(self.PixelData)
-            # print len(CompressedPixelDataSeq)
-            for frame in CompressedPixelDataSeq:
-                decompressed_image = jpeg_ls.decode(numpy.fromstring(frame, dtype=numpy.uint8))
-                UncompressedPixelData += decompressed_image.tobytes()
+            if self.SamplesPerPixel > 1:
+                # TODO: Handle Planar Configuration attribute
+                assert self.PlanarConfiguration == 0
+                pixel_array = pixel_array.reshape(self.NumberOfFrames,
+                                                  self.Rows, self.Columns,
+                                                  self.SamplesPerPixel)
+            else:
+                pixel_array = pixel_array.reshape(self.NumberOfFrames,
+                                                  self.Rows, self.Columns)
         else:
-            # single compressed frame
-            CompressedPixelData = pydicom.encaps.defragment_data(self.PixelData)
-            decompressed_image = jpeg_ls.decode(numpy.fromstring(CompressedPixelData, dtype=numpy.uint8))
-            UncompressedPixelData = decompressed_image.tobytes()
-        return UncompressedPixelData
+            if self.SamplesPerPixel > 1:
+                if self.BitsAllocated == 8:
+                    if self.PlanarConfiguration == 0:
+                        pixel_array = pixel_array.reshape(self.Rows,
+                                                          self.Columns,
+                                                          self.SamplesPerPixel)
+                    else:
+                        pixel_array = pixel_array.reshape(self.SamplesPerPixel,
+                                                          self.Rows,
+                                                          self.Columns)
+                        pixel_array = pixel_array.transpose(1, 2, 0)
+                else:
+                    raise NotImplementedError("This code only handles "
+                                              "SamplesPerPixel > 1 if Bits "
+                                              "Allocated = 8")
+            else:
+                pixel_array = pixel_array.reshape(self.Rows, self.Columns)
+        return pixel_array
+
 
     # Use by pixel_array property
     def _get_pixel_array(self):
@@ -1068,17 +790,21 @@ class Dataset(dict):
             already_have = False
         elif self._pixel_id != id(self.PixelData):
             already_have = False
-        if not already_have and not self._is_uncompressed_transfer_syntax():
+        if not already_have:
             try:
-                # print("Pixel Data is compressed")
-                self._pixel_array = self._compressed_pixel_data_numpy()
+                for x in pydicom.config.image_handlers:
+                    try:
+                        pixel_array = x.get_pixeldata(self)
+                        self._pixel_array = self._reshape_pixel_array(pixel_array)
+                        break
+                    except Exception as e:
+                        logger.warning("Trouble with", exc_info=e)
+                        continue
                 self._pixel_id = id(self.PixelData)  # is this guaranteed to work if memory is re-used??
                 return self._pixel_array
-            except Exception:
-                logger.info("Pillow or JPLS did not support this transfer syntax")
-        if not already_have:
-            self._pixel_array = self._pixel_data_numpy()
-            self._pixel_id = id(self.PixelData)  # is this guaranteed to work if memory is re-used??
+            except Exception as e:
+                logger.warning("Pillow or JPLS did not support this transfer syntax", exc_info=e)
+                raise NotImplementedError("Could not decode this transfer syntax")
         return self._pixel_array
 
     @property

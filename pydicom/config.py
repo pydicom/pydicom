@@ -15,8 +15,36 @@ import os
 #    default False; was decimal-based in pydicom 0.9.7
 use_DS_decimal = False
 
-force_pillow_decompression = os.environ.get("PYDCM_FPD")
-force_gdcm_decompression = os.environ.get("PYDCM_FGD")
+image_handlers = []
+
+have_numpy = True
+try:
+    import pydicom.pixel_data_handlers.numpy_handler as numpy_handler
+    image_handlers.append(numpy_handler)
+except ImportError:
+    have_numpy = False
+
+have_pillow = True
+try:
+    import pydicom.pixel_data_handlers.pillow_handler as pillow_handler
+    image_handlers.append(pillow_handler)
+except ImportError:
+    have_pillow = False
+
+have_jpeg_ls = True
+try:
+    import pydicom.pixel_data_handlers.jpeg_ls_handler as jpeg_ls_handler
+    image_handlers.append(jpeg_ls_handler)
+except ImportError:
+    have_jpeg_ls = False
+
+have_gdcm = True
+try:
+    import pydicom.pixel_data_handlers.gdcm_handler as gdcm_handler
+    image_handlers.append(gdcm_handler)
+except ImportError:
+    have_gdcm = False
+
 
 data_element_callback = None
 """Set data_element_callback to a function to be called from read_dataset
