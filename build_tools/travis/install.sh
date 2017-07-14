@@ -45,21 +45,7 @@ if [[ "$DISTRIB" == "conda" ]]; then
     if [[ "$DEPS" == "pillow" ]]; then
         conda install --yes pillow jpeg
     elif [[ "$DEPS" == "gdcm" ]]; then
-        git clone --branch release git://git.code.sf.net/p/gdcm/gdcm
-        mkdir gdcmbin
-        cd gdcmbin
-        cmake -DGDCM_WRAP_PYTHON:BOOK=ON \
-              -DGDCM_BUILD_DOCBOOK_MANPAGES:BOOL=OFF \
-              -DCMAKE_CXX_FLAGS=-fPIC \
-              -DCMAKE_C_FLAGS=-fPIC \
-              ../gdcm
-        make -j
-        cd bin
-        GDCM_PATH=($pwd)
-        export PYTHONPATH="$GDCM_PATH:$PYTHONPATH"
-        python -c "import sys; print(sys.path)"
-        cd ../../
-        python -c "import gdcm; print('gdcm %s' % gdcm.__version__)"
+        conda install --yes -c conda-forge gdcm
     fi
     # Install nose-timer via pip
     pip install nose-timer codecov
