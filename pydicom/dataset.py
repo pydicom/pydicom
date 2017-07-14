@@ -689,9 +689,9 @@ class Dataset(dict):
         elif self._pixel_id != id(self.PixelData):
             already_have = False
         if not already_have:
+            last_error_message = ''
+            successfully_read_pixel_data = False
             for x in pydicom.config.image_handlers:
-                last_error_message = ''
-                successfully_read_pixel_data = False
                 try:
                     pixel_array = x.get_pixeldata(self)
                     self._pixel_array = self._reshape_pixel_array(pixel_array)

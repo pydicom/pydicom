@@ -7,8 +7,13 @@ from pydicom.tag import Tag
 
 pillow_handler = None
 have_pillow_handler = True
+numpy_handler = None
+have_numpy_handler = True
 try:
     import pydicom.pixel_data_handlers.numpy_handler as numpy_handler
+except ImportError:
+    have_numpy_handler = False
+try:
     import pydicom.pixel_data_handlers.pillow_handler as pillow_handler
 except ImportError:
     have_pillow_handler = False
@@ -66,28 +71,6 @@ class pillow_JPEG_LS_Tests(unittest.TestCase):
     def test_emri_JPEG_LS_PixelArray(self):
         with self.assertRaises((NotImplementedError, )):
             _ = self.emri_jpeg_ls_lossless.pixel_array
-
-
-class pillow_BigEndian_Tests(unittest.TestCase):
-    def setUp(self):
-        self.emri_big_endian = read_file(emri_big_endian_name)
-        self.emri_small = read_file(emri_name)
-        self.original_handlers = pydicom.config.image_handlers
-        pydicom.config.image_handlers = [pillow_handler, numpy_handler]
-
-    def tearDown(self):
-        pydicom.config.image_handlers = self.original_handlers
-
-    def test_big_endian_PixelArray(self):
-        """Test big endian pixel data vs little endian"""
-        if have_pillow_handler:
-            a = self.emri_big_endian.pixel_array
-            b = self.emri_small.pixel_array
-            self.assertEqual(a.mean(), b.mean(),
-                             "Decoded big endian pixel data is not all {0} (mean == {1})".format(b.mean(), a.mean()))
-        else:
-            with self.assertRaises((NotImplementedError, )):
-                _ = self.emri_big_endian.pixel_array
 
 
 class pillow_JPEG2000Tests(unittest.TestCase):

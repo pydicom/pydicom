@@ -6,8 +6,13 @@ from pydicom.filereader import read_file
 
 jpeg_ls_handler = None
 have_jpeg_ls_handler = True
+numpy_handler = None
+have_numpy_handler = True
 try:
     import pydicom.pixel_data_handlers.numpy_handler as numpy_handler
+except ImportError:
+    have_numpy_handler = False
+try:
     import pydicom.pixel_data_handlers.jpeg_ls_handler as jpeg_ls_handler
 except ImportError:
     have_jpeg_ls_handler = False
