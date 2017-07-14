@@ -67,7 +67,8 @@ class jpeg_ls_JPEG_LS_Tests(unittest.TestCase):
             self.assertEqual(a.mean(), b.mean(),
                              "Decoded pixel data is not all {0} (mean == {1})".format(b.mean(), a.mean()))
         else:
-            self.assertRaises(NotImplementedError, self.jpeg_ls_lossless._get_pixel_array)
+            with self.assertRaises((NotImplementedError, )):
+                _ = self.jpeg_ls_lossless.pixel_array
 
     def test_emri_JPEG_LS_PixelArray(self):
         if have_jpeg_ls_handler:
@@ -76,13 +77,14 @@ class jpeg_ls_JPEG_LS_Tests(unittest.TestCase):
             self.assertEqual(a.mean(), b.mean(),
                              "Decoded pixel data is not all {0} (mean == {1})".format(b.mean(), a.mean()))
         else:
-            self.assertRaises(NotImplementedError, self.emri_jpeg_ls_lossless._get_pixel_array)
+            with self.assertRaises((NotImplementedError, )):
+                _ = self.emri_jpeg_ls_lossless.pixel_array
 
 
 class jpeg_ls_JPEG2000Tests(unittest.TestCase):
     def setUp(self):
-        self.jpeg = read_file(jpeg2000_name)
-        self.jpegls = read_file(jpeg2000_lossless_name)
+        self.jpeg_2k = read_file(jpeg2000_name)
+        self.jpeg_2k_lossless = read_file(jpeg2000_lossless_name)
         self.mr_small = read_file(mr_name)
         self.emri_jpeg_2k_lossless = read_file(emri_jpeg_2k_lossless)
         self.emri_small = read_file(emri_name)
@@ -94,17 +96,19 @@ class jpeg_ls_JPEG2000Tests(unittest.TestCase):
 
     def test_JPEG2000PixelArray(self):
         """JPEG2000: Now works"""
-        self.assertRaises(NotImplementedError, self.jpegls._get_pixel_array)
+        with self.assertRaises((NotImplementedError, )):
+            _ = self.jpeg_2k.pixel_array
 
     def test_emri_JPEG2000PixelArray(self):
         """JPEG2000: Now works"""
-        self.assertRaises(NotImplementedError, self.emri_jpeg_2k_lossless._get_pixel_array)
+        with self.assertRaises((NotImplementedError, )):
+            _ = self.emri_jpeg_2k_lossless.pixel_array
 
 
 class jpeg_ls_JPEGlossyTests(unittest.TestCase):
 
     def setUp(self):
-        self.jpeg = read_file(jpeg_lossy_name)
+        self.jpeg_lossy = read_file(jpeg_lossy_name)
         self.color_3d_jpeg = read_file(color_3d_jpeg_baseline)
         self.original_handlers = pydicom.config.image_handlers
         pydicom.config.image_handlers = [jpeg_ls_handler, numpy_handler]
@@ -114,21 +118,23 @@ class jpeg_ls_JPEGlossyTests(unittest.TestCase):
 
     def testJPEGlossy(self):
         """JPEG-lossy: Returns correct values for sample data elements.........."""
-        got = self.jpeg.DerivationCodeSequence[0].CodeMeaning
+        got = self.jpeg_lossy.DerivationCodeSequence[0].CodeMeaning
         expected = 'Lossy Compression'
         self.assertEqual(got, expected, "JPEG-lossy file, Code Meaning got %s, expected %s" % (got, expected))
 
     def testJPEGlossyPixelArray(self):
         """JPEG-lossy: Fails gracefully when uncompressed data is asked for....."""
-        self.assertRaises(NotImplementedError, self.jpeg._get_pixel_array)
+        with self.assertRaises((NotImplementedError, )):
+            _ = self.jpeg_lossy.pixel_array
 
     def testJPEGBaselineColor3DPixelArray(self):
-        self.assertRaises(NotImplementedError, self.color_3d_jpeg._get_pixel_array)
+        with self.assertRaises((NotImplementedError, )):
+            _ = self.color_3d_jpeg.pixel_array
 
 
 class jpeg_ls_JPEGlosslessTests(unittest.TestCase):
     def setUp(self):
-        self.jpeg = read_file(jpeg_lossless_name)
+        self.jpeg_lossless = read_file(jpeg_lossless_name)
         self.original_handlers = pydicom.config.image_handlers
         pydicom.config.image_handlers = [jpeg_ls_handler, numpy_handler]
 
@@ -137,24 +143,12 @@ class jpeg_ls_JPEGlosslessTests(unittest.TestCase):
 
     def testJPEGlossless(self):
         """JPEGlossless: Returns correct values for sample data elements........"""
-        got = self.jpeg.SourceImageSequence[0].PurposeOfReferenceCodeSequence[0].CodeMeaning
+        got = self.jpeg_lossless.SourceImageSequence[0].PurposeOfReferenceCodeSequence[0].CodeMeaning
         expected = 'Uncompressed predecessor'
         self.assertEqual(got, expected, "JPEG-lossless file, Code Meaning got %s, expected %s" % (got, expected))
 
     def testJPEGlosslessPixelArray(self):
         """JPEGlossless: Fails gracefully when uncompressed data is asked for..."""
-        # This test passes if the call raises either an
-        # ImportError when there is no Pillow module
-        # Or
-        # NotImplementedError when there is a Pillow module
-        #    but it lacks JPEG Lossless Dll's
-        # Or
-        # the call does not raise any Exceptions
-        # This test fails if any other exception is raised
-        with self.assertRaises((ImportError, NotImplementedError)):
-            try:
-                _x = self.jpeg._get_pixel_array()
-            except Exception:
-                raise
-            else:
-                raise ImportError()
+        with self.assertRaises((NotImplementedError, )):
+            _ = self.jpeg_lossless.pixel_array
+

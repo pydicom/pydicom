@@ -47,6 +47,7 @@ try:
 except ImportError:
     stat_available = False
 
+
 class PropertyError(Exception):
     """For AttributeErrors caught in a property, so do not go to __getattr__"""
     #  http://docs.python.org/release/3.1.3/tutorial/errors.html#tut-userexceptions
@@ -637,108 +638,6 @@ class Dataset(dict):
         """Compare `self` and `other` for inequality."""
         return not (self == other)
 
-    def _compressed_pixel_data_numpy(self):
-        """Return a NumPy array of the Pixel Data.
-
-        NumPy is a numerical package for python. It is used if available.
-
-        Returns
-        -------
-        numpy.ndarray
-            The Pixel Data as an array.
-
-        Raises
-        ------
-        TypeError
-            If no Pixel Data element in the dataset.
-        ImportError
-            If cannot import numpy.
-        """
-        if 'PixelData' not in self:
-            raise TypeError("No pixel data found in this dataset.")
-
-        if not have_numpy:
-            msg = "The Numpy package is required to use pixel_array, and " \
-                  "numpy could not be imported."
-            raise ImportError(msg)
-
-        # determine the type used for the array
-        need_byteswap = (self.is_little_endian != sys_is_little_endian)
-
-        # Make NumPy format code, e.g. "uint16", "int32" etc
-        # from two pieces of info:
-        #    self.PixelRepresentation -- 0 for unsigned, 1 for signed;
-        #    self.BitsAllocated -- 8, 16, or 32
-        format_str = '%sint%d' % (('u', '')[self.PixelRepresentation],
-                                  self.BitsAllocated)
-        try:
-            numpy_format = numpy.dtype(format_str)
-        except TypeError:
-            msg = ("Data type not understood by NumPy: "
-                   "format='%s', PixelRepresentation=%d, BitsAllocated=%d")
-            raise TypeError(msg % (format_str, self.PixelRepresentation,
-                                   self.BitsAllocated))
-        if pydicom.config.force_pillow_decompression:
-            # use pillow or jpeg_ls or throw exception
-            if self.file_meta.TransferSyntaxUID in pydicom.uid.PILSupportedCompressedPixelTransferSyntaxes:
-                UncompressedPixelData = self._get_PIL_supported_compressed_pixeldata()
-            elif self.file_meta.TransferSyntaxUID in pydicom.uid.JPEGLSSupportedCompressedPixelTransferSyntaxes:
-                UncompressedPixelData = self._get_jpeg_ls_supported_compressed_pixeldata()
-            else:
-                msg = "The transfer syntax {0} is not currently supported.".format(self.file_meta.TransferSyntaxUID)
-                raise NotImplementedError(msg)
-        elif pydicom.config.force_gdcm_decompression:
-            if not self._is_uncompressed_transfer_syntax():
-                UncompressedPixelData = self._get_GDCM_supported_compressed_pixeldata()
-            else:
-                msg = "The transfer syntax {0} is not currently supported.".format(self.file_meta.TransferSyntaxUID)
-                raise NotImplementedError(msg)
-        else:
-            # neither is forced, so try pillow then gdcm
-            if self.file_meta.TransferSyntaxUID in pydicom.uid.PILSupportedCompressedPixelTransferSyntaxes:
-                UncompressedPixelData = self._get_PIL_supported_compressed_pixeldata()
-            elif self.file_meta.TransferSyntaxUID in pydicom.uid.JPEGLSSupportedCompressedPixelTransferSyntaxes:
-                UncompressedPixelData = self._get_jpeg_ls_supported_compressed_pixeldata()
-            elif not self._is_uncompressed_transfer_syntax():
-                UncompressedPixelData = self._get_GDCM_supported_compressed_pixeldata()
-            else:
-                msg = "The transfer syntax {0} is not currently supported.".format(self.file_meta.TransferSyntaxUID)
-                raise NotImplementedError(msg)
-
-        # Have correct Numpy format, so create the NumPy array
-        arr = numpy.fromstring(UncompressedPixelData, numpy_format)
-
-        # XXX byte swap - may later handle this in read_file!!?
-        if need_byteswap:
-            arr.byteswap(True)  # True means swap in-place, don't make a new copy
-        # Note the following reshape operations return a new *view* onto arr, but don't copy the data
-        if 'NumberOfFrames' in self and self.NumberOfFrames > 1:
-            if self.SamplesPerPixel > 1:
-                arr = arr.reshape(self.NumberOfFrames, self.Rows, self.Columns,
-                                  self.SamplesPerPixel)
-            else:
-                arr = arr.reshape(self.NumberOfFrames, self.Rows, self.Columns)
-        else:
-            if self.SamplesPerPixel > 1:
-                if self.BitsAllocated == 8:
-                    if self.PlanarConfiguration == 0:
-                        arr = arr.reshape(self.Rows, self.Columns,
-                                          self.SamplesPerPixel)
-                    else:
-                        arr = arr.reshape(self.SamplesPerPixel, self.Rows,
-                                          self.Columns)
-                        arr = arr.transpose(1, 2, 0)
-                else:
-                    raise NotImplementedError("This code only handles "
-                                              "SamplesPerPixel > 1 if Bits "
-                                              "Allocated = 8")
-            else:
-                arr = arr.reshape(self.Rows, self.Columns)
-        if self.file_meta.TransferSyntaxUID in pydicom.uid.JPEG2000CompressedPixelTransferSyntaxes and self.BitsStored == 16:
-            # WHY IS THIS EVEN NECESSARY??
-            arr &= 0x7FFF
-        return arr
-
     def _reshape_pixel_array(self, pixel_array):
 
         # Note the following reshape operations return a new *view* onto
@@ -773,7 +672,6 @@ class Dataset(dict):
                 pixel_array = pixel_array.reshape(self.Rows, self.Columns)
         return pixel_array
 
-
     # Use by pixel_array property
     def _get_pixel_array(self):
         """Convert the Pixel Data to a numpy array.
@@ -791,20 +689,25 @@ class Dataset(dict):
         elif self._pixel_id != id(self.PixelData):
             already_have = False
         if not already_have:
-            try:
-                for x in pydicom.config.image_handlers:
-                    try:
-                        pixel_array = x.get_pixeldata(self)
-                        self._pixel_array = self._reshape_pixel_array(pixel_array)
-                        break
-                    except Exception as e:
-                        logger.warning("Trouble with", exc_info=e)
-                        continue
-                self._pixel_id = id(self.PixelData)  # is this guaranteed to work if memory is re-used??
-                return self._pixel_array
-            except Exception as e:
-                logger.warning("Pillow or JPLS did not support this transfer syntax", exc_info=e)
-                raise NotImplementedError("Could not decode this transfer syntax")
+            for x in pydicom.config.image_handlers:
+                last_error_message = ''
+                successfully_read_pixel_data = False
+                try:
+                    pixel_array = x.get_pixeldata(self)
+                    self._pixel_array = self._reshape_pixel_array(pixel_array)
+                    successfully_read_pixel_data = True
+                    break
+                except Exception as e:
+                    logger.debug("Trouble with", exc_info=e)
+                    last_error_message = str(e)
+                    continue
+            if not successfully_read_pixel_data:
+                logger.info("Pillow or JPLS did not support this transfer syntax")
+                self._pixel_array = None
+                self._pixel_id = None
+                raise NotImplementedError(last_error_message)
+            self._pixel_id = id(self.PixelData)  # is this guaranteed to work if memory is re-used??
+            return self._pixel_array
         return self._pixel_array
 
     @property

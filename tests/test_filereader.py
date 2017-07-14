@@ -749,7 +749,7 @@ class ReadTruncatedFileTests(unittest.TestCase):
     def testReadFileWithMissingPixelDataArray(self):
         mr = read_file(truncated_mr_name)
         mr.decode()
-        with self.assertRaisesRegexp(AttributeError, "Amount of pixel data.*does not match the expected data"):
+        with self.assertRaisesRegexp(NotImplementedError, "Unexpected end of file. Read .* bytes of .* expected starting at position"):
             mr.pixel_array
 
 

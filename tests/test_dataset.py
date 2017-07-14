@@ -60,8 +60,8 @@ class DatasetTests(unittest.TestCase):
         def callable_pixel_array():
             ds.pixel_array
 
-        msg = "'Dataset' object has no attribute 'TransferSyntaxUID'"
-        self.failUnlessExceptionArgs(msg, AttributeError, callable_pixel_array)
+        msg = "'Dataset' object has no attribute 'PixelRepresentation'"
+        self.failUnlessExceptionArgs(msg, NotImplementedError, callable_pixel_array)
 
     def test_attribute_error_in_property_correct_debug(self):
         """Test AttributeError in property raises correctly."""
