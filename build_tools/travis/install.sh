@@ -57,6 +57,7 @@ if [[ "$DISTRIB" == "conda" ]]; then
         cd bin
         GDCM_PATH=($pwd)
         export PYTHONPATH="$GDCM_PATH:$PYTHONPATH"
+        python -c "import sys; print(sys.path)"
         cd ../../
         python -c "import gdcm; print('gdcm %s' % gdcm.__version__)"
     fi
