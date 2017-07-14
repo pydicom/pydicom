@@ -16,14 +16,15 @@ addons:
     - swig
 
 env:
-  DISTRIB="conda"
-  PYTHON_VERSION="2.7"
-  PYTHON_VERSION="3.4"
-  PYTHON_VERSION="3.5"
-  PYTHON_VERSION="3.6"
-  NUMPY=true
-  DEPS="pillow"
-  DEPS="gdcm"
+  - DISTRIB="conda"
+  - PYTHON_VERSION="2.7"
+  - PYTHON_VERSION="3.4"
+  - PYTHON_VERSION="3.5"
+  - PYTHON_VERSION="3.6"
+  - NUMPY=true
+  - NUMPY=false
+  - DEPS="pillow"
+  - DEPS="gdcm"
 
 # matrix:
 #   include:
