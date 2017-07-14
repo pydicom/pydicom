@@ -16,18 +16,19 @@ addons:
     - swig
 
 env:
-  - DISTRIB="conda"
-env:
-  - PYTHON_VERSION="2.7"
-  - PYTHON_VERSION="3.4"
-  - PYTHON_VERSION="3.5"
-  - PYTHON_VERSION="3.6"
-env:
-  - NUMPY=true
-  - NUMPY=false
-env:
-  - DEPS="pillow"
-  - DEPS="gdcm"
+  matrix:
+    - DISTRIB="conda"
+  matrix:
+    - PYTHON_VERSION="2.7"
+    - PYTHON_VERSION="3.4"
+    - PYTHON_VERSION="3.5"
+    - PYTHON_VERSION="3.6"
+  matrix:
+    - NUMPY=true
+    - NUMPY=false
+  matrix:
+    - DEPS="pillow"
+    - DEPS="gdcm"
 
 # matrix:
 #   include:
