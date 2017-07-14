@@ -58,6 +58,7 @@ if [[ "$DISTRIB" == "conda" ]]; then
         GDCM_PATH=($pwd)
         export PYTHONPATH="$GDCM_PATH:$PYTHONPATH"
         cd ../../
+        python -c "import gdcm; print('gdcm %s' % gdcm.__version__)"
     fi
     # Install nose-timer via pip
     pip install nose-timer codecov
