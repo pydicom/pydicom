@@ -5,6 +5,7 @@
 #    See the file license.txt included with this distribution, also
 #    available at https://github.com/darcymason/pydicom
 
+from pydicom.misc import size_in_bytes
 
 extra_length_VRs_b = (b'OB', b'OW', b'OF', b'SQ', b'UN', b'UT')
 ExplicitVRLittleEndian = b'1.2.840.10008.1.2.1'
@@ -114,6 +115,7 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian,
     fp_read = fp.read
     fp_tell = fp.tell
     element_struct_unpack = element_struct.unpack
+    defer_size = size_in_bytes(defer_size)
 
     while True:
         # Read tag, VR, length, get ready to read value
