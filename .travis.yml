@@ -15,29 +15,30 @@ addons:
     - cmake
     - swig
 
-matrix:
-  env:
-    DISTRIB="conda"
-    PYTHON_VERSION="2.7"
-    PYTHON_VERSION="3.4"
-    PYTHON_VERSION="3.5"
-    PYTHON_VERSION="3.6"
-    NUMPY=true
-    DEPS="pillow"
-    DEPS="gdcm"
-  include:
-    - env:
-        DISTRIB="pypy"
-        PYTHON_VERSION="2.7"
-        PYTHON_VERSION="3.5"
-        NUMPY=false
-        NUMPY=true
-    - env: DISTRIB="ubuntu" PYTHON_VERSION="2.7" DEPS=false
-    - env: DISTRIB="ubuntu" PYTHON_VERSION="2.7" DEPS=true
-      addons:
-        apt:
-          packages:
-              - python-numpy
+env:
+  DISTRIB="conda"
+  PYTHON_VERSION="2.7"
+  PYTHON_VERSION="3.4"
+  PYTHON_VERSION="3.5"
+  PYTHON_VERSION="3.6"
+  NUMPY=true
+  DEPS="pillow"
+  DEPS="gdcm"
+
+# matrix:
+#   include:
+#     - env:
+#         DISTRIB="pypy"
+#         PYTHON_VERSION="2.7"
+#         PYTHON_VERSION="3.5"
+#         NUMPY=false
+#         NUMPY=true
+#     - env: DISTRIB="ubuntu" PYTHON_VERSION="2.7" DEPS=false
+#     - env: DISTRIB="ubuntu" PYTHON_VERSION="2.7" DEPS=true
+#       addons:
+#         apt:
+#           packages:
+#               - python-numpy
 
 install: source build_tools/travis/install.sh
 
