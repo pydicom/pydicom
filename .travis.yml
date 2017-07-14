@@ -9,12 +9,6 @@ cache:
   - $HOME/.cache/pip
   - $HOME/.ccache
 
-addons:
-  apt:
-    packages:
-    - cmake
-    - swig
-
 matrix:
   include:
     - env: DISTRIB="conda" PYTHON_VERSION="2.7" NUMPY=false DEPS="pillow"
