@@ -15,7 +15,8 @@ addons:
     - cmake
     - swig
 
-env:
+matrix:
+  env:
   DISTRIB="conda"
   PYTHON_VERSION="2.7"
   PYTHON_VERSION="3.4"
@@ -24,8 +25,6 @@ env:
   NUMPY=true
   DEPS="pillow"
   DEPS="gdcm"
-
-matrix:
   include:
     - env:
         DISTRIB="pypy"
