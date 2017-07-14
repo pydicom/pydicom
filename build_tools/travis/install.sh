@@ -39,10 +39,25 @@ if [[ "$DISTRIB" == "conda" ]]; then
     conda create -n testenv --yes python=$PYTHON_VERSION pip
     source activate testenv
     conda install --yes nose pytest pytest-cov
-    if [[ "$DEPS" == "true" ]]; then
+    if [[ "$NUMPY" == "true" ]]; then
         conda install --yes numpy
-    elif [[ "$DEPS" == "all" ]]; then
-        conda install --yes numpy pillow jpeg
+    fi
+    if [[ "$DEPS" == "pillow" ]]; then
+        conda install --yes pillow jpeg
+    elif [[ "$DEPS" == "gdcm" ]]; then
+        git clone --branch release git://git.code.sf.net/p/gdcm/gdcm
+        mkdir gdcmbin
+        cd gdcmbin
+        cmake -DGDCM_WRAP_PYTHON:BOOK=ON \
+              -DGDCM_BUILD_DOCBOOK_MANPAGES:BOOL=OFF \
+              -DCMAKE_CXX_FLAGS=-fPIC \
+              -DCMAKE_C_FLAGS=-fPIC \
+              ../gdcm
+        make -j
+        cd bin
+        GDCM_PATH=($pwd)
+        export PYTHONPATH="$GDCM_PATH:$PYTHONPATH"
+        cd ../../
     fi
     # Install nose-timer via pip
     pip install nose-timer codecov
@@ -81,17 +96,17 @@ elif [[ "$DISTRIB" == "pypy" ]]; then
     # install pip
     python -m ensurepip
     pip install -U pip wheel
-    if [[ "$DEPS" == "true" ]] && [[ "$PYTHON_VERSION" == "2.7" ]]; then
+    if [[ "$NUMPY" == "true" ]] && [[ "$PYTHON_VERSION" == "2.7" ]]; then
         python -m pip install git+https://bitbucket.org/pypy/numpy.git
     # numpypy does not work with pypy3 so fall back on numpy
-    elif [[ "$DEPS" == "true" ]]; then
+    elif [[ "$NUMPY" == "true" ]]; then
         python -m pip install cython numpy
     fi
     python -m pip install nose nose-timer pytest pytest-cov codecov
 fi
 
 python --version
-if [[ "$DEPS" == "true" ]]; then
+if [[ "$NUMPY" == "true" ]]; then
     python -c "import numpy; print('numpy %s' % numpy.__version__)"
 fi
 
