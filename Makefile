@@ -17,9 +17,6 @@ test: test-code test-doc
 doc:
 	make -C doc html
 
-doc-noplot:
-	make -C doc html-noplot
-
 clean:
 	find . -name "*.so" -o -name "*.pyc" -o -name "*.md5" -o -name "*.pyd" -o -name "*~" | xargs rm -f
 	find . -name "*.pyx" -exec ./tools/rm_pyx_c_file.sh {} \;
