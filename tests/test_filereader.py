@@ -831,7 +831,7 @@ class DeferredReadTests(unittest.TestCase):
     def testTimeCheck(self):
         """Deferred read warns if file has been modified..........."""
         if stat_available:
-            ds = read_file(self.testfile_name, defer_size=2000)
+            ds = read_file(self.testfile_name, defer_size='2 kB')
             from time import sleep
             sleep(1)
             with open(self.testfile_name, "r+") as f:

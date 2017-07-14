@@ -6,6 +6,8 @@
 #    available at https://github.com/darcymason/pydicom
 
 from struct import pack, unpack
+
+from pydicom.misc import size_in_bytes
 from pydicom.tag import TupleTag, Tag
 from pydicom.datadict import dictionary_description
 
@@ -96,6 +98,11 @@ def read_undefined_length_value(fp, is_little_endian, delimiter_tag, defer_size=
     fp : a file-like object
     is_little_endian : boolean
         True if file transfer syntax is little endian, else False.
+    delimiter_tag : BaseTag
+        tag used as and marker for reading
+    defer_size : int, None, optional
+        Size to avoid loading large elements in memory.
+        See ``filereader.read_file`` for more parameter info.
     read_size : int
         Number of bytes to read at one time.
 
@@ -121,6 +128,7 @@ def read_undefined_length_value(fp, is_little_endian, delimiter_tag, defer_size=
     found = False
     EOF = False
     value_chunks = []
+    defer_size = size_in_bytes(defer_size)
     byte_count = 0  # for defer_size checks
     while not found:
         chunk_start = fp.tell()
@@ -154,7 +162,7 @@ def read_undefined_length_value(fp, is_little_endian, delimiter_tag, defer_size=
             if defer_size is None or byte_count < defer_size:
                 value_chunks.append(new_bytes)
     # if get here then have found the byte string
-    if defer_size is not None and defer_size >= defer_size:
+    if defer_size is not None and byte_count >= defer_size:
         return None
     else:
         return b"".join(value_chunks)

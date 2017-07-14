@@ -11,6 +11,7 @@ import warnings
 import zlib
 from io import BytesIO
 
+from pydicom.misc import size_in_bytes
 from pydicom.tag import TupleTag
 from pydicom.dataelem import RawDataElement
 from pydicom.util.hexutil import bytes2hex
@@ -39,12 +40,14 @@ from pydicom.sequence import Sequence
 from pydicom.fileutil import read_undefined_length_value
 from struct import Struct, unpack
 from sys import byteorder
+
 sys_is_little_endian = (byteorder == 'little')
 
 
 class DicomIter(object):
     """Iterator over DICOM data elements created from a file-like object
     """
+
     def __init__(self, fp, stop_when=None, force=False):
         """Read the preamble and meta info and prepare iterator for remainder of file.
 
@@ -182,6 +185,7 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian,
     logger_debug = logger.debug
     debugging = config.debugging
     element_struct_unpack = element_struct.unpack
+    defer_size = size_in_bytes(defer_size)
 
     while True:
         # Read tag, VR, length, get ready to read value
@@ -248,7 +252,8 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian,
                     if length > 12:
                         dotdot = "..."
                     logger_debug("%08x: %-34s %s %r %s" % (value_tell,
-                                                           bytes2hex(value[:12]), dotdot, value[:12], dotdot))
+                                                           bytes2hex(value[:12]), dotdot,
+                                                           value[:12], dotdot))
 
             # If the tag is (0008,0005) Specific Character Set, then store it
             if tag == (0x08, 0x05):
@@ -446,6 +451,7 @@ def _read_command_set_elements(fp):
         The command set elements as a Dataset instance. May be empty if no
         command set elements are present.
     """
+
     def _not_group_0000(tag, VR, length):
         """Return True if the tag is not in group 0x0000, False otherwise."""
         return (tag.group != 0)
@@ -474,6 +480,7 @@ def _read_file_meta_info(fp):
         The File Meta elements as a Dataset instance. May be empty if no
         File Meta are present.
     """
+
     def _not_group_0002(tag, VR, length):
         """Return True if the tag is not in group 0x0002, False otherwise."""
         return (tag.group != 2)
@@ -619,7 +626,7 @@ def read_partial(fileobj, stop_when=None, defer_size=None, force=False):
     is_implicit_VR = True
     is_little_endian = True
     transfer_syntax = file_meta_dataset.get("TransferSyntaxUID")
-    if peek == b'': # EOF
+    if peek == b'':  # EOF
         pass
     elif transfer_syntax is None:  # issue 258
         # If no TransferSyntaxUID element then we have to try and figure out
@@ -772,10 +779,8 @@ def read_file(fp, defer_size=None, stop_before_pixels=False, force=False):
             logger.debug("Caller passed file name")
         logger.debug("-" * 80)
 
-    # Convert size to defer reading into bytes, and store in file object
-    # if defer_size is not None:
-    #    defer_size = size_in_bytes(defer_size)
-    # fp.defer_size = defer_size
+    # Convert size to defer reading into bytes
+    defer_size = size_in_bytes(defer_size)
 
     # Iterate through all items and store them --include file meta if present
     stop_when = None
@@ -824,7 +829,7 @@ def read_dicomdir(filename="DICOMDIR"):
 def data_element_offset_to_value(is_implicit_VR, VR):
     """Return number of bytes from start of data element to start of value"""
     if is_implicit_VR:
-        offset = 8   # tag of 4 plus 4-byte length
+        offset = 8  # tag of 4 plus 4-byte length
     else:
         if VR in extra_length_VRs:
             offset = 12  # tag 4 + 2 VR + 2 reserved + 4 length
