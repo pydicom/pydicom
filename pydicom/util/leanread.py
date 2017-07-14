@@ -1,4 +1,3 @@
-# leanread.py
 """Read a dicom media file"""
 # Copyright (c) 2013 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
@@ -6,6 +5,7 @@
 #    available at https://github.com/darcymason/pydicom
 
 from pydicom.misc import size_in_bytes
+from struct import Struct, unpack
 
 extra_length_VRs_b = (b'OB', b'OW', b'OF', b'SQ', b'UN', b'UT')
 ExplicitVRLittleEndian = b'1.2.840.10008.1.2.1'
@@ -16,9 +16,6 @@ ExplicitVRBigEndian = b'1.2.840.10008.1.2.2'
 ItemTag = 0xFFFEE000  # start of Sequence Item
 ItemDelimiterTag = 0xFFFEE00D  # end of Sequence Item
 SequenceDelimiterTag = 0xFFFEE0DD  # end of Sequence of undefined length
-
-
-from struct import Struct, unpack
 
 
 class dicomfile(object):
@@ -47,7 +44,8 @@ class dicomfile(object):
         # Yield the file meta info elements
         file_meta_gen = data_element_generator(self.fobj, is_implicit_VR=False,
                                                is_little_endian=True,
-                                               stop_when=lambda gp, elem: gp != 2)
+                                               stop_when=lambda gp,
+                                               elem: gp != 2)
         for data_elem in file_meta_gen:
             if data_elem[0] == (0x0002, 0x0010):
                 transfer_syntax_uid = data_elem[3]
@@ -58,12 +56,14 @@ class dicomfile(object):
             if transfer_syntax_uid.endswith(b' ') or \
                     transfer_syntax_uid.endswith(b'\0'):
                 transfer_syntax_uid = transfer_syntax_uid[:-1]
-            is_implicit_VR, is_little_endian = transfer_syntax(transfer_syntax_uid)
+            is_implicit_VR, is_little_endian = transfer_syntax(
+                transfer_syntax_uid)
             # print is_implicit_VR
         else:
             raise NotImplementedError("No transfer syntax in file meta info")
 
-        ds_gen = data_element_generator(self.fobj, is_implicit_VR, is_little_endian)
+        ds_gen = data_element_generator(self.fobj, is_implicit_VR,
+                                        is_little_endian)
         for data_elem in ds_gen:
             yield data_elem
 
@@ -168,7 +168,8 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian,
                 try:
                     VR = dictionary_VR(tag)
                 except KeyError:
-                    # Look ahead to see if it consists of items and is thus a SQ
+                    # Look ahead to see if it consists of items and
+                    # is thus a SQ
                     next_tag = TupleTag(unpack(endian_chr + "HH", fp_read(4)))
                     # Rewind the file
                     fp.seek(fp_tell() - 4)
@@ -182,7 +183,8 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian,
                 # yield DataElement(tag, VR, seq, value_tell,
                 #                   is_undefined_length=True)
             else:
-                raise NotImplementedError("This reader does not handle undefined length except for SQ")
+                raise NotImplementedError("This reader does not handle "
+                                          "undefined length except for SQ")
                 from pydicom.fileio.fileutil import read_undefined_length_value
 
                 delimiter = SequenceDelimiterTag
