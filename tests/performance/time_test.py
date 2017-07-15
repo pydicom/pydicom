@@ -5,15 +5,29 @@
 #    See the file license.txt included with this distribution, also
 #    available at https://github.com/darcymason/pydicom
 
-import os.path
+import cProfile
+from io import BytesIO
+import glob
 import os
-import sys
+import os.path
+import pydicom
+
+from pydicom.filereader import (
+    read_partial,
+    _at_pixel_data
+)
+
+import pstats
 import pytest
+import random
+import sys
 on_windows = sys.platform.startswith("win")
 
+
 # EDIT THIS SECTION --------------------------
-#    to point to local temp directory, and to a set of >400 DICOM files of same size to work on
-# I used images freely available from http://pcir.org
+#    to point to local temp directory, and to a set of
+#    >400 DICOM files of same size to work on
+#    I used images freely available from http://pcir.org
 if on_windows:
     tempfile = "c:/temp/pydicom_stats"
     location_base = r"z:/testdicom/"
@@ -28,16 +42,8 @@ locations = [
     "98890234_20010101/98890234/20010101/CT7/",
 ]
 locations = [os.path.join(location_base, location) for location in locations]
-# -------------------------------------------------------
-import glob
-import pydicom
-from pydicom.filereader import read_partial, _at_pixel_data
-from io import BytesIO
 
-import cProfile
-import pstats
-import sys
-import random
+# -------------------------------------------------------
 
 rp = read_partial
 filenames = []
@@ -45,36 +51,48 @@ for location in locations:
     loc_list = glob.glob(os.path.join(location, "*"))
     filenames.extend((x for x in loc_list if not x.startswith(".")))
 
-# assert len(filenames) >= 400, "Need at least 400 files"  # unless change slices below
-
+# assert len(filenames) >= 400
+# "Need at least 400 files"
+# unless change slices below
 
 print()
-random.shuffle(filenames)  # to make sure no bias for any particular file
 
+# to make sure no bias for any particular file
+random.shuffle(filenames)
 
-print("Sampling from %d files. Each test gets 100 distinct files" % len(filenames))
+print("Sampling from %d files. Each test gets 100 distinct files"
+      % len(filenames))
 print("Test order is randomized too...")
 
-# Give each test it's own set of files, to avoid reading something in cache from previous test
-filenames1 = filenames[:100]  # keep the time to a reasonable amount (~2-25 sec)
+# Give each test it's own set of files, to avoid
+# reading something in cache from previous test
+# keep the time to a reasonable amount (~2-25 sec)
+filenames1 = filenames[:100]
 filenames2 = filenames[100:200]
 filenames3 = filenames[200:300]
 filenames4 = filenames[300:400]
 
-@pytest.mark.skipif(len(filenames) < 400, reason="Not doing time tests - Need at least 400 files in %s" % str(locations))
+reason = "Not doing time tests."
+reason = "%s Need at least 400 files in %s" % str(reason, locations)
+
+
+@pytest.mark.skipif(len(filenames) < 400,
+                    reason=reason)
 def test_full_read():
     rf = pydicom.read_file
     datasets = [rf(fn) for fn in filenames1]
     return datasets
 
 
-@pytest.mark.skipif(len(filenames) < 400, reason="Not doing time tests - Need at least 400 files in %s" % str(locations))
+@pytest.mark.skipif(len(filenames) < 400,
+                    reason=reason)
 def test_partial():
     rp = read_partial
     [rp(open(fn, 'rb'), stop_when=_at_pixel_data) for fn in filenames2]
 
 
-@pytest.mark.skipif(len(filenames) < 400, reason="Not doing time tests - Need at least 400 files in %s" % str(locations))
+@pytest.mark.skipif(len(filenames) < 400,
+                    reason=reason)
 def test_mem_read_full():
     rf = pydicom.read_file
     str_io = BytesIO
@@ -82,7 +100,8 @@ def test_mem_read_full():
     [rf(memory_file) for memory_file in memory_files]
 
 
-@pytest.mark.skipif(len(filenames) < 400, reason="Not doing time tests - Need at least 400 files in %s" % str(locations))
+@pytest.mark.skipif(len(filenames) < 400,
+                    reason=reason)
 def test_mem_read_small():
     rf = pydicom.read_file
     str_io = BytesIO  # avoid global lookup, make local instead
@@ -90,7 +109,8 @@ def test_mem_read_small():
     [rf(memory_file) for memory_file in memory_files]
 
 
-@pytest.mark.skipif(len(filenames) < 400, reason="Not doing time tests - Need at least 400 files in %s" % str(locations))
+@pytest.mark.skipif(len(filenames) < 400,
+                    reason=reason)
 def test_python_read_files():
     [open(fn, 'rb').read() for fn in filenames4]
 
@@ -120,7 +140,8 @@ if __name__ == "__main__":
 
     # Clear disk cache for next run?
     if not on_windows:
-        prompt = "Run purge command (linux/Mac OS X) to clear disk cache?...(N):"
+        prompt = "Run purge command (linux/Mac OS X)"
+        prompt = "%s to clear disk cache?...(N):" % (prompt)
         if sys.version_info[0] > 2:
             answer = input(prompt)
         else:

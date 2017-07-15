@@ -2,20 +2,21 @@
 """Try reading a large RTSTRUCT file, profiling how much time it takes"""
 # Copyright (c) 2012 Darcy Mason
 # This file is part of pydicom, relased under an MIT license.
-#    See the file license.txt included with this distribution, also
-#    available at https://github.com/darcymason/pydicom
+#    See the file LICENSE included with this distribution, also
+#    available at https://github.com/pydicom/pydicom
 
 # EDIT THIS SECTION --------------------------
 #    to point to local temp directory
-
-tempfile = "/tmp/pydicom_stats"
-read_filename = r"/Users/darcy/hg/pydicom/source/dicom/testfiles/RStest.dcm"
-write_filename = "/tmp/write_test.dcm"
 
 import pydicom
 import cProfile
 import pstats
 import pytest
+
+tempfile = "/tmp/pydicom_stats"
+read_filename = r"/Users/darcy/hg/pydicom/source/dicom/testfiles/RStest.dcm"
+write_filename = "/tmp/write_test.dcm"
+
 
 @pytest.mark.skip(reason="This is not an actual pytest test")
 def test_full_read(filename):
