@@ -24,5 +24,6 @@ if __name__ == "__main__":
             for series in all_series:
                 image_count = len(series.children)
                 plural = ('', 's')[image_count > 1]
-                print(" " * 8 + "Series {0.SeriesNumber}: {0.SeriesDescription}"
+                series_name = "Series {0.SeriesNumber}: {0.SeriesDescription}"
+                print(" " * 8 + series_name
                       " ({1} image{2})".format(series, image_count, plural))
