@@ -2,8 +2,8 @@
 """Test suite for util functions"""
 # Copyright (c) 2014 Darcy Mason
 # This file is part of pydicom, released under an MIT-style license.
-#    See the file license.txt included with this distribution, also
-#    available at https://github.com/darcymason/pydicom
+#    See the file LICENSE included with this distribution, also
+#    available at https://github.com/pydicom/pydicom
 
 from io import BytesIO
 import os
@@ -39,14 +39,15 @@ class DataElementCallbackTests(unittest.TestCase):
         config.enforce_valid_values = False
 
     def testBadSeparator(self):
-        """Ensure that unchanged bad separator does raise an error..........."""
+        """Ensure that unchanged bad separator does raise an error..."""
         ds = filereader.read_dataset(self.bytesio, is_little_endian=True,
                                      is_implicit_VR=True)
         contour = ds.ROIContourSequence[0].ContourSequence[0]
         self.assertRaises(ValueError, getattr, contour, "ContourData")
 
     def testImplVRcomma(self):
-        """util.fix_separator: Able to replace comma in Implicit VR dataset.."""
+        """util.fix_separator:
+           Able to replace comma in Implicit VR dataset.."""
         fixer.fix_separator(b",", for_VRs=["DS", "IS"],
                             process_unknown_VRs=False)
         ds = filereader.read_dataset(self.bytesio, is_little_endian=True,
