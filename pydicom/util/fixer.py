@@ -3,8 +3,8 @@
 """
 # Copyright (c) 2008-2014 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
-#    See the file license.txt included with this distribution, also
-#    available at https://github.com/darcymason/pydicom
+#    See the file LICENSE included with this distribution, also
+#    available at https://github.com/pydicom/pydicom
 
 from pydicom import config
 from pydicom import datadict
@@ -32,13 +32,15 @@ def fix_separator_callback(raw_elem, **kwargs):
     if try_replace:
         # Note value has not been decoded yet when this function called,
         #    so need to replace backslash as bytes
-        new_value = raw_elem.value.replace(kwargs['invalid_separator'], b"\\")
+        new_value = raw_elem.value.replace(kwargs['invalid_separator'],
+                                           b"\\")
         return_val = raw_elem._replace(value=new_value)
 
     return return_val
 
 
-def fix_separator(invalid_separator, for_VRs=["DS", "IS"],
+def fix_separator(invalid_separator,
+                  for_VRs=["DS", "IS"],
                   process_unknown_VRs=True):
     """A callback function to fix RawDataElement values using
     some other separator than the dicom standard backslash character

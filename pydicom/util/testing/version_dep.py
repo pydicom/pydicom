@@ -2,8 +2,8 @@
 """Holds test code that is dependent on certain python versions"""
 # Copyright (c) 2009-2012 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
-#    See the file license.txt included with this distribution, also
-#    available at https://github.com/darcymason/pydicom
+#    See the file LICENSE included with this distribution, also
+#    available at https://github.com/pydicom/pydicom
 
 import warnings
 
@@ -15,4 +15,5 @@ def capture_warnings(function, *func_args, **func_kwargs):
         warnings.simplefilter("always")
         result = function(*func_args, **func_kwargs)
         all_warnings = w
-    return result, [str(warning.message) for warning in all_warnings]
+    return result, [str(warning.message)
+                    for warning in all_warnings]

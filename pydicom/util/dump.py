@@ -2,8 +2,8 @@
 """Utility functions used in debugging writing and reading"""
 # Copyright (c) 2008-2012 Darcy Mason
 # This file is part of pydicom, relased under an MIT license.
-#    See the file license.txt included with this distribution, also
-#    available at https://github.com/darcymason/pydicom
+#    See the file LICENSE included with this distribution, also
+#    available at https://github.com/pydicom/pydicom
 
 from __future__ import print_function
 from io import BytesIO
@@ -18,9 +18,13 @@ def print_character(ordchr):
 
 
 def filedump(filename, start_address=0, stop_address=None):
-    """Dump out the contents of a file to a standard hex dump 16 bytes wide"""
+    """Dump out the contents of a file to a
+       standard hex dump 16 bytes wide"""
+
     fp = open(filename, 'rb')
-    return hexdump(fp, start_address, stop_address)
+    return hexdump(fp,
+                   start_address,
+                   stop_address)
 
 
 def datadump(data):
@@ -29,7 +33,8 @@ def datadump(data):
     print(hexdump(fp, 0, stop_address))
 
 
-def hexdump(file_in, start_address=0, stop_address=None, showAddress=True):
+def hexdump(file_in, start_address=0,
+            stop_address=None, showAddress=True):
     """Return a formatted string of hex bytes and characters in data.
 
     This is a utility function for debugging file writing.
@@ -37,7 +42,8 @@ def hexdump(file_in, start_address=0, stop_address=None, showAddress=True):
     file_in -- a file-like object to get the bytes to show from"""
 
     str_out = BytesIO()
-    byteslen = 16 * 3 - 1  # space taken up if row has a full 16 bytes
+    # space taken up if row has a full 16 bytes
+    byteslen = 16 * 3 - 1
     blanks = ' ' * byteslen
 
     file_in.seek(start_address)
@@ -46,16 +52,23 @@ def hexdump(file_in, start_address=0, stop_address=None, showAddress=True):
         if stop_address and file_in.tell() > stop_address:
             break
         if showAddress:
-            str_out.write("%04x : " % file_in.tell())  # address at start of line
+            # address at start of line
+            str_out.write("%04x : " % (file_in.tell()))
         data = file_in.read(16)
         if not data:
             break
         row = [ord(x) for x in data]  # need ord twice below so convert once
-        byte_string = ' '.join(["%02x" % x for x in row])  # string of two digit hex bytes
+
+        # string of two digit hex bytes
+        byte_string = ' '.join(["%02x" % x for x in row])
         str_out.write(byte_string)
-        str_out.write(blanks[:byteslen - len(byte_string)])  # if not 16, pad
+
+        # if not 16, pad
+        str_out.write(blanks[:byteslen - len(byte_string)])
         str_out.write('  ')
-        str_out.write(''.join([print_character(x) for x in row]))  # character rep of bytes
+
+        # character rep of bytes
+        str_out.write(''.join([print_character(x) for x in row]))
         str_out.write("\n")
 
     return str_out.getvalue()
@@ -75,8 +88,10 @@ def pretty_print(ds, indent=0, indent_chars="   "):
     for data_element in ds:
         if data_element.VR == "SQ":   # a sequence
             fmt_str = "{0:s}{1:s} {2:s}  {3:d} item(s) ---"
-            new_str = fmt_str.format(indentStr, str(data_element.tag),
-                                     data_element.name, len(data_element.value))
+            new_str = fmt_str.format(indentStr,
+                                     str(data_element.tag),
+                                     data_element.name,
+                                     len(data_element.value))
             print(new_str)
             for dataset in data_element.value:
                 pretty_print(dataset, indent + 1)
