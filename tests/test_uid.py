@@ -2,39 +2,49 @@
 """Test suite for uid.py"""
 # Copyright (c) 2008-2012 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
-#    See the file license.txt included with this distribution, also
-#    available at https://github.com/darcymason/pydicom
+#    See the file LICENSE included with this distribution, also
+#    available at https://github.com/pydicom/pydicom
 
 import unittest
-from pydicom.uid import UID, generate_uid, pydicom_root_UID, InvalidUID
+from pydicom.uid import (
+    UID,
+    generate_uid,
+    pydicom_root_UID,
+    InvalidUID
+)
 
 
 class UIDtests(unittest.TestCase):
     def testKnownUID(self):
-        """UID: Known UID properties accessed....................."""
+        """UID: Known UID properties accessed..."""
 
         msg = "UID: expected '{1:s}', got '{2:s}' for UID {0:s}"
 
-        uid = UID('1.2.840.10008.1.2')  # Implicit VR Little Endian
+        # Implicit VR Little Endian
+        uid = UID('1.2.840.10008.1.2')
         expected = 'Implicit VR Little Endian'
         got = uid.name
-        self.assertEqual(got, expected, msg.format("name", expected, got))
+        self.assertEqual(got, expected,
+                         msg.format("name", expected, got))
 
         expected = 'Transfer Syntax'
         got = uid.type
-        self.assertEqual(got, expected, msg.format("type", expected, got))
+        self.assertEqual(got, expected,
+                         msg.format("type", expected, got))
 
         expected = 'Default Transfer Syntax for DICOM'
         got = uid.info
-        self.assertEqual(got, expected, msg.format("info", expected, got))
+        self.assertEqual(got, expected,
+                         msg.format("info", expected, got))
 
         expected = False
         got = uid.is_retired
         self.assertEqual(got, expected,
-                         msg.format("is_retired", str(expected), str(got)))
+                         msg.format("is_retired",
+                                    str(expected), str(got)))
 
     def testComparison(self):
-        """UID: can compare by number or by name.................."""
+        """UID: can compare by number or by name..."""
         uid = UID('1.2.840.10008.1.2')
         self.assertEqual(uid, 'Implicit VR Little Endian',
                          "UID equality failed on name")
@@ -42,23 +52,25 @@ class UIDtests(unittest.TestCase):
                          "UID equality failed on number string")
 
     def testCompareNumber(self):
-        """UID: comparing against a number give False............."""
+        """UID: comparing against a number give False..."""
         # From issue 96
         uid = UID('1.2.3')
-        self.assertNotEqual(uid, 3, "Comparison to a number returned True")
+        self.assertNotEqual(uid, 3,
+                            "Comparison to a number returned True")
 
     def testCompareNotEqualByName(self):
-        """UID: comparing not equal by name......................."""
+        """UID: comparing not equal by name..."""
         # from Issue 121
         ct_image_storage = UID('1.2.840.10008.5.1.4.1.1.2')
         msg = "UID not equal comparison by name was not correct"
         self.assertFalse(ct_image_storage != 'CT Image Storage', msg)
 
     def testCompareNone(self):
-        """UID: comparing against None give False................."""
+        """UID: comparing against None give False..."""
         # From issue 96
         uid = UID('1.2.3')
-        self.assertNotEqual(uid, None, "Comparison to a number returned True")
+        self.assertNotEqual(uid, None,
+                            "Comparison to a number returned True")
 
     def testTransferSyntaxes(self):
         pass
@@ -85,8 +97,7 @@ class UIDtests(unittest.TestCase):
                                '1.2',
                                '1.2..3.',
                                '1.a.2.',
-                               '1.01.1.',
-                              ):
+                               '1.01.1.'):
             self.assertRaises(ValueError,
                               lambda: generate_uid(prefix=invalid_prefix))
 
@@ -96,8 +107,7 @@ class UIDtests(unittest.TestCase):
                              '1.23.',
                              '1.0.23.',
                              ('1' * 62) + '.',
-                             '1.2.3.444444.',
-                            ):
+                             '1.2.3.444444.'):
             uid = generate_uid(prefix=valid_prefix)
             self.assertEqual(uid[:len(valid_prefix)], valid_prefix)
             self.assertTrue(len(uid) <= 64)
@@ -109,8 +119,7 @@ class UIDtests(unittest.TestCase):
                             '.',
                             '1.',
                             '1.01',
-                            '1.a.2',
-                           ):
+                            '1.a.2'):
             self.assertRaises(InvalidUID,
                               lambda: UID(invalid_uid).is_valid())
 
@@ -119,9 +128,9 @@ class UIDtests(unittest.TestCase):
                           '0.1',
                           '1' * 64,
                           '1.' + ('2' * 62),
-                          '1.0.23',
-                         ):
-            UID(valid_uid).is_valid() # Shouldn't raise
+                          '1.0.23'):
+            UID(valid_uid).is_valid()
+            # Shouldn't raise
 
     def test_is_private(self):
         """Test the is_private property"""
