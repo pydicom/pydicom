@@ -56,8 +56,11 @@ class DataElementTests(unittest.TestCase):
 
     def testKeyword(self):
         """DataElement: return correct keyword"""
-        self.assertEqual(self.data_elementCommand.keyword, 'CommandGroupLength')
-        self.assertEqual(self.data_elementPrivate.keyword, '')
+        self.assertEqual(self.data_elementCommand.keyword,
+                         'CommandGroupLength')
+
+        self.assertEqual(self.data_elementPrivate.keyword,
+                         '')
 
     def testRetired(self):
         """DataElement: return correct is_retired"""
@@ -153,7 +156,7 @@ class DataElementTests(unittest.TestCase):
     def testEqualityNotElement(self):
         """DataElement: equality returns correct value when not same class"""
         dd = DataElement(0x00100010, 'PN', 'ANON')
-        ee = {'0x00100010' : 'ANON'}
+        ee = {'0x00100010': 'ANON'}
         self.assertFalse(dd == ee)
 
     def testEqualityInheritance(self):
