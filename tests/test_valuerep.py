@@ -4,7 +4,7 @@
 # This file is part of pydicom, released under a modified MIT license.
 #    See the file LICENSE included with this distribution, also
 #    available at https://github.com/pydicom/pydicom
-
+import copy
 from datetime import (
     datetime,
     date,
@@ -219,9 +219,30 @@ class PersonNametests(unittest.TestCase):
                          "PN: expected '%s', got '%s' for phonetic component"
                          % (expected, got))
 
+    def testCopy(self):
+        """PN: Copy and deepcopy works..."""
+        pn = PersonNameUnicode(
+            'Hong^Gildong='
+            '\033$)C\373\363^\033$)C\321\316\324\327='
+            '\033$)C\310\253^\033$)C\261\346\265\277',
+            [default_encoding, 'euc_kr'])
+        pn_copy = copy.copy(pn)
+        self.assertEqual(pn_copy, pn)
+        self.assertEqual(pn_copy.components, pn.components)
+        # the copied object references the original components
+        self.assertTrue(pn_copy.components is pn.components)
+        self.assertEqual(pn_copy.encodings, pn.encodings)
+
+        pn_copy = copy.deepcopy(pn)
+        self.assertEqual(pn_copy, pn)
+        self.assertEqual(pn_copy.components, pn.components)
+        # deepcopy() shall have made a copy of components
+        self.assertFalse(pn_copy.components is pn.components)
+        self.assertEqual(pn_copy.encodings, pn.encodings)
+
     def testThreeComponent(self):
         """PN: 3component (single-byte, ideographic,
-        phonetic characters) works.."""
+        phonetic characters) works..."""
         # Example name from PS3.5-2008 section I.2 p. 108
         pn = PersonName('Hong^Gildong='
                         '\033$)C\373\363^\033$)C\321\316\324\327='
