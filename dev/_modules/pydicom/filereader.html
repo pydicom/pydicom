@@ -166,19 +166,20 @@
            <div itemprop="articleBody">
             
   <h1>Source code for pydicom.filereader</h1><div class="highlight"><pre>
-<span></span><span class="c1"># filereader.py</span>
-<span class="sd">&quot;&quot;&quot;Read a dicom media file&quot;&quot;&quot;</span>
+<span></span><span class="sd">&quot;&quot;&quot;Read a dicom media file&quot;&quot;&quot;</span>
 <span class="c1"># Copyright (c) 2008-2012 Darcy Mason</span>
 <span class="c1"># This file is part of pydicom, released under a modified MIT license.</span>
 <span class="c1">#    See the file license.txt included with this distribution, also</span>
 <span class="c1">#    available at https://github.com/darcymason/pydicom</span>
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
+
 <span class="c1"># Need zlib and io.BytesIO for deflate-compressed file</span>
 <span class="kn">import</span> <span class="nn">os.path</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">import</span> <span class="nn">zlib</span>
 <span class="kn">from</span> <span class="nn">io</span> <span class="k">import</span> <span class="n">BytesIO</span>
 
+<span class="kn">from</span> <span class="nn">pydicom.misc</span> <span class="k">import</span> <span class="n">size_in_bytes</span>
 <span class="kn">from</span> <span class="nn">pydicom.tag</span> <span class="k">import</span> <span class="n">TupleTag</span>
 <span class="kn">from</span> <span class="nn">pydicom.dataelem</span> <span class="k">import</span> <span class="n">RawDataElement</span>
 <span class="kn">from</span> <span class="nn">pydicom.util.hexutil</span> <span class="k">import</span> <span class="n">bytes2hex</span>
@@ -188,15 +189,8 @@
 <span class="kn">from</span> <span class="nn">pydicom</span> <span class="k">import</span> <span class="n">compat</span>
 <span class="kn">from</span> <span class="nn">pydicom</span> <span class="k">import</span> <span class="n">config</span>  <span class="c1"># don&#39;t import datetime_conversion directly</span>
 <span class="kn">from</span> <span class="nn">pydicom.config</span> <span class="k">import</span> <span class="n">logger</span>
-
-<span class="n">stat_available</span> <span class="o">=</span> <span class="kc">True</span>
-<span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">stat</span>
-<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="n">stat_available</span> <span class="o">=</span> <span class="kc">False</span>
-
 <span class="kn">from</span> <span class="nn">pydicom.errors</span> <span class="k">import</span> <span class="n">InvalidDicomError</span>
-<span class="kn">import</span> <span class="nn">pydicom.uid</span>  <span class="c1"># for Implicit/Explicit/Little/Big Endian transfer syntax UIDs</span>
+<span class="kn">import</span> <span class="nn">pydicom.uid</span>  <span class="c1"># for transfer syntax UIDs</span>
 <span class="kn">from</span> <span class="nn">pydicom.filebase</span> <span class="k">import</span> <span class="n">DicomFile</span>
 <span class="kn">from</span> <span class="nn">pydicom.dataset</span> <span class="k">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">FileDataset</span>
 <span class="kn">from</span> <span class="nn">pydicom.dicomdir</span> <span class="k">import</span> <span class="n">DicomDir</span>
@@ -207,12 +201,19 @@
 <span class="kn">from</span> <span class="nn">pydicom.fileutil</span> <span class="k">import</span> <span class="n">read_undefined_length_value</span>
 <span class="kn">from</span> <span class="nn">struct</span> <span class="k">import</span> <span class="n">Struct</span><span class="p">,</span> <span class="n">unpack</span>
 <span class="kn">from</span> <span class="nn">sys</span> <span class="k">import</span> <span class="n">byteorder</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">stat</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">stat</span> <span class="o">=</span> <span class="kc">None</span>
+
 <span class="n">sys_is_little_endian</span> <span class="o">=</span> <span class="p">(</span><span class="n">byteorder</span> <span class="o">==</span> <span class="s1">&#39;little&#39;</span><span class="p">)</span>
 
 
 <span class="k">class</span> <span class="nc">DicomIter</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Iterator over DICOM data elements created from a file-like object</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fp</span><span class="p">,</span> <span class="n">stop_when</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Read the preamble and meta info and prepare iterator for remainder of file.</span>
 
@@ -277,13 +278,15 @@
             <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_meta_info</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span>
 
         <span class="k">for</span> <span class="n">data_element</span> <span class="ow">in</span> <span class="n">data_element_generator</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="p">,</span>
-                                                   <span class="bp">self</span><span class="o">.</span><span class="n">_is_implicit_VR</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_little_endian</span><span class="p">,</span>
+                                                   <span class="bp">self</span><span class="o">.</span><span class="n">_is_implicit_VR</span><span class="p">,</span>
+                                                   <span class="bp">self</span><span class="o">.</span><span class="n">_is_little_endian</span><span class="p">,</span>
                                                    <span class="n">stop_when</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">stop_when</span><span class="p">):</span>
             <span class="k">yield</span> <span class="n">data_element</span>
 
 
 <span class="k">def</span> <span class="nf">data_element_generator</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">is_implicit_VR</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">,</span>
-                           <span class="n">stop_when</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">defer_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">default_encoding</span><span class="p">):</span>
+                           <span class="n">stop_when</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">defer_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                           <span class="n">encoding</span><span class="o">=</span><span class="n">default_encoding</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Create a generator to efficiently return the raw data elements.</span>
 
 <span class="sd">    Parameters</span>
@@ -350,6 +353,7 @@
     <span class="n">logger_debug</span> <span class="o">=</span> <span class="n">logger</span><span class="o">.</span><span class="n">debug</span>
     <span class="n">debugging</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">debugging</span>
     <span class="n">element_struct_unpack</span> <span class="o">=</span> <span class="n">element_struct</span><span class="o">.</span><span class="n">unpack</span>
+    <span class="n">defer_size</span> <span class="o">=</span> <span class="n">size_in_bytes</span><span class="p">(</span><span class="n">defer_size</span><span class="p">)</span>
 
     <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
         <span class="c1"># Read tag, VR, length, get ready to read value</span>
@@ -401,9 +405,10 @@
         <span class="c1"># Reading the value</span>
         <span class="c1"># First case (most common): reading a value with a defined length</span>
         <span class="k">if</span> <span class="n">length</span> <span class="o">!=</span> <span class="mh">0xFFFFFFFF</span><span class="p">:</span>
-            <span class="c1"># don&#39;t defer loading of Specific Character Set value as it is needed</span>
-            <span class="c1"># immediately to get the character encoding for other tags</span>
-            <span class="k">if</span> <span class="n">defer_size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">length</span> <span class="o">&gt;</span> <span class="n">defer_size</span> <span class="ow">and</span> <span class="n">tag</span> <span class="o">!=</span> <span class="p">(</span><span class="mh">0x08</span><span class="p">,</span> <span class="mh">0x05</span><span class="p">):</span>
+            <span class="c1"># don&#39;t defer loading of Specific Character Set value as it is</span>
+            <span class="c1"># needed immediately to get the character encoding for other tags</span>
+            <span class="k">if</span> <span class="n">defer_size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">length</span> <span class="o">&gt;</span> <span class="n">defer_size</span> <span class="ow">and</span> <span class="n">tag</span> <span class="o">!=</span> <span class="p">(</span>
+                    <span class="mh">0x08</span><span class="p">,</span> <span class="mh">0x05</span><span class="p">):</span>
                 <span class="c1"># Flag as deferred by setting value to None, and skip bytes</span>
                 <span class="n">value</span> <span class="o">=</span> <span class="kc">None</span>
                 <span class="n">logger_debug</span><span class="p">(</span><span class="s2">&quot;Defer size exceeded. &quot;</span>
@@ -416,13 +421,18 @@
                     <span class="k">if</span> <span class="n">length</span> <span class="o">&gt;</span> <span class="mi">12</span><span class="p">:</span>
                         <span class="n">dotdot</span> <span class="o">=</span> <span class="s2">&quot;...&quot;</span>
                     <span class="n">logger_debug</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%08x</span><span class="s2">: </span><span class="si">%-34s</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> </span><span class="si">%r</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">value_tell</span><span class="p">,</span>
-                                                           <span class="n">bytes2hex</span><span class="p">(</span><span class="n">value</span><span class="p">[:</span><span class="mi">12</span><span class="p">]),</span> <span class="n">dotdot</span><span class="p">,</span> <span class="n">value</span><span class="p">[:</span><span class="mi">12</span><span class="p">],</span> <span class="n">dotdot</span><span class="p">))</span>
+                                                           <span class="n">bytes2hex</span><span class="p">(</span>
+                                                               <span class="n">value</span><span class="p">[:</span><span class="mi">12</span><span class="p">]),</span>
+                                                           <span class="n">dotdot</span><span class="p">,</span>
+                                                           <span class="n">value</span><span class="p">[:</span><span class="mi">12</span><span class="p">],</span> <span class="n">dotdot</span><span class="p">))</span>
 
             <span class="c1"># If the tag is (0008,0005) Specific Character Set, then store it</span>
             <span class="k">if</span> <span class="n">tag</span> <span class="o">==</span> <span class="p">(</span><span class="mh">0x08</span><span class="p">,</span> <span class="mh">0x05</span><span class="p">):</span>
                 <span class="kn">from</span> <span class="nn">pydicom.values</span> <span class="k">import</span> <span class="n">convert_string</span>
-                <span class="n">encoding</span> <span class="o">=</span> <span class="n">convert_string</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">default_encoding</span><span class="p">)</span>
-                <span class="c1"># Store the encoding value in the generator for use with future elements (SQs)</span>
+                <span class="n">encoding</span> <span class="o">=</span> <span class="n">convert_string</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">,</span>
+                                          <span class="n">encoding</span><span class="o">=</span><span class="n">default_encoding</span><span class="p">)</span>
+                <span class="c1"># Store the encoding value in the generator</span>
+                <span class="c1"># for use with future elements (SQs)</span>
                 <span class="n">encoding</span> <span class="o">=</span> <span class="n">convert_encodings</span><span class="p">(</span><span class="n">encoding</span><span class="p">)</span>
 
             <span class="k">yield</span> <span class="n">RawDataElement</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">VR</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">value_tell</span><span class="p">,</span>
@@ -441,7 +451,8 @@
                 <span class="k">try</span><span class="p">:</span>
                     <span class="n">VR</span> <span class="o">=</span> <span class="n">dictionary_VR</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span>
                 <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-                    <span class="c1"># Look ahead to see if it consists of items and is thus a SQ</span>
+                    <span class="c1"># Look ahead to see if it consists of items</span>
+                    <span class="c1"># and is thus a SQ</span>
                     <span class="n">next_tag</span> <span class="o">=</span> <span class="n">TupleTag</span><span class="p">(</span><span class="n">unpack</span><span class="p">(</span><span class="n">endian_chr</span> <span class="o">+</span> <span class="s2">&quot;HH&quot;</span><span class="p">,</span> <span class="n">fp_read</span><span class="p">(</span><span class="mi">4</span><span class="p">)))</span>
                     <span class="c1"># Rewind the file</span>
                     <span class="n">fp</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">fp_tell</span><span class="p">()</span> <span class="o">-</span> <span class="mi">4</span><span class="p">)</span>
@@ -463,11 +474,14 @@
                 <span class="n">value</span> <span class="o">=</span> <span class="n">read_undefined_length_value</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">,</span>
                                                     <span class="n">delimiter</span><span class="p">,</span> <span class="n">defer_size</span><span class="p">)</span>
 
-                <span class="c1"># If the tag is (0008,0005) Specific Character Set, then store it</span>
+                <span class="c1"># If the tag is (0008,0005) Specific Character Set,</span>
+                <span class="c1"># then store it</span>
                 <span class="k">if</span> <span class="n">tag</span> <span class="o">==</span> <span class="p">(</span><span class="mh">0x08</span><span class="p">,</span> <span class="mh">0x05</span><span class="p">):</span>
                     <span class="kn">from</span> <span class="nn">pydicom.values</span> <span class="k">import</span> <span class="n">convert_string</span>
-                    <span class="n">encoding</span> <span class="o">=</span> <span class="n">convert_string</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">default_encoding</span><span class="p">)</span>
-                    <span class="c1"># Store the encoding value in the generator for use with future elements (SQs)</span>
+                    <span class="n">encoding</span> <span class="o">=</span> <span class="n">convert_string</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">,</span>
+                                              <span class="n">encoding</span><span class="o">=</span><span class="n">default_encoding</span><span class="p">)</span>
+                    <span class="c1"># Store the encoding value in the generator for use</span>
+                    <span class="c1"># with future elements (SQs)</span>
                     <span class="n">encoding</span> <span class="o">=</span> <span class="n">convert_encodings</span><span class="p">(</span><span class="n">encoding</span><span class="p">)</span>
 
                 <span class="k">yield</span> <span class="n">RawDataElement</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">VR</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">value_tell</span><span class="p">,</span>
@@ -475,7 +489,8 @@
 
 
 <span class="k">def</span> <span class="nf">read_dataset</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">is_implicit_VR</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">,</span> <span class="n">bytelength</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">stop_when</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">defer_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">parent_encoding</span><span class="o">=</span><span class="n">default_encoding</span><span class="p">):</span>
+                 <span class="n">stop_when</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">defer_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">parent_encoding</span><span class="o">=</span><span class="n">default_encoding</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Return a Dataset instance containing the next dataset in the file.</span>
 
 <span class="sd">    Parameters</span>
@@ -557,7 +572,8 @@
     <span class="k">return</span> <span class="n">seq</span>
 
 
-<span class="k">def</span> <span class="nf">read_sequence_item</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">is_implicit_VR</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">,</span> <span class="n">encoding</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">read_sequence_item</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">is_implicit_VR</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">,</span> <span class="n">encoding</span><span class="p">,</span>
+                       <span class="n">offset</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Read and return a single sequence item, i.e. a Dataset&quot;&quot;&quot;</span>
     <span class="n">seq_item_tell</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span> <span class="o">+</span> <span class="n">offset</span>
     <span class="k">if</span> <span class="n">is_little_endian</span><span class="p">:</span>
@@ -567,15 +583,17 @@
     <span class="k">try</span><span class="p">:</span>
         <span class="n">bytes_read</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
         <span class="n">group</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">length</span> <span class="o">=</span> <span class="n">unpack</span><span class="p">(</span><span class="n">tag_length_format</span><span class="p">,</span> <span class="n">bytes_read</span><span class="p">)</span>
-    <span class="k">except</span><span class="p">:</span>
+    <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;No tag to read at file position &quot;</span>
                       <span class="s2">&quot;</span><span class="si">{0:05x}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fp</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span> <span class="o">+</span> <span class="n">offset</span><span class="p">))</span>
     <span class="n">tag</span> <span class="o">=</span> <span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="n">element</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">tag</span> <span class="o">==</span> <span class="n">SequenceDelimiterTag</span><span class="p">:</span>  <span class="c1"># No more items, time to stop reading</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0:08x}</span><span class="s2">: </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fp</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span> <span class="o">-</span> <span class="mi">8</span> <span class="o">+</span> <span class="n">offset</span><span class="p">,</span> <span class="s2">&quot;End of Sequence&quot;</span><span class="p">))</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+            <span class="s2">&quot;</span><span class="si">{0:08x}</span><span class="s2">: </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fp</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span> <span class="o">-</span> <span class="mi">8</span> <span class="o">+</span> <span class="n">offset</span><span class="p">,</span> <span class="s2">&quot;End of Sequence&quot;</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">length</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Expected 0x00000000 after delimiter, found 0x</span><span class="si">%x</span><span class="s2">, &quot;</span>
-                           <span class="s2">&quot;at position 0x</span><span class="si">%x</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">length</span><span class="p">,</span> <span class="n">fp</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span> <span class="o">-</span> <span class="mi">4</span> <span class="o">+</span> <span class="n">offset</span><span class="p">))</span>
+                           <span class="s2">&quot;at position 0x</span><span class="si">%x</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span>
+                               <span class="n">length</span><span class="p">,</span> <span class="n">fp</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span> <span class="o">-</span> <span class="mi">4</span> <span class="o">+</span> <span class="n">offset</span><span class="p">))</span>
         <span class="k">return</span> <span class="kc">None</span>
     <span class="k">if</span> <span class="n">tag</span> <span class="o">!=</span> <span class="n">ItemTag</span><span class="p">:</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Expected sequence item with tag </span><span class="si">%s</span><span class="s2"> at file position &quot;</span>
@@ -597,11 +615,12 @@
 
 
 <span class="k">def</span> <span class="nf">_read_command_set_elements</span><span class="p">(</span><span class="n">fp</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Return a Dataset containing any Command Set (0000,eeee) elements in `fp`.</span>
+    <span class="sd">&quot;&quot;&quot;Return a Dataset containing any Command Set (0000,eeee) elements</span>
+<span class="sd">    in `fp`.</span>
 
 <span class="sd">    Command Set elements are always Implicit VR Little Endian (as per PS3.7</span>
-<span class="sd">    Section 6.3). Once any Command Set elements are read `fp` will be positioned</span>
-<span class="sd">    at the start of the next group of elements.</span>
+<span class="sd">    Section 6.3). Once any Command Set elements are read `fp` will be</span>
+<span class="sd">    positioned at the start of the next group of elements.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -614,6 +633,7 @@
 <span class="sd">        The command set elements as a Dataset instance. May be empty if no</span>
 <span class="sd">        command set elements are present.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="nf">_not_group_0000</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">VR</span><span class="p">,</span> <span class="n">length</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return True if the tag is not in group 0x0000, False otherwise.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">tag</span><span class="o">.</span><span class="n">group</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
@@ -642,9 +662,10 @@
 <span class="sd">        The File Meta elements as a Dataset instance. May be empty if no</span>
 <span class="sd">        File Meta are present.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="nf">_not_group_0002</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">VR</span><span class="p">,</span> <span class="n">length</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return True if the tag is not in group 0x0002, False otherwise.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">tag</span><span class="o">.</span><span class="n">group</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">tag</span><span class="o">.</span><span class="n">group</span> <span class="o">!=</span> <span class="mi">2</span>
 
     <span class="n">start_file_meta</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
     <span class="n">file_meta</span> <span class="o">=</span> <span class="n">read_dataset</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">is_implicit_VR</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -659,9 +680,9 @@
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;_read_file_meta_info: (0002,0000) &#39;File Meta &quot;</span>
                         <span class="s2">&quot;Information Group Length&#39; value doesn&#39;t match the &quot;</span>
                         <span class="s2">&quot;actual File Meta Information length (</span><span class="si">{0}</span><span class="s2"> vs </span><span class="si">{1}</span><span class="s2"> &quot;</span>
-                        <span class="s2">&quot;bytes).&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                        <span class="n">file_meta</span><span class="o">.</span><span class="n">FileMetaInformationGroupLength</span><span class="p">,</span>
-                        <span class="n">length_file_meta</span><span class="p">))</span>
+                        <span class="s2">&quot;bytes).&quot;</span>
+                        <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">file_meta</span><span class="o">.</span><span class="n">FileMetaInformationGroupLength</span><span class="p">,</span>
+                                <span class="n">length_file_meta</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">file_meta</span>
 
 
@@ -680,11 +701,11 @@
 <span class="k">def</span> <span class="nf">read_preamble</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">force</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Return the 128-byte DICOM preamble in `fp` if present.</span>
 
-<span class="sd">    `fp` should be positioned at the start of the file-like. If the preamble and</span>
-<span class="sd">    prefix are found then after reading `fp` will be positioned at the first</span>
-<span class="sd">    byte after the prefix (byte offset 133). If either the preamble or prefix</span>
-<span class="sd">    are missing and `force` is True then after reading `fp` will be positioned</span>
-<span class="sd">    at the start of the file-like.</span>
+<span class="sd">    `fp` should be positioned at the start of the file-like. If the preamble</span>
+<span class="sd">    and prefix are found then after reading `fp` will be positioned at the</span>
+<span class="sd">    first byte after the prefix (byte offset 133). If either the preamble or</span>
+<span class="sd">    prefix are missing and `force` is True then after reading `fp` will be</span>
+<span class="sd">    positioned at the start of the file-like.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -719,10 +740,11 @@
     <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Reading File Meta Information prefix...&quot;</span><span class="p">)</span>
     <span class="n">magic</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">magic</span> <span class="o">!=</span> <span class="sa">b</span><span class="s2">&quot;DICM&quot;</span> <span class="ow">and</span> <span class="n">force</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;File is not conformant with the DICOM File Format: &#39;DICM&#39; &quot;</span>
-                    <span class="s2">&quot;prefix is missing from the File Meta Information header &quot;</span>
-                    <span class="s2">&quot;or the header itself is missing. Assuming no header and &quot;</span>
-                    <span class="s2">&quot;continuing.&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="s2">&quot;File is not conformant with the DICOM File Format: &#39;DICM&#39; &quot;</span>
+            <span class="s2">&quot;prefix is missing from the File Meta Information header &quot;</span>
+            <span class="s2">&quot;or the header itself is missing. Assuming no header and &quot;</span>
+            <span class="s2">&quot;continuing.&quot;</span><span class="p">)</span>
         <span class="n">preamble</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">fp</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">magic</span> <span class="o">!=</span> <span class="sa">b</span><span class="s2">&quot;DICM&quot;</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">force</span><span class="p">:</span>
@@ -766,13 +788,15 @@
 <span class="sd">    read_file</span>
 <span class="sd">        More generic file reading function.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1">## Read File Meta Information</span>
+    <span class="c1"># Read File Meta Information</span>
+
     <span class="c1"># Read preamble (if present)</span>
     <span class="n">preamble</span> <span class="o">=</span> <span class="n">read_preamble</span><span class="p">(</span><span class="n">fileobj</span><span class="p">,</span> <span class="n">force</span><span class="p">)</span>
     <span class="c1"># Read any File Meta Information group (0002,eeee) elements (if present)</span>
     <span class="n">file_meta_dataset</span> <span class="o">=</span> <span class="n">_read_file_meta_info</span><span class="p">(</span><span class="n">fileobj</span><span class="p">)</span>
 
-    <span class="c1">## Read Dataset</span>
+    <span class="c1"># Read Dataset</span>
+
     <span class="c1"># Read any Command Set group (0000,eeee) elements (if present)</span>
     <span class="n">command_set</span> <span class="o">=</span> <span class="n">_read_command_set_elements</span><span class="p">(</span><span class="n">fileobj</span><span class="p">)</span>
 
@@ -780,14 +804,14 @@
     <span class="n">peek</span> <span class="o">=</span> <span class="n">fileobj</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">fileobj</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
-    <span class="c1"># `filobj` should be positioned at the start of the dataset by this point,</span>
+    <span class="c1"># `filobj` should be positioned at the start of the dataset by this point.</span>
     <span class="c1"># Ensure we have appropriate values for `is_implicit_VR` and</span>
-    <span class="c1">#   `is_little_endian` before we try decoding. We assume an initial</span>
-    <span class="c1">#   transfer syntax of implicit VR little endian and correct it as necessary</span>
+    <span class="c1"># `is_little_endian` before we try decoding. We assume an initial</span>
+    <span class="c1"># transfer syntax of implicit VR little endian and correct it as necessary</span>
     <span class="n">is_implicit_VR</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">is_little_endian</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">transfer_syntax</span> <span class="o">=</span> <span class="n">file_meta_dataset</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;TransferSyntaxUID&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">peek</span> <span class="o">==</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span><span class="p">:</span> <span class="c1"># EOF</span>
+    <span class="k">if</span> <span class="n">peek</span> <span class="o">==</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span><span class="p">:</span>  <span class="c1"># EOF</span>
         <span class="k">pass</span>
     <span class="k">elif</span> <span class="n">transfer_syntax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># issue 258</span>
         <span class="c1"># If no TransferSyntaxUID element then we have to try and figure out</span>
@@ -861,11 +885,12 @@
 <div class="viewcode-block" id="read_file"><a class="viewcode-back" href="../../ref_guide.html#pydicom.filereader.read_file">[docs]</a><span class="k">def</span> <span class="nf">read_file</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">defer_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stop_before_pixels</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Read and parse a DICOM dataset stored in the DICOM File Format.</span>
 
-<span class="sd">    Read a DICOM dataset stored in accordance with the DICOM File Format (DICOM</span>
-<span class="sd">    Standard Part 10 Section 7). If the dataset is not stored in accordance</span>
-<span class="sd">    with the File Format (i.e. the preamble and prefix are missing, there are</span>
-<span class="sd">    missing required Type 1 File Meta Information Group elements or the entire</span>
-<span class="sd">    File Meta Information is missing) then you will have to set `force` to True.</span>
+<span class="sd">    Read a DICOM dataset stored in accordance with the DICOM File Format</span>
+<span class="sd">    (DICOM Standard Part 10 Section 7). If the dataset is not stored in</span>
+<span class="sd">    accordance with the File Format (i.e. the preamble and prefix are missing,</span>
+<span class="sd">    there are missing required Type 1 File Meta Information Group elements</span>
+<span class="sd">    or the entire File Meta Information is missing) then you will have to</span>
+<span class="sd">    set `force` to True.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -940,10 +965,8 @@
             <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Caller passed file name&quot;</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">80</span><span class="p">)</span>
 
-    <span class="c1"># Convert size to defer reading into bytes, and store in file object</span>
-    <span class="c1"># if defer_size is not None:</span>
-    <span class="c1">#    defer_size = size_in_bytes(defer_size)</span>
-    <span class="c1"># fp.defer_size = defer_size</span>
+    <span class="c1"># Convert size to defer reading into bytes</span>
+    <span class="n">defer_size</span> <span class="o">=</span> <span class="n">size_in_bytes</span><span class="p">(</span><span class="n">defer_size</span><span class="p">)</span>
 
     <span class="c1"># Iterate through all items and store them --include file meta if present</span>
     <span class="n">stop_when</span> <span class="o">=</span> <span class="kc">None</span>
@@ -984,7 +1007,8 @@
     <span class="n">ds</span> <span class="o">=</span> <span class="n">read_file</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
     <span class="c1"># Here, check that it is in fact DicomDir</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">DicomDir</span><span class="p">):</span>
-        <span class="n">msg</span> <span class="o">=</span> <span class="sa">u</span><span class="s2">&quot;File &#39;</span><span class="si">{0}</span><span class="s2">&#39; is not a Media Storage Directory file&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">u</span><span class="s2">&quot;File &#39;</span><span class="si">{0}</span><span class="s2">&#39; is not a Media Storage Directory file&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">filename</span><span class="p">)</span>
         <span class="k">raise</span> <span class="n">InvalidDicomError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">ds</span>
 
@@ -992,7 +1016,7 @@
 <span class="k">def</span> <span class="nf">data_element_offset_to_value</span><span class="p">(</span><span class="n">is_implicit_VR</span><span class="p">,</span> <span class="n">VR</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Return number of bytes from start of data element to start of value&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">is_implicit_VR</span><span class="p">:</span>
-        <span class="n">offset</span> <span class="o">=</span> <span class="mi">8</span>   <span class="c1"># tag of 4 plus 4-byte length</span>
+        <span class="n">offset</span> <span class="o">=</span> <span class="mi">8</span>  <span class="c1"># tag of 4 plus 4-byte length</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">VR</span> <span class="ow">in</span> <span class="n">extra_length_VRs</span><span class="p">:</span>
             <span class="n">offset</span> <span class="o">=</span> <span class="mi">12</span>  <span class="c1"># tag 4 + 2 VR + 2 reserved + 4 length</span>
@@ -1014,7 +1038,7 @@
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;Deferred read -- original file &quot;</span>
                       <span class="s2">&quot;</span><span class="si">{0:s}</span><span class="s2"> is missing&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filename</span><span class="p">))</span>
-    <span class="k">if</span> <span class="n">stat_available</span> <span class="ow">and</span> <span class="p">(</span><span class="n">timestamp</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">stat</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span><span class="n">timestamp</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
         <span class="n">statinfo</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">statinfo</span><span class="o">.</span><span class="n">st_mtime</span> <span class="o">!=</span> <span class="n">timestamp</span><span class="p">:</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Deferred read warning -- file modification time &quot;</span>
@@ -1035,10 +1059,12 @@
     <span class="n">fp</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">data_elem</span><span class="o">.</span><span class="n">VR</span> <span class="o">!=</span> <span class="n">raw_data_elem</span><span class="o">.</span><span class="n">VR</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Deferred read VR </span><span class="si">{0:s}</span><span class="s2"> does not match &quot;</span>
-                         <span class="s2">&quot;original </span><span class="si">{1:s}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">data_elem</span><span class="o">.</span><span class="n">VR</span><span class="p">,</span> <span class="n">raw_data_elem</span><span class="o">.</span><span class="n">VR</span><span class="p">))</span>
+                         <span class="s2">&quot;original </span><span class="si">{1:s}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">data_elem</span><span class="o">.</span><span class="n">VR</span><span class="p">,</span>
+                                                 <span class="n">raw_data_elem</span><span class="o">.</span><span class="n">VR</span><span class="p">))</span>
     <span class="k">if</span> <span class="n">data_elem</span><span class="o">.</span><span class="n">tag</span> <span class="o">!=</span> <span class="n">raw_data_elem</span><span class="o">.</span><span class="n">tag</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Deferred read tag </span><span class="si">{0!r}</span><span class="s2"> does not match &quot;</span>
-                         <span class="s2">&quot;original </span><span class="si">{1!r}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">data_elem</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="n">raw_data_elem</span><span class="o">.</span><span class="n">tag</span><span class="p">))</span>
+                         <span class="s2">&quot;original </span><span class="si">{1!r}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">data_elem</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span>
+                                                 <span class="n">raw_data_elem</span><span class="o">.</span><span class="n">tag</span><span class="p">))</span>
 
     <span class="c1"># Everything is ok, now this object should act like usual DataElement</span>
     <span class="k">return</span> <span class="n">data_elem</span>
