@@ -1,11 +1,15 @@
 """Test suite for Tag.py"""
 # Copyright (c) 2008 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
-#    See the file license.txt included with this distribution, also
-#    available at https://github.com/darcymason/pydicom
+#    See the file LICENSE included with this distribution, also
+#    available at https://github.com/pydicom/pydicom
 
 import unittest
-from pydicom.tag import BaseTag, Tag, TupleTag
+from pydicom.tag import (
+    BaseTag,
+    Tag,
+    TupleTag
+)
 
 
 class TestBaseTag(unittest.TestCase):
@@ -24,7 +28,8 @@ class TestBaseTag(unittest.TestCase):
 
     def test_le_subclass(self):
         """Test __le__ of two classes with one as a subclass."""
-        class BaseTagPlus(BaseTag): pass
+        class BaseTagPlus(BaseTag):
+            pass
         self.assertTrue(BaseTagPlus(0x00000000) <= BaseTag(0x00000001))
         self.assertTrue(BaseTagPlus(0x00000001) <= BaseTag(0x00000001))
         self.assertFalse(BaseTagPlus(0x00000001) <= BaseTag(0x00000000))
@@ -55,7 +60,8 @@ class TestBaseTag(unittest.TestCase):
 
     def test_lt_subclass(self):
         """Test __lt__ of two classes with one as a subclass."""
-        class BaseTagPlus(BaseTag): pass
+        class BaseTagPlus(BaseTag):
+            pass
         self.assertTrue(BaseTagPlus(0x00000000) < BaseTag(0x00000001))
         self.assertFalse(BaseTagPlus(0x00000001) < BaseTag(0x00000001))
         self.assertFalse(BaseTagPlus(0x00000001) < BaseTag(0x00000000))
@@ -86,7 +92,8 @@ class TestBaseTag(unittest.TestCase):
 
     def test_ge_subclass(self):
         """Test __ge__ of two classes with one as a subclass."""
-        class BaseTagPlus(BaseTag): pass
+        class BaseTagPlus(BaseTag):
+            pass
         self.assertFalse(BaseTagPlus(0x00000000) >= BaseTag(0x00000001))
         self.assertTrue(BaseTagPlus(0x00000001) >= BaseTag(0x00000001))
         self.assertTrue(BaseTagPlus(0x00000001) >= BaseTag(0x00000000))
@@ -117,7 +124,8 @@ class TestBaseTag(unittest.TestCase):
 
     def test_gt_subclass(self):
         """Test __gt__ of two classes with one as a subclass."""
-        class BaseTagPlus(BaseTag): pass
+        class BaseTagPlus(BaseTag):
+            pass
         self.assertFalse(BaseTagPlus(0x00000000) > BaseTag(0x00000001))
         self.assertFalse(BaseTagPlus(0x00000001) > BaseTag(0x00000001))
         self.assertTrue(BaseTagPlus(0x00000001) > BaseTag(0x00000000))
@@ -146,7 +154,8 @@ class TestBaseTag(unittest.TestCase):
 
     def test_eq_subclass(self):
         """Test __eq__ of two classes with one as a subclass."""
-        class BaseTagPlus(BaseTag): pass
+        class BaseTagPlus(BaseTag):
+            pass
         self.assertTrue(BaseTagPlus(0x00000000) == BaseTag(0x00000000))
         self.assertFalse(BaseTagPlus(0x00000001) == BaseTag(0x00000000))
 
@@ -173,7 +182,8 @@ class TestBaseTag(unittest.TestCase):
 
     def test_ne_subclass(self):
         """Test __ne__ of two classes with one as a subclass."""
-        class BaseTagPlus(BaseTag): pass
+        class BaseTagPlus(BaseTag):
+            pass
         self.assertFalse(BaseTagPlus(0x00000000) != BaseTag(0x00000000))
         self.assertTrue(BaseTagPlus(0x00000001) != BaseTag(0x00000000))
 
@@ -190,9 +200,12 @@ class TestBaseTag(unittest.TestCase):
 
     def test_hash(self):
         """Test hash of BaseTag class."""
-        self.assertEqual(hash(BaseTag(0x00010001)), hash(BaseTag(0x00010001)))
-        self.assertNotEqual(hash(BaseTag(0x00010001)), hash(BaseTag(0x00010002)))
-        self.assertNotEqual(hash(BaseTag(0x00020001)), hash(BaseTag(0x00010002)))
+        self.assertEqual(hash(BaseTag(0x00010001)),
+                         hash(BaseTag(0x00010001)))
+        self.assertNotEqual(hash(BaseTag(0x00010001)),
+                            hash(BaseTag(0x00010002)))
+        self.assertNotEqual(hash(BaseTag(0x00020001)),
+                            hash(BaseTag(0x00010002)))
 
     def test_str(self):
         """Test str(BaseTag) produces correct value."""
@@ -215,9 +228,12 @@ class TestBaseTag(unittest.TestCase):
 
     def test_private(self):
         """Test BaseTag.is_private returns correct values."""
-        self.assertTrue(BaseTag(0x00010001).is_private) # Odd groups private
-        self.assertFalse(BaseTag(0x00020001).is_private) # Even groups not private
-        self.assertFalse(BaseTag(0x00000001).is_private) # Group 0 not private
+        # Odd groups private
+        self.assertTrue(BaseTag(0x00010001).is_private)
+        # Even groups not private
+        self.assertFalse(BaseTag(0x00020001).is_private)
+        # Group 0 not private
+        self.assertFalse(BaseTag(0x00000001).is_private)
 
 
 class TestTag(unittest.TestCase):
@@ -322,7 +338,7 @@ class TestTag(unittest.TestCase):
     def test_tag_double_int(self):
         """Test creating a Tag from a two ints."""
         self.assertEqual(Tag(0x0000, 0x0000), BaseTag(0x00000000))
-        self.assertEqual(Tag(2, 0), BaseTag(0x00020000)) # Issue #47
+        self.assertEqual(Tag(2, 0), BaseTag(0x00020000))
         self.assertTrue(Tag(2, 0).elem == 0x0000)
         self.assertEqual(Tag(0x99, 0xFE), BaseTag(0x009900FE))
         self.assertEqual(Tag(15, 14), BaseTag(0x000F000E))
@@ -341,7 +357,8 @@ class TestTupleTag(unittest.TestCase):
     """Test the TupleTag method."""
     def test_tuple_tag(self):
         """Test quick tag construction with TupleTag."""
-        self.assertEqual(TupleTag((0xFFFF, 0xFFee)), BaseTag(0xFFFFFFEE))
+        self.assertEqual(TupleTag((0xFFFF, 0xFFee)),
+                         BaseTag(0xFFFFFFEE))
 
 
 if __name__ == "__main__":
