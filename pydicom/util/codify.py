@@ -1,5 +1,6 @@
 # codify.py
-"""Produce runnable python code which can recreate DICOM objects or files.
+"""
+Produce runnable python code which can recreate DICOM objects or files.
 
 Can run as a script to produce code for an entire file,
 or import and use specific functions to provide code for pydicom DICOM classes
@@ -7,8 +8,8 @@ or import and use specific functions to provide code for pydicom DICOM classes
 """
 # Copyright (c) 2013 Darcy Mason
 # This file is part of pydicom, released under an MIT license.
-#    See the file license.txt included with this distribution, also
-#    available at https://github.com/darcymason/pydicom
+#    See the file LICENSE included with this distribution, also
+#    available at https://github.com/pydicom/pydicom
 
 # Run this from the same directory as a "base" dicom file and
 # this code will output to screen the dicom parameters like:
@@ -31,8 +32,13 @@ line_term = "\n"
 first_cap_re = re.compile('(.)([A-Z][a-z]+)')
 all_cap_re = re.compile('([a-z0-9])([A-Z])')
 
-byte_VRs = ['OB', 'OW', 'OW/OB', 'OW or OB', 'OB or OW',
-            'US or SS or OW', 'US or SS']
+byte_VRs = ['OB',
+            'OW',
+            'OW/OB',
+            'OW or OB',
+            'OB or OW',
+            'US or SS or OW',
+            'US or SS']
 
 
 def camel_to_underscore(name):
@@ -92,7 +98,9 @@ def code_dataelem(dataelem, dataset_name="ds", exclude_size=None,
     """
 
     if dataelem.VR == "SQ":
-        return code_sequence(dataelem, dataset_name, exclude_size,
+        return code_sequence(dataelem,
+                             dataset_name,
+                             exclude_size,
                              include_private)
 
     # If in DICOM dictionary, set using the keyword
@@ -105,8 +113,10 @@ def code_dataelem(dataelem, dataset_name="ds", exclude_size=None,
 
     valuerep = repr(dataelem.value)
     if exclude_size:
-        if dataelem.VR in byte_VRs and len(dataelem.value) > exclude_size:
-            valuerep = "# XXX Array of %d bytes excluded" % len(dataelem.value)
+        value_gr_size = len(dataelem.value) > exclude_size
+        if (dataelem.VR in byte_VRs and value_gr_size):
+            valuerep = ("# XXX Array of %d bytes excluded"
+                        % len(dataelem.value))
 
     if have_keyword:
         format_str = "{ds_name}.{keyword} = {valuerep}"
@@ -179,7 +189,10 @@ def code_sequence(dataelem, dataset_name="ds",
         ds_name = seq_var.replace("_sequence", "") + index_str
 
         # Code the sequence item
-        code_item = code_dataset(ds, ds_name, exclude_size, include_private)
+        code_item = code_dataset(ds,
+                                 ds_name,
+                                 exclude_size,
+                                 include_private)
         lines.append(code_item)
 
         # Code the line to append the item to its parent sequence
@@ -209,7 +222,9 @@ def code_dataset(ds, dataset_name="ds", exclude_size=None,
         if not include_private and dataelem.tag.is_private:
             continue
         # Otherwise code the line and add it to the lines list
-        code_line = code_dataelem(dataelem, dataset_name, exclude_size,
+        code_line = code_dataelem(dataelem,
+                                  dataset_name,
+                                  exclude_size,
                                   include_private)
         lines.append(code_line)
         # Add blank line if just coded a sequence
@@ -249,7 +264,10 @@ def code_file(filename, exclude_size=None, include_private=False):
 
     # Code the file_meta information
     lines.append("# File meta info data elements")
-    code_meta = code_dataset(ds.file_meta, "file_meta", exclude_size, include_private)
+    code_meta = code_dataset(ds.file_meta,
+                             "file_meta",
+                             exclude_size,
+                             include_private)
     lines.append(code_meta)
     lines.append('')
 
@@ -283,8 +301,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Produce python/pydicom code from a DICOM file",
         epilog="Binary data (e.g. pixels) larger than --exclude-size "
-               "(default %d bytes) is not included. A dummy line with a syntax "
-               "error is produced. "
+               "(default %d bytes) is not included. A dummy line "
+               "with a syntax error is produced. "
                "Private data elements are not included "
                "by default." % default_exclude_size)
     parser.add_argument('filename',
@@ -293,9 +311,10 @@ if __name__ == "__main__":
                         help="Filename to write python code to. "
                         "If not specified, code is written to stdout",
                         default=sys.stdout)
+    help_exclude_size = 'Exclude binary data larger than specified (bytes)'
     parser.add_argument('-e', '--exclude-size', type=long,
                         default=default_exclude_size,
-                        help='Exclude binary data larger than specified (bytes)'
+                        help=help_exclude_size
                         '. Default is %d bytes' % default_exclude_size)
     parser.add_argument('-p', '--include-private', action="store_true",
                         help='Include private data elements '
