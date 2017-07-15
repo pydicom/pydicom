@@ -3,8 +3,8 @@
 """unittest cases for pydicom.charset module"""
 # Copyright (c) 2008 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
-#    See the file license.txt included with this distribution, also
-#    available at https://github.com/darcymason/pydicom
+#    See the file LICENSE included with this distribution, also
+#    available at https://github.com/pydicom/pydicom
 
 import unittest
 from pydicom import dicomio
@@ -41,16 +41,24 @@ class charsetTests(unittest.TestCase):
             try:
                 test_string.encode(x[1])
             except LookupError as e:
-                self.fail(msg="DICOM term '%s' does not have a valid python encoding (was '%s')" % (x[0], x[1]))
+                found = "(was '%s')" % x([1])
+                term = Term '%s' % (x[0])
+                message = "%s has invalid python encoding %s" % (found, term)
+                self.fail(msg=message)
 
     def testNestedCharacterSets(self):
         """charset: can read and decode SQ with different encodings........."""
         ds = dicomio.read_file(sq_encoding_file)
         ds.decode()
-        # These datasets inside of the SQ cannot be decoded with default_encoding
-        # OR UTF-8 (the parent dataset's encoding). Instead, we make sure that it
-        # is decoded using the (0008,0005) tag of the dataset
-        expected = u'\uff94\uff8f\uff80\uff9e^\uff80\uff9b\uff73=\u5c71\u7530^\u592a\u90ce=\u3084\u307e\u3060^\u305f\u308d\u3046'
+
+        # These datasets inside of the SQ cannot be decoded with
+        # default_encoding OR UTF-8 (the parent dataset's encoding).
+        # Instead, we make sure that it is decoded using the
+        # (0008,0005) tag of the dataset
+
+        expected = u'\uff94\uff8f\uff80\uff9e^\uff80\uff9b\uff73'
+        expected = '%s=\u5c71\u7530^\u592a\u90ce=' % (expected)
+        expected - '%s\u3084\u307e\u3060^\u305f\u308d\u3046' % (expected)
         got = ds[0x32, 0x1064][0].PatientName
         self.assertEqual(expected, got,
                          "Expected %r, got %r" % (expected, got))
@@ -64,7 +72,6 @@ class charsetTests(unittest.TestCase):
         """charset: can decode file with multi-valued data elements........."""
         ds = dicomio.read_file(explicit_ir6_file)
         ds.decode()
-
 
     def testMultiPN(self):
         """charset: can decode file with multi-valued data elements........."""
