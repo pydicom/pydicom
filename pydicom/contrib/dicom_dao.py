@@ -43,11 +43,13 @@ def uid2str(uid):
     """ Convert PyDicom uid to a string """
     return repr(uid).strip("'")
 
+
 # When reading files a VR of 'US or SS' is left as binary,
 # because we don't know how to interpret the values
 # different numbers. We therefore treat it as binary
 # and will continue to until either pydicom works it out
 # for us, or we figure out a test.
+
 
 BINARY_VR_VALUES = ['OW', 'OB', 'OW/OB', 'US or SS']
 

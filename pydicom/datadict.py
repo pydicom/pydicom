@@ -195,6 +195,7 @@ def keyword_for_tag(tag):
     except KeyError:
         return ""
 
+
 # Provide for the 'reverse' lookup. Given the keyword, what is the tag?
 logger.debug("Reversing DICOM dictionary so can look up tag from a keyword...")
 keyword_dict = dict([(dictionary_keyword(tag), tag)

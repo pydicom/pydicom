@@ -43,6 +43,7 @@ def DS_decimal(use_Decimal_boolean=True):
     else:
         pydicom.valuerep.DSclass = pydicom.valuerep.DSfloat
 
+
 # Configuration flags
 allow_DS_float = False
 """Set allow_float to True to allow DSdecimal instances
@@ -50,11 +51,13 @@ to be created with floats; otherwise, they must be explicitly
 converted to strings, with the user explicity setting the
 precision of digits and rounding. Default: False"""
 
+
 enforce_valid_values = False
 """Raise errors if any value is not allowed by DICOM standard,
 e.g. DS strings that are longer than 16 characters;
 IS strings outside the allowed range.
 """
+
 
 datetime_conversion = False
 """Set datetime_conversion to convert DA, DT and TM
@@ -87,6 +90,7 @@ def debug(debug_on=True):
     else:
         logger.setLevel(logging.WARNING)
         debugging = False
+
 
 # force level=WARNING, in case logging default is set differently (issue 103)
 debug(False)

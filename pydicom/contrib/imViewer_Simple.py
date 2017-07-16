@@ -341,10 +341,13 @@ class App(wx.App):
         ImFrame(None, 'wxImage Example')
         return True
 
+
 # ------------------------------------------------------
 # If this file is running as main or a
 # standalone test, begin execution here.
 # ------------------------------------------------------
+
+
 if __name__ == '__main__':
     app = App(0)
     app.MainLoop()

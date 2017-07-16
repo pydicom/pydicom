@@ -121,8 +121,9 @@ class BaseTag(BaseTag_base_class):
         if not isinstance(other, BaseTag):
             try:
                 other = Tag(other)
-            except:
+            except Exception:
                 raise TypeError("Cannot compare Tag with non-Tag item")
+
         return BaseTag_base_class(self) < BaseTag_base_class(other)
 
     def __ge__(self, other):
@@ -139,7 +140,7 @@ class BaseTag(BaseTag_base_class):
         if not isinstance(other, BaseTag):
             try:
                 other = Tag(other)
-            except:
+            except Exception:
                 raise TypeError("Cannot compare Tag with non-Tag item")
         return BaseTag_base_class(self) == BaseTag_base_class(other)
 
@@ -184,14 +185,18 @@ def TupleTag(group_elem):
     long_value = group_elem[0] << 16 | group_elem[1]
     return BaseTag(long_value)
 
+
 # Define some special tags:
 # See PS 3.5-2008 section 7.5 (p.40)
+
 
 # start of Sequence Item
 ItemTag = TupleTag((0xFFFE, 0xE000))
 
+
 # end of Sequence Item
 ItemDelimiterTag = TupleTag((0xFFFE, 0xE00D))
+
 
 # end of Sequence of undefined length
 SequenceDelimiterTag = TupleTag((0xFFFE, 0xE0DD))

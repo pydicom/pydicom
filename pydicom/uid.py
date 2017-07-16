@@ -164,6 +164,7 @@ class UID(str):
     def __hash__(self):
         return super(UID, self).__hash__()
 
+
 ExplicitVRLittleEndian = UID('1.2.840.10008.1.2.1')
 ImplicitVRLittleEndian = UID('1.2.840.10008.1.2')
 DeflatedExplicitVRLittleEndian = UID('1.2.840.10008.1.2.1.99')
