@@ -448,27 +448,22 @@ class DSdecimal(Decimal):
         return val
 
     def __init__(self, val):
-        """Store the original string if one given, for exact
-        write-out of same value later. E.g. if set '1.23e2',
-        Decimal would write '123', but DS will use the original
+        """Store the original string if one given, for exact write-out of same
+        value later. E.g. if set '1.23e2', Decimal would write '123', but DS
+        will use the original
         """
         # ... also if user changes a data element value, then will get
         # a different Decimal, as Decimal is immutable.
-        has_attribute = hasattr(val, 'original_string')
         if isinstance(val, (str, compat.text_type)):
             self.original_string = val
-        elif isinstance(val, (DSfloat, DSdecimal)) and has_attribute:
+        elif isinstance(val, (DSfloat, DSdecimal)) and hasattr(val, 'original_string'):  # noqa
             self.original_string = val.original_string
 
     def __str__(self):
-        if hasattr(self, 'original_string'):
-            if self.original_string <= 16:
-                return self.original_string
-        return super(DSdecimal, self).__str__()
-
-    def __repr__(self):
-        return "\"" + str(self) + "\""
-
+        if hasattr(self, 'original_string') and len(self.original_string) <= 16:
+            return self.original_string
+        else:
+            return super(DSdecimal, self).__str__()
 
 # CHOOSE TYPE OF DS
 if config.use_DS_decimal:

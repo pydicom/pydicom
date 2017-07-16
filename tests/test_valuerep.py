@@ -174,18 +174,14 @@ class DecimalStringtests(unittest.TestCase):
         valid_str = '-9.81338674e-006'
         ds = valuerep.DS(valid_str)
         L = len(str(ds))
-        self.assertTrue(L <= 16,
-                        "DS: expected a string of length 16 but got %d"
-                        % (L,))
+        self.assertTrue(L <= 16, "DS: expected a string of length 16 but got %d" % (L,))  # noqa
 
         # Now the input string is too long but decimal.Decimal can convert it
         # to a valid 16-character string
         long_str = '-0.000000981338674'
         ds = valuerep.DS(long_str)
         L = len(str(ds))
-        self.assertTrue(L <= 16,
-                        "DS: expected a string of length 16 but got %d"
-                        % (L,))
+        self.assertTrue(L <= 16, "DS: expected a string of length 16 but got %d" % (L,))  # noqa
 
     def testInvalidDecimalStrings(self):
         # Now the input string truly is invalid
