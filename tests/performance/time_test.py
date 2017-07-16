@@ -73,7 +73,7 @@ filenames3 = filenames[200:300]
 filenames4 = filenames[300:400]
 
 reason = "Not doing time tests."
-reason = "%s Need at least 400 files in %s" % str(reason, locations)
+reason = "%s Need at least 400 files in %s" % (reason, str(locations))
 
 
 @pytest.mark.skipif(len(filenames) < 400,

@@ -41,8 +41,8 @@ class charsetTests(unittest.TestCase):
             try:
                 test_string.encode(x[1])
             except LookupError as e:
-                found = "(was '%s')" % x([1])
-                term = Term '%s' % (x[0])
+                found = "(was '%s')" % x[1]
+                term = Term '%s' % x[0]
                 message = "%s has invalid python encoding %s" % (found, term)
                 self.fail(msg=message)
 
