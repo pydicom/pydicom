@@ -6,7 +6,7 @@ import os
 import re
 import tokenize
 
-import sys
+from pydicom.compat import in_py2
 
 import pydicom
 
@@ -14,8 +14,6 @@ from pydicom._uid_dict import UID_dictionary
 
 STORAGE_REGEX = re.compile('.*(Storage|Storage SOP Class|Storage - '
                            'For Presentation|Storage - For Processing)$')
-
-IS_PYTHON3 = sys.version_info >= (3,)
 
 
 def is_storage_class(attributes):
@@ -67,7 +65,7 @@ def sop_class_name(description):
 
 def replace_bad_characters(name):
     bad_chars = r'!@#$%^&*(),;:.?\|{}[]+-=/ '
-    if IS_PYTHON3:
+    if not in_py2:
         translate_table = dict((ord(char), None) for char in bad_chars)
         name = name.translate(translate_table)
     else:
