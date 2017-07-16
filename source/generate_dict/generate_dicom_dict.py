@@ -82,9 +82,9 @@ def write_dict(fp, dict_name, attributes, tag_is_string):
         entry_format = "{Tag}: %s" % (tag_content)
 
     fp.write("\n%s = {\n    " % dict_name)
-    fp.write(",\n    ".join(entry_format.format(**attr)
-                            for attr in attributes))
-    fp.write("\n}\n")
+    fp.write(",  # noqa\n    ".join(entry_format.format(**attr)
+                                    for attr in attributes))
+    fp.write("  # noqa\n}\n")
 
 
 def parse_docbook_table(book_root, caption):
@@ -104,9 +104,9 @@ def parse_docbook_table(book_root, caption):
     """
     br = '{http://docbook.org/ns/docbook}'  # Shorthand variable
 
-    for table in book_root.iter('%stable' % (br)):
+    for table in book_root.iter('%stable' % br):
         # Find the table in book_root with caption
-        if table.find('%scaption' % (br)).text == caption:
+        if table.find('%scaption' % br).text == caption:
 
             def parse_header(header_row):
                 """Parses the table's thead/tr row, header_row, for the column
@@ -132,13 +132,11 @@ def parse_docbook_table(book_root, caption):
                     A list of the field header names used in the table
                 """
                 field_names = []
-                for x in header_row.iter('%sth' % (br)):
+                for x in header_row.iter('%sth' % br):
                     # If there is an emphasis tag under the para tag then its
                     #   text is the column header
-                    emphasis_tag = '%spara' % (br)).find('%semphasis' % (br)
-                    if x.find(ephasiis_tag) is not None:
-                        col_label = (x.find('%spara' % (br))
-                                     .find('%semphasis' % (br)).text)
+                    if x.find('%spara' % br).find('%semphasis' % br) is not None:  # noqa
+                        col_label = x.find('%spara' % br).find('%semphasis' % br).text  # noqa
                         field_names.append(col_label)
 
                     # If there isn't an emphasis tag under the para tag then it
@@ -149,8 +147,8 @@ def parse_docbook_table(book_root, caption):
                 return field_names
 
             # Get the column headers
-            field_names = parse_header(table.find('%sthead'
-                                       % (br)).find('%str' % (br)))
+            element = table.find('%sthead' % br).find('%str' % br)
+            field_names = parse_header(element)
 
             def parse_row(field_names, row):
                 """Parses the table's tbody tr row, row, for the Element data.
@@ -202,14 +200,13 @@ def parse_docbook_table(book_root, caption):
                         else:
                             cell_values.append("")
 
-                return {key: value for key, value
-                        in zip(field_names, cell_values)}
+                return {key: value for key, value in zip(field_names,
+                                                         cell_values)}
 
             # Get all the Element data from the table
-            row_attrs = [parse_row(field_names, row) for row in
-                         table.find('%stbody' % (br))
-                         .iter('%str' % (br))]
-
+            row_attrs = [parse_row(field_names, row)
+                         for row in table.find('%stbody' % br)
+                         .iter('%str' % br)]
             return row_attrs
 
 
