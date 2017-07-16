@@ -70,6 +70,7 @@ def isStringOrStringList(val):
     else:  # single value - test for a string
         return isString(val)
 
+
 # double '\' because it is used as escape chr in Python
 _backslash = "\\"
 

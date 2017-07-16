@@ -212,6 +212,7 @@ def parse_docbook_table(book_root, caption):
 
             return row_attrs
 
+
 attrs = []
 
 url_base = "http://medical.nema.org/medical/dicom/current/source/docbook"

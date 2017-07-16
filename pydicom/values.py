@@ -434,6 +434,7 @@ def convert_value(VR, raw_data_element, encoding=default_encoding):
                 value = raw_data_element.value
     return value
 
+
 convert_retry_VR_order = [
     'SH', 'UL', 'SL', 'US', 'SS', 'FL', 'FD', 'OF', 'OB', 'UI', 'DA', 'TM',
     'PN', 'IS', 'DS', 'LT', 'SQ', 'UN', 'AT', 'OW', 'DT', 'UT', ]

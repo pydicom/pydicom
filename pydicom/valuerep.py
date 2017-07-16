@@ -470,6 +470,7 @@ class DSdecimal(Decimal):
     def __repr__(self):
         return "\"" + str(self) + "\""
 
+
 # CHOOSE TYPE OF DS
 if config.use_DS_decimal:
     DSclass = DSdecimal

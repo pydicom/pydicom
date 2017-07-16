@@ -116,6 +116,7 @@ def _dummyProgressCallback(progress):
     """ A callback to indicate progress that does nothing. """
     pass
 
+
 _progressBar = ProgressBar()
 
 
