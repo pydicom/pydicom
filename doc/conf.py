@@ -273,10 +273,10 @@ issues_user_uri = 'https://github.com/{user}'
 
 
 def setup(app):
-    app.connect('autodoc-process-docstring', generate_example_rst)  # noqa
+    app.connect('autodoc-process-docstring', generate_example_rst)
 
 # Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {'http://docs.python.org/': None}
+intersphinx_mapping = {'http://docs.python.org/': None}  # noqa
 
 # The following is used by sphinx.ext.linkcode to provide links to github
 linkcode_resolve = make_linkcode_resolve('pydicom',
