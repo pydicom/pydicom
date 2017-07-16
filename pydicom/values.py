@@ -238,13 +238,6 @@ def convert_OWvalue(byte_string,
     return convert_OBvalue(byte_string, is_little_endian)
 
 
-def _calc_valtype(x):
-    if not in_py2:
-        return PersonName(x, *args).decode()
-    else:
-        return PersonName(x, *args)
-
-
 def convert_PN(byte_string,
                is_little_endian,
                struct_format=None,
@@ -268,11 +261,15 @@ def convert_PN(byte_string,
         args = ()
 
     # We would like to return string literals
-    # This needs testing - might not work
-    if len(splitup) == 1:
-        return _calc_valtype(splitup[0])
+    if not in_py2:
+        valtype = lambda x: PersonName(x, *args).decode()  # noqa
     else:
-        return MultiValue(_calc_valtype, splitup)
+        valtype = lambda x: PersonName(x, *args)  # noqa
+
+    if len(splitup) == 1:
+        return valtype(splitup[0])
+    else:
+        return MultiValue(valtype, splitup)
 
 
 def convert_string(byte_string,
