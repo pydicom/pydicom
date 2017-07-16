@@ -204,7 +204,7 @@ class RawSequenceTests(unittest.TestCase):
         got = "got {0:d} item(s)".format(len(seq))
         self.assertTrue(len(seq) == 1, "%s, %s" % (expected, got))
         msg = "Expected the sequence item (dataset) to be empty"
-        self.assertTrue(len(seq[0]) == 0,msg)
+        self.assertTrue(len(seq[0]) == 0, msg)
         elem2 = next(gen)
         self.assertEqual(elem2.tag,
                          0x0008103e,

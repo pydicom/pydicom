@@ -220,7 +220,7 @@ class PersonNametests(unittest.TestCase):
                          % (expected, got))
 
     def testThreeComponent(self):
-        """PN: 3component (single-byte, ideographic, 
+        """PN: 3component (single-byte, ideographic,
         phonetic characters) works.."""
         # Example name from PS3.5-2008 section I.2 p. 108
         pn = PersonName("""Hong^Gildong=\033$)C\373\363^\033$)C\321\316\324\327=\033$)C\310\253^\033$)C\261\346\265\277""")  # noqa
@@ -246,7 +246,7 @@ class PersonNametests(unittest.TestCase):
             [default_encoding, 'euc_kr'])
         expected = ("Hong", "Gildong")
         got = (pn.family_name, pn.given_name)
-        msg = "PN: Expected single_byte name '{0!s}', got '{1!s}'".format(expected, got)
+        msg = "PN: Expected single_byte name '{0!s}', got '{1!s}'".format(expected, got)  # noqa
         self.assertEqual(got, expected, msg)
 
     def testUnicodeJp(self):
