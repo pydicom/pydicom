@@ -58,7 +58,7 @@ class charsetTests(unittest.TestCase):
 
         expected = u'\uff94\uff8f\uff80\uff9e^\uff80\uff9b\uff73'
         expected = '%s=\u5c71\u7530^\u592a\u90ce=' % (expected)
-        expected - '%s\u3084\u307e\u3060^\u305f\u308d\u3046' % (expected)
+        expected = '%s\u3084\u307e\u3060^\u305f\u308d\u3046' % (expected)
         got = ds[0x32, 0x1064][0].PatientName
         self.assertEqual(expected, got,
                          "Expected %r, got %r" % (expected, got))

@@ -159,7 +159,7 @@ class RawReaderImplVRTests(unittest.TestCase):
             got = next(de_gen)
             got_len = len(got.value)
             msg_loc = "in read of undefined length Implicit VR"
-            msg_loc = "%s with 'multiplier' %d" % (multiplier, msg_loc)
+            msg_loc = "%s with 'multiplier' %d" % (msg_loc, multiplier)
             self.assertEqual(expected, got_len,
                              "Expected value length %d, got %d in %s"
                              % (expected, got_len, msg_loc))

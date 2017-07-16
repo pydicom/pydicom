@@ -461,11 +461,10 @@ class DSdecimal(Decimal):
             self.original_string = val.original_string
 
     def __str__(self):
-        short_length = len(self.original_string) <= 16
-        if hasattr(self, 'original_string') and short_length:
-            return self.original_string
-        else:
-            return super(DSdecimal, self).__str__()
+        if hasattr(self, 'original_string'):
+            if self.original_string <= 16:
+                return self.original_string
+        return super(DSdecimal, self).__str__()
 
     def __repr__(self):
         return "\"" + str(self) + "\""
