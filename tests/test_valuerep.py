@@ -224,22 +224,14 @@ class PersonNametests(unittest.TestCase):
                          % (expected, got))
 
     def testThreeComponent(self):
-        """PN: 3component (single-byte, ideographic,
-           phonetic characters) works.."""
-
+        """PN: 3component (single-byte, ideographic, 
+        phonetic characters) works.."""
         # Example name from PS3.5-2008 section I.2 p. 108
-        parts = "\033$)C\373\363^\033$)C"
-        parts = "%s\321\316\324\327=" % (parts)
-        parts = "%s\033$)C\310\253^" % (parts)
-        parts = "%s\033$)C\261\346\265\277" % (parts)
-
-        pn = PersonName("Hong^Gildong=%s" % (parts))
+        pn = PersonName("""Hong^Gildong=\033$)C\373\363^\033$)C\321\316\324\327=\033$)C\310\253^\033$)C\261\346\265\277""")  # noqa
         expected = ("Hong", "Gildong")
         got = (pn.family_name, pn.given_name)
-        msg = ", got '%s^%s'" % (got)
-        self.assertEqual(got, expected,
-                         "PN: Expected single_byte name '%s', %s"
-                         % (expected, msg))
+        msg = "PN: Expected single_byte name '%s', got '%s'" % (expected, got)
+        self.assertEqual(got, expected, msg)
 
     def testFormatting(self):
         """PN: Formatting works..."""
@@ -252,19 +244,13 @@ class PersonNametests(unittest.TestCase):
 
     def testUnicodeKr(self):
         """PN: 3component in unicode works (Korean)..."""
-        parts = "\033$)C\373\363^\033$)C"
-        parts = "%s\321\316\324\327=" % (parts)
-        parts = "%s\033$)C\310\253^" % (parts)
-        parts = "%s\033$)C\261\346\265\277" % (parts)
-
         # Example name from PS3.5-2008 section I.2 p. 101
         pn = PersonNameUnicode(
-            "Hong^Gildong=%s" % (parts),
+            """Hong^Gildong=\033$)C\373\363^\033$)C\321\316\324\327=\033$)C\310\253^\033$)C\261\346\265\277""",  # noqa
             [default_encoding, 'euc_kr'])
         expected = ("Hong", "Gildong")
         got = (pn.family_name, pn.given_name)
-        msg = ("PN: Expected single_byte name '{0!s}', got '{1!s}'"
-               .format(expected, got))
+        msg = "PN: Expected single_byte name '{0!s}', got '{1!s}'".format(expected, got)
         self.assertEqual(got, expected, msg)
 
     def testUnicodeJp(self):
