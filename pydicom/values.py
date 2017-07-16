@@ -262,9 +262,9 @@ def convert_PN(byte_string,
 
     # We would like to return string literals
     if not in_py2:
-        valtype = lambda x: PersonName(x, *args).decode()  # noqa
+        valtype = lambda x: PersonName(x, *args).decode()  # nopep8
     else:
-        valtype = lambda x: PersonName(x, *args)  # noqa
+        valtype = lambda x: PersonName(x, *args)  # nopep8
 
     if len(splitup) == 1:
         return valtype(splitup[0])

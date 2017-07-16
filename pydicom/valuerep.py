@@ -460,10 +460,11 @@ class DSdecimal(Decimal):
             self.original_string = val.original_string
 
     def __str__(self):
-        if hasattr(self, 'original_string') and len(self.original_string) <= 16:
+        if hasattr(self, 'original_string') and len(self.original_string) <= 16:  # noqa
             return self.original_string
         else:
             return super(DSdecimal, self).__str__()
+
 
 # CHOOSE TYPE OF DS
 if config.use_DS_decimal:
