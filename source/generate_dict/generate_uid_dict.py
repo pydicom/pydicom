@@ -48,9 +48,9 @@ def write_dict(fp, dict_name, attributes):
     entry_format = "'{UID Value}': %s" % (uid_entry)
 
     fp.write("\n%s = {\n    " % dict_name)
-    fp.write(",\n    ".join(entry_format.format(**attr)
-                            for attr in attributes))
-    fp.write("\n}\n")
+    fp.write(",  # noqa\n    ".join(entry_format.format(**attr)
+                                    for attr in attributes))
+    fp.write("  # noqa\n}\n")
 
 
 def parse_docbook_table(book_root, caption):

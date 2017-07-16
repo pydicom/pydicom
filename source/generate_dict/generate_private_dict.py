@@ -80,9 +80,9 @@ def write_dict(fp, dict_name, dict_entries):
         fp.write("    '{0}': {{\n".format(owner))
         for entry in sorted(dict_entries[owner]):
             if "'" in dict_entries[owner][entry][2]:
-                format_str = "        '{0}': ('{1}', '{2}', \"{3}\", '{4}'),\n"
+                format_str = "        '{0}': ('{1}', '{2}', \"{3}\", '{4}'),  # noqa\n"
             else:
-                format_str = "        '{0}': ('{1}', '{2}', '{3}', '{4}'),\n"
+                format_str = "        '{0}': ('{1}', '{2}', '{3}', '{4}'),  # noqa\n"
             fp.write(format_str.format(entry,
                                        dict_entries[owner][entry][0],
                                        dict_entries[owner][entry][1],
