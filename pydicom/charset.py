@@ -3,8 +3,8 @@
 #
 # Copyright (c) 2008-2012 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
-#    See the file license.txt included with this distribution, also
-#    available at https://github.com/darcymason/pydicom
+#    See the file LICENSE included with this distribution, also
+#    available at https://github.com/pydicom/pydicom
 #
 
 from pydicom import compat
@@ -14,10 +14,16 @@ from pydicom.compat import in_py2
 
 # Map DICOM Specific Character Set to python equivalent
 python_encoding = {
-    '': 'iso8859',           # default character set for DICOM
-    'ISO_IR 6': 'iso8859',   # alias for latin_1 too (iso_ir_6 exists as an alias to 'ascii')
+
+    # default character set for DICOM
+    '': 'iso8859',
+
+    # alias for latin_1 too (iso_ir_6 exists as an alias to 'ascii')
+    'ISO_IR 6': 'iso8859',
     'ISO_IR 13': 'shift_jis',
-    'ISO_IR 100': 'latin_1',  # these also have iso_ir_1XX aliases in python 2.7
+
+    # these also have iso_ir_1XX aliases in python 2.7
+    'ISO_IR 100': 'latin_1',
     'ISO_IR 101': 'iso8859_2',
     'ISO_IR 109': 'iso8859_3',
     'ISO_IR 110': 'iso8859_4',
@@ -91,7 +97,10 @@ def convert_encodings(encodings):
 
     try:
         encodings = [python_encoding[x] for x in encodings]
-    except KeyError:  # Assume that it is already the python encoding (is there a way to check this?)
+
+    # Assume that it is already the python encoding
+    # (is there a way to check this?)
+    except KeyError:
         pass
 
     if len(encodings) == 1:
@@ -121,15 +130,18 @@ def decode(data_element, dicom_character_set):
     # decode the string value to unicode
     # PN is special case as may have 3 components with differenct chr sets
     if data_element.VR == "PN":
-        # logger.warn("%s ... type: %s" %(str(data_element), type(data_element.VR)))
+        # logger.warn("%s ... type: %s" %(str(data_element),
+        # type(data_element.VR)))
         if not in_py2:
             if data_element.VM == 1:
                 data_element.value = data_element.value.decode(encodings)
             else:
-                data_element.value = [val.decode(encodings) for val in data_element.value]
+                data_element.value = [val.decode(encodings)
+                                      for val in data_element.value]
         else:
             if data_element.VM == 1:
-                data_element.value = PersonNameUnicode(data_element.value, encodings)
+                data_element.value = PersonNameUnicode(data_element.value,
+                                                       encodings)
             else:
                 data_element.value = [PersonNameUnicode(value, encodings)
                                       for value in data_element.value]
@@ -152,6 +164,7 @@ def decode(data_element, dicom_character_set):
                 if isinstance(value, compat.text_type):
                     output.append(value)
                 else:
-                    output.append(clean_escseq(value.decode(encodings[0]), encodings))
+                    output.append(clean_escseq(value.decode(encodings[0]),
+                                               encodings))
 
             data_element.value = output

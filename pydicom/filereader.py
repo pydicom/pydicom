@@ -1,4 +1,5 @@
 """Read a dicom media file"""
+
 # Copyright (c) 2008-2012 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
 #    See the file license.txt included with this distribution, also
@@ -16,22 +17,43 @@ from pydicom.tag import TupleTag
 from pydicom.dataelem import RawDataElement
 from pydicom.util.hexutil import bytes2hex
 from pydicom.valuerep import extra_length_VRs
-from pydicom.charset import default_encoding, convert_encodings
+from pydicom.charset import (
+    default_encoding,
+    convert_encodings
+)
+
 from pydicom.compat import in_py2
 from pydicom import compat
-from pydicom import config  # don't import datetime_conversion directly
+
+# don't import datetime_conversion directly
+from pydicom import config
 from pydicom.config import logger
 from pydicom.errors import InvalidDicomError
-import pydicom.uid  # for transfer syntax UIDs
+
+# for transfer syntax UIDs
+import pydicom.uid
 from pydicom.filebase import DicomFile
-from pydicom.dataset import Dataset, FileDataset
+
+from pydicom.dataset import (
+    Dataset,
+    FileDataset
+)
+
 from pydicom.dicomdir import DicomDir
 from pydicom.datadict import dictionary_VR
 from pydicom.dataelem import DataElement
-from pydicom.tag import ItemTag, SequenceDelimiterTag
+from pydicom.tag import (
+    ItemTag,
+    SequenceDelimiterTag
+)
+
 from pydicom.sequence import Sequence
 from pydicom.fileutil import read_undefined_length_value
-from struct import Struct, unpack
+from struct import (
+    Struct,
+    unpack
+)
+
 from sys import byteorder
 
 try:
@@ -43,57 +65,72 @@ sys_is_little_endian = (byteorder == 'little')
 
 
 class DicomIter(object):
-    """Iterator over DICOM data elements created from a file-like object
+    """Iterator over DICOM data elements
+       created from a file-like object
     """
 
     def __init__(self, fp, stop_when=None, force=False):
-        """Read the preamble and meta info and prepare iterator for remainder of file.
+        """Read the preamble and meta info and prepare
+           iterator for remainder of file.
 
         Parameters
         ----------
         fp : an open DicomFileLike object, at start of file
         force : boolean
-            Force reading of data. See ``read_file`` for more parameter info.
+            Force reading of data. See ``read_file`` for
+             more parameter info.
 
-        Adds flags to fp: Big/Little-endian and Implicit/Explicit VR
+        Adds flags to fp: Big/Little-endian & Implicit/Explicit VR
         """
         self.fp = fp
         self.stop_when = stop_when
         self.preamble = preamble = read_preamble(fp, force)
         self.has_header = has_header = (preamble is not None)
         self.file_meta_info = Dataset()
+
         if has_header:
             self.file_meta_info = file_meta_info = _read_file_meta_info(fp)
             transfer_syntax = file_meta_info.TransferSyntaxUID
+
             if transfer_syntax == pydicom.uid.ExplicitVRLittleEndian:
                 self._is_implicit_VR = False
                 self._is_little_endian = True
+
             elif transfer_syntax == pydicom.uid.ImplicitVRLittleEndian:
                 self._is_implicit_VR = True
                 self._is_little_endian = True
+
             elif transfer_syntax == pydicom.uid.ExplicitVRBigEndian:
                 self._is_implicit_VR = False
                 self._is_little_endian = False
+
             elif transfer_syntax == pydicom.uid.DeflatedExplicitVRLittleEndian:
                 # See PS3.6-2008 A.5 (p 71) -- when written, the entire dataset
-                #   following the file metadata was prepared the normal way,
-                #   then "deflate" compression applied.
-                #  All that is needed here is to decompress and then
-                #      use as normal in a file-like object
+                # following the file metadata was prepared the normal way,
+                # then "deflate" compression applied.
+                # All that is needed here is to decompress and then
+                # use as normal in a file-like object
                 zipped = fp.read()
+
                 # -MAX_WBITS part is from comp.lang.python answer:
                 # groups.google.com/group/comp.lang.python/msg/e95b3b38a71e6799
                 unzipped = zlib.decompress(zipped, -zlib.MAX_WBITS)
-                fp = BytesIO(unzipped)  # a file-like object
-                self.fp = fp  # point to new object
+
+                # a file-like object
+                fp = BytesIO(unzipped)
+
+                # point to new object
+                self.fp = fp
                 self._is_implicit_VR = False
                 self._is_little_endian = True
+
             else:
                 # Any other syntax should be Explicit VR Little Endian,
-                #   e.g. all Encapsulated (JPEG etc) are ExplVR-LE
-                #        by Standard PS 3.5-2008 A.4 (p63)
+                # e.g. all Encapsulated (JPEG etc) are ExplVR-LE
+                # by Standard PS 3.5-2008 A.4 (p63)
                 self._is_implicit_VR = False
                 self._is_little_endian = True
+
         else:  # no header -- make assumptions
             fp.TransferSyntaxUID = pydicom.uid.ImplicitVRLittleEndian
             self._is_little_endian = True
@@ -102,7 +139,7 @@ class DicomIter(object):
         impl_expl = ("Explicit", "Implicit")[self._is_implicit_VR]
         big_little = ("Big", "Little")[self._is_little_endian]
         logger.debug("Using {0:s} VR, {1:s} Endian transfer syntax".format(
-            impl_expl, big_little))
+                     impl_expl, big_little))
 
     def __iter__(self):
         tags = sorted(self.file_meta_info.keys())
@@ -116,9 +153,13 @@ class DicomIter(object):
             yield data_element
 
 
-def data_element_generator(fp, is_implicit_VR, is_little_endian,
-                           stop_when=None, defer_size=None,
+def data_element_generator(fp,
+                           is_implicit_VR,
+                           is_little_endian,
+                           stop_when=None,
+                           defer_size=None,
                            encoding=default_encoding):
+
     """Create a generator to efficiently return the raw data elements.
 
     Parameters
@@ -151,7 +192,8 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian,
     # Summary of DICOM standard PS3.5-2008 chapter 7:
     # If Implicit VR, data element is:
     #    tag, 4-byte length, value.
-    #       The 4-byte length can be FFFFFFFF (undefined length)*
+    #        The 4-byte length can be FFFFFFFF (undefined length)*
+    #
     # If Explicit VR:
     #    if OB, OW, OF, SQ, UN, or UT:
     #       tag, VR, 2-bytes reserved (both zero), 4-byte length, value
