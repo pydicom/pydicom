@@ -1,12 +1,15 @@
 """Define the DataElement class.
 
-A DataElement has a tag, a value representation (VR), a value multiplicity (VM)
-and a value.
+A DataElement has a tag,
+              a value representation (VR),
+              a value multiplicity (VM)
+              and a value.
 """
+
 # Copyright (c) 2008-2012 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
-#    See the file license.txt included with this distribution, also
-#    available at https://github.com/darcymason/pydicom
+#    See the file LICENSE included with this distribution, also
+#    available at https://github.com/pydicom/pydicom
 #
 from __future__ import absolute_import
 from collections import namedtuple
@@ -14,13 +17,22 @@ from collections import namedtuple
 from pydicom import config  # don't import datetime_conversion directly
 from pydicom import compat
 from pydicom.config import logger
-from pydicom.datadict import (dictionary_has_tag, dictionary_description,
-                              dictionary_keyword, dictionary_is_retired,
-                              private_dictionary_description, dictionary_VR,
-                              repeater_has_tag)
+from pydicom.datadict import (
+    dictionary_has_tag,
+    dictionary_description,
+    dictionary_keyword,
+    dictionary_is_retired,
+    private_dictionary_description,
+    dictionary_VR,
+    repeater_has_tag
+)
+
 from pydicom.tag import Tag
 from pydicom.uid import UID
-import pydicom.valuerep  # don't import DS directly as can be changed by config
+
+# don't import DS directly as can be changed by config
+import pydicom.valuerep
+
 from pydicom.compat import in_py2
 
 if not in_py2:
@@ -30,7 +42,8 @@ if not in_py2:
 
 # Helper functions:
 def isMultiValue(value):
-    """Return True if `value` is list-like (iterable), False otherwise."""
+    """Return True if `value` is list-like (iterable),
+       False otherwise."""
     if isString(value) or isinstance(value, bytes):
         return False
     try:
@@ -39,12 +52,16 @@ def isMultiValue(value):
         return False
     return True
 
+
 def isString(val):
-    """Return True if `val` is string-like, False otherwise."""
+    """Return True if `val` is string-like,
+       False otherwise."""
     return isinstance(val, compat.string_types)
 
+
 def isStringOrStringList(val):
-    """Return True if `val` is a str or an iterable containing only strings."""
+    """Return True if `val` is a str or an iterable
+       containing only strings."""
     if isMultiValue(val):
         for item in val:
             if not isString(item):
@@ -53,70 +70,82 @@ def isStringOrStringList(val):
     else:  # single value - test for a string
         return isString(val)
 
-_backslash = "\\"  # double '\' because it is used as escape chr in Python
+# double '\' because it is used as escape chr in Python
+_backslash = "\\"
 
 
 class DataElement(object):
     """Contain and manipulate a DICOM Element.
 
-    While its possible to create a new DataElement directly and add it to a
-    Dataset:
+    While its possible to create a new DataElement
+    directly and add it to a Dataset:
+
     >>> elem = DataElement(0x00100010, 'PN', 'CITIZEN^Joan')
     >>> ds = Dataset()
     >>> ds.add(elem)
 
-    Its far more convenient to use a Dataset to add a new DataElement, as the VR
-    and tag are determined automatically from the DICOM dictionary:
+    Its far more convenient to use a Dataset to add a new
+    DataElement, as the VR and tag are determined
+    automatically from the DICOM dictionary:
+
     >>> ds = Dataset()
     >>> ds.PatientName = 'CITIZEN^Joan'
 
     Attributes
     ----------
     descripWidth : int
-        For string display, this is the maximum width of the description field
-        (default 35 characters).
+        For string display, this is the maximum width of
+        the description field (default 35 characters).
     file_tell : int or None
     is_retired : bool
-        For officially registered DICOM Data Elements this will be True if the
-        retired status as given in PS3.6 Table 6-1 is 'RET'. For private or
-        unknown Elements this will always be False
+        For officially registered DICOM Data Elements this
+        will be True if the retired status as given in PS3.6
+        Table 6-1 is 'RET'. For private or unknown Elements
+        this will always be False
     is_undefined_length : bool
-        Indicates whether the length field for the element was 0xFFFFFFFFL (ie
-        undefined).
+        Indicates whether the length field for the element
+        was 0xFFFFFFFFL (ie undefined).
     keyword : str
-        For officially registered DICOM Data Elements this will be the Keyword
-        as given in PS3.6 Table 6-1. For private or unknown Elements this will
-        return an empty string.
-    maxBytesToDisplay : int
-        For string display, elements with values containing data which is longer
-        than this value will display "array of # bytes" (default 16 bytes).
-    name : str
-        For officially registered DICOM Data Elements this will be the Name
-        as given in PS3.6 Table 6-1. For private Elements known to pydicom this
-        will be the Name in the format '[name]'. For unknown private Elements
-        this will be 'Private Creator'. For unknown Elements this will return
+        For officially registered DICOM Data Elements this
+        will be the Keyword as given in PS3.6 Table 6-1.
+        For private or unknown Elements this will return
         an empty string.
+    maxBytesToDisplay : int
+        For string display, elements with values containing
+        data which is longer than this value will display
+        "array of # bytes" (default 16 bytes).
+    name : str
+        For officially registered DICOM Data Elements this
+        will be the Name as given in PS3.6 Table 6-1.
+        For private Elements known to pydicom this will be
+        the Name in the format '[name]'. For unknown
+        private Elements this will be 'Private Creator'.
+        For unknown Elements this will return an empty string.
     showVR : bool
-        For string display, include the Element's VR just before it's `value`
-        (default True)
+        For string display, include the Element's VR
+        just before it's `value` (default True)
     tag : pydicom.tag.Tag
         The DICOM Tag for the Data Element
     value
         The Data Element's stored value(s)
     VM : int
-        The Value Multiplicity of the Data Element's stored value(s)
+        The Value Multiplicity of the Data Element's
+        stored value(s)
     VR : str
         The Data Element's Value Representation value
     """
+
     descripWidth = 35
     maxBytesToDisplay = 16
     showVR = True
 
-    # Python 2: Classes which define __eq__ should flag themselves as unhashable
+    # Python 2: Classes which define __eq__
+    # should flag themselves as unhashable
     __hash__ = None
 
     def __init__(self, tag, VR, value, file_value_tell=None,
                  is_undefined_length=False, already_converted=False):
+
         """Create a new DataElement.
 
         Parameters
@@ -292,13 +321,15 @@ class DataElement(object):
             # start with the string rep then replace the value part
             #   with the unicode
             strVal = str(self)
-            uniVal = compat.text_type(strVal.replace(self.repval, "")) + self.value
+            strVal = strVal.replace(self.repval, "")
+            uniVal = compat.text_type(strVal) + self.value
             return uniVal
         else:
             return compat.text_type(str(self))
 
     def __getitem__(self, key):
-        """Return the value at `key` if the element's `value` is indexable."""
+        """Return the value at `key` if the element's
+           `value` is indexable."""
         try:
             return self.value[key]
         except TypeError:
@@ -321,12 +352,16 @@ class DataElement(object):
                     # If have name from private dictionary, use it, but
                     #   but put in square brackets so is differentiated,
                     #   and clear that cannot access it by name
-                    name = "[" + private_dictionary_description(self.tag, self.private_creator) + "]"
+                    name = private_dictionary_description(self.tag,
+                                                          self.private_creator)
+                    name = "[%s]" % (name)
                 except KeyError:
                     pass
             elif self.tag.elem >> 8 == 0:
                 name = "Private Creator"
-        elif self.tag.element == 0:  # implied Group Length dicom versions < 3
+
+        # implied Group Length dicom versions < 3
+        elif self.tag.element == 0:
             name = "Group Length"
         else:
             name = ""
@@ -357,9 +392,11 @@ class DataElement(object):
 
 
 class DeferredDataElement(DataElement):
-    """Subclass of DataElement where value is not read into memory until needed"""
+    """Subclass of DataElement where value is not read
+       into memory until needed"""
     def __init__(self, tag, VR, fp, file_mtime, data_element_tell, length):
-        """Store basic info for the data element but value will be read later
+        """Store basic info for the data element but value
+           will be read later
 
         fp -- DicomFile object representing the dicom file being read
         file_mtime -- last modification time on file, used to make sure
@@ -399,8 +436,8 @@ class DeferredDataElement(DataElement):
         DataElement.value.fset(self, val)
 
 
-RawDataElement = namedtuple('RawDataElement',
-                            'tag VR length value value_tell is_implicit_VR is_little_endian')
+msg = 'tag VR length value value_tell is_implicit_VR is_little_endian'
+RawDataElement = namedtuple('RawDataElement', msg)
 
 
 def DataElement_from_raw(raw_data_element, encoding=None):
@@ -417,24 +454,35 @@ def DataElement_from_raw(raw_data_element, encoding=None):
     -------
     pydicom.dataelem.DataElement
     """
-    from pydicom.values import convert_value  # XXX buried here to avoid circular import filereader->Dataset->convert_value->filereader (for SQ parsing)
+    # XXX buried here to avoid circular import
+    # filereader->Dataset->convert_value->filereader
+    # (for SQ parsing)
+
+    from pydicom.values import convert_value
     raw = raw_data_element
 
     # If user has hooked into conversion of raw values, call his/her routine
     if config.data_element_callback:
-        raw = config.data_element_callback(raw_data_element,
-                                           **config.data_element_callback_kwargs)
+        data_elem = config.data_element_callback
+        raw = data_elem(raw_data_element,
+                        **config.data_element_callback_kwargs)
     VR = raw.VR
     if VR is None:  # Can be if was implicit VR
         try:
             VR = dictionary_VR(raw.tag)
         except KeyError:
+
+            # just read the bytes, no way to know what they mean
             if raw.tag.is_private:
-                VR = 'OB'  # just read the bytes, no way to know what they mean
-            elif raw.tag.element == 0:  # group length tag implied in versions < 3.0
+                VR = 'OB'
+
+            # group length tag implied in versions < 3.0
+            elif raw.tag.element == 0:
                 VR = 'UL'
             else:
-                raise KeyError("Unknown DICOM tag {0:s} - can't look up VR".format(str(raw.tag)))
+                msg = "Unknown DICOM tag {0:s}".format(str(raw.tag))
+                msg += " can't look up VR"
+                raise KeyError(msg)
     try:
         value = convert_value(VR, raw, encoding)
     except NotImplementedError as e:

@@ -17,8 +17,8 @@ from __future__ import print_function
 #
 # Copyright (c) 2010 Almar Klein
 # This file is released under the pydicom license.
-#    See the file license.txt included with the pydicom distribution, also
-#    available at https://github.com/darcymason/pydicom
+#    See the file LICENSE included with the pydicom distribution, also
+#    available at https://github.com/pydicom/pydicom
 #
 
 
@@ -263,8 +263,10 @@ def _getPixelDataFromDataset(ds):
         else:
             # Determine required range
             minReq, maxReq = data.min(), data.max()
-            minReq = min([minReq, minReq * slope + offset, maxReq * slope + offset])
-            maxReq = max([maxReq, minReq * slope + offset, maxReq * slope + offset])
+            minReq = min([minReq, minReq * slope + offset,
+                          maxReq * slope + offset])
+            maxReq = max([maxReq, minReq * slope + offset,
+                          maxReq * slope + offset])
 
             # Determine required datatype from that
             dtype = None
@@ -506,7 +508,8 @@ class DicomSeries(object):
 
     def __repr__(self):
         adr = hex(id(self)).upper()
-        return "<DicomSeries with %i images at %s>" % (len(self._datasets), adr)
+        data_len = len(self._datasets)
+        return "<DicomSeries with %i images at %s>" % (data_len, adr)
 
     def get_pixel_array(self):
         """ get_pixel_array()
@@ -600,7 +603,8 @@ class DicomSeries(object):
             ds = self._datasets[0]
             self._info = self._datasets[0]
             self._shape = [ds.Rows, ds.Columns]
-            self._sampling = [float(ds.PixelSpacing[0]), float(ds.PixelSpacing[1])]
+            self._sampling = [float(ds.PixelSpacing[0]),
+                              float(ds.PixelSpacing[1])]
             return
 
         # Get previous
@@ -611,7 +615,9 @@ class DicomSeries(object):
 
         # Init measures to check (these are in 2D)
         dimensions = ds1.Rows, ds1.Columns
-        sampling = float(ds1.PixelSpacing[0]), float(ds1.PixelSpacing[1])  # row, column
+
+        # row, column
+        sampling = float(ds1.PixelSpacing[0]), float(ds1.PixelSpacing[1])
 
         for index in range(len(L)):
             # The first round ds1 and ds2 will be the same, for the

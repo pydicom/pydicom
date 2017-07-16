@@ -1,8 +1,8 @@
 """Define Tag class to hold a DICOM (group, element) tag."""
 # Copyright (c) 2008-2012 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
-#    See the file license.txt included with this distribution, also
-#    available at https://github.com/darcymason/pydicom
+#    See the file LICENSE included with this distribution, also
+#    available at https://github.com/pydicom/pydicom
 
 # Store the 4 bytes of a dicom tag as an arbitary length integer
 #      (python "long" in python <3; "int" for python >=3).
@@ -19,6 +19,7 @@ def Tag(arg, arg2=None):
     """Create a Tag.
 
     General function for creating a Tag in any of the standard forms:
+
     * Tag(0x00100015)
     * Tag('0x00100015')
     * Tag((0x10, 0x50))
@@ -31,12 +32,12 @@ def Tag(arg, arg2=None):
     Parameters
     ----------
     arg : int or str or 2-tuple/list
-        If int or str, then either the group or the combined group/element
-        number of the DICOM tag. If 2-tuple/list then the (group, element)
-        numbers as int or str.
+        If int or str, then either the group or the combined
+        group/element number of the DICOM tag. If 2-tuple/list
+        then the (group, element) numbers as int or str.
     arg2 : int or str, optional
-        The element number of the DICOM tag, required when `arg` only contains
-        the group number of the tag.
+        The element number of the DICOM tag, required when
+        `arg` only contains the group number of the tag.
 
     Returns
     -------
@@ -103,7 +104,8 @@ class BaseTag(BaseTag_base_class):
     group : int
         The group number of the tag
     is_private : bool
-        Returns True if the corresponding element is private, False otherwise.
+        Returns True if the corresponding element is private,
+        False otherwise.
     """
     # Override comparisons so can convert "other" to Tag as necessary
     #   See Ordering Comparisons at:
@@ -114,7 +116,8 @@ class BaseTag(BaseTag_base_class):
 
     def __lt__(self, other):
         """Return True if `self` is less than `other`."""
-        # Check if comparing with another Tag object; if not, create a temp one
+        # Check if comparing with another Tag object;
+        # if not, create a temp one
         if not isinstance(other, BaseTag):
             try:
                 other = Tag(other)
@@ -144,9 +147,11 @@ class BaseTag(BaseTag_base_class):
         """Return True if `self` does not equal `other`."""
         return not (self == other)
 
-    # For python 3, any override of __cmp__ or __eq__ immutable requires
-    #   explicit redirect of hash function to the parent class
-    #   See http://docs.python.org/dev/3.0/reference/datamodel.html#object.__hash__
+    # For python 3, any override of __cmp__ or __eq__
+    # immutable requires explicit redirect of hash function
+    # to the parent class
+    #   See http://docs.python.org/dev/3.0/reference/
+    #              datamodel.html#object.__hash__
     __hash__ = BaseTag_base_class.__hash__
 
     def __str__(self):
@@ -174,12 +179,19 @@ class BaseTag(BaseTag_base_class):
 
 
 def TupleTag(group_elem):
-    """Fast factory for BaseTag object with known safe (group, element) tuple"""
+    """Fast factory for BaseTag object with known safe
+       (group, element) tuple"""
     long_value = group_elem[0] << 16 | group_elem[1]
     return BaseTag(long_value)
 
 # Define some special tags:
 # See PS 3.5-2008 section 7.5 (p.40)
-ItemTag = TupleTag((0xFFFE, 0xE000))  # start of Sequence Item
-ItemDelimiterTag = TupleTag((0xFFFE, 0xE00D))  # end of Sequence Item
-SequenceDelimiterTag = TupleTag((0xFFFE, 0xE0DD))  # end of Sequence of undefined length
+
+# start of Sequence Item
+ItemTag = TupleTag((0xFFFE, 0xE000))
+
+# end of Sequence Item
+ItemDelimiterTag = TupleTag((0xFFFE, 0xE00D))
+
+# end of Sequence of undefined length
+SequenceDelimiterTag = TupleTag((0xFFFE, 0xE0DD))
