@@ -236,7 +236,7 @@ class PersonNametests(unittest.TestCase):
         pn = PersonName("Hong^Gildong=%s" % (parts))
         expected = ("Hong", "Gildong")
         got = (pn.family_name, pn.given_name)
-        msg = ", got '%s'" % (got)
+        msg = ", got '%s^%s'" % (got)
         self.assertEqual(got, expected,
                          "PN: Expected single_byte name '%s', %s"
                          % (expected, msg))
