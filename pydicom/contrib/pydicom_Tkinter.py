@@ -151,11 +151,11 @@ def get_tkinter_photoimage_from_pydicom_image(data):
         ww = data.WindowWidth
         try:
             wc = wc[0]            # can be multiple values
-        except:
+        except Exception:
             pass
         try:
             ww = ww[0]
-        except:
+        except Exception:
             pass
 
     # scale array to account for center, width and PGM grayscale range,
@@ -185,7 +185,7 @@ def get_tkinter_photoimage_from_pydicom_image(data):
     try:
         os.close(os_id)
         os.remove(abs_path)
-    except:
+    except Exception:
         pass  # silently leave file on disk in temp-like directory
 
     return photo_image
