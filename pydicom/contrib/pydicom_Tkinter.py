@@ -2,7 +2,7 @@
 #
 # Copyright (c) 2009 Daniel Nanz
 # This file is released under the pydicom
-# (https://github.com/darcymason/pydicom)
+# (https://github.com/pydicom/pydicom)
 # license, see the file LICENSE available at
 # (https://github.com/pydicom/pydicom)
 #

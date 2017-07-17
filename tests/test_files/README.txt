@@ -85,7 +85,7 @@ priv_SQ.dcm
 OBXXXX1A.dcm
   * a file with a Photometric Interpretation of PALETTE COLOR
   * used to check if to pixel_array is interpreted correctly for such a case
-  * taken from https://github.com/darcymason/pydicom/issues/205#issuecomment-103329677
+  * taken from https://github.com/pydicom/pydicom/issues/205#issuecomment-103329677
   * supposedly from a Philips machine
 
 OT-PAL-8-face.dcm

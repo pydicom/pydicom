@@ -29,6 +29,7 @@ py3source
 
 # Docs build
 docs/_build/*
+doc/_build/*
 
 # coverage.py files
 .coverage

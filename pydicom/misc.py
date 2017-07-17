@@ -2,8 +2,8 @@
 """Miscellaneous helper functions"""
 # Copyright (c) 2009 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
-#    See the file license.txt included with this distribution, also
-#    available at https://github.com/darcymason/pydicom
+#    See the file LICENSE included with this distribution, also
+#    available at https://github.com/pydicom/pydicom
 import os.path
 
 _size_factors = dict(KB=1024, MB=1024 * 1024, GB=1024 * 1024 * 1024)

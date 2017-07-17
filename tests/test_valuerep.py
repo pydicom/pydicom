@@ -223,7 +223,9 @@ class PersonNametests(unittest.TestCase):
         """PN: 3component (single-byte, ideographic,
         phonetic characters) works.."""
         # Example name from PS3.5-2008 section I.2 p. 108
-        pn = PersonName("""Hong^Gildong=\033$)C\373\363^\033$)C\321\316\324\327=\033$)C\310\253^\033$)C\261\346\265\277""")  # noqa
+        pn = PersonName('Hong^Gildong='
+                        '\033$)C\373\363^\033$)C\321\316\324\327='
+                        '\033$)C\310\253^\033$)C\261\346\265\277')
         expected = ("Hong", "Gildong")
         got = (pn.family_name, pn.given_name)
         msg = "PN: Expected single_byte name '%s', got '%s'" % (expected, got)
@@ -241,8 +243,9 @@ class PersonNametests(unittest.TestCase):
     def testUnicodeKr(self):
         """PN: 3component in unicode works (Korean)..."""
         # Example name from PS3.5-2008 section I.2 p. 101
-        pn = PersonNameUnicode(
-            """Hong^Gildong=\033$)C\373\363^\033$)C\321\316\324\327=\033$)C\310\253^\033$)C\261\346\265\277""",  # noqa
+        pn = PersonNameUnicode('Hong^Gildong='
+                               '\033$)C\373\363^\033$)C\321\316\324\327='
+                               '\033$)C\310\253^\033$)C\261\346\265\277',
             [default_encoding, 'euc_kr'])
         expected = ("Hong", "Gildong")
         got = (pn.family_name, pn.given_name)
@@ -252,13 +255,9 @@ class PersonNametests(unittest.TestCase):
     def testUnicodeJp(self):
         """PN: 3component in unicode works (Japanese)..."""
         # Example name from PS3.5-2008 section H  p. 98
-        parts = "\033$B;3ED\033(B^"
-        parts = "%s\033$BB@O:\033(B=" % (parts)
-        parts = "%s\033$B$d$^$@\033(B^" % (parts)
-        parts = "%s\033$B$?$m$&\033(B" % (parts)
-
-        pn = PersonNameUnicode(
-            "Yamada^Tarou=%s" % (parts),
+        pn = PersonNameUnicode('Yamada^Tarou='
+              '\033$B;3ED\033(B^\033$BB@O:\033(B='
+              '\033$B$d$^$@\033(B^\033$B$?$m$&\033(B',
             [default_encoding, 'iso2022_jp'])
         expected = ("Yamada", "Tarou")
         got = (pn.family_name, pn.given_name)
