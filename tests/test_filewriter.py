@@ -13,6 +13,19 @@ import os.path
 import sys
 from tempfile import TemporaryFile
 
+from pydicom import config
+from pydicom.dataset import Dataset, FileDataset
+from pydicom.dataelem import DataElement
+from pydicom.filebase import DicomBytesIO
+from pydicom.filereader import read_file, read_dataset
+from pydicom.filewriter import (write_data_element, write_dataset,
+                                correct_ambiguous_vr, write_file_meta_info)
+from pydicom.multival import MultiValue
+from pydicom.sequence import Sequence
+from pydicom.uid import ImplicitVRLittleEndian, ExplicitVRBigEndian
+from pydicom.util.hexutil import hex2bytes, bytes2hex
+from pydicom.valuerep import DA, DT, TM
+
 have_dateutil = True
 try:
     from dateutil.tz import tzoffset
@@ -26,19 +39,6 @@ except AttributeError:
         import unittest2 as unittest
     except ImportError:
         print("unittest2 is required for testing in python2.6")
-
-from pydicom import config
-from pydicom.dataset import Dataset, FileDataset
-from pydicom.dataelem import DataElement
-from pydicom.filebase import DicomBytesIO
-from pydicom.filereader import read_file, read_dataset
-from pydicom.filewriter import (write_data_element, write_dataset,
-                                correct_ambiguous_vr, write_file_meta_info)
-from pydicom.multival import MultiValue
-from pydicom.sequence import Sequence
-from pydicom.uid import ImplicitVRLittleEndian, ExplicitVRBigEndian
-from pydicom.util.hexutil import hex2bytes, bytes2hex
-from pydicom.valuerep import DA, DT, TM
 
 test_dir = os.path.dirname(__file__)
 test_files = os.path.join(test_dir, 'test_files')
