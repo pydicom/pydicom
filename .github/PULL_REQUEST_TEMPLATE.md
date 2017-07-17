@@ -7,10 +7,15 @@ the contribution guidelines: https://github.com/pydicom/pydicom/blob/master/CONT
 
 
 #### What does this implement/fix? Explain your changes.
-
+<!--
+Please summarize the key points of the reference issue, problem or contribution
+to facilitate reviewing task. Of course reviewers can always refer to the
+original issue but facilitating the reviewing process is much appreciated.
+-->
 
 #### Any other comments?
-
+<!--
+-->
 
 <!--
 Please be aware that we are a loose team of volunteers so patience is
