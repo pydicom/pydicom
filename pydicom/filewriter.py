@@ -3,8 +3,8 @@
 from __future__ import absolute_import
 # Copyright (c) 2008-2012 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
-#    See the file LICENSE included with this distribution, also
-#    available at https://github.com/pydicom/pydicom
+#    See the file license.txt included with this distribution, also
+#    available at https://github.com/darcymason/pydicom
 
 from struct import pack, unpack
 
@@ -80,7 +80,7 @@ def correct_ambiguous_vr_element(elem, ds, is_little_endian):
                           0x00409211, 0x00409216, 0x00603004, 0x00603006]:
             # US if PixelRepresenation value is 0x0000, else SS
             #   For references, see the list at
-            #   https://github.com/pydicom/pydicom/pull/298
+            #   https://github.com/darcymason/pydicom/pull/298
             if 'PixelRepresentation' in ds:
                 if ds.PixelRepresentation == 0:
                     elem.VR = 'US'
