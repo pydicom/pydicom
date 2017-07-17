@@ -33,7 +33,7 @@ matrix:
 install: source build_tools/travis/install.sh
 
 script:
-  - py.test --cov=pydicom -v s tests
+  - py.test --cov=pydicom -r s tests
 
 after_success:
   - codecov
