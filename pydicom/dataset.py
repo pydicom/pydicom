@@ -714,6 +714,8 @@ class Dataset(dict):
             #    self.BitsAllocated -- 8, 16, or 32
             format_str = '%sint%d' % (('u', '')[self.PixelRepresentation],
                                       self.BitsAllocated)
+            if format_str == 'uint1':
+                format_str = 'bool_'
             try:
                 numpy_dtype = numpy.dtype(format_str)
             except TypeError:
