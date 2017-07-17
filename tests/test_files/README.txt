@@ -99,9 +99,12 @@ zipMR.gz
   * used for checking that deferred read reopens as zip again (issue 103)
   
 dcmqi_seg.dcm 
-  * From the DCMQI project 
-  * voxel-based segmentations (http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_A.51.html)
+  * voxel-based segmentation from the DCMQI project
+  * http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_A.51.html
 
+dcmqi_tid1500.dcm
+* structured report element from DCMQI
+* http://dicom.nema.org/medical/dicom/current/output/chtml/part16/chapter_A.html#sect_TID_1500
 
 == DICOMDIR tests ==
 
