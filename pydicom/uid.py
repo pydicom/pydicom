@@ -2,8 +2,8 @@
 """Dicom Unique identifiers"""
 # Copyright (c) 2008-2014 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
-#    See the file license.txt included with this distribution, also
-#    available at https://github.com/darcymason/pydicom
+#    See the file LICENSE included with this distribution, also
+#    available at https://github.com/pydicom/pydicom
 
 import os
 import uuid
@@ -16,12 +16,13 @@ from pydicom import compat
 
 
 valid_uid_re = '^(0|[1-9][0-9]*)(\.(0|[1-9][0-9]*))*$'
-'''Regular expression that matches valid UIDs. Does not enforce 64 char limit.
+'''Regular expression that matches valid UIDs.
+   Does not enforce 64 char limit.
 '''
 
 valid_prefix_re = '^(0|[1-9][0-9]*)(\.(0|[1-9][0-9]*))*\.$'
-'''Regular expression that matches valid UID prefixes. Does not enforce length
-constraints.
+'''Regular expression that matches valid UID prefixes.
+   Does not enforce length constraints.
 '''
 
 
@@ -54,8 +55,9 @@ class UID(str):
     """
     def __new__(cls, val):
         """Set up new instance of the class"""
-        # Don't repeat if already a UID class -- then may get the name
-        #     that str(uid) gives rather than the dotted number
+        # Don't repeat if already a UID class
+        # then may get the name that str(uid)
+        # gives rather than the dotted number
         if isinstance(val, UID):
             return val
         else:
@@ -89,19 +91,27 @@ class UID(str):
             self.is_little_endian = True
             self.is_deflated = False
 
-            if val == '1.2.840.10008.1.2':  # implicit VR little endian
+            # implicit VR little endian
+            if val == '1.2.840.10008.1.2':
                 pass
-            elif val == '1.2.840.10008.1.2.1':  # ExplicitVRLittleEndian
+
+            # ExplicitVRLittleEndian
+            elif val == '1.2.840.10008.1.2.1':
                 self.is_implicit_VR = False
-            elif val == '1.2.840.10008.1.2.2':  # ExplicitVRBigEndian
+
+            # ExplicitVRBigEndian
+            elif val == '1.2.840.10008.1.2.2':
                 self.is_implicit_VR = False
                 self.is_little_endian = False
-            elif val == '1.2.840.10008.1.2.1.99':  # DeflatedExplicitVRLittleEndian:
+
+            # DeflatedExplicitVRLittleEndian
+            elif val == '1.2.840.10008.1.2.1.99':
                 self.is_deflated = True
                 self.is_implicit_VR = False
             else:
                 # Any other syntax should be Explicit VR Little Endian,
-                #   e.g. all Encapsulated (JPEG etc) are ExplVR-LE by Standard PS 3.5-2008 A.4 (p63)
+                #   e.g. all Encapsulated (JPEG etc) are ExplVR-LE by
+                # Standard PS 3.5-2008 A.4 (p63)
                 self.is_implicit_VR = False
 
     def __str__(self):
@@ -109,7 +119,8 @@ class UID(str):
         return self.name
 
     def __eq__(self, other):
-        """Override string equality so either name or UID number match passes"""
+        """Override string equality so either name
+           or UID number match passes"""
         if str.__eq__(self, other) is True:  # 'is True' needed (issue 96)
             return True
         if str.__eq__(self.name, other) is True:  # 'is True' needed (issue 96)
@@ -144,12 +155,15 @@ class UID(str):
         if not re.match(valid_uid_re, self):
             raise InvalidUID('UID is not a valid format: %s' % self)
 
-    # For python 3, any override of __cmp__ or __eq__ immutable requires
-    #   explicit redirect of hash function to the parent class
-    #   See http://docs.python.org/dev/3.0/reference/datamodel.html#object.__hash__
+    # For python 3, any override of __cmp__ or __eq__
+    #   immutable requires explicit redirect of hash
+    #   function to the parent class
+    #   See http://docs.python.org/dev/3.0/
+    #       reference/datamodel.html#object.__hash__
 
     def __hash__(self):
         return super(UID, self).__hash__()
+
 
 ExplicitVRLittleEndian = UID('1.2.840.10008.1.2.1')
 ImplicitVRLittleEndian = UID('1.2.840.10008.1.2')
@@ -185,7 +199,8 @@ NotCompressedPixelTransferSyntaxes = [ExplicitVRLittleEndian,
                                       DeflatedExplicitVRLittleEndian,
                                       ExplicitVRBigEndian]
 
-# Many thanks to the Medical Connections for offering free valid UIDs (http://www.medicalconnections.co.uk/FreeUID.html)
+# Many thanks to the Medical Connections for offering free
+# valid UIDs (http://www.medicalconnections.co.uk/FreeUID.html)
 # Their service was used to obtain the following root UID for pydicom:
 pydicom_root_UID = '1.2.826.0.1.3680043.8.498.'
 pydicom_uids = {

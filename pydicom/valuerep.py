@@ -2,16 +2,22 @@
 """Special classes for DICOM value representations (VR)"""
 # Copyright (c) 2008-2012 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
-#    See the file license.txt included with this distribution, also
-#    available at https://github.com/darcymason/pydicom
+#    See the file LICENSE included with this distribution, also
+#    available at https://github.com/pydicom/pydicom
 
 from decimal import Decimal
+import re
 
-from pydicom import config  # don't import datetime_conversion directly
+# don't import datetime_conversion directly
+from pydicom import config
 from pydicom import compat
 from pydicom.multival import MultiValue
 
-from datetime import date, datetime, time
+from datetime import (
+    date,
+    datetime,
+    time
+)
 
 have_dateutil = True
 try:
@@ -19,18 +25,29 @@ try:
 except ImportError:
     have_dateutil = False
 
-import re
 
-default_encoding = "iso8859"  # can't import from charset or get circular import
+# can't import from charset or get circular import
+default_encoding = "iso8859"
 
-# For reading/writing data elements, these ones have longer explicit VR format
+# For reading/writing data elements,
+# these ones have longer explicit VR format
 # Taken from PS3.5 Section 7.1.2
-extra_length_VRs = ('OB', 'OD', 'OF', 'OL', 'OW', 'SQ', 'UC', 'UN',
-                    'UR', 'UT')
+extra_length_VRs = ('OB',
+                    'OD',
+                    'OF',
+                    'OL',
+                    'OW',
+                    'SQ',
+                    'UC',
+                    'UN',
+                    'UR',
+                    'UT')
 
-# VRs that can be affected by character repertoire in (0008,0005) Specific Character Set
+# VRs that can be affected by character repertoire
+# in (0008,0005) Specific Character Set
 # See PS-3.5 (2011), section 6.1.2 Graphic Characters
-text_VRs = ('SH', 'LO', 'ST', 'LT',  'UC', 'UR', 'UT')  # and PN, but it is handled separately.
+# and PN, but it is handled separately.
+text_VRs = ('SH', 'LO', 'ST', 'LT',  'UC', 'UR', 'UT')
 
 match_string = b''.join([
     b'(?P<single_byte>',
@@ -100,9 +117,13 @@ class DA(date):
                 try:
                     val = super(DA, cls).__new__(cls, val)
                 except TypeError:
-                    raise ValueError("Cannot convert to datetime: '" + val + "'")
+                    raise ValueError("Cannot convert to datetime: '%s'"
+                                     % (val))
         elif isinstance(val, date):
-            val = super(DA, cls).__new__(cls, val.year, val.month, val.day)
+            val = super(DA, cls).__new__(cls,
+                                         val.year,
+                                         val.month,
+                                         val.day)
         else:
             val = super(DA, cls).__new__(cls, val)
         return val
@@ -188,12 +209,17 @@ class DT(datetime):
                         microsecond = 0
                 tz_match = match.group(5)
                 if tz_match:
-                    offset = (int(tz_match[1:3]) * 60 + int(tz_match[3:5])) * 60
+                    offset1 = int(tz_match[1:3]) * 60
+                    offset2 = int(tz_match[3:5])
+                    offset = (offset1 + offset2) * 60
                     if tz_match[0] == '-':
                         offset = -offset
                     if not have_dateutil:
-                        msg = "The python-dateutil package is required to convert dates/times to datetime objects"
-                        msg += "\nPlease install python-dateutil or set pydicom.config.datetime_conversion = False"
+                        msg = "The python-dateutil package is required"
+                        msg += "to convert dates/times to datetime objects. "
+                        msg += "\nPlease install python-dateutil or set "
+                        msg += "pydicom.config.datetime_conversion = False"
+
                         raise ImportError(msg)
                     tzinfo = tzoffset(tz_match, offset)
                 else:
@@ -205,11 +231,18 @@ class DT(datetime):
                 try:
                     val = super(DT, cls).__new__(cls, val)
                 except TypeError:
-                    raise ValueError("Cannot convert to datetime: '" + val + "'")
+                    raise ValueError("Cannot convert to datetime: '%s'"
+                                     % (val))
         elif isinstance(val, datetime):
-            val = super(DT, cls).__new__(cls, val.year, val.month, val.day,
-                                         val.hour, val.minute, val.second,
-                                         val.microsecond, val.tzinfo)
+            val = super(DT, cls).__new__(cls,
+                                         val.year,
+                                         val.month,
+                                         val.day,
+                                         val.hour,
+                                         val.minute,
+                                         val.second,
+                                         val.microsecond,
+                                         val.tzinfo)
         else:
             val = super(DT, cls).__new__(cls, val)
         return val
@@ -289,9 +322,13 @@ class TM(time):
                 try:
                     val = super(TM, cls).__new__(cls, val)
                 except TypeError:
-                    raise ValueError("Cannot convert to datetime: '" + val + "'")
+                    raise ValueError("Cannot convert to datetime: '%s"
+                                     % (val))
         elif isinstance(val, time):
-            val = super(TM, cls).__new__(cls, val.hour, val.minute, val.second,
+            val = super(TM, cls).__new__(cls,
+                                         val.hour,
+                                         val.minute,
+                                         val.second,
                                          val.microsecond)
         else:
             val = super(TM, cls).__new__(cls, val)
@@ -337,9 +374,10 @@ class DSfloat(float):
         # ... also if user changes a data element value, then will get
         # a different object, because float is immutable.
 
+        has_attribute = hasattr(val, 'original_string')
         if isinstance(val, (str, compat.text_type)):
             self.original_string = val
-        elif isinstance(val, (DSfloat, DSdecimal)) and hasattr(val, 'original_string'):
+        elif isinstance(val, (DSfloat, DSdecimal)) and has_attribute:
             self.original_string = val.original_string
 
     def __str__(self):
@@ -381,7 +419,8 @@ class DSdecimal(Decimal):
         # string but decimal.Decimal transforms it to an invalid string it will
         # still be initialized properly
         enforce_length = config.enforce_valid_values
-        # DICOM allows spaces around the string, but python doesn't, so clean it
+        # DICOM allows spaces around the string,
+        # but python doesn't, so clean it
         if isinstance(val, (str, compat.text_type)):
             val = val.strip()
             # If the input string is actually invalid that we relax the valid
@@ -391,18 +430,20 @@ class DSdecimal(Decimal):
         if val == '':
             return val
         if isinstance(val, float) and not config.allow_DS_float:
-            msg = ("DS cannot be instantiated with a float value, unless "
-                   "config.allow_DS_float is set to True. It is recommended to "
-                   "convert to a string instead, with the desired number of digits, "
-                   "or use Decimal.quantize and pass a Decimal instance.")
+            msg = ("DS cannot be instantiated with a float value, "
+                   "unless config.allow_DS_float is set to True. "
+                   "It is recommended to convert to a string instead, "
+                   "with the desired number of digits, or use "
+                   "Decimal.quantize and pass a Decimal instance.")
             raise TypeError(msg)
         if not isinstance(val, Decimal):
             val = super(DSdecimal, cls).__new__(cls, val)
         if len(str(val)) > 16 and enforce_length:
-            msg = ("DS value representation must be <= 16 characters by DICOM "
-                   "standard. Initialize with a smaller string, or set config.enforce_valid_values "
-                   "to False to override, "
-                   "or use Decimal.quantize() and initialize with a Decimal instance.")
+            msg = ("DS value representation must be <= 16 "
+                   "characters by DICOM standard. Initialize with "
+                   "a smaller string, or set config.enforce_valid_values "
+                   "to False to override, or use Decimal.quantize() and "
+                   "initialize with a Decimal instance.")
             raise OverflowError(msg)
         return val
 
@@ -415,17 +456,18 @@ class DSdecimal(Decimal):
         # a different Decimal, as Decimal is immutable.
         if isinstance(val, (str, compat.text_type)):
             self.original_string = val
-        elif isinstance(val, (DSfloat, DSdecimal)) and hasattr(val, 'original_string'):
+        elif isinstance(val, (DSfloat, DSdecimal)) and hasattr(val, 'original_string'):  # noqa
             self.original_string = val.original_string
 
     def __str__(self):
-        if hasattr(self, 'original_string') and len(self.original_string) <= 16:
+        if hasattr(self, 'original_string') and len(self.original_string) <= 16:  # noqa
             return self.original_string
         else:
             return super(DSdecimal, self).__str__()
 
     def __repr__(self):
         return "\"" + str(self) + "\""
+
 
 # CHOOSE TYPE OF DS
 if config.use_DS_decimal:
@@ -436,11 +478,13 @@ else:
 
 def DS(val):
     """Factory function for creating DS class instances.
-    Checks for blank string; if so, return that. Else calls DSfloat or DSdecimal
-    to create the class instance. This avoids overriding __new__ in DSfloat
+    Checks for blank string; if so, return that.
+    Else calls DSfloat or DSdecimal to create the class
+    instance. This avoids overriding __new__ in DSfloat
     (which carries a time penalty for large arrays of DS).
-    Similarly the string clean and check can be avoided and DSfloat called
-    directly if a string has already been processed.
+    Similarly the string clean and check can be avoided
+    and DSfloat called directly if a string has already
+    been processed.
     """
     if isinstance(val, (str, compat.text_type)):
         val = val.strip()
@@ -450,12 +494,14 @@ def DS(val):
 
 
 class IS(int):
-    """Derived class of int. Stores original integer string for exact rewriting
+    """Derived class of int. Stores original integer
+    string for exact rewriting
     of the string originally read or stored.
     """
     if compat.in_py2:
         __slots__ = ['original_string']
-        # Unlikely that str(int) will not be the same as the original, but could happen
+        # Unlikely that str(int) will not be the
+        # same as the original, but could happen
         # with leading zeros.
 
         def __getstate__(self):
@@ -481,8 +527,10 @@ class IS(int):
         if isinstance(val, (float, Decimal)) and newval != val:
             raise TypeError("Could not convert value to integer without loss")
         # Checks in case underlying int is >32 bits, DICOM does not allow this
-        if (newval < -2 ** 31 or newval >= 2 ** 31) and config.enforce_valid_values:
-            message = "Value exceeds DICOM limits of -2**31 to (2**31 - 1) for IS"
+        check_newval = (newval < -2 ** 31 or newval >= 2 ** 31)
+        if check_newval and config.enforce_valid_values:
+            dcm_limit = "-2**31 to (2**31 - 1) for IS"
+            message = "Value exceeds DICOM limits of %s" % (dcm_limit)
             raise OverflowError(message)
         return newval
 
@@ -504,10 +552,12 @@ def MultiString(val, valtype=str):
     """Split a bytestring by delimiters if there are any
 
     val -- DICOM bytestring to split up
-    valtype -- default str, but can be e.g. UID to overwrite to a specific type
+    valtype -- default str, but can be e.g.
+    UID to overwrite to a specific type
     """
     # Remove trailing blank used to pad to even length
-    # 2005.05.25: also check for trailing 0, error made in PET files we are converting
+    # 2005.05.25: also check for trailing 0, error made
+    # in PET files we are converting
 
     if val and (val.endswith(' ') or val.endswith('\x00')):
         val = val[:-1]
@@ -555,9 +605,11 @@ class PersonName3(object):
     def __repr__(self):
         return self.original_string.__repr__()
 
-    # For python 3, any override of __cmp__ or __eq__ immutable requires
-    #   explicit redirect of hash function to the parent class
-    #   See http://docs.python.org/dev/3.0/reference/datamodel.html#object.__hash__
+    # For python 3, any override of __cmp__ or __eq__
+    # immutable requires explicit redirect of hash
+    # function to the parent class See
+    # See http://docs.python.org/
+    #  dev/3.0/reference/datamodel.html#object.__hash__
     __hash__ = object.__hash__
 
     def decode(self, encodings=None):
@@ -581,7 +633,8 @@ class PersonName3(object):
         if isinstance(self.components[0], bytes):
             comps = self.components
         else:
-            comps = [C.encode(enc) for C, enc in zip(self.components, encodings)]
+            comps = [C.encode(enc) for C,
+                     enc in zip(self.components, encodings)]
 
         # Remove empty elements from the end
         while len(comps) and not comps[-1]:
@@ -616,19 +669,25 @@ class PersonNameBase(object):
 
     def __init__(self, val):
         """Initialize the PN properties"""
-        # Note normally use __new__ on subclassing an immutable, but here we just want
-        #    to do some pre-processing for properties
-        # PS 3.5-2008 section 6.2 (p.28)  and 6.2.1 describes PN. Briefly:
-        #  single-byte-characters=ideographic characters=phonetic-characters
+        # Note normally use __new__ on subclassing an immutable,
+        # but here we just want to do some pre-processing
+        # for properties PS 3.5-2008 section 6.2 (p.28)
+        # and 6.2.1 describes PN. Briefly:
+        # single-byte-characters=ideographic
+        # characters=phonetic-characters
         # (each with?):
-        #   family-name-complex^Given-name-complex^Middle-name^name-prefix^name-suffix
+        #   family-name-complex
+        #  ^Given-name-complex
+        #  ^Middle-name^name-prefix^name-suffix
         self.parse()
 
     def formatted(self, format_str):
         """Return a formatted string according to the format pattern
 
-        Use "...%(property)...%(property)..." where property is one of
-           family_name, given_name, middle_name, name_prefix, name_suffix
+        Use "...%(property)...%(property)..." where property
+        is one of family_name, given_name,
+                  middle_name, name_prefix,
+                  name_suffix
         """
         return format_str % self.__dict__
 
@@ -645,7 +704,8 @@ class PersonNameBase(object):
             self.phonetic = self.components[2]
 
         if self.single_byte:
-            name_string = self.single_byte + "^^^^"  # in case missing trailing items are left out
+            # in case missing trailing items are left out
+            name_string = self.single_byte + "^^^^"
             parts = name_string.split("^")[:5]
             self.family_name, self.given_name, self.middle_name = parts[:3]
             self.name_prefix, self.name_suffix = parts[3:]
@@ -658,7 +718,8 @@ class PersonName(PersonNameBase, bytes):
     """Human-friendly class to hold VR of Person Name (PN)
 
     Name is parsed into the following properties:
-    single-byte, ideographic, and phonetic components (PS3.5-2008 6.2.1)
+    single-byte, ideographic, and phonetic components
+    (PS3.5-2008 6.2.1)
     family_name,
     given_name,
     middle_name,
@@ -699,7 +760,8 @@ class PersonNameUnicode(PersonNameBase, compat.text_type):
                  from pydicom.charset.python_encodings mapping
                  of values in DICOM data element (0008,0005).
         """
-        from pydicom.charset import clean_escseq  # in here to avoid circular import
+        # in here to avoid circular import
+        from pydicom.charset import clean_escseq
 
         # Make the possible three character encodings explicit:
         if not isinstance(encodings, list):

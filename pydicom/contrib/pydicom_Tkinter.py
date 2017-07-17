@@ -1,9 +1,10 @@
 # pydicom_Tkinter.py
 #
 # Copyright (c) 2009 Daniel Nanz
-# This file is released under the pydicom (https://github.com/darcymason/pydicom)
-# license, see the file license.txt available at
-# (https://github.com/darcymason/pydicom)
+# This file is released under the pydicom
+# (https://github.com/pydicom/pydicom)
+# license, see the file LICENSE available at
+# (https://github.com/pydicom/pydicom)
 #
 # revision history:
 # Dec-08-2009: version 0.1
@@ -12,6 +13,7 @@
 #        under Windows XP Professional 2002, and Mac OS X 10.5.5,
 #        using numpy 1.3.0 and a small random selection of MRI and
 #        CT images.
+
 '''
 View DICOM images from pydicom
 
@@ -42,11 +44,13 @@ except ImportError:
 
 
 def get_PGM_bytedata_string(arr):
-    '''Given a 2D numpy array as input write gray-value image data in the PGM
+    '''Given a 2D numpy array as input write
+    gray-value image data in the PGM
     format into a byte string and return it.
 
     arr: single-byte unsigned int numpy array
-    note: Tkinter's PhotoImage object seems to accept only single-byte data
+    note: Tkinter's PhotoImage object seems to
+    accept only single-byte data
     '''
 
     if arr.dtype != np.uint8:
@@ -119,8 +123,8 @@ def get_tkinter_photoimage_from_pydicom_image(data):
     Wrap data.pixel_array in a Tkinter PhotoImage instance,
     after conversion into a PGM grayscale image.
 
-    This will fail if the "numpy" module is not installed in the attempt of
-    creating the data.pixel_array.
+    This will fail if the "numpy" module is not
+    installed in the attempt of creating the data.pixel_array.
 
     data:  object returned from pydicom.read_file()
     side effect: may leave a temporary .pgm file on disk
@@ -147,11 +151,11 @@ def get_tkinter_photoimage_from_pydicom_image(data):
         ww = data.WindowWidth
         try:
             wc = wc[0]            # can be multiple values
-        except:
+        except Exception:
             pass
         try:
             ww = ww[0]
-        except:
+        except Exception:
             pass
 
     # scale array to account for center, width and PGM grayscale range,
@@ -181,7 +185,7 @@ def get_tkinter_photoimage_from_pydicom_image(data):
     try:
         os.close(os_id)
         os.remove(abs_path)
-    except:
+    except Exception:
         pass  # silently leave file on disk in temp-like directory
 
     return photo_image
@@ -193,7 +197,8 @@ def show_image(data, block=True, master=None):
 
     data: object returned from pydicom.read_file()
     block: if True run Tk mainloop() to show the image
-    master: use with block==False and an existing Tk widget as parent widget
+    master: use with block==False and an existing
+    Tk widget as parent widget
 
     side effects: may leave a temporary .pgm file on disk
     '''
@@ -206,6 +211,7 @@ def show_image(data, block=True, master=None):
     frame.master.title(title)
     photo_image = get_tkinter_photoimage_from_pydicom_image(data)
     label = tkinter.Label(frame, image=photo_image, background='#000')
+
     # keep a reference to avoid disappearance upon garbage collection
     label.photo_reference = photo_image
     label.grid()

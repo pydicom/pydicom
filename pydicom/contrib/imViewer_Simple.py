@@ -1,4 +1,4 @@
-# ==========================================================================
+# ===================================================================
 # imViewer-Simple.py
 #
 #    An example program that opens uncompressed DICOM images and
@@ -26,7 +26,8 @@
 #               and PIL 1.1.7b1, Python 2.6.4, and wxPython 2.8.10.1
 #
 # Dave Witten:  Nov. 11, 2009
-# ==========================================================================
+# ===================================================================
+
 import pydicom
 import wx
 from pydicom import compat
@@ -44,6 +45,7 @@ except ImportError:
 # ----------------------------------------------------------------
 #  Initialize image capabilities.
 # ----------------------------------------------------------------
+
 wx.InitAllImageHandlers()
 
 
@@ -61,9 +63,12 @@ class ImFrame(wx.Frame):
     def __init__(self, parent, title):
         """Create the pydicom image example's main frame window."""
 
-        wx.Frame.__init__(self, parent, id=-1, title="", pos=wx.DefaultPosition,
+        style = wx.DEFAULT_FRAME_STYLE | wx.SUNKEN_BORDER | wx.CLIP_CHILDREN
+
+        wx.Frame.__init__(self, parent, id=-1, title="",
+                          pos=wx.DefaultPosition,
                           size=wx.Size(w=1024, h=768),
-                          style=wx.DEFAULT_FRAME_STYLE | wx.SUNKEN_BORDER | wx.CLIP_CHILDREN)
+                          style=style)
 
         # --------------------------------------------------------
         # Set up the menubar.
@@ -90,14 +95,21 @@ class ImFrame(wx.Frame):
         # -------------------------------------------------------------
         # Create the folderTreeView on the left.
         # -------------------------------------------------------------
-        self.dsTreeView = wx.TreeCtrl(self.mainSplitter, style=wx.TR_LINES_AT_ROOT | wx.TR_HAS_BUTTONS)
+        dsstyle = wx.TR_LINES_AT_ROOT | wx.TR_HAS_BUTTONS
+        self.dsTreeView = wx.TreeCtrl(self.mainSplitter,
+                                      style=dsstyle)
 
         # --------------------------------------------------------
         # Create the ImageView on the right pane.
         # --------------------------------------------------------
-        self.imView = wx.Panel(self.mainSplitter, style=wx.VSCROLL | wx.HSCROLL | wx.CLIP_CHILDREN)
+        imstyle = wx.VSCROLL | wx.HSCROLL | wx.CLIP_CHILDREN
+        self.imView = wx.Panel(self.mainSplitter,
+                               style=imstyle)
+
         self.imView.Bind(wx.EVT_PAINT, self.OnPaint)
-        self.imView.Bind(wx.EVT_ERASE_BACKGROUND, self.OnEraseBackground)
+        self.imView.Bind(wx.EVT_ERASE_BACKGROUND,
+                         self.OnEraseBackground)
+
         self.imView.Bind(wx.EVT_SIZE, self.OnSize)
 
         # --------------------------------------------------------
@@ -142,22 +154,28 @@ class ImFrame(wx.Frame):
         """ order the dicom tags """
         for data_element in ds:
             if isinstance(data_element.value, compat.text_type):
-                ip = self.dsTreeView.AppendItem(parent, text=compat.text_type(data_element))
+                text = compat.text_type(data_element)
+                ip = self.dsTreeView.AppendItem(parent,
+                                                text=text)
             else:
-                ip = self.dsTreeView.AppendItem(parent, text=str(data_element))
+                ip = self.dsTreeView.AppendItem(parent,
+                                                text=str(data_element))
 
             if data_element.VR == "SQ":
                 for i, ds in enumerate(data_element.value):
-                    sq_item_description = data_element.name.replace(" Sequence", "")
-                    item_text = "%s %d" % (sq_item_description, i + 1)
-                    parentNodeID = self.dsTreeView.AppendItem(ip, text=item_text.rjust(128))
+                    item_describe = data_element.name.replace(" Sequence", "")
+                    item_text = "%s %d" % (item_describe, i + 1)
+                    rjust = item_text.rjust(128)
+                    parentNodeID = self.dsTreeView.AppendItem(ip,
+                                                              text=rjust)
                     self.recurse_tree(ds, parentNodeID)
 
 # --- Most of what is important happens below this line ---------------------
 
     def OnFileOpen(self, event):
         """Opens a selected file."""
-        dlg = wx.FileDialog(self, 'Choose a file to add.', '', '', '*.*', wx.OPEN)
+        msg = 'Choose a file to add.'
+        dlg = wx.FileDialog(self, msg, '', '', '*.*', wx.OPEN)
         if dlg.ShowModal() == wx.ID_OK:
             fullPath = dlg.GetPath()
             imageFile = dlg.GetFilename()
@@ -215,17 +233,28 @@ class ImFrame(wx.Frame):
         return image
 
     def get_LUT_value(self, data, window, level):
-        """Apply the RGB Look-Up Table for the given data and window/level value."""
+        """Apply the RGB Look-Up Table for the given
+           data and window/level value."""
         if not have_numpy:
-            raise ImportError("Numpy is not available. See http://numpy.scipy.org/ to download and install")
+            raise ImportError("Numpy is not available. "
+                              "See http://numpy.scipy.org/ "
+                              "to download and install")
+
         if isinstance(window, list):
             window = window[0]
         if isinstance(level, list):
             level = level[0]
+
+        win = window
+        lvl = level
+
+        e = [0,
+             255,
+             lambda data: ((data - (lvl - 0.5)) / (win - 1) + 0.5) * (255 - 0)]
         return np.piecewise(data,
-                            [data <= (level - 0.5 - (window - 1) / 2),
-                             data > (level - 0.5 + (window - 1) / 2)],
-                            [0, 255, lambda data: ((data - (level - 0.5)) / (window - 1) + 0.5) * (255 - 0)]
+                            [data <= (lvl - 0.5 - (win - 1) / 2),
+                             data > (lvl - 0.5 + (win - 1) / 2)],
+                            e
                             )
 
     # -----------------------------------------------------------
@@ -234,25 +263,49 @@ class ImFrame(wx.Frame):
     # -----------------------------------------------------------
     def loadPIL_LUT(self, dataset):
         if not have_PIL:
-            raise ImportError("Python Imaging Library is not available. See http://www.pythonware.com/products/pil/ to download and install")
+            raise ImportError("Python Imaging Library is not available."
+                              " See http://www.pythonware.com/products/pil/"
+                              " to download and install")
         if('PixelData' not in dataset):
-            raise TypeError("Cannot show image -- DICOM dataset does not have pixel data")
-        if('WindowWidth' not in dataset) or ('WindowCenter' not in dataset):  # can only apply LUT if these values exist
+            raise TypeError("Cannot show image -- "
+                            "DICOM dataset does not have pixel data")
+
+        # can only apply LUT if these values exist
+        if('WindowWidth' not in dataset) or ('WindowCenter' not in dataset):
             bits = dataset.BitsAllocated
             samples = dataset.SamplesPerPixel
             if bits == 8 and samples == 1:
                 mode = "L"
             elif bits == 8 and samples == 3:
                 mode = "RGB"
-            elif bits == 16:  # not sure about this -- PIL source says is 'experimental' and no documentation.
-                mode = "I;16"  # Also, should bytes swap depending on endian of file and system??
+            # not sure about this -- PIL source says is
+            # 'experimental' and no documentation.
+            elif bits == 16:
+                # Also, should bytes swap depending
+                # on endian of file and system??
+                mode = "I;16"
             else:
-                raise TypeError("Don't know PIL mode for %d BitsAllocated and %d SamplesPerPixel" % (bits, samples))
+                msg = "Don't know PIL mode for %d BitsAllocated" % (bits)
+                msg += " and %d SamplesPerPixel" % (samples)
+                raise TypeError(msg)
             size = (dataset.Columns, dataset.Rows)
-            im = PIL.Image.frombuffer(mode, size, dataset.PixelData, "raw", mode, 0, 1)  # Recommended to specify all details by http://www.pythonware.com/library/pil/handbook/image.htm
+
+            # Recommended to specify all details by
+            # http://www.pythonware.com/library/pil/handbook/image.htm
+            im = PIL.Image.frombuffer(mode,
+                                      size,
+                                      dataset.PixelData,
+                                      "raw",
+                                      mode, 0, 1)
         else:
-            image = self.get_LUT_value(dataset.pixel_array, dataset.WindowWidth, dataset.WindowCenter)
-            im = PIL.Image.fromarray(image).convert('L')  # Convert mode to L since LUT has only 256 values: http://www.pythonware.com/library/pil/handbook/image.htm
+
+            image = self.get_LUT_value(dataset.pixel_array,
+                                       dataset.WindowWidth,
+                                       dataset.WindowCenter)
+
+            # Convert mode to L since LUT has only 256 values:
+            # http://www.pythonware.com/library/pil/handbook/image.htm
+            im = PIL.Image.fromarray(image).convert('L')
         return im
 
     def show_file(self, imageFile, fullPath):
@@ -262,7 +315,9 @@ class ImFrame(wx.Frame):
         give you 'fp object does not have a defer_size attribute,
         or some such."""
         ds = pydicom.read_file(str(fullPath))
-        ds.decode()                                         # change strings to unicode
+
+        # change strings to unicode
+        ds.decode()
         self.populateTree(ds)
         if 'PixelData' in ds:
             self.dImage = self.loadPIL_LUT(ds)
@@ -271,12 +326,13 @@ class ImFrame(wx.Frame):
                 self.bitmap = wx.BitmapFromImage(tmpImage)
                 self.Refresh()
 
-# ------ This is just the initialization of the App  -------------------------
+# ------ This is just the initialization of the App  ----
 
 
 # =======================================================
 # The main App Class.
 # =======================================================
+
 class App(wx.App):
     """Image Application."""
 
@@ -285,9 +341,13 @@ class App(wx.App):
         ImFrame(None, 'wxImage Example')
         return True
 
-# ---------------------------------------------------------------------
-# If this file is running as main or a standalone test, begin execution here.
-# ---------------------------------------------------------------------
+
+# ------------------------------------------------------
+# If this file is running as main or a
+# standalone test, begin execution here.
+# ------------------------------------------------------
+
+
 if __name__ == '__main__':
     app = App(0)
     app.MainLoop()

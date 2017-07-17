@@ -1,9 +1,10 @@
 # dcm_qt_tree.py
 """View DICOM files in a tree using Qt and PySide"""
 # Copyright (c) 2013 Padraig Looney
-# This file is released under the pydicom (https://github.com/darcymason/pydicom)
-# license, see the file license.txt available at
-# (https://github.com/darcymason/pydicom)
+# This file is released under the
+# pydicom (https://github.com/pydicom/pydicom)
+# license, see the file LICENSE available at
+# (https://github.com/pydicom/pydicom)
 
 import pydicom
 import sys
@@ -83,7 +84,9 @@ class DicomTree(object):
 
     def display(self, model):
         app = QtGui.QApplication.instance()
-        if not app:  # create QApplication if it doesnt exist
+
+        # create QApplication if it doesnt exist
+        if not app:
             app = QtGui.QApplication(sys.argv)
         tree = QtGui.QTreeView()
         tree.setModel(model)
@@ -96,6 +99,7 @@ def main():
     filename = sys.argv[1]
     dicomTree = DicomTree(filename)
     dicomTree.show_tree()
+
 
 if __name__ == "__main__":
     main()

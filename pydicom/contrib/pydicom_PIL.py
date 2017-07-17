@@ -1,4 +1,5 @@
 # pydicom_PIL.py
+
 """View DICOM images using Python image Library (PIL)
 
 Usage:
@@ -7,14 +8,17 @@ Usage:
 >>> ds = pydicom.read_file("filename")
 >>> show_PIL(ds)
 
-Requires Numpy:  http://numpy.scipy.org/
-and Python Imaging Library:   http://www.pythonware.com/products/pil/
+Requires Numpy:
+    http://numpy.scipy.org/
+
+and Python Imaging Library:
+    http://www.pythonware.com/products/pil/
 
 """
 # Copyright (c) 2009 Darcy Mason, Adit Panchal
 # This file is part of pydicom, relased under an MIT license.
-#    See the file license.txt included with this distribution, also
-#    available at https://github.com/darcymason/pydicom
+#    See the file LICENSE included with this distribution, also
+#    available at https://github.com/pydicom/pydicom
 
 # Based on image.py from pydicom version 0.9.3,
 #    LUT code added by Adit Panchal
@@ -35,10 +39,12 @@ except ImportError:
 
 
 def get_LUT_value(data, window, level):
-    """Apply the RGB Look-Up Table for the given data and window/level value."""
+    """Apply the RGB Look-Up Table for the given
+       data and window/level value."""
     if not have_numpy:
-        raise ImportError("Numpy is not available. See http://numpy.scipy.org/"
-                          " to download and install")
+        raise ImportError("Numpy is not available."
+                          "See http://numpy.scipy.org/"
+                          "to download and install")
 
     return np.piecewise(data,
                         [data <= (level - 0.5 - (window - 1) / 2),
@@ -53,6 +59,7 @@ def get_PIL_image(dataset):
         raise ImportError("Python Imaging Library is not available. "
                           "See http://www.pythonware.com/products/pil/ "
                           "to download and install")
+
     if ('PixelData' not in dataset):
         raise TypeError("Cannot show image -- DICOM dataset does not have "
                         "pixel data")

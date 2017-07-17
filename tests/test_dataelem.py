@@ -2,8 +2,8 @@
 """unittest cases for pydicom.dataelem module"""
 # Copyright (c) 2008 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
-#    See the file license.txt included with this distribution, also
-#    available at https://github.com/darcymason/pydicom
+#    See the file LICENSE included with this distribution, also
+#    available at https://github.com/pydicom/pydicom
 
 # Many tests of DataElement class are implied in test_dataset also
 
@@ -56,8 +56,11 @@ class DataElementTests(unittest.TestCase):
 
     def testKeyword(self):
         """DataElement: return correct keyword"""
-        self.assertEqual(self.data_elementCommand.keyword, 'CommandGroupLength')
-        self.assertEqual(self.data_elementPrivate.keyword, '')
+        self.assertEqual(self.data_elementCommand.keyword,
+                         'CommandGroupLength')
+
+        self.assertEqual(self.data_elementPrivate.keyword,
+                         '')
 
     def testRetired(self):
         """DataElement: return correct is_retired"""
@@ -153,7 +156,7 @@ class DataElementTests(unittest.TestCase):
     def testEqualityNotElement(self):
         """DataElement: equality returns correct value when not same class"""
         dd = DataElement(0x00100010, 'PN', 'ANON')
-        ee = {'0x00100010' : 'ANON'}
+        ee = {'0x00100010': 'ANON'}
         self.assertFalse(dd == ee)
 
     def testEqualityInheritance(self):

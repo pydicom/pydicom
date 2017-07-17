@@ -8,7 +8,7 @@ from pydicom import dicomio
 
 class UnicodeFilenames(unittest.TestCase):
     def testRead(self):
-        """Unicode: Can read a file with unicode characters in name................"""
+        """Unicode: Can read a file with unicode characters in name..."""
         uni_name = u'test°'
 
         # verify first that we could encode file name in this environment

@@ -1,8 +1,8 @@
 """Read a dicom media file"""
 # Copyright (c) 2013 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
-#    See the file license.txt included with this distribution, also
-#    available at https://github.com/darcymason/pydicom
+#    See the file LICENSE included with this distribution, also
+#    available at https://github.com/pydicom/pydicom
 
 from pydicom.misc import size_in_bytes
 from struct import Struct, unpack
@@ -42,7 +42,8 @@ class dicomfile(object):
         transfer_syntax_uid = None
 
         # Yield the file meta info elements
-        file_meta_gen = data_element_generator(self.fobj, is_implicit_VR=False,
+        file_meta_gen = data_element_generator(self.fobj,
+                                               is_implicit_VR=False,
                                                is_little_endian=True,
                                                stop_when=lambda gp,
                                                elem: gp != 2)
@@ -62,7 +63,8 @@ class dicomfile(object):
         else:
             raise NotImplementedError("No transfer syntax in file meta info")
 
-        ds_gen = data_element_generator(self.fobj, is_implicit_VR,
+        ds_gen = data_element_generator(self.fobj,
+                                        is_implicit_VR,
                                         is_little_endian)
         for data_elem in ds_gen:
             yield data_elem
@@ -188,6 +190,8 @@ def data_element_generator(fp, is_implicit_VR, is_little_endian,
                 from pydicom.fileio.fileutil import read_undefined_length_value
 
                 delimiter = SequenceDelimiterTag
-                value = read_undefined_length_value(fp, is_little_endian,
-                                                    delimiter, defer_size)
+                value = read_undefined_length_value(fp,
+                                                    is_little_endian,
+                                                    delimiter,
+                                                    defer_size)
                 yield ((group, elem), VR, length, value, value_tell)

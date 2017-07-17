@@ -24,11 +24,12 @@ Tested with:
  - couchdb 0.10.1
 
 """
+
 #
 # Copyright (c) 2010 Michael Wallace
 # This file is released under the pydicom license.
-#    See the file license.txt included with the pydicom distribution, also
-#    available at https://github.com/darcymason/pydicom
+#    See the file LICENSE included with the pydicom distribution, also
+#    available at https://github.com/pydicom/pydicom
 #
 
 import hashlib
@@ -42,25 +43,33 @@ def uid2str(uid):
     """ Convert PyDicom uid to a string """
     return repr(uid).strip("'")
 
-# When reading files a VR of 'US or SS' is left as binary, because we
-# don't know how to interpret the values different numbers. We therefore
-# treat it as binary and will continue to until either pydicom works it out
+
+# When reading files a VR of 'US or SS' is left as binary,
+# because we don't know how to interpret the values
+# different numbers. We therefore treat it as binary
+# and will continue to until either pydicom works it out
 # for us, or we figure out a test.
+
+
 BINARY_VR_VALUES = ['OW', 'OB', 'OW/OB', 'US or SS']
 
 
 class DicomCouch(dict):
-    """ A Data Access Object for persisting PyDicom objects into CouchDB
+    """ A Data Access Object for persisting
+        PyDicom objects into CouchDB
 
-    We follow the same pattern as the python-couchdb library for getting and
-    setting documents, for example storing pydicom.dataset.Dataset object dcm:
+    We follow the same pattern as the python-couchdb
+    library for getting and setting documents, for
+        example storing pydicom.dataset.Dataset object dcm:
         db = DicomCouch('http://localhost:5984/', 'dbname')
         db[dcm.SeriesInstanceUID] = dcm
 
-    The only constraints on the key are that it must be json-serializable and
-    unique within the database instance. In theory it should be possible to
-    use any DICOM UID. Unfortunately I have written this code under the
-    assumption that SeriesInstanceUID will always be used. This will be fixed.
+    The only constraints on the key are that it must be
+    json-serializable and unique within the database instance.
+    In theory it should be possible to use any DICOM UID.
+    Unfortunately I have written this code under the assumption
+    that SeriesInstanceUID will always be used.
+    This will be fixed.
 
     Retrieving object with key 'foo':
         dcm = db['foo']
@@ -70,7 +79,8 @@ class DicomCouch(dict):
         db.delete(dcm)
 
     TODO:
-     - It is possible to have couchdb assign a uid when adding objects. This
+     - It is possible to have couchdb assign a uid
+       when adding objects. This
        should be supported.
     """
 
@@ -85,7 +95,8 @@ class DicomCouch(dict):
             self._db = server.create(db)
 
     def __getitem__(self, key):
-        """ Retrieve DICOM object with specified SeriesInstanceUID """
+        """ Retrieve DICOM object with
+            specified SeriesInstanceUID """
         doc = self._db[key]
         dcm = json2pydicom(doc)
 
@@ -104,14 +115,23 @@ class DicomCouch(dict):
         """ Write the supplied DICOM object to the database """
         try:
             dcm.PixelData = dcm.pixel_array.tostring()
-        except AttributeError:
-            pass  # Silently ignore errors due to pixel_array not existing
-        except NotImplementedError:
-            pass  # Silently ignore attempts to modify compressed pixel data
-        except TypeError:
-            pass  # Silently ignore errors due to PixelData not existing
 
-        jsn, binary_elements, file_meta_binary_elements = pydicom2json(dcm)
+        # Silently ignore errors due to pixel_array not existing
+        except AttributeError:
+            pass
+
+        # Silently ignore attempts to modify compressed pixel data
+        except NotImplementedError:
+            pass
+
+        # Silently ignore errors due to PixelData not existing
+        except TypeError:
+            pass
+
+        jsn,
+        binary_elements,
+        file_meta_binary_elements = pydicom2json(dcm)
+
         _strip_elements(jsn, binary_elements)
         _strip_elements(jsn['file_meta'], file_meta_binary_elements)
         if dcm.SeriesInstanceUID in self._meta:
@@ -129,41 +149,49 @@ class DicomCouch(dict):
 
         self.__put_attachments(dcm, binary_elements, jsn)
         # Get a local copy of the document
-        # We get this from couch because we get the _id, _rev and _attachments
-        # keys which will ensure we don't overwrite the attachments we just
-        # uploaded.
-        # I don't really like the extra HTTP GET and I think we can generate
-        # what we need without doing it. Don't have time to work out how yet.
+        # We get this from couch because we get the _id,
+        # _rev and _attachments keys which will ensure
+        # we don't overwrite the attachments we just uploaded.
+        # I don't really like the extra HTTP GET and
+        # I think we can generate what we need without doing
+        # it. Don't have time to work out how yet.
         self._meta[dcm.SeriesInstanceUID]['doc'] = \
             self._db[dcm.SeriesInstanceUID]
 
     def __str__(self):
-        """ Return the string representation of the couchdb client """
+        """ Return the string representation of the
+            couchdb client """
         return str(self._db)
 
     def __repr__(self):
-        """ Return the canonical string representation of the couchdb client """
+        """ Return the canonical string representation
+            of the couchdb client """
         return repr(self._db)
 
     def __get_attachments(self, dcm, doc):
-        """ Set binary tags by retrieving attachments from couchdb.
+        """ Set binary tags by retrieving attachments
+            from couchdb.
 
-        Values are hashed so they are only updated if they have changed.
+        Values are hashed so they are only updated
+        if they have changed.
 
         """
         for id in doc['_attachments'].keys():
             tagstack = id.split(':')
             value = self._db.get_attachment(doc['_id'], id)
             _add_element(dcm, tagstack, value)
-            self._meta[dcm.SeriesInstanceUID]['hashes'][id] = hashlib.md5(value)
+            value = hashlib.md5(value)
+            self._meta[dcm.SeriesInstanceUID]['hashes'][id] = value
 
     def __put_attachments(self, dcm, binary_elements, jsn):
         """ Upload all new and modified attachments """
+        func = self.__attachment_update_needed
         elements_to_update = \
             [(tagstack, item)
              for tagstack, item in binary_elements
-             if self.__attachment_update_needed(dcm,
-                                                _tagstack2id(tagstack + [item.tag]), item)
+             if func(dcm,
+                     _tagstack2id(tagstack + [item.tag]),
+                     item)
             ]  # nopep8
         for tagstack, element in elements_to_update:
             id = _tagstack2id(tagstack + [element.tag])
@@ -198,7 +226,8 @@ class DicomCouch(dict):
 
 
 def _add_element(dcm, tagstack, value):
-    """ Add element with tag, vr and value to dcm at location tagstack """
+    """ Add element with tag, vr and value to dcm
+        at location tagstack """
     current_node = dcm
     for item in tagstack[:-1]:
         try:
@@ -208,19 +237,23 @@ def _add_element(dcm, tagstack, value):
         current_node = current_node[address]
     tag = __str2tag(tagstack[-1])
     vr = pydicom.datadict.dictionary_VR(tag)
-    current_node[tag] = pydicom.dataelem.DataElement(tag, vr, value)
+    current_node[tag] = pydicom.dataelem.DataElement(tag,
+                                                     vr,
+                                                     value)
 
 
 def _tagstack2id(tagstack):
-    """ Convert a list of tags to a unique (within document) attachment id """
+    """ Convert a list of tags to a unique
+        (within document) attachment id """
     return string.join([str(tag) for tag in tagstack], ':')
 
 
 def _strip_elements(jsn, elements):
     """ Remove supplied elements from the dict object
 
-    We use this with a list of binary elements so that we don't store
-    empty tags in couchdb when we are already storing the binary data as
+    We use this with a list of binary elements so that
+    we don't store empty tags in couchdb when we are
+    already storing the binary data as
     attachments.
 
     """
@@ -237,8 +270,9 @@ def _strip_elements(jsn, elements):
 def _set_meta_info_dcm(dcm):
     """ Set the file metadata DataSet attributes
 
-    This is done by PyDicom when we pydicom.read_file(foo) but we need to do it
-    ourselves when creating a DataSet from scratch, otherwise we cannot use
+    This is done by PyDicom when we pydicom.read_file(foo)
+    but we need to do it ourselves when creating
+    a DataSet from scratch, otherwise we cannot use
     foo.pixel_array or pydicom.write_file(foo).
 
     This code is lifted from PyDicom.
@@ -247,16 +281,26 @@ def _set_meta_info_dcm(dcm):
     TransferSyntax = dcm.file_meta.TransferSyntaxUID
     if TransferSyntax == pydicom.uid.ExplicitVRLittleEndian:
         dcm.is_implicit_vr = False
-        dcm.is_little_endian = True  # This line not in PyDicom
+
+        # This line not in PyDicom
+        dcm.is_little_endian = True
+
     elif TransferSyntax == pydicom.uid.ImplicitVRLittleEndian:
         dcm.is_implicit_vr = True
         dcm.is_little_endian = True
+
     elif TransferSyntax == pydicom.uid.ExplicitVRBigEndian:
         dcm.is_implicit_vr = False
         dcm.is_little_endian = False
+
     elif TransferSyntax == pydicom.uid.DeflatedExplicitVRLittleEndian:
-        dcm.is_implicit_vr = False   # Deleted lines above as it relates
-        dcm.is_little_endian = True  # to reading compressed file data.
+
+        # Deleted lines above as it relates
+        dcm.is_implicit_vr = False
+
+        # to reading compressed file data.
+        dcm.is_little_endian = True
+
     else:
         # Any other syntax should be Explicit VR Little Endian,
         #   e.g. all Encapsulated (JPEG etc) are ExplVR-LE by
@@ -266,17 +310,21 @@ def _set_meta_info_dcm(dcm):
 
 
 def pydicom2json(dcm):
-    """ Convert the supplied PyDicom object into a json-serializable dict
+    """ Convert the supplied PyDicom object into a
+        json-serializable dict
 
-    Binary elements cannot be represented in json so we return these as
-    as separate list of the tuple (tagstack, element), where:
+    Binary elements cannot be represented in json
+    so we return these as as separate list of the
+    tuple (tagstack, element), where:
      - element  = pydicom.dataelem.DataElement
-     - tagstack = list of tags/sequence IDs that address the element
+     - tagstack = list of tags/sequence IDs that address
+                  the element
 
-    The tagstack variable means we know the absolute address of each binary
-    element. We then use this as the attachment id in couchdb - when we
-    retrieve the attachment we can then insert it at the appropriate point in
-    the tree.
+    The tagstack variable means we know the absolute
+    address of each binary element. We then use this as
+    the attachment id in couchdb - when we retrieve
+    the attachment we can then insert it at the
+    appropriate point in the tree.
 
     """
     dcm.remove_private_tags()  # No support for now
@@ -295,8 +343,8 @@ def pydicom2json(dcm):
 def __jsonify(element, binary_elements, tagstack):
     """ Convert key, value to json-serializable types
 
-    Recursive, so if value is key/value pairs then all children will get
-    converted
+    Recursive, so if value is key/value pairs then
+    all children will get converted
 
     """
     value = element.value
@@ -311,9 +359,9 @@ def __jsonify(element, binary_elements, tagstack):
         nested_data = []
         for i in range(0, len(value)):
             tagstack.append(i)
-            nested_data.append(dict(
-                (subkey, __jsonify(value[i][subkey], binary_elements, tagstack))
-                for subkey in value[i].keys()))
+            nested_data.append(dict((subkey, __jsonify(value[i][subkey],
+                                     binary_elements, tagstack))
+                               for subkey in value[i].keys()))
             tagstack.pop()
         tagstack.pop()
         return nested_data
@@ -322,7 +370,8 @@ def __jsonify(element, binary_elements, tagstack):
 
 
 def __typemap(value):
-    """ Map PyDicom types that won't serialise to JSON types """
+    """ Map PyDicom types that won't serialize
+        to JSON types """
     if type(value) == pydicom.uid.UID:
         return uid2str(value)
     elif isinstance(value, pydicom.tag.BaseTag):
@@ -332,11 +381,15 @@ def __typemap(value):
 
 
 def json2pydicom(jsn):
-    """ Convert the supplied json dict into a PyDicom object """
+    """ Convert the supplied json dict into
+        a PyDicom object """
     dataset = pydicom.dataset.Dataset()
     # Don't try to convert couch specific tags
     dicom_keys = [key for key in jsn.keys()
-                  if key not in ['_rev', '_id', '_attachments', 'file_meta']]
+                  if key not in ['_rev',
+                                 '_id',
+                                 '_attachments',
+                                 'file_meta']]
     for key in dicom_keys:
         dataset.add(__dicomify(key, jsn[key]))
     file_meta = pydicom.dataset.Dataset()
@@ -349,7 +402,9 @@ def json2pydicom(jsn):
 def __dicomify(key, value):
     """ Convert a json key, value to a PyDicom DataElement """
     tag = __str2tag(key)
-    if tag.element == 0:  # 0 tag implies group length (filreader.py pydicom)
+
+    # 0 tag implies group length (filreader.py pydicom)
+    if tag.element == 0:
         vr = 'UL'
     else:
         vr = pydicom.datadict.dictionary_VR(tag)

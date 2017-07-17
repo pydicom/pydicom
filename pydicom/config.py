@@ -2,11 +2,10 @@
 """Pydicom configuration options."""
 # Copyright (c) 2012 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
-#    See the file license.txt included with this distribution, also
-#    available at https://github.com/darcymason/pydicom
+#    See the file LICENSE included with this distribution, also
+#    available at https://github.com/pydicom/pydicom
 
 # doc strings following items are picked up by sphinx for documentation
-
 
 import logging
 import os
@@ -79,18 +78,23 @@ def DS_decimal(use_Decimal_boolean=True):
 
 # Configuration flags
 allow_DS_float = False
-"""Set allow_float to True to allow DSdecimal instances to be created with floats;
-otherwise, they must be explicitly converted to strings, with the user
-explicity setting the precision of digits and rounding. Default: False"""
+"""Set allow_float to True to allow DSdecimal instances
+to be created with floats; otherwise, they must be explicitly
+converted to strings, with the user explicity setting the
+precision of digits and rounding. Default: False"""
+
 
 enforce_valid_values = False
-"""Raise errors if any value is not allowed by DICOM standard, e.g. DS strings
-that are longer than 16 characters; IS strings outside the allowed range.
+"""Raise errors if any value is not allowed by DICOM standard,
+e.g. DS strings that are longer than 16 characters;
+IS strings outside the allowed range.
 """
 
+
 datetime_conversion = False
-"""Set datetime_conversion to convert DA, DT and TM data elements to
-datetime.date, datetime.datetime and datetime.time respectively. Default: False
+"""Set datetime_conversion to convert DA, DT and TM
+data elements to datetime.date, datetime.datetime
+and datetime.time respectively. Default: False
 """
 
 
@@ -104,10 +108,12 @@ logger.addHandler(handler)
 
 def debug(debug_on=True):
     """Turn debugging of DICOM file reading and writing on or off.
-    When debugging is on, file location and details about the elements read at
-    that location are logged to the 'pydicom' logger using python's logging module.
+    When debugging is on, file location and details about the
+    elements read at that location are logged to the 'pydicom'
+    logger using python's logging module.
 
-    :param debug_on: True (default) to turn on debugging, False to turn off.
+    :param debug_on: True (default) to turn on debugging,
+    False to turn off.
     """
     global logger, debugging
     if debug_on:
