@@ -99,4 +99,4 @@ def generate_uids(filename):
 
 if __name__ == "__main__":
     pydicom_dir = os.path.dirname(pydicom.__file__)
-    generate_uids(os.path.join(pydicom_dir, 'sopclass_uids.py'))
+    generate_uids(os.path.join(pydicom_dir, '_storage_sopclass_uids.py'))
