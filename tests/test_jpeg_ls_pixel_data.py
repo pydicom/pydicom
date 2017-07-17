@@ -53,6 +53,7 @@ color_3d_jpeg_baseline = os.path.join(test_files, "color3d_jpeg_baseline.dcm")
 dir_name = os.path.dirname(sys.argv[0])
 save_dir = os.getcwd()
 
+
 @pytest.mark.skipif(test_jpeg_ls_decoder, reason="jpeg_ls pixel data extension is being tested")
 class jpeg_ls_JPEG_LS_Tests_no_jpeg_ls(unittest.TestCase):
     def setUp(self):
@@ -83,7 +84,6 @@ class jpeg_ls_JPEG_LS_Tests_with_jpeg_ls(unittest.TestCase):
 
     def tearDown(self):
         pydicom.config.image_handlers = self.original_handlers
-
 
     def test_JPEG_LS_PixelArray(self):
         a = self.jpeg_ls_lossless.pixel_array
@@ -243,4 +243,3 @@ class jpeg_ls_JPEGlosslessTests_with_jpeg_ls(unittest.TestCase):
         """JPEGlossless: Fails gracefully when uncompressed data is asked for..."""
         with self.assertRaises((NotImplementedError, )):
             _ = self.jpeg_lossless.pixel_array
-
