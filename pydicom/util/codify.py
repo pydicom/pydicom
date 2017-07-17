@@ -311,11 +311,11 @@ if __name__ == "__main__":
                         help="Filename to write python code to. "
                         "If not specified, code is written to stdout",
                         default=sys.stdout)
-    help_exclude_size = 'Exclude binary data larger than specified (bytes)'
+    help_exclude_size = 'Exclude binary data larger than specified (bytes). '
+    help_exclude_size += 'Default is %d bytes' % default_exclude_size
     parser.add_argument('-e', '--exclude-size', type=long,
                         default=default_exclude_size,
-                        help=help_exclude_size
-                        '. Default is %d bytes' % default_exclude_size)
+                        help=help_exclude_size)
     parser.add_argument('-p', '--include-private', action="store_true",
                         help='Include private data elements '
                         '(default is to exclude them)')
