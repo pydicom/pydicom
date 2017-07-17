@@ -43,7 +43,7 @@ if [[ "$DISTRIB" == "conda" ]]; then
         conda install --yes numpy
     fi
     if [[ "$JPEG2000" == "true" ]]; then
-        apt-get install libopenjp2-7 libopenjp2-7-dev
+        sudo apt-get install libopenjp2-7 libopenjp2-7-dev
     fi
     if [[ "$JPEG_LS" == "true" ]]; then
         pip install CharPyLS
