@@ -32,7 +32,7 @@ install:
   - "python -c \"import struct; print(struct.calcsize('P') * 8)\""
 
   # Installed prebuilt dependencies from conda
-  - "conda install pip numpy nose wheel matplotlib -y -q"
+  - "conda install pip numpy nose wheel matplotlib pytest -y -q"
   - "pip install nose-timer nose-exclude"
 
   # Install other pydicom dependencies
