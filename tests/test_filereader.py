@@ -17,10 +17,8 @@ import unittest
 from pydicom.util.testing.warncheck import assertWarns
 from pydicom.dataset import Dataset, FileDataset
 from pydicom.dataelem import DataElement
-from pydicom.filebase import DicomBytesIO
-from pydicom.filereader import read_file, data_element_generator
+from pydicom.filereader import read_file
 from pydicom.errors import InvalidDicomError
-from pydicom.dataset import PropertyError
 from pydicom.tag import Tag, TupleTag
 from pydicom.uid import ImplicitVRLittleEndian
 import pydicom.valuerep
@@ -59,15 +57,6 @@ except ImportError:
     except ImportError:
         # Neither worked, so it's likely not installed.
         PILImg = None
-
-from pydicom.dataset import Dataset, FileDataset
-from pydicom.dataelem import DataElement
-from pydicom.filereader import read_file
-from pydicom.errors import InvalidDicomError
-from pydicom.tag import Tag, TupleTag
-from pydicom.uid import ImplicitVRLittleEndian
-from pydicom.util.testing.warncheck import assertWarns
-import pydicom.valuerep
 
 have_numpy = numpy is not None
 have_jpeg_ls = jpeg_ls is not None
@@ -832,9 +821,10 @@ class ReadTruncatedFileTests(unittest.TestCase):
     def testReadFileWithMissingPixelDataArray(self):
         mr = read_file(truncated_mr_name)
         mr.decode()
-        with self.assertRaisesRegexp(AttributeError,
-                                     "Amount of pixel data.*does not match "
-                                     "the expected data"):
+        msg = r"(Amount of pixel data.*" \
+            "does not match the expected data|" \
+            "Unexpected end of file. Read.*bytes of.*expected)"
+        with self.assertRaisesRegexp(NotImplementedError, msg):
             mr.pixel_array
 
 
