@@ -51,7 +51,7 @@ License
 =======
 
 pydicom has an MIT-based `license
-<https://github.com/darcymason/pydicom/blob/master/source/dicom/license.txt>`_.
+<https://github.com/pydicom/pydicom/blob/master/LICENSE>`_.
 
 
 Installing
@@ -97,8 +97,8 @@ but the install should still be ok.
 
 Installing from source (all platforms)
 --------------------------------------
-  * `Download <https://github.com/darcymason/pydicom/archive/master.zip>`_ the source code directly, or
-    `clone <github-windows://openRepo/https://github.com/darcymason/pydicom>`_ the repo with
+  * `Download <https://github.com/pydicom/pydicom/archive/master.zip>`_ the source code directly, or
+    `clone <github-windows://openRepo/https://github.com/pydicom/pydicom>`_ the repo with
     Github's desktop application.
   * In a command terminal, move to the directory with the setup.py file
   * With admin privileges, run ``python setup.py install``
@@ -122,7 +122,7 @@ Using pydicom
 Once installed, the package can be imported at a python command line or used
 in your own python program with ``import pydicom``.
 See the `examples directory
-<https://github.com/darcymason/pydicom/tree/dev/pydicom/examples>`_
+<https://github.com/pydicom/pydicom/tree/dev/pydicom/examples>`_
 for both kinds of uses. Also see the :doc:`User Guide </pydicom_user_guide>`
 for more details of how to use the package.
 
@@ -132,9 +132,9 @@ Support
 
 Please join the `pydicom discussion group <http://groups.google.com/group/pydicom>`_
 to ask questions or give feedback.
-Bugs can be submitted through the `issue tracker <https://github.com/darcymason/pydicom/issues>`_.
+Bugs can be submitted through the `issue tracker <https://github.com/pydicom/pydicom/issues>`_.
 Besides the example directory, cookbook recipes are encouraged to be posted on the
-`wiki page <https://github.com/darcymason/pydicom/wiki>`_
+`wiki page <https://github.com/pydicom/pydicom/wiki>`_
 
 New versions, major bug fixes, etc. will also be announced through the group.
 
