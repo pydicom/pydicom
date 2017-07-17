@@ -222,9 +222,8 @@ class ReaderTests(unittest.TestCase):
         """Check that we can read the Segmentation IOD data
         """
         seg = read_file(dcmqi_seg_file)
-        print(seg.pixel_array.shape)
-        print(seg.pixel_array[-1][-1])
-
+        self.assertEquals(seg.pixel_array.shape, (13, 128, 128))
+        self.assertEquals(numpy.sum(seg.pixel_array), 795)
 
     def testNoForce(self):
         """Raises exception if missing DICOM header and force==False."""
