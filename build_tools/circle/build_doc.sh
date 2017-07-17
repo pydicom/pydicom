@@ -78,7 +78,7 @@ then
     MAKE_TARGET="dist LATEXMKOPTS=-halt-on-error"
 elif [[ "$build_type" =~ ^QUICK ]]
 then
-	MAKE_TARGET=html-noplot
+	MAKE_TARGET=html
 else
     MAKE_TARGET=html
 fi
