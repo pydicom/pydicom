@@ -242,12 +242,18 @@ def convert_PN(byte_string,
                is_little_endian,
                struct_format=None,
                encoding=None):
-
     """Read and return string(s) as PersonName instance(s)"""
 
-    # XXX - We have to replicate MultiString functionality here
-    # because we can't decode easily here since that is
-    # performed in PersonNameUnicode
+    def get_valtype(x):
+        if not in_py2:
+            if encoding:
+                return PersonName(x, encoding).decode()
+            return PersonName(x).decode()
+        return PersonName(x)
+
+    # XXX - We have to replicate MultiString functionality
+    # here because we can't decode easily here since that
+    # is performed in PersonNameUnicode
     ends_with1 = byte_string.endswith(b' ')
     ends_with2 = byte_string.endswith(b'\x00')
     if byte_string and (ends_with1 or ends_with2):
@@ -255,21 +261,10 @@ def convert_PN(byte_string,
 
     splitup = byte_string.split(b"\\")
 
-    if encoding and not in_py2:
-        args = (encoding,)
-    else:
-        args = ()
-
-    # We would like to return string literals
-    if not in_py2:
-        valtype = lambda x: PersonName(x, *args).decode()  # nopep8
-    else:
-        valtype = lambda x: PersonName(x, *args)  # nopep8
-
     if len(splitup) == 1:
-        return valtype(splitup[0])
+        return get_valtype(splitup[0])
     else:
-        return MultiValue(valtype, splitup)
+        return MultiValue(get_valtype, splitup)
 
 
 def convert_string(byte_string,
