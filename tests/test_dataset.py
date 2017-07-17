@@ -60,7 +60,7 @@ class DatasetTests(unittest.TestCase):
         def callable_pixel_array():
             ds.pixel_array
 
-        msg = r"'Dataset' object has no attribute '(PixelRepresentation|TransferSyntaxUID)'"
+        msg = r"'(Dataset' object has no attribute '(PixelRepresentation|TransferSyntaxUID)|)'"
         with self.assertRaisesRegexp(NotImplementedError, msg):
             callable_pixel_array()
 
