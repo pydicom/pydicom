@@ -14,7 +14,6 @@ from struct import (
 )
 
 from io import BytesIO
-from pydicom.config import logger
 
 
 class DicomIO(object):

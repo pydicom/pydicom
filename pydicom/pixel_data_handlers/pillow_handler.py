@@ -1,9 +1,10 @@
 import sys
 import io
-import pydicom
 import pydicom.encaps
-from pydicom.config import logger
+import pydicom.uid
+import logging
 have_numpy = True
+logger = logging.getLogger('pydicom')
 try:
     import numpy
 except ImportError:

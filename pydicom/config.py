@@ -8,41 +8,10 @@
 # doc strings following items are picked up by sphinx for documentation
 
 import logging
-import os
 
 # Set the type used to hold DS values
 #    default False; was decimal-based in pydicom 0.9.7
 use_DS_decimal = False
-
-image_handlers = []
-
-have_numpy = True
-try:
-    import pydicom.pixel_data_handlers.numpy_handler as numpy_handler
-    image_handlers.append(numpy_handler)
-except ImportError:
-    have_numpy = False
-
-have_pillow = True
-try:
-    import pydicom.pixel_data_handlers.pillow_handler as pillow_handler
-    image_handlers.append(pillow_handler)
-except ImportError:
-    have_pillow = False
-
-have_jpeg_ls = True
-try:
-    import pydicom.pixel_data_handlers.jpeg_ls_handler as jpeg_ls_handler
-    image_handlers.append(jpeg_ls_handler)
-except ImportError:
-    have_jpeg_ls = False
-
-have_gdcm = True
-try:
-    import pydicom.pixel_data_handlers.gdcm_handler as gdcm_handler
-    image_handlers.append(gdcm_handler)
-except ImportError:
-    have_gdcm = False
 
 
 data_element_callback = None
@@ -104,6 +73,41 @@ handler = logging.StreamHandler()
 formatter = logging.Formatter("%(message)s")
 handler.setFormatter(formatter)
 logger.addHandler(handler)
+
+
+image_handlers = []
+
+have_numpy = True
+try:
+    import pydicom.pixel_data_handlers.numpy_handler as numpy_handler
+    image_handlers.append(numpy_handler)
+except ImportError as e:
+    logger.debug("Could not import numpy", exc_info=e)
+    have_numpy = False
+
+have_pillow = True
+try:
+    import pydicom.pixel_data_handlers.pillow_handler as pillow_handler
+    image_handlers.append(pillow_handler)
+except ImportError as e:
+    logger.debug("Could not import pillow", exc_info=e)
+    have_pillow = False
+
+have_jpeg_ls = True
+try:
+    import pydicom.pixel_data_handlers.jpeg_ls_handler as jpeg_ls_handler
+    image_handlers.append(jpeg_ls_handler)
+except ImportError as e:
+    logger.debug("Could not import jpeg_ls", exc_info=e)
+    have_jpeg_ls = False
+
+have_gdcm = True
+try:
+    import pydicom.pixel_data_handlers.gdcm_handler as gdcm_handler
+    image_handlers.append(gdcm_handler)
+except ImportError as e:
+    logger.debug("Could not import gdcm", exc_info=e)
+    have_gdcm = False
 
 
 def debug(debug_on=True):

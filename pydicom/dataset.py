@@ -702,7 +702,8 @@ class Dataset(dict):
                     last_error_message = str(e)
                     continue
             if not successfully_read_pixel_data:
-                logger.info("Pillow or JPLS did not support this transfer syntax")
+                handlers_tried = " ".join([str(x) for x in pydicom.config.image_handlers])
+                logger.info("%s did not support this transfer syntax", handlers_tried)
                 self._pixel_array = None
                 self._pixel_id = None
                 raise NotImplementedError(last_error_message)
