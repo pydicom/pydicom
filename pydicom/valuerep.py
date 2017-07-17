@@ -465,6 +465,9 @@ class DSdecimal(Decimal):
         else:
             return super(DSdecimal, self).__str__()
 
+    def __repr__(self):
+        return "\"" + str(self) + "\""
+
 
 # CHOOSE TYPE OF DS
 if config.use_DS_decimal:

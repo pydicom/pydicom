@@ -38,7 +38,7 @@ You can display the entire dataset by simply printing its string
 .. note::
     You can also view DICOM files in a collapsible tree using
     the example program `dcm_qt_tree.py
-    <https://github.com/darcymason/pydicom/blob/dev/pydicom/contrib/dcm_qt_tree.py>`_.
+    <https://github.com/pydicom/pydicom/blob/dev/pydicom/contrib/dcm_qt_tree.py>`_.
 
 You can access specific data elements by name (DICOM 'keyword') or by DICOM tag number::
 

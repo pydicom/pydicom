@@ -29,7 +29,7 @@ import sphinx_rtd_theme
 # Try to override the matplotlib configuration as early as possible
 try:
     import gen_rst
-except Exception:
+except ImportError:
     pass
 # -- General configuration ------------------------------------------------
 
