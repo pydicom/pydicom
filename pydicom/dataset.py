@@ -690,6 +690,7 @@ class Dataset(dict):
             already_have = False
         if not already_have:
             last_error_message = ''
+            last_exception = None
             successfully_read_pixel_data = False
             for x in [h for h in pydicom.config.image_handlers if h and h.supports_transfer_syntax(self)]:
                 try:
@@ -700,13 +701,18 @@ class Dataset(dict):
                 except Exception as e:
                     logger.debug("Trouble with", exc_info=e)
                     last_error_message = str(e)
+                    last_exception = e
                     continue
             if not successfully_read_pixel_data:
                 handlers_tried = " ".join([str(x) for x in pydicom.config.image_handlers])
                 logger.info("%s did not support this transfer syntax", handlers_tried)
                 self._pixel_array = None
                 self._pixel_id = None
-                raise NotImplementedError(last_error_message)
+                if last_exception:
+                    raise last_exception
+                else:
+                    msg = "No available image handler could decode this transfer syntax {}".format(self.file_meta.TransferSyntaxUID)
+                    raise NotImplementedError(msg)
             self._pixel_id = id(self.PixelData)  # is this guaranteed to work if memory is re-used??
             return self._pixel_array
         return self._pixel_array

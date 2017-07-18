@@ -824,7 +824,7 @@ class ReadTruncatedFileTests(unittest.TestCase):
         msg = r"(Amount of pixel data.*" \
             "does not match the expected data|" \
             "Unexpected end of file. Read.*bytes of.*expected)"
-        with self.assertRaisesRegexp(NotImplementedError, msg):
+        with self.assertRaisesRegexp(AttributeError, msg):
             mr.pixel_array
 
 

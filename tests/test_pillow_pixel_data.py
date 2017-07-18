@@ -11,12 +11,16 @@ pillow_handler = None
 have_pillow_handler = True
 numpy_handler = None
 have_numpy_handler = True
+have_pillow_jpeg_plugin = False
+have_pillow_jpeg2000_plugin = False
 try:
     import pydicom.pixel_data_handlers.numpy_handler as numpy_handler
 except ImportError:
     have_numpy_handler = False
 try:
     import pydicom.pixel_data_handlers.pillow_handler as pillow_handler
+    have_pillow_jpeg_plugin = pillow_handler.have_pillow_jpeg_plugin
+    have_pillow_jpeg2000_plugin = pillow_handler.have_pillow_jpeg2000_plugin
 except ImportError:
     have_pillow_handler = False
 
@@ -79,7 +83,7 @@ class pillow_JPEG_LS_Tests_no_pillow(unittest.TestCase):
             _ = self.emri_jpeg_ls_lossless.pixel_array
 
 
-@pytest.mark.skipif(test_pillow_decoder, reason=pillow_present_message)
+@pytest.mark.skipif(test_pillow_decoder and have_pillow_jpeg2000_plugin, reason=pillow_present_message)
 class pillow_JPEG2000Tests_no_pillow(unittest.TestCase):
     def setUp(self):
         self.jpeg_2k = read_file(jpeg2000_name)
@@ -112,7 +116,7 @@ class pillow_JPEG2000Tests_no_pillow(unittest.TestCase):
             _ = self.emri_jpeg_2k_lossless.pixel_array
 
 
-@pytest.mark.skipif(test_pillow_decoder, reason=pillow_present_message)
+@pytest.mark.skipif(test_pillow_decoder and have_pillow_jpeg_plugin, reason=pillow_present_message)
 class pillow_JPEGlossyTests_no_pillow(unittest.TestCase):
 
     def setUp(self):
@@ -139,7 +143,7 @@ class pillow_JPEGlossyTests_no_pillow(unittest.TestCase):
             _ = self.color_3d_jpeg.pixel_array
 
 
-@pytest.mark.skipif(test_pillow_decoder, reason=pillow_present_message)
+@pytest.mark.skipif(test_pillow_decoder and have_pillow_jpeg_plugin, reason=pillow_present_message)
 class pillow_JPEGlosslessTests_no_pillow(unittest.TestCase):
     def setUp(self):
         self.jpeg_lossless = read_file(jpeg_lossless_name)
@@ -182,7 +186,7 @@ class pillow_JPEG_LS_Tests_with_pillow(unittest.TestCase):
             _ = self.emri_jpeg_ls_lossless.pixel_array
 
 
-@pytest.mark.skipif(not test_pillow_decoder, reason=pillow_missing_message)
+@pytest.mark.skipif(not (test_pillow_decoder and have_pillow_jpeg2000_plugin), reason=pillow_missing_message)
 class pillow_JPEG2000Tests_with_pillow(unittest.TestCase):
     def setUp(self):
         self.jpeg_2k = read_file(jpeg2000_name)
@@ -219,7 +223,7 @@ class pillow_JPEG2000Tests_with_pillow(unittest.TestCase):
                          "Decoded pixel data is not all {0} (mean == {1})".format(b.mean(), a.mean()))
 
 
-@pytest.mark.skipif(not test_pillow_decoder, reason=pillow_missing_message)
+@pytest.mark.skipif(not (test_pillow_decoder and have_pillow_jpeg_plugin), reason=pillow_missing_message)
 class pillow_JPEGlossyTests_with_pillow(unittest.TestCase):
 
     def setUp(self):
@@ -249,7 +253,7 @@ class pillow_JPEGlossyTests_with_pillow(unittest.TestCase):
         self.assertEqual(tuple(a[3, 169, 290, :]), (57, 57, 57))
 
 
-@pytest.mark.skipif(not test_pillow_decoder, reason=pillow_missing_message)
+@pytest.mark.skipif(not (test_pillow_decoder and have_pillow_jpeg_plugin), reason=pillow_missing_message)
 class pillow_JPEGlosslessTests_with_pillow(unittest.TestCase):
     def setUp(self):
         self.jpeg_lossless = read_file(jpeg_lossless_name)
