@@ -712,8 +712,12 @@ class Dataset(dict):
             # from two pieces of info:
             #    self.PixelRepresentation -- 0 for unsigned, 1 for signed;
             #    self.BitsAllocated -- 8, 16, or 32
-            format_str = '%sint%d' % (('u', '')[self.PixelRepresentation],
-                                      self.BitsAllocated)
+            if self.BitsAllocated == 1:
+                # single bits are used for representation of binary data
+                format_str = 'uint8'
+            else:
+                format_str = '%sint%d' % (('u', '')[self.PixelRepresentation],
+                                          self.BitsAllocated)
             try:
                 numpy_dtype = numpy.dtype(format_str)
             except TypeError:
@@ -789,7 +793,13 @@ class Dataset(dict):
                     #   in a Numpy error later on.
                     pass
 
-        pixel_array = numpy.fromstring(pixel_bytearray, dtype=numpy_dtype)
+        if (self.BitsAllocated == 1) and (len(self.SegmentSequence)==1):
+            # if single bits are used for binary representation, a uint8 array
+            # has to be converted to a binary-valued array (that is 8 times bigger)
+            pixel_array = numpy.unpackbits(numpy.fromstring(pixel_bytearray, dtype='uint8'))
+        else:
+            pixel_array = numpy.fromstring(pixel_bytearray, dtype=numpy_dtype)
+
         length_of_pixel_array = pixel_array.nbytes
         expected_length = self.Rows * self.Columns
         if 'NumberOfFrames' in self and self.NumberOfFrames > 1:

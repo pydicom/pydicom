@@ -90,6 +90,9 @@ emri_jpeg_ls_lossless = os.path.join(test_files,
 emri_jpeg_2k_lossless = os.path.join(test_files,
                                      "emri_small_jpeg_2k_lossless.dcm")
 color_3d_jpeg_baseline = os.path.join(test_files, "color3d_jpeg_baseline.dcm")
+dcmqi_seg_file = os.path.join(test_files, "dcmqi_seg.dcm")
+dcmqi_sr_file = os.path.join(test_files, "dcmqi_tid1500.dcm")
+
 dir_name = os.path.dirname(sys.argv[0])
 save_dir = os.getcwd()
 
@@ -214,6 +217,23 @@ class ReaderTests(unittest.TestCase):
         msg = ("Did not get correct value for last pixel: "
                "expected %d, got %r" % (expected, got))
         self.assertEqual(expected, got, msg)
+
+    @unittest.skipUnless(have_numpy, "Numpy not installed")
+    def testSegIODData(self):
+        """Check that we can read the Segmentation IOD data
+        """
+        seg = read_file(dcmqi_seg_file)
+        self.assertEquals(seg.pixel_array.shape, (13, 128, 128))
+        self.assertEquals(numpy.sum(seg.pixel_array), 795)
+
+    def testSRData(self):
+        """Check that we can read the StructuredReporting Data
+        """
+        sr_data = read_file(dcmqi_sr_file)
+        self.assertEquals(sr_data[(0x0008, 0x0016)].repval, 'Enhanced SR Storage')
+        seq_tag = sr_data[0x0040, 0xa730]
+        self.assertEquals(seq_tag.VM, 6)
+        self.assertEquals(seq_tag[2][0x0040,0xa123].value, 'Reader1')
 
     def testNoForce(self):
         """Raises exception if missing DICOM header and force==False."""
