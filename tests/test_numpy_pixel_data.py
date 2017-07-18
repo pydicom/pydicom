@@ -5,7 +5,8 @@ import pytest
 import pydicom
 from pydicom.filereader import read_file
 from pydicom.tag import Tag
-
+numpy_missing_message = "numpy is not available in this test environment"
+numpy_present_message = "numpy is being tested"
 numpy_handler = None
 have_numpy_handler = True
 try:
@@ -46,7 +47,8 @@ color_3d_jpeg_baseline = os.path.join(test_files, "color3d_jpeg_baseline.dcm")
 dir_name = os.path.dirname(sys.argv[0])
 save_dir = os.getcwd()
 
-@pytest.mark.skipif(have_numpy_handler, reason="numpy pixel data extension is being tested")
+
+@pytest.mark.skipif(have_numpy_handler, reason=numpy_present_message)
 class numpy_JPEG_LS_Tests_no_numpy(unittest.TestCase):
     def setUp(self):
         self.jpeg_ls_lossless = read_file(jpeg_ls_lossless_name)
@@ -69,7 +71,7 @@ class numpy_JPEG_LS_Tests_no_numpy(unittest.TestCase):
             _ = self.emri_jpeg_ls_lossless.pixel_array
 
 
-@pytest.mark.skipif(have_numpy_handler, reason="numpy pixel data extension is being tested")
+@pytest.mark.skipif(have_numpy_handler, reason=numpy_present_message)
 class numpy_BigEndian_Tests_no_numpy(unittest.TestCase):
     def setUp(self):
         self.emri_big_endian = read_file(emri_big_endian_name)
@@ -85,7 +87,7 @@ class numpy_BigEndian_Tests_no_numpy(unittest.TestCase):
             _ = self.emri_big_endian.pixel_array
 
 
-@pytest.mark.skipif(have_numpy_handler, reason="numpy pixel data extension is being tested")
+@pytest.mark.skipif(have_numpy_handler, reason=numpy_present_message)
 class numpy_JPEG2000Tests_no_numpy(unittest.TestCase):
     def setUp(self):
         self.jpeg_2k = read_file(jpeg2000_name)
@@ -120,7 +122,7 @@ class numpy_JPEG2000Tests_no_numpy(unittest.TestCase):
             _ = self.emri_jpeg_2k_lossless.pixel_array
 
 
-@pytest.mark.skipif(have_numpy_handler, reason="numpy pixel data extension is being tested")
+@pytest.mark.skipif(have_numpy_handler, reason=numpy_present_message)
 class numpy_JPEGlossyTests_no_numpy(unittest.TestCase):
 
     def setUp(self):
@@ -148,7 +150,7 @@ class numpy_JPEGlossyTests_no_numpy(unittest.TestCase):
             _ = self.color_3d_jpeg.pixel_array
 
 
-@pytest.mark.skipif(have_numpy_handler, reason="numpy pixel data extension is being tested")
+@pytest.mark.skipif(have_numpy_handler, reason=numpy_present_message)
 class numpy_JPEGlosslessTests_no_numpy(unittest.TestCase):
     def setUp(self):
         self.jpeg = read_file(jpeg_lossless_name)
@@ -170,7 +172,7 @@ class numpy_JPEGlosslessTests_no_numpy(unittest.TestCase):
             _ = self.jpeg.pixel_array
 
 
-@pytest.mark.skipif(not have_numpy_handler, reason="numpy pixel data extension is not being tested")
+@pytest.mark.skipif(not have_numpy_handler, reason=numpy_missing_message)
 class numpy_JPEG_LS_Tests_with_numpy(unittest.TestCase):
     def setUp(self):
         self.jpeg_ls_lossless = read_file(jpeg_ls_lossless_name)
@@ -193,7 +195,7 @@ class numpy_JPEG_LS_Tests_with_numpy(unittest.TestCase):
             _ = self.emri_jpeg_ls_lossless.pixel_array
 
 
-@pytest.mark.skipif(not have_numpy_handler, reason="numpy pixel data extension is not being tested")
+@pytest.mark.skipif(not have_numpy_handler, reason=numpy_missing_message)
 class numpy_BigEndian_Tests_with_numpy(unittest.TestCase):
     def setUp(self):
         self.emri_big_endian = read_file(emri_big_endian_name)
@@ -211,8 +213,7 @@ class numpy_BigEndian_Tests_with_numpy(unittest.TestCase):
                          "Decoded big endian pixel data is not all {0} (mean == {1})".format(b.mean(), a.mean()))
 
 
-
-@pytest.mark.skipif(not have_numpy_handler, reason="numpy pixel data extension is not being tested")
+@pytest.mark.skipif(not have_numpy_handler, reason=numpy_missing_message)
 class numpy_JPEG2000Tests_with_numpy(unittest.TestCase):
     def setUp(self):
         self.jpeg_2k = read_file(jpeg2000_name)
@@ -245,7 +246,7 @@ class numpy_JPEG2000Tests_with_numpy(unittest.TestCase):
             _ = self.emri_jpeg_2k_lossless.pixel_array
 
 
-@pytest.mark.skipif(not have_numpy_handler, reason="numpy pixel data extension is not being tested")
+@pytest.mark.skipif(not have_numpy_handler, reason=numpy_missing_message)
 class numpy_JPEGlossyTests_with_numpy(unittest.TestCase):
 
     def setUp(self):
@@ -272,7 +273,7 @@ class numpy_JPEGlossyTests_with_numpy(unittest.TestCase):
             _ = self.color_3d_jpeg.pixel_array
 
 
-@pytest.mark.skipif(not have_numpy_handler, reason="numpy pixel data extension is not being tested")
+@pytest.mark.skipif(not have_numpy_handler, reason=numpy_missing_message)
 class numpy_JPEGlosslessTests_with_numpy(unittest.TestCase):
     def setUp(self):
         self.jpeg = read_file(jpeg_lossless_name)

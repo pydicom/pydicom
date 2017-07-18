@@ -1,10 +1,11 @@
 import unittest
 import os
 import sys
+import pytest
 import pydicom
 from pydicom.filereader import read_file
-import pytest
-
+jpeg_ls_missing_message = "jpeg_ls is not available in this test environment"
+jpeg_ls_present_message = "jpeg_ls is being tested"
 jpeg_ls_handler = None
 have_jpeg_ls_handler = True
 numpy_handler = None
@@ -54,7 +55,7 @@ dir_name = os.path.dirname(sys.argv[0])
 save_dir = os.getcwd()
 
 
-@pytest.mark.skipif(test_jpeg_ls_decoder, reason="jpeg_ls pixel data extension is being tested")
+@pytest.mark.skipif(test_jpeg_ls_decoder, reason=jpeg_ls_present_message)
 class jpeg_ls_JPEG_LS_Tests_no_jpeg_ls(unittest.TestCase):
     def setUp(self):
         self.jpeg_ls_lossless = read_file(jpeg_ls_lossless_name)
@@ -72,7 +73,7 @@ class jpeg_ls_JPEG_LS_Tests_no_jpeg_ls(unittest.TestCase):
             _ = self.jpeg_ls_lossless.pixel_array
 
 
-@pytest.mark.skipif(test_jpeg_ls_decoder, reason="jpeg_ls pixel data extension is being tested")
+@pytest.mark.skipif(test_jpeg_ls_decoder, reason=jpeg_ls_present_message)
 class jpeg_ls_JPEG2000Tests_no_jpeg_ls(unittest.TestCase):
     def setUp(self):
         self.jpeg_2k = read_file(jpeg2000_name)
@@ -97,7 +98,7 @@ class jpeg_ls_JPEG2000Tests_no_jpeg_ls(unittest.TestCase):
             _ = self.emri_jpeg_2k_lossless.pixel_array
 
 
-@pytest.mark.skipif(test_jpeg_ls_decoder, reason="jpeg_ls pixel data extension is being tested")
+@pytest.mark.skipif(test_jpeg_ls_decoder, reason=jpeg_ls_present_message)
 class jpeg_ls_JPEGlossyTests_no_jpeg_ls(unittest.TestCase):
 
     def setUp(self):
@@ -125,7 +126,7 @@ class jpeg_ls_JPEGlossyTests_no_jpeg_ls(unittest.TestCase):
             _ = self.color_3d_jpeg.pixel_array
 
 
-@pytest.mark.skipif(test_jpeg_ls_decoder, reason="jpeg_ls pixel data extension is being tested")
+@pytest.mark.skipif(test_jpeg_ls_decoder, reason=jpeg_ls_present_message)
 class jpeg_ls_JPEGlosslessTests_no_jpeg_ls(unittest.TestCase):
     def setUp(self):
         self.jpeg_lossless = read_file(jpeg_lossless_name)
@@ -147,7 +148,7 @@ class jpeg_ls_JPEGlosslessTests_no_jpeg_ls(unittest.TestCase):
             _ = self.jpeg_lossless.pixel_array
 
 
-@pytest.mark.skipif(not test_jpeg_ls_decoder, reason="jpeg_ls pixel data extension is not available")
+@pytest.mark.skipif(not test_jpeg_ls_decoder, reason=jpeg_ls_missing_message)
 class jpeg_ls_JPEG_LS_Tests_with_jpeg_ls(unittest.TestCase):
     def setUp(self):
         self.jpeg_ls_lossless = read_file(jpeg_ls_lossless_name)
@@ -173,7 +174,7 @@ class jpeg_ls_JPEG_LS_Tests_with_jpeg_ls(unittest.TestCase):
                          "Decoded pixel data is not all {0} (mean == {1})".format(b.mean(), a.mean()))
 
 
-@pytest.mark.skipif(not test_jpeg_ls_decoder, reason="jpeg_ls pixel data extension is not available")
+@pytest.mark.skipif(not test_jpeg_ls_decoder, reason=jpeg_ls_missing_message)
 class jpeg_ls_JPEG2000Tests_with_jpeg_ls(unittest.TestCase):
     def setUp(self):
         self.jpeg_2k = read_file(jpeg2000_name)
@@ -196,7 +197,7 @@ class jpeg_ls_JPEG2000Tests_with_jpeg_ls(unittest.TestCase):
             _ = self.emri_jpeg_2k_lossless.pixel_array
 
 
-@pytest.mark.skipif(not test_jpeg_ls_decoder, reason="jpeg_ls pixel data extension is not available")
+@pytest.mark.skipif(not test_jpeg_ls_decoder, reason=jpeg_ls_missing_message)
 class jpeg_ls_JPEGlossyTests_with_jpeg_ls(unittest.TestCase):
 
     def setUp(self):
@@ -223,7 +224,7 @@ class jpeg_ls_JPEGlossyTests_with_jpeg_ls(unittest.TestCase):
             _ = self.color_3d_jpeg.pixel_array
 
 
-@pytest.mark.skipif(not test_jpeg_ls_decoder, reason="jpeg_ls pixel data extension is not available")
+@pytest.mark.skipif(not test_jpeg_ls_decoder, reason=jpeg_ls_missing_message)
 class jpeg_ls_JPEGlosslessTests_with_jpeg_ls(unittest.TestCase):
     def setUp(self):
         self.jpeg_lossless = read_file(jpeg_lossless_name)

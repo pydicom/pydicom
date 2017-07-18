@@ -56,13 +56,12 @@ class DatasetTests(unittest.TestCase):
         ds = Dataset()
         ds.file_meta = Dataset()
         ds.PixelData = 'xyzlmnop'
-
-        def callable_pixel_array():
+        msg_from_gdcm = r"'Dataset' object has no attribute 'filename'"
+        msg_from_numpy = r"'Dataset' object has no attribute 'TransferSyntaxUID'"
+        msg_from_pillow = r"'Dataset' object has no attribute 'PixelRepresentation'"
+        msg = "("+"|".join([msg_from_gdcm, msg_from_numpy, msg_from_pillow]) + ")"
+        with self.assertRaisesRegexp(AttributeError, msg):
             ds.pixel_array
-
-        msg = r"('Dataset' object has no attribute '(PixelRepresentation|TransferSyntaxUID)'|^$)"
-        with self.assertRaisesRegexp(NotImplementedError, msg):
-            callable_pixel_array()
 
     def test_attribute_error_in_property_correct_debug(self):
         """Test AttributeError in property raises correctly."""

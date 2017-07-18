@@ -1,4 +1,5 @@
 import sys
+import pydicom.uid
 have_numpy = True
 try:
     import numpy
@@ -7,6 +8,10 @@ except ImportError:
     raise
 
 sys_is_little_endian = (sys.byteorder == 'little')
+
+
+def supports_transfer_syntax(self):
+    return self.file_meta.TransferSyntaxUID in pydicom.uid.UncompressedPixelTransferSyntaxes
 
 
 def get_pixeldata(self):
@@ -22,7 +27,7 @@ def get_pixeldata(self):
     numpy.ndarray
         The contents of the Pixel Data element (7FE0,0010) as an ndarray.
     """
-    if not self._is_uncompressed_transfer_syntax():
+    if self.file_meta.TransferSyntaxUID not in pydicom.uid.UncompressedPixelTransferSyntaxes:
         raise NotImplementedError("Pixel Data is compressed in a "
                                   "format pydicom does not yet handle. "
                                   "Cannot return array. Pydicom might "

@@ -14,6 +14,9 @@ except ImportError:
     raise
 can_use_gdcm = have_gdcm and have_numpy
 
+def supports_transfer_syntax(self):
+    return True
+
 
 def get_pixeldata(self):
     # read the file using GDCM

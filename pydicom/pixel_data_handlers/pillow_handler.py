@@ -30,6 +30,14 @@ have_pillow_jpeg_plugin = 'JpegImagePlugin' in PIL._plugins
 have_pillow_jpeg2000_plugin = 'Jpeg2KImagePlugin' in PIL._plugins
 
 
+def supports_transfer_syntax(self):
+    if have_pillow_jpeg_plugin and (self.file_meta.TransferSyntaxUID in pydicom.uid.PillowJPEGCompressedPixelTransferSyntaxes):
+        return True
+    if have_pillow_jpeg2000_plugin and (self.file_meta.TransferSyntaxUID in pydicom.uid.PillowJPEG2000CompressedPixelTransferSyntaxes):
+        return True
+    return False
+
+
 def get_pixeldata(self):
     """Use PIL to decompress compressed Pixel Data.
 

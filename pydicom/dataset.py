@@ -691,7 +691,7 @@ class Dataset(dict):
         if not already_have:
             last_error_message = ''
             successfully_read_pixel_data = False
-            for x in pydicom.config.image_handlers:
+            for x in [h for h in pydicom.config.image_handlers if h and h.supports_transfer_syntax(self)]:
                 try:
                     pixel_array = x.get_pixeldata(self)
                     self._pixel_array = self._reshape_pixel_array(pixel_array)

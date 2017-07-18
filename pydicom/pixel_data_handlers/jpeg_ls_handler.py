@@ -17,6 +17,10 @@ except ImportError:
 sys_is_little_endian = (sys.byteorder == 'little')
 
 
+def supports_transfer_syntax(self):
+    return self.file_meta.TransferSyntaxUID in pydicom.uid.JPEGLSSupportedCompressedPixelTransferSyntaxes
+
+
 def get_pixeldata(self):
     """Use jpeg_ls to decompress compressed Pixel Data.
 
