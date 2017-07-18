@@ -32,7 +32,7 @@ install:
   - "python -c \"import struct; print(struct.calcsize('P') * 8)\""
 
   # Installed prebuilt dependencies from conda
-  - "conda install pip numpy nose wheel matplotlib -y -q"
+  - "conda install pip numpy nose wheel pytest matplotlib -y -q"
   - "pip install nose-timer nose-exclude"
 
   # Install other pydicom dependencies
@@ -46,11 +46,7 @@ install:
 build: false
 
 test_script:
-  # Change to a non-source folder to make sure we run the tests on the
-  # installed library.
-  # TODO: Once the tests will be moved we have to revert this part
-  # - "cd C:\\"
-  - "python -c \"import nose; nose.main()\" -v -s --with-timer --timer-top-n 50 --exclude-dir=pydicom/tests/performance pydicom"
+  - powershell ./build_tools/appveyor/test.ps1
 
 artifacts:
   # Archive the generated packages in the ci.appveyor.com build report.
