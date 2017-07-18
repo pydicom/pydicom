@@ -1,27 +1,24 @@
 # Docs with Sphinx
 
-This documentation will be automatically built and generated with continuous integration, via the [circle.yml](../circle.yml). However, if you have need to test locally, you may not want to install dependencies. Here we are providing a simple Dockerfile to build an image that you can use to generate the docs. First, build the basic image:
+This documentation will be automatically built and generated with continuous integration, via the [circle.yml](../circle.yml). You can also generate them locally by installing dependencies (you may need the below):
+
+```
+pip install Sphinx==1.4
+pip install sphinx_rtd_theme
+pip install alabaster 
+pip install sphinx_bootstrap_theme
+```
+
+and then to generate:
 
 ```
 cd pydicom/doc
-docker build -t pydicom/pydicom-docs .
+make html
 ```
 
-Next, cd back into the repo base. We want to mount from here.
+However, if you have need to test locally, you may not want to install dependencies. We have provided a [Docker container](https://hub.docker.com/r/pydicom/pydicom-docs/) that will let you do this.
 
-```
-cd ..
-docker run --volume $PWD:/data -it pydicom/pydicom-docs
-```
-
-Then you can build the docs:
-
-```
-cd doc && make html
-exit
-```
-
-You should then be able to cd into `_build/html` on your local machine and preview with your webserver of choice
+Whether you use the above local approach or the Docker container, when you finish you should then be able to cd into `_build/html` on your local machine and preview with your webserver of choice
 
 ```
 cd doc/_build/html
