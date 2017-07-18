@@ -24,10 +24,10 @@ def get_pixeldata(self):
     """
     if not self._is_uncompressed_transfer_syntax():
         raise NotImplementedError("Pixel Data is compressed in a "
-                                      "format pydicom does not yet handle. "
-                                      "Cannot return array. Pydicom might "
-                                      "be able to convert the pixel data "
-                                      "using GDCM if it is installed.")
+                                  "format pydicom does not yet handle. "
+                                  "Cannot return array. Pydicom might "
+                                  "be able to convert the pixel data "
+                                  "using GDCM if it is installed.")
     if not have_numpy:
         msg = "The Numpy package is required to use pixel_array, and " \
               "numpy could not be imported."
@@ -66,6 +66,3 @@ def get_pixeldata(self):
     if length_of_pixel_array != expected_length:
         raise AttributeError("Amount of pixel data %d does not match the expected data %d" % (length_of_pixel_array, expected_length))
     return pixel_array
-
-
-

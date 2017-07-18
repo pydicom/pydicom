@@ -72,32 +72,6 @@ class jpeg_ls_JPEG_LS_Tests_no_jpeg_ls(unittest.TestCase):
             _ = self.jpeg_ls_lossless.pixel_array
 
 
-@pytest.mark.skipif(not test_jpeg_ls_decoder, reason="jpeg_ls pixel data extension is not available")
-class jpeg_ls_JPEG_LS_Tests_with_jpeg_ls(unittest.TestCase):
-    def setUp(self):
-        self.jpeg_ls_lossless = read_file(jpeg_ls_lossless_name)
-        self.mr_small = read_file(mr_name)
-        self.emri_jpeg_ls_lossless = read_file(emri_jpeg_ls_lossless)
-        self.emri_small = read_file(emri_name)
-        self.original_handlers = pydicom.config.image_handlers
-        pydicom.config.image_handlers = [jpeg_ls_handler, numpy_handler]
-
-    def tearDown(self):
-        pydicom.config.image_handlers = self.original_handlers
-
-    def test_JPEG_LS_PixelArray(self):
-        a = self.jpeg_ls_lossless.pixel_array
-        b = self.mr_small.pixel_array
-        self.assertEqual(a.mean(), b.mean(),
-                         "Decoded pixel data is not all {0} (mean == {1})".format(b.mean(), a.mean()))
-
-    def test_emri_JPEG_LS_PixelArray(self):
-        a = self.emri_jpeg_ls_lossless.pixel_array
-        b = self.emri_small.pixel_array
-        self.assertEqual(a.mean(), b.mean(),
-                         "Decoded pixel data is not all {0} (mean == {1})".format(b.mean(), a.mean()))
-
-
 @pytest.mark.skipif(test_jpeg_ls_decoder, reason="jpeg_ls pixel data extension is being tested")
 class jpeg_ls_JPEG2000Tests_no_jpeg_ls(unittest.TestCase):
     def setUp(self):
@@ -171,6 +145,32 @@ class jpeg_ls_JPEGlosslessTests_no_jpeg_ls(unittest.TestCase):
         """JPEGlossless: Fails gracefully when uncompressed data is asked for..."""
         with self.assertRaises((NotImplementedError, )):
             _ = self.jpeg_lossless.pixel_array
+
+
+@pytest.mark.skipif(not test_jpeg_ls_decoder, reason="jpeg_ls pixel data extension is not available")
+class jpeg_ls_JPEG_LS_Tests_with_jpeg_ls(unittest.TestCase):
+    def setUp(self):
+        self.jpeg_ls_lossless = read_file(jpeg_ls_lossless_name)
+        self.mr_small = read_file(mr_name)
+        self.emri_jpeg_ls_lossless = read_file(emri_jpeg_ls_lossless)
+        self.emri_small = read_file(emri_name)
+        self.original_handlers = pydicom.config.image_handlers
+        pydicom.config.image_handlers = [jpeg_ls_handler, numpy_handler]
+
+    def tearDown(self):
+        pydicom.config.image_handlers = self.original_handlers
+
+    def test_JPEG_LS_PixelArray(self):
+        a = self.jpeg_ls_lossless.pixel_array
+        b = self.mr_small.pixel_array
+        self.assertEqual(a.mean(), b.mean(),
+                         "Decoded pixel data is not all {0} (mean == {1})".format(b.mean(), a.mean()))
+
+    def test_emri_JPEG_LS_PixelArray(self):
+        a = self.emri_jpeg_ls_lossless.pixel_array
+        b = self.emri_small.pixel_array
+        self.assertEqual(a.mean(), b.mean(),
+                         "Decoded pixel data is not all {0} (mean == {1})".format(b.mean(), a.mean()))
 
 
 @pytest.mark.skipif(not test_jpeg_ls_decoder, reason="jpeg_ls pixel data extension is not available")

@@ -1,5 +1,6 @@
 import sys
 import pydicom
+import pydicom.uid
 have_numpy = True
 try:
     import numpy
@@ -15,6 +16,7 @@ except ImportError:
     raise
 sys_is_little_endian = (sys.byteorder == 'little')
 
+
 def get_pixeldata(self):
     """Use jpeg_ls to decompress compressed Pixel Data.
 
@@ -28,6 +30,10 @@ def get_pixeldata(self):
     ImportError
         If jpeg_ls is not available.
     """
+    if self.file_meta.TransferSyntaxUID not in pydicom.uid.JPEGLSSupportedCompressedPixelTransferSyntaxes:
+        msg = "The jpeg_ls does not support this transfer syntax {0}.".format(self.file_meta.TransferSyntaxUID)
+        raise NotImplementedError(msg)
+
     if not have_jpeg_ls:
         msg = "The jpeg_ls package is required to use pixel_array for " \
               "this transfer syntax {0}, and jpeg_ls could not be " \

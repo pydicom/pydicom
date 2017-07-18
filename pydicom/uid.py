@@ -185,15 +185,16 @@ UncompressedPixelTransferSyntaxes = [ExplicitVRLittleEndian,
 JPEGLSSupportedCompressedPixelTransferSyntaxes = [JPEGLSLossless,
                                                   JPEGLSLossy, ]
 
-PILSupportedCompressedPixelTransferSyntaxes = [JPEGBaseLineLossy8bit,
+PillowSupportedCompressedPixelTransferSyntaxes = [JPEGBaseLineLossy8bit,
                                                JPEGLossless,
                                                JPEGBaseLineLossy12bit,
                                                JPEG2000Lossless,
                                                JPEG2000Lossy, ]
-JPEG2000CompressedPixelTransferSyntaxes = [JPEG2000Lossless,
-                                           JPEG2000Lossy, ]
-JPEGLossyCompressedPixelTransferSyntaxes = [JPEGBaseLineLossy8bit,
-                                            JPEGBaseLineLossy12bit, ]
+PillowJPEG2000CompressedPixelTransferSyntaxes = [JPEG2000Lossless,
+                                                 JPEG2000Lossy, ]
+PillowJPEGCompressedPixelTransferSyntaxes = [JPEGBaseLineLossy8bit,
+                                             JPEGBaseLineLossy12bit,
+                                             JPEGLossless,]
 NotCompressedPixelTransferSyntaxes = [ExplicitVRLittleEndian,
                                       ImplicitVRLittleEndian,
                                       DeflatedExplicitVRLittleEndian,

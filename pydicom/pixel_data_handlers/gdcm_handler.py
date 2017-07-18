@@ -12,15 +12,22 @@ try:
 except ImportError:
     have_gdcm = False
     raise
+can_use_gdcm = have_gdcm and have_numpy
+
 
 def get_pixeldata(self):
     # read the file using GDCM
     # FIXME this should just use self.PixelData instead of self.filename
     #       but it is unclear how this should be achieved using GDCM
+    if not can_use_gdcm:
+        msg = "GDCM requires both the gdcm package and numpy and one or more could not be imported"
+        raise ImportError(msg)
+
     gdcm_image_reader = gdcm.ImageReader()
     gdcm_image_reader.SetFileName(self.filename)
     if not gdcm_image_reader.Read():
         raise TypeError("GDCM could not read DICOM image")
+
     gdcm_image = gdcm_image_reader.GetImage()
 
     # determine the correct numpy datatype
