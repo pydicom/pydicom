@@ -31,7 +31,8 @@ rtdose.dcm              : Impl VR Little Endian
 rtplan.dcm              : Impl VR Little Endian
 rtplan_truncated.dcm    : Impl VR Little Endian
 rtstruct.dcm            : Impl VR Little Endian
-dcmqi_seg.dcm           : DCMQI Segment Format
+dcmqi_seg.dcm           : Expl VR Little Endian
+dcmqi_tid1500.dcm       : Expl VR Little Endian
 
 
 CT_small.dcm
@@ -99,7 +100,7 @@ zipMR.gz
   * used for checking that deferred read reopens as zip again (issue 103)
   
 dcmqi_seg.dcm 
-  * voxel-based segmentation from the DCMQI project
+  * Segmentation IOD (voxel-based segmentation)
   * http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_A.51.html
 
 dcmqi_tid1500.dcm

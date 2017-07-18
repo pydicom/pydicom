@@ -793,7 +793,7 @@ class Dataset(dict):
                     #   in a Numpy error later on.
                     pass
 
-        if self.BitsAllocated == 1:
+        if (self.BitsAllocated == 1) and (len(self.SegmentSequence)==1):
             # if single bits are used for binary representation, a uint8 array
             # has to be converted to a binary-valued array (that is 8 times bigger)
             pixel_array = numpy.unpackbits(numpy.fromstring(pixel_bytearray, dtype='uint8'))
