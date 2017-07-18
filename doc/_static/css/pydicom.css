@@ -28,8 +28,16 @@
     background: #fcfcfc !important;
 }
 
+.wy-side-nav-search>a, .wy-side-nav-search .wy-dropdown>a {
+    color: #3f7cad !important
+}
+
+.version {
+    color: #3f7cad !important;
+}
+
 .wy-side-nav-search {
-   background-color: #3f7cad !important;
+   background-color: white !important;
 }
 
 .deprecated p span.versionmodified {
