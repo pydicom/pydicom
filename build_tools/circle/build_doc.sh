@@ -112,7 +112,7 @@ source activate $CONDA_ENV_NAME
 conda install --yes pip setuptools numpy matplotlib sphinx pillow sphinx_rtd_theme numpydoc
 pip install sphinx-gallery
 
-# Build and install scikit-learn in dev mode
+# Build and install pydicom in dev mode
 python setup.py develop
 
 # The pipefail is requested to propagate exit code
