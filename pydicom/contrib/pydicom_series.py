@@ -21,7 +21,6 @@ from __future__ import print_function
 #    available at https://github.com/pydicom/pydicom
 #
 
-
 # I (Almar) performed some test to loading a series of data
 # in two different ways: loading all data, and deferring loading
 # the data. Both ways seem equally fast on my system. I have to
@@ -37,7 +36,6 @@ from __future__ import print_function
 # - Full loading of data, warm: 3 sec
 # - Deferred loading of data, cold: 9 sec
 # - Deferred loading of data, warm: 3 sec
-
 
 import os
 import time
@@ -60,6 +58,7 @@ except ImportError:
 class ProgressBar(object):
     """ To print progress to the screen.
     """
+
     def __init__(self, char='-', length=20):
         self.char = char
         self.length = length
@@ -264,31 +263,31 @@ def _getPixelDataFromDataset(ds):
         else:
             # Determine required range
             minReq, maxReq = data.min(), data.max()
-            minReq = min([minReq, minReq * slope + offset,
-                          maxReq * slope + offset])
-            maxReq = max([maxReq, minReq * slope + offset,
-                          maxReq * slope + offset])
+            minReq = min(
+                [minReq, minReq * slope + offset, maxReq * slope + offset])
+            maxReq = max(
+                [maxReq, minReq * slope + offset, maxReq * slope + offset])
 
             # Determine required datatype from that
             dtype = None
             if minReq < 0:
                 # Signed integer type
                 maxReq = max([-minReq, maxReq])
-                if maxReq < 2 ** 7:
+                if maxReq < 2**7:
                     dtype = np.int8
-                elif maxReq < 2 ** 15:
+                elif maxReq < 2**15:
                     dtype = np.int16
-                elif maxReq < 2 ** 31:
+                elif maxReq < 2**31:
                     dtype = np.int32
                 else:
                     dtype = np.float32
             else:
                 # Unsigned integer type
-                if maxReq < 2 ** 8:
+                if maxReq < 2**8:
                     dtype = np.uint8
-                elif maxReq < 2 ** 16:
+                elif maxReq < 2**16:
                     dtype = np.uint16
-                elif maxReq < 2 ** 32:
+                elif maxReq < 2**32:
                     dtype = np.uint32
                 else:
                     dtype = np.float32
@@ -306,6 +305,7 @@ def _getPixelDataFromDataset(ds):
 
 
 # The public functions and classes
+
 
 def read_files(path, showProgress=False, readPixelData=False, force=False):
     """ read_files(path, showProgress=False, readPixelData=False)
@@ -604,8 +604,9 @@ class DicomSeries(object):
             ds = self._datasets[0]
             self._info = self._datasets[0]
             self._shape = [ds.Rows, ds.Columns]
-            self._sampling = [float(ds.PixelSpacing[0]),
-                              float(ds.PixelSpacing[1])]
+            self._sampling = [
+                float(ds.PixelSpacing[0]), float(ds.PixelSpacing[1])
+            ]
             return
 
         # Get previous

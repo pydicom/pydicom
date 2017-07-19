@@ -14,7 +14,6 @@ import re
 from pydicom._uid_dict import UID_dictionary
 from pydicom import compat
 
-
 valid_uid_re = '^(0|[1-9][0-9]*)(\.(0|[1-9][0-9]*))*$'
 '''Regular expression that matches valid UIDs.
    Does not enforce 64 char limit.
@@ -34,6 +33,7 @@ class InvalidUID(Exception):
 
         >>> uid = '1.2.123.'
     '''
+
     def __init__(self, value):
         self.value = value
 
@@ -53,6 +53,7 @@ class UID(str):
     String representation (__str__) will be the name,
     __repr__ will be the full 1.2.840....
     """
+
     def __new__(cls, val):
         """Set up new instance of the class"""
         # Don't repeat if already a UID class
@@ -177,28 +178,39 @@ JPEGLSLossy = UID('1.2.840.10008.1.2.4.81')
 JPEG2000Lossless = UID('1.2.840.10008.1.2.4.90')
 JPEG2000Lossy = UID('1.2.840.10008.1.2.4.91')
 
-UncompressedPixelTransferSyntaxes = [ExplicitVRLittleEndian,
-                                     ImplicitVRLittleEndian,
-                                     DeflatedExplicitVRLittleEndian,
-                                     ExplicitVRBigEndian, ]
 
-JPEGLSSupportedCompressedPixelTransferSyntaxes = [JPEGLSLossless,
-                                                  JPEGLSLossy, ]
+UncompressedPixelTransferSyntaxes = [
+    ExplicitVRLittleEndian,
+    ImplicitVRLittleEndian,
+    DeflatedExplicitVRLittleEndian,
+    ExplicitVRBigEndian,
+]
 
-PillowSupportedCompressedPixelTransferSyntaxes = [JPEGBaseLineLossy8bit,
-                                               JPEGLossless,
-                                               JPEGBaseLineLossy12bit,
-                                               JPEG2000Lossless,
-                                               JPEG2000Lossy, ]
-PillowJPEG2000CompressedPixelTransferSyntaxes = [JPEG2000Lossless,
-                                                 JPEG2000Lossy, ]
-PillowJPEGCompressedPixelTransferSyntaxes = [JPEGBaseLineLossy8bit,
-                                             JPEGBaseLineLossy12bit,
-                                             JPEGLossless,]
-NotCompressedPixelTransferSyntaxes = [ExplicitVRLittleEndian,
-                                      ImplicitVRLittleEndian,
-                                      DeflatedExplicitVRLittleEndian,
-                                      ExplicitVRBigEndian]
+JPEGLSSupportedCompressedPixelTransferSyntaxes = [
+    JPEGLSLossless,
+    JPEGLSLossy,
+]
+
+PillowSupportedCompressedPixelTransferSyntaxes = [
+    JPEGBaseLineLossy8bit,
+    JPEGLossless,
+    JPEGBaseLineLossy12bit,
+    JPEG2000Lossless,
+    JPEG2000Lossy,
+]
+PillowJPEG2000CompressedPixelTransferSyntaxes = [
+    JPEG2000Lossless,
+    JPEG2000Lossy,
+]
+PillowJPEGCompressedPixelTransferSyntaxes = [
+    JPEGBaseLineLossy8bit,
+    JPEGBaseLineLossy12bit,
+]
+NotCompressedPixelTransferSyntaxes = [
+    ExplicitVRLittleEndian, ImplicitVRLittleEndian,
+    DeflatedExplicitVRLittleEndian, ExplicitVRBigEndian
+]
+
 
 # Many thanks to the Medical Connections for offering free
 # valid UIDs (http://www.medicalconnections.co.uk/FreeUID.html)
@@ -250,10 +262,11 @@ def generate_uid(prefix=pydicom_root_UID, entropy_srcs=None):
     avail_digits = max_uid_len - len(prefix)
 
     if entropy_srcs is None:
-        entropy_srcs = [str(uuid.uuid1()),  # 128-bit from MAC/time/randomness
-                        str(os.getpid()),  # Current process ID
-                        hex(random.getrandbits(64))  # 64 bits randomness
-                        ]
+        entropy_srcs = [
+            str(uuid.uuid1()),  # 128-bit from MAC/time/randomness
+            str(os.getpid()),  # Current process ID
+            hex(random.getrandbits(64))  # 64 bits randomness
+        ]
     hash_val = hashlib.sha512(''.join(entropy_srcs).encode('utf-8'))
 
     # Convert this to an int with the maximum available digits

@@ -2,7 +2,6 @@
 recursive-include doc *
 recursive-include examples *
 include pydicom/*
-include tests/*
 include CONTRIBUTING.md
 include LICENSE
 include README.md

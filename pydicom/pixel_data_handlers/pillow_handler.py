@@ -104,7 +104,7 @@ def get_pixeldata(self):
         generic_jpeg_file_header = b''
         frame_start_from = 0
     try:
-        UncompressedPixelData = ''
+        UncompressedPixelData = b''
         if 'NumberOfFrames' in self and self.NumberOfFrames > 1:
             # multiple compressed frames
             CompressedPixelDataSeq = pydicom.encaps.decode_data_sequence(self.PixelData)

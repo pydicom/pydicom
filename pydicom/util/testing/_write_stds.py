@@ -1,5 +1,4 @@
 # _write_stds.py
-
 """Snippets for what a particular dataset (including nested sequences)
 should look like after writing in different expl/impl Vr and endian combos,
 as well as undefined length sequences and items

@@ -65,10 +65,14 @@ class ImFrame(wx.Frame):
 
         style = wx.DEFAULT_FRAME_STYLE | wx.SUNKEN_BORDER | wx.CLIP_CHILDREN
 
-        wx.Frame.__init__(self, parent, id=-1, title="",
-                          pos=wx.DefaultPosition,
-                          size=wx.Size(w=1024, h=768),
-                          style=style)
+        wx.Frame.__init__(
+            self,
+            parent,
+            id=-1,
+            title="",
+            pos=wx.DefaultPosition,
+            size=wx.Size(w=1024, h=768),
+            style=style)
 
         # --------------------------------------------------------
         # Set up the menubar.
@@ -96,19 +100,16 @@ class ImFrame(wx.Frame):
         # Create the folderTreeView on the left.
         # -------------------------------------------------------------
         dsstyle = wx.TR_LINES_AT_ROOT | wx.TR_HAS_BUTTONS
-        self.dsTreeView = wx.TreeCtrl(self.mainSplitter,
-                                      style=dsstyle)
+        self.dsTreeView = wx.TreeCtrl(self.mainSplitter, style=dsstyle)
 
         # --------------------------------------------------------
         # Create the ImageView on the right pane.
         # --------------------------------------------------------
         imstyle = wx.VSCROLL | wx.HSCROLL | wx.CLIP_CHILDREN
-        self.imView = wx.Panel(self.mainSplitter,
-                               style=imstyle)
+        self.imView = wx.Panel(self.mainSplitter, style=imstyle)
 
         self.imView.Bind(wx.EVT_PAINT, self.OnPaint)
-        self.imView.Bind(wx.EVT_ERASE_BACKGROUND,
-                         self.OnEraseBackground)
+        self.imView.Bind(wx.EVT_ERASE_BACKGROUND, self.OnEraseBackground)
 
         self.imView.Bind(wx.EVT_SIZE, self.OnSize)
 
@@ -155,19 +156,16 @@ class ImFrame(wx.Frame):
         for data_element in ds:
             if isinstance(data_element.value, compat.text_type):
                 text = compat.text_type(data_element)
-                ip = self.dsTreeView.AppendItem(parent,
-                                                text=text)
+                ip = self.dsTreeView.AppendItem(parent, text=text)
             else:
-                ip = self.dsTreeView.AppendItem(parent,
-                                                text=str(data_element))
+                ip = self.dsTreeView.AppendItem(parent, text=str(data_element))
 
             if data_element.VR == "SQ":
                 for i, ds in enumerate(data_element.value):
                     item_describe = data_element.name.replace(" Sequence", "")
                     item_text = "%s %d" % (item_describe, i + 1)
                     rjust = item_text.rjust(128)
-                    parentNodeID = self.dsTreeView.AppendItem(ip,
-                                                              text=rjust)
+                    parentNodeID = self.dsTreeView.AppendItem(ip, text=rjust)
                     self.recurse_tree(ds, parentNodeID)
 
 # --- Most of what is important happens below this line ---------------------
@@ -248,14 +246,14 @@ class ImFrame(wx.Frame):
         win = window
         lvl = level
 
-        e = [0,
-             255,
-             lambda data: ((data - (lvl - 0.5)) / (win - 1) + 0.5) * (255 - 0)]
-        return np.piecewise(data,
-                            [data <= (lvl - 0.5 - (win - 1) / 2),
-                             data > (lvl - 0.5 + (win - 1) / 2)],
-                            e
-                            )
+        e = [
+            0, 255,
+            lambda data: ((data - (lvl - 0.5)) / (win - 1) + 0.5) * (255 - 0)
+        ]
+        return np.piecewise(data, [
+            data <= (lvl - 0.5 - (win - 1) / 2),
+            data > (lvl - 0.5 + (win - 1) / 2)
+        ], e)
 
     # -----------------------------------------------------------
     # ImFrame.loadPIL_LUT(dataset)
@@ -266,12 +264,12 @@ class ImFrame(wx.Frame):
             raise ImportError("Python Imaging Library is not available."
                               " See http://www.pythonware.com/products/pil/"
                               " to download and install")
-        if('PixelData' not in dataset):
+        if 'PixelData' not in dataset:
             raise TypeError("Cannot show image -- "
                             "DICOM dataset does not have pixel data")
 
         # can only apply LUT if these values exist
-        if('WindowWidth' not in dataset) or ('WindowCenter' not in dataset):
+        if ('WindowWidth' not in dataset) or ('WindowCenter' not in dataset):
             bits = dataset.BitsAllocated
             samples = dataset.SamplesPerPixel
             if bits == 8 and samples == 1:
@@ -292,16 +290,12 @@ class ImFrame(wx.Frame):
 
             # Recommended to specify all details by
             # http://www.pythonware.com/library/pil/handbook/image.htm
-            im = PIL.Image.frombuffer(mode,
-                                      size,
-                                      dataset.PixelData,
-                                      "raw",
+            im = PIL.Image.frombuffer(mode, size, dataset.PixelData, "raw",
                                       mode, 0, 1)
         else:
 
-            image = self.get_LUT_value(dataset.pixel_array,
-                                       dataset.WindowWidth,
-                                       dataset.WindowCenter)
+            image = self.get_LUT_value(
+                dataset.pixel_array, dataset.WindowWidth, dataset.WindowCenter)
 
             # Convert mode to L since LUT has only 256 values:
             # http://www.pythonware.com/library/pil/handbook/image.htm
@@ -326,12 +320,13 @@ class ImFrame(wx.Frame):
                 self.bitmap = wx.BitmapFromImage(tmpImage)
                 self.Refresh()
 
-# ------ This is just the initialization of the App  ----
 
+# ------ This is just the initialization of the App  ----
 
 # =======================================================
 # The main App Class.
 # =======================================================
+
 
 class App(wx.App):
     """Image Application."""
@@ -346,7 +341,6 @@ class App(wx.App):
 # If this file is running as main or a
 # standalone test, begin execution here.
 # ------------------------------------------------------
-
 
 if __name__ == '__main__':
     app = App(0)

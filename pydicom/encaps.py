@@ -25,10 +25,7 @@
 import pydicom.config
 
 from pydicom.filebase import DicomBytesIO
-from pydicom.tag import (
-    ItemTag,
-    SequenceDelimiterTag
-)
+from pydicom.tag import (ItemTag, SequenceDelimiterTag)
 
 
 def decode_data_sequence(data):
@@ -101,9 +98,7 @@ def read_item(fp):
             "Expected Item with tag %s at data position 0x%x",
             ItemTag,
             fp.tell() - 4)
-
         length = fp.read_UL()
-
     else:
         length = fp.read_UL()
         pydicom.config.logger.debug(

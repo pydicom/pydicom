@@ -28,10 +28,11 @@ import sys
 from pydicom import compat
 from pydicom.charset import default_encoding, convert_encodings
 from pydicom.datadict import dictionary_VR
-from pydicom.datadict import tag_for_keyword, keyword_for_tag, repeater_has_keyword
+from pydicom.datadict import (tag_for_keyword, keyword_for_tag,
+                              repeater_has_keyword)
 from pydicom.tag import Tag, BaseTag
 from pydicom.dataelem import DataElement, DataElement_from_raw, RawDataElement
-from pydicom.uid import NotCompressedPixelTransferSyntaxes, UncompressedPixelTransferSyntaxes
+from pydicom.uid import NotCompressedPixelTransferSyntaxes
 from pydicom.tagtools import tag_in_exception
 import pydicom  # for write_file
 import pydicom.charset
@@ -142,7 +143,7 @@ class Dataset(dict):
     """
     indent_chars = "   "
 
-    # Python 2: Classes which define __eq__ should flag themselves as unhashable
+    # Python 2: Classes defining __eq__ should flag themselves as unhashable
     __hash__ = None
 
     def __init__(self, *args, **kwargs):
@@ -241,7 +242,8 @@ class Dataset(dict):
         if tag is not None:
             return dict.__contains__(self, tag)
         else:
-            return dict.__contains__(self, name)  # will no doubt raise an exception
+            return dict.__contains__(self,
+                                     name)  # will no doubt raise an exception
 
     def decode(self):
         """Apply character set decoding to all DataElements in the Dataset.
@@ -285,7 +287,8 @@ class Dataset(dict):
         # First check if a valid DICOM keyword and if we have that data element
         tag = tag_for_keyword(name)
         if tag is not None and tag in self:
-            dict.__delitem__(self, tag)  # direct to dict as we know we have key
+            dict.__delitem__(self,
+                             tag)  # direct to dict as we know we have key
         # If not a DICOM name in this dataset, check for regular instance name
         #   can't do delete directly, that will call __delattr__ again
         elif name in self.__dict__:
@@ -343,10 +346,11 @@ class Dataset(dict):
         """
         # Force zip object into a list in case of python3. Also backwards
         # compatible
-        meths = set(list(zip(*inspect.getmembers(Dataset,
-                                                 inspect.isroutine)))[0])
-        props = set(list(zip(*inspect.getmembers(Dataset,
-                                                 inspect.isdatadescriptor)))[0])
+        meths = set(
+            list(zip(*inspect.getmembers(Dataset, inspect.isroutine)))[0])
+        props = set(
+            list(zip(*inspect.getmembers(Dataset, inspect.isdatadescriptor)))[
+                0])
         dicom_names = set(self.dir())
         alldir = sorted(props | meths | dicom_names)
         return alldir
@@ -401,7 +405,8 @@ class Dataset(dict):
             return True
 
         if isinstance(other, self.__class__):
-            # Compare Elements using values() and class variables using __dict__
+            # Compare Elements using values() and class variables using
+            # __dict__
             # Convert values() to a list for compatibility between
             #   python 2 and 3
             return (list(self.values()) == list(other.values()) and
@@ -423,8 +428,8 @@ class Dataset(dict):
         Returns
         -------
         value
-            If `key` is the keyword for a DataElement in the Dataset then return
-            the DataElement's value.
+            If `key` is the keyword for a DataElement in the Dataset then
+            return the DataElement's value.
         pydicom.dataelem.DataElement
             If `key` is a tag for a DataElement in the Dataset then return the
             DataElement instance.
@@ -465,8 +470,8 @@ class Dataset(dict):
         -------
         value
               If `name` matches a DICOM keyword, returns the corresponding
-              DataElement's value. Otherwise returns the class attribute's value
-              (if present).
+              DataElement's value. Otherwise returns the class attribute's
+              value (if present).
         """
         tag = tag_for_keyword(name)
         if tag is None:  # `name` isn't a DICOM element keyword
@@ -526,9 +531,9 @@ class Dataset(dict):
         Returns
         -------
         pydicom.dataelem.DataElement or pydicom.dataset.Dataset
-            If a single DICOM element tag is used then returns the corresponding
-            DataElement. If a slice is used then returns a Dataset object
-            containing the corresponding DataElements.
+            If a single DICOM element tag is used then returns the
+            corresponding DataElement. If a slice is used then returns a
+            Dataset object containing the corresponding DataElements.
         """
         # If passed a slice, return a Dataset containing the corresponding
         #   DataElements
@@ -547,10 +552,9 @@ class Dataset(dict):
             # If a deferred read, then go get the value now
             if data_elem.value is None:
                 from pydicom.filereader import read_deferred_data_element
-                data_elem = read_deferred_data_element(self.fileobj_type,
-                                                       self.filename,
-                                                       self.timestamp,
-                                                       data_elem)
+                data_elem = read_deferred_data_element(
+                    self.fileobj_type, self.filename, self.timestamp,
+                    data_elem)
 
             if tag != (0x08, 0x05):
                 character_set = self._character_set
@@ -562,8 +566,8 @@ class Dataset(dict):
             # If the Element has an ambiguous VR, try to correct it
             if 'or' in self[tag].VR:
                 from pydicom.filewriter import correct_ambiguous_vr_element
-                self[tag] = correct_ambiguous_vr_element(self[tag], self,
-                                                         data_elem[6])
+                self[tag] = correct_ambiguous_vr_element(
+                    self[tag], self, data_elem[6])
 
         return dict.__getitem__(self, tag)
 
@@ -632,14 +636,14 @@ class Dataset(dict):
     def _is_uncompressed_transfer_syntax(self):
         """Return True if the TransferSyntaxUID is a compressed syntax."""
         # FIXME uses file_meta here, should really only be thus for FileDataset
-        return self.file_meta.TransferSyntaxUID in NotCompressedPixelTransferSyntaxes
+        return self.file_meta.TransferSyntaxUID in (
+            NotCompressedPixelTransferSyntaxes)
 
     def __ne__(self, other):
         """Compare `self` and `other` for inequality."""
         return not (self == other)
 
     def _reshape_pixel_array(self, pixel_array):
-
         # Note the following reshape operations return a new *view* onto
         #   pixel_array, but don't copy the data
         if 'NumberOfFrames' in self and self.NumberOfFrames > 1:
@@ -656,13 +660,11 @@ class Dataset(dict):
             if self.SamplesPerPixel > 1:
                 if self.BitsAllocated == 8:
                     if self.PlanarConfiguration == 0:
-                        pixel_array = pixel_array.reshape(self.Rows,
-                                                          self.Columns,
-                                                          self.SamplesPerPixel)
+                        pixel_array = pixel_array.reshape(
+                            self.Rows, self.Columns, self.SamplesPerPixel)
                     else:
-                        pixel_array = pixel_array.reshape(self.SamplesPerPixel,
-                                                          self.Rows,
-                                                          self.Columns)
+                        pixel_array = pixel_array.reshape(
+                            self.SamplesPerPixel, self.Rows, self.Columns)
                         pixel_array = pixel_array.transpose(1, 2, 0)
                 else:
                     raise NotImplementedError("This code only handles "
@@ -729,13 +731,15 @@ class Dataset(dict):
         return self._get_pixel_array()
 
     # Format strings spec'd according to python string formatting options
-    #    See http://docs.python.org/library/stdtypes.html#string-formatting-operations
+    #    See http://docs.python.org/library/stdtypes.html#string-formatting-operations # noqa
     default_element_format = "%(tag)s %(name)-35.35s %(VR)s: %(repval)s"
-    default_sequence_element_format = "%(tag)s %(name)-35.35s %(VR)s: %(repval)s"
+    default_sequence_element_format = "%(tag)s %(name)-35.35s %(VR)s: %(repval)s"  # noqa
 
-    def formatted_lines(self, element_format=default_element_format,
-                        sequence_element_format=default_sequence_element_format,
-                        indent_format=None):
+    def formatted_lines(
+            self,
+            element_format=default_element_format,
+            sequence_element_format=default_sequence_element_format,
+            indent_format=None):
         """Iterate through the Dataset yielding formatted str for each element.
 
         Parameters
@@ -759,11 +763,13 @@ class Dataset(dict):
         for data_element in self.iterall():
             # Get all the attributes possible for this data element (e.g.
             #   gets descriptive text name too)
-            # This is the dictionary of names that can be used in the format string
+            # This is the dictionary of names that can be used in the format
+            #   string
             elem_dict = dict([(x, getattr(data_element, x)()
-                               if callable(getattr(data_element, x))
-                               else getattr(data_element, x))
-                              for x in dir(data_element) if not x.startswith("_")])
+                               if callable(getattr(data_element, x)) else
+                               getattr(data_element, x))
+                              for x in dir(data_element)
+                              if not x.startswith("_")])
             if data_element.VR == "SQ":
                 yield sequence_element_format % elem_dict
             else:
@@ -774,7 +780,7 @@ class Dataset(dict):
 
         This private method is called by the __str__() method for handling
         print statements or str(dataset), and the __repr__() method.
-        It is also used by top(), which is the reason for the top_level_only flag.
+        It is also used by top(), therefore the top_level_only flag.
         This function recurses, with increasing indentation levels.
 
         Parameters
@@ -795,11 +801,11 @@ class Dataset(dict):
         nextindent_str = self.indent_chars * (indent + 1)
         for data_element in self:
             with tag_in_exception(data_element.tag):
-                if data_element.VR == "SQ":   # a sequence
+                if data_element.VR == "SQ":  # a sequence
                     strings.append(indent_str + str(data_element.tag) +
-                                   "  %s   %i item(s) ---- "
-                                   % (data_element.description(),
-                                      len(data_element.value)))
+                                   "  %s   %i item(s) ---- " %
+                                   (data_element.description(),
+                                    len(data_element.value)))
                     if not top_level_only:
                         for dataset in data_element.value:
                             strings.append(dataset._pretty_str(indent + 1))
@@ -810,11 +816,13 @@ class Dataset(dict):
 
     def remove_private_tags(self):
         """Remove all private DataElements in the Dataset."""
+
         def RemoveCallback(dataset, data_element):
             """Internal method to use as callback to walk() method."""
             if data_element.tag.is_private:
                 # can't del self[tag] - won't be right dataset on recursion
                 del dataset[data_element.tag]
+
         self.walk(RemoveCallback)
 
     def save_as(self, filename, write_like_original=True):
@@ -846,8 +854,8 @@ class Dataset(dict):
         write_like_original : bool
             If True (default), preserves the following information from
             the Dataset (and may result in a non-conformant file):
-            - preamble -- if the original file has no preamble then none will be
-                written.
+            - preamble -- if the original file has no preamble then none will
+                be written.
             - file_meta -- if the original file was missing any required File
                 Meta Information Group elements then they will not be added or
                 written.
@@ -855,8 +863,8 @@ class Dataset(dict):
                 then it may have its value updated.
             - seq.is_undefined_length -- if original had delimiters, write them
                 now too, instead of the more sensible length characters
-            - is_undefined_length_sequence_item -- for datasets that belong to a
-                sequence, write the undefined length delimiters if that is
+            - is_undefined_length_sequence_item -- for datasets that belong to
+                a sequence, write the undefined length delimiters if that is
                 what the original had.
             If False, produces a file conformant with the DICOM File Format,
             with explicit lengths for all elements.
@@ -897,7 +905,8 @@ class Dataset(dict):
         """
         tag = tag_for_keyword(name)
         if tag is not None:  # successfully mapped name to a tag
-            if tag not in self:  # don't have this tag yet->create the data_element instance
+            if tag not in self:
+                # don't have this tag yet->create the data_element instance
                 VR = dictionary_VR(tag)
                 data_element = DataElement(tag, VR, value)
             else:  # already have this data_element, just changing its value
@@ -909,7 +918,9 @@ class Dataset(dict):
             raise ValueError('{} is a DICOM repeating group element and must '
                              'be added using the add() or add_new() methods.'
                              .format(name))
-        else:  # name not in dicom dictionary - setting a non-dicom instance attribute
+        else:
+            # name not in dicom dictionary - setting a non-dicom instance
+            # attribute
             # XXX note if user mis-spells a dicom data_element - no error!!!
             super(Dataset, self).__setattr__(name, value)
 
@@ -951,8 +962,8 @@ class Dataset(dict):
             private_creator_tag = Tag(tag.group, private_block)
             if private_creator_tag in self and tag != private_creator_tag:
                 if isinstance(data_element, RawDataElement):
-                    data_element = DataElement_from_raw(data_element,
-                                                        self._character_set)
+                    data_element = DataElement_from_raw(
+                        data_element, self._character_set)
                 data_element.private_creator = self[private_creator_tag].value
         dict.__setitem__(self, tag, data_element)
 
@@ -1060,7 +1071,8 @@ class Dataset(dict):
             with tag_in_exception(tag):
                 data_element = self[tag]
                 callback(self, data_element)  # self = this Dataset
-                # 'tag in self' below needed in case callback deleted data_element
+                # 'tag in self' below needed in case callback deleted
+                # data_element
                 if recursive and tag in self and data_element.VR == "SQ":
                     sequence = data_element.value
                     for dataset in sequence:
@@ -1093,8 +1105,14 @@ class FileDataset(Dataset):
         The modification time of the file the dataset was read from, None if
         the modification time is not available.
     """
-    def __init__(self, filename_or_obj, dataset, preamble=None, file_meta=None,
-                 is_implicit_VR=True, is_little_endian=True):
+
+    def __init__(self,
+                 filename_or_obj,
+                 dataset,
+                 preamble=None,
+                 file_meta=None,
+                 is_implicit_VR=True,
+                 is_little_endian=True):
         """Initialize a Dataset read from a DICOM file.
 
         Parameters
@@ -1128,13 +1146,17 @@ class FileDataset(Dataset):
             # This is the appropriate constructor for io.BufferedReader
             self.fileobj_type = open
         else:
-            self.fileobj_type = filename_or_obj.__class__  # use __class__ python <2.7?; http://docs.python.org/reference/datamodel.html
+            # use __class__ python <2.7?;
+            # http://docs.python.org/reference/datamodel.html
+            self.fileobj_type = filename_or_obj.__class__
             if getattr(filename_or_obj, "name", False):
                 self.filename = filename_or_obj.name
-            elif getattr(filename_or_obj, "filename", False):  # gzip python <2.7?
+            elif getattr(filename_or_obj, "filename",
+                         False):  # gzip python <2.7?
                 self.filename = filename_or_obj.filename
             else:
-                self.filename = None  # e.g. came from BytesIO or something file-like
+                # e.g. came from BytesIO or something file-like
+                self.filename = None
         self.timestamp = None
         if stat_available and self.filename and os.path.exists(self.filename):
             statinfo = os.stat(self.filename)

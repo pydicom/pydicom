@@ -61,7 +61,7 @@ def get_pixeldata(self):
         numpy_format = numpy_format.newbyteorder('S')
 
     # decompress here
-    UncompressedPixelData = ''
+    UncompressedPixelData = b''
     if 'NumberOfFrames' in self and self.NumberOfFrames > 1:
         # multiple compressed frames
         CompressedPixelDataSeq = pydicom.encaps.decode_data_sequence(self.PixelData)
