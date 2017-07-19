@@ -22,9 +22,7 @@ def filedump(filename, start_address=0, stop_address=None):
        standard hex dump 16 bytes wide"""
 
     fp = open(filename, 'rb')
-    return hexdump(fp,
-                   start_address,
-                   stop_address)
+    return hexdump(fp, start_address, stop_address)
 
 
 def datadump(data):
@@ -33,8 +31,7 @@ def datadump(data):
     print(hexdump(fp, 0, stop_address))
 
 
-def hexdump(file_in, start_address=0,
-            stop_address=None, showAddress=True):
+def hexdump(file_in, start_address=0, stop_address=None, showAddress=True):
     """Return a formatted string of hex bytes and characters in data.
 
     This is a utility function for debugging file writing.
@@ -47,7 +44,7 @@ def hexdump(file_in, start_address=0,
     blanks = ' ' * byteslen
 
     file_in.seek(start_address)
-    data = True   # dummy to start the loop
+    data = True  # dummy to start the loop
     while data:
         if stop_address and file_in.tell() > stop_address:
             break
@@ -86,11 +83,10 @@ def pretty_print(ds, indent=0, indent_chars="   "):
     indentStr = indent_chars * indent
     nextIndentStr = indent_chars * (indent + 1)
     for data_element in ds:
-        if data_element.VR == "SQ":   # a sequence
+        if data_element.VR == "SQ":  # a sequence
             fmt_str = "{0:s}{1:s} {2:s}  {3:d} item(s) ---"
             new_str = fmt_str.format(indentStr,
-                                     str(data_element.tag),
-                                     data_element.name,
+                                     str(data_element.tag), data_element.name,
                                      len(data_element.value))
             print(new_str)
             for dataset in data_element.value:

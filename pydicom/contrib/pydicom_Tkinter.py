@@ -13,7 +13,6 @@
 #        under Windows XP Professional 2002, and Mac OS X 10.5.5,
 #        using numpy 1.3.0 and a small random selection of MRI and
 #        CT images.
-
 '''
 View DICOM images from pydicom
 
@@ -61,15 +60,16 @@ def get_PGM_bytedata_string(arr):
     # array.shape is (#rows, #cols) tuple; PGM input needs this reversed
     col_row_string = ' '.join(reversed([str(x) for x in arr.shape]))
 
-    bytedata_string = '\n'.join(('P5',
-                                 col_row_string,
-                                 str(arr.max()),
+    bytedata_string = '\n'.join(('P5', col_row_string, str(arr.max()),
                                  arr.tostring()))
     return bytedata_string
 
 
-def get_PGM_from_numpy_arr(arr, window_center, window_width,
-                           lut_min=0, lut_max=255):
+def get_PGM_from_numpy_arr(arr,
+                           window_center,
+                           window_width,
+                           lut_min=0,
+                           lut_max=255):
     '''real-valued numpy input  ->  PGM-image formatted byte string
 
     arr: real-valued numpy array to display as grayscale image
@@ -150,7 +150,7 @@ def get_tkinter_photoimage_from_pydicom_image(data):
         wc = data.WindowCenter
         ww = data.WindowWidth
         try:
-            wc = wc[0]            # can be multiple values
+            wc = wc[0]  # can be multiple values
         except Exception:
             pass
         try:

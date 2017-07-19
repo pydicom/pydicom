@@ -28,6 +28,7 @@ class Sequence(MultiValue):
     substituted for type_constructor when constructing
     the MultiValue super class
     """
+
     def __init__(self, iterable=None):
         """Initialize a list of Datasets.
 
@@ -60,5 +61,8 @@ class Sequence(MultiValue):
     def __repr__(self):
         """String representation of the Sequence."""
         formatstr = "<%(classname)s, length %(count)d, at %(id)X>"
-        return formatstr % {'classname': self.__class__.__name__,
-                            'id': id(self), 'count': len(self)}
+        return formatstr % {
+            'classname': self.__class__.__name__,
+            'id': id(self),
+            'count': len(self)
+        }

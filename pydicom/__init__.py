@@ -1,5 +1,4 @@
 # __init__.py for Dicom package
-
 """pydicom package -- easily handle DICOM files.
    See Quick Start below.
 

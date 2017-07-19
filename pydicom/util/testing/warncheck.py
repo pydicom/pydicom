@@ -17,13 +17,11 @@ def assertWarns(self, warn_msg, function, *func_args, **func_kwargs):
 
     Return the function return value.
     """
-    result, all_warnings = capture_warnings(function,
-                                            *func_args,
+    result, all_warnings = capture_warnings(function, *func_args,
                                             **func_kwargs)
 
     msg = "Expected one warning; got {0:d}"
-    self.assertTrue(len(all_warnings) == 1,
-                    msg.format(len(all_warnings)))
+    self.assertTrue(len(all_warnings) == 1, msg.format(len(all_warnings)))
 
     msg = "Expected warning message '{0:s}...'; got '{1:s}'"
     self.assertTrue(warn_msg in all_warnings[0],

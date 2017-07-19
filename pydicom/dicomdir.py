@@ -18,8 +18,14 @@ class DicomDir(FileDataset):
     methods are available,
     specific to the Directory structure
     """
-    def __init__(self, filename_or_obj, dataset, preamble=None, file_meta=None,
-                 is_implicit_VR=True, is_little_endian=True):
+
+    def __init__(self,
+                 filename_or_obj,
+                 dataset,
+                 preamble=None,
+                 file_meta=None,
+                 is_implicit_VR=True,
+                 is_little_endian=True):
         """Initialize a DICOMDIR dataset read from a DICOM file
         Carries forward all the initialization from
         FileDataset class
@@ -46,9 +52,14 @@ class DicomDir(FileDataset):
             if not class_uid == "Media Storage Directory Storage":
                 msg = "SOP Class is not Media Storage Directory (DICOMDIR)"
                 raise InvalidDicomError(msg)
-        FileDataset.__init__(self, filename_or_obj, dataset,
-                             preamble, file_meta,
-                             is_implicit_VR=True, is_little_endian=True)
+        FileDataset.__init__(
+            self,
+            filename_or_obj,
+            dataset,
+            preamble,
+            file_meta,
+            is_implicit_VR=True,
+            is_little_endian=True)
         self.parse_records()
 
     def parse_records(self):
@@ -60,6 +71,7 @@ class DicomDir(FileDataset):
 
         :return: None
         """
+
         # Define a helper function for organizing the records
         def get_siblings(record, map_offset_to_record):
             """Return a list of all siblings of the given directory record,

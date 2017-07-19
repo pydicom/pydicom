@@ -2,6 +2,7 @@
 """Code for multi-value data elements values,
 or any list of items that must all be the same type.
 """
+
 # Copyright (c) 2009-2012 Darcy Mason
 # This file is part of pydicom, relased under an MIT-style license.
 #    See the file LICENSE included with this distribution, also
@@ -40,8 +41,9 @@ class MultiValue(list):
         self.type_constructor = type_constructor
 
         if isinstance(type_constructor, (DSfloat, IS, DSdecimal)):
-            converted_list = [type_constructor(x) if x != ''
-                              else x for x in iterable]
+            converted_list = [
+                type_constructor(x) if x != '' else x for x in iterable
+            ]
         else:
             converted_list = [type_constructor(x) for x in iterable]
         super(MultiValue, self).__init__(converted_list)
@@ -54,11 +56,10 @@ class MultiValue(list):
 
     def extend(self, list_of_vals):
         super(MultiValue, self).extend((self.type_constructor(x)
-                                       for x in list_of_vals))
+                                        for x in list_of_vals))
 
     def insert(self, position, val):
-        super(MultiValue, self).insert(position,
-                                       self.type_constructor(val))
+        super(MultiValue, self).insert(position, self.type_constructor(val))
 
     def __setitem__(self, i, val):
         """Set an item of the list, making sure it is of the right VR type"""
@@ -71,4 +72,5 @@ class MultiValue(list):
     def __str__(self):
         lines = [str(x) for x in self]
         return "['" + "', '".join(lines) + "']"
+
     __repr__ = __str__
