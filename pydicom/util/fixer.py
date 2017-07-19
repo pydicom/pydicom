@@ -32,8 +32,7 @@ def fix_separator_callback(raw_elem, **kwargs):
     if try_replace:
         # Note value has not been decoded yet when this function called,
         #    so need to replace backslash as bytes
-        new_value = raw_elem.value.replace(kwargs['invalid_separator'],
-                                           b"\\")
+        new_value = raw_elem.value.replace(kwargs['invalid_separator'], b"\\")
         return_val = raw_elem._replace(value=new_value)
 
     return return_val

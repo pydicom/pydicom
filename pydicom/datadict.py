@@ -29,7 +29,7 @@ for mask_x in RepeatersDictionary:
     # then AND those out with 0 bits at the "x"
     # ("we don't care") location using mask2
     mask1 = int(mask_x.replace("x", "0"), 16)
-    mask2 = int("".join(["F0"[c == "x"] for c in mask_x]), 16)
+    mask2 = int("".join(["F0" [c == "x"] for c in mask_x]), 16)
     masks[mask_x] = (mask1, mask2)
 
 
@@ -119,8 +119,8 @@ def add_dict_entries(new_entries_dict):
     DicomDictionary.update(new_entries_dict)
 
     # Update the reverse mapping from name to tag
-    new_names_dict = dict([(val[4], tag) for tag, val in
-                          new_entries_dict.items()])
+    new_names_dict = dict([(val[4], tag)
+                           for tag, val in new_entries_dict.items()])
     keyword_dict.update(new_names_dict)
 
 
@@ -199,7 +199,7 @@ def keyword_for_tag(tag):
 # Provide for the 'reverse' lookup. Given the keyword, what is the tag?
 logger.debug("Reversing DICOM dictionary so can look up tag from a keyword...")
 keyword_dict = dict([(dictionary_keyword(tag), tag)
-                    for tag in DicomDictionary])
+                     for tag in DicomDictionary])
 
 
 def tag_for_keyword(keyword):

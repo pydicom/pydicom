@@ -8,10 +8,7 @@
 from __future__ import absolute_import
 
 from pydicom.tag import Tag
-from struct import (
-    unpack,
-    pack
-)
+from struct import (unpack, pack)
 
 from io import BytesIO
 from pydicom.config import logger
@@ -93,9 +90,10 @@ class DicomIO(object):
             if num_bytes < length:
                 start_pos = self.tell() - num_bytes
                 msg = "Unexpected end of file. "
-                msg += "Read {0} bytes of {1} expected starting at position 0x{2:x}".format(len(bytes_read),  # noqa
-                                                                                            length,     # noqa
-                                                                                            start_pos)  # noqa
+                msg += "Read {0} bytes of {1} expected starting at position 0x{2:x}".format(
+                    len(bytes_read),  # noqa
+                    length,  # noqa
+                    start_pos)  # noqa
                 raise EOFError(msg)
         return bytes_read
 
@@ -115,8 +113,8 @@ class DicomIO(object):
         """Write an unsigned long with big endian byte order"""
         self.write(pack(b">L", val))
 
-    write_US = write_leUS   # XXX should we default to this?
-    write_UL = write_leUL   # XXX "
+    write_US = write_leUS  # XXX should we default to this?
+    write_UL = write_leUL  # XXX "
 
     def read_beUL(self):
         """Return an unsigned long read with big endian byte order"""
@@ -138,7 +136,7 @@ class DicomIO(object):
             self.write_US = self.write_leUS
             self.write_UL = self.write_leUL
             self.read_tag = self.read_le_tag
-        else:      # Big Endian
+        else:  # Big Endian
             self.read_US = self.read_beUS
             self.read_UL = self.read_beUL
             self.write_US = self.write_beUS
@@ -155,7 +153,6 @@ class DicomIO(object):
 
 
 class DicomFileLike(DicomIO):
-
     def __init__(self, file_like_obj):
         self.parent = file_like_obj
         self.parent_read = getattr(file_like_obj, "read", self.no_read)

@@ -73,11 +73,12 @@ def correct_ambiguous_vr_element(elem, ds, is_little_endian):
                 pass
 
         # 'US or SS' and dependent on PixelRepresentation
-        elif elem.tag in [0x00189810, 0x00221452, 0x00280104, 0x00280105,
-                          0x00280106, 0x00280107, 0x00280108, 0x00280109,
-                          0x00280110, 0x00280111, 0x00280120, 0x00280121,
-                          0x00281101, 0x00281102, 0x00281103, 0x00283002,
-                          0x00409211, 0x00409216, 0x00603004, 0x00603006]:
+        elif elem.tag in [
+                0x00189810, 0x00221452, 0x00280104, 0x00280105, 0x00280106,
+                0x00280107, 0x00280108, 0x00280109, 0x00280110, 0x00280111,
+                0x00280120, 0x00280121, 0x00281101, 0x00281102, 0x00281103,
+                0x00283002, 0x00409211, 0x00409216, 0x00603004, 0x00603006
+        ]:
             # US if PixelRepresenation value is 0x0000, else SS
             #   For references, see the list at
             #   https://github.com/darcymason/pydicom/pull/298
@@ -92,8 +93,7 @@ def correct_ambiguous_vr_element(elem, ds, is_little_endian):
                                              byte_type)
 
         # 'OB or OW' and dependent on WaveformBitsAllocated
-        elif elem.tag in [0x54000100, 0x54000112, 0x5400100A,
-                          0x54001010]:
+        elif elem.tag in [0x54000100, 0x54000112, 0x5400100A, 0x54001010]:
             # If WaveformBitsAllocated is > 8 then OW, otherwise may be
             #   OB or OW, however not sure how to handle this.
             #   See PS3.3 C.10.9.1.
@@ -109,8 +109,7 @@ def correct_ambiguous_vr_element(elem, ds, is_little_endian):
                 # As per PS3.3 C.11.1.1.1
                 if ds.LUTDescriptor[0] == 1:
                     elem.VR = 'US'
-                    elem.value = convert_numbers(elem.value,
-                                                 is_little_endian,
+                    elem.value = convert_numbers(elem.value, is_little_endian,
                                                  'H')
                 else:
                     elem.VR = 'OW'
@@ -124,6 +123,7 @@ def correct_ambiguous_vr_element(elem, ds, is_little_endian):
                 elem.VR = 'OW'
 
     return elem
+
 
 def correct_ambiguous_vr(ds, is_little_endian):
     """Iterate through `ds` correcting ambiguous VR elements (if possible).
@@ -167,7 +167,7 @@ def write_numbers(fp, data_element, struct_format):
     struct_format -- the character format as used by the struct module.
 
     """
-    endianChar = '><'[fp.is_little_endian]
+    endianChar = '><' [fp.is_little_endian]
     value = data_element.value
     if value == "":
         return  # don't need to write anything for empty string
@@ -175,14 +175,15 @@ def write_numbers(fp, data_element, struct_format):
     format_string = endianChar + struct_format
     try:
         try:
-            value.append   # works only if list, not if string or number
+            value.append  # works only if list, not if string or number
         except AttributeError:  # is a single value - the usual case
             fp.write(pack(format_string, value))
         else:
             for val in value:
                 fp.write(pack(format_string, val))
     except Exception as e:
-        raise IOError("{0}\nfor data_element:\n{1}".format(str(e), str(data_element)))
+        raise IOError(
+            "{0}\nfor data_element:\n{1}".format(str(e), str(data_element)))
 
 
 def write_OBvalue(fp, data_element):
@@ -250,8 +251,9 @@ def write_number_string(fp, data_element, padding=' '):
     # unchanged data elements are written with exact string as when read from file
     val = data_element.value
     if isinstance(val, (list, tuple)):
-        val = "\\".join((x.original_string if hasattr(x, 'original_string')
-                         else str(x) for x in val))
+        val = "\\".join((x.original_string
+                         if hasattr(x, 'original_string') else str(x)
+                         for x in val))
     else:
         val = val.original_string if hasattr(val, 'original_string') else str(val)
     if len(val) % 2 != 0:
@@ -367,15 +369,19 @@ def write_data_element(fp, data_element, encoding=default_encoding):
         else:
             fp.write(VR)
         if VR in extra_length_VRs:
-            fp.write_US(0)   # reserved 2 bytes
+            fp.write_US(0)  # reserved 2 bytes
     if VR not in writers:
-        raise NotImplementedError("write_data_element: unknown Value Representation '{0}'".format(VR))
+        raise NotImplementedError(
+            "write_data_element: unknown Value Representation '{0}'".format(
+                VR))
 
     length_location = fp.tell()  # save location for later.
     if not fp.is_implicit_VR and VR not in extra_length_VRs:
         fp.write_US(0)  # Explicit VR length field is only 2 bytes
     else:
-        fp.write_UL(0xFFFFFFFF)   # will fill in real length value later if not undefined length item
+        fp.write_UL(
+            0xFFFFFFFF
+        )  # will fill in real length value later if not undefined length item
 
     encoding = convert_encodings(encoding)
 
@@ -444,7 +450,7 @@ def write_sequence_item(fp, dataset, encoding):
     """Write an item (dataset) in a dicom Sequence to the dicom file fp."""
     # see Dicom standard Part 5, p. 39 ('03 version)
     # This is similar to writing a data_element, but with a specific tag for Sequence Item
-    fp.write_tag(ItemTag)   # marker for start of Sequence Item
+    fp.write_tag(ItemTag)  # marker for start of Sequence Item
     length_location = fp.tell()  # save location for later.
     fp.write_UL(0xffffffff)   # will fill in real value later if not undefined length
     write_dataset(fp, dataset, parent_encoding=encoding)
@@ -560,7 +566,7 @@ def write_file_meta_info(fp, file_meta, enforce_standard=True):
                   "'file_meta':\n"
             for tag in missing:
                 msg += '\t{0} {1}\n'.format(tag, keyword_for_tag(tag))
-            raise ValueError(msg[:-1]) # Remove final newline
+            raise ValueError(msg[:-1])  # Remove final newline
 
     # Only used if FileMetaInformationGroupLength is present.
     #   FileMetaInformationGroupLength has a VR of 'UL' and so has a value that
@@ -756,7 +762,7 @@ def write_file(filename, dataset, write_like_original=True):
             fp.write(preamble)
             fp.write(b'DICM')
 
-        if file_meta is not None: # May be an empty Dataset
+        if file_meta is not None:  # May be an empty Dataset
             # If we want to `write_like_original`, don't enforce_standard
             write_file_meta_info(fp, file_meta, not write_like_original)
 
@@ -784,45 +790,47 @@ def write_file(filename, dataset, write_like_original=True):
         if not caller_owns_file:
             fp.close()
 
+
 # Map each VR to a function which can write it
 # for write_numbers, the Writer maps to a tuple (function, struct_format)
 #                                  (struct_format is python's struct module format)
-writers = {'UL': (write_numbers, 'L'),
-           'SL': (write_numbers, 'l'),
-           'US': (write_numbers, 'H'),
-           'SS': (write_numbers, 'h'),
-           'FL': (write_numbers, 'f'),
-           'FD': (write_numbers, 'd'),
-           'OF': (write_numbers, 'f'),
-           'OB': (write_OBvalue, None),
-           'OD': (write_OWvalue, None),
-           'OL': (write_OWvalue, None),
-           'UI': (write_UI, None),
-           'SH': (write_string, None),
-           'DA': (write_DA, None),
-           'TM': (write_TM, None),
-           'CS': (write_string, None),
-           'PN': (write_PN, None),
-           'LO': (write_string, None),
-           'IS': (write_number_string, None),
-           'DS': (write_number_string, None),
-           'AE': (write_string, None),
-           'AS': (write_string, None),
-           'LT': (write_string, None),
-           'SQ': (write_sequence, None),
-           'UC': (write_string, None),
-           'UN': (write_UN, None),
-           'UR': (write_string, None),
-           'AT': (write_ATvalue, None),
-           'ST': (write_string, None),
-           'OW': (write_OWvalue, None),
-           'US or SS': (write_OWvalue, None),
-           'US or OW': (write_OWvalue, None),
-           'US or SS or OW': (write_OWvalue, None),
-           'OW/OB': (write_OBvalue, None),
-           'OB/OW': (write_OBvalue, None),
-           'OB or OW': (write_OBvalue, None),
-           'OW or OB': (write_OBvalue, None),
-           'DT': (write_DT, None),
-           'UT': (write_string, None),
-           }  # note OW/OB depends on other items, which we don't know at write time
+writers = {
+    'UL': (write_numbers, 'L'),
+    'SL': (write_numbers, 'l'),
+    'US': (write_numbers, 'H'),
+    'SS': (write_numbers, 'h'),
+    'FL': (write_numbers, 'f'),
+    'FD': (write_numbers, 'd'),
+    'OF': (write_numbers, 'f'),
+    'OB': (write_OBvalue, None),
+    'OD': (write_OWvalue, None),
+    'OL': (write_OWvalue, None),
+    'UI': (write_UI, None),
+    'SH': (write_string, None),
+    'DA': (write_DA, None),
+    'TM': (write_TM, None),
+    'CS': (write_string, None),
+    'PN': (write_PN, None),
+    'LO': (write_string, None),
+    'IS': (write_number_string, None),
+    'DS': (write_number_string, None),
+    'AE': (write_string, None),
+    'AS': (write_string, None),
+    'LT': (write_string, None),
+    'SQ': (write_sequence, None),
+    'UC': (write_string, None),
+    'UN': (write_UN, None),
+    'UR': (write_string, None),
+    'AT': (write_ATvalue, None),
+    'ST': (write_string, None),
+    'OW': (write_OWvalue, None),
+    'US or SS': (write_OWvalue, None),
+    'US or OW': (write_OWvalue, None),
+    'US or SS or OW': (write_OWvalue, None),
+    'OW/OB': (write_OBvalue, None),
+    'OB/OW': (write_OBvalue, None),
+    'OB or OW': (write_OBvalue, None),
+    'OW or OB': (write_OBvalue, None),
+    'DT': (write_DT, None),
+    'UT': (write_string, None),
+}  # note OW/OB depends on other items, which we don't know at write time

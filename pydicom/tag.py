@@ -107,6 +107,7 @@ class BaseTag(BaseTag_base_class):
         Returns True if the corresponding element is private,
         False otherwise.
     """
+
     # Override comparisons so can convert "other" to Tag as necessary
     #   See Ordering Comparisons at:
     #   http://docs.python.org/dev/3.0/whatsnew/3.0.html
@@ -189,14 +190,11 @@ def TupleTag(group_elem):
 # Define some special tags:
 # See PS 3.5-2008 section 7.5 (p.40)
 
-
 # start of Sequence Item
 ItemTag = TupleTag((0xFFFE, 0xE000))
 
-
 # end of Sequence Item
 ItemDelimiterTag = TupleTag((0xFFFE, 0xE00D))
-
 
 # end of Sequence of undefined length
 SequenceDelimiterTag = TupleTag((0xFFFE, 0xE0DD))

@@ -92,7 +92,9 @@ def find_bytes(fp, bytes_to_find, read_size=128, rewind=True):
     return found_at
 
 
-def read_undefined_length_value(fp, is_little_endian, delimiter_tag,
+def read_undefined_length_value(fp,
+                                is_little_endian,
+                                delimiter_tag,
                                 defer_size=None,
                                 read_size=128):
     """Read until the delimiter tag found and return the value;
@@ -163,9 +165,8 @@ def read_undefined_length_value(fp, is_little_endian, delimiter_tag,
                 logger.error(msg.format(fp.tell() - 4))
         elif eof:
             fp.seek(data_start)
-            raise EOFError(
-                "End of file reached before delimiter {0!r} found".format(
-                    delimiter_tag))
+            raise EOFError("End of file reached before delimiter {0!r} found".
+                           format(delimiter_tag))
         else:
             # rewind a bit in case delimiter crossed read_size boundary
             fp.seek(fp.tell() - search_rewind)
@@ -203,12 +204,15 @@ def find_delimiter(fp, delimiter, is_little_endian, read_size=128,
     if not is_little_endian:
         struct_format = ">H"
     delimiter = Tag(delimiter)
-    bytes_to_find = pack(struct_format, delimiter.group) + pack(struct_format,
-                                                                delimiter.elem)
+    bytes_to_find = pack(struct_format, delimiter.group) + pack(
+        struct_format, delimiter.elem)
     return find_bytes(fp, bytes_to_find, read_size=read_size, rewind=rewind)
 
 
-def length_of_undefined_length(fp, delimiter, is_little_endian, read_size=128,
+def length_of_undefined_length(fp,
+                               delimiter,
+                               is_little_endian,
+                               read_size=128,
                                rewind=True):
     """Search through the file to find the delimiter and return the length
     of the data element.
@@ -234,8 +238,8 @@ def length_of_undefined_length(fp, delimiter, is_little_endian, read_size=128,
     the calling routine must handle that. Delimiter must be 4 bytes long.
     """
     data_start = fp.tell()
-    delimiter_pos = find_delimiter(fp, delimiter, is_little_endian,
-                                   rewind=rewind)
+    delimiter_pos = find_delimiter(
+        fp, delimiter, is_little_endian, rewind=rewind)
     length = delimiter_pos - data_start
     return length
 

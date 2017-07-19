@@ -1,5 +1,4 @@
 #!/usr/bin/python
-
 """ dicom_dao
 
 Data Access Objects for persisting PyDicom DataSet objects.
@@ -49,7 +48,6 @@ def uid2str(uid):
 # different numbers. We therefore treat it as binary
 # and will continue to until either pydicom works it out
 # for us, or we figure out a test.
-
 
 BINARY_VR_VALUES = ['OW', 'OB', 'OW/OB', 'US or SS']
 
@@ -237,9 +235,7 @@ def _add_element(dcm, tagstack, value):
         current_node = current_node[address]
     tag = __str2tag(tagstack[-1])
     vr = pydicom.datadict.dictionary_VR(tag)
-    current_node[tag] = pydicom.dataelem.DataElement(tag,
-                                                     vr,
-                                                     value)
+    current_node[tag] = pydicom.dataelem.DataElement(tag, vr, value)
 
 
 def _tagstack2id(tagstack):
@@ -359,9 +355,10 @@ def __jsonify(element, binary_elements, tagstack):
         nested_data = []
         for i in range(0, len(value)):
             tagstack.append(i)
-            nested_data.append(dict((subkey, __jsonify(value[i][subkey],
-                                     binary_elements, tagstack))
-                               for subkey in value[i].keys()))
+            nested_data.append(
+                dict((subkey, __jsonify(value[i][subkey],
+                                        binary_elements, tagstack))
+                     for subkey in value[i].keys()))
             tagstack.pop()
         tagstack.pop()
         return nested_data
@@ -385,11 +382,10 @@ def json2pydicom(jsn):
         a PyDicom object """
     dataset = pydicom.dataset.Dataset()
     # Don't try to convert couch specific tags
-    dicom_keys = [key for key in jsn.keys()
-                  if key not in ['_rev',
-                                 '_id',
-                                 '_attachments',
-                                 'file_meta']]
+    dicom_keys = [
+        key for key in jsn.keys()
+        if key not in ['_rev', '_id', '_attachments', 'file_meta']
+    ]
     for key in dicom_keys:
         dataset.add(__dicomify(key, jsn[key]))
     file_meta = pydicom.dataset.Dataset()

@@ -25,10 +25,7 @@
 from pydicom.config import logger
 
 from pydicom.filebase import DicomBytesIO
-from pydicom.tag import (
-    ItemTag,
-    SequenceDelimiterTag
-)
+from pydicom.tag import (ItemTag, SequenceDelimiterTag)
 
 
 def decode_data_sequence(data):
@@ -84,33 +81,28 @@ def read_item(fp):
     if tag == SequenceDelimiterTag:
         length = fp.read_UL()
         logger.debug("%04x: Sequence Delimiter, length 0x%x",
-                     fp.tell() - 8,
-                     length)
+                     fp.tell() - 8, length)
 
         if length != 0:
             msg = "Expected 0x00000000 after delimiter, found "
-            logger.warning("%s0x%x, at data position 0x%x" % (msg),
-                           length, fp.tell() - 4)
+            logger.warning("%s0x%x, at data position 0x%x" % (msg), length,
+                           fp.tell() - 4)
         return None
 
     if tag != ItemTag:
         msg = "Expected Item with tag "
-        logger.warning("%sat data position 0x%x" % (msg),
-                       ItemTag,
+        logger.warning("%sat data position 0x%x" % (msg), ItemTag,
                        fp.tell() - 4)
 
         length = fp.read_UL()
 
     else:
         length = fp.read_UL()
-        logger.debug("%04x: Item, length 0x%x",
-                     fp.tell() - 8,
-                     length)
+        logger.debug("%04x: Item, length 0x%x", fp.tell() - 8, length)
 
     if length == 0xFFFFFFFF:
         msg = "Encapsulated data fragment had Undefined Length"
-        raise ValueError("%s at data position 0x%x"
-                         % (msg, fp.tell() - 4))
+        raise ValueError("%s at data position 0x%x" % (msg, fp.tell() - 4))
 
     item_data = fp.read(length)
     return item_data

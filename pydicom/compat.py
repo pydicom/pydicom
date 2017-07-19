@@ -21,11 +21,12 @@ if in_py2:
     string_types = (str, unicode)
 else:
     text_type = str
-    string_types = (str,)
+    string_types = (str, )
 
 if in_py2:
     # Have to run through exec as the code is a syntax error in py 3
     exec('def reraise(tp, value, tb):\n raise tp, value, tb')
 else:
+
     def reraise(tp, value, tb):
         raise value.with_traceback(tb)

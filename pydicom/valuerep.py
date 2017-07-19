@@ -13,11 +13,7 @@ from pydicom import config
 from pydicom import compat
 from pydicom.multival import MultiValue
 
-from datetime import (
-    date,
-    datetime,
-    time
-)
+from datetime import (date, datetime, time)
 
 have_dateutil = True
 try:
@@ -25,40 +21,26 @@ try:
 except ImportError:
     have_dateutil = False
 
-
 # can't import from charset or get circular import
 default_encoding = "iso8859"
 
 # For reading/writing data elements,
 # these ones have longer explicit VR format
 # Taken from PS3.5 Section 7.1.2
-extra_length_VRs = ('OB',
-                    'OD',
-                    'OF',
-                    'OL',
-                    'OW',
-                    'SQ',
-                    'UC',
-                    'UN',
-                    'UR',
-                    'UT')
+extra_length_VRs = ('OB', 'OD', 'OF', 'OL', 'OW', 'SQ', 'UC', 'UN', 'UR', 'UT')
 
 # VRs that can be affected by character repertoire
 # in (0008,0005) Specific Character Set
 # See PS-3.5 (2011), section 6.1.2 Graphic Characters
 # and PN, but it is handled separately.
-text_VRs = ('SH', 'LO', 'ST', 'LT',  'UC', 'UR', 'UT')
+text_VRs = ('SH', 'LO', 'ST', 'LT', 'UC', 'UR', 'UT')
 
 match_string = b''.join([
-    b'(?P<single_byte>',
-    b'(?P<family_name>[^=\^]*)',
-    b'\^?(?P<given_name>[^=\^]*)',
-    b'\^?(?P<middle_name>[^=\^]*)',
-    b'\^?(?P<name_prefix>[^=\^]*)',
-    b'\^?(?P<name_suffix>[^=\^]*)',
-    b')',
-    b'=?(?P<ideographic>[^=]*)',
-    b'=?(?P<phonetic>[^=]*)$'])
+    b'(?P<single_byte>', b'(?P<family_name>[^=\^]*)',
+    b'\^?(?P<given_name>[^=\^]*)', b'\^?(?P<middle_name>[^=\^]*)',
+    b'\^?(?P<name_prefix>[^=\^]*)', b'\^?(?P<name_suffix>[^=\^]*)', b')',
+    b'=?(?P<ideographic>[^=]*)', b'=?(?P<phonetic>[^=]*)$'
+])
 
 match_string_uni = re.compile(match_string.decode('iso8859'))
 match_string_bytes = re.compile(match_string)
@@ -73,21 +55,18 @@ class DA(date):
     __slots__ = ['original_string']
 
     def __getstate__(self):
-        return dict(
-            (slot, getattr(self, slot))
-            for slot in self.__slots__
-            if hasattr(self, slot)
-        )
+        return dict((slot, getattr(self, slot)) for slot in self.__slots__
+                    if hasattr(self, slot))
 
     def __setstate__(self, state):
         for slot, value in state.items():
             setattr(self, slot, value)
 
     def __reduce__(self):
-        return super(DA, self).__reduce__() + (self.__getstate__(),)
+        return super(DA, self).__reduce__() + (self.__getstate__(), )
 
     def __reduce_ex__(self, protocol):
-        return super(DA, self).__reduce__() + (self.__getstate__(),)
+        return super(DA, self).__reduce__() + (self.__getstate__(), )
 
     def __new__(cls, val):
         """Create an instance of DA object.
@@ -117,13 +96,10 @@ class DA(date):
                 try:
                     val = super(DA, cls).__new__(cls, val)
                 except TypeError:
-                    raise ValueError("Cannot convert to datetime: '%s'"
-                                     % (val))
+                    raise ValueError("Cannot convert to datetime: '%s'" %
+                                     (val))
         elif isinstance(val, date):
-            val = super(DA, cls).__new__(cls,
-                                         val.year,
-                                         val.month,
-                                         val.day)
+            val = super(DA, cls).__new__(cls, val.year, val.month, val.day)
         else:
             val = super(DA, cls).__new__(cls, val)
         return val
@@ -151,21 +127,18 @@ class DT(datetime):
     _regex_dt = re.compile(r"((\d{4,14})(\.(\d{1,6}))?)([+-]\d{4})?")
 
     def __getstate__(self):
-        return dict(
-            (slot, getattr(self, slot))
-            for slot in self.__slots__
-            if hasattr(self, slot)
-        )
+        return dict((slot, getattr(self, slot)) for slot in self.__slots__
+                    if hasattr(self, slot))
 
     def __setstate__(self, state):
         for slot, value in state.items():
             setattr(self, slot, value)
 
     def __reduce__(self):
-        return super(DT, self).__reduce__() + (self.__getstate__(),)
+        return super(DT, self).__reduce__() + (self.__getstate__(), )
 
     def __reduce_ex__(self, protocol):
-        return super(DT, self).__reduce__() + (self.__getstate__(),)
+        return super(DT, self).__reduce__() + (self.__getstate__(), )
 
     def __new__(cls, val):
         """Create an instance of DT object.
@@ -224,25 +197,19 @@ class DT(datetime):
                     tzinfo = tzoffset(tz_match, offset)
                 else:
                     tzinfo = None
-                val = super(DT, cls).__new__(cls, year, month, day,
-                                             hour, minute, second,
-                                             microsecond, tzinfo)
+                val = super(DT,
+                            cls).__new__(cls, year, month, day, hour, minute,
+                                         second, microsecond, tzinfo)
             else:
                 try:
                     val = super(DT, cls).__new__(cls, val)
                 except TypeError:
-                    raise ValueError("Cannot convert to datetime: '%s'"
-                                     % (val))
+                    raise ValueError("Cannot convert to datetime: '%s'" %
+                                     (val))
         elif isinstance(val, datetime):
-            val = super(DT, cls).__new__(cls,
-                                         val.year,
-                                         val.month,
-                                         val.day,
-                                         val.hour,
-                                         val.minute,
-                                         val.second,
-                                         val.microsecond,
-                                         val.tzinfo)
+            val = super(DT, cls).__new__(cls, val.year, val.month, val.day,
+                                         val.hour, val.minute, val.second,
+                                         val.microsecond, val.tzinfo)
         else:
             val = super(DT, cls).__new__(cls, val)
         return val
@@ -270,21 +237,18 @@ class TM(time):
     _regex_tm = re.compile(r"(\d{2,6})(\.(\d{1,6}))?")
 
     def __getstate__(self):
-        return dict(
-            (slot, getattr(self, slot))
-            for slot in self.__slots__
-            if hasattr(self, slot)
-        )
+        return dict((slot, getattr(self, slot)) for slot in self.__slots__
+                    if hasattr(self, slot))
 
     def __setstate__(self, state):
         for slot, value in state.items():
             setattr(self, slot, value)
 
     def __reduce__(self):
-        return super(TM, self).__reduce__() + (self.__getstate__(),)
+        return super(TM, self).__reduce__() + (self.__getstate__(), )
 
     def __reduce_ex__(self, protocol):
-        return super(TM, self).__reduce__() + (self.__getstate__(),)
+        return super(TM, self).__reduce__() + (self.__getstate__(), )
 
     def __new__(cls, val):
         """Create an instance of TM object from a string.
@@ -322,13 +286,9 @@ class TM(time):
                 try:
                     val = super(TM, cls).__new__(cls, val)
                 except TypeError:
-                    raise ValueError("Cannot convert to datetime: '%s"
-                                     % (val))
+                    raise ValueError("Cannot convert to datetime: '%s" % (val))
         elif isinstance(val, time):
-            val = super(TM, cls).__new__(cls,
-                                         val.hour,
-                                         val.minute,
-                                         val.second,
+            val = super(TM, cls).__new__(cls, val.hour, val.minute, val.second,
                                          val.microsecond)
         else:
             val = super(TM, cls).__new__(cls, val)
@@ -357,11 +317,8 @@ class DSfloat(float):
     __slots__ = ['original_string']
 
     def __getstate__(self):
-        return dict(
-            (slot, getattr(self, slot))
-            for slot in self.__slots__
-            if hasattr(self, slot)
-        )
+        return dict((slot, getattr(self, slot)) for slot in self.__slots__
+                    if hasattr(self, slot))
 
     def __setstate__(self, state):
         for slot, value in state.items():
@@ -398,11 +355,8 @@ class DSdecimal(Decimal):
     __slots__ = ['original_string']
 
     def __getstate__(self):
-        return dict(
-            (slot, getattr(self, slot))
-            for slot in self.__slots__
-            if hasattr(self, slot)
-        )
+        return dict((slot, getattr(self, slot)) for slot in self.__slots__
+                    if hasattr(self, slot))
 
     def __setstate__(self, state):
         for slot, value in state.items():
@@ -500,16 +454,14 @@ class IS(int):
     """
     if compat.in_py2:
         __slots__ = ['original_string']
+
         # Unlikely that str(int) will not be the
         # same as the original, but could happen
         # with leading zeros.
 
         def __getstate__(self):
-            return dict(
-                (slot, getattr(self, slot))
-                for slot in self.__slots__
-                if hasattr(self, slot)
-            )
+            return dict((slot, getattr(self, slot)) for slot in self.__slots__
+                        if hasattr(self, slot))
 
         def __setstate__(self, state):
             for slot, value in state.items():
@@ -527,7 +479,7 @@ class IS(int):
         if isinstance(val, (float, Decimal)) and newval != val:
             raise TypeError("Could not convert value to integer without loss")
         # Checks in case underlying int is >32 bits, DICOM does not allow this
-        check_newval = (newval < -2 ** 31 or newval >= 2 ** 31)
+        check_newval = (newval < -2**31 or newval >= 2**31)
         if check_newval and config.enforce_valid_values:
             dcm_limit = "-2**31 to (2**31 - 1) for IS"
             message = "Value exceeds DICOM limits of %s" % (dcm_limit)
@@ -619,8 +571,10 @@ class PersonName3(object):
         if not isinstance(self.components[0], bytes):
             comps = self.components
         else:
-            comps = [clean_escseq(comp.decode(enc), encodings)
-                     for comp, enc in zip(self.components, encodings)]
+            comps = [
+                clean_escseq(comp.decode(enc), encodings)
+                for comp, enc in zip(self.components, encodings)
+            ]
 
         while len(comps) and not comps[-1]:
             comps.pop()
@@ -633,8 +587,9 @@ class PersonName3(object):
         if isinstance(self.components[0], bytes):
             comps = self.components
         else:
-            comps = [C.encode(enc) for C,
-                     enc in zip(self.components, encodings)]
+            comps = [
+                C.encode(enc) for C, enc in zip(self.components, encodings)
+            ]
 
         # Remove empty elements from the end
         while len(comps) and not comps[-1]:
@@ -711,7 +666,7 @@ class PersonNameBase(object):
             self.name_prefix, self.name_suffix = parts[3:]
         else:
             (self.family_name, self.given_name, self.middle_name,
-                self.name_prefix, self.name_suffix) = ('', '', '', '', '')
+             self.name_prefix, self.name_suffix) = ('', '', '', '', '')
 
 
 class PersonName(PersonNameBase, bytes):
@@ -727,6 +682,7 @@ class PersonName(PersonNameBase, bytes):
     name_suffix
 
     """
+
     def __new__(cls, val):
         """Return instance of the new class"""
         # Check if trying to convert a string that has already been converted
@@ -743,11 +699,12 @@ class PersonName(PersonNameBase, bytes):
     def family_comma_given(self):
         """Return name as 'Family-name, Given-name'"""
         return self.formatted("%(family_name)s, %(given_name)s")
+
     # def __str__(self):
-        # return str(self.byte_string)
-        # XXX need to process the ideographic or phonetic components?
+    # return str(self.byte_string)
+    # XXX need to process the ideographic or phonetic components?
     # def __len__(self):
-        # return len(self.byte_string)
+    # return len(self.byte_string)
 
 
 class PersonNameUnicode(PersonNameBase, compat.text_type):
@@ -773,8 +730,10 @@ class PersonNameUnicode(PersonNameBase, compat.text_type):
         if (len(components) == 1):
             del encodings[0]
 
-        comps = [clean_escseq(C.decode(enc), encodings)
-                 for C, enc in zip(components, encodings)]
+        comps = [
+            clean_escseq(C.decode(enc), encodings)
+            for C, enc in zip(components, encodings)
+        ]
         new_val = u"=".join(comps)
 
         return compat.text_type.__new__(cls, new_val)
