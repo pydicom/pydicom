@@ -41,7 +41,7 @@ matrix:
 install: source build_tools/travis/install.sh
 
 script:
-  - py.test --cov=pydicom pydicom
+  - py.test --cov=pydicom --pyargs pydicom
 
 after_success:
   - codecov
