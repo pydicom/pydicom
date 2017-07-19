@@ -30,7 +30,11 @@ except AttributeError:
         import unittest2 as unittest
     except ImportError:
         print("unittest2 is required for testing in python2.6")
-
+have_gdcm_handler = True
+try:
+    import pydicom.pixel_data_handlers.gdcm_handler as gdcm_handler
+except ImportError as e:
+    have_gdcm_handler = False
 # os.stat is only available on Unix and Windows   XXX Mac?
 # Not sure if on other platforms the import fails, or the call to it??
 try:
@@ -817,7 +821,7 @@ class ReadTruncatedFileTests(unittest.TestCase):
         expected = [DS('0.3125'), DS('0.3125')]
         self.assertTrue(got == expected, "Wrong pixel spacing")
 
-    @unittest.skipUnless(have_numpy, "Numpy not installed")
+    @unittest.skipUnless(have_numpy and not have_gdcm_handler, "Numpy not installed or gdcm is installed, gdcm fixes truncated data??")
     def testReadFileWithMissingPixelDataArray(self):
         mr = read_file(truncated_mr_name)
         mr.decode()
