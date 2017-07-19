@@ -6,17 +6,15 @@ from __future__ import absolute_import
 #    See the file license.txt included with this distribution, also
 #    available at https://github.com/darcymason/pydicom
 
-from struct import pack, unpack
+from struct import pack
 
 from pydicom import compat
-from pydicom.config import logger
 from pydicom.compat import in_py2
 from pydicom.charset import default_encoding, text_VRs, convert_encodings
-from pydicom.uid import ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian
+from pydicom.uid import ImplicitVRLittleEndian, ExplicitVRBigEndian
 from pydicom.filebase import DicomFile, DicomFileLike
 from pydicom.datadict import keyword_for_tag
 from pydicom.dataset import Dataset
-from pydicom.dataelem import DataElement
 from pydicom.tag import Tag, ItemTag, ItemDelimiterTag, SequenceDelimiterTag
 from pydicom.valuerep import extra_length_VRs
 from pydicom.values import convert_numbers
@@ -115,8 +113,8 @@ def correct_ambiguous_vr_element(elem, ds, is_little_endian):
                     elem.VR = 'OW'
 
         # 'OB or OW': 60xx,3000 OverlayData and dependent on Transfer Syntax
-        elif elem.tag.group in range(0x6000, 0x601F, 2) and \
-                                                    elem.tag.elem == 0x3000:
+        elif (elem.tag.group in range(0x6000, 0x601F, 2)
+              and elem.tag.elem == 0x3000):
             # Implicit VR must be OW, explicit VR may be OB or OW
             #   as per PS3.5 Section 8.1.2 and Annex A
             if hasattr(ds, 'is_implicit_VR') and ds.is_implicit_VR:
@@ -208,7 +206,8 @@ def write_UI(fp, data_element):
 def multi_string(val):
     """Put a string together with delimiter if has more than one value"""
     if isinstance(val, (list, tuple)):
-        return "\\".join(val)  # \ is escape chr, so "\\" gives single backslash
+        # \ is escape chr, so "\\" gives single backslash
+        return "\\".join(val)
     else:
         return val
 
@@ -248,14 +247,20 @@ def write_string(fp, data_element, padding=' ', encoding=default_encoding):
 def write_number_string(fp, data_element, padding=' '):
     """Handle IS or DS VR - write a number stored as a string of digits."""
     # If the DS or IS has an original_string attribute, use that, so that
-    # unchanged data elements are written with exact string as when read from file
+    # unchanged data elements are written with exact string as when read from
+    # file
     val = data_element.value
+
     if isinstance(val, (list, tuple)):
         val = "\\".join((x.original_string
                          if hasattr(x, 'original_string') else str(x)
                          for x in val))
     else:
-        val = val.original_string if hasattr(val, 'original_string') else str(val)
+        if hasattr(val, 'original_string'):
+            val = val.original_string
+        else:
+            val = str(val)
+
     if len(val) % 2 != 0:
         val = val + padding  # pad to even length
 
@@ -361,8 +366,10 @@ def write_data_element(fp, data_element, encoding=default_encoding):
     VR = data_element.VR
     if not fp.is_implicit_VR:
         if len(VR) != 2:
-            msg = "Cannot write ambiguous VR of '%s' for data element with tag %r." % (VR, data_element.tag)
-            msg += "\nSet the correct VR before writing, or use an implicit VR transfer syntax"
+            msg = ("Cannot write ambiguous VR of '{}' for data element with ",
+                   "tag {}.\nSet the correct VR before writing, or use an ",
+                   "implicit VR transfer syntax".format(
+                       VR, repr(data_element.tag)))
             raise ValueError(msg)
         if not in_py2:
             fp.write(bytes(VR, default_encoding))
@@ -391,7 +398,8 @@ def write_data_element(fp, data_element, encoding=default_encoding):
     elif VR in ('PN', 'SQ'):
         writer_function(fp, data_element, encoding=encoding)
     else:
-        # Many numeric types use the same writer but with numeric format parameter
+        # Many numeric types use the same writer but with numeric format
+        # parameter
         if writer_param is not None:
             writer_function(fp, data_element, writer_param)
         else:
@@ -400,14 +408,16 @@ def write_data_element(fp, data_element, encoding=default_encoding):
     #  print DataElement(tag, VR, value)
 
     is_undefined_length = False
-    if hasattr(data_element, "is_undefined_length") and data_element.is_undefined_length:
+    if (hasattr(data_element, "is_undefined_length")
+            and data_element.is_undefined_length):
         is_undefined_length = True
     location = fp.tell()
     fp.seek(length_location)
     if not fp.is_implicit_VR and VR not in extra_length_VRs:
         fp.write_US(location - length_location - 2)  # 2 is length of US
     else:
-        # write the proper length of the data_element back in the length slot, unless is SQ with undefined length.
+        # write the proper length of the data_element back in the length slot,
+        # unless is SQ with undefined length.
         if not is_undefined_length:
             fp.write_UL(location - length_location - 4)  # 4 is length of UL
     fp.seek(location)  # ready for next data_element
@@ -417,9 +427,11 @@ def write_data_element(fp, data_element, encoding=default_encoding):
 
 
 def write_dataset(fp, dataset, parent_encoding=default_encoding):
-    """Write a Dataset dictionary to the file. Return the total length written."""
-    # Attempt to correct ambiguous VR elements when explicit little/big encoding
-    #   Elements that can't be corrected will be returned unchanged.
+    """Write a Dataset dictionary to the file. Return the total length written.
+
+    Attempt to correct ambiguous VR elements when explicit little/big
+      encoding Elements that can't be corrected will be returned unchanged.
+    """
     if not fp.is_implicit_VR:
         dataset = correct_ambiguous_vr(dataset, fp.is_little_endian)
 
@@ -431,7 +443,8 @@ def write_dataset(fp, dataset, parent_encoding=default_encoding):
 
     for tag in tags:
         with tag_in_exception(tag):
-            # write_data_element(fp, dataset.get_item(tag), dataset_encoding)  XXX for writing raw tags without converting to DataElement
+            # write_data_element(fp, dataset.get_item(tag), dataset_encoding)
+            # XXX for writing raw tags without converting to DataElement
             write_data_element(fp, dataset[tag], dataset_encoding)
 
     return fp.tell() - fpStart
@@ -447,12 +460,17 @@ def write_sequence(fp, data_element, encoding):
 
 
 def write_sequence_item(fp, dataset, encoding):
-    """Write an item (dataset) in a dicom Sequence to the dicom file fp."""
-    # see Dicom standard Part 5, p. 39 ('03 version)
-    # This is similar to writing a data_element, but with a specific tag for Sequence Item
+    """Write an item (dataset) in a dicom Sequence to the dicom file fp.
+
+    This is similar to writing a data_element, but with a specific tag for
+    Sequence Item
+
+    see Dicom standard Part 5, p. 39 ('03 version)
+    """
     fp.write_tag(ItemTag)  # marker for start of Sequence Item
     length_location = fp.tell()  # save location for later.
-    fp.write_UL(0xffffffff)   # will fill in real value later if not undefined length
+    # will fill in real value later if not undefined length
+    fp.write_UL(0xffffffff)
     write_dataset(fp, dataset, parent_encoding=encoding)
     if getattr(dataset, "is_undefined_length_sequence_item", False):
         fp.write_tag(ItemDelimiterTag)
@@ -472,9 +490,12 @@ def write_UN(fp, data_element):
 def write_ATvalue(fp, data_element):
     """Write a data_element tag to a file."""
     try:
-        iter(data_element.value)  # see if is multi-valued AT;  # Note will fail if Tag ever derived from true tuple rather than being a long
+        iter(data_element.value)  # see if is multi-valued AT;
+        # Note will fail if Tag ever derived from true tuple rather than being
+        # a long
     except TypeError:
-        tag = Tag(data_element.value)   # make sure is expressed as a Tag instance
+        # make sure is expressed as a Tag instance
+        tag = Tag(data_element.value)
         fp.write_tag(tag)
     else:
         tags = [Tag(tag) for tag in data_element.value]
@@ -517,7 +538,8 @@ def write_file_meta_info(fp, file_meta, enforce_standard=True):
 
     Encoding
     ~~~~~~~~
-    The encoding of the File Meta Information shall be Explicit VR Little Endian
+    The encoding of the File Meta Information shall be Explicit VR Little
+    Endian
 
     Parameters
     ----------
@@ -574,8 +596,8 @@ def write_file_meta_info(fp, file_meta, enforce_standard=True):
     #   therefore be 12 bytes.
     end_group_length_elem = fp.tell() + 12
 
-    # The 'is_little_endian' and 'is_implicit_VR' attributes will need to be set
-    #   correctly after the File Meta Info has been written.
+    # The 'is_little_endian' and 'is_implicit_VR' attributes will need to be
+    #   set correctly after the File Meta Info has been written.
     fp.is_little_endian = True
     fp.is_implicit_VR = False
 
@@ -591,8 +613,8 @@ def write_file_meta_info(fp, file_meta, enforce_standard=True):
         # Update the FileMetaInformationGroupLength value, which is the number
         #   of bytes from the end of the FileMetaInformationGroupLength element
         #   to the end of all the File Meta Information elements
-        file_meta.FileMetaInformationGroupLength = \
-                                int(end_of_file_meta - end_group_length_elem)
+        group_length = int(end_of_file_meta - end_group_length_elem)
+        file_meta.FileMetaInformationGroupLength = group_length
         fp.seek(end_group_length_elem - 12)
         write_data_element(fp, file_meta[0x00020000])
 
@@ -603,10 +625,10 @@ def write_file_meta_info(fp, file_meta, enforce_standard=True):
 def write_file(filename, dataset, write_like_original=True):
     """Write `dataset` to the `filename` specified.
 
-    If `write_like_original` is True then `dataset` will be written as is (after
-    minimal validation checking) and may or may not contain all or parts of the
-    File Meta Information (and hence may or may not be conformant with the DICOM
-    File Format).
+    If `write_like_original` is True then `dataset` will be written as is
+    (after minimal validation checking) and may or may not contain all or parts
+    of the File Meta Information (and hence may or may not be conformant with
+    the DICOM File Format).
     If `write_like_original` is False, `dataset` will be stored in the DICOM
     File Format in accordance with DICOM Standard Part 10 Section 7. The byte
     stream of the `dataset` will be placed into the file after the DICOM File
@@ -622,9 +644,9 @@ def write_file(filename, dataset, write_like_original=True):
     The `dataset.preamble` attribute shall be 128-bytes long or None and is
     available for use as defined by the Application Profile or specific
     implementations. If the preamble is not used by an Application Profile or
-    specific implementation then all 128 bytes should be set to 0x00. The actual
-    preamble written depends on `write_like_original` and `dataset.preamble`
-    (see the table below).
+    specific implementation then all 128 bytes should be set to 0x00. The
+    actual preamble written depends on `write_like_original` and
+    `dataset.preamble` (see the table below).
 
     +------------------+------------------------------+
     |                  | write_like_original          |
@@ -642,9 +664,9 @@ def write_file(filename, dataset, write_like_original=True):
     File Meta Information Group Elements
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     The preamble and prefix are followed by a set of DICOM Elements from the
-    (0002,eeee) group. Some of these elements are required (Type 1) while others
-    are optional (Type 3/1C). If `write_like_original` is True then the File
-    Meta Information Group elements are all optional. See
+    (0002,eeee) group. Some of these elements are required (Type 1) while
+    others are optional (Type 3/1C). If `write_like_original` is True then the
+    File Meta Information Group elements are all optional. See
     pydicom.filewriter.write_file_meta_info for more information on which
     elements are required.
 
@@ -671,7 +693,7 @@ def write_file(filename, dataset, write_like_original=True):
 
     Encoding
     ~~~~~~~~
-    The `dataset` will be encoded as specified by the `dataset.is_little_endian`
+    The `dataset` is encoded as specified by the `dataset.is_little_endian`
     and `dataset.is_implicit_VR` attributes. It's up to the user to ensure
     these attributes are set correctly (as well as setting an appropriate value
     for `dataset.file_meta.TransferSyntaxUID` if present).
@@ -756,7 +778,7 @@ def write_file(filename, dataset, write_like_original=True):
         fp = DicomFileLike(filename)
 
     try:
-        ## WRITE FILE META INFORMATION
+        # WRITE FILE META INFORMATION
         if preamble:
             # Write the 'DICM' prefix if and only if we write the preamble
             fp.write(preamble)
@@ -766,9 +788,9 @@ def write_file(filename, dataset, write_like_original=True):
             # If we want to `write_like_original`, don't enforce_standard
             write_file_meta_info(fp, file_meta, not write_like_original)
 
-        ## WRITE DATASET
-        # The transfer syntax used to encode the dataset can't be changed within
-        #   the dataset
+        # WRITE DATASET
+        # The transfer syntax used to encode the dataset can't be changed
+        #   within the dataset.
         # Write any Command Set elements now as elements must be in tag order
         #   Mixing Command Set with other elements is non-conformant so we
         #   require `write_like_original` to be True
@@ -793,7 +815,7 @@ def write_file(filename, dataset, write_like_original=True):
 
 # Map each VR to a function which can write it
 # for write_numbers, the Writer maps to a tuple (function, struct_format)
-#                                  (struct_format is python's struct module format)
+#   (struct_format is python's struct module format)
 writers = {
     'UL': (write_numbers, 'L'),
     'SL': (write_numbers, 'l'),

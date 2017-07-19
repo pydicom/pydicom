@@ -11,7 +11,6 @@ from pydicom.tag import Tag
 from struct import (unpack, pack)
 
 from io import BytesIO
-from pydicom.config import logger
 
 
 class DicomIO(object):
@@ -89,11 +88,9 @@ class DicomIO(object):
             num_bytes = len(bytes_read)
             if num_bytes < length:
                 start_pos = self.tell() - num_bytes
-                msg = "Unexpected end of file. "
-                msg += "Read {0} bytes of {1} expected starting at position 0x{2:x}".format(
-                    len(bytes_read),  # noqa
-                    length,  # noqa
-                    start_pos)  # noqa
+                msg = ("Unexpected end of file. Read {0} bytes of {1} ",
+                       "expected starting at position 0x{2:x}".format(
+                           len(bytes_read), length, start_pos))
                 raise EOFError(msg)
         return bytes_read
 
