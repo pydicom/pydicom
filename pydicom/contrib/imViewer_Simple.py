@@ -264,7 +264,7 @@ class ImFrame(wx.Frame):
             raise ImportError("Python Imaging Library is not available."
                               " See http://www.pythonware.com/products/pil/"
                               " to download and install")
-        if ('PixelData' not in dataset):
+        if 'PixelData' not in dataset:
             raise TypeError("Cannot show image -- "
                             "DICOM dataset does not have pixel data")
 
