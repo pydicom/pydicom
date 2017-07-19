@@ -201,10 +201,11 @@
 <span class="kn">from</span> <span class="nn">pydicom</span> <span class="k">import</span> <span class="n">compat</span>
 <span class="kn">from</span> <span class="nn">pydicom.charset</span> <span class="k">import</span> <span class="n">default_encoding</span><span class="p">,</span> <span class="n">convert_encodings</span>
 <span class="kn">from</span> <span class="nn">pydicom.datadict</span> <span class="k">import</span> <span class="n">dictionary_VR</span>
-<span class="kn">from</span> <span class="nn">pydicom.datadict</span> <span class="k">import</span> <span class="n">tag_for_keyword</span><span class="p">,</span> <span class="n">keyword_for_tag</span><span class="p">,</span> <span class="n">repeater_has_keyword</span>
+<span class="kn">from</span> <span class="nn">pydicom.datadict</span> <span class="k">import</span> <span class="p">(</span><span class="n">tag_for_keyword</span><span class="p">,</span> <span class="n">keyword_for_tag</span><span class="p">,</span>
+                              <span class="n">repeater_has_keyword</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">pydicom.tag</span> <span class="k">import</span> <span class="n">Tag</span><span class="p">,</span> <span class="n">BaseTag</span>
 <span class="kn">from</span> <span class="nn">pydicom.dataelem</span> <span class="k">import</span> <span class="n">DataElement</span><span class="p">,</span> <span class="n">DataElement_from_raw</span><span class="p">,</span> <span class="n">RawDataElement</span>
-<span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="k">import</span> <span class="n">NotCompressedPixelTransferSyntaxes</span><span class="p">,</span> <span class="n">UncompressedPixelTransferSyntaxes</span>
+<span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="k">import</span> <span class="n">NotCompressedPixelTransferSyntaxes</span>
 <span class="kn">from</span> <span class="nn">pydicom.tagtools</span> <span class="k">import</span> <span class="n">tag_in_exception</span>
 <span class="kn">import</span> <span class="nn">pydicom</span>  <span class="c1"># for write_file</span>
 <span class="kn">import</span> <span class="nn">pydicom.charset</span>
@@ -344,7 +345,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">indent_chars</span> <span class="o">=</span> <span class="s2">&quot;   &quot;</span>
 
-    <span class="c1"># Python 2: Classes which define __eq__ should flag themselves as unhashable</span>
+    <span class="c1"># Python 2: Classes defining __eq__ should flag themselves as unhashable</span>
     <span class="fm">__hash__</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -437,13 +438,14 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">tag</span> <span class="o">=</span> <span class="n">Tag</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-            <span class="k">except</span><span class="p">:</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">OverflowError</span><span class="p">):</span>
                 <span class="k">return</span> <span class="kc">False</span>
         <span class="c1"># Test against None as (0000,0000) is a possible tag</span>
         <span class="k">if</span> <span class="n">tag</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="nb">dict</span><span class="o">.</span><span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="nb">dict</span><span class="o">.</span><span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>  <span class="c1"># will no doubt raise an exception</span>
+            <span class="k">return</span> <span class="nb">dict</span><span class="o">.</span><span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                                     <span class="n">name</span><span class="p">)</span>  <span class="c1"># will no doubt raise an exception</span>
 
 <div class="viewcode-block" id="Dataset.decode"><a class="viewcode-back" href="../../ref_guide.html#pydicom.dataset.Dataset.decode">[docs]</a>    <span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Apply character set decoding to all DataElements in the Dataset.</span>
@@ -487,7 +489,8 @@
         <span class="c1"># First check if a valid DICOM keyword and if we have that data element</span>
         <span class="n">tag</span> <span class="o">=</span> <span class="n">tag_for_keyword</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">tag</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">tag</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
-            <span class="nb">dict</span><span class="o">.</span><span class="fm">__delitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="p">)</span>  <span class="c1"># direct to dict as we know we have key</span>
+            <span class="nb">dict</span><span class="o">.</span><span class="fm">__delitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                             <span class="n">tag</span><span class="p">)</span>  <span class="c1"># direct to dict as we know we have key</span>
         <span class="c1"># If not a DICOM name in this dataset, check for regular instance name</span>
         <span class="c1">#   can&#39;t do delete directly, that will call __delattr__ again</span>
         <span class="k">elif</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span>
@@ -545,10 +548,11 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Force zip object into a list in case of python3. Also backwards</span>
         <span class="c1"># compatible</span>
-        <span class="n">meths</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">inspect</span><span class="o">.</span><span class="n">getmembers</span><span class="p">(</span><span class="n">Dataset</span><span class="p">,</span>
-                                                 <span class="n">inspect</span><span class="o">.</span><span class="n">isroutine</span><span class="p">)))[</span><span class="mi">0</span><span class="p">])</span>
-        <span class="n">props</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">inspect</span><span class="o">.</span><span class="n">getmembers</span><span class="p">(</span><span class="n">Dataset</span><span class="p">,</span>
-                                                 <span class="n">inspect</span><span class="o">.</span><span class="n">isdatadescriptor</span><span class="p">)))[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">meths</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span>
+            <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">inspect</span><span class="o">.</span><span class="n">getmembers</span><span class="p">(</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isroutine</span><span class="p">)))[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">props</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span>
+            <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">inspect</span><span class="o">.</span><span class="n">getmembers</span><span class="p">(</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isdatadescriptor</span><span class="p">)))[</span>
+                <span class="mi">0</span><span class="p">])</span>
         <span class="n">dicom_names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dir</span><span class="p">())</span>
         <span class="n">alldir</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">props</span> <span class="o">|</span> <span class="n">meths</span> <span class="o">|</span> <span class="n">dicom_names</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">alldir</span>
@@ -603,7 +607,8 @@
             <span class="k">return</span> <span class="kc">True</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">):</span>
-            <span class="c1"># Compare Elements using values() and class variables using __dict__</span>
+            <span class="c1"># Compare Elements using values() and class variables using</span>
+            <span class="c1"># __dict__</span>
             <span class="c1"># Convert values() to a list for compatibility between</span>
             <span class="c1">#   python 2 and 3</span>
             <span class="k">return</span> <span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="o">==</span> <span class="nb">list</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="ow">and</span>
@@ -625,8 +630,8 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        value</span>
-<span class="sd">            If `key` is the keyword for a DataElement in the Dataset then return</span>
-<span class="sd">            the DataElement&#39;s value.</span>
+<span class="sd">            If `key` is the keyword for a DataElement in the Dataset then</span>
+<span class="sd">            return the DataElement&#39;s value.</span>
 <span class="sd">        pydicom.dataelem.DataElement</span>
 <span class="sd">            If `key` is a tag for a DataElement in the Dataset then return the</span>
 <span class="sd">            DataElement instance.</span>
@@ -644,7 +649,7 @@
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">BaseTag</span><span class="p">):</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="n">key</span> <span class="o">=</span> <span class="n">Tag</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-                <span class="k">except</span><span class="p">:</span>
+                <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">OverflowError</span><span class="p">):</span>
                     <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Dataset.get key must be a string or tag&quot;</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">return_val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
@@ -667,15 +672,15 @@
 <span class="sd">        -------</span>
 <span class="sd">        value</span>
 <span class="sd">              If `name` matches a DICOM keyword, returns the corresponding</span>
-<span class="sd">              DataElement&#39;s value. Otherwise returns the class attribute&#39;s value</span>
-<span class="sd">              (if present).</span>
+<span class="sd">              DataElement&#39;s value. Otherwise returns the class attribute&#39;s</span>
+<span class="sd">              value (if present).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">tag</span> <span class="o">=</span> <span class="n">tag_for_keyword</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">tag</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="c1"># `name` isn&#39;t a DICOM element keyword</span>
+        <span class="k">if</span> <span class="n">tag</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># `name` isn&#39;t a DICOM element keyword</span>
             <span class="c1"># Try the base class attribute getter (fix for issue 332)</span>
             <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">Dataset</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
         <span class="n">tag</span> <span class="o">=</span> <span class="n">Tag</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">tag</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span> <span class="c1"># DICOM DataElement not in the Dataset</span>
+        <span class="k">if</span> <span class="n">tag</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>  <span class="c1"># DICOM DataElement not in the Dataset</span>
             <span class="c1"># Try the base class attribute getter (fix for issue 332)</span>
             <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">Dataset</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -728,9 +733,9 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        pydicom.dataelem.DataElement or pydicom.dataset.Dataset</span>
-<span class="sd">            If a single DICOM element tag is used then returns the corresponding</span>
-<span class="sd">            DataElement. If a slice is used then returns a Dataset object</span>
-<span class="sd">            containing the corresponding DataElements.</span>
+<span class="sd">            If a single DICOM element tag is used then returns the</span>
+<span class="sd">            corresponding DataElement. If a slice is used then returns a</span>
+<span class="sd">            Dataset object containing the corresponding DataElements.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># If passed a slice, return a Dataset containing the corresponding</span>
         <span class="c1">#   DataElements</span>
@@ -749,10 +754,9 @@
             <span class="c1"># If a deferred read, then go get the value now</span>
             <span class="k">if</span> <span class="n">data_elem</span><span class="o">.</span><span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="kn">from</span> <span class="nn">pydicom.filereader</span> <span class="k">import</span> <span class="n">read_deferred_data_element</span>
-                <span class="n">data_elem</span> <span class="o">=</span> <span class="n">read_deferred_data_element</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fileobj_type</span><span class="p">,</span>
-                                                       <span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span>
-                                                       <span class="bp">self</span><span class="o">.</span><span class="n">timestamp</span><span class="p">,</span>
-                                                       <span class="n">data_elem</span><span class="p">)</span>
+                <span class="n">data_elem</span> <span class="o">=</span> <span class="n">read_deferred_data_element</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">fileobj_type</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">timestamp</span><span class="p">,</span>
+                    <span class="n">data_elem</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">tag</span> <span class="o">!=</span> <span class="p">(</span><span class="mh">0x08</span><span class="p">,</span> <span class="mh">0x05</span><span class="p">):</span>
                 <span class="n">character_set</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_character_set</span>
@@ -764,8 +768,8 @@
             <span class="c1"># If the Element has an ambiguous VR, try to correct it</span>
             <span class="k">if</span> <span class="s1">&#39;or&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span><span class="o">.</span><span class="n">VR</span><span class="p">:</span>
                 <span class="kn">from</span> <span class="nn">pydicom.filewriter</span> <span class="k">import</span> <span class="n">correct_ambiguous_vr_element</span>
-                <span class="bp">self</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span> <span class="o">=</span> <span class="n">correct_ambiguous_vr_element</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">tag</span><span class="p">],</span> <span class="bp">self</span><span class="p">,</span>
-                                                         <span class="n">data_elem</span><span class="p">[</span><span class="mi">6</span><span class="p">])</span>
+                <span class="bp">self</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span> <span class="o">=</span> <span class="n">correct_ambiguous_vr_element</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="p">[</span><span class="n">tag</span><span class="p">],</span> <span class="bp">self</span><span class="p">,</span> <span class="n">data_elem</span><span class="p">[</span><span class="mi">6</span><span class="p">])</span>
 
         <span class="k">return</span> <span class="nb">dict</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="p">)</span>
 
@@ -834,7 +838,8 @@
     <span class="k">def</span> <span class="nf">_is_uncompressed_transfer_syntax</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return True if the TransferSyntaxUID is a compressed syntax.&quot;&quot;&quot;</span>
         <span class="c1"># FIXME uses file_meta here, should really only be thus for FileDataset</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span> <span class="ow">in</span> <span class="n">NotCompressedPixelTransferSyntaxes</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span> <span class="ow">in</span> <span class="p">(</span>
+            <span class="n">NotCompressedPixelTransferSyntaxes</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Compare `self` and `other` for inequality.&quot;&quot;&quot;</span>
@@ -860,11 +865,12 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_uncompressed_transfer_syntax</span><span class="p">():</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">have_gdcm</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Pixel Data is compressed in a &quot;</span>
-                                          <span class="s2">&quot;format pydicom does not yet handle. &quot;</span>
-                                          <span class="s2">&quot;Cannot return array. Pydicom might &quot;</span>
-                                          <span class="s2">&quot;be able to convert the pixel data &quot;</span>
-                                          <span class="s2">&quot;using GDCM if it is installed.&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+                    <span class="s2">&quot;Pixel Data is compressed in a &quot;</span>
+                    <span class="s2">&quot;format pydicom does not yet handle. &quot;</span>
+                    <span class="s2">&quot;Cannot return array. Pydicom might &quot;</span>
+                    <span class="s2">&quot;be able to convert the pixel data &quot;</span>
+                    <span class="s2">&quot;using GDCM if it is installed.&quot;</span><span class="p">)</span>
             <span class="k">elif</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;GDCM is only supported when the &quot;</span>
                                           <span class="s2">&quot;dataset has been created with a &quot;</span>
@@ -901,8 +907,9 @@
             <span class="n">pixel_bytearray</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">PixelData</span>
         <span class="k">elif</span> <span class="n">have_gdcm</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">:</span>
             <span class="c1"># read the file using GDCM</span>
-            <span class="c1"># FIXME this should just use self.PixelData instead of self.filename</span>
-            <span class="c1">#       but it is unclear how this should be achieved using GDCM</span>
+            <span class="c1"># FIXME this should just use self.PixelData instead of</span>
+            <span class="c1">#       self.filename but it is unclear how this should be achieved</span>
+            <span class="c1">#       using GDCM</span>
             <span class="n">gdcm_image_reader</span> <span class="o">=</span> <span class="n">gdcm</span><span class="o">.</span><span class="n">ImageReader</span><span class="p">()</span>
             <span class="n">gdcm_image_reader</span><span class="o">.</span><span class="n">SetFileName</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">gdcm_image_reader</span><span class="o">.</span><span class="n">Read</span><span class="p">():</span>
@@ -911,14 +918,14 @@
 
             <span class="c1"># determine the correct numpy datatype</span>
             <span class="n">gdcm_numpy_typemap</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="n">gdcm</span><span class="o">.</span><span class="n">PixelFormat</span><span class="o">.</span><span class="n">INT8</span><span class="p">:</span>     <span class="n">numpy</span><span class="o">.</span><span class="n">int8</span><span class="p">,</span>
-                <span class="n">gdcm</span><span class="o">.</span><span class="n">PixelFormat</span><span class="o">.</span><span class="n">UINT8</span><span class="p">:</span>    <span class="n">numpy</span><span class="o">.</span><span class="n">uint8</span><span class="p">,</span>
-                <span class="n">gdcm</span><span class="o">.</span><span class="n">PixelFormat</span><span class="o">.</span><span class="n">UINT16</span><span class="p">:</span>   <span class="n">numpy</span><span class="o">.</span><span class="n">uint16</span><span class="p">,</span>
-                <span class="n">gdcm</span><span class="o">.</span><span class="n">PixelFormat</span><span class="o">.</span><span class="n">INT16</span><span class="p">:</span>    <span class="n">numpy</span><span class="o">.</span><span class="n">int16</span><span class="p">,</span>
-                <span class="n">gdcm</span><span class="o">.</span><span class="n">PixelFormat</span><span class="o">.</span><span class="n">UINT32</span><span class="p">:</span>   <span class="n">numpy</span><span class="o">.</span><span class="n">uint32</span><span class="p">,</span>
-                <span class="n">gdcm</span><span class="o">.</span><span class="n">PixelFormat</span><span class="o">.</span><span class="n">INT32</span><span class="p">:</span>    <span class="n">numpy</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span>
-                <span class="n">gdcm</span><span class="o">.</span><span class="n">PixelFormat</span><span class="o">.</span><span class="n">FLOAT32</span><span class="p">:</span>  <span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span>
-                <span class="n">gdcm</span><span class="o">.</span><span class="n">PixelFormat</span><span class="o">.</span><span class="n">FLOAT64</span><span class="p">:</span>  <span class="n">numpy</span><span class="o">.</span><span class="n">float64</span>
+                <span class="n">gdcm</span><span class="o">.</span><span class="n">PixelFormat</span><span class="o">.</span><span class="n">INT8</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">int8</span><span class="p">,</span>
+                <span class="n">gdcm</span><span class="o">.</span><span class="n">PixelFormat</span><span class="o">.</span><span class="n">UINT8</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">uint8</span><span class="p">,</span>
+                <span class="n">gdcm</span><span class="o">.</span><span class="n">PixelFormat</span><span class="o">.</span><span class="n">UINT16</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">uint16</span><span class="p">,</span>
+                <span class="n">gdcm</span><span class="o">.</span><span class="n">PixelFormat</span><span class="o">.</span><span class="n">INT16</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">int16</span><span class="p">,</span>
+                <span class="n">gdcm</span><span class="o">.</span><span class="n">PixelFormat</span><span class="o">.</span><span class="n">UINT32</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">uint32</span><span class="p">,</span>
+                <span class="n">gdcm</span><span class="o">.</span><span class="n">PixelFormat</span><span class="o">.</span><span class="n">INT32</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span>
+                <span class="n">gdcm</span><span class="o">.</span><span class="n">PixelFormat</span><span class="o">.</span><span class="n">FLOAT32</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span>
+                <span class="n">gdcm</span><span class="o">.</span><span class="n">PixelFormat</span><span class="o">.</span><span class="n">FLOAT64</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">float64</span>
             <span class="p">}</span>
             <span class="n">gdcm_pixel_format</span> <span class="o">=</span> <span class="n">gdcm_image</span><span class="o">.</span><span class="n">GetPixelFormat</span><span class="p">()</span><span class="o">.</span><span class="n">GetScalarType</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">gdcm_pixel_format</span> <span class="ow">in</span> <span class="n">gdcm_numpy_typemap</span><span class="p">:</span>
@@ -937,8 +944,8 @@
             <span class="c1"># representation on Python 3 by using the same parameters.</span>
             <span class="n">pixel_bytearray</span> <span class="o">=</span> <span class="n">gdcm_image</span><span class="o">.</span><span class="n">GetBuffer</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
-                <span class="n">pixel_bytearray</span> <span class="o">=</span> <span class="n">pixel_bytearray</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span>
-                                                         <span class="s2">&quot;surrogateescape&quot;</span><span class="p">)</span>
+                <span class="n">pixel_bytearray</span> <span class="o">=</span> <span class="n">pixel_bytearray</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span>
+                    <span class="s2">&quot;utf-8&quot;</span><span class="p">,</span> <span class="s2">&quot;surrogateescape&quot;</span><span class="p">)</span>
 
             <span class="c1"># if GDCM indicates that a byte swap is in order, make</span>
             <span class="c1">#   sure to inform numpy as well</span>
@@ -949,7 +956,8 @@
             <span class="c1"># buffer that is too large, so we need to make sure we only include</span>
             <span class="c1"># the first n_rows * n_columns * dtype_size bytes.</span>
 
-            <span class="n">n_bytes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Rows</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">Columns</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="n">numpy_dtype</span><span class="p">)</span><span class="o">.</span><span class="n">itemsize</span>
+            <span class="n">n_bytes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Rows</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">Columns</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span>
+                <span class="n">numpy_dtype</span><span class="p">)</span><span class="o">.</span><span class="n">itemsize</span>
 
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pixel_bytearray</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">n_bytes</span><span class="p">:</span>
 
@@ -972,7 +980,9 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">BitsAllocated</span> <span class="o">&gt;</span> <span class="mi">8</span><span class="p">:</span>
             <span class="n">expected_length</span> <span class="o">*=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">BitsAllocated</span> <span class="o">//</span> <span class="mi">8</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">length_of_pixel_array</span> <span class="o">!=</span> <span class="n">expected_length</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;Amount of pixel data </span><span class="si">%d</span><span class="s2"> does not match the expected data </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">length_of_pixel_array</span><span class="p">,</span> <span class="n">expected_length</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span>
+                <span class="s2">&quot;Amount of pixel data </span><span class="si">%d</span><span class="s2"> does not match the expected data </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span>
+                <span class="p">(</span><span class="n">length_of_pixel_array</span><span class="p">,</span> <span class="n">expected_length</span><span class="p">))</span>
 
         <span class="c1"># Note the following reshape operations return a new *view* onto</span>
         <span class="c1">#   pixel_array, but don&#39;t copy the data</span>
@@ -990,13 +1000,11 @@
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">SamplesPerPixel</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">BitsAllocated</span> <span class="o">==</span> <span class="mi">8</span><span class="p">:</span>
                     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">PlanarConfiguration</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                        <span class="n">pixel_array</span> <span class="o">=</span> <span class="n">pixel_array</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Rows</span><span class="p">,</span>
-                                                          <span class="bp">self</span><span class="o">.</span><span class="n">Columns</span><span class="p">,</span>
-                                                          <span class="bp">self</span><span class="o">.</span><span class="n">SamplesPerPixel</span><span class="p">)</span>
+                        <span class="n">pixel_array</span> <span class="o">=</span> <span class="n">pixel_array</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">Rows</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Columns</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">SamplesPerPixel</span><span class="p">)</span>
                     <span class="k">else</span><span class="p">:</span>
-                        <span class="n">pixel_array</span> <span class="o">=</span> <span class="n">pixel_array</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SamplesPerPixel</span><span class="p">,</span>
-                                                          <span class="bp">self</span><span class="o">.</span><span class="n">Rows</span><span class="p">,</span>
-                                                          <span class="bp">self</span><span class="o">.</span><span class="n">Columns</span><span class="p">)</span>
+                        <span class="n">pixel_array</span> <span class="o">=</span> <span class="n">pixel_array</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">SamplesPerPixel</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Rows</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Columns</span><span class="p">)</span>
                         <span class="n">pixel_array</span> <span class="o">=</span> <span class="n">pixel_array</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;This code only handles &quot;</span>
@@ -1047,12 +1055,18 @@
                    <span class="s2">&quot;format=&#39;</span><span class="si">%s</span><span class="s2">&#39;, PixelRepresentation=</span><span class="si">%d</span><span class="s2">, BitsAllocated=</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span> <span class="o">%</span> <span class="p">(</span><span class="n">format_str</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">PixelRepresentation</span><span class="p">,</span>
                                    <span class="bp">self</span><span class="o">.</span><span class="n">BitsAllocated</span><span class="p">))</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span> <span class="ow">in</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">uid</span><span class="o">.</span><span class="n">PILSupportedCompressedPixelTransferSyntaxes</span><span class="p">:</span>
-            <span class="n">UncompressedPixelData</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_PIL_supported_compressed_pixeldata</span><span class="p">()</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span> <span class="ow">in</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">uid</span><span class="o">.</span><span class="n">JPEGLSSupportedCompressedPixelTransferSyntaxes</span><span class="p">:</span>
-            <span class="n">UncompressedPixelData</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_jpeg_ls_supported_compressed_pixeldata</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span> <span class="ow">in</span>
+                <span class="n">pydicom</span><span class="o">.</span><span class="n">uid</span><span class="o">.</span><span class="n">PILSupportedCompressedPixelTransferSyntaxes</span><span class="p">):</span>
+            <span class="n">UncompressedPixelData</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span>\
+                <span class="n">_get_PIL_supported_compressed_pixeldata</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span> <span class="ow">in</span>
+                <span class="n">pydicom</span><span class="o">.</span><span class="n">uid</span><span class="o">.</span><span class="n">JPEGLSSupportedCompressedPixelTransferSyntaxes</span><span class="p">):</span>
+            <span class="n">UncompressedPixelData</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span>\
+                <span class="n">_get_jpeg_ls_supported_compressed_pixeldata</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;The transfer syntax </span><span class="si">{0}</span><span class="s2"> is not currently supported.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span><span class="p">)</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;The transfer syntax </span><span class="si">{0}</span><span class="s2"> is not currently supported.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span><span class="p">)</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
         <span class="c1"># Have correct Numpy format, so create the NumPy array</span>
@@ -1060,8 +1074,10 @@
 
         <span class="c1"># XXX byte swap - may later handle this in read_file!!?</span>
         <span class="k">if</span> <span class="n">need_byteswap</span><span class="p">:</span>
-            <span class="n">arr</span><span class="o">.</span><span class="n">byteswap</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># True means swap in-place, don&#39;t make a new copy</span>
-        <span class="c1"># Note the following reshape operations return a new *view* onto arr, but don&#39;t copy the data</span>
+            <span class="c1"># True means swap in-place, don&#39;t make a new copy</span>
+            <span class="n">arr</span><span class="o">.</span><span class="n">byteswap</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="c1"># Note the following reshape operations return a new *view* onto arr,</span>
+        <span class="c1"># but don&#39;t copy the data</span>
         <span class="k">if</span> <span class="s1">&#39;NumberOfFrames&#39;</span> <span class="ow">in</span> <span class="bp">self</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">NumberOfFrames</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">SamplesPerPixel</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="n">arr</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">NumberOfFrames</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Rows</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Columns</span><span class="p">,</span>
@@ -1084,7 +1100,9 @@
                                               <span class="s2">&quot;Allocated = 8&quot;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">arr</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Rows</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Columns</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span> <span class="ow">in</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">uid</span><span class="o">.</span><span class="n">JPEG2000CompressedPixelTransferSyntaxes</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">BitsStored</span> <span class="o">==</span> <span class="mi">16</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span> <span class="ow">in</span>
+            <span class="n">pydicom</span><span class="o">.</span><span class="n">uid</span><span class="o">.</span><span class="n">JPEG2000CompressedPixelTransferSyntaxes</span>
+                <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">BitsStored</span> <span class="o">==</span> <span class="mi">16</span><span class="p">):</span>
             <span class="c1"># WHY IS THIS EVEN NECESSARY??</span>
             <span class="n">arr</span> <span class="o">&amp;=</span> <span class="mh">0x7FFF</span>
         <span class="k">return</span> <span class="n">arr</span>
@@ -1110,15 +1128,20 @@
                   <span class="s2">&quot;imported.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span><span class="p">)</span>
             <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
         <span class="c1"># decompress here</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span> <span class="ow">in</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">uid</span><span class="o">.</span><span class="n">JPEGLossyCompressedPixelTransferSyntaxes</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span> <span class="ow">in</span>
+                <span class="n">pydicom</span><span class="o">.</span><span class="n">uid</span><span class="o">.</span><span class="n">JPEGLossyCompressedPixelTransferSyntaxes</span><span class="p">):</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">BitsAllocated</span> <span class="o">&gt;</span> <span class="mi">8</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;JPEG Lossy only supported if Bits &quot;</span>
                                           <span class="s2">&quot;Allocated = 8&quot;</span><span class="p">)</span>
-            <span class="n">generic_jpeg_file_header</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\xff\xd8\xff\xe0\x00\x10</span><span class="s1">JFIF</span><span class="se">\x00\x01\x01\x01\x00\x01\x00\x01\x00\x00</span><span class="s1">&#39;</span>
+            <span class="n">generic_jpeg_file_header</span> <span class="o">=</span> <span class="p">(</span><span class="sa">b</span><span class="s1">&#39;</span><span class="se">\xff\xd8\xff\xe0\x00\x10</span><span class="s1">JFIF</span><span class="se">\x00</span><span class="s1">&#39;</span><span class="p">,</span>
+                                        <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x01\x01\x01\x00\x01\x00\x01\x00</span><span class="s1">&#39;</span><span class="p">,</span>
+                                        <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">&#39;</span><span class="p">)</span>
             <span class="n">frame_start_from</span> <span class="o">=</span> <span class="mi">2</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span> <span class="ow">in</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">uid</span><span class="o">.</span><span class="n">JPEG2000CompressedPixelTransferSyntaxes</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span> <span class="ow">in</span>
+                <span class="n">pydicom</span><span class="o">.</span><span class="n">uid</span><span class="o">.</span><span class="n">JPEG2000CompressedPixelTransferSyntaxes</span><span class="p">):</span>
             <span class="n">generic_jpeg_file_header</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span>
-            <span class="c1"># generic_jpeg_file_header = b&#39;\x00\x00\x00\x0C\x6A\x50\x20\x20\x0D\x0A\x87\x0A&#39;</span>
+            <span class="c1"># generic_jpeg_file_header = (b&#39;\x00\x00\x00\x0C\x6A\x50&#39;</span>
+            <span class="c1">#                             b&#39;\x20\x20\x0D\x0A\x87\x0A&#39;)</span>
             <span class="n">frame_start_from</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">generic_jpeg_file_header</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span>
@@ -1127,7 +1150,8 @@
             <span class="n">UncompressedPixelData</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
             <span class="k">if</span> <span class="s1">&#39;NumberOfFrames&#39;</span> <span class="ow">in</span> <span class="bp">self</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">NumberOfFrames</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="c1"># multiple compressed frames</span>
-                <span class="n">CompressedPixelDataSeq</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">encaps</span><span class="o">.</span><span class="n">decode_data_sequence</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">PixelData</span><span class="p">)</span>
+                <span class="n">CompressedPixelDataSeq</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">encaps</span><span class="o">.</span><span class="n">decode_data_sequence</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">PixelData</span><span class="p">)</span>
                 <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="n">CompressedPixelDataSeq</span><span class="p">:</span>
                     <span class="n">data</span> <span class="o">=</span> <span class="n">generic_jpeg_file_header</span> <span class="o">+</span> <span class="n">frame</span><span class="p">[</span><span class="n">frame_start_from</span><span class="p">:]</span>
                     <span class="n">fio</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
@@ -1136,31 +1160,33 @@
                     <span class="k">except</span> <span class="ne">IOError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                         <span class="k">try</span><span class="p">:</span>
                             <span class="n">message</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
-                        <span class="k">except</span><span class="p">:</span>
+                        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
                             <span class="k">try</span><span class="p">:</span>
                                 <span class="n">message</span> <span class="o">=</span> <span class="n">unicode</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
-                            <span class="k">except</span><span class="p">:</span>
+                            <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
                                 <span class="n">message</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
                         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
                     <span class="n">UncompressedPixelData</span> <span class="o">+=</span> <span class="n">decompressed_image</span><span class="o">.</span><span class="n">tobytes</span><span class="p">()</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="c1"># single compressed frame</span>
-                <span class="n">UncompressedPixelData</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">encaps</span><span class="o">.</span><span class="n">defragment_data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">PixelData</span><span class="p">)</span>
-                <span class="n">UncompressedPixelData</span> <span class="o">=</span> <span class="n">generic_jpeg_file_header</span> <span class="o">+</span> <span class="n">UncompressedPixelData</span><span class="p">[</span><span class="n">frame_start_from</span><span class="p">:]</span>
+                <span class="n">UncompressedPixelData</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">encaps</span><span class="o">.</span><span class="n">defragment_data</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">PixelData</span><span class="p">)</span>
+                <span class="n">UncompressedPixelData</span> <span class="o">=</span> <span class="p">(</span><span class="n">generic_jpeg_file_header</span> <span class="o">+</span>
+                                         <span class="n">UncompressedPixelData</span><span class="p">[</span><span class="n">frame_start_from</span><span class="p">:])</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="n">fio</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">UncompressedPixelData</span><span class="p">)</span>
                     <span class="n">decompressed_image</span> <span class="o">=</span> <span class="n">PILImg</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">fio</span><span class="p">)</span>
                 <span class="k">except</span> <span class="ne">IOError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                     <span class="k">try</span><span class="p">:</span>
                         <span class="n">message</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
-                    <span class="k">except</span><span class="p">:</span>
+                    <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
                         <span class="k">try</span><span class="p">:</span>
                             <span class="n">message</span> <span class="o">=</span> <span class="n">unicode</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
-                        <span class="k">except</span><span class="p">:</span>
+                        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
                             <span class="n">message</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
                     <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
                 <span class="n">UncompressedPixelData</span> <span class="o">=</span> <span class="n">decompressed_image</span><span class="o">.</span><span class="n">tobytes</span><span class="p">()</span>
-        <span class="k">except</span><span class="p">:</span>
+        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
             <span class="k">raise</span>
         <span class="k">return</span> <span class="n">UncompressedPixelData</span>
 
@@ -1186,15 +1212,19 @@
         <span class="n">UncompressedPixelData</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
         <span class="k">if</span> <span class="s1">&#39;NumberOfFrames&#39;</span> <span class="ow">in</span> <span class="bp">self</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">NumberOfFrames</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="c1"># multiple compressed frames</span>
-            <span class="n">CompressedPixelDataSeq</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">encaps</span><span class="o">.</span><span class="n">decode_data_sequence</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">PixelData</span><span class="p">)</span>
+            <span class="n">CompressedPixelDataSeq</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">encaps</span><span class="o">.</span><span class="n">decode_data_sequence</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">PixelData</span><span class="p">)</span>
             <span class="c1"># print len(CompressedPixelDataSeq)</span>
             <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="n">CompressedPixelDataSeq</span><span class="p">:</span>
-                <span class="n">decompressed_image</span> <span class="o">=</span> <span class="n">jpeg_ls</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">uint8</span><span class="p">))</span>
+                <span class="n">decompressed_image</span> <span class="o">=</span> <span class="n">jpeg_ls</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span>
+                    <span class="n">numpy</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">uint8</span><span class="p">))</span>
                 <span class="n">UncompressedPixelData</span> <span class="o">+=</span> <span class="n">decompressed_image</span><span class="o">.</span><span class="n">tobytes</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># single compressed frame</span>
-            <span class="n">CompressedPixelData</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">encaps</span><span class="o">.</span><span class="n">defragment_data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">PixelData</span><span class="p">)</span>
-            <span class="n">decompressed_image</span> <span class="o">=</span> <span class="n">jpeg_ls</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">CompressedPixelData</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">uint8</span><span class="p">))</span>
+            <span class="n">CompressedPixelData</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">encaps</span><span class="o">.</span><span class="n">defragment_data</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">PixelData</span><span class="p">)</span>
+            <span class="n">decompressed_image</span> <span class="o">=</span> <span class="n">jpeg_ls</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span>
+                <span class="n">numpy</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">CompressedPixelData</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">uint8</span><span class="p">))</span>
             <span class="n">UncompressedPixelData</span> <span class="o">=</span> <span class="n">decompressed_image</span><span class="o">.</span><span class="n">tobytes</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">UncompressedPixelData</span>
 
@@ -1218,13 +1248,18 @@
             <span class="k">try</span><span class="p">:</span>
                 <span class="c1"># print(&quot;Pixel Data is compressed&quot;)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_pixel_array</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compressed_pixel_data_numpy</span><span class="p">()</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_pixel_id</span> <span class="o">=</span> <span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">PixelData</span><span class="p">)</span>  <span class="c1"># is this guaranteed to work if memory is re-used??</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_pixel_id</span> <span class="o">=</span> <span class="nb">id</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">PixelData</span>
+                <span class="p">)</span>  <span class="c1"># is this guaranteed to work if memory is re-used??</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pixel_array</span>
-            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">I</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Pillow or JPLS did not support this transfer syntax&quot;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="s2">&quot;Pillow or JPLS did not support this transfer syntax&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">already_have</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_pixel_array</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pixel_data_numpy</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_pixel_id</span> <span class="o">=</span> <span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">PixelData</span><span class="p">)</span>  <span class="c1"># is this guaranteed to work if memory is re-used??</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pixel_id</span> <span class="o">=</span> <span class="nb">id</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">PixelData</span>
+            <span class="p">)</span>  <span class="c1"># is this guaranteed to work if memory is re-used??</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pixel_array</span>
 
     <span class="nd">@property</span>
@@ -1239,13 +1274,15 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_pixel_array</span><span class="p">()</span>
 
     <span class="c1"># Format strings spec&#39;d according to python string formatting options</span>
-    <span class="c1">#    See http://docs.python.org/library/stdtypes.html#string-formatting-operations</span>
+    <span class="c1">#    See http://docs.python.org/library/stdtypes.html#string-formatting-operations # noqa</span>
     <span class="n">default_element_format</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%(tag)s</span><span class="s2"> </span><span class="si">%(name)-35.35s</span><span class="s2"> </span><span class="si">%(VR)s</span><span class="s2">: </span><span class="si">%(repval)s</span><span class="s2">&quot;</span>
-    <span class="n">default_sequence_element_format</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%(tag)s</span><span class="s2"> </span><span class="si">%(name)-35.35s</span><span class="s2"> </span><span class="si">%(VR)s</span><span class="s2">: </span><span class="si">%(repval)s</span><span class="s2">&quot;</span>
+    <span class="n">default_sequence_element_format</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%(tag)s</span><span class="s2"> </span><span class="si">%(name)-35.35s</span><span class="s2"> </span><span class="si">%(VR)s</span><span class="s2">: </span><span class="si">%(repval)s</span><span class="s2">&quot;</span>  <span class="c1"># noqa</span>
 
-<div class="viewcode-block" id="Dataset.formatted_lines"><a class="viewcode-back" href="../../ref_guide.html#pydicom.dataset.Dataset.formatted_lines">[docs]</a>    <span class="k">def</span> <span class="nf">formatted_lines</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element_format</span><span class="o">=</span><span class="n">default_element_format</span><span class="p">,</span>
-                        <span class="n">sequence_element_format</span><span class="o">=</span><span class="n">default_sequence_element_format</span><span class="p">,</span>
-                        <span class="n">indent_format</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Dataset.formatted_lines"><a class="viewcode-back" href="../../ref_guide.html#pydicom.dataset.Dataset.formatted_lines">[docs]</a>    <span class="k">def</span> <span class="nf">formatted_lines</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">element_format</span><span class="o">=</span><span class="n">default_element_format</span><span class="p">,</span>
+            <span class="n">sequence_element_format</span><span class="o">=</span><span class="n">default_sequence_element_format</span><span class="p">,</span>
+            <span class="n">indent_format</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Iterate through the Dataset yielding formatted str for each element.</span>
 
 <span class="sd">        Parameters</span>
@@ -1269,11 +1306,13 @@
         <span class="k">for</span> <span class="n">data_element</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">iterall</span><span class="p">():</span>
             <span class="c1"># Get all the attributes possible for this data element (e.g.</span>
             <span class="c1">#   gets descriptive text name too)</span>
-            <span class="c1"># This is the dictionary of names that can be used in the format string</span>
+            <span class="c1"># This is the dictionary of names that can be used in the format</span>
+            <span class="c1">#   string</span>
             <span class="n">elem_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">([(</span><span class="n">x</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">data_element</span><span class="p">,</span> <span class="n">x</span><span class="p">)()</span>
-                               <span class="k">if</span> <span class="n">callable</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">data_element</span><span class="p">,</span> <span class="n">x</span><span class="p">))</span>
-                               <span class="k">else</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">data_element</span><span class="p">,</span> <span class="n">x</span><span class="p">))</span>
-                              <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="n">data_element</span><span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)])</span>
+                               <span class="k">if</span> <span class="n">callable</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">data_element</span><span class="p">,</span> <span class="n">x</span><span class="p">))</span> <span class="k">else</span>
+                               <span class="nb">getattr</span><span class="p">(</span><span class="n">data_element</span><span class="p">,</span> <span class="n">x</span><span class="p">))</span>
+                              <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="n">data_element</span><span class="p">)</span>
+                              <span class="k">if</span> <span class="ow">not</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)])</span>
             <span class="k">if</span> <span class="n">data_element</span><span class="o">.</span><span class="n">VR</span> <span class="o">==</span> <span class="s2">&quot;SQ&quot;</span><span class="p">:</span>
                 <span class="k">yield</span> <span class="n">sequence_element_format</span> <span class="o">%</span> <span class="n">elem_dict</span>
             <span class="k">else</span><span class="p">:</span>
@@ -1284,7 +1323,7 @@
 
 <span class="sd">        This private method is called by the __str__() method for handling</span>
 <span class="sd">        print statements or str(dataset), and the __repr__() method.</span>
-<span class="sd">        It is also used by top(), which is the reason for the top_level_only flag.</span>
+<span class="sd">        It is also used by top(), therefore the top_level_only flag.</span>
 <span class="sd">        This function recurses, with increasing indentation levels.</span>
 
 <span class="sd">        Parameters</span>
@@ -1305,11 +1344,11 @@
         <span class="n">nextindent_str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">indent_chars</span> <span class="o">*</span> <span class="p">(</span><span class="n">indent</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">data_element</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
             <span class="k">with</span> <span class="n">tag_in_exception</span><span class="p">(</span><span class="n">data_element</span><span class="o">.</span><span class="n">tag</span><span class="p">):</span>
-                <span class="k">if</span> <span class="n">data_element</span><span class="o">.</span><span class="n">VR</span> <span class="o">==</span> <span class="s2">&quot;SQ&quot;</span><span class="p">:</span>   <span class="c1"># a sequence</span>
+                <span class="k">if</span> <span class="n">data_element</span><span class="o">.</span><span class="n">VR</span> <span class="o">==</span> <span class="s2">&quot;SQ&quot;</span><span class="p">:</span>  <span class="c1"># a sequence</span>
                     <span class="n">strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">indent_str</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">data_element</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span> <span class="o">+</span>
-                                   <span class="s2">&quot;  </span><span class="si">%s</span><span class="s2">   </span><span class="si">%i</span><span class="s2"> item(s) ---- &quot;</span>
-                                   <span class="o">%</span><span class="p">(</span><span class="n">data_element</span><span class="o">.</span><span class="n">description</span><span class="p">(),</span>
-                                     <span class="nb">len</span><span class="p">(</span><span class="n">data_element</span><span class="o">.</span><span class="n">value</span><span class="p">)))</span>
+                                   <span class="s2">&quot;  </span><span class="si">%s</span><span class="s2">   </span><span class="si">%i</span><span class="s2"> item(s) ---- &quot;</span> <span class="o">%</span>
+                                   <span class="p">(</span><span class="n">data_element</span><span class="o">.</span><span class="n">description</span><span class="p">(),</span>
+                                    <span class="nb">len</span><span class="p">(</span><span class="n">data_element</span><span class="o">.</span><span class="n">value</span><span class="p">)))</span>
                     <span class="k">if</span> <span class="ow">not</span> <span class="n">top_level_only</span><span class="p">:</span>
                         <span class="k">for</span> <span class="n">dataset</span> <span class="ow">in</span> <span class="n">data_element</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
                             <span class="n">strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">_pretty_str</span><span class="p">(</span><span class="n">indent</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
@@ -1320,11 +1359,13 @@
 
 <div class="viewcode-block" id="Dataset.remove_private_tags"><a class="viewcode-back" href="../../ref_guide.html#pydicom.dataset.Dataset.remove_private_tags">[docs]</a>    <span class="k">def</span> <span class="nf">remove_private_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Remove all private DataElements in the Dataset.&quot;&quot;&quot;</span>
+
         <span class="k">def</span> <span class="nf">RemoveCallback</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">data_element</span><span class="p">):</span>
             <span class="sd">&quot;&quot;&quot;Internal method to use as callback to walk() method.&quot;&quot;&quot;</span>
             <span class="k">if</span> <span class="n">data_element</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">is_private</span><span class="p">:</span>
                 <span class="c1"># can&#39;t del self[tag] - won&#39;t be right dataset on recursion</span>
                 <span class="k">del</span> <span class="n">dataset</span><span class="p">[</span><span class="n">data_element</span><span class="o">.</span><span class="n">tag</span><span class="p">]</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">RemoveCallback</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Dataset.save_as"><a class="viewcode-back" href="../../ref_guide.html#pydicom.dataset.Dataset.save_as">[docs]</a>    <span class="k">def</span> <span class="nf">save_as</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">write_like_original</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
@@ -1356,8 +1397,8 @@
 <span class="sd">        write_like_original : bool</span>
 <span class="sd">            If True (default), preserves the following information from</span>
 <span class="sd">            the Dataset (and may result in a non-conformant file):</span>
-<span class="sd">            - preamble -- if the original file has no preamble then none will be</span>
-<span class="sd">                written.</span>
+<span class="sd">            - preamble -- if the original file has no preamble then none will</span>
+<span class="sd">                be written.</span>
 <span class="sd">            - file_meta -- if the original file was missing any required File</span>
 <span class="sd">                Meta Information Group elements then they will not be added or</span>
 <span class="sd">                written.</span>
@@ -1365,8 +1406,8 @@
 <span class="sd">                then it may have its value updated.</span>
 <span class="sd">            - seq.is_undefined_length -- if original had delimiters, write them</span>
 <span class="sd">                now too, instead of the more sensible length characters</span>
-<span class="sd">            - is_undefined_length_sequence_item -- for datasets that belong to a</span>
-<span class="sd">                sequence, write the undefined length delimiters if that is</span>
+<span class="sd">            - is_undefined_length_sequence_item -- for datasets that belong to</span>
+<span class="sd">                a sequence, write the undefined length delimiters if that is</span>
 <span class="sd">                what the original had.</span>
 <span class="sd">            If False, produces a file conformant with the DICOM File Format,</span>
 <span class="sd">            with explicit lengths for all elements.</span>
@@ -1407,7 +1448,8 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">tag</span> <span class="o">=</span> <span class="n">tag_for_keyword</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">tag</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># successfully mapped name to a tag</span>
-            <span class="k">if</span> <span class="n">tag</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>  <span class="c1"># don&#39;t have this tag yet-&gt;create the data_element instance</span>
+            <span class="k">if</span> <span class="n">tag</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+                <span class="c1"># don&#39;t have this tag yet-&gt;create the data_element instance</span>
                 <span class="n">VR</span> <span class="o">=</span> <span class="n">dictionary_VR</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span>
                 <span class="n">data_element</span> <span class="o">=</span> <span class="n">DataElement</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">VR</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>  <span class="c1"># already have this data_element, just changing its value</span>
@@ -1415,11 +1457,14 @@
                 <span class="n">data_element</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
             <span class="c1"># Now have data_element - store it in this dict</span>
             <span class="bp">self</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_element</span>
-        <span class="k">elif</span> <span class="n">repeater_has_keyword</span><span class="p">(</span><span class="n">name</span><span class="p">):</span> <span class="c1"># Check if `name` is repeaters element</span>
+        <span class="k">elif</span> <span class="n">repeater_has_keyword</span><span class="p">(</span>
+                <span class="n">name</span><span class="p">):</span>  <span class="c1"># Check if `name` is repeaters element</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> is a DICOM repeating group element and must &#39;</span>
                              <span class="s1">&#39;be added using the add() or add_new() methods.&#39;</span>
                              <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
-        <span class="k">else</span><span class="p">:</span>  <span class="c1"># name not in dicom dictionary - setting a non-dicom instance attribute</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># name not in dicom dictionary - setting a non-dicom instance</span>
+            <span class="c1"># attribute</span>
             <span class="c1"># XXX note if user mis-spells a dicom data_element - no error!!!</span>
             <span class="nb">super</span><span class="p">(</span><span class="n">Dataset</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
 
@@ -1461,8 +1506,8 @@
             <span class="n">private_creator_tag</span> <span class="o">=</span> <span class="n">Tag</span><span class="p">(</span><span class="n">tag</span><span class="o">.</span><span class="n">group</span><span class="p">,</span> <span class="n">private_block</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">private_creator_tag</span> <span class="ow">in</span> <span class="bp">self</span> <span class="ow">and</span> <span class="n">tag</span> <span class="o">!=</span> <span class="n">private_creator_tag</span><span class="p">:</span>
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data_element</span><span class="p">,</span> <span class="n">RawDataElement</span><span class="p">):</span>
-                    <span class="n">data_element</span> <span class="o">=</span> <span class="n">DataElement_from_raw</span><span class="p">(</span><span class="n">data_element</span><span class="p">,</span>
-                                                        <span class="bp">self</span><span class="o">.</span><span class="n">_character_set</span><span class="p">)</span>
+                    <span class="n">data_element</span> <span class="o">=</span> <span class="n">DataElement_from_raw</span><span class="p">(</span>
+                        <span class="n">data_element</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_character_set</span><span class="p">)</span>
                 <span class="n">data_element</span><span class="o">.</span><span class="n">private_creator</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">private_creator_tag</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
         <span class="nb">dict</span><span class="o">.</span><span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="p">,</span> <span class="n">data_element</span><span class="p">)</span>
 
@@ -1570,7 +1615,8 @@
             <span class="k">with</span> <span class="n">tag_in_exception</span><span class="p">(</span><span class="n">tag</span><span class="p">):</span>
                 <span class="n">data_element</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span>
                 <span class="n">callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_element</span><span class="p">)</span>  <span class="c1"># self = this Dataset</span>
-                <span class="c1"># &#39;tag in self&#39; below needed in case callback deleted data_element</span>
+                <span class="c1"># &#39;tag in self&#39; below needed in case callback deleted</span>
+                <span class="c1"># data_element</span>
                 <span class="k">if</span> <span class="n">recursive</span> <span class="ow">and</span> <span class="n">tag</span> <span class="ow">in</span> <span class="bp">self</span> <span class="ow">and</span> <span class="n">data_element</span><span class="o">.</span><span class="n">VR</span> <span class="o">==</span> <span class="s2">&quot;SQ&quot;</span><span class="p">:</span>
                     <span class="n">sequence</span> <span class="o">=</span> <span class="n">data_element</span><span class="o">.</span><span class="n">value</span>
                     <span class="k">for</span> <span class="n">dataset</span> <span class="ow">in</span> <span class="n">sequence</span><span class="p">:</span>
@@ -1603,8 +1649,14 @@
 <span class="sd">        The modification time of the file the dataset was read from, None if</span>
 <span class="sd">        the modification time is not available.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename_or_obj</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">preamble</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">file_meta</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">is_implicit_VR</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">filename_or_obj</span><span class="p">,</span>
+                 <span class="n">dataset</span><span class="p">,</span>
+                 <span class="n">preamble</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">file_meta</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">is_implicit_VR</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                 <span class="n">is_little_endian</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Initialize a Dataset read from a DICOM file.</span>
 
 <span class="sd">        Parameters</span>
@@ -1638,13 +1690,17 @@
             <span class="c1"># This is the appropriate constructor for io.BufferedReader</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fileobj_type</span> <span class="o">=</span> <span class="nb">open</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">fileobj_type</span> <span class="o">=</span> <span class="n">filename_or_obj</span><span class="o">.</span><span class="vm">__class__</span>  <span class="c1"># use __class__ python &lt;2.7?; http://docs.python.org/reference/datamodel.html</span>
+            <span class="c1"># use __class__ python &lt;2.7?;</span>
+            <span class="c1"># http://docs.python.org/reference/datamodel.html</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fileobj_type</span> <span class="o">=</span> <span class="n">filename_or_obj</span><span class="o">.</span><span class="vm">__class__</span>
             <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">filename_or_obj</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="n">filename_or_obj</span><span class="o">.</span><span class="n">name</span>
-            <span class="k">elif</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">filename_or_obj</span><span class="p">,</span> <span class="s2">&quot;filename&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>  <span class="c1"># gzip python &lt;2.7?</span>
+            <span class="k">elif</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">filename_or_obj</span><span class="p">,</span> <span class="s2">&quot;filename&quot;</span><span class="p">,</span>
+                         <span class="kc">False</span><span class="p">):</span>  <span class="c1"># gzip python &lt;2.7?</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="n">filename_or_obj</span><span class="o">.</span><span class="n">filename</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># e.g. came from BytesIO or something file-like</span>
+                <span class="c1"># e.g. came from BytesIO or something file-like</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="n">stat_available</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">):</span>
             <span class="n">statinfo</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
