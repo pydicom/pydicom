@@ -26,9 +26,14 @@ except ImportError:
         raise
 
 sys_is_little_endian = (sys.byteorder == 'little')
-have_pillow_jpeg_plugin = 'JpegImagePlugin' in PIL._plugins
-have_pillow_jpeg2000_plugin = 'Jpeg2KImagePlugin' in PIL._plugins
-
+have_pillow_jpeg_plugin = False
+have_pillow_jpeg2000_plugin = False
+try:
+    from PIL import _imaging as pillow_core
+    have_pillow_jpeg_plugin = hasattr(pillow_core, "jpeg_decoder")
+    have_pillow_jpeg2000_plugin = hasattr(pillow_core, "jpeg2k_decoder")
+except:
+    pass
 
 def supports_transfer_syntax(self):
     if have_pillow_jpeg_plugin and (self.file_meta.TransferSyntaxUID in pydicom.uid.PillowJPEGCompressedPixelTransferSyntaxes):

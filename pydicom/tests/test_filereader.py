@@ -823,7 +823,8 @@ class ReadTruncatedFileTests(unittest.TestCase):
         mr.decode()
         msg = r"(Amount of pixel data.*" \
             "does not match the expected data|" \
-            "Unexpected end of file. Read.*bytes of.*expected)"
+            "Unexpected end of file. Read.*bytes of.*expected|" \
+            "'str' object has no attribute 'reshape')"
         with self.assertRaisesRegexp(AttributeError, msg):
             mr.pixel_array
 
