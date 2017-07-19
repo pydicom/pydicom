@@ -52,7 +52,7 @@ URL = "https://github.com/pydicom/pydicom"
 DOWNLOAD_URL = "https://github.com/pydicom/pydicom/archive/master.zip"
 LICENSE = "MIT"
 VERSION = __version__
-# PACKAGE_DATA = {'pydicom': ['../tests/tests_files/*']}
+PACKAGE_DATA = {'pydicom': ['tests/test_files/*', 'tests/charset_files/*']}
 REQUIRES = []
 
 opts = dict(name=NAME,
@@ -69,7 +69,7 @@ opts = dict(name=NAME,
             keywords=KEYWORDS,
             classifiers=CLASSIFIERS,
             packages=find_packages(),
-            # package_data=PACKAGE_DATA,
+            package_data=PACKAGE_DATA,
             include_package_data=True,
             install_requires=REQUIRES,
             zip_safe=False)
