@@ -174,7 +174,7 @@ class jpeg_ls_JPEGlosslessTests_no_jpeg_ls(unittest.TestCase):
             "expected %s" % (got, expected))
 
     def testJPEGlosslessPixelArray(self):
-        """JPEGlossless: Fails gracefully when uncompressed data is asked for"""
+        """JPEGlossless: Fails gracefully when uncompressed data asked for"""
         with self.assertRaises((NotImplementedError, )):
             _ = self.jpeg_lossless.pixel_array
 
@@ -297,6 +297,6 @@ class jpeg_ls_JPEGlosslessTests_with_jpeg_ls(unittest.TestCase):
             "expected %s" % (got, expected))
 
     def testJPEGlosslessPixelArray(self):
-        """JPEGlossless: Fails gracefully when uncompressed data is asked for"""
+        """JPEGlossless: Fails gracefully when uncompressed data asked for"""
         with self.assertRaises((NotImplementedError, )):
             _ = self.jpeg_lossless.pixel_array

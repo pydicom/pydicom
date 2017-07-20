@@ -404,7 +404,8 @@ class DatasetTests(unittest.TestCase):
         self.assertFalse(d == e)
 
     def testEqualityPrivate(self):
-        """Dataset: equality returns correct value when dataset has private elements"""
+        """Dataset: equality returns correct value"""
+        """when dataset has private elements"""
         d = Dataset()
         d_elem = DataElement(0x01110001, 'PN', 'Private')
         self.assertTrue(d == d)
@@ -419,7 +420,8 @@ class DatasetTests(unittest.TestCase):
         self.assertFalse(d == e)
 
     def testEqualitySequence(self):
-        """Dataset: equality returns correct value when dataset has sequences"""
+        """Dataset: equality returns correct value"""
+        """when dataset has sequences"""
         # Test even sequences
         d = Dataset()
         d.SOPInstanceUID = '1.2.3.4'
@@ -525,7 +527,8 @@ class DatasetTests(unittest.TestCase):
         self.assertEqual(dsp.test, 'ABCD')
 
     def test_add_repeater_elem_by_keyword(self):
-        """Repeater using keyword to add repeater group elements raises ValueError."""
+        """Repeater using keyword to add repeater"""
+        """group elements raises ValueError."""
         ds = Dataset()
 
         def test():

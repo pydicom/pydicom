@@ -182,7 +182,7 @@ class GDCM_JPEGlosslessTests_no_gdcm(unittest.TestCase):
             "expected %s" % (got, expected))
 
     def testJPEGlosslessPixelArray(self):
-        """JPEGlossless: Fails gracefully when uncompressed data is asked for"""
+        """JPEGlossless: Fails gracefully when uncompressed data asked for"""
         with self.assertRaises((NotImplementedError, )):
             _ = self.jpeg_lossless.pixel_array
 
