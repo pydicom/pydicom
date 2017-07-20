@@ -7,10 +7,7 @@
 #    See the file LICENSE included with this distribution, also
 #    available at https://github.com/pydicom/pydicom
 
-from struct import (
-    unpack,
-    calcsize
-)
+from struct import (unpack, calcsize)
 
 # don't import datetime_conversion directly
 from pydicom import config
@@ -20,28 +17,17 @@ from pydicom.compat import in_py2
 # don't import DS directly as can be changed by config
 import pydicom.valuerep
 
-from pydicom.valuerep import (
-    MultiString,
-    DA,
-    DT,
-    TM
-)
+from pydicom.valuerep import (MultiString, DA, DT, TM)
 
 from pydicom.config import logger
 
 from pydicom.multival import MultiValue
 import pydicom.uid
-from pydicom.tag import (
-    Tag,
-    TupleTag
-)
+from pydicom.tag import (Tag, TupleTag)
 
 from pydicom.filereader import read_sequence
 from io import BytesIO
-from pydicom.charset import (
-    default_encoding,
-    text_VRs
-)
+from pydicom.charset import (default_encoding, text_VRs)
 
 if not in_py2:
     from pydicom.valuerep import PersonName3 as PersonName
@@ -54,8 +40,7 @@ def convert_tag(byte_string, is_little_endian, offset=0):
         struct_format = "<HH"
     else:
         struct_format = ">HH"
-    return TupleTag(unpack(struct_format,
-                    byte_string[offset:offset + 4]))
+    return TupleTag(unpack(struct_format, byte_string[offset:offset + 4]))
 
 
 def convert_AE_string(byte_string,
@@ -76,18 +61,16 @@ def convert_ATvalue(byte_string, is_little_endian, struct_format=None):
     """Read and return AT (tag) data_element value(s)"""
     length = len(byte_string)
     if length == 4:
-        return convert_tag(byte_string,
-                           is_little_endian)
+        return convert_tag(byte_string, is_little_endian)
 
     # length > 4
     if length % 4 != 0:
         logger.warn("Expected length to be multiple of 4 for VR 'AT', "
                     "got length %d", length)
-    return MultiValue(Tag,
-                      [convert_tag(byte_string,
-                                   is_little_endian,
-                                   offset=x)
-                       for x in range(0, length, 4)])
+    return MultiValue(Tag, [
+        convert_tag(byte_string, is_little_endian, offset=x)
+        for x in range(0, length, 4)
+    ])
 
 
 def _DA_from_byte_string(byte_string):
@@ -122,8 +105,7 @@ def convert_DS_string(byte_string, is_little_endian, struct_format=None):
     # rather than factory DS, but need to
     # ensure last string doesn't have
     # blank padding (use strip())
-    return MultiString(byte_string.strip(),
-                       valtype=pydicom.valuerep.DSclass)
+    return MultiString(byte_string.strip(), valtype=pydicom.valuerep.DSclass)
 
 
 def _DT_from_byte_string(byte_string):
@@ -157,10 +139,7 @@ def convert_IS_string(byte_string, is_little_endian, struct_format=None):
     return MultiString(byte_string, valtype=pydicom.valuerep.IS)
 
 
-def convert_numbers(byte_string,
-                    is_little_endian,
-                    struct_format):
-
+def convert_numbers(byte_string, is_little_endian, struct_format):
     """Convert `byte_string` to a value,
        depending on `struct_format`.
 
@@ -191,7 +170,7 @@ def convert_numbers(byte_string,
         then a list of the decoded
         values will be returned.
     """
-    endianChar = '><'[is_little_endian]
+    endianChar = '><' [is_little_endian]
 
     # "=" means use 'standard' size, needed on 64-bit systems.
     bytes_per_value = calcsize("=" + struct_format)
@@ -200,8 +179,7 @@ def convert_numbers(byte_string,
     if length % bytes_per_value != 0:
         logger.warn("Expected length to be even multiple of number size")
 
-    format_string = "%c%u%c" % (endianChar,
-                                length // bytes_per_value,
+    format_string = "%c%u%c" % (endianChar, length // bytes_per_value,
                                 struct_format)
 
     value = unpack(format_string, byte_string)
@@ -217,18 +195,12 @@ def convert_numbers(byte_string,
         return list(value)
 
 
-def convert_OBvalue(byte_string,
-                    is_little_endian,
-                    struct_format=None):
-
+def convert_OBvalue(byte_string, is_little_endian, struct_format=None):
     """Return the raw bytes from reading an OB value"""
     return byte_string
 
 
-def convert_OWvalue(byte_string,
-                    is_little_endian,
-                    struct_format=None):
-
+def convert_OWvalue(byte_string, is_little_endian, struct_format=None):
     """Return the raw bytes from reading an OW value rep
 
     Note: pydicom does NOT do byte swapping, except in
@@ -290,17 +262,16 @@ def convert_single_string(byte_string,
     return byte_string
 
 
-def convert_SQ(byte_string, is_implicit_VR, is_little_endian,
-               encoding=default_encoding, offset=0):
+def convert_SQ(byte_string,
+               is_implicit_VR,
+               is_little_endian,
+               encoding=default_encoding,
+               offset=0):
     """Convert a sequence that has been read
        as bytes but not yet parsed."""
     fp = BytesIO(byte_string)
-    seq = read_sequence(fp,
-                        is_implicit_VR,
-                        is_little_endian,
-                        len(byte_string),
-                        encoding,
-                        offset)
+    seq = read_sequence(fp, is_implicit_VR, is_little_endian,
+                        len(byte_string), encoding, offset)
     return seq
 
 
@@ -323,9 +294,7 @@ def convert_TM_string(byte_string, is_little_endian, struct_format=None):
         else:
             return MultiValue(_TM_from_byte_string, splitup)
     else:
-        return convert_string(byte_string,
-                              is_little_endian,
-                              struct_format)
+        return convert_string(byte_string, is_little_endian, struct_format)
 
 
 def convert_UI(byte_string, is_little_endian, struct_format=None):

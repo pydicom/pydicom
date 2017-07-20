@@ -17,15 +17,10 @@ from collections import namedtuple
 from pydicom import config  # don't import datetime_conversion directly
 from pydicom import compat
 from pydicom.config import logger
-from pydicom.datadict import (
-    dictionary_has_tag,
-    dictionary_description,
-    dictionary_keyword,
-    dictionary_is_retired,
-    private_dictionary_description,
-    dictionary_VR,
-    repeater_has_tag
-)
+from pydicom.datadict import (dictionary_has_tag, dictionary_description,
+                              dictionary_keyword, dictionary_is_retired,
+                              private_dictionary_description, dictionary_VR,
+                              repeater_has_tag)
 
 from pydicom.tag import Tag
 from pydicom.uid import UID
@@ -144,9 +139,13 @@ class DataElement(object):
     # should flag themselves as unhashable
     __hash__ = None
 
-    def __init__(self, tag, VR, value, file_value_tell=None,
-                 is_undefined_length=False, already_converted=False):
-
+    def __init__(self,
+                 tag,
+                 VR,
+                 value,
+                 file_value_tell=None,
+                 is_undefined_length=False,
+                 already_converted=False):
         """Create a new DataElement.
 
         Parameters
@@ -353,8 +352,8 @@ class DataElement(object):
                     # If have name from private dictionary, use it, but
                     #   but put in square brackets so is differentiated,
                     #   and clear that cannot access it by name
-                    name = private_dictionary_description(self.tag,
-                                                          self.private_creator)
+                    name = private_dictionary_description(
+                        self.tag, self.private_creator)
                     name = "[%s]" % (name)
                 except KeyError:
                     pass
@@ -395,6 +394,7 @@ class DataElement(object):
 class DeferredDataElement(DataElement):
     """Subclass of DataElement where value is not read
        into memory until needed"""
+
     def __init__(self, tag, VR, fp, file_mtime, data_element_tell, length):
         """Store basic info for the data element but value
            will be read later

@@ -15,5 +15,4 @@ def capture_warnings(function, *func_args, **func_kwargs):
         warnings.simplefilter("always")
         result = function(*func_args, **func_kwargs)
         all_warnings = w
-    return result, [str(warning.message)
-                    for warning in all_warnings]
+    return result, [str(warning.message) for warning in all_warnings]

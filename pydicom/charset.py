@@ -33,8 +33,7 @@ python_encoding = {
     'ISO_IR 144': 'iso_ir_144',  # Russian
     'ISO_IR 148': 'iso_ir_148',  # Turkish
     'ISO_IR 166': 'iso_ir_166',  # Thai
-
-    'ISO 2022 IR 6': 'iso8859',   # alias for latin_1 too
+    'ISO 2022 IR 6': 'iso8859',  # alias for latin_1 too
     'ISO 2022 IR 13': 'shift_jis',
     'ISO 2022 IR 87': 'iso2022_jp',
     'ISO 2022 IR 100': 'latin_1',
@@ -49,13 +48,11 @@ python_encoding = {
     'ISO 2022 IR 149': 'euc_kr',  # needs cleanup via clean_escseq()
     'ISO 2022 IR 159': 'iso-2022-jp',
     'ISO 2022 IR 166': 'iso_ir_166',
-
-    'ISO_IR 192': 'UTF8',     # from Chinese example, 2008 PS3.5 Annex J p1-4
+    'ISO_IR 192': 'UTF8',  # from Chinese example, 2008 PS3.5 Annex J p1-4
     'GB18030': 'GB18030',
     'ISO 2022 GBK': 'GBK',  # from DICOM correction CP1234
     'ISO 2022 58': 'GB2312',  # from DICOM correction CP1234
     'GBK': 'GBK',  # from DICOM correction CP1234
-
 }
 
 default_encoding = "iso8859"
@@ -66,10 +63,11 @@ def clean_escseq(element, encodings):
        Korean encoding ISO 2022 IR 149 due to the G1 code element.
     """
     if 'euc_kr' in encodings:
-        return element.replace(
-            "\x1b\x24\x29\x43", "").replace("\x1b\x28\x42", "")
+        return element.replace("\x1b\x24\x29\x43", "").replace(
+            "\x1b\x28\x42", "")
     else:
         return element
+
 
 # DICOM PS3.5-2008 6.1.1 (p 18) says:
 #   default is ISO-IR 6 G0, equiv to common chr set of ISO 8859 (PS3.5 6.1.2.1)
@@ -136,15 +134,18 @@ def decode(data_element, dicom_character_set):
             if data_element.VM == 1:
                 data_element.value = data_element.value.decode(encodings)
             else:
-                data_element.value = [val.decode(encodings)
-                                      for val in data_element.value]
+                data_element.value = [
+                    val.decode(encodings) for val in data_element.value
+                ]
         else:
             if data_element.VM == 1:
                 data_element.value = PersonNameUnicode(data_element.value,
                                                        encodings)
             else:
-                data_element.value = [PersonNameUnicode(value, encodings)
-                                      for value in data_element.value]
+                data_element.value = [
+                    PersonNameUnicode(value, encodings)
+                    for value in data_element.value
+                ]
     if data_element.VR in text_VRs:
         # Remove the first encoding if this is a multi-byte encoding
         if len(encodings) > 1:
@@ -164,7 +165,7 @@ def decode(data_element, dicom_character_set):
                 if isinstance(value, compat.text_type):
                     output.append(value)
                 else:
-                    output.append(clean_escseq(value.decode(encodings[0]),
-                                               encodings))
+                    output.append(
+                        clean_escseq(value.decode(encodings[0]), encodings))
 
             data_element.value = output

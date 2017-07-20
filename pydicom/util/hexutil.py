@@ -5,10 +5,7 @@
 #    See the file LICENSE included with this distribution, also
 #    available at https://github.com/pydicom/pydicom
 
-from binascii import (
-    a2b_hex,
-    b2a_hex
-)
+from binascii import (a2b_hex, b2a_hex)
 
 from pydicom.compat import in_py2
 from pydicom.charset import default_encoding
@@ -36,8 +33,7 @@ def hex2bytes(hexstring):
     if isinstance(hexstring, bytes):
         return a2b_hex(hexstring.replace(b" ", b""))
     else:
-        return a2b_hex(bytes(hexstring.replace(" ", ""),
-                       default_encoding))
+        return a2b_hex(bytes(hexstring.replace(" ", ""), default_encoding))
 
 
 def bytes2hex(byte_string):
