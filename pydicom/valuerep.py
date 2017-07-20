@@ -4,7 +4,7 @@
 # This file is part of pydicom, released under a modified MIT license.
 #    See the file LICENSE included with this distribution, also
 #    available at https://github.com/pydicom/pydicom
-
+from copy import deepcopy
 from decimal import Decimal
 import re
 
@@ -741,6 +741,28 @@ class PersonNameUnicode(PersonNameBase, compat.text_type):
     def __init__(self, val, encodings):
         self.encodings = self._verify_encodings(encodings)
         PersonNameBase.__init__(self, val)
+
+    def __copy__(self):
+        """Correctly copy object.
+        Needed because of the overwritten __new__.
+        """
+        # no need to use the original encoding here - we just encode and
+        # decode in utf-8 and set the original encoding later
+        name = compat.text_type(self).encode('utf8')
+        new_person = PersonNameUnicode(name, 'utf8')
+        new_person.__dict__.update(self.__dict__)
+        return new_person
+
+    def __deepcopy__(self, memo):
+        """Make a correctly deep copy of the object.
+        Needed because of the overwritten __new__.
+        """
+        name = compat.text_type(self).encode('utf8')
+        new_person = PersonNameUnicode(name, 'utf8')
+        memo[id(self)] = new_person
+        for k, v in self.__dict__.items():
+            setattr(new_person, k, deepcopy(v, memo))
+        return new_person
 
     def _verify_encodings(self, encodings):
         """Checks the encoding to ensure proper format"""
