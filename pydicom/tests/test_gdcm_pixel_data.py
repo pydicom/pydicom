@@ -100,8 +100,9 @@ class GDCM_JPEG2000Tests_no_gdcm(unittest.TestCase):
         pydicom.config.image_handlers = self.original_handlers
 
     def test_JPEG2000(self):
-        """JPEG2000: Returns correct values for sample data elements............"""
-        expected = [Tag(0x0054, 0x0010), Tag(0x0054, 0x0020)]  # XX also tests multiple-valued AT data element
+        """JPEG2000: Returns correct values for sample data elements"""
+        # XX also tests multiple-valued AT data element
+        expected = [Tag(0x0054, 0x0010), Tag(0x0054, 0x0020)]
         got = self.jpeg_2k.FrameIncrementPointer
         self.assertEqual(
             got,
@@ -139,7 +140,7 @@ class GDCM_JPEGlossyTests_no_gdcm(unittest.TestCase):
         pydicom.config.image_handlers = self.original_handlers
 
     def test_JPEGlossy(self):
-        """JPEG-lossy: Returns correct values for sample data elements.........."""
+        """JPEG-lossy: Returns correct values for sample data elements"""
         got = self.jpeg_lossy.DerivationCodeSequence[0].CodeMeaning
         expected = 'Lossy Compression'
         self.assertEqual(
@@ -168,7 +169,7 @@ class GDCM_JPEGlosslessTests_no_gdcm(unittest.TestCase):
         pydicom.config.image_handlers = self.original_handlers
 
     def testJPEGlossless(self):
-        """JPEGlossless: Returns correct values for sample data elements........"""
+        """JPEGlossless: Returns correct values for sample data elements"""
         got = self.\
             jpeg_lossless.\
             SourceImageSequence[0].\
@@ -181,7 +182,7 @@ class GDCM_JPEGlosslessTests_no_gdcm(unittest.TestCase):
             "expected %s" % (got, expected))
 
     def testJPEGlosslessPixelArray(self):
-        """JPEGlossless: Fails gracefully when uncompressed data is asked for..."""
+        """JPEGlossless: Fails gracefully when uncompressed data is asked for"""
         with self.assertRaises((NotImplementedError, )):
             _ = self.jpeg_lossless.pixel_array
 
@@ -234,8 +235,9 @@ class GDCM_JPEG2000Tests_with_gdcm(unittest.TestCase):
         pydicom.config.image_handlers = self.original_handlers
 
     def test_JPEG2000(self):
-        """JPEG2000: Returns correct values for sample data elements............"""
-        expected = [Tag(0x0054, 0x0010), Tag(0x0054, 0x0020)]  # XX also tests multiple-valued AT data element
+        """JPEG2000: Returns correct values for sample data elements"""
+        # XX also tests multiple-valued AT data element
+        expected = [Tag(0x0054, 0x0010), Tag(0x0054, 0x0020)]
         got = self.jpeg_2k.FrameIncrementPointer
         self.assertEqual(
             got,
@@ -284,7 +286,7 @@ class GDCM_JPEGlossyTests_with_gdcm(unittest.TestCase):
         pydicom.config.image_handlers = self.original_handlers
 
     def test_JPEGlossy(self):
-        """JPEG-lossy: Returns correct values for sample data elements.........."""
+        """JPEG-lossy: Returns correct values for sample data elements"""
         got = self.jpeg_lossy.DerivationCodeSequence[0].CodeMeaning
         expected = 'Lossy Compression'
         self.assertEqual(
@@ -320,7 +322,7 @@ class GDCM_JPEGlosslessTests_with_gdcm(unittest.TestCase):
         pydicom.config.image_handlers = self.original_handlers
 
     def testJPEGlossless(self):
-        """JPEGlossless: Returns correct values for sample data elements........"""
+        """JPEGlossless: Returns correct values for sample data elements"""
         got = self.\
             jpeg_lossless.\
             SourceImageSequence[0].\
@@ -333,7 +335,7 @@ class GDCM_JPEGlosslessTests_with_gdcm(unittest.TestCase):
             "expected %s" % (got, expected))
 
     def testJPEGlosslessPixelArray(self):
-        """JPEGlossless: Fails gracefully when uncompressed data is asked for..."""
+        """JPEGlossless: Fails gracefully when uncompressed data is asked for"""
         a = self.jpeg_lossless.pixel_array
         self.assertEqual(a.shape, (1024, 256))
         # this test points were manually identified in Osirix viewer

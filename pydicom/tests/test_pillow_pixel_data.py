@@ -117,8 +117,9 @@ class pillow_JPEG2000Tests_no_pillow(unittest.TestCase):
         pydicom.config.image_handlers = self.original_handlers
 
     def testJPEG2000(self):
-        """JPEG2000: Returns correct values for sample data elements............"""
-        expected = [Tag(0x0054, 0x0010), Tag(0x0054, 0x0020)]  # XX also tests multiple-valued AT data element
+        """JPEG2000: Returns correct values for sample data elements"""
+        # XX also tests multiple-valued AT data element
+        expected = [Tag(0x0054, 0x0010), Tag(0x0054, 0x0020)]
         got = self.jpeg_2k.FrameIncrementPointer
         self.assertEqual(
             got,
@@ -158,7 +159,7 @@ class pillow_JPEGlossyTests_no_pillow(unittest.TestCase):
         pydicom.config.image_handlers = self.original_handlers
 
     def testJPEGlossy(self):
-        """JPEG-lossy: Returns correct values for sample data elements.........."""
+        """JPEG-lossy: Returns correct values for sample data elements"""
         got = self.jpeg_lossy.DerivationCodeSequence[0].CodeMeaning
         expected = 'Lossy Compression'
         self.assertEqual(
@@ -189,7 +190,7 @@ class pillow_JPEGlosslessTests_no_pillow(unittest.TestCase):
         pydicom.config.image_handlers = self.original_handlers
 
     def testJPEGlossless(self):
-        """JPEGlossless: Returns correct values for sample data elements........"""
+        """JPEGlossless: Returns correct values for sample data elements"""
         got = self.\
             jpeg_lossless.\
             SourceImageSequence[0].\
@@ -247,8 +248,9 @@ class pillow_JPEG2000Tests_with_pillow(unittest.TestCase):
         pydicom.config.image_handlers = self.original_handlers
 
     def testJPEG2000(self):
-        """JPEG2000: Returns correct values for sample data elements............"""
-        expected = [Tag(0x0054, 0x0010), Tag(0x0054, 0x0020)]  # XX also tests multiple-valued AT data element
+        """JPEG2000: Returns correct values for sample data elements"""
+        # XX also tests multiple-valued AT data element
+        expected = [Tag(0x0054, 0x0010), Tag(0x0054, 0x0020)]
         got = self.jpeg_2k.FrameIncrementPointer
         self.assertEqual(
             got,
@@ -298,7 +300,7 @@ class pillow_JPEGlossyTests_with_pillow(unittest.TestCase):
         pydicom.config.image_handlers = self.original_handlers
 
     def testJPEGlossy(self):
-        """JPEG-lossy: Returns correct values for sample data elements.........."""
+        """JPEG-lossy: Returns correct values for sample data elements"""
         got = self.jpeg_lossy.DerivationCodeSequence[0].CodeMeaning
         expected = 'Lossy Compression'
         self.assertEqual(
@@ -332,7 +334,7 @@ class pillow_JPEGlosslessTests_with_pillow(unittest.TestCase):
         pydicom.config.image_handlers = self.original_handlers
 
     def testJPEGlossless(self):
-        """JPEGlossless: Returns correct values for sample data elements........"""
+        """JPEGlossless: Returns correct values for sample data elements"""
         got = self.\
             jpeg_lossless.\
             SourceImageSequence[0].\

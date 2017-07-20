@@ -129,7 +129,7 @@ class jpeg_ls_JPEGlossyTests_no_jpeg_ls(unittest.TestCase):
         pydicom.config.image_handlers = self.original_handlers
 
     def testJPEGlossy(self):
-        """JPEG-lossy: Returns correct values for sample data elements.........."""
+        """JPEG-lossy: Returns correct values for sample data elements"""
         got = self.jpeg_lossy.DerivationCodeSequence[0].CodeMeaning
         expected = 'Lossy Compression'
         self.assertEqual(
@@ -139,7 +139,7 @@ class jpeg_ls_JPEGlossyTests_no_jpeg_ls(unittest.TestCase):
             "expected %s" % (got, expected))
 
     def testJPEGlossyPixelArray(self):
-        """JPEG-lossy: Fails gracefully when uncompressed data is asked for....."""
+        """JPEG-lossy: Fails gracefully when uncompressed data is asked for"""
         with self.assertRaises((NotImplementedError, )):
             _ = self.jpeg_lossy.pixel_array
 
@@ -161,7 +161,7 @@ class jpeg_ls_JPEGlosslessTests_no_jpeg_ls(unittest.TestCase):
         pydicom.config.image_handlers = self.original_handlers
 
     def testJPEGlossless(self):
-        """JPEGlossless: Returns correct values for sample data elements........"""
+        """JPEGlossless: Returns correct values for sample data elements"""
         got = self.\
             jpeg_lossless.\
             SourceImageSequence[0].\
@@ -174,7 +174,7 @@ class jpeg_ls_JPEGlosslessTests_no_jpeg_ls(unittest.TestCase):
             "expected %s" % (got, expected))
 
     def testJPEGlosslessPixelArray(self):
-        """JPEGlossless: Fails gracefully when uncompressed data is asked for..."""
+        """JPEGlossless: Fails gracefully when uncompressed data is asked for"""
         with self.assertRaises((NotImplementedError, )):
             _ = self.jpeg_lossless.pixel_array
 
@@ -253,7 +253,7 @@ class jpeg_ls_JPEGlossyTests_with_jpeg_ls(unittest.TestCase):
         pydicom.config.image_handlers = self.original_handlers
 
     def testJPEGlossy(self):
-        """JPEG-lossy: Returns correct values for sample data elements.........."""
+        """JPEG-lossy: Returns correct values for sample data elements"""
         got = self.jpeg_lossy.DerivationCodeSequence[0].CodeMeaning
         expected = 'Lossy Compression'
         self.assertEqual(
@@ -284,7 +284,7 @@ class jpeg_ls_JPEGlosslessTests_with_jpeg_ls(unittest.TestCase):
         pydicom.config.image_handlers = self.original_handlers
 
     def testJPEGlossless(self):
-        """JPEGlossless: Returns correct values for sample data elements........"""
+        """JPEGlossless: Returns correct values for sample data elements"""
         got = self.\
             jpeg_lossless.\
             SourceImageSequence[0].\
@@ -297,6 +297,6 @@ class jpeg_ls_JPEGlosslessTests_with_jpeg_ls(unittest.TestCase):
             "expected %s" % (got, expected))
 
     def testJPEGlosslessPixelArray(self):
-        """JPEGlossless: Fails gracefully when uncompressed data is asked for..."""
+        """JPEGlossless: Fails gracefully when uncompressed data is asked for"""
         with self.assertRaises((NotImplementedError, )):
             _ = self.jpeg_lossless.pixel_array

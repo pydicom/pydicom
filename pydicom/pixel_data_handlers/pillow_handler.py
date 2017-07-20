@@ -196,9 +196,13 @@ def get_pixeldata(dicom_dataset):
             UncompressedPixelData = decompressed_image.tobytes()
     except Exception:
         raise
-    logger.debug("Successfully read %s pixel bytes", len(UncompressedPixelData))
+    logger.debug(
+        "Successfully read %s pixel bytes",
+        len(UncompressedPixelData))
     pixel_array = numpy.fromstring(UncompressedPixelData, numpy_format)
-    if dicom_dataset.file_meta.TransferSyntaxUID in PillowJPEG2000TransferSyntaxes and dicom_dataset.BitsStored == 16:
+    if (dicom_dataset.file_meta.TransferSyntaxUID in
+            PillowJPEG2000TransferSyntaxes and
+            dicom_dataset.BitsStored == 16):
         # WHY IS THIS EVEN NECESSARY??
         pixel_array &= 0x7FFF
     return pixel_array

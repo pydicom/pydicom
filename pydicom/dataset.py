@@ -718,7 +718,8 @@ class Dataset(dict):
                           "decode this transfer syntax {}".format(
                               self.file_meta.TransferSyntaxUID)
                     raise NotImplementedError(msg)
-            self._pixel_id = id(self.PixelData)  # is this guaranteed to work if memory is re-used??
+            # is this guaranteed to work if memory is re-used??
+            self._pixel_id = id(self.PixelData)
             return self._pixel_array
         return self._pixel_array
 
@@ -912,12 +913,14 @@ class Dataset(dict):
                 # don't have this tag yet->create the data_element instance
                 VR = dictionary_VR(tag)
                 data_element = DataElement(tag, VR, value)
-            else:  # already have this data_element, just changing its value
+            else:
+                # already have this data_element, just changing its value
                 data_element = self[tag]
                 data_element.value = value
             # Now have data_element - store it in this dict
             self[tag] = data_element
-        elif repeater_has_keyword(name):  # Check if `name` is repeaters element
+        elif repeater_has_keyword(name):
+            # Check if `name` is repeaters element
             raise ValueError('{} is a DICOM repeating group '
                              'element and must be added using '
                              'the add() or add_new() methods.'
