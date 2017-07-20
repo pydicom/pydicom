@@ -9,12 +9,19 @@ except ImportError:
 
 sys_is_little_endian = (sys.byteorder == 'little')
 
+NumpySupportedTransferSyntaxes = [
+    pydicom.uid.ExplicitVRLittleEndian,
+    pydicom.uid.ImplicitVRLittleEndian,
+    pydicom.uid.DeflatedExplicitVRLittleEndian,
+    pydicom.uid.ExplicitVRBigEndian,
+]
 
-def supports_transfer_syntax(self):
-    return self.file_meta.TransferSyntaxUID in pydicom.uid.UncompressedPixelTransferSyntaxes
+
+def supports_transfer_syntax(dicom_dataset):
+    return dicom_dataset.file_meta.TransferSyntaxUID in NumpySupportedTransferSyntaxes
 
 
-def get_pixeldata(self):
+def get_pixeldata(dicom_dataset):
     """If NumPy is available, return an ndarray of the Pixel Data.
     Raises
     ------
@@ -27,7 +34,7 @@ def get_pixeldata(self):
     numpy.ndarray
         The contents of the Pixel Data element (7FE0,0010) as an ndarray.
     """
-    if self.file_meta.TransferSyntaxUID not in pydicom.uid.UncompressedPixelTransferSyntaxes:
+    if dicom_dataset.file_meta.TransferSyntaxUID not in NumpySupportedTransferSyntaxes:
         raise NotImplementedError("Pixel Data is compressed in a "
                                   "format pydicom does not yet handle. "
                                   "Cannot return array. Pydicom might "
@@ -37,37 +44,37 @@ def get_pixeldata(self):
         msg = "The Numpy package is required to use pixel_array, and " \
               "numpy could not be imported."
         raise ImportError(msg)
-    if 'PixelData' not in self:
+    if 'PixelData' not in dicom_dataset:
         raise TypeError("No pixel data found in this dataset.")
 
     # Make NumPy format code, e.g. "uint16", "int32" etc
     # from two pieces of info:
-    #    self.PixelRepresentation -- 0 for unsigned, 1 for signed;
-    #    self.BitsAllocated -- 8, 16, or 32
-    format_str = '%sint%d' % (('u', '')[self.PixelRepresentation],
-                              self.BitsAllocated)
+    #    dicom_dataset.PixelRepresentation -- 0 for unsigned, 1 for signed;
+    #    dicom_dataset.BitsAllocated -- 8, 16, or 32
+    format_str = '%sint%d' % (('u', '')[dicom_dataset.PixelRepresentation],
+                              dicom_dataset.BitsAllocated)
     try:
         numpy_dtype = numpy.dtype(format_str)
     except TypeError:
         msg = ("Data type not understood by NumPy: "
                "format='%s', PixelRepresentation=%d, BitsAllocated=%d")
-        raise TypeError(msg % (format_str, self.PixelRepresentation,
-                               self.BitsAllocated))
+        raise TypeError(msg % (format_str, dicom_dataset.PixelRepresentation,
+                               dicom_dataset.BitsAllocated))
 
-    if self.is_little_endian != sys_is_little_endian:
+    if dicom_dataset.is_little_endian != sys_is_little_endian:
         numpy_dtype = numpy_dtype.newbyteorder('S')
 
-    pixel_bytearray = self.PixelData
+    pixel_bytearray = dicom_dataset.PixelData
 
     pixel_array = numpy.fromstring(pixel_bytearray, dtype=numpy_dtype)
     length_of_pixel_array = pixel_array.nbytes
-    expected_length = self.Rows * self.Columns
-    if 'NumberOfFrames' in self and self.NumberOfFrames > 1:
-        expected_length *= self.NumberOfFrames
-    if 'SamplesPerPixel' in self and self.SamplesPerPixel > 1:
-        expected_length *= self.SamplesPerPixel
-    if self.BitsAllocated > 8:
-        expected_length *= (self.BitsAllocated // 8)
+    expected_length = dicom_dataset.Rows * dicom_dataset.Columns
+    if 'NumberOfFrames' in dicom_dataset and dicom_dataset.NumberOfFrames > 1:
+        expected_length *= dicom_dataset.NumberOfFrames
+    if 'SamplesPerPixel' in dicom_dataset and dicom_dataset.SamplesPerPixel > 1:
+        expected_length *= dicom_dataset.SamplesPerPixel
+    if dicom_dataset.BitsAllocated > 8:
+        expected_length *= (dicom_dataset.BitsAllocated // 8)
     if length_of_pixel_array != expected_length:
         raise AttributeError("Amount of pixel data %d does not match the expected data %d" % (length_of_pixel_array, expected_length))
     return pixel_array

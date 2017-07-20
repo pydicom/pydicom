@@ -15,20 +15,20 @@ except ImportError:
 can_use_gdcm = have_gdcm and have_numpy
 
 
-def supports_transfer_syntax(self):
+def supports_transfer_syntax(dicom_dataset):
     return True
 
 
-def get_pixeldata(self):
+def get_pixeldata(dicom_dataset):
     # read the file using GDCM
-    # FIXME this should just use self.PixelData instead of self.filename
+    # FIXME this should just use dicom_dataset.PixelData instead of dicom_dataset.filename
     #       but it is unclear how this should be achieved using GDCM
     if not can_use_gdcm:
         msg = "GDCM requires both the gdcm package and numpy and one or more could not be imported"
         raise ImportError(msg)
 
     gdcm_image_reader = gdcm.ImageReader()
-    gdcm_image_reader.SetFileName(self.filename)
+    gdcm_image_reader.SetFileName(dicom_dataset.filename)
     if not gdcm_image_reader.Read():
         raise TypeError("GDCM could not read DICOM image")
 
@@ -74,7 +74,9 @@ def get_pixeldata(self):
     # buffer that is too large, so we need to make sure we only include
     # the first n_rows * n_columns * dtype_size bytes.
 
-    n_bytes = self.Rows * self.Columns * numpy.dtype(numpy_dtype).itemsize
+    n_bytes = (dicom_dataset.Rows *
+               dicom_dataset.Columns *
+               numpy.dtype(numpy_dtype).itemsize)
 
     if len(pixel_bytearray) > n_bytes:
 
@@ -88,13 +90,13 @@ def get_pixeldata(self):
             pass
     pixel_array = numpy.fromstring(pixel_bytearray, dtype=numpy_dtype)
     length_of_pixel_array = pixel_array.nbytes
-    expected_length = self.Rows * self.Columns
-    if 'NumberOfFrames' in self and self.NumberOfFrames > 1:
-        expected_length *= self.NumberOfFrames
-    if 'SamplesPerPixel' in self and self.SamplesPerPixel > 1:
-        expected_length *= self.SamplesPerPixel
-    if self.BitsAllocated > 8:
-        expected_length *= (self.BitsAllocated // 8)
+    expected_length = dicom_dataset.Rows * dicom_dataset.Columns
+    if 'NumberOfFrames' in dicom_dataset and dicom_dataset.NumberOfFrames > 1:
+        expected_length *= dicom_dataset.NumberOfFrames
+    if 'SamplesPerPixel' in dicom_dataset and dicom_dataset.SamplesPerPixel > 1:
+        expected_length *= dicom_dataset.SamplesPerPixel
+    if dicom_dataset.BitsAllocated > 8:
+        expected_length *= (dicom_dataset.BitsAllocated // 8)
     if length_of_pixel_array != expected_length:
         raise AttributeError("Amount of pixel data %d does not match the expected data %d" % (length_of_pixel_array, expected_length))
     return pixel_array
