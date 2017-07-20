@@ -21,10 +21,12 @@ def supports_transfer_syntax(dicom_dataset):
 
 def get_pixeldata(dicom_dataset):
     # read the file using GDCM
-    # FIXME this should just use dicom_dataset.PixelData instead of dicom_dataset.filename
+    # FIXME this should just use dicom_dataset.PixelData
+    # instead of dicom_dataset.filename
     #       but it is unclear how this should be achieved using GDCM
     if not can_use_gdcm:
-        msg = "GDCM requires both the gdcm package and numpy and one or more could not be imported"
+        msg = "GDCM requires both the gdcm package and numpy "\
+              "and one or more could not be imported"
         raise ImportError(msg)
 
     gdcm_image_reader = gdcm.ImageReader()
@@ -91,12 +93,18 @@ def get_pixeldata(dicom_dataset):
     pixel_array = numpy.fromstring(pixel_bytearray, dtype=numpy_dtype)
     length_of_pixel_array = pixel_array.nbytes
     expected_length = dicom_dataset.Rows * dicom_dataset.Columns
-    if 'NumberOfFrames' in dicom_dataset and dicom_dataset.NumberOfFrames > 1:
+    try:
         expected_length *= dicom_dataset.NumberOfFrames
-    if 'SamplesPerPixel' in dicom_dataset and dicom_dataset.SamplesPerPixel > 1:
+    except Exception:
+        pass
+    try:
         expected_length *= dicom_dataset.SamplesPerPixel
+    except Exception:
+        pass
     if dicom_dataset.BitsAllocated > 8:
         expected_length *= (dicom_dataset.BitsAllocated // 8)
     if length_of_pixel_array != expected_length:
-        raise AttributeError("Amount of pixel data %d does not match the expected data %d" % (length_of_pixel_array, expected_length))
+        raise AttributeError("Amount of pixel data %d does "
+                             "not match the expected data %d" %
+                             (length_of_pixel_array, expected_length))
     return pixel_array

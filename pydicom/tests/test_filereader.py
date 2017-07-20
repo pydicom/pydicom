@@ -821,7 +821,10 @@ class ReadTruncatedFileTests(unittest.TestCase):
         expected = [DS('0.3125'), DS('0.3125')]
         self.assertTrue(got == expected, "Wrong pixel spacing")
 
-    @unittest.skipUnless(have_numpy and not have_gdcm_handler, "Numpy not installed or gdcm is installed, gdcm fixes truncated data??")
+    @unittest.skipUnless(
+        have_numpy and not have_gdcm_handler,
+        "Numpy not installed or gdcm is installed, "
+        "gdcm fixes truncated data??")
     def testReadFileWithMissingPixelDataArray(self):
         mr = read_file(truncated_mr_name)
         mr.decode()

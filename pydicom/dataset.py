@@ -641,7 +641,7 @@ class Dataset(dict):
 
     def __ne__(self, other):
         """Compare `self` and `other` for inequality."""
-        return not (self == other)
+        return not self == other
 
     def _reshape_pixel_array(self, pixel_array):
         # Note the following reshape operations return a new *view* onto
@@ -691,10 +691,10 @@ class Dataset(dict):
         elif self._pixel_id != id(self.PixelData):
             already_have = False
         if not already_have:
-            last_error_message = ''
             last_exception = None
             successfully_read_pixel_data = False
-            for x in [h for h in pydicom.config.image_handlers if h and h.supports_transfer_syntax(self)]:
+            for x in [h for h in pydicom.config.image_handlers
+                      if h and h.supports_transfer_syntax(self)]:
                 try:
                     pixel_array = x.get_pixeldata(self)
                     self._pixel_array = self._reshape_pixel_array(pixel_array)
@@ -702,18 +702,21 @@ class Dataset(dict):
                     break
                 except Exception as e:
                     logger.debug("Trouble with", exc_info=e)
-                    last_error_message = str(e)
                     last_exception = e
                     continue
             if not successfully_read_pixel_data:
-                handlers_tried = " ".join([str(x) for x in pydicom.config.image_handlers])
-                logger.info("%s did not support this transfer syntax", handlers_tried)
+                handlers_tried = " ".join(
+                    [str(x) for x in pydicom.config.image_handlers])
+                logger.info("%s did not support this transfer syntax",
+                            handlers_tried)
                 self._pixel_array = None
                 self._pixel_id = None
                 if last_exception:
                     raise last_exception
                 else:
-                    msg = "No available image handler could decode this transfer syntax {}".format(self.file_meta.TransferSyntaxUID)
+                    msg = "No available image handler could " \
+                          "decode this transfer syntax {}".format(
+                              self.file_meta.TransferSyntaxUID)
                     raise NotImplementedError(msg)
             self._pixel_id = id(self.PixelData)  # is this guaranteed to work if memory is re-used??
             return self._pixel_array
@@ -915,8 +918,9 @@ class Dataset(dict):
             # Now have data_element - store it in this dict
             self[tag] = data_element
         elif repeater_has_keyword(name):  # Check if `name` is repeaters element
-            raise ValueError('{} is a DICOM repeating group element and must '
-                             'be added using the add() or add_new() methods.'
+            raise ValueError('{} is a DICOM repeating group '
+                             'element and must be added using '
+                             'the add() or add_new() methods.'
                              .format(name))
         else:
             # name not in dicom dictionary - setting a non-dicom instance
@@ -1159,5 +1163,5 @@ class FileDataset(Dataset):
                 self.filename = None
         self.timestamp = None
         if stat_available and self.filename and os.path.exists(self.filename):
-            statinfo = os.stat(self.filename)
+            statinfo = stat(self.filename)
             self.timestamp = statinfo.st_mtime
