@@ -335,7 +335,7 @@ class GDCM_JPEGlosslessTests_with_gdcm(unittest.TestCase):
             "expected %s" % (got, expected))
 
     def testJPEGlosslessPixelArray(self):
-        """JPEGlossless: Fails gracefully when uncompressed data is asked for"""
+        """JPEGlossless: Fails gracefully when uncompressed data asked for"""
         a = self.jpeg_lossless.pixel_array
         self.assertEqual(a.shape, (1024, 256))
         # this test points were manually identified in Osirix viewer
