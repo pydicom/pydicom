@@ -69,6 +69,8 @@ def defragment_data(data):
 def read_item(fp):
     """Read and return a single Item in the
     fragmented data stream"""
+
+    logger = pydicom.config.logger
     try:
         tag = fp.read_tag()
 
@@ -80,13 +82,13 @@ def read_item(fp):
     # No more items, time for sequence to stop reading
     if tag == SequenceDelimiterTag:
         length = fp.read_UL()
-        pydicom.config.logger.debug(
+        logger.debug(
             "%04x: Sequence Delimiter, length 0x%x",
             fp.tell() - 8,
             length)
 
         if length != 0:
-            pydicom.config.logger.warning(
+            logger.warning(
                 "Expected 0x00000000 after delimiter, found 0x%x,"
                 " at data position 0x%x",
                 length,
@@ -94,14 +96,14 @@ def read_item(fp):
         return None
 
     if tag != ItemTag:
-        pydicom.config.logger.warning(
+        logger.warning(
             "Expected Item with tag %s at data position 0x%x",
             ItemTag,
             fp.tell() - 4)
         length = fp.read_UL()
     else:
         length = fp.read_UL()
-        pydicom.config.logger.debug(
+        logger.debug(
             "%04x: Item, length 0x%x",
             fp.tell() - 8,
             length)
