@@ -79,7 +79,7 @@ try:
     import pydicom.pixel_data_handlers.numpy_handler as numpy_handler
     image_handlers.append(numpy_handler)
 except ImportError as e:
-    logger.debug("Could not import numpy", exc_info=e)
+    logger.debug("Could not import numpy")
     have_numpy = False
 
 have_pillow = True
@@ -87,7 +87,7 @@ try:
     import pydicom.pixel_data_handlers.pillow_handler as pillow_handler
     image_handlers.append(pillow_handler)
 except ImportError as e:
-    logger.debug("Could not import pillow", exc_info=e)
+    logger.debug("Could not import pillow")
     have_pillow = False
 
 have_jpeg_ls = True
@@ -95,7 +95,7 @@ try:
     import pydicom.pixel_data_handlers.jpeg_ls_handler as jpeg_ls_handler
     image_handlers.append(jpeg_ls_handler)
 except ImportError as e:
-    logger.debug("Could not import jpeg_ls", exc_info=e)
+    logger.debug("Could not import jpeg_ls")
     have_jpeg_ls = False
 
 have_gdcm = True
@@ -103,7 +103,7 @@ try:
     import pydicom.pixel_data_handlers.gdcm_handler as gdcm_handler
     image_handlers.append(gdcm_handler)
 except ImportError as e:
-    logger.debug("Could not import gdcm", exc_info=e)
+    logger.debug("Could not import gdcm")
     have_gdcm = False
 
 
