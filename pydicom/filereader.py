@@ -14,7 +14,7 @@ import zlib
 from io import BytesIO
 
 from pydicom.misc import size_in_bytes
-from pydicom.tag import TupleTag
+from pydicom.tag import TupleTag, Tag, BaseTag
 from pydicom.dataelem import RawDataElement
 from pydicom.util.hexutil import bytes2hex
 from pydicom.valuerep import extra_length_VRs
@@ -41,7 +41,7 @@ from pydicom.dataset import (
 )
 
 from pydicom.dicomdir import DicomDir
-from pydicom.datadict import dictionary_VR
+from pydicom.datadict import dictionary_VR, tag_for_keyword
 from pydicom.dataelem import DataElement
 from pydicom.tag import (
     ItemTag,
@@ -159,7 +159,8 @@ def data_element_generator(fp,
                            is_little_endian,
                            stop_when=None,
                            defer_size=None,
-                           encoding=default_encoding):
+                           encoding=default_encoding,
+                           specific_tags=None):
 
     """Create a generator to efficiently return the raw data elements.
 
@@ -177,6 +178,8 @@ def data_element_generator(fp,
         See ``read_file`` for parameter info.
     encoding :
         Encoding scheme
+    specific_tags : list or None
+        See ``read_file`` for parameter info.
 
     Returns
     -------
@@ -230,6 +233,18 @@ def data_element_generator(fp,
     element_struct_unpack = element_struct.unpack
     defer_size = size_in_bytes(defer_size)
 
+    tag_set = set()
+    has_specific_char_set = True
+    if specific_tags is not None:
+        for tag in specific_tags:
+            if isinstance(tag, (str, compat.text_type)):
+                tag = Tag(tag_for_keyword(tag))
+            if isinstance(tag, BaseTag):
+                tag_set.add(tag)
+        has_specific_char_set = Tag(0x08, 0x05) in tag_set
+        tag_set.add(Tag(0x08, 0x05))
+    has_tag_set = len(tag_set) > 0
+
     while True:
         # Read tag, VR, length, get ready to read value
         bytes_read = fp_read(8)
@@ -282,6 +297,11 @@ def data_element_generator(fp,
         if length != 0xFFFFFFFF:
             # don't defer loading of Specific Character Set value as it is
             # needed immediately to get the character encoding for other tags
+            if has_tag_set and tag not in tag_set:
+                # skip the tag if not in specific tags
+                fp.seek(fp_tell() + length)
+                continue
+
             if defer_size is not None and length > defer_size and tag != (
                     0x08, 0x05):
                 # Flag as deferred by setting value to None, and skip bytes
@@ -309,6 +329,8 @@ def data_element_generator(fp,
                 # Store the encoding value in the generator
                 # for use with future elements (SQs)
                 encoding = convert_encodings(encoding)
+                if not has_specific_char_set:
+                    continue
 
             yield RawDataElement(tag, VR, length, value, value_tell,
                                  is_implicit_VR, is_little_endian)
@@ -340,6 +362,8 @@ def data_element_generator(fp,
                     logger_debug(msg.format(fp_tell()))
                 seq = read_sequence(fp, is_implicit_VR,
                                     is_little_endian, length, encoding)
+                if has_tag_set and tag not in tag_set:
+                    continue
                 yield DataElement(tag, VR, seq, value_tell,
                                   is_undefined_length=True)
             else:
@@ -358,14 +382,19 @@ def data_element_generator(fp,
                     # Store the encoding value in the generator for use
                     # with future elements (SQs)
                     encoding = convert_encodings(encoding)
+                    if not has_specific_char_set:
+                        continue
 
+                # tags with undefined length are skipped after read
+                if has_tag_set and tag not in tag_set:
+                    continue
                 yield RawDataElement(tag, VR, length, value, value_tell,
                                      is_implicit_VR, is_little_endian)
 
 
 def read_dataset(fp, is_implicit_VR, is_little_endian, bytelength=None,
                  stop_when=None, defer_size=None,
-                 parent_encoding=default_encoding):
+                 parent_encoding=default_encoding, specific_tags=None):
     """Return a Dataset instance containing the next dataset in the file.
 
     Parameters
@@ -387,6 +416,8 @@ def read_dataset(fp, is_implicit_VR, is_little_endian, bytelength=None,
     parent_encoding :
         optional encoding to use as a default in case
         a Specific Character Set (0008,0005) isn't specified
+    specific_tags : list or None
+        See ``read_file`` for parameter info.
 
     Returns
     -------
@@ -400,7 +431,8 @@ def read_dataset(fp, is_implicit_VR, is_little_endian, bytelength=None,
     raw_data_elements = dict()
     fpStart = fp.tell()
     de_gen = data_element_generator(fp, is_implicit_VR, is_little_endian,
-                                    stop_when, defer_size, parent_encoding)
+                                    stop_when, defer_size, parent_encoding,
+                                    specific_tags)
     try:
         while (bytelength is None) or (fp.tell() - fpStart < bytelength):
             raw_data_element = next(de_gen)
@@ -635,7 +667,8 @@ def _at_pixel_data(tag, VR, length):
     return tag == (0x7fe0, 0x0010)
 
 
-def read_partial(fileobj, stop_when=None, defer_size=None, force=False):
+def read_partial(fileobj, stop_when=None, defer_size=None,
+                 force=False, specific_tags=None):
     """Parse a DICOM file until a condition is met.
 
     Parameters
@@ -647,6 +680,8 @@ def read_partial(fileobj, stop_when=None, defer_size=None, force=False):
     defer_size : int, str, None, optional
         See ``read_file`` for parameter info.
     force : boolean
+        See ``read_file`` for parameter info.
+    specific_tags : list or None
         See ``read_file`` for parameter info.
 
     Notes
@@ -741,7 +776,8 @@ def read_partial(fileobj, stop_when=None, defer_size=None, force=False):
     #   the transfer syntax (whether read from the file meta or guessed at)
     try:
         dataset = read_dataset(fileobj, is_implicit_VR, is_little_endian,
-                               stop_when=stop_when, defer_size=defer_size)
+                               stop_when=stop_when, defer_size=defer_size,
+                               specific_tags=specific_tags)
     except EOFError:
         pass  # error already logged in read_dataset
 
@@ -757,7 +793,8 @@ def read_partial(fileobj, stop_when=None, defer_size=None, force=False):
                            is_implicit_VR, is_little_endian)
 
 
-def read_file(fp, defer_size=None, stop_before_pixels=False, force=False):
+def read_file(fp, defer_size=None, stop_before_pixels=False,
+              force=False, specific_tags=None):
     """Read and parse a DICOM dataset stored in the DICOM File Format.
 
     Read a DICOM dataset stored in accordance with the DICOM File Format
@@ -785,6 +822,9 @@ def read_file(fp, defer_size=None, stop_before_pixels=False, force=False):
         If False (default), raises an InvalidDicomError if the file is missing
         the File Meta Information header. Set to True to force reading even if
         no File Meta Information header is found.
+    specific_tags : list or None
+        If not None, only the tags in the list are returned. The list
+        elements can be tags or tag names.
 
     Returns
     -------
@@ -832,8 +872,9 @@ def read_file(fp, defer_size=None, stop_before_pixels=False, force=False):
         logger.debug("\n" + "-" * 80)
         logger.debug("Call to read_file()")
         msg = ("filename:'%s', defer_size='%s', "
-               "stop_before_pixels=%s, force=%s")
-        logger.debug(msg % (fp.name, defer_size, stop_before_pixels, force))
+               "stop_before_pixels=%s, force=%s, specific_tags=%s")
+        logger.debug(msg % (fp.name, defer_size, stop_before_pixels,
+                            force, specific_tags))
         if caller_owns_file:
             logger.debug("Caller passed file object")
         else:
@@ -849,7 +890,7 @@ def read_file(fp, defer_size=None, stop_before_pixels=False, force=False):
         stop_when = _at_pixel_data
     try:
         dataset = read_partial(fp, stop_when, defer_size=defer_size,
-                               force=force)
+                               force=force, specific_tags=specific_tags)
     finally:
         if not caller_owns_file:
             fp.close()
