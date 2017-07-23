@@ -73,6 +73,34 @@ logger.addHandler(handler)
 
 
 image_handlers = []
+"""Image handlers for converting pixel data.
+This is an ordered list that the dataset._get_pixel_array()
+method will try to extract a correctly sized numpy array from the
+PixelData attribute.
+If a handler lacks required dependencies or can not otherwise be loaded,
+it shall through an ImportError.
+Handers shall have two methods:
+
+supports_transfer_syntax(dicom_dataset)
+  This returns True if the handler might support the transfer syntax
+  indicated in the dicom_dataset
+
+def get_pixeldata(dicom_dataset):
+  This shall either throw an exception or return a correctly sized numpy
+  array derived from the PixelData.  Reshaping the array to the correct
+  dimensions is handled outside the image handler
+
+The first handler that both announces that it supports the transfer syntax
+and does not throw an exception, either in getting the data or when the data
+is reshaped to the correct dimensions, is the handler that will provide the
+data.
+
+If they all fail, the last one to throw an exception gets to see its
+exception thrown up.
+
+If no one throws an exception, but they all refuse to support the transfer
+syntax, then this fact is announced in a NotImplementedError exception.
+"""
 
 have_numpy = True
 try:
