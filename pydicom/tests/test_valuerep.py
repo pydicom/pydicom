@@ -13,6 +13,10 @@ from datetime import (
 )
 
 import os
+
+from pydicom.tag import Tag
+from pydicom.values import convert_value
+
 import pydicom
 import platform
 from pydicom.compat import in_py2
@@ -148,12 +152,32 @@ class BadValueReadtests(unittest.TestCase):
     """Unit tests for handling a bad value for a VR
        (a string in a number VR here)"""
 
-    def testReadBadValueInVR(self):
-        # Check that invalid values are read
-        # and converted to some semi-useful type
+    def setUp(self):
+        class TagLike(object):
+            pass
 
-        dataset = pydicom.read_file(badvr_name)
-        self.assertIn(dataset.NumberOfFrames, ['1A', ])
+        self.tag = TagLike()
+        self.tag.value = b'1A'
+        self.tag.is_little_endian = True
+        self.tag.is_implicit_VR = False
+        self.tag.tag = Tag(0x0010, 0x0020)
+
+    def testReadBadValueInVRDefault(self):
+        # found a conversion
+        self.assertEqual('1A', convert_value('SH', self.tag))
+        # converted with fallback vr "SH"
+        self.assertEqual('1A', convert_value('IS', self.tag))
+
+        pydicom.values.convert_retry_VR_order = ['FL', 'UL']
+        # no fallback VR succeeded, returned original value untranslated
+        self.assertEqual(b'1A', convert_value('IS', self.tag))
+
+    def testReadBadValueInVREnforceValidValue(self):
+        pydicom.config.enforce_valid_values = True
+        # found a conversion
+        self.assertEqual('1A', convert_value('SH', self.tag))
+        # invalid literal for base 10
+        self.assertRaises(ValueError, convert_value, 'IS', self.tag)
 
 
 class DecimalStringtests(unittest.TestCase):
