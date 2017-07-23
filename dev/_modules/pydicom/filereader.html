@@ -187,7 +187,7 @@
 <span class="kn">from</span> <span class="nn">io</span> <span class="k">import</span> <span class="n">BytesIO</span>
 
 <span class="kn">from</span> <span class="nn">pydicom.misc</span> <span class="k">import</span> <span class="n">size_in_bytes</span>
-<span class="kn">from</span> <span class="nn">pydicom.tag</span> <span class="k">import</span> <span class="n">TupleTag</span>
+<span class="kn">from</span> <span class="nn">pydicom.tag</span> <span class="k">import</span> <span class="n">TupleTag</span><span class="p">,</span> <span class="n">Tag</span><span class="p">,</span> <span class="n">BaseTag</span>
 <span class="kn">from</span> <span class="nn">pydicom.dataelem</span> <span class="k">import</span> <span class="n">RawDataElement</span>
 <span class="kn">from</span> <span class="nn">pydicom.util.hexutil</span> <span class="k">import</span> <span class="n">bytes2hex</span>
 <span class="kn">from</span> <span class="nn">pydicom.valuerep</span> <span class="k">import</span> <span class="n">extra_length_VRs</span>
@@ -214,7 +214,7 @@
 <span class="p">)</span>
 
 <span class="kn">from</span> <span class="nn">pydicom.dicomdir</span> <span class="k">import</span> <span class="n">DicomDir</span>
-<span class="kn">from</span> <span class="nn">pydicom.datadict</span> <span class="k">import</span> <span class="n">dictionary_VR</span>
+<span class="kn">from</span> <span class="nn">pydicom.datadict</span> <span class="k">import</span> <span class="n">dictionary_VR</span><span class="p">,</span> <span class="n">tag_for_keyword</span>
 <span class="kn">from</span> <span class="nn">pydicom.dataelem</span> <span class="k">import</span> <span class="n">DataElement</span>
 <span class="kn">from</span> <span class="nn">pydicom.tag</span> <span class="k">import</span> <span class="p">(</span>
     <span class="n">ItemTag</span><span class="p">,</span>
@@ -332,7 +332,8 @@
                            <span class="n">is_little_endian</span><span class="p">,</span>
                            <span class="n">stop_when</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                            <span class="n">defer_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                           <span class="n">encoding</span><span class="o">=</span><span class="n">default_encoding</span><span class="p">):</span>
+                           <span class="n">encoding</span><span class="o">=</span><span class="n">default_encoding</span><span class="p">,</span>
+                           <span class="n">specific_tags</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
     <span class="sd">&quot;&quot;&quot;Create a generator to efficiently return the raw data elements.</span>
 
@@ -350,6 +351,8 @@
 <span class="sd">        See ``read_file`` for parameter info.</span>
 <span class="sd">    encoding :</span>
 <span class="sd">        Encoding scheme</span>
+<span class="sd">    specific_tags : list or None</span>
+<span class="sd">        See ``read_file`` for parameter info.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -403,6 +406,18 @@
     <span class="n">element_struct_unpack</span> <span class="o">=</span> <span class="n">element_struct</span><span class="o">.</span><span class="n">unpack</span>
     <span class="n">defer_size</span> <span class="o">=</span> <span class="n">size_in_bytes</span><span class="p">(</span><span class="n">defer_size</span><span class="p">)</span>
 
+    <span class="n">tag_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="n">has_specific_char_set</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">if</span> <span class="n">specific_tags</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">specific_tags</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">compat</span><span class="o">.</span><span class="n">text_type</span><span class="p">)):</span>
+                <span class="n">tag</span> <span class="o">=</span> <span class="n">Tag</span><span class="p">(</span><span class="n">tag_for_keyword</span><span class="p">(</span><span class="n">tag</span><span class="p">))</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">BaseTag</span><span class="p">):</span>
+                <span class="n">tag_set</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span>
+        <span class="n">has_specific_char_set</span> <span class="o">=</span> <span class="n">Tag</span><span class="p">(</span><span class="mh">0x08</span><span class="p">,</span> <span class="mh">0x05</span><span class="p">)</span> <span class="ow">in</span> <span class="n">tag_set</span>
+        <span class="n">tag_set</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Tag</span><span class="p">(</span><span class="mh">0x08</span><span class="p">,</span> <span class="mh">0x05</span><span class="p">))</span>
+    <span class="n">has_tag_set</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">tag_set</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
+
     <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
         <span class="c1"># Read tag, VR, length, get ready to read value</span>
         <span class="n">bytes_read</span> <span class="o">=</span> <span class="n">fp_read</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
@@ -455,6 +470,11 @@
         <span class="k">if</span> <span class="n">length</span> <span class="o">!=</span> <span class="mh">0xFFFFFFFF</span><span class="p">:</span>
             <span class="c1"># don&#39;t defer loading of Specific Character Set value as it is</span>
             <span class="c1"># needed immediately to get the character encoding for other tags</span>
+            <span class="k">if</span> <span class="n">has_tag_set</span> <span class="ow">and</span> <span class="n">tag</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">tag_set</span><span class="p">:</span>
+                <span class="c1"># skip the tag if not in specific tags</span>
+                <span class="n">fp</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">fp_tell</span><span class="p">()</span> <span class="o">+</span> <span class="n">length</span><span class="p">)</span>
+                <span class="k">continue</span>
+
             <span class="k">if</span> <span class="n">defer_size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">length</span> <span class="o">&gt;</span> <span class="n">defer_size</span> <span class="ow">and</span> <span class="n">tag</span> <span class="o">!=</span> <span class="p">(</span>
                     <span class="mh">0x08</span><span class="p">,</span> <span class="mh">0x05</span><span class="p">):</span>
                 <span class="c1"># Flag as deferred by setting value to None, and skip bytes</span>
@@ -482,6 +502,8 @@
                 <span class="c1"># Store the encoding value in the generator</span>
                 <span class="c1"># for use with future elements (SQs)</span>
                 <span class="n">encoding</span> <span class="o">=</span> <span class="n">convert_encodings</span><span class="p">(</span><span class="n">encoding</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">has_specific_char_set</span><span class="p">:</span>
+                    <span class="k">continue</span>
 
             <span class="k">yield</span> <span class="n">RawDataElement</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">VR</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">value_tell</span><span class="p">,</span>
                                  <span class="n">is_implicit_VR</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">)</span>
@@ -513,6 +535,8 @@
                     <span class="n">logger_debug</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fp_tell</span><span class="p">()))</span>
                 <span class="n">seq</span> <span class="o">=</span> <span class="n">read_sequence</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">is_implicit_VR</span><span class="p">,</span>
                                     <span class="n">is_little_endian</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">encoding</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">has_tag_set</span> <span class="ow">and</span> <span class="n">tag</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">tag_set</span><span class="p">:</span>
+                    <span class="k">continue</span>
                 <span class="k">yield</span> <span class="n">DataElement</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">VR</span><span class="p">,</span> <span class="n">seq</span><span class="p">,</span> <span class="n">value_tell</span><span class="p">,</span>
                                   <span class="n">is_undefined_length</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
@@ -531,14 +555,19 @@
                     <span class="c1"># Store the encoding value in the generator for use</span>
                     <span class="c1"># with future elements (SQs)</span>
                     <span class="n">encoding</span> <span class="o">=</span> <span class="n">convert_encodings</span><span class="p">(</span><span class="n">encoding</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">has_specific_char_set</span><span class="p">:</span>
+                        <span class="k">continue</span>
 
+                <span class="c1"># tags with undefined length are skipped after read</span>
+                <span class="k">if</span> <span class="n">has_tag_set</span> <span class="ow">and</span> <span class="n">tag</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">tag_set</span><span class="p">:</span>
+                    <span class="k">continue</span>
                 <span class="k">yield</span> <span class="n">RawDataElement</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">VR</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">value_tell</span><span class="p">,</span>
                                      <span class="n">is_implicit_VR</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">read_dataset</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">is_implicit_VR</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">,</span> <span class="n">bytelength</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">stop_when</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">defer_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">parent_encoding</span><span class="o">=</span><span class="n">default_encoding</span><span class="p">):</span>
+                 <span class="n">parent_encoding</span><span class="o">=</span><span class="n">default_encoding</span><span class="p">,</span> <span class="n">specific_tags</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Return a Dataset instance containing the next dataset in the file.</span>
 
 <span class="sd">    Parameters</span>
@@ -560,6 +589,8 @@
 <span class="sd">    parent_encoding :</span>
 <span class="sd">        optional encoding to use as a default in case</span>
 <span class="sd">        a Specific Character Set (0008,0005) isn&#39;t specified</span>
+<span class="sd">    specific_tags : list or None</span>
+<span class="sd">        See ``read_file`` for parameter info.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -573,7 +604,8 @@
     <span class="n">raw_data_elements</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="n">fpStart</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
     <span class="n">de_gen</span> <span class="o">=</span> <span class="n">data_element_generator</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">is_implicit_VR</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">,</span>
-                                    <span class="n">stop_when</span><span class="p">,</span> <span class="n">defer_size</span><span class="p">,</span> <span class="n">parent_encoding</span><span class="p">)</span>
+                                    <span class="n">stop_when</span><span class="p">,</span> <span class="n">defer_size</span><span class="p">,</span> <span class="n">parent_encoding</span><span class="p">,</span>
+                                    <span class="n">specific_tags</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="k">while</span> <span class="p">(</span><span class="n">bytelength</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">fp</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span> <span class="o">-</span> <span class="n">fpStart</span> <span class="o">&lt;</span> <span class="n">bytelength</span><span class="p">):</span>
             <span class="n">raw_data_element</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">de_gen</span><span class="p">)</span>
@@ -808,7 +840,8 @@
     <span class="k">return</span> <span class="n">tag</span> <span class="o">==</span> <span class="p">(</span><span class="mh">0x7fe0</span><span class="p">,</span> <span class="mh">0x0010</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="read_partial"><a class="viewcode-back" href="../../ref_guide.html#pydicom.filereader.read_partial">[docs]</a><span class="k">def</span> <span class="nf">read_partial</span><span class="p">(</span><span class="n">fileobj</span><span class="p">,</span> <span class="n">stop_when</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">defer_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="read_partial"><a class="viewcode-back" href="../../ref_guide.html#pydicom.filereader.read_partial">[docs]</a><span class="k">def</span> <span class="nf">read_partial</span><span class="p">(</span><span class="n">fileobj</span><span class="p">,</span> <span class="n">stop_when</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">defer_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">specific_tags</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Parse a DICOM file until a condition is met.</span>
 
 <span class="sd">    Parameters</span>
@@ -820,6 +853,8 @@
 <span class="sd">    defer_size : int, str, None, optional</span>
 <span class="sd">        See ``read_file`` for parameter info.</span>
 <span class="sd">    force : boolean</span>
+<span class="sd">        See ``read_file`` for parameter info.</span>
+<span class="sd">    specific_tags : list or None</span>
 <span class="sd">        See ``read_file`` for parameter info.</span>
 
 <span class="sd">    Notes</span>
@@ -914,7 +949,8 @@
     <span class="c1">#   the transfer syntax (whether read from the file meta or guessed at)</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">dataset</span> <span class="o">=</span> <span class="n">read_dataset</span><span class="p">(</span><span class="n">fileobj</span><span class="p">,</span> <span class="n">is_implicit_VR</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">,</span>
-                               <span class="n">stop_when</span><span class="o">=</span><span class="n">stop_when</span><span class="p">,</span> <span class="n">defer_size</span><span class="o">=</span><span class="n">defer_size</span><span class="p">)</span>
+                               <span class="n">stop_when</span><span class="o">=</span><span class="n">stop_when</span><span class="p">,</span> <span class="n">defer_size</span><span class="o">=</span><span class="n">defer_size</span><span class="p">,</span>
+                               <span class="n">specific_tags</span><span class="o">=</span><span class="n">specific_tags</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">EOFError</span><span class="p">:</span>
         <span class="k">pass</span>  <span class="c1"># error already logged in read_dataset</span>
 
@@ -930,7 +966,8 @@
                            <span class="n">is_implicit_VR</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="read_file"><a class="viewcode-back" href="../../ref_guide.html#pydicom.filereader.read_file">[docs]</a><span class="k">def</span> <span class="nf">read_file</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">defer_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stop_before_pixels</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="read_file"><a class="viewcode-back" href="../../ref_guide.html#pydicom.filereader.read_file">[docs]</a><span class="k">def</span> <span class="nf">read_file</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">defer_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stop_before_pixels</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+              <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">specific_tags</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Read and parse a DICOM dataset stored in the DICOM File Format.</span>
 
 <span class="sd">    Read a DICOM dataset stored in accordance with the DICOM File Format</span>
@@ -958,6 +995,9 @@
 <span class="sd">        If False (default), raises an InvalidDicomError if the file is missing</span>
 <span class="sd">        the File Meta Information header. Set to True to force reading even if</span>
 <span class="sd">        no File Meta Information header is found.</span>
+<span class="sd">    specific_tags : list or None</span>
+<span class="sd">        If not None, only the tags in the list are returned. The list</span>
+<span class="sd">        elements can be tags or tag names.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -1005,8 +1045,9 @@
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">80</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Call to read_file()&quot;</span><span class="p">)</span>
         <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;filename:&#39;</span><span class="si">%s</span><span class="s2">&#39;, defer_size=&#39;</span><span class="si">%s</span><span class="s2">&#39;, &quot;</span>
-               <span class="s2">&quot;stop_before_pixels=</span><span class="si">%s</span><span class="s2">, force=</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">msg</span> <span class="o">%</span> <span class="p">(</span><span class="n">fp</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">defer_size</span><span class="p">,</span> <span class="n">stop_before_pixels</span><span class="p">,</span> <span class="n">force</span><span class="p">))</span>
+               <span class="s2">&quot;stop_before_pixels=</span><span class="si">%s</span><span class="s2">, force=</span><span class="si">%s</span><span class="s2">, specific_tags=</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">msg</span> <span class="o">%</span> <span class="p">(</span><span class="n">fp</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">defer_size</span><span class="p">,</span> <span class="n">stop_before_pixels</span><span class="p">,</span>
+                            <span class="n">force</span><span class="p">,</span> <span class="n">specific_tags</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">caller_owns_file</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Caller passed file object&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -1022,7 +1063,7 @@
         <span class="n">stop_when</span> <span class="o">=</span> <span class="n">_at_pixel_data</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">dataset</span> <span class="o">=</span> <span class="n">read_partial</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">stop_when</span><span class="p">,</span> <span class="n">defer_size</span><span class="o">=</span><span class="n">defer_size</span><span class="p">,</span>
-                               <span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">)</span>
+                               <span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">,</span> <span class="n">specific_tags</span><span class="o">=</span><span class="n">specific_tags</span><span class="p">)</span>
     <span class="k">finally</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">caller_owns_file</span><span class="p">:</span>
             <span class="n">fp</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
