@@ -321,6 +321,43 @@ class ReaderTests(unittest.TestCase):
         missing = [Tag(0x7fe0, 0x10), Tag(0xfffc, 0xfffc)]
         self.assertEqual(ctfull_tags, ctpartial_tags + missing, msg)
 
+    def testSpecificTags(self):
+        """Returns only tags specified by user."""
+        ctspecific = read_file(ct_name, specific_tags=[
+            Tag(0x0010, 0x0010), 'PatientID', 'ImageType', 'ViewName'])
+        ctspecific_tags = sorted(ctspecific.keys())
+        expected = [
+            # ViewName does not exist in the data set
+            Tag(0x0008, 0x0008), Tag(0x0010, 0x0010), Tag(0x0010, 0x0020)
+        ]
+        self.assertEqual(expected, ctspecific_tags)
+
+    def testSpecificTagsWithUnknownLengthSQ(self):
+        """Returns only tags specified by user."""
+        unknown_len_sq_tag = Tag(0x3f03, 0x1001)
+        tags = read_file(priv_SQ_name, specific_tags=[
+            unknown_len_sq_tag])
+        tags = sorted(tags.keys())
+        self.assertEqual([unknown_len_sq_tag], tags)
+
+        tags = read_file(priv_SQ_name, specific_tags=[
+            'PatientName'])
+        tags = sorted(tags.keys())
+        self.assertEqual([], tags)
+
+    def testSpecificTagsWithUnknownLengthTag(self):
+        """Returns only tags specified by user."""
+        unknown_len_tag = Tag(0x7fe0, 0x0010)  # Pixel Data
+        tags = read_file(emri_jpeg_2k_lossless, specific_tags=[
+            unknown_len_tag])
+        tags = sorted(tags.keys())
+        self.assertEqual([unknown_len_tag], tags)
+
+        tags = read_file(emri_jpeg_2k_lossless, specific_tags=[
+            'SpecificCharacterSet'])
+        tags = sorted(tags.keys())
+        self.assertEqual([Tag(0x08, 0x05)], tags)
+
     def testPrivateSQ(self):
         """Can read private undefined length SQ without error."""
         # From issues 91, 97, 98. Bug introduced by fast reading, due to
