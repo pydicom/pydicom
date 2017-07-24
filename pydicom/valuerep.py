@@ -8,12 +8,13 @@ from copy import deepcopy
 from decimal import Decimal
 import re
 
+from datetime import (date, datetime, time, timedelta)
+
 # don't import datetime_conversion directly
 from pydicom import config
 from pydicom import compat
 from pydicom.multival import MultiValue
-
-from datetime import (date, datetime, time, timezone, timedelta)
+from pydicom.util.fixes import timezone
 
 # can't import from charset or get circular import
 default_encoding = "iso8859"

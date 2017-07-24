@@ -9,8 +9,7 @@ from datetime import (
     datetime,
     date,
     time,
-    timedelta,
-    timezone
+    timedelta
 )
 
 import os
@@ -19,6 +18,7 @@ import platform
 from pydicom.compat import in_py2
 from pydicom import config
 from pydicom import valuerep
+from pydicom.util.fixes import timezone
 import unittest
 
 try:

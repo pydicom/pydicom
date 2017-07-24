@@ -6,7 +6,7 @@
 #    available at https://github.com/darcymason/pydicom
 
 from copy import deepcopy
-from datetime import date, datetime, time, timedelta, timezone
+from datetime import date, datetime, time, timedelta
 from io import BytesIO
 import os
 import os.path
@@ -32,6 +32,7 @@ from pydicom.multival import MultiValue
 from pydicom.sequence import Sequence
 from pydicom.uid import ImplicitVRLittleEndian, ExplicitVRBigEndian
 from pydicom.util.hexutil import hex2bytes, bytes2hex
+from pydicom.util.fixes import timezone
 from pydicom.valuerep import DA, DT, TM
 
 test_dir = os.path.dirname(__file__)
