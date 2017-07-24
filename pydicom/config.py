@@ -78,7 +78,7 @@ This is an ordered list that the dataset._get_pixel_array()
 method will try to extract a correctly sized numpy array from the
 PixelData attribute.
 If a handler lacks required dependencies or can not otherwise be loaded,
-it shall through an ImportError.
+it shall throw an ImportError.
 Handers shall have two methods:
 
 supports_transfer_syntax(dicom_dataset)
