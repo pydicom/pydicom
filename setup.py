@@ -53,8 +53,6 @@ URL = "https://github.com/pydicom/pydicom"
 DOWNLOAD_URL = "https://github.com/pydicom/pydicom/archive/master.zip"
 LICENSE = "MIT"
 VERSION = __version__
-PACKAGE_DATA = {'pydicom': ['tests/test_files/*',
-                            'tests/charset_files/*']}
 REQUIRES = []
 DATA_FILES = []
 
@@ -62,8 +60,11 @@ data_roots = ['pydicom/tests']
 
 for data_root in data_roots:
     for root, subfolder, files in os.walk(data_root):
-        files = [x for x in glob(root+'*') if not os.path.isdir(x)]
-        DATA_FILES.append((root, files))
+        files = [x.replace('pydicom/','') for x in glob(root+'/*')
+                if not os.path.isdir(x)]
+        DATA_FILES = DATA_FILES + files 
+
+PACKAGE_DATA = {'pydicom': DATA_FILES}
 
 
 opts = dict(name=NAME,
@@ -81,7 +82,6 @@ opts = dict(name=NAME,
             classifiers=CLASSIFIERS,
             packages=find_packages(),
             package_data=PACKAGE_DATA,
-            data_files=DATA_FILES,
             include_package_data=True,
             install_requires=REQUIRES,
             zip_safe=False)
