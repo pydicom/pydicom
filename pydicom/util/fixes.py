@@ -121,7 +121,6 @@ if sys.version_info[0] < 3:
             minutes = rest // timedelta(minutes=1)
             return 'UTC{}{:02d}:{:02d}'.format(sign, hours, minutes)
 
-
     timezone.utc = timezone._create(timedelta(0))
     timezone.min = timezone._create(timezone._minoffset)
     timezone.max = timezone._create(timezone._maxoffset)
