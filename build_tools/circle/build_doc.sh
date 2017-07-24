@@ -111,7 +111,6 @@ source activate $CONDA_ENV_NAME
 
 conda install --yes --quiet pip setuptools numpy matplotlib sphinx pillow sphinx_rtd_theme numpydoc
 conda install --yes --quiet -c conda-forge gdcm
-pip install CharPyLS
 pip install sphinx-gallery
 
 # Build and install pydicom in dev mode
