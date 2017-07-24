@@ -6,18 +6,12 @@
 #    available at https://github.com/darcymason/pydicom
 
 from copy import deepcopy
-from datetime import date, datetime, time
+from datetime import date, datetime, time, timedelta, timezone
 from io import BytesIO
 import os
 import os.path
-import sys
 from tempfile import TemporaryFile
 
-have_dateutil = True
-try:
-    from dateutil.tz import tzoffset
-except ImportError:
-    have_dateutil = False
 import unittest
 try:
     unittest.TestCase.assertSequenceEqual
@@ -64,6 +58,7 @@ def files_identical(a, b):
             b_bytes = B.read()
 
     return bytes_identical(a_bytes, b_bytes)
+
 
 def bytes_identical(a_bytes, b_bytes):
     """Return a tuple (bytes a == bytes b, index of first difference)"""
@@ -177,7 +172,6 @@ class WriteFileTests(unittest.TestCase):
         self.assertRaises(ValueError, ds.save_as, self.file_out)
 
 
-@unittest.skipIf(not have_dateutil, "Need python-dateutil installed for these tests")
 class ScratchWriteDateTimeTests(WriteFileTests):
     """Write and reread simple or multi-value DA/DT/TM data elements"""
     def setUp(self):
@@ -191,10 +185,11 @@ class ScratchWriteDateTimeTests(WriteFileTests):
         """Write DA/DT/TM data elements.........."""
         multi_DA_expected = (date(1961, 8, 4), date(1963, 11, 22))
         DA_expected = date(1961, 8, 4)
-        tzinfo = tzoffset('-0600', -21600)
+        tzinfo = timezone(timedelta(seconds=-21600), '-0600')
         multi_DT_expected = (datetime(1961, 8, 4),
                              datetime(1963, 11, 22, 12, 30, 0, 0,
-                                      tzoffset('-0600', -21600)))
+                                      timezone(timedelta(seconds=-21600),
+                                               '-0600')))
         multi_TM_expected = (time(1, 23, 45), time(11, 11, 11))
         TM_expected = time(11, 11, 11, 1)
         ds = read_file(datetime_name)
