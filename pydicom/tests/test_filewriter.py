@@ -78,7 +78,8 @@ class WriteFileTests(unittest.TestCase):
         self.file_out = TemporaryFile('w+b')
 
     def compare(self, in_filename, decode=False):
-        """Read Dataset from `in_filename`, write Dataset to file, then compare."""
+        """Read Dataset from `in_filename`, write Dataset to file,
+        then compare."""
         with open(in_filename, 'rb') as f:
             bytes_in = BytesIO(f.read())
             bytes_in.seek(0)
@@ -301,8 +302,9 @@ class WriteDataElementTests(unittest.TestCase):
         # VR (OD): \x4f\x44
         # Reserved: \x00\x00
         # Length (16): \x10\x00\x00\x00
-        #             | Tag          | VR    | Rsrvd |   Length      |    Value ->
-        ref_bytes = b'\x70\x00\x0d\x15\x4f\x44\x00\x00\x10\x00\x00\x00' + bytestring
+        #      | Tag          | VR    | Rsrvd |   Length      |    Value ->
+        ref_bytes = (b'\x70\x00\x0d\x15\x4f\x44\x00\x00\x10\x00\x00\x00' +
+                     bytestring)
         self.assertEqual(encoded_elem, ref_bytes)
 
         # Empty data
@@ -345,8 +347,9 @@ class WriteDataElementTests(unittest.TestCase):
         # VR (OL): \x4f\x4c
         # Reserved: \x00\x00
         # Length (12): 0c 00 00 00
-        #             | Tag          | VR    | Rsrvd |   Length      |    Value ->
-        ref_bytes = b'\x66\x00\x29\x01\x4f\x4c\x00\x00\x0c\x00\x00\x00' + bytestring
+        #         | Tag          | VR    | Rsrvd |   Length      |    Value ->
+        ref_bytes = (b'\x66\x00\x29\x01\x4f\x4c\x00\x00\x0c\x00\x00\x00' +
+                     bytestring)
         self.assertEqual(encoded_elem, ref_bytes)
 
         # Empty data
@@ -811,7 +814,8 @@ class ScratchWriteTests(unittest.TestCase):
 
     def testImpl_LE_deflen_write(self):
         """Scratch Write for implicit VR little endian, defined length SQ's"""
-        from pydicom.util.testing._write_stds import impl_LE_deflen_std_hex as std
+        from pydicom.util.testing._write_stds import impl_LE_deflen_std_hex \
+            as std
 
         file_ds = FileDataset("test", self.ds)
         self.compare_write(std, file_ds)
@@ -936,7 +940,8 @@ class TestWriteToStandard(unittest.TestCase):
             write_like_original=False)
 
     def test_raise_no_file_meta(self):
-        """Test exception is raised if trying to write a dataset with no file_meta"""
+        """Test exception is raised if trying to write a dataset with no
+        file_meta"""
         ds = read_file(rtplan_name)
         ds.file_meta = Dataset()
         self.assertRaises(
@@ -961,7 +966,8 @@ class TestWriteToStandard(unittest.TestCase):
         self.assertTrue('TransferSyntaxUID' in ds_out.file_meta)
 
     def test_commandset_no_written(self):
-        """Test that Command Set elements are not written when writing to standard"""
+        """Test that Command Set elements are not written when writing to
+        standard"""
         ds = read_file(ct_name)
         preamble = ds.preamble[:]
         ds.MessageID = 3
@@ -1288,7 +1294,8 @@ class TestWriteNonStandard(unittest.TestCase):
         self.assertEqual(self.fp.read(128), preamble)
         self.assertEqual(self.fp.read(4), b'DICM')
         # Ensure Command Set Elements written as little endian implicit VR
-        #self.assertEqual(self.fp.read(12), b'\x00\x00\x00\x00\x04\x00\x00\x00\x08\x00\x00\x00')
+        # self.assertEqual(self.fp.read(12),
+        #                  b'\x00\x00\x00\x00\x04\x00\x00\x00\x08\x00\x00\x00')
 
         fp = BytesIO(self.fp.getvalue())  # Workaround to avoid #358
         ds_out = read_file(fp, force=True)
@@ -1314,7 +1321,8 @@ class TestWriteNonStandard(unittest.TestCase):
         self.assertNotEqual(self.fp.read(4), b'DICM')
         # Ensure Command Set Elements written as little endian implicit VR
         self.fp.seek(0)
-        #self.assertEqual(self.fp.read(12), b'\x00\x00\x00\x00\x04\x00\x00\x00\x08\x00\x00\x00')
+        # self.assertEqual(self.fp.read(12),
+        #                  b'\x00\x00\x00\x00\x04\x00\x00\x00\x08\x00\x00\x00')
 
         fp = BytesIO(self.fp.getvalue())  # Workaround to avoid #358
         ds_out = read_file(fp, force=True)
@@ -1339,7 +1347,8 @@ class TestWriteNonStandard(unittest.TestCase):
         self.assertNotEqual(self.fp.read(4), b'DICM')
         # Ensure Command Set Elements written as little endian implicit VR
         self.fp.seek(0)
-        #self.assertEqual(self.fp.read(12), b'\x00\x00\x00\x00\x04\x00\x00\x00\x08\x00\x00\x00')
+        # self.assertEqual(self.fp.read(12),
+        #                  b'\x00\x00\x00\x00\x04\x00\x00\x00\x08\x00\x00\x00')
 
         fp = BytesIO(self.fp.getvalue())  # Workaround to avoid #358
         ds_out = read_file(fp, force=True)
@@ -1365,7 +1374,8 @@ class TestWriteNonStandard(unittest.TestCase):
         self.assertNotEqual(self.fp.read(4), b'DICM')
         # Ensure Command Set Elements written as little endian implicit VR
         self.fp.seek(0)
-        #self.assertEqual(self.fp.read(12), b'\x00\x00\x00\x00\x04\x00\x00\x00\x08\x00\x00\x00')
+        # self.assertEqual(self.fp.read(12),
+        #                  b'\x00\x00\x00\x00\x04\x00\x00\x00\x08\x00\x00\x00')
 
         fp = BytesIO(self.fp.getvalue())  # Workaround to avoid #358
         ds_out = read_file(fp, force=True)
@@ -1412,7 +1422,8 @@ class TestWriteNonStandard(unittest.TestCase):
         self.assertEqual(self.fp.read(128), ds.preamble)
         self.assertEqual(self.fp.read(4), b'DICM')
         # Ensure Command Set Elements written as little endian implicit VR
-        #self.assertEqual(self.fp.read(12), b'\x00\x00\x00\x00\x04\x00\x00\x00\x08\x00\x00\x00')
+        # self.assertEqual(self.fp.read(12),
+        #                  b'\x00\x00\x00\x00\x04\x00\x00\x00\x08\x00\x00\x00')
 
         fp = BytesIO(self.fp.getvalue())  # Workaround to avoid #358
         ds_out = read_file(fp, force=True)
