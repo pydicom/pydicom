@@ -114,8 +114,11 @@ class DatasetTests(unittest.TestCase):
             expected_msg = ("Invalid tag (0028, 0106): object of type 'int' "
                             "has no len()")
 
-        callback = lambda dataset, data_element: str(data_element)
-        func = lambda: ds.walk(callback)
+        def callback(dataset, data_element):
+            return str(data_element)
+
+        def func(dataset=ds):
+            return dataset.walk(callback)
 
         self.failUnlessExceptionArgs(expected_msg, TypeError, func)
 
