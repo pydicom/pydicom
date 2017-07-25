@@ -1,8 +1,10 @@
 #!/usr/bin/env python
-from setuptools import setup, find_packages
-from pydicom import __version__
-from glob import glob
+
 import os
+from glob import glob
+from setuptools import setup, find_packages
+
+from pydicom import __version__
 
 description = "Pure python package for DICOM medical file reading and writing"
 
