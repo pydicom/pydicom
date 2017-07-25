@@ -96,7 +96,7 @@ def read_undefined_length_value(fp,
                                 is_little_endian,
                                 delimiter_tag,
                                 defer_size=None,
-                                read_size=128):
+                                read_size=1024*8):
     """Read until the delimiter tag found and return the value;
      ignore the delimiter.
 
