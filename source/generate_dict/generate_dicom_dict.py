@@ -271,7 +271,7 @@ for attr in attrs:
         attr['Retired'] = ''
 
     # e.g. (0028,1200)
-    attr['VM'] = attr['VM'].replace(" or ", " ")
+    attr['VM'] = attr['VM'].split(' or ')[0]
 
     # If blank then add dummy vals
     # e.g. (0018,9445) and (0028,0020)

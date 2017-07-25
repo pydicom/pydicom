@@ -1871,7 +1871,7 @@ DicomDictionary = {
     0x00281112: ('US or SS', '4', "Large Green Palette Color Lookup Table Descriptor", 'Retired', 'LargeGreenPaletteColorLookupTableDescriptor'),  # noqa
     0x00281113: ('US or SS', '4', "Large Blue Palette Color Lookup Table Descriptor", 'Retired', 'LargeBluePaletteColorLookupTableDescriptor'),  # noqa
     0x00281199: ('UI', '1', "Palette Color Lookup Table UID", '', 'PaletteColorLookupTableUID'),  # noqa
-    0x00281200: ('US or SS or OW', '1-n 1', "Gray Lookup Table Data", 'Retired', 'GrayLookupTableData'),  # noqa
+    0x00281200: ('US or SS or OW', '1-n', "Gray Lookup Table Data", 'Retired', 'GrayLookupTableData'),  # noqa
     0x00281201: ('OW', '1', "Red Palette Color Lookup Table Data", '', 'RedPaletteColorLookupTableData'),  # noqa
     0x00281202: ('OW', '1', "Green Palette Color Lookup Table Data", '', 'GreenPaletteColorLookupTableData'),  # noqa
     0x00281203: ('OW', '1', "Blue Palette Color Lookup Table Data", '', 'BluePaletteColorLookupTableData'),  # noqa
@@ -1915,7 +1915,7 @@ DicomDictionary = {
     0x00283002: ('US or SS', '3', "LUT Descriptor", '', 'LUTDescriptor'),  # noqa
     0x00283003: ('LO', '1', "LUT Explanation", '', 'LUTExplanation'),  # noqa
     0x00283004: ('LO', '1', "Modality LUT Type", '', 'ModalityLUTType'),  # noqa
-    0x00283006: ('US or OW', '1-n 1', "LUT Data", '', 'LUTData'),  # noqa
+    0x00283006: ('US or OW', '1-n', "LUT Data", '', 'LUTData'),  # noqa
     0x00283010: ('SQ', '1', "VOI LUT Sequence", '', 'VOILUTSequence'),  # noqa
     0x00283110: ('SQ', '1', "Softcopy VOI LUT Sequence", '', 'SoftcopyVOILUTSequence'),  # noqa
     0x00284000: ('LT', '1', "Image Presentation Comments", 'Retired', 'ImagePresentationComments'),  # noqa
