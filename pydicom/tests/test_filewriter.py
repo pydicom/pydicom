@@ -28,6 +28,7 @@ except AttributeError:
         print("unittest2 is required for testing in python2.6")
 
 from pydicom import config
+from pydicom.data import get_dataset
 from pydicom.dataset import Dataset, FileDataset
 from pydicom.dataelem import DataElement
 from pydicom.filebase import DicomBytesIO
@@ -40,9 +41,8 @@ from pydicom.uid import ImplicitVRLittleEndian, ExplicitVRBigEndian
 from pydicom.util.hexutil import hex2bytes, bytes2hex
 from pydicom.valuerep import DA, DT, TM
 
-test_dir = os.path.dirname(__file__)
-test_files = os.path.join(test_dir, 'test_files')
-testcharset_dir = os.path.join(test_dir, 'charset_files')
+test_files = get_dataset('test', return_base=True)
+testcharset_dir = get_dataset('charset', return_base=True)
 
 rtplan_name = os.path.join(test_files, "rtplan.dcm")
 rtdose_name = os.path.join(test_files, "rtdose.dcm")

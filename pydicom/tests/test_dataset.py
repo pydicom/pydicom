@@ -8,6 +8,7 @@
 import os
 import unittest
 
+from pydicom.data import get_dataset
 from pydicom.dataset import Dataset, PropertyError
 from pydicom.dataelem import DataElement, RawDataElement
 from pydicom.dicomio import read_file
@@ -756,8 +757,8 @@ class DatasetElementsTests(unittest.TestCase):
 
 class FileDatasetTests(unittest.TestCase):
     def setUp(self):
-        test_dir = os.path.dirname(__file__)
-        self.test_file = os.path.join(test_dir, 'test_files', 'CT_small.dcm')
+        test_dir = get_dataset('test', return_base=True)
+        self.test_file = os.path.join(test_dir, 'CT_small.dcm')
 
     def testEqualityFileMeta(self):
         """Dataset: equality returns correct value if with metadata"""

@@ -42,6 +42,7 @@ except ImportError:
         # Neither worked, so it's likely not installed.
         PILImg = None
 
+from pydicom.data import get_dataset
 from pydicom.dataset import Dataset, FileDataset
 from pydicom.dataelem import DataElement
 from pydicom.filereader import read_file
@@ -56,7 +57,7 @@ have_jpeg_ls = jpeg_ls is not None
 have_pillow = PILImg is not None
 
 test_dir = os.path.dirname(__file__)
-test_files = os.path.join(test_dir, 'test_files')
+test_files = get_dataset('test', return_base=True)
 
 empty_number_tags_name = os.path.join(test_files,
                                       "reportsi_with_empty_number_tags.dcm")
