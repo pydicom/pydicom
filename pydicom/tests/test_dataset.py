@@ -57,10 +57,10 @@ class DatasetTests(unittest.TestCase):
         ds.file_meta = Dataset()
         ds.PixelData = 'xyzlmnop'
         msg_from_gdcm = r"'Dataset' object has no attribute 'filename'"
-        msg_from_numpy = r"'Dataset' object has no attribute " \
-                         "'TransferSyntaxUID'"
-        msg_from_pillow = r"'Dataset' object has no attribute " \
-                          "'PixelRepresentation'"
+        msg_from_numpy = (r"'Dataset' object has no attribute "
+                          "'TransferSyntaxUID'")
+        msg_from_pillow = (r"'Dataset' object has no attribute "
+                           "'PixelRepresentation'")
         msg = "(" + "|".join(
             [msg_from_gdcm, msg_from_numpy, msg_from_pillow]) + ")"
         with self.assertRaisesRegexp(AttributeError, msg):

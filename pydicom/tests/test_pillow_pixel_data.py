@@ -5,8 +5,8 @@ import pytest
 import pydicom
 from pydicom.filereader import read_file
 from pydicom.tag import Tag
-pillow_missing_message = "pillow is not available " \
-                         "in this test environment"
+pillow_missing_message = ("pillow is not available "
+                          "in this test environment")
 pillow_present_message = "pillow is being tested"
 pillow_handler = None
 have_pillow_handler = True

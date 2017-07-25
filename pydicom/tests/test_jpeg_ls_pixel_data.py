@@ -4,8 +4,8 @@ import sys
 import pytest
 import pydicom
 from pydicom.filereader import read_file
-jpeg_ls_missing_message = "jpeg_ls is not available " \
-    "in this test environment"
+jpeg_ls_missing_message = ("jpeg_ls is not available "
+                           "in this test environment")
 jpeg_ls_present_message = "jpeg_ls is being tested"
 jpeg_ls_handler = None
 have_jpeg_ls_handler = True

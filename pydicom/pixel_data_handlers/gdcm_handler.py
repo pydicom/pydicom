@@ -25,8 +25,8 @@ def get_pixeldata(dicom_dataset):
     # instead of dicom_dataset.filename
     #       but it is unclear how this should be achieved using GDCM
     if not can_use_gdcm:
-        msg = "GDCM requires both the gdcm package and numpy "\
-              "and one or more could not be imported"
+        msg = ("GDCM requires both the gdcm package and numpy "
+               "and one or more could not be imported")
         raise ImportError(msg)
 
     gdcm_image_reader = gdcm.ImageReader()

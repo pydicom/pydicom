@@ -43,8 +43,8 @@ def get_pixeldata(dicom_dataset):
                                   "be able to convert the pixel data "
                                   "using GDCM if it is installed.")
     if not have_numpy:
-        msg = "The Numpy package is required to use pixel_array, and " \
-              "numpy could not be imported."
+        msg = ("The Numpy package is required to use pixel_array, and "
+               "numpy could not be imported.")
         raise ImportError(msg)
     if 'PixelData' not in dicom_dataset:
         raise TypeError("No pixel data found in this dataset.")
@@ -62,12 +62,12 @@ def get_pixeldata(dicom_dataset):
     try:
         numpy_dtype = numpy.dtype(format_str)
     except TypeError:
-        msg = "Data type not understood by NumPy: " \
-              "format='{}', PixelRepresentation={}, " \
-              "BitsAllocated={}".format(
-                  format_str,
-                  dicom_dataset.PixelRepresentation,
-                  dicom_dataset.BitsAllocated)
+        msg = ("Data type not understood by NumPy: "
+               "format='{}', PixelRepresentation={}, "
+               "BitsAllocated={}".format(
+                   format_str,
+                   dicom_dataset.PixelRepresentation,
+                   dicom_dataset.BitsAllocated))
         raise TypeError(msg)
 
     if dicom_dataset.is_little_endian != sys_is_little_endian:

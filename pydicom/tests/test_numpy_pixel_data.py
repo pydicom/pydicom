@@ -5,8 +5,8 @@ import pytest
 import pydicom
 from pydicom.filereader import read_file
 from pydicom.tag import Tag
-numpy_missing_message = "numpy is not available "\
-                        "in this test environment"
+numpy_missing_message = ("numpy is not available "
+                         "in this test environment")
 numpy_present_message = "numpy is being tested"
 numpy_handler = None
 have_numpy_handler = True

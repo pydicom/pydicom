@@ -42,16 +42,16 @@ def get_pixeldata(dicom_dataset):
     """
     if (dicom_dataset.file_meta.TransferSyntaxUID
             not in JPEGLSSupportedTransferSyntaxes):
-        msg = "The jpeg_ls does not support " \
-              "this transfer syntax {0}.".format(
-                  dicom_dataset.file_meta.TransferSyntaxUID)
+        msg = ("The jpeg_ls does not support "
+               "this transfer syntax {0}.".format(
+                   dicom_dataset.file_meta.TransferSyntaxUID))
         raise NotImplementedError(msg)
 
     if not have_jpeg_ls:
-        msg = "The jpeg_ls package is required to use pixel_array " \
-              "for this transfer syntax {0}, and jpeg_ls could not " \
-              "be imported.".format(
-                  dicom_dataset.file_meta.TransferSyntaxUID)
+        msg = ("The jpeg_ls package is required to use pixel_array "
+               "for this transfer syntax {0}, and jpeg_ls could not "
+               "be imported.".format(
+                   dicom_dataset.file_meta.TransferSyntaxUID))
         raise ImportError(msg)
     # Make NumPy format code, e.g. "uint16", "int32" etc
     # from two pieces of info:
@@ -66,12 +66,12 @@ def get_pixeldata(dicom_dataset):
     try:
         numpy_format = numpy.dtype(format_str)
     except TypeError:
-        msg = "Data type not understood by NumPy: " \
-              "format='{}', PixelRepresentation={}, " \
-              "BitsAllocated={}".format(
-                  format_str,
-                  dicom_dataset.PixelRepresentation,
-                  dicom_dataset.BitsAllocated)
+        msg = ("Data type not understood by NumPy: "
+               "format='{}', PixelRepresentation={}, "
+               "BitsAllocated={}".format(
+                   format_str,
+                   dicom_dataset.PixelRepresentation,
+                   dicom_dataset.BitsAllocated))
         raise TypeError(msg)
 
     if (dicom_dataset.is_little_endian !=

@@ -80,30 +80,30 @@ def get_pixeldata(dicom_dataset):
     logger.debug("Trying to use Pillow to read pixel array "
                  "(has pillow = %s)", have_pillow)
     if not have_pillow:
-        msg = "The pillow package is required to use pixel_array for " \
-              "this transfer syntax {0}, and pillow could not be " \
-              "imported.".format(
-                  dicom_dataset.file_meta.TransferSyntaxUID)
+        msg = ("The pillow package is required to use pixel_array for "
+               "this transfer syntax {0}, and pillow could not be "
+               "imported.".format(
+                   dicom_dataset.file_meta.TransferSyntaxUID))
         raise ImportError(msg)
     if (not have_pillow_jpeg_plugin and
             dicom_dataset.file_meta.TransferSyntaxUID in
             PillowJPEGTransferSyntaxes):
-        msg = "this transfer syntax {0}, can not be read because " \
-              "Pillow lacks the jpeg decoder plugin".format(
-                  dicom_dataset.file_meta.TransferSyntaxUID)
+        msg = ("this transfer syntax {0}, can not be read because "
+               "Pillow lacks the jpeg decoder plugin".format(
+                   dicom_dataset.file_meta.TransferSyntaxUID))
         raise NotImplementedError(msg)
     if (not have_pillow_jpeg2000_plugin and
             dicom_dataset.file_meta.TransferSyntaxUID in
             PillowJPEG2000TransferSyntaxes):
-        msg = "this transfer syntax {0}, can not be read because " \
-              "Pillow lacks the jpeg 2000 decoder plugin".format(
-                  dicom_dataset.file_meta.TransferSyntaxUID)
+        msg = ("this transfer syntax {0}, can not be read because "
+               "Pillow lacks the jpeg 2000 decoder plugin".format(
+                   dicom_dataset.file_meta.TransferSyntaxUID))
         raise NotImplementedError(msg)
     if (dicom_dataset.file_meta.TransferSyntaxUID not in
             PillowSupportedTransferSyntaxes):
-        msg = "this transfer syntax {0}, can not be read because " \
-              "Pillow does not support this syntax".format(
-                  dicom_dataset.file_meta.TransferSyntaxUID)
+        msg = ("this transfer syntax {0}, can not be read because "
+               "Pillow does not support this syntax".format(
+                   dicom_dataset.file_meta.TransferSyntaxUID))
         raise NotImplementedError(msg)
 
     # Make NumPy format code, e.g. "uint16", "int32" etc
@@ -119,12 +119,12 @@ def get_pixeldata(dicom_dataset):
     try:
         numpy_format = numpy.dtype(format_str)
     except TypeError:
-        msg = "Data type not understood by NumPy: " \
-              "format='{}', PixelRepresentation={}, " \
-              "BitsAllocated={}".format(
-                  format_str,
-                  dicom_dataset.PixelRepresentation,
-                  dicom_dataset.BitsAllocated)
+        msg = ("Data type not understood by NumPy: "
+               "format='{}', PixelRepresentation={}, "
+               "BitsAllocated={}".format(
+                   format_str,
+                   dicom_dataset.PixelRepresentation,
+                   dicom_dataset.BitsAllocated))
         raise TypeError(msg)
 
     if dicom_dataset.is_little_endian != sys_is_little_endian:
@@ -137,8 +137,9 @@ def get_pixeldata(dicom_dataset):
         if dicom_dataset.BitsAllocated > 8:
             raise NotImplementedError("JPEG Lossy only supported if "
                                       "Bits Allocated = 8")
-        generic_jpeg_file_header = b'\xff\xd8\xff\xe0\x00' \
-            b'\x10JFIF\x00\x01\x01\x01\x00\x01\x00\x01\x00\x00'
+        generic_jpeg_file_header = (
+            b'\xff\xd8\xff\xe0\x00\x10'
+            b'JFIF\x00\x01\x01\x01\x00\x01\x00\x01\x00\x00')
         frame_start_from = 2
     elif (dicom_dataset.file_meta.TransferSyntaxUID in
           PillowJPEG2000TransferSyntaxes):
