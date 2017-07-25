@@ -4,6 +4,7 @@ import unittest
 
 from pydicom.data import get_dataset
 
+
 class TestData(unittest.TestCase):
 
     def test_get_dataset(self):
@@ -16,7 +17,7 @@ class TestData(unittest.TestCase):
         # parent directory base for all of files
         testbase = get_dataset('test', return_base=True)
         testdata = get_dataset('test')
-        self.assertTrue(len(testdata)>20)
+        self.assertTrue(len(testdata) > 20)
         [self.assertTrue(testbase in x) for x in testdata]
 
         # Matching a pattern

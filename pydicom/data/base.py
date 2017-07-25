@@ -10,6 +10,7 @@
 import fnmatch
 import os
 
+
 def get_datadir():
     '''get the data directory base
     '''
