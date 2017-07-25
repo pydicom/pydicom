@@ -62,7 +62,7 @@ data_roots = ['pydicom/tests']
 
 for data_root in data_roots:
     for root, subfolder, files in os.walk(data_root):
-        files = [x.replace('pydicom/', '') for x in glob(root+'/*')
+        files = [x.replace('pydicom/', '') for x in glob(root + '/*')
                  if not os.path.isdir(x)]
         DATA_FILES = DATA_FILES + files
 
