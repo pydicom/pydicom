@@ -7,7 +7,7 @@ from pydicom.data import get_dataset
 from pydicom.misc import is_dicom, size_in_bytes
 
 test_files = get_dataset('test', return_base=True)
-test_file = osp.join(test_files,'CT_small.dcm')
+test_file = osp.join(test_files, 'CT_small.dcm')
 
 
 class TestMisc(unittest.TestCase):

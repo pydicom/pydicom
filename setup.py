@@ -58,19 +58,6 @@ VERSION = __version__
 REQUIRES = []
 
 
-def data_files_inventory():
-    data_files = []
-    data_roots = ['pydicom/tests']
-    for data_root in data_roots:
-        for root, subfolder, files in os.walk(data_root):
-            files = [x.replace('pydicom/', '') for x in glob(root + '/*')
-                     if not os.path.isdir(x)]
-            data_files = data_files + files
-    return data_files
-
-PACKAGE_DATA = {'pydicom': data_files_inventory()}
-
-
 opts = dict(name=NAME,
             version=__version__,
             maintainer=MAINTAINER,
@@ -85,7 +72,6 @@ opts = dict(name=NAME,
             keywords=KEYWORDS,
             classifiers=CLASSIFIERS,
             packages=find_packages(),
-            package_data=PACKAGE_DATA,
             include_package_data=True,
             install_requires=REQUIRES,
             zip_safe=False)
