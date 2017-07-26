@@ -57,7 +57,7 @@ class TestUID(unittest.TestCase):
         self.assertFalse(self.uid == 'Explicit VR Little Endian')
         # Issue 96
         self.assertFalse(self.uid == 3)
-        self.assertFalse(self.uid == None)
+        self.assertFalse(self.uid is None)
 
     def test_inequality(self):
         """Test that UID.__ne__ works with private UIDs."""
@@ -69,7 +69,7 @@ class TestUID(unittest.TestCase):
         self.assertTrue(self.uid != 'Explicit VR Little Endian')
         # Issue 96
         self.assertTrue(self.uid != 3)
-        self.assertTrue(self.uid != None)
+        self.assertTrue(self.uid is not None)
 
     def test_hash(self):
         """Test that UID.__hash_- works."""

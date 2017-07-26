@@ -264,7 +264,8 @@ def generate_uid(prefix=PYDICOM_ROOT_UID, entropy_srcs=None):
     entropy_srcs : list of str or None
         If a list of str, the prefix will be appended with a SHA512 hash of the
         list which means the result is deterministic and should make the
-        original data unrecoverable. If None random data will be used (default).
+        original data unrecoverable. If None random data will be used
+        (default).
 
     Returns
     -------
