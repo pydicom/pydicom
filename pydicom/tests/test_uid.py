@@ -305,7 +305,3 @@ class TestUIDPrivate(object):
     def test_is_private(self):
         """Test that UID.is_private works with private UIDs."""
         assert self.uid.is_private
-
-
-if __name__ == "__main__":
-    unittest.main()
