@@ -225,7 +225,8 @@ class TestUID(object):
 
 class TestUIDPrivate(object):
     """Test private UIDs"""
-    def setUp(self):
+    @classmethod
+    def setup_class(self):
         """Set default UID"""
         self.uid = UID('9.9.999.90009.1.2')
 
