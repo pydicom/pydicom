@@ -65,6 +65,7 @@ def files_identical(a, b):
 
     return bytes_identical(a_bytes, b_bytes)
 
+
 def bytes_identical(a_bytes, b_bytes):
     """Return a tuple (bytes a == bytes b, index of first difference)"""
     if len(a_bytes) != len(b_bytes):
@@ -83,7 +84,7 @@ class WriteFileTests(unittest.TestCase):
         self.file_out = TemporaryFile('w+b')
 
     def compare(self, in_filename, decode=False):
-        """Read Dataset from `in_filename`, write Dataset to file, then compare."""
+        """Read Dataset from `in_filename`, write to file, then compare."""
         with open(in_filename, 'rb') as f:
             bytes_in = BytesIO(f.read())
             bytes_in.seek(0)
@@ -102,7 +103,7 @@ class WriteFileTests(unittest.TestCase):
         """Compare two bytestreams for equality"""
         same, pos = bytes_identical(bytes_in, bytes_out)
         self.assertTrue(same, "Bytestreams are not identical - first "
-                        "difference at 0x%x" %pos)
+                        "difference at 0x%x" % pos)
 
     def testRTPlan(self):
         """Input file, write back and verify them identical (RT Plan file)"""
@@ -177,7 +178,8 @@ class WriteFileTests(unittest.TestCase):
         self.assertRaises(ValueError, ds.save_as, self.file_out)
 
 
-@unittest.skipIf(not have_dateutil, "Need python-dateutil installed for these tests")
+@unittest.skipIf(not have_dateutil,
+                 "Need python-dateutil installed for these tests")
 class ScratchWriteDateTimeTests(WriteFileTests):
     """Write and reread simple or multi-value DA/DT/TM data elements"""
     def setUp(self):
@@ -208,11 +210,11 @@ class ScratchWriteDateTimeTests(WriteFileTests):
         self.file_out.seek(0)
         # Now read it back in and check the values are as expected
         ds = read_file(self.file_out)
-        self.assertSequenceEqual(multi_DA_expected, ds.CalibrationDate, "Multiple dates not written correctly (VR=DA)")
-        self.assertEqual(DA_expected, ds.DateOfLastCalibration, "Date not written correctly (VR=DA)")
-        self.assertSequenceEqual(multi_DT_expected, ds.ReferencedDateTime, "Multiple datetimes not written correctly (VR=DT)")
-        self.assertSequenceEqual(multi_TM_expected, ds.CalibrationTime, "Multiple times not written correctly (VR=TM)")
-        self.assertEqual(TM_expected, ds.TimeOfLastCalibration, "Time not written correctly (VR=DA)")
+        self.assertSequenceEqual(multi_DA_expected, ds.CalibrationDate)
+        self.assertEqual(DA_expected, ds.DateOfLastCalibration)
+        self.assertSequenceEqual(multi_DT_expected, ds.ReferencedDateTime)
+        self.assertSequenceEqual(multi_TM_expected, ds.CalibrationTime)
+        self.assertEqual(TM_expected, ds.TimeOfLastCalibration)
 
 
 class WriteDataElementTests(unittest.TestCase):
@@ -503,21 +505,21 @@ class TestCorrectAmbiguousVR(unittest.TestCase):
 
         # If PixelRepresentation is 0 then VR should be US
         ref_ds.PixelRepresentation = 0
-        ref_ds.SmallestValidPixelValue = b'\x00\x01' # Little endian 256
+        ref_ds.SmallestValidPixelValue = b'\x00\x01'  # Little endian 256
         ds = correct_ambiguous_vr(deepcopy(ref_ds), True)
         self.assertEqual(ds.SmallestValidPixelValue, 256)
         self.assertEqual(ds[0x00280104].VR, 'US')
 
         # If PixelRepresentation is 1 then VR should be SS
         ref_ds.PixelRepresentation = 1
-        ref_ds.SmallestValidPixelValue = b'\x00\x01' # Big endian 1
+        ref_ds.SmallestValidPixelValue = b'\x00\x01'  # Big endian 1
         ds = correct_ambiguous_vr(deepcopy(ref_ds), False)
         self.assertEqual(ds.SmallestValidPixelValue, 1)
         self.assertEqual(ds[0x00280104].VR, 'SS')
 
         # If no PixelRepresentation then should be unchanged
         ref_ds = Dataset()
-        ref_ds.SmallestValidPixelValue = b'\x00\x01' # Big endian 1
+        ref_ds.SmallestValidPixelValue = b'\x00\x01'  # Big endian 1
         ds = correct_ambiguous_vr(deepcopy(ref_ds), True)
         self.assertEqual(ds.SmallestValidPixelValue, b'\x00\x01')
         self.assertEqual(ds[0x00280104].VR, 'US or SS')
@@ -528,7 +530,7 @@ class TestCorrectAmbiguousVR(unittest.TestCase):
 
         # If PixelRepresentation is 0 then VR should be US - Little endian
         ref_ds.PixelRepresentation = 0
-        ref_ds.LUTDescriptor = b'\x01\x00\x00\x01\x10\x00' # 1\256\16
+        ref_ds.LUTDescriptor = b'\x01\x00\x00\x01\x10\x00'  # 1\256\16
         ds = correct_ambiguous_vr(deepcopy(ref_ds), True)
         self.assertEqual(ds.LUTDescriptor, [1, 256, 16])
         self.assertEqual(ds[0x00283002].VR, 'US')
@@ -553,11 +555,11 @@ class TestCorrectAmbiguousVR(unittest.TestCase):
 
         # If BitsAllocated  > 8 then VR must be OW
         ref_ds.BitsAllocated = 16
-        ref_ds.PixelData = b'\x00\x01' # Little endian 256
-        ds = correct_ambiguous_vr(deepcopy(ref_ds), True) # Little endian
+        ref_ds.PixelData = b'\x00\x01'  # Little endian 256
+        ds = correct_ambiguous_vr(deepcopy(ref_ds), True)  # Little endian
         self.assertEqual(ds.PixelData, b'\x00\x01')
         self.assertEqual(ds[0x7fe00010].VR, 'OW')
-        ds = correct_ambiguous_vr(deepcopy(ref_ds), False) # Big endian
+        ds = correct_ambiguous_vr(deepcopy(ref_ds), False)  # Big endian
         self.assertEqual(ds.PixelData, b'\x00\x01')
         self.assertEqual(ds[0x7fe00010].VR, 'OW')
 
@@ -583,7 +585,7 @@ class TestCorrectAmbiguousVR(unittest.TestCase):
 
         # If no BitsAllocated then VR should be unchanged
         ref_ds = Dataset()
-        ref_ds.PixelData = b'\x00\x01' # Big endian 1
+        ref_ds.PixelData = b'\x00\x01'  # Big endian 1
         ds = correct_ambiguous_vr(deepcopy(ref_ds), True)
         self.assertEqual(ds.PixelData, b'\x00\x01')
         self.assertEqual(ds[0x7fe00010].VR, 'OB or OW')
@@ -603,11 +605,11 @@ class TestCorrectAmbiguousVR(unittest.TestCase):
 
         # If WaveformBitsAllocated  > 8 then VR must be OW
         ref_ds.WaveformBitsAllocated = 16
-        ref_ds.WaveformData = b'\x00\x01' # Little endian 256
-        ds = correct_ambiguous_vr(deepcopy(ref_ds), True) # Little endian
+        ref_ds.WaveformData = b'\x00\x01'  # Little endian 256
+        ds = correct_ambiguous_vr(deepcopy(ref_ds), True)  # Little endian
         self.assertEqual(ds.WaveformData, b'\x00\x01')
         self.assertEqual(ds[0x54001010].VR, 'OW')
-        ds = correct_ambiguous_vr(deepcopy(ref_ds), False) # Big endian
+        ds = correct_ambiguous_vr(deepcopy(ref_ds), False)  # Big endian
         self.assertEqual(ds.WaveformData, b'\x00\x01')
         self.assertEqual(ds[0x54001010].VR, 'OW')
 
@@ -621,7 +623,7 @@ class TestCorrectAmbiguousVR(unittest.TestCase):
 
         # If no WaveformBitsAllocated then VR should be unchanged
         ref_ds = Dataset()
-        ref_ds.WaveformData = b'\x00\x01' # Big endian 1
+        ref_ds.WaveformData = b'\x00\x01'  # Big endian 1
         ds = correct_ambiguous_vr(deepcopy(ref_ds), True)
         self.assertEqual(ds.WaveformData, b'\x00\x01')
         self.assertEqual(ds[0x54001010].VR, 'OB or OW')
@@ -632,18 +634,18 @@ class TestCorrectAmbiguousVR(unittest.TestCase):
         ref_ds.PixelRepresentation = 0
 
         # If LUTDescriptor[0] is 1 then LUTData VR is 'US'
-        ref_ds.LUTDescriptor = b'\x01\x00\x00\x01\x10\x00' # 1\256\16
+        ref_ds.LUTDescriptor = b'\x01\x00\x00\x01\x10\x00'  # 1\256\16
         ref_ds.LUTData = b'\x00\x01' # Little endian 256
-        ds = correct_ambiguous_vr(deepcopy(ref_ds), True) # Little endian
+        ds = correct_ambiguous_vr(deepcopy(ref_ds), True)  # Little endian
         self.assertEqual(ds.LUTDescriptor[0], 1)
         self.assertEqual(ds[0x00283002].VR, 'US')
         self.assertEqual(ds.LUTData, 256)
         self.assertEqual(ds[0x00283006].VR, 'US')
 
         # If LUTDescriptor[0] is not 1 then LUTData VR is 'OW'
-        ref_ds.LUTDescriptor = b'\x02\x00\x00\x01\x10\x00' # 2\256\16
+        ref_ds.LUTDescriptor = b'\x02\x00\x00\x01\x10\x00'  # 2\256\16
         ref_ds.LUTData = b'\x00\x01\x00\x02'
-        ds = correct_ambiguous_vr(deepcopy(ref_ds), True) # Little endian
+        ds = correct_ambiguous_vr(deepcopy(ref_ds), True)  # Little endian
         self.assertEqual(ds.LUTDescriptor[0], 2)
         self.assertEqual(ds[0x00283002].VR, 'US')
         self.assertEqual(ds.LUTData, b'\x00\x01\x00\x02')
@@ -721,7 +723,7 @@ class WriteAmbiguousVRTests(unittest.TestCase):
         # Create a dataset containing element with ambiguous VRs
         ref_ds = Dataset()
         ref_ds.PixelRepresentation = 0
-        ref_ds.SmallestValidPixelValue = b'\x00\x01' # Little endian 256
+        ref_ds.SmallestValidPixelValue = b'\x00\x01'  # Little endian 256
 
         fp = BytesIO()
         file_ds = FileDataset(fp, ref_ds)
@@ -739,7 +741,7 @@ class WriteAmbiguousVRTests(unittest.TestCase):
         # Create a dataset containing element with ambiguous VRs
         ref_ds = Dataset()
         ref_ds.PixelRepresentation = 1
-        ref_ds.SmallestValidPixelValue = b'\x00\x01' # Big endian 1
+        ref_ds.SmallestValidPixelValue = b'\x00\x01'  # Big endian 1
 
         fp = BytesIO()
         file_ds = FileDataset(fp, ref_ds)
@@ -794,16 +796,17 @@ class ScratchWriteTests(unittest.TestCase):
         # print "written:", bytes2hex(bytes_written)
         same, pos = bytes_identical(std, bytes_written)
         self.assertTrue(same,
-                        "Writing from scratch unexpected result - 1st diff at 0x%x" % pos)
+                        "Writing from scratch unexpected result "
+                        "- 1st diff at 0x%x" % pos)
         if os.path.exists(out_filename):
             os.remove(out_filename)  # get rid of the file
 
     def testImpl_LE_deflen_write(self):
         """Scratch Write for implicit VR little endian, defined length SQ's"""
-        from pydicom.util.testing._write_stds import impl_LE_deflen_std_hex as std
+        from pydicom.util.testing._write_stds import impl_LE_deflen_std_hex
 
         file_ds = FileDataset("test", self.ds)
-        self.compare_write(std, file_ds)
+        self.compare_write(impl_LE_deflen_std_hex, file_ds)
 
 
 class TestWriteToStandard(unittest.TestCase):
@@ -826,7 +829,8 @@ class TestWriteToStandard(unittest.TestCase):
         ds.preamble = b'\x01\x02\x03\x04' + b'\x00' * 124
         ds.save_as(self.fp, write_like_original=False)
         self.fp.seek(0)
-        self.assertEqual(self.fp.read(128), b'\x01\x02\x03\x04' + b'\x00' * 124)
+        self.assertEqual(self.fp.read(128),
+                         b'\x01\x02\x03\x04' + b'\x00' * 124)
 
     def test_no_preamble(self):
         """Test that a default preamble is written when absent."""
@@ -848,9 +852,11 @@ class TestWriteToStandard(unittest.TestCase):
         """Test that ValueError is raised when preamble is bad."""
         ds = read_file(ct_name)
         ds.preamble = b'\x00' * 127
-        self.assertRaises(ValueError, ds.save_as, self.fp, write_like_original=False)
+        self.assertRaises(ValueError, ds.save_as, self.fp,
+                          write_like_original=False)
         ds.preamble = b'\x00' * 129
-        self.assertRaises(ValueError, ds.save_as, self.fp, write_like_original=False)
+        self.assertRaises(ValueError, ds.save_as, self.fp,
+                          write_like_original=False)
 
     def test_prefix(self):
         """Test that the 'DICM' prefix is written with preamble."""
@@ -874,8 +880,10 @@ class TestWriteToStandard(unittest.TestCase):
         ds = read_file(rtplan_name)
         ref_ds = read_file(rtplan_name)
         # Ensure no RawDataElements in ref_ds
-        for elem in ref_ds.file_meta: pass
-        for elem in ref_ds.iterall(): pass
+        for elem in ref_ds.file_meta:
+            pass
+        for elem in ref_ds.iterall():
+            pass
         ds.save_as(self.fp, write_like_original=False)
         self.assertTrue(ref_ds.file_meta == ds.file_meta)
         self.assertTrue(ref_ds == ds)
@@ -888,7 +896,8 @@ class TestWriteToStandard(unittest.TestCase):
         ds.is_implicit_VR = True
         ds.is_little_endian = True
         ds.save_as(self.fp, write_like_original=False)
-        self.assertEqual(ds.file_meta.TransferSyntaxUID, ImplicitVRLittleEndian)
+        self.assertEqual(ds.file_meta.TransferSyntaxUID,
+                         ImplicitVRLittleEndian)
 
         # Updated
         ds.is_implicit_VR = False
@@ -902,7 +911,8 @@ class TestWriteToStandard(unittest.TestCase):
         del ds.file_meta.TransferSyntaxUID
         ds.is_implicit_VR = False
         ds.is_little_endian = True
-        self.assertRaises(ValueError, ds.save_as, self.fp, write_like_original=False)
+        self.assertRaises(ValueError, ds.save_as, self.fp,
+                          write_like_original=False)
         self.assertFalse('TransferSyntaxUID' in ds.file_meta)
 
     def test_transfer_syntax_raises(self):
@@ -910,7 +920,8 @@ class TestWriteToStandard(unittest.TestCase):
         ds = read_file(rtplan_name)
         ds.is_implicit_VR = True
         ds.is_little_endian = False
-        self.assertRaises(NotImplementedError, ds.save_as, self.fp, write_like_original=False)
+        self.assertRaises(NotImplementedError, ds.save_as, self.fp,
+                          write_like_original=False)
 
     def test_write_no_file_meta(self):
         """Test writing a dataset with no file_meta"""
@@ -918,7 +929,7 @@ class TestWriteToStandard(unittest.TestCase):
         transfer_syntax = ds.file_meta.TransferSyntaxUID
         ds.file_meta = Dataset()
         ds.save_as(self.fp, write_like_original=False)
-        fp = BytesIO(self.fp.getvalue()) # Workaround to avoid #358
+        fp = BytesIO(self.fp.getvalue())  # Workaround to avoid #358
         out = read_file(fp)
         self.assertEqual(out.file_meta.MediaStorageSOPClassUID, ds.SOPClassUID)
         self.assertEqual(out.file_meta.MediaStorageSOPInstanceUID,
@@ -932,7 +943,7 @@ class TestWriteToStandard(unittest.TestCase):
         self.fp.seek(0)
         del ds.file_meta
         ds.save_as(self.fp, write_like_original=False)
-        fp = BytesIO(self.fp.getvalue()) # Workaround to avoid #358
+        fp = BytesIO(self.fp.getvalue())  # Workaround to avoid #358
         out = read_file(fp)
         self.assertEqual(out.file_meta.MediaStorageSOPClassUID, ds.SOPClassUID)
         self.assertEqual(out.file_meta.MediaStorageSOPInstanceUID,
@@ -944,13 +955,15 @@ class TestWriteToStandard(unittest.TestCase):
         self.assertEqual(out.file_meta.TransferSyntaxUID, transfer_syntax)
 
     def test_raise_no_file_meta(self):
-        """Test exception is raised if trying to write a dataset with no file_meta"""
+        """Test exception is raised if trying to write with no file_meta."""
         ds = read_file(rtplan_name)
         del ds.SOPInstanceUID
         ds.file_meta = Dataset()
-        self.assertRaises(ValueError, ds.save_as, self.fp, write_like_original=False)
+        self.assertRaises(ValueError, ds.save_as, self.fp,
+                          write_like_original=False)
         del ds.file_meta
-        self.assertRaises(ValueError, ds.save_as, self.fp, write_like_original=False)
+        self.assertRaises(ValueError, ds.save_as, self.fp,
+                          write_like_original=False)
 
     def test_standard(self):
         """Test preamble + file_meta + dataset written OK."""
@@ -961,14 +974,14 @@ class TestWriteToStandard(unittest.TestCase):
         self.assertEqual(self.fp.read(128), preamble)
         self.assertEqual(self.fp.read(4), b'DICM')
 
-        fp = BytesIO(self.fp.getvalue()) # Workaround to avoid #358
+        fp = BytesIO(self.fp.getvalue())  # Workaround to avoid #358
         ds_out = read_file(fp)
         self.assertEqual(ds_out.preamble, preamble)
         self.assertTrue('PatientID' in ds_out)
         self.assertTrue('TransferSyntaxUID' in ds_out.file_meta)
 
     def test_commandset_no_written(self):
-        """Test that Command Set elements are not written when writing to standard"""
+        """Test that Command Set elements aren't written."""
         ds = read_file(ct_name)
         preamble = ds.preamble[:]
         ds.MessageID = 3
@@ -978,7 +991,7 @@ class TestWriteToStandard(unittest.TestCase):
         self.assertEqual(self.fp.read(4), b'DICM')
         self.assertTrue('MessageID' in ds)
 
-        fp = BytesIO(self.fp.getvalue()) # Workaround to avoid #358
+        fp = BytesIO(self.fp.getvalue())  # Workaround to avoid #358
         ds_out = read_file(fp)
         self.assertEqual(ds_out.preamble, preamble)
         self.assertTrue('PatientID' in ds_out)
@@ -1020,7 +1033,6 @@ class TestWriteFileMetaInfoToStandard(unittest.TestCase):
         meta.MediaStorageSOPClassUID = '1.1'
         meta.MediaStorageSOPInstanceUID = '1.2'
         meta.TransferSyntaxUID = '1.3'
-        #meta.ImplementationClassUID = '1.4'
         meta.ImplementationClassUID = '1.2.826.0.1.3680043.8.498.1'
         meta.ImplementationVersionName = 'PYDICOM ' + __version__
 
@@ -1028,15 +1040,15 @@ class TestWriteFileMetaInfoToStandard(unittest.TestCase):
 
         length = 115 + len(__version__) - 12
         # FIXME: convert length to bytes
-        #print(length)
-        #print('0x{0:02x}'.format(length#))
+        # print(length)
+        # print('0x{0:02x}'.format(length#))
         self.fp.seek(8)
         self.assertEqual(self.fp.read(4), b'\x6e\x00\x00\x00')
 
     def test_group_length_updated(self):
         """Test that FileMetaInformationGroupLength gets updated if present."""
         meta = Dataset()
-        meta.FileMetaInformationGroupLength = 100 # Not actual length
+        meta.FileMetaInformationGroupLength = 100  # Not actual length
         meta.MediaStorageSOPClassUID = '1.1'
         meta.MediaStorageSOPInstanceUID = '1.2'
         meta.TransferSyntaxUID = '1.3'
@@ -1111,7 +1123,7 @@ class TestWriteNonStandard(unittest.TestCase):
         """Compare two bytestreams for equality"""
         same, pos = bytes_identical(bytes_in, bytes_out)
         self.assertTrue(same, "Bytestreams are not identical - first "
-                        "difference at 0x%x" %pos)
+                        "difference at 0x%x" % pos)
 
     def test_preamble_default(self):
         """Test that the default preamble is written correctly when present."""
@@ -1128,7 +1140,8 @@ class TestWriteNonStandard(unittest.TestCase):
         self.fp.seek(0)
         ds.save_as(self.fp, write_like_original=True)
         self.fp.seek(0)
-        self.assertEqual(self.fp.read(128), b'\x01\x02\x03\x04' + b'\x00' * 124)
+        self.assertEqual(self.fp.read(128),
+                         b'\x01\x02\x03\x04' + b'\x00' * 124)
 
     def test_no_preamble(self):
         """Test no preamble or prefix is written if preamble absent."""
@@ -1148,8 +1161,10 @@ class TestWriteNonStandard(unittest.TestCase):
         ds = read_file(rtplan_name)
         ref_ds = read_file(rtplan_name)
         # Ensure no RawDataElements in ref_ds
-        for elem in ref_ds.file_meta: pass
-        for elem in ref_ds.iterall(): pass
+        for elem in ref_ds.file_meta:
+            pass
+        for elem in ref_ds.iterall():
+            pass
         ds.save_as(self.fp, write_like_original=True)
         self.assertTrue(ref_ds == ds)
 
@@ -1171,7 +1186,7 @@ class TestWriteNonStandard(unittest.TestCase):
         self.fp.seek(0)
         self.assertNotEqual(self.fp.read(4), b'DICM')
 
-        fp = BytesIO(self.fp.getvalue()) # Workaround to avoid #358
+        fp = BytesIO(self.fp.getvalue())  # Workaround to avoid #358
         ds_out = read_file(fp, force=True)
         self.assertEqual(ds_out.preamble, None)
         self.assertEqual(ds_out.file_meta, Dataset())
@@ -1187,7 +1202,7 @@ class TestWriteNonStandard(unittest.TestCase):
         self.assertEqual(self.fp.read(128), preamble)
         self.assertEqual(self.fp.read(4), b'DICM')
 
-        fp = BytesIO(self.fp.getvalue()) # Workaround to avoid #358
+        fp = BytesIO(self.fp.getvalue())  # Workaround to avoid #358
         ds_out = read_file(fp, force=True)
         self.assertEqual(ds_out.file_meta, Dataset())
         self.assertTrue('PatientID' in ds_out)
@@ -1205,7 +1220,7 @@ class TestWriteNonStandard(unittest.TestCase):
         self.fp.seek(0)
         self.assertNotEqual(self.fp.read(4), b'DICM')
 
-        fp = BytesIO(self.fp.getvalue()) # Workaround to avoid #358
+        fp = BytesIO(self.fp.getvalue())  # Workaround to avoid #358
         ds_out = read_file(fp, force=True)
         self.assertTrue('ImplementationClassUID' in ds_out.file_meta)
         self.assertEqual(ds_out.preamble, None)
@@ -1220,7 +1235,7 @@ class TestWriteNonStandard(unittest.TestCase):
         self.assertEqual(self.fp.read(128), preamble)
         self.assertEqual(self.fp.read(4), b'DICM')
 
-        fp = BytesIO(self.fp.getvalue()) # Workaround to avoid #358
+        fp = BytesIO(self.fp.getvalue())  # Workaround to avoid #358
         ds_out = read_file(fp, force=True)
         self.assertEqual(ds.file_meta[:], ds_out.file_meta[:])
         self.assertTrue('TransferSyntaxUID' in ds_out.file_meta[:])
@@ -1248,9 +1263,10 @@ class TestWriteNonStandard(unittest.TestCase):
         self.assertNotEqual(self.fp.read(4), b'DICM')
         # Ensure Command Set Elements written as little endian implicit VRe
         self.fp.seek(0)
-        self.assertEqual(self.fp.read(12), b'\x00\x00\x00\x00\x04\x00\x00\x00\x08\x00\x00\x00')
+        self.assertEqual(self.fp.read(12),
+                         b'\x00\x00\x00\x00\x04\x00\x00\x00\x08\x00\x00\x00')
 
-        fp = BytesIO(self.fp.getvalue()) # Workaround to avoid #358
+        fp = BytesIO(self.fp.getvalue())  # Workaround to avoid #358
         ds_out = read_file(fp, force=True)
         self.assertEqual(ds_out.file_meta, Dataset())
         self.assertTrue('Status' in ds_out)
@@ -1270,9 +1286,10 @@ class TestWriteNonStandard(unittest.TestCase):
         self.assertEqual(self.fp.read(128), preamble)
         self.assertEqual(self.fp.read(4), b'DICM')
         # Ensure Command Set Elements written as little endian implicit VR
-        self.assertEqual(self.fp.read(12), b'\x00\x00\x00\x00\x04\x00\x00\x00\x08\x00\x00\x00')
+        self.assertEqual(self.fp.read(12),
+                         b'\x00\x00\x00\x00\x04\x00\x00\x00\x08\x00\x00\x00')
 
-        fp = BytesIO(self.fp.getvalue()) # Workaround to avoid #358
+        fp = BytesIO(self.fp.getvalue())  # Workaround to avoid #358
         ds_out = read_file(fp, force=True)
         self.assertEqual(ds_out.file_meta, Dataset())
         self.assertTrue('Status' in ds_out)
@@ -1291,9 +1308,8 @@ class TestWriteNonStandard(unittest.TestCase):
         self.assertEqual(self.fp.read(128), preamble)
         self.assertEqual(self.fp.read(4), b'DICM')
         # Ensure Command Set Elements written as little endian implicit VR
-        #self.assertEqual(self.fp.read(12), b'\x00\x00\x00\x00\x04\x00\x00\x00\x08\x00\x00\x00')
 
-        fp = BytesIO(self.fp.getvalue()) # Workaround to avoid #358
+        fp = BytesIO(self.fp.getvalue())  # Workaround to avoid #358
         ds_out = read_file(fp, force=True)
         self.assertTrue('TransferSyntaxUID' in ds_out.file_meta)
         self.assertTrue('Status' in ds_out)
@@ -1317,9 +1333,8 @@ class TestWriteNonStandard(unittest.TestCase):
         self.assertNotEqual(self.fp.read(4), b'DICM')
         # Ensure Command Set Elements written as little endian implicit VR
         self.fp.seek(0)
-        #self.assertEqual(self.fp.read(12), b'\x00\x00\x00\x00\x04\x00\x00\x00\x08\x00\x00\x00')
 
-        fp = BytesIO(self.fp.getvalue()) # Workaround to avoid #358
+        fp = BytesIO(self.fp.getvalue())  # Workaround to avoid #358
         ds_out = read_file(fp, force=True)
         self.assertTrue('TransferSyntaxUID' in ds_out.file_meta)
         self.assertTrue('Status' in ds_out)
@@ -1342,9 +1357,8 @@ class TestWriteNonStandard(unittest.TestCase):
         self.assertNotEqual(self.fp.read(4), b'DICM')
         # Ensure Command Set Elements written as little endian implicit VR
         self.fp.seek(0)
-        #self.assertEqual(self.fp.read(12), b'\x00\x00\x00\x00\x04\x00\x00\x00\x08\x00\x00\x00')
 
-        fp = BytesIO(self.fp.getvalue()) # Workaround to avoid #358
+        fp = BytesIO(self.fp.getvalue())  # Workaround to avoid #358
         ds_out = read_file(fp, force=True)
         self.assertEqual(ds_out.file_meta, Dataset())
         self.assertTrue('Status' in ds_out)
@@ -1368,9 +1382,8 @@ class TestWriteNonStandard(unittest.TestCase):
         self.assertNotEqual(self.fp.read(4), b'DICM')
         # Ensure Command Set Elements written as little endian implicit VR
         self.fp.seek(0)
-        #self.assertEqual(self.fp.read(12), b'\x00\x00\x00\x00\x04\x00\x00\x00\x08\x00\x00\x00')
 
-        fp = BytesIO(self.fp.getvalue()) # Workaround to avoid #358
+        fp = BytesIO(self.fp.getvalue())  # Workaround to avoid #358
         ds_out = read_file(fp, force=True)
         self.assertTrue('TransferSyntaxUID' in ds_out.file_meta)
         self.assertTrue('Status' in ds_out)
@@ -1391,9 +1404,10 @@ class TestWriteNonStandard(unittest.TestCase):
         self.assertEqual(self.fp.read(128), ds.preamble)
         self.assertEqual(self.fp.read(4), b'DICM')
         # Ensure Command Set Elements written as little endian implicit VR
-        self.assertEqual(self.fp.read(12), b'\x00\x00\x00\x00\x04\x00\x00\x00\x08\x00\x00\x00')
+        self.assertEqual(self.fp.read(12),
+                         b'\x00\x00\x00\x00\x04\x00\x00\x00\x08\x00\x00\x00')
 
-        fp = BytesIO(self.fp.getvalue()) # Workaround to avoid #358
+        fp = BytesIO(self.fp.getvalue())  # Workaround to avoid #358
         ds_out = read_file(fp, force=True)
         self.assertEqual(ds_out.file_meta, Dataset())
         self.assertTrue('Status' in ds_out)
@@ -1412,10 +1426,8 @@ class TestWriteNonStandard(unittest.TestCase):
         self.fp.seek(0)
         self.assertEqual(self.fp.read(128), ds.preamble)
         self.assertEqual(self.fp.read(4), b'DICM')
-        # Ensure Command Set Elements written as little endian implicit VR
-        #self.assertEqual(self.fp.read(12), b'\x00\x00\x00\x00\x04\x00\x00\x00\x08\x00\x00\x00')
 
-        fp = BytesIO(self.fp.getvalue()) # Workaround to avoid #358
+        fp = BytesIO(self.fp.getvalue())  # Workaround to avoid #358
         ds_out = read_file(fp, force=True)
         self.assertTrue('Status' in ds_out)
         self.assertTrue('TransferSyntaxUID' in ds_out.file_meta)
@@ -1425,7 +1437,7 @@ class TestWriteNonStandard(unittest.TestCase):
     def test_read_write_identical(self):
         """Test the written bytes matches the read bytes."""
         for dcm_in in [rtplan_name, rtdose_name, ct_name, mr_name, jpeg_name,
-                        no_ts, unicode_name, multiPN_name]:
+                       no_ts, unicode_name, multiPN_name]:
             with open(dcm_in, 'rb') as f:
                 bytes_in = BytesIO(f.read())
                 ds_in = read_file(bytes_in)
@@ -1448,7 +1460,7 @@ class TestWriteFileMetaInfoNonStandard(unittest.TestCase):
         self.assertTrue('ImplementationClassUID' in ds.file_meta)
 
         # Check written meta dataset doesn't contain TransferSyntaxUID
-        fp = BytesIO(self.fp.getvalue()) # Workaround to avoid #358
+        fp = BytesIO(self.fp.getvalue())  # Workaround to avoid #358
         written_ds = read_file(fp, force=True)
         self.assertTrue('ImplementationClassUID' in written_ds.file_meta)
         self.assertFalse('TransferSyntaxUID' in written_ds.file_meta)
@@ -1545,7 +1557,7 @@ class TestWriteFileMetaInfoNonStandard(unittest.TestCase):
 
         # Conformant
         meta = Dataset()
-        meta.FileMetaInformationGroupLength = 62 # Correct length
+        meta.FileMetaInformationGroupLength = 62  # Correct length
         meta.FileMetaInformationVersion = b'\x00\x01'
         meta.MediaStorageSOPClassUID = '1.1'
         meta.MediaStorageSOPInstanceUID = '1.2'
