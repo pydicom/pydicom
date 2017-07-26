@@ -68,6 +68,7 @@ def data_files_inventory():
             data_files = data_files + files
     return data_files
 
+
 PACKAGE_DATA = {'pydicom': data_files_inventory()}
 
 opts = dict(name=NAME,
