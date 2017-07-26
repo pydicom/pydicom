@@ -32,7 +32,7 @@ from pydicom.datadict import (tag_for_keyword, keyword_for_tag,
                               repeater_has_keyword)
 from pydicom.tag import Tag, BaseTag
 from pydicom.dataelem import DataElement, DataElement_from_raw, RawDataElement
-from pydicom.uid import NotCompressedPixelTransferSyntaxes
+from pydicom.uid import UncompressedPixelTransferSyntaxes
 from pydicom.tagtools import tag_in_exception
 import pydicom  # for write_file
 import pydicom.charset
@@ -666,7 +666,7 @@ class Dataset(dict):
         """Return True if the TransferSyntaxUID is a compressed syntax."""
         # FIXME uses file_meta here, should really only be thus for FileDataset
         return self.file_meta.TransferSyntaxUID in (
-            NotCompressedPixelTransferSyntaxes)
+            UncompressedPixelTransferSyntaxes)
 
     def __ne__(self, other):
         """Compare `self` and `other` for inequality."""
