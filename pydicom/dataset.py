@@ -998,8 +998,10 @@ class Dataset(dict):
                 # single compressed frame
                 UncompressedPixelData = pydicom.encaps.defragment_data(
                     self.PixelData)
-                UncompressedPixelData = (generic_jpeg_file_header +
-                    UncompressedPixelData[frame_start_from:])
+                UncompressedPixelData = (
+                    generic_jpeg_file_header +
+                    UncompressedPixelData[frame_start_from:]
+                )
                 try:
                     fio = io.BytesIO(UncompressedPixelData)
                     decompressed_image = PILImg.open(fio)
