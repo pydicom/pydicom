@@ -8,6 +8,8 @@ from __future__ import absolute_import
 
 from struct import pack
 
+from pydicom.multival import MultiValue
+
 from pydicom import compat
 from pydicom.compat import in_py2
 from pydicom.charset import default_encoding, text_VRs, convert_encodings
@@ -203,9 +205,14 @@ def write_UI(fp, data_element):
     write_string(fp, data_element, '\0')  # pad with 0-byte to even length
 
 
+def _is_multi_value(val):
+    """Return True if `val` is a multi-value container."""
+    return isinstance(val, (MultiValue, list, tuple))
+
+
 def multi_string(val):
     """Put a string together with delimiter if has more than one value"""
-    if isinstance(val, (list, tuple)):
+    if _is_multi_value(val):
         # \ is escape chr, so "\\" gives single backslash
         return "\\".join(val)
     else:
@@ -251,7 +258,7 @@ def write_number_string(fp, data_element, padding=' '):
     # file
     val = data_element.value
 
-    if isinstance(val, (list, tuple)):
+    if _is_multi_value(val):
         val = "\\".join((x.original_string
                          if hasattr(x, 'original_string') else str(x)
                          for x in val))
@@ -284,7 +291,7 @@ def write_DA(fp, data_element, padding=' '):
     if isinstance(val, (str, compat.string_types)):
         write_string(fp, data_element, padding)
     else:
-        if isinstance(val, (list, tuple)):
+        if _is_multi_value(val):
             val = "\\".join((x if isinstance(x, (str, compat.string_types))
                              else _format_DA(x) for x in val))
         else:
@@ -312,7 +319,7 @@ def write_DT(fp, data_element, padding=' '):
     if isinstance(val, (str, compat.string_types)):
         write_string(fp, data_element, padding)
     else:
-        if isinstance(val, (list, tuple)):
+        if _is_multi_value(val):
             val = "\\".join((x if isinstance(x, (str, compat.string_types))
                              else _format_DT(x) for x in val))
         else:
@@ -342,7 +349,7 @@ def write_TM(fp, data_element, padding=' '):
     if isinstance(val, (str, compat.string_types)):
         write_string(fp, data_element, padding)
     else:
-        if isinstance(val, (list, tuple)):
+        if _is_multi_value(val):
             val = "\\".join((x if isinstance(x, (str, compat.string_types))
                              else _format_TM(x) for x in val))
         else:
