@@ -10,7 +10,7 @@ from pydicom.dataset import Dataset
 from pydicom.tag import Tag
 from pydicom.datadict import (keyword_for_tag, dictionary_description,
                               dictionary_has_tag, repeater_has_tag,
-                              repeater_has_keyword)
+                              repeater_has_keyword, get_private_entry)
 from pydicom.datadict import add_dict_entry, add_dict_entries
 
 
@@ -40,6 +40,25 @@ class DictTests(unittest.TestCase):
         """Test repeater_has_keyword"""
         self.assertTrue(repeater_has_keyword('OverlayData'))
         self.assertFalse(repeater_has_keyword('PixelData'))
+
+    def test_get_private_entry(self):
+        """Test get_private_entry"""
+        # existing entry
+        entry = get_private_entry((0x0903, 0x0011), 'GEIIS PACS')
+        self.assertEqual('US', entry[0])  # VR
+        self.assertEqual('1', entry[1])  # VM
+        self.assertEqual('Significant Flag', entry[2])  # name
+        self.assertFalse(entry[3])  # is retired
+
+        # existing entry in another slot
+        entry = get_private_entry((0x0903, 0x1011), 'GEIIS PACS')
+        self.assertEqual('Significant Flag', entry[2])  # name
+
+        # non-existing entry
+        self.assertRaises(KeyError, get_private_entry,
+                          (0x0903, 0x0011), 'Nonexisting')
+        self.assertRaises(KeyError, get_private_entry,
+                          (0x0903, 0x0091), 'GEIIS PACS')
 
     def testAddEntry(self):
         """dicom_dictionary: Can add and use a single dictionary entry"""
