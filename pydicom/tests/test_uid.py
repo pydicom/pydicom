@@ -1,7 +1,5 @@
 """Test suite for uid.py"""
 
-import unittest
-
 import pytest
 
 from pydicom.uid import UID, generate_uid, PYDICOM_ROOT_UID
@@ -225,7 +223,7 @@ class TestUID(object):
         assert not self.uid.is_private
 
 
-class TestUIDPrivate(unittest.TestCase):
+class TestUIDPrivate(object):
     """Test private UIDs"""
     def setUp(self):
         """Set default UID"""
