@@ -73,8 +73,8 @@ class TestUID(unittest.TestCase):
 
     def test_hash(self):
         """Test that UID.__hash_- works."""
-        self.assertEqual(hash(self.uid), 3026120838586540702)
-        self.assertEqual(hash(self.uid), 3026120838586540702)
+        hash_val = hash(self.uid)
+        self.assertEqual(hash(self.uid), hash_val)
 
     def test_str(self):
         """Test that UID.__str__ works."""
@@ -245,8 +245,8 @@ class TestUIDPrivate(unittest.TestCase):
 
     def test_hash(self):
         """Test that UID.__hash_- works with private UIDs."""
-        self.assertEqual(hash(self.uid), 6878411962048153691)
-        self.assertEqual(hash(self.uid), 6878411962048153691)
+        hash_val = hash(self.uid)
+        self.assertEqual(hash(self.uid), hash_val)
 
     def test_str(self):
         """Test that UID.__str__ works with private UIDs."""
