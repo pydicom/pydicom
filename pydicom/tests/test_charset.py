@@ -7,13 +7,13 @@
 #    available at https://github.com/pydicom/pydicom
 
 import unittest
-from pydicom.data import get_dataset
+from pydicom.data import get_charset_base, get_testdata_base
 from pydicom import dicomio
 import os.path
 import pydicom.charset
 
-testcharset_dir = get_dataset('charset', return_base=True)
-test_files = get_dataset('test', return_base=True)
+testcharset_dir = get_charset_base()
+test_files = get_testdata_base()
 
 latin1_file = os.path.join(testcharset_dir, "chrFren.dcm")
 jp_file = os.path.join(testcharset_dir, "chrH31.dcm")

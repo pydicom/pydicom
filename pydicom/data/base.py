@@ -10,62 +10,42 @@
 import fnmatch
 import os
 
+from .utils import get_files
+
 
 def get_datadir():
-    '''get the data directory base
-    '''
     return os.path.abspath(os.path.dirname(__file__))
 
 
-def get_dataset(dataset=None, pattern=None, return_base=False):
-    '''get_dataset will return data provided by pydicom
-    based on a user-provided label.
-    '''
-    here = get_datadir()
-    valid_datasets = {'charset': '%s/charset_files' % here,
-                      'test': '%s/test_files' % here}
-
-    if dataset is not None:
-
-        dataset = os.path.splitext(dataset)[0].lower()
-        if dataset in valid_datasets:
-            if return_base is True:
-                return valid_datasets[dataset]
-            return get_files(bases=valid_datasets[dataset],
-                             pattern=pattern)
-
-    print("Valid datasets include: %s"
-          % (', '.join(list(valid_datasets.keys()))))
+def get_testdata_base():
+    return os.path.join(get_datadir(), 'test_files')
 
 
-def recursive_find(base, pattern=None):
-    '''recursively find files based on a pattern
-    '''
-    if pattern is None:
-        pattern = "*"
-    files = []
-    for root, dirnames, filenames in os.walk(base):
-        for filename in fnmatch.filter(filenames, pattern):
-            files.append(os.path.join(root, filename))
-
-    return files
+def get_charset_base():
+    return os.path.join(get_datadir(), 'charset_files')
 
 
-def get_files(bases, pattern=None):
-    '''return all files for a valid dataset, which may
-    be a list of files and/or folders conforming to some
-    pattern.
-    '''
-    if not isinstance(bases, list):
-        bases = [bases]
+'''
 
-    files = []
-    for contender in bases:
-        if os.path.isdir(contender):
-            data_files = recursive_find(contender,
-                                        pattern=pattern)
-            files.extend(data_files)
-        else:
-            files.append(contender)
+Data get functions.
 
-    return files
+For each of the below, a complete list of files is returned.
+Note the distinction between "get" (returning a list) and
+what might be interpreted as reading in the files (load).
+These functions serve to only provide the paths.
+
+Optionally, the user can specify a pattern to filter by.
+
+'''
+
+
+def get_charset_files(pattern=None):
+    charset_base = get_charset_base()
+    return get_files(bases=charset_base,
+                     pattern=pattern)
+
+
+def get_testdata_files(pattern=None):
+    testdata_base = get_testdata_base()
+    return get_files(bases=testdata_base,
+                     pattern=pattern)

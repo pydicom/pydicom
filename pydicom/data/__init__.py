@@ -7,4 +7,7 @@
 #    available at https://github.com/pydicom/pydicom
 #
 
-from .base import get_dataset
+from .base import (get_charset_files,
+                   get_testdata_files,
+                   get_charset_base,
+                   get_testdata_base)
