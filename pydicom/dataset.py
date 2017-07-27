@@ -963,7 +963,9 @@ class Dataset(dict):
             generic_jpeg_file_header = (b'\xff\xd8\xff\xe0\x00\x10JFIF\x00',
                                         b'\x01\x01\x01\x00\x01\x00\x01\x00',
                                         b'\x00')
+            generic_jpeg_file_header = b''.join(generic_jpeg_file_header)
             frame_start_from = 2
+
         elif (self.file_meta.TransferSyntaxUID in
                 pydicom.uid.JPEG2000CompressedPixelTransferSyntaxes):
             generic_jpeg_file_header = b''
