@@ -1060,7 +1060,6 @@ class Dataset(dict):
             already_have = False
         elif self._pixel_id != id(self.PixelData):
             already_have = False
-        already_have = False
         if not already_have and not self._is_uncompressed_transfer_syntax():
             try:
                 # print("Pixel Data is compressed")
