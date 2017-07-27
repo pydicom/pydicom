@@ -29,9 +29,9 @@ class TestGetData(unittest.TestCase):
 
         # Test file get
         chardata = get_charset_files()
-        self.assertEqual(len(chardata), 19)
+        self.assertTrue(len(chardata) > 15)
         testdata = get_testdata_files()
-        self.assertEqual(len(testdata), 75)
+        self.assertTrue(len(testdata) > 70)
 
         # The files should be from their respective bases
         [self.assertTrue(testbase in x) for x in testdata]
