@@ -379,20 +379,21 @@ def convert_value(VR, raw_data_element, encoding=default_encoding):
         logger.debug('unable to translate tag %s with VR %s'
                      % (raw_data_element.tag, VR))
 
-        for convert_vr in convert_retry_VR_order:
-            vr = convert_vr
-            converter = converters[vr]
+        for vr in convert_retry_VR_order:
             if vr == VR:
                 continue
             try:
                 value = convert_value(vr, raw_data_element, encoding)
+                logger.debug('converted value for tag %s with VR %s'
+                             % (raw_data_element.tag, vr))
                 break
             except Exception:
                 pass
-            else:
-                logger.debug('converted tag %s with VR %s'
-                             % (raw_data_element.tag, vr))
-                value = raw_data_element.value
+        else:
+            logger.debug('Could not convert value for tag %s with any VR '
+                         'in the convert_retry_VR_order list'
+                         % raw_data_element.tag)
+            value = raw_data_element.value
     return value
 
 
