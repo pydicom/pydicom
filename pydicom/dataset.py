@@ -22,6 +22,7 @@ Dataset (dict subclass)
 
 import inspect  # for __dir__
 import io
+import os
 import os.path
 import sys
 
@@ -41,12 +42,6 @@ import pydicom.encaps
 import pydicom.config
 
 sys_is_little_endian = (sys.byteorder == 'little')
-
-stat_available = True
-try:
-    from os import stat
-except ImportError:
-    stat_available = False
 
 
 class PropertyError(Exception):
@@ -1165,6 +1160,6 @@ class FileDataset(Dataset):
                 # e.g. came from BytesIO or something file-like
                 self.filename = None
         self.timestamp = None
-        if stat_available and self.filename and os.path.exists(self.filename):
-            statinfo = stat(self.filename)
+        if self.filename and os.path.exists(self.filename):
+            statinfo = os.stat(self.filename)
             self.timestamp = statinfo.st_mtime
