@@ -49,7 +49,7 @@ try:
 except ImportError:
     import pickle
 
-test_files = get_testdata_base
+test_files = get_testdata_base()
 badvr_name = os.path.join(test_files, "badVR.dcm")
 default_encoding = 'iso8859'
 
