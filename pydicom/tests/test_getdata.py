@@ -20,11 +20,11 @@ class TestGetData(unittest.TestCase):
 
         # Test base locations
         charbase = get_charset_base()
-        self.assertTrue(charbase.endswith('pydicom/data/charset_files'))
+        self.assertTrue(charbase.endswith('charset_files'))
         self.assertTrue(os.path.exists(charbase))
 
         testbase = get_testdata_base()
-        self.assertTrue(testbase.endswith('pydicom/data/test_files'))
+        self.assertTrue(testbase.endswith('test_files'))
         self.assertTrue(os.path.exists(testbase))
 
         # Test file get
