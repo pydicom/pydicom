@@ -1147,7 +1147,7 @@
             <span class="n">generic_jpeg_file_header</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span>
             <span class="n">frame_start_from</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">UncompressedPixelData</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+            <span class="n">UncompressedPixelData</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">()</span>
             <span class="k">if</span> <span class="s1">&#39;NumberOfFrames&#39;</span> <span class="ow">in</span> <span class="bp">self</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">NumberOfFrames</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="c1"># multiple compressed frames</span>
                 <span class="n">CompressedPixelDataSeq</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">encaps</span><span class="o">.</span><span class="n">decode_data_sequence</span><span class="p">(</span>
@@ -1158,37 +1158,25 @@
                     <span class="k">try</span><span class="p">:</span>
                         <span class="n">decompressed_image</span> <span class="o">=</span> <span class="n">PILImg</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">fio</span><span class="p">)</span>
                     <span class="k">except</span> <span class="ne">IOError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                        <span class="k">try</span><span class="p">:</span>
-                            <span class="n">message</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
-                        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
-                            <span class="k">try</span><span class="p">:</span>
-                                <span class="n">message</span> <span class="o">=</span> <span class="n">unicode</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
-                            <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
-                                <span class="n">message</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
-                        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+                        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">strerror</span><span class="p">)</span>
                     <span class="n">UncompressedPixelData</span> <span class="o">+=</span> <span class="n">decompressed_image</span><span class="o">.</span><span class="n">tobytes</span><span class="p">()</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="c1"># single compressed frame</span>
                 <span class="n">UncompressedPixelData</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">encaps</span><span class="o">.</span><span class="n">defragment_data</span><span class="p">(</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">PixelData</span><span class="p">)</span>
-                <span class="n">UncompressedPixelData</span> <span class="o">=</span> <span class="p">(</span><span class="n">generic_jpeg_file_header</span> <span class="o">+</span>
-                                         <span class="n">UncompressedPixelData</span><span class="p">[</span><span class="n">frame_start_from</span><span class="p">:])</span>
+                <span class="n">UncompressedPixelData</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">generic_jpeg_file_header</span> <span class="o">+</span>
+                    <span class="n">UncompressedPixelData</span><span class="p">[</span><span class="n">frame_start_from</span><span class="p">:]</span>
+                <span class="p">)</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="n">fio</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">UncompressedPixelData</span><span class="p">)</span>
                     <span class="n">decompressed_image</span> <span class="o">=</span> <span class="n">PILImg</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">fio</span><span class="p">)</span>
                 <span class="k">except</span> <span class="ne">IOError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                    <span class="k">try</span><span class="p">:</span>
-                        <span class="n">message</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
-                    <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
-                        <span class="k">try</span><span class="p">:</span>
-                            <span class="n">message</span> <span class="o">=</span> <span class="n">unicode</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
-                        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
-                            <span class="n">message</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
-                    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">strerror</span><span class="p">)</span>
                 <span class="n">UncompressedPixelData</span> <span class="o">=</span> <span class="n">decompressed_image</span><span class="o">.</span><span class="n">tobytes</span><span class="p">()</span>
         <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
             <span class="k">raise</span>
-        <span class="k">return</span> <span class="n">UncompressedPixelData</span>
+        <span class="k">return</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">UncompressedPixelData</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_get_jpeg_ls_supported_compressed_pixeldata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Use jpeg_ls to decompress compressed Pixel Data.</span>
