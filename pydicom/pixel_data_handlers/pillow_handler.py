@@ -167,14 +167,7 @@ def get_pixeldata(dicom_dataset):
                 try:
                     decompressed_image = PILImg.open(fio)
                 except IOError as e:
-                    try:
-                        message = str(e)
-                    except Exception:
-                        try:
-                            message = unicode(e)
-                        except Exception:
-                            message = ''
-                    raise NotImplementedError(message)
+                    raise NotImplementedError(e.strerror)
                 UncompressedPixelData += decompressed_image.tobytes()
         else:
             # single compressed frame
@@ -186,14 +179,7 @@ def get_pixeldata(dicom_dataset):
                 fio = io.BytesIO(UncompressedPixelData)
                 decompressed_image = PILImg.open(fio)
             except IOError as e:
-                try:
-                    message = str(e)
-                except Exception:
-                    try:
-                        message = unicode(e)
-                    except Exception:
-                        message = ''
-                raise NotImplementedError(message)
+                raise NotImplementedError(e.strerror)
             UncompressedPixelData = decompressed_image.tobytes()
     except Exception:
         raise
