@@ -960,10 +960,9 @@ class Dataset(dict):
             if self.BitsAllocated > 8:
                 raise NotImplementedError("JPEG Lossy only supported if Bits "
                                           "Allocated = 8")
-            generic_jpeg_file_header = (b'\xff\xd8\xff\xe0\x00\x10JFIF\x00',
-                                        b'\x01\x01\x01\x00\x01\x00\x01\x00',
+            generic_jpeg_file_header = (b'\xff\xd8\xff\xe0\x00\x10JFIF\x00'
+                                        b'\x01\x01\x01\x00\x01\x00\x01\x00'
                                         b'\x00')
-            generic_jpeg_file_header = b''.join(generic_jpeg_file_header)
             frame_start_from = 2
 
         elif (self.file_meta.TransferSyntaxUID in
@@ -1061,6 +1060,7 @@ class Dataset(dict):
             already_have = False
         elif self._pixel_id != id(self.PixelData):
             already_have = False
+        already_have = False
         if not already_have and not self._is_uncompressed_transfer_syntax():
             try:
                 # print("Pixel Data is compressed")
