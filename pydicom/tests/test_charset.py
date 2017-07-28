@@ -13,7 +13,7 @@ import os.path
 import pydicom.charset
 
 testcharset_dir = os.path.join(DATA_ROOT, 'charset_files')
-test_files = get_testdata_base(DATA_ROOT, 'test_files')
+test_files = os.path.join(DATA_ROOT, 'test_files')
 
 latin1_file = os.path.join(testcharset_dir, "chrFren.dcm")
 jp_file = os.path.join(testcharset_dir, "chrH31.dcm")

@@ -14,7 +14,7 @@ import sys
 from tempfile import TemporaryFile
 
 from pydicom import config
-from pydicom.data import get_testdata_base, get_charset_base
+from pydicom.data import DATA_ROOT
 from pydicom.dataset import Dataset, FileDataset
 from pydicom.dataelem import DataElement
 from pydicom.filebase import DicomBytesIO
@@ -41,8 +41,8 @@ except AttributeError:
     except ImportError:
         print("unittest2 is required for testing in python2.6")
 
-test_files = get_testdata_base()
-testcharset_dir = get_charset_base()
+test_files = os.path.join(DATA_ROOT, 'test_files')
+testcharset_dir = os.path.join(DATA_ROOT, 'charset_files')
 
 rtplan_name = os.path.join(test_files, "rtplan.dcm")
 rtdose_name = os.path.join(test_files, "rtdose.dcm")
