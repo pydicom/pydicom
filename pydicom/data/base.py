@@ -28,7 +28,7 @@ def get_testdata_files(pattern=None):
 
     """
 
-    data_path = join(ROOT_PATH, 'test_files')
+    data_path = join(DATA_ROOT, 'test_files')
     return get_files(bases=data_path, pattern=pattern)
 
 
@@ -46,5 +46,5 @@ def get_charset_files(pattern=None):
 
     """
 
-    data_path = join(ROOT_PATH, 'charset_files')
+    data_path = join(DATA_ROOT, 'charset_files')
     return get_files(bases=data_path, pattern=pattern)

@@ -9,5 +9,4 @@
 
 from .base import (get_charset_files,
                    get_testdata_files,
-                   get_charset_base,
-                   get_testdata_base)
+                   DATA_ROOT)

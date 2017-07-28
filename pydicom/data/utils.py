@@ -42,7 +42,6 @@ def get_files(bases, pattern=None):
                 for filename in fnmatch.filter(filenames, pattern):
                     files.append(os.path.join(root, filename))
 
-            files.extend(data_files)
         else:
             files.append(contender)
 
