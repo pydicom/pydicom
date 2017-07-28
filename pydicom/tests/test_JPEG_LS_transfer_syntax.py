@@ -1,12 +1,17 @@
 import os
 import sys
+import re
 import pytest
 import pydicom
-import re
 from pydicom.filereader import read_file
 pillow_missing_message = ("pillow is not available "
                           "in this test environment")
 pillow_present_message = "pillow is being tested"
+gdcm_missing_message = "GDCM is not available in this test environment"
+numpy_missing_message = ("numpy is not available "
+                         "in this test environment")
+jpeg_ls_missing_message = ("jpeg_ls is not available "
+                           "in this test environment")
 pillow_handler = None
 numpy_handler = None
 gdcm_handler = None
@@ -58,7 +63,7 @@ class Test_JPEG_LS_Lossless_transfer_syntax():
     def teardown_method(self, method):
         pydicom.config.image_handlers = self.original_handlers
 
-    @pytest.mark.skipif(numpy_handler is None, reason="numpy is not available")
+    @pytest.mark.skipif(numpy_handler is None, reason=numpy_missing_message)
     def test_read_mr_with_numpy(self):
         pydicom.config.image_handlers = [numpy_handler]
         with pytest.raises((NotImplementedError, )) as e:
@@ -67,7 +72,7 @@ class Test_JPEG_LS_Lossless_transfer_syntax():
             ".*No available image handler could decode this transfer "
             "syntax JPEG-LS Lossless Image Compression.*", str(e))
 
-    @pytest.mark.skipif(numpy_handler is None, reason="numpy is not available")
+    @pytest.mark.skipif(numpy_handler is None, reason=numpy_missing_message)
     def test_read_emri_with_numpy(self):
         pydicom.config.image_handlers = [numpy_handler]
         with pytest.raises((NotImplementedError, )) as e:
@@ -76,7 +81,7 @@ class Test_JPEG_LS_Lossless_transfer_syntax():
             ".*No available image handler could decode this transfer "
             "syntax JPEG-LS Lossless Image Compression.*", str(e))
 
-    @pytest.mark.skipif(pillow_handler is None, reason="pillow is not available")
+    @pytest.mark.skipif(pillow_handler is None, reason=pillow_missing_message)
     def test_read_mr_with_pillow(self):
         pydicom.config.image_handlers = [pillow_handler]
         with pytest.raises((NotImplementedError, )) as e:
@@ -85,7 +90,7 @@ class Test_JPEG_LS_Lossless_transfer_syntax():
             ".*No available image handler could decode this transfer "
             "syntax JPEG-LS Lossless Image Compression.*", str(e))
 
-    @pytest.mark.skipif(pillow_handler is None, reason="pillow is not available")
+    @pytest.mark.skipif(pillow_handler is None, reason=pillow_missing_message)
     def test_read_emri_with_pillow(self):
         pydicom.config.image_handlers = [pillow_handler]
         with pytest.raises((NotImplementedError, )) as e:
@@ -94,8 +99,7 @@ class Test_JPEG_LS_Lossless_transfer_syntax():
             ".*No available image handler could decode this transfer "
             "syntax JPEG-LS Lossless Image Compression.*", str(e))
 
-
-    @pytest.mark.skipif(gdcm_handler is None, reason="gdcm is not available")
+    @pytest.mark.skipif(gdcm_handler is None, reason=gdcm_missing_message)
     def test_read_mr_with_gdcm(self):
         pydicom.config.image_handlers = [numpy_handler, gdcm_handler]
         a = self.jpeg_ls_lossless.pixel_array
@@ -104,7 +108,7 @@ class Test_JPEG_LS_Lossless_transfer_syntax():
             "using GDCM Decoded pixel data is not " \
             "all {0} (mean == {1})".format(b.mean(), a.mean())
 
-    @pytest.mark.skipif(gdcm_handler is None, reason="gdcm is not available")
+    @pytest.mark.skipif(gdcm_handler is None, reason=gdcm_missing_message)
     @pytest.mark.xfail(reason="GDCM only returns the first frame of EMRI?")
     def test_read_emri_with_gdcm(self):
         pydicom.config.image_handlers = [numpy_handler, gdcm_handler]
@@ -114,7 +118,7 @@ class Test_JPEG_LS_Lossless_transfer_syntax():
             "using GDCM Decoded pixel data is not " \
             "all {0} (mean == {1})".format(b.mean(), a.mean())
 
-    @pytest.mark.skipif(jpeg_ls_handler is None, reason="jpeg_ls is not available")
+    @pytest.mark.skipif(jpeg_ls_handler is None, reason=jpeg_ls_missing_message)
     def test_read_mr_with_jpeg_ls(self):
         pydicom.config.image_handlers = [numpy_handler, jpeg_ls_handler]
         a = self.jpeg_ls_lossless.pixel_array
@@ -123,7 +127,7 @@ class Test_JPEG_LS_Lossless_transfer_syntax():
             "using jpeg_ls decoded pixel data is not " \
             "all {0} (mean == {1})".format(b.mean(), a.mean())
 
-    @pytest.mark.skipif(jpeg_ls_handler is None, reason="jpeg_ls is not available")
+    @pytest.mark.skipif(jpeg_ls_handler is None, reason=jpeg_ls_missing_message)
     def test_read_emri_with_jpeg_ls(self):
         pydicom.config.image_handlers = [numpy_handler, jpeg_ls_handler]
         a = self.emri_jpeg_ls_lossless.pixel_array
