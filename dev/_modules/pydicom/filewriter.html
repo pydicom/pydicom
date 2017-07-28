@@ -539,8 +539,8 @@
     <span class="n">VR</span> <span class="o">=</span> <span class="n">data_element</span><span class="o">.</span><span class="n">VR</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">fp</span><span class="o">.</span><span class="n">is_implicit_VR</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">VR</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Cannot write ambiguous VR of &#39;</span><span class="si">{}</span><span class="s2">&#39; for data element with &quot;</span><span class="p">,</span>
-                   <span class="s2">&quot;tag </span><span class="si">{}</span><span class="s2">.</span><span class="se">\n</span><span class="s2">Set the correct VR before writing, or use an &quot;</span><span class="p">,</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Cannot write ambiguous VR of &#39;</span><span class="si">{}</span><span class="s2">&#39; for data element with &quot;</span>
+                   <span class="s2">&quot;tag </span><span class="si">{}</span><span class="s2">.</span><span class="se">\n</span><span class="s2">Set the correct VR before writing, or use an &quot;</span>
                    <span class="s2">&quot;implicit VR transfer syntax&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                        <span class="n">VR</span><span class="p">,</span> <span class="nb">repr</span><span class="p">(</span><span class="n">data_element</span><span class="o">.</span><span class="n">tag</span><span class="p">)))</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
