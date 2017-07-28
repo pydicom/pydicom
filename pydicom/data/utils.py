@@ -11,32 +11,37 @@ import os
 import fnmatch
 
 
-def recursive_find(base, pattern=None):
-    '''recursively find files based on a pattern
-    '''
+def get_files(bases, pattern=None):
+    """Return all files from a set of sources.
+
+    Parameters
+    ----------
+    bases : list or file-like
+            This can be a list of files and/or folders conforming
+            to some standard pattern.
+    pattern : string for fnmatch
+            A string pattern to filter the files
+
+    Returns
+    ----------
+    files : list of files recursively found
+            from the bases
+    """
+
     if pattern is None:
         pattern = "*"
-    files = []
-    for root, dirnames, filenames in os.walk(base):
-        for filename in fnmatch.filter(filenames, pattern):
-            files.append(os.path.join(root, filename))
 
-    return files
-
-
-def get_files(bases, pattern=None):
-    '''return all files for a valid dataset, which may
-    be a list of files and/or folders conforming to some
-    pattern.
-    '''
     if not isinstance(bases, list):
         bases = [bases]
 
     files = []
     for contender in bases:
         if os.path.isdir(contender):
-            data_files = recursive_find(contender,
-                                        pattern=pattern)
+
+            for root, dirnames, filenames in os.walk(contender):
+                for filename in fnmatch.filter(filenames, pattern):
+                    files.append(os.path.join(root, filename))
+
             files.extend(data_files)
         else:
             files.append(contender)

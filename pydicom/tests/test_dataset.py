@@ -8,7 +8,7 @@
 import os
 import unittest
 
-from pydicom.data import get_testdata_base
+from pydicom.data import DATA_ROOT
 from pydicom.dataset import Dataset, PropertyError
 from pydicom.dataelem import DataElement, RawDataElement
 from pydicom.dicomio import read_file
@@ -789,7 +789,7 @@ class DatasetElementsTests(unittest.TestCase):
 
 class FileDatasetTests(unittest.TestCase):
     def setUp(self):
-        test_dir = get_testdata_base()
+        test_dir = os.path.join(DATA_ROOT, 'test_files')
         self.test_file = os.path.join(test_dir, 'CT_small.dcm')
 
     def testEqualityFileMeta(self):

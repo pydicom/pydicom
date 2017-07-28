@@ -18,7 +18,7 @@ import platform
 from pydicom.compat import in_py2
 from pydicom import config
 from pydicom import valuerep
-from pydicom.data import get_testdata_base
+from pydicom.data import DATA_ROOT
 import unittest
 
 have_dateutil = True
@@ -49,7 +49,7 @@ try:
 except ImportError:
     import pickle
 
-test_files = get_testdata_base()
+test_files = os.path.join(DATA_ROOT, 'test_files')
 badvr_name = os.path.join(test_files, "badVR.dcm")
 default_encoding = 'iso8859'
 
