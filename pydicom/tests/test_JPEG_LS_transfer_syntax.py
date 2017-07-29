@@ -146,7 +146,7 @@ class Test_JPEG_LS_Lossless_transfer_syntax():
             _ = self.jpeg_ls_lossless.pixel_array
         assert re.match(
             ".*No available image handler could decode this transfer "
-            "syntax JPEG-LS Lossless Image Compression.*", str(e))
+            "syntax (1.2.840.10008.1.2.4.80|JPEG-LS Lossless Image Compression).*", str(e))
 
     def test_read_emri_without_any_handler(self):
         pydicom.config.image_handlers = []
@@ -154,4 +154,4 @@ class Test_JPEG_LS_Lossless_transfer_syntax():
             _ = self.emri_jpeg_ls_lossless.pixel_array
         assert re.match(
             ".*No available image handler could decode this transfer "
-            "syntax JPEG-LS Lossless Image Compression.*", str(e))
+            "syntax (1.2.840.10008.1.2.4.80|JPEG-LS Lossless Image Compression).*", str(e))
