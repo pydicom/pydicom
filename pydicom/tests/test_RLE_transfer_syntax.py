@@ -70,7 +70,7 @@ class Test_RLE_transfer_syntax():
             _ = self.compressed_mr.pixel_array
         assert re.match(
             ".*No available image handler could decode this transfer "
-            "syntax (1.2.840.10008.1.2.4.80|RLE Lossless).*", str(e))
+            "syntax (1.2.840.10008.1.2.5|RLE Lossless).*", str(e))
 
     @pytest.mark.skipif(numpy_handler is None, reason=numpy_missing_message)
     def test_read_emri_with_numpy(self):
@@ -79,7 +79,7 @@ class Test_RLE_transfer_syntax():
             _ = self.compressed_emri.pixel_array
         assert re.match(
             ".*No available image handler could decode this transfer "
-            "syntax (1.2.840.10008.1.2.4.80|RLE Lossless).*", str(e))
+            "syntax (1.2.840.10008.1.2.5|RLE Lossless).*", str(e))
 
     @pytest.mark.skipif(pillow_handler is None, reason=pillow_missing_message)
     def test_read_mr_with_pillow(self):
@@ -88,7 +88,7 @@ class Test_RLE_transfer_syntax():
             _ = self.compressed_mr.pixel_array
         assert re.match(
             ".*No available image handler could decode this transfer "
-            "syntax (1.2.840.10008.1.2.4.80|RLE Lossless).*", str(e))
+            "syntax (1.2.840.10008.1.2.5|RLE Lossless).*", str(e))
 
     @pytest.mark.skipif(pillow_handler is None, reason=pillow_missing_message)
     def test_read_emri_with_pillow(self):
@@ -97,7 +97,7 @@ class Test_RLE_transfer_syntax():
             _ = self.compressed_emri.pixel_array
         assert re.match(
             ".*No available image handler could decode this transfer "
-            "syntax (1.2.840.10008.1.2.4.80|RLE Lossless).*", str(e))
+            "syntax (1.2.840.10008.1.2.5|RLE Lossless).*", str(e))
 
     @pytest.mark.skipif(gdcm_handler is None, reason=gdcm_missing_message)
     def test_read_mr_with_gdcm(self):
@@ -127,7 +127,7 @@ class Test_RLE_transfer_syntax():
             _ = self.compressed_mr.pixel_array
         assert re.match(
             ".*No available image handler could decode this transfer "
-            "syntax (1.2.840.10008.1.2.4.80|RLE Lossless).*", str(e))
+            "syntax (1.2.840.10008.1.2.5|RLE Lossless).*", str(e))
 
     @pytest.mark.skipif(
         jpeg_ls_handler is None,
@@ -138,7 +138,7 @@ class Test_RLE_transfer_syntax():
             _ = self.compressed_mr.pixel_array
         assert re.match(
             ".*No available image handler could decode this transfer "
-            "syntax (1.2.840.10008.1.2.4.80|RLE Lossless).*", str(e))
+            "syntax (1.2.840.10008.1.2.5|RLE Lossless).*", str(e))
 
     def test_read_mr_without_any_handler(self):
         pydicom.config.image_handlers = []
@@ -146,7 +146,7 @@ class Test_RLE_transfer_syntax():
             _ = self.compressed_mr.pixel_array
         assert re.match(
             ".*No available image handler could decode this transfer "
-            "syntax (1.2.840.10008.1.2.4.80|RLE Lossless).*", str(e))
+            "syntax (1.2.840.10008.1.2.5|RLE Lossless).*", str(e))
 
     def test_read_emri_without_any_handler(self):
         pydicom.config.image_handlers = []
@@ -154,4 +154,4 @@ class Test_RLE_transfer_syntax():
             _ = self.compressed_emri.pixel_array
         assert re.match(
             ".*No available image handler could decode this transfer "
-            "syntax (1.2.840.10008.1.2.4.80|RLE Lossless).*", str(e))
+            "syntax (1.2.840.10008.1.2.5|RLE Lossless).*", str(e))
