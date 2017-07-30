@@ -14,12 +14,12 @@ import re
 from pydicom._uid_dict import UID_dictionary
 from pydicom import compat
 
-valid_uid_re = '^(0|[1-9][0-9]*)(\.(0|[1-9][0-9]*))*$'
+valid_uid_re = r'^(0|[1-9][0-9]*)(\.(0|[1-9][0-9]*))*$'
 '''Regular expression that matches valid UIDs.
    Does not enforce 64 char limit.
 '''
 
-valid_prefix_re = '^(0|[1-9][0-9]*)(\.(0|[1-9][0-9]*))*\.$'
+valid_prefix_re = r'^(0|[1-9][0-9]*)(\.(0|[1-9][0-9]*))*\.$'
 '''Regular expression that matches valid UID prefixes.
    Does not enforce length constraints.
 '''
@@ -178,37 +178,11 @@ JPEGLSLossy = UID('1.2.840.10008.1.2.4.81')
 JPEG2000Lossless = UID('1.2.840.10008.1.2.4.90')
 JPEG2000Lossy = UID('1.2.840.10008.1.2.4.91')
 
-UncompressedPixelTransferSyntaxes = [
-    ExplicitVRLittleEndian,
-    ImplicitVRLittleEndian,
-    DeflatedExplicitVRLittleEndian,
-    ExplicitVRBigEndian,
-]
-
-JPEGLSSupportedCompressedPixelTransferSyntaxes = [
-    JPEGLSLossless,
-    JPEGLSLossy,
-]
-
-PILSupportedCompressedPixelTransferSyntaxes = [
-    JPEGBaseLineLossy8bit,
-    JPEGLossless,
-    JPEGBaseLineLossy12bit,
-    JPEG2000Lossless,
-    JPEG2000Lossy,
-]
-JPEG2000CompressedPixelTransferSyntaxes = [
-    JPEG2000Lossless,
-    JPEG2000Lossy,
-]
-JPEGLossyCompressedPixelTransferSyntaxes = [
-    JPEGBaseLineLossy8bit,
-    JPEGBaseLineLossy12bit,
-]
 NotCompressedPixelTransferSyntaxes = [
     ExplicitVRLittleEndian, ImplicitVRLittleEndian,
     DeflatedExplicitVRLittleEndian, ExplicitVRBigEndian
 ]
+
 
 # Many thanks to the Medical Connections for offering free
 # valid UIDs (http://www.medicalconnections.co.uk/FreeUID.html)
