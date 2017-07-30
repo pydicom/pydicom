@@ -18,52 +18,52 @@ set -e
 # behavior is to quick build the documentation.
 
 get_build_type() {
-	if [ -z "$CIRCLE_SHA1" ]
-	then
-		echo SKIP: undefined CIRCLE_SHA1
-		return
-	fi
-	commit_msg=$(git log --format=%B -n 1 $CIRCLE_SHA1)
-	if [ -z "$commit_msg" ]
-	then
-		echo QUICK BUILD: failed to inspect commit $CIRCLE_SHA1
-		return
-	fi
-	if [[ "$commit_msg" =~ \[doc\ skip\] ]]
-	then
-		echo SKIP: [doc skip] marker found
-		return
-	fi
-	if [[ "$commit_msg" =~ \[doc\ quick\] ]]
-	then
-		echo QUICK: [doc quick] marker found
-		return
-	fi
-	if [[ "$commit_msg" =~ \[doc\ build\] ]]
-	then
-		echo BUILD: [doc build] marker found
-		return
-	fi
-	if [ -z "$CI_PULL_REQUEST" ]
-	then
-		echo BUILD: not a pull request
-		return
-	fi
-	git_range="origin/master...$CIRCLE_SHA1"
-	git fetch origin master >&2 || (echo QUICK BUILD: failed to get changed filenames for $git_range; return)
-	filenames=$(git diff --name-only $git_range)
-	if [ -z "$filenames" ]
-	then
-		echo QUICK BUILD: no changed filenames for $git_range
-		return
-	fi
-	if echo "$filenames" | grep -q -e ^examples/
-	then
-		echo BUILD: detected examples/ filename modified in $git_range: $(echo "$filenames" | grep -e ^examples/ | head -n1)
-		return
-	fi
-	echo QUICK BUILD: no examples/ filename modified in $git_range:
-	echo "$filenames"
+    if [ -z "$CIRCLE_SHA1" ]
+    then
+        echo SKIP: undefined CIRCLE_SHA1
+        return
+    fi
+    commit_msg=$(git log --format=%B -n 1 $CIRCLE_SHA1)
+    if [ -z "$commit_msg" ]
+    then
+        echo QUICK BUILD: failed to inspect commit $CIRCLE_SHA1
+        return
+    fi
+    if [[ "$commit_msg" =~ \[doc\ skip\] ]]
+    then
+        echo SKIP: [doc skip] marker found
+        return
+    fi
+    if [[ "$commit_msg" =~ \[doc\ quick\] ]]
+    then
+        echo QUICK: [doc quick] marker found
+        return
+    fi
+    if [[ "$commit_msg" =~ \[doc\ build\] ]]
+    then
+        echo BUILD: [doc build] marker found
+        return
+    fi
+    if [ -z "$CI_PULL_REQUEST" ]
+    then
+        echo BUILD: not a pull request
+        return
+    fi
+    git_range="origin/master...$CIRCLE_SHA1"
+    git fetch origin master >&2 || (echo QUICK BUILD: failed to get changed filenames for $git_range; return)
+    filenames=$(git diff --name-only $git_range)
+    if [ -z "$filenames" ]
+    then
+        echo QUICK BUILD: no changed filenames for $git_range
+        return
+    fi
+    if echo "$filenames" | grep -q -e ^examples/
+    then
+        echo BUILD: detected examples/ filename modified in $git_range: $(echo "$filenames" | grep -e ^examples/ | head -n1)
+        return
+    fi
+    echo QUICK BUILD: no examples/ filename modified in $git_range:
+    echo "$filenames"
 }
 
 build_type=$(get_build_type)
@@ -78,7 +78,7 @@ then
     MAKE_TARGET="dist LATEXMKOPTS=-halt-on-error"
 elif [[ "$build_type" =~ ^QUICK ]]
 then
-	MAKE_TARGET=html
+    MAKE_TARGET=html
 else
     MAKE_TARGET=html
 fi
@@ -109,7 +109,8 @@ conda update --yes --quiet conda
 conda create -n $CONDA_ENV_NAME --yes --quiet python=3
 source activate $CONDA_ENV_NAME
 
-conda install --yes pip setuptools numpy matplotlib sphinx pillow sphinx_rtd_theme numpydoc
+conda install --yes --quiet pip setuptools numpy matplotlib sphinx pillow sphinx_rtd_theme numpydoc
+conda install --yes --quiet -c conda-forge gdcm
 pip install sphinx-gallery
 
 # Build and install pydicom in dev mode
