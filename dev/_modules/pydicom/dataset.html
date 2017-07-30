@@ -195,6 +195,7 @@
 
 <span class="kn">import</span> <span class="nn">inspect</span>  <span class="c1"># for __dir__</span>
 <span class="kn">import</span> <span class="nn">io</span>
+<span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">os.path</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 
@@ -211,44 +212,9 @@
 <span class="kn">import</span> <span class="nn">pydicom.charset</span>
 <span class="kn">from</span> <span class="nn">pydicom.config</span> <span class="k">import</span> <span class="n">logger</span>
 <span class="kn">import</span> <span class="nn">pydicom.encaps</span>
+<span class="kn">import</span> <span class="nn">pydicom.config</span>
 
 <span class="n">sys_is_little_endian</span> <span class="o">=</span> <span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">byteorder</span> <span class="o">==</span> <span class="s1">&#39;little&#39;</span><span class="p">)</span>
-
-<span class="n">have_numpy</span> <span class="o">=</span> <span class="kc">True</span>
-<span class="k">try</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">numpy</span>
-<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="n">have_numpy</span> <span class="o">=</span> <span class="kc">False</span>
-
-<span class="n">have_gdcm</span> <span class="o">=</span> <span class="kc">True</span>
-<span class="k">try</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">gdcm</span>
-<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="n">have_gdcm</span> <span class="o">=</span> <span class="kc">False</span>
-
-<span class="n">stat_available</span> <span class="o">=</span> <span class="kc">True</span>
-<span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">stat</span>
-<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="n">stat_available</span> <span class="o">=</span> <span class="kc">False</span>
-<span class="n">have_jpeg_ls</span> <span class="o">=</span> <span class="kc">True</span>
-
-<span class="k">try</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">jpeg_ls</span>
-<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="n">have_jpeg_ls</span> <span class="o">=</span> <span class="kc">False</span>
-
-<span class="n">have_pillow</span> <span class="o">=</span> <span class="kc">True</span>
-<span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">PIL</span> <span class="k">import</span> <span class="n">Image</span> <span class="k">as</span> <span class="n">PILImg</span>
-<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="n">have_pillow</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="c1"># If that failed, try the alternate import syntax for PIL.</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="kn">import</span> <span class="nn">Image</span> <span class="k">as</span> <span class="nn">PILImg</span>
-    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-        <span class="c1"># Neither worked, so it&#39;s likely not installed.</span>
-        <span class="n">have_pillow</span> <span class="o">=</span> <span class="kc">False</span>
 
 
 <span class="k">class</span> <span class="nc">PropertyError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
@@ -438,7 +404,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">tag</span> <span class="o">=</span> <span class="n">Tag</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-            <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">OverflowError</span><span class="p">):</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
                 <span class="k">return</span> <span class="kc">False</span>
         <span class="c1"># Test against None as (0000,0000) is a possible tag</span>
         <span class="k">if</span> <span class="n">tag</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -649,7 +615,7 @@
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">BaseTag</span><span class="p">):</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="n">key</span> <span class="o">=</span> <span class="n">Tag</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-                <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">OverflowError</span><span class="p">):</span>
+                <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Dataset.get key must be a string or tag&quot;</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">return_val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
@@ -843,147 +809,9 @@
 
     <span class="k">def</span> <span class="nf">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Compare `self` and `other` for inequality.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span> <span class="o">==</span> <span class="n">other</span><span class="p">)</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span> <span class="o">==</span> <span class="n">other</span>
 
-    <span class="k">def</span> <span class="nf">_pixel_data_numpy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;If NumPy is available, return an ndarray of the Pixel Data.</span>
-
-<span class="sd">        Falls back to GDCM in case of unsupported transfer syntaxes.</span>
-
-<span class="sd">        Raises</span>
-<span class="sd">        ------</span>
-<span class="sd">        TypeError</span>
-<span class="sd">            If there is no Pixel Data or not a supported data type.</span>
-<span class="sd">        ImportError</span>
-<span class="sd">            If NumPy isn&#39;t found, or in the case of fallback, if GDCM isn&#39;t</span>
-<span class="sd">            found.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        numpy.ndarray</span>
-<span class="sd">            The contents of the Pixel Data element (7FE0,0010) as an ndarray.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_uncompressed_transfer_syntax</span><span class="p">():</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">have_gdcm</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-                    <span class="s2">&quot;Pixel Data is compressed in a &quot;</span>
-                    <span class="s2">&quot;format pydicom does not yet handle. &quot;</span>
-                    <span class="s2">&quot;Cannot return array. Pydicom might &quot;</span>
-                    <span class="s2">&quot;be able to convert the pixel data &quot;</span>
-                    <span class="s2">&quot;using GDCM if it is installed.&quot;</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;GDCM is only supported when the &quot;</span>
-                                          <span class="s2">&quot;dataset has been created with a &quot;</span>
-                                          <span class="s2">&quot;filename.&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">have_numpy</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;The Numpy package is required to use pixel_array, and &quot;</span> \
-                  <span class="s2">&quot;numpy could not be imported.&quot;</span>
-            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-        <span class="k">if</span> <span class="s1">&#39;PixelData&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;No pixel data found in this dataset.&quot;</span><span class="p">)</span>
-
-        <span class="c1"># There are two cases:</span>
-        <span class="c1"># 1) uncompressed PixelData -&gt; use numpy</span>
-        <span class="c1"># 2) compressed PixelData, filename is available and GDCM is</span>
-        <span class="c1">#    available -&gt; use GDCM</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_uncompressed_transfer_syntax</span><span class="p">():</span>
-            <span class="c1"># Make NumPy format code, e.g. &quot;uint16&quot;, &quot;int32&quot; etc</span>
-            <span class="c1"># from two pieces of info:</span>
-            <span class="c1">#    self.PixelRepresentation -- 0 for unsigned, 1 for signed;</span>
-            <span class="c1">#    self.BitsAllocated -- 8, 16, or 32</span>
-            <span class="n">format_str</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">int</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">((</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)[</span><span class="bp">self</span><span class="o">.</span><span class="n">PixelRepresentation</span><span class="p">],</span>
-                                      <span class="bp">self</span><span class="o">.</span><span class="n">BitsAllocated</span><span class="p">)</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">numpy_dtype</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="n">format_str</span><span class="p">)</span>
-            <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
-                <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Data type not understood by NumPy: &quot;</span>
-                       <span class="s2">&quot;format=&#39;</span><span class="si">%s</span><span class="s2">&#39;, PixelRepresentation=</span><span class="si">%d</span><span class="s2">, BitsAllocated=</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
-                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span> <span class="o">%</span> <span class="p">(</span><span class="n">format_str</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">PixelRepresentation</span><span class="p">,</span>
-                                       <span class="bp">self</span><span class="o">.</span><span class="n">BitsAllocated</span><span class="p">))</span>
-
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_little_endian</span> <span class="o">!=</span> <span class="n">sys_is_little_endian</span><span class="p">:</span>
-                <span class="n">numpy_dtype</span> <span class="o">=</span> <span class="n">numpy_dtype</span><span class="o">.</span><span class="n">newbyteorder</span><span class="p">(</span><span class="s1">&#39;S&#39;</span><span class="p">)</span>
-
-            <span class="n">pixel_bytearray</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">PixelData</span>
-        <span class="k">elif</span> <span class="n">have_gdcm</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">:</span>
-            <span class="c1"># read the file using GDCM</span>
-            <span class="c1"># FIXME this should just use self.PixelData instead of</span>
-            <span class="c1">#       self.filename but it is unclear how this should be achieved</span>
-            <span class="c1">#       using GDCM</span>
-            <span class="n">gdcm_image_reader</span> <span class="o">=</span> <span class="n">gdcm</span><span class="o">.</span><span class="n">ImageReader</span><span class="p">()</span>
-            <span class="n">gdcm_image_reader</span><span class="o">.</span><span class="n">SetFileName</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">gdcm_image_reader</span><span class="o">.</span><span class="n">Read</span><span class="p">():</span>
-                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;GDCM could not read DICOM image&quot;</span><span class="p">)</span>
-            <span class="n">gdcm_image</span> <span class="o">=</span> <span class="n">gdcm_image_reader</span><span class="o">.</span><span class="n">GetImage</span><span class="p">()</span>
-
-            <span class="c1"># determine the correct numpy datatype</span>
-            <span class="n">gdcm_numpy_typemap</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="n">gdcm</span><span class="o">.</span><span class="n">PixelFormat</span><span class="o">.</span><span class="n">INT8</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">int8</span><span class="p">,</span>
-                <span class="n">gdcm</span><span class="o">.</span><span class="n">PixelFormat</span><span class="o">.</span><span class="n">UINT8</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">uint8</span><span class="p">,</span>
-                <span class="n">gdcm</span><span class="o">.</span><span class="n">PixelFormat</span><span class="o">.</span><span class="n">UINT16</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">uint16</span><span class="p">,</span>
-                <span class="n">gdcm</span><span class="o">.</span><span class="n">PixelFormat</span><span class="o">.</span><span class="n">INT16</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">int16</span><span class="p">,</span>
-                <span class="n">gdcm</span><span class="o">.</span><span class="n">PixelFormat</span><span class="o">.</span><span class="n">UINT32</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">uint32</span><span class="p">,</span>
-                <span class="n">gdcm</span><span class="o">.</span><span class="n">PixelFormat</span><span class="o">.</span><span class="n">INT32</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span>
-                <span class="n">gdcm</span><span class="o">.</span><span class="n">PixelFormat</span><span class="o">.</span><span class="n">FLOAT32</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span>
-                <span class="n">gdcm</span><span class="o">.</span><span class="n">PixelFormat</span><span class="o">.</span><span class="n">FLOAT64</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">float64</span>
-            <span class="p">}</span>
-            <span class="n">gdcm_pixel_format</span> <span class="o">=</span> <span class="n">gdcm_image</span><span class="o">.</span><span class="n">GetPixelFormat</span><span class="p">()</span><span class="o">.</span><span class="n">GetScalarType</span><span class="p">()</span>
-            <span class="k">if</span> <span class="n">gdcm_pixel_format</span> <span class="ow">in</span> <span class="n">gdcm_numpy_typemap</span><span class="p">:</span>
-                <span class="n">numpy_dtype</span> <span class="o">=</span> <span class="n">gdcm_numpy_typemap</span><span class="p">[</span><span class="n">gdcm_pixel_format</span><span class="p">]</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{0}</span><span class="s1"> is not a GDCM supported &#39;</span>
-                                <span class="s1">&#39;pixel format&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">gdcm_pixel_format</span><span class="p">))</span>
-
-            <span class="c1"># GDCM returns char* as type str. Under Python 2 `str` are</span>
-            <span class="c1"># byte arrays by default. Python 3 decodes this to</span>
-            <span class="c1"># unicode strings by default.</span>
-            <span class="c1"># The SWIG docs mention that they always decode byte streams</span>
-            <span class="c1"># as utf-8 strings for Python 3, with the `surrogateescape`</span>
-            <span class="c1"># error handler configured.</span>
-            <span class="c1"># Therefore, we can encode them back to their original bytearray</span>
-            <span class="c1"># representation on Python 3 by using the same parameters.</span>
-            <span class="n">pixel_bytearray</span> <span class="o">=</span> <span class="n">gdcm_image</span><span class="o">.</span><span class="n">GetBuffer</span><span class="p">()</span>
-            <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
-                <span class="n">pixel_bytearray</span> <span class="o">=</span> <span class="n">pixel_bytearray</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span>
-                    <span class="s2">&quot;utf-8&quot;</span><span class="p">,</span> <span class="s2">&quot;surrogateescape&quot;</span><span class="p">)</span>
-
-            <span class="c1"># if GDCM indicates that a byte swap is in order, make</span>
-            <span class="c1">#   sure to inform numpy as well</span>
-            <span class="k">if</span> <span class="n">gdcm_image</span><span class="o">.</span><span class="n">GetNeedByteSwap</span><span class="p">():</span>
-                <span class="n">numpy_dtype</span> <span class="o">=</span> <span class="n">numpy_dtype</span><span class="o">.</span><span class="n">newbyteorder</span><span class="p">(</span><span class="s1">&#39;S&#39;</span><span class="p">)</span>
-
-            <span class="c1"># Here we need to be careful because in some cases, GDCM reads a</span>
-            <span class="c1"># buffer that is too large, so we need to make sure we only include</span>
-            <span class="c1"># the first n_rows * n_columns * dtype_size bytes.</span>
-
-            <span class="n">n_bytes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Rows</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">Columns</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span>
-                <span class="n">numpy_dtype</span><span class="p">)</span><span class="o">.</span><span class="n">itemsize</span>
-
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pixel_bytearray</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">n_bytes</span><span class="p">:</span>
-
-                <span class="c1"># We make sure that all the bytes after are in fact zeros</span>
-                <span class="n">padding</span> <span class="o">=</span> <span class="n">pixel_bytearray</span><span class="p">[</span><span class="n">n_bytes</span><span class="p">:]</span>
-                <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">padding</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">byte</span><span class="p">)):</span>
-                    <span class="n">pixel_bytearray</span> <span class="o">=</span> <span class="n">pixel_bytearray</span><span class="p">[:</span><span class="n">n_bytes</span><span class="p">]</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="c1"># We revert to the old behavior which should then result</span>
-                    <span class="c1">#   in a Numpy error later on.</span>
-                    <span class="k">pass</span>
-
-        <span class="n">pixel_array</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">pixel_bytearray</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy_dtype</span><span class="p">)</span>
-        <span class="n">length_of_pixel_array</span> <span class="o">=</span> <span class="n">pixel_array</span><span class="o">.</span><span class="n">nbytes</span>
-        <span class="n">expected_length</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Rows</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">Columns</span>
-        <span class="k">if</span> <span class="s1">&#39;NumberOfFrames&#39;</span> <span class="ow">in</span> <span class="bp">self</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">NumberOfFrames</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">expected_length</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">NumberOfFrames</span>
-        <span class="k">if</span> <span class="s1">&#39;SamplesPerPixel&#39;</span> <span class="ow">in</span> <span class="bp">self</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">SamplesPerPixel</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">expected_length</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SamplesPerPixel</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">BitsAllocated</span> <span class="o">&gt;</span> <span class="mi">8</span><span class="p">:</span>
-            <span class="n">expected_length</span> <span class="o">*=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">BitsAllocated</span> <span class="o">//</span> <span class="mi">8</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">length_of_pixel_array</span> <span class="o">!=</span> <span class="n">expected_length</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span>
-                <span class="s2">&quot;Amount of pixel data </span><span class="si">%d</span><span class="s2"> does not match the expected data </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span>
-                <span class="p">(</span><span class="n">length_of_pixel_array</span><span class="p">,</span> <span class="n">expected_length</span><span class="p">))</span>
-
+    <span class="k">def</span> <span class="nf">_reshape_pixel_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pixel_array</span><span class="p">):</span>
         <span class="c1"># Note the following reshape operations return a new *view* onto</span>
         <span class="c1">#   pixel_array, but don&#39;t copy the data</span>
         <span class="k">if</span> <span class="s1">&#39;NumberOfFrames&#39;</span> <span class="ow">in</span> <span class="bp">self</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">NumberOfFrames</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
@@ -1014,209 +842,6 @@
                 <span class="n">pixel_array</span> <span class="o">=</span> <span class="n">pixel_array</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Rows</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Columns</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">pixel_array</span>
 
-    <span class="k">def</span> <span class="nf">_compressed_pixel_data_numpy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Return a NumPy array of the Pixel Data.</span>
-
-<span class="sd">        NumPy is a numerical package for python. It is used if available.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        numpy.ndarray</span>
-<span class="sd">            The Pixel Data as an array.</span>
-
-<span class="sd">        Raises</span>
-<span class="sd">        ------</span>
-<span class="sd">        TypeError</span>
-<span class="sd">            If no Pixel Data element in the dataset.</span>
-<span class="sd">        ImportError</span>
-<span class="sd">            If cannot import numpy.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="s1">&#39;PixelData&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;No pixel data found in this dataset.&quot;</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">have_numpy</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;The Numpy package is required to use pixel_array, and &quot;</span> \
-                  <span class="s2">&quot;numpy could not be imported.&quot;</span>
-            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-
-        <span class="c1"># determine the type used for the array</span>
-        <span class="n">need_byteswap</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">is_little_endian</span> <span class="o">!=</span> <span class="n">sys_is_little_endian</span><span class="p">)</span>
-
-        <span class="c1"># Make NumPy format code, e.g. &quot;uint16&quot;, &quot;int32&quot; etc</span>
-        <span class="c1"># from two pieces of info:</span>
-        <span class="c1">#    self.PixelRepresentation -- 0 for unsigned, 1 for signed;</span>
-        <span class="c1">#    self.BitsAllocated -- 8, 16, or 32</span>
-        <span class="n">format_str</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">int</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">((</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)[</span><span class="bp">self</span><span class="o">.</span><span class="n">PixelRepresentation</span><span class="p">],</span>
-                                  <span class="bp">self</span><span class="o">.</span><span class="n">BitsAllocated</span><span class="p">)</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">numpy_format</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="n">format_str</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Data type not understood by NumPy: &quot;</span>
-                   <span class="s2">&quot;format=&#39;</span><span class="si">%s</span><span class="s2">&#39;, PixelRepresentation=</span><span class="si">%d</span><span class="s2">, BitsAllocated=</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span> <span class="o">%</span> <span class="p">(</span><span class="n">format_str</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">PixelRepresentation</span><span class="p">,</span>
-                                   <span class="bp">self</span><span class="o">.</span><span class="n">BitsAllocated</span><span class="p">))</span>
-
-        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span> <span class="ow">in</span>
-                <span class="n">pydicom</span><span class="o">.</span><span class="n">uid</span><span class="o">.</span><span class="n">PILSupportedCompressedPixelTransferSyntaxes</span><span class="p">):</span>
-            <span class="n">UncompressedPixelData</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span>\
-                <span class="n">_get_PIL_supported_compressed_pixeldata</span><span class="p">()</span>
-        <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span> <span class="ow">in</span>
-                <span class="n">pydicom</span><span class="o">.</span><span class="n">uid</span><span class="o">.</span><span class="n">JPEGLSSupportedCompressedPixelTransferSyntaxes</span><span class="p">):</span>
-            <span class="n">UncompressedPixelData</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span>\
-                <span class="n">_get_jpeg_ls_supported_compressed_pixeldata</span><span class="p">()</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;The transfer syntax </span><span class="si">{0}</span><span class="s2"> is not currently supported.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-
-        <span class="c1"># Have correct Numpy format, so create the NumPy array</span>
-        <span class="n">arr</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">UncompressedPixelData</span><span class="p">,</span> <span class="n">numpy_format</span><span class="p">)</span>
-
-        <span class="c1"># XXX byte swap - may later handle this in read_file!!?</span>
-        <span class="k">if</span> <span class="n">need_byteswap</span><span class="p">:</span>
-            <span class="c1"># True means swap in-place, don&#39;t make a new copy</span>
-            <span class="n">arr</span><span class="o">.</span><span class="n">byteswap</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
-        <span class="c1"># Note the following reshape operations return a new *view* onto arr,</span>
-        <span class="c1"># but don&#39;t copy the data</span>
-        <span class="k">if</span> <span class="s1">&#39;NumberOfFrames&#39;</span> <span class="ow">in</span> <span class="bp">self</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">NumberOfFrames</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">SamplesPerPixel</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="n">arr</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">NumberOfFrames</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Rows</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Columns</span><span class="p">,</span>
-                                  <span class="bp">self</span><span class="o">.</span><span class="n">SamplesPerPixel</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">arr</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">NumberOfFrames</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Rows</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Columns</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">SamplesPerPixel</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">BitsAllocated</span> <span class="o">==</span> <span class="mi">8</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">PlanarConfiguration</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                        <span class="n">arr</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Rows</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Columns</span><span class="p">,</span>
-                                          <span class="bp">self</span><span class="o">.</span><span class="n">SamplesPerPixel</span><span class="p">)</span>
-                    <span class="k">else</span><span class="p">:</span>
-                        <span class="n">arr</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SamplesPerPixel</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Rows</span><span class="p">,</span>
-                                          <span class="bp">self</span><span class="o">.</span><span class="n">Columns</span><span class="p">)</span>
-                        <span class="n">arr</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;This code only handles &quot;</span>
-                                              <span class="s2">&quot;SamplesPerPixel &gt; 1 if Bits &quot;</span>
-                                              <span class="s2">&quot;Allocated = 8&quot;</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">arr</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Rows</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Columns</span><span class="p">)</span>
-        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span> <span class="ow">in</span>
-            <span class="n">pydicom</span><span class="o">.</span><span class="n">uid</span><span class="o">.</span><span class="n">JPEG2000CompressedPixelTransferSyntaxes</span>
-                <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">BitsStored</span> <span class="o">==</span> <span class="mi">16</span><span class="p">):</span>
-            <span class="c1"># WHY IS THIS EVEN NECESSARY??</span>
-            <span class="n">arr</span> <span class="o">&amp;=</span> <span class="mh">0x7FFF</span>
-        <span class="k">return</span> <span class="n">arr</span>
-
-    <span class="k">def</span> <span class="nf">_get_PIL_supported_compressed_pixeldata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Use PIL to decompress compressed Pixel Data.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        bytes or str</span>
-<span class="sd">            The decompressed Pixel Data</span>
-
-<span class="sd">        Raises</span>
-<span class="sd">        ------</span>
-<span class="sd">        ImportError</span>
-<span class="sd">            If PIL is not available.</span>
-<span class="sd">        NotImplementedError</span>
-<span class="sd">            If unable to decompress the Pixel Data.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">have_pillow</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;The pillow package is required to use pixel_array for &quot;</span> \
-                  <span class="s2">&quot;this transfer syntax </span><span class="si">{0}</span><span class="s2">, and pillow could not be &quot;</span> \
-                  <span class="s2">&quot;imported.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-        <span class="c1"># decompress here</span>
-        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span> <span class="ow">in</span>
-                <span class="n">pydicom</span><span class="o">.</span><span class="n">uid</span><span class="o">.</span><span class="n">JPEGLossyCompressedPixelTransferSyntaxes</span><span class="p">):</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">BitsAllocated</span> <span class="o">&gt;</span> <span class="mi">8</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;JPEG Lossy only supported if Bits &quot;</span>
-                                          <span class="s2">&quot;Allocated = 8&quot;</span><span class="p">)</span>
-            <span class="n">generic_jpeg_file_header</span> <span class="o">=</span> <span class="p">(</span><span class="sa">b</span><span class="s1">&#39;</span><span class="se">\xff\xd8\xff\xe0\x00\x10</span><span class="s1">JFIF</span><span class="se">\x00</span><span class="s1">&#39;</span>
-                                        <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x01\x01\x01\x00\x01\x00\x01\x00</span><span class="s1">&#39;</span>
-                                        <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">&#39;</span><span class="p">)</span>
-            <span class="n">frame_start_from</span> <span class="o">=</span> <span class="mi">2</span>
-
-        <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span> <span class="ow">in</span>
-                <span class="n">pydicom</span><span class="o">.</span><span class="n">uid</span><span class="o">.</span><span class="n">JPEG2000CompressedPixelTransferSyntaxes</span><span class="p">):</span>
-            <span class="n">generic_jpeg_file_header</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span>
-            <span class="c1"># generic_jpeg_file_header = (b&#39;\x00\x00\x00\x0C\x6A\x50&#39;</span>
-            <span class="c1">#                             b&#39;\x20\x20\x0D\x0A\x87\x0A&#39;)</span>
-            <span class="n">frame_start_from</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">generic_jpeg_file_header</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span>
-            <span class="n">frame_start_from</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">UncompressedPixelData</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">()</span>
-            <span class="k">if</span> <span class="s1">&#39;NumberOfFrames&#39;</span> <span class="ow">in</span> <span class="bp">self</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">NumberOfFrames</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="c1"># multiple compressed frames</span>
-                <span class="n">CompressedPixelDataSeq</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">encaps</span><span class="o">.</span><span class="n">decode_data_sequence</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">PixelData</span><span class="p">)</span>
-                <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="n">CompressedPixelDataSeq</span><span class="p">:</span>
-                    <span class="n">data</span> <span class="o">=</span> <span class="n">generic_jpeg_file_header</span> <span class="o">+</span> <span class="n">frame</span><span class="p">[</span><span class="n">frame_start_from</span><span class="p">:]</span>
-                    <span class="n">fio</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-                    <span class="k">try</span><span class="p">:</span>
-                        <span class="n">decompressed_image</span> <span class="o">=</span> <span class="n">PILImg</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">fio</span><span class="p">)</span>
-                    <span class="k">except</span> <span class="ne">IOError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">strerror</span><span class="p">)</span>
-                    <span class="n">UncompressedPixelData</span> <span class="o">+=</span> <span class="n">decompressed_image</span><span class="o">.</span><span class="n">tobytes</span><span class="p">()</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="c1"># single compressed frame</span>
-                <span class="n">UncompressedPixelData</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">encaps</span><span class="o">.</span><span class="n">defragment_data</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">PixelData</span><span class="p">)</span>
-                <span class="n">UncompressedPixelData</span> <span class="o">=</span> <span class="p">(</span>
-                    <span class="n">generic_jpeg_file_header</span> <span class="o">+</span>
-                    <span class="n">UncompressedPixelData</span><span class="p">[</span><span class="n">frame_start_from</span><span class="p">:]</span>
-                <span class="p">)</span>
-                <span class="k">try</span><span class="p">:</span>
-                    <span class="n">fio</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">UncompressedPixelData</span><span class="p">)</span>
-                    <span class="n">decompressed_image</span> <span class="o">=</span> <span class="n">PILImg</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">fio</span><span class="p">)</span>
-                <span class="k">except</span> <span class="ne">IOError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">strerror</span><span class="p">)</span>
-                <span class="n">UncompressedPixelData</span> <span class="o">=</span> <span class="n">decompressed_image</span><span class="o">.</span><span class="n">tobytes</span><span class="p">()</span>
-        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
-            <span class="k">raise</span>
-        <span class="k">return</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">UncompressedPixelData</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">_get_jpeg_ls_supported_compressed_pixeldata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Use jpeg_ls to decompress compressed Pixel Data.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        bytes or str</span>
-<span class="sd">            The decompressed Pixel Data</span>
-
-<span class="sd">        Raises</span>
-<span class="sd">        ------</span>
-<span class="sd">        ImportError</span>
-<span class="sd">            If jpeg_ls is not available.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">have_jpeg_ls</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;The jpeg_ls package is required to use pixel_array for &quot;</span> \
-                  <span class="s2">&quot;this transfer syntax </span><span class="si">{0}</span><span class="s2">, and jpeg_ls could not be &quot;</span> \
-                  <span class="s2">&quot;imported.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-        <span class="c1"># decompress here</span>
-        <span class="n">UncompressedPixelData</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
-        <span class="k">if</span> <span class="s1">&#39;NumberOfFrames&#39;</span> <span class="ow">in</span> <span class="bp">self</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">NumberOfFrames</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="c1"># multiple compressed frames</span>
-            <span class="n">CompressedPixelDataSeq</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">encaps</span><span class="o">.</span><span class="n">decode_data_sequence</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">PixelData</span><span class="p">)</span>
-            <span class="c1"># print len(CompressedPixelDataSeq)</span>
-            <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="n">CompressedPixelDataSeq</span><span class="p">:</span>
-                <span class="n">decompressed_image</span> <span class="o">=</span> <span class="n">jpeg_ls</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span>
-                    <span class="n">numpy</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">uint8</span><span class="p">))</span>
-                <span class="n">UncompressedPixelData</span> <span class="o">+=</span> <span class="n">decompressed_image</span><span class="o">.</span><span class="n">tobytes</span><span class="p">()</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># single compressed frame</span>
-            <span class="n">CompressedPixelData</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">encaps</span><span class="o">.</span><span class="n">defragment_data</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">PixelData</span><span class="p">)</span>
-            <span class="n">decompressed_image</span> <span class="o">=</span> <span class="n">jpeg_ls</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span>
-                <span class="n">numpy</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">CompressedPixelData</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">uint8</span><span class="p">))</span>
-            <span class="n">UncompressedPixelData</span> <span class="o">=</span> <span class="n">decompressed_image</span><span class="o">.</span><span class="n">tobytes</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">UncompressedPixelData</span>
-
     <span class="c1"># Use by pixel_array property</span>
     <span class="k">def</span> <span class="nf">_get_pixel_array</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Convert the Pixel Data to a numpy array.</span>
@@ -1233,22 +858,37 @@
             <span class="n">already_have</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pixel_id</span> <span class="o">!=</span> <span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">PixelData</span><span class="p">):</span>
             <span class="n">already_have</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">already_have</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_uncompressed_transfer_syntax</span><span class="p">():</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="c1"># print(&quot;Pixel Data is compressed&quot;)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_pixel_array</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compressed_pixel_data_numpy</span><span class="p">()</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_pixel_id</span> <span class="o">=</span> <span class="nb">id</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">PixelData</span>
-                <span class="p">)</span>  <span class="c1"># is this guaranteed to work if memory is re-used??</span>
-                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pixel_array</span>
-            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-                    <span class="s2">&quot;Pillow or JPLS did not support this transfer syntax&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">already_have</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_pixel_array</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pixel_data_numpy</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_pixel_id</span> <span class="o">=</span> <span class="nb">id</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">PixelData</span>
-            <span class="p">)</span>  <span class="c1"># is this guaranteed to work if memory is re-used??</span>
+            <span class="n">last_exception</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">successfully_read_pixel_data</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="n">h</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">image_handlers</span>
+                      <span class="k">if</span> <span class="n">h</span> <span class="ow">and</span> <span class="n">h</span><span class="o">.</span><span class="n">supports_transfer_syntax</span><span class="p">(</span><span class="bp">self</span><span class="p">)]:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">pixel_array</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">get_pixeldata</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_pixel_array</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reshape_pixel_array</span><span class="p">(</span><span class="n">pixel_array</span><span class="p">)</span>
+                    <span class="n">successfully_read_pixel_data</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="k">break</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Trouble with&quot;</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="n">e</span><span class="p">)</span>
+                    <span class="n">last_exception</span> <span class="o">=</span> <span class="n">e</span>
+                    <span class="k">continue</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">successfully_read_pixel_data</span><span class="p">:</span>
+                <span class="n">handlers_tried</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                    <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">image_handlers</span><span class="p">])</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> did not support this transfer syntax&quot;</span><span class="p">,</span>
+                            <span class="n">handlers_tried</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_pixel_array</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_pixel_id</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">if</span> <span class="n">last_exception</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">last_exception</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;No available image handler could &quot;</span>
+                           <span class="s2">&quot;decode this transfer syntax </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                               <span class="bp">self</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span><span class="p">))</span>
+                    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="c1"># is this guaranteed to work if memory is re-used??</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pixel_id</span> <span class="o">=</span> <span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">PixelData</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pixel_array</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pixel_array</span>
 
     <span class="nd">@property</span>
@@ -1441,15 +1081,17 @@
                 <span class="c1"># don&#39;t have this tag yet-&gt;create the data_element instance</span>
                 <span class="n">VR</span> <span class="o">=</span> <span class="n">dictionary_VR</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span>
                 <span class="n">data_element</span> <span class="o">=</span> <span class="n">DataElement</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">VR</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>  <span class="c1"># already have this data_element, just changing its value</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># already have this data_element, just changing its value</span>
                 <span class="n">data_element</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span>
                 <span class="n">data_element</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
             <span class="c1"># Now have data_element - store it in this dict</span>
             <span class="bp">self</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_element</span>
-        <span class="k">elif</span> <span class="n">repeater_has_keyword</span><span class="p">(</span>
-                <span class="n">name</span><span class="p">):</span>  <span class="c1"># Check if `name` is repeaters element</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> is a DICOM repeating group element and must &#39;</span>
-                             <span class="s1">&#39;be added using the add() or add_new() methods.&#39;</span>
+        <span class="k">elif</span> <span class="n">repeater_has_keyword</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+            <span class="c1"># Check if `name` is repeaters element</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> is a DICOM repeating group &#39;</span>
+                             <span class="s1">&#39;element and must be added using &#39;</span>
+                             <span class="s1">&#39;the add() or add_new() methods.&#39;</span>
                              <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># name not in dicom dictionary - setting a non-dicom instance</span>
@@ -1691,7 +1333,7 @@
                 <span class="c1"># e.g. came from BytesIO or something file-like</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">if</span> <span class="n">stat_available</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">):</span>
             <span class="n">statinfo</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">=</span> <span class="n">statinfo</span><span class="o">.</span><span class="n">st_mtime</span>
 </pre></div>
