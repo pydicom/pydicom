@@ -1314,7 +1314,7 @@ class TestWriteNonStandard(unittest.TestCase):
         ds.Status = 0x0000
         ds.save_as(self.fp, write_like_original=True)
         self.fp.seek(0)
-        self.assertRaises(EOFError, self.fp.read, 128)
+        self.assertRaises(EOFError, self.fp.read, 128, need_exact_length=True)
         self.fp.seek(0)
         self.assertNotEqual(self.fp.read(4), b'DICM')
         # Ensure Command Set Elements written as little endian implicit VR
