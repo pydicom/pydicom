@@ -78,6 +78,17 @@ class charsetTests(unittest.TestCase):
         ds = dicomio.read_file(multiPN_file)
         ds.decode()
 
+    def testEncodingWithSpecificTags(self):
+        """Encoding is correctly applied even if  Specific Character Set
+        is not in specific tags..."""
+        ds = dicomio.read_file(jp_file, specific_tags=['PatientName'])
+        ds.decode()
+        self.assertEqual(1, len(ds))
+        expected = ('Yamada^Tarou='
+                    '\033$B;3ED\033(B^\033$BB@O:\033(B='
+                    '\033$B$d$^$@\033(B^\033$B$?$m$&\033(B')
+        self.assertEqual(expected, ds.PatientName)
+
 
 if __name__ == "__main__":
     # This is called if run alone, but not if loaded through run_tests.py

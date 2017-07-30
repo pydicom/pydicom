@@ -366,8 +366,8 @@ def write_data_element(fp, data_element, encoding=default_encoding):
     VR = data_element.VR
     if not fp.is_implicit_VR:
         if len(VR) != 2:
-            msg = ("Cannot write ambiguous VR of '{}' for data element with ",
-                   "tag {}.\nSet the correct VR before writing, or use an ",
+            msg = ("Cannot write ambiguous VR of '{}' for data element with "
+                   "tag {}.\nSet the correct VR before writing, or use an "
                    "implicit VR transfer syntax".format(
                        VR, repr(data_element.tag)))
             raise ValueError(msg)

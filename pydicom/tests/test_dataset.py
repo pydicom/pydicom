@@ -60,21 +60,26 @@ class DatasetTests(unittest.TestCase):
         ds = Dataset()
         ds.file_meta = Dataset()
         ds.PixelData = 'xyzlmnop'
-
-        def callable_pixel_array():
+        msg_from_gdcm = r"'Dataset' object has no attribute 'filename'"
+        msg_from_numpy = (r"'Dataset' object has no attribute "
+                          "'TransferSyntaxUID'")
+        msg_from_pillow = (r"'Dataset' object has no attribute "
+                           "'PixelRepresentation'")
+        msg = "(" + "|".join(
+            [msg_from_gdcm, msg_from_numpy, msg_from_pillow]) + ")"
+        with self.assertRaisesRegexp(AttributeError, msg):
             ds.pixel_array
 
-        msg = "'Dataset' object has no attribute 'TransferSyntaxUID'"
-        self.failUnlessExceptionArgs(msg, AttributeError,
-                                     callable_pixel_array)
-
+            
     def test_attribute_error_in_property_correct_debug(self):
         """Test AttributeError in property raises correctly."""
         class Foo(Dataset):
             @property
-            def bar(self): return self._barr()
+            def bar(self):
+                return self._barr()
 
-            def _bar(self): return 'OK'
+            def _bar(self):
+                return 'OK'
 
         def test():
             ds = Foo()
@@ -92,9 +97,11 @@ class DatasetTests(unittest.TestCase):
         ds.SmallestImagePixelValue = 0  # Invalid value
 
         if compat.in_PyPy:
-            expected_msg = "Invalid tag (0028, 0106): 'int' has no length"
+            expected_msg = ("Invalid tag (0028, 0106): "
+                            "'int' has no length")
         else:
-            expected_msg = ("Invalid tag (0028, 0106): object of type 'int' "
+            expected_msg = ("Invalid tag (0028, 0106): "
+                            "object of type 'int' "
                             "has no len()")
 
         self.failUnlessExceptionArgs(expected_msg,
@@ -109,9 +116,11 @@ class DatasetTests(unittest.TestCase):
         ds.SmallestImagePixelValue = 0  # Invalid value
 
         if compat.in_PyPy:
-            expected_msg = "Invalid tag (0028, 0106): 'int' has no length"
+            expected_msg = ("Invalid tag (0028, 0106): "
+                            "'int' has no length")
         else:
-            expected_msg = ("Invalid tag (0028, 0106): object of type 'int' "
+            expected_msg = ("Invalid tag (0028, 0106): "
+                            "object of type 'int' "
                             "has no len()")
 
         def callback(dataset, data_element):
@@ -151,17 +160,23 @@ class DatasetTests(unittest.TestCase):
         has_it = hasattr(ds, 'SomeVariableName')
         self.assertTrue(has_it, "Variable did not get created")
         if has_it:
-            self.assertEqual(ds.SomeVariableName,
-                             42, "There, but wrong value")
+
+            self.assertEqual(
+                ds.SomeVariableName,
+                42,
+                "There, but wrong value")
+
 
     def testMembership(self):
         """Dataset: can test if item present by 'if <name> in dataset'..."""
         ds = self.dummy_dataset()
+
         self.assertTrue('TreatmentMachineName' in ds,
                         "membership test failed")
         self.assertTrue('Dummyname' not in ds,
                         "non-member tested as member")
 
+    
     def testContains(self):
         """Dataset: can test if item present by 'if <tag> in dataset'..."""
         ds = self.dummy_dataset()
@@ -172,39 +187,52 @@ class DatasetTests(unittest.TestCase):
         self.assertTrue(0x300a00b2 in ds, "membership test failed")
         self.assertTrue(not (0x10, 0x5f) in ds,
                         "non-member tested as member")
+
         self.assertTrue('CommandGroupLength' in ds)
 
     def testGetExists1(self):
         """Dataset: dataset.get() returns an existing item by name..."""
         ds = self.dummy_dataset()
         unit = ds.get('TreatmentMachineName', None)
-        message = "dataset.get() did not return existing member by name"
-        self.assertEqual(unit, 'unit001',
-                         message)
 
+        self.assertEqual(
+            unit,
+            'unit001',
+            "dataset.get() did not return existing member by name")
+
+        
     def testGetExists2(self):
         """Dataset: dataset.get() returns an existing item by long tag..."""
         ds = self.dummy_dataset()
         unit = ds.get(0x300A00B2, None).value
-        message = "dataset.get() did not return existing member by long tag"
-        self.assertEqual(unit, 'unit001',
-                         message)
+
+        self.assertEqual(
+            unit,
+            'unit001',
+            "dataset.get() did not return existing member by long tag")
+
 
     def testGetExists3(self):
         """Dataset: dataset.get() returns an existing item by tuple tag"""
         ds = self.dummy_dataset()
         unit = ds.get((0x300A, 0x00B2), None).value
-        message = "dataset.get() did not return existing member by tuple tag"
-        self.assertEqual(unit, 'unit001',
-                         message)
+
+        self.assertEqual(
+            unit,
+            'unit001',
+            "dataset.get() did not return existing member by tuple tag")
+
 
     def testGetExists4(self):
         """Dataset: dataset.get() returns an existing item by Tag..."""
         ds = self.dummy_dataset()
         unit = ds.get(Tag(0x300A00B2), None).value
-        message = "dataset.get() did not return existing member by tuple tag"
-        self.assertEqual(unit, 'unit001',
-                         message)
+
+        self.assertEqual(
+            unit,
+            'unit001',
+            "dataset.get() did not return existing member by tuple tag")
+
 
     def testGetDefault1(self):
         """Dataset: dataset.get() returns default for non-existing name"""
@@ -250,7 +278,8 @@ class DatasetTests(unittest.TestCase):
         by_get = ds.get(test_tag)
         by_item = ds[test_tag]
 
-        msg = ("Dataset.get() returned different objects for ds.get(tag) "
+        msg = ("Dataset.get() returned different "
+               "objects for ds.get(tag) "
                "and ds[tag]:\nBy get():%r\nBy ds[tag]:%r\n")
         self.assertEqual(by_get, by_item, msg % (by_get, by_item))
 
@@ -285,7 +314,10 @@ class DatasetTests(unittest.TestCase):
         ds.update({'PatientName': 'John', (0x10, 0x12): pat_data_element})
         self.assertEqual(ds[0x10, 0x10].value, 'John',
                          "named data_element not set")
-        self.assertEqual(ds[0x10, 0x12].value, 'Johnny', "set by tag failed")
+        self.assertEqual(
+            ds[0x10, 0x12].value,
+            'Johnny',
+            "set by tag failed")
 
     def testDir(self):
         """Dataset: dir() returns sorted list of named data_elements........"""
@@ -295,11 +327,17 @@ class DatasetTests(unittest.TestCase):
         ds.NonDicomVariable = "junk"
         ds.add_new((0x18, 0x1151), "IS", 150)  # X-ray Tube Current
         ds.add_new((0x1111, 0x123), "DS", "42.0")  # private - no name in dir()
-        expected = ['PatientID', 'PatientName', 'TreatmentMachineName',
+        expected = ['PatientID',
+                    'PatientName',
+                    'TreatmentMachineName',
                     'XRayTubeCurrent']
-        self.assertEqual(ds.dir(), expected,
-                         "dir() returned %s, expected %s"
-                         % (str(ds.dir()), str(expected)))
+
+        self.assertEqual(
+            ds.dir(),
+            expected,
+            "dir() returned %s, "
+            "expected %s" % (str(ds.dir()), str(expected)))
+
 
     def testDeleteDicomAttr(self):
         """Dataset: delete DICOM attribute by name.........................."""
@@ -389,8 +427,10 @@ class DatasetTests(unittest.TestCase):
         self.assertFalse(d == e)
 
     def testEqualityPrivate(self):
-        """Dataset: equality returns correct value
-           when dataset has private elements"""
+
+        """Dataset: equality returns correct value"""
+        """when dataset has private elements"""
+
         d = Dataset()
         d_elem = DataElement(0x01110001, 'PN', 'Private')
         self.assertTrue(d == d)
@@ -405,8 +445,10 @@ class DatasetTests(unittest.TestCase):
         self.assertFalse(d == e)
 
     def testEqualitySequence(self):
-        """Dataset: equality returns correct value
-           when dataset has sequences"""
+
+        """Dataset: equality returns correct value"""
+        """when dataset has sequences"""
+
         # Test even sequences
         d = Dataset()
         d.SOPInstanceUID = '1.2.3.4'
@@ -512,8 +554,10 @@ class DatasetTests(unittest.TestCase):
         self.assertEqual(dsp.test, 'ABCD')
 
     def test_add_repeater_elem_by_keyword(self):
-        """Repeater using keyword to add repeater
-           group elements raises ValueError."""
+
+        """Repeater using keyword to add repeater"""
+        """group elements raises ValueError."""
+
         ds = Dataset()
 
         def test():
@@ -618,13 +662,18 @@ class DatasetTests(unittest.TestCase):
         self.assertFalse(0x00090008 in test_ds)
 
         # Slice starting and ending (and not including) (0008,0018)
-        self.assertEqual(ds[(0x0008, 0x0018):(0x0008, 0x0018)], Dataset())
+        self.assertEqual(
+            ds[(0x0008, 0x0018):(0x0008, 0x0018)],
+            Dataset())
 
         # Test slicing using other acceptable Tag initialisations
-        self.assertTrue('SOPInstanceUID' in ds[(0x00080018):(0x00080019)])
-        instance_uid_range = ds[(0x0008, 0x0018):(0x0008, 0x0019)]
-        self.assertTrue('SOPInstanceUID' in instance_uid_range)
-        self.assertTrue('SOPInstanceUID' in ds['0x00080018':'0x00080019'])
+        self.assertTrue(
+            'SOPInstanceUID' in ds[(0x00080018):(0x00080019)])
+        self.assertTrue(
+            'SOPInstanceUID' in ds[(0x0008, 0x0018):(0x0008, 0x0019)])
+        self.assertTrue(
+            'SOPInstanceUID' in ds['0x00080018':'0x00080019'])
+
 
     def test_delitem_slice(self):
         """Test Dataset.__delitem__ using slices."""
@@ -722,8 +771,10 @@ class DatasetTests(unittest.TestCase):
         ds.add_new(0x00090001, 'PN', 'CITIZEN^1')
         ds.BeamSequence = [Dataset()]
         ds.BeamSequence[0].PatientName = 'ANON'
-        self.assertEqual(ds.data_element('CommandGroupLength'), ds[0x00000000])
-        self.assertEqual(ds.data_element('BeamSequence'), ds[0x300A00B0])
+        self.assertEqual(
+            ds.data_element('CommandGroupLength'), ds[0x00000000])
+        self.assertEqual(
+            ds.data_element('BeamSequence'), ds[0x300A00B0])
 
     def test_iterall(self):
         """Test Dataset.iterall"""
@@ -734,15 +785,17 @@ class DatasetTests(unittest.TestCase):
         ds.BeamSequence = [Dataset()]
         ds.BeamSequence[0].PatientName = 'ANON'
         elem_gen = ds.iterall()
-        self.assertEqual(ds.data_element('CommandGroupLength'),
-                         next(elem_gen))
-        self.assertEqual(ds.data_element('SkipFrameRangeFlag'),
-                         next(elem_gen))
+
+        self.assertEqual(
+            ds.data_element('CommandGroupLength'), next(elem_gen))
+        self.assertEqual(
+            ds.data_element('SkipFrameRangeFlag'), next(elem_gen))
         self.assertEqual(ds[0x00090001], next(elem_gen))
-        self.assertEqual(ds.data_element('BeamSequence'),
-                         next(elem_gen))
-        self.assertEqual(ds.BeamSequence[0].data_element('PatientName'),
-                         next(elem_gen))
+        self.assertEqual(
+            ds.data_element('BeamSequence'), next(elem_gen))
+        self.assertEqual(
+            ds.BeamSequence[0].data_element('PatientName'),
+            next(elem_gen))
 
     def test_save_as(self):
         """Test Dataset.save_as"""
@@ -750,15 +803,26 @@ class DatasetTests(unittest.TestCase):
         ds = Dataset()
         ds.PatientName = 'CITIZEN'
         # Raise AttributeError if is_implicit_VR or is_little_endian missing
-        self.assertRaises(AttributeError, ds.save_as, fp,
-                          write_like_original=False)
+
+        self.assertRaises(
+            AttributeError,
+            ds.save_as,
+            fp,
+            write_like_original=False)
         ds.is_implicit_VR = True
-        self.assertRaises(AttributeError, ds.save_as, fp,
-                          write_like_original=False)
+        self.assertRaises(
+            AttributeError,
+            ds.save_as,
+            fp,
+            write_like_original=False)
         ds.is_little_endian = True
         del ds.is_implicit_VR
-        self.assertRaises(AttributeError, ds.save_as, fp,
-                          write_like_original=False)
+        self.assertRaises(
+            AttributeError,
+            ds.save_as,
+            fp,
+            write_like_original=False)
+
         ds.is_implicit_VR = True
         ds.file_meta = Dataset()
         ds.file_meta.MediaStorageSOPClassUID = '1.1'
@@ -779,12 +843,14 @@ class DatasetElementsTests(unittest.TestCase):
         """Assignment to SQ works only if valid Sequence assigned......"""
         def try_non_Sequence():
             self.ds.ConceptCodeSequence = [1, 2, 3]
-        msg = "Assigning non-sequence to SQ data element did not raise error"
+        msg = ("Assigning non-sequence to "
+               "SQ data element did not raise error")
         self.assertRaises(TypeError, try_non_Sequence, msg=msg)
         # check also that assigning proper sequence *does* work
         self.ds.ConceptCodeSequence = [self.sub_ds1, self.sub_ds2]
-        self.assertTrue(isinstance(self.ds.ConceptCodeSequence, Sequence),
-                        "Sequence assignment did not result in Sequence type")
+        self.assertTrue(
+            isinstance(self.ds.ConceptCodeSequence, Sequence),
+            "Sequence assignment did not result in Sequence type")
 
 
 class FileDatasetTests(unittest.TestCase):

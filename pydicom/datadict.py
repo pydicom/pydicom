@@ -247,8 +247,8 @@ def get_private_entry(tag, private_creator):
         elem_str = "%04x" % tag.elem
         key = "%sxx%s" % (group_str, elem_str[-2:])
         if key not in private_dict:
-            msg = "Tag {0} not in private ".format(key)
-            msg += "dictionary for private creator {1}".format(private_creator)
+            msg = ("Tag {0} not in private dictionary "
+                   "for private creator {1}".format(key, private_creator))
             raise KeyError(msg)
         dict_entry = private_dict[key]
     return dict_entry
