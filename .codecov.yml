@@ -20,4 +20,4 @@ coverage:
         target: auto
         threshold: 1%
 ignore:
-  "pydicom/tests"
+  - "pydicom/tests"
