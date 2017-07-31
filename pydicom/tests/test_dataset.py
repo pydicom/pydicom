@@ -900,7 +900,7 @@ class DatasetTests(unittest.TestCase):
         # 'tag VR length value value_tell is_implicit_VR is_little_endian'
         elem = RawDataElement((0x0043, 0x1029), 'OB', 2, b'\x00\x01', 0,
                               True, True)
-        ds.__setitem__((0x0043 ,0x1029), elem)
+        ds.__setitem__((0x0043, 0x1029), elem)
 
         assert ds[(0x0043, 0x1029)].value == b'\x00\x01'
         assert type(ds[(0x0043, 0x1029)]) == DataElement
