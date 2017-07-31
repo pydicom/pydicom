@@ -16,6 +16,7 @@ import tempfile
 import unittest
 from pydicom.util.testing.warncheck import assertWarns
 from pydicom.dataset import Dataset, FileDataset
+from pydicom.data import DATA_ROOT
 from pydicom.dataelem import DataElement
 from pydicom.filereader import read_file
 from pydicom.errors import InvalidDicomError
@@ -61,17 +62,6 @@ except ImportError:
     except ImportError:
         # Neither worked, so it's likely not installed.
         PILImg = None
-
-
-from pydicom.data import DATA_ROOT
-from pydicom.dataset import Dataset, FileDataset
-from pydicom.dataelem import DataElement
-from pydicom.filereader import read_file
-from pydicom.errors import InvalidDicomError
-from pydicom.tag import Tag, TupleTag
-from pydicom.uid import ImplicitVRLittleEndian
-from pydicom.util.testing.warncheck import assertWarns
-import pydicom.valuerep
 
 have_numpy = numpy is not None
 have_jpeg_ls = jpeg_ls is not None
