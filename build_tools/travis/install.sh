@@ -26,17 +26,12 @@ if [[ "$DISTRIB" == "conda" ]]; then
     # conda-based environment instead
     deactivate
 
-    # Workaround for gdcm error?
-    mkdir noarch
-    echo '{}' > noarch/repodata.json
-    bzip2 -k noarch/repodata.json
-
-    # Install miniconda
-    wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh \
-        -O miniconda.sh
-    MINICONDA_PATH=/home/travis/miniconda
-    chmod +x miniconda.sh && ./miniconda.sh -b -p $MINICONDA_PATH
-    export PATH=$MINICONDA_PATH/bin:$PATH
+    # Install anaconda
+    wget https://repo.continuum.io/archive/Anaconda3-4.4.0-Linux-x86_64.sh \
+        -O anaconda.sh
+    ANACONDA_PATH=/home/travis/anaconda
+    chmod +x anaconda.sh && ./anaconda.sh -b -p $ANACONDA_PATH
+    export PATH=$ANACONDA_PATH/bin:$PATH
     conda update --yes conda
 
     # Configure the conda environment and put it in the path using the
