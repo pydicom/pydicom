@@ -90,20 +90,24 @@ elif [[ "$DISTRIB" == "pypy" ]]; then
     fi
     # add the binary to the path
     export PATH="$BIN_PATH:$PATH"
-    # install pip
-    python -m ensurepip
-    pip install -U pip wheel
+    
+    which python
+    which pip
 
-    # cache will cause permissions issues
-    chmod -R +x /opt/python/2.7.9/lib/python2.7/site-packages
+    # install pip
+    $BIN_PATH/python -m ensurepip
+    $BIN_PATH/pip install -U pip wheel
+
+    which python
+    which pip
 
     if [[ "$NUMPY" == "true" ]] && [[ "$PYTHON_VERSION" == "2.7" ]]; then
-        python -m pip install git+https://bitbucket.org/pypy/numpy.git
+        $BIN_PATH/python -m pip install git+https://bitbucket.org/pypy/numpy.git
     # numpypy does not work with pypy3 so fall back on numpy
     elif [[ "$NUMPY" == "true" ]]; then
-        python -m pip install cython numpy
+        $BIN_PATH/python -m pip install cython numpy
     fi
-    python -m pip install nose nose-timer pytest pytest-cov codecov python-dateutil
+    $BIN_PATH/python -m pip install nose nose-timer pytest pytest-cov codecov python-dateutil
 fi
 
 python --version
