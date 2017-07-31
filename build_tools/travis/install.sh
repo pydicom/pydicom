@@ -93,13 +93,17 @@ elif [[ "$DISTRIB" == "pypy" ]]; then
     # install pip
     python -m ensurepip
     pip install -U pip wheel
+
+    # cache will cause permissions issues
+    chmod -R +x /opt/python/2.7.9/lib/python2.7/site-packages
+
     if [[ "$NUMPY" == "true" ]] && [[ "$PYTHON_VERSION" == "2.7" ]]; then
         python -m pip install git+https://bitbucket.org/pypy/numpy.git
     # numpypy does not work with pypy3 so fall back on numpy
     elif [[ "$NUMPY" == "true" ]]; then
-        python -m pip install cython numpy --no-cache-dir
+        python -m pip install cython numpy
     fi
-    python -m pip install nose nose-timer pytest pytest-cov codecov python-dateutil --no-cache-dir
+    python -m pip install nose nose-timer pytest pytest-cov codecov python-dateutil
 fi
 
 python --version
