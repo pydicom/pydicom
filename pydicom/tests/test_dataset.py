@@ -179,7 +179,7 @@ class DatasetTests(unittest.TestCase):
         assert (0x10, 0x5f) not in ds
         assert 'CommandGroupLength' in ds
         # Use a negative tag to cause an exception
-        assert not (-0x0010,0x0010) in ds
+        assert not (-0x0010, 0x0010) in ds
 
     def testGetExists1(self):
         """Dataset: dataset.get() returns an existing item by name.........."""
@@ -254,8 +254,8 @@ class DatasetTests(unittest.TestCase):
         """Test Dataset.get() raises exception when invalid Tag"""
         ds = self.dummy_dataset()
         with pytest.raises(TypeError):
-            ds.get((-0x0010,0x0010))
-        
+            ds.get((-0x0010, 0x0010))
+
     def testGetFromRaw(self):
         """Dataset: get(tag) returns same object as ds[tag] for raw element."""
         # This came from issue 88, where get(tag#) returned a RawDataElement,
@@ -898,11 +898,12 @@ class DatasetTests(unittest.TestCase):
         test_file = os.path.join(test_dir, 'test_files', 'CT_small.dcm')
         ds = read_file(test_file, force=True)
         # 'tag VR length value value_tell is_implicit_VR is_little_endian'
-        elem = RawDataElement((0x0043,0x1029), 'OB', 2, b'\x00\x01', 0, True, True)
-        ds.__setitem__((0x0043,0x1029), elem)
+        elem = RawDataElement((0x0043, 0x1029), 'OB', 2, b'\x00\x01', 0,
+                              True, True)
+        ds.__setitem__((0x0043 ,0x1029), elem)
 
-        assert ds[(0x0043,0x1029)].value == b'\x00\x01'
-        assert type(ds[(0x0043,0x1029)]) == DataElement
+        assert ds[(0x0043, 0x1029)].value == b'\x00\x01'
+        assert type(ds[(0x0043, 0x1029)]) == DataElement
 
     def test_top(self):
         """Test Dataset.top returns only top level str"""
@@ -911,7 +912,7 @@ class DatasetTests(unittest.TestCase):
         ds.BeamSequence = [Dataset()]
         ds.BeamSequence[0].PatientID = 'JAN^Citizen'
         assert "Patient's Name" in ds.top()
-        assert not "Patient ID" in ds.top()
+        assert "Patient ID" not in ds.top()
 
     def test_trait_names(self):
         """Test Dataset.trait_names contains element keywords"""
@@ -999,6 +1000,7 @@ class FileDatasetTests(unittest.TestCase):
         ds.PatientName = "CITIZEN^Jan"
         fds = FileDataset(Dummy(), ds)
         assert fds.filename == '/some/path/to/test'
+
 
 if __name__ == "__main__":
     unittest.main()
