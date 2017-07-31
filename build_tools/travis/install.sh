@@ -88,18 +88,11 @@ elif [[ "$DISTRIB" == "pypy" ]]; then
     else
         ln -s "$BIN_PATH/pypy3" "$BIN_PATH/python"
     fi
+
     # add the binary to the path
     export PATH="$BIN_PATH:$PATH"
-    
-    which python
-    which pip
-
-    # install pip
-    $BIN_PATH/python -m ensurepip
-    $BIN_PATH/pip install -U pip wheel
-
-    which python
-    which pip
+    wget https://bootstrap.pypa.io/get-pip.py
+    python get-pip.py    
 
     if [[ "$NUMPY" == "true" ]] && [[ "$PYTHON_VERSION" == "2.7" ]]; then
         $BIN_PATH/python -m pip install git+https://bitbucket.org/pypy/numpy.git
