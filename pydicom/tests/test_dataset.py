@@ -843,8 +843,7 @@ class DatasetTests(unittest.TestCase):
         with DSException() as ds:
             with pytest.raises(ValueError) as ex:
                 ds.test
-
-            assert ex.value.message == 'Random ex message!'
+            assert str(ex.value) == 'Random ex message!'
 
     def test_is_uncompressed_transfer_syntax(self):
         """Test Dataset._is_uncompressed_transfer_syntax"""
