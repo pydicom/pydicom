@@ -26,12 +26,12 @@ if [[ "$DISTRIB" == "conda" ]]; then
     # conda-based environment instead
     deactivate
 
-    # Install anaconda
-    wget https://repo.continuum.io/archive/Anaconda3-4.4.0-Linux-x86_64.sh \
-        -O anaconda.sh
-    ANACONDA_PATH=/home/travis/anaconda
-    chmod +x anaconda.sh && ./anaconda.sh -b -p $ANACONDA_PATH
-    export PATH=$ANACONDA_PATH/bin:$PATH
+    # Install miniconda
+    wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh \
+        -O miniconda.sh
+    MINICONDA_PATH=/home/travis/miniconda
+    chmod +x miniconda.sh && ./miniconda.sh -b -p $MINICONDA_PATH
+    export PATH=$MINICONDA_PATH/bin:$PATH
     conda update --yes conda
 
     # Configure the conda environment and put it in the path using the
@@ -39,8 +39,6 @@ if [[ "$DISTRIB" == "conda" ]]; then
     conda create -n testenv --yes python=$PYTHON_VERSION pip
     source activate testenv
     conda install --yes nose pytest pytest-cov python-dateutil
-    conda config --add channels conda-forge
-
     if [[ "$NUMPY" == "true" ]]; then
         conda install --yes numpy
     fi
@@ -54,7 +52,7 @@ if [[ "$DISTRIB" == "conda" ]]; then
         conda install --yes pillow jpeg
     fi
     if [[ "$GDCM" == "true" ]]; then
-        conda install --yes gdcm
+        conda install --yes -c conda-forge gdcm
     fi
     # Install nose-timer via pip
     pip install nose-timer codecov
