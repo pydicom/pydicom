@@ -97,9 +97,9 @@ elif [[ "$DISTRIB" == "pypy" ]]; then
         python -m pip install git+https://bitbucket.org/pypy/numpy.git
     # numpypy does not work with pypy3 so fall back on numpy
     elif [[ "$NUMPY" == "true" ]]; then
-        python -m pip install cython numpy
+        python -m pip install cython numpy --no-cache-dir
     fi
-    python -m pip install nose nose-timer pytest pytest-cov codecov python-dateutil
+    python -m pip install nose nose-timer pytest pytest-cov codecov python-dateutil --no-cache-dir
 fi
 
 python --version
