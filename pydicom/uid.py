@@ -1,3 +1,4 @@
+# Copyright 2008-2017 pydicom authors. See LICENSE file for details.
 """Functions for handling DICOM unique identifiers (UIDs)"""
 
 import os

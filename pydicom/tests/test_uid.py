@@ -1,3 +1,4 @@
+# Copyright 2008-2017 pydicom authors. See LICENSE file for details.
 """Test suite for uid.py"""
 
 import pytest
