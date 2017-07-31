@@ -33,6 +33,7 @@ if [[ "$DISTRIB" == "conda" ]]; then
     chmod +x miniconda.sh && ./miniconda.sh -b -p $MINICONDA_PATH
     export PATH=$MINICONDA_PATH/bin:$PATH
     conda update --yes conda
+    conda config --show
 
     # Configure the conda environment and put it in the path using the
     # provided versions
@@ -52,7 +53,8 @@ if [[ "$DISTRIB" == "conda" ]]; then
         conda install --yes pillow jpeg
     fi
     if [[ "$GDCM" == "true" ]]; then
-        conda install --yes -c conda-forge gdcm
+        wget https://anaconda.org/conda-forge/gdcm/2.6.3/download/linux-64/gdcm-2.6.3-py35_0.tar.bz2
+        conda install --yes gdcm-2.6.3-py35_0.tar.bz2
     fi
     # Install nose-timer via pip
     pip install nose-timer codecov
