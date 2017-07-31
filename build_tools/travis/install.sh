@@ -44,6 +44,8 @@ if [[ "$DISTRIB" == "conda" ]]; then
     conda create -n testenv --yes python=$PYTHON_VERSION pip
     source activate testenv
     conda install --yes nose pytest pytest-cov python-dateutil
+    conda config --add channels conda-forge
+
     if [[ "$NUMPY" == "true" ]]; then
         conda install --yes numpy
     fi
@@ -57,7 +59,7 @@ if [[ "$DISTRIB" == "conda" ]]; then
         conda install --yes pillow jpeg
     fi
     if [[ "$GDCM" == "true" ]]; then
-        conda install --yes -c conda-forge gdcm
+        conda install --yes gdcm
     fi
     # Install nose-timer via pip
     pip install nose-timer codecov
