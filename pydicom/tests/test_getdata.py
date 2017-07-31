@@ -30,7 +30,7 @@ class TestGetData(unittest.TestCase):
         bases = [basename(x) for x in chardata]
         self.assertTrue('charlist.py' in bases)
 
-        # Test that subdirectory files included        
+        # Test that subdirectory files included
         testdata = get_testdata_files()
         bases = [basename(x) for x in testdata]
         self.assertTrue('2693' in bases)
