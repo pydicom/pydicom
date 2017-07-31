@@ -20,6 +20,13 @@ from pydicom.tag import Tag
 from pydicom.uid import ImplicitVRLittleEndian, JPEGBaseLineLossy8bit
 
 
+def assert_raises_regex(type_error, message, func, *args, **kwargs):
+    """Taken from https://github.com/glemaitre/specio, BSD 3 license."""
+    with pytest.raises(type_error) as excinfo:
+        func(*args, **kwargs)
+    excinfo.match(message)
+
+
 class DatasetTests(unittest.TestCase):
     def failUnlessRaises(self, excClass, callableObj, *args, **kwargs):
         """Redefine unittest Exception test to return the exception object"""
@@ -180,6 +187,8 @@ class DatasetTests(unittest.TestCase):
         assert 'CommandGroupLength' in ds
         # Use a negative tag to cause an exception
         assert not (-0x0010, 0x0010) in ds
+        # Random non-existent property
+        assert not 'random name' in ds
 
     def testGetExists1(self):
         """Dataset: dataset.get() returns an existing item by name.........."""
@@ -253,8 +262,9 @@ class DatasetTests(unittest.TestCase):
     def test_get_raises(self):
         """Test Dataset.get() raises exception when invalid Tag"""
         ds = self.dummy_dataset()
-        with pytest.raises(TypeError):
-            ds.get((-0x0010, 0x0010))
+        assert_raises_regex(TypeError,
+                            'Dataset.get key must be a string or tag',
+                            ds.get, (-0x0010, 0x0010))
 
     def testGetFromRaw(self):
         """Dataset: get(tag) returns same object as ds[tag] for raw element."""
@@ -840,10 +850,9 @@ class DatasetTests(unittest.TestCase):
             def test(self):
                 raise ValueError("Random ex message!")
 
-        with DSException() as ds:
-            with pytest.raises(ValueError) as ex:
-                ds.test
-            assert str(ex.value) == 'Random ex message!'
+        assert_raises_regex(ValueError,
+                            "Random ex message!",
+                            getattr, DSException(), 'test')
 
     def test_is_uncompressed_transfer_syntax(self):
         """Test Dataset._is_uncompressed_transfer_syntax"""
