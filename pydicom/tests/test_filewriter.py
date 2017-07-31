@@ -6,6 +6,7 @@ from datetime import date, datetime, time
 from io import BytesIO
 import os
 import os.path
+from struct import unpack
 import sys
 from tempfile import TemporaryFile
 
@@ -25,6 +26,7 @@ except AttributeError:
 
 import pytest
 
+from pydicom._storage_sopclass_uids import CTImageStorage
 from pydicom import config, __version__
 from pydicom.dataset import Dataset, FileDataset
 from pydicom.dataelem import DataElement
@@ -808,74 +810,75 @@ class ScratchWriteTests(unittest.TestCase):
         self.compare_write(impl_LE_deflen_std_hex, file_ds)
 
 
-class TestWriteToStandard(unittest.TestCase):
+class TestWriteToStandard(object):
     """Unit tests for writing datasets to the DICOM standard"""
-    def setUp(self):
-        """Create an empty file-like for use in testing."""
-        self.fp = BytesIO()
-
     def test_preamble_default(self):
         """Test that the default preamble is written correctly when present."""
+        fp = DicomBytesIO()
         ds = read_file(ct_name)
         ds.preamble = b'\x00' * 128
-        ds.save_as(self.fp, write_like_original=False)
-        self.fp.seek(0)
-        self.assertEqual(self.fp.read(128), b'\x00' * 128)
+        ds.save_as(fp, write_like_original=False)
+        fp.seek(0)
+        assert fp.read(128) == b'\x00' * 128
 
     def test_preamble_custom(self):
         """Test that a custom preamble is written correctly when present."""
+        fp = DicomBytesIO()
         ds = read_file(ct_name)
         ds.preamble = b'\x01\x02\x03\x04' + b'\x00' * 124
-        ds.save_as(self.fp, write_like_original=False)
-        self.fp.seek(0)
-        self.assertEqual(self.fp.read(128),
-                         b'\x01\x02\x03\x04' + b'\x00' * 124)
+        ds.save_as(fp, write_like_original=False)
+        fp.seek(0)
+        assert fp.read(128) == b'\x01\x02\x03\x04' + b'\x00' * 124
 
     def test_no_preamble(self):
         """Test that a default preamble is written when absent."""
+        fp = DicomBytesIO()
         ds = read_file(ct_name)
         del ds.preamble
-        ds.save_as(self.fp, write_like_original=False)
-        self.fp.seek(0)
-        self.assertEqual(self.fp.read(128), b'\x00' * 128)
+        ds.save_as(fp, write_like_original=False)
+        fp.seek(0)
+        assert fp.read(128) == b'\x00' * 128
 
     def test_none_preamble(self):
         """Test that a default preamble is written when None."""
+        fp = DicomBytesIO()
         ds = read_file(ct_name)
         ds.preamble = None
-        ds.save_as(self.fp, write_like_original=False)
-        self.fp.seek(0)
-        self.assertEqual(self.fp.read(128), b'\x00' * 128)
+        ds.save_as(fp, write_like_original=False)
+        fp.seek(0)
+        assert fp.read(128) == b'\x00' * 128
 
     def test_bad_preamble(self):
         """Test that ValueError is raised when preamble is bad."""
         ds = read_file(ct_name)
         ds.preamble = b'\x00' * 127
-        self.assertRaises(ValueError, ds.save_as, self.fp,
-                          write_like_original=False)
+        with pytest.raises(ValueError):
+            ds.save_as(DicomBytesIO(), write_like_original=False)
         ds.preamble = b'\x00' * 129
-        self.assertRaises(ValueError, ds.save_as, self.fp,
-                          write_like_original=False)
+        with pytest.raises(ValueError):
+            ds.save_as(DicomBytesIO(), write_like_original=False)
 
     def test_prefix(self):
         """Test that the 'DICM' prefix is written with preamble."""
         # Has preamble
+        fp = DicomBytesIO()
         ds = read_file(ct_name)
         ds.preamble = b'\x00' * 128
-        ds.save_as(self.fp, write_like_original=False)
-        self.fp.seek(128)
-        self.assertEqual(self.fp.read(4), b'DICM')
+        ds.save_as(fp, write_like_original=False)
+        fp.seek(128)
+        assert fp.read(4) == b'DICM'
 
     def test_prefix_none(self):
         """Test the 'DICM' prefix is written when preamble is None"""
+        fp = DicomBytesIO()
         ds = read_file(ct_name)
         ds.preamble = None
-        ds.save_as(self.fp, write_like_original=False)
-        self.fp.seek(128)
-        self.assertEqual(self.fp.read(4), b'DICM')
+        ds.save_as(fp, write_like_original=False)
+        fp.seek(128)
+        assert fp.read(4) == b'DICM'
 
     def test_ds_changed(self):
-        """Test writing the dataset changes it."""
+        """Test writing the dataset changes its file_meta."""
         ds = read_file(rtplan_name)
         ref_ds = read_file(rtplan_name)
         # Ensure no RawDataElements in ref_ds
@@ -883,9 +886,15 @@ class TestWriteToStandard(unittest.TestCase):
             pass
         for elem in ref_ds.iterall():
             pass
-        ds.save_as(self.fp, write_like_original=False)
-        self.assertTrue(ref_ds.file_meta == ds.file_meta)
-        self.assertTrue(ref_ds == ds)
+
+        for ref_elem, test_elem in zip(ref_ds.file_meta, ds.file_meta):
+            assert ref_elem == test_elem
+
+        ds.save_as(DicomBytesIO(), write_like_original=False)
+        assert ref_ds.file_meta != ds.file_meta
+        del ref_ds.file_meta
+        del ds.file_meta
+        assert ref_ds == ds
 
     def test_transfer_syntax_added(self):
         """Test TransferSyntaxUID is added/updated if possible."""
@@ -894,15 +903,14 @@ class TestWriteToStandard(unittest.TestCase):
         ds = read_file(rtplan_name)
         ds.is_implicit_VR = True
         ds.is_little_endian = True
-        ds.save_as(self.fp, write_like_original=False)
-        self.assertEqual(ds.file_meta.TransferSyntaxUID,
-                         ImplicitVRLittleEndian)
+        ds.save_as(DicomBytesIO(), write_like_original=False)
+        assert ds.file_meta.TransferSyntaxUID == ImplicitVRLittleEndian
 
         # Updated
         ds.is_implicit_VR = False
         ds.is_little_endian = False
-        ds.save_as(self.fp, write_like_original=False)
-        self.assertEqual(ds.file_meta.TransferSyntaxUID, ExplicitVRBigEndian)
+        ds.save_as(DicomBytesIO(), write_like_original=False)
+        assert ds.file_meta.TransferSyntaxUID == ExplicitVRBigEndian
 
     def test_transfer_syntax_not_added(self):
         """Test TransferSyntaxUID is not added if ExplVRLE."""
@@ -910,46 +918,58 @@ class TestWriteToStandard(unittest.TestCase):
         del ds.file_meta.TransferSyntaxUID
         ds.is_implicit_VR = False
         ds.is_little_endian = True
-        self.assertRaises(ValueError, ds.save_as, self.fp,
-                          write_like_original=False)
-        self.assertFalse('TransferSyntaxUID' in ds.file_meta)
+        with pytest.raises(ValueError):
+            ds.save_as(DicomBytesIO(), write_like_original=False)
+        assert 'TransferSyntaxUID' not in ds.file_meta
 
     def test_transfer_syntax_raises(self):
         """Test TransferSyntaxUID is raises NotImplementedError if ImplVRBE."""
         ds = read_file(rtplan_name)
         ds.is_implicit_VR = True
         ds.is_little_endian = False
-        self.assertRaises(NotImplementedError, ds.save_as, self.fp,
-                          write_like_original=False)
+        with pytest.raises(NotImplementedError):
+            ds.save_as(DicomBytesIO(), write_like_original=False)
+
+    def test_media_storage_sop_class_uid_added(self):
+        """Test MediatStorageSOPClassUID and InstanceUID are added."""
+        fp = DicomBytesIO()
+        ds = Dataset()
+        ds.is_little_endian = True
+        ds.is_implicit_VR = True
+        ds.SOPClassUID = CTImageStorage
+        ds.SOPInstanceUID = '1.2.3'
+        ds.save_as(fp, write_like_original=False)
+        assert ds.file_meta.MediaStorageSOPClassUID == CTImageStorage
+        assert ds.file_meta.MediaStorageSOPInstanceUID == '1.2.3'
 
     def test_write_no_file_meta(self):
         """Test writing a dataset with no file_meta"""
+        fp = DicomBytesIO()
+        version = 'PYDICOM ' + __version__
         ds = read_file(rtplan_name)
         transfer_syntax = ds.file_meta.TransferSyntaxUID
         ds.file_meta = Dataset()
-        ds.save_as(self.fp, write_like_original=False)
-        fp = BytesIO(self.fp.getvalue())  # Workaround to avoid #358
+        ds.save_as(fp, write_like_original=False)
+        fp = BytesIO(fp.getvalue())  # Workaround to avoid #358
         out = read_file(fp)
         assert out.file_meta.MediaStorageSOPClassUID == ds.SOPClassUID
         assert out.file_meta.MediaStorageSOPInstanceUID == ds.SOPInstanceUID
         assert (
             out.file_meta.ImplementationClassUID == PYDICOM_IMPLEMENTATION_UID)
-        assert (
-            out.file_meta.ImplementationVersionName == 'PYDICOM ' + __version__)
+        assert (out.file_meta.ImplementationVersionName == version)
         assert out.file_meta.TransferSyntaxUID == transfer_syntax
 
-        self.fp.seek(0)
+        fp = DicomBytesIO()
         del ds.file_meta
-        ds.save_as(self.fp, write_like_original=False)
-        fp = BytesIO(self.fp.getvalue())  # Workaround to avoid #358
+        ds.save_as(fp, write_like_original=False)
+        fp = BytesIO(fp.getvalue())  # Workaround to avoid #358
         out = read_file(fp)
         assert (out.file_meta.MediaStorageSOPClassUID == ds.SOPClassUID)
         assert (
             out.file_meta.MediaStorageSOPInstanceUID == ds.SOPInstanceUID)
         assert (
             out.file_meta.ImplementationClassUID == PYDICOM_IMPLEMENTATION_UID)
-        assert (
-            out.file_meta.ImplementationVersionName == 'PYDICOM ' + __version__)
+        assert (out.file_meta.ImplementationVersionName == version)
         assert out.file_meta.TransferSyntaxUID == transfer_syntax
 
     def test_raise_no_file_meta(self):
@@ -957,39 +977,52 @@ class TestWriteToStandard(unittest.TestCase):
         ds = read_file(rtplan_name)
         del ds.SOPInstanceUID
         ds.file_meta = Dataset()
-        self.assertRaises(ValueError, ds.save_as, self.fp,
-                          write_like_original=False)
+        with pytest.raises(ValueError):
+            ds.save_as(DicomBytesIO(), write_like_original=False)
         del ds.file_meta
-        self.assertRaises(ValueError, ds.save_as, self.fp,
-                          write_like_original=False)
+        with pytest.raises(ValueError):
+            ds.save_as(DicomBytesIO(), write_like_original=False)
+
+    def test_add_file_meta(self):
+        """Test that file_meta is added if it doesn't exist"""
+        fp = DicomBytesIO()
+        ds = Dataset()
+        ds.is_little_endian = True
+        ds.is_implicit_VR = True
+        ds.SOPClassUID = CTImageStorage
+        ds.SOPInstanceUID = '1.2.3'
+        ds.save_as(fp, write_like_original=False)
+        assert isinstance(ds.file_meta, Dataset)
 
     def test_standard(self):
         """Test preamble + file_meta + dataset written OK."""
+        fp = DicomBytesIO()
         ds = read_file(ct_name)
         preamble = ds.preamble[:]
-        ds.save_as(self.fp, write_like_original=False)
-        self.fp.seek(0)
-        self.assertEqual(self.fp.read(128), preamble)
-        self.assertEqual(self.fp.read(4), b'DICM')
+        ds.save_as(fp, write_like_original=False)
+        fp.seek(0)
+        assert fp.read(128) == preamble
+        assert fp.read(4) == b'DICM'
 
-        fp = BytesIO(self.fp.getvalue())  # Workaround to avoid #358
+        fp = BytesIO(fp.getvalue())  # Workaround to avoid #358
         ds_out = read_file(fp)
-        self.assertEqual(ds_out.preamble, preamble)
-        self.assertTrue('PatientID' in ds_out)
-        self.assertTrue('TransferSyntaxUID' in ds_out.file_meta)
+        assert ds_out.preamble == preamble
+        assert 'PatientID' in ds_out
+        assert 'TransferSyntaxUID' in ds_out.file_meta
 
     def test_commandset_no_written(self):
         """Test that Command Set elements aren't written."""
+        fp = DicomBytesIO()
         ds = read_file(ct_name)
         preamble = ds.preamble[:]
         ds.MessageID = 3
-        ds.save_as(self.fp, write_like_original=False)
-        self.fp.seek(0)
-        assert self.fp.read(128) == preamble
-        assert self.fp.read(4) == b'DICM'
+        ds.save_as(fp, write_like_original=False)
+        fp.seek(0)
+        assert fp.read(128) == preamble
+        assert fp.read(4) == b'DICM'
         assert 'MessageID' in ds
 
-        fp = BytesIO(self.fp.getvalue())  # Workaround to avoid #358
+        fp = BytesIO(fp.getvalue())  # Workaround to avoid #358
         ds_out = read_file(fp)
         assert ds_out.preamble == preamble
         assert 'PatientID' in ds_out
@@ -999,13 +1032,9 @@ class TestWriteToStandard(unittest.TestCase):
 
 class TestWriteFileMetaInfoToStandard(object):
     """Unit tests for writing File Meta Info to the DICOM standard."""
-    @classmethod
-    def setUp(self):
-        """Create an empty file-like for use in testing."""
-        self.fp = DicomBytesIO()
-
     def test_bad_elements(self):
         """Test that non-group 2 elements aren't written to the file meta."""
+        fp = DicomBytesIO()
         meta = Dataset()
         meta.PatientID = '12345678'
         meta.MediaStorageSOPClassUID = '1.1'
@@ -1013,53 +1042,65 @@ class TestWriteFileMetaInfoToStandard(object):
         meta.TransferSyntaxUID = '1.3'
         meta.ImplementationClassUID = '1.4'
         with pytest.raises(ValueError):
-            write_file_meta_info(self.fp, meta, enforce_standard=True)
+            write_file_meta_info(fp, meta, enforce_standard=True)
 
     def test_missing_elements(self):
         """Test that missing required elements raises ValueError."""
+        fp = DicomBytesIO()
         meta = Dataset()
         with pytest.raises(ValueError):
-            write_file_meta_info(self.fp, meta)
+            write_file_meta_info(fp, meta)
         meta.MediaStorageSOPClassUID = '1.1'
         with pytest.raises(ValueError):
-            write_file_meta_info(self.fp, meta)
+            write_file_meta_info(fp, meta)
         meta.MediaStorageSOPInstanceUID = '1.2'
         with pytest.raises(ValueError):
-            write_file_meta_info(self.fp, meta)
+            write_file_meta_info(fp, meta)
         meta.TransferSyntaxUID = '1.3'
-        write_file_meta_info(self.fp, meta, enforce_standard=True)
+        write_file_meta_info(fp, meta, enforce_standard=True)
 
     def test_group_length(self):
         """Test that the value for FileMetaInformationGroupLength is OK."""
+        fp = DicomBytesIO()
         meta = Dataset()
         meta.MediaStorageSOPClassUID = '1.1'
         meta.MediaStorageSOPInstanceUID = '1.2'
         meta.TransferSyntaxUID = '1.3'
-        meta.ImplementationClassUID = PYDICOM_IMPLEMENTATION_UID
-        meta.ImplementationVersionName = 'PYDICOM ' + __version__
+        write_file_meta_info(fp, meta, enforce_standard=True)
 
-        write_file_meta_info(self.fp, meta, enforce_standard=True)
+        class_length = len(PYDICOM_IMPLEMENTATION_UID)
+        if class_length % 2:
+            class_length += 1
+        version_length = len(meta.ImplementationVersionName)
+        # Padded to even length
+        if version_length % 2:
+            version_length += 1
 
-        length = 115 + len(__version__) - 12
-        # FIXME: convert length to bytes
-        # print(length)
-        # print('0x{0:02x}'.format(length#))
-        self.fp.seek(8)
-        assert self.fp.read(4) == b'\x6e\x00\x00\x00'
+        fp.seek(8)
+        test_length = unpack('<I', fp.read(4))[0]
+        assert test_length == 66 + class_length + version_length
 
     def test_group_length_updated(self):
         """Test that FileMetaInformationGroupLength gets updated if present."""
+        fp = DicomBytesIO()
         meta = Dataset()
         meta.FileMetaInformationGroupLength = 100  # Not actual length
         meta.MediaStorageSOPClassUID = '1.1'
         meta.MediaStorageSOPInstanceUID = '1.2'
         meta.TransferSyntaxUID = '1.3'
-        meta.ImplementationClassUID = '1.1'
-        write_file_meta_info(self.fp, meta, enforce_standard=True)
+        write_file_meta_info(fp, meta, enforce_standard=True)
 
-        # FIXME: needs dynamic length
-        self.fp.seek(8)
-        assert self.fp.read(4) == b'\x6e\x00\x00\x00'
+        class_length = len(PYDICOM_IMPLEMENTATION_UID)
+        if class_length % 2:
+            class_length += 1
+        version_length = len(meta.ImplementationVersionName)
+        # Padded to even length
+        if version_length % 2:
+            version_length += 1
+
+        fp.seek(8)
+        test_length = unpack('<I', fp.read(4))[0]
+        assert test_length == 66 + class_length + version_length
         # Check original file meta is unchanged/updated
         assert meta.FileMetaInformationGroupLength == 110
         assert meta.FileMetaInformationVersion == b'\x00\x01'
@@ -1072,43 +1113,84 @@ class TestWriteFileMetaInfoToStandard(object):
 
     def test_version(self):
         """Test that the value for FileMetaInformationVersion is OK."""
+        fp = DicomBytesIO()
         meta = Dataset()
         meta.MediaStorageSOPClassUID = '1.1'
         meta.MediaStorageSOPInstanceUID = '1.2'
         meta.TransferSyntaxUID = '1.3'
-        meta.ImplementationClassUID = '1.4'
-        write_file_meta_info(self.fp, meta, enforce_standard=True)
+        write_file_meta_info(fp, meta, enforce_standard=True)
 
-        self.fp.seek(12 + 12)
-        assert self.fp.read(2) == b'\x00\x01'
+        fp.seek(12 + 12)
+        assert fp.read(2) == b'\x00\x01'
+
+    def test_implementation_version_name_length(self):
+        """Test that the written Implementation Version Name length is OK"""
+        fp = DicomBytesIO()
+        meta = Dataset()
+        meta.MediaStorageSOPClassUID = '1.1'
+        meta.MediaStorageSOPInstanceUID = '1.2'
+        meta.TransferSyntaxUID = '1.3'
+        write_file_meta_info(fp, meta, enforce_standard=True)
+        version_length = len(meta.ImplementationVersionName)
+        # Padded to even length
+        if not version_length % 2:
+            version_length += 1
+        # VR of SH, 16 bytes max
+        assert version_length <= 16
+
+    def test_implementation_class_uid_length(self):
+        """Test that the written Implementation Class UID length is OK"""
+        fp = DicomBytesIO()
+        meta = Dataset()
+        meta.MediaStorageSOPClassUID = '1.1'
+        meta.MediaStorageSOPInstanceUID = '1.2'
+        meta.TransferSyntaxUID = '1.3'
+        write_file_meta_info(fp, meta, enforce_standard=True)
+        class_length = len(meta.ImplementationClassUID)
+        # Padded to even length
+        if not class_length % 2:
+            class_length += 1
+        # VR of UI, 64 bytes max
+        assert class_length <= 64
 
     def test_filelike_position(self):
         """Test that the file-like's ending position is OK."""
+        fp = DicomBytesIO()
+        meta = Dataset()
+        meta.MediaStorageSOPClassUID = '1.1'
+        meta.MediaStorageSOPInstanceUID = '1.2'
+        meta.TransferSyntaxUID = '1.3'
+        write_file_meta_info(fp, meta, enforce_standard=True)
+
         # 8 + 4 bytes FileMetaInformationGroupLength
         # 12 + 2 bytes FileMetaInformationVersion
         # 8 + 4 bytes MediaStorageSOPClassUID
         # 8 + 4 bytes MediaStorageSOPInstanceUID
         # 8 + 4 bytes TransferSyntaxUID
-        # 8 + 4 bytes ImplementationClassUID
-        # 74 bytes total
-        meta = Dataset()
-        meta.MediaStorageSOPClassUID = '1.1'
-        meta.MediaStorageSOPInstanceUID = '1.2'
-        meta.TransferSyntaxUID = '1.3'
-        write_file_meta_info(self.fp, meta, enforce_standard=True)
-        assert self.fp.tell() == 122
+        # 8 + XX bytes ImplementationClassUID
+        # 8 + YY bytes ImplementationVersionName
+        # 78 + XX + YY bytes total
+        class_length = len(PYDICOM_IMPLEMENTATION_UID)
+        if class_length % 2:
+            class_length += 1
+        version_length = len(meta.ImplementationVersionName)
+        # Padded to even length
+        if version_length % 2:
+            version_length += 1
 
-        # 8 + 6 bytes ImplementationClassUID
-        # 76 bytes total, group length 64
-        self.fp.seek(0)
+        assert fp.tell() == 78 + class_length + version_length
+
+        fp = DicomBytesIO()
+        # 8 + 6 bytes MediaStorageSOPInstanceUID
         meta.MediaStorageSOPInstanceUID = '1.4.1'
-        write_file_meta_info(self.fp, meta, enforce_standard=True)
+        write_file_meta_info(fp, meta, enforce_standard=True)
         # Check File Meta length
-        assert self.fp.tell() == 124
-        # Check Group Length
-        # FIXME: make dyntamic
-        self.fp.seek(8)
-        assert self.fp.read(4) == b'\x70\x00\x00\x00'
+        assert fp.tell() == 80 + class_length + version_length
+
+        # Check Group Length - 68 + XX + YY as bytes
+        fp.seek(8)
+        test_length = unpack('<I', fp.read(4))[0]
+        assert test_length == 68 + class_length + version_length
 
 
 class TestWriteNonStandard(unittest.TestCase):

@@ -754,7 +754,8 @@ def write_file(filename, dataset, write_like_original=True):
     #   `write_like_original` is True we treat it as optional
     file_meta = getattr(dataset, 'file_meta', None)
     if not file_meta and not write_like_original:
-        file_meta = Dataset()
+        dataset.file_meta = Dataset()
+        file_meta = dataset.file_meta
 
     # If enforcing the standard, correct the TransferSyntaxUID where possible,
     #   noting that the transfer syntax for is_implicit_VR = False and
