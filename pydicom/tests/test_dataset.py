@@ -186,9 +186,9 @@ class DatasetTests(unittest.TestCase):
         assert (0x10, 0x5f) not in ds
         assert 'CommandGroupLength' in ds
         # Use a negative tag to cause an exception
-        assert not (-0x0010, 0x0010) in ds
+        assert (-0x0010, 0x0010) not in ds
         # Random non-existent property
-        assert not 'random name' in ds
+        assert 'random name' not in ds
 
     def testGetExists1(self):
         """Dataset: dataset.get() returns an existing item by name.........."""
