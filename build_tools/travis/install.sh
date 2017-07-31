@@ -38,13 +38,20 @@ if [[ "$DISTRIB" == "conda" ]]; then
     # provided versions
     conda create -n testenv --yes python=$PYTHON_VERSION pip
     source activate testenv
-    conda install --yes nose pytest pytest-cov
+    conda install --yes nose pytest pytest-cov python-dateutil
     if [[ "$NUMPY" == "true" ]]; then
         conda install --yes numpy
     fi
-    if [[ "$DEPS" == "pillow" ]]; then
+    if [[ "$JPEG2000" == "true" ]]; then
+        echo cant apt-get install libopenjp2-7 libopenjp2-7-dev
+    fi
+    if [[ "$JPEG_LS" == "true" ]]; then
+        echo cant do python -m pip install CharPyLS
+    fi
+    if [[ "$PILLOW" == "true" ]]; then
         conda install --yes pillow jpeg
-    elif [[ "$DEPS" == "gdcm" ]]; then
+    fi
+    if [[ "$GDCM" == "true" ]]; then
         conda install --yes -c conda-forge gdcm
     fi
     # Install nose-timer via pip
@@ -58,7 +65,7 @@ elif [[ "$DISTRIB" == "ubuntu" ]]; then
     # Create a new virtualenv using system site packages for python, numpy
     virtualenv --system-site-packages testvenv
     source testvenv/bin/activate
-    pip install nose nose-timer pytest pytest-cov codecov
+    pip install nose nose-timer pytest pytest-cov codecov python-dateutil
 
 elif [[ "$DISTRIB" == "pypy" ]]; then
     # This is to see if we are supporting pypy. With pypy3, numpypy is not
@@ -90,7 +97,7 @@ elif [[ "$DISTRIB" == "pypy" ]]; then
     elif [[ "$NUMPY" == "true" ]]; then
         python -m pip install cython numpy
     fi
-    python -m pip install nose nose-timer pytest pytest-cov codecov
+    python -m pip install nose nose-timer pytest pytest-cov codecov python-dateutil
 fi
 
 python --version
