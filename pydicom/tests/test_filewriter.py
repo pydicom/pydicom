@@ -11,19 +11,6 @@ import sys
 from tempfile import TemporaryFile
 import unittest
 
-have_dateutil = True
-try:
-    from dateutil.tz import tzoffset
-except ImportError:
-    have_dateutil = False
-try:
-    unittest.TestCase.assertSequenceEqual
-except AttributeError:
-    try:
-        import unittest2 as unittest
-    except ImportError:
-        print("unittest2 is required for testing in python2.6")
-
 import pytest
 
 from pydicom._storage_sopclass_uids import CTImageStorage
@@ -40,6 +27,13 @@ from pydicom.uid import (ImplicitVRLittleEndian, ExplicitVRBigEndian,
                          PYDICOM_IMPLEMENTATION_UID)
 from pydicom.util.hexutil import hex2bytes, bytes2hex
 from pydicom.valuerep import DA, DT, TM
+
+have_dateutil = True
+try:
+    from dateutil.tz import tzoffset
+except ImportError:
+    have_dateutil = False
+
 
 test_dir = os.path.dirname(__file__)
 test_files = os.path.join(test_dir, 'test_files')
@@ -640,7 +634,7 @@ class TestCorrectAmbiguousVR(unittest.TestCase):
 
         # If LUTDescriptor[0] is 1 then LUTData VR is 'US'
         ref_ds.LUTDescriptor = b'\x01\x00\x00\x01\x10\x00'  # 1\256\16
-        ref_ds.LUTData = b'\x00\x01' # Little endian 256
+        ref_ds.LUTData = b'\x00\x01'  # Little endian 256
         ds = correct_ambiguous_vr(deepcopy(ref_ds), True)  # Little endian
         self.assertEqual(ds.LUTDescriptor[0], 1)
         self.assertEqual(ds[0x00283002].VR, 'US')
