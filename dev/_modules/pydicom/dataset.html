@@ -171,7 +171,8 @@
            <div itemprop="articleBody">
             
   <h1>Source code for pydicom.dataset</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Define the Dataset and FileDataset classes.</span>
+<span></span><span class="c1"># Copyright 2008-2017 pydicom authors. See LICENSE file for details.</span>
+<span class="sd">&quot;&quot;&quot;Define the Dataset and FileDataset classes.</span>
 
 <span class="sd">The Dataset class represents the DICOM Dataset while the FileDataset class</span>
 <span class="sd">adds extra functionality to Dataset when data is read from or written to file.</span>
@@ -186,12 +187,6 @@
 <span class="sd">        * A Sequence (list subclass), where each item is a Dataset which</span>
 <span class="sd">            contains its own DataElements, and so on in a recursive manner.</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="c1">#</span>
-<span class="c1"># Copyright (c) 2008-2013 Darcy Mason</span>
-<span class="c1"># This file is part of pydicom, released under a modified MIT license.</span>
-<span class="c1">#    See the file license.txt included with this distribution, also</span>
-<span class="c1">#    available at https://github.com/darcymason/pydicom</span>
-<span class="c1">#</span>
 
 <span class="kn">import</span> <span class="nn">inspect</span>  <span class="c1"># for __dir__</span>
 <span class="kn">import</span> <span class="nn">io</span>
@@ -206,7 +201,7 @@
                               <span class="n">repeater_has_keyword</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">pydicom.tag</span> <span class="k">import</span> <span class="n">Tag</span><span class="p">,</span> <span class="n">BaseTag</span>
 <span class="kn">from</span> <span class="nn">pydicom.dataelem</span> <span class="k">import</span> <span class="n">DataElement</span><span class="p">,</span> <span class="n">DataElement_from_raw</span><span class="p">,</span> <span class="n">RawDataElement</span>
-<span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="k">import</span> <span class="n">NotCompressedPixelTransferSyntaxes</span>
+<span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="k">import</span> <span class="n">UncompressedPixelTransferSyntaxes</span>
 <span class="kn">from</span> <span class="nn">pydicom.tagtools</span> <span class="k">import</span> <span class="n">tag_in_exception</span>
 <span class="kn">import</span> <span class="nn">pydicom</span>  <span class="c1"># for write_file</span>
 <span class="kn">import</span> <span class="nn">pydicom.charset</span>
@@ -805,7 +800,7 @@
         <span class="sd">&quot;&quot;&quot;Return True if the TransferSyntaxUID is a compressed syntax.&quot;&quot;&quot;</span>
         <span class="c1"># FIXME uses file_meta here, should really only be thus for FileDataset</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span> <span class="ow">in</span> <span class="p">(</span>
-            <span class="n">NotCompressedPixelTransferSyntaxes</span><span class="p">)</span>
+            <span class="n">UncompressedPixelTransferSyntaxes</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Compare `self` and `other` for inequality.&quot;&quot;&quot;</span>
