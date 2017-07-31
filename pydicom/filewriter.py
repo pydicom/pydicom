@@ -11,9 +11,7 @@ from pydicom.dataset import Dataset
 from pydicom.filebase import DicomFile, DicomFileLike
 from pydicom.tag import Tag, ItemTag, ItemDelimiterTag, SequenceDelimiterTag
 from pydicom.tagtools import tag_in_exception
-#from pydicom.uid import (PYDICOM_IMPLEMENTATION_UID, ImplicitVRLittleEndian,
-#                         ExplicitVRBigEndian)
-from pydicom.uid import (ImplicitVRLittleEndian,
+from pydicom.uid import (PYDICOM_IMPLEMENTATION_UID, ImplicitVRLittleEndian,
                          ExplicitVRBigEndian)
 from pydicom.valuerep import extra_length_VRs
 from pydicom.values import convert_numbers
@@ -534,6 +532,8 @@ def write_file_meta_info(fp, file_meta, enforce_standard=True):
         * (0002,0100) PrivateInformationCreatorUID, UI, N
         * (0002,0102) PrivateInformation, OB, N
 
+    If `enforce_standard` is True then (0002,0013) will be added/updated.
+
     Encoding
     ~~~~~~~~
     The encoding of the File Meta Information shall be Explicit VR Little
@@ -555,7 +555,7 @@ def write_file_meta_info(fp, file_meta, enforce_standard=True):
     ValueError
         If `enforce_standard` is True and any of the required File Meta
         Information elements are missing from `file_meta`, with the
-        exception of (0002,0000) and (0002,0001).
+        exception of (0002,0000), (0002,0001) and (0002,0012).
     ValueError
         If any non-Group 2 Elements are present in `file_meta`.
     """
@@ -576,8 +576,7 @@ def write_file_meta_info(fp, file_meta, enforce_standard=True):
         if 'FileMetaInformationVersion' not in file_meta:
             file_meta.FileMetaInformationVersion = b'\x00\x01'
 
-        #file_meta.ImplementationClassUID = PYDICOM_IMPLEMENTATION_UID
-        file_meta.ImplementationClassUID = '1.2.826.0.1.3680043.8.498.1'
+        file_meta.ImplementationClassUID = PYDICOM_IMPLEMENTATION_UID
         file_meta.ImplementationVersionName = 'PYDICOM ' + __version__
 
         # Check that required File Meta Elements are present
