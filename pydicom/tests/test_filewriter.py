@@ -9,13 +9,13 @@ import os.path
 from struct import unpack
 import sys
 from tempfile import TemporaryFile
+import unittest
 
 have_dateutil = True
 try:
     from dateutil.tz import tzoffset
 except ImportError:
     have_dateutil = False
-import unittest
 try:
     unittest.TestCase.assertSequenceEqual
 except AttributeError:
@@ -300,8 +300,10 @@ class WriteDataElementTests(unittest.TestCase):
         # VR (OD): \x4f\x44
         # Reserved: \x00\x00
         # Length (16): \x10\x00\x00\x00
-        #             | Tag          | VR    | Rsrvd |   Length      |    Value ->
-        ref_bytes = b'\x70\x00\x0d\x15\x4f\x44\x00\x00\x10\x00\x00\x00' + bytestring
+        #             | Tag          | VR    |
+        ref_bytes = b'\x70\x00\x0d\x15\x4f\x44' \
+                    b'\x00\x00\x10\x00\x00\x00' + bytestring
+        #             |Rsrvd |   Length      |    Value ->
         self.assertEqual(encoded_elem, ref_bytes)
 
         # Empty data
@@ -344,8 +346,10 @@ class WriteDataElementTests(unittest.TestCase):
         # VR (OL): \x4f\x4c
         # Reserved: \x00\x00
         # Length (12): 0c 00 00 00
-        #             | Tag          | VR    | Rsrvd |   Length      |    Value ->
-        ref_bytes = b'\x66\x00\x29\x01\x4f\x4c\x00\x00\x0c\x00\x00\x00' + bytestring
+        #             | Tag          | VR    |
+        ref_bytes = b'\x66\x00\x29\x01\x4f\x4c' \
+                    b'\x00\x00\x0c\x00\x00\x00' + bytestring
+        #             |Rsrvd |   Length      |    Value ->
         self.assertEqual(encoded_elem, ref_bytes)
 
         # Empty data
@@ -692,13 +696,15 @@ class TestCorrectAmbiguousVR(unittest.TestCase):
         ref_ds.BeamSequence[0].SmallestValidPixelValue = b'\x00\x01'
         ref_ds.BeamSequence[0].BeamSequence = [Dataset()]
         ref_ds.BeamSequence[0].BeamSequence[0].PixelRepresentation = 0
-        ref_ds.BeamSequence[0].BeamSequence[0].SmallestValidPixelValue = b'\x00\x01'
+        ref_ds.BeamSequence[0].BeamSequence[0].SmallestValidPixelValue = \
+            b'\x00\x01'
 
         ds = correct_ambiguous_vr(deepcopy(ref_ds), True)
-        self.assertEqual(ds.BeamSequence[0].SmallestValidPixelValue, 256)
-        self.assertEqual(ds.BeamSequence[0][0x00280104].VR, 'US')
-        self.assertEqual(ds.BeamSequence[0].BeamSequence[0].SmallestValidPixelValue, 256)
-        self.assertEqual(ds.BeamSequence[0].BeamSequence[0][0x00280104].VR, 'US')
+        assert ds.BeamSequence[0].SmallestValidPixelValue == 256
+        assert ds.BeamSequence[0][0x00280104].VR == 'US'
+        assert (
+            ds.BeamSequence[0].BeamSequence[0].SmallestValidPixelValue == 256)
+        assert ds.BeamSequence[0].BeamSequence[0][0x00280104].VR == 'US'
 
 
 class WriteAmbiguousVRTests(unittest.TestCase):
