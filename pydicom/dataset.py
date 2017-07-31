@@ -152,6 +152,7 @@ class Dataset(dict):
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         """Method invoked on exit from a with statement."""
+        # Returning False will re-raise any exceptions that occur
         return False
 
     def add(self, data_element):
@@ -629,7 +630,7 @@ class Dataset(dict):
             yield self[tag]
 
     def _is_uncompressed_transfer_syntax(self):
-        """Return True if the TransferSyntaxUID is a compressed syntax."""
+        """Return True if the TransferSyntaxUID is not a compressed syntax."""
         # FIXME uses file_meta here, should really only be thus for FileDataset
         return self.file_meta.TransferSyntaxUID in (
             NotCompressedPixelTransferSyntaxes)
@@ -685,6 +686,7 @@ class Dataset(dict):
             already_have = False
         elif self._pixel_id != id(self.PixelData):
             already_have = False
+
         if not already_have:
             last_exception = None
             successfully_read_pixel_data = False
