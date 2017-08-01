@@ -1,4 +1,4 @@
-dist: precise
+dist: trusty
 sudo: false
 
 language: python
