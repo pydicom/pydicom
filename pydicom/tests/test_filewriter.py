@@ -1133,7 +1133,7 @@ class TestWriteFileMetaInfoToStandard(object):
         write_file_meta_info(fp, meta, enforce_standard=True)
         version_length = len(meta.ImplementationVersionName)
         # Padded to even length
-        if not version_length % 2:
+        if version_length % 2:
             version_length += 1
         # VR of SH, 16 bytes max
         assert version_length <= 16
@@ -1148,7 +1148,7 @@ class TestWriteFileMetaInfoToStandard(object):
         write_file_meta_info(fp, meta, enforce_standard=True)
         class_length = len(meta.ImplementationClassUID)
         # Padded to even length
-        if not class_length % 2:
+        if class_length % 2:
             class_length += 1
         # VR of UI, 64 bytes max
         assert class_length <= 64
