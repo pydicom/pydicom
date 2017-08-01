@@ -521,7 +521,7 @@ def write_file_meta_info(fp, file_meta, enforce_standard=True):
 
     If `enforce_standard` is True then (0002,0000) will be added/updated,
     (0002,0001) and (0002,0012) will be added if not already present and the
-    other required elements will checked to see if they exist. If
+    other required elements will be checked to see if they exist. If
     `enforce_standard` is False then `file_meta` will be written as is after
     minimal validation checking.
 

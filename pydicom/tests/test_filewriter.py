@@ -931,7 +931,7 @@ class TestWriteToStandard(object):
             ds.save_as(DicomBytesIO(), write_like_original=False)
 
     def test_media_storage_sop_class_uid_added(self):
-        """Test MediatStorageSOPClassUID and InstanceUID are added."""
+        """Test MediaStorageSOPClassUID and InstanceUID are added."""
         fp = DicomBytesIO()
         ds = Dataset()
         ds.is_little_endian = True
@@ -1132,9 +1132,6 @@ class TestWriteFileMetaInfoToStandard(object):
         meta.TransferSyntaxUID = '1.3'
         write_file_meta_info(fp, meta, enforce_standard=True)
         version_length = len(meta.ImplementationVersionName)
-        # Padded to even length
-        if version_length % 2:
-            version_length += 1
         # VR of SH, 16 bytes max
         assert version_length <= 16
 
@@ -1147,9 +1144,6 @@ class TestWriteFileMetaInfoToStandard(object):
         meta.TransferSyntaxUID = '1.3'
         write_file_meta_info(fp, meta, enforce_standard=True)
         class_length = len(meta.ImplementationClassUID)
-        # Padded to even length
-        if class_length % 2:
-            class_length += 1
         # VR of UI, 64 bytes max
         assert class_length <= 64
 
