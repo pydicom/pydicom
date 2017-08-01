@@ -736,7 +736,6 @@ class TestCorrectAmbiguousVR(unittest.TestCase):
         assert ds.BeamSequence[0].BeamSequence[0][0x00280104].VR == 'US'
 
 
-
 class WriteAmbiguousVRTests(unittest.TestCase):
     """Attempt to write data elements with ambiguous VR."""
     def setUp(self):
@@ -843,8 +842,6 @@ class ScratchWriteTests(unittest.TestCase):
     def testImpl_LE_deflen_write(self):
         """Scratch Write for implicit VR little endian, defined length SQs"""
         from pydicom.util.testing._write_stds import impl_LE_deflen_std_hex
-
-
         file_ds = FileDataset("test", self.ds)
         self.compare_write(impl_LE_deflen_std_hex, file_ds)
 
@@ -942,7 +939,6 @@ class TestWriteToStandard(unittest.TestCase):
         ds.save_as(self.fp, write_like_original=False)
 
         assert ds.file_meta.TransferSyntaxUID == ImplicitVRLittleEndian
-
 
         # Updated
         ds.is_implicit_VR = False
