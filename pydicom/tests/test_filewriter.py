@@ -894,8 +894,6 @@ class TestWriteToStandard(unittest.TestCase):
         """Test that ValueError is raised when preamble is bad."""
         ds = read_file(ct_name)
         ds.preamble = b'\x00' * 127
-                self.fp, write_like_original=False)
-
         with pytest.raises(ValueError):
             ds.save_as(self.fp, write_like_original=False)
         ds.preamble = b'\x00' * 129
