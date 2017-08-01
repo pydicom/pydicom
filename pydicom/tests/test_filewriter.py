@@ -637,7 +637,7 @@ class TestCorrectAmbiguousVR(unittest.TestCase):
 
         # If LUTDescriptor[0] is 1 then LUTData VR is 'US'
         ref_ds.LUTDescriptor = b'\x01\x00\x00\x01\x10\x00'  # 1\256\16
-        ref_ds.LUTData = b'\x00\x01' # Little endian 256
+        ref_ds.LUTData = b'\x00\x01'  # Little endian 256
         ds = correct_ambiguous_vr(deepcopy(ref_ds), True)  # Little endian
         self.assertEqual(ds.LUTDescriptor[0], 1)
         self.assertEqual(ds[0x00283002].VR, 'US')
@@ -833,7 +833,7 @@ class TestWriteToStandard(unittest.TestCase):
         ds.preamble = b'\x01\x02\x03\x04' + b'\x00' * 124
         ds.save_as(self.fp, write_like_original=False)
         self.fp.seek(0)
-        self.assertEqual(self.fp.read(128), b'\x01\x02\x03\x04' + b'\x00' * 124)
+        assert self.fp.read(128) == b'\x01\x02\x03\x04' + b'\x00' * 124
 
     def test_no_preamble(self):
         """Test that a default preamble is written when absent."""
@@ -855,9 +855,11 @@ class TestWriteToStandard(unittest.TestCase):
         """Test that ValueError is raised when preamble is bad."""
         ds = read_file(ct_name)
         ds.preamble = b'\x00' * 127
-        self.assertRaises(ValueError, ds.save_as, self.fp, write_like_original=False)
+        with pytest.raises(ValueError):
+            ds.save_as(self.fp, write_like_original=False)
         ds.preamble = b'\x00' * 129
-        self.assertRaises(ValueError, ds.save_as, self.fp, write_like_original=False)
+        with pytest.raises(ValueError):
+            ds.save_as(self.fp, write_like_original=False)
 
     def test_prefix(self):
         """Test that the 'DICM' prefix is written with preamble."""
@@ -881,8 +883,10 @@ class TestWriteToStandard(unittest.TestCase):
         ds = read_file(rtplan_name)
         ref_ds = read_file(rtplan_name)
         # Ensure no RawDataElements in ref_ds
-        for elem in ref_ds.file_meta: pass
-        for elem in ref_ds.iterall(): pass
+        for elem in ref_ds.file_meta:
+            pass
+        for elem in ref_ds.iterall():
+            pass
         ds.save_as(self.fp, write_like_original=False)
         self.assertTrue(ref_ds.file_meta == ds.file_meta)
         self.assertTrue(ref_ds == ds)
@@ -895,13 +899,13 @@ class TestWriteToStandard(unittest.TestCase):
         ds.is_implicit_VR = True
         ds.is_little_endian = True
         ds.save_as(self.fp, write_like_original=False)
-        self.assertEqual(ds.file_meta.TransferSyntaxUID, ImplicitVRLittleEndian)
+        assert ds.file_meta.TransferSyntaxUID == ImplicitVRLittleEndian
 
         # Updated
         ds.is_implicit_VR = False
         ds.is_little_endian = False
         ds.save_as(self.fp, write_like_original=False)
-        self.assertEqual(ds.file_meta.TransferSyntaxUID, ExplicitVRBigEndian)
+        assert ds.file_meta.TransferSyntaxUID == ExplicitVRBigEndian
 
     def test_transfer_syntax_not_added(self):
         """Test TransferSyntaxUID is not added if ExplVRLE."""
@@ -909,7 +913,8 @@ class TestWriteToStandard(unittest.TestCase):
         del ds.file_meta.TransferSyntaxUID
         ds.is_implicit_VR = False
         ds.is_little_endian = True
-        self.assertRaises(ValueError, ds.save_as, self.fp, write_like_original=False)
+        with pytest.raises(ValueError):
+            ds.save_as(self.fp, write_like_original=False)
         self.assertFalse('TransferSyntaxUID' in ds.file_meta)
 
     def test_transfer_syntax_raises(self):
@@ -917,15 +922,19 @@ class TestWriteToStandard(unittest.TestCase):
         ds = read_file(rtplan_name)
         ds.is_implicit_VR = True
         ds.is_little_endian = False
-        self.assertRaises(NotImplementedError, ds.save_as, self.fp, write_like_original=False)
+        with pytest.raises(NotImplementedError):
+            ds.save_as(self.fp, write_like_original=False)
 
     def test_raise_no_file_meta(self):
-        """Test exception is raised if trying to write a dataset with no file_meta"""
+        """Test exception is raised if trying to write with no file_meta."""
         ds = read_file(rtplan_name)
         ds.file_meta = Dataset()
-        self.assertRaises(ValueError, ds.save_as, self.fp, write_like_original=False)
+        
+        with pytest.raises(ValueError):
+            ds.save_as(self.fp, write_like_original=False)
         del ds.file_meta
-        self.assertRaises(ValueError, ds.save_as, self.fp, write_like_original=False)
+        with pytest.raises(ValueError):
+            ds.save_as(self.fp, write_like_original=False)
 
     def test_standard(self):
         """Test preamble + file_meta + dataset written OK."""
@@ -936,14 +945,14 @@ class TestWriteToStandard(unittest.TestCase):
         self.assertEqual(self.fp.read(128), preamble)
         self.assertEqual(self.fp.read(4), b'DICM')
 
-        fp = BytesIO(self.fp.getvalue()) # Workaround to avoid #358
+        fp = BytesIO(self.fp.getvalue())  # Workaround to avoid #358
         ds_out = read_file(fp)
         self.assertEqual(ds_out.preamble, preamble)
         self.assertTrue('PatientID' in ds_out)
         self.assertTrue('TransferSyntaxUID' in ds_out.file_meta)
 
     def test_commandset_no_written(self):
-        """Test that Command Set elements are not written when writing to standard"""
+        """Test that Command Set elements aren't written"""
         ds = read_file(ct_name)
         preamble = ds.preamble[:]
         ds.MessageID = 3
@@ -953,7 +962,7 @@ class TestWriteToStandard(unittest.TestCase):
         self.assertEqual(self.fp.read(4), b'DICM')
         self.assertTrue('MessageID' in ds)
 
-        fp = BytesIO(self.fp.getvalue()) # Workaround to avoid #358
+        fp = BytesIO(self.fp.getvalue())  # Workaround to avoid #358
         ds_out = read_file(fp)
         self.assertEqual(ds_out.preamble, preamble)
         self.assertTrue('PatientID' in ds_out)
