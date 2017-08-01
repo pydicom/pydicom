@@ -33,28 +33,19 @@ if [[ "$DISTRIB" == "conda" ]]; then
     chmod +x miniconda.sh && ./miniconda.sh -b -p $MINICONDA_PATH
     export PATH=$MINICONDA_PATH/bin:$PATH
     conda update --yes conda
-    conda config --show
 
     # Configure the conda environment and put it in the path using the
     # provided versions
     conda create -n testenv --yes python=$PYTHON_VERSION pip
     source activate testenv
-    conda install --yes nose pytest pytest-cov python-dateutil
+    conda install --yes nose pytest pytest-cov
     if [[ "$NUMPY" == "true" ]]; then
         conda install --yes numpy
     fi
-    if [[ "$JPEG2000" == "true" ]]; then
-        echo cant apt-get install libopenjp2-7 libopenjp2-7-dev
-    fi
-    if [[ "$JPEG_LS" == "true" ]]; then
-        echo cant do python -m pip install CharPyLS
-    fi
-    if [[ "$PILLOW" == "true" ]]; then
+    if [[ "$DEPS" == "pillow" ]]; then
         conda install --yes pillow jpeg
-    fi
-    if [[ "$GDCM" == "true" ]]; then
-        wget https://anaconda.org/conda-forge/gdcm/2.6.3/download/linux-64/gdcm-2.6.3-py35_0.tar.bz2
-        conda install --yes gdcm-2.6.3-py35_0.tar.bz2
+    elif [[ "$DEPS" == "gdcm" ]]; then
+        conda install --yes -c conda-forge gdcm
     fi
     # Install nose-timer via pip
     pip install nose-timer codecov
@@ -67,7 +58,7 @@ elif [[ "$DISTRIB" == "ubuntu" ]]; then
     # Create a new virtualenv using system site packages for python, numpy
     virtualenv --system-site-packages testvenv
     source testvenv/bin/activate
-    pip install nose nose-timer pytest pytest-cov codecov python-dateutil
+    pip install nose nose-timer pytest pytest-cov codecov
 
 elif [[ "$DISTRIB" == "pypy" ]]; then
     # This is to see if we are supporting pypy. With pypy3, numpypy is not
@@ -88,19 +79,18 @@ elif [[ "$DISTRIB" == "pypy" ]]; then
     else
         ln -s "$BIN_PATH/pypy3" "$BIN_PATH/python"
     fi
-
     # add the binary to the path
     export PATH="$BIN_PATH:$PATH"
-    wget https://bootstrap.pypa.io/get-pip.py
-    python get-pip.py    
-
+    # install pip
+    python -m ensurepip
+    pip install -U pip wheel
     if [[ "$NUMPY" == "true" ]] && [[ "$PYTHON_VERSION" == "2.7" ]]; then
-        $BIN_PATH/python -m pip install git+https://bitbucket.org/pypy/numpy.git
+        python -m pip install git+https://bitbucket.org/pypy/numpy.git
     # numpypy does not work with pypy3 so fall back on numpy
     elif [[ "$NUMPY" == "true" ]]; then
-        $BIN_PATH/python -m pip install cython numpy
+        python -m pip install cython numpy
     fi
-    $BIN_PATH/python -m pip install nose nose-timer pytest pytest-cov codecov python-dateutil
+    python -m pip install nose nose-timer pytest pytest-cov codecov
 fi
 
 python --version

@@ -14,7 +14,7 @@ from .utils import get_files
 DATA_ROOT = abspath(dirname(__file__))
 
 
-def get_testdata_files(pattern=None):
+def get_testdata_files(pattern="*"):
     """Return test data files from pydicom data root
 
     Parameters
@@ -32,7 +32,7 @@ def get_testdata_files(pattern=None):
     return get_files(bases=data_path, pattern=pattern)
 
 
-def get_charset_files(pattern=None):
+def get_charset_files(pattern="*"):
     """Return charset files from pydicom data root
 
     Parameters

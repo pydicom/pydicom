@@ -31,7 +31,7 @@ def get_files(bases, pattern=None):
     if pattern is None:
         pattern = "*"
 
-    if not isinstance(bases, list):
+    if not isinstance(bases, (list, tuple)):
         bases = [bases]
 
     files = []
