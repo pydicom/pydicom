@@ -929,7 +929,7 @@ class TestWriteToStandard(unittest.TestCase):
         """Test exception is raised if trying to write with no file_meta."""
         ds = read_file(rtplan_name)
         ds.file_meta = Dataset()
-        
+
         with pytest.raises(ValueError):
             ds.save_as(self.fp, write_like_original=False)
         del ds.file_meta
