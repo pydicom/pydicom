@@ -1389,7 +1389,6 @@ class TestWriteNonStandard(unittest.TestCase):
         self.fp.seek(0)
         self.assertEqual(self.fp.read(128), preamble)
         self.assertEqual(self.fp.read(4), b'DICM')
-        # Ensure Command Set Elements written as little endian implicit VR
 
         fp = BytesIO(self.fp.getvalue())  # Workaround to avoid #358
         ds_out = read_file(fp, force=True)
