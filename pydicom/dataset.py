@@ -1,3 +1,4 @@
+# Copyright 2008-2017 pydicom authors. See LICENSE file for details.
 """Define the Dataset and FileDataset classes.
 
 The Dataset class represents the DICOM Dataset while the FileDataset class
@@ -13,12 +14,6 @@ Dataset (dict subclass)
         * A Sequence (list subclass), where each item is a Dataset which
             contains its own DataElements, and so on in a recursive manner.
 """
-#
-# Copyright (c) 2008-2013 Darcy Mason
-# This file is part of pydicom, released under a modified MIT license.
-#    See the file license.txt included with this distribution, also
-#    available at https://github.com/darcymason/pydicom
-#
 
 import inspect  # for __dir__
 import io
@@ -33,7 +28,7 @@ from pydicom.datadict import (tag_for_keyword, keyword_for_tag,
                               repeater_has_keyword)
 from pydicom.tag import Tag, BaseTag
 from pydicom.dataelem import DataElement, DataElement_from_raw, RawDataElement
-from pydicom.uid import NotCompressedPixelTransferSyntaxes
+from pydicom.uid import UncompressedPixelTransferSyntaxes
 from pydicom.tagtools import tag_in_exception
 import pydicom  # for write_file
 import pydicom.charset
@@ -633,7 +628,7 @@ class Dataset(dict):
         """Return True if the TransferSyntaxUID is not a compressed syntax."""
         # FIXME uses file_meta here, should really only be thus for FileDataset
         return self.file_meta.TransferSyntaxUID in (
-            NotCompressedPixelTransferSyntaxes)
+            UncompressedPixelTransferSyntaxes)
 
     def __ne__(self, other):
         """Compare `self` and `other` for inequality."""

@@ -5,6 +5,7 @@ import pytest
 import pydicom
 import logging
 from pydicom.filereader import read_file
+from pydicom.data import DATA_ROOT
 from pydicom.tag import Tag
 gdcm_missing_message = "GDCM is not available in this test environment"
 gdcm_present_message = "GDCM is being tested"
@@ -18,8 +19,7 @@ except ImportError as e:
 
 test_gdcm_decoder = have_gdcm_handler
 
-test_dir = os.path.dirname(__file__)
-test_files = os.path.join(test_dir, 'test_files')
+test_files = os.path.join(DATA_ROOT, 'test_files')
 
 empty_number_tags_name = os.path.join(
     test_files, "reportsi_with_empty_number_tags.dcm")

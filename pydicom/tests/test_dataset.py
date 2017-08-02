@@ -1,9 +1,5 @@
-# test_dataset.py
+# Copyright 2008-2017 pydicom authors. See LICENSE file for details.
 """unittest cases for pydicom.dataset module"""
-# Copyright (c) 2008-2012 Darcy Mason
-# This file is part of pydicom, released under a modified MIT license.
-#    See the file license.txt included with this distribution, also
-#    available at https://github.com/darcymason/pydicom
 
 import os
 import unittest
@@ -11,6 +7,7 @@ import unittest
 import pytest
 
 from pydicom import compat
+from pydicom.data import DATA_ROOT
 from pydicom.dataelem import DataElement, RawDataElement
 from pydicom.dataset import Dataset, FileDataset
 from pydicom.dicomio import read_file
@@ -978,8 +975,9 @@ class DatasetElementsTests(unittest.TestCase):
 
 class FileDatasetTests(unittest.TestCase):
     def setUp(self):
-        test_dir = os.path.dirname(__file__)
-        self.test_file = os.path.join(test_dir, 'test_files', 'CT_small.dcm')
+        self.test_file = os.path.join(DATA_ROOT,
+                                      'test_files',
+                                      'CT_small.dcm')
 
     def test_equality_file_meta(self):
         """Dataset: equality returns correct value if with metadata"""
