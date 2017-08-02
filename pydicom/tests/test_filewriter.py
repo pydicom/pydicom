@@ -14,8 +14,6 @@ from struct import unpack
 import sys
 from tempfile import TemporaryFile
 
-import unittest
-
 import pytest
 
 from pydicom._storage_sopclass_uids import CTImageStorage
@@ -47,12 +45,6 @@ except AttributeError:
         import unittest2 as unittest
     except ImportError:
         print("unittest2 is required for testing in python2.6")
-
-have_dateutil = True
-try:
-    from dateutil.tz import tzoffset
-except ImportError:
-    have_dateutil = False
 
 test_files = os.path.join(DATA_ROOT, 'test_files')
 testcharset_dir = os.path.join(DATA_ROOT, 'charset_files')
