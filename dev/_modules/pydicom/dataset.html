@@ -320,6 +320,7 @@
 
     <span class="k">def</span> <span class="nf">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Method invoked on exit from a with statement.&quot;&quot;&quot;</span>
+        <span class="c1"># Returning False will re-raise any exceptions that occur</span>
         <span class="k">return</span> <span class="kc">False</span>
 
 <div class="viewcode-block" id="Dataset.add"><a class="viewcode-back" href="../../ref_guide.html#pydicom.dataset.Dataset.add">[docs]</a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_element</span><span class="p">):</span>
@@ -797,7 +798,7 @@
             <span class="k">yield</span> <span class="bp">self</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">_is_uncompressed_transfer_syntax</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Return True if the TransferSyntaxUID is a compressed syntax.&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;Return True if the TransferSyntaxUID is not a compressed syntax.&quot;&quot;&quot;</span>
         <span class="c1"># FIXME uses file_meta here, should really only be thus for FileDataset</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span> <span class="ow">in</span> <span class="p">(</span>
             <span class="n">UncompressedPixelTransferSyntaxes</span><span class="p">)</span>
@@ -853,6 +854,7 @@
             <span class="n">already_have</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pixel_id</span> <span class="o">!=</span> <span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">PixelData</span><span class="p">):</span>
             <span class="n">already_have</span> <span class="o">=</span> <span class="kc">False</span>
+
         <span class="k">if</span> <span class="ow">not</span> <span class="n">already_have</span><span class="p">:</span>
             <span class="n">last_exception</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="n">successfully_read_pixel_data</span> <span class="o">=</span> <span class="kc">False</span>
