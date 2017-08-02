@@ -34,7 +34,7 @@ class DicomIO(object):
         return unpack(b"<HH", bytes_read)
 
     def read_be_tag(self):
-        """Read and return two unsigned shorts (little endian)
+        """Read and return two unsigned shorts (big endian)
            from the file."""
         bytes_read = self.read(4, need_exact_length=True)
         return unpack(b">HH", bytes_read)
