@@ -22,7 +22,7 @@
 # If a single frame, it may be 0 length/no value,
 # or it may have a single pointer (0).
 
-from pydicom.config import logger
+import pydicom.config
 
 from pydicom.filebase import DicomBytesIO
 from pydicom.tag import (ItemTag, SequenceDelimiterTag)
@@ -69,6 +69,8 @@ def defragment_data(data):
 def read_item(fp):
     """Read and return a single Item in the
     fragmented data stream"""
+
+    logger = pydicom.config.logger
     try:
         tag = fp.read_tag()
 
@@ -80,29 +82,36 @@ def read_item(fp):
     # No more items, time for sequence to stop reading
     if tag == SequenceDelimiterTag:
         length = fp.read_UL()
-        logger.debug("%04x: Sequence Delimiter, length 0x%x",
-                     fp.tell() - 8, length)
+        logger.debug(
+            "%04x: Sequence Delimiter, length 0x%x",
+            fp.tell() - 8,
+            length)
 
         if length != 0:
-            msg = "Expected 0x00000000 after delimiter, found "
-            logger.warning("%s0x%x, at data position 0x%x" % (msg), length,
-                           fp.tell() - 4)
+            logger.warning(
+                "Expected 0x00000000 after delimiter, found 0x%x,"
+                " at data position 0x%x",
+                length,
+                fp.tell() - 4)
         return None
 
     if tag != ItemTag:
-        msg = "Expected Item with tag "
-        logger.warning("%sat data position 0x%x" % (msg), ItemTag,
-                       fp.tell() - 4)
-
+        logger.warning(
+            "Expected Item with tag %s at data position 0x%x",
+            ItemTag,
+            fp.tell() - 4)
         length = fp.read_UL()
-
     else:
         length = fp.read_UL()
-        logger.debug("%04x: Item, length 0x%x", fp.tell() - 8, length)
+        logger.debug(
+            "%04x: Item, length 0x%x",
+            fp.tell() - 8,
+            length)
 
     if length == 0xFFFFFFFF:
-        msg = "Encapsulated data fragment had Undefined Length"
-        raise ValueError("%s at data position 0x%x" % (msg, fp.tell() - 4))
+        raise ValueError(
+            "Encapsulated data fragment had Undefined Length"
+            " at data position 0x%x" % (fp.tell() - 4, ))
 
     item_data = fp.read(length)
     return item_data

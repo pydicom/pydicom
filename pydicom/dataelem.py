@@ -14,6 +14,8 @@ A DataElement has a tag,
 from __future__ import absolute_import
 from collections import namedtuple
 
+from pydicom.charset import default_encoding
+
 from pydicom import config  # don't import datetime_conversion directly
 from pydicom import compat
 from pydicom.config import logger
@@ -459,6 +461,8 @@ def DataElement_from_raw(raw_data_element, encoding=None):
     # filereader->Dataset->convert_value->filereader
     # (for SQ parsing)
 
+    if in_py2:
+        encoding = encoding or default_encoding
     from pydicom.values import convert_value
     raw = raw_data_element
 

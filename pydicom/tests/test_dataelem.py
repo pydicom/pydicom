@@ -9,6 +9,10 @@
 
 import unittest
 
+import sys
+
+from pydicom.charset import default_encoding
+
 from pydicom.dataelem import DataElement
 from pydicom.dataelem import RawDataElement, DataElement_from_raw
 from pydicom.dataset import Dataset
@@ -201,16 +205,39 @@ class DataElementTests(unittest.TestCase):
 
 
 class RawDataElementTests(unittest.TestCase):
-    def setUp(self):
+    def testKeyError(self):
+        """RawDataElement: conversion of unknown tag throws KeyError..."""
         # raw data element -> tag VR length value
         #                       value_tell is_implicit_VR is_little_endian'
         # Unknown (not in DICOM dict), non-private, non-group 0 for this test
-        self.raw1 = RawDataElement(Tag(0x88880002), None, 4, 0x1111,
-                                   0, True, True)
+        raw = RawDataElement(Tag(0x88880002), None, 4, 0x1111,
+                             0, True, True)
+        self.assertRaises(KeyError, DataElement_from_raw, raw)
 
-    def testKeyError(self):
-        """RawDataElement: conversion of unknown tag throws KeyError........"""
-        self.assertRaises(KeyError, DataElement_from_raw, self.raw1)
+    def testValidTag(self):
+        """RawDataElement: conversion of known tag succeeds..."""
+        raw = RawDataElement(Tag(0x00080020), 'DA', 8, b'20170101',
+                             0, False, True)
+        element = DataElement_from_raw(raw, default_encoding)
+        self.assertEqual(element.name, 'Study Date')
+        self.assertEqual(element.VR, 'DA')
+        self.assertEqual(element.value, '20170101')
+
+    @unittest.skipIf(sys.version_info >= (3, ), 'Testing Python 2 behavior')
+    def testTagWithoutEncodingPython2(self):
+        """RawDataElement: no encoding needed in Python 2."""
+        raw = RawDataElement(Tag(0x00104000), 'LT', 23,
+                             b'comment\\comment2\\comment3',
+                             0, False, True)
+        element = DataElement_from_raw(raw)
+        self.assertEqual(element.name, 'Patient Comments')
+
+    @unittest.skipIf(sys.version_info < (3, ), 'Testing Python 3 behavior')
+    def testTagWithoutEncodingPython3(self):
+        """RawDataElement: raises if no encoding given in Python 3."""
+        self.assertRaises(TypeError, RawDataElement(Tag(0x00104000), 'LT', 14,
+                                                    b'comment1\\comment2',
+                                                    0, False, True))
 
 
 if __name__ == "__main__":
