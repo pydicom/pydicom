@@ -747,8 +747,7 @@ class DatasetTests(unittest.TestCase):
         assert ds.get_item(0x00080018).value == '1.2.3.4'
 
         # Test deferred read
-        test_dir = os.path.dirname(__file__)
-        test_file = os.path.join(test_dir, 'test_files', 'MR_small.dcm')
+        test_file = os.path.join(DATA_ROOT, 'test_files', 'MR_small.dcm')
         ds = read_file(test_file, force=True, defer_size='0.8 kB')
         ds_ref = read_file(test_file, force=True)
         # get_item will follow the deferred read branch
@@ -835,8 +834,7 @@ class DatasetTests(unittest.TestCase):
 
     def test_with(self):
         """Test Dataset.__enter__ and __exit__."""
-        test_dir = os.path.dirname(__file__)
-        test_file = os.path.join(test_dir, 'test_files', 'CT_small.dcm')
+        test_file = os.path.join(DATA_ROOT, 'test_files', 'CT_small.dcm')
         with read_file(test_file) as ds:
             assert ds.PatientName == 'CompressedSamples^CT1'
 
@@ -900,8 +898,7 @@ class DatasetTests(unittest.TestCase):
 
     def test_set_convert_private_elem_from_raw(self):
         """Test Dataset.__setitem__ with a raw private element"""
-        test_dir = os.path.dirname(__file__)
-        test_file = os.path.join(test_dir, 'test_files', 'CT_small.dcm')
+        test_file = os.path.join(DATA_ROOT, 'test_files', 'CT_small.dcm')
         ds = read_file(test_file, force=True)
         # 'tag VR length value value_tell is_implicit_VR is_little_endian'
         elem = RawDataElement((0x0043, 0x1029), 'OB', 2, b'\x00\x01', 0,
@@ -922,8 +919,7 @@ class DatasetTests(unittest.TestCase):
 
     def test_trait_names(self):
         """Test Dataset.trait_names contains element keywords"""
-        test_dir = os.path.dirname(__file__)
-        test_file = os.path.join(test_dir, 'test_files', 'CT_small.dcm')
+        test_file = os.path.join(DATA_ROOT, 'test_files', 'CT_small.dcm')
         ds = read_file(test_file, force=True)
         names = ds.trait_names()
         assert 'PatientName' in names
