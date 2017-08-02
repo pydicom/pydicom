@@ -1,21 +1,27 @@
-# test_dataset.py
+# Copyright 2008-2017 pydicom authors. See LICENSE file for details.
 """unittest cases for pydicom.dataset module"""
-# Copyright (c) 2008-2012 Darcy Mason
-# This file is part of pydicom, released under a modified MIT license.
-#    See the file license.txt included with this distribution, also
-#    available at https://github.com/darcymason/pydicom
 
 import os
 import unittest
 
-from pydicom.dataset import Dataset
+import pytest
+
+from pydicom import compat
 from pydicom.data import DATA_ROOT
 from pydicom.dataelem import DataElement, RawDataElement
+from pydicom.dataset import Dataset, FileDataset
 from pydicom.dicomio import read_file
 from pydicom.filebase import DicomBytesIO
-from pydicom.tag import Tag
 from pydicom.sequence import Sequence
-from pydicom import compat
+from pydicom.tag import Tag
+from pydicom.uid import ImplicitVRLittleEndian, JPEGBaseLineLossy8bit
+
+
+def assert_raises_regex(type_error, message, func, *args, **kwargs):
+    """Taken from https://github.com/glemaitre/specio, BSD 3 license."""
+    with pytest.raises(type_error) as excinfo:
+        func(*args, **kwargs)
+    excinfo.match(message)
 
 
 class DatasetTests(unittest.TestCase):
@@ -167,17 +173,19 @@ class DatasetTests(unittest.TestCase):
         self.assertTrue(
             'Dummyname' not in ds, "non-member tested as member")
 
-    def testContains(self):
+    def test_contains(self):
         """Dataset: can test if item present by 'if <tag> in dataset'......."""
         ds = self.dummy_dataset()
         ds.CommandGroupLength = 100  # (0000,0000)
-        self.assertTrue((0x300a, 0xb2) in ds, "membership test failed")
-        self.assertTrue([0x300a, 0xb2] in ds,
-                        "membership test failed when list used")
-        self.assertTrue(0x300a00b2 in ds, "membership test failed")
-        self.assertTrue(
-            (0x10, 0x5f) not in ds, "non-member tested as member")
-        self.assertTrue('CommandGroupLength' in ds)
+        assert (0x300a, 0xb2) in ds
+        assert [0x300a, 0xb2] in ds
+        assert 0x300a00b2 in ds
+        assert (0x10, 0x5f) not in ds
+        assert 'CommandGroupLength' in ds
+        # Use a negative tag to cause an exception
+        assert (-0x0010, 0x0010) not in ds
+        # Random non-existent property
+        assert 'random name' not in ds
 
     def testGetExists1(self):
         """Dataset: dataset.get() returns an existing item by name.........."""
@@ -248,6 +256,13 @@ class DatasetTests(unittest.TestCase):
                " for non-member by Tag")
         self.assertEqual(not_there, "not-there", msg)
 
+    def test_get_raises(self):
+        """Test Dataset.get() raises exception when invalid Tag"""
+        ds = self.dummy_dataset()
+        assert_raises_regex(TypeError,
+                            'Dataset.get key must be a string or tag',
+                            ds.get, (-0x0010, 0x0010))
+
     def testGetFromRaw(self):
         """Dataset: get(tag) returns same object as ds[tag] for raw element."""
         # This came from issue 88, where get(tag#) returned a RawDataElement,
@@ -300,8 +315,8 @@ class DatasetTests(unittest.TestCase):
             'Johnny',
             "set by tag failed")
 
-    def testDir(self):
-        """Dataset: dir() returns sorted list of named data_elements........"""
+    def test_dir(self):
+        """Dataset.dir() returns sorted list of named data_elements."""
         ds = self.dummy_dataset()
         ds.PatientName = "name"
         ds.PatientID = "id"
@@ -312,11 +327,25 @@ class DatasetTests(unittest.TestCase):
                     'PatientName',
                     'TreatmentMachineName',
                     'XRayTubeCurrent']
-        self.assertEqual(
-            ds.dir(),
-            expected,
-            "dir() returned %s, "
-            "expected %s" % (str(ds.dir()), str(expected)))
+        assert ds.dir() == expected
+
+    def test_dir_filter(self):
+        """Test Dataset.dir(*filters) works OK."""
+        ds = self.dummy_dataset()
+        ds.PatientName = "name"
+        ds.PatientID = "id"
+        ds.NonDicomVariable = "junk"
+        ds.add_new((0x18, 0x1151), "IS", 150)  # X-ray Tube Current
+        ds.add_new((0x1111, 0x123), "DS", "42.0")  # private - no name in dir()
+        assert 'PatientID' in ds
+        assert 'XRayTubeCurrent' in ds
+        assert 'TreatmentMachineName' in ds
+        assert 'PatientName' in ds
+        assert 'PatientBirthDate' not in ds
+        assert ds.dir('Patient') == ['PatientID', 'PatientName']
+        assert ds.dir('Name') == ['PatientName', 'TreatmentMachineName']
+        assert ds.dir('Name', 'Patient') == ['PatientID', 'PatientName',
+                                             'TreatmentMachineName']
 
     def testDeleteDicomAttr(self):
         """Dataset: delete DICOM attribute by name.........................."""
@@ -707,16 +736,22 @@ class DatasetTests(unittest.TestCase):
 
     def test_get_item(self):
         """Test Dataset.get_item"""
-        # TODO: Add test for deferred read
         ds = Dataset()
         ds.CommandGroupLength = 120  # 0000,0000
         ds.SOPInstanceUID = '1.2.3.4'  # 0008,0018
 
         # Test non-deferred read
-        self.assertEqual(ds.get_item(0x00000000), ds[0x00000000])
-        self.assertEqual(ds.get_item(0x00000000).value, 120)
-        self.assertEqual(ds.get_item(0x00080018), ds[0x00080018])
-        self.assertEqual(ds.get_item(0x00080018).value, '1.2.3.4')
+        assert ds.get_item(0x00000000) == ds[0x00000000]
+        assert ds.get_item(0x00000000).value == 120
+        assert ds.get_item(0x00080018) == ds[0x00080018]
+        assert ds.get_item(0x00080018).value == '1.2.3.4'
+
+        # Test deferred read
+        test_file = os.path.join(DATA_ROOT, 'test_files', 'MR_small.dcm')
+        ds = read_file(test_file, force=True, defer_size='0.8 kB')
+        ds_ref = read_file(test_file, force=True)
+        # get_item will follow the deferred read branch
+        assert ds.get_item((0x7fe00010)).value == ds_ref.PixelData
 
     def test_remove_private_tags(self):
         """Test Dataset.remove_private_tags"""
@@ -741,10 +776,9 @@ class DatasetTests(unittest.TestCase):
         ds.add_new(0x00090001, 'PN', 'CITIZEN^1')
         ds.BeamSequence = [Dataset()]
         ds.BeamSequence[0].PatientName = 'ANON'
-        self.assertEqual(
-            ds.data_element('CommandGroupLength'), ds[0x00000000])
-        self.assertEqual(
-            ds.data_element('BeamSequence'), ds[0x300A00B0])
+        assert ds.data_element('CommandGroupLength') == ds[0x00000000]
+        assert ds.data_element('BeamSequence') == ds[0x300A00B0]
+        assert ds.data_element('not an element keyword') is None
 
     def test_iterall(self):
         """Test Dataset.iterall"""
@@ -798,6 +832,121 @@ class DatasetTests(unittest.TestCase):
         ds.file_meta.ImplementationClassUID = '1.4'
         ds.save_as(fp, write_like_original=False)
 
+    def test_with(self):
+        """Test Dataset.__enter__ and __exit__."""
+        test_file = os.path.join(DATA_ROOT, 'test_files', 'CT_small.dcm')
+        with read_file(test_file) as ds:
+            assert ds.PatientName == 'CompressedSamples^CT1'
+
+    def test_exit_exception(self):
+        """Test Dataset.__exit__ when an exception is raised."""
+        class DSException(Dataset):
+            @property
+            def test(self):
+                raise ValueError("Random ex message!")
+
+        assert_raises_regex(ValueError,
+                            "Random ex message!",
+                            getattr, DSException(), 'test')
+
+    def test_is_uncompressed_transfer_syntax(self):
+        """Test Dataset._is_uncompressed_transfer_syntax"""
+        ds = Dataset()
+        with pytest.raises(AttributeError):
+            ds._is_uncompressed_transfer_syntax()
+        ds.file_meta = Dataset()
+        with pytest.raises(AttributeError):
+            ds._is_uncompressed_transfer_syntax()
+        ds.file_meta.TransferSyntaxUID = ImplicitVRLittleEndian
+        assert ds._is_uncompressed_transfer_syntax()
+        ds.file_meta.TransferSyntaxUID = JPEGBaseLineLossy8bit
+        assert not ds._is_uncompressed_transfer_syntax()
+
+    def test_reshape_pixel_array_not_implemented(self):
+        """Test Dataset._reshape_pixel_array raises exception"""
+        ds = Dataset()
+        ds.SamplesPerPixel = 2
+        ds.BitsAllocated = 16
+        with pytest.raises(NotImplementedError):
+            ds._reshape_pixel_array(None)
+
+    def test_get_pixel_array_already_have(self):
+        """Test Dataset._get_pixel_array when we already have the array"""
+        # Test that _pixel_array is returned unchanged unless required
+        ds = Dataset()
+        ds.PixelData = b'\x00'
+        ds._pixel_id = id(ds.PixelData)
+        ds._pixel_array = 'Test Value'
+        assert ds._get_pixel_array() == 'Test Value'
+
+    def test_formatted_lines(self):
+        """Test Dataset.formatted_lines"""
+        ds = Dataset()
+        ds.PatientName = 'CITIZEN^Jan'
+        ds.BeamSequence = [Dataset()]
+        ds.BeamSequence[0].PatientID = 'JAN^Citizen'
+        elem_format = "%(tag)s"
+        seq_format = "%(name)s %(tag)s"
+        indent_format = ">>>"  # placeholder for future functionality
+
+        line_generator = ds.formatted_lines(element_format=elem_format,
+                                            sequence_element_format=seq_format,
+                                            indent_format=indent_format)
+        assert next(line_generator) == "(0010, 0010)"
+        assert next(line_generator) == "Beam Sequence (300a, 00b0)"
+        assert next(line_generator) == "(0010, 0020)"
+
+    def test_set_convert_private_elem_from_raw(self):
+        """Test Dataset.__setitem__ with a raw private element"""
+        test_file = os.path.join(DATA_ROOT, 'test_files', 'CT_small.dcm')
+        ds = read_file(test_file, force=True)
+        # 'tag VR length value value_tell is_implicit_VR is_little_endian'
+        elem = RawDataElement((0x0043, 0x1029), 'OB', 2, b'\x00\x01', 0,
+                              True, True)
+        ds.__setitem__((0x0043, 0x1029), elem)
+
+        assert ds[(0x0043, 0x1029)].value == b'\x00\x01'
+        assert type(ds[(0x0043, 0x1029)]) == DataElement
+
+    def test_top(self):
+        """Test Dataset.top returns only top level str"""
+        ds = Dataset()
+        ds.PatientName = 'CITIZEN^Jan'
+        ds.BeamSequence = [Dataset()]
+        ds.BeamSequence[0].PatientID = 'JAN^Citizen'
+        assert "Patient's Name" in ds.top()
+        assert "Patient ID" not in ds.top()
+
+    def test_trait_names(self):
+        """Test Dataset.trait_names contains element keywords"""
+        test_file = os.path.join(DATA_ROOT, 'test_files', 'CT_small.dcm')
+        ds = read_file(test_file, force=True)
+        names = ds.trait_names()
+        assert 'PatientName' in names
+        assert 'save_as' in names
+        assert 'PixelData' in names
+
+    def test_walk(self):
+        """Test Dataset.walk iterates through sequences"""
+        def test_callback(dataset, elem):
+            if elem.keyword is 'PatientID':
+                dataset.PatientID = 'FIXED'
+
+        ds = Dataset()
+        ds.PatientName = 'CITIZEN^Jan'
+        ds.BeamSequence = [Dataset(), Dataset()]
+        ds.BeamSequence[0].PatientID = 'JAN^Citizen^Snr'
+        ds.BeamSequence[0].PatientName = 'Some^Name'
+        ds.BeamSequence[1].PatientID = 'JAN^Citizen^Jr'
+        ds.BeamSequence[1].PatientName = 'Other^Name'
+        ds.walk(test_callback, recursive=True)
+
+        assert ds.PatientName == 'CITIZEN^Jan'
+        assert ds.BeamSequence[0].PatientID == 'FIXED'
+        assert ds.BeamSequence[0].PatientName == 'Some^Name'
+        assert ds.BeamSequence[1].PatientID == 'FIXED'
+        assert ds.BeamSequence[1].PatientName == 'Other^Name'
+
 
 class DatasetElementsTests(unittest.TestCase):
     """Test valid assignments of data elements"""
@@ -826,7 +975,7 @@ class FileDatasetTests(unittest.TestCase):
                                       'test_files',
                                       'CT_small.dcm')
 
-    def testEqualityFileMeta(self):
+    def test_equality_file_meta(self):
         """Dataset: equality returns correct value if with metadata"""
         d = read_file(self.test_file)
         e = read_file(self.test_file)
@@ -844,6 +993,16 @@ class FileDatasetTests(unittest.TestCase):
         self.assertTrue(d == e)
         e.filename = 'test_filename.dcm'
         self.assertFalse(d == e)
+
+    def test_creation_with_container(self):
+        """FileDataset.__init__ works OK with a container such as gzip"""
+        class Dummy(object):
+            filename = '/some/path/to/test'
+
+        ds = Dataset()
+        ds.PatientName = "CITIZEN^Jan"
+        fds = FileDataset(Dummy(), ds)
+        assert fds.filename == '/some/path/to/test'
 
 
 if __name__ == "__main__":
