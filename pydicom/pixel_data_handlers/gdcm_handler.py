@@ -18,10 +18,14 @@ can_use_gdcm = have_gdcm and have_numpy
 
 def supports_transfer_syntax(dicom_dataset):
     """
-    Return True if this pixel data handler might support this
-    transfer syntax.
-    Return False to prevent any attempt to try to use this handler
-    to decode the given transfer syntax
+    Returns
+    -------
+    True:
+        if this pixel data handler might support this transfer syntax.
+
+    False:
+        to prevent any attempt to try to use this handler
+        to decode the given transfer syntax
     """
     return True
 
