@@ -60,7 +60,6 @@ dir_name = os.path.dirname(sys.argv[0])
 save_dir = os.getcwd()
 
 
-
 class numpy_JPEG_LS_Tests_no_numpy(unittest.TestCase):
     def setUp(self):
         self.jpeg_ls_lossless = read_file(jpeg_ls_lossless_name)

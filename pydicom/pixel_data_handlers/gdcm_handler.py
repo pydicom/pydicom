@@ -61,8 +61,9 @@ def get_pixeldata(dicom_dataset):
         raise ImportError(msg)
 
     gdcm_image_reader = gdcm.ImageReader()
-    if type(dicom_dataset.filename) == unicode:
-        gdcm_image_reader.SetFileName(dicom_dataset.filename.encode('utf8'))
+    if isinstance(dicom_dataset.filename, unicode):
+        gdcm_image_reader.SetFileName(
+            dicom_dataset.filename.encode(sys.getfilesystemencoding()))
     else:
         gdcm_image_reader.SetFileName(dicom_dataset.filename)
 

@@ -75,7 +75,14 @@ class GDCM_JPEG_LS_Tests_no_gdcm(unittest.TestCase):
     def setUp(self):
         self.utf8_filename = os.path.join(tempfile.gettempdir(), "ДИКОМ.dcm")
         shutil.copyfile(jpeg_ls_lossless_name, self.utf8_filename)
-        self.jpeg_ls_lossless = read_file(unicode(self.utf8_filename, encoding='utf8'))
+        try:
+            self.jpeg_ls_lossless = read_file(
+                unicode(self.utf8_filename,
+                        encoding=sys.getfilesystemencoding()))
+        except NameError:
+            # must be python3
+            self.jpeg_ls_lossless = read_file(self.utf8_filename)
+
         self.mr_small = read_file(mr_name)
         self.emri_jpeg_ls_lossless = read_file(emri_jpeg_ls_lossless)
         self.emri_small = read_file(emri_name)
@@ -199,7 +206,14 @@ class GDCM_JPEG_LS_Tests_with_gdcm(unittest.TestCase):
     def setUp(self):
         self.utf8_filename = os.path.join(tempfile.gettempdir(), "ДИКОМ.dcm")
         shutil.copyfile(jpeg_ls_lossless_name, self.utf8_filename)
-        self.jpeg_ls_lossless = read_file(unicode(self.utf8_filename, encoding='utf8'))
+        try:
+            self.jpeg_ls_lossless = read_file(
+                unicode(self.utf8_filename,
+                        encoding=sys.getfilesystemencoding()))
+        except NameError:
+            # must be python3
+            self.jpeg_ls_lossless = read_file(self.utf8_filename)
+
         self.mr_small = read_file(mr_name)
         self.emri_jpeg_ls_lossless = read_file(emri_jpeg_ls_lossless)
         self.emri_small = read_file(emri_name)

@@ -1,4 +1,7 @@
-"""Use the jpeg_ls (CharPyLS) python package to decode pixel transfer syntaxes."""
+"""
+Use the jpeg_ls (CharPyLS) python package
+to decode pixel transfer syntaxes.
+"""
 import sys
 import pydicom
 import pydicom.uid

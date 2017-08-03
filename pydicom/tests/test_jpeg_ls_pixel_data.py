@@ -67,7 +67,6 @@ dir_name = os.path.dirname(sys.argv[0])
 save_dir = os.getcwd()
 
 
-
 class jpeg_ls_JPEG_LS_Tests_no_jpeg_ls(unittest.TestCase):
     def setUp(self):
         self.jpeg_ls_lossless = read_file(jpeg_ls_lossless_name)
@@ -83,7 +82,6 @@ class jpeg_ls_JPEG_LS_Tests_no_jpeg_ls(unittest.TestCase):
     def test_JPEG_LS_PixelArray(self):
         with self.assertRaises((NotImplementedError, )):
             _ = self.jpeg_ls_lossless.pixel_array
-
 
 
 class jpeg_ls_JPEG2000Tests_no_jpeg_ls(unittest.TestCase):
@@ -108,7 +106,6 @@ class jpeg_ls_JPEG2000Tests_no_jpeg_ls(unittest.TestCase):
         """JPEG2000: Now works"""
         with self.assertRaises((NotImplementedError, )):
             _ = self.emri_jpeg_2k_lossless.pixel_array
-
 
 
 class jpeg_ls_JPEGlossyTests_no_jpeg_ls(unittest.TestCase):
