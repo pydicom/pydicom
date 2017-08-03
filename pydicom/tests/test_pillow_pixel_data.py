@@ -78,7 +78,6 @@ dir_name = os.path.dirname(sys.argv[0])
 save_dir = os.getcwd()
 
 
-@pytest.mark.skipif(test_pillow_decoder, reason=pillow_present_message)
 class pillow_JPEG_LS_Tests_no_pillow(unittest.TestCase):
     def setUp(self):
         self.jpeg_ls_lossless = read_file(jpeg_ls_lossless_name)
@@ -86,7 +85,7 @@ class pillow_JPEG_LS_Tests_no_pillow(unittest.TestCase):
         self.emri_jpeg_ls_lossless = read_file(emri_jpeg_ls_lossless)
         self.emri_small = read_file(emri_name)
         self.original_handlers = pydicom.config.image_handlers
-        pydicom.config.image_handlers = [pillow_handler, numpy_handler]
+        pydicom.config.image_handlers = [None, numpy_handler]
 
     def tearDown(self):
         pydicom.config.image_handlers = self.original_handlers
