@@ -4,6 +4,7 @@ import sys
 import pytest
 import pydicom
 from pydicom.filereader import read_file
+from pydicom.data import DATA_ROOT
 jpeg_ls_missing_message = ("jpeg_ls is not available "
                            "in this test environment")
 jpeg_ls_present_message = "jpeg_ls is being tested"
@@ -22,8 +23,7 @@ except ImportError:
 
 test_jpeg_ls_decoder = have_numpy_handler and have_jpeg_ls_handler
 
-test_dir = os.path.dirname(__file__)
-test_files = os.path.join(test_dir, 'test_files')
+test_files = os.path.join(DATA_ROOT, 'test_files')
 
 empty_number_tags_name = os.path.join(
     test_files, "reportsi_with_empty_number_tags.dcm")

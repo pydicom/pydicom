@@ -4,6 +4,7 @@ import sys
 import pytest
 import pydicom
 from pydicom.filereader import read_file
+from pydicom.data import DATA_ROOT
 from pydicom.tag import Tag
 pillow_missing_message = ("pillow is not available "
                           "in this test environment")
@@ -32,9 +33,7 @@ test_pillow_jpeg_decoder = (test_pillow_decoder and
 test_pillow_jpeg2000_decoder = (test_pillow_decoder and
                                 have_pillow_jpeg2000_plugin)
 
-
-test_dir = os.path.dirname(__file__)
-test_files = os.path.join(test_dir, 'test_files')
+test_files = os.path.join(DATA_ROOT, 'test_files')
 
 empty_number_tags_name = os.path.join(
     test_files, "reportsi_with_empty_number_tags.dcm")

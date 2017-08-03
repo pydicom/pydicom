@@ -16,6 +16,7 @@ import tempfile
 import unittest
 from pydicom.util.testing.warncheck import assertWarns
 from pydicom.dataset import Dataset, FileDataset
+from pydicom.data import DATA_ROOT
 from pydicom.dataelem import DataElement
 from pydicom.filereader import read_file
 from pydicom.errors import InvalidDicomError
@@ -66,8 +67,7 @@ have_numpy = numpy is not None
 have_jpeg_ls = jpeg_ls is not None
 have_pillow = PILImg is not None
 
-test_dir = os.path.dirname(__file__)
-test_files = os.path.join(test_dir, 'test_files')
+test_files = os.path.join(DATA_ROOT, 'test_files')
 
 empty_number_tags_name = os.path.join(test_files,
                                       "reportsi_with_empty_number_tags.dcm")
