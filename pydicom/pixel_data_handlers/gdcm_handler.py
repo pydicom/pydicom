@@ -1,3 +1,4 @@
+"""Use the gdcm python package to decode pixel transfer syntaxes."""
 import sys
 have_numpy = True
 try:
@@ -16,10 +17,35 @@ can_use_gdcm = have_gdcm and have_numpy
 
 
 def supports_transfer_syntax(dicom_dataset):
+    """
+    Return True if this pixel data handler might support this
+    transfer syntax.
+    Return False to prevent any attempt to try to use this handler
+    to decode the given transfer syntax
+    """
     return True
 
 
 def get_pixeldata(dicom_dataset):
+    """
+    Use the GDCM package to decode the PixelData attribute
+
+    Returns
+    -------
+    A correctly sized (but not shaped) numpy array of the entire data volume
+
+    Raises
+    ------
+    ImportError if the required packages are not available
+
+    TypeError:
+        if the image could not be read by GDCM
+        if the pixel data type is unsupported
+
+    AttributeError if the decoded amount of data does not match the expected
+    amount
+    """
+
     # read the file using GDCM
     # FIXME this should just use dicom_dataset.PixelData
     # instead of dicom_dataset.filename
@@ -30,7 +56,11 @@ def get_pixeldata(dicom_dataset):
         raise ImportError(msg)
 
     gdcm_image_reader = gdcm.ImageReader()
-    gdcm_image_reader.SetFileName(dicom_dataset.filename)
+    if type(dicom_dataset.filename) == unicode:
+        gdcm_image_reader.SetFileName(dicom_dataset.filename.encode('utf8'))
+    else:
+        gdcm_image_reader.SetFileName(dicom_dataset.filename)
+
     if not gdcm_image_reader.Read():
         raise TypeError("GDCM could not read DICOM image")
 

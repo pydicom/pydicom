@@ -1,6 +1,7 @@
 import sys
 import pydicom
 import pydicom.uid
+
 have_numpy = True
 try:
     import numpy

@@ -141,6 +141,9 @@ def get_pixeldata(dicom_dataset):
             b'\xff\xd8\xff\xe0\x00\x10'
             b'JFIF\x00\x01\x01\x01\x00\x01\x00\x01\x00\x00')
         frame_start_from = 2
+        print("Going to try with no app0 header")
+        generic_jpeg_file_header = b''
+        frame_start_from = 0
     elif (dicom_dataset.file_meta.TransferSyntaxUID in
           PillowJPEG2000TransferSyntaxes):
         logger.debug("This is a JPEG 2000 format")
