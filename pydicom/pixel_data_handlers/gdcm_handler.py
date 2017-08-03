@@ -61,10 +61,14 @@ def get_pixeldata(dicom_dataset):
         raise ImportError(msg)
 
     gdcm_image_reader = gdcm.ImageReader()
-    if isinstance(dicom_dataset.filename, unicode):
-        gdcm_image_reader.SetFileName(
-            dicom_dataset.filename.encode(sys.getfilesystemencoding()))
-    else:
+    try:
+        if isinstance(dicom_dataset.filename, unicode):
+            gdcm_image_reader.SetFileName(
+                dicom_dataset.filename.encode(sys.getfilesystemencoding()))
+        else:
+            gdcm_image_reader.SetFileName(dicom_dataset.filename)
+    except NameError:
+        # python 3
         gdcm_image_reader.SetFileName(dicom_dataset.filename)
 
     if not gdcm_image_reader.Read():
