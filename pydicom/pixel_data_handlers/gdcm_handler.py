@@ -36,14 +36,15 @@ def get_pixeldata(dicom_dataset):
 
     Raises
     ------
-    ImportError if the required packages are not available
+    ImportError:
+        if the required packages are not available
 
     TypeError:
         if the image could not be read by GDCM
         if the pixel data type is unsupported
 
-    AttributeError if the decoded amount of data does not match the expected
-    amount
+    AttributeError:
+        if the decoded amount of data does not match the expected amount
     """
 
     # read the file using GDCM
