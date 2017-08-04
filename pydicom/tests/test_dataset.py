@@ -1,5 +1,5 @@
 # Copyright 2008-2017 pydicom authors. See LICENSE file for details.
-"""unittest cases for pydicom.dataset module"""
+"""Tests for dataset.py"""
 
 import os
 import unittest
@@ -882,6 +882,8 @@ class DatasetTests(unittest.TestCase):
     def test_formatted_lines(self):
         """Test Dataset.formatted_lines"""
         ds = Dataset()
+        with pytest.raises(StopIteration):
+            next(ds.formatted_lines())
         ds.PatientName = 'CITIZEN^Jan'
         ds.BeamSequence = [Dataset()]
         ds.BeamSequence[0].PatientID = 'JAN^Citizen'
@@ -895,6 +897,8 @@ class DatasetTests(unittest.TestCase):
         assert next(line_generator) == "(0010, 0010)"
         assert next(line_generator) == "Beam Sequence (300a, 00b0)"
         assert next(line_generator) == "(0010, 0020)"
+        with pytest.raises(StopIteration):
+            next(line_generator)
 
     def test_set_convert_private_elem_from_raw(self):
         """Test Dataset.__setitem__ with a raw private element"""

@@ -43,6 +43,20 @@ class TestGenerateUID(object):
             assert uid[:len(valid_prefix)] == valid_prefix
             assert len(uid) <= 64
 
+    def test_entropy_src(self):
+        """Test UID generator with default entropy sources"""
+        # Should be different
+        uid = generate_uid(entropy_srcs=None)
+        assert uid != generate_uid(entropy_srcs=None)
+
+    def test_entropy_src_custom(self):
+        """Test UID generator with custom entropy sources"""
+        # Should be identical
+        uid = generate_uid(entropy_srcs=['lorem', 'ipsum'])
+        rf = '1.2.826.0.1.3680043.8.498.87507166259346337659265156363895084463'
+        assert uid == rf
+        assert len(uid) == 64
+
 
 class TestUID(object):
     """Test DICOM UIDs"""
@@ -222,6 +236,11 @@ class TestUID(object):
         private_uid = UID('1.2.840.10009.1.2')
         assert private_uid.is_private
         assert not self.uid.is_private
+
+    def test_raises(self):
+        """Test raises exception if not a str type"""
+        with pytest.raises(TypeError):
+            UID(1234)
 
 
 class TestUIDPrivate(object):
