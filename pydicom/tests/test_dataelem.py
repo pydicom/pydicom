@@ -24,10 +24,8 @@ from pydicom.valuerep import DSfloat
 def test_is_string_like():
     """Test isStringOrStringList"""
     assert isStringOrStringList('some str')
-    assert not isStringOrStringList(b'some str')
     assert not isStringOrStringList(1234)
     assert isStringOrStringList(['some str', 'list'])
-    assert not isStringOrStringList([b'some str', b'list'])
     assert not isStringOrStringList(['some str', 1234])
 
 
