@@ -171,27 +171,24 @@
            <div itemprop="articleBody">
             
   <h1>Source code for pydicom.filewriter</h1><div class="highlight"><pre>
-<span></span><span class="c1"># filewriter.py</span>
-<span class="sd">&quot;&quot;&quot;Write a dicom media file.&quot;&quot;&quot;</span>
+<span></span><span class="c1"># Copyright 2008-2017 pydicom authors. See LICENSE file for details.</span>
+<span class="sd">&quot;&quot;&quot;Functions related to writing DICOM data.&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
-<span class="c1"># Copyright (c) 2008-2012 Darcy Mason</span>
-<span class="c1"># This file is part of pydicom, released under a modified MIT license.</span>
-<span class="c1">#    See the file license.txt included with this distribution, also</span>
-<span class="c1">#    available at https://github.com/darcymason/pydicom</span>
 
 <span class="kn">from</span> <span class="nn">struct</span> <span class="k">import</span> <span class="n">pack</span>
 
-<span class="kn">from</span> <span class="nn">pydicom</span> <span class="k">import</span> <span class="n">compat</span>
+<span class="kn">from</span> <span class="nn">pydicom</span> <span class="k">import</span> <span class="n">compat</span><span class="p">,</span> <span class="n">__version__</span>
 <span class="kn">from</span> <span class="nn">pydicom.compat</span> <span class="k">import</span> <span class="n">in_py2</span>
 <span class="kn">from</span> <span class="nn">pydicom.charset</span> <span class="k">import</span> <span class="n">default_encoding</span><span class="p">,</span> <span class="n">text_VRs</span><span class="p">,</span> <span class="n">convert_encodings</span>
-<span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="k">import</span> <span class="n">ImplicitVRLittleEndian</span><span class="p">,</span> <span class="n">ExplicitVRBigEndian</span>
-<span class="kn">from</span> <span class="nn">pydicom.filebase</span> <span class="k">import</span> <span class="n">DicomFile</span><span class="p">,</span> <span class="n">DicomFileLike</span>
 <span class="kn">from</span> <span class="nn">pydicom.datadict</span> <span class="k">import</span> <span class="n">keyword_for_tag</span>
 <span class="kn">from</span> <span class="nn">pydicom.dataset</span> <span class="k">import</span> <span class="n">Dataset</span>
+<span class="kn">from</span> <span class="nn">pydicom.filebase</span> <span class="k">import</span> <span class="n">DicomFile</span><span class="p">,</span> <span class="n">DicomFileLike</span>
 <span class="kn">from</span> <span class="nn">pydicom.tag</span> <span class="k">import</span> <span class="n">Tag</span><span class="p">,</span> <span class="n">ItemTag</span><span class="p">,</span> <span class="n">ItemDelimiterTag</span><span class="p">,</span> <span class="n">SequenceDelimiterTag</span>
+<span class="kn">from</span> <span class="nn">pydicom.tagtools</span> <span class="k">import</span> <span class="n">tag_in_exception</span>
+<span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="k">import</span> <span class="p">(</span><span class="n">PYDICOM_IMPLEMENTATION_UID</span><span class="p">,</span> <span class="n">ImplicitVRLittleEndian</span><span class="p">,</span>
+                         <span class="n">ExplicitVRBigEndian</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">pydicom.valuerep</span> <span class="k">import</span> <span class="n">extra_length_VRs</span>
 <span class="kn">from</span> <span class="nn">pydicom.values</span> <span class="k">import</span> <span class="n">convert_numbers</span>
-<span class="kn">from</span> <span class="nn">pydicom.tagtools</span> <span class="k">import</span> <span class="n">tag_in_exception</span>
 
 
 <span class="k">def</span> <span class="nf">correct_ambiguous_vr_element</span><span class="p">(</span><span class="n">elem</span><span class="p">,</span> <span class="n">ds</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">):</span>
@@ -696,10 +693,10 @@
 <span class="sd">        * (0002,0012) ImplementationClassUID, UI, N</span>
 
 <span class="sd">    If `enforce_standard` is True then (0002,0000) will be added/updated,</span>
-<span class="sd">    (0002,0001) will be added if not already present and the other required</span>
-<span class="sd">    elements will checked to see if they exist. If `enforce_standard` is</span>
-<span class="sd">    False then `file_meta` will be written as is after minimal validation</span>
-<span class="sd">    checking.</span>
+<span class="sd">    (0002,0001) and (0002,0012) will be added if not already present and the</span>
+<span class="sd">    other required elements will be checked to see if they exist. If</span>
+<span class="sd">    `enforce_standard` is False then `file_meta` will be written as is after</span>
+<span class="sd">    minimal validation checking.</span>
 
 <span class="sd">    The following Type 3/1C Elements may also be present:</span>
 <span class="sd">        * (0002,0013) ImplementationVersionName, SH, N</span>
@@ -708,6 +705,8 @@
 <span class="sd">        * (0002,0018) ReceivingApplicationEntityTitle, AE, N</span>
 <span class="sd">        * (0002,0100) PrivateInformationCreatorUID, UI, N</span>
 <span class="sd">        * (0002,0102) PrivateInformation, OB, N</span>
+
+<span class="sd">    If `enforce_standard` is True then (0002,0013) will be added/updated.</span>
 
 <span class="sd">    Encoding</span>
 <span class="sd">    ~~~~~~~~</span>
@@ -730,7 +729,7 @@
 <span class="sd">    ValueError</span>
 <span class="sd">        If `enforce_standard` is True and any of the required File Meta</span>
 <span class="sd">        Information elements are missing from `file_meta`, with the</span>
-<span class="sd">        exception of (0002,0000) and (0002,0001).</span>
+<span class="sd">        exception of (0002,0000), (0002,0001) and (0002,0012).</span>
 <span class="sd">    ValueError</span>
 <span class="sd">        If any non-Group 2 Elements are present in `file_meta`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -751,9 +750,12 @@
         <span class="k">if</span> <span class="s1">&#39;FileMetaInformationVersion&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">file_meta</span><span class="p">:</span>
             <span class="n">file_meta</span><span class="o">.</span><span class="n">FileMetaInformationVersion</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00\x01</span><span class="s1">&#39;</span>
 
+        <span class="n">file_meta</span><span class="o">.</span><span class="n">ImplementationClassUID</span> <span class="o">=</span> <span class="n">PYDICOM_IMPLEMENTATION_UID</span>
+        <span class="n">file_meta</span><span class="o">.</span><span class="n">ImplementationVersionName</span> <span class="o">=</span> <span class="s1">&#39;PYDICOM &#39;</span> <span class="o">+</span> <span class="n">__version__</span>
+
         <span class="c1"># Check that required File Meta Elements are present</span>
         <span class="n">missing</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="p">[</span><span class="mh">0x0002</span><span class="p">,</span> <span class="mh">0x0003</span><span class="p">,</span> <span class="mh">0x0010</span><span class="p">,</span> <span class="mh">0x0012</span><span class="p">]:</span>
+        <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="p">[</span><span class="mh">0x0002</span><span class="p">,</span> <span class="mh">0x0003</span><span class="p">,</span> <span class="mh">0x0010</span><span class="p">]:</span>
             <span class="k">if</span> <span class="n">Tag</span><span class="p">(</span><span class="mh">0x0002</span><span class="p">,</span> <span class="n">element</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">file_meta</span><span class="p">:</span>
                 <span class="n">missing</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Tag</span><span class="p">(</span><span class="mh">0x0002</span><span class="p">,</span> <span class="n">element</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">missing</span><span class="p">:</span>
@@ -926,7 +928,8 @@
     <span class="c1">#   `write_like_original` is True we treat it as optional</span>
     <span class="n">file_meta</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="s1">&#39;file_meta&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">file_meta</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">write_like_original</span><span class="p">:</span>
-        <span class="n">file_meta</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">()</span>
+        <span class="n">dataset</span><span class="o">.</span><span class="n">file_meta</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">()</span>
+        <span class="n">file_meta</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">file_meta</span>
 
     <span class="c1"># If enforcing the standard, correct the TransferSyntaxUID where possible,</span>
     <span class="c1">#   noting that the transfer syntax for is_implicit_VR = False and</span>
@@ -940,6 +943,11 @@
         <span class="k">elif</span> <span class="ow">not</span> <span class="n">dataset</span><span class="o">.</span><span class="n">is_little_endian</span> <span class="ow">and</span> <span class="n">dataset</span><span class="o">.</span><span class="n">is_implicit_VR</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Implicit VR Big Endian is not a&quot;</span>
                                       <span class="s2">&quot;supported Transfer Syntax.&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s1">&#39;SOPClassUID&#39;</span> <span class="ow">in</span> <span class="n">dataset</span><span class="p">:</span>
+            <span class="n">file_meta</span><span class="o">.</span><span class="n">MediaStorageSOPClassUID</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">SOPClassUID</span>
+        <span class="k">if</span> <span class="s1">&#39;SOPInstanceUID&#39;</span> <span class="ow">in</span> <span class="n">dataset</span><span class="p">:</span>
+            <span class="n">file_meta</span><span class="o">.</span><span class="n">MediaStorageSOPInstanceUID</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">SOPInstanceUID</span>
 
     <span class="n">caller_owns_file</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="c1"># Open file if not already a file object</span>
