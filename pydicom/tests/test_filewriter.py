@@ -274,9 +274,70 @@ class WriteDataElementTests(unittest.TestCase):
         got = self.f1.getvalue()
         msg = ("Did not write zero-length AT value correctly. "
                "Expected %r, got %r") % (bytes2hex(expected), bytes2hex(got))
-        msg = "%r %r" % (type(expected), type(got))
-        msg = "'%r' '%r'" % (expected, got)
         self.assertEqual(expected, got, msg)
+
+    def check_data_element(self, data_elem, expected):
+        encoded_elem = self.encode_element(data_elem)
+        self.assertEqual(expected, encoded_elem)
+
+    def test_write_DA(self):
+        data_elem = DataElement(0x00080022, 'DA', '20000101')
+        expected = (b'\x08\x00\x22\x00'  # tag
+                    b'\x08\x00\x00\x00'  # length
+                    b'20000101')  # value
+        self.check_data_element(data_elem, expected)
+        data_elem = DataElement(0x00080022, 'DA', date(2000, 1, 1))
+        self.check_data_element(data_elem, expected)
+
+    def test_write_multi_DA(self):
+        data_elem = DataElement(0x0014407E, 'DA', ['20100101', '20101231'])
+        expected = (b'\x14\x00\x7E\x40'  # tag
+                    b'\x12\x00\x00\x00'  # length
+                    b'20100101\\20101231 ')  # padded value
+        self.check_data_element(data_elem, expected)
+        data_elem = DataElement(0x0014407E, 'DA', [date(2010, 1, 1),
+                                                   date(2010, 12, 31)])
+        self.check_data_element(data_elem, expected)
+
+    def test_write_TM(self):
+        data_elem = DataElement(0x00080030, 'TM', '010203')
+        expected = (b'\x08\x00\x30\x00'  # tag
+                    b'\x06\x00\x00\x00'  # length
+                    b'010203')  # padded value
+        self.check_data_element(data_elem, expected)
+        data_elem = DataElement(0x00080030, 'TM', time(1, 2, 3))
+        self.check_data_element(data_elem, expected)
+
+    def test_write_multi_TM(self):
+        data_elem = DataElement(0x0014407C, 'TM', ['082500', '092655'])
+        expected = (b'\x14\x00\x7C\x40'  # tag
+                    b'\x0E\x00\x00\x00'  # length
+                    b'082500\\092655 ')  # padded value
+        self.check_data_element(data_elem, expected)
+        data_elem = DataElement(0x0014407C, 'TM', [time(8, 25),
+                                                   time(9, 26, 55)])
+        self.check_data_element(data_elem, expected)
+
+    def test_write_DT(self):
+        data_elem = DataElement(0x0008002A, 'DT', '20170101120000')
+        expected = (b'\x08\x00\x2A\x00'  # tag
+                    b'\x0E\x00\x00\x00'  # length
+                    b'20170101120000')  # value
+        self.check_data_element(data_elem, expected)
+        data_elem = DataElement(0x0008002A, 'DT', datetime(2017, 1, 1, 12))
+        self.check_data_element(data_elem, expected)
+
+    def test_write_multi_DT(self):
+        data_elem = DataElement(0x0040A13A, 'DT',
+                                ['20120820120804', '20130901111111'])
+        expected = (b'\x40\x00\x3A\xA1'  # tag
+                    b'\x1E\x00\x00\x00'  # length
+                    b'20120820120804\\20130901111111 ')  # padded value
+        self.check_data_element(data_elem, expected)
+        data_elem = DataElement(0x0040A13A, 'DT',
+                                [datetime(2012, 8, 20, 12, 8, 4),
+                                 datetime(2013, 9, 1, 11, 11, 11)])
+        self.check_data_element(data_elem, expected)
 
     def test_write_OD_implicit_little(self):
         """Test writing elements with VR of OD works correctly."""
