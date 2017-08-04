@@ -24,10 +24,10 @@ from pydicom.valuerep import DSfloat
 def test_is_string_like():
     """Test isStringOrStringList"""
     assert isStringOrStringList('some str')
-    assert isStringOrStringList(b'some str')
+    assert not isStringOrStringList(b'some str')
     assert not isStringOrStringList(1234)
     assert isStringOrStringList(['some str', 'list'])
-    assert isStringOrStringList([b'some str', b'list'])
+    assert not isStringOrStringList([b'some str', b'list'])
     assert not isStringOrStringList(['some str', 1234])
 
 
@@ -304,6 +304,7 @@ class DataElementTests(unittest.TestCase):
         assert "(0010, 0010) Patient's Name" in str(elem)
         assert "PN: 'foo'" in str(elem)
 
+    @unittest.skipIf(sys.version_info >= (3, ), 'Testing Python 2 behavior')
     def test_unicode(self):
         """Test unicode representation of the DataElement"""
         elem = DataElement(0x00100010, 'PN', 'ANON')
