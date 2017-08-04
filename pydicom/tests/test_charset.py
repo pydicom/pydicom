@@ -7,20 +7,19 @@
 #    available at https://github.com/pydicom/pydicom
 
 import unittest
+from pydicom.data import DATA_ROOT
 from pydicom import dicomio
 import os.path
 import pydicom.charset
 
-test_dir = os.path.dirname(__file__)
-testcharset_dir = os.path.join(test_dir, 'charset_files')
+testcharset_dir = os.path.join(DATA_ROOT, 'charset_files')
+test_files = os.path.join(DATA_ROOT, 'test_files')
 
 latin1_file = os.path.join(testcharset_dir, "chrFren.dcm")
 jp_file = os.path.join(testcharset_dir, "chrH31.dcm")
 multiPN_file = os.path.join(testcharset_dir, "chrFrenMulti.dcm")
 sq_encoding_file = os.path.join(testcharset_dir, "chrSQEncoding.dcm")
 explicit_ir6_file = os.path.join(testcharset_dir, "chrJapMultiExplicitIR6.dcm")
-
-test_files = os.path.join(test_dir, 'test_files')
 normal_file = os.path.join(test_files, "CT_small.dcm")
 
 

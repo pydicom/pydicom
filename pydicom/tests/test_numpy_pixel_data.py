@@ -4,6 +4,7 @@ import sys
 import pytest
 import pydicom
 from pydicom.filereader import read_file
+from pydicom.data import DATA_ROOT
 from pydicom.tag import Tag
 numpy_missing_message = ("numpy is not available "
                          "in this test environment")
@@ -15,8 +16,7 @@ try:
 except ImportError:
     have_numpy_handler = False
 
-test_dir = os.path.dirname(__file__)
-test_files = os.path.join(test_dir, 'test_files')
+test_files = os.path.join(DATA_ROOT, 'test_files')
 
 empty_number_tags_name = os.path.join(
     test_files, "reportsi_with_empty_number_tags.dcm")
