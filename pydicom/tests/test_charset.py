@@ -5,12 +5,14 @@
 # This file is part of pydicom, released under a modified MIT license.
 #    See the file LICENSE included with this distribution, also
 #    available at https://github.com/pydicom/pydicom
-
-import unittest
-from pydicom.data import DATA_ROOT
-from pydicom import dicomio
 import os.path
+import unittest
+
+from pydicom import dicomio
 import pydicom.charset
+from pydicom.data import DATA_ROOT
+from pydicom.dataelem import DataElement
+
 
 testcharset_dir = os.path.join(DATA_ROOT, 'charset_files')
 test_files = os.path.join(DATA_ROOT, 'test_files')
@@ -88,6 +90,11 @@ class charsetTests(unittest.TestCase):
                     '\033$B;3ED\033(B^\033$BB@O:\033(B='
                     '\033$B$d$^$@\033(B^\033$B$?$m$&\033(B')
         self.assertEqual(expected, ds.PatientName)
+
+    def test_bad_charset(self):
+        """Test bad charset defaults to ISO IR 6"""
+        elem = DataElement(0x00100010, 'PN', 'CITIZEN')
+        pydicom.charset.decode(elem, [])
 
 
 if __name__ == "__main__":

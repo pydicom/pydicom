@@ -26,6 +26,8 @@ def hex2bytes(hexstring):
     Note in the example that all lines except the first must
     start with a space, alternatively the space could
     end the previous line.
+
+    TODO: Should raise TypeError if not a bytes or str
     """
 
     # This works in both 3.x and 2.x because the first conditional evaluates to
