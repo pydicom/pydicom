@@ -55,11 +55,10 @@ def supports_transfer_syntax(dicom_dataset):
     """
     Returns
     -------
-    True:
-        if this pixel data handler might support this transfer syntax.
+    bool
+        True if this pixel data handler might support this transfer syntax.
 
-    False:
-        to prevent any attempt to try to use this handler
+        False to prevent any attempt to try to use this handler
         to decode the given transfer syntax
     """
     if (have_pillow_jpeg_plugin and
@@ -83,13 +82,13 @@ def get_pixeldata(dicom_dataset):
 
     Raises
     ------
-    ImportError:
+    ImportError
         If PIL is not available.
 
-    NotImplementedError:
+    NotImplementedError
         if the transfer syntax is not supported
 
-    TypeError:
+    TypeError
         if the pixel data type is unsupported
     """
     logger.debug("Trying to use Pillow to read pixel array "

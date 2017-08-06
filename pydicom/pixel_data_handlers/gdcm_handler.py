@@ -20,11 +20,10 @@ def supports_transfer_syntax(dicom_dataset):
     """
     Returns
     -------
-    True:
-        if this pixel data handler might support this transfer syntax.
+    bool
+        True if this pixel data handler might support this transfer syntax.
 
-    False:
-        to prevent any attempt to try to use this handler
+        False to prevent any attempt to try to use this handler
         to decode the given transfer syntax
     """
     return True
@@ -36,18 +35,21 @@ def get_pixeldata(dicom_dataset):
 
     Returns
     -------
-    A correctly sized (but not shaped) numpy array of the entire data volume
+    numpy.ndarray
+
+        A correctly sized (but not shaped) numpy array
+        of the entire data volume
 
     Raises
     ------
-    ImportError:
+    ImportError
         if the required packages are not available
 
-    TypeError:
+    TypeError
         if the image could not be read by GDCM
         if the pixel data type is unsupported
 
-    AttributeError:
+    AttributeError
         if the decoded amount of data does not match the expected amount
     """
 

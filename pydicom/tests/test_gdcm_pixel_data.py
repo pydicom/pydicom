@@ -78,7 +78,7 @@ class GDCM_JPEG_LS_Tests_no_gdcm(unittest.TestCase):
         try:
             self.jpeg_ls_lossless = read_file(
                 unicode(self.utf8_filename,
-                        encoding=sys.getfilesystemencoding()))
+                        encoding="utf8"))
         except NameError:
             # must be python3
             self.jpeg_ls_lossless = read_file(self.utf8_filename)
@@ -209,7 +209,7 @@ class GDCM_JPEG_LS_Tests_with_gdcm(unittest.TestCase):
         try:
             self.jpeg_ls_lossless = read_file(
                 unicode(self.utf8_filename,
-                        encoding=sys.getfilesystemencoding()))
+                        encoding="utf8"))
         except NameError:
             # must be python3
             self.jpeg_ls_lossless = read_file(self.utf8_filename)
