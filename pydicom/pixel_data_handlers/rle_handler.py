@@ -104,6 +104,7 @@ def get_pixeldata(dicom_dataset):
 
     return pixel_array
 
+
 def rle_decode_frame(d, Rows, Columns, SamplesPerPixel, numpy_format):
     rle_start = 0
     rle_len = len(d)
@@ -139,6 +140,7 @@ def rle_decode_frame(d, Rows, Columns, SamplesPerPixel, numpy_format):
         frame_bytes[plane_number::SamplesPerPixel*SampleSize] = plane_bytes
 
     return frame_bytes
+
 
 def rle_decode_plane(data):
 
