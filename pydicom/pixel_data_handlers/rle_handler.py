@@ -83,7 +83,7 @@ def get_pixeldata(dicom_dataset):
                                                   Rows=dicom_dataset.Rows,
                                                   Columns=dicom_dataset.Columns,
                                                   SamplesPerPixel=dicom_dataset.SamplesPerPixel,
-                                                  numpy_format=numpy_format)
+                                                  BitsAllocated=dicom_dataset.BitsAllocated)
 
             UncompressedPixelData.extend(decompressed_frame)
 
@@ -96,7 +96,7 @@ def get_pixeldata(dicom_dataset):
                                               Rows=dicom_dataset.Rows,
                                               Columns=dicom_dataset.Columns,
                                               SamplesPerPixel=dicom_dataset.SamplesPerPixel,
-                                              numpy_format=numpy_format)
+                                              BitsAllocated=dicom_dataset.BitsAllocated)
 
         UncompressedPixelData.extend(decompressed_frame)
 
@@ -105,15 +105,18 @@ def get_pixeldata(dicom_dataset):
     return pixel_array
 
 
-def rle_decode_frame(d, Rows, Columns, SamplesPerPixel, numpy_format):
+def rle_decode_frame(d, Rows, Columns, SamplesPerPixel, BitsAllocated):
     rle_start = 0
     rle_len = len(d)
 
     number_of_planes = unpack(b'<L', d[rle_start: rle_start + 4])[0]
 
-    SampleSize = numpy_format.itemsize
+    if BitsAllocated % 8 != 0:
+        raise Exception("Don't know how to handle BitsAllocated not being a multiple of bytes")
 
-    expected_number_of_planes = SamplesPerPixel * SampleSize
+    BytesAllocated = BitsAllocated // 8
+
+    expected_number_of_planes = SamplesPerPixel * BytesAllocated
 
     if number_of_planes != expected_number_of_planes:
         raise Exception("Unexpected number of planes")
@@ -126,7 +129,7 @@ def rle_decode_frame(d, Rows, Columns, SamplesPerPixel, numpy_format):
     plane_end_list = plane_start_list[1:]
     plane_end_list.append(rle_len + rle_start)
 
-    frame_bytes = bytearray(Rows * Columns * SamplesPerPixel * SampleSize)
+    frame_bytes = bytearray(Rows * Columns * SamplesPerPixel * BytesAllocated)
 
     for plane_number in range(number_of_planes):
         plane_start = plane_start_list[plane_number]
@@ -137,7 +140,7 @@ def rle_decode_frame(d, Rows, Columns, SamplesPerPixel, numpy_format):
         if len(plane_bytes) != Rows * Columns:
             raise Exception("Error unpacking bytes from RLE")
 
-        frame_bytes[plane_number::SamplesPerPixel*SampleSize] = plane_bytes
+        frame_bytes[plane_number::SamplesPerPixel*BytesAllocated] = plane_bytes
 
     return frame_bytes
 
