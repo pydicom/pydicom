@@ -1,5 +1,6 @@
 import sys
 import pydicom.uid
+import pydicom.encaps
 from struct import unpack
 have_numpy = True
 try:
