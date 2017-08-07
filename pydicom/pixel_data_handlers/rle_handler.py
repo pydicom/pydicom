@@ -189,7 +189,7 @@ def _rle_decode_plane(data):
         The decompressed data
     """
 
-    data = memoryview(data)
+    data = bytearray(data)
     result = bytearray()
     pos = 0
     len_data = len(data)
