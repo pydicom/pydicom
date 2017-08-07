@@ -6,17 +6,20 @@ import pydicom
 import pydicom.config
 from pydicom.filereader import read_file
 from pydicom.data import DATA_ROOT
+
 rle_missing_message = ("RLE decoder (numpy based) is not available "
-                           "in this test environment")
+                       "in this test environment")
 rle_present_message = "RLE decoder (numpy based) is being tested"
 rle_handler = None
 have_rle_handler = True
 numpy_handler = None
 have_numpy_handler = True
+
 try:
     import pydicom.pixel_data_handlers.numpy_handler as numpy_handler
 except ImportError:
     have_numpy_handler = False
+
 try:
     import pydicom.pixel_data_handlers.rle_handler as rle_handler
 except ImportError:
@@ -92,8 +95,6 @@ class rle_RLE_Tests_no_rle(unittest.TestCase):
             _ = self.mr_rle.pixel_array
 
 
-
-
 @pytest.mark.skipif(
     not test_rle_decoder,
     reason=rle_missing_message)
@@ -126,4 +127,3 @@ class rle_RLE_Tests_with_rle(unittest.TestCase):
             b.mean(),
             "Decoded pixel data is not all {0} "
             "(mean == {1})".format(b.mean(), a.mean()))
-

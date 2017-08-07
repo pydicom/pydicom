@@ -84,10 +84,10 @@ def get_pixeldata(dicom_dataset):
 
         for frame in CompressedPixelDataSeq:
             decompressed_frame = _rle_decode_frame(frame,
-                                  rows=dicom_dataset.Rows,
-                                  columns=dicom_dataset.Columns,
-                                  samples_per_pixel=dicom_dataset.SamplesPerPixel,
-                                  bits_allocated=dicom_dataset.BitsAllocated)
+                                                   rows=dicom_dataset.Rows,
+                                                   columns=dicom_dataset.Columns,
+                                                   samples_per_pixel=dicom_dataset.SamplesPerPixel,
+                                                   bits_allocated=dicom_dataset.BitsAllocated) # noqa
 
             UncompressedPixelData.extend(decompressed_frame)
 
@@ -97,10 +97,10 @@ def get_pixeldata(dicom_dataset):
             dicom_dataset.PixelData)
 
         decompressed_frame = _rle_decode_frame(CompressedPixelData,
-                              rows=dicom_dataset.Rows,
-                              columns=dicom_dataset.Columns,
-                              samples_per_pixel=dicom_dataset.SamplesPerPixel,
-                              bits_allocated=dicom_dataset.BitsAllocated)
+                                               rows=dicom_dataset.Rows,
+                                               columns=dicom_dataset.Columns,
+                                               samples_per_pixel=dicom_dataset.SamplesPerPixel,
+                                               bits_allocated=dicom_dataset.BitsAllocated) # noqa
 
         UncompressedPixelData.extend(decompressed_frame)
 
@@ -155,19 +155,19 @@ def _rle_decode_frame(d, rows, columns, samples_per_pixel, bits_allocated):
     for i in range(number_of_planes):
         header_offset_start = rle_start + 4 + (4 * i)
         header_offset_end = rle_start + 4 + (4 * (i + 1))
-        plane_start_in_rle = unpack(b'<L', d[header_offset_start:header_offset_end])[0]
+        plane_start_in_rle = unpack(b'<L', d[header_offset_start:header_offset_end])[0] # noqa
         plane_start_list.append(plane_start_in_rle + rle_start)
 
     plane_end_list = plane_start_list[1:]
     plane_end_list.append(rle_len + rle_start)
 
-    frame_bytes = bytearray(rows * columns * samples_per_pixel * bytes_allocated)
+    frame_bytes = bytearray(rows * columns * samples_per_pixel * bytes_allocated) # noqa
 
     for sample_number in range(samples_per_pixel):
         for byte_number in range(bytes_allocated):
 
             plane_number = byte_number + (sample_number * bytes_allocated)
-            out_plane_number = ((sample_number+1) * bytes_allocated) - byte_number - 1
+            out_plane_number = ((sample_number+1) * bytes_allocated) - byte_number - 1 # noqa
             plane_start = plane_start_list[plane_number]
             plane_end = plane_end_list[plane_number]
 
@@ -177,7 +177,7 @@ def _rle_decode_frame(d, rows, columns, samples_per_pixel, bits_allocated):
                 raise AttributeError("Different number of bytes unpacked "
                                      "from RLE than expected")
 
-            frame_bytes[out_plane_number::samples_per_pixel * bytes_allocated] = plane_bytes
+            frame_bytes[out_plane_number::samples_per_pixel * bytes_allocated] = plane_bytes # noqa
 
     return frame_bytes
 
