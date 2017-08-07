@@ -17,7 +17,8 @@ RLESupportedTransferSyntaxes = [
 
 
 def supports_transfer_syntax(dicom_dataset):
-    return (dicom_dataset.file_meta.TransferSyntaxUID in RLESupportedTransferSyntaxes)
+    return (dicom_dataset.file_meta.TransferSyntaxUID in
+            RLESupportedTransferSyntaxes)
 
 
 def get_pixeldata(dicom_dataset):
@@ -83,10 +84,10 @@ def get_pixeldata(dicom_dataset):
 
         for frame in CompressedPixelDataSeq:
             decompressed_frame = _rle_decode_frame(frame,
-                                                  Rows=dicom_dataset.Rows,
-                                                  Columns=dicom_dataset.Columns,
-                                                  SamplesPerPixel=dicom_dataset.SamplesPerPixel,
-                                                  BitsAllocated=dicom_dataset.BitsAllocated)
+                                  rows=dicom_dataset.Rows,
+                                  columns=dicom_dataset.Columns,
+                                  samples_per_pixel=dicom_dataset.SamplesPerPixel,
+                                  bits_allocated=dicom_dataset.BitsAllocated)
 
             UncompressedPixelData.extend(decompressed_frame)
 
@@ -96,10 +97,10 @@ def get_pixeldata(dicom_dataset):
             dicom_dataset.PixelData)
 
         decompressed_frame = _rle_decode_frame(CompressedPixelData,
-                                              Rows=dicom_dataset.Rows,
-                                              Columns=dicom_dataset.Columns,
-                                              SamplesPerPixel=dicom_dataset.SamplesPerPixel,
-                                              BitsAllocated=dicom_dataset.BitsAllocated)
+                              rows=dicom_dataset.Rows,
+                              columns=dicom_dataset.Columns,
+                              samples_per_pixel=dicom_dataset.SamplesPerPixel,
+                              bits_allocated=dicom_dataset.BitsAllocated)
 
         UncompressedPixelData.extend(decompressed_frame)
 
@@ -108,10 +109,12 @@ def get_pixeldata(dicom_dataset):
     return pixel_array
 
 
-def _rle_decode_frame(d, Rows, Columns, SamplesPerPixel, BitsAllocated):
+def _rle_decode_frame(d, rows, columns, samples_per_pixel, bits_allocated):
     """Decodes a single frame of RLE encoded data.
     Reads the plane information at the beginning of the data.
-    If more than pixel size > 1 byte appropriately interleaves the data from the high and low planes
+    If more than pixel size > 1 byte appropriately interleaves the data from
+    the high and low planes. Data is always stored big endian. Output always
+    little endian
 
     Parameters
     ----------
@@ -137,40 +140,44 @@ def _rle_decode_frame(d, Rows, Columns, SamplesPerPixel, BitsAllocated):
 
     number_of_planes = unpack(b'<L', d[rle_start: rle_start + 4])[0]
 
-    if BitsAllocated % 8 != 0:
-        raise NotImplementedError("Don't know how to handle BitsAllocated not being a multiple of bytes")
+    if bits_allocated % 8 != 0:
+        raise NotImplementedError("Don't know how to handle BitsAllocated "
+                                  "not being a multiple of bytes")
 
-    BytesAllocated = BitsAllocated // 8
+    bytes_allocated = bits_allocated // 8
 
-    expected_number_of_planes = SamplesPerPixel * BytesAllocated
+    expected_number_of_planes = samples_per_pixel * bytes_allocated
 
     if number_of_planes != expected_number_of_planes:
         raise AttributeError("Unexpected number of planes")
 
     plane_start_list = []
     for i in range(number_of_planes):
-        plane_start_in_rle = unpack(b'<L', d[rle_start + 4 + (4 * i):rle_start + 4 + (4 * (i + 1))])[0]
+        header_offset_start = rle_start + 4 + (4 * i)
+        header_offset_end = rle_start + 4 + (4 * (i + 1))
+        plane_start_in_rle = unpack(b'<L', d[header_offset_start:header_offset_end])[0]
         plane_start_list.append(plane_start_in_rle + rle_start)
 
     plane_end_list = plane_start_list[1:]
     plane_end_list.append(rle_len + rle_start)
 
-    frame_bytes = bytearray(Rows * Columns * SamplesPerPixel * BytesAllocated)
+    frame_bytes = bytearray(rows * columns * samples_per_pixel * bytes_allocated)
 
-    for sample_number in range(SamplesPerPixel):
-        for byte_number in range(BytesAllocated):
+    for sample_number in range(samples_per_pixel):
+        for byte_number in range(bytes_allocated):
 
-            plane_number = byte_number + (sample_number * BytesAllocated)
-            out_plane_number = ((sample_number+1) * BytesAllocated) - byte_number - 1
+            plane_number = byte_number + (sample_number * bytes_allocated)
+            out_plane_number = ((sample_number+1) * bytes_allocated) - byte_number - 1
             plane_start = plane_start_list[plane_number]
             plane_end = plane_end_list[plane_number]
 
             plane_bytes = _rle_decode_plane(d[plane_start:plane_end])
 
-            if len(plane_bytes) != Rows * Columns:
-                raise AttributeError("Different number of bytes unpacked from RLE than expected")
+            if len(plane_bytes) != rows * columns:
+                raise AttributeError("Different number of bytes unpacked "
+                                     "from RLE than expected")
 
-            frame_bytes[out_plane_number::SamplesPerPixel*BytesAllocated] = plane_bytes
+            frame_bytes[out_plane_number::samples_per_pixel * bytes_allocated] = plane_bytes
 
     return frame_bytes
 
