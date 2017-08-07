@@ -14,11 +14,13 @@ import shutil
 import sys
 import tempfile
 import unittest
+
+from pydicom.filebase import DicomBytesIO
 from pydicom.util.testing.warncheck import assertWarns
 from pydicom.dataset import Dataset, FileDataset
 from pydicom.data import DATA_ROOT
 from pydicom.dataelem import DataElement
-from pydicom.filereader import read_file
+from pydicom.filereader import read_file, data_element_generator
 from pydicom.errors import InvalidDicomError
 from pydicom.tag import Tag, TupleTag
 from pydicom.uid import ImplicitVRLittleEndian
@@ -667,6 +669,22 @@ class ReaderTests(unittest.TestCase):
         self.assertTrue(ds.preamble is None)
         self.assertEqual(ds.file_meta, Dataset())
         self.assertEqual(ds[:], Dataset())
+
+    def test_read_file_does_not_raise(self):
+        """Test that reading from DicomBytesIO does not raise on EOF.
+        Regression test for #358."""
+        ds = read_file(mr_name)
+        fp = DicomBytesIO()
+        ds.save_as(fp)
+        fp.seek(0)
+        de_gen = data_element_generator(fp, False, True)
+        try:
+            while True:
+                next(de_gen)
+        except StopIteration:
+            pass
+        except EOFError:
+            self.fail('Unexpected EOFError raised')
 
 
 class ReadDataElementTests(unittest.TestCase):
