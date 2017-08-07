@@ -86,10 +86,10 @@ class rle_RLE_Tests_no_rle(unittest.TestCase):
     def tearDown(self):
         pydicom.config.image_handlers = self.original_handlers
 
-    def test_JPEG_LS_PixelArray(self):
+    def test_RLE_PixelArray(self):
         with self.assertRaises((NotImplementedError, )):
-            _ = self.emri_rle_lossless.pixel_array
-            _ = self.mr_rle_lossless.pixel_array
+            _ = self.emri_rle.pixel_array
+            _ = self.mr_rle.pixel_array
 
 
 
