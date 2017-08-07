@@ -225,7 +225,7 @@ class GDCM_JPEG_LS_Tests_with_gdcm(unittest.TestCase):
 
     def tearDown(self):
         pydicom.config.image_handlers = self.original_handlers
-        os.remove(self.utf8_filename)
+        os.remove(self.unicode_filename)
 
     def test_JPEG_LS_PixelArray(self):
         a = self.jpeg_ls_lossless.pixel_array
