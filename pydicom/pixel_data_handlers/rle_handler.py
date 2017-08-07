@@ -157,16 +157,21 @@ def _rle_decode_frame(d, Rows, Columns, SamplesPerPixel, BitsAllocated):
 
     frame_bytes = bytearray(Rows * Columns * SamplesPerPixel * BytesAllocated)
 
-    for plane_number in range(number_of_planes):
-        plane_start = plane_start_list[plane_number]
-        plane_end = plane_end_list[plane_number]
 
-        plane_bytes = _rle_decode_plane(d[plane_start:plane_end])
+    for sample_number in range(SamplesPerPixel):
+        for byte_number in range(BytesAllocated):
 
-        if len(plane_bytes) != Rows * Columns:
-            raise AttributeError("Different number of bytes unpacked from RLE than expected")
+            plane_number = byte_number + (sample_number * BytesAllocated)
+            out_plane_number = ((sample_number+1) * BytesAllocated) - byte_number - 1
+            plane_start = plane_start_list[plane_number]
+            plane_end = plane_end_list[plane_number]
 
-        frame_bytes[plane_number::SamplesPerPixel*BytesAllocated] = plane_bytes
+            plane_bytes = _rle_decode_plane(d[plane_start:plane_end])
+
+            if len(plane_bytes) != Rows * Columns:
+                raise AttributeError("Different number of bytes unpacked from RLE than expected")
+
+            frame_bytes[out_plane_number::SamplesPerPixel*BytesAllocated] = plane_bytes
 
     return frame_bytes
 
