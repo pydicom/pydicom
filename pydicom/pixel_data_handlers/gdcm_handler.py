@@ -1,5 +1,6 @@
 """Use the gdcm python package to decode pixel transfer syntaxes."""
 import sys
+from pydicom import compat
 have_numpy = True
 try:
     import numpy
@@ -63,13 +64,13 @@ def get_pixeldata(dicom_dataset):
         raise ImportError(msg)
 
     gdcm_image_reader = gdcm.ImageReader()
-    try:
+    if compat.in_py2:
         if isinstance(dicom_dataset.filename, unicode):
             gdcm_image_reader.SetFileName(
                 dicom_dataset.filename.encode(sys.getfilesystemencoding()))
         else:
             gdcm_image_reader.SetFileName(dicom_dataset.filename)
-    except NameError:
+    else:
         # python 3
         gdcm_image_reader.SetFileName(dicom_dataset.filename)
 

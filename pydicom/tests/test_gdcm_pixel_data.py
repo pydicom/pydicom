@@ -10,6 +10,7 @@ import logging
 from pydicom.filereader import read_file
 from pydicom.data import DATA_ROOT
 from pydicom.tag import Tag
+from pydicom import compat
 gdcm_missing_message = "GDCM is not available in this test environment"
 gdcm_present_message = "GDCM is being tested"
 
@@ -73,16 +74,17 @@ save_dir = os.getcwd()
 
 class GDCM_JPEG_LS_Tests_no_gdcm(unittest.TestCase):
     def setUp(self):
-        self.utf8_filename = os.path.join(tempfile.gettempdir(), "ДИКОМ.dcm")
-        shutil.copyfile(jpeg_ls_lossless_name, self.utf8_filename)
-        try:
-            self.jpeg_ls_lossless = read_file(
-                unicode(self.utf8_filename,
-                        encoding="utf8"))
-        except NameError:
-            # must be python3
-            self.jpeg_ls_lossless = read_file(self.utf8_filename)
-
+        if compat.in_py2:
+            self.utf8_filename = os.path.join(
+                tempfile.gettempdir(), "ДИКОМ.dcm")
+            self.unicode_filename = self.utf8_filename.decode("utf8")
+            shutil.copyfile(jpeg_ls_lossless_name.decode("utf8"),
+                            self.unicode_filename)
+        else:
+            self.unicode_filename = os.path.join(
+                tempfile.gettempdir(), "ДИКОМ.dcm")
+            shutil.copyfile(jpeg_ls_lossless_name, self.unicode_filename)
+        self.jpeg_ls_lossless = read_file(self.unicode_filename)
         self.mr_small = read_file(mr_name)
         self.emri_jpeg_ls_lossless = read_file(emri_jpeg_ls_lossless)
         self.emri_small = read_file(emri_name)
@@ -91,7 +93,7 @@ class GDCM_JPEG_LS_Tests_no_gdcm(unittest.TestCase):
 
     def tearDown(self):
         pydicom.config.image_handlers = self.original_handlers
-        os.remove(self.utf8_filename)
+        os.remove(self.unicode_filename)
 
     def test_JPEG_LS_PixelArray(self):
         with self.assertRaises((NotImplementedError, )):
@@ -204,16 +206,17 @@ class GDCM_JPEGlosslessTests_no_gdcm(unittest.TestCase):
 @pytest.mark.skipif(not test_gdcm_decoder, reason=gdcm_missing_message)
 class GDCM_JPEG_LS_Tests_with_gdcm(unittest.TestCase):
     def setUp(self):
-        self.utf8_filename = os.path.join(tempfile.gettempdir(), "ДИКОМ.dcm")
-        shutil.copyfile(jpeg_ls_lossless_name, self.utf8_filename)
-        try:
-            self.jpeg_ls_lossless = read_file(
-                unicode(self.utf8_filename,
-                        encoding="utf8"))
-        except NameError:
-            # must be python3
-            self.jpeg_ls_lossless = read_file(self.utf8_filename)
-
+        if compat.in_py2:
+            self.utf8_filename = os.path.join(
+                tempfile.gettempdir(), "ДИКОМ.dcm")
+            self.unicode_filename = self.utf8_filename.decode("utf8")
+            shutil.copyfile(jpeg_ls_lossless_name.decode("utf8"),
+                            self.unicode_filename)
+        else:
+            self.unicode_filename = os.path.join(
+                tempfile.gettempdir(), "ДИКОМ.dcm")
+            shutil.copyfile(jpeg_ls_lossless_name, self.unicode_filename)
+        self.jpeg_ls_lossless = read_file(self.unicode_filename)
         self.mr_small = read_file(mr_name)
         self.emri_jpeg_ls_lossless = read_file(emri_jpeg_ls_lossless)
         self.emri_small = read_file(emri_name)
