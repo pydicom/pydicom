@@ -28,6 +28,8 @@ def get_pixeldata(dicom_dataset):
         If there is no Pixel Data or not a supported data type.
     ImportError
         If NumPy isn't found
+    NotImplementedError
+        If cannot handle the format
     Returns
     -------
     numpy.ndarray
@@ -59,6 +61,7 @@ def get_pixeldata(dicom_dataset):
         format_str = 'int{}'.format(dicom_dataset.BitsAllocated)
     else:
         format_str = 'bad_pixel_representation'
+
     try:
         numpy_format = numpy.dtype(format_str)
     except TypeError:
@@ -70,7 +73,6 @@ def get_pixeldata(dicom_dataset):
                    dicom_dataset.BitsAllocated))
         raise TypeError(msg)
 
-    print("Decoding RLE")
     UncompressedPixelData = bytearray()
 
     if ('NumberOfFrames' in dicom_dataset and
@@ -80,7 +82,7 @@ def get_pixeldata(dicom_dataset):
             dicom_dataset.PixelData)
 
         for frame in CompressedPixelDataSeq:
-            decompressed_frame = rle_decode_frame(frame,
+            decompressed_frame = _rle_decode_frame(frame,
                                                   Rows=dicom_dataset.Rows,
                                                   Columns=dicom_dataset.Columns,
                                                   SamplesPerPixel=dicom_dataset.SamplesPerPixel,
@@ -93,7 +95,7 @@ def get_pixeldata(dicom_dataset):
         CompressedPixelData = pydicom.encaps.defragment_data(
             dicom_dataset.PixelData)
 
-        decompressed_frame = rle_decode_frame(CompressedPixelData,
+        decompressed_frame = _rle_decode_frame(CompressedPixelData,
                                               Rows=dicom_dataset.Rows,
                                               Columns=dicom_dataset.Columns,
                                               SamplesPerPixel=dicom_dataset.SamplesPerPixel,
@@ -106,21 +108,44 @@ def get_pixeldata(dicom_dataset):
     return pixel_array
 
 
-def rle_decode_frame(d, Rows, Columns, SamplesPerPixel, BitsAllocated):
+def _rle_decode_frame(d, Rows, Columns, SamplesPerPixel, BitsAllocated):
+    """Decodes a single frame of RLE encoded data.
+    Reads the plane information at the beginning of the data.
+    If more than pixel size > 1 byte appropriately interleaves the data from the high and low planes
+
+    Parameters
+    ----------
+    d: bytes
+        The RLE frame data
+    Rows: int
+        The number of output rows
+    Columns: int
+        The number of output columns
+    SamplesPerPixel: int
+        Number of samples per pixel (e.g. 3 for RGB data).
+    BitsAllocated: int
+        Number of bits per sample - must be a multiple of 8
+
+    Returns
+    -------
+    bytearray
+        The decompressed data
+    """
+
     rle_start = 0
     rle_len = len(d)
 
     number_of_planes = unpack(b'<L', d[rle_start: rle_start + 4])[0]
 
     if BitsAllocated % 8 != 0:
-        raise Exception("Don't know how to handle BitsAllocated not being a multiple of bytes")
+        raise NotImplementedError("Don't know how to handle BitsAllocated not being a multiple of bytes")
 
     BytesAllocated = BitsAllocated // 8
 
     expected_number_of_planes = SamplesPerPixel * BytesAllocated
 
     if number_of_planes != expected_number_of_planes:
-        raise Exception("Unexpected number of planes")
+        raise AttributeError("Unexpected number of planes")
 
     plane_start_list = []
     for i in range(number_of_planes):
@@ -136,17 +161,29 @@ def rle_decode_frame(d, Rows, Columns, SamplesPerPixel, BitsAllocated):
         plane_start = plane_start_list[plane_number]
         plane_end = plane_end_list[plane_number]
 
-        plane_bytes = rle_decode_plane(d[plane_start:plane_end])
+        plane_bytes = _rle_decode_plane(d[plane_start:plane_end])
 
         if len(plane_bytes) != Rows * Columns:
-            raise Exception("Error unpacking bytes from RLE")
+            raise AttributeError("Different number of bytes unpacked from RLE than expected")
 
         frame_bytes[plane_number::SamplesPerPixel*BytesAllocated] = plane_bytes
 
     return frame_bytes
 
 
-def rle_decode_plane(data):
+def _rle_decode_plane(data):
+    """Decodes a single plane of RLE encoded data using the PackBits algorithm
+
+    Parameters
+    ----------
+    data: bytes
+        The data to be decompressed
+
+    Returns
+    -------
+    bytearray
+        The decompressed data
+    """
 
     data = bytearray(data)
     result = bytearray()
