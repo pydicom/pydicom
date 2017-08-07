@@ -157,7 +157,6 @@ def _rle_decode_frame(d, Rows, Columns, SamplesPerPixel, BitsAllocated):
 
     frame_bytes = bytearray(Rows * Columns * SamplesPerPixel * BytesAllocated)
 
-
     for sample_number in range(SamplesPerPixel):
         for byte_number in range(BytesAllocated):
 
@@ -190,7 +189,7 @@ def _rle_decode_plane(data):
         The decompressed data
     """
 
-    data = bytearray(data)
+    data = memoryview(data)
     result = bytearray()
     pos = 0
     len_data = len(data)
