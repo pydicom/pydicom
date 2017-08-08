@@ -77,7 +77,6 @@ dir_name = os.path.dirname(sys.argv[0])
 save_dir = os.getcwd()
 
 
-@pytest.mark.skipif(test_pillow_decoder, reason=pillow_present_message)
 class pillow_JPEG_LS_Tests_no_pillow(unittest.TestCase):
     def setUp(self):
         self.jpeg_ls_lossless = read_file(jpeg_ls_lossless_name)
@@ -85,7 +84,7 @@ class pillow_JPEG_LS_Tests_no_pillow(unittest.TestCase):
         self.emri_jpeg_ls_lossless = read_file(emri_jpeg_ls_lossless)
         self.emri_small = read_file(emri_name)
         self.original_handlers = pydicom.config.image_handlers
-        pydicom.config.image_handlers = [pillow_handler, numpy_handler]
+        pydicom.config.image_handlers = [None, numpy_handler]
 
     def tearDown(self):
         pydicom.config.image_handlers = self.original_handlers
@@ -99,9 +98,6 @@ class pillow_JPEG_LS_Tests_no_pillow(unittest.TestCase):
             _ = self.emri_jpeg_ls_lossless.pixel_array
 
 
-@pytest.mark.skipif(
-    test_pillow_jpeg2000_decoder,
-    reason=pillow_present_message)
 class pillow_JPEG2000Tests_no_pillow(unittest.TestCase):
     def setUp(self):
         self.jpeg_2k = read_file(jpeg2000_name)
@@ -110,7 +106,7 @@ class pillow_JPEG2000Tests_no_pillow(unittest.TestCase):
         self.emri_jpeg_2k_lossless = read_file(emri_jpeg_2k_lossless)
         self.emri_small = read_file(emri_name)
         self.original_handlers = pydicom.config.image_handlers
-        pydicom.config.image_handlers = [pillow_handler, numpy_handler]
+        pydicom.config.image_handlers = [None, numpy_handler]
 
     def tearDown(self):
         pydicom.config.image_handlers = self.original_handlers
@@ -143,16 +139,13 @@ class pillow_JPEG2000Tests_no_pillow(unittest.TestCase):
             _ = self.emri_jpeg_2k_lossless.pixel_array
 
 
-@pytest.mark.skipif(
-    test_pillow_jpeg_decoder,
-    reason=pillow_present_message)
 class pillow_JPEGlossyTests_no_pillow(unittest.TestCase):
 
     def setUp(self):
         self.jpeg_lossy = read_file(jpeg_lossy_name)
         self.color_3d_jpeg = read_file(color_3d_jpeg_baseline)
         self.original_handlers = pydicom.config.image_handlers
-        pydicom.config.image_handlers = [pillow_handler, numpy_handler]
+        pydicom.config.image_handlers = [None, numpy_handler]
 
     def tearDown(self):
         pydicom.config.image_handlers = self.original_handlers
@@ -176,14 +169,11 @@ class pillow_JPEGlossyTests_no_pillow(unittest.TestCase):
             _ = self.color_3d_jpeg.pixel_array
 
 
-@pytest.mark.skipif(
-    test_pillow_jpeg_decoder,
-    reason=pillow_present_message)
 class pillow_JPEGlosslessTests_no_pillow(unittest.TestCase):
     def setUp(self):
         self.jpeg_lossless = read_file(jpeg_lossless_name)
         self.original_handlers = pydicom.config.image_handlers
-        pydicom.config.image_handlers = [pillow_handler, numpy_handler]
+        pydicom.config.image_handlers = [None, numpy_handler]
 
     def tearDown(self):
         pydicom.config.image_handlers = self.original_handlers

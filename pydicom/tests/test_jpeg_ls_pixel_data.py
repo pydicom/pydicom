@@ -67,9 +67,6 @@ dir_name = os.path.dirname(sys.argv[0])
 save_dir = os.getcwd()
 
 
-@pytest.mark.skipif(
-    test_jpeg_ls_decoder,
-    reason=jpeg_ls_present_message)
 class jpeg_ls_JPEG_LS_Tests_no_jpeg_ls(unittest.TestCase):
     def setUp(self):
         self.jpeg_ls_lossless = read_file(jpeg_ls_lossless_name)
@@ -77,7 +74,7 @@ class jpeg_ls_JPEG_LS_Tests_no_jpeg_ls(unittest.TestCase):
         self.emri_jpeg_ls_lossless = read_file(emri_jpeg_ls_lossless)
         self.emri_small = read_file(emri_name)
         self.original_handlers = pydicom.config.image_handlers
-        pydicom.config.image_handlers = [jpeg_ls_handler, numpy_handler]
+        pydicom.config.image_handlers = [None, numpy_handler]
 
     def tearDown(self):
         pydicom.config.image_handlers = self.original_handlers
@@ -87,9 +84,6 @@ class jpeg_ls_JPEG_LS_Tests_no_jpeg_ls(unittest.TestCase):
             _ = self.jpeg_ls_lossless.pixel_array
 
 
-@pytest.mark.skipif(
-    test_jpeg_ls_decoder,
-    reason=jpeg_ls_present_message)
 class jpeg_ls_JPEG2000Tests_no_jpeg_ls(unittest.TestCase):
     def setUp(self):
         self.jpeg_2k = read_file(jpeg2000_name)
@@ -98,7 +92,7 @@ class jpeg_ls_JPEG2000Tests_no_jpeg_ls(unittest.TestCase):
         self.emri_jpeg_2k_lossless = read_file(emri_jpeg_2k_lossless)
         self.emri_small = read_file(emri_name)
         self.original_handlers = pydicom.config.image_handlers
-        pydicom.config.image_handlers = [jpeg_ls_handler, numpy_handler]
+        pydicom.config.image_handlers = [None, numpy_handler]
 
     def tearDown(self):
         pydicom.config.image_handlers = self.original_handlers
@@ -114,16 +108,13 @@ class jpeg_ls_JPEG2000Tests_no_jpeg_ls(unittest.TestCase):
             _ = self.emri_jpeg_2k_lossless.pixel_array
 
 
-@pytest.mark.skipif(
-    test_jpeg_ls_decoder,
-    reason=jpeg_ls_present_message)
 class jpeg_ls_JPEGlossyTests_no_jpeg_ls(unittest.TestCase):
 
     def setUp(self):
         self.jpeg_lossy = read_file(jpeg_lossy_name)
         self.color_3d_jpeg = read_file(color_3d_jpeg_baseline)
         self.original_handlers = pydicom.config.image_handlers
-        pydicom.config.image_handlers = [jpeg_ls_handler, numpy_handler]
+        pydicom.config.image_handlers = [None, numpy_handler]
 
     def tearDown(self):
         pydicom.config.image_handlers = self.original_handlers
@@ -148,14 +139,11 @@ class jpeg_ls_JPEGlossyTests_no_jpeg_ls(unittest.TestCase):
             _ = self.color_3d_jpeg.pixel_array
 
 
-@pytest.mark.skipif(
-    test_jpeg_ls_decoder,
-    reason=jpeg_ls_present_message)
 class jpeg_ls_JPEGlosslessTests_no_jpeg_ls(unittest.TestCase):
     def setUp(self):
         self.jpeg_lossless = read_file(jpeg_lossless_name)
         self.original_handlers = pydicom.config.image_handlers
-        pydicom.config.image_handlers = [jpeg_ls_handler, numpy_handler]
+        pydicom.config.image_handlers = [None, numpy_handler]
 
     def tearDown(self):
         pydicom.config.image_handlers = self.original_handlers

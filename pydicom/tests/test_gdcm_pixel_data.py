@@ -1,12 +1,16 @@
+# -*- coding: utf-8 -*-
 import unittest
 import os
 import sys
+import tempfile
+import shutil
 import pytest
 import pydicom
 import logging
 from pydicom.filereader import read_file
 from pydicom.data import DATA_ROOT
 from pydicom.tag import Tag
+from pydicom import compat
 gdcm_missing_message = "GDCM is not available in this test environment"
 gdcm_present_message = "GDCM is being tested"
 
@@ -16,7 +20,12 @@ try:
     import pydicom.pixel_data_handlers.gdcm_handler as gdcm_handler
 except ImportError as e:
     have_gdcm_handler = False
-
+numpy_handler = None
+have_numpy_handler = True
+try:
+    import pydicom.pixel_data_handlers.numpy_handler as numpy_handler
+except ImportError:
+    have_numpy_handler = False
 test_gdcm_decoder = have_gdcm_handler
 
 test_files = os.path.join(DATA_ROOT, 'test_files')
@@ -63,18 +72,28 @@ dir_name = os.path.dirname(sys.argv[0])
 save_dir = os.getcwd()
 
 
-@pytest.mark.skipif(have_gdcm_handler, reason=gdcm_present_message)
 class GDCM_JPEG_LS_Tests_no_gdcm(unittest.TestCase):
     def setUp(self):
-        self.jpeg_ls_lossless = read_file(jpeg_ls_lossless_name)
+        if compat.in_py2:
+            self.utf8_filename = os.path.join(
+                tempfile.gettempdir(), "ДИКОМ.dcm")
+            self.unicode_filename = self.utf8_filename.decode("utf8")
+            shutil.copyfile(jpeg_ls_lossless_name.decode("utf8"),
+                            self.unicode_filename)
+        else:
+            self.unicode_filename = os.path.join(
+                tempfile.gettempdir(), "ДИКОМ.dcm")
+            shutil.copyfile(jpeg_ls_lossless_name, self.unicode_filename)
+        self.jpeg_ls_lossless = read_file(self.unicode_filename)
         self.mr_small = read_file(mr_name)
         self.emri_jpeg_ls_lossless = read_file(emri_jpeg_ls_lossless)
         self.emri_small = read_file(emri_name)
         self.original_handlers = pydicom.config.image_handlers
-        pydicom.config.image_handlers = [gdcm_handler]
+        pydicom.config.image_handlers = [None]
 
     def tearDown(self):
         pydicom.config.image_handlers = self.original_handlers
+        os.remove(self.unicode_filename)
 
     def test_JPEG_LS_PixelArray(self):
         with self.assertRaises((NotImplementedError, )):
@@ -85,7 +104,6 @@ class GDCM_JPEG_LS_Tests_no_gdcm(unittest.TestCase):
             _ = self.emri_jpeg_ls_lossless.pixel_array
 
 
-@pytest.mark.skipif(have_gdcm_handler, reason=gdcm_present_message)
 class GDCM_JPEG2000Tests_no_gdcm(unittest.TestCase):
     def setUp(self):
         self.jpeg_2k = read_file(jpeg2000_name)
@@ -94,7 +112,7 @@ class GDCM_JPEG2000Tests_no_gdcm(unittest.TestCase):
         self.emri_jpeg_2k_lossless = read_file(emri_jpeg_2k_lossless)
         self.emri_small = read_file(emri_name)
         self.original_handlers = pydicom.config.image_handlers
-        pydicom.config.image_handlers = [gdcm_handler]
+        pydicom.config.image_handlers = [None]
 
     def tearDown(self):
         pydicom.config.image_handlers = self.original_handlers
@@ -127,14 +145,13 @@ class GDCM_JPEG2000Tests_no_gdcm(unittest.TestCase):
             _ = self.emri_jpeg_2k_lossless.pixel_array
 
 
-@pytest.mark.skipif(have_gdcm_handler, reason=gdcm_present_message)
 class GDCM_JPEGlossyTests_no_gdcm(unittest.TestCase):
 
     def setUp(self):
         self.jpeg_lossy = read_file(jpeg_lossy_name)
         self.color_3d_jpeg = read_file(color_3d_jpeg_baseline)
         self.original_handlers = pydicom.config.image_handlers
-        pydicom.config.image_handlers = [gdcm_handler]
+        pydicom.config.image_handlers = [None]
 
     def tearDown(self):
         pydicom.config.image_handlers = self.original_handlers
@@ -158,12 +175,11 @@ class GDCM_JPEGlossyTests_no_gdcm(unittest.TestCase):
             _ = self.color_3d_jpeg.pixel_array
 
 
-@pytest.mark.skipif(have_gdcm_handler, reason=gdcm_present_message)
 class GDCM_JPEGlosslessTests_no_gdcm(unittest.TestCase):
     def setUp(self):
         self.jpeg_lossless = read_file(jpeg_lossless_name)
         self.original_handlers = pydicom.config.image_handlers
-        pydicom.config.image_handlers = [gdcm_handler]
+        pydicom.config.image_handlers = [None]
 
     def tearDown(self):
         pydicom.config.image_handlers = self.original_handlers
@@ -190,15 +206,26 @@ class GDCM_JPEGlosslessTests_no_gdcm(unittest.TestCase):
 @pytest.mark.skipif(not test_gdcm_decoder, reason=gdcm_missing_message)
 class GDCM_JPEG_LS_Tests_with_gdcm(unittest.TestCase):
     def setUp(self):
-        self.jpeg_ls_lossless = read_file(jpeg_ls_lossless_name)
+        if compat.in_py2:
+            self.utf8_filename = os.path.join(
+                tempfile.gettempdir(), "ДИКОМ.dcm")
+            self.unicode_filename = self.utf8_filename.decode("utf8")
+            shutil.copyfile(jpeg_ls_lossless_name.decode("utf8"),
+                            self.unicode_filename)
+        else:
+            self.unicode_filename = os.path.join(
+                tempfile.gettempdir(), "ДИКОМ.dcm")
+            shutil.copyfile(jpeg_ls_lossless_name, self.unicode_filename)
+        self.jpeg_ls_lossless = read_file(self.unicode_filename)
         self.mr_small = read_file(mr_name)
         self.emri_jpeg_ls_lossless = read_file(emri_jpeg_ls_lossless)
         self.emri_small = read_file(emri_name)
         self.original_handlers = pydicom.config.image_handlers
-        pydicom.config.image_handlers = [gdcm_handler]
+        pydicom.config.image_handlers = [numpy_handler, gdcm_handler]
 
     def tearDown(self):
         pydicom.config.image_handlers = self.original_handlers
+        os.remove(self.unicode_filename)
 
     def test_JPEG_LS_PixelArray(self):
         a = self.jpeg_ls_lossless.pixel_array
@@ -229,7 +256,7 @@ class GDCM_JPEG2000Tests_with_gdcm(unittest.TestCase):
         self.emri_jpeg_2k_lossless = read_file(emri_jpeg_2k_lossless)
         self.emri_small = read_file(emri_name)
         self.original_handlers = pydicom.config.image_handlers
-        pydicom.config.image_handlers = [gdcm_handler]
+        pydicom.config.image_handlers = [numpy_handler, gdcm_handler]
 
     def tearDown(self):
         pydicom.config.image_handlers = self.original_handlers
@@ -280,7 +307,7 @@ class GDCM_JPEGlossyTests_with_gdcm(unittest.TestCase):
         self.jpeg_lossy = read_file(jpeg_lossy_name)
         self.color_3d_jpeg = read_file(color_3d_jpeg_baseline)
         self.original_handlers = pydicom.config.image_handlers
-        pydicom.config.image_handlers = [gdcm_handler]
+        pydicom.config.image_handlers = [numpy_handler, gdcm_handler]
 
     def tearDown(self):
         pydicom.config.image_handlers = self.original_handlers
@@ -316,7 +343,7 @@ class GDCM_JPEGlosslessTests_with_gdcm(unittest.TestCase):
     def setUp(self):
         self.jpeg_lossless = read_file(jpeg_lossless_name)
         self.original_handlers = pydicom.config.image_handlers
-        pydicom.config.image_handlers = [gdcm_handler]
+        pydicom.config.image_handlers = [numpy_handler, gdcm_handler]
 
     def tearDown(self):
         pydicom.config.image_handlers = self.original_handlers
