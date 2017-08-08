@@ -109,7 +109,7 @@ def get_pixeldata(dicom_dataset):
     return pixel_array
 
 
-def _rle_decode_frame(d, rows, columns, samples_per_pixel, bits_allocated):
+def _rle_decode_frame(data, rows, columns, samples_per_pixel, bits_allocated):
     """Decodes a single frame of RLE encoded data.
     Reads the plane information at the beginning of the data.
     If more than pixel size > 1 byte appropriately interleaves the data from
@@ -118,15 +118,15 @@ def _rle_decode_frame(d, rows, columns, samples_per_pixel, bits_allocated):
 
     Parameters
     ----------
-    d: bytes
+    data: bytes
         The RLE frame data
-    Rows: int
+    rows: int
         The number of output rows
-    Columns: int
+    columns: int
         The number of output columns
-    SamplesPerPixel: int
+    samples_per_pixel: int
         Number of samples per pixel (e.g. 3 for RGB data).
-    BitsAllocated: int
+    bits_allocated: int
         Number of bits per sample - must be a multiple of 8
 
     Returns
@@ -136,9 +136,9 @@ def _rle_decode_frame(d, rows, columns, samples_per_pixel, bits_allocated):
     """
 
     rle_start = 0
-    rle_len = len(d)
+    rle_len = len(data)
 
-    number_of_planes = unpack(b'<L', d[rle_start: rle_start + 4])[0]
+    number_of_planes = unpack(b'<L', data[rle_start: rle_start + 4])[0]
 
     if bits_allocated % 8 != 0:
         raise NotImplementedError("Don't know how to handle BitsAllocated "
@@ -155,7 +155,7 @@ def _rle_decode_frame(d, rows, columns, samples_per_pixel, bits_allocated):
     for i in range(number_of_planes):
         header_offset_start = rle_start + 4 + (4 * i)
         header_offset_end = rle_start + 4 + (4 * (i + 1))
-        plane_start_in_rle = unpack(b'<L', d[header_offset_start:header_offset_end])[0]  # noqa
+        plane_start_in_rle = unpack(b'<L', data[header_offset_start:header_offset_end])[0]  # noqa
         plane_start_list.append(plane_start_in_rle + rle_start)
 
     plane_end_list = plane_start_list[1:]
@@ -167,11 +167,11 @@ def _rle_decode_frame(d, rows, columns, samples_per_pixel, bits_allocated):
         for byte_number in range(bytes_allocated):
 
             plane_number = byte_number + (sample_number * bytes_allocated)
-            out_plane_number = ((sample_number+1) * bytes_allocated) - byte_number - 1  # noqa
+            out_plane_number = ((sample_number + 1) * bytes_allocated) - byte_number - 1  # noqa
             plane_start = plane_start_list[plane_number]
             plane_end = plane_end_list[plane_number]
 
-            plane_bytes = _rle_decode_plane(d[plane_start:plane_end])
+            plane_bytes = _rle_decode_plane(data[plane_start:plane_end])
 
             if len(plane_bytes) != rows * columns:
                 raise AttributeError("Different number of bytes unpacked "
@@ -211,7 +211,7 @@ def _rle_decode_plane(data):
             pos += 1
             continue
 
-        if header_byte <= 127:
+        if header_byte < 128:
             result.extend(data[pos:pos+header_byte+1])
             pos += header_byte+1
             continue
