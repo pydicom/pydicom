@@ -1,11 +1,5 @@
-# encaps.py
-"""Routines for working with encapsulated (compressed) data
-
-"""
-# Copyright (c) 2008-2012 Darcy Mason
-# This file is part of pydicom, released under a modified MIT license.
-#    See the file LICENSE included with this distribution, also
-#    available at https://github.com/pydicom/pydicom
+# Copyright 2008-2017 pydicom authors. See LICENSE file for details.
+"""Functions for working with encapsulated (compressed) data."""
 
 # Encapsulated Pixel Data --  3.5-2008 A.4
 # Encapsulated Pixel data is in a number of Items
@@ -29,12 +23,18 @@ from pydicom.tag import (ItemTag, SequenceDelimiterTag)
 
 
 def decode_data_sequence(data):
-    """Read encapsulated data and return a list of strings
-    data -- string of encapsulated data, typically
-    dataset.PixelData
-    Return all fragments in a list of byte strings
-    """
+    """Read encapsulated data and return a list of strings.
 
+    Parameters
+    ----------
+    data : str
+        String of encapsulated data, typically dataset.PixelData
+
+    Returns
+    -------
+    list of bytes
+        All fragments in a list of byte strings
+    """
     # Convert data into a memory-mapped file
     with DicomBytesIO(data) as fp:
 
@@ -56,19 +56,37 @@ def decode_data_sequence(data):
 
 
 def defragment_data(data):
-    """Read encapsulated data and return one continuous string
-    data -- string of encapsulated data, typically dataset.PixelData
-    Return all fragments concatenated together as a byte string
-    If PixelData has multiple frames, then should separate
-    out before calling this routine.
+    """Read encapsulated data and return one continuous string.
+
+    Parameters
+    ----------
+    data : list of str
+        String of encapsulated data, typically dataset.PixelData. If PixelData
+        has multiple frames, then should separate out before calling this
+        routine.
+
+    Returns
+    -------
+    bytes
+        All fragments concatenated together as a byte string.
     """
     return b"".join(decode_data_sequence(data))
 
 
 # read_item modeled after filereader.ReadSequenceItem
 def read_item(fp):
-    """Read and return a single Item in the
-    fragmented data stream"""
+    """Read and return a single Item in the fragmented data stream.
+
+    Parameters
+    ----------
+    fp : pydicom.filebase.DicomIO
+        The file-like to read the item from.
+
+    Returns
+    -------
+    bytes
+        The Item's raw bytes (value?).
+    """
 
     logger = pydicom.config.logger
     try:
