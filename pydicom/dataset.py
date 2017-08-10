@@ -26,10 +26,9 @@ from pydicom.charset import default_encoding, convert_encodings
 from pydicom.datadict import dictionary_VR
 from pydicom.datadict import (tag_for_keyword, keyword_for_tag,
                               repeater_has_keyword)
-from pydicom.tag import Tag, BaseTag
+from pydicom.tag import Tag, BaseTag, tag_in_exception
 from pydicom.dataelem import DataElement, DataElement_from_raw, RawDataElement
 from pydicom.uid import UncompressedPixelTransferSyntaxes
-from pydicom.tagtools import tag_in_exception
 import pydicom  # for write_file
 import pydicom.charset
 from pydicom.config import logger

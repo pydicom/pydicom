@@ -99,12 +99,11 @@ class DatasetTests(unittest.TestCase):
         ds.SmallestImagePixelValue = 0  # Invalid value
 
         if compat.in_PyPy:
-            expected_msg = ("Invalid tag (0028, 0106): "
+            expected_msg = ("With tag (0028, 0106) got exception: "
                             "'int' has no length")
         else:
-            expected_msg = ("Invalid tag (0028, 0106): "
-                            "object of type 'int' "
-                            "has no len()")
+            expected_msg = ("With tag (0028, 0106) got exception: "
+                            "object of type 'int' has no len()")
 
         self.failUnlessExceptionArgs(expected_msg, TypeError, lambda: str(ds))
 
@@ -116,12 +115,11 @@ class DatasetTests(unittest.TestCase):
         ds.SmallestImagePixelValue = 0  # Invalid value
 
         if compat.in_PyPy:
-            expected_msg = ("Invalid tag (0028, 0106): "
+            expected_msg = ("With tag (0028, 0106) got exception: "
                             "'int' has no length")
         else:
-            expected_msg = ("Invalid tag (0028, 0106): "
-                            "object of type 'int' "
-                            "has no len()")
+            expected_msg = ("With tag (0028, 0106) got exception: "
+                            "object of type 'int' has no len()")
 
         def callback(dataset, data_element):
             return str(data_element)
