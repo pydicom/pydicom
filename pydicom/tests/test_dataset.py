@@ -401,9 +401,11 @@ class DatasetTests(unittest.TestCase):
         """Dataset: equality returns correct value with simple dataset"""
         d = Dataset()
         d.SOPInstanceUID = '1.2.3.4'
+        d.PatientName = 'Test'
         self.assertTrue(d == d)
 
         e = Dataset()
+        e.PatientName = 'Test'
         e.SOPInstanceUID = '1.2.3.4'
         self.assertTrue(d == e)
 
