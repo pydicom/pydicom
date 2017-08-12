@@ -101,8 +101,18 @@ def Tag(arg, arg2=None):
     return BaseTag(long_value)
 
 
-class BaseTag(int):
+if compat.in_py2:
+    # May get an overflow error with int if sys.maxsize < 0xFFFFFFFF
+    BaseTag_base_class = long
+else:
+    BaseTag_base_class = int
+
+
+class BaseTag(BaseTag_base_class):
     """Represents a DICOM element (group, element) tag.
+
+    If using python 2.7 then tags are represented as a long, while for python
+    3 they are represented as an int.
 
     Attributes
     ----------
@@ -148,7 +158,7 @@ class BaseTag(int):
             except Exception:
                 raise TypeError("Cannot compare Tag with non-Tag item")
 
-        return int(self) == int(other)
+        return BaseTag_base_class(self) == BaseTag_base_class(other)
 
     def __ne__(self, other):
         """Return True if `self` does not equal `other`."""
@@ -159,7 +169,7 @@ class BaseTag(int):
     # to the parent class
     #   See http://docs.python.org/dev/3.0/reference/
     #              datamodel.html#object.__hash__
-    __hash__ = int.__hash__
+    __hash__ = BaseTag_base_class.__hash__
 
     def __str__(self):
         """Return the tag value as a hex string '(gggg, eeee)'."""

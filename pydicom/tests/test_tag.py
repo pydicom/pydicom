@@ -1,7 +1,10 @@
 # Copyright 2008-2017 pydicom authors. See LICENSE file for details.
 """Test suite for tag.py"""
+import sys
+
 import pytest
 
+from pydicom.compat import in_py2
 from pydicom.tag import BaseTag, Tag, TupleTag, tag_in_exception
 
 
@@ -224,6 +227,16 @@ class TestBaseTag(object):
         assert not BaseTag(0x00020001).is_private
         # Group 0 not private
         assert not BaseTag(0x00000001).is_private
+
+    def test_base_class(self):
+        """Test the class BaseTag inherits from."""
+        if in_py2:
+            # Test for overflow of int
+            tag = Tag(0xFFFFFFFF)
+            assert isinstance(tag, long)
+        else:
+            tag = Tag(0xFFFFFFFF)
+            assert isinstance(tag, int)
 
 
 class TestTag(object):
