@@ -1,8 +1,9 @@
 # Copyright 2008-2017 pydicom authors. See LICENSE file for details.
 """Define Tag class to hold a DICOM (group, element) tag and related functions.
 
-The 4 bytes of the DICOM tag are stored as an arbitrary length 'int'. Tags are
-stored as a single number and separated to (group, element) as required.
+The 4 bytes of the DICOM tag are stored as an arbitrary length 'long' for
+Python 2 and as an 'int' for Python 3. Tags are stored as a single number and
+separated to (group, element) as required.
 """
 # NOTE: Tags must be not be stored as a tuple internally, as some code logic
 #       (e.g. in filewriter.write_AT) checks if a value is a multi-value
@@ -139,7 +140,7 @@ class BaseTag(BaseTag_base_class):
             except Exception:
                 raise TypeError("Cannot compare Tag with non-Tag item")
 
-        return int(self) < int(other)
+        return BaseTag_base_class(self) < BaseTag_base_class(other)
 
     def __ge__(self, other):
         """Return True if `self` is greater than or equal to `other`."""
