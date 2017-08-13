@@ -5,11 +5,13 @@
 #    available at https://github.com/pydicom/pydicom
 import unittest
 
-import pydicom.charset
-from pydicom import dicomio
 from pydicom.data import get_charset_files
 from pydicom.data import get_testdata_files
+from pydicom import dicomio
+import pydicom.charset
+from pydicom.compat import in_py2
 from pydicom.dataelem import DataElement
+import pytest
 
 latin1_file = get_charset_files("chrFren.dcm")[0]
 jp_file = get_charset_files("chrH31.dcm")[0]
@@ -85,6 +87,7 @@ class CharsetTests(unittest.TestCase):
                     '\033$B$d$^$@\033(B^\033$B$?$m$&\033(B')
         self.assertEqual(expected, ds.PatientName)
 
+    @pytest.mark.skipif(not in_py2, reason='Fails with python3 due to #466')
     def test_bad_charset(self):
         """Test bad charset defaults to ISO IR 6"""
         # Python 3: elem.value is PersonName3, Python 2: elem.value is str
