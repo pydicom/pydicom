@@ -14,6 +14,7 @@ def assert_raises_regex(type_error, message, func, *args, **kwargs):
         func(*args, **kwargs)
     excinfo.match(message)
 
+
 def test_python_version():
     """Test that the correct python version is returned"""
     if sys.version_info[0] == 2:
@@ -27,6 +28,7 @@ def test_python_version():
 
     # Kinda redundant
     assert in_PyPy == ('PyPy' in sys.version)
+
 
 def test_reraise():
     """Test reraising an exception works in both py2 and 3"""

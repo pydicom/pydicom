@@ -12,11 +12,13 @@ def assert_raises_regex(type_error, message, func, *args, **kwargs):
         func(*args, **kwargs)
     excinfo.match(message)
 
+
 def test_message():
     """Test InvalidDicomError with a message"""
     def _test():
         raise InvalidDicomError('test msg')
     assert_raises_regex(InvalidDicomError, 'test msg', _test)
+
 
 def test_no_message():
     """Test InvalidDicomError with no message"""

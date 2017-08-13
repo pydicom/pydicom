@@ -369,5 +369,6 @@ class RawDataElementTests(unittest.TestCase):
         with pytest.raises(NotImplementedError):
             DataElement_from_raw(raw, default_encoding)
 
+
 if __name__ == "__main__":
     unittest.main()

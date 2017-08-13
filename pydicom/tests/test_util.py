@@ -40,8 +40,8 @@ class TestCodify(object):
     def test_tag_repr(self):
         """Test utils.codify.tag_repr"""
         input_tag = [0x00000000, 0x00100010, 0x7fe00010, 0x11110001]
-        output_str = ['(0x0000, 0x0000)', '(0x0010, 0x0010)', '(0x7fe0, 0x0010)',
-                      '(0x1111, 0x0001)']
+        output_str = ['(0x0000, 0x0000)', '(0x0010, 0x0010)',
+                      '(0x7fe0, 0x0010)', '(0x1111, 0x0001)']
         for tag, out_str in zip(input_tag, output_str):
             assert tag_repr(Tag(tag)) == out_str
 
@@ -75,11 +75,11 @@ class TestCodify(object):
     def test_code_dataelem_exclude_size(self):
         """Test utils.codify.code_dataelem exclude_size param"""
         input_elem = [DataElement(0x00100010, 'OB', 'CITIZEN'),
-                      DataElement(0x0008010c, 'UI', '1.1'),]
+                      DataElement(0x0008010c, 'UI', '1.1')]
         # Fails
         # DataElement(0x00080301, 'US', 1200)]
         out_str = ["ds.PatientName = # XXX Array of 7 bytes excluded",
-                   "ds.CodingSchemeUID = '1.1'",]
+                   "ds.CodingSchemeUID = '1.1'"]
         # Fails
         # "ds.PrivateGroupReference = 1200"]
         for elem, out in zip(input_elem, out_str):

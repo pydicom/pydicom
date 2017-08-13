@@ -94,7 +94,13 @@ class charsetTests(unittest.TestCase):
     def test_bad_charset(self):
         """Test bad charset defaults to ISO IR 6"""
         elem = DataElement(0x00100010, 'PN', 'CITIZEN')
+        #print(elem.value.encodings)
+        pydicom.charset.decode(elem, ['ISO 2022 IR 100'])
+        assert 'latin_1' in elem.value.encodings
+        assert 'iso8859' not in elem.value.encodings
+        # default encoding is iso8859
         pydicom.charset.decode(elem, [])
+        assert 'iso8859' in elem.value.encodings
 
 
 if __name__ == "__main__":
