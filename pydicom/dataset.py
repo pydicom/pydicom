@@ -400,8 +400,10 @@ class Dataset(dict):
             # __dict__
             # Convert values() to a list for compatibility between
             #   python 2 and 3
-            return (list(self.values()) == list(other.values()) and
-                    self.__dict__ == other.__dict__)
+            # Sort values() by element tag
+            self_elem = sorted(list(self.values()), key=lambda x: x.tag)
+            other_elem = sorted(list(other.values()), key=lambda x: x.tag)
+            return self_elem == other_elem and self.__dict__ == other.__dict__
 
         return NotImplemented
 

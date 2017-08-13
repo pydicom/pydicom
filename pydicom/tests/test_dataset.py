@@ -401,9 +401,11 @@ class DatasetTests(unittest.TestCase):
         """Dataset: equality returns correct value with simple dataset"""
         d = Dataset()
         d.SOPInstanceUID = '1.2.3.4'
+        d.PatientName = 'Test'
         self.assertTrue(d == d)
 
         e = Dataset()
+        e.PatientName = 'Test'
         e.SOPInstanceUID = '1.2.3.4'
         self.assertTrue(d == e)
 
@@ -457,6 +459,7 @@ class DatasetTests(unittest.TestCase):
         d.SOPInstanceUID = '1.2.3.4'
         d.BeamSequence = []
         beam_seq = Dataset()
+        beam_seq.PatientID = '1234'
         beam_seq.PatientName = 'ANON'
         d.BeamSequence.append(beam_seq)
         self.assertTrue(d == d)
@@ -466,6 +469,7 @@ class DatasetTests(unittest.TestCase):
         e.BeamSequence = []
         beam_seq = Dataset()
         beam_seq.PatientName = 'ANON'
+        beam_seq.PatientID = '1234'
         e.BeamSequence.append(beam_seq)
         self.assertTrue(d == e)
 
