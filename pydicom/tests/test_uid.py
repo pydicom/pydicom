@@ -75,6 +75,7 @@ class TestUID(object):
         assert not self.uid == 'Explicit VR Little Endian'
         # Issue 96
         assert not self.uid == 3
+        assert self.uid is not None
 
     def test_inequality(self):
         """Test that UID.__ne__ works."""
