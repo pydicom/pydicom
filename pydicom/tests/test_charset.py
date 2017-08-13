@@ -8,8 +8,11 @@
 import os.path
 import unittest
 
+import pytest
+
 from pydicom import dicomio
 import pydicom.charset
+from pydicom.compat import in_py2
 from pydicom.data import DATA_ROOT
 from pydicom.dataelem import DataElement
 
@@ -91,12 +94,14 @@ class charsetTests(unittest.TestCase):
                     '\033$B$d$^$@\033(B^\033$B$?$m$&\033(B')
         self.assertEqual(expected, ds.PatientName)
 
+    @pytest.mark.skipif(not in_py2, reason='Fails with python3 due to #466')
     def test_bad_charset(self):
         """Test bad charset defaults to ISO IR 6"""
+        # Python 3: elem.value is PersonName3, Python 2: elem.value is str
         elem = DataElement(0x00100010, 'PN', 'CITIZEN')
-        #print(elem.value.encodings)
-        pydicom.charset.decode(elem, ['ISO 2022 IR 100'])
-        assert 'latin_1' in elem.value.encodings
+        pydicom.charset.decode(elem, ['ISO 2022 IR 126'])
+        # After decode Python 2: elem.value is PersonNameUnicode
+        assert 'iso_ir_126' in elem.value.encodings
         assert 'iso8859' not in elem.value.encodings
         # default encoding is iso8859
         pydicom.charset.decode(elem, [])
