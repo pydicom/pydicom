@@ -459,6 +459,7 @@ class DatasetTests(unittest.TestCase):
         d.SOPInstanceUID = '1.2.3.4'
         d.BeamSequence = []
         beam_seq = Dataset()
+        beam_seq.PatientID = '1234'
         beam_seq.PatientName = 'ANON'
         d.BeamSequence.append(beam_seq)
         self.assertTrue(d == d)
@@ -468,6 +469,7 @@ class DatasetTests(unittest.TestCase):
         e.BeamSequence = []
         beam_seq = Dataset()
         beam_seq.PatientName = 'ANON'
+        beam_seq.PatientID = '1234'
         e.BeamSequence.append(beam_seq)
         self.assertTrue(d == e)
 
