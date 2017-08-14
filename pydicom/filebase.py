@@ -30,19 +30,13 @@ class DicomIO(object):
     def read_le_tag(self):
         """Read and return two unsigned shorts (little endian)
            from the file."""
-        bytes_read = self.read(4)
-        if len(bytes_read) < 4:
-            # needed for reading "next" tag when at end of file
-            raise EOFError
+        bytes_read = self.read(4, need_exact_length=True)
         return unpack(b"<HH", bytes_read)
 
     def read_be_tag(self):
-        """Read and return two unsigned shorts (little endian)
+        """Read and return two unsigned shorts (big endian)
            from the file."""
-        bytes_read = self.read(4)
-        if len(bytes_read) < 4:
-            # needed for reading "next" tag when at end of file
-            raise EOFError
+        bytes_read = self.read(4, need_exact_length=True)
         return unpack(b">HH", bytes_read)
 
     def write_tag(self, tag):
@@ -67,7 +61,7 @@ class DicomIO(object):
            little endian byte order"""
         return unpack(b"<L", self.read(4))[0]
 
-    def read(self, length=None, need_exact_length=True):
+    def read(self, length=None, need_exact_length=False):
         """Reads the required length, returns
         EOFError if gets less
 
@@ -88,7 +82,7 @@ class DicomIO(object):
             num_bytes = len(bytes_read)
             if num_bytes < length:
                 start_pos = self.tell() - num_bytes
-                msg = ("Unexpected end of file. Read {0} bytes of {1} ",
+                msg = ("Unexpected end of file. Read {0} bytes of {1} "
                        "expected starting at position 0x{2:x}".format(
                            len(bytes_read), length, start_pos))
                 raise EOFError(msg)

@@ -1,24 +1,22 @@
-# filewriter.py
-"""Write a dicom media file."""
+# Copyright 2008-2017 pydicom authors. See LICENSE file for details.
+"""Functions related to writing DICOM data."""
 from __future__ import absolute_import
-# Copyright (c) 2008-2012 Darcy Mason
-# This file is part of pydicom, released under a modified MIT license.
-#    See the file license.txt included with this distribution, also
-#    available at https://github.com/darcymason/pydicom
 
 from struct import pack
 
-from pydicom import compat
+from pydicom import compat, __version__
 from pydicom.compat import in_py2
 from pydicom.charset import default_encoding, text_VRs, convert_encodings
-from pydicom.uid import ImplicitVRLittleEndian, ExplicitVRBigEndian
-from pydicom.filebase import DicomFile, DicomFileLike
 from pydicom.datadict import keyword_for_tag
 from pydicom.dataset import Dataset
-from pydicom.tag import Tag, ItemTag, ItemDelimiterTag, SequenceDelimiterTag
+from pydicom.filebase import DicomFile, DicomFileLike
+from pydicom.multival import MultiValue
+from pydicom.tag import (Tag, ItemTag, ItemDelimiterTag, SequenceDelimiterTag,
+                         tag_in_exception)
+from pydicom.uid import (PYDICOM_IMPLEMENTATION_UID, ImplicitVRLittleEndian,
+                         ExplicitVRBigEndian)
 from pydicom.valuerep import extra_length_VRs
 from pydicom.values import convert_numbers
-from pydicom.tagtools import tag_in_exception
 
 
 def correct_ambiguous_vr_element(elem, ds, is_little_endian):
@@ -203,9 +201,14 @@ def write_UI(fp, data_element):
     write_string(fp, data_element, '\0')  # pad with 0-byte to even length
 
 
+def _is_multi_value(val):
+    """Return True if `val` is a multi-value container."""
+    return isinstance(val, (MultiValue, list, tuple))
+
+
 def multi_string(val):
     """Put a string together with delimiter if has more than one value"""
-    if isinstance(val, (list, tuple)):
+    if _is_multi_value(val):
         # \ is escape chr, so "\\" gives single backslash
         return "\\".join(val)
     else:
@@ -251,7 +254,7 @@ def write_number_string(fp, data_element, padding=' '):
     # file
     val = data_element.value
 
-    if isinstance(val, (list, tuple)):
+    if _is_multi_value(val):
         val = "\\".join((x.original_string
                          if hasattr(x, 'original_string') else str(x)
                          for x in val))
@@ -284,7 +287,7 @@ def write_DA(fp, data_element, padding=' '):
     if isinstance(val, (str, compat.string_types)):
         write_string(fp, data_element, padding)
     else:
-        if isinstance(val, (list, tuple)):
+        if _is_multi_value(val):
             val = "\\".join((x if isinstance(x, (str, compat.string_types))
                              else _format_DA(x) for x in val))
         else:
@@ -312,7 +315,7 @@ def write_DT(fp, data_element, padding=' '):
     if isinstance(val, (str, compat.string_types)):
         write_string(fp, data_element, padding)
     else:
-        if isinstance(val, (list, tuple)):
+        if _is_multi_value(val):
             val = "\\".join((x if isinstance(x, (str, compat.string_types))
                              else _format_DT(x) for x in val))
         else:
@@ -342,7 +345,7 @@ def write_TM(fp, data_element, padding=' '):
     if isinstance(val, (str, compat.string_types)):
         write_string(fp, data_element, padding)
     else:
-        if isinstance(val, (list, tuple)):
+        if _is_multi_value(val):
             val = "\\".join((x if isinstance(x, (str, compat.string_types))
                              else _format_TM(x) for x in val))
         else:
@@ -366,8 +369,8 @@ def write_data_element(fp, data_element, encoding=default_encoding):
     VR = data_element.VR
     if not fp.is_implicit_VR:
         if len(VR) != 2:
-            msg = ("Cannot write ambiguous VR of '{}' for data element with ",
-                   "tag {}.\nSet the correct VR before writing, or use an ",
+            msg = ("Cannot write ambiguous VR of '{}' for data element with "
+                   "tag {}.\nSet the correct VR before writing, or use an "
                    "implicit VR transfer syntax".format(
                        VR, repr(data_element.tag)))
             raise ValueError(msg)
@@ -523,10 +526,10 @@ def write_file_meta_info(fp, file_meta, enforce_standard=True):
         * (0002,0012) ImplementationClassUID, UI, N
 
     If `enforce_standard` is True then (0002,0000) will be added/updated,
-    (0002,0001) will be added if not already present and the other required
-    elements will checked to see if they exist. If `enforce_standard` is
-    False then `file_meta` will be written as is after minimal validation
-    checking.
+    (0002,0001) and (0002,0012) will be added if not already present and the
+    other required elements will be checked to see if they exist. If
+    `enforce_standard` is False then `file_meta` will be written as is after
+    minimal validation checking.
 
     The following Type 3/1C Elements may also be present:
         * (0002,0013) ImplementationVersionName, SH, N
@@ -535,6 +538,8 @@ def write_file_meta_info(fp, file_meta, enforce_standard=True):
         * (0002,0018) ReceivingApplicationEntityTitle, AE, N
         * (0002,0100) PrivateInformationCreatorUID, UI, N
         * (0002,0102) PrivateInformation, OB, N
+
+    If `enforce_standard` is True then (0002,0013) will be added/updated.
 
     Encoding
     ~~~~~~~~
@@ -557,7 +562,7 @@ def write_file_meta_info(fp, file_meta, enforce_standard=True):
     ValueError
         If `enforce_standard` is True and any of the required File Meta
         Information elements are missing from `file_meta`, with the
-        exception of (0002,0000) and (0002,0001).
+        exception of (0002,0000), (0002,0001) and (0002,0012).
     ValueError
         If any non-Group 2 Elements are present in `file_meta`.
     """
@@ -578,9 +583,12 @@ def write_file_meta_info(fp, file_meta, enforce_standard=True):
         if 'FileMetaInformationVersion' not in file_meta:
             file_meta.FileMetaInformationVersion = b'\x00\x01'
 
+        file_meta.ImplementationClassUID = PYDICOM_IMPLEMENTATION_UID
+        file_meta.ImplementationVersionName = 'PYDICOM ' + __version__
+
         # Check that required File Meta Elements are present
         missing = []
-        for element in [0x0002, 0x0003, 0x0010, 0x0012]:
+        for element in [0x0002, 0x0003, 0x0010]:
             if Tag(0x0002, element) not in file_meta:
                 missing.append(Tag(0x0002, element))
         if missing:
@@ -753,7 +761,8 @@ def write_file(filename, dataset, write_like_original=True):
     #   `write_like_original` is True we treat it as optional
     file_meta = getattr(dataset, 'file_meta', None)
     if not file_meta and not write_like_original:
-        file_meta = Dataset()
+        dataset.file_meta = Dataset()
+        file_meta = dataset.file_meta
 
     # If enforcing the standard, correct the TransferSyntaxUID where possible,
     #   noting that the transfer syntax for is_implicit_VR = False and
@@ -767,6 +776,11 @@ def write_file(filename, dataset, write_like_original=True):
         elif not dataset.is_little_endian and dataset.is_implicit_VR:
             raise NotImplementedError("Implicit VR Big Endian is not a"
                                       "supported Transfer Syntax.")
+
+        if 'SOPClassUID' in dataset:
+            file_meta.MediaStorageSOPClassUID = dataset.SOPClassUID
+        if 'SOPInstanceUID' in dataset:
+            file_meta.MediaStorageSOPInstanceUID = dataset.SOPInstanceUID
 
     caller_owns_file = True
     # Open file if not already a file object

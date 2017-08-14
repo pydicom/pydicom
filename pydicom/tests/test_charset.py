@@ -7,20 +7,19 @@
 #    available at https://github.com/pydicom/pydicom
 
 import unittest
+from pydicom.data import DATA_ROOT
 from pydicom import dicomio
 import os.path
 import pydicom.charset
 
-test_dir = os.path.dirname(__file__)
-testcharset_dir = os.path.join(test_dir, 'charset_files')
+testcharset_dir = os.path.join(DATA_ROOT, 'charset_files')
+test_files = os.path.join(DATA_ROOT, 'test_files')
 
 latin1_file = os.path.join(testcharset_dir, "chrFren.dcm")
 jp_file = os.path.join(testcharset_dir, "chrH31.dcm")
 multiPN_file = os.path.join(testcharset_dir, "chrFrenMulti.dcm")
 sq_encoding_file = os.path.join(testcharset_dir, "chrSQEncoding.dcm")
 explicit_ir6_file = os.path.join(testcharset_dir, "chrJapMultiExplicitIR6.dcm")
-
-test_files = os.path.join(test_dir, 'test_files')
 normal_file = os.path.join(test_files, "CT_small.dcm")
 
 
@@ -78,6 +77,17 @@ class charsetTests(unittest.TestCase):
         """charset: can decode file with multi-valued data elements........."""
         ds = dicomio.read_file(multiPN_file)
         ds.decode()
+
+    def testEncodingWithSpecificTags(self):
+        """Encoding is correctly applied even if  Specific Character Set
+        is not in specific tags..."""
+        ds = dicomio.read_file(jp_file, specific_tags=['PatientName'])
+        ds.decode()
+        self.assertEqual(1, len(ds))
+        expected = ('Yamada^Tarou='
+                    '\033$B;3ED\033(B^\033$BB@O:\033(B='
+                    '\033$B$d$^$@\033(B^\033$B$?$m$&\033(B')
+        self.assertEqual(expected, ds.PatientName)
 
 
 if __name__ == "__main__":

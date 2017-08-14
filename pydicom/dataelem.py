@@ -14,6 +14,10 @@ A DataElement has a tag,
 from __future__ import absolute_import
 from collections import namedtuple
 
+from pydicom.multival import MultiValue
+
+from pydicom.charset import default_encoding
+
 from pydicom import config  # don't import datetime_conversion directly
 from pydicom import compat
 from pydicom.config import logger
@@ -228,10 +232,7 @@ class DataElement(object):
         except AttributeError:  # not a list
             return self._convert(val)
         else:
-            returnvalue = []
-            for subval in val:
-                returnvalue.append(self._convert(subval))
-            return returnvalue
+            return MultiValue(lambda x: self._convert(x), val)
 
     def _convert(self, val):
         """Convert `val` to an appropriate type for the element's VR."""
@@ -459,6 +460,8 @@ def DataElement_from_raw(raw_data_element, encoding=None):
     # filereader->Dataset->convert_value->filereader
     # (for SQ parsing)
 
+    if in_py2:
+        encoding = encoding or default_encoding
     from pydicom.values import convert_value
     raw = raw_data_element
 

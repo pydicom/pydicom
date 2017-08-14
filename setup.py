@@ -1,7 +1,10 @@
 #!/usr/bin/env python
-from setuptools import setup, find_packages
-from pydicom import __version__
 
+import os
+from glob import glob
+from setuptools import setup, find_packages
+
+from pydicom import __version__
 
 description = "Pure python package for DICOM medical file reading and writing"
 
@@ -52,8 +55,21 @@ URL = "https://github.com/pydicom/pydicom"
 DOWNLOAD_URL = "https://github.com/pydicom/pydicom/archive/master.zip"
 LICENSE = "MIT"
 VERSION = __version__
-PACKAGE_DATA = {'pydicom': ['tests/test_files/*', 'tests/charset_files/*']}
 REQUIRES = []
+
+
+def data_files_inventory():
+    data_files = []
+    data_roots = ['pydicom/data']
+    for data_root in data_roots:
+        for root, subfolder, files in os.walk(data_root):
+            files = [x.replace('pydicom/', '') for x in glob(root + '/*')
+                     if not os.path.isdir(x)]
+            data_files = data_files + files
+    return data_files
+
+
+PACKAGE_DATA = {'pydicom': data_files_inventory()}
 
 opts = dict(name=NAME,
             version=__version__,

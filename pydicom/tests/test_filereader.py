@@ -15,6 +15,29 @@ import sys
 import tempfile
 import unittest
 
+from pydicom.filebase import DicomBytesIO
+from pydicom.util.testing.warncheck import assertWarns
+from pydicom.dataset import Dataset, FileDataset
+from pydicom.data import DATA_ROOT
+from pydicom.dataelem import DataElement
+from pydicom.filereader import read_file, data_element_generator
+from pydicom.errors import InvalidDicomError
+from pydicom.tag import Tag, TupleTag
+from pydicom.uid import ImplicitVRLittleEndian
+import pydicom.valuerep
+import pydicom.config
+try:
+    unittest.skipUnless
+except AttributeError:
+    try:
+        import unittest2 as unittest
+    except ImportError:
+        print("unittest2 is required for testing in python2.6")
+have_gdcm_handler = True
+try:
+    import pydicom.pixel_data_handlers.gdcm_handler as gdcm_handler
+except ImportError as e:
+    have_gdcm_handler = False
 # os.stat is only available on Unix and Windows   XXX Mac?
 # Not sure if on other platforms the import fails, or the call to it??
 try:
@@ -42,21 +65,11 @@ except ImportError:
         # Neither worked, so it's likely not installed.
         PILImg = None
 
-from pydicom.dataset import Dataset, FileDataset
-from pydicom.dataelem import DataElement
-from pydicom.filereader import read_file
-from pydicom.errors import InvalidDicomError
-from pydicom.tag import Tag, TupleTag
-from pydicom.uid import ImplicitVRLittleEndian
-from pydicom.util.testing.warncheck import assertWarns
-import pydicom.valuerep
-
 have_numpy = numpy is not None
 have_jpeg_ls = jpeg_ls is not None
 have_pillow = PILImg is not None
 
-test_dir = os.path.dirname(__file__)
-test_files = os.path.join(test_dir, 'test_files')
+test_files = os.path.join(DATA_ROOT, 'test_files')
 
 empty_number_tags_name = os.path.join(test_files,
                                       "reportsi_with_empty_number_tags.dcm")
@@ -309,6 +322,43 @@ class ReaderTests(unittest.TestCase):
         msg += "\nExpected: %r\nGot %r" % (ctfull_tags[:-2], ctpartial_tags)
         missing = [Tag(0x7fe0, 0x10), Tag(0xfffc, 0xfffc)]
         self.assertEqual(ctfull_tags, ctpartial_tags + missing, msg)
+
+    def testSpecificTags(self):
+        """Returns only tags specified by user."""
+        ctspecific = read_file(ct_name, specific_tags=[
+            Tag(0x0010, 0x0010), 'PatientID', 'ImageType', 'ViewName'])
+        ctspecific_tags = sorted(ctspecific.keys())
+        expected = [
+            # ViewName does not exist in the data set
+            Tag(0x0008, 0x0008), Tag(0x0010, 0x0010), Tag(0x0010, 0x0020)
+        ]
+        self.assertEqual(expected, ctspecific_tags)
+
+    def testSpecificTagsWithUnknownLengthSQ(self):
+        """Returns only tags specified by user."""
+        unknown_len_sq_tag = Tag(0x3f03, 0x1001)
+        tags = read_file(priv_SQ_name, specific_tags=[
+            unknown_len_sq_tag])
+        tags = sorted(tags.keys())
+        self.assertEqual([unknown_len_sq_tag], tags)
+
+        tags = read_file(priv_SQ_name, specific_tags=[
+            'PatientName'])
+        tags = sorted(tags.keys())
+        self.assertEqual([], tags)
+
+    def testSpecificTagsWithUnknownLengthTag(self):
+        """Returns only tags specified by user."""
+        unknown_len_tag = Tag(0x7fe0, 0x0010)  # Pixel Data
+        tags = read_file(emri_jpeg_2k_lossless, specific_tags=[
+            unknown_len_tag])
+        tags = sorted(tags.keys())
+        self.assertEqual([unknown_len_tag], tags)
+
+        tags = read_file(emri_jpeg_2k_lossless, specific_tags=[
+            'SpecificCharacterSet'])
+        tags = sorted(tags.keys())
+        self.assertEqual([Tag(0x08, 0x05)], tags)
 
     def testPrivateSQ(self):
         """Can read private undefined length SQ without error."""
@@ -620,6 +670,22 @@ class ReaderTests(unittest.TestCase):
         self.assertEqual(ds.file_meta, Dataset())
         self.assertEqual(ds[:], Dataset())
 
+    def test_read_file_does_not_raise(self):
+        """Test that reading from DicomBytesIO does not raise on EOF.
+        Regression test for #358."""
+        ds = read_file(mr_name)
+        fp = DicomBytesIO()
+        ds.save_as(fp)
+        fp.seek(0)
+        de_gen = data_element_generator(fp, False, True)
+        try:
+            while True:
+                next(de_gen)
+        except StopIteration:
+            pass
+        except EOFError:
+            self.fail('Unexpected EOFError raised')
+
 
 class ReadDataElementTests(unittest.TestCase):
     def setUp(self):
@@ -737,169 +803,6 @@ class ReadDataElementTests(unittest.TestCase):
         self.assertEqual(ds.DestinationAE, 'TEST  12')
 
 
-class JPEG_LS_Tests(unittest.TestCase):
-    def setUp(self):
-        self.jpeg_ls_lossless = read_file(jpeg_ls_lossless_name)
-        self.mr_small = read_file(mr_name)
-        self.emri_jpeg_ls_lossless = read_file(emri_jpeg_ls_lossless)
-        self.emri_small = read_file(emri_name)
-
-    def testJPEG_LS_PixelArray(self):
-        """JPEG LS Lossless: Now works"""
-        if have_numpy and have_jpeg_ls:
-            a = self.jpeg_ls_lossless.pixel_array
-            b = self.mr_small.pixel_array
-            self.assertEqual(a.mean(), b.mean(),
-                             "Decoded pixel data is not all {0} "
-                             "(mean == {1})".format(b.mean(), a.mean()))
-        else:
-            self.assertRaises(NotImplementedError,
-                              self.jpeg_ls_lossless._get_pixel_array)
-
-    def test_emri_JPEG_LS_PixelArray(self):
-        """JPEG LS Lossless: Now works"""
-        if have_numpy and have_jpeg_ls:
-            a = self.emri_jpeg_ls_lossless.pixel_array
-            b = self.emri_small.pixel_array
-            self.assertEqual(a.mean(), b.mean(),
-                             "Decoded pixel data is not all {0} "
-                             "(mean == {1})".format(b.mean(), a.mean()))
-        else:
-            self.assertRaises(NotImplementedError,
-                              self.emri_jpeg_ls_lossless._get_pixel_array)
-
-
-class BigEndian_Tests(unittest.TestCase):
-    def setUp(self):
-        self.emri_big_endian = read_file(emri_big_endian_name)
-        self.emri_small = read_file(emri_name)
-
-    def test_big_endian_PixelArray(self):
-        """Test big endian pixel data vs little endian"""
-        if have_numpy:
-            a = self.emri_big_endian.pixel_array
-            b = self.emri_small.pixel_array
-            self.assertEqual(a.mean(), b.mean(),
-                             "Decoded big endian pixel data is not all {0} "
-                             "(mean == {1})".format(b.mean(), a.mean()))
-        else:
-            self.assertRaises(ImportError,
-                              self.emri_big_endian._get_pixel_array)
-
-
-class JPEG2000Tests(unittest.TestCase):
-    def setUp(self):
-        self.jpeg = read_file(jpeg2000_name)
-        self.jpegls = read_file(jpeg2000_lossless_name)
-        self.mr_small = read_file(mr_name)
-        self.emri_jpeg_2k_lossless = read_file(emri_jpeg_2k_lossless)
-        self.emri_small = read_file(emri_name)
-
-    def testJPEG2000(self):
-        """JPEG2000: Returns correct values for sample data elements."""
-        # XX also tests multiple-valued AT data element
-        expected = [Tag(0x0054, 0x0010), Tag(0x0054, 0x0020)]
-        got = self.jpeg.FrameIncrementPointer
-        self.assertEqual(got, expected,
-                         "JPEG2000 file, Frame Increment Pointer: "
-                         "expected %s, got %s" % (expected, got))
-
-        got = self.jpeg.DerivationCodeSequence[0].CodeMeaning
-        expected = 'Lossy Compression'
-        self.assertEqual(got, expected,
-                         "JPEG200 file, Code Meaning got %s, expected %s" % (
-                             got, expected))
-
-    def testJPEG2000PixelArray(self):
-        """JPEG2000: Now works"""
-        if have_numpy and have_pillow:
-            a = self.jpegls.pixel_array
-            b = self.mr_small.pixel_array
-            self.assertEqual(a.mean(), b.mean(),
-                             "Decoded pixel data is not all {0} "
-                             "(mean == {1})".format(b.mean(), a.mean()))
-        else:
-            self.assertRaises(NotImplementedError,
-                              self.jpegls._get_pixel_array)
-
-    def test_emri_JPEG2000PixelArray(self):
-        """JPEG2000: Now works"""
-        if have_numpy and have_pillow:
-            a = self.emri_jpeg_2k_lossless.pixel_array
-            b = self.emri_small.pixel_array
-            self.assertEqual(a.mean(), b.mean(),
-                             "Decoded pixel data is not all {0} "
-                             "(mean == {1})".format(b.mean(), a.mean()))
-        else:
-            self.assertRaises(NotImplementedError,
-                              self.emri_jpeg_2k_lossless._get_pixel_array)
-
-
-class JPEGlossyTests(unittest.TestCase):
-    def setUp(self):
-        self.jpeg = read_file(jpeg_lossy_name)
-        self.color_3d_jpeg = read_file(color_3d_jpeg_baseline)
-
-    def testJPEGlossy(self):
-        """JPEG-lossy: Returns correct values for sample data elements."""
-        got = self.jpeg.DerivationCodeSequence[0].CodeMeaning
-        expected = 'Lossy Compression'
-        self.assertEqual(got, expected,
-                         "JPEG-lossy file, Code Meaning got %s, "
-                         "expected %s" % (got, expected))
-
-    def testJPEGlossyPixelArray(self):
-        """JPEG-lossy: Fails gracefully when uncompressed data is asked for."""
-        if have_pillow and have_numpy:
-            self.assertRaises(NotImplementedError, self.jpeg._get_pixel_array)
-        else:
-            self.assertRaises(NotImplementedError, self.jpeg._get_pixel_array)
-
-    def testJPEGBaselineColor3DPixelArray(self):
-        if have_pillow and have_numpy:
-            a = self.color_3d_jpeg.pixel_array
-            self.assertEqual(a.shape, (120, 480, 640, 3))
-            # this test points were manually identified in Osirix viewer
-            self.assertEqual(tuple(a[3, 159, 290, :]), (41, 41, 41))
-            self.assertEqual(tuple(a[3, 169, 290, :]), (57, 57, 57))
-        else:
-            self.assertRaises(NotImplementedError,
-                              self.color_3d_jpeg._get_pixel_array)
-
-
-class JPEGlosslessTests(unittest.TestCase):
-    def setUp(self):
-        self.jpeg = read_file(jpeg_lossless_name)
-
-    def testJPEGlossless(self):
-        """JPEGlossless: Returns correct values for sample data elements."""
-        got = self.jpeg.SourceImageSequence[0].PurposeOfReferenceCodeSequence[
-            0].CodeMeaning
-        expected = 'Uncompressed predecessor'
-        self.assertEqual(got, expected,
-                         "JPEG-lossless file, Code Meaning got %s, "
-                         "expected %s" % (got, expected))
-
-    def testJPEGlosslessPixelArray(self):
-        """JPEGlossless: Fails gracefully when uncompressed data is asked for.
-        """
-        # This test passes if the call raises either an
-        # ImportError when there is no Pillow module
-        # Or
-        # NotImplementedError when there is a Pillow module
-        #    but it lacks JPEG Lossless Dll's
-        # Or
-        # the call does not raise any Exceptions
-        # This test fails if any other exception is raised
-        with self.assertRaises((ImportError, NotImplementedError)):
-            try:
-                _x = self.jpeg._get_pixel_array()
-            except Exception:
-                raise
-            else:
-                raise ImportError()
-
-
 class DeferredReadTests(unittest.TestCase):
     """Test that deferred data element reading (for large size)
     works as expected
@@ -973,13 +876,19 @@ class ReadTruncatedFileTests(unittest.TestCase):
         expected = [DS('0.3125'), DS('0.3125')]
         self.assertTrue(got == expected, "Wrong pixel spacing")
 
-    @unittest.skipUnless(have_numpy, "Numpy not installed")
+    @unittest.skipUnless(
+        have_numpy and not have_gdcm_handler,
+        "Numpy not installed or gdcm is installed, "
+        "gdcm fixes truncated data??")
     def testReadFileWithMissingPixelDataArray(self):
         mr = read_file(truncated_mr_name)
         mr.decode()
-        with self.assertRaisesRegexp(AttributeError,
-                                     "Amount of pixel data.*does not match "
-                                     "the expected data"):
+        msg = (r"(Amount of pixel data.*"
+               "does not match the expected data|"
+               "Unexpected end of file. Read.*bytes of.*expected|"
+               "'str' object has no attribute 'reshape'|"
+               "'bytes' object has no attribute 'reshape')")
+        with self.assertRaisesRegexp(AttributeError, msg):
             mr.pixel_array
 
 
