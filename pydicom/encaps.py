@@ -1,5 +1,5 @@
 # Copyright 2008-2017 pydicom authors. See LICENSE file for details.
-"""Functions for working with encapsulated (compressed) data."""
+"""Functions for working with encapsulated (compressed) pixel data."""
 
 # Encapsulated Pixel Data --  3.5-2008 A.4
 # Encapsulated Pixel data is in a number of Items
@@ -22,6 +22,74 @@ from struct import unpack
 import pydicom.config
 from pydicom.filebase import DicomBytesIO
 from pydicom.tag import (Tag, ItemTag, SequenceDelimiterTag)
+
+
+def get_frame_offsets(fp):
+    """Return a list of the fragment offsets from the Basic Offset Table.
+
+    For single or multi-frame images with only one frame this will return
+    an empty list. For multi-frame images with multiple frames this will return
+    a list containing the byte offsets to the first fragment of each frame, as
+    measured from the end of the Basic Offset Table Item.
+
+    Basic Offset Table
+    ~~~~~~~~~~~~~~~~~~
+    The Basic Offset Table Item must be present and have a tag (FFEE,E000) and
+    a length, however it may or may not have a value.
+    
+    For single or multi-frame images with only one frame, the Basic Offset
+    Table may or may not have a value.
+
+    For multi-frame images with more than one frame, the Basic Offset Table
+    should have a value.
+    
+    When the Basic Offset Table has no value then its length shall be
+    0x00000000. When it has a value, then it shall contain concatenated 32-bit
+    unsigned integer values that are the byte offsets to the first byte of the
+    Item tag of the first fragment in each frame in the Sequence of Items.
+    These offsets are measured from the first byte of the first item tag
+    following the Basic Offset Table Item.
+
+    All decoders, both for single and multi-frame images should accept both
+    an empty Basic Offset Table and one containing offset values.
+
+    Parameters
+    ----------
+    fp : pydicom.filebase.DicomBytesIO
+        The encapsulated pixel data positioned at the start of the Basic Offset
+        Table.
+
+    Returns
+    -------
+    offsets : list of int
+        The byte offsets to the first fragment of each frame, as measured from
+        the end of the Basic Offset Table item.
+
+    Raises
+    ------
+    ValueError
+        If the Basic Offset Table item's tag is not (FFEE,E000) or if the length
+        of the item in bytes is not a multiple of 4.
+    """
+    # Just in case the user forgot to set it beforehand
+    fp.is_little_endian = True
+
+    tag = Tag(fp.read_tag())
+
+    if tag != 0xfffee000:
+        raise ValueError("Unexpected tag '{}' when parsing the Basic Table "
+                         "Offset item.".format(tag))
+
+    length = fp.read_UL()
+    if length % 4:
+        raise ValueError("The length of the Basic Offset Table item is not "
+                           "a multiple of 4.")
+
+    offsets = []
+    for ii in range(length / 4):
+        offsets.append(fp.read_UL())
+
+    return offsets
 
 
 def get_pixel_data_fragments(fp):
@@ -62,16 +130,8 @@ def get_pixel_data_fragments(fp):
     The Sequence of Items is terminated by a Sequence Delimiter Item with tag
     (fffe,e0dd) and an Item Length field of value 0x00000000.
 
-    Sample Encapsulated Pixel Data
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Pixel Data
-    | Tag     | VR  | Rsvd| Length    |
-    e0 7f 10 00 4f 42 00 00 ff ff ff ff
-
-    Item: Basic Offset Table (40 bytes item length)
-    | Tag     | Length    | Value (0 and 4966)    |
-    fe ff 00 e0 28 00 00 00 00 00 00 00 66 13 00 00
-
+    Sample Fragment Data
+    ~~~~~~~~~~~~~~~~~~~~
     Item : First Fragment of Frame 1 (4958 bytes item length)
     | Tag     | Length    | Value --->
     fe ff 00 e0 5e 13 00 00 ...
@@ -105,10 +165,12 @@ def get_pixel_data_fragments(fp):
     ----------
     DICOM Standard Part 5, Annex A.4
     """
+    # Just in case the user forgot to set it beforehand
+    fp.is_little_endian = True
+
     # We should be positioned at the start of the Item Tag for the first
     # fragment after the Basic Offset Table
     fragments = []
-    at_end_of_stream = False
     while True:
         try:
             tag = Tag(fp.read_tag())
@@ -119,82 +181,21 @@ def get_pixel_data_fragments(fp):
             # Item
             length = fp.read_UL()
             if length == 0xFFFFFFFF:
-                raise ValueError("Undefined length at offset %d when parsing "
-                                 "the encapsulated pixel data"
-                                 .format(fp.tell() - 4))
+                raise ValueError("Undefined item length at offset {} when "
+                                 "parsing the encapsulated pixel data "
+                                 "fragments.".format(fp.tell() - 4))
             fragments.append(fp.read(length))
         elif tag == 0xFFFEE0DD:
-            # Sequence Delimiter Item
+            # Rewind back to the end of the items
+            fp.seek(-4, 1)
             break
         else:
-            raise ValueError("Unknown tag '%s' at offset %d when parsing the "
-                             "encapsulated pixel data"
+            raise ValueError("Unexpected tag '{0}' at offset {1} when parsing "
+                             "the encapsulated pixel data fragment items."
                              .format(tag, fp.tell() - 4))
 
     return fragments
 
-def get_frame_offsets(fp):
-    """Return a list of the fragment offsets from the Basic Offset Table.
-
-    For single or multi-frame images with only one frame this will return
-    an empty list. For multi-frame images with multiple frames this will return
-    a list containing the byte offsets to the first fragment of each frame, as
-    measured from the end of the Basic Offset Table Item.
-
-    Basic Offset Table
-    ~~~~~~~~~~~~~~~~~~
-    The Basic Offset Table Item must be present and have a tag (FFEE,E000) and
-    a length, however it may or may not have a value.
-    
-    For single or multi-frame images with only one frame, the Basic Offset
-    Table may or may not have a value.
-
-    For multi-frame images with more than one frame, the Basic Offset Table
-    should have a value.
-    
-    When the Basic Offset Table has no value then its length shall be
-    0x00000000. When it has a value, then it shall contain concatenated 32-bit
-    unsigned integer values that are the byte offsets to the first byte of the
-    Item tag of the first fragment in each frame in the Sequence of Items.
-    These offsets are measured from the first byte of the first item tag
-    following the Basic Offset Table Item.
-
-    All decoders, both for single and multi-frame images should accept both
-    an empty Basic Offset Table and one containing offset values.
-
-    Parameters
-    ----------
-    fp : pydicom.filebase.DicomBytesIO
-        The encapsulated pixel data positioned at the start of the Basic Offset
-        Table.
-
-    Returns
-    -------
-    list of int
-        The byte offsets to the first fragment of each frame, as measured from
-        the end of the Basic Offset Table item.
-
-    Raises
-    ------
-    ValueError
-        If the Basic Offset Table item's tag is not (FFEE,E000) or if the length
-        of the item in bytes is not a multiple of 4.
-    """
-    tag = Tag(fp.read_tag())
-    if tag != 0xfffee000:
-        raise ValueError("Unknown tag '%s' at offset %d when parsing the "
-                         "encapsulated pixel data" %(tag, fp.tell() - 4))
-
-    length = fp.read_UL()
-    if length % 4:
-        raise ValueError("The length of the Basic Offset Table item is not "
-                           "a multiple of 4.")
-
-    value = []
-    for ii in range(length / 4):
-        value.append(fp.read_UL())
-
-    return value
 
 def get_pixel_data_frames(bytestream):
     """Return the encapsulated pixel data frame(s) as a list of bytearray.
@@ -221,10 +222,34 @@ def get_pixel_data_frames(bytestream):
 
     1.2.840.10008.1.2.5 - RLE Lossless
 
+    Sample Encapsulated Pixel Data
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Pixel Data
+    | Tag     | VR  | Rsvd| Length    |
+    e0 7f 10 00 4f 42 00 00 ff ff ff ff
+
+    Item: Basic Offset Table (40 bytes item length)
+    | Tag     | Length    | Value (0 and 4966)    |
+    fe ff 00 e0 28 00 00 00 00 00 00 00 66 13 00 00
+
+    Item : First Fragment of Frame 1 (4958 bytes item length)
+    | Tag     | Length    | Value --->
+    fe ff 00 e0 5e 13 00 00 ...
+
+    Item : First Fragment of Frame 2 (4742 bytes item length)
+    | Tag     | Length    | Value --->
+    fe ff 00 e0 86 12 00 00 ...
+
+    Item: Sequence Delimiter
+    | Tag     | Length    |
+    fe ff dd e0 00 00 00 00
+
     Parameters
     ----------
     bytestream : str or bytes
-        The encapsulated pixel data byte stream.
+        The value of the (7fe0, 0010) 'Pixel Data' element from an encapsulated
+        dataset. The Basic Offset Table item should be present and the
+        Sequence Delimiter item may or may not be present.
 
     Returns
     -------
