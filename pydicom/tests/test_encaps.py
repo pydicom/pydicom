@@ -151,7 +151,7 @@ class TestGetFrameOffsets(object):
                      b'\x00\x00\x00\x00'
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
-        assert [] == get_frame_offsets(fp)
+        assert [0] == get_frame_offsets(fp)
 
     def test_multi_frame(self):
         """Test reading multi-frame BOT item"""
@@ -177,32 +177,129 @@ class TestGetFrameOffsets(object):
 
 class TestGetPixelDataFrames(object):
     """Test encaps.get_pixel_data_frames"""
-    def test_no_bot_single_fragment(self):
+    def test_empty_bot_single_fragment(self):
         """Test a single-frame image where the frame is one fragments"""
-        pass
+        # 1 frame, 1 fragment long
+        bytestream = b'\xFE\xFF\x00\xE0' \
+                     b'\x00\x00\x00\x00' \
+                     b'\xFE\xFF\x00\xE0' \
+                     b'\x04\x00\x00\x00' \
+                     b'\x01\x00\x00\x00'
+        frames = get_pixel_data_frames(bytestream)
+        assert frames == [bytearray(b'\x01\x00\x00\x00')]
 
-    def test_no_bot_triple_fragment_single_frame(self):
+    def test_empty_bot_triple_fragment_single_frame(self):
         """Test a single-frame image where the frame is three fragments"""
-        pass
+        # 1 frame, 3 fragments long
+        bytestream = b'\xFE\xFF\x00\xE0' \
+                     b'\x00\x00\x00\x00' \
+                     b'\xFE\xFF\x00\xE0' \
+                     b'\x04\x00\x00\x00' \
+                     b'\x01\x00\x00\x00' \
+                     b'\xFE\xFF\x00\xE0' \
+                     b'\x04\x00\x00\x00' \
+                     b'\x02\x00\x00\x00' \
+                     b'\xFE\xFF\x00\xE0' \
+                     b'\x04\x00\x00\x00' \
+                     b'\x03\x00\x00\x00'
+        frames = get_pixel_data_frames(bytestream)
+        assert frames == [bytearray(b'\x01\x00\x00\x00'
+                                    b'\x02\x00\x00\x00'
+                                    b'\x03\x00\x00\x00')]
 
     def test_bot_single_fragment(self):
         """Test a single-frame image where the frame is one fragment"""
-        pass
+        # 1 frame, 1 fragment long
+        bytestream = b'\xFE\xFF\x00\xE0' \
+                     b'\x04\x00\x00\x00' \
+                     b'\x00\x00\x00\x00' \
+                     b'\xFE\xFF\x00\xE0' \
+                     b'\x04\x00\x00\x00' \
+                     b'\x01\x00\x00\x00'
+        frames = get_pixel_data_frames(bytestream)
+        assert frames == [bytearray(b'\x01\x00\x00\x00')]
 
     def test_bot_triple_fragment_single_frame(self):
         """Test a single-frame image where the frame is three fragments"""
-        pass
+        # 1 frame, 3 fragments long
+        bytestream = b'\xFE\xFF\x00\xE0' \
+                     b'\x04\x00\x00\x00' \
+                     b'\x00\x00\x00\x00' \
+                     b'\xFE\xFF\x00\xE0' \
+                     b'\x04\x00\x00\x00' \
+                     b'\x01\x00\x00\x00' \
+                     b'\xFE\xFF\x00\xE0' \
+                     b'\x04\x00\x00\x00' \
+                     b'\x02\x00\x00\x00' \
+                     b'\xFE\xFF\x00\xE0' \
+                     b'\x04\x00\x00\x00' \
+                     b'\x03\x00\x00\x00'
+        frames = get_pixel_data_frames(bytestream)
+        assert frames == [bytearray(b'\x01\x00\x00\x00'
+                                    b'\x02\x00\x00\x00'
+                                    b'\x03\x00\x00\x00')]
 
     def test_multi_frame_one_to_one(self):
         """Test a multi-frame image where each frame is one fragment"""
-        pass
+        # 3 frames, each 1 fragment long
+        bytestream = b'\xFE\xFF\x00\xE0' \
+                     b'\x0C\x00\x00\x00' \
+                     b'\x00\x00\x00\x00' \
+                     b'\x0C\x00\x00\x00' \
+                     b'\x18\x00\x00\x00' \
+                     b'\xFE\xFF\x00\xE0' \
+                     b'\x04\x00\x00\x00' \
+                     b'\x01\x00\x00\x00' \
+                     b'\xFE\xFF\x00\xE0' \
+                     b'\x04\x00\x00\x00' \
+                     b'\x02\x00\x00\x00' \
+                     b'\xFE\xFF\x00\xE0' \
+                     b'\x04\x00\x00\x00' \
+                     b'\x03\x00\x00\x00'
+        frames = get_pixel_data_frames(bytestream)
+        assert frames == [bytearray(b'\x01\x00\x00\x00'),
+                          bytearray(b'\x02\x00\x00\x00'),
+                          bytearray(b'\x03\x00\x00\x00')]
 
     def test_multi_frame_three_to_one(self):
         """Test a multi-frame image where each frame is three fragments"""
-        pass
+        # 2 frames, each 3 fragments long
+        bytestream = b'\xFE\xFF\x00\xE0' \
+                     b'\x0C\x00\x00\x00' \
+                     b'\x00\x00\x00\x00' \
+                     b'\x20\x00\x00\x00' \
+                     b'\x40\x00\x00\x00' \
+                     b'\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\x00\x00\x00' \
+                     b'\xFE\xFF\x00\xE0\x04\x00\x00\x00\x02\x00\x00\x00' \
+                     b'\xFE\xFF\x00\xE0\x04\x00\x00\x00\x03\x00\x00\x00' \
+                     b'\xFE\xFF\x00\xE0\x04\x00\x00\x00\x02\x00\x00\x00' \
+                     b'\xFE\xFF\x00\xE0\x04\x00\x00\x00\x02\x00\x00\x00' \
+                     b'\xFE\xFF\x00\xE0\x04\x00\x00\x00\x03\x00\x00\x00' \
+                     b'\xFE\xFF\x00\xE0\x04\x00\x00\x00\x03\x00\x00\x00' \
+                     b'\xFE\xFF\x00\xE0\x04\x00\x00\x00\x02\x00\x00\x00' \
+                     b'\xFE\xFF\x00\xE0\x04\x00\x00\x00\x03\x00\x00\x00'
+        frames = get_pixel_data_frames(bytestream)
+        assert frames == [bytearray(b'\x01\x00\x00\x00\x02\x00\x00\x00\x03\x00\x00\x00'),
+                          bytearray(b'\x02\x00\x00\x00\x02\x00\x00\x00\x03\x00\x00\x00'),
+                          bytearray(b'\x03\x00\x00\x00\x02\x00\x00\x00\x03\x00\x00\x00')]
 
     def test_multi_frame_varied_ratio(self):
         """Test a multi-frame image where each frames is random fragments"""
-        pass
+        # 3 frames, 1st is 1 fragment, 2nd is 3 fragments, 3rd is 2 fragments
+        bytestream = b'\xFE\xFF\x00\xE0' \
+                     b'\x0C\x00\x00\x00' \
+                     b'\x00\x00\x00\x00' \
+                     b'\x0E\x00\x00\x00' \
+                     b'\x32\x00\x00\x00' \
+                     b'\xFE\xFF\x00\xE0\x06\x00\x00\x00\x01\x00\x00\x00\x00\x01' \
+                     b'\xFE\xFF\x00\xE0\x02\x00\x00\x00\x02\x00' \
+                     b'\xFE\xFF\x00\xE0\x04\x00\x00\x00\x02\x00\x00\x00' \
+                     b'\xFE\xFF\x00\xE0\x06\x00\x00\x00\x03\x00\x00\x00\x00\x02' \
+                     b'\xFE\xFF\x00\xE0\x04\x00\x00\x00\x03\x00\x00\x00' \
+                     b'\xFE\xFF\x00\xE0\x02\x00\x00\x00\x02\x04'
+        frames = get_pixel_data_frames(bytestream)
+        assert frames == [bytearray(b'\x01\x00\x00\x00\x00\x01'),
+                          bytearray(b'\x02\x00\x02\x00\x00\x00\x03\x00\x00\x00\x00\x02'),
+                          bytearray(b'\x03\x00\x00\x00\x02\x04')]
 
 

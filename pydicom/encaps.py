@@ -86,6 +86,10 @@ def get_frame_offsets(fp):
                            "a multiple of 4.")
 
     offsets = []
+    if length == 0:
+        # Always return at least a 0 offset
+        offsets.append(0)
+
     for ii in range(length / 4):
         offsets.append(fp.read_UL())
 
@@ -264,31 +268,33 @@ def get_pixel_data_frames(bytestream):
     fp.is_little_endian = True
     
     # offsets contains the byte offset for the first fragment in each frame
-    offsets = parse_basic_offset_table(fp)
-    # - N * (8 bytes for item tag and length), where N is fragment number
-    # FIXME: This is wrong, only works when 1:1 ratio of fragment to frame
-    offsets = [val - ii * 8 for ii, val in enumerate(offsets)]
-    fragments = parse_pixel_data_fragments(fp)
+    offsets = get_frame_offsets(fp)
+    fragments = get_pixel_data_fragments(fp)
+
+    # Number of frames - define it now because we change `offsets`
+    no_frames = len(offsets)
+
+    # Need to know the total size of the fragments
+    end = 0
+    frag_ends = []
+    for frag in fragments:
+        end += len(frag) + 8
+        frag_ends.append(end)
+
+    offsets.append(frag_ends[-1])
 
     frames = []
-    if offsets:
-        # We start at the second offset so we'll need to do the final frame
-        # once we've iterated through the offsets
-        fragment_no = 0
-        frame_length = 0
-        for frame_offset in offsets[1:]:
-            frame = bytearray()
-            while frame_length < frame_offset:
-                frame.extend(fragments[fragment_no])
-                frame_length += len(fragments[fragment_no])
-                fragment_no += 1
+    frame_length = 0
+    fragment_no = 0
+    for ii in range(no_frames):
+        frame = bytearray()
+        while frame_length < offsets[ii + 1]:
+            frame.extend(fragments[fragment_no])
+            # Add 8 bytes for the item tag and length
+            frame_length += len(fragments[fragment_no]) + 8
+            fragment_no += 1
 
-            frames.append(frame)
-
-        # Final frame
-        frames.append(bytearray(b''.join(fragments[fragment_no:])))
-    else:
-        frames.append(bytearray(b''.join(fragments)))
+        frames.append(frame)
 
     return frames
 
