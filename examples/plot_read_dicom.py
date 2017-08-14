@@ -1,20 +1,22 @@
 """
-=============
-Title example
-=============
+=======================================
+Read DICOM and ploting using matplotlib
+=======================================
 
-Description of the example.
+This example illustrates how to open a DICOM file and show it using matplotlib.
 
 """
 
-# authors : some author
-# license : BSD3
+# authors : Guillaume Lemaitre <g.lemaitre58@gmail.com>
+# license : MIT
 
 import matplotlib.pyplot as plt
 import pydicom
+from pydicom.data import get_testdata_files
 
 print(__doc__)
 
-ds = pydicom.read_file("CT_small.dcm")
-plt.imshow(ds.pixel_array, cmap=plt.cm.bone)
+filename = get_testdata_files('CT_small.dcm')[0]
+dataset = pydicom.read_file(filename)
+plt.imshow(dataset.pixel_array, cmap=plt.cm.bone)
 plt.show()
