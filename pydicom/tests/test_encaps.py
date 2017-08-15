@@ -223,6 +223,7 @@ class TestGeneratePixelDataFrames(object):
                      b'\x01\x00\x00\x00'
         frames = generate_pixel_data_frame(bytestream)
         assert next(frames) == b'\x01\x00\x00\x00'
+        pytest.raises(StopIteration, next, frames)
 
     def test_empty_bot_triple_fragment_single_frame(self):
         """Test a single-frame image where the frame is three fragments"""
@@ -239,7 +240,10 @@ class TestGeneratePixelDataFrames(object):
                      b'\x04\x00\x00\x00' \
                      b'\x03\x00\x00\x00'
         frames = generate_pixel_data_frame(bytestream)
-        assert next(frames) == b'\x01\x00\x00\x00\x02\x00\x00\x00\x03\x00\x00\x00'
+        assert next(frames) == (
+            b'\x01\x00\x00\x00\x02\x00\x00\x00\x03\x00\x00\x00'
+        )
+        pytest.raises(StopIteration, next, frames)
 
     def test_bot_single_fragment(self):
         """Test a single-frame image where the frame is one fragment"""
@@ -252,6 +256,7 @@ class TestGeneratePixelDataFrames(object):
                      b'\x01\x00\x00\x00'
         frames = generate_pixel_data_frame(bytestream)
         assert next(frames) == b'\x01\x00\x00\x00'
+        pytest.raises(StopIteration, next, frames)
 
     def test_bot_triple_fragment_single_frame(self):
         """Test a single-frame image where the frame is three fragments"""
@@ -269,7 +274,10 @@ class TestGeneratePixelDataFrames(object):
                      b'\x04\x00\x00\x00' \
                      b'\x03\x00\x00\x00'
         frames = generate_pixel_data_frame(bytestream)
-        assert next(frames) == b'\x01\x00\x00\x00\x02\x00\x00\x00\x03\x00\x00\x00'
+        assert next(frames) == (
+            b'\x01\x00\x00\x00\x02\x00\x00\x00\x03\x00\x00\x00'
+        )
+        pytest.raises(StopIteration, next, frames)
 
     def test_multi_frame_one_to_one(self):
         """Test a multi-frame image where each frame is one fragment"""
@@ -292,6 +300,7 @@ class TestGeneratePixelDataFrames(object):
         assert next(frames) == b'\x01\x00\x00\x00'
         assert next(frames) == b'\x02\x00\x00\x00'
         assert next(frames) == b'\x03\x00\x00\x00'
+        pytest.raises(StopIteration, next, frames)
 
     def test_multi_frame_three_to_one(self):
         """Test a multi-frame image where each frame is three fragments"""
@@ -311,9 +320,16 @@ class TestGeneratePixelDataFrames(object):
                      b'\xFE\xFF\x00\xE0\x04\x00\x00\x00\x02\x00\x00\x00' \
                      b'\xFE\xFF\x00\xE0\x04\x00\x00\x00\x03\x00\x00\x00'
         frames = generate_pixel_data_frame(bytestream)
-        assert next(frames) == b'\x01\x00\x00\x00\x02\x00\x00\x00\x03\x00\x00\x00'
-        assert next(frames) == b'\x02\x00\x00\x00\x02\x00\x00\x00\x03\x00\x00\x00'
-        assert next(frames) == b'\x03\x00\x00\x00\x02\x00\x00\x00\x03\x00\x00\x00'
+        assert next(frames) == (
+            b'\x01\x00\x00\x00\x02\x00\x00\x00\x03\x00\x00\x00'
+        )
+        assert next(frames) == (
+            b'\x02\x00\x00\x00\x02\x00\x00\x00\x03\x00\x00\x00'
+        )
+        assert next(frames) == (
+            b'\x03\x00\x00\x00\x02\x00\x00\x00\x03\x00\x00\x00'
+        )
+        pytest.raises(StopIteration, next, frames)
 
     def test_multi_frame_varied_ratio(self):
         """Test a multi-frame image where each frames is random fragments"""
@@ -337,8 +353,11 @@ class TestGeneratePixelDataFrames(object):
                      b'\x02\x00\x00\x00\x02\x04'
         frames = generate_pixel_data_frame(bytestream)
         assert next(frames) == b'\x01\x00\x00\x00\x00\x01'
-        assert next(frames) == b'\x02\x00\x02\x00\x00\x00\x03\x00\x00\x00\x00\x02'
+        assert next(frames) == (
+            b'\x02\x00\x02\x00\x00\x00\x03\x00\x00\x00\x00\x02'
+        )
         assert next(frames) == b'\x03\x00\x00\x00\x02\x04'
+        pytest.raises(StopIteration, next, frames)
 
 
 class TestGeneratePixelData(object):
@@ -673,7 +692,7 @@ class TestReadItem(object):
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
         assert read_item(fp) == b'\x01\x00\x00\x00'
-        assert read_item(fp) == None
+        assert read_item(fp) is None
         assert read_item(fp) == b'\x02\x00\x00\x00'
 
     def test_item_sequence_delimiter_zero_length(self):
@@ -689,7 +708,7 @@ class TestReadItem(object):
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
         assert read_item(fp) == b'\x01\x00\x00\x00'
-        assert read_item(fp) == None
+        assert read_item(fp) is None
         assert read_item(fp) == b'\x02\x00\x00\x00'
 
     def test_item_bad_tag(self):
