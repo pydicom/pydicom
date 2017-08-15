@@ -6,7 +6,7 @@ from os.path import basename
 from pydicom.data import (get_charset_files,
                           get_testdata_files)
 
-from pydicom.data.base import DATA_ROOT
+from pydicom.data.data_manager import DATA_ROOT
 
 
 class TestGetData(unittest.TestCase):
