@@ -91,10 +91,3 @@ for de in data_elements:
 
 output_filename = tempfile.NamedTemporaryFile().name
 dataset.save_as(output_filename)
-
-###############################################################################
-# Anonymize several files from a directory
-###############################################################################
-
-###############################################################################
-# This is possible to make the processing for a full directory
