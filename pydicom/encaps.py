@@ -1,24 +1,6 @@
 # Copyright 2008-2017 pydicom authors. See LICENSE file for details.
 """Functions for working with encapsulated (compressed) pixel data."""
 
-# Encapsulated Pixel Data --  3.5-2008 A.4
-# Encapsulated Pixel data is in a number of Items
-# (start with Item tag (0xFFFE,E000) and ending ultimately
-# with SQ delimiter and Item Length field of 0 (no value),
-# just like SQ of undefined length,
-# but here Item must have explicit length.
-
-# PixelData length is Undefined Length if encapsulated
-# First item is an Offset Table. It can have 0 length and no value,
-# or it can have a table of US pointers to first byte
-# of the Item tag starting each *Frame*, where 0 of pointer
-# is at first Item tag following the Offset table
-# If a single frame, it may be 0 length/no value,
-# or it may have a single pointer (0).
-
-from io import BytesIO
-from struct import unpack
-
 import pydicom.config
 from pydicom.filebase import DicomBytesIO
 from pydicom.tag import (Tag, ItemTag, SequenceDelimiterTag)
@@ -57,7 +39,7 @@ def get_frame_offsets(fp):
     ----------
     fp : pydicom.filebase.DicomBytesIO
         The encapsulated pixel data positioned at the start of the Basic Offset
-        Table. DicomBytesIO.is_little_endian should be set to True.
+        Table. `fp.is_little_endian` should be set to True.
 
     Returns
     -------
@@ -75,8 +57,8 @@ def get_frame_offsets(fp):
     ----------
     DICOM Standard Part 5, Annex A.4
     """
-    # Just in case the user forgot to set it beforehand
-    fp.is_little_endian = True
+    if not fp.is_little_endian:
+        raise ValueError("'fp.is_little_endian' must be True")
 
     tag = Tag(fp.read_tag())
 
@@ -134,26 +116,12 @@ def get_pixel_data_fragments(fp):
     ~~~~~~~~
     The encoding of the data shall be little endian.
 
-    Sample Fragment Data
-    ~~~~~~~~~~~~~~~~~~~~
-    Item : First Fragment of Frame 1 (4958 bytes item length)
-    Tag        | Length    | Value --->
-    fe ff 00 e0 5e 13 00 00 ...
-
-    Item : First Fragment of Frame 2 (4742 bytes item length)
-    Tag        | Length    | Value --->
-    fe ff 00 e0 86 12 00 00 ...
-
-    Item: Sequence Delimiter
-    Tag        | Length    |
-    fe ff dd e0 00 00 00 00
-
     Parameters
     ----------
     fp : pydicom.filebase.DicomBytesIO
         The encoded (7fe0,0010) 'Pixel Data' element value, positioned at the
         start of the item tag for the first item after the Basic Offset Table
-        item. DicomBytesIO.is_little_endian should be set to True.
+        item. `fp.is_little_endian` should be set to True.
 
     Returns
     -------
@@ -170,8 +138,8 @@ def get_pixel_data_fragments(fp):
     ----------
     DICOM Standard Part 5, Annex A.4
     """
-    # Just in case the user forgot to set it beforehand
-    fp.is_little_endian = True
+    if not fp.is_little_endian:
+        raise ValueError("'fp.is_little_endian' must be True")
 
     # We should be positioned at the start of the Item Tag for the first
     # fragment after the Basic Offset Table
@@ -191,6 +159,7 @@ def get_pixel_data_fragments(fp):
                                  "fragments.".format(fp.tell() - 4))
             fragments.append(fp.read(length))
         elif tag == 0xFFFEE0DD:
+            # Sequence Delimiter
             # Behave nicely and rewind back to the end of the items
             fp.seek(-4, 1)
             break
@@ -203,7 +172,29 @@ def get_pixel_data_fragments(fp):
 
 
 def get_pixel_data_frames(bytestream):
-    """Return the encapsulated pixel data frame(s) as a list of bytearray.
+    """Return the encapsulated pixel data frame(s) as a list of frame data.
+
+    Parameters
+    ----------
+    bytestream : bytes
+        The value of the (7fe0, 0010) 'Pixel Data' element from an encapsulated
+        dataset. The Basic Offset Table item should be present and the
+        Sequence Delimiter item may or may not be present.
+
+    Returns
+    -------
+    list of bytes
+        The frame(s) contained in the encapsulated pixel data.
+
+    References
+    ----------
+    DICOM Standard Part 5, Annex A
+    """
+    return [b''.join(fragments) for fragments in get_pixel_data(bytestream)]
+
+
+def get_pixel_data(bytestream):
+    """Return the encapsulated pixel data as a list of tuples of bytes.
 
     For the following transfer syntaxes, a fragment may not contain encoded
     data from more than one frame. However data from one frame may span
@@ -227,39 +218,18 @@ def get_pixel_data_frames(bytestream):
 
     1.2.840.10008.1.2.5 - RLE Lossless
 
-    Sample Encapsulated Pixel Data
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Pixel Data
-    Tag        | VR  | Rsvd| Length    |
-    e0 7f 10 00 4f 42 00 00 ff ff ff ff
-
-    Item: Basic Offset Table (40 bytes item length)
-    Tag        | Length    | Value (0 and 4966)    |
-    fe ff 00 e0 28 00 00 00 00 00 00 00 66 13 00 00
-
-    Item : First Fragment of Frame 1 (4958 bytes item length)
-    Tag        | Length    | Value --->
-    fe ff 00 e0 5e 13 00 00 ...
-
-    Item : First Fragment of Frame 2 (4742 bytes item length)
-    Tag        | Length    | Value --->
-    fe ff 00 e0 86 12 00 00 ...
-
-    Item: Sequence Delimiter
-    Tag        | Length    |
-    fe ff dd e0 00 00 00 00
-
     Parameters
     ----------
-    bytestream : str or bytes
+    bytestream : bytes
         The value of the (7fe0, 0010) 'Pixel Data' element from an encapsulated
         dataset. The Basic Offset Table item should be present and the
         Sequence Delimiter item may or may not be present.
 
     Returns
     -------
-    list of bytearray
-        The frame(s) contained in the encapsulated pixel data.
+    list of tuple of bytes
+        A list of tuples, with each tuple representing an encapsulated pixel
+        data frame and the contents of the tuple the frame's fragmented data.
 
     References
     ----------
@@ -270,32 +240,35 @@ def get_pixel_data_frames(bytestream):
     
     # `offsets` is a list of the offsets to the first fragment in each frame
     offsets = get_frame_offsets(fp)
-    # Number of frames - define it now because we change `offsets`
+    # Define it now because we change `offsets` later
     no_frames = len(offsets)
 
     fragments = get_pixel_data_fragments(fp)
 
-    # Need to know the total size of the fragments
+    # Need to know the total size of the item fragments
     end = 0
     frag_ends = []
     for frag in fragments:
+        # Add 8 bytes for the item tag and length
         end += len(frag) + 8
         frag_ends.append(end)
 
     offsets.append(frag_ends[-1])
 
+    # For each frame, extend the frame using the next fragment as long as the
+    # total frame_length so far is less than the offset for the next frame
     frames = []
     frame_length = 0
     fragment_no = 0
     for ii in range(no_frames):
-        frame = bytearray()
+        frame = []
         while frame_length < offsets[ii + 1]:
-            frame.extend(fragments[fragment_no])
+            frame.append(fragments[fragment_no])
             # Add 8 bytes for the item tag and length
             frame_length += len(fragments[fragment_no]) + 8
             fragment_no += 1
 
-        frames.append(frame)
+        frames.append(tuple(frame))
 
     return frames
 
