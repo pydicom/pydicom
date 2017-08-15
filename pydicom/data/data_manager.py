@@ -11,16 +11,15 @@ import fnmatch
 DATA_ROOT = abspath(dirname(__file__))
 
 
-def get_files(bases, pattern="*"):
+def get_files(base, pattern):
     """Return all files from a set of sources.
 
     Parameters
     ----------
-    bases : list of str or str
-        This can be a list of files and/or folders conforming to some standard
-        pattern.
+    base : str
+        Base directory to recursively search.
 
-    pattern : str, optional (default="*")
+    pattern : str
         A string pattern to filter the files. Default is "*" and it will return
         all files.
 
@@ -33,23 +32,13 @@ def get_files(bases, pattern="*"):
     # if the user forgot to add them
     pattern = "*" + pattern + "*"
 
-    if not isinstance(bases, (list, tuple)):
-        bases = [bases]
-
     files = []
-    for contender in bases:
-        if isdir(contender):
-
-            for root, dirnames, filenames in walk(contender):
-                for filename in filenames:
-                    filename_filter = fnmatch.filter([join(root, filename)],
-                                                     pattern)
-                    if len(filename_filter):
-                        files.append(filename_filter[0])
-        else:
-            files.append(contender)
-
-    files = [filename for filename in files if not filename.endswith('.py')]
+    for root, dirnames, filenames in walk(base):
+        for filename in filenames:
+            filename_filter = fnmatch.filter([join(root, filename)],
+                                             pattern)
+            if len(filename_filter):
+                files.append(filename_filter[0])
 
     return files
 
@@ -70,7 +59,11 @@ def get_testdata_files(pattern="*"):
     """
 
     data_path = join(DATA_ROOT, 'test_files')
-    return get_files(bases=data_path, pattern=pattern)
+
+    files = get_files(base=data_path, pattern=pattern)
+    files = [filename for filename in files if not filename.endswith('.py')]
+
+    return files
 
 
 def get_charset_files(pattern="*"):
@@ -89,4 +82,8 @@ def get_charset_files(pattern="*"):
     """
 
     data_path = join(DATA_ROOT, 'charset_files')
-    return get_files(bases=data_path, pattern=pattern)
+
+    files = get_files(base=data_path, pattern=pattern)
+    files = [filename for filename in files if not filename.endswith('.py')]
+
+    return files
