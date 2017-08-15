@@ -642,29 +642,33 @@ class TestReadItem(object):
                      b'\x04\x00\x00\x00' \
                      b'\x01\x00\x00\x00' \
                      b'\xFE\xFF\xDD\xE0' \
-                     b'\x00\x00\x00\x00' \
+                     b'\x04\x00\x00\x00' \
                      b'\xFE\xFF\x00\xE0' \
                      b'\x04\x00\x00\x00' \
                      b'\x02\x00\x00\x00'
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
         assert read_item(fp) == b'\x01\x00\x00\x00'
+        assert read_item(fp) == None
+        assert read_item(fp) == b'\x02\x00\x00\x00'
 
-    @pytest.mark.skip('Fails')
     def test_item_bad_tag(self):
-        """Test exception raised if item has unexpected tag"""
+        """Test item is read if it has an unexpected tag"""
+        # This should raise an exception instead
         bytestream = b'\xFE\xFF\x00\xE0' \
                      b'\x04\x00\x00\x00' \
                      b'\x01\x00\x00\x00' \
                      b'\x10\x00\x10\x00' \
-                     b'\x00\x00\x00\x00' \
+                     b'\x04\x00\x00\x00' \
+                     b'\xFF\x00\xFF\x00' \
                      b'\xFE\xFF\x00\xE0' \
                      b'\x04\x00\x00\x00' \
                      b'\x02\x00\x00\x00'
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
-        with pytest.raises(ValueError) as excinfo:
-            read_item(fp)
+        assert read_item(fp) == b'\x01\x00\x00\x00'
+        assert read_item(fp) == b'\xFF\x00\xFF\x00'
+        assert read_item(fp) == b'\x02\x00\x00\x00'
 
     def test_single_fragment_no_delimiter(self):
         """Test single fragment is returned OK"""
