@@ -46,5 +46,5 @@ class TestGetData(unittest.TestCase):
         self.assertTrue(filename[0].endswith('CT_small.dcm'))
 
         pattern = 'chrX1'
-        filename = get_testdata_files(pattern)
+        filename = get_charset_files(pattern)
         self.assertTrue(filename[0].endswith('chrX1.dcm'))
