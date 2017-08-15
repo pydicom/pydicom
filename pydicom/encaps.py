@@ -21,7 +21,7 @@ def get_frame_offsets(fp):
     Basic Offset Table with value (2 frames)
     Item Tag   | Length    | Offset 1  | Offset 2  |
     FE FF 00 E0 08 00 00 00 00 00 00 00 10 00 00 00
-    
+
     For single or multi-frame images with only one frame, the Basic Offset
     Table may or may not have a value. When it has no value then its length
     shall be 0x00000000.
@@ -69,7 +69,7 @@ def get_frame_offsets(fp):
     length = fp.read_UL()
     if length % 4:
         raise ValueError("The length of the Basic Offset Table item is not "
-                           "a multiple of 4.")
+                         "a multiple of 4.")
 
     offsets = []
     # Always return at least a 0 offset
@@ -86,7 +86,7 @@ def get_pixel_data_fragments(fp):
     """Return the encapsulated pixel data fragments as a list of bytes.
 
     For compressed (encapsulated) Transfer Syntaxes, the (7fe0,0010) 'Pixel
-    Data' element is encoded in an encapsulated format. 
+    Data' element is encoded in an encapsulated format.
 
     Encapsulation
     -------------
@@ -237,7 +237,7 @@ def get_pixel_data(bytestream):
     """
     fp = DicomBytesIO(bytestream)
     fp.is_little_endian = True
-    
+
     # `offsets` is a list of the offsets to the first fragment in each frame
     offsets = get_frame_offsets(fp)
     # Define it now because we change `offsets` later
