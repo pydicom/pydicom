@@ -1,5 +1,3 @@
-# -*- coding: latin_1 -*-
-# test_charset.py
 """unittest cases for pydicom.charset module"""
 # Copyright (c) 2008 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
@@ -7,20 +5,18 @@
 #    available at https://github.com/pydicom/pydicom
 
 import unittest
-from pydicom.data import DATA_ROOT
-from pydicom import dicomio
-import os.path
+
 import pydicom.charset
+from pydicom import dicomio
+from pydicom.data import get_charset_files
+from pydicom.data import get_testdata_files
 
-testcharset_dir = os.path.join(DATA_ROOT, 'charset_files')
-test_files = os.path.join(DATA_ROOT, 'test_files')
-
-latin1_file = os.path.join(testcharset_dir, "chrFren.dcm")
-jp_file = os.path.join(testcharset_dir, "chrH31.dcm")
-multiPN_file = os.path.join(testcharset_dir, "chrFrenMulti.dcm")
-sq_encoding_file = os.path.join(testcharset_dir, "chrSQEncoding.dcm")
-explicit_ir6_file = os.path.join(testcharset_dir, "chrJapMultiExplicitIR6.dcm")
-normal_file = os.path.join(test_files, "CT_small.dcm")
+latin1_file = get_charset_files("chrFren.dcm")[0]
+jp_file = get_charset_files("chrH31.dcm")[0]
+multiPN_file = get_charset_files("chrFrenMulti.dcm")[0]
+sq_encoding_file = get_charset_files("chrSQEncoding.dcm")[0]
+explicit_ir6_file = get_charset_files("chrJapMultiExplicitIR6.dcm")[0]
+normal_file = get_testdata_files("CT_small.dcm")[0]
 
 
 class charsetTests(unittest.TestCase):

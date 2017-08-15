@@ -3,11 +3,10 @@
 import unittest
 import os.path as osp
 
-from pydicom.data import DATA_ROOT
+from pydicom.data import get_testdata_files
 from pydicom.misc import is_dicom, size_in_bytes
 
-test_files = osp.join(DATA_ROOT, 'test_files')
-test_file = osp.join(test_files, 'CT_small.dcm')
+test_file = get_testdata_files('CT_small.dcm')[0]
 
 
 class TestMisc(unittest.TestCase):
