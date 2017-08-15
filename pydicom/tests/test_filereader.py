@@ -85,7 +85,12 @@ jpeg_lossy_name = get_testdata_files("JPEG-lossy.dcm")[0]
 jpeg_lossless_name = get_testdata_files("JPEG-LL.dcm")[0]
 deflate_name = get_testdata_files("image_dfl.dcm")[0]
 rtstruct_name = get_testdata_files("rtstruct.dcm")[0]
-priv_SQ_name = get_testdata_files("priv_SQ.dcm")[0]
+priv_SQ_name = get_testdata_files("priv_SQ.dcm")
+# be sure that we don't pick up the nested_priv_sq
+priv_SQ_name = [filename
+                for filename in priv_SQ_name
+                if 'nested' not in filename]
+priv_SQ_name = priv_SQ_name[0]
 nested_priv_SQ_name = get_testdata_files("nested_priv_SQ.dcm")[0]
 meta_missing_tsyntax_name = get_testdata_files("meta_missing_tsyntax.dcm")[0]
 no_meta_group_length = get_testdata_files("no_meta_group_length.dcm")[0]
