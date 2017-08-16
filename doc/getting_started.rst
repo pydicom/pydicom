@@ -37,6 +37,8 @@ head-first-prone, and save to a new file::
   (300a, 01b2) Setup Technique Description         ST: ''
   >>> ds.PatientSetupSequence[0].PatientPosition = "HFP"
   >>> ds.save_as("rtplan2.dcm")
+
+..
   >>> os.remove("rtplan2.dcm")
 
 pydicom is not a DICOM server [#]_, and is not primarily about viewing

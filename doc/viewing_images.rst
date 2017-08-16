@@ -28,16 +28,20 @@ matplotlib is available at http://matplotlib.sourceforge.net/. It
 can take 2-d image information from ``Dataset.pixel_array`` and display it.
 Here is an example::
 
-    >>> import pydicom
-    >>> import pylab
-    >>> ds=pydicom.read_file("CT_small.dcm")
-    >>> pylab.imshow(ds.pixel_array, cmap=pylab.cm.bone)
-    <matplotlib.image.AxesImage object at 0x0162A530>
-    >>> pylab.show()
-    >>>
+  >>> import matplotlib.pyplot as plt
+  >>> import pydicom
+  >>> from pydicom.data import get_testdata_files
+  >>> filename = get_testdata_files("CT_small.dcm")[0]
+  >>> ds = pydicom.read_file(filename)
+  >>> plt.imshow(ds.pixel_array, cmap=plt.cm.bone) # doctest: +ELLIPSIS
+  <matplotlib.image.AxesImage object at ...>
+
+.. image:: ./auto_examples/input_output/images/sphx_glr_plot_read_dicom_001.png
+   :target: ./auto_examples/input_output/plot_printing_dataset.html
+   :scale: 60
+   :align: center
 
 Thanks to Roy Keyes for pointing out how to do this.
-
 
 Using pydicom with Tkinter
 --------------------------
@@ -48,7 +52,6 @@ in the ``contrib`` folder demonstrates how to show an image using the
 Tkinter graphics system, which comes standard with most python installs.
 It creates a Tkinter PhotoImage in a Label widget or a user-supplied widget.
 
-
 Using pydicom with Python Imaging Library (PIL)
 -----------------------------------------------
 
@@ -57,7 +60,6 @@ The module `pydicom_PIL.py
 in the ``contrib`` folder
 uses PIL's ``Image.show()`` method after creating an Image instance
 from the pixel data and some basic information about it (bit depth, LUTs, etc)
-
 
 Using pydicom with wxPython
 ---------------------------

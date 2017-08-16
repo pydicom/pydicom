@@ -1,146 +1,184 @@
-Core structure in pydicom
-=========================
+Core elements in pydicom
+========================
 
 .. rubric:: pydicom object model, description of classes, examples
 
 Dataset
 -------
 
-``Dataset`` is the main object you will work with directly. Dataset is derived
-from python's ``dict``, so it inherits (and overrides some of) the methods
-of ``dict``. In other words it is a collection of key:value pairs, where
-the key value is the DICOM (group,element) tag (as a Tag object,
-described below), and the value is a DataElement instance
-(also described below).
+.. currentmodule:: pydicom
+
+:class:`dataset.Dataset` is the main object you will work with
+directly. Dataset is derived from python's ``dict``, so it inherits (and
+overrides some of) the methods of ``dict``. In other words it is a collection
+of key:value pairs, where the key value is the DICOM (group,element) tag (as a
+Tag object, described below), and the value is a DataElement instance (also
+described below).
 
 A dataset could be created directly, but you will usually get one by reading
 an existing DICOM file::
 
-    >>> import pydicom
-    >>> ds = pydicom.read_file("rtplan.dcm") # (rtplan.dcm is in the testfiles directory)
+  >>> import pydicom
+  >>> from pydicom.data import get_testdata_files
+  >>> # get some test data
+  >>> filename = get_testdata_files("rtplan.dcm")[0]
+  >>> ds = pydicom.read_file(filename)
 
 You can display the entire dataset by simply printing its string
 (str or repr) value::
 
-    >>> ds
-    (0008, 0012) Instance Creation Date              DA: '20030903'
-    (0008, 0013) Instance Creation Time              TM: '150031'
-    (0008, 0016) SOP Class UID                       UI: RT Plan Storage
-    (0008, 0018) SOP Instance UID                    UI: 1.2.777.777.77.7.7777.7777.20030903150023
-    (0008, 0020) Study Date                          DA: '20030716'
-    (0008, 0030) Study Time                          TM: '153557'
-    (0008, 0050) Accession Number                    SH: ''
-    (0008, 0060) Modality                            CS: 'RTPLAN'
+  >>> ds # doctest: +ELLIPSIS
+  (0008, 0012) Instance Creation Date              DA: '20030903'
+  (0008, 0013) Instance Creation Time              TM: '150031'
+  (0008, 0016) SOP Class UID                       UI: RT Plan Storage
+  (0008, 0018) SOP Instance UID                    UI: 1.2.777.777.77.7.7777.7777.20030903150023
+  (0008, 0020) Study Date                          DA: '20030716'
+  (0008, 0030) Study Time                          TM: '153557'
+  (0008, 0050) Accession Number                    SH: ''
+  (0008, 0060) Modality                            CS: 'RTPLAN'
+  ...
 
 .. note::
+
     You can also view DICOM files in a collapsible tree using
     the example program `dcm_qt_tree.py
     <https://github.com/pydicom/pydicom/blob/dev/pydicom/contrib/dcm_qt_tree.py>`_.
 
-You can access specific data elements by name (DICOM 'keyword') or by DICOM tag number::
+You can access specific data elements by name (DICOM 'keyword') or by DICOM tag
+number::
 
-    >>> ds.PatientName
-    'Last^First^mid^pre'
-    >>> ds[0x10,0x10].value
-    'Last^First^mid^pre'
+  >>> ds.PatientName
+  'Last^First^mid^pre'
+  >>> ds[0x10,0x10].value
+  'Last^First^mid^pre'
 
-In the latter case (using the tag number directly) a DataElement instance
-is returned, so the ``.value`` must be used to get the value.
+In the latter case (using the tag number directly) a DataElement instance is
+returned, so the ``.value`` must be used to get the value.
 
 You can also set values by name (DICOM keyword) or tag number::
 
-    >>> ds.PatientID = "12345"
-    >>> ds.SeriesNumber = 5
-    >>> ds[0x10,0x10].value = 'Test'
+  >>> ds.PatientID = "12345"
+  >>> ds.SeriesNumber = 5
+  >>> ds[0x10,0x10].value = 'Test'
 
-The use of names is possible because pydicom intercepts requests for
-member variables, and checks if they are in the DICOM dictionary.
-It translates the keyword to a (group,element) number and returns
-the corresponding value for that key if it exists.
+The use of names is possible because pydicom intercepts requests for member
+variables, and checks if they are in the DICOM dictionary. It translates the
+keyword to a (group,element) number and returns the corresponding value for
+that key if it exists.
+
+See :ref:`sphx_glr_auto_examples_metadata_processing_plot_anonymize.py` for a
+usage example of data elements removal and assignation.
 
 .. note::
-To understand using Sequences in pydicom, please refer to this object model:
-    Dataset (derived from python's `dict`)
+
+   To understand using :class:`sequence.Sequences` in pydicom, please refer to
+   this object model:
+   :class:`dataset.Dataset` (derived from python's ``dict``)
        ---> contains DataElement instances
           --> the value of the data element can be one of:
-               * a regular value like a number, string, etc.
-               * a list of regular values (e.g. a 3-D coordinate)
-               * a Sequence instance
-                  --> a Sequence is a list of Datasets (and so we come full circle)
 
-DICOM Sequences are turned into python ``list`` s.
-Items in the sequence are referenced by number, beginning at index 0 as per
-python convention.::
+          * a regular value like a number, string, etc.
+          * a list of regular values (e.g. a 3-D coordinate)
+          * a Sequence instance
 
-    >>> ds.BeamSequence[0].BeamName
-    'Field 1'
+         --> a Sequence is a list of :class:`dataset.Dataset` (and so we come full circle)
 
-Using DICOM keywords is the recommended way to access data elements, but you can also use the tag numbers directly, such as:
+DICOM :class:`sequence.Sequences` are turned into python ``list`` s. Items in
+the sequence are referenced by number, beginning at index 0 as per python
+convention::
 
-    >>> # Same thing with tag numbers:
-    >>> ds[0x300a,0xb0][0][0x300a,0xc2].value
-    'Field 1'
-    >>> # yet another way, using another variable
-    >>> beam1=ds[0x300a,0xb0][0]
-    >>> beam1.BeamName, beam1[0x300a,0xc2].value
-    ('Field 1', 'Field 1')
+  >>> ds.BeamSequence[0].BeamName
+  'Field 1'
+
+See :ref:`sphx_glr_auto_examples_metadata_processing_plot_sequences.py`.
+
+Using DICOM keywords is the recommended way to access data elements, but you
+can also use the tag numbers directly, such as::
+
+  >>> # Same thing with tag numbers:
+  >>> ds[0x300a,0xb0][0][0x300a,0xc2].value
+  'Field 1'
+  >>> # yet another way, using another variable
+  >>> beam1=ds[0x300a,0xb0][0]
+  >>> beam1.BeamName, beam1[0x300a,0xc2].value
+  ('Field 1', 'Field 1')
 
 
-If you don't remember or know the exact tag name, Dataset provides
-a handy `dir()` method, useful during interactive sessions
-at the python prompt::
+If you don't remember or know the exact tag name, :class:`dataset.Dataset`
+provides a handy :func:`dataset.Dataset.dir` method, useful during interactive
+sessions at the python prompt::
 
-    >>> ds.dir("pat")
-    ['PatientBirthDate', 'PatientID', 'PatientName', 'PatientSetupSequence', 'PatientSex']
+  >>> ds.dir("pat")
+  ['PatientBirthDate', 'PatientID', 'PatientName', 'PatientSetupSequence', 'PatientSex']
 
-``dir`` will return any DICOM tag names in the dataset that have
-the specified string anywhere in the name (case insensitive).
+:func:`dataset.Dataset.dir` will return any DICOM tag names in the dataset that
+have the specified string anywhere in the name (case insensitive).
 
 .. note::
-    Calling `dir` with no string will list all tag names available in the dataset.
+
+   Calling :func:`dataset.Dataset.dir` with no string will list all tag names
+   available in the dataset.
 
 You can also see all the names that pydicom knows about by viewing the
-`_dicom_dict.py` file. You could modify that file to add tags
-that pydicom doesn't already know about.
+``_dicom_dict.py`` file. You could modify that file to add tags that pydicom
+doesn't already know about.
 
-Under the hood, Dataset stores a DataElement object for each item,
-but when accessed by name (e.g. ``ds.PatientName``) only the `value`
-of that DataElement is returned. If you need the whole DataElement
-(see the DataElement class discussion), you can use Dataset's data_element()
-method or access the item using the tag number::
+Under the hood, :class:`dataset.Dataset` stores a DataElement object for each
+item, but when accessed by name (e.g. ``ds.PatientName``) only the ``value`` of
+that :class:`dataelem.DataElement` is returned. If you need the whole
+:mod:`dataelem` (see the :class:`dataelem.DataElement` discussion), you can use
+:func:`dataset.Dataset.data_element` method or access the item using the tag
+number::
 
-    >>> data_element = ds.data_element("PatientsName")  # or data_element = ds[0x10,0x10]
-    >>> data_element.VR, data_element.value
-    ('PN', 'Last^First^mid^pre')
+  >>> # reload the data
+  >>> ds = pydicom.read_file(filename)
+  >>> data_element = ds.data_element("PatientName")
+  >>> data_element.VR, data_element.value
+  ('PN', 'Last^First^mid^pre')
+  >>> # an alternative is to use:
+  >>> data_element = ds[0x10,0x10]
+  >>> data_element.VR, data_element.value
+  ('PN', 'Last^First^mid^pre')
 
 To check for the existence of a particular tag before using it,
 use the `in` keyword::
 
-    >>> "PatientName" in ds
-    True
+  >>> "PatientName" in ds
+  True
 
-To remove a data element from the dataset,  use ``del``::
+To remove a data element from the dataset,  use :func:`dataset.Dataset.del`::
 
-    >>> del ds.SoftwareVersions   # or del ds[0x0018, 0x1020]
+  >>> del ds.SoftwareVersions   # or del ds[0x0018, 0x1020]
 
 To work with pixel data, the raw bytes are available through the usual tag::
 
-    >>> pixel_bytes = ds.PixelData
+  >>> # read data with actual pixel data
+  >>> filename = get_testdata_files("CT_small.dcm")[0]
+  >>> ds = pydicom.read_file(filename)
+  >>> pixel_bytes = ds.PixelData
 
 but to work with them in a more intelligent way, use ``pixel_array``
 (requires the `NumPy library <http://numpy.org>`_)::
 
-    >>> pix = ds.pixel_array
+  >>> pix = ds.pixel_array
+  >>> pix # doctest: +NORMALIZE_WHITESPACE
+  array([[175, 180, 166, ..., 203, 207, 216],
+         [186, 183, 157, ..., 181, 190, 239],
+         [184, 180, 171, ..., 152, 164, 235],
+         ...,
+         [906, 910, 923, ..., 922, 929, 927],
+         [914, 954, 938, ..., 942, 925, 905],
+         [959, 955, 916, ..., 911, 904, 909]], dtype=int16)
 
 For more details, see :doc:`working_with_pixel_data`.
-
 
 DataElement
 -----------
 
-The DataElement class is not usually used directly in user code,
-but is used extensively by Dataset.
-DataElement is a simple object which stores the following things:
+The :class:`dataelem.DataElement` class is not usually used directly in user
+code, but is used extensively by
+:class:`dataset.Dataset`. :class:`dataelem.DataElement` is a simple object
+which stores the following things:
 
   * tag -- a DICOM tag (as a Tag object)
   * VR -- DICOM value representation -- various number and string formats, etc
@@ -149,7 +187,6 @@ DataElement is a simple object which stores the following things:
     the DataElement class keeps track of it based on value.
   * value -- the actual value. A regular value like a number or string
     (or list of them), or a Sequence.
-
 
 Tag
 ---
@@ -161,16 +198,17 @@ a number with some extra behaviour:
   * A Tag instance can be created from an int or from a tuple containing
     the (group,element) separately::
 
-        >>> from pydicom.tag import Tag
-        >>> t1=Tag(0x00100010) # all of these are equivalent
-        >>> t2=Tag(0x10,0x10)
-        >>> t3=Tag((0x10, 0x10))
-        >>> t1
-        (0010, 0010)
-        >>> t1==t2, t1==t3
-        (True, True)
+      >>> from pydicom.tag import Tag
+      >>> t1=Tag(0x00100010) # all of these are equivalent
+      >>> t2=Tag(0x10,0x10)
+      >>> t3=Tag((0x10, 0x10))
+      >>> t1
+      (0010, 0010)
+      >>> t1==t2, t1==t3
+      (True, True)
 
-  * Tag has properties group and element (or elem) to return the group and element portions
+  * Tag has properties group and element (or elem) to return the group and
+    element portions
   * The ``is_private`` property checks whether the tag represents
     a private tag (i.e. if group number is odd).
 

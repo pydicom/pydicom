@@ -71,7 +71,7 @@ sphinx_gallery_conf = {
     'examples_dirs': '../examples',
     # path where to save gallery generated examples
     'gallery_dirs': 'auto_examples',
-    'filename_pattern': '/plot_',
+    'backreferences_dir': os.path.join('generated'),
     # to make references clickable
     'doc_module': 'pydicom',
     'reference_url': {
@@ -259,7 +259,7 @@ latex_documents = [
 def generate_example_rst(app, what, name, obj, options, lines):
     # generate empty examples files, so that we don't get
     # inclusion errors if there are no examples for a class / module
-    examples_path = os.path.join(app.srcdir, "modules", "generated",
+    examples_path = os.path.join(app.srcdir, "generated",
                                  "%s.examples" % name)
     if not os.path.exists(examples_path):
         # touch file

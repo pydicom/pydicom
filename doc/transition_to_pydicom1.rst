@@ -62,22 +62,22 @@ things going quickly for you.
 For those with pydicom < 1.0 installed, on trying to import pydicom, they will
 get an ImportError message::
 
-    >>> import pydicom
-    Traceback (most recent call last):
-      File "<stdin>", line 1, in <module>
-    ImportError: No module named pydicom
+  >>> import pydicom # doctest: +SKIP
+  Traceback (most recent call last):
+    File "<stdin>", line 1, in <module>
+  ImportError: No module named pydicom
 
 Your choice then is to update to pydicom >=1.0 (see Installing pydicom
 section), or to instead use ``import dicom`` and follow old-style pydicom
 syntax.
 
 Conversely, if pydicom >= 1.0 is installed, the error message for ``import
-dicom`` will look like:
+dicom`` will look like::
 
-    >>> import dicom
-    Traceback (most recent call last):
-      File "<stdin>", line 1, in <module>
-    ImportError: No module named dicom
+  >>> import dicom # doctest: +SKIP
+  Traceback (most recent call last):
+    File "<stdin>", line 1, in <module>
+  ImportError: No module named dicom
 
 In this case you likely have installed pydicom >= 1.0, and so ``dicom`` library
 does not exist.  You can simply ``import pydicom`` instead, and continue with

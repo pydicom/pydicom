@@ -7,7 +7,7 @@ This example shows how to downsize an MR image from :math:`512 \times 512` to
 :math:`64 \times 64`. The downsizing is performed by taking the central section
 instead of averagin the pixels. Finally, the image is store as a dicom image.
 
-.. notes::
+.. note::
 
    This example requires the Numpy library to manipulate the pixel data.
 
