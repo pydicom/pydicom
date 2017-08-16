@@ -25,11 +25,11 @@ beam = Dataset()
 plan_ds = Dataset()
 # starting from scratch since we did not read a file
 plan_ds.BeamSequence = Sequence([beam])
-plan_ds.BeamSequence[0].Blocks = Sequence([block_ds1, block_ds2])
+plan_ds.BeamSequence[0].BlockSequence = Sequence([block_ds1, block_ds2])
 plan_ds.BeamSequence[0].NumberOfBlocks = 2
 
 beam0 = plan_ds.BeamSequence[0]
-print('Number of block sequence: {}'.format(len(beam0.BlockSequence)))
+print('Number of blocks: {}'.format(beam0.BlockSequence))
 
 # create a new data set
 block_ds3 = Dataset()
