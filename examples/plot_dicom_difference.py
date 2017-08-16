@@ -7,6 +7,9 @@ This examples illustrates how to find the differences between two DICOM files.
 
 """
 
+# authors : Guillaume Lemaitre <g.lemaitre58@gmail.com>
+# license : MIT
+
 import difflib
 
 import pydicom
