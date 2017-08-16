@@ -22,6 +22,7 @@ Here is a simple example of using pydicom in an interactive session, to read a
 radiotherapy plan file, change the patient setup from head-first-supine to
 head-first-prone, and save to a new file::
 
+  >>> import os
   >>> import pydicom
   >>> from pydicom.data import get_testdata_files
   >>> filename = get_testdata_files("rtplan.dcm")[0]
@@ -36,6 +37,7 @@ head-first-prone, and save to a new file::
   (300a, 01b2) Setup Technique Description         ST: ''
   >>> ds.PatientSetupSequence[0].PatientPosition = "HFP"
   >>> ds.save_as("rtplan2.dcm")
+  >>> os.remove("rtplan2.dcm")
 
 pydicom is not a DICOM server [#]_, and is not primarily about viewing
 images. It is designed to let you manipulate data elements in DICOM files with

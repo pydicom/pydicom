@@ -71,6 +71,7 @@ sphinx_gallery_conf = {
     'examples_dirs': '../examples',
     # path where to save gallery generated examples
     'gallery_dirs': 'auto_examples',
+    'filename_pattern': '/plot_',
     # to make references clickable
     'doc_module': 'pydicom',
     'reference_url': {
