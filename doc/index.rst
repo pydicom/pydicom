@@ -10,24 +10,21 @@ Contents:
 
 .. toctree::
    :maxdepth: 2
+   :hidden:
+   :caption: Getting started
 
    getting_started.rst
-   pydicom_user_guide.rst
-   transition_to_pydicom1.rst
-   working_with_pixel_data.rst
-   viewing_images.rst
-   ref_guide.rst
 
+.. toctree::
+   :maxdepth: 2
+   :hidden:
+   :caption: Documentation
+
+   pydicom_user_guide.rst
+   ref_guide.rst
 
 .. toctree::
    :maxdepth: 2
    :caption: Tutorial - Examples
 
    auto_examples/index
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`

@@ -1,13 +1,12 @@
 .. _viewing_images:
 
-==============
 Viewing Images
 ==============
 
 .. rubric:: How to use other packages with pydicom to view DICOM images
 
 Introduction
-============
+------------
 
 pydicom is mainly concerned with getting at the DICOM data elements in files,
 but it is often desirable to view pixel data as an image.
@@ -23,7 +22,7 @@ There are several options:
   * use pydicom with `wxPython <http://www.wxpython.org/>`_
 
 Using pydicom with matplotlib
-=============================
+-----------------------------
 
 matplotlib is available at http://matplotlib.sourceforge.net/. It
 can take 2-d image information from ``Dataset.pixel_array`` and display it.
@@ -41,7 +40,7 @@ Thanks to Roy Keyes for pointing out how to do this.
 
 
 Using pydicom with Tkinter
-==========================
+--------------------------
 
 The program `pydicom_Tkinter.py
 <https://github.com/pydicom/pydicom/blob/dev/pydicom/contrib/pydicom_Tkinter.py>`_
@@ -51,7 +50,7 @@ It creates a Tkinter PhotoImage in a Label widget or a user-supplied widget.
 
 
 Using pydicom with Python Imaging Library (PIL)
-===============================================
+-----------------------------------------------
 
 The module `pydicom_PIL.py
 <https://github.com/pydicom/pydicom/blob/dev/pydicom/contrib/pydicom_PIL.py>`_
@@ -61,7 +60,7 @@ from the pixel data and some basic information about it (bit depth, LUTs, etc)
 
 
 Using pydicom with wxPython
-===========================
+---------------------------
 
 The module `imViewer-Simple.py
 <https://github.com/pydicom/pydicom/blob/dev/pydicom/contrib/imViewer_Simple.py>`_

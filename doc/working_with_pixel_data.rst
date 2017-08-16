@@ -1,14 +1,13 @@
 .. _working_with_pixel_data:
 .. title:: Working with Pixel Data
 
-=======================
 Working with Pixel Data
 =======================
 
 .. rubric:: How to work with pixel data in pydicom.
 
 Introduction
-============
+------------
 
 pydicom tends to be "lazy" in interpreting DICOM data. For example,
 by default it doesn't do anything with pixel data
@@ -28,7 +27,7 @@ raw bytes. But there is a function that can shape the pixels more sensibly
 if you need to work with them...
 
 pixel_array
-===========
+-----------
 
 .. warning::
     To work with the pixel_array property `NumPy <http://numpy.org/>`_
