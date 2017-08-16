@@ -183,17 +183,17 @@ def _rle_decode_frame(data, rows, columns, samples_per_pixel, bits_allocated):
 
 
 def _rle_decode_plane(data):
-    """Decodes a single plane of RLE encoded data using the PackBits algorithm
+    """Return a single plane of decoded RLE data.
 
     Parameters
     ----------
-    data: bytes
-        The data to be decompressed
+    data : bytes
+        The data to be decompressed.
 
     Returns
     -------
     bytearray
-        The decompressed data
+        The decompressed data.
     """
 
     data = bytearray(data)
@@ -203,17 +203,18 @@ def _rle_decode_plane(data):
 
     while pos < len_data:
         header_byte = data[pos]
-
         pos += 1
-
         if header_byte > 128:
-            result.extend([data[pos]] * (255 - header_byte + 2))
+            # Extend by copying the next byte (-N + 1) times
+            # however since using uint8 instead of int8 this will be
+            # (256 - N + 1) times
+            result.extend(data[pos:pos + 1] * (257 - header_byte))
             pos += 1
             continue
 
         if header_byte < 128:
-            result.extend(data[pos:pos+header_byte+1])
-            pos += header_byte+1
-            continue
+            # Extend by literally copying the next (N + 1) bytes
+            result.extend(data[pos:pos + header_byte + 1])
+            pos += header_byte + 1
 
     return result
