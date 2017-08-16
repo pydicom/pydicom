@@ -25,7 +25,7 @@ pydicom documentation
 .. toctree::
    :maxdepth: 2
    :hidden:
-   :caption: Tutorial - Examples
+   :caption: Examples
 
    auto_examples/index
 

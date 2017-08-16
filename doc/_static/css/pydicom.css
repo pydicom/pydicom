@@ -63,3 +63,7 @@ div.sphx-glr-download a:hover {
     color: white !important;
     border: 1px solid #3f7cad !important;
 }
+
+.section {
+    padding-bottom:20px !important;
+}
