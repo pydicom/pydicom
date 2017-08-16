@@ -1,12 +1,16 @@
-# dicomtree.py
-"""Show a dicom file using a hierarchical tree in a graphical window"""
-from __future__ import print_function
-# Copyright (c) 2008-2012 Darcy Mason
-# This file is part of pydicom, relased under an MIT license.
-#    See the file license.txt included with this distribution, also
-#    available at https://github.com/darcymason/pydicom
+"""
+=========================================
+Show a dicom file using hierarchical tree
+=========================================
 
-usage = "Usage: python dicomtree.py dicom_filename"
+Show a dicom file using a hierarchical tree in a graphical window.
+
+"""
+
+# authors : Guillaume Lemaitre <g.lemaitre58@gmail.com>
+# license : MIT
+
+from __future__ import print_function
 
 from pydicom import compat
 
@@ -14,6 +18,10 @@ if compat.in_py2:
     import Tix as tkinter_tix
 else:
     import tkinter.tix as tkinter_tix
+
+print(__doc__)
+
+usage = "Usage: python dicomtree.py dicom_filename"
 
 
 def RunTree(w, filename):
@@ -60,6 +68,7 @@ def recurse_tree(tree, dataset, parent, hide=False):
                 tree.hlist.add(item_id, text=item_text)
                 tree.hlist.hide_entry(item_id)
                 recurse_tree(tree, dataset, item_id, hide=True)
+
 
 if __name__ == '__main__':
     import sys

@@ -1,9 +1,14 @@
-# show_charset_name.py
-"""Very simple app to display unicode person names"""
-# Copyright (c) 2008-2012 Darcy Mason
-# This file is part of pydicom, relased under an MIT license.
-#    See the file license.txt included with this distribution, also
-#    available at https://github.com/darcymason/pydicom
+"""
+============================
+Display unicode person names
+============================
+
+Very simple app to display unicode person names.
+
+"""
+
+# authors : Guillaume Lemaitre <g.lemaitre58@gmail.com>
+# license : MIT
 
 from pydicom import compat
 from pydicom.valuerep import PersonNameUnicode
@@ -12,6 +17,8 @@ if compat.in_py2:
     import Tkinter as tkinter
 else:
     import tkinter
+
+print(__doc__)
 
 default_encoding = 'iso8859'
 
