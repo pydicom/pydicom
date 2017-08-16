@@ -19,6 +19,8 @@ instead of averagin the pixels. Finally, the image is store as a dicom image.
 import pydicom
 from pydicom.data import get_testdata_files
 
+print(__doc__)
+
 # FIXME: add a full-sized MR image in the testing data
 filename = get_testdata_files('MR_small.dcm')[0]
 ds = pydicom.read_file(filename)
