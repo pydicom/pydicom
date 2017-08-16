@@ -15,7 +15,7 @@ There are several options:
   * Use any of the many `DICOM viewer
     <http://www.dclunie.com/medical-image-faq/html/part8.html#DICOMFileConvertorsAndViewers>`_
     programs available
-  * use pydicom with `matplotlib <http://matplotlib.sourceforge.net/>`_
+  * use pydicom with `matplotlib <https://matplotlib.org/>`_
   * use pydicom with python's stdlib `Tkinter <https://docs.python.org/3.4/library/tkinter.html>`_ module.
   * use pydicom with the `Python Imaging Library (PIL)
     <http://www.pythonware.com/products/pil/>`_
@@ -24,7 +24,7 @@ There are several options:
 Using pydicom with matplotlib
 -----------------------------
 
-matplotlib is available at http://matplotlib.sourceforge.net/. It
+matplotlib is available at https://matplotlib.org/. It
 can take 2-d image information from ``Dataset.pixel_array`` and display it.
 Here is an example::
 
