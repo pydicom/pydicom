@@ -1,3 +1,4 @@
+"""Use the pillow python package to decode pixel transfer syntaxes."""
 import sys
 import io
 import pydicom.encaps
@@ -51,6 +52,15 @@ except Exception:
 
 
 def supports_transfer_syntax(dicom_dataset):
+    """
+    Returns
+    -------
+    bool
+        True if this pixel data handler might support this transfer syntax.
+
+        False to prevent any attempt to try to use this handler
+        to decode the given transfer syntax
+    """
     if (have_pillow_jpeg_plugin and
             (dicom_dataset.file_meta.TransferSyntaxUID in
              PillowJPEGTransferSyntaxes)):
@@ -63,19 +73,23 @@ def supports_transfer_syntax(dicom_dataset):
 
 
 def get_pixeldata(dicom_dataset):
-    """Use PIL to decompress compressed Pixel Data.
+    """Use Pillow to decompress compressed Pixel Data.
 
     Returns
     -------
-    bytes or str
-        The decompressed Pixel Data
+    numpy.ndarray
+       The contents of the Pixel Data element (7FE0,0010) as an ndarray.
 
     Raises
     ------
     ImportError
         If PIL is not available.
+
     NotImplementedError
-        If unable to decompress the Pixel Data.
+        if the transfer syntax is not supported
+
+    TypeError
+        if the pixel data type is unsupported
     """
     logger.debug("Trying to use Pillow to read pixel array "
                  "(has pillow = %s)", have_pillow)

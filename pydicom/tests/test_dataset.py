@@ -99,12 +99,11 @@ class DatasetTests(unittest.TestCase):
         ds.SmallestImagePixelValue = 0  # Invalid value
 
         if compat.in_PyPy:
-            expected_msg = ("Invalid tag (0028, 0106): "
+            expected_msg = ("With tag (0028, 0106) got exception: "
                             "'int' has no length")
         else:
-            expected_msg = ("Invalid tag (0028, 0106): "
-                            "object of type 'int' "
-                            "has no len()")
+            expected_msg = ("With tag (0028, 0106) got exception: "
+                            "object of type 'int' has no len()")
 
         self.failUnlessExceptionArgs(expected_msg, TypeError, lambda: str(ds))
 
@@ -116,12 +115,11 @@ class DatasetTests(unittest.TestCase):
         ds.SmallestImagePixelValue = 0  # Invalid value
 
         if compat.in_PyPy:
-            expected_msg = ("Invalid tag (0028, 0106): "
+            expected_msg = ("With tag (0028, 0106) got exception: "
                             "'int' has no length")
         else:
-            expected_msg = ("Invalid tag (0028, 0106): "
-                            "object of type 'int' "
-                            "has no len()")
+            expected_msg = ("With tag (0028, 0106) got exception: "
+                            "object of type 'int' has no len()")
 
         def callback(dataset, data_element):
             return str(data_element)
@@ -401,9 +399,11 @@ class DatasetTests(unittest.TestCase):
         """Dataset: equality returns correct value with simple dataset"""
         d = Dataset()
         d.SOPInstanceUID = '1.2.3.4'
+        d.PatientName = 'Test'
         self.assertTrue(d == d)
 
         e = Dataset()
+        e.PatientName = 'Test'
         e.SOPInstanceUID = '1.2.3.4'
         self.assertTrue(d == e)
 
@@ -457,6 +457,7 @@ class DatasetTests(unittest.TestCase):
         d.SOPInstanceUID = '1.2.3.4'
         d.BeamSequence = []
         beam_seq = Dataset()
+        beam_seq.PatientID = '1234'
         beam_seq.PatientName = 'ANON'
         d.BeamSequence.append(beam_seq)
         self.assertTrue(d == d)
@@ -466,6 +467,7 @@ class DatasetTests(unittest.TestCase):
         e.BeamSequence = []
         beam_seq = Dataset()
         beam_seq.PatientName = 'ANON'
+        beam_seq.PatientID = '1234'
         e.BeamSequence.append(beam_seq)
         self.assertTrue(d == e)
 
