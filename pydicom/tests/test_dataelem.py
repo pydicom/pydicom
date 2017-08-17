@@ -11,6 +11,8 @@ import unittest
 
 import sys
 
+from pydicom.valuerep import DSfloat
+
 from pydicom.charset import default_encoding
 
 from pydicom.dataelem import DataElement
@@ -42,6 +44,26 @@ class DataElementTests(unittest.TestCase):
         VM = self.data_elementIS.VM
         self.assertEqual(VM, 1,
                          "Wrong Value Multiplicity, expected 1, got %i" % VM)
+
+    def testDSFloatConversion(self):
+        """Test that strings are correctly converted if changing the value."""
+        self.assertTrue(isinstance(self.data_elementDS.value, DSfloat))
+        self.assertTrue(isinstance(self.data_elementMulti.value[0], DSfloat))
+        self.assertEqual(DSfloat('42.1'), self.data_elementMulti.value[0])
+
+        # multi-value append/insert
+        self.data_elementMulti.value.append('42.4')
+        self.assertTrue(isinstance(self.data_elementMulti.value[3], DSfloat))
+        self.assertEqual(DSfloat('42.4'), self.data_elementMulti.value[3])
+
+        self.data_elementMulti.value.insert(0, '42.0')
+        self.assertTrue(isinstance(self.data_elementMulti.value[0], DSfloat))
+        self.assertEqual(DSfloat('42.0'), self.data_elementMulti.value[0])
+
+        # change single value of multi-value
+        self.data_elementMulti.value[3] = '123.4'
+        self.assertTrue(isinstance(self.data_elementMulti.value[3], DSfloat))
+        self.assertEqual(DSfloat('123.4'), self.data_elementMulti.value[3])
 
     def testBackslash(self):
         """DataElement: String with '\\' sets multi-valued data_element."""

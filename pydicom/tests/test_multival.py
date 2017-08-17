@@ -26,6 +26,18 @@ class MultiValuetests(unittest.TestCase):
             self.assertTrue(isinstance(val, (DSfloat, DSdecimal)),
                             "Multi-value DS item not converted to DS")
 
+    def testEmptyElements(self):
+        """MultiValue: Empty number string elements are not converted..."""
+        multival = MultiValue(DSfloat, ['1.0', ''])
+        self.assertEqual(1.0, multival[0])
+        self.assertEqual('', multival[1])
+        multival = MultiValue(IS, ['1', ''])
+        self.assertEqual(1, multival[0])
+        self.assertEqual('', multival[1])
+        multival = MultiValue(DSdecimal, ['1', ''])
+        self.assertEqual(1, multival[0])
+        self.assertEqual('', multival[1])
+
     def testLimits(self):
         """MultiValue: Raise error if any item outside DICOM limits...."""
         original_flag = config.enforce_valid_values
@@ -51,6 +63,14 @@ class MultiValuetests(unittest.TestCase):
         self.assertTrue(isinstance(multival[1], IS))
         self.assertEqual(multival[1], 7,
                          "Item set by index is not correct value")
+
+    def testDeleteIndex(self):
+        """MultiValue: Deleting item at index behaves as expected..."""
+        multival = MultiValue(IS, [1, 5, 10])
+        del multival[1]
+        self.assertEqual(2, len(multival))
+        self.assertEqual(multival[0], 1)
+        self.assertEqual(multival[1], 10)
 
     def testExtend(self):
         """MultiValue: Extending a list converts all to required type"""

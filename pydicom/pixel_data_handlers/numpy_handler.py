@@ -1,3 +1,4 @@
+"""Use the numpy package to decode pixel transfer syntaxes."""
 import sys
 import pydicom.uid
 have_numpy = True
@@ -18,6 +19,15 @@ NumpySupportedTransferSyntaxes = [
 
 
 def supports_transfer_syntax(dicom_dataset):
+    """
+    Returns
+    -------
+    bool
+        True if this pixel data handler might support this transfer syntax.
+
+        False to prevent any attempt to try to use this handler
+        to decode the given transfer syntax
+    """
     return (dicom_dataset.file_meta.TransferSyntaxUID in
             NumpySupportedTransferSyntaxes)
 
@@ -28,8 +38,16 @@ def get_pixeldata(dicom_dataset):
     ------
     TypeError
         If there is no Pixel Data or not a supported data type.
+
     ImportError
         If NumPy isn't found
+
+    NotImplementedError
+        if the transfer syntax is not supported
+
+    AttributeError
+        if the decoded amount of data does not match the expected amount
+
     Returns
     -------
     numpy.ndarray
