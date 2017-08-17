@@ -26,12 +26,10 @@ class TestGetFrameOffsets(object):
                      b'\x01\x02\x03\x04\x05\x06\x07\x08'
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
-        # For some reason matching the messages fails using assert_raises_regex
-        # It looks like the conversion of the tag to str is the issue
-        with pytest.raises(ValueError) as excinfo:
-            get_frame_offsets(fp)
-        assert str(excinfo.value) == ("Unexpected tag '(fffe, e100)' when "
-                                      "parsing the Basic Table Offset item.")
+        assert_raises_regex(ValueError,
+                            "Unexpected tag '\(fffe, e100\)' when "
+                            "parsing the Basic Table Offset item.",
+                            get_frame_offsets, fp)
 
     def test_bad_length_multiple(self):
         """Test raises exception if the item length is not a multiple of 4."""
@@ -133,14 +131,11 @@ class TestGeneratePixelDataFragment(object):
         fp.is_little_endian = True
         fragments = generate_pixel_data_fragment(fp)
         assert next(fragments) == b'\x01\x00\x00\x00'
-        with pytest.raises(ValueError) as excinfo:
-            next(fragments)
-        # For some reason matching the messages fails using assert_raises_regex
-        # It looks like the conversion of the tag to str is the issue
-        assert str(excinfo.value) == ("Unexpected tag '(0010, 0010)' at "
-                                      "offset 12 when parsing the "
-                                      "encapsulated pixel data fragment "
-                                      "items.")
+        assert_raises_regex(ValueError,
+                            "Unexpected tag '\(0010, 0010\)' at offset 12 "
+                            "when parsing the encapsulated pixel data "
+                             "fragment items.",
+                             next, fragments)
         pytest.raises(StopIteration, next, fragments)
 
     def test_single_fragment_no_delimiter(self):
