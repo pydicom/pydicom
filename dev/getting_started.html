@@ -1,0 +1,403 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Getting Started with pydicom &mdash; pydicom 1.0a documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/pydicom.css" type="text/css" />
+  
+
+  
+    <link rel="stylesheet" href="_static/gallery.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="pydicom 1.0a documentation" href="index.html"/>
+        <link rel="next" title="Pydicom User Guide" href="pydicom_user_guide.html"/>
+        <link rel="prev" title="pydicom documentation" href="index.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> pydicom
+          
+
+          
+            
+            <img src="_static/logo.png" class="logo" />
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Getting Started with pydicom</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#license">License</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installing">Installing</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#installing-using-pip-all-platforms">Installing using pip (all platforms)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#installing-from-source-all-platforms">Installing from source (all platforms)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#installing-on-mac">Installing on Mac</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#using-pydicom">Using pydicom</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#support">Support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#next-steps">Next Steps</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="pydicom_user_guide.html">Pydicom User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transition_to_pydicom1.html">Transition to pydicom 1.x</a></li>
+<li class="toctree-l1"><a class="reference internal" href="working_with_pixel_data.html">Working with Pixel Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="viewing_images.html">Viewing Images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ref_guide.html">Pydicom Reference Guide</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Tutorial - Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html">General examples</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">pydicom</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Getting Started with pydicom</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/getting_started.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="getting-started-with-pydicom">
+<span id="getting-started"></span><h1>Getting Started with pydicom<a class="headerlink" href="#getting-started-with-pydicom" title="Permalink to this headline">¶</a></h1>
+<p class="rubric">Brief overview of pydicom and how to install.</p>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>pydicom is a pure python package for working with
+<a class="reference external" href="http://en.wikipedia.org/wiki/DICOM">DICOM</a>
+files such as medical images, reports, and radiotherapy objects.</p>
+<p>pydicom makes it easy to read these complex files into natural pythonic
+structures for easy manipulation. Modified datasets can be written again to
+DICOM format files.</p>
+<p>Here is a simple example of using pydicom in an interactive session, to read
+a radiotherapy plan file, change the patient setup from head-first-supine to
+head-first-prone, and save to a new file:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="k">import</span> <span class="n">dicomio</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">dicomio</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="s2">&quot;rtplan.dcm&quot;</span><span class="p">)</span>  <span class="c1"># plan dataset</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">PatientName</span>
+<span class="go">&#39;Last^First^mid^pre&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">dir</span><span class="p">(</span><span class="s2">&quot;setup&quot;</span><span class="p">)</span>    <span class="c1"># get a list of tags with &quot;setup&quot; somewhere in the name</span>
+<span class="go">[&#39;PatientSetupSequence&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">PatientSetupSequence</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">(0018, 5100) Patient Position                    CS: &#39;HFS&#39;</span>
+<span class="go">(300a, 0182) Patient Setup Number                IS: &#39;1&#39;</span>
+<span class="go">(300a, 01b2) Setup Technique Description         ST: &#39;&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">PatientSetupSequence</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">PatientPosition</span> <span class="o">=</span> <span class="s2">&quot;HFP&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><span class="s2">&quot;rtplan2.dcm&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>pydicom is not a DICOM server <a class="footnote-reference" href="#id4" id="id1">[1]</a>, and is not primarily about viewing images. It is designed to let you manipulate data elements in DICOM files with python code.</p>
+<p>pydicom is easy to install and use, and because it is a pure
+python package, it should run anywhere python runs.</p>
+<p>One limitation of pydicom: compressed pixel data (e.g. JPEG)
+cannot be altered in an intelligent way as it can be for uncompressed pixels.
+Files can always be read and saved, but compressed pixel data cannot
+easily be modified.</p>
+</div>
+<div class="section" id="license">
+<h2>License<a class="headerlink" href="#license" title="Permalink to this headline">¶</a></h2>
+<p>pydicom has an MIT-based <a class="reference external" href="https://github.com/pydicom/pydicom/blob/master/LICENSE">license</a>.</p>
+</div>
+<div class="section" id="installing">
+<h2>Installing<a class="headerlink" href="#installing" title="Permalink to this headline">¶</a></h2>
+<p>As a pure python package, pydicom is easy to install and has no
+requirements other than python itself (the NumPy library is recommended,
+but is only required if manipulating pixel data).</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">In addition to the instructions below, pydicom can also be installed
+through the <a class="reference external" href="http://www.pythonxy.com/">Python(x,y)</a> distribution, which can
+install python and a number of packages <a class="footnote-reference" href="#id5" id="id3">[2]</a> (including pydicom) at once.</p>
+</div>
+<div class="section" id="prerequisites">
+<h3>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><ul class="simple">
+<li>python 2.6, 2.7, 3.3 or later</li>
+<li><a class="reference external" href="http://numpy.scipy.org/">NumPy</a> – optional, only needed
+if manipulating pixel data</li>
+</ul>
+</div></blockquote>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">To run unit tests when using python 2.6, <a class="reference external" href="https://pypi.python.org/pypi/unittest2">Unittest2</a>
+is required.</p>
+</div>
+<p>Python installers can be found at the python web site
+(<a class="reference external" href="http://python.org/download/">http://python.org/download/</a>). On Windows, the <a class="reference external" href="http://activestate.com/activepython">Activepython</a> distributions are also quite good.</p>
+</div>
+<div class="section" id="installing-using-pip-all-platforms">
+<h3>Installing using pip (all platforms)<a class="headerlink" href="#installing-using-pip-all-platforms" title="Permalink to this headline">¶</a></h3>
+<p>The easiest way to install pydicom is using <a class="reference external" href="https://pypi.python.org/pypi/pip">pip</a>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">pydicom</span>
+</pre></div>
+</div>
+<p>Depending on your python version, there may be some warning messages,
+but the install should still be ok.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Pip comes pre-installed with Python 3.x.</p>
+</div>
+</div>
+<div class="section" id="installing-from-source-all-platforms">
+<h3>Installing from source (all platforms)<a class="headerlink" href="#installing-from-source-all-platforms" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><ul class="simple">
+<li><a class="reference external" href="https://github.com/pydicom/pydicom/archive/master.zip">Download</a> the source code directly, or
+<a class="reference external" href="github-windows://openRepo/https://github.com/pydicom/pydicom">clone</a> the repo with
+Github’s desktop application.</li>
+<li>In a command terminal, move to the directory with the setup.py file</li>
+<li>With admin privileges, run <code class="docutils literal"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">install</span></code><ul>
+<li>With some linux variants, for example, use <code class="docutils literal"><span class="pre">sudo</span> <span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">install</span></code></li>
+<li>With other linux variants you may have to <code class="docutils literal"><span class="pre">su</span></code> before running the command.</li>
+</ul>
+</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="installing-on-mac">
+<h3>Installing on Mac<a class="headerlink" href="#installing-on-mac" title="Permalink to this headline">¶</a></h3>
+<p>Using pip as described above is recommended.  However, there was previously a
+<a class="reference external" href="https://www.macports.org/ports.php?by=library&amp;substr=py27-pydicom">MacPorts portfile</a>.
+This is maintained by other users and may not immediately be up to
+the latest release.</p>
+</div>
+</div>
+<div class="section" id="using-pydicom">
+<h2>Using pydicom<a class="headerlink" href="#using-pydicom" title="Permalink to this headline">¶</a></h2>
+<p>Once installed, the package can be imported at a python command line or used
+in your own python program with <code class="docutils literal"><span class="pre">import</span> <span class="pre">pydicom</span></code>.
+See the <a class="reference external" href="https://github.com/pydicom/pydicom/tree/dev/pydicom/examples">examples directory</a>
+for both kinds of uses. Also see the <a class="reference internal" href="pydicom_user_guide.html"><span class="doc">User Guide</span></a>
+for more details of how to use the package.</p>
+</div>
+<div class="section" id="support">
+<h2>Support<a class="headerlink" href="#support" title="Permalink to this headline">¶</a></h2>
+<p>Please join the <a class="reference external" href="http://groups.google.com/group/pydicom">pydicom discussion group</a>
+to ask questions or give feedback.
+Bugs can be submitted through the <a class="reference external" href="https://github.com/pydicom/pydicom/issues">issue tracker</a>.
+Besides the example directory, cookbook recipes are encouraged to be posted on the
+<a class="reference external" href="https://github.com/pydicom/pydicom/wiki">wiki page</a></p>
+<p>New versions, major bug fixes, etc. will also be announced through the group.</p>
+</div>
+<div class="section" id="next-steps">
+<h2>Next Steps<a class="headerlink" href="#next-steps" title="Permalink to this headline">¶</a></h2>
+<p>To start learning how to use pydicom, see the <a class="reference internal" href="pydicom_user_guide.html"><span class="doc">Pydicom User Guide</span></a>.</p>
+<p class="rubric">Footnotes::</p>
+<table class="docutils footnote" frame="void" id="id4" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>For DICOM network capabilities, see the <a class="reference external" href="https://github.com/patmun/pynetdicom">pynetdicom</a> project.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id5" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id3">[2]</a></td><td>If using python(x,y), other packages you might be interested in include IPython
+(an indispensable interactive shell with auto-completion, history etc),
+Numpy (optionally used by pydicom for pixel data), and ITK/VTK or PIL (image processing and visualization).</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="pydicom_user_guide.html" class="btn btn-neutral float-right" title="Pydicom User Guide" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral" title="pydicom documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2017, Darcy Mason and pydicom contributors.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'1.0a',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
