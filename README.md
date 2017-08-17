@@ -27,4 +27,4 @@ Documentation
 
 pydicom [documentation](https://pydicom.readthedocs.org/en/stable/) is available on Read The Docs.
 
-See [Getting Started](https://pydicom.readthedocs.org/en/stable/getting_started.html) for installation and basic information, and the [User Guide](https://pydicom.readthedocs.org/en/stable/pydicom_user_guide.html) for an overview of how to use the pydicom library.
+See [Getting Started](https://pydicom.readthedocs.org/en/stable/getting_started.html) for installation and basic information, and the [User Guide](https://pydicom.readthedocs.org/en/stable/pydicom_user_guide.html) for an overview of how to use the pydicom library. To contribute to pydicom, read our [contribution guide](CONTRIBUTING.md). To contribute an example or extension of pydicom that does not belong with the core software, see [contrib-pydicom](https://www.github.com/pydicom/contrib-pydicom).
