@@ -45,7 +45,7 @@ Using pydicom with Tkinter
 
 The program `pydicom_Tkinter.py
 <https://github.com/pydicom/contrib-pydicom/blob/master/viewers/pydicom_Tkinter.py>`_
- +in the ``contrib-pydicom`` repository demonstrates how to show an image using the
+in the ``contrib-pydicom`` repository demonstrates how to show an image using the
 Tkinter graphics system, which comes standard with most python installs.
 It creates a Tkinter PhotoImage in a Label widget or a user-supplied widget.
 
