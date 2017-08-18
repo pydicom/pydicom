@@ -36,10 +36,20 @@ Quick Start
 """
 
 import sys
+
+from .dataset import Dataset, FileDataset
+from .sequence import Sequence
+from .dataelem import DataElement
+
 from ._version import __version__
 from ._version import __version_info__
 
-__all__ = ['__version__', '__version_info__']
+__all__ = ['Dataset',
+           'FileDataset',
+           'Sequence',
+           'DataElement',
+           '__version__',
+           '__version_info__']
 
 if sys.version_info < (2, 6, 0):
     raise ImportError("pydicom > 0.9.7 requires python 2.6 or later")
