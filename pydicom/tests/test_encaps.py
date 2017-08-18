@@ -134,8 +134,8 @@ class TestGeneratePixelDataFragment(object):
         assert_raises_regex(ValueError,
                             "Unexpected tag '\(0010, 0010\)' at offset 12 "
                             "when parsing the encapsulated pixel data "
-                             "fragment items.",
-                             next, fragments)
+                            "fragment items.",
+                            next, fragments)
         pytest.raises(StopIteration, next, fragments)
 
     def test_single_fragment_no_delimiter(self):
