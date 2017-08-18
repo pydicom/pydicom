@@ -8,44 +8,49 @@ Getting Started with pydicom
 
 
 Introduction
-==============
+============
 
-pydicom is a pure python package for working with
-`DICOM <http://en.wikipedia.org/wiki/DICOM>`_
-files such as medical images, reports, and radiotherapy objects.
+pydicom is a pure python package for working with `DICOM
+<http://en.wikipedia.org/wiki/DICOM>`_ files such as medical images, reports,
+and radiotherapy objects.
 
 pydicom makes it easy to read these complex files into natural pythonic
 structures for easy manipulation. Modified datasets can be written again to
 DICOM format files.
 
-Here is a simple example of using pydicom in an interactive session, to read
-a radiotherapy plan file, change the patient setup from head-first-supine to
-head-first-prone, and save to a new file:
+Here is a simple example of using pydicom in an interactive session, to read a
+radiotherapy plan file, change the patient setup from head-first-supine to
+head-first-prone, and save to a new file::
 
->>> from pydicom import dicomio
->>> ds = dicomio.read_file("rtplan.dcm")  # plan dataset
->>> ds.PatientName
-'Last^First^mid^pre'
->>> ds.dir("setup")    # get a list of tags with "setup" somewhere in the name
-['PatientSetupSequence']
->>> ds.PatientSetupSequence[0]
-(0018, 5100) Patient Position                    CS: 'HFS'
-(300a, 0182) Patient Setup Number                IS: '1'
-(300a, 01b2) Setup Technique Description         ST: ''
->>> ds.PatientSetupSequence[0].PatientPosition = "HFP"
->>> ds.save_as("rtplan2.dcm")
+  >>> import os
+  >>> import pydicom
+  >>> from pydicom.data import get_testdata_files
+  >>> filename = get_testdata_files("rtplan.dcm")[0]
+  >>> ds = pydicom.read_file(filename)  # plan dataset
+  >>> ds.PatientName
+  'Last^First^mid^pre'
+  >>> ds.dir("setup")    # get a list of tags with "setup" somewhere in the name
+  ['PatientSetupSequence']
+  >>> ds.PatientSetupSequence[0]
+  (0018, 5100) Patient Position                    CS: 'HFS'
+  (300a, 0182) Patient Setup Number                IS: '1'
+  (300a, 01b2) Setup Technique Description         ST: ''
+  >>> ds.PatientSetupSequence[0].PatientPosition = "HFP"
+  >>> ds.save_as("rtplan2.dcm")
 
+..
+  >>> os.remove("rtplan2.dcm")
 
-pydicom is not a DICOM server [#]_, and is not primarily about viewing images. It is designed to let you manipulate data elements in DICOM files with python code.
+pydicom is not a DICOM server [#]_, and is not primarily about viewing
+images. It is designed to let you manipulate data elements in DICOM files with
+python code.
 
-pydicom is easy to install and use, and because it is a pure
-python package, it should run anywhere python runs.
+pydicom is easy to install and use, and because it is a pure python package, it
+should run anywhere python runs.
 
-One limitation of pydicom: compressed pixel data (e.g. JPEG)
-cannot be altered in an intelligent way as it can be for uncompressed pixels.
-Files can always be read and saved, but compressed pixel data cannot
-easily be modified.
-
+One limitation of pydicom: compressed pixel data (e.g. JPEG) cannot be altered
+in an intelligent way as it can be for uncompressed pixels.  Files can always
+be read and saved, but compressed pixel data cannot easily be modified.
 
 License
 =======
@@ -53,68 +58,62 @@ License
 pydicom has an MIT-based `license
 <https://github.com/pydicom/pydicom/blob/master/LICENSE>`_.
 
-
 Installing
 ==========
 
-As a pure python package, pydicom is easy to install and has no
-requirements other than python itself (the NumPy library is recommended,
-but is only required if manipulating pixel data).
+As a pure python package, pydicom is easy to install and has no requirements
+other than python itself (the NumPy library is recommended, but is only
+required if manipulating pixel data).
 
 .. note::
-    In addition to the instructions below, pydicom can also be installed
-    through the `Python(x,y) <http://www.pythonxy.com/>`_ distribution, which can
-    install python and a number of packages [#]_ (including pydicom) at once.
-
+   In addition to the instructions below, pydicom can also be installed
+   through the `Python(x,y) <http://www.pythonxy.com/>`_ distribution, which
+   can install python and a number of packages [#]_ (including pydicom) at
+   once.
 
 Prerequisites
 -------------
 
-  * python 2.6, 2.7, 3.3 or later
-  * `NumPy <http://numpy.scipy.org/>`_ -- optional, only needed
-    if manipulating pixel data
+* Python 2.7, 3.4 or later
+* Optional dependencies:
+  * numpy
+  * pillow
+  * gdcm
+  * jpeg_ls
+  * jpeg2000
 
-.. note::
-    To run unit tests when using python 2.6, `Unittest2 <https://pypi.python.org/pypi/unittest2>`_
-    is required.
+We encourage you to use `minconda <https://conda.io/miniconda.html>`_ or
+`anaconda <https://docs.continuum.io/anaconda/>`_ which is cross-platforms
+compatible.
 
-Python installers can be found at the python web site
-(http://python.org/download/). On Windows, the `Activepython
-<http://activestate.com/activepython>`_ distributions are also quite good.
+Installing pydicom
+------------------
 
-Installing using pip (all platforms)
-----------------------------------------------------
-The easiest way to install pydicom is using `pip <https://pypi.python.org/pypi/pip>`_::
+pydicom is currently available on the PyPi's repositories and you can install using ``pip``::
 
-    pip install pydicom
+  pip install -U pydicom
 
-Depending on your python version, there may be some warning messages,
-but the install should still be ok.
+If you prefer, you can clone it and run the setup.py file. Use the following
+commands to get a copy from Github and install all dependencies::
 
-.. note::
-    Pip comes pre-installed with Python 3.x.
+  git clone https://github.com/pydicom/pydicom.git
+  cd pydicom
+  pip install .
 
+Or install using pip and GitHub::
 
-Installing from source (all platforms)
---------------------------------------
-  * `Download <https://github.com/pydicom/pydicom/archive/master.zip>`_ the source code directly, or
-    `clone <github-windows://openRepo/https://github.com/pydicom/pydicom>`_ the repo with
-    Github's desktop application.
-  * In a command terminal, move to the directory with the setup.py file
-  * With admin privileges, run ``python setup.py install``
+  pip install -U git+https://github.com/pydicom/pydicom.git
 
-    * With some linux variants, for example, use ``sudo python setup.py install``
-    * With other linux variants you may have to ``su`` before running the command.
+Test and coverage
+=================
 
+You want to test the installed code::
 
-Installing on Mac
------------------
+  make test-code
 
-Using pip as described above is recommended.  However, there was previously a
-`MacPorts portfile <https://www.macports.org/ports.php?by=library&substr=py27-pydicom>`_.
-This is maintained by other users and may not immediately be up to
-the latest release.
+You wish to test the coverage of your versions::
 
+  make test-coverage
 
 Using pydicom
 =============
@@ -126,18 +125,17 @@ See the `examples directory
 for both kinds of uses. Also see the :doc:`User Guide </pydicom_user_guide>`
 for more details of how to use the package.
 
-
 Support
 =======
 
-Please join the `pydicom discussion group <http://groups.google.com/group/pydicom>`_
-to ask questions or give feedback.
-Bugs can be submitted through the `issue tracker <https://github.com/pydicom/pydicom/issues>`_.
-Besides the example directory, cookbook recipes are encouraged to be posted on the
-`wiki page <https://github.com/pydicom/pydicom/wiki>`_
+Please join the `pydicom discussion group
+<http://groups.google.com/group/pydicom>`_ to ask questions or give feedback.
+Bugs can be submitted through the `issue tracker
+<https://github.com/pydicom/pydicom/issues>`_.  Besides the example directory,
+cookbook recipes are encouraged to be posted on the `wiki page
+<https://github.com/pydicom/pydicom/wiki>`_
 
 New versions, major bug fixes, etc. will also be announced through the group.
-
 
 Next Steps
 ==========
