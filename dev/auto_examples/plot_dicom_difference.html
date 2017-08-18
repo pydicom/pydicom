@@ -1,0 +1,940 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Analyse differences between DICOM files &mdash; pydicom 1.0a documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
+  
+
+  
+    <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
+  
+    <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
+    <link rel="top" title="pydicom 1.0a documentation" href="../index.html"/>
+        <link rel="up" title="General examples" href="index.html"/>
+        <link rel="next" title="Display unicode person names" href="show_charset_name.html"/>
+        <link rel="prev" title="General examples" href="index.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> pydicom
+          
+
+          
+            
+            <img src="../_static/logo.png" class="logo" />
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started with pydicom</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../pydicom_user_guide.html">Pydicom User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ref_guide.html">Pydicom API’s Reference Guide</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Examples</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">General examples</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Analyse differences between DICOM files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="show_charset_name.html">Display unicode person names</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dicomtree.html">Show a dicom file using hierarchical tree</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#image-processing">Image processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#input-output">Input-output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#metadata-processing">Metadata processing</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pydicom</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">General examples</a> &raquo;</li>
+        
+      <li>Analyse differences between DICOM files</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/auto_examples/plot_dicom_difference.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="analyse-differences-between-dicom-files">
+<span id="sphx-glr-auto-examples-plot-dicom-difference-py"></span><h1>Analyse differences between DICOM files<a class="headerlink" href="#analyse-differences-between-dicom-files" title="Permalink to this headline">¶</a></h1>
+<p>This examples illustrates how to find the differences between two DICOM files.</p>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-default"><div class="highlight"><pre><span></span><span class="o">+</span> <span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">0005</span><span class="p">)</span> <span class="n">Specific</span> <span class="n">Character</span> <span class="n">Set</span>              <span class="n">CS</span><span class="p">:</span> <span class="s1">&#39;ISO_IR 100&#39;</span>
+
+<span class="o">-</span> <span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">0008</span><span class="p">)</span> <span class="n">Image</span> <span class="n">Type</span>                          <span class="n">CS</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;DERIVED&#39;</span><span class="p">,</span> <span class="s1">&#39;SECONDARY&#39;</span><span class="p">,</span> <span class="s1">&#39;OTHER&#39;</span><span class="p">]</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">0008</span><span class="p">)</span> <span class="n">Image</span> <span class="n">Type</span>                          <span class="n">CS</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;ORIGINAL&#39;</span><span class="p">,</span> <span class="s1">&#39;PRIMARY&#39;</span><span class="p">,</span> <span class="s1">&#39;AXIAL&#39;</span><span class="p">]</span>
+
+<span class="o">-</span> <span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">0012</span><span class="p">)</span> <span class="n">Instance</span> <span class="n">Creation</span> <span class="n">Date</span>              <span class="n">DA</span><span class="p">:</span> <span class="s1">&#39;20040826&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">0012</span><span class="p">)</span> <span class="n">Instance</span> <span class="n">Creation</span> <span class="n">Date</span>              <span class="n">DA</span><span class="p">:</span> <span class="s1">&#39;20040119&#39;</span>
+
+<span class="o">-</span> <span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">0013</span><span class="p">)</span> <span class="n">Instance</span> <span class="n">Creation</span> <span class="n">Time</span>              <span class="n">TM</span><span class="p">:</span> <span class="s1">&#39;185434&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">0013</span><span class="p">)</span> <span class="n">Instance</span> <span class="n">Creation</span> <span class="n">Time</span>              <span class="n">TM</span><span class="p">:</span> <span class="s1">&#39;072731&#39;</span>
+
+  <span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">0014</span><span class="p">)</span> <span class="n">Instance</span> <span class="n">Creator</span> <span class="n">UID</span>                <span class="n">UI</span><span class="p">:</span> <span class="mf">1.3</span><span class="o">.</span><span class="mf">6.1</span><span class="o">.</span><span class="mf">4.1</span><span class="o">.</span><span class="mf">5962.3</span>
+
+<span class="o">-</span> <span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">0016</span><span class="p">)</span> <span class="n">SOP</span> <span class="n">Class</span> <span class="n">UID</span>                       <span class="n">UI</span><span class="p">:</span> <span class="n">MR</span> <span class="n">Image</span> <span class="n">Storage</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">0016</span><span class="p">)</span> <span class="n">SOP</span> <span class="n">Class</span> <span class="n">UID</span>                       <span class="n">UI</span><span class="p">:</span> <span class="n">CT</span> <span class="n">Image</span> <span class="n">Storage</span>
+
+<span class="o">-</span> <span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">0018</span><span class="p">)</span> <span class="n">SOP</span> <span class="n">Instance</span> <span class="n">UID</span>                    <span class="n">UI</span><span class="p">:</span> <span class="mf">1.3</span><span class="o">.</span><span class="mf">6.1</span><span class="o">.</span><span class="mf">4.1</span><span class="o">.</span><span class="mf">5962.1</span><span class="o">.</span><span class="mf">1.4</span><span class="o">.</span><span class="mf">1.1</span><span class="o">.</span><span class="mf">20040826185059.5457</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">0018</span><span class="p">)</span> <span class="n">SOP</span> <span class="n">Instance</span> <span class="n">UID</span>                    <span class="n">UI</span><span class="p">:</span> <span class="mf">1.3</span><span class="o">.</span><span class="mf">6.1</span><span class="o">.</span><span class="mf">4.1</span><span class="o">.</span><span class="mf">5962.1</span><span class="o">.</span><span class="mf">1.1</span><span class="o">.</span><span class="mf">1.1</span><span class="o">.</span><span class="mf">20040119072730.12322</span>
+
+<span class="o">-</span> <span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">0020</span><span class="p">)</span> <span class="n">Study</span> <span class="n">Date</span>                          <span class="n">DA</span><span class="p">:</span> <span class="s1">&#39;20040826&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">0020</span><span class="p">)</span> <span class="n">Study</span> <span class="n">Date</span>                          <span class="n">DA</span><span class="p">:</span> <span class="s1">&#39;20040119&#39;</span>
+
+<span class="o">-</span> <span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">0021</span><span class="p">)</span> <span class="n">Series</span> <span class="n">Date</span>                         <span class="n">DA</span><span class="p">:</span> <span class="s1">&#39;&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">0021</span><span class="p">)</span> <span class="n">Series</span> <span class="n">Date</span>                         <span class="n">DA</span><span class="p">:</span> <span class="s1">&#39;19970430&#39;</span>
+
+<span class="o">-</span> <span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">0022</span><span class="p">)</span> <span class="n">Acquisition</span> <span class="n">Date</span>                    <span class="n">DA</span><span class="p">:</span> <span class="s1">&#39;&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">0022</span><span class="p">)</span> <span class="n">Acquisition</span> <span class="n">Date</span>                    <span class="n">DA</span><span class="p">:</span> <span class="s1">&#39;19970430&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">0023</span><span class="p">)</span> <span class="n">Content</span> <span class="n">Date</span>                        <span class="n">DA</span><span class="p">:</span> <span class="s1">&#39;19970430&#39;</span>
+
+<span class="o">-</span> <span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">0030</span><span class="p">)</span> <span class="n">Study</span> <span class="n">Time</span>                          <span class="n">TM</span><span class="p">:</span> <span class="s1">&#39;185059&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">0030</span><span class="p">)</span> <span class="n">Study</span> <span class="n">Time</span>                          <span class="n">TM</span><span class="p">:</span> <span class="s1">&#39;072730&#39;</span>
+
+<span class="o">-</span> <span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">0031</span><span class="p">)</span> <span class="n">Series</span> <span class="n">Time</span>                         <span class="n">TM</span><span class="p">:</span> <span class="s1">&#39;&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">0031</span><span class="p">)</span> <span class="n">Series</span> <span class="n">Time</span>                         <span class="n">TM</span><span class="p">:</span> <span class="s1">&#39;112749&#39;</span>
+
+<span class="o">-</span> <span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">0032</span><span class="p">)</span> <span class="n">Acquisition</span> <span class="n">Time</span>                    <span class="n">TM</span><span class="p">:</span> <span class="s1">&#39;&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">0032</span><span class="p">)</span> <span class="n">Acquisition</span> <span class="n">Time</span>                    <span class="n">TM</span><span class="p">:</span> <span class="s1">&#39;112936&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">0033</span><span class="p">)</span> <span class="n">Content</span> <span class="n">Time</span>                        <span class="n">TM</span><span class="p">:</span> <span class="s1">&#39;113008&#39;</span>
+
+  <span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">0050</span><span class="p">)</span> <span class="n">Accession</span> <span class="n">Number</span>                    <span class="n">SH</span><span class="p">:</span> <span class="s1">&#39;&#39;</span>
+
+<span class="o">-</span> <span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">0060</span><span class="p">)</span> <span class="n">Modality</span>                            <span class="n">CS</span><span class="p">:</span> <span class="s1">&#39;MR&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">0060</span><span class="p">)</span> <span class="n">Modality</span>                            <span class="n">CS</span><span class="p">:</span> <span class="s1">&#39;CT&#39;</span>
+
+<span class="o">-</span> <span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">0070</span><span class="p">)</span> <span class="n">Manufacturer</span>                        <span class="n">LO</span><span class="p">:</span> <span class="s1">&#39;TOSHIBA_MEC&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">0070</span><span class="p">)</span> <span class="n">Manufacturer</span>                        <span class="n">LO</span><span class="p">:</span> <span class="s1">&#39;GE MEDICAL SYSTEMS&#39;</span>
+
+<span class="o">-</span> <span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">0080</span><span class="p">)</span> <span class="n">Institution</span> <span class="n">Name</span>                    <span class="n">LO</span><span class="p">:</span> <span class="s1">&#39;TOSHIBA&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">0080</span><span class="p">)</span> <span class="n">Institution</span> <span class="n">Name</span>                    <span class="n">LO</span><span class="p">:</span> <span class="s1">&#39;JFK IMAGING CENTER&#39;</span>
+
+  <span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">0090</span><span class="p">)</span> <span class="n">Referring</span> <span class="n">Physician</span><span class="s1">&#39;s Name          PN: &#39;&#39;</span>
+
+<span class="o">-</span> <span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">0201</span><span class="p">)</span> <span class="n">Timezone</span> <span class="n">Offset</span> <span class="n">From</span> <span class="n">UTC</span>            <span class="n">SH</span><span class="p">:</span> <span class="s1">&#39;-0400&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">0201</span><span class="p">)</span> <span class="n">Timezone</span> <span class="n">Offset</span> <span class="n">From</span> <span class="n">UTC</span>            <span class="n">SH</span><span class="p">:</span> <span class="s1">&#39;-0500&#39;</span>
+
+<span class="o">-</span> <span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">1010</span><span class="p">)</span> <span class="n">Station</span> <span class="n">Name</span>                        <span class="n">SH</span><span class="p">:</span> <span class="s1">&#39;000000000&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">1010</span><span class="p">)</span> <span class="n">Station</span> <span class="n">Name</span>                        <span class="n">SH</span><span class="p">:</span> <span class="s1">&#39;CT01_OC0&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">1030</span><span class="p">)</span> <span class="n">Study</span> <span class="n">Description</span>                   <span class="n">LO</span><span class="p">:</span> <span class="s1">&#39;e+1&#39;</span>
+
+<span class="o">-</span> <span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">1060</span><span class="p">)</span> <span class="n">Name</span> <span class="n">of</span> <span class="n">Physician</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="n">Reading</span> <span class="n">Study</span>  <span class="n">PN</span><span class="p">:</span> <span class="s1">&#39;----&#39;</span>
+
+<span class="o">-</span> <span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">1070</span><span class="p">)</span> <span class="n">Operators</span><span class="s1">&#39; Name                     PN: &#39;</span><span class="o">----</span><span class="s1">&#39;</span>
+
+<span class="o">-</span> <span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">1090</span><span class="p">)</span> <span class="n">Manufacturer</span><span class="s1">&#39;s Model Name           LO: &#39;</span><span class="n">MRT50H1</span><span class="s1">&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">1090</span><span class="p">)</span> <span class="n">Manufacturer</span><span class="s1">&#39;s Model Name           LO: &#39;</span><span class="n">RHAPSODE</span><span class="s1">&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0009</span><span class="p">,</span> <span class="mi">0010</span><span class="p">)</span> <span class="n">Private</span> <span class="n">Creator</span>                     <span class="n">LO</span><span class="p">:</span> <span class="s1">&#39;GEMS_IDEN_01&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0009</span><span class="p">,</span> <span class="mi">1001</span><span class="p">)</span> <span class="p">[</span><span class="n">Full</span> <span class="n">fidelity</span><span class="p">]</span>                     <span class="n">LO</span><span class="p">:</span> <span class="s1">&#39;GE_GENESIS_FF&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0009</span><span class="p">,</span> <span class="mi">1002</span><span class="p">)</span> <span class="p">[</span><span class="n">Suite</span> <span class="nb">id</span><span class="p">]</span>                          <span class="n">SH</span><span class="p">:</span> <span class="s1">&#39;CT01&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0009</span><span class="p">,</span> <span class="mi">1004</span><span class="p">)</span> <span class="p">[</span><span class="n">Product</span> <span class="nb">id</span><span class="p">]</span>                        <span class="n">SH</span><span class="p">:</span> <span class="s1">&#39;HiSpeed CT/i&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0009</span><span class="p">,</span> <span class="mi">1027</span><span class="p">)</span> <span class="p">[</span><span class="n">Image</span> <span class="n">actual</span> <span class="n">date</span><span class="p">]</span>                 <span class="n">SL</span><span class="p">:</span> <span class="mi">862399669</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0009</span><span class="p">,</span> <span class="mi">1030</span><span class="p">)</span> <span class="p">[</span><span class="n">Service</span> <span class="nb">id</span><span class="p">]</span>                        <span class="n">SH</span><span class="p">:</span> <span class="s1">&#39;&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0009</span><span class="p">,</span> <span class="mi">1031</span><span class="p">)</span> <span class="p">[</span><span class="n">Mobile</span> <span class="n">location</span> <span class="n">number</span><span class="p">]</span>            <span class="n">SH</span><span class="p">:</span> <span class="s1">&#39;&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0009</span><span class="p">,</span> <span class="mf">10e6</span><span class="p">)</span> <span class="p">[</span><span class="n">Genesis</span> <span class="n">Version</span> <span class="o">-</span> <span class="n">now</span><span class="p">]</span>             <span class="n">SH</span><span class="p">:</span> <span class="s1">&#39;05&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0009</span><span class="p">,</span> <span class="mf">10e7</span><span class="p">)</span> <span class="p">[</span><span class="n">Exam</span> <span class="n">Record</span> <span class="n">checksum</span><span class="p">]</span>              <span class="n">UL</span><span class="p">:</span> <span class="mi">973283917</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0009</span><span class="p">,</span> <span class="mf">10e9</span><span class="p">)</span> <span class="p">[</span><span class="n">Actual</span> <span class="n">series</span> <span class="n">data</span> <span class="n">time</span> <span class="n">stamp</span><span class="p">]</span>     <span class="n">SL</span><span class="p">:</span> <span class="mi">862399669</span>
+
+<span class="o">-</span> <span class="p">(</span><span class="mi">0010</span><span class="p">,</span> <span class="mi">0010</span><span class="p">)</span> <span class="n">Patient</span><span class="s1">&#39;s Name                      PN: &#39;</span><span class="n">CompressedSamples</span><span class="o">^</span><span class="n">MR1</span><span class="s1">&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0010</span><span class="p">,</span> <span class="mi">0010</span><span class="p">)</span> <span class="n">Patient</span><span class="s1">&#39;s Name                      PN: &#39;</span><span class="n">CompressedSamples</span><span class="o">^</span><span class="n">CT1</span><span class="s1">&#39;</span>
+
+<span class="o">-</span> <span class="p">(</span><span class="mi">0010</span><span class="p">,</span> <span class="mi">0020</span><span class="p">)</span> <span class="n">Patient</span> <span class="n">ID</span>                          <span class="n">LO</span><span class="p">:</span> <span class="s1">&#39;4MR1&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0010</span><span class="p">,</span> <span class="mi">0020</span><span class="p">)</span> <span class="n">Patient</span> <span class="n">ID</span>                          <span class="n">LO</span><span class="p">:</span> <span class="s1">&#39;1CT1&#39;</span>
+
+  <span class="p">(</span><span class="mi">0010</span><span class="p">,</span> <span class="mi">0030</span><span class="p">)</span> <span class="n">Patient</span><span class="s1">&#39;s Birth Date                DA: &#39;&#39;</span>
+
+<span class="o">-</span> <span class="p">(</span><span class="mi">0010</span><span class="p">,</span> <span class="mi">0040</span><span class="p">)</span> <span class="n">Patient</span><span class="s1">&#39;s Sex                       CS: &#39;</span><span class="n">F</span><span class="s1">&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0010</span><span class="p">,</span> <span class="mi">0040</span><span class="p">)</span> <span class="n">Patient</span><span class="s1">&#39;s Sex                       CS: &#39;</span><span class="n">O</span><span class="s1">&#39;</span>
+
+<span class="o">-</span> <span class="p">(</span><span class="mi">0010</span><span class="p">,</span> <span class="mi">1020</span><span class="p">)</span> <span class="n">Patient</span><span class="s1">&#39;s Size                      DS: &#39;&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0010</span><span class="p">,</span> <span class="mi">1010</span><span class="p">)</span> <span class="n">Patient</span><span class="s1">&#39;s Age                       AS: &#39;</span><span class="mi">000</span><span class="n">Y</span><span class="s1">&#39;</span>
+
+<span class="o">-</span> <span class="p">(</span><span class="mi">0010</span><span class="p">,</span> <span class="mi">1030</span><span class="p">)</span> <span class="n">Patient</span><span class="s1">&#39;s Weight                    DS: &quot;80.0000&quot;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0010</span><span class="p">,</span> <span class="mi">1030</span><span class="p">)</span> <span class="n">Patient</span><span class="s1">&#39;s Weight                    DS: &quot;0.000000&quot;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0010</span><span class="p">,</span> <span class="mi">21</span><span class="n">b0</span><span class="p">)</span> <span class="n">Additional</span> <span class="n">Patient</span> <span class="n">History</span>          <span class="n">LT</span><span class="p">:</span> <span class="s1">&#39;&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0011</span><span class="p">,</span> <span class="mi">0010</span><span class="p">)</span> <span class="n">Private</span> <span class="n">Creator</span>                     <span class="n">LO</span><span class="p">:</span> <span class="s1">&#39;GEMS_PATI_01&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0011</span><span class="p">,</span> <span class="mi">1010</span><span class="p">)</span> <span class="p">[</span><span class="n">Patient</span> <span class="n">Status</span><span class="p">]</span>                    <span class="n">SS</span><span class="p">:</span> <span class="mi">0</span>
+
+<span class="o">-</span> <span class="p">(</span><span class="mi">0018</span><span class="p">,</span> <span class="mi">0010</span><span class="p">)</span> <span class="n">Contrast</span><span class="o">/</span><span class="n">Bolus</span> <span class="n">Agent</span>                <span class="n">LO</span><span class="p">:</span> <span class="s1">&#39;&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0018</span><span class="p">,</span> <span class="mi">0010</span><span class="p">)</span> <span class="n">Contrast</span><span class="o">/</span><span class="n">Bolus</span> <span class="n">Agent</span>                <span class="n">LO</span><span class="p">:</span> <span class="s1">&#39;ISOVUE300/100&#39;</span>
+
+<span class="o">-</span> <span class="p">(</span><span class="mi">0018</span><span class="p">,</span> <span class="mi">0020</span><span class="p">)</span> <span class="n">Scanning</span> <span class="n">Sequence</span>                   <span class="n">CS</span><span class="p">:</span> <span class="s1">&#39;SE&#39;</span>
+
+<span class="o">-</span> <span class="p">(</span><span class="mi">0018</span><span class="p">,</span> <span class="mi">0021</span><span class="p">)</span> <span class="n">Sequence</span> <span class="n">Variant</span>                    <span class="n">CS</span><span class="p">:</span> <span class="s1">&#39;NONE&#39;</span>
+
+<span class="o">-</span> <span class="p">(</span><span class="mi">0018</span><span class="p">,</span> <span class="mi">0022</span><span class="p">)</span> <span class="n">Scan</span> <span class="n">Options</span>                        <span class="n">CS</span><span class="p">:</span> <span class="s1">&#39;&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0018</span><span class="p">,</span> <span class="mi">0022</span><span class="p">)</span> <span class="n">Scan</span> <span class="n">Options</span>                        <span class="n">CS</span><span class="p">:</span> <span class="s1">&#39;HELICAL MODE&#39;</span>
+
+<span class="o">-</span> <span class="p">(</span><span class="mi">0018</span><span class="p">,</span> <span class="mi">0023</span><span class="p">)</span> <span class="n">MR</span> <span class="n">Acquisition</span> <span class="n">Type</span>                 <span class="n">CS</span><span class="p">:</span> <span class="s1">&#39;3D&#39;</span>
+
+<span class="o">-</span> <span class="p">(</span><span class="mi">0018</span><span class="p">,</span> <span class="mi">0050</span><span class="p">)</span> <span class="n">Slice</span> <span class="n">Thickness</span>                     <span class="n">DS</span><span class="p">:</span> <span class="s2">&quot;0.8000&quot;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0018</span><span class="p">,</span> <span class="mi">0050</span><span class="p">)</span> <span class="n">Slice</span> <span class="n">Thickness</span>                     <span class="n">DS</span><span class="p">:</span> <span class="s2">&quot;5.000000&quot;</span>
+
+<span class="o">-</span> <span class="p">(</span><span class="mi">0018</span><span class="p">,</span> <span class="mi">0080</span><span class="p">)</span> <span class="n">Repetition</span> <span class="n">Time</span>                     <span class="n">DS</span><span class="p">:</span> <span class="s2">&quot;4000.0000&quot;</span>
+
+<span class="o">-</span> <span class="p">(</span><span class="mi">0018</span><span class="p">,</span> <span class="mi">0081</span><span class="p">)</span> <span class="n">Echo</span> <span class="n">Time</span>                           <span class="n">DS</span><span class="p">:</span> <span class="s2">&quot;240.0000&quot;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0018</span><span class="p">,</span> <span class="mi">0060</span><span class="p">)</span> <span class="n">KVP</span>                                 <span class="n">DS</span><span class="p">:</span> <span class="s2">&quot;120&quot;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0018</span><span class="p">,</span> <span class="mi">0088</span><span class="p">)</span> <span class="n">Spacing</span> <span class="n">Between</span> <span class="n">Slices</span>              <span class="n">DS</span><span class="p">:</span> <span class="s2">&quot;5.000000&quot;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0018</span><span class="p">,</span> <span class="mi">0090</span><span class="p">)</span> <span class="n">Data</span> <span class="n">Collection</span> <span class="n">Diameter</span>            <span class="n">DS</span><span class="p">:</span> <span class="s2">&quot;480.000000&quot;</span>
+
+<span class="o">-</span> <span class="p">(</span><span class="mi">0018</span><span class="p">,</span> <span class="mi">0083</span><span class="p">)</span> <span class="n">Number</span> <span class="n">of</span> <span class="n">Averages</span>                  <span class="n">DS</span><span class="p">:</span> <span class="s2">&quot;1.0000&quot;</span>
+
+<span class="o">-</span> <span class="p">(</span><span class="mi">0018</span><span class="p">,</span> <span class="mi">0084</span><span class="p">)</span> <span class="n">Imaging</span> <span class="n">Frequency</span>                   <span class="n">DS</span><span class="p">:</span> <span class="s2">&quot;63.92433900&quot;</span>
+
+<span class="o">-</span> <span class="p">(</span><span class="mi">0018</span><span class="p">,</span> <span class="mi">0085</span><span class="p">)</span> <span class="n">Imaged</span> <span class="n">Nucleus</span>                      <span class="n">SH</span><span class="p">:</span> <span class="s1">&#39;H&#39;</span>
+
+<span class="o">-</span> <span class="p">(</span><span class="mi">0018</span><span class="p">,</span> <span class="mi">0086</span><span class="p">)</span> <span class="n">Echo</span> <span class="n">Number</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>                      <span class="n">IS</span><span class="p">:</span> <span class="s1">&#39;1&#39;</span>
+
+<span class="o">-</span> <span class="p">(</span><span class="mi">0018</span><span class="p">,</span> <span class="mi">0091</span><span class="p">)</span> <span class="n">Echo</span> <span class="n">Train</span> <span class="n">Length</span>                   <span class="n">IS</span><span class="p">:</span> <span class="s1">&#39;&#39;</span>
+
+<span class="o">-</span> <span class="p">(</span><span class="mi">0018</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span> <span class="n">Device</span> <span class="n">Serial</span> <span class="n">Number</span>                <span class="n">LO</span><span class="p">:</span> <span class="s1">&#39;-0000200&#39;</span>
+
+<span class="o">-</span> <span class="p">(</span><span class="mi">0018</span><span class="p">,</span> <span class="mi">1020</span><span class="p">)</span> <span class="n">Software</span> <span class="n">Version</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>                 <span class="n">LO</span><span class="p">:</span> <span class="s1">&#39;V3.51*P25&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0018</span><span class="p">,</span> <span class="mi">1020</span><span class="p">)</span> <span class="n">Software</span> <span class="n">Version</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>                 <span class="n">LO</span><span class="p">:</span> <span class="s1">&#39;05&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0018</span><span class="p">,</span> <span class="mi">1040</span><span class="p">)</span> <span class="n">Contrast</span><span class="o">/</span><span class="n">Bolus</span> <span class="n">Route</span>                <span class="n">LO</span><span class="p">:</span> <span class="s1">&#39;IV&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0018</span><span class="p">,</span> <span class="mi">1100</span><span class="p">)</span> <span class="n">Reconstruction</span> <span class="n">Diameter</span>             <span class="n">DS</span><span class="p">:</span> <span class="s2">&quot;338.671600&quot;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0018</span><span class="p">,</span> <span class="mi">1110</span><span class="p">)</span> <span class="n">Distance</span> <span class="n">Source</span> <span class="n">to</span> <span class="n">Detector</span>         <span class="n">DS</span><span class="p">:</span> <span class="s2">&quot;1099.3100585938&quot;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0018</span><span class="p">,</span> <span class="mi">1111</span><span class="p">)</span> <span class="n">Distance</span> <span class="n">Source</span> <span class="n">to</span> <span class="n">Patient</span>          <span class="n">DS</span><span class="p">:</span> <span class="s2">&quot;630.000000&quot;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0018</span><span class="p">,</span> <span class="mi">1120</span><span class="p">)</span> <span class="n">Gantry</span><span class="o">/</span><span class="n">Detector</span> <span class="n">Tilt</span>                <span class="n">DS</span><span class="p">:</span> <span class="s2">&quot;0.000000&quot;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0018</span><span class="p">,</span> <span class="mi">1130</span><span class="p">)</span> <span class="n">Table</span> <span class="n">Height</span>                        <span class="n">DS</span><span class="p">:</span> <span class="s2">&quot;133.699997&quot;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0018</span><span class="p">,</span> <span class="mi">1150</span><span class="p">)</span> <span class="n">Exposure</span> <span class="n">Time</span>                       <span class="n">IS</span><span class="p">:</span> <span class="s1">&#39;1601&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0018</span><span class="p">,</span> <span class="mi">1151</span><span class="p">)</span> <span class="n">X</span><span class="o">-</span><span class="n">Ray</span> <span class="n">Tube</span> <span class="n">Current</span>                  <span class="n">IS</span><span class="p">:</span> <span class="s1">&#39;170&#39;</span>
+
+<span class="o">-</span> <span class="p">(</span><span class="mi">0018</span><span class="p">,</span> <span class="mi">1314</span><span class="p">)</span> <span class="n">Flip</span> <span class="n">Angle</span>                          <span class="n">DS</span><span class="p">:</span> <span class="s2">&quot;90&quot;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0018</span><span class="p">,</span> <span class="mi">1152</span><span class="p">)</span> <span class="n">Exposure</span>                            <span class="n">IS</span><span class="p">:</span> <span class="s1">&#39;170&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0018</span><span class="p">,</span> <span class="mi">1160</span><span class="p">)</span> <span class="n">Filter</span> <span class="n">Type</span>                         <span class="n">SH</span><span class="p">:</span> <span class="s1">&#39;LARGE BOWTIE FIL&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0018</span><span class="p">,</span> <span class="mi">1190</span><span class="p">)</span> <span class="n">Focal</span> <span class="n">Spot</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>                       <span class="n">DS</span><span class="p">:</span> <span class="s2">&quot;0.700000&quot;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0018</span><span class="p">,</span> <span class="mi">1210</span><span class="p">)</span> <span class="n">Convolution</span> <span class="n">Kernel</span>                  <span class="n">SH</span><span class="p">:</span> <span class="s1">&#39;STANDARD&#39;</span>
+
+<span class="o">-</span> <span class="p">(</span><span class="mi">0018</span><span class="p">,</span> <span class="mi">5100</span><span class="p">)</span> <span class="n">Patient</span> <span class="n">Position</span>                    <span class="n">CS</span><span class="p">:</span> <span class="s1">&#39;HFS&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0018</span><span class="p">,</span> <span class="mi">5100</span><span class="p">)</span> <span class="n">Patient</span> <span class="n">Position</span>                    <span class="n">CS</span><span class="p">:</span> <span class="s1">&#39;FFS&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0019</span><span class="p">,</span> <span class="mi">0010</span><span class="p">)</span> <span class="n">Private</span> <span class="n">Creator</span>                     <span class="n">LO</span><span class="p">:</span> <span class="s1">&#39;GEMS_ACQU_01&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0019</span><span class="p">,</span> <span class="mi">1002</span><span class="p">)</span> <span class="p">[</span><span class="n">Detector</span> <span class="n">Channel</span><span class="p">]</span>                  <span class="n">SL</span><span class="p">:</span> <span class="mi">912</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0019</span><span class="p">,</span> <span class="mi">1003</span><span class="p">)</span> <span class="p">[</span><span class="n">Cell</span> <span class="n">number</span> <span class="n">at</span> <span class="n">Theta</span><span class="p">]</span>              <span class="n">DS</span><span class="p">:</span> <span class="s2">&quot;373.750000&quot;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0019</span><span class="p">,</span> <span class="mi">1004</span><span class="p">)</span> <span class="p">[</span><span class="n">Cell</span> <span class="n">spacing</span><span class="p">]</span>                      <span class="n">DS</span><span class="p">:</span> <span class="s2">&quot;1.016600&quot;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0019</span><span class="p">,</span> <span class="mi">100</span><span class="n">f</span><span class="p">)</span> <span class="p">[</span><span class="n">Horiz</span><span class="o">.</span> <span class="n">Frame</span> <span class="n">of</span> <span class="n">ref</span><span class="o">.</span><span class="p">]</span>              <span class="n">DS</span><span class="p">:</span> <span class="s2">&quot;955.799988&quot;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0019</span><span class="p">,</span> <span class="mi">1011</span><span class="p">)</span> <span class="p">[</span><span class="n">Series</span> <span class="n">contrast</span><span class="p">]</span>                   <span class="n">SS</span><span class="p">:</span> <span class="mi">2</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0019</span><span class="p">,</span> <span class="mi">1013</span><span class="p">)</span> <span class="p">[</span><span class="n">Start</span> <span class="n">number</span> <span class="k">for</span> <span class="n">baseline</span><span class="p">]</span>         <span class="n">SS</span><span class="p">:</span> <span class="mi">0</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0019</span><span class="p">,</span> <span class="mi">1014</span><span class="p">)</span> <span class="p">[</span><span class="n">End</span> <span class="n">number</span> <span class="k">for</span> <span class="n">baseline</span><span class="p">]</span>           <span class="n">SS</span><span class="p">:</span> <span class="mi">0</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0019</span><span class="p">,</span> <span class="mi">1015</span><span class="p">)</span> <span class="p">[</span><span class="n">Start</span> <span class="n">number</span> <span class="k">for</span> <span class="n">enhanced</span> <span class="n">scans</span><span class="p">]</span>   <span class="n">SS</span><span class="p">:</span> <span class="mi">0</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0019</span><span class="p">,</span> <span class="mi">1016</span><span class="p">)</span> <span class="p">[</span><span class="n">End</span> <span class="n">number</span> <span class="k">for</span> <span class="n">enhanced</span> <span class="n">scans</span><span class="p">]</span>     <span class="n">SS</span><span class="p">:</span> <span class="mi">0</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0019</span><span class="p">,</span> <span class="mi">1017</span><span class="p">)</span> <span class="p">[</span><span class="n">Series</span> <span class="n">plane</span><span class="p">]</span>                      <span class="n">SS</span><span class="p">:</span> <span class="mi">2</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0019</span><span class="p">,</span> <span class="mi">1018</span><span class="p">)</span> <span class="p">[</span><span class="n">First</span> <span class="n">scan</span> <span class="n">ras</span><span class="p">]</span>                    <span class="n">LO</span><span class="p">:</span> <span class="s1">&#39;S&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0019</span><span class="p">,</span> <span class="mi">1019</span><span class="p">)</span> <span class="p">[</span><span class="n">First</span> <span class="n">scan</span> <span class="n">location</span><span class="p">]</span>               <span class="n">DS</span><span class="p">:</span> <span class="s2">&quot;7.791870&quot;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0019</span><span class="p">,</span> <span class="mi">101</span><span class="n">a</span><span class="p">)</span> <span class="p">[</span><span class="n">Last</span> <span class="n">scan</span> <span class="n">ras</span><span class="p">]</span>                     <span class="n">LO</span><span class="p">:</span> <span class="s1">&#39;I&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0019</span><span class="p">,</span> <span class="mi">101</span><span class="n">b</span><span class="p">)</span> <span class="p">[</span><span class="n">Last</span> <span class="n">scan</span> <span class="n">loc</span><span class="p">]</span>                     <span class="n">DS</span><span class="p">:</span> <span class="s2">&quot;-320.197968&quot;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0019</span><span class="p">,</span> <span class="mi">101</span><span class="n">e</span><span class="p">)</span> <span class="p">[</span><span class="n">Display</span> <span class="n">field</span> <span class="n">of</span> <span class="n">view</span><span class="p">]</span>             <span class="n">DS</span><span class="p">:</span> <span class="s2">&quot;0.000000&quot;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0019</span><span class="p">,</span> <span class="mi">1023</span><span class="p">)</span> <span class="p">[</span><span class="n">Table</span> <span class="n">Speed</span> <span class="p">[</span><span class="n">mm</span><span class="o">/</span><span class="n">rotation</span><span class="p">]]</span>         <span class="n">DS</span><span class="p">:</span> <span class="s2">&quot;5.000000&quot;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0019</span><span class="p">,</span> <span class="mi">1024</span><span class="p">)</span> <span class="p">[</span><span class="n">Mid</span> <span class="n">Scan</span> <span class="n">Time</span> <span class="p">[</span><span class="n">sec</span><span class="p">]]</span>               <span class="n">DS</span><span class="p">:</span> <span class="s2">&quot;17.784578&quot;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0019</span><span class="p">,</span> <span class="mi">1025</span><span class="p">)</span> <span class="p">[</span><span class="n">Mid</span> <span class="n">scan</span> <span class="n">flag</span><span class="p">]</span>                     <span class="n">SS</span><span class="p">:</span> <span class="mi">1</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0019</span><span class="p">,</span> <span class="mi">1026</span><span class="p">)</span> <span class="p">[</span><span class="n">Tube</span> <span class="n">Azimuth</span> <span class="p">[</span><span class="n">degree</span><span class="p">]]</span>             <span class="n">SL</span><span class="p">:</span> <span class="mi">0</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0019</span><span class="p">,</span> <span class="mi">1027</span><span class="p">)</span> <span class="p">[</span><span class="n">Rotation</span> <span class="n">Speed</span> <span class="p">[</span><span class="n">msec</span><span class="p">]]</span>             <span class="n">DS</span><span class="p">:</span> <span class="s2">&quot;1.000000&quot;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0019</span><span class="p">,</span> <span class="mi">102</span><span class="n">a</span><span class="p">)</span> <span class="p">[</span><span class="n">x</span><span class="o">-</span><span class="n">ray</span> <span class="n">On</span> <span class="n">position</span><span class="p">]</span>                 <span class="n">DS</span><span class="p">:</span> <span class="s2">&quot;178.079926&quot;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0019</span><span class="p">,</span> <span class="mi">102</span><span class="n">b</span><span class="p">)</span> <span class="p">[</span><span class="n">x</span><span class="o">-</span><span class="n">ray</span> <span class="n">Off</span> <span class="n">position</span><span class="p">]</span>                <span class="n">DS</span><span class="p">:</span> <span class="s2">&quot;3994.299316&quot;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0019</span><span class="p">,</span> <span class="mi">102</span><span class="n">c</span><span class="p">)</span> <span class="p">[</span><span class="n">Number</span> <span class="n">of</span> <span class="n">triggers</span><span class="p">]</span>                <span class="n">SL</span><span class="p">:</span> <span class="mi">10431</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0019</span><span class="p">,</span> <span class="mi">102</span><span class="n">e</span><span class="p">)</span> <span class="p">[</span><span class="n">Angle</span> <span class="n">of</span> <span class="n">first</span> <span class="n">view</span><span class="p">]</span>               <span class="n">DS</span><span class="p">:</span> <span class="s2">&quot;-718.079956&quot;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0019</span><span class="p">,</span> <span class="mi">102</span><span class="n">f</span><span class="p">)</span> <span class="p">[</span><span class="n">Trigger</span> <span class="n">frequency</span><span class="p">]</span>                 <span class="n">DS</span><span class="p">:</span> <span class="s2">&quot;984.000000&quot;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0019</span><span class="p">,</span> <span class="mi">1039</span><span class="p">)</span> <span class="p">[</span><span class="n">SFOV</span> <span class="n">Type</span><span class="p">]</span>                         <span class="n">SS</span><span class="p">:</span> <span class="mi">16</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0019</span><span class="p">,</span> <span class="mi">1040</span><span class="p">)</span> <span class="p">[</span><span class="n">Stat</span> <span class="n">recon</span> <span class="n">flag</span><span class="p">]</span>                   <span class="n">SS</span><span class="p">:</span> <span class="mi">0</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0019</span><span class="p">,</span> <span class="mi">1041</span><span class="p">)</span> <span class="p">[</span><span class="n">Compute</span> <span class="nb">type</span><span class="p">]</span>                      <span class="n">SS</span><span class="p">:</span> <span class="mi">1</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0019</span><span class="p">,</span> <span class="mi">1042</span><span class="p">)</span> <span class="p">[</span><span class="n">Segment</span> <span class="n">Number</span><span class="p">]</span>                    <span class="n">SS</span><span class="p">:</span> <span class="mi">0</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0019</span><span class="p">,</span> <span class="mi">1043</span><span class="p">)</span> <span class="p">[</span><span class="n">Total</span> <span class="n">Segments</span> <span class="n">Required</span><span class="p">]</span>           <span class="n">SS</span><span class="p">:</span> <span class="mi">0</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0019</span><span class="p">,</span> <span class="mi">1044</span><span class="p">)</span> <span class="p">[</span><span class="n">Interscan</span> <span class="n">delay</span><span class="p">]</span>                   <span class="n">DS</span><span class="p">:</span> <span class="s2">&quot;1.000000&quot;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0019</span><span class="p">,</span> <span class="mi">1047</span><span class="p">)</span> <span class="p">[</span><span class="n">View</span> <span class="n">compression</span> <span class="n">factor</span><span class="p">]</span>           <span class="n">SS</span><span class="p">:</span> <span class="mi">1</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0019</span><span class="p">,</span> <span class="mi">104</span><span class="n">a</span><span class="p">)</span> <span class="p">[</span><span class="n">Total</span> <span class="n">no</span><span class="o">.</span> <span class="n">of</span> <span class="n">ref</span> <span class="n">channels</span><span class="p">]</span>         <span class="n">SS</span><span class="p">:</span> <span class="mi">6</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0019</span><span class="p">,</span> <span class="mi">104</span><span class="n">b</span><span class="p">)</span> <span class="p">[</span><span class="n">Data</span> <span class="n">size</span> <span class="k">for</span> <span class="n">scan</span> <span class="n">data</span><span class="p">]</span>           <span class="n">SL</span><span class="p">:</span> <span class="mi">10431</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0019</span><span class="p">,</span> <span class="mi">1052</span><span class="p">)</span> <span class="p">[</span><span class="n">Recon</span> <span class="n">post</span> <span class="n">proc</span><span class="o">.</span> <span class="n">Flag</span><span class="p">]</span>             <span class="n">SS</span><span class="p">:</span> <span class="mi">1</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0019</span><span class="p">,</span> <span class="mi">1057</span><span class="p">)</span> <span class="p">[</span><span class="n">CT</span> <span class="n">water</span> <span class="n">number</span><span class="p">]</span>                   <span class="n">SS</span><span class="p">:</span> <span class="o">-</span><span class="mi">95</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0019</span><span class="p">,</span> <span class="mi">1058</span><span class="p">)</span> <span class="p">[</span><span class="n">CT</span> <span class="n">bone</span> <span class="n">number</span><span class="p">]</span>                    <span class="n">SS</span><span class="p">:</span> <span class="mi">0</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0019</span><span class="p">,</span> <span class="mi">105</span><span class="n">e</span><span class="p">)</span> <span class="p">[</span><span class="n">Number</span> <span class="n">of</span> <span class="n">channels</span> <span class="p">(</span><span class="mf">1.</span><span class="o">..</span><span class="mi">512</span><span class="p">)]</span>      <span class="n">SL</span><span class="p">:</span> <span class="mi">763</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0019</span><span class="p">,</span> <span class="mi">105</span><span class="n">f</span><span class="p">)</span> <span class="p">[</span><span class="n">Increment</span> <span class="n">between</span> <span class="n">channels</span><span class="p">]</span>        <span class="n">SL</span><span class="p">:</span> <span class="mi">1</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0019</span><span class="p">,</span> <span class="mi">1060</span><span class="p">)</span> <span class="p">[</span><span class="n">Starting</span> <span class="n">view</span><span class="p">]</span>                     <span class="n">SL</span><span class="p">:</span> <span class="mi">1969</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0019</span><span class="p">,</span> <span class="mi">1061</span><span class="p">)</span> <span class="p">[</span><span class="n">Number</span> <span class="n">of</span> <span class="n">views</span><span class="p">]</span>                   <span class="n">SL</span><span class="p">:</span> <span class="mi">1576</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0019</span><span class="p">,</span> <span class="mi">1062</span><span class="p">)</span> <span class="p">[</span><span class="n">Increment</span> <span class="n">between</span> <span class="n">views</span><span class="p">]</span>           <span class="n">SL</span><span class="p">:</span> <span class="mi">1</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0019</span><span class="p">,</span> <span class="mi">106</span><span class="n">a</span><span class="p">)</span> <span class="p">[</span><span class="n">Dependent</span> <span class="n">on</span> <span class="c1">#views processed]     SS: 4</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0019</span><span class="p">,</span> <span class="mi">106</span><span class="n">b</span><span class="p">)</span> <span class="p">[</span><span class="n">Field</span> <span class="n">of</span> <span class="n">view</span> <span class="ow">in</span> <span class="n">detector</span> <span class="n">cells</span><span class="p">]</span>   <span class="n">SS</span><span class="p">:</span> <span class="mi">852</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0019</span><span class="p">,</span> <span class="mi">1070</span><span class="p">)</span> <span class="p">[</span><span class="n">Value</span> <span class="n">of</span> <span class="n">back</span> <span class="n">projection</span> <span class="n">button</span><span class="p">]</span>   <span class="n">SS</span><span class="p">:</span> <span class="mi">1</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0019</span><span class="p">,</span> <span class="mi">1071</span><span class="p">)</span> <span class="p">[</span><span class="n">Set</span> <span class="k">if</span> <span class="n">fatq</span> <span class="n">estimates</span> <span class="n">were</span> <span class="n">used</span><span class="p">]</span>   <span class="n">SS</span><span class="p">:</span> <span class="mi">0</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0019</span><span class="p">,</span> <span class="mi">1072</span><span class="p">)</span> <span class="p">[</span><span class="n">Z</span> <span class="n">chan</span> <span class="n">avg</span> <span class="n">over</span> <span class="n">views</span><span class="p">]</span>             <span class="n">DS</span><span class="p">:</span> <span class="s2">&quot;0.000000&quot;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0019</span><span class="p">,</span> <span class="mi">1073</span><span class="p">)</span> <span class="p">[</span><span class="n">Avg</span> <span class="n">of</span> <span class="n">left</span> <span class="n">ref</span> <span class="n">chans</span> <span class="n">over</span> <span class="n">views</span><span class="p">]</span>  <span class="n">DS</span><span class="p">:</span> <span class="s2">&quot;0.000000&quot;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0019</span><span class="p">,</span> <span class="mi">1074</span><span class="p">)</span> <span class="p">[</span><span class="n">Max</span> <span class="n">left</span> <span class="n">chan</span> <span class="n">over</span> <span class="n">views</span><span class="p">]</span>          <span class="n">DS</span><span class="p">:</span> <span class="s2">&quot;0.000000&quot;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0019</span><span class="p">,</span> <span class="mi">1075</span><span class="p">)</span> <span class="p">[</span><span class="n">Avg</span> <span class="n">of</span> <span class="n">right</span> <span class="n">ref</span> <span class="n">chans</span> <span class="n">over</span> <span class="n">views</span><span class="p">]</span> <span class="n">DS</span><span class="p">:</span> <span class="s2">&quot;0.000000&quot;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0019</span><span class="p">,</span> <span class="mi">1076</span><span class="p">)</span> <span class="p">[</span><span class="n">Max</span> <span class="n">right</span> <span class="n">chan</span> <span class="n">over</span> <span class="n">views</span><span class="p">]</span>         <span class="n">DS</span><span class="p">:</span> <span class="s2">&quot;0.000000&quot;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0019</span><span class="p">,</span> <span class="mi">10</span><span class="n">da</span><span class="p">)</span> <span class="p">[</span><span class="n">Reference</span> <span class="n">channel</span> <span class="n">used</span><span class="p">]</span>            <span class="n">SS</span><span class="p">:</span> <span class="mi">0</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0019</span><span class="p">,</span> <span class="mi">10</span><span class="n">db</span><span class="p">)</span> <span class="p">[</span><span class="n">Back</span> <span class="n">projector</span> <span class="n">coefficient</span><span class="p">]</span>        <span class="n">DS</span><span class="p">:</span> <span class="s2">&quot;0.000000&quot;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0019</span><span class="p">,</span> <span class="mi">10</span><span class="n">dc</span><span class="p">)</span> <span class="p">[</span><span class="n">Primary</span> <span class="n">speed</span> <span class="n">correction</span> <span class="n">used</span><span class="p">]</span>     <span class="n">SS</span><span class="p">:</span> <span class="mi">1</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0019</span><span class="p">,</span> <span class="mi">10</span><span class="n">dd</span><span class="p">)</span> <span class="p">[</span><span class="n">Overrange</span> <span class="n">correction</span> <span class="n">used</span><span class="p">]</span>         <span class="n">SS</span><span class="p">:</span> <span class="mi">1</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0019</span><span class="p">,</span> <span class="mi">10</span><span class="n">de</span><span class="p">)</span> <span class="p">[</span><span class="n">Dynamic</span> <span class="n">Z</span> <span class="n">alpha</span> <span class="n">value</span><span class="p">]</span>             <span class="n">DS</span><span class="p">:</span> <span class="s2">&quot;0.000000&quot;</span>
+
+<span class="o">-</span> <span class="p">(</span><span class="mi">0020</span><span class="p">,</span> <span class="mi">000</span><span class="n">d</span><span class="p">)</span> <span class="n">Study</span> <span class="n">Instance</span> <span class="n">UID</span>                  <span class="n">UI</span><span class="p">:</span> <span class="mf">1.3</span><span class="o">.</span><span class="mf">6.1</span><span class="o">.</span><span class="mf">4.1</span><span class="o">.</span><span class="mf">5962.1</span><span class="o">.</span><span class="mf">2.4</span><span class="o">.</span><span class="mf">20040826185059.5457</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0020</span><span class="p">,</span> <span class="mi">000</span><span class="n">d</span><span class="p">)</span> <span class="n">Study</span> <span class="n">Instance</span> <span class="n">UID</span>                  <span class="n">UI</span><span class="p">:</span> <span class="mf">1.3</span><span class="o">.</span><span class="mf">6.1</span><span class="o">.</span><span class="mf">4.1</span><span class="o">.</span><span class="mf">5962.1</span><span class="o">.</span><span class="mf">2.1</span><span class="o">.</span><span class="mf">20040119072730.12322</span>
+
+<span class="o">-</span> <span class="p">(</span><span class="mi">0020</span><span class="p">,</span> <span class="mi">000</span><span class="n">e</span><span class="p">)</span> <span class="n">Series</span> <span class="n">Instance</span> <span class="n">UID</span>                 <span class="n">UI</span><span class="p">:</span> <span class="mf">1.3</span><span class="o">.</span><span class="mf">6.1</span><span class="o">.</span><span class="mf">4.1</span><span class="o">.</span><span class="mf">5962.1</span><span class="o">.</span><span class="mf">3.4</span><span class="o">.</span><span class="mf">1.20040826185059</span><span class="o">.</span><span class="mi">5457</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0020</span><span class="p">,</span> <span class="mi">000</span><span class="n">e</span><span class="p">)</span> <span class="n">Series</span> <span class="n">Instance</span> <span class="n">UID</span>                 <span class="n">UI</span><span class="p">:</span> <span class="mf">1.3</span><span class="o">.</span><span class="mf">6.1</span><span class="o">.</span><span class="mf">4.1</span><span class="o">.</span><span class="mf">5962.1</span><span class="o">.</span><span class="mf">3.1</span><span class="o">.</span><span class="mf">1.20040119072730</span><span class="o">.</span><span class="mi">12322</span>
+
+<span class="o">-</span> <span class="p">(</span><span class="mi">0020</span><span class="p">,</span> <span class="mi">0010</span><span class="p">)</span> <span class="n">Study</span> <span class="n">ID</span>                            <span class="n">SH</span><span class="p">:</span> <span class="s1">&#39;4MR1&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0020</span><span class="p">,</span> <span class="mi">0010</span><span class="p">)</span> <span class="n">Study</span> <span class="n">ID</span>                            <span class="n">SH</span><span class="p">:</span> <span class="s1">&#39;1CT1&#39;</span>
+
+  <span class="p">(</span><span class="mi">0020</span><span class="p">,</span> <span class="mi">0011</span><span class="p">)</span> <span class="n">Series</span> <span class="n">Number</span>                       <span class="n">IS</span><span class="p">:</span> <span class="s1">&#39;1&#39;</span>
+
+<span class="o">-</span> <span class="p">(</span><span class="mi">0020</span><span class="p">,</span> <span class="mi">0012</span><span class="p">)</span> <span class="n">Acquisition</span> <span class="n">Number</span>                  <span class="n">IS</span><span class="p">:</span> <span class="s1">&#39;0&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0020</span><span class="p">,</span> <span class="mi">0012</span><span class="p">)</span> <span class="n">Acquisition</span> <span class="n">Number</span>                  <span class="n">IS</span><span class="p">:</span> <span class="s1">&#39;2&#39;</span>
+
+  <span class="p">(</span><span class="mi">0020</span><span class="p">,</span> <span class="mi">0013</span><span class="p">)</span> <span class="n">Instance</span> <span class="n">Number</span>                     <span class="n">IS</span><span class="p">:</span> <span class="s1">&#39;1&#39;</span>
+
+<span class="o">-</span> <span class="p">(</span><span class="mi">0020</span><span class="p">,</span> <span class="mi">0032</span><span class="p">)</span> <span class="n">Image</span> <span class="n">Position</span> <span class="p">(</span><span class="n">Patient</span><span class="p">)</span>            <span class="n">DS</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;-83.9063&#39;</span><span class="p">,</span> <span class="s1">&#39;-91.2000&#39;</span><span class="p">,</span> <span class="s1">&#39;6.6406&#39;</span><span class="p">]</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0020</span><span class="p">,</span> <span class="mi">0032</span><span class="p">)</span> <span class="n">Image</span> <span class="n">Position</span> <span class="p">(</span><span class="n">Patient</span><span class="p">)</span>            <span class="n">DS</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;-158.135803&#39;</span><span class="p">,</span> <span class="s1">&#39;-179.035797&#39;</span><span class="p">,</span> <span class="s1">&#39;-75.699997&#39;</span><span class="p">]</span>
+
+<span class="o">-</span> <span class="p">(</span><span class="mi">0020</span><span class="p">,</span> <span class="mi">0037</span><span class="p">)</span> <span class="n">Image</span> <span class="n">Orientation</span> <span class="p">(</span><span class="n">Patient</span><span class="p">)</span>         <span class="n">DS</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;1.0000&#39;</span><span class="p">,</span> <span class="s1">&#39;0.0000&#39;</span><span class="p">,</span> <span class="s1">&#39;0.0000&#39;</span><span class="p">,</span> <span class="s1">&#39;0.0000&#39;</span><span class="p">,</span> <span class="s1">&#39;1.0000&#39;</span><span class="p">,</span> <span class="s1">&#39;0.0000&#39;</span><span class="p">]</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0020</span><span class="p">,</span> <span class="mi">0037</span><span class="p">)</span> <span class="n">Image</span> <span class="n">Orientation</span> <span class="p">(</span><span class="n">Patient</span><span class="p">)</span>         <span class="n">DS</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;1.000000&#39;</span><span class="p">,</span> <span class="s1">&#39;0.000000&#39;</span><span class="p">,</span> <span class="s1">&#39;0.000000&#39;</span><span class="p">,</span> <span class="s1">&#39;0.000000&#39;</span><span class="p">,</span> <span class="s1">&#39;1.000000&#39;</span><span class="p">,</span> <span class="s1">&#39;0.000000&#39;</span><span class="p">]</span>
+
+<span class="o">-</span> <span class="p">(</span><span class="mi">0020</span><span class="p">,</span> <span class="mi">0052</span><span class="p">)</span> <span class="n">Frame</span> <span class="n">of</span> <span class="n">Reference</span> <span class="n">UID</span>              <span class="n">UI</span><span class="p">:</span> <span class="mf">1.3</span><span class="o">.</span><span class="mf">6.1</span><span class="o">.</span><span class="mf">4.1</span><span class="o">.</span><span class="mf">5962.1</span><span class="o">.</span><span class="mf">4.4</span><span class="o">.</span><span class="mf">1.20040826185059</span><span class="o">.</span><span class="mi">5457</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0020</span><span class="p">,</span> <span class="mi">0052</span><span class="p">)</span> <span class="n">Frame</span> <span class="n">of</span> <span class="n">Reference</span> <span class="n">UID</span>              <span class="n">UI</span><span class="p">:</span> <span class="mf">1.3</span><span class="o">.</span><span class="mf">6.1</span><span class="o">.</span><span class="mf">4.1</span><span class="o">.</span><span class="mf">5962.1</span><span class="o">.</span><span class="mf">4.1</span><span class="o">.</span><span class="mf">1.20040119072730</span><span class="o">.</span><span class="mi">12322</span>
+
+  <span class="p">(</span><span class="mi">0020</span><span class="p">,</span> <span class="mi">0060</span><span class="p">)</span> <span class="n">Laterality</span>                          <span class="n">CS</span><span class="p">:</span> <span class="s1">&#39;&#39;</span>
+
+<span class="o">-</span> <span class="p">(</span><span class="mi">0020</span><span class="p">,</span> <span class="mi">1040</span><span class="p">)</span> <span class="n">Position</span> <span class="n">Reference</span> <span class="n">Indicator</span>        <span class="n">LO</span><span class="p">:</span> <span class="s1">&#39;&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0020</span><span class="p">,</span> <span class="mi">1040</span><span class="p">)</span> <span class="n">Position</span> <span class="n">Reference</span> <span class="n">Indicator</span>        <span class="n">LO</span><span class="p">:</span> <span class="s1">&#39;SN&#39;</span>
+
+<span class="o">-</span> <span class="p">(</span><span class="mi">0020</span><span class="p">,</span> <span class="mi">1041</span><span class="p">)</span> <span class="n">Slice</span> <span class="n">Location</span>                      <span class="n">DS</span><span class="p">:</span> <span class="s2">&quot;0.0000&quot;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0020</span><span class="p">,</span> <span class="mi">1041</span><span class="p">)</span> <span class="n">Slice</span> <span class="n">Location</span>                      <span class="n">DS</span><span class="p">:</span> <span class="s2">&quot;-77.2040634155&quot;</span>
+
+  <span class="p">(</span><span class="mi">0020</span><span class="p">,</span> <span class="mi">4000</span><span class="p">)</span> <span class="n">Image</span> <span class="n">Comments</span>                      <span class="n">LT</span><span class="p">:</span> <span class="s1">&#39;Uncompressed&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0021</span><span class="p">,</span> <span class="mi">0010</span><span class="p">)</span> <span class="n">Private</span> <span class="n">Creator</span>                     <span class="n">LO</span><span class="p">:</span> <span class="s1">&#39;GEMS_RELA_01&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0021</span><span class="p">,</span> <span class="mi">1003</span><span class="p">)</span> <span class="p">[</span><span class="n">Series</span> <span class="kn">from</span> <span class="nn">which</span> <span class="n">Prescribed</span><span class="p">]</span>      <span class="n">SS</span><span class="p">:</span> <span class="mi">2</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0021</span><span class="p">,</span> <span class="mi">1005</span><span class="p">)</span> <span class="p">[</span><span class="n">Genesis</span> <span class="n">Version</span> <span class="o">-</span> <span class="n">now</span><span class="p">]</span>             <span class="n">SH</span><span class="p">:</span> <span class="s1">&#39;05&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0021</span><span class="p">,</span> <span class="mi">1007</span><span class="p">)</span> <span class="p">[</span><span class="n">Series</span> <span class="n">Record</span> <span class="n">checksum</span><span class="p">]</span>            <span class="n">UL</span><span class="p">:</span> <span class="mi">1605775145</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0021</span><span class="p">,</span> <span class="mi">1015</span><span class="p">)</span> <span class="p">[</span><span class="n">Unknown</span><span class="p">]</span>                           <span class="n">US</span><span class="p">:</span> <span class="mi">24078</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0021</span><span class="p">,</span> <span class="mi">1016</span><span class="p">)</span> <span class="p">[</span><span class="n">Unknown</span><span class="p">]</span>                           <span class="n">SS</span><span class="p">:</span> <span class="mi">2</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0021</span><span class="p">,</span> <span class="mi">1018</span><span class="p">)</span> <span class="p">[</span><span class="n">Genesis</span> <span class="n">version</span> <span class="o">-</span> <span class="n">Now</span><span class="p">]</span>             <span class="n">SH</span><span class="p">:</span> <span class="s1">&#39;05&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0021</span><span class="p">,</span> <span class="mi">1019</span><span class="p">)</span> <span class="p">[</span><span class="n">Acq</span> <span class="n">recon</span> <span class="n">record</span> <span class="n">checksum</span><span class="p">]</span>         <span class="n">UL</span><span class="p">:</span> <span class="mi">750675506</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0021</span><span class="p">,</span> <span class="mi">1037</span><span class="p">)</span> <span class="p">[</span><span class="n">Screen</span> <span class="n">Format</span><span class="p">]</span>                     <span class="n">SS</span><span class="p">:</span> <span class="mi">16</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0021</span><span class="p">,</span> <span class="mi">104</span><span class="n">a</span><span class="p">)</span> <span class="p">[</span><span class="n">Anatomical</span> <span class="n">reference</span> <span class="k">for</span> <span class="n">scout</span><span class="p">]</span>    <span class="n">LO</span><span class="p">:</span> <span class="s1">&#39;&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0021</span><span class="p">,</span> <span class="mi">1090</span><span class="p">)</span> <span class="p">[</span><span class="n">Tube</span> <span class="n">focal</span> <span class="n">spot</span> <span class="n">position</span><span class="p">]</span>          <span class="n">SS</span><span class="p">:</span> <span class="mi">7400</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0021</span><span class="p">,</span> <span class="mi">1091</span><span class="p">)</span> <span class="p">[</span><span class="n">Biopsy</span> <span class="n">position</span><span class="p">]</span>                   <span class="n">SS</span><span class="p">:</span> <span class="mi">0</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0021</span><span class="p">,</span> <span class="mi">1092</span><span class="p">)</span> <span class="p">[</span><span class="n">Biopsy</span> <span class="n">T</span> <span class="n">location</span><span class="p">]</span>                 <span class="n">FL</span><span class="p">:</span> <span class="mf">0.0</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0021</span><span class="p">,</span> <span class="mi">1093</span><span class="p">)</span> <span class="p">[</span><span class="n">Biopsy</span> <span class="n">ref</span> <span class="n">location</span><span class="p">]</span>               <span class="n">FL</span><span class="p">:</span> <span class="mf">0.0</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0023</span><span class="p">,</span> <span class="mi">0010</span><span class="p">)</span> <span class="n">Private</span> <span class="n">Creator</span>                     <span class="n">LO</span><span class="p">:</span> <span class="s1">&#39;GEMS_STDY_01&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0023</span><span class="p">,</span> <span class="mi">1070</span><span class="p">)</span> <span class="p">[</span><span class="n">Start</span> <span class="n">time</span><span class="p">(</span><span class="n">secs</span><span class="p">)</span> <span class="ow">in</span> <span class="n">first</span> <span class="n">axial</span><span class="p">]</span>   <span class="n">FD</span><span class="p">:</span> <span class="mf">862399761.111079</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0023</span><span class="p">,</span> <span class="mi">1074</span><span class="p">)</span> <span class="p">[</span><span class="n">No</span><span class="o">.</span> <span class="n">of</span> <span class="n">updates</span> <span class="n">to</span> <span class="n">header</span><span class="p">]</span>          <span class="n">SL</span><span class="p">:</span> <span class="mi">1</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0023</span><span class="p">,</span> <span class="mi">107</span><span class="n">d</span><span class="p">)</span> <span class="p">[</span><span class="n">Indicates</span> <span class="n">study</span> <span class="n">has</span> <span class="n">complete</span> <span class="n">info</span>  <span class="n">SS</span><span class="p">:</span> <span class="mi">0</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0025</span><span class="p">,</span> <span class="mi">0010</span><span class="p">)</span> <span class="n">Private</span> <span class="n">Creator</span>                     <span class="n">LO</span><span class="p">:</span> <span class="s1">&#39;GEMS_SERS_01&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0025</span><span class="p">,</span> <span class="mi">1006</span><span class="p">)</span> <span class="p">[</span><span class="n">Last</span> <span class="n">pulse</span> <span class="n">sequence</span> <span class="n">used</span><span class="p">]</span>          <span class="n">SS</span><span class="p">:</span> <span class="mi">0</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0025</span><span class="p">,</span> <span class="mi">1007</span><span class="p">)</span> <span class="p">[</span><span class="n">Images</span> <span class="ow">in</span> <span class="n">Series</span><span class="p">]</span>                  <span class="n">SL</span><span class="p">:</span> <span class="mi">44</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0025</span><span class="p">,</span> <span class="mi">1010</span><span class="p">)</span> <span class="p">[</span><span class="n">Landmark</span> <span class="n">Counter</span><span class="p">]</span>                  <span class="n">SL</span><span class="p">:</span> <span class="mi">0</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0025</span><span class="p">,</span> <span class="mi">1011</span><span class="p">)</span> <span class="p">[</span><span class="n">Number</span> <span class="n">of</span> <span class="n">Acquisitions</span><span class="p">]</span>            <span class="n">SS</span><span class="p">:</span> <span class="mi">0</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0025</span><span class="p">,</span> <span class="mi">1017</span><span class="p">)</span> <span class="p">[</span><span class="n">Series</span> <span class="n">Complete</span> <span class="n">Flag</span><span class="p">]</span>              <span class="n">SL</span><span class="p">:</span> <span class="mi">0</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0025</span><span class="p">,</span> <span class="mi">1018</span><span class="p">)</span> <span class="p">[</span><span class="n">Number</span> <span class="n">of</span> <span class="n">images</span> <span class="n">archived</span><span class="p">]</span>         <span class="n">SL</span><span class="p">:</span> <span class="mi">0</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0025</span><span class="p">,</span> <span class="mi">1019</span><span class="p">)</span> <span class="p">[</span><span class="n">Last</span> <span class="n">image</span> <span class="n">number</span> <span class="n">used</span><span class="p">]</span>            <span class="n">SL</span><span class="p">:</span> <span class="mi">4</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0025</span><span class="p">,</span> <span class="mi">101</span><span class="n">a</span><span class="p">)</span> <span class="p">[</span><span class="n">Primary</span> <span class="n">Receiver</span> <span class="n">Suite</span> <span class="ow">and</span> <span class="n">Host</span><span class="p">]</span>   <span class="n">SH</span><span class="p">:</span> <span class="s1">&#39;&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0027</span><span class="p">,</span> <span class="mi">0010</span><span class="p">)</span> <span class="n">Private</span> <span class="n">Creator</span>                     <span class="n">LO</span><span class="p">:</span> <span class="s1">&#39;GEMS_IMAG_01&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0027</span><span class="p">,</span> <span class="mi">1006</span><span class="p">)</span> <span class="p">[</span><span class="n">Image</span> <span class="n">archive</span> <span class="n">flag</span><span class="p">]</span>                <span class="n">SL</span><span class="p">:</span> <span class="mi">1</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0027</span><span class="p">,</span> <span class="mi">1010</span><span class="p">)</span> <span class="p">[</span><span class="n">Scout</span> <span class="n">Type</span><span class="p">]</span>                        <span class="n">SS</span><span class="p">:</span> <span class="mi">0</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0027</span><span class="p">,</span> <span class="mi">101</span><span class="n">c</span><span class="p">)</span> <span class="p">[</span><span class="n">Vma</span> <span class="n">mamp</span><span class="p">]</span>                          <span class="n">SL</span><span class="p">:</span> <span class="mi">150</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0027</span><span class="p">,</span> <span class="mi">101</span><span class="n">d</span><span class="p">)</span> <span class="p">[</span><span class="n">Vma</span> <span class="n">phase</span><span class="p">]</span>                         <span class="n">SS</span><span class="p">:</span> <span class="mi">1</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0027</span><span class="p">,</span> <span class="mi">101</span><span class="n">e</span><span class="p">)</span> <span class="p">[</span><span class="n">Vma</span> <span class="n">mod</span><span class="p">]</span>                           <span class="n">SL</span><span class="p">:</span> <span class="mi">24</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0027</span><span class="p">,</span> <span class="mi">101</span><span class="n">f</span><span class="p">)</span> <span class="p">[</span><span class="n">Vma</span> <span class="n">clip</span><span class="p">]</span>                          <span class="n">SL</span><span class="p">:</span> <span class="mi">129</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0027</span><span class="p">,</span> <span class="mi">1020</span><span class="p">)</span> <span class="p">[</span><span class="n">Smart</span> <span class="n">scan</span> <span class="n">ON</span><span class="o">/</span><span class="n">OFF</span> <span class="n">flag</span><span class="p">]</span>            <span class="n">SS</span><span class="p">:</span> <span class="mi">1</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0027</span><span class="p">,</span> <span class="mi">1030</span><span class="p">)</span> <span class="p">[</span><span class="n">Foreign</span> <span class="n">Image</span> <span class="n">Revision</span><span class="p">]</span>            <span class="n">SH</span><span class="p">:</span> <span class="s1">&#39;&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0027</span><span class="p">,</span> <span class="mi">1035</span><span class="p">)</span> <span class="p">[</span><span class="n">Plane</span> <span class="n">Type</span><span class="p">]</span>                        <span class="n">SS</span><span class="p">:</span> <span class="mi">2</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0027</span><span class="p">,</span> <span class="mi">1040</span><span class="p">)</span> <span class="p">[</span><span class="n">RAS</span> <span class="n">letter</span> <span class="n">of</span> <span class="n">image</span> <span class="n">location</span><span class="p">]</span>      <span class="n">SH</span><span class="p">:</span> <span class="s1">&#39;I&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0027</span><span class="p">,</span> <span class="mi">1041</span><span class="p">)</span> <span class="p">[</span><span class="n">Image</span> <span class="n">location</span><span class="p">]</span>                    <span class="n">FL</span><span class="p">:</span> <span class="o">-</span><span class="mf">77.20406341552734</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0027</span><span class="p">,</span> <span class="mi">1042</span><span class="p">)</span> <span class="p">[</span><span class="n">Center</span> <span class="n">R</span> <span class="n">coord</span> <span class="n">of</span> <span class="n">plane</span> <span class="n">image</span><span class="p">]</span>     <span class="n">FL</span><span class="p">:</span> <span class="o">-</span><span class="mf">11.199999809265137</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0027</span><span class="p">,</span> <span class="mi">1043</span><span class="p">)</span> <span class="p">[</span><span class="n">Center</span> <span class="n">A</span> <span class="n">coord</span> <span class="n">of</span> <span class="n">plane</span> <span class="n">image</span><span class="p">]</span>     <span class="n">FL</span><span class="p">:</span> <span class="mf">9.699999809265137</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0027</span><span class="p">,</span> <span class="mi">1044</span><span class="p">)</span> <span class="p">[</span><span class="n">Center</span> <span class="n">S</span> <span class="n">coord</span> <span class="n">of</span> <span class="n">plane</span> <span class="n">image</span><span class="p">]</span>     <span class="n">FL</span><span class="p">:</span> <span class="o">-</span><span class="mf">75.69999694824219</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0027</span><span class="p">,</span> <span class="mi">1045</span><span class="p">)</span> <span class="p">[</span><span class="n">Normal</span> <span class="n">R</span> <span class="n">coord</span><span class="p">]</span>                    <span class="n">FL</span><span class="p">:</span> <span class="mf">0.0</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0027</span><span class="p">,</span> <span class="mi">1046</span><span class="p">)</span> <span class="p">[</span><span class="n">Normal</span> <span class="n">A</span> <span class="n">coord</span><span class="p">]</span>                    <span class="n">FL</span><span class="p">:</span> <span class="mf">0.0</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0027</span><span class="p">,</span> <span class="mi">1047</span><span class="p">)</span> <span class="p">[</span><span class="n">Normal</span> <span class="n">S</span> <span class="n">coord</span><span class="p">]</span>                    <span class="n">FL</span><span class="p">:</span> <span class="o">-</span><span class="mf">1.0</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0027</span><span class="p">,</span> <span class="mi">1048</span><span class="p">)</span> <span class="p">[</span><span class="n">R</span> <span class="n">Coord</span> <span class="n">of</span> <span class="n">Top</span> <span class="n">Right</span> <span class="n">Corner</span><span class="p">]</span>       <span class="n">FL</span><span class="p">:</span> <span class="o">-</span><span class="mf">180.53579711914062</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0027</span><span class="p">,</span> <span class="mi">1049</span><span class="p">)</span> <span class="p">[</span><span class="n">A</span> <span class="n">Coord</span> <span class="n">of</span> <span class="n">Top</span> <span class="n">Right</span> <span class="n">Corner</span><span class="p">]</span>       <span class="n">FL</span><span class="p">:</span> <span class="mf">179.03579711914062</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0027</span><span class="p">,</span> <span class="mi">104</span><span class="n">a</span><span class="p">)</span> <span class="p">[</span><span class="n">S</span> <span class="n">Coord</span> <span class="n">of</span> <span class="n">Top</span> <span class="n">Right</span> <span class="n">Corner</span><span class="p">]</span>       <span class="n">FL</span><span class="p">:</span> <span class="o">-</span><span class="mf">75.69999694824219</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0027</span><span class="p">,</span> <span class="mi">104</span><span class="n">b</span><span class="p">)</span> <span class="p">[</span><span class="n">R</span> <span class="n">Coord</span> <span class="n">of</span> <span class="n">Bottom</span> <span class="n">Right</span> <span class="n">Corner</span><span class="p">]</span>    <span class="n">FL</span><span class="p">:</span> <span class="o">-</span><span class="mf">180.53579711914062</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0027</span><span class="p">,</span> <span class="mi">104</span><span class="n">c</span><span class="p">)</span> <span class="p">[</span><span class="n">A</span> <span class="n">Coord</span> <span class="n">of</span> <span class="n">Bottom</span> <span class="n">Right</span> <span class="n">Corner</span><span class="p">]</span>    <span class="n">FL</span><span class="p">:</span> <span class="o">-</span><span class="mf">159.63580322265625</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0027</span><span class="p">,</span> <span class="mi">104</span><span class="n">d</span><span class="p">)</span> <span class="p">[</span><span class="n">S</span> <span class="n">Coord</span> <span class="n">of</span> <span class="n">Bottom</span> <span class="n">Right</span> <span class="n">Corner</span><span class="p">]</span>    <span class="n">FL</span><span class="p">:</span> <span class="o">-</span><span class="mf">75.69999694824219</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0027</span><span class="p">,</span> <span class="mi">1050</span><span class="p">)</span> <span class="p">[</span><span class="n">Scan</span> <span class="n">Start</span> <span class="n">Location</span><span class="p">]</span>               <span class="n">FL</span><span class="p">:</span> <span class="o">-</span><span class="mf">63.19999694824219</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0027</span><span class="p">,</span> <span class="mi">1051</span><span class="p">)</span> <span class="p">[</span><span class="n">Scan</span> <span class="n">End</span> <span class="n">Location</span><span class="p">]</span>                 <span class="n">FL</span><span class="p">:</span> <span class="o">-</span><span class="mf">116.20304870605469</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0027</span><span class="p">,</span> <span class="mi">1052</span><span class="p">)</span> <span class="p">[</span><span class="n">RAS</span> <span class="n">letter</span> <span class="k">for</span> <span class="n">side</span> <span class="n">of</span> <span class="n">image</span><span class="p">]</span>      <span class="n">SH</span><span class="p">:</span> <span class="s1">&#39;L&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0027</span><span class="p">,</span> <span class="mi">1053</span><span class="p">)</span> <span class="p">[</span><span class="n">RAS</span> <span class="n">letter</span> <span class="k">for</span> <span class="n">anterior</span><span class="o">/</span><span class="n">posterior</span><span class="p">]</span> <span class="n">SH</span><span class="p">:</span> <span class="s1">&#39;A&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0027</span><span class="p">,</span> <span class="mi">1054</span><span class="p">)</span> <span class="p">[</span><span class="n">RAS</span> <span class="n">letter</span> <span class="k">for</span> <span class="n">scout</span> <span class="n">start</span> <span class="n">loc</span><span class="p">]</span>    <span class="n">SH</span><span class="p">:</span> <span class="s1">&#39;I&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0027</span><span class="p">,</span> <span class="mi">1055</span><span class="p">)</span> <span class="p">[</span><span class="n">RAS</span> <span class="n">letter</span> <span class="k">for</span> <span class="n">scout</span> <span class="n">end</span> <span class="n">loc</span><span class="p">]</span>      <span class="n">SH</span><span class="p">:</span> <span class="s1">&#39;I&#39;</span>
+
+  <span class="p">(</span><span class="mi">0028</span><span class="p">,</span> <span class="mi">0002</span><span class="p">)</span> <span class="n">Samples</span> <span class="n">per</span> <span class="n">Pixel</span>                   <span class="n">US</span><span class="p">:</span> <span class="mi">1</span>
+
+  <span class="p">(</span><span class="mi">0028</span><span class="p">,</span> <span class="mi">0004</span><span class="p">)</span> <span class="n">Photometric</span> <span class="n">Interpretation</span>          <span class="n">CS</span><span class="p">:</span> <span class="s1">&#39;MONOCHROME2&#39;</span>
+
+<span class="o">-</span> <span class="p">(</span><span class="mi">0028</span><span class="p">,</span> <span class="mi">0010</span><span class="p">)</span> <span class="n">Rows</span>                                <span class="n">US</span><span class="p">:</span> <span class="mi">64</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0028</span><span class="p">,</span> <span class="mi">0010</span><span class="p">)</span> <span class="n">Rows</span>                                <span class="n">US</span><span class="p">:</span> <span class="mi">128</span>
+
+<span class="o">-</span> <span class="p">(</span><span class="mi">0028</span><span class="p">,</span> <span class="mi">0011</span><span class="p">)</span> <span class="n">Columns</span>                             <span class="n">US</span><span class="p">:</span> <span class="mi">64</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0028</span><span class="p">,</span> <span class="mi">0011</span><span class="p">)</span> <span class="n">Columns</span>                             <span class="n">US</span><span class="p">:</span> <span class="mi">128</span>
+
+<span class="o">-</span> <span class="p">(</span><span class="mi">0028</span><span class="p">,</span> <span class="mi">0030</span><span class="p">)</span> <span class="n">Pixel</span> <span class="n">Spacing</span>                       <span class="n">DS</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;0.3125&#39;</span><span class="p">,</span> <span class="s1">&#39;0.3125&#39;</span><span class="p">]</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0028</span><span class="p">,</span> <span class="mi">0030</span><span class="p">)</span> <span class="n">Pixel</span> <span class="n">Spacing</span>                       <span class="n">DS</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;0.661468&#39;</span><span class="p">,</span> <span class="s1">&#39;0.661468&#39;</span><span class="p">]</span>
+
+  <span class="p">(</span><span class="mi">0028</span><span class="p">,</span> <span class="mi">0100</span><span class="p">)</span> <span class="n">Bits</span> <span class="n">Allocated</span>                      <span class="n">US</span><span class="p">:</span> <span class="mi">16</span>
+
+  <span class="p">(</span><span class="mi">0028</span><span class="p">,</span> <span class="mi">0101</span><span class="p">)</span> <span class="n">Bits</span> <span class="n">Stored</span>                         <span class="n">US</span><span class="p">:</span> <span class="mi">16</span>
+
+  <span class="p">(</span><span class="mi">0028</span><span class="p">,</span> <span class="mi">0102</span><span class="p">)</span> <span class="n">High</span> <span class="n">Bit</span>                            <span class="n">US</span><span class="p">:</span> <span class="mi">15</span>
+
+  <span class="p">(</span><span class="mi">0028</span><span class="p">,</span> <span class="mi">0103</span><span class="p">)</span> <span class="n">Pixel</span> <span class="n">Representation</span>                <span class="n">US</span><span class="p">:</span> <span class="mi">1</span>
+
+<span class="o">-</span> <span class="p">(</span><span class="mi">0028</span><span class="p">,</span> <span class="mi">0106</span><span class="p">)</span> <span class="n">Smallest</span> <span class="n">Image</span> <span class="n">Pixel</span> <span class="n">Value</span>          <span class="n">SS</span><span class="p">:</span> <span class="mi">0</span>
+
+<span class="o">-</span> <span class="p">(</span><span class="mi">0028</span><span class="p">,</span> <span class="mi">0107</span><span class="p">)</span> <span class="n">Largest</span> <span class="n">Image</span> <span class="n">Pixel</span> <span class="n">Value</span>           <span class="n">SS</span><span class="p">:</span> <span class="mi">4000</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0028</span><span class="p">,</span> <span class="mi">0120</span><span class="p">)</span> <span class="n">Pixel</span> <span class="n">Padding</span> <span class="n">Value</span>                 <span class="n">SS</span><span class="p">:</span> <span class="o">-</span><span class="mi">2000</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0028</span><span class="p">,</span> <span class="mi">1052</span><span class="p">)</span> <span class="n">Rescale</span> <span class="n">Intercept</span>                   <span class="n">DS</span><span class="p">:</span> <span class="s2">&quot;-1024&quot;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0028</span><span class="p">,</span> <span class="mi">1053</span><span class="p">)</span> <span class="n">Rescale</span> <span class="n">Slope</span>                       <span class="n">DS</span><span class="p">:</span> <span class="s2">&quot;1&quot;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0029</span><span class="p">,</span> <span class="mi">0010</span><span class="p">)</span> <span class="n">Private</span> <span class="n">Creator</span>                     <span class="n">LO</span><span class="p">:</span> <span class="s1">&#39;GEMS_IMPS_01&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0029</span><span class="p">,</span> <span class="mi">1004</span><span class="p">)</span> <span class="p">[</span><span class="n">Lower</span> <span class="nb">range</span> <span class="n">of</span> <span class="n">Pixels1</span><span class="p">]</span>            <span class="n">SL</span><span class="p">:</span> <span class="mi">0</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0029</span><span class="p">,</span> <span class="mi">1005</span><span class="p">)</span> <span class="p">[</span><span class="n">Lower</span> <span class="nb">range</span> <span class="n">of</span> <span class="n">Pixels1</span><span class="p">]</span>            <span class="n">DS</span><span class="p">:</span> <span class="s2">&quot;0.000000&quot;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0029</span><span class="p">,</span> <span class="mi">1006</span><span class="p">)</span> <span class="p">[</span><span class="n">Lower</span> <span class="nb">range</span> <span class="n">of</span> <span class="n">Pixels1</span><span class="p">]</span>            <span class="n">DS</span><span class="p">:</span> <span class="s2">&quot;0.000000&quot;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0029</span><span class="p">,</span> <span class="mi">1007</span><span class="p">)</span> <span class="p">[</span><span class="n">Lower</span> <span class="nb">range</span> <span class="n">of</span> <span class="n">Pixels1</span><span class="p">]</span>            <span class="n">SL</span><span class="p">:</span> <span class="mi">87</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0029</span><span class="p">,</span> <span class="mi">1008</span><span class="p">)</span> <span class="p">[</span><span class="n">Lower</span> <span class="nb">range</span> <span class="n">of</span> <span class="n">Pixels1</span><span class="p">]</span>            <span class="n">SH</span><span class="p">:</span> <span class="s1">&#39;&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0029</span><span class="p">,</span> <span class="mi">1009</span><span class="p">)</span> <span class="p">[</span><span class="n">Lower</span> <span class="nb">range</span> <span class="n">of</span> <span class="n">Pixels1</span><span class="p">]</span>            <span class="n">SH</span><span class="p">:</span> <span class="s1">&#39;&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0029</span><span class="p">,</span> <span class="mi">100</span><span class="n">a</span><span class="p">)</span> <span class="p">[</span><span class="n">Lower</span> <span class="nb">range</span> <span class="n">of</span> <span class="n">Pixels1</span><span class="p">]</span>            <span class="n">SS</span><span class="p">:</span> <span class="mi">764</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0029</span><span class="p">,</span> <span class="mi">1026</span><span class="p">)</span> <span class="p">[</span><span class="n">Version</span> <span class="n">of</span> <span class="n">the</span> <span class="n">hdr</span> <span class="n">struct</span><span class="p">]</span>         <span class="n">SS</span><span class="p">:</span> <span class="mi">2</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0029</span><span class="p">,</span> <span class="mi">1034</span><span class="p">)</span> <span class="p">[</span><span class="n">Advantage</span> <span class="n">comp</span><span class="o">.</span> <span class="n">Overflow</span><span class="p">]</span>          <span class="n">SL</span><span class="p">:</span> <span class="mi">0</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0029</span><span class="p">,</span> <span class="mi">1035</span><span class="p">)</span> <span class="p">[</span><span class="n">Advantage</span> <span class="n">comp</span><span class="o">.</span> <span class="n">Underflow</span><span class="p">]</span>         <span class="n">SL</span><span class="p">:</span> <span class="mi">0</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0043</span><span class="p">,</span> <span class="mi">0010</span><span class="p">)</span> <span class="n">Private</span> <span class="n">Creator</span>                     <span class="n">LO</span><span class="p">:</span> <span class="s1">&#39;GEMS_PARM_01&#39;</span>
+
+<span class="o">-</span> <span class="p">(</span><span class="mi">0028</span><span class="p">,</span> <span class="mi">1050</span><span class="p">)</span> <span class="n">Window</span> <span class="n">Center</span>                       <span class="n">DS</span><span class="p">:</span> <span class="s2">&quot;600&quot;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0043</span><span class="p">,</span> <span class="mi">1010</span><span class="p">)</span> <span class="p">[</span><span class="n">Window</span> <span class="n">value</span><span class="p">]</span>                      <span class="n">US</span><span class="p">:</span> <span class="mi">400</span>
+
+<span class="o">-</span> <span class="p">(</span><span class="mi">0028</span><span class="p">,</span> <span class="mi">1051</span><span class="p">)</span> <span class="n">Window</span> <span class="n">Width</span>                        <span class="n">DS</span><span class="p">:</span> <span class="s2">&quot;1600&quot;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0043</span><span class="p">,</span> <span class="mi">1011</span><span class="p">)</span> <span class="p">[</span><span class="n">Total</span> <span class="nb">input</span> <span class="n">views</span><span class="p">]</span>                 <span class="n">US</span><span class="p">:</span> <span class="mi">10431</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0043</span><span class="p">,</span> <span class="mi">1012</span><span class="p">)</span> <span class="p">[</span><span class="n">X</span><span class="o">-</span><span class="n">ray</span> <span class="n">chain</span><span class="p">]</span>                       <span class="n">SS</span><span class="p">:</span> <span class="p">[</span><span class="mi">14</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0043</span><span class="p">,</span> <span class="mi">1013</span><span class="p">)</span> <span class="p">[</span><span class="n">Decon</span> <span class="n">kernel</span> <span class="n">parameters</span><span class="p">]</span>           <span class="n">SS</span><span class="p">:</span> <span class="p">[</span><span class="mi">107</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">20</span><span class="p">]</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0043</span><span class="p">,</span> <span class="mi">1014</span><span class="p">)</span> <span class="p">[</span><span class="n">Calibration</span> <span class="n">parameters</span><span class="p">]</span>            <span class="n">SS</span><span class="p">:</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">]</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0043</span><span class="p">,</span> <span class="mi">1015</span><span class="p">)</span> <span class="p">[</span><span class="n">Total</span> <span class="n">output</span> <span class="n">views</span><span class="p">]</span>                <span class="n">SS</span><span class="p">:</span> <span class="mi">10431</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0043</span><span class="p">,</span> <span class="mi">1016</span><span class="p">)</span> <span class="p">[</span><span class="n">Number</span> <span class="n">of</span> <span class="n">overranges</span><span class="p">]</span>              <span class="n">SS</span><span class="p">:</span> <span class="mi">0</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0043</span><span class="p">,</span> <span class="mi">1017</span><span class="p">)</span> <span class="p">[</span><span class="n">IBH</span> <span class="n">image</span> <span class="n">scale</span> <span class="n">factors</span><span class="p">]</span>           <span class="n">DS</span><span class="p">:</span> <span class="s2">&quot;0.095000&quot;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0043</span><span class="p">,</span> <span class="mi">1018</span><span class="p">)</span> <span class="p">[</span><span class="n">BBH</span> <span class="n">coefficients</span><span class="p">]</span>                  <span class="n">DS</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;0.085000&#39;</span><span class="p">,</span> <span class="s1">&#39;1.102000&#39;</span><span class="p">,</span> <span class="s1">&#39;0.095000&#39;</span><span class="p">]</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0043</span><span class="p">,</span> <span class="mi">1019</span><span class="p">)</span> <span class="p">[</span><span class="n">Number</span> <span class="n">of</span> <span class="n">BBH</span> <span class="n">chains</span> <span class="n">to</span> <span class="n">blend</span><span class="p">]</span>     <span class="n">SS</span><span class="p">:</span> <span class="mi">350</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0043</span><span class="p">,</span> <span class="mi">101</span><span class="n">a</span><span class="p">)</span> <span class="p">[</span><span class="n">Starting</span> <span class="n">channel</span> <span class="n">number</span><span class="p">]</span>           <span class="n">SL</span><span class="p">:</span> <span class="mi">7</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0043</span><span class="p">,</span> <span class="mi">101</span><span class="n">b</span><span class="p">)</span> <span class="p">[</span><span class="n">Ppscan</span> <span class="n">parameters</span><span class="p">]</span>                 <span class="n">SS</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0043</span><span class="p">,</span> <span class="mi">101</span><span class="n">c</span><span class="p">)</span> <span class="p">[</span><span class="n">GE</span> <span class="n">image</span> <span class="n">integrity</span><span class="p">]</span>                <span class="n">SS</span><span class="p">:</span> <span class="mi">0</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0043</span><span class="p">,</span> <span class="mi">101</span><span class="n">d</span><span class="p">)</span> <span class="p">[</span><span class="n">Level</span> <span class="n">value</span><span class="p">]</span>                       <span class="n">SS</span><span class="p">:</span> <span class="mi">40</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0043</span><span class="p">,</span> <span class="mi">101</span><span class="n">e</span><span class="p">)</span> <span class="p">[</span><span class="n">Delta</span> <span class="n">Start</span> <span class="n">Time</span> <span class="p">[</span><span class="n">msec</span><span class="p">]]</span>           <span class="n">DS</span><span class="p">:</span> <span class="s2">&quot;2.000000&quot;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0043</span><span class="p">,</span> <span class="mi">101</span><span class="n">f</span><span class="p">)</span> <span class="p">[</span><span class="n">Max</span> <span class="n">overranges</span> <span class="ow">in</span> <span class="n">a</span> <span class="n">view</span><span class="p">]</span>          <span class="n">SL</span><span class="p">:</span> <span class="mi">0</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0043</span><span class="p">,</span> <span class="mi">1020</span><span class="p">)</span> <span class="p">[</span><span class="n">Avg</span> <span class="n">overranges</span> <span class="nb">all</span> <span class="n">views</span><span class="p">]</span>          <span class="n">DS</span><span class="p">:</span> <span class="s2">&quot;0.000000&quot;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0043</span><span class="p">,</span> <span class="mi">1021</span><span class="p">)</span> <span class="p">[</span><span class="n">Corrected</span> <span class="n">after</span> <span class="n">glow</span> <span class="n">terms</span><span class="p">]</span>        <span class="n">SS</span><span class="p">:</span> <span class="mi">0</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0043</span><span class="p">,</span> <span class="mi">1025</span><span class="p">)</span> <span class="p">[</span><span class="n">Reference</span> <span class="n">channels</span><span class="p">]</span>                <span class="n">SS</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">748</span><span class="p">,</span> <span class="mi">749</span><span class="p">,</span> <span class="mi">750</span><span class="p">]</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0043</span><span class="p">,</span> <span class="mi">1026</span><span class="p">)</span> <span class="p">[</span><span class="n">No</span> <span class="n">views</span> <span class="n">ref</span> <span class="n">chans</span> <span class="n">blocked</span><span class="p">]</span>        <span class="n">US</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0043</span><span class="p">,</span> <span class="mi">1027</span><span class="p">)</span> <span class="p">[</span><span class="n">Scan</span> <span class="n">Pitch</span> <span class="n">Ratio</span><span class="p">]</span>                  <span class="n">SH</span><span class="p">:</span> <span class="s1">&#39;/1.0:1&#39;</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0043</span><span class="p">,</span> <span class="mi">1028</span><span class="p">)</span> <span class="p">[</span><span class="n">Unique</span> <span class="n">image</span> <span class="n">iden</span><span class="p">]</span>                 <span class="n">OB</span><span class="p">:</span> <span class="n">Array</span> <span class="n">of</span> <span class="mi">80</span> <span class="nb">bytes</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0043</span><span class="p">,</span> <span class="mi">1029</span><span class="p">)</span> <span class="p">[</span><span class="n">Histogram</span> <span class="n">tables</span><span class="p">]</span>                  <span class="n">OB</span><span class="p">:</span> <span class="n">Array</span> <span class="n">of</span> <span class="mi">2068</span> <span class="nb">bytes</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0043</span><span class="p">,</span> <span class="mi">102</span><span class="n">a</span><span class="p">)</span> <span class="p">[</span><span class="n">User</span> <span class="n">defined</span> <span class="n">data</span><span class="p">]</span>                 <span class="n">OB</span><span class="p">:</span> <span class="n">Array</span> <span class="n">of</span> <span class="mi">40</span> <span class="nb">bytes</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0043</span><span class="p">,</span> <span class="mi">102</span><span class="n">b</span><span class="p">)</span> <span class="p">[</span><span class="n">Private</span> <span class="n">Scan</span> <span class="n">Options</span><span class="p">]</span>              <span class="n">SS</span><span class="p">:</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0043</span><span class="p">,</span> <span class="mi">1031</span><span class="p">)</span> <span class="p">[</span><span class="n">Recon</span> <span class="n">Center</span> <span class="n">Coordinates</span><span class="p">]</span>          <span class="n">DS</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;-11.200000&#39;</span><span class="p">,</span> <span class="s1">&#39;9.700000&#39;</span><span class="p">]</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0043</span><span class="p">,</span> <span class="mi">1040</span><span class="p">)</span> <span class="p">[</span><span class="n">Trigger</span> <span class="n">on</span> <span class="n">position</span><span class="p">]</span>               <span class="n">FL</span><span class="p">:</span> <span class="mf">178.07992553710938</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0043</span><span class="p">,</span> <span class="mi">1041</span><span class="p">)</span> <span class="p">[</span><span class="n">Degree</span> <span class="n">of</span> <span class="n">rotation</span><span class="p">]</span>                <span class="n">FL</span><span class="p">:</span> <span class="mf">3816.219482421875</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0043</span><span class="p">,</span> <span class="mi">1042</span><span class="p">)</span> <span class="p">[</span><span class="n">DAS</span> <span class="n">trigger</span> <span class="n">source</span><span class="p">]</span>                <span class="n">SL</span><span class="p">:</span> <span class="mi">0</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0043</span><span class="p">,</span> <span class="mi">1043</span><span class="p">)</span> <span class="p">[</span><span class="n">DAS</span> <span class="n">fpa</span> <span class="n">gain</span><span class="p">]</span>                      <span class="n">SL</span><span class="p">:</span> <span class="mi">0</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0043</span><span class="p">,</span> <span class="mi">1044</span><span class="p">)</span> <span class="p">[</span><span class="n">DAS</span> <span class="n">output</span> <span class="n">source</span><span class="p">]</span>                 <span class="n">SL</span><span class="p">:</span> <span class="mi">1</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0043</span><span class="p">,</span> <span class="mi">1045</span><span class="p">)</span> <span class="p">[</span><span class="n">DAS</span> <span class="n">ad</span> <span class="nb">input</span><span class="p">]</span>                      <span class="n">SL</span><span class="p">:</span> <span class="mi">1</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0043</span><span class="p">,</span> <span class="mi">1046</span><span class="p">)</span> <span class="p">[</span><span class="n">DAS</span> <span class="n">cal</span> <span class="n">mode</span><span class="p">]</span>                      <span class="n">SL</span><span class="p">:</span> <span class="mi">3</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0043</span><span class="p">,</span> <span class="mi">1047</span><span class="p">)</span> <span class="p">[</span><span class="n">DAS</span> <span class="n">cal</span> <span class="n">frequency</span><span class="p">]</span>                 <span class="n">SL</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0043</span><span class="p">,</span> <span class="mi">1048</span><span class="p">)</span> <span class="p">[</span><span class="n">DAS</span> <span class="n">reg</span> <span class="n">xm</span><span class="p">]</span>                        <span class="n">SL</span><span class="p">:</span> <span class="mi">1</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0043</span><span class="p">,</span> <span class="mi">1049</span><span class="p">)</span> <span class="p">[</span><span class="n">DAS</span> <span class="n">auto</span> <span class="n">zero</span><span class="p">]</span>                     <span class="n">SL</span><span class="p">:</span> <span class="mi">0</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0043</span><span class="p">,</span> <span class="mi">104</span><span class="n">a</span><span class="p">)</span> <span class="p">[</span><span class="n">Starting</span> <span class="n">channel</span> <span class="n">of</span> <span class="n">view</span><span class="p">]</span>          <span class="n">SS</span><span class="p">:</span> <span class="mi">1</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0043</span><span class="p">,</span> <span class="mi">104</span><span class="n">b</span><span class="p">)</span> <span class="p">[</span><span class="n">DAS</span> <span class="n">xm</span> <span class="n">pattern</span><span class="p">]</span>                    <span class="n">SL</span><span class="p">:</span> <span class="mi">0</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0043</span><span class="p">,</span> <span class="mi">104</span><span class="n">c</span><span class="p">)</span> <span class="p">[</span><span class="n">TGGC</span> <span class="n">trigger</span> <span class="n">mode</span><span class="p">]</span>                 <span class="n">SS</span><span class="p">:</span> <span class="mi">0</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0043</span><span class="p">,</span> <span class="mi">104</span><span class="n">d</span><span class="p">)</span> <span class="p">[</span><span class="n">Start</span> <span class="n">scan</span> <span class="n">to</span> <span class="n">X</span><span class="o">-</span><span class="n">ray</span> <span class="n">on</span> <span class="n">delay</span><span class="p">]</span>      <span class="n">FL</span><span class="p">:</span> <span class="mf">0.0</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">0043</span><span class="p">,</span> <span class="mi">104</span><span class="n">e</span><span class="p">)</span> <span class="p">[</span><span class="n">Duration</span> <span class="n">of</span> <span class="n">X</span><span class="o">-</span><span class="n">ray</span> <span class="n">on</span><span class="p">]</span>              <span class="n">FL</span><span class="p">:</span> <span class="mf">10.60060977935791</span>
+
+<span class="o">-</span> <span class="p">(</span><span class="mi">7</span><span class="n">fe0</span><span class="p">,</span> <span class="mi">0010</span><span class="p">)</span> <span class="n">Pixel</span> <span class="n">Data</span>                          <span class="n">OW</span><span class="p">:</span> <span class="n">Array</span> <span class="n">of</span> <span class="mi">8192</span> <span class="nb">bytes</span>
+
+<span class="o">+</span> <span class="p">(</span><span class="mi">7</span><span class="n">fe0</span><span class="p">,</span> <span class="mi">0010</span><span class="p">)</span> <span class="n">Pixel</span> <span class="n">Data</span>                          <span class="n">OW</span><span class="p">:</span> <span class="n">Array</span> <span class="n">of</span> <span class="mi">32768</span> <span class="nb">bytes</span>
+
+  <span class="p">(</span><span class="n">fffc</span><span class="p">,</span> <span class="n">fffc</span><span class="p">)</span> <span class="n">Data</span> <span class="n">Set</span> <span class="n">Trailing</span> <span class="n">Padding</span>           <span class="n">OB</span><span class="p">:</span> <span class="n">Array</span> <span class="n">of</span> <span class="mi">126</span> <span class="nb">bytes</span>
+</pre></div>
+</div>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># authors : Guillaume Lemaitre &lt;g.lemaitre58@gmail.com&gt;</span>
+<span class="c1"># license : MIT</span>
+
+<span class="kn">import</span> <span class="nn">difflib</span>
+
+<span class="kn">import</span> <span class="nn">pydicom</span>
+<span class="kn">from</span> <span class="nn">pydicom.data</span> <span class="kn">import</span> <span class="n">get_testdata_files</span>
+
+<span class="k">print</span><span class="p">(</span><span class="vm">__doc__</span><span class="p">)</span>
+
+<span class="n">filename_mr</span> <span class="o">=</span> <span class="n">get_testdata_files</span><span class="p">(</span><span class="s1">&#39;MR_small.dcm&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">filename_ct</span> <span class="o">=</span> <span class="n">get_testdata_files</span><span class="p">(</span><span class="s1">&#39;CT_small.dcm&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="n">datasets</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="n">pydicom</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+                  <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="p">(</span><span class="n">filename_mr</span><span class="p">,</span> <span class="n">filename_ct</span><span class="p">)])</span>
+
+<span class="c1"># difflib compare functions require a list of lines, each terminated with</span>
+<span class="c1"># newline character massage the string representation of each dicom dataset</span>
+<span class="c1"># into this form:</span>
+<span class="n">rep</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">dataset</span> <span class="ow">in</span> <span class="n">datasets</span><span class="p">:</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">line</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">]</span>  <span class="c1"># add the newline to end</span>
+    <span class="n">rep</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+
+
+<span class="n">diff</span> <span class="o">=</span> <span class="n">difflib</span><span class="o">.</span><span class="n">Differ</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">diff</span><span class="o">.</span><span class="n">compare</span><span class="p">(</span><span class="n">rep</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">rep</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+    <span class="k">if</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;?&quot;</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Total running time of the script:</strong> ( 0 minutes  0.526 seconds)</p>
+<div class="sphx-glr-footer docutils container">
+<div class="sphx-glr-download docutils container">
+<a class="reference download internal" href="../_downloads/plot_dicom_difference.py" download=""><code class="xref download docutils literal"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_dicom_difference.py</span></code></a></div>
+<div class="sphx-glr-download docutils container">
+<a class="reference download internal" href="../_downloads/plot_dicom_difference.ipynb" download=""><code class="xref download docutils literal"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_dicom_difference.ipynb</span></code></a></div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Generated by Sphinx-Gallery</a></p>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="show_charset_name.html" class="btn btn-neutral float-right" title="Display unicode person names" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral" title="General examples" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2017, Darcy Mason and pydicom contributors.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'1.0a',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

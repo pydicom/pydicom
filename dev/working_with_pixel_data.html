@@ -34,14 +34,17 @@
   
     <link rel="stylesheet" href="_static/gallery.css" type="text/css" />
   
+    <link rel="stylesheet" href="_static/css/pydicom.css" type="text/css" />
+  
 
   
         <link rel="index" title="Index"
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
     <link rel="top" title="pydicom 1.0a documentation" href="index.html"/>
+        <link rel="up" title="Pydicom User Guide" href="pydicom_user_guide.html"/>
         <link rel="next" title="Viewing Images" href="viewing_images.html"/>
-        <link rel="prev" title="Transition to pydicom 1.x" href="transition_to_pydicom1.html"/> 
+        <link rel="prev" title="Core elements in pydicom" href="base_element.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -97,21 +100,31 @@
               
             
             
-              <ul class="current">
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started with pydicom</a></li>
-<li class="toctree-l1"><a class="reference internal" href="pydicom_user_guide.html">Pydicom User Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="transition_to_pydicom1.html">Transition to pydicom 1.x</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Working with Pixel Data</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#introduction">Introduction</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#pixel-array">pixel_array</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="pydicom_user_guide.html">Pydicom User Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="transition_to_pydicom1.html">Transition to pydicom 1.x</a></li>
+<li class="toctree-l2"><a class="reference internal" href="base_element.html">Core elements in pydicom</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Working with Pixel Data</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#introduction">Introduction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pixel-array"><code class="docutils literal"><span class="pre">pixel_array</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="viewing_images.html">Viewing Images</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ref_guide.html">Pydicom Reference Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="viewing_images.html">Viewing Images</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Tutorial - Examples</span></p>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ref_guide.html">Pydicom API’s Reference Guide</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Examples</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html">General examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html#image-processing">Image processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html#input-output">Input-output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html#metadata-processing">Metadata processing</a></li>
 </ul>
 
             
@@ -156,6 +169,8 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
+          <li><a href="pydicom_user_guide.html">Pydicom User Guide</a> &raquo;</li>
+        
       <li>Working with Pixel Data</li>
     
     
@@ -177,38 +192,38 @@
             
   <div class="section" id="working-with-pixel-data">
 <span id="id1"></span><h1>Working with Pixel Data<a class="headerlink" href="#working-with-pixel-data" title="Permalink to this headline">¶</a></h1>
+<p>..currentmodule:: pydicom</p>
 <p class="rubric">How to work with pixel data in pydicom.</p>
 <div class="section" id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
-<p>pydicom tends to be “lazy” in interpreting DICOM data. For example,
-by default it doesn’t do anything with pixel data
-except read in the raw bytes:</p>
+<p>pydicom tends to be “lazy” in interpreting DICOM data. For example, by default
+it doesn’t do anything with pixel data except read in the raw bytes:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pydicom</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">=</span><span class="n">pydicom</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="s2">&quot;MR_small.dcm&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span>
-<span class="go">&#39;\x89\x03\xfb\x03\xcb\x04\xeb\x04\xf9\x02\x94\x01\x7f ...</span>
-<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.data</span> <span class="k">import</span> <span class="n">get_testdata_files</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">filename</span> <span class="o">=</span> <span class="n">get_testdata_files</span><span class="p">(</span><span class="s2">&quot;MR_small.dcm&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span> 
+<span class="go">b&#39;\x89\x03\xfb\x03\xcb\x04\xeb\x04\xf9\x02\x94\x01\x7f...</span>
 </pre></div>
 </div>
-<p><code class="docutils literal"><span class="pre">PixelData</span></code> contains the raw bytes exactly as found in the file.
-If the image is JPEG compressed, these bytes will be the compressed
-pixel data, not the expanded, uncompressed image. Whether the image is
-e.g. 16-bit or 8-bit, multiple frames or not, <code class="docutils literal"><span class="pre">PixelData</span></code> contains the same
-raw bytes. But there is a function that can shape the pixels more sensibly
-if you need to work with them…</p>
+<p><code class="docutils literal"><span class="pre">PixelData</span></code> contains the raw bytes exactly as found in the file. If the
+image is JPEG compressed, these bytes will be the compressed pixel data, not
+the expanded, uncompressed image. Whether the image is e.g. 16-bit or 8-bit,
+multiple frames or not, <code class="docutils literal"><span class="pre">PixelData</span></code> contains the same raw bytes. But there is
+a function that can shape the pixels more sensibly if you need to work with
+them …</p>
 </div>
 <div class="section" id="pixel-array">
-<h2>pixel_array<a class="headerlink" href="#pixel-array" title="Permalink to this headline">¶</a></h2>
+<h2><code class="docutils literal"><span class="pre">pixel_array</span></code><a class="headerlink" href="#pixel-array" title="Permalink to this headline">¶</a></h2>
 <div class="admonition warning">
 <p class="first admonition-title">Warning</p>
-<p class="last">To work with the pixel_array property <a class="reference external" href="http://numpy.org/">NumPy</a>
-must be installed on your system.</p>
+<p class="last">To work with the pixel_array property <a class="reference external" href="http://numpy.org/">NumPy</a> must be
+installed on your system.</p>
 </div>
-<p>A property of Dataset called <code class="docutils literal"><span class="pre">pixel_array</span></code> provides more useful pixel data
-for uncompressed images. The <code class="docutils literal"><span class="pre">pixel_array</span></code> property returns a NumPy array:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">dicom</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">=</span><span class="n">pydicom</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="s2">&quot;MR_small.dcm&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">pixel_array</span>
+<p>A property of <code class="xref py py-class docutils literal"><span class="pre">dataset.Dataset</span></code> called <code class="docutils literal"><span class="pre">pixel_array</span></code> provides more
+useful pixel data for uncompressed images. The <code class="docutils literal"><span class="pre">pixel_array</span></code> property returns
+a NumPy array:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">pixel_array</span> 
 <span class="go">array([[ 905, 1019, 1227, ...,  302,  304,  328],</span>
 <span class="go">       [ 628,  770,  907, ...,  298,  331,  355],</span>
 <span class="go">       [ 498,  566,  706, ...,  280,  285,  320],</span>
@@ -229,10 +244,13 @@ they must be written back to the <code class="docutils literal"><span class="pre
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><span class="s2">&quot;newfilename.dcm&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Some changes may require other DICOM tags to be modified. For example,
-if the pixel data is reduced (e.g. a 512x512 image is collapsed to 256x256)
-then <code class="docutils literal"><span class="pre">ds.Rows</span></code> and <code class="docutils literal"><span class="pre">ds.Columns</span></code> should be set appropriately.
-You must explicitly set these yourself; pydicom does not do so automatically.</p>
+<p>Some changes may require other DICOM tags to be modified. For example, if the
+pixel data is reduced (e.g. a <img class="math" src="_images/math/d72b335725fd86466c687f792396cb4120b0eeed.png" alt="512 \times 512"/> image is collapsed to
+<img class="math" src="_images/math/459c4906bea7c4dc223f826a88f8d1083af8e692.png" alt="256 \times 256"/>) then <code class="docutils literal"><span class="pre">ds.Rows</span></code> and <code class="docutils literal"><span class="pre">ds.Columns</span></code> should be set
+appropriately. You must explicitly set these yourself; pydicom does not do so
+automatically.</p>
+<p>See <a class="reference internal" href="auto_examples/image_processing/plot_downsize_image.html#sphx-glr-auto-examples-image-processing-plot-downsize-image-py"><span class="std std-ref">Downsize MRI image using pydicom</span></a> for
+an example.</p>
 <p><code class="docutils literal"><span class="pre">pixel_array</span></code> can also be used to pass image data to graphics libraries
 for viewing. See <a class="reference internal" href="viewing_images.html"><span class="doc">Viewing Images</span></a> for details.</p>
 </div>
@@ -251,7 +269,7 @@ for viewing. See <a class="reference internal" href="viewing_images.html"><span 
         <a href="viewing_images.html" class="btn btn-neutral float-right" title="Viewing Images" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="transition_to_pydicom1.html" class="btn btn-neutral" title="Transition to pydicom 1.x" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="base_element.html" class="btn btn-neutral" title="Core elements in pydicom" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

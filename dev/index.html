@@ -34,6 +34,8 @@
   
     <link rel="stylesheet" href="_static/gallery.css" type="text/css" />
   
+    <link rel="stylesheet" href="_static/css/pydicom.css" type="text/css" />
+  
 
   
         <link rel="index" title="Index"
@@ -96,17 +98,21 @@
               
             
             
-              <ul>
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started with pydicom</a></li>
-<li class="toctree-l1"><a class="reference internal" href="pydicom_user_guide.html">Pydicom User Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="transition_to_pydicom1.html">Transition to pydicom 1.x</a></li>
-<li class="toctree-l1"><a class="reference internal" href="working_with_pixel_data.html">Working with Pixel Data</a></li>
-<li class="toctree-l1"><a class="reference internal" href="viewing_images.html">Viewing Images</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ref_guide.html">Pydicom Reference Guide</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Tutorial - Examples</span></p>
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="pydicom_user_guide.html">Pydicom User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ref_guide.html">Pydicom API’s Reference Guide</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Examples</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html">General examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html#image-processing">Image processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html#input-output">Input-output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html#metadata-processing">Metadata processing</a></li>
 </ul>
 
             
@@ -172,66 +178,32 @@
             
   <div class="section" id="pydicom-documentation">
 <h1>pydicom documentation<a class="headerlink" href="#pydicom-documentation" title="Permalink to this headline">¶</a></h1>
-<p>Contents:</p>
 <div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started with pydicom</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="getting_started.html#introduction">Introduction</a></li>
-<li class="toctree-l2"><a class="reference internal" href="getting_started.html#license">License</a></li>
-<li class="toctree-l2"><a class="reference internal" href="getting_started.html#installing">Installing</a></li>
-<li class="toctree-l2"><a class="reference internal" href="getting_started.html#using-pydicom">Using pydicom</a></li>
-<li class="toctree-l2"><a class="reference internal" href="getting_started.html#support">Support</a></li>
-<li class="toctree-l2"><a class="reference internal" href="getting_started.html#next-steps">Next Steps</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="pydicom_user_guide.html">Pydicom User Guide</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="pydicom_user_guide.html#dataset">Dataset</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pydicom_user_guide.html#dataelement">DataElement</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pydicom_user_guide.html#tag">Tag</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pydicom_user_guide.html#sequence">Sequence</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="transition_to_pydicom1.html">Transition to pydicom 1.x</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="transition_to_pydicom1.html#introduction">Introduction</a></li>
-<li class="toctree-l2"><a class="reference internal" href="transition_to_pydicom1.html#for-authors-of-packages-requiring-pydicom-1-0">For authors of packages requiring pydicom &lt; 1.0</a></li>
-<li class="toctree-l2"><a class="reference internal" href="transition_to_pydicom1.html#error-messages-relating-to-the-pydicom-transition">Error messages relating to the pydicom transition</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="working_with_pixel_data.html">Working with Pixel Data</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="working_with_pixel_data.html#introduction">Introduction</a></li>
-<li class="toctree-l2"><a class="reference internal" href="working_with_pixel_data.html#pixel-array">pixel_array</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="viewing_images.html">Viewing Images</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="viewing_images.html#introduction">Introduction</a></li>
-<li class="toctree-l2"><a class="reference internal" href="viewing_images.html#using-pydicom-with-matplotlib">Using pydicom with matplotlib</a></li>
-<li class="toctree-l2"><a class="reference internal" href="viewing_images.html#using-pydicom-with-tkinter">Using pydicom with Tkinter</a></li>
-<li class="toctree-l2"><a class="reference internal" href="viewing_images.html#using-pydicom-with-python-imaging-library-pil">Using pydicom with Python Imaging Library (PIL)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="viewing_images.html#using-pydicom-with-wxpython">Using pydicom with wxPython</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="ref_guide.html">Pydicom Reference Guide</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="ref_guide.html#file-reading-parsing">File Reading/Parsing</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ref_guide.html#file-writing">File Writing</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ref_guide.html#dataset">Dataset</a></li>
-</ul>
-</li>
-</ul>
 </div>
 <div class="toctree-wrapper compound">
-<p class="caption"><span class="caption-text">Tutorial - Examples</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html">General examples</a></li>
-</ul>
 </div>
+<div class="toctree-wrapper compound">
 </div>
-<div class="section" id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
-<ul class="simple">
-<li><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></li>
-<li><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></li>
-<li><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></li>
-</ul>
+<div class="section" id="id1">
+<h2><a class="reference external" href="getting_started.html">Getting started</a><a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<p>Information to install, test, and contribute to the package.</p>
+</div>
+<div class="section" id="id2">
+<h2><a class="reference external" href="pydicom_user_guide.html">User Guide</a><a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<p>The main documentation. This contains an in-depth description of all
+core elements of pydicom and how to apply them.</p>
+</div>
+<div class="section" id="id3">
+<h2><a class="reference external" href="ref_guide.html">API Documentation</a><a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+<p>The exact API of all functions and classes, as given in the
+doctring. The API documents expected types and allowed features for
+all functions, and all parameters available for the core elements.</p>
+</div>
+<div class="section" id="id4">
+<h2><a class="reference external" href="auto_examples/index.html">Examples</a><a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
+<p>A set of examples illustrating the use of the different core elements. It
+complements the <a class="reference external" href="pydicom_user_guide.html">User Guide</a>.</p>
+</div>
 </div>
 
 
