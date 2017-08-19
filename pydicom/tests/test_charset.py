@@ -13,6 +13,7 @@ import pydicom.charset
 from pydicom.compat import in_py2
 from pydicom.data import get_charset_files
 from pydicom.data import get_testdata_files
+from pydicom.dataelem import DataElement
 
 latin1_file = get_charset_files("chrFren.dcm")[0]
 jp_file = get_charset_files("chrH31.dcm")[0]
