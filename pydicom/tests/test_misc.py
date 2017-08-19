@@ -9,6 +9,7 @@ from pydicom.data import get_testdata_files
 from pydicom.misc import is_dicom, size_in_bytes
 
 test_file = get_testdata_files('CT_small.dcm')[0]
+no_meta_file = get_testdata_files('ExplVR_LitEndNoMeta.dcm')[0]
 
 
 class TestMisc(object):
@@ -16,7 +17,6 @@ class TestMisc(object):
         """Test the is_dicom function."""
         invalid_file = test_file.replace('CT_', 'CT')  # invalid file
         notdicom_file = os.path.abspath(__file__)  # use own file
-        nometa_file = get_testdata_files('ExplVR_LitEndNoMeta.dcm')[0]
 
         # valid file returns True
         assert is_dicom(test_file)
@@ -29,7 +29,7 @@ class TestMisc(object):
             is_dicom(invalid_file)
 
         # Test no meta prefix/preamble fails
-        assert not is_dicom(nometa_file)
+        assert not is_dicom(no_meta_file)
 
     def test_size_in_bytes(self):
         """Test convenience function size_in_bytes()."""
