@@ -1,6 +1,11 @@
+"""
+Use the jpeg_ls (CharPyLS) python package
+to decode pixel transfer syntaxes.
+"""
 import sys
 import pydicom
 import pydicom.uid
+
 have_numpy = True
 try:
     import numpy
@@ -23,22 +28,40 @@ JPEGLSSupportedTransferSyntaxes = [
 
 
 def supports_transfer_syntax(dicom_dataset):
+    """
+    Returns
+    -------
+    bool
+        True if this pixel data handler might support this transfer syntax.
+
+        False to prevent any attempt to try to use this handler
+        to decode the given transfer syntax
+    """
     return (dicom_dataset.file_meta.TransferSyntaxUID
             in JPEGLSSupportedTransferSyntaxes)
 
 
 def get_pixeldata(dicom_dataset):
-    """Use jpeg_ls to decompress compressed Pixel Data.
+    """
+    Use the jpeg_ls package to decode the PixelData attribute
 
     Returns
     -------
-    bytes or str
-        The decompressed Pixel Data
+    numpy.ndarray
+
+        A correctly sized (but not shaped) numpy array
+        of the entire data volume
 
     Raises
     ------
     ImportError
-        If jpeg_ls is not available.
+        if the required packages are not available
+
+    NotImplementedError
+        if the transfer syntax is not supported
+
+    TypeError
+        if the pixel data type is unsupported
     """
     if (dicom_dataset.file_meta.TransferSyntaxUID
             not in JPEGLSSupportedTransferSyntaxes):

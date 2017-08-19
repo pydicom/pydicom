@@ -11,8 +11,8 @@ from pydicom.datadict import keyword_for_tag
 from pydicom.dataset import Dataset
 from pydicom.filebase import DicomFile, DicomFileLike
 from pydicom.multival import MultiValue
-from pydicom.tag import Tag, ItemTag, ItemDelimiterTag, SequenceDelimiterTag
-from pydicom.tagtools import tag_in_exception
+from pydicom.tag import (Tag, ItemTag, ItemDelimiterTag, SequenceDelimiterTag,
+                         tag_in_exception)
 from pydicom.uid import (PYDICOM_IMPLEMENTATION_UID, ImplicitVRLittleEndian,
                          ExplicitVRBigEndian)
 from pydicom.valuerep import extra_length_VRs

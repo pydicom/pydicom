@@ -4,7 +4,8 @@ import re
 import pytest
 import pydicom
 from pydicom.filereader import read_file
-from pydicom.data import DATA_ROOT
+from pydicom.data import get_testdata_files
+
 pillow_missing_message = ("pillow is not available "
                           "in this test environment")
 pillow_present_message = "pillow is being tested"
@@ -40,14 +41,10 @@ try:
 except ImportError:
     gdcm_handler = None
 
-test_files = os.path.join(DATA_ROOT, 'test_files')
-
-mr_name = os.path.join(test_files, "MR_small.dcm")
-compressed_mr_name = os.path.join(
-    test_files, "MR_small_RLE.dcm")
-emri_name = os.path.join(test_files, "emri_small.dcm")
-compressed_emri_name = os.path.join(
-    test_files, "emri_small_RLE.dcm")
+mr_name = get_testdata_files("MR_small.dcm")[0]
+compressed_mr_name = get_testdata_files("MR_small_RLE.dcm")[0]
+emri_name = get_testdata_files("emri_small.dcm")[0]
+compressed_emri_name = get_testdata_files("emri_small_RLE.dcm")[0]
 dir_name = os.path.dirname(sys.argv[0])
 save_dir = os.getcwd()
 

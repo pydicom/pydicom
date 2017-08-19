@@ -55,6 +55,7 @@ div.sphx-glr-download a {
     background-image: none !important;
     background-color: #ffdf5a !important;
     border: 1px solid #cea455 !important;
+    min-width: 20em;
 }
 
 div.sphx-glr-download a:hover {
@@ -62,4 +63,8 @@ div.sphx-glr-download a:hover {
     background-color: #3f7cad !important;
     color: white !important;
     border: 1px solid #3f7cad !important;
+}
+
+.section {
+    padding-bottom:20px !important;
 }

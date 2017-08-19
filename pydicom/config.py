@@ -106,6 +106,10 @@ have_numpy = True
 try:
     import pydicom.pixel_data_handlers.numpy_handler as numpy_handler
     image_handlers.append(numpy_handler)
+
+    import pydicom.pixel_data_handlers.rle_handler as rle_handler
+    image_handlers.append(rle_handler)
+
 except ImportError as e:
     logger.debug("Could not import numpy")
     have_numpy = False

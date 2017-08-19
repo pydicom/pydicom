@@ -48,6 +48,7 @@ python_encoding = {
     'ISO 2022 IR 149': 'euc_kr',  # needs cleanup via clean_escseq()
     'ISO 2022 IR 159': 'iso-2022-jp',
     'ISO 2022 IR 166': 'iso_ir_166',
+    'ISO 2022 IR 58': 'iso_ir_58',
     'ISO_IR 192': 'UTF8',  # from Chinese example, 2008 PS3.5 Annex J p1-4
     'GB18030': 'GB18030',
     'ISO 2022 GBK': 'GBK',  # from DICOM correction CP1234
