@@ -32,7 +32,6 @@ from pydicom.uid import UncompressedPixelTransferSyntaxes
 import pydicom  # for write_file
 import pydicom.charset
 from pydicom.config import logger
-import pydicom.encaps
 import pydicom.config
 
 sys_is_little_endian = (sys.byteorder == 'little')
