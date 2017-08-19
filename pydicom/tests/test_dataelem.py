@@ -305,15 +305,23 @@ class DataElementTests(unittest.TestCase):
     @unittest.skipIf(sys.version_info >= (3, ), 'Testing Python 2 behavior')
     def test_unicode(self):
         """Test unicode representation of the DataElement"""
-        elem = DataElement(0x00100010, 'PN', 'ANON')
+        elem = DataElement(0x00100010, 'PN', u'ANON')
+        # Make sure elem.value is actually unicode
+        assert isinstance(elem.value, unicode)
+        assert unicode(elem) == (
+            u"(0010, 0010) Patient's Name                      PN: ANON"
+        )
         assert isinstance(unicode(elem), unicode)
-        assert u"(0010, 0010) Patient's Name" in unicode(elem)
-        assert u"PN: 'ANON'" in unicode(elem)
+        assert not isinstance(unicode(elem), str)
+        # Make sure elem.value is still unicode
+        assert isinstance(elem.value, unicode)
 
+        # When value is not in compat.text_type
         elem = DataElement(0x00100010, 'LO', 12345)
         assert isinstance(unicode(elem), unicode)
-        assert u"(0010, 0010) Patient's Name" in unicode(elem)
-        assert u"LO: 12345" in unicode(elem)
+        assert unicode(elem) == (
+            u"(0010, 0010) Patient's Name                      LO: 12345"
+        )
 
     def test_getitem_raises(self):
         """Test DataElement.__getitem__ raise if value not indexable"""
