@@ -111,6 +111,10 @@ class DataElementTests(unittest.TestCase):
         elem = DataElement(0x00110010, 'LO', 12345)
         elem.private_creator = 'TEST'
         assert elem.description() == 'Private tag data'
+        elem = DataElement(0x00110F00, 'LO', 12345)
+        assert elem.tag.is_private
+        assert not hasattr(elem, 'private_creator')
+        assert elem.description() == 'Private tag data'
 
     def test_description_unknown(self):
         """Test DataElement.description with an unknown element"""
