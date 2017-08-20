@@ -11,14 +11,16 @@
 import gzip
 from io import BytesIO
 import os
+from os import stat
 import os.path
 import shutil
 import sys
 import tempfile
 import unittest
 
+import pytest
+
 from pydicom.filebase import DicomBytesIO
-from pydicom.util.testing.warncheck import assertWarns
 from pydicom.dataset import Dataset, FileDataset
 from pydicom.data import get_testdata_files
 from pydicom.dataelem import DataElement
@@ -28,24 +30,13 @@ from pydicom.tag import Tag, TupleTag
 from pydicom.uid import ImplicitVRLittleEndian
 import pydicom.valuerep
 import pydicom.config
-try:
-    unittest.skipUnless
-except AttributeError:
-    try:
-        import unittest2 as unittest
-    except ImportError:
-        print("unittest2 is required for testing in python2.6")
+from .testing import assert_warns_regex
+
 have_gdcm_handler = True
 try:
     import pydicom.pixel_data_handlers.gdcm_handler as gdcm_handler
 except ImportError as e:
     have_gdcm_handler = False
-# os.stat is only available on Unix and Windows   XXX Mac?
-# Not sure if on other platforms the import fails, or the call to it??
-try:
-    from os import stat  # NOQA
-except ImportError:
-    stat = None
 
 try:
     import numpy  # NOQA
@@ -828,19 +819,20 @@ class DeferredReadTests(unittest.TestCase):
         shutil.copyfile(ct_name, self.testfile_name)
 
     def testTimeCheck(self):
-        """Deferred read warns if file has been modified..........."""
-        if stat is not None:
-            ds = dcmread(self.testfile_name, defer_size='2 kB')
-            from time import sleep
-            sleep(1)
-            with open(self.testfile_name, "r+") as f:
-                f.write('\0')  # "touch" the file
-            warning_start = "Deferred read warning -- file modification time "
+        """Deferred read warns if file has been modified"""
+        ds = dcmread(self.testfile_name, defer_size='2 kB')
+        from time import sleep
+        sleep(0.1)
+        with open(self.testfile_name, "r+") as f:
+            f.write('\0')  # "touch" the file
 
-            def read_value():
-                ds.PixelData
+        def read_value():
+            ds.PixelData
 
-            assertWarns(self, warning_start, read_value)
+        assert_warns_regex(UserWarning,
+                           "Deferred read warning -- file modification "
+                           "time has changed",
+                           read_value)
 
     def testFileExists(self):
         """Deferred read raises error if file no longer exists....."""
@@ -960,6 +952,37 @@ class FileLikeTests(unittest.TestCase):
         # Should also be able to close the file ourselves without
         # exception raised:
         file_like.close()
+
+
+class TestDataElementGenerator(object):
+    """Test filereader.data_element_generator"""
+    def test_read_little_endian_explicit(self):
+        """"""
+        pass
+
+    def test_read_little_endian_implicit(self):
+        pass
+
+    def test_read_extra_length_vr(self):
+        pass
+
+    def test_undefined_length(self):
+        pass
+
+    def test_read_big_endian_explicit(self):
+        pass
+
+    def test_stop_when(self):
+        pass
+
+    def test_encoding(self):
+        pass
+
+    def test_specific_tags(self):
+        pass
+
+    def test_debugging(self):
+        pass
 
 
 if __name__ == "__main__":
