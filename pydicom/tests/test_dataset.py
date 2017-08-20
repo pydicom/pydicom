@@ -324,6 +324,11 @@ class DatasetTests(unittest.TestCase):
         assert callable(ds.test_func)
         assert 'test_func' in dir(ds)
 
+        ds = Dataset()
+        assert hasattr(ds, 'group_dataset')
+        assert callable(ds.group_dataset)
+        assert 'group_dataset' in dir(ds)
+
     def test_dir(self):
         """Dataset.dir() returns sorted list of named data_elements."""
         ds = self.dummy_dataset()
