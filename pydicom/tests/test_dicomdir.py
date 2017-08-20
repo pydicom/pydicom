@@ -5,7 +5,9 @@ import pytest
 
 from pydicom.data import get_testdata_files
 from pydicom.dicomdir import DicomDir
+from pydicom.errors import InvalidDicomError
 from pydicom import read_file
+from .testing import assert_raises_regex
 
 
 TEST_FILE = get_testdata_files('DICOMDIR')[0]
@@ -18,6 +20,38 @@ class TestDicomDir(object):
         ds = read_file(TEST_FILE)
         assert isinstance(ds, DicomDir)
 
-    def test_invalid_sop_class(self):
+    def test_invalid_sop_file_meta(self):
         """Test exception raised if SOP Class is not Media Storage Directory"""
         ds = read_file(get_testdata_files('CT_small.dcm')[0])
+        assert_raises_regex(InvalidDicomError,
+                            "SOP Class is not Media Storage "
+                            "Directory \(DICOMDIR\)",
+                            DicomDir,
+                            "some_name",
+                            ds,
+                            b'\x00' * 128,
+                            ds.file_meta,
+                            True,
+                            True)
+
+    def test_invalid_sop_no_file_meta(self):
+        """Test exception raised if invalid sop class but no file_meta"""
+        ds = read_file(get_testdata_files('CT_small.dcm')[0])
+        assert_raises_regex(AttributeError,
+                            "'DicomDir' object has no attribute "
+                            "'DirectoryRecordSequence'",
+                            DicomDir,
+                            "some_name",
+                            ds,
+                            b'\x00' * 128,
+                            None,
+                            True,
+                            True)
+
+    def test_parse_records(self):
+        """Test DicomDir.parse_records"""
+        ds = read_file(TEST_FILE)
+        print(dir(ds))
+        ds.parse_records()
+        assert 'patient_records' in ds
+        print(ds.patient_records)
