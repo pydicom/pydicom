@@ -313,6 +313,22 @@ class DatasetTests(unittest.TestCase):
             'Johnny',
             "set by tag failed")
 
+    def test_dir_subclass(self):
+        """Dataset.__dir__ returns class specific dir"""
+        class DSP(Dataset):
+            def test_func(self):
+                pass
+
+        ds = DSP()
+        assert hasattr(ds, 'test_func')
+        assert callable(ds.test_func)
+        assert 'test_func' in dir(ds)
+
+        ds = Dataset()
+        assert hasattr(ds, 'group_dataset')
+        assert callable(ds.group_dataset)
+        assert 'group_dataset' in dir(ds)
+
     def test_dir(self):
         """Dataset.dir() returns sorted list of named data_elements."""
         ds = self.dummy_dataset()
