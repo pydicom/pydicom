@@ -51,7 +51,8 @@ class TestDicomDir(object):
     def test_parse_records(self):
         """Test DicomDir.parse_records"""
         ds = read_file(TEST_FILE)
-        print(dir(ds))
-        ds.parse_records()
-        assert 'patient_records' in ds
-        print(ds.patient_records)
+        assert hasattr(ds, 'patient_records')
+        # There are two top level PATIENT records
+        assert len(ds.patient_records) == 2
+        assert ds.patient_records[0].PatientName == 'Doe^Archibald'
+        assert ds.patient_records[1].PatientName == 'Doe^Peter'
