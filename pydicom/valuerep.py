@@ -754,7 +754,7 @@ class PersonNameUnicode(PersonNameBase, compat.text_type):
         return new_person
 
     def __deepcopy__(self, memo):
-        """Make a correct deep copy of the object.
+        """Make correctly a deep copy of the object.
         Needed because of the overwritten __new__.
         """
         name = compat.text_type(self).encode('utf8')
