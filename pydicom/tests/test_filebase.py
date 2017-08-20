@@ -1,6 +1,8 @@
 # Copyright 2008-2017 pydicom authors. See LICENSE file for details.
 """Test for filebase.py"""
 
+from io import BytesIO
+
 import pytest
 
 from pydicom.data import get_testdata_files
@@ -210,14 +212,57 @@ class TestDicomIO(object):
 
 class TestDicomFileLike(object):
     """Test filebase.DicomFileLike class"""
-    pass
+    def test_init_good_parent(self):
+        """Test methods are set OK if parent is good"""
+        fp = DicomFileLike(BytesIO())
+        assert fp.parent_read == fp.parent.read
+        assert fp.write == fp.parent.write
+        assert fp.seek == fp.parent.seek
+
+    def test_init_bad_parent(self):
+        """Test exceptions raised if parent has no IO methods"""
+        class IntPlus(int):
+            def tell(self):
+                pass
+            def close(self):
+                pass
+
+        fp = DicomFileLike(IntPlus)
+        assert_raises_regex(IOError,
+                            "This DicomFileLike object has no write\(\) "
+                            "method",
+                            fp.write,
+                            b'')
+        assert_raises_regex(IOError,
+                            "This DicomFileLike object has no read\(\) "
+                            "method",
+                            fp.parent_read,
+                            b'')
+        assert_raises_regex(IOError,
+                            "This DicomFileLike object has no seek\(\) "
+                            "method",
+                            fp.seek,
+                            0,
+                            1)
+        assert fp.name == '<no filename>'
+
+    def test_context(self):
+        """Test using DicomFileLike as a context"""
+        with DicomFileLike(BytesIO(b'\x00\x01')) as fp:
+            assert fp.parent_read(2) == b'\x00\x01'
 
 
 class TestDicomBytesIO(object):
     """Test filebase.DicomBytesIO class"""
-    pass
+    def test_getvalue(self):
+        """Test DicomBytesIO.getvalue"""
+        fp = DicomBytesIO(b'\x00\x01\x00\x02')
+        assert fp.getvalue() == b'\x00\x01\x00\x02'
 
 
 class TestDicomFile(object):
     """Test filebase.DicomFile function"""
-    pass
+    fp = DicomFile(TEST_FILE)
+    assert not fp.parent.closed
+    assert 'CT_small.dcm' in fp.name
+    assert fp.read(2) == b'\x49\x49'
