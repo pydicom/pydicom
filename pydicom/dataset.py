@@ -336,9 +336,9 @@ class Dataset(dict):
         # Force zip object into a list in case of python3. Also backwards
         # compatible
         meths = set(
-            list(zip(*inspect.getmembers(Dataset, inspect.isroutine)))[0])
+            list(zip(*inspect.getmembers(self.__class__, inspect.isroutine)))[0])
         props = set(
-            list(zip(*inspect.getmembers(Dataset, inspect.isdatadescriptor)))[
+            list(zip(*inspect.getmembers(self.__class__, inspect.isdatadescriptor)))[
                 0])
         dicom_names = set(self.dir())
         alldir = sorted(props | meths | dicom_names)
