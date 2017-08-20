@@ -122,8 +122,6 @@ class TestCodify(object):
         out += "cp1.PatientID = '1234'\n"
         out += "cp_sequence.append(cp1)"
 
-        print(code_dataelem(elem))
-
         assert code_dataelem(elem) == out
 
     def test_code_dataset(self):

@@ -133,9 +133,7 @@ def decode(data_element, dicom_character_set):
         # type(data_element.VR)))
         if not in_py2:
             if data_element.VM == 1:
-                print('before', data_element.value.encodings)
                 data_element.value = data_element.value.decode(encodings)
-                print('after', data_element.value.encodings)
             else:
                 data_element.value = [
                     val.decode(encodings) for val in data_element.value

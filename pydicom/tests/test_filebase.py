@@ -224,6 +224,7 @@ class TestDicomFileLike(object):
         class IntPlus(int):
             def tell(self):
                 pass
+
             def close(self):
                 pass
 
@@ -262,7 +263,7 @@ class TestDicomBytesIO(object):
 
 class TestDicomFile(object):
     """Test filebase.DicomFile function"""
-    fp = DicomFile(TEST_FILE)
+    fp = DicomFile(TEST_FILE, 'rb')
     assert not fp.parent.closed
     assert 'CT_small.dcm' in fp.name
     assert fp.read(2) == b'\x49\x49'
