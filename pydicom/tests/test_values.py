@@ -6,13 +6,7 @@ import pytest
 from pydicom.tag import Tag
 from pydicom.values import (convert_value, converters, convert_tag,
                             convert_ATvalue, convert_DA_string)
-
-
-def assert_raises_regex(type_error, message, func, *args, **kwargs):
-    """Taken from https://github.com/glemaitre/specio, BSD 3 license."""
-    with pytest.raises(type_error) as excinfo:
-        func(*args, **kwargs)
-    excinfo.match(message)
+from .testing import assert_raises_regex
 
 
 class TestConvertTag(object):
