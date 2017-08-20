@@ -1,5 +1,5 @@
 # Copyright 2008-2017 pydicom authors. See LICENSE file for details.
-"""Test for encaps.py"""
+"""Test for dicomdir.py"""
 
 import pytest
 
