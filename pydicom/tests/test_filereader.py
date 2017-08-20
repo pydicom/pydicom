@@ -18,7 +18,6 @@ import tempfile
 import unittest
 
 from pydicom.filebase import DicomBytesIO
-from pydicom.util.testing.warncheck import assertWarns
 from pydicom.dataset import Dataset, FileDataset
 from pydicom.data import get_testdata_files
 from pydicom.dataelem import DataElement
@@ -28,6 +27,8 @@ from pydicom.tag import Tag, TupleTag
 from pydicom.uid import ImplicitVRLittleEndian
 import pydicom.valuerep
 import pydicom.config
+from .testing import assert_warns_regex
+
 try:
     unittest.skipUnless
 except AttributeError:
@@ -821,15 +822,15 @@ class DeferredReadTests(unittest.TestCase):
         if stat is not None:
             ds = read_file(self.testfile_name, defer_size='2 kB')
             from time import sleep
-            sleep(1)
+            sleep(0.1)
             with open(self.testfile_name, "r+") as f:
                 f.write('\0')  # "touch" the file
-            warning_start = "Deferred read warning -- file modification time "
+            msg = "Deferred read warning -- file modification time"
 
             def read_value():
                 ds.PixelData
 
-            assertWarns(self, warning_start, read_value)
+            assert_warns_regex(UserWarning, msg, read_value)
 
     def testFileExists(self):
         """Deferred read raises error if file no longer exists....."""
