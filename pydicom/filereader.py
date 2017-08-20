@@ -8,67 +8,39 @@
 from __future__ import absolute_import
 
 # Need zlib and io.BytesIO for deflate-compressed file
+from io import BytesIO
+from os import stat
 import os.path
+from struct import (Struct, unpack)
+from sys import byteorder
 import warnings
 import zlib
-from io import BytesIO
 
+from pydicom import compat  # don't import datetime_conversion directly
+from pydicom import config
+from pydicom.charset import (default_encoding, convert_encodings)
+from pydicom.compat import in_py2
+from pydicom.config import logger
+from pydicom.datadict import dictionary_VR, tag_for_keyword
+from pydicom.dataelem import (DataElement, RawDataElement)
+from pydicom.dataset import (Dataset, FileDataset)
+from pydicom.dicomdir import DicomDir
+from pydicom.errors import InvalidDicomError
+from pydicom.filebase import DicomFile
+from pydicom.fileutil import read_undefined_length_value
 from pydicom.misc import size_in_bytes
-from pydicom.tag import TupleTag, Tag, BaseTag
-from pydicom.dataelem import RawDataElement
+from pydicom.sequence import Sequence
+from pydicom.tag import (ItemTag, SequenceDelimiterTag, TupleTag, Tag, BaseTag)
+import pydicom.uid
 from pydicom.util.hexutil import bytes2hex
 from pydicom.valuerep import extra_length_VRs
-from pydicom.charset import (
-    default_encoding,
-    convert_encodings
-)
 
-from pydicom.compat import in_py2
-from pydicom import compat
-
-# don't import datetime_conversion directly
-from pydicom import config
-from pydicom.config import logger
-from pydicom.errors import InvalidDicomError
-
-# for transfer syntax UIDs
-import pydicom.uid
-from pydicom.filebase import DicomFile
-
-from pydicom.dataset import (
-    Dataset,
-    FileDataset
-)
-
-from pydicom.dicomdir import DicomDir
-from pydicom.datadict import dictionary_VR, tag_for_keyword
-from pydicom.dataelem import DataElement
-from pydicom.tag import (
-    ItemTag,
-    SequenceDelimiterTag
-)
-
-from pydicom.sequence import Sequence
-from pydicom.fileutil import read_undefined_length_value
-from struct import (
-    Struct,
-    unpack
-)
-
-from sys import byteorder
-
-try:
-    from os import stat
-except ImportError:
-    stat = None
 
 sys_is_little_endian = (byteorder == 'little')
 
 
 class DicomIter(object):
-    """Iterator over DICOM data elements
-       created from a file-like object
-    """
+    """Iterator over DICOM data elements created from a file-like object"""
 
     def __init__(self, fp, stop_when=None, force=False):
         """Read the preamble and meta info and prepare
@@ -955,7 +927,7 @@ def read_deferred_data_element(fileobj_type, filename, timestamp,
         raise IOError(u"Deferred read -- original file "
                       "{0:s} is missing".format(filename))
     if stat is not None and (timestamp is not None):
-        statinfo = os.stat(filename)
+        statinfo = stat(filename)
         if statinfo.st_mtime != timestamp:
             warnings.warn("Deferred read warning -- file modification time "
                           "has changed.")
