@@ -25,9 +25,9 @@ class TestAssertRaisesRegex(object):
             raise ValueError("Something happened")
 
         with pytest.raises(AssertionError):
-                           assert_raises_regex(ValueError,
-                           "Something didn't happen",
-                           raise_ex)
+            assert_raises_regex(ValueError,
+                                "Something didn't happen",
+                                raise_ex)
         with pytest.raises(AssertionError):
             assert_raises_regex(ValueError, "[0-9]", raise_ex)
 
