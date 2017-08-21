@@ -8,6 +8,7 @@ import os
 import os.path
 from struct import unpack
 from tempfile import TemporaryFile
+import unittest
 
 import pytest
 
@@ -19,28 +20,23 @@ from pydicom.dataelem import DataElement
 from pydicom.filebase import DicomBytesIO
 from pydicom.filereader import read_file, read_dataset
 from pydicom.filewriter import (write_data_element, write_dataset,
-                                correct_ambiguous_vr, write_file_meta_info)
+                                correct_ambiguous_vr, write_file_meta_info,
+                                correct_ambiguous_vr_element, write_numbers,
+                                write_PN, _format_DT)
 from pydicom.multival import MultiValue
 from pydicom.sequence import Sequence
 from pydicom.uid import (ImplicitVRLittleEndian, ExplicitVRBigEndian,
                          PYDICOM_IMPLEMENTATION_UID)
 from pydicom.util.hexutil import hex2bytes, bytes2hex
 from pydicom.valuerep import DA, DT, TM
-import unittest
+from .testing import assert_raises_regex
+from ._write_stds import impl_LE_deflen_std_hex
 
 have_dateutil = True
 try:
     from dateutil.tz import tzoffset
 except ImportError:
     have_dateutil = False
-try:
-    unittest.TestCase.assertSequenceEqual
-except AttributeError:
-    try:
-        import unittest2 as unittest
-    except ImportError:
-        print("unittest2 is required for testing in python2.6")
-
 
 rtplan_name = get_testdata_files("rtplan.dcm")[0]
 rtdose_name = get_testdata_files("rtdose.dcm")[0]
@@ -575,6 +571,25 @@ class WriteDataElementTests(unittest.TestCase):
         ref_bytes = b'\x08\x00\x20\x01\x55\x52\x00\x00\x00\x00\x00\x00'
         self.assertEqual(encoded_elem, ref_bytes)
 
+    def test_write_UN_implicit_little(self):
+        """Test writing UN VR in implicit little"""
+        elem = DataElement(0x00100010, 'UN', b'\x01\x02')
+        assert self.encode_element(elem) == (
+            b'\x10\x00\x10\x00\x02\x00\x00\x00\x01\x02')
+
+    def test_write_unknown_vr_raises(self):
+        """Test exception raised trying to write unknown VR element"""
+        fp = DicomBytesIO()
+        fp.is_implicit_VR = True
+        fp.is_little_endian = True
+        elem = DataElement(0x00100010, 'ZZ', 'Test')
+        assert_raises_regex(NotImplementedError,
+                            "write_data_element: unknown Value "
+                            "Representation 'ZZ'",
+                            write_data_element,
+                            fp,
+                            elem)
+
 
 class TestCorrectAmbiguousVR(unittest.TestCase):
     """Test correct_ambiguous_vr."""
@@ -782,6 +797,29 @@ class TestCorrectAmbiguousVR(unittest.TestCase):
         assert ds.BeamSequence[0].BeamSequence[0][0x00280104].VR == 'US'
 
 
+class TestCorrectAmbiguousVRElement(object):
+    """Test filewriter.correct_ambiguous_vr_element"""
+    def test_not_ambiguous(self):
+        """Test no change in element if not ambiguous"""
+        elem = DataElement(0x60003000, 'OB', b'\x00')
+        out = correct_ambiguous_vr_element(elem, Dataset(), True)
+        assert out.VR == 'OB'
+        assert out.tag == 0x60003000
+        assert out.value == b'\x00'
+
+    def test_pixel_data_not_ow_or_ob(self):
+        """Test no change if can't figure out bit depth"""
+        ds = Dataset()
+        ds.Rows = 1
+        ds.Columns = 1
+        ds.PixelData = b'\x00\x01\x02'
+        ds[0x7fe00010].VR = 'OB or OW'
+        out = correct_ambiguous_vr_element(ds[0x7fe00010],ds, True)
+        assert out.VR == 'OB or OW'
+        assert out.tag == 0x7fe00010
+        assert out.value == b'\x00\x01\x02'
+
+
 class WriteAmbiguousVRTests(unittest.TestCase):
     """Attempt to write data elements with ambiguous VR."""
     def setUp(self):
@@ -887,7 +925,6 @@ class ScratchWriteTests(unittest.TestCase):
 
     def testImpl_LE_deflen_write(self):
         """Scratch Write for implicit VR little endian, defined length SQs"""
-        from pydicom.util.testing._write_stds import impl_LE_deflen_std_hex
         file_ds = FileDataset("test", self.ds)
         self.compare_write(impl_LE_deflen_std_hex, file_ds)
 
@@ -1729,6 +1766,94 @@ class TestWriteFileMetaInfoNonStandard(unittest.TestCase):
         ref_meta = deepcopy(meta)
         write_file_meta_info(self.fp, meta, enforce_standard=False)
         self.assertEqual(meta, ref_meta)
+
+
+class TestWriteNumbers(object):
+    """Test filewriter.write_numbers"""
+    def test_write_empty_value(self):
+        """Test writing an empty value does nothing"""
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        elem = DataElement(0x00100010, 'US', '')
+        fmt = 'H'
+        write_numbers(fp, elem, fmt)
+        assert fp.getvalue() == b''
+
+    def test_write_list(self):
+        """Test writing an element value with VM > 1"""
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        elem = DataElement(0x00100010, 'US', [1, 2, 3, 4])
+        fmt = 'H'
+        write_numbers(fp, elem, fmt)
+        assert fp.getvalue() == b'\x01\x00\x02\x00\x03\x00\x04\x00'
+
+    def test_write_singleton(self):
+        """Test writing an element value with VM = 1"""
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        elem = DataElement(0x00100010, 'US', 1)
+        fmt = 'H'
+        write_numbers(fp, elem, fmt)
+        assert fp.getvalue() == b'\x01\x00'
+
+    def test_exception(self):
+        """Test exceptions raise IOError"""
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        elem = DataElement(0x00100010, 'US', b'\x00')
+        fmt = 'H'
+        assert_raises_regex(IOError,
+                            "for data_element:\n\(0010, 0010\)",
+                            write_numbers,
+                            fp,
+                            elem,
+                            fmt)
+
+    def test_write_big_endian(self):
+        """Test writing big endian"""
+        fp = DicomBytesIO()
+        fp.is_little_endian = False
+        elem = DataElement(0x00100010, 'US', 1)
+        fmt = 'H'
+        write_numbers(fp, elem, fmt)
+        assert fp.getvalue() == b'\x00\x01'
+
+
+class TestWritePN(object):
+    """Test filewriter.write_PN"""
+    @pytest.mark.skip("Raises exception due to issue #489")
+    def test_no_encoding_unicode(self):
+        """If PN element as no encoding info, default is used"""
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        elem = DataElement(0x00100010, 'PN', u'\u03b8')
+        write_PN(fp, elem)
+
+    def test_no_encoding(self):
+        """If PN element as no encoding info, default is used"""
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        elem = DataElement(0x00100010, 'PN', 'Test')
+        write_PN(fp, elem)
+        assert fp.getvalue() == b'Test'
+
+
+class TestWriteDT(object):
+    """Test filewriter.write_DT"""
+    def test_format_dt(self):
+        """Test _format_DT"""
+        elem = DataElement(0x00181078, 'DT', DT('20010203123456.123456'))
+        assert hasattr(elem.value, 'original_string')
+        assert _format_DT(elem.value) == '20010203123456.123456'
+        del elem.value.original_string
+        assert not hasattr(elem.value, 'original_string')
+        assert elem.value.microsecond > 0
+        assert _format_DT(elem.value) == '20010203123456.123456'
+
+        elem = DataElement(0x00181078, 'DT', DT('20010203123456'))
+        del elem.value.original_string
+        assert _format_DT(elem.value) == '20010203123456'
 
 
 if __name__ == "__main__":
