@@ -1,6 +1,4 @@
 # coding: utf-8
-
-# test_filereader.py
 # -*- coding: utf-8 -*-
 """unittest tests for pydicom.filereader module"""
 # Copyright (c) 2010-2012 Darcy Mason
@@ -20,16 +18,20 @@ import unittest
 
 import pytest
 
-from pydicom.filebase import DicomBytesIO
+import pydicom.config
 from pydicom.dataset import Dataset, FileDataset
 from pydicom.data import get_testdata_files
-from pydicom.dataelem import DataElement
-from pydicom.filereader import dcmread, data_element_generator
+from pydicom.filereader import dcmread
+from pydicom.dataelem import DataElement, DataElement_from_raw
 from pydicom.errors import InvalidDicomError
+from pydicom.filebase import DicomBytesIO
+from pydicom.filereader import (read_file, data_element_generator,
+                                read_dataset, read_sequence,
+                                read_sequence_item, read_file_meta_info,
+                                read_dicomdir)
 from pydicom.tag import Tag, TupleTag
 from pydicom.uid import ImplicitVRLittleEndian
 import pydicom.valuerep
-import pydicom.config
 from .testing import assert_warns_regex
 
 have_gdcm_handler = True
@@ -956,21 +958,49 @@ class FileLikeTests(unittest.TestCase):
 
 class TestDataElementGenerator(object):
     """Test filereader.data_element_generator"""
-    def test_read_little_endian_explicit(self):
-        """"""
-        pass
+    def test_little_endian_explicit(self):
+        """Test reading little endian explicit VR data"""
+        # (0010, 0010) PatientName PN 6 ABCDEF
+        bytestream = b'\x10\x00\x10\x00' \
+                     b'\x50\x4E' \
+                     b'\x06\x00' \
+                     b'\x41\x42\x43\x44\x45\x46'
+        fp = BytesIO(bytestream)
+        # fp, is_implicit_VR, is_little_endian,
+        gen = data_element_generator(fp, False, True)
+        elem = DataElement(0x00100010, 'PN', 'ABCDEF')
+        assert elem == DataElement_from_raw(next(gen), 'ISO_IR 100')
 
-    def test_read_little_endian_implicit(self):
-        pass
+    def test_little_endian_implicit(self):
+        """Test reading little endian implicit VR data"""
+        # (0010, 0010) PatientName PN 6 ABCDEF
+        bytestream = b'\x10\x00\x10\x00' \
+                     b'\x06\x00\x00\x00' \
+                     b'\x41\x42\x43\x44\x45\x46'
+        fp = BytesIO(bytestream)
+        # fp, is_implicit_VR, is_little_endian,
+        gen = data_element_generator(fp, True, True)
+        elem = DataElement(0x00100010, 'PN', 'ABCDEF')
+        assert elem == DataElement_from_raw(next(gen), 'ISO_IR 100')
 
-    def test_read_extra_length_vr(self):
+    def test_extra_length_vr(self):
         pass
 
     def test_undefined_length(self):
         pass
 
-    def test_read_big_endian_explicit(self):
-        pass
+    def test_big_endian_explicit(self):
+        """Test reading big endian explicit VR data"""
+        # (0010, 0010) PatientName PN 6 ABCDEF
+        bytestream = b'\x00\x10\x00\x10' \
+                     b'\x50\x4E' \
+                     b'\x00\x06' \
+                     b'\x41\x42\x43\x44\x45\x46'
+        fp = BytesIO(bytestream)
+        # fp, is_implicit_VR, is_little_endian,
+        gen = data_element_generator(fp, False, False)
+        elem = DataElement(0x00100010, 'PN', 'ABCDEF')
+        assert elem == DataElement_from_raw(next(gen), 'ISO_IR 100')
 
     def test_stop_when(self):
         pass
@@ -982,6 +1012,41 @@ class TestDataElementGenerator(object):
         pass
 
     def test_debugging(self):
+        pass
+
+
+class TestReadDataset(object):
+    """Test filereader.read_dataset"""
+    def test(self):
+        """"""
+        pass
+
+
+class TestReadSequence(object):
+    """Test filereader.read_sequence"""
+    def test(self):
+        """"""
+        pass
+
+
+class TestReadSequenceItem(object):
+    """Test filereader.read_sequence_item"""
+    def test(self):
+        """"""
+        pass
+
+
+class TestReadFileMetaInfo(object):
+    """Test filereader.read_file_meta_info"""
+    def test(self):
+        """"""
+        pass
+
+
+class TestReadDicomDir(object):
+    """Test filereader.read_dicomdir"""
+    def test(self):
+        """"""
         pass
 
 
