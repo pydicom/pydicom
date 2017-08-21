@@ -3,14 +3,14 @@
 # caution: testing won't work on windows
 
 test-code:
-	py.test tests
+	py.test pydicom
 
 test-doc:
 	pytest  doc/*.rst
 
 test-coverage:
 	rm -rf coverage .coverage
-	py.test tests --cov-report term-missing --cov=pydicom
+	py.test pydicom --cov-report term-missing --cov=pydicom
 
 test: test-code test-doc
 

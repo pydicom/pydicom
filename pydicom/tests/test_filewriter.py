@@ -8,14 +8,13 @@ import os
 import os.path
 
 from struct import unpack
-import sys
 from tempfile import TemporaryFile
 
 import pytest
 
 from pydicom._storage_sopclass_uids import CTImageStorage
 from pydicom import config, __version__
-from pydicom.data import DATA_ROOT
+from pydicom.data import get_testdata_files, get_charset_files
 from pydicom.dataset import Dataset, FileDataset
 from pydicom.dataelem import DataElement
 from pydicom.filebase import DicomBytesIO
@@ -39,19 +38,16 @@ except AttributeError:
         print("unittest2 is required for testing in python2.6")
 
 
-test_files = os.path.join(DATA_ROOT, 'test_files')
-testcharset_dir = os.path.join(DATA_ROOT, 'charset_files')
-
-rtplan_name = os.path.join(test_files, "rtplan.dcm")
-rtdose_name = os.path.join(test_files, "rtdose.dcm")
-ct_name = os.path.join(test_files, "CT_small.dcm")
-mr_name = os.path.join(test_files, "MR_small.dcm")
-jpeg_name = os.path.join(test_files, "JPEG2000.dcm")
-no_ts = os.path.join(test_files, "meta_missing_tsyntax.dcm")
+rtplan_name = get_testdata_files("rtplan.dcm")[0]
+rtdose_name = get_testdata_files("rtdose.dcm")[0]
+ct_name = get_testdata_files("CT_small.dcm")[0]
+mr_name = get_testdata_files("MR_small.dcm")[0]
+jpeg_name = get_testdata_files("JPEG2000.dcm")[0]
+no_ts = get_testdata_files("meta_missing_tsyntax.dcm")[0]
 datetime_name = mr_name
 
-unicode_name = os.path.join(testcharset_dir, "chrH31.dcm")
-multiPN_name = os.path.join(testcharset_dir, "chrFrenMulti.dcm")
+unicode_name = get_charset_files("chrH31.dcm")[0]
+multiPN_name = get_charset_files("chrFrenMulti.dcm")[0]
 
 
 def files_identical(a, b):

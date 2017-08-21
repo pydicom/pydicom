@@ -12,8 +12,6 @@ from datetime import (
     timedelta
 )
 
-import os
-
 from pydicom.tag import Tag
 from pydicom.values import convert_value
 
@@ -23,7 +21,7 @@ from pydicom.compat import in_py2
 from pydicom import config
 from pydicom import valuerep
 from pydicom.util.fixes import timezone
-from pydicom.data import DATA_ROOT
+from pydicom.data import get_testdata_files
 import unittest
 
 try:
@@ -48,8 +46,7 @@ try:
 except ImportError:
     import pickle
 
-test_files = os.path.join(DATA_ROOT, 'test_files')
-badvr_name = os.path.join(test_files, "badVR.dcm")
+badvr_name = get_testdata_files("badVR.dcm")[0]
 default_encoding = 'iso8859'
 
 

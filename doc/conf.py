@@ -56,7 +56,7 @@ from github_link import make_linkcode_resolve
 # (named 'sphinx.ext.*') or your custom ones.
 extensions = [
     'sphinx.ext.autodoc', 'sphinx.ext.doctest', 'sphinx.ext.intersphinx',
-    'sphinx.ext.todo', 'sphinx.ext.pngmath', 'sphinx.ext.ifconfig',
+    'sphinx.ext.todo', 'sphinx.ext.imgmath', 'sphinx.ext.ifconfig',
     'sphinx.ext.viewcode', 'sphinx_gallery.gen_gallery',
     'sphinx.ext.autosummary', 'numpydoc',
     'sphinx_issues', 'sphinx.ext.linkcode'
@@ -71,6 +71,7 @@ sphinx_gallery_conf = {
     'examples_dirs': '../examples',
     # path where to save gallery generated examples
     'gallery_dirs': 'auto_examples',
+    'backreferences_dir': os.path.join('generated'),
     # to make references clickable
     'doc_module': 'pydicom',
     'reference_url': {
@@ -258,7 +259,7 @@ latex_documents = [
 def generate_example_rst(app, what, name, obj, options, lines):
     # generate empty examples files, so that we don't get
     # inclusion errors if there are no examples for a class / module
-    examples_path = os.path.join(app.srcdir, "modules", "generated",
+    examples_path = os.path.join(app.srcdir, "generated",
                                  "%s.examples" % name)
     if not os.path.exists(examples_path):
         # touch file
@@ -274,6 +275,7 @@ issues_user_uri = 'https://github.com/{user}'
 
 def setup(app):
     app.connect('autodoc-process-docstring', generate_example_rst)
+    app.add_stylesheet('css/pydicom.css')
 
 # Example configuration for intersphinx: refer to
 # the Python standard library.

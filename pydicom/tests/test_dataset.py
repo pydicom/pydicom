@@ -7,7 +7,7 @@ import unittest
 import pytest
 
 from pydicom import compat
-from pydicom.data import DATA_ROOT
+from pydicom.data import get_testdata_files
 from pydicom.dataelem import DataElement, RawDataElement
 from pydicom.dataset import Dataset, FileDataset
 from pydicom.dicomio import read_file
@@ -312,6 +312,22 @@ class DatasetTests(unittest.TestCase):
             ds[0x10, 0x12].value,
             'Johnny',
             "set by tag failed")
+
+    def test_dir_subclass(self):
+        """Dataset.__dir__ returns class specific dir"""
+        class DSP(Dataset):
+            def test_func(self):
+                pass
+
+        ds = DSP()
+        assert hasattr(ds, 'test_func')
+        assert callable(ds.test_func)
+        assert 'test_func' in dir(ds)
+
+        ds = Dataset()
+        assert hasattr(ds, 'group_dataset')
+        assert callable(ds.group_dataset)
+        assert 'group_dataset' in dir(ds)
 
     def test_dir(self):
         """Dataset.dir() returns sorted list of named data_elements."""
@@ -749,7 +765,7 @@ class DatasetTests(unittest.TestCase):
         assert ds.get_item(0x00080018).value == '1.2.3.4'
 
         # Test deferred read
-        test_file = os.path.join(DATA_ROOT, 'test_files', 'MR_small.dcm')
+        test_file = get_testdata_files('MR_small.dcm')[0]
         ds = read_file(test_file, force=True, defer_size='0.8 kB')
         ds_ref = read_file(test_file, force=True)
         # get_item will follow the deferred read branch
@@ -836,7 +852,7 @@ class DatasetTests(unittest.TestCase):
 
     def test_with(self):
         """Test Dataset.__enter__ and __exit__."""
-        test_file = os.path.join(DATA_ROOT, 'test_files', 'CT_small.dcm')
+        test_file = get_testdata_files('CT_small.dcm')[0]
         with read_file(test_file) as ds:
             assert ds.PatientName == 'CompressedSamples^CT1'
 
@@ -900,7 +916,7 @@ class DatasetTests(unittest.TestCase):
 
     def test_set_convert_private_elem_from_raw(self):
         """Test Dataset.__setitem__ with a raw private element"""
-        test_file = os.path.join(DATA_ROOT, 'test_files', 'CT_small.dcm')
+        test_file = get_testdata_files('CT_small.dcm')[0]
         ds = read_file(test_file, force=True)
         # 'tag VR length value value_tell is_implicit_VR is_little_endian'
         elem = RawDataElement((0x0043, 0x1029), 'OB', 2, b'\x00\x01', 0,
@@ -921,7 +937,7 @@ class DatasetTests(unittest.TestCase):
 
     def test_trait_names(self):
         """Test Dataset.trait_names contains element keywords"""
-        test_file = os.path.join(DATA_ROOT, 'test_files', 'CT_small.dcm')
+        test_file = get_testdata_files('CT_small.dcm')[0]
         ds = read_file(test_file, force=True)
         names = ds.trait_names()
         assert 'PatientName' in names
@@ -973,9 +989,7 @@ class DatasetElementsTests(unittest.TestCase):
 
 class FileDatasetTests(unittest.TestCase):
     def setUp(self):
-        self.test_file = os.path.join(DATA_ROOT,
-                                      'test_files',
-                                      'CT_small.dcm')
+        self.test_file = get_testdata_files('CT_small.dcm')[0]
 
     def test_equality_file_meta(self):
         """Dataset: equality returns correct value if with metadata"""
