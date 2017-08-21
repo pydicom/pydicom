@@ -414,6 +414,17 @@ def write_data_element(fp, data_element, encoding=default_encoding):
     if (hasattr(data_element, "is_undefined_length")
             and data_element.is_undefined_length):
         is_undefined_length = True
+        if data_element.tag == 0x7fe00010:  # pixel data
+            starts_with_item_tag = False
+            if fp.is_little_endian:
+                if data_element.value.startswith(b'\xfe\xff\x00\xe0'):
+                    starts_with_item_tag = True
+            else:
+                if data_element.value.startswith(b'\xff\xfe\xe0\x00'):
+                    starts_with_item_tag = True
+            if not starts_with_item_tag:
+                raise ValueError('Pixel Data with undefined length must '
+                                 'start with an an item tag')
     location = fp.tell()
     fp.seek(length_location)
     if not fp.is_implicit_VR and VR not in extra_length_VRs:
