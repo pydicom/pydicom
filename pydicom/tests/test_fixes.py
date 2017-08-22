@@ -201,6 +201,7 @@ class TestTimeZone(unittest.TestCase):
         self.assertIn(timezone(ZERO), {timezone(ZERO)})
         self.assertTrue(timezone(ZERO) is not None)
         self.assertFalse(timezone(ZERO) is None)
+        self.assertNotEqual(timezone(ZERO), 'random')
 
     def test_aware_datetime(self):
         # test that timezone instances can be used by datetime
