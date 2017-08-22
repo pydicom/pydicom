@@ -50,21 +50,17 @@ if sys.version_info[0] < 3:
                 return False
             return self._offset == other._offset
 
+        def __lt__(self, other):
+            raise TypeError("'<' not supported between instances of"
+                            " 'datetime.timezone' and 'datetime.timezone'")
+
         def __hash__(self):
             return hash(self._offset)
 
         def __repr__(self):
-            """Convert to formal string, for repr().
-
-            >>> tz = timezone.utc
-            >>> repr(tz)
-            'datetime.timezone.utc'
-            >>> tz = timezone(timedelta(hours=-5), 'EST')
-            >>> repr(tz)
-            "datetime.timezone(datetime.timedelta(-1, 68400), 'EST')"
-            """
             if self is self.utc:
-                return 'datetime.timezone.utc'
+                return '%s.%s.utc' % (self.__class__.__module__,
+                                          self.__class__.__name__)
             if self._name is None:
                 return "%s.%s(%r)" % (self.__class__.__module__,
                                       self.__class__.__name__,
@@ -117,8 +113,10 @@ if sys.version_info[0] < 3:
                 delta = -delta
             else:
                 sign = '+'
-            hours, rest = divmod(delta, timedelta(hours=1))
-            minutes = rest // timedelta(minutes=1)
+            hours, rest = divmod(delta.total_seconds(), 3600)
+            hours = int(hours)
+            minutes = rest // timedelta(minutes=1).total_seconds()
+            minutes = int(minutes)
             return 'UTC{}{:02d}:{:02d}'.format(sign, hours, minutes)
 
     timezone.utc = timezone._create(timedelta(0))

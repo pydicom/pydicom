@@ -12,6 +12,7 @@ from datetime import datetime
 from datetime import timedelta
 from datetime import tzinfo
 
+import pydicom as pydicom_module
 from pydicom.util.fixes import timezone
 
 pickle_choices = [(pickle, pickle, proto)
@@ -95,6 +96,7 @@ class TestTimeZone(unittest.TestCase):
 
     def test_repr(self):
         datetime = datetime_module
+        pydicom = pydicom_module
         for tz in [self.ACDT, self.EST, timezone.utc,
                    timezone.min, timezone.max]:
             # test round-trip
@@ -135,7 +137,8 @@ class TestTimeZone(unittest.TestCase):
     def test_utcoffset(self):
         dummy = self.DT
         for h in [0, 1.5, 12]:
-            offset = h * HOUR
+            offset = h * HOUR.total_seconds()
+            offset = timedelta(seconds=offset)
             self.assertEqual(offset, timezone(offset).utcoffset(dummy))
             self.assertEqual(-offset, timezone(-offset).utcoffset(dummy))
 
@@ -155,8 +158,10 @@ class TestTimeZone(unittest.TestCase):
     def test_tzname(self):
         self.assertEqual('UTC', timezone.utc.tzname(None))
         self.assertEqual('UTC', timezone(ZERO).tzname(None))
-        self.assertEqual('UTC-05:00', timezone(-5 * HOUR).tzname(None))
-        self.assertEqual('UTC+09:30', timezone(9.5 * HOUR).tzname(None))
+        self.assertEqual('UTC-05:00', timezone(timedelta(
+            hours=-5)).tzname(None))
+        self.assertEqual('UTC+09:30', timezone(timedelta(
+            hours=9.5)).tzname(None))
         self.assertEqual('UTC-00:01',
                          timezone(timedelta(minutes=-1)).tzname(None))
         self.assertEqual('XYZ', timezone(-5 * HOUR, 'XYZ').tzname(None))
@@ -192,6 +197,7 @@ class TestTimeZone(unittest.TestCase):
         # test that timezone instances can be used by datetime
         t = datetime(1, 1, 1)
         for tz in [timezone.min, timezone.max, timezone.utc]:
+            print(tz.tzname(t))
             self.assertEqual(tz.tzname(t),
                              t.replace(tzinfo=tz).tzname())
             self.assertEqual(tz.utcoffset(t),
