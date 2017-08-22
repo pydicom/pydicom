@@ -22,8 +22,7 @@ Enhancements
 * optional GDCM support for reading files with compressed pixel data
 * optional Pillow, jpeg_ls support for reading some compressed pixel data files
 * cleaned up dicom dictionary code, old non-dicom-keyword code removed
-
-* dicom dictionary updated to ..............
+* dicom dictionary updated to 2017c
 
 Documentation
 .............
