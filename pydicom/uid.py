@@ -220,6 +220,7 @@ JPEGLSLossless = UID('1.2.840.10008.1.2.4.80')
 JPEGLSLossy = UID('1.2.840.10008.1.2.4.81')
 JPEG2000Lossless = UID('1.2.840.10008.1.2.4.90')
 JPEG2000Lossy = UID('1.2.840.10008.1.2.4.91')
+RLELossless = UID('1.2.840.10008.1.2.5')
 
 UncompressedPixelTransferSyntaxes = [
     ExplicitVRLittleEndian,
@@ -249,6 +250,11 @@ JPEG2000CompressedPixelTransferSyntaxes = [
 JPEGLossyCompressedPixelTransferSyntaxes = [
     JPEGBaseLineLossy8bit,
     JPEGBaseLineLossy12bit,
+]
+
+
+RLECompressedLosslessSyntaxes = [
+    RLELossless
 ]
 
 

@@ -4,19 +4,20 @@ from __future__ import absolute_import
 
 from struct import pack
 
-from pydicom import compat, __version__
+from pydicom import compat
 from pydicom.compat import in_py2
 from pydicom.charset import default_encoding, text_VRs, convert_encodings
 from pydicom.datadict import keyword_for_tag
 from pydicom.dataset import Dataset
 from pydicom.filebase import DicomFile, DicomFileLike
 from pydicom.multival import MultiValue
-from pydicom.tag import Tag, ItemTag, ItemDelimiterTag, SequenceDelimiterTag
-from pydicom.tagtools import tag_in_exception
+from pydicom.tag import (Tag, ItemTag, ItemDelimiterTag, SequenceDelimiterTag,
+                         tag_in_exception)
 from pydicom.uid import (PYDICOM_IMPLEMENTATION_UID, ImplicitVRLittleEndian,
                          ExplicitVRBigEndian)
 from pydicom.valuerep import extra_length_VRs
 from pydicom.values import convert_numbers
+from pydicom._version import __version__
 
 
 def correct_ambiguous_vr_element(elem, ds, is_little_endian):

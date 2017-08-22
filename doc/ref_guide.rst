@@ -1,8 +1,8 @@
 .. _api_filereader:
 
-=======================
-Pydicom Reference Guide
-=======================
+=============================
+Pydicom API's Reference Guide
+=============================
 
 .. rubric:: Common pydicom functions called by user code
 

@@ -26,14 +26,12 @@ from pydicom.charset import default_encoding, convert_encodings
 from pydicom.datadict import dictionary_VR
 from pydicom.datadict import (tag_for_keyword, keyword_for_tag,
                               repeater_has_keyword)
-from pydicom.tag import Tag, BaseTag
+from pydicom.tag import Tag, BaseTag, tag_in_exception
 from pydicom.dataelem import DataElement, DataElement_from_raw, RawDataElement
 from pydicom.uid import UncompressedPixelTransferSyntaxes
-from pydicom.tagtools import tag_in_exception
 import pydicom  # for write_file
 import pydicom.charset
 from pydicom.config import logger
-import pydicom.encaps
 import pydicom.config
 
 sys_is_little_endian = (sys.byteorder == 'little')
@@ -337,11 +335,10 @@ class Dataset(dict):
         """
         # Force zip object into a list in case of python3. Also backwards
         # compatible
-        meths = set(
-            list(zip(*inspect.getmembers(Dataset, inspect.isroutine)))[0])
-        props = set(
-            list(zip(*inspect.getmembers(Dataset, inspect.isdatadescriptor)))[
-                0])
+        meths = set(list(zip(
+            *inspect.getmembers(self.__class__, inspect.isroutine)))[0])
+        props = set(list(zip(
+            *inspect.getmembers(self.__class__, inspect.isdatadescriptor)))[0])
         dicom_names = set(self.dir())
         alldir = sorted(props | meths | dicom_names)
         return alldir
@@ -400,8 +397,10 @@ class Dataset(dict):
             # __dict__
             # Convert values() to a list for compatibility between
             #   python 2 and 3
-            return (list(self.values()) == list(other.values()) and
-                    self.__dict__ == other.__dict__)
+            # Sort values() by element tag
+            self_elem = sorted(list(self.values()), key=lambda x: x.tag)
+            other_elem = sorted(list(other.values()), key=lambda x: x.tag)
+            return self_elem == other_elem and self.__dict__ == other.__dict__
 
         return NotImplemented
 
