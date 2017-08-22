@@ -1,5 +1,5 @@
 # Copyright 2008-2017 pydicom authors. See LICENSE file for details.
-"""unittest cases for pydicom.filewriter module"""
+"""unittest cases for pydicom.dicomio.filewriter module"""
 
 from copy import deepcopy
 from datetime import date, datetime, time

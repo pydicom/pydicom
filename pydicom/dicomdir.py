@@ -44,7 +44,7 @@ class DicomDir(FileDataset):
         :param is_little_endian: True if little-endian transfer syntax used;
                                  False if big-endian. Default is True.
         """
-        # Usually this class is created through filereader.read_partial,
+        # Usually this class is created through pydicom.dicomio.read_partial,
         # and it checks class SOP, but in case of direct creation,
         # check here also
         if file_meta:

@@ -840,7 +840,7 @@ def read_file(fp, defer_size=None, stop_before_pixels=False,
     --------
     pydicom.dataset.FileDataset
         Data class that is returned.
-    pydicom.filereader.read_partial
+    pydicom.dicomio.read_partial
         Only read part of a DICOM file, stopping on given conditions.
 
     Examples

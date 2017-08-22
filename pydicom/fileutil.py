@@ -112,7 +112,7 @@ def read_undefined_length_value(fp,
         tag used as and marker for reading
     defer_size : int, None, optional
         Size to avoid loading large elements in memory.
-        See ``filereader.read_file`` for more parameter info.
+        See ``dicomio.read_file`` for more parameter info.
     read_size : int
         Number of bytes to read at one time.
 

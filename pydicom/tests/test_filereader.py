@@ -2,7 +2,7 @@
 
 # test_filereader.py
 # -*- coding: utf-8 -*-
-"""unittest tests for pydicom.filereader module"""
+"""unittest tests for pydicom.dicomio.filereader module"""
 # Copyright (c) 2010-2012 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
 #    See the file LICENSE included with this distribution, also

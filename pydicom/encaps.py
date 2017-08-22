@@ -310,7 +310,7 @@ def defragment_data(data):
     return b"".join(decode_data_sequence(data))
 
 
-# read_item modeled after filereader.ReadSequenceItem
+# read_item modeled after pydicom.dicomio.filereader.ReadSequenceItem
 def read_item(fp):
     """Read and return a single Item in the fragmented data stream.
 

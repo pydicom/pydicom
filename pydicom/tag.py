@@ -6,8 +6,8 @@ Python 2 and as an 'int' for Python 3. Tags are stored as a single number and
 separated to (group, element) as required.
 """
 # NOTE: Tags must be not be stored as a tuple internally, as some code logic
-#       (e.g. in filewriter.write_AT) checks if a value is a multi-value
-#       element
+#       (e.g. in dicomio.filewriter.write_AT) checks if a value is a
+#       multi-value element
 from contextlib import contextmanager
 
 from pydicom import compat

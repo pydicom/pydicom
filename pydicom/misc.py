@@ -41,8 +41,8 @@ def is_dicom(file):
 
     See Also
     --------
-    filereader.read_preamble
-    filereader.read_partial
+    pydicom.dicomio.read_preamble
+    pydicom.dicomio.read_partial
     """
     # TODO: add a force parameter maybe?
     if not os.path.isfile(file):
