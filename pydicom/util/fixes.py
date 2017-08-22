@@ -61,7 +61,7 @@ if sys.version_info[0] < 3:
         def __repr__(self):
             if self is self.utc:
                 return '%s.%s.utc' % (self.__class__.__module__,
-                                          self.__class__.__name__)
+                                      self.__class__.__name__)
             if self._name is None:
                 return "%s.%s(%r)" % (self.__class__.__module__,
                                       self.__class__.__name__,
