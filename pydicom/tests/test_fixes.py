@@ -156,8 +156,8 @@ class TestTimeZone(unittest.TestCase):
             self.EST.dst(5)
 
     def test_tzname(self):
-        self.assertEqual('UTC', timezone.utc.tzname(None))
-        self.assertEqual('UTC', timezone(ZERO).tzname(None))
+        self.assertTrue('UTC' in timezone.utc.tzname(None))
+        self.assertTrue('UTC' in timezone(ZERO).tzname(None))
         self.assertEqual('UTC-05:00', timezone(timedelta(
             hours=-5)).tzname(None))
         self.assertEqual('UTC+09:30', timezone(timedelta(

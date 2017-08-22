@@ -1,7 +1,7 @@
 """Compatibility fixes for older version of python."""
 
 # Authors : Guillaume Lemaitre <g.lemaitre58@mgail.com>
-# License : MIT
+# Copyright 2008-2017 pydicom authors. See LICENSE file for details.
 
 import sys
 
@@ -9,6 +9,7 @@ from datetime import datetime, tzinfo, timedelta
 
 if sys.version_info[0] < 3:
     class timezone(tzinfo):
+        """timezone fixes imported from CPython 3.6"""
         __slots__ = '_offset', '_name'
 
         # Sentinel value to disallow None
