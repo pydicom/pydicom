@@ -83,6 +83,15 @@ Eastern = USTimeZone(-5, "Eastern",  "EST", "EDT")
 
 
 class TestTimeZone(unittest.TestCase):
+    """Backport of datetime.timezone tests.
+
+    Notes
+    -----
+    Backport of datetime.timezone for Python 2.7, from Python 3.6
+    documentation (https://tinyurl.com/z4cegu9), copyright Python Software
+    Foundation (https://docs.python.org/3/license.html)
+
+    """
 
     def setUp(self):
         self.ACDT = timezone(timedelta(hours=9.5), 'ACDT')

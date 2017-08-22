@@ -9,7 +9,15 @@ from datetime import datetime, tzinfo, timedelta
 
 if sys.version_info[0] < 3:
     class timezone(tzinfo):
-        """timezone fixes imported from CPython 3.6"""
+        """Backport of datetime.timezone.
+
+        Notes
+        -----
+        Backport of datetime.timezone for Python 2.7, from Python 3.6
+        documentation (https://tinyurl.com/z4cegu9), copyright Python Software
+        Foundation (https://docs.python.org/3/license.html)
+
+        """
         __slots__ = '_offset', '_name'
 
         # Sentinel value to disallow None
