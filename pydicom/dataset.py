@@ -541,7 +541,8 @@ class Dataset(dict):
         elif isinstance(data_elem, tuple):
             # If a deferred read, then go get the value now
             if data_elem.value is None:
-                from pydicom.filereader import read_deferred_data_element
+                from pydicom.dicomio.filereader import \
+                    read_deferred_data_element
                 data_elem = read_deferred_data_element(
                     self.fileobj_type, self.filename, self.timestamp,
                     data_elem)
@@ -555,7 +556,8 @@ class Dataset(dict):
 
             # If the Element has an ambiguous VR, try to correct it
             if 'or' in self[tag].VR:
-                from pydicom.filewriter import correct_ambiguous_vr_element
+                from pydicom.dicomio.filewriter import \
+                    correct_ambiguous_vr_element
                 self[tag] = correct_ambiguous_vr_element(
                     self[tag], self, data_elem[6])
 

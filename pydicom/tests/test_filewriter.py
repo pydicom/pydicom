@@ -17,9 +17,11 @@ from pydicom.data import get_testdata_files, get_charset_files
 from pydicom.dataset import Dataset, FileDataset
 from pydicom.dataelem import DataElement
 from pydicom.filebase import DicomBytesIO
-from pydicom.filereader import read_file, read_dataset
-from pydicom.filewriter import (write_data_element, write_dataset,
-                                correct_ambiguous_vr, write_file_meta_info)
+from pydicom.dicomio import read_file
+from pydicom.dicomio.filereader import read_dataset
+from pydicom.dicomio.filewriter import (write_data_element, write_dataset,
+                                        correct_ambiguous_vr,
+                                        write_file_meta_info)
 from pydicom.multival import MultiValue
 from pydicom.sequence import Sequence
 from pydicom.uid import (ImplicitVRLittleEndian, ExplicitVRBigEndian,

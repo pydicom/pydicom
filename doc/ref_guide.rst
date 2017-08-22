@@ -18,9 +18,9 @@ dicom.filereader, but is also imported when the pydicom package is imported::
 If you need fine control over the reading, you can either call ``read_partial`` or use ``open_dicom``.
 All are documented below:
 
-.. autofunction:: pydicom.filereader.read_file
+.. autofunction:: pydicom.dicomio.filereader.read_file
 
-.. autofunction:: pydicom.filereader.read_partial
+.. autofunction:: pydicom.dicomio.filereader.read_partial
 
 
 File Writing
@@ -30,7 +30,7 @@ DICOM files can also be written using pydicom. There are two ways to do this.
 The first is to use ``write_file`` with a prexisting FileDataset (derived from Dataset) instance.
 The second is to use the ``save_as`` method on an Dataset instance.
 
-.. autofunction:: pydicom.filewriter.write_file
+.. autofunction:: pydicom.dicomio.filewriter.write_file
 
 .. automethod:: pydicom.dataset.Dataset.save_as
 

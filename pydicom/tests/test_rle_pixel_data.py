@@ -4,7 +4,7 @@ import sys
 import pytest
 import pydicom
 import pydicom.config
-from pydicom.filereader import read_file
+from pydicom.dicomio import read_file
 from pydicom.data import get_testdata_files
 
 rle_missing_message = ("RLE decoder (numpy based) is not available "

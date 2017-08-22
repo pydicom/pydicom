@@ -22,7 +22,8 @@ from pydicom.util.testing.warncheck import assertWarns
 from pydicom.dataset import Dataset, FileDataset
 from pydicom.data import get_testdata_files
 from pydicom.dataelem import DataElement
-from pydicom.filereader import read_file, data_element_generator
+from pydicom.dicomio import read_file
+from pydicom.dicomio.filereader import data_element_generator
 from pydicom.errors import InvalidDicomError
 from pydicom.tag import Tag, TupleTag
 from pydicom.uid import ImplicitVRLittleEndian

@@ -12,7 +12,7 @@ import os
 import os.path
 import pydicom
 
-from pydicom.filereader import (
+from pydicom.dicomio.filereader import (
     read_partial,
     _at_pixel_data
 )
