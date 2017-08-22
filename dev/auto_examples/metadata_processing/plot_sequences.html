@@ -198,21 +198,21 @@
 <div class="line"><br /></div>
 </div>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom.sequence</span> <span class="kn">import</span> <span class="n">Sequence</span>
-<span class="kn">from</span> <span class="nn">pydicom.dataset</span> <span class="kn">import</span> <a href="../../ref_guide.html#pydicom.dataset.Dataset" title="View documentation for pydicom.dataset.Dataset"><span class="n">Dataset</span></a>
+<span class="kn">from</span> <span class="nn">pydicom.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
 
 <span class="c1"># create to toy datasets</span>
-<span class="n">block_ds1</span> <span class="o">=</span> <a href="../../ref_guide.html#pydicom.dataset.Dataset" title="View documentation for pydicom.dataset.Dataset"><span class="n">Dataset</span></a><span class="p">()</span>
+<span class="n">block_ds1</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">()</span>
 <span class="n">block_ds1</span><span class="o">.</span><span class="n">BlockType</span> <span class="o">=</span> <span class="s2">&quot;APERTURE&quot;</span>
 <span class="n">block_ds1</span><span class="o">.</span><span class="n">BlockName</span> <span class="o">=</span> <span class="s2">&quot;Block1&quot;</span>
 
-<span class="n">block_ds2</span> <span class="o">=</span> <a href="../../ref_guide.html#pydicom.dataset.Dataset" title="View documentation for pydicom.dataset.Dataset"><span class="n">Dataset</span></a><span class="p">()</span>
+<span class="n">block_ds2</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">()</span>
 <span class="n">block_ds2</span><span class="o">.</span><span class="n">BlockType</span> <span class="o">=</span> <span class="s2">&quot;APERTURE&quot;</span>
 <span class="n">block_ds2</span><span class="o">.</span><span class="n">BlockName</span> <span class="o">=</span> <span class="s2">&quot;Block2&quot;</span>
 
-<span class="n">beam</span> <span class="o">=</span> <a href="../../ref_guide.html#pydicom.dataset.Dataset" title="View documentation for pydicom.dataset.Dataset"><span class="n">Dataset</span></a><span class="p">()</span>
+<span class="n">beam</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">()</span>
 <span class="c1"># note that you should add beam data elements like BeamName, etc; these are</span>
 <span class="c1"># skipped in this example</span>
-<span class="n">plan_ds</span> <span class="o">=</span> <a href="../../ref_guide.html#pydicom.dataset.Dataset" title="View documentation for pydicom.dataset.Dataset"><span class="n">Dataset</span></a><span class="p">()</span>
+<span class="n">plan_ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">()</span>
 <span class="c1"># starting from scratch since we did not read a file</span>
 <span class="n">plan_ds</span><span class="o">.</span><span class="n">BeamSequence</span> <span class="o">=</span> <span class="n">Sequence</span><span class="p">([</span><span class="n">beam</span><span class="p">])</span>
 <span class="n">plan_ds</span><span class="o">.</span><span class="n">BeamSequence</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">BlockSequence</span> <span class="o">=</span> <span class="n">Sequence</span><span class="p">([</span><span class="n">block_ds1</span><span class="p">,</span> <span class="n">block_ds2</span><span class="p">])</span>
@@ -222,7 +222,7 @@
 <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Number of blocks: {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">beam0</span><span class="o">.</span><span class="n">BlockSequence</span><span class="p">))</span>
 
 <span class="c1"># create a new data set</span>
-<span class="n">block_ds3</span> <span class="o">=</span> <a href="../../ref_guide.html#pydicom.dataset.Dataset" title="View documentation for pydicom.dataset.Dataset"><span class="n">Dataset</span></a><span class="p">()</span>
+<span class="n">block_ds3</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">()</span>
 <span class="c1"># add data elements to it as above and don&#39;t forget to update Number of Blocks</span>
 <span class="c1"># data element</span>
 <span class="n">beam0</span><span class="o">.</span><span class="n">BlockSequence</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">block_ds3</span><span class="p">)</span>
