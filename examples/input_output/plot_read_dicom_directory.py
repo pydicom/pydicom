@@ -15,7 +15,7 @@ from pprint import pprint
 
 import pydicom
 from pydicom.data import get_testdata_files
-from pydicom.filereader import read_dicomdir
+from pydicom.dicomio.filereader import read_dicomdir
 
 # fetch the path to the test data
 filepath = get_testdata_files('DICOMDIR')[0]

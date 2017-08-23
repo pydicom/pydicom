@@ -9,9 +9,8 @@ from io import BytesIO
 import os
 import unittest
 
-from pydicom import compat
 from pydicom import config
-from pydicom import filereader
+from pydicom.dicomio import filereader
 from pydicom.util import fixer
 from pydicom.util import hexutil
 from pydicom import valuerep

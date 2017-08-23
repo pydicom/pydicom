@@ -541,7 +541,8 @@ class Dataset(dict):
         elif isinstance(data_elem, tuple):
             # If a deferred read, then go get the value now
             if data_elem.value is None:
-                from pydicom.filereader import read_deferred_data_element
+                from pydicom.dicomio.filereader import \
+                    read_deferred_data_element
                 data_elem = read_deferred_data_element(
                     self.fileobj_type, self.filename, self.timestamp,
                     data_elem)
@@ -555,7 +556,8 @@ class Dataset(dict):
 
             # If the Element has an ambiguous VR, try to correct it
             if 'or' in self[tag].VR:
-                from pydicom.filewriter import correct_ambiguous_vr_element
+                from pydicom.dicomio.filewriter import \
+                    correct_ambiguous_vr_element
                 self[tag] = correct_ambiguous_vr_element(
                     self[tag], self, data_elem[6])
 
@@ -834,8 +836,8 @@ class Dataset(dict):
         DICOM File Format in accordance with DICOM Standard Part 10 Section 7.
         To do so requires that the `Dataset.file_meta` attribute exists and
         contains a Dataset with the required (Type 1) File Meta Information
-        Group elements (see pydicom.filewriter.write_file and
-        pydicom.filewriter.write_file_meta_info for more information).
+        Group elements (see pydicom.dicomio.write_file and
+        pydicom.dicomio.write_file_meta_info for more information).
 
         If `write_like_original` is True then the Dataset will be written as is
         (after minimal validation checking) and may or may not contain all or
@@ -866,11 +868,11 @@ class Dataset(dict):
 
         See Also
         --------
-        pydicom.filewriter.write_dataset
+        pydicom.dicomio.write_dataset
             Write a DICOM Dataset to a file.
-        pydicom.filewriter.write_file_meta_info
+        pydicom.dicomio.write_file_meta_info
             Write the DICOM File Meta Information Group elements to a file.
-        pydicom.filewriter.write_file
+        pydicom.dicomio.write_file
             Write a DICOM file from a FileDataset instance.
         """
         # Ensure is_little_endian and is_implicit_VR exist

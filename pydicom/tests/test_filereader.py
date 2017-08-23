@@ -2,7 +2,7 @@
 
 # test_filereader.py
 # -*- coding: utf-8 -*-
-"""unittest tests for pydicom.filereader module"""
+"""unittest tests for pydicom.dicomio.filereader module"""
 # Copyright (c) 2010-2012 Darcy Mason
 # This file is part of pydicom, released under a modified MIT license.
 #    See the file LICENSE included with this distribution, also
@@ -22,7 +22,8 @@ from pydicom.util.testing.warncheck import assertWarns
 from pydicom.dataset import Dataset, FileDataset
 from pydicom.data import get_testdata_files
 from pydicom.dataelem import DataElement
-from pydicom.filereader import read_file, data_element_generator
+from pydicom.dicomio import read_file
+from pydicom.dicomio.filereader import data_element_generator
 from pydicom.errors import InvalidDicomError
 from pydicom.tag import Tag, TupleTag
 from pydicom.uid import ImplicitVRLittleEndian

@@ -25,7 +25,7 @@ from pydicom.multival import MultiValue
 import pydicom.uid
 from pydicom.tag import (Tag, TupleTag)
 
-from pydicom.filereader import read_sequence
+from pydicom.dicomio.filereader import read_sequence
 from io import BytesIO
 from pydicom.charset import (default_encoding, text_VRs)
 

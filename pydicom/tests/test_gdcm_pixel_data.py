@@ -6,7 +6,7 @@ import tempfile
 import shutil
 import pytest
 import pydicom
-from pydicom.filereader import read_file
+from pydicom.dicomio import read_file
 from pydicom.data import get_testdata_files
 from pydicom.tag import Tag
 from pydicom import compat

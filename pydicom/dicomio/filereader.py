@@ -793,8 +793,8 @@ def read_partial(fileobj, stop_when=None, defer_size=None,
                            is_implicit_VR, is_little_endian)
 
 
-def read_file(fp, defer_size=None, stop_before_pixels=False,
-              force=False, specific_tags=None):
+def dcmread(filepath_or_buffer, defer_size=None, stop_before_pixels=False,
+            force_read=False, specific_tags=None):
     """Read and parse a DICOM dataset stored in the DICOM File Format.
 
     Read a DICOM dataset stored in accordance with the DICOM File Format
@@ -802,98 +802,124 @@ def read_file(fp, defer_size=None, stop_before_pixels=False,
     accordance with the File Format (i.e. the preamble and prefix are missing,
     there are missing required Type 1 File Meta Information Group elements
     or the entire File Meta Information is missing) then you will have to
-    set `force` to True.
+    set ``force_read`` to True.
 
     Parameters
     ----------
-    fp : str or file-like
+    filepath_or_buffer : str or file-like
         Either a file-like object, or a string containing the file name. If a
         file-like object, the caller is responsible for closing it.
-    defer_size : int or str or None
+
+    defer_size : int, str or None, optional
         If None (default), all elements read into memory. If specified, then if
-        a data element's stored value is larger than `defer_size`, the value is
-        not read into memory until it is accessed in code. Specify an integer
-        (bytes), or a string value with units, e.g. "512 KB", "2 MB".
-    stop_before_pixels : bool
-        If False (default), the full file will be read and parsed. Set True to
-        stop before reading (7FE0,0010) 'Pixel Data' (and all subsequent
+        a data element's stored value is larger than ``defer_size``, the value
+        is not read into memory until it is accessed in code. Specify an
+        integer (bytes), or a string value with units, e.g. "512 KB", "2 MB".
+
+    stop_before_pixels : bool, (default=False)
+        If False (default), the full file will be read and parsed. Set to True
+        to stop before reading (7FE0,0010) 'Pixel Data' (and all subsequent
         elements).
-    force : bool
+
+    force_read : bool, (default=False)
         If False (default), raises an InvalidDicomError if the file is missing
         the File Meta Information header. Set to True to force reading even if
         no File Meta Information header is found.
-    specific_tags : list or None
+
+    specific_tags : list or None, optional
         If not None, only the tags in the list are returned. The list
         elements can be tags or tag names.
 
     Returns
     -------
-    FileDataset
+    dataset : FileDataset
         An instance of FileDataset that represents a parsed DICOM file.
 
     Raises
     ------
     InvalidDicomError
-        If `force` is True and the file is not a valid DICOM file.
+        If ``force_read`` is False and the file is not a valid DICOM file or a
+        DICOMDIR is read and the filepath is not a DICOMDIR file.
 
     See Also
     --------
     pydicom.dataset.FileDataset
         Data class that is returned.
-    pydicom.filereader.read_partial
+    pydicom.dicomio.read_partial
         Only read part of a DICOM file, stopping on given conditions.
 
     Examples
     --------
     Read and return a dataset stored in accordance with the DICOM File Format
-    >>> ds = pydicom.read_file("rtplan.dcm")
+
+    >>> from pydicom.data import get_testdata_files
+    >>> from pydicom.dicomio import dcmread
+    >>> filename = get_testdata_files('rtplan.dcm')[0]
+    >>> ds = dcmread(filename)
     >>> ds.PatientName
+    'Last^First^mid^pre'
+
+    You can also read the file and pass the file handle directly
+
+    >>> with open(filename, 'rb') as dcmfile:
+    ...     ds = dcmread(dcmfile)
+    ...     ds.PatientName
+    'Last^First^mid^pre'
 
     Read and return a dataset not in accordance with the DICOM File Format
-    >>> ds = pydicom.read_file("rtplan.dcm", force=True)
-    >>> ds.PatientName
 
-    Use within a context manager:
-    >>> with pydicom.read_file("rtplan.dcm") as ds:
-    >>>     ds.PatientName
+    >>> ds = dcmread(filename, force_read=True)
+    >>> ds.PatientName
+    'Last^First^mid^pre'
+
+    Use within a context manager to garbage collect the dataset without
+    deleting the dataset by hand
+
+    >>> with dcmread(filename) as ds:
+    ...     ds.PatientName
+    'Last^First^mid^pre'
+
     """
-    # Open file if not already a file object
     caller_owns_file = True
-    if isinstance(fp, compat.string_types):
+    if isinstance(filepath_or_buffer, compat.string_types):
         # caller provided a file name; we own the file handle
         caller_owns_file = False
-        try:
-            logger.debug(u"Reading file '{0}'".format(fp))
-        except Exception:
-            logger.debug("Reading file '{0}'".format(fp))
-        fp = open(fp, 'rb')
+        logger.debug("Reading file '{}'".format(filepath_or_buffer))
 
-    if config.debugging:
-        logger.debug("\n" + "-" * 80)
-        logger.debug("Call to read_file()")
-        msg = ("filename:'%s', defer_size='%s', "
-               "stop_before_pixels=%s, force=%s, specific_tags=%s")
-        logger.debug(msg % (fp.name, defer_size, stop_before_pixels,
-                            force, specific_tags))
-        if caller_owns_file:
-            logger.debug("Caller passed file object")
-        else:
-            logger.debug("Caller passed file name")
-        logger.debug("-" * 80)
+        dcmfile = open(filepath_or_buffer, 'rb')
+    else:
+        dcmfile = filepath_or_buffer
+
+    # if a file is passed, the filename will be None
+    dcmfilename = getattr(dcmfile, 'name', None)
+
+    msg = ("filename:'%s', defer_size='%s', "
+           "stop_before_pixels=%s, force=%s, specific_tags=%s")
+    logger.debug(msg % (getattr(dcmfile, 'name', None),
+                        defer_size, stop_before_pixels,
+                        force_read, specific_tags))
+    if caller_owns_file:
+        logger.debug("Caller passed file object")
+    else:
+        logger.debug("Caller passed file name")
 
     # Convert size to defer reading into bytes
     defer_size = size_in_bytes(defer_size)
 
     # Iterate through all items and store them --include file meta if present
-    stop_when = None
-    if stop_before_pixels:
-        stop_when = _at_pixel_data
+    stop_when = _at_pixel_data if stop_before_pixels else None
     try:
-        dataset = read_partial(fp, stop_when, defer_size=defer_size,
-                               force=force, specific_tags=specific_tags)
+        dataset = read_partial(dcmfile, stop_when, defer_size=defer_size,
+                               force=force_read, specific_tags=specific_tags)
     finally:
         if not caller_owns_file:
-            fp.close()
+            dcmfile.close()
+
+    if dcmfilename is not None and dcmfilename.endswith('DICOMDIR'):
+        if not isinstance(dataset, DicomDir):
+            raise InvalidDicomError("File '{}' is not a Media Storage"
+                                    " Directory file".format(dcmfilename))
+
     # XXX need to store transfer syntax etc.
     return dataset
 
@@ -917,16 +943,89 @@ def read_dicomdir(filename="DICOMDIR"):
     InvalidDicomError
         Raised if filename is not a DICOMDIR file.
     """
-    # read_file will return a DicomDir instance if file is one.
+    return dcmread(filename)
 
-    # Read the file as usual.
-    ds = read_file(filename)
-    # Here, check that it is in fact DicomDir
-    if not isinstance(ds, DicomDir):
-        msg = u"File '{0}' is not a Media Storage Directory file".format(
-            filename)
-        raise InvalidDicomError(msg)
-    return ds
+
+def read_file(fp, defer_size=None, stop_before_pixels=False,
+              force=False, specific_tags=None):
+    """Read and parse a DICOM dataset stored in the DICOM File Format.
+
+    Read a DICOM dataset stored in accordance with the DICOM File Format
+    (DICOM Standard Part 10 Section 7). If the dataset is not stored in
+    accordance with the File Format (i.e. the preamble and prefix are missing,
+    there are missing required Type 1 File Meta Information Group elements
+    or the entire File Meta Information is missing) then you will have to
+    set ``force`` to True.
+
+    Parameters
+    ----------
+    fp : str or file-like
+        Either a file-like object, or a string containing the file name. If a
+        file-like object, the caller is responsible for closing it.
+
+    defer_size : int, str or None, optional
+        If None (default), all elements read into memory. If specified, then if
+        a data element's stored value is larger than ``defer_size``, the value
+        is not read into memory until it is accessed in code. Specify an
+        integer (bytes), or a string value with units, e.g. "512 KB", "2 MB".
+
+    stop_before_pixels : bool, (default=False)
+        If False (default), the full file will be read and parsed. Set True to
+        stop before reading (7FE0,0010) 'Pixel Data' (and all subsequent
+        elements).
+
+    force : bool, (default=False)
+        If False (default), raises an InvalidDicomError if the file is missing
+        the File Meta Information header. Set to True to force reading even if
+        no File Meta Information header is found.
+
+    specific_tags : list or None, optional
+        If not None, only the tags in the list are returned. The list
+        elements can be tags or tag names.
+
+    Returns
+    -------
+    FileDataset
+        An instance of FileDataset that represents a parsed DICOM file.
+
+    Raises
+    ------
+    InvalidDicomError
+        If ``force`` is True and the file is not a valid DICOM file.
+
+    See Also
+    --------
+    pydicom.dataset.FileDataset
+        Data class that is returned.
+    pydicom.dicomio.read_partial
+        Only read part of a DICOM file, stopping on given conditions.
+
+    Examples
+    --------
+    Read and return a dataset stored in accordance with the DICOM File Format
+
+    >>> import pydicom
+    >>> from pydicom.data import get_testdata_files
+    >>> filename = get_testdata_files('rtplan.dcm')[0]
+    >>> ds = pydicom.read_file(filename)
+    >>> ds.PatientName
+    'Last^First^mid^pre'
+
+    Read and return a dataset not in accordance with the DICOM File Format
+
+    >>> ds = pydicom.read_file(filename, force=True)
+    >>> ds.PatientName
+    'Last^First^mid^pre'
+
+    Use within a context manager:
+
+    >>> with pydicom.read_file(filename) as ds:
+    ...     ds.PatientName
+    'Last^First^mid^pre'
+
+    """
+    return dcmread(fp, defer_size, stop_before_pixels,
+                   force, specific_tags)
 
 
 def data_element_offset_to_value(is_implicit_VR, VR):

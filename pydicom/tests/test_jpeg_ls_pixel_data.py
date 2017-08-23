@@ -3,7 +3,7 @@ import os
 import sys
 import pytest
 import pydicom
-from pydicom.filereader import read_file
+from pydicom.dicomio import read_file
 from pydicom.data import get_testdata_files
 jpeg_ls_missing_message = ("jpeg_ls is not available "
                            "in this test environment")

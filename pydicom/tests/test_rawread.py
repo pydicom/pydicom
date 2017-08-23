@@ -7,7 +7,7 @@
 
 from io import BytesIO
 import unittest
-from pydicom.filereader import data_element_generator
+from pydicom.dicomio.filereader import data_element_generator
 from pydicom.values import convert_value
 from pydicom.sequence import Sequence
 from pydicom.util.hexutil import hex2bytes
