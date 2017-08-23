@@ -414,14 +414,14 @@ def write_data_element(fp, data_element, encoding=default_encoding):
     if (hasattr(data_element, "is_undefined_length")
             and data_element.is_undefined_length):
         is_undefined_length = True
+        # valid pixel data with undefined length shall contain encapsulated
+        # data, e.g. sequence items - raise ValueError otherwise (see #238)
         if data_element.tag == 0x7fe00010:  # pixel data
-            starts_with_item_tag = False
+            val = data_element.value
             if fp.is_little_endian:
-                if data_element.value.startswith(b'\xfe\xff\x00\xe0'):
-                    starts_with_item_tag = True
+                starts_with_item_tag = val.startswith(b'\xfe\xff\x00\xe0')
             else:
-                if data_element.value.startswith(b'\xff\xfe\xe0\x00'):
-                    starts_with_item_tag = True
+                starts_with_item_tag = val.startswith(b'\xff\xfe\xe0\x00')
             if not starts_with_item_tag:
                 raise ValueError('Pixel Data with undefined length must '
                                  'start with an an item tag')
