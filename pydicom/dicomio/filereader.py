@@ -890,9 +890,13 @@ def dcmread(filepath_or_buffer, defer_size=None, stop_before_pixels=False,
     else:
         dcmfile = filepath_or_buffer
 
+    # if a file is passed, the filename will be None
+    dcmfilename = getattr(dcmfile, 'name', None)
+
     msg = ("filename:'%s', defer_size='%s', "
            "stop_before_pixels=%s, force=%s, specific_tags=%s")
-    logger.debug(msg % (dcmfile.name, defer_size, stop_before_pixels,
+    logger.debug(msg % (getattr(dcmfile, 'name', None),
+                        defer_size, stop_before_pixels,
                         force_read, specific_tags))
     if caller_owns_file:
         logger.debug("Caller passed file object")
@@ -911,11 +915,10 @@ def dcmread(filepath_or_buffer, defer_size=None, stop_before_pixels=False,
         if not caller_owns_file:
             dcmfile.close()
 
-    if dcmfile.name.endswith('DICOMDIR'):
+    if dcmfilename is not None and dcmfilename.endswith('DICOMDIR'):
         if not isinstance(dataset, DicomDir):
-            msg = "File '{}' is not a Media Storage Directory file".format(
-                dcmfile.name)
-        raise InvalidDicomError(msg)
+            raise InvalidDicomError("File '{}' is not a Media Storage"
+                                    " Directory file".format(dcmfilename))
 
     # XXX need to store transfer syntax etc.
     return dataset
