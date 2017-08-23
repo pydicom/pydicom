@@ -418,13 +418,12 @@ def write_data_element(fp, data_element, encoding=default_encoding):
         # data, e.g. sequence items - raise ValueError otherwise (see #238)
         if data_element.tag == 0x7fe00010:  # pixel data
             val = data_element.value
-            if fp.is_little_endian:
-                starts_with_item_tag = val.startswith(b'\xfe\xff\x00\xe0')
-            else:
-                starts_with_item_tag = val.startswith(b'\xff\xfe\xe0\x00')
-            if not starts_with_item_tag:
+            if (fp.is_little_endian and not
+                    val.startswith(b'\xfe\xff\x00\xe0') or
+                    not fp.is_little_endian and
+                    not val.startswith(b'\xff\xfe\xe0\x00')):
                 raise ValueError('Pixel Data with undefined length must '
-                                 'start with an an item tag')
+                                 'start with an item tag')
     location = fp.tell()
     fp.seek(length_location)
     if not fp.is_implicit_VR and VR not in extra_length_VRs:

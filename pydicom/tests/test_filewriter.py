@@ -1780,7 +1780,8 @@ class TestWriteUndefinedLengthPixelData(unittest.TestCase):
                                  b'\x00\x01\x02\x03'
                                  b'\xfe\xff\xdd\xe0',
                                  is_undefined_length=True)
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match='Pixel Data .* must '
+                                             'start with an item tag'):
             write_data_element(self.fp, pixel_data)
 
     def test_big_endian_incorrect_data(self):
@@ -1792,7 +1793,8 @@ class TestWriteUndefinedLengthPixelData(unittest.TestCase):
                                  b'\x00\x01\x02\x03'
                                  b'\xff\xfe\xe0\xdd',
                                  is_undefined_length=True)
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match='Pixel Data .+ must '
+                                             'start with an item tag'):
             write_data_element(self.fp, pixel_data)
 
 
