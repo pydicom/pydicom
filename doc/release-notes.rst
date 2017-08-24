@@ -7,6 +7,9 @@ Release history
 Version 1.0.0 (under development)
 =================================
 
+Highlights
+----------
+
 This is a major release, with major changes, including backwards-incompatible
 changes.
 
@@ -29,6 +32,12 @@ Documentation
 
 * Documentation refactorization with examples. :issue:`472` by :user:`Guillaume
   Lemaitre <glemaitre>`.
+
+Maintenance
+...........
+
+* Remove ``python-dateutil`` dependency by backporting ``datetime.timezone``
+  from Python 3.6 to Python 2.7. :issue:`425` by :user:`Guillaume Lemaitre`
 
 Other changes
 .............
