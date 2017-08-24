@@ -27,8 +27,13 @@ Enhancements
 Documentation
 .............
 
-* Documentation refactorization with examples. :issue:`472` by :user:`Guillaume
-  Lemaitre <glemaitre>`.
+* Documentation refactorization with examples. :issue:`472`.
+
+Maintenance
+...........
+
+* Remove :class:`pydicom.filereader.DicomIter` since it is
+  unused. :issue:`493`.
 
 Other changes
 .............
