@@ -33,7 +33,7 @@ Documentation
 Maintenance
 ...........
 
-* Remove :class:`pydicom.filereader.DicomIter` since it is unused. :issue:`482`
+* Remove :class:`pydicom.filereader.DicomIter` since it is unused. :issue:`493`
   by :user:`Guillaume Lemaitre <glemaitre>`.
 
 Other changes
