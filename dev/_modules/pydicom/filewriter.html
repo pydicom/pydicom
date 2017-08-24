@@ -594,6 +594,16 @@
     <span class="k">if</span> <span class="p">(</span><span class="nb">hasattr</span><span class="p">(</span><span class="n">data_element</span><span class="p">,</span> <span class="s2">&quot;is_undefined_length&quot;</span><span class="p">)</span>
             <span class="ow">and</span> <span class="n">data_element</span><span class="o">.</span><span class="n">is_undefined_length</span><span class="p">):</span>
         <span class="n">is_undefined_length</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="c1"># valid pixel data with undefined length shall contain encapsulated</span>
+        <span class="c1"># data, e.g. sequence items - raise ValueError otherwise (see #238)</span>
+        <span class="k">if</span> <span class="n">data_element</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="mh">0x7fe00010</span><span class="p">:</span>  <span class="c1"># pixel data</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="n">data_element</span><span class="o">.</span><span class="n">value</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">fp</span><span class="o">.</span><span class="n">is_little_endian</span> <span class="ow">and</span> <span class="ow">not</span>
+                    <span class="n">val</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;</span><span class="se">\xfe\xff\x00\xe0</span><span class="s1">&#39;</span><span class="p">)</span> <span class="ow">or</span>
+                    <span class="ow">not</span> <span class="n">fp</span><span class="o">.</span><span class="n">is_little_endian</span> <span class="ow">and</span>
+                    <span class="ow">not</span> <span class="n">val</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;</span><span class="se">\xff\xfe\xe0\x00</span><span class="s1">&#39;</span><span class="p">)):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Pixel Data with undefined length must &#39;</span>
+                                 <span class="s1">&#39;start with an item tag&#39;</span><span class="p">)</span>
     <span class="n">location</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
     <span class="n">fp</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">length_location</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">fp</span><span class="o">.</span><span class="n">is_implicit_VR</span> <span class="ow">and</span> <span class="n">VR</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">extra_length_VRs</span><span class="p">:</span>
