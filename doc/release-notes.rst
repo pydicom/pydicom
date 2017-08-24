@@ -30,6 +30,12 @@ Documentation
 * Documentation refactorization with examples. :issue:`472` by :user:`Guillaume
   Lemaitre <glemaitre>`.
 
+Maintenance
+...........
+
+* Remove :class:`pydicom.filereader.DicomIter` since it is unused. :issue:`482`
+  by :user:`Guillaume Lemaitre <glemaitre>`.
+
 Other changes
 .............
 
