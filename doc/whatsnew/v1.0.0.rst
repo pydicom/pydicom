@@ -1,0 +1,48 @@
+Version 1.0.0 (under development)
+=================================
+
+This is a major release, with major changes, including backwards-incompatible
+changes.
+
+Changelog
+---------
+
+Enhancements
+............
+
+* fully python3 compatible -- one code-base for both python 2 and python 3
+* package name and the import name match -- now use ``import pydicom`` rather
+  than ``import dicom``
+* optional GDCM support for reading files with compressed pixel data
+* optional Pillow, jpeg_ls support for reading some compressed pixel data files
+* cleaned up dicom dictionary code, old non-dicom-keyword code removed
+* dicom dictionary updated to 2017c
+
+Documentation
+.............
+
+* Documentation refactorization with examples. :issue:`472` by :user:`Guillaume
+  Lemaitre <glemaitre>`.
+
+Other changes
+.............
+
+* updated doc strings for common functions
+* UID.py now uid.py to match python style guide
+* added util/fixer.py -- callbacks available to fix dicom non-compliant values
+  before exceptions thrown
+* added PyPy support
+* added util/leanread.py -- very bare-bones reading (for fastest possible speed)
+* added misc/is_dicom function -- return True if a dicom file
+* added context management methods to Dataset
+* added date/time converters :issue:`143`
+* fixed pixel handling for ``PlanarConfiguration=0``
+* updated uid generation to ensure uniqueness
+* added some heuristics to accept files with missing preamble and file_meta
+* added ``from_name()`` method to UID class, to generate UID instance from
+  descriptive name
+* added ability to add custom dicom dictionary items via ``add_dict_entry()``
+  and ``add_dict_entries()``
+* more methods for DataElement -- keyword, is_retired, etc.
+* some support for pickle, cpickle
+* fixes/additions for some character set encodings
