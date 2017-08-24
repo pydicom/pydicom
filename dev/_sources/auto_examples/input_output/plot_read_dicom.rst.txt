@@ -82,7 +82,7 @@ information, and show it using matplotlib.
     plt.imshow(dataset.pixel_array, cmap=plt.cm.bone)
     plt.show()
 
-**Total running time of the script:** ( 0 minutes  0.108 seconds)
+**Total running time of the script:** ( 0 minutes  0.072 seconds)
 
 
 
