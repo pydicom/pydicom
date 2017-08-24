@@ -37,7 +37,8 @@ Maintenance
 ...........
 
 * Remove ``python-dateutil`` dependency by backporting ``datetime.timezone``
-  from Python 3.6 to Python 2.7. :issue:`425` by :user:`Guillaume Lemaitre`
+  from Python 3.6 to Python 2.7. :issue:`425` by :user:`Guillaume Lemaitre
+  <glemaitre>`
 
 Other changes
 .............
