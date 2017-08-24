@@ -37,7 +37,6 @@ except AttributeError:
     except ImportError:
         print("unittest2 is required for testing in python2.6")
 
-
 rtplan_name = get_testdata_files("rtplan.dcm")[0]
 rtdose_name = get_testdata_files("rtdose.dcm")[0]
 ct_name = get_testdata_files("CT_small.dcm")[0]
@@ -1724,6 +1723,74 @@ class TestWriteFileMetaInfoNonStandard(unittest.TestCase):
         ref_meta = deepcopy(meta)
         write_file_meta_info(self.fp, meta, enforce_standard=False)
         self.assertEqual(meta, ref_meta)
+
+
+class TestWriteUndefinedLengthPixelData(unittest.TestCase):
+    """Test write_data_element() for pixel data with undefined length."""
+
+    def setUp(self):
+        self.fp = DicomBytesIO()
+
+    def test_little_endian_correct_data(self):
+        """Pixel data starting with an item tag is written."""
+        self.fp.is_little_endian = True
+        self.fp.is_implicit_VR = False
+        pixel_data = DataElement(0x7fe00010, 'OB',
+                                 b'\xfe\xff\x00\xe0'
+                                 b'\x00\x01\x02\x03',
+                                 is_undefined_length=True)
+        write_data_element(self.fp, pixel_data)
+
+        expected = (b'\xe0\x7f\x10\x00'  # tag
+                    b'OB\x00\x00'  # VR
+                    b'\xff\xff\xff\xff'  # length
+                    b'\xfe\xff\x00\xe0\x00\x01\x02\x03'  # contents
+                    b'\xfe\xff\xdd\xe0\x00\x00\x00\x00')  # SQ delimiter
+        self.fp.seek(0)
+        assert self.fp.read() == expected
+
+    def test_big_endian_correct_data(self):
+        """Pixel data starting with an item tag is written."""
+        self.fp.is_little_endian = False
+        self.fp.is_implicit_VR = False
+        pixel_data = DataElement(0x7fe00010, 'OB',
+                                 b'\xff\xfe\xe0\x00'
+                                 b'\x00\x01\x02\x03',
+                                 is_undefined_length=True)
+        write_data_element(self.fp, pixel_data)
+        expected = (b'\x7f\xe0\x00\x10'  # tag
+                    b'OB\x00\x00'  # VR
+                    b'\xff\xff\xff\xff'  # length
+                    b'\xff\xfe\xe0\x00\x00\x01\x02\x03'  # contents
+                    b'\xff\xfe\xe0\xdd\x00\x00\x00\x00')  # SQ delimiter
+        self.fp.seek(0)
+        assert self.fp.read() == expected
+
+    def test_little_endian_incorrect_data(self):
+        """Writing pixel data not starting with an item tag raises."""
+        self.fp.is_little_endian = True
+        self.fp.is_implicit_VR = False
+        pixel_data = DataElement(0x7fe00010, 'OB',
+                                 b'\xff\xff\x00\xe0'
+                                 b'\x00\x01\x02\x03'
+                                 b'\xfe\xff\xdd\xe0',
+                                 is_undefined_length=True)
+        with pytest.raises(ValueError, match='Pixel Data .* must '
+                                             'start with an item tag'):
+            write_data_element(self.fp, pixel_data)
+
+    def test_big_endian_incorrect_data(self):
+        """Writing pixel data not starting with an item tag raises."""
+        self.fp.is_little_endian = False
+        self.fp.is_implicit_VR = False
+        pixel_data = DataElement(0x7fe00010, 'OB',
+                                 b'\x00\x00\x00\x00'
+                                 b'\x00\x01\x02\x03'
+                                 b'\xff\xfe\xe0\xdd',
+                                 is_undefined_length=True)
+        with pytest.raises(ValueError, match='Pixel Data .+ must '
+                                             'start with an item tag'):
+            write_data_element(self.fp, pixel_data)
 
 
 if __name__ == "__main__":
