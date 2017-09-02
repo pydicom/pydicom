@@ -38,7 +38,7 @@ if [[ "$DISTRIB" == "conda" ]]; then
     # provided versions
     conda create -n testenv --yes python=$PYTHON_VERSION pip
     source activate testenv
-    conda install --yes nose pytest pytest-cov python-dateutil
+    conda install --yes nose pytest pytest-cov
     if [[ "$NUMPY" == "true" ]]; then
         conda install --yes numpy
     fi
@@ -65,7 +65,7 @@ elif [[ "$DISTRIB" == "ubuntu" ]]; then
     # Create a new virtualenv using system site packages for python, numpy
     virtualenv --system-site-packages testvenv
     source testvenv/bin/activate
-    pip install nose nose-timer pytest pytest-cov codecov python-dateutil
+    pip install nose nose-timer pytest pytest-cov codecov
 
 elif [[ "$DISTRIB" == "pypy" ]]; then
     # This is to see if we are supporting pypy. With pypy3, numpypy is not
@@ -97,7 +97,7 @@ elif [[ "$DISTRIB" == "pypy" ]]; then
     elif [[ "$NUMPY" == "true" ]]; then
         python -m pip install cython numpy
     fi
-    python -m pip install nose nose-timer pytest pytest-cov codecov python-dateutil
+    python -m pip install nose nose-timer pytest pytest-cov codecov
 fi
 
 python --version

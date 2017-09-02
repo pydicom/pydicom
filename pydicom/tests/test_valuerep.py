@@ -20,14 +20,9 @@ import platform
 from pydicom.compat import in_py2
 from pydicom import config
 from pydicom import valuerep
+from pydicom.util.fixes import timezone
 from pydicom.data import get_testdata_files
 import unittest
-
-have_dateutil = True
-try:
-    from dateutil.tz import tzoffset
-except ImportError:
-    have_dateutil = False
 
 try:
     unittest.skipIf
@@ -316,8 +311,6 @@ class PersonNametests(unittest.TestCase):
         self.assertFalse(pn != "John^Doe", msg)
 
 
-@unittest.skipIf(not have_dateutil,
-                 "Need python-dateutil installed for these tests")
 class DateTimeTests(unittest.TestCase):
     """Unit tests for DA, DT, TM conversion to datetime objects"""
 
@@ -377,7 +370,7 @@ class DateTimeTests(unittest.TestCase):
         dicom_datetime = "196108041924-1000"
         dt = valuerep.DT(dicom_datetime)
         datetime_datetime = datetime(1961, 8, 4, 19, 24, 0, 0,
-                                     tzoffset(None, -10 * 3600))
+                                     timezone(timedelta(seconds=-10 * 3600)))
         self.assertEqual(dt, datetime_datetime,
                          ("DT {0} not equal to datetime {1}"
                           .format(dicom_datetime,

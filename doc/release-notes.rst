@@ -7,6 +7,9 @@ Release history
 Version 1.0.0 (under development)
 =================================
 
+Highlights
+----------
+
 This is a major release, with major changes, including backwards-incompatible
 changes.
 
@@ -34,6 +37,12 @@ Maintenance
 
 * Remove :class:`pydicom.filereader.DicomIter` since it is
   unused. :issue:`493`.
+
+Maintenance
+...........
+
+* Remove ``python-dateutil`` dependency by backporting ``datetime.timezone``
+  from Python 3.6 to Python 2.7. :issue:`435`.
 
 Other changes
 .............
