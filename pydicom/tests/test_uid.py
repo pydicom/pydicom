@@ -61,7 +61,8 @@ class TestUID(object):
         assert not self.uid == 'Explicit VR Little Endian'
         # Issue 96
         assert not self.uid == 3
-        assert not self.uid is None
+        is_none = self.uid is None
+        assert not is_none
 
     def test_inequality(self):
         """Test that UID.__ne__ works."""
@@ -182,6 +183,14 @@ class TestUID(object):
         """Test that UID.name works."""
         assert self.uid.name == 'Implicit VR Little Endian'
         assert UID('1.2.840.10008.5.1.4.1.1.2').name == 'CT Image Storage'
+
+    def test_name_with_equal_hash(self):
+        """Test that UID name works for UID with same hash as predefined UID.
+        """
+        uid_string = '1.3.12.2.1107.5.2.18.41538.2017072416190348328326500'
+        uid = UID(uid_string)
+        # Issue 499 - infinite recursion
+        assert uid.name == uid_string
 
     def test_type(self):
         """Test that UID.type works."""
