@@ -11,6 +11,7 @@ from io import BytesIO
 import os
 from os import stat
 import os.path
+from re import compile
 import shutil
 import sys
 import tempfile
@@ -31,7 +32,6 @@ from pydicom.filereader import (read_file, data_element_generator,
 from pydicom.tag import Tag, TupleTag
 from pydicom.uid import ImplicitVRLittleEndian
 import pydicom.valuerep
-from .testing import assert_warns_regex
 
 have_gdcm_handler = True
 try:
@@ -100,6 +100,43 @@ emri_jpeg_2k_lossless = get_testdata_files(
 color_3d_jpeg_baseline = get_testdata_files("color3d_jpeg_baseline.dcm")[0]
 dir_name = os.path.dirname(sys.argv[0])
 save_dir = os.getcwd()
+
+
+def assert_warns_regex(type_warn, message, func, *args, **kwargs):
+    """Test a warning against an expected warning.
+
+    Only tests that the first `type_warn` warning fired matches the expected
+    warning.
+
+    Parameters
+    ----------
+    type_warn : Warning
+        The expected warning.
+    message : str
+        A string that will be used as a regex pattern to match against the
+        actual warning message. If using the actual expected message don't
+        forget to escape any regex special characters like '|', '(', ')', etc.
+    func : callable
+        The function that is expected to fire the warning.
+    args
+        The callable function `func`'s arguments.
+    kwargs
+        The callable function `func`'s keyword arguments.
+
+    Raises
+    ------
+    AssertionError
+        If the regex pattern in `message` doesn't match the actual warning.
+    """
+    with pytest.warns(None) as wrnrecord:
+        func(*args, **kwargs)
+
+    wrn = wrnrecord.pop(type_warn)
+    regex = compile(message)
+    if regex.search(str(wrn.message)) is None:
+        msg = "Pattern '{}' not found in warnings".format(message)
+        raise AssertionError(msg)
+
 
 
 def isClose(a, b, epsilon=0.000001):

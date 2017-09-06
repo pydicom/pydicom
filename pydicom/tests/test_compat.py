@@ -6,7 +6,6 @@ import sys
 import pytest
 
 from pydicom.compat import *
-from .testing import assert_raises_regex
 
 
 def test_python_version():
