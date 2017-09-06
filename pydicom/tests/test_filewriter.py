@@ -31,7 +31,6 @@ from pydicom.uid import (ImplicitVRLittleEndian, ExplicitVRBigEndian,
 from pydicom.util.hexutil import hex2bytes, bytes2hex
 from pydicom.util.fixes import timezone
 from pydicom.valuerep import DA, DT, TM
-from .testing import assert_raises_regex
 from ._write_stds import impl_LE_deflen_std_hex
 
 have_dateutil = True
@@ -50,6 +49,33 @@ datetime_name = mr_name
 
 unicode_name = get_charset_files("chrH31.dcm")[0]
 multiPN_name = get_charset_files("chrFrenMulti.dcm")[0]
+
+
+def assert_raises_regex(type_error, message, func, *args, **kwargs):
+    """Test a raised exception against an expected exception.
+
+    Parameters
+    ----------
+    type_error : Exception
+        The expected raised exception.
+    message : str
+        A string that will be used as a regex pattern to match against the
+        actual exception message. If using the actual expected message don't
+        forget to escape any regex special characters like '|', '(', ')', etc.
+    func : callable
+        The function that is expected to raise the exception.
+    args
+        The callable function `func`'s arguments.
+    kwargs
+        The callable function `func`'s keyword arguments.
+
+    Notes
+    -----
+    Taken from https://github.com/glemaitre/specio, BSD 3 license.
+    """
+    with pytest.raises(type_error) as excinfo:
+        func(*args, **kwargs)
+    excinfo.match(message)
 
 
 def files_identical(a, b):
