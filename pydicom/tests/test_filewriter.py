@@ -833,7 +833,7 @@ class TestCorrectAmbiguousVRElement(object):
         ds.Columns = 1
         ds.PixelData = b'\x00\x01\x02'
         ds[0x7fe00010].VR = 'OB or OW'
-        out = correct_ambiguous_vr_element(ds[0x7fe00010],ds, True)
+        out = correct_ambiguous_vr_element(ds[0x7fe00010], ds, True)
         assert out.VR == 'OB or OW'
         assert out.tag == 0x7fe00010
         assert out.value == b'\x00\x01\x02'
