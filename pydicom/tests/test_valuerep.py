@@ -310,6 +310,15 @@ class PersonNametests(unittest.TestCase):
         msg = "PersonName3 not equal comparison did not work correctly"
         self.assertFalse(pn != "John^Doe", msg)
 
+    def test_encoding_carried(self):
+        """Test encoding is carried over to a new PN3 object"""
+        # Issue 466
+        from pydicom.valuerep import PersonName3
+        pn = PersonName3("John^Doe", encodings='iso_ir_126')
+        assert pn.encodings == ['iso_ir_126', 'iso_ir_126', 'iso_ir_126']
+        pn2 = PersonName3(pn)
+        assert pn2.encodings == ['iso_ir_126', 'iso_ir_126', 'iso_ir_126']
+
 
 class DateTimeTests(unittest.TestCase):
     """Unit tests for DA, DT, TM conversion to datetime objects"""

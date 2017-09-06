@@ -517,6 +517,7 @@ def MultiString(val, valtype=str):
 class PersonName3(object):
     def __init__(self, val, encodings=default_encoding):
         if isinstance(val, PersonName3):
+            encodings = val.encodings
             val = val.original_string
 
         self.original_string = val
