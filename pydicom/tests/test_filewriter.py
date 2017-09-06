@@ -2,10 +2,11 @@
 """unittest cases for pydicom.filewriter module"""
 
 from copy import deepcopy
-from datetime import date, datetime, time
+from datetime import date, datetime, time, timedelta
 from io import BytesIO
 import os
 import os.path
+
 from struct import unpack
 from tempfile import TemporaryFile
 import unittest
@@ -28,14 +29,11 @@ from pydicom.sequence import Sequence
 from pydicom.uid import (ImplicitVRLittleEndian, ExplicitVRBigEndian,
                          PYDICOM_IMPLEMENTATION_UID)
 from pydicom.util.hexutil import hex2bytes, bytes2hex
+from pydicom.util.fixes import timezone
 from pydicom.valuerep import DA, DT, TM
 from ._write_stds import impl_LE_deflen_std_hex
 
-have_dateutil = True
-try:
-    from dateutil.tz import tzoffset
-except ImportError:
-    have_dateutil = False
+import unittest
 
 rtplan_name = get_testdata_files("rtplan.dcm")[0]
 rtdose_name = get_testdata_files("rtdose.dcm")[0]
@@ -106,7 +104,6 @@ class WriteFileTests(unittest.TestCase):
 
     def compare(self, in_filename, decode=False):
         """Read Dataset from in_filename, write to file, compare"""
-
         with open(in_filename, 'rb') as f:
             bytes_in = BytesIO(f.read())
             bytes_in.seek(0)
@@ -119,7 +116,7 @@ class WriteFileTests(unittest.TestCase):
         bytes_out.seek(0)
         same, pos = bytes_identical(bytes_in.getvalue(), bytes_out.getvalue())
         self.assertTrue(same, "Read bytes is not identical to written bytes - "
-                              "first difference at 0x%x" % pos)
+                        "first difference at 0x%x" % pos)
 
     def compare_bytes(self, bytes_in, bytes_out):
         """Compare two bytestreams for equality"""
@@ -208,10 +205,9 @@ class WriteFileTests(unittest.TestCase):
         self.assertRaises(ValueError, ds.save_as, self.file_out)
 
 
-@unittest.skipIf(not have_dateutil,
-                 "Need python-dateutil installed for these tests")
 class ScratchWriteDateTimeTests(WriteFileTests):
     """Write and reread simple or multi-value DA/DT/TM data elements"""
+
     def setUp(self):
         config.datetime_conversion = True
         self.file_out = TemporaryFile('w+b')
@@ -223,10 +219,10 @@ class ScratchWriteDateTimeTests(WriteFileTests):
         """Write DA/DT/TM data elements.........."""
         multi_DA_expected = (date(1961, 8, 4), date(1963, 11, 22))
         DA_expected = date(1961, 8, 4)
-        tzinfo = tzoffset('-0600', -21600)
-        multi_DT_expected = (datetime(1961, 8, 4),
-                             datetime(1963, 11, 22, 12, 30, 0, 0,
-                                      tzoffset('-0600', -21600)))
+        tzinfo = timezone(timedelta(seconds=-21600), '-0600')
+        multi_DT_expected = (datetime(1961, 8, 4), datetime(
+            1963, 11, 22, 12, 30, 0, 0,
+            timezone(timedelta(seconds=-21600), '-0600')))
         multi_TM_expected = (time(1, 23, 45), time(11, 11, 11))
         TM_expected = time(11, 11, 11, 1)
         ds = read_file(datetime_name)
@@ -240,7 +236,6 @@ class ScratchWriteDateTimeTests(WriteFileTests):
         self.file_out.seek(0)
         # Now read it back in and check the values are as expected
         ds = read_file(self.file_out)
-
         self.assertSequenceEqual(multi_DA_expected, ds.CalibrationDate)
         self.assertEqual(DA_expected, ds.DateOfLastCalibration)
         self.assertSequenceEqual(multi_DT_expected, ds.ReferencedDateTime)
@@ -250,6 +245,7 @@ class ScratchWriteDateTimeTests(WriteFileTests):
 
 class WriteDataElementTests(unittest.TestCase):
     """Attempt to write data elements has the expected behaviour"""
+
     def setUp(self):
         # Create a dummy (in memory) file to write to
         self.f1 = DicomBytesIO()
@@ -285,8 +281,8 @@ class WriteDataElementTests(unittest.TestCase):
         # Was issue 74
         data_elem = DataElement(0x00280009, "AT", [])
         expected = hex2bytes((
-            " 28 00 09 00"   # (0028,0009) Frame Increment Pointer
-            " 00 00 00 00"   # length 0
+            " 28 00 09 00"  # (0028,0009) Frame Increment Pointer
+            " 00 00 00 00"  # length 0
         ))
         write_data_element(self.f1, data_elem)
         got = self.f1.getvalue()
@@ -391,12 +387,10 @@ class WriteDataElementTests(unittest.TestCase):
         # VR (OD): \x4f\x44
         # Reserved: \x00\x00
         # Length (16): \x10\x00\x00\x00
-
         #             | Tag          | VR    |
         ref_bytes = b'\x70\x00\x0d\x15\x4f\x44' \
                     b'\x00\x00\x10\x00\x00\x00' + bytestring
         #             |Rsrvd |   Length      |    Value ->
-
         self.assertEqual(encoded_elem, ref_bytes)
 
         # Empty data
@@ -439,12 +433,10 @@ class WriteDataElementTests(unittest.TestCase):
         # VR (OL): \x4f\x4c
         # Reserved: \x00\x00
         # Length (12): 0c 00 00 00
-
         #             | Tag          | VR    |
         ref_bytes = b'\x66\x00\x29\x01\x4f\x4c' \
                     b'\x00\x00\x0c\x00\x00\x00' + bytestring
         #             |Rsrvd |   Length      |    Value ->
-
         self.assertEqual(encoded_elem, ref_bytes)
 
         # Empty data
@@ -619,6 +611,7 @@ class WriteDataElementTests(unittest.TestCase):
 
 class TestCorrectAmbiguousVR(unittest.TestCase):
     """Test correct_ambiguous_vr."""
+
     def test_pixel_representation_vm_one(self):
         """Test correcting VM 1 elements which require PixelRepresentation."""
         ref_ds = Dataset()
@@ -848,6 +841,7 @@ class TestCorrectAmbiguousVRElement(object):
 
 class WriteAmbiguousVRTests(unittest.TestCase):
     """Attempt to write data elements with ambiguous VR."""
+
     def setUp(self):
         # Create a dummy (in memory) file to write to
         self.fp = DicomBytesIO()
@@ -903,6 +897,7 @@ class WriteAmbiguousVRTests(unittest.TestCase):
 
 class ScratchWriteTests(unittest.TestCase):
     """Simple dataset from scratch, written in all endian/VR combinations"""
+
     def setUp(self):
         # Create simple dataset for all tests
         ds = Dataset()
@@ -922,7 +917,7 @@ class ScratchWriteTests(unittest.TestCase):
         sub_ds.ContourSequence = Sequence((subitem1, subitem2))
 
         # Now the top-level sequence
-        ds.ROIContourSequence = Sequence((sub_ds,))  # Comma to make one-tuple
+        ds.ROIContourSequence = Sequence((sub_ds, ))  # Comma to make one-tuple
 
         # Store so each test can use it
         self.ds = ds
@@ -941,7 +936,6 @@ class ScratchWriteTests(unittest.TestCase):
         # print "std    :", bytes2hex(std)
         # print "written:", bytes2hex(bytes_written)
         same, pos = bytes_identical(std, bytes_written)
-
         self.assertTrue(same,
                         "Writing from scratch unexpected result "
                         "- 1st diff at 0x%x" % pos)
@@ -1032,7 +1026,6 @@ class TestWriteToStandard(object):
             pass
         for elem in ref_ds.iterall():
             pass
-
         for ref_elem, test_elem in zip(ref_ds.file_meta, ds.file_meta):
             assert ref_elem == test_elem
 
@@ -1064,7 +1057,6 @@ class TestWriteToStandard(object):
         del ds.file_meta.TransferSyntaxUID
         ds.is_implicit_VR = False
         ds.is_little_endian = True
-
         with pytest.raises(ValueError):
             ds.save_as(DicomBytesIO(), write_like_original=False)
         assert 'TransferSyntaxUID' not in ds.file_meta
@@ -1075,7 +1067,6 @@ class TestWriteToStandard(object):
         ds = read_file(rtplan_name)
         ds.is_implicit_VR = True
         ds.is_little_endian = False
-
         with pytest.raises(NotImplementedError):
             ds.save_as(DicomBytesIO(), write_like_original=False)
 
@@ -1338,6 +1329,7 @@ class TestWriteFileMetaInfoToStandard(object):
 
 class TestWriteNonStandard(unittest.TestCase):
     """Unit tests for writing datasets not to the DICOM standard."""
+
     def setUp(self):
         """Create an empty file-like for use in testing."""
         self.fp = DicomBytesIO()
@@ -1674,6 +1666,7 @@ class TestWriteNonStandard(unittest.TestCase):
 
 class TestWriteFileMetaInfoNonStandard(unittest.TestCase):
     """Unit tests for writing File Meta Info not to the DICOM standard."""
+
     def setUp(self):
         """Create an empty file-like for use in testing."""
         self.fp = DicomBytesIO()
@@ -1699,8 +1692,12 @@ class TestWriteFileMetaInfoNonStandard(unittest.TestCase):
         meta.MediaStorageSOPInstanceUID = '1.2'
         meta.TransferSyntaxUID = '1.3'
         meta.ImplementationClassUID = '1.4'
-        self.assertRaises(ValueError, write_file_meta_info, self.fp, meta,
-                          enforce_standard=False)
+        self.assertRaises(
+            ValueError,
+            write_file_meta_info,
+            self.fp,
+            meta,
+            enforce_standard=False)
 
     def test_missing_elements(self):
         """Test that missing required elements doesn't raise ValueError."""
@@ -1880,6 +1877,74 @@ class TestWriteDT(object):
         elem = DataElement(0x00181078, 'DT', DT('20010203123456'))
         del elem.value.original_string
         assert _format_DT(elem.value) == '20010203123456'
+
+
+class TestWriteUndefinedLengthPixelData(unittest.TestCase):
+    """Test write_data_element() for pixel data with undefined length."""
+
+    def setUp(self):
+        self.fp = DicomBytesIO()
+
+    def test_little_endian_correct_data(self):
+        """Pixel data starting with an item tag is written."""
+        self.fp.is_little_endian = True
+        self.fp.is_implicit_VR = False
+        pixel_data = DataElement(0x7fe00010, 'OB',
+                                 b'\xfe\xff\x00\xe0'
+                                 b'\x00\x01\x02\x03',
+                                 is_undefined_length=True)
+        write_data_element(self.fp, pixel_data)
+
+        expected = (b'\xe0\x7f\x10\x00'  # tag
+                    b'OB\x00\x00'  # VR
+                    b'\xff\xff\xff\xff'  # length
+                    b'\xfe\xff\x00\xe0\x00\x01\x02\x03'  # contents
+                    b'\xfe\xff\xdd\xe0\x00\x00\x00\x00')  # SQ delimiter
+        self.fp.seek(0)
+        assert self.fp.read() == expected
+
+    def test_big_endian_correct_data(self):
+        """Pixel data starting with an item tag is written."""
+        self.fp.is_little_endian = False
+        self.fp.is_implicit_VR = False
+        pixel_data = DataElement(0x7fe00010, 'OB',
+                                 b'\xff\xfe\xe0\x00'
+                                 b'\x00\x01\x02\x03',
+                                 is_undefined_length=True)
+        write_data_element(self.fp, pixel_data)
+        expected = (b'\x7f\xe0\x00\x10'  # tag
+                    b'OB\x00\x00'  # VR
+                    b'\xff\xff\xff\xff'  # length
+                    b'\xff\xfe\xe0\x00\x00\x01\x02\x03'  # contents
+                    b'\xff\xfe\xe0\xdd\x00\x00\x00\x00')  # SQ delimiter
+        self.fp.seek(0)
+        assert self.fp.read() == expected
+
+    def test_little_endian_incorrect_data(self):
+        """Writing pixel data not starting with an item tag raises."""
+        self.fp.is_little_endian = True
+        self.fp.is_implicit_VR = False
+        pixel_data = DataElement(0x7fe00010, 'OB',
+                                 b'\xff\xff\x00\xe0'
+                                 b'\x00\x01\x02\x03'
+                                 b'\xfe\xff\xdd\xe0',
+                                 is_undefined_length=True)
+        with pytest.raises(ValueError, match='Pixel Data .* must '
+                                             'start with an item tag'):
+            write_data_element(self.fp, pixel_data)
+
+    def test_big_endian_incorrect_data(self):
+        """Writing pixel data not starting with an item tag raises."""
+        self.fp.is_little_endian = False
+        self.fp.is_implicit_VR = False
+        pixel_data = DataElement(0x7fe00010, 'OB',
+                                 b'\x00\x00\x00\x00'
+                                 b'\x00\x01\x02\x03'
+                                 b'\xff\xfe\xe0\xdd',
+                                 is_undefined_length=True)
+        with pytest.raises(ValueError, match='Pixel Data .+ must '
+                                             'start with an item tag'):
+            write_data_element(self.fp, pixel_data)
 
 
 if __name__ == "__main__":

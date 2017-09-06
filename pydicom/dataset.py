@@ -32,7 +32,6 @@ from pydicom.uid import UncompressedPixelTransferSyntaxes
 import pydicom  # for write_file
 import pydicom.charset
 from pydicom.config import logger
-import pydicom.encaps
 import pydicom.config
 
 sys_is_little_endian = (sys.byteorder == 'little')
@@ -336,11 +335,10 @@ class Dataset(dict):
         """
         # Force zip object into a list in case of python3. Also backwards
         # compatible
-        meths = set(
-            list(zip(*inspect.getmembers(Dataset, inspect.isroutine)))[0])
-        props = set(
-            list(zip(*inspect.getmembers(Dataset, inspect.isdatadescriptor)))[
-                0])
+        meths = set(list(zip(
+            *inspect.getmembers(self.__class__, inspect.isroutine)))[0])
+        props = set(list(zip(
+            *inspect.getmembers(self.__class__, inspect.isdatadescriptor)))[0])
         dicom_names = set(self.dir())
         alldir = sorted(props | meths | dicom_names)
         return alldir
