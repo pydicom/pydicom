@@ -138,7 +138,6 @@ def assert_warns_regex(type_warn, message, func, *args, **kwargs):
         raise AssertionError(msg)
 
 
-
 def isClose(a, b, epsilon=0.000001):
     """Compare within some tolerance, to avoid machine roundoff differences"""
     try:
