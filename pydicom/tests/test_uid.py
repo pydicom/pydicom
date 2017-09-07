@@ -3,7 +3,7 @@
 
 import pytest
 
-from pydicom.uid import UID, generate_uid, PYDICOM_ROOT_UID
+from pydicom.uid import UID, generate_uid, PYDICOM_ROOT_UID, JPEGLSLossy
 
 
 class TestGenerateUID(object):
@@ -61,8 +61,6 @@ class TestUID(object):
         assert not self.uid == 'Explicit VR Little Endian'
         # Issue 96
         assert not self.uid == 3
-        is_none = self.uid is None
-        assert not is_none
 
     def test_inequality(self):
         """Test that UID.__ne__ works."""
@@ -74,7 +72,6 @@ class TestUID(object):
         assert self.uid != 'Explicit VR Little Endian'
         # Issue 96
         assert self.uid != 3
-        assert self.uid is not None
 
     def test_hash(self):
         """Test that UID.__hash_- works."""
@@ -187,10 +184,15 @@ class TestUID(object):
     def test_name_with_equal_hash(self):
         """Test that UID name works for UID with same hash as predefined UID.
         """
-        uid_string = '1.3.12.2.1107.5.2.18.41538.2017072416190348328326500'
-        uid = UID(uid_string)
-        # Issue 499 - infinite recursion
-        assert uid.name == uid_string
+        uid = UID('1.2.3')
+        # force the equal hash to reproduce the problem
+        original_hash = UID.__hash__
+        UID.__hash__ = lambda val: hash(JPEGLSLossy)
+        try:
+            # Issue 499 - infinite recursion
+            assert uid.name == '1.2.3'
+        finally:
+            UID.__hash__ = original_hash
 
     def test_type(self):
         """Test that UID.type works."""
