@@ -8,18 +8,13 @@ from copy import deepcopy
 from decimal import Decimal
 import re
 
+from datetime import (date, datetime, time, timedelta)
+
 # don't import datetime_conversion directly
 from pydicom import config
 from pydicom import compat
 from pydicom.multival import MultiValue
-
-from datetime import (date, datetime, time)
-
-have_dateutil = True
-try:
-    from dateutil.tz import tzoffset
-except ImportError:
-    have_dateutil = False
+from pydicom.util.fixes import timezone
 
 # can't import from charset or get circular import
 default_encoding = "iso8859"
@@ -140,6 +135,10 @@ class DT(datetime):
     def __reduce_ex__(self, protocol):
         return super(DT, self).__reduce__() + (self.__getstate__(), )
 
+    @staticmethod
+    def _utc_offset(offset, name):
+        return timezone(timedelta(seconds=offset), name)
+
     def __new__(cls, val):
         """Create an instance of DT object.
 
@@ -187,14 +186,7 @@ class DT(datetime):
                     offset = (offset1 + offset2) * 60
                     if tz_match[0] == '-':
                         offset = -offset
-                    if not have_dateutil:
-                        msg = "The python-dateutil package is required"
-                        msg += "to convert dates/times to datetime objects. "
-                        msg += "\nPlease install python-dateutil or set "
-                        msg += "pydicom.config.datetime_conversion = False"
-
-                        raise ImportError(msg)
-                    tzinfo = tzoffset(tz_match, offset)
+                    tzinfo = cls._utc_offset(offset, tz_match)
                 else:
                     tzinfo = None
                 val = super(DT,
