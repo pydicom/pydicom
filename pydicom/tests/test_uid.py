@@ -184,15 +184,17 @@ class TestUID(object):
     def test_name_with_equal_hash(self):
         """Test that UID name works for UID with same hash as predefined UID.
         """
-        uid = UID('1.2.3')
-        # force the equal hash to reproduce the problem
-        original_hash = UID.__hash__
-        UID.__hash__ = lambda val: hash(JPEGLSLossy)
-        try:
-            # Issue 499 - infinite recursion
-            assert uid.name == '1.2.3'
-        finally:
-            UID.__hash__ = original_hash
+        class MockedUID(UID):
+            # Force the UID to return the same hash as one of the
+            # uid dictionary entries (any will work).
+            # The resulting hash collision forces the usage of the `eq`
+            # operator while checking for containment in the uid dictionary
+            # (regression test for issue #499)
+            def __hash__(self):
+                return hash(JPEGLSLossy)
+
+        uid = MockedUID('1.2.3')
+        assert uid.name == '1.2.3'
 
     def test_type(self):
         """Test that UID.type works."""
