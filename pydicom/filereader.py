@@ -461,7 +461,7 @@ def _read_command_set_elements(fp):
     return command_set
 
 
-def _read_file_meta_info(fp):
+def _read_file_meta_info(fp, is_implicit_VR=False):
     """Return a Dataset containing any File Meta (0002,eeee) elements in `fp`.
 
     File Meta elements are always Explicit VR Little Endian (as per PS3.10
@@ -486,7 +486,7 @@ def _read_file_meta_info(fp):
         return tag.group != 2
 
     start_file_meta = fp.tell()
-    file_meta = read_dataset(fp, is_implicit_VR=False, is_little_endian=True,
+    file_meta = read_dataset(fp, is_implicit_VR=is_implicit_VR, is_little_endian=True,
                              stop_when=_not_group_0002)
     # Log if the Group Length doesn't match actual length
     if 'FileMetaInformationGroupLength' in file_meta:
@@ -501,6 +501,15 @@ def _read_file_meta_info(fp):
                         "bytes)."
                         .format(file_meta.FileMetaInformationGroupLength,
                                 length_file_meta))
+
+    # Test the file meta for correct interpretation: if it fails, retry loading the file meta with
+    #   an implicit VR (issue #503)
+    try:
+        file_meta.get("TransferSyntaxUID")
+    except NotImplementedError:
+        fp.seek(start_file_meta)
+        file_meta = _read_file_meta_info(fp, is_implicit_VR=True)
+
     return file_meta
 
 
