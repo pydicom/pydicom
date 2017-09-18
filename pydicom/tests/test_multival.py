@@ -107,6 +107,8 @@ class MultiValuetests(unittest.TestCase):
         self.assertEqual([1, 5, 7, 12, 33], multival)
         multival.sort(reverse=True)
         self.assertEqual([33, 12, 7, 5, 1], multival)
+        multival.sort(key=str)
+        self.assertEqual([1, 12, 33, 5, 7], multival)
 
 
 if __name__ == "__main__":
