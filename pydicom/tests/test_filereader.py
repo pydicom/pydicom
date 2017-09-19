@@ -664,6 +664,17 @@ class ReaderTests(unittest.TestCase):
         self.assertTrue(ds.preamble is None)
         self.assertEqual(ds.file_meta, Dataset())
 
+    def test_file_meta_dataset_implicit_vr(self):
+        """Test reading a file meta dataset that is implicit VR"""
+
+        bytestream = (b'\x02\x00\x10\x00\x12\x00\x00\x00'
+                      b'\x31\x2e\x32\x2e\x38\x34\x30\x2e'
+                      b'\x31\x30\x30\x30\x38\x2e\x31\x2e'
+                      b'\x32\x00')
+        fp = BytesIO(bytestream)
+        ds = read_file(fp, force=True)
+        self.assertTrue('TransferSyntaxUID' in ds.file_meta)
+
     def test_no_dataset(self):
         """Test reading no elements or preamble produces empty Dataset"""
         bytestream = b''
