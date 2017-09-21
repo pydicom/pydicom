@@ -671,6 +671,20 @@
     <span class="n">start_file_meta</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
     <span class="n">file_meta</span> <span class="o">=</span> <span class="n">read_dataset</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">is_implicit_VR</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                              <span class="n">stop_when</span><span class="o">=</span><span class="n">_not_group_0002</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">file_meta</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">file_meta</span>
+
+    <span class="c1"># Test the file meta for correct interpretation by requesting the first</span>
+    <span class="c1">#   data element: if it fails, retry loading the file meta with an</span>
+    <span class="c1">#   implicit VR (issue #503)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">file_meta</span><span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">file_meta</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">tag</span><span class="p">]</span>
+    <span class="k">except</span> <span class="ne">NotImplementedError</span><span class="p">:</span>
+        <span class="n">fp</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">start_file_meta</span><span class="p">)</span>
+        <span class="n">file_meta</span> <span class="o">=</span> <span class="n">read_dataset</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">is_implicit_VR</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                 <span class="n">is_little_endian</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                 <span class="n">stop_when</span><span class="o">=</span><span class="n">_not_group_0002</span><span class="p">)</span>
+
     <span class="c1"># Log if the Group Length doesn&#39;t match actual length</span>
     <span class="k">if</span> <span class="s1">&#39;FileMetaInformationGroupLength&#39;</span> <span class="ow">in</span> <span class="n">file_meta</span><span class="p">:</span>
         <span class="c1"># FileMetaInformationGroupLength must be 12 bytes long and its value</span>
@@ -684,6 +698,7 @@
                         <span class="s2">&quot;bytes).&quot;</span>
                         <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">file_meta</span><span class="o">.</span><span class="n">FileMetaInformationGroupLength</span><span class="p">,</span>
                                 <span class="n">length_file_meta</span><span class="p">))</span>
+
     <span class="k">return</span> <span class="n">file_meta</span>
 
 
