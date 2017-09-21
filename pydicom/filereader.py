@@ -86,11 +86,11 @@ def data_element_generator(fp,
         and returns True or False. If it returns True,
         read_data_element will just return.
     defer_size : int, str, None, optional
-        See ``read_file`` for parameter info.
+        See ``dcmread`` for parameter info.
     encoding :
         Encoding scheme
     specific_tags : list or None
-        See ``read_file`` for parameter info.
+        See ``dcmread`` for parameter info.
 
     Returns
     -------
@@ -323,12 +323,12 @@ def read_dataset(fp, is_implicit_VR, is_little_endian, bytelength=None,
         See help for data_element_generator for details
     defer_size : int, None, optional
         Size to avoid loading large elements in memory.
-        See ``read_file`` for more parameter info.
+        See ``dcmread`` for more parameter info.
     parent_encoding :
         optional encoding to use as a default in case
         a Specific Character Set (0008,0005) isn't specified
     specific_tags : list or None
-        See ``read_file`` for parameter info.
+        See ``dcmread`` for parameter info.
 
     Returns
     -------
@@ -604,15 +604,15 @@ def read_partial(fileobj, stop_when=None, defer_size=None,
     stop_when :
         Stop condition. See ``read_dataset`` for more info.
     defer_size : int, str, None, optional
-        See ``read_file`` for parameter info.
+        See ``dcmread`` for parameter info.
     force : boolean
-        See ``read_file`` for parameter info.
+        See ``dcmread`` for parameter info.
     specific_tags : list or None
-        See ``read_file`` for parameter info.
+        See ``dcmread`` for parameter info.
 
     Notes
     -----
-    Use ``read_file`` unless you need to stop on some condition other than
+    Use ``dcmread`` unless you need to stop on some condition other than
     reaching pixel data.
 
     Returns
@@ -621,7 +621,7 @@ def read_partial(fileobj, stop_when=None, defer_size=None,
 
     See Also
     --------
-    read_file
+    dcmread
         More generic file reading function.
     """
     # Read File Meta Information
@@ -719,7 +719,7 @@ def read_partial(fileobj, stop_when=None, defer_size=None,
                            is_implicit_VR, is_little_endian)
 
 
-def read_file(fp, defer_size=None, stop_before_pixels=False,
+def dcmread(fp, defer_size=None, stop_before_pixels=False,
               force=False, specific_tags=None):
     """Read and parse a DICOM dataset stored in the DICOM File Format.
 
@@ -772,15 +772,15 @@ def read_file(fp, defer_size=None, stop_before_pixels=False,
     Examples
     --------
     Read and return a dataset stored in accordance with the DICOM File Format
-    >>> ds = pydicom.read_file("rtplan.dcm")
+    >>> ds = pydicom.dcmread("rtplan.dcm")
     >>> ds.PatientName
 
     Read and return a dataset not in accordance with the DICOM File Format
-    >>> ds = pydicom.read_file("rtplan.dcm", force=True)
+    >>> ds = pydicom.dcmread("rtplan.dcm", force=True)
     >>> ds.PatientName
 
     Use within a context manager:
-    >>> with pydicom.read_file("rtplan.dcm") as ds:
+    >>> with pydicom.dcmread("rtplan.dcm") as ds:
     >>>     ds.PatientName
     """
     # Open file if not already a file object
@@ -796,7 +796,7 @@ def read_file(fp, defer_size=None, stop_before_pixels=False,
 
     if config.debugging:
         logger.debug("\n" + "-" * 80)
-        logger.debug("Call to read_file()")
+        logger.debug("Call to dcmread()")
         msg = ("filename:'%s', defer_size='%s', "
                "stop_before_pixels=%s, force=%s, specific_tags=%s")
         logger.debug(msg % (fp.name, defer_size, stop_before_pixels,
@@ -823,11 +823,12 @@ def read_file(fp, defer_size=None, stop_before_pixels=False,
     # XXX need to store transfer syntax etc.
     return dataset
 
+read_file = dcmread  # used read_file until pydicom 1.0. Kept for compatibility
 
 def read_dicomdir(filename="DICOMDIR"):
     """Read a DICOMDIR file and return a DicomDir instance.
 
-    This is a wrapper around read_file, which gives a default file name.
+    This is a wrapper around dcmread, which gives a default file name.
 
     Parameters
     ----------
@@ -843,10 +844,10 @@ def read_dicomdir(filename="DICOMDIR"):
     InvalidDicomError
         Raised if filename is not a DICOMDIR file.
     """
-    # read_file will return a DicomDir instance if file is one.
+    # dcmread will return a DicomDir instance if file is one.
 
     # Read the file as usual.
-    ds = read_file(filename)
+    ds = dcmread(filename)
     # Here, check that it is in fact DicomDir
     if not isinstance(ds, DicomDir):
         msg = u"File '{0}' is not a Media Storage Directory file".format(

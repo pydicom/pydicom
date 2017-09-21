@@ -3,7 +3,7 @@ import sys
 import re
 import pytest
 import pydicom
-from pydicom.filereader import read_file
+from pydicom.filereader import dcmread
 from pydicom.data import get_testdata_files
 
 pillow_missing_message = ("pillow is not available "
@@ -51,10 +51,10 @@ save_dir = os.getcwd()
 
 class Test_RLE_transfer_syntax():
     def setup_method(self, method):
-        self.mr = read_file(mr_name)
-        self.compressed_mr = read_file(compressed_mr_name)
-        self.emri = read_file(emri_name)
-        self.compressed_emri = read_file(compressed_emri_name)
+        self.mr = dcmread(mr_name)
+        self.compressed_mr = dcmread(compressed_mr_name)
+        self.emri = dcmread(emri_name)
+        self.compressed_emri = dcmread(compressed_emri_name)
         self.original_handlers = pydicom.config.image_handlers
 
     def teardown_method(self, method):

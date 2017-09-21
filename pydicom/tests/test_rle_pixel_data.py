@@ -4,7 +4,7 @@ import sys
 import pytest
 import pydicom
 import pydicom.config
-from pydicom.filereader import read_file
+from pydicom.filereader import dcmread
 from pydicom.data import get_testdata_files
 
 rle_missing_message = ("RLE decoder (numpy based) is not available "
@@ -77,10 +77,10 @@ save_dir = os.getcwd()
     reason=rle_present_message)
 class rle_RLE_Tests_no_rle(unittest.TestCase):
     def setUp(self):
-        self.mr_small = read_file(mr_name)
-        self.mr_rle = read_file(mr_rle)
-        self.emri = read_file(emri_name)
-        self.emri_rle = read_file(emri_rle)
+        self.mr_small = dcmread(mr_name)
+        self.mr_rle = dcmread(mr_rle)
+        self.emri = dcmread(emri_name)
+        self.emri_rle = dcmread(emri_rle)
         self.original_handlers = pydicom.config.image_handlers
         pydicom.config.image_handlers = [rle_handler, numpy_handler]
 
@@ -98,10 +98,10 @@ class rle_RLE_Tests_no_rle(unittest.TestCase):
     reason=rle_missing_message)
 class rle_RLE_Tests_with_rle(unittest.TestCase):
     def setUp(self):
-        self.mr_small = read_file(mr_name)
-        self.mr_rle = read_file(mr_rle)
-        self.emri_small = read_file(emri_name)
-        self.emri_rle = read_file(emri_rle)
+        self.mr_small = dcmread(mr_name)
+        self.mr_rle = dcmread(mr_rle)
+        self.emri_small = dcmread(emri_name)
+        self.emri_rle = dcmread(emri_rle)
         self.original_handlers = pydicom.config.image_handlers
         pydicom.config.image_handlers = [rle_handler, numpy_handler]
 

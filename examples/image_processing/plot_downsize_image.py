@@ -23,7 +23,7 @@ print(__doc__)
 
 # FIXME: add a full-sized MR image in the testing data
 filename = get_testdata_files('MR_small.dcm')[0]
-ds = pydicom.read_file(filename)
+ds = pydicom.dcmread(filename)
 
 # get the pixel information into a numpy array
 data = ds.pixel_array

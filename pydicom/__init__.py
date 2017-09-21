@@ -14,7 +14,7 @@ Quick Start
    file::
 
     from pydicom import dicomio
-    dataset = dicomio.read_file("file1.dcm")
+    dataset = dicomio.dcmread("file1.dcm")
     dataset.PatientName = 'anonymous'
     dataset.save_as("file2.dcm")
 
@@ -34,7 +34,7 @@ Quick Start
 
 from pydicom.dataelem import DataElement
 from pydicom.dataset import Dataset, FileDataset
-from pydicom.dicomio import read_file
+from pydicom.filereader import dcmread, read_file
 from pydicom.dicomio import write_file
 from pydicom.sequence import Sequence
 
@@ -45,6 +45,7 @@ __all__ = ['DataElement',
            'Dataset',
            'FileDataset',
            'Sequence',
+           'dcmread',
            'read_file',
            'write_file',
            '__version__',

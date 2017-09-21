@@ -20,7 +20,7 @@ print(__doc__)
 filename_mr = get_testdata_files('MR_small.dcm')[0]
 filename_ct = get_testdata_files('CT_small.dcm')[0]
 
-datasets = tuple([pydicom.read_file(filename, force=True)
+datasets = tuple([pydicom.dcmread(filename, force=True)
                   for filename in (filename_mr, filename_ct)])
 
 # difflib compare functions require a list of lines, each terminated with

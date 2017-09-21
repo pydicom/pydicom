@@ -19,7 +19,7 @@ if __name__ == "__main__":
     # Collect summary information from the files
     files_info = []
     for name in names:
-        ds = pydicom.read_file(name)
+        ds = pydicom.dcmread(name)
         ds.decode()
         try:
             files_info.append((name, ds.SpecificCharacterSet, ds.PatientName))

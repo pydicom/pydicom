@@ -10,7 +10,7 @@ from pydicom import compat
 from pydicom.data import get_testdata_files
 from pydicom.dataelem import DataElement, RawDataElement
 from pydicom.dataset import Dataset, FileDataset
-from pydicom.dicomio import read_file
+from pydicom.dicomio import dcmread
 from pydicom.filebase import DicomBytesIO
 from pydicom.sequence import Sequence
 from pydicom.tag import Tag
@@ -766,8 +766,8 @@ class DatasetTests(unittest.TestCase):
 
         # Test deferred read
         test_file = get_testdata_files('MR_small.dcm')[0]
-        ds = read_file(test_file, force=True, defer_size='0.8 kB')
-        ds_ref = read_file(test_file, force=True)
+        ds = dcmread(test_file, force=True, defer_size='0.8 kB')
+        ds_ref = dcmread(test_file, force=True)
         # get_item will follow the deferred read branch
         assert ds.get_item((0x7fe00010)).value == ds_ref.PixelData
 
@@ -853,7 +853,7 @@ class DatasetTests(unittest.TestCase):
     def test_with(self):
         """Test Dataset.__enter__ and __exit__."""
         test_file = get_testdata_files('CT_small.dcm')[0]
-        with read_file(test_file) as ds:
+        with dcmread(test_file) as ds:
             assert ds.PatientName == 'CompressedSamples^CT1'
 
     def test_exit_exception(self):
@@ -917,7 +917,7 @@ class DatasetTests(unittest.TestCase):
     def test_set_convert_private_elem_from_raw(self):
         """Test Dataset.__setitem__ with a raw private element"""
         test_file = get_testdata_files('CT_small.dcm')[0]
-        ds = read_file(test_file, force=True)
+        ds = dcmread(test_file, force=True)
         # 'tag VR length value value_tell is_implicit_VR is_little_endian'
         elem = RawDataElement((0x0043, 0x1029), 'OB', 2, b'\x00\x01', 0,
                               True, True)
@@ -938,7 +938,7 @@ class DatasetTests(unittest.TestCase):
     def test_trait_names(self):
         """Test Dataset.trait_names contains element keywords"""
         test_file = get_testdata_files('CT_small.dcm')[0]
-        ds = read_file(test_file, force=True)
+        ds = dcmread(test_file, force=True)
         names = ds.trait_names()
         assert 'PatientName' in names
         assert 'save_as' in names
@@ -993,8 +993,8 @@ class FileDatasetTests(unittest.TestCase):
 
     def test_equality_file_meta(self):
         """Dataset: equality returns correct value if with metadata"""
-        d = read_file(self.test_file)
-        e = read_file(self.test_file)
+        d = dcmread(self.test_file)
+        e = dcmread(self.test_file)
         self.assertTrue(d == e)
 
         e.is_implicit_VR = not e.is_implicit_VR
