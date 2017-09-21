@@ -29,7 +29,7 @@ from pydicom.datadict import (tag_for_keyword, keyword_for_tag,
 from pydicom.tag import Tag, BaseTag, tag_in_exception
 from pydicom.dataelem import DataElement, DataElement_from_raw, RawDataElement
 from pydicom.uid import UncompressedPixelTransferSyntaxes
-import pydicom  # for write_file
+import pydicom  # for dcmwrite
 import pydicom.charset
 from pydicom.config import logger
 import pydicom.config
@@ -834,7 +834,7 @@ class Dataset(dict):
         DICOM File Format in accordance with DICOM Standard Part 10 Section 7.
         To do so requires that the `Dataset.file_meta` attribute exists and
         contains a Dataset with the required (Type 1) File Meta Information
-        Group elements (see pydicom.filewriter.write_file and
+        Group elements (see pydicom.filewriter.dcmwrite and
         pydicom.filewriter.write_file_meta_info for more information).
 
         If `write_like_original` is True then the Dataset will be written as is
@@ -870,7 +870,7 @@ class Dataset(dict):
             Write a DICOM Dataset to a file.
         pydicom.filewriter.write_file_meta_info
             Write the DICOM File Meta Information Group elements to a file.
-        pydicom.filewriter.write_file
+        pydicom.filewriter.dcmwrite
             Write a DICOM file from a FileDataset instance.
         """
         # Ensure is_little_endian and is_implicit_VR exist
@@ -881,7 +881,7 @@ class Dataset(dict):
                                  "set appropriately before "
                                  "saving.".format(self.__class__.__name__))
 
-        pydicom.write_file(filename, self, write_like_original)
+        pydicom.dcmwrite(filename, self, write_like_original)
 
     def __setattr__(self, name, value):
         """Intercept any attempts to set a value for an instance attribute.

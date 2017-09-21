@@ -35,7 +35,7 @@ Quick Start
 from pydicom.dataelem import DataElement
 from pydicom.dataset import Dataset, FileDataset
 from pydicom.filereader import dcmread, read_file
-from pydicom.dicomio import write_file
+from pydicom.dicomio import dcmwrite, write_file
 from pydicom.sequence import Sequence
 
 from ._version import __version__
@@ -46,6 +46,7 @@ __all__ = ['DataElement',
            'FileDataset',
            'Sequence',
            'dcmread',
+           'dcmwrite',
            'read_file',
            'write_file',
            '__version__',

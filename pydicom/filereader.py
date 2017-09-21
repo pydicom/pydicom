@@ -720,7 +720,7 @@ def read_partial(fileobj, stop_when=None, defer_size=None,
 
 
 def dcmread(fp, defer_size=None, stop_before_pixels=False,
-              force=False, specific_tags=None):
+            force=False, specific_tags=None):
     """Read and parse a DICOM dataset stored in the DICOM File Format.
 
     Read a DICOM dataset stored in accordance with the DICOM File Format
@@ -824,6 +824,7 @@ def dcmread(fp, defer_size=None, stop_before_pixels=False,
     return dataset
 
 read_file = dcmread  # used read_file until pydicom 1.0. Kept for compatibility
+
 
 def read_dicomdir(filename="DICOMDIR"):
     """Read a DICOMDIR file and return a DicomDir instance.
