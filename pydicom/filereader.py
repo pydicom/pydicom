@@ -488,6 +488,20 @@ def _read_file_meta_info(fp):
     start_file_meta = fp.tell()
     file_meta = read_dataset(fp, is_implicit_VR=False, is_little_endian=True,
                              stop_when=_not_group_0002)
+    if not file_meta:
+        return file_meta
+
+    # Test the file meta for correct interpretation by requesting the first
+    #   data element: if it fails, retry loading the file meta with an
+    #   implicit VR (issue #503)
+    try:
+        file_meta[list(file_meta)[0].tag]
+    except NotImplementedError:
+        fp.seek(start_file_meta)
+        file_meta = read_dataset(fp, is_implicit_VR=True,
+                                 is_little_endian=True,
+                                 stop_when=_not_group_0002)
+
     # Log if the Group Length doesn't match actual length
     if 'FileMetaInformationGroupLength' in file_meta:
         # FileMetaInformationGroupLength must be 12 bytes long and its value
@@ -501,6 +515,7 @@ def _read_file_meta_info(fp):
                         "bytes)."
                         .format(file_meta.FileMetaInformationGroupLength,
                                 length_file_meta))
+
     return file_meta
 
 

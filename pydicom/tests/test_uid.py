@@ -3,7 +3,7 @@
 
 import pytest
 
-from pydicom.uid import UID, generate_uid, PYDICOM_ROOT_UID
+from pydicom.uid import UID, generate_uid, PYDICOM_ROOT_UID, JPEGLSLossy
 
 
 class TestGenerateUID(object):
@@ -61,7 +61,6 @@ class TestUID(object):
         assert not self.uid == 'Explicit VR Little Endian'
         # Issue 96
         assert not self.uid == 3
-        assert not self.uid is None
 
     def test_inequality(self):
         """Test that UID.__ne__ works."""
@@ -73,7 +72,6 @@ class TestUID(object):
         assert self.uid != 'Explicit VR Little Endian'
         # Issue 96
         assert self.uid != 3
-        assert self.uid is not None
 
     def test_hash(self):
         """Test that UID.__hash_- works."""
@@ -182,6 +180,21 @@ class TestUID(object):
         """Test that UID.name works."""
         assert self.uid.name == 'Implicit VR Little Endian'
         assert UID('1.2.840.10008.5.1.4.1.1.2').name == 'CT Image Storage'
+
+    def test_name_with_equal_hash(self):
+        """Test that UID name works for UID with same hash as predefined UID.
+        """
+        class MockedUID(UID):
+            # Force the UID to return the same hash as one of the
+            # uid dictionary entries (any will work).
+            # The resulting hash collision forces the usage of the `eq`
+            # operator while checking for containment in the uid dictionary
+            # (regression test for issue #499)
+            def __hash__(self):
+                return hash(JPEGLSLossy)
+
+        uid = MockedUID('1.2.3')
+        assert uid.name == '1.2.3'
 
     def test_type(self):
         """Test that UID.type works."""

@@ -162,15 +162,16 @@ class UID(str):
     @property
     def name(self):
         """Return the UID name from the UID dictionary."""
-        if self in UID_dictionary:
+        uid_string = str.__str__(self)
+        if uid_string in UID_dictionary:
             return UID_dictionary[self][0]
 
-        return str.__str__(self)
+        return uid_string
 
     @property
     def type(self):
         """Return the UID type from the UID dictionary."""
-        if self in UID_dictionary:
+        if str.__str__(self) in UID_dictionary:
             return UID_dictionary[self][1]
 
         return ''
@@ -178,7 +179,7 @@ class UID(str):
     @property
     def info(self):
         """Return the UID info from the UID dictionary."""
-        if self in UID_dictionary:
+        if str.__str__(self) in UID_dictionary:
             return UID_dictionary[self][2]
 
         return ''
@@ -186,7 +187,7 @@ class UID(str):
     @property
     def is_retired(self):
         """Return True if the UID is retired, False otherwise or if private."""
-        if self in UID_dictionary:
+        if str.__str__(self) in UID_dictionary:
             return bool(UID_dictionary[self][3])
 
         return False
