@@ -17,7 +17,7 @@ it doesn't do anything with pixel data except read in the raw bytes::
   >>> import pydicom
   >>> from pydicom.data import get_testdata_files
   >>> filename = get_testdata_files("MR_small.dcm")[0]
-  >>> ds = pydicom.read_file(filename)
+  >>> ds = pydicom.dcmread(filename)
   >>> ds.PixelData # doctest: +ELLIPSIS
   b'\x89\x03\xfb\x03\xcb\x04\xeb\x04\xf9\x02\x94\x01\x7f...
 
