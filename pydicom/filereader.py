@@ -823,6 +823,7 @@ def dcmread(fp, defer_size=None, stop_before_pixels=False,
     # XXX need to store transfer syntax etc.
     return dataset
 
+
 read_file = dcmread  # used read_file until pydicom 1.0. Kept for compatibility
 
 
