@@ -692,7 +692,7 @@ class Dataset(dict):
                     successfully_read_pixel_data = True
                     break
                 except Exception as e:
-                    logger.debug("Trouble with", exc_info=e)
+                    logger.warning("Trouble with", exc_info=e)
                     last_exception = e
                     continue
             if not successfully_read_pixel_data:

@@ -109,7 +109,6 @@ class Test_JPEG_LS_Lossless_transfer_syntax():
             "all {0} (mean == {1})".format(b.mean(), a.mean())
 
     @pytest.mark.skipif(gdcm_handler is None, reason=gdcm_missing_message)
-    @pytest.mark.xfail(reason="GDCM only returns the first frame of EMRI?")
     def test_read_emri_with_gdcm(self):
         pydicom.config.image_handlers = [numpy_handler, gdcm_handler]
         a = self.emri_jpeg_ls_lossless.pixel_array

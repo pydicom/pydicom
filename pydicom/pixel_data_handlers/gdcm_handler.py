@@ -1,6 +1,7 @@
 """Use the gdcm python package to decode pixel transfer syntaxes."""
 import sys
 from pydicom import compat
+import pydicom.uid
 have_numpy = True
 try:
     import numpy
@@ -15,7 +16,6 @@ except ImportError:
     have_gdcm = False
     raise
 can_use_gdcm = have_gdcm and have_numpy
-
 
 def supports_transfer_syntax(dicom_dataset):
     """
@@ -122,9 +122,15 @@ def get_pixeldata(dicom_dataset):
     n_bytes = (dicom_dataset.Rows *
                dicom_dataset.Columns *
                numpy.dtype(numpy_dtype).itemsize)
-
+    try:
+        n_bytes *= dicom_dataset.NumberOfFrames
+    except Exception:
+        pass
+    try:
+        n_bytes *= dicom_dataset.SamplesPerPixel
+    except Exception:
+        pass
     if len(pixel_bytearray) > n_bytes:
-
         # We make sure that all the bytes after are in fact zeros
         padding = pixel_bytearray[n_bytes:]
         if numpy.any(numpy.fromstring(padding, numpy.byte)):
