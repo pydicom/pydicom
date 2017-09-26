@@ -72,9 +72,6 @@ dir_name = os.path.dirname(sys.argv[0])
 save_dir = os.getcwd()
 
 
-@pytest.mark.skipif(
-    test_rle_decoder,
-    reason=rle_present_message)
 class rle_RLE_Tests_no_rle(unittest.TestCase):
     def setUp(self):
         self.mr_small = read_file(mr_name)
@@ -82,7 +79,7 @@ class rle_RLE_Tests_no_rle(unittest.TestCase):
         self.emri = read_file(emri_name)
         self.emri_rle = read_file(emri_rle)
         self.original_handlers = pydicom.config.image_handlers
-        pydicom.config.image_handlers = [rle_handler, numpy_handler]
+        pydicom.config.image_handlers = [numpy_handler]
 
     def tearDown(self):
         pydicom.config.image_handlers = self.original_handlers
