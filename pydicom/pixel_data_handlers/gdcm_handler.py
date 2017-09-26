@@ -1,7 +1,6 @@
 """Use the gdcm python package to decode pixel transfer syntaxes."""
 import sys
 from pydicom import compat
-import pydicom.uid
 have_numpy = True
 try:
     import numpy
