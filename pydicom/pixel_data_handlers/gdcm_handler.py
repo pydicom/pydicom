@@ -17,6 +17,7 @@ except ImportError:
     raise
 can_use_gdcm = have_gdcm and have_numpy
 
+
 def supports_transfer_syntax(dicom_dataset):
     """
     Returns
