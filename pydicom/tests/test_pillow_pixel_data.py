@@ -3,7 +3,7 @@ import os
 import sys
 import pytest
 import pydicom
-from pydicom.filereader import read_file
+from pydicom.filereader import dcmread
 from pydicom.data import get_testdata_files
 from pydicom.tag import Tag
 pillow_missing_message = ("pillow is not available "
@@ -77,10 +77,10 @@ save_dir = os.getcwd()
 
 class pillow_JPEG_LS_Tests_no_pillow(unittest.TestCase):
     def setUp(self):
-        self.jpeg_ls_lossless = read_file(jpeg_ls_lossless_name)
-        self.mr_small = read_file(mr_name)
-        self.emri_jpeg_ls_lossless = read_file(emri_jpeg_ls_lossless)
-        self.emri_small = read_file(emri_name)
+        self.jpeg_ls_lossless = dcmread(jpeg_ls_lossless_name)
+        self.mr_small = dcmread(mr_name)
+        self.emri_jpeg_ls_lossless = dcmread(emri_jpeg_ls_lossless)
+        self.emri_small = dcmread(emri_name)
         self.original_handlers = pydicom.config.image_handlers
         pydicom.config.image_handlers = [None, numpy_handler]
 
@@ -98,11 +98,11 @@ class pillow_JPEG_LS_Tests_no_pillow(unittest.TestCase):
 
 class pillow_JPEG2000Tests_no_pillow(unittest.TestCase):
     def setUp(self):
-        self.jpeg_2k = read_file(jpeg2000_name)
-        self.jpeg_2k_lossless = read_file(jpeg2000_lossless_name)
-        self.mr_small = read_file(mr_name)
-        self.emri_jpeg_2k_lossless = read_file(emri_jpeg_2k_lossless)
-        self.emri_small = read_file(emri_name)
+        self.jpeg_2k = dcmread(jpeg2000_name)
+        self.jpeg_2k_lossless = dcmread(jpeg2000_lossless_name)
+        self.mr_small = dcmread(mr_name)
+        self.emri_jpeg_2k_lossless = dcmread(emri_jpeg_2k_lossless)
+        self.emri_small = dcmread(emri_name)
         self.original_handlers = pydicom.config.image_handlers
         pydicom.config.image_handlers = [None, numpy_handler]
 
@@ -140,8 +140,8 @@ class pillow_JPEG2000Tests_no_pillow(unittest.TestCase):
 class pillow_JPEGlossyTests_no_pillow(unittest.TestCase):
 
     def setUp(self):
-        self.jpeg_lossy = read_file(jpeg_lossy_name)
-        self.color_3d_jpeg = read_file(color_3d_jpeg_baseline)
+        self.jpeg_lossy = dcmread(jpeg_lossy_name)
+        self.color_3d_jpeg = dcmread(color_3d_jpeg_baseline)
         self.original_handlers = pydicom.config.image_handlers
         pydicom.config.image_handlers = [None, numpy_handler]
 
@@ -169,7 +169,7 @@ class pillow_JPEGlossyTests_no_pillow(unittest.TestCase):
 
 class pillow_JPEGlosslessTests_no_pillow(unittest.TestCase):
     def setUp(self):
-        self.jpeg_lossless = read_file(jpeg_lossless_name)
+        self.jpeg_lossless = dcmread(jpeg_lossless_name)
         self.original_handlers = pydicom.config.image_handlers
         pydicom.config.image_handlers = [None, numpy_handler]
 
@@ -199,10 +199,10 @@ class pillow_JPEGlosslessTests_no_pillow(unittest.TestCase):
     reason=pillow_missing_message)
 class pillow_JPEG_LS_Tests_with_pillow(unittest.TestCase):
     def setUp(self):
-        self.jpeg_ls_lossless = read_file(jpeg_ls_lossless_name)
-        self.mr_small = read_file(mr_name)
-        self.emri_jpeg_ls_lossless = read_file(emri_jpeg_ls_lossless)
-        self.emri_small = read_file(emri_name)
+        self.jpeg_ls_lossless = dcmread(jpeg_ls_lossless_name)
+        self.mr_small = dcmread(mr_name)
+        self.emri_jpeg_ls_lossless = dcmread(emri_jpeg_ls_lossless)
+        self.emri_small = dcmread(emri_name)
         self.original_handlers = pydicom.config.image_handlers
         pydicom.config.image_handlers = [pillow_handler, numpy_handler]
 
@@ -223,11 +223,11 @@ class pillow_JPEG_LS_Tests_with_pillow(unittest.TestCase):
     reason=pillow_missing_message)
 class pillow_JPEG2000Tests_with_pillow(unittest.TestCase):
     def setUp(self):
-        self.jpeg_2k = read_file(jpeg2000_name)
-        self.jpeg_2k_lossless = read_file(jpeg2000_lossless_name)
-        self.mr_small = read_file(mr_name)
-        self.emri_jpeg_2k_lossless = read_file(emri_jpeg_2k_lossless)
-        self.emri_small = read_file(emri_name)
+        self.jpeg_2k = dcmread(jpeg2000_name)
+        self.jpeg_2k_lossless = dcmread(jpeg2000_lossless_name)
+        self.mr_small = dcmread(mr_name)
+        self.emri_jpeg_2k_lossless = dcmread(emri_jpeg_2k_lossless)
+        self.emri_small = dcmread(emri_name)
         self.original_handlers = pydicom.config.image_handlers
         pydicom.config.image_handlers = [pillow_handler, numpy_handler]
 
@@ -278,8 +278,8 @@ class pillow_JPEG2000Tests_with_pillow(unittest.TestCase):
 class pillow_JPEGlossyTests_with_pillow(unittest.TestCase):
 
     def setUp(self):
-        self.jpeg_lossy = read_file(jpeg_lossy_name)
-        self.color_3d_jpeg = read_file(color_3d_jpeg_baseline)
+        self.jpeg_lossy = dcmread(jpeg_lossy_name)
+        self.color_3d_jpeg = dcmread(color_3d_jpeg_baseline)
         self.original_handlers = pydicom.config.image_handlers
         pydicom.config.image_handlers = [pillow_handler, numpy_handler]
 
@@ -313,7 +313,7 @@ class pillow_JPEGlossyTests_with_pillow(unittest.TestCase):
     reason=pillow_missing_message)
 class pillow_JPEGlosslessTests_with_pillow(unittest.TestCase):
     def setUp(self):
-        self.jpeg_lossless = read_file(jpeg_lossless_name)
+        self.jpeg_lossless = dcmread(jpeg_lossless_name)
         self.original_handlers = pydicom.config.image_handlers
         pydicom.config.image_handlers = [pillow_handler, numpy_handler]
 

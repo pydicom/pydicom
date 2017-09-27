@@ -17,7 +17,7 @@ class InvalidDicomError(Exception):
     have this.)
 
     To force reading the file (because maybe it is a dicom file without
-    a header), use read_file(..., force=True).
+    a header), use dcmread(..., force=True).
     """
 
     def __init__(self, *args):

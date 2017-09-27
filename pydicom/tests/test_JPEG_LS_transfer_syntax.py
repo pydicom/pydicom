@@ -3,7 +3,7 @@ import sys
 import re
 import pytest
 import pydicom
-from pydicom.filereader import read_file
+from pydicom.filereader import dcmread
 from pydicom.data import get_testdata_files
 
 pillow_missing_message = ("pillow is not available "
@@ -52,10 +52,10 @@ save_dir = os.getcwd()
 
 class Test_JPEG_LS_Lossless_transfer_syntax():
     def setup_method(self, method):
-        self.jpeg_ls_lossless = read_file(jpeg_ls_lossless_name)
-        self.mr_small = read_file(mr_name)
-        self.emri_jpeg_ls_lossless = read_file(emri_jpeg_ls_lossless)
-        self.emri_small = read_file(emri_name)
+        self.jpeg_ls_lossless = dcmread(jpeg_ls_lossless_name)
+        self.mr_small = dcmread(mr_name)
+        self.emri_jpeg_ls_lossless = dcmread(emri_jpeg_ls_lossless)
+        self.emri_small = dcmread(emri_name)
         self.original_handlers = pydicom.config.image_handlers
 
     def teardown_method(self, method):

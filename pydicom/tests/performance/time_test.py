@@ -79,7 +79,7 @@ reason = "%s Need at least 400 files in %s" % (reason, str(locations))
 @pytest.mark.skipif(len(filenames) < 400,
                     reason=reason)
 def test_full_read():
-    rf = pydicom.read_file
+    rf = pydicom.dcmread
     datasets = [rf(fn) for fn in filenames1]
     return datasets
 
@@ -94,7 +94,7 @@ def test_partial():
 @pytest.mark.skipif(len(filenames) < 400,
                     reason=reason)
 def test_mem_read_full():
-    rf = pydicom.read_file
+    rf = pydicom.dcmread
     str_io = BytesIO
     memory_files = (str_io(open(fn, 'rb').read()) for fn in filenames3)
     [rf(memory_file) for memory_file in memory_files]
@@ -103,7 +103,7 @@ def test_mem_read_full():
 @pytest.mark.skipif(len(filenames) < 400,
                     reason=reason)
 def test_mem_read_small():
-    rf = pydicom.read_file
+    rf = pydicom.dcmread
     str_io = BytesIO  # avoid global lookup, make local instead
     memory_files = (str_io(open(fn, 'rb').read(4000)) for fn in filenames4)
     [rf(memory_file) for memory_file in memory_files]

@@ -42,7 +42,7 @@ new_names_dict = dict([(val[4], tag) for tag, val in
 keyword_dict.update(new_names_dict)
 
 # Test that it is working
-ds = Dataset()  # or could get one from read_file, etc
+ds = Dataset()  # or could get one from dcmread, etc
 
 ds.TestOne = 42
 ds.TestTwo = '12345'

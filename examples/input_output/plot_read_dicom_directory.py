@@ -59,7 +59,7 @@ for patient_record in dicom_dir.patient_records:
             image_filenames = [join(base_dir, *image_rec.ReferencedFileID)
                                for image_rec in image_records]
 
-            datasets = [pydicom.read_file(image_filename)
+            datasets = [pydicom.dcmread(image_filename)
                         for image_filename in image_filenames]
 
             patient_names = set(ds.PatientName for ds in datasets)

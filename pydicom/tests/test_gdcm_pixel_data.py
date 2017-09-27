@@ -6,7 +6,7 @@ import tempfile
 import shutil
 import pytest
 import pydicom
-from pydicom.filereader import read_file
+from pydicom.filereader import dcmread
 from pydicom.data import get_testdata_files
 from pydicom.tag import Tag
 from pydicom import compat
@@ -81,10 +81,10 @@ class GDCM_JPEG_LS_Tests_no_gdcm(unittest.TestCase):
             self.unicode_filename = os.path.join(
                 tempfile.gettempdir(), "ДИКОМ.dcm")
             shutil.copyfile(jpeg_ls_lossless_name, self.unicode_filename)
-        self.jpeg_ls_lossless = read_file(self.unicode_filename)
-        self.mr_small = read_file(mr_name)
-        self.emri_jpeg_ls_lossless = read_file(emri_jpeg_ls_lossless)
-        self.emri_small = read_file(emri_name)
+        self.jpeg_ls_lossless = dcmread(self.unicode_filename)
+        self.mr_small = dcmread(mr_name)
+        self.emri_jpeg_ls_lossless = dcmread(emri_jpeg_ls_lossless)
+        self.emri_small = dcmread(emri_name)
         self.original_handlers = pydicom.config.image_handlers
         pydicom.config.image_handlers = [None]
 
@@ -103,11 +103,11 @@ class GDCM_JPEG_LS_Tests_no_gdcm(unittest.TestCase):
 
 class GDCM_JPEG2000Tests_no_gdcm(unittest.TestCase):
     def setUp(self):
-        self.jpeg_2k = read_file(jpeg2000_name)
-        self.jpeg_2k_lossless = read_file(jpeg2000_lossless_name)
-        self.mr_small = read_file(mr_name)
-        self.emri_jpeg_2k_lossless = read_file(emri_jpeg_2k_lossless)
-        self.emri_small = read_file(emri_name)
+        self.jpeg_2k = dcmread(jpeg2000_name)
+        self.jpeg_2k_lossless = dcmread(jpeg2000_lossless_name)
+        self.mr_small = dcmread(mr_name)
+        self.emri_jpeg_2k_lossless = dcmread(emri_jpeg_2k_lossless)
+        self.emri_small = dcmread(emri_name)
         self.original_handlers = pydicom.config.image_handlers
         pydicom.config.image_handlers = [None]
 
@@ -145,8 +145,8 @@ class GDCM_JPEG2000Tests_no_gdcm(unittest.TestCase):
 class GDCM_JPEGlossyTests_no_gdcm(unittest.TestCase):
 
     def setUp(self):
-        self.jpeg_lossy = read_file(jpeg_lossy_name)
-        self.color_3d_jpeg = read_file(color_3d_jpeg_baseline)
+        self.jpeg_lossy = dcmread(jpeg_lossy_name)
+        self.color_3d_jpeg = dcmread(color_3d_jpeg_baseline)
         self.original_handlers = pydicom.config.image_handlers
         pydicom.config.image_handlers = [None]
 
@@ -174,7 +174,7 @@ class GDCM_JPEGlossyTests_no_gdcm(unittest.TestCase):
 
 class GDCM_JPEGlosslessTests_no_gdcm(unittest.TestCase):
     def setUp(self):
-        self.jpeg_lossless = read_file(jpeg_lossless_name)
+        self.jpeg_lossless = dcmread(jpeg_lossless_name)
         self.original_handlers = pydicom.config.image_handlers
         pydicom.config.image_handlers = [None]
 
@@ -213,10 +213,10 @@ class GDCM_JPEG_LS_Tests_with_gdcm(unittest.TestCase):
             self.unicode_filename = os.path.join(
                 tempfile.gettempdir(), "ДИКОМ.dcm")
             shutil.copyfile(jpeg_ls_lossless_name, self.unicode_filename)
-        self.jpeg_ls_lossless = read_file(self.unicode_filename)
-        self.mr_small = read_file(mr_name)
-        self.emri_jpeg_ls_lossless = read_file(emri_jpeg_ls_lossless)
-        self.emri_small = read_file(emri_name)
+        self.jpeg_ls_lossless = dcmread(self.unicode_filename)
+        self.mr_small = dcmread(mr_name)
+        self.emri_jpeg_ls_lossless = dcmread(emri_jpeg_ls_lossless)
+        self.emri_small = dcmread(emri_name)
         self.original_handlers = pydicom.config.image_handlers
         pydicom.config.image_handlers = [numpy_handler, gdcm_handler]
 
@@ -247,11 +247,11 @@ class GDCM_JPEG_LS_Tests_with_gdcm(unittest.TestCase):
 @pytest.mark.skipif(not test_gdcm_decoder, reason=gdcm_missing_message)
 class GDCM_JPEG2000Tests_with_gdcm(unittest.TestCase):
     def setUp(self):
-        self.jpeg_2k = read_file(jpeg2000_name)
-        self.jpeg_2k_lossless = read_file(jpeg2000_lossless_name)
-        self.mr_small = read_file(mr_name)
-        self.emri_jpeg_2k_lossless = read_file(emri_jpeg_2k_lossless)
-        self.emri_small = read_file(emri_name)
+        self.jpeg_2k = dcmread(jpeg2000_name)
+        self.jpeg_2k_lossless = dcmread(jpeg2000_lossless_name)
+        self.mr_small = dcmread(mr_name)
+        self.emri_jpeg_2k_lossless = dcmread(emri_jpeg_2k_lossless)
+        self.emri_small = dcmread(emri_name)
         self.original_handlers = pydicom.config.image_handlers
         pydicom.config.image_handlers = [numpy_handler, gdcm_handler]
 
@@ -301,8 +301,8 @@ class GDCM_JPEG2000Tests_with_gdcm(unittest.TestCase):
 class GDCM_JPEGlossyTests_with_gdcm(unittest.TestCase):
 
     def setUp(self):
-        self.jpeg_lossy = read_file(jpeg_lossy_name)
-        self.color_3d_jpeg = read_file(color_3d_jpeg_baseline)
+        self.jpeg_lossy = dcmread(jpeg_lossy_name)
+        self.color_3d_jpeg = dcmread(color_3d_jpeg_baseline)
         self.original_handlers = pydicom.config.image_handlers
         pydicom.config.image_handlers = [numpy_handler, gdcm_handler]
 
@@ -338,7 +338,7 @@ class GDCM_JPEGlossyTests_with_gdcm(unittest.TestCase):
 @pytest.mark.skipif(not test_gdcm_decoder, reason=gdcm_missing_message)
 class GDCM_JPEGlosslessTests_with_gdcm(unittest.TestCase):
     def setUp(self):
-        self.jpeg_lossless = read_file(jpeg_lossless_name)
+        self.jpeg_lossless = dcmread(jpeg_lossless_name)
         self.original_handlers = pydicom.config.image_handlers
         pydicom.config.image_handlers = [numpy_handler, gdcm_handler]
 

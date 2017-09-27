@@ -26,7 +26,7 @@ head-first-prone, and save to a new file::
   >>> import pydicom
   >>> from pydicom.data import get_testdata_files
   >>> filename = get_testdata_files("rtplan.dcm")[0]
-  >>> ds = pydicom.read_file(filename)  # plan dataset
+  >>> ds = pydicom.dcmread(filename)  # plan dataset
   >>> ds.PatientName
   'Last^First^mid^pre'
   >>> ds.dir("setup")    # get a list of tags with "setup" somewhere in the name

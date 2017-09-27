@@ -20,7 +20,7 @@ write_filename = "/tmp/write_test.dcm"
 
 @pytest.mark.skip(reason="This is not an actual pytest test")
 def test_full_read(filename):
-    dataset = pydicom.read_file(filename)
+    dataset = pydicom.dcmread(filename)
     return dataset
 
 

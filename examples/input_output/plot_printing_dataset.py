@@ -47,6 +47,6 @@ def myprint(dataset, indent=0):
 
 
 filename = get_testdata_files('MR_small.dcm')[0]
-ds = pydicom.read_file(filename)
+ds = pydicom.dcmread(filename)
 
 myprint(ds)

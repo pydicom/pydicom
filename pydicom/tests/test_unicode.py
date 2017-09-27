@@ -19,7 +19,7 @@ class UnicodeFilenames(unittest.TestCase):
             return
 
         try:
-            dicomio.read_file(uni_name)
+            dicomio.dcmread(uni_name)
         except UnicodeEncodeError:
             self.fail("UnicodeEncodeError generated for unicode name")
         # ignore file doesn't exist error

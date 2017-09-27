@@ -27,7 +27,7 @@ print(__doc__)
 ###############################################################################
 
 filename = get_testdata_files('MR_small.dcm')[0]
-dataset = pydicom.read_file(filename)
+dataset = pydicom.dcmread(filename)
 
 data_elements = ['PatientID',
                  'PatientBirthDate']

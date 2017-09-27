@@ -641,7 +641,7 @@ def write_file_meta_info(fp, file_meta, enforce_standard=True):
         fp.seek(end_of_file_meta)
 
 
-def write_file(filename, dataset, write_like_original=True):
+def dcmwrite(filename, dataset, write_like_original=True):
     """Write `dataset` to the `filename` specified.
 
     If `write_like_original` is True then `dataset` will be written as is
@@ -723,7 +723,7 @@ def write_file(filename, dataset, write_like_original=True):
         Name of file or the file-like to write the new DICOM file to.
     dataset : pydicom.dataset.FileDataset
         Dataset holding the DICOM information; e.g. an object read with
-        pydicom.read_file().
+        pydicom.dcmread().
     write_like_original : bool
         If True (default), preserves the following information from
         the Dataset (and may result in a non-conformant file):
@@ -746,8 +746,8 @@ def write_file(filename, dataset, write_like_original=True):
     pydicom.dataset.FileDataset
         Dataset class with relevant attributes and information.
     pydicom.dataset.Dataset.save_as
-        Write a DICOM file from a dataset that was read in with read_file().
-        save_as wraps write_file.
+        Write a DICOM file from a dataset that was read in with dcmread().
+        save_as wraps dcmwrite.
     """
     # Check that dataset's group 0x0002 elements are only present in the
     #   `dataset.file_meta` Dataset - user may have added them to the wrong
@@ -837,6 +837,8 @@ def write_file(filename, dataset, write_like_original=True):
         if not caller_owns_file:
             fp.close()
 
+
+write_file = dcmwrite  # write_file before pydicom 1.0, kept for compatibility
 
 # Map each VR to a function which can write it
 # for write_numbers, the Writer maps to a tuple (function, struct_format)
