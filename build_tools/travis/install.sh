@@ -90,7 +90,7 @@ elif [[ "$DISTRIB" == "pypy" ]]; then
     export PATH="$BIN_PATH:$PATH"
     # install pip
     python -m ensurepip
-    pip install -U pip wheel
+    pip install -U pip
     if [[ "$NUMPY" == "true" ]] && [[ "$PYTHON_VERSION" == "2.7" ]]; then
         python -m pip install git+https://bitbucket.org/pypy/numpy.git
     # numpypy does not work with pypy3 so fall back on numpy
