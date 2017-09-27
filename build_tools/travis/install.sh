@@ -74,7 +74,7 @@ elif [[ "$DISTRIB" == "pypy" ]]; then
     if [[ "$PYTHON_VERSION" == "2.7" ]]; then
         PYPY_TAR=pypy2-v5.8.0-linux64
     else
-        PYPY_TAR=pypy3-v5.3.1-linux64
+        PYPY_TAR=pypy3-v5.7.1-linux64
     fi
     wget "https://bitbucket.org/pypy/pypy/downloads/"$PYPY_TAR".tar.bz2"
     tar -xvjf $PYPY_TAR".tar.bz2"
