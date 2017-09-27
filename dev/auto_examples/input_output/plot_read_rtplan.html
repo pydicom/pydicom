@@ -228,7 +228,7 @@
 
 
 <span class="n">filename</span> <span class="o">=</span> <span class="n">get_testdata_files</span><span class="p">(</span><span class="s1">&#39;rtplan.dcm&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-<span class="n">dataset</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">dcmread</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
 <span class="k">print</span><span class="p">(</span><span class="n">list_beams</span><span class="p">(</span><span class="n">dataset</span><span class="p">))</span>
 </pre></div>
 </div>

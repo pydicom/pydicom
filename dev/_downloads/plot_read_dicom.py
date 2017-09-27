@@ -18,7 +18,7 @@ from pydicom.data import get_testdata_files
 print(__doc__)
 
 filename = get_testdata_files('CT_small.dcm')[0]
-dataset = pydicom.read_file(filename)
+dataset = pydicom.dcmread(filename)
 
 # Normal mode:
 print()

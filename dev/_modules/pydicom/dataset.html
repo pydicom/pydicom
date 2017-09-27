@@ -212,7 +212,7 @@
 <span class="kn">from</span> <span class="nn">pydicom.tag</span> <span class="k">import</span> <span class="n">Tag</span><span class="p">,</span> <span class="n">BaseTag</span><span class="p">,</span> <span class="n">tag_in_exception</span>
 <span class="kn">from</span> <span class="nn">pydicom.dataelem</span> <span class="k">import</span> <span class="n">DataElement</span><span class="p">,</span> <span class="n">DataElement_from_raw</span><span class="p">,</span> <span class="n">RawDataElement</span>
 <span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="k">import</span> <span class="n">UncompressedPixelTransferSyntaxes</span>
-<span class="kn">import</span> <span class="nn">pydicom</span>  <span class="c1"># for write_file</span>
+<span class="kn">import</span> <span class="nn">pydicom</span>  <span class="c1"># for dcmwrite</span>
 <span class="kn">import</span> <span class="nn">pydicom.charset</span>
 <span class="kn">from</span> <span class="nn">pydicom.config</span> <span class="k">import</span> <span class="n">logger</span>
 <span class="kn">import</span> <span class="nn">pydicom.config</span>
@@ -1017,7 +1017,7 @@
 <span class="sd">        DICOM File Format in accordance with DICOM Standard Part 10 Section 7.</span>
 <span class="sd">        To do so requires that the `Dataset.file_meta` attribute exists and</span>
 <span class="sd">        contains a Dataset with the required (Type 1) File Meta Information</span>
-<span class="sd">        Group elements (see pydicom.filewriter.write_file and</span>
+<span class="sd">        Group elements (see pydicom.filewriter.dcmwrite and</span>
 <span class="sd">        pydicom.filewriter.write_file_meta_info for more information).</span>
 
 <span class="sd">        If `write_like_original` is True then the Dataset will be written as is</span>
@@ -1053,7 +1053,7 @@
 <span class="sd">            Write a DICOM Dataset to a file.</span>
 <span class="sd">        pydicom.filewriter.write_file_meta_info</span>
 <span class="sd">            Write the DICOM File Meta Information Group elements to a file.</span>
-<span class="sd">        pydicom.filewriter.write_file</span>
+<span class="sd">        pydicom.filewriter.dcmwrite</span>
 <span class="sd">            Write a DICOM file from a FileDataset instance.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Ensure is_little_endian and is_implicit_VR exist</span>
@@ -1064,7 +1064,7 @@
                                  <span class="s2">&quot;set appropriately before &quot;</span>
                                  <span class="s2">&quot;saving.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
 
-        <span class="n">pydicom</span><span class="o">.</span><span class="n">write_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">write_like_original</span><span class="p">)</span></div>
+        <span class="n">pydicom</span><span class="o">.</span><span class="n">dcmwrite</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">write_like_original</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Intercept any attempts to set a value for an instance attribute.</span>

@@ -33,5 +33,5 @@ def list_beams(plan_dataset):
 
 
 filename = get_testdata_files('rtplan.dcm')[0]
-dataset = pydicom.read_file(filename)
+dataset = pydicom.dcmread(filename)
 print(list_beams(dataset))

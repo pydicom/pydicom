@@ -236,7 +236,7 @@ missing from pydicom’s DICOM dictionaries.</p>
 <span class="n">keyword_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">new_names_dict</span><span class="p">)</span>
 
 <span class="c1"># Test that it is working</span>
-<span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">()</span>  <span class="c1"># or could get one from read_file, etc</span>
+<span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">()</span>  <span class="c1"># or could get one from dcmread, etc</span>
 
 <span class="n">ds</span><span class="o">.</span><span class="n">TestOne</span> <span class="o">=</span> <span class="mi">42</span>
 <span class="n">ds</span><span class="o">.</span><span class="n">TestTwo</span> <span class="o">=</span> <span class="s1">&#39;12345&#39;</span>

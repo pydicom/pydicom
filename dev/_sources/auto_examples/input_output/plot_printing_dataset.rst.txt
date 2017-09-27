@@ -141,11 +141,11 @@ This example illustrates how to print the data set in your own format.
 
 
     filename = get_testdata_files('MR_small.dcm')[0]
-    ds = pydicom.read_file(filename)
+    ds = pydicom.dcmread(filename)
 
     myprint(ds)
 
-**Total running time of the script:** ( 0 minutes  0.015 seconds)
+**Total running time of the script:** ( 0 minutes  0.016 seconds)
 
 
 

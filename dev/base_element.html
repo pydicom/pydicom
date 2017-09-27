@@ -213,7 +213,7 @@ an existing DICOM file:</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.data</span> <span class="k">import</span> <span class="n">get_testdata_files</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># get some test data</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">filename</span> <span class="o">=</span> <span class="n">get_testdata_files</span><span class="p">(</span><span class="s2">&quot;rtplan.dcm&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">dcmread</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>You can display the entire dataset by simply printing its string
@@ -321,7 +321,7 @@ that <code class="xref py py-class docutils literal"><span class="pre">dataelem.
 <a class="reference internal" href="ref_guide.html#pydicom.dataset.Dataset.data_element" title="pydicom.dataset.Dataset.data_element"><code class="xref py py-func docutils literal"><span class="pre">dataset.Dataset.data_element()</span></code></a> method or access the item using the tag
 number:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># reload the data</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">dcmread</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">data_element</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">data_element</span><span class="p">(</span><span class="s2">&quot;PatientName&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">data_element</span><span class="o">.</span><span class="n">VR</span><span class="p">,</span> <span class="n">data_element</span><span class="o">.</span><span class="n">value</span>
 <span class="go">(&#39;PN&#39;, &#39;Last^First^mid^pre&#39;)</span>
@@ -344,7 +344,7 @@ use the <cite>in</cite> keyword:</p>
 <p>To work with pixel data, the raw bytes are available through the usual tag:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># read data with actual pixel data</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">filename</span> <span class="o">=</span> <span class="n">get_testdata_files</span><span class="p">(</span><span class="s2">&quot;CT_small.dcm&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">dcmread</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pixel_bytes</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span>
 </pre></div>
 </div>

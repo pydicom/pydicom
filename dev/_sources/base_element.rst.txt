@@ -22,7 +22,7 @@ an existing DICOM file::
   >>> from pydicom.data import get_testdata_files
   >>> # get some test data
   >>> filename = get_testdata_files("rtplan.dcm")[0]
-  >>> ds = pydicom.read_file(filename)
+  >>> ds = pydicom.dcmread(filename)
 
 You can display the entire dataset by simply printing its string
 (str or repr) value::
@@ -131,7 +131,7 @@ that :class:`dataelem.DataElement` is returned. If you need the whole
 number::
 
   >>> # reload the data
-  >>> ds = pydicom.read_file(filename)
+  >>> ds = pydicom.dcmread(filename)
   >>> data_element = ds.data_element("PatientName")
   >>> data_element.VR, data_element.value
   ('PN', 'Last^First^mid^pre')
@@ -154,7 +154,7 @@ To work with pixel data, the raw bytes are available through the usual tag::
 
   >>> # read data with actual pixel data
   >>> filename = get_testdata_files("CT_small.dcm")[0]
-  >>> ds = pydicom.read_file(filename)
+  >>> ds = pydicom.dcmread(filename)
   >>> pixel_bytes = ds.PixelData
 
 but to work with them in a more intelligent way, use ``pixel_array``

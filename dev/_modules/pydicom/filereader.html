@@ -269,11 +269,11 @@
 <span class="sd">        and returns True or False. If it returns True,</span>
 <span class="sd">        read_data_element will just return.</span>
 <span class="sd">    defer_size : int, str, None, optional</span>
-<span class="sd">        See ``read_file`` for parameter info.</span>
+<span class="sd">        See ``dcmread`` for parameter info.</span>
 <span class="sd">    encoding :</span>
 <span class="sd">        Encoding scheme</span>
 <span class="sd">    specific_tags : list or None</span>
-<span class="sd">        See ``read_file`` for parameter info.</span>
+<span class="sd">        See ``dcmread`` for parameter info.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -506,12 +506,12 @@
 <span class="sd">        See help for data_element_generator for details</span>
 <span class="sd">    defer_size : int, None, optional</span>
 <span class="sd">        Size to avoid loading large elements in memory.</span>
-<span class="sd">        See ``read_file`` for more parameter info.</span>
+<span class="sd">        See ``dcmread`` for more parameter info.</span>
 <span class="sd">    parent_encoding :</span>
 <span class="sd">        optional encoding to use as a default in case</span>
 <span class="sd">        a Specific Character Set (0008,0005) isn&#39;t specified</span>
 <span class="sd">    specific_tags : list or None</span>
-<span class="sd">        See ``read_file`` for parameter info.</span>
+<span class="sd">        See ``dcmread`` for parameter info.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -787,15 +787,15 @@
 <span class="sd">    stop_when :</span>
 <span class="sd">        Stop condition. See ``read_dataset`` for more info.</span>
 <span class="sd">    defer_size : int, str, None, optional</span>
-<span class="sd">        See ``read_file`` for parameter info.</span>
+<span class="sd">        See ``dcmread`` for parameter info.</span>
 <span class="sd">    force : boolean</span>
-<span class="sd">        See ``read_file`` for parameter info.</span>
+<span class="sd">        See ``dcmread`` for parameter info.</span>
 <span class="sd">    specific_tags : list or None</span>
-<span class="sd">        See ``read_file`` for parameter info.</span>
+<span class="sd">        See ``dcmread`` for parameter info.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
-<span class="sd">    Use ``read_file`` unless you need to stop on some condition other than</span>
+<span class="sd">    Use ``dcmread`` unless you need to stop on some condition other than</span>
 <span class="sd">    reaching pixel data.</span>
 
 <span class="sd">    Returns</span>
@@ -804,7 +804,7 @@
 
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
-<span class="sd">    read_file</span>
+<span class="sd">    dcmread</span>
 <span class="sd">        More generic file reading function.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Read File Meta Information</span>
@@ -902,8 +902,8 @@
                            <span class="n">is_implicit_VR</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="read_file"><a class="viewcode-back" href="../../ref_guide.html#pydicom.filereader.read_file">[docs]</a><span class="k">def</span> <span class="nf">read_file</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">defer_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stop_before_pixels</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-              <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">specific_tags</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="dcmread"><a class="viewcode-back" href="../../ref_guide.html#pydicom.filereader.dcmread">[docs]</a><span class="k">def</span> <span class="nf">dcmread</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">defer_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stop_before_pixels</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">specific_tags</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Read and parse a DICOM dataset stored in the DICOM File Format.</span>
 
 <span class="sd">    Read a DICOM dataset stored in accordance with the DICOM File Format</span>
@@ -955,15 +955,15 @@
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 <span class="sd">    Read and return a dataset stored in accordance with the DICOM File Format</span>
-<span class="sd">    &gt;&gt;&gt; ds = pydicom.read_file(&quot;rtplan.dcm&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; ds = pydicom.dcmread(&quot;rtplan.dcm&quot;)</span>
 <span class="sd">    &gt;&gt;&gt; ds.PatientName</span>
 
 <span class="sd">    Read and return a dataset not in accordance with the DICOM File Format</span>
-<span class="sd">    &gt;&gt;&gt; ds = pydicom.read_file(&quot;rtplan.dcm&quot;, force=True)</span>
+<span class="sd">    &gt;&gt;&gt; ds = pydicom.dcmread(&quot;rtplan.dcm&quot;, force=True)</span>
 <span class="sd">    &gt;&gt;&gt; ds.PatientName</span>
 
 <span class="sd">    Use within a context manager:</span>
-<span class="sd">    &gt;&gt;&gt; with pydicom.read_file(&quot;rtplan.dcm&quot;) as ds:</span>
+<span class="sd">    &gt;&gt;&gt; with pydicom.dcmread(&quot;rtplan.dcm&quot;) as ds:</span>
 <span class="sd">    &gt;&gt;&gt;     ds.PatientName</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Open file if not already a file object</span>
@@ -979,7 +979,7 @@
 
     <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">debugging</span><span class="p">:</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">80</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Call to read_file()&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Call to dcmread()&quot;</span><span class="p">)</span>
         <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;filename:&#39;</span><span class="si">%s</span><span class="s2">&#39;, defer_size=&#39;</span><span class="si">%s</span><span class="s2">&#39;, &quot;</span>
                <span class="s2">&quot;stop_before_pixels=</span><span class="si">%s</span><span class="s2">, force=</span><span class="si">%s</span><span class="s2">, specific_tags=</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">msg</span> <span class="o">%</span> <span class="p">(</span><span class="n">fp</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">defer_size</span><span class="p">,</span> <span class="n">stop_before_pixels</span><span class="p">,</span>
@@ -1007,10 +1007,13 @@
     <span class="k">return</span> <span class="n">dataset</span></div>
 
 
+<span class="n">read_file</span> <span class="o">=</span> <span class="n">dcmread</span>  <span class="c1"># used read_file until pydicom 1.0. Kept for compatibility</span>
+
+
 <span class="k">def</span> <span class="nf">read_dicomdir</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s2">&quot;DICOMDIR&quot;</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Read a DICOMDIR file and return a DicomDir instance.</span>
 
-<span class="sd">    This is a wrapper around read_file, which gives a default file name.</span>
+<span class="sd">    This is a wrapper around dcmread, which gives a default file name.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -1026,10 +1029,10 @@
 <span class="sd">    InvalidDicomError</span>
 <span class="sd">        Raised if filename is not a DICOMDIR file.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># read_file will return a DicomDir instance if file is one.</span>
+    <span class="c1"># dcmread will return a DicomDir instance if file is one.</span>
 
     <span class="c1"># Read the file as usual.</span>
-    <span class="n">ds</span> <span class="o">=</span> <span class="n">read_file</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="n">ds</span> <span class="o">=</span> <span class="n">dcmread</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
     <span class="c1"># Here, check that it is in fact DicomDir</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">DicomDir</span><span class="p">):</span>
         <span class="n">msg</span> <span class="o">=</span> <span class="sa">u</span><span class="s2">&quot;File &#39;</span><span class="si">{0}</span><span class="s2">&#39; is not a Media Storage Directory file&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>

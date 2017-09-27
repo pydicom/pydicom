@@ -840,7 +840,7 @@
 <span class="n">filename_mr</span> <span class="o">=</span> <span class="n">get_testdata_files</span><span class="p">(</span><span class="s1">&#39;MR_small.dcm&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 <span class="n">filename_ct</span> <span class="o">=</span> <span class="n">get_testdata_files</span><span class="p">(</span><span class="s1">&#39;CT_small.dcm&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 
-<span class="n">datasets</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="n">pydicom</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">datasets</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="n">pydicom</span><span class="o">.</span><span class="n">dcmread</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
                   <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="p">(</span><span class="n">filename_mr</span><span class="p">,</span> <span class="n">filename_ct</span><span class="p">)])</span>
 
 <span class="c1"># difflib compare functions require a list of lines, each terminated with</span>
@@ -859,7 +859,7 @@
         <span class="k">print</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
 </pre></div>
 </div>
-<p><strong>Total running time of the script:</strong> ( 0 minutes  0.225 seconds)</p>
+<p><strong>Total running time of the script:</strong> ( 0 minutes  0.224 seconds)</p>
 <div class="sphx-glr-footer docutils container">
 <div class="sphx-glr-download docutils container">
 <a class="reference download internal" href="../_downloads/plot_dicom_difference.py" download=""><code class="xref download docutils literal"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_dicom_difference.py</span></code></a></div>

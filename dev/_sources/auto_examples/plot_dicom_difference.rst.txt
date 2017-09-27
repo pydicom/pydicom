@@ -670,7 +670,7 @@ This examples illustrates how to find the differences between two DICOM files.
     filename_mr = get_testdata_files('MR_small.dcm')[0]
     filename_ct = get_testdata_files('CT_small.dcm')[0]
 
-    datasets = tuple([pydicom.read_file(filename, force=True)
+    datasets = tuple([pydicom.dcmread(filename, force=True)
                       for filename in (filename_mr, filename_ct)])
 
     # difflib compare functions require a list of lines, each terminated with
@@ -688,7 +688,7 @@ This examples illustrates how to find the differences between two DICOM files.
         if line[0] != "?":
             print(line)
 
-**Total running time of the script:** ( 0 minutes  0.225 seconds)
+**Total running time of the script:** ( 0 minutes  0.224 seconds)
 
 
 

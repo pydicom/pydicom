@@ -272,6 +272,7 @@ changes.</p>
 <li>fully python3 compatible – one code-base for both python 2 and python 3</li>
 <li>package name and the import name match – now use <code class="docutils literal"><span class="pre">import</span> <span class="pre">pydicom</span></code> rather
 than <code class="docutils literal"><span class="pre">import</span> <span class="pre">dicom</span></code></li>
+<li><code class="docutils literal"><span class="pre">read_file</span></code> changed to <code class="docutils literal"><span class="pre">dcmread</span></code> for greater clarity.  Similarly <code class="docutils literal"><span class="pre">write_file</span></code> becomes <code class="docutils literal"><span class="pre">dcmwrite</span></code>.  Previous names still available for backwards compatibility</li>
 <li>optional GDCM support for reading files with compressed pixel data</li>
 <li>optional Pillow, jpeg_ls support for reading some compressed pixel data files</li>
 <li>cleaned up dicom dictionary code, old non-dicom-keyword code removed</li>

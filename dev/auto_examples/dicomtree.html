@@ -229,7 +229,7 @@
 
 <span class="k">def</span> <span class="nf">show_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">tree</span><span class="p">):</span>
     <span class="n">tree</span><span class="o">.</span><span class="n">hlist</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;root&quot;</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="n">filename</span><span class="p">)</span>
-    <span class="n">ds</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">ds</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">dcmread</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
     <span class="n">ds</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>  <span class="c1"># change strings to unicode</span>
     <span class="n">recurse_tree</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">ds</span><span class="p">,</span> <span class="s2">&quot;root&quot;</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span>
     <span class="n">tree</span><span class="o">.</span><span class="n">autosetmode</span><span class="p">()</span>

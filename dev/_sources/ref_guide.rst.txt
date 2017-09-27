@@ -9,16 +9,16 @@ Pydicom API's Reference Guide
 File Reading/Parsing
 ====================
 
-The main function to read and parse DICOM files using pydicom is ``read_file``. It is coded in the module
+The main function to read and parse DICOM files using pydicom is ``dcmread``. It is coded in the module
 dicom.filereader, but is also imported when the pydicom package is imported::
 
    >>> import pydicom
-   >>> dataset = pydicom.read_file(...)
+   >>> dataset = pydicom.dcmread(...)
 
 If you need fine control over the reading, you can either call ``read_partial`` or use ``open_dicom``.
 All are documented below:
 
-.. autofunction:: pydicom.filereader.read_file
+.. autofunction:: pydicom.filereader.dcmread
 
 .. autofunction:: pydicom.filereader.read_partial
 

@@ -824,7 +824,7 @@
         <span class="n">fp</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">end_of_file_meta</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="write_file"><a class="viewcode-back" href="../../ref_guide.html#pydicom.filewriter.write_file">[docs]</a><span class="k">def</span> <span class="nf">write_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">write_like_original</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">dcmwrite</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">write_like_original</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Write `dataset` to the `filename` specified.</span>
 
 <span class="sd">    If `write_like_original` is True then `dataset` will be written as is</span>
@@ -906,7 +906,7 @@
 <span class="sd">        Name of file or the file-like to write the new DICOM file to.</span>
 <span class="sd">    dataset : pydicom.dataset.FileDataset</span>
 <span class="sd">        Dataset holding the DICOM information; e.g. an object read with</span>
-<span class="sd">        pydicom.read_file().</span>
+<span class="sd">        pydicom.dcmread().</span>
 <span class="sd">    write_like_original : bool</span>
 <span class="sd">        If True (default), preserves the following information from</span>
 <span class="sd">        the Dataset (and may result in a non-conformant file):</span>
@@ -929,8 +929,8 @@
 <span class="sd">    pydicom.dataset.FileDataset</span>
 <span class="sd">        Dataset class with relevant attributes and information.</span>
 <span class="sd">    pydicom.dataset.Dataset.save_as</span>
-<span class="sd">        Write a DICOM file from a dataset that was read in with read_file().</span>
-<span class="sd">        save_as wraps write_file.</span>
+<span class="sd">        Write a DICOM file from a dataset that was read in with dcmread().</span>
+<span class="sd">        save_as wraps dcmwrite.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Check that dataset&#39;s group 0x0002 elements are only present in the</span>
     <span class="c1">#   `dataset.file_meta` Dataset - user may have added them to the wrong</span>
@@ -1018,8 +1018,10 @@
         <span class="n">write_dataset</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">dataset</span><span class="p">[</span><span class="mh">0x00010000</span><span class="p">:])</span>
     <span class="k">finally</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">caller_owns_file</span><span class="p">:</span>
-            <span class="n">fp</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+            <span class="n">fp</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
+
+<span class="n">write_file</span> <span class="o">=</span> <span class="n">dcmwrite</span>  <span class="c1"># write_file before pydicom 1.0, kept for compatibility</span>
 
 <span class="c1"># Map each VR to a function which can write it</span>
 <span class="c1"># for write_numbers, the Writer maps to a tuple (function, struct_format)</span>

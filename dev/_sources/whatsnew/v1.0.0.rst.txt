@@ -13,6 +13,7 @@ Enhancements
 * fully python3 compatible -- one code-base for both python 2 and python 3
 * package name and the import name match -- now use ``import pydicom`` rather
   than ``import dicom``
+* ``read_file`` changed to ``dcmread`` for greater clarity.  Similarly ``write_file`` becomes ``dcmwrite``.  Previous names still available for backwards compatibility
 * optional GDCM support for reading files with compressed pixel data
 * optional Pillow, jpeg_ls support for reading some compressed pixel data files
 * cleaned up dicom dictionary code, old non-dicom-keyword code removed
