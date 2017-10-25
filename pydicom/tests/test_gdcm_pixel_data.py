@@ -233,7 +233,6 @@ class GDCM_JPEG_LS_Tests_with_gdcm(unittest.TestCase):
             "using GDCM Decoded pixel data is not "
             "all {0} (mean == {1})".format(b.mean(), a.mean()))
 
-    @pytest.mark.xfail(reason="GDCM does not support EMRI?")
     def test_emri_JPEG_LS_PixelArray_with_gdcm(self):
         a = self.emri_jpeg_ls_lossless.pixel_array
         b = self.emri_small.pixel_array
@@ -286,7 +285,6 @@ class GDCM_JPEG2000Tests_with_gdcm(unittest.TestCase):
             "Decoded pixel data is not all {0} "
             "(mean == {1})".format(b.mean(), a.mean()))
 
-    @pytest.mark.xfail(reason="GDCM does not support EMRI?")
     def test_emri_JPEG2000PixelArray(self):
         a = self.emri_jpeg_2k_lossless.pixel_array
         b = self.emri_small.pixel_array

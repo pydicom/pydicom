@@ -122,9 +122,15 @@ def get_pixeldata(dicom_dataset):
     n_bytes = (dicom_dataset.Rows *
                dicom_dataset.Columns *
                numpy.dtype(numpy_dtype).itemsize)
-
+    try:
+        n_bytes *= dicom_dataset.NumberOfFrames
+    except Exception:
+        pass
+    try:
+        n_bytes *= dicom_dataset.SamplesPerPixel
+    except Exception:
+        pass
     if len(pixel_bytearray) > n_bytes:
-
         # We make sure that all the bytes after are in fact zeros
         padding = pixel_bytearray[n_bytes:]
         if numpy.any(numpy.fromstring(padding, numpy.byte)):
@@ -136,14 +142,10 @@ def get_pixeldata(dicom_dataset):
     pixel_array = numpy.fromstring(pixel_bytearray, dtype=numpy_dtype)
     length_of_pixel_array = pixel_array.nbytes
     expected_length = dicom_dataset.Rows * dicom_dataset.Columns
-    try:
-        expected_length *= dicom_dataset.NumberOfFrames
-    except Exception:
-        pass
-    try:
-        expected_length *= dicom_dataset.SamplesPerPixel
-    except Exception:
-        pass
+
+    expected_length *= dicom_dataset.get("NumberOfFrames", 1)
+    expected_length *= dicom_dataset.get("SamplesPerPixel", 1)
+
     if dicom_dataset.BitsAllocated > 8:
         expected_length *= (dicom_dataset.BitsAllocated // 8)
     if length_of_pixel_array != expected_length:
