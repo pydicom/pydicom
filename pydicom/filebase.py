@@ -7,7 +7,7 @@
 
 from __future__ import absolute_import
 
-from pydicom.tag import Tag
+from pydicom.tag import Tag, BaseTag
 from struct import (unpack, pack)
 
 from io import BytesIO
@@ -42,7 +42,8 @@ class DicomIO(object):
     def write_tag(self, tag):
         """Write a dicom tag (two unsigned shorts) to the file."""
         # make sure is an instance of class, not just a tuple or int
-        tag = Tag(tag)
+        if not isinstance(tag, BaseTag):
+            tag = Tag(tag)
         self.write_US(tag.group)
         self.write_US(tag.element)
 

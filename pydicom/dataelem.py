@@ -14,19 +14,25 @@ A DataElement has a tag,
 from __future__ import absolute_import
 from collections import namedtuple
 
+from pydicom.multival import MultiValue
+
+from pydicom.charset import default_encoding
+
 from pydicom import config  # don't import datetime_conversion directly
 from pydicom import compat
-from pydicom.charset import default_encoding
-from pydicom.compat import in_py2
 from pydicom.config import logger
 from pydicom.datadict import (dictionary_has_tag, dictionary_description,
                               dictionary_keyword, dictionary_is_retired,
                               private_dictionary_description, dictionary_VR,
                               repeater_has_tag)
-from pydicom.multival import MultiValue
-from pydicom.tag import Tag
+
+from pydicom.tag import Tag, BaseTag
 from pydicom.uid import UID
-import pydicom.valuerep  # don't import DS directly as can be changed by config
+
+# don't import DS directly as can be changed by config
+import pydicom.valuerep
+
+from pydicom.compat import in_py2
 
 if not in_py2:
     from pydicom.valuerep import PersonName3 as PersonNameUnicode
@@ -171,7 +177,9 @@ class DataElement(object):
             Used to determine whether or not `value` requires conversion to a
             value with VM > 1. Default is False.
         """
-        self.tag = Tag(tag)
+        if not isinstance(tag, BaseTag):
+            tag = Tag(tag)
+        self.tag = tag
         self.VR = VR  # Note!: you must set VR before setting value
         if already_converted:
             self._value = value
@@ -400,7 +408,9 @@ class DeferredDataElement(DataElement):
         data_element_tell -- file position at start of data element,
            (not the start of the value part, but start of whole element)
         """
-        self.tag = Tag(tag)
+        if not isinstance(tag, BaseTag):
+            tag = Tag(tag)
+        self.tag = tag
         self.VR = VR
         self._value = None  # flag as unread
 

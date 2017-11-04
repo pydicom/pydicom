@@ -70,10 +70,34 @@ filenames1 = filenames[:50]
 reason = "Not doing time tests."
 reason = "%s Need at least 400 files in %s" % (reason, str(locations))
 
+set_calls = []
+get_calls = []
+def trace_calls(frame, event, arg):
+    if event != 'call':
+        return
+    co = frame.f_code
+    func_name = co.co_name
+    func_line_no = frame.f_lineno
+    func_filename = co.co_filename
+    
+    if func_name not in ["__getitem__", "__setitem__"]:
+        return
+    if "dataset.py" not in func_filename:
+        return
+
+    caller = frame.f_back
+    caller_line_no = caller.f_lineno
+    caller_filename = caller.f_code.co_filename
+    caller_mosh = os.path.basename(caller_filename) + ":" + str(caller_line_no)
+    
+    if func_name == "__getitem__":
+        get_calls.append(caller_mosh)
+    else:
+        set_calls.append(caller_mosh)
 
 def test_write():
-    for ds in datasets:
-        ds.save_as(ds.new_filename)
+    for i in range(len(datasets)):
+        datasets[i].save_as(ds_new_filenames[i])
 
 @pytest.mark.skipif(len(filenames) < 400,
                     reason=reason)
@@ -87,8 +111,8 @@ if __name__ == "__main__":
     write_filenames = filenames1[:50]
     # print("Filenames:", write_filenames)
     datasets = [pydicom.dcmread(fn) for fn in write_filenames]
-    for ds in datasets:
-        ds.new_filename = os.path.join(tempwrite, os.path.basename(ds.filename))
+    ds_new_filenames = [os.path.join(tempwrite, os.path.basename(ds.filename))
+                        for ds in datasets]
     
     num_tags = sum([len(x.keys()) for x in datasets])
     print("Total number of tags: %d in %d files" % (num_tags, len(datasets)))
@@ -97,8 +121,16 @@ if __name__ == "__main__":
             # 'test_python_write_files()',
             ]
 
-
-
+    one_file = filenames1[0]
+    one_ds = pydicom.dcmread(one_file)
+    trace_callers = not True
+    if trace_callers:
+        sys.settrace(trace_calls)
+        one_ds.save_as(os.path.join(tempwrite, "Test_write.dcm"))
+        from collections import Counter
+        print("Get", Counter(get_calls))
+        print("Set", Counter(set_calls))
+        sys.exit()
     do_trace = False   
     if do_trace:       
         import trace
@@ -128,6 +160,7 @@ if __name__ == "__main__":
         p.strip_dirs().sort_stats('time').print_stats(8)
 
 
+        
     # Clear disk cache for next run?
     if not on_windows:
         prompt = "Run purge command (linux/Mac OS X)"
