@@ -1,7 +1,6 @@
 # Copyright 2008-2017 pydicom authors. See LICENSE file for details.
 """Functions related to writing DICOM data."""
 from __future__ import absolute_import
-
 from struct import pack
 
 from pydicom import compat
@@ -239,13 +238,12 @@ def write_PN(fp, data_element, padding=b' ', encoding=None):
 def write_string(fp, data_element, padding=' ', encoding=default_encoding):
     """Write a single or multivalued string."""
     val = multi_string(data_element.value)
-    if len(val) % 2 != 0:
-        val = val + padding  # pad to even length
-
-    if isinstance(val, compat.text_type):
-        val = val.encode(encoding)
-
-    fp.write(val)
+    if val is not None:
+        if len(val) % 2 != 0:
+            val = val + padding  # pad to even length
+        if isinstance(val, compat.text_type):
+            val = val.encode(encoding)
+        fp.write(val)
 
 
 def write_number_string(fp, data_element, padding=' '):

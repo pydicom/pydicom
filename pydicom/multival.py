@@ -81,5 +81,8 @@ class MultiValue(MutableSequence):
     def __eq__(self, other):
         return self._list == other
 
+    def __ne__(self, other):
+        return self._list != other
+
     def sort(self, key=None, reverse=False):
         self._list.sort(key=key, reverse=reverse)

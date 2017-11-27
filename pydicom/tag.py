@@ -11,7 +11,7 @@ separated to (group, element) as required.
 from contextlib import contextmanager
 
 from pydicom import compat
-
+from pydicom.config import logger
 
 @contextmanager
 def tag_in_exception(tag):
@@ -28,6 +28,7 @@ def tag_in_exception(tag):
     try:
         yield
     except Exception as ex:
+        logger.warning("trouble with", exc_info=ex)
         msg = 'With tag {0} got exception: {1}'.format(tag, str(ex))
         raise type(ex)(msg)
 

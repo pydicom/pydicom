@@ -324,7 +324,6 @@ class GDCM_JPEGlossyTests_with_gdcm(unittest.TestCase):
         self.assertEqual(a[420, 140], 244)
         self.assertEqual(a[230, 120], 95)
 
-    @pytest.mark.xfail(reason="GDCM does not support 3D color?")
     def test_JPEGBaselineColor3DPixelArray(self):
         a = self.color_3d_jpeg.pixel_array
         self.assertEqual(a.shape, (120, 480, 640, 3))
