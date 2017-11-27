@@ -269,6 +269,13 @@ class WriteDataElementTests(unittest.TestCase):
         encoded_elem = self.encode_element(data_elem)
         self.assertEqual(expected, encoded_elem)
 
+    def test_write_empty_LO(self):
+        data_elem = DataElement(0x00080070, 'LO', None)
+        expected = (b'\x08\x00\x70\x00'  # tag
+                    b'\x00\x00\x00\x00'  # length
+                    )  # value
+        self.check_data_element(data_elem, expected)
+
     def test_write_DA(self):
         data_elem = DataElement(0x00080022, 'DA', '20000101')
         expected = (b'\x08\x00\x22\x00'  # tag
