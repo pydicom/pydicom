@@ -481,7 +481,7 @@ class ReaderTests(unittest.TestCase):
         file_ds = FileDataset(fp, ds)
         file_ds.is_implicit_VR = True
         file_ds.is_little_endian = True
-        file_ds.save_as(fp)
+        file_ds.save_as(fp, write_like_original=True)
 
         ds = dcmread(fp, force=True)
         self.assertEqual(ds[0x00280108].VR, 'US')
@@ -495,7 +495,7 @@ class ReaderTests(unittest.TestCase):
         file_ds = FileDataset(fp, ds)
         file_ds.is_implicit_VR = True
         file_ds.is_little_endian = True
-        file_ds.save_as(fp)
+        file_ds.save_as(fp, write_like_original=True)
 
         ds = dcmread(fp, force=True)
         self.assertEqual(ds[0x7fe00010].VR, 'OB')
@@ -510,7 +510,7 @@ class ReaderTests(unittest.TestCase):
 
         fp = BytesIO()
         file_ds = FileDataset(fp, ds)
-        file_ds.save_as(fp)
+        file_ds.save_as(fp, write_like_original=True)
 
         ds = dcmread(fp, defer_size=65, force=True)
         self.assertEqual(ds[0x00080005].value, long_specific_char_set_value)
@@ -689,7 +689,7 @@ class ReaderTests(unittest.TestCase):
         Regression test for #358."""
         ds = dcmread(mr_name)
         fp = DicomBytesIO()
-        ds.save_as(fp)
+        ds.save_as(fp, write_like_original=True)
         fp.seek(0)
         de_gen = data_element_generator(fp, False, True)
         try:
@@ -719,13 +719,13 @@ class ReadDataElementTests(unittest.TestCase):
         file_ds = FileDataset(self.fp, ds)
         file_ds.is_implicit_VR = True
         file_ds.is_little_endian = True
-        file_ds.save_as(self.fp)
+        file_ds.save_as(self.fp, write_like_original=True)
 
         self.fp_ex = BytesIO()  # Explicit little
         file_ds = FileDataset(self.fp_ex, ds)
         file_ds.is_implicit_VR = False
         file_ds.is_little_endian = True
-        file_ds.save_as(self.fp_ex)
+        file_ds.save_as(self.fp_ex, write_like_original=True)
 
     def test_read_OD_implicit_little(self):
         """Check creation of OD DataElement from byte data works correctly."""

@@ -38,7 +38,6 @@ try:
     import numpy
 except ImportError:
     have_numpy = False
-    raise
 
 sys_is_little_endian = (sys.byteorder == 'little')
 
