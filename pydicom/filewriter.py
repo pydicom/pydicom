@@ -592,8 +592,11 @@ def write_file_meta_info(fp, file_meta, enforce_standard=True):
         if 'FileMetaInformationVersion' not in file_meta:
             file_meta.FileMetaInformationVersion = b'\x00\x01'
 
-        file_meta.ImplementationClassUID = PYDICOM_IMPLEMENTATION_UID
-        file_meta.ImplementationVersionName = 'PYDICOM ' + __version__
+        if 'ImplementationClassUID' not in file_meta:
+            file_meta.ImplementationClassUID = PYDICOM_IMPLEMENTATION_UID
+
+        if 'ImplementationVersionName' not in file_meta:
+            file_meta.ImplementationVersionName = 'PYDICOM ' + __version__
 
         # Check that required File Meta Elements are present
         missing = []
@@ -809,7 +812,7 @@ def dcmwrite(filename, dataset, write_like_original=True):
 
         if file_meta is not None:  # May be an empty Dataset
             # If we want to `write_like_original`, don't enforce_standard
-            write_file_meta_info(fp, file_meta, not write_like_original)
+            write_file_meta_info(fp, file_meta, enforce_standard=not write_like_original)
 
         # WRITE DATASET
         # The transfer syntax used to encode the dataset can't be changed

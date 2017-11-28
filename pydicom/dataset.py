@@ -843,7 +843,7 @@ class Dataset(dict):
 
         self.walk(RemoveCallback)
 
-    def save_as(self, filename, write_like_original=False):
+    def save_as(self, filename, write_like_original=True):
         """Write the Dataset to `filename`.
 
         Saving a Dataset requires that the Dataset.is_implicit_VR and
