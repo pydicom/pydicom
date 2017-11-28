@@ -8,10 +8,11 @@ separated to (group, element) as required.
 # NOTE: Tags must be not be stored as a tuple internally, as some code logic
 #       (e.g. in filewriter.write_AT) checks if a value is a multi-value
 #       element
+import traceback
 from contextlib import contextmanager
 
 from pydicom import compat
-from pydicom.config import logger
+
 
 @contextmanager
 def tag_in_exception(tag):
@@ -28,8 +29,11 @@ def tag_in_exception(tag):
     try:
         yield
     except Exception as ex:
-        logger.warning("trouble with", exc_info=ex)
-        msg = 'With tag {0} got exception: {1}'.format(tag, str(ex))
+        stack_trace = traceback.format_exc()
+        msg = 'With tag {0} got exception: {1}\n{2}'.format(
+            tag,
+            str(ex),
+            stack_trace)
         raise type(ex)(msg)
 
 
