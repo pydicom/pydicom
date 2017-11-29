@@ -216,6 +216,11 @@
 <span class="kn">import</span> <span class="nn">pydicom.charset</span>
 <span class="kn">from</span> <span class="nn">pydicom.config</span> <span class="k">import</span> <span class="n">logger</span>
 <span class="kn">import</span> <span class="nn">pydicom.config</span>
+<span class="n">have_numpy</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">numpy</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">have_numpy</span> <span class="o">=</span> <span class="kc">False</span>
 
 <span class="n">sys_is_little_endian</span> <span class="o">=</span> <span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">byteorder</span> <span class="o">==</span> <span class="s1">&#39;little&#39;</span><span class="p">)</span>
 
@@ -847,6 +852,22 @@
                 <span class="n">pixel_array</span> <span class="o">=</span> <span class="n">pixel_array</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Rows</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Columns</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">pixel_array</span>
 
+    <span class="k">def</span> <span class="nf">_convert_YBR_to_RGB</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">array_of_YBR_pixels</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">have_numpy</span><span class="p">:</span>
+            <span class="n">ybr_to_rgb</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
+            <span class="n">ybr_to_rgb</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="o">+</span><span class="mf">0.000000</span><span class="p">,</span> <span class="o">+</span><span class="mf">1.402000</span><span class="p">]</span>
+            <span class="n">ybr_to_rgb</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.344136</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.714136</span><span class="p">]</span>
+            <span class="n">ybr_to_rgb</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="o">+</span><span class="mf">1.772000</span><span class="p">,</span> <span class="o">+</span><span class="mf">0.000000</span><span class="p">]</span>
+            <span class="n">orig_type</span> <span class="o">=</span> <span class="n">array_of_YBR_pixels</span><span class="o">.</span><span class="n">dtype</span>
+            <span class="n">array_of_YBR_pixels</span> <span class="o">=</span> <span class="n">array_of_YBR_pixels</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
+            <span class="n">array_of_YBR_pixels</span> <span class="o">-=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="mi">128</span><span class="p">]</span>
+            <span class="n">array_of_YBR_pixels</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span>
+                <span class="n">array_of_YBR_pixels</span><span class="p">,</span> <span class="n">ybr_to_rgb</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">orig_type</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">array_of_YBR_pixels</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Numpy is required&quot;</span>
+                                      <span class="s2">&quot;To convert the color space&quot;</span><span class="p">)</span>
+
     <span class="c1"># Use by pixel_array property</span>
     <span class="k">def</span> <span class="nf">_get_pixel_array</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Convert the Pixel Data to a numpy array.</span>
@@ -872,6 +893,8 @@
                 <span class="k">try</span><span class="p">:</span>
                     <span class="n">pixel_array</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">get_pixeldata</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_pixel_array</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reshape_pixel_array</span><span class="p">(</span><span class="n">pixel_array</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">needs_to_convert_to_RGB</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_pixel_array</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert_YBR_to_RGB</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pixel_array</span><span class="p">)</span>
                     <span class="n">successfully_read_pixel_data</span> <span class="o">=</span> <span class="kc">True</span>
                     <span class="k">break</span>
                 <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>

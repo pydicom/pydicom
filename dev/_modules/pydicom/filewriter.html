@@ -184,7 +184,6 @@
 <span></span><span class="c1"># Copyright 2008-2017 pydicom authors. See LICENSE file for details.</span>
 <span class="sd">&quot;&quot;&quot;Functions related to writing DICOM data.&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
-
 <span class="kn">from</span> <span class="nn">struct</span> <span class="k">import</span> <span class="n">pack</span>
 
 <span class="kn">from</span> <span class="nn">pydicom</span> <span class="k">import</span> <span class="n">compat</span>
@@ -422,13 +421,12 @@
 <span class="k">def</span> <span class="nf">write_string</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">data_element</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">default_encoding</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Write a single or multivalued string.&quot;&quot;&quot;</span>
     <span class="n">val</span> <span class="o">=</span> <span class="n">multi_string</span><span class="p">(</span><span class="n">data_element</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">val</span> <span class="o">=</span> <span class="n">val</span> <span class="o">+</span> <span class="n">padding</span>  <span class="c1"># pad to even length</span>
-
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">compat</span><span class="o">.</span><span class="n">text_type</span><span class="p">):</span>
-        <span class="n">val</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">encoding</span><span class="p">)</span>
-
-    <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="n">val</span> <span class="o">+</span> <span class="n">padding</span>  <span class="c1"># pad to even length</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">compat</span><span class="o">.</span><span class="n">text_type</span><span class="p">):</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">encoding</span><span class="p">)</span>
+        <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">write_number_string</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">data_element</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">):</span>
@@ -777,8 +775,11 @@
         <span class="k">if</span> <span class="s1">&#39;FileMetaInformationVersion&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">file_meta</span><span class="p">:</span>
             <span class="n">file_meta</span><span class="o">.</span><span class="n">FileMetaInformationVersion</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00\x01</span><span class="s1">&#39;</span>
 
-        <span class="n">file_meta</span><span class="o">.</span><span class="n">ImplementationClassUID</span> <span class="o">=</span> <span class="n">PYDICOM_IMPLEMENTATION_UID</span>
-        <span class="n">file_meta</span><span class="o">.</span><span class="n">ImplementationVersionName</span> <span class="o">=</span> <span class="s1">&#39;PYDICOM &#39;</span> <span class="o">+</span> <span class="n">__version__</span>
+        <span class="k">if</span> <span class="s1">&#39;ImplementationClassUID&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">file_meta</span><span class="p">:</span>
+            <span class="n">file_meta</span><span class="o">.</span><span class="n">ImplementationClassUID</span> <span class="o">=</span> <span class="n">PYDICOM_IMPLEMENTATION_UID</span>
+
+        <span class="k">if</span> <span class="s1">&#39;ImplementationVersionName&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">file_meta</span><span class="p">:</span>
+            <span class="n">file_meta</span><span class="o">.</span><span class="n">ImplementationVersionName</span> <span class="o">=</span> <span class="s1">&#39;PYDICOM &#39;</span> <span class="o">+</span> <span class="n">__version__</span>
 
         <span class="c1"># Check that required File Meta Elements are present</span>
         <span class="n">missing</span> <span class="o">=</span> <span class="p">[]</span>
@@ -994,7 +995,7 @@
 
         <span class="k">if</span> <span class="n">file_meta</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># May be an empty Dataset</span>
             <span class="c1"># If we want to `write_like_original`, don&#39;t enforce_standard</span>
-            <span class="n">write_file_meta_info</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">file_meta</span><span class="p">,</span> <span class="ow">not</span> <span class="n">write_like_original</span><span class="p">)</span>
+            <span class="n">write_file_meta_info</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">file_meta</span><span class="p">,</span> <span class="n">enforce_standard</span><span class="o">=</span><span class="ow">not</span> <span class="n">write_like_original</span><span class="p">)</span>
 
         <span class="c1"># WRITE DATASET</span>
         <span class="c1"># The transfer syntax used to encode the dataset can&#39;t be changed</span>
