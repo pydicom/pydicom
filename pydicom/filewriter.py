@@ -1,7 +1,6 @@
 # Copyright 2008-2017 pydicom authors. See LICENSE file for details.
 """Functions related to writing DICOM data."""
 from __future__ import absolute_import
-
 from struct import pack
 
 from pydicom import compat
@@ -239,13 +238,12 @@ def write_PN(fp, data_element, padding=b' ', encoding=None):
 def write_string(fp, data_element, padding=' ', encoding=default_encoding):
     """Write a single or multivalued string."""
     val = multi_string(data_element.value)
-    if len(val) % 2 != 0:
-        val = val + padding  # pad to even length
-
-    if isinstance(val, compat.text_type):
-        val = val.encode(encoding)
-
-    fp.write(val)
+    if val is not None:
+        if len(val) % 2 != 0:
+            val = val + padding  # pad to even length
+        if isinstance(val, compat.text_type):
+            val = val.encode(encoding)
+        fp.write(val)
 
 
 def write_number_string(fp, data_element, padding=' '):
@@ -594,8 +592,11 @@ def write_file_meta_info(fp, file_meta, enforce_standard=True):
         if 'FileMetaInformationVersion' not in file_meta:
             file_meta.FileMetaInformationVersion = b'\x00\x01'
 
-        file_meta.ImplementationClassUID = PYDICOM_IMPLEMENTATION_UID
-        file_meta.ImplementationVersionName = 'PYDICOM ' + __version__
+        if 'ImplementationClassUID' not in file_meta:
+            file_meta.ImplementationClassUID = PYDICOM_IMPLEMENTATION_UID
+
+        if 'ImplementationVersionName' not in file_meta:
+            file_meta.ImplementationVersionName = 'PYDICOM ' + __version__
 
         # Check that required File Meta Elements are present
         missing = []
@@ -811,7 +812,7 @@ def dcmwrite(filename, dataset, write_like_original=True):
 
         if file_meta is not None:  # May be an empty Dataset
             # If we want to `write_like_original`, don't enforce_standard
-            write_file_meta_info(fp, file_meta, not write_like_original)
+            write_file_meta_info(fp, file_meta, enforce_standard=not write_like_original)
 
         # WRITE DATASET
         # The transfer syntax used to encode the dataset can't be changed

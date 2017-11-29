@@ -1,6 +1,7 @@
 """Use the gdcm python package to decode pixel transfer syntaxes."""
 import sys
 from pydicom import compat
+import pydicom
 have_numpy = True
 try:
     import numpy
@@ -15,6 +16,15 @@ except ImportError:
     have_gdcm = False
     raise
 can_use_gdcm = have_gdcm and have_numpy
+
+
+should_convert_these_syntaxes_to_RGB = [
+    pydicom.uid.JPEGBaseLineLossy8bit, ]
+
+
+def needs_to_convert_to_RGB(dicom_dataset):
+    return (dicom_dataset.file_meta.TransferSyntaxUID in
+            should_convert_these_syntaxes_to_RGB)
 
 
 def supports_transfer_syntax(dicom_dataset):

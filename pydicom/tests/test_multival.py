@@ -110,6 +110,31 @@ class MultiValuetests(unittest.TestCase):
         multival.sort(key=str)
         self.assertEqual([1, 12, 33, 5, 7], multival)
 
+    def test_equal(self):
+        """MultiValue: test equality operator"""
+        multival = MultiValue(DS, [12, 33, 5, 7, 1])
+        multival2 = MultiValue(DS, [12, 33, 5, 7, 1])
+        multival3 = MultiValue(DS, [33, 12, 5, 7, 1])
+        self.assertTrue(multival == multival2)
+        self.assertFalse(multival == multival3)
+        multival = MultiValue(str, ['a', 'b', 'c'])
+        multival2 = MultiValue(str, ['a', 'b', 'c'])
+        multival3 = MultiValue(str, ['b', 'c', 'a'])
+        self.assertTrue(multival == multival2)
+        self.assertFalse(multival == multival3)
+
+    def test_not_equal(self):
+        """MultiValue: test equality operator"""
+        multival = MultiValue(DS, [12, 33, 5, 7, 1])
+        multival2 = MultiValue(DS, [12, 33, 5, 7, 1])
+        multival3 = MultiValue(DS, [33, 12, 5, 7, 1])
+        self.assertFalse(multival != multival2)
+        self.assertTrue(multival != multival3)
+        multival = MultiValue(str, ['a', 'b', 'c'])
+        multival2 = MultiValue(str, ['a', 'b', 'c'])
+        multival3 = MultiValue(str, ['b', 'c', 'a'])
+        self.assertFalse(multival != multival2)
+        self.assertTrue(multival != multival3)
 
 if __name__ == "__main__":
     unittest.main()

@@ -33,6 +33,11 @@ import pydicom  # for dcmwrite
 import pydicom.charset
 from pydicom.config import logger
 import pydicom.config
+have_numpy = True
+try:
+    import numpy
+except ImportError:
+    have_numpy = False
 
 sys_is_little_endian = (sys.byteorder == 'little')
 
@@ -664,6 +669,22 @@ class Dataset(dict):
                 pixel_array = pixel_array.reshape(self.Rows, self.Columns)
         return pixel_array
 
+    def _convert_YBR_to_RGB(self, array_of_YBR_pixels):
+        if have_numpy:
+            ybr_to_rgb = numpy.ndarray((3, 3), dtype=numpy.float)
+            ybr_to_rgb[0, :] = [1.0, +0.000000, +1.402000]
+            ybr_to_rgb[1, :] = [1.0, -0.344136, -0.714136]
+            ybr_to_rgb[2, :] = [1.0, +1.772000, +0.000000]
+            orig_type = array_of_YBR_pixels.dtype
+            array_of_YBR_pixels = array_of_YBR_pixels.astype(numpy.float)
+            array_of_YBR_pixels -= [0, 128, 128]
+            array_of_YBR_pixels = numpy.dot(
+                array_of_YBR_pixels, ybr_to_rgb.T.copy()).astype(orig_type)
+            return array_of_YBR_pixels
+        else:
+            raise NotImplementedError("Numpy is required"
+                                      "To convert the color space")
+
     # Use by pixel_array property
     def _get_pixel_array(self):
         """Convert the Pixel Data to a numpy array.
@@ -689,6 +710,8 @@ class Dataset(dict):
                 try:
                     pixel_array = x.get_pixeldata(self)
                     self._pixel_array = self._reshape_pixel_array(pixel_array)
+                    if x.needs_to_convert_to_RGB(self):
+                        self._pixel_array = self._convert_YBR_to_RGB(self._pixel_array)
                     successfully_read_pixel_data = True
                     break
                 except Exception as e:

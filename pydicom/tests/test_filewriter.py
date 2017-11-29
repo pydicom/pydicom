@@ -84,7 +84,7 @@ class WriteFileTests(unittest.TestCase):
             bytes_in.seek(0)
 
         ds = dcmread(bytes_in)
-        ds.save_as(self.file_out)
+        ds.save_as(self.file_out, write_like_original=True)
         self.file_out.seek(0)
         bytes_out = BytesIO(self.file_out.read())
         bytes_in.seek(0)
@@ -144,7 +144,7 @@ class WriteFileTests(unittest.TestCase):
         ds.ImagePositionPatient[2] = DS_expected
         ds.ImageType[1] = CS_expected
         ds[(0x0043, 0x1012)].value[0] = SS_expected
-        ds.save_as(self.file_out)
+        ds.save_as(self.file_out, write_like_original=True)
         self.file_out.seek(0)
         # Now read it back in and check that the values were changed
         ds = dcmread(self.file_out)
@@ -158,7 +158,7 @@ class WriteFileTests(unittest.TestCase):
     def testwrite_short_uid(self):
         ds = dcmread(rtplan_name)
         ds.SOPInstanceUID = "1.2"
-        ds.save_as(self.file_out)
+        ds.save_as(self.file_out, write_like_original=True)
         self.file_out.seek(0)
         ds = dcmread(self.file_out)
         self.assertEqual(ds.SOPInstanceUID, "1.2")
@@ -207,7 +207,7 @@ class ScratchWriteDateTimeTests(WriteFileTests):
         ds.ReferencedDateTime = MultiValue(DT, multi_DT_expected)
         ds.CalibrationTime = MultiValue(TM, multi_TM_expected)
         ds.TimeOfLastCalibration = TM(TM_expected)
-        ds.save_as(self.file_out)
+        ds.save_as(self.file_out, write_like_original=True)
         self.file_out.seek(0)
         # Now read it back in and check the values are as expected
         ds = dcmread(self.file_out)
@@ -268,6 +268,13 @@ class WriteDataElementTests(unittest.TestCase):
     def check_data_element(self, data_elem, expected):
         encoded_elem = self.encode_element(data_elem)
         self.assertEqual(expected, encoded_elem)
+
+    def test_write_empty_LO(self):
+        data_elem = DataElement(0x00080070, 'LO', None)
+        expected = (b'\x08\x00\x70\x00'  # tag
+                    b'\x00\x00\x00\x00'  # length
+                    )  # value
+        self.check_data_element(data_elem, expected)
 
     def test_write_DA(self):
         data_elem = DataElement(0x00080022, 'DA', '20000101')
@@ -802,7 +809,7 @@ class WriteAmbiguousVRTests(unittest.TestCase):
         file_ds = FileDataset(fp, ref_ds)
         file_ds.is_implicit_VR = False
         file_ds.is_little_endian = True
-        file_ds.save_as(fp)
+        file_ds.save_as(fp, write_like_original=True)
         fp.seek(0)
 
         ds = read_dataset(fp, False, True)
@@ -820,7 +827,7 @@ class WriteAmbiguousVRTests(unittest.TestCase):
         file_ds = FileDataset(fp, ref_ds)
         file_ds.is_implicit_VR = False
         file_ds.is_little_endian = False
-        file_ds.save_as(fp)
+        file_ds.save_as(fp, write_like_original=True)
         fp.seek(0)
 
         ds = read_dataset(fp, False, False)
@@ -862,7 +869,7 @@ class ScratchWriteTests(unittest.TestCase):
         :arg file_ds: a FileDataset instance containing the dataset to write
         """
         out_filename = "scratch.dcm"
-        file_ds.save_as(out_filename)
+        file_ds.save_as(out_filename, write_like_original=True)
         std = hex2bytes(hex_std)
         with open(out_filename, 'rb') as f:
             bytes_written = f.read()

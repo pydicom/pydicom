@@ -21,6 +21,10 @@ def supports_transfer_syntax(dicom_dataset):
             RLESupportedTransferSyntaxes)
 
 
+def needs_to_convert_to_RGB(dicom_dataset):
+    return False
+
+
 def get_pixeldata(dicom_dataset):
     """If NumPy is available, return an ndarray of the Pixel Data.
     Raises
