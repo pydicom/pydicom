@@ -76,6 +76,11 @@ def needs_to_convert_to_RGB(dicom_dataset):
     return False
 
 
+def should_change_PhotometricInterpretation_to_RGB(dicom_dataset):
+    should_change = dicom_dataset.SamplesPerPixel == 3
+    return should_change
+
+
 def get_pixeldata(dicom_dataset):
     """Use Pillow to decompress compressed Pixel Data.
 
@@ -210,4 +215,6 @@ def get_pixeldata(dicom_dataset):
             dicom_dataset.BitsStored == 16):
         # WHY IS THIS EVEN NECESSARY??
         pixel_array &= 0x7FFF
+    if should_change_PhotometricInterpretation_to_RGB(dicom_dataset):
+        dicom_dataset.PhotometricInterpretation = "RGB"
     return pixel_array

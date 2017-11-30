@@ -25,6 +25,10 @@ def needs_to_convert_to_RGB(dicom_dataset):
     return False
 
 
+def should_change_PhotometricInterpretation_to_RGB(dicom_dataset):
+    return False
+
+
 def get_pixeldata(dicom_dataset):
     """If NumPy is available, return an ndarray of the Pixel Data.
     Raises
@@ -109,7 +113,8 @@ def get_pixeldata(dicom_dataset):
         UncompressedPixelData.extend(decompressed_frame)
 
     pixel_array = numpy.frombuffer(UncompressedPixelData, numpy_format)
-
+    if should_change_PhotometricInterpretation_to_RGB(dicom_dataset):
+        dicom_dataset.PhotometricInterpretation = "RGB"
     return pixel_array
 
 

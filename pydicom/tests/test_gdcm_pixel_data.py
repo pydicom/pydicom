@@ -325,11 +325,13 @@ class GDCM_JPEGlossyTests_with_gdcm(unittest.TestCase):
         self.assertEqual(a[230, 120], 95)
 
     def test_JPEGBaselineColor3DPixelArray(self):
+        self.assertEqual(self.color_3d_jpeg.PhotometricInterpretation, "YBR_FULL_422")
         a = self.color_3d_jpeg.pixel_array
         self.assertEqual(a.shape, (120, 480, 640, 3))
         # this test points were manually identified in Osirix viewer
         self.assertEqual(tuple(a[3, 159, 290, :]), (41, 41, 41))
         self.assertEqual(tuple(a[3, 169, 290, :]), (57, 57, 57))
+        self.assertEqual(self.color_3d_jpeg.PhotometricInterpretation, "RGB")
 
 
 @pytest.mark.skipif(not test_gdcm_decoder, reason=gdcm_missing_message)

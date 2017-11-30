@@ -23,8 +23,17 @@ should_convert_these_syntaxes_to_RGB = [
 
 
 def needs_to_convert_to_RGB(dicom_dataset):
-    return (dicom_dataset.file_meta.TransferSyntaxUID in
-            should_convert_these_syntaxes_to_RGB)
+    should_convert = (dicom_dataset.file_meta.TransferSyntaxUID in
+                      should_convert_these_syntaxes_to_RGB)
+    should_convert &= dicom_dataset.SamplesPerPixel == 3
+    return should_convert
+
+
+def should_change_PhotometricInterpretation_to_RGB(dicom_dataset):
+    should_change = (dicom_dataset.file_meta.TransferSyntaxUID in
+                     should_convert_these_syntaxes_to_RGB)
+    should_change &= dicom_dataset.SamplesPerPixel == 3
+    return should_change
 
 
 def supports_transfer_syntax(dicom_dataset):
@@ -162,4 +171,6 @@ def get_pixeldata(dicom_dataset):
         raise AttributeError("Amount of pixel data %d does "
                              "not match the expected data %d" %
                              (length_of_pixel_array, expected_length))
+    if should_change_PhotometricInterpretation_to_RGB(dicom_dataset):
+        dicom_dataset.PhotometricInterpretation = "RGB"
     return pixel_array
