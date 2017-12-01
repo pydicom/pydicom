@@ -71,6 +71,18 @@ emri_jpeg_2k_lossless = get_testdata_files(
     "emri_small_jpeg_2k_lossless.dcm")[0]
 color_3d_jpeg_baseline = get_testdata_files(
     "color3d_jpeg_baseline.dcm")[0]
+sc_rgb_jpeg_dcmtk_411_YBR_FULL_422 = get_testdata_files(
+    "SC_rgb_dcmtk_+eb+cy+np.dcm")[0]
+sc_rgb_jpeg_dcmtk_411_YBR_FULL = get_testdata_files(
+    "SC_rgb_dcmtk_+eb+cy+n1.dcm")[0]
+sc_rgb_jpeg_dcmtk_422_YBR_FULL = get_testdata_files(
+    "SC_rgb_dcmtk_+eb+cy+n2.dcm")[0]
+sc_rgb_jpeg_dcmtk_444_YBR_FULL = get_testdata_files(
+    "SC_rgb_dcmtk_+eb+cy+s4.dcm")[0]
+sc_rgb_jpeg_dcmtk_422_YBR_FULL_422 = get_testdata_files(
+    "SC_rgb_dcmtk_+eb+cy+s2.dcm")[0]
+sc_rgb_jpeg_dcmtk_RGB = get_testdata_files(
+    "SC_rgb_dcmtk_+eb+cr.dcm")[0]
 dir_name = os.path.dirname(sys.argv[0])
 save_dir = os.getcwd()
 
@@ -308,6 +320,45 @@ class pillow_JPEGlossyTests_with_pillow(unittest.TestCase):
         self.assertEqual(tuple(a[3, 159, 290, :]), (41, 41, 41))
         self.assertEqual(tuple(a[3, 169, 290, :]), (57, 57, 57))
         self.assertEqual(self.color_3d_jpeg.PhotometricInterpretation, "RGB")
+
+
+@pytest.fixture(scope="module")
+def test_with_pillow():
+    original_handlers = pydicom.config.image_handlers
+    pydicom.config.image_handlers = [pillow_handler, numpy_handler]
+    yield original_handlers
+    pydicom.config.image_handlers = original_handlers
+
+testdata = [
+    (sc_rgb_jpeg_dcmtk_RGB, "RGB"),
+    (sc_rgb_jpeg_dcmtk_411_YBR_FULL, "YBR_FULL"),
+    (sc_rgb_jpeg_dcmtk_411_YBR_FULL_422, "YBR_FULL_422"),
+    (sc_rgb_jpeg_dcmtk_422_YBR_FULL, "YBR_FULL"),
+    (sc_rgb_jpeg_dcmtk_422_YBR_FULL_422, "YBR_FULL_422"),
+    (sc_rgb_jpeg_dcmtk_444_YBR_FULL, "YBR_FULL"), ]
+
+
+@pytest.mark.skipif(
+    not test_pillow_jpeg_decoder,
+    reason=pillow_missing_message)
+@pytest.mark.parametrize("image,PhotometricInterpretation", testdata)
+def test_PI_RGB(test_with_pillow, image, PhotometricInterpretation):
+    t = dcmread(image)
+    assert t.PhotometricInterpretation == PhotometricInterpretation
+    a = t.pixel_array
+    assert a.shape == (100, 100, 3)
+    # this test points are from the ImageComments tag
+    assert tuple(a[5, 50, :]) == (255, 0, 0)
+    assert tuple(a[15, 50, :]) == (255, 128, 128)
+    assert tuple(a[25, 50, :]) == (0, 255, 0)
+    assert tuple(a[35, 50, :]) == (128, 255, 128)
+    assert tuple(a[45, 50, :]) == (0, 0, 255)
+    assert tuple(a[55, 50, :]) == (128, 128, 255)
+    assert tuple(a[65, 50, :]) == (0, 0, 0)
+    assert tuple(a[75, 50, :]) == (64, 64, 64)
+    assert tuple(a[85, 50, :]) == (192, 192, 192)
+    assert tuple(a[95, 50, :]) == (255, 255, 255)
+    assert t.PhotometricInterpretation == "RGB"
 
 
 @pytest.mark.skipif(
