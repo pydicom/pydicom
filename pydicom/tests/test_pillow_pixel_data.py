@@ -329,35 +329,118 @@ def test_with_pillow():
     yield original_handlers
     pydicom.config.image_handlers = original_handlers
 
+test_ids = [
+    "JPEG_RGB_RGB",
+    "JPEG_RGB_411_AS_YBR_FULL",
+    "JPEG_RGB_411_AS_YBR_FULL_422",
+    "JPEG_RGB_422_AS_YBR_FULL",
+    "JPEG_RGB_422_AS_YBR_FULL_422",
+    "JPEG_RGB_444_AS_YBR_FULL", ]
+
 testdata = [
-    (sc_rgb_jpeg_dcmtk_RGB, "RGB"),
-    (sc_rgb_jpeg_dcmtk_411_YBR_FULL, "YBR_FULL"),
-    (sc_rgb_jpeg_dcmtk_411_YBR_FULL_422, "YBR_FULL_422"),
-    (sc_rgb_jpeg_dcmtk_422_YBR_FULL, "YBR_FULL"),
-    (sc_rgb_jpeg_dcmtk_422_YBR_FULL_422, "YBR_FULL_422"),
-    (sc_rgb_jpeg_dcmtk_444_YBR_FULL, "YBR_FULL"), ]
+    (sc_rgb_jpeg_dcmtk_RGB, "RGB",
+     [
+         (255, 0, 0),
+         (255, 128, 128),
+         (0, 255, 0),
+         (128, 255, 128),
+         (0, 0, 255),
+         (128, 128, 255),
+         (0, 0, 0),
+         (64, 64, 64),
+         (192, 192, 192),
+         (255, 255, 255),
+     ], ),
+    (sc_rgb_jpeg_dcmtk_411_YBR_FULL, "YBR_FULL",
+     [
+         (248, 3, 2),
+         (246, 131, 138),
+         (0, 255, 5),
+         (129, 252, 145),
+         (2, 0, 254),
+         (128, 128, 250),
+         (0, 0, 0),
+         (64, 64, 64),
+         (192, 192, 192),
+         (255, 255, 255),
+     ], ),
+    (sc_rgb_jpeg_dcmtk_411_YBR_FULL_422, "YBR_FULL_422",
+     [
+         (248, 3, 2),
+         (246, 131, 138),
+         (0, 255, 5),
+         (129, 252, 145),
+         (2, 0, 254),
+         (128, 128, 250),
+         (0, 0, 0),
+         (64, 64, 64),
+         (192, 192, 192),
+         (255, 255, 255),
+     ], ),
+    (sc_rgb_jpeg_dcmtk_422_YBR_FULL, "YBR_FULL",
+     [
+         (254, 0, 0),
+         (255, 127, 127),
+         (0, 255, 5),
+         (129, 255, 129),
+         (0, 0, 254),
+         (128, 127, 255),
+         (0, 0, 0),
+         (64, 64, 64),
+         (192, 192, 192),
+         (255, 255, 255),
+     ],),
+    (sc_rgb_jpeg_dcmtk_422_YBR_FULL_422, "YBR_FULL_422",
+     [
+         (254, 0, 0),
+         (255, 127, 127),
+         (0, 255, 5),
+         (129, 255, 129),
+         (0, 0, 254),
+         (128, 127, 255),
+         (0, 0, 0),
+         (64, 64, 64),
+         (192, 192, 192),
+         (255, 255, 255),
+     ], ),
+    (sc_rgb_jpeg_dcmtk_444_YBR_FULL, "YBR_FULL",
+     [
+         (254, 0, 0),
+         (255, 127, 127),
+         (0, 255, 5),
+         (129, 255, 129),
+         (0, 0, 254),
+         (128, 127, 255),
+         (0, 0, 0),
+         (64, 64, 64),
+         (192, 192, 192),
+         (255, 255, 255),
+     ], ), ]
 
 
 @pytest.mark.skipif(
     not test_pillow_jpeg_decoder,
     reason=pillow_missing_message)
-@pytest.mark.parametrize("image,PhotometricInterpretation", testdata)
-def test_PI_RGB(test_with_pillow, image, PhotometricInterpretation):
+@pytest.mark.parametrize(
+    "image,PhotometricInterpretation,results",
+    testdata,
+    ids=test_ids)
+def test_PI_RGB(test_with_pillow, image, PhotometricInterpretation, results):
     t = dcmread(image)
     assert t.PhotometricInterpretation == PhotometricInterpretation
     a = t.pixel_array
     assert a.shape == (100, 100, 3)
     # this test points are from the ImageComments tag
-    assert tuple(a[5, 50, :]) == (255, 0, 0)
-    assert tuple(a[15, 50, :]) == (255, 128, 128)
-    assert tuple(a[25, 50, :]) == (0, 255, 0)
-    assert tuple(a[35, 50, :]) == (128, 255, 128)
-    assert tuple(a[45, 50, :]) == (0, 0, 255)
-    assert tuple(a[55, 50, :]) == (128, 128, 255)
-    assert tuple(a[65, 50, :]) == (0, 0, 0)
-    assert tuple(a[75, 50, :]) == (64, 64, 64)
-    assert tuple(a[85, 50, :]) == (192, 192, 192)
-    assert tuple(a[95, 50, :]) == (255, 255, 255)
+    assert tuple(a[5, 50, :]) == results[0]
+    assert tuple(a[15, 50, :]) == results[1]
+    assert tuple(a[25, 50, :]) == results[2]
+    assert tuple(a[35, 50, :]) == results[3]
+    assert tuple(a[45, 50, :]) == results[4]
+    assert tuple(a[55, 50, :]) == results[5]
+    assert tuple(a[65, 50, :]) == results[6]
+    assert tuple(a[75, 50, :]) == results[7]
+    assert tuple(a[85, 50, :]) == results[8]
+    assert tuple(a[95, 50, :]) == results[9]
     assert t.PhotometricInterpretation == "RGB"
 
 
