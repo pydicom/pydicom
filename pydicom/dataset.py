@@ -687,12 +687,19 @@ class Dataset(dict):
 
     # Use by pixel_array property
     def _get_pixel_array(self):
-        """Convert the Pixel Data to a numpy array.
+        self.convert_pixel_data()
+        return self._pixel_array
+
+    def convert_pixel_data(self):
+        """Convert the Pixel Data to a numpy array internally.
 
         Returns
         -------
-        numpy.ndarray
-            The array containing the Pixel Data.
+        None  
+            Converted pixel data is stored internally in the dataset.
+            
+        If a compressed image format, the image is  decompressed,
+        and any related data elements are changed accordingly.
         """
         # Check if already have converted to a NumPy array
         # Also check if self.PixelData has changed. If so, get new NumPy array
@@ -734,8 +741,8 @@ class Dataset(dict):
                     raise NotImplementedError(msg)
             # is this guaranteed to work if memory is re-used??
             self._pixel_id = id(self.PixelData)
-            return self._pixel_array
-        return self._pixel_array
+            
+    decompress = convert_pixel_data  # alias
 
     @property
     def pixel_array(self):
