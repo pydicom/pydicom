@@ -143,6 +143,7 @@ class Dataset(dict):
         """Create a new Dataset instance."""
         self._parent_encoding = kwargs.get('parent_encoding', default_encoding)
         dict.__init__(self, *args)
+        self.is_decompressed = False
 
     def __enter__(self):
         """Method invoked on entry to a with statement."""
@@ -742,8 +743,10 @@ class Dataset(dict):
             # is this guaranteed to work if memory is re-used??
             self._pixel_id = id(self.PixelData)
             
-    decompress = convert_pixel_data  # alias
-
+    def decompress(self):
+        self.convert_pixel_data()
+        self.is_decompressed = True
+        
     @property
     def pixel_array(self):
         """Return the Pixel Data as a NumPy array.

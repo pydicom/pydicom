@@ -13,7 +13,8 @@ from pydicom.multival import MultiValue
 from pydicom.tag import (Tag, ItemTag, ItemDelimiterTag, SequenceDelimiterTag,
                          tag_in_exception)
 from pydicom.uid import (PYDICOM_IMPLEMENTATION_UID, ImplicitVRLittleEndian,
-                         ExplicitVRBigEndian)
+                         ExplicitVRBigEndian,
+                         UncompressedPixelTransferSyntaxes)
 from pydicom.valuerep import extra_length_VRs
 from pydicom.values import convert_numbers
 from pydicom._version import __version__
@@ -786,7 +787,7 @@ def dcmwrite(filename, dataset, write_like_original=True):
         elif not dataset.is_little_endian and not dataset.is_implicit_VR:
             file_meta.TransferSyntaxUID = ExplicitVRBigEndian
         elif not dataset.is_little_endian and dataset.is_implicit_VR:
-            raise NotImplementedError("Implicit VR Big Endian is not a"
+            raise NotImplementedError("Implicit VR Big Endian is not a "
                                       "supported Transfer Syntax.")
 
         if 'SOPClassUID' in dataset:
@@ -794,6 +795,17 @@ def dcmwrite(filename, dataset, write_like_original=True):
         if 'SOPInstanceUID' in dataset:
             file_meta.MediaStorageSOPInstanceUID = dataset.SOPInstanceUID
 
+    # Check for decompression, give warnings if inconsistencies
+    # If decompressed, then pixel_array is now used instead of PixelData
+    if dataset.is_decompressed:
+        xfer = dataset.file_meta.TransferSyntaxUID
+        if xfer not in UncompressedPixelTransferSyntaxes:
+            raise ValueError("file_meta transfer SyntaxUID is compressed type "
+                             "but pixel data has been decompressed")
+        
+        # Force PixelData to the decompressed version
+        dataset.PixelData = dataset.pixel_array.tobytes()
+        
     caller_owns_file = True
     # Open file if not already a file object
     if isinstance(filename, compat.string_types):
