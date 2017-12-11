@@ -581,7 +581,7 @@ def read_preamble(fp, force):
         preamble = None
         fp.seek(0)
     elif magic != b"DICM" and not force:
-        raise InvalidDicomError("File is missing DICOM File Meta Information"
+        raise InvalidDicomError("File is missing DICOM File Meta Information "
                                 "header or the 'DICM' prefix is missing from "
                                 "the header. Use force=True to force reading.")
     else:
