@@ -764,7 +764,7 @@
         <span class="n">preamble</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">fp</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">magic</span> <span class="o">!=</span> <span class="sa">b</span><span class="s2">&quot;DICM&quot;</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">force</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="n">InvalidDicomError</span><span class="p">(</span><span class="s2">&quot;File is missing DICOM File Meta Information&quot;</span>
+        <span class="k">raise</span> <span class="n">InvalidDicomError</span><span class="p">(</span><span class="s2">&quot;File is missing DICOM File Meta Information &quot;</span>
                                 <span class="s2">&quot;header or the &#39;DICM&#39; prefix is missing from &quot;</span>
                                 <span class="s2">&quot;the header. Use force=True to force reading.&quot;</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
