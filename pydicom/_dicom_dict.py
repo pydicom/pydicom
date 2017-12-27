@@ -120,6 +120,7 @@ DicomDictionary = {
     0x00080060: ('CS', '1', "Modality", '', 'Modality'),  # noqa
     0x00080061: ('CS', '1-n', "Modalities in Study", '', 'ModalitiesInStudy'),  # noqa
     0x00080062: ('UI', '1-n', "SOP Classes in Study", '', 'SOPClassesInStudy'),  # noqa
+    0x00080063: ('SQ', '1', "Anatomic Regions in Study Code Sequence", '', 'AnatomicRegionsInStudyCodeSequence'),  # noqa
     0x00080064: ('CS', '1', "Conversion Type", '', 'ConversionType'),  # noqa
     0x00080068: ('CS', '1', "Presentation Intent Type", '', 'PresentationIntentType'),  # noqa
     0x00080070: ('LO', '1', "Manufacturer", '', 'Manufacturer'),  # noqa
@@ -255,7 +256,7 @@ DicomDictionary = {
     0x00082218: ('SQ', '1', "Anatomic Region Sequence", '', 'AnatomicRegionSequence'),  # noqa
     0x00082220: ('SQ', '1', "Anatomic Region Modifier Sequence", '', 'AnatomicRegionModifierSequence'),  # noqa
     0x00082228: ('SQ', '1', "Primary Anatomic Structure Sequence", '', 'PrimaryAnatomicStructureSequence'),  # noqa
-    0x00082229: ('SQ', '1', "Anatomic Structure, Space or Region Sequence", '', 'AnatomicStructureSpaceOrRegionSequence'),  # noqa
+    0x00082229: ('SQ', '1', "Anatomic Structure, Space or Region Sequence", 'Retired', 'AnatomicStructureSpaceOrRegionSequence'),  # noqa
     0x00082230: ('SQ', '1', "Primary Anatomic Structure Modifier Sequence", '', 'PrimaryAnatomicStructureModifierSequence'),  # noqa
     0x00082240: ('SQ', '1', "Transducer Position Sequence", 'Retired', 'TransducerPositionSequence'),  # noqa
     0x00082242: ('SQ', '1', "Transducer Position Modifier Sequence", 'Retired', 'TransducerPositionModifierSequence'),  # noqa
@@ -377,6 +378,8 @@ DicomDictionary = {
     0x00120042: ('LO', '1', "Clinical Trial Subject Reading ID", '', 'ClinicalTrialSubjectReadingID'),  # noqa
     0x00120050: ('LO', '1', "Clinical Trial Time Point ID", '', 'ClinicalTrialTimePointID'),  # noqa
     0x00120051: ('ST', '1', "Clinical Trial Time Point Description", '', 'ClinicalTrialTimePointDescription'),  # noqa
+    0x00120052: ('FD', '1', "Longitudinal Temporal Offset from Event", '', 'LongitudinalTemporalOffsetFromEvent'),  # noqa
+    0x00120053: ('CS', '1', "Longitudinal Temporal Event Type", '', 'LongitudinalTemporalEventType'),  # noqa
     0x00120060: ('LO', '1', "Clinical Trial Coordinating Center Name", '', 'ClinicalTrialCoordinatingCenterName'),  # noqa
     0x00120062: ('CS', '1', "Patient Identity Removed", '', 'PatientIdentityRemoved'),  # noqa
     0x00120063: ('LO', '1-n', "De-identification Method", '', 'DeidentificationMethod'),  # noqa
@@ -750,7 +753,9 @@ DicomDictionary = {
     0x00181191: ('CS', '1', "Anode Target Material", '', 'AnodeTargetMaterial'),  # noqa
     0x001811A0: ('DS', '1', "Body Part Thickness", '', 'BodyPartThickness'),  # noqa
     0x001811A2: ('DS', '1', "Compression Force", '', 'CompressionForce'),  # noqa
+    0x001811A3: ('DS', '1', "Compression Pressure", '', 'CompressionPressure'),  # noqa
     0x001811A4: ('LO', '1', "Paddle Description", '', 'PaddleDescription'),  # noqa
+    0x001811A5: ('DS', '1', "Compression Contact Area", '', 'CompressionContactArea'),  # noqa
     0x00181200: ('DA', '1-n', "Date of Last Calibration", '', 'DateOfLastCalibration'),  # noqa
     0x00181201: ('TM', '1-n', "Time of Last Calibration", '', 'TimeOfLastCalibration'),  # noqa
     0x00181202: ('DT', '1', "DateTime of Last Calibration", '', 'DateTimeOfLastCalibration'),  # noqa
@@ -2152,13 +2157,13 @@ DicomDictionary = {
     0x00400294: ('DS', '1', "Quantity", '', 'Quantity'),  # noqa
     0x00400295: ('SQ', '1', "Measuring Units Sequence", '', 'MeasuringUnitsSequence'),  # noqa
     0x00400296: ('SQ', '1', "Billing Item Sequence", '', 'BillingItemSequence'),  # noqa
-    0x00400300: ('US', '1', "Total Time of Fluoroscopy", '', 'TotalTimeOfFluoroscopy'),  # noqa
-    0x00400301: ('US', '1', "Total Number of Exposures", '', 'TotalNumberOfExposures'),  # noqa
+    0x00400300: ('US', '1', "Total Time of Fluoroscopy", 'Retired', 'TotalTimeOfFluoroscopy'),  # noqa
+    0x00400301: ('US', '1', "Total Number of Exposures", 'Retired', 'TotalNumberOfExposures'),  # noqa
     0x00400302: ('US', '1', "Entrance Dose", '', 'EntranceDose'),  # noqa
     0x00400303: ('US', '1-2', "Exposed Area", '', 'ExposedArea'),  # noqa
     0x00400306: ('DS', '1', "Distance Source to Entrance", '', 'DistanceSourceToEntrance'),  # noqa
     0x00400307: ('DS', '1', "Distance Source to Support", 'Retired', 'DistanceSourceToSupport'),  # noqa
-    0x0040030E: ('SQ', '1', "Exposure Dose Sequence", '', 'ExposureDoseSequence'),  # noqa
+    0x0040030E: ('SQ', '1', "Exposure Dose Sequence", 'Retired', 'ExposureDoseSequence'),  # noqa
     0x00400310: ('ST', '1', "Comments on Radiation Dose", '', 'CommentsOnRadiationDose'),  # noqa
     0x00400312: ('DS', '1', "X-Ray Output", '', 'XRayOutput'),  # noqa
     0x00400314: ('DS', '1', "Half Value Layer", '', 'HalfValueLayer'),  # noqa
@@ -3170,6 +3175,7 @@ DicomDictionary = {
     0x00741002: ('SQ', '1', "Procedure Step Progress Information Sequence", '', 'ProcedureStepProgressInformationSequence'),  # noqa
     0x00741004: ('DS', '1', "Procedure Step Progress", '', 'ProcedureStepProgress'),  # noqa
     0x00741006: ('ST', '1', "Procedure Step Progress Description", '', 'ProcedureStepProgressDescription'),  # noqa
+    0x00741007: ('SQ', '1', "Procedure Step Progress Parameters Sequence", '', 'ProcedureStepProgressParametersSequence'),  # noqa
     0x00741008: ('SQ', '1', "Procedure Step Communications URI Sequence", '', 'ProcedureStepCommunicationsURISequence'),  # noqa
     0x0074100A: ('UR', '1', "Contact URI", '', 'ContactURI'),  # noqa
     0x0074100C: ('LO', '1', "Contact Display Name", '', 'ContactDisplayName'),  # noqa
@@ -3721,17 +3727,18 @@ DicomDictionary = {
     0x300A0083: ('UI', '1', "Referenced Dose Reference UID", '', 'ReferencedDoseReferenceUID'),  # noqa
     0x300A0084: ('DS', '1', "Beam Dose", '', 'BeamDose'),  # noqa
     0x300A0086: ('DS', '1', "Beam Meterset", '', 'BeamMeterset'),  # noqa
-    0x300A0088: ('FL', '1', "Beam Dose Point Depth", 'Retired', 'BeamDosePointDepth'),  # noqa
-    0x300A0089: ('FL', '1', "Beam Dose Point Equivalent Depth", 'Retired', 'BeamDosePointEquivalentDepth'),  # noqa
-    0x300A008A: ('FL', '1', "Beam Dose Point SSD", 'Retired', 'BeamDosePointSSD'),  # noqa
+    0x300A0088: ('FL', '1', "Beam Dose Point Depth", '', 'BeamDosePointDepth'),  # noqa
+    0x300A0089: ('FL', '1', "Beam Dose Point Equivalent Depth", '', 'BeamDosePointEquivalentDepth'),  # noqa
+    0x300A008A: ('FL', '1', "Beam Dose Point SSD", '', 'BeamDosePointSSD'),  # noqa
     0x300A008B: ('CS', '1', "Beam Dose Meaning", '', 'BeamDoseMeaning'),  # noqa
     0x300A008C: ('SQ', '1', "Beam Dose Verification Control Point Sequence", '', 'BeamDoseVerificationControlPointSequence'),  # noqa
-    0x300A008D: ('FL', '1', "Average Beam Dose Point Depth", '', 'AverageBeamDosePointDepth'),  # noqa
-    0x300A008E: ('FL', '1', "Average Beam Dose Point Equivalent Depth", '', 'AverageBeamDosePointEquivalentDepth'),  # noqa
-    0x300A008F: ('FL', '1', "Average Beam Dose Point SSD", '', 'AverageBeamDosePointSSD'),  # noqa
+    0x300A008D: ('FL', '1', "Average Beam Dose Point Depth", 'Retired', 'AverageBeamDosePointDepth'),  # noqa
+    0x300A008E: ('FL', '1', "Average Beam Dose Point Equivalent Depth", 'Retired', 'AverageBeamDosePointEquivalentDepth'),  # noqa
+    0x300A008F: ('FL', '1', "Average Beam Dose Point SSD", 'Retired', 'AverageBeamDosePointSSD'),  # noqa
     0x300A0090: ('CS', '1', "Beam Dose Type", '', 'BeamDoseType'),  # noqa
     0x300A0091: ('DS', '1', "Alternate Beam Dose", '', 'AlternateBeamDose'),  # noqa
     0x300A0092: ('CS', '1', "Alternate Beam Dose Type", '', 'AlternateBeamDoseType'),  # noqa
+    0x300A0093: ('CS', '1', "Depth Value Averaging Flag", '', 'DepthValueAveragingFlag'),  # noqa
     0x300A00A0: ('IS', '1', "Number of Brachy Application Setups", '', 'NumberOfBrachyApplicationSetups'),  # noqa
     0x300A00A2: ('DS', '3', "Brachy Application Setup Dose Specification Point", '', 'BrachyApplicationSetupDoseSpecificationPoint'),  # noqa
     0x300A00A4: ('DS', '1', "Brachy Application Setup Dose", '', 'BrachyApplicationSetupDose'),  # noqa
@@ -3915,6 +3922,10 @@ DicomDictionary = {
     0x300A0266: ('LO', '1', "Brachy Accessory Device Name", '', 'BrachyAccessoryDeviceName'),  # noqa
     0x300A026A: ('DS', '1', "Brachy Accessory Device Nominal Thickness", '', 'BrachyAccessoryDeviceNominalThickness'),  # noqa
     0x300A026C: ('DS', '1', "Brachy Accessory Device Nominal Transmission", '', 'BrachyAccessoryDeviceNominalTransmission'),  # noqa
+    0x300A0271: ('DS', '1', "Channel Effective Length", '', 'ChannelEffectiveLength'),  # noqa
+    0x300A0272: ('DS', '1', "Channel Inner Length", '', 'ChannelInnerLength'),  # noqa
+    0x300A0273: ('SH', '1', "Afterloader Channel ID", '', 'AfterloaderChannelID'),  # noqa
+    0x300A0274: ('DS', '1', "Source Applicator Tip Length", '', 'SourceApplicatorTipLength'),  # noqa
     0x300A0280: ('SQ', '1', "Channel Sequence", '', 'ChannelSequence'),  # noqa
     0x300A0282: ('IS', '1', "Channel Number", '', 'ChannelNumber'),  # noqa
     0x300A0284: ('DS', '1', "Channel Length", '', 'ChannelLength'),  # noqa

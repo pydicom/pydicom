@@ -56,7 +56,8 @@ except ImportError:
     # python3
 
 
-PYDICOM_DICT_FILENAME = '../../pydicom/_dicom_dict.py'
+_DIRECTORY = os.path.dirname(__file__)
+PYDICOM_DICT_FILENAME = os.path.join(_DIRECTORY, '../../pydicom/_dicom_dict.py')
 MAIN_DICT_NAME = 'DicomDictionary'
 MASK_DICT_NAME = 'RepeatersDictionary'
 
