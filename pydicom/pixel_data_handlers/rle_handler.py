@@ -29,20 +29,30 @@ def should_change_PhotometricInterpretation_to_RGB(dicom_dataset):
     return False
 
 
-def get_pixeldata(dicom_dataset):
+def get_pixeldata(dicom_dataset, file_list=None):
     """If NumPy is available, return an ndarray of the Pixel Data.
-    Raises
-    ------
-    TypeError
-        If there is no Pixel Data or not a supported data type.
-    ImportError
-        If NumPy isn't found
-    NotImplementedError
-        If cannot handle the format
+
+    Parameters
+    ----------
+    frame_list : List[int], optional
+        One-based indices of frames within the Pixel Data Element.
+
     Returns
     -------
     numpy.ndarray
        The contents of the Pixel Data element (7FE0,0010) as an ndarray.
+
+    Raises
+    ------
+    TypeError
+        If there is no Pixel Data or not a supported data type.
+
+    ImportError
+        If NumPy isn't found
+
+    NotImplementedError
+        If cannot handle the format
+
     """
     if (dicom_dataset.file_meta.TransferSyntaxUID not in
             RLESupportedTransferSyntaxes):
@@ -59,6 +69,9 @@ def get_pixeldata(dicom_dataset):
 
     if 'PixelData' not in dicom_dataset:
         raise TypeError("No pixel data found in this dataset.")
+
+    if frame_list is not None:
+        msg = ("Reading individual frames with GDCM is not yet supported.")
 
     # Make NumPy format code, e.g. "uint16", "int32" etc
     # from two pieces of info:

@@ -657,18 +657,20 @@ class Dataset(dict):
         """Compare `self` and `other` for inequality."""
         return not self == other
 
-    def _reshape_pixel_array(self, pixel_array):
+    def _reshape_pixel_array(self, pixel_array, n_frames=None):
         # Note the following reshape operations return a new *view* onto
         #   pixel_array, but don't copy the data
         if 'NumberOfFrames' in self and self.NumberOfFrames > 1:
+            if n_frames is None:
+                n_frames = self.NumberOfFrames
             if self.SamplesPerPixel > 1:
                 # TODO: Handle Planar Configuration attribute
                 assert self.PlanarConfiguration == 0
-                pixel_array = pixel_array.reshape(self.NumberOfFrames,
+                pixel_array = pixel_array.reshape(n_frames,
                                                   self.Rows, self.Columns,
                                                   self.SamplesPerPixel)
             else:
-                pixel_array = pixel_array.reshape(self.NumberOfFrames,
+                pixel_array = pixel_array.reshape(n_frames,
                                                   self.Rows, self.Columns)
         else:
             if self.SamplesPerPixel > 1:
@@ -766,6 +768,50 @@ class Dataset(dict):
             The Pixel Data (7FE0,0010) as a NumPy ndarray.
         """
         return self._get_pixel_array()
+
+    def get_frames(self, frame_list):
+        """Return a subset of frames of a multi-frame Pixel Data Element
+        as a NumPy array.
+
+        Parameters
+        ----------
+        frame_list : List[int]
+            One-based indicies of frames within the Pixel Data Element.
+
+        Returns
+        -------
+        numpy.ndarray
+            Individual frames of the Pixel Data (7FE0,0010) as a NumPy ndarray.
+        """
+        last_exception = None
+        successfully_read_pixel_data = False
+        for x in [h for h in pydicom.config.image_handlers
+                  if h and h.supports_transfer_syntax(self)]:
+            try:
+                pixel_array = x.get_pixeldata(self, frame_list)
+                n_frames = len(frame_list)
+                pixel_array = self._reshape_pixel_array(pixel_array, n_frames)
+                if x.needs_to_convert_to_RGB(self):
+                    pixel_array = self._convert_YBR_to_RGB(pixel_array)
+                successfully_read_pixel_data = True
+                break
+            except Exception as e:
+                logger.debug("Trouble with", exc_info=e)
+                last_exception = e
+                continue
+        if not successfully_read_pixel_data:
+            handlers_tried = " ".join(
+                [str(x) for x in pydicom.config.image_handlers])
+            logger.info("%s did not support this transfer syntax",
+                        handlers_tried)
+            if last_exception:
+                raise last_exception
+            else:
+                msg = ("No available image handler could "
+                       "decode this transfer syntax {}".format(
+                           self.file_meta.TransferSyntaxUID))
+                raise NotImplementedError(msg)
+        return pixel_array
 
     # Format strings spec'd according to python string formatting options
     #    See http://docs.python.org/library/stdtypes.html#string-formatting-operations # noqa
@@ -1201,3 +1247,4 @@ class FileDataset(Dataset):
         if self.filename and os.path.exists(self.filename):
             statinfo = os.stat(self.filename)
             self.timestamp = statinfo.st_mtime
+

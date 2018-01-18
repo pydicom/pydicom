@@ -49,9 +49,15 @@ def supports_transfer_syntax(dicom_dataset):
     return True
 
 
-def get_pixeldata(dicom_dataset):
+def get_pixeldata(dicom_dataset, frame_list=None):
     """
     Use the GDCM package to decode the PixelData attribute
+
+    Parameters
+    ----------
+    frame_list : List[int], optional
+        One-based indices of frames within the Pixel Data Element.
+
 
     Returns
     -------
@@ -81,6 +87,9 @@ def get_pixeldata(dicom_dataset):
         msg = ("GDCM requires both the gdcm package and numpy "
                "and one or more could not be imported")
         raise ImportError(msg)
+
+    if frame_list is not None:
+        msg = ("Reading individual frames with GDCM is not yet supported.")
 
     gdcm_image_reader = gdcm.ImageReader()
     if compat.in_py2:
@@ -116,6 +125,12 @@ def get_pixeldata(dicom_dataset):
         raise TypeError('{0} is not a GDCM supported '
                         'pixel format'.format(gdcm_pixel_format))
 
+    if frame_list is not None:
+        if 'NumberOfFrames' not in dicom_dataset:
+            msg = ("The NumberOfFrames attribute is required to read "
+                   "individual frames from the Pixel Data Element.")
+            raise ValueError(msg)
+
     # GDCM returns char* as type str. Under Python 2 `str` are
     # byte arrays by default. Python 3 decodes this to
     # unicode strings by default.
@@ -138,6 +153,7 @@ def get_pixeldata(dicom_dataset):
     # buffer that is too large, so we need to make sure we only include
     # the first n_rows * n_columns * dtype_size bytes.
 
+    # TODO: hackermd
     n_bytes = (dicom_dataset.Rows *
                dicom_dataset.Columns *
                numpy.dtype(numpy_dtype).itemsize)

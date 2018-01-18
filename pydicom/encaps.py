@@ -261,13 +261,15 @@ def generate_pixel_data(bytestream):
     yield tuple(frame)
 
 
-def decode_data_sequence(data):
+def decode_data_sequence(data, has_basic_offset_table_item=True):
     """Read encapsulated data and return a list of strings.
 
     Parameters
     ----------
     data : str
         String of encapsulated data, typically dataset.PixelData
+    has_basic_offset_table_item: bool, optional
+        Whether encapsulated data contains a Basic Offset Table item.
 
     Returns
     -------
@@ -279,7 +281,8 @@ def decode_data_sequence(data):
 
         # DICOM standard requires this
         fp.is_little_endian = True
-        BasicOffsetTable = read_item(fp)  # NOQA
+        if has_basic_offset_table_item:
+            BasicOffsetTable = read_item(fp)  # NOQA
         seq = []
 
         while True:

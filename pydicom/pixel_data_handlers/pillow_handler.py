@@ -24,6 +24,7 @@ except ImportError:
         have_pillow = False
         raise
 
+
 PillowSupportedTransferSyntaxes = [
     pydicom.uid.JPEGBaseLineLossy8bit,
     pydicom.uid.JPEGLossless,
@@ -49,6 +50,7 @@ try:
     have_pillow_jpeg2000_plugin = hasattr(pillow_core, "jpeg2k_decoder")
 except Exception:
     pass
+
 
 
 def supports_transfer_syntax(dicom_dataset):
@@ -81,8 +83,13 @@ def should_change_PhotometricInterpretation_to_RGB(dicom_dataset):
     return should_change
 
 
-def get_pixeldata(dicom_dataset):
+def get_pixeldata(dicom_dataset, frame_list=None):
     """Use Pillow to decompress compressed Pixel Data.
+
+    Parameters
+    ----------
+    frame_list : List[int], optional
+        One-based indices of frames within the Pixel Data Element.
 
     Returns
     -------
@@ -175,40 +182,66 @@ def get_pixeldata(dicom_dataset):
         logger.debug("This is a another pillow supported format")
         generic_jpeg_file_header = b''
         frame_start_from = 0
-    try:
-        UncompressedPixelData = b''
-        if ('NumberOfFrames' in dicom_dataset and
-                dicom_dataset.NumberOfFrames > 1):
-            # multiple compressed frames
-            CompressedPixelDataSeq = \
-                pydicom.encaps.decode_data_sequence(
-                    dicom_dataset.PixelData)
-            for frame in CompressedPixelDataSeq:
-                data = generic_jpeg_file_header + \
-                    frame[frame_start_from:]
-                fio = io.BytesIO(data)
-                try:
-                    decompressed_image = PILImg.open(fio)
-                except IOError as e:
-                    raise NotImplementedError(e.strerror)
-                UncompressedPixelData += decompressed_image.tobytes()
+
+    if frame_list is not None:
+        if 'NumberOfFrames' not in dicom_dataset:
+            msg = ("The NumberOfFrames attribute is required to read "
+                   "individual frames from the Pixel Data element.")
+            raise ValueError(msg)
+        for frame_num in frame_list:
+            if frame_num > int(dicom_dataset.NumberOfFrames):
+                msg = ("Frame number {} exceeds total number of frames in "
+                       "Pixel Data element.".format(frame_num))
+                raise ValueError(msg)
+
+    UncompressedPixelData = b''
+    if ('NumberOfFrames' in dicom_dataset and
+            dicom_dataset.NumberOfFrames > 1):
+        # multiple compressed frames
+        data_elem = dicom_dataset.raw_data_element('PixelData')
+        if frame_list is not None and data_elem.value is None:
+            filename = dicom_dataset.filename
+            fileobj_type = dicom_dataset.fileobj_type
+            is_little_endian = data_elem.is_little_endian
+            data_elem_offset = data_elem.value_tell
+            # Causes ImportError when imported at top level
+            from pydicom.filereader import read_frame
+            with fileobj_type(filename, 'rb') as fp:
+                CompressedPixelDataSeq = []
+                for frame_num in frame_list:
+                    data = read_frame(fp, is_little_endian,
+                                      data_elem_offset, frame_num)
+                    seq = pydicom.encaps.decode_data_sequence(data, False)
+                    CompressedPixelDataSeq.extend(seq)
         else:
-            # single compressed frame
-            UncompressedPixelData = pydicom.encaps.defragment_data(
-                dicom_dataset.PixelData)
-            UncompressedPixelData = generic_jpeg_file_header + \
-                UncompressedPixelData[frame_start_from:]
+            CompressedPixelDataSeq = \
+                pydicom.encaps.decode_data_sequence(dicom_dataset.PixelData)
+        for index, frame in enumerate(CompressedPixelDataSeq):
+            if frame_list is not None and (index + 1) not in frame_list:
+                continue
+            data = generic_jpeg_file_header + \
+                frame[frame_start_from:]
+            fio = io.BytesIO(data)
             try:
-                fio = io.BytesIO(UncompressedPixelData)
                 decompressed_image = PILImg.open(fio)
             except IOError as e:
                 raise NotImplementedError(e.strerror)
-            UncompressedPixelData = decompressed_image.tobytes()
-    except Exception:
-        raise
+            UncompressedPixelData += decompressed_image.tobytes()
+    else:
+        # single compressed frame
+        UncompressedPixelData = \
+            pydicom.encaps.defragment_data(dicom_dataset.PixelData)
+        UncompressedPixelData = generic_jpeg_file_header + \
+            UncompressedPixelData[frame_start_from:]
+        try:
+            fio = io.BytesIO(UncompressedPixelData)
+            decompressed_image = PILImg.open(fio)
+        except IOError as e:
+            raise NotImplementedError(e.strerror)
+        UncompressedPixelData = decompressed_image.tobytes()
+
     logger.debug(
-        "Successfully read %s pixel bytes",
-        len(UncompressedPixelData))
+        "Successfully read %s pixel bytes", len(UncompressedPixelData))
     pixel_array = numpy.fromstring(UncompressedPixelData, numpy_format)
     if (dicom_dataset.file_meta.TransferSyntaxUID in
             PillowJPEG2000TransferSyntaxes and

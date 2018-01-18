@@ -50,9 +50,14 @@ def supports_transfer_syntax(dicom_dataset):
             in JPEGLSSupportedTransferSyntaxes)
 
 
-def get_pixeldata(dicom_dataset):
+def get_pixeldata(dicom_dataset, frame_list=None):
     """
     Use the jpeg_ls package to decode the PixelData attribute
+
+    Parameters
+    ----------
+    frame_list : List[int], optional
+        One-based indices of frames within the Pixel Data Element.
 
     Returns
     -------
@@ -70,7 +75,10 @@ def get_pixeldata(dicom_dataset):
         if the transfer syntax is not supported
 
     TypeError
-        if the pixel data type is unsupported
+        if the pixel data type is not supported
+
+    ValueError
+        if specified frames do not exist
     """
     if (dicom_dataset.file_meta.TransferSyntaxUID
             not in JPEGLSSupportedTransferSyntaxes):
@@ -106,6 +114,17 @@ def get_pixeldata(dicom_dataset):
                    dicom_dataset.BitsAllocated))
         raise TypeError(msg)
 
+    if frame_list is not None:
+        if 'NumberOfFrames' not in dicom_dataset:
+            msg = ("The NumberOfFrames attribute is required to read "
+                   "individual frames from the Pixel Data element.")
+            raise ValueError(msg)
+        for frame_num in frame_list:
+            if frame_num > int(dicom_dataset.NumberOfFrames):
+                msg = ("Frame number {} exceeds total number of frames in "
+                       "Pixel Data element.".format(frame_num))
+                raise ValueError(msg)
+
     if (dicom_dataset.is_little_endian !=
             sys_is_little_endian):
         numpy_format = numpy_format.newbyteorder('S')
@@ -115,10 +134,27 @@ def get_pixeldata(dicom_dataset):
     if ('NumberOfFrames' in dicom_dataset and
             dicom_dataset.NumberOfFrames > 1):
         # multiple compressed frames
-        CompressedPixelDataSeq = pydicom.encaps.decode_data_sequence(
-            dicom_dataset.PixelData)
-        # print len(CompressedPixelDataSeq)
-        for frame in CompressedPixelDataSeq:
+        data_elem = dicom_dataset.raw_data_element('PixelData')
+        if frame_list is not None and data_elem.value is None:
+            filename = dicom_dataset.filename
+            fileobj_type = dicom_dataset.fileobj_type
+            is_little_endian = data_elem.is_little_endian
+            data_elem_offset = data_elem.value_tell
+            # Causes ImportError when imported at top level
+            from pydicom.filereader import read_frame
+            with fileobj_type(filename, 'rb') as fp:
+                CompressedPixelDataSeq = []
+                for frame_num in frame_list:
+                    data = read_frame(fp, is_little_endian,
+                                      data_elem_offset, frame_num)
+                    seq = pydicom.encaps.decode_data_sequence(data, False)
+                    CompressedPixelDataSeq.append(seq)
+        else:
+            CompressedPixelDataSeq = \
+                pydicom.encaps.decode_data_sequence(dicom_dataset.PixelData)
+        for index, frame in enumerate(CompressedPixelDataSeq):
+            if frame_list is not None and (index + 1) not in frame_list:
+                continue
             decompressed_image = jpeg_ls.decode(
                 numpy.fromstring(frame, dtype=numpy.uint8))
             UncompressedPixelData += decompressed_image.tobytes()

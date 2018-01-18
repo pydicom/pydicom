@@ -14,8 +14,8 @@ import zlib
 from io import BytesIO
 
 from pydicom.misc import size_in_bytes
-from pydicom.tag import TupleTag, Tag, BaseTag
-from pydicom.dataelem import RawDataElement
+from pydicom.tag import TupleTag, Tag, BaseTag, ItemTag
+from pydicom.dataelem import RawDataElement, DeferredDataElement
 from pydicom.util.hexutil import bytes2hex
 from pydicom.valuerep import extra_length_VRs
 from pydicom.charset import (
@@ -868,6 +868,99 @@ def data_element_offset_to_value(is_implicit_VR, VR):
         else:
             offset = 8  # tag 4 + 2 VR + 2 length
     return offset
+
+
+def read_frame(fp, is_little_endian, data_elem_value_offset, frame_number,
+               frame_length=None):
+    """Return all fragments of an individual frame of a multi-frame
+    Pixel Data element.
+
+    Parameters
+    ----------
+    fp : an opened file object
+    data_elem_value_offset : int
+        Number of bytes to start of data element value.
+    frame_number : int
+        One-based index of the frame within the data element.
+    frame_length : int, optional
+        Number of bytes of the frame (required if pixels are encoded natively
+        and not encapsulated).
+
+    Returns
+    -------
+    bytes
+        encoded items belonging to the given frame
+
+    """
+    if frame_number < 1:
+        raise ValueError("Frame number must be a positive unsigned integer.")
+
+    if not(is_little_endian):
+        raise ValueError("Pixel Data element must be little endian encoded.")
+
+    # Positioned to read the value of pixel data element
+    fp.seek(data_elem_value_offset)
+
+    endian_chr = "<"
+    item_struct = Struct(endian_chr + "HHL")
+
+    debugging = config.debugging
+
+    if frame_length is None:
+        # First item is the basic offset table.
+        bytes_read = fp.read(8)
+        bot_group, bot_elem, bot_length = item_struct.unpack(bytes_read)
+        bot_tag = TupleTag((bot_group, bot_elem))
+        if bot_tag != ItemTag:
+            error_msg = ("Basic offset table item is required for "
+                         "encapsulated Pixel Data element.")
+            raise ValueError(error_msg)
+        if bot_length > 0:
+            logger.debug("Determine frame offset from basic offset table "
+                         "item value.")
+            bot_value_struct = Struct(endian_chr + "L")
+            frame_offset_list = []
+            # Each offset value is a 32-bit unsigned integer
+            for ii in range(bot_length // 4):
+                bytes_read = fp.read(4)
+                offset = bot_value_struct.unpack(bytes_read)[0]
+                frame_offset_list.append(offset)
+        else:
+            # Basic offset table value is not required by standard!!!
+            error_msg = ("Basic offset table item value is needed for "
+                         "reading individual frame of encapsulated "
+                         "Pixel Data element.")
+            raise ValueError(error_msg)
+
+        first_item_tell = fp.tell()
+
+        # Determine position of frame within Pixel Data element value.
+        try:
+            frame_offset = frame_offset_list[frame_number-1]
+            next_frame_offset = frame_offset_list[frame_number]
+            # Offset is measured from the first byte of the first Item tag
+            # following the Basic Offset Table item
+            frame_tell = first_item_tell + frame_offset
+        except IndexError:
+            error_msg = ("Frame offset could not be determined from "
+                         "basic offset table item value.")
+            raise ValueError(error_msg)
+        fp.seek(frame_tell)
+        bytes_read = fp.read(8)
+        item_group, item_elem, item_length = item_struct.unpack(bytes_read)
+        item_tag = TupleTag((item_group, item_elem))
+        if item_tag != ItemTag:
+            error_msg = "No item in Pixel Data element at frame offset."
+            raise ValueError(error_msg)
+        frame_length = next_frame_offset - frame_offset
+    else:
+        frame_tell = data_elem_value_offset
+
+    # Read bytes of frame items
+    fp.seek(frame_tell)
+    data = fp.read(frame_length)
+
+    return data
 
 
 def read_deferred_data_element(fileobj_type, filename, timestamp,
