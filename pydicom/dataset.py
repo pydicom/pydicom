@@ -208,6 +208,25 @@ class Dataset(dict):
             return self[tag]
         return None
 
+    def raw_data_element(self, name):
+        """Return the RawDataElement corresponding to the element keyword `name`.
+
+        Parameters
+        ----------
+        name : str
+            A DICOM element keyword.
+
+        Returns
+        -------
+        pydicom.dataelem.RawDataElement or None
+            For the given DICOM element `keyword`, return the corresponding
+            Dataset RawDataElement if present, None otherwise.
+        """
+        tag = tag_for_keyword(name)
+        if tag is not None:
+            return dict.__getitem__(self, tag)
+        return None
+
     def __contains__(self, name):
         """Extend dict.__contains__() to handle DICOM keywords.
 
