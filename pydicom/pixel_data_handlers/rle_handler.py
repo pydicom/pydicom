@@ -29,7 +29,7 @@ def should_change_PhotometricInterpretation_to_RGB(dicom_dataset):
     return False
 
 
-def get_pixeldata(dicom_dataset, file_list=None):
+def get_pixeldata(dicom_dataset, frame_list=None):
     """If NumPy is available, return an ndarray of the Pixel Data.
 
     Parameters
