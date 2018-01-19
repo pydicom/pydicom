@@ -952,6 +952,10 @@ def read_frame(fp, is_little_endian, data_elem_value_offset, frame_number,
         if item_tag != ItemTag:
             error_msg = "No item in Pixel Data element at frame offset."
             raise ValueError(error_msg)
+        if next_frame_offset <= frame_offset:
+            error_msg = ("Elements of basic offset table item value must "
+                         "be in ascending order.")
+            raise ValueError(error_msg)
         frame_length = next_frame_offset - frame_offset
     else:
         frame_tell = data_elem_value_offset
