@@ -466,7 +466,7 @@ def test_PI_RGB(test_with_gdcm, image, PhotometricInterpretation, results):
     assert tuple(a[75, 50, :]) == results[7]
     assert tuple(a[85, 50, :]) == results[8]
     assert tuple(a[95, 50, :]) == results[9]
-    assert t.PhotometricInterpretation == "RGB"
+    assert t.PhotometricInterpretation == PhotometricInterpretation
 
 
 @pytest.mark.skipif(not test_gdcm_decoder, reason=gdcm_missing_message)

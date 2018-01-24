@@ -319,7 +319,7 @@ class pillow_JPEGlossyTests_with_pillow(unittest.TestCase):
         # this test points were manually identified in Osirix viewer
         self.assertEqual(tuple(a[3, 159, 290, :]), (41, 41, 41))
         self.assertEqual(tuple(a[3, 169, 290, :]), (57, 57, 57))
-        self.assertEqual(self.color_3d_jpeg.PhotometricInterpretation, "RGB")
+        self.assertEqual(self.color_3d_jpeg.PhotometricInterpretation, "YBR_FULL_422")
 
 
 @pytest.fixture(scope="module")
@@ -441,7 +441,7 @@ def test_PI_RGB(test_with_pillow, image, PhotometricInterpretation, results):
     assert tuple(a[75, 50, :]) == results[7]
     assert tuple(a[85, 50, :]) == results[8]
     assert tuple(a[95, 50, :]) == results[9]
-    assert t.PhotometricInterpretation == "RGB"
+    assert t.PhotometricInterpretation == PhotometricInterpretation
 
 
 @pytest.mark.skipif(
