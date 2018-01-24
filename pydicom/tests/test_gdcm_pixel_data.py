@@ -345,7 +345,7 @@ class GDCM_JPEGlossyTests_with_gdcm(unittest.TestCase):
         # this test points were manually identified in Osirix viewer
         self.assertEqual(tuple(a[3, 159, 290, :]), (41, 41, 41))
         self.assertEqual(tuple(a[3, 169, 290, :]), (57, 57, 57))
-        self.assertEqual(self.color_3d_jpeg.PhotometricInterpretation, "RGB")
+        self.assertEqual(self.color_3d_jpeg.PhotometricInterpretation, "YBR_FULL_422")
 
 
 @pytest.fixture(scope="module")
@@ -461,7 +461,7 @@ def test_PI_RGB(test_with_gdcm,
     a = t.pixel_array
     assert a.shape == (100, 100, 3)
     if convert_yuv_to_rgb:
-        a = t.color_3d_jpeg._convert_YBR_to_RGB(a)
+        a = t._convert_YBR_to_RGB(a)
     # this test points are from the ImageComments tag
     assert tuple(a[5, 50, :]) == results[0]
     assert tuple(a[15, 50, :]) == results[1]
