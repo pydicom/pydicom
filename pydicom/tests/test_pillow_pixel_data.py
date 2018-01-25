@@ -335,13 +335,17 @@ class pillow_JPEGlossyTests_with_pillow(unittest.TestCase):
             _ = self.jpeg_lossy.pixel_array
 
     def testJPEGBaselineColor3DPixelArray(self):
-        self.assertEqual(self.color_3d_jpeg.PhotometricInterpretation, "YBR_FULL_422")
+        self.assertEqual(
+            self.color_3d_jpeg.PhotometricInterpretation,
+            "YBR_FULL_422")
         a = self.color_3d_jpeg.pixel_array
         self.assertEqual(a.shape, (120, 480, 640, 3))
         # this test points were manually identified in Osirix viewer
         self.assertEqual(tuple(a[3, 159, 290, :]), (41, 41, 41))
         self.assertEqual(tuple(a[3, 169, 290, :]), (57, 57, 57))
-        self.assertEqual(self.color_3d_jpeg.PhotometricInterpretation, "YBR_FULL_422")
+        self.assertEqual(
+            self.color_3d_jpeg.PhotometricInterpretation,
+            "YBR_FULL_422")
 
 
 @pytest.fixture(scope="module")
@@ -350,6 +354,7 @@ def test_with_pillow():
     pydicom.config.image_handlers = [pillow_handler, numpy_handler]
     yield original_handlers
     pydicom.config.image_handlers = original_handlers
+
 
 test_ids = [
     "JPEG_RGB_RGB",
