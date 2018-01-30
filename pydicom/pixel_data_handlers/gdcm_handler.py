@@ -26,14 +26,14 @@ def needs_to_convert_to_RGB(dicom_dataset):
     should_convert = (dicom_dataset.file_meta.TransferSyntaxUID in
                       should_convert_these_syntaxes_to_RGB)
     should_convert &= dicom_dataset.SamplesPerPixel == 3
-    return should_convert
+    return False
 
 
 def should_change_PhotometricInterpretation_to_RGB(dicom_dataset):
     should_change = (dicom_dataset.file_meta.TransferSyntaxUID in
                      should_convert_these_syntaxes_to_RGB)
     should_change &= dicom_dataset.SamplesPerPixel == 3
-    return should_change
+    return False
 
 
 def supports_transfer_syntax(dicom_dataset):
