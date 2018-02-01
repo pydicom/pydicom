@@ -187,7 +187,7 @@ Finally, this is possible to store the image
     (0010, 0030) Patient's Birth Date                DA: '01011900'
 
 
-**Total running time of the script:** ( 0 minutes  0.022 seconds)
+**Total running time of the script:** ( 0 minutes  0.025 seconds)
 
 
 
