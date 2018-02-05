@@ -776,7 +776,7 @@ class Dataset(dict):
         Parameters
         ----------
         frame_list : List[int]
-            One-based indicies of frames within the Pixel Data Element.
+            One-based frame numbers.
 
         Returns
         -------

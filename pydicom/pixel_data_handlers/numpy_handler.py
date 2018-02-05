@@ -46,7 +46,7 @@ def get_pixeldata(dicom_dataset, frame_list=None):
     Parameters
     ----------
     frame_list : List[int], optional
-        One-based indices of frames within the Pixel Data Element.
+        One-based frame numbers.
 
     Raises
     ------
