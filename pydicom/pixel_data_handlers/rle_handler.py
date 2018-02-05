@@ -71,7 +71,7 @@ def get_pixeldata(dicom_dataset, frame_list=None):
         raise TypeError("No pixel data found in this dataset.")
 
     if frame_list is not None:
-        msg = ("Reading individual frames with GDCM is not yet supported.")
+        msg = ("Reading individual frames with RLE is not yet supported.")
 
     # Make NumPy format code, e.g. "uint16", "int32" etc
     # from two pieces of info:
