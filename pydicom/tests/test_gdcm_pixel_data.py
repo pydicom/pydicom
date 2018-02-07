@@ -338,13 +338,18 @@ class GDCM_JPEGlossyTests_with_gdcm(unittest.TestCase):
         self.assertEqual(a[230, 120], 95)
 
     def test_JPEGBaselineColor3DPixelArray(self):
-        self.assertEqual(self.color_3d_jpeg.PhotometricInterpretation, "YBR_FULL_422")
+        self.assertEqual(
+            self.color_3d_jpeg.PhotometricInterpretation,
+            "YBR_FULL_422")
         a = self.color_3d_jpeg.pixel_array
         self.assertEqual(a.shape, (120, 480, 640, 3))
+        a = self.color_3d_jpeg._convert_YBR_to_RGB(a)
         # this test points were manually identified in Osirix viewer
         self.assertEqual(tuple(a[3, 159, 290, :]), (41, 41, 41))
         self.assertEqual(tuple(a[3, 169, 290, :]), (57, 57, 57))
-        self.assertEqual(self.color_3d_jpeg.PhotometricInterpretation, "RGB")
+        self.assertEqual(
+            self.color_3d_jpeg.PhotometricInterpretation,
+            "YBR_FULL_422")
 
 
 @pytest.fixture(scope="module")
@@ -353,6 +358,7 @@ def test_with_gdcm():
     pydicom.config.image_handlers = [numpy_handler, gdcm_handler]
     yield original_handlers
     pydicom.config.image_handlers = original_handlers
+
 
 test_ids = [
     "JPEG_RGB_RGB",
@@ -375,33 +381,33 @@ testdata = [
          (64, 64, 64),
          (192, 192, 192),
          (255, 255, 255),
-     ], ),
+     ], False),
     (sc_rgb_jpeg_dcmtk_411_YBR_FULL, "YBR_FULL",
      [
-         (248, 3, 2),
-         (246, 131, 138),
+         (253, 1, 0),
+         (253, 128, 132),
          (0, 255, 5),
-         (129, 252, 145),
-         (2, 0, 254),
-         (128, 128, 250),
+         (127, 255, 127),
+         (1, 0, 254),
+         (127, 128, 255),
          (0, 0, 0),
          (64, 64, 64),
          (192, 192, 192),
          (255, 255, 255),
-     ], ),
+     ], True),
     (sc_rgb_jpeg_dcmtk_411_YBR_FULL_422, "YBR_FULL_422",
      [
-         (248, 3, 2),
-         (246, 131, 138),
+         (253, 1, 0),
+         (253, 128, 132),
          (0, 255, 5),
-         (129, 252, 145),
-         (2, 0, 254),
-         (128, 128, 250),
+         (127, 255, 127),
+         (1, 0, 254),
+         (127, 128, 255),
          (0, 0, 0),
          (64, 64, 64),
          (192, 192, 192),
          (255, 255, 255),
-     ], ),
+     ], True),
     (sc_rgb_jpeg_dcmtk_422_YBR_FULL, "YBR_FULL",
      [
          (254, 0, 0),
@@ -414,7 +420,7 @@ testdata = [
          (64, 64, 64),
          (192, 192, 192),
          (255, 255, 255),
-     ],),
+     ], True),
     (sc_rgb_jpeg_dcmtk_422_YBR_FULL_422, "YBR_FULL_422",
      [
          (254, 0, 0),
@@ -427,7 +433,7 @@ testdata = [
          (64, 64, 64),
          (192, 192, 192),
          (255, 255, 255),
-     ], ),
+     ], True),
     (sc_rgb_jpeg_dcmtk_444_YBR_FULL, "YBR_FULL",
      [
          (254, 0, 0),
@@ -440,21 +446,27 @@ testdata = [
          (64, 64, 64),
          (192, 192, 192),
          (255, 255, 255),
-     ], ), ]
+     ], True), ]
 
 
 @pytest.mark.skipif(
     not test_gdcm_decoder,
     reason=gdcm_missing_message)
 @pytest.mark.parametrize(
-    "image,PhotometricInterpretation,results",
+    "image,PhotometricInterpretation,results,convert_yuv_to_rgb",
     testdata,
     ids=test_ids)
-def test_PI_RGB(test_with_gdcm, image, PhotometricInterpretation, results):
+def test_PI_RGB(test_with_gdcm,
+                image,
+                PhotometricInterpretation,
+                results,
+                convert_yuv_to_rgb):
     t = dcmread(image)
     assert t.PhotometricInterpretation == PhotometricInterpretation
     a = t.pixel_array
     assert a.shape == (100, 100, 3)
+    if convert_yuv_to_rgb:
+        a = t._convert_YBR_to_RGB(a)
     # this test points are from the ImageComments tag
     assert tuple(a[5, 50, :]) == results[0]
     assert tuple(a[15, 50, :]) == results[1]
@@ -466,7 +478,7 @@ def test_PI_RGB(test_with_gdcm, image, PhotometricInterpretation, results):
     assert tuple(a[75, 50, :]) == results[7]
     assert tuple(a[85, 50, :]) == results[8]
     assert tuple(a[95, 50, :]) == results[9]
-    assert t.PhotometricInterpretation == "RGB"
+    assert t.PhotometricInterpretation == PhotometricInterpretation
 
 
 @pytest.mark.skipif(not test_gdcm_decoder, reason=gdcm_missing_message)
