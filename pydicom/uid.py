@@ -17,8 +17,8 @@ PYDICOM_ROOT_UID = '1.2.826.0.1.3680043.8.498.'
 PYDICOM_IMPLEMENTATION_UID = PYDICOM_ROOT_UID + '1'
 
 # Regexes for valid UIDs and valid UID prefixes
-RE_VALID_UID = '^(0|[1-9][0-9]*)(\.(0|[1-9][0-9]*))*$'
-RE_VALID_UID_PREFIX = '^(0|[1-9][0-9]*)(\.(0|[1-9][0-9]*))*\.$'
+RE_VALID_UID = r'^(0|[1-9][0-9]*)(\.(0|[1-9][0-9]*))*$'
+RE_VALID_UID_PREFIX = r'^(0|[1-9][0-9]*)(\.(0|[1-9][0-9]*))*\.$'
 
 
 class UID(str):

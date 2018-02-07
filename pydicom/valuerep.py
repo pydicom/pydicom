@@ -31,9 +31,9 @@ extra_length_VRs = ('OB', 'OD', 'OF', 'OL', 'OW', 'SQ', 'UC', 'UN', 'UR', 'UT')
 text_VRs = ('SH', 'LO', 'ST', 'LT', 'UC', 'UR', 'UT')
 
 match_string = b''.join([
-    b'(?P<single_byte>', b'(?P<family_name>[^=\^]*)',
-    b'\^?(?P<given_name>[^=\^]*)', b'\^?(?P<middle_name>[^=\^]*)',
-    b'\^?(?P<name_prefix>[^=\^]*)', b'\^?(?P<name_suffix>[^=\^]*)', b')',
+    b'(?P<single_byte>', br'(?P<family_name>[^=\^]*)',
+    br'\^?(?P<given_name>[^=\^]*)', br'\^?(?P<middle_name>[^=\^]*)',
+    br'\^?(?P<name_prefix>[^=\^]*)', br'\^?(?P<name_suffix>[^=\^]*)', b')',
     b'=?(?P<ideographic>[^=]*)', b'=?(?P<phonetic>[^=]*)$'
 ])
 

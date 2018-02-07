@@ -27,12 +27,10 @@ def assert_raises_regex(type_error, message, func, *args, **kwargs):
 class DatasetTests(unittest.TestCase):
     def failUnlessRaises(self, excClass, callableObj, *args, **kwargs):
         """Redefine unittest Exception test to return the exception object"""
-        # from http://stackoverflow.com/questions/88325/
-        # how-do-i-unit-test-an-init-method-of-a-python-class-with-assertraises
         try:
             callableObj(*args, **kwargs)
-        except excClass as excObj:
-            return excObj  # Actually return the exception object
+        except excClass as e:
+            return e
         else:
             if hasattr(excClass, '__name__'):
                 excName = excClass.__name__
