@@ -196,7 +196,8 @@
 <span class="kn">from</span> <span class="nn">pydicom.tag</span> <span class="k">import</span> <span class="p">(</span><span class="n">Tag</span><span class="p">,</span> <span class="n">ItemTag</span><span class="p">,</span> <span class="n">ItemDelimiterTag</span><span class="p">,</span> <span class="n">SequenceDelimiterTag</span><span class="p">,</span>
                          <span class="n">tag_in_exception</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="k">import</span> <span class="p">(</span><span class="n">PYDICOM_IMPLEMENTATION_UID</span><span class="p">,</span> <span class="n">ImplicitVRLittleEndian</span><span class="p">,</span>
-                         <span class="n">ExplicitVRBigEndian</span><span class="p">)</span>
+                         <span class="n">ExplicitVRBigEndian</span><span class="p">,</span>
+                         <span class="n">UncompressedPixelTransferSyntaxes</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">pydicom.valuerep</span> <span class="k">import</span> <span class="n">extra_length_VRs</span>
 <span class="kn">from</span> <span class="nn">pydicom.values</span> <span class="k">import</span> <span class="n">convert_numbers</span>
 <span class="kn">from</span> <span class="nn">pydicom._version</span> <span class="k">import</span> <span class="n">__version__</span>
@@ -969,7 +970,7 @@
         <span class="k">elif</span> <span class="ow">not</span> <span class="n">dataset</span><span class="o">.</span><span class="n">is_little_endian</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">dataset</span><span class="o">.</span><span class="n">is_implicit_VR</span><span class="p">:</span>
             <span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span> <span class="o">=</span> <span class="n">ExplicitVRBigEndian</span>
         <span class="k">elif</span> <span class="ow">not</span> <span class="n">dataset</span><span class="o">.</span><span class="n">is_little_endian</span> <span class="ow">and</span> <span class="n">dataset</span><span class="o">.</span><span class="n">is_implicit_VR</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Implicit VR Big Endian is not a&quot;</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Implicit VR Big Endian is not a &quot;</span>
                                       <span class="s2">&quot;supported Transfer Syntax.&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="s1">&#39;SOPClassUID&#39;</span> <span class="ow">in</span> <span class="n">dataset</span><span class="p">:</span>
@@ -977,6 +978,17 @@
         <span class="k">if</span> <span class="s1">&#39;SOPInstanceUID&#39;</span> <span class="ow">in</span> <span class="n">dataset</span><span class="p">:</span>
             <span class="n">file_meta</span><span class="o">.</span><span class="n">MediaStorageSOPInstanceUID</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">SOPInstanceUID</span>
 
+    <span class="c1"># Check for decompression, give warnings if inconsistencies</span>
+    <span class="c1"># If decompressed, then pixel_array is now used instead of PixelData</span>
+    <span class="k">if</span> <span class="n">dataset</span><span class="o">.</span><span class="n">is_decompressed</span><span class="p">:</span>
+        <span class="n">xfer</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span>
+        <span class="k">if</span> <span class="n">xfer</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">UncompressedPixelTransferSyntaxes</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;file_meta transfer SyntaxUID is compressed type &quot;</span>
+                             <span class="s2">&quot;but pixel data has been decompressed&quot;</span><span class="p">)</span>
+        
+        <span class="c1"># Force PixelData to the decompressed version</span>
+        <span class="n">dataset</span><span class="o">.</span><span class="n">PixelData</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">pixel_array</span><span class="o">.</span><span class="n">tobytes</span><span class="p">()</span>
+        
     <span class="n">caller_owns_file</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="c1"># Open file if not already a file object</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">compat</span><span class="o">.</span><span class="n">string_types</span><span class="p">):</span>
