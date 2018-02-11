@@ -3,7 +3,7 @@ import sys
 import re
 import pytest
 import pydicom
-from pydicom.filereader import dcmread
+from pydicom import dcmread
 from pydicom.data import get_testdata_files
 
 pillow_missing_message = ("pillow is not available "

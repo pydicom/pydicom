@@ -239,7 +239,7 @@ class ReaderTests(unittest.TestCase):
         """Returns correct values for sample elements in test RTSTRUCT file."""
         # RTSTRUCT test file has complex nested sequences
         # -- see rtstruct.dump file
-        # Also has no DICOM header ... so tests 'force' argument of read_file
+        # Also has no DICOM header ... so tests 'force' argument of dcmread
 
         rtss = dcmread(rtstruct_name, force=True)
         frame_of_ref = rtss.ReferencedFrameOfReferenceSequence[0]
@@ -684,7 +684,7 @@ class ReaderTests(unittest.TestCase):
         self.assertEqual(ds.file_meta, Dataset())
         self.assertEqual(ds[:], Dataset())
 
-    def test_read_file_does_not_raise(self):
+    def test_dcmread_does_not_raise(self):
         """Test that reading from DicomBytesIO does not raise on EOF.
         Regression test for #358."""
         ds = dcmread(mr_name)
