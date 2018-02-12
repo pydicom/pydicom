@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import os
+import sys
 from glob import glob
 from setuptools import setup, find_packages
 
@@ -25,6 +26,9 @@ installation and basic information, and the `Pydicom User Guide
 <http://pydicom.readthedocs.org/en/latest/pydicom_user_guide.html>`_ page for
 an overview of how to use the pydicom library.
 """
+
+needs_pytest = {'pytest', 'test', 'ptr'}.intersection(sys.argv)
+pytest_runner = ['pytest-runner'] if needs_pytest else []
 
 CLASSIFIERS = [
     "License :: OSI Approved :: MIT License",
@@ -56,7 +60,8 @@ DOWNLOAD_URL = "https://github.com/pydicom/pydicom/archive/master.zip"
 LICENSE = "MIT"
 VERSION = __version__
 REQUIRES = []
-
+SETUP_REQUIRES = pytest_runner
+TESTS_REQUIRE = ['pytest']
 
 def data_files_inventory():
     data_files = []
@@ -88,6 +93,8 @@ opts = dict(name=NAME,
             package_data=PACKAGE_DATA,
             include_package_data=True,
             install_requires=REQUIRES,
+            setup_requires=SETUP_REQUIRES,
+            tests_require=TESTS_REQUIRE,
             zip_safe=False)
 
 

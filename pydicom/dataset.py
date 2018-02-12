@@ -28,7 +28,8 @@ from pydicom.datadict import (tag_for_keyword, keyword_for_tag,
                               repeater_has_keyword)
 from pydicom.tag import Tag, BaseTag, tag_in_exception
 from pydicom.dataelem import DataElement, DataElement_from_raw, RawDataElement
-from pydicom.uid import UncompressedPixelTransferSyntaxes
+from pydicom.uid import (UncompressedPixelTransferSyntaxes, 
+						 ExplicitVRLittleEndian)
 import pydicom  # for dcmwrite
 import pydicom.charset
 from pydicom.config import logger
@@ -143,6 +144,7 @@ class Dataset(dict):
         """Create a new Dataset instance."""
         self._parent_encoding = kwargs.get('parent_encoding', default_encoding)
         dict.__init__(self, *args)
+        self.is_decompressed = False
 
     def __enter__(self):
         """Method invoked on entry to a with statement."""
@@ -687,12 +689,19 @@ class Dataset(dict):
 
     # Use by pixel_array property
     def _get_pixel_array(self):
-        """Convert the Pixel Data to a numpy array.
+        self.convert_pixel_data()
+        return self._pixel_array
+
+    def convert_pixel_data(self):
+        """Convert the Pixel Data to a numpy array internally.
 
         Returns
         -------
-        numpy.ndarray
-            The array containing the Pixel Data.
+        None  
+            Converted pixel data is stored internally in the dataset.
+            
+        If a compressed image format, the image is  decompressed,
+        and any related data elements are changed accordingly.
         """
         # Check if already have converted to a NumPy array
         # Also check if self.PixelData has changed. If so, get new NumPy array
@@ -734,8 +743,50 @@ class Dataset(dict):
                     raise NotImplementedError(msg)
             # is this guaranteed to work if memory is re-used??
             self._pixel_id = id(self.PixelData)
-            return self._pixel_array
-        return self._pixel_array
+            
+    def decompress(self):
+        """Decompresses pixel data and modifies the Dataset in-place
+
+		If not a compressed tranfer syntax, then pixel data is converted
+		to a numpy array internally, but not returned.
+		
+		If compressed pixel data, then is decompressed using an image handler,
+		and internal state is updated appropriately:
+		    - TransferSyntax is updated to non-compressed form
+			- is_undefined_length for pixel data is set False
+
+        Returns
+        -------
+        None
+
+		Raises
+        ------
+        NotImplementedError
+            If the pixel data was originally compressed but file is not
+			ExplicitVR LittleEndian as required by Dicom standard
+        """		
+        self.convert_pixel_data()
+        self.is_decompressed = True
+		# May have been undefined length pixel data, but won't be now
+        if 'PixelData' in self:
+            self[0x7fe00010].is_undefined_length = False
+
+        # Make sure correct Transfer Syntax is set
+        # According to the dicom standard PS3.5 section A.4,
+        # all compressed files must have been explicit VR, little endian
+        # First check if was a compressed file
+        if (hasattr(self, 'file_meta') and
+                self.file_meta.TransferSyntaxUID.is_compressed):
+            # Check that current file as read does match expected
+            if not self.is_little_endian or self.is_implicit_VR:
+                msg = ("Current dataset does not match expected ExplicitVR "
+                       "LittleEndian transfer syntax from a compressed " 
+                       "transfer syntax")
+                raise NotImplementedError(msg)
+                
+            # All is as expected, updated the Transfer Syntax
+            self.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
+
 
     @property
     def pixel_array(self):
