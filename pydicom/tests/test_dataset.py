@@ -10,7 +10,7 @@ from pydicom import compat
 from pydicom.data import get_testdata_files
 from pydicom.dataelem import DataElement, RawDataElement
 from pydicom.dataset import Dataset, FileDataset
-from pydicom.dicomio import dcmread
+from pydicom import dcmread
 from pydicom.filebase import DicomBytesIO
 from pydicom.sequence import Sequence
 from pydicom.tag import Tag
