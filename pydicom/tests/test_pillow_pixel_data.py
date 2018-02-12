@@ -2,7 +2,6 @@ import unittest
 import os
 import sys
 import pytest
-import numpy.testing as npt
 import pydicom
 from pydicom.filereader import dcmread
 from pydicom.data import get_testdata_files
@@ -16,6 +15,12 @@ numpy_handler = None
 have_numpy_handler = True
 have_pillow_jpeg_plugin = False
 have_pillow_jpeg2000_plugin = False
+have_numpy_testing = True
+try:
+    import numpy.testing
+except ImportError as e:
+    have_numpy_testing = False
+
 try:
     import pydicom.pixel_data_handlers.numpy_handler as numpy_handler
 except ImportError:
@@ -304,27 +309,38 @@ class pillow_JPEG2000Tests_with_pillow(unittest.TestCase):
     def testJPEG2000PixelArray(self):
         a = self.jpeg_2k_lossless.pixel_array
         b = self.mr_small.pixel_array
-        npt.assert_array_equal(a, b)
-        self.assertEqual(
-            a.mean(),
-            b.mean(),
-            "Decoded pixel data is not all {0} "
-            "(mean == {1})".format(b.mean(), a.mean()))
+        if have_numpy_testing:
+            numpy.testing.assert_array_equal(a, b)
+        else:
+            self.assertEqual(
+                a.mean(),
+                b.mean(),
+                "Decoded pixel data is not all {0} "
+                "(mean == {1})".format(b.mean(), a.mean()))
 
     def test_emri_JPEG2000PixelArray(self):
         a = self.emri_jpeg_2k_lossless.pixel_array
         b = self.emri_small.pixel_array
-        npt.assert_array_equal(a, b)
-        self.assertEqual(
-            a.mean(),
-            b.mean(),
-            "Decoded pixel data is not all {0} "
-            "(mean == {1})".format(b.mean(), a.mean()))
+        if have_numpy_testing:
+            numpy.testing.assert_array_equal(a, b)
+        else:
+            self.assertEqual(
+                a.mean(),
+                b.mean(),
+                "Decoded pixel data is not all {0} "
+                "(mean == {1})".format(b.mean(), a.mean()))
 
     def test_jpeg2000_lossy(self):
         a = self.sc_rgb_jpeg2k_gdcm_KY.pixel_array
         b = self.ground_truth_sc_rgb_jpeg2k_gdcm_KY_gdcm.pixel_array
-        npt.assert_array_equal(a, b)
+        if have_numpy_testing:
+            numpy.testing.assert_array_equal(a, b)
+        else:
+            self.assertEqual(
+                a.mean(),
+                b.mean(),
+                "Decoded pixel data is not all {0} "
+                "(mean == {1})".format(b.mean(), a.mean()))
 
 
 @pytest.mark.skipif(

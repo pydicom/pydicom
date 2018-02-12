@@ -4,7 +4,6 @@ import os
 import sys
 import tempfile
 import shutil
-import numpy.testing as npt
 import pytest
 import pydicom
 from pydicom.filereader import dcmread
@@ -13,6 +12,11 @@ from pydicom.tag import Tag
 from pydicom import compat
 gdcm_missing_message = "GDCM is not available in this test environment"
 gdcm_present_message = "GDCM is being tested"
+have_numpy_testing = True
+try:
+    import numpy.testing
+except ImportError as e:
+    have_numpy_testing = False
 
 gdcm_handler = None
 have_gdcm_handler = True
@@ -323,7 +327,14 @@ class GDCM_JPEG2000Tests_with_gdcm(unittest.TestCase):
     def test_jpeg2000_lossy(self):
         a = self.sc_rgb_jpeg2k_gdcm_KY.pixel_array
         b = self.ground_truth_sc_rgb_jpeg2k_gdcm_KY_gdcm.pixel_array
-        npt.assert_array_equal(a, b)
+        if have_numpy_testing:
+            numpy.testing.assert_array_equal(a, b)
+        else:
+            self.assertEqual(
+                a.mean(),
+                b.mean(),
+                "Decoded pixel data is not all {0} "
+                "(mean == {1})".format(b.mean(), a.mean()))
 
 
 @pytest.mark.skipif(not test_gdcm_decoder, reason=gdcm_missing_message)
