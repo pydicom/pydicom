@@ -399,6 +399,7 @@ def test_with_pillow():
     yield original_handlers
     pydicom.config.image_handlers = original_handlers
 
+
 if have_pytest_param:
     test_ids = [
         "JPEG_RGB_RGB",
