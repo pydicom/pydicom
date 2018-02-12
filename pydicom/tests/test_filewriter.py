@@ -6,10 +6,10 @@ from datetime import date, datetime, time, timedelta
 from io import BytesIO
 import os
 import os.path
+import unittest
 
 from struct import unpack
 from tempfile import TemporaryFile
-import unittest
 
 import pytest
 
@@ -33,11 +33,6 @@ from pydicom.util.fixes import timezone
 from pydicom.valuerep import DA, DT, TM
 from ._write_stds import impl_LE_deflen_std_hex
 
-have_dateutil = True
-try:
-    from dateutil.tz import tzoffset
-except ImportError:
-    have_dateutil = False
 
 rtplan_name = get_testdata_files("rtplan.dcm")[0]
 rtdose_name = get_testdata_files("rtdose.dcm")[0]
@@ -1800,6 +1795,94 @@ class TestWriteFileMetaInfoNonStandard(unittest.TestCase):
         ref_meta = deepcopy(meta)
         write_file_meta_info(self.fp, meta, enforce_standard=False)
         self.assertEqual(meta, ref_meta)
+
+
+class TestWriteNumbers(object):
+    """Test filewriter.write_numbers"""
+    def test_write_empty_value(self):
+        """Test writing an empty value does nothing"""
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        elem = DataElement(0x00100010, 'US', '')
+        fmt = 'H'
+        write_numbers(fp, elem, fmt)
+        assert fp.getvalue() == b''
+
+    def test_write_list(self):
+        """Test writing an element value with VM > 1"""
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        elem = DataElement(0x00100010, 'US', [1, 2, 3, 4])
+        fmt = 'H'
+        write_numbers(fp, elem, fmt)
+        assert fp.getvalue() == b'\x01\x00\x02\x00\x03\x00\x04\x00'
+
+    def test_write_singleton(self):
+        """Test writing an element value with VM = 1"""
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        elem = DataElement(0x00100010, 'US', 1)
+        fmt = 'H'
+        write_numbers(fp, elem, fmt)
+        assert fp.getvalue() == b'\x01\x00'
+
+    def test_exception(self):
+        """Test exceptions raise IOError"""
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        elem = DataElement(0x00100010, 'US', b'\x00')
+        fmt = 'H'
+        assert_raises_regex(IOError,
+                            "for data_element:\n\(0010, 0010\)",
+                            write_numbers,
+                            fp,
+                            elem,
+                            fmt)
+
+    def test_write_big_endian(self):
+        """Test writing big endian"""
+        fp = DicomBytesIO()
+        fp.is_little_endian = False
+        elem = DataElement(0x00100010, 'US', 1)
+        fmt = 'H'
+        write_numbers(fp, elem, fmt)
+        assert fp.getvalue() == b'\x00\x01'
+
+
+class TestWritePN(object):
+    """Test filewriter.write_PN"""
+    @pytest.mark.skip("Raises exception due to issue #489")
+    def test_no_encoding_unicode(self):
+        """If PN element as no encoding info, default is used"""
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        elem = DataElement(0x00100010, 'PN', u'\u03b8')
+        write_PN(fp, elem)
+
+    def test_no_encoding(self):
+        """If PN element as no encoding info, default is used"""
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        elem = DataElement(0x00100010, 'PN', 'Test')
+        write_PN(fp, elem)
+        assert fp.getvalue() == b'Test'
+
+
+class TestWriteDT(object):
+    """Test filewriter.write_DT"""
+    def test_format_dt(self):
+        """Test _format_DT"""
+        elem = DataElement(0x00181078, 'DT', DT('20010203123456.123456'))
+        assert hasattr(elem.value, 'original_string')
+        assert _format_DT(elem.value) == '20010203123456.123456'
+        del elem.value.original_string
+        assert not hasattr(elem.value, 'original_string')
+        assert elem.value.microsecond > 0
+        assert _format_DT(elem.value) == '20010203123456.123456'
+
+        elem = DataElement(0x00181078, 'DT', DT('20010203123456'))
+        del elem.value.original_string
+        assert _format_DT(elem.value) == '20010203123456'
 
 
 class TestWriteUndefinedLengthPixelData(unittest.TestCase):

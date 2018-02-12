@@ -96,7 +96,6 @@ class DicomIter(object):
                 self.fp = fp
                 self._is_implicit_VR = False
                 self._is_little_endian = True
-
             else:
                 # Any other syntax should be Explicit VR Little Endian,
                 # e.g. all Encapsulated (JPEG etc) are ExplVR-LE
