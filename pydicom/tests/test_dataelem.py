@@ -7,19 +7,26 @@
 
 # Many tests of DataElement class are implied in test_dataset also
 
+import sys
 import unittest
 
-import sys
-
-from pydicom.valuerep import DSfloat
+import pytest
 
 from pydicom.charset import default_encoding
-
-from pydicom.dataelem import DataElement
-from pydicom.dataelem import RawDataElement, DataElement_from_raw
+from pydicom.dataelem import (DataElement, RawDataElement,
+                              DataElement_from_raw, isStringOrStringList)
 from pydicom.dataset import Dataset
 from pydicom.tag import Tag
 from pydicom.uid import UID
+from pydicom.valuerep import DSfloat
+
+
+def test_is_string_like():
+    """Test isStringOrStringList"""
+    assert isStringOrStringList('some str')
+    assert not isStringOrStringList(1234)
+    assert isStringOrStringList(['some str', 'list'])
+    assert not isStringOrStringList(['some str', 1234])
 
 
 class DataElementTests(unittest.TestCase):
@@ -93,6 +100,26 @@ class DataElementTests(unittest.TestCase):
         self.assertEqual(self.data_elementCommand.is_retired, False)
         self.assertEqual(self.data_elementRetired.is_retired, True)
         self.assertEqual(self.data_elementPrivate.is_retired, False)
+
+    def test_description_group_length(self):
+        """Test DataElement.description for Group Length element"""
+        elem = DataElement(0x00100000, 'LO', 12345)
+        assert elem.description() == 'Group Length'
+
+    def test_description_unknown_private(self):
+        """Test DataElement.description with an unknown private element"""
+        elem = DataElement(0x00110010, 'LO', 12345)
+        elem.private_creator = 'TEST'
+        assert elem.description() == 'Private tag data'
+        elem = DataElement(0x00110F00, 'LO', 12345)
+        assert elem.tag.is_private
+        assert not hasattr(elem, 'private_creator')
+        assert elem.description() == 'Private tag data'
+
+    def test_description_unknown(self):
+        """Test DataElement.description with an unknown element"""
+        elem = DataElement(0x00000004, 'LO', 12345)
+        assert elem.description() == ''
 
     def testEqualityStandardElement(self):
         """DataElement: equality returns correct value for simple elements"""
@@ -211,6 +238,38 @@ class DataElementTests(unittest.TestCase):
         ee = DataElement(0x00100010, 'PN', 'ANON')
         self.assertTrue(dd == ee)
 
+    def test_inequality_standard(self):
+        """Test DataElement.__ne__ for standard element"""
+        dd = DataElement(0x00100010, 'PN', 'ANON')
+        assert not dd != dd
+        ee = DataElement(0x00100010, 'PN', 'ANONA')
+        assert dd != ee
+
+        # Check tag
+        ee = DataElement(0x00100011, 'PN', 'ANON')
+        assert dd != ee
+
+        # Check VR
+        ee = DataElement(0x00100010, 'SH', 'ANON')
+        assert dd != ee
+
+    def test_inequality_sequence(self):
+        """Test DataElement.__ne__ for sequence element"""
+        dd = DataElement(0x300A00B0, 'SQ', [])
+        assert not dd != dd
+        ee = DataElement(0x300A00B0, 'SQ', [])
+        assert not dd != ee
+        ee = DataElement(0x300A00B0, 'SQ', [Dataset()])
+        assert dd != ee
+
+        # Check value
+        dd.value = [Dataset()]
+        dd[0].PatientName = 'ANON'
+        ee[0].PatientName = 'ANON'
+        assert not dd != ee
+        ee[0].PatientName = 'ANONA'
+        assert dd != ee
+
     def testHash(self):
         """DataElement: hash returns TypeErrpr"""
         dd = DataElement(0x00100010, 'PN', 'ANON')
@@ -224,6 +283,55 @@ class DataElementTests(unittest.TestCase):
         """Test a repeater group element displays the element name."""
         elem = DataElement(0x60023000, 'OB', b'\x00')
         self.assertTrue('Overlay Data' in elem.__str__())
+
+    def test_str_no_vr(self):
+        """Test DataElement.__str__ output with no VR"""
+        elem = DataElement(0x00100010, 'PN', 'ANON')
+        assert "(0010, 0010) Patient's Name" in str(elem)
+        assert "PN: 'ANON'" in str(elem)
+        elem.showVR = False
+        assert "(0010, 0010) Patient's Name" in str(elem)
+        assert 'PN' not in str(elem)
+
+    def test_repr_seq(self):
+        """Test DataElement.__repr__ with a sequence"""
+        elem = DataElement(0x300A00B0, 'SQ', [Dataset()])
+        elem[0].PatientID = '1234'
+        assert repr(elem) == repr(elem.value)
+
+    def test_repval_original_string(self):
+        """Test DataElement.repval when original_string is present"""
+        elem = DataElement(0x00100010, 'PN', 'ANON')
+        elem.original_string = 'foo'
+        assert "(0010, 0010) Patient's Name" in str(elem)
+        assert "PN: 'foo'" in str(elem)
+
+    @unittest.skipIf(sys.version_info >= (3, ), 'Testing Python 2 behavior')
+    def test_unicode(self):
+        """Test unicode representation of the DataElement"""
+        elem = DataElement(0x00100010, 'PN', u'ANON')
+        # Make sure elem.value is actually unicode
+        assert isinstance(elem.value, unicode)
+        assert unicode(elem) == (
+            u"(0010, 0010) Patient's Name                      PN: ANON"
+        )
+        assert isinstance(unicode(elem), unicode)
+        assert not isinstance(unicode(elem), str)
+        # Make sure elem.value is still unicode
+        assert isinstance(elem.value, unicode)
+
+        # When value is not in compat.text_type
+        elem = DataElement(0x00100010, 'LO', 12345)
+        assert isinstance(unicode(elem), unicode)
+        assert unicode(elem) == (
+            u"(0010, 0010) Patient's Name                      LO: 12345"
+        )
+
+    def test_getitem_raises(self):
+        """Test DataElement.__getitem__ raise if value not indexable"""
+        elem = DataElement(0x00100010, 'LO', 12345)
+        with pytest.raises(TypeError):
+            elem[0]
 
 
 class RawDataElementTests(unittest.TestCase):
@@ -245,6 +353,11 @@ class RawDataElementTests(unittest.TestCase):
         self.assertEqual(element.VR, 'DA')
         self.assertEqual(element.value, '20170101')
 
+        raw = RawDataElement(Tag(0x00080000), None, 4, b'\x02\x00\x00\x00',
+                             0, True, True)
+        elem = DataElement_from_raw(raw, default_encoding)
+        assert elem.VR == 'UL'
+
     @unittest.skipIf(sys.version_info >= (3, ), 'Testing Python 2 behavior')
     def testTagWithoutEncodingPython2(self):
         """RawDataElement: no encoding needed in Python 2."""
@@ -260,6 +373,13 @@ class RawDataElementTests(unittest.TestCase):
         self.assertRaises(TypeError, RawDataElement(Tag(0x00104000), 'LT', 14,
                                                     b'comment1\\comment2',
                                                     0, False, True))
+
+    def test_unknown_vr(self):
+        """Test converting a raw element with unknown VR"""
+        raw = RawDataElement(Tag(0x00080000), 'AA', 8, b'20170101',
+                             0, False, True)
+        with pytest.raises(NotImplementedError):
+            DataElement_from_raw(raw, default_encoding)
 
 
 if __name__ == "__main__":

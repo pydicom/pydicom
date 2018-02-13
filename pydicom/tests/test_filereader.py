@@ -1,6 +1,4 @@
 # coding: utf-8
-
-# test_filereader.py
 # -*- coding: utf-8 -*-
 """unittest tests for pydicom.filereader module"""
 # Copyright (c) 2010-2012 Darcy Mason
@@ -11,41 +9,36 @@
 import gzip
 from io import BytesIO
 import os
+from os import stat
 import os.path
+from re import compile
 import shutil
 import sys
 import tempfile
 import unittest
 
-from pydicom.filebase import DicomBytesIO
-from pydicom.util.testing.warncheck import assertWarns
+import pytest
+
+import pydicom.config
 from pydicom.dataset import Dataset, FileDataset
 from pydicom.data import get_testdata_files
-from pydicom.dataelem import DataElement
-from pydicom.filereader import dcmread, data_element_generator
+from pydicom.filereader import dcmread
+from pydicom.dataelem import DataElement, DataElement_from_raw
 from pydicom.errors import InvalidDicomError
+from pydicom.filebase import DicomBytesIO
+from pydicom.filereader import (read_file, data_element_generator,
+                                read_dataset, read_sequence,
+                                read_sequence_item, read_file_meta_info,
+                                read_dicomdir)
 from pydicom.tag import Tag, TupleTag
 from pydicom.uid import ImplicitVRLittleEndian
 import pydicom.valuerep
-import pydicom.config
-try:
-    unittest.skipUnless
-except AttributeError:
-    try:
-        import unittest2 as unittest
-    except ImportError:
-        print("unittest2 is required for testing in python2.6")
+
 have_gdcm_handler = True
 try:
     import pydicom.pixel_data_handlers.gdcm_handler as gdcm_handler
 except ImportError as e:
     have_gdcm_handler = False
-# os.stat is only available on Unix and Windows   XXX Mac?
-# Not sure if on other platforms the import fails, or the call to it??
-try:
-    from os import stat  # NOQA
-except ImportError:
-    stat = None
 
 try:
     import numpy  # NOQA
@@ -108,6 +101,42 @@ emri_jpeg_2k_lossless = get_testdata_files(
 color_3d_jpeg_baseline = get_testdata_files("color3d_jpeg_baseline.dcm")[0]
 dir_name = os.path.dirname(sys.argv[0])
 save_dir = os.getcwd()
+
+
+def assert_warns_regex(type_warn, message, func, *args, **kwargs):
+    """Test a warning against an expected warning.
+
+    Only tests that the first `type_warn` warning fired matches the expected
+    warning.
+
+    Parameters
+    ----------
+    type_warn : Warning
+        The expected warning.
+    message : str
+        A string that will be used as a regex pattern to match against the
+        actual warning message. If using the actual expected message don't
+        forget to escape any regex special characters like '|', '(', ')', etc.
+    func : callable
+        The function that is expected to fire the warning.
+    args
+        The callable function `func`'s arguments.
+    kwargs
+        The callable function `func`'s keyword arguments.
+
+    Raises
+    ------
+    AssertionError
+        If the regex pattern in `message` doesn't match the actual warning.
+    """
+    with pytest.warns(None) as wrnrecord:
+        func(*args, **kwargs)
+
+    wrn = wrnrecord.pop(type_warn)
+    regex = compile(message)
+    if regex.search(str(wrn.message)) is None:
+        msg = "Pattern '{}' not found in warnings".format(message)
+        raise AssertionError(msg)
 
 
 def isClose(a, b, epsilon=0.000001):
@@ -828,19 +857,20 @@ class DeferredReadTests(unittest.TestCase):
         shutil.copyfile(ct_name, self.testfile_name)
 
     def testTimeCheck(self):
-        """Deferred read warns if file has been modified..........."""
-        if stat is not None:
-            ds = dcmread(self.testfile_name, defer_size='2 kB')
-            from time import sleep
-            sleep(1)
-            with open(self.testfile_name, "r+") as f:
-                f.write('\0')  # "touch" the file
-            warning_start = "Deferred read warning -- file modification time "
+        """Deferred read warns if file has been modified"""
+        ds = dcmread(self.testfile_name, defer_size='2 kB')
+        from time import sleep
+        sleep(0.1)
+        with open(self.testfile_name, "r+") as f:
+            f.write('\0')  # "touch" the file
 
-            def read_value():
-                ds.PixelData
+        def read_value():
+            ds.PixelData
 
-            assertWarns(self, warning_start, read_value)
+        assert_warns_regex(UserWarning,
+                           "Deferred read warning -- file modification "
+                           "time has changed",
+                           read_value)
 
     def testFileExists(self):
         """Deferred read raises error if file no longer exists....."""
@@ -960,6 +990,100 @@ class FileLikeTests(unittest.TestCase):
         # Should also be able to close the file ourselves without
         # exception raised:
         file_like.close()
+
+
+class TestDataElementGenerator(object):
+    """Test filereader.data_element_generator"""
+    def test_little_endian_explicit(self):
+        """Test reading little endian explicit VR data"""
+        # (0010, 0010) PatientName PN 6 ABCDEF
+        bytestream = b'\x10\x00\x10\x00' \
+                     b'\x50\x4E' \
+                     b'\x06\x00' \
+                     b'\x41\x42\x43\x44\x45\x46'
+        fp = BytesIO(bytestream)
+        # fp, is_implicit_VR, is_little_endian,
+        gen = data_element_generator(fp, False, True)
+        elem = DataElement(0x00100010, 'PN', 'ABCDEF')
+        assert elem == DataElement_from_raw(next(gen), 'ISO_IR 100')
+
+    def test_little_endian_implicit(self):
+        """Test reading little endian implicit VR data"""
+        # (0010, 0010) PatientName PN 6 ABCDEF
+        bytestream = b'\x10\x00\x10\x00' \
+                     b'\x06\x00\x00\x00' \
+                     b'\x41\x42\x43\x44\x45\x46'
+        fp = BytesIO(bytestream)
+        # fp, is_implicit_VR, is_little_endian,
+        gen = data_element_generator(fp, True, True)
+        elem = DataElement(0x00100010, 'PN', 'ABCDEF')
+        assert elem == DataElement_from_raw(next(gen), 'ISO_IR 100')
+
+    def test_extra_length_vr(self):
+        pass
+
+    def test_undefined_length(self):
+        pass
+
+    def test_big_endian_explicit(self):
+        """Test reading big endian explicit VR data"""
+        # (0010, 0010) PatientName PN 6 ABCDEF
+        bytestream = b'\x00\x10\x00\x10' \
+                     b'\x50\x4E' \
+                     b'\x00\x06' \
+                     b'\x41\x42\x43\x44\x45\x46'
+        fp = BytesIO(bytestream)
+        # fp, is_implicit_VR, is_little_endian,
+        gen = data_element_generator(fp, False, False)
+        elem = DataElement(0x00100010, 'PN', 'ABCDEF')
+        assert elem == DataElement_from_raw(next(gen), 'ISO_IR 100')
+
+    def test_stop_when(self):
+        pass
+
+    def test_encoding(self):
+        pass
+
+    def test_specific_tags(self):
+        pass
+
+    def test_debugging(self):
+        pass
+
+
+class TestReadDataset(object):
+    """Test filereader.read_dataset"""
+    def test(self):
+        """"""
+        pass
+
+
+class TestReadSequence(object):
+    """Test filereader.read_sequence"""
+    def test(self):
+        """"""
+        pass
+
+
+class TestReadSequenceItem(object):
+    """Test filereader.read_sequence_item"""
+    def test(self):
+        """"""
+        pass
+
+
+class TestReadFileMetaInfo(object):
+    """Test filereader.read_file_meta_info"""
+    def test(self):
+        """"""
+        pass
+
+
+class TestReadDicomDir(object):
+    """Test filereader.read_dicomdir"""
+    def test(self):
+        """"""
+        pass
 
 
 if __name__ == "__main__":

@@ -1,16 +1,14 @@
-# test_dictionary.py
-"""Test suite for dicom_dictionary.py"""
-# Copyright (c) 2008 Darcy Mason
-# This file is part of pydicom, released under a modified MIT license.
-#    See the file LICENSE included with this distribution, also
-#    available at https://github.com/pydicom/pydicom
+# Copyright 2008-2017 pydicom authors. See LICENSE file for details.
+"""Test for datadict.py"""
 
 import unittest
 from pydicom.dataset import Dataset
 from pydicom.tag import Tag
 from pydicom.datadict import (keyword_for_tag, dictionary_description,
                               dictionary_has_tag, repeater_has_tag,
-                              repeater_has_keyword, get_private_entry)
+                              repeater_has_keyword, get_private_entry,
+                              dictionary_VM, private_dictionary_VR,
+                              private_dictionary_VM)
 from pydicom.datadict import add_dict_entry, add_dict_entries
 
 
@@ -78,6 +76,24 @@ class DictTests(unittest.TestCase):
         ds = Dataset()
         ds.TestOne = 'test'
         ds.TestTwo = ['1', '2', '3']
+
+    def test_dictionary_VM(self):
+        """Test dictionary_VM"""
+        assert dictionary_VM(0x00000000) == '1'
+        assert dictionary_VM(0x00081163) == '2'
+        assert dictionary_VM(0x0000901) == '1-n'
+        assert dictionary_VM(0x00041141) == '1-8'
+        assert dictionary_VM(0x00080008) == '2-n'
+        assert dictionary_VM(0x00080309) == '1-3'
+        assert dictionary_VM(0x00081162) == '3-3n'
+
+    def test_private_dict_VR(self):
+        """Test private_dictionary_VR"""
+        assert private_dictionary_VR(0x00090000, 'ACUSON') == 'IS'
+
+    def test_private_dict_VM(self):
+        """Test private_dictionary_VM"""
+        assert private_dictionary_VM(0x00090000, 'ACUSON') == '1'
 
 
 if __name__ == "__main__":

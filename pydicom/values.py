@@ -1,33 +1,23 @@
-# values.py
+# Copyright 2008-2017 pydicom authors. See LICENSE file for details.
 """Functions for converting values of DICOM
    data elements to proper python types
 """
-# Copyright (c) 2010-2012 Darcy Mason
-# This file is part of pydicom, relased under an MIT license.
-#    See the file LICENSE included with this distribution, also
-#    available at https://github.com/pydicom/pydicom
 
+from io import BytesIO
 from struct import (unpack, calcsize)
 
 # don't import datetime_conversion directly
 from pydicom import config
 from pydicom import compat
 from pydicom.compat import in_py2
-
-# don't import DS directly as can be changed by config
-import pydicom.valuerep
-
-from pydicom.valuerep import (MultiString, DA, DT, TM)
-
-from pydicom.config import logger
-
-from pydicom.multival import MultiValue
-import pydicom.uid
-from pydicom.tag import (Tag, TupleTag)
-
-from pydicom.filereader import read_sequence
-from io import BytesIO
 from pydicom.charset import (default_encoding, text_VRs)
+from pydicom.config import logger
+from pydicom.filereader import read_sequence
+from pydicom.multival import MultiValue
+from pydicom.tag import (Tag, TupleTag)
+import pydicom.uid
+import pydicom.valuerep  # don't import DS directly as can be changed by config
+from pydicom.valuerep import (MultiString, DA, DT, TM)
 
 if not in_py2:
     from pydicom.valuerep import PersonName3 as PersonName

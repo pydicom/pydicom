@@ -1,41 +1,49 @@
-"""Test the miscellaneous functions."""
+# Copyright 2008-2017 pydicom authors. See LICENSE file for details.
+"""Tests for misc.py"""
 
-import unittest
-import os.path as osp
+import os
+
+import pytest
 
 from pydicom.data import get_testdata_files
 from pydicom.misc import is_dicom, size_in_bytes
 
 test_file = get_testdata_files('CT_small.dcm')[0]
+no_meta_file = get_testdata_files('ExplVR_LitEndNoMeta.dcm')[0]
 
 
-class TestMisc(unittest.TestCase):
+class TestMisc(object):
     def test_is_dicom(self):
         """Test the is_dicom function."""
         invalid_file = test_file.replace('CT_', 'CT')  # invalid file
-        notdicom_file = osp.abspath(__file__)  # use own file
+        notdicom_file = os.path.abspath(__file__)  # use own file
 
         # valid file returns True
-        self.assertTrue(is_dicom(test_file))
+        assert is_dicom(test_file)
 
         # return false for real file but not dicom
-        self.assertFalse(is_dicom(notdicom_file))
+        assert not is_dicom(notdicom_file)
 
         # test invalid path
-        self.assertRaises(IOError, is_dicom, invalid_file)
+        with pytest.raises(IOError):
+            is_dicom(invalid_file)
+
+        # Test no meta prefix/preamble fails
+        assert not is_dicom(no_meta_file)
 
     def test_size_in_bytes(self):
         """Test convenience function size_in_bytes()."""
         # None or numbers shall be returned unchanged
-        self.assertIsNone(size_in_bytes(None))
-        self.assertEqual(1234, size_in_bytes(1234))
+        assert size_in_bytes(None) is None
+        assert size_in_bytes(1234) == 1234
 
         # string shall be parsed
-        self.assertEqual(1234, size_in_bytes('1234'))
-        self.assertEqual(4096, size_in_bytes('4 kb'))
-        self.assertEqual(0x4000, size_in_bytes('16 KB'))
-        self.assertEqual(0x300000, size_in_bytes('3  MB'))
-        self.assertEqual(0x80000000, size_in_bytes('2gB'))
+        assert size_in_bytes('1234') == 1234
+        assert size_in_bytes('4 kb') == 4096
+        assert size_in_bytes('16 KB') == 0x4000
+        assert size_in_bytes('3  MB') == 0x300000
+        assert size_in_bytes('2gB') == 0x80000000
 
-        self.assertRaises(ValueError, size_in_bytes, '2 TB')
-        self.assertRaises(ValueError, size_in_bytes, 'KB 2')
+        with pytest.raises(ValueError):
+            size_in_bytes('2 TB')
+            size_in_bytes('KB 2')

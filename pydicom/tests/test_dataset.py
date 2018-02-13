@@ -1,5 +1,5 @@
 # Copyright 2008-2017 pydicom authors. See LICENSE file for details.
-"""unittest cases for pydicom.dataset module"""
+"""Tests for dataset.py"""
 
 import os
 import unittest
@@ -18,7 +18,27 @@ from pydicom.uid import ImplicitVRLittleEndian, JPEGBaseLineLossy8bit
 
 
 def assert_raises_regex(type_error, message, func, *args, **kwargs):
-    """Taken from https://github.com/glemaitre/specio, BSD 3 license."""
+    """Test a raised exception against an expected exception.
+
+    Parameters
+    ----------
+    type_error : Exception
+        The expected raised exception.
+    message : str
+        A string that will be used as a regex pattern to match against the
+        actual exception message. If using the actual expected message don't
+        forget to escape any regex special characters like '|', '(', ')', etc.
+    func : callable
+        The function that is expected to raise the exception.
+    args
+        The callable function `func`'s arguments.
+    kwargs
+        The callable function `func`'s keyword arguments.
+
+    Notes
+    -----
+    Taken from https://github.com/glemaitre/specio, BSD 3 license.
+    """
     with pytest.raises(type_error) as excinfo:
         func(*args, **kwargs)
     excinfo.match(message)
@@ -898,6 +918,8 @@ class DatasetTests(unittest.TestCase):
     def test_formatted_lines(self):
         """Test Dataset.formatted_lines"""
         ds = Dataset()
+        with pytest.raises(StopIteration):
+            next(ds.formatted_lines())
         ds.PatientName = 'CITIZEN^Jan'
         ds.BeamSequence = [Dataset()]
         ds.BeamSequence[0].PatientID = 'JAN^Citizen'
@@ -911,6 +933,8 @@ class DatasetTests(unittest.TestCase):
         assert next(line_generator) == "(0010, 0010)"
         assert next(line_generator) == "Beam Sequence (300a, 00b0)"
         assert next(line_generator) == "(0010, 0020)"
+        with pytest.raises(StopIteration):
+            next(line_generator)
 
     def test_set_convert_private_elem_from_raw(self):
         """Test Dataset.__setitem__ with a raw private element"""
