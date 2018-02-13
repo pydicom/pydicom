@@ -7,13 +7,7 @@ from pydicom.encaps import (generate_pixel_data_fragment, get_frame_offsets,
                             generate_pixel_data_frame, generate_pixel_data,
                             decode_data_sequence, defragment_data, read_item)
 from pydicom.filebase import DicomBytesIO
-
-
-def assert_raises_regex(type_error, message, func, *args, **kwargs):
-    """Taken from https://github.com/glemaitre/specio, BSD 3 license."""
-    with pytest.raises(type_error) as excinfo:
-        func(*args, **kwargs)
-    excinfo.match(message)
+from .testing import assert_raises_regex
 
 
 class TestGetFrameOffsets(object):
