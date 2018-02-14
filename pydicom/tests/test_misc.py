@@ -46,4 +46,5 @@ class TestMisc(object):
 
         with pytest.raises(ValueError):
             size_in_bytes('2 TB')
+        with pytest.raises(ValueError):
             size_in_bytes('KB 2')

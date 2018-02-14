@@ -13,33 +13,6 @@ from pydicom.tag import Tag
 TEST_FILE = get_testdata_files('CT_small.dcm')[0]
 
 
-def assert_raises_regex(type_error, message, func, *args, **kwargs):
-    """Test a raised exception against an expected exception.
-
-    Parameters
-    ----------
-    type_error : Exception
-        The expected raised exception.
-    message : str
-        A string that will be used as a regex pattern to match against the
-        actual exception message. If using the actual expected message don't
-        forget to escape any regex special characters like '|', '(', ')', etc.
-    func : callable
-        The function that is expected to raise the exception.
-    args
-        The callable function `func`'s arguments.
-    kwargs
-        The callable function `func`'s keyword arguments.
-
-    Notes
-    -----
-    Taken from https://github.com/glemaitre/specio, BSD 3 license.
-    """
-    with pytest.raises(type_error) as excinfo:
-        func(*args, **kwargs)
-    excinfo.match(message)
-
-
 class TestDicomIO(object):
     """Test filebase.DicomIO class"""
     def test_init(self):
@@ -98,7 +71,7 @@ class TestDicomIO(object):
         fp.is_little_endian = True
         assert fp.read_beUS() == 0
         assert fp.read_beUS() == 255
-        assert fp.read_beUS() == 65534
+        assert fp.read_beUS() == 0xFFFE
 
     def test_write_le_us(self):
         """Test DicomIO.write_leUS indirectly"""
@@ -131,8 +104,8 @@ class TestDicomIO(object):
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
         assert fp.read_leUL() == 0
-        assert fp.read_leUL() == 65535
-        assert fp.read_leUL() == 4294967294
+        assert fp.read_leUL() == 0xFFFF
+        assert fp.read_leUL() == 0xFFFFFFFE
 
     def test_read_be_ul(self):
         """Test DicomIO.read_beUL indirectly"""
@@ -141,8 +114,8 @@ class TestDicomIO(object):
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = False
         assert fp.read_beUL() == 0
-        assert fp.read_beUL() == 65535
-        assert fp.read_beUL() == 4294967294
+        assert fp.read_beUL() == 0xFFFF
+        assert fp.read_beUL() == 0xFFFFFFFE
 
     def test_write_le_ul(self):
         """Test DicomIO.write_leUL indirectly"""
@@ -195,12 +168,10 @@ class TestDicomIO(object):
         """Test DicomIO.read exact length raises if short"""
         fp = DicomBytesIO(b'\x00\x01\x03')
         fp.is_little_endian = True
-        assert_raises_regex(EOFError,
-                            "Unexpected end of file. Read 3 bytes of 4 "
-                            "expected starting at position 0x0",
-                            fp.read,
-                            length=4,
-                            need_exact_length=True)
+        with pytest.raises(EOFError,
+                           match="Unexpected end of file. Read 3 bytes of 4 "
+                                 "expected starting at position 0x0"):
+            fp.read(length=4, need_exact_length=True)
 
     def test_getter_is_little_endian(self):
         """Test DicomIO.is_little_endian getter"""
@@ -255,22 +226,18 @@ class TestDicomFileLike(object):
                 pass
 
         fp = DicomFileLike(IntPlus)
-        assert_raises_regex(IOError,
-                            "This DicomFileLike object has no write\(\) "
-                            "method",
-                            fp.write,
-                            b'')
-        assert_raises_regex(IOError,
-                            "This DicomFileLike object has no read\(\) "
-                            "method",
-                            fp.parent_read,
-                            b'')
-        assert_raises_regex(IOError,
-                            "This DicomFileLike object has no seek\(\) "
-                            "method",
-                            fp.seek,
-                            0,
-                            1)
+        with pytest.raises(IOError,
+                           match="This DicomFileLike object has no write\(\) "
+                                 "method"):
+            fp.write(b'')
+        with pytest.raises(IOError,
+                           match="This DicomFileLike object has no read\(\) "
+                                 "method"):
+            fp.parent_read(b'')
+        with pytest.raises(IOError,
+                           match="This DicomFileLike object has no seek\(\) "
+                                 "method"):
+            fp.seek(0, 1)
         assert fp.name == '<no filename>'
 
     def test_context(self):

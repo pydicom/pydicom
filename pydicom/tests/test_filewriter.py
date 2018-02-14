@@ -5,7 +5,6 @@ from copy import deepcopy
 from datetime import date, datetime, time, timedelta
 from io import BytesIO
 import os
-import os.path
 import unittest
 
 from struct import unpack
@@ -44,33 +43,6 @@ datetime_name = mr_name
 
 unicode_name = get_charset_files("chrH31.dcm")[0]
 multiPN_name = get_charset_files("chrFrenMulti.dcm")[0]
-
-
-def assert_raises_regex(type_error, message, func, *args, **kwargs):
-    """Test a raised exception against an expected exception.
-
-    Parameters
-    ----------
-    type_error : Exception
-        The expected raised exception.
-    message : str
-        A string that will be used as a regex pattern to match against the
-        actual exception message. If using the actual expected message don't
-        forget to escape any regex special characters like '|', '(', ')', etc.
-    func : callable
-        The function that is expected to raise the exception.
-    args
-        The callable function `func`'s arguments.
-    kwargs
-        The callable function `func`'s keyword arguments.
-
-    Notes
-    -----
-    Taken from https://github.com/glemaitre/specio, BSD 3 license.
-    """
-    with pytest.raises(type_error) as excinfo:
-        func(*args, **kwargs)
-    excinfo.match(message)
 
 
 def files_identical(a, b):
@@ -607,12 +579,10 @@ class WriteDataElementTests(unittest.TestCase):
         fp.is_implicit_VR = True
         fp.is_little_endian = True
         elem = DataElement(0x00100010, 'ZZ', 'Test')
-        assert_raises_regex(NotImplementedError,
-                            "write_data_element: unknown Value "
-                            "Representation 'ZZ'",
-                            write_data_element,
-                            fp,
-                            elem)
+        with pytest.raises(NotImplementedError,
+                           match="write_data_element: unknown Value "
+                                 "Representation 'ZZ'"):
+            write_data_element(fp, elem)
 
 
 class TestCorrectAmbiguousVR(unittest.TestCase):
@@ -1832,12 +1802,9 @@ class TestWriteNumbers(object):
         fp.is_little_endian = True
         elem = DataElement(0x00100010, 'US', b'\x00')
         fmt = 'H'
-        assert_raises_regex(IOError,
-                            "for data_element:\n\(0010, 0010\)",
-                            write_numbers,
-                            fp,
-                            elem,
-                            fmt)
+        with pytest.raises(IOError,
+                           match="for data_element:\n\(0010, 0010\)"):
+            write_numbers(fp, elem, fmt)
 
     def test_write_big_endian(self):
         """Test writing big endian"""
@@ -1853,14 +1820,14 @@ class TestWritePN(object):
     """Test filewriter.write_PN"""
     @pytest.mark.skip("Raises exception due to issue #489")
     def test_no_encoding_unicode(self):
-        """If PN element as no encoding info, default is used"""
+        """If PN element has no encoding info, default is used"""
         fp = DicomBytesIO()
         fp.is_little_endian = True
         elem = DataElement(0x00100010, 'PN', u'\u03b8')
         write_PN(fp, elem)
 
     def test_no_encoding(self):
-        """If PN element as no encoding info, default is used"""
+        """If PN element has no encoding info, default is used"""
         fp = DicomBytesIO()
         fp.is_little_endian = True
         elem = DataElement(0x00100010, 'PN', 'Test')
@@ -1988,12 +1955,9 @@ class TestWriteNumbers(object):
         fp.is_little_endian = True
         elem = DataElement(0x00100010, 'US', b'\x00')
         fmt = 'H'
-        assert_raises_regex(IOError,
-                            "for data_element:\n\(0010, 0010\)",
-                            write_numbers,
-                            fp,
-                            elem,
-                            fmt)
+        with pytest.raises(IOError,
+                           match="for data_element:\n\(0010, 0010\)"):
+            write_numbers(fp, elem, fmt)
 
     def test_write_big_endian(self):
         """Test writing big endian"""
