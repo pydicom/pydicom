@@ -20,7 +20,6 @@ pydicom documentation
    :caption: Documentation
 
    pydicom_user_guide.rst
-   image_data_handlers.rst
    ref_guide.rst
 
 .. toctree::
