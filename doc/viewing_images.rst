@@ -64,7 +64,6 @@ from the pixel data and some basic information about it (bit depth, LUTs, etc)
 Using pydicom with wxPython
 ---------------------------
 
-The module `imViewer-Simple.py
-<https://github.com/pydicom/contrib-pydicom/blob/master/viewers/imViewer_Simple.py>`
+The module `imViewer-Simple.py <https://github.com/pydicom/contrib-pydicom/blob/master/viewers/imViewer_Simple.py>`_
 in the ``contrib-pydicom`` repository uses wxPython (also PIL, but it notes that it
 may not be strictly necessary) to display an image from a pydicom dataset.

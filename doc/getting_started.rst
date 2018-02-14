@@ -48,9 +48,10 @@ python code.
 pydicom is easy to install and use, and because it is a pure python package, it
 should run anywhere python runs.
 
-One limitation of pydicom: compressed pixel data (e.g. JPEG) cannot be altered
-in an intelligent way as it can be for uncompressed pixels.  Files can always
-be read and saved, but compressed pixel data cannot easily be modified.
+One limitation of pydicom: compressed pixel data (e.g. JPEG) can only be
+altered in an intelligent way if :doc:`decompressing </image_data_handlers>`
+them first. Once decompressed, they can be altered and written back to a
+DICOM file the same way as initially uncompressed data.
 
 License
 =======
@@ -67,34 +68,35 @@ required if manipulating pixel data).
 
 .. note::
    In addition to the instructions below, pydicom can also be installed
-   through the `Python(x,y) <http://www.pythonxy.com/>`_ distribution, which
-   can install python and a number of packages [#]_ (including pydicom) at
-   once.
+   through the `Python(x,y) <https://sourceforge.net/projects/python-xy/>`_
+   distribution, which can install python and a number of packages [#]_
+   (including pydicom) at once.
 
 Prerequisites
 -------------
 
 * Python 2.7, 3.4 or later
 * Optional dependencies:
-  * numpy
-  * pillow
-  * gdcm
-  * jpeg_ls
-  * jpeg2000
+   * numpy
+   * pillow
+   * gdcm
+   * jpeg_ls
+   * jpeg2000
 
-We encourage you to use `minconda <https://conda.io/miniconda.html>`_ or
-`anaconda <https://docs.continuum.io/anaconda/>`_ which is cross-platforms
+We encourage you to use `Miniconda <https://conda.io/miniconda.html>`_ or
+`Anaconda <https://docs.continuum.io/anaconda/>`_ which is cross-platforms
 compatible.
 
 Installing pydicom
 ------------------
 
-pydicom is currently available on the PyPi's repositories and you can install using ``pip``::
+pydicom is currently available on `PyPi <https://pypi.python.org/pypi/pydicom/>`_
+and you can install it using ``pip``::
 
   pip install -U pydicom
 
-If you prefer, you can clone it and run the setup.py file. Use the following
-commands to get a copy from Github and install all dependencies::
+If you prefer, you can clone it and run the ``setup.py`` file. Use the
+following commands to get a copy from GitHub and install all dependencies::
 
   git clone https://github.com/pydicom/pydicom.git
   cd pydicom
@@ -121,7 +123,7 @@ Using pydicom
 Once installed, the package can be imported at a python command line or used
 in your own python program with ``import pydicom``.
 See the `examples directory
-<https://github.com/pydicom/pydicom/tree/dev/pydicom/examples>`_
+<https://github.com/pydicom/pydicom/tree/master/examples>`_
 for both kinds of uses. Also see the :doc:`User Guide </pydicom_user_guide>`
 for more details of how to use the package.
 
@@ -133,7 +135,7 @@ Please join the `pydicom discussion group
 Bugs can be submitted through the `issue tracker
 <https://github.com/pydicom/pydicom/issues>`_.  Besides the example directory,
 cookbook recipes are encouraged to be posted on the `wiki page
-<https://github.com/pydicom/pydicom/wiki>`_
+<https://github.com/pydicom/pydicom/wiki>`_.
 
 New versions, major bug fixes, etc. will also be announced through the group.
 
@@ -144,7 +146,10 @@ To start learning how to use pydicom, see the :doc:`pydicom_user_guide`.
 
 .. rubric:: Footnotes::
 
-.. [#] For DICOM network capabilities, see the `pynetdicom <https://github.com/patmun/pynetdicom>`_ project.
+.. [#] For DICOM network capabilities, see the
+   `pynetdicom <https://github.com/patmun/pynetdicom>`_ and the newer
+   `pynetetdicom3 <https://github.com/pydicom/pynetdicom3>`_ projects.
 .. [#] If using python(x,y), other packages you might be interested in include IPython
    (an indispensable interactive shell with auto-completion, history etc),
-   Numpy (optionally used by pydicom for pixel data), and ITK/VTK or PIL (image processing and visualization).
+   Numpy (optionally used by pydicom for pixel data), and ITK/VTK or PIL
+   (image processing and visualization).
