@@ -43,7 +43,7 @@
         <link rel="search" title="Search" href="search.html"/>
     <link rel="top" title="pydicom 1.0a documentation" href="index.html"/>
         <link rel="up" title="Pydicom User Guide" href="pydicom_user_guide.html"/>
-        <link rel="next" title="Viewing Images" href="viewing_images.html"/>
+        <link rel="next" title="Handling of compressed image data" href="image_data_handlers.html"/>
         <link rel="prev" title="Core elements in pydicom" href="base_element.html"/> 
 
   
@@ -114,6 +114,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#pixel-array"><code class="docutils literal"><span class="pre">pixel_array</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="image_data_handlers.html">Handling of compressed image data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viewing_images.html">Viewing Images</a></li>
 </ul>
 </li>
@@ -196,7 +197,6 @@
             
   <div class="section" id="working-with-pixel-data">
 <span id="id1"></span><h1>Working with Pixel Data<a class="headerlink" href="#working-with-pixel-data" title="Permalink to this headline">¶</a></h1>
-<p>..currentmodule:: pydicom</p>
 <p class="rubric">How to work with pixel data in pydicom.</p>
 <div class="section" id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
@@ -224,7 +224,7 @@ them …</p>
 <p class="last">To work with the pixel_array property <a class="reference external" href="http://numpy.org/">NumPy</a> must be
 installed on your system.</p>
 </div>
-<p>A property of <code class="xref py py-class docutils literal"><span class="pre">dataset.Dataset</span></code> called <code class="docutils literal"><span class="pre">pixel_array</span></code> provides more
+<p>A property of <a class="reference internal" href="ref_guide.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal"><span class="pre">dataset.Dataset</span></code></a> called <code class="docutils literal"><span class="pre">pixel_array</span></code> provides more
 useful pixel data for uncompressed images. The <code class="docutils literal"><span class="pre">pixel_array</span></code> property returns
 a NumPy array:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">pixel_array</span> 
@@ -270,7 +270,7 @@ for viewing. See <a class="reference internal" href="viewing_images.html"><span 
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="viewing_images.html" class="btn btn-neutral float-right" title="Viewing Images" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="image_data_handlers.html" class="btn btn-neutral float-right" title="Handling of compressed image data" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="base_element.html" class="btn btn-neutral" title="Core elements in pydicom" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

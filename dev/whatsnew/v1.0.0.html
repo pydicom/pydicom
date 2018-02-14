@@ -185,48 +185,87 @@
 changes.</p>
 <div class="section" id="changelog">
 <h2>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="enhancements">
-<h3>Enhancements<a class="headerlink" href="#enhancements" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="major-changes">
+<h3>Major changes<a class="headerlink" href="#major-changes" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li>fully python3 compatible – one code-base for both python 2 and python 3</li>
-<li>package name and the import name match – now use <code class="docutils literal"><span class="pre">import</span> <span class="pre">pydicom</span></code> rather
-than <code class="docutils literal"><span class="pre">import</span> <span class="pre">dicom</span></code></li>
-<li><code class="docutils literal"><span class="pre">read_file</span></code> changed to <code class="docutils literal"><span class="pre">dcmread</span></code> for greater clarity.  Similarly <code class="docutils literal"><span class="pre">write_file</span></code> becomes <code class="docutils literal"><span class="pre">dcmwrite</span></code>.  Previous names still available for backwards compatibility</li>
-<li>optional GDCM support for reading files with compressed pixel data</li>
-<li>optional Pillow, jpeg_ls support for reading some compressed pixel data files</li>
-<li>cleaned up dicom dictionary code, old non-dicom-keyword code removed</li>
-<li>dicom dictionary updated to 2017c</li>
+<li>full Python 3 compatibility - one code base for both Python 2 and Python 3</li>
+<li>package name and import name now match – use <code class="docutils literal"><span class="pre">import</span> <span class="pre">pydicom</span></code>
+rather than <code class="docutils literal"><span class="pre">import</span> <span class="pre">dicom</span></code></li>
+<li><dl class="first docutils">
+<dt>added <span class="xref std std-doc">image_data_handlers</span>:</dt>
+<dd><ul class="first last">
+<li>optional GDCM support for reading files with compressed pixel data
+(<a class="reference external" href="https://github.com/pydicom/pydicom/issues/18">#18</a>)</li>
+<li>optional Pillow and jpeg_ls support for reading some compressed pixel data
+files</li>
+<li>support for decompressing a compressed dataset in-place</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li>DICOM dictionary updated to 2017c</li>
+<li>cleaned up DICOM dictionary code, old non-DICOM-keyword code removed</li>
 </ul>
 </div>
-<div class="section" id="documentation">
-<h3>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="other-enhancements">
+<h3>Other enhancements<a class="headerlink" href="#other-enhancements" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li>Documentation refactorization with examples. <a class="reference external" href="https://github.com/pydicom/pydicom/issues/472">#472</a> by <a class="reference external" href="https://github.com/glemaitre">Guillaume
-Lemaitre</a>.</li>
+<li>added <code class="docutils literal"><span class="pre">util/fixer.py</span></code> callbacks available to fix non DICOM-compliant
+values before exceptions thrown</li>
+<li>added context management methods to <code class="docutils literal"><span class="pre">Dataset</span></code></li>
+<li>added <code class="docutils literal"><span class="pre">misc.is_dicom()</span></code> function to check for DICOM file format</li>
+<li>added date/time converters (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/143">#143</a>)</li>
+<li>added option to attempt other VRs if translate fails (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/197">#197</a>)</li>
+<li>added heuristics to read files that have no preamble or file meta
+information</li>
+<li>support for multi-valued DA, DT, TM data elements (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/212">#212</a>)</li>
+<li><code class="docutils literal"><span class="pre">DataElement</span></code>: added <code class="docutils literal"><span class="pre">keyword</span></code> and <code class="docutils literal"><span class="pre">is_retired</span></code> properties</li>
+<li><code class="docutils literal"><span class="pre">datadict</span></code>: added <code class="docutils literal"><span class="pre">dictionary_is_retired()</span></code></li>
+<li><code class="docutils literal"><span class="pre">datadict</span></code>: added ability to add custom DICOM dictionary items via
+<code class="docutils literal"><span class="pre">add_dict_entry()</span></code> and <code class="docutils literal"><span class="pre">add_dict_entries()</span></code></li>
+<li>added some support for pickle</li>
+<li>added support for VRs <code class="docutils literal"><span class="pre">OD</span></code>, <code class="docutils literal"><span class="pre">OL</span></code> and <code class="docutils literal"><span class="pre">UC</span></code></li>
+<li>added support for Thai, Japanese and Chinese encodings (#346, #353)</li>
+<li>added support for slicing to Dataset</li>
+<li>add/update TransferSyntaxUID when writing standard</li>
+<li>renamed <code class="docutils literal"><span class="pre">UID</span></code> package to <code class="docutils literal"><span class="pre">uid</span></code> (conforms to Python standard)</li>
+<li>added property <code class="docutils literal"><span class="pre">uid.is_private</span></code></li>
+<li>added definitions for storage SOP Class UIDs (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/172">#172</a>)</li>
+<li>added possibility to read only specific tags (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/95">#95</a>)</li>
+<li>added missing meta elements when writing DICOM file</li>
+<li>added <code class="docutils literal"><span class="pre">encaps</span></code> generator functions to access compressed frames</li>
+<li><code class="docutils literal"><span class="pre">read_file</span></code> changed to <code class="docutils literal"><span class="pre">dcmread</span></code>, <code class="docutils literal"><span class="pre">write_file</span></code> to <code class="docutils literal"><span class="pre">dcmwrite</span></code> for
+greater clarity. Previous names still available for backwards compatibility.</li>
 </ul>
 </div>
-<div class="section" id="other-changes">
-<h3>Other changes<a class="headerlink" href="#other-changes" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="infrastructure">
+<h3>Infrastructure<a class="headerlink" href="#infrastructure" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li>updated doc strings for common functions</li>
-<li>UID.py now uid.py to match python style guide</li>
-<li>added util/fixer.py – callbacks available to fix dicom non-compliant values
-before exceptions thrown</li>
+<li>added <a class="reference external" href="https://travis-ci.org/pydicom/pydicom/">TravisCI</a> and
+<a class="reference external" href="https://ci.appveyor.com/project/pydicom/pydicom">AppVeyor</a> builds for
+automatic tests under Linux and Windows</li>
+<li>added automatic <a class="reference external" href="https://codecov.io/gh/pydicom/pydicom">code coverage builds</a>
+and PEP-8 checks</li>
+<li>added automatic <a class="reference external" href="https://circleci.com/gh/pydicom/pydicom">documentation builds</a>
+on GitHub Pages for <a class="reference external" href="https://pydicom.github.io/pydicom/dev">development</a>
+and <a class="reference external" href="https://pydicom.github.io/pydicom/stable/">release</a> builds</li>
 <li>added PyPy support</li>
-<li>added util/leanread.py – very bare-bones reading (for fastest possible speed)</li>
-<li>added misc/is_dicom function – return True if a dicom file</li>
-<li>added context management methods to Dataset</li>
-<li>added date/time converters <a class="reference external" href="https://github.com/pydicom/pydicom/issues/143">#143</a></li>
-<li>fixed pixel handling for <code class="docutils literal"><span class="pre">PlanarConfiguration=0</span></code></li>
-<li>updated uid generation to ensure uniqueness</li>
-<li>added some heuristics to accept files with missing preamble and file_meta</li>
-<li>added <code class="docutils literal"><span class="pre">from_name()</span></code> method to UID class, to generate UID instance from
-descriptive name</li>
-<li>added ability to add custom dicom dictionary items via <code class="docutils literal"><span class="pre">add_dict_entry()</span></code>
-and <code class="docutils literal"><span class="pre">add_dict_entries()</span></code></li>
-<li>more methods for DataElement – keyword, is_retired, etc.</li>
-<li>some support for pickle, cpickle</li>
-<li>fixes/additions for some character set encodings</li>
+<li>removed support for Python 2.6, added support for Python 3.6</li>
+</ul>
+</div>
+<div class="section" id="fixes">
+<h3>Fixes<a class="headerlink" href="#fixes" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>correctly handle PlanarConfiguration==0 (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/151">#151</a>)</li>
+<li>updated uid generation to ensure uniqueness (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/125">#125</a>)</li>
+<li>handle missing patient data in <code class="docutils literal"><span class="pre">show_dicomdir</span></code></li>
+<li>assume default transfer syntax if none in file meta  (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/258">#258</a>)</li>
+<li>fixed reading/writing of empty tags and tags with bad VR</li>
+<li>fixed reading AE elements with leading or trailing spaces</li>
+<li>fixed handling of ambiguous VR elements</li>
+<li>fixed handling for several error conditions</li>
+<li>fixed Latin5 (Turkish) character set handling</li>
+<li>a lot of other small fixes…</li>
 </ul>
 </div>
 </div>

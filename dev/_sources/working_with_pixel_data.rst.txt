@@ -4,7 +4,7 @@
 Working with Pixel Data
 =======================
 
-..currentmodule:: pydicom
+.. currentmodule:: pydicom
 
 .. rubric:: How to work with pixel data in pydicom.
 
