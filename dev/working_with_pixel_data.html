@@ -225,8 +225,9 @@ them …</p>
 installed on your system.</p>
 </div>
 <p>A property of <a class="reference internal" href="ref_guide.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal"><span class="pre">dataset.Dataset</span></code></a> called <code class="docutils literal"><span class="pre">pixel_array</span></code> provides more
-useful pixel data for uncompressed images. The <code class="docutils literal"><span class="pre">pixel_array</span></code> property returns
-a NumPy array:</p>
+useful pixel data for uncompressed and compressed images
+(<a class="reference internal" href="image_data_handlers.html"><span class="doc">decompressing compressed images if supported</span></a>).
+The <code class="docutils literal"><span class="pre">pixel_array</span></code> property returns a NumPy array:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">pixel_array</span> 
 <span class="go">array([[ 905, 1019, 1227, ...,  302,  304,  328],</span>
 <span class="go">       [ 628,  770,  907, ...,  298,  331,  355],</span>
@@ -241,13 +242,23 @@ a NumPy array:</p>
 </div>
 <p>NumPy can be used to modify the pixels, but if the changes are to be saved,
 they must be written back to the <code class="docutils literal"><span class="pre">PixelData</span></code> attribute:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">n</span><span class="p">,</span><span class="n">val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">pixel_array</span><span class="o">.</span><span class="n">flat</span><span class="p">):</span> <span class="c1"># example: zero anything &lt; 300</span>
-<span class="gp">... </span>    <span class="k">if</span> <span class="n">val</span> <span class="o">&lt;</span> <span class="mi">300</span><span class="p">:</span>
-<span class="gp">... </span>        <span class="n">ds</span><span class="o">.</span><span class="n">pixel_array</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">=</span><span class="mi">0</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">pixel_array</span><span class="o">.</span><span class="n">tostring</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><span class="s2">&quot;newfilename.dcm&quot;</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">..</span> <span class="n">code</span><span class="o">-</span><span class="n">block</span><span class="p">::</span> <span class="n">python</span>
 </pre></div>
 </div>
+<blockquote>
+<div><dl class="docutils">
+<dt>for n,val in enumerate(ds.pixel_array.flat): # example: zero anything &lt; 300</dt>
+<dd><dl class="first last docutils">
+<dt>if val &lt; 300:</dt>
+<dd>ds.pixel_array.flat[n]=0</dd>
+</dl>
+</dd>
+</dl>
+<p>ds.PixelData = ds.pixel_array.tostring()
+ds.save_as(“newfilename.dcm”)</p>
+<p>import os
+os.remove(“newfilename.dcm”)</p>
+</div></blockquote>
 <p>Some changes may require other DICOM tags to be modified. For example, if the
 pixel data is reduced (e.g. a <img class="math" src="_images/math/d72b335725fd86466c687f792396cb4120b0eeed.png" alt="512 \times 512"/> image is collapsed to
 <img class="math" src="_images/math/459c4906bea7c4dc223f826a88f8d1083af8e692.png" alt="256 \times 256"/>) then <code class="docutils literal"><span class="pre">ds.Rows</span></code> and <code class="docutils literal"><span class="pre">ds.Columns</span></code> should be set

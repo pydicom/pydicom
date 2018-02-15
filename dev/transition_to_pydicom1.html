@@ -205,9 +205,9 @@
 breaks with the previous release of pydicom (0.9.9) in several ways.  These
 require changes to user code to target the pydicom &gt;= 1.0 package, or to check
 and deal with the differences between the versions.</p>
-<dl class="docutils">
-<dt>Backwards-compatible changes post 1.0</dt>
-<dd><ul class="first last simple">
+<p>Backwards-incompatible changes post 1.0</p>
+<blockquote>
+<div><ul class="simple">
 <li>the library is no longer <code class="docutils literal"><span class="pre">dicom</span></code> but is <code class="docutils literal"><span class="pre">pydicom</span></code>, to match the package
 name</li>
 <li>short-form names such as <code class="docutils literal"><span class="pre">Beams</span></code> are no longer allowed; use the full
@@ -215,8 +215,7 @@ keyword e.g. <code class="docutils literal"><span class="pre">BeamSequence</span
 <li>some less-used modules within pydicom have been renamed, e.g. <code class="docutils literal"><span class="pre">dicom.UID</span></code>
 is now <code class="docutils literal"><span class="pre">pydicom.uid</span></code></li>
 </ul>
-</dd>
-</dl>
+</div></blockquote>
 <p>Why was the package name changed?  There are several reasons for this change:</p>
 <blockquote>
 <div><ul class="simple">
@@ -277,8 +276,9 @@ syntax.</p>
 <p>In this case you likely have installed pydicom &gt;= 1.0, and so <code class="docutils literal"><span class="pre">dicom</span></code> library
 does not exist.  You can simply <code class="docutils literal"><span class="pre">import</span> <span class="pre">pydicom</span></code> instead, and continue with
 the new pydicom, or, if you really need the old pydicom, then you should:</p>
-<blockquote>
-<div>pip install dicom</div></blockquote>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">dicom</span>
+</pre></div>
+</div>
 <p>and you should be good to go.</p>
 </div>
 </div>

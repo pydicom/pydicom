@@ -229,9 +229,10 @@ images. It is designed to let you manipulate data elements in DICOM files with
 python code.</p>
 <p>pydicom is easy to install and use, and because it is a pure python package, it
 should run anywhere python runs.</p>
-<p>One limitation of pydicom: compressed pixel data (e.g. JPEG) cannot be altered
-in an intelligent way as it can be for uncompressed pixels.  Files can always
-be read and saved, but compressed pixel data cannot easily be modified.</p>
+<p>One limitation of pydicom: compressed pixel data (e.g. JPEG) can only be
+altered in an intelligent way if <a class="reference internal" href="image_data_handlers.html"><span class="doc">decompressing</span></a>
+them first. Once decompressed, they can be altered and written back to a
+DICOM file the same way as initially uncompressed data.</p>
 </div>
 <div class="section" id="license">
 <h2>License<a class="headerlink" href="#license" title="Permalink to this headline">¶</a></h2>
@@ -245,33 +246,40 @@ required if manipulating pixel data).</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">In addition to the instructions below, pydicom can also be installed
-through the <a class="reference external" href="http://www.pythonxy.com/">Python(x,y)</a> distribution, which
-can install python and a number of packages <a class="footnote-reference" href="#id5" id="id3">[2]</a> (including pydicom) at
-once.</p>
+through the <a class="reference external" href="https://sourceforge.net/projects/python-xy/">Python(x,y)</a>
+distribution, which can install python and a number of packages <a class="footnote-reference" href="#id5" id="id3">[2]</a>
+(including pydicom) at once.</p>
 </div>
 <div class="section" id="prerequisites">
 <h3>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Python 2.7, 3.4 or later</li>
-<li>Optional dependencies:
-* numpy
-* pillow
-* gdcm
-* jpeg_ls
-* jpeg2000</li>
+<li><dl class="first docutils">
+<dt>Optional dependencies:</dt>
+<dd><ul class="first last">
+<li>numpy</li>
+<li>pillow</li>
+<li>gdcm</li>
+<li>jpeg_ls</li>
+<li>jpeg2000</li>
 </ul>
-<p>We encourage you to use <a class="reference external" href="https://conda.io/miniconda.html">minconda</a> or
-<a class="reference external" href="https://docs.continuum.io/anaconda/">anaconda</a> which is cross-platforms
+</dd>
+</dl>
+</li>
+</ul>
+<p>We encourage you to use <a class="reference external" href="https://conda.io/miniconda.html">Miniconda</a> or
+<a class="reference external" href="https://docs.continuum.io/anaconda/">Anaconda</a> which is cross-platforms
 compatible.</p>
 </div>
 <div class="section" id="installing-pydicom">
 <h3>Installing pydicom<a class="headerlink" href="#installing-pydicom" title="Permalink to this headline">¶</a></h3>
-<p>pydicom is currently available on the PyPi’s repositories and you can install using <code class="docutils literal"><span class="pre">pip</span></code>:</p>
+<p>pydicom is currently available on <a class="reference external" href="https://pypi.python.org/pypi/pydicom/">PyPi</a>
+and you can install it using <code class="docutils literal"><span class="pre">pip</span></code>:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">U</span> <span class="n">pydicom</span>
 </pre></div>
 </div>
-<p>If you prefer, you can clone it and run the setup.py file. Use the following
-commands to get a copy from Github and install all dependencies:</p>
+<p>If you prefer, you can clone it and run the <code class="docutils literal"><span class="pre">setup.py</span></code> file. Use the
+following commands to get a copy from GitHub and install all dependencies:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">pydicom</span><span class="o">/</span><span class="n">pydicom</span><span class="o">.</span><span class="n">git</span>
 <span class="n">cd</span> <span class="n">pydicom</span>
 <span class="n">pip</span> <span class="n">install</span> <span class="o">.</span>
@@ -298,7 +306,7 @@ commands to get a copy from Github and install all dependencies:</p>
 <h2>Using pydicom<a class="headerlink" href="#using-pydicom" title="Permalink to this headline">¶</a></h2>
 <p>Once installed, the package can be imported at a python command line or used
 in your own python program with <code class="docutils literal"><span class="pre">import</span> <span class="pre">pydicom</span></code>.
-See the <a class="reference external" href="https://github.com/pydicom/pydicom/tree/dev/pydicom/examples">examples directory</a>
+See the <a class="reference external" href="https://github.com/pydicom/pydicom/tree/master/examples">examples directory</a>
 for both kinds of uses. Also see the <a class="reference internal" href="pydicom_user_guide.html"><span class="doc">User Guide</span></a>
 for more details of how to use the package.</p>
 </div>
@@ -306,7 +314,7 @@ for more details of how to use the package.</p>
 <h2>Support<a class="headerlink" href="#support" title="Permalink to this headline">¶</a></h2>
 <p>Please join the <a class="reference external" href="http://groups.google.com/group/pydicom">pydicom discussion group</a> to ask questions or give feedback.
 Bugs can be submitted through the <a class="reference external" href="https://github.com/pydicom/pydicom/issues">issue tracker</a>.  Besides the example directory,
-cookbook recipes are encouraged to be posted on the <a class="reference external" href="https://github.com/pydicom/pydicom/wiki">wiki page</a></p>
+cookbook recipes are encouraged to be posted on the <a class="reference external" href="https://github.com/pydicom/pydicom/wiki">wiki page</a>.</p>
 <p>New versions, major bug fixes, etc. will also be announced through the group.</p>
 </div>
 <div class="section" id="next-steps">
@@ -316,7 +324,9 @@ cookbook recipes are encouraged to be posted on the <a class="reference external
 <table class="docutils footnote" frame="void" id="id4" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>For DICOM network capabilities, see the <a class="reference external" href="https://github.com/patmun/pynetdicom">pynetdicom</a> project.</td></tr>
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>For DICOM network capabilities, see the
+<a class="reference external" href="https://github.com/patmun/pynetdicom">pynetdicom</a> and the newer
+<a class="reference external" href="https://github.com/pydicom/pynetdicom3">pynetetdicom3</a> projects.</td></tr>
 </tbody>
 </table>
 <table class="docutils footnote" frame="void" id="id5" rules="none">
@@ -324,7 +334,8 @@ cookbook recipes are encouraged to be posted on the <a class="reference external
 <tbody valign="top">
 <tr><td class="label"><a class="fn-backref" href="#id3">[2]</a></td><td>If using python(x,y), other packages you might be interested in include IPython
 (an indispensable interactive shell with auto-completion, history etc),
-Numpy (optionally used by pydicom for pixel data), and ITK/VTK or PIL (image processing and visualization).</td></tr>
+Numpy (optionally used by pydicom for pixel data), and ITK/VTK or PIL
+(image processing and visualization).</td></tr>
 </tbody>
 </table>
 </div>
