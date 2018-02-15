@@ -53,7 +53,7 @@ The ``pixel_array`` property returns a NumPy array::
   (64, 64)
 
 NumPy can be used to modify the pixels, but if the changes are to be saved,
-they must be written back to the ``PixelData`` attribute::
+they must be written back to the ``PixelData`` attribute:
 
 .. code-block:: python
 
