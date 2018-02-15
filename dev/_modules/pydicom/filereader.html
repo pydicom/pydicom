@@ -192,8 +192,7 @@
 
 <span class="c1"># Need zlib and io.BytesIO for deflate-compressed file</span>
 <span class="kn">from</span> <span class="nn">io</span> <span class="k">import</span> <span class="n">BytesIO</span>
-<span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">stat</span>
-<span class="kn">import</span> <span class="nn">os.path</span>
+<span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">struct</span> <span class="k">import</span> <span class="p">(</span><span class="n">Struct</span><span class="p">,</span> <span class="n">unpack</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">sys</span> <span class="k">import</span> <span class="n">byteorder</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
@@ -1126,8 +1125,8 @@
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;Deferred read -- original file &quot;</span>
                       <span class="s2">&quot;</span><span class="si">{0:s}</span><span class="s2"> is missing&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filename</span><span class="p">))</span>
-    <span class="k">if</span> <span class="n">stat</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span><span class="n">timestamp</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
-        <span class="n">statinfo</span> <span class="o">=</span> <span class="n">stat</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">timestamp</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">statinfo</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">statinfo</span><span class="o">.</span><span class="n">st_mtime</span> <span class="o">!=</span> <span class="n">timestamp</span><span class="p">:</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Deferred read warning -- file modification time &quot;</span>
                           <span class="s2">&quot;has changed.&quot;</span><span class="p">)</span>
