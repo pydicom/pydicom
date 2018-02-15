@@ -13,7 +13,8 @@ breaks with the previous release of pydicom (0.9.9) in several ways.  These
 require changes to user code to target the pydicom >= 1.0 package, or to check
 and deal with the differences between the versions.
 
-Backwards-compatible changes post 1.0
+Backwards-incompatible changes post 1.0
+
   * the library is no longer ``dicom`` but is ``pydicom``, to match the package
     name
   * short-form names such as ``Beams`` are no longer allowed; use the full
@@ -81,7 +82,7 @@ dicom`` will look like::
 
 In this case you likely have installed pydicom >= 1.0, and so ``dicom`` library
 does not exist.  You can simply ``import pydicom`` instead, and continue with
-the new pydicom, or, if you really need the old pydicom, then you should:
+the new pydicom, or, if you really need the old pydicom, then you should::
 
   pip install dicom
 

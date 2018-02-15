@@ -37,8 +37,9 @@ them ...
     installed on your system.
 
 A property of :class:`dataset.Dataset` called ``pixel_array`` provides more
-useful pixel data for uncompressed images. The ``pixel_array`` property returns
-a NumPy array::
+useful pixel data for uncompressed and compressed images
+(:doc:`decompressing compressed images if supported </image_data_handlers>`).
+The ``pixel_array`` property returns a NumPy array::
 
   >>> ds.pixel_array # doctest: +NORMALIZE_WHITESPACE
   array([[ 905, 1019, 1227, ...,  302,  304,  328],
@@ -54,15 +55,16 @@ a NumPy array::
 NumPy can be used to modify the pixels, but if the changes are to be saved,
 they must be written back to the ``PixelData`` attribute::
 
-  >>> for n,val in enumerate(ds.pixel_array.flat): # example: zero anything < 300
-  ...     if val < 300:
-  ...         ds.pixel_array.flat[n]=0
-  >>> ds.PixelData = ds.pixel_array.tostring()
-  >>> ds.save_as("newfilename.dcm")
+.. code-block:: python
 
-..
-  >>> import os
-  >>> os.remove("newfilename.dcm")
+  for n,val in enumerate(ds.pixel_array.flat): # example: zero anything < 300
+      if val < 300:
+          ds.pixel_array.flat[n]=0
+  ds.PixelData = ds.pixel_array.tostring()
+  ds.save_as("newfilename.dcm")
+
+  import os
+  os.remove("newfilename.dcm")
 
 Some changes may require other DICOM tags to be modified. For example, if the
 pixel data is reduced (e.g. a :math:`512 \times 512` image is collapsed to
