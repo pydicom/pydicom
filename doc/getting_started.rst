@@ -72,12 +72,12 @@ Prerequisites
 
 * Python 2.7, 3.4 or later
 * Optional dependencies:
-  * numpy
-  * pillow
-  * gdcm
-  * jpeg_ls
-  * jpeg2000
-  * pytest (if running pydicom's test suite)
+   * numpy
+   * pillow
+   * gdcm
+   * jpeg_ls
+   * jpeg2000
+   * pytest (if running pydicom's test suite)
 
 
 Installing pydicom
@@ -100,10 +100,13 @@ we encourage you to use `Miniconda <https://conda.io/miniconda.html>`_ or
 
   conda create --name pydicomenv python=3.6 pip pydicom numpy
 
-will install pip, pydicom, and numpy in an environment called pydicomenv.  To add gdcm::
+will install pip, pydicom, and numpy in an environment called pydicomenv.  
+To add gdcm after activating the environment::
 
   conda install -c clinicalgraphics gdcm
 
+The environment is optional; see the conda software for details of its setup 
+and use of environments.
 
 For developers, you can clone the pydicom repository and run 
 the ``setup.py`` file. Use the following commands to get a copy 
