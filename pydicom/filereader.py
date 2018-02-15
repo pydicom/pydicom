@@ -9,8 +9,7 @@ from __future__ import absolute_import
 
 # Need zlib and io.BytesIO for deflate-compressed file
 from io import BytesIO
-from os import stat
-import os.path
+import os
 from struct import (Struct, unpack)
 from sys import byteorder
 import warnings
@@ -943,8 +942,8 @@ def read_deferred_data_element(fileobj_type, filename, timestamp,
     if not os.path.exists(filename):
         raise IOError(u"Deferred read -- original file "
                       "{0:s} is missing".format(filename))
-    if stat is not None and (timestamp is not None):
-        statinfo = stat(filename)
+    if timestamp is not None:
+        statinfo = os.stat(filename)
         if statinfo.st_mtime != timestamp:
             warnings.warn("Deferred read warning -- file modification time "
                           "has changed.")

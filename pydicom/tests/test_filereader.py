@@ -1,4 +1,3 @@
-# coding: utf-8
 # -*- coding: utf-8 -*-
 """unittest tests for pydicom.filereader module"""
 # Copyright (c) 2010-2012 Darcy Mason
@@ -9,9 +8,6 @@
 import gzip
 from io import BytesIO
 import os
-from os import stat
-import os.path
-from re import compile
 import shutil
 import sys
 import tempfile
@@ -26,10 +22,7 @@ from pydicom.filereader import dcmread
 from pydicom.dataelem import DataElement, DataElement_from_raw
 from pydicom.errors import InvalidDicomError
 from pydicom.filebase import DicomBytesIO
-from pydicom.filereader import (read_file, data_element_generator,
-                                read_dataset, read_sequence,
-                                read_sequence_item, read_file_meta_info,
-                                read_dicomdir)
+from pydicom.filereader import data_element_generator
 from pydicom.tag import Tag, TupleTag
 from pydicom.uid import ImplicitVRLittleEndian
 import pydicom.valuerep
@@ -101,57 +94,6 @@ emri_jpeg_2k_lossless = get_testdata_files(
 color_3d_jpeg_baseline = get_testdata_files("color3d_jpeg_baseline.dcm")[0]
 dir_name = os.path.dirname(sys.argv[0])
 save_dir = os.getcwd()
-
-
-def assert_warns_regex(type_warn, message, func, *args, **kwargs):
-    """Test a warning against an expected warning.
-
-    Only tests that the first `type_warn` warning fired matches the expected
-    warning.
-
-    Parameters
-    ----------
-    type_warn : Warning
-        The expected warning.
-    message : str
-        A string that will be used as a regex pattern to match against the
-        actual warning message. If using the actual expected message don't
-        forget to escape any regex special characters like '|', '(', ')', etc.
-    func : callable
-        The function that is expected to fire the warning.
-    args
-        The callable function `func`'s arguments.
-    kwargs
-        The callable function `func`'s keyword arguments.
-
-    Raises
-    ------
-    AssertionError
-        If the regex pattern in `message` doesn't match the actual warning.
-    """
-    with pytest.warns(None) as wrnrecord:
-        func(*args, **kwargs)
-
-    wrn = wrnrecord.pop(type_warn)
-    regex = compile(message)
-    if regex.search(str(wrn.message)) is None:
-        msg = "Pattern '{}' not found in warnings".format(message)
-        raise AssertionError(msg)
-
-
-def isClose(a, b, epsilon=0.000001):
-    """Compare within some tolerance, to avoid machine roundoff differences"""
-    try:
-        a.append  # see if is a list
-    except BaseException:  # (is not)
-        return abs(a - b) < epsilon
-    else:
-        if len(a) != len(b):
-            return False
-        for ai, bi in zip(a, b):
-            if abs(ai - bi) > epsilon:
-                return False
-        return True
 
 
 class ReaderTests(unittest.TestCase):
@@ -867,10 +809,10 @@ class DeferredReadTests(unittest.TestCase):
         def read_value():
             ds.PixelData
 
-        assert_warns_regex(UserWarning,
-                           "Deferred read warning -- file modification "
-                           "time has changed",
-                           read_value)
+        with pytest.warns(UserWarning,
+                          match="Deferred read warning -- file modification "
+                                "time has changed"):
+            read_value()
 
     def testFileExists(self):
         """Deferred read raises error if file no longer exists....."""
@@ -997,10 +939,10 @@ class TestDataElementGenerator(object):
     def test_little_endian_explicit(self):
         """Test reading little endian explicit VR data"""
         # (0010, 0010) PatientName PN 6 ABCDEF
-        bytestream = b'\x10\x00\x10\x00' \
-                     b'\x50\x4E' \
-                     b'\x06\x00' \
-                     b'\x41\x42\x43\x44\x45\x46'
+        bytestream = (b'\x10\x00\x10\x00'
+                      b'PN'
+                      b'\x06\x00'
+                      b'ABCDEF')
         fp = BytesIO(bytestream)
         # fp, is_implicit_VR, is_little_endian,
         gen = data_element_generator(fp, False, True)
@@ -1012,78 +954,25 @@ class TestDataElementGenerator(object):
         # (0010, 0010) PatientName PN 6 ABCDEF
         bytestream = b'\x10\x00\x10\x00' \
                      b'\x06\x00\x00\x00' \
-                     b'\x41\x42\x43\x44\x45\x46'
+                     b'ABCDEF'
         fp = BytesIO(bytestream)
-        # fp, is_implicit_VR, is_little_endian,
-        gen = data_element_generator(fp, True, True)
+        gen = data_element_generator(fp, is_implicit_VR=True,
+                                     is_little_endian=True)
         elem = DataElement(0x00100010, 'PN', 'ABCDEF')
         assert elem == DataElement_from_raw(next(gen), 'ISO_IR 100')
-
-    def test_extra_length_vr(self):
-        pass
-
-    def test_undefined_length(self):
-        pass
 
     def test_big_endian_explicit(self):
         """Test reading big endian explicit VR data"""
         # (0010, 0010) PatientName PN 6 ABCDEF
         bytestream = b'\x00\x10\x00\x10' \
-                     b'\x50\x4E' \
+                     b'PN' \
                      b'\x00\x06' \
-                     b'\x41\x42\x43\x44\x45\x46'
+                     b'ABCDEF'
         fp = BytesIO(bytestream)
         # fp, is_implicit_VR, is_little_endian,
         gen = data_element_generator(fp, False, False)
         elem = DataElement(0x00100010, 'PN', 'ABCDEF')
         assert elem == DataElement_from_raw(next(gen), 'ISO_IR 100')
-
-    def test_stop_when(self):
-        pass
-
-    def test_encoding(self):
-        pass
-
-    def test_specific_tags(self):
-        pass
-
-    def test_debugging(self):
-        pass
-
-
-class TestReadDataset(object):
-    """Test filereader.read_dataset"""
-    def test(self):
-        """"""
-        pass
-
-
-class TestReadSequence(object):
-    """Test filereader.read_sequence"""
-    def test(self):
-        """"""
-        pass
-
-
-class TestReadSequenceItem(object):
-    """Test filereader.read_sequence_item"""
-    def test(self):
-        """"""
-        pass
-
-
-class TestReadFileMetaInfo(object):
-    """Test filereader.read_file_meta_info"""
-    def test(self):
-        """"""
-        pass
-
-
-class TestReadDicomDir(object):
-    """Test filereader.read_dicomdir"""
-    def test(self):
-        """"""
-        pass
 
 
 if __name__ == "__main__":

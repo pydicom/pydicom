@@ -90,7 +90,6 @@ class CharsetTests(unittest.TestCase):
                     '\033$B$d$^$@\033(B^\033$B$?$m$&\033(B')
         self.assertEqual(expected, ds.PatientName)
 
-    @pytest.mark.skipif(not in_py2, reason='Fails with python3 due to #466')
     def test_bad_charset(self):
         """Test bad charset defaults to ISO IR 6"""
         # Python 3: elem.value is PersonName3, Python 2: elem.value is str

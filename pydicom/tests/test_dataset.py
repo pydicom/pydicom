@@ -1,7 +1,6 @@
 # Copyright 2008-2017 pydicom authors. See LICENSE file for details.
 """Tests for dataset.py"""
 
-import os
 import unittest
 
 import pytest
@@ -15,33 +14,6 @@ from pydicom.filebase import DicomBytesIO
 from pydicom.sequence import Sequence
 from pydicom.tag import Tag
 from pydicom.uid import ImplicitVRLittleEndian, JPEGBaseLineLossy8bit
-
-
-def assert_raises_regex(type_error, message, func, *args, **kwargs):
-    """Test a raised exception against an expected exception.
-
-    Parameters
-    ----------
-    type_error : Exception
-        The expected raised exception.
-    message : str
-        A string that will be used as a regex pattern to match against the
-        actual exception message. If using the actual expected message don't
-        forget to escape any regex special characters like '|', '(', ')', etc.
-    func : callable
-        The function that is expected to raise the exception.
-    args
-        The callable function `func`'s arguments.
-    kwargs
-        The callable function `func`'s keyword arguments.
-
-    Notes
-    -----
-    Taken from https://github.com/glemaitre/specio, BSD 3 license.
-    """
-    with pytest.raises(type_error) as excinfo:
-        func(*args, **kwargs)
-    excinfo.match(message)
 
 
 class DatasetTests(unittest.TestCase):
@@ -275,9 +247,9 @@ class DatasetTests(unittest.TestCase):
     def test_get_raises(self):
         """Test Dataset.get() raises exception when invalid Tag"""
         ds = self.dummy_dataset()
-        assert_raises_regex(TypeError,
-                            'Dataset.get key must be a string or tag',
-                            ds.get, (-0x0010, 0x0010))
+        with pytest.raises(TypeError,
+                           match='Dataset.get key must be a string or tag'):
+            ds.get(-0x0010, 0x0010)
 
     def testGetFromRaw(self):
         """Dataset: get(tag) returns same object as ds[tag] for raw element."""
@@ -881,9 +853,8 @@ class DatasetTests(unittest.TestCase):
             def test(self):
                 raise ValueError("Random ex message!")
 
-        assert_raises_regex(ValueError,
-                            "Random ex message!",
-                            getattr, DSException(), 'test')
+        with pytest.raises(ValueError, match="Random ex message!"):
+                    getattr(DSException(), 'test')
 
     def test_is_uncompressed_transfer_syntax(self):
         """Test Dataset._is_uncompressed_transfer_syntax"""
