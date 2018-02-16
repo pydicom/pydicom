@@ -39,7 +39,6 @@ from pydicom.filewriter import dcmwrite, write_file
 from pydicom.sequence import Sequence
 
 from ._version import __version__
-from ._version import __version_info__
 
 __all__ = ['DataElement',
            'Dataset',
@@ -49,5 +48,4 @@ __all__ = ['DataElement',
            'dcmwrite',
            'read_file',
            'write_file',
-           '__version__',
-           '__version_info__']
+           '__version__']
