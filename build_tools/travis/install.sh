@@ -50,7 +50,8 @@ if [[ "$DISTRIB" == "conda" ]]; then
     fi
     if [[ "$JPEG_LS" == "true" ]]; then
         conda install --yes cython
-        pip install git+https://github.com/Who8MyLunch/CharPyLS
+        export MSCV=False
+        pip install git+https://github.com/glemaitre/CharPyLS
     fi
     if [[ "$GDCM" == "true" ]]; then
         conda install --yes -c conda-forge gdcm
