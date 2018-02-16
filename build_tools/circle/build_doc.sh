@@ -115,7 +115,7 @@ conda install --yes --quiet -c conda-forge gdcm
 pip install sphinx-gallery
 
 # Build and install pydicom in dev mode
-python install -e .
+pip install -e .
 
 # The pipefail is requested to propagate exit code
 set -o pipefail && cd doc && make $MAKE_TARGET 2>&1 | tee ~/log.txt
