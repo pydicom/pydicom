@@ -1,6 +1,3 @@
-# coding: utf-8
-
-# test_filereader.py
 # -*- coding: utf-8 -*-
 """unittest tests for pydicom.filereader module"""
 # Copyright (c) 2010-2012 Darcy Mason
@@ -11,41 +8,30 @@
 import gzip
 from io import BytesIO
 import os
-import os.path
 import shutil
 import sys
 import tempfile
 import unittest
 
-from pydicom.filebase import DicomBytesIO
-from pydicom.util.testing.warncheck import assertWarns
+import pytest
+
+import pydicom.config
 from pydicom.dataset import Dataset, FileDataset
 from pydicom.data import get_testdata_files
-from pydicom.dataelem import DataElement
-from pydicom.filereader import dcmread, data_element_generator
+from pydicom.filereader import dcmread
+from pydicom.dataelem import DataElement, DataElement_from_raw
 from pydicom.errors import InvalidDicomError
+from pydicom.filebase import DicomBytesIO
+from pydicom.filereader import data_element_generator
 from pydicom.tag import Tag, TupleTag
 from pydicom.uid import ImplicitVRLittleEndian
 import pydicom.valuerep
-import pydicom.config
-try:
-    unittest.skipUnless
-except AttributeError:
-    try:
-        import unittest2 as unittest
-    except ImportError:
-        print("unittest2 is required for testing in python2.6")
+
 have_gdcm_handler = True
 try:
     import pydicom.pixel_data_handlers.gdcm_handler as gdcm_handler
 except ImportError as e:
     have_gdcm_handler = False
-# os.stat is only available on Unix and Windows   XXX Mac?
-# Not sure if on other platforms the import fails, or the call to it??
-try:
-    from os import stat  # NOQA
-except ImportError:
-    stat = None
 
 try:
     import numpy  # NOQA
@@ -108,21 +94,6 @@ emri_jpeg_2k_lossless = get_testdata_files(
 color_3d_jpeg_baseline = get_testdata_files("color3d_jpeg_baseline.dcm")[0]
 dir_name = os.path.dirname(sys.argv[0])
 save_dir = os.getcwd()
-
-
-def isClose(a, b, epsilon=0.000001):
-    """Compare within some tolerance, to avoid machine roundoff differences"""
-    try:
-        a.append  # see if is a list
-    except BaseException:  # (is not)
-        return abs(a - b) < epsilon
-    else:
-        if len(a) != len(b):
-            return False
-        for ai, bi in zip(a, b):
-            if abs(ai - bi) > epsilon:
-                return False
-        return True
 
 
 class ReaderTests(unittest.TestCase):
@@ -828,19 +799,20 @@ class DeferredReadTests(unittest.TestCase):
         shutil.copyfile(ct_name, self.testfile_name)
 
     def testTimeCheck(self):
-        """Deferred read warns if file has been modified..........."""
-        if stat is not None:
-            ds = dcmread(self.testfile_name, defer_size='2 kB')
-            from time import sleep
-            sleep(1)
-            with open(self.testfile_name, "r+") as f:
-                f.write('\0')  # "touch" the file
-            warning_start = "Deferred read warning -- file modification time "
+        """Deferred read warns if file has been modified"""
+        ds = dcmread(self.testfile_name, defer_size='2 kB')
+        from time import sleep
+        sleep(0.1)
+        with open(self.testfile_name, "r+") as f:
+            f.write('\0')  # "touch" the file
 
-            def read_value():
-                ds.PixelData
+        def read_value():
+            ds.PixelData
 
-            assertWarns(self, warning_start, read_value)
+        with pytest.warns(UserWarning,
+                          match="Deferred read warning -- file modification "
+                                "time has changed"):
+            read_value()
 
     def testFileExists(self):
         """Deferred read raises error if file no longer exists....."""
@@ -960,6 +932,47 @@ class FileLikeTests(unittest.TestCase):
         # Should also be able to close the file ourselves without
         # exception raised:
         file_like.close()
+
+
+class TestDataElementGenerator(object):
+    """Test filereader.data_element_generator"""
+    def test_little_endian_explicit(self):
+        """Test reading little endian explicit VR data"""
+        # (0010, 0010) PatientName PN 6 ABCDEF
+        bytestream = (b'\x10\x00\x10\x00'
+                      b'PN'
+                      b'\x06\x00'
+                      b'ABCDEF')
+        fp = BytesIO(bytestream)
+        # fp, is_implicit_VR, is_little_endian,
+        gen = data_element_generator(fp, False, True)
+        elem = DataElement(0x00100010, 'PN', 'ABCDEF')
+        assert elem == DataElement_from_raw(next(gen), 'ISO_IR 100')
+
+    def test_little_endian_implicit(self):
+        """Test reading little endian implicit VR data"""
+        # (0010, 0010) PatientName PN 6 ABCDEF
+        bytestream = b'\x10\x00\x10\x00' \
+                     b'\x06\x00\x00\x00' \
+                     b'ABCDEF'
+        fp = BytesIO(bytestream)
+        gen = data_element_generator(fp, is_implicit_VR=True,
+                                     is_little_endian=True)
+        elem = DataElement(0x00100010, 'PN', 'ABCDEF')
+        assert elem == DataElement_from_raw(next(gen), 'ISO_IR 100')
+
+    def test_big_endian_explicit(self):
+        """Test reading big endian explicit VR data"""
+        # (0010, 0010) PatientName PN 6 ABCDEF
+        bytestream = b'\x00\x10\x00\x10' \
+                     b'PN' \
+                     b'\x00\x06' \
+                     b'ABCDEF'
+        fp = BytesIO(bytestream)
+        # fp, is_implicit_VR, is_little_endian,
+        gen = data_element_generator(fp, False, False)
+        elem = DataElement(0x00100010, 'PN', 'ABCDEF')
+        assert elem == DataElement_from_raw(next(gen), 'ISO_IR 100')
 
 
 if __name__ == "__main__":

@@ -3,14 +3,18 @@
 # This file is part of pydicom, released under a modified MIT license.
 #    See the file LICENSE included with this distribution, also
 #    available at https://github.com/pydicom/pydicom
-
 import unittest
 
-import pydicom.charset
 from pydicom.data import get_charset_files
 from pydicom.data import get_testdata_files
+from pydicom import dicomio
+import pydicom.charset
+from pydicom.compat import in_py2
 from pydicom.dataelem import DataElement
 from pydicom import dcmread
+import unittest
+import pytest
+
 
 latin1_file = get_charset_files("chrFren.dcm")[0]
 jp_file = get_charset_files("chrH31.dcm")[0]
@@ -20,7 +24,7 @@ explicit_ir6_file = get_charset_files("chrJapMultiExplicitIR6.dcm")[0]
 normal_file = get_testdata_files("CT_small.dcm")[0]
 
 
-class charsetTests(unittest.TestCase):
+class CharsetTests(unittest.TestCase):
     def testLatin1(self):
         """charset: can read and decode latin_1 file........................"""
         ds = dcmread(latin1_file)
@@ -36,7 +40,7 @@ class charsetTests(unittest.TestCase):
         for x in pydicom.charset.python_encoding.items():
             try:
                 test_string.encode(x[1])
-            except LookupError as e:
+            except LookupError:
                 found = "(was '%s')" % x[1]
                 term = "Term '%s'" % x[0]
                 message = "%s has invalid python encoding %s" % (found, term)

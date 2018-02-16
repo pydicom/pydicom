@@ -15,7 +15,8 @@ The modifications can be written again to a new file.
 As a pure python package, pydicom can run anywhere python runs without any other requirements,
 although [NumPy](http://www.numpy.org) is needed if manipulating pixel data.
 
-pydicom is not a DICOM server, and is not primarily about viewing images. It is designed to let you
+pydicom is not a DICOM server, and is not primarily about viewing images. 
+It is designed to let you
 manipulate data elements in DICOM files with python code.
 
 Limitations -- the main limitation of the current version is that _compressed_ pixel data (e.g. JPEG)
@@ -25,6 +26,15 @@ Files can always be read and saved, but compressed pixel data cannot easily be m
 Documentation
 -------------
 
-pydicom [documentation](https://pydicom.readthedocs.org/en/stable/) is available on Read The Docs.
+pydicom documentation is available on GitHub Pages both for the [development
+ (master) version](https://pydicom.github.io/pydicom/dev) and for the 
+[released version](https://pydicom.github.io/pydicom/stable).
 
-See [Getting Started](https://pydicom.readthedocs.org/en/stable/getting_started.html) for installation and basic information, and the [User Guide](https://pydicom.readthedocs.org/en/stable/pydicom_user_guide.html) for an overview of how to use the pydicom library. To contribute to pydicom, read our [contribution guide](CONTRIBUTING.md). To contribute an example or extension of pydicom that does not belong with the core software, see our contribution repository, [contrib-pydicom](https://www.github.com/pydicom/contrib-pydicom).
+See [Getting Started](https://pydicom.github.io/pydicom/stable/getting_started.html) 
+for installation and basic information, and the 
+[User Guide](https://pydicom.github.io/pydicom/stable/pydicom_user_guide.html) 
+for an overview of how to use the pydicom library. 
+To contribute to pydicom, read our [contribution guide](CONTRIBUTING.md). 
+To contribute an example or extension of pydicom that does not belong with 
+the core software, see our contribution repository, 
+[contrib-pydicom](https://www.github.com/pydicom/contrib-pydicom).
