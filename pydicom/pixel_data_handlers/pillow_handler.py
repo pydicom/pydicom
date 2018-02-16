@@ -80,7 +80,7 @@ def needs_to_convert_to_RGB(dicom_dataset):
 
 def should_change_PhotometricInterpretation_to_RGB(dicom_dataset):
     should_change = dicom_dataset.SamplesPerPixel == 3
-    return should_change
+    return False
 
 
 def get_pixeldata(dicom_dataset, frame_list=None):

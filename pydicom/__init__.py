@@ -13,8 +13,8 @@ Quick Start
 1. A simple program to read a dicom file, modify a value, and write to a new
    file::
 
-    from pydicom import dicomio
-    dataset = dicomio.dcmread("file1.dcm")
+    from pydicom.filereader import dcmread
+    dataset = dcmread("file1.dcm")
     dataset.PatientName = 'anonymous'
     dataset.save_as("file2.dcm")
 
@@ -35,7 +35,7 @@ Quick Start
 from pydicom.dataelem import DataElement
 from pydicom.dataset import Dataset, FileDataset
 from pydicom.filereader import dcmread, read_file
-from pydicom.dicomio import dcmwrite, write_file
+from pydicom.filewriter import dcmwrite, write_file
 from pydicom.sequence import Sequence
 
 from ._version import __version__

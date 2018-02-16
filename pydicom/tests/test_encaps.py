@@ -9,13 +9,6 @@ from pydicom.encaps import (generate_pixel_data_fragment, get_frame_offsets,
 from pydicom.filebase import DicomBytesIO
 
 
-def assert_raises_regex(type_error, message, func, *args, **kwargs):
-    """Taken from https://github.com/glemaitre/specio, BSD 3 license."""
-    with pytest.raises(type_error) as excinfo:
-        func(*args, **kwargs)
-    excinfo.match(message)
-
-
 class TestGetFrameOffsets(object):
     """Test encaps.get_frame_offsets"""
     def test_bad_tag(self):
@@ -26,10 +19,10 @@ class TestGetFrameOffsets(object):
                      b'\x01\x02\x03\x04\x05\x06\x07\x08'
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
-        assert_raises_regex(ValueError,
-                            "Unexpected tag '\(fffe, e100\)' when "
-                            "parsing the Basic Table Offset item.",
-                            get_frame_offsets, fp)
+        with pytest.raises(ValueError,
+                           match="Unexpected tag '\(fffe, e100\)' when "
+                                 "parsing the Basic Table Offset item."):
+            get_frame_offsets(fp)
 
     def test_bad_length_multiple(self):
         """Test raises exception if the item length is not a multiple of 4."""
@@ -39,10 +32,10 @@ class TestGetFrameOffsets(object):
                      b'\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0A'
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
-        assert_raises_regex(ValueError,
-                            "The length of the Basic Offset Table item is not "
-                            "a multiple of 4.",
-                            get_frame_offsets, fp)
+        with pytest.raises(ValueError,
+                           match="The length of the Basic Offset Table item"
+                                 " is not a multiple of 4."):
+            get_frame_offsets(fp)
 
     def test_zero_length(self):
         """Test reading BOT with zero length"""
@@ -79,9 +72,9 @@ class TestGetFrameOffsets(object):
                      b'\x00\x00\x00\x00'
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = False
-        assert_raises_regex(ValueError,
-                            "'fp.is_little_endian' must be True",
-                            get_frame_offsets, fp)
+        with pytest.raises(ValueError,
+                           match="'fp.is_little_endian' must be True"):
+            get_frame_offsets(fp)
 
 
 class TestGeneratePixelDataFragment(object):
@@ -94,11 +87,11 @@ class TestGeneratePixelDataFragment(object):
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
         fragments = generate_pixel_data_fragment(fp)
-        assert_raises_regex(ValueError,
-                            "Undefined item length at offset 4 when "
-                            "parsing the encapsulated pixel data "
-                            "fragments.",
-                            next, fragments)
+        with pytest.raises(ValueError,
+                           match="Undefined item length at offset 4 when "
+                                 "parsing the encapsulated pixel data "
+                                 "fragments."):
+            next(fragments)
         pytest.raises(StopIteration, next, fragments)
 
     def test_item_sequence_delimiter(self):
@@ -131,11 +124,11 @@ class TestGeneratePixelDataFragment(object):
         fp.is_little_endian = True
         fragments = generate_pixel_data_fragment(fp)
         assert next(fragments) == b'\x01\x00\x00\x00'
-        assert_raises_regex(ValueError,
-                            "Unexpected tag '\(0010, 0010\)' at offset 12 "
-                            "when parsing the encapsulated pixel data "
-                            "fragment items.",
-                            next, fragments)
+        with pytest.raises(ValueError,
+                           match="Unexpected tag '\(0010, 0010\)' at offset "
+                                 "12 when parsing the encapsulated pixel data "
+                                 "fragment items."):
+            next(fragments)
         pytest.raises(StopIteration, next, fragments)
 
     def test_single_fragment_no_delimiter(self):
@@ -200,9 +193,9 @@ class TestGeneratePixelDataFragment(object):
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = False
         fragments = generate_pixel_data_fragment(fp)
-        assert_raises_regex(ValueError,
-                            "'fp.is_little_endian' must be True",
-                            next, fragments)
+        with pytest.raises(ValueError,
+                           match="'fp.is_little_endian' must be True"):
+            next(fragments)
         pytest.raises(StopIteration, next, fragments)
 
 
@@ -669,10 +662,10 @@ class TestReadItem(object):
                      b'\x00\x00\x00\x01'
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
-        assert_raises_regex(ValueError,
-                            "Encapsulated data fragment had Undefined Length"
-                            " at data position 0x4",
-                            read_item, fp)
+        with pytest.raises(ValueError,
+                           match="Encapsulated data fragment had Undefined "
+                                 "Length at data position 0x4"):
+            read_item(fp)
 
     def test_item_sequence_delimiter(self):
         """Test non-zero length seq delimiter reads correctly."""

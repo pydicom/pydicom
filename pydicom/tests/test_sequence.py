@@ -55,6 +55,19 @@ class SequenceTests(unittest.TestCase):
 
         self.assertEqual(seq[0], ds, "Dataset modified during assignment")
 
+    def test_str(self):
+        """Test string output of the sequence"""
+        ds = Dataset()
+        ds.BeamSequence = [Dataset()]
+        ds.BeamSequence[0].PatientName = 'TEST'
+        ds.BeamSequence[0].PatientID = '12345'
+
+        out = str(ds.BeamSequence)
+        assert "[(0010, 0010) Patient's Name" in out
+        assert "PN: 'TEST'" in out
+        assert "(0010, 0020) Patient ID" in out
+        assert "LO: '12345']" in out
+
 
 if __name__ == "__main__":
     unittest.main()

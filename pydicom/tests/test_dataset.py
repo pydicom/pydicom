@@ -1,7 +1,6 @@
 # Copyright 2008-2017 pydicom authors. See LICENSE file for details.
-"""unittest cases for pydicom.dataset module"""
+"""Tests for dataset.py"""
 
-import os
 import unittest
 
 import pytest
@@ -10,29 +9,20 @@ from pydicom import compat
 from pydicom.data import get_testdata_files
 from pydicom.dataelem import DataElement, RawDataElement
 from pydicom.dataset import Dataset, FileDataset
-from pydicom.dicomio import dcmread
+from pydicom import dcmread
 from pydicom.filebase import DicomBytesIO
 from pydicom.sequence import Sequence
 from pydicom.tag import Tag
 from pydicom.uid import ImplicitVRLittleEndian, JPEGBaseLineLossy8bit
 
 
-def assert_raises_regex(type_error, message, func, *args, **kwargs):
-    """Taken from https://github.com/glemaitre/specio, BSD 3 license."""
-    with pytest.raises(type_error) as excinfo:
-        func(*args, **kwargs)
-    excinfo.match(message)
-
-
 class DatasetTests(unittest.TestCase):
     def failUnlessRaises(self, excClass, callableObj, *args, **kwargs):
         """Redefine unittest Exception test to return the exception object"""
-        # from http://stackoverflow.com/questions/88325/
-        # how-do-i-unit-test-an-init-method-of-a-python-class-with-assertraises
         try:
             callableObj(*args, **kwargs)
-        except excClass as excObj:
-            return excObj  # Actually return the exception object
+        except excClass as e:
+            return e
         else:
             if hasattr(excClass, '__name__'):
                 excName = excClass.__name__
@@ -257,9 +247,9 @@ class DatasetTests(unittest.TestCase):
     def test_get_raises(self):
         """Test Dataset.get() raises exception when invalid Tag"""
         ds = self.dummy_dataset()
-        assert_raises_regex(TypeError,
-                            'Dataset.get key must be a string or tag',
-                            ds.get, (-0x0010, 0x0010))
+        with pytest.raises(TypeError,
+                           match='Dataset.get key must be a string or tag'):
+            ds.get(-0x0010, 0x0010)
 
     def testGetFromRaw(self):
         """Dataset: get(tag) returns same object as ds[tag] for raw element."""
@@ -863,9 +853,8 @@ class DatasetTests(unittest.TestCase):
             def test(self):
                 raise ValueError("Random ex message!")
 
-        assert_raises_regex(ValueError,
-                            "Random ex message!",
-                            getattr, DSException(), 'test')
+        with pytest.raises(ValueError, match="Random ex message!"):
+                    getattr(DSException(), 'test')
 
     def test_is_uncompressed_transfer_syntax(self):
         """Test Dataset._is_uncompressed_transfer_syntax"""
@@ -900,6 +889,8 @@ class DatasetTests(unittest.TestCase):
     def test_formatted_lines(self):
         """Test Dataset.formatted_lines"""
         ds = Dataset()
+        with pytest.raises(StopIteration):
+            next(ds.formatted_lines())
         ds.PatientName = 'CITIZEN^Jan'
         ds.BeamSequence = [Dataset()]
         ds.BeamSequence[0].PatientID = 'JAN^Citizen'
@@ -913,6 +904,8 @@ class DatasetTests(unittest.TestCase):
         assert next(line_generator) == "(0010, 0010)"
         assert next(line_generator) == "Beam Sequence (300a, 00b0)"
         assert next(line_generator) == "(0010, 0020)"
+        with pytest.raises(StopIteration):
+            next(line_generator)
 
     def test_set_convert_private_elem_from_raw(self):
         """Test Dataset.__setitem__ with a raw private element"""

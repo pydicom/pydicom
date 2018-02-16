@@ -3,14 +3,18 @@
 # This file is part of pydicom, released under a modified MIT license.
 #    See the file LICENSE included with this distribution, also
 #    available at https://github.com/pydicom/pydicom
-
 import unittest
 
-import pydicom.charset
-from pydicom import dicomio
 from pydicom.data import get_charset_files
 from pydicom.data import get_testdata_files
+from pydicom import dicomio
+import pydicom.charset
+from pydicom.compat import in_py2
 from pydicom.dataelem import DataElement
+from pydicom import dcmread
+import unittest
+import pytest
+
 
 latin1_file = get_charset_files("chrFren.dcm")[0]
 jp_file = get_charset_files("chrH31.dcm")[0]
@@ -20,10 +24,10 @@ explicit_ir6_file = get_charset_files("chrJapMultiExplicitIR6.dcm")[0]
 normal_file = get_testdata_files("CT_small.dcm")[0]
 
 
-class charsetTests(unittest.TestCase):
+class CharsetTests(unittest.TestCase):
     def testLatin1(self):
         """charset: can read and decode latin_1 file........................"""
-        ds = dicomio.dcmread(latin1_file)
+        ds = dcmread(latin1_file)
         ds.decode()
         # Make sure don't get unicode encode error on converting to string
         expected = u'Buc^J\xe9r\xf4me'
@@ -36,7 +40,7 @@ class charsetTests(unittest.TestCase):
         for x in pydicom.charset.python_encoding.items():
             try:
                 test_string.encode(x[1])
-            except LookupError as e:
+            except LookupError:
                 found = "(was '%s')" % x[1]
                 term = "Term '%s'" % x[0]
                 message = "%s has invalid python encoding %s" % (found, term)
@@ -44,7 +48,7 @@ class charsetTests(unittest.TestCase):
 
     def testNestedCharacterSets(self):
         """charset: can read and decode SQ with different encodings........."""
-        ds = dicomio.dcmread(sq_encoding_file)
+        ds = dcmread(sq_encoding_file)
         ds.decode()
 
         # These datasets inside of the SQ cannot be decoded with
@@ -62,23 +66,23 @@ class charsetTests(unittest.TestCase):
 
     def testStandardFile(self):
         """charset: can read and decode standard file without special char.."""
-        ds = dicomio.dcmread(normal_file)
+        ds = dcmread(normal_file)
         ds.decode()
 
     def testExplicitISO2022_IR6(self):
         """charset: can decode file with multi-valued data elements........."""
-        ds = dicomio.dcmread(explicit_ir6_file)
+        ds = dcmread(explicit_ir6_file)
         ds.decode()
 
     def testMultiPN(self):
         """charset: can decode file with multi-valued data elements........."""
-        ds = dicomio.dcmread(multiPN_file)
+        ds = dcmread(multiPN_file)
         ds.decode()
 
     def testEncodingWithSpecificTags(self):
         """Encoding is correctly applied even if  Specific Character Set
         is not in specific tags..."""
-        ds = dicomio.dcmread(jp_file, specific_tags=['PatientName'])
+        ds = dcmread(jp_file, specific_tags=['PatientName'])
         ds.decode()
         self.assertEqual(1, len(ds))
         expected = ('Yamada^Tarou='
