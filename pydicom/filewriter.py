@@ -804,10 +804,10 @@ def dcmwrite(filename, dataset, write_like_original=True):
         if xfer not in UncompressedPixelTransferSyntaxes:
             raise ValueError("file_meta transfer SyntaxUID is compressed type "
                              "but pixel data has been decompressed")
-        
+
         # Force PixelData to the decompressed version
         dataset.PixelData = dataset.pixel_array.tobytes()
-        
+
     caller_owns_file = True
     # Open file if not already a file object
     if isinstance(filename, compat.string_types):
@@ -826,7 +826,8 @@ def dcmwrite(filename, dataset, write_like_original=True):
 
         if file_meta is not None:  # May be an empty Dataset
             # If we want to `write_like_original`, don't enforce_standard
-            write_file_meta_info(fp, file_meta, enforce_standard=not write_like_original)
+            write_file_meta_info(fp, file_meta,
+                                 enforce_standard=not write_like_original)
 
         # WRITE DATASET
         # The transfer syntax used to encode the dataset can't be changed
