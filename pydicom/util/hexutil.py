@@ -7,6 +7,7 @@
 
 from binascii import (a2b_hex, b2a_hex)
 
+from pydicom import compat
 from pydicom.compat import in_py2
 from pydicom.charset import default_encoding
 
@@ -26,16 +27,15 @@ def hex2bytes(hexstring):
     Note in the example that all lines except the first must
     start with a space, alternatively the space could
     end the previous line.
-
-    TODO: Should raise TypeError if not a bytes or str
     """
 
     # This works in both 3.x and 2.x because the first conditional evaluates to
     # true in 2.x so the difference in bytes constructor doesn't matter
     if isinstance(hexstring, bytes):
         return a2b_hex(hexstring.replace(b" ", b""))
-    else:
+    elif isinstance(hexstring, compat.string_types):
         return a2b_hex(bytes(hexstring.replace(" ", ""), default_encoding))
+    raise TypeError('argument shall be bytes or string type')
 
 
 def bytes2hex(byte_string):
