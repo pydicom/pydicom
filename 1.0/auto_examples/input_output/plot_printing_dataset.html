@@ -1,0 +1,403 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Format the output of the data set printing &mdash; pydicom 1.0.0 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+  
+
+  
+    <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+  
+    <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="pydicom 1.0.0 documentation" href="../../index.html"/>
+        <link rel="up" title="General examples" href="../index.html"/>
+        <link rel="next" title="Write DICOM data" href="plot_write_dicom.html"/>
+        <link rel="prev" title="Read DICOM and ploting using matplotlib" href="plot_read_dicom.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> pydicom
+          
+
+          
+            
+            <img src="../../_static/logo.png" class="logo" />
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started with pydicom</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../pydicom_user_guide.html">Pydicom User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ref_guide.html">Pydicom API’s Reference Guide</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Examples</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../index.html">General examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../index.html#image-processing">Image processing</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html#input-output">Input-output</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="plot_read_rtplan.html">Read RTPLAN DICOM and list information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_read_dicom.html">Read DICOM and ploting using matplotlib</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Format the output of the data set printing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_write_dicom.html">Write DICOM data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_read_dicom_directory.html">Read DICOM directory</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../index.html#metadata-processing">Metadata processing</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../release-notes.html">Release history</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pydicom</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">General examples</a> &raquo;</li>
+        
+      <li>Format the output of the data set printing</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/auto_examples/input_output/plot_printing_dataset.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="format-the-output-of-the-data-set-printing">
+<span id="sphx-glr-auto-examples-input-output-plot-printing-dataset-py"></span><h1>Format the output of the data set printing<a class="headerlink" href="#format-the-output-of-the-data-set-printing" title="Permalink to this headline">¶</a></h1>
+<p>This example illustrates how to print the data set in your own format.</p>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-default"><div class="highlight"><pre><span></span><span class="n">Image</span> <span class="n">Type</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;DERIVED&#39;</span><span class="p">,</span> <span class="s1">&#39;SECONDARY&#39;</span><span class="p">,</span> <span class="s1">&#39;OTHER&#39;</span><span class="p">]</span>
+ <span class="n">Instance</span> <span class="n">Creation</span> <span class="n">Date</span> <span class="o">=</span> <span class="s1">&#39;20040826&#39;</span>
+ <span class="n">Instance</span> <span class="n">Creation</span> <span class="n">Time</span> <span class="o">=</span> <span class="s1">&#39;185434&#39;</span>
+ <span class="n">Instance</span> <span class="n">Creator</span> <span class="n">UID</span> <span class="o">=</span> <span class="s1">&#39;1.3.6.1.4.1.5962.3&#39;</span>
+ <span class="n">SOP</span> <span class="n">Class</span> <span class="n">UID</span> <span class="o">=</span> <span class="s1">&#39;1.2.840.10008.5.1.4.1.1.4&#39;</span>
+ <span class="n">SOP</span> <span class="n">Instance</span> <span class="n">UID</span> <span class="o">=</span> <span class="s1">&#39;1.3.6.1.4.1.5962.1.1.4.1.1.20040826185059.5457&#39;</span>
+ <span class="n">Study</span> <span class="n">Date</span> <span class="o">=</span> <span class="s1">&#39;20040826&#39;</span>
+ <span class="n">Series</span> <span class="n">Date</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+ <span class="n">Acquisition</span> <span class="n">Date</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+ <span class="n">Study</span> <span class="n">Time</span> <span class="o">=</span> <span class="s1">&#39;185059&#39;</span>
+ <span class="n">Series</span> <span class="n">Time</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+ <span class="n">Acquisition</span> <span class="n">Time</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+ <span class="n">Accession</span> <span class="n">Number</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+ <span class="n">Modality</span> <span class="o">=</span> <span class="s1">&#39;MR&#39;</span>
+ <span class="n">Manufacturer</span> <span class="o">=</span> <span class="s1">&#39;TOSHIBA_MEC&#39;</span>
+ <span class="n">Institution</span> <span class="n">Name</span> <span class="o">=</span> <span class="s1">&#39;TOSHIBA&#39;</span>
+ <span class="n">Referring</span> <span class="n">Physician</span><span class="s1">&#39;s Name = &#39;&#39;</span>
+ <span class="n">Timezone</span> <span class="n">Offset</span> <span class="n">From</span> <span class="n">UTC</span> <span class="o">=</span> <span class="s1">&#39;-0400&#39;</span>
+ <span class="n">Station</span> <span class="n">Name</span> <span class="o">=</span> <span class="s1">&#39;000000000&#39;</span>
+ <span class="n">Name</span> <span class="n">of</span> <span class="n">Physician</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="n">Reading</span> <span class="n">Study</span> <span class="o">=</span> <span class="s1">&#39;----&#39;</span>
+ <span class="n">Operators</span><span class="s1">&#39; Name = &#39;</span><span class="o">----</span><span class="s1">&#39;</span>
+ <span class="n">Manufacturer</span><span class="s1">&#39;s Model Name = &#39;</span><span class="n">MRT50H1</span><span class="s1">&#39;</span>
+ <span class="n">Patient</span><span class="s1">&#39;s Name = &#39;</span><span class="n">CompressedSamples</span><span class="o">^</span><span class="n">MR1</span><span class="s1">&#39;</span>
+ <span class="n">Patient</span> <span class="n">ID</span> <span class="o">=</span> <span class="s1">&#39;4MR1&#39;</span>
+ <span class="n">Patient</span><span class="s1">&#39;s Birth Date = &#39;&#39;</span>
+ <span class="n">Patient</span><span class="s1">&#39;s Sex = &#39;</span><span class="n">F</span><span class="s1">&#39;</span>
+ <span class="n">Patient</span><span class="s1">&#39;s Size = &#39;&#39;</span>
+ <span class="n">Patient</span><span class="s1">&#39;s Weight = &quot;80.0000&quot;</span>
+ <span class="n">Contrast</span><span class="o">/</span><span class="n">Bolus</span> <span class="n">Agent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+ <span class="n">Scanning</span> <span class="n">Sequence</span> <span class="o">=</span> <span class="s1">&#39;SE&#39;</span>
+ <span class="n">Sequence</span> <span class="n">Variant</span> <span class="o">=</span> <span class="s1">&#39;NONE&#39;</span>
+ <span class="n">Scan</span> <span class="n">Options</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+ <span class="n">MR</span> <span class="n">Acquisition</span> <span class="n">Type</span> <span class="o">=</span> <span class="s1">&#39;3D&#39;</span>
+ <span class="n">Slice</span> <span class="n">Thickness</span> <span class="o">=</span> <span class="s2">&quot;0.8000&quot;</span>
+ <span class="n">Repetition</span> <span class="n">Time</span> <span class="o">=</span> <span class="s2">&quot;4000.0000&quot;</span>
+ <span class="n">Echo</span> <span class="n">Time</span> <span class="o">=</span> <span class="s2">&quot;240.0000&quot;</span>
+ <span class="n">Number</span> <span class="n">of</span> <span class="n">Averages</span> <span class="o">=</span> <span class="s2">&quot;1.0000&quot;</span>
+ <span class="n">Imaging</span> <span class="n">Frequency</span> <span class="o">=</span> <span class="s2">&quot;63.92433900&quot;</span>
+ <span class="n">Imaged</span> <span class="n">Nucleus</span> <span class="o">=</span> <span class="s1">&#39;H&#39;</span>
+ <span class="n">Echo</span> <span class="n">Number</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">=</span> <span class="s1">&#39;1&#39;</span>
+ <span class="n">Echo</span> <span class="n">Train</span> <span class="n">Length</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+ <span class="n">Device</span> <span class="n">Serial</span> <span class="n">Number</span> <span class="o">=</span> <span class="s1">&#39;-0000200&#39;</span>
+ <span class="n">Software</span> <span class="n">Version</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">=</span> <span class="s1">&#39;V3.51*P25&#39;</span>
+ <span class="n">Flip</span> <span class="n">Angle</span> <span class="o">=</span> <span class="s2">&quot;90&quot;</span>
+ <span class="n">Patient</span> <span class="n">Position</span> <span class="o">=</span> <span class="s1">&#39;HFS&#39;</span>
+ <span class="n">Study</span> <span class="n">Instance</span> <span class="n">UID</span> <span class="o">=</span> <span class="s1">&#39;1.3.6.1.4.1.5962.1.2.4.20040826185059.5457&#39;</span>
+ <span class="n">Series</span> <span class="n">Instance</span> <span class="n">UID</span> <span class="o">=</span> <span class="s1">&#39;1.3.6.1.4.1.5962.1.3.4.1.20040826185059.5457&#39;</span>
+ <span class="n">Study</span> <span class="n">ID</span> <span class="o">=</span> <span class="s1">&#39;4MR1&#39;</span>
+ <span class="n">Series</span> <span class="n">Number</span> <span class="o">=</span> <span class="s1">&#39;1&#39;</span>
+ <span class="n">Acquisition</span> <span class="n">Number</span> <span class="o">=</span> <span class="s1">&#39;0&#39;</span>
+ <span class="n">Instance</span> <span class="n">Number</span> <span class="o">=</span> <span class="s1">&#39;1&#39;</span>
+ <span class="n">Image</span> <span class="n">Position</span> <span class="p">(</span><span class="n">Patient</span><span class="p">)</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;-83.9063&#39;</span><span class="p">,</span> <span class="s1">&#39;-91.2000&#39;</span><span class="p">,</span> <span class="s1">&#39;6.6406&#39;</span><span class="p">]</span>
+ <span class="n">Image</span> <span class="n">Orientation</span> <span class="p">(</span><span class="n">Patient</span><span class="p">)</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;1.0000&#39;</span><span class="p">,</span> <span class="s1">&#39;0.0000&#39;</span><span class="p">,</span> <span class="s1">&#39;0.0000&#39;</span><span class="p">,</span> <span class="s1">&#39;0.0000&#39;</span><span class="p">,</span> <span class="s1">&#39;1.0000&#39;</span><span class="p">,</span><span class="o">...</span>
+ <span class="n">Frame</span> <span class="n">of</span> <span class="n">Reference</span> <span class="n">UID</span> <span class="o">=</span> <span class="s1">&#39;1.3.6.1.4.1.5962.1.4.4.1.20040826185059.5457&#39;</span>
+ <span class="n">Laterality</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+ <span class="n">Position</span> <span class="n">Reference</span> <span class="n">Indicator</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+ <span class="n">Slice</span> <span class="n">Location</span> <span class="o">=</span> <span class="s2">&quot;0.0000&quot;</span>
+ <span class="n">Image</span> <span class="n">Comments</span> <span class="o">=</span> <span class="s1">&#39;Uncompressed&#39;</span>
+ <span class="n">Samples</span> <span class="n">per</span> <span class="n">Pixel</span> <span class="o">=</span> <span class="mi">1</span>
+ <span class="n">Photometric</span> <span class="n">Interpretation</span> <span class="o">=</span> <span class="s1">&#39;MONOCHROME2&#39;</span>
+ <span class="n">Rows</span> <span class="o">=</span> <span class="mi">64</span>
+ <span class="n">Columns</span> <span class="o">=</span> <span class="mi">64</span>
+ <span class="n">Pixel</span> <span class="n">Spacing</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;0.3125&#39;</span><span class="p">,</span> <span class="s1">&#39;0.3125&#39;</span><span class="p">]</span>
+ <span class="n">Bits</span> <span class="n">Allocated</span> <span class="o">=</span> <span class="mi">16</span>
+ <span class="n">Bits</span> <span class="n">Stored</span> <span class="o">=</span> <span class="mi">16</span>
+ <span class="n">High</span> <span class="n">Bit</span> <span class="o">=</span> <span class="mi">15</span>
+ <span class="n">Pixel</span> <span class="n">Representation</span> <span class="o">=</span> <span class="mi">1</span>
+ <span class="n">Smallest</span> <span class="n">Image</span> <span class="n">Pixel</span> <span class="n">Value</span> <span class="o">=</span> <span class="mi">0</span>
+ <span class="n">Largest</span> <span class="n">Image</span> <span class="n">Pixel</span> <span class="n">Value</span> <span class="o">=</span> <span class="mi">4000</span>
+ <span class="n">Window</span> <span class="n">Center</span> <span class="o">=</span> <span class="s2">&quot;600&quot;</span>
+ <span class="n">Window</span> <span class="n">Width</span> <span class="o">=</span> <span class="s2">&quot;1600&quot;</span>
+<span class="o">&lt;</span><span class="n">item</span> <span class="ow">not</span> <span class="n">printed</span> <span class="o">--</span> <span class="ow">in</span> <span class="n">the</span> <span class="s2">&quot;don&#39;t print&quot;</span> <span class="nb">list</span><span class="o">&gt;</span>
+ <span class="n">Data</span> <span class="n">Set</span> <span class="n">Trailing</span> <span class="n">Padding</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\n\x00\xfe\x00\x04\x00\x01\x00\x00\x00\x00\x00</span><span class="s1">\x...</span>
+</pre></div>
+</div>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># authors : Guillaume Lemaitre &lt;g.lemaitre58@gmail.com&gt;</span>
+<span class="c1"># license : MIT</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
+
+<span class="kn">import</span> <span class="nn">pydicom</span>
+<span class="kn">from</span> <span class="nn">pydicom.data</span> <span class="kn">import</span> <span class="n">get_testdata_files</span>
+
+<span class="k">print</span><span class="p">(</span><span class="vm">__doc__</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">myprint</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Go through all items in the dataset and print them with custom format</span>
+
+<span class="sd">    Modelled after Dataset._pretty_str()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dont_print</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Pixel Data&#39;</span><span class="p">,</span> <span class="s1">&#39;File Meta Information Version&#39;</span><span class="p">]</span>
+
+    <span class="n">indent_string</span> <span class="o">=</span> <span class="s2">&quot;   &quot;</span> <span class="o">*</span> <span class="n">indent</span>
+    <span class="n">next_indent_string</span> <span class="o">=</span> <span class="s2">&quot;   &quot;</span> <span class="o">*</span> <span class="p">(</span><span class="n">indent</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">data_element</span> <span class="ow">in</span> <span class="n">dataset</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">data_element</span><span class="o">.</span><span class="n">VR</span> <span class="o">==</span> <span class="s2">&quot;SQ&quot;</span><span class="p">:</span>   <span class="c1"># a sequence</span>
+            <span class="k">print</span><span class="p">(</span><span class="n">indent_string</span><span class="p">,</span> <span class="n">data_element</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">sequence_item</span> <span class="ow">in</span> <span class="n">data_element</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+                <span class="n">myprint</span><span class="p">(</span><span class="n">sequence_item</span><span class="p">,</span> <span class="n">indent</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="k">print</span><span class="p">(</span><span class="n">next_indent_string</span> <span class="o">+</span> <span class="s2">&quot;---------&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">data_element</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">dont_print</span><span class="p">:</span>
+                <span class="k">print</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;&lt;item not printed -- in the &quot;don&#39;t print&quot; list&gt;&quot;&quot;&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">repr_value</span> <span class="o">=</span> <span class="nb">repr</span><span class="p">(</span><span class="n">data_element</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">repr_value</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">50</span><span class="p">:</span>
+                    <span class="n">repr_value</span> <span class="o">=</span> <span class="n">repr_value</span><span class="p">[:</span><span class="mi">50</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;...&quot;</span>
+                <span class="k">print</span><span class="p">(</span><span class="s2">&quot;{0:s} {1:s} = {2:s}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">indent_string</span><span class="p">,</span>
+                                                   <span class="n">data_element</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                                                   <span class="n">repr_value</span><span class="p">))</span>
+
+
+<span class="n">filename</span> <span class="o">=</span> <span class="n">get_testdata_files</span><span class="p">(</span><span class="s1">&#39;MR_small.dcm&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">ds</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">dcmread</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+
+<span class="n">myprint</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Total running time of the script:</strong> ( 0 minutes  0.012 seconds)</p>
+<div class="sphx-glr-footer docutils container">
+<div class="sphx-glr-download docutils container">
+<a class="reference download internal" href="../../_downloads/plot_printing_dataset.py" download=""><code class="xref download docutils literal"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_printing_dataset.py</span></code></a></div>
+<div class="sphx-glr-download docutils container">
+<a class="reference download internal" href="../../_downloads/plot_printing_dataset.ipynb" download=""><code class="xref download docutils literal"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_printing_dataset.ipynb</span></code></a></div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="plot_write_dicom.html" class="btn btn-neutral float-right" title="Write DICOM data" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="plot_read_dicom.html" class="btn btn-neutral" title="Read DICOM and ploting using matplotlib" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2018, Darcy Mason and pydicom contributors.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'1.0.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

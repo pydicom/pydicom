@@ -1,0 +1,777 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Release history &mdash; pydicom 1.0.0 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/pydicom.css" type="text/css" />
+  
+
+  
+    <link rel="stylesheet" href="_static/gallery.css" type="text/css" />
+  
+    <link rel="stylesheet" href="_static/css/pydicom.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="pydicom 1.0.0 documentation" href="index.html"/>
+        <link rel="prev" title="Anonymize DICOM data" href="auto_examples/metadata_processing/plot_anonymize.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> pydicom
+          
+
+          
+            
+            <img src="_static/logo.png" class="logo" />
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started with pydicom</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="pydicom_user_guide.html">Pydicom User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ref_guide.html">Pydicom API’s Reference Guide</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html">General examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html#image-processing">Image processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html#input-output">Input-output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html#metadata-processing">Metadata processing</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Additional Information</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Release history</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#version-1-0-0">Version 1.0.0</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#changelog">Changelog</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#major-changes">Major changes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#other-enhancements">Other enhancements</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#infrastructure">Infrastructure</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fixes">Fixes</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-9-9">Version 0.9.9</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id1">Changelog</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#enhancements">Enhancements</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#contrib-file-changes">Contrib file changes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#other-contributors">Other Contributors</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-9-8">Version 0.9.8</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id2">Changelog</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id3">Major changes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#bug-fixes">Bug fixes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id4">Enhancements</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id5">Contrib file changes</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-9-7">Version 0.9.7</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id6">Changelog</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id7">Major changes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id8">Bug fixes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id9">Other Enhancements</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-9-6">Version 0.9.6</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id10">Changelog</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id11">Major changes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id12">Bug fixes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#other">Other</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-9-5">Version 0.9.5</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id13">Changelog</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#major-fixes-in-this-release">Major fixes in this release</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#other-fixes-in-this-release">Other fixes in this release</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#new-contrib-files">New ‘Contrib’ files</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id14">Other</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-9-3">Version 0.9.3</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id15">Changelog</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id16">Major changes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id17">Other Enhancements</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id18">Bug Fixes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id19">Other</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-9-2">Version 0.9.2</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id20">Changelog</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id21">Major changes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id22">Other Enhancements</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id23">Bug Fixes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id24">Other</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">pydicom</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Release history</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/release-notes.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="release-history">
+<h1>Release history<a class="headerlink" href="#release-history" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="version-1-0-0">
+<h2>Version 1.0.0<a class="headerlink" href="#version-1-0-0" title="Permalink to this headline">¶</a></h2>
+<p>This is a major release, with major changes, including backwards-incompatible
+changes.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">We urge you to review the
+<a class="reference internal" href="transition_to_pydicom1.html"><span class="doc">Transition Guide</span></a> if you have previously
+used a pydicom version less than 1.0.</p>
+</div>
+<div class="section" id="changelog">
+<h3>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="major-changes">
+<h4>Major changes<a class="headerlink" href="#major-changes" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>full Python 3 compatibility - one code base for both Python 2 and Python 3</li>
+<li>package name and import name now match – use <code class="docutils literal"><span class="pre">import</span> <span class="pre">pydicom</span></code>
+rather than <code class="docutils literal"><span class="pre">import</span> <span class="pre">dicom</span></code>.</li>
+<li><dl class="first docutils">
+<dt>added <a class="reference internal" href="image_data_handlers.html"><span class="doc">Handling of compressed image data</span></a>:</dt>
+<dd><ul class="first last">
+<li>optional GDCM support for reading files with compressed pixel data
+(<a class="reference external" href="https://github.com/pydicom/pydicom/issues/18">#18</a>)</li>
+<li>optional Pillow and jpeg_ls support for reading some compressed pixel data
+files</li>
+<li>support for decompressing a compressed dataset in-place</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li>DICOM dictionary updated to 2017c</li>
+<li>cleaned up DICOM dictionary code, old non-DICOM-keyword code removed</li>
+</ul>
+</div>
+<div class="section" id="other-enhancements">
+<h4>Other enhancements<a class="headerlink" href="#other-enhancements" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>added <code class="docutils literal"><span class="pre">util/fixer.py</span></code> callbacks available to fix non DICOM-compliant
+values before exceptions thrown</li>
+<li>added context management methods to <code class="docutils literal"><span class="pre">Dataset</span></code></li>
+<li>added <code class="docutils literal"><span class="pre">misc.is_dicom()</span></code> function to check for DICOM file format</li>
+<li>added date/time converters (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/143">#143</a>)</li>
+<li>added option to attempt other VRs if translate fails (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/197">#197</a>)</li>
+<li>added heuristics to read files that have no preamble or file meta
+information</li>
+<li>support for multi-valued DA, DT, TM data elements (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/212">#212</a>)</li>
+<li><code class="docutils literal"><span class="pre">DataElement</span></code>: added <code class="docutils literal"><span class="pre">keyword</span></code> and <code class="docutils literal"><span class="pre">is_retired</span></code> properties</li>
+<li><code class="docutils literal"><span class="pre">datadict</span></code>: added <code class="docutils literal"><span class="pre">dictionary_is_retired()</span></code></li>
+<li><code class="docutils literal"><span class="pre">datadict</span></code>: added ability to add custom DICOM dictionary items via
+<code class="docutils literal"><span class="pre">add_dict_entry()</span></code> and <code class="docutils literal"><span class="pre">add_dict_entries()</span></code></li>
+<li>added some support for pickle</li>
+<li>added support for VRs <code class="docutils literal"><span class="pre">OD</span></code>, <code class="docutils literal"><span class="pre">OL</span></code> and <code class="docutils literal"><span class="pre">UC</span></code></li>
+<li>added support for Thai, Japanese and Chinese encodings (#346, #353)</li>
+<li>added support for slicing to Dataset</li>
+<li>add/update TransferSyntaxUID when writing standard</li>
+<li>renamed <code class="docutils literal"><span class="pre">UID</span></code> package to <code class="docutils literal"><span class="pre">uid</span></code> (conforms to Python standard)</li>
+<li>added property <code class="docutils literal"><span class="pre">uid.is_private</span></code></li>
+<li>added definitions for storage SOP Class UIDs (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/172">#172</a>)</li>
+<li>added possibility to read only specific tags (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/95">#95</a>)</li>
+<li>added missing meta elements when writing DICOM file</li>
+<li>added <code class="docutils literal"><span class="pre">encaps</span></code> generator functions to access compressed frames</li>
+<li><code class="docutils literal"><span class="pre">read_file</span></code> changed to <code class="docutils literal"><span class="pre">dcmread</span></code>, <code class="docutils literal"><span class="pre">write_file</span></code> to <code class="docutils literal"><span class="pre">dcmwrite</span></code> for
+greater clarity. Previous names still available for backwards compatibility.</li>
+</ul>
+</div>
+<div class="section" id="infrastructure">
+<h4>Infrastructure<a class="headerlink" href="#infrastructure" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>added <a class="reference external" href="https://travis-ci.org/pydicom/pydicom/">TravisCI</a> and
+<a class="reference external" href="https://ci.appveyor.com/project/pydicom/pydicom">AppVeyor</a> builds for
+automatic tests under Linux and Windows</li>
+<li>added automatic <a class="reference external" href="https://codecov.io/gh/pydicom/pydicom">code coverage builds</a>
+and PEP-8 checks</li>
+<li>added automatic <a class="reference external" href="https://circleci.com/gh/pydicom/pydicom">documentation builds</a>
+on GitHub Pages for <a class="reference external" href="https://pydicom.github.io/pydicom/dev">development</a>
+and <a class="reference external" href="https://pydicom.github.io/pydicom/stable/">release</a> builds</li>
+<li>added PyPy support</li>
+<li>removed support for Python 2.6, added support for Python 3.6</li>
+</ul>
+</div>
+<div class="section" id="fixes">
+<h4>Fixes<a class="headerlink" href="#fixes" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>correctly handle PlanarConfiguration==0 (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/151">#151</a>)</li>
+<li>updated uid generation to ensure uniqueness (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/125">#125</a>)</li>
+<li>handle missing patient data in <code class="docutils literal"><span class="pre">show_dicomdir</span></code></li>
+<li>assume default transfer syntax if none in file meta  (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/258">#258</a>)</li>
+<li>fixed reading/writing of empty tags and tags with bad VR</li>
+<li>fixed reading AE elements with leading or trailing spaces</li>
+<li>fixed handling of ambiguous VR elements</li>
+<li>fixed handling for several error conditions</li>
+<li>fixed Latin5 (Turkish) character set handling</li>
+<li>a lot of other small fixes…</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="section" id="version-0-9-9">
+<h2>Version 0.9.9<a class="headerlink" href="#version-0-9-9" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h3>Changelog<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>In addition to bug fixes, pydicom 0.9.9 contains updates for all dicom
+dictionaries.  New features include DICOMDIR handling, and a utility module
+which produces python/pydicom source code to recreate a dicom file.</p>
+<div class="section" id="enhancements">
+<h4>Enhancements<a class="headerlink" href="#enhancements" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>All dicom dictionaries updated (standard dictionary, UID dictionary, and
+private dictionaries)</li>
+<li>Dicom commands also added to dictionary</li>
+<li>Ability to work with DICOMDIR: <code class="docutils literal"><span class="pre">read_dicomdir()</span></code> function and <code class="docutils literal"><span class="pre">DicomDir</span></code>
+class. Example file <code class="docutils literal"><span class="pre">show_dicomdir.py</span></code> file added to examples subdirectory.</li>
+<li><code class="docutils literal"><span class="pre">codify.py</span></code>: Produce python/pydicom source code from a dicom file.</li>
+<li>a number of python 3 compatibility enhancements</li>
+<li>setup.py uses ez_setup only if setuptools not already installed</li>
+<li>exceptions carry tag info with them, to aid in debugging</li>
+</ul>
+</div>
+<div class="section" id="contrib-file-changes">
+<h4>Contrib file changes<a class="headerlink" href="#contrib-file-changes" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>pydicom_series:  force parameter added (Nil Goyette)</li>
+<li>dcm_qt_tree: switch to OrderedDict to preserve ordering of tags (Padraig Looney)</li>
+</ul>
+</div>
+<div class="section" id="other-contributors">
+<h4>Other Contributors<a class="headerlink" href="#other-contributors" title="Permalink to this headline">¶</a></h4>
+<p>Other than Jonathan and myself, other contributors were: Rickard Holmberg,
+Julien Lamy, Yaroslav Halchenko, Mark White, Matthew Brett, Dimitri
+Papadopoulos, videan42 …(sorry if I’ve missed anyone).</p>
+</div>
+</div>
+</div>
+<div class="section" id="version-0-9-8">
+<h2>Version 0.9.8<a class="headerlink" href="#version-0-9-8" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id2">
+<h3>Changelog<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<p>pydicom 0.9.8 is mainly a consolidation step before moving to official python 3
+compatibility in pydicom 1.0.  It also reverts the change to using Decimal for
+VR of DS (in pydicom 0.9.7), due to performance issues. DS as Decimal is still
+available, but is off by default.</p>
+<div class="section" id="id3">
+<h4>Major changes<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>Requires python 2.6 or later, in preparation for python 3 compatibility</li>
+<li>experimental python 3 compatibility (unofficial at this point) – uncomment
+the two indicated lines in setup.py to use it. Please provide feedback to the
+issues list.</li>
+<li>DS values reverted to using float as default (issue 114) due to slow
+performance using python Decimal. Speed tests show approx factor of 10
+improvement compared with pydicom 0.9.7 (several revisions up to
+r78ba350a3eb8)</li>
+<li>streamlined much code internally taking advantage of modern python
+constructs: decorators, generators, etc</li>
+</ul>
+</div>
+<div class="section" id="bug-fixes">
+<h4>Bug fixes<a class="headerlink" href="#bug-fixes" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>Fix for duplicate logger from Gunnar Schaefer. Fixes issue 107 (revision
+774b7a55db33)</li>
+<li>Fix rewind behavior in find_bytes (issue 60, revision 6b949a5b925b)</li>
+<li>Fix error in nested private sequences (issue 113, revision 84af4b240add)</li>
+</ul>
+</div>
+<div class="section" id="id4">
+<h4>Enhancements<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>UID generator added (Félix C. Morency) (revisions 0197b5846bb5 and
+3678b1be6aca, tests in f1ae573d9de5, 0411bab7c985)</li>
+<li>new PersonName3 class for python 3: (revision 9b92b336e7d4)</li>
+</ul>
+</div>
+<div class="section" id="id5">
+<h4>Contrib file changes<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>Fix for pydicom_series for DS decimal (revision e830f30b6781)</li>
+<li>new dcm_qt_tree.py module - tree display of dicom files using PySide and
+Qt. Contributed by Padraig Looney.</li>
+</ul>
+<p>Special acknowledgement to Jonathan Suever who contributed most of the python 3
+work and many bug fixes.</p>
+</div>
+</div>
+</div>
+<div class="section" id="version-0-9-7">
+<h2>Version 0.9.7<a class="headerlink" href="#version-0-9-7" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id6">
+<h3>Changelog<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<p>pydicom 0.9.7 resolves some remaining bugs before moving to python 3
+compatibility. ** It is the last version which will run with python &lt; 2.6 **
+(it will run with python2.4 to python2.7)</p>
+<div class="section" id="id7">
+<h4>Major changes<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>Added DICOM 2011 keywords. Old “named tags” still work, but will be</li>
+</ul>
+<p>deprecated in future versions. Most names are identical, but some have changed.
+For example:
+* SamplesperPixel becomes SamplesPerPixel (capital ‘P’ on ‘Per’)
+* Beams becomes BeamSequence (and similar for all sequences)
+* Decimal and integer strings handled much better (revisions 4ed698a7bfbe and</p>
+<blockquote>
+<div>c313d2befb08).</div></blockquote>
+<ul class="simple">
+<li>New classes for VR of types DS and IS (DS is derived from python Decimal)</li>
+<li>New MultiValue class, enforcing all values of same type</li>
+<li>New config.py file with user-definable parameters:</li>
+<li>allow_DS_float (default False) for controlling whether float values can be
+used to construct DS or IS strings.</li>
+<li>enforce_valid_values (default True) for ensuring IS, DS meet DICOM standard
+limits To change these, use ‘import dicom.config, then
+dicom.config.&lt;parameter&gt;={True|False}’ before setting values of data elements</li>
+</ul>
+<p>Users are encouraged to switch to the official DICOM keywords, as these are now
+part of the standard, and promote consistency across programming languages and
+libraries.</p>
+</div>
+<div class="section" id="id8">
+<h4>Bug fixes<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>New way to read file meta information, not using the group length, instead
+reading until end of group 2 data elements. If group length dose not match,
+log a warning (revision b6b3658f3b14).</li>
+<li>Fix bug in copying raw private data elements (issue 98)</li>
+<li>Force logging level to warning on ‘import dicom’ (issue 102)</li>
+<li>Deferred read fixed to work with gzipped files (issue 103)</li>
+<li>Setting individual items in a DS or IS list now saves to file correctly</li>
+<li>Japanese and Korean encoding fixes (issue 110)</li>
+</ul>
+</div>
+<div class="section" id="id9">
+<h4>Other Enhancements<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>New Sequence class which verifies items are Datasets (issue 52)</li>
+<li>Assignment to SQ data element checks value is a Sequence or can be converted
+to one (issue 111)</li>
+<li>dir(ds) now includes methods and properties as well as DICOM named tags. Work
+only on Python &gt;= 2.6 as previous versions do not call __dir__ method
+(issue 95)</li>
+<li>Added much more debugging info and simplified reading of data elements
+(revision b6b3658f3b14)</li>
+<li>updated example files to DICOM 2011 keywords; fixed bugs</li>
+</ul>
+<p>Many of the bug fixes/enhancements were submitted by users. Many thanks to
+those who contributed.</p>
+</div>
+</div>
+</div>
+<div class="section" id="version-0-9-6">
+<h2>Version 0.9.6<a class="headerlink" href="#version-0-9-6" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id10">
+<h3>Changelog<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
+<p>pydicom 0.9.6 updates the dictionary to the DICOM 2011 standard, and has a
+number of bug fixes</p>
+<div class="section" id="id11">
+<h4>Major changes<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>updated the dictionary to the DICOM 2011 standard’s dictionary.</li>
+</ul>
+</div>
+<div class="section" id="id12">
+<h4>Bug fixes<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>Fixed bug in Dataset.file_metadata() and deprecated in favor of FileDataset
+(issue 93)</li>
+<li>Fixed UID comparisons against non-string values (issue 96)</li>
+<li>catch exceptions on reading undefined length private data elements (issue 91,
+issue 97)</li>
+<li>Fixed bug in raising exception for unknown tag</li>
+</ul>
+</div>
+<div class="section" id="other">
+<h4>Other<a class="headerlink" href="#other" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>added example file write_new.py to show how to create DICOM files from scratch</li>
+<li>updated other example files</li>
+<li>more PEP-8 style changes</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="section" id="version-0-9-5">
+<h2>Version 0.9.5<a class="headerlink" href="#version-0-9-5" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id13">
+<h3>Changelog<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h3>
+<p>pydicom 0.9.5 is primarily a bug-fix release but includes some contrib files
+also.</p>
+<div class="section" id="major-fixes-in-this-release">
+<h4>Major fixes in this release<a class="headerlink" href="#major-fixes-in-this-release" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>fix for incorrect pixel integer types which could lead to numeric errors
+(issue 79)</li>
+<li>By default an InvalidDicomError will be raised when trying to read a
+non-DICOM file (unless read_file keyword arg {{{force}}} is True) (revision
+fc790f01f5)</li>
+<li>fix recursion error on private data elements (issue 81, issue 84)</li>
+</ul>
+</div>
+<div class="section" id="other-fixes-in-this-release">
+<h4>Other fixes in this release<a class="headerlink" href="#other-fixes-in-this-release" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>Fix for unicode decode failing with VM &gt; 1 (issue 78)</li>
+<li>fix for fail of DicomIter on files with Explicit VR Transfer Syntax UID
+(issue 82)</li>
+<li>Fix for python 2.5 and ‘with’ statement (revision 1c32791bf0)</li>
+<li>Handle ‘OB/OW’ VR as well as ‘OW/OB’ (revision e3ee934bbc)</li>
+<li>Fix dataset.get(tag) so returns same as dataset[tag] (issue 88)</li>
+</ul>
+</div>
+<div class="section" id="new-contrib-files">
+<h4>New ‘Contrib’ files<a class="headerlink" href="#new-contrib-files" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>dicom_dao.py by Mike Wallace – CouchDB storage of DICOM info and binary data</li>
+<li>pydicom_series.py by Almar Klein – Reads files and separates into distinct
+series.</li>
+</ul>
+</div>
+<div class="section" id="id14">
+<h4>Other<a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>switch to Distribute for packaging</li>
+<li>preliminary work on python 3 compatiblity</li>
+<li>preliminary work on using sphinx for documentation</li>
+<li>preliminary work on better writing of files from scratch</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="section" id="version-0-9-3">
+<h2>Version 0.9.3<a class="headerlink" href="#version-0-9-3" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id15">
+<h3>Changelog<a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id16">
+<h4>Major changes<a class="headerlink" href="#id16" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>changed to MIT-style license</li>
+<li>option to defer reading of large data element values using read_file()’s new
+defer_size argument (r102, r103)</li>
+<li>dictionary of private tags added – descriptive text shown when available
+(issue36, r97, r110)</li>
+<li>more conversion to PEP-8 style. Should now use read_file(), save_as(),
+pixel_array rather than !ReadFile(), !SaveAs(), !PixelArray. Old names kept
+for now as aliases.</li>
+</ul>
+</div>
+<div class="section" id="id17">
+<h4>Other Enhancements<a class="headerlink" href="#id17" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>added DicomFileLike class to simplify and generalize access. Any object that
+has read, write, seek, tell, and close can now be used. (r105)</li>
+<li>added dataset.iterall() function to iterate through all items (including
+inside sequences) (r105)</li>
+<li>added dataset.formatted_lines() generator to allow custom formatting (r91,
+r113)</li>
+<li>made reading tolerant of truncated files – gives a warning, but returns
+dataset read to that point (r95)</li>
+</ul>
+</div>
+<div class="section" id="id18">
+<h4>Bug Fixes<a class="headerlink" href="#id18" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>fixed issue38, name collision for ‘Other Patient Ids’ as both data element
+and sequence name in DICOM standard (r95, r96)</li>
+<li>fixed issue40, blank VRs in some DICOM dictionary entries caused
+NotImplementError on reading (r100)</li>
+<li>fixed issue41, reading VRs of ‘US or SS’ and similar split on backslash
+character (r104)</li>
+<li>fixed bug where TransferSyntaxUID not present when reading file without DICOM
+header (r109)</li>
+<li>fixed print recursion bug when printing a UID (r111)</li>
+</ul>
+</div>
+<div class="section" id="id19">
+<h4>Other<a class="headerlink" href="#id19" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>many of the example files updated</li>
+<li>updated anonymize example file to also deal with ‘OtherPatientIDs’ and
+‘PatientsBirthDate’ (r98)</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="section" id="version-0-9-2">
+<h2>Version 0.9.2<a class="headerlink" href="#version-0-9-2" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id20">
+<h3>Changelog<a class="headerlink" href="#id20" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id21">
+<h4>Major changes<a class="headerlink" href="#id21" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>Renamed Attribute class and related modules to !DataElement. Old code will
+continue to work until pydicom 1.0, but with a !DeprecationWarning (issue22,
+r72, r73)</li>
+<li>Added support for character sets through Specific Character Set (0008,0005),
+using python unicode. Thus foreign languages can display names in Greek,
+Japanese, Chinese etc characters in environments which support unicode
+(demonstrated in dicomtree.py example using Tkinter GUI) (r64, r65)</li>
+</ul>
+</div>
+<div class="section" id="id22">
+<h4>Other Enhancements<a class="headerlink" href="#id22" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>Added support for auto-completion of dataset elements in ipython; also all
+environments using python 2.6 (r69, r70)</li>
+<li>Added __iter__() to Dataset so returns data elements in DICOM order with “for
+data_elem in dataset:” (r68)</li>
+<li>Added dicomtree.py example program showing a DICOM file in a GUI window
+(Tkinter/Tix).</li>
+<li>Added !PersonName class to parse components of names more easily (r55)</li>
+<li>Added UID class to handle UID values. Name rather than UID number shown,
+UID_dictionary used (r51).</li>
+<li>Code tested under python 2.6</li>
+<li>Added !DataElement.name property; synonym for !DataElement.description()
+function</li>
+</ul>
+</div>
+<div class="section" id="id23">
+<h4>Bug Fixes<a class="headerlink" href="#id23" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>Fixed issue27, sequence with a single empty item read incorrectly</li>
+<li>Fixed bug that read_OW did not handle !UndefinedLength (r50)</li>
+<li>Fixed bugs in example files anonymize.py, !DicomInfo.py, and dicomtree.py
+(r51)</li>
+<li>Fixed issue33, VR=UN being split on backslash (r70)</li>
+<li>Fixed issue18, util directory not installed (r45)</li>
+</ul>
+</div>
+<div class="section" id="id24">
+<h4>Other<a class="headerlink" href="#id24" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>Added example file myprint.py – shows how to custom format DICOM file
+information (r67)</li>
+<li>Reorganized test files and added various new tests</li>
+<li>added preliminary work on encapsulated data (r50)</li>
+<li>added some simple files to view or work with pixel data (r46)</li>
+<li>Dataset.!PixelDataArray() Numpy array changed to property Dataset.!PixelArray</li>
+<li>changed to setuptools for packaging rather than distutils</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="auto_examples/metadata_processing/plot_anonymize.html" class="btn btn-neutral" title="Anonymize DICOM data" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2018, Darcy Mason and pydicom contributors.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'1.0.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
