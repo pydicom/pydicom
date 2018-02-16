@@ -2,6 +2,7 @@
 """Functions related to writing DICOM data."""
 from __future__ import absolute_import
 from struct import pack
+from packaging import version
 
 from pydicom import compat
 from pydicom.compat import in_py2
@@ -597,7 +598,8 @@ def write_file_meta_info(fp, file_meta, enforce_standard=True):
             file_meta.ImplementationClassUID = PYDICOM_IMPLEMENTATION_UID
 
         if 'ImplementationVersionName' not in file_meta:
-            file_meta.ImplementationVersionName = 'PYDICOM ' + __version__
+            file_meta.ImplementationVersionName = (
+                'PYDICOM ' + version.parse(__version__).base_version)
 
         # Check that required File Meta Elements are present
         missing = []

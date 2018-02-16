@@ -1062,7 +1062,7 @@ class TestWriteToStandard(object):
     def test_write_no_file_meta(self):
         """Test writing a dataset with no file_meta"""
         fp = DicomBytesIO()
-        version = 'PYDICOM ' + __version__
+        version = 'PYDICOM ' + pversion.parse(__version__).base_version
         ds = dcmread(rtplan_name)
         transfer_syntax = ds.file_meta.TransferSyntaxUID
         ds.file_meta = Dataset()
@@ -1228,7 +1228,8 @@ class TestWriteFileMetaInfoToStandard(object):
         assert meta.TransferSyntaxUID == '1.3'
         # Updated to meet standard
         assert meta.ImplementationClassUID == PYDICOM_IMPLEMENTATION_UID
-        assert meta.ImplementationVersionName == 'PYDICOM ' + __version__
+        assert meta.ImplementationVersionName == (
+            'PYDICOM ' + pversion.parse(__version__).base_version)
 
     def test_version(self):
         """Test that the value for FileMetaInformationVersion is OK."""
