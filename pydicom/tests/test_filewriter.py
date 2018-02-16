@@ -1216,9 +1216,10 @@ class TestWriteFileMetaInfoToStandard(object):
 
         fp.seek(8)
         test_length = unpack('<I', fp.read(4))[0]
-        assert test_length == 66 + class_length + version_length
+        assert test_length == (61 + class_length
+                               + version_length + len(__version__))
         # Check original file meta is unchanged/updated
-        assert meta.FileMetaInformationGroupLength == 110
+        assert meta.FileMetaInformationGroupLength == test_length
         assert meta.FileMetaInformationVersion == b'\x00\x01'
         assert meta.MediaStorageSOPClassUID == '1.1'
         assert meta.MediaStorageSOPInstanceUID == '1.2'
