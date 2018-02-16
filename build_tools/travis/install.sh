@@ -45,11 +45,12 @@ if [[ "$DISTRIB" == "conda" ]]; then
     if [[ "$JPEG2000" == "true" ]]; then
         sudo apt-get install libopenjp2-7 libopenjp2-7-dev
     fi
-    if [[ "$JPEG_LS" == "true" ]]; then
-        pip install CharPyLS
-    fi
     if [[ "$PILLOW" == "true" ]]; then
         conda install --yes pillow jpeg
+    fi
+    if [[ "$JPEG_LS" == "true" ]]; then
+        conda install --yes cython
+        pip install git+https://github.com/Who8MyLunch/CharPyLS
     fi
     if [[ "$GDCM" == "true" ]]; then
         conda install --yes -c conda-forge gdcm
