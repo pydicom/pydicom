@@ -43,10 +43,10 @@ if [[ "$DISTRIB" == "conda" ]]; then
         conda install --yes numpy
     fi
     if [[ "$JPEG2000" == "true" ]]; then
-        echo cant apt-get install libopenjp2-7 libopenjp2-7-dev
+        sudo apt-get install libopenjp2-7 libopenjp2-7-dev
     fi
     if [[ "$JPEG_LS" == "true" ]]; then
-        echo cant do python -m pip install CharPyLS
+        pip install CharPyLS
     fi
     if [[ "$PILLOW" == "true" ]]; then
         conda install --yes pillow jpeg
