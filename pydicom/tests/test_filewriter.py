@@ -6,6 +6,7 @@ from datetime import date, datetime, time, timedelta
 from io import BytesIO
 import os
 import unittest
+from packaging import version as pversion
 
 from struct import unpack
 from tempfile import TemporaryFile
@@ -1217,7 +1218,8 @@ class TestWriteFileMetaInfoToStandard(object):
         fp.seek(8)
         test_length = unpack('<I', fp.read(4))[0]
         assert test_length == (61 + class_length
-                               + version_length + len(__version__))
+                               + version_length
+                               + len(pversion.parse(__version__).base_version))
         # Check original file meta is unchanged/updated
         assert meta.FileMetaInformationGroupLength == test_length
         assert meta.FileMetaInformationVersion == b'\x00\x01'
