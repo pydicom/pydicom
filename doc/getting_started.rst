@@ -56,7 +56,7 @@ DICOM file the same way as initially uncompressed data.
 License
 =======
 
-pydicom has an MIT-based `license
+Pydicom has an MIT-based `license
 <https://github.com/pydicom/pydicom/blob/master/LICENSE>`_.
 
 Installing
@@ -83,7 +83,7 @@ Prerequisites
 Installing pydicom
 ------------------
 
-pydicom is currently available on `PyPi <https://pypi.python.org/pypi/pydicom/>`_
+Pydicom is currently available on `PyPi <https://pypi.python.org/pypi/pydicom/>`_
 . The simplest way to install pydicom alone is using ``pip`` at a command line::
 
   pip install -U pydicom
