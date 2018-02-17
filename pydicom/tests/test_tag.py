@@ -291,6 +291,10 @@ class TestTag(object):
         pytest.raises(ValueError, Tag, ['0x10', '0x20', '0x03'])
         pytest.raises(ValueError, Tag, [0x1000])
         pytest.raises(ValueError, Tag, ['0x10'])
+
+        # Must be int or string
+        pytest.raises(ValueError, Tag, [1., 2.])
+
         # Must be 32-bit
         pytest.raises(OverflowError, Tag, [65536, 0])
         pytest.raises(OverflowError, Tag, [0, 65536])
@@ -305,6 +309,12 @@ class TestTag(object):
         pytest.raises(ValueError, Tag, [0x01, 0x02], '0x01')
         pytest.raises(ValueError, Tag, ['0x01', '0x02'], '0x01')
         pytest.raises(ValueError, Tag, ['0x01', '0x02'], 0x01)
+
+    @pytest.mark.skipIf(not in_py2, reason='Long type only in Python 2')
+    def test_mixed_long_int(self):
+        assert Tag([0x1000, long(0x2000)]) == BaseTag(0x10002000)
+        assert Tag([long(0x1000), 0x2000]) == BaseTag(0x10002000)
+        assert Tag([long(0x1000), long(0x2000)]) == BaseTag(0x10002000)
 
     def test_tag_single_str(self):
         """Test creating a Tag from a single str."""

@@ -72,14 +72,16 @@ def Tag(arg, arg2=None):
         if len(arg) != 2:
             raise ValueError("Tag must be an int or a 2-tuple")
 
-        # Check argument types aren't mixed (i.e. str and int)
-        arg_types = set([type(arg[0]), type(arg[1])])
-        if len(arg_types) != 1:
-            raise ValueError("Both arguments for Tag must be the same type.")
-
-        # Double str parameters
-        if isinstance(arg[0], (str, compat.text_type)):
-            arg = (int(arg[0], 16), int(arg[1], 16))
+        valid = False
+        if isinstance(arg[0], compat.string_types):
+            valid = isinstance(arg[1], (str, compat.string_types))
+            if valid:
+                arg = (int(arg[0], 16), int(arg[1], 16))
+        elif isinstance(arg[0], compat.number_types):
+            valid = isinstance(arg[1], compat.number_types)
+        if not valid:
+            raise ValueError("Both arguments for Tag must be the same type, "
+                             "either string or int.")
 
         if arg[0] > 0xFFFF or arg[1] > 0xFFFF:
             raise OverflowError("Groups and elements of tags must each "
