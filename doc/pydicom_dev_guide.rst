@@ -54,3 +54,8 @@ By doing so, any bug fix pushed in a maintenance branch will trigger a
 documentation build. The ``stable`` version of the doc will also point to the
 new release while ``dev`` doc will still point to ``dev`` folder which is the
 documentation of the ``master`` branch.
+
+PyPi build
+----------
+
+TODO
