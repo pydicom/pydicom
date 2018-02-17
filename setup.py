@@ -63,6 +63,7 @@ REQUIRES = []
 SETUP_REQUIRES = pytest_runner
 TESTS_REQUIRE = ['pytest']
 
+
 def data_files_inventory():
     data_files = []
     data_roots = ['pydicom/data']
