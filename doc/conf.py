@@ -76,7 +76,7 @@ intersphinx_mapping = {
 }
 
 sphinx_gallery_conf = {
-    'default_thumb_file': 'assets/img/logo.png',
+    'default_thumb_file': 'assets/img/pydicom_flat_black_alpha.png',
     # path to your examples scripts
     'examples_dirs': '../examples',
     # path where to save gallery generated examples
@@ -178,7 +178,7 @@ html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
-html_logo = "assets/img/logo.png"
+html_logo = "assets/img/pydicom_flat_black.png"
 
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
