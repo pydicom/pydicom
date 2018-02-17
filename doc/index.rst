@@ -51,7 +51,7 @@ core elements of pydicom and how to apply them.
 `Developer Guide <pydicom_dev_guide.html>`_
 --------------------------------------------
 
-The documentation dedicated for developer. It contains information
+The documentation dedicated to developers. It contains information
 for release.
 
 `API Documentation <ref_guide.html>`_

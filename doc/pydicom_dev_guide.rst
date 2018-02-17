@@ -10,7 +10,7 @@ Release guideline
 Bumpversion
 -----------
 
-When you want to release, you can use ``bumpversion`` to update all version
+When you want to release, you can use ``bumpversion`` to update the version
 across the library::
 
   bumpversion release  # Move from 1.0.0.dev0 to 1.0.0
@@ -18,11 +18,11 @@ across the library::
 Then, you can commit this change and refer to the section :ref:`git_github` to
 create a branch and a release.
 
-Once the release created, you need to turn to a new development version::
+Once the release is created, you need to turn to a new development version::
 
   bumpversion minor # Move from 1.0.0 to 1.1.0.dev0
 
-Once this done, you can commit and push to master.
+Once this is done, you can commit and push to master.
 
 .. _git_github:
 
@@ -58,4 +58,11 @@ documentation of the ``master`` branch.
 PyPi build
 ----------
 
-TODO
+The package can be built for the different platform::
+  
+  python setup.py bdist_wininst
+  python setup.py sdist
+  python setup.py bdist_wheel --universal
+
+Then, the different builds can be uploaded to PyPi.
+
