@@ -66,7 +66,17 @@ autosummary_generate = True
 
 autodoc_default_flags = ['members', 'inherited-members']
 
+# intersphinx configuration
+intersphinx_mapping = {
+    'python': ('https://docs.python.org/{.major}'.format(
+        sys.version_info), None),
+    'numpy': ('https://docs.scipy.org/doc/numpy/', None),
+    'scipy': ('https://docs.scipy.org/doc/scipy/reference', None),
+    'matplotlib': ('http://matplotlib.org', None),
+}
+
 sphinx_gallery_conf = {
+    'default_thumb_file': 'assets/img/logo.png',
     # path to your examples scripts
     'examples_dirs': '../examples',
     # path where to save gallery generated examples
@@ -75,10 +85,7 @@ sphinx_gallery_conf = {
     # to make references clickable
     'doc_module': 'pydicom',
     'reference_url': {
-        'pydicom': None,
-        'matplotlib': 'http://matplotlib.org',
-        'numpy': 'http://docs.scipy.org/doc/numpy-1.11.0',
-        'scipy': 'http://docs.scipy.org/doc/scipy-0.18.0/reference'
+        'pydicom': None
     }
 }
 
