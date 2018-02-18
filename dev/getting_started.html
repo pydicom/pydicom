@@ -200,7 +200,7 @@
 <p class="rubric">Brief overview of pydicom and how to install.</p>
 <div class="section" id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
-<p>Pydicom is a pure python package for working with <a class="reference external" href="http://en.wikipedia.org/wiki/DICOM">DICOM</a> files such as medical images, reports,
+<p>Pydicom is a pure Python package for working with <a class="reference external" href="http://en.wikipedia.org/wiki/DICOM">DICOM</a> files such as medical images, reports,
 and radiotherapy objects.</p>
 <p>Pydicom makes it easy to read these complex files into natural pythonic
 structures for easy manipulation. Modified datasets can be written again to
@@ -227,9 +227,9 @@ head-first-prone, and save to a new file:</p>
 </div>
 <p>Pydicom is not a DICOM server <a class="footnote-reference" href="#id3" id="id1">[1]</a>, and is not primarily about viewing
 images. It is designed to let you manipulate data elements in DICOM files with
-python code.</p>
-<p>Pydicom is easy to install and use, and because it is a pure python package, it
-should run anywhere python runs.</p>
+Python code.</p>
+<p>Pydicom is easy to install and use, and because it is a pure Python package, it
+should run wherever Python runs.</p>
 <p>One limitation of pydicom: compressed pixel data (e.g. JPEG) can only be
 altered in an intelligent way if <a class="reference internal" href="image_data_handlers.html"><span class="doc">decompressing</span></a>
 them first. Once decompressed, they can be altered and written back to a
@@ -241,8 +241,8 @@ DICOM file the same way as initially uncompressed data.</p>
 </div>
 <div class="section" id="installing">
 <h2>Installing<a class="headerlink" href="#installing" title="Permalink to this headline">¶</a></h2>
-<p>As a pure python package, pydicom is easy to install and has no requirements
-other than python itself (the NumPy library is recommended, but is only
+<p>As a pure Python package, pydicom is easy to install and has no requirements
+other than Python itself (the NumPy library is recommended, but is only
 required if manipulating pixel data).</p>
 <div class="section" id="prerequisites">
 <h3>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h3>
@@ -306,7 +306,7 @@ from GitHub and install all dependencies:</p>
 </pre></div>
 </div>
 <p>to install in ‘develop’ or ‘editable’ mode, where changes can be made to the
-local working code and python will use the updated pydicom code.</p>
+local working code and Python will use the updated pydicom code.</p>
 </div>
 </div>
 <div class="section" id="test-and-coverage">
@@ -329,8 +329,8 @@ already installed.</p>
 </div>
 <div class="section" id="using-pydicom">
 <h2>Using pydicom<a class="headerlink" href="#using-pydicom" title="Permalink to this headline">¶</a></h2>
-<p>Once installed, the package can be imported at a python command line or used
-in your own python program with <code class="docutils literal"><span class="pre">import</span> <span class="pre">pydicom</span></code>.
+<p>Once installed, the package can be imported at a Python command line or used
+in your own Python program with <code class="docutils literal"><span class="pre">import</span> <span class="pre">pydicom</span></code>.
 See the <a class="reference external" href="https://github.com/pydicom/pydicom/tree/master/examples">examples directory</a>
 for both kinds of uses. Also see the <a class="reference internal" href="pydicom_user_guide.html"><span class="doc">User Guide</span></a>
 for more details of how to use the package.</p>
@@ -351,7 +351,7 @@ cookbook recipes are encouraged to be posted on the <a class="reference external
 <tbody valign="top">
 <tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>For DICOM network capabilities, see the
 <a class="reference external" href="https://github.com/patmun/pynetdicom">pynetdicom</a> and the newer
-<a class="reference external" href="https://github.com/pydicom/pynetdicom3">pynetetdicom3</a> projects.</td></tr>
+<a class="reference external" href="https://github.com/pydicom/pynetdicom3">pynetdicom3</a> projects.</td></tr>
 </tbody>
 </table>
 <table class="docutils footnote" frame="void" id="id4" rules="none">
@@ -359,7 +359,7 @@ cookbook recipes are encouraged to be posted on the <a class="reference external
 <tbody valign="top">
 <tr><td class="label">[2]</td><td>If using python(x,y), other packages you might be interested in include IPython
 (an indispensable interactive shell with auto-completion, history etc),
-Numpy (optionally used by pydicom for pixel data), and ITK/VTK or PIL
+NumPy (optionally used by pydicom for pixel data), and ITK/VTK or PIL
 (image processing and visualization).</td></tr>
 </tbody>
 </table>

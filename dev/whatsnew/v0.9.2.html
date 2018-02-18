@@ -191,7 +191,7 @@
 continue to work until pydicom 1.0, but with a !DeprecationWarning (issue22,
 r72, r73)</li>
 <li>Added support for character sets through Specific Character Set (0008,0005),
-using python unicode. Thus foreign languages can display names in Greek,
+using Python unicode. Thus foreign languages can display names in Greek,
 Japanese, Chinese etc characters in environments which support unicode
 (demonstrated in dicomtree.py example using Tkinter GUI) (r64, r65)</li>
 </ul>
@@ -200,7 +200,7 @@ Japanese, Chinese etc characters in environments which support unicode
 <h3>Other Enhancements<a class="headerlink" href="#other-enhancements" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Added support for auto-completion of dataset elements in ipython; also all
-environments using python 2.6 (r69, r70)</li>
+environments using Python 2.6 (r69, r70)</li>
 <li>Added __iter__() to Dataset so returns data elements in DICOM order with “for
 data_elem in dataset:” (r68)</li>
 <li>Added dicomtree.py example program showing a DICOM file in a GUI window
@@ -208,7 +208,7 @@ data_elem in dataset:” (r68)</li>
 <li>Added !PersonName class to parse components of names more easily (r55)</li>
 <li>Added UID class to handle UID values. Name rather than UID number shown,
 UID_dictionary used (r51).</li>
-<li>Code tested under python 2.6</li>
+<li>Code tested under Python 2.6</li>
 <li>Added !DataElement.name property; synonym for !DataElement.description()
 function</li>
 </ul>
@@ -232,7 +232,7 @@ information (r67)</li>
 <li>Reorganized test files and added various new tests</li>
 <li>added preliminary work on encapsulated data (r50)</li>
 <li>added some simple files to view or work with pixel data (r46)</li>
-<li>Dataset.!PixelDataArray() Numpy array changed to property Dataset.!PixelArray</li>
+<li>Dataset.!PixelDataArray() NumPy array changed to property Dataset.!PixelArray</li>
 <li>changed to setuptools for packaging rather than distutils</li>
 </ul>
 </div>

@@ -8,8 +8,8 @@ Changelog
 
    * there is a *backwards incompatible* change made to storage of file_meta
      info. See item below.
-   * pydicom 0.9.4 requires python 2.4 or higher (pydicom 0.9.3 can run under
-     python 2.3)
+   * pydicom 0.9.4 requires Python 2.4 or higher (pydicom 0.9.3 can run under
+     Python 2.3)
 
 Major changes/additions in this version
 .......................................

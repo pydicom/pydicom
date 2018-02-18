@@ -10,7 +10,7 @@ Getting Started with pydicom
 Introduction
 ============
 
-Pydicom is a pure python package for working with `DICOM
+Pydicom is a pure Python package for working with `DICOM
 <http://en.wikipedia.org/wiki/DICOM>`_ files such as medical images, reports,
 and radiotherapy objects.
 
@@ -43,10 +43,10 @@ head-first-prone, and save to a new file::
 
 Pydicom is not a DICOM server [#]_, and is not primarily about viewing
 images. It is designed to let you manipulate data elements in DICOM files with
-python code.
+Python code.
 
-Pydicom is easy to install and use, and because it is a pure python package, it
-should run anywhere python runs.
+Pydicom is easy to install and use, and because it is a pure Python package, it
+should run wherever Python runs.
 
 One limitation of pydicom: compressed pixel data (e.g. JPEG) can only be
 altered in an intelligent way if :doc:`decompressing </image_data_handlers>`
@@ -62,8 +62,8 @@ Pydicom has an MIT-based `license
 Installing
 ==========
 
-As a pure python package, pydicom is easy to install and has no requirements
-other than python itself (the NumPy library is recommended, but is only
+As a pure Python package, pydicom is easy to install and has no requirements
+other than Python itself (the NumPy library is recommended, but is only
 required if manipulating pixel data).
 
 
@@ -126,7 +126,7 @@ or, for the last line, instead use::
   pip install -e .
 
 to install in 'develop' or 'editable' mode, where changes can be made to the
-local working code and python will use the updated pydicom code.
+local working code and Python will use the updated pydicom code.
 
 
 Test and coverage
@@ -152,8 +152,8 @@ To test the coverage of your versions in linux::
 Using pydicom
 =============
 
-Once installed, the package can be imported at a python command line or used
-in your own python program with ``import pydicom``.
+Once installed, the package can be imported at a Python command line or used
+in your own Python program with ``import pydicom``.
 See the `examples directory
 <https://github.com/pydicom/pydicom/tree/master/examples>`_
 for both kinds of uses. Also see the :doc:`User Guide </pydicom_user_guide>`
@@ -180,8 +180,8 @@ To start learning how to use pydicom, see the :doc:`pydicom_user_guide`.
 
 .. [#] For DICOM network capabilities, see the
    `pynetdicom <https://github.com/patmun/pynetdicom>`_ and the newer
-   `pynetetdicom3 <https://github.com/pydicom/pynetdicom3>`_ projects.
+   `pynetdicom3 <https://github.com/pydicom/pynetdicom3>`_ projects.
 .. [#] If using python(x,y), other packages you might be interested in include IPython
    (an indispensable interactive shell with auto-completion, history etc),
-   Numpy (optionally used by pydicom for pixel data), and ITK/VTK or PIL
+   NumPy (optionally used by pydicom for pixel data), and ITK/VTK or PIL
    (image processing and visualization).

@@ -4,9 +4,9 @@ Version 0.9.7
 Changelog
 ---------
 
-pydicom 0.9.7 resolves some remaining bugs before moving to python 3
-compatibility. ** It is the last version which will run with python < 2.6 **
-(it will run with python2.4 to python2.7)
+pydicom 0.9.7 resolves some remaining bugs before moving to Python 3
+compatibility. ** It is the last version which will run with Python < 2.6 **
+(it will run with Python 2.4 to Python 2.7)
 
 Major changes
 .............
@@ -18,7 +18,7 @@ For example:
 * Beams becomes BeamSequence (and similar for all sequences)
 * Decimal and integer strings handled much better (revisions 4ed698a7bfbe and
   c313d2befb08).
-* New classes for VR of types DS and IS (DS is derived from python Decimal)
+* New classes for VR of types DS and IS (DS is derived from Python Decimal)
 * New MultiValue class, enforcing all values of same type
 * New config.py file with user-definable parameters:
 * allow_DS_float (default False) for controlling whether float values can be

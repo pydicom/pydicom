@@ -204,7 +204,7 @@
 <p class="rubric">How to use other packages with pydicom to view DICOM images</p>
 <div class="section" id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
-<p>pydicom is mainly concerned with getting at the DICOM data elements in files,
+<p>Pydicom is mainly concerned with getting at the DICOM data elements in files,
 but it is often desirable to view pixel data as an image.
 There are several options:</p>
 <blockquote>
@@ -212,7 +212,7 @@ There are several options:</p>
 <li>Use any of the many <a class="reference external" href="http://www.dclunie.com/medical-image-faq/html/part8.html#DICOMFileConvertorsAndViewers">DICOM viewer</a>
 programs available</li>
 <li>use pydicom with <a class="reference external" href="https://matplotlib.org/">matplotlib</a></li>
-<li>use pydicom with python’s stdlib <a class="reference external" href="https://docs.python.org/3.4/library/tkinter.html">Tkinter</a> module.</li>
+<li>use pydicom with Python’s stdlib <a class="reference external" href="https://docs.python.org/3.4/library/tkinter.html">Tkinter</a> module.</li>
 <li>use pydicom with the <a class="reference external" href="http://www.pythonware.com/products/pil/">Python Imaging Library (PIL)</a></li>
 <li>use pydicom with <a class="reference external" href="http://www.wxpython.org/">wxPython</a></li>
 </ul>
@@ -220,8 +220,8 @@ programs available</li>
 </div>
 <div class="section" id="using-pydicom-with-matplotlib">
 <h2>Using pydicom with matplotlib<a class="headerlink" href="#using-pydicom-with-matplotlib" title="Permalink to this headline">¶</a></h2>
-<p>matplotlib is available at <a class="reference external" href="https://matplotlib.org/">https://matplotlib.org/</a>. It
-can take 2-d image information from <code class="docutils literal"><span class="pre">Dataset.pixel_array</span></code> and display it.
+<p>Matplotlib is available at <a class="reference external" href="https://matplotlib.org/">https://matplotlib.org/</a>. It
+can take 2D image information from <code class="docutils literal"><span class="pre">Dataset.pixel_array</span></code> and display it.
 Here is an example:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pydicom</span>
@@ -239,7 +239,7 @@ Here is an example:</p>
 <h2>Using pydicom with Tkinter<a class="headerlink" href="#using-pydicom-with-tkinter" title="Permalink to this headline">¶</a></h2>
 <p>The program <a class="reference external" href="https://github.com/pydicom/contrib-pydicom/blob/master/viewers/pydicom_Tkinter.py">pydicom_Tkinter.py</a>
 in the <code class="docutils literal"><span class="pre">contrib-pydicom</span></code> repository demonstrates how to show an image using the
-Tkinter graphics system, which comes standard with most python installs.
+Tkinter graphics system, which comes by default with most Python installations.
 It creates a Tkinter PhotoImage in a Label widget or a user-supplied widget.</p>
 </div>
 <div class="section" id="using-pydicom-with-python-imaging-library-pil">
@@ -247,7 +247,7 @@ It creates a Tkinter PhotoImage in a Label widget or a user-supplied widget.</p>
 <p>The module <a class="reference external" href="https://github.com/pydicom/contrib-pydicom/blob/master/viewers/pydicom_PIL.py">pydicom_PIL.py</a>
 in the <code class="docutils literal"><span class="pre">contrib-pydicom</span></code> repository
 uses PIL’s <code class="docutils literal"><span class="pre">Image.show()</span></code> method after creating an Image instance
-from the pixel data and some basic information about it (bit depth, LUTs, etc)</p>
+from the pixel data and some basic information about it (bit depth, LUTs, etc).</p>
 </div>
 <div class="section" id="using-pydicom-with-wxpython">
 <h2>Using pydicom with wxPython<a class="headerlink" href="#using-pydicom-with-wxpython" title="Permalink to this headline">¶</a></h2>

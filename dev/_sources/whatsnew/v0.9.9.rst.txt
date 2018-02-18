@@ -4,20 +4,20 @@ Version 0.9.9
 Changelog
 ---------
 
-In addition to bug fixes, pydicom 0.9.9 contains updates for all dicom
+In addition to bug fixes, pydicom 0.9.9 contains updates for all DICOM
 dictionaries.  New features include DICOMDIR handling, and a utility module
-which produces python/pydicom source code to recreate a dicom file.
+which produces python/pydicom source code to recreate a DICOM file.
 
 Enhancements
 ............
 
-* All dicom dictionaries updated (standard dictionary, UID dictionary, and
+* All DICOM dictionaries updated (standard dictionary, UID dictionary, and
   private dictionaries)
 * Dicom commands also added to dictionary
 * Ability to work with DICOMDIR: ``read_dicomdir()`` function and ``DicomDir``
   class. Example file ``show_dicomdir.py`` file added to examples subdirectory.
-* ``codify.py``: Produce python/pydicom source code from a dicom file.
-* a number of python 3 compatibility enhancements
+* ``codify.py``: Produce python/pydicom source code from a DICOM file.
+* a number of Python 3 compatibility enhancements
 * setup.py uses ez_setup only if setuptools not already installed
 * exceptions carry tag info with them, to aid in debugging
 
