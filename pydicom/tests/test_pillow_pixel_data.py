@@ -338,16 +338,8 @@ class pillow_JPEG2000Tests_with_pillow(unittest.TestCase):
                 "(mean == {1})".format(b.mean(), a.mean()))
 
     def test_jpeg2000_lossy(self):
-        a = self.sc_rgb_jpeg2k_gdcm_KY.pixel_array
-        b = self.ground_truth_sc_rgb_jpeg2k_gdcm_KY_gdcm.pixel_array
-        if have_numpy_testing:
-            numpy.testing.assert_array_equal(a, b)
-        else:
-            self.assertEqual(
-                a.mean(),
-                b.mean(),
-                "Decoded pixel data is not all {0} "
-                "(mean == {1})".format(b.mean(), a.mean()))
+        with pytest.raises(NotImplementedError):
+            _ = self.sc_rgb_jpeg2k_gdcm_KY.pixel_array
 
 
 @pytest.mark.skipif(
