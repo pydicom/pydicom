@@ -93,17 +93,22 @@ which installs the latest release.  To install the latest code from the reposito
 
   pip install -U git+https://github.com/pydicom/pydicom.git
 
-  
+
+Pydicom is also available on conda-forge::
+
+  conda install pydicom --channel conda-forge
+
 To install pydicom along with image handlers for compressed pixel data, 
 we encourage you to use `Miniconda <https://conda.io/miniconda.html>`_ or
 `Anaconda <https://docs.continuum.io/anaconda/>`_.  For example::
 
-  conda create --name pydicomenv python=3.6 pip pydicom numpy
+  conda create --name pydicomenv python=3.6 pip numpy
+  conda install pydicom --channel conda-forge
 
 will install pip, pydicom, and numpy in an environment called pydicomenv.  
 To add gdcm after activating the environment::
 
-  conda install -c clinicalgraphics gdcm
+  conda install -c conda-forge gdcm
 
 The environment is optional; see the conda software for details of its setup 
 and use of environments.

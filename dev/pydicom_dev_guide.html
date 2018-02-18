@@ -1,0 +1,324 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Pydicom Developer Guide &mdash; pydicom 1.0.0 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/pydicom.css" type="text/css" />
+  
+
+  
+    <link rel="stylesheet" href="_static/gallery.css" type="text/css" />
+  
+    <link rel="stylesheet" href="_static/css/pydicom.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="pydicom 1.0.0 documentation" href="index.html"/>
+        <link rel="next" title="Pydicom API’s Reference Guide" href="ref_guide.html"/>
+        <link rel="prev" title="Viewing Images" href="viewing_images.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> pydicom
+          
+
+          
+            
+            <img src="_static/logo.png" class="logo" />
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started with pydicom</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="pydicom_user_guide.html">Pydicom User Guide</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Pydicom Developer Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#release-guideline">Release guideline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#bumpversion">Bumpversion</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#git-and-github">Git and GitHub</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#documentation">Documentation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#pypi-build">PyPi build</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ref_guide.html">Pydicom API’s Reference Guide</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html">General examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html#image-processing">Image processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html#input-output">Input-output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html#metadata-processing">Metadata processing</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="release-notes.html">Release history</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">pydicom</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Pydicom Developer Guide</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/pydicom_dev_guide.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="pydicom-developer-guide">
+<span id="pydicom-dev-guide"></span><h1>Pydicom Developer Guide<a class="headerlink" href="#pydicom-developer-guide" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="release-guideline">
+<h2>Release guideline<a class="headerlink" href="#release-guideline" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="bumpversion">
+<h2>Bumpversion<a class="headerlink" href="#bumpversion" title="Permalink to this headline">¶</a></h2>
+<p>When you want to release, you can use <code class="docutils literal"><span class="pre">bumpversion</span></code> to update the version
+across the library:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">bumpversion</span> <span class="n">release</span>  <span class="c1"># Move from 1.0.0.dev0 to 1.0.0</span>
+</pre></div>
+</div>
+<p>Then, you can commit this change and refer to the section <a class="reference internal" href="#git-github"><span class="std std-ref">Git and GitHub</span></a> to
+create a branch and a release.</p>
+<p>Once the release is created, you need to turn to a new development version:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">bumpversion</span> <span class="n">minor</span> <span class="c1"># Move from 1.0.0 to 1.1.0.dev0</span>
+</pre></div>
+</div>
+<p>Once this is done, you can commit and push to master.</p>
+<div class="section" id="git-and-github">
+<span id="git-github"></span><h3>Git and GitHub<a class="headerlink" href="#git-and-github" title="Permalink to this headline">¶</a></h3>
+<p>At the moment of a release, a git branch need to be created with the semantic
+<code class="docutils literal"><span class="pre">major.minor.X</span></code> (e.g. <a href="#id1"><span class="problematic" id="id2">``</span></a>1.0.X). It will be used in the future to backport bug
+fixes.</p>
+<p>For each patch, a release with an associated tag should be created through the
+GitHub front-end. The target branch will not be <code class="docutils literal"><span class="pre">master</span></code> but the maintenance
+branch <code class="docutils literal"><span class="pre">major.minor.X</span></code>.</p>
+</div>
+<div class="section" id="documentation">
+<h3>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h3>
+<p>At the moment of a release, there is a need to manually edit the directory of
+the <cite>gh-pages</cite>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">checkout</span> <span class="n">gh</span><span class="o">-</span><span class="n">pages</span>
+<span class="n">cp</span> <span class="o">-</span><span class="n">r</span> <span class="n">dev</span> <span class="n">major</span><span class="o">.</span><span class="n">minor</span>  <span class="c1"># major.minor represent a version of the release (1.0)</span>
+<span class="n">unlink</span> <span class="n">stable</span>
+<span class="n">ln</span> <span class="o">-</span><span class="n">s</span> <span class="n">major</span><span class="o">.</span><span class="n">minor</span> <span class="n">stable</span>
+<span class="n">git</span> <span class="n">add</span> <span class="n">major</span><span class="o">.</span><span class="n">minor</span>
+<span class="n">git</span> <span class="n">commit</span> <span class="o">-</span><span class="n">am</span> <span class="s1">&#39;DOC new release major.minor&#39;</span>
+</pre></div>
+</div>
+<p>By doing so, any bug fix pushed in a maintenance branch will trigger a
+documentation build. The <code class="docutils literal"><span class="pre">stable</span></code> version of the doc will also point to the
+new release while <code class="docutils literal"><span class="pre">dev</span></code> doc will still point to <code class="docutils literal"><span class="pre">dev</span></code> folder which is the
+documentation of the <code class="docutils literal"><span class="pre">master</span></code> branch.</p>
+</div>
+</div>
+<div class="section" id="pypi-build">
+<h2>PyPi build<a class="headerlink" href="#pypi-build" title="Permalink to this headline">¶</a></h2>
+<p>The package can be built for the different platform:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">bdist_wininst</span>
+<span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">sdist</span>
+<span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">bdist_wheel</span> <span class="o">--</span><span class="n">universal</span>
+</pre></div>
+</div>
+<p>Then, the different builds can be uploaded to PyPi.</p>
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="ref_guide.html" class="btn btn-neutral float-right" title="Pydicom API’s Reference Guide" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="viewing_images.html" class="btn btn-neutral" title="Viewing Images" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2018, Darcy Mason and pydicom contributors.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'1.0.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
