@@ -5,7 +5,10 @@ import sys
 from glob import glob
 from setuptools import setup, find_packages
 
-from pydicom import __version__
+# get __version__ from _version.py
+ver_file = os.path.join('pydicom', '_version.py')
+with open(ver_file) as f:
+    exec(f.read())
 
 description = "Pure python package for DICOM medical file reading and writing"
 
@@ -78,7 +81,7 @@ def data_files_inventory():
 PACKAGE_DATA = {'pydicom': data_files_inventory()}
 
 opts = dict(name=NAME,
-            version=__version__,
+            version=VERSION,
             maintainer=MAINTAINER,
             maintainer_email=MAINTAINER_EMAIL,
             author=AUTHOR,
