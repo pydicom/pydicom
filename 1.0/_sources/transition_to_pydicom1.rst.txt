@@ -24,7 +24,7 @@ Backwards-incompatible changes post 1.0
 
 Why was the package name changed?  There are several reasons for this change:
 
-  * it is standard python practice for the package and the installed library to
+  * it is standard Python practice for the package and the installed library to
     have the same name
   * first-time users expect to be able to type ``import pydicom`` rather than
     ``import dicom``, which has caused confusion
@@ -32,7 +32,7 @@ Why was the package name changed?  There are several reasons for this change:
     to find relevant questions and example code online
 
 The decision wasn't taken lightly, but with a great deal of discussion on the
-github issues list.  Having made the leap, the rest of this guide should help
+GitHub issues list.  Having made the leap, the rest of this guide should help
 smooth the way...
 
 For authors of packages requiring pydicom < 1.0
@@ -69,7 +69,7 @@ get an ImportError message::
   ImportError: No module named pydicom
 
 Your choice then is to update to pydicom >=1.0 (see Installing pydicom
-section), or to instead use ``import dicom`` and follow old-style pydicom
+section), or to instead use ``import dicom`` and follow the old-style pydicom
 syntax.
 
 Conversely, if pydicom >= 1.0 is installed, the error message for ``import
@@ -80,7 +80,7 @@ dicom`` will look like::
     File "<stdin>", line 1, in <module>
   ImportError: No module named dicom
 
-In this case you likely have installed pydicom >= 1.0, and so ``dicom`` library
+In this case you likely have installed pydicom >= 1.0, and so the ``dicom`` library
 does not exist.  You can simply ``import pydicom`` instead, and continue with
 the new pydicom, or, if you really need the old pydicom, then you should::
 

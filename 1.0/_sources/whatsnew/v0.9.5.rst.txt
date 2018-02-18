@@ -23,7 +23,7 @@ Other fixes in this release
 * Fix for unicode decode failing with VM > 1 (issue 78)
 * fix for fail of DicomIter on files with Explicit VR Transfer Syntax UID
   (issue 82)
-* Fix for python 2.5 and 'with' statement (revision 1c32791bf0)
+* Fix for Python 2.5 and 'with' statement (revision 1c32791bf0)
 * Handle 'OB/OW' VR as well as 'OW/OB' (revision e3ee934bbc)
 * Fix dataset.get(tag) so returns same as dataset[tag] (issue 88)
 
@@ -38,6 +38,6 @@ Other
 .....
 
 * switch to Distribute for packaging
-* preliminary work on python 3 compatiblity
+* preliminary work on Python 3 compatiblity
 * preliminary work on using sphinx for documentation
 * preliminary work on better writing of files from scratch

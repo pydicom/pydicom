@@ -66,7 +66,7 @@
 
           
             
-            <img src="_static/logo.png" class="logo" />
+            <img src="_static/pydicom_flat_black.svg" class="logo" />
           
           </a>
 
@@ -105,6 +105,7 @@
 <p class="caption"><span class="caption-text">Documentation</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="pydicom_user_guide.html">Pydicom User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pydicom_dev_guide.html">Pydicom Developer Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ref_guide.html">Pydicom API’s Reference Guide</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Examples</span></p>
@@ -362,19 +363,19 @@ and <a class="reference external" href="https://pydicom.github.io/pydicom/stable
 <h2>Version 0.9.9<a class="headerlink" href="#version-0-9-9" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="id1">
 <h3>Changelog<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
-<p>In addition to bug fixes, pydicom 0.9.9 contains updates for all dicom
+<p>In addition to bug fixes, pydicom 0.9.9 contains updates for all DICOM
 dictionaries.  New features include DICOMDIR handling, and a utility module
-which produces python/pydicom source code to recreate a dicom file.</p>
+which produces python/pydicom source code to recreate a DICOM file.</p>
 <div class="section" id="enhancements">
 <h4>Enhancements<a class="headerlink" href="#enhancements" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
-<li>All dicom dictionaries updated (standard dictionary, UID dictionary, and
+<li>All DICOM dictionaries updated (standard dictionary, UID dictionary, and
 private dictionaries)</li>
 <li>Dicom commands also added to dictionary</li>
 <li>Ability to work with DICOMDIR: <code class="docutils literal"><span class="pre">read_dicomdir()</span></code> function and <code class="docutils literal"><span class="pre">DicomDir</span></code>
 class. Example file <code class="docutils literal"><span class="pre">show_dicomdir.py</span></code> file added to examples subdirectory.</li>
-<li><code class="docutils literal"><span class="pre">codify.py</span></code>: Produce python/pydicom source code from a dicom file.</li>
-<li>a number of python 3 compatibility enhancements</li>
+<li><code class="docutils literal"><span class="pre">codify.py</span></code>: Produce python/pydicom source code from a DICOM file.</li>
+<li>a number of Python 3 compatibility enhancements</li>
 <li>setup.py uses ez_setup only if setuptools not already installed</li>
 <li>exceptions carry tag info with them, to aid in debugging</li>
 </ul>
@@ -398,22 +399,22 @@ Papadopoulos, videan42 …(sorry if I’ve missed anyone).</p>
 <h2>Version 0.9.8<a class="headerlink" href="#version-0-9-8" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="id2">
 <h3>Changelog<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
-<p>pydicom 0.9.8 is mainly a consolidation step before moving to official python 3
+<p>pydicom 0.9.8 is mainly a consolidation step before moving to official Python 3
 compatibility in pydicom 1.0.  It also reverts the change to using Decimal for
 VR of DS (in pydicom 0.9.7), due to performance issues. DS as Decimal is still
 available, but is off by default.</p>
 <div class="section" id="id3">
 <h4>Major changes<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
-<li>Requires python 2.6 or later, in preparation for python 3 compatibility</li>
-<li>experimental python 3 compatibility (unofficial at this point) – uncomment
+<li>Requires Python 2.6 or later, in preparation for Python 3 compatibility</li>
+<li>experimental Python 3 compatibility (unofficial at this point) – uncomment
 the two indicated lines in setup.py to use it. Please provide feedback to the
 issues list.</li>
 <li>DS values reverted to using float as default (issue 114) due to slow
-performance using python Decimal. Speed tests show approx factor of 10
+performance using Python Decimal. Speed tests show approx factor of 10
 improvement compared with pydicom 0.9.7 (several revisions up to
 r78ba350a3eb8)</li>
-<li>streamlined much code internally taking advantage of modern python
+<li>streamlined much code internally taking advantage of modern Python
 constructs: decorators, generators, etc</li>
 </ul>
 </div>
@@ -431,17 +432,17 @@ constructs: decorators, generators, etc</li>
 <ul class="simple">
 <li>UID generator added (Félix C. Morency) (revisions 0197b5846bb5 and
 3678b1be6aca, tests in f1ae573d9de5, 0411bab7c985)</li>
-<li>new PersonName3 class for python 3: (revision 9b92b336e7d4)</li>
+<li>new PersonName3 class for Python 3: (revision 9b92b336e7d4)</li>
 </ul>
 </div>
 <div class="section" id="id5">
 <h4>Contrib file changes<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li>Fix for pydicom_series for DS decimal (revision e830f30b6781)</li>
-<li>new dcm_qt_tree.py module - tree display of dicom files using PySide and
+<li>new dcm_qt_tree.py module - tree display of DICOM files using PySide and
 Qt. Contributed by Padraig Looney.</li>
 </ul>
-<p>Special acknowledgement to Jonathan Suever who contributed most of the python 3
+<p>Special acknowledgement to Jonathan Suever who contributed most of the Python 3
 work and many bug fixes.</p>
 </div>
 </div>
@@ -450,9 +451,9 @@ work and many bug fixes.</p>
 <h2>Version 0.9.7<a class="headerlink" href="#version-0-9-7" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="id6">
 <h3>Changelog<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
-<p>pydicom 0.9.7 resolves some remaining bugs before moving to python 3
-compatibility. ** It is the last version which will run with python &lt; 2.6 **
-(it will run with python2.4 to python2.7)</p>
+<p>pydicom 0.9.7 resolves some remaining bugs before moving to Python 3
+compatibility. ** It is the last version which will run with Python &lt; 2.6 **
+(it will run with Python 2.4 to Python 2.7)</p>
 <div class="section" id="id7">
 <h4>Major changes<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
@@ -466,7 +467,7 @@ For example:
 <blockquote>
 <div>c313d2befb08).</div></blockquote>
 <ul class="simple">
-<li>New classes for VR of types DS and IS (DS is derived from python Decimal)</li>
+<li>New classes for VR of types DS and IS (DS is derived from Python Decimal)</li>
 <li>New MultiValue class, enforcing all values of same type</li>
 <li>New config.py file with user-definable parameters:</li>
 <li>allow_DS_float (default False) for controlling whether float values can be
@@ -566,7 +567,7 @@ fc790f01f5)</li>
 <li>Fix for unicode decode failing with VM &gt; 1 (issue 78)</li>
 <li>fix for fail of DicomIter on files with Explicit VR Transfer Syntax UID
 (issue 82)</li>
-<li>Fix for python 2.5 and ‘with’ statement (revision 1c32791bf0)</li>
+<li>Fix for Python 2.5 and ‘with’ statement (revision 1c32791bf0)</li>
 <li>Handle ‘OB/OW’ VR as well as ‘OW/OB’ (revision e3ee934bbc)</li>
 <li>Fix dataset.get(tag) so returns same as dataset[tag] (issue 88)</li>
 </ul>
@@ -583,7 +584,7 @@ series.</li>
 <h4>Other<a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li>switch to Distribute for packaging</li>
-<li>preliminary work on python 3 compatiblity</li>
+<li>preliminary work on Python 3 compatiblity</li>
 <li>preliminary work on using sphinx for documentation</li>
 <li>preliminary work on better writing of files from scratch</li>
 </ul>
@@ -655,7 +656,7 @@ header (r109)</li>
 continue to work until pydicom 1.0, but with a !DeprecationWarning (issue22,
 r72, r73)</li>
 <li>Added support for character sets through Specific Character Set (0008,0005),
-using python unicode. Thus foreign languages can display names in Greek,
+using Python unicode. Thus foreign languages can display names in Greek,
 Japanese, Chinese etc characters in environments which support unicode
 (demonstrated in dicomtree.py example using Tkinter GUI) (r64, r65)</li>
 </ul>
@@ -664,7 +665,7 @@ Japanese, Chinese etc characters in environments which support unicode
 <h4>Other Enhancements<a class="headerlink" href="#id22" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li>Added support for auto-completion of dataset elements in ipython; also all
-environments using python 2.6 (r69, r70)</li>
+environments using Python 2.6 (r69, r70)</li>
 <li>Added __iter__() to Dataset so returns data elements in DICOM order with “for
 data_elem in dataset:” (r68)</li>
 <li>Added dicomtree.py example program showing a DICOM file in a GUI window
@@ -672,7 +673,7 @@ data_elem in dataset:” (r68)</li>
 <li>Added !PersonName class to parse components of names more easily (r55)</li>
 <li>Added UID class to handle UID values. Name rather than UID number shown,
 UID_dictionary used (r51).</li>
-<li>Code tested under python 2.6</li>
+<li>Code tested under Python 2.6</li>
 <li>Added !DataElement.name property; synonym for !DataElement.description()
 function</li>
 </ul>
@@ -696,7 +697,7 @@ information (r67)</li>
 <li>Reorganized test files and added various new tests</li>
 <li>added preliminary work on encapsulated data (r50)</li>
 <li>added some simple files to view or work with pixel data (r46)</li>
-<li>Dataset.!PixelDataArray() Numpy array changed to property Dataset.!PixelArray</li>
+<li>Dataset.!PixelDataArray() NumPy array changed to property Dataset.!PixelArray</li>
 <li>changed to setuptools for packaging rather than distutils</li>
 </ul>
 </div>

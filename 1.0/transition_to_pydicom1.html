@@ -68,7 +68,7 @@
 
           
             
-            <img src="_static/logo.png" class="logo" />
+            <img src="_static/pydicom_flat_black.svg" class="logo" />
           
           </a>
 
@@ -119,6 +119,7 @@
 <li class="toctree-l2"><a class="reference internal" href="viewing_images.html">Viewing Images</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="pydicom_dev_guide.html">Pydicom Developer Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ref_guide.html">Pydicom API’s Reference Guide</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Examples</span></p>
@@ -219,7 +220,7 @@ is now <code class="docutils literal"><span class="pre">pydicom.uid</span></code
 <p>Why was the package name changed?  There are several reasons for this change:</p>
 <blockquote>
 <div><ul class="simple">
-<li>it is standard python practice for the package and the installed library to
+<li>it is standard Python practice for the package and the installed library to
 have the same name</li>
 <li>first-time users expect to be able to type <code class="docutils literal"><span class="pre">import</span> <span class="pre">pydicom</span></code> rather than
 <code class="docutils literal"><span class="pre">import</span> <span class="pre">dicom</span></code>, which has caused confusion</li>
@@ -228,7 +229,7 @@ to find relevant questions and example code online</li>
 </ul>
 </div></blockquote>
 <p>The decision wasn’t taken lightly, but with a great deal of discussion on the
-github issues list.  Having made the leap, the rest of this guide should help
+GitHub issues list.  Having made the leap, the rest of this guide should help
 smooth the way…</p>
 </div>
 <div class="section" id="for-authors-of-packages-requiring-pydicom-1-0">
@@ -263,7 +264,7 @@ get an ImportError message:</p>
 </pre></div>
 </div>
 <p>Your choice then is to update to pydicom &gt;=1.0 (see Installing pydicom
-section), or to instead use <code class="docutils literal"><span class="pre">import</span> <span class="pre">dicom</span></code> and follow old-style pydicom
+section), or to instead use <code class="docutils literal"><span class="pre">import</span> <span class="pre">dicom</span></code> and follow the old-style pydicom
 syntax.</p>
 <p>Conversely, if pydicom &gt;= 1.0 is installed, the error message for <code class="docutils literal"><span class="pre">import</span>
 <span class="pre">dicom</span></code> will look like:</p>
@@ -273,7 +274,7 @@ syntax.</p>
 <span class="gr">ImportError</span>: <span class="n">No module named dicom</span>
 </pre></div>
 </div>
-<p>In this case you likely have installed pydicom &gt;= 1.0, and so <code class="docutils literal"><span class="pre">dicom</span></code> library
+<p>In this case you likely have installed pydicom &gt;= 1.0, and so the <code class="docutils literal"><span class="pre">dicom</span></code> library
 does not exist.  You can simply <code class="docutils literal"><span class="pre">import</span> <span class="pre">pydicom</span></code> instead, and continue with
 the new pydicom, or, if you really need the old pydicom, then you should:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">dicom</span>

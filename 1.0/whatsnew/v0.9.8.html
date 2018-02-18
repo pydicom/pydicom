@@ -65,7 +65,7 @@
 
           
             
-            <img src="../_static/logo.png" class="logo" />
+            <img src="../_static/pydicom_flat_black.svg" class="logo" />
           
           </a>
 
@@ -104,6 +104,7 @@
 <p class="caption"><span class="caption-text">Documentation</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../pydicom_user_guide.html">Pydicom User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pydicom_dev_guide.html">Pydicom Developer Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ref_guide.html">Pydicom API’s Reference Guide</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Examples</span></p>
@@ -183,22 +184,22 @@
 <h1>Version 0.9.8<a class="headerlink" href="#version-0-9-8" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="changelog">
 <h2>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h2>
-<p>pydicom 0.9.8 is mainly a consolidation step before moving to official python 3
+<p>pydicom 0.9.8 is mainly a consolidation step before moving to official Python 3
 compatibility in pydicom 1.0.  It also reverts the change to using Decimal for
 VR of DS (in pydicom 0.9.7), due to performance issues. DS as Decimal is still
 available, but is off by default.</p>
 <div class="section" id="major-changes">
 <h3>Major changes<a class="headerlink" href="#major-changes" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li>Requires python 2.6 or later, in preparation for python 3 compatibility</li>
-<li>experimental python 3 compatibility (unofficial at this point) – uncomment
+<li>Requires Python 2.6 or later, in preparation for Python 3 compatibility</li>
+<li>experimental Python 3 compatibility (unofficial at this point) – uncomment
 the two indicated lines in setup.py to use it. Please provide feedback to the
 issues list.</li>
 <li>DS values reverted to using float as default (issue 114) due to slow
-performance using python Decimal. Speed tests show approx factor of 10
+performance using Python Decimal. Speed tests show approx factor of 10
 improvement compared with pydicom 0.9.7 (several revisions up to
 r78ba350a3eb8)</li>
-<li>streamlined much code internally taking advantage of modern python
+<li>streamlined much code internally taking advantage of modern Python
 constructs: decorators, generators, etc</li>
 </ul>
 </div>
@@ -216,17 +217,17 @@ constructs: decorators, generators, etc</li>
 <ul class="simple">
 <li>UID generator added (Félix C. Morency) (revisions 0197b5846bb5 and
 3678b1be6aca, tests in f1ae573d9de5, 0411bab7c985)</li>
-<li>new PersonName3 class for python 3: (revision 9b92b336e7d4)</li>
+<li>new PersonName3 class for Python 3: (revision 9b92b336e7d4)</li>
 </ul>
 </div>
 <div class="section" id="contrib-file-changes">
 <h3>Contrib file changes<a class="headerlink" href="#contrib-file-changes" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Fix for pydicom_series for DS decimal (revision e830f30b6781)</li>
-<li>new dcm_qt_tree.py module - tree display of dicom files using PySide and
+<li>new dcm_qt_tree.py module - tree display of DICOM files using PySide and
 Qt. Contributed by Padraig Looney.</li>
 </ul>
-<p>Special acknowledgement to Jonathan Suever who contributed most of the python 3
+<p>Special acknowledgement to Jonathan Suever who contributed most of the Python 3
 work and many bug fixes.</p>
 </div>
 </div>

@@ -68,7 +68,7 @@
 
           
             
-            <img src="_static/logo.png" class="logo" />
+            <img src="_static/pydicom_flat_black.svg" class="logo" />
           
           </a>
 
@@ -120,6 +120,7 @@
 <li class="toctree-l2"><a class="reference internal" href="viewing_images.html">Viewing Images</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="pydicom_dev_guide.html">Pydicom Developer Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ref_guide.html">Pydicom API’s Reference Guide</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Examples</span></p>
@@ -203,9 +204,9 @@
 <div class="section" id="dataset">
 <h2>Dataset<a class="headerlink" href="#dataset" title="Permalink to this headline">¶</a></h2>
 <p><a class="reference internal" href="ref_guide.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal"><span class="pre">dataset.Dataset</span></code></a> is the main object you will work with
-directly. Dataset is derived from python’s <code class="docutils literal"><span class="pre">dict</span></code>, so it inherits (and
-overrides some of) the methods of <code class="docutils literal"><span class="pre">dict</span></code>. In other words it is a collection
-of key:value pairs, where the key value is the DICOM (group,element) tag (as a
+directly. Dataset is derived from Python’s <code class="docutils literal"><span class="pre">dict</span></code>, so it inherits (and
+overrides some of) the methods of <code class="docutils literal"><span class="pre">dict</span></code>. In other words, it is a collection
+of key:value pairs, where the key is the DICOM (group,element) tag (as a
 Tag object, described below), and the value is a DataElement instance (also
 described below).</p>
 <p>A dataset could be created directly, but you will usually get one by reading
@@ -262,7 +263,7 @@ usage example of data elements removal and assignation.</p>
 <p class="first admonition-title">Note</p>
 <p>To understand using <code class="xref py py-class docutils literal"><span class="pre">sequence.Sequences</span></code> in pydicom, please refer to
 this object model:
-<a class="reference internal" href="ref_guide.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal"><span class="pre">dataset.Dataset</span></code></a> (derived from python’s <code class="docutils literal"><span class="pre">dict</span></code>)</p>
+<a class="reference internal" href="ref_guide.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal"><span class="pre">dataset.Dataset</span></code></a> (derived from Python’s <code class="docutils literal"><span class="pre">dict</span></code>)</p>
 <blockquote class="last">
 <div><dl class="docutils">
 <dt>—&gt; contains DataElement instances</dt>
@@ -279,8 +280,8 @@ this object model:
 </dl>
 </div></blockquote>
 </div>
-<p>DICOM <code class="xref py py-class docutils literal"><span class="pre">sequence.Sequences</span></code> are turned into python <code class="docutils literal"><span class="pre">list</span></code> s. Items in
-the sequence are referenced by number, beginning at index 0 as per python
+<p>DICOM <code class="xref py py-class docutils literal"><span class="pre">sequence.Sequences</span></code> are turned into Python <code class="docutils literal"><span class="pre">list</span></code> s. Items in
+the sequence are referenced by number, beginning at index 0 as per Python
 convention:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">BeamSequence</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">BeamName</span>
 <span class="go">&#39;Field 1&#39;</span>
@@ -300,7 +301,7 @@ can also use the tag numbers directly, such as:</p>
 </div>
 <p>If you don’t remember or know the exact tag name, <a class="reference internal" href="ref_guide.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal"><span class="pre">dataset.Dataset</span></code></a>
 provides a handy <a class="reference internal" href="ref_guide.html#pydicom.dataset.Dataset.dir" title="pydicom.dataset.Dataset.dir"><code class="xref py py-func docutils literal"><span class="pre">dataset.Dataset.dir()</span></code></a> method, useful during interactive
-sessions at the python prompt:</p>
+sessions at the Python prompt:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">dir</span><span class="p">(</span><span class="s2">&quot;pat&quot;</span><span class="p">)</span>
 <span class="go">[&#39;PatientBirthDate&#39;, &#39;PatientID&#39;, &#39;PatientName&#39;, &#39;PatientSetupSequence&#39;, &#39;PatientSex&#39;]</span>
 </pre></div>
@@ -318,9 +319,9 @@ doesn’t already know about.</p>
 <p>Under the hood, <a class="reference internal" href="ref_guide.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal"><span class="pre">dataset.Dataset</span></code></a> stores a DataElement object for each
 item, but when accessed by name (e.g. <code class="docutils literal"><span class="pre">ds.PatientName</span></code>) only the <code class="docutils literal"><span class="pre">value</span></code> of
 that <code class="xref py py-class docutils literal"><span class="pre">dataelem.DataElement</span></code> is returned. If you need the whole
-<code class="xref py py-mod docutils literal"><span class="pre">dataelem</span></code> (see the <code class="xref py py-class docutils literal"><span class="pre">dataelem.DataElement</span></code> discussion), you can use
-<a class="reference internal" href="ref_guide.html#pydicom.dataset.Dataset.data_element" title="pydicom.dataset.Dataset.data_element"><code class="xref py py-func docutils literal"><span class="pre">dataset.Dataset.data_element()</span></code></a> method or access the item using the tag
-number:</p>
+<code class="xref py py-mod docutils literal"><span class="pre">dataelem</span></code> (see the <code class="xref py py-class docutils literal"><span class="pre">dataelem.DataElement</span></code> discussion), you can
+use the <a class="reference internal" href="ref_guide.html#pydicom.dataset.Dataset.data_element" title="pydicom.dataset.Dataset.data_element"><code class="xref py py-func docutils literal"><span class="pre">dataset.Dataset.data_element()</span></code></a> method or access the item using
+the tag number:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># reload the data</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">dcmread</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">data_element</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">data_element</span><span class="p">(</span><span class="s2">&quot;PatientName&quot;</span><span class="p">)</span>
@@ -384,7 +385,7 @@ the DataElement class keeps track of it based on value.</li>
 </div>
 <div class="section" id="tag">
 <h2>Tag<a class="headerlink" href="#tag" title="Permalink to this headline">¶</a></h2>
-<p>The Tag class is derived from python’s <code class="docutils literal"><span class="pre">int</span></code>, so in effect, it is just
+<p>The Tag class is derived from Python’s <code class="docutils literal"><span class="pre">int</span></code>, so in effect, it is just
 a number with some extra behaviour:</p>
 <blockquote>
 <div><ul>
@@ -414,7 +415,7 @@ a private tag (i.e. if group number is odd).</p>
 </div>
 <div class="section" id="sequence">
 <h2>Sequence<a class="headerlink" href="#sequence" title="Permalink to this headline">¶</a></h2>
-<p>Sequence is derived from python’s <code class="docutils literal"><span class="pre">list</span></code>. The only added functionality is
+<p>Sequence is derived from Python’s <code class="docutils literal"><span class="pre">list</span></code>. The only added functionality is
 to make string representations prettier. Otherwise all the usual methods of
 <code class="docutils literal"><span class="pre">list</span></code> like item selection, append, etc. are available.</p>
 </div>

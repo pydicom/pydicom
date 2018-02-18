@@ -196,7 +196,7 @@ These examples illustrate the use of pydicom to read DICOM data.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example show how to read DICOM directory.">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example shows how to read DICOM directory.">
 
 .. only:: html
 
@@ -222,7 +222,7 @@ These examples illustrate the use of pydicom to read DICOM data.
 Metadata processing
 -------------------
 
-These examples illustrates the processing available in pydicom to modified the
+These examples illustrates the processing available in pydicom to modify the
 metadata of DICOM data.
 
 
@@ -269,7 +269,7 @@ metadata of DICOM data.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example is starting point to anonymize DICOM data.">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example is a starting point to anonymize DICOM data.">
 
 .. only:: html
 
