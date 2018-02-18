@@ -201,6 +201,9 @@ class TestHexUtil(object):
                      b'\xA0\xB0\xC0\xD0\xE0\xF0'
         assert bytestring == hex2bytes(hexstring)
 
+        with pytest.raises(TypeError):
+            hex2bytes(0x1234)
+
     def test_bytes_to_hex(self):
         """Test utils.hexutil.hex2bytes"""
         hexstring = "00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f"
