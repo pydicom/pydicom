@@ -3,7 +3,7 @@
 Read DICOM directory
 ====================
 
-This example show how to read DICOM directory.
+This example shows how to read DICOM directory.
 
 """
 

@@ -3,5 +3,5 @@
 Metadata processing
 -------------------
 
-These examples illustrates the processing available in pydicom to modified the
+These examples illustrates the processing available in pydicom to modify the
 metadata of DICOM data.

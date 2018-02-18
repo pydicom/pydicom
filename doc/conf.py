@@ -66,7 +66,17 @@ autosummary_generate = True
 
 autodoc_default_flags = ['members', 'inherited-members']
 
+# intersphinx configuration
+intersphinx_mapping = {
+    'python': ('https://docs.python.org/{.major}'.format(
+        sys.version_info), None),
+    'numpy': ('https://docs.scipy.org/doc/numpy/', None),
+    'scipy': ('https://docs.scipy.org/doc/scipy/reference', None),
+    'matplotlib': ('http://matplotlib.org', None),
+}
+
 sphinx_gallery_conf = {
+    'default_thumb_file': 'assets/img/pydicom_flat_black_alpha.png',
     # path to your examples scripts
     'examples_dirs': '../examples',
     # path where to save gallery generated examples
@@ -75,10 +85,7 @@ sphinx_gallery_conf = {
     # to make references clickable
     'doc_module': 'pydicom',
     'reference_url': {
-        'pydicom': None,
-        'matplotlib': 'http://matplotlib.org',
-        'numpy': 'http://docs.scipy.org/doc/numpy-1.11.0',
-        'scipy': 'http://docs.scipy.org/doc/scipy-0.18.0/reference'
+        'pydicom': None
     }
 }
 
@@ -171,7 +178,7 @@ html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
-html_logo = "assets/img/logo.png"
+html_logo = "assets/img/pydicom_flat_black.svg"
 
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32

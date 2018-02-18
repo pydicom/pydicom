@@ -21,9 +21,9 @@ information such as reports and radiotherapy objects.
 pydicom makes it easy to read these complex files into natural pythonic
 structures for easy manipulation.  Modified datasets can be written again to
 DICOM format files. See the `Getting Started
-<http://pydicom.readthedocs.org/en/latest/getting_started.html>`_ page for
+<https://pydicom.github.io/pydicom/stable/getting_started.html>`_ page for
 installation and basic information, and the `Pydicom User Guide
-<http://pydicom.readthedocs.org/en/latest/pydicom_user_guide.html>`_ page for
+<https://pydicom.github.io/pydicom/stable/getting_started.html>`_ page for
 an overview of how to use the pydicom library.
 """
 
@@ -62,6 +62,7 @@ VERSION = __version__
 REQUIRES = []
 SETUP_REQUIRES = pytest_runner
 TESTS_REQUIRE = ['pytest']
+
 
 def data_files_inventory():
     data_files = []
