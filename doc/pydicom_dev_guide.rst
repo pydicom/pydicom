@@ -29,7 +29,7 @@ Once this is done, you can commit and push to master.
 Git and GitHub
 ~~~~~~~~~~~~~~
 
-At the moment of a release, a git branch need to be created with the semantic
+At the moment of a release, a git branch needs to be created with the semantic
 ``major.minor.X`` (e.g. ``1.0.X). It will be used in the future to backport bug
 fixes.
 
@@ -58,7 +58,7 @@ documentation of the ``master`` branch.
 PyPi build
 ----------
 
-The package can be built for the different platform::
+The package can be built for different platforms::
   
   python setup.py bdist_wininst
   python setup.py sdist
