@@ -22,6 +22,7 @@ MR_small.dcm            : Expl VR Little Endian
 OBXXXX1A.dcm            : Expl VR Little Endian
 reportsi.dcm            : Expl VR Little Endian
 test-SR.dcm             : Expl VR Little Endian
+liver.dcm               : Expl VR Little Endian
 
 nested_priv_SQ.dcm      : Impl VR Little Endian
 no_meta_group_length.dcm: Impl VR Little Endian
@@ -31,7 +32,6 @@ rtdose.dcm              : Impl VR Little Endian
 rtplan.dcm              : Impl VR Little Endian
 rtplan_truncated.dcm    : Impl VR Little Endian
 rtstruct.dcm            : Impl VR Little Endian
-
 
 CT_small.dcm
   * CT image, Explicit VR, LittleEndian
@@ -63,6 +63,10 @@ JPEG-lossy.dcm
   * NM1_JPLY from ftp://medical.nema.org/MEDICAL/Dicom/DataSets/WG04/
   * 1.2.840.10008.1.2.4.51 Default Transfer Syntax for Lossy JPEG 12-bit
   * GDCM prints when reading this file: "Unsupported JPEG data precision 12" and "Invalid SOS parameters for sequential JPEG", although it does appear to be read properly
+
+liver.dcm
+  * The DICOM SEG example was generated using the dcmqi library: https://github.com/qiicr/dcmqi
+  * Provided by Andrey Fedorov (@fedorov)
 
 Created by a commercial radiotherapy treatment planning system and modified:
 rtplan.dcm       Implicit VR, Little Endian
