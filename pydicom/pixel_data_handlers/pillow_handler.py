@@ -32,7 +32,6 @@ PillowSupportedTransferSyntaxes = [
 ]
 PillowJPEG2000TransferSyntaxes = [
     pydicom.uid.JPEG2000Lossless,
-    pydicom.uid.JPEG2000Lossy,
 ]
 PillowJPEGTransferSyntaxes = [
     pydicom.uid.JPEGBaseLineLossy8bit,
