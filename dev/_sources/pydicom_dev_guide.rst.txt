@@ -64,5 +64,20 @@ The package can be built for the different platform::
   python setup.py sdist
   python setup.py bdist_wheel --universal
 
-Then, the different builds can be uploaded to PyPi.
+Then, the different builds can be uploaded to PyPi.  This has to be done by the package owner on PyPi.
+Best practice is to use twine, and to upload to the *Test* PyPi server for initial testing::
+
+  twine upload --repository-url https://test.pypi.org/legacy/ dist/*
+  
+Then anyone can test the install, e.g. in a local virtual environment::
+
+  pip install [--pre] --index-url https://test.pypi.org/simple/ pydicom
+
+If it is a pre-release version, the optional ``--pre`` argument should be used.
+
+When all has been tested satisfactorily, prepare an announcement for the pydicom google group,
+then repeat the above twine upload/install test without the test repository urls, and then send the announcement.
+
+There are more details at the `Python packaging guide <https://packaging.python.org/guides/using-testpypi/>`_.
+
 
