@@ -19,9 +19,11 @@ in_PyPy = 'PyPy' in sys.version
 if in_py2:
     text_type = unicode
     string_types = (str, unicode)
+    number_types = (int, long)
 else:
     text_type = str
     string_types = (str, )
+    number_types = (int, )
 
 if in_py2:
     # Have to run through exec as the code is a syntax error in py 3
