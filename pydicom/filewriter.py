@@ -2,7 +2,6 @@
 """Functions related to writing DICOM data."""
 from __future__ import absolute_import
 from struct import pack
-from packaging import version
 
 from pydicom import compat
 from pydicom.compat import in_py2
@@ -18,7 +17,7 @@ from pydicom.uid import (PYDICOM_IMPLEMENTATION_UID, ImplicitVRLittleEndian,
                          UncompressedPixelTransferSyntaxes)
 from pydicom.valuerep import extra_length_VRs
 from pydicom.values import convert_numbers
-from pydicom._version import __version__
+from pydicom._version import __version_info__
 
 
 def correct_ambiguous_vr_element(elem, ds, is_little_endian):
@@ -599,7 +598,7 @@ def write_file_meta_info(fp, file_meta, enforce_standard=True):
 
         if 'ImplementationVersionName' not in file_meta:
             file_meta.ImplementationVersionName = (
-                'PYDICOM ' + version.parse(__version__).base_version)
+                'PYDICOM ' + ".".join(str(x) for x in __version_info__))
 
         # Check that required File Meta Elements are present
         missing = []
