@@ -44,7 +44,7 @@ datetime_name = mr_name
 unicode_name = get_charset_files("chrH31.dcm")[0]
 multiPN_name = get_charset_files("chrFrenMulti.dcm")[0]
 
-base_version = ''.join(str(i) for i in __version_info__)
+base_version = '.'.join(str(i) for i in __version_info__)
 
 
 def files_identical(a, b):
