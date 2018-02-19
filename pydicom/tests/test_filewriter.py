@@ -74,7 +74,10 @@ class WriteFileTests(unittest.TestCase):
     def setUp(self):
         self.file_out = TemporaryFile('w+b')
 
-    def compare(self, in_filename, decode=False):
+    def tearDown(self):
+        self.file_out.close()
+
+    def compare(self, in_filename):
         """Read Dataset from in_filename, write to file, compare"""
         with open(in_filename, 'rb') as f:
             bytes_in = BytesIO(f.read())
@@ -119,12 +122,12 @@ class WriteFileTests(unittest.TestCase):
     def testUnicode(self):
         """Ensure decoded string DataElements
            are written to file properly"""
-        self.compare(unicode_name, decode=True)
+        self.compare(unicode_name)
 
     def testMultiPN(self):
         """Ensure multiple Person Names are written
            to the file correctly."""
-        self.compare(multiPN_name, decode=True)
+        self.compare(multiPN_name)
 
     def testJPEG2000(self):
         """Input file, write back and verify
@@ -186,6 +189,7 @@ class ScratchWriteDateTimeTests(WriteFileTests):
 
     def tearDown(self):
         config.datetime_conversion = False
+        self.file_out.close()
 
     def test_multivalue_DA(self):
         """Write DA/DT/TM data elements.........."""
