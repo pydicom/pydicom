@@ -32,7 +32,6 @@ Quick Start
 
 """
 
-from packaging import version
 
 from pydicom.dataelem import DataElement
 from pydicom.dataset import Dataset, FileDataset
@@ -40,10 +39,7 @@ from pydicom.filereader import dcmread, read_file
 from pydicom.filewriter import dcmwrite, write_file
 from pydicom.sequence import Sequence
 
-from ._version import __version__
-
-__version_info__ = tuple(
-    int(x) for x in version.parse(__version__).base_version.split('.'))
+from ._version import __version__, __version_info__
 
 __all__ = ['DataElement',
            'Dataset',
