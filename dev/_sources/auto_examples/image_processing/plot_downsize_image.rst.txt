@@ -132,7 +132,7 @@ instead of averagin the pixels. Finally, the image is store as a dicom image.
         data_downsampling.shape[0], data_downsampling.shape[1]))
 
     # copy the data back to the original data set
-    ds.PixelData = data_downsampling.tostring()
+    ds.PixelData = data_downsampling.tobytes()
     # update the information regarding the shape of the data array
     ds.Rows, ds.Columns = data_downsampling.shape
 
@@ -140,7 +140,7 @@ instead of averagin the pixels. Finally, the image is store as a dicom image.
     print('The information of the data set after downsampling: \n')
     print(ds)
 
-**Total running time of the script:** ( 0 minutes  0.012 seconds)
+**Total running time of the script:** ( 0 minutes  0.013 seconds)
 
 
 

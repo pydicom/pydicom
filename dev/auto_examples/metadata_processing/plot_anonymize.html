@@ -198,7 +198,7 @@
 <p>This example is a starting point to anonymize DICOM data.</p>
 <p>It shows how to read data and replace tags: person names, patient id,
 optionally remove curves and private tags, and write the results in a new file.</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># authors : Guillaume Lemaitre &lt;g.lemaitre58@gmail.com&gt;</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># authors : Guillaume Lemaitre &lt;g.lemaitre58@gmail.com&gt;</span>
 <span class="c1"># license : MIT</span>
 
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
@@ -213,7 +213,7 @@ optionally remove curves and private tags, and write the results in a new file.<
 </div>
 <div class="section" id="anonymize-a-single-file">
 <h2>Anonymize a single file<a class="headerlink" href="#anonymize-a-single-file" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">filename</span> <span class="o">=</span> <span class="n">get_testdata_files</span><span class="p">(</span><span class="s1">&#39;MR_small.dcm&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">filename</span> <span class="o">=</span> <span class="n">get_testdata_files</span><span class="p">(</span><span class="s1">&#39;MR_small.dcm&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 <span class="n">dataset</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">dcmread</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
 
 <span class="n">data_elements</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;PatientID&#39;</span><span class="p">,</span>
@@ -223,14 +223,14 @@ optionally remove curves and private tags, and write the results in a new file.<
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-default"><div class="highlight"><pre><span></span><span class="p">(</span><span class="mi">0010</span><span class="p">,</span> <span class="mi">0020</span><span class="p">)</span> <span class="n">Patient</span> <span class="n">ID</span>                          <span class="n">LO</span><span class="p">:</span> <span class="s1">&#39;4MR1&#39;</span>
+<div class="sphx-glr-script-out highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="mi">0010</span><span class="p">,</span> <span class="mi">0020</span><span class="p">)</span> <span class="n">Patient</span> <span class="n">ID</span>                          <span class="n">LO</span><span class="p">:</span> <span class="s1">&#39;4MR1&#39;</span>
 <span class="p">(</span><span class="mi">0010</span><span class="p">,</span> <span class="mi">0030</span><span class="p">)</span> <span class="n">Patient</span><span class="s1">&#39;s Birth Date                DA: &#39;&#39;</span>
 </pre></div>
 </div>
 <p>We can define a callback function to find all tags corresponding to a person
 names inside the dataset. We can also define a callback function to remove
 curves tags.</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">person_names_callback</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">data_element</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">person_names_callback</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">data_element</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">data_element</span><span class="o">.</span><span class="n">VR</span> <span class="o">==</span> <span class="s2">&quot;PN&quot;</span><span class="p">:</span>
         <span class="n">data_element</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s2">&quot;anonymous&quot;</span>
 
@@ -242,18 +242,18 @@ curves tags.</p>
 </div>
 <p>We can use the different callback function to iterate through the dataset but
 also some other tags such that patient ID, etc.</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">dataset</span><span class="o">.</span><span class="n">PatientID</span> <span class="o">=</span> <span class="s2">&quot;id&quot;</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">dataset</span><span class="o">.</span><span class="n">PatientID</span> <span class="o">=</span> <span class="s2">&quot;id&quot;</span>
 <span class="n">dataset</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">person_names_callback</span><span class="p">)</span>
 <span class="n">dataset</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">curves_callback</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>pydicom allows to remove private tags using <code class="docutils literal"><span class="pre">remove_private_tags</span></code> method</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">dataset</span><span class="o">.</span><span class="n">remove_private_tags</span><span class="p">()</span>
+<p>pydicom allows to remove private tags using <code class="docutils literal notranslate"><span class="pre">remove_private_tags</span></code> method</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">dataset</span><span class="o">.</span><span class="n">remove_private_tags</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>Data elements of type 3 (optional) can be easily deleted using <code class="docutils literal"><span class="pre">del</span></code> or
-<code class="docutils literal"><span class="pre">delattr</span></code>.</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="s1">&#39;OtherPatientIDs&#39;</span> <span class="ow">in</span> <span class="n">dataset</span><span class="p">:</span>
+<p>Data elements of type 3 (optional) can be easily deleted using <code class="docutils literal notranslate"><span class="pre">del</span></code> or
+<code class="docutils literal notranslate"><span class="pre">delattr</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="s1">&#39;OtherPatientIDs&#39;</span> <span class="ow">in</span> <span class="n">dataset</span><span class="p">:</span>
     <span class="nb">delattr</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="s1">&#39;OtherPatientIDs&#39;</span><span class="p">)</span>
 
 <span class="k">if</span> <span class="s1">&#39;OtherPatientIDsSequence&#39;</span> <span class="ow">in</span> <span class="n">dataset</span><span class="p">:</span>
@@ -262,13 +262,13 @@ also some other tags such that patient ID, etc.</p>
 </div>
 <p>For data elements of type 2, this is possible to blank it by assigning a
 blank string.</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">tag</span> <span class="o">=</span> <span class="s1">&#39;PatientBirthDate&#39;</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tag</span> <span class="o">=</span> <span class="s1">&#39;PatientBirthDate&#39;</span>
 <span class="k">if</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">dataset</span><span class="p">:</span>
     <span class="n">dataset</span><span class="o">.</span><span class="n">data_element</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s1">&#39;01011900&#39;</span>
 </pre></div>
 </div>
 <p>Finally, this is possible to store the image</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">data_elements</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;PatientID&#39;</span><span class="p">,</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">data_elements</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;PatientID&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;PatientBirthDate&#39;</span><span class="p">]</span>
 <span class="k">for</span> <span class="n">de</span> <span class="ow">in</span> <span class="n">data_elements</span><span class="p">:</span>
     <span class="k">print</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">data_element</span><span class="p">(</span><span class="n">de</span><span class="p">))</span>
@@ -278,16 +278,16 @@ blank string.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-default"><div class="highlight"><pre><span></span><span class="p">(</span><span class="mi">0010</span><span class="p">,</span> <span class="mi">0020</span><span class="p">)</span> <span class="n">Patient</span> <span class="n">ID</span>                          <span class="n">LO</span><span class="p">:</span> <span class="s1">&#39;id&#39;</span>
+<div class="sphx-glr-script-out highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="mi">0010</span><span class="p">,</span> <span class="mi">0020</span><span class="p">)</span> <span class="n">Patient</span> <span class="n">ID</span>                          <span class="n">LO</span><span class="p">:</span> <span class="s1">&#39;id&#39;</span>
 <span class="p">(</span><span class="mi">0010</span><span class="p">,</span> <span class="mi">0030</span><span class="p">)</span> <span class="n">Patient</span><span class="s1">&#39;s Birth Date                DA: &#39;</span><span class="mi">01011900</span><span class="s1">&#39;</span>
 </pre></div>
 </div>
-<p><strong>Total running time of the script:</strong> ( 0 minutes  0.024 seconds)</p>
+<p><strong>Total running time of the script:</strong> ( 0 minutes  0.025 seconds)</p>
 <div class="sphx-glr-footer docutils container">
 <div class="sphx-glr-download docutils container">
-<a class="reference download internal" href="../../_downloads/plot_anonymize.py" download=""><code class="xref download docutils literal"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_anonymize.py</span></code></a></div>
+<a class="reference download internal" href="../../_downloads/plot_anonymize.py" download=""><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_anonymize.py</span></code></a></div>
 <div class="sphx-glr-download docutils container">
-<a class="reference download internal" href="../../_downloads/plot_anonymize.ipynb" download=""><code class="xref download docutils literal"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_anonymize.ipynb</span></code></a></div>
+<a class="reference download internal" href="../../_downloads/plot_anonymize.ipynb" download=""><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_anonymize.ipynb</span></code></a></div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
 </div>

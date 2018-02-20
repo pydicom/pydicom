@@ -198,7 +198,7 @@ instead of averagin the pixels. Finally, the image is store as a dicom image.</p
 <p class="last">This example requires the Numpy library to manipulate the pixel data.</p>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-default"><div class="highlight"><pre><span></span><span class="n">The</span> <span class="n">image</span> <span class="n">has</span> <span class="mi">64</span> <span class="n">x</span> <span class="mi">64</span> <span class="n">voxels</span>
+<div class="sphx-glr-script-out highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">The</span> <span class="n">image</span> <span class="n">has</span> <span class="mi">64</span> <span class="n">x</span> <span class="mi">64</span> <span class="n">voxels</span>
 <span class="n">The</span> <span class="n">downsampled</span> <span class="n">image</span> <span class="n">has</span> <span class="mi">8</span> <span class="n">x</span> <span class="mi">8</span> <span class="n">voxels</span>
 <span class="n">The</span> <span class="n">information</span> <span class="n">of</span> <span class="n">the</span> <span class="n">data</span> <span class="nb">set</span> <span class="n">after</span> <span class="n">downsampling</span><span class="p">:</span>
 
@@ -280,7 +280,7 @@ instead of averagin the pixels. Finally, the image is store as a dicom image.</p
 <div class="line-block">
 <div class="line"><br /></div>
 </div>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># authors : Guillaume Lemaitre &lt;g.lemaitre58@gmail.com&gt;</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># authors : Guillaume Lemaitre &lt;g.lemaitre58@gmail.com&gt;</span>
 <span class="c1"># license : MIT</span>
 
 <span class="kn">import</span> <span class="nn">pydicom</span>
@@ -301,7 +301,7 @@ instead of averagin the pixels. Finally, the image is store as a dicom image.</p
     <span class="n">data_downsampling</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_downsampling</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
 
 <span class="c1"># copy the data back to the original data set</span>
-<span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span> <span class="o">=</span> <span class="n">data_downsampling</span><span class="o">.</span><span class="n">tostring</span><span class="p">()</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span> <span class="o">=</span> <span class="n">data_downsampling</span><span class="o">.</span><span class="n">tobytes</span><span class="p">()</span>
 <span class="c1"># update the information regarding the shape of the data array</span>
 <span class="n">ds</span><span class="o">.</span><span class="n">Rows</span><span class="p">,</span> <span class="n">ds</span><span class="o">.</span><span class="n">Columns</span> <span class="o">=</span> <span class="n">data_downsampling</span><span class="o">.</span><span class="n">shape</span>
 
@@ -310,12 +310,12 @@ instead of averagin the pixels. Finally, the image is store as a dicom image.</p
 <span class="k">print</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
 </pre></div>
 </div>
-<p><strong>Total running time of the script:</strong> ( 0 minutes  0.012 seconds)</p>
+<p><strong>Total running time of the script:</strong> ( 0 minutes  0.013 seconds)</p>
 <div class="sphx-glr-footer docutils container">
 <div class="sphx-glr-download docutils container">
-<a class="reference download internal" href="../../_downloads/plot_downsize_image.py" download=""><code class="xref download docutils literal"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_downsize_image.py</span></code></a></div>
+<a class="reference download internal" href="../../_downloads/plot_downsize_image.py" download=""><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_downsize_image.py</span></code></a></div>
 <div class="sphx-glr-download docutils container">
-<a class="reference download internal" href="../../_downloads/plot_downsize_image.ipynb" download=""><code class="xref download docutils literal"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_downsize_image.ipynb</span></code></a></div>
+<a class="reference download internal" href="../../_downloads/plot_downsize_image.ipynb" download=""><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_downsize_image.ipynb</span></code></a></div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
 </div>

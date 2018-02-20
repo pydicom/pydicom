@@ -348,8 +348,8 @@
 <span class="sd">        ----------</span>
 <span class="sd">        data_element : pydicom.dataelem.DataElement</span>
 <span class="sd">            The DataElement to add to the Dataset.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="p">[</span><span class="n">data_element</span><span class="o">.</span><span class="n">tag</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_element</span></div>
+<span class="sd">        &quot;&quot;&quot;</span></div>
+        <span class="bp">self</span><span class="p">[</span><span class="n">data_element</span><span class="o">.</span><span class="n">tag</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_element</span>
 
 <div class="viewcode-block" id="Dataset.add_new"><a class="viewcode-back" href="../../ref_guide.html#pydicom.dataset.Dataset.add_new">[docs]</a>    <span class="k">def</span> <span class="nf">add_new</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="p">,</span> <span class="n">VR</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Add a DataElement to the Dataset.</span>
@@ -371,8 +371,8 @@
 <span class="sd">            * for a sequence DataElement, an empty list or list of Dataset</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">data_element</span> <span class="o">=</span> <span class="n">DataElement</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">VR</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
-        <span class="c1"># use data_element.tag since DataElement verified it</span>
-        <span class="bp">self</span><span class="p">[</span><span class="n">data_element</span><span class="o">.</span><span class="n">tag</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_element</span></div>
+        <span class="c1"># use data_element.tag since DataElement verified it</span></div>
+        <span class="bp">self</span><span class="p">[</span><span class="n">data_element</span><span class="o">.</span><span class="n">tag</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_element</span>
 
 <div class="viewcode-block" id="Dataset.data_element"><a class="viewcode-back" href="../../ref_guide.html#pydicom.dataset.Dataset.data_element">[docs]</a>    <span class="k">def</span> <span class="nf">data_element</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return the DataElement corresponding to the element keyword `name`.</span>
@@ -391,8 +391,8 @@
         <span class="n">tag</span> <span class="o">=</span> <span class="n">tag_for_keyword</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
         <span class="c1"># Test against None as (0000,0000) is a possible tag</span>
         <span class="k">if</span> <span class="n">tag</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span>
-        <span class="k">return</span> <span class="kc">None</span></div>
+            <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span></div>
+        <span class="k">return</span> <span class="kc">None</span>
 
     <span class="k">def</span> <span class="nf">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Extend dict.__contains__() to handle DICOM keywords.</span>
@@ -446,8 +446,8 @@
                     <span class="n">dset</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">decode_data_element</span><span class="p">(</span><span class="n">data_element</span><span class="p">,</span> <span class="n">dicom_character_set</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">decode_callback</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+</div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">decode_callback</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__delattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Intercept requests to delete an attribute by `name`.</span>
@@ -565,8 +565,8 @@
         <span class="k">if</span> <span class="n">filters</span><span class="p">:</span>
             <span class="n">names</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">matches</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
             <span class="k">return</span> <span class="n">names</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">allnames</span><span class="p">)</span></div>
+        <span class="k">else</span><span class="p">:</span></div>
+            <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">allnames</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Compare `self` and `other` for equality.</span>
@@ -633,8 +633,8 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="n">return_val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-            <span class="n">return_val</span> <span class="o">=</span> <span class="n">default</span>
-        <span class="k">return</span> <span class="n">return_val</span></div>
+            <span class="n">return_val</span> <span class="o">=</span> <span class="n">default</span></div>
+        <span class="k">return</span> <span class="n">return_val</span>
 
     <span class="k">def</span> <span class="nf">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Intercept requests for Dataset attribute names.</span>
@@ -774,8 +774,8 @@
         <span class="n">data_elem</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="p">)</span>
         <span class="c1"># If a deferred read, return using __getitem__ to read and convert it</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data_elem</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">and</span> <span class="n">data_elem</span><span class="o">.</span><span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
-        <span class="k">return</span> <span class="n">data_elem</span></div>
+            <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span></div>
+        <span class="k">return</span> <span class="n">data_elem</span>
 
 <div class="viewcode-block" id="Dataset.group_dataset"><a class="viewcode-back" href="../../ref_guide.html#pydicom.dataset.Dataset.group_dataset">[docs]</a>    <span class="k">def</span> <span class="nf">group_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return a Dataset containing only DataElements of a certain group.</span>
@@ -789,8 +789,8 @@
 <span class="sd">        -------</span>
 <span class="sd">        pydicom.dataset.Dataset</span>
 <span class="sd">            A dataset instance containing elements of the group specified.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="p">[(</span><span class="n">group</span><span class="p">,</span> <span class="mh">0x0000</span><span class="p">):(</span><span class="n">group</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mh">0x0000</span><span class="p">)]</span></div>
+<span class="sd">        &quot;&quot;&quot;</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">[(</span><span class="n">group</span><span class="p">,</span> <span class="mh">0x0000</span><span class="p">):(</span><span class="n">group</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mh">0x0000</span><span class="p">)]</span>
 
     <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Iterate through the top-level of the Dataset, yielding DataElements.</span>
@@ -925,8 +925,8 @@
                            <span class="s2">&quot;decode this transfer syntax </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                                <span class="bp">self</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span><span class="p">))</span>
                     <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-            <span class="c1"># is this guaranteed to work if memory is re-used??</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_pixel_id</span> <span class="o">=</span> <span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">PixelData</span><span class="p">)</span></div>
+            <span class="c1"># is this guaranteed to work if memory is re-used??</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pixel_id</span> <span class="o">=</span> <span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">PixelData</span><span class="p">)</span>
             
 <div class="viewcode-block" id="Dataset.decompress"><a class="viewcode-back" href="../../ref_guide.html#pydicom.dataset.Dataset.decompress">[docs]</a>    <span class="k">def</span> <span class="nf">decompress</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Decompresses pixel data and modifies the Dataset in-place</span>
@@ -968,8 +968,8 @@
                        <span class="s2">&quot;transfer syntax&quot;</span><span class="p">)</span>
                 <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
                 
-            <span class="c1"># All is as expected, updated the Transfer Syntax</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span> <span class="o">=</span> <span class="n">ExplicitVRLittleEndian</span></div>
+            <span class="c1"># All is as expected, updated the Transfer Syntax</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span> <span class="o">=</span> <span class="n">ExplicitVRLittleEndian</span>
 
 
     <span class="nd">@property</span>
@@ -1025,8 +1025,8 @@
                               <span class="k">if</span> <span class="ow">not</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)])</span>
             <span class="k">if</span> <span class="n">data_element</span><span class="o">.</span><span class="n">VR</span> <span class="o">==</span> <span class="s2">&quot;SQ&quot;</span><span class="p">:</span>
                 <span class="k">yield</span> <span class="n">sequence_element_format</span> <span class="o">%</span> <span class="n">elem_dict</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">yield</span> <span class="n">element_format</span> <span class="o">%</span> <span class="n">elem_dict</span></div>
+            <span class="k">else</span><span class="p">:</span></div>
+                <span class="k">yield</span> <span class="n">element_format</span> <span class="o">%</span> <span class="n">elem_dict</span>
 
     <span class="k">def</span> <span class="nf">_pretty_str</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">top_level_only</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return a string of the DataElements in the Dataset, with indented levels.</span>
@@ -1075,8 +1075,8 @@
             <span class="k">if</span> <span class="n">data_element</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">is_private</span><span class="p">:</span>
                 <span class="c1"># can&#39;t del self[tag] - won&#39;t be right dataset on recursion</span>
                 <span class="k">del</span> <span class="n">dataset</span><span class="p">[</span><span class="n">data_element</span><span class="o">.</span><span class="n">tag</span><span class="p">]</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">RemoveCallback</span><span class="p">)</span></div>
+</div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">RemoveCallback</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Dataset.save_as"><a class="viewcode-back" href="../../ref_guide.html#pydicom.dataset.Dataset.save_as">[docs]</a>    <span class="k">def</span> <span class="nf">save_as</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">write_like_original</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Write the Dataset to `filename`.</span>
@@ -1138,8 +1138,8 @@
                                  <span class="s2">&quot;&#39;</span><span class="si">{0}</span><span class="s2">.is_implicit_VR&#39; must exist and be &quot;</span>
                                  <span class="s2">&quot;set appropriately before &quot;</span>
                                  <span class="s2">&quot;saving.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
-
-        <span class="n">pydicom</span><span class="o">.</span><span class="n">dcmwrite</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">write_like_original</span><span class="p">)</span></div>
+</div>
+        <span class="n">pydicom</span><span class="o">.</span><span class="n">dcmwrite</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">write_like_original</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Intercept any attempts to set a value for an instance attribute.</span>
@@ -1265,24 +1265,24 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pretty_str</span><span class="p">()</span>
 
 <div class="viewcode-block" id="Dataset.top"><a class="viewcode-back" href="../../ref_guide.html#pydicom.dataset.Dataset.top">[docs]</a>    <span class="k">def</span> <span class="nf">top</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Return a str of the Dataset&#39;s top level DataElements only.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pretty_str</span><span class="p">(</span><span class="n">top_level_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+        <span class="sd">&quot;&quot;&quot;Return a str of the Dataset&#39;s top level DataElements only.&quot;&quot;&quot;</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pretty_str</span><span class="p">(</span><span class="n">top_level_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Dataset.trait_names"><a class="viewcode-back" href="../../ref_guide.html#pydicom.dataset.Dataset.trait_names">[docs]</a>    <span class="k">def</span> <span class="nf">trait_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return a list of valid names for auto-completion code.</span>
 
 <span class="sd">        Used in IPython, so that data element names can be found and offered</span>
 <span class="sd">        for autocompletion on the IPython command line.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">dir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>  <span class="c1"># only valid python &gt;=2.6, else use self.__dir__()</span></div>
+<span class="sd">        &quot;&quot;&quot;</span></div>
+        <span class="k">return</span> <span class="nb">dir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>  <span class="c1"># only valid python &gt;=2.6, else use self.__dir__()</span>
 
 <div class="viewcode-block" id="Dataset.update"><a class="viewcode-back" href="../../ref_guide.html#pydicom.dataset.Dataset.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dictionary</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Extend dict.update() to handle DICOM keywords.&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">dictionary</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">compat</span><span class="o">.</span><span class="n">text_type</span><span class="p">)):</span>
                 <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="bp">self</span><span class="p">[</span><span class="n">Tag</span><span class="p">(</span><span class="n">key</span><span class="p">)]</span> <span class="o">=</span> <span class="n">value</span></div>
+            <span class="k">else</span><span class="p">:</span></div>
+                <span class="bp">self</span><span class="p">[</span><span class="n">Tag</span><span class="p">(</span><span class="n">key</span><span class="p">)]</span> <span class="o">=</span> <span class="n">value</span>
 
 <div class="viewcode-block" id="Dataset.iterall"><a class="viewcode-back" href="../../ref_guide.html#pydicom.dataset.Dataset.iterall">[docs]</a>    <span class="k">def</span> <span class="nf">iterall</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Iterate through the Dataset, yielding all DataElements.</span>
@@ -1299,8 +1299,8 @@
             <span class="k">if</span> <span class="n">data_element</span><span class="o">.</span><span class="n">VR</span> <span class="o">==</span> <span class="s2">&quot;SQ&quot;</span><span class="p">:</span>
                 <span class="n">sequence</span> <span class="o">=</span> <span class="n">data_element</span><span class="o">.</span><span class="n">value</span>
                 <span class="k">for</span> <span class="n">dataset</span> <span class="ow">in</span> <span class="n">sequence</span><span class="p">:</span>
-                    <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">iterall</span><span class="p">():</span>
-                        <span class="k">yield</span> <span class="n">elem</span></div>
+                    <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">iterall</span><span class="p">():</span></div>
+                        <span class="k">yield</span> <span class="n">elem</span>
 
 <div class="viewcode-block" id="Dataset.walk"><a class="viewcode-back" href="../../ref_guide.html#pydicom.dataset.Dataset.walk">[docs]</a>    <span class="k">def</span> <span class="nf">walk</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">callback</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Iterate through the DataElements and run `callback` on each.</span>
@@ -1331,10 +1331,10 @@
                 <span class="c1"># data_element</span>
                 <span class="k">if</span> <span class="n">recursive</span> <span class="ow">and</span> <span class="n">tag</span> <span class="ow">in</span> <span class="bp">self</span> <span class="ow">and</span> <span class="n">data_element</span><span class="o">.</span><span class="n">VR</span> <span class="o">==</span> <span class="s2">&quot;SQ&quot;</span><span class="p">:</span>
                     <span class="n">sequence</span> <span class="o">=</span> <span class="n">data_element</span><span class="o">.</span><span class="n">value</span>
-                    <span class="k">for</span> <span class="n">dataset</span> <span class="ow">in</span> <span class="n">sequence</span><span class="p">:</span>
-                        <span class="n">dataset</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">callback</span><span class="p">)</span></div>
-
-    <span class="fm">__repr__</span> <span class="o">=</span> <span class="fm">__str__</span></div>
+                    <span class="k">for</span> <span class="n">dataset</span> <span class="ow">in</span> <span class="n">sequence</span><span class="p">:</span></div>
+                        <span class="n">dataset</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">callback</span><span class="p">)</span>
+</div>
+    <span class="fm">__repr__</span> <span class="o">=</span> <span class="fm">__str__</span>
 
 
 <span class="k">class</span> <span class="nc">FileDataset</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>

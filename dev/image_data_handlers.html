@@ -204,14 +204,14 @@
 <h2>Preconditions<a class="headerlink" href="#preconditions" title="Permalink to this headline">¶</a></h2>
 <p>To be able to decompress compressed DICOM image data, you need to have
 one or more packages installed that are able to handle this kind of data.
-<code class="docutils literal"><span class="pre">pydicom</span></code> detects the installed packages and provides image data handlers
+<code class="docutils literal notranslate"><span class="pre">pydicom</span></code> detects the installed packages and provides image data handlers
 that use the available packages.</p>
-<p>The following packages can be used with <code class="docutils literal"><span class="pre">pydicom</span></code>:</p>
+<p>The following packages can be used with <code class="docutils literal notranslate"><span class="pre">pydicom</span></code>:</p>
 <ul class="simple">
 <li><a class="reference external" href="http://gdcm.sourceforge.net/">gdcm</a> - this is the package that supports
 most compressed formats</li>
 <li><a class="reference external" href="http://pillow.readthedocs.io/en/latest/">pillow</a>, ideally with
-<code class="docutils literal"><span class="pre">jpeg</span></code> and <code class="docutils literal"><span class="pre">jpeg2000</span></code> plugins</li>
+<code class="docutils literal notranslate"><span class="pre">jpeg</span></code> and <code class="docutils literal notranslate"><span class="pre">jpeg2000</span></code> plugins</li>
 <li><a class="reference external" href="https://github.com/Who8MyLunch/CharPyLS">jpeg_ls</a></li>
 </ul>
 <p>Note that you always need the <a class="reference external" href="http://numpy.org/">NumPy</a> package to be able to handle image
@@ -251,12 +251,12 @@ deviations from the expected result:</p>
 <h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
 <p>To use decompressed image data from compressed DICOM images, you have two options:</p>
 <ul class="simple">
-<li>use <code class="docutils literal"><span class="pre">decompress()</span></code> on the dataset to convert it in-place and work with the pixel data as described before</li>
-<li>get an uncompressed copy of the pixel data as a NumPy array using <code class="docutils literal"><span class="pre">Dataset.pixel_array</span></code> without touching the original dataset</li>
+<li>use <code class="docutils literal notranslate"><span class="pre">decompress()</span></code> on the dataset to convert it in-place and work with the pixel data as described before</li>
+<li>get an uncompressed copy of the pixel data as a NumPy array using <code class="docutils literal notranslate"><span class="pre">Dataset.pixel_array</span></code> without touching the original dataset</li>
 </ul>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">Using <code class="docutils literal"><span class="pre">decompress()</span></code> adapts the transfer syntax of the data set, but not the Photometric Interpretation.
+<p class="last">Using <code class="docutils literal notranslate"><span class="pre">decompress()</span></code> adapts the transfer syntax of the data set, but not the Photometric Interpretation.
 The Photometric Interpretation may not match the pixel data, depending on the used decompression handler.</p>
 </div>
 </div>
