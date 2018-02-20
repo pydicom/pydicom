@@ -8,7 +8,7 @@ Viewing Images
 Introduction
 ------------
 
-pydicom is mainly concerned with getting at the DICOM data elements in files,
+Pydicom is mainly concerned with getting at the DICOM data elements in files,
 but it is often desirable to view pixel data as an image.
 There are several options:
 
@@ -16,7 +16,7 @@ There are several options:
     <http://www.dclunie.com/medical-image-faq/html/part8.html#DICOMFileConvertorsAndViewers>`_
     programs available
   * use pydicom with `matplotlib <https://matplotlib.org/>`_
-  * use pydicom with python's stdlib `Tkinter <https://docs.python.org/3.4/library/tkinter.html>`_ module.
+  * use pydicom with Python's stdlib `Tkinter <https://docs.python.org/3.4/library/tkinter.html>`_ module.
   * use pydicom with the `Python Imaging Library (PIL)
     <http://www.pythonware.com/products/pil/>`_
   * use pydicom with `wxPython <http://www.wxpython.org/>`_
@@ -24,8 +24,8 @@ There are several options:
 Using pydicom with matplotlib
 -----------------------------
 
-matplotlib is available at https://matplotlib.org/. It
-can take 2-d image information from ``Dataset.pixel_array`` and display it.
+Matplotlib is available at https://matplotlib.org/. It
+can take 2D image information from ``Dataset.pixel_array`` and display it.
 Here is an example::
 
   >>> import matplotlib.pyplot as plt
@@ -49,7 +49,7 @@ Using pydicom with Tkinter
 The program `pydicom_Tkinter.py
 <https://github.com/pydicom/contrib-pydicom/blob/master/viewers/pydicom_Tkinter.py>`_
 in the ``contrib-pydicom`` repository demonstrates how to show an image using the
-Tkinter graphics system, which comes standard with most python installs.
+Tkinter graphics system, which comes by default with most Python installations.
 It creates a Tkinter PhotoImage in a Label widget or a user-supplied widget.
 
 Using pydicom with Python Imaging Library (PIL)
@@ -59,7 +59,7 @@ The module `pydicom_PIL.py
 <https://github.com/pydicom/contrib-pydicom/blob/master/viewers/pydicom_PIL.py>`_
 in the ``contrib-pydicom`` repository
 uses PIL's ``Image.show()`` method after creating an Image instance
-from the pixel data and some basic information about it (bit depth, LUTs, etc)
+from the pixel data and some basic information about it (bit depth, LUTs, etc).
 
 Using pydicom with wxPython
 ---------------------------

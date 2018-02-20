@@ -32,14 +32,14 @@ Quick Start
 
 """
 
+
 from pydicom.dataelem import DataElement
 from pydicom.dataset import Dataset, FileDataset
 from pydicom.filereader import dcmread, read_file
 from pydicom.filewriter import dcmwrite, write_file
 from pydicom.sequence import Sequence
 
-from ._version import __version__
-from ._version import __version_info__
+from ._version import __version__, __version_info__
 
 __all__ = ['DataElement',
            'Dataset',

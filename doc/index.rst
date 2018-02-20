@@ -20,6 +20,7 @@ pydicom documentation
    :caption: Documentation
 
    pydicom_user_guide.rst
+   pydicom_dev_guide.rst
    ref_guide.rst
 
 .. toctree::
@@ -47,11 +48,17 @@ Information to install, test, and contribute to the package.
 The main documentation. This contains an in-depth description of all
 core elements of pydicom and how to apply them.
 
+`Developer Guide <pydicom_dev_guide.html>`_
+--------------------------------------------
+
+The documentation dedicated to developers. It contains information
+for release.
+
 `API Documentation <ref_guide.html>`_
 -------------------------------------
 
 The exact API of all functions and classes, as given in the
-doctring. The API documents expected types and allowed features for
+docstring. The API documents expected types and allowed features for
 all functions, and all parameters available for the core elements.
 
 `Examples <auto_examples/index.html>`_
