@@ -28,8 +28,8 @@ from pydicom.datadict import (tag_for_keyword, keyword_for_tag,
                               repeater_has_keyword)
 from pydicom.tag import Tag, BaseTag, tag_in_exception
 from pydicom.dataelem import DataElement, DataElement_from_raw, RawDataElement
-from pydicom.uid import (UncompressedPixelTransferSyntaxes, 
-						 ExplicitVRLittleEndian)
+from pydicom.uid import (UncompressedPixelTransferSyntaxes,
+                         ExplicitVRLittleEndian)
 import pydicom  # for dcmwrite
 import pydicom.charset
 from pydicom.config import logger
@@ -684,7 +684,7 @@ class Dataset(dict):
                 array_of_YBR_pixels, ybr_to_rgb.T.copy()).astype(orig_type)
             return array_of_YBR_pixels
         else:
-            raise NotImplementedError("Numpy is required"
+            raise NotImplementedError("Numpy is required "
                                       "To convert the color space")
 
     # Use by pixel_array property
@@ -697,9 +697,9 @@ class Dataset(dict):
 
         Returns
         -------
-        None  
+        None
             Converted pixel data is stored internally in the dataset.
-            
+
         If a compressed image format, the image is  decompressed,
         and any related data elements are changed accordingly.
         """
@@ -712,7 +712,7 @@ class Dataset(dict):
             already_have = False
 
         if not already_have:
-            last_exception = None
+            handler_exceptions = []
             successfully_read_pixel_data = False
             for x in [h for h in pydicom.config.image_handlers
                       if h and h.supports_transfer_syntax(self)]:
@@ -725,7 +725,7 @@ class Dataset(dict):
                     break
                 except Exception as e:
                     logger.debug("Trouble with", exc_info=e)
-                    last_exception = e
+                    handler_exceptions.append(e)
                     continue
             if not successfully_read_pixel_data:
                 handlers_tried = " ".join(
@@ -734,40 +734,45 @@ class Dataset(dict):
                             handlers_tried)
                 self._pixel_array = None
                 self._pixel_id = None
-                if last_exception:
-                    raise last_exception
-                else:
+                exception_messages = []
+                for x in handler_exceptions:
+                    logger.debug("image handler exception", exc_info=x)
+                    exception_messages.append(str(x))
+                if not handler_exceptions:
                     msg = ("No available image handler could "
                            "decode this transfer syntax {}".format(
                                self.file_meta.TransferSyntaxUID))
                     raise NotImplementedError(msg)
+                else:
+                    raise NotImplementedError("\n".join(exception_messages))
+
             # is this guaranteed to work if memory is re-used??
             self._pixel_id = id(self.PixelData)
-            
+
     def decompress(self):
         """Decompresses pixel data and modifies the Dataset in-place
 
-		If not a compressed tranfer syntax, then pixel data is converted
-		to a numpy array internally, but not returned.
-		
-		If compressed pixel data, then is decompressed using an image handler,
-		and internal state is updated appropriately:
-		    - TransferSyntax is updated to non-compressed form
-			- is_undefined_length for pixel data is set False
+        If not a compressed tranfer syntax, then pixel data is converted
+        to a numpy array internally, but not returned.
+
+        If compressed pixel data, then is decompressed using an image handler,
+        and internal state is updated appropriately:
+            - TransferSyntax is updated to non-compressed form
+            - is_undefined_length for pixel data is set False
 
         Returns
         -------
         None
 
-		Raises
+        Raises
         ------
         NotImplementedError
             If the pixel data was originally compressed but file is not
-			ExplicitVR LittleEndian as required by Dicom standard
-        """		
+            ExplicitVR LittleEndian as required by Dicom standard
+        """
         self.convert_pixel_data()
         self.is_decompressed = True
-		# May have been undefined length pixel data, but won't be now
+        # May have been undefined length pixel data, but won't be now
         if 'PixelData' in self:
             self[0x7fe00010].is_undefined_length = False
 
@@ -780,13 +785,12 @@ class Dataset(dict):
             # Check that current file as read does match expected
             if not self.is_little_endian or self.is_implicit_VR:
                 msg = ("Current dataset does not match expected ExplicitVR "
-                       "LittleEndian transfer syntax from a compressed " 
+                       "LittleEndian transfer syntax from a compressed "
                        "transfer syntax")
                 raise NotImplementedError(msg)
-                
+
             # All is as expected, updated the Transfer Syntax
             self.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
-
 
     @property
     def pixel_array(self):

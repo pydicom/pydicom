@@ -11,14 +11,19 @@ try:
     import numpy
 except ImportError:
     have_numpy = False
-    raise
 
 have_jpeg_ls = True
 try:
     import jpeg_ls
 except ImportError:
     have_jpeg_ls = False
-    raise
+
+is_this_usable = have_numpy and have_jpeg_ls
+
+what_is_needed_to_use_this = ("Both the numpy module and the jpeg_ls "
+                              "(CharPyLS) module are needed to support "
+                              "pixel data for this transfer syntax:")
+
 sys_is_little_endian = (sys.byteorder == 'little')
 
 JPEGLSSupportedTransferSyntaxes = [
@@ -80,10 +85,9 @@ def get_pixeldata(dicom_dataset):
         raise NotImplementedError(msg)
 
     if not have_jpeg_ls:
-        msg = ("The jpeg_ls package is required to use pixel_array "
-               "for this transfer syntax {0}, and jpeg_ls could not "
-               "be imported.".format(
-                   dicom_dataset.file_meta.TransferSyntaxUID))
+        msg = "{0} {1}.".format(
+            what_is_needed_to_use_this,
+            dicom_dataset.file_meta.TransferSyntaxUID)
         raise ImportError(msg)
     # Make NumPy format code, e.g. "uint16", "int32" etc
     # from two pieces of info:
