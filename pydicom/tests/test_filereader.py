@@ -874,7 +874,7 @@ class ReadTruncatedFileTests(unittest.TestCase):
                "Unexpected end of file. Read.*bytes of.*expected|"
                "'str' object has no attribute 'reshape'|"
                "'bytes' object has no attribute 'reshape')")
-        with self.assertRaisesRegexp(AttributeError, msg):
+        with pytest.raises(AttributeError, match=msg):
             mr.pixel_array
 
 

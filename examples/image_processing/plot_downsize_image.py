@@ -34,7 +34,7 @@ print('The downsampled image has {} x {} voxels'.format(
     data_downsampling.shape[0], data_downsampling.shape[1]))
 
 # copy the data back to the original data set
-ds.PixelData = data_downsampling.tostring()
+ds.PixelData = data_downsampling.tobytes()
 # update the information regarding the shape of the data array
 ds.Rows, ds.Columns = data_downsampling.shape
 

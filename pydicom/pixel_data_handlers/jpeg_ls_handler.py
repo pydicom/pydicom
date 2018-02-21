@@ -124,17 +124,17 @@ def get_pixeldata(dicom_dataset):
         # print len(CompressedPixelDataSeq)
         for frame in CompressedPixelDataSeq:
             decompressed_image = jpeg_ls.decode(
-                numpy.fromstring(frame, dtype=numpy.uint8))
+                numpy.frombuffer(frame, dtype=numpy.uint8))
             UncompressedPixelData += decompressed_image.tobytes()
     else:
         # single compressed frame
         CompressedPixelData = pydicom.encaps.defragment_data(
             dicom_dataset.PixelData)
         decompressed_image = jpeg_ls.decode(
-            numpy.fromstring(CompressedPixelData, dtype=numpy.uint8))
+            numpy.frombuffer(CompressedPixelData, dtype=numpy.uint8))
         UncompressedPixelData = decompressed_image.tobytes()
 
-    pixel_array = numpy.fromstring(UncompressedPixelData, numpy_format)
+    pixel_array = numpy.frombuffer(UncompressedPixelData, numpy_format)
     if should_change_PhotometricInterpretation_to_RGB(dicom_dataset):
         dicom_dataset.PhotometricInterpretation = "RGB"
 

@@ -167,7 +167,7 @@ def convert_numbers(byte_string, is_little_endian, struct_format):
     length = len(byte_string)
 
     if length % bytes_per_value != 0:
-        logger.warn("Expected length to be even multiple of number size")
+        logger.warning("Expected length to be even multiple of number size")
 
     format_string = "%c%u%c" % (endianChar, length // bytes_per_value,
                                 struct_format)

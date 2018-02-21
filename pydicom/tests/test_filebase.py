@@ -258,7 +258,7 @@ class TestDicomFile(object):
     """Test filebase.DicomFile() function"""
     def test_read(self):
         """Test the function"""
-        fp = DicomFile(TEST_FILE, 'rb')
-        assert not fp.parent.closed
-        assert 'CT_small.dcm' in fp.name
-        assert fp.read(2) == b'\x49\x49'
+        with DicomFile(TEST_FILE, 'rb') as fp:
+            assert not fp.parent.closed
+            assert 'CT_small.dcm' in fp.name
+            assert fp.read(2) == b'\x49\x49'

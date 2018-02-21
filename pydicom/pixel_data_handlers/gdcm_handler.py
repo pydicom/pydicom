@@ -156,13 +156,13 @@ def get_pixeldata(dicom_dataset):
     if len(pixel_bytearray) > n_bytes:
         # We make sure that all the bytes after are in fact zeros
         padding = pixel_bytearray[n_bytes:]
-        if numpy.any(numpy.fromstring(padding, numpy.byte)):
+        if numpy.any(numpy.frombuffer(padding, numpy.byte)):
             pixel_bytearray = pixel_bytearray[:n_bytes]
         else:
             # We revert to the old behavior which should then result
             #   in a Numpy error later on.
             pass
-    pixel_array = numpy.fromstring(pixel_bytearray, dtype=numpy_dtype)
+    pixel_array = numpy.frombuffer(pixel_bytearray, dtype=numpy_dtype)
     length_of_pixel_array = pixel_array.nbytes
     expected_length = dicom_dataset.Rows * dicom_dataset.Columns
 
