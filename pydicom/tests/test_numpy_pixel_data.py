@@ -10,12 +10,14 @@ numpy_missing_message = ("numpy is not available "
                          "in this test environment")
 numpy_present_message = "numpy is being tested"
 numpy_handler = None
-have_numpy_handler = True
 try:
     import pydicom.pixel_data_handlers.numpy_handler as numpy_handler
+    if not numpy_handler.is_this_usable:
+        numpy_handler = None
 except ImportError:
-    have_numpy_handler = False
+    numpy_handler = None
 
+have_numpy_handler = numpy_handler is not None
 empty_number_tags_name = get_testdata_files(
     "reportsi_with_empty_number_tags.dcm")[0]
 rtplan_name = get_testdata_files("rtplan.dcm")[0]
