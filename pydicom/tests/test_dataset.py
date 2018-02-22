@@ -60,7 +60,7 @@ class DatasetTests(unittest.TestCase):
                            "'PixelRepresentation'")
         msg = "(" + "|".join(
             [msg_from_gdcm, msg_from_numpy, msg_from_pillow]) + ")"
-        with self.assertRaisesRegexp(AttributeError, msg):
+        with pytest.raises(AttributeError, match=msg):
             ds.pixel_array
 
     def test_attribute_error_in_property_correct_debug(self):

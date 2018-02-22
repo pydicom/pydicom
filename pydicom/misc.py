@@ -6,13 +6,15 @@
 #    available at https://github.com/pydicom/pydicom
 import os.path
 
+import errno
+
 _size_factors = dict(KB=1024, MB=1024 * 1024, GB=1024 * 1024 * 1024)
 
 
 def size_in_bytes(expr):
     """Return the number of bytes for a defer_size argument to dcmread()
     """
-    if expr is None:
+    if expr is None or expr == float('inf'):
         return None
     try:
         return int(expr)
@@ -26,7 +28,7 @@ def size_in_bytes(expr):
                 "Unable to parse length with unit '{0:s}'".format(unit))
 
 
-def is_dicom(file):
+def is_dicom(file_path):
     """Boolean specifying if file is a proper DICOM file.
 
     This function is a pared down version of read_preamble meant for a
@@ -36,7 +38,7 @@ def is_dicom(file):
 
     Parameters
     ----------
-    file : str
+    file_path : str
         The path to the file.
 
     See Also
@@ -44,11 +46,7 @@ def is_dicom(file):
     filereader.read_preamble
     filereader.read_partial
     """
-    # TODO: add a force parameter maybe?
-    if not os.path.isfile(file):
-        raise IOError("File passed was not a valid file")
-        # TODO: error is only in Py3; what's a better Py2/3 error?
-    fp = open(file, 'rb')
-    fp.read(0x80)  # preamble
-    magic = fp.read(4)
+    with open(file_path, 'rb') as fp:
+        fp.read(0x80)  # preamble
+        magic = fp.read(4)
     return magic == b"DICM"

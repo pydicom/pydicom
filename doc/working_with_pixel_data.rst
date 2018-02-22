@@ -60,7 +60,7 @@ they must be written back to the ``PixelData`` attribute:
   for n,val in enumerate(ds.pixel_array.flat): # example: zero anything < 300
       if val < 300:
           ds.pixel_array.flat[n]=0
-  ds.PixelData = ds.pixel_array.tostring()
+  ds.PixelData = ds.pixel_array.tobytes()
   ds.save_as("newfilename.dcm")
 
   import os
