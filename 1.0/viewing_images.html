@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Viewing Images &mdash; pydicom 1.0.1rc1 documentation</title>
+  <title>Viewing Images &mdash; pydicom 1.0.0 documentation</title>
   
 
   
@@ -41,7 +41,7 @@
         <link rel="index" title="Index"
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="pydicom 1.0.1rc1 documentation" href="index.html"/>
+    <link rel="top" title="pydicom 1.0.0 documentation" href="index.html"/>
         <link rel="up" title="Pydicom User Guide" href="pydicom_user_guide.html"/>
         <link rel="next" title="Pydicom Developer Guide" href="pydicom_dev_guide.html"/>
         <link rel="prev" title="Handling of compressed image data" href="image_data_handlers.html"/> 
@@ -76,7 +76,7 @@
             
             
               <div class="version">
-                1.0.1rc1
+                1.0.0
               </div>
             
           
@@ -221,9 +221,9 @@ programs available</li>
 <div class="section" id="using-pydicom-with-matplotlib">
 <h2>Using pydicom with matplotlib<a class="headerlink" href="#using-pydicom-with-matplotlib" title="Permalink to this headline">¶</a></h2>
 <p>Matplotlib is available at <a class="reference external" href="https://matplotlib.org/">https://matplotlib.org/</a>. It
-can take 2D image information from <code class="docutils literal"><span class="pre">Dataset.pixel_array</span></code> and display it.
+can take 2D image information from <code class="docutils literal notranslate"><span class="pre">Dataset.pixel_array</span></code> and display it.
 Here is an example:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pydicom</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.data</span> <span class="k">import</span> <span class="n">get_testdata_files</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">filename</span> <span class="o">=</span> <span class="n">get_testdata_files</span><span class="p">(</span><span class="s2">&quot;CT_small.dcm&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
@@ -238,21 +238,21 @@ Here is an example:</p>
 <div class="section" id="using-pydicom-with-tkinter">
 <h2>Using pydicom with Tkinter<a class="headerlink" href="#using-pydicom-with-tkinter" title="Permalink to this headline">¶</a></h2>
 <p>The program <a class="reference external" href="https://github.com/pydicom/contrib-pydicom/blob/master/viewers/pydicom_Tkinter.py">pydicom_Tkinter.py</a>
-in the <code class="docutils literal"><span class="pre">contrib-pydicom</span></code> repository demonstrates how to show an image using the
+in the <code class="docutils literal notranslate"><span class="pre">contrib-pydicom</span></code> repository demonstrates how to show an image using the
 Tkinter graphics system, which comes by default with most Python installations.
 It creates a Tkinter PhotoImage in a Label widget or a user-supplied widget.</p>
 </div>
 <div class="section" id="using-pydicom-with-python-imaging-library-pil">
 <h2>Using pydicom with Python Imaging Library (PIL)<a class="headerlink" href="#using-pydicom-with-python-imaging-library-pil" title="Permalink to this headline">¶</a></h2>
 <p>The module <a class="reference external" href="https://github.com/pydicom/contrib-pydicom/blob/master/viewers/pydicom_PIL.py">pydicom_PIL.py</a>
-in the <code class="docutils literal"><span class="pre">contrib-pydicom</span></code> repository
-uses PIL’s <code class="docutils literal"><span class="pre">Image.show()</span></code> method after creating an Image instance
+in the <code class="docutils literal notranslate"><span class="pre">contrib-pydicom</span></code> repository
+uses PIL’s <code class="docutils literal notranslate"><span class="pre">Image.show()</span></code> method after creating an Image instance
 from the pixel data and some basic information about it (bit depth, LUTs, etc).</p>
 </div>
 <div class="section" id="using-pydicom-with-wxpython">
 <h2>Using pydicom with wxPython<a class="headerlink" href="#using-pydicom-with-wxpython" title="Permalink to this headline">¶</a></h2>
 <p>The module <a class="reference external" href="https://github.com/pydicom/contrib-pydicom/blob/master/viewers/imViewer_Simple.py">imViewer-Simple.py</a>
-in the <code class="docutils literal"><span class="pre">contrib-pydicom</span></code> repository uses wxPython (also PIL, but it notes that it
+in the <code class="docutils literal notranslate"><span class="pre">contrib-pydicom</span></code> repository uses wxPython (also PIL, but it notes that it
 may not be strictly necessary) to display an image from a pydicom dataset.</p>
 </div>
 </div>
@@ -301,7 +301,7 @@ may not be strictly necessary) to display an image from a pydicom dataset.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'1.0.1rc1',
+            VERSION:'1.0.0',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,

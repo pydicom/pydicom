@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Pydicom API’s Reference Guide &mdash; pydicom 1.0.1rc1 documentation</title>
+  <title>Pydicom API’s Reference Guide &mdash; pydicom 1.0.0 documentation</title>
   
 
   
@@ -41,7 +41,7 @@
         <link rel="index" title="Index"
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="pydicom 1.0.1rc1 documentation" href="index.html"/>
+    <link rel="top" title="pydicom 1.0.0 documentation" href="index.html"/>
         <link rel="prev" title="Pydicom Developer Guide" href="pydicom_dev_guide.html"/> 
 
   
@@ -74,7 +74,7 @@
             
             
               <div class="version">
-                1.0.1rc1
+                1.0.0
               </div>
             
           
@@ -193,17 +193,17 @@
 <p class="rubric">Common pydicom functions called by user code</p>
 <div class="section" id="file-reading-parsing">
 <h2>File Reading/Parsing<a class="headerlink" href="#file-reading-parsing" title="Permalink to this headline">¶</a></h2>
-<p>The main function to read and parse DICOM files using pydicom is <code class="docutils literal"><span class="pre">dcmread</span></code>. It is coded in the module
+<p>The main function to read and parse DICOM files using pydicom is <code class="docutils literal notranslate"><span class="pre">dcmread</span></code>. It is coded in the module
 dicom.filereader, but is also imported when the pydicom package is imported:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pydicom</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pydicom</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">dcmread</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>If you need fine control over the reading, you can either call <code class="docutils literal"><span class="pre">read_partial</span></code> or use <code class="docutils literal"><span class="pre">open_dicom</span></code>.
+<p>If you need fine control over the reading, you can either call <code class="docutils literal notranslate"><span class="pre">read_partial</span></code> or use <code class="docutils literal notranslate"><span class="pre">open_dicom</span></code>.
 All are documented below:</p>
 <dl class="function">
 <dt id="pydicom.filereader.dcmread">
-<code class="descclassname">pydicom.filereader.</code><code class="descname">dcmread</code><span class="sig-paren">(</span><em>fp</em>, <em>defer_size=None</em>, <em>stop_before_pixels=False</em>, <em>force=False</em>, <em>specific_tags=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/filereader.html#dcmread"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/d2f7088/pydicom/filereader.py#L781"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filereader.dcmread" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pydicom.filereader.</code><code class="descname">dcmread</code><span class="sig-paren">(</span><em>fp</em>, <em>defer_size=None</em>, <em>stop_before_pixels=False</em>, <em>force=False</em>, <em>specific_tags=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/filereader.html#dcmread"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/868c52a/pydicom/filereader.py#L781"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filereader.dcmread" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read and parse a DICOM dataset stored in the DICOM File Format.</p>
 <p>Read a DICOM dataset stored in accordance with the DICOM File Format
 (DICOM Standard Part 10 Section 7). If the dataset is not stored in
@@ -263,9 +263,9 @@ elements can be tags or tag names.</p>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
 <dl class="last docutils">
-<dt><code class="xref py py-obj docutils literal"><span class="pre">pydicom.dataset.FileDataset</span></code></dt>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">pydicom.dataset.FileDataset</span></code></dt>
 <dd>Data class that is returned.</dd>
-<dt><a class="reference internal" href="#pydicom.filereader.read_partial" title="pydicom.filereader.read_partial"><code class="xref py py-obj docutils literal"><span class="pre">pydicom.filereader.read_partial</span></code></a></dt>
+<dt><a class="reference internal" href="#pydicom.filereader.read_partial" title="pydicom.filereader.read_partial"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pydicom.filereader.read_partial</span></code></a></dt>
 <dd>Only read part of a DICOM file, stopping on given conditions.</dd>
 </dl>
 </div>
@@ -283,7 +283,7 @@ elements can be tags or tag names.</p>
 
 <dl class="function">
 <dt id="pydicom.filereader.read_partial">
-<code class="descclassname">pydicom.filereader.</code><code class="descname">read_partial</code><span class="sig-paren">(</span><em>fileobj</em>, <em>stop_when=None</em>, <em>defer_size=None</em>, <em>force=False</em>, <em>specific_tags=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/filereader.html#read_partial"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/d2f7088/pydicom/filereader.py#L655"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filereader.read_partial" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pydicom.filereader.</code><code class="descname">read_partial</code><span class="sig-paren">(</span><em>fileobj</em>, <em>stop_when=None</em>, <em>defer_size=None</em>, <em>force=False</em>, <em>specific_tags=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/filereader.html#read_partial"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/868c52a/pydicom/filereader.py#L655"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filereader.read_partial" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parse a DICOM file until a condition is met.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -295,19 +295,19 @@ elements can be tags or tag names.</p>
 </div></blockquote>
 <p><strong>stop_when :</strong></p>
 <blockquote>
-<div><p>Stop condition. See <code class="docutils literal"><span class="pre">read_dataset</span></code> for more info.</p>
+<div><p>Stop condition. See <code class="docutils literal notranslate"><span class="pre">read_dataset</span></code> for more info.</p>
 </div></blockquote>
 <p><strong>defer_size</strong> : int, str, None, optional</p>
 <blockquote>
-<div><p>See <code class="docutils literal"><span class="pre">dcmread</span></code> for parameter info.</p>
+<div><p>See <code class="docutils literal notranslate"><span class="pre">dcmread</span></code> for parameter info.</p>
 </div></blockquote>
 <p><strong>force</strong> : boolean</p>
 <blockquote>
-<div><p>See <code class="docutils literal"><span class="pre">dcmread</span></code> for parameter info.</p>
+<div><p>See <code class="docutils literal notranslate"><span class="pre">dcmread</span></code> for parameter info.</p>
 </div></blockquote>
 <p><strong>specific_tags</strong> : list or None</p>
 <blockquote>
-<div><p>See <code class="docutils literal"><span class="pre">dcmread</span></code> for parameter info.</p>
+<div><p>See <code class="docutils literal notranslate"><span class="pre">dcmread</span></code> for parameter info.</p>
 </div></blockquote>
 </td>
 </tr>
@@ -319,12 +319,12 @@ elements can be tags or tag names.</p>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
 <dl class="last docutils">
-<dt><a class="reference internal" href="#pydicom.filereader.dcmread" title="pydicom.filereader.dcmread"><code class="xref py py-obj docutils literal"><span class="pre">dcmread</span></code></a></dt>
+<dt><a class="reference internal" href="#pydicom.filereader.dcmread" title="pydicom.filereader.dcmread"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dcmread</span></code></a></dt>
 <dd>More generic file reading function.</dd>
 </dl>
 </div>
 <p class="rubric">Notes</p>
-<p>Use <code class="docutils literal"><span class="pre">dcmread</span></code> unless you need to stop on some condition other than
+<p>Use <code class="docutils literal notranslate"><span class="pre">dcmread</span></code> unless you need to stop on some condition other than
 reaching pixel data.</p>
 </dd></dl>
 
@@ -332,11 +332,11 @@ reaching pixel data.</p>
 <div class="section" id="file-writing">
 <h2>File Writing<a class="headerlink" href="#file-writing" title="Permalink to this headline">¶</a></h2>
 <p>DICOM files can also be written using pydicom. There are two ways to do this.
-The first is to use <code class="docutils literal"><span class="pre">write_file</span></code> with a prexisting FileDataset (derived from Dataset) instance.
-The second is to use the <code class="docutils literal"><span class="pre">save_as</span></code> method on an Dataset instance.</p>
+The first is to use <code class="docutils literal notranslate"><span class="pre">write_file</span></code> with a prexisting FileDataset (derived from Dataset) instance.
+The second is to use the <code class="docutils literal notranslate"><span class="pre">save_as</span></code> method on an Dataset instance.</p>
 <dl class="function">
 <dt id="pydicom.filewriter.write_file">
-<code class="descclassname">pydicom.filewriter.</code><code class="descname">write_file</code><span class="sig-paren">(</span><em>filename</em>, <em>dataset</em>, <em>write_like_original=True</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/d2f7088/pydicom/filewriter.py#L647"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filewriter.write_file" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pydicom.filewriter.</code><code class="descname">write_file</code><span class="sig-paren">(</span><em>filename</em>, <em>dataset</em>, <em>write_like_original=True</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/868c52a/pydicom/filewriter.py#L647"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filewriter.write_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write <cite>dataset</cite> to the <cite>filename</cite> specified.</p>
 <p>If <cite>write_like_original</cite> is True then <cite>dataset</cite> will be written as is
 (after minimal validation checking) and may or may not contain all or parts
@@ -397,9 +397,9 @@ explicit lengths for all elements.</p>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
 <dl class="last docutils">
-<dt><code class="xref py py-obj docutils literal"><span class="pre">pydicom.dataset.FileDataset</span></code></dt>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">pydicom.dataset.FileDataset</span></code></dt>
 <dd>Dataset class with relevant attributes and information.</dd>
-<dt><a class="reference internal" href="#pydicom.dataset.Dataset.save_as" title="pydicom.dataset.Dataset.save_as"><code class="xref py py-obj docutils literal"><span class="pre">pydicom.dataset.Dataset.save_as</span></code></a></dt>
+<dt><a class="reference internal" href="#pydicom.dataset.Dataset.save_as" title="pydicom.dataset.Dataset.save_as"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pydicom.dataset.Dataset.save_as</span></code></a></dt>
 <dd>Write a DICOM file from a dataset that was read in with dcmread(). save_as wraps dcmwrite.</dd>
 </dl>
 </div>
@@ -407,7 +407,7 @@ explicit lengths for all elements.</p>
 
 <dl class="method">
 <dt id="pydicom.dataset.Dataset.save_as">
-<code class="descclassname">Dataset.</code><code class="descname">save_as</code><span class="sig-paren">(</span><em>filename</em>, <em>write_like_original=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.save_as"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/d2f7088/pydicom/dataset.py#L897"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.save_as" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">Dataset.</code><code class="descname">save_as</code><span class="sig-paren">(</span><em>filename</em>, <em>write_like_original=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.save_as"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/868c52a/pydicom/dataset.py#L897"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.save_as" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write the Dataset to <cite>filename</cite>.</p>
 <p>Saving a Dataset requires that the Dataset.is_implicit_VR and
 Dataset.is_little_endian attributes exist and are set appropriately. If
@@ -460,11 +460,11 @@ with explicit lengths for all elements.</p>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
 <dl class="last docutils">
-<dt><code class="xref py py-obj docutils literal"><span class="pre">pydicom.filewriter.write_dataset</span></code></dt>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">pydicom.filewriter.write_dataset</span></code></dt>
 <dd>Write a DICOM Dataset to a file.</dd>
-<dt><code class="xref py py-obj docutils literal"><span class="pre">pydicom.filewriter.write_file_meta_info</span></code></dt>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">pydicom.filewriter.write_file_meta_info</span></code></dt>
 <dd>Write the DICOM File Meta Information Group elements to a file.</dd>
-<dt><code class="xref py py-obj docutils literal"><span class="pre">pydicom.filewriter.dcmwrite</span></code></dt>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">pydicom.filewriter.dcmwrite</span></code></dt>
 <dd>Write a DICOM file from a FileDataset instance.</dd>
 </dl>
 </div>
@@ -475,7 +475,7 @@ with explicit lengths for all elements.</p>
 <h2>Dataset<a class="headerlink" href="#dataset" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="pydicom.dataset.Dataset">
-<em class="property">class </em><code class="descclassname">pydicom.dataset.</code><code class="descname">Dataset</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/d2f7088/pydicom/dataset.py#L52"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">pydicom.dataset.</code><code class="descname">Dataset</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/868c52a/pydicom/dataset.py#L52"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>A collection (dictionary) of DICOM DataElements.</p>
 <p class="rubric">Examples</p>
 <p>Add DataElements to the Dataset (for elements in the DICOM dictionary).
@@ -562,92 +562,92 @@ True</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#pydicom.dataset.Dataset.add" title="pydicom.dataset.Dataset.add"><code class="xref py py-obj docutils literal"><span class="pre">add</span></code></a>(data_element)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#pydicom.dataset.Dataset.add" title="pydicom.dataset.Dataset.add"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add</span></code></a>(data_element)</td>
 <td>Add a DataElement to the Dataset.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#pydicom.dataset.Dataset.add_new" title="pydicom.dataset.Dataset.add_new"><code class="xref py py-obj docutils literal"><span class="pre">add_new</span></code></a>(tag,&nbsp;VR,&nbsp;value)</td>
+<tr class="row-even"><td><a class="reference internal" href="#pydicom.dataset.Dataset.add_new" title="pydicom.dataset.Dataset.add_new"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_new</span></code></a>(tag,&nbsp;VR,&nbsp;value)</td>
 <td>Add a DataElement to the Dataset.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#pydicom.dataset.Dataset.clear" title="pydicom.dataset.Dataset.clear"><code class="xref py py-obj docutils literal"><span class="pre">clear</span></code></a>(()&nbsp;-&gt;&nbsp;None.&nbsp;&nbsp;Remove&nbsp;all&nbsp;items&nbsp;from&nbsp;D.)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#pydicom.dataset.Dataset.clear" title="pydicom.dataset.Dataset.clear"><code class="xref py py-obj docutils literal notranslate"><span class="pre">clear</span></code></a>()</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#pydicom.dataset.Dataset.convert_pixel_data" title="pydicom.dataset.Dataset.convert_pixel_data"><code class="xref py py-obj docutils literal"><span class="pre">convert_pixel_data</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#pydicom.dataset.Dataset.convert_pixel_data" title="pydicom.dataset.Dataset.convert_pixel_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_pixel_data</span></code></a>()</td>
 <td>Convert the Pixel Data to a numpy array internally.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#pydicom.dataset.Dataset.copy" title="pydicom.dataset.Dataset.copy"><code class="xref py py-obj docutils literal"><span class="pre">copy</span></code></a>(()&nbsp;-&gt;&nbsp;a&nbsp;shallow&nbsp;copy&nbsp;of&nbsp;D)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#pydicom.dataset.Dataset.copy" title="pydicom.dataset.Dataset.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code></a>()</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#pydicom.dataset.Dataset.data_element" title="pydicom.dataset.Dataset.data_element"><code class="xref py py-obj docutils literal"><span class="pre">data_element</span></code></a>(name)</td>
+<tr class="row-even"><td><a class="reference internal" href="#pydicom.dataset.Dataset.data_element" title="pydicom.dataset.Dataset.data_element"><code class="xref py py-obj docutils literal notranslate"><span class="pre">data_element</span></code></a>(name)</td>
 <td>Return the DataElement corresponding to the element keyword <cite>name</cite>.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#pydicom.dataset.Dataset.decode" title="pydicom.dataset.Dataset.decode"><code class="xref py py-obj docutils literal"><span class="pre">decode</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#pydicom.dataset.Dataset.decode" title="pydicom.dataset.Dataset.decode"><code class="xref py py-obj docutils literal notranslate"><span class="pre">decode</span></code></a>()</td>
 <td>Apply character set decoding to all DataElements in the Dataset.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#pydicom.dataset.Dataset.decompress" title="pydicom.dataset.Dataset.decompress"><code class="xref py py-obj docutils literal"><span class="pre">decompress</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#pydicom.dataset.Dataset.decompress" title="pydicom.dataset.Dataset.decompress"><code class="xref py py-obj docutils literal notranslate"><span class="pre">decompress</span></code></a>()</td>
 <td>Decompresses pixel data and modifies the Dataset in-place</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#pydicom.dataset.Dataset.dir" title="pydicom.dataset.Dataset.dir"><code class="xref py py-obj docutils literal"><span class="pre">dir</span></code></a>(*filters)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#pydicom.dataset.Dataset.dir" title="pydicom.dataset.Dataset.dir"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dir</span></code></a>(*filters)</td>
 <td>Return an alphabetical list of DataElement keywords in the Dataset.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#pydicom.dataset.Dataset.formatted_lines" title="pydicom.dataset.Dataset.formatted_lines"><code class="xref py py-obj docutils literal"><span class="pre">formatted_lines</span></code></a>([element_format,&nbsp;…])</td>
+<tr class="row-even"><td><a class="reference internal" href="#pydicom.dataset.Dataset.formatted_lines" title="pydicom.dataset.Dataset.formatted_lines"><code class="xref py py-obj docutils literal notranslate"><span class="pre">formatted_lines</span></code></a>([element_format,&nbsp;…])</td>
 <td>Iterate through the Dataset yielding formatted str for each element.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#pydicom.dataset.Dataset.fromkeys" title="pydicom.dataset.Dataset.fromkeys"><code class="xref py py-obj docutils literal"><span class="pre">fromkeys</span></code></a>($type,&nbsp;iterable[,&nbsp;value])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#pydicom.dataset.Dataset.fromkeys" title="pydicom.dataset.Dataset.fromkeys"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fromkeys</span></code></a>($type,&nbsp;iterable[,&nbsp;value])</td>
 <td>Returns a new dict with keys from iterable and values equal to value.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#pydicom.dataset.Dataset.get" title="pydicom.dataset.Dataset.get"><code class="xref py py-obj docutils literal"><span class="pre">get</span></code></a>(key[,&nbsp;default])</td>
+<tr class="row-even"><td><a class="reference internal" href="#pydicom.dataset.Dataset.get" title="pydicom.dataset.Dataset.get"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get</span></code></a>(key[,&nbsp;default])</td>
 <td>Extend dict.get() to handle DICOM DataElement keywords.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#pydicom.dataset.Dataset.get_item" title="pydicom.dataset.Dataset.get_item"><code class="xref py py-obj docutils literal"><span class="pre">get_item</span></code></a>(key)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#pydicom.dataset.Dataset.get_item" title="pydicom.dataset.Dataset.get_item"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_item</span></code></a>(key)</td>
 <td>Return the raw data element if possible.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#pydicom.dataset.Dataset.group_dataset" title="pydicom.dataset.Dataset.group_dataset"><code class="xref py py-obj docutils literal"><span class="pre">group_dataset</span></code></a>(group)</td>
+<tr class="row-even"><td><a class="reference internal" href="#pydicom.dataset.Dataset.group_dataset" title="pydicom.dataset.Dataset.group_dataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">group_dataset</span></code></a>(group)</td>
 <td>Return a Dataset containing only DataElements of a certain group.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#pydicom.dataset.Dataset.items" title="pydicom.dataset.Dataset.items"><code class="xref py py-obj docutils literal"><span class="pre">items</span></code></a>(…)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#pydicom.dataset.Dataset.items" title="pydicom.dataset.Dataset.items"><code class="xref py py-obj docutils literal notranslate"><span class="pre">items</span></code></a>()</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#pydicom.dataset.Dataset.iterall" title="pydicom.dataset.Dataset.iterall"><code class="xref py py-obj docutils literal"><span class="pre">iterall</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#pydicom.dataset.Dataset.iterall" title="pydicom.dataset.Dataset.iterall"><code class="xref py py-obj docutils literal notranslate"><span class="pre">iterall</span></code></a>()</td>
 <td>Iterate through the Dataset, yielding all DataElements.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#pydicom.dataset.Dataset.keys" title="pydicom.dataset.Dataset.keys"><code class="xref py py-obj docutils literal"><span class="pre">keys</span></code></a>(…)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#pydicom.dataset.Dataset.keys" title="pydicom.dataset.Dataset.keys"><code class="xref py py-obj docutils literal notranslate"><span class="pre">keys</span></code></a>()</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#pydicom.dataset.Dataset.pop" title="pydicom.dataset.Dataset.pop"><code class="xref py py-obj docutils literal"><span class="pre">pop</span></code></a>((k[,d])&nbsp;-&gt;&nbsp;v,&nbsp;…)</td>
+<tr class="row-even"><td><a class="reference internal" href="#pydicom.dataset.Dataset.pop" title="pydicom.dataset.Dataset.pop"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pop</span></code></a>(k[,d])</td>
 <td>If key is not found, d is returned if given, otherwise KeyError is raised</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#pydicom.dataset.Dataset.popitem" title="pydicom.dataset.Dataset.popitem"><code class="xref py py-obj docutils literal"><span class="pre">popitem</span></code></a>(()&nbsp;-&gt;&nbsp;(k,&nbsp;v),&nbsp;…)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#pydicom.dataset.Dataset.popitem" title="pydicom.dataset.Dataset.popitem"><code class="xref py py-obj docutils literal notranslate"><span class="pre">popitem</span></code></a>()</td>
 <td>2-tuple; but raise KeyError if D is empty.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#pydicom.dataset.Dataset.remove_private_tags" title="pydicom.dataset.Dataset.remove_private_tags"><code class="xref py py-obj docutils literal"><span class="pre">remove_private_tags</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#pydicom.dataset.Dataset.remove_private_tags" title="pydicom.dataset.Dataset.remove_private_tags"><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_private_tags</span></code></a>()</td>
 <td>Remove all private DataElements in the Dataset.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#pydicom.dataset.Dataset.save_as" title="pydicom.dataset.Dataset.save_as"><code class="xref py py-obj docutils literal"><span class="pre">save_as</span></code></a>(filename[,&nbsp;write_like_original])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#pydicom.dataset.Dataset.save_as" title="pydicom.dataset.Dataset.save_as"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_as</span></code></a>(filename[,&nbsp;write_like_original])</td>
 <td>Write the Dataset to <cite>filename</cite>.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#pydicom.dataset.Dataset.setdefault" title="pydicom.dataset.Dataset.setdefault"><code class="xref py py-obj docutils literal"><span class="pre">setdefault</span></code></a>((k[,d])&nbsp;-&gt;&nbsp;D.get(k,d),&nbsp;…)</td>
+<tr class="row-even"><td><a class="reference internal" href="#pydicom.dataset.Dataset.setdefault" title="pydicom.dataset.Dataset.setdefault"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setdefault</span></code></a>(k[,d])</td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#pydicom.dataset.Dataset.top" title="pydicom.dataset.Dataset.top"><code class="xref py py-obj docutils literal"><span class="pre">top</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#pydicom.dataset.Dataset.top" title="pydicom.dataset.Dataset.top"><code class="xref py py-obj docutils literal notranslate"><span class="pre">top</span></code></a>()</td>
 <td>Return a str of the Dataset’s top level DataElements only.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#pydicom.dataset.Dataset.trait_names" title="pydicom.dataset.Dataset.trait_names"><code class="xref py py-obj docutils literal"><span class="pre">trait_names</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#pydicom.dataset.Dataset.trait_names" title="pydicom.dataset.Dataset.trait_names"><code class="xref py py-obj docutils literal notranslate"><span class="pre">trait_names</span></code></a>()</td>
 <td>Return a list of valid names for auto-completion code.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#pydicom.dataset.Dataset.update" title="pydicom.dataset.Dataset.update"><code class="xref py py-obj docutils literal"><span class="pre">update</span></code></a>(dictionary)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#pydicom.dataset.Dataset.update" title="pydicom.dataset.Dataset.update"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code></a>(dictionary)</td>
 <td>Extend dict.update() to handle DICOM keywords.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#pydicom.dataset.Dataset.values" title="pydicom.dataset.Dataset.values"><code class="xref py py-obj docutils literal"><span class="pre">values</span></code></a>(…)</td>
+<tr class="row-even"><td><a class="reference internal" href="#pydicom.dataset.Dataset.values" title="pydicom.dataset.Dataset.values"><code class="xref py py-obj docutils literal notranslate"><span class="pre">values</span></code></a>()</td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#pydicom.dataset.Dataset.walk" title="pydicom.dataset.Dataset.walk"><code class="xref py py-obj docutils literal"><span class="pre">walk</span></code></a>(callback[,&nbsp;recursive])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#pydicom.dataset.Dataset.walk" title="pydicom.dataset.Dataset.walk"><code class="xref py py-obj docutils literal notranslate"><span class="pre">walk</span></code></a>(callback[,&nbsp;recursive])</td>
 <td>Iterate through the DataElements and run <cite>callback</cite> on each.</td>
 </tr>
 </tbody>
 </table>
 <dl class="method">
 <dt id="pydicom.dataset.Dataset.add">
-<code class="descname">add</code><span class="sig-paren">(</span><em>data_element</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.add"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/d2f7088/pydicom/dataset.py#L158"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.add" title="Permalink to this definition">¶</a></dt>
+<code class="descname">add</code><span class="sig-paren">(</span><em>data_element</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.add"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/868c52a/pydicom/dataset.py#L158"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.add" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a DataElement to the Dataset.</p>
 <p>Equivalent to ds[data_element.tag] = data_element</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -666,7 +666,7 @@ True</p>
 
 <dl class="method">
 <dt id="pydicom.dataset.Dataset.add_new">
-<code class="descname">add_new</code><span class="sig-paren">(</span><em>tag</em>, <em>VR</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.add_new"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/d2f7088/pydicom/dataset.py#L170"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.add_new" title="Permalink to this definition">¶</a></dt>
+<code class="descname">add_new</code><span class="sig-paren">(</span><em>tag</em>, <em>VR</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.add_new"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/868c52a/pydicom/dataset.py#L170"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.add_new" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a DataElement to the Dataset.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -704,7 +704,7 @@ etc.</p>
 
 <dl class="method">
 <dt id="pydicom.dataset.Dataset.convert_pixel_data">
-<code class="descname">convert_pixel_data</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.convert_pixel_data"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/d2f7088/pydicom/dataset.py#L695"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.convert_pixel_data" title="Permalink to this definition">¶</a></dt>
+<code class="descname">convert_pixel_data</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.convert_pixel_data"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/868c52a/pydicom/dataset.py#L695"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.convert_pixel_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert the Pixel Data to a numpy array internally.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -729,7 +729,7 @@ etc.</p>
 
 <dl class="method">
 <dt id="pydicom.dataset.Dataset.data_element">
-<code class="descname">data_element</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.data_element"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/d2f7088/pydicom/dataset.py#L193"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.data_element" title="Permalink to this definition">¶</a></dt>
+<code class="descname">data_element</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.data_element"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/868c52a/pydicom/dataset.py#L193"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.data_element" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the DataElement corresponding to the element keyword <cite>name</cite>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -754,14 +754,14 @@ Dataset DataElement if present, None otherwise.</p>
 
 <dl class="method">
 <dt id="pydicom.dataset.Dataset.decode">
-<code class="descname">decode</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.decode"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/d2f7088/pydicom/dataset.py#L244"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.decode" title="Permalink to this definition">¶</a></dt>
+<code class="descname">decode</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.decode"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/868c52a/pydicom/dataset.py#L244"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.decode" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply character set decoding to all DataElements in the Dataset.</p>
 <p>See DICOM PS3.5-2008 6.1.1.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="pydicom.dataset.Dataset.decompress">
-<code class="descname">decompress</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.decompress"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/d2f7088/pydicom/dataset.py#L747"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.decompress" title="Permalink to this definition">¶</a></dt>
+<code class="descname">decompress</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.decompress"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/868c52a/pydicom/dataset.py#L747"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.decompress" title="Permalink to this definition">¶</a></dt>
 <dd><p>Decompresses pixel data and modifies the Dataset in-place</p>
 <blockquote>
 <div><p>If not a compressed tranfer syntax, then pixel data is converted
@@ -804,7 +804,7 @@ and internal state is updated appropriately:</p>
 
 <dl class="method">
 <dt id="pydicom.dataset.Dataset.dir">
-<code class="descname">dir</code><span class="sig-paren">(</span><em>*filters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.dir"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/d2f7088/pydicom/dataset.py#L353"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.dir" title="Permalink to this definition">¶</a></dt>
+<code class="descname">dir</code><span class="sig-paren">(</span><em>*filters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.dir"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/868c52a/pydicom/dataset.py#L353"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.dir" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return an alphabetical list of DataElement keywords in the Dataset.</p>
 <p>Intended mainly for use in interactive Python sessions. Only lists the
 DataElement keywords in the current level of the Dataset (i.e. the
@@ -833,7 +833,7 @@ used then all DataElement keywords are returned.</p>
 
 <dl class="method">
 <dt id="pydicom.dataset.Dataset.formatted_lines">
-<code class="descname">formatted_lines</code><span class="sig-paren">(</span><em>element_format='%(tag)s %(name)-35.35s %(VR)s: %(repval)s'</em>, <em>sequence_element_format='%(tag)s %(name)-35.35s %(VR)s: %(repval)s'</em>, <em>indent_format=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.formatted_lines"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/d2f7088/pydicom/dataset.py#L807"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.formatted_lines" title="Permalink to this definition">¶</a></dt>
+<code class="descname">formatted_lines</code><span class="sig-paren">(</span><em>element_format='%(tag)s %(name)-35.35s %(VR)s: %(repval)s'</em>, <em>sequence_element_format='%(tag)s %(name)-35.35s %(VR)s: %(repval)s'</em>, <em>indent_format=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.formatted_lines"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/868c52a/pydicom/dataset.py#L807"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.formatted_lines" title="Permalink to this definition">¶</a></dt>
 <dd><p>Iterate through the Dataset yielding formatted str for each element.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -875,7 +875,7 @@ the attributes of DataElement. Default is
 
 <dl class="method">
 <dt id="pydicom.dataset.Dataset.get">
-<code class="descname">get</code><span class="sig-paren">(</span><em>key</em>, <em>default=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.get"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/d2f7088/pydicom/dataset.py#L414"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.get" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get</code><span class="sig-paren">(</span><em>key</em>, <em>default=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.get"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/868c52a/pydicom/dataset.py#L414"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.get" title="Permalink to this definition">¶</a></dt>
 <dd><p>Extend dict.get() to handle DICOM DataElement keywords.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -914,7 +914,7 @@ DataElement instance.</p>
 
 <dl class="method">
 <dt id="pydicom.dataset.Dataset.get_item">
-<code class="descname">get_item</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.get_item"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/d2f7088/pydicom/dataset.py#L571"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.get_item" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_item</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.get_item"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/868c52a/pydicom/dataset.py#L571"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.get_item" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the raw data element if possible.</p>
 <p>It will be raw if the user has never accessed the value, or set their
 own value. Note if the data element is a deferred-read element,
@@ -940,7 +940,7 @@ etc.</p>
 
 <dl class="method">
 <dt id="pydicom.dataset.Dataset.group_dataset">
-<code class="descname">group_dataset</code><span class="sig-paren">(</span><em>group</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.group_dataset"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/d2f7088/pydicom/dataset.py#L596"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.group_dataset" title="Permalink to this definition">¶</a></dt>
+<code class="descname">group_dataset</code><span class="sig-paren">(</span><em>group</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.group_dataset"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/868c52a/pydicom/dataset.py#L596"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.group_dataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a Dataset containing only DataElements of a certain group.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -969,7 +969,7 @@ etc.</p>
 
 <dl class="method">
 <dt id="pydicom.dataset.Dataset.iterall">
-<code class="descname">iterall</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.iterall"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/d2f7088/pydicom/dataset.py#L1103"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.iterall" title="Permalink to this definition">¶</a></dt>
+<code class="descname">iterall</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.iterall"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/868c52a/pydicom/dataset.py#L1103"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.iterall" title="Permalink to this definition">¶</a></dt>
 <dd><p>Iterate through the Dataset, yielding all DataElements.</p>
 <p>Unlike Dataset.__iter__, this <em>does</em> recurse into sequences,
 and so returns all data elements as if the file were “flattened”.</p>
@@ -1020,13 +1020,13 @@ and so returns all data elements as if the file were “flattened”.</p>
 
 <dl class="method">
 <dt id="pydicom.dataset.Dataset.remove_private_tags">
-<code class="descname">remove_private_tags</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.remove_private_tags"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/d2f7088/pydicom/dataset.py#L886"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.remove_private_tags" title="Permalink to this definition">¶</a></dt>
+<code class="descname">remove_private_tags</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.remove_private_tags"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/868c52a/pydicom/dataset.py#L886"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.remove_private_tags" title="Permalink to this definition">¶</a></dt>
 <dd><p>Remove all private DataElements in the Dataset.</p>
 </dd></dl>
 
 <dl class="method">
 <dt>
-<code class="descname">save_as</code><span class="sig-paren">(</span><em>filename</em>, <em>write_like_original=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.save_as"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/d2f7088/pydicom/dataset.py#L897"><span class="viewcode-link">[source]</span></a></dt>
+<code class="descname">save_as</code><span class="sig-paren">(</span><em>filename</em>, <em>write_like_original=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.save_as"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/868c52a/pydicom/dataset.py#L897"><span class="viewcode-link">[source]</span></a></dt>
 <dd><p>Write the Dataset to <cite>filename</cite>.</p>
 <p>Saving a Dataset requires that the Dataset.is_implicit_VR and
 Dataset.is_little_endian attributes exist and are set appropriately. If
@@ -1079,11 +1079,11 @@ with explicit lengths for all elements.</p>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
 <dl class="last docutils">
-<dt><code class="xref py py-obj docutils literal"><span class="pre">pydicom.filewriter.write_dataset</span></code></dt>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">pydicom.filewriter.write_dataset</span></code></dt>
 <dd>Write a DICOM Dataset to a file.</dd>
-<dt><code class="xref py py-obj docutils literal"><span class="pre">pydicom.filewriter.write_file_meta_info</span></code></dt>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">pydicom.filewriter.write_file_meta_info</span></code></dt>
 <dd>Write the DICOM File Meta Information Group elements to a file.</dd>
-<dt><code class="xref py py-obj docutils literal"><span class="pre">pydicom.filewriter.dcmwrite</span></code></dt>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">pydicom.filewriter.dcmwrite</span></code></dt>
 <dd>Write a DICOM file from a FileDataset instance.</dd>
 </dl>
 </div>
@@ -1096,13 +1096,13 @@ with explicit lengths for all elements.</p>
 
 <dl class="method">
 <dt id="pydicom.dataset.Dataset.top">
-<code class="descname">top</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.top"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/d2f7088/pydicom/dataset.py#L1083"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.top" title="Permalink to this definition">¶</a></dt>
+<code class="descname">top</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.top"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/868c52a/pydicom/dataset.py#L1083"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.top" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a str of the Dataset’s top level DataElements only.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="pydicom.dataset.Dataset.trait_names">
-<code class="descname">trait_names</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.trait_names"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/d2f7088/pydicom/dataset.py#L1087"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.trait_names" title="Permalink to this definition">¶</a></dt>
+<code class="descname">trait_names</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.trait_names"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/868c52a/pydicom/dataset.py#L1087"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.trait_names" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a list of valid names for auto-completion code.</p>
 <p>Used in IPython, so that data element names can be found and offered
 for autocompletion on the IPython command line.</p>
@@ -1110,7 +1110,7 @@ for autocompletion on the IPython command line.</p>
 
 <dl class="method">
 <dt id="pydicom.dataset.Dataset.update">
-<code class="descname">update</code><span class="sig-paren">(</span><em>dictionary</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.update"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/d2f7088/pydicom/dataset.py#L1095"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.update" title="Permalink to this definition">¶</a></dt>
+<code class="descname">update</code><span class="sig-paren">(</span><em>dictionary</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.update"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/868c52a/pydicom/dataset.py#L1095"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.update" title="Permalink to this definition">¶</a></dt>
 <dd><p>Extend dict.update() to handle DICOM keywords.</p>
 </dd></dl>
 
@@ -1121,7 +1121,7 @@ for autocompletion on the IPython command line.</p>
 
 <dl class="method">
 <dt id="pydicom.dataset.Dataset.walk">
-<code class="descname">walk</code><span class="sig-paren">(</span><em>callback</em>, <em>recursive=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.walk"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/d2f7088/pydicom/dataset.py#L1121"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.walk" title="Permalink to this definition">¶</a></dt>
+<code class="descname">walk</code><span class="sig-paren">(</span><em>callback</em>, <em>recursive=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.walk"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/868c52a/pydicom/dataset.py#L1121"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.walk" title="Permalink to this definition">¶</a></dt>
 <dd><p>Iterate through the DataElements and run <cite>callback</cite> on each.</p>
 <p>Visit all DataElements, possibly recursing into sequences and their
 datasets. The callback function is called for each DataElement
@@ -1201,7 +1201,7 @@ increasing tag number within their dataset).</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'1.0.1rc1',
+            VERSION:'1.0.0',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,

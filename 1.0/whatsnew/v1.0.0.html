@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Version 1.0.0 &mdash; pydicom 1.0.1rc1 documentation</title>
+  <title>Version 1.0.0 &mdash; pydicom 1.0.0 documentation</title>
   
 
   
@@ -41,7 +41,7 @@
         <link rel="index" title="Index"
               href="../genindex.html"/>
         <link rel="search" title="Search" href="../search.html"/>
-    <link rel="top" title="pydicom 1.0.1rc1 documentation" href="../index.html"/> 
+    <link rel="top" title="pydicom 1.0.0 documentation" href="../index.html"/> 
 
   
   <script src="../_static/js/modernizr.min.js"></script>
@@ -73,7 +73,7 @@
             
             
               <div class="version">
-                1.0.1rc1
+                1.0.0
               </div>
             
           
@@ -196,8 +196,8 @@ used a pydicom version less than 1.0.</p>
 <h3>Major changes<a class="headerlink" href="#major-changes" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>full Python 3 compatibility - one code base for both Python 2 and Python 3</li>
-<li>package name and import name now match – use <code class="docutils literal"><span class="pre">import</span> <span class="pre">pydicom</span></code>
-rather than <code class="docutils literal"><span class="pre">import</span> <span class="pre">dicom</span></code>.</li>
+<li>package name and import name now match – use <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">pydicom</span></code>
+rather than <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">dicom</span></code>.</li>
 <li><dl class="first docutils">
 <dt>added <span class="xref std std-doc">image_data_handlers</span>:</dt>
 <dd><ul class="first last">
@@ -217,31 +217,31 @@ files</li>
 <div class="section" id="other-enhancements">
 <h3>Other enhancements<a class="headerlink" href="#other-enhancements" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li>added <code class="docutils literal"><span class="pre">util/fixer.py</span></code> callbacks available to fix non DICOM-compliant
+<li>added <code class="docutils literal notranslate"><span class="pre">util/fixer.py</span></code> callbacks available to fix non DICOM-compliant
 values before exceptions thrown</li>
-<li>added context management methods to <code class="docutils literal"><span class="pre">Dataset</span></code></li>
-<li>added <code class="docutils literal"><span class="pre">misc.is_dicom()</span></code> function to check for DICOM file format</li>
+<li>added context management methods to <code class="docutils literal notranslate"><span class="pre">Dataset</span></code></li>
+<li>added <code class="docutils literal notranslate"><span class="pre">misc.is_dicom()</span></code> function to check for DICOM file format</li>
 <li>added date/time converters (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/143">#143</a>)</li>
 <li>added option to attempt other VRs if translate fails (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/197">#197</a>)</li>
 <li>added heuristics to read files that have no preamble or file meta
 information</li>
 <li>support for multi-valued DA, DT, TM data elements (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/212">#212</a>)</li>
-<li><code class="docutils literal"><span class="pre">DataElement</span></code>: added <code class="docutils literal"><span class="pre">keyword</span></code> and <code class="docutils literal"><span class="pre">is_retired</span></code> properties</li>
-<li><code class="docutils literal"><span class="pre">datadict</span></code>: added <code class="docutils literal"><span class="pre">dictionary_is_retired()</span></code></li>
-<li><code class="docutils literal"><span class="pre">datadict</span></code>: added ability to add custom DICOM dictionary items via
-<code class="docutils literal"><span class="pre">add_dict_entry()</span></code> and <code class="docutils literal"><span class="pre">add_dict_entries()</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">DataElement</span></code>: added <code class="docutils literal notranslate"><span class="pre">keyword</span></code> and <code class="docutils literal notranslate"><span class="pre">is_retired</span></code> properties</li>
+<li><code class="docutils literal notranslate"><span class="pre">datadict</span></code>: added <code class="docutils literal notranslate"><span class="pre">dictionary_is_retired()</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">datadict</span></code>: added ability to add custom DICOM dictionary items via
+<code class="docutils literal notranslate"><span class="pre">add_dict_entry()</span></code> and <code class="docutils literal notranslate"><span class="pre">add_dict_entries()</span></code></li>
 <li>added some support for pickle</li>
-<li>added support for VRs <code class="docutils literal"><span class="pre">OD</span></code>, <code class="docutils literal"><span class="pre">OL</span></code> and <code class="docutils literal"><span class="pre">UC</span></code></li>
+<li>added support for VRs <code class="docutils literal notranslate"><span class="pre">OD</span></code>, <code class="docutils literal notranslate"><span class="pre">OL</span></code> and <code class="docutils literal notranslate"><span class="pre">UC</span></code></li>
 <li>added support for Thai, Japanese and Chinese encodings (#346, #353)</li>
 <li>added support for slicing to Dataset</li>
 <li>add/update TransferSyntaxUID when writing standard</li>
-<li>renamed <code class="docutils literal"><span class="pre">UID</span></code> package to <code class="docutils literal"><span class="pre">uid</span></code> (conforms to Python standard)</li>
-<li>added property <code class="docutils literal"><span class="pre">uid.is_private</span></code></li>
+<li>renamed <code class="docutils literal notranslate"><span class="pre">UID</span></code> package to <code class="docutils literal notranslate"><span class="pre">uid</span></code> (conforms to Python standard)</li>
+<li>added property <code class="docutils literal notranslate"><span class="pre">uid.is_private</span></code></li>
 <li>added definitions for storage SOP Class UIDs (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/172">#172</a>)</li>
 <li>added possibility to read only specific tags (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/95">#95</a>)</li>
 <li>added missing meta elements when writing DICOM file</li>
-<li>added <code class="docutils literal"><span class="pre">encaps</span></code> generator functions to access compressed frames</li>
-<li><code class="docutils literal"><span class="pre">read_file</span></code> changed to <code class="docutils literal"><span class="pre">dcmread</span></code>, <code class="docutils literal"><span class="pre">write_file</span></code> to <code class="docutils literal"><span class="pre">dcmwrite</span></code> for
+<li>added <code class="docutils literal notranslate"><span class="pre">encaps</span></code> generator functions to access compressed frames</li>
+<li><code class="docutils literal notranslate"><span class="pre">read_file</span></code> changed to <code class="docutils literal notranslate"><span class="pre">dcmread</span></code>, <code class="docutils literal notranslate"><span class="pre">write_file</span></code> to <code class="docutils literal notranslate"><span class="pre">dcmwrite</span></code> for
 greater clarity. Previous names still available for backwards compatibility.</li>
 </ul>
 </div>
@@ -265,7 +265,7 @@ and <a class="reference external" href="https://pydicom.github.io/pydicom/stable
 <ul class="simple">
 <li>correctly handle PlanarConfiguration==0 (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/151">#151</a>)</li>
 <li>updated uid generation to ensure uniqueness (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/125">#125</a>)</li>
-<li>handle missing patient data in <code class="docutils literal"><span class="pre">show_dicomdir</span></code></li>
+<li>handle missing patient data in <code class="docutils literal notranslate"><span class="pre">show_dicomdir</span></code></li>
 <li>assume default transfer syntax if none in file meta  (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/258">#258</a>)</li>
 <li>fixed reading/writing of empty tags and tags with bad VR</li>
 <li>fixed reading AE elements with leading or trailing spaces</li>
@@ -313,7 +313,7 @@ and <a class="reference external" href="https://pydicom.github.io/pydicom/stable
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'1.0.1rc1',
+            VERSION:'1.0.0',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,
