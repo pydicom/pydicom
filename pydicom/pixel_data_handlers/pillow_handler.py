@@ -29,11 +29,9 @@ PillowSupportedTransferSyntaxes = [
     pydicom.uid.JPEGLossless,
     pydicom.uid.JPEGBaseLineLossy12bit,
     pydicom.uid.JPEG2000Lossless,
-    pydicom.uid.JPEG2000Lossy,
 ]
 PillowJPEG2000TransferSyntaxes = [
     pydicom.uid.JPEG2000Lossless,
-    pydicom.uid.JPEG2000Lossy,
 ]
 PillowJPEGTransferSyntaxes = [
     pydicom.uid.JPEGBaseLineLossy8bit,
@@ -209,7 +207,8 @@ def get_pixeldata(dicom_dataset):
     logger.debug(
         "Successfully read %s pixel bytes",
         len(UncompressedPixelData))
-    pixel_array = numpy.fromstring(UncompressedPixelData, numpy_format)
+    pixel_array = numpy.copy(
+        numpy.frombuffer(UncompressedPixelData, numpy_format))
     if (dicom_dataset.file_meta.TransferSyntaxUID in
             PillowJPEG2000TransferSyntaxes and
             dicom_dataset.BitsStored == 16):

@@ -1,12 +1,6 @@
-# datadict.py
+# Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 # -*- coding: utf-8 -*-
 """Access dicom dictionary information"""
-
-# Copyright (c) 2008-2012 Darcy Mason
-# This file is part of pydicom, released under a modified MIT license.
-#    See the file LICENSE included with this distribution, also
-#    available at https://github.com/pydicom/pydicom
-#
 
 from pydicom.config import logger
 from pydicom.tag import Tag
@@ -206,6 +200,14 @@ def tag_for_keyword(keyword):
     """Return the dicom tag corresponding to keyword,
        or None if none exist."""
     return keyword_dict.get(keyword)
+
+
+def tag_for_name(name):
+    """Deprecated -- use tag_for_keyword"""
+    msg = "tag_for_name is deprecated.  Use tag_for_keyword instead"
+    warnings.warn(msg, DeprecationWarning)
+
+    return tag_for_keyword(name)
 
 
 def repeater_has_tag(tag):

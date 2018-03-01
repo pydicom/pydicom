@@ -9,9 +9,9 @@ Dataset
 .. currentmodule:: pydicom
 
 :class:`dataset.Dataset` is the main object you will work with
-directly. Dataset is derived from python's ``dict``, so it inherits (and
-overrides some of) the methods of ``dict``. In other words it is a collection
-of key:value pairs, where the key value is the DICOM (group,element) tag (as a
+directly. Dataset is derived from Python's ``dict``, so it inherits (and
+overrides some of) the methods of ``dict``. In other words, it is a collection
+of key:value pairs, where the key is the DICOM (group,element) tag (as a
 Tag object, described below), and the value is a DataElement instance (also
 described below).
 
@@ -73,7 +73,7 @@ usage example of data elements removal and assignation.
 
    To understand using :class:`sequence.Sequences` in pydicom, please refer to
    this object model:
-   :class:`dataset.Dataset` (derived from python's ``dict``)
+   :class:`dataset.Dataset` (derived from Python's ``dict``)
        ---> contains DataElement instances
           --> the value of the data element can be one of:
 
@@ -83,8 +83,8 @@ usage example of data elements removal and assignation.
 
          --> a Sequence is a list of :class:`dataset.Dataset` (and so we come full circle)
 
-DICOM :class:`sequence.Sequences` are turned into python ``list`` s. Items in
-the sequence are referenced by number, beginning at index 0 as per python
+DICOM :class:`sequence.Sequences` are turned into Python ``list`` s. Items in
+the sequence are referenced by number, beginning at index 0 as per Python
 convention::
 
   >>> ds.BeamSequence[0].BeamName
@@ -106,7 +106,7 @@ can also use the tag numbers directly, such as::
 
 If you don't remember or know the exact tag name, :class:`dataset.Dataset`
 provides a handy :func:`dataset.Dataset.dir` method, useful during interactive
-sessions at the python prompt::
+sessions at the Python prompt::
 
   >>> ds.dir("pat")
   ['PatientBirthDate', 'PatientID', 'PatientName', 'PatientSetupSequence', 'PatientSex']
@@ -126,9 +126,9 @@ doesn't already know about.
 Under the hood, :class:`dataset.Dataset` stores a DataElement object for each
 item, but when accessed by name (e.g. ``ds.PatientName``) only the ``value`` of
 that :class:`dataelem.DataElement` is returned. If you need the whole
-:mod:`dataelem` (see the :class:`dataelem.DataElement` discussion), you can use
-:func:`dataset.Dataset.data_element` method or access the item using the tag
-number::
+:mod:`dataelem` (see the :class:`dataelem.DataElement` discussion), you can
+use the :func:`dataset.Dataset.data_element` method or access the item using
+the tag number::
 
   >>> # reload the data
   >>> ds = pydicom.dcmread(filename)
@@ -191,7 +191,7 @@ which stores the following things:
 Tag
 ---
 
-The Tag class is derived from python's ``int``, so in effect, it is just
+The Tag class is derived from Python's ``int``, so in effect, it is just
 a number with some extra behaviour:
 
   * Tag enforces that the DICOM tag fits in the expected 4-byte (group,element)
@@ -215,6 +215,6 @@ a number with some extra behaviour:
 Sequence
 --------
 
-Sequence is derived from python's ``list``. The only added functionality is
+Sequence is derived from Python's ``list``. The only added functionality is
 to make string representations prettier. Otherwise all the usual methods of
 ``list`` like item selection, append, etc. are available.

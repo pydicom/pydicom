@@ -13,7 +13,7 @@ from tempfile import TemporaryFile
 import pytest
 
 from pydicom._storage_sopclass_uids import CTImageStorage
-from pydicom import config, __version__
+from pydicom import config, __version_info__
 from pydicom.data import get_testdata_files, get_charset_files
 from pydicom.dataset import Dataset, FileDataset
 from pydicom.dataelem import DataElement
@@ -44,6 +44,8 @@ datetime_name = mr_name
 unicode_name = get_charset_files("chrH31.dcm")[0]
 multiPN_name = get_charset_files("chrFrenMulti.dcm")[0]
 
+base_version = '.'.join(str(i) for i in __version_info__)
+
 
 def files_identical(a, b):
     """Return a tuple (file a == file b, index of first difference)"""
@@ -73,7 +75,10 @@ class WriteFileTests(unittest.TestCase):
     def setUp(self):
         self.file_out = TemporaryFile('w+b')
 
-    def compare(self, in_filename, decode=False):
+    def tearDown(self):
+        self.file_out.close()
+
+    def compare(self, in_filename):
         """Read Dataset from in_filename, write to file, compare"""
         with open(in_filename, 'rb') as f:
             bytes_in = BytesIO(f.read())
@@ -118,12 +123,12 @@ class WriteFileTests(unittest.TestCase):
     def testUnicode(self):
         """Ensure decoded string DataElements
            are written to file properly"""
-        self.compare(unicode_name, decode=True)
+        self.compare(unicode_name)
 
     def testMultiPN(self):
         """Ensure multiple Person Names are written
            to the file correctly."""
-        self.compare(multiPN_name, decode=True)
+        self.compare(multiPN_name)
 
     def testJPEG2000(self):
         """Input file, write back and verify
@@ -185,6 +190,7 @@ class ScratchWriteDateTimeTests(WriteFileTests):
 
     def tearDown(self):
         config.datetime_conversion = False
+        self.file_out.close()
 
     def test_multivalue_DA(self):
         """Write DA/DT/TM data elements.........."""
@@ -1061,7 +1067,7 @@ class TestWriteToStandard(object):
     def test_write_no_file_meta(self):
         """Test writing a dataset with no file_meta"""
         fp = DicomBytesIO()
-        version = 'PYDICOM ' + __version__
+        version = 'PYDICOM ' + base_version
         ds = dcmread(rtplan_name)
         transfer_syntax = ds.file_meta.TransferSyntaxUID
         ds.file_meta = Dataset()
@@ -1217,7 +1223,8 @@ class TestWriteFileMetaInfoToStandard(object):
         fp.seek(8)
         test_length = unpack('<I', fp.read(4))[0]
         assert test_length == (61 + class_length
-                               + version_length + len(__version__))
+                               + version_length
+                               + len(base_version))
         # Check original file meta is unchanged/updated
         assert meta.FileMetaInformationGroupLength == test_length
         assert meta.FileMetaInformationVersion == b'\x00\x01'
@@ -1226,7 +1233,7 @@ class TestWriteFileMetaInfoToStandard(object):
         assert meta.TransferSyntaxUID == '1.3'
         # Updated to meet standard
         assert meta.ImplementationClassUID == PYDICOM_IMPLEMENTATION_UID
-        assert meta.ImplementationVersionName == 'PYDICOM ' + __version__
+        assert meta.ImplementationVersionName == 'PYDICOM ' + base_version
 
     def test_version(self):
         """Test that the value for FileMetaInformationVersion is OK."""

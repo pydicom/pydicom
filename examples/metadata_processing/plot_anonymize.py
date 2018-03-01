@@ -3,7 +3,7 @@
 Anonymize DICOM data
 ====================
 
-This example is starting point to anonymize DICOM data.
+This example is a starting point to anonymize DICOM data.
 
 It shows how to read data and replace tags: person names, patient id,
 optionally remove curves and private tags, and write the results in a new file.

@@ -17,7 +17,7 @@ from pydicom.uid import (PYDICOM_IMPLEMENTATION_UID, ImplicitVRLittleEndian,
                          UncompressedPixelTransferSyntaxes)
 from pydicom.valuerep import extra_length_VRs
 from pydicom.values import convert_numbers
-from pydicom._version import __version__
+from pydicom._version import __version_info__
 
 
 def correct_ambiguous_vr_element(elem, ds, is_little_endian):
@@ -597,7 +597,8 @@ def write_file_meta_info(fp, file_meta, enforce_standard=True):
             file_meta.ImplementationClassUID = PYDICOM_IMPLEMENTATION_UID
 
         if 'ImplementationVersionName' not in file_meta:
-            file_meta.ImplementationVersionName = 'PYDICOM ' + __version__
+            file_meta.ImplementationVersionName = (
+                'PYDICOM ' + ".".join(str(x) for x in __version_info__))
 
         # Check that required File Meta Elements are present
         missing = []
@@ -802,10 +803,10 @@ def dcmwrite(filename, dataset, write_like_original=True):
         if xfer not in UncompressedPixelTransferSyntaxes:
             raise ValueError("file_meta transfer SyntaxUID is compressed type "
                              "but pixel data has been decompressed")
-        
+
         # Force PixelData to the decompressed version
         dataset.PixelData = dataset.pixel_array.tobytes()
-        
+
     caller_owns_file = True
     # Open file if not already a file object
     if isinstance(filename, compat.string_types):
@@ -824,7 +825,8 @@ def dcmwrite(filename, dataset, write_like_original=True):
 
         if file_meta is not None:  # May be an empty Dataset
             # If we want to `write_like_original`, don't enforce_standard
-            write_file_meta_info(fp, file_meta, enforce_standard=not write_like_original)
+            write_file_meta_info(fp, file_meta,
+                                 enforce_standard=not write_like_original)
 
         # WRITE DATASET
         # The transfer syntax used to encode the dataset can't be changed

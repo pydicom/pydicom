@@ -35,6 +35,7 @@ class TestMisc(object):
         """Test convenience function size_in_bytes()."""
         # None or numbers shall be returned unchanged
         assert size_in_bytes(None) is None
+        assert size_in_bytes(float('inf')) is None
         assert size_in_bytes(1234) == 1234
 
         # string shall be parsed
