@@ -14,7 +14,7 @@ except ImportError:
 
 # get __version__ from _version.py
 base_dir = os.path.dirname(os.path.realpath(__file__))
-ver_file = os.path.join(base_dir,'pydicom', '_version.py')
+ver_file = os.path.join(base_dir, 'pydicom', '_version.py')
 with open(ver_file) as f:
     exec(f.read())
 
