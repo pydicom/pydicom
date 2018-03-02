@@ -1,8 +1,10 @@
 import unittest
+import platform
 import os
 import sys
 import pytest
 import pydicom
+from pydicom.compat import in_py2
 from pydicom.filereader import dcmread
 from pydicom.data import get_testdata_files
 from pydicom.tag import Tag
@@ -262,6 +264,9 @@ class numpy_BigEndian_Tests_with_numpy(unittest.TestCase):
 
 
 @pytest.mark.skipif(not have_numpy_handler, reason=numpy_missing_message)
+@pytest.mark.skipif(
+    in_py2 and platform.python_implementation() == 'PyPy',
+    reason='PyPy2 does not implement unpackbits')
 class OneBitAllocatedTests(unittest.TestCase):
     def setUp(self):
         self.original_handlers = pydicom.config.image_handlers

@@ -107,8 +107,13 @@ def get_pixeldata(dicom_dataset):
     if dicom_dataset.BitsAllocated == 1:
         # if single bits are used for binary representation, a uint8 array
         # has to be converted to a binary-valued array (that is 8 times bigger)
-        pixel_array = numpy.unpackbits(
-            numpy.frombuffer(pixel_bytearray, dtype='uint8'))
+        try:
+            pixel_array = numpy.unpackbits(
+                numpy.frombuffer(pixel_bytearray, dtype='uint8'))
+        except NotImplementedError:
+            # PyPy2 does not implement numpy.unpackbits
+            raise NotImplementedError(
+                'Cannot handle BitsAllocated == 1 on this platform')
     else:
         pixel_array = numpy.frombuffer(pixel_bytearray, dtype=numpy_dtype)
     length_of_pixel_array = pixel_array.nbytes
