@@ -6,6 +6,12 @@ import sys
 from glob import glob
 from setuptools import setup, find_packages
 
+have_dicom = True
+try:
+    import dicom
+except ImportError:
+    have_dicom = False
+
 # get __version__ from _version.py
 base_dir = os.path.dirname(os.path.realpath(__file__))
 ver_file = os.path.join(base_dir,'pydicom', '_version.py')
@@ -34,6 +40,9 @@ an overview of how to use the pydicom library.
 
 needs_pytest = {'pytest', 'test', 'ptr'}.intersection(sys.argv)
 pytest_runner = ['pytest-runner'] if needs_pytest else []
+_py_modules = []
+if not have_dicom:
+    _py_modules = ['dicom']
 
 CLASSIFIERS = [
     "License :: OSI Approved :: MIT License",
@@ -96,6 +105,7 @@ opts = dict(name=NAME,
             keywords=KEYWORDS,
             classifiers=CLASSIFIERS,
             packages=find_packages(),
+            py_modules=_py_modules,
             package_data=PACKAGE_DATA,
             include_package_data=True,
             install_requires=REQUIRES,
