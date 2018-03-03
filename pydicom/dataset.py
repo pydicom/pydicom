@@ -28,7 +28,7 @@ from pydicom.datadict import (tag_for_keyword, keyword_for_tag,
                               repeater_has_keyword)
 from pydicom.tag import Tag, BaseTag, tag_in_exception
 from pydicom.dataelem import DataElement, DataElement_from_raw, RawDataElement
-from pydicom.uid import (UncompressedPixelTransferSyntaxes, 
+from pydicom.uid import (UncompressedPixelTransferSyntaxes,
 						 ExplicitVRLittleEndian)
 import pydicom  # for dcmwrite
 import pydicom.charset
@@ -400,14 +400,13 @@ class Dataset(dict):
             return True
 
         if isinstance(other, self.__class__):
-            # Compare Elements using values() and class variables using
-            # __dict__
+            # Compare Elements using values()
             # Convert values() to a list for compatibility between
             #   python 2 and 3
             # Sort values() by element tag
             self_elem = sorted(list(self.values()), key=lambda x: x.tag)
             other_elem = sorted(list(other.values()), key=lambda x: x.tag)
-            return self_elem == other_elem and self.__dict__ == other.__dict__
+            return self_elem == other_elem
 
         return NotImplemented
 
@@ -697,9 +696,9 @@ class Dataset(dict):
 
         Returns
         -------
-        None  
+        None
             Converted pixel data is stored internally in the dataset.
-            
+
         If a compressed image format, the image is  decompressed,
         and any related data elements are changed accordingly.
         """
@@ -743,13 +742,13 @@ class Dataset(dict):
                     raise NotImplementedError(msg)
             # is this guaranteed to work if memory is re-used??
             self._pixel_id = id(self.PixelData)
-            
+
     def decompress(self):
         """Decompresses pixel data and modifies the Dataset in-place
 
 		If not a compressed tranfer syntax, then pixel data is converted
 		to a numpy array internally, but not returned.
-		
+
 		If compressed pixel data, then is decompressed using an image handler,
 		and internal state is updated appropriately:
 		    - TransferSyntax is updated to non-compressed form
@@ -764,7 +763,7 @@ class Dataset(dict):
         NotImplementedError
             If the pixel data was originally compressed but file is not
 			ExplicitVR LittleEndian as required by Dicom standard
-        """		
+        """
         self.convert_pixel_data()
         self.is_decompressed = True
 		# May have been undefined length pixel data, but won't be now
@@ -780,10 +779,10 @@ class Dataset(dict):
             # Check that current file as read does match expected
             if not self.is_little_endian or self.is_implicit_VR:
                 msg = ("Current dataset does not match expected ExplicitVR "
-                       "LittleEndian transfer syntax from a compressed " 
+                       "LittleEndian transfer syntax from a compressed "
                        "transfer syntax")
                 raise NotImplementedError(msg)
-                
+
             # All is as expected, updated the Transfer Syntax
             self.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
 
@@ -1233,3 +1232,29 @@ class FileDataset(Dataset):
         if self.filename and os.path.exists(self.filename):
             statinfo = os.stat(self.filename)
             self.timestamp = statinfo.st_mtime
+
+    def __eq__(self, other):
+        """Compare `self` and `other` for equality.
+
+        Returns
+        -------
+        bool
+            The result if `self` and `other` are the same class
+        NotImplemented
+            If `other` is not the same class as `self` then returning
+            NotImplemented delegates the result to superclass.__eq__(subclass)
+        """
+        # When comparing against self this will be faster
+        if other is self:
+            return True
+
+        if isinstance(other, self.__class__):
+            # Compare Elements using values() and class members using __dict__
+            # Convert values() to a list for compatibility between
+            #   python 2 and 3
+            # Sort values() by element tag
+            self_elem = sorted(list(self.values()), key=lambda x: x.tag)
+            other_elem = sorted(list(other.values()), key=lambda x: x.tag)
+            return self_elem == other_elem and self.__dict__ == other.__dict__
+
+        return NotImplemented
