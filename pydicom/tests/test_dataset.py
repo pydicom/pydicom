@@ -682,6 +682,25 @@ class DatasetTests(unittest.TestCase):
         self.assertTrue(
             'SOPInstanceUID' in ds['0x00080018':'0x00080019'])
 
+    def test_getitem_slice_ffff(self):
+        """Test slicing group FFFF tags"""
+        # Issue #92
+        ds = Dataset()
+        ds.CommandGroupLength = 120  # 0000,0000
+        ds.CommandLengthToEnd = 111  # 0000,0001
+        ds.Overlays = 12  # 0000,51B0
+        ds.LengthToEnd = 12  # 0008,0001
+        ds.SOPInstanceUID = '1.2.3.4'  # 0008,0018
+        ds.SkipFrameRangeFlag = 'TEST'  # 0008,9460
+        ds.add_new(0xFFFF0001, 'PN', 'CITIZEN^1')
+        ds.add_new(0xFFFF0002, 'PN', 'CITIZEN^2')
+        ds.add_new(0xFFFF0003, 'PN', 'CITIZEN^3')
+        ds.add_new(0xFFFFFFFE, 'PN', 'CITIZEN^4')
+        ds.add_new(0xFFFFFFFF, 'PN', 'CITIZEN^5')
+
+        ds[:]
+
+
     def test_delitem_slice(self):
         """Test Dataset.__delitem__ using slices."""
         ds = Dataset()
