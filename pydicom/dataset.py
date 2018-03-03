@@ -1076,9 +1076,8 @@ class Dataset(dict):
 
         # Issue 92: if stop is None then 0xFFFFFFFF + 1 causes overflow in Tag
         if stop == 0x100000000:
-            stop = 0xFFFFFFFF
             slice_tags = [
-                tag for tag in all_tags if Tag(start) <= tag <= Tag(stop)
+                tag for tag in all_tags if Tag(start) <= tag <= Tag(stop - 1)
             ]
         else:
             slice_tags = [
