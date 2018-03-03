@@ -180,6 +180,16 @@ class WriteFileTests(unittest.TestCase):
         ds.TransferSyntaxUID = '1.1'
         self.assertRaises(ValueError, ds.save_as, self.file_out)
 
+    def test_write_ffff_ffff(self):
+        """Test writing element (FFFF, FFFF) to file #92"""
+        fp = DicomBytesIO()
+        ds = Dataset()
+        ds.file_meta = Dataset()
+        ds.is_little_endian = True
+        ds.is_implicit_VR = True
+        ds.add_new(0xFFFFFFFF, 'LO', '12345')
+        ds.save_as(fp, write_like_original=True)
+
 
 class ScratchWriteDateTimeTests(WriteFileTests):
     """Write and reread simple or multi-value DA/DT/TM data elements"""
