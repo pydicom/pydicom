@@ -29,7 +29,7 @@ from pydicom.datadict import (tag_for_keyword, keyword_for_tag,
 from pydicom.tag import Tag, BaseTag, tag_in_exception
 from pydicom.dataelem import DataElement, DataElement_from_raw, RawDataElement
 from pydicom.uid import (UncompressedPixelTransferSyntaxes,
-						 ExplicitVRLittleEndian)
+                         ExplicitVRLittleEndian)
 import pydicom  # for dcmwrite
 import pydicom.charset
 from pydicom.config import logger
@@ -719,7 +719,9 @@ class Dataset(dict):
                     pixel_array = x.get_pixeldata(self)
                     self._pixel_array = self._reshape_pixel_array(pixel_array)
                     if x.needs_to_convert_to_RGB(self):
-                        self._pixel_array = self._convert_YBR_to_RGB(self._pixel_array)
+                        self._pixel_array = self._convert_YBR_to_RGB(
+                            self._pixel_array
+                        )
                     successfully_read_pixel_data = True
                     break
                 except Exception as e:
@@ -746,27 +748,27 @@ class Dataset(dict):
     def decompress(self):
         """Decompresses pixel data and modifies the Dataset in-place
 
-		If not a compressed tranfer syntax, then pixel data is converted
-		to a numpy array internally, but not returned.
+        If not a compressed tranfer syntax, then pixel data is converted
+        to a numpy array internally, but not returned.
 
-		If compressed pixel data, then is decompressed using an image handler,
-		and internal state is updated appropriately:
-		    - TransferSyntax is updated to non-compressed form
-			- is_undefined_length for pixel data is set False
+        If compressed pixel data, then is decompressed using an image handler,
+        and internal state is updated appropriately:
+            - TransferSyntax is updated to non-compressed form
+            - is_undefined_length for pixel data is set False
 
         Returns
         -------
         None
 
-		Raises
+        Raises
         ------
         NotImplementedError
             If the pixel data was originally compressed but file is not
-			ExplicitVR LittleEndian as required by Dicom standard
+            ExplicitVR LittleEndian as required by Dicom standard
         """
         self.convert_pixel_data()
         self.is_decompressed = True
-		# May have been undefined length pixel data, but won't be now
+        # May have been undefined length pixel data, but won't be now
         if 'PixelData' in self:
             self[0x7fe00010].is_undefined_length = False
 
@@ -785,7 +787,6 @@ class Dataset(dict):
 
             # All is as expected, updated the Transfer Syntax
             self.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
-
 
     @property
     def pixel_array(self):
