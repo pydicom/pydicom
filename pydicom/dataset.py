@@ -28,7 +28,7 @@ from pydicom.datadict import (tag_for_keyword, keyword_for_tag,
                               repeater_has_keyword)
 from pydicom.tag import Tag, BaseTag, tag_in_exception
 from pydicom.dataelem import DataElement, DataElement_from_raw, RawDataElement
-from pydicom.uid import (UncompressedPixelTransferSyntaxes, 
+from pydicom.uid import (UncompressedPixelTransferSyntaxes,
 						 ExplicitVRLittleEndian)
 import pydicom  # for dcmwrite
 import pydicom.charset
@@ -697,9 +697,9 @@ class Dataset(dict):
 
         Returns
         -------
-        None  
+        None
             Converted pixel data is stored internally in the dataset.
-            
+
         If a compressed image format, the image is  decompressed,
         and any related data elements are changed accordingly.
         """
@@ -743,13 +743,13 @@ class Dataset(dict):
                     raise NotImplementedError(msg)
             # is this guaranteed to work if memory is re-used??
             self._pixel_id = id(self.PixelData)
-            
+
     def decompress(self):
         """Decompresses pixel data and modifies the Dataset in-place
 
 		If not a compressed tranfer syntax, then pixel data is converted
 		to a numpy array internally, but not returned.
-		
+
 		If compressed pixel data, then is decompressed using an image handler,
 		and internal state is updated appropriately:
 		    - TransferSyntax is updated to non-compressed form
@@ -764,7 +764,7 @@ class Dataset(dict):
         NotImplementedError
             If the pixel data was originally compressed but file is not
 			ExplicitVR LittleEndian as required by Dicom standard
-        """		
+        """
         self.convert_pixel_data()
         self.is_decompressed = True
 		# May have been undefined length pixel data, but won't be now
@@ -780,13 +780,12 @@ class Dataset(dict):
             # Check that current file as read does match expected
             if not self.is_little_endian or self.is_implicit_VR:
                 msg = ("Current dataset does not match expected ExplicitVR "
-                       "LittleEndian transfer syntax from a compressed " 
+                       "LittleEndian transfer syntax from a compressed "
                        "transfer syntax")
                 raise NotImplementedError(msg)
-                
+
             # All is as expected, updated the Transfer Syntax
             self.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
-
 
     @property
     def pixel_array(self):
@@ -1073,7 +1072,17 @@ class Dataset(dict):
         if stop is None:
             stop = all_tags[-1] + 1
 
-        slice_tags = [tag for tag in all_tags if Tag(start) <= tag < Tag(stop)]
+        # Issue 92: if stop is None then 0xFFFFFFFF + 1 causes overflow in Tag
+        if stop == 0x100000000:
+            stop = 0xFFFFFFFF
+            slice_tags = [
+                tag for tag in all_tags if Tag(start) <= tag <= Tag(stop)
+            ]
+        else:
+            slice_tags = [
+                tag for tag in all_tags if Tag(start) <= tag < Tag(stop)
+            ]
+
         return slice_tags[::step]
 
     def __str__(self):

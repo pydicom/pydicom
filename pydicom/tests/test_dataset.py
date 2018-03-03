@@ -683,7 +683,7 @@ class DatasetTests(unittest.TestCase):
             'SOPInstanceUID' in ds['0x00080018':'0x00080019'])
 
     def test_getitem_slice_ffff(self):
-        """Test slicing group FFFF tags"""
+        """Test slicing with (FFFF,FFFF)"""
         # Issue #92
         ds = Dataset()
         ds.CommandGroupLength = 120  # 0000,0000
@@ -698,8 +698,8 @@ class DatasetTests(unittest.TestCase):
         ds.add_new(0xFFFFFFFE, 'PN', 'CITIZEN^4')
         ds.add_new(0xFFFFFFFF, 'PN', 'CITIZEN^5')
 
-        ds[:]
-
+        assert ds[:][0xFFFFFFFF].value == 'CITIZEN^5'
+        assert 0xFFFFFFFF not in ds[0x1000:0xFFFFFFF]
 
     def test_delitem_slice(self):
         """Test Dataset.__delitem__ using slices."""
