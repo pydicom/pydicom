@@ -212,8 +212,8 @@
                               <span class="n">repeater_has_keyword</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">pydicom.tag</span> <span class="k">import</span> <span class="n">Tag</span><span class="p">,</span> <span class="n">BaseTag</span><span class="p">,</span> <span class="n">tag_in_exception</span>
 <span class="kn">from</span> <span class="nn">pydicom.dataelem</span> <span class="k">import</span> <span class="n">DataElement</span><span class="p">,</span> <span class="n">DataElement_from_raw</span><span class="p">,</span> <span class="n">RawDataElement</span>
-<span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="k">import</span> <span class="p">(</span><span class="n">UncompressedPixelTransferSyntaxes</span><span class="p">,</span> 
-						 <span class="n">ExplicitVRLittleEndian</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="k">import</span> <span class="p">(</span><span class="n">UncompressedPixelTransferSyntaxes</span><span class="p">,</span>
+                         <span class="n">ExplicitVRLittleEndian</span><span class="p">)</span>
 <span class="kn">import</span> <span class="nn">pydicom</span>  <span class="c1"># for dcmwrite</span>
 <span class="kn">import</span> <span class="nn">pydicom.charset</span>
 <span class="kn">from</span> <span class="nn">pydicom.config</span> <span class="k">import</span> <span class="n">logger</span>
@@ -584,14 +584,13 @@
             <span class="k">return</span> <span class="kc">True</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">):</span>
-            <span class="c1"># Compare Elements using values() and class variables using</span>
-            <span class="c1"># __dict__</span>
+            <span class="c1"># Compare Elements using values()</span>
             <span class="c1"># Convert values() to a list for compatibility between</span>
             <span class="c1">#   python 2 and 3</span>
             <span class="c1"># Sort values() by element tag</span>
             <span class="n">self_elem</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>
             <span class="n">other_elem</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">self_elem</span> <span class="o">==</span> <span class="n">other_elem</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="vm">__dict__</span>
+            <span class="k">return</span> <span class="n">self_elem</span> <span class="o">==</span> <span class="n">other_elem</span>
 
         <span class="k">return</span> <span class="bp">NotImplemented</span>
 
@@ -881,9 +880,9 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        None  </span>
+<span class="sd">        None</span>
 <span class="sd">            Converted pixel data is stored internally in the dataset.</span>
-<span class="sd">            </span>
+
 <span class="sd">        If a compressed image format, the image is  decompressed,</span>
 <span class="sd">        and any related data elements are changed accordingly.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -904,7 +903,9 @@
                     <span class="n">pixel_array</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">get_pixeldata</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_pixel_array</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reshape_pixel_array</span><span class="p">(</span><span class="n">pixel_array</span><span class="p">)</span>
                     <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">needs_to_convert_to_RGB</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">_pixel_array</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert_YBR_to_RGB</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pixel_array</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_pixel_array</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert_YBR_to_RGB</span><span class="p">(</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">_pixel_array</span>
+                        <span class="p">)</span>
                     <span class="n">successfully_read_pixel_data</span> <span class="o">=</span> <span class="kc">True</span>
                     <span class="k">break</span>
                 <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
@@ -927,31 +928,31 @@
                     <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
             <span class="c1"># is this guaranteed to work if memory is re-used??</span></div>
             <span class="bp">self</span><span class="o">.</span><span class="n">_pixel_id</span> <span class="o">=</span> <span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">PixelData</span><span class="p">)</span>
-            
+
 <div class="viewcode-block" id="Dataset.decompress"><a class="viewcode-back" href="../../ref_guide.html#pydicom.dataset.Dataset.decompress">[docs]</a>    <span class="k">def</span> <span class="nf">decompress</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Decompresses pixel data and modifies the Dataset in-place</span>
 
-<span class="sd">		If not a compressed tranfer syntax, then pixel data is converted</span>
-<span class="sd">		to a numpy array internally, but not returned.</span>
-<span class="sd">		</span>
-<span class="sd">		If compressed pixel data, then is decompressed using an image handler,</span>
-<span class="sd">		and internal state is updated appropriately:</span>
-<span class="sd">		    - TransferSyntax is updated to non-compressed form</span>
-<span class="sd">			- is_undefined_length for pixel data is set False</span>
+<span class="sd">        If not a compressed tranfer syntax, then pixel data is converted</span>
+<span class="sd">        to a numpy array internally, but not returned.</span>
+
+<span class="sd">        If compressed pixel data, then is decompressed using an image handler,</span>
+<span class="sd">        and internal state is updated appropriately:</span>
+<span class="sd">            - TransferSyntax is updated to non-compressed form</span>
+<span class="sd">            - is_undefined_length for pixel data is set False</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        None</span>
 
-<span class="sd">		Raises</span>
+<span class="sd">        Raises</span>
 <span class="sd">        ------</span>
 <span class="sd">        NotImplementedError</span>
 <span class="sd">            If the pixel data was originally compressed but file is not</span>
-<span class="sd">			ExplicitVR LittleEndian as required by Dicom standard</span>
-<span class="sd">        &quot;&quot;&quot;</span>		
+<span class="sd">            ExplicitVR LittleEndian as required by Dicom standard</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">convert_pixel_data</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_decompressed</span> <span class="o">=</span> <span class="kc">True</span>
-		<span class="c1"># May have been undefined length pixel data, but won&#39;t be now</span>
+        <span class="c1"># May have been undefined length pixel data, but won&#39;t be now</span>
         <span class="k">if</span> <span class="s1">&#39;PixelData&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
             <span class="bp">self</span><span class="p">[</span><span class="mh">0x7fe00010</span><span class="p">]</span><span class="o">.</span><span class="n">is_undefined_length</span> <span class="o">=</span> <span class="kc">False</span>
 
@@ -964,13 +965,12 @@
             <span class="c1"># Check that current file as read does match expected</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_little_endian</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_implicit_VR</span><span class="p">:</span>
                 <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Current dataset does not match expected ExplicitVR &quot;</span>
-                       <span class="s2">&quot;LittleEndian transfer syntax from a compressed &quot;</span> 
+                       <span class="s2">&quot;LittleEndian transfer syntax from a compressed &quot;</span>
                        <span class="s2">&quot;transfer syntax&quot;</span><span class="p">)</span>
                 <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-                
+
             <span class="c1"># All is as expected, updated the Transfer Syntax</span></div>
             <span class="bp">self</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span> <span class="o">=</span> <span class="n">ExplicitVRLittleEndian</span>
-
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">pixel_array</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1417,6 +1417,32 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">):</span>
             <span class="n">statinfo</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">=</span> <span class="n">statinfo</span><span class="o">.</span><span class="n">st_mtime</span>
+
+    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Compare `self` and `other` for equality.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            The result if `self` and `other` are the same class</span>
+<span class="sd">        NotImplemented</span>
+<span class="sd">            If `other` is not the same class as `self` then returning</span>
+<span class="sd">            NotImplemented delegates the result to superclass.__eq__(subclass)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># When comparing against self this will be faster</span>
+        <span class="k">if</span> <span class="n">other</span> <span class="ow">is</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">):</span>
+            <span class="c1"># Compare Elements using values() and class members using __dict__</span>
+            <span class="c1"># Convert values() to a list for compatibility between</span>
+            <span class="c1">#   python 2 and 3</span>
+            <span class="c1"># Sort values() by element tag</span>
+            <span class="n">self_elem</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>
+            <span class="n">other_elem</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">self_elem</span> <span class="o">==</span> <span class="n">other_elem</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="vm">__dict__</span>
+
+        <span class="k">return</span> <span class="bp">NotImplemented</span>
 </pre></div>
 
            </div>
