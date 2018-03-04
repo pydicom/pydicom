@@ -700,6 +700,7 @@ class DatasetTests(unittest.TestCase):
 
         assert ds[:][0xFFFFFFFF].value == 'CITIZEN^5'
         assert 0xFFFFFFFF not in ds[0x1000:0xFFFFFFFF]
+        assert 0xFFFFFFFF not in ds[(0x1000):(0xFFFF, 0xFFFF)]
 
     def test_delitem_slice(self):
         """Test Dataset.__delitem__ using slices."""
