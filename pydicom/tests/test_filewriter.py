@@ -1826,7 +1826,6 @@ class TestWriteNumbers(object):
 
 class TestWritePN(object):
     """Test filewriter.write_PN"""
-    @pytest.mark.skip("Raises exception due to issue #489")
     def test_no_encoding_unicode(self):
         """If PN element has no encoding info, default is used"""
         fp = DicomBytesIO()
@@ -1979,12 +1978,11 @@ class TestWriteNumbers(object):
 
 class TestWritePN(object):
     """Test filewriter.write_PN"""
-    @pytest.mark.skip("Raises exception due to issue #489")
     def test_no_encoding_unicode(self):
         """If PN element as no encoding info, default is used"""
         fp = DicomBytesIO()
         fp.is_little_endian = True
-        elem = DataElement(0x00100010, 'PN', u'\u03b8')
+        elem = DataElement(0x00100010, 'PN', u'\u00e8')
         write_PN(fp, elem)
 
     def test_no_encoding(self):

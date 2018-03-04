@@ -226,7 +226,10 @@ def write_PN(fp, data_element, padding=b' ', encoding=None):
         val = data_element.value
 
     if isinstance(val[0], compat.text_type) or not in_py2:
-        val = [elem.encode(encoding) for elem in val]
+        try:
+            val = [elem.encode(encoding) for elem in val]
+        except TypeError:
+            val = [elem.encode(encoding[0]) for elem in val]
 
     val = b'\\'.join(val)
 
