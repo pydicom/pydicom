@@ -403,32 +403,35 @@ class DatasetTests(unittest.TestCase):
 
     def testEqualityNoSequence(self):
         """Dataset: equality returns correct value with simple dataset"""
+        # Test empty dataset
+        assert Dataset() == Dataset()
+
         d = Dataset()
         d.SOPInstanceUID = '1.2.3.4'
         d.PatientName = 'Test'
-        self.assertTrue(d == d)
+        assert d == d
 
         e = Dataset()
         e.PatientName = 'Test'
         e.SOPInstanceUID = '1.2.3.4'
-        self.assertTrue(d == e)
+        assert d == e
 
         e.SOPInstanceUID = '1.2.3.5'
-        self.assertFalse(d == e)
+        assert not d == e
 
         # Check VR
         del e.SOPInstanceUID
         e.add(DataElement(0x00080018, 'PN', '1.2.3.4'))
-        self.assertFalse(d == e)
+        assert not d == e
 
         # Check Tag
         del e.SOPInstanceUID
         e.StudyInstanceUID = '1.2.3.4'
-        self.assertFalse(d == e)
+        assert not d == e
 
         # Check missing Element in self
         e.SOPInstanceUID = '1.2.3.4'
-        self.assertFalse(d == e)
+        assert not d == e
 
         # Check missing Element in other
         d = Dataset()
@@ -437,7 +440,7 @@ class DatasetTests(unittest.TestCase):
 
         e = Dataset()
         e.SOPInstanceUID = '1.2.3.4'
-        self.assertFalse(d == e)
+        assert not d == e
 
     def testEqualityPrivate(self):
         """Dataset: equality returns correct value"""
@@ -500,16 +503,14 @@ class DatasetTests(unittest.TestCase):
 
     def testEqualityUnknown(self):
         """Dataset: equality returns correct value with extra members """
+        # Non-element class members are ignored in equality testing
         d = Dataset()
         d.SOPEustaceUID = '1.2.3.4'
-        self.assertTrue(d == d)
+        assert d == d
 
         e = Dataset()
-        e.SOPEustaceUID = '1.2.3.4'
-        self.assertTrue(d == e)
-
         e.SOPEustaceUID = '1.2.3.5'
-        self.assertFalse(d == e)
+        assert d == e
 
     def testEqualityInheritance(self):
         """Dataset: equality returns correct value for subclass """
@@ -528,6 +529,19 @@ class DatasetTests(unittest.TestCase):
         e.PatientName = 'ANONY'
         self.assertFalse(d == e)
         self.assertFalse(e == d)
+
+    def test_equality_elements(self):
+        """Test that Dataset equality only checks DataElements."""
+        d = Dataset()
+        d.SOPInstanceUID = '1.2.3.4'
+        d.PatientName = 'Test'
+        d.foo = 'foo'
+        assert d == d
+
+        e = Dataset()
+        e.PatientName = 'Test'
+        e.SOPInstanceUID = '1.2.3.4'
+        assert d == e
 
     def test_inequality(self):
         """Test inequality operator"""
