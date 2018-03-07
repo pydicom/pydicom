@@ -87,3 +87,54 @@ the new pydicom, or, if you really need the old pydicom, then you should::
   pip install dicom
 
 and you should be good to go.
+
+
+API Changes in version 1.0
+==========================
+
+Apart from the change of the package name, there are some changes in
+module names, class names, and behavior that may require some code changes.
+
+Changed module names
+--------------------
+
+  * module ``UID`` is now ``uid``
+
+Changed function and variable names
+-----------------------------------
+
+  * in module ``datadict``:
+
+    * ``dictionaryVM()`` -> ``dictionary_VM``
+    * ``dictionaryVR()`` -> ``dictionary_VR``
+    * ``private_dictionaryVM()`` -> ``private_dictionary_VM``
+    * ``private_dictionaryVR()`` -> ``private_dictionary_VR``
+  * in module ``filereader``:
+
+    * ``read_file()`` -> ``dcmread()`` (but old name remains for compatibility)
+  * in module ``filewriter``:
+
+    * ``write_file()`` -> ``dcmwrite()`` (but old name remains for compatibility)
+  * module ``tagtools``:
+
+    * ``tag_in_exception()`` has been moved to ``tag`` module
+  * module ``uid``:
+
+    * ``UID.is_valid()`` is now a property
+    * ``NotCompressedPixelTransferSyntaxes`` ->  ``UncompressedPixelTransferSyntaxes``
+    * ``pydicom_root_UID`` -> ``PYDICOM_ROOT_UID``
+
+Removed functions and names
+---------------------------
+
+  * support for old names (before DICOM keywords) in module ``datadict`` is
+    gone (``CleanName()``, ``short_name()``, ``long_name()``,
+    ``all_names_for_tag()``
+  * ``filereader.not_group2()`` is no longer available
+  * ``uid.pydicom_UIDs`` has been removed
+
+Changed behavior
+----------------
+
+  * ``dataset.save_as()``:  ``TransferSyntaxUID`` not added automatically if
+    missing
