@@ -1228,10 +1228,12 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        start : int or None</span>
-<span class="sd">            The slice&#39;s starting element tag value.</span>
-<span class="sd">        stop : int or None</span>
-<span class="sd">            The slice&#39;s stopping element tag value.</span>
+<span class="sd">        start : int or 2-tuple of int or None</span>
+<span class="sd">            The slice&#39;s starting element tag value, in any format accepted by</span>
+<span class="sd">            pydicom.tag.Tag.</span>
+<span class="sd">        stop : int or 2-tuple of int or None</span>
+<span class="sd">            The slice&#39;s stopping element tag value, in any format accepted by</span>
+<span class="sd">            pydicom.tag.Tag.</span>
 <span class="sd">        step : int or None</span>
 <span class="sd">            The slice&#39;s step size.</span>
 
@@ -1257,7 +1259,18 @@
         <span class="k">if</span> <span class="n">stop</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">stop</span> <span class="o">=</span> <span class="n">all_tags</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
 
-        <span class="n">slice_tags</span> <span class="o">=</span> <span class="p">[</span><span class="n">tag</span> <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">all_tags</span> <span class="k">if</span> <span class="n">Tag</span><span class="p">(</span><span class="n">start</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">tag</span> <span class="o">&lt;</span> <span class="n">Tag</span><span class="p">(</span><span class="n">stop</span><span class="p">)]</span>
+        <span class="c1"># Issue 92: if `stop` is None then 0xFFFFFFFF + 1 causes overflow in</span>
+        <span class="c1"># Tag. The only this occurs if the `stop` parameter value is None</span>
+        <span class="c1"># and the dataset contains an (0xFFFF, 0xFFFF) element</span>
+        <span class="k">if</span> <span class="n">stop</span> <span class="o">==</span> <span class="mh">0x100000000</span><span class="p">:</span>
+            <span class="n">slice_tags</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">tag</span> <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">all_tags</span> <span class="k">if</span> <span class="n">Tag</span><span class="p">(</span><span class="n">start</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">tag</span> <span class="o">&lt;=</span> <span class="n">Tag</span><span class="p">(</span><span class="n">stop</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">slice_tags</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">tag</span> <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">all_tags</span> <span class="k">if</span> <span class="n">Tag</span><span class="p">(</span><span class="n">start</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">tag</span> <span class="o">&lt;</span> <span class="n">Tag</span><span class="p">(</span><span class="n">stop</span><span class="p">)</span>
+            <span class="p">]</span>
+
         <span class="k">return</span> <span class="n">slice_tags</span><span class="p">[::</span><span class="n">step</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

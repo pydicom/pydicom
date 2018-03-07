@@ -22,21 +22,21 @@ have to change UIDs to valid values and add all required DICOM data elements.
 
     Setting file meta information...
     Setting dataset values...
-    Writing test file /tmp/tmp1767seqn.dcm
+    Writing test file /tmp/tmpxc00s5cg.dcm
     File saved.
-    Writing test file as Big Endian Explicit VR /tmp/tmp_a_9iddn.dcm
-    Load file /tmp/tmp1767seqn.dcm ...
-    (0008, 0023) Content Date                        DA: '20180304'
-    (0008, 0033) Content Time                        TM: '154842.997276'
+    Writing test file as Big Endian Explicit VR /tmp/tmphrboirvx.dcm
+    Load file /tmp/tmpxc00s5cg.dcm ...
+    (0008, 0023) Content Date                        DA: '20180307'
+    (0008, 0033) Content Time                        TM: '233227.589138'
     (0010, 0010) Patient's Name                      PN: 'Test^Firstname'
     (0010, 0020) Patient ID                          LO: '123456'
-    Remove file /tmp/tmp1767seqn.dcm ...
-    Load file /tmp/tmp_a_9iddn.dcm ...
-    (0008, 0023) Content Date                        DA: '20180304'
-    (0008, 0033) Content Time                        TM: '154842.997276'
+    Remove file /tmp/tmpxc00s5cg.dcm ...
+    Load file /tmp/tmphrboirvx.dcm ...
+    (0008, 0023) Content Date                        DA: '20180307'
+    (0008, 0033) Content Time                        TM: '233227.589138'
     (0010, 0010) Patient's Name                      PN: 'Test^Firstname'
     (0010, 0020) Patient ID                          LO: '123456'
-    Remove file /tmp/tmp_a_9iddn.dcm ...
+    Remove file /tmp/tmphrboirvx.dcm ...
 
 
 
@@ -113,7 +113,7 @@ have to change UIDs to valid values and add all required DICOM data elements.
         print('Remove file {} ...'.format(filename))
         os.remove(filename)
 
-**Total running time of the script:** ( 0 minutes  0.007 seconds)
+**Total running time of the script:** ( 0 minutes  0.008 seconds)
 
 
 
