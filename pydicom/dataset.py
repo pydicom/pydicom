@@ -1044,10 +1044,12 @@ class Dataset(dict):
 
         Parameters
         ----------
-        start : int or None
-            The slice's starting element tag value.
-        stop : int or None
-            The slice's stopping element tag value.
+        start : int or 2-tuple of int or None
+            The slice's starting element tag value, in any format accepted by
+            pydicom.tag.Tag.
+        stop : int or 2-tuple of int or None
+            The slice's stopping element tag value, in any format accepted by
+            pydicom.tag.Tag.
         step : int or None
             The slice's step size.
 
@@ -1073,7 +1075,18 @@ class Dataset(dict):
         if stop is None:
             stop = all_tags[-1] + 1
 
-        slice_tags = [tag for tag in all_tags if Tag(start) <= tag < Tag(stop)]
+        # Issue 92: if `stop` is None then 0xFFFFFFFF + 1 causes overflow in
+        # Tag. The only this occurs if the `stop` parameter value is None
+        # and the dataset contains an (0xFFFF, 0xFFFF) element
+        if stop == 0x100000000:
+            slice_tags = [
+                tag for tag in all_tags if Tag(start) <= tag <= Tag(stop - 1)
+            ]
+        else:
+            slice_tags = [
+                tag for tag in all_tags if Tag(start) <= tag < Tag(stop)
+            ]
+
         return slice_tags[::step]
 
     def __str__(self):
