@@ -42,8 +42,8 @@ if in_py2:
     int_type = long
 else:
     int_type = int
-    
-    
+
+
 def camel_to_underscore(name):
     """Convert name from CamelCase to lower_case_with_underscores"""
     # From http://stackoverflow.com/questions/1175208
@@ -115,10 +115,10 @@ def code_dataelem(dataelem,
         have_keyword = False
 
     valuerep = repr(dataelem.value)
-    
+
     if exclude_size:
         if (dataelem.VR in byte_VRs and
-            len(dataelem.value) > exclude_size):
+                len(dataelem.value) > exclude_size):
             valuerep = (
                 "# XXX Array of %d bytes excluded" % len(dataelem.value))
 
