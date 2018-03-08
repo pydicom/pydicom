@@ -341,8 +341,9 @@ if __name__ == "__main__":
 
     # If requested, write a code line to save the dataset
     if args.save_as:
-        save_line = "\nds.save_as('{filename}')".format(filename=args.save_as)
+        save_line = "\nds.save_as('{filename}', write_like_original=False)".format(filename=args.save_as)
         code_lines += save_line
 
     # Write the code lines to specified file or to standard output
+    print("Writing code to file '%s'" % args.outfile.name)
     args.outfile.write(code_lines)
