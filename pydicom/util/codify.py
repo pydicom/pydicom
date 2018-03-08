@@ -21,7 +21,7 @@ or import and use specific functions to provide code for pydicom DICOM classes
 import sys
 import pydicom
 from pydicom.datadict import dictionary_keyword
-from pydicom.compat import in_py2
+from pydicom.compat import int_type
 
 import re
 
@@ -37,11 +37,6 @@ byte_VRs = [
     'OB', 'OW', 'OW/OB', 'OW or OB', 'OB or OW', 'US or SS or OW', 'US or SS',
     'OD', 'OL'
 ]
-
-if in_py2:
-    int_type = long
-else:
-    int_type = int
 
 
 def camel_to_underscore(name):
@@ -341,7 +336,7 @@ if __name__ == "__main__":
 
     # If requested, write a code line to save the dataset
     if args.save_as:
-        msg = "\nds.save_as('{filename}', write_like_original=False)"
+        msg = "\nds.save_as(u'{filename}', write_like_original=False)"
         save_line = msg.format(filename=args.save_as)
         code_lines += save_line
 
