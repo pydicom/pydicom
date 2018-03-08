@@ -136,5 +136,5 @@ Removed functions and names
 Changed behavior
 ----------------
 
-  * ``dataset.save_as()``:  ``TransferSyntaxUID`` not added automatically if
+  * ``dataset.save_as()``:  ``TransferSyntaxUID`` not added automatically to ``dataset.file_meta`` if
     missing
