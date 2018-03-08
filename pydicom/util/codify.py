@@ -21,6 +21,7 @@ or import and use specific functions to provide code for pydicom DICOM classes
 import sys
 import pydicom
 from pydicom.datadict import dictionary_keyword
+from pydicom.compat import in_py2
 
 import re
 
@@ -33,10 +34,16 @@ first_cap_re = re.compile('(.)([A-Z][a-z]+)')
 all_cap_re = re.compile('([a-z0-9])([A-Z])')
 
 byte_VRs = [
-    'OB', 'OW', 'OW/OB', 'OW or OB', 'OB or OW', 'US or SS or OW', 'US or SS'
+    'OB', 'OW', 'OW/OB', 'OW or OB', 'OB or OW', 'US or SS or OW', 'US or SS',
+    'OD', 'OL'
 ]
 
-
+if in_py2:
+    int_type = long
+else:
+    int_type = int
+    
+    
 def camel_to_underscore(name):
     """Convert name from CamelCase to lower_case_with_underscores"""
     # From http://stackoverflow.com/questions/1175208
@@ -108,9 +115,10 @@ def code_dataelem(dataelem,
         have_keyword = False
 
     valuerep = repr(dataelem.value)
+    
     if exclude_size:
-        value_gr_size = len(dataelem.value) > exclude_size
-        if (dataelem.VR in byte_VRs and value_gr_size):
+        if (dataelem.VR in byte_VRs and
+            len(dataelem.value) > exclude_size):
             valuerep = (
                 "# XXX Array of %d bytes excluded" % len(dataelem.value))
 
@@ -303,7 +311,7 @@ if __name__ == "__main__":
     parser.add_argument(
         'outfile',
         nargs='?',
-        type=argparse.FileType('wb'),
+        type=argparse.FileType('w'),
         help="Filename to write python code to. "
         "If not specified, code is written to stdout",
         default=sys.stdout)
@@ -312,7 +320,7 @@ if __name__ == "__main__":
     parser.add_argument(
         '-e',
         '--exclude-size',
-        type=long,
+        type=int_type,
         default=default_exclude_size,
         help=help_exclude_size)
     parser.add_argument(
