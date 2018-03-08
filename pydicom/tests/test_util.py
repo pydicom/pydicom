@@ -75,11 +75,13 @@ class TestCodify(object):
     def test_code_dataelem_exclude_size(self):
         """Test utils.codify.code_dataelem exclude_size param"""
         input_elem = [DataElement(0x00100010, 'OB', 'CITIZEN'),
-                      DataElement(0x0008010c, 'UI', '1.1')]
+                      DataElement(0x0008010c, 'UI', '1.1'),
+                      DataElement(0x00200011, 'IS', 3)]
         # Fails
         # DataElement(0x00080301, 'US', 1200)]
         out_str = ["ds.PatientName = # XXX Array of 7 bytes excluded",
-                   "ds.CodingSchemeUID = '1.1'"]
+                   "ds.CodingSchemeUID = '1.1'",
+                   'ds.SeriesNumber = "3"']
         # Fails
         # "ds.PrivateGroupReference = 1200"]
         for elem, out in zip(input_elem, out_str):
