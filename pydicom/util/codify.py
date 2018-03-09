@@ -19,6 +19,7 @@ or import and use specific functions to provide code for pydicom DICOM classes
 # to create a DICOM file from scratch
 
 import sys
+import os.path
 import pydicom
 from pydicom.datadict import dictionary_keyword
 from pydicom.compat import int_type
@@ -74,10 +75,12 @@ def code_imports():
     :return: a string of import statement lines
 
     """
+    line0 = "from __future__ import unicode_literals"
+    line0 += "  # Only for python2.7 and save_as unicode filename"
     line1 = "import pydicom"
     line2 = "from pydicom.dataset import Dataset"
     line3 = "from pydicom.sequence import Sequence"
-    return line_term.join((line1, line2, line3))
+    return line_term.join((line0, line1, line2, line3))
 
 
 def code_dataelem(dataelem,
@@ -283,8 +286,17 @@ def code_file(filename, exclude_size=None, include_private=False):
     return line_term.join(lines)
 
 
-if __name__ == "__main__":
-    default_exclude_size = 100  # bytes
+def main(default_exclude_size, args=None):
+    """Create python code according to user options
+
+    Parameters:
+    -----------
+    default_exclude_size:  int
+        Values longer than this will be coded as a commented syntax error
+
+    args: list
+        Command-line arguments to parse.  If None, then sys.argv is used
+    """
 
     try:
         import argparse
@@ -302,13 +314,13 @@ if __name__ == "__main__":
         "Private data elements are not included "
         "by default." % default_exclude_size)
     parser.add_argument(
-        'filename', help="DICOM file from which to produce code lines")
+        'infile', help="DICOM file from which to produce code lines")
     parser.add_argument(
         'outfile',
         nargs='?',
         type=argparse.FileType('w'),
-        help="Filename to write python code to. "
-        "If not specified, code is written to stdout",
+        help=("Filename to write python code to. "
+              "If not specified, code is written to stdout"),
         default=sys.stdout)
     help_exclude_size = 'Exclude binary data larger than specified (bytes). '
     help_exclude_size += 'Default is %d bytes' % default_exclude_size
@@ -327,19 +339,33 @@ if __name__ == "__main__":
     parser.add_argument(
         '-s',
         '--save-as',
-        help="End the code with a ds.save_as(save_filename)")
+        help=("Specify the filename for ds.save_as(save_filename); "
+              "otherwise the input name + '_from_codify' will be used"))
 
-    args = parser.parse_args()
+    args = parser.parse_args(args)
+
     # Read the requested file and convert to python/pydicom code lines
-    filename = args.filename
+    filename = args.infile  # name
     code_lines = code_file(filename, args.exclude_size, args.include_private)
 
     # If requested, write a code line to save the dataset
     if args.save_as:
-        msg = "\nds.save_as(u'{filename}', write_like_original=False)"
-        save_line = msg.format(filename=args.save_as)
-        code_lines += save_line
+        save_as_filename = args.save_as
+    else:
+        base, ext = os.path.splitext(filename)
+        save_as_filename = base + "_from_codify" + ".dcm"
+    line = "\nds.save_as(r'{filename}', write_like_original=False)"
+    save_line = line.format(filename=save_as_filename)
+    code_lines += save_line
 
     # Write the code lines to specified file or to standard output
-    print("Writing code to file '%s'" % args.outfile.name)
+    # For test_util, captured output .name throws error, ignore it:
+    try:
+        if args.outfile.name != "<stdout>":
+            print("Writing code to file '%s'" % args.outfile.name)
+    except AttributeError:
+        pass
     args.outfile.write(code_lines)
+
+if __name__ == "__main__":
+    main(default_exclude_size=100)
