@@ -59,7 +59,7 @@ Given an RTPLAN DICOM file, list basic info for the beams in it.
     dataset = pydicom.dcmread(filename)
     print(list_beams(dataset))
 
-**Total running time of the script:** ( 0 minutes  0.004 seconds)
+**Total running time of the script:** ( 0 minutes  0.005 seconds)
 
 
 
