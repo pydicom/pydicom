@@ -113,6 +113,13 @@
 <li class="toctree-l3"><a class="reference internal" href="#error-messages-relating-to-the-pydicom-transition">Error messages relating to the pydicom transition</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#api-changes-in-version-1-0">API Changes in version 1.0</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#changed-module-names">Changed module names</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#changed-function-and-variable-names">Changed function and variable names</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#removed-functions-and-names">Removed functions and names</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#changed-behavior">Changed behavior</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="base_element.html">Core elements in pydicom</a></li>
 <li class="toctree-l2"><a class="reference internal" href="working_with_pixel_data.html">Working with Pixel Data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="image_data_handlers.html">Handling of compressed image data</a></li>
@@ -281,6 +288,72 @@ the new pydicom, or, if you really need the old pydicom, then you should:</p>
 </pre></div>
 </div>
 <p>and you should be good to go.</p>
+</div>
+</div>
+<div class="section" id="api-changes-in-version-1-0">
+<h1>API Changes in version 1.0<a class="headerlink" href="#api-changes-in-version-1-0" title="Permalink to this headline">¶</a></h1>
+<p>Apart from the change of the package name, there are some changes in
+module names, class names, and behavior that may require some code changes.</p>
+<div class="section" id="changed-module-names">
+<h2>Changed module names<a class="headerlink" href="#changed-module-names" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li>module <code class="docutils literal notranslate"><span class="pre">UID</span></code> is now <code class="docutils literal notranslate"><span class="pre">uid</span></code></li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="changed-function-and-variable-names">
+<h2>Changed function and variable names<a class="headerlink" href="#changed-function-and-variable-names" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li>in module <code class="docutils literal notranslate"><span class="pre">datadict</span></code>:<ul>
+<li><code class="docutils literal notranslate"><span class="pre">dictionaryVM()</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">dictionary_VM</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">dictionaryVR()</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">dictionary_VR</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">private_dictionaryVM()</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">private_dictionary_VM</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">private_dictionaryVR()</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">private_dictionary_VR</span></code></li>
+</ul>
+</li>
+<li>in module <code class="docutils literal notranslate"><span class="pre">filereader</span></code>:<ul>
+<li><code class="docutils literal notranslate"><span class="pre">read_file()</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">dcmread()</span></code> (but old name remains for compatibility)</li>
+</ul>
+</li>
+<li>in module <code class="docutils literal notranslate"><span class="pre">filewriter</span></code>:<ul>
+<li><code class="docutils literal notranslate"><span class="pre">write_file()</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">dcmwrite()</span></code> (but old name remains for compatibility)</li>
+</ul>
+</li>
+<li>module <code class="docutils literal notranslate"><span class="pre">tagtools</span></code>:<ul>
+<li><code class="docutils literal notranslate"><span class="pre">tag_in_exception()</span></code> has been moved to <code class="docutils literal notranslate"><span class="pre">tag</span></code> module</li>
+</ul>
+</li>
+<li>module <code class="docutils literal notranslate"><span class="pre">uid</span></code>:<ul>
+<li><code class="docutils literal notranslate"><span class="pre">UID.is_valid()</span></code> is now a property</li>
+<li><code class="docutils literal notranslate"><span class="pre">NotCompressedPixelTransferSyntaxes</span></code> -&gt;  <code class="docutils literal notranslate"><span class="pre">UncompressedPixelTransferSyntaxes</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">pydicom_root_UID</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">PYDICOM_ROOT_UID</span></code></li>
+</ul>
+</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="removed-functions-and-names">
+<h2>Removed functions and names<a class="headerlink" href="#removed-functions-and-names" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li>support for old names (before DICOM keywords) in module <code class="docutils literal notranslate"><span class="pre">datadict</span></code> is
+gone (<code class="docutils literal notranslate"><span class="pre">CleanName()</span></code>, <code class="docutils literal notranslate"><span class="pre">short_name()</span></code>, <code class="docutils literal notranslate"><span class="pre">long_name()</span></code>,
+<code class="docutils literal notranslate"><span class="pre">all_names_for_tag()</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">filereader.not_group2()</span></code> is no longer available</li>
+<li><code class="docutils literal notranslate"><span class="pre">uid.pydicom_UIDs</span></code> has been removed</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="changed-behavior">
+<h2>Changed behavior<a class="headerlink" href="#changed-behavior" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">dataset.save_as()</span></code>:  <code class="docutils literal notranslate"><span class="pre">TransferSyntaxUID</span></code> not added automatically to <code class="docutils literal notranslate"><span class="pre">dataset.file_meta</span></code> if
+missing</li>
+</ul>
+</div></blockquote>
 </div>
 </div>
 
