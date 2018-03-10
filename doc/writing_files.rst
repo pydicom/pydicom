@@ -28,6 +28,10 @@ In the pydicom 'util' folder, there is a script called `codify.py
 
 In other words: pydicom has a tool that can automatically generate well-designed python code for you - code that creates DICOM files. The only requirement is that you have an existing DICOM file that looks approximately like the one you need. You can then use the code as a model to work from. The tool is especially useful with Sequences, which can be tricky to code correctly.  
 
+.. Warning::
+
+  The code produced by codify will contain all the information in the original file, which may include private health information or other sensitive information.  If the code is run, the resulting dicom file will also contain that information. You may want to consider using de-identified dicom files with codify, or handling the output files according to your requirements for sensitive information.
+
 One issue to be aware of is that codify will not create code for large items like pixel data. Instead it creates a line like:
 
 .. code-block:: python
@@ -36,7 +40,7 @@ One issue to be aware of is that codify will not create code for large items lik
 
 In that case, the code will produce a syntax error when run, and you will have to edit the code to supply a valid value.
 
-.. note:: The --exclude-size parameter can set the maximum size of the data element value this is coded. Data elements bigger than that will have the syntax error line as shown above. 
+.. note:: The --exclude-size parameter can set the maximum size of the data element value that is coded. Data elements bigger than that will have the syntax error line as shown above. 
 
 One potential disadvantage of codify, depending on your use case, is that it does not create loops. If you have, say, 30 items in a Sequence, codify will produce code that makes them one at a time. Code you wrote by hand would likely create them in a loop, because most of the code needed is quite repetitive. If you want to switch to a loop, you could use the first item's code as a starting point, and modify as needed, deleting the code for the other individual items.
 
