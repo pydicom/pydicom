@@ -367,5 +367,6 @@ def main(default_exclude_size, args=None):
         pass
     args.outfile.write(code_lines)
 
+
 if __name__ == "__main__":
     main(default_exclude_size=100)
