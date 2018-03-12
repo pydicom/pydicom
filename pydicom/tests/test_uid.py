@@ -261,6 +261,7 @@ class TestUID(object):
         a = '1.2.840.10008.1.1'
         uid = UID(a)
         b = str(uid)
+        assert uid.name == 'Verification SOP Class'
         assert uid == a
         assert uid == b
         assert a == b
