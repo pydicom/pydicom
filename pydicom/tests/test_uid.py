@@ -94,7 +94,7 @@ class TestUID(object):
 
     def test_str(self):
         """Test that UID.__str__ works."""
-        assert self.uid.__str__() == 'Implicit VR Little Endian'
+        assert self.uid.__str__() == '1.2.840.10008.1.2'
 
     def test_is_implicit_vr(self):
         """Test that UID.is_implicit_VR works."""

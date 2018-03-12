@@ -56,10 +56,6 @@ class UID(str):
 
         raise TypeError("UID must be a string")
 
-    def __str__(self):
-        """Return the human-friendly name for this UID"""
-        return self.name
-
     def __eq__(self, other):
         """Return True if `self` or `self.name` equals `other`."""
         if str.__eq__(self, other) is True:  # 'is True' needed (issue 96)
