@@ -76,14 +76,14 @@ def get_pixeldata(dicom_dataset):
             not in JPEGLSSupportedTransferSyntaxes):
         msg = ("The jpeg_ls does not support "
                "this transfer syntax {0}.".format(
-                   dicom_dataset.file_meta.TransferSyntaxUID))
+                   dicom_dataset.file_meta.TransferSyntaxUID.name))
         raise NotImplementedError(msg)
 
     if not have_jpeg_ls:
         msg = ("The jpeg_ls package is required to use pixel_array "
                "for this transfer syntax {0}, and jpeg_ls could not "
                "be imported.".format(
-                   dicom_dataset.file_meta.TransferSyntaxUID))
+                   dicom_dataset.file_meta.TransferSyntaxUID.name))
         raise ImportError(msg)
     # Make NumPy format code, e.g. "uint16", "int32" etc
     # from two pieces of info:
