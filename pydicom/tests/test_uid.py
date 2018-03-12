@@ -256,6 +256,15 @@ class TestUID(object):
         with pytest.raises(TypeError):
             UID(1234)
 
+    def test_transitive(self):
+        """Test for #256"""
+        a = '1.2.840.10008.1.1'
+        uid = UID(a)
+        b = str(uid)
+        assert uid == a
+        assert uid == b
+        assert a == b
+
 
 class TestUIDPrivate(object):
     """Test private UIDs"""
