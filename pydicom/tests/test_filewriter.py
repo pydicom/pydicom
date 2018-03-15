@@ -39,6 +39,7 @@ ct_name = get_testdata_files("CT_small.dcm")[0]
 mr_name = get_testdata_files("MR_small.dcm")[0]
 jpeg_name = get_testdata_files("JPEG2000.dcm")[0]
 no_ts = get_testdata_files("meta_missing_tsyntax.dcm")[0]
+color_pl_name = get_testdata_files("color-pl.dcm")[0]
 datetime_name = mr_name
 
 unicode_name = get_charset_files("chrH31.dcm")[0]
@@ -193,6 +194,15 @@ class WriteFileTests(unittest.TestCase):
         fp.seek(0)
         ds = dcmread(fp, force=True)
         assert ds[0xFFFFFFFF].value == b'123456'
+
+    def test_write_removes_grouplength(self):
+        ds = dcmread(color_pl_name)
+        assert 0x00080000 in ds
+        ds.save_as(self.file_out, write_like_original=True)
+        self.file_out.seek(0)
+        ds = dcmread(self.file_out)
+        # group length has been removed
+        assert 0x00080000 not in ds
 
 
 class ScratchWriteDateTimeTests(WriteFileTests):
