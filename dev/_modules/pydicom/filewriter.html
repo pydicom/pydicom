@@ -642,6 +642,9 @@
     <span class="n">tags</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
 
     <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">tags</span><span class="p">:</span>
+        <span class="c1"># do not write retired Group Length (see PS3.5, 7.2)</span>
+        <span class="k">if</span> <span class="n">tag</span><span class="o">.</span><span class="n">element</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">tag</span><span class="o">.</span><span class="n">group</span> <span class="o">&gt;</span> <span class="mi">6</span><span class="p">:</span>
+            <span class="k">continue</span>
         <span class="k">with</span> <span class="n">tag_in_exception</span><span class="p">(</span><span class="n">tag</span><span class="p">):</span>
             <span class="c1"># write_data_element(fp, dataset.get_item(tag), dataset_encoding)</span>
             <span class="c1"># XXX for writing raw tags without converting to DataElement</span>
