@@ -18,9 +18,11 @@ from pydicom.util import fixer
 from pydicom.util import hexutil
 from pydicom.util.codify import (camel_to_underscore, tag_repr,
                                  default_name_filter, code_imports,
-                                 code_dataelem, code_sequence)
+                                 code_dataelem, code_sequence,
+                                 main as codify_main)
 from pydicom.util.dump import *
 from pydicom.util.hexutil import hex2bytes, bytes2hex
+from pydicom.data import get_testdata_files
 
 
 test_dir = os.path.dirname(__file__)
@@ -55,7 +57,9 @@ class TestCodify(object):
 
     def test_code_imports(self):
         """Test utils.codify.code_imports"""
-        out = 'import pydicom\n'
+        out = "from __future__ import unicode_literals"
+        out += "  # Only for python2.7 and save_as unicode filename\n"
+        out += 'import pydicom\n'
         out += 'from pydicom.dataset import Dataset\n'
         out += 'from pydicom.sequence import Sequence'
         assert code_imports() == out
@@ -75,11 +79,13 @@ class TestCodify(object):
     def test_code_dataelem_exclude_size(self):
         """Test utils.codify.code_dataelem exclude_size param"""
         input_elem = [DataElement(0x00100010, 'OB', 'CITIZEN'),
-                      DataElement(0x0008010c, 'UI', '1.1')]
+                      DataElement(0x0008010c, 'UI', '1.1'),
+                      DataElement(0x00200011, 'IS', 3)]
         # Fails
         # DataElement(0x00080301, 'US', 1200)]
         out_str = ["ds.PatientName = # XXX Array of 7 bytes excluded",
-                   "ds.CodingSchemeUID = '1.1'"]
+                   "ds.CodingSchemeUID = '1.1'",
+                   'ds.SeriesNumber = "3"']
         # Fails
         # "ds.PrivateGroupReference = 1200"]
         for elem, out in zip(input_elem, out_str):
@@ -125,12 +131,16 @@ class TestCodify(object):
         assert code_dataelem(elem) == out
 
     def test_code_dataset(self):
-        """Test utils.codify.code_dataelem"""
+        """Test utils.codify.code_dataset"""
         pass
 
-    def test_code_file(self):
-        """Test utils.codify.code_dataelem"""
-        pass
+    def test_code_file(self, capsys):
+        """Test utils.codify.code_file"""
+        filename = get_testdata_files("rtplan")[0]
+        args = ["--save-as", r"c:\temp\testout.dcm", filename]
+        codify_main(100, args)
+        out, err = capsys.readouterr()
+        assert r"c:\temp\testout.dcm" in out
 
 
 class TestDump(object):

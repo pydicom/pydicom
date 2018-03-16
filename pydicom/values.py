@@ -64,11 +64,7 @@ def convert_ATvalue(byte_string, is_little_endian, struct_format=None):
 
 
 def _DA_from_byte_string(byte_string):
-    byte_string = byte_string.rstrip()
-    length = len(byte_string)
-    if length != 8 and length != 0:
-        logger.warn("Expected length to be 8, got length %d", length)
-    return DA(byte_string)
+    return DA(byte_string.rstrip())
 
 
 def convert_DA_string(byte_string, is_little_endian, struct_format=None):

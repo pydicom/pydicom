@@ -226,7 +226,10 @@ def write_PN(fp, data_element, padding=b' ', encoding=None):
         val = data_element.value
 
     if isinstance(val[0], compat.text_type) or not in_py2:
-        val = [elem.encode(encoding) for elem in val]
+        try:
+            val = [elem.encode(encoding) for elem in val]
+        except TypeError:
+            val = [elem.encode(encoding[0]) for elem in val]
 
     val = b'\\'.join(val)
 
@@ -455,6 +458,9 @@ def write_dataset(fp, dataset, parent_encoding=default_encoding):
     tags = sorted(dataset.keys())
 
     for tag in tags:
+        # do not write retired Group Length (see PS3.5, 7.2)
+        if tag.element == 0 and tag.group > 6:
+            continue
         with tag_in_exception(tag):
             # write_data_element(fp, dataset.get_item(tag), dataset_encoding)
             # XXX for writing raw tags without converting to DataElement

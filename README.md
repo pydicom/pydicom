@@ -28,7 +28,9 @@ Documentation
 
 pydicom documentation is available on GitHub Pages both for the [development
  (master) version](https://pydicom.github.io/pydicom/dev) and for the 
-[released version](https://pydicom.github.io/pydicom/stable).
+[released version](https://pydicom.github.io/pydicom/stable). The 
+documentation for [the previous 0.9.9 version](https://pydicom.github.io/pydicom/0.9/)
+is still there for reference.
 
 See [Getting Started](https://pydicom.github.io/pydicom/stable/getting_started.html) 
 for installation and basic information, and the 

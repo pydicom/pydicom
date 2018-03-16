@@ -400,14 +400,13 @@ class Dataset(dict):
             return True
 
         if isinstance(other, self.__class__):
-            # Compare Elements using values() and class variables using
-            # __dict__
+            # Compare Elements using values()
             # Convert values() to a list for compatibility between
             #   python 2 and 3
             # Sort values() by element tag
             self_elem = sorted(list(self.values()), key=lambda x: x.tag)
             other_elem = sorted(list(other.values()), key=lambda x: x.tag)
-            return self_elem == other_elem and self.__dict__ == other.__dict__
+            return self_elem == other_elem
 
         return NotImplemented
 
@@ -720,7 +719,9 @@ class Dataset(dict):
                     pixel_array = x.get_pixeldata(self)
                     self._pixel_array = self._reshape_pixel_array(pixel_array)
                     if x.needs_to_convert_to_RGB(self):
-                        self._pixel_array = self._convert_YBR_to_RGB(self._pixel_array)
+                        self._pixel_array = self._convert_YBR_to_RGB(
+                            self._pixel_array
+                        )
                     successfully_read_pixel_data = True
                     break
                 except Exception as e:
@@ -1048,10 +1049,12 @@ class Dataset(dict):
 
         Parameters
         ----------
-        start : int or None
-            The slice's starting element tag value.
-        stop : int or None
-            The slice's stopping element tag value.
+        start : int or 2-tuple of int or None
+            The slice's starting element tag value, in any format accepted by
+            pydicom.tag.Tag.
+        stop : int or 2-tuple of int or None
+            The slice's stopping element tag value, in any format accepted by
+            pydicom.tag.Tag.
         step : int or None
             The slice's step size.
 
@@ -1077,7 +1080,18 @@ class Dataset(dict):
         if stop is None:
             stop = all_tags[-1] + 1
 
-        slice_tags = [tag for tag in all_tags if Tag(start) <= tag < Tag(stop)]
+        # Issue 92: if `stop` is None then 0xFFFFFFFF + 1 causes overflow in
+        # Tag. The only this occurs if the `stop` parameter value is None
+        # and the dataset contains an (0xFFFF, 0xFFFF) element
+        if stop == 0x100000000:
+            slice_tags = [
+                tag for tag in all_tags if Tag(start) <= tag <= Tag(stop - 1)
+            ]
+        else:
+            slice_tags = [
+                tag for tag in all_tags if Tag(start) <= tag < Tag(stop)
+            ]
+
         return slice_tags[::step]
 
     def __str__(self):
@@ -1237,3 +1251,29 @@ class FileDataset(Dataset):
         if self.filename and os.path.exists(self.filename):
             statinfo = os.stat(self.filename)
             self.timestamp = statinfo.st_mtime
+
+    def __eq__(self, other):
+        """Compare `self` and `other` for equality.
+
+        Returns
+        -------
+        bool
+            The result if `self` and `other` are the same class
+        NotImplemented
+            If `other` is not the same class as `self` then returning
+            NotImplemented delegates the result to superclass.__eq__(subclass)
+        """
+        # When comparing against self this will be faster
+        if other is self:
+            return True
+
+        if isinstance(other, self.__class__):
+            # Compare Elements using values() and class members using __dict__
+            # Convert values() to a list for compatibility between
+            #   python 2 and 3
+            # Sort values() by element tag
+            self_elem = sorted(list(self.values()), key=lambda x: x.tag)
+            other_elem = sorted(list(other.values()), key=lambda x: x.tag)
+            return self_elem == other_elem and self.__dict__ == other.__dict__
+
+        return NotImplemented
