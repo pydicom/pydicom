@@ -26,22 +26,19 @@ except AttributeError:
     have_pytest_param = False
 
 gdcm_handler = None
-
+test_gdcm_decoder = False
 try:
     import pydicom.pixel_data_handlers.gdcm_handler as gdcm_handler
+    test_gdcm_decoder = gdcm_handler.is_this_usable
 except ImportError as e:
     gdcm_handler = None
+    test_gdcm_decoder = False
 
 numpy_handler = None
 try:
     import pydicom.pixel_data_handlers.numpy_handler as numpy_handler
 except ImportError:
     numpy_handler = None
-test_gdcm_decoder = False
-try:
-    test_gdcm_decoder = gdcm_handler.is_this_usable
-except:
-    test_gdcm_decoder = False
 
 empty_number_tags_name = get_testdata_files(
     "reportsi_with_empty_number_tags.dcm")[0]
