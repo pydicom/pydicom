@@ -30,7 +30,13 @@ class UID(str):
     >>> uid = UID('1.2.840.10008.1.2.4.50')
     >>> uid
     '1.2.840.10008.1.2.4.50'
-    >>> print(uid)
+    >>> uid.is_implicit_VR
+    False
+    >>> uid.is_little_endian
+    True
+    >>> uid.is_transfer_syntax
+    True
+    >>> uid.name
     'JPEG Baseline (Process 1)'
     """
     def __new__(cls, val):
