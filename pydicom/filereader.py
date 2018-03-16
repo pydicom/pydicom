@@ -770,7 +770,7 @@ def read_partial(fileobj, stop_when=None, defer_size=None,
     dataset.update(command_set)
 
     class_uid = file_meta_dataset.get("MediaStorageSOPClassUID", None)
-    if class_uid and class_uid == "Media Storage Directory Storage":
+    if class_uid and class_uid.name == "Media Storage Directory Storage":
         return DicomDir(fileobj, dataset, preamble, file_meta_dataset,
                         is_implicit_VR, is_little_endian)
     else:

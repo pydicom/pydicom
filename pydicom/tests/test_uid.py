@@ -69,10 +69,8 @@ class TestUID(object):
         """Test that UID.__eq__ works."""
         assert self.uid == UID('1.2.840.10008.1.2')
         assert self.uid == '1.2.840.10008.1.2'
-        assert self.uid == 'Implicit VR Little Endian'
         assert not self.uid == UID('1.2.840.10008.1.2.1')
         assert not self.uid == '1.2.840.10008.1.2.1'
-        assert not self.uid == 'Explicit VR Little Endian'
         # Issue 96
         assert not self.uid == 3
         assert self.uid is not None
@@ -81,10 +79,8 @@ class TestUID(object):
         """Test that UID.__ne__ works."""
         assert not self.uid != UID('1.2.840.10008.1.2')
         assert not self.uid != '1.2.840.10008.1.2'
-        assert not self.uid != 'Implicit VR Little Endian'
         assert self.uid != UID('1.2.840.10008.1.2.1')
         assert self.uid != '1.2.840.10008.1.2.1'
-        assert self.uid != 'Explicit VR Little Endian'
         # Issue 96
         assert self.uid != 3
 
