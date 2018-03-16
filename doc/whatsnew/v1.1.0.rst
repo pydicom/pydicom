@@ -1,0 +1,22 @@
+Version 1.1.0
+=================================
+
+Changelog
+---------
+
+Minor changes
+.............
+
+* ``UID.__str__`` no longer returns the UID name (when known). The UID name is
+  still available using the ``UID.name`` property.
+* ``Dataset`` equality now only compares the dataset's ``DataElements`` (#464).
+
+Fixes
+.....
+
+* UID should behave as expected for a python str subclass (#256).
+* group length elements in groups above 0x0006 removed on writing (#32).
+* fixed ``write_PN`` raising a ``TypeError`` when called with a non-iterable
+  encoding parameter (#489).
+* fixed Dataset not slicing correctly when an (0xFFFF,0xFFFF) element is present
+  (#92)
