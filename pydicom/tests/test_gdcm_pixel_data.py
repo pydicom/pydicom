@@ -357,6 +357,13 @@ class GDCM_JPEGlossyTests_with_gdcm(unittest.TestCase):
     def tearDown(self):
         pydicom.config.image_handlers = self.original_handlers
 
+    def testJPEGlossless_odd_data_size(self):
+        test_file = get_testdata_files('SC_rgb_small_odd_jpeg.dcm')[0]
+        ds = dcmread(test_file)
+        pixel_data = ds.pixel_array
+        assert pixel_data.nbytes == 27
+        assert pixel_data.shape == (3, 3, 3)
+
     def test_JPEGlossy(self):
         """JPEG-lossy: Returns correct values for sample data elements"""
         got = self.jpeg_lossy.DerivationCodeSequence[0].CodeMeaning
