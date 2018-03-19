@@ -248,6 +248,31 @@ class numpy_BigEndian_Tests_with_numpy(unittest.TestCase):
 @pytest.mark.skipif(
     not have_numpy_handler,
     reason=numpy_missing_message)
+class numpy_LittleEndian_Tests(unittest.TestCase):
+    def setUp(self):
+        self.emri_small = dcmread(emri_name)
+        self.original_handlers = pydicom.config.image_handlers
+        pydicom.config.image_handlers = [numpy_handler]
+
+    def tearDown(self):
+        pydicom.config.image_handlers = self.original_handlers
+
+    def test_little_endian_PixelArray_odd_data_size(self):
+        test_file = get_testdata_files('SC_rgb_small_odd.dcm')[0]
+        ds = dcmread(test_file)
+        pixel_data = ds.pixel_array
+        assert pixel_data.nbytes == 27
+        assert pixel_data.shape == (3, 3, 3)
+
+    def test_little_endian_PixelArray(self):
+        pixel_data = self.emri_small.pixel_array
+        assert pixel_data.nbytes == 81920
+        assert pixel_data.shape == (10, 64, 64)
+
+
+@pytest.mark.skipif(
+    not have_numpy_handler,
+    reason=numpy_missing_message)
 class numpy_JPEG2000Tests_with_numpy(unittest.TestCase):
     def setUp(self):
         self.jpeg_2k = dcmread(jpeg2000_name)
