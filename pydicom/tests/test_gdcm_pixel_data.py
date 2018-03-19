@@ -26,18 +26,19 @@ except AttributeError:
     have_pytest_param = False
 
 gdcm_handler = None
-have_gdcm_handler = True
+test_gdcm_decoder = False
 try:
     import pydicom.pixel_data_handlers.gdcm_handler as gdcm_handler
+    test_gdcm_decoder = gdcm_handler.is_this_usable
 except ImportError as e:
-    have_gdcm_handler = False
+    gdcm_handler = None
+    test_gdcm_decoder = False
+
 numpy_handler = None
-have_numpy_handler = True
 try:
     import pydicom.pixel_data_handlers.numpy_handler as numpy_handler
 except ImportError:
-    have_numpy_handler = False
-test_gdcm_decoder = have_gdcm_handler
+    numpy_handler = None
 
 empty_number_tags_name = get_testdata_files(
     "reportsi_with_empty_number_tags.dcm")[0]
@@ -355,6 +356,13 @@ class GDCM_JPEGlossyTests_with_gdcm(unittest.TestCase):
 
     def tearDown(self):
         pydicom.config.image_handlers = self.original_handlers
+
+    def testJPEGlossless_odd_data_size(self):
+        test_file = get_testdata_files('SC_rgb_small_odd_jpeg.dcm')[0]
+        ds = dcmread(test_file)
+        pixel_data = ds.pixel_array
+        assert pixel_data.nbytes == 27
+        assert pixel_data.shape == (3, 3, 3)
 
     def test_JPEGlossy(self):
         """JPEG-lossy: Returns correct values for sample data elements"""

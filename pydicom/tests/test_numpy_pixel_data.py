@@ -10,12 +10,14 @@ numpy_missing_message = ("numpy is not available "
                          "in this test environment")
 numpy_present_message = "numpy is being tested"
 numpy_handler = None
-have_numpy_handler = True
 try:
     import pydicom.pixel_data_handlers.numpy_handler as numpy_handler
+    if not numpy_handler.is_this_usable:
+        numpy_handler = None
 except ImportError:
-    have_numpy_handler = False
+    numpy_handler = None
 
+have_numpy_handler = numpy_handler is not None
 empty_number_tags_name = get_testdata_files(
     "reportsi_with_empty_number_tags.dcm")[0]
 rtplan_name = get_testdata_files("rtplan.dcm")[0]
@@ -243,6 +245,30 @@ class numpy_BigEndian_Tests_with_numpy(unittest.TestCase):
             b.mean(),
             "Decoded big endian pixel data is not "
             "all {0} (mean == {1})".format(b.mean(), a.mean()))
+
+@pytest.mark.skipif(
+    not have_numpy_handler,
+    reason=numpy_missing_message)
+class numpy_LittleEndian_Tests(unittest.TestCase):
+    def setUp(self):
+        self.emri_small = dcmread(emri_name)
+        self.original_handlers = pydicom.config.image_handlers
+        pydicom.config.image_handlers = [numpy_handler]
+
+    def tearDown(self):
+        pydicom.config.image_handlers = self.original_handlers
+
+    def test_little_endian_PixelArray_odd_data_size(self):
+        test_file = get_testdata_files('SC_rgb_small_odd.dcm')[0]
+        ds = dcmread(test_file)
+        pixel_data = ds.pixel_array
+        assert pixel_data.nbytes == 27
+        assert pixel_data.shape == (3, 3, 3)
+
+    def test_little_endian_PixelArray(self):
+        pixel_data = self.emri_small.pixel_array
+        assert pixel_data.nbytes == 81920
+        assert pixel_data.shape == (10, 64, 64)
 
 
 @pytest.mark.skipif(
