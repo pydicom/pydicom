@@ -1131,6 +1131,13 @@ class Dataset(dict):
                     for elem in dataset.iterall():
                         yield elem
 
+    def copy(self):
+        """Copy the entire dataset.
+
+        Overrides method inherited from dict.
+        """
+        return self[:]
+
     def walk(self, callback, recursive=True):
         """Iterate through the DataElements and run `callback` on each.
 
