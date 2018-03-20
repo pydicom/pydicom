@@ -60,12 +60,12 @@ save_dir = os.getcwd()
 
 class numpy_JPEG_LS_Tests_no_numpy(unittest.TestCase):
     def setUp(self):
+        self.original_handlers = pydicom.config.image_handlers
+        pydicom.config.image_handlers = [None]
         self.jpeg_ls_lossless = dcmread(jpeg_ls_lossless_name)
         self.mr_small = dcmread(mr_name)
         self.emri_jpeg_ls_lossless = dcmread(emri_jpeg_ls_lossless)
         self.emri_small = dcmread(emri_name)
-        self.original_handlers = pydicom.config.image_handlers
-        pydicom.config.image_handlers = [None]
 
     def tearDown(self):
         pydicom.config.image_handlers = self.original_handlers
@@ -82,10 +82,10 @@ class numpy_JPEG_LS_Tests_no_numpy(unittest.TestCase):
 
 class numpy_BigEndian_Tests_no_numpy(unittest.TestCase):
     def setUp(self):
-        self.emri_big_endian = dcmread(emri_big_endian_name)
-        self.emri_small = dcmread(emri_name)
         self.original_handlers = pydicom.config.image_handlers
         pydicom.config.image_handlers = [None]
+        self.emri_big_endian = dcmread(emri_big_endian_name)
+        self.emri_small = dcmread(emri_name)
 
     def tearDown(self):
         pydicom.config.image_handlers = self.original_handlers
@@ -97,13 +97,13 @@ class numpy_BigEndian_Tests_no_numpy(unittest.TestCase):
 
 class numpy_JPEG2000Tests_no_numpy(unittest.TestCase):
     def setUp(self):
+        self.original_handlers = pydicom.config.image_handlers
+        pydicom.config.image_handlers = [None]
         self.jpeg_2k = dcmread(jpeg2000_name)
         self.jpeg_2k_lossless = dcmread(jpeg2000_lossless_name)
         self.mr_small = dcmread(mr_name)
         self.emri_jpeg_2k_lossless = dcmread(emri_jpeg_2k_lossless)
         self.emri_small = dcmread(emri_name)
-        self.original_handlers = pydicom.config.image_handlers
-        pydicom.config.image_handlers = [None]
 
     def tearDown(self):
         pydicom.config.image_handlers = self.original_handlers
@@ -141,10 +141,10 @@ class numpy_JPEG2000Tests_no_numpy(unittest.TestCase):
 class numpy_JPEGlossyTests_no_numpy(unittest.TestCase):
 
     def setUp(self):
-        self.jpeg = dcmread(jpeg_lossy_name)
-        self.color_3d_jpeg = dcmread(color_3d_jpeg_baseline)
         self.original_handlers = pydicom.config.image_handlers
         pydicom.config.image_handlers = [None]
+        self.jpeg = dcmread(jpeg_lossy_name)
+        self.color_3d_jpeg = dcmread(color_3d_jpeg_baseline)
 
     def tearDown(self):
         pydicom.config.image_handlers = self.original_handlers
@@ -171,9 +171,9 @@ class numpy_JPEGlossyTests_no_numpy(unittest.TestCase):
 
 class numpy_JPEGlosslessTests_no_numpy(unittest.TestCase):
     def setUp(self):
-        self.jpeg = dcmread(jpeg_lossless_name)
         self.original_handlers = pydicom.config.image_handlers
         pydicom.config.image_handlers = [None]
+        self.jpeg = dcmread(jpeg_lossless_name)
 
     def tearDown(self):
         pydicom.config.image_handlers = self.original_handlers
@@ -202,12 +202,12 @@ class numpy_JPEGlosslessTests_no_numpy(unittest.TestCase):
     reason=numpy_missing_message)
 class numpy_JPEG_LS_Tests_with_numpy(unittest.TestCase):
     def setUp(self):
+        self.original_handlers = pydicom.config.image_handlers
+        pydicom.config.image_handlers = [numpy_handler]
         self.jpeg_ls_lossless = dcmread(jpeg_ls_lossless_name)
         self.mr_small = dcmread(mr_name)
         self.emri_jpeg_ls_lossless = dcmread(emri_jpeg_ls_lossless)
         self.emri_small = dcmread(emri_name)
-        self.original_handlers = pydicom.config.image_handlers
-        pydicom.config.image_handlers = [numpy_handler]
 
     def tearDown(self):
         pydicom.config.image_handlers = self.original_handlers
@@ -227,10 +227,10 @@ class numpy_JPEG_LS_Tests_with_numpy(unittest.TestCase):
     reason=numpy_missing_message)
 class numpy_BigEndian_Tests_with_numpy(unittest.TestCase):
     def setUp(self):
-        self.emri_big_endian = dcmread(emri_big_endian_name)
-        self.emri_small = dcmread(emri_name)
         self.original_handlers = pydicom.config.image_handlers
         pydicom.config.image_handlers = [numpy_handler]
+        self.emri_big_endian = dcmread(emri_big_endian_name)
+        self.emri_small = dcmread(emri_name)
 
     def tearDown(self):
         pydicom.config.image_handlers = self.original_handlers
@@ -250,17 +250,17 @@ class numpy_BigEndian_Tests_with_numpy(unittest.TestCase):
     reason=numpy_missing_message)
 class numpy_LittleEndian_Tests(unittest.TestCase):
     def setUp(self):
-        self.emri_small = dcmread(emri_name)
         self.original_handlers = pydicom.config.image_handlers
         pydicom.config.image_handlers = [numpy_handler]
+        self.odd_size_image = dcmread(
+            get_testdata_files('SC_rgb_small_odd.dcm')[0])
+        self.emri_small = dcmread(emri_name)
 
     def tearDown(self):
         pydicom.config.image_handlers = self.original_handlers
 
     def test_little_endian_PixelArray_odd_data_size(self):
-        test_file = get_testdata_files('SC_rgb_small_odd.dcm')[0]
-        ds = dcmread(test_file)
-        pixel_data = ds.pixel_array
+        pixel_data = self.odd_size_image.pixel_array
         assert pixel_data.nbytes == 27
         assert pixel_data.shape == (3, 3, 3)
 
@@ -275,13 +275,13 @@ class numpy_LittleEndian_Tests(unittest.TestCase):
     reason=numpy_missing_message)
 class numpy_JPEG2000Tests_with_numpy(unittest.TestCase):
     def setUp(self):
+        self.original_handlers = pydicom.config.image_handlers
+        pydicom.config.image_handlers = [numpy_handler]
         self.jpeg_2k = dcmread(jpeg2000_name)
         self.jpeg_2k_lossless = dcmread(jpeg2000_lossless_name)
         self.mr_small = dcmread(mr_name)
         self.emri_jpeg_2k_lossless = dcmread(emri_jpeg_2k_lossless)
         self.emri_small = dcmread(emri_name)
-        self.original_handlers = pydicom.config.image_handlers
-        pydicom.config.image_handlers = [numpy_handler]
 
     def tearDown(self):
         pydicom.config.image_handlers = self.original_handlers
@@ -320,10 +320,10 @@ class numpy_JPEG2000Tests_with_numpy(unittest.TestCase):
 class numpy_JPEGlossyTests_with_numpy(unittest.TestCase):
 
     def setUp(self):
-        self.jpeg = dcmread(jpeg_lossy_name)
-        self.color_3d_jpeg = dcmread(color_3d_jpeg_baseline)
         self.original_handlers = pydicom.config.image_handlers
         pydicom.config.image_handlers = [numpy_handler]
+        self.jpeg = dcmread(jpeg_lossy_name)
+        self.color_3d_jpeg = dcmread(color_3d_jpeg_baseline)
 
     def tearDown(self):
         pydicom.config.image_handlers = self.original_handlers
@@ -352,9 +352,9 @@ class numpy_JPEGlossyTests_with_numpy(unittest.TestCase):
     reason=numpy_missing_message)
 class numpy_JPEGlosslessTests_with_numpy(unittest.TestCase):
     def setUp(self):
-        self.jpeg = dcmread(jpeg_lossless_name)
         self.original_handlers = pydicom.config.image_handlers
         pydicom.config.image_handlers = [numpy_handler]
+        self.jpeg = dcmread(jpeg_lossless_name)
 
     def tearDown(self):
         pydicom.config.image_handlers = self.original_handlers
