@@ -65,6 +65,9 @@ def Tag(arg, arg2=None):
     -------
     pydicom.tag.BaseTag
     """
+    if isinstance(arg, BaseTag):
+        return arg
+
     if arg2 is not None:
         arg = (arg, arg2)  # act as if was passed a single tuple
 
