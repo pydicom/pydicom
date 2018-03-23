@@ -163,7 +163,7 @@ class BaseTag(BaseTag_base_class):
     def __eq__(self, other):
         """Return True if `self` equals `other`."""
         # Check if comparing with another Tag object; if not, create a temp one
-        if not isinstance(other, BaseTag):
+        if not isinstance(other, BaseTag_base_class):
             try:
                 other = Tag(other)
             except Exception:

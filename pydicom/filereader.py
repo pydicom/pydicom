@@ -272,8 +272,8 @@ def data_element_generator(fp,
                 fp.seek(fp_tell() + length)
                 continue
 
-            if defer_size is not None and length > defer_size and tag != (
-                    0x08, 0x05):
+            if (defer_size is not None and length > defer_size and
+                    tag != BaseTag(0x00080005)):
                 # Flag as deferred by setting value to None, and skip bytes
                 value = None
                 logger_debug("Defer size exceeded. "
@@ -292,7 +292,7 @@ def data_element_generator(fp,
                                                            value[:12], dotdot))
 
             # If the tag is (0008,0005) Specific Character Set, then store it
-            if tag == (0x08, 0x05):
+            if tag == BaseTag(0x00080005):
                 from pydicom.values import convert_string
                 encoding = convert_string(value, is_little_endian,
                                           encoding=default_encoding)
@@ -409,7 +409,7 @@ def read_dataset(fp, is_implicit_VR, is_little_endian, bytelength=None,
             # Read data elements. Stop on some errors, but return what was read
             tag = raw_data_element.tag
             # Check for ItemDelimiterTag --dataset is an item in a sequence
-            if tag == (0xFFFE, 0xE00D):
+            if tag == BaseTag(0xFFFEE00D):
                 break
             raw_data_elements[tag] = raw_data_element
     except StopIteration:
