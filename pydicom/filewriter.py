@@ -8,7 +8,7 @@ from pydicom.compat import in_py2
 from pydicom.charset import default_encoding, text_VRs, convert_encodings
 from pydicom.datadict import keyword_for_tag
 from pydicom.dataset import Dataset
-from pydicom.filebase import DicomFile, DicomFileLike
+from pydicom.filebase import DicomFile, DicomFileLike, DicomBytesIO
 from pydicom.multival import MultiValue
 from pydicom.tag import (Tag, ItemTag, ItemDelimiterTag, SequenceDelimiterTag,
                          tag_in_exception)
@@ -388,11 +388,15 @@ def write_data_element(fp, data_element, encoding=default_encoding):
             "write_data_element: unknown Value Representation '{0}'".format(
                 VR))
 
-    length_location = fp.tell()  # save location for later.
+    # write into a buffer to avoid seeking back which can be expansive
+    buffer = DicomBytesIO()
+    buffer.is_little_endian = fp.is_little_endian
+    buffer.is_implicit_VR = fp.is_implicit_VR
+
     if not fp.is_implicit_VR and VR not in extra_length_VRs:
-        fp.write_US(0)  # Explicit VR length field is only 2 bytes
+        buffer.write_US(0)  # Explicit VR length field is only 2 bytes
     else:
-        fp.write_UL(
+        buffer.write_UL(
             0xFFFFFFFF
         )  # will fill in real length value later if not undefined length item
 
@@ -400,16 +404,16 @@ def write_data_element(fp, data_element, encoding=default_encoding):
 
     writer_function, writer_param = writers[VR]
     if VR in text_VRs:
-        writer_function(fp, data_element, encoding=encoding[1])
+        writer_function(buffer, data_element, encoding=encoding[1])
     elif VR in ('PN', 'SQ'):
-        writer_function(fp, data_element, encoding=encoding)
+        writer_function(buffer, data_element, encoding=encoding)
     else:
         # Many numeric types use the same writer but with numeric format
         # parameter
         if writer_param is not None:
-            writer_function(fp, data_element, writer_param)
+            writer_function(buffer, data_element, writer_param)
         else:
-            writer_function(fp, data_element)
+            writer_function(buffer, data_element)
 
     #  print DataElement(tag, VR, value)
 
@@ -427,16 +431,16 @@ def write_data_element(fp, data_element, encoding=default_encoding):
                     not val.startswith(b'\xff\xfe\xe0\x00')):
                 raise ValueError('Pixel Data with undefined length must '
                                  'start with an item tag')
-    location = fp.tell()
-    fp.seek(length_location)
+    location = buffer.tell()
+    buffer.seek(0)
     if not fp.is_implicit_VR and VR not in extra_length_VRs:
-        fp.write_US(location - length_location - 2)  # 2 is length of US
+        buffer.write_US(location - 2)  # 2 is length of US
     else:
         # write the proper length of the data_element back in the length slot,
         # unless is SQ with undefined length.
         if not is_undefined_length:
-            fp.write_UL(location - length_location - 4)  # 4 is length of UL
-    fp.seek(location)  # ready for next data_element
+            buffer.write_UL(location - 4)  # 4 is length of UL
+    fp.write(buffer.getvalue())
     if is_undefined_length:
         fp.write_tag(SequenceDelimiterTag)
         fp.write_UL(0)  # 4-byte 'length' of delimiter data item
