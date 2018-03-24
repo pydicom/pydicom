@@ -539,7 +539,10 @@ class Dataset(dict):
                 ds.add(self[tag])
             return ds
 
-        tag = Tag(key)
+        if isinstance(key, BaseTag):
+            tag = key
+        else:
+            tag = Tag(key)
         data_elem = dict.__getitem__(self, tag)
 
         if isinstance(data_elem, DataElement):
@@ -585,7 +588,10 @@ class Dataset(dict):
         -------
         pydicom.dataelem.DataElement
         """
-        tag = Tag(key)
+        if isinstance(key, BaseTag):
+            tag = key
+        else:
+            tag = Tag(key)
         data_elem = dict.__getitem__(self, tag)
         # If a deferred read, return using __getitem__ to read and convert it
         if isinstance(data_elem, tuple) and data_elem.value is None:
@@ -1022,7 +1028,10 @@ class Dataset(dict):
         # OK if is subclass, e.g. DeferredDataElement
         if not isinstance(value, (DataElement, RawDataElement)):
             raise TypeError("Dataset contents must be DataElement instances.")
-        tag = Tag(value.tag)
+        if isinstance(value.tag, BaseTag):
+            tag = value.tag
+        else:
+            tag = Tag(value.tag)
         if key != tag:
             raise ValueError("DataElement.tag must match the dictionary key")
 
@@ -1078,13 +1087,16 @@ class Dataset(dict):
         # Issue 92: if `stop` is None then 0xFFFFFFFF + 1 causes overflow in
         # Tag. The only this occurs if the `stop` parameter value is None
         # and the dataset contains an (0xFFFF, 0xFFFF) element
+        start_tag = Tag(start)
         if stop == 0x100000000:
+            stop_tag_min1 = Tag(stop - 1)
             slice_tags = [
-                tag for tag in all_tags if Tag(start) <= tag <= Tag(stop - 1)
+                tag for tag in all_tags if start_tag <= tag <= stop_tag_min1
             ]
         else:
+            stop_tag = Tag(stop)
             slice_tags = [
-                tag for tag in all_tags if Tag(start) <= tag < Tag(stop)
+                tag for tag in all_tags if start_tag <= tag < stop_tag
             ]
 
         return slice_tags[::step]

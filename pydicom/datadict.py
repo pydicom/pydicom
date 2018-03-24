@@ -3,7 +3,7 @@
 """Access dicom dictionary information"""
 
 from pydicom.config import logger
-from pydicom.tag import Tag
+from pydicom.tag import Tag, BaseTag
 
 # the actual dict of {tag: (VR, VM, name, is_retired, keyword), ...}
 from pydicom._dicom_dict import DicomDictionary
@@ -129,7 +129,8 @@ def get_entry(tag):
     # and with DicomDictionary.get, instead of try/except
     # Try/except was fastest using timeit if tag is valid (usual case)
     # My test had 5.2 usec vs 8.2 for 'contains' test, vs 5.32 for dict.get
-    tag = Tag(tag)
+    if not isinstance(tag, BaseTag):
+        tag = Tag(tag)
     try:
         return DicomDictionary[tag]
     except KeyError:
@@ -228,7 +229,8 @@ def repeater_has_keyword(keyword):
 def get_private_entry(tag, private_creator):
     """Return the tuple (VR, VM, name, is_retired)
        from a private dictionary"""
-    tag = Tag(tag)
+    if not isinstance(tag, BaseTag):
+        tag = Tag(tag)
     try:
         private_dict = private_dictionaries[private_creator]
     except KeyError:
