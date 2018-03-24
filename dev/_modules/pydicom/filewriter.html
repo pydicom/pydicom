@@ -192,7 +192,7 @@
 <span class="kn">from</span> <span class="nn">pydicom.charset</span> <span class="k">import</span> <span class="n">default_encoding</span><span class="p">,</span> <span class="n">text_VRs</span><span class="p">,</span> <span class="n">convert_encodings</span>
 <span class="kn">from</span> <span class="nn">pydicom.datadict</span> <span class="k">import</span> <span class="n">keyword_for_tag</span>
 <span class="kn">from</span> <span class="nn">pydicom.dataset</span> <span class="k">import</span> <span class="n">Dataset</span>
-<span class="kn">from</span> <span class="nn">pydicom.filebase</span> <span class="k">import</span> <span class="n">DicomFile</span><span class="p">,</span> <span class="n">DicomFileLike</span>
+<span class="kn">from</span> <span class="nn">pydicom.filebase</span> <span class="k">import</span> <span class="n">DicomFile</span><span class="p">,</span> <span class="n">DicomFileLike</span><span class="p">,</span> <span class="n">DicomBytesIO</span>
 <span class="kn">from</span> <span class="nn">pydicom.multival</span> <span class="k">import</span> <span class="n">MultiValue</span>
 <span class="kn">from</span> <span class="nn">pydicom.tag</span> <span class="k">import</span> <span class="p">(</span><span class="n">Tag</span><span class="p">,</span> <span class="n">ItemTag</span><span class="p">,</span> <span class="n">ItemDelimiterTag</span><span class="p">,</span> <span class="n">SequenceDelimiterTag</span><span class="p">,</span>
                          <span class="n">tag_in_exception</span><span class="p">)</span>
@@ -572,11 +572,15 @@
             <span class="s2">&quot;write_data_element: unknown Value Representation &#39;</span><span class="si">{0}</span><span class="s2">&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                 <span class="n">VR</span><span class="p">))</span>
 
-    <span class="n">length_location</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>  <span class="c1"># save location for later.</span>
+    <span class="c1"># write into a buffer to avoid seeking back which can be expansive</span>
+    <span class="n">buffer</span> <span class="o">=</span> <span class="n">DicomBytesIO</span><span class="p">()</span>
+    <span class="n">buffer</span><span class="o">.</span><span class="n">is_little_endian</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">is_little_endian</span>
+    <span class="n">buffer</span><span class="o">.</span><span class="n">is_implicit_VR</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">is_implicit_VR</span>
+
     <span class="k">if</span> <span class="ow">not</span> <span class="n">fp</span><span class="o">.</span><span class="n">is_implicit_VR</span> <span class="ow">and</span> <span class="n">VR</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">extra_length_VRs</span><span class="p">:</span>
-        <span class="n">fp</span><span class="o">.</span><span class="n">write_US</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># Explicit VR length field is only 2 bytes</span>
+        <span class="n">buffer</span><span class="o">.</span><span class="n">write_US</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># Explicit VR length field is only 2 bytes</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">fp</span><span class="o">.</span><span class="n">write_UL</span><span class="p">(</span>
+        <span class="n">buffer</span><span class="o">.</span><span class="n">write_UL</span><span class="p">(</span>
             <span class="mh">0xFFFFFFFF</span>
         <span class="p">)</span>  <span class="c1"># will fill in real length value later if not undefined length item</span>
 
@@ -584,16 +588,16 @@
 
     <span class="n">writer_function</span><span class="p">,</span> <span class="n">writer_param</span> <span class="o">=</span> <span class="n">writers</span><span class="p">[</span><span class="n">VR</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">VR</span> <span class="ow">in</span> <span class="n">text_VRs</span><span class="p">:</span>
-        <span class="n">writer_function</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">data_element</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">writer_function</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span> <span class="n">data_element</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
     <span class="k">elif</span> <span class="n">VR</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;PN&#39;</span><span class="p">,</span> <span class="s1">&#39;SQ&#39;</span><span class="p">):</span>
-        <span class="n">writer_function</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">data_element</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">)</span>
+        <span class="n">writer_function</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span> <span class="n">data_element</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># Many numeric types use the same writer but with numeric format</span>
         <span class="c1"># parameter</span>
         <span class="k">if</span> <span class="n">writer_param</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">writer_function</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">data_element</span><span class="p">,</span> <span class="n">writer_param</span><span class="p">)</span>
+            <span class="n">writer_function</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span> <span class="n">data_element</span><span class="p">,</span> <span class="n">writer_param</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">writer_function</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">data_element</span><span class="p">)</span>
+            <span class="n">writer_function</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span> <span class="n">data_element</span><span class="p">)</span>
 
     <span class="c1">#  print DataElement(tag, VR, value)</span>
 
@@ -611,16 +615,16 @@
                     <span class="ow">not</span> <span class="n">val</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;</span><span class="se">\xff\xfe\xe0\x00</span><span class="s1">&#39;</span><span class="p">)):</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Pixel Data with undefined length must &#39;</span>
                                  <span class="s1">&#39;start with an item tag&#39;</span><span class="p">)</span>
-    <span class="n">location</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
-    <span class="n">fp</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">length_location</span><span class="p">)</span>
+    <span class="n">location</span> <span class="o">=</span> <span class="n">buffer</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
+    <span class="n">buffer</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">fp</span><span class="o">.</span><span class="n">is_implicit_VR</span> <span class="ow">and</span> <span class="n">VR</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">extra_length_VRs</span><span class="p">:</span>
-        <span class="n">fp</span><span class="o">.</span><span class="n">write_US</span><span class="p">(</span><span class="n">location</span> <span class="o">-</span> <span class="n">length_location</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span>  <span class="c1"># 2 is length of US</span>
+        <span class="n">buffer</span><span class="o">.</span><span class="n">write_US</span><span class="p">(</span><span class="n">location</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span>  <span class="c1"># 2 is length of US</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># write the proper length of the data_element back in the length slot,</span>
         <span class="c1"># unless is SQ with undefined length.</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">is_undefined_length</span><span class="p">:</span>
-            <span class="n">fp</span><span class="o">.</span><span class="n">write_UL</span><span class="p">(</span><span class="n">location</span> <span class="o">-</span> <span class="n">length_location</span> <span class="o">-</span> <span class="mi">4</span><span class="p">)</span>  <span class="c1"># 4 is length of UL</span>
-    <span class="n">fp</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">location</span><span class="p">)</span>  <span class="c1"># ready for next data_element</span>
+            <span class="n">buffer</span><span class="o">.</span><span class="n">write_UL</span><span class="p">(</span><span class="n">location</span> <span class="o">-</span> <span class="mi">4</span><span class="p">)</span>  <span class="c1"># 4 is length of UL</span>
+    <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">buffer</span><span class="o">.</span><span class="n">getvalue</span><span class="p">())</span>
     <span class="k">if</span> <span class="n">is_undefined_length</span><span class="p">:</span>
         <span class="n">fp</span><span class="o">.</span><span class="n">write_tag</span><span class="p">(</span><span class="n">SequenceDelimiterTag</span><span class="p">)</span>
         <span class="n">fp</span><span class="o">.</span><span class="n">write_UL</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># 4-byte &#39;length&#39; of delimiter data item</span>
