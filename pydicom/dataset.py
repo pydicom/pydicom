@@ -552,7 +552,7 @@ class Dataset(dict):
                     self.fileobj_type, self.filename, self.timestamp,
                     data_elem)
 
-            if tag != (0x08, 0x05):
+            if tag != BaseTag(0x00080005):
                 character_set = self._character_set
             else:
                 character_set = default_encoding
