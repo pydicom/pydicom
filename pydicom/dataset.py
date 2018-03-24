@@ -483,7 +483,7 @@ class Dataset(dict):
     @property
     def _character_set(self):
         """The Dataset's SpecificCharacterSet value (if present)."""
-        char_set = self.get('SpecificCharacterSet', None)
+        char_set = self.get(BaseTag(0x00080005), None)
 
         if not char_set:
             char_set = self._parent_encoding
