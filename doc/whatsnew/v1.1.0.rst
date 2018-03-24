@@ -23,7 +23,10 @@ Fixes
 
 Other
 -----
-* Starting in v1.2, ``UID`` equality and inequality comparisons will return
-  ``False`` when performing the equivalent of ``UID == UID.name`` and
-  ``UID != UID.name``, respectively. E.g. UID('1.2.840.10008.1.1') ==
-  'Verification SOP Class' will return False.
+
+* A deprecation warning has been added for UID.__eq__ and UID.__ne__ when
+  comparing ``UID == [UID name]`` and ``UID != [UID name]``. Starting in v1.2,
+  ``UID`` equality and inequality comparisons will return ``False`` when
+  performing the equivalent of ``UID == [UID name]`` and ``UID != [UID name]``,
+  respectively. E.g. UID('1.2.840.10008.1.1') == 'Verification SOP Class' will
+  return False. Use ``UID.name == [UID name]`` instead.
