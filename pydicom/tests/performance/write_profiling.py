@@ -72,6 +72,8 @@ reason = "%s Need at least 400 files in %s" % (reason, str(locations))
 
 set_calls = []
 get_calls = []
+
+
 def trace_calls(frame, event, arg):
     if event != 'call':
         return
@@ -79,7 +81,7 @@ def trace_calls(frame, event, arg):
     func_name = co.co_name
     func_line_no = frame.f_lineno
     func_filename = co.co_filename
-    
+
     if func_name not in ["__getitem__", "__setitem__"]:
         return
     if "dataset.py" not in func_filename:
@@ -89,34 +91,36 @@ def trace_calls(frame, event, arg):
     caller_line_no = caller.f_lineno
     caller_filename = caller.f_code.co_filename
     caller_mosh = os.path.basename(caller_filename) + ":" + str(caller_line_no)
-    
+
     if func_name == "__getitem__":
         get_calls.append(caller_mosh)
     else:
         set_calls.append(caller_mosh)
 
+
 def test_write():
     for i in range(len(datasets)):
         datasets[i].save_as(ds_new_filenames[i])
+
 
 @pytest.mark.skipif(len(filenames) < 400,
                     reason=reason)
 def test_python_write_files():
     [open(fn, 'rb').read() for fn in filenames4]
-    
+
 
 if __name__ == "__main__":
     print("Reading files from", location_base)
-    
+
     write_filenames = filenames1[:50]
     # print("Filenames:", write_filenames)
     datasets = [pydicom.dcmread(fn) for fn in write_filenames]
     ds_new_filenames = [os.path.join(tempwrite, os.path.basename(ds.filename))
                         for ds in datasets]
-    
+
     num_tags = sum([len(x.keys()) for x in datasets])
     print("Total number of tags: %d in %d files" % (num_tags, len(datasets)))
-      
+
     runs = ['test_write()',
             # 'test_python_write_files()',
             ]
@@ -131,8 +135,8 @@ if __name__ == "__main__":
         print("Get", Counter(get_calls))
         print("Set", Counter(set_calls))
         sys.exit()
-    do_trace = False   
-    if do_trace:       
+    do_trace = False
+    if do_trace:
         import trace
 
         # create a Trace object, telling it what to ignore, and whether to
@@ -147,10 +151,10 @@ if __name__ == "__main__":
 
         # make a report, placing output in the current directory
         r = tracer.results()
-        r.write_results(show_missing=True, coverdir=".")            
+        r.write_results(show_missing=True, coverdir=".")
 
         sys.exit()
-    
+
     for testrun in runs:
         cProfile.run(testrun, tempfile)
         p = pstats.Stats(tempfile)
@@ -159,8 +163,6 @@ if __name__ == "__main__":
         print("---------------")
         p.strip_dirs().sort_stats('time').print_stats(8)
 
-
-        
     # Clear disk cache for next run?
     if not on_windows:
         prompt = "Run purge command (linux/Mac OS X)"
