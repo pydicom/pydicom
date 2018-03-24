@@ -540,7 +540,10 @@ class Dataset(dict):
             tags = self._slice_dataset(key.start, key.stop, key.step)
             return Dataset({tag: self[tag] for tag in tags})
 
-        tag = Tag(key)
+        if isinstance(key, BaseTag):
+            tag = key
+        else:
+            tag = Tag(key)
         data_elem = dict.__getitem__(self, tag)
 
         if isinstance(data_elem, DataElement):
@@ -586,7 +589,10 @@ class Dataset(dict):
         -------
         pydicom.dataelem.DataElement
         """
-        tag = Tag(key)
+        if isinstance(key, BaseTag):
+            tag = key
+        else:
+            tag = Tag(key)
         data_elem = dict.__getitem__(self, tag)
         # If a deferred read, return using __getitem__ to read and convert it
         if isinstance(data_elem, tuple) and data_elem.value is None:
@@ -1023,7 +1029,10 @@ class Dataset(dict):
         # OK if is subclass, e.g. DeferredDataElement
         if not isinstance(value, (DataElement, RawDataElement)):
             raise TypeError("Dataset contents must be DataElement instances.")
-        tag = Tag(value.tag)
+        if isinstance(value.tag, BaseTag):
+            tag = value.tag
+        else:
+            tag = Tag(value.tag)
         if key != tag:
             raise ValueError("DataElement.tag must match the dictionary key")
 

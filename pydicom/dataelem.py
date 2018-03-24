@@ -24,7 +24,7 @@ from pydicom.datadict import (dictionary_has_tag, dictionary_description,
                               private_dictionary_description, dictionary_VR,
                               repeater_has_tag)
 from pydicom.multival import MultiValue
-from pydicom.tag import Tag
+from pydicom.tag import Tag, BaseTag
 from pydicom.uid import UID
 import pydicom.valuerep  # don't import DS directly as can be changed by config
 
@@ -171,7 +171,9 @@ class DataElement(object):
             Used to determine whether or not `value` requires conversion to a
             value with VM > 1. Default is False.
         """
-        self.tag = Tag(tag)
+        if not isinstance(tag, BaseTag):
+            tag = Tag(tag)
+        self.tag = tag
         self.VR = VR  # Note!: you must set VR before setting value
         if already_converted:
             self._value = value
@@ -400,7 +402,9 @@ class DeferredDataElement(DataElement):
         data_element_tell -- file position at start of data element,
            (not the start of the value part, but start of whole element)
         """
-        self.tag = Tag(tag)
+        if not isinstance(tag, BaseTag):
+            tag = Tag(tag)
+        self.tag = tag
         self.VR = VR
         self._value = None  # flag as unread
 
