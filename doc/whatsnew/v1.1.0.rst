@@ -9,8 +9,6 @@ Minor changes
 
 * ``UID.__str__`` no longer returns the UID name (when known). The UID name is
   still available using the ``UID.name`` property.
-* ``UID`` equality comparisons now return ``False`` when performing the
-  equivalent of ``UID == UID.name``.
 * ``Dataset`` equality now only compares the dataset's ``DataElements`` (#464).
 
 Fixes
@@ -22,3 +20,10 @@ Fixes
   encoding parameter (#489).
 * fixed ``Dataset`` not slicing correctly when an (0xFFFF,0xFFFF) element is
   present (#92).
+
+Other
+-----
+* Starting in v1.2, ``UID`` equality and inequality comparisons will return
+  ``False`` when performing the equivalent of ``UID == UID.name`` and
+  ``UID != UID.name``, respectively. E.g. UID('1.2.840.10008.1.1') ==
+  'Verification SOP Class' will return False.
