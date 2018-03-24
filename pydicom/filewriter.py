@@ -424,13 +424,13 @@ def write_data_element(fp, data_element, encoding=default_encoding):
                 raise ValueError('Pixel Data with undefined length must '
                                  'start with an item tag')
 
-    tag_length = buffer.tell()
+    value_length = buffer.tell()
     if not fp.is_implicit_VR and VR not in extra_length_VRs:
-        fp.write_US(tag_length)  # Explicit VR length field is only 2 bytes
+        fp.write_US(value_length)  # Explicit VR length field is only 2 bytes
     else:
         # write the proper length of the data_element in the length slot,
         # unless is SQ with undefined length.
-        fp.write_UL(0xFFFFFFFF if is_undefined_length else tag_length)
+        fp.write_UL(0xFFFFFFFF if is_undefined_length else value_length)
 
     fp.write(buffer.getvalue())
     if is_undefined_length:
