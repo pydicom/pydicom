@@ -66,7 +66,7 @@ class UID(str):
     def __eq__(self, other):
         """Return True if `self` or `self.name` equals `other`."""
         # TODO: v1.2 - The __ne__ override is deprecated
-        if isinstance(other, str) and '.' not in other:
+        if isinstance(other, str) and other and '.' not in other:
             msg = "The equality test for \"UID == '{0}'\" is deprecated and " \
                   "will be removed in pydicom v1.2. In the future use " \
                   "\"UID.name == '{0}'\"".format(other)
@@ -83,7 +83,7 @@ class UID(str):
     def __ne__(self, other):
         """Return True if `self` or `self.name` does not equal `other`."""
         # TODO: v1.2 - The __ne__ override is deprecated
-        if isinstance(other, str) and '.' not in other:
+        if isinstance(other, str) and other and '.' not in other:
             msg = "The equality test for \"UID != '{0}'\" is deprecated and " \
                   "will be removed in pydicom v1.2. In the future use " \
                   "\"UID.name != '{0}'\"".format(other)
