@@ -740,7 +740,7 @@ class Dataset(dict):
                 else:
                     msg = ("No available image handler could "
                            "decode this transfer syntax {}".format(
-                               self.file_meta.TransferSyntaxUID))
+                               self.file_meta.TransferSyntaxUID.name))
                     raise NotImplementedError(msg)
             # is this guaranteed to work if memory is re-used??
             self._pixel_id = id(self.PixelData)

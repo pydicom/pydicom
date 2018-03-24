@@ -6,6 +6,7 @@ import uuid
 import random
 import hashlib
 import re
+import warnings
 
 from pydicom._uid_dict import UID_dictionary
 from pydicom import compat
@@ -30,7 +31,13 @@ class UID(str):
     >>> uid = UID('1.2.840.10008.1.2.4.50')
     >>> uid
     '1.2.840.10008.1.2.4.50'
-    >>> print(uid)
+    >>> uid.is_implicit_VR
+    False
+    >>> uid.is_little_endian
+    True
+    >>> uid.is_transfer_syntax
+    True
+    >>> uid.name
     'JPEG Baseline (Process 1)'
     """
     def __new__(cls, val):
@@ -56,24 +63,43 @@ class UID(str):
 
         raise TypeError("UID must be a string")
 
-    def __str__(self):
-        """Return the human-friendly name for this UID"""
-        return self.name
-
     def __eq__(self, other):
         """Return True if `self` or `self.name` equals `other`."""
+        # TODO: v1.2 - The __ne__ override is deprecated
+        if isinstance(other, str) and other and '.' not in other:
+            msg = "The equality test for \"UID == '{0}'\" is deprecated and " \
+                  "will be removed in pydicom v1.2. In the future use " \
+                  "\"UID.name == '{0}'\"".format(other)
+            warnings.warn(msg, DeprecationWarning)
+
         if str.__eq__(self, other) is True:  # 'is True' needed (issue 96)
             return True
+
         if str.__eq__(self.name, other) is True:  # 'is True' needed (issue 96)
             return True
+
         return False
 
     def __ne__(self, other):
-        """Return True if `self` does not equal `other`."""
-        return not self == other
+        """Return True if `self` or `self.name` does not equal `other`."""
+        # TODO: v1.2 - The __ne__ override is deprecated
+        if isinstance(other, str) and other and '.' not in other:
+            msg = "The equality test for \"UID != '{0}'\" is deprecated and " \
+                  "will be removed in pydicom v1.2. In the future use " \
+                  "\"UID.name != '{0}'\"".format(other)
+            warnings.warn(msg, DeprecationWarning)
+
+        if str.__eq__(self, other) is True:
+            return False
+
+        if str.__eq__(self.name, other) is True:
+            return False
+
+        return True
 
     def __hash__(self):
         """Return the hash of `self`."""
+        # TODO: v1.2 - The __hash__ override is deprecated
         # For python 3, any override of __cmp__ or __eq__
         #   immutable requires explicit redirect of hash
         #   function to the parent class

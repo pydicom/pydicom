@@ -1,0 +1,32 @@
+Version 1.1.0
+=================================
+
+Changelog
+---------
+
+Minor changes
+.............
+
+* ``UID.__str__`` no longer returns the UID name (when known). The UID name is
+  still available using the ``UID.name`` property.
+* ``Dataset`` equality now only compares the dataset's ``DataElements`` (#464).
+
+Fixes
+.....
+
+* ``UID`` should behave as expected for a python ``str`` subclass (#256).
+* group length elements in groups above 0x0006 removed on writing (#32).
+* fixed ``write_PN`` raising a ``TypeError`` when called with a non-iterable
+  encoding parameter (#489).
+* fixed ``Dataset`` not slicing correctly when an (0xFFFF,0xFFFF) element is
+  present (#92).
+
+Other
+-----
+
+* A deprecation warning has been added for UID.__eq__ and UID.__ne__ when
+  comparing ``UID == [UID name]`` and ``UID != [UID name]``. Starting in v1.2,
+  ``UID`` equality and inequality comparisons will return ``False`` when
+  performing the equivalent of ``UID == [UID name]`` and ``UID != [UID name]``,
+  respectively. E.g. UID('1.2.840.10008.1.1') == 'Verification SOP Class' will
+  return False. Use ``UID.name == [UID name]`` instead.

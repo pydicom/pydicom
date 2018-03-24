@@ -941,6 +941,12 @@ class DatasetTests(unittest.TestCase):
         with pytest.raises(StopIteration):
             next(line_generator)
 
+    def test_formatted_lines_known_uid(self):
+        """Test that the UID name is output when known."""
+        ds = Dataset()
+        ds.TransferSyntaxUID = '1.2.840.10008.1.2'
+        assert 'Implicit VR Little Endian' in str(ds)
+
     def test_set_convert_private_elem_from_raw(self):
         """Test Dataset.__setitem__ with a raw private element"""
         test_file = get_testdata_files('CT_small.dcm')[0]

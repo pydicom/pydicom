@@ -49,7 +49,7 @@ class DicomDir(FileDataset):
         # check here also
         if file_meta:
             class_uid = file_meta.MediaStorageSOPClassUID
-            if not class_uid == "Media Storage Directory Storage":
+            if not class_uid.name == "Media Storage Directory Storage":
                 msg = "SOP Class is not Media Storage Directory (DICOMDIR)"
                 raise InvalidDicomError(msg)
         FileDataset.__init__(
