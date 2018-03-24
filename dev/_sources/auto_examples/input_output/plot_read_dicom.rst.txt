@@ -23,7 +23,7 @@ information, and show it using matplotlib.
  Out::
 
     Filename.........: /home/ubuntu/pydicom/pydicom/data/test_files/CT_small.dcm
-    Storage type.....: CT Image Storage
+    Storage type.....: 1.2.840.10008.5.1.4.1.1.2
 
     Patient's name...: CompressedSamples, CT1
     Patient id.......: 1CT1
@@ -82,7 +82,7 @@ information, and show it using matplotlib.
     plt.imshow(dataset.pixel_array, cmap=plt.cm.bone)
     plt.show()
 
-**Total running time of the script:** ( 0 minutes  0.029 seconds)
+**Total running time of the script:** ( 0 minutes  0.036 seconds)
 
 
 

@@ -145,7 +145,7 @@ This example illustrates how to print the data set in your own format.
 
     myprint(ds)
 
-**Total running time of the script:** ( 0 minutes  0.006 seconds)
+**Total running time of the script:** ( 0 minutes  0.007 seconds)
 
 
 
