@@ -736,7 +736,7 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">fileobj_type</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">timestamp</span><span class="p">,</span>
                     <span class="n">data_elem</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="n">tag</span> <span class="o">!=</span> <span class="p">(</span><span class="mh">0x08</span><span class="p">,</span> <span class="mh">0x05</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">tag</span> <span class="o">!=</span> <span class="n">BaseTag</span><span class="p">(</span><span class="mh">0x00080005</span><span class="p">):</span>
                 <span class="n">character_set</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_character_set</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">character_set</span> <span class="o">=</span> <span class="n">default_encoding</span>
