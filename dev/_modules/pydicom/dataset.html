@@ -723,7 +723,10 @@
                 <span class="n">ds</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">tag</span><span class="p">])</span>
             <span class="k">return</span> <span class="n">ds</span>
 
-        <span class="n">tag</span> <span class="o">=</span> <span class="n">Tag</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">BaseTag</span><span class="p">):</span>
+            <span class="n">tag</span> <span class="o">=</span> <span class="n">key</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">tag</span> <span class="o">=</span> <span class="n">Tag</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
         <span class="n">data_elem</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data_elem</span><span class="p">,</span> <span class="n">DataElement</span><span class="p">):</span>
@@ -769,7 +772,10 @@
 <span class="sd">        -------</span>
 <span class="sd">        pydicom.dataelem.DataElement</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">tag</span> <span class="o">=</span> <span class="n">Tag</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">BaseTag</span><span class="p">):</span>
+            <span class="n">tag</span> <span class="o">=</span> <span class="n">key</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">tag</span> <span class="o">=</span> <span class="n">Tag</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
         <span class="n">data_elem</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="p">)</span>
         <span class="c1"># If a deferred read, return using __getitem__ to read and convert it</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data_elem</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">and</span> <span class="n">data_elem</span><span class="o">.</span><span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -1206,7 +1212,10 @@
         <span class="c1"># OK if is subclass, e.g. DeferredDataElement</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="n">DataElement</span><span class="p">,</span> <span class="n">RawDataElement</span><span class="p">)):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Dataset contents must be DataElement instances.&quot;</span><span class="p">)</span>
-        <span class="n">tag</span> <span class="o">=</span> <span class="n">Tag</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="n">BaseTag</span><span class="p">):</span>
+            <span class="n">tag</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">tag</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">tag</span> <span class="o">=</span> <span class="n">Tag</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">key</span> <span class="o">!=</span> <span class="n">tag</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;DataElement.tag must match the dictionary key&quot;</span><span class="p">)</span>
 
@@ -1262,13 +1271,16 @@
         <span class="c1"># Issue 92: if `stop` is None then 0xFFFFFFFF + 1 causes overflow in</span>
         <span class="c1"># Tag. The only this occurs if the `stop` parameter value is None</span>
         <span class="c1"># and the dataset contains an (0xFFFF, 0xFFFF) element</span>
+        <span class="n">start_tag</span> <span class="o">=</span> <span class="n">Tag</span><span class="p">(</span><span class="n">start</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">stop</span> <span class="o">==</span> <span class="mh">0x100000000</span><span class="p">:</span>
+            <span class="n">stop_tag_min1</span> <span class="o">=</span> <span class="n">Tag</span><span class="p">(</span><span class="n">stop</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
             <span class="n">slice_tags</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="n">tag</span> <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">all_tags</span> <span class="k">if</span> <span class="n">Tag</span><span class="p">(</span><span class="n">start</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">tag</span> <span class="o">&lt;=</span> <span class="n">Tag</span><span class="p">(</span><span class="n">stop</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">tag</span> <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">all_tags</span> <span class="k">if</span> <span class="n">start_tag</span> <span class="o">&lt;=</span> <span class="n">tag</span> <span class="o">&lt;=</span> <span class="n">stop_tag_min1</span>
             <span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
+            <span class="n">stop_tag</span> <span class="o">=</span> <span class="n">Tag</span><span class="p">(</span><span class="n">stop</span><span class="p">)</span>
             <span class="n">slice_tags</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="n">tag</span> <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">all_tags</span> <span class="k">if</span> <span class="n">Tag</span><span class="p">(</span><span class="n">start</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">tag</span> <span class="o">&lt;</span> <span class="n">Tag</span><span class="p">(</span><span class="n">stop</span><span class="p">)</span>
+                <span class="n">tag</span> <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">all_tags</span> <span class="k">if</span> <span class="n">start_tag</span> <span class="o">&lt;=</span> <span class="n">tag</span> <span class="o">&lt;</span> <span class="n">stop_tag</span>
             <span class="p">]</span>
 
         <span class="k">return</span> <span class="n">slice_tags</span><span class="p">[::</span><span class="n">step</span><span class="p">]</span>
