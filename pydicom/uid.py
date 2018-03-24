@@ -6,6 +6,7 @@ import uuid
 import random
 import hashlib
 import re
+import warnings
 
 from pydicom._uid_dict import UID_dictionary
 from pydicom import compat
@@ -64,18 +65,38 @@ class UID(str):
 
     def __eq__(self, other):
         """Return True if `self` or `self.name` equals `other`."""
+        # TODO: v1.2 - The __ne__ override is deprecated
         if str.__eq__(self, other) is True:  # 'is True' needed (issue 96)
             return True
+
         if str.__eq__(self.name, other) is True:  # 'is True' needed (issue 96)
+            msg = "The equality test for \"UID == '{0}'\" is deprecated and " \
+                  "will be removed in pydicom v1.2. In the future use " \
+                  "\"UID.name == '{0}'\"".format(other)
+            warnings.warn(msg, DeprecationWarning)
             return True
+
         return False
 
     def __ne__(self, other):
-        """Return True if `self` does not equal `other`."""
-        return not self == other
+        """Return True if `self` or `self.name` does not equal `other`."""
+        # TODO: v1.2 - The __ne__ override is deprecated
+        if str.__eq__(self, other) is True:
+            return False
+
+        if str.__eq__(self.name, other) is True:
+            return False
+        else:
+            msg = "The equality test for \"UID != '{0}'\" is deprecated and " \
+                  "will be removed in pydicom v1.2. In the future use " \
+                  "\"UID.name != '{0}'\"".format(other)
+            warnings.warn(msg, DeprecationWarning)
+
+        return True
 
     def __hash__(self):
         """Return the hash of `self`."""
+        # TODO: v1.2 - The __hash__ override is deprecated
         # For python 3, any override of __cmp__ or __eq__
         #   immutable requires explicit redirect of hash
         #   function to the parent class

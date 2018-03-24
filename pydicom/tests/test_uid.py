@@ -77,6 +77,14 @@ class TestUID(object):
         assert not self.uid == 3
         assert self.uid is not None
 
+    def test_equality_deprecation_warning(self):
+        """Test the deprecation warning is working"""
+        uid = UID('1.2.840.10008.1.1')
+        assert uid.name == 'Verification SOP Class'
+        with pytest.warns(DeprecationWarning,
+                          match="UID == 'Verification SOP Class'"):
+            assert uid == 'Verification SOP Class'
+
     def test_inequality(self):
         """Test that UID.__ne__ works."""
         assert not self.uid != UID('1.2.840.10008.1.2')
@@ -87,6 +95,14 @@ class TestUID(object):
         assert self.uid != 'Explicit VR Little Endian'
         # Issue 96
         assert self.uid != 3
+
+    def test_inequality_deprecation_warning(self):
+        """Test the deprecation warning is working"""
+        uid = UID('1.2.840.10008.1.1')
+        assert uid.name == 'Verification SOP Class'
+        with pytest.warns(DeprecationWarning,
+                          match="UID != 'Implicit VR Little Endian'"):
+            assert uid != 'Implicit VR Little Endian'
 
     def test_hash(self):
         """Test that UID.__hash_- works."""
