@@ -85,8 +85,8 @@ class TestUID(object):
         """Test the deprecation warning is working"""
         uid = UID('1.2.840.10008.1.1')
         assert uid.name == 'Verification SOP Class'
-        with pytest.warns(DeprecationWarning,
-                          match="UID == 'Verification SOP Class'"):
+        assert uid == 'Verification SOP Class'
+        with pytest.deprecated_call():
             assert uid == 'Verification SOP Class'
             assert 'Verification SOP Class' == uid
 
@@ -109,9 +109,8 @@ class TestUID(object):
         """Test the deprecation warning is working"""
         uid = UID('1.2.840.10008.1.1')
         assert uid.name == 'Verification SOP Class'
-        assert uid.name != 'Implicit VR Little Endian'
-        with pytest.warns(DeprecationWarning,
-                          match="UID != 'Implicit VR Little Endian'"):
+        assert uid != 'Implicit VR Little Endian'
+        with pytest.deprecated_call():
             assert uid != 'Implicit VR Little Endian'
             assert 'Implicit VR Little Endian' != uid
 
