@@ -204,6 +204,8 @@
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">os.path</span>
 <span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">bisect</span> <span class="k">import</span> <span class="n">bisect_left</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="k">import</span> <span class="n">takewhile</span>
 
 <span class="kn">from</span> <span class="nn">pydicom</span> <span class="k">import</span> <span class="n">compat</span>
 <span class="kn">from</span> <span class="nn">pydicom.charset</span> <span class="k">import</span> <span class="n">default_encoding</span><span class="p">,</span> <span class="n">convert_encodings</span>
@@ -218,6 +220,7 @@
 <span class="kn">import</span> <span class="nn">pydicom.charset</span>
 <span class="kn">from</span> <span class="nn">pydicom.config</span> <span class="k">import</span> <span class="n">logger</span>
 <span class="kn">import</span> <span class="nn">pydicom.config</span>
+
 <span class="n">have_numpy</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">numpy</span>
@@ -718,10 +721,8 @@
         <span class="c1"># If passed a slice, return a Dataset containing the corresponding</span>
         <span class="c1">#   DataElements</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">slice</span><span class="p">):</span>
-            <span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">()</span>
-            <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_slice_dataset</span><span class="p">(</span><span class="n">key</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="n">key</span><span class="o">.</span><span class="n">stop</span><span class="p">,</span> <span class="n">key</span><span class="o">.</span><span class="n">step</span><span class="p">):</span>
-                <span class="n">ds</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">tag</span><span class="p">])</span>
-            <span class="k">return</span> <span class="n">ds</span>
+            <span class="n">tags</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_slice_dataset</span><span class="p">(</span><span class="n">key</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="n">key</span><span class="o">.</span><span class="n">stop</span><span class="p">,</span> <span class="n">key</span><span class="o">.</span><span class="n">step</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">Dataset</span><span class="p">({</span><span class="n">tag</span><span class="p">:</span> <span class="bp">self</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span> <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">tags</span><span class="p">})</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">BaseTag</span><span class="p">):</span>
             <span class="n">tag</span> <span class="o">=</span> <span class="n">key</span>
@@ -1252,38 +1253,35 @@
 <span class="sd">            The tags in the Dataset that meet the conditions of the slice.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Check the starting/stopping Tags are valid when used</span>
-        <span class="k">if</span> <span class="n">start</span> <span class="ow">and</span> <span class="n">Tag</span><span class="p">(</span><span class="n">start</span><span class="p">):</span>
-            <span class="k">pass</span>
-        <span class="k">if</span> <span class="n">stop</span> <span class="ow">and</span> <span class="n">Tag</span><span class="p">(</span><span class="n">stop</span><span class="p">):</span>
-            <span class="k">pass</span>
+        <span class="k">if</span> <span class="n">start</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">start</span> <span class="o">=</span> <span class="n">Tag</span><span class="p">(</span><span class="n">start</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">stop</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">stop</span> <span class="o">=</span> <span class="n">Tag</span><span class="p">(</span><span class="n">stop</span><span class="p">)</span>
 
         <span class="n">all_tags</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
         <span class="c1"># If the Dataset is empty, return an empty list</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">all_tags</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">[]</span>
 
-        <span class="c1"># Ensure we have valid Tags when start/stop are None</span>
+        <span class="c1"># Special case the common situations:</span>
+        <span class="c1">#   - start and/or stop are None</span>
+        <span class="c1">#   - step is 1</span>
+
         <span class="k">if</span> <span class="n">start</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">start</span> <span class="o">=</span> <span class="n">all_tags</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">stop</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># For step=1 avoid copying the list</span>
+                <span class="k">return</span> <span class="n">all_tags</span> <span class="k">if</span> <span class="n">step</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">all_tags</span><span class="p">[::</span><span class="n">step</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># Have a stop value, get values until that point</span>
+                <span class="n">step1_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">takewhile</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="n">stop</span><span class="p">,</span> <span class="n">all_tags</span><span class="p">))</span>
+                <span class="k">return</span> <span class="n">step1_list</span> <span class="k">if</span> <span class="n">step</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">step1_list</span><span class="p">[::</span><span class="n">step</span><span class="p">]</span>
+
+        <span class="c1"># Have a non-None start value.  Find its index</span>
+        <span class="n">i_start</span> <span class="o">=</span> <span class="n">bisect_left</span><span class="p">(</span><span class="n">all_tags</span><span class="p">,</span> <span class="n">start</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">stop</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">stop</span> <span class="o">=</span> <span class="n">all_tags</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
-
-        <span class="c1"># Issue 92: if `stop` is None then 0xFFFFFFFF + 1 causes overflow in</span>
-        <span class="c1"># Tag. The only this occurs if the `stop` parameter value is None</span>
-        <span class="c1"># and the dataset contains an (0xFFFF, 0xFFFF) element</span>
-        <span class="n">start_tag</span> <span class="o">=</span> <span class="n">Tag</span><span class="p">(</span><span class="n">start</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">stop</span> <span class="o">==</span> <span class="mh">0x100000000</span><span class="p">:</span>
-            <span class="n">stop_tag_min1</span> <span class="o">=</span> <span class="n">Tag</span><span class="p">(</span><span class="n">stop</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
-            <span class="n">slice_tags</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="n">tag</span> <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">all_tags</span> <span class="k">if</span> <span class="n">start_tag</span> <span class="o">&lt;=</span> <span class="n">tag</span> <span class="o">&lt;=</span> <span class="n">stop_tag_min1</span>
-            <span class="p">]</span>
+            <span class="k">return</span> <span class="n">all_tags</span><span class="p">[</span><span class="n">i_start</span><span class="p">::</span><span class="n">step</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">stop_tag</span> <span class="o">=</span> <span class="n">Tag</span><span class="p">(</span><span class="n">stop</span><span class="p">)</span>
-            <span class="n">slice_tags</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="n">tag</span> <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">all_tags</span> <span class="k">if</span> <span class="n">start_tag</span> <span class="o">&lt;=</span> <span class="n">tag</span> <span class="o">&lt;</span> <span class="n">stop_tag</span>
-            <span class="p">]</span>
-
-        <span class="k">return</span> <span class="n">slice_tags</span><span class="p">[::</span><span class="n">step</span><span class="p">]</span>
+            <span class="n">i_stop</span> <span class="o">=</span> <span class="n">bisect_left</span><span class="p">(</span><span class="n">all_tags</span><span class="p">,</span> <span class="n">stop</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">all_tags</span><span class="p">[</span><span class="n">i_start</span><span class="p">:</span><span class="n">i_stop</span><span class="p">:</span><span class="n">step</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Handle str(dataset).&quot;&quot;&quot;</span>
