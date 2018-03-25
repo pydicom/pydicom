@@ -20,6 +20,8 @@ import io
 import os
 import os.path
 import sys
+from bisect import bisect_left
+from itertools import takewhile
 
 from pydicom import compat
 from pydicom.charset import default_encoding, convert_encodings
@@ -34,6 +36,7 @@ import pydicom  # for dcmwrite
 import pydicom.charset
 from pydicom.config import logger
 import pydicom.config
+
 have_numpy = True
 try:
     import numpy
@@ -534,10 +537,8 @@ class Dataset(dict):
         # If passed a slice, return a Dataset containing the corresponding
         #   DataElements
         if isinstance(key, slice):
-            ds = Dataset()
-            for tag in self._slice_dataset(key.start, key.stop, key.step):
-                ds.add(self[tag])
-            return ds
+            tags = self._slice_dataset(key.start, key.stop, key.step)
+            return Dataset({tag: self[tag] for tag in tags})
 
         if isinstance(key, BaseTag):
             tag = key
@@ -1068,38 +1069,35 @@ class Dataset(dict):
             The tags in the Dataset that meet the conditions of the slice.
         """
         # Check the starting/stopping Tags are valid when used
-        if start and Tag(start):
-            pass
-        if stop and Tag(stop):
-            pass
+        if start is not None:
+            start = Tag(start)
+        if stop is not None:
+            stop = Tag(stop)
 
         all_tags = sorted(self.keys())
         # If the Dataset is empty, return an empty list
         if not all_tags:
             return []
 
-        # Ensure we have valid Tags when start/stop are None
+        # Special case the common situations:
+        #   - start and/or stop are None
+        #   - step is 1
+
         if start is None:
-            start = all_tags[0]
+            if stop is None:
+                # For step=1 avoid copying the list
+                return all_tags if step == 1 else all_tags[::step]
+            else:  # Have a stop value, get values until that point
+                step1_list = list(takewhile(lambda x: x < stop, all_tags))
+                return step1_list if step == 1 else step1_list[::step]
+
+        # Have a non-None start value.  Find its index
+        i_start = bisect_left(all_tags, start)
         if stop is None:
-            stop = all_tags[-1] + 1
-
-        # Issue 92: if `stop` is None then 0xFFFFFFFF + 1 causes overflow in
-        # Tag. The only this occurs if the `stop` parameter value is None
-        # and the dataset contains an (0xFFFF, 0xFFFF) element
-        start_tag = Tag(start)
-        if stop == 0x100000000:
-            stop_tag_min1 = Tag(stop - 1)
-            slice_tags = [
-                tag for tag in all_tags if start_tag <= tag <= stop_tag_min1
-            ]
+            return all_tags[i_start::step]
         else:
-            stop_tag = Tag(stop)
-            slice_tags = [
-                tag for tag in all_tags if start_tag <= tag < stop_tag
-            ]
-
-        return slice_tags[::step]
+            i_stop = bisect_left(all_tags, stop)
+            return all_tags[i_start:i_stop:step]
 
     def __str__(self):
         """Handle str(dataset)."""
