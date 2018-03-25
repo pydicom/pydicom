@@ -393,15 +393,7 @@ def write_data_element(fp, data_element, encoding=default_encoding):
     buffer.is_little_endian = fp.is_little_endian
     buffer.is_implicit_VR = fp.is_implicit_VR
 
-    if not fp.is_implicit_VR and VR not in extra_length_VRs:
-        buffer.write_US(0)  # Explicit VR length field is only 2 bytes
-    else:
-        buffer.write_UL(
-            0xFFFFFFFF
-        )  # will fill in real length value later if not undefined length item
-
     encoding = convert_encodings(encoding)
-
     writer_function, writer_param = writers[VR]
     if VR in text_VRs:
         writer_function(buffer, data_element, encoding=encoding[1])
@@ -431,15 +423,15 @@ def write_data_element(fp, data_element, encoding=default_encoding):
                     not val.startswith(b'\xff\xfe\xe0\x00')):
                 raise ValueError('Pixel Data with undefined length must '
                                  'start with an item tag')
-    location = buffer.tell()
-    buffer.seek(0)
+
+    value_length = buffer.tell()
     if not fp.is_implicit_VR and VR not in extra_length_VRs:
-        buffer.write_US(location - 2)  # 2 is length of US
+        fp.write_US(value_length)  # Explicit VR length field is only 2 bytes
     else:
-        # write the proper length of the data_element back in the length slot,
+        # write the proper length of the data_element in the length slot,
         # unless is SQ with undefined length.
-        if not is_undefined_length:
-            buffer.write_UL(location - 4)  # 4 is length of UL
+        fp.write_UL(0xFFFFFFFF if is_undefined_length else value_length)
+
     fp.write(buffer.getvalue())
     if is_undefined_length:
         fp.write_tag(SequenceDelimiterTag)
