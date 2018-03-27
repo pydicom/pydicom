@@ -79,7 +79,10 @@ def get_pixeldata(dicom_dataset):
     # from two pieces of info:
     # dicom_dataset.PixelRepresentation -- 0 for unsigned, 1 for signed;
     # dicom_dataset.BitsAllocated -- 8, 16, or 32
-    if dicom_dataset.PixelRepresentation == 0:
+    if dicom_dataset.BitsAllocated == 1:
+        # single bits are used for representation of binary data
+        format_str = 'uint8'
+    elif dicom_dataset.PixelRepresentation == 0:
         format_str = 'uint{}'.format(dicom_dataset.BitsAllocated)
     elif dicom_dataset.PixelRepresentation == 1:
         format_str = 'int{}'.format(dicom_dataset.BitsAllocated)
@@ -101,7 +104,18 @@ def get_pixeldata(dicom_dataset):
 
     pixel_bytearray = dicom_dataset.PixelData
 
-    pixel_array = numpy.frombuffer(pixel_bytearray, dtype=numpy_dtype)
+    if dicom_dataset.BitsAllocated == 1:
+        # if single bits are used for binary representation, a uint8 array
+        # has to be converted to a binary-valued array (that is 8 times bigger)
+        try:
+            pixel_array = numpy.unpackbits(
+                numpy.frombuffer(pixel_bytearray, dtype='uint8'))
+        except NotImplementedError:
+            # PyPy2 does not implement numpy.unpackbits
+            raise NotImplementedError(
+                'Cannot handle BitsAllocated == 1 on this platform')
+    else:
+        pixel_array = numpy.frombuffer(pixel_bytearray, dtype=numpy_dtype)
     length_of_pixel_array = pixel_array.nbytes
     expected_length = dicom_dataset.Rows * dicom_dataset.Columns
     if ('NumberOfFrames' in dicom_dataset and
