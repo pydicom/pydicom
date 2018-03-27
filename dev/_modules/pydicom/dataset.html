@@ -670,7 +670,7 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">_character_set</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;The Dataset&#39;s SpecificCharacterSet value (if present).&quot;&quot;&quot;</span>
-        <span class="n">char_set</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;SpecificCharacterSet&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">char_set</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">BaseTag</span><span class="p">(</span><span class="mh">0x00080005</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">char_set</span><span class="p">:</span>
             <span class="n">char_set</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parent_encoding</span>
