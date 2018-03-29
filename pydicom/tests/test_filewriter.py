@@ -1027,11 +1027,6 @@ class TestWriteToStandard(object):
         """Test writing the dataset changes its file_meta."""
         ds = dcmread(rtplan_name)
         ref_ds = dcmread(rtplan_name)
-        # Ensure no RawDataElements in ref_ds
-        for elem in ref_ds.file_meta:
-            pass
-        for elem in ref_ds.iterall():
-            pass
         for ref_elem, test_elem in zip(ref_ds.file_meta, ds.file_meta):
             assert ref_elem == test_elem
 
@@ -1039,6 +1034,12 @@ class TestWriteToStandard(object):
         assert ref_ds.file_meta != ds.file_meta
         del ref_ds.file_meta
         del ds.file_meta
+
+        # Ensure no RawDataElements in ref_ds and ds
+        for elem in ref_ds:
+            pass
+        for elem in ds:
+            pass
         assert ref_ds == ds
 
     def test_transfer_syntax_added(self):
@@ -1385,11 +1386,6 @@ class TestWriteNonStandard(unittest.TestCase):
         """Test writing the dataset doesn't change it."""
         ds = dcmread(rtplan_name)
         ref_ds = dcmread(rtplan_name)
-        # Ensure no RawDataElements in ref_ds
-        for elem in ref_ds.file_meta:
-            pass
-        for elem in ref_ds.iterall():
-            pass
         ds.save_as(self.fp, write_like_original=True)
         self.assertTrue(ref_ds == ds)
 

@@ -132,6 +132,7 @@ class DataElement(object):
     descripWidth = 35
     maxBytesToDisplay = 16
     showVR = True
+    is_raw = False
 
     # Python 2: Classes which define __eq__
     # should flag themselves as unhashable
@@ -438,6 +439,7 @@ class DeferredDataElement(DataElement):
 
 msg = 'tag VR length value value_tell is_implicit_VR is_little_endian'
 RawDataElement = namedtuple('RawDataElement', msg)
+RawDataElement.is_raw = True
 
 
 def DataElement_from_raw(raw_data_element, encoding=None):

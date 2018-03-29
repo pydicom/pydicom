@@ -589,6 +589,10 @@ class Dataset(dict):
         -------
         pydicom.dataelem.DataElement
         """
+        if isinstance(key, slice):
+            tags = self._slice_dataset(key.start, key.stop, key.step)
+            return Dataset({tag: self.get_item(tag) for tag in tags})
+
         if isinstance(key, BaseTag):
             tag = key
         else:
@@ -635,6 +639,24 @@ class Dataset(dict):
         taglist = sorted(self.keys())
         for tag in taglist:
             yield self[tag]
+
+    def raw(self):
+        """Iterate through the top-level of the Dataset, yielding DataElements
+        or RawDataElements (no convertion done).
+
+        >>> for elem in ds.raw():
+        >>>     print(elem)
+
+        The elements are returned in the same way as in __getitem__.
+
+        Yields
+        ------
+        pydicom.dataelem.DataElement or pydicom.dataelem.RawDataElement
+            The Dataset's DataElements, sorted by increasing tag order.
+        """
+        taglist = sorted(self.keys())
+        for tag in taglist:
+            yield self.get_item(tag)
 
     def _is_uncompressed_transfer_syntax(self):
         """Return True if the TransferSyntaxUID is not a compressed syntax."""
@@ -1043,7 +1065,7 @@ class Dataset(dict):
             private_block = tag.elem >> 8
             private_creator_tag = Tag(tag.group, private_block)
             if private_creator_tag in self and tag != private_creator_tag:
-                if isinstance(data_element, RawDataElement):
+                if data_element.is_raw:
                     data_element = DataElement_from_raw(
                         data_element, self._character_set)
                 data_element.private_creator = self[private_creator_tag].value
