@@ -203,7 +203,7 @@ dicom.filereader, but is also imported when the pydicom package is imported:</p>
 All are documented below:</p>
 <dl class="function">
 <dt id="pydicom.filereader.dcmread">
-<code class="descclassname">pydicom.filereader.</code><code class="descname">dcmread</code><span class="sig-paren">(</span><em>fp</em>, <em>defer_size=None</em>, <em>stop_before_pixels=False</em>, <em>force=False</em>, <em>specific_tags=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/filereader.html#dcmread"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a0c8744/pydicom/filereader.py#L781"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filereader.dcmread" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pydicom.filereader.</code><code class="descname">dcmread</code><span class="sig-paren">(</span><em>fp</em>, <em>defer_size=None</em>, <em>stop_before_pixels=False</em>, <em>force=False</em>, <em>specific_tags=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/filereader.html#dcmread"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/6bc2ec6/pydicom/filereader.py#L781"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filereader.dcmread" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read and parse a DICOM dataset stored in the DICOM File Format.</p>
 <p>Read a DICOM dataset stored in accordance with the DICOM File Format
 (DICOM Standard Part 10 Section 7). If the dataset is not stored in
@@ -215,47 +215,46 @@ set <cite>force</cite> to True.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>fp</strong> : str or file-like</p>
-<blockquote>
-<div><p>Either a file-like object, or a string containing the file name. If a
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>fp</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str or file-like</span></dt>
+<dd><p class="first last">Either a file-like object, or a string containing the file name. If a
 file-like object, the caller is responsible for closing it.</p>
-</div></blockquote>
-<p><strong>defer_size</strong> : int or str or None</p>
-<blockquote>
-<div><p>If None (default), all elements read into memory. If specified, then if
+</dd>
+<dt><strong>defer_size</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int or str or None</span></dt>
+<dd><p class="first last">If None (default), all elements read into memory. If specified, then if
 a data element’s stored value is larger than <cite>defer_size</cite>, the value is
 not read into memory until it is accessed in code. Specify an integer
 (bytes), or a string value with units, e.g. “512 KB”, “2 MB”.</p>
-</div></blockquote>
-<p><strong>stop_before_pixels</strong> : bool</p>
-<blockquote>
-<div><p>If False (default), the full file will be read and parsed. Set True to
+</dd>
+<dt><strong>stop_before_pixels</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
+<dd><p class="first last">If False (default), the full file will be read and parsed. Set True to
 stop before reading (7FE0,0010) ‘Pixel Data’ (and all subsequent
 elements).</p>
-</div></blockquote>
-<p><strong>force</strong> : bool</p>
-<blockquote>
-<div><p>If False (default), raises an InvalidDicomError if the file is missing
+</dd>
+<dt><strong>force</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
+<dd><p class="first last">If False (default), raises an InvalidDicomError if the file is missing
 the File Meta Information header. Set to True to force reading even if
 no File Meta Information header is found.</p>
-</div></blockquote>
-<p><strong>specific_tags</strong> : list or None</p>
-<blockquote>
-<div><p>If not None, only the tags in the list are returned. The list
+</dd>
+<dt><strong>specific_tags</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list or None</span></dt>
+<dd><p class="first last">If not None, only the tags in the list are returned. The list
 elements can be tags or tag names.</p>
-</div></blockquote>
+</dd>
+</dl>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">FileDataset</p>
-<blockquote>
-<div><p>An instance of FileDataset that represents a parsed DICOM file.</p>
-</div></blockquote>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>FileDataset</strong></dt>
+<dd><p class="first last">An instance of FileDataset that represents a parsed DICOM file.</p>
+</dd>
+</dl>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>InvalidDicomError</strong></p>
-<blockquote class="last">
-<div><p>If <cite>force</cite> is True and the file is not a valid DICOM file.</p>
-</div></blockquote>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>InvalidDicomError</strong></dt>
+<dd><p class="first last">If <cite>force</cite> is True and the file is not a valid DICOM file.</p>
+</dd>
+</dl>
 </td>
 </tr>
 </tbody>
@@ -283,35 +282,35 @@ elements can be tags or tag names.</p>
 
 <dl class="function">
 <dt id="pydicom.filereader.read_partial">
-<code class="descclassname">pydicom.filereader.</code><code class="descname">read_partial</code><span class="sig-paren">(</span><em>fileobj</em>, <em>stop_when=None</em>, <em>defer_size=None</em>, <em>force=False</em>, <em>specific_tags=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/filereader.html#read_partial"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a0c8744/pydicom/filereader.py#L655"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filereader.read_partial" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pydicom.filereader.</code><code class="descname">read_partial</code><span class="sig-paren">(</span><em>fileobj</em>, <em>stop_when=None</em>, <em>defer_size=None</em>, <em>force=False</em>, <em>specific_tags=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/filereader.html#read_partial"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/6bc2ec6/pydicom/filereader.py#L655"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filereader.read_partial" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parse a DICOM file until a condition is met.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>fileobj</strong> : a file-like object</p>
-<blockquote>
-<div><p>Note that the file will not close when the function returns.</p>
-</div></blockquote>
-<p><strong>stop_when :</strong></p>
-<blockquote>
-<div><p>Stop condition. See <code class="docutils literal notranslate"><span class="pre">read_dataset</span></code> for more info.</p>
-</div></blockquote>
-<p><strong>defer_size</strong> : int, str, None, optional</p>
-<blockquote>
-<div><p>See <code class="docutils literal notranslate"><span class="pre">dcmread</span></code> for parameter info.</p>
-</div></blockquote>
-<p><strong>force</strong> : boolean</p>
-<blockquote>
-<div><p>See <code class="docutils literal notranslate"><span class="pre">dcmread</span></code> for parameter info.</p>
-</div></blockquote>
-<p><strong>specific_tags</strong> : list or None</p>
-<blockquote>
-<div><p>See <code class="docutils literal notranslate"><span class="pre">dcmread</span></code> for parameter info.</p>
-</div></blockquote>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>fileobj</strong> <span class="classifier-delimiter">:</span> <span class="classifier">a file-like object</span></dt>
+<dd><p class="first last">Note that the file will not close when the function returns.</p>
+</dd>
+<dt><strong>stop_when :</strong></dt>
+<dd><p class="first last">Stop condition. See <code class="docutils literal notranslate"><span class="pre">read_dataset</span></code> for more info.</p>
+</dd>
+<dt><strong>defer_size</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int, str, None, optional</span></dt>
+<dd><p class="first last">See <code class="docutils literal notranslate"><span class="pre">dcmread</span></code> for parameter info.</p>
+</dd>
+<dt><strong>force</strong> <span class="classifier-delimiter">:</span> <span class="classifier">boolean</span></dt>
+<dd><p class="first last">See <code class="docutils literal notranslate"><span class="pre">dcmread</span></code> for parameter info.</p>
+</dd>
+<dt><strong>specific_tags</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list or None</span></dt>
+<dd><p class="first last">See <code class="docutils literal notranslate"><span class="pre">dcmread</span></code> for parameter info.</p>
+</dd>
+</dl>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">FileDataset instance or DicomDir instance.</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>FileDataset instance or DicomDir instance.</strong></dt>
+<dd></dd>
+</dl>
 </td>
 </tr>
 </tbody>
@@ -336,7 +335,7 @@ The first is to use <code class="docutils literal notranslate"><span class="pre"
 The second is to use the <code class="docutils literal notranslate"><span class="pre">save_as</span></code> method on an Dataset instance.</p>
 <dl class="function">
 <dt id="pydicom.filewriter.write_file">
-<code class="descclassname">pydicom.filewriter.</code><code class="descname">write_file</code><span class="sig-paren">(</span><em>filename</em>, <em>dataset</em>, <em>write_like_original=True</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a0c8744/pydicom/filewriter.py#L649"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filewriter.write_file" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pydicom.filewriter.</code><code class="descname">write_file</code><span class="sig-paren">(</span><em>filename</em>, <em>dataset</em>, <em>write_like_original=True</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/6bc2ec6/pydicom/filewriter.py#L649"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filewriter.write_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write <cite>dataset</cite> to the <cite>filename</cite> specified.</p>
 <p>If <cite>write_like_original</cite> is True then <cite>dataset</cite> will be written as is
 (after minimal validation checking) and may or may not contain all or parts
@@ -350,18 +349,16 @@ Meta Information.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename</strong> : str or file-like</p>
-<blockquote>
-<div><p>Name of file or the file-like to write the new DICOM file to.</p>
-</div></blockquote>
-<p><strong>dataset</strong> : pydicom.dataset.FileDataset</p>
-<blockquote>
-<div><p>Dataset holding the DICOM information; e.g. an object read with
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>filename</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str or file-like</span></dt>
+<dd><p class="first last">Name of file or the file-like to write the new DICOM file to.</p>
+</dd>
+<dt><strong>dataset</strong> <span class="classifier-delimiter">:</span> <span class="classifier">pydicom.dataset.FileDataset</span></dt>
+<dd><p class="first last">Dataset holding the DICOM information; e.g. an object read with
 pydicom.dcmread().</p>
-</div></blockquote>
-<p><strong>write_like_original</strong> : bool</p>
-<blockquote class="last">
-<div><p>If True (default), preserves the following information from
+</dd>
+<dt><strong>write_like_original</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
+<dd><p class="first">If True (default), preserves the following information from
 the Dataset (and may result in a non-conformant file):
 - preamble – if the original file has no preamble then none will be</p>
 <blockquote>
@@ -387,9 +384,10 @@ what the original had.</dd>
 </dl>
 </li>
 </ul>
-<p>If False, produces a file conformant with the DICOM File Format, with
+<p class="last">If False, produces a file conformant with the DICOM File Format, with
 explicit lengths for all elements.</p>
-</div></blockquote>
+</dd>
+</dl>
 </td>
 </tr>
 </tbody>
@@ -407,7 +405,7 @@ explicit lengths for all elements.</p>
 
 <dl class="method">
 <dt id="pydicom.dataset.Dataset.save_as">
-<code class="descclassname">Dataset.</code><code class="descname">save_as</code><span class="sig-paren">(</span><em>filename</em>, <em>write_like_original=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.save_as"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a0c8744/pydicom/dataset.py#L904"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.save_as" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">Dataset.</code><code class="descname">save_as</code><span class="sig-paren">(</span><em>filename</em>, <em>write_like_original=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.save_as"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/6bc2ec6/pydicom/dataset.py#L904"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.save_as" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write the Dataset to <cite>filename</cite>.</p>
 <p>Saving a Dataset requires that the Dataset.is_implicit_VR and
 Dataset.is_little_endian attributes exist and are set appropriately. If
@@ -417,13 +415,12 @@ a consistent value to ensure conformance.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename</strong> : str or file-like</p>
-<blockquote>
-<div><p>Name of file or the file-like to write the new DICOM file to.</p>
-</div></blockquote>
-<p><strong>write_like_original</strong> : bool</p>
-<blockquote class="last">
-<div><p>If True (default), preserves the following information from
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>filename</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str or file-like</span></dt>
+<dd><p class="first last">Name of file or the file-like to write the new DICOM file to.</p>
+</dd>
+<dt><strong>write_like_original</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
+<dd><p class="first">If True (default), preserves the following information from
 the Dataset (and may result in a non-conformant file):
 - preamble – if the original file has no preamble then none will</p>
 <blockquote>
@@ -450,9 +447,10 @@ what the original had.</dd>
 </dl>
 </li>
 </ul>
-<p>If False, produces a file conformant with the DICOM File Format,
+<p class="last">If False, produces a file conformant with the DICOM File Format,
 with explicit lengths for all elements.</p>
-</div></blockquote>
+</dd>
+</dl>
 </td>
 </tr>
 </tbody>
@@ -475,7 +473,7 @@ with explicit lengths for all elements.</p>
 <h2>Dataset<a class="headerlink" href="#dataset" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="pydicom.dataset.Dataset">
-<em class="property">class </em><code class="descclassname">pydicom.dataset.</code><code class="descname">Dataset</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a0c8744/pydicom/dataset.py#L55"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">pydicom.dataset.</code><code class="descname">Dataset</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/6bc2ec6/pydicom/dataset.py#L55"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>A collection (dictionary) of DICOM DataElements.</p>
 <p class="rubric">Examples</p>
 <p>Add DataElements to the Dataset (for elements in the DICOM dictionary).
@@ -537,21 +535,23 @@ True</p>
 &gt;&gt;&gt;             [recurse(item) for item in elem]
 &gt;&gt;&gt;         else:
 &gt;&gt;&gt;             # Do something useful with each DataElement</p>
-<p class="rubric">Attributes</p>
-<table border="1" class="docutils">
-<colgroup>
-<col width="28%" />
-<col width="72%" />
-</colgroup>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
 <tbody valign="top">
-<tr class="row-odd"><td><strong>default_element_format</strong></td>
-<td>(str) The default formatting for string display.</td>
-</tr>
-<tr class="row-even"><td><strong>default_sequence_element_format</strong></td>
-<td>(str) The default formatting for string display of sequences.</td>
-</tr>
-<tr class="row-odd"><td><strong>indent_chars</strong></td>
-<td>(str) For string display, the characters used to indent nested Sequences. Default is ”   “.</td>
+<tr class="field-odd field"><th class="field-name">Attributes:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>default_element_format</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first last">The default formatting for string display.</p>
+</dd>
+<dt><strong>default_sequence_element_format</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first last">The default formatting for string display of sequences.</p>
+</dd>
+<dt><strong>indent_chars</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first last">For string display, the characters used to indent nested Sequences.
+Default is ”   “.</p>
+</dd>
+</dl>
+</td>
 </tr>
 </tbody>
 </table>
@@ -596,7 +596,7 @@ True</p>
 <td>Returns a new dict with keys from iterable and values equal to value.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#pydicom.dataset.Dataset.get" title="pydicom.dataset.Dataset.get"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get</span></code></a>(key[,&nbsp;default])</td>
-<td>Extend dict.</td>
+<td>Extend dict.get() to handle DICOM DataElement keywords.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#pydicom.dataset.Dataset.get_item" title="pydicom.dataset.Dataset.get_item"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_item</span></code></a>(key)</td>
 <td>Return the raw data element if possible.</td>
@@ -635,7 +635,7 @@ True</p>
 <td>Return a list of valid names for auto-completion code.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#pydicom.dataset.Dataset.update" title="pydicom.dataset.Dataset.update"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code></a>(dictionary)</td>
-<td>Extend dict.</td>
+<td>Extend dict.update() to handle DICOM keywords.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#pydicom.dataset.Dataset.values" title="pydicom.dataset.Dataset.values"><code class="xref py py-obj docutils literal notranslate"><span class="pre">values</span></code></a>()</td>
 <td></td>
@@ -647,17 +647,18 @@ True</p>
 </table>
 <dl class="method">
 <dt id="pydicom.dataset.Dataset.add">
-<code class="descname">add</code><span class="sig-paren">(</span><em>data_element</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.add"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a0c8744/pydicom/dataset.py#L161"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.add" title="Permalink to this definition">¶</a></dt>
+<code class="descname">add</code><span class="sig-paren">(</span><em>data_element</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.add"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/6bc2ec6/pydicom/dataset.py#L161"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.add" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a DataElement to the Dataset.</p>
 <p>Equivalent to ds[data_element.tag] = data_element</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>data_element</strong> : pydicom.dataelem.DataElement</p>
-<blockquote class="last">
-<div><p>The DataElement to add to the Dataset.</p>
-</div></blockquote>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>data_element</strong> <span class="classifier-delimiter">:</span> <span class="classifier">pydicom.dataelem.DataElement</span></dt>
+<dd><p class="first last">The DataElement to add to the Dataset.</p>
+</dd>
+</dl>
 </td>
 </tr>
 </tbody>
@@ -666,31 +667,30 @@ True</p>
 
 <dl class="method">
 <dt id="pydicom.dataset.Dataset.add_new">
-<code class="descname">add_new</code><span class="sig-paren">(</span><em>tag</em>, <em>VR</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.add_new"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a0c8744/pydicom/dataset.py#L173"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.add_new" title="Permalink to this definition">¶</a></dt>
+<code class="descname">add_new</code><span class="sig-paren">(</span><em>tag</em>, <em>VR</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.add_new"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/6bc2ec6/pydicom/dataset.py#L173"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.add_new" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a DataElement to the Dataset.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>tag</strong></p>
-<blockquote>
-<div><p>The DICOM (group, element) tag in any form accepted by
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>tag</strong></dt>
+<dd><p class="first last">The DICOM (group, element) tag in any form accepted by
 pydicom.tag.Tag such as [0x0010, 0x0010], (0x10, 0x10), 0x00100010,
 etc.</p>
-</div></blockquote>
-<p><strong>VR</strong> : str</p>
-<blockquote>
-<div><p>The 2 character DICOM value representation (see DICOM standard part
+</dd>
+<dt><strong>VR</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first last">The 2 character DICOM value representation (see DICOM standard part
 5, Section 6.2).</p>
-</div></blockquote>
-<p><strong>value</strong></p>
-<blockquote class="last">
-<div><p>The value of the data element. One of the following:
+</dd>
+<dt><strong>value</strong></dt>
+<dd><p class="first last">The value of the data element. One of the following:
 * a single string or number
 * a list or tuple with all strings or all numbers
 * a multi-value string with backslash separator
 * for a sequence DataElement, an empty list or list of Dataset</p>
-</div></blockquote>
+</dd>
+</dl>
 </td>
 </tr>
 </tbody>
@@ -704,18 +704,21 @@ etc.</p>
 
 <dl class="method">
 <dt id="pydicom.dataset.Dataset.convert_pixel_data">
-<code class="descname">convert_pixel_data</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.convert_pixel_data"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a0c8744/pydicom/dataset.py#L701"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.convert_pixel_data" title="Permalink to this definition">¶</a></dt>
+<code class="descname">convert_pixel_data</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.convert_pixel_data"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/6bc2ec6/pydicom/dataset.py#L701"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.convert_pixel_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert the Pixel Data to a numpy array internally.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">None</p>
-<blockquote>
-<div><p>Converted pixel data is stored internally in the dataset.</p>
-</div></blockquote>
-<p>If a compressed image format, the image is  decompressed,</p>
-<p class="last">and any related data elements are changed accordingly.</p>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>None</strong></dt>
+<dd><p class="first last">Converted pixel data is stored internally in the dataset.</p>
+</dd>
+<dt><strong>If a compressed image format, the image is  decompressed,</strong></dt>
+<dd></dd>
+<dt><strong>and any related data elements are changed accordingly.</strong></dt>
+<dd></dd>
+</dl>
 </td>
 </tr>
 </tbody>
@@ -729,23 +732,25 @@ etc.</p>
 
 <dl class="method">
 <dt id="pydicom.dataset.Dataset.data_element">
-<code class="descname">data_element</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.data_element"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a0c8744/pydicom/dataset.py#L196"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.data_element" title="Permalink to this definition">¶</a></dt>
+<code class="descname">data_element</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.data_element"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/6bc2ec6/pydicom/dataset.py#L196"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.data_element" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the DataElement corresponding to the element keyword <cite>name</cite>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>name</strong> : str</p>
-<blockquote>
-<div><p>A DICOM element keyword.</p>
-</div></blockquote>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>name</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first last">A DICOM element keyword.</p>
+</dd>
+</dl>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">pydicom.dataelem.DataElement or None</p>
-<blockquote class="last">
-<div><p>For the given DICOM element <cite>keyword</cite>, return the corresponding
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>pydicom.dataelem.DataElement or None</strong></dt>
+<dd><p class="first last">For the given DICOM element <cite>keyword</cite>, return the corresponding
 Dataset DataElement if present, None otherwise.</p>
-</div></blockquote>
+</dd>
+</dl>
 </td>
 </tr>
 </tbody>
@@ -754,14 +759,14 @@ Dataset DataElement if present, None otherwise.</p>
 
 <dl class="method">
 <dt id="pydicom.dataset.Dataset.decode">
-<code class="descname">decode</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.decode"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a0c8744/pydicom/dataset.py#L247"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.decode" title="Permalink to this definition">¶</a></dt>
+<code class="descname">decode</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.decode"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/6bc2ec6/pydicom/dataset.py#L247"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.decode" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply character set decoding to all DataElements in the Dataset.</p>
 <p>See DICOM PS3.5-2008 6.1.1.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="pydicom.dataset.Dataset.decompress">
-<code class="descname">decompress</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.decompress"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a0c8744/pydicom/dataset.py#L755"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.decompress" title="Permalink to this definition">¶</a></dt>
+<code class="descname">decompress</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.decompress"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/6bc2ec6/pydicom/dataset.py#L755"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.decompress" title="Permalink to this definition">¶</a></dt>
 <dd><p>Decompresses pixel data and modifies the Dataset in-place</p>
 <p>If not a compressed tranfer syntax, then pixel data is converted
 to a numpy array internally, but not returned.</p>
@@ -777,14 +782,18 @@ and internal state is updated appropriately:</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">None</p>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>None</strong></dt>
+<dd></dd>
+</dl>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>NotImplementedError</strong></p>
-<blockquote class="last">
-<div><p>If the pixel data was originally compressed but file is not
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>NotImplementedError</strong></dt>
+<dd><p class="first last">If the pixel data was originally compressed but file is not
 ExplicitVR LittleEndian as required by Dicom standard</p>
-</div></blockquote>
+</dd>
+</dl>
 </td>
 </tr>
 </tbody>
@@ -793,7 +802,7 @@ ExplicitVR LittleEndian as required by Dicom standard</p>
 
 <dl class="method">
 <dt id="pydicom.dataset.Dataset.dir">
-<code class="descname">dir</code><span class="sig-paren">(</span><em>*filters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.dir"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a0c8744/pydicom/dataset.py#L356"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.dir" title="Permalink to this definition">¶</a></dt>
+<code class="descname">dir</code><span class="sig-paren">(</span><em>*filters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.dir"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/6bc2ec6/pydicom/dataset.py#L356"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.dir" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return an alphabetical list of DataElement keywords in the Dataset.</p>
 <p>Intended mainly for use in interactive Python sessions. Only lists the
 DataElement keywords in the current level of the Dataset (i.e. the
@@ -802,18 +811,20 @@ contents of any Sequence elements are ignored).</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filters</strong> : str</p>
-<blockquote>
-<div><p>Zero or more string arguments to the function. Used for
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>filters</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first last">Zero or more string arguments to the function. Used for
 case-insensitive match to any part of the DICOM keyword.</p>
-</div></blockquote>
+</dd>
+</dl>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">list of str</p>
-<blockquote class="last">
-<div><p>The matching DataElement keywords in the dataset. If no filters are
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>list of str</strong></dt>
+<dd><p class="first last">The matching DataElement keywords in the dataset. If no filters are
 used then all DataElement keywords are returned.</p>
-</div></blockquote>
+</dd>
+</dl>
 </td>
 </tr>
 </tbody>
@@ -822,34 +833,34 @@ used then all DataElement keywords are returned.</p>
 
 <dl class="method">
 <dt id="pydicom.dataset.Dataset.formatted_lines">
-<code class="descname">formatted_lines</code><span class="sig-paren">(</span><em>element_format='%(tag)s %(name)-35.35s %(VR)s: %(repval)s'</em>, <em>sequence_element_format='%(tag)s %(name)-35.35s %(VR)s: %(repval)s'</em>, <em>indent_format=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.formatted_lines"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a0c8744/pydicom/dataset.py#L814"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.formatted_lines" title="Permalink to this definition">¶</a></dt>
+<code class="descname">formatted_lines</code><span class="sig-paren">(</span><em>element_format='%(tag)s %(name)-35.35s %(VR)s: %(repval)s'</em>, <em>sequence_element_format='%(tag)s %(name)-35.35s %(VR)s: %(repval)s'</em>, <em>indent_format=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.formatted_lines"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/6bc2ec6/pydicom/dataset.py#L814"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.formatted_lines" title="Permalink to this definition">¶</a></dt>
 <dd><p>Iterate through the Dataset yielding formatted str for each element.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>element_format</strong> : str</p>
-<blockquote>
-<div><p>The string format to use for non-sequence elements. Formatting uses
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>element_format</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first last">The string format to use for non-sequence elements. Formatting uses
 the attributes of DataElement. Default is
 “%(tag)s %(name)-35.35s %(VR)s: %(repval)s”.</p>
-</div></blockquote>
-<p><strong>sequence_element_format</strong> : str</p>
-<blockquote>
-<div><p>The string format to use for sequence elements. Formatting uses
+</dd>
+<dt><strong>sequence_element_format</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first last">The string format to use for sequence elements. Formatting uses
 the attributes of DataElement. Default is
 “%(tag)s %(name)-35.35s %(VR)s: %(repval)s”</p>
-</div></blockquote>
-<p><strong>indent_format</strong> : str or None</p>
-<blockquote>
-<div><p>Placeholder for future functionality.</p>
-</div></blockquote>
+</dd>
+<dt><strong>indent_format</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str or None</span></dt>
+<dd><p class="first last">Placeholder for future functionality.</p>
+</dd>
+</dl>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><p class="first">str</p>
-<blockquote class="last">
-<div><p>A string representation of a DataElement.</p>
-</div></blockquote>
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>str</strong></dt>
+<dd><p class="first last">A string representation of a DataElement.</p>
+</dd>
+</dl>
 </td>
 </tr>
 </tbody>
@@ -864,37 +875,36 @@ the attributes of DataElement. Default is
 
 <dl class="method">
 <dt id="pydicom.dataset.Dataset.get">
-<code class="descname">get</code><span class="sig-paren">(</span><em>key</em>, <em>default=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.get"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a0c8744/pydicom/dataset.py#L416"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.get" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get</code><span class="sig-paren">(</span><em>key</em>, <em>default=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.get"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/6bc2ec6/pydicom/dataset.py#L416"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.get" title="Permalink to this definition">¶</a></dt>
 <dd><p>Extend dict.get() to handle DICOM DataElement keywords.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>key</strong> : str or pydicom.tag.Tag</p>
-<blockquote>
-<div><p>The element keyword or Tag or the class attribute name to get.</p>
-</div></blockquote>
-<p><strong>default</strong> : obj or None</p>
-<blockquote>
-<div><p>If the DataElement or class attribute is not present, return
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>key</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str or pydicom.tag.Tag</span></dt>
+<dd><p class="first last">The element keyword or Tag or the class attribute name to get.</p>
+</dd>
+<dt><strong>default</strong> <span class="classifier-delimiter">:</span> <span class="classifier">obj or None</span></dt>
+<dd><p class="first last">If the DataElement or class attribute is not present, return
 <cite>default</cite> (default None).</p>
-</div></blockquote>
+</dd>
+</dl>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">value</p>
-<blockquote>
-<div><p>If <cite>key</cite> is the keyword for a DataElement in the Dataset then
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>value</strong></dt>
+<dd><p class="first last">If <cite>key</cite> is the keyword for a DataElement in the Dataset then
 return the DataElement’s value.</p>
-</div></blockquote>
-<p>pydicom.dataelem.DataElement</p>
-<blockquote>
-<div><p>If <cite>key</cite> is a tag for a DataElement in the Dataset then return the
+</dd>
+<dt><strong>pydicom.dataelem.DataElement</strong></dt>
+<dd><p class="first last">If <cite>key</cite> is a tag for a DataElement in the Dataset then return the
 DataElement instance.</p>
-</div></blockquote>
-<p>value</p>
-<blockquote class="last">
-<div><p>If <cite>key</cite> is a class attribute then return its value.</p>
-</div></blockquote>
+</dd>
+<dt><strong>value</strong></dt>
+<dd><p class="first last">If <cite>key</cite> is a class attribute then return its value.</p>
+</dd>
+</dl>
 </td>
 </tr>
 </tbody>
@@ -903,7 +913,7 @@ DataElement instance.</p>
 
 <dl class="method">
 <dt id="pydicom.dataset.Dataset.get_item">
-<code class="descname">get_item</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.get_item"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a0c8744/pydicom/dataset.py#L574"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.get_item" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_item</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.get_item"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/6bc2ec6/pydicom/dataset.py#L574"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.get_item" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the raw data element if possible.</p>
 <p>It will be raw if the user has never accessed the value, or set their
 own value. Note if the data element is a deferred-read element,
@@ -912,15 +922,19 @@ then it is read and converted before being returned.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>key</strong></p>
-<blockquote>
-<div><p>The DICOM (group, element) tag in any form accepted by
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>key</strong></dt>
+<dd><p class="first last">The DICOM (group, element) tag in any form accepted by
 pydicom.tag.Tag such as [0x0010, 0x0010], (0x10, 0x10), 0x00100010,
 etc.</p>
-</div></blockquote>
+</dd>
+</dl>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">pydicom.dataelem.DataElement</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>pydicom.dataelem.DataElement</strong></dt>
+<dd></dd>
+</dl>
 </td>
 </tr>
 </tbody>
@@ -929,22 +943,24 @@ etc.</p>
 
 <dl class="method">
 <dt id="pydicom.dataset.Dataset.group_dataset">
-<code class="descname">group_dataset</code><span class="sig-paren">(</span><em>group</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.group_dataset"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a0c8744/pydicom/dataset.py#L602"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.group_dataset" title="Permalink to this definition">¶</a></dt>
+<code class="descname">group_dataset</code><span class="sig-paren">(</span><em>group</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.group_dataset"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/6bc2ec6/pydicom/dataset.py#L602"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.group_dataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a Dataset containing only DataElements of a certain group.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>group</strong> : int</p>
-<blockquote>
-<div><p>The group part of a DICOM (group, element) tag.</p>
-</div></blockquote>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>group</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd><p class="first last">The group part of a DICOM (group, element) tag.</p>
+</dd>
+</dl>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">pydicom.dataset.Dataset</p>
-<blockquote class="last">
-<div><p>A dataset instance containing elements of the group specified.</p>
-</div></blockquote>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>pydicom.dataset.Dataset</strong></dt>
+<dd><p class="first last">A dataset instance containing elements of the group specified.</p>
+</dd>
+</dl>
 </td>
 </tr>
 </tbody>
@@ -958,7 +974,7 @@ etc.</p>
 
 <dl class="method">
 <dt id="pydicom.dataset.Dataset.iterall">
-<code class="descname">iterall</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.iterall"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a0c8744/pydicom/dataset.py#L1126"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.iterall" title="Permalink to this definition">¶</a></dt>
+<code class="descname">iterall</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.iterall"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/6bc2ec6/pydicom/dataset.py#L1126"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.iterall" title="Permalink to this definition">¶</a></dt>
 <dd><p>Iterate through the Dataset, yielding all DataElements.</p>
 <p>Unlike Dataset.__iter__, this <em>does</em> recurse into sequences,
 and so returns all data elements as if the file were “flattened”.</p>
@@ -966,7 +982,11 @@ and so returns all data elements as if the file were “flattened”.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Yields:</th><td class="field-body">pydicom.dataelem.DataElement</td>
+<tr class="field-odd field"><th class="field-name">Yields:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>pydicom.dataelem.DataElement</strong></dt>
+<dd></dd>
+</dl>
+</td>
 </tr>
 </tbody>
 </table>
@@ -985,10 +1005,11 @@ and so returns all data elements as if the file were “flattened”.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">numpy.ndarray</p>
-<blockquote class="last">
-<div><p>The Pixel Data (7FE0,0010) as a NumPy ndarray.</p>
-</div></blockquote>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>numpy.ndarray</strong></dt>
+<dd><p class="first last">The Pixel Data (7FE0,0010) as a NumPy ndarray.</p>
+</dd>
+</dl>
 </td>
 </tr>
 </tbody>
@@ -1009,13 +1030,13 @@ and so returns all data elements as if the file were “flattened”.</p>
 
 <dl class="method">
 <dt id="pydicom.dataset.Dataset.remove_private_tags">
-<code class="descname">remove_private_tags</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.remove_private_tags"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a0c8744/pydicom/dataset.py#L893"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.remove_private_tags" title="Permalink to this definition">¶</a></dt>
+<code class="descname">remove_private_tags</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.remove_private_tags"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/6bc2ec6/pydicom/dataset.py#L893"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.remove_private_tags" title="Permalink to this definition">¶</a></dt>
 <dd><p>Remove all private DataElements in the Dataset.</p>
 </dd></dl>
 
 <dl class="method">
 <dt>
-<code class="descname">save_as</code><span class="sig-paren">(</span><em>filename</em>, <em>write_like_original=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.save_as"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a0c8744/pydicom/dataset.py#L904"><span class="viewcode-link">[source]</span></a></dt>
+<code class="descname">save_as</code><span class="sig-paren">(</span><em>filename</em>, <em>write_like_original=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.save_as"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/6bc2ec6/pydicom/dataset.py#L904"><span class="viewcode-link">[source]</span></a></dt>
 <dd><p>Write the Dataset to <cite>filename</cite>.</p>
 <p>Saving a Dataset requires that the Dataset.is_implicit_VR and
 Dataset.is_little_endian attributes exist and are set appropriately. If
@@ -1025,13 +1046,12 @@ a consistent value to ensure conformance.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename</strong> : str or file-like</p>
-<blockquote>
-<div><p>Name of file or the file-like to write the new DICOM file to.</p>
-</div></blockquote>
-<p><strong>write_like_original</strong> : bool</p>
-<blockquote class="last">
-<div><p>If True (default), preserves the following information from
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>filename</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str or file-like</span></dt>
+<dd><p class="first last">Name of file or the file-like to write the new DICOM file to.</p>
+</dd>
+<dt><strong>write_like_original</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
+<dd><p class="first">If True (default), preserves the following information from
 the Dataset (and may result in a non-conformant file):
 - preamble – if the original file has no preamble then none will</p>
 <blockquote>
@@ -1058,9 +1078,10 @@ what the original had.</dd>
 </dl>
 </li>
 </ul>
-<p>If False, produces a file conformant with the DICOM File Format,
+<p class="last">If False, produces a file conformant with the DICOM File Format,
 with explicit lengths for all elements.</p>
-</div></blockquote>
+</dd>
+</dl>
 </td>
 </tr>
 </tbody>
@@ -1085,13 +1106,13 @@ with explicit lengths for all elements.</p>
 
 <dl class="method">
 <dt id="pydicom.dataset.Dataset.top">
-<code class="descname">top</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.top"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a0c8744/pydicom/dataset.py#L1106"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.top" title="Permalink to this definition">¶</a></dt>
+<code class="descname">top</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.top"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/6bc2ec6/pydicom/dataset.py#L1106"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.top" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a str of the Dataset’s top level DataElements only.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="pydicom.dataset.Dataset.trait_names">
-<code class="descname">trait_names</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.trait_names"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a0c8744/pydicom/dataset.py#L1110"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.trait_names" title="Permalink to this definition">¶</a></dt>
+<code class="descname">trait_names</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.trait_names"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/6bc2ec6/pydicom/dataset.py#L1110"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.trait_names" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a list of valid names for auto-completion code.</p>
 <p>Used in IPython, so that data element names can be found and offered
 for autocompletion on the IPython command line.</p>
@@ -1099,7 +1120,7 @@ for autocompletion on the IPython command line.</p>
 
 <dl class="method">
 <dt id="pydicom.dataset.Dataset.update">
-<code class="descname">update</code><span class="sig-paren">(</span><em>dictionary</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.update"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a0c8744/pydicom/dataset.py#L1118"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.update" title="Permalink to this definition">¶</a></dt>
+<code class="descname">update</code><span class="sig-paren">(</span><em>dictionary</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.update"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/6bc2ec6/pydicom/dataset.py#L1118"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.update" title="Permalink to this definition">¶</a></dt>
 <dd><p>Extend dict.update() to handle DICOM keywords.</p>
 </dd></dl>
 
@@ -1110,7 +1131,7 @@ for autocompletion on the IPython command line.</p>
 
 <dl class="method">
 <dt id="pydicom.dataset.Dataset.walk">
-<code class="descname">walk</code><span class="sig-paren">(</span><em>callback</em>, <em>recursive=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.walk"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a0c8744/pydicom/dataset.py#L1144"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.walk" title="Permalink to this definition">¶</a></dt>
+<code class="descname">walk</code><span class="sig-paren">(</span><em>callback</em>, <em>recursive=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.walk"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/6bc2ec6/pydicom/dataset.py#L1144"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.walk" title="Permalink to this definition">¶</a></dt>
 <dd><p>Iterate through the DataElements and run <cite>callback</cite> on each.</p>
 <p>Visit all DataElements, possibly recursing into sequences and their
 datasets. The callback function is called for each DataElement
@@ -1122,9 +1143,9 @@ increasing tag number within their dataset).</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>callback</strong></p>
-<blockquote>
-<div><dl class="docutils">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>callback</strong></dt>
+<dd><dl class="first last docutils">
 <dt>A callable that takes two arguments:</dt>
 <dd><ul class="first last simple">
 <li>a Dataset</li>
@@ -1132,11 +1153,11 @@ increasing tag number within their dataset).</p>
 </ul>
 </dd>
 </dl>
-</div></blockquote>
-<p><strong>recursive</strong> : bool</p>
-<blockquote class="last">
-<div><p>Flag to indicate whether to recurse into Sequences.</p>
-</div></blockquote>
+</dd>
+<dt><strong>recursive</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
+<dd><p class="first last">Flag to indicate whether to recurse into Sequences.</p>
+</dd>
+</dl>
 </td>
 </tr>
 </tbody>

@@ -958,8 +958,8 @@
         <span class="k">return</span> <span class="n">DicomDir</span><span class="p">(</span><span class="n">fileobj</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">preamble</span><span class="p">,</span> <span class="n">file_meta_dataset</span><span class="p">,</span>
                         <span class="n">is_implicit_VR</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">FileDataset</span><span class="p">(</span><span class="n">fileobj</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">preamble</span><span class="p">,</span> <span class="n">file_meta_dataset</span><span class="p">,</span></div>
-                           <span class="n">is_implicit_VR</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">FileDataset</span><span class="p">(</span><span class="n">fileobj</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">preamble</span><span class="p">,</span> <span class="n">file_meta_dataset</span><span class="p">,</span>
+                           <span class="n">is_implicit_VR</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="dcmread"><a class="viewcode-back" href="../../ref_guide.html#pydicom.filereader.dcmread">[docs]</a><span class="k">def</span> <span class="nf">dcmread</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">defer_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stop_before_pixels</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -1063,8 +1063,8 @@
     <span class="k">finally</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">caller_owns_file</span><span class="p">:</span>
             <span class="n">fp</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-    <span class="c1"># XXX need to store transfer syntax etc.</span></div>
-    <span class="k">return</span> <span class="n">dataset</span>
+    <span class="c1"># XXX need to store transfer syntax etc.</span>
+    <span class="k">return</span> <span class="n">dataset</span></div>
 
 
 <span class="n">read_file</span> <span class="o">=</span> <span class="n">dcmread</span>  <span class="c1"># used read_file until pydicom 1.0. Kept for compatibility</span>
