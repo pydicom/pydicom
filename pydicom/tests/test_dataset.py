@@ -795,6 +795,95 @@ class DatasetTests(unittest.TestCase):
         # get_item will follow the deferred read branch
         assert ds.get_item((0x7fe00010)).value == ds_ref.PixelData
 
+    def test_get_item_slice(self):
+        """Test Dataset.get_item with slice argument"""
+        # adapted from test_getitem_slice
+        ds = Dataset()
+        ds.CommandGroupLength = 120  # 0000,0000
+        ds.CommandLengthToEnd = 111  # 0000,0001
+        ds.Overlays = 12  # 0000,51B0
+        ds.LengthToEnd = 12  # 0008,0001
+        ds.SOPInstanceUID = '1.2.3.4'  # 0008,0018
+        ds.SkipFrameRangeFlag = 'TEST'  # 0008,9460
+        ds.add_new(0x00090001, 'PN', 'CITIZEN^1')
+        ds.add_new(0x00090002, 'PN', 'CITIZEN^2')
+        ds.add_new(0x00090003, 'PN', 'CITIZEN^3')
+        elem = RawDataElement(0x00090004, 'PN', 9, b'CITIZEN^4', 0, True, True)
+        ds.__setitem__(0x00090004, elem)
+        elem = RawDataElement(0x00090005, 'PN', 9, b'CITIZEN^5', 0, True, True)
+        ds.__setitem__(0x00090005, elem)
+        elem = RawDataElement(0x00090006, 'PN', 9, b'CITIZEN^6', 0, True, True)
+        ds.__setitem__(0x00090006, elem)
+        ds.PatientName = 'CITIZEN^Jan'  # 0010,0010
+        elem = RawDataElement(0x00100020, 'LO', 5, b'12345', 0, True, True)
+        ds.__setitem__(0x00100020, elem)  # Patient ID
+        ds.ExaminedBodyThickness = 1.223  # 0010,9431
+        ds.BeamSequence = [Dataset()]  # 300A,00B0
+        ds.BeamSequence[0].PatientName = 'ANON'
+
+        # Slice all items - should return original dataset
+        self.assertEqual(ds.get_item(slice(None, None)), ds)
+
+        # Slice starting from and including (0008,0001)
+        test_ds = ds.get_item(slice(0x00080001, None))
+        self.assertFalse('CommandGroupLength' in test_ds)
+        self.assertFalse('CommandLengthToEnd' in test_ds)
+        self.assertFalse('Overlays' in test_ds)
+        self.assertTrue('LengthToEnd' in test_ds)
+        self.assertTrue('BeamSequence' in test_ds)
+
+        # Slice ending at and not including (0009,0002)
+        test_ds = ds.get_item(slice(None, 0x00090002))
+        self.assertTrue('CommandGroupLength' in test_ds)
+        self.assertTrue('CommandLengthToEnd' in test_ds)
+        self.assertTrue('Overlays' in test_ds)
+        self.assertTrue('LengthToEnd' in test_ds)
+        self.assertTrue(0x00090001 in test_ds)
+        self.assertFalse(0x00090002 in test_ds)
+        self.assertFalse('BeamSequence' in test_ds)
+
+        # Slice with a step - every second tag
+        # Should return zeroth tag, then second, fourth, etc...
+        test_ds = ds.get_item(slice(None, None, 2))
+        self.assertTrue('CommandGroupLength' in test_ds)
+        self.assertFalse('CommandLengthToEnd' in test_ds)
+        self.assertTrue(0x00090001 in test_ds)
+        self.assertFalse(0x00090002 in test_ds)
+
+        # Slice starting at and including (0008,0018) and ending at and not
+        #   including (0009,0008)
+        test_ds = ds.get_item(slice(0x00080018, 0x00090006))
+        self.assertTrue('SOPInstanceUID' in test_ds)
+        self.assertTrue(0x00090005 in test_ds)
+        self.assertFalse(0x00090006 in test_ds)
+
+        # Slice starting at and including (0008,0018) and ending at and not
+        #   including (0009,0006), every third element
+        test_ds = ds.get_item(slice(0x00080018, 0x00090008, 3))
+        self.assertTrue('SOPInstanceUID' in test_ds)
+        self.assertFalse(0x00090001 in test_ds)
+        self.assertTrue(0x00090002 in test_ds)
+        self.assertFalse(test_ds.get_item(0x00090002).is_raw)
+        self.assertFalse(0x00090003 in test_ds)
+        self.assertFalse(0x00090004 in test_ds)
+        self.assertTrue(0x00090005 in test_ds)
+        self.assertTrue(test_ds.get_item(0x00090005).is_raw)
+        self.assertFalse(0x00090006 in test_ds)
+
+        # Slice starting and ending (and not including) (0008,0018)
+        self.assertEqual(
+            ds.get_item(slice((0x0008, 0x0018), (0x0008, 0x0018))),
+            Dataset())
+
+        # Test slicing using other acceptable Tag initialisations
+        self.assertTrue(
+            'SOPInstanceUID' in ds.get_item(slice(0x00080018, 0x00080019)))
+        self.assertTrue(
+            'SOPInstanceUID' in ds.get_item(slice((0x0008, 0x0018),
+                                                  (0x0008, 0x0019))))
+        self.assertTrue(
+            'SOPInstanceUID' in ds.get_item(slice('0x00080018', '0x00080019')))
+
     def test_remove_private_tags(self):
         """Test Dataset.remove_private_tags"""
         ds = Dataset()

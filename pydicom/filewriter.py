@@ -1,18 +1,18 @@
 # Copyright 2008-2017 pydicom authors. See LICENSE file for details.
 """Functions related to writing DICOM data."""
 from __future__ import absolute_import
-from struct import pack
+from struct import pack, unpack
 
 from pydicom import compat
 from pydicom.compat import in_py2
 from pydicom.charset import default_encoding, text_VRs, convert_encodings
-from pydicom.datadict import keyword_for_tag
-from pydicom.dataelem import RawDataElement, DataElement_from_raw
+from pydicom.datadict import keyword_for_tag, dictionary_VR
+from pydicom.dataelem import DataElement_from_raw, RawDataElement
 from pydicom.dataset import Dataset
 from pydicom.filebase import DicomFile, DicomFileLike, DicomBytesIO
 from pydicom.multival import MultiValue
 from pydicom.tag import (Tag, ItemTag, ItemDelimiterTag, SequenceDelimiterTag,
-                         tag_in_exception, BaseTag)
+                         tag_in_exception, TupleTag)
 from pydicom.uid import (PYDICOM_IMPLEMENTATION_UID, ImplicitVRLittleEndian,
                          ExplicitVRBigEndian,
                          UncompressedPixelTransferSyntaxes)
@@ -46,6 +46,11 @@ def correct_ambiguous_vr_element(elem, ds, is_little_endian):
         The corrected element
     """
     if 'or' in elem.VR:
+        # convert raw data elements before handling them
+        if elem.is_raw:
+            elem = DataElement_from_raw(elem)
+            ds.__setitem__(elem.tag, elem)
+
         # 'OB or OW': 7fe0,0010 PixelData
         if elem.tag == 0x7fe00010:
 
@@ -145,17 +150,47 @@ def correct_ambiguous_vr(ds, is_little_endian):
     ds : pydicom.dataset.Dataset
         The corrected dataset
     """
-    # Iterate through the elements
-    if isinstance(ds, Dataset):
-        for elem in ds.raw():
-            # Iterate the correction through any sequences
-            if not elem.is_raw:
-                if elem.VR == 'SQ':
-                    for item in elem:
-                        correct_ambiguous_vr(item, is_little_endian)
-                elif 'or' in elem.VR:
-                    correct_ambiguous_vr_element(elem, ds, is_little_endian)
+    endian_chr = "<" if is_little_endian else ">"
 
+    # Iterate through the elements
+    for elem in ds.elements():
+        # for raw data elements read from implicit VR transfer syntax
+        # the VR has to be defined
+        if elem.VR is None:
+            try:
+                VR = dictionary_VR(elem.tag)
+            except KeyError:
+                # Look ahead to see if it consists of sequence items
+                VR = 'UN'
+                if len(elem.value) >= 4:
+                    next_tag = TupleTag(
+                        unpack(endian_chr + "HH", elem.value[:4]))
+                    if next_tag == ItemTag:
+                        VR = 'SQ'
+
+            # as RawDataElement is immutable, we have to copy it
+            # to set the new VR
+            elem = RawDataElement(elem.tag, VR, elem.length, elem.value,
+                                  elem.value_tell, elem.is_implicit_VR,
+                                  elem.is_little_endian)
+            ds.__setitem__(elem.tag, elem)
+
+        # Sequence handling:
+        # - raw data elements with explicit VR transfer syntax can be
+        #   written as they are, no handling needed
+        # - raw data elements with implicit VR transfer syntax shall be
+        #   converted to a sequence, and the elements handled
+        #   recursively afterwards
+        # - normal data elements are handled by handling the contained
+        #   elements recursively
+        if elem.VR == 'SQ' and (not elem.is_raw or elem.is_implicit_VR):
+            if elem.is_raw:
+                elem = DataElement_from_raw(elem)
+                ds.__setitem__(elem.tag, elem)
+            for item in elem:
+                correct_ambiguous_vr(item, is_little_endian)
+        elif 'or' in elem.VR:
+            correct_ambiguous_vr_element(elem, ds, is_little_endian)
     return ds
 
 
@@ -374,9 +409,6 @@ def write_data_element(fp, data_element, encoding=default_encoding):
     # If explicit VR, write the VR
     VR = data_element.VR
     if not fp.is_implicit_VR:
-        if VR is None:
-            data_element = DataElement_from_raw(data_element, encoding)
-            VR = data_element.VR
         if len(VR) != 2:
             msg = ("Cannot write ambiguous VR of '{}' for data element with "
                    "tag {}.\nSet the correct VR before writing, or use an "
@@ -396,13 +428,9 @@ def write_data_element(fp, data_element, encoding=default_encoding):
     buffer.is_implicit_VR = fp.is_implicit_VR
 
     if data_element.is_raw:
-        if (fp.is_implicit_VR == data_element.is_implicit_VR and
-                fp.is_little_endian == data_element.is_little_endian):
-            buffer.write(data_element.value)
-            is_undefined_length = data_element.length == 0xFFFFFFFF
-        else:
-            data_element = DataElement_from_raw(data_element, encoding)
-    if not data_element.is_raw:
+        buffer.write(data_element.value)
+        is_undefined_length = data_element.length == 0xFFFFFFFF
+    else:
         if VR not in writers:
             raise NotImplementedError(
                 "write_data_element: unknown Value Representation "
@@ -455,6 +483,12 @@ def write_dataset(fp, dataset, parent_encoding=default_encoding):
     Attempt to correct ambiguous VR elements when explicit little/big
       encoding Elements that can't be corrected will be returned unchanged.
     """
+    if ('is_little_endian' in dataset and
+            dataset.is_little_endian != fp.is_little_endian):
+        # TODO: check if this shall be supported
+        raise NotImplementedError(
+            'Cannot write a dataset that differs in Endianess')
+
     if not fp.is_implicit_VR:
         dataset = correct_ambiguous_vr(dataset, fp.is_little_endian)
 
@@ -590,7 +624,7 @@ def write_file_meta_info(fp, file_meta, enforce_standard=True):
         If any non-Group 2 Elements are present in `file_meta`.
     """
     # Check that no non-Group 2 Elements are present
-    for elem in file_meta.raw():
+    for elem in file_meta.elements():
         if elem.tag.group != 0x0002:
             raise ValueError("Only File Meta Information Group (0002,eeee) "
                              "elements must be present in 'file_meta'.")

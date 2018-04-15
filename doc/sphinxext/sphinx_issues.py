@@ -95,7 +95,7 @@ def issue_role(name, rawtext, text, lineno,
         node = _make_issue_node(issue_no, config, options=options)
         ret.append(node)
         if i != len(issue_nos) - 1:
-            sep = nodes.raw(text=', ', format='html')
+            sep = nodes.elements(text=', ', format='html')
             ret.append(sep)
     return ret, []
 

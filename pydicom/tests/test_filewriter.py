@@ -1036,11 +1036,47 @@ class TestWriteToStandard(object):
         del ds.file_meta
 
         # Ensure no RawDataElements in ref_ds and ds
-        for elem in ref_ds:
+        for _ in ref_ds:
             pass
-        for elem in ds:
+        for _ in ds:
             pass
         assert ref_ds == ds
+
+    def test_raw_elements_preserved_implicit_vr(self):
+        """Test writing the dataset preserves raw elements."""
+        ds = dcmread(rtplan_name)
+
+        # raw data elements after reading
+        assert ds.get_item(0x00080070).is_raw  # Manufacturer
+        assert ds.get_item(0x00100020).is_raw  # Patient ID
+        assert ds.get_item(0x300A0006).is_raw  # RT Plan Date
+        assert ds.get_item(0x300A0010).is_raw  # Dose Reference Sequence
+
+        ds.save_as(DicomBytesIO(), write_like_original=False)
+
+        # data set still contains raw data elements after writing
+        assert ds.get_item(0x00080070).is_raw  # Manufacturer
+        assert ds.get_item(0x00100020).is_raw  # Patient ID
+        assert ds.get_item(0x300A0006).is_raw  # RT Plan Date
+        assert ds.get_item(0x300A0010).is_raw  # Dose Reference Sequence
+
+    def test_raw_elements_preserved_explicit_vr(self):
+        """Test writing the dataset preserves raw elements."""
+        ds = dcmread(color_pl_name)
+
+        # raw data elements after reading
+        assert ds.get_item(0x00080070).is_raw  # Manufacturer
+        assert ds.get_item(0x00100010).is_raw  # Patient Name
+        assert ds.get_item(0x00080030).is_raw  # Study Time
+        assert ds.get_item(0x00089215).is_raw  # Derivation Code Sequence
+
+        ds.save_as(DicomBytesIO(), write_like_original=False)
+
+        # data set still contains raw data elements after writing
+        assert ds.get_item(0x00080070).is_raw  # Manufacturer
+        assert ds.get_item(0x00100010).is_raw  # Patient Name
+        assert ds.get_item(0x00080030).is_raw  # Study Time
+        assert ds.get_item(0x00089215).is_raw  # Derivation Code Sequence
 
     def test_transfer_syntax_added(self):
         """Test TransferSyntaxUID is added/updated if possible."""

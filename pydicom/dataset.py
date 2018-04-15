@@ -583,7 +583,7 @@ class Dataset(dict):
         key
             The DICOM (group, element) tag in any form accepted by
             pydicom.tag.Tag such as [0x0010, 0x0010], (0x10, 0x10), 0x00100010,
-            etc.
+            etc. May also be a slice made up of DICOM tags.
 
         Returns
         -------
@@ -640,11 +640,11 @@ class Dataset(dict):
         for tag in taglist:
             yield self[tag]
 
-    def raw(self):
+    def elements(self):
         """Iterate through the top-level of the Dataset, yielding DataElements
-        or RawDataElements (no convertion done).
+        or RawDataElements (no conversion done).
 
-        >>> for elem in ds.raw():
+        >>> for elem in ds.elements():
         >>>     print(elem)
 
         The elements are returned in the same way as in __getitem__.
