@@ -37,6 +37,8 @@ rtplan_name = get_testdata_files("rtplan.dcm")[0]
 rtdose_name = get_testdata_files("rtdose.dcm")[0]
 ct_name = get_testdata_files("CT_small.dcm")[0]
 mr_name = get_testdata_files("MR_small.dcm")[0]
+mr_implicit_name = get_testdata_files("MR_small_implicit.dcm")[0]
+mr_bigendian_name = get_testdata_files("MR_small_bigendian.dcm")[0]
 jpeg_name = get_testdata_files("JPEG2000.dcm")[0]
 no_ts = get_testdata_files("meta_missing_tsyntax.dcm")[0]
 color_pl_name = get_testdata_files("color-pl.dcm")[0]
@@ -1077,6 +1079,40 @@ class TestWriteToStandard(object):
         assert ds.get_item(0x00100010).is_raw  # Patient Name
         assert ds.get_item(0x00080030).is_raw  # Study Time
         assert ds.get_item(0x00089215).is_raw  # Derivation Code Sequence
+
+    def test_convert_implicit_to_explicit_vr(self):
+        # make sure conversion from implicit to explicit VR works
+        # without private tags
+        ds = dcmread(mr_implicit_name)
+        ds.is_implicit_VR = False
+        ds.file_meta.TransferSyntaxUID = '1.2.840.10008.1.2.1'
+        fp = DicomBytesIO()
+        ds.save_as(fp, write_like_original=False)
+        fp.seek(0)
+        ds_out = dcmread(fp)
+        ds_explicit = dcmread(mr_name)
+
+        for elem_in, elem_out in zip(ds_explicit, ds_out):
+            assert elem_in == elem_out
+
+    def test_convert_big_to_little_endian(self):
+        # make sure conversion from big to little endian works
+        # except for pixel data
+        ds = dcmread(mr_bigendian_name)
+        ds.is_little_endian = True
+        ds.file_meta.TransferSyntaxUID = '1.2.840.10008.1.2.1'
+        fp = DicomBytesIO()
+        ds.save_as(fp, write_like_original=False)
+        fp.seek(0)
+        ds_out = dcmread(fp)
+        ds_explicit = dcmread(mr_name)
+
+        # pixel data is not converted automatically
+        del ds_out.PixelData
+        del ds_explicit.PixelData
+
+        for elem_in, elem_out in zip(ds_explicit, ds_out):
+            assert elem_in == elem_out
 
     def test_transfer_syntax_added(self):
         """Test TransferSyntaxUID is added/updated if possible."""

@@ -771,11 +771,15 @@ def read_partial(fileobj, stop_when=None, defer_size=None,
 
     class_uid = file_meta_dataset.get("MediaStorageSOPClassUID", None)
     if class_uid and class_uid.name == "Media Storage Directory Storage":
-        return DicomDir(fileobj, dataset, preamble, file_meta_dataset,
-                        is_implicit_VR, is_little_endian)
+        dataset_class = DicomDir
     else:
-        return FileDataset(fileobj, dataset, preamble, file_meta_dataset,
-                           is_implicit_VR, is_little_endian)
+        dataset_class = FileDataset
+    new_dataset = dataset_class(fileobj, dataset, preamble, file_meta_dataset,
+                        is_implicit_VR, is_little_endian)
+    # save the originally read transfer syntax properties in the dataset
+    new_dataset.read_little_endian = is_little_endian
+    new_dataset.read_implicit_vr = is_implicit_VR
+    return new_dataset
 
 
 def dcmread(fp, defer_size=None, stop_before_pixels=False,

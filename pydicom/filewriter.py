@@ -176,17 +176,11 @@ def correct_ambiguous_vr(ds, is_little_endian):
             ds.__setitem__(elem.tag, elem)
 
         # Sequence handling:
-        # - raw data elements with explicit VR transfer syntax can be
-        #   written as they are, no handling needed
-        # - raw data elements with implicit VR transfer syntax shall be
-        #   converted to a sequence, and the elements handled
-        #   recursively afterwards
+        # - raw data elements can be written as they are, because
+        #   we have ensured that the transfer has not changed at this point
         # - normal data elements are handled by handling the contained
         #   elements recursively
-        if elem.VR == 'SQ' and (not elem.is_raw or elem.is_implicit_VR):
-            if elem.is_raw:
-                elem = DataElement_from_raw(elem)
-                ds.__setitem__(elem.tag, elem)
+        if elem.VR == 'SQ' and not elem.is_raw:
             for item in elem:
                 correct_ambiguous_vr(item, is_little_endian)
         elif 'or' in elem.VR:
@@ -428,6 +422,7 @@ def write_data_element(fp, data_element, encoding=default_encoding):
     buffer.is_implicit_VR = fp.is_implicit_VR
 
     if data_element.is_raw:
+        # raw data element values can be written as they are
         buffer.write(data_element.value)
         is_undefined_length = data_element.length == 0xFFFFFFFF
     else:
@@ -483,12 +478,6 @@ def write_dataset(fp, dataset, parent_encoding=default_encoding):
     Attempt to correct ambiguous VR elements when explicit little/big
       encoding Elements that can't be corrected will be returned unchanged.
     """
-    if ('is_little_endian' in dataset and
-            dataset.is_little_endian != fp.is_little_endian):
-        # TODO: check if this shall be supported
-        raise NotImplementedError(
-            'Cannot write a dataset that differs in Endianess')
-
     if not fp.is_implicit_VR:
         dataset = correct_ambiguous_vr(dataset, fp.is_little_endian)
 
@@ -863,6 +852,16 @@ def dcmwrite(filename, dataset, write_like_original=True):
     else:
         fp = DicomFileLike(filename)
 
+    # if we want to write with the same endianess and VR handling as
+    # the read dataset we want to preserve raw data elements for
+    # performance reasons (which is done by get_item);
+    # otherwise we use the default converting iterator
+    if (dataset.read_implicit_vr == dataset.is_implicit_VR and
+        dataset.read_little_endian == dataset.is_little_endian):
+        get_item = Dataset.get_item
+    else:
+        get_item = Dataset.__getitem__
+
     try:
         # WRITE FILE META INFORMATION
         if preamble:
@@ -881,7 +880,7 @@ def dcmwrite(filename, dataset, write_like_original=True):
         # Write any Command Set elements now as elements must be in tag order
         #   Mixing Command Set with other elements is non-conformant so we
         #   require `write_like_original` to be True
-        command_set = dataset.get_item(slice(0x00000000, 0x00010000))
+        command_set = get_item(dataset, slice(0x00000000, 0x00010000))
         if command_set and write_like_original:
             fp.is_implicit_VR = True
             fp.is_little_endian = True
@@ -894,7 +893,7 @@ def dcmwrite(filename, dataset, write_like_original=True):
         fp.is_little_endian = dataset.is_little_endian
 
         # Write non-Command Set elements now
-        write_dataset(fp, dataset.get_item(slice(0x00010000, None)))
+        write_dataset(fp, get_item(dataset, slice(0x00010000, None)))
     finally:
         if not caller_owns_file:
             fp.close()

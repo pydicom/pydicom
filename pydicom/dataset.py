@@ -149,6 +149,10 @@ class Dataset(dict):
         dict.__init__(self, *args)
         self.is_decompressed = False
 
+        # these will be set if the dataset is read from a file
+        self.read_little_endian = None
+        self.read_implicit_vr = None
+
     def __enter__(self):
         """Method invoked on entry to a with statement."""
         return self
@@ -591,7 +595,10 @@ class Dataset(dict):
         """
         if isinstance(key, slice):
             tags = self._slice_dataset(key.start, key.stop, key.step)
-            return Dataset({tag: self.get_item(tag) for tag in tags})
+            dataset = Dataset({tag: self.get_item(tag) for tag in tags})
+            dataset.read_implicit_vr = self.read_implicit_vr
+            dataset.read_little_endian = self.read_little_endian
+            return dataset
 
         if isinstance(key, BaseTag):
             tag = key

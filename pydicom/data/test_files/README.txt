@@ -41,6 +41,12 @@ MR_small.dcm
   * MR image, Explicit VR, LittleEndian
   * Downsized to 64x64 from 'MR1_UNC', ftp://medical.nema.org/MEDICAL/Dicom/DataSets/WG04/
 
+MR_small_implicit.dcm
+  * The same dataset as MR_small, saved with Implicit VR using dcmodify
+
+MR_small_bigendian.dcm
+  * The same dataset as MR_small, saved as Big Endian using dcmodify
+
 JPEG2000.dcm
   * JPEG 2000 small image
   * to test JPEG transfer syntax, eventually JPEG decompression
