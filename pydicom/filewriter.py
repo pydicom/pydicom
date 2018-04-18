@@ -1,18 +1,18 @@
 # Copyright 2008-2017 pydicom authors. See LICENSE file for details.
 """Functions related to writing DICOM data."""
 from __future__ import absolute_import
-from struct import pack, unpack
+from struct import pack
 
 from pydicom import compat
 from pydicom.compat import in_py2
 from pydicom.charset import default_encoding, text_VRs, convert_encodings
-from pydicom.datadict import keyword_for_tag, dictionary_VR
-from pydicom.dataelem import DataElement_from_raw, RawDataElement
+from pydicom.datadict import keyword_for_tag
+from pydicom.dataelem import DataElement_from_raw
 from pydicom.dataset import Dataset
 from pydicom.filebase import DicomFile, DicomFileLike, DicomBytesIO
 from pydicom.multival import MultiValue
 from pydicom.tag import (Tag, ItemTag, ItemDelimiterTag, SequenceDelimiterTag,
-                         tag_in_exception, TupleTag)
+                         tag_in_exception)
 from pydicom.uid import (PYDICOM_IMPLEMENTATION_UID, ImplicitVRLittleEndian,
                          ExplicitVRBigEndian,
                          UncompressedPixelTransferSyntaxes)
@@ -122,7 +122,7 @@ def correct_ambiguous_vr_element(elem, ds, is_little_endian):
               and elem.tag.elem == 0x3000):
             # Implicit VR must be OW, explicit VR may be OB or OW
             #   as per PS3.5 Section 8.1.2 and Annex A
-            if hasattr(ds, 'is_implicit_VR') and ds.is_implicit_VR:
+            if ds.is_implicit_VR:
                 elem.VR = 'OW'
 
     return elem
@@ -150,36 +150,17 @@ def correct_ambiguous_vr(ds, is_little_endian):
     ds : pydicom.dataset.Dataset
         The corrected dataset
     """
-    endian_chr = "<" if is_little_endian else ">"
+    # if we want to write with the same endianess and VR handling as
+    # the read dataset we want to preserve raw data elements
+    if ds.write_like_original():
+        dataset_elements = ds.elements()
+    else:
+        dataset_elements = ds
 
     # Iterate through the elements
-    for elem in ds.elements():
-        # for raw data elements read from implicit VR transfer syntax
-        # the VR has to be defined
-        if elem.VR is None:
-            try:
-                VR = dictionary_VR(elem.tag)
-            except KeyError:
-                # Look ahead to see if it consists of sequence items
-                VR = 'UN'
-                if len(elem.value) >= 4:
-                    next_tag = TupleTag(
-                        unpack(endian_chr + "HH", elem.value[:4]))
-                    if next_tag == ItemTag:
-                        VR = 'SQ'
-
-            # as RawDataElement is immutable, we have to copy it
-            # to set the new VR
-            elem = RawDataElement(elem.tag, VR, elem.length, elem.value,
-                                  elem.value_tell, elem.is_implicit_VR,
-                                  elem.is_little_endian)
-            ds.__setitem__(elem.tag, elem)
-
-        # Sequence handling:
-        # - raw data elements can be written as they are, because
-        #   we have ensured that the transfer has not changed at this point
-        # - normal data elements are handled by handling the contained
-        #   elements recursively
+    for elem in dataset_elements:
+        # raw data element sequences can be written as they are, because we
+        # have ensured that the transfer syntax has not changed at this point
         if elem.VR == 'SQ' and not elem.is_raw:
             for item in elem:
                 correct_ambiguous_vr(item, is_little_endian)
@@ -855,9 +836,8 @@ def dcmwrite(filename, dataset, write_like_original=True):
     # if we want to write with the same endianess and VR handling as
     # the read dataset we want to preserve raw data elements for
     # performance reasons (which is done by get_item);
-    # otherwise we use the default converting iterator
-    if (dataset.read_implicit_vr == dataset.is_implicit_VR and
-        dataset.read_little_endian == dataset.is_little_endian):
+    # otherwise we use the default converting item getter
+    if dataset.write_like_original():
         get_item = Dataset.get_item
     else:
         get_item = Dataset.__getitem__

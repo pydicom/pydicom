@@ -152,6 +152,8 @@ class Dataset(dict):
         # these will be set if the dataset is read from a file
         self.read_little_endian = None
         self.read_implicit_vr = None
+        self.is_little_endian = None
+        self.is_implicit_VR = None
 
     def __enter__(self):
         """Method invoked on entry to a with statement."""
@@ -541,8 +543,7 @@ class Dataset(dict):
         # If passed a slice, return a Dataset containing the corresponding
         #   DataElements
         if isinstance(key, slice):
-            tags = self._slice_dataset(key.start, key.stop, key.step)
-            return Dataset({tag: self[tag] for tag in tags})
+            return self._dataset_slice(key)
 
         if isinstance(key, BaseTag):
             tag = key
@@ -594,11 +595,7 @@ class Dataset(dict):
         pydicom.dataelem.DataElement
         """
         if isinstance(key, slice):
-            tags = self._slice_dataset(key.start, key.stop, key.step)
-            dataset = Dataset({tag: self.get_item(tag) for tag in tags})
-            dataset.read_implicit_vr = self.read_implicit_vr
-            dataset.read_little_endian = self.read_little_endian
-            return dataset
+            return self._dataset_slice(key)
 
         if isinstance(key, BaseTag):
             tag = key
@@ -609,6 +606,27 @@ class Dataset(dict):
         if isinstance(data_elem, tuple) and data_elem.value is None:
             return self[key]
         return data_elem
+
+    def _dataset_slice(self, slice):
+        """Return a slice that has the same properties as the original
+        dataset.
+        """
+        tags = self._slice_dataset(slice.start, slice.stop, slice.step)
+        dataset = Dataset({tag: self.get_item(tag) for tag in tags})
+        dataset.read_implicit_vr = self.read_implicit_vr
+        dataset.read_little_endian = self.read_little_endian
+        dataset.is_little_endian = self.is_little_endian
+        dataset.is_implicit_VR = self.is_implicit_VR
+        return dataset
+
+    def write_like_original(self):
+        """Return True if the properties used for writing are the same ones
+        that are used for reading the dataset, or some properties are not set.
+        """
+        return (self.is_implicit_VR is not None and
+                self.is_little_endian is not None and
+                self.read_implicit_vr == self.is_implicit_VR and
+                self.read_little_endian == self.is_little_endian)
 
     def group_dataset(self, group):
         """Return a Dataset containing only DataElements of a certain group.
@@ -983,13 +1001,12 @@ class Dataset(dict):
         pydicom.filewriter.dcmwrite
             Write a DICOM file from a FileDataset instance.
         """
-        # Ensure is_little_endian and is_implicit_VR exist
-        if not (hasattr(self, 'is_little_endian') and
-                hasattr(self, 'is_implicit_VR')):
-            raise AttributeError("'{0}.is_little_endian' and "
-                                 "'{0}.is_implicit_VR' must exist and be "
-                                 "set appropriately before "
-                                 "saving.".format(self.__class__.__name__))
+        # Ensure is_little_endian and is_implicit_VR are set
+        if self.is_little_endian is None or self.is_implicit_VR is None:
+            raise AttributeError(
+                "'{0}.is_little_endian' and '{0}.is_implicit_VR' must be "
+                "set appropriately before saving.".format(
+                    self.__class__.__name__))
 
         pydicom.dcmwrite(filename, self, write_like_original)
 

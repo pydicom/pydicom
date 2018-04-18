@@ -799,7 +799,7 @@ class TestCorrectAmbiguousVR(unittest.TestCase):
         self.assertTrue(ref_ds[0x60003000].VR == 'OB or OW')
 
         # Missing is_implicit_VR (leave unchanged)
-        del ref_ds.is_implicit_VR
+        ref_ds.is_implicit_VR = None
         ds = correct_ambiguous_vr(deepcopy(ref_ds), True)
         self.assertTrue(ds[0x60003000].VR == 'OB or OW')
         self.assertTrue(ref_ds[0x60003000].VR == 'OB or OW')
@@ -1169,7 +1169,7 @@ class TestWriteToStandard(object):
         transfer_syntax = ds.file_meta.TransferSyntaxUID
         ds.file_meta = Dataset()
         ds.save_as(fp, write_like_original=False)
-        fp = BytesIO(fp.getvalue())  # Workaround to avoid #358
+        fp.seek(0)
         out = dcmread(fp)
         assert out.file_meta.MediaStorageSOPClassUID == ds.SOPClassUID
         assert out.file_meta.MediaStorageSOPInstanceUID == ds.SOPInstanceUID
@@ -1181,7 +1181,7 @@ class TestWriteToStandard(object):
         fp = DicomBytesIO()
         del ds.file_meta
         ds.save_as(fp, write_like_original=False)
-        fp = BytesIO(fp.getvalue())  # Workaround to avoid #358
+        fp.seek(0)
         out = dcmread(fp)
         assert (out.file_meta.MediaStorageSOPClassUID == ds.SOPClassUID)
         assert (
@@ -1223,7 +1223,7 @@ class TestWriteToStandard(object):
         assert fp.read(128) == preamble
         assert fp.read(4) == b'DICM'
 
-        fp = BytesIO(fp.getvalue())  # Workaround to avoid #358
+        fp.seek(0)
         ds_out = dcmread(fp)
         assert ds_out.preamble == preamble
         assert 'PatientID' in ds_out
@@ -1241,7 +1241,7 @@ class TestWriteToStandard(object):
         assert fp.read(4) == b'DICM'
         assert 'MessageID' in ds
 
-        fp = BytesIO(fp.getvalue())  # Workaround to avoid #358
+        fp.seek(0)
         ds_out = dcmread(fp)
         assert ds_out.preamble == preamble
         assert 'PatientID' in ds_out
@@ -1423,6 +1423,12 @@ class TestWriteNonStandard(unittest.TestCase):
         self.assertTrue(same, "Bytestreams are not identical - first "
                         "difference at 0x%x" % pos)
 
+    def ensure_no_raw_data_elements(self, ds):
+        for _ in ds.file_meta:
+            pass
+        for _ in ds:
+            pass
+
     def test_preamble_default(self):
         """Test that the default preamble is written correctly when present."""
         ds = dcmread(ct_name)
@@ -1459,6 +1465,9 @@ class TestWriteNonStandard(unittest.TestCase):
         ds = dcmread(rtplan_name)
         ref_ds = dcmread(rtplan_name)
         ds.save_as(self.fp, write_like_original=True)
+
+        self.ensure_no_raw_data_elements(ds)
+        self.ensure_no_raw_data_elements(ref_ds)
         self.assertTrue(ref_ds == ds)
 
     def test_file_meta_unchanged(self):
@@ -1479,8 +1488,8 @@ class TestWriteNonStandard(unittest.TestCase):
         self.fp.seek(0)
         self.assertNotEqual(self.fp.read(4), b'DICM')
 
-        fp = BytesIO(self.fp.getvalue())  # Workaround to avoid #358
-        ds_out = dcmread(fp, force=True)
+        self.fp.seek(0)
+        ds_out = dcmread(self.fp, force=True)
         self.assertEqual(ds_out.preamble, None)
         self.assertEqual(ds_out.file_meta, Dataset())
         self.assertTrue('PatientID' in ds_out)
@@ -1495,8 +1504,8 @@ class TestWriteNonStandard(unittest.TestCase):
         self.assertEqual(self.fp.read(128), preamble)
         self.assertEqual(self.fp.read(4), b'DICM')
 
-        fp = BytesIO(self.fp.getvalue())  # Workaround to avoid #358
-        ds_out = dcmread(fp, force=True)
+        self.fp.seek(0)
+        ds_out = dcmread(self.fp, force=True)
         self.assertEqual(ds_out.file_meta, Dataset())
         self.assertTrue('PatientID' in ds_out)
 
@@ -1513,8 +1522,8 @@ class TestWriteNonStandard(unittest.TestCase):
         self.fp.seek(0)
         self.assertNotEqual(self.fp.read(4), b'DICM')
 
-        fp = BytesIO(self.fp.getvalue())  # Workaround to avoid #358
-        ds_out = dcmread(fp, force=True)
+        self.fp.seek(0)
+        ds_out = dcmread(self.fp, force=True)
         self.assertTrue('ImplementationClassUID' in ds_out.file_meta)
         self.assertEqual(ds_out.preamble, None)
         self.assertTrue('PatientID' in ds_out)
@@ -1528,8 +1537,10 @@ class TestWriteNonStandard(unittest.TestCase):
         self.assertEqual(self.fp.read(128), preamble)
         self.assertEqual(self.fp.read(4), b'DICM')
 
-        fp = BytesIO(self.fp.getvalue())  # Workaround to avoid #358
-        ds_out = dcmread(fp, force=True)
+        self.fp.seek(0)
+        ds_out = dcmread(self.fp, force=True)
+        self.ensure_no_raw_data_elements(ds_out)
+
         self.assertEqual(ds.file_meta[:], ds_out.file_meta[:])
         self.assertTrue('TransferSyntaxUID' in ds_out.file_meta[:])
         self.assertEqual(ds_out.preamble, preamble)
@@ -1559,8 +1570,8 @@ class TestWriteNonStandard(unittest.TestCase):
         self.assertEqual(self.fp.read(12),
                          b'\x00\x00\x00\x00\x04\x00\x00\x00\x08\x00\x00\x00')
 
-        fp = BytesIO(self.fp.getvalue())  # Workaround to avoid #358
-        ds_out = dcmread(fp, force=True)
+        self.fp.seek(0)
+        ds_out = dcmread(self.fp, force=True)
         self.assertEqual(ds_out.file_meta, Dataset())
         self.assertTrue('Status' in ds_out)
         self.assertTrue('PatientID' in ds_out)
@@ -1582,8 +1593,8 @@ class TestWriteNonStandard(unittest.TestCase):
         self.assertEqual(self.fp.read(12),
                          b'\x00\x00\x00\x00\x04\x00\x00\x00\x08\x00\x00\x00')
 
-        fp = BytesIO(self.fp.getvalue())  # Workaround to avoid #358
-        ds_out = dcmread(fp, force=True)
+        self.fp.seek(0)
+        ds_out = dcmread(self.fp, force=True)
         self.assertEqual(ds_out.file_meta, Dataset())
         self.assertTrue('Status' in ds_out)
         self.assertTrue('PatientID' in ds_out)
@@ -1601,8 +1612,8 @@ class TestWriteNonStandard(unittest.TestCase):
         self.assertEqual(self.fp.read(128), preamble)
         self.assertEqual(self.fp.read(4), b'DICM')
 
-        fp = BytesIO(self.fp.getvalue())  # Workaround to avoid #358
-        ds_out = dcmread(fp, force=True)
+        self.fp.seek(0)
+        ds_out = dcmread(self.fp, force=True)
         self.assertTrue('TransferSyntaxUID' in ds_out.file_meta)
         self.assertTrue('Status' in ds_out)
         self.assertTrue('PatientID' in ds_out)
@@ -1628,8 +1639,7 @@ class TestWriteNonStandard(unittest.TestCase):
         # Ensure Command Set Elements written as little endian implicit VR
         self.fp.seek(0)
 
-        fp = BytesIO(self.fp.getvalue())  # Workaround to avoid #358
-        ds_out = dcmread(fp, force=True)
+        ds_out = dcmread(self.fp, force=True)
         self.assertTrue('TransferSyntaxUID' in ds_out.file_meta)
         self.assertTrue('Status' in ds_out)
         self.assertTrue('PatientID' in ds_out)
@@ -1721,8 +1731,8 @@ class TestWriteNonStandard(unittest.TestCase):
         self.assertEqual(self.fp.read(128), ds.preamble)
         self.assertEqual(self.fp.read(4), b'DICM')
 
-        fp = BytesIO(self.fp.getvalue())  # Workaround to avoid #358
-        ds_out = dcmread(fp, force=True)
+        self.fp.seek(0)
+        ds_out = dcmread(self.fp, force=True)
         self.assertTrue('Status' in ds_out)
         self.assertTrue('TransferSyntaxUID' in ds_out.file_meta)
         self.assertFalse('PatientID' in ds_out)
@@ -1755,8 +1765,7 @@ class TestWriteFileMetaInfoNonStandard(unittest.TestCase):
         self.assertTrue('ImplementationClassUID' in ds.file_meta)
 
         # Check written meta dataset doesn't contain TransferSyntaxUID
-        fp = BytesIO(self.fp.getvalue())  # Workaround to avoid #358
-        written_ds = dcmread(fp, force=True)
+        written_ds = dcmread(self.fp, force=True)
         self.assertTrue('ImplementationClassUID' in written_ds.file_meta)
         self.assertFalse('TransferSyntaxUID' in written_ds.file_meta)
 
