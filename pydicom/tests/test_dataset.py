@@ -822,67 +822,83 @@ class DatasetTests(unittest.TestCase):
         ds.BeamSequence[0].PatientName = 'ANON'
 
         # Slice all items - should return original dataset
-        self.assertEqual(ds.get_item(slice(None, None)), ds)
+        assert ds.get_item(slice(None, None)) == ds
 
         # Slice starting from and including (0008,0001)
         test_ds = ds.get_item(slice(0x00080001, None))
-        self.assertFalse('CommandGroupLength' in test_ds)
-        self.assertFalse('CommandLengthToEnd' in test_ds)
-        self.assertFalse('Overlays' in test_ds)
-        self.assertTrue('LengthToEnd' in test_ds)
-        self.assertTrue('BeamSequence' in test_ds)
+        assert 'CommandGroupLength' not in test_ds
+        assert 'CommandLengthToEnd' not in test_ds
+        assert 'Overlays' not in test_ds
+        assert 'LengthToEnd' in test_ds
+        assert 'BeamSequence' in test_ds
 
         # Slice ending at and not including (0009,0002)
         test_ds = ds.get_item(slice(None, 0x00090002))
-        self.assertTrue('CommandGroupLength' in test_ds)
-        self.assertTrue('CommandLengthToEnd' in test_ds)
-        self.assertTrue('Overlays' in test_ds)
-        self.assertTrue('LengthToEnd' in test_ds)
-        self.assertTrue(0x00090001 in test_ds)
-        self.assertFalse(0x00090002 in test_ds)
-        self.assertFalse('BeamSequence' in test_ds)
+        assert 'CommandGroupLength' in test_ds
+        assert 'CommandLengthToEnd' in test_ds
+        assert 'Overlays' in test_ds
+        assert 'LengthToEnd' in test_ds
+        assert 0x00090001 in test_ds
+        assert 0x00090002 not in test_ds
+        assert 'BeamSequence' not in test_ds
 
         # Slice with a step - every second tag
         # Should return zeroth tag, then second, fourth, etc...
         test_ds = ds.get_item(slice(None, None, 2))
-        self.assertTrue('CommandGroupLength' in test_ds)
-        self.assertFalse('CommandLengthToEnd' in test_ds)
-        self.assertTrue(0x00090001 in test_ds)
-        self.assertFalse(0x00090002 in test_ds)
+        assert 'CommandGroupLength' in test_ds
+        assert 'CommandLengthToEnd' not in test_ds
+        assert 0x00090001 in test_ds
+        assert 0x00090002 not in test_ds
 
         # Slice starting at and including (0008,0018) and ending at and not
         #   including (0009,0008)
         test_ds = ds.get_item(slice(0x00080018, 0x00090006))
-        self.assertTrue('SOPInstanceUID' in test_ds)
-        self.assertTrue(0x00090005 in test_ds)
-        self.assertFalse(0x00090006 in test_ds)
+        assert 'SOPInstanceUID' in test_ds
+        assert 0x00090005 in test_ds
+        assert 0x00090006 not in test_ds
 
         # Slice starting at and including (0008,0018) and ending at and not
         #   including (0009,0006), every third element
         test_ds = ds.get_item(slice(0x00080018, 0x00090008, 3))
-        self.assertTrue('SOPInstanceUID' in test_ds)
-        self.assertFalse(0x00090001 in test_ds)
-        self.assertTrue(0x00090002 in test_ds)
-        self.assertFalse(test_ds.get_item(0x00090002).is_raw)
-        self.assertFalse(0x00090003 in test_ds)
-        self.assertFalse(0x00090004 in test_ds)
-        self.assertTrue(0x00090005 in test_ds)
-        self.assertTrue(test_ds.get_item(0x00090005).is_raw)
-        self.assertFalse(0x00090006 in test_ds)
+        assert 'SOPInstanceUID' in test_ds
+        assert 0x00090001 not in test_ds
+        assert 0x00090002 in test_ds
+        assert not test_ds.get_item(0x00090002).is_raw
+        assert 0x00090003 not in test_ds
+        assert 0x00090004 not in test_ds
+        assert 0x00090005 in test_ds
+        assert test_ds.get_item(0x00090005).is_raw
+        assert 0x00090006 not in test_ds
 
         # Slice starting and ending (and not including) (0008,0018)
-        self.assertEqual(
-            ds.get_item(slice((0x0008, 0x0018), (0x0008, 0x0018))),
-            Dataset())
+        assert ds.get_item(slice((0x0008, 0x0018),
+                                 (0x0008, 0x0018))) == Dataset()
 
         # Test slicing using other acceptable Tag initialisations
-        self.assertTrue(
-            'SOPInstanceUID' in ds.get_item(slice(0x00080018, 0x00080019)))
-        self.assertTrue(
-            'SOPInstanceUID' in ds.get_item(slice((0x0008, 0x0018),
-                                                  (0x0008, 0x0019))))
-        self.assertTrue(
-            'SOPInstanceUID' in ds.get_item(slice('0x00080018', '0x00080019')))
+        assert 'SOPInstanceUID' in ds.get_item(slice(0x00080018, 0x00080019))
+        assert 'SOPInstanceUID' in ds.get_item(slice((0x0008, 0x0018),
+                                                     (0x0008, 0x0019)))
+        assert 'SOPInstanceUID' in ds.get_item(slice('0x00080018',
+                                                     '0x00080019'))
+
+    def test_write_like_original(self):
+        """Test Dataset.write_like_original"""
+        ds = Dataset()
+        assert not ds.write_like_original()
+
+        # simulate reading
+        ds.read_little_endian = True
+        ds.read_implicit_vr = True
+        assert not ds.write_like_original()
+
+        ds.is_little_endian = True
+        ds.is_implicit_VR = True
+        assert ds.write_like_original()
+        ds.is_little_endian = False
+        assert not ds.write_like_original()
+        ds.is_little_endian = True
+        ds.is_implicit_VR = False
+        assert not ds.write_like_original()
 
     def test_remove_private_tags(self):
         """Test Dataset.remove_private_tags"""

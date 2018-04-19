@@ -620,8 +620,8 @@ class Dataset(dict):
         return dataset
 
     def write_like_original(self):
-        """Return True if the properties used for writing are the same ones
-        that are used for reading the dataset, or some properties are not set.
+        """Return True if the properties to be used for writing are set and
+        have the same value as the ones in the dataset after reading it.
         """
         return (self.is_implicit_VR is not None and
                 self.is_little_endian is not None and

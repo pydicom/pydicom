@@ -13,10 +13,10 @@ from tempfile import TemporaryFile
 import pytest
 
 from pydicom._storage_sopclass_uids import CTImageStorage
-from pydicom import config, __version_info__
+from pydicom import config, __version_info__, uid
 from pydicom.data import get_testdata_files, get_charset_files
 from pydicom.dataset import Dataset, FileDataset
-from pydicom.dataelem import DataElement
+from pydicom.dataelem import DataElement, RawDataElement
 from pydicom.filebase import DicomBytesIO
 from pydicom.filereader import dcmread, read_dataset
 from pydicom.filewriter import (write_data_element, write_dataset,
@@ -834,6 +834,38 @@ class TestCorrectAmbiguousVRElement(object):
         assert out.tag == 0x60003000
         assert out.value == b'\x00'
 
+    def test_not_ambiguous_raw_data_element(self):
+        """Test no change in raw data element if not ambiguous"""
+        elem = RawDataElement(0x60003000, 'OB', 1, b'\x00', 0, True, True)
+        out = correct_ambiguous_vr_element(elem, Dataset(), True)
+        assert out == elem
+        assert type(out) == RawDataElement
+
+    def test_correct_ambiguous_data_element(self):
+        """Test correct ambiguous US/SS element"""
+        ds = Dataset()
+        ds.PixelPaddingValue = b'\xfe\xff'
+        out = correct_ambiguous_vr_element(ds[0x00280120], ds, True)
+        assert out.VR == 'US or SS'
+
+        ds.PixelRepresentation = 0
+        out = correct_ambiguous_vr_element(ds[0x00280120], ds, True)
+        assert out.VR == 'US'
+        assert out.value == 0xfffe
+
+    def test_correct_ambiguous_raw_data_element(self):
+        """Test that correcting ambiguous US/SS raw data element
+        works and converts it to a data element"""
+        ds = Dataset()
+        elem = RawDataElement(
+            0x00280120, 'US or SS', 2, b'\xfe\xff', 0, True, True)
+        ds[0x00280120] = elem
+        ds.PixelRepresentation = 0
+        out = correct_ambiguous_vr_element(elem, ds, True)
+        assert type(out) == DataElement
+        assert out.VR == 'US'
+        assert out.value == 0xfffe
+
     def test_pixel_data_not_ow_or_ob(self):
         """Test no change if can't figure out bit depth"""
         ds = Dataset()
@@ -1095,17 +1127,51 @@ class TestWriteToStandard(object):
         for elem_in, elem_out in zip(ds_explicit, ds_out):
             assert elem_in == elem_out
 
+    def test_convert_explicit_to_implicit_vr(self):
+        # make sure conversion from explicit to implicit VR works
+        # without private tags
+        ds = dcmread(mr_name)
+        ds.is_implicit_VR = True
+        ds.file_meta.TransferSyntaxUID = uid.ImplicitVRLittleEndian
+        fp = DicomBytesIO()
+        ds.save_as(fp, write_like_original=False)
+        fp.seek(0)
+        ds_out = dcmread(fp)
+        ds_implicit = dcmread(mr_implicit_name)
+
+        for elem_in, elem_out in zip(ds_implicit, ds_out):
+            assert elem_in == elem_out
+
     def test_convert_big_to_little_endian(self):
         # make sure conversion from big to little endian works
         # except for pixel data
         ds = dcmread(mr_bigendian_name)
         ds.is_little_endian = True
-        ds.file_meta.TransferSyntaxUID = '1.2.840.10008.1.2.1'
+        ds.file_meta.TransferSyntaxUID = uid.ExplicitVRLittleEndian
         fp = DicomBytesIO()
         ds.save_as(fp, write_like_original=False)
         fp.seek(0)
         ds_out = dcmread(fp)
         ds_explicit = dcmread(mr_name)
+
+        # pixel data is not converted automatically
+        del ds_out.PixelData
+        del ds_explicit.PixelData
+
+        for elem_in, elem_out in zip(ds_explicit, ds_out):
+            assert elem_in == elem_out
+
+    def test_convert_little_to_big_endian(self):
+        # make sure conversion from little to big endian works
+        # except for pixel data
+        ds = dcmread(mr_name)
+        ds.is_little_endian = False
+        ds.file_meta.TransferSyntaxUID = uid.ExplicitVRBigEndian
+        fp = DicomBytesIO()
+        ds.save_as(fp, write_like_original=False)
+        fp.seek(0)
+        ds_out = dcmread(fp)
+        ds_explicit = dcmread(mr_bigendian_name)
 
         # pixel data is not converted automatically
         del ds_out.PixelData
