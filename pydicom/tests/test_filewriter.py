@@ -43,6 +43,7 @@ mr_bigendian_name = get_testdata_files("MR_small_bigendian.dcm")[0]
 jpeg_name = get_testdata_files("JPEG2000.dcm")[0]
 no_ts = get_testdata_files("meta_missing_tsyntax.dcm")[0]
 color_pl_name = get_testdata_files("color-pl.dcm")[0]
+sc_rgb_name = get_testdata_files("SC_rgb.dcm")[0]
 datetime_name = mr_name
 
 unicode_name = get_charset_files("chrH31.dcm")[0]
@@ -1229,21 +1230,45 @@ class TestWriteToStandard(object):
         fp = DicomBytesIO()
         ds_orig.save_as(fp, write_like_original=False)
         fp.seek(0)
-        ds_le = dcmread(fp)
+        ds_impl = dcmread(fp)
 
         # convert the dataset back to explicit VR - private tag VR now unknown
-        ds_le.is_implicit_VR = False
-        ds_le.is_little_endian = True
-        ds_le.file_meta.TransferSyntaxUID = uid.ExplicitVRLittleEndian
+        ds_impl.is_implicit_VR = False
+        ds_impl.is_little_endian = True
+        ds_impl.file_meta.TransferSyntaxUID = uid.ExplicitVRLittleEndian
         fp = DicomBytesIO()
-        ds_le.save_as(fp, write_like_original=False)
+        ds_impl.save_as(fp, write_like_original=False)
         fp.seek(0)
-        ds_conv = dcmread(fp)
+        ds_expl = dcmread(fp)
 
-        assert ds_conv[(0x0009, 0x0010)].VR == 'LO'  # private creator
-        assert ds_conv[(0x0009, 0x1001)].VR == 'UN'  # originally LO
-        assert ds_conv[(0x0009, 0x10e7)].VR == 'UN'  # originally UL
-        assert ds_conv[(0x0043, 0x1010)].VR == 'UN'  # originally US
+        assert ds_expl[(0x0009, 0x0010)].VR == 'LO'  # private creator
+        assert ds_expl[(0x0009, 0x1001)].VR == 'UN'  # originally LO
+        assert ds_expl[(0x0009, 0x10e7)].VR == 'UN'  # originally UL
+        assert ds_expl[(0x0043, 0x1010)].VR == 'UN'  # originally US
+
+    def test_convert_rgb_from_implicit_to_explicit_vr(self):
+        """Test converting an RGB dataset from implicit to explicit VR
+        and vice verse."""
+        ds_orig = dcmread(sc_rgb_name)
+        ds_orig.is_implicit_VR = True
+        ds_orig.is_little_endian = True
+        fp = DicomBytesIO()
+        ds_orig.save_as(fp, write_like_original=False)
+        fp.seek(0)
+        ds_impl = dcmread(fp)
+        for elem_orig, elem_conv in zip(ds_orig, ds_impl):
+            assert elem_orig == elem_conv
+
+        ds_impl.is_implicit_VR = False
+        ds_impl.is_little_endian = True
+        ds_impl.file_meta.TransferSyntaxUID = uid.ExplicitVRLittleEndian
+        fp = DicomBytesIO()
+        ds_impl.save_as(fp, write_like_original=False)
+        fp.seek(0)
+        # used to raise, see #620
+        ds_expl = dcmread(fp)
+        for elem_orig, elem_conv in zip(ds_orig, ds_expl):
+            assert elem_orig == elem_conv
 
     def test_transfer_syntax_not_added(self):
         """Test TransferSyntaxUID is not added if ExplVRLE."""
