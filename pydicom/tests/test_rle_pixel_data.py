@@ -11,21 +11,21 @@ rle_missing_message = ("RLE decoder (numpy based) is not available "
                        "in this test environment")
 rle_present_message = "RLE decoder (numpy based) is being tested"
 rle_handler = None
-have_rle_handler = True
 numpy_handler = None
-have_numpy_handler = True
 
 try:
     import pydicom.pixel_data_handlers.numpy_handler as numpy_handler
+    if not numpy_handler.is_this_usable:
+        numpy_handler = None
 except ImportError:
-    have_numpy_handler = False
-
+    numpy_handler = None
 try:
     import pydicom.pixel_data_handlers.rle_handler as rle_handler
+    if not rle_handler.is_this_usable:
+        rle_handler = None
 except ImportError:
-    have_rle_handler = False
-
-test_rle_decoder = have_numpy_handler and have_rle_handler
+    rle_handler = None
+test_rle_decoder = not (numpy_handler is None or rle_handler is None)
 
 empty_number_tags_name = get_testdata_files(
     "reportsi_with_empty_number_tags.dcm")[0]
