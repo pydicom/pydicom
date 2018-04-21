@@ -143,6 +143,7 @@ def get_pixeldata(dicom_dataset):
         #  * DICOM 3.5 Sect 8.1.1 (explanation of bit ordering)
         #  * DICOM Annex D (examples of encoding)
         for byte in pixel_bytearray:
+            byte = ord(byte)
             for bit in range(bit, bit+8):
                 pixel_array[bit] = byte & 1
                 byte >>= 1
