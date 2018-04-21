@@ -13,7 +13,7 @@ from tempfile import TemporaryFile
 import pytest
 
 from pydicom._storage_sopclass_uids import CTImageStorage
-from pydicom import config, __version_info__
+from pydicom import config, __version_info__, uid
 from pydicom.data import get_testdata_files, get_charset_files
 from pydicom.dataset import Dataset, FileDataset
 from pydicom.dataelem import DataElement
@@ -1056,6 +1056,33 @@ class TestWriteToStandard(object):
         ds.is_little_endian = False
         ds.save_as(DicomBytesIO(), write_like_original=False)
         assert ds.file_meta.TransferSyntaxUID == ExplicitVRBigEndian
+
+    def test_private_tag_vr_from_implicit_data(self):
+        """Test that private tags have the correct VR if converting
+        a dataset from implicit to explicit VR.
+        """
+        # convert a dataset with private tags to Implicit VR
+        ds_orig = dcmread(ct_name)
+        ds_orig.is_implicit_VR = True
+        ds_orig.is_little_endian = True
+        fp = DicomBytesIO()
+        ds_orig.save_as(fp, write_like_original=False)
+        fp.seek(0)
+        ds_le = dcmread(fp)
+
+        # convert the dataset back to explicit VR - private tag VR now unknown
+        ds_le.is_implicit_VR = False
+        ds_le.is_little_endian = True
+        ds_le.file_meta.TransferSyntaxUID = uid.ExplicitVRLittleEndian
+        fp = DicomBytesIO()
+        ds_le.save_as(fp, write_like_original=False)
+        fp.seek(0)
+        ds_conv = dcmread(fp)
+
+        assert ds_conv[(0x0009, 0x0010)].VR == 'LO'  # private creator
+        assert ds_conv[(0x0009, 0x1001)].VR == 'UN'  # originally LO
+        assert ds_conv[(0x0009, 0x10e7)].VR == 'UN'  # originally UL
+        assert ds_conv[(0x0043, 0x1010)].VR == 'UN'  # originally US
 
     def test_transfer_syntax_not_added(self):
         """Test TransferSyntaxUID is not added if ExplVRLE."""

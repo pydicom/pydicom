@@ -205,6 +205,11 @@ class BaseTag(BaseTag_base_class):
         """Return True if the tag is private (has an odd group number)."""
         return self.group % 2 == 1
 
+    @property
+    def is_private_creator(self):
+        """Return True if the tag is a private creator."""
+        return self.is_private and 0x0010 <= self.element < 0x0100
+
 
 def TupleTag(group_elem):
     """Fast factory for BaseTag object with known safe (group, elem) tuple"""
