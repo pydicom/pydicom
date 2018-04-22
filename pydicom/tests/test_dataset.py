@@ -887,12 +887,20 @@ class DatasetTests(unittest.TestCase):
         assert not ds.write_like_original()
 
         # simulate reading
+        ds.SpecificCharacterSet = 'ISO_IR 100'
         ds.read_little_endian = True
         ds.read_implicit_vr = True
+        ds.read_encoding = ['latin_1', 'latin_1', 'latin_1']
         assert not ds.write_like_original()
 
         ds.is_little_endian = True
         ds.is_implicit_VR = True
+        assert ds.write_like_original()
+        # changed character set
+        ds.SpecificCharacterSet = 'ISO_IR 192'
+        assert not ds.write_like_original()
+        # back to original character set
+        ds.SpecificCharacterSet = 'ISO_IR 100'
         assert ds.write_like_original()
         ds.is_little_endian = False
         assert not ds.write_like_original()

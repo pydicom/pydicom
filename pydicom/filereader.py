@@ -779,6 +779,7 @@ def read_partial(fileobj, stop_when=None, defer_size=None,
     # save the originally read transfer syntax properties in the dataset
     new_dataset.read_little_endian = is_little_endian
     new_dataset.read_implicit_vr = is_implicit_VR
+    new_dataset.read_encoding = dataset._character_set
     return new_dataset
 
 

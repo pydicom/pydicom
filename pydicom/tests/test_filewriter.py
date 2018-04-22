@@ -5,6 +5,7 @@ from copy import deepcopy
 from datetime import date, datetime, time, timedelta
 from io import BytesIO
 import os
+import sys
 import unittest
 
 from struct import unpack
@@ -1178,6 +1179,27 @@ class TestWriteToStandard(object):
         del ds_explicit.PixelData
 
         for elem_in, elem_out in zip(ds_explicit, ds_out):
+            assert elem_in == elem_out
+
+    @pytest.mark.skipif(sys.version_info[0] == 2,
+                        reason='Saving with another encoding fails in Python2')
+    def test_changed_character_set(self):
+        """Make sure that a changed character set is reflected
+        in the written data elements."""
+        ds = dcmread(multiPN_name)
+        # Latin 1 original encoding
+        assert ds.get_item(0x00100010).value == b'Buc^J\xe9r\xf4me'
+
+        # change encoding to UTF-8
+        ds.SpecificCharacterSet = 'ISO_IR 192'
+        fp = DicomBytesIO()
+        ds.save_as(fp, write_like_original=False)
+        fp.seek(0)
+        ds_out = dcmread(fp)
+        # patient name shall be UTF-8 encoded
+        assert ds_out.get_item(0x00100010).value == b'Buc^J\xc3\xa9r\xc3\xb4me'
+        # decoded values shall be the same as in original dataset
+        for elem_in, elem_out in zip(ds, ds_out):
             assert elem_in == elem_out
 
     def test_transfer_syntax_added(self):

@@ -473,8 +473,6 @@ def write_dataset(fp, dataset, parent_encoding=default_encoding):
         if tag.element == 0 and tag.group > 6:
             continue
         with tag_in_exception(tag):
-            # write_data_element(fp, dataset.get_item(tag), dataset_encoding)
-            # XXX for writing raw tags without converting to DataElement
             write_data_element(fp, dataset.get_item(tag), dataset_encoding)
 
     return fp.tell() - fpStart

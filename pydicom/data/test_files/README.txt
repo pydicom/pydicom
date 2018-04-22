@@ -9,6 +9,7 @@ I believe there is no restriction on using any of these files in this manner.
 First, which transfer syntax the files are:
 ExplVR_BigEnd.dcm       : Expl VR Big Endian
 ExplVR_BigEndNoMeta.dcm : Expl VR Big Endian
+MR_small_bigendian.dcm  : Expl VR Big Endian
 
 color-pl.dcm            : Expl VR Little Endian
 color-px.dcm            : Expl VR Little Endian
@@ -18,12 +19,13 @@ image_dfl.dcm           : Expl VR Little Endian
 JPEG-LL.dcm             : Expl VR Little Endian
 JPEG-lossy.dcm          : Expl VR Little Endian
 JPEG2000.dcm            : Expl VR Little Endian
+liver.dcm               : Expl VR Little Endian
 MR_small.dcm            : Expl VR Little Endian
 OBXXXX1A.dcm            : Expl VR Little Endian
 reportsi.dcm            : Expl VR Little Endian
 test-SR.dcm             : Expl VR Little Endian
-liver.dcm               : Expl VR Little Endian
 
+MR_small_implicit.dcm   : Impl VR Little Endian
 nested_priv_SQ.dcm      : Impl VR Little Endian
 no_meta_group_length.dcm: Impl VR Little Endian
 OT-PAL-8-face.dcm       : Impl VR Little Endian

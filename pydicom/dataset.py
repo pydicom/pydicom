@@ -152,6 +152,7 @@ class Dataset(dict):
         # these will be set if the dataset is read from a file
         self.read_little_endian = None
         self.read_implicit_vr = None
+        self.read_encoding = None
         self.is_little_endian = None
         self.is_implicit_VR = None
 
@@ -562,7 +563,7 @@ class Dataset(dict):
                     data_elem)
 
             if tag != BaseTag(0x00080005):
-                character_set = self._character_set
+                character_set = self.read_encoding or self._character_set
             else:
                 character_set = default_encoding
             # Not converted from raw form read from file yet; do so now
@@ -609,7 +610,9 @@ class Dataset(dict):
 
     def _dataset_slice(self, slice):
         """Return a slice that has the same properties as the original
-        dataset.
+        dataset. That includes properties related to endianess and VR handling,
+        and the specific character set. No element conversion is done, e.g.
+        elements of type RawDataElement are kept.
         """
         tags = self._slice_dataset(slice.start, slice.stop, slice.step)
         dataset = Dataset({tag: self.get_item(tag) for tag in tags})
@@ -617,16 +620,20 @@ class Dataset(dict):
         dataset.read_little_endian = self.read_little_endian
         dataset.is_little_endian = self.is_little_endian
         dataset.is_implicit_VR = self.is_implicit_VR
+        dataset.read_encoding = self.read_encoding
         return dataset
 
     def write_like_original(self):
         """Return True if the properties to be used for writing are set and
         have the same value as the ones in the dataset after reading it.
+        This includes properties related to endianess, VR handling and the
+        specific character set.
         """
         return (self.is_implicit_VR is not None and
                 self.is_little_endian is not None and
                 self.read_implicit_vr == self.is_implicit_VR and
-                self.read_little_endian == self.is_little_endian)
+                self.read_little_endian == self.is_little_endian and
+                self.read_encoding == self._character_set)
 
     def group_dataset(self, group):
         """Return a Dataset containing only DataElements of a certain group.
