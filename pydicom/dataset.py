@@ -137,6 +137,16 @@ class Dataset(dict):
     indent_chars : str
         For string display, the characters used to indent nested Sequences.
         Default is "   ".
+    is_little_endian : bool
+        Shall be set before writing with `write_like_original=False`.
+        The written dataset (excluding the pixel data) will be written using
+        the given endianess.
+    is_implicit_VR : bool
+        Shall be set before writing with `write_like_original=False`.
+        The written dataset will be written using the transfer syntax with
+        the given VR handling, e.g LittleEndianImplicit if True,
+        and LittleEndianExplicit or BigEndianExplicit (depending on
+        `is_little_endian`) if False.
     """
     indent_chars = "   "
 
@@ -149,10 +159,16 @@ class Dataset(dict):
         dict.__init__(self, *args)
         self.is_decompressed = False
 
-        # these will be set if the dataset is read from a file
+        # the following read_XXX attributes are used internally to store
+        # the properties of the dataset after read from a file
+
+        # set depending on the endianess of the read dataset
         self.read_little_endian = None
+        # set depending on the VR handling of the read dataset
         self.read_implicit_vr = None
+        # set to the encoding the dataset had originally
         self.read_encoding = None
+
         self.is_little_endian = None
         self.is_implicit_VR = None
 
@@ -623,7 +639,8 @@ class Dataset(dict):
         dataset.read_encoding = self.read_encoding
         return dataset
 
-    def write_like_original(self):
+    @property
+    def is_original_encoding(self):
         """Return True if the properties to be used for writing are set and
         have the same value as the ones in the dataset after reading it.
         This includes properties related to endianess, VR handling and the

@@ -881,32 +881,32 @@ class DatasetTests(unittest.TestCase):
         assert 'SOPInstanceUID' in ds.get_item(slice('0x00080018',
                                                      '0x00080019'))
 
-    def test_write_like_original(self):
+    def test_is_original_encoding(self):
         """Test Dataset.write_like_original"""
         ds = Dataset()
-        assert not ds.write_like_original()
+        assert not ds.is_original_encoding
 
         # simulate reading
         ds.SpecificCharacterSet = 'ISO_IR 100'
         ds.read_little_endian = True
         ds.read_implicit_vr = True
         ds.read_encoding = ['latin_1', 'latin_1', 'latin_1']
-        assert not ds.write_like_original()
+        assert not ds.is_original_encoding
 
         ds.is_little_endian = True
         ds.is_implicit_VR = True
-        assert ds.write_like_original()
+        assert ds.is_original_encoding
         # changed character set
         ds.SpecificCharacterSet = 'ISO_IR 192'
-        assert not ds.write_like_original()
+        assert not ds.is_original_encoding
         # back to original character set
         ds.SpecificCharacterSet = 'ISO_IR 100'
-        assert ds.write_like_original()
+        assert ds.is_original_encoding
         ds.is_little_endian = False
-        assert not ds.write_like_original()
+        assert not ds.is_original_encoding
         ds.is_little_endian = True
         ds.is_implicit_VR = False
-        assert not ds.write_like_original()
+        assert not ds.is_original_encoding
 
     def test_remove_private_tags(self):
         """Test Dataset.remove_private_tags"""

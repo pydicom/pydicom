@@ -150,18 +150,11 @@ def correct_ambiguous_vr(ds, is_little_endian):
     ds : pydicom.dataset.Dataset
         The corrected dataset
     """
-    # if we want to write with the same endianess and VR handling as
-    # the read dataset we want to preserve raw data elements
-    if ds.write_like_original():
-        dataset_elements = ds.elements()
-    else:
-        dataset_elements = ds
-
     # Iterate through the elements
-    for elem in dataset_elements:
+    for elem in ds:
         # raw data element sequences can be written as they are, because we
         # have ensured that the transfer syntax has not changed at this point
-        if elem.VR == 'SQ' and not elem.is_raw:
+        if elem.VR == 'SQ':
             for item in elem:
                 correct_ambiguous_vr(item, is_little_endian)
         elif 'or' in elem.VR:
@@ -459,7 +452,7 @@ def write_dataset(fp, dataset, parent_encoding=default_encoding):
     Attempt to correct ambiguous VR elements when explicit little/big
       encoding Elements that can't be corrected will be returned unchanged.
     """
-    if not fp.is_implicit_VR:
+    if not fp.is_implicit_VR and not dataset.is_original_encoding:
         dataset = correct_ambiguous_vr(dataset, fp.is_little_endian)
 
     dataset_encoding = dataset.get('SpecificCharacterSet', parent_encoding)
@@ -835,7 +828,7 @@ def dcmwrite(filename, dataset, write_like_original=True):
     # the read dataset we want to preserve raw data elements for
     # performance reasons (which is done by get_item);
     # otherwise we use the default converting item getter
-    if dataset.write_like_original():
+    if dataset.is_original_encoding:
         get_item = Dataset.get_item
     else:
         get_item = Dataset.__getitem__
