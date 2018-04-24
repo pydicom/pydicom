@@ -67,6 +67,7 @@ def add_dict_entry(tag, VR, keyword, description, VM='1', is_retired=''):
 
     Examples
     --------
+    >>> from pydicom import Dataset
     >>> add_dict_entry(0x10011001, "UL", "TestOne", "Test One")
     >>> add_dict_entry(0x10011002, "DS", "TestTwo", "Test Two", VM='3')
     >>> ds = Dataset()
@@ -95,16 +96,17 @@ def add_dict_entries(new_entries_dict):
 
     Examples
     --------
+    >>> from pydicom import Dataset
     >>> new_dict_items = {
-            0x10011001: ('UL', '1', "Test One", '', 'TestOne'),
-            0x10011002: ('DS', '3', "Test Two", '', 'TestTwo'),
-            }
+    ...        0x10011001: ('UL', '1', "Test One", '', 'TestOne'),
+    ...        0x10011002: ('DS', '3', "Test Two", '', 'TestTwo'),
+    ... }
     >>> add_dict_entries(new_dict_items)
     >>> ds = Dataset()
     >>> ds.TestOne = 'test'
     >>> ds.TestTwo = ['1', '2', '3']
 
-    add_dict_entry(0x10011001, "UL", "TestOne", "Test One")
+    >>> add_dict_entry(0x10011001, "UL", "TestOne", "Test One")
     >>> ds = Dataset()
     >>> ds.TestOne = 'test'
     """
@@ -217,11 +219,13 @@ def repeater_has_tag(tag):
     return (mask_match(tag) in RepeatersDictionary)
 
 
+REPEATER_KEYWORDS = [val[4] for val in RepeatersDictionary.values()]
+
+
 def repeater_has_keyword(keyword):
     """Return True if the DICOM repeaters element
        exists with `keyword`."""
-    repeater_keywords = [val[4] for val in RepeatersDictionary.values()]
-    return (keyword in repeater_keywords)
+    return keyword in REPEATER_KEYWORDS
 
 
 # PRIVATE DICTIONARY handling
