@@ -137,6 +137,16 @@ class Dataset(dict):
     indent_chars : str
         For string display, the characters used to indent nested Sequences.
         Default is "   ".
+    is_little_endian : bool
+        Shall be set before writing with `write_like_original=False`.
+        The written dataset (excluding the pixel data) will be written using
+        the given endianess.
+    is_implicit_VR : bool
+        Shall be set before writing with `write_like_original=False`.
+        The written dataset will be written using the transfer syntax with
+        the given VR handling, e.g LittleEndianImplicit if True,
+        and LittleEndianExplicit or BigEndianExplicit (depending on
+        `is_little_endian`) if False.
     """
     indent_chars = "   "
 
@@ -148,6 +158,19 @@ class Dataset(dict):
         self._parent_encoding = kwargs.get('parent_encoding', default_encoding)
         dict.__init__(self, *args)
         self.is_decompressed = False
+
+        # the following read_XXX attributes are used internally to store
+        # the properties of the dataset after read from a file
+
+        # set depending on the endianess of the read dataset
+        self.read_little_endian = None
+        # set depending on the VR handling of the read dataset
+        self.read_implicit_vr = None
+        # set to the encoding the dataset had originally
+        self.read_encoding = None
+
+        self.is_little_endian = None
+        self.is_implicit_VR = None
 
     def __enter__(self):
         """Method invoked on entry to a with statement."""
@@ -537,8 +560,7 @@ class Dataset(dict):
         # If passed a slice, return a Dataset containing the corresponding
         #   DataElements
         if isinstance(key, slice):
-            tags = self._slice_dataset(key.start, key.stop, key.step)
-            return Dataset({tag: self[tag] for tag in tags})
+            return self._dataset_slice(key)
 
         if isinstance(key, BaseTag):
             tag = key
@@ -557,7 +579,7 @@ class Dataset(dict):
                     data_elem)
 
             if tag != BaseTag(0x00080005):
-                character_set = self._character_set
+                character_set = self.read_encoding or self._character_set
             else:
                 character_set = default_encoding
             # Not converted from raw form read from file yet; do so now
@@ -583,12 +605,15 @@ class Dataset(dict):
         key
             The DICOM (group, element) tag in any form accepted by
             pydicom.tag.Tag such as [0x0010, 0x0010], (0x10, 0x10), 0x00100010,
-            etc.
+            etc. May also be a slice made up of DICOM tags.
 
         Returns
         -------
         pydicom.dataelem.DataElement
         """
+        if isinstance(key, slice):
+            return self._dataset_slice(key)
+
         if isinstance(key, BaseTag):
             tag = key
         else:
@@ -598,6 +623,34 @@ class Dataset(dict):
         if isinstance(data_elem, tuple) and data_elem.value is None:
             return self[key]
         return data_elem
+
+    def _dataset_slice(self, slice):
+        """Return a slice that has the same properties as the original
+        dataset. That includes properties related to endianess and VR handling,
+        and the specific character set. No element conversion is done, e.g.
+        elements of type RawDataElement are kept.
+        """
+        tags = self._slice_dataset(slice.start, slice.stop, slice.step)
+        dataset = Dataset({tag: self.get_item(tag) for tag in tags})
+        dataset.read_implicit_vr = self.read_implicit_vr
+        dataset.read_little_endian = self.read_little_endian
+        dataset.is_little_endian = self.is_little_endian
+        dataset.is_implicit_VR = self.is_implicit_VR
+        dataset.read_encoding = self.read_encoding
+        return dataset
+
+    @property
+    def is_original_encoding(self):
+        """Return True if the properties to be used for writing are set and
+        have the same value as the ones in the dataset after reading it.
+        This includes properties related to endianess, VR handling and the
+        specific character set.
+        """
+        return (self.is_implicit_VR is not None and
+                self.is_little_endian is not None and
+                self.read_implicit_vr == self.is_implicit_VR and
+                self.read_little_endian == self.is_little_endian and
+                self.read_encoding == self._character_set)
 
     def group_dataset(self, group):
         """Return a Dataset containing only DataElements of a certain group.
@@ -635,6 +688,24 @@ class Dataset(dict):
         taglist = sorted(self.keys())
         for tag in taglist:
             yield self[tag]
+
+    def elements(self):
+        """Iterate through the top-level of the Dataset, yielding DataElements
+        or RawDataElements (no conversion done).
+
+        >>> for elem in ds.elements():
+        >>>     print(elem)
+
+        The elements are returned in the same way as in __getitem__.
+
+        Yields
+        ------
+        pydicom.dataelem.DataElement or pydicom.dataelem.RawDataElement
+            The Dataset's DataElements, sorted by increasing tag order.
+        """
+        taglist = sorted(self.keys())
+        for tag in taglist:
+            yield self.get_item(tag)
 
     def _is_uncompressed_transfer_syntax(self):
         """Return True if the TransferSyntaxUID is not a compressed syntax."""
@@ -954,13 +1025,12 @@ class Dataset(dict):
         pydicom.filewriter.dcmwrite
             Write a DICOM file from a FileDataset instance.
         """
-        # Ensure is_little_endian and is_implicit_VR exist
-        if not (hasattr(self, 'is_little_endian') and
-                hasattr(self, 'is_implicit_VR')):
-            raise AttributeError("'{0}.is_little_endian' and "
-                                 "'{0}.is_implicit_VR' must exist and be "
-                                 "set appropriately before "
-                                 "saving.".format(self.__class__.__name__))
+        # Ensure is_little_endian and is_implicit_VR are set
+        if self.is_little_endian is None or self.is_implicit_VR is None:
+            raise AttributeError(
+                "'{0}.is_little_endian' and '{0}.is_implicit_VR' must be "
+                "set appropriately before saving.".format(
+                    self.__class__.__name__))
 
         pydicom.dcmwrite(filename, self, write_like_original)
 
@@ -1043,7 +1113,7 @@ class Dataset(dict):
             private_block = tag.elem >> 8
             private_creator_tag = Tag(tag.group, private_block)
             if private_creator_tag in self and tag != private_creator_tag:
-                if isinstance(data_element, RawDataElement):
+                if data_element.is_raw:
                     data_element = DataElement_from_raw(
                         data_element, self._character_set)
                 data_element.private_creator = self[private_creator_tag].value

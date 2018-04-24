@@ -554,7 +554,7 @@ def _read_file_meta_info(fp):
     #   data element: if it fails, retry loading the file meta with an
     #   implicit VR (issue #503)
     try:
-        file_meta[list(file_meta)[0].tag]
+        file_meta[list(file_meta.elements())[0].tag]
     except NotImplementedError:
         fp.seek(start_file_meta)
         file_meta = read_dataset(fp, is_implicit_VR=True,
@@ -771,11 +771,16 @@ def read_partial(fileobj, stop_when=None, defer_size=None,
 
     class_uid = file_meta_dataset.get("MediaStorageSOPClassUID", None)
     if class_uid and class_uid.name == "Media Storage Directory Storage":
-        return DicomDir(fileobj, dataset, preamble, file_meta_dataset,
-                        is_implicit_VR, is_little_endian)
+        dataset_class = DicomDir
     else:
-        return FileDataset(fileobj, dataset, preamble, file_meta_dataset,
-                           is_implicit_VR, is_little_endian)
+        dataset_class = FileDataset
+    new_dataset = dataset_class(fileobj, dataset, preamble, file_meta_dataset,
+                                is_implicit_VR, is_little_endian)
+    # save the originally read transfer syntax properties in the dataset
+    new_dataset.read_little_endian = is_little_endian
+    new_dataset.read_implicit_vr = is_implicit_VR
+    new_dataset.read_encoding = dataset._character_set
+    return new_dataset
 
 
 def dcmread(fp, defer_size=None, stop_before_pixels=False,
