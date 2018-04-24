@@ -310,6 +310,16 @@
 <span class="sd">    indent_chars : str</span>
 <span class="sd">        For string display, the characters used to indent nested Sequences.</span>
 <span class="sd">        Default is &quot;   &quot;.</span>
+<span class="sd">    is_little_endian : bool</span>
+<span class="sd">        Shall be set before writing with `write_like_original=False`.</span>
+<span class="sd">        The written dataset (excluding the pixel data) will be written using</span>
+<span class="sd">        the given endianess.</span>
+<span class="sd">    is_implicit_VR : bool</span>
+<span class="sd">        Shall be set before writing with `write_like_original=False`.</span>
+<span class="sd">        The written dataset will be written using the transfer syntax with</span>
+<span class="sd">        the given VR handling, e.g LittleEndianImplicit if True,</span>
+<span class="sd">        and LittleEndianExplicit or BigEndianExplicit (depending on</span>
+<span class="sd">        `is_little_endian`) if False.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">indent_chars</span> <span class="o">=</span> <span class="s2">&quot;   &quot;</span>
 
@@ -321,6 +331,19 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_parent_encoding</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;parent_encoding&#39;</span><span class="p">,</span> <span class="n">default_encoding</span><span class="p">)</span>
         <span class="nb">dict</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_decompressed</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="c1"># the following read_XXX attributes are used internally to store</span>
+        <span class="c1"># the properties of the dataset after read from a file</span>
+
+        <span class="c1"># set depending on the endianess of the read dataset</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">read_little_endian</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1"># set depending on the VR handling of the read dataset</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">read_implicit_vr</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1"># set to the encoding the dataset had originally</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">read_encoding</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_little_endian</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_implicit_VR</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="k">def</span> <span class="nf">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Method invoked on entry to a with statement.&quot;&quot;&quot;</span>
@@ -710,8 +733,7 @@
         <span class="c1"># If passed a slice, return a Dataset containing the corresponding</span>
         <span class="c1">#   DataElements</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">slice</span><span class="p">):</span>
-            <span class="n">tags</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_slice_dataset</span><span class="p">(</span><span class="n">key</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="n">key</span><span class="o">.</span><span class="n">stop</span><span class="p">,</span> <span class="n">key</span><span class="o">.</span><span class="n">step</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">Dataset</span><span class="p">({</span><span class="n">tag</span><span class="p">:</span> <span class="bp">self</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span> <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">tags</span><span class="p">})</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset_slice</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">BaseTag</span><span class="p">):</span>
             <span class="n">tag</span> <span class="o">=</span> <span class="n">key</span>
@@ -730,7 +752,7 @@
                     <span class="n">data_elem</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">tag</span> <span class="o">!=</span> <span class="n">BaseTag</span><span class="p">(</span><span class="mh">0x00080005</span><span class="p">):</span>
-                <span class="n">character_set</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_character_set</span>
+                <span class="n">character_set</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_encoding</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_character_set</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">character_set</span> <span class="o">=</span> <span class="n">default_encoding</span>
             <span class="c1"># Not converted from raw form read from file yet; do so now</span>
@@ -756,12 +778,15 @@
 <span class="sd">        key</span>
 <span class="sd">            The DICOM (group, element) tag in any form accepted by</span>
 <span class="sd">            pydicom.tag.Tag such as [0x0010, 0x0010], (0x10, 0x10), 0x00100010,</span>
-<span class="sd">            etc.</span>
+<span class="sd">            etc. May also be a slice made up of DICOM tags.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        pydicom.dataelem.DataElement</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">slice</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset_slice</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">BaseTag</span><span class="p">):</span>
             <span class="n">tag</span> <span class="o">=</span> <span class="n">key</span>
         <span class="k">else</span><span class="p">:</span>
@@ -771,6 +796,34 @@
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data_elem</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">and</span> <span class="n">data_elem</span><span class="o">.</span><span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">data_elem</span></div>
+
+    <span class="k">def</span> <span class="nf">_dataset_slice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">slice</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a slice that has the same properties as the original</span>
+<span class="sd">        dataset. That includes properties related to endianess and VR handling,</span>
+<span class="sd">        and the specific character set. No element conversion is done, e.g.</span>
+<span class="sd">        elements of type RawDataElement are kept.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">tags</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_slice_dataset</span><span class="p">(</span><span class="nb">slice</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="nb">slice</span><span class="o">.</span><span class="n">stop</span><span class="p">,</span> <span class="nb">slice</span><span class="o">.</span><span class="n">step</span><span class="p">)</span>
+        <span class="n">dataset</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">({</span><span class="n">tag</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span> <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">tags</span><span class="p">})</span>
+        <span class="n">dataset</span><span class="o">.</span><span class="n">read_implicit_vr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_implicit_vr</span>
+        <span class="n">dataset</span><span class="o">.</span><span class="n">read_little_endian</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_little_endian</span>
+        <span class="n">dataset</span><span class="o">.</span><span class="n">is_little_endian</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_little_endian</span>
+        <span class="n">dataset</span><span class="o">.</span><span class="n">is_implicit_VR</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_implicit_VR</span>
+        <span class="n">dataset</span><span class="o">.</span><span class="n">read_encoding</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_encoding</span>
+        <span class="k">return</span> <span class="n">dataset</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">is_original_encoding</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return True if the properties to be used for writing are set and</span>
+<span class="sd">        have the same value as the ones in the dataset after reading it.</span>
+<span class="sd">        This includes properties related to endianess, VR handling and the</span>
+<span class="sd">        specific character set.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">is_implicit_VR</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">is_little_endian</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">read_implicit_vr</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_implicit_VR</span> <span class="ow">and</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">read_little_endian</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_little_endian</span> <span class="ow">and</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">read_encoding</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_character_set</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Dataset.group_dataset"><a class="viewcode-back" href="../../ref_guide.html#pydicom.dataset.Dataset.group_dataset">[docs]</a>    <span class="k">def</span> <span class="nf">group_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return a Dataset containing only DataElements of a certain group.</span>
@@ -808,6 +861,24 @@
         <span class="n">taglist</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
         <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">taglist</span><span class="p">:</span>
             <span class="k">yield</span> <span class="bp">self</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span>
+
+<div class="viewcode-block" id="Dataset.elements"><a class="viewcode-back" href="../../ref_guide.html#pydicom.dataset.Dataset.elements">[docs]</a>    <span class="k">def</span> <span class="nf">elements</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Iterate through the top-level of the Dataset, yielding DataElements</span>
+<span class="sd">        or RawDataElements (no conversion done).</span>
+
+<span class="sd">        &gt;&gt;&gt; for elem in ds.elements():</span>
+<span class="sd">        &gt;&gt;&gt;     print(elem)</span>
+
+<span class="sd">        The elements are returned in the same way as in __getitem__.</span>
+
+<span class="sd">        Yields</span>
+<span class="sd">        ------</span>
+<span class="sd">        pydicom.dataelem.DataElement or pydicom.dataelem.RawDataElement</span>
+<span class="sd">            The Dataset&#39;s DataElements, sorted by increasing tag order.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">taglist</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">taglist</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_is_uncompressed_transfer_syntax</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return True if the TransferSyntaxUID is not a compressed syntax.&quot;&quot;&quot;</span>
@@ -1127,13 +1198,12 @@
 <span class="sd">        pydicom.filewriter.dcmwrite</span>
 <span class="sd">            Write a DICOM file from a FileDataset instance.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># Ensure is_little_endian and is_implicit_VR exist</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;is_little_endian&#39;</span><span class="p">)</span> <span class="ow">and</span>
-                <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;is_implicit_VR&#39;</span><span class="p">)):</span>
-            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;&#39;</span><span class="si">{0}</span><span class="s2">.is_little_endian&#39; and &quot;</span>
-                                 <span class="s2">&quot;&#39;</span><span class="si">{0}</span><span class="s2">.is_implicit_VR&#39; must exist and be &quot;</span>
-                                 <span class="s2">&quot;set appropriately before &quot;</span>
-                                 <span class="s2">&quot;saving.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
+        <span class="c1"># Ensure is_little_endian and is_implicit_VR are set</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_little_endian</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_implicit_VR</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span>
+                <span class="s2">&quot;&#39;</span><span class="si">{0}</span><span class="s2">.is_little_endian&#39; and &#39;</span><span class="si">{0}</span><span class="s2">.is_implicit_VR&#39; must be &quot;</span>
+                <span class="s2">&quot;set appropriately before saving.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
 
         <span class="n">pydicom</span><span class="o">.</span><span class="n">dcmwrite</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">write_like_original</span><span class="p">)</span></div>
 
@@ -1216,7 +1286,7 @@
             <span class="n">private_block</span> <span class="o">=</span> <span class="n">tag</span><span class="o">.</span><span class="n">elem</span> <span class="o">&gt;&gt;</span> <span class="mi">8</span>
             <span class="n">private_creator_tag</span> <span class="o">=</span> <span class="n">Tag</span><span class="p">(</span><span class="n">tag</span><span class="o">.</span><span class="n">group</span><span class="p">,</span> <span class="n">private_block</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">private_creator_tag</span> <span class="ow">in</span> <span class="bp">self</span> <span class="ow">and</span> <span class="n">tag</span> <span class="o">!=</span> <span class="n">private_creator_tag</span><span class="p">:</span>
-                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data_element</span><span class="p">,</span> <span class="n">RawDataElement</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">data_element</span><span class="o">.</span><span class="n">is_raw</span><span class="p">:</span>
                     <span class="n">data_element</span> <span class="o">=</span> <span class="n">DataElement_from_raw</span><span class="p">(</span>
                         <span class="n">data_element</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_character_set</span><span class="p">)</span>
                 <span class="n">data_element</span><span class="o">.</span><span class="n">private_creator</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">private_creator_tag</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
