@@ -1,6 +1,7 @@
 """Use the numpy package to decode pixel transfer syntaxes."""
 import sys
 import pydicom.uid
+from pydicom import compat
 have_numpy = True
 try:
     import numpy
@@ -143,7 +144,7 @@ def get_pixeldata(dicom_dataset):
         #  * DICOM 3.5 Sect 8.1.1 (explanation of bit ordering)
         #  * DICOM Annex D (examples of encoding)
         for byte in pixel_bytearray:
-            if isinstance(byte, str):
+            if compat.in_py2:
                 byte = ord(byte)
             for bit in range(bit, bit+8):
                 pixel_array[bit] = byte & 1
