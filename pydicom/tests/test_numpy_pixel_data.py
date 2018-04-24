@@ -264,9 +264,6 @@ class numpy_BigEndian_Tests_with_numpy(unittest.TestCase):
 
 
 @pytest.mark.skipif(not have_numpy_handler, reason=numpy_missing_message)
-@pytest.mark.skipif(
-    in_py2 and platform.python_implementation() == 'PyPy',
-    reason='PyPy2 does not implement unpackbits')
 class OneBitAllocatedTests(unittest.TestCase):
     def setUp(self):
         self.original_handlers = pydicom.config.image_handlers
@@ -288,26 +285,6 @@ class OneBitAllocatedTests(unittest.TestCase):
         assert unpacked_data[0][0][0] == 0
         assert unpacked_data[2][511][511] == 0
         assert unpacked_data[1][256][256] == 1
-
-
-@pytest.mark.skipif(not have_numpy_handler, reason=numpy_missing_message)
-@pytest.mark.skipif(
-    not in_py2 or platform.python_implementation() != 'PyPy',
-    reason='Testing PyPy2 exception only')
-class OneBitAllocatedTestsPyPy2(unittest.TestCase):
-    def setUp(self):
-        self.original_handlers = pydicom.config.image_handlers
-        pydicom.config.image_handlers = [numpy_handler]
-
-    def tearDown(self):
-        pydicom.config.image_handlers = self.original_handlers
-
-    def test_unpack_pixel_data(self):
-        dataset = dcmread(one_bit_allocated_name)
-        packed_data = dataset.PixelData
-        assert len(packed_data) == 3 * 512 * 512 / 8
-        with pytest.raises(NotImplementedError):
-            _ = dataset.pixel_array
 
 
 @pytest.mark.skipif(
