@@ -229,6 +229,16 @@ class TestBaseTag(object):
         # Group 0 not private
         assert not BaseTag(0x00000001).is_private
 
+    def test_private_creator(self):
+        """Test BaseTag.is_private_creator returns correct values."""
+        # Non-private tag
+        assert not BaseTag(0x00080010).is_private_creator
+        # private creator have element 0x0010 - 0x00FF
+        assert not BaseTag(0x0009000F).is_private_creator
+        assert BaseTag(0x00090010).is_private_creator
+        assert BaseTag(0x000900FF).is_private_creator
+        assert not BaseTag(0x00090100).is_private_creator
+
     def test_base_class(self):
         """Test the class BaseTag inherits from."""
         if in_py2:

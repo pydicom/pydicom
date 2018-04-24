@@ -473,10 +473,13 @@ def DataElement_from_raw(raw_data_element, encoding=None):
         try:
             VR = dictionary_VR(raw.tag)
         except KeyError:
-
             # just read the bytes, no way to know what they mean
             if raw.tag.is_private:
-                VR = 'OB'
+                # for VR for private tags see PS3.5, 6.2.2
+                if raw.tag.is_private_creator:
+                    VR = 'LO'
+                else:
+                    VR = 'UN'
 
             # group length tag implied in versions < 3.0
             elif raw.tag.element == 0:
