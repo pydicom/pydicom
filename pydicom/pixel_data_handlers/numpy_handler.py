@@ -142,7 +142,6 @@ def get_pixeldata(dicom_dataset):
         #  See the following for details:
         #  * DICOM 3.5 Sect 8.1.1 (explanation of bit ordering)
         #  * DICOM Annex D (examples of encoding)
-        print("Type: "+str(type(pixel_bytearray[0])))
         for byte in pixel_bytearray:
             if isinstance(byte, str):
                 byte = ord(byte)
