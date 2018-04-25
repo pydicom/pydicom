@@ -68,9 +68,13 @@ def correct_ambiguous_vr_element(elem, ds, is_little_endian):
                     if ds.BitsAllocated > 8:
                         elem.VR = 'OW'
                     else:
-                        if len(ds.PixelData) / (ds.Rows * ds.Columns) == 2:
+                        nr_pixels = ds.Rows * ds.Columns
+                        if 'SamplesPerPixel' in ds:
+                            nr_pixels *= ds.SamplesPerPixel
+                        pixel_size = len(ds.PixelData) / nr_pixels
+                        if pixel_size == 2:
                             elem.VR = 'OW'
-                        elif len(ds.PixelData) / (ds.Rows * ds.Columns) == 1:
+                        elif pixel_size == 1:
                             elem.VR = 'OB'
             except AttributeError:
                 pass
