@@ -69,24 +69,50 @@ class TestUID(object):
         """Test that UID.__eq__ works."""
         assert self.uid == UID('1.2.840.10008.1.2')
         assert self.uid == '1.2.840.10008.1.2'
+        assert '1.2.840.10008.1.2' == self.uid
         assert self.uid == 'Implicit VR Little Endian'
+        assert 'Implicit VR Little Endian' == self.uid
         assert not self.uid == UID('1.2.840.10008.1.2.1')
         assert not self.uid == '1.2.840.10008.1.2.1'
+        assert not '1.2.840.10008.1.2.1' == self.uid
         assert not self.uid == 'Explicit VR Little Endian'
+        assert not 'Explicit VR Little Endian' == self.uid
         # Issue 96
         assert not self.uid == 3
         assert self.uid is not None
+
+    def test_equality_deprecation_warning(self):
+        """Test the deprecation warning is working"""
+        uid = UID('1.2.840.10008.1.1')
+        assert uid.name == 'Verification SOP Class'
+        assert uid == 'Verification SOP Class'
+        with pytest.deprecated_call():
+            assert uid == 'Verification SOP Class'
+            assert 'Verification SOP Class' == uid
 
     def test_inequality(self):
         """Test that UID.__ne__ works."""
         assert not self.uid != UID('1.2.840.10008.1.2')
         assert not self.uid != '1.2.840.10008.1.2'
+        assert not '1.2.840.10008.1.2' != self.uid
         assert not self.uid != 'Implicit VR Little Endian'
+        assert not 'Implicit VR Little Endian' != self.uid
         assert self.uid != UID('1.2.840.10008.1.2.1')
         assert self.uid != '1.2.840.10008.1.2.1'
+        assert '1.2.840.10008.1.2.1' != self.uid
         assert self.uid != 'Explicit VR Little Endian'
+        assert 'Explicit VR Little Endian' != self.uid
         # Issue 96
         assert self.uid != 3
+
+    def test_inequality_deprecation_warning(self):
+        """Test the deprecation warning is working"""
+        uid = UID('1.2.840.10008.1.1')
+        assert uid.name == 'Verification SOP Class'
+        assert uid != 'Implicit VR Little Endian'
+        with pytest.deprecated_call():
+            assert uid != 'Implicit VR Little Endian'
+            assert 'Implicit VR Little Endian' != uid
 
     def test_hash(self):
         """Test that UID.__hash_- works."""
@@ -94,7 +120,7 @@ class TestUID(object):
 
     def test_str(self):
         """Test that UID.__str__ works."""
-        assert self.uid.__str__() == 'Implicit VR Little Endian'
+        assert self.uid.__str__() == '1.2.840.10008.1.2'
 
     def test_is_implicit_vr(self):
         """Test that UID.is_implicit_VR works."""
@@ -255,6 +281,16 @@ class TestUID(object):
         """Test raises exception if not a str type"""
         with pytest.raises(TypeError):
             UID(1234)
+
+    def test_transitive(self):
+        """Test for #256"""
+        a = '1.2.840.10008.1.1'
+        uid = UID(a)
+        b = str(uid)
+        assert uid.name == 'Verification SOP Class'
+        assert uid == a
+        assert uid == b
+        assert a == b
 
 
 class TestUIDPrivate(object):

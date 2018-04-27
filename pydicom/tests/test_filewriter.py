@@ -5,6 +5,7 @@ from copy import deepcopy
 from datetime import date, datetime, time, timedelta
 from io import BytesIO
 import os
+import sys
 import unittest
 
 from struct import unpack
@@ -13,10 +14,10 @@ from tempfile import TemporaryFile
 import pytest
 
 from pydicom._storage_sopclass_uids import CTImageStorage
-from pydicom import config, __version_info__
+from pydicom import config, __version_info__, uid
 from pydicom.data import get_testdata_files, get_charset_files
 from pydicom.dataset import Dataset, FileDataset
-from pydicom.dataelem import DataElement
+from pydicom.dataelem import DataElement, RawDataElement
 from pydicom.filebase import DicomBytesIO
 from pydicom.filereader import dcmread, read_dataset
 from pydicom.filewriter import (write_data_element, write_dataset,
@@ -37,9 +38,12 @@ rtplan_name = get_testdata_files("rtplan.dcm")[0]
 rtdose_name = get_testdata_files("rtdose.dcm")[0]
 ct_name = get_testdata_files("CT_small.dcm")[0]
 mr_name = get_testdata_files("MR_small.dcm")[0]
+mr_implicit_name = get_testdata_files("MR_small_implicit.dcm")[0]
+mr_bigendian_name = get_testdata_files("MR_small_bigendian.dcm")[0]
 jpeg_name = get_testdata_files("JPEG2000.dcm")[0]
 no_ts = get_testdata_files("meta_missing_tsyntax.dcm")[0]
 color_pl_name = get_testdata_files("color-pl.dcm")[0]
+sc_rgb_name = get_testdata_files("SC_rgb.dcm")[0]
 datetime_name = mr_name
 
 unicode_name = get_charset_files("chrH31.dcm")[0]
@@ -797,7 +801,7 @@ class TestCorrectAmbiguousVR(unittest.TestCase):
         self.assertTrue(ref_ds[0x60003000].VR == 'OB or OW')
 
         # Missing is_implicit_VR (leave unchanged)
-        del ref_ds.is_implicit_VR
+        ref_ds.is_implicit_VR = None
         ds = correct_ambiguous_vr(deepcopy(ref_ds), True)
         self.assertTrue(ds[0x60003000].VR == 'OB or OW')
         self.assertTrue(ref_ds[0x60003000].VR == 'OB or OW')
@@ -831,6 +835,38 @@ class TestCorrectAmbiguousVRElement(object):
         assert out.VR == 'OB'
         assert out.tag == 0x60003000
         assert out.value == b'\x00'
+
+    def test_not_ambiguous_raw_data_element(self):
+        """Test no change in raw data element if not ambiguous"""
+        elem = RawDataElement(0x60003000, 'OB', 1, b'\x00', 0, True, True)
+        out = correct_ambiguous_vr_element(elem, Dataset(), True)
+        assert out == elem
+        assert type(out) == RawDataElement
+
+    def test_correct_ambiguous_data_element(self):
+        """Test correct ambiguous US/SS element"""
+        ds = Dataset()
+        ds.PixelPaddingValue = b'\xfe\xff'
+        out = correct_ambiguous_vr_element(ds[0x00280120], ds, True)
+        assert out.VR == 'US or SS'
+
+        ds.PixelRepresentation = 0
+        out = correct_ambiguous_vr_element(ds[0x00280120], ds, True)
+        assert out.VR == 'US'
+        assert out.value == 0xfffe
+
+    def test_correct_ambiguous_raw_data_element(self):
+        """Test that correcting ambiguous US/SS raw data element
+        works and converts it to a data element"""
+        ds = Dataset()
+        elem = RawDataElement(
+            0x00280120, 'US or SS', 2, b'\xfe\xff', 0, True, True)
+        ds[0x00280120] = elem
+        ds.PixelRepresentation = 0
+        out = correct_ambiguous_vr_element(elem, ds, True)
+        assert type(out) == DataElement
+        assert out.VR == 'US'
+        assert out.value == 0xfffe
 
     def test_pixel_data_not_ow_or_ob(self):
         """Test no change if can't figure out bit depth"""
@@ -1027,11 +1063,6 @@ class TestWriteToStandard(object):
         """Test writing the dataset changes its file_meta."""
         ds = dcmread(rtplan_name)
         ref_ds = dcmread(rtplan_name)
-        # Ensure no RawDataElements in ref_ds
-        for elem in ref_ds.file_meta:
-            pass
-        for elem in ref_ds.iterall():
-            pass
         for ref_elem, test_elem in zip(ref_ds.file_meta, ds.file_meta):
             assert ref_elem == test_elem
 
@@ -1039,7 +1070,138 @@ class TestWriteToStandard(object):
         assert ref_ds.file_meta != ds.file_meta
         del ref_ds.file_meta
         del ds.file_meta
+
+        # Ensure no RawDataElements in ref_ds and ds
+        for _ in ref_ds:
+            pass
+        for _ in ds:
+            pass
         assert ref_ds == ds
+
+    def test_raw_elements_preserved_implicit_vr(self):
+        """Test writing the dataset preserves raw elements."""
+        ds = dcmread(rtplan_name)
+
+        # raw data elements after reading
+        assert ds.get_item(0x00080070).is_raw  # Manufacturer
+        assert ds.get_item(0x00100020).is_raw  # Patient ID
+        assert ds.get_item(0x300A0006).is_raw  # RT Plan Date
+        assert ds.get_item(0x300A0010).is_raw  # Dose Reference Sequence
+
+        ds.save_as(DicomBytesIO(), write_like_original=False)
+
+        # data set still contains raw data elements after writing
+        assert ds.get_item(0x00080070).is_raw  # Manufacturer
+        assert ds.get_item(0x00100020).is_raw  # Patient ID
+        assert ds.get_item(0x300A0006).is_raw  # RT Plan Date
+        assert ds.get_item(0x300A0010).is_raw  # Dose Reference Sequence
+
+    def test_raw_elements_preserved_explicit_vr(self):
+        """Test writing the dataset preserves raw elements."""
+        ds = dcmread(color_pl_name)
+
+        # raw data elements after reading
+        assert ds.get_item(0x00080070).is_raw  # Manufacturer
+        assert ds.get_item(0x00100010).is_raw  # Patient Name
+        assert ds.get_item(0x00080030).is_raw  # Study Time
+        assert ds.get_item(0x00089215).is_raw  # Derivation Code Sequence
+
+        ds.save_as(DicomBytesIO(), write_like_original=False)
+
+        # data set still contains raw data elements after writing
+        assert ds.get_item(0x00080070).is_raw  # Manufacturer
+        assert ds.get_item(0x00100010).is_raw  # Patient Name
+        assert ds.get_item(0x00080030).is_raw  # Study Time
+        assert ds.get_item(0x00089215).is_raw  # Derivation Code Sequence
+
+    def test_convert_implicit_to_explicit_vr(self):
+        # make sure conversion from implicit to explicit VR works
+        # without private tags
+        ds = dcmread(mr_implicit_name)
+        ds.is_implicit_VR = False
+        ds.file_meta.TransferSyntaxUID = '1.2.840.10008.1.2.1'
+        fp = DicomBytesIO()
+        ds.save_as(fp, write_like_original=False)
+        fp.seek(0)
+        ds_out = dcmread(fp)
+        ds_explicit = dcmread(mr_name)
+
+        for elem_in, elem_out in zip(ds_explicit, ds_out):
+            assert elem_in == elem_out
+
+    def test_convert_explicit_to_implicit_vr(self):
+        # make sure conversion from explicit to implicit VR works
+        # without private tags
+        ds = dcmread(mr_name)
+        ds.is_implicit_VR = True
+        ds.file_meta.TransferSyntaxUID = uid.ImplicitVRLittleEndian
+        fp = DicomBytesIO()
+        ds.save_as(fp, write_like_original=False)
+        fp.seek(0)
+        ds_out = dcmread(fp)
+        ds_implicit = dcmread(mr_implicit_name)
+
+        for elem_in, elem_out in zip(ds_implicit, ds_out):
+            assert elem_in == elem_out
+
+    def test_convert_big_to_little_endian(self):
+        # make sure conversion from big to little endian works
+        # except for pixel data
+        ds = dcmread(mr_bigendian_name)
+        ds.is_little_endian = True
+        ds.file_meta.TransferSyntaxUID = uid.ExplicitVRLittleEndian
+        fp = DicomBytesIO()
+        ds.save_as(fp, write_like_original=False)
+        fp.seek(0)
+        ds_out = dcmread(fp)
+        ds_explicit = dcmread(mr_name)
+
+        # pixel data is not converted automatically
+        del ds_out.PixelData
+        del ds_explicit.PixelData
+
+        for elem_in, elem_out in zip(ds_explicit, ds_out):
+            assert elem_in == elem_out
+
+    def test_convert_little_to_big_endian(self):
+        # make sure conversion from little to big endian works
+        # except for pixel data
+        ds = dcmread(mr_name)
+        ds.is_little_endian = False
+        ds.file_meta.TransferSyntaxUID = uid.ExplicitVRBigEndian
+        fp = DicomBytesIO()
+        ds.save_as(fp, write_like_original=False)
+        fp.seek(0)
+        ds_out = dcmread(fp)
+        ds_explicit = dcmread(mr_bigendian_name)
+
+        # pixel data is not converted automatically
+        del ds_out.PixelData
+        del ds_explicit.PixelData
+
+        for elem_in, elem_out in zip(ds_explicit, ds_out):
+            assert elem_in == elem_out
+
+    @pytest.mark.skipif(sys.version_info[0] == 2,
+                        reason='Saving with another encoding fails in Python2')
+    def test_changed_character_set(self):
+        """Make sure that a changed character set is reflected
+        in the written data elements."""
+        ds = dcmread(multiPN_name)
+        # Latin 1 original encoding
+        assert ds.get_item(0x00100010).value == b'Buc^J\xe9r\xf4me'
+
+        # change encoding to UTF-8
+        ds.SpecificCharacterSet = 'ISO_IR 192'
+        fp = DicomBytesIO()
+        ds.save_as(fp, write_like_original=False)
+        fp.seek(0)
+        ds_out = dcmread(fp)
+        # patient name shall be UTF-8 encoded
+        assert ds_out.get_item(0x00100010).value == b'Buc^J\xc3\xa9r\xc3\xb4me'
+        # decoded values shall be the same as in original dataset
+        for elem_in, elem_out in zip(ds, ds_out):
+            assert elem_in == elem_out
 
     def test_transfer_syntax_added(self):
         """Test TransferSyntaxUID is added/updated if possible."""
@@ -1056,6 +1218,57 @@ class TestWriteToStandard(object):
         ds.is_little_endian = False
         ds.save_as(DicomBytesIO(), write_like_original=False)
         assert ds.file_meta.TransferSyntaxUID == ExplicitVRBigEndian
+
+    def test_private_tag_vr_from_implicit_data(self):
+        """Test that private tags have the correct VR if converting
+        a dataset from implicit to explicit VR.
+        """
+        # convert a dataset with private tags to Implicit VR
+        ds_orig = dcmread(ct_name)
+        ds_orig.is_implicit_VR = True
+        ds_orig.is_little_endian = True
+        fp = DicomBytesIO()
+        ds_orig.save_as(fp, write_like_original=False)
+        fp.seek(0)
+        ds_impl = dcmread(fp)
+
+        # convert the dataset back to explicit VR - private tag VR now unknown
+        ds_impl.is_implicit_VR = False
+        ds_impl.is_little_endian = True
+        ds_impl.file_meta.TransferSyntaxUID = uid.ExplicitVRLittleEndian
+        fp = DicomBytesIO()
+        ds_impl.save_as(fp, write_like_original=False)
+        fp.seek(0)
+        ds_expl = dcmread(fp)
+
+        assert ds_expl[(0x0009, 0x0010)].VR == 'LO'  # private creator
+        assert ds_expl[(0x0009, 0x1001)].VR == 'UN'  # originally LO
+        assert ds_expl[(0x0009, 0x10e7)].VR == 'UN'  # originally UL
+        assert ds_expl[(0x0043, 0x1010)].VR == 'UN'  # originally US
+
+    def test_convert_rgb_from_implicit_to_explicit_vr(self):
+        """Test converting an RGB dataset from implicit to explicit VR
+        and vice verse."""
+        ds_orig = dcmread(sc_rgb_name)
+        ds_orig.is_implicit_VR = True
+        ds_orig.is_little_endian = True
+        fp = DicomBytesIO()
+        ds_orig.save_as(fp, write_like_original=False)
+        fp.seek(0)
+        ds_impl = dcmread(fp)
+        for elem_orig, elem_conv in zip(ds_orig, ds_impl):
+            assert elem_orig == elem_conv
+
+        ds_impl.is_implicit_VR = False
+        ds_impl.is_little_endian = True
+        ds_impl.file_meta.TransferSyntaxUID = uid.ExplicitVRLittleEndian
+        fp = DicomBytesIO()
+        ds_impl.save_as(fp, write_like_original=False)
+        fp.seek(0)
+        # used to raise, see #620
+        ds_expl = dcmread(fp)
+        for elem_orig, elem_conv in zip(ds_orig, ds_expl):
+            assert elem_orig == elem_conv
 
     def test_transfer_syntax_not_added(self):
         """Test TransferSyntaxUID is not added if ExplVRLE."""
@@ -1096,7 +1309,7 @@ class TestWriteToStandard(object):
         transfer_syntax = ds.file_meta.TransferSyntaxUID
         ds.file_meta = Dataset()
         ds.save_as(fp, write_like_original=False)
-        fp = BytesIO(fp.getvalue())  # Workaround to avoid #358
+        fp.seek(0)
         out = dcmread(fp)
         assert out.file_meta.MediaStorageSOPClassUID == ds.SOPClassUID
         assert out.file_meta.MediaStorageSOPInstanceUID == ds.SOPInstanceUID
@@ -1108,7 +1321,7 @@ class TestWriteToStandard(object):
         fp = DicomBytesIO()
         del ds.file_meta
         ds.save_as(fp, write_like_original=False)
-        fp = BytesIO(fp.getvalue())  # Workaround to avoid #358
+        fp.seek(0)
         out = dcmread(fp)
         assert (out.file_meta.MediaStorageSOPClassUID == ds.SOPClassUID)
         assert (
@@ -1150,7 +1363,7 @@ class TestWriteToStandard(object):
         assert fp.read(128) == preamble
         assert fp.read(4) == b'DICM'
 
-        fp = BytesIO(fp.getvalue())  # Workaround to avoid #358
+        fp.seek(0)
         ds_out = dcmread(fp)
         assert ds_out.preamble == preamble
         assert 'PatientID' in ds_out
@@ -1168,7 +1381,7 @@ class TestWriteToStandard(object):
         assert fp.read(4) == b'DICM'
         assert 'MessageID' in ds
 
-        fp = BytesIO(fp.getvalue())  # Workaround to avoid #358
+        fp.seek(0)
         ds_out = dcmread(fp)
         assert ds_out.preamble == preamble
         assert 'PatientID' in ds_out
@@ -1350,6 +1563,12 @@ class TestWriteNonStandard(unittest.TestCase):
         self.assertTrue(same, "Bytestreams are not identical - first "
                         "difference at 0x%x" % pos)
 
+    def ensure_no_raw_data_elements(self, ds):
+        for _ in ds.file_meta:
+            pass
+        for _ in ds:
+            pass
+
     def test_preamble_default(self):
         """Test that the default preamble is written correctly when present."""
         ds = dcmread(ct_name)
@@ -1385,12 +1604,10 @@ class TestWriteNonStandard(unittest.TestCase):
         """Test writing the dataset doesn't change it."""
         ds = dcmread(rtplan_name)
         ref_ds = dcmread(rtplan_name)
-        # Ensure no RawDataElements in ref_ds
-        for elem in ref_ds.file_meta:
-            pass
-        for elem in ref_ds.iterall():
-            pass
         ds.save_as(self.fp, write_like_original=True)
+
+        self.ensure_no_raw_data_elements(ds)
+        self.ensure_no_raw_data_elements(ref_ds)
         self.assertTrue(ref_ds == ds)
 
     def test_file_meta_unchanged(self):
@@ -1411,8 +1628,8 @@ class TestWriteNonStandard(unittest.TestCase):
         self.fp.seek(0)
         self.assertNotEqual(self.fp.read(4), b'DICM')
 
-        fp = BytesIO(self.fp.getvalue())  # Workaround to avoid #358
-        ds_out = dcmread(fp, force=True)
+        self.fp.seek(0)
+        ds_out = dcmread(self.fp, force=True)
         self.assertEqual(ds_out.preamble, None)
         self.assertEqual(ds_out.file_meta, Dataset())
         self.assertTrue('PatientID' in ds_out)
@@ -1427,8 +1644,8 @@ class TestWriteNonStandard(unittest.TestCase):
         self.assertEqual(self.fp.read(128), preamble)
         self.assertEqual(self.fp.read(4), b'DICM')
 
-        fp = BytesIO(self.fp.getvalue())  # Workaround to avoid #358
-        ds_out = dcmread(fp, force=True)
+        self.fp.seek(0)
+        ds_out = dcmread(self.fp, force=True)
         self.assertEqual(ds_out.file_meta, Dataset())
         self.assertTrue('PatientID' in ds_out)
 
@@ -1445,8 +1662,8 @@ class TestWriteNonStandard(unittest.TestCase):
         self.fp.seek(0)
         self.assertNotEqual(self.fp.read(4), b'DICM')
 
-        fp = BytesIO(self.fp.getvalue())  # Workaround to avoid #358
-        ds_out = dcmread(fp, force=True)
+        self.fp.seek(0)
+        ds_out = dcmread(self.fp, force=True)
         self.assertTrue('ImplementationClassUID' in ds_out.file_meta)
         self.assertEqual(ds_out.preamble, None)
         self.assertTrue('PatientID' in ds_out)
@@ -1460,8 +1677,10 @@ class TestWriteNonStandard(unittest.TestCase):
         self.assertEqual(self.fp.read(128), preamble)
         self.assertEqual(self.fp.read(4), b'DICM')
 
-        fp = BytesIO(self.fp.getvalue())  # Workaround to avoid #358
-        ds_out = dcmread(fp, force=True)
+        self.fp.seek(0)
+        ds_out = dcmread(self.fp, force=True)
+        self.ensure_no_raw_data_elements(ds_out)
+
         self.assertEqual(ds.file_meta[:], ds_out.file_meta[:])
         self.assertTrue('TransferSyntaxUID' in ds_out.file_meta[:])
         self.assertEqual(ds_out.preamble, preamble)
@@ -1491,8 +1710,8 @@ class TestWriteNonStandard(unittest.TestCase):
         self.assertEqual(self.fp.read(12),
                          b'\x00\x00\x00\x00\x04\x00\x00\x00\x08\x00\x00\x00')
 
-        fp = BytesIO(self.fp.getvalue())  # Workaround to avoid #358
-        ds_out = dcmread(fp, force=True)
+        self.fp.seek(0)
+        ds_out = dcmread(self.fp, force=True)
         self.assertEqual(ds_out.file_meta, Dataset())
         self.assertTrue('Status' in ds_out)
         self.assertTrue('PatientID' in ds_out)
@@ -1514,8 +1733,8 @@ class TestWriteNonStandard(unittest.TestCase):
         self.assertEqual(self.fp.read(12),
                          b'\x00\x00\x00\x00\x04\x00\x00\x00\x08\x00\x00\x00')
 
-        fp = BytesIO(self.fp.getvalue())  # Workaround to avoid #358
-        ds_out = dcmread(fp, force=True)
+        self.fp.seek(0)
+        ds_out = dcmread(self.fp, force=True)
         self.assertEqual(ds_out.file_meta, Dataset())
         self.assertTrue('Status' in ds_out)
         self.assertTrue('PatientID' in ds_out)
@@ -1533,8 +1752,8 @@ class TestWriteNonStandard(unittest.TestCase):
         self.assertEqual(self.fp.read(128), preamble)
         self.assertEqual(self.fp.read(4), b'DICM')
 
-        fp = BytesIO(self.fp.getvalue())  # Workaround to avoid #358
-        ds_out = dcmread(fp, force=True)
+        self.fp.seek(0)
+        ds_out = dcmread(self.fp, force=True)
         self.assertTrue('TransferSyntaxUID' in ds_out.file_meta)
         self.assertTrue('Status' in ds_out)
         self.assertTrue('PatientID' in ds_out)
@@ -1560,8 +1779,7 @@ class TestWriteNonStandard(unittest.TestCase):
         # Ensure Command Set Elements written as little endian implicit VR
         self.fp.seek(0)
 
-        fp = BytesIO(self.fp.getvalue())  # Workaround to avoid #358
-        ds_out = dcmread(fp, force=True)
+        ds_out = dcmread(self.fp, force=True)
         self.assertTrue('TransferSyntaxUID' in ds_out.file_meta)
         self.assertTrue('Status' in ds_out)
         self.assertTrue('PatientID' in ds_out)
@@ -1653,8 +1871,8 @@ class TestWriteNonStandard(unittest.TestCase):
         self.assertEqual(self.fp.read(128), ds.preamble)
         self.assertEqual(self.fp.read(4), b'DICM')
 
-        fp = BytesIO(self.fp.getvalue())  # Workaround to avoid #358
-        ds_out = dcmread(fp, force=True)
+        self.fp.seek(0)
+        ds_out = dcmread(self.fp, force=True)
         self.assertTrue('Status' in ds_out)
         self.assertTrue('TransferSyntaxUID' in ds_out.file_meta)
         self.assertFalse('PatientID' in ds_out)
@@ -1687,8 +1905,7 @@ class TestWriteFileMetaInfoNonStandard(unittest.TestCase):
         self.assertTrue('ImplementationClassUID' in ds.file_meta)
 
         # Check written meta dataset doesn't contain TransferSyntaxUID
-        fp = BytesIO(self.fp.getvalue())  # Workaround to avoid #358
-        written_ds = dcmread(fp, force=True)
+        written_ds = dcmread(self.fp, force=True)
         self.assertTrue('ImplementationClassUID' in written_ds.file_meta)
         self.assertFalse('TransferSyntaxUID' in written_ds.file_meta)
 

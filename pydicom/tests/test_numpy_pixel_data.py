@@ -1,8 +1,10 @@
 import unittest
+import platform
 import os
 import sys
 import pytest
 import pydicom
+from pydicom.compat import in_py2
 from pydicom.filereader import dcmread
 from pydicom.data import get_testdata_files
 from pydicom.tag import Tag
@@ -56,6 +58,8 @@ emri_jpeg_2k_lossless = get_testdata_files(
     "emri_small_jpeg_2k_lossless.dcm")[0]
 color_3d_jpeg_baseline = get_testdata_files(
     "color3d_jpeg_baseline.dcm")[0]
+one_bit_allocated_name = get_testdata_files(
+    "liver.dcm")[0]
 dir_name = os.path.dirname(sys.argv[0])
 save_dir = os.getcwd()
 
@@ -95,6 +99,20 @@ class numpy_BigEndian_Tests_no_numpy(unittest.TestCase):
     def test_big_endian_PixelArray(self):
         with self.assertRaises((NotImplementedError, )):
             _ = self.emri_big_endian.pixel_array
+
+
+class OneBitAllocatedTestsNoNumpy(unittest.TestCase):
+    def setUp(self):
+        self.test_data = dcmread(one_bit_allocated_name)
+        self.original_handlers = pydicom.config.image_handlers
+        pydicom.config.image_handlers = [None]
+
+    def tearDown(self):
+        pydicom.config.image_handlers = self.original_handlers
+
+    def test_access_pixel_array_raises(self):
+        with self.assertRaises((NotImplementedError, )):
+            _ = self.test_data.pixel_array
 
 
 class numpy_JPEG2000Tests_no_numpy(unittest.TestCase):
@@ -245,6 +263,55 @@ class numpy_BigEndian_Tests_with_numpy(unittest.TestCase):
             b.mean(),
             "Decoded big endian pixel data is not "
             "all {0} (mean == {1})".format(b.mean(), a.mean()))
+
+
+@pytest.mark.skipif(not have_numpy_handler, reason=numpy_missing_message)
+class OneBitAllocatedTests(unittest.TestCase):
+    def setUp(self):
+        self.original_handlers = pydicom.config.image_handlers
+        pydicom.config.image_handlers = [numpy_handler]
+
+    def tearDown(self):
+        pydicom.config.image_handlers = self.original_handlers
+
+    def test_unpack_pixel_data(self):
+        dataset = dcmread(one_bit_allocated_name)
+        packed_data = dataset.PixelData
+        assert len(packed_data) == 3 * 512 * 512 / 8
+        unpacked_data = dataset.pixel_array
+        assert len(unpacked_data) == 3
+        assert len(unpacked_data[0]) == 512
+        assert len(unpacked_data[2]) == 512
+        assert len(unpacked_data[0][0]) == 512
+        assert len(unpacked_data[2][511]) == 512
+        assert unpacked_data[0][0][0] == 0
+        assert unpacked_data[2][511][511] == 0
+        assert unpacked_data[1][256][256] == 1
+
+
+@pytest.mark.skipif(
+    not have_numpy_handler,
+    reason=numpy_missing_message)
+class numpy_LittleEndian_Tests(unittest.TestCase):
+    def setUp(self):
+        self.original_handlers = pydicom.config.image_handlers
+        pydicom.config.image_handlers = [numpy_handler]
+        self.odd_size_image = dcmread(
+            get_testdata_files('SC_rgb_small_odd.dcm')[0])
+        self.emri_small = dcmread(emri_name)
+
+    def tearDown(self):
+        pydicom.config.image_handlers = self.original_handlers
+
+    def test_little_endian_PixelArray_odd_data_size(self):
+        pixel_data = self.odd_size_image.pixel_array
+        assert pixel_data.nbytes == 27
+        assert pixel_data.shape == (3, 3, 3)
+
+    def test_little_endian_PixelArray(self):
+        pixel_data = self.emri_small.pixel_array
+        assert pixel_data.nbytes == 81920
+        assert pixel_data.shape == (10, 64, 64)
 
 
 @pytest.mark.skipif(

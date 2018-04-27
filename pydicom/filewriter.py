@@ -7,8 +7,9 @@ from pydicom import compat
 from pydicom.compat import in_py2
 from pydicom.charset import default_encoding, text_VRs, convert_encodings
 from pydicom.datadict import keyword_for_tag
+from pydicom.dataelem import DataElement_from_raw
 from pydicom.dataset import Dataset
-from pydicom.filebase import DicomFile, DicomFileLike
+from pydicom.filebase import DicomFile, DicomFileLike, DicomBytesIO
 from pydicom.multival import MultiValue
 from pydicom.tag import (Tag, ItemTag, ItemDelimiterTag, SequenceDelimiterTag,
                          tag_in_exception)
@@ -45,6 +46,11 @@ def correct_ambiguous_vr_element(elem, ds, is_little_endian):
         The corrected element
     """
     if 'or' in elem.VR:
+        # convert raw data elements before handling them
+        if elem.is_raw:
+            elem = DataElement_from_raw(elem)
+            ds.__setitem__(elem.tag, elem)
+
         # 'OB or OW': 7fe0,0010 PixelData
         if elem.tag == 0x7fe00010:
 
@@ -62,9 +68,13 @@ def correct_ambiguous_vr_element(elem, ds, is_little_endian):
                     if ds.BitsAllocated > 8:
                         elem.VR = 'OW'
                     else:
-                        if len(ds.PixelData) / (ds.Rows * ds.Columns) == 2:
+                        nr_pixels = ds.Rows * ds.Columns
+                        if 'SamplesPerPixel' in ds:
+                            nr_pixels *= ds.SamplesPerPixel
+                        pixel_size = len(ds.PixelData) / nr_pixels
+                        if pixel_size == 2:
                             elem.VR = 'OW'
-                        elif len(ds.PixelData) / (ds.Rows * ds.Columns) == 1:
+                        elif pixel_size == 1:
                             elem.VR = 'OB'
             except AttributeError:
                 pass
@@ -116,7 +126,7 @@ def correct_ambiguous_vr_element(elem, ds, is_little_endian):
               and elem.tag.elem == 0x3000):
             # Implicit VR must be OW, explicit VR may be OB or OW
             #   as per PS3.5 Section 8.1.2 and Annex A
-            if hasattr(ds, 'is_implicit_VR') and ds.is_implicit_VR:
+            if ds.is_implicit_VR:
                 elem.VR = 'OW'
 
     return elem
@@ -146,13 +156,13 @@ def correct_ambiguous_vr(ds, is_little_endian):
     """
     # Iterate through the elements
     for elem in ds:
-        # Iterate the correction through any sequences
+        # raw data element sequences can be written as they are, because we
+        # have ensured that the transfer syntax has not changed at this point
         if elem.VR == 'SQ':
             for item in elem:
-                item = correct_ambiguous_vr(item, is_little_endian)
+                correct_ambiguous_vr(item, is_little_endian)
         elif 'or' in elem.VR:
-            elem = correct_ambiguous_vr_element(elem, ds, is_little_endian)
-
+            correct_ambiguous_vr_element(elem, ds, is_little_endian)
     return ds
 
 
@@ -383,60 +393,58 @@ def write_data_element(fp, data_element, encoding=default_encoding):
             fp.write(VR)
         if VR in extra_length_VRs:
             fp.write_US(0)  # reserved 2 bytes
-    if VR not in writers:
-        raise NotImplementedError(
-            "write_data_element: unknown Value Representation '{0}'".format(
-                VR))
 
-    length_location = fp.tell()  # save location for later.
-    if not fp.is_implicit_VR and VR not in extra_length_VRs:
-        fp.write_US(0)  # Explicit VR length field is only 2 bytes
+    # write into a buffer to avoid seeking back which can be expansive
+    buffer = DicomBytesIO()
+    buffer.is_little_endian = fp.is_little_endian
+    buffer.is_implicit_VR = fp.is_implicit_VR
+
+    if data_element.is_raw:
+        # raw data element values can be written as they are
+        buffer.write(data_element.value)
+        is_undefined_length = data_element.length == 0xFFFFFFFF
     else:
-        fp.write_UL(
-            0xFFFFFFFF
-        )  # will fill in real length value later if not undefined length item
+        if VR not in writers:
+            raise NotImplementedError(
+                "write_data_element: unknown Value Representation "
+                "'{0}'".format(VR))
 
-    encoding = convert_encodings(encoding)
-
-    writer_function, writer_param = writers[VR]
-    if VR in text_VRs:
-        writer_function(fp, data_element, encoding=encoding[1])
-    elif VR in ('PN', 'SQ'):
-        writer_function(fp, data_element, encoding=encoding)
-    else:
-        # Many numeric types use the same writer but with numeric format
-        # parameter
-        if writer_param is not None:
-            writer_function(fp, data_element, writer_param)
+        encoding = convert_encodings(encoding)
+        writer_function, writer_param = writers[VR]
+        is_undefined_length = data_element.is_undefined_length
+        if VR in text_VRs:
+            writer_function(buffer, data_element, encoding=encoding[1])
+        elif VR in ('PN', 'SQ'):
+            writer_function(buffer, data_element, encoding=encoding)
         else:
-            writer_function(fp, data_element)
+            # Many numeric types use the same writer but with numeric format
+            # parameter
+            if writer_param is not None:
+                writer_function(buffer, data_element, writer_param)
+            else:
+                writer_function(buffer, data_element)
 
-    #  print DataElement(tag, VR, value)
+    # valid pixel data with undefined length shall contain encapsulated
+    # data, e.g. sequence items - raise ValueError otherwise (see #238)
+    if is_undefined_length and data_element.tag == 0x7fe00010:
+        val = data_element.value
+        if (fp.is_little_endian and not
+                val.startswith(b'\xfe\xff\x00\xe0') or
+                not fp.is_little_endian and
+                not val.startswith(b'\xff\xfe\xe0\x00')):
+            raise ValueError('Pixel Data with undefined length must '
+                             'start with an item tag')
 
-    is_undefined_length = False
-    if (hasattr(data_element, "is_undefined_length")
-            and data_element.is_undefined_length):
-        is_undefined_length = True
-        # valid pixel data with undefined length shall contain encapsulated
-        # data, e.g. sequence items - raise ValueError otherwise (see #238)
-        if data_element.tag == 0x7fe00010:  # pixel data
-            val = data_element.value
-            if (fp.is_little_endian and not
-                    val.startswith(b'\xfe\xff\x00\xe0') or
-                    not fp.is_little_endian and
-                    not val.startswith(b'\xff\xfe\xe0\x00')):
-                raise ValueError('Pixel Data with undefined length must '
-                                 'start with an item tag')
-    location = fp.tell()
-    fp.seek(length_location)
-    if not fp.is_implicit_VR and VR not in extra_length_VRs:
-        fp.write_US(location - length_location - 2)  # 2 is length of US
+    value_length = buffer.tell()
+    if (not fp.is_implicit_VR and VR not in extra_length_VRs and
+            not is_undefined_length):
+        fp.write_US(value_length)  # Explicit VR length field is only 2 bytes
     else:
-        # write the proper length of the data_element back in the length slot,
+        # write the proper length of the data_element in the length slot,
         # unless is SQ with undefined length.
-        if not is_undefined_length:
-            fp.write_UL(location - length_location - 4)  # 4 is length of UL
-    fp.seek(location)  # ready for next data_element
+        fp.write_UL(0xFFFFFFFF if is_undefined_length else value_length)
+
+    fp.write(buffer.getvalue())
     if is_undefined_length:
         fp.write_tag(SequenceDelimiterTag)
         fp.write_UL(0)  # 4-byte 'length' of delimiter data item
@@ -448,7 +456,7 @@ def write_dataset(fp, dataset, parent_encoding=default_encoding):
     Attempt to correct ambiguous VR elements when explicit little/big
       encoding Elements that can't be corrected will be returned unchanged.
     """
-    if not fp.is_implicit_VR:
+    if not fp.is_implicit_VR and not dataset.is_original_encoding:
         dataset = correct_ambiguous_vr(dataset, fp.is_little_endian)
 
     dataset_encoding = dataset.get('SpecificCharacterSet', parent_encoding)
@@ -462,9 +470,7 @@ def write_dataset(fp, dataset, parent_encoding=default_encoding):
         if tag.element == 0 and tag.group > 6:
             continue
         with tag_in_exception(tag):
-            # write_data_element(fp, dataset.get_item(tag), dataset_encoding)
-            # XXX for writing raw tags without converting to DataElement
-            write_data_element(fp, dataset[tag], dataset_encoding)
+            write_data_element(fp, dataset.get_item(tag), dataset_encoding)
 
     return fp.tell() - fpStart
 
@@ -583,7 +589,7 @@ def write_file_meta_info(fp, file_meta, enforce_standard=True):
         If any non-Group 2 Elements are present in `file_meta`.
     """
     # Check that no non-Group 2 Elements are present
-    for elem in file_meta:
+    for elem in file_meta.elements():
         if elem.tag.group != 0x0002:
             raise ValueError("Only File Meta Information Group (0002,eeee) "
                              "elements must be present in 'file_meta'.")
@@ -822,6 +828,15 @@ def dcmwrite(filename, dataset, write_like_original=True):
     else:
         fp = DicomFileLike(filename)
 
+    # if we want to write with the same endianess and VR handling as
+    # the read dataset we want to preserve raw data elements for
+    # performance reasons (which is done by get_item);
+    # otherwise we use the default converting item getter
+    if dataset.is_original_encoding:
+        get_item = Dataset.get_item
+    else:
+        get_item = Dataset.__getitem__
+
     try:
         # WRITE FILE META INFORMATION
         if preamble:
@@ -840,7 +855,7 @@ def dcmwrite(filename, dataset, write_like_original=True):
         # Write any Command Set elements now as elements must be in tag order
         #   Mixing Command Set with other elements is non-conformant so we
         #   require `write_like_original` to be True
-        command_set = dataset[0x00000000:0x00010000]
+        command_set = get_item(dataset, slice(0x00000000, 0x00010000))
         if command_set and write_like_original:
             fp.is_implicit_VR = True
             fp.is_little_endian = True
@@ -853,7 +868,7 @@ def dcmwrite(filename, dataset, write_like_original=True):
         fp.is_little_endian = dataset.is_little_endian
 
         # Write non-Command Set elements now
-        write_dataset(fp, dataset[0x00010000:])
+        write_dataset(fp, get_item(dataset, slice(0x00010000, None)))
     finally:
         if not caller_owns_file:
             fp.close()

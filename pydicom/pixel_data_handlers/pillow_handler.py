@@ -114,20 +114,20 @@ def get_pixeldata(dicom_dataset):
             PillowJPEGTransferSyntaxes):
         msg = ("this transfer syntax {0}, can not be read because "
                "Pillow lacks the jpeg decoder plugin".format(
-                   dicom_dataset.file_meta.TransferSyntaxUID))
+                   dicom_dataset.file_meta.TransferSyntaxUID.name))
         raise NotImplementedError(msg)
     if (not have_pillow_jpeg2000_plugin and
             dicom_dataset.file_meta.TransferSyntaxUID in
             PillowJPEG2000TransferSyntaxes):
         msg = ("this transfer syntax {0}, can not be read because "
                "Pillow lacks the jpeg 2000 decoder plugin".format(
-                   dicom_dataset.file_meta.TransferSyntaxUID))
+                   dicom_dataset.file_meta.TransferSyntaxUID.name))
         raise NotImplementedError(msg)
     if (dicom_dataset.file_meta.TransferSyntaxUID not in
             PillowSupportedTransferSyntaxes):
         msg = ("this transfer syntax {0}, can not be read because "
                "Pillow does not support this syntax".format(
-                   dicom_dataset.file_meta.TransferSyntaxUID))
+                   dicom_dataset.file_meta.TransferSyntaxUID.name))
         raise NotImplementedError(msg)
 
     # Make NumPy format code, e.g. "uint16", "int32" etc

@@ -1,6 +1,7 @@
 """Use the numpy package to decode pixel transfer syntaxes."""
 import sys
 import pydicom.uid
+from pydicom import compat
 have_numpy = True
 try:
     import numpy
@@ -84,7 +85,10 @@ def get_pixeldata(dicom_dataset):
     # from two pieces of info:
     # dicom_dataset.PixelRepresentation -- 0 for unsigned, 1 for signed;
     # dicom_dataset.BitsAllocated -- 8, 16, or 32
-    if dicom_dataset.PixelRepresentation == 0:
+    if dicom_dataset.BitsAllocated == 1:
+        # single bits are used for representation of binary data
+        format_str = 'uint8'
+    elif dicom_dataset.PixelRepresentation == 0:
         format_str = 'uint{}'.format(dicom_dataset.BitsAllocated)
     elif dicom_dataset.PixelRepresentation == 1:
         format_str = 'int{}'.format(dicom_dataset.BitsAllocated)
@@ -106,8 +110,7 @@ def get_pixeldata(dicom_dataset):
 
     pixel_bytearray = dicom_dataset.PixelData
 
-    pixel_array = numpy.frombuffer(pixel_bytearray, dtype=numpy_dtype)
-    length_of_pixel_array = pixel_array.nbytes
+    length_of_pixel_array = len(pixel_bytearray)
     expected_length = dicom_dataset.Rows * dicom_dataset.Columns
     if ('NumberOfFrames' in dicom_dataset and
             dicom_dataset.NumberOfFrames > 1):
@@ -117,6 +120,11 @@ def get_pixeldata(dicom_dataset):
         expected_length *= dicom_dataset.SamplesPerPixel
     if dicom_dataset.BitsAllocated > 8:
         expected_length *= (dicom_dataset.BitsAllocated // 8)
+    elif dicom_dataset.BitsAllocated == 1:
+        # need to take the nearest number of bytes that will be needed
+        #  to encode expected_length
+        expected_bit_length = expected_length
+        expected_length = int(expected_length / 8) + (expected_length % 8 > 0)
     padded_length = expected_length
     if expected_length & 1:
         padded_length += 1
@@ -125,8 +133,36 @@ def get_pixeldata(dicom_dataset):
             "Amount of pixel data %d does not "
             "match the expected data %d" %
             (length_of_pixel_array, padded_length))
-    if expected_length != padded_length:
+
+    # the checks above confirmed the amount of data in PixelData is what
+    #  we expect, now we can unpack it
+    if dicom_dataset.BitsAllocated == 1:
+        # if single bits are used for binary representation, a uint8 array
+        # has to be converted to a binary-valued array (that is 8 times bigger)
+        bit = 0
+        pixel_array = \
+            numpy.ndarray(shape=(length_of_pixel_array * 8), dtype='uint8')
+        # bit-packed pixels are packed from the right; i.e., the first pixel
+        #  in the image frame corresponds to the first from the right bit of
+        #  the first byte of the packed PixelData!
+        #  See the following for details:
+        #  * DICOM 3.5 Sect 8.1.1 (explanation of bit ordering)
+        #  * DICOM Annex D (examples of encoding)
+        for byte in pixel_bytearray:
+            if compat.in_py2:
+                byte = ord(byte)
+            for bit in range(bit, bit + 8):
+                pixel_array[bit] = byte & 1
+                byte >>= 1
+            bit += 1
+    else:
+        pixel_array = numpy.frombuffer(pixel_bytearray, dtype=numpy_dtype)
+
+    if dicom_dataset.BitsAllocated == 1:
+        pixel_array = pixel_array[:expected_bit_length]
+    elif expected_length != padded_length:
         pixel_array = pixel_array[:expected_length]
+
     if should_change_PhotometricInterpretation_to_RGB(dicom_dataset):
         dicom_dataset.PhotometricInterpretation = "RGB"
     return pixel_array

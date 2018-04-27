@@ -81,7 +81,7 @@ def get_pixeldata(dicom_dataset):
             not in JPEGLSSupportedTransferSyntaxes):
         msg = ("The jpeg_ls does not support "
                "this transfer syntax {0}.".format(
-                   dicom_dataset.file_meta.TransferSyntaxUID))
+                   dicom_dataset.file_meta.TransferSyntaxUID.name))
         raise NotImplementedError(msg)
 
     if not have_jpeg_ls:

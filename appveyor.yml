@@ -9,7 +9,7 @@ environment:
       PYTHON_VERSION: "2.7.x"
       PYTHON_ARCH: "64"
 
-    - PYTHON: "C:\\Miniconda3-x64"
+    - PYTHON: "C:\\Miniconda34-x64"
       PYTHON_VERSION: "3.4.x"
       PYTHON_ARCH: "64"
 

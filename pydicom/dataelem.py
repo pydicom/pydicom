@@ -24,7 +24,7 @@ from pydicom.datadict import (dictionary_has_tag, dictionary_description,
                               private_dictionary_description, dictionary_VR,
                               repeater_has_tag)
 from pydicom.multival import MultiValue
-from pydicom.tag import Tag
+from pydicom.tag import Tag, BaseTag
 from pydicom.uid import UID
 import pydicom.valuerep  # don't import DS directly as can be changed by config
 
@@ -132,6 +132,7 @@ class DataElement(object):
     descripWidth = 35
     maxBytesToDisplay = 16
     showVR = True
+    is_raw = False
 
     # Python 2: Classes which define __eq__
     # should flag themselves as unhashable
@@ -171,7 +172,9 @@ class DataElement(object):
             Used to determine whether or not `value` requires conversion to a
             value with VM > 1. Default is False.
         """
-        self.tag = Tag(tag)
+        if not isinstance(tag, BaseTag):
+            tag = Tag(tag)
+        self.tag = tag
         self.VR = VR  # Note!: you must set VR before setting value
         if already_converted:
             self._value = value
@@ -400,7 +403,9 @@ class DeferredDataElement(DataElement):
         data_element_tell -- file position at start of data element,
            (not the start of the value part, but start of whole element)
         """
-        self.tag = Tag(tag)
+        if not isinstance(tag, BaseTag):
+            tag = Tag(tag)
+        self.tag = tag
         self.VR = VR
         self._value = None  # flag as unread
 
@@ -434,6 +439,7 @@ class DeferredDataElement(DataElement):
 
 msg = 'tag VR length value value_tell is_implicit_VR is_little_endian'
 RawDataElement = namedtuple('RawDataElement', msg)
+RawDataElement.is_raw = True
 
 
 def DataElement_from_raw(raw_data_element, encoding=None):
@@ -469,10 +475,13 @@ def DataElement_from_raw(raw_data_element, encoding=None):
         try:
             VR = dictionary_VR(raw.tag)
         except KeyError:
-
             # just read the bytes, no way to know what they mean
             if raw.tag.is_private:
-                VR = 'OB'
+                # for VR for private tags see PS3.5, 6.2.2
+                if raw.tag.is_private_creator:
+                    VR = 'LO'
+                else:
+                    VR = 'UN'
 
             # group length tag implied in versions < 3.0
             elif raw.tag.element == 0:

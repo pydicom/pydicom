@@ -65,6 +65,9 @@ def Tag(arg, arg2=None):
     -------
     pydicom.tag.BaseTag
     """
+    if isinstance(arg, BaseTag):
+        return arg
+
     if arg2 is not None:
         arg = (arg, arg2)  # act as if was passed a single tuple
 
@@ -160,7 +163,7 @@ class BaseTag(BaseTag_base_class):
     def __eq__(self, other):
         """Return True if `self` equals `other`."""
         # Check if comparing with another Tag object; if not, create a temp one
-        if not isinstance(other, BaseTag):
+        if not isinstance(other, BaseTag_base_class):
             try:
                 other = Tag(other)
             except Exception:
@@ -201,6 +204,11 @@ class BaseTag(BaseTag_base_class):
     def is_private(self):
         """Return True if the tag is private (has an odd group number)."""
         return self.group % 2 == 1
+
+    @property
+    def is_private_creator(self):
+        """Return True if the tag is a private creator."""
+        return self.is_private and 0x0010 <= self.element < 0x0100
 
 
 def TupleTag(group_elem):

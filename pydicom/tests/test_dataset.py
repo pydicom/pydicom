@@ -795,6 +795,119 @@ class DatasetTests(unittest.TestCase):
         # get_item will follow the deferred read branch
         assert ds.get_item((0x7fe00010)).value == ds_ref.PixelData
 
+    def test_get_item_slice(self):
+        """Test Dataset.get_item with slice argument"""
+        # adapted from test_getitem_slice
+        ds = Dataset()
+        ds.CommandGroupLength = 120  # 0000,0000
+        ds.CommandLengthToEnd = 111  # 0000,0001
+        ds.Overlays = 12  # 0000,51B0
+        ds.LengthToEnd = 12  # 0008,0001
+        ds.SOPInstanceUID = '1.2.3.4'  # 0008,0018
+        ds.SkipFrameRangeFlag = 'TEST'  # 0008,9460
+        ds.add_new(0x00090001, 'PN', 'CITIZEN^1')
+        ds.add_new(0x00090002, 'PN', 'CITIZEN^2')
+        ds.add_new(0x00090003, 'PN', 'CITIZEN^3')
+        elem = RawDataElement(0x00090004, 'PN', 9, b'CITIZEN^4', 0, True, True)
+        ds.__setitem__(0x00090004, elem)
+        elem = RawDataElement(0x00090005, 'PN', 9, b'CITIZEN^5', 0, True, True)
+        ds.__setitem__(0x00090005, elem)
+        elem = RawDataElement(0x00090006, 'PN', 9, b'CITIZEN^6', 0, True, True)
+        ds.__setitem__(0x00090006, elem)
+        ds.PatientName = 'CITIZEN^Jan'  # 0010,0010
+        elem = RawDataElement(0x00100020, 'LO', 5, b'12345', 0, True, True)
+        ds.__setitem__(0x00100020, elem)  # Patient ID
+        ds.ExaminedBodyThickness = 1.223  # 0010,9431
+        ds.BeamSequence = [Dataset()]  # 300A,00B0
+        ds.BeamSequence[0].PatientName = 'ANON'
+
+        # Slice all items - should return original dataset
+        assert ds.get_item(slice(None, None)) == ds
+
+        # Slice starting from and including (0008,0001)
+        test_ds = ds.get_item(slice(0x00080001, None))
+        assert 'CommandGroupLength' not in test_ds
+        assert 'CommandLengthToEnd' not in test_ds
+        assert 'Overlays' not in test_ds
+        assert 'LengthToEnd' in test_ds
+        assert 'BeamSequence' in test_ds
+
+        # Slice ending at and not including (0009,0002)
+        test_ds = ds.get_item(slice(None, 0x00090002))
+        assert 'CommandGroupLength' in test_ds
+        assert 'CommandLengthToEnd' in test_ds
+        assert 'Overlays' in test_ds
+        assert 'LengthToEnd' in test_ds
+        assert 0x00090001 in test_ds
+        assert 0x00090002 not in test_ds
+        assert 'BeamSequence' not in test_ds
+
+        # Slice with a step - every second tag
+        # Should return zeroth tag, then second, fourth, etc...
+        test_ds = ds.get_item(slice(None, None, 2))
+        assert 'CommandGroupLength' in test_ds
+        assert 'CommandLengthToEnd' not in test_ds
+        assert 0x00090001 in test_ds
+        assert 0x00090002 not in test_ds
+
+        # Slice starting at and including (0008,0018) and ending at and not
+        #   including (0009,0008)
+        test_ds = ds.get_item(slice(0x00080018, 0x00090006))
+        assert 'SOPInstanceUID' in test_ds
+        assert 0x00090005 in test_ds
+        assert 0x00090006 not in test_ds
+
+        # Slice starting at and including (0008,0018) and ending at and not
+        #   including (0009,0006), every third element
+        test_ds = ds.get_item(slice(0x00080018, 0x00090008, 3))
+        assert 'SOPInstanceUID' in test_ds
+        assert 0x00090001 not in test_ds
+        assert 0x00090002 in test_ds
+        assert not test_ds.get_item(0x00090002).is_raw
+        assert 0x00090003 not in test_ds
+        assert 0x00090004 not in test_ds
+        assert 0x00090005 in test_ds
+        assert test_ds.get_item(0x00090005).is_raw
+        assert 0x00090006 not in test_ds
+
+        # Slice starting and ending (and not including) (0008,0018)
+        assert ds.get_item(slice((0x0008, 0x0018),
+                                 (0x0008, 0x0018))) == Dataset()
+
+        # Test slicing using other acceptable Tag initialisations
+        assert 'SOPInstanceUID' in ds.get_item(slice(0x00080018, 0x00080019))
+        assert 'SOPInstanceUID' in ds.get_item(slice((0x0008, 0x0018),
+                                                     (0x0008, 0x0019)))
+        assert 'SOPInstanceUID' in ds.get_item(slice('0x00080018',
+                                                     '0x00080019'))
+
+    def test_is_original_encoding(self):
+        """Test Dataset.write_like_original"""
+        ds = Dataset()
+        assert not ds.is_original_encoding
+
+        # simulate reading
+        ds.SpecificCharacterSet = 'ISO_IR 100'
+        ds.read_little_endian = True
+        ds.read_implicit_vr = True
+        ds.read_encoding = ['latin_1', 'latin_1', 'latin_1']
+        assert not ds.is_original_encoding
+
+        ds.is_little_endian = True
+        ds.is_implicit_VR = True
+        assert ds.is_original_encoding
+        # changed character set
+        ds.SpecificCharacterSet = 'ISO_IR 192'
+        assert not ds.is_original_encoding
+        # back to original character set
+        ds.SpecificCharacterSet = 'ISO_IR 100'
+        assert ds.is_original_encoding
+        ds.is_little_endian = False
+        assert not ds.is_original_encoding
+        ds.is_little_endian = True
+        ds.is_implicit_VR = False
+        assert not ds.is_original_encoding
+
     def test_remove_private_tags(self):
         """Test Dataset.remove_private_tags"""
         ds = Dataset()
@@ -940,6 +1053,12 @@ class DatasetTests(unittest.TestCase):
         assert next(line_generator) == "(0010, 0020)"
         with pytest.raises(StopIteration):
             next(line_generator)
+
+    def test_formatted_lines_known_uid(self):
+        """Test that the UID name is output when known."""
+        ds = Dataset()
+        ds.TransferSyntaxUID = '1.2.840.10008.1.2'
+        assert 'Implicit VR Little Endian' in str(ds)
 
     def test_set_convert_private_elem_from_raw(self):
         """Test Dataset.__setitem__ with a raw private element"""
