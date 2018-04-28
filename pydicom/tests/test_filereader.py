@@ -173,10 +173,15 @@ class ReaderTests(unittest.TestCase):
         # [-158.13580300000001, -179.035797, -75.699996999999996]
         got = ct.ImagePositionPatient
         DS = pydicom.valuerep.DS
-        expected = [DS('-158.135803'), DS('-179.035797'), DS('-75.699997')]
-        self.assertTrue(got == expected,
-                        "ImagePosition(Patient) values not as expected."
-                        "got {0}, expected {1}".format(got, expected))
+        if have_numpy:
+            expected = numpy.array([-158.135803, -179.035797, -75.699997])
+            self.assertTrue(numpy.allclose(got, expected),
+                            "ImagePosition(Patient) values not as expected.")
+        else:
+            expected = [DS('-158.135803'), DS('-179.035797'), DS('-75.699997')]
+            self.assertTrue(got == expected,
+                            "ImagePosition(Patient) values not as expected."
+                            "got {0}, expected {1}".format(got, expected))
 
         self.assertEqual(ct.Rows, 128, "Rows not 128")
         self.assertEqual(ct.Columns, 128, "Columns not 128")
@@ -265,8 +270,12 @@ class ReaderTests(unittest.TestCase):
                          "accessed by tag number")
         got = mr.PixelSpacing
         DS = pydicom.valuerep.DS
-        expected = [DS('0.3125'), DS('0.3125')]
-        self.assertTrue(got == expected, "Wrong pixel spacing")
+        if have_numpy:
+            expected = numpy.array([0.3125, 0.3125])
+            self.assertTrue(numpy.allclose(got, expected), "Wrong pixel spacing")
+        else:
+            expected = [DS('0.3125'), DS('0.3125')]
+            self.assertTrue(got == expected, "Wrong pixel spacing")
 
     def testDeflate(self):
         """Returns correct values for sample data elements in test compressed
@@ -876,8 +885,12 @@ class ReadTruncatedFileTests(unittest.TestCase):
                          "accessed by tag number")
         got = mr.PixelSpacing
         DS = pydicom.valuerep.DS
-        expected = [DS('0.3125'), DS('0.3125')]
-        self.assertTrue(got == expected, "Wrong pixel spacing")
+        if have_numpy:
+            expected = numpy.array([0.3125, 0.3125])
+            self.assertTrue(numpy.allclose(got, expected), "Wrong pixel spacing")
+        else:
+            expected = [DS('0.3125'), DS('0.3125')]
+            self.assertTrue(got == expected, "Wrong pixel spacing")
 
     @unittest.skipUnless(
         have_numpy and not have_gdcm_handler,
@@ -910,7 +923,8 @@ class FileLikeTests(unittest.TestCase):
         DS = pydicom.valuerep.DS
         if have_numpy:
             expected = numpy.array([-158.135803, -179.035797, -75.699997])
-            self.assertTrue(numpy.allclose(got, expected))
+            self.assertTrue(numpy.allclose(got, expected),
+                            "ImagePosition(Patient) values not as expected")
         else:
             expected = [DS('-158.135803'), DS('-179.035797'), DS('-75.699997')]
             self.assertTrue(got == expected,
@@ -941,9 +955,14 @@ class FileLikeTests(unittest.TestCase):
         # Tests here simply repeat some of testCT test
         got = ct.ImagePositionPatient
         DS = pydicom.valuerep.DS
-        expected = [DS('-158.135803'), DS('-179.035797'), DS('-75.699997')]
-        self.assertTrue(got == expected,
-                        "ImagePosition(Patient) values not as expected")
+        if have_numpy:
+            expected = numpy.array([-158.135803, -179.035797, -75.699997])
+            self.assertTrue(numpy.allclose(got, expected),
+                            "ImagePosition(Patient) values not as expected")
+        else:
+            expected = [DS('-158.135803'), DS('-179.035797'), DS('-75.699997')]
+            self.assertTrue(got == expected,
+                            "ImagePosition(Patient) values not as expected")
         self.assertEqual(len(ct.PixelData), 128 * 128 * 2,
                          "Pixel data not expected length")
         # Should also be able to close the file ourselves without
