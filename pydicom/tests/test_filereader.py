@@ -272,7 +272,8 @@ class ReaderTests(unittest.TestCase):
         DS = pydicom.valuerep.DS
         if have_numpy:
             expected = numpy.array([0.3125, 0.3125])
-            self.assertTrue(numpy.allclose(got, expected), "Wrong pixel spacing")
+            self.assertTrue(numpy.allclose(got, expected),
+                            "Wrong pixel spacing")
         else:
             expected = [DS('0.3125'), DS('0.3125')]
             self.assertTrue(got == expected, "Wrong pixel spacing")
@@ -887,7 +888,8 @@ class ReadTruncatedFileTests(unittest.TestCase):
         DS = pydicom.valuerep.DS
         if have_numpy:
             expected = numpy.array([0.3125, 0.3125])
-            self.assertTrue(numpy.allclose(got, expected), "Wrong pixel spacing")
+            self.assertTrue(numpy.allclose(got, expected),
+                            "Wrong pixel spacing")
         else:
             expected = [DS('0.3125'), DS('0.3125')]
             self.assertTrue(got == expected, "Wrong pixel spacing")
