@@ -498,7 +498,11 @@ def DataElement_from_raw(raw_data_element, encoding=None):
                 raise KeyError(msg)
     try:
         if have_numpy and VR in ('IS', 'DS'):
-            value = numpy.fromstring(raw.value.decode(encoding),
+            try:
+                num_str = raw.value.decode(encoding)
+            except TypeError:  # In case encoding is a list
+                num_str = raw.value.decode(encoding[0])
+            value = numpy.fromstring(num_str,
                                      dtype='i8' if VR == 'IS' else 'f8',
                                      sep=chr(92))  # 92:'/'
         else:
