@@ -14,6 +14,12 @@ A DataElement has a tag,
 from __future__ import absolute_import
 from collections import namedtuple
 
+have_numpy = True
+try:
+    import numpy
+except ImportError:
+    have_numpy = False
+
 from pydicom import config  # don't import datetime_conversion directly
 from pydicom import compat
 from pydicom.charset import default_encoding
@@ -491,7 +497,12 @@ def DataElement_from_raw(raw_data_element, encoding=None):
                 msg += " can't look up VR"
                 raise KeyError(msg)
     try:
-        value = convert_value(VR, raw, encoding)
+        if have_numpy and VR in ('IS', 'DS'):
+            value = numpy.fromstring(raw.value.decode(encoding),
+                                     dtype='i8' if VR == 'IS' else 'f8',
+                                     sep=chr(92))  # 92:'/'
+        else:
+            value = convert_value(VR, raw, encoding)
     except NotImplementedError as e:
         raise NotImplementedError("{0:s} in tag {1!r}".format(str(e), raw.tag))
     return DataElement(raw.tag, VR, value, raw.value_tell,
