@@ -908,9 +908,13 @@ class FileLikeTests(unittest.TestCase):
         # the code together?
         got = ct.ImagePositionPatient
         DS = pydicom.valuerep.DS
-        expected = [DS('-158.135803'), DS('-179.035797'), DS('-75.699997')]
-        self.assertTrue(got == expected,
-                        "ImagePosition(Patient) values not as expected")
+        if have_numpy:
+            expected = numpy.array([-158.135803, -179.035797, -75.699997])
+            self.assertTrue(numpy.allclose(got, expected))
+        else:
+            expected = [DS('-158.135803'), DS('-179.035797'), DS('-75.699997')]
+            self.assertTrue(got == expected,
+                            "ImagePosition(Patient) values not as expected")
         self.assertEqual(ct.file_meta.ImplementationClassUID,
                          '1.3.6.1.4.1.5962.2',
                          "ImplementationClassUID not the expected value")
@@ -920,10 +924,6 @@ class FileLikeTests(unittest.TestCase):
                          "value accessed by tag number")
         # (0020, 0032) Image Position (Patient)
         # [-158.13580300000001, -179.035797, -75.699996999999996]
-        got = ct.ImagePositionPatient
-        expected = [DS('-158.135803'), DS('-179.035797'), DS('-75.699997')]
-        self.assertTrue(got == expected,
-                        "ImagePosition(Patient) values not as expected")
         self.assertEqual(ct.Rows, 128, "Rows not 128")
         self.assertEqual(ct.Columns, 128, "Columns not 128")
         self.assertEqual(ct.BitsStored, 16, "Bits Stored not 16")
