@@ -857,8 +857,13 @@ class DeferredReadTests(unittest.TestCase):
         ds_defer = dcmread(self.testfile_name, defer_size=2000)
         for data_elem in ds_norm:
             tag = data_elem.tag
-            self.assertEqual(data_elem.value, ds_defer[tag].value,
-                             "Mismatched value for tag %r" % tag)
+            if data_elem.value.__class__.__name__ == "ndarray":
+                self.assertTrue(numpy.allclose(data_elem.value,
+                                               ds_defer[tag].value),
+                                "Mismatched value for tag {}".format(tag))
+            else:
+                self.assertEqual(data_elem.value, ds_defer[tag].value,
+                                 "Mismatched value for tag {}".format(tag))
 
     def testZippedDeferred(self):
         """Deferred values from a gzipped file works.............."""
