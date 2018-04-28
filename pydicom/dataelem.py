@@ -14,12 +14,6 @@ A DataElement has a tag,
 from __future__ import absolute_import
 from collections import namedtuple
 
-have_numpy = True
-try:
-    import numpy
-except ImportError:
-    have_numpy = False
-
 from pydicom import config  # don't import datetime_conversion directly
 from pydicom import compat
 from pydicom.charset import default_encoding
@@ -33,6 +27,12 @@ from pydicom.multival import MultiValue
 from pydicom.tag import Tag, BaseTag
 from pydicom.uid import UID
 import pydicom.valuerep  # don't import DS directly as can be changed by config
+
+have_numpy = True
+try:
+    import numpy
+except ImportError:
+    have_numpy = False
 
 if not in_py2:
     from pydicom.valuerep import PersonName3 as PersonNameUnicode
