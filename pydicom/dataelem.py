@@ -282,9 +282,12 @@ class DataElement(object):
             return True
 
         if isinstance(other, self.__class__):
-            if self.tag == other.tag and self.VR == other.VR \
-                    and self.value == other.value:
-                return True
+            if self.tag == other.tag and self.VR == other.VR:
+                if self.value.__class__.__name__ == 'ndarray':
+                    if numpy.allclose(self.value, other.value):
+                        return True
+                elif self.value == other.value:
+                    return True
 
         return NotImplemented
 
