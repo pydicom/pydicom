@@ -509,6 +509,8 @@ def DataElement_from_raw(raw_data_element, encoding=None):
             value = numpy.fromstring(num_str,
                                      dtype='i8' if VR == 'IS' else 'f8',
                                      sep=chr(92))  # 92:'/'
+            if len(value) == 1:  # Don't use array for one number
+                value = value[0]
         else:
             value = convert_value(VR, raw, encoding)
     except NotImplementedError as e:
