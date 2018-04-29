@@ -20,12 +20,13 @@ latin1_file = get_charset_files("chrFren.dcm")[0]
 jp_file = get_charset_files("chrH31.dcm")[0]
 multiPN_file = get_charset_files("chrFrenMulti.dcm")[0]
 sq_encoding_file = get_charset_files("chrSQEncoding.dcm")[0]
+sq_encoding1_file = get_charset_files("chrSQEncoding1.dcm")[0]
 explicit_ir6_file = get_charset_files("chrJapMultiExplicitIR6.dcm")[0]
 normal_file = get_testdata_files("CT_small.dcm")[0]
 
 
 class CharsetTests(unittest.TestCase):
-    def testLatin1(self):
+    def test_latin1(self):
         """charset: can read and decode latin_1 file........................"""
         ds = dcmread(latin1_file)
         ds.decode()
@@ -35,7 +36,7 @@ class CharsetTests(unittest.TestCase):
         self.assertEqual(expected, got,
                          "Expected %r, got %r" % (expected, got))
 
-    def testEncodings(self):
+    def test_encodings(self):
         test_string = u'Hello World'
         for x in pydicom.charset.python_encoding.items():
             try:
@@ -46,7 +47,7 @@ class CharsetTests(unittest.TestCase):
                 message = "%s has invalid python encoding %s" % (found, term)
                 self.fail(msg=message)
 
-    def testNestedCharacterSets(self):
+    def test_nested_character_sets(self):
         """charset: can read and decode SQ with different encodings........."""
         ds = dcmread(sq_encoding_file)
         ds.decode()
@@ -56,6 +57,21 @@ class CharsetTests(unittest.TestCase):
         # Instead, we make sure that it is decoded using the
         # (0008,0005) tag of the dataset
 
+        expected = (u'\uff94\uff8f\uff80\uff9e^\uff80\uff9b\uff73='
+                    u'\u5c71\u7530^\u592a\u90ce='
+                    u'\u3084\u307e\u3060^\u305f\u308d\u3046')
+
+        got = ds[0x32, 0x1064][0].PatientName
+        self.assertEqual(expected, got,
+                         "Expected %r, got %r" % (expected, got))
+
+    def test_inherited_character_set_in_sequence(self):
+        """charset: can read and decode SQ with parent encoding............."""
+        ds = dcmread(sq_encoding1_file)
+        ds.decode()
+
+        # These datasets inside of the SQ shall be decoded with the parent
+        # dataset's encoding
         expected = (u'\uff94\uff8f\uff80\uff9e^\uff80\uff9b\uff73='
                     u'\u5c71\u7530^\u592a\u90ce='
                     u'\u3084\u307e\u3060^\u305f\u308d\u3046')

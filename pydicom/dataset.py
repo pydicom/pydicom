@@ -285,6 +285,7 @@ class Dataset(dict):
             """Callback to decode `data_element`."""
             if data_element.VR == 'SQ':
                 for dset in data_element.value:
+                    dset._parent_encoding = dicom_character_set
                     dset.decode()
             else:
                 decode_data_element(data_element, dicom_character_set)
