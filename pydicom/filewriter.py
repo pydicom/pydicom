@@ -214,6 +214,8 @@ def write_UI(fp, data_element):
 
 def _is_multi_value(val):
     """Return True if `val` is a multi-value container."""
+    if val.__class__.__name__ == 'ndarray':
+        return True
     return isinstance(val, (MultiValue, list, tuple))
 
 
@@ -269,8 +271,8 @@ def write_number_string(fp, data_element, padding=' '):
 
     if _is_multi_value(val):
         val = "\\".join((x.original_string
-                         if hasattr(x, 'original_string') else str(x)
-                         for x in val))
+                         if hasattr(x, 'original_string')
+                         else str(x) for x in val))
     else:
         if hasattr(val, 'original_string'):
             val = val.original_string
