@@ -61,9 +61,10 @@ class CharsetTests(unittest.TestCase):
                     u'\u5c71\u7530^\u592a\u90ce='
                     u'\u3084\u307e\u3060^\u305f\u308d\u3046')
 
-        got = ds[0x32, 0x1064][0].PatientName
-        self.assertEqual(expected, got,
-                         "Expected %r, got %r" % (expected, got))
+        sequence = ds[0x32, 0x1064][0]
+        assert sequence._character_set == [
+            'shift_jis', 'iso2022_jp', 'iso2022_jp']
+        assert expected == sequence.PatientName
 
     def test_inherited_character_set_in_sequence(self):
         """charset: can read and decode SQ with parent encoding............."""
@@ -76,26 +77,27 @@ class CharsetTests(unittest.TestCase):
                     u'\u5c71\u7530^\u592a\u90ce='
                     u'\u3084\u307e\u3060^\u305f\u308d\u3046')
 
-        got = ds[0x32, 0x1064][0].PatientName
-        self.assertEqual(expected, got,
-                         "Expected %r, got %r" % (expected, got))
+        sequence = ds[0x32, 0x1064][0]
+        assert sequence._character_set == [
+            'shift_jis', 'iso2022_jp', 'iso2022_jp']
+        assert expected == sequence.PatientName
 
-    def testStandardFile(self):
+    def test_standard_file(self):
         """charset: can read and decode standard file without special char.."""
         ds = dcmread(normal_file)
         ds.decode()
 
-    def testExplicitISO2022_IR6(self):
+    def test_explicit_iso2022_ir6(self):
         """charset: can decode file with multi-valued data elements........."""
         ds = dcmread(explicit_ir6_file)
         ds.decode()
 
-    def testMultiPN(self):
+    def test_multi_PN(self):
         """charset: can decode file with multi-valued data elements........."""
         ds = dcmread(multiPN_file)
         ds.decode()
 
-    def testEncodingWithSpecificTags(self):
+    def test_encoding_with_specific_tags(self):
         """Encoding is correctly applied even if  Specific Character Set
         is not in specific tags..."""
         ds = dcmread(jp_file, specific_tags=['PatientName'])
