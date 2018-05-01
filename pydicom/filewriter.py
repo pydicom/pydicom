@@ -483,9 +483,9 @@ def _harmonize_properties(dataset, fp):
     Properties set on the destination file object always have preference.
     """
     # ensure preference of fp over dataset
-    if fp.is_little_endian is not None:
+    if hasattr(fp, 'is_little_endian'):
         dataset.is_little_endian = fp.is_little_endian
-    if fp.is_implicit_VR is not None:
+    if hasattr(fp, 'is_implicit_VR'):
         dataset.is_implicit_VR = fp.is_implicit_VR
 
     # write the properties back to have a consistent state
