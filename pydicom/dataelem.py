@@ -509,8 +509,8 @@ def DataElement_from_raw(raw_data_element, encoding=None):
                 num_str = raw.value.decode(encoding)
             except TypeError:  # In case encoding is a list
                 num_str = raw.value.decode(encoding[0])
-            regex = r'[ \\0-9\.+-]*' if VR == 'IS' else r'[ \\0-9\.+eE-]*'
-            if re.fullmatch(regex, num_str) is None:
+            regex = r'[ \\0-9\.+-]*\Z' if VR == 'IS' else r'[ \\0-9\.+eE-]*\Z'
+            if re.match(regex, num_str) is None:
                 raise ValueError("{}: char(s) not in repertoire: '{}'".
                                  format(VR, re.sub(regex, '', num_str)))
             value = numpy.fromstring(num_str,
