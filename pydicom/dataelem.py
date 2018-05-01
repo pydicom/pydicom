@@ -13,6 +13,7 @@ A DataElement has a tag,
 #
 from __future__ import absolute_import
 from collections import namedtuple
+import re
 
 from pydicom import config  # don't import datetime_conversion directly
 from pydicom import compat
@@ -502,13 +503,19 @@ def DataElement_from_raw(raw_data_element, encoding=None):
                 raise KeyError(msg)
     try:
         if have_numpy and VR in ('IS', 'DS'):
+            # allowed chars IS: \ 0-9 + -
+            #               DS: \ 0-9 + - E e .
             try:
                 num_str = raw.value.decode(encoding)
             except TypeError:  # In case encoding is a list
                 num_str = raw.value.decode(encoding[0])
+            regex = r'[ \\0-9\.+-]*' if VR == 'IS' else r'[ \\0-9\.+eE-]*'
+            if re.fullmatch(regex, num_str) is None:
+                raise ValueError("{}: char(s) not in repertoire: '{}'".
+                                 format(VR, re.sub(regex, '', num_str)))
             value = numpy.fromstring(num_str,
                                      dtype='i8' if VR == 'IS' else 'f8',
-                                     sep=chr(92))  # 92:'/'
+                                     sep=chr(92))  # 92:'\'
             if len(value) == 1:  # Don't use array for one number
                 value = value[0]
         else:
