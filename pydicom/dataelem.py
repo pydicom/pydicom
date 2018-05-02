@@ -38,6 +38,7 @@ try:
 except ImportError:
     have_numpy = False
 
+
 # Helper functions:
 def isMultiValue(value):
     """Return True if `value` is list-like (iterable),

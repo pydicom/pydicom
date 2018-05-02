@@ -341,6 +341,7 @@ def convert_value_num_str(VR, raw_data_element, encoding):
         value = value[0]
     return value
 
+
 def convert_value(VR, raw_data_element, encoding=default_encoding):
     """Return the converted value (from raw bytes) for the given VR"""
     if VR not in converters:
