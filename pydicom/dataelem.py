@@ -13,7 +13,6 @@ A DataElement has a tag,
 #
 from __future__ import absolute_import
 from collections import namedtuple
-import re
 
 from pydicom import config  # don't import datetime_conversion directly
 from pydicom import compat
@@ -29,16 +28,15 @@ from pydicom.tag import Tag, BaseTag
 from pydicom.uid import UID
 import pydicom.valuerep  # don't import DS directly as can be changed by config
 
+if not in_py2:
+    from pydicom.valuerep import PersonName3 as PersonNameUnicode
+    PersonName = PersonNameUnicode
+
 have_numpy = True
 try:
     import numpy
 except ImportError:
     have_numpy = False
-
-if not in_py2:
-    from pydicom.valuerep import PersonName3 as PersonNameUnicode
-    PersonName = PersonNameUnicode
-
 
 # Helper functions:
 def isMultiValue(value):
@@ -473,7 +471,7 @@ def DataElement_from_raw(raw_data_element, encoding=None):
 
     if in_py2:
         encoding = encoding or default_encoding
-    from pydicom.values import convert_value
+    from pydicom.values import convert_value, convert_value_num_str
     raw = raw_data_element
 
     # If user has hooked into conversion of raw values, call his/her routine
@@ -503,21 +501,7 @@ def DataElement_from_raw(raw_data_element, encoding=None):
                 raise KeyError(msg)
     try:
         if have_numpy and VR in ('IS', 'DS'):
-            # allowed chars IS: \ 0-9 + -
-            #               DS: \ 0-9 + - E e .
-            try:
-                num_str = raw.value.decode(encoding)
-            except TypeError:  # In case encoding is a list
-                num_str = raw.value.decode(encoding[0])
-            regex = r'[ \\0-9\.+-]*\Z' if VR == 'IS' else r'[ \\0-9\.+eE-]*\Z'
-            if re.match(regex, num_str) is None:
-                raise ValueError("{}: char(s) not in repertoire: '{}'".
-                                 format(VR, re.sub(regex[:-2], '', num_str)))
-            value = numpy.fromstring(num_str,
-                                     dtype='i8' if VR == 'IS' else 'f8',
-                                     sep=chr(92))  # 92:'\'
-            if len(value) == 1:  # Don't use array for one number
-                value = value[0]
+            value = convert_value_num_str(VR, raw, encoding)
         else:
             value = convert_value(VR, raw, encoding)
     except NotImplementedError as e:

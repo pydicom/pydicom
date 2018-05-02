@@ -3,6 +3,7 @@
    data elements to proper python types
 """
 
+import re
 from io import BytesIO
 from struct import (unpack, calcsize)
 
@@ -18,6 +19,12 @@ from pydicom.tag import (Tag, TupleTag)
 import pydicom.uid
 import pydicom.valuerep  # don't import DS directly as can be changed by config
 from pydicom.valuerep import (MultiString, DA, DT, TM)
+
+have_numpy = True
+try:
+    import numpy
+except ImportError:
+    have_numpy = False
 
 if not in_py2:
     from pydicom.valuerep import PersonName3 as PersonName
@@ -312,6 +319,27 @@ def convert_UR_string(byte_string,
     byte_string = byte_string.rstrip()
     return byte_string
 
+
+def convert_value_num_str(VR, raw_data_element, encoding):
+    """Return the converted value (from raw bytes) for IS and DS.
+
+    Only for use if numpy is available. Faster due to fromstring."""
+    try:
+        num_str = raw_data_element.value.decode(encoding)
+    except TypeError:  # In case encoding is a list
+        num_str = raw_data_element.value.decode(encoding[0])
+    # allowed chars IS: \ 0-9 + -
+    #               DS: \ 0-9 + - E e .
+    regex = r'[ \\0-9\.+-]*\Z' if VR == 'IS' else r'[ \\0-9\.+eE-]*\Z'
+    if re.match(regex, num_str) is None:
+        raise ValueError("{}: char(s) not in repertoire: '{}'".
+                         format(VR, re.sub(regex[:-2], '', num_str)))
+    value = numpy.fromstring(num_str,
+                             dtype='i8' if VR == 'IS' else 'f8',
+                             sep=chr(92))  # 92:'\'
+    if len(value) == 1:  # Don't use array for one number
+        value = value[0]
+    return value
 
 def convert_value(VR, raw_data_element, encoding=default_encoding):
     """Return the converted value (from raw bytes) for the given VR"""
