@@ -512,7 +512,7 @@ def DataElement_from_raw(raw_data_element, encoding=None):
             regex = r'[ \\0-9\.+-]*\Z' if VR == 'IS' else r'[ \\0-9\.+eE-]*\Z'
             if re.match(regex, num_str) is None:
                 raise ValueError("{}: char(s) not in repertoire: '{}'".
-                                 format(VR, re.sub(regex, '', num_str)))
+                                 format(VR, re.sub(regex[:-2], '', num_str)))
             value = numpy.fromstring(num_str,
                                      dtype='i8' if VR == 'IS' else 'f8',
                                      sep=chr(92))  # 92:'\'
