@@ -456,6 +456,8 @@ def write_dataset(fp, dataset, parent_encoding=default_encoding):
     Attempt to correct ambiguous VR elements when explicit little/big
       encoding Elements that can't be corrected will be returned unchanged.
     """
+    _harmonize_properties(dataset, fp)
+
     if not fp.is_implicit_VR and not dataset.is_original_encoding:
         dataset = correct_ambiguous_vr(dataset, fp.is_little_endian)
 
@@ -473,6 +475,22 @@ def write_dataset(fp, dataset, parent_encoding=default_encoding):
             write_data_element(fp, dataset.get_item(tag), dataset_encoding)
 
     return fp.tell() - fpStart
+
+
+def _harmonize_properties(dataset, fp):
+    """Make sure the properties in the dataset and the file pointer are
+    consistent, so the user can set both with the same effect.
+    Properties set on the destination file object always have preference.
+    """
+    # ensure preference of fp over dataset
+    if hasattr(fp, 'is_little_endian'):
+        dataset.is_little_endian = fp.is_little_endian
+    if hasattr(fp, 'is_implicit_VR'):
+        dataset.is_implicit_VR = fp.is_implicit_VR
+
+    # write the properties back to have a consistent state
+    fp.is_implicit_VR = dataset.is_implicit_VR
+    fp.is_little_endian = dataset.is_little_endian
 
 
 def write_sequence(fp, data_element, encoding):

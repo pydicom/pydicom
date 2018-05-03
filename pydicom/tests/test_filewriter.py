@@ -1129,6 +1129,46 @@ class TestWriteToStandard(object):
         for elem_in, elem_out in zip(ds_explicit, ds_out):
             assert elem_in == elem_out
 
+    def test_write_dataset(self):
+        # make sure writing and reading back a dataset works correctly
+        ds = dcmread(mr_implicit_name)
+        fp = DicomBytesIO()
+        write_dataset(fp, ds)
+        fp.seek(0)
+        ds_read = read_dataset(fp, is_implicit_VR=True, is_little_endian=True)
+        for elem_orig, elem_read in zip(ds_read, ds):
+            assert elem_orig == elem_read
+
+    def test_write_dataset_with_explicit_vr(self):
+        # make sure conversion from implicit to explicit VR does not
+        # raise (regression test for #632)
+        ds = dcmread(mr_implicit_name)
+        fp = DicomBytesIO()
+        fp.is_implicit_VR = False
+        fp.is_little_endian = True
+        write_dataset(fp, ds)
+        fp.seek(0)
+        ds_read = read_dataset(fp, is_implicit_VR=False, is_little_endian=True)
+        for elem_orig, elem_read in zip(ds_read, ds):
+            assert elem_orig == elem_read
+
+    def test_convert_implicit_to_explicit_vr_using_destination(self):
+        # make sure conversion from implicit to explicit VR works
+        # if setting the property in the destination
+        ds = dcmread(mr_implicit_name)
+        ds.is_implicit_VR = False
+        ds.file_meta.TransferSyntaxUID = '1.2.840.10008.1.2.1'
+        fp = DicomBytesIO()
+        fp.is_implicit_VR = False
+        fp.is_little_endian = True
+        ds.save_as(fp, write_like_original=False)
+        fp.seek(0)
+        ds_out = dcmread(fp)
+        ds_explicit = dcmread(mr_name)
+
+        for elem_in, elem_out in zip(ds_explicit, ds_out):
+            assert elem_in == elem_out
+
     def test_convert_explicit_to_implicit_vr(self):
         # make sure conversion from explicit to implicit VR works
         # without private tags
