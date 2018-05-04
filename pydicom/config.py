@@ -9,6 +9,9 @@
 
 import logging
 
+class ConfigConflictError(Exception):
+    pass
+
 # Set the type used to hold DS values
 #    default False; was decimal-based in pydicom 0.9.7
 use_DS_decimal = False
@@ -36,8 +39,12 @@ def DS_decimal(use_Decimal_boolean=True):
     """Set DS class to be derived from Decimal (True) or from float (False)
     If this function is never called, the default in pydicom >= 0.9.8
     is for DS to be based on float.
+
+    Setting Decimal sets use_DS_numpy to False.
     """
     use_DS_decimal = use_Decimal_boolean
+    if use_DS_decimal:
+        use_DS_numpy = False
     import pydicom.valuerep
     if use_DS_decimal:
         pydicom.valuerep.DSclass = pydicom.valuerep.DSdecimal
@@ -45,7 +52,27 @@ def DS_decimal(use_Decimal_boolean=True):
         pydicom.valuerep.DSclass = pydicom.valuerep.DSfloat
 
 
+def use_numpy_for_VR(VR):
+    """Returns True if the given VR should be returned as a numpy ndarray."""
+    if VR == 'IS' and use_IS_numpy:
+        return True
+    elif VR == 'DS' and use_DS_numpy:
+        if use_DS_decimal:
+            msg = 'use_DS_decimal and use_DS_numpy are both set to True.'
+            raise ConfigConflictError(msg)
+        return True
+    # VR is not IS or DS
+    return False
+
 # Configuration flags
+use_DS_numpy = True
+"""Set to False to avoid DS being returned as numpy ndarray objects.
+Default: True."""
+
+use_IS_numpy = True
+"""Set to False to avoid IS being returned as numpy ndarray objects.
+Default: True."""
+
 allow_DS_float = False
 """Set allow_float to True to allow DSdecimal instances
 to be created with floats; otherwise, they must be explicitly

@@ -698,6 +698,58 @@ class ReaderTests(unittest.TestCase):
         except EOFError:
             self.fail('Unexpected EOFError raised')
 
+    def test_IS_class_default_config(self):
+        """Test class of the object matches the config."""
+        # config.use_DS_numpy default is True
+        # ndarray should be used if it is available
+        rtss = dcmread(rtstruct_name, force=True)
+        col = rtss.ROIContourSequence[0].ROIDisplayColor  # VR is IS
+        if have_numpy:
+            self.assertEqual(col.__class__.__name__, 'ndarray')
+            self.assertEqual(col.dtype, 'int64')
+        else:
+            self.assertEqual(col.__class__.__name__, 'MultiValue')
+
+    def test_alt_config_IS_class(self):
+        """Test class of the object matches the config,
+        when the config is changed"""
+        pydicom.config.use_IS_numpy = False
+        rtss = dcmread(rtstruct_name, force=True)
+        col = rtss.ROIContourSequence[0].ROIDisplayColor  # VR is IS
+        self.assertEqual(col.__class__.__name__, 'MultiValue')
+        pydicom.config.use_IS_numpy = True
+
+    def test_DS_class_default_config(self):
+        """Test class of the object matches the config."""
+        # config.use_DS_numpy default is True
+        # ndarray should be used if it is available
+        rtss = dcmread(rtstruct_name, force=True)
+        # ContourData has VR of DS
+        cd = rtss.ROIContourSequence[0].ContourSequence[0].ContourData
+        if have_numpy:
+            self.assertEqual(cd.__class__.__name__, 'ndarray')
+            self.assertEqual(cd.dtype, 'float64')
+        else:
+            self.assertEqual(cd.__class__.__name__, 'MultiValue')
+
+    def test_alt_config_DS_class_default_config(self):
+        """Test class of the object matches the config."""
+        pydicom.config.use_DS_numpy = False
+        rtss = dcmread(rtstruct_name, force=True)
+        # ContourData has VR of DS
+        cd = rtss.ROIContourSequence[0].ContourSequence[0].ContourData
+        self.assertEqual(cd.__class__.__name__, 'MultiValue')
+        pydicom.config.use_DS_numpy = True
+
+    @unittest.skipUnless(have_numpy, 'Will not trigger without numpy.')
+    def test_DS_conflict_config(self):
+        pydicom.config.use_DS_numpy = True
+        pydicom.config.DS_decimal(True)
+        rtss = dcmread(rtstruct_name, force=True)
+        # ContourData has VR of DS
+        cd = rtss.ROIContourSequence[0].ContourSequence[0].ContourData
+        self.assertRaises(pydicom.config.ConfigConflictError)
+        pydicom.config.DS_decimal(False)
 
 class ReadDataElementTests(unittest.TestCase):
     def setUp(self):

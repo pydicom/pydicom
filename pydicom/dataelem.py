@@ -501,7 +501,7 @@ def DataElement_from_raw(raw_data_element, encoding=None):
                 msg += " can't look up VR"
                 raise KeyError(msg)
     try:
-        if have_numpy and VR in ('IS', 'DS'):
+        if have_numpy and config.use_numpy_for_VR(VR):
             value = convert_value_num_str(VR, raw, encoding)
         else:
             value = convert_value(VR, raw, encoding)
