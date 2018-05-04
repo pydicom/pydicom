@@ -751,6 +751,7 @@ class ReaderTests(unittest.TestCase):
         self.assertRaises(pydicom.config.ConfigConflictError)
         pydicom.config.DS_decimal(False)
 
+
 class ReadDataElementTests(unittest.TestCase):
     def setUp(self):
         ds = Dataset()

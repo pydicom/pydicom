@@ -9,8 +9,10 @@
 
 import logging
 
+
 class ConfigConflictError(Exception):
     pass
+
 
 # Set the type used to hold DS values
 #    default False; was decimal-based in pydicom 0.9.7
@@ -63,6 +65,7 @@ def use_numpy_for_VR(VR):
         return True
     # VR is not IS or DS
     return False
+
 
 # Configuration flags
 use_DS_numpy = True
