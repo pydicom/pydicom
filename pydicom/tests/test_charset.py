@@ -7,13 +7,9 @@ import unittest
 
 from pydicom.data import get_charset_files
 from pydicom.data import get_testdata_files
-from pydicom import dicomio
 import pydicom.charset
-from pydicom.compat import in_py2
 from pydicom.dataelem import DataElement
 from pydicom import dcmread
-import unittest
-import pytest
 
 
 latin1_file = get_charset_files("chrFren.dcm")[0]

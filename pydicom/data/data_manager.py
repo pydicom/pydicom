@@ -5,7 +5,7 @@
 # license : See LICENSE
 
 from os import walk
-from os.path import abspath, dirname, join, isdir
+from os.path import abspath, dirname, join
 import fnmatch
 
 DATA_ROOT = abspath(dirname(__file__))
