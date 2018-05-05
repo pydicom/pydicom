@@ -133,5 +133,6 @@ class MultiValuetests(unittest.TestCase):
         self.assertFalse(multival != multival2)
         self.assertTrue(multival != multival3)
 
+
 if __name__ == "__main__":
     unittest.main()
