@@ -458,6 +458,7 @@
             <span class="sd">&quot;&quot;&quot;Callback to decode `data_element`.&quot;&quot;&quot;</span>
             <span class="k">if</span> <span class="n">data_element</span><span class="o">.</span><span class="n">VR</span> <span class="o">==</span> <span class="s1">&#39;SQ&#39;</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">dset</span> <span class="ow">in</span> <span class="n">data_element</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+                    <span class="n">dset</span><span class="o">.</span><span class="n">_parent_encoding</span> <span class="o">=</span> <span class="n">dicom_character_set</span>
                     <span class="n">dset</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">decode_data_element</span><span class="p">(</span><span class="n">data_element</span><span class="p">,</span> <span class="n">dicom_character_set</span><span class="p">)</span>
