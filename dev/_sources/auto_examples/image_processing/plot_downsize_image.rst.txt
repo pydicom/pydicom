@@ -140,7 +140,7 @@ instead of averagin the pixels. Finally, the image is store as a dicom image.
     print('The information of the data set after downsampling: \n')
     print(ds)
 
-**Total running time of the script:** ( 0 minutes  0.007 seconds)
+**Total running time of the script:** ( 0 minutes  0.008 seconds)
 
 
 
