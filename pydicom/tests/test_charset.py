@@ -20,12 +20,13 @@ latin1_file = get_charset_files("chrFren.dcm")[0]
 jp_file = get_charset_files("chrH31.dcm")[0]
 multiPN_file = get_charset_files("chrFrenMulti.dcm")[0]
 sq_encoding_file = get_charset_files("chrSQEncoding.dcm")[0]
+sq_encoding1_file = get_charset_files("chrSQEncoding1.dcm")[0]
 explicit_ir6_file = get_charset_files("chrJapMultiExplicitIR6.dcm")[0]
 normal_file = get_testdata_files("CT_small.dcm")[0]
 
 
 class CharsetTests(unittest.TestCase):
-    def testLatin1(self):
+    def test_latin1(self):
         """charset: can read and decode latin_1 file........................"""
         ds = dcmread(latin1_file)
         ds.decode()
@@ -35,7 +36,7 @@ class CharsetTests(unittest.TestCase):
         self.assertEqual(expected, got,
                          "Expected %r, got %r" % (expected, got))
 
-    def testEncodings(self):
+    def test_encodings(self):
         test_string = u'Hello World'
         for x in pydicom.charset.python_encoding.items():
             try:
@@ -46,7 +47,7 @@ class CharsetTests(unittest.TestCase):
                 message = "%s has invalid python encoding %s" % (found, term)
                 self.fail(msg=message)
 
-    def testNestedCharacterSets(self):
+    def test_nested_character_sets(self):
         """charset: can read and decode SQ with different encodings........."""
         ds = dcmread(sq_encoding_file)
         ds.decode()
@@ -60,26 +61,43 @@ class CharsetTests(unittest.TestCase):
                     u'\u5c71\u7530^\u592a\u90ce='
                     u'\u3084\u307e\u3060^\u305f\u308d\u3046')
 
-        got = ds[0x32, 0x1064][0].PatientName
-        self.assertEqual(expected, got,
-                         "Expected %r, got %r" % (expected, got))
+        sequence = ds[0x32, 0x1064][0]
+        assert sequence._character_set == [
+            'shift_jis', 'iso2022_jp', 'iso2022_jp']
+        assert expected == sequence.PatientName
 
-    def testStandardFile(self):
+    def test_inherited_character_set_in_sequence(self):
+        """charset: can read and decode SQ with parent encoding............."""
+        ds = dcmread(sq_encoding1_file)
+        ds.decode()
+
+        # These datasets inside of the SQ shall be decoded with the parent
+        # dataset's encoding
+        expected = (u'\uff94\uff8f\uff80\uff9e^\uff80\uff9b\uff73='
+                    u'\u5c71\u7530^\u592a\u90ce='
+                    u'\u3084\u307e\u3060^\u305f\u308d\u3046')
+
+        sequence = ds[0x32, 0x1064][0]
+        assert sequence._character_set == [
+            'shift_jis', 'iso2022_jp', 'iso2022_jp']
+        assert expected == sequence.PatientName
+
+    def test_standard_file(self):
         """charset: can read and decode standard file without special char.."""
         ds = dcmread(normal_file)
         ds.decode()
 
-    def testExplicitISO2022_IR6(self):
+    def test_explicit_iso2022_ir6(self):
         """charset: can decode file with multi-valued data elements........."""
         ds = dcmread(explicit_ir6_file)
         ds.decode()
 
-    def testMultiPN(self):
+    def test_multi_PN(self):
         """charset: can decode file with multi-valued data elements........."""
         ds = dcmread(multiPN_file)
         ds.decode()
 
-    def testEncodingWithSpecificTags(self):
+    def test_encoding_with_specific_tags(self):
         """Encoding is correctly applied even if  Specific Character Set
         is not in specific tags..."""
         ds = dcmread(jp_file, specific_tags=['PatientName'])
