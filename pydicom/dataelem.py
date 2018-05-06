@@ -18,7 +18,6 @@ from pydicom import config  # don't import datetime_conversion directly
 from pydicom import compat
 from pydicom.charset import default_encoding
 from pydicom.compat import in_py2
-from pydicom.config import logger
 from pydicom.datadict import (dictionary_has_tag, dictionary_description,
                               dictionary_keyword, dictionary_is_retired,
                               private_dictionary_description, dictionary_VR,

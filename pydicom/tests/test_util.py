@@ -7,7 +7,6 @@ import unittest
 
 import pytest
 
-from pydicom import compat
 from pydicom import config
 from pydicom import filereader
 from pydicom import valuerep
@@ -18,8 +17,7 @@ from pydicom.util import fixer
 from pydicom.util import hexutil
 from pydicom.util.codify import (camel_to_underscore, tag_repr,
                                  default_name_filter, code_imports,
-                                 code_dataelem, code_sequence,
-                                 main as codify_main)
+                                 code_dataelem, main as codify_main)
 from pydicom.util.dump import *
 from pydicom.util.hexutil import hex2bytes, bytes2hex
 from pydicom.data import get_testdata_files

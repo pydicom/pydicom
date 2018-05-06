@@ -4,9 +4,7 @@
 # This file is part of pydicom, released under a modified MIT license.
 #    See the file LICENSE included with this distribution, also
 #    available at https://github.com/pydicom/pydicom
-import os.path
 
-import errno
 
 _size_factors = dict(KB=1024, MB=1024 * 1024, GB=1024 * 1024 * 1024)
 

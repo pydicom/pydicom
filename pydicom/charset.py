@@ -8,7 +8,6 @@
 #
 
 from pydicom import compat
-from pydicom.config import logger
 from pydicom.valuerep import PersonNameUnicode, text_VRs
 from pydicom.compat import in_py2
 
@@ -129,8 +128,6 @@ def decode(data_element, dicom_character_set):
     # decode the string value to unicode
     # PN is special case as may have 3 components with differenct chr sets
     if data_element.VR == "PN":
-        # logger.warn("%s ... type: %s" %(str(data_element),
-        # type(data_element.VR)))
         if not in_py2:
             if data_element.VM == 1:
                 data_element.value = data_element.value.decode(encodings)

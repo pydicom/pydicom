@@ -6,12 +6,9 @@
 #    available at https://github.com/pydicom/pydicom
 
 import unittest
-from datetime import date
 from pydicom.multival import MultiValue
 from pydicom.valuerep import DS, DSfloat, DSdecimal, IS
 from pydicom import config
-from pydicom.dataset import Dataset
-from pydicom.sequence import Sequence
 from copy import deepcopy
 
 import sys
@@ -135,6 +132,7 @@ class MultiValuetests(unittest.TestCase):
         multival3 = MultiValue(str, ['b', 'c', 'a'])
         self.assertFalse(multival != multival2)
         self.assertTrue(multival != multival3)
+
 
 if __name__ == "__main__":
     unittest.main()
