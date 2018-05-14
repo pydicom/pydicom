@@ -465,7 +465,14 @@ class IS(int):
             return ''
         if isinstance(val, (str, compat.text_type)) and val.strip() == '':
             return ''
-        newval = super(IS, cls).__new__(cls, val)
+        # Overflow error in Python 2 for integers too large
+        # while calling super(IS). Fall back on the regular int
+        # casting that will automatically convert the val to long
+        # if needed.
+        try:
+            newval = super(IS, cls).__new__(cls, val)
+        except OverflowError:
+            newval = int(val)
         # check if a float or Decimal passed in, then could have lost info,
         # and will raise error. E.g. IS(Decimal('1')) is ok, but not IS(1.23)
         if isinstance(val, (float, Decimal)) and newval != val:

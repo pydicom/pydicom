@@ -139,6 +139,14 @@ class ISPickleTest(unittest.TestCase):
         self.assertEqual(x.original_string,
                          x2.original_string)
 
+    def testLongInt(self):
+        # Check that a long int is read properly
+        # Will not work with enforce_valid_values
+        x = pydicom.valuerep.IS(3103050000)
+        data1_string = pickle.dumps(x)
+        x2 = pickle.loads(data1_string)
+        self.assertEqual(x.real, x2.real)
+
 
 class BadValueReadtests(unittest.TestCase):
     """Unit tests for handling a bad value for a VR
