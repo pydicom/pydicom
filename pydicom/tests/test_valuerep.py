@@ -147,6 +147,13 @@ class ISPickleTest(unittest.TestCase):
         x2 = pickle.loads(data1_string)
         self.assertEqual(x.real, x2.real)
 
+    def testOverflow(self):
+        original_flag = config.enforce_valid_values
+        config.enforce_valid_values = True
+        with pytest.raises(OverflowError, match="Value exceeds DICOM limits*"):
+            pydicom.valuerep.IS(3103050000)
+        config.enforce_valid_values = original_flag
+
 
 class BadValueReadtests(unittest.TestCase):
     """Unit tests for handling a bad value for a VR
