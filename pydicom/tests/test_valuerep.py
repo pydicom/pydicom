@@ -23,6 +23,7 @@ from pydicom import valuerep
 from pydicom.util.fixes import timezone
 from pydicom.data import get_testdata_files
 import unittest
+import pytest
 
 try:
     unittest.skipIf
