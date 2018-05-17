@@ -23,6 +23,7 @@ from pydicom import valuerep
 from pydicom.util.fixes import timezone
 from pydicom.data import get_testdata_files
 import unittest
+import pytest
 
 try:
     unittest.skipIf
@@ -138,6 +139,21 @@ class ISPickleTest(unittest.TestCase):
         self.assertEqual(x.real, x2.real)
         self.assertEqual(x.original_string,
                          x2.original_string)
+
+    def testLongInt(self):
+        # Check that a long int is read properly
+        # Will not work with enforce_valid_values
+        x = pydicom.valuerep.IS(3103050000)
+        data1_string = pickle.dumps(x)
+        x2 = pickle.loads(data1_string)
+        self.assertEqual(x.real, x2.real)
+
+    def testOverflow(self):
+        original_flag = config.enforce_valid_values
+        config.enforce_valid_values = True
+        with pytest.raises(OverflowError, match="Value exceeds DICOM limits*"):
+            pydicom.valuerep.IS(3103050000)
+        config.enforce_valid_values = original_flag
 
 
 class BadValueReadtests(unittest.TestCase):
