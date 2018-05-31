@@ -3,6 +3,10 @@ checkout:
     - ./build_tools/circle/checkout_merge_commit.sh
 
 machine:
+  pre:
+    - cd /opt/circleci/.pyenv; git pull
+  python:
+    version: 3.6.2
   environment:
     # The github organization or username of the repository which hosts the
     # project and documentation.
@@ -19,9 +23,6 @@ machine:
 
     # The email is to be used for commits in the Github Page
     EMAIL: "g.lemaitre58@gmail.com"
-
-    MINICONDA_PATH: $HOME/miniconda
-    CONDA_ENV_NAME: testenv
 
 dependencies:
   # Check whether the doc build is required, install build dependencies and
