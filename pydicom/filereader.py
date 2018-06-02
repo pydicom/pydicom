@@ -835,15 +835,18 @@ def dcmread(fp, defer_size=None, stop_before_pixels=False,
 
     Examples
     --------
-    Read and return a dataset stored in accordance with the DICOM File Format
+    Read and return a dataset stored in accordance with the DICOM File Format:
+
     >>> ds = pydicom.dcmread("rtplan.dcm")
     >>> ds.PatientName
 
-    Read and return a dataset not in accordance with the DICOM File Format
+    Read and return a dataset not in accordance with the DICOM File Format:
+
     >>> ds = pydicom.dcmread("rtplan.dcm", force=True)
     >>> ds.PatientName
 
     Use within a context manager:
+
     >>> with pydicom.dcmread("rtplan.dcm") as ds:
     >>>     ds.PatientName
     """
