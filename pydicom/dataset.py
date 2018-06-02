@@ -57,24 +57,28 @@ class Dataset(dict):
 
     Examples
     --------
-    Add DataElements to the Dataset (for elements in the DICOM dictionary).
+    Add DataElements to the Dataset (for elements in the DICOM dictionary):
+
     >>> ds = Dataset()
     >>> ds.PatientName = "CITIZEN^Joan"
     >>> ds.add_new(0x00100020, 'LO', '12345')
     >>> ds[0x0010, 0x0030] = DataElement(0x00100030, 'DA', '20010101')
 
-    Add Sequence DataElement to the Dataset
+    Add Sequence DataElement to the Dataset:
+
     >>> ds.BeamSequence = [Dataset(), Dataset(), Dataset()]
     >>> ds.BeamSequence[0].Manufacturer = "Linac, co."
     >>> ds.BeamSequence[1].Manufacturer = "Linac and Sons, co."
     >>> ds.BeamSequence[2].Manufacturer = "Linac and Daughters, co."
 
-    Add private DataElements to the Dataset
+    Add private DataElements to the Dataset:
+
     >>> ds.add(DataElement(0x0043102b, 'SS', [4, 4, 0, 0]))
     >>> ds.add_new(0x0043102b, 'SS', [4, 4, 0, 0])
     >>> ds[0x0043, 0x102b] = DataElement(0x0043102b, 'SS', [4, 4, 0, 0])
 
-    Updating and retrieving DataElement values
+    Updating and retrieving DataElement values:
+
     >>> ds.PatientName = "CITIZEN^Joan"
     >>> ds.PatientName
     'CITIZEN^Joan"
@@ -82,27 +86,32 @@ class Dataset(dict):
     >>> ds.PatientName
     'CITIZEN^John'
 
-    Retrieving a DataElement's value from a Sequence
+    Retrieving a DataElement's value from a Sequence:
+
     >>> ds.BeamSequence[0].Manufacturer
     'Linac, co.'
     >>> ds.BeamSequence[1].Manufacturer
     'Linac and Sons, co.'
 
-    Retrieving DataElements
+    Retrieving DataElements:
+
     >>> elem = ds[0x00100010]
     >>> elem = ds.data_element('PatientName')
     >>> elem
     (0010, 0010) Patient's Name                      PN: 'CITIZEN^Joan'
 
-    Deleting a DataElement from the Dataset
+    Deleting a DataElement from the Dataset:
+
     >>> del ds.PatientID
     >>> del ds.BeamSequence[1].Manufacturer
     >>> del ds.BeamSequence[2]
 
-    Deleting a private DataElement from the Dataset
+    Deleting a private DataElement from the Dataset:
+
     >>> del ds[0x0043, 0x102b]
 
-    Determining if a DataElement is present in the Dataset
+    Determining if a DataElement is present in the Dataset:
+
     >>> 'PatientName' in ds
     True
     >>> 'PatientID' in ds
@@ -112,15 +121,18 @@ class Dataset(dict):
     >>> 'Manufacturer' in ds.BeamSequence[0]
     True
 
-    Iterating through the top level of a Dataset only (excluding Sequences)
+    Iterating through the top level of a Dataset only (excluding Sequences):
+
     >>> for elem in ds:
     >>>    print(elem)
 
-    Iterating through the entire Dataset (including Sequences)
+    Iterating through the entire Dataset (including Sequences):
+
     >>> for elem in ds.iterall():
     >>>     print(elem)
 
-    Recursively iterate through a Dataset (including Sequences)
+    Recursively iterate through a Dataset (including Sequences):
+
     >>> def recurse(ds):
     >>>     for elem in ds:
     >>>         if elem.VR == 'SQ':
