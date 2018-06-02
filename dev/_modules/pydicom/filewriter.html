@@ -96,7 +96,8 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../pydicom_user_guide.html">Pydicom User Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../pydicom_dev_guide.html">Pydicom Developer Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../ref_guide.html">Pydicom API’s Reference Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ref_guide.html">Reading and writing DICOM files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api_ref.html">Pydicom Complete API Reference</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Examples</span></p>
 <ul>
@@ -194,7 +195,7 @@
 <span class="kn">from</span> <span class="nn">pydicom._version</span> <span class="k">import</span> <span class="n">__version_info__</span>
 
 
-<span class="k">def</span> <span class="nf">correct_ambiguous_vr_element</span><span class="p">(</span><span class="n">elem</span><span class="p">,</span> <span class="n">ds</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">):</span>
+<div class="viewcode-block" id="correct_ambiguous_vr_element"><a class="viewcode-back" href="../../api_ref.html#pydicom.filewriter.correct_ambiguous_vr_element">[docs]</a><span class="k">def</span> <span class="nf">correct_ambiguous_vr_element</span><span class="p">(</span><span class="n">elem</span><span class="p">,</span> <span class="n">ds</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Attempt to correct the ambiguous VR element `elem`.</span>
 
 <span class="sd">    When it&#39;s not possible to correct the VR, the element will be returned</span>
@@ -302,10 +303,10 @@
             <span class="k">if</span> <span class="n">ds</span><span class="o">.</span><span class="n">is_implicit_VR</span><span class="p">:</span>
                 <span class="n">elem</span><span class="o">.</span><span class="n">VR</span> <span class="o">=</span> <span class="s1">&#39;OW&#39;</span>
 
-    <span class="k">return</span> <span class="n">elem</span>
+    <span class="k">return</span> <span class="n">elem</span></div>
 
 
-<span class="k">def</span> <span class="nf">correct_ambiguous_vr</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">):</span>
+<div class="viewcode-block" id="correct_ambiguous_vr"><a class="viewcode-back" href="../../api_ref.html#pydicom.filewriter.correct_ambiguous_vr">[docs]</a><span class="k">def</span> <span class="nf">correct_ambiguous_vr</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Iterate through `ds` correcting ambiguous VR elements (if possible).</span>
 
 <span class="sd">    When it&#39;s not possible to correct the VR, the element will be returned</span>
@@ -336,10 +337,10 @@
                 <span class="n">correct_ambiguous_vr</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">)</span>
         <span class="k">elif</span> <span class="s1">&#39;or&#39;</span> <span class="ow">in</span> <span class="n">elem</span><span class="o">.</span><span class="n">VR</span><span class="p">:</span>
             <span class="n">correct_ambiguous_vr_element</span><span class="p">(</span><span class="n">elem</span><span class="p">,</span> <span class="n">ds</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">ds</span>
+    <span class="k">return</span> <span class="n">ds</span></div>
 
 
-<span class="k">def</span> <span class="nf">write_numbers</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">data_element</span><span class="p">,</span> <span class="n">struct_format</span><span class="p">):</span>
+<div class="viewcode-block" id="write_numbers"><a class="viewcode-back" href="../../api_ref.html#pydicom.filewriter.write_numbers">[docs]</a><span class="k">def</span> <span class="nf">write_numbers</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">data_element</span><span class="p">,</span> <span class="n">struct_format</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Write a &quot;value&quot; of type struct_format from the dicom file.</span>
 
 <span class="sd">    &quot;Value&quot; can be more than one number.</span>
@@ -363,26 +364,26 @@
                 <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">pack</span><span class="p">(</span><span class="n">format_string</span><span class="p">,</span> <span class="n">val</span><span class="p">))</span>
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span>
-            <span class="s2">&quot;</span><span class="si">{0}</span><span class="se">\n</span><span class="s2">for data_element:</span><span class="se">\n</span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">data_element</span><span class="p">)))</span>
+            <span class="s2">&quot;</span><span class="si">{0}</span><span class="se">\n</span><span class="s2">for data_element:</span><span class="se">\n</span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">data_element</span><span class="p">)))</span></div>
 
 
-<span class="k">def</span> <span class="nf">write_OBvalue</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">data_element</span><span class="p">):</span>
+<div class="viewcode-block" id="write_OBvalue"><a class="viewcode-back" href="../../api_ref.html#pydicom.filewriter.write_OBvalue">[docs]</a><span class="k">def</span> <span class="nf">write_OBvalue</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">data_element</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Write a data_element with VR of &#39;other byte&#39; (OB).&quot;&quot;&quot;</span>
-    <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data_element</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+    <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data_element</span><span class="o">.</span><span class="n">value</span><span class="p">)</span></div>
 
 
-<span class="k">def</span> <span class="nf">write_OWvalue</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">data_element</span><span class="p">):</span>
+<div class="viewcode-block" id="write_OWvalue"><a class="viewcode-back" href="../../api_ref.html#pydicom.filewriter.write_OWvalue">[docs]</a><span class="k">def</span> <span class="nf">write_OWvalue</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">data_element</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Write a data_element with VR of &#39;other word&#39; (OW).</span>
 
 <span class="sd">    Note: This **does not currently do the byte swapping** for Endian state.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># XXX for now just write the raw bytes without endian swapping</span>
-    <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data_element</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+    <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data_element</span><span class="o">.</span><span class="n">value</span><span class="p">)</span></div>
 
 
-<span class="k">def</span> <span class="nf">write_UI</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">data_element</span><span class="p">):</span>
+<div class="viewcode-block" id="write_UI"><a class="viewcode-back" href="../../api_ref.html#pydicom.filewriter.write_UI">[docs]</a><span class="k">def</span> <span class="nf">write_UI</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">data_element</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Write a data_element with VR of &#39;unique identifier&#39; (UI).&quot;&quot;&quot;</span>
-    <span class="n">write_string</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">data_element</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\0</span><span class="s1">&#39;</span><span class="p">)</span>  <span class="c1"># pad with 0-byte to even length</span>
+    <span class="n">write_string</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">data_element</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\0</span><span class="s1">&#39;</span><span class="p">)</span>  <span class="c1"># pad with 0-byte to even length</span></div>
 
 
 <span class="k">def</span> <span class="nf">_is_multi_value</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
@@ -390,13 +391,13 @@
     <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="p">(</span><span class="n">MultiValue</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">))</span>
 
 
-<span class="k">def</span> <span class="nf">multi_string</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
+<div class="viewcode-block" id="multi_string"><a class="viewcode-back" href="../../api_ref.html#pydicom.filewriter.multi_string">[docs]</a><span class="k">def</span> <span class="nf">multi_string</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Put a string together with delimiter if has more than one value&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">_is_multi_value</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
         <span class="c1"># \ is escape chr, so &quot;\\&quot; gives single backslash</span>
         <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">val</span>
+        <span class="k">return</span> <span class="n">val</span></div>
 
 
 <span class="k">def</span> <span class="nf">write_PN</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">data_element</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="sa">b</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -422,7 +423,7 @@
     <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">write_string</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">data_element</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">default_encoding</span><span class="p">):</span>
+<div class="viewcode-block" id="write_string"><a class="viewcode-back" href="../../api_ref.html#pydicom.filewriter.write_string">[docs]</a><span class="k">def</span> <span class="nf">write_string</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">data_element</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">default_encoding</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Write a single or multivalued string.&quot;&quot;&quot;</span>
     <span class="n">val</span> <span class="o">=</span> <span class="n">multi_string</span><span class="p">(</span><span class="n">data_element</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -430,10 +431,10 @@
             <span class="n">val</span> <span class="o">=</span> <span class="n">val</span> <span class="o">+</span> <span class="n">padding</span>  <span class="c1"># pad to even length</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">compat</span><span class="o">.</span><span class="n">text_type</span><span class="p">):</span>
             <span class="n">val</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">encoding</span><span class="p">)</span>
-        <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+        <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">val</span><span class="p">)</span></div>
 
 
-<span class="k">def</span> <span class="nf">write_number_string</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">data_element</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="write_number_string"><a class="viewcode-back" href="../../api_ref.html#pydicom.filewriter.write_number_string">[docs]</a><span class="k">def</span> <span class="nf">write_number_string</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">data_element</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Handle IS or DS VR - write a number stored as a string of digits.&quot;&quot;&quot;</span>
     <span class="c1"># If the DS or IS has an original_string attribute, use that, so that</span>
     <span class="c1"># unchanged data elements are written with exact string as when read from</span>
@@ -456,7 +457,7 @@
     <span class="k">if</span> <span class="ow">not</span> <span class="n">in_py2</span><span class="p">:</span>
         <span class="n">val</span> <span class="o">=</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">default_encoding</span><span class="p">)</span>
 
-    <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+    <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">val</span><span class="p">)</span></div>
 
 
 <span class="k">def</span> <span class="nf">_format_DA</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
@@ -545,7 +546,7 @@
         <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">write_data_element</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">data_element</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">default_encoding</span><span class="p">):</span>
+<div class="viewcode-block" id="write_data_element"><a class="viewcode-back" href="../../api_ref.html#pydicom.filewriter.write_data_element">[docs]</a><span class="k">def</span> <span class="nf">write_data_element</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">data_element</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">default_encoding</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Write the data_element to file fp according to dicom media storage rules.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Write element&#39;s tag</span>
@@ -620,10 +621,10 @@
     <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">buffer</span><span class="o">.</span><span class="n">getvalue</span><span class="p">())</span>
     <span class="k">if</span> <span class="n">is_undefined_length</span><span class="p">:</span>
         <span class="n">fp</span><span class="o">.</span><span class="n">write_tag</span><span class="p">(</span><span class="n">SequenceDelimiterTag</span><span class="p">)</span>
-        <span class="n">fp</span><span class="o">.</span><span class="n">write_UL</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># 4-byte &#39;length&#39; of delimiter data item</span>
+        <span class="n">fp</span><span class="o">.</span><span class="n">write_UL</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># 4-byte &#39;length&#39; of delimiter data item</span></div>
 
 
-<span class="k">def</span> <span class="nf">write_dataset</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">parent_encoding</span><span class="o">=</span><span class="n">default_encoding</span><span class="p">):</span>
+<div class="viewcode-block" id="write_dataset"><a class="viewcode-back" href="../../api_ref.html#pydicom.filewriter.write_dataset">[docs]</a><span class="k">def</span> <span class="nf">write_dataset</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">parent_encoding</span><span class="o">=</span><span class="n">default_encoding</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Write a Dataset dictionary to the file. Return the total length written.</span>
 
 <span class="sd">    Attempt to correct ambiguous VR elements when explicit little/big</span>
@@ -647,7 +648,7 @@
         <span class="k">with</span> <span class="n">tag_in_exception</span><span class="p">(</span><span class="n">tag</span><span class="p">):</span>
             <span class="n">write_data_element</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">tag</span><span class="p">),</span> <span class="n">dataset_encoding</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">fp</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span> <span class="o">-</span> <span class="n">fpStart</span>
+    <span class="k">return</span> <span class="n">fp</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span> <span class="o">-</span> <span class="n">fpStart</span></div>
 
 
 <span class="k">def</span> <span class="nf">_harmonize_properties</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">fp</span><span class="p">):</span>
@@ -666,16 +667,16 @@
     <span class="n">fp</span><span class="o">.</span><span class="n">is_little_endian</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">is_little_endian</span>
 
 
-<span class="k">def</span> <span class="nf">write_sequence</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">data_element</span><span class="p">,</span> <span class="n">encoding</span><span class="p">):</span>
+<div class="viewcode-block" id="write_sequence"><a class="viewcode-back" href="../../api_ref.html#pydicom.filewriter.write_sequence">[docs]</a><span class="k">def</span> <span class="nf">write_sequence</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">data_element</span><span class="p">,</span> <span class="n">encoding</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Write a dicom Sequence contained in data_element to the file fp.&quot;&quot;&quot;</span>
     <span class="c1"># write_data_element has already written the VR=&#39;SQ&#39; (if needed) and</span>
     <span class="c1">#    a placeholder for length&quot;&quot;&quot;</span>
     <span class="n">sequence</span> <span class="o">=</span> <span class="n">data_element</span><span class="o">.</span><span class="n">value</span>
     <span class="k">for</span> <span class="n">dataset</span> <span class="ow">in</span> <span class="n">sequence</span><span class="p">:</span>
-        <span class="n">write_sequence_item</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">encoding</span><span class="p">)</span>
+        <span class="n">write_sequence_item</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">encoding</span><span class="p">)</span></div>
 
 
-<span class="k">def</span> <span class="nf">write_sequence_item</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">encoding</span><span class="p">):</span>
+<div class="viewcode-block" id="write_sequence_item"><a class="viewcode-back" href="../../api_ref.html#pydicom.filewriter.write_sequence_item">[docs]</a><span class="k">def</span> <span class="nf">write_sequence_item</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">encoding</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Write an item (dataset) in a dicom Sequence to the dicom file fp.</span>
 
 <span class="sd">    This is similar to writing a data_element, but with a specific tag for</span>
@@ -695,15 +696,15 @@
         <span class="n">location</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
         <span class="n">fp</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">length_location</span><span class="p">)</span>
         <span class="n">fp</span><span class="o">.</span><span class="n">write_UL</span><span class="p">(</span><span class="n">location</span> <span class="o">-</span> <span class="n">length_location</span> <span class="o">-</span> <span class="mi">4</span><span class="p">)</span>  <span class="c1"># 4 is length of UL</span>
-        <span class="n">fp</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">location</span><span class="p">)</span>  <span class="c1"># ready for next data_element</span>
+        <span class="n">fp</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">location</span><span class="p">)</span>  <span class="c1"># ready for next data_element</span></div>
 
 
-<span class="k">def</span> <span class="nf">write_UN</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">data_element</span><span class="p">):</span>
+<div class="viewcode-block" id="write_UN"><a class="viewcode-back" href="../../api_ref.html#pydicom.filewriter.write_UN">[docs]</a><span class="k">def</span> <span class="nf">write_UN</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">data_element</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Write a byte string for an DataElement of value &#39;UN&#39; (unknown).&quot;&quot;&quot;</span>
-    <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data_element</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+    <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data_element</span><span class="o">.</span><span class="n">value</span><span class="p">)</span></div>
 
 
-<span class="k">def</span> <span class="nf">write_ATvalue</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">data_element</span><span class="p">):</span>
+<div class="viewcode-block" id="write_ATvalue"><a class="viewcode-back" href="../../api_ref.html#pydicom.filewriter.write_ATvalue">[docs]</a><span class="k">def</span> <span class="nf">write_ATvalue</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">data_element</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Write a data_element tag to a file.&quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="nb">iter</span><span class="p">(</span><span class="n">data_element</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>  <span class="c1"># see if is multi-valued AT;</span>
@@ -716,10 +717,10 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="n">tags</span> <span class="o">=</span> <span class="p">[</span><span class="n">Tag</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span> <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">data_element</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">tags</span><span class="p">:</span>
-            <span class="n">fp</span><span class="o">.</span><span class="n">write_tag</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span>
+            <span class="n">fp</span><span class="o">.</span><span class="n">write_tag</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span></div>
 
 
-<span class="k">def</span> <span class="nf">write_file_meta_info</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">file_meta</span><span class="p">,</span> <span class="n">enforce_standard</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="write_file_meta_info"><a class="viewcode-back" href="../../api_ref.html#pydicom.filewriter.write_file_meta_info">[docs]</a><span class="k">def</span> <span class="nf">write_file_meta_info</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">file_meta</span><span class="p">,</span> <span class="n">enforce_standard</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Write the File Meta Information elements in `file_meta` to `fp`.</span>
 
 <span class="sd">    If `enforce_standard` is True then the file-like `fp` should be positioned</span>
@@ -844,10 +845,10 @@
         <span class="n">write_data_element</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">file_meta</span><span class="p">[</span><span class="mh">0x00020000</span><span class="p">])</span>
 
         <span class="c1"># Return to end of the file meta, ready to write remainder of the file</span>
-        <span class="n">fp</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">end_of_file_meta</span><span class="p">)</span>
+        <span class="n">fp</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">end_of_file_meta</span><span class="p">)</span></div>
 
 
-<span class="k">def</span> <span class="nf">dcmwrite</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">write_like_original</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="dcmwrite"><a class="viewcode-back" href="../../api_ref.html#pydicom.filewriter.dcmwrite">[docs]</a><span class="k">def</span> <span class="nf">dcmwrite</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">write_like_original</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Write `dataset` to the `filename` specified.</span>
 
 <span class="sd">    If `write_like_original` is True then `dataset` will be written as is</span>
@@ -1062,7 +1063,7 @@
         <span class="n">write_dataset</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">get_item</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="nb">slice</span><span class="p">(</span><span class="mh">0x00010000</span><span class="p">,</span> <span class="kc">None</span><span class="p">)))</span>
     <span class="k">finally</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">caller_owns_file</span><span class="p">:</span>
-            <span class="n">fp</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="n">fp</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 
 
 <span class="n">write_file</span> <span class="o">=</span> <span class="n">dcmwrite</span>  <span class="c1"># write_file before pydicom 1.0, kept for compatibility</span>
@@ -1165,9 +1166,7 @@
 
   <script type="text/javascript">
       jQuery(function () {
-          
-          SphinxRtdTheme.Navigation.enableSticky();
-          
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script> 
 

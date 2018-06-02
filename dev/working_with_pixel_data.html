@@ -111,7 +111,8 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="pydicom_dev_guide.html">Pydicom Developer Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ref_guide.html">Pydicom API’s Reference Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ref_guide.html">Reading and writing DICOM files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_ref.html">Pydicom Complete API Reference</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Examples</span></p>
 <ul>
@@ -218,7 +219,7 @@ them …</p>
 <p class="last">To work with the pixel_array property <a class="reference external" href="http://numpy.org/">NumPy</a> must be
 installed on your system.</p>
 </div>
-<p>A property of <a class="reference internal" href="ref_guide.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">dataset.Dataset</span></code></a> called <code class="docutils literal notranslate"><span class="pre">pixel_array</span></code> provides more
+<p>A property of <a class="reference internal" href="api_ref.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">dataset.Dataset</span></code></a> called <code class="docutils literal notranslate"><span class="pre">pixel_array</span></code> provides more
 useful pixel data for uncompressed and compressed images
 (<a class="reference internal" href="image_data_handlers.html"><span class="doc">decompressing compressed images if supported</span></a>).
 The <code class="docutils literal notranslate"><span class="pre">pixel_array</span></code> property returns a NumPy array:</p>
@@ -321,9 +322,7 @@ for viewing. See <a class="reference internal" href="viewing_images.html"><span 
 
   <script type="text/javascript">
       jQuery(function () {
-          
-          SphinxRtdTheme.Navigation.enableSticky();
-          
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script> 
 

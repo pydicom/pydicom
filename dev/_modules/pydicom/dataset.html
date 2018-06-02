@@ -96,7 +96,8 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../pydicom_user_guide.html">Pydicom User Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../pydicom_dev_guide.html">Pydicom Developer Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../ref_guide.html">Pydicom API’s Reference Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ref_guide.html">Reading and writing DICOM files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api_ref.html">Pydicom Complete API Reference</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Examples</span></p>
 <ul>
@@ -219,35 +220,39 @@
 <span class="n">sys_is_little_endian</span> <span class="o">=</span> <span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">byteorder</span> <span class="o">==</span> <span class="s1">&#39;little&#39;</span><span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">PropertyError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<div class="viewcode-block" id="PropertyError"><a class="viewcode-back" href="../../api_ref.html#pydicom.dataset.PropertyError">[docs]</a><span class="k">class</span> <span class="nc">PropertyError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;For AttributeErrors caught in a property, so do not go to __getattr__&quot;&quot;&quot;</span>
     <span class="c1">#  http://docs.python.org/release/3.1.3/tutorial/errors.html#tut-userexceptions</span>
-    <span class="k">pass</span>
+    <span class="k">pass</span></div>
 
 
-<div class="viewcode-block" id="Dataset"><a class="viewcode-back" href="../../ref_guide.html#pydicom.dataset.Dataset">[docs]</a><span class="k">class</span> <span class="nc">Dataset</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
+<div class="viewcode-block" id="Dataset"><a class="viewcode-back" href="../../api_ref.html#pydicom.dataset.Dataset">[docs]</a><span class="k">class</span> <span class="nc">Dataset</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;A collection (dictionary) of DICOM DataElements.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
-<span class="sd">    Add DataElements to the Dataset (for elements in the DICOM dictionary).</span>
+<span class="sd">    Add DataElements to the Dataset (for elements in the DICOM dictionary):</span>
+
 <span class="sd">    &gt;&gt;&gt; ds = Dataset()</span>
 <span class="sd">    &gt;&gt;&gt; ds.PatientName = &quot;CITIZEN^Joan&quot;</span>
 <span class="sd">    &gt;&gt;&gt; ds.add_new(0x00100020, &#39;LO&#39;, &#39;12345&#39;)</span>
 <span class="sd">    &gt;&gt;&gt; ds[0x0010, 0x0030] = DataElement(0x00100030, &#39;DA&#39;, &#39;20010101&#39;)</span>
 
-<span class="sd">    Add Sequence DataElement to the Dataset</span>
+<span class="sd">    Add Sequence DataElement to the Dataset:</span>
+
 <span class="sd">    &gt;&gt;&gt; ds.BeamSequence = [Dataset(), Dataset(), Dataset()]</span>
 <span class="sd">    &gt;&gt;&gt; ds.BeamSequence[0].Manufacturer = &quot;Linac, co.&quot;</span>
 <span class="sd">    &gt;&gt;&gt; ds.BeamSequence[1].Manufacturer = &quot;Linac and Sons, co.&quot;</span>
 <span class="sd">    &gt;&gt;&gt; ds.BeamSequence[2].Manufacturer = &quot;Linac and Daughters, co.&quot;</span>
 
-<span class="sd">    Add private DataElements to the Dataset</span>
+<span class="sd">    Add private DataElements to the Dataset:</span>
+
 <span class="sd">    &gt;&gt;&gt; ds.add(DataElement(0x0043102b, &#39;SS&#39;, [4, 4, 0, 0]))</span>
 <span class="sd">    &gt;&gt;&gt; ds.add_new(0x0043102b, &#39;SS&#39;, [4, 4, 0, 0])</span>
 <span class="sd">    &gt;&gt;&gt; ds[0x0043, 0x102b] = DataElement(0x0043102b, &#39;SS&#39;, [4, 4, 0, 0])</span>
 
-<span class="sd">    Updating and retrieving DataElement values</span>
+<span class="sd">    Updating and retrieving DataElement values:</span>
+
 <span class="sd">    &gt;&gt;&gt; ds.PatientName = &quot;CITIZEN^Joan&quot;</span>
 <span class="sd">    &gt;&gt;&gt; ds.PatientName</span>
 <span class="sd">    &#39;CITIZEN^Joan&quot;</span>
@@ -255,27 +260,32 @@
 <span class="sd">    &gt;&gt;&gt; ds.PatientName</span>
 <span class="sd">    &#39;CITIZEN^John&#39;</span>
 
-<span class="sd">    Retrieving a DataElement&#39;s value from a Sequence</span>
+<span class="sd">    Retrieving a DataElement&#39;s value from a Sequence:</span>
+
 <span class="sd">    &gt;&gt;&gt; ds.BeamSequence[0].Manufacturer</span>
 <span class="sd">    &#39;Linac, co.&#39;</span>
 <span class="sd">    &gt;&gt;&gt; ds.BeamSequence[1].Manufacturer</span>
 <span class="sd">    &#39;Linac and Sons, co.&#39;</span>
 
-<span class="sd">    Retrieving DataElements</span>
+<span class="sd">    Retrieving DataElements:</span>
+
 <span class="sd">    &gt;&gt;&gt; elem = ds[0x00100010]</span>
 <span class="sd">    &gt;&gt;&gt; elem = ds.data_element(&#39;PatientName&#39;)</span>
 <span class="sd">    &gt;&gt;&gt; elem</span>
 <span class="sd">    (0010, 0010) Patient&#39;s Name                      PN: &#39;CITIZEN^Joan&#39;</span>
 
-<span class="sd">    Deleting a DataElement from the Dataset</span>
+<span class="sd">    Deleting a DataElement from the Dataset:</span>
+
 <span class="sd">    &gt;&gt;&gt; del ds.PatientID</span>
 <span class="sd">    &gt;&gt;&gt; del ds.BeamSequence[1].Manufacturer</span>
 <span class="sd">    &gt;&gt;&gt; del ds.BeamSequence[2]</span>
 
-<span class="sd">    Deleting a private DataElement from the Dataset</span>
+<span class="sd">    Deleting a private DataElement from the Dataset:</span>
+
 <span class="sd">    &gt;&gt;&gt; del ds[0x0043, 0x102b]</span>
 
-<span class="sd">    Determining if a DataElement is present in the Dataset</span>
+<span class="sd">    Determining if a DataElement is present in the Dataset:</span>
+
 <span class="sd">    &gt;&gt;&gt; &#39;PatientName&#39; in ds</span>
 <span class="sd">    True</span>
 <span class="sd">    &gt;&gt;&gt; &#39;PatientID&#39; in ds</span>
@@ -285,15 +295,18 @@
 <span class="sd">    &gt;&gt;&gt; &#39;Manufacturer&#39; in ds.BeamSequence[0]</span>
 <span class="sd">    True</span>
 
-<span class="sd">    Iterating through the top level of a Dataset only (excluding Sequences)</span>
+<span class="sd">    Iterating through the top level of a Dataset only (excluding Sequences):</span>
+
 <span class="sd">    &gt;&gt;&gt; for elem in ds:</span>
 <span class="sd">    &gt;&gt;&gt;    print(elem)</span>
 
-<span class="sd">    Iterating through the entire Dataset (including Sequences)</span>
+<span class="sd">    Iterating through the entire Dataset (including Sequences):</span>
+
 <span class="sd">    &gt;&gt;&gt; for elem in ds.iterall():</span>
 <span class="sd">    &gt;&gt;&gt;     print(elem)</span>
 
-<span class="sd">    Recursively iterate through a Dataset (including Sequences)</span>
+<span class="sd">    Recursively iterate through a Dataset (including Sequences):</span>
+
 <span class="sd">    &gt;&gt;&gt; def recurse(ds):</span>
 <span class="sd">    &gt;&gt;&gt;     for elem in ds:</span>
 <span class="sd">    &gt;&gt;&gt;         if elem.VR == &#39;SQ&#39;:</span>
@@ -354,7 +367,7 @@
         <span class="c1"># Returning False will re-raise any exceptions that occur</span>
         <span class="k">return</span> <span class="kc">False</span>
 
-<div class="viewcode-block" id="Dataset.add"><a class="viewcode-back" href="../../ref_guide.html#pydicom.dataset.Dataset.add">[docs]</a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_element</span><span class="p">):</span>
+<div class="viewcode-block" id="Dataset.add"><a class="viewcode-back" href="../../api_ref.html#pydicom.dataset.Dataset.add">[docs]</a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_element</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Add a DataElement to the Dataset.</span>
 
 <span class="sd">        Equivalent to ds[data_element.tag] = data_element</span>
@@ -366,7 +379,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="p">[</span><span class="n">data_element</span><span class="o">.</span><span class="n">tag</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_element</span></div>
 
-<div class="viewcode-block" id="Dataset.add_new"><a class="viewcode-back" href="../../ref_guide.html#pydicom.dataset.Dataset.add_new">[docs]</a>    <span class="k">def</span> <span class="nf">add_new</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="p">,</span> <span class="n">VR</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<div class="viewcode-block" id="Dataset.add_new"><a class="viewcode-back" href="../../api_ref.html#pydicom.dataset.Dataset.add_new">[docs]</a>    <span class="k">def</span> <span class="nf">add_new</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="p">,</span> <span class="n">VR</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Add a DataElement to the Dataset.</span>
 
 <span class="sd">        Parameters</span>
@@ -389,7 +402,7 @@
         <span class="c1"># use data_element.tag since DataElement verified it</span>
         <span class="bp">self</span><span class="p">[</span><span class="n">data_element</span><span class="o">.</span><span class="n">tag</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_element</span></div>
 
-<div class="viewcode-block" id="Dataset.data_element"><a class="viewcode-back" href="../../ref_guide.html#pydicom.dataset.Dataset.data_element">[docs]</a>    <span class="k">def</span> <span class="nf">data_element</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+<div class="viewcode-block" id="Dataset.data_element"><a class="viewcode-back" href="../../api_ref.html#pydicom.dataset.Dataset.data_element">[docs]</a>    <span class="k">def</span> <span class="nf">data_element</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return the DataElement corresponding to the element keyword `name`.</span>
 
 <span class="sd">        Parameters</span>
@@ -440,7 +453,7 @@
             <span class="k">return</span> <span class="nb">dict</span><span class="o">.</span><span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                                      <span class="n">name</span><span class="p">)</span>  <span class="c1"># will no doubt raise an exception</span>
 
-<div class="viewcode-block" id="Dataset.decode"><a class="viewcode-back" href="../../ref_guide.html#pydicom.dataset.Dataset.decode">[docs]</a>    <span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Dataset.decode"><a class="viewcode-back" href="../../api_ref.html#pydicom.dataset.Dataset.decode">[docs]</a>    <span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Apply character set decoding to all DataElements in the Dataset.</span>
 
 <span class="sd">        See DICOM PS3.5-2008 6.1.1.</span>
@@ -550,7 +563,7 @@
         <span class="n">alldir</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">props</span> <span class="o">|</span> <span class="n">meths</span> <span class="o">|</span> <span class="n">dicom_names</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">alldir</span>
 
-<div class="viewcode-block" id="Dataset.dir"><a class="viewcode-back" href="../../ref_guide.html#pydicom.dataset.Dataset.dir">[docs]</a>    <span class="k">def</span> <span class="nf">dir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">filters</span><span class="p">):</span>
+<div class="viewcode-block" id="Dataset.dir"><a class="viewcode-back" href="../../api_ref.html#pydicom.dataset.Dataset.dir">[docs]</a>    <span class="k">def</span> <span class="nf">dir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">filters</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return an alphabetical list of DataElement keywords in the Dataset.</span>
 
 <span class="sd">        Intended mainly for use in interactive Python sessions. Only lists the</span>
@@ -610,7 +623,7 @@
 
         <span class="k">return</span> <span class="bp">NotImplemented</span>
 
-<div class="viewcode-block" id="Dataset.get"><a class="viewcode-back" href="../../ref_guide.html#pydicom.dataset.Dataset.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Dataset.get"><a class="viewcode-back" href="../../api_ref.html#pydicom.dataset.Dataset.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Extend dict.get() to handle DICOM DataElement keywords.</span>
 
 <span class="sd">        Parameters</span>
@@ -767,7 +780,7 @@
 
         <span class="k">return</span> <span class="nb">dict</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Dataset.get_item"><a class="viewcode-back" href="../../ref_guide.html#pydicom.dataset.Dataset.get_item">[docs]</a>    <span class="k">def</span> <span class="nf">get_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+<div class="viewcode-block" id="Dataset.get_item"><a class="viewcode-back" href="../../api_ref.html#pydicom.dataset.Dataset.get_item">[docs]</a>    <span class="k">def</span> <span class="nf">get_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return the raw data element if possible.</span>
 
 <span class="sd">        It will be raw if the user has never accessed the value, or set their</span>
@@ -826,7 +839,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">read_little_endian</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_little_endian</span> <span class="ow">and</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">read_encoding</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_character_set</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Dataset.group_dataset"><a class="viewcode-back" href="../../ref_guide.html#pydicom.dataset.Dataset.group_dataset">[docs]</a>    <span class="k">def</span> <span class="nf">group_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group</span><span class="p">):</span>
+<div class="viewcode-block" id="Dataset.group_dataset"><a class="viewcode-back" href="../../api_ref.html#pydicom.dataset.Dataset.group_dataset">[docs]</a>    <span class="k">def</span> <span class="nf">group_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return a Dataset containing only DataElements of a certain group.</span>
 
 <span class="sd">        Parameters</span>
@@ -863,7 +876,7 @@
         <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">taglist</span><span class="p">:</span>
             <span class="k">yield</span> <span class="bp">self</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span>
 
-<div class="viewcode-block" id="Dataset.elements"><a class="viewcode-back" href="../../ref_guide.html#pydicom.dataset.Dataset.elements">[docs]</a>    <span class="k">def</span> <span class="nf">elements</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Dataset.elements"><a class="viewcode-back" href="../../api_ref.html#pydicom.dataset.Dataset.elements">[docs]</a>    <span class="k">def</span> <span class="nf">elements</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Iterate through the top-level of the Dataset, yielding DataElements</span>
 <span class="sd">        or RawDataElements (no conversion done).</span>
 
@@ -943,7 +956,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">convert_pixel_data</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pixel_array</span>
 
-<div class="viewcode-block" id="Dataset.convert_pixel_data"><a class="viewcode-back" href="../../ref_guide.html#pydicom.dataset.Dataset.convert_pixel_data">[docs]</a>    <span class="k">def</span> <span class="nf">convert_pixel_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Dataset.convert_pixel_data"><a class="viewcode-back" href="../../api_ref.html#pydicom.dataset.Dataset.convert_pixel_data">[docs]</a>    <span class="k">def</span> <span class="nf">convert_pixel_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Convert the Pixel Data to a numpy array internally.</span>
 
 <span class="sd">        Returns</span>
@@ -997,7 +1010,7 @@
             <span class="c1"># is this guaranteed to work if memory is re-used??</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_pixel_id</span> <span class="o">=</span> <span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">PixelData</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Dataset.decompress"><a class="viewcode-back" href="../../ref_guide.html#pydicom.dataset.Dataset.decompress">[docs]</a>    <span class="k">def</span> <span class="nf">decompress</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Dataset.decompress"><a class="viewcode-back" href="../../api_ref.html#pydicom.dataset.Dataset.decompress">[docs]</a>    <span class="k">def</span> <span class="nf">decompress</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Decompresses pixel data and modifies the Dataset in-place</span>
 
 <span class="sd">        If not a compressed tranfer syntax, then pixel data is converted</span>
@@ -1056,7 +1069,7 @@
     <span class="n">default_element_format</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%(tag)s</span><span class="s2"> </span><span class="si">%(name)-35.35s</span><span class="s2"> </span><span class="si">%(VR)s</span><span class="s2">: </span><span class="si">%(repval)s</span><span class="s2">&quot;</span>
     <span class="n">default_sequence_element_format</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%(tag)s</span><span class="s2"> </span><span class="si">%(name)-35.35s</span><span class="s2"> </span><span class="si">%(VR)s</span><span class="s2">: </span><span class="si">%(repval)s</span><span class="s2">&quot;</span>  <span class="c1"># noqa</span>
 
-<div class="viewcode-block" id="Dataset.formatted_lines"><a class="viewcode-back" href="../../ref_guide.html#pydicom.dataset.Dataset.formatted_lines">[docs]</a>    <span class="k">def</span> <span class="nf">formatted_lines</span><span class="p">(</span>
+<div class="viewcode-block" id="Dataset.formatted_lines"><a class="viewcode-back" href="../../api_ref.html#pydicom.dataset.Dataset.formatted_lines">[docs]</a>    <span class="k">def</span> <span class="nf">formatted_lines</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">element_format</span><span class="o">=</span><span class="n">default_element_format</span><span class="p">,</span>
             <span class="n">sequence_element_format</span><span class="o">=</span><span class="n">default_sequence_element_format</span><span class="p">,</span>
@@ -1135,7 +1148,7 @@
                     <span class="n">strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">indent_str</span> <span class="o">+</span> <span class="nb">repr</span><span class="p">(</span><span class="n">data_element</span><span class="p">))</span>
         <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">strings</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Dataset.remove_private_tags"><a class="viewcode-back" href="../../ref_guide.html#pydicom.dataset.Dataset.remove_private_tags">[docs]</a>    <span class="k">def</span> <span class="nf">remove_private_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Dataset.remove_private_tags"><a class="viewcode-back" href="../../api_ref.html#pydicom.dataset.Dataset.remove_private_tags">[docs]</a>    <span class="k">def</span> <span class="nf">remove_private_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Remove all private DataElements in the Dataset.&quot;&quot;&quot;</span>
 
         <span class="k">def</span> <span class="nf">RemoveCallback</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">data_element</span><span class="p">):</span>
@@ -1347,11 +1360,11 @@
         <span class="sd">&quot;&quot;&quot;Handle str(dataset).&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pretty_str</span><span class="p">()</span>
 
-<div class="viewcode-block" id="Dataset.top"><a class="viewcode-back" href="../../ref_guide.html#pydicom.dataset.Dataset.top">[docs]</a>    <span class="k">def</span> <span class="nf">top</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Dataset.top"><a class="viewcode-back" href="../../api_ref.html#pydicom.dataset.Dataset.top">[docs]</a>    <span class="k">def</span> <span class="nf">top</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return a str of the Dataset&#39;s top level DataElements only.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pretty_str</span><span class="p">(</span><span class="n">top_level_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Dataset.trait_names"><a class="viewcode-back" href="../../ref_guide.html#pydicom.dataset.Dataset.trait_names">[docs]</a>    <span class="k">def</span> <span class="nf">trait_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Dataset.trait_names"><a class="viewcode-back" href="../../api_ref.html#pydicom.dataset.Dataset.trait_names">[docs]</a>    <span class="k">def</span> <span class="nf">trait_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return a list of valid names for auto-completion code.</span>
 
 <span class="sd">        Used in IPython, so that data element names can be found and offered</span>
@@ -1359,7 +1372,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">dir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>  <span class="c1"># only valid python &gt;=2.6, else use self.__dir__()</span></div>
 
-<div class="viewcode-block" id="Dataset.update"><a class="viewcode-back" href="../../ref_guide.html#pydicom.dataset.Dataset.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dictionary</span><span class="p">):</span>
+<div class="viewcode-block" id="Dataset.update"><a class="viewcode-back" href="../../api_ref.html#pydicom.dataset.Dataset.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dictionary</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Extend dict.update() to handle DICOM keywords.&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">dictionary</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">compat</span><span class="o">.</span><span class="n">text_type</span><span class="p">)):</span>
@@ -1367,7 +1380,7 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="p">[</span><span class="n">Tag</span><span class="p">(</span><span class="n">key</span><span class="p">)]</span> <span class="o">=</span> <span class="n">value</span></div>
 
-<div class="viewcode-block" id="Dataset.iterall"><a class="viewcode-back" href="../../ref_guide.html#pydicom.dataset.Dataset.iterall">[docs]</a>    <span class="k">def</span> <span class="nf">iterall</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Dataset.iterall"><a class="viewcode-back" href="../../api_ref.html#pydicom.dataset.Dataset.iterall">[docs]</a>    <span class="k">def</span> <span class="nf">iterall</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Iterate through the Dataset, yielding all DataElements.</span>
 
 <span class="sd">        Unlike Dataset.__iter__, this *does* recurse into sequences,</span>
@@ -1385,7 +1398,7 @@
                     <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">iterall</span><span class="p">():</span>
                         <span class="k">yield</span> <span class="n">elem</span></div>
 
-<div class="viewcode-block" id="Dataset.walk"><a class="viewcode-back" href="../../ref_guide.html#pydicom.dataset.Dataset.walk">[docs]</a>    <span class="k">def</span> <span class="nf">walk</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">callback</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="Dataset.walk"><a class="viewcode-back" href="../../api_ref.html#pydicom.dataset.Dataset.walk">[docs]</a>    <span class="k">def</span> <span class="nf">walk</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">callback</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Iterate through the DataElements and run `callback` on each.</span>
 
 <span class="sd">        Visit all DataElements, possibly recursing into sequences and their</span>
@@ -1420,7 +1433,7 @@
     <span class="fm">__repr__</span> <span class="o">=</span> <span class="fm">__str__</span></div>
 
 
-<span class="k">class</span> <span class="nc">FileDataset</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
+<div class="viewcode-block" id="FileDataset"><a class="viewcode-back" href="../../api_ref.html#pydicom.dataset.FileDataset">[docs]</a><span class="k">class</span> <span class="nc">FileDataset</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;An extension of Dataset to make reading and writing to file-like easier.</span>
 
 <span class="sd">    Attributes</span>
@@ -1525,7 +1538,7 @@
             <span class="n">other_elem</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">self_elem</span> <span class="o">==</span> <span class="n">other_elem</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="vm">__dict__</span>
 
-        <span class="k">return</span> <span class="bp">NotImplemented</span>
+        <span class="k">return</span> <span class="bp">NotImplemented</span></div>
 </pre></div>
 
            </div>
@@ -1581,9 +1594,7 @@
 
   <script type="text/javascript">
       jQuery(function () {
-          
-          SphinxRtdTheme.Navigation.enableSticky();
-          
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script> 
 

@@ -96,7 +96,8 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../pydicom_user_guide.html">Pydicom User Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../pydicom_dev_guide.html">Pydicom Developer Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../ref_guide.html">Pydicom API’s Reference Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ref_guide.html">Reading and writing DICOM files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api_ref.html">Pydicom Complete API Reference</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Examples</span></p>
 <ul>
@@ -211,7 +212,7 @@
 <span class="n">sys_is_little_endian</span> <span class="o">=</span> <span class="p">(</span><span class="n">byteorder</span> <span class="o">==</span> <span class="s1">&#39;little&#39;</span><span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">DicomIter</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="DicomIter"><a class="viewcode-back" href="../../api_ref.html#pydicom.filereader.DicomIter">[docs]</a><span class="k">class</span> <span class="nc">DicomIter</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Iterator over DICOM data elements created from a file-like object&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fp</span><span class="p">,</span> <span class="n">stop_when</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -294,10 +295,10 @@
                                                    <span class="bp">self</span><span class="o">.</span><span class="n">_is_implicit_VR</span><span class="p">,</span>
                                                    <span class="bp">self</span><span class="o">.</span><span class="n">_is_little_endian</span><span class="p">,</span>
                                                    <span class="n">stop_when</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">stop_when</span><span class="p">):</span>
-            <span class="k">yield</span> <span class="n">data_element</span>
+            <span class="k">yield</span> <span class="n">data_element</span></div>
 
 
-<span class="k">def</span> <span class="nf">data_element_generator</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span>
+<div class="viewcode-block" id="data_element_generator"><a class="viewcode-back" href="../../api_ref.html#pydicom.filereader.data_element_generator">[docs]</a><span class="k">def</span> <span class="nf">data_element_generator</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span>
                            <span class="n">is_implicit_VR</span><span class="p">,</span>
                            <span class="n">is_little_endian</span><span class="p">,</span>
                            <span class="n">stop_when</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -532,10 +533,10 @@
                 <span class="k">if</span> <span class="n">has_tag_set</span> <span class="ow">and</span> <span class="n">tag</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">tag_set</span><span class="p">:</span>
                     <span class="k">continue</span>
                 <span class="k">yield</span> <span class="n">RawDataElement</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">VR</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">value_tell</span><span class="p">,</span>
-                                     <span class="n">is_implicit_VR</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">)</span>
+                                     <span class="n">is_implicit_VR</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">)</span></div>
 
 
-<span class="k">def</span> <span class="nf">read_dataset</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">is_implicit_VR</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">,</span> <span class="n">bytelength</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<div class="viewcode-block" id="read_dataset"><a class="viewcode-back" href="../../api_ref.html#pydicom.filereader.read_dataset">[docs]</a><span class="k">def</span> <span class="nf">read_dataset</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">is_implicit_VR</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">,</span> <span class="n">bytelength</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">stop_when</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">defer_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">parent_encoding</span><span class="o">=</span><span class="n">default_encoding</span><span class="p">,</span> <span class="n">specific_tags</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Return a Dataset instance containing the next dataset in the file.</span>
@@ -594,10 +595,10 @@
     <span class="k">except</span> <span class="ne">NotImplementedError</span> <span class="k">as</span> <span class="n">details</span><span class="p">:</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">details</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">Dataset</span><span class="p">(</span><span class="n">raw_data_elements</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Dataset</span><span class="p">(</span><span class="n">raw_data_elements</span><span class="p">)</span></div>
 
 
-<span class="k">def</span> <span class="nf">read_sequence</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">is_implicit_VR</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">,</span> <span class="n">bytelength</span><span class="p">,</span> <span class="n">encoding</span><span class="p">,</span>
+<div class="viewcode-block" id="read_sequence"><a class="viewcode-back" href="../../api_ref.html#pydicom.filereader.read_sequence">[docs]</a><span class="k">def</span> <span class="nf">read_sequence</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">is_implicit_VR</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">,</span> <span class="n">bytelength</span><span class="p">,</span> <span class="n">encoding</span><span class="p">,</span>
                   <span class="n">offset</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Read and return a Sequence -- i.e. a list of Datasets&quot;&quot;&quot;</span>
 
@@ -619,10 +620,10 @@
             <span class="n">seq</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
     <span class="n">seq</span> <span class="o">=</span> <span class="n">Sequence</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span>
     <span class="n">seq</span><span class="o">.</span><span class="n">is_undefined_length</span> <span class="o">=</span> <span class="n">is_undefined_length</span>
-    <span class="k">return</span> <span class="n">seq</span>
+    <span class="k">return</span> <span class="n">seq</span></div>
 
 
-<span class="k">def</span> <span class="nf">read_sequence_item</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">is_implicit_VR</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">,</span> <span class="n">encoding</span><span class="p">,</span>
+<div class="viewcode-block" id="read_sequence_item"><a class="viewcode-back" href="../../api_ref.html#pydicom.filereader.read_sequence_item">[docs]</a><span class="k">def</span> <span class="nf">read_sequence_item</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">is_implicit_VR</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">,</span> <span class="n">encoding</span><span class="p">,</span>
                        <span class="n">offset</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Read and return a single sequence item, i.e. a Dataset&quot;&quot;&quot;</span>
     <span class="n">seq_item_tell</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span> <span class="o">+</span> <span class="n">offset</span>
@@ -661,7 +662,7 @@
         <span class="n">ds</span><span class="o">.</span><span class="n">is_undefined_length_sequence_item</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%08x</span><span class="s2">: Finished sequence item&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">fp</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span> <span class="o">+</span> <span class="n">offset</span><span class="p">,))</span>
     <span class="n">ds</span><span class="o">.</span><span class="n">seq_item_tell</span> <span class="o">=</span> <span class="n">seq_item_tell</span>
-    <span class="k">return</span> <span class="n">ds</span>
+    <span class="k">return</span> <span class="n">ds</span></div>
 
 
 <span class="k">def</span> <span class="nf">_read_command_set_elements</span><span class="p">(</span><span class="n">fp</span><span class="p">):</span>
@@ -751,7 +752,7 @@
     <span class="k">return</span> <span class="n">file_meta</span>
 
 
-<span class="k">def</span> <span class="nf">read_file_meta_info</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+<div class="viewcode-block" id="read_file_meta_info"><a class="viewcode-back" href="../../api_ref.html#pydicom.filereader.read_file_meta_info">[docs]</a><span class="k">def</span> <span class="nf">read_file_meta_info</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Read and return the DICOM file meta information only.</span>
 
 <span class="sd">    This function is meant to be used in user code, for quickly going through</span>
@@ -760,10 +761,10 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">with</span> <span class="n">DicomFile</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
         <span class="n">read_preamble</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>  <span class="c1"># if no header, raise exception</span>
-        <span class="k">return</span> <span class="n">_read_file_meta_info</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_read_file_meta_info</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span></div>
 
 
-<span class="k">def</span> <span class="nf">read_preamble</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">force</span><span class="p">):</span>
+<div class="viewcode-block" id="read_preamble"><a class="viewcode-back" href="../../api_ref.html#pydicom.filereader.read_preamble">[docs]</a><span class="k">def</span> <span class="nf">read_preamble</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">force</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Return the 128-byte DICOM preamble in `fp` if present.</span>
 
 <span class="sd">    `fp` should be positioned at the start of the file-like. If the preamble</span>
@@ -818,7 +819,7 @@
                                 <span class="s2">&quot;the header. Use force=True to force reading.&quot;</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0:08x}</span><span class="s2">: &#39;DICM&#39; prefix found&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fp</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span> <span class="o">-</span> <span class="mi">4</span><span class="p">))</span>
-    <span class="k">return</span> <span class="n">preamble</span>
+    <span class="k">return</span> <span class="n">preamble</span></div>
 
 
 <span class="k">def</span> <span class="nf">_at_pixel_data</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">VR</span><span class="p">,</span> <span class="n">length</span><span class="p">):</span>
@@ -1008,15 +1009,18 @@
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
-<span class="sd">    Read and return a dataset stored in accordance with the DICOM File Format</span>
+<span class="sd">    Read and return a dataset stored in accordance with the DICOM File Format:</span>
+
 <span class="sd">    &gt;&gt;&gt; ds = pydicom.dcmread(&quot;rtplan.dcm&quot;)</span>
 <span class="sd">    &gt;&gt;&gt; ds.PatientName</span>
 
-<span class="sd">    Read and return a dataset not in accordance with the DICOM File Format</span>
+<span class="sd">    Read and return a dataset not in accordance with the DICOM File Format:</span>
+
 <span class="sd">    &gt;&gt;&gt; ds = pydicom.dcmread(&quot;rtplan.dcm&quot;, force=True)</span>
 <span class="sd">    &gt;&gt;&gt; ds.PatientName</span>
 
 <span class="sd">    Use within a context manager:</span>
+
 <span class="sd">    &gt;&gt;&gt; with pydicom.dcmread(&quot;rtplan.dcm&quot;) as ds:</span>
 <span class="sd">    &gt;&gt;&gt;     ds.PatientName</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -1064,7 +1068,7 @@
 <span class="n">read_file</span> <span class="o">=</span> <span class="n">dcmread</span>  <span class="c1"># used read_file until pydicom 1.0. Kept for compatibility</span>
 
 
-<span class="k">def</span> <span class="nf">read_dicomdir</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s2">&quot;DICOMDIR&quot;</span><span class="p">):</span>
+<div class="viewcode-block" id="read_dicomdir"><a class="viewcode-back" href="../../api_ref.html#pydicom.filereader.read_dicomdir">[docs]</a><span class="k">def</span> <span class="nf">read_dicomdir</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s2">&quot;DICOMDIR&quot;</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Read a DICOMDIR file and return a DicomDir instance.</span>
 
 <span class="sd">    This is a wrapper around dcmread, which gives a default file name.</span>
@@ -1092,10 +1096,10 @@
         <span class="n">msg</span> <span class="o">=</span> <span class="sa">u</span><span class="s2">&quot;File &#39;</span><span class="si">{0}</span><span class="s2">&#39; is not a Media Storage Directory file&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
             <span class="n">filename</span><span class="p">)</span>
         <span class="k">raise</span> <span class="n">InvalidDicomError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">ds</span>
+    <span class="k">return</span> <span class="n">ds</span></div>
 
 
-<span class="k">def</span> <span class="nf">data_element_offset_to_value</span><span class="p">(</span><span class="n">is_implicit_VR</span><span class="p">,</span> <span class="n">VR</span><span class="p">):</span>
+<div class="viewcode-block" id="data_element_offset_to_value"><a class="viewcode-back" href="../../api_ref.html#pydicom.filereader.data_element_offset_to_value">[docs]</a><span class="k">def</span> <span class="nf">data_element_offset_to_value</span><span class="p">(</span><span class="n">is_implicit_VR</span><span class="p">,</span> <span class="n">VR</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Return number of bytes from start of data element to start of value&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">is_implicit_VR</span><span class="p">:</span>
         <span class="n">offset</span> <span class="o">=</span> <span class="mi">8</span>  <span class="c1"># tag of 4 plus 4-byte length</span>
@@ -1104,10 +1108,10 @@
             <span class="n">offset</span> <span class="o">=</span> <span class="mi">12</span>  <span class="c1"># tag 4 + 2 VR + 2 reserved + 4 length</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">offset</span> <span class="o">=</span> <span class="mi">8</span>  <span class="c1"># tag 4 + 2 VR + 2 length</span>
-    <span class="k">return</span> <span class="n">offset</span>
+    <span class="k">return</span> <span class="n">offset</span></div>
 
 
-<span class="k">def</span> <span class="nf">read_deferred_data_element</span><span class="p">(</span><span class="n">fileobj_type</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">,</span>
+<div class="viewcode-block" id="read_deferred_data_element"><a class="viewcode-back" href="../../api_ref.html#pydicom.filereader.read_deferred_data_element">[docs]</a><span class="k">def</span> <span class="nf">read_deferred_data_element</span><span class="p">(</span><span class="n">fileobj_type</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">,</span>
                                <span class="n">raw_data_elem</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Read the previously deferred value from the file into memory</span>
 <span class="sd">    and return a raw data element&quot;&quot;&quot;</span>
@@ -1149,7 +1153,7 @@
                                                  <span class="n">raw_data_elem</span><span class="o">.</span><span class="n">tag</span><span class="p">))</span>
 
     <span class="c1"># Everything is ok, now this object should act like usual DataElement</span>
-    <span class="k">return</span> <span class="n">data_elem</span>
+    <span class="k">return</span> <span class="n">data_elem</span></div>
 </pre></div>
 
            </div>
@@ -1205,9 +1209,7 @@
 
   <script type="text/javascript">
       jQuery(function () {
-          
-          SphinxRtdTheme.Navigation.enableSticky();
-          
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script> 
 

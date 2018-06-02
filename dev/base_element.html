@@ -113,7 +113,8 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="pydicom_dev_guide.html">Pydicom Developer Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ref_guide.html">Pydicom API’s Reference Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ref_guide.html">Reading and writing DICOM files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_ref.html">Pydicom Complete API Reference</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Examples</span></p>
 <ul>
@@ -196,7 +197,7 @@
 <p class="rubric">pydicom object model, description of classes, examples</p>
 <div class="section" id="dataset">
 <h2>Dataset<a class="headerlink" href="#dataset" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference internal" href="ref_guide.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">dataset.Dataset</span></code></a> is the main object you will work with
+<p><a class="reference internal" href="api_ref.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">dataset.Dataset</span></code></a> is the main object you will work with
 directly. Dataset is derived from Python’s <code class="docutils literal notranslate"><span class="pre">dict</span></code>, so it inherits (and
 overrides some of) the methods of <code class="docutils literal notranslate"><span class="pre">dict</span></code>. In other words, it is a collection
 of key:value pairs, where the key is the DICOM (group,element) tag (as a
@@ -256,7 +257,7 @@ usage example of data elements removal and assignation.</p>
 <p class="first admonition-title">Note</p>
 <p>To understand using <code class="xref py py-class docutils literal notranslate"><span class="pre">sequence.Sequences</span></code> in pydicom, please refer to
 this object model:
-<a class="reference internal" href="ref_guide.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">dataset.Dataset</span></code></a> (derived from Python’s <code class="docutils literal notranslate"><span class="pre">dict</span></code>)</p>
+<a class="reference internal" href="api_ref.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">dataset.Dataset</span></code></a> (derived from Python’s <code class="docutils literal notranslate"><span class="pre">dict</span></code>)</p>
 <blockquote class="last">
 <div><dl class="docutils">
 <dt>—&gt; contains DataElement instances</dt>
@@ -268,7 +269,7 @@ this object model:
 <li>a Sequence instance</li>
 </ul>
 </div></blockquote>
-<p class="last">–&gt; a Sequence is a list of <a class="reference internal" href="ref_guide.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">dataset.Dataset</span></code></a> (and so we come full circle)</p>
+<p class="last">–&gt; a Sequence is a list of <a class="reference internal" href="api_ref.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">dataset.Dataset</span></code></a> (and so we come full circle)</p>
 </dd>
 </dl>
 </div></blockquote>
@@ -292,28 +293,28 @@ can also use the tag numbers directly, such as:</p>
 <span class="go">(&#39;Field 1&#39;, &#39;Field 1&#39;)</span>
 </pre></div>
 </div>
-<p>If you don’t remember or know the exact tag name, <a class="reference internal" href="ref_guide.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">dataset.Dataset</span></code></a>
-provides a handy <a class="reference internal" href="ref_guide.html#pydicom.dataset.Dataset.dir" title="pydicom.dataset.Dataset.dir"><code class="xref py py-func docutils literal notranslate"><span class="pre">dataset.Dataset.dir()</span></code></a> method, useful during interactive
+<p>If you don’t remember or know the exact tag name, <a class="reference internal" href="api_ref.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">dataset.Dataset</span></code></a>
+provides a handy <a class="reference internal" href="api_ref.html#pydicom.dataset.Dataset.dir" title="pydicom.dataset.Dataset.dir"><code class="xref py py-func docutils literal notranslate"><span class="pre">dataset.Dataset.dir()</span></code></a> method, useful during interactive
 sessions at the Python prompt:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">dir</span><span class="p">(</span><span class="s2">&quot;pat&quot;</span><span class="p">)</span>
 <span class="go">[&#39;PatientBirthDate&#39;, &#39;PatientID&#39;, &#39;PatientName&#39;, &#39;PatientSetupSequence&#39;, &#39;PatientSex&#39;]</span>
 </pre></div>
 </div>
-<p><a class="reference internal" href="ref_guide.html#pydicom.dataset.Dataset.dir" title="pydicom.dataset.Dataset.dir"><code class="xref py py-func docutils literal notranslate"><span class="pre">dataset.Dataset.dir()</span></code></a> will return any DICOM tag names in the dataset that
+<p><a class="reference internal" href="api_ref.html#pydicom.dataset.Dataset.dir" title="pydicom.dataset.Dataset.dir"><code class="xref py py-func docutils literal notranslate"><span class="pre">dataset.Dataset.dir()</span></code></a> will return any DICOM tag names in the dataset that
 have the specified string anywhere in the name (case insensitive).</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">Calling <a class="reference internal" href="ref_guide.html#pydicom.dataset.Dataset.dir" title="pydicom.dataset.Dataset.dir"><code class="xref py py-func docutils literal notranslate"><span class="pre">dataset.Dataset.dir()</span></code></a> with no string will list all tag names
+<p class="last">Calling <a class="reference internal" href="api_ref.html#pydicom.dataset.Dataset.dir" title="pydicom.dataset.Dataset.dir"><code class="xref py py-func docutils literal notranslate"><span class="pre">dataset.Dataset.dir()</span></code></a> with no string will list all tag names
 available in the dataset.</p>
 </div>
 <p>You can also see all the names that pydicom knows about by viewing the
 <code class="docutils literal notranslate"><span class="pre">_dicom_dict.py</span></code> file. You could modify that file to add tags that pydicom
 doesn’t already know about.</p>
-<p>Under the hood, <a class="reference internal" href="ref_guide.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">dataset.Dataset</span></code></a> stores a DataElement object for each
+<p>Under the hood, <a class="reference internal" href="api_ref.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">dataset.Dataset</span></code></a> stores a DataElement object for each
 item, but when accessed by name (e.g. <code class="docutils literal notranslate"><span class="pre">ds.PatientName</span></code>) only the <code class="docutils literal notranslate"><span class="pre">value</span></code> of
-that <code class="xref py py-class docutils literal notranslate"><span class="pre">dataelem.DataElement</span></code> is returned. If you need the whole
-<code class="xref py py-mod docutils literal notranslate"><span class="pre">dataelem</span></code> (see the <code class="xref py py-class docutils literal notranslate"><span class="pre">dataelem.DataElement</span></code> discussion), you can
-use the <a class="reference internal" href="ref_guide.html#pydicom.dataset.Dataset.data_element" title="pydicom.dataset.Dataset.data_element"><code class="xref py py-func docutils literal notranslate"><span class="pre">dataset.Dataset.data_element()</span></code></a> method or access the item using
+that <a class="reference internal" href="api_ref.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement"><code class="xref py py-class docutils literal notranslate"><span class="pre">dataelem.DataElement</span></code></a> is returned. If you need the whole
+<code class="xref py py-mod docutils literal notranslate"><span class="pre">dataelem</span></code> (see the <a class="reference internal" href="api_ref.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement"><code class="xref py py-class docutils literal notranslate"><span class="pre">dataelem.DataElement</span></code></a> discussion), you can
+use the <a class="reference internal" href="api_ref.html#pydicom.dataset.Dataset.data_element" title="pydicom.dataset.Dataset.data_element"><code class="xref py py-func docutils literal notranslate"><span class="pre">dataset.Dataset.data_element()</span></code></a> method or access the item using
 the tag number:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># reload the data</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">dcmread</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
@@ -360,9 +361,9 @@ use the <cite>in</cite> keyword:</p>
 </div>
 <div class="section" id="dataelement">
 <h2>DataElement<a class="headerlink" href="#dataelement" title="Permalink to this headline">¶</a></h2>
-<p>The <code class="xref py py-class docutils literal notranslate"><span class="pre">dataelem.DataElement</span></code> class is not usually used directly in user
+<p>The <a class="reference internal" href="api_ref.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement"><code class="xref py py-class docutils literal notranslate"><span class="pre">dataelem.DataElement</span></code></a> class is not usually used directly in user
 code, but is used extensively by
-<a class="reference internal" href="ref_guide.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">dataset.Dataset</span></code></a>. <code class="xref py py-class docutils literal notranslate"><span class="pre">dataelem.DataElement</span></code> is a simple object
+<a class="reference internal" href="api_ref.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">dataset.Dataset</span></code></a>. <a class="reference internal" href="api_ref.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement"><code class="xref py py-class docutils literal notranslate"><span class="pre">dataelem.DataElement</span></code></a> is a simple object
 which stores the following things:</p>
 <blockquote>
 <div><ul class="simple">
@@ -477,9 +478,7 @@ to make string representations prettier. Otherwise all the usual methods of
 
   <script type="text/javascript">
       jQuery(function () {
-          
-          SphinxRtdTheme.Navigation.enableSticky();
-          
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script> 
 

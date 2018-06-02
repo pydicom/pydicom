@@ -1,0 +1,420 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pydicom.filebase &mdash; pydicom 1.1.0.dev0 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> pydicom
+          
+
+          
+            
+            <img src="../../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.1.0.dev0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started with pydicom</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../pydicom_user_guide.html">Pydicom User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../pydicom_dev_guide.html">Pydicom Developer Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ref_guide.html">Reading and writing DICOM files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api_ref.html">Pydicom Complete API Reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">General examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#image-processing">Image processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#input-output">Input-output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../release-notes.html">Release history</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pydicom</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>pydicom.filebase</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for pydicom.filebase</h1><div class="highlight"><pre>
+<span></span><span class="c1"># filebase.py</span>
+<span class="sd">&quot;&quot;&quot;Hold DicomFile class, which does basic I/O for a dicom file.&quot;&quot;&quot;</span>
+<span class="c1"># Copyright (c) 2008-2012 Darcy Mason</span>
+<span class="c1"># This file is part of pydicom, released under a modified MIT license.</span>
+<span class="c1">#    See the file LICENSE included with this distribution, also</span>
+<span class="c1">#    available at https://github.com/pydicom/pydicom</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
+
+<span class="kn">from</span> <span class="nn">pydicom.tag</span> <span class="k">import</span> <span class="n">Tag</span><span class="p">,</span> <span class="n">BaseTag</span>
+<span class="kn">from</span> <span class="nn">struct</span> <span class="k">import</span> <span class="p">(</span><span class="n">unpack</span><span class="p">,</span> <span class="n">pack</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">io</span> <span class="k">import</span> <span class="n">BytesIO</span>
+
+
+<div class="viewcode-block" id="DicomIO"><a class="viewcode-back" href="../../api_ref.html#pydicom.filebase.DicomIO">[docs]</a><span class="k">class</span> <span class="nc">DicomIO</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;File object which holds transfer syntax info</span>
+<span class="sd">       and anything else we need.&quot;&quot;&quot;</span>
+
+    <span class="c1"># number of times to read if don&#39;t get requested bytes</span>
+    <span class="n">max_read_attempts</span> <span class="o">=</span> <span class="mi">3</span>
+
+    <span class="c1"># default</span>
+    <span class="n">defer_size</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="c1"># start with this by default</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_implicit_VR</span> <span class="o">=</span> <span class="kc">True</span>
+
+<div class="viewcode-block" id="DicomIO.read_le_tag"><a class="viewcode-back" href="../../api_ref.html#pydicom.filebase.DicomIO.read_le_tag">[docs]</a>    <span class="k">def</span> <span class="nf">read_le_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Read and return two unsigned shorts (little endian)</span>
+<span class="sd">           from the file.&quot;&quot;&quot;</span>
+        <span class="n">bytes_read</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">need_exact_length</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">unpack</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;&lt;HH&quot;</span><span class="p">,</span> <span class="n">bytes_read</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DicomIO.read_be_tag"><a class="viewcode-back" href="../../api_ref.html#pydicom.filebase.DicomIO.read_be_tag">[docs]</a>    <span class="k">def</span> <span class="nf">read_be_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Read and return two unsigned shorts (big endian)</span>
+<span class="sd">           from the file.&quot;&quot;&quot;</span>
+        <span class="n">bytes_read</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">need_exact_length</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">unpack</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;&gt;HH&quot;</span><span class="p">,</span> <span class="n">bytes_read</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DicomIO.write_tag"><a class="viewcode-back" href="../../api_ref.html#pydicom.filebase.DicomIO.write_tag">[docs]</a>    <span class="k">def</span> <span class="nf">write_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Write a dicom tag (two unsigned shorts) to the file.&quot;&quot;&quot;</span>
+        <span class="c1"># make sure is an instance of class, not just a tuple or int</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">BaseTag</span><span class="p">):</span>
+            <span class="n">tag</span> <span class="o">=</span> <span class="n">Tag</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write_US</span><span class="p">(</span><span class="n">tag</span><span class="o">.</span><span class="n">group</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write_US</span><span class="p">(</span><span class="n">tag</span><span class="o">.</span><span class="n">element</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DicomIO.read_leUS"><a class="viewcode-back" href="../../api_ref.html#pydicom.filebase.DicomIO.read_leUS">[docs]</a>    <span class="k">def</span> <span class="nf">read_leUS</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return an unsigned short from the file</span>
+<span class="sd">           with little endian byte order&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">unpack</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;&lt;H&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">2</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="DicomIO.read_beUS"><a class="viewcode-back" href="../../api_ref.html#pydicom.filebase.DicomIO.read_beUS">[docs]</a>    <span class="k">def</span> <span class="nf">read_beUS</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return an unsigned short from the file</span>
+<span class="sd">           with big endian byte order&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">unpack</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;&gt;H&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">2</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="DicomIO.read_leUL"><a class="viewcode-back" href="../../api_ref.html#pydicom.filebase.DicomIO.read_leUL">[docs]</a>    <span class="k">def</span> <span class="nf">read_leUL</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return an unsigned long read with</span>
+<span class="sd">           little endian byte order&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">unpack</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;&lt;L&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="DicomIO.read"><a class="viewcode-back" href="../../api_ref.html#pydicom.filebase.DicomIO.read">[docs]</a>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">need_exact_length</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Reads the required length, returns</span>
+<span class="sd">        EOFError if gets less</span>
+
+<span class="sd">        If length is None, then read all bytes</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">parent_read</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent_read</span>  <span class="c1"># super(DicomIO, self).read</span>
+        <span class="k">if</span> <span class="n">length</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">parent_read</span><span class="p">()</span>  <span class="c1"># get all of it</span>
+        <span class="n">bytes_read</span> <span class="o">=</span> <span class="n">parent_read</span><span class="p">(</span><span class="n">length</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">bytes_read</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">length</span> <span class="ow">and</span> <span class="n">need_exact_length</span><span class="p">:</span>
+            <span class="c1"># Didn&#39;t get all the desired bytes. Keep trying to get the rest.</span>
+            <span class="c1"># If reading across network, might want to add a delay here</span>
+            <span class="n">attempts</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">max_reads</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_read_attempts</span>
+            <span class="k">while</span> <span class="n">attempts</span> <span class="o">&lt;</span> <span class="n">max_reads</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">bytes_read</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">length</span><span class="p">:</span>
+                <span class="n">bytes_read</span> <span class="o">+=</span> <span class="n">parent_read</span><span class="p">(</span><span class="n">length</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">bytes_read</span><span class="p">))</span>
+                <span class="n">attempts</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">num_bytes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">bytes_read</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">num_bytes</span> <span class="o">&lt;</span> <span class="n">length</span><span class="p">:</span>
+                <span class="n">start_pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span> <span class="o">-</span> <span class="n">num_bytes</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Unexpected end of file. Read </span><span class="si">{0}</span><span class="s2"> bytes of </span><span class="si">{1}</span><span class="s2"> &quot;</span>
+                       <span class="s2">&quot;expected starting at position 0x</span><span class="si">{2:x}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                           <span class="nb">len</span><span class="p">(</span><span class="n">bytes_read</span><span class="p">),</span> <span class="n">length</span><span class="p">,</span> <span class="n">start_pos</span><span class="p">))</span>
+                <span class="k">raise</span> <span class="ne">EOFError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">bytes_read</span></div>
+
+<div class="viewcode-block" id="DicomIO.write_leUS"><a class="viewcode-back" href="../../api_ref.html#pydicom.filebase.DicomIO.write_leUS">[docs]</a>    <span class="k">def</span> <span class="nf">write_leUS</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Write an unsigned short with little endian byte order&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">pack</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;&lt;H&quot;</span><span class="p">,</span> <span class="n">val</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="DicomIO.write_leUL"><a class="viewcode-back" href="../../api_ref.html#pydicom.filebase.DicomIO.write_leUL">[docs]</a>    <span class="k">def</span> <span class="nf">write_leUL</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Write an unsigned long with little endian byte order&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">pack</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;&lt;L&quot;</span><span class="p">,</span> <span class="n">val</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="DicomIO.write_beUS"><a class="viewcode-back" href="../../api_ref.html#pydicom.filebase.DicomIO.write_beUS">[docs]</a>    <span class="k">def</span> <span class="nf">write_beUS</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Write an unsigned short with big endian byte order&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">pack</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;&gt;H&quot;</span><span class="p">,</span> <span class="n">val</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="DicomIO.write_beUL"><a class="viewcode-back" href="../../api_ref.html#pydicom.filebase.DicomIO.write_beUL">[docs]</a>    <span class="k">def</span> <span class="nf">write_beUL</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Write an unsigned long with big endian byte order&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">pack</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;&gt;L&quot;</span><span class="p">,</span> <span class="n">val</span><span class="p">))</span></div>
+
+    <span class="n">write_US</span> <span class="o">=</span> <span class="n">write_leUS</span>  <span class="c1"># XXX should we default to this?</span>
+    <span class="n">write_UL</span> <span class="o">=</span> <span class="n">write_leUL</span>  <span class="c1"># XXX &quot;</span>
+
+<div class="viewcode-block" id="DicomIO.read_beUL"><a class="viewcode-back" href="../../api_ref.html#pydicom.filebase.DicomIO.read_beUL">[docs]</a>    <span class="k">def</span> <span class="nf">read_beUL</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return an unsigned long read with big endian byte order&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">unpack</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;&gt;L&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span></div>
+
+    <span class="c1"># Set up properties is_little_endian and is_implicit_VR</span>
+    <span class="c1"># Big/Little Endian changes functions to read unsigned</span>
+    <span class="c1"># short or long, e.g. length fields etc</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">is_little_endian</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_little_endian</span>
+
+    <span class="nd">@is_little_endian</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">is_little_endian</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_little_endian</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">if</span> <span class="n">value</span><span class="p">:</span>  <span class="c1"># Little Endian</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">read_US</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_leUS</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">read_UL</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_leUL</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">write_US</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">write_leUS</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">write_UL</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">write_leUL</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">read_tag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_le_tag</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># Big Endian</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">read_US</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_beUS</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">read_UL</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_beUL</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">write_US</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">write_beUS</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">write_UL</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">write_beUL</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">read_tag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_be_tag</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">is_implicit_VR</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_implicit_VR</span>
+
+    <span class="nd">@is_implicit_VR</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">is_implicit_VR</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_implicit_VR</span> <span class="o">=</span> <span class="n">value</span></div>
+
+
+<div class="viewcode-block" id="DicomFileLike"><a class="viewcode-back" href="../../api_ref.html#pydicom.filebase.DicomFileLike">[docs]</a><span class="k">class</span> <span class="nc">DicomFileLike</span><span class="p">(</span><span class="n">DicomIO</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_like_obj</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">file_like_obj</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent_read</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">file_like_obj</span><span class="p">,</span> <span class="s2">&quot;read&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">no_read</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">file_like_obj</span><span class="p">,</span> <span class="s2">&quot;write&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">no_write</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">seek</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">file_like_obj</span><span class="p">,</span> <span class="s2">&quot;seek&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">no_seek</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tell</span> <span class="o">=</span> <span class="n">file_like_obj</span><span class="o">.</span><span class="n">tell</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">close</span> <span class="o">=</span> <span class="n">file_like_obj</span><span class="o">.</span><span class="n">close</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">file_like_obj</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;no filename&gt;&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="DicomFileLike.no_write"><a class="viewcode-back" href="../../api_ref.html#pydicom.filebase.DicomFileLike.no_write">[docs]</a>    <span class="k">def</span> <span class="nf">no_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bytes_read</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Used for file-like objects where no write is available&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;This DicomFileLike object has no write() method&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DicomFileLike.no_read"><a class="viewcode-back" href="../../api_ref.html#pydicom.filebase.DicomFileLike.no_read">[docs]</a>    <span class="k">def</span> <span class="nf">no_read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bytes_read</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Used for file-like objects where no read is available&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;This DicomFileLike object has no read() method&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DicomFileLike.no_seek"><a class="viewcode-back" href="../../api_ref.html#pydicom.filebase.DicomFileLike.no_seek">[docs]</a>    <span class="k">def</span> <span class="nf">no_seek</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">from_what</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Used for file-like objects where no seek is available&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;This DicomFileLike object has no seek() method&quot;</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">exc_info</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+
+<span class="k">def</span> <span class="nf">DicomFile</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">DicomFileLike</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="DicomBytesIO"><a class="viewcode-back" href="../../api_ref.html#pydicom.filebase.DicomBytesIO">[docs]</a><span class="k">class</span> <span class="nc">DicomBytesIO</span><span class="p">(</span><span class="n">DicomFileLike</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">DicomBytesIO</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">BytesIO</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">getvalue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2018, Darcy Mason and pydicom contributors.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'1.1.0.dev0',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
