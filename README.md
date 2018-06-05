@@ -36,7 +36,7 @@ See [Getting Started](https://pydicom.github.io/pydicom/stable/getting_started.h
 for installation and basic information, and the 
 [User Guide](https://pydicom.github.io/pydicom/stable/pydicom_user_guide.html) 
 for an overview of how to use the pydicom library. 
-To contribute to pydicom, read our [contribution guide](CONTRIBUTING.md). 
+To contribute to pydicom, read our [contribution guide](https://github.com/pydicom/pydicom/blob/master/CONTRIBUTING.md).
 To contribute an example or extension of pydicom that does not belong with 
 the core software, see our contribution repository, 
 [contrib-pydicom](https://www.github.com/pydicom/contrib-pydicom).
