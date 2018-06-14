@@ -1,4 +1,8 @@
+.. note::
+    :class: sphx-glr-download-link-note
 
+    Click :ref:`here <sphx_glr_download_auto_examples_input_output_plot_write_dicom.py>` to download the full example code
+.. rst-class:: sphx-glr-example-title
 
 .. _sphx_glr_auto_examples_input_output_plot_write_dicom.py:
 
@@ -18,25 +22,27 @@ have to change UIDs to valid values and add all required DICOM data elements.
 
 .. rst-class:: sphx-glr-script-out
 
- Out::
+ Out:
+
+ .. code-block:: none
 
     Setting file meta information...
     Setting dataset values...
-    Writing test file /tmp/tmpnsvu0b5h.dcm
+    Writing test file /tmp/tmp54urhajn.dcm
     File saved.
-    Writing test file as Big Endian Explicit VR /tmp/tmpj1rul8xc.dcm
-    Load file /tmp/tmpnsvu0b5h.dcm ...
-    (0008, 0023) Content Date                        DA: '20180602'
-    (0008, 0033) Content Time                        TM: '193235.942286'
+    Writing test file as Big Endian Explicit VR /tmp/tmp5xlnchn1.dcm
+    Load file /tmp/tmp54urhajn.dcm ...
+    (0008, 0023) Content Date                        DA: '20180614'
+    (0008, 0033) Content Time                        TM: '231635.478717'
     (0010, 0010) Patient's Name                      PN: 'Test^Firstname'
     (0010, 0020) Patient ID                          LO: '123456'
-    Remove file /tmp/tmpnsvu0b5h.dcm ...
-    Load file /tmp/tmpj1rul8xc.dcm ...
-    (0008, 0023) Content Date                        DA: '20180602'
-    (0008, 0033) Content Time                        TM: '193235.942286'
+    Remove file /tmp/tmp54urhajn.dcm ...
+    Load file /tmp/tmp5xlnchn1.dcm ...
+    (0008, 0023) Content Date                        DA: '20180614'
+    (0008, 0033) Content Time                        TM: '231635.478717'
     (0010, 0010) Patient's Name                      PN: 'Test^Firstname'
     (0010, 0020) Patient ID                          LO: '123456'
-    Remove file /tmp/tmpj1rul8xc.dcm ...
+    Remove file /tmp/tmp5xlnchn1.dcm ...
 
 
 
@@ -113,13 +119,17 @@ have to change UIDs to valid values and add all required DICOM data elements.
         print('Remove file {} ...'.format(filename))
         os.remove(filename)
 
-**Total running time of the script:** ( 0 minutes  0.006 seconds)
+**Total running time of the script:** ( 0 minutes  0.007 seconds)
 
+
+.. _sphx_glr_download_auto_examples_input_output_plot_write_dicom.py:
 
 
 .. only :: html
 
  .. container:: sphx-glr-footer
+    :class: sphx-glr-footer-example
+
 
 
   .. container:: sphx-glr-download

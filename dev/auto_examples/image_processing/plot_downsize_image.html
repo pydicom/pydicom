@@ -26,8 +26,7 @@
 
   
 
-  
-    <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
@@ -180,7 +179,11 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="downsize-mri-image-using-pydicom">
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Click <a class="reference internal" href="#sphx-glr-download-auto-examples-image-processing-plot-downsize-image-py"><span class="std std-ref">here</span></a> to download the full example code</p>
+</div>
+<div class="sphx-glr-example-title section" id="downsize-mri-image-using-pydicom">
 <span id="sphx-glr-auto-examples-image-processing-plot-downsize-image-py"></span><h1>Downsize MRI image using pydicom<a class="headerlink" href="#downsize-mri-image-using-pydicom" title="Permalink to this headline">¶</a></h1>
 <p>This example shows how to downsize an MR image from <img class="math" src="../../_images/math/cd9e50a863e7b2639b0afb3dc81597e506eca3d2.png" alt="512  imes 512"/> to
 <img class="math" src="../../_images/math/5913dfc6081655e97fa07b78f7e5f60f3b491b94.png" alt="64       imes 64"/>. The downsizing is performed by taking the central section
@@ -190,83 +193,83 @@ instead of averagin the pixels. Finally, the image is store as a dicom image.</p
 <p class="last">This example requires the Numpy library to manipulate the pixel data.</p>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">The</span> <span class="n">image</span> <span class="n">has</span> <span class="mi">64</span> <span class="n">x</span> <span class="mi">64</span> <span class="n">voxels</span>
-<span class="n">The</span> <span class="n">downsampled</span> <span class="n">image</span> <span class="n">has</span> <span class="mi">8</span> <span class="n">x</span> <span class="mi">8</span> <span class="n">voxels</span>
-<span class="n">The</span> <span class="n">information</span> <span class="n">of</span> <span class="n">the</span> <span class="n">data</span> <span class="nb">set</span> <span class="n">after</span> <span class="n">downsampling</span><span class="p">:</span>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>The image has 64 x 64 voxels
+The downsampled image has 8 x 8 voxels
+The information of the data set after downsampling:
 
-<span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">0008</span><span class="p">)</span> <span class="n">Image</span> <span class="n">Type</span>                          <span class="n">CS</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;DERIVED&#39;</span><span class="p">,</span> <span class="s1">&#39;SECONDARY&#39;</span><span class="p">,</span> <span class="s1">&#39;OTHER&#39;</span><span class="p">]</span>
-<span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">0012</span><span class="p">)</span> <span class="n">Instance</span> <span class="n">Creation</span> <span class="n">Date</span>              <span class="n">DA</span><span class="p">:</span> <span class="s1">&#39;20040826&#39;</span>
-<span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">0013</span><span class="p">)</span> <span class="n">Instance</span> <span class="n">Creation</span> <span class="n">Time</span>              <span class="n">TM</span><span class="p">:</span> <span class="s1">&#39;185434&#39;</span>
-<span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">0014</span><span class="p">)</span> <span class="n">Instance</span> <span class="n">Creator</span> <span class="n">UID</span>                <span class="n">UI</span><span class="p">:</span> <span class="mf">1.3</span><span class="o">.</span><span class="mf">6.1</span><span class="o">.</span><span class="mf">4.1</span><span class="o">.</span><span class="mf">5962.3</span>
-<span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">0016</span><span class="p">)</span> <span class="n">SOP</span> <span class="n">Class</span> <span class="n">UID</span>                       <span class="n">UI</span><span class="p">:</span> <span class="n">MR</span> <span class="n">Image</span> <span class="n">Storage</span>
-<span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">0018</span><span class="p">)</span> <span class="n">SOP</span> <span class="n">Instance</span> <span class="n">UID</span>                    <span class="n">UI</span><span class="p">:</span> <span class="mf">1.3</span><span class="o">.</span><span class="mf">6.1</span><span class="o">.</span><span class="mf">4.1</span><span class="o">.</span><span class="mf">5962.1</span><span class="o">.</span><span class="mf">1.4</span><span class="o">.</span><span class="mf">1.1</span><span class="o">.</span><span class="mf">20040826185059.5457</span>
-<span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">0020</span><span class="p">)</span> <span class="n">Study</span> <span class="n">Date</span>                          <span class="n">DA</span><span class="p">:</span> <span class="s1">&#39;20040826&#39;</span>
-<span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">0021</span><span class="p">)</span> <span class="n">Series</span> <span class="n">Date</span>                         <span class="n">DA</span><span class="p">:</span> <span class="s1">&#39;&#39;</span>
-<span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">0022</span><span class="p">)</span> <span class="n">Acquisition</span> <span class="n">Date</span>                    <span class="n">DA</span><span class="p">:</span> <span class="s1">&#39;&#39;</span>
-<span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">0030</span><span class="p">)</span> <span class="n">Study</span> <span class="n">Time</span>                          <span class="n">TM</span><span class="p">:</span> <span class="s1">&#39;185059&#39;</span>
-<span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">0031</span><span class="p">)</span> <span class="n">Series</span> <span class="n">Time</span>                         <span class="n">TM</span><span class="p">:</span> <span class="s1">&#39;&#39;</span>
-<span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">0032</span><span class="p">)</span> <span class="n">Acquisition</span> <span class="n">Time</span>                    <span class="n">TM</span><span class="p">:</span> <span class="s1">&#39;&#39;</span>
-<span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">0050</span><span class="p">)</span> <span class="n">Accession</span> <span class="n">Number</span>                    <span class="n">SH</span><span class="p">:</span> <span class="s1">&#39;&#39;</span>
-<span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">0060</span><span class="p">)</span> <span class="n">Modality</span>                            <span class="n">CS</span><span class="p">:</span> <span class="s1">&#39;MR&#39;</span>
-<span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">0070</span><span class="p">)</span> <span class="n">Manufacturer</span>                        <span class="n">LO</span><span class="p">:</span> <span class="s1">&#39;TOSHIBA_MEC&#39;</span>
-<span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">0080</span><span class="p">)</span> <span class="n">Institution</span> <span class="n">Name</span>                    <span class="n">LO</span><span class="p">:</span> <span class="s1">&#39;TOSHIBA&#39;</span>
-<span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">0090</span><span class="p">)</span> <span class="n">Referring</span> <span class="n">Physician</span><span class="s1">&#39;s Name          PN: &#39;&#39;</span>
-<span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">0201</span><span class="p">)</span> <span class="n">Timezone</span> <span class="n">Offset</span> <span class="n">From</span> <span class="n">UTC</span>            <span class="n">SH</span><span class="p">:</span> <span class="s1">&#39;-0400&#39;</span>
-<span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">1010</span><span class="p">)</span> <span class="n">Station</span> <span class="n">Name</span>                        <span class="n">SH</span><span class="p">:</span> <span class="s1">&#39;000000000&#39;</span>
-<span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">1060</span><span class="p">)</span> <span class="n">Name</span> <span class="n">of</span> <span class="n">Physician</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="n">Reading</span> <span class="n">Study</span>  <span class="n">PN</span><span class="p">:</span> <span class="s1">&#39;----&#39;</span>
-<span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">1070</span><span class="p">)</span> <span class="n">Operators</span><span class="s1">&#39; Name                     PN: &#39;</span><span class="o">----</span><span class="s1">&#39;</span>
-<span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">1090</span><span class="p">)</span> <span class="n">Manufacturer</span><span class="s1">&#39;s Model Name           LO: &#39;</span><span class="n">MRT50H1</span><span class="s1">&#39;</span>
-<span class="p">(</span><span class="mi">0010</span><span class="p">,</span> <span class="mi">0010</span><span class="p">)</span> <span class="n">Patient</span><span class="s1">&#39;s Name                      PN: &#39;</span><span class="n">CompressedSamples</span><span class="o">^</span><span class="n">MR1</span><span class="s1">&#39;</span>
-<span class="p">(</span><span class="mi">0010</span><span class="p">,</span> <span class="mi">0020</span><span class="p">)</span> <span class="n">Patient</span> <span class="n">ID</span>                          <span class="n">LO</span><span class="p">:</span> <span class="s1">&#39;4MR1&#39;</span>
-<span class="p">(</span><span class="mi">0010</span><span class="p">,</span> <span class="mi">0030</span><span class="p">)</span> <span class="n">Patient</span><span class="s1">&#39;s Birth Date                DA: &#39;&#39;</span>
-<span class="p">(</span><span class="mi">0010</span><span class="p">,</span> <span class="mi">0040</span><span class="p">)</span> <span class="n">Patient</span><span class="s1">&#39;s Sex                       CS: &#39;</span><span class="n">F</span><span class="s1">&#39;</span>
-<span class="p">(</span><span class="mi">0010</span><span class="p">,</span> <span class="mi">1020</span><span class="p">)</span> <span class="n">Patient</span><span class="s1">&#39;s Size                      DS: &#39;&#39;</span>
-<span class="p">(</span><span class="mi">0010</span><span class="p">,</span> <span class="mi">1030</span><span class="p">)</span> <span class="n">Patient</span><span class="s1">&#39;s Weight                    DS: &quot;80.0000&quot;</span>
-<span class="p">(</span><span class="mi">0018</span><span class="p">,</span> <span class="mi">0010</span><span class="p">)</span> <span class="n">Contrast</span><span class="o">/</span><span class="n">Bolus</span> <span class="n">Agent</span>                <span class="n">LO</span><span class="p">:</span> <span class="s1">&#39;&#39;</span>
-<span class="p">(</span><span class="mi">0018</span><span class="p">,</span> <span class="mi">0020</span><span class="p">)</span> <span class="n">Scanning</span> <span class="n">Sequence</span>                   <span class="n">CS</span><span class="p">:</span> <span class="s1">&#39;SE&#39;</span>
-<span class="p">(</span><span class="mi">0018</span><span class="p">,</span> <span class="mi">0021</span><span class="p">)</span> <span class="n">Sequence</span> <span class="n">Variant</span>                    <span class="n">CS</span><span class="p">:</span> <span class="s1">&#39;NONE&#39;</span>
-<span class="p">(</span><span class="mi">0018</span><span class="p">,</span> <span class="mi">0022</span><span class="p">)</span> <span class="n">Scan</span> <span class="n">Options</span>                        <span class="n">CS</span><span class="p">:</span> <span class="s1">&#39;&#39;</span>
-<span class="p">(</span><span class="mi">0018</span><span class="p">,</span> <span class="mi">0023</span><span class="p">)</span> <span class="n">MR</span> <span class="n">Acquisition</span> <span class="n">Type</span>                 <span class="n">CS</span><span class="p">:</span> <span class="s1">&#39;3D&#39;</span>
-<span class="p">(</span><span class="mi">0018</span><span class="p">,</span> <span class="mi">0050</span><span class="p">)</span> <span class="n">Slice</span> <span class="n">Thickness</span>                     <span class="n">DS</span><span class="p">:</span> <span class="s2">&quot;0.8000&quot;</span>
-<span class="p">(</span><span class="mi">0018</span><span class="p">,</span> <span class="mi">0080</span><span class="p">)</span> <span class="n">Repetition</span> <span class="n">Time</span>                     <span class="n">DS</span><span class="p">:</span> <span class="s2">&quot;4000.0000&quot;</span>
-<span class="p">(</span><span class="mi">0018</span><span class="p">,</span> <span class="mi">0081</span><span class="p">)</span> <span class="n">Echo</span> <span class="n">Time</span>                           <span class="n">DS</span><span class="p">:</span> <span class="s2">&quot;240.0000&quot;</span>
-<span class="p">(</span><span class="mi">0018</span><span class="p">,</span> <span class="mi">0083</span><span class="p">)</span> <span class="n">Number</span> <span class="n">of</span> <span class="n">Averages</span>                  <span class="n">DS</span><span class="p">:</span> <span class="s2">&quot;1.0000&quot;</span>
-<span class="p">(</span><span class="mi">0018</span><span class="p">,</span> <span class="mi">0084</span><span class="p">)</span> <span class="n">Imaging</span> <span class="n">Frequency</span>                   <span class="n">DS</span><span class="p">:</span> <span class="s2">&quot;63.92433900&quot;</span>
-<span class="p">(</span><span class="mi">0018</span><span class="p">,</span> <span class="mi">0085</span><span class="p">)</span> <span class="n">Imaged</span> <span class="n">Nucleus</span>                      <span class="n">SH</span><span class="p">:</span> <span class="s1">&#39;H&#39;</span>
-<span class="p">(</span><span class="mi">0018</span><span class="p">,</span> <span class="mi">0086</span><span class="p">)</span> <span class="n">Echo</span> <span class="n">Number</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>                      <span class="n">IS</span><span class="p">:</span> <span class="s1">&#39;1&#39;</span>
-<span class="p">(</span><span class="mi">0018</span><span class="p">,</span> <span class="mi">0091</span><span class="p">)</span> <span class="n">Echo</span> <span class="n">Train</span> <span class="n">Length</span>                   <span class="n">IS</span><span class="p">:</span> <span class="s1">&#39;&#39;</span>
-<span class="p">(</span><span class="mi">0018</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span> <span class="n">Device</span> <span class="n">Serial</span> <span class="n">Number</span>                <span class="n">LO</span><span class="p">:</span> <span class="s1">&#39;-0000200&#39;</span>
-<span class="p">(</span><span class="mi">0018</span><span class="p">,</span> <span class="mi">1020</span><span class="p">)</span> <span class="n">Software</span> <span class="n">Version</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>                 <span class="n">LO</span><span class="p">:</span> <span class="s1">&#39;V3.51*P25&#39;</span>
-<span class="p">(</span><span class="mi">0018</span><span class="p">,</span> <span class="mi">1314</span><span class="p">)</span> <span class="n">Flip</span> <span class="n">Angle</span>                          <span class="n">DS</span><span class="p">:</span> <span class="s2">&quot;90&quot;</span>
-<span class="p">(</span><span class="mi">0018</span><span class="p">,</span> <span class="mi">5100</span><span class="p">)</span> <span class="n">Patient</span> <span class="n">Position</span>                    <span class="n">CS</span><span class="p">:</span> <span class="s1">&#39;HFS&#39;</span>
-<span class="p">(</span><span class="mi">0020</span><span class="p">,</span> <span class="mi">000</span><span class="n">d</span><span class="p">)</span> <span class="n">Study</span> <span class="n">Instance</span> <span class="n">UID</span>                  <span class="n">UI</span><span class="p">:</span> <span class="mf">1.3</span><span class="o">.</span><span class="mf">6.1</span><span class="o">.</span><span class="mf">4.1</span><span class="o">.</span><span class="mf">5962.1</span><span class="o">.</span><span class="mf">2.4</span><span class="o">.</span><span class="mf">20040826185059.5457</span>
-<span class="p">(</span><span class="mi">0020</span><span class="p">,</span> <span class="mi">000</span><span class="n">e</span><span class="p">)</span> <span class="n">Series</span> <span class="n">Instance</span> <span class="n">UID</span>                 <span class="n">UI</span><span class="p">:</span> <span class="mf">1.3</span><span class="o">.</span><span class="mf">6.1</span><span class="o">.</span><span class="mf">4.1</span><span class="o">.</span><span class="mf">5962.1</span><span class="o">.</span><span class="mf">3.4</span><span class="o">.</span><span class="mf">1.20040826185059</span><span class="o">.</span><span class="mi">5457</span>
-<span class="p">(</span><span class="mi">0020</span><span class="p">,</span> <span class="mi">0010</span><span class="p">)</span> <span class="n">Study</span> <span class="n">ID</span>                            <span class="n">SH</span><span class="p">:</span> <span class="s1">&#39;4MR1&#39;</span>
-<span class="p">(</span><span class="mi">0020</span><span class="p">,</span> <span class="mi">0011</span><span class="p">)</span> <span class="n">Series</span> <span class="n">Number</span>                       <span class="n">IS</span><span class="p">:</span> <span class="s1">&#39;1&#39;</span>
-<span class="p">(</span><span class="mi">0020</span><span class="p">,</span> <span class="mi">0012</span><span class="p">)</span> <span class="n">Acquisition</span> <span class="n">Number</span>                  <span class="n">IS</span><span class="p">:</span> <span class="s1">&#39;0&#39;</span>
-<span class="p">(</span><span class="mi">0020</span><span class="p">,</span> <span class="mi">0013</span><span class="p">)</span> <span class="n">Instance</span> <span class="n">Number</span>                     <span class="n">IS</span><span class="p">:</span> <span class="s1">&#39;1&#39;</span>
-<span class="p">(</span><span class="mi">0020</span><span class="p">,</span> <span class="mi">0032</span><span class="p">)</span> <span class="n">Image</span> <span class="n">Position</span> <span class="p">(</span><span class="n">Patient</span><span class="p">)</span>            <span class="n">DS</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;-83.9063&#39;</span><span class="p">,</span> <span class="s1">&#39;-91.2000&#39;</span><span class="p">,</span> <span class="s1">&#39;6.6406&#39;</span><span class="p">]</span>
-<span class="p">(</span><span class="mi">0020</span><span class="p">,</span> <span class="mi">0037</span><span class="p">)</span> <span class="n">Image</span> <span class="n">Orientation</span> <span class="p">(</span><span class="n">Patient</span><span class="p">)</span>         <span class="n">DS</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;1.0000&#39;</span><span class="p">,</span> <span class="s1">&#39;0.0000&#39;</span><span class="p">,</span> <span class="s1">&#39;0.0000&#39;</span><span class="p">,</span> <span class="s1">&#39;0.0000&#39;</span><span class="p">,</span> <span class="s1">&#39;1.0000&#39;</span><span class="p">,</span> <span class="s1">&#39;0.0000&#39;</span><span class="p">]</span>
-<span class="p">(</span><span class="mi">0020</span><span class="p">,</span> <span class="mi">0052</span><span class="p">)</span> <span class="n">Frame</span> <span class="n">of</span> <span class="n">Reference</span> <span class="n">UID</span>              <span class="n">UI</span><span class="p">:</span> <span class="mf">1.3</span><span class="o">.</span><span class="mf">6.1</span><span class="o">.</span><span class="mf">4.1</span><span class="o">.</span><span class="mf">5962.1</span><span class="o">.</span><span class="mf">4.4</span><span class="o">.</span><span class="mf">1.20040826185059</span><span class="o">.</span><span class="mi">5457</span>
-<span class="p">(</span><span class="mi">0020</span><span class="p">,</span> <span class="mi">0060</span><span class="p">)</span> <span class="n">Laterality</span>                          <span class="n">CS</span><span class="p">:</span> <span class="s1">&#39;&#39;</span>
-<span class="p">(</span><span class="mi">0020</span><span class="p">,</span> <span class="mi">1040</span><span class="p">)</span> <span class="n">Position</span> <span class="n">Reference</span> <span class="n">Indicator</span>        <span class="n">LO</span><span class="p">:</span> <span class="s1">&#39;&#39;</span>
-<span class="p">(</span><span class="mi">0020</span><span class="p">,</span> <span class="mi">1041</span><span class="p">)</span> <span class="n">Slice</span> <span class="n">Location</span>                      <span class="n">DS</span><span class="p">:</span> <span class="s2">&quot;0.0000&quot;</span>
-<span class="p">(</span><span class="mi">0020</span><span class="p">,</span> <span class="mi">4000</span><span class="p">)</span> <span class="n">Image</span> <span class="n">Comments</span>                      <span class="n">LT</span><span class="p">:</span> <span class="s1">&#39;Uncompressed&#39;</span>
-<span class="p">(</span><span class="mi">0028</span><span class="p">,</span> <span class="mi">0002</span><span class="p">)</span> <span class="n">Samples</span> <span class="n">per</span> <span class="n">Pixel</span>                   <span class="n">US</span><span class="p">:</span> <span class="mi">1</span>
-<span class="p">(</span><span class="mi">0028</span><span class="p">,</span> <span class="mi">0004</span><span class="p">)</span> <span class="n">Photometric</span> <span class="n">Interpretation</span>          <span class="n">CS</span><span class="p">:</span> <span class="s1">&#39;MONOCHROME2&#39;</span>
-<span class="p">(</span><span class="mi">0028</span><span class="p">,</span> <span class="mi">0010</span><span class="p">)</span> <span class="n">Rows</span>                                <span class="n">US</span><span class="p">:</span> <span class="mi">8</span>
-<span class="p">(</span><span class="mi">0028</span><span class="p">,</span> <span class="mi">0011</span><span class="p">)</span> <span class="n">Columns</span>                             <span class="n">US</span><span class="p">:</span> <span class="mi">8</span>
-<span class="p">(</span><span class="mi">0028</span><span class="p">,</span> <span class="mi">0030</span><span class="p">)</span> <span class="n">Pixel</span> <span class="n">Spacing</span>                       <span class="n">DS</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;0.3125&#39;</span><span class="p">,</span> <span class="s1">&#39;0.3125&#39;</span><span class="p">]</span>
-<span class="p">(</span><span class="mi">0028</span><span class="p">,</span> <span class="mi">0100</span><span class="p">)</span> <span class="n">Bits</span> <span class="n">Allocated</span>                      <span class="n">US</span><span class="p">:</span> <span class="mi">16</span>
-<span class="p">(</span><span class="mi">0028</span><span class="p">,</span> <span class="mi">0101</span><span class="p">)</span> <span class="n">Bits</span> <span class="n">Stored</span>                         <span class="n">US</span><span class="p">:</span> <span class="mi">16</span>
-<span class="p">(</span><span class="mi">0028</span><span class="p">,</span> <span class="mi">0102</span><span class="p">)</span> <span class="n">High</span> <span class="n">Bit</span>                            <span class="n">US</span><span class="p">:</span> <span class="mi">15</span>
-<span class="p">(</span><span class="mi">0028</span><span class="p">,</span> <span class="mi">0103</span><span class="p">)</span> <span class="n">Pixel</span> <span class="n">Representation</span>                <span class="n">US</span><span class="p">:</span> <span class="mi">1</span>
-<span class="p">(</span><span class="mi">0028</span><span class="p">,</span> <span class="mi">0106</span><span class="p">)</span> <span class="n">Smallest</span> <span class="n">Image</span> <span class="n">Pixel</span> <span class="n">Value</span>          <span class="n">SS</span><span class="p">:</span> <span class="mi">0</span>
-<span class="p">(</span><span class="mi">0028</span><span class="p">,</span> <span class="mi">0107</span><span class="p">)</span> <span class="n">Largest</span> <span class="n">Image</span> <span class="n">Pixel</span> <span class="n">Value</span>           <span class="n">SS</span><span class="p">:</span> <span class="mi">4000</span>
-<span class="p">(</span><span class="mi">0028</span><span class="p">,</span> <span class="mi">1050</span><span class="p">)</span> <span class="n">Window</span> <span class="n">Center</span>                       <span class="n">DS</span><span class="p">:</span> <span class="s2">&quot;600&quot;</span>
-<span class="p">(</span><span class="mi">0028</span><span class="p">,</span> <span class="mi">1051</span><span class="p">)</span> <span class="n">Window</span> <span class="n">Width</span>                        <span class="n">DS</span><span class="p">:</span> <span class="s2">&quot;1600&quot;</span>
-<span class="p">(</span><span class="mi">7</span><span class="n">fe0</span><span class="p">,</span> <span class="mi">0010</span><span class="p">)</span> <span class="n">Pixel</span> <span class="n">Data</span>                          <span class="n">OW</span><span class="p">:</span> <span class="n">Array</span> <span class="n">of</span> <span class="mi">128</span> <span class="nb">bytes</span>
-<span class="p">(</span><span class="n">fffc</span><span class="p">,</span> <span class="n">fffc</span><span class="p">)</span> <span class="n">Data</span> <span class="n">Set</span> <span class="n">Trailing</span> <span class="n">Padding</span>           <span class="n">OB</span><span class="p">:</span> <span class="n">Array</span> <span class="n">of</span> <span class="mi">126</span> <span class="nb">bytes</span>
+(0008, 0008) Image Type                          CS: [&#39;DERIVED&#39;, &#39;SECONDARY&#39;, &#39;OTHER&#39;]
+(0008, 0012) Instance Creation Date              DA: &#39;20040826&#39;
+(0008, 0013) Instance Creation Time              TM: &#39;185434&#39;
+(0008, 0014) Instance Creator UID                UI: 1.3.6.1.4.1.5962.3
+(0008, 0016) SOP Class UID                       UI: MR Image Storage
+(0008, 0018) SOP Instance UID                    UI: 1.3.6.1.4.1.5962.1.1.4.1.1.20040826185059.5457
+(0008, 0020) Study Date                          DA: &#39;20040826&#39;
+(0008, 0021) Series Date                         DA: &#39;&#39;
+(0008, 0022) Acquisition Date                    DA: &#39;&#39;
+(0008, 0030) Study Time                          TM: &#39;185059&#39;
+(0008, 0031) Series Time                         TM: &#39;&#39;
+(0008, 0032) Acquisition Time                    TM: &#39;&#39;
+(0008, 0050) Accession Number                    SH: &#39;&#39;
+(0008, 0060) Modality                            CS: &#39;MR&#39;
+(0008, 0070) Manufacturer                        LO: &#39;TOSHIBA_MEC&#39;
+(0008, 0080) Institution Name                    LO: &#39;TOSHIBA&#39;
+(0008, 0090) Referring Physician&#39;s Name          PN: &#39;&#39;
+(0008, 0201) Timezone Offset From UTC            SH: &#39;-0400&#39;
+(0008, 1010) Station Name                        SH: &#39;000000000&#39;
+(0008, 1060) Name of Physician(s) Reading Study  PN: &#39;----&#39;
+(0008, 1070) Operators&#39; Name                     PN: &#39;----&#39;
+(0008, 1090) Manufacturer&#39;s Model Name           LO: &#39;MRT50H1&#39;
+(0010, 0010) Patient&#39;s Name                      PN: &#39;CompressedSamples^MR1&#39;
+(0010, 0020) Patient ID                          LO: &#39;4MR1&#39;
+(0010, 0030) Patient&#39;s Birth Date                DA: &#39;&#39;
+(0010, 0040) Patient&#39;s Sex                       CS: &#39;F&#39;
+(0010, 1020) Patient&#39;s Size                      DS: &#39;&#39;
+(0010, 1030) Patient&#39;s Weight                    DS: &quot;80.0000&quot;
+(0018, 0010) Contrast/Bolus Agent                LO: &#39;&#39;
+(0018, 0020) Scanning Sequence                   CS: &#39;SE&#39;
+(0018, 0021) Sequence Variant                    CS: &#39;NONE&#39;
+(0018, 0022) Scan Options                        CS: &#39;&#39;
+(0018, 0023) MR Acquisition Type                 CS: &#39;3D&#39;
+(0018, 0050) Slice Thickness                     DS: &quot;0.8000&quot;
+(0018, 0080) Repetition Time                     DS: &quot;4000.0000&quot;
+(0018, 0081) Echo Time                           DS: &quot;240.0000&quot;
+(0018, 0083) Number of Averages                  DS: &quot;1.0000&quot;
+(0018, 0084) Imaging Frequency                   DS: &quot;63.92433900&quot;
+(0018, 0085) Imaged Nucleus                      SH: &#39;H&#39;
+(0018, 0086) Echo Number(s)                      IS: &#39;1&#39;
+(0018, 0091) Echo Train Length                   IS: &#39;&#39;
+(0018, 1000) Device Serial Number                LO: &#39;-0000200&#39;
+(0018, 1020) Software Version(s)                 LO: &#39;V3.51*P25&#39;
+(0018, 1314) Flip Angle                          DS: &quot;90&quot;
+(0018, 5100) Patient Position                    CS: &#39;HFS&#39;
+(0020, 000d) Study Instance UID                  UI: 1.3.6.1.4.1.5962.1.2.4.20040826185059.5457
+(0020, 000e) Series Instance UID                 UI: 1.3.6.1.4.1.5962.1.3.4.1.20040826185059.5457
+(0020, 0010) Study ID                            SH: &#39;4MR1&#39;
+(0020, 0011) Series Number                       IS: &#39;1&#39;
+(0020, 0012) Acquisition Number                  IS: &#39;0&#39;
+(0020, 0013) Instance Number                     IS: &#39;1&#39;
+(0020, 0032) Image Position (Patient)            DS: [&#39;-83.9063&#39;, &#39;-91.2000&#39;, &#39;6.6406&#39;]
+(0020, 0037) Image Orientation (Patient)         DS: [&#39;1.0000&#39;, &#39;0.0000&#39;, &#39;0.0000&#39;, &#39;0.0000&#39;, &#39;1.0000&#39;, &#39;0.0000&#39;]
+(0020, 0052) Frame of Reference UID              UI: 1.3.6.1.4.1.5962.1.4.4.1.20040826185059.5457
+(0020, 0060) Laterality                          CS: &#39;&#39;
+(0020, 1040) Position Reference Indicator        LO: &#39;&#39;
+(0020, 1041) Slice Location                      DS: &quot;0.0000&quot;
+(0020, 4000) Image Comments                      LT: &#39;Uncompressed&#39;
+(0028, 0002) Samples per Pixel                   US: 1
+(0028, 0004) Photometric Interpretation          CS: &#39;MONOCHROME2&#39;
+(0028, 0010) Rows                                US: 8
+(0028, 0011) Columns                             US: 8
+(0028, 0030) Pixel Spacing                       DS: [&#39;0.3125&#39;, &#39;0.3125&#39;]
+(0028, 0100) Bits Allocated                      US: 16
+(0028, 0101) Bits Stored                         US: 16
+(0028, 0102) High Bit                            US: 15
+(0028, 0103) Pixel Representation                US: 1
+(0028, 0106) Smallest Image Pixel Value          SS: 0
+(0028, 0107) Largest Image Pixel Value           SS: 4000
+(0028, 1050) Window Center                       DS: &quot;600&quot;
+(0028, 1051) Window Width                        DS: &quot;1600&quot;
+(7fe0, 0010) Pixel Data                          OW: Array of 128 bytes
+(fffc, fffc) Data Set Trailing Padding           OB: Array of 126 bytes
 </pre></div>
 </div>
 <div class="line-block">
@@ -302,8 +305,8 @@ instead of averagin the pixels. Finally, the image is store as a dicom image.</p
 <span class="k">print</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
 </pre></div>
 </div>
-<p><strong>Total running time of the script:</strong> ( 0 minutes  0.008 seconds)</p>
-<div class="sphx-glr-footer docutils container">
+<p><strong>Total running time of the script:</strong> ( 0 minutes  0.010 seconds)</p>
+<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-image-processing-plot-downsize-image-py">
 <div class="sphx-glr-download docutils container">
 <a class="reference download internal" href="../../_downloads/plot_downsize_image.py" download=""><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_downsize_image.py</span></code></a></div>
 <div class="sphx-glr-download docutils container">
@@ -368,10 +371,7 @@ instead of averagin the pixels. Finally, the image is store as a dicom image.</p
 
   
 
-  
-  
-    <script type="text/javascript" src="../../_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
   <script type="text/javascript">
       jQuery(function () {

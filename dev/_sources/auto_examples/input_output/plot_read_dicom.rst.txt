@@ -1,4 +1,8 @@
+.. note::
+    :class: sphx-glr-download-link-note
 
+    Click :ref:`here <sphx_glr_download_auto_examples_input_output_plot_read_dicom.py>` to download the full example code
+.. rst-class:: sphx-glr-example-title
 
 .. _sphx_glr_auto_examples_input_output_plot_read_dicom.py:
 
@@ -15,12 +19,14 @@ information, and show it using matplotlib.
 
 
 .. image:: /auto_examples/input_output/images/sphx_glr_plot_read_dicom_001.png
-    :align: center
+    :class: sphx-glr-single-img
 
 
 .. rst-class:: sphx-glr-script-out
 
- Out::
+ Out:
+
+ .. code-block:: none
 
     Filename.........: /home/ubuntu/pydicom/pydicom/data/test_files/CT_small.dcm
     Storage type.....: 1.2.840.10008.5.1.4.1.1.2
@@ -85,10 +91,14 @@ information, and show it using matplotlib.
 **Total running time of the script:** ( 0 minutes  0.024 seconds)
 
 
+.. _sphx_glr_download_auto_examples_input_output_plot_read_dicom.py:
+
 
 .. only :: html
 
  .. container:: sphx-glr-footer
+    :class: sphx-glr-footer-example
+
 
 
   .. container:: sphx-glr-download

@@ -1,4 +1,8 @@
+.. note::
+    :class: sphx-glr-download-link-note
 
+    Click :ref:`here <sphx_glr_download_auto_examples_input_output_plot_printing_dataset.py>` to download the full example code
+.. rst-class:: sphx-glr-example-title
 
 .. _sphx_glr_auto_examples_input_output_plot_printing_dataset.py:
 
@@ -16,7 +20,9 @@ This example illustrates how to print the data set in your own format.
 
 .. rst-class:: sphx-glr-script-out
 
- Out::
+ Out:
+
+ .. code-block:: none
 
     Image Type = ['DERIVED', 'SECONDARY', 'OTHER']
      Instance Creation Date = '20040826'
@@ -145,13 +151,17 @@ This example illustrates how to print the data set in your own format.
 
     myprint(ds)
 
-**Total running time of the script:** ( 0 minutes  0.007 seconds)
+**Total running time of the script:** ( 0 minutes  0.010 seconds)
 
+
+.. _sphx_glr_download_auto_examples_input_output_plot_printing_dataset.py:
 
 
 .. only :: html
 
  .. container:: sphx-glr-footer
+    :class: sphx-glr-footer-example
+
 
 
   .. container:: sphx-glr-download

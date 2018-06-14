@@ -1,4 +1,8 @@
+.. note::
+    :class: sphx-glr-download-link-note
 
+    Click :ref:`here <sphx_glr_download_auto_examples_metadata_processing_plot_add_dict_entries.py>` to download the full example code
+.. rst-class:: sphx-glr-example-title
 
 .. _sphx_glr_auto_examples_metadata_processing_plot_add_dict_entries.py:
 
@@ -23,7 +27,9 @@ dictionary dynamically.
 
 .. rst-class:: sphx-glr-script-out
 
- Out::
+ Out:
+
+ .. code-block:: none
 
     (1001, 1001) Test One                            UL: 42
     (1001, 1002) Test Two                            OB: '12345'
@@ -77,10 +83,14 @@ dictionary dynamically.
 **Total running time of the script:** ( 0 minutes  0.001 seconds)
 
 
+.. _sphx_glr_download_auto_examples_metadata_processing_plot_add_dict_entries.py:
+
 
 .. only :: html
 
  .. container:: sphx-glr-footer
+    :class: sphx-glr-footer-example
+
 
 
   .. container:: sphx-glr-download

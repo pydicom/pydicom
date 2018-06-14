@@ -1,4 +1,8 @@
+.. note::
+    :class: sphx-glr-download-link-note
 
+    Click :ref:`here <sphx_glr_download_auto_examples_input_output_plot_read_rtplan.py>` to download the full example code
+.. rst-class:: sphx-glr-example-title
 
 .. _sphx_glr_auto_examples_input_output_plot_read_rtplan.py:
 
@@ -16,7 +20,9 @@ Given an RTPLAN DICOM file, list basic info for the beams in it.
 
 .. rst-class:: sphx-glr-script-out
 
- Out::
+ Out:
+
+ .. code-block:: none
 
     Beam name    Number   Gantry   SSD (cm)  
        Field 1           1      0.0     89.8
@@ -62,10 +68,14 @@ Given an RTPLAN DICOM file, list basic info for the beams in it.
 **Total running time of the script:** ( 0 minutes  0.004 seconds)
 
 
+.. _sphx_glr_download_auto_examples_input_output_plot_read_rtplan.py:
+
 
 .. only :: html
 
  .. container:: sphx-glr-footer
+    :class: sphx-glr-footer-example
+
 
 
   .. container:: sphx-glr-download

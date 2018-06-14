@@ -1,4 +1,8 @@
+.. note::
+    :class: sphx-glr-download-link-note
 
+    Click :ref:`here <sphx_glr_download_auto_examples_image_processing_plot_downsize_image.py>` to download the full example code
+.. rst-class:: sphx-glr-example-title
 
 .. _sphx_glr_auto_examples_image_processing_plot_downsize_image.py:
 
@@ -22,7 +26,9 @@ instead of averagin the pixels. Finally, the image is store as a dicom image.
 
 .. rst-class:: sphx-glr-script-out
 
- Out::
+ Out:
+
+ .. code-block:: none
 
     The image has 64 x 64 voxels
     The downsampled image has 8 x 8 voxels
@@ -140,13 +146,17 @@ instead of averagin the pixels. Finally, the image is store as a dicom image.
     print('The information of the data set after downsampling: \n')
     print(ds)
 
-**Total running time of the script:** ( 0 minutes  0.008 seconds)
+**Total running time of the script:** ( 0 minutes  0.010 seconds)
 
+
+.. _sphx_glr_download_auto_examples_image_processing_plot_downsize_image.py:
 
 
 .. only :: html
 
  .. container:: sphx-glr-footer
+    :class: sphx-glr-footer-example
+
 
 
   .. container:: sphx-glr-download

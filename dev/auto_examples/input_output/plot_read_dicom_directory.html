@@ -26,8 +26,7 @@
 
   
 
-  
-    <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
@@ -184,126 +183,130 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="read-dicom-directory">
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Click <a class="reference internal" href="#sphx-glr-download-auto-examples-input-output-plot-read-dicom-directory-py"><span class="std std-ref">here</span></a> to download the full example code</p>
+</div>
+<div class="sphx-glr-example-title section" id="read-dicom-directory">
 <span id="sphx-glr-auto-examples-input-output-plot-read-dicom-directory-py"></span><h1>Read DICOM directory<a class="headerlink" href="#read-dicom-directory" title="Permalink to this headline">¶</a></h1>
 <p>This example shows how to read DICOM directory.</p>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Path</span> <span class="n">to</span> <span class="n">the</span> <span class="n">DICOM</span> <span class="n">directory</span><span class="p">:</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">ubuntu</span><span class="o">/</span><span class="n">pydicom</span><span class="o">/</span><span class="n">pydicom</span><span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">test_files</span><span class="o">/</span><span class="n">dicomdirtests</span><span class="o">/</span><span class="n">DICOMDIR</span>
-    <span class="n">Study</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">20010101</span><span class="p">:</span> <span class="n">XR</span> <span class="n">C</span> <span class="n">Spine</span> <span class="n">Comp</span> <span class="n">Min</span> <span class="mi">4</span> <span class="n">Views</span>
-        <span class="n">Series</span> <span class="mi">1</span><span class="p">:</span> <span class="n">CR</span><span class="p">:</span> <span class="n">N</span><span class="o">/</span><span class="n">A</span> <span class="p">(</span><span class="mi">1</span> <span class="n">image</span><span class="p">)</span>
-            <span class="n">Reading</span> <span class="n">images</span><span class="o">...</span>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Path to the DICOM directory: /home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/DICOMDIR
+    Study 2: 20010101: XR C Spine Comp Min 4 Views
+        Series 1: CR: N/A (1 image)
+            Reading images...
 
-            <span class="n">Image</span> <span class="n">filenames</span><span class="p">:</span>
-             <span class="p">[</span><span class="s1">&#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/77654033/CR1/6154&#39;</span><span class="p">]</span>
-            <span class="n">Patient</span> <span class="n">Names</span> <span class="ow">in</span> <span class="n">images</span><span class="o">..</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;Doe^Archibald&#39;</span><span class="p">}</span>
-            <span class="n">Patient</span> <span class="n">IDs</span> <span class="ow">in</span> <span class="n">images</span><span class="o">..</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;77654033&#39;</span><span class="p">}</span>
-        <span class="n">Series</span> <span class="mi">2</span><span class="p">:</span> <span class="n">CR</span><span class="p">:</span> <span class="n">N</span><span class="o">/</span><span class="n">A</span> <span class="p">(</span><span class="mi">1</span> <span class="n">image</span><span class="p">)</span>
-            <span class="n">Reading</span> <span class="n">images</span><span class="o">...</span>
+            Image filenames:
+             [&#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/77654033/CR1/6154&#39;]
+            Patient Names in images..: {&#39;Doe^Archibald&#39;}
+            Patient IDs in images..: {&#39;77654033&#39;}
+        Series 2: CR: N/A (1 image)
+            Reading images...
 
-            <span class="n">Image</span> <span class="n">filenames</span><span class="p">:</span>
-             <span class="p">[</span><span class="s1">&#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/77654033/CR2/6247&#39;</span><span class="p">]</span>
-            <span class="n">Patient</span> <span class="n">Names</span> <span class="ow">in</span> <span class="n">images</span><span class="o">..</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;Doe^Archibald&#39;</span><span class="p">}</span>
-            <span class="n">Patient</span> <span class="n">IDs</span> <span class="ow">in</span> <span class="n">images</span><span class="o">..</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;77654033&#39;</span><span class="p">}</span>
-        <span class="n">Series</span> <span class="mi">3</span><span class="p">:</span> <span class="n">CR</span><span class="p">:</span> <span class="n">N</span><span class="o">/</span><span class="n">A</span> <span class="p">(</span><span class="mi">1</span> <span class="n">image</span><span class="p">)</span>
-            <span class="n">Reading</span> <span class="n">images</span><span class="o">...</span>
+            Image filenames:
+             [&#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/77654033/CR2/6247&#39;]
+            Patient Names in images..: {&#39;Doe^Archibald&#39;}
+            Patient IDs in images..: {&#39;77654033&#39;}
+        Series 3: CR: N/A (1 image)
+            Reading images...
 
-            <span class="n">Image</span> <span class="n">filenames</span><span class="p">:</span>
-             <span class="p">[</span><span class="s1">&#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/77654033/CR3/6278&#39;</span><span class="p">]</span>
-            <span class="n">Patient</span> <span class="n">Names</span> <span class="ow">in</span> <span class="n">images</span><span class="o">..</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;Doe^Archibald&#39;</span><span class="p">}</span>
-            <span class="n">Patient</span> <span class="n">IDs</span> <span class="ow">in</span> <span class="n">images</span><span class="o">..</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;77654033&#39;</span><span class="p">}</span>
-    <span class="n">Study</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">19950903</span><span class="p">:</span> <span class="n">CT</span><span class="p">,</span> <span class="n">HEAD</span><span class="o">/</span><span class="n">BRAIN</span> <span class="n">WO</span> <span class="n">CONTRAST</span>
-        <span class="n">Series</span> <span class="mi">2</span><span class="p">:</span> <span class="n">CT</span><span class="p">:</span> <span class="n">N</span><span class="o">/</span><span class="n">A</span> <span class="p">(</span><span class="mi">4</span> <span class="n">images</span><span class="p">)</span>
-            <span class="n">Reading</span> <span class="n">images</span><span class="o">...</span>
+            Image filenames:
+             [&#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/77654033/CR3/6278&#39;]
+            Patient Names in images..: {&#39;Doe^Archibald&#39;}
+            Patient IDs in images..: {&#39;77654033&#39;}
+    Study 2: 19950903: CT, HEAD/BRAIN WO CONTRAST
+        Series 2: CT: N/A (4 images)
+            Reading images...
 
-            <span class="n">Image</span> <span class="n">filenames</span><span class="p">:</span>
-             <span class="p">[</span>           <span class="s1">&#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/77654033/CT2/17106&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/77654033/CT2/17136&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/77654033/CT2/17166&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/77654033/CT2/17196&#39;</span><span class="p">]</span>
-            <span class="n">Patient</span> <span class="n">Names</span> <span class="ow">in</span> <span class="n">images</span><span class="o">..</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;Doe^Archibald&#39;</span><span class="p">,</span> <span class="s1">&#39;Doe^Archibald&#39;</span><span class="p">,</span> <span class="s1">&#39;Doe^Archibald&#39;</span><span class="p">,</span> <span class="s1">&#39;Doe^Archibald&#39;</span><span class="p">}</span>
-            <span class="n">Patient</span> <span class="n">IDs</span> <span class="ow">in</span> <span class="n">images</span><span class="o">..</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;77654033&#39;</span><span class="p">}</span>
-    <span class="n">Study</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">20010101</span><span class="p">:</span>
-        <span class="n">Series</span> <span class="mi">4</span><span class="p">:</span> <span class="n">CT</span><span class="p">:</span> <span class="n">N</span><span class="o">/</span><span class="n">A</span> <span class="p">(</span><span class="mi">2</span> <span class="n">images</span><span class="p">)</span>
-            <span class="n">Reading</span> <span class="n">images</span><span class="o">...</span>
+            Image filenames:
+             [           &#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/77654033/CT2/17106&#39;,
+            &#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/77654033/CT2/17136&#39;,
+            &#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/77654033/CT2/17166&#39;,
+            &#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/77654033/CT2/17196&#39;]
+            Patient Names in images..: {&#39;Doe^Archibald&#39;, &#39;Doe^Archibald&#39;, &#39;Doe^Archibald&#39;, &#39;Doe^Archibald&#39;}
+            Patient IDs in images..: {&#39;77654033&#39;}
+    Study 2: 20010101:
+        Series 4: CT: N/A (2 images)
+            Reading images...
 
-            <span class="n">Image</span> <span class="n">filenames</span><span class="p">:</span>
-             <span class="p">[</span>           <span class="s1">&#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892001/CT2N/6293&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892001/CT2N/6924&#39;</span><span class="p">]</span>
-            <span class="n">Patient</span> <span class="n">Names</span> <span class="ow">in</span> <span class="n">images</span><span class="o">..</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;Doe^Peter&#39;</span><span class="p">,</span> <span class="s1">&#39;Doe^Peter&#39;</span><span class="p">}</span>
-            <span class="n">Patient</span> <span class="n">IDs</span> <span class="ow">in</span> <span class="n">images</span><span class="o">..</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;98890234&#39;</span><span class="p">}</span>
-        <span class="n">Series</span> <span class="mi">5</span><span class="p">:</span> <span class="n">CT</span><span class="p">:</span> <span class="n">N</span><span class="o">/</span><span class="n">A</span> <span class="p">(</span><span class="mi">5</span> <span class="n">images</span><span class="p">)</span>
-            <span class="n">Reading</span> <span class="n">images</span><span class="o">...</span>
+            Image filenames:
+             [           &#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892001/CT2N/6293&#39;,
+            &#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892001/CT2N/6924&#39;]
+            Patient Names in images..: {&#39;Doe^Peter&#39;, &#39;Doe^Peter&#39;}
+            Patient IDs in images..: {&#39;98890234&#39;}
+        Series 5: CT: N/A (5 images)
+            Reading images...
 
-            <span class="n">Image</span> <span class="n">filenames</span><span class="p">:</span>
-             <span class="p">[</span>           <span class="s1">&#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892001/CT5N/2062&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892001/CT5N/2392&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892001/CT5N/2693&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892001/CT5N/3023&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892001/CT5N/3353&#39;</span><span class="p">]</span>
-            <span class="n">Patient</span> <span class="n">Names</span> <span class="ow">in</span> <span class="n">images</span><span class="o">..</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;Doe^Peter&#39;</span><span class="p">,</span> <span class="s1">&#39;Doe^Peter&#39;</span><span class="p">,</span> <span class="s1">&#39;Doe^Peter&#39;</span><span class="p">,</span> <span class="s1">&#39;Doe^Peter&#39;</span><span class="p">,</span> <span class="s1">&#39;Doe^Peter&#39;</span><span class="p">}</span>
-            <span class="n">Patient</span> <span class="n">IDs</span> <span class="ow">in</span> <span class="n">images</span><span class="o">..</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;98890234&#39;</span><span class="p">}</span>
-    <span class="n">Study</span> <span class="mi">428</span><span class="p">:</span> <span class="mi">20030505</span><span class="p">:</span> <span class="n">Carotids</span>
-        <span class="n">Series</span> <span class="mi">1</span><span class="p">:</span> <span class="n">MR</span><span class="p">:</span> <span class="n">N</span><span class="o">/</span><span class="n">A</span> <span class="p">(</span><span class="mi">1</span> <span class="n">image</span><span class="p">)</span>
-            <span class="n">Reading</span> <span class="n">images</span><span class="o">...</span>
+            Image filenames:
+             [           &#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892001/CT5N/2062&#39;,
+            &#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892001/CT5N/2392&#39;,
+            &#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892001/CT5N/2693&#39;,
+            &#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892001/CT5N/3023&#39;,
+            &#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892001/CT5N/3353&#39;]
+            Patient Names in images..: {&#39;Doe^Peter&#39;, &#39;Doe^Peter&#39;, &#39;Doe^Peter&#39;, &#39;Doe^Peter&#39;, &#39;Doe^Peter&#39;}
+            Patient IDs in images..: {&#39;98890234&#39;}
+    Study 428: 20030505: Carotids
+        Series 1: MR: N/A (1 image)
+            Reading images...
 
-            <span class="n">Image</span> <span class="n">filenames</span><span class="p">:</span>
-             <span class="p">[</span>           <span class="s1">&#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892003/MR1/15820&#39;</span><span class="p">]</span>
-            <span class="n">Patient</span> <span class="n">Names</span> <span class="ow">in</span> <span class="n">images</span><span class="o">..</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;Doe^Peter&#39;</span><span class="p">}</span>
-            <span class="n">Patient</span> <span class="n">IDs</span> <span class="ow">in</span> <span class="n">images</span><span class="o">..</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;98890234&#39;</span><span class="p">}</span>
-        <span class="n">Series</span> <span class="mi">2</span><span class="p">:</span> <span class="n">MR</span><span class="p">:</span> <span class="n">N</span><span class="o">/</span><span class="n">A</span> <span class="p">(</span><span class="mi">1</span> <span class="n">image</span><span class="p">)</span>
-            <span class="n">Reading</span> <span class="n">images</span><span class="o">...</span>
+            Image filenames:
+             [           &#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892003/MR1/15820&#39;]
+            Patient Names in images..: {&#39;Doe^Peter&#39;}
+            Patient IDs in images..: {&#39;98890234&#39;}
+        Series 2: MR: N/A (1 image)
+            Reading images...
 
-            <span class="n">Image</span> <span class="n">filenames</span><span class="p">:</span>
-             <span class="p">[</span>           <span class="s1">&#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892003/MR2/15970&#39;</span><span class="p">]</span>
-            <span class="n">Patient</span> <span class="n">Names</span> <span class="ow">in</span> <span class="n">images</span><span class="o">..</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;Doe^Peter&#39;</span><span class="p">}</span>
-            <span class="n">Patient</span> <span class="n">IDs</span> <span class="ow">in</span> <span class="n">images</span><span class="o">..</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;98890234&#39;</span><span class="p">}</span>
-    <span class="n">Study</span> <span class="mi">134</span><span class="p">:</span> <span class="mi">20030505</span><span class="p">:</span> <span class="n">Brain</span>
-        <span class="n">Series</span> <span class="mi">1</span><span class="p">:</span> <span class="n">MR</span><span class="p">:</span> <span class="n">N</span><span class="o">/</span><span class="n">A</span> <span class="p">(</span><span class="mi">1</span> <span class="n">image</span><span class="p">)</span>
-            <span class="n">Reading</span> <span class="n">images</span><span class="o">...</span>
+            Image filenames:
+             [           &#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892003/MR2/15970&#39;]
+            Patient Names in images..: {&#39;Doe^Peter&#39;}
+            Patient IDs in images..: {&#39;98890234&#39;}
+    Study 134: 20030505: Brain
+        Series 1: MR: N/A (1 image)
+            Reading images...
 
-            <span class="n">Image</span> <span class="n">filenames</span><span class="p">:</span>
-             <span class="p">[</span><span class="s1">&#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892003/MR1/4919&#39;</span><span class="p">]</span>
-            <span class="n">Patient</span> <span class="n">Names</span> <span class="ow">in</span> <span class="n">images</span><span class="o">..</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;Doe^Peter&#39;</span><span class="p">}</span>
-            <span class="n">Patient</span> <span class="n">IDs</span> <span class="ow">in</span> <span class="n">images</span><span class="o">..</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;98890234&#39;</span><span class="p">}</span>
-        <span class="n">Series</span> <span class="mi">2</span><span class="p">:</span> <span class="n">MR</span><span class="p">:</span> <span class="n">N</span><span class="o">/</span><span class="n">A</span> <span class="p">(</span><span class="mi">3</span> <span class="n">images</span><span class="p">)</span>
-            <span class="n">Reading</span> <span class="n">images</span><span class="o">...</span>
+            Image filenames:
+             [&#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892003/MR1/4919&#39;]
+            Patient Names in images..: {&#39;Doe^Peter&#39;}
+            Patient IDs in images..: {&#39;98890234&#39;}
+        Series 2: MR: N/A (3 images)
+            Reading images...
 
-            <span class="n">Image</span> <span class="n">filenames</span><span class="p">:</span>
-             <span class="p">[</span>           <span class="s1">&#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892003/MR2/4950&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892003/MR2/5011&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892003/MR2/4981&#39;</span><span class="p">]</span>
-            <span class="n">Patient</span> <span class="n">Names</span> <span class="ow">in</span> <span class="n">images</span><span class="o">..</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;Doe^Peter&#39;</span><span class="p">,</span> <span class="s1">&#39;Doe^Peter&#39;</span><span class="p">,</span> <span class="s1">&#39;Doe^Peter&#39;</span><span class="p">}</span>
-            <span class="n">Patient</span> <span class="n">IDs</span> <span class="ow">in</span> <span class="n">images</span><span class="o">..</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;98890234&#39;</span><span class="p">}</span>
-    <span class="n">Study</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">20030505</span><span class="p">:</span> <span class="n">Brain</span><span class="o">-</span><span class="n">MRA</span>
-        <span class="n">Series</span> <span class="mi">1</span><span class="p">:</span> <span class="n">MR</span><span class="p">:</span> <span class="n">N</span><span class="o">/</span><span class="n">A</span> <span class="p">(</span><span class="mi">1</span> <span class="n">image</span><span class="p">)</span>
-            <span class="n">Reading</span> <span class="n">images</span><span class="o">...</span>
+            Image filenames:
+             [           &#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892003/MR2/4950&#39;,
+            &#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892003/MR2/5011&#39;,
+            &#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892003/MR2/4981&#39;]
+            Patient Names in images..: {&#39;Doe^Peter&#39;, &#39;Doe^Peter&#39;, &#39;Doe^Peter&#39;}
+            Patient IDs in images..: {&#39;98890234&#39;}
+    Study 2: 20030505: Brain-MRA
+        Series 1: MR: N/A (1 image)
+            Reading images...
 
-            <span class="n">Image</span> <span class="n">filenames</span><span class="p">:</span>
-             <span class="p">[</span><span class="s1">&#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892003/MR1/5641&#39;</span><span class="p">]</span>
-            <span class="n">Patient</span> <span class="n">Names</span> <span class="ow">in</span> <span class="n">images</span><span class="o">..</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;Doe^Peter&#39;</span><span class="p">}</span>
-            <span class="n">Patient</span> <span class="n">IDs</span> <span class="ow">in</span> <span class="n">images</span><span class="o">..</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;98890234&#39;</span><span class="p">}</span>
-        <span class="n">Series</span> <span class="mi">2</span><span class="p">:</span> <span class="n">MR</span><span class="p">:</span> <span class="n">N</span><span class="o">/</span><span class="n">A</span> <span class="p">(</span><span class="mi">3</span> <span class="n">images</span><span class="p">)</span>
-            <span class="n">Reading</span> <span class="n">images</span><span class="o">...</span>
+            Image filenames:
+             [&#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892003/MR1/5641&#39;]
+            Patient Names in images..: {&#39;Doe^Peter&#39;}
+            Patient IDs in images..: {&#39;98890234&#39;}
+        Series 2: MR: N/A (3 images)
+            Reading images...
 
-            <span class="n">Image</span> <span class="n">filenames</span><span class="p">:</span>
-             <span class="p">[</span>           <span class="s1">&#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892003/MR2/6935&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892003/MR2/6605&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892003/MR2/6273&#39;</span><span class="p">]</span>
-            <span class="n">Patient</span> <span class="n">Names</span> <span class="ow">in</span> <span class="n">images</span><span class="o">..</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;Doe^Peter&#39;</span><span class="p">,</span> <span class="s1">&#39;Doe^Peter&#39;</span><span class="p">,</span> <span class="s1">&#39;Doe^Peter&#39;</span><span class="p">}</span>
-            <span class="n">Patient</span> <span class="n">IDs</span> <span class="ow">in</span> <span class="n">images</span><span class="o">..</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;98890234&#39;</span><span class="p">}</span>
-        <span class="n">Series</span> <span class="mi">700</span><span class="p">:</span> <span class="n">MR</span><span class="p">:</span> <span class="n">N</span><span class="o">/</span><span class="n">A</span> <span class="p">(</span><span class="mi">7</span> <span class="n">images</span><span class="p">)</span>
-            <span class="n">Reading</span> <span class="n">images</span><span class="o">...</span>
+            Image filenames:
+             [           &#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892003/MR2/6935&#39;,
+            &#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892003/MR2/6605&#39;,
+            &#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892003/MR2/6273&#39;]
+            Patient Names in images..: {&#39;Doe^Peter&#39;, &#39;Doe^Peter&#39;, &#39;Doe^Peter&#39;}
+            Patient IDs in images..: {&#39;98890234&#39;}
+        Series 700: MR: N/A (7 images)
+            Reading images...
 
-            <span class="n">Image</span> <span class="n">filenames</span><span class="p">:</span>
-             <span class="p">[</span>           <span class="s1">&#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892003/MR700/4558&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892003/MR700/4528&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892003/MR700/4588&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892003/MR700/4467&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892003/MR700/4618&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892003/MR700/4678&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892003/MR700/4648&#39;</span><span class="p">]</span>
-            <span class="n">Patient</span> <span class="n">Names</span> <span class="ow">in</span> <span class="n">images</span><span class="o">..</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;Doe^Peter&#39;</span><span class="p">,</span> <span class="s1">&#39;Doe^Peter&#39;</span><span class="p">,</span> <span class="s1">&#39;Doe^Peter&#39;</span><span class="p">,</span> <span class="s1">&#39;Doe^Peter&#39;</span><span class="p">,</span> <span class="s1">&#39;Doe^Peter&#39;</span><span class="p">,</span> <span class="s1">&#39;Doe^Peter&#39;</span><span class="p">,</span> <span class="s1">&#39;Doe^Peter&#39;</span><span class="p">}</span>
-            <span class="n">Patient</span> <span class="n">IDs</span> <span class="ow">in</span> <span class="n">images</span><span class="o">..</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;98890234&#39;</span><span class="p">}</span>
+            Image filenames:
+             [           &#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892003/MR700/4558&#39;,
+            &#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892003/MR700/4528&#39;,
+            &#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892003/MR700/4588&#39;,
+            &#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892003/MR700/4467&#39;,
+            &#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892003/MR700/4618&#39;,
+            &#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892003/MR700/4678&#39;,
+            &#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892003/MR700/4648&#39;]
+            Patient Names in images..: {&#39;Doe^Peter&#39;, &#39;Doe^Peter&#39;, &#39;Doe^Peter&#39;, &#39;Doe^Peter&#39;, &#39;Doe^Peter&#39;, &#39;Doe^Peter&#39;, &#39;Doe^Peter&#39;}
+            Patient IDs in images..: {&#39;98890234&#39;}
 </pre></div>
 </div>
 <div class="line-block">
@@ -380,8 +383,8 @@
                 <span class="n">patient_IDs</span><span class="p">))</span>
 </pre></div>
 </div>
-<p><strong>Total running time of the script:</strong> ( 0 minutes  0.092 seconds)</p>
-<div class="sphx-glr-footer docutils container">
+<p><strong>Total running time of the script:</strong> ( 0 minutes  0.094 seconds)</p>
+<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-input-output-plot-read-dicom-directory-py">
 <div class="sphx-glr-download docutils container">
 <a class="reference download internal" href="../../_downloads/plot_read_dicom_directory.py" download=""><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_read_dicom_directory.py</span></code></a></div>
 <div class="sphx-glr-download docutils container">
@@ -446,10 +449,7 @@
 
   
 
-  
-  
-    <script type="text/javascript" src="../../_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
   <script type="text/javascript">
       jQuery(function () {

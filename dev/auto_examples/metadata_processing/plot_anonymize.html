@@ -26,8 +26,7 @@
 
   
 
-  
-    <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
@@ -185,7 +184,11 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="anonymize-dicom-data">
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Click <a class="reference internal" href="#sphx-glr-download-auto-examples-metadata-processing-plot-anonymize-py"><span class="std std-ref">here</span></a> to download the full example code</p>
+</div>
+<div class="sphx-glr-example-title section" id="anonymize-dicom-data">
 <span id="sphx-glr-auto-examples-metadata-processing-plot-anonymize-py"></span><h1>Anonymize DICOM data<a class="headerlink" href="#anonymize-dicom-data" title="Permalink to this headline">¶</a></h1>
 <p>This example is a starting point to anonymize DICOM data.</p>
 <p>It shows how to read data and replace tags: person names, patient id,
@@ -215,8 +218,8 @@ optionally remove curves and private tags, and write the results in a new file.<
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="mi">0010</span><span class="p">,</span> <span class="mi">0020</span><span class="p">)</span> <span class="n">Patient</span> <span class="n">ID</span>                          <span class="n">LO</span><span class="p">:</span> <span class="s1">&#39;4MR1&#39;</span>
-<span class="p">(</span><span class="mi">0010</span><span class="p">,</span> <span class="mi">0030</span><span class="p">)</span> <span class="n">Patient</span><span class="s1">&#39;s Birth Date                DA: &#39;&#39;</span>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(0010, 0020) Patient ID                          LO: &#39;4MR1&#39;
+(0010, 0030) Patient&#39;s Birth Date                DA: &#39;&#39;
 </pre></div>
 </div>
 <p>We can define a callback function to find all tags corresponding to a person
@@ -270,12 +273,12 @@ blank string.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="mi">0010</span><span class="p">,</span> <span class="mi">0020</span><span class="p">)</span> <span class="n">Patient</span> <span class="n">ID</span>                          <span class="n">LO</span><span class="p">:</span> <span class="s1">&#39;id&#39;</span>
-<span class="p">(</span><span class="mi">0010</span><span class="p">,</span> <span class="mi">0030</span><span class="p">)</span> <span class="n">Patient</span><span class="s1">&#39;s Birth Date                DA: &#39;</span><span class="mi">01011900</span><span class="s1">&#39;</span>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(0010, 0020) Patient ID                          LO: &#39;id&#39;
+(0010, 0030) Patient&#39;s Birth Date                DA: &#39;01011900&#39;
 </pre></div>
 </div>
 <p><strong>Total running time of the script:</strong> ( 0 minutes  0.013 seconds)</p>
-<div class="sphx-glr-footer docutils container">
+<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-metadata-processing-plot-anonymize-py">
 <div class="sphx-glr-download docutils container">
 <a class="reference download internal" href="../../_downloads/plot_anonymize.py" download=""><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_anonymize.py</span></code></a></div>
 <div class="sphx-glr-download docutils container">
@@ -341,10 +344,7 @@ blank string.</p>
 
   
 
-  
-  
-    <script type="text/javascript" src="../../_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
   <script type="text/javascript">
       jQuery(function () {

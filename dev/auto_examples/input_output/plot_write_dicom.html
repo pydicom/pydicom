@@ -26,8 +26,7 @@
 
   
 
-  
-    <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
@@ -184,29 +183,33 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="write-dicom-data">
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Click <a class="reference internal" href="#sphx-glr-download-auto-examples-input-output-plot-write-dicom-py"><span class="std std-ref">here</span></a> to download the full example code</p>
+</div>
+<div class="sphx-glr-example-title section" id="write-dicom-data">
 <span id="sphx-glr-auto-examples-input-output-plot-write-dicom-py"></span><h1>Write DICOM data<a class="headerlink" href="#write-dicom-data" title="Permalink to this headline">¶</a></h1>
 <p>This example shows how to write a DICOM file from scratch using pydicom. This
 example does not produce a DICOM standards compliant file as written, you will
 have to change UIDs to valid values and add all required DICOM data elements.</p>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Setting</span> <span class="n">file</span> <span class="n">meta</span> <span class="n">information</span><span class="o">...</span>
-<span class="n">Setting</span> <span class="n">dataset</span> <span class="n">values</span><span class="o">...</span>
-<span class="n">Writing</span> <span class="n">test</span> <span class="n">file</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">tmpnsvu0b5h</span><span class="o">.</span><span class="n">dcm</span>
-<span class="n">File</span> <span class="n">saved</span><span class="o">.</span>
-<span class="n">Writing</span> <span class="n">test</span> <span class="n">file</span> <span class="k">as</span> <span class="n">Big</span> <span class="n">Endian</span> <span class="n">Explicit</span> <span class="n">VR</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">tmpj1rul8xc</span><span class="o">.</span><span class="n">dcm</span>
-<span class="n">Load</span> <span class="n">file</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">tmpnsvu0b5h</span><span class="o">.</span><span class="n">dcm</span> <span class="o">...</span>
-<span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">0023</span><span class="p">)</span> <span class="n">Content</span> <span class="n">Date</span>                        <span class="n">DA</span><span class="p">:</span> <span class="s1">&#39;20180602&#39;</span>
-<span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">0033</span><span class="p">)</span> <span class="n">Content</span> <span class="n">Time</span>                        <span class="n">TM</span><span class="p">:</span> <span class="s1">&#39;193235.942286&#39;</span>
-<span class="p">(</span><span class="mi">0010</span><span class="p">,</span> <span class="mi">0010</span><span class="p">)</span> <span class="n">Patient</span><span class="s1">&#39;s Name                      PN: &#39;</span><span class="n">Test</span><span class="o">^</span><span class="n">Firstname</span><span class="s1">&#39;</span>
-<span class="p">(</span><span class="mi">0010</span><span class="p">,</span> <span class="mi">0020</span><span class="p">)</span> <span class="n">Patient</span> <span class="n">ID</span>                          <span class="n">LO</span><span class="p">:</span> <span class="s1">&#39;123456&#39;</span>
-<span class="n">Remove</span> <span class="n">file</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">tmpnsvu0b5h</span><span class="o">.</span><span class="n">dcm</span> <span class="o">...</span>
-<span class="n">Load</span> <span class="n">file</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">tmpj1rul8xc</span><span class="o">.</span><span class="n">dcm</span> <span class="o">...</span>
-<span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">0023</span><span class="p">)</span> <span class="n">Content</span> <span class="n">Date</span>                        <span class="n">DA</span><span class="p">:</span> <span class="s1">&#39;20180602&#39;</span>
-<span class="p">(</span><span class="mi">0008</span><span class="p">,</span> <span class="mi">0033</span><span class="p">)</span> <span class="n">Content</span> <span class="n">Time</span>                        <span class="n">TM</span><span class="p">:</span> <span class="s1">&#39;193235.942286&#39;</span>
-<span class="p">(</span><span class="mi">0010</span><span class="p">,</span> <span class="mi">0010</span><span class="p">)</span> <span class="n">Patient</span><span class="s1">&#39;s Name                      PN: &#39;</span><span class="n">Test</span><span class="o">^</span><span class="n">Firstname</span><span class="s1">&#39;</span>
-<span class="p">(</span><span class="mi">0010</span><span class="p">,</span> <span class="mi">0020</span><span class="p">)</span> <span class="n">Patient</span> <span class="n">ID</span>                          <span class="n">LO</span><span class="p">:</span> <span class="s1">&#39;123456&#39;</span>
-<span class="n">Remove</span> <span class="n">file</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">tmpj1rul8xc</span><span class="o">.</span><span class="n">dcm</span> <span class="o">...</span>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Setting file meta information...
+Setting dataset values...
+Writing test file /tmp/tmp54urhajn.dcm
+File saved.
+Writing test file as Big Endian Explicit VR /tmp/tmp5xlnchn1.dcm
+Load file /tmp/tmp54urhajn.dcm ...
+(0008, 0023) Content Date                        DA: &#39;20180614&#39;
+(0008, 0033) Content Time                        TM: &#39;231635.478717&#39;
+(0010, 0010) Patient&#39;s Name                      PN: &#39;Test^Firstname&#39;
+(0010, 0020) Patient ID                          LO: &#39;123456&#39;
+Remove file /tmp/tmp54urhajn.dcm ...
+Load file /tmp/tmp5xlnchn1.dcm ...
+(0008, 0023) Content Date                        DA: &#39;20180614&#39;
+(0008, 0033) Content Time                        TM: &#39;231635.478717&#39;
+(0010, 0010) Patient&#39;s Name                      PN: &#39;Test^Firstname&#39;
+(0010, 0020) Patient ID                          LO: &#39;123456&#39;
+Remove file /tmp/tmp5xlnchn1.dcm ...
 </pre></div>
 </div>
 <div class="line-block">
@@ -279,8 +282,8 @@ have to change UIDs to valid values and add all required DICOM data elements.</p
     <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
 </pre></div>
 </div>
-<p><strong>Total running time of the script:</strong> ( 0 minutes  0.006 seconds)</p>
-<div class="sphx-glr-footer docutils container">
+<p><strong>Total running time of the script:</strong> ( 0 minutes  0.007 seconds)</p>
+<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-input-output-plot-write-dicom-py">
 <div class="sphx-glr-download docutils container">
 <a class="reference download internal" href="../../_downloads/plot_write_dicom.py" download=""><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_write_dicom.py</span></code></a></div>
 <div class="sphx-glr-download docutils container">
@@ -345,10 +348,7 @@ have to change UIDs to valid values and add all required DICOM data elements.</p
 
   
 
-  
-  
-    <script type="text/javascript" src="../../_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
   <script type="text/javascript">
       jQuery(function () {

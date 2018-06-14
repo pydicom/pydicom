@@ -1,4 +1,8 @@
+.. note::
+    :class: sphx-glr-download-link-note
 
+    Click :ref:`here <sphx_glr_download_auto_examples_input_output_plot_read_dicom_directory.py>` to download the full example code
+.. rst-class:: sphx-glr-example-title
 
 .. _sphx_glr_auto_examples_input_output_plot_read_dicom_directory.py:
 
@@ -16,7 +20,9 @@ This example shows how to read DICOM directory.
 
 .. rst-class:: sphx-glr-script-out
 
- Out::
+ Out:
+
+ .. code-block:: none
 
     Path to the DICOM directory: /home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/DICOMDIR
         Study 2: 20010101: XR C Spine Comp Min 4 Views
@@ -214,13 +220,17 @@ This example shows how to read DICOM directory.
                 print(" " * 12 + "Patient IDs in images..: {}".format(
                     patient_IDs))
 
-**Total running time of the script:** ( 0 minutes  0.092 seconds)
+**Total running time of the script:** ( 0 minutes  0.094 seconds)
 
+
+.. _sphx_glr_download_auto_examples_input_output_plot_read_dicom_directory.py:
 
 
 .. only :: html
 
  .. container:: sphx-glr-footer
+    :class: sphx-glr-footer-example
+
 
 
   .. container:: sphx-glr-download

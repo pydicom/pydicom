@@ -26,8 +26,7 @@
 
   
 
-  
-    <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
@@ -184,83 +183,87 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="format-the-output-of-the-data-set-printing">
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Click <a class="reference internal" href="#sphx-glr-download-auto-examples-input-output-plot-printing-dataset-py"><span class="std std-ref">here</span></a> to download the full example code</p>
+</div>
+<div class="sphx-glr-example-title section" id="format-the-output-of-the-data-set-printing">
 <span id="sphx-glr-auto-examples-input-output-plot-printing-dataset-py"></span><h1>Format the output of the data set printing<a class="headerlink" href="#format-the-output-of-the-data-set-printing" title="Permalink to this headline">¶</a></h1>
 <p>This example illustrates how to print the data set in your own format.</p>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Image</span> <span class="n">Type</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;DERIVED&#39;</span><span class="p">,</span> <span class="s1">&#39;SECONDARY&#39;</span><span class="p">,</span> <span class="s1">&#39;OTHER&#39;</span><span class="p">]</span>
- <span class="n">Instance</span> <span class="n">Creation</span> <span class="n">Date</span> <span class="o">=</span> <span class="s1">&#39;20040826&#39;</span>
- <span class="n">Instance</span> <span class="n">Creation</span> <span class="n">Time</span> <span class="o">=</span> <span class="s1">&#39;185434&#39;</span>
- <span class="n">Instance</span> <span class="n">Creator</span> <span class="n">UID</span> <span class="o">=</span> <span class="s1">&#39;1.3.6.1.4.1.5962.3&#39;</span>
- <span class="n">SOP</span> <span class="n">Class</span> <span class="n">UID</span> <span class="o">=</span> <span class="s1">&#39;1.2.840.10008.5.1.4.1.1.4&#39;</span>
- <span class="n">SOP</span> <span class="n">Instance</span> <span class="n">UID</span> <span class="o">=</span> <span class="s1">&#39;1.3.6.1.4.1.5962.1.1.4.1.1.20040826185059.5457&#39;</span>
- <span class="n">Study</span> <span class="n">Date</span> <span class="o">=</span> <span class="s1">&#39;20040826&#39;</span>
- <span class="n">Series</span> <span class="n">Date</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
- <span class="n">Acquisition</span> <span class="n">Date</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
- <span class="n">Study</span> <span class="n">Time</span> <span class="o">=</span> <span class="s1">&#39;185059&#39;</span>
- <span class="n">Series</span> <span class="n">Time</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
- <span class="n">Acquisition</span> <span class="n">Time</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
- <span class="n">Accession</span> <span class="n">Number</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
- <span class="n">Modality</span> <span class="o">=</span> <span class="s1">&#39;MR&#39;</span>
- <span class="n">Manufacturer</span> <span class="o">=</span> <span class="s1">&#39;TOSHIBA_MEC&#39;</span>
- <span class="n">Institution</span> <span class="n">Name</span> <span class="o">=</span> <span class="s1">&#39;TOSHIBA&#39;</span>
- <span class="n">Referring</span> <span class="n">Physician</span><span class="s1">&#39;s Name = &#39;&#39;</span>
- <span class="n">Timezone</span> <span class="n">Offset</span> <span class="n">From</span> <span class="n">UTC</span> <span class="o">=</span> <span class="s1">&#39;-0400&#39;</span>
- <span class="n">Station</span> <span class="n">Name</span> <span class="o">=</span> <span class="s1">&#39;000000000&#39;</span>
- <span class="n">Name</span> <span class="n">of</span> <span class="n">Physician</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="n">Reading</span> <span class="n">Study</span> <span class="o">=</span> <span class="s1">&#39;----&#39;</span>
- <span class="n">Operators</span><span class="s1">&#39; Name = &#39;</span><span class="o">----</span><span class="s1">&#39;</span>
- <span class="n">Manufacturer</span><span class="s1">&#39;s Model Name = &#39;</span><span class="n">MRT50H1</span><span class="s1">&#39;</span>
- <span class="n">Patient</span><span class="s1">&#39;s Name = &#39;</span><span class="n">CompressedSamples</span><span class="o">^</span><span class="n">MR1</span><span class="s1">&#39;</span>
- <span class="n">Patient</span> <span class="n">ID</span> <span class="o">=</span> <span class="s1">&#39;4MR1&#39;</span>
- <span class="n">Patient</span><span class="s1">&#39;s Birth Date = &#39;&#39;</span>
- <span class="n">Patient</span><span class="s1">&#39;s Sex = &#39;</span><span class="n">F</span><span class="s1">&#39;</span>
- <span class="n">Patient</span><span class="s1">&#39;s Size = &#39;&#39;</span>
- <span class="n">Patient</span><span class="s1">&#39;s Weight = &quot;80.0000&quot;</span>
- <span class="n">Contrast</span><span class="o">/</span><span class="n">Bolus</span> <span class="n">Agent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
- <span class="n">Scanning</span> <span class="n">Sequence</span> <span class="o">=</span> <span class="s1">&#39;SE&#39;</span>
- <span class="n">Sequence</span> <span class="n">Variant</span> <span class="o">=</span> <span class="s1">&#39;NONE&#39;</span>
- <span class="n">Scan</span> <span class="n">Options</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
- <span class="n">MR</span> <span class="n">Acquisition</span> <span class="n">Type</span> <span class="o">=</span> <span class="s1">&#39;3D&#39;</span>
- <span class="n">Slice</span> <span class="n">Thickness</span> <span class="o">=</span> <span class="s2">&quot;0.8000&quot;</span>
- <span class="n">Repetition</span> <span class="n">Time</span> <span class="o">=</span> <span class="s2">&quot;4000.0000&quot;</span>
- <span class="n">Echo</span> <span class="n">Time</span> <span class="o">=</span> <span class="s2">&quot;240.0000&quot;</span>
- <span class="n">Number</span> <span class="n">of</span> <span class="n">Averages</span> <span class="o">=</span> <span class="s2">&quot;1.0000&quot;</span>
- <span class="n">Imaging</span> <span class="n">Frequency</span> <span class="o">=</span> <span class="s2">&quot;63.92433900&quot;</span>
- <span class="n">Imaged</span> <span class="n">Nucleus</span> <span class="o">=</span> <span class="s1">&#39;H&#39;</span>
- <span class="n">Echo</span> <span class="n">Number</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">=</span> <span class="s1">&#39;1&#39;</span>
- <span class="n">Echo</span> <span class="n">Train</span> <span class="n">Length</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
- <span class="n">Device</span> <span class="n">Serial</span> <span class="n">Number</span> <span class="o">=</span> <span class="s1">&#39;-0000200&#39;</span>
- <span class="n">Software</span> <span class="n">Version</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">=</span> <span class="s1">&#39;V3.51*P25&#39;</span>
- <span class="n">Flip</span> <span class="n">Angle</span> <span class="o">=</span> <span class="s2">&quot;90&quot;</span>
- <span class="n">Patient</span> <span class="n">Position</span> <span class="o">=</span> <span class="s1">&#39;HFS&#39;</span>
- <span class="n">Study</span> <span class="n">Instance</span> <span class="n">UID</span> <span class="o">=</span> <span class="s1">&#39;1.3.6.1.4.1.5962.1.2.4.20040826185059.5457&#39;</span>
- <span class="n">Series</span> <span class="n">Instance</span> <span class="n">UID</span> <span class="o">=</span> <span class="s1">&#39;1.3.6.1.4.1.5962.1.3.4.1.20040826185059.5457&#39;</span>
- <span class="n">Study</span> <span class="n">ID</span> <span class="o">=</span> <span class="s1">&#39;4MR1&#39;</span>
- <span class="n">Series</span> <span class="n">Number</span> <span class="o">=</span> <span class="s1">&#39;1&#39;</span>
- <span class="n">Acquisition</span> <span class="n">Number</span> <span class="o">=</span> <span class="s1">&#39;0&#39;</span>
- <span class="n">Instance</span> <span class="n">Number</span> <span class="o">=</span> <span class="s1">&#39;1&#39;</span>
- <span class="n">Image</span> <span class="n">Position</span> <span class="p">(</span><span class="n">Patient</span><span class="p">)</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;-83.9063&#39;</span><span class="p">,</span> <span class="s1">&#39;-91.2000&#39;</span><span class="p">,</span> <span class="s1">&#39;6.6406&#39;</span><span class="p">]</span>
- <span class="n">Image</span> <span class="n">Orientation</span> <span class="p">(</span><span class="n">Patient</span><span class="p">)</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;1.0000&#39;</span><span class="p">,</span> <span class="s1">&#39;0.0000&#39;</span><span class="p">,</span> <span class="s1">&#39;0.0000&#39;</span><span class="p">,</span> <span class="s1">&#39;0.0000&#39;</span><span class="p">,</span> <span class="s1">&#39;1.0000&#39;</span><span class="p">,</span><span class="o">...</span>
- <span class="n">Frame</span> <span class="n">of</span> <span class="n">Reference</span> <span class="n">UID</span> <span class="o">=</span> <span class="s1">&#39;1.3.6.1.4.1.5962.1.4.4.1.20040826185059.5457&#39;</span>
- <span class="n">Laterality</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
- <span class="n">Position</span> <span class="n">Reference</span> <span class="n">Indicator</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
- <span class="n">Slice</span> <span class="n">Location</span> <span class="o">=</span> <span class="s2">&quot;0.0000&quot;</span>
- <span class="n">Image</span> <span class="n">Comments</span> <span class="o">=</span> <span class="s1">&#39;Uncompressed&#39;</span>
- <span class="n">Samples</span> <span class="n">per</span> <span class="n">Pixel</span> <span class="o">=</span> <span class="mi">1</span>
- <span class="n">Photometric</span> <span class="n">Interpretation</span> <span class="o">=</span> <span class="s1">&#39;MONOCHROME2&#39;</span>
- <span class="n">Rows</span> <span class="o">=</span> <span class="mi">64</span>
- <span class="n">Columns</span> <span class="o">=</span> <span class="mi">64</span>
- <span class="n">Pixel</span> <span class="n">Spacing</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;0.3125&#39;</span><span class="p">,</span> <span class="s1">&#39;0.3125&#39;</span><span class="p">]</span>
- <span class="n">Bits</span> <span class="n">Allocated</span> <span class="o">=</span> <span class="mi">16</span>
- <span class="n">Bits</span> <span class="n">Stored</span> <span class="o">=</span> <span class="mi">16</span>
- <span class="n">High</span> <span class="n">Bit</span> <span class="o">=</span> <span class="mi">15</span>
- <span class="n">Pixel</span> <span class="n">Representation</span> <span class="o">=</span> <span class="mi">1</span>
- <span class="n">Smallest</span> <span class="n">Image</span> <span class="n">Pixel</span> <span class="n">Value</span> <span class="o">=</span> <span class="mi">0</span>
- <span class="n">Largest</span> <span class="n">Image</span> <span class="n">Pixel</span> <span class="n">Value</span> <span class="o">=</span> <span class="mi">4000</span>
- <span class="n">Window</span> <span class="n">Center</span> <span class="o">=</span> <span class="s2">&quot;600&quot;</span>
- <span class="n">Window</span> <span class="n">Width</span> <span class="o">=</span> <span class="s2">&quot;1600&quot;</span>
-<span class="o">&lt;</span><span class="n">item</span> <span class="ow">not</span> <span class="n">printed</span> <span class="o">--</span> <span class="ow">in</span> <span class="n">the</span> <span class="s2">&quot;don&#39;t print&quot;</span> <span class="nb">list</span><span class="o">&gt;</span>
- <span class="n">Data</span> <span class="n">Set</span> <span class="n">Trailing</span> <span class="n">Padding</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\n\x00\xfe\x00\x04\x00\x01\x00\x00\x00\x00\x00</span><span class="s1">\x...</span>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Image Type = [&#39;DERIVED&#39;, &#39;SECONDARY&#39;, &#39;OTHER&#39;]
+ Instance Creation Date = &#39;20040826&#39;
+ Instance Creation Time = &#39;185434&#39;
+ Instance Creator UID = &#39;1.3.6.1.4.1.5962.3&#39;
+ SOP Class UID = &#39;1.2.840.10008.5.1.4.1.1.4&#39;
+ SOP Instance UID = &#39;1.3.6.1.4.1.5962.1.1.4.1.1.20040826185059.5457&#39;
+ Study Date = &#39;20040826&#39;
+ Series Date = &#39;&#39;
+ Acquisition Date = &#39;&#39;
+ Study Time = &#39;185059&#39;
+ Series Time = &#39;&#39;
+ Acquisition Time = &#39;&#39;
+ Accession Number = &#39;&#39;
+ Modality = &#39;MR&#39;
+ Manufacturer = &#39;TOSHIBA_MEC&#39;
+ Institution Name = &#39;TOSHIBA&#39;
+ Referring Physician&#39;s Name = &#39;&#39;
+ Timezone Offset From UTC = &#39;-0400&#39;
+ Station Name = &#39;000000000&#39;
+ Name of Physician(s) Reading Study = &#39;----&#39;
+ Operators&#39; Name = &#39;----&#39;
+ Manufacturer&#39;s Model Name = &#39;MRT50H1&#39;
+ Patient&#39;s Name = &#39;CompressedSamples^MR1&#39;
+ Patient ID = &#39;4MR1&#39;
+ Patient&#39;s Birth Date = &#39;&#39;
+ Patient&#39;s Sex = &#39;F&#39;
+ Patient&#39;s Size = &#39;&#39;
+ Patient&#39;s Weight = &quot;80.0000&quot;
+ Contrast/Bolus Agent = &#39;&#39;
+ Scanning Sequence = &#39;SE&#39;
+ Sequence Variant = &#39;NONE&#39;
+ Scan Options = &#39;&#39;
+ MR Acquisition Type = &#39;3D&#39;
+ Slice Thickness = &quot;0.8000&quot;
+ Repetition Time = &quot;4000.0000&quot;
+ Echo Time = &quot;240.0000&quot;
+ Number of Averages = &quot;1.0000&quot;
+ Imaging Frequency = &quot;63.92433900&quot;
+ Imaged Nucleus = &#39;H&#39;
+ Echo Number(s) = &#39;1&#39;
+ Echo Train Length = &#39;&#39;
+ Device Serial Number = &#39;-0000200&#39;
+ Software Version(s) = &#39;V3.51*P25&#39;
+ Flip Angle = &quot;90&quot;
+ Patient Position = &#39;HFS&#39;
+ Study Instance UID = &#39;1.3.6.1.4.1.5962.1.2.4.20040826185059.5457&#39;
+ Series Instance UID = &#39;1.3.6.1.4.1.5962.1.3.4.1.20040826185059.5457&#39;
+ Study ID = &#39;4MR1&#39;
+ Series Number = &#39;1&#39;
+ Acquisition Number = &#39;0&#39;
+ Instance Number = &#39;1&#39;
+ Image Position (Patient) = [&#39;-83.9063&#39;, &#39;-91.2000&#39;, &#39;6.6406&#39;]
+ Image Orientation (Patient) = [&#39;1.0000&#39;, &#39;0.0000&#39;, &#39;0.0000&#39;, &#39;0.0000&#39;, &#39;1.0000&#39;,...
+ Frame of Reference UID = &#39;1.3.6.1.4.1.5962.1.4.4.1.20040826185059.5457&#39;
+ Laterality = &#39;&#39;
+ Position Reference Indicator = &#39;&#39;
+ Slice Location = &quot;0.0000&quot;
+ Image Comments = &#39;Uncompressed&#39;
+ Samples per Pixel = 1
+ Photometric Interpretation = &#39;MONOCHROME2&#39;
+ Rows = 64
+ Columns = 64
+ Pixel Spacing = [&#39;0.3125&#39;, &#39;0.3125&#39;]
+ Bits Allocated = 16
+ Bits Stored = 16
+ High Bit = 15
+ Pixel Representation = 1
+ Smallest Image Pixel Value = 0
+ Largest Image Pixel Value = 4000
+ Window Center = &quot;600&quot;
+ Window Width = &quot;1600&quot;
+&lt;item not printed -- in the &quot;don&#39;t print&quot; list&gt;
+ Data Set Trailing Padding = b&#39;\n\x00\xfe\x00\x04\x00\x01\x00\x00\x00\x00\x00\x...
 </pre></div>
 </div>
 <div class="line-block">
@@ -311,8 +314,8 @@
 <span class="n">myprint</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
 </pre></div>
 </div>
-<p><strong>Total running time of the script:</strong> ( 0 minutes  0.007 seconds)</p>
-<div class="sphx-glr-footer docutils container">
+<p><strong>Total running time of the script:</strong> ( 0 minutes  0.010 seconds)</p>
+<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-input-output-plot-printing-dataset-py">
 <div class="sphx-glr-download docutils container">
 <a class="reference download internal" href="../../_downloads/plot_printing_dataset.py" download=""><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_printing_dataset.py</span></code></a></div>
 <div class="sphx-glr-download docutils container">
@@ -377,10 +380,7 @@
 
   
 
-  
-  
-    <script type="text/javascript" src="../../_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
   <script type="text/javascript">
       jQuery(function () {
