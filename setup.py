@@ -20,24 +20,6 @@ with open(ver_file) as f:
 
 description = "Pure python package for DICOM medical file reading and writing"
 
-long_description = """
-
-pydicom
-=======
-
-pydicom is a pure python package for parsing DICOM files. DICOM is a standard
-(http://medical.nema.org) for communicating medical images and related
-information such as reports and radiotherapy objects.
-
-pydicom makes it easy to read these complex files into natural pythonic
-structures for easy manipulation.  Modified datasets can be written again to
-DICOM format files. See the `Getting Started
-<https://pydicom.github.io/pydicom/stable/getting_started.html>`_ page for
-installation and basic information, and the `Pydicom User Guide
-<https://pydicom.github.io/pydicom/stable/getting_started.html>`_ page for
-an overview of how to use the pydicom library.
-"""
-
 needs_pytest = {'pytest', 'test', 'ptr'}.intersection(sys.argv)
 pytest_runner = ['pytest-runner'] if needs_pytest else []
 _py_modules = []
@@ -68,7 +50,6 @@ AUTHOR_EMAIL = "darcymason@gmail.com"
 MAINTAINER = "Darcy Mason and contributors"
 MAINTAINER_EMAIL = "darcymason@gmail.com"
 DESCRIPTION = description
-LONG_DESCRIPTION = long_description
 URL = "https://github.com/pydicom/pydicom"
 DOWNLOAD_URL = "https://github.com/pydicom/pydicom/archive/master.zip"
 LICENSE = "MIT"
@@ -76,6 +57,11 @@ VERSION = __version__
 REQUIRES = []
 SETUP_REQUIRES = pytest_runner
 TESTS_REQUIRE = ['pytest']
+
+# get long description from README.md
+BASE_PATH = os.path.abspath(os.path.dirname(__file__))
+with open(os.path.join(BASE_PATH, 'README.md')) as f:
+    LONG_DESCRIPTION = f.read()
 
 
 def data_files_inventory():
@@ -98,7 +84,8 @@ opts = dict(name=NAME,
             author=AUTHOR,
             author_email=AUTHOR_EMAIL,
             description=description,
-            long_description=long_description,
+            long_description=LONG_DESCRIPTION,
+            long_description_content_type='text/markdown',
             url=URL,
             download_url=DOWNLOAD_URL,
             license=LICENSE,
@@ -112,7 +99,6 @@ opts = dict(name=NAME,
             setup_requires=SETUP_REQUIRES,
             tests_require=TESTS_REQUIRE,
             zip_safe=False)
-
 
 if __name__ == '__main__':
     setup(**opts)

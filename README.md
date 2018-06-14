@@ -19,9 +19,11 @@ pydicom is not a DICOM server, and is not primarily about viewing images.
 It is designed to let you
 manipulate data elements in DICOM files with python code.
 
-Limitations -- the main limitation of the current version is that _compressed_ pixel data (e.g. JPEG)
-cannot be altered in an intelligent way as it can for uncompressed pixels.
-Files can always be read and saved, but compressed pixel data cannot easily be modified.
+Limitations -- for files with _compressed_ pixel data, pydicom can decompress 
+it (with additional libraries installed) and allow you to manipulate the data, 
+but can only store changed pixel data as uncompressed. Files can always be 
+read and saved (including compressed pixel data that has not been modified), 
+but once decompressed, modified pixel data cannot be compressed again.
 
 Documentation
 -------------
@@ -36,7 +38,7 @@ See [Getting Started](https://pydicom.github.io/pydicom/stable/getting_started.h
 for installation and basic information, and the 
 [User Guide](https://pydicom.github.io/pydicom/stable/pydicom_user_guide.html) 
 for an overview of how to use the pydicom library. 
-To contribute to pydicom, read our [contribution guide](CONTRIBUTING.md). 
+To contribute to pydicom, read our [contribution guide](https://github.com/pydicom/pydicom/blob/master/CONTRIBUTING.md).
 To contribute an example or extension of pydicom that does not belong with 
 the core software, see our contribution repository, 
 [contrib-pydicom](https://www.github.com/pydicom/contrib-pydicom).
