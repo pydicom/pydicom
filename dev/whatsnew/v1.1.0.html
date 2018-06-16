@@ -176,23 +176,39 @@
 <h1>Version 1.1.0<a class="headerlink" href="#version-1-1-0" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="changelog">
 <h2>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="minor-changes">
-<h3>Minor changes<a class="headerlink" href="#minor-changes" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="enhancements">
+<h3>Enhancements<a class="headerlink" href="#enhancements" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><code class="docutils literal notranslate"><span class="pre">UID.__str__</span></code> no longer returns the UID name (when known). The UID name is
 still available using the <code class="docutils literal notranslate"><span class="pre">UID.name</span></code> property.</li>
-<li><code class="docutils literal notranslate"><span class="pre">Dataset</span></code> equality now only compares the dataset’s <code class="docutils literal notranslate"><span class="pre">DataElements</span></code> (#464).</li>
+<li><code class="docutils literal notranslate"><span class="pre">Dataset</span></code> equality now only compares the dataset’s <code class="docutils literal notranslate"><span class="pre">DataElements</span></code>
+(<a class="reference external" href="https://github.com/pydicom/pydicom/issues/464">#464</a>)</li>
+<li>the <code class="docutils literal notranslate"><span class="pre">codify</span></code> script now supports VRs OD and OL, and works in Python 3
+(<a class="reference external" href="https://github.com/pydicom/pydicom/issues/498">#498</a>); documentation has been added for <code class="docutils literal notranslate"><span class="pre">codify</span></code></li>
+<li>the performance for reading and writing datasets has been improved to
+be better than in pydicom 0.9.9 (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/605">#605</a>, <a class="reference external" href="https://github.com/pydicom/pydicom/issues/512">#512</a>)</li>
+<li>added support for bit-packed pixel data (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/292">#292</a>)</li>
+<li>updated DICOM dictionary for 2018b edition</li>
+<li>added full API documentation to pydicom documentation (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/649">#649</a>)</li>
 </ul>
 </div>
 <div class="section" id="fixes">
 <h3>Fixes<a class="headerlink" href="#fixes" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">UID</span></code> should behave as expected for a python <code class="docutils literal notranslate"><span class="pre">str</span></code> subclass (#256).</li>
-<li>group length elements in groups above 0x0006 removed on writing (#32).</li>
+<li><code class="docutils literal notranslate"><span class="pre">UID</span></code> should behave as expected for a python <code class="docutils literal notranslate"><span class="pre">str</span></code> subclass
+(<a class="reference external" href="https://github.com/pydicom/pydicom/issues/256">#256</a>)</li>
+<li>group length elements in groups above 0x0006 removed on writing
+(<a class="reference external" href="https://github.com/pydicom/pydicom/issues/32">#32</a>)</li>
 <li>fixed <code class="docutils literal notranslate"><span class="pre">write_PN</span></code> raising a <code class="docutils literal notranslate"><span class="pre">TypeError</span></code> when called with a non-iterable
-encoding parameter (#489).</li>
+encoding parameter (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/489">#489</a>)</li>
+<li>fixed padding for some odd-sized image data (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/599">#599</a>)</li>
+<li>removed unneeded warning for incorrect date string length (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/597">#597</a>)</li>
 <li>fixed <code class="docutils literal notranslate"><span class="pre">Dataset</span></code> not slicing correctly when an (0xFFFF,0xFFFF) element is
-present (#92).</li>
+present (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/92">#92</a>)</li>
+<li>use correct VR for unknown private tags and private creators (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/620">#620</a>)</li>
+<li>fixed crash on reading RGB data with implicit VR (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/620">#620</a>)</li>
+<li>parent encoding was not used in sequences without own encoding (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/625">#625</a>)</li>
+<li>fixed error handling for values too large to fit in VR IS (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/640">#640</a>)</li>
 </ul>
 </div>
 </div>
