@@ -1,0 +1,933 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Analyse differences between DICOM files &mdash; pydicom 1.1.0 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Display unicode person names" href="show_charset_name.html" />
+    <link rel="prev" title="General examples" href="index.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> pydicom
+          
+
+          
+            
+            <img src="../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started with pydicom</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../pydicom_user_guide.html">Pydicom User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pydicom_dev_guide.html">Pydicom Developer Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ref_guide.html">Reading and writing DICOM files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api_ref.html">Pydicom Complete API Reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Examples</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">General examples</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Analyse differences between DICOM files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="show_charset_name.html">Display unicode person names</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dicomtree.html">Show a dicom file using hierarchical tree</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#image-processing">Image processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#input-output">Input-output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#metadata-processing">Metadata processing</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../release-notes.html">Release history</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pydicom</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">General examples</a> &raquo;</li>
+        
+      <li>Analyse differences between DICOM files</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/auto_examples/plot_dicom_difference.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Click <a class="reference internal" href="#sphx-glr-download-auto-examples-plot-dicom-difference-py"><span class="std std-ref">here</span></a> to download the full example code</p>
+</div>
+<div class="sphx-glr-example-title section" id="analyse-differences-between-dicom-files">
+<span id="sphx-glr-auto-examples-plot-dicom-difference-py"></span><h1>Analyse differences between DICOM files<a class="headerlink" href="#analyse-differences-between-dicom-files" title="Permalink to this headline">¶</a></h1>
+<p>This examples illustrates how to find the differences between two DICOM files.</p>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>+ (0008, 0005) Specific Character Set              CS: &#39;ISO_IR 100&#39;
+
+- (0008, 0008) Image Type                          CS: [&#39;DERIVED&#39;, &#39;SECONDARY&#39;, &#39;OTHER&#39;]
+
++ (0008, 0008) Image Type                          CS: [&#39;ORIGINAL&#39;, &#39;PRIMARY&#39;, &#39;AXIAL&#39;]
+
+- (0008, 0012) Instance Creation Date              DA: &#39;20040826&#39;
+
++ (0008, 0012) Instance Creation Date              DA: &#39;20040119&#39;
+
+- (0008, 0013) Instance Creation Time              TM: &#39;185434&#39;
+
++ (0008, 0013) Instance Creation Time              TM: &#39;072731&#39;
+
+  (0008, 0014) Instance Creator UID                UI: 1.3.6.1.4.1.5962.3
+
+- (0008, 0016) SOP Class UID                       UI: MR Image Storage
+
++ (0008, 0016) SOP Class UID                       UI: CT Image Storage
+
+- (0008, 0018) SOP Instance UID                    UI: 1.3.6.1.4.1.5962.1.1.4.1.1.20040826185059.5457
+
++ (0008, 0018) SOP Instance UID                    UI: 1.3.6.1.4.1.5962.1.1.1.1.1.20040119072730.12322
+
+- (0008, 0020) Study Date                          DA: &#39;20040826&#39;
+
++ (0008, 0020) Study Date                          DA: &#39;20040119&#39;
+
+- (0008, 0021) Series Date                         DA: &#39;&#39;
+
++ (0008, 0021) Series Date                         DA: &#39;19970430&#39;
+
+- (0008, 0022) Acquisition Date                    DA: &#39;&#39;
+
++ (0008, 0022) Acquisition Date                    DA: &#39;19970430&#39;
+
++ (0008, 0023) Content Date                        DA: &#39;19970430&#39;
+
+- (0008, 0030) Study Time                          TM: &#39;185059&#39;
+
++ (0008, 0030) Study Time                          TM: &#39;072730&#39;
+
+- (0008, 0031) Series Time                         TM: &#39;&#39;
+
++ (0008, 0031) Series Time                         TM: &#39;112749&#39;
+
+- (0008, 0032) Acquisition Time                    TM: &#39;&#39;
+
++ (0008, 0032) Acquisition Time                    TM: &#39;112936&#39;
+
++ (0008, 0033) Content Time                        TM: &#39;113008&#39;
+
+  (0008, 0050) Accession Number                    SH: &#39;&#39;
+
+- (0008, 0060) Modality                            CS: &#39;MR&#39;
+
++ (0008, 0060) Modality                            CS: &#39;CT&#39;
+
+- (0008, 0070) Manufacturer                        LO: &#39;TOSHIBA_MEC&#39;
+
++ (0008, 0070) Manufacturer                        LO: &#39;GE MEDICAL SYSTEMS&#39;
+
+- (0008, 0080) Institution Name                    LO: &#39;TOSHIBA&#39;
+
++ (0008, 0080) Institution Name                    LO: &#39;JFK IMAGING CENTER&#39;
+
+  (0008, 0090) Referring Physician&#39;s Name          PN: &#39;&#39;
+
+- (0008, 0201) Timezone Offset From UTC            SH: &#39;-0400&#39;
+
++ (0008, 0201) Timezone Offset From UTC            SH: &#39;-0500&#39;
+
+- (0008, 1010) Station Name                        SH: &#39;000000000&#39;
+
++ (0008, 1010) Station Name                        SH: &#39;CT01_OC0&#39;
+
++ (0008, 1030) Study Description                   LO: &#39;e+1&#39;
+
+- (0008, 1060) Name of Physician(s) Reading Study  PN: &#39;----&#39;
+
+- (0008, 1070) Operators&#39; Name                     PN: &#39;----&#39;
+
+- (0008, 1090) Manufacturer&#39;s Model Name           LO: &#39;MRT50H1&#39;
+
++ (0008, 1090) Manufacturer&#39;s Model Name           LO: &#39;RHAPSODE&#39;
+
++ (0009, 0010) Private Creator                     LO: &#39;GEMS_IDEN_01&#39;
+
++ (0009, 1001) [Full fidelity]                     LO: &#39;GE_GENESIS_FF&#39;
+
++ (0009, 1002) [Suite id]                          SH: &#39;CT01&#39;
+
++ (0009, 1004) [Product id]                        SH: &#39;HiSpeed CT/i&#39;
+
++ (0009, 1027) [Image actual date]                 SL: 862399669
+
++ (0009, 1030) [Service id]                        SH: &#39;&#39;
+
++ (0009, 1031) [Mobile location number]            SH: &#39;&#39;
+
++ (0009, 10e6) [Genesis Version - now]             SH: &#39;05&#39;
+
++ (0009, 10e7) [Exam Record checksum]              UL: 973283917
+
++ (0009, 10e9) [Actual series data time stamp]     SL: 862399669
+
+- (0010, 0010) Patient&#39;s Name                      PN: &#39;CompressedSamples^MR1&#39;
+
++ (0010, 0010) Patient&#39;s Name                      PN: &#39;CompressedSamples^CT1&#39;
+
+- (0010, 0020) Patient ID                          LO: &#39;4MR1&#39;
+
++ (0010, 0020) Patient ID                          LO: &#39;1CT1&#39;
+
+  (0010, 0030) Patient&#39;s Birth Date                DA: &#39;&#39;
+
+- (0010, 0040) Patient&#39;s Sex                       CS: &#39;F&#39;
+
++ (0010, 0040) Patient&#39;s Sex                       CS: &#39;O&#39;
+
+- (0010, 1020) Patient&#39;s Size                      DS: &#39;&#39;
+
++ (0010, 1010) Patient&#39;s Age                       AS: &#39;000Y&#39;
+
+- (0010, 1030) Patient&#39;s Weight                    DS: &quot;80.0000&quot;
+
++ (0010, 1030) Patient&#39;s Weight                    DS: &quot;0.000000&quot;
+
++ (0010, 21b0) Additional Patient History          LT: &#39;&#39;
+
++ (0011, 0010) Private Creator                     LO: &#39;GEMS_PATI_01&#39;
+
++ (0011, 1010) [Patient Status]                    SS: 0
+
+- (0018, 0010) Contrast/Bolus Agent                LO: &#39;&#39;
+
++ (0018, 0010) Contrast/Bolus Agent                LO: &#39;ISOVUE300/100&#39;
+
+- (0018, 0020) Scanning Sequence                   CS: &#39;SE&#39;
+
+- (0018, 0021) Sequence Variant                    CS: &#39;NONE&#39;
+
+- (0018, 0022) Scan Options                        CS: &#39;&#39;
+
++ (0018, 0022) Scan Options                        CS: &#39;HELICAL MODE&#39;
+
+- (0018, 0023) MR Acquisition Type                 CS: &#39;3D&#39;
+
+- (0018, 0050) Slice Thickness                     DS: &quot;0.8000&quot;
+
++ (0018, 0050) Slice Thickness                     DS: &quot;5.000000&quot;
+
+- (0018, 0080) Repetition Time                     DS: &quot;4000.0000&quot;
+
+- (0018, 0081) Echo Time                           DS: &quot;240.0000&quot;
+
++ (0018, 0060) KVP                                 DS: &quot;120&quot;
+
++ (0018, 0088) Spacing Between Slices              DS: &quot;5.000000&quot;
+
++ (0018, 0090) Data Collection Diameter            DS: &quot;480.000000&quot;
+
+- (0018, 0083) Number of Averages                  DS: &quot;1.0000&quot;
+
+- (0018, 0084) Imaging Frequency                   DS: &quot;63.92433900&quot;
+
+- (0018, 0085) Imaged Nucleus                      SH: &#39;H&#39;
+
+- (0018, 0086) Echo Number(s)                      IS: &#39;1&#39;
+
+- (0018, 0091) Echo Train Length                   IS: &#39;&#39;
+
+- (0018, 1000) Device Serial Number                LO: &#39;-0000200&#39;
+
+- (0018, 1020) Software Version(s)                 LO: &#39;V3.51*P25&#39;
+
++ (0018, 1020) Software Version(s)                 LO: &#39;05&#39;
+
++ (0018, 1040) Contrast/Bolus Route                LO: &#39;IV&#39;
+
++ (0018, 1100) Reconstruction Diameter             DS: &quot;338.671600&quot;
+
++ (0018, 1110) Distance Source to Detector         DS: &quot;1099.3100585938&quot;
+
++ (0018, 1111) Distance Source to Patient          DS: &quot;630.000000&quot;
+
++ (0018, 1120) Gantry/Detector Tilt                DS: &quot;0.000000&quot;
+
++ (0018, 1130) Table Height                        DS: &quot;133.699997&quot;
+
++ (0018, 1150) Exposure Time                       IS: &#39;1601&#39;
+
++ (0018, 1151) X-Ray Tube Current                  IS: &#39;170&#39;
+
+- (0018, 1314) Flip Angle                          DS: &quot;90&quot;
+
++ (0018, 1152) Exposure                            IS: &#39;170&#39;
+
++ (0018, 1160) Filter Type                         SH: &#39;LARGE BOWTIE FIL&#39;
+
++ (0018, 1190) Focal Spot(s)                       DS: &quot;0.700000&quot;
+
++ (0018, 1210) Convolution Kernel                  SH: &#39;STANDARD&#39;
+
+- (0018, 5100) Patient Position                    CS: &#39;HFS&#39;
+
++ (0018, 5100) Patient Position                    CS: &#39;FFS&#39;
+
++ (0019, 0010) Private Creator                     LO: &#39;GEMS_ACQU_01&#39;
+
++ (0019, 1002) [Detector Channel]                  SL: 912
+
++ (0019, 1003) [Cell number at Theta]              DS: &quot;373.750000&quot;
+
++ (0019, 1004) [Cell spacing]                      DS: &quot;1.016600&quot;
+
++ (0019, 100f) [Horiz. Frame of ref.]              DS: &quot;955.799988&quot;
+
++ (0019, 1011) [Series contrast]                   SS: 2
+
++ (0019, 1013) [Start number for baseline]         SS: 0
+
++ (0019, 1014) [End number for baseline]           SS: 0
+
++ (0019, 1015) [Start number for enhanced scans]   SS: 0
+
++ (0019, 1016) [End number for enhanced scans]     SS: 0
+
++ (0019, 1017) [Series plane]                      SS: 2
+
++ (0019, 1018) [First scan ras]                    LO: &#39;S&#39;
+
++ (0019, 1019) [First scan location]               DS: &quot;7.791870&quot;
+
++ (0019, 101a) [Last scan ras]                     LO: &#39;I&#39;
+
++ (0019, 101b) [Last scan loc]                     DS: &quot;-320.197968&quot;
+
++ (0019, 101e) [Display field of view]             DS: &quot;0.000000&quot;
+
++ (0019, 1023) [Table Speed [mm/rotation]]         DS: &quot;5.000000&quot;
+
++ (0019, 1024) [Mid Scan Time [sec]]               DS: &quot;17.784578&quot;
+
++ (0019, 1025) [Mid scan flag]                     SS: 1
+
++ (0019, 1026) [Tube Azimuth [degree]]             SL: 0
+
++ (0019, 1027) [Rotation Speed [msec]]             DS: &quot;1.000000&quot;
+
++ (0019, 102a) [x-ray On position]                 DS: &quot;178.079926&quot;
+
++ (0019, 102b) [x-ray Off position]                DS: &quot;3994.299316&quot;
+
++ (0019, 102c) [Number of triggers]                SL: 10431
+
++ (0019, 102e) [Angle of first view]               DS: &quot;-718.079956&quot;
+
++ (0019, 102f) [Trigger frequency]                 DS: &quot;984.000000&quot;
+
++ (0019, 1039) [SFOV Type]                         SS: 16
+
++ (0019, 1040) [Stat recon flag]                   SS: 0
+
++ (0019, 1041) [Compute type]                      SS: 1
+
++ (0019, 1042) [Segment Number]                    SS: 0
+
++ (0019, 1043) [Total Segments Required]           SS: 0
+
++ (0019, 1044) [Interscan delay]                   DS: &quot;1.000000&quot;
+
++ (0019, 1047) [View compression factor]           SS: 1
+
++ (0019, 104a) [Total no. of ref channels]         SS: 6
+
++ (0019, 104b) [Data size for scan data]           SL: 10431
+
++ (0019, 1052) [Recon post proc. Flag]             SS: 1
+
++ (0019, 1057) [CT water number]                   SS: -95
+
++ (0019, 1058) [CT bone number]                    SS: 0
+
++ (0019, 105e) [Number of channels (1...512)]      SL: 763
+
++ (0019, 105f) [Increment between channels]        SL: 1
+
++ (0019, 1060) [Starting view]                     SL: 1969
+
++ (0019, 1061) [Number of views]                   SL: 1576
+
++ (0019, 1062) [Increment between views]           SL: 1
+
++ (0019, 106a) [Dependent on #views processed]     SS: 4
+
++ (0019, 106b) [Field of view in detector cells]   SS: 852
+
++ (0019, 1070) [Value of back projection button]   SS: 1
+
++ (0019, 1071) [Set if fatq estimates were used]   SS: 0
+
++ (0019, 1072) [Z chan avg over views]             DS: &quot;0.000000&quot;
+
++ (0019, 1073) [Avg of left ref chans over views]  DS: &quot;0.000000&quot;
+
++ (0019, 1074) [Max left chan over views]          DS: &quot;0.000000&quot;
+
++ (0019, 1075) [Avg of right ref chans over views] DS: &quot;0.000000&quot;
+
++ (0019, 1076) [Max right chan over views]         DS: &quot;0.000000&quot;
+
++ (0019, 10da) [Reference channel used]            SS: 0
+
++ (0019, 10db) [Back projector coefficient]        DS: &quot;0.000000&quot;
+
++ (0019, 10dc) [Primary speed correction used]     SS: 1
+
++ (0019, 10dd) [Overrange correction used]         SS: 1
+
++ (0019, 10de) [Dynamic Z alpha value]             DS: &quot;0.000000&quot;
+
+- (0020, 000d) Study Instance UID                  UI: 1.3.6.1.4.1.5962.1.2.4.20040826185059.5457
+
++ (0020, 000d) Study Instance UID                  UI: 1.3.6.1.4.1.5962.1.2.1.20040119072730.12322
+
+- (0020, 000e) Series Instance UID                 UI: 1.3.6.1.4.1.5962.1.3.4.1.20040826185059.5457
+
++ (0020, 000e) Series Instance UID                 UI: 1.3.6.1.4.1.5962.1.3.1.1.20040119072730.12322
+
+- (0020, 0010) Study ID                            SH: &#39;4MR1&#39;
+
++ (0020, 0010) Study ID                            SH: &#39;1CT1&#39;
+
+  (0020, 0011) Series Number                       IS: &#39;1&#39;
+
+- (0020, 0012) Acquisition Number                  IS: &#39;0&#39;
+
++ (0020, 0012) Acquisition Number                  IS: &#39;2&#39;
+
+  (0020, 0013) Instance Number                     IS: &#39;1&#39;
+
+- (0020, 0032) Image Position (Patient)            DS: [&#39;-83.9063&#39;, &#39;-91.2000&#39;, &#39;6.6406&#39;]
+
++ (0020, 0032) Image Position (Patient)            DS: [&#39;-158.135803&#39;, &#39;-179.035797&#39;, &#39;-75.699997&#39;]
+
+- (0020, 0037) Image Orientation (Patient)         DS: [&#39;1.0000&#39;, &#39;0.0000&#39;, &#39;0.0000&#39;, &#39;0.0000&#39;, &#39;1.0000&#39;, &#39;0.0000&#39;]
+
++ (0020, 0037) Image Orientation (Patient)         DS: [&#39;1.000000&#39;, &#39;0.000000&#39;, &#39;0.000000&#39;, &#39;0.000000&#39;, &#39;1.000000&#39;, &#39;0.000000&#39;]
+
+- (0020, 0052) Frame of Reference UID              UI: 1.3.6.1.4.1.5962.1.4.4.1.20040826185059.5457
+
++ (0020, 0052) Frame of Reference UID              UI: 1.3.6.1.4.1.5962.1.4.1.1.20040119072730.12322
+
+  (0020, 0060) Laterality                          CS: &#39;&#39;
+
+- (0020, 1040) Position Reference Indicator        LO: &#39;&#39;
+
++ (0020, 1040) Position Reference Indicator        LO: &#39;SN&#39;
+
+- (0020, 1041) Slice Location                      DS: &quot;0.0000&quot;
+
++ (0020, 1041) Slice Location                      DS: &quot;-77.2040634155&quot;
+
+  (0020, 4000) Image Comments                      LT: &#39;Uncompressed&#39;
+
++ (0021, 0010) Private Creator                     LO: &#39;GEMS_RELA_01&#39;
+
++ (0021, 1003) [Series from which Prescribed]      SS: 2
+
++ (0021, 1005) [Genesis Version - now]             SH: &#39;05&#39;
+
++ (0021, 1007) [Series Record checksum]            UL: 1605775145
+
++ (0021, 1015) [Unknown]                           US: 24078
+
++ (0021, 1016) [Unknown]                           SS: 2
+
++ (0021, 1018) [Genesis version - Now]             SH: &#39;05&#39;
+
++ (0021, 1019) [Acq recon record checksum]         UL: 750675506
+
++ (0021, 1037) [Screen Format]                     SS: 16
+
++ (0021, 104a) [Anatomical reference for scout]    LO: &#39;&#39;
+
++ (0021, 1090) [Tube focal spot position]          SS: 7400
+
++ (0021, 1091) [Biopsy position]                   SS: 0
+
++ (0021, 1092) [Biopsy T location]                 FL: 0.0
+
++ (0021, 1093) [Biopsy ref location]               FL: 0.0
+
++ (0023, 0010) Private Creator                     LO: &#39;GEMS_STDY_01&#39;
+
++ (0023, 1070) [Start time(secs) in first axial]   FD: 862399761.111079
+
++ (0023, 1074) [No. of updates to header]          SL: 1
+
++ (0023, 107d) [Indicates study has complete info  SS: 0
+
++ (0025, 0010) Private Creator                     LO: &#39;GEMS_SERS_01&#39;
+
++ (0025, 1006) [Last pulse sequence used]          SS: 0
+
++ (0025, 1007) [Images in Series]                  SL: 44
+
++ (0025, 1010) [Landmark Counter]                  SL: 0
+
++ (0025, 1011) [Number of Acquisitions]            SS: 0
+
++ (0025, 1017) [Series Complete Flag]              SL: 0
+
++ (0025, 1018) [Number of images archived]         SL: 0
+
++ (0025, 1019) [Last image number used]            SL: 4
+
++ (0025, 101a) [Primary Receiver Suite and Host]   SH: &#39;&#39;
+
++ (0027, 0010) Private Creator                     LO: &#39;GEMS_IMAG_01&#39;
+
++ (0027, 1006) [Image archive flag]                SL: 1
+
++ (0027, 1010) [Scout Type]                        SS: 0
+
++ (0027, 101c) [Vma mamp]                          SL: 150
+
++ (0027, 101d) [Vma phase]                         SS: 1
+
++ (0027, 101e) [Vma mod]                           SL: 24
+
++ (0027, 101f) [Vma clip]                          SL: 129
+
++ (0027, 1020) [Smart scan ON/OFF flag]            SS: 1
+
++ (0027, 1030) [Foreign Image Revision]            SH: &#39;&#39;
+
++ (0027, 1035) [Plane Type]                        SS: 2
+
++ (0027, 1040) [RAS letter of image location]      SH: &#39;I&#39;
+
++ (0027, 1041) [Image location]                    FL: -77.20406341552734
+
++ (0027, 1042) [Center R coord of plane image]     FL: -11.199999809265137
+
++ (0027, 1043) [Center A coord of plane image]     FL: 9.699999809265137
+
++ (0027, 1044) [Center S coord of plane image]     FL: -75.69999694824219
+
++ (0027, 1045) [Normal R coord]                    FL: 0.0
+
++ (0027, 1046) [Normal A coord]                    FL: 0.0
+
++ (0027, 1047) [Normal S coord]                    FL: -1.0
+
++ (0027, 1048) [R Coord of Top Right Corner]       FL: -180.53579711914062
+
++ (0027, 1049) [A Coord of Top Right Corner]       FL: 179.03579711914062
+
++ (0027, 104a) [S Coord of Top Right Corner]       FL: -75.69999694824219
+
++ (0027, 104b) [R Coord of Bottom Right Corner]    FL: -180.53579711914062
+
++ (0027, 104c) [A Coord of Bottom Right Corner]    FL: -159.63580322265625
+
++ (0027, 104d) [S Coord of Bottom Right Corner]    FL: -75.69999694824219
+
++ (0027, 1050) [Scan Start Location]               FL: -63.19999694824219
+
++ (0027, 1051) [Scan End Location]                 FL: -116.20304870605469
+
++ (0027, 1052) [RAS letter for side of image]      SH: &#39;L&#39;
+
++ (0027, 1053) [RAS letter for anterior/posterior] SH: &#39;A&#39;
+
++ (0027, 1054) [RAS letter for scout start loc]    SH: &#39;I&#39;
+
++ (0027, 1055) [RAS letter for scout end loc]      SH: &#39;I&#39;
+
+  (0028, 0002) Samples per Pixel                   US: 1
+
+  (0028, 0004) Photometric Interpretation          CS: &#39;MONOCHROME2&#39;
+
+- (0028, 0010) Rows                                US: 64
+
++ (0028, 0010) Rows                                US: 128
+
+- (0028, 0011) Columns                             US: 64
+
++ (0028, 0011) Columns                             US: 128
+
+- (0028, 0030) Pixel Spacing                       DS: [&#39;0.3125&#39;, &#39;0.3125&#39;]
+
++ (0028, 0030) Pixel Spacing                       DS: [&#39;0.661468&#39;, &#39;0.661468&#39;]
+
+  (0028, 0100) Bits Allocated                      US: 16
+
+  (0028, 0101) Bits Stored                         US: 16
+
+  (0028, 0102) High Bit                            US: 15
+
+  (0028, 0103) Pixel Representation                US: 1
+
+- (0028, 0106) Smallest Image Pixel Value          SS: 0
+
+- (0028, 0107) Largest Image Pixel Value           SS: 4000
+
++ (0028, 0120) Pixel Padding Value                 SS: -2000
+
++ (0028, 1052) Rescale Intercept                   DS: &quot;-1024&quot;
+
++ (0028, 1053) Rescale Slope                       DS: &quot;1&quot;
+
++ (0029, 0010) Private Creator                     LO: &#39;GEMS_IMPS_01&#39;
+
++ (0029, 1004) [Lower range of Pixels1]            SL: 0
+
++ (0029, 1005) [Lower range of Pixels1]            DS: &quot;0.000000&quot;
+
++ (0029, 1006) [Lower range of Pixels1]            DS: &quot;0.000000&quot;
+
++ (0029, 1007) [Lower range of Pixels1]            SL: 87
+
++ (0029, 1008) [Lower range of Pixels1]            SH: &#39;&#39;
+
++ (0029, 1009) [Lower range of Pixels1]            SH: &#39;&#39;
+
++ (0029, 100a) [Lower range of Pixels1]            SS: 764
+
++ (0029, 1026) [Version of the hdr struct]         SS: 2
+
++ (0029, 1034) [Advantage comp. Overflow]          SL: 0
+
++ (0029, 1035) [Advantage comp. Underflow]         SL: 0
+
++ (0043, 0010) Private Creator                     LO: &#39;GEMS_PARM_01&#39;
+
+- (0028, 1050) Window Center                       DS: &quot;600&quot;
+
++ (0043, 1010) [Window value]                      US: 400
+
+- (0028, 1051) Window Width                        DS: &quot;1600&quot;
+
++ (0043, 1011) [Total input views]                 US: 10431
+
++ (0043, 1012) [X-ray chain]                       SS: [14, 2, 3]
+
++ (0043, 1013) [Decon kernel parameters]           SS: [107, 21, 4, 2, 20]
+
++ (0043, 1014) [Calibration parameters]            SS: [4, 4, 5]
+
++ (0043, 1015) [Total output views]                SS: 10431
+
++ (0043, 1016) [Number of overranges]              SS: 0
+
++ (0043, 1017) [IBH image scale factors]           DS: &quot;0.095000&quot;
+
++ (0043, 1018) [BBH coefficients]                  DS: [&#39;0.085000&#39;, &#39;1.102000&#39;, &#39;0.095000&#39;]
+
++ (0043, 1019) [Number of BBH chains to blend]     SS: 350
+
++ (0043, 101a) [Starting channel number]           SL: 7
+
++ (0043, 101b) [Ppscan parameters]                 SS: [0, 0, 0, 0, 0]
+
++ (0043, 101c) [GE image integrity]                SS: 0
+
++ (0043, 101d) [Level value]                       SS: 40
+
++ (0043, 101e) [Delta Start Time [msec]]           DS: &quot;2.000000&quot;
+
++ (0043, 101f) [Max overranges in a view]          SL: 0
+
++ (0043, 1020) [Avg overranges all views]          DS: &quot;0.000000&quot;
+
++ (0043, 1021) [Corrected after glow terms]        SS: 0
+
++ (0043, 1025) [Reference channels]                SS: [1, 2, 3, 748, 749, 750]
+
++ (0043, 1026) [No views ref chans blocked]        US: [0, 1, 1, 0, 0, 0]
+
++ (0043, 1027) [Scan Pitch Ratio]                  SH: &#39;/1.0:1&#39;
+
++ (0043, 1028) [Unique image iden]                 OB: Array of 80 bytes
+
++ (0043, 1029) [Histogram tables]                  OB: Array of 2068 bytes
+
++ (0043, 102a) [User defined data]                 OB: Array of 40 bytes
+
++ (0043, 102b) [Private Scan Options]              SS: [4, 4, 0, 0]
+
++ (0043, 1031) [Recon Center Coordinates]          DS: [&#39;-11.200000&#39;, &#39;9.700000&#39;]
+
++ (0043, 1040) [Trigger on position]               FL: 178.07992553710938
+
++ (0043, 1041) [Degree of rotation]                FL: 3816.219482421875
+
++ (0043, 1042) [DAS trigger source]                SL: 0
+
++ (0043, 1043) [DAS fpa gain]                      SL: 0
+
++ (0043, 1044) [DAS output source]                 SL: 1
+
++ (0043, 1045) [DAS ad input]                      SL: 1
+
++ (0043, 1046) [DAS cal mode]                      SL: 3
+
++ (0043, 1047) [DAS cal frequency]                 SL: -1
+
++ (0043, 1048) [DAS reg xm]                        SL: 1
+
++ (0043, 1049) [DAS auto zero]                     SL: 0
+
++ (0043, 104a) [Starting channel of view]          SS: 1
+
++ (0043, 104b) [DAS xm pattern]                    SL: 0
+
++ (0043, 104c) [TGGC trigger mode]                 SS: 0
+
++ (0043, 104d) [Start scan to X-ray on delay]      FL: 0.0
+
++ (0043, 104e) [Duration of X-ray on]              FL: 10.60060977935791
+
+- (7fe0, 0010) Pixel Data                          OW: Array of 8192 bytes
+
++ (7fe0, 0010) Pixel Data                          OW: Array of 32768 bytes
+
+  (fffc, fffc) Data Set Trailing Padding           OB: Array of 126 bytes
+</pre></div>
+</div>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># authors : Guillaume Lemaitre &lt;g.lemaitre58@gmail.com&gt;</span>
+<span class="c1"># license : MIT</span>
+
+<span class="kn">import</span> <span class="nn">difflib</span>
+
+<span class="kn">import</span> <span class="nn">pydicom</span>
+<span class="kn">from</span> <span class="nn">pydicom.data</span> <span class="kn">import</span> <span class="n">get_testdata_files</span>
+
+<span class="k">print</span><span class="p">(</span><span class="vm">__doc__</span><span class="p">)</span>
+
+<span class="n">filename_mr</span> <span class="o">=</span> <span class="n">get_testdata_files</span><span class="p">(</span><span class="s1">&#39;MR_small.dcm&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">filename_ct</span> <span class="o">=</span> <span class="n">get_testdata_files</span><span class="p">(</span><span class="s1">&#39;CT_small.dcm&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="n">datasets</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="n">pydicom</span><span class="o">.</span><span class="n">dcmread</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+                  <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="p">(</span><span class="n">filename_mr</span><span class="p">,</span> <span class="n">filename_ct</span><span class="p">)])</span>
+
+<span class="c1"># difflib compare functions require a list of lines, each terminated with</span>
+<span class="c1"># newline character massage the string representation of each dicom dataset</span>
+<span class="c1"># into this form:</span>
+<span class="n">rep</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">dataset</span> <span class="ow">in</span> <span class="n">datasets</span><span class="p">:</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">line</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">]</span>  <span class="c1"># add the newline to end</span>
+    <span class="n">rep</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+
+
+<span class="n">diff</span> <span class="o">=</span> <span class="n">difflib</span><span class="o">.</span><span class="n">Differ</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">diff</span><span class="o">.</span><span class="n">compare</span><span class="p">(</span><span class="n">rep</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">rep</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+    <span class="k">if</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;?&quot;</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Total running time of the script:</strong> ( 0 minutes  0.200 seconds)</p>
+<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-dicom-difference-py">
+<div class="sphx-glr-download docutils container">
+<a class="reference download internal" href="../_downloads/plot_dicom_difference.py" download=""><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_dicom_difference.py</span></code></a></div>
+<div class="sphx-glr-download docutils container">
+<a class="reference download internal" href="../_downloads/plot_dicom_difference.ipynb" download=""><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_dicom_difference.ipynb</span></code></a></div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="show_charset_name.html" class="btn btn-neutral float-right" title="Display unicode person names" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral" title="General examples" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2018, Darcy Mason and pydicom contributors.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'1.1.0',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+
+  
+
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

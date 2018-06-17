@@ -1,0 +1,510 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pydicom.datadict &mdash; pydicom 1.1.0 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> pydicom
+          
+
+          
+            
+            <img src="../../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started with pydicom</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../pydicom_user_guide.html">Pydicom User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../pydicom_dev_guide.html">Pydicom Developer Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ref_guide.html">Reading and writing DICOM files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api_ref.html">Pydicom Complete API Reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">General examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#image-processing">Image processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#input-output">Input-output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../release-notes.html">Release history</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pydicom</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>pydicom.datadict</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for pydicom.datadict</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2008-2018 pydicom authors. See LICENSE file for details.</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;Access dicom dictionary information&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">pydicom.config</span> <span class="k">import</span> <span class="n">logger</span>
+<span class="kn">from</span> <span class="nn">pydicom.tag</span> <span class="k">import</span> <span class="n">Tag</span><span class="p">,</span> <span class="n">BaseTag</span>
+
+<span class="c1"># the actual dict of {tag: (VR, VM, name, is_retired, keyword), ...}</span>
+<span class="kn">from</span> <span class="nn">pydicom._dicom_dict</span> <span class="k">import</span> <span class="n">DicomDictionary</span>
+
+<span class="c1"># those with tags like &quot;(50xx, 0005)&quot;</span>
+<span class="kn">from</span> <span class="nn">pydicom._dicom_dict</span> <span class="k">import</span> <span class="n">RepeatersDictionary</span>
+<span class="kn">from</span> <span class="nn">pydicom._private_dict</span> <span class="k">import</span> <span class="n">private_dictionaries</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="c1"># Generate mask dict for checking repeating groups etc.</span>
+<span class="c1"># Map a true bitwise mask to the DICOM mask with &quot;x&quot;&#39;s in it.</span>
+<span class="n">masks</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">mask_x</span> <span class="ow">in</span> <span class="n">RepeatersDictionary</span><span class="p">:</span>
+    <span class="c1"># mask1 is XOR&#39;d to see that all non-&quot;x&quot; bits</span>
+    <span class="c1"># are identical (XOR result = 0 if bits same)</span>
+    <span class="c1"># then AND those out with 0 bits at the &quot;x&quot;</span>
+    <span class="c1"># (&quot;we don&#39;t care&quot;) location using mask2</span>
+    <span class="n">mask1</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">mask_x</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;0&quot;</span><span class="p">),</span> <span class="mi">16</span><span class="p">)</span>
+    <span class="n">mask2</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;F0&quot;</span> <span class="p">[</span><span class="n">c</span> <span class="o">==</span> <span class="s2">&quot;x&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">mask_x</span><span class="p">]),</span> <span class="mi">16</span><span class="p">)</span>
+    <span class="n">masks</span><span class="p">[</span><span class="n">mask_x</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">mask1</span><span class="p">,</span> <span class="n">mask2</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">mask_match</span><span class="p">(</span><span class="n">tag</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">mask_x</span><span class="p">,</span> <span class="p">(</span><span class="n">mask1</span><span class="p">,</span> <span class="n">mask2</span><span class="p">)</span> <span class="ow">in</span> <span class="n">masks</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">tag</span> <span class="o">^</span> <span class="n">mask1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">mask2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">mask_x</span>
+    <span class="k">return</span> <span class="kc">None</span>
+
+
+<div class="viewcode-block" id="add_dict_entry"><a class="viewcode-back" href="../../api_ref.html#pydicom.datadict.add_dict_entry">[docs]</a><span class="k">def</span> <span class="nf">add_dict_entry</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">VR</span><span class="p">,</span> <span class="n">keyword</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="n">VM</span><span class="o">=</span><span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="n">is_retired</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Update pydicom&#39;s DICOM dictionary with a new entry.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    ----</span>
+<span class="sd">    Dose not permanently update the dictionary,</span>
+<span class="sd">    but only during run-time. Will replace an existing</span>
+<span class="sd">    entry if the tag already exists in the dictionary.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    tag : int</span>
+<span class="sd">        The tag number for the new dictionary entry</span>
+<span class="sd">    VR : str</span>
+<span class="sd">        DICOM value representation</span>
+<span class="sd">    description : str</span>
+<span class="sd">        The descriptive name used in printing the entry.</span>
+<span class="sd">        Often the same as the keyword, but with spaces between words.</span>
+<span class="sd">    VM : str, optional</span>
+<span class="sd">        DICOM value multiplicity. If not specified, then &#39;1&#39; is used.</span>
+<span class="sd">    is_retired : str, optional</span>
+<span class="sd">        Usually leave as blank string (default).</span>
+<span class="sd">        Set to &#39;Retired&#39; if is a retired data element.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    pydicom.examples.add_dict_entry</span>
+<span class="sd">        Example file which shows how to use this function</span>
+<span class="sd">    add_dict_entries</span>
+<span class="sd">        Update multiple values at once.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from pydicom import Dataset</span>
+<span class="sd">    &gt;&gt;&gt; add_dict_entry(0x10011001, &quot;UL&quot;, &quot;TestOne&quot;, &quot;Test One&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; add_dict_entry(0x10011002, &quot;DS&quot;, &quot;TestTwo&quot;, &quot;Test Two&quot;, VM=&#39;3&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; ds = Dataset()</span>
+<span class="sd">    &gt;&gt;&gt; ds.TestOne = &#39;test&#39;</span>
+<span class="sd">    &gt;&gt;&gt; ds.TestTwo = [&#39;1&#39;, &#39;2&#39;, &#39;3&#39;]</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">new_dict_val</span> <span class="o">=</span> <span class="p">(</span><span class="n">VR</span><span class="p">,</span> <span class="n">VM</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="n">is_retired</span><span class="p">,</span> <span class="n">keyword</span><span class="p">)</span>
+    <span class="n">add_dict_entries</span><span class="p">({</span><span class="n">tag</span><span class="p">:</span> <span class="n">new_dict_val</span><span class="p">})</span></div>
+
+
+<div class="viewcode-block" id="add_dict_entries"><a class="viewcode-back" href="../../api_ref.html#pydicom.datadict.add_dict_entries">[docs]</a><span class="k">def</span> <span class="nf">add_dict_entries</span><span class="p">(</span><span class="n">new_entries_dict</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Update pydicom&#39;s DICOM dictionary with new entries.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    new_entries_dict : dict</span>
+<span class="sd">        Dictionary of form:</span>
+<span class="sd">        {tag: (VR, VM, description, is_retired, keyword),...}</span>
+<span class="sd">        where parameters are as described in add_dict_entry</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    add_dict_entry</span>
+<span class="sd">        Simpler function to add a single entry to the dictionary.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from pydicom import Dataset</span>
+<span class="sd">    &gt;&gt;&gt; new_dict_items = {</span>
+<span class="sd">    ...        0x10011001: (&#39;UL&#39;, &#39;1&#39;, &quot;Test One&quot;, &#39;&#39;, &#39;TestOne&#39;),</span>
+<span class="sd">    ...        0x10011002: (&#39;DS&#39;, &#39;3&#39;, &quot;Test Two&quot;, &#39;&#39;, &#39;TestTwo&#39;),</span>
+<span class="sd">    ... }</span>
+<span class="sd">    &gt;&gt;&gt; add_dict_entries(new_dict_items)</span>
+<span class="sd">    &gt;&gt;&gt; ds = Dataset()</span>
+<span class="sd">    &gt;&gt;&gt; ds.TestOne = &#39;test&#39;</span>
+<span class="sd">    &gt;&gt;&gt; ds.TestTwo = [&#39;1&#39;, &#39;2&#39;, &#39;3&#39;]</span>
+
+<span class="sd">    &gt;&gt;&gt; add_dict_entry(0x10011001, &quot;UL&quot;, &quot;TestOne&quot;, &quot;Test One&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; ds = Dataset()</span>
+<span class="sd">    &gt;&gt;&gt; ds.TestOne = &#39;test&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Update the dictionary itself</span>
+    <span class="n">DicomDictionary</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">new_entries_dict</span><span class="p">)</span>
+
+    <span class="c1"># Update the reverse mapping from name to tag</span>
+    <span class="n">new_names_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">([(</span><span class="n">val</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">tag</span><span class="p">)</span>
+                           <span class="k">for</span> <span class="n">tag</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">new_entries_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span>
+    <span class="n">keyword_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">new_names_dict</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_entry"><a class="viewcode-back" href="../../api_ref.html#pydicom.datadict.get_entry">[docs]</a><span class="k">def</span> <span class="nf">get_entry</span><span class="p">(</span><span class="n">tag</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return the tuple (VR, VM, name, is_retired, keyword)</span>
+<span class="sd">    from the DICOM dictionary</span>
+
+<span class="sd">    If the entry is not in the main dictionary,</span>
+<span class="sd">    check the masked ones, e.g. repeating groups like 50xx, etc.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Note: tried the lookup with &#39;if tag in DicomDictionary&#39;</span>
+    <span class="c1"># and with DicomDictionary.get, instead of try/except</span>
+    <span class="c1"># Try/except was fastest using timeit if tag is valid (usual case)</span>
+    <span class="c1"># My test had 5.2 usec vs 8.2 for &#39;contains&#39; test, vs 5.32 for dict.get</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">BaseTag</span><span class="p">):</span>
+        <span class="n">tag</span> <span class="o">=</span> <span class="n">Tag</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">DicomDictionary</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span>
+    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+        <span class="n">mask_x</span> <span class="o">=</span> <span class="n">mask_match</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">mask_x</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">RepeatersDictionary</span><span class="p">[</span><span class="n">mask_x</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;Tag </span><span class="si">{0}</span><span class="s2"> not found in DICOM dictionary&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tag</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="dictionary_is_retired"><a class="viewcode-back" href="../../api_ref.html#pydicom.datadict.dictionary_is_retired">[docs]</a><span class="k">def</span> <span class="nf">dictionary_is_retired</span><span class="p">(</span><span class="n">tag</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return True if the dicom retired status</span>
+<span class="sd">       is &#39;Retired&#39; for the given tag&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="s1">&#39;retired&#39;</span> <span class="ow">in</span> <span class="n">get_entry</span><span class="p">(</span><span class="n">tag</span><span class="p">)[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="dictionary_VR"><a class="viewcode-back" href="../../api_ref.html#pydicom.datadict.dictionary_VR">[docs]</a><span class="k">def</span> <span class="nf">dictionary_VR</span><span class="p">(</span><span class="n">tag</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return the dicom value representation</span>
+<span class="sd">       for the given dicom tag.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">get_entry</span><span class="p">(</span><span class="n">tag</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="dictionary_VM"><a class="viewcode-back" href="../../api_ref.html#pydicom.datadict.dictionary_VM">[docs]</a><span class="k">def</span> <span class="nf">dictionary_VM</span><span class="p">(</span><span class="n">tag</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return the dicom value multiplicity</span>
+<span class="sd">       for the given dicom tag.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">get_entry</span><span class="p">(</span><span class="n">tag</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="dictionary_description"><a class="viewcode-back" href="../../api_ref.html#pydicom.datadict.dictionary_description">[docs]</a><span class="k">def</span> <span class="nf">dictionary_description</span><span class="p">(</span><span class="n">tag</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return the descriptive text for the given dicom tag.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">get_entry</span><span class="p">(</span><span class="n">tag</span><span class="p">)[</span><span class="mi">2</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="dictionary_keyword"><a class="viewcode-back" href="../../api_ref.html#pydicom.datadict.dictionary_keyword">[docs]</a><span class="k">def</span> <span class="nf">dictionary_keyword</span><span class="p">(</span><span class="n">tag</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return the official DICOM standard</span>
+<span class="sd">      (since 2011) keyword for the tag&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">get_entry</span><span class="p">(</span><span class="n">tag</span><span class="p">)[</span><span class="mi">4</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="dictionary_has_tag"><a class="viewcode-back" href="../../api_ref.html#pydicom.datadict.dictionary_has_tag">[docs]</a><span class="k">def</span> <span class="nf">dictionary_has_tag</span><span class="p">(</span><span class="n">tag</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return True if the dicom dictionary</span>
+<span class="sd">       has an entry for the given tag.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">tag</span> <span class="ow">in</span> <span class="n">DicomDictionary</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="keyword_for_tag"><a class="viewcode-back" href="../../api_ref.html#pydicom.datadict.keyword_for_tag">[docs]</a><span class="k">def</span> <span class="nf">keyword_for_tag</span><span class="p">(</span><span class="n">tag</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return the DICOM keyword for the given tag.</span>
+
+<span class="sd">    Will return GroupLength for group length tags,</span>
+<span class="sd">    and returns empty string (&quot;&quot;) if the tag</span>
+<span class="sd">    doesn&#39;t exist in the dictionary.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">dictionary_keyword</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;&quot;</span></div>
+
+
+<span class="c1"># Provide for the &#39;reverse&#39; lookup. Given the keyword, what is the tag?</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Reversing DICOM dictionary so can look up tag from a keyword...&quot;</span><span class="p">)</span>
+<span class="n">keyword_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">([(</span><span class="n">dictionary_keyword</span><span class="p">(</span><span class="n">tag</span><span class="p">),</span> <span class="n">tag</span><span class="p">)</span>
+                     <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">DicomDictionary</span><span class="p">])</span>
+
+
+<div class="viewcode-block" id="tag_for_keyword"><a class="viewcode-back" href="../../api_ref.html#pydicom.datadict.tag_for_keyword">[docs]</a><span class="k">def</span> <span class="nf">tag_for_keyword</span><span class="p">(</span><span class="n">keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return the dicom tag corresponding to keyword,</span>
+<span class="sd">       or None if none exist.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">keyword_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">keyword</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="tag_for_name"><a class="viewcode-back" href="../../api_ref.html#pydicom.datadict.tag_for_name">[docs]</a><span class="k">def</span> <span class="nf">tag_for_name</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Deprecated -- use tag_for_keyword&quot;&quot;&quot;</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;tag_for_name is deprecated.  Use tag_for_keyword instead&quot;</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">tag_for_keyword</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="repeater_has_tag"><a class="viewcode-back" href="../../api_ref.html#pydicom.datadict.repeater_has_tag">[docs]</a><span class="k">def</span> <span class="nf">repeater_has_tag</span><span class="p">(</span><span class="n">tag</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return True if the DICOM repeaters dictionary</span>
+<span class="sd">       has an entry for `tag`.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">mask_match</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span> <span class="ow">in</span> <span class="n">RepeatersDictionary</span><span class="p">)</span></div>
+
+
+<span class="n">REPEATER_KEYWORDS</span> <span class="o">=</span> <span class="p">[</span><span class="n">val</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">RepeatersDictionary</span><span class="o">.</span><span class="n">values</span><span class="p">()]</span>
+
+
+<div class="viewcode-block" id="repeater_has_keyword"><a class="viewcode-back" href="../../api_ref.html#pydicom.datadict.repeater_has_keyword">[docs]</a><span class="k">def</span> <span class="nf">repeater_has_keyword</span><span class="p">(</span><span class="n">keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return True if the DICOM repeaters element</span>
+<span class="sd">       exists with `keyword`.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="n">REPEATER_KEYWORDS</span></div>
+
+
+<span class="c1"># PRIVATE DICTIONARY handling</span>
+<span class="c1"># functions in analogy with those of main DICOM dict</span>
+<div class="viewcode-block" id="get_private_entry"><a class="viewcode-back" href="../../api_ref.html#pydicom.datadict.get_private_entry">[docs]</a><span class="k">def</span> <span class="nf">get_private_entry</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">private_creator</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return the tuple (VR, VM, name, is_retired)</span>
+<span class="sd">       from a private dictionary&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">BaseTag</span><span class="p">):</span>
+        <span class="n">tag</span> <span class="o">=</span> <span class="n">Tag</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">private_dict</span> <span class="o">=</span> <span class="n">private_dictionaries</span><span class="p">[</span><span class="n">private_creator</span><span class="p">]</span>
+    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Private creator </span><span class="si">{0}</span><span class="s2"> &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">private_creator</span><span class="p">)</span>
+        <span class="n">msg</span> <span class="o">+=</span> <span class="s2">&quot;not in private dictionary&quot;</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="c1"># private elements are usually agnostic for</span>
+    <span class="c1"># &quot;block&quot; (see PS3.5-2008 7.8.1 p44)</span>
+    <span class="c1"># Some elements in _private_dict are explicit;</span>
+    <span class="c1"># most have &quot;xx&quot; for high-byte of element</span>
+    <span class="c1"># Try exact key first, but then try with &quot;xx&quot; in block position</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">dict_entry</span> <span class="o">=</span> <span class="n">private_dict</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span>
+    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+        <span class="c1">#  so here put in the &quot;xx&quot; in the block position for key to look up</span>
+        <span class="n">group_str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%04x</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">tag</span><span class="o">.</span><span class="n">group</span>
+        <span class="n">elem_str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%04x</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">tag</span><span class="o">.</span><span class="n">elem</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">xx</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">group_str</span><span class="p">,</span> <span class="n">elem_str</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:])</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">private_dict</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Tag </span><span class="si">{0}</span><span class="s2"> not in private dictionary &quot;</span>
+                   <span class="s2">&quot;for private creator </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">private_creator</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="n">dict_entry</span> <span class="o">=</span> <span class="n">private_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">dict_entry</span></div>
+
+
+<div class="viewcode-block" id="private_dictionary_VR"><a class="viewcode-back" href="../../api_ref.html#pydicom.datadict.private_dictionary_VR">[docs]</a><span class="k">def</span> <span class="nf">private_dictionary_VR</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">private_creator</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return the dicom value representation</span>
+<span class="sd">       for the given dicom tag.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">get_private_entry</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">private_creator</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="private_dictionary_VM"><a class="viewcode-back" href="../../api_ref.html#pydicom.datadict.private_dictionary_VM">[docs]</a><span class="k">def</span> <span class="nf">private_dictionary_VM</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">private_creator</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return the dicom value multiplicity</span>
+<span class="sd">       for the given dicom tag.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">get_private_entry</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">private_creator</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="private_dictionary_description"><a class="viewcode-back" href="../../api_ref.html#pydicom.datadict.private_dictionary_description">[docs]</a><span class="k">def</span> <span class="nf">private_dictionary_description</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">private_creator</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return the descriptive text</span>
+<span class="sd">       for the given dicom tag.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">get_private_entry</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">private_creator</span><span class="p">)[</span><span class="mi">2</span><span class="p">]</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2018, Darcy Mason and pydicom contributors.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'1.1.0',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
