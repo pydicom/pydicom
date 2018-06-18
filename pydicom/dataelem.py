@@ -304,8 +304,6 @@ class DataElement(object):
                     'US or SS or OW', 'US or SS']
         if (self.VR in byte_VRs and len(self.value) > self.maxBytesToDisplay):
             repVal = "Array of %d bytes" % len(self.value)
-        elif hasattr(self, 'original_string'):  # for VR of IS or DS
-            repVal = repr(self.original_string)
         elif isinstance(self.value, UID):
             repVal = self.value.name
         else:
