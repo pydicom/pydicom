@@ -111,6 +111,9 @@ class DA(date):
         else:
             return super(DA, self).__str__()
 
+    def __repr__(self):
+        return "\"" + str(self) + "\""
+
 
 class DT(datetime):
     """Store value for DICOM VR DT (DateTime) as datetime.datetime.
@@ -218,6 +221,9 @@ class DT(datetime):
         else:
             return super(DT, self).__str__()
 
+    def __repr__(self):
+        return "\"" + str(self) + "\""
+
 
 class TM(time):
     """Store value for DICOM VR of TM (Time) as datetime.time.
@@ -297,6 +303,9 @@ class TM(time):
             return self.original_string
         else:
             return super(TM, self).__str__()
+
+    def __repr__(self):
+        return "\"" + str(self) + "\""
 
 
 class DSfloat(float):
