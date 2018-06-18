@@ -1,0 +1,1027 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pydicom.valuerep &mdash; pydicom 1.1.0 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> pydicom
+          
+
+          
+            
+            <img src="../../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started with pydicom</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../pydicom_user_guide.html">Pydicom User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../pydicom_dev_guide.html">Pydicom Developer Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ref_guide.html">Reading and writing DICOM files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api_ref.html">Pydicom Complete API Reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">General examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#image-processing">Image processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#input-output">Input-output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../release-notes.html">Release history</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pydicom</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>pydicom.valuerep</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for pydicom.valuerep</h1><div class="highlight"><pre>
+<span></span><span class="c1"># valuerep.py</span>
+<span class="sd">&quot;&quot;&quot;Special classes for DICOM value representations (VR)&quot;&quot;&quot;</span>
+<span class="c1"># Copyright (c) 2008-2012 Darcy Mason</span>
+<span class="c1"># This file is part of pydicom, released under a modified MIT license.</span>
+<span class="c1">#    See the file LICENSE included with this distribution, also</span>
+<span class="c1">#    available at https://github.com/pydicom/pydicom</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="k">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">decimal</span> <span class="k">import</span> <span class="n">Decimal</span>
+<span class="kn">import</span> <span class="nn">re</span>
+
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">timedelta</span><span class="p">)</span>
+
+<span class="c1"># don&#39;t import datetime_conversion directly</span>
+<span class="kn">from</span> <span class="nn">pydicom</span> <span class="k">import</span> <span class="n">config</span>
+<span class="kn">from</span> <span class="nn">pydicom</span> <span class="k">import</span> <span class="n">compat</span>
+<span class="kn">from</span> <span class="nn">pydicom.multival</span> <span class="k">import</span> <span class="n">MultiValue</span>
+<span class="kn">from</span> <span class="nn">pydicom.util.fixes</span> <span class="k">import</span> <span class="n">timezone</span>
+
+<span class="c1"># can&#39;t import from charset or get circular import</span>
+<span class="n">default_encoding</span> <span class="o">=</span> <span class="s2">&quot;iso8859&quot;</span>
+
+<span class="c1"># For reading/writing data elements,</span>
+<span class="c1"># these ones have longer explicit VR format</span>
+<span class="c1"># Taken from PS3.5 Section 7.1.2</span>
+<span class="n">extra_length_VRs</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;OB&#39;</span><span class="p">,</span> <span class="s1">&#39;OD&#39;</span><span class="p">,</span> <span class="s1">&#39;OF&#39;</span><span class="p">,</span> <span class="s1">&#39;OL&#39;</span><span class="p">,</span> <span class="s1">&#39;OW&#39;</span><span class="p">,</span> <span class="s1">&#39;SQ&#39;</span><span class="p">,</span> <span class="s1">&#39;UC&#39;</span><span class="p">,</span> <span class="s1">&#39;UN&#39;</span><span class="p">,</span> <span class="s1">&#39;UR&#39;</span><span class="p">,</span> <span class="s1">&#39;UT&#39;</span><span class="p">)</span>
+
+<span class="c1"># VRs that can be affected by character repertoire</span>
+<span class="c1"># in (0008,0005) Specific Character Set</span>
+<span class="c1"># See PS-3.5 (2011), section 6.1.2 Graphic Characters</span>
+<span class="c1"># and PN, but it is handled separately.</span>
+<span class="n">text_VRs</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;SH&#39;</span><span class="p">,</span> <span class="s1">&#39;LO&#39;</span><span class="p">,</span> <span class="s1">&#39;ST&#39;</span><span class="p">,</span> <span class="s1">&#39;LT&#39;</span><span class="p">,</span> <span class="s1">&#39;UC&#39;</span><span class="p">,</span> <span class="s1">&#39;UR&#39;</span><span class="p">,</span> <span class="s1">&#39;UT&#39;</span><span class="p">)</span>
+
+<span class="n">match_string</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
+    <span class="sa">b</span><span class="s1">&#39;(?P&lt;single_byte&gt;&#39;</span><span class="p">,</span> <span class="sa">br</span><span class="s1">&#39;(?P&lt;family_name&gt;[^=\^]*)&#39;</span><span class="p">,</span>
+    <span class="sa">br</span><span class="s1">&#39;\^?(?P&lt;given_name&gt;[^=\^]*)&#39;</span><span class="p">,</span> <span class="sa">br</span><span class="s1">&#39;\^?(?P&lt;middle_name&gt;[^=\^]*)&#39;</span><span class="p">,</span>
+    <span class="sa">br</span><span class="s1">&#39;\^?(?P&lt;name_prefix&gt;[^=\^]*)&#39;</span><span class="p">,</span> <span class="sa">br</span><span class="s1">&#39;\^?(?P&lt;name_suffix&gt;[^=\^]*)&#39;</span><span class="p">,</span> <span class="sa">b</span><span class="s1">&#39;)&#39;</span><span class="p">,</span>
+    <span class="sa">b</span><span class="s1">&#39;=?(?P&lt;ideographic&gt;[^=]*)&#39;</span><span class="p">,</span> <span class="sa">b</span><span class="s1">&#39;=?(?P&lt;phonetic&gt;[^=]*)$&#39;</span>
+<span class="p">])</span>
+
+<span class="n">match_string_uni</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">match_string</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;iso8859&#39;</span><span class="p">))</span>
+<span class="n">match_string_bytes</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">match_string</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="DA"><a class="viewcode-back" href="../../api_ref.html#pydicom.valuerep.DA">[docs]</a><span class="k">class</span> <span class="nc">DA</span><span class="p">(</span><span class="n">date</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Store value for DICOM VR DA (Date) as datetime.date.</span>
+
+<span class="sd">    Note that the datetime.date base class is immutable.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;original_string&#39;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">((</span><span class="n">slot</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slot</span><span class="p">))</span> <span class="k">for</span> <span class="n">slot</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__slots__</span>
+                    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slot</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">slot</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">state</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slot</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__reduce__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">DA</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__reduce__</span><span class="p">()</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__getstate__</span><span class="p">(),</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__reduce_ex__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">protocol</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">DA</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__reduce__</span><span class="p">()</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__getstate__</span><span class="p">(),</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create an instance of DA object.</span>
+
+<span class="sd">        Raise an exception if the string cannot be parsed or the argument</span>
+<span class="sd">        is otherwise incompatible.</span>
+
+<span class="sd">        :param val: val must be a string conformant to the DA definition</span>
+<span class="sd">        in the DICOM Standard PS 3.5-2011</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">compat</span><span class="o">.</span><span class="n">string_types</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">==</span> <span class="mi">8</span><span class="p">:</span>
+                <span class="n">year</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">val</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">4</span><span class="p">])</span>
+                <span class="n">month</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">val</span><span class="p">[</span><span class="mi">4</span><span class="p">:</span><span class="mi">6</span><span class="p">])</span>
+                <span class="n">day</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">val</span><span class="p">[</span><span class="mi">6</span><span class="p">:</span><span class="mi">8</span><span class="p">])</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">DA</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">,</span> <span class="n">day</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">==</span> <span class="mi">10</span> <span class="ow">and</span> <span class="n">val</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;.&#39;</span> <span class="ow">and</span> <span class="n">val</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;.&#39;</span><span class="p">:</span>
+                <span class="c1"># ACR-NEMA Standard 300, predecessor to DICOM</span>
+                <span class="c1"># for compatibility with a few old pydicom example files</span>
+                <span class="n">year</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">val</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">4</span><span class="p">])</span>
+                <span class="n">month</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">val</span><span class="p">[</span><span class="mi">5</span><span class="p">:</span><span class="mi">7</span><span class="p">])</span>
+                <span class="n">day</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">val</span><span class="p">[</span><span class="mi">8</span><span class="p">:</span><span class="mi">10</span><span class="p">])</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">DA</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">,</span> <span class="n">day</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">val</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># empty date</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">val</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">DA</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cannot convert to datetime: &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span>
+                                     <span class="p">(</span><span class="n">val</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">date</span><span class="p">):</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">DA</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">val</span><span class="o">.</span><span class="n">year</span><span class="p">,</span> <span class="n">val</span><span class="o">.</span><span class="n">month</span><span class="p">,</span> <span class="n">val</span><span class="o">.</span><span class="n">day</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">DA</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">val</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">compat</span><span class="o">.</span><span class="n">string_types</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">original_string</span> <span class="o">=</span> <span class="n">val</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">DA</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="s1">&#39;original_string&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">original_string</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">original_string</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;original_string&#39;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">original_string</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">DA</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="DT"><a class="viewcode-back" href="../../api_ref.html#pydicom.valuerep.DT">[docs]</a><span class="k">class</span> <span class="nc">DT</span><span class="p">(</span><span class="n">datetime</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Store value for DICOM VR DT (DateTime) as datetime.datetime.</span>
+
+<span class="sd">    Note that the datetime.datetime base class is immutable.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;original_string&#39;</span><span class="p">]</span>
+    <span class="n">_regex_dt</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;((\d{4,14})(\.(\d{1,6}))?)([+-]\d</span><span class="si">{4}</span><span class="s2">)?&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">((</span><span class="n">slot</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slot</span><span class="p">))</span> <span class="k">for</span> <span class="n">slot</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__slots__</span>
+                    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slot</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">slot</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">state</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slot</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__reduce__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">DT</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__reduce__</span><span class="p">()</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__getstate__</span><span class="p">(),</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__reduce_ex__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">protocol</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">DT</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__reduce__</span><span class="p">()</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__getstate__</span><span class="p">(),</span> <span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_utc_offset</span><span class="p">(</span><span class="n">offset</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">timezone</span><span class="p">(</span><span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="n">offset</span><span class="p">),</span> <span class="n">name</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create an instance of DT object.</span>
+
+<span class="sd">        Raise an exception if the string cannot be parsed or the argument</span>
+<span class="sd">        is otherwise incompatible.</span>
+
+<span class="sd">        :param val: val must be a string conformant to the DT definition</span>
+<span class="sd">        in the DICOM Standard PS 3.5-2011</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">compat</span><span class="o">.</span><span class="n">string_types</span><span class="p">)):</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">DT</span><span class="o">.</span><span class="n">_regex_dt</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">match</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">26</span><span class="p">:</span>
+                <span class="n">dt_match</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+                <span class="n">year</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">dt_match</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">4</span><span class="p">])</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dt_match</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">6</span><span class="p">:</span>
+                    <span class="n">month</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">month</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">dt_match</span><span class="p">[</span><span class="mi">4</span><span class="p">:</span><span class="mi">6</span><span class="p">])</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dt_match</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">8</span><span class="p">:</span>
+                    <span class="n">day</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">day</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">dt_match</span><span class="p">[</span><span class="mi">6</span><span class="p">:</span><span class="mi">8</span><span class="p">])</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dt_match</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">:</span>
+                    <span class="n">hour</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">hour</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">dt_match</span><span class="p">[</span><span class="mi">8</span><span class="p">:</span><span class="mi">10</span><span class="p">])</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dt_match</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">12</span><span class="p">:</span>
+                    <span class="n">minute</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">minute</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">dt_match</span><span class="p">[</span><span class="mi">10</span><span class="p">:</span><span class="mi">12</span><span class="p">])</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dt_match</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">14</span><span class="p">:</span>
+                    <span class="n">second</span> <span class="o">=</span> <span class="mi">0</span>
+                    <span class="n">microsecond</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">second</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">dt_match</span><span class="p">[</span><span class="mi">12</span><span class="p">:</span><span class="mi">14</span><span class="p">])</span>
+                    <span class="n">ms_match</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">ms_match</span><span class="p">:</span>
+                        <span class="n">microsecond</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ms_match</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="s1">&#39;0&#39;</span><span class="p">))</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">microsecond</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">tz_match</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">tz_match</span><span class="p">:</span>
+                    <span class="n">offset1</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">tz_match</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">])</span> <span class="o">*</span> <span class="mi">60</span>
+                    <span class="n">offset2</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">tz_match</span><span class="p">[</span><span class="mi">3</span><span class="p">:</span><span class="mi">5</span><span class="p">])</span>
+                    <span class="n">offset</span> <span class="o">=</span> <span class="p">(</span><span class="n">offset1</span> <span class="o">+</span> <span class="n">offset2</span><span class="p">)</span> <span class="o">*</span> <span class="mi">60</span>
+                    <span class="k">if</span> <span class="n">tz_match</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;-&#39;</span><span class="p">:</span>
+                        <span class="n">offset</span> <span class="o">=</span> <span class="o">-</span><span class="n">offset</span>
+                    <span class="n">tzinfo</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_utc_offset</span><span class="p">(</span><span class="n">offset</span><span class="p">,</span> <span class="n">tz_match</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">tzinfo</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">DT</span><span class="p">,</span>
+                            <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">,</span> <span class="n">day</span><span class="p">,</span> <span class="n">hour</span><span class="p">,</span> <span class="n">minute</span><span class="p">,</span>
+                                         <span class="n">second</span><span class="p">,</span> <span class="n">microsecond</span><span class="p">,</span> <span class="n">tzinfo</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">val</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">DT</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cannot convert to datetime: &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span>
+                                     <span class="p">(</span><span class="n">val</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">datetime</span><span class="p">):</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">DT</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">val</span><span class="o">.</span><span class="n">year</span><span class="p">,</span> <span class="n">val</span><span class="o">.</span><span class="n">month</span><span class="p">,</span> <span class="n">val</span><span class="o">.</span><span class="n">day</span><span class="p">,</span>
+                                         <span class="n">val</span><span class="o">.</span><span class="n">hour</span><span class="p">,</span> <span class="n">val</span><span class="o">.</span><span class="n">minute</span><span class="p">,</span> <span class="n">val</span><span class="o">.</span><span class="n">second</span><span class="p">,</span>
+                                         <span class="n">val</span><span class="o">.</span><span class="n">microsecond</span><span class="p">,</span> <span class="n">val</span><span class="o">.</span><span class="n">tzinfo</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">DT</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">val</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">compat</span><span class="o">.</span><span class="n">string_types</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">original_string</span> <span class="o">=</span> <span class="n">val</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">DT</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="s1">&#39;original_string&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">original_string</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">original_string</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;original_string&#39;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">original_string</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">DT</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="TM"><a class="viewcode-back" href="../../api_ref.html#pydicom.valuerep.TM">[docs]</a><span class="k">class</span> <span class="nc">TM</span><span class="p">(</span><span class="n">time</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Store value for DICOM VR of TM (Time) as datetime.time.</span>
+
+<span class="sd">    Note that the datetime.time base class is immutable.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;original_string&#39;</span><span class="p">]</span>
+    <span class="n">_regex_tm</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;(\d{2,6})(\.(\d{1,6}))?&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">((</span><span class="n">slot</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slot</span><span class="p">))</span> <span class="k">for</span> <span class="n">slot</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__slots__</span>
+                    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slot</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">slot</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">state</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slot</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__reduce__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">TM</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__reduce__</span><span class="p">()</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__getstate__</span><span class="p">(),</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__reduce_ex__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">protocol</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">TM</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__reduce__</span><span class="p">()</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__getstate__</span><span class="p">(),</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create an instance of TM object from a string.</span>
+
+<span class="sd">        Raise an exception if the string cannot be parsed or the argument</span>
+<span class="sd">        is otherwise incompatible.</span>
+
+<span class="sd">        :param val: val must be a string conformant to the TM definition</span>
+<span class="sd">        in the DICOM Standard PS 3.5-2011</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">compat</span><span class="o">.</span><span class="n">string_types</span><span class="p">)):</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">TM</span><span class="o">.</span><span class="n">_regex_tm</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">match</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">16</span><span class="p">:</span>
+                <span class="n">tm_match</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">hour</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">tm_match</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">])</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tm_match</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">4</span><span class="p">:</span>
+                    <span class="n">minute</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">minute</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">tm_match</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">4</span><span class="p">])</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tm_match</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">6</span><span class="p">:</span>
+                    <span class="n">second</span> <span class="o">=</span> <span class="mi">0</span>
+                    <span class="n">microsecond</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">second</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">tm_match</span><span class="p">[</span><span class="mi">4</span><span class="p">:</span><span class="mi">6</span><span class="p">])</span>
+                    <span class="n">ms_match</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">ms_match</span><span class="p">:</span>
+                        <span class="n">microsecond</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ms_match</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="s1">&#39;0&#39;</span><span class="p">))</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">microsecond</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">TM</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">hour</span><span class="p">,</span> <span class="n">minute</span><span class="p">,</span> <span class="n">second</span><span class="p">,</span>
+                                             <span class="n">microsecond</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">val</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># empty time</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">val</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">TM</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cannot convert to datetime: &#39;</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">val</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">time</span><span class="p">):</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">TM</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">val</span><span class="o">.</span><span class="n">hour</span><span class="p">,</span> <span class="n">val</span><span class="o">.</span><span class="n">minute</span><span class="p">,</span> <span class="n">val</span><span class="o">.</span><span class="n">second</span><span class="p">,</span>
+                                         <span class="n">val</span><span class="o">.</span><span class="n">microsecond</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">TM</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">val</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">compat</span><span class="o">.</span><span class="n">string_types</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">original_string</span> <span class="o">=</span> <span class="n">val</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">TM</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="s1">&#39;original_string&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">original_string</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">original_string</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;original_string&#39;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">original_string</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">TM</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="DSfloat"><a class="viewcode-back" href="../../api_ref.html#pydicom.valuerep.DSfloat">[docs]</a><span class="k">class</span> <span class="nc">DSfloat</span><span class="p">(</span><span class="nb">float</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Store values for DICOM VR of DS (Decimal String) as a float.</span>
+
+<span class="sd">    If constructed from an empty string, return the empty string,</span>
+<span class="sd">    not an instance of this class.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;original_string&#39;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">((</span><span class="n">slot</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slot</span><span class="p">))</span> <span class="k">for</span> <span class="n">slot</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__slots__</span>
+                    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slot</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">slot</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">state</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slot</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Store the original string if one given, for exact write-out of same</span>
+<span class="sd">        value later.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># ... also if user changes a data element value, then will get</span>
+        <span class="c1"># a different object, because float is immutable.</span>
+
+        <span class="n">has_attribute</span> <span class="o">=</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="s1">&#39;original_string&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">compat</span><span class="o">.</span><span class="n">text_type</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">original_string</span> <span class="o">=</span> <span class="n">val</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="p">(</span><span class="n">DSfloat</span><span class="p">,</span> <span class="n">DSdecimal</span><span class="p">))</span> <span class="ow">and</span> <span class="n">has_attribute</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">original_string</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">original_string</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;original_string&#39;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">original_string</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">DSfloat</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\&quot;</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\&quot;</span><span class="s2">&quot;</span></div>
+
+
+<div class="viewcode-block" id="DSdecimal"><a class="viewcode-back" href="../../api_ref.html#pydicom.valuerep.DSdecimal">[docs]</a><span class="k">class</span> <span class="nc">DSdecimal</span><span class="p">(</span><span class="n">Decimal</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Store values for DICOM VR of DS (Decimal String).</span>
+<span class="sd">    Note: if constructed by an empty string, returns the empty string,</span>
+<span class="sd">    not an instance of this class.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;original_string&#39;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">((</span><span class="n">slot</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slot</span><span class="p">))</span> <span class="k">for</span> <span class="n">slot</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__slots__</span>
+                    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slot</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">slot</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">state</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slot</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create an instance of DS object, or return a blank string if one is</span>
+<span class="sd">        passed in, e.g. from a type 2 DICOM blank value.</span>
+
+<span class="sd">        :param val: val must be a string or a number type which can be</span>
+<span class="sd">                   converted to a decimal</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Store this value here so that if the input string is actually a valid</span>
+        <span class="c1"># string but decimal.Decimal transforms it to an invalid string it will</span>
+        <span class="c1"># still be initialized properly</span>
+        <span class="n">enforce_length</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">enforce_valid_values</span>
+        <span class="c1"># DICOM allows spaces around the string,</span>
+        <span class="c1"># but python doesn&#39;t, so clean it</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">compat</span><span class="o">.</span><span class="n">text_type</span><span class="p">)):</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="c1"># If the input string is actually invalid that we relax the valid</span>
+            <span class="c1"># value constraint for this particular instance</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">16</span><span class="p">:</span>
+                <span class="n">enforce_length</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">val</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">val</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">config</span><span class="o">.</span><span class="n">allow_DS_float</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;DS cannot be instantiated with a float value, &quot;</span>
+                   <span class="s2">&quot;unless config.allow_DS_float is set to True. &quot;</span>
+                   <span class="s2">&quot;It is recommended to convert to a string instead, &quot;</span>
+                   <span class="s2">&quot;with the desired number of digits, or use &quot;</span>
+                   <span class="s2">&quot;Decimal.quantize and pass a Decimal instance.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">Decimal</span><span class="p">):</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">DSdecimal</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">16</span> <span class="ow">and</span> <span class="n">enforce_length</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;DS value representation must be &lt;= 16 &quot;</span>
+                   <span class="s2">&quot;characters by DICOM standard. Initialize with &quot;</span>
+                   <span class="s2">&quot;a smaller string, or set config.enforce_valid_values &quot;</span>
+                   <span class="s2">&quot;to False to override, or use Decimal.quantize() and &quot;</span>
+                   <span class="s2">&quot;initialize with a Decimal instance.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">OverflowError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">val</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Store the original string if one given, for exact write-out of same</span>
+<span class="sd">        value later. E.g. if set &#39;1.23e2&#39;, Decimal would write &#39;123&#39;, but DS</span>
+<span class="sd">        will use the original</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># ... also if user changes a data element value, then will get</span>
+        <span class="c1"># a different Decimal, as Decimal is immutable.</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">compat</span><span class="o">.</span><span class="n">text_type</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">original_string</span> <span class="o">=</span> <span class="n">val</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="p">(</span><span class="n">DSfloat</span><span class="p">,</span> <span class="n">DSdecimal</span><span class="p">))</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="s1">&#39;original_string&#39;</span><span class="p">):</span>  <span class="c1"># noqa</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">original_string</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">original_string</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;original_string&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">original_string</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">16</span><span class="p">:</span>  <span class="c1"># noqa</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">original_string</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">DSdecimal</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\&quot;</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\&quot;</span><span class="s2">&quot;</span></div>
+
+
+<span class="c1"># CHOOSE TYPE OF DS</span>
+<span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">use_DS_decimal</span><span class="p">:</span>
+    <span class="n">DSclass</span> <span class="o">=</span> <span class="n">DSdecimal</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">DSclass</span> <span class="o">=</span> <span class="n">DSfloat</span>
+
+
+<div class="viewcode-block" id="DS"><a class="viewcode-back" href="../../api_ref.html#pydicom.valuerep.DS">[docs]</a><span class="k">def</span> <span class="nf">DS</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Factory function for creating DS class instances.</span>
+<span class="sd">    Checks for blank string; if so, return that.</span>
+<span class="sd">    Else calls DSfloat or DSdecimal to create the class</span>
+<span class="sd">    instance. This avoids overriding __new__ in DSfloat</span>
+<span class="sd">    (which carries a time penalty for large arrays of DS).</span>
+<span class="sd">    Similarly the string clean and check can be avoided</span>
+<span class="sd">    and DSfloat called directly if a string has already</span>
+<span class="sd">    been processed.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">compat</span><span class="o">.</span><span class="n">text_type</span><span class="p">)):</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">val</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span> <span class="ow">or</span> <span class="n">val</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s1">&#39;&#39;</span>
+    <span class="k">return</span> <span class="n">DSclass</span><span class="p">(</span><span class="n">val</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="IS"><a class="viewcode-back" href="../../api_ref.html#pydicom.valuerep.IS">[docs]</a><span class="k">class</span> <span class="nc">IS</span><span class="p">(</span><span class="nb">int</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Derived class of int. Stores original integer</span>
+<span class="sd">    string for exact rewriting</span>
+<span class="sd">    of the string originally read or stored.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">compat</span><span class="o">.</span><span class="n">in_py2</span><span class="p">:</span>
+        <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;original_string&#39;</span><span class="p">]</span>
+
+        <span class="c1"># Unlikely that str(int) will not be the</span>
+        <span class="c1"># same as the original, but could happen</span>
+        <span class="c1"># with leading zeros.</span>
+
+        <span class="k">def</span> <span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">dict</span><span class="p">((</span><span class="n">slot</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slot</span><span class="p">))</span> <span class="k">for</span> <span class="n">slot</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__slots__</span>
+                        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slot</span><span class="p">))</span>
+
+        <span class="k">def</span> <span class="nf">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">slot</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">state</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slot</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create instance if new integer string&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">compat</span><span class="o">.</span><span class="n">text_type</span><span class="p">))</span> <span class="ow">and</span> <span class="n">val</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;&#39;</span>
+        <span class="c1"># Overflow error in Python 2 for integers too large</span>
+        <span class="c1"># while calling super(IS). Fall back on the regular int</span>
+        <span class="c1"># casting that will automatically convert the val to long</span>
+        <span class="c1"># if needed.</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">newval</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">IS</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">OverflowError</span><span class="p">:</span>
+            <span class="n">newval</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+        <span class="c1"># check if a float or Decimal passed in, then could have lost info,</span>
+        <span class="c1"># and will raise error. E.g. IS(Decimal(&#39;1&#39;)) is ok, but not IS(1.23)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">Decimal</span><span class="p">))</span> <span class="ow">and</span> <span class="n">newval</span> <span class="o">!=</span> <span class="n">val</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Could not convert value to integer without loss&quot;</span><span class="p">)</span>
+        <span class="c1"># Checks in case underlying int is &gt;32 bits, DICOM does not allow this</span>
+        <span class="n">check_newval</span> <span class="o">=</span> <span class="p">(</span><span class="n">newval</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">2</span><span class="o">**</span><span class="mi">31</span> <span class="ow">or</span> <span class="n">newval</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="o">**</span><span class="mi">31</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">check_newval</span> <span class="ow">and</span> <span class="n">config</span><span class="o">.</span><span class="n">enforce_valid_values</span><span class="p">:</span>
+            <span class="n">dcm_limit</span> <span class="o">=</span> <span class="s2">&quot;-2**31 to (2**31 - 1) for IS&quot;</span>
+            <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;Value exceeds DICOM limits of </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">dcm_limit</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">OverflowError</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">newval</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="c1"># If a string passed, then store it</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">compat</span><span class="o">.</span><span class="n">text_type</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">original_string</span> <span class="o">=</span> <span class="n">val</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">IS</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="s1">&#39;original_string&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">original_string</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">original_string</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;original_string&#39;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="s2">&quot;&#39;&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">original_string</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\&quot;</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="nb">int</span><span class="o">.</span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\&quot;</span><span class="s2">&quot;</span></div>
+
+
+<div class="viewcode-block" id="MultiString"><a class="viewcode-back" href="../../api_ref.html#pydicom.valuerep.MultiString">[docs]</a><span class="k">def</span> <span class="nf">MultiString</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">valtype</span><span class="o">=</span><span class="nb">str</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Split a bytestring by delimiters if there are any</span>
+
+<span class="sd">    val -- DICOM bytestring to split up</span>
+<span class="sd">    valtype -- default str, but can be e.g.</span>
+<span class="sd">    UID to overwrite to a specific type</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Remove trailing blank used to pad to even length</span>
+    <span class="c1"># 2005.05.25: also check for trailing 0, error made</span>
+    <span class="c1"># in PET files we are converting</span>
+
+    <span class="k">if</span> <span class="n">val</span> <span class="ow">and</span> <span class="p">(</span><span class="n">val</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">val</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">&#39;</span><span class="p">)):</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="n">val</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">splitup</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">splitup</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="n">splitup</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">valtype</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="k">if</span> <span class="n">val</span> <span class="k">else</span> <span class="n">val</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">MultiValue</span><span class="p">(</span><span class="n">valtype</span><span class="p">,</span> <span class="n">splitup</span><span class="p">)</span></div>
+
+
+<span class="k">class</span> <span class="nc">PersonName3</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">encodings</span><span class="o">=</span><span class="n">default_encoding</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">PersonName3</span><span class="p">):</span>
+            <span class="n">encodings</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">encodings</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">original_string</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">original_string</span> <span class="o">=</span> <span class="n">val</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">encodings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verify_encodings</span><span class="p">(</span><span class="n">encodings</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
+            <span class="n">matchstr</span> <span class="o">=</span> <span class="n">match_string_bytes</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">matchstr</span> <span class="o">=</span> <span class="n">match_string_uni</span>
+
+        <span class="n">matchobj</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">matchstr</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">matchobj</span><span class="o">.</span><span class="n">groupdict</span><span class="p">())</span>
+
+        <span class="n">groups</span> <span class="o">=</span> <span class="n">matchobj</span><span class="o">.</span><span class="n">groups</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">components</span> <span class="o">=</span> <span class="p">[</span><span class="n">groups</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)]</span>
+
+    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">original_string</span> <span class="o">==</span> <span class="n">other</span>
+
+    <span class="k">def</span> <span class="nf">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span> <span class="o">==</span> <span class="n">other</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">original_string</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">original_string</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">()</span>
+
+    <span class="c1"># For python 3, any override of __cmp__ or __eq__</span>
+    <span class="c1"># immutable requires explicit redirect of hash</span>
+    <span class="c1"># function to the parent class See</span>
+    <span class="c1"># See http://docs.python.org/</span>
+    <span class="c1">#  dev/3.0/reference/datamodel.html#object.__hash__</span>
+    <span class="fm">__hash__</span> <span class="o">=</span> <span class="nb">object</span><span class="o">.</span><span class="fm">__hash__</span>
+
+    <span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">encodings</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">encodings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verify_encodings</span><span class="p">(</span><span class="n">encodings</span><span class="p">)</span>
+
+        <span class="kn">from</span> <span class="nn">pydicom.charset</span> <span class="k">import</span> <span class="n">clean_escseq</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">bytes</span><span class="p">):</span>
+            <span class="n">comps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">components</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">comps</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">clean_escseq</span><span class="p">(</span><span class="n">comp</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">enc</span><span class="p">),</span> <span class="n">encodings</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">comp</span><span class="p">,</span> <span class="n">enc</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">,</span> <span class="n">encodings</span><span class="p">)</span>
+            <span class="p">]</span>
+
+        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">comps</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">comps</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="n">comps</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">PersonName3</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">comps</span><span class="p">),</span> <span class="n">encodings</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">encodings</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">encodings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verify_encodings</span><span class="p">(</span><span class="n">encodings</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">bytes</span><span class="p">):</span>
+            <span class="n">comps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">components</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">comps</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">C</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">enc</span><span class="p">)</span> <span class="k">for</span> <span class="n">C</span><span class="p">,</span> <span class="n">enc</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">,</span> <span class="n">encodings</span><span class="p">)</span>
+            <span class="p">]</span>
+
+        <span class="c1"># Remove empty elements from the end</span>
+        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">comps</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">comps</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="n">comps</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="sa">b</span><span class="s1">&#39;=&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">comps</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">family_comma_given</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">formatted</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%(family_name)s</span><span class="s1">, </span><span class="si">%(given_name)s</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">formatted</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">format_str</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">original_string</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">format_str</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">default_encoding</span><span class="p">)</span><span class="o">.</span><span class="vm">__dict__</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">format_str</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span>
+
+    <span class="k">def</span> <span class="nf">_verify_encodings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">encodings</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">encodings</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">encodings</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">encodings</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">encodings</span> <span class="o">=</span> <span class="p">[</span><span class="n">encodings</span><span class="p">]</span> <span class="o">*</span> <span class="mi">3</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">encodings</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">encodings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">encodings</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">encodings</span>
+
+
+<div class="viewcode-block" id="PersonNameBase"><a class="viewcode-back" href="../../api_ref.html#pydicom.valuerep.PersonNameBase">[docs]</a><span class="k">class</span> <span class="nc">PersonNameBase</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Base class for Person Name classes&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize the PN properties&quot;&quot;&quot;</span>
+        <span class="c1"># Note normally use __new__ on subclassing an immutable,</span>
+        <span class="c1"># but here we just want to do some pre-processing</span>
+        <span class="c1"># for properties PS 3.5-2008 section 6.2 (p.28)</span>
+        <span class="c1"># and 6.2.1 describes PN. Briefly:</span>
+        <span class="c1"># single-byte-characters=ideographic</span>
+        <span class="c1"># characters=phonetic-characters</span>
+        <span class="c1"># (each with?):</span>
+        <span class="c1">#   family-name-complex</span>
+        <span class="c1">#  ^Given-name-complex</span>
+        <span class="c1">#  ^Middle-name^name-prefix^name-suffix</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parse</span><span class="p">()</span>
+
+<div class="viewcode-block" id="PersonNameBase.formatted"><a class="viewcode-back" href="../../api_ref.html#pydicom.valuerep.PersonNameBase.formatted">[docs]</a>    <span class="k">def</span> <span class="nf">formatted</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">format_str</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a formatted string according to the format pattern</span>
+
+<span class="sd">        Use &quot;...%(property)...%(property)...&quot; where property</span>
+<span class="sd">        is one of family_name, given_name,</span>
+<span class="sd">                  middle_name, name_prefix,</span>
+<span class="sd">                  name_suffix</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">format_str</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span></div>
+
+<div class="viewcode-block" id="PersonNameBase.parse"><a class="viewcode-back" href="../../api_ref.html#pydicom.valuerep.PersonNameBase.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Break down the components and name parts&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">components</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">)</span>
+        <span class="n">nComponents</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">single_byte</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ideographic</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">phonetic</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">nComponents</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ideographic</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">nComponents</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">phonetic</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">single_byte</span><span class="p">:</span>
+            <span class="c1"># in case missing trailing items are left out</span>
+            <span class="n">name_string</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">single_byte</span> <span class="o">+</span> <span class="s2">&quot;^^^^&quot;</span>
+            <span class="n">parts</span> <span class="o">=</span> <span class="n">name_string</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;^&quot;</span><span class="p">)[:</span><span class="mi">5</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">family_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">given_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">middle_name</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">name_prefix</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name_suffix</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="mi">3</span><span class="p">:]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">family_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">given_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">middle_name</span><span class="p">,</span>
+             <span class="bp">self</span><span class="o">.</span><span class="n">name_prefix</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name_suffix</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="PersonName"><a class="viewcode-back" href="../../api_ref.html#pydicom.valuerep.PersonName">[docs]</a><span class="k">class</span> <span class="nc">PersonName</span><span class="p">(</span><span class="n">PersonNameBase</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Human-friendly class to hold VR of Person Name (PN)</span>
+
+<span class="sd">    Name is parsed into the following properties:</span>
+<span class="sd">    single-byte, ideographic, and phonetic components</span>
+<span class="sd">    (PS3.5-2008 6.2.1)</span>
+<span class="sd">    family_name,</span>
+<span class="sd">    given_name,</span>
+<span class="sd">    middle_name,</span>
+<span class="sd">    name_prefix,</span>
+<span class="sd">    name_suffix</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return instance of the new class&quot;&quot;&quot;</span>
+        <span class="c1"># Check if trying to convert a string that has already been converted</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">PersonName</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">val</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">PersonName</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+
+<div class="viewcode-block" id="PersonName.encode"><a class="viewcode-back" href="../../api_ref.html#pydicom.valuerep.PersonName.encode">[docs]</a>    <span class="k">def</span> <span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Dummy method to mimic py2 str behavior in py3 bytes subclass&quot;&quot;&quot;</span>
+        <span class="c1"># This greatly simplifies the write process so all objects have the</span>
+        <span class="c1"># &quot;encode&quot; method</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="PersonName.family_comma_given"><a class="viewcode-back" href="../../api_ref.html#pydicom.valuerep.PersonName.family_comma_given">[docs]</a>    <span class="k">def</span> <span class="nf">family_comma_given</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return name as &#39;Family-name, Given-name&#39;&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">formatted</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%(family_name)s</span><span class="s2">, </span><span class="si">%(given_name)s</span><span class="s2">&quot;</span><span class="p">)</span></div></div>
+
+    <span class="c1"># def __str__(self):</span>
+    <span class="c1"># return str(self.byte_string)</span>
+    <span class="c1"># XXX need to process the ideographic or phonetic components?</span>
+    <span class="c1"># def __len__(self):</span>
+    <span class="c1"># return len(self.byte_string)</span>
+
+
+<div class="viewcode-block" id="PersonNameUnicode"><a class="viewcode-back" href="../../api_ref.html#pydicom.valuerep.PersonNameUnicode">[docs]</a><span class="k">class</span> <span class="nc">PersonNameUnicode</span><span class="p">(</span><span class="n">PersonNameBase</span><span class="p">,</span> <span class="n">compat</span><span class="o">.</span><span class="n">text_type</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Unicode version of Person Name&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">encodings</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return unicode string after conversion of each part</span>
+<span class="sd">        val -- the PN value to store</span>
+<span class="sd">        encodings -- a list of python encodings, generally found</span>
+<span class="sd">                 from pydicom.charset.python_encodings mapping</span>
+<span class="sd">                 of values in DICOM data element (0008,0005).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># in here to avoid circular import</span>
+        <span class="kn">from</span> <span class="nn">pydicom.charset</span> <span class="k">import</span> <span class="n">clean_escseq</span>
+
+        <span class="c1"># Make the possible three character encodings explicit:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">encodings</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">encodings</span> <span class="o">=</span> <span class="p">[</span><span class="n">encodings</span><span class="p">]</span> <span class="o">*</span> <span class="mi">3</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">encodings</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">encodings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">encodings</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">components</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;=&quot;</span><span class="p">)</span>
+        <span class="c1"># Remove the first encoding if only one component is present</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">components</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="k">del</span> <span class="n">encodings</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">comps</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">clean_escseq</span><span class="p">(</span><span class="n">C</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">enc</span><span class="p">),</span> <span class="n">encodings</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">C</span><span class="p">,</span> <span class="n">enc</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">components</span><span class="p">,</span> <span class="n">encodings</span><span class="p">)</span>
+        <span class="p">]</span>
+        <span class="n">new_val</span> <span class="o">=</span> <span class="sa">u</span><span class="s2">&quot;=&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">comps</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">compat</span><span class="o">.</span><span class="n">text_type</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">new_val</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">encodings</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encodings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verify_encodings</span><span class="p">(</span><span class="n">encodings</span><span class="p">)</span>
+        <span class="n">PersonNameBase</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__copy__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Correctly copy object.</span>
+<span class="sd">        Needed because of the overwritten __new__.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># no need to use the original encoding here - we just encode and</span>
+        <span class="c1"># decode in utf-8 and set the original encoding later</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">compat</span><span class="o">.</span><span class="n">text_type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf8&#39;</span><span class="p">)</span>
+        <span class="n">new_person</span> <span class="o">=</span> <span class="n">PersonNameUnicode</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;utf8&#39;</span><span class="p">)</span>
+        <span class="n">new_person</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">new_person</span>
+
+    <span class="k">def</span> <span class="nf">__deepcopy__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">memo</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Make correctly a deep copy of the object.</span>
+<span class="sd">        Needed because of the overwritten __new__.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">compat</span><span class="o">.</span><span class="n">text_type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf8&#39;</span><span class="p">)</span>
+        <span class="n">new_person</span> <span class="o">=</span> <span class="n">PersonNameUnicode</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;utf8&#39;</span><span class="p">)</span>
+        <span class="n">memo</span><span class="p">[</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">)]</span> <span class="o">=</span> <span class="n">new_person</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="n">new_person</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">memo</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">new_person</span>
+
+    <span class="k">def</span> <span class="nf">_verify_encodings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">encodings</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Checks the encoding to ensure proper format&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">encodings</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">encodings</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">encodings</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">encodings</span> <span class="o">=</span> <span class="p">[</span><span class="n">encodings</span><span class="p">]</span> <span class="o">*</span> <span class="mi">3</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">encodings</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">encodings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">encodings</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">encodings</span>
+
+<div class="viewcode-block" id="PersonNameUnicode.encode"><a class="viewcode-back" href="../../api_ref.html#pydicom.valuerep.PersonNameUnicode.encode">[docs]</a>    <span class="k">def</span> <span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">encodings</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Encode the unicode using the specified encoding&quot;&quot;&quot;</span>
+        <span class="n">encodings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verify_encodings</span><span class="p">(</span><span class="n">encodings</span><span class="p">)</span>
+
+        <span class="n">components</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">)</span>
+
+        <span class="n">comps</span> <span class="o">=</span> <span class="p">[</span><span class="n">C</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">enc</span><span class="p">)</span> <span class="k">for</span> <span class="n">C</span><span class="p">,</span> <span class="n">enc</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">components</span><span class="p">,</span> <span class="n">encodings</span><span class="p">)]</span>
+
+        <span class="c1"># Remove empty elements from the end</span>
+        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">comps</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">comps</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="n">comps</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="s1">&#39;=&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">comps</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PersonNameUnicode.family_comma_given"><a class="viewcode-back" href="../../api_ref.html#pydicom.valuerep.PersonNameUnicode.family_comma_given">[docs]</a>    <span class="k">def</span> <span class="nf">family_comma_given</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return name as &#39;Family-name, Given-name&#39;&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">formatted</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%(family_name)u</span><span class="s2">, </span><span class="si">%(given_name)u</span><span class="s2">&quot;</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2018, Darcy Mason and pydicom contributors.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'1.1.0',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

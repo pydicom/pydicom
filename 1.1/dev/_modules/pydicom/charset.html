@@ -1,0 +1,400 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pydicom.charset &mdash; pydicom 1.1.0 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> pydicom
+          
+
+          
+            
+            <img src="../../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started with pydicom</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../pydicom_user_guide.html">Pydicom User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../pydicom_dev_guide.html">Pydicom Developer Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ref_guide.html">Reading and writing DICOM files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api_ref.html">Pydicom Complete API Reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">General examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#image-processing">Image processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#input-output">Input-output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../release-notes.html">Release history</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pydicom</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>pydicom.charset</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for pydicom.charset</h1><div class="highlight"><pre>
+<span></span><span class="c1"># charset.py</span>
+<span class="sd">&quot;&quot;&quot;Handle alternate character sets for character strings.&quot;&quot;&quot;</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright (c) 2008-2012 Darcy Mason</span>
+<span class="c1"># This file is part of pydicom, released under a modified MIT license.</span>
+<span class="c1">#    See the file LICENSE included with this distribution, also</span>
+<span class="c1">#    available at https://github.com/pydicom/pydicom</span>
+<span class="c1">#</span>
+
+<span class="kn">from</span> <span class="nn">pydicom</span> <span class="k">import</span> <span class="n">compat</span>
+<span class="kn">from</span> <span class="nn">pydicom.valuerep</span> <span class="k">import</span> <span class="n">PersonNameUnicode</span><span class="p">,</span> <span class="n">text_VRs</span>
+<span class="kn">from</span> <span class="nn">pydicom.compat</span> <span class="k">import</span> <span class="n">in_py2</span>
+
+<span class="c1"># Map DICOM Specific Character Set to python equivalent</span>
+<span class="n">python_encoding</span> <span class="o">=</span> <span class="p">{</span>
+
+    <span class="c1"># default character set for DICOM</span>
+    <span class="s1">&#39;&#39;</span><span class="p">:</span> <span class="s1">&#39;iso8859&#39;</span><span class="p">,</span>
+
+    <span class="c1"># alias for latin_1 too (iso_ir_6 exists as an alias to &#39;ascii&#39;)</span>
+    <span class="s1">&#39;ISO_IR 6&#39;</span><span class="p">:</span> <span class="s1">&#39;iso8859&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ISO_IR 13&#39;</span><span class="p">:</span> <span class="s1">&#39;shift_jis&#39;</span><span class="p">,</span>
+
+    <span class="c1"># these also have iso_ir_1XX aliases in python 2.7</span>
+    <span class="s1">&#39;ISO_IR 100&#39;</span><span class="p">:</span> <span class="s1">&#39;latin_1&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ISO_IR 101&#39;</span><span class="p">:</span> <span class="s1">&#39;iso8859_2&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ISO_IR 109&#39;</span><span class="p">:</span> <span class="s1">&#39;iso8859_3&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ISO_IR 110&#39;</span><span class="p">:</span> <span class="s1">&#39;iso8859_4&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ISO_IR 126&#39;</span><span class="p">:</span> <span class="s1">&#39;iso_ir_126&#39;</span><span class="p">,</span>  <span class="c1"># Greek</span>
+    <span class="s1">&#39;ISO_IR 127&#39;</span><span class="p">:</span> <span class="s1">&#39;iso_ir_127&#39;</span><span class="p">,</span>  <span class="c1"># Arabic</span>
+    <span class="s1">&#39;ISO_IR 138&#39;</span><span class="p">:</span> <span class="s1">&#39;iso_ir_138&#39;</span><span class="p">,</span>  <span class="c1"># Hebrew</span>
+    <span class="s1">&#39;ISO_IR 144&#39;</span><span class="p">:</span> <span class="s1">&#39;iso_ir_144&#39;</span><span class="p">,</span>  <span class="c1"># Russian</span>
+    <span class="s1">&#39;ISO_IR 148&#39;</span><span class="p">:</span> <span class="s1">&#39;iso_ir_148&#39;</span><span class="p">,</span>  <span class="c1"># Turkish</span>
+    <span class="s1">&#39;ISO_IR 166&#39;</span><span class="p">:</span> <span class="s1">&#39;iso_ir_166&#39;</span><span class="p">,</span>  <span class="c1"># Thai</span>
+    <span class="s1">&#39;ISO 2022 IR 6&#39;</span><span class="p">:</span> <span class="s1">&#39;iso8859&#39;</span><span class="p">,</span>  <span class="c1"># alias for latin_1 too</span>
+    <span class="s1">&#39;ISO 2022 IR 13&#39;</span><span class="p">:</span> <span class="s1">&#39;shift_jis&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ISO 2022 IR 87&#39;</span><span class="p">:</span> <span class="s1">&#39;iso2022_jp&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ISO 2022 IR 100&#39;</span><span class="p">:</span> <span class="s1">&#39;latin_1&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ISO 2022 IR 101&#39;</span><span class="p">:</span> <span class="s1">&#39;iso8859_2&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ISO 2022 IR 109&#39;</span><span class="p">:</span> <span class="s1">&#39;iso8859_3&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ISO 2022 IR 110&#39;</span><span class="p">:</span> <span class="s1">&#39;iso8859_4&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ISO 2022 IR 126&#39;</span><span class="p">:</span> <span class="s1">&#39;iso_ir_126&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ISO 2022 IR 127&#39;</span><span class="p">:</span> <span class="s1">&#39;iso_ir_127&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ISO 2022 IR 138&#39;</span><span class="p">:</span> <span class="s1">&#39;iso_ir_138&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ISO 2022 IR 144&#39;</span><span class="p">:</span> <span class="s1">&#39;iso_ir_144&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ISO 2022 IR 148&#39;</span><span class="p">:</span> <span class="s1">&#39;iso_ir_148&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ISO 2022 IR 149&#39;</span><span class="p">:</span> <span class="s1">&#39;euc_kr&#39;</span><span class="p">,</span>  <span class="c1"># needs cleanup via clean_escseq()</span>
+    <span class="s1">&#39;ISO 2022 IR 159&#39;</span><span class="p">:</span> <span class="s1">&#39;iso-2022-jp&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ISO 2022 IR 166&#39;</span><span class="p">:</span> <span class="s1">&#39;iso_ir_166&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ISO 2022 IR 58&#39;</span><span class="p">:</span> <span class="s1">&#39;iso_ir_58&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ISO_IR 192&#39;</span><span class="p">:</span> <span class="s1">&#39;UTF8&#39;</span><span class="p">,</span>  <span class="c1"># from Chinese example, 2008 PS3.5 Annex J p1-4</span>
+    <span class="s1">&#39;GB18030&#39;</span><span class="p">:</span> <span class="s1">&#39;GB18030&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ISO 2022 GBK&#39;</span><span class="p">:</span> <span class="s1">&#39;GBK&#39;</span><span class="p">,</span>  <span class="c1"># from DICOM correction CP1234</span>
+    <span class="s1">&#39;ISO 2022 58&#39;</span><span class="p">:</span> <span class="s1">&#39;GB2312&#39;</span><span class="p">,</span>  <span class="c1"># from DICOM correction CP1234</span>
+    <span class="s1">&#39;GBK&#39;</span><span class="p">:</span> <span class="s1">&#39;GBK&#39;</span><span class="p">,</span>  <span class="c1"># from DICOM correction CP1234</span>
+<span class="p">}</span>
+
+<span class="n">default_encoding</span> <span class="o">=</span> <span class="s2">&quot;iso8859&quot;</span>
+
+
+<div class="viewcode-block" id="clean_escseq"><a class="viewcode-back" href="../../api_ref.html#pydicom.charset.clean_escseq">[docs]</a><span class="k">def</span> <span class="nf">clean_escseq</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="n">encodings</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Remove escape sequences that Python does not remove from</span>
+<span class="sd">       Korean encoding ISO 2022 IR 149 due to the G1 code element.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="s1">&#39;euc_kr&#39;</span> <span class="ow">in</span> <span class="n">encodings</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">element</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\x1b\x24\x29\x43</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
+            <span class="s2">&quot;</span><span class="se">\x1b\x28\x42</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">element</span></div>
+
+
+<span class="c1"># DICOM PS3.5-2008 6.1.1 (p 18) says:</span>
+<span class="c1">#   default is ISO-IR 6 G0, equiv to common chr set of ISO 8859 (PS3.5 6.1.2.1)</span>
+<span class="c1">#    (0008,0005)  value 1 can *replace* the default encoding...</span>
+<span class="c1">#           for VRs of SH, LO, ST, LT, PN and UT (PS3.5 6.1.2.3)...</span>
+<span class="c1">#           with a single-byte character encoding</span>
+<span class="c1">#  if (0008,0005) is multi-valued, then value 1 (or default if blank)...</span>
+<span class="c1">#           is used until code extension escape sequence is hit,</span>
+<span class="c1">#          which can be at start of string, or after CR/LF, FF, or</span>
+<span class="c1">#          in Person Name PN, after ^ or =</span>
+<span class="c1"># NOTE also that 7.5.3 SEQUENCE INHERITANCE states that if (0008,0005)</span>
+<span class="c1">#       is not present in a sequence item then it is inherited from its parent.</span>
+
+
+<div class="viewcode-block" id="convert_encodings"><a class="viewcode-back" href="../../api_ref.html#pydicom.charset.convert_encodings">[docs]</a><span class="k">def</span> <span class="nf">convert_encodings</span><span class="p">(</span><span class="n">encodings</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Converts DICOM encodings into corresponding python encodings&quot;&quot;&quot;</span>
+
+    <span class="c1"># If a list if passed, we don&#39;t want to modify the list in place so copy it</span>
+    <span class="n">encodings</span> <span class="o">=</span> <span class="n">encodings</span><span class="p">[:]</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">encodings</span><span class="p">,</span> <span class="n">compat</span><span class="o">.</span><span class="n">string_types</span><span class="p">):</span>
+        <span class="n">encodings</span> <span class="o">=</span> <span class="p">[</span><span class="n">encodings</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="ow">not</span> <span class="n">encodings</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+        <span class="n">encodings</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;ISO_IR 6&#39;</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">encodings</span> <span class="o">=</span> <span class="p">[</span><span class="n">python_encoding</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">encodings</span><span class="p">]</span>
+
+    <span class="c1"># Assume that it is already the python encoding</span>
+    <span class="c1"># (is there a way to check this?)</span>
+    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+        <span class="k">pass</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">encodings</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">encodings</span> <span class="o">=</span> <span class="p">[</span><span class="n">encodings</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">*</span> <span class="mi">3</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">encodings</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">encodings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">encodings</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">encodings</span></div>
+
+
+<div class="viewcode-block" id="decode"><a class="viewcode-back" href="../../api_ref.html#pydicom.charset.decode">[docs]</a><span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="n">data_element</span><span class="p">,</span> <span class="n">dicom_character_set</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Apply the DICOM character encoding to the data element</span>
+
+<span class="sd">    data_element -- DataElement instance containing a value to convert</span>
+<span class="sd">    dicom_character_set -- the value of Specific Character Set (0008,0005),</span>
+<span class="sd">                    which may be a single value,</span>
+<span class="sd">                    a multiple value (code extension), or</span>
+<span class="sd">                    may also be &#39;&#39; or None.</span>
+<span class="sd">                    If blank or None, ISO_IR 6 is used.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">dicom_character_set</span><span class="p">:</span>
+        <span class="n">dicom_character_set</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ISO_IR 6&#39;</span><span class="p">]</span>
+
+    <span class="n">encodings</span> <span class="o">=</span> <span class="n">convert_encodings</span><span class="p">(</span><span class="n">dicom_character_set</span><span class="p">)</span>
+
+    <span class="c1"># decode the string value to unicode</span>
+    <span class="c1"># PN is special case as may have 3 components with differenct chr sets</span>
+    <span class="k">if</span> <span class="n">data_element</span><span class="o">.</span><span class="n">VR</span> <span class="o">==</span> <span class="s2">&quot;PN&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">in_py2</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">data_element</span><span class="o">.</span><span class="n">VM</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">data_element</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">data_element</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">encodings</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">data_element</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="n">val</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">encodings</span><span class="p">)</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">data_element</span><span class="o">.</span><span class="n">value</span>
+                <span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">data_element</span><span class="o">.</span><span class="n">VM</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">data_element</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">PersonNameUnicode</span><span class="p">(</span><span class="n">data_element</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                                                       <span class="n">encodings</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">data_element</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="n">PersonNameUnicode</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">encodings</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">data_element</span><span class="o">.</span><span class="n">value</span>
+                <span class="p">]</span>
+    <span class="k">if</span> <span class="n">data_element</span><span class="o">.</span><span class="n">VR</span> <span class="ow">in</span> <span class="n">text_VRs</span><span class="p">:</span>
+        <span class="c1"># Remove the first encoding if this is a multi-byte encoding</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">encodings</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">del</span> <span class="n">encodings</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># You can&#39;t re-decode unicode (string literals in py3)</span>
+        <span class="k">if</span> <span class="n">data_element</span><span class="o">.</span><span class="n">VM</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data_element</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">compat</span><span class="o">.</span><span class="n">text_type</span><span class="p">):</span>
+                <span class="k">return</span>
+            <span class="n">data_element</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">clean_escseq</span><span class="p">(</span>
+                <span class="n">data_element</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">encodings</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">encodings</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+
+            <span class="n">output</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+            <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">data_element</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">compat</span><span class="o">.</span><span class="n">text_type</span><span class="p">):</span>
+                    <span class="n">output</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">output</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="n">clean_escseq</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">encodings</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">encodings</span><span class="p">))</span>
+
+            <span class="n">data_element</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">output</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2018, Darcy Mason and pydicom contributors.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'1.1.0',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
