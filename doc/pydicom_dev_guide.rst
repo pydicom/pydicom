@@ -7,22 +7,16 @@ Pydicom Developer Guide
 Release guideline
 -----------------
 
-Bumpversion
+Version change
 -----------
 
-When you want to release, you can use ``bumpversion`` to update the version
-across the library::
+When you want to release, edit ``_version.py`` to change ``__version__`` to major.minor.0 (e.g. 1.2.0)
 
-  bumpversion release  # Move from 1.0.0.dev0 to 1.0.0
-
-Then, you can commit this change and refer to the section :ref:`git_github` to
+Commit this change and refer to the section :ref:`git_github` to
 create a branch and a release.
 
-Once the release is created, you need to turn to a new development version::
-
-  bumpversion minor # Move from 1.0.0 to 1.1.0.dev0
-
-Once this is done, you can commit and push to master.
+Once the release is created, update the version again in ``_version.py`` to ``major.new-minor.0.dev0``,
+and commit and push to master.
 
 .. _git_github:
 
@@ -58,13 +52,11 @@ documentation of the ``master`` branch.
 PyPi build
 ----------
 
-The package can be built for different platforms::
+The package can be built as a universal wheel (universal is specified in setup.cfg)::
   
-  python setup.py bdist_wininst
-  python setup.py sdist
-  python setup.py bdist_wheel --universal
+  python setup.py bdist_wheel
 
-Then, the different builds can be uploaded to PyPi.  This has to be done by the package owner on PyPi.
+Then the package owner on PyPi can upload to pypi.
 Best practice is to use twine, and to upload to the *Test* PyPi server for initial testing::
 
   twine upload --repository-url https://test.pypi.org/legacy/ dist/*
