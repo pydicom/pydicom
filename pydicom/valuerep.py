@@ -503,7 +503,7 @@ class IS(int):
 
     def __repr__(self):
         if hasattr(self, 'original_string'):
-            return "'" + self.original_string + "'"
+            return "\"" + self.original_string + "\""
         else:
             return "\"" + int.__str__(self) + "\""
 
