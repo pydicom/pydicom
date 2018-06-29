@@ -302,10 +302,17 @@ class DataElement(object):
     @property
     def repval(self):
         """Return a str representation of the element's `value`."""
-        byte_VRs = ['OB', 'OW', 'OW/OB', 'OW or OB', 'OB or OW',
-                    'US or SS or OW', 'US or SS']
-        if (self.VR in byte_VRs and len(self.value) > self.maxBytesToDisplay):
-            repVal = "Array of %d bytes" % len(self.value)
+        long_VRs = {"OB", "OD", "OF", "OW", "UN", "UT"}
+        if set(self.VR.split(" or ")) & long_VRs:
+            try:
+                length = len(self.value)
+            except TypeError:
+                pass
+            else:
+                if length > self.maxBytesToDisplay:
+                    return "Array of %d elements" % length
+        if self.VM > self.maxBytesToDisplay:
+            repVal = "Array of %d elements" % self.VM
         elif isinstance(self.value, UID):
             repVal = self.value.name
         else:

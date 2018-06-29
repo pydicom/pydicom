@@ -138,30 +138,22 @@ class DatasetTests(unittest.TestCase):
         # messages
         ds = Dataset()
         ds.PatientID = "123456"  # Valid value
-        ds.SmallestImagePixelValue = 0  # Invalid value
+        ds.SmallestImagePixelValue = BadRepr()  # Invalid value
 
-        if compat.in_PyPy:
-            expected_msg = ("With tag (0028, 0106) got exception: "
-                            "'int' has no length")
-        else:
-            expected_msg = ("With tag (0028, 0106) got exception: "
-                            "object of type 'int' has no len()")
+        expected_msg = ("With tag (0028, 0106) got exception: "
+                        "bad repr")
 
-        self.failUnlessExceptionArgs(expected_msg, TypeError, lambda: str(ds))
+        self.failUnlessExceptionArgs(expected_msg, ValueError, lambda: str(ds))
 
     def testTagExceptionWalk(self):
         # When recursing through dataset, a tag number should appear in
         # error messages
         ds = Dataset()
         ds.PatientID = "123456"  # Valid value
-        ds.SmallestImagePixelValue = 0  # Invalid value
+        ds.SmallestImagePixelValue = BadRepr()  # Invalid value
 
-        if compat.in_PyPy:
-            expected_msg = ("With tag (0028, 0106) got exception: "
-                            "'int' has no length")
-        else:
-            expected_msg = ("With tag (0028, 0106) got exception: "
-                            "object of type 'int' has no len()")
+        expected_msg = ("With tag (0028, 0106) got exception: "
+                        "bad repr")
 
         def callback(dataset, data_element):
             return str(data_element)
@@ -169,7 +161,7 @@ class DatasetTests(unittest.TestCase):
         def func(dataset=ds):
             return dataset.walk(callback)
 
-        self.failUnlessExceptionArgs(expected_msg, TypeError, func)
+        self.failUnlessExceptionArgs(expected_msg, ValueError, func)
 
     def dummy_dataset(self):
         # This dataset is used by many of the tests
@@ -1526,3 +1518,8 @@ class FileDatasetTests(unittest.TestCase):
         di = dict()
         expected_diff = {'__class__', '__doc__', '__hash__'}
         assert expected_diff == set(dir(di)) - set(dir(ds))
+
+
+class BadRepr(object):
+    def __repr__(self):
+        raise ValueError("bad repr")
