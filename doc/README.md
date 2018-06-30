@@ -1,6 +1,8 @@
 # Docs with Sphinx
 
-This documentation will be automatically built and generated with continuous integration, via the [circle.yml](../circle.yml). You can also generate them locally by installing dependencies (you may need the below):
+This documentation will be automatically built and generated with continuous
+ integration, via the [circle.yml](../.circleci/config.yml). You can also 
+ generate them locally by installing dependencies (you may need the below):
 
 ```
 pip install Sphinx==1.4

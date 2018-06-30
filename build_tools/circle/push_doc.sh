@@ -2,7 +2,7 @@
 # This script is meant to be called in the "deploy" step defined in
 # circle.yml. See https://circleci.com/docs/ for more details.
 # The behavior of the script is controlled by environment variable defined
-# in the circle.yml in the top level folder of the project.
+# in the circle.yml in the .circleci folder of the project.
 
 if [ "$CIRCLE_BRANCH" = "master" ]
 then
