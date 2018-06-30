@@ -39,6 +39,13 @@ matrix:
     - env: DISTRIB="conda" PYTHON_VERSION="3.6" NUMPY=true  PILLOW=true  JPEG2000=false JPEG_LS=true  GDCM=false
     - env: DISTRIB="conda" PYTHON_VERSION="3.6" NUMPY=true  PILLOW=true  JPEG2000=false JPEG_LS=true  GDCM=true
 
+    - env: DISTRIB="conda" PYTHON_VERSION="3.7" NUMPY=false PILLOW=false JPEG2000=false JPEG_LS=false GDCM=false
+    - env: DISTRIB="conda" PYTHON_VERSION="3.7" NUMPY=true  PILLOW=false JPEG2000=false JPEG_LS=false GDCM=false
+    - env: DISTRIB="conda" PYTHON_VERSION="3.7" NUMPY=true  PILLOW=false JPEG2000=false JPEG_LS=false GDCM=true
+    - env: DISTRIB="conda" PYTHON_VERSION="3.7" NUMPY=true  PILLOW=true  JPEG2000=false JPEG_LS=false GDCM=false
+    - env: DISTRIB="conda" PYTHON_VERSION="3.7" NUMPY=true  PILLOW=true  JPEG2000=false JPEG_LS=true  GDCM=false
+    - env: DISTRIB="conda" PYTHON_VERSION="3.7" NUMPY=true  PILLOW=true  JPEG2000=false JPEG_LS=true  GDCM=true
+
     - env: DISTRIB="pypy" PYTHON_VERSION="2.7" NUMPY=false
     - env: DISTRIB="pypy" PYTHON_VERSION="2.7" NUMPY=true
     - env: DISTRIB="pypy" PYTHON_VERSION="3.5" NUMPY=false
