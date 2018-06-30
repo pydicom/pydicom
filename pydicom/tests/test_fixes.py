@@ -12,7 +12,10 @@ from datetime import datetime
 from datetime import timedelta
 from datetime import tzinfo
 
+import pytest
+
 import pydicom as pydicom_module
+from pydicom import compat
 from pydicom.util.fixes import timezone
 
 pickle_choices = [(pickle, pickle, proto)
@@ -82,6 +85,8 @@ class USTimeZone(tzinfo):
 Eastern = USTimeZone(-5, "Eastern",  "EST", "EDT")
 
 
+@pytest.mark.skipif(not compat.in_py2,
+                    reason='only test the backport to Python 2')
 class TestTimeZone(unittest.TestCase):
     """Backport of datetime.timezone tests.
 
