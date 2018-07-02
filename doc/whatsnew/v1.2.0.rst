@@ -1,0 +1,11 @@
+Version 1.2.0
+=================================
+
+Changelog
+---------
+
+Fixes
+.....
+
+* Removed unused ``original_string`` attribute from the ``DataElement`` class
+  (:pull_request:`660`)

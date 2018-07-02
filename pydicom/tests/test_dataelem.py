@@ -299,13 +299,6 @@ class DataElementTests(unittest.TestCase):
         elem[0].PatientID = '1234'
         assert repr(elem) == repr(elem.value)
 
-    def test_repval_original_string(self):
-        """Test DataElement.repval when original_string is present"""
-        elem = DataElement(0x00100010, 'PN', 'ANON')
-        elem.original_string = 'foo'
-        assert "(0010, 0010) Patient's Name" in str(elem)
-        assert "PN: 'foo'" in str(elem)
-
     @unittest.skipIf(sys.version_info >= (3, ), 'Testing Python 2 behavior')
     def test_unicode(self):
         """Test unicode representation of the DataElement"""
