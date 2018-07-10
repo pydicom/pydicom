@@ -820,19 +820,23 @@ class Dataset(dict):
                     last_exception = e
                     continue
             if not successfully_read_pixel_data:
-                handlers_tried = " ".join(
-                    [str(x) for x in pydicom.config.image_handlers])
-                logger.info("%s did not support this transfer syntax",
-                            handlers_tried)
-                self._pixel_array = None
-                self._pixel_id = None
-                if last_exception:
-                    raise last_exception
-                else:
-                    msg = ("No available image handler could "
-                           "decode this transfer syntax {}".format(
-                               self.file_meta.TransferSyntaxUID.name))
-                    raise NotImplementedError(msg)
+				if self.PixelData.find('PADDING') > 0:
+                    self.PixelData = self.PixelData[0:len(self.PixelData) - 15] + self.PixelData[len(self.PixelData) - 2:len(self.PixelData)]
+                    self.convert_pixel_data()
+				else:
+					handlers_tried = " ".join(
+						[str(x) for x in pydicom.config.image_handlers])
+					logger.info("%s did not support this transfer syntax",
+								handlers_tried)
+					self._pixel_array = None
+					self._pixel_id = None
+					if last_exception:
+						raise last_exception
+					else:
+						msg = ("No available image handler could "
+							   "decode this transfer syntax {}".format(
+								   self.file_meta.TransferSyntaxUID.name))
+						raise NotImplementedError(msg)
             # is this guaranteed to work if memory is re-used??
             self._pixel_id = id(self.PixelData)
 
