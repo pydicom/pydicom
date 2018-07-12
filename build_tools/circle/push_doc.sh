@@ -33,6 +33,7 @@ then
   cd $DOC_REPO
   git config core.sparsecheckout true
   echo $dir > .git/info/sparse-checkout
+  git fetch origin gh-pages
   git checkout gh-pages
   git reset --hard origin/gh-pages
   git rm -rf $dir/ && rm -rf $dir/
