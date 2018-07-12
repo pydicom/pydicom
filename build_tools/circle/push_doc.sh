@@ -26,7 +26,32 @@ then
 
   MSG="Pushing the docs to $dir/ for branch: $CIRCLE_BRANCH, commit $CIRCLE_SHA1"
 
+  cd $HOME
+  if [ ! -d $DOC_REPO ];
+  then git clone --depth 1 --no-checkout "git@github.com:"$ORGANIZATION"/"$DOC_REPO".git";
+  fi
+  cd $DOC_REPO
+  git config core.sparseCheckout true
+  echo $dir > .git/info/sparse-checkout
+  git checkout gh-pages
+  git reset --hard origin/gh-pages
+  git rm -rf $dir/ && rm -rf $dir/
+  cp -R $HOME/pydicom/doc/_build/html $dir
+  git config --global user.email $EMAIL
+  git config --global user.name $USERNAME
+  git config --global push.default matching
+  git add -f $dir/
+  git commit -m "$MSG" $dir
 
+  echo $MSG
+  git push origin gh-pages
+
+  echo "Done"
+
+else
+  # We run the git stuff (except the push) to check that it would've worked
+  echo "Testing git clone and commit (but not push) for $CIRCLE_BRANCH"
+  dir=test_git
 
   cd $HOME
   if [ ! -d $DOC_REPO ];
@@ -44,10 +69,6 @@ then
   git config --global push.default matching
   git add -f $dir/
   git commit -m "$MSG" $dir
-  git push origin gh-pages
 
-  echo $MSG
-
-else
-  echo Not pushing ${CIRCLE_BRANCH}
+  echo "Test complete, changes NOT pushed"
 fi
