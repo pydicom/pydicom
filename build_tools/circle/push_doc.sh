@@ -69,7 +69,6 @@ else
   git config --global user.email $EMAIL
   git config --global user.name $USERNAME
   git config --global push.default matching
-  git diff
   git add -f $dir/
   git commit -m "Commit test" $dir
 
