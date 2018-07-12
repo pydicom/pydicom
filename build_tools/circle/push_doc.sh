@@ -65,8 +65,9 @@ else
   echo Initial contents of gh-pages: $(ls)
   git reset --hard origin/gh-pages
   git rm -rf $dir/ && rm -rf $dir/
-  echo $(ls $HOME)
-  cp -R $HOME/project/pydicom/doc/_build/html $dir
+  echo $(ls $HOME/project)
+  echo $(ls $HOME/pydicom)
+  cp -R $HOME/project/doc/_build/html $dir
   git config --global user.email $EMAIL
   git config --global user.name $USERNAME
   git config --global push.default matching
