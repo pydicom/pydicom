@@ -12,7 +12,7 @@ if [ -z ${HOME+x} ]; then echo "HOME is unset"; fi
 if [ -z ${EMAIL+x} ]; then echo "EMAIL is unset"; fi
 if [ -z ${USERNAME+x} ]; then echo "USERNAME is unset"; fi
 
-if [ "$CIRCLE_BRANCH" =~ ^master$|^[0-9]+\.[0-9]+\.X$ ]
+if [[ "$CIRCLE_BRANCH" =~ ^master$|^[0-9]+\.[0-9]+\.X$ ]]
 then
   echo Pushing $CIRCLE_BRANCH to gh-pages branch...
 
