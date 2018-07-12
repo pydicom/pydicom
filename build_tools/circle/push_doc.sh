@@ -55,12 +55,14 @@ else
 
   cd $HOME
   if [ ! -d $DOC_REPO ];
-  then git clone --depth 1 --no-checkout "git@github.com:"$ORGANIZATION"/"$DOC_REPO".git";
+  then git clone "git@github.com:"$ORGANIZATION"/"$DOC_REPO".git";
   fi
   cd $DOC_REPO
-  git config core.sparseCheckout true
+  git config core.sparsecheckout true
   echo $dir > .git/info/sparse-checkout
+  git fetch origin gh-pages
   git checkout gh-pages
+  echo Initial contents of gh-pages: $(ls)
   git reset --hard origin/gh-pages
   git rm -rf $dir/ && rm -rf $dir/
   cp -R $HOME/pydicom/doc/_build/html $dir
@@ -69,6 +71,7 @@ else
   git config --global push.default matching
   git add -f $dir/
   git commit -m "$MSG" $dir
+  echo Final contents of gh-pages: $(ls)
 
   echo "Test complete, changes NOT pushed"
 fi
