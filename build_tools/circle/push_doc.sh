@@ -51,7 +51,7 @@ then
 else
   # We run the git stuff (except the push) to check that it would've worked
   echo "Testing git clone and commit (but not push) for $CIRCLE_BRANCH"
-  dir=test_git
+  dir=dev
 
   cd $HOME
   if [ ! -d $DOC_REPO ];
