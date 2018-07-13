@@ -53,7 +53,6 @@ function git_fetch_commit {
 # Test that the vars have been set
 if [ -z ${CIRCLE_BRANCH+x} ]; then echo "CIRCLE_BRANCH is unset"; fi
 if [ -z ${CIRCLE_SHA1+x} ]; then echo "CIRCLE_SHA1 is unset"; fi
-if [ -z ${CIRCLE_WORKING_DIRECTORY+x} ]; then echo "CIRCLE_WORKING_DIRECTORY is unset"; fi
 if [ -z ${CIRCLE_REPOSITORY_URL+x} ]; then echo "CIRCLE_REPOSITORY_URL is unset"; fi
 if [ -z ${CIRCLE_PROJECT_REPONAME+x} ]; then echo "CIRCLE_PROJECT_REPONAME is unset"; fi
 if [ -z ${HOME+x} ]; then echo "HOME is unset"; fi
