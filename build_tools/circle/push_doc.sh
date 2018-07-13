@@ -26,7 +26,7 @@ function git_fetch_commit {
     # Test to see if $HOME/pydicom exists, if not then clone it from the repo
     #   with CicleCI v2.0 this will always be the case
     cd $HOME
-    if [ ! -d $CIRCLE_PROJECT_REPONAME ];
+    if [ ! -d $CIRCLE_PROJECT_REPONAME ]
     then
         # Because this will be a new clone we can't use --depth 1 if we want
         #   to fetch/checkout gh-pages
@@ -68,16 +68,16 @@ then
     # Changes are made to dev/ directory
     DIR=dev
     git_fetch_commit
-    git push origin gh-pages
+    #git push origin gh-pages
     echo "Push complete"
-else if [[ "$CIRCLE_BRANCH" =~ ^[0-9]+\.[0-9]+\.X$ ]]
+elif [[ "$CIRCLE_BRANCH" =~ ^[0-9]+\.[0-9]+\.X$ ]]
 then
     # build of release, matches branch name against 0.1.X, 91.235.X, etc
     echo "Performing commit and push to $CIRCLE_PROJECT_REPONAME/gh-pages for $CIRCLE_BRANCH"
     # Strip off .X from branch name, so changes will go to 0.1/, 91.235/, etc
     DIR="${CIRCLE_BRANCH::-2}"
     git_fetch_commit
-    git push origin gh-pages
+    #git push origin gh-pages
     echo "Push complete"
 else
     # build pull release, should be regex ^pull\/[0-9]+$ but lets run against
