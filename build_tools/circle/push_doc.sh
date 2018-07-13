@@ -42,7 +42,7 @@ function git_fetch_commit {
     git reset --hard origin/gh-pages
     # Remove the existing document subdirectory and copy across the current version
     git rm -rf $DIR/ && rm -rf $DIR/
-    cp -R $CIRCLE_WORKING_DIRECTORY/doc/_build/html $DIR
+    cp -R $HOME/project/doc/_build/html $DIR
     git config --global user.email $EMAIL
     git config --global user.name $USERNAME
     git config --global push.default matching
