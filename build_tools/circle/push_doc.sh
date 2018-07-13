@@ -1,44 +1,35 @@
 #!/bin/bash
-# This script is meant to be called in the "deploy" step defined in
-# circle.yml. See https://circleci.com/docs/ for more details.
-# The behavior of the script is controlled by environment variable defined
-# in the circle.yml in the .circleci folder of the project.
+
+# This script is meant to be called in the "deploy" step defined
+# in .circleci/config.yml. See https://circleci.com/docs/2.0 for more details.
 
 # We have three possibily workflows:
 #   If the git branch is 'master' then we want to commit and merge the dev/
 #       docs on gh-pages
-#   If the git branch is [0-9].[0.9]. (i.e. 0.9, 1.0, 1.0, 1.2) then we want to
-#       commit and merge the major.minor/ docs on gh-pages
+#   If the git branch is [0-9].[0.9].X (i.e. 0.9.X, 1.0.X, 1.2.X, 41.21.X) then
+#        we want to commit and merge the major.minor/ docs on gh-pages
 #   If the git branch is anything else then we just want to test that committing
-#       the changes works so that problems can be debugged without needing to merge
-#       to master
+#       the changes works so that any issues can be debugged
 
 function git_fetch_commit {
-    # Clone the pydicom repo, the checkout gh-pages, update the $DIR directory
+    # Clone the pydicom repo, then checkout gh-pages, update the $DIR directory
     #   by deleting existing content and copying the most recent version from the
     #   $CIRCLE_BRANCH, then commit the changes with message $MSG
     MSG="Updating the docs in $DIR/ for branch: $CIRCLE_BRANCH, commit $CIRCLE_SHA1"
 
     # CircleCI version 2.0 builds the project in $HOME/project, i.e.:
     #   /home/circleci/project/pydicom/dataset.py
-    # note the base directory for the repo is 'project' not 'pydicom'
-    # DOC_REPO is set by the circle yaml file (currently 'pydicom')
+    #   note the base directory for the repo is 'project' not 'pydicom'
+
     # Test to see if $HOME/pydicom exists, if not then clone it from the repo
-    #   with CicleCI v2.0 this will always be the case
+    #   with CircleCI v2.0 it will always be the case that we need to clone
     cd $HOME
     if [ ! -d $CIRCLE_PROJECT_REPONAME ]
     then
-        # Because this will be a new clone we can't use --depth 1 if we want
-        #   to fetch/checkout gh-pages
-        git clone $CIRCLE_REPOSITORY_URL
+        git clone -b gh-pages --single-branch $CIRCLE_REPOSITORY_URL
     fi
 
     cd $CIRCLE_PROJECT_REPONAME
-    # We use sparecheckout to only checkout the directory we want to change
-    git config core.sparsecheckout true
-    echo $DIR > .git/info/sparse-checkout
-    git fetch origin gh-pages
-    git checkout gh-pages
     git reset --hard origin/gh-pages
     # Remove the existing document subdirectory and copy across the current version
     git rm -rf $DIR/ && rm -rf $DIR/
