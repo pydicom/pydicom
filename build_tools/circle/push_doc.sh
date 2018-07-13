@@ -67,7 +67,7 @@ then
     # Changes are made to dev/ directory
     DIR=dev
     git_fetch_commit
-    #git push origin gh-pages
+    git push origin gh-pages
     echo "Push complete"
 elif [[ "$CIRCLE_BRANCH" =~ ^[0-9]+\.[0-9]+\.X$ ]]
 then
@@ -76,7 +76,7 @@ then
     # Strip off .X from branch name, so changes will go to 0.1/, 91.235/, etc
     DIR="${CIRCLE_BRANCH::-2}"
     git_fetch_commit
-    #git push origin gh-pages
+    git push origin gh-pages
     echo "Push complete"
 else
     # build pull release, should be regex ^pull\/[0-9]+$ but lets run against
