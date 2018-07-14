@@ -39,9 +39,4 @@ jobs:
 
       - deploy:
           name: Deploy documentation
-          command: |
-            if [[ "${CIRCLE_BRANCH}" =~ ^master$|^[0-9]+\.[0-9]+\.X$ ]]; then
-              bash ./build_tools/circle/push_doc.sh
-            else
-              echo Not pushing ${CIRCLE_BRANCH}
-            fi
+          command: ./build_tools/circle/push_doc.sh
