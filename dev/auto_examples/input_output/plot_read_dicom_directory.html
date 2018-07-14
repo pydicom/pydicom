@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Read DICOM directory &mdash; pydicom 1.1.0 documentation</title>
+  <title>Read DICOM directory &mdash; pydicom 1.2.0.dev0 documentation</title>
   
 
   
@@ -65,7 +65,7 @@
             
             
               <div class="version">
-                1.1.0
+                1.2.0.dev0
               </div>
             
           
@@ -96,7 +96,6 @@
 <p class="caption"><span class="caption-text">Documentation</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../pydicom_user_guide.html">Pydicom User Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../pydicom_dev_guide.html">Pydicom Developer Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ref_guide.html">Reading and writing DICOM files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../api_ref.html">Pydicom Complete API Reference</a></li>
 </ul>
@@ -191,27 +190,27 @@
 <span id="sphx-glr-auto-examples-input-output-plot-read-dicom-directory-py"></span><h1>Read DICOM directory<a class="headerlink" href="#read-dicom-directory" title="Permalink to this headline">¶</a></h1>
 <p>This example shows how to read DICOM directory.</p>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Path to the DICOM directory: /home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/DICOMDIR
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Path to the DICOM directory: /home/circleci/project/pydicom/data/test_files/dicomdirtests/DICOMDIR
     Study 2: 20010101: XR C Spine Comp Min 4 Views
         Series 1: CR: N/A (1 image)
             Reading images...
 
             Image filenames:
-             [&#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/77654033/CR1/6154&#39;]
+             [           &#39;/home/circleci/project/pydicom/data/test_files/dicomdirtests/77654033/CR1/6154&#39;]
             Patient Names in images..: {&#39;Doe^Archibald&#39;}
             Patient IDs in images..: {&#39;77654033&#39;}
         Series 2: CR: N/A (1 image)
             Reading images...
 
             Image filenames:
-             [&#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/77654033/CR2/6247&#39;]
+             [           &#39;/home/circleci/project/pydicom/data/test_files/dicomdirtests/77654033/CR2/6247&#39;]
             Patient Names in images..: {&#39;Doe^Archibald&#39;}
             Patient IDs in images..: {&#39;77654033&#39;}
         Series 3: CR: N/A (1 image)
             Reading images...
 
             Image filenames:
-             [&#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/77654033/CR3/6278&#39;]
+             [           &#39;/home/circleci/project/pydicom/data/test_files/dicomdirtests/77654033/CR3/6278&#39;]
             Patient Names in images..: {&#39;Doe^Archibald&#39;}
             Patient IDs in images..: {&#39;77654033&#39;}
     Study 2: 19950903: CT, HEAD/BRAIN WO CONTRAST
@@ -219,10 +218,10 @@
             Reading images...
 
             Image filenames:
-             [           &#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/77654033/CT2/17106&#39;,
-            &#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/77654033/CT2/17136&#39;,
-            &#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/77654033/CT2/17166&#39;,
-            &#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/77654033/CT2/17196&#39;]
+             [           &#39;/home/circleci/project/pydicom/data/test_files/dicomdirtests/77654033/CT2/17106&#39;,
+            &#39;/home/circleci/project/pydicom/data/test_files/dicomdirtests/77654033/CT2/17136&#39;,
+            &#39;/home/circleci/project/pydicom/data/test_files/dicomdirtests/77654033/CT2/17166&#39;,
+            &#39;/home/circleci/project/pydicom/data/test_files/dicomdirtests/77654033/CT2/17196&#39;]
             Patient Names in images..: {&#39;Doe^Archibald&#39;, &#39;Doe^Archibald&#39;, &#39;Doe^Archibald&#39;, &#39;Doe^Archibald&#39;}
             Patient IDs in images..: {&#39;77654033&#39;}
     Study 2: 20010101:
@@ -230,19 +229,19 @@
             Reading images...
 
             Image filenames:
-             [           &#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892001/CT2N/6293&#39;,
-            &#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892001/CT2N/6924&#39;]
+             [           &#39;/home/circleci/project/pydicom/data/test_files/dicomdirtests/98892001/CT2N/6293&#39;,
+            &#39;/home/circleci/project/pydicom/data/test_files/dicomdirtests/98892001/CT2N/6924&#39;]
             Patient Names in images..: {&#39;Doe^Peter&#39;, &#39;Doe^Peter&#39;}
             Patient IDs in images..: {&#39;98890234&#39;}
         Series 5: CT: N/A (5 images)
             Reading images...
 
             Image filenames:
-             [           &#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892001/CT5N/2062&#39;,
-            &#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892001/CT5N/2392&#39;,
-            &#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892001/CT5N/2693&#39;,
-            &#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892001/CT5N/3023&#39;,
-            &#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892001/CT5N/3353&#39;]
+             [           &#39;/home/circleci/project/pydicom/data/test_files/dicomdirtests/98892001/CT5N/2062&#39;,
+            &#39;/home/circleci/project/pydicom/data/test_files/dicomdirtests/98892001/CT5N/2392&#39;,
+            &#39;/home/circleci/project/pydicom/data/test_files/dicomdirtests/98892001/CT5N/2693&#39;,
+            &#39;/home/circleci/project/pydicom/data/test_files/dicomdirtests/98892001/CT5N/3023&#39;,
+            &#39;/home/circleci/project/pydicom/data/test_files/dicomdirtests/98892001/CT5N/3353&#39;]
             Patient Names in images..: {&#39;Doe^Peter&#39;, &#39;Doe^Peter&#39;, &#39;Doe^Peter&#39;, &#39;Doe^Peter&#39;, &#39;Doe^Peter&#39;}
             Patient IDs in images..: {&#39;98890234&#39;}
     Study 428: 20030505: Carotids
@@ -250,14 +249,14 @@
             Reading images...
 
             Image filenames:
-             [           &#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892003/MR1/15820&#39;]
+             [           &#39;/home/circleci/project/pydicom/data/test_files/dicomdirtests/98892003/MR1/15820&#39;]
             Patient Names in images..: {&#39;Doe^Peter&#39;}
             Patient IDs in images..: {&#39;98890234&#39;}
         Series 2: MR: N/A (1 image)
             Reading images...
 
             Image filenames:
-             [           &#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892003/MR2/15970&#39;]
+             [           &#39;/home/circleci/project/pydicom/data/test_files/dicomdirtests/98892003/MR2/15970&#39;]
             Patient Names in images..: {&#39;Doe^Peter&#39;}
             Patient IDs in images..: {&#39;98890234&#39;}
     Study 134: 20030505: Brain
@@ -265,16 +264,16 @@
             Reading images...
 
             Image filenames:
-             [&#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892003/MR1/4919&#39;]
+             [           &#39;/home/circleci/project/pydicom/data/test_files/dicomdirtests/98892003/MR1/4919&#39;]
             Patient Names in images..: {&#39;Doe^Peter&#39;}
             Patient IDs in images..: {&#39;98890234&#39;}
         Series 2: MR: N/A (3 images)
             Reading images...
 
             Image filenames:
-             [           &#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892003/MR2/4950&#39;,
-            &#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892003/MR2/5011&#39;,
-            &#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892003/MR2/4981&#39;]
+             [           &#39;/home/circleci/project/pydicom/data/test_files/dicomdirtests/98892003/MR2/4950&#39;,
+            &#39;/home/circleci/project/pydicom/data/test_files/dicomdirtests/98892003/MR2/5011&#39;,
+            &#39;/home/circleci/project/pydicom/data/test_files/dicomdirtests/98892003/MR2/4981&#39;]
             Patient Names in images..: {&#39;Doe^Peter&#39;, &#39;Doe^Peter&#39;, &#39;Doe^Peter&#39;}
             Patient IDs in images..: {&#39;98890234&#39;}
     Study 2: 20030505: Brain-MRA
@@ -282,29 +281,29 @@
             Reading images...
 
             Image filenames:
-             [&#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892003/MR1/5641&#39;]
+             [           &#39;/home/circleci/project/pydicom/data/test_files/dicomdirtests/98892003/MR1/5641&#39;]
             Patient Names in images..: {&#39;Doe^Peter&#39;}
             Patient IDs in images..: {&#39;98890234&#39;}
         Series 2: MR: N/A (3 images)
             Reading images...
 
             Image filenames:
-             [           &#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892003/MR2/6935&#39;,
-            &#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892003/MR2/6605&#39;,
-            &#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892003/MR2/6273&#39;]
+             [           &#39;/home/circleci/project/pydicom/data/test_files/dicomdirtests/98892003/MR2/6935&#39;,
+            &#39;/home/circleci/project/pydicom/data/test_files/dicomdirtests/98892003/MR2/6605&#39;,
+            &#39;/home/circleci/project/pydicom/data/test_files/dicomdirtests/98892003/MR2/6273&#39;]
             Patient Names in images..: {&#39;Doe^Peter&#39;, &#39;Doe^Peter&#39;, &#39;Doe^Peter&#39;}
             Patient IDs in images..: {&#39;98890234&#39;}
         Series 700: MR: N/A (7 images)
             Reading images...
 
             Image filenames:
-             [           &#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892003/MR700/4558&#39;,
-            &#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892003/MR700/4528&#39;,
-            &#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892003/MR700/4588&#39;,
-            &#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892003/MR700/4467&#39;,
-            &#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892003/MR700/4618&#39;,
-            &#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892003/MR700/4678&#39;,
-            &#39;/home/ubuntu/pydicom/pydicom/data/test_files/dicomdirtests/98892003/MR700/4648&#39;]
+             [           &#39;/home/circleci/project/pydicom/data/test_files/dicomdirtests/98892003/MR700/4558&#39;,
+            &#39;/home/circleci/project/pydicom/data/test_files/dicomdirtests/98892003/MR700/4528&#39;,
+            &#39;/home/circleci/project/pydicom/data/test_files/dicomdirtests/98892003/MR700/4588&#39;,
+            &#39;/home/circleci/project/pydicom/data/test_files/dicomdirtests/98892003/MR700/4467&#39;,
+            &#39;/home/circleci/project/pydicom/data/test_files/dicomdirtests/98892003/MR700/4618&#39;,
+            &#39;/home/circleci/project/pydicom/data/test_files/dicomdirtests/98892003/MR700/4678&#39;,
+            &#39;/home/circleci/project/pydicom/data/test_files/dicomdirtests/98892003/MR700/4648&#39;]
             Patient Names in images..: {&#39;Doe^Peter&#39;, &#39;Doe^Peter&#39;, &#39;Doe^Peter&#39;, &#39;Doe^Peter&#39;, &#39;Doe^Peter&#39;, &#39;Doe^Peter&#39;, &#39;Doe^Peter&#39;}
             Patient IDs in images..: {&#39;98890234&#39;}
 </pre></div>
@@ -435,7 +434,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../',
-            VERSION:'1.1.0',
+            VERSION:'1.2.0.dev0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

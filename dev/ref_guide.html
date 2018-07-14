@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Reading and writing DICOM files &mdash; pydicom 1.1.0 documentation</title>
+  <title>Reading and writing DICOM files &mdash; pydicom 1.2.0.dev0 documentation</title>
   
 
   
@@ -33,7 +33,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Pydicom Complete API Reference" href="api_ref.html" />
-    <link rel="prev" title="Pydicom Developer Guide" href="pydicom_dev_guide.html" /> 
+    <link rel="prev" title="Viewing Images" href="viewing_images.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -65,7 +65,7 @@
             
             
               <div class="version">
-                1.1.0
+                1.2.0.dev0
               </div>
             
           
@@ -96,7 +96,6 @@
 <p class="caption"><span class="caption-text">Documentation</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="pydicom_user_guide.html">Pydicom User Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="pydicom_dev_guide.html">Pydicom Developer Guide</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Reading and writing DICOM files</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#file-reading-parsing">File Reading/Parsing</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#file-writing">File Writing</a></li>
@@ -193,7 +192,7 @@ dicom.filereader, but is also imported when the pydicom package is imported:</p>
 All are documented below:</p>
 <dl class="function">
 <dt id="pydicom.filereader.dcmread">
-<code class="descclassname">pydicom.filereader.</code><code class="descname">dcmread</code><span class="sig-paren">(</span><em>fp</em>, <em>defer_size=None</em>, <em>stop_before_pixels=False</em>, <em>force=False</em>, <em>specific_tags=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/filereader.html#dcmread"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/c702609/pydicom/filereader.py#L786"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filereader.dcmread" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pydicom.filereader.</code><code class="descname">dcmread</code><span class="sig-paren">(</span><em>fp</em>, <em>defer_size=None</em>, <em>stop_before_pixels=False</em>, <em>force=False</em>, <em>specific_tags=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/filereader.html#dcmread"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/1894cb9/pydicom/filereader.py#L786"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filereader.dcmread" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read and parse a DICOM dataset stored in the DICOM File Format.</p>
 <p>Read a DICOM dataset stored in accordance with the DICOM File Format
 (DICOM Standard Part 10 Section 7). If the dataset is not stored in
@@ -278,7 +277,7 @@ elements can be tags or tag names.</p>
 
 <dl class="function">
 <dt id="pydicom.filereader.read_partial">
-<code class="descclassname">pydicom.filereader.</code><code class="descname">read_partial</code><span class="sig-paren">(</span><em>fileobj</em>, <em>stop_when=None</em>, <em>defer_size=None</em>, <em>force=False</em>, <em>specific_tags=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/filereader.html#read_partial"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/c702609/pydicom/filereader.py#L655"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filereader.read_partial" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pydicom.filereader.</code><code class="descname">read_partial</code><span class="sig-paren">(</span><em>fileobj</em>, <em>stop_when=None</em>, <em>defer_size=None</em>, <em>force=False</em>, <em>specific_tags=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/filereader.html#read_partial"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/1894cb9/pydicom/filereader.py#L655"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filereader.read_partial" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parse a DICOM file until a condition is met.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -331,7 +330,7 @@ The first is to use <code class="docutils literal notranslate"><span class="pre"
 The second is to use the <code class="docutils literal notranslate"><span class="pre">save_as</span></code> method on an Dataset instance.</p>
 <dl class="function">
 <dt id="pydicom.filewriter.write_file">
-<code class="descclassname">pydicom.filewriter.</code><code class="descname">write_file</code><span class="sig-paren">(</span><em>filename</em>, <em>dataset</em>, <em>write_like_original=True</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/c702609/pydicom/filewriter.py#L677"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filewriter.write_file" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pydicom.filewriter.</code><code class="descname">write_file</code><span class="sig-paren">(</span><em>filename</em>, <em>dataset</em>, <em>write_like_original=True</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/1894cb9/pydicom/filewriter.py#L677"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filewriter.write_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write <cite>dataset</cite> to the <cite>filename</cite> specified.</p>
 <p>If <cite>write_like_original</cite> is True then <cite>dataset</cite> will be written as is
 (after minimal validation checking) and may or may not contain all or parts
@@ -401,7 +400,7 @@ explicit lengths for all elements.</p>
 
 <dl class="method">
 <dt id="pydicom.dataset.Dataset.save_as">
-<code class="descclassname">Dataset.</code><code class="descname">save_as</code><span class="sig-paren">(</span><em>filename</em>, <em>write_like_original=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.save_as"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/c702609/pydicom/dataset.py#L988"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.save_as" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">Dataset.</code><code class="descname">save_as</code><span class="sig-paren">(</span><em>filename</em>, <em>write_like_original=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.save_as"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/1894cb9/pydicom/dataset.py#L988"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.save_as" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write the Dataset to <cite>filename</cite>.</p>
 <p>Saving a Dataset requires that the Dataset.is_implicit_VR and
 Dataset.is_little_endian attributes exist and are set appropriately. If
@@ -480,7 +479,7 @@ classes in the following section.</p>
         <a href="api_ref.html" class="btn btn-neutral float-right" title="Pydicom Complete API Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="pydicom_dev_guide.html" class="btn btn-neutral" title="Pydicom Developer Guide" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="viewing_images.html" class="btn btn-neutral" title="Viewing Images" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -511,7 +510,7 @@ classes in the following section.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'1.1.0',
+            VERSION:'1.2.0.dev0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

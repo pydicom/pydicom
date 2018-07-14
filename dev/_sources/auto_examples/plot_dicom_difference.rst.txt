@@ -192,7 +192,7 @@ This examples illustrates how to find the differences between two DICOM files.
 
     - (0018, 0085) Imaged Nucleus                      SH: 'H'
 
-    - (0018, 0086) Echo Number(s)                      IS: '1'
+    - (0018, 0086) Echo Number(s)                      IS: "1"
 
     - (0018, 0091) Echo Train Length                   IS: ''
 
@@ -214,13 +214,13 @@ This examples illustrates how to find the differences between two DICOM files.
 
     + (0018, 1130) Table Height                        DS: "133.699997"
 
-    + (0018, 1150) Exposure Time                       IS: '1601'
+    + (0018, 1150) Exposure Time                       IS: "1601"
 
-    + (0018, 1151) X-Ray Tube Current                  IS: '170'
+    + (0018, 1151) X-Ray Tube Current                  IS: "170"
 
     - (0018, 1314) Flip Angle                          DS: "90"
 
-    + (0018, 1152) Exposure                            IS: '170'
+    + (0018, 1152) Exposure                            IS: "170"
 
     + (0018, 1160) Filter Type                         SH: 'LARGE BOWTIE FIL'
 
@@ -358,13 +358,13 @@ This examples illustrates how to find the differences between two DICOM files.
 
     + (0020, 0010) Study ID                            SH: '1CT1'
 
-      (0020, 0011) Series Number                       IS: '1'
+      (0020, 0011) Series Number                       IS: "1"
 
-    - (0020, 0012) Acquisition Number                  IS: '0'
+    - (0020, 0012) Acquisition Number                  IS: "0"
 
-    + (0020, 0012) Acquisition Number                  IS: '2'
+    + (0020, 0012) Acquisition Number                  IS: "2"
 
-      (0020, 0013) Instance Number                     IS: '1'
+      (0020, 0013) Instance Number                     IS: "1"
 
     - (0020, 0032) Image Position (Patient)            DS: ['-83.9063', '-91.2000', '6.6406']
 
@@ -694,7 +694,7 @@ This examples illustrates how to find the differences between two DICOM files.
         if line[0] != "?":
             print(line)
 
-**Total running time of the script:** ( 0 minutes  0.202 seconds)
+**Total running time of the script:** ( 0 minutes  0.193 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_dicom_difference.py:

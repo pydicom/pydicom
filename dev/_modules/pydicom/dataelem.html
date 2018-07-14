@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pydicom.dataelem &mdash; pydicom 1.1.0 documentation</title>
+  <title>pydicom.dataelem &mdash; pydicom 1.2.0.dev0 documentation</title>
   
 
   
@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                1.1.0
+                1.2.0.dev0
               </div>
             
           
@@ -94,7 +94,6 @@
 <p class="caption"><span class="caption-text">Documentation</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../pydicom_user_guide.html">Pydicom User Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../pydicom_dev_guide.html">Pydicom Developer Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ref_guide.html">Reading and writing DICOM files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../api_ref.html">Pydicom Complete API Reference</a></li>
 </ul>
@@ -477,8 +476,6 @@
                     <span class="s1">&#39;US or SS or OW&#39;</span><span class="p">,</span> <span class="s1">&#39;US or SS&#39;</span><span class="p">]</span>
         <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">VR</span> <span class="ow">in</span> <span class="n">byte_VRs</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">maxBytesToDisplay</span><span class="p">):</span>
             <span class="n">repVal</span> <span class="o">=</span> <span class="s2">&quot;Array of </span><span class="si">%d</span><span class="s2"> bytes&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;original_string&#39;</span><span class="p">):</span>  <span class="c1"># for VR of IS or DS</span>
-            <span class="n">repVal</span> <span class="o">=</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">original_string</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">UID</span><span class="p">):</span>
             <span class="n">repVal</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">name</span>
         <span class="k">else</span><span class="p">:</span>
@@ -702,7 +699,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../',
-            VERSION:'1.1.0',
+            VERSION:'1.2.0.dev0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

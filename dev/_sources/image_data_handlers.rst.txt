@@ -5,6 +5,8 @@ Handling of compressed image data
 
 .. rubric:: How to get image data from compressed DICOM images
 
+.. |chk|   unicode:: U+02713 .. CHECK MARK
+
 Preconditions
 ............
 To be able to decompress compressed DICOM image data, you need to have
@@ -14,9 +16,9 @@ that use the available packages.
 
 The following packages can be used with ``pydicom``:
 
-* `gdcm <http://gdcm.sourceforge.net/>`_ - this is the package that supports
+* `GDCM <http://gdcm.sourceforge.net/>`_ - this is the package that supports
   most compressed formats
-* `pillow <http://pillow.readthedocs.io/en/latest/>`_, ideally with
+* `Pillow <http://pillow.readthedocs.io/en/latest/>`_, ideally with
   ``jpeg`` and ``jpeg2000`` plugins
 * `jpeg_ls <https://github.com/Who8MyLunch/CharPyLS>`_
 
@@ -31,24 +33,41 @@ data.
 Supported Transfer Syntaxes
 ...........................
 As far as we have been able to verify, the following transfer syntaxes are
-handled correctly:
+handled by the given packages:
 
-* Explicit and Implicit VR Little Endian (uncompressed)
-* Explicit VR Big Endian (uncompressed)
-* Deflated Explicit VR Little Endian
-* RLE Lossless
-* JPEG Lossless
-* JPEG-LS Lossless
-* JPEG 2000 Lossless
-* JPEG Lossy 8 Bit Grayscale
-* JPEG-LS Lossy (probably)
++------------------------------------+------------------------+------------+-------------------+----------------+------------------+
+|       Transfer Syntax Name         |  Transfer Syntax UID   | NumPy only | JPEG-LS *+* NumPy | GDCM *+* NumPy | Pillow *+* NumPy |
++====================================+========================+============+===================+================+==================+
+| Explicit VR Little Endian          | 1.2.840.10008.1.2.1    |    |chk|   |     |chk|         |    |chk|       |     |chk|        |
++------------------------------------+------------------------+------------+-------------------+----------------+------------------+
+| Implicit VR Little Endian          | 1.2.840.10008.1.2      |    |chk|   |     |chk|         |    |chk|       |     |chk|        |
++------------------------------------+------------------------+------------+-------------------+----------------+------------------+
+| Explicit VR Big Endian             | 1.2.840.10008.1.2.2    |    |chk|   |     |chk|         |    |chk|       |     |chk|        |
++------------------------------------+------------------------+------------+-------------------+----------------+------------------+
+| Deflated Explicit VR Little Endian | 1.2.840.10008.1.2.1.99 |    |chk|   |     |chk|         |    |chk|       |     |chk|        |
++------------------------------------+------------------------+------------+-------------------+----------------+------------------+
+| RLE Lossless                       | 1.2.840.10008.1.2.5    |    |chk|   |     |chk|         |    |chk|       |     |chk|        |
++------------------------------------+------------------------+------------+-------------------+----------------+------------------+
+| JPEG BaseLine Lossy 8bit           | 1.2.840.10008.1.2.4.50 |            |                   |    |chk|       | |chk|\ :sup:`1`  |
++------------------------------------+------------------------+------------+-------------------+----------------+------------------+
+| JPEG BaseLine Lossy 12bit          | 1.2.840.10008.1.2.4.51 |            |                   |    |chk|       | |chk|\ :sup:`1`  |
++------------------------------------+------------------------+------------+-------------------+----------------+------------------+
+| JPEG Lossless                      | 1.2.840.10008.1.2.4.70 |            |                   |    |chk|       |     |chk|        |
++------------------------------------+------------------------+------------+-------------------+----------------+------------------+
+| JPEG LS Lossless                   | 1.2.840.10008.1.2.4.80 |            |         |chk|     |    |chk|       |                  |
++------------------------------------+------------------------+------------+-------------------+----------------+------------------+
+| JPEG LS Lossy :sup:`3`             | 1.2.840.10008.1.2.4.81 |            |         |chk|     |    |chk|       |                  |
++------------------------------------+------------------------+------------+-------------------+----------------+------------------+
+| JPEG2000 Lossless                  | 1.2.840.10008.1.2.4.90 |            |                   |    |chk|       | |chk|\ :sup:`2`  |
++------------------------------------+------------------------+------------+-------------------+----------------+------------------+
+| JPEG2000 Lossy :sup:`4`            | 1.2.840.10008.1.2.4.91 |            |                   |                | |chk|\ :sup:`5`  |
++------------------------------------+------------------------+------------+-------------------+----------------+------------------+
 
-Decompression of the following transfer syntaxes may not work or show
-deviations from the expected result:
-
-* JPEG 2000 Lossy 8 bit Grayscale
-* JPEG 2000 Lossy > 8 bit - not handled by Pillow/OpenJpeg
-* JPEG Lossy 8 bit Color - handled differently by Pillow and GDCM
+| :sup:`1` *only with JpegImagePlugin*
+| :sup:`2` *only with Jpeg2KImagePlugin*
+| :sup:`3` *handled differently by Pillow and GDCM*
+| :sup:`4` *no support for 8 bit Grayscale*
+| :sup:`5` *not supported for > 8 bit*
 
 Usage
 .....

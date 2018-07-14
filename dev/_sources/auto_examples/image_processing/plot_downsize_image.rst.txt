@@ -73,7 +73,7 @@ instead of averagin the pixels. Finally, the image is store as a dicom image.
     (0018, 0083) Number of Averages                  DS: "1.0000"
     (0018, 0084) Imaging Frequency                   DS: "63.92433900"
     (0018, 0085) Imaged Nucleus                      SH: 'H'
-    (0018, 0086) Echo Number(s)                      IS: '1'
+    (0018, 0086) Echo Number(s)                      IS: "1"
     (0018, 0091) Echo Train Length                   IS: ''
     (0018, 1000) Device Serial Number                LO: '-0000200'
     (0018, 1020) Software Version(s)                 LO: 'V3.51*P25'
@@ -82,9 +82,9 @@ instead of averagin the pixels. Finally, the image is store as a dicom image.
     (0020, 000d) Study Instance UID                  UI: 1.3.6.1.4.1.5962.1.2.4.20040826185059.5457
     (0020, 000e) Series Instance UID                 UI: 1.3.6.1.4.1.5962.1.3.4.1.20040826185059.5457
     (0020, 0010) Study ID                            SH: '4MR1'
-    (0020, 0011) Series Number                       IS: '1'
-    (0020, 0012) Acquisition Number                  IS: '0'
-    (0020, 0013) Instance Number                     IS: '1'
+    (0020, 0011) Series Number                       IS: "1"
+    (0020, 0012) Acquisition Number                  IS: "0"
+    (0020, 0013) Instance Number                     IS: "1"
     (0020, 0032) Image Position (Patient)            DS: ['-83.9063', '-91.2000', '6.6406']
     (0020, 0037) Image Orientation (Patient)         DS: ['1.0000', '0.0000', '0.0000', '0.0000', '1.0000', '0.0000']
     (0020, 0052) Frame of Reference UID              UI: 1.3.6.1.4.1.5962.1.4.4.1.20040826185059.5457

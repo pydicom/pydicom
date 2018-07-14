@@ -28,7 +28,7 @@ information, and show it using matplotlib.
 
  .. code-block:: none
 
-    Filename.........: /home/ubuntu/pydicom/pydicom/data/test_files/CT_small.dcm
+    Filename.........: /home/circleci/project/pydicom/data/test_files/CT_small.dcm
     Storage type.....: 1.2.840.10008.5.1.4.1.1.2
 
     Patient's name...: CompressedSamples, CT1
