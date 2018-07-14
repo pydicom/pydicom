@@ -37,6 +37,10 @@ jobs:
       - store_artifacts:
           path: doc/_build/html
 
+      - add_ssh_keys:
+          fingerprints:
+              - "68:22:28:55:a9:d1:cc:ee:18:b1:0e:a4:87:ac:d1:f0"
+
       - deploy:
           name: Deploy documentation
           command: ./build_tools/circle/push_doc.sh
