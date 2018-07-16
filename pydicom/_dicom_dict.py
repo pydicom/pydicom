@@ -3366,6 +3366,7 @@ DicomDictionary = {
     0x04000563: ('LO', '1', "Modifying System", '', 'ModifyingSystem'),  # noqa
     0x04000564: ('LO', '1', "Source of Previous Values", '', 'SourceOfPreviousValues'),  # noqa
     0x04000565: ('CS', '1', "Reason for the Attribute Modification", '', 'ReasonForTheAttributeModification'),  # noqa
+    0x04000600: ('CS', '1', "Instance Origin Status", '', 'InstanceOriginStatus'),  # noqa
     0x20000010: ('IS', '1', "Number of Copies", '', 'NumberOfCopies'),  # noqa
     0x2000001E: ('SQ', '1', "Printer Configuration Sequence", '', 'PrinterConfigurationSequence'),  # noqa
     0x20000020: ('CS', '1', "Print Priority", '', 'PrintPriority'),  # noqa
@@ -3748,6 +3749,7 @@ DicomDictionary = {
     0x300A0091: ('DS', '1', "Alternate Beam Dose", '', 'AlternateBeamDose'),  # noqa
     0x300A0092: ('CS', '1', "Alternate Beam Dose Type", '', 'AlternateBeamDoseType'),  # noqa
     0x300A0093: ('CS', '1', "Depth Value Averaging Flag", '', 'DepthValueAveragingFlag'),  # noqa
+    0x300A0094: ('DS', '1', "Beam Dose Point Source to External Contour Distance", '', 'BeamDosePointSourceToExternalContourDistance'),  # noqa
     0x300A00A0: ('IS', '1', "Number of Brachy Application Setups", '', 'NumberOfBrachyApplicationSetups'),  # noqa
     0x300A00A2: ('DS', '3', "Brachy Application Setup Dose Specification Point", '', 'BrachyApplicationSetupDoseSpecificationPoint'),  # noqa
     0x300A00A4: ('DS', '1', "Brachy Application Setup Dose", '', 'BrachyApplicationSetupDose'),  # noqa
