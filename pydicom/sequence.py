@@ -1,11 +1,8 @@
+# Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Define the Sequence class, which contains a sequence DataElement's items.
 
 Sequence is a list of pydicom Dataset objects.
 """
-# Copyright (c) 2008-2012 Darcy Mason
-# This file is part of pydicom, released under a modified MIT license.
-#    See the file LICENSE included with this distribution, also
-#    available at https://github.com/pydicom/pydicom
 
 from pydicom.dataset import Dataset
 from pydicom.multival import MultiValue

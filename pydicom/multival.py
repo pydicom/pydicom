@@ -1,13 +1,8 @@
-# multival.py
+# Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Code for multi-value data elements values,
 or any list of items that must all be the same type.
 """
 
-# Copyright (c) 2009-2012 Darcy Mason
-# This file is part of pydicom, relased under an MIT-style license.
-#    See the file LICENSE included with this distribution, also
-#    available at https://github.com/pydicom/pydicom
-#
 from collections import MutableSequence
 
 

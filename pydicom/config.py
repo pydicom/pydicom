@@ -1,9 +1,5 @@
-# config.py
+# Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Pydicom configuration options."""
-# Copyright (c) 2012 Darcy Mason
-# This file is part of pydicom, released under a modified MIT license.
-#    See the file LICENSE included with this distribution, also
-#    available at https://github.com/pydicom/pydicom
 
 # doc strings following items are picked up by sphinx for documentation
 
