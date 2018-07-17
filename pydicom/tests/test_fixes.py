@@ -1,7 +1,5 @@
+# Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Test fixes modules"""
-
-# Authors : Guillaume Lemaitre <g.lemaitre58@mgail.com>
-# License : MIT
 
 import unittest
 import copy

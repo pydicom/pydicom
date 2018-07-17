@@ -1,9 +1,5 @@
-# test_rawread.py
+# Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """unittest tests for pydicom.filereader module -- simple raw data elements"""
-# Copyright (c) 2010-2012 Darcy Mason
-# This file is part of pydicom, relased under an MIT license.
-#    See the file LICENSE included with this distribution, also
-#    available at https://github.com/pydicom/pydicom
 
 from io import BytesIO
 import unittest

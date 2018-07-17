@@ -1,4 +1,6 @@
+# Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Use the numpy package to decode pixel transfer syntaxes."""
+
 import sys
 import pydicom.uid
 from pydicom import compat

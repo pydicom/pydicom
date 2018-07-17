@@ -1,4 +1,6 @@
+# Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 # -*- coding: utf-8 -*-
+
 import unittest
 import os
 import sys

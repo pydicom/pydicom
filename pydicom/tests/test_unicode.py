@@ -1,4 +1,4 @@
-# test_unicode.py
+# Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 # -*- coding: utf-8 -*-
 
 import sys
