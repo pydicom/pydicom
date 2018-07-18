@@ -364,9 +364,11 @@ class WriteDataElementTests(unittest.TestCase):
                     b'\x1E\x00\x00\x00'  # length
                     b'20120820120804\\20130901111111 ')  # padded value
         self.check_data_element(data_elem, expected)
-        data_elem = DataElement(0x0040A13A, 'DT', u'20120820120804\\20130901111111')
+        data_elem = DataElement(
+            0x0040A13A, 'DT', u'20120820120804\\20130901111111')
         self.check_data_element(data_elem, expected)
-        data_elem = DataElement(0x0040A13A, 'DT', b'20120820120804\\20130901111111')
+        data_elem = DataElement(
+            0x0040A13A, 'DT', b'20120820120804\\20130901111111')
         self.check_data_element(data_elem, expected)
 
         data_elem = DataElement(0x0040A13A, 'DT',
