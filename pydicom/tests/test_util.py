@@ -134,7 +134,7 @@ class TestCodify(object):
 
     def test_code_file(self, capsys):
         """Test utils.codify.code_file"""
-        filename = get_testdata_files("rtplan")[0]
+        filename = get_testdata_files("rtplan.dcm")[0]
         args = ["--save-as", r"c:\temp\testout.dcm", filename]
         codify_main(100, args)
         out, err = capsys.readouterr()

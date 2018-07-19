@@ -174,7 +174,7 @@ def get_pixeldata(dicom_dataset):
         generic_jpeg_file_header = b''
         frame_start_from = 0
     try:
-        UncompressedPixelData = b''
+        UncompressedPixelData = bytearray()
         if ('NumberOfFrames' in dicom_dataset and
                 dicom_dataset.NumberOfFrames > 1):
             # multiple compressed frames
@@ -189,7 +189,7 @@ def get_pixeldata(dicom_dataset):
                     decompressed_image = PILImg.open(fio)
                 except IOError as e:
                     raise NotImplementedError(e.strerror)
-                UncompressedPixelData += decompressed_image.tobytes()
+                UncompressedPixelData.extend(decompressed_image.tobytes())
         else:
             # single compressed frame
             UncompressedPixelData = pydicom.encaps.defragment_data(
