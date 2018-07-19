@@ -5,7 +5,7 @@ Changelog
 ---------
 
 * ``DeferredDataElement`` class deprecated and will be removed in v1.3
-  (:pull request:`291`)
+  (:issue:`291`)
 
 Fixes
 .....
