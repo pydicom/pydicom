@@ -13,6 +13,7 @@ A DataElement has a tag,
 #
 from __future__ import absolute_import
 from collections import namedtuple
+import warnings
 
 from pydicom import config  # don't import datetime_conversion directly
 from pydicom import compat
@@ -413,6 +414,12 @@ class DeferredDataElement(DataElement):
         data_element_tell -- file position at start of data element,
            (not the start of the value part, but start of whole element)
         """
+        warnings.warn(
+            "DeferredDataElement is deprecated and will be removed in "
+            "pydicom v1.3",
+            DeprecationWarning
+        )
+
         if not isinstance(tag, BaseTag):
             tag = Tag(tag)
         self.tag = tag

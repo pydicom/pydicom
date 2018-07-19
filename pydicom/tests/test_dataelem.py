@@ -13,9 +13,15 @@ import unittest
 import pytest
 
 from pydicom.charset import default_encoding
-from pydicom.dataelem import (DataElement, RawDataElement,
-                              DataElement_from_raw, isStringOrStringList)
+from pydicom.dataelem import (
+    DataElement,
+    RawDataElement,
+    DataElement_from_raw,
+    isStringOrStringList,
+    DeferredDataElement
+)
 from pydicom.dataset import Dataset
+from pydicom.filebase import DicomBytesIO
 from pydicom.tag import Tag
 from pydicom.uid import UID
 from pydicom.valuerep import DSfloat
@@ -375,5 +381,10 @@ class RawDataElementTests(unittest.TestCase):
             DataElement_from_raw(raw, default_encoding)
 
 
-if __name__ == "__main__":
-    unittest.main()
+def test_deferred_data_element_deprecated():
+    """Test the deprecation warning is working"""
+    fp = DicomBytesIO()
+    fp.is_little_endian = True
+    fp.is_implicit_VR = True
+    with pytest.deprecated_call():
+        elem = DeferredDataElement(0x00000000, 'UL', fp, 0, 0, 4)
