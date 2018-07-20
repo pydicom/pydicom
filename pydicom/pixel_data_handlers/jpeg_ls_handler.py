@@ -111,7 +111,7 @@ def get_pixeldata(dicom_dataset):
         numpy_format = numpy_format.newbyteorder('S')
 
     # decompress here
-    UncompressedPixelData = b''
+    UncompressedPixelData = bytearray()
     if ('NumberOfFrames' in dicom_dataset and
             dicom_dataset.NumberOfFrames > 1):
         # multiple compressed frames
@@ -121,7 +121,7 @@ def get_pixeldata(dicom_dataset):
         for frame in CompressedPixelDataSeq:
             decompressed_image = jpeg_ls.decode(
                 numpy.frombuffer(frame, dtype=numpy.uint8))
-            UncompressedPixelData += decompressed_image.tobytes()
+            UncompressedPixelData.extend(decompressed_image.tobytes())
     else:
         # single compressed frame
         CompressedPixelData = pydicom.encaps.defragment_data(
