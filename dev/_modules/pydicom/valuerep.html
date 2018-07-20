@@ -170,12 +170,9 @@
            <div itemprop="articleBody">
             
   <h1>Source code for pydicom.valuerep</h1><div class="highlight"><pre>
-<span></span><span class="c1"># valuerep.py</span>
+<span></span><span class="c1"># Copyright 2008-2018 pydicom authors. See LICENSE file for details.</span>
 <span class="sd">&quot;&quot;&quot;Special classes for DICOM value representations (VR)&quot;&quot;&quot;</span>
-<span class="c1"># Copyright (c) 2008-2012 Darcy Mason</span>
-<span class="c1"># This file is part of pydicom, released under a modified MIT license.</span>
-<span class="c1">#    See the file LICENSE included with this distribution, also</span>
-<span class="c1">#    available at https://github.com/pydicom/pydicom</span>
+
 <span class="kn">from</span> <span class="nn">copy</span> <span class="k">import</span> <span class="n">deepcopy</span>
 <span class="kn">from</span> <span class="nn">decimal</span> <span class="k">import</span> <span class="n">Decimal</span>
 <span class="kn">import</span> <span class="nn">re</span>
