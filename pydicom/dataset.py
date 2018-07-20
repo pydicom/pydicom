@@ -23,19 +23,20 @@ import sys
 from bisect import bisect_left
 from itertools import takewhile
 
+import pydicom  # for dcmwrite
+import pydicom.charset
+import pydicom.config
 from pydicom import compat
+from pydicom._version import __version_info__
 from pydicom.charset import default_encoding, convert_encodings
+from pydicom.config import logger
 from pydicom.datadict import dictionary_VR
 from pydicom.datadict import (tag_for_keyword, keyword_for_tag,
                               repeater_has_keyword)
-from pydicom.tag import Tag, BaseTag, tag_in_exception
 from pydicom.dataelem import DataElement, DataElement_from_raw, RawDataElement
-from pydicom.uid import (UncompressedPixelTransferSyntaxes,
-                         ExplicitVRLittleEndian)
-import pydicom  # for dcmwrite
-import pydicom.charset
-from pydicom.config import logger
-import pydicom.config
+from pydicom.tag import Tag, BaseTag, tag_in_exception
+from pydicom.uid import (ExplicitVRLittleEndian, ImplicitVRLittleEndian,
+                         ExplicitVRBigEndian, PYDICOM_IMPLEMENTATION_UID)
 
 have_numpy = True
 try:
@@ -720,12 +721,6 @@ class Dataset(dict):
         for tag in taglist:
             yield self.get_item(tag)
 
-    def _is_uncompressed_transfer_syntax(self):
-        """Return True if the TransferSyntaxUID is not a compressed syntax."""
-        # FIXME uses file_meta here, should really only be thus for FileDataset
-        return self.file_meta.TransferSyntaxUID in (
-            UncompressedPixelTransferSyntaxes)
-
     def __ne__(self, other):
         """Compare `self` and `other` for inequality."""
         return not self == other
@@ -1047,6 +1042,43 @@ class Dataset(dict):
 
         pydicom.dcmwrite(filename, self, write_like_original)
 
+    def ensure_file_meta(self):
+        """Create an empty file meta dataset if none exists."""
+        self.file_meta = getattr(self, 'file_meta', None) or Dataset()
+
+    def fix_meta_info(self, include_checks=True):
+        """Ensure the file meta info exists and has the correct values
+        for transfer syntax and media storage uids.
+
+        .. note::
+
+            The transfer syntax for is_implicit_VR = False and
+            is_little_endian = True is ambiguous and will therefore not set.
+
+        Parameters
+        ----------
+        include_checks : boolean
+            If True, a check for incorrect and missing elements is performed.
+            (see pydicom.filewriter.check_and_fix_file_meta_info)
+
+        """
+        self.ensure_file_meta()
+
+        if self.is_little_endian and self.is_implicit_VR:
+            self.file_meta.TransferSyntaxUID = ImplicitVRLittleEndian
+        elif not self.is_little_endian and not self.is_implicit_VR:
+            self.file_meta.TransferSyntaxUID = ExplicitVRBigEndian
+        elif not self.is_little_endian and self.is_implicit_VR:
+            raise NotImplementedError("Implicit VR Big Endian is not a "
+                                      "supported Transfer Syntax.")
+
+        if 'SOPClassUID' in self:
+            self.file_meta.MediaStorageSOPClassUID = self.SOPClassUID
+        if 'SOPInstanceUID' in self:
+            self.file_meta.MediaStorageSOPInstanceUID = self.SOPInstanceUID
+        if include_checks:
+            check_and_fix_file_meta_info(self.file_meta, enforce_standard=True)
+
     def __setattr__(self, name, value):
         """Intercept any attempts to set a value for an instance attribute.
 
@@ -1365,3 +1397,60 @@ class FileDataset(Dataset):
             return self_elem == other_elem and self.__dict__ == other.__dict__
 
         return NotImplemented
+
+
+def check_and_fix_file_meta_info(file_meta, enforce_standard=True):
+    """Checks the File Meta Information elements in `file_meta` and
+    adds some tags if missing and enforce_standard is True.
+
+    Parameters
+    ----------
+    file_meta : pydicom.dataset.Dataset
+        The File Meta Information DataElements.
+    enforce_standard : bool
+        If False, then only a check for invalid elements is performed.
+        If True, the following elements will be added if not already present:
+            * (0002,0001) FileMetaInformationVersion
+            * (0002,0012) ImplementationClassUID
+            * (0002,0013) ImplementationVersionName
+        and the following elements will be checked:
+            * (0002,0002) MediaStorageSOPClassUID
+            * (0002,0003) MediaStorageSOPInstanceUID
+            * (0002,0010) TransferSyntaxUID
+
+    Raises
+    ------
+    ValueError
+        If `enforce_standard` is True and any of the checked File Meta
+        Information elements are missing from `file_meta`.
+    ValueError
+        If any non-Group 2 Elements are present in `file_meta`.
+    """
+    # Check that no non-Group 2 Elements are present
+    for elem in file_meta.elements():
+        if elem.tag.group != 0x0002:
+            raise ValueError("Only File Meta Information Group (0002,eeee) "
+                             "elements must be present in 'file_meta'.")
+
+    if enforce_standard:
+        if 'FileMetaInformationVersion' not in file_meta:
+            file_meta.FileMetaInformationVersion = b'\x00\x01'
+
+        if 'ImplementationClassUID' not in file_meta:
+            file_meta.ImplementationClassUID = PYDICOM_IMPLEMENTATION_UID
+
+        if 'ImplementationVersionName' not in file_meta:
+            file_meta.ImplementationVersionName = (
+                'PYDICOM ' + ".".join(str(x) for x in __version_info__))
+
+        # Check that required File Meta Elements are present
+        missing = []
+        for element in [0x0002, 0x0003, 0x0010]:
+            if Tag(0x0002, element) not in file_meta:
+                missing.append(Tag(0x0002, element))
+        if missing:
+            msg = ("Missing required File Meta Information elements from "
+                   "'file_meta':\n")
+            for tag in missing:
+                msg += '\t{0} {1}\n'.format(tag, keyword_for_tag(tag))
+            raise ValueError(msg[:-1])  # Remove final newline
