@@ -224,6 +224,11 @@
     <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">compat</span><span class="o">.</span><span class="n">string_types</span><span class="p">)</span></div>
 
 
+<span class="k">def</span> <span class="nf">_is_bytes</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return True only in Python 3 if `val` is of type `bytes`.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="kc">False</span> <span class="k">if</span> <span class="n">in_py2</span> <span class="k">else</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)</span>
+
+
 <div class="viewcode-block" id="isStringOrStringList"><a class="viewcode-back" href="../../api_ref.html#pydicom.dataelem.isStringOrStringList">[docs]</a><span class="k">def</span> <span class="nf">isStringOrStringList</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Return True if `val` is a str or an iterable</span>
 <span class="sd">       containing only strings.&quot;&quot;&quot;</span>
@@ -405,6 +410,14 @@
 
     <span class="k">def</span> <span class="nf">_convert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Convert `val` to an appropriate type for the element&#39;s VR.&quot;&quot;&quot;</span>
+
+        <span class="c1"># If the value is a byte string and has a VR that can only be encoded</span>
+        <span class="c1"># using the default character repertoire, we convert it to a string</span>
+        <span class="c1"># here to allow for byte string input in these cases</span>
+        <span class="k">if</span> <span class="n">_is_bytes</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">VR</span> <span class="ow">in</span> <span class="p">(</span>
+                <span class="s1">&#39;AE&#39;</span><span class="p">,</span> <span class="s1">&#39;AS&#39;</span><span class="p">,</span> <span class="s1">&#39;CS&#39;</span><span class="p">,</span> <span class="s1">&#39;DA&#39;</span><span class="p">,</span> <span class="s1">&#39;DS&#39;</span><span class="p">,</span> <span class="s1">&#39;DT&#39;</span><span class="p">,</span> <span class="s1">&#39;IS&#39;</span><span class="p">,</span> <span class="s1">&#39;TM&#39;</span><span class="p">,</span> <span class="s1">&#39;UI&#39;</span><span class="p">,</span> <span class="s1">&#39;UR&#39;</span><span class="p">):</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">VR</span> <span class="o">==</span> <span class="s1">&#39;IS&#39;</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">valuerep</span><span class="o">.</span><span class="n">IS</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">VR</span> <span class="o">==</span> <span class="s1">&#39;DA&#39;</span> <span class="ow">and</span> <span class="n">config</span><span class="o">.</span><span class="n">datetime_conversion</span><span class="p">:</span>
