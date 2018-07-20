@@ -52,6 +52,11 @@ def isString(val):
     return isinstance(val, compat.string_types)
 
 
+def _is_bytes(val):
+    """Return True only in Python 3 if `val` is of type `bytes`."""
+    return False if in_py2 else isinstance(val, bytes)
+
+
 def isStringOrStringList(val):
     """Return True if `val` is a str or an iterable
        containing only strings."""
@@ -233,6 +238,14 @@ class DataElement(object):
 
     def _convert(self, val):
         """Convert `val` to an appropriate type for the element's VR."""
+
+        # If the value is a byte string and has a VR that can only be encoded
+        # using the default character repertoire, we convert it to a string
+        # here to allow for byte string input in these cases
+        if _is_bytes(val) and self.VR in (
+                'AE', 'AS', 'CS', 'DA', 'DS', 'DT', 'IS', 'TM', 'UI', 'UR'):
+            val = val.decode()
+
         if self.VR == 'IS':
             return pydicom.valuerep.IS(val)
         elif self.VR == 'DA' and config.datetime_conversion:

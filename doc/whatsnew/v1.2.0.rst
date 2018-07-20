@@ -4,8 +4,16 @@ Version 1.2.0
 Changelog
 ---------
 
+
+Enhancements
+............
+
+* Added possibility to set byte strings as value for VRs that use only the
+  default character set (:issue:`624`)
+
 * ``DeferredDataElement`` class deprecated and will be removed in v1.3
   (:issue:`291`)
+
 
 Fixes
 .....
