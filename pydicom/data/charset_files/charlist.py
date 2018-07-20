@@ -1,9 +1,5 @@
-# charlist.py
+# Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """List summary info for the test files in the charset directory"""
-# Copyright (c) 2008-2012 Darcy Mason
-# This file is part of pydicom, relased under an MIT license.
-#    See the file LICENSE included with this distribution, also
-#    available at https://github.com/pydicom/pydicom
 
 import logging
 logging.basicConfig(level=logging.INFO,

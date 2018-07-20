@@ -1,8 +1,5 @@
+# Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Functions for reading to certain bytes, e.g. delimiters."""
-# Copyright (c) 2009-2012 Darcy Mason
-# This file is part of pydicom, released under a modified MIT license.
-#    See the file LICENSE included with this distribution, also
-#    available at https://github.com/pydicom/pydicom
 
 from struct import pack, unpack
 

@@ -1,4 +1,4 @@
-# codify.py
+# Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """
 Produce runnable python code which can recreate DICOM objects or files.
 
@@ -6,10 +6,6 @@ Can run as a script to produce code for an entire file,
 or import and use specific functions to provide code for pydicom DICOM classes
 
 """
-# Copyright (c) 2013 Darcy Mason
-# This file is part of pydicom, released under an MIT license.
-#    See the file LICENSE included with this distribution, also
-#    available at https://github.com/pydicom/pydicom
 
 # Run this from the same directory as a "base" dicom file and
 # this code will output to screen the dicom parameters like:

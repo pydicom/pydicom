@@ -1,8 +1,5 @@
+# Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """pydicom data manager"""
-
-# authors : Vanessa Sochat
-#           Guillaume Lemaitre <g.lemaitre58@gmail.com>
-# license : See LICENSE
 
 from os import walk
 from os.path import abspath, dirname, join

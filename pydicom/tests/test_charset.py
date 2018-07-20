@@ -1,8 +1,6 @@
+# Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """unittest cases for pydicom.charset module"""
-# Copyright (c) 2008 Darcy Mason
-# This file is part of pydicom, released under a modified MIT license.
-#    See the file LICENSE included with this distribution, also
-#    available at https://github.com/pydicom/pydicom
+
 import unittest
 
 from pydicom.data import get_charset_files

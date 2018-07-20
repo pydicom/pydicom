@@ -1,7 +1,5 @@
+# Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Compatibility fixes for older version of python."""
-
-# Authors : Guillaume Lemaitre <g.lemaitre58@mgail.com>
-# Copyright 2008-2017 pydicom authors. See LICENSE file for details.
 
 import sys
 
