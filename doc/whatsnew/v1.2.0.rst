@@ -12,3 +12,5 @@ Fixes
 
 * Removed unused ``original_string`` attribute from the ``DataElement`` class
   (:pull_request:`660`)
+* Improve performance for Python 3 when dealing with compressed multi-frame
+  Pixel Data with pillow and jpeg-ls (:issue:`682`).
