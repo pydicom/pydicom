@@ -63,6 +63,12 @@ emri_jpeg_2k_lossless = get_testdata_files(
     "emri_small_jpeg_2k_lossless.dcm")[0]
 color_3d_jpeg_baseline = get_testdata_files(
     "color3d_jpeg_baseline.dcm")[0]
+emri_small_jpls_1k_fragment_no_offset_table = get_testdata_files(
+    "emri_small_jpls_1k_fragment_no_offset_table.dcm")[0]
+emri_small_jpls_1k_fragment_with_offset_table = get_testdata_files(
+    "emri_small_jpls_1k_fragment_with_offset_table.dcm")[0]
+
+
 dir_name = os.path.dirname(sys.argv[0])
 save_dir = os.getcwd()
 
@@ -288,3 +294,43 @@ class jpeg_ls_JPEGlosslessTests_with_jpeg_ls(unittest.TestCase):
         """JPEGlossless: Fails gracefully when uncompressed data asked for"""
         with self.assertRaises((NotImplementedError, )):
             _ = self.jpeg_lossless.pixel_array
+
+
+@pytest.mark.skipif(
+    not test_jpeg_ls_decoder,
+    reason=jpeg_ls_missing_message)
+class jpeg_ls_mutlifragment_per_frame(unittest.TestCase):
+    def setUp(self):
+        self.emri_small_jpls_1k_fragment_no_offset_table = \
+            dcmread(emri_small_jpls_1k_fragment_no_offset_table)
+        self.emri_small_jpls_1k_fragment_with_offset_table = \
+            dcmread(emri_small_jpls_1k_fragment_with_offset_table)
+        self.emri_small = dcmread(emri_name)
+
+        self.original_handlers = pydicom.config.image_handlers
+        pydicom.config.image_handlers = [jpeg_ls_handler, numpy_handler]
+
+    def tearDown(self):
+        pydicom.config.image_handlers = self.original_handlers
+
+    def test_emri_small_jpls_1k_fragment_no_offset_table(self):
+        """JPEG-LS: decodes multiple fragments per frame with
+           no offset table"""
+        a = self.emri_small_jpls_1k_fragment_no_offset_table.pixel_array
+        b = self.emri_small.pixel_array
+        self.assertEqual(
+            a.mean(),
+            b.mean(),
+            "Decoded pixel data is not all {0} "
+            "(mean == {1})".format(b.mean(), a.mean()))
+
+    def test_emri_small_jpls_1k_fragment_with_offset_table(self):
+        """JPEG-LS: decodes multiple fragments per frame with
+           offset table"""
+        a = self.emri_small_jpls_1k_fragment_with_offset_table.pixel_array
+        b = self.emri_small.pixel_array
+        self.assertEqual(
+            a.mean(),
+            b.mean(),
+            "Decoded pixel data is not all {0} "
+            "(mean == {1})".format(b.mean(), a.mean()))
