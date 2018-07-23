@@ -1,9 +1,5 @@
-# test_dataelem.py
+# Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """unittest cases for pydicom.dataelem module"""
-# Copyright (c) 2008 Darcy Mason
-# This file is part of pydicom, released under a modified MIT license.
-#    See the file LICENSE included with this distribution, also
-#    available at https://github.com/pydicom/pydicom
 
 # Many tests of DataElement class are implied in test_dataset also
 
@@ -13,9 +9,15 @@ import unittest
 import pytest
 
 from pydicom.charset import default_encoding
-from pydicom.dataelem import (DataElement, RawDataElement,
-                              DataElement_from_raw, isStringOrStringList)
+from pydicom.dataelem import (
+    DataElement,
+    RawDataElement,
+    DataElement_from_raw,
+    isStringOrStringList,
+    DeferredDataElement
+)
 from pydicom.dataset import Dataset
+from pydicom.filebase import DicomBytesIO
 from pydicom.tag import Tag
 from pydicom.uid import UID
 from pydicom.valuerep import DSfloat
@@ -299,13 +301,6 @@ class DataElementTests(unittest.TestCase):
         elem[0].PatientID = '1234'
         assert repr(elem) == repr(elem.value)
 
-    def test_repval_original_string(self):
-        """Test DataElement.repval when original_string is present"""
-        elem = DataElement(0x00100010, 'PN', 'ANON')
-        elem.original_string = 'foo'
-        assert "(0010, 0010) Patient's Name" in str(elem)
-        assert "PN: 'foo'" in str(elem)
-
     @unittest.skipIf(sys.version_info >= (3, ), 'Testing Python 2 behavior')
     def test_unicode(self):
         """Test unicode representation of the DataElement"""
@@ -382,5 +377,10 @@ class RawDataElementTests(unittest.TestCase):
             DataElement_from_raw(raw, default_encoding)
 
 
-if __name__ == "__main__":
-    unittest.main()
+def test_deferred_data_element_deprecated():
+    """Test the deprecation warning is working"""
+    fp = DicomBytesIO()
+    fp.is_little_endian = True
+    fp.is_implicit_VR = True
+    with pytest.deprecated_call():
+        elem = DeferredDataElement(0x00000000, 'UL', fp, 0, 0, 4)

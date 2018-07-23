@@ -1,9 +1,5 @@
-# raw_convert_test.py
+# Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Try reading a large RTSTRUCT file, profiling how much time it takes"""
-# Copyright (c) 2012 Darcy Mason
-# This file is part of pydicom, relased under an MIT license.
-#    See the file LICENSE included with this distribution, also
-#    available at https://github.com/pydicom/pydicom
 
 # EDIT THIS SECTION --------------------------
 #    to point to local temp directory

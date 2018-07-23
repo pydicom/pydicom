@@ -1,4 +1,6 @@
+# Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Use the gdcm python package to decode pixel transfer syntaxes."""
+
 import sys
 from pydicom import compat
 import pydicom

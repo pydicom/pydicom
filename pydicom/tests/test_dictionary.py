@@ -1,9 +1,8 @@
-# Copyright 2008-2017 pydicom authors. See LICENSE file for details.
+# Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Test for datadict.py"""
 
 import unittest
 from pydicom.dataset import Dataset
-from pydicom.tag import Tag
 from pydicom.datadict import (keyword_for_tag, dictionary_description,
                               dictionary_has_tag, repeater_has_tag,
                               repeater_has_keyword, get_private_entry,

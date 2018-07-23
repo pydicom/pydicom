@@ -1,3 +1,4 @@
+# Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Define the DataElement class.
 
 A DataElement has a tag,
@@ -6,19 +7,14 @@ A DataElement has a tag,
               and a value.
 """
 
-# Copyright (c) 2008-2012 Darcy Mason
-# This file is part of pydicom, released under a modified MIT license.
-#    See the file LICENSE included with this distribution, also
-#    available at https://github.com/pydicom/pydicom
-#
 from __future__ import absolute_import
 from collections import namedtuple
+import warnings
 
 from pydicom import config  # don't import datetime_conversion directly
 from pydicom import compat
 from pydicom.charset import default_encoding
 from pydicom.compat import in_py2
-from pydicom.config import logger
 from pydicom.datadict import (dictionary_has_tag, dictionary_description,
                               dictionary_keyword, dictionary_is_retired,
                               private_dictionary_description, dictionary_VR,
@@ -50,6 +46,11 @@ def isString(val):
     """Return True if `val` is string-like,
        False otherwise."""
     return isinstance(val, compat.string_types)
+
+
+def _is_bytes(val):
+    """Return True only in Python 3 if `val` is of type `bytes`."""
+    return False if in_py2 else isinstance(val, bytes)
 
 
 def isStringOrStringList(val):
@@ -233,6 +234,14 @@ class DataElement(object):
 
     def _convert(self, val):
         """Convert `val` to an appropriate type for the element's VR."""
+
+        # If the value is a byte string and has a VR that can only be encoded
+        # using the default character repertoire, we convert it to a string
+        # here to allow for byte string input in these cases
+        if _is_bytes(val) and self.VR in (
+                'AE', 'AS', 'CS', 'DA', 'DS', 'DT', 'IS', 'TM', 'UI', 'UR'):
+            val = val.decode()
+
         if self.VR == 'IS':
             return pydicom.valuerep.IS(val)
         elif self.VR == 'DA' and config.datetime_conversion:
@@ -305,8 +314,6 @@ class DataElement(object):
                     'US or SS or OW', 'US or SS']
         if (self.VR in byte_VRs and len(self.value) > self.maxBytesToDisplay):
             repVal = "Array of %d bytes" % len(self.value)
-        elif hasattr(self, 'original_string'):  # for VR of IS or DS
-            repVal = repr(self.original_string)
         elif isinstance(self.value, UID):
             repVal = self.value.name
         else:
@@ -403,6 +410,12 @@ class DeferredDataElement(DataElement):
         data_element_tell -- file position at start of data element,
            (not the start of the value part, but start of whole element)
         """
+        warnings.warn(
+            "DeferredDataElement is deprecated and will be removed in "
+            "pydicom v1.3",
+            DeprecationWarning
+        )
+
         if not isinstance(tag, BaseTag):
             tag = Tag(tag)
         self.tag = tag

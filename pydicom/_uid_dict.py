@@ -42,8 +42,8 @@ UID_dictionary = {
     '1.2.840.10008.1.2.4.107': ('HEVC/H.265 Main Profile / Level 5.1', 'Transfer Syntax', '', ''),  # noqa
     '1.2.840.10008.1.2.4.108': ('HEVC/H.265 Main 10 Profile / Level 5.1', 'Transfer Syntax', '', ''),  # noqa
     '1.2.840.10008.1.2.5': ('RLE Lossless', 'Transfer Syntax', '', ''),  # noqa
-    '1.2.840.10008.1.2.6.1': ('RFC 2557 MIME encapsulation', 'Transfer Syntax', '', ''),  # noqa
-    '1.2.840.10008.1.2.6.2': ('XML Encoding', 'Transfer Syntax', '', ''),  # noqa
+    '1.2.840.10008.1.2.6.1': ('RFC 2557 MIME encapsulation', 'Transfer Syntax', '', 'Retired'),  # noqa
+    '1.2.840.10008.1.2.6.2': ('XML Encoding', 'Transfer Syntax', '', 'Retired'),  # noqa
     '1.2.840.10008.1.3.10': ('Media Storage Directory Storage', 'SOP Class', '', ''),  # noqa
     '1.2.840.10008.1.4.1.1': ('Talairach Brain Atlas Frame of Reference', 'Well-known frame of reference', '', ''),  # noqa
     '1.2.840.10008.1.4.1.2': ('SPM2 T1 Frame of Reference', 'Well-known frame of reference', '', ''),  # noqa
@@ -263,6 +263,7 @@ UID_dictionary = {
     '1.2.840.10008.5.1.4.1.1.90.1': ('Content Assessment Results Storage', 'SOP Class', '', ''),  # noqa
     '1.2.840.10008.5.1.4.1.1.104.1': ('Encapsulated PDF Storage', 'SOP Class', '', ''),  # noqa
     '1.2.840.10008.5.1.4.1.1.104.2': ('Encapsulated CDA Storage', 'SOP Class', '', ''),  # noqa
+    '1.2.840.10008.5.1.4.1.1.104.3': ('Encapsulated STL Storage', 'SOP Class', '', ''),  # noqa
     '1.2.840.10008.5.1.4.1.1.128': ('Positron Emission Tomography Image Storage', 'SOP Class', '', ''),  # noqa
     '1.2.840.10008.5.1.4.1.1.128.1': ('Legacy Converted Enhanced PET Image Storage', 'SOP Class', '', ''),  # noqa
     '1.2.840.10008.5.1.4.1.1.129': ('Standalone PET Curve Storage', 'SOP Class', '', 'Retired'),  # noqa

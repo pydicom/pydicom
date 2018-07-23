@@ -1,14 +1,7 @@
-# charset.py
+# Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Handle alternate character sets for character strings."""
-#
-# Copyright (c) 2008-2012 Darcy Mason
-# This file is part of pydicom, released under a modified MIT license.
-#    See the file LICENSE included with this distribution, also
-#    available at https://github.com/pydicom/pydicom
-#
 
 from pydicom import compat
-from pydicom.config import logger
 from pydicom.valuerep import PersonNameUnicode, text_VRs
 from pydicom.compat import in_py2
 
@@ -129,8 +122,6 @@ def decode(data_element, dicom_character_set):
     # decode the string value to unicode
     # PN is special case as may have 3 components with differenct chr sets
     if data_element.VR == "PN":
-        # logger.warn("%s ... type: %s" %(str(data_element),
-        # type(data_element.VR)))
         if not in_py2:
             if data_element.VM == 1:
                 data_element.value = data_element.value.decode(encodings)

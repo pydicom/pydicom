@@ -1,9 +1,5 @@
-# compat.py
+# Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Compatibility functions for python 2 vs later versions"""
-# Copyright (c) 2014 Darcy Mason
-# This file is part of pydicom, released under a modified MIT license.
-#    See the file LICENSE included with this distribution, also
-#    available at http://github.com/pydicom/pydicom
 
 # These are largely modeled on Armin Ronacher's porting advice
 # at http://lucumr.pocoo.org/2013/5/21/porting-to-python-3-redux/

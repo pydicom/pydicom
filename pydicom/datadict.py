@@ -12,7 +12,6 @@ from pydicom._dicom_dict import DicomDictionary
 from pydicom._dicom_dict import RepeatersDictionary
 from pydicom._private_dict import private_dictionaries
 import warnings
-from pydicom.compat import in_py2
 
 # Generate mask dict for checking repeating groups etc.
 # Map a true bitwise mask to the DICOM mask with "x"'s in it.

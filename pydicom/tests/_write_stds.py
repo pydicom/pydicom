@@ -1,4 +1,4 @@
-# _write_stds.py
+# Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 
 """Snippets for what a particular dataset (including nested sequences)
 should look like after writing in different expl/impl Vr and endian combos,

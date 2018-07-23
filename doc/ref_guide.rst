@@ -1,8 +1,8 @@
 .. _api_filereader:
 
-=============================
-Pydicom API's Reference Guide
-=============================
+===============================
+Reading and writing DICOM files
+===============================
 
 .. rubric:: Common pydicom functions called by user code
 
@@ -34,7 +34,5 @@ The second is to use the ``save_as`` method on an Dataset instance.
 
 .. automethod:: pydicom.dataset.Dataset.save_as
 
-Dataset
-=======
-
-.. autoclass:: pydicom.dataset.Dataset
+You can find the complete API documentation for ``Dataset`` and other
+classes in the following section.

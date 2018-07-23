@@ -1,0 +1,24 @@
+Version 1.2.0
+=================================
+
+Changelog
+---------
+
+
+Enhancements
+............
+
+* Added possibility to set byte strings as value for VRs that use only the
+  default character set (:issue:`624`)
+
+* ``DeferredDataElement`` class deprecated and will be removed in v1.3
+  (:issue:`291`)
+
+
+Fixes
+.....
+
+* Removed unused ``original_string`` attribute from the ``DataElement`` class
+  (:pull_request:`660`)
+* Improve performance for Python 3 when dealing with compressed multi-frame
+  Pixel Data with pillow and jpeg-ls (:issue:`682`).

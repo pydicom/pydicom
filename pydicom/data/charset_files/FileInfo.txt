@@ -16,3 +16,8 @@ chrX2.dcm        GB18030                                  'Wang^XiaoDong=\xcd\xf
 Other
 =====
 chrFrenMulti.dcm is a modified version of chrFren.dcm with multi-valued PN and LO for testing decoding
+chrSQEncoding.dcm is a minimal constructed dataset with a sequence that has
+    another encoding (['ISO 2022 IR 13', 'ISO 2022 IR 87']) than the dataset (ISO_IR 192)
+chrSQEncoding1.dcm is the same dataset with the encoding ['ISO 2022 IR 13', 'ISO 2022 IR 87']
+    defined in the dataset, but not in the sequence
+

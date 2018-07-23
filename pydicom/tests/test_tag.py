@@ -1,6 +1,6 @@
-# Copyright 2008-2017 pydicom authors. See LICENSE file for details.
+# Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Test suite for tag.py"""
-import sys
+
 import unittest
 
 import pytest

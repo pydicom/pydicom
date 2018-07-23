@@ -216,6 +216,7 @@ DicomDictionary = {
     0x0008114B: ('SQ', '1', "Referenced Real World Value Mapping Instance Sequence", '', 'ReferencedRealWorldValueMappingInstanceSequence'),  # noqa
     0x00081150: ('UI', '1', "Referenced SOP Class UID", '', 'ReferencedSOPClassUID'),  # noqa
     0x00081155: ('UI', '1', "Referenced SOP Instance UID", '', 'ReferencedSOPInstanceUID'),  # noqa
+    0x00081156: ('SQ', '1', "Definition Source Sequence", '', 'DefinitionSourceSequence'),  # noqa
     0x0008115A: ('UI', '1-n', "SOP Classes Supported", '', 'SOPClassesSupported'),  # noqa
     0x00081160: ('IS', '1-n', "Referenced Frame Number", '', 'ReferencedFrameNumber'),  # noqa
     0x00081161: ('UL', '1-n', "Simple Frame List", '', 'SimpleFrameList'),  # noqa
@@ -2201,6 +2202,7 @@ DicomDictionary = {
     0x00400612: ('SQ', '1', "Specimen Preparation Step Content Item Sequence", '', 'SpecimenPreparationStepContentItemSequence'),  # noqa
     0x00400620: ('SQ', '1', "Specimen Localization Content Item Sequence", '', 'SpecimenLocalizationContentItemSequence'),  # noqa
     0x004006FA: ('LO', '1', "Slide Identifier", 'Retired', 'SlideIdentifier'),  # noqa
+    0x00400710: ('SQ', '1', "Whole Slide Microscopy Image Frame Type Sequence", '', 'WholeSlideMicroscopyImageFrameTypeSequence'),  # noqa
     0x0040071A: ('SQ', '1', "Image Center Point Coordinates Sequence", '', 'ImageCenterPointCoordinatesSequence'),  # noqa
     0x0040072A: ('DS', '1', "X Offset in Slide Coordinate System", '', 'XOffsetInSlideCoordinateSystem'),  # noqa
     0x0040073A: ('DS', '1', "Y Offset in Slide Coordinate System", '', 'YOffsetInSlideCoordinateSystem'),  # noqa
@@ -2247,7 +2249,8 @@ DicomDictionary = {
     0x00404004: ('SQ', '1', "Scheduled Processing Applications Code Sequence", 'Retired', 'ScheduledProcessingApplicationsCodeSequence'),  # noqa
     0x00404005: ('DT', '1', "Scheduled Procedure Step Start DateTime", '', 'ScheduledProcedureStepStartDateTime'),  # noqa
     0x00404006: ('CS', '1', "Multiple Copies Flag", 'Retired', 'MultipleCopiesFlag'),  # noqa
-    0x00404007: ('SQ', '1', "Performed Processing Applications Code Sequence", '', 'PerformedProcessingApplicationsCodeSequence'),  # noqa
+    0x00404007: ('SQ', '1', "Performed Processing Applications Code Sequence", 'Retired', 'PerformedProcessingApplicationsCodeSequence'),  # noqa
+    0x00404008: ('DT', '1', "Scheduled Procedure Step Expiration DateTime", '', 'ScheduledProcedureStepExpirationDateTime'),  # noqa
     0x00404009: ('SQ', '1', "Human Performer Code Sequence", '', 'HumanPerformerCodeSequence'),  # noqa
     0x00404010: ('DT', '1', "Scheduled Procedure Step Modification DateTime", '', 'ScheduledProcedureStepModificationDateTime'),  # noqa
     0x00404011: ('DT', '1', "Expected Completion DateTime", '', 'ExpectedCompletionDateTime'),  # noqa
@@ -2567,6 +2570,8 @@ DicomDictionary = {
     0x0048021E: ('SL', '1', "Column Position In Total Image Pixel Matrix", '', 'ColumnPositionInTotalImagePixelMatrix'),  # noqa
     0x0048021F: ('SL', '1', "Row Position In Total Image Pixel Matrix", '', 'RowPositionInTotalImagePixelMatrix'),  # noqa
     0x00480301: ('CS', '1', "Pixel Origin Interpretation", '', 'PixelOriginInterpretation'),  # noqa
+    0x00480302: ('UL', '1', "Number of Optical Paths", '', 'NumberOfOpticalPaths'),  # noqa
+    0x00480303: ('UL', '1', "Total Pixel Matrix Focal Planes", '', 'TotalPixelMatrixFocalPlanes'),  # noqa
     0x00500004: ('CS', '1', "Calibration Image", '', 'CalibrationImage'),  # noqa
     0x00500010: ('SQ', '1', "Device Sequence", '', 'DeviceSequence'),  # noqa
     0x00500012: ('SQ', '1', "Container Component Type Code Sequence", '', 'ContainerComponentTypeCodeSequence'),  # noqa
@@ -2862,6 +2867,9 @@ DicomDictionary = {
     0x006865F0: ('FD', '4', "2D Plane Intersection", '', 'TwoDPlaneIntersection'),  # noqa
     0x00686610: ('FD', '3', "3D Plane Origin", '', 'ThreeDPlaneOrigin'),  # noqa
     0x00686620: ('FD', '3', "3D Plane Normal", '', 'ThreeDPlaneNormal'),  # noqa
+    0x00687001: ('CS', '1', "Model Modification", '', 'ModelModification'),  # noqa
+    0x00687002: ('CS', '1', "Model Mirroring", '', 'ModelMirroring'),  # noqa
+    0x00687003: ('SQ', '1', "Model Usage Code Sequence", '', 'ModelUsageCodeSequence'),  # noqa
     0x00700001: ('SQ', '1', "Graphic Annotation Sequence", '', 'GraphicAnnotationSequence'),  # noqa
     0x00700002: ('CS', '1', "Graphic Layer", '', 'GraphicLayer'),  # noqa
     0x00700003: ('CS', '1', "Bounding Box Annotation Units", '', 'BoundingBoxAnnotationUnits'),  # noqa
@@ -2962,6 +2970,7 @@ DicomDictionary = {
     0x00700314: ('SQ', '1', "Used Fiducials Sequence", '', 'UsedFiducialsSequence'),  # noqa
     0x00700318: ('SQ', '1', "Graphic Coordinates Data Sequence", '', 'GraphicCoordinatesDataSequence'),  # noqa
     0x0070031A: ('UI', '1', "Fiducial UID", '', 'FiducialUID'),  # noqa
+    0x0070031B: ('UI', '1', "Referenced Fiducial UID", '', 'ReferencedFiducialUID'),  # noqa
     0x0070031C: ('SQ', '1', "Fiducial Set Sequence", '', 'FiducialSetSequence'),  # noqa
     0x0070031E: ('SQ', '1', "Fiducial Sequence", '', 'FiducialSequence'),  # noqa
     0x0070031F: ('SQ', '1', "Fiducials Property Category Code Sequence", '', 'FiducialsPropertyCategoryCodeSequence'),  # noqa
@@ -3293,8 +3302,8 @@ DicomDictionary = {
     0x00800007: ('US', '3-3n', "Surface Point Color CIELab Value Data", '', 'SurfacePointColorCIELabValueData'),  # noqa
     0x00800008: ('SQ', '1', "UV Mapping Sequence", '', 'UVMappingSequence'),  # noqa
     0x00800009: ('SH', '1', "Texture Label", '', 'TextureLabel'),  # noqa
-    0x00800010: ('OF', '1-n', "U Value Data", '', 'UValueData'),  # noqa
-    0x00800011: ('OF', '1-n', "V Value Data", '', 'VValueData'),  # noqa
+    0x00800010: ('OF', '1', "U Value Data", '', 'UValueData'),  # noqa
+    0x00800011: ('OF', '1', "V Value Data", '', 'VValueData'),  # noqa
     0x00800012: ('SQ', '1', "Referenced Texture Sequence", '', 'ReferencedTextureSequence'),  # noqa
     0x00800013: ('SQ', '1', "Referenced Surface Data Sequence", '', 'ReferencedSurfaceDataSequence'),  # noqa
     0x00820001: ('CS', '1', "Assessment Summary", '', 'AssessmentSummary'),  # noqa
@@ -3357,6 +3366,7 @@ DicomDictionary = {
     0x04000563: ('LO', '1', "Modifying System", '', 'ModifyingSystem'),  # noqa
     0x04000564: ('LO', '1', "Source of Previous Values", '', 'SourceOfPreviousValues'),  # noqa
     0x04000565: ('CS', '1', "Reason for the Attribute Modification", '', 'ReasonForTheAttributeModification'),  # noqa
+    0x04000600: ('CS', '1', "Instance Origin Status", '', 'InstanceOriginStatus'),  # noqa
     0x20000010: ('IS', '1', "Number of Copies", '', 'NumberOfCopies'),  # noqa
     0x2000001E: ('SQ', '1', "Printer Configuration Sequence", '', 'PrinterConfigurationSequence'),  # noqa
     0x20000020: ('CS', '1', "Print Priority", '', 'PrintPriority'),  # noqa
@@ -3739,6 +3749,7 @@ DicomDictionary = {
     0x300A0091: ('DS', '1', "Alternate Beam Dose", '', 'AlternateBeamDose'),  # noqa
     0x300A0092: ('CS', '1', "Alternate Beam Dose Type", '', 'AlternateBeamDoseType'),  # noqa
     0x300A0093: ('CS', '1', "Depth Value Averaging Flag", '', 'DepthValueAveragingFlag'),  # noqa
+    0x300A0094: ('DS', '1', "Beam Dose Point Source to External Contour Distance", '', 'BeamDosePointSourceToExternalContourDistance'),  # noqa
     0x300A00A0: ('IS', '1', "Number of Brachy Application Setups", '', 'NumberOfBrachyApplicationSetups'),  # noqa
     0x300A00A2: ('DS', '3', "Brachy Application Setup Dose Specification Point", '', 'BrachyApplicationSetupDoseSpecificationPoint'),  # noqa
     0x300A00A4: ('DS', '1', "Brachy Application Setup Dose", '', 'BrachyApplicationSetupDose'),  # noqa

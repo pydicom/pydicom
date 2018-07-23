@@ -1,9 +1,6 @@
-# valuerep.py
+# Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Special classes for DICOM value representations (VR)"""
-# Copyright (c) 2008-2012 Darcy Mason
-# This file is part of pydicom, released under a modified MIT license.
-#    See the file LICENSE included with this distribution, also
-#    available at https://github.com/pydicom/pydicom
+
 from copy import deepcopy
 from decimal import Decimal
 import re
@@ -110,6 +107,9 @@ class DA(date):
             return self.original_string
         else:
             return super(DA, self).__str__()
+
+    def __repr__(self):
+        return "\"" + str(self) + "\""
 
 
 class DT(datetime):
@@ -218,6 +218,9 @@ class DT(datetime):
         else:
             return super(DT, self).__str__()
 
+    def __repr__(self):
+        return "\"" + str(self) + "\""
+
 
 class TM(time):
     """Store value for DICOM VR of TM (Time) as datetime.time.
@@ -297,6 +300,9 @@ class TM(time):
             return self.original_string
         else:
             return super(TM, self).__str__()
+
+    def __repr__(self):
+        return "\"" + str(self) + "\""
 
 
 class DSfloat(float):
@@ -465,7 +471,14 @@ class IS(int):
             return ''
         if isinstance(val, (str, compat.text_type)) and val.strip() == '':
             return ''
-        newval = super(IS, cls).__new__(cls, val)
+        # Overflow error in Python 2 for integers too large
+        # while calling super(IS). Fall back on the regular int
+        # casting that will automatically convert the val to long
+        # if needed.
+        try:
+            newval = super(IS, cls).__new__(cls, val)
+        except OverflowError:
+            newval = int(val)
         # check if a float or Decimal passed in, then could have lost info,
         # and will raise error. E.g. IS(Decimal('1')) is ok, but not IS(1.23)
         if isinstance(val, (float, Decimal)) and newval != val:
@@ -487,7 +500,7 @@ class IS(int):
 
     def __repr__(self):
         if hasattr(self, 'original_string'):
-            return "'" + self.original_string + "'"
+            return "\"" + self.original_string + "\""
         else:
             return "\"" + int.__str__(self) + "\""
 

@@ -1,4 +1,4 @@
-# Copyright 2008-2017 pydicom authors. See LICENSE file for details.
+# Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """unittest cases for pydicom.filewriter module"""
 
 from copy import deepcopy
@@ -316,7 +316,7 @@ class WriteDataElementTests(unittest.TestCase):
         self.check_data_element(data_elem, expected)
 
     def test_write_multi_DA(self):
-        data_elem = DataElement(0x0014407E, 'DA', ['20100101', '20101231'])
+        data_elem = DataElement(0x0014407E, 'DA', ['20100101', b'20101231'])
         expected = (b'\x14\x00\x7E\x40'  # tag
                     b'\x12\x00\x00\x00'  # length
                     b'20100101\\20101231 ')  # padded value
@@ -331,11 +331,13 @@ class WriteDataElementTests(unittest.TestCase):
                     b'\x06\x00\x00\x00'  # length
                     b'010203')  # padded value
         self.check_data_element(data_elem, expected)
+        data_elem = DataElement(0x00080030, 'TM', b'010203')
+        self.check_data_element(data_elem, expected)
         data_elem = DataElement(0x00080030, 'TM', time(1, 2, 3))
         self.check_data_element(data_elem, expected)
 
     def test_write_multi_TM(self):
-        data_elem = DataElement(0x0014407C, 'TM', ['082500', '092655'])
+        data_elem = DataElement(0x0014407C, 'TM', ['082500', b'092655'])
         expected = (b'\x14\x00\x7C\x40'  # tag
                     b'\x0E\x00\x00\x00'  # length
                     b'082500\\092655 ')  # padded value
@@ -350,19 +352,53 @@ class WriteDataElementTests(unittest.TestCase):
                     b'\x0E\x00\x00\x00'  # length
                     b'20170101120000')  # value
         self.check_data_element(data_elem, expected)
+        data_elem = DataElement(0x0008002A, 'DT', b'20170101120000')
+        self.check_data_element(data_elem, expected)
         data_elem = DataElement(0x0008002A, 'DT', datetime(2017, 1, 1, 12))
         self.check_data_element(data_elem, expected)
 
     def test_write_multi_DT(self):
         data_elem = DataElement(0x0040A13A, 'DT',
-                                ['20120820120804', '20130901111111'])
+                                ['20120820120804', b'20130901111111'])
         expected = (b'\x40\x00\x3A\xA1'  # tag
                     b'\x1E\x00\x00\x00'  # length
                     b'20120820120804\\20130901111111 ')  # padded value
         self.check_data_element(data_elem, expected)
+        data_elem = DataElement(
+            0x0040A13A, 'DT', u'20120820120804\\20130901111111')
+        self.check_data_element(data_elem, expected)
+        data_elem = DataElement(
+            0x0040A13A, 'DT', b'20120820120804\\20130901111111')
+        self.check_data_element(data_elem, expected)
+
         data_elem = DataElement(0x0040A13A, 'DT',
                                 [datetime(2012, 8, 20, 12, 8, 4),
                                  datetime(2013, 9, 1, 11, 11, 11)])
+        self.check_data_element(data_elem, expected)
+
+    def test_write_ascii_vr_with_padding(self):
+        expected = (b'\x08\x00\x54\x00'  # tag
+                    b'\x0C\x00\x00\x00'  # length
+                    b'CONQUESTSRV ')  # padded value
+        data_elem = DataElement(0x00080054, 'AE', 'CONQUESTSRV')
+        self.check_data_element(data_elem, expected)
+        data_elem = DataElement(0x00080054, 'AE', b'CONQUESTSRV')
+        self.check_data_element(data_elem, expected)
+
+        expected = (b'\x08\x00\x62\x00'  # tag
+                    b'\x06\x00\x00\x00'  # length
+                    b'1.2.3\x00')  # padded value
+        data_elem = DataElement(0x00080062, 'UI', '1.2.3')
+        self.check_data_element(data_elem, expected)
+        data_elem = DataElement(0x00080062, 'UI', b'1.2.3')
+        self.check_data_element(data_elem, expected)
+
+        expected = (b'\x08\x00\x60\x00'  # tag
+                    b'\x04\x00\x00\x00'  # length
+                    b'REG ')
+        data_elem = DataElement(0x00080060, 'CS', 'REG')
+        self.check_data_element(data_elem, expected)
+        data_elem = DataElement(0x00080060, 'CS', b'REG')
         self.check_data_element(data_elem, expected)
 
     def test_write_OD_implicit_little(self):
@@ -1121,6 +1157,46 @@ class TestWriteToStandard(object):
         ds.is_implicit_VR = False
         ds.file_meta.TransferSyntaxUID = '1.2.840.10008.1.2.1'
         fp = DicomBytesIO()
+        ds.save_as(fp, write_like_original=False)
+        fp.seek(0)
+        ds_out = dcmread(fp)
+        ds_explicit = dcmread(mr_name)
+
+        for elem_in, elem_out in zip(ds_explicit, ds_out):
+            assert elem_in == elem_out
+
+    def test_write_dataset(self):
+        # make sure writing and reading back a dataset works correctly
+        ds = dcmread(mr_implicit_name)
+        fp = DicomBytesIO()
+        write_dataset(fp, ds)
+        fp.seek(0)
+        ds_read = read_dataset(fp, is_implicit_VR=True, is_little_endian=True)
+        for elem_orig, elem_read in zip(ds_read, ds):
+            assert elem_orig == elem_read
+
+    def test_write_dataset_with_explicit_vr(self):
+        # make sure conversion from implicit to explicit VR does not
+        # raise (regression test for #632)
+        ds = dcmread(mr_implicit_name)
+        fp = DicomBytesIO()
+        fp.is_implicit_VR = False
+        fp.is_little_endian = True
+        write_dataset(fp, ds)
+        fp.seek(0)
+        ds_read = read_dataset(fp, is_implicit_VR=False, is_little_endian=True)
+        for elem_orig, elem_read in zip(ds_read, ds):
+            assert elem_orig == elem_read
+
+    def test_convert_implicit_to_explicit_vr_using_destination(self):
+        # make sure conversion from implicit to explicit VR works
+        # if setting the property in the destination
+        ds = dcmread(mr_implicit_name)
+        ds.is_implicit_VR = False
+        ds.file_meta.TransferSyntaxUID = '1.2.840.10008.1.2.1'
+        fp = DicomBytesIO()
+        fp.is_implicit_VR = False
+        fp.is_little_endian = True
         ds.save_as(fp, write_like_original=False)
         fp.seek(0)
         ds_out = dcmread(fp)

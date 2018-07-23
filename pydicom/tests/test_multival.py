@@ -1,17 +1,10 @@
-# test_multival.py
+# Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Test suite for MultiValue class"""
-# Copyright (c) 2012 Darcy Mason
-# This file is part of pydicom, relased under an MIT-style license.
-#    See the file LICENSE included with this distribution, also
-#    available at https://github.com/pydicom/pydicom
 
 import unittest
-from datetime import date
 from pydicom.multival import MultiValue
 from pydicom.valuerep import DS, DSfloat, DSdecimal, IS
 from pydicom import config
-from pydicom.dataset import Dataset
-from pydicom.sequence import Sequence
 from copy import deepcopy
 
 import sys
@@ -135,6 +128,7 @@ class MultiValuetests(unittest.TestCase):
         multival3 = MultiValue(str, ['b', 'c', 'a'])
         self.assertFalse(multival != multival2)
         self.assertTrue(multival != multival3)
+
 
 if __name__ == "__main__":
     unittest.main()

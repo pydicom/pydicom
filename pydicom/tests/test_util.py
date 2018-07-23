@@ -1,4 +1,4 @@
-# Copyright 2008-2017 pydicom authors. See LICENSE file for details.
+# Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Test suite for util functions"""
 
 from io import BytesIO
@@ -7,7 +7,6 @@ import unittest
 
 import pytest
 
-from pydicom import compat
 from pydicom import config
 from pydicom import filereader
 from pydicom import valuerep
@@ -18,8 +17,7 @@ from pydicom.util import fixer
 from pydicom.util import hexutil
 from pydicom.util.codify import (camel_to_underscore, tag_repr,
                                  default_name_filter, code_imports,
-                                 code_dataelem, code_sequence,
-                                 main as codify_main)
+                                 code_dataelem, main as codify_main)
 from pydicom.util.dump import *
 from pydicom.util.hexutil import hex2bytes, bytes2hex
 from pydicom.data import get_testdata_files
@@ -136,7 +134,7 @@ class TestCodify(object):
 
     def test_code_file(self, capsys):
         """Test utils.codify.code_file"""
-        filename = get_testdata_files("rtplan")[0]
+        filename = get_testdata_files("rtplan.dcm")[0]
         args = ["--save-as", r"c:\temp\testout.dcm", filename]
         codify_main(100, args)
         out, err = capsys.readouterr()

@@ -1,10 +1,10 @@
+# Copyright 2008-2018 pydicom authors. See LICENSE file for details.
+
 import unittest
-import platform
 import os
 import sys
 import pytest
 import pydicom
-from pydicom.compat import in_py2
 from pydicom.filereader import dcmread
 from pydicom.data import get_testdata_files
 from pydicom.tag import Tag

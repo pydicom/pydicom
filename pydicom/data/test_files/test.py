@@ -1,12 +1,7 @@
-# test.py
+# Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Temporary test file for pydicom development; will change over revisions
 as test various things
 """
-# Copyright (c) 2013 Darcy Mason
-# This file is part of pydicom, relased under an MIT-style license.
-#    See the file LICENSE included with this distribution, also
-#    available at https://github.com/pydicom/pydicom
-#
 
 import pydicom
 # pydicom.debug()

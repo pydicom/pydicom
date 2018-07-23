@@ -1,9 +1,6 @@
-# test_valuerep.py
+# Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Test suite for valuerep.py"""
-# Copyright (c) 2008-2012 Darcy Mason
-# This file is part of pydicom, released under a modified MIT license.
-#    See the file LICENSE included with this distribution, also
-#    available at https://github.com/pydicom/pydicom
+
 import copy
 from datetime import (
     datetime,
@@ -23,6 +20,7 @@ from pydicom import valuerep
 from pydicom.util.fixes import timezone
 from pydicom.data import get_testdata_files
 import unittest
+import pytest
 
 try:
     unittest.skipIf
@@ -138,6 +136,21 @@ class ISPickleTest(unittest.TestCase):
         self.assertEqual(x.real, x2.real)
         self.assertEqual(x.original_string,
                          x2.original_string)
+
+    def testLongInt(self):
+        # Check that a long int is read properly
+        # Will not work with enforce_valid_values
+        x = pydicom.valuerep.IS(3103050000)
+        data1_string = pickle.dumps(x)
+        x2 = pickle.loads(data1_string)
+        self.assertEqual(x.real, x2.real)
+
+    def testOverflow(self):
+        original_flag = config.enforce_valid_values
+        config.enforce_valid_values = True
+        with pytest.raises(OverflowError, match="Value exceeds DICOM limits*"):
+            pydicom.valuerep.IS(3103050000)
+        config.enforce_valid_values = original_flag
 
 
 class BadValueReadtests(unittest.TestCase):
@@ -333,20 +346,31 @@ class DateTimeTests(unittest.TestCase):
         """DA conversion to datetime.date ..."""
         dicom_date = "19610804"
         da = valuerep.DA(dicom_date)
+        # Assert `da` equals to correct `date`
         datetime_date = date(1961, 8, 4)
         self.assertEqual(da, datetime_date,
                          ("DA {0} not equal to date {1}"
                           .format(dicom_date, datetime_date)))
+        # Assert `da.__repr__` holds original string
+        self.assertEqual(repr(da), '"{0}"'.format(dicom_date),
+                         ('DA {0} string representation is not equal to '
+                          'original DICOM string: {1}').format(da, dicom_date))
 
         dicom_date = "1961.08.04"  # ACR-NEMA Standard 300
         da = valuerep.DA(dicom_date)
+        # Assert `da` equals to correct `date`
         datetime_date = date(1961, 8, 4)
         self.assertEqual(da, datetime_date,
                          ("DA {0} not equal to date {1}"
                           .format(dicom_date, datetime_date)))
+        # Assert `da.__repr__` holds original string
+        self.assertEqual(repr(da), '"{0}"'.format(dicom_date),
+                         ('DA {0} string representation is not equal to '
+                          'original DICOM string: {1}').format(da, dicom_date))
 
         dicom_date = ""
         da = valuerep.DA(dicom_date)
+        # Assert `da` equals to no date
         self.assertEqual(da, None,
                          "DA {0} not None".format(dicom_date))
 
@@ -354,30 +378,49 @@ class DateTimeTests(unittest.TestCase):
         """DT conversion to datetime.datetime ..."""
         dicom_datetime = "1961"
         dt = valuerep.DT(dicom_datetime)
+        # Assert `dt` equals to correct `datetime`
         datetime_datetime = datetime(1961, 1, 1)
         self.assertEqual(dt, datetime_datetime,
                          ("DT {0} not equal to datetime {1}"
                           .format(dicom_datetime,
                                   datetime_datetime)))
+        # Assert `dt.__repr__` holds original string
+        self.assertEqual(repr(dt), '"{0}"'.format(dicom_datetime),
+                         ('DT {0} string representation is not equal to '
+                          'original DICOM string: {1}'
+                          .format(dt, dicom_datetime)))
 
         dicom_datetime = "19610804"
         dt = valuerep.DT(dicom_datetime)
+        # Assert `dt` equals to correct `datetime`
         datetime_datetime = datetime(1961, 8, 4)
         self.assertEqual(dt, datetime_datetime,
                          ("DT {0} not equal to datetime {1}"
                           .format(dicom_datetime,
                                   datetime_datetime)))
+        # Assert `dt.__repr__` holds original string
+        self.assertEqual(repr(dt), '"{0}"'.format(dicom_datetime),
+                         ('DT {0} string representation is not equal to '
+                          'original DICOM string: {1}'
+                          .format(dt, dicom_datetime)))
 
         dicom_datetime = "19610804192430.123"
         dt = valuerep.DT(dicom_datetime)
+        # Assert `dt` equals to correct `datetime`
         datetime_datetime = datetime(1961, 8, 4, 19, 24, 30, 123000)
         self.assertEqual(dt, datetime_datetime,
                          ("DT {0} not equal to datetime {1}"
                           .format(dicom_datetime,
                                   datetime_datetime)))
+        # Assert `dt.__repr__` holds original string
+        self.assertEqual(repr(dt), '"{0}"'.format(dicom_datetime),
+                         ('DT {0} string representation is not equal to '
+                          'original DICOM string: {1}'
+                          .format(dt, dicom_datetime)))
 
         dicom_datetime = "196108041924-1000"
         dt = valuerep.DT(dicom_datetime)
+        # Assert `dt` equals to correct `datetime`
         datetime_datetime = datetime(1961, 8, 4, 19, 24, 0, 0,
                                      timezone(timedelta(seconds=-10 * 3600)))
         self.assertEqual(dt, datetime_datetime,
@@ -387,24 +430,42 @@ class DateTimeTests(unittest.TestCase):
         self.assertEqual(dt.utcoffset(),
                          timedelta(0, 0, 0, 0, 0, -10),
                          "DT offset did not compare correctly to timedelta")
+        # Assert `dt.__repr__` holds original string
+        self.assertEqual(repr(dt), '"{0}"'.format(dicom_datetime),
+                         ('DT {0} string representation is not equal to '
+                          'original DICOM string: {1}'
+                          .format(dt, dicom_datetime)))
 
     def testTime(self):
         """TM conversion to datetime.time..."""
         dicom_time = "2359"
         tm = valuerep.TM(dicom_time)
+        # Assert `tm` equals to correct `time`
         datetime_time = time(23, 59)
         self.assertEqual(tm, datetime_time,
                          ("TM {0} not equal to time {1}"
                           .format(dicom_time, datetime_time)))
+        # Assert `tm.__repr__` holds original string
+        self.assertEqual(repr(tm), '"{0}"'.format(dicom_time),
+                         ('TM {0} string representation is not equal to '
+                          'original DICOM string: {1}'
+                          .format(tm, dicom_time)))
 
         dicom_time = "235900.123"
         tm = valuerep.TM(dicom_time)
+        # Assert `tm` equals to correct `time`
         datetime_time = time(23, 59, 00, 123000)
         self.assertEqual(tm, datetime_time,
                          ("TM {0} not equal to time {1}"
                           .format(dicom_time, datetime_time)))
+        # Assert `tm.__repr__` holds original string
+        self.assertEqual(repr(tm), '"{0}"'.format(dicom_time),
+                         ('TM {0} string representation is not equal to '
+                          'original DICOM string: {1}'
+                          .format(tm, dicom_time)))
 
         dicom_time = ""
+        # Assert `tm` equals to no `time`
         tm = valuerep.TM(dicom_time)
         self.assertEqual(tm, None,
                          "TM {0} not None".format(dicom_time))
