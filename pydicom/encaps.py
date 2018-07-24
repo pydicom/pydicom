@@ -168,7 +168,7 @@ def generate_pixel_data_fragment(fp):
                              .format(tag, fp.tell() - 4))
 
 
-def generate_pixel_data_frame(bytestream):
+def generate_pixel_data_frame(bytestream, number_of_frames=None):
     """Yield an encapsulated pixel data frame as bytes.
 
     Parameters
@@ -187,11 +187,11 @@ def generate_pixel_data_frame(bytestream):
     ----------
     DICOM Standard Part 5, Annex A
     """
-    for fragmented_frame in generate_pixel_data(bytestream):
+    for fragmented_frame in generate_pixel_data(bytestream, number_of_frames=number_of_frames):
         yield b''.join(fragmented_frame)
 
 
-def generate_pixel_data(bytestream):
+def generate_pixel_data(bytestream, number_of_frames=None):
     """Yield an encapsulated pixel data frame as a tuples of bytes.
 
     For the following transfer syntaxes, a fragment may not contain encoded
@@ -241,12 +241,14 @@ def generate_pixel_data(bytestream):
     # Doesn't actually matter what the last offset value is, as long as its
     # greater than the total number of bytes in the fragments
     offsets.append(len(bytestream))
-
+    do_one_fragment_per_frame = False
+    if number_of_frames is not None and len(offsets) == 2:
+        do_one_fragment_per_frame = True
     frame = []
     frame_length = 0
     frame_number = 0
     for fragment in generate_pixel_data_fragment(fp):
-        if frame_length < offsets[frame_number + 1]:
+        if (not do_one_fragment_per_frame) and frame_length < offsets[frame_number + 1]:
             frame.append(fragment)
         else:
             yield tuple(frame)

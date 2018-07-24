@@ -7,6 +7,7 @@ to decode pixel transfer syntaxes.
 import sys
 import pydicom
 import pydicom.uid
+from pydicom.config import logger
 
 have_numpy = True
 try:
@@ -116,14 +117,13 @@ def get_pixeldata(dicom_dataset):
     UncompressedPixelData = bytearray()
     if ('NumberOfFrames' in dicom_dataset and
             dicom_dataset.NumberOfFrames > 1):
-        # multiple compressed frames
-        CompressedPixelDataSeq = pydicom.encaps.decode_data_sequence(
-            dicom_dataset.PixelData)
-        # print len(CompressedPixelDataSeq)
-        for frame in CompressedPixelDataSeq:
-            decompressed_image = jpeg_ls.decode(
-                numpy.frombuffer(frame, dtype=numpy.uint8))
-            UncompressedPixelData.extend(decompressed_image.tobytes())
+        for frame in pydicom.encaps.generate_pixel_data_frame(dicom_dataset.PixelData, number_of_frames=dicom_dataset.NumberOfFrames):
+            if frame:
+                decompressed_image = jpeg_ls.decode(
+                    numpy.frombuffer(frame, dtype=numpy.uint8))
+                UncompressedPixelData.extend(decompressed_image.tobytes())
+            else:
+                logger.debug("Why is the first frame zero length?")
     else:
         # single compressed frame
         CompressedPixelData = pydicom.encaps.defragment_data(
