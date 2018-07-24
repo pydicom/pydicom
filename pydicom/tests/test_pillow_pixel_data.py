@@ -102,6 +102,11 @@ sc_rgb_jpeg2k_gdcm_KY = get_testdata_files(
     "SC_rgb_gdcm_KY.dcm")[0]
 ground_truth_sc_rgb_jpeg2k_gdcm_KY_gdcm = get_testdata_files(
     "SC_rgb_gdcm2k_uncompressed.dcm")[0]
+emri_8bit_jpeg_lossy_no_offset_table = get_testdata_files(
+    "emri_8bit_jpeg_lossy_no_offset_table.dcm")[0]
+emri_8bit_jpeg_lossy_with_offset_table = get_testdata_files(
+    "emri_8bit_jpeg_lossy_with_offset_table.dcm")[0]
+emri_8bit = get_testdata_files("emri_8bit.dcm")[0]
 
 
 """
@@ -606,9 +611,50 @@ def test_PI_RGB(test_with_pillow,
 @pytest.mark.skipif(
     not test_pillow_jpeg_decoder,
     reason=pillow_missing_message)
+class jpeg_lossless_mutlifragment_per_frame(unittest.TestCase):
+    def setUp(self):
+        self.emri_8bit_jpeg_lossy_no_offset_table = \
+            dcmread(emri_8bit_jpeg_lossy_no_offset_table)
+        self.emri_8bit_jpeg_lossy_with_offset_table = \
+            dcmread(emri_8bit_jpeg_lossy_with_offset_table)
+        self.emri_8bit = dcmread(emri_8bit)
+
+        self.original_handlers = pydicom.config.image_handlers
+        pydicom.config.image_handlers = [pillow_handler, numpy_handler]
+
+    def tearDown(self):
+        pydicom.config.image_handlers = self.original_handlers
+
+    def test_emri_8bit_jpeg_lossy_with_offset_table(self):
+        """JPEG-LS: decodes multiple fragments per frame with
+           no offset table"""
+        a = self.emri_8bit_jpeg_lossy_with_offset_table.pixel_array
+        b = self.emri_8bit.pixel_array
+        self.assertEqual(
+            a.mean(),
+            b.mean(),
+            "Decoded pixel data is not all {0} "
+            "(mean == {1})".format(b.mean(), a.mean()))
+
+    def test_emri_8bit_jpeg_lossy_no_offset_table(self):
+        """JPEG-LS: decodes multiple fragments per frame with
+           offset table"""
+        a = self.emri_8bit_jpeg_lossy_no_offset_table.pixel_array
+        b = self.emri_8bit.pixel_array
+        self.assertEqual(
+            a.mean(),
+            b.mean(),
+            "Decoded pixel data is not all {0} "
+            "(mean == {1})".format(b.mean(), a.mean()))
+
+
+@pytest.mark.skipif(
+    not test_pillow_jpeg_decoder,
+    reason=pillow_missing_message)
 class pillow_JPEGlosslessTests_with_pillow(unittest.TestCase):
     def setUp(self):
         self.jpeg_lossless = dcmread(jpeg_lossless_name)
+        self.emri_small = dcmread(emri_name)
         self.original_handlers = pydicom.config.image_handlers
         pydicom.config.image_handlers = [pillow_handler, numpy_handler]
 

@@ -152,7 +152,7 @@ def get_pixeldata(dicom_dataset):
 
     if dicom_dataset.is_little_endian != sys_is_little_endian:
         numpy_format = numpy_format.newbyteorder('S')
-
+    is_jpeg = False
     # decompress here
     if (dicom_dataset.file_meta.TransferSyntaxUID in
             PillowJPEGTransferSyntaxes):
@@ -164,6 +164,7 @@ def get_pixeldata(dicom_dataset):
             b'\xff\xd8\xff\xe0\x00\x10'
             b'JFIF\x00\x01\x01\x01\x00\x01\x00\x01\x00\x00')
         frame_start_from = 2
+        is_jpeg = True
     elif (dicom_dataset.file_meta.TransferSyntaxUID in
           PillowJPEG2000TransferSyntaxes):
         logger.debug("This is a JPEG 2000 format")
@@ -171,19 +172,21 @@ def get_pixeldata(dicom_dataset):
         # generic_jpeg_file_header = b'\x00\x00\x00\x0C\x6A'
         #     b'\x50\x20\x20\x0D\x0A\x87\x0A'
         frame_start_from = 0
+        is_jpeg = True
     else:
         logger.debug("This is a another pillow supported format")
         generic_jpeg_file_header = b''
         frame_start_from = 0
+        is_jpeg = False
     try:
         UncompressedPixelData = bytearray()
         if ('NumberOfFrames' in dicom_dataset and
                 dicom_dataset.NumberOfFrames > 1):
             # multiple compressed frames
-            CompressedPixelDataSeq = \
-                pydicom.encaps.decode_data_sequence(
-                    dicom_dataset.PixelData)
-            for frame in CompressedPixelDataSeq:
+            for frame in pydicom.encaps.generate_pixel_data_frame(
+                    dicom_dataset.PixelData,
+                    number_of_frames=dicom_dataset.NumberOfFrames,
+                    is_jpeg=is_jpeg):
                 data = generic_jpeg_file_header + \
                     frame[frame_start_from:]
                 fio = io.BytesIO(data)

@@ -168,7 +168,9 @@ def generate_pixel_data_fragment(fp):
                              .format(tag, fp.tell() - 4))
 
 
-def generate_pixel_data_frame(bytestream, number_of_frames=None):
+def generate_pixel_data_frame(bytestream,
+                              number_of_frames=None,
+                              is_jpeg=False):
     """Yield an encapsulated pixel data frame as bytes.
 
     Parameters
@@ -187,11 +189,16 @@ def generate_pixel_data_frame(bytestream, number_of_frames=None):
     ----------
     DICOM Standard Part 5, Annex A
     """
-    for fragmented_frame in generate_pixel_data(bytestream, number_of_frames=number_of_frames):
+    for fragmented_frame in generate_pixel_data(
+            bytestream,
+            number_of_frames=number_of_frames,
+            is_jpeg=is_jpeg):
         yield b''.join(fragmented_frame)
 
 
-def generate_pixel_data(bytestream, number_of_frames=None):
+def generate_pixel_data(bytestream,
+                        number_of_frames=None,
+                        is_jpeg=False):
     """Yield an encapsulated pixel data frame as a tuples of bytes.
 
     For the following transfer syntaxes, a fragment may not contain encoded
@@ -241,26 +248,33 @@ def generate_pixel_data(bytestream, number_of_frames=None):
     # Doesn't actually matter what the last offset value is, as long as its
     # greater than the total number of bytes in the fragments
     offsets.append(len(bytestream))
-    do_one_fragment_per_frame = False
+    search_for_end_of_frame_marker = False
     if number_of_frames is not None and len(offsets) == 2:
-        do_one_fragment_per_frame = True
+        # somebody passed in a number of frames and the offset table is empty
+        # will have to search fragments for end of frame if it is jpeg
+        search_for_end_of_frame_marker = True
     frame = []
     frame_length = 0
     frame_number = 0
     for fragment in generate_pixel_data_fragment(fp):
-        if (not do_one_fragment_per_frame) and frame_length < offsets[frame_number + 1]:
-            frame.append(fragment)
-        else:
-            yield tuple(frame)
-            frame = [fragment]
-            frame_number += 1
-
+        frame.append(fragment)
         frame_length += len(fragment) + 8
+
+        if search_for_end_of_frame_marker and is_jpeg:
+            if fragment[-10:].find("\xFF\xD9") > 0:
+                yield tuple(frame)
+                frame = []
+                frame_number += 1
+        elif frame_length >= offsets[frame_number + 1]:
+            yield tuple(frame)
+            frame = []
+            frame_number += 1
 
     # Yield the final frame - required here because the frame_length will
     # never be greater than offsets[-1] and thus never trigger the final yield
     # within the for block
-    yield tuple(frame)
+    if not (search_for_end_of_frame_marker and is_jpeg):
+        yield tuple(frame)
 
 
 def decode_data_sequence(data):
