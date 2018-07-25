@@ -259,9 +259,8 @@ def generate_pixel_data(bytestream,
     for fragment in generate_pixel_data_fragment(fp):
         frame.append(fragment)
         frame_length += len(fragment) + 8
-
         if search_for_end_of_frame_marker and is_jpeg:
-            if str(fragment[-10:]).find("\xFF\xD9") > 0:
+            if b"\xFF\xD9" in fragment[-10:]:
                 yield tuple(frame)
                 frame = []
                 frame_number += 1
