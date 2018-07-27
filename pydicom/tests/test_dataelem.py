@@ -328,6 +328,23 @@ class DataElementTests(unittest.TestCase):
         with pytest.raises(TypeError):
             elem[0]
 
+    def test_private_tag_in_repeater_range(self):
+        """Test that a private tag in the repeater range is not handled as
+        repeater tag"""
+        # regression test for #689
+        ds = Dataset()
+        ds[0x50f10010] = RawDataElement(
+            Tag(0x50f10010), None, 8, b'FDMS 1.0', 0, True, True)
+        ds[0x50f1100a] = RawDataElement(
+            Tag(0x50f1100a), None, 6, b'ACC0.6', 0, True, True)
+        private_creator_tag = ds[0x50f10010]
+        assert private_creator_tag.name == 'Private Creator'
+        assert private_creator_tag.VR == 'LO'
+
+        private_tag = ds[0x50f1100a]
+        assert private_tag.name == '[FNC Parameters]'
+        assert private_tag.VR == 'UN'
+
 
 class RawDataElementTests(unittest.TestCase):
     def testKeyError(self):
