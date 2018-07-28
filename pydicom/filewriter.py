@@ -8,7 +8,7 @@ from pydicom import compat
 from pydicom.compat import in_py2
 from pydicom.charset import default_encoding, text_VRs, convert_encodings
 from pydicom.dataelem import DataElement_from_raw
-from pydicom.dataset import Dataset, check_and_fix_file_meta_info
+from pydicom.dataset import Dataset, validate_file_meta
 from pydicom.filebase import DicomFile, DicomFileLike, DicomBytesIO
 from pydicom.multival import MultiValue
 from pydicom.tag import (Tag, ItemTag, ItemDelimiterTag, SequenceDelimiterTag,
@@ -603,7 +603,7 @@ def write_file_meta_info(fp, file_meta, enforce_standard=True):
     ValueError
         If any non-Group 2 Elements are present in `file_meta`.
     """
-    check_and_fix_file_meta_info(file_meta, enforce_standard)
+    validate_file_meta(file_meta, enforce_standard)
 
     if enforce_standard and 'FileMetaInformationGroupLength' not in file_meta:
         # Will be updated with the actual length later
@@ -772,7 +772,7 @@ def dcmwrite(filename, dataset, write_like_original=True):
     #   `write_like_original` is True we treat it as optional
     if not write_like_original:
         # the checks will be done in write_file_meta_info()
-        dataset.fix_meta_info(include_checks=False)
+        dataset.fix_meta_info(enforce_standard=False)
     else:
         dataset.ensure_file_meta()
 

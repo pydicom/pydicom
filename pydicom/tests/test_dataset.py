@@ -8,7 +8,7 @@ import pytest
 from pydicom import compat
 from pydicom.data import get_testdata_files
 from pydicom.dataelem import DataElement, RawDataElement
-from pydicom.dataset import Dataset, FileDataset, check_and_fix_file_meta_info
+from pydicom.dataset import Dataset, FileDataset, validate_file_meta
 from pydicom import dcmread
 from pydicom.filebase import DicomBytesIO
 from pydicom.sequence import Sequence
@@ -1129,11 +1129,11 @@ class DatasetElementsTests(unittest.TestCase):
     def test_fix_meta_info(self):
         self.ds.is_little_endian = True
         self.ds.is_implicit_VR = True
-        self.ds.fix_meta_info(include_checks=False)
+        self.ds.fix_meta_info(enforce_standard=False)
         assert self.ds.file_meta.TransferSyntaxUID == ImplicitVRLittleEndian
 
         self.ds.is_implicit_VR = False
-        self.ds.fix_meta_info(include_checks=False)
+        self.ds.fix_meta_info(enforce_standard=False)
         # transfer syntax does not change because of ambiguity
         assert self.ds.file_meta.TransferSyntaxUID == ImplicitVRLittleEndian
 
@@ -1143,33 +1143,33 @@ class DatasetElementsTests(unittest.TestCase):
             self.ds.fix_meta_info()
 
         self.ds.is_implicit_VR = False
-        self.ds.fix_meta_info(include_checks=False)
+        self.ds.fix_meta_info(enforce_standard=False)
         assert self.ds.file_meta.TransferSyntaxUID == ExplicitVRBigEndian
 
         assert 'MediaStorageSOPClassUID' not in self.ds.file_meta
         assert 'MediaStorageSOPInstanceUID ' not in self.ds.file_meta
         with pytest.raises(ValueError,
                            match='Missing required File Meta .*'):
-            self.ds.fix_meta_info(include_checks=True)
+            self.ds.fix_meta_info(enforce_standard=True)
 
         self.ds.SOPClassUID = '1.2.3'
         self.ds.SOPInstanceUID = '4.5.6'
-        self.ds.fix_meta_info(include_checks=False)
+        self.ds.fix_meta_info(enforce_standard=False)
         assert self.ds.file_meta.MediaStorageSOPClassUID == '1.2.3'
         assert self.ds.file_meta.MediaStorageSOPInstanceUID == '4.5.6'
-        self.ds.fix_meta_info(include_checks=True)
+        self.ds.fix_meta_info(enforce_standard=True)
 
         self.ds.file_meta.PatientID = 'PatientID'
         with pytest.raises(ValueError,
                            match=r'Only File Meta Information Group '
                                  r'\(0002,eeee\) elements must be present .*'):
-            self.ds.fix_meta_info(include_checks=True)
+            self.ds.fix_meta_info(enforce_standard=True)
 
-    def test_check_and_fix_file_meta_info(self):
+    def test_validate_and_correct_file_meta(self):
         file_meta = Dataset()
-        check_and_fix_file_meta_info(file_meta, enforce_standard=False)
+        validate_file_meta(file_meta, enforce_standard=False)
         with pytest.raises(ValueError):
-            check_and_fix_file_meta_info(file_meta, enforce_standard=True)
+            validate_file_meta(file_meta, enforce_standard=True)
 
         file_meta.PatientID = 'PatientID'
         for enforce_standard in (True, False):
@@ -1177,7 +1177,7 @@ class DatasetElementsTests(unittest.TestCase):
                     ValueError,
                     match=r'Only File Meta Information Group '
                           r'\(0002,eeee\) elements must be present .*'):
-                check_and_fix_file_meta_info(
+                validate_file_meta(
                     file_meta, enforce_standard=enforce_standard)
 
         file_meta = Dataset()
@@ -1185,10 +1185,10 @@ class DatasetElementsTests(unittest.TestCase):
         file_meta.MediaStorageSOPInstanceUID = '1.2.4'
         # still missing TransferSyntaxUID
         with pytest.raises(ValueError):
-            check_and_fix_file_meta_info(file_meta, enforce_standard=True)
+            validate_file_meta(file_meta, enforce_standard=True)
 
         file_meta.TransferSyntaxUID = ImplicitVRLittleEndian
-        check_and_fix_file_meta_info(file_meta, enforce_standard=True)
+        validate_file_meta(file_meta, enforce_standard=True)
 
         # check the default created values
         assert file_meta.FileMetaInformationVersion == b'\x00\x01'
@@ -1197,7 +1197,7 @@ class DatasetElementsTests(unittest.TestCase):
 
         file_meta.ImplementationClassUID = '1.2.3.4'
         file_meta.ImplementationVersionName = 'ACME LTD'
-        check_and_fix_file_meta_info(file_meta, enforce_standard=True)
+        validate_file_meta(file_meta, enforce_standard=True)
         # check that existing values are left alone
         assert file_meta.ImplementationClassUID == '1.2.3.4'
         assert file_meta.ImplementationVersionName == 'ACME LTD'

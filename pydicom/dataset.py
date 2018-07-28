@@ -1044,22 +1044,22 @@ class Dataset(dict):
 
     def ensure_file_meta(self):
         """Create an empty file meta dataset if none exists."""
-        self.file_meta = getattr(self, 'file_meta', None) or Dataset()
+        self.file_meta = getattr(self, 'file_meta', Dataset())
 
-    def fix_meta_info(self, include_checks=True):
+    def fix_meta_info(self, enforce_standard=True):
         """Ensure the file meta info exists and has the correct values
         for transfer syntax and media storage uids.
 
-        .. note::
+        .. warning::
 
             The transfer syntax for is_implicit_VR = False and
-            is_little_endian = True is ambiguous and will therefore not set.
+            is_little_endian = True is ambiguous and will therefore not be set.
 
         Parameters
         ----------
-        include_checks : boolean
+        enforce_standard : boolean
             If True, a check for incorrect and missing elements is performed.
-            (see pydicom.filewriter.check_and_fix_file_meta_info)
+            (see pydicom.filewriter.validate_file_meta)
 
         """
         self.ensure_file_meta()
@@ -1076,8 +1076,8 @@ class Dataset(dict):
             self.file_meta.MediaStorageSOPClassUID = self.SOPClassUID
         if 'SOPInstanceUID' in self:
             self.file_meta.MediaStorageSOPInstanceUID = self.SOPInstanceUID
-        if include_checks:
-            check_and_fix_file_meta_info(self.file_meta, enforce_standard=True)
+        if enforce_standard:
+            validate_file_meta(self.file_meta, enforce_standard=True)
 
     def __setattr__(self, name, value):
         """Intercept any attempts to set a value for an instance attribute.
@@ -1399,14 +1399,14 @@ class FileDataset(Dataset):
         return NotImplemented
 
 
-def check_and_fix_file_meta_info(file_meta, enforce_standard=True):
-    """Checks the File Meta Information elements in `file_meta` and
-    adds some tags if missing and enforce_standard is True.
+def validate_file_meta(file_meta, enforce_standard=True):
+    """Validates the File Meta Information elements in `file_meta` and
+    adds some tags if missing and `enforce_standard` is True.
 
     Parameters
     ----------
     file_meta : pydicom.dataset.Dataset
-        The File Meta Information DataElements.
+        The File Meta Information data elements.
     enforce_standard : bool
         If False, then only a check for invalid elements is performed.
         If True, the following elements will be added if not already present:
@@ -1443,7 +1443,7 @@ def check_and_fix_file_meta_info(file_meta, enforce_standard=True):
             file_meta.ImplementationVersionName = (
                 'PYDICOM ' + ".".join(str(x) for x in __version_info__))
 
-        # Check that required File Meta Elements are present
+        # Check that required File Meta Information elements are present
         missing = []
         for element in [0x0002, 0x0003, 0x0010]:
             if Tag(0x0002, element) not in file_meta:
