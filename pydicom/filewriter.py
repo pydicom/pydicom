@@ -7,19 +7,15 @@ from struct import pack
 from pydicom import compat
 from pydicom.compat import in_py2
 from pydicom.charset import default_encoding, text_VRs, convert_encodings
-from pydicom.datadict import keyword_for_tag
 from pydicom.dataelem import DataElement_from_raw
-from pydicom.dataset import Dataset
+from pydicom.dataset import Dataset, validate_file_meta
 from pydicom.filebase import DicomFile, DicomFileLike, DicomBytesIO
 from pydicom.multival import MultiValue
 from pydicom.tag import (Tag, ItemTag, ItemDelimiterTag, SequenceDelimiterTag,
                          tag_in_exception)
-from pydicom.uid import (PYDICOM_IMPLEMENTATION_UID, ImplicitVRLittleEndian,
-                         ExplicitVRBigEndian,
-                         UncompressedPixelTransferSyntaxes)
+from pydicom.uid import UncompressedPixelTransferSyntaxes
 from pydicom.valuerep import extra_length_VRs
 from pydicom.values import convert_numbers
-from pydicom._version import __version_info__
 
 
 def correct_ambiguous_vr_element(elem, ds, is_little_endian):
@@ -607,41 +603,11 @@ def write_file_meta_info(fp, file_meta, enforce_standard=True):
     ValueError
         If any non-Group 2 Elements are present in `file_meta`.
     """
-    # Check that no non-Group 2 Elements are present
-    for elem in file_meta.elements():
-        if elem.tag.group != 0x0002:
-            raise ValueError("Only File Meta Information Group (0002,eeee) "
-                             "elements must be present in 'file_meta'.")
+    validate_file_meta(file_meta, enforce_standard)
 
-    # The Type 1 File Meta Elements are only required when `enforce_standard`
-    #   is True, except for FileMetaInformationGroupLength and
-    #   FileMetaInformationVersion, which may or may not be present
-    if enforce_standard:
+    if enforce_standard and 'FileMetaInformationGroupLength' not in file_meta:
         # Will be updated with the actual length later
-        if 'FileMetaInformationGroupLength' not in file_meta:
-            file_meta.FileMetaInformationGroupLength = 0
-
-        if 'FileMetaInformationVersion' not in file_meta:
-            file_meta.FileMetaInformationVersion = b'\x00\x01'
-
-        if 'ImplementationClassUID' not in file_meta:
-            file_meta.ImplementationClassUID = PYDICOM_IMPLEMENTATION_UID
-
-        if 'ImplementationVersionName' not in file_meta:
-            file_meta.ImplementationVersionName = (
-                'PYDICOM ' + ".".join(str(x) for x in __version_info__))
-
-        # Check that required File Meta Elements are present
-        missing = []
-        for element in [0x0002, 0x0003, 0x0010]:
-            if Tag(0x0002, element) not in file_meta:
-                missing.append(Tag(0x0002, element))
-        if missing:
-            msg = "Missing required File Meta Information elements from " \
-                  "'file_meta':\n"
-            for tag in missing:
-                msg += '\t{0} {1}\n'.format(tag, keyword_for_tag(tag))
-            raise ValueError(msg[:-1])  # Remove final newline
+        file_meta.FileMetaInformationGroupLength = 0
 
     # Only used if FileMetaInformationGroupLength is present.
     #   FileMetaInformationGroupLength has a VR of 'UL' and so has a value that
@@ -804,28 +770,11 @@ def dcmwrite(filename, dataset, write_like_original=True):
 
     # File Meta Information is required under the DICOM standard, however if
     #   `write_like_original` is True we treat it as optional
-    file_meta = getattr(dataset, 'file_meta', None)
-    if not file_meta and not write_like_original:
-        dataset.file_meta = Dataset()
-        file_meta = dataset.file_meta
-
-    # If enforcing the standard, correct the TransferSyntaxUID where possible,
-    #   noting that the transfer syntax for is_implicit_VR = False and
-    #   is_little_endian = True is ambiguous as it may be an encapsulated
-    #   transfer syntax
     if not write_like_original:
-        if dataset.is_little_endian and dataset.is_implicit_VR:
-            file_meta.TransferSyntaxUID = ImplicitVRLittleEndian
-        elif not dataset.is_little_endian and not dataset.is_implicit_VR:
-            file_meta.TransferSyntaxUID = ExplicitVRBigEndian
-        elif not dataset.is_little_endian and dataset.is_implicit_VR:
-            raise NotImplementedError("Implicit VR Big Endian is not a "
-                                      "supported Transfer Syntax.")
-
-        if 'SOPClassUID' in dataset:
-            file_meta.MediaStorageSOPClassUID = dataset.SOPClassUID
-        if 'SOPInstanceUID' in dataset:
-            file_meta.MediaStorageSOPInstanceUID = dataset.SOPInstanceUID
+        # the checks will be done in write_file_meta_info()
+        dataset.fix_meta_info(enforce_standard=False)
+    else:
+        dataset.ensure_file_meta()
 
     # Check for decompression, give warnings if inconsistencies
     # If decompressed, then pixel_array is now used instead of PixelData
@@ -863,9 +812,9 @@ def dcmwrite(filename, dataset, write_like_original=True):
             fp.write(preamble)
             fp.write(b'DICM')
 
-        if file_meta is not None:  # May be an empty Dataset
+        if dataset.file_meta:  # May be an empty Dataset
             # If we want to `write_like_original`, don't enforce_standard
-            write_file_meta_info(fp, file_meta,
+            write_file_meta_info(fp, dataset.file_meta,
                                  enforce_standard=not write_like_original)
 
         # WRITE DATASET
