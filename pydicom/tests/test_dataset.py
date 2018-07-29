@@ -889,9 +889,7 @@ class DatasetTests(unittest.TestCase):
 
         # simulate reading
         ds.SpecificCharacterSet = 'ISO_IR 100'
-        ds.read_little_endian = True
-        ds.read_implicit_vr = True
-        ds.read_encoding = ['latin_1', 'latin_1', 'latin_1']
+        ds.set_original_encoding(True, True, ['latin_1', 'latin_1', 'latin_1'])
         assert not ds.is_original_encoding
 
         ds.is_little_endian = True

@@ -17,7 +17,8 @@ from pydicom.charset import (default_encoding, convert_encodings)
 from pydicom.compat import in_py2
 from pydicom.config import logger
 from pydicom.datadict import dictionary_VR, tag_for_keyword
-from pydicom.dataelem import (DataElement, RawDataElement)
+from pydicom.dataelem import (DataElement, RawDataElement,
+                              DataElement_from_raw)
 from pydicom.dataset import (Dataset, FileDataset)
 from pydicom.dicomdir import DicomDir
 from pydicom.errors import InvalidDicomError
@@ -417,7 +418,14 @@ def read_dataset(fp, is_implicit_VR, is_little_endian, bytelength=None,
     except NotImplementedError as details:
         logger.error(details)
 
-    return Dataset(raw_data_elements)
+    ds = Dataset(raw_data_elements)
+    if 0x00080005 in raw_data_elements:
+        char_set = DataElement_from_raw(raw_data_elements[0x00080005])
+        encoding = convert_encodings(char_set)
+    else:
+        encoding = parent_encoding
+    ds.set_original_encoding(is_implicit_VR, is_little_endian, encoding)
+    return ds
 
 
 def read_sequence(fp, is_implicit_VR, is_little_endian, bytelength, encoding,
@@ -773,9 +781,8 @@ def read_partial(fileobj, stop_when=None, defer_size=None,
     new_dataset = dataset_class(fileobj, dataset, preamble, file_meta_dataset,
                                 is_implicit_VR, is_little_endian)
     # save the originally read transfer syntax properties in the dataset
-    new_dataset.read_little_endian = is_little_endian
-    new_dataset.read_implicit_vr = is_implicit_VR
-    new_dataset.read_encoding = dataset._character_set
+    new_dataset.set_original_encoding(is_implicit_VR, is_little_endian,
+                                      dataset._character_set)
     return new_dataset
 
 
