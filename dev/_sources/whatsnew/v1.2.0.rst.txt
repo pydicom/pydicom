@@ -14,6 +14,8 @@ Enhancements
 * ``DeferredDataElement`` class deprecated and will be removed in v1.3
   (:issue:`291`)
 
+* Added ``Dataset.fix_meta_info()`` (:issue:`584`)
+
 
 Fixes
 .....

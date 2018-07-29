@@ -195,19 +195,20 @@
 <span class="kn">from</span> <span class="nn">bisect</span> <span class="k">import</span> <span class="n">bisect_left</span>
 <span class="kn">from</span> <span class="nn">itertools</span> <span class="k">import</span> <span class="n">takewhile</span>
 
+<span class="kn">import</span> <span class="nn">pydicom</span>  <span class="c1"># for dcmwrite</span>
+<span class="kn">import</span> <span class="nn">pydicom.charset</span>
+<span class="kn">import</span> <span class="nn">pydicom.config</span>
 <span class="kn">from</span> <span class="nn">pydicom</span> <span class="k">import</span> <span class="n">compat</span>
+<span class="kn">from</span> <span class="nn">pydicom._version</span> <span class="k">import</span> <span class="n">__version_info__</span>
 <span class="kn">from</span> <span class="nn">pydicom.charset</span> <span class="k">import</span> <span class="n">default_encoding</span><span class="p">,</span> <span class="n">convert_encodings</span>
+<span class="kn">from</span> <span class="nn">pydicom.config</span> <span class="k">import</span> <span class="n">logger</span>
 <span class="kn">from</span> <span class="nn">pydicom.datadict</span> <span class="k">import</span> <span class="n">dictionary_VR</span>
 <span class="kn">from</span> <span class="nn">pydicom.datadict</span> <span class="k">import</span> <span class="p">(</span><span class="n">tag_for_keyword</span><span class="p">,</span> <span class="n">keyword_for_tag</span><span class="p">,</span>
                               <span class="n">repeater_has_keyword</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">pydicom.tag</span> <span class="k">import</span> <span class="n">Tag</span><span class="p">,</span> <span class="n">BaseTag</span><span class="p">,</span> <span class="n">tag_in_exception</span>
 <span class="kn">from</span> <span class="nn">pydicom.dataelem</span> <span class="k">import</span> <span class="n">DataElement</span><span class="p">,</span> <span class="n">DataElement_from_raw</span><span class="p">,</span> <span class="n">RawDataElement</span>
-<span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="k">import</span> <span class="p">(</span><span class="n">UncompressedPixelTransferSyntaxes</span><span class="p">,</span>
-                         <span class="n">ExplicitVRLittleEndian</span><span class="p">)</span>
-<span class="kn">import</span> <span class="nn">pydicom</span>  <span class="c1"># for dcmwrite</span>
-<span class="kn">import</span> <span class="nn">pydicom.charset</span>
-<span class="kn">from</span> <span class="nn">pydicom.config</span> <span class="k">import</span> <span class="n">logger</span>
-<span class="kn">import</span> <span class="nn">pydicom.config</span>
+<span class="kn">from</span> <span class="nn">pydicom.tag</span> <span class="k">import</span> <span class="n">Tag</span><span class="p">,</span> <span class="n">BaseTag</span><span class="p">,</span> <span class="n">tag_in_exception</span>
+<span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="k">import</span> <span class="p">(</span><span class="n">ExplicitVRLittleEndian</span><span class="p">,</span> <span class="n">ImplicitVRLittleEndian</span><span class="p">,</span>
+                         <span class="n">ExplicitVRBigEndian</span><span class="p">,</span> <span class="n">PYDICOM_IMPLEMENTATION_UID</span><span class="p">)</span>
 
 <span class="n">have_numpy</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="k">try</span><span class="p">:</span>
@@ -892,12 +893,6 @@
         <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">taglist</span><span class="p">:</span>
             <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">_is_uncompressed_transfer_syntax</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Return True if the TransferSyntaxUID is not a compressed syntax.&quot;&quot;&quot;</span>
-        <span class="c1"># FIXME uses file_meta here, should really only be thus for FileDataset</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span> <span class="ow">in</span> <span class="p">(</span>
-            <span class="n">UncompressedPixelTransferSyntaxes</span><span class="p">)</span>
-
     <span class="k">def</span> <span class="nf">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Compare `self` and `other` for inequality.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span> <span class="o">==</span> <span class="n">other</span>
@@ -1219,6 +1214,43 @@
 
         <span class="n">pydicom</span><span class="o">.</span><span class="n">dcmwrite</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">write_like_original</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="Dataset.ensure_file_meta"><a class="viewcode-back" href="../../api_ref.html#pydicom.dataset.Dataset.ensure_file_meta">[docs]</a>    <span class="k">def</span> <span class="nf">ensure_file_meta</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create an empty file meta dataset if none exists.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_meta</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;file_meta&#39;</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="Dataset.fix_meta_info"><a class="viewcode-back" href="../../api_ref.html#pydicom.dataset.Dataset.fix_meta_info">[docs]</a>    <span class="k">def</span> <span class="nf">fix_meta_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">enforce_standard</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Ensure the file meta info exists and has the correct values</span>
+<span class="sd">        for transfer syntax and media storage uids.</span>
+
+<span class="sd">        .. warning::</span>
+
+<span class="sd">            The transfer syntax for is_implicit_VR = False and</span>
+<span class="sd">            is_little_endian = True is ambiguous and will therefore not be set.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        enforce_standard : boolean</span>
+<span class="sd">            If True, a check for incorrect and missing elements is performed.</span>
+<span class="sd">            (see pydicom.filewriter.validate_file_meta)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ensure_file_meta</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_little_endian</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_implicit_VR</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span> <span class="o">=</span> <span class="n">ImplicitVRLittleEndian</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_little_endian</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_implicit_VR</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span> <span class="o">=</span> <span class="n">ExplicitVRBigEndian</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_little_endian</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_implicit_VR</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Implicit VR Big Endian is not a &quot;</span>
+                                      <span class="s2">&quot;supported Transfer Syntax.&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s1">&#39;SOPClassUID&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">MediaStorageSOPClassUID</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SOPClassUID</span>
+        <span class="k">if</span> <span class="s1">&#39;SOPInstanceUID&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">MediaStorageSOPInstanceUID</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SOPInstanceUID</span>
+        <span class="k">if</span> <span class="n">enforce_standard</span><span class="p">:</span>
+            <span class="n">validate_file_meta</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_meta</span><span class="p">,</span> <span class="n">enforce_standard</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
     <span class="k">def</span> <span class="nf">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Intercept any attempts to set a value for an instance attribute.</span>
 
@@ -1537,6 +1569,63 @@
             <span class="k">return</span> <span class="n">self_elem</span> <span class="o">==</span> <span class="n">other_elem</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="vm">__dict__</span>
 
         <span class="k">return</span> <span class="bp">NotImplemented</span></div>
+
+
+<div class="viewcode-block" id="validate_file_meta"><a class="viewcode-back" href="../../api_ref.html#pydicom.dataset.validate_file_meta">[docs]</a><span class="k">def</span> <span class="nf">validate_file_meta</span><span class="p">(</span><span class="n">file_meta</span><span class="p">,</span> <span class="n">enforce_standard</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Validates the File Meta Information elements in `file_meta` and</span>
+<span class="sd">    adds some tags if missing and `enforce_standard` is True.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    file_meta : pydicom.dataset.Dataset</span>
+<span class="sd">        The File Meta Information data elements.</span>
+<span class="sd">    enforce_standard : bool</span>
+<span class="sd">        If False, then only a check for invalid elements is performed.</span>
+<span class="sd">        If True, the following elements will be added if not already present:</span>
+<span class="sd">            * (0002,0001) FileMetaInformationVersion</span>
+<span class="sd">            * (0002,0012) ImplementationClassUID</span>
+<span class="sd">            * (0002,0013) ImplementationVersionName</span>
+<span class="sd">        and the following elements will be checked:</span>
+<span class="sd">            * (0002,0002) MediaStorageSOPClassUID</span>
+<span class="sd">            * (0002,0003) MediaStorageSOPInstanceUID</span>
+<span class="sd">            * (0002,0010) TransferSyntaxUID</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If `enforce_standard` is True and any of the checked File Meta</span>
+<span class="sd">        Information elements are missing from `file_meta`.</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If any non-Group 2 Elements are present in `file_meta`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Check that no non-Group 2 Elements are present</span>
+    <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">file_meta</span><span class="o">.</span><span class="n">elements</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">elem</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">group</span> <span class="o">!=</span> <span class="mh">0x0002</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Only File Meta Information Group (0002,eeee) &quot;</span>
+                             <span class="s2">&quot;elements must be present in &#39;file_meta&#39;.&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">enforce_standard</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s1">&#39;FileMetaInformationVersion&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">file_meta</span><span class="p">:</span>
+            <span class="n">file_meta</span><span class="o">.</span><span class="n">FileMetaInformationVersion</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00\x01</span><span class="s1">&#39;</span>
+
+        <span class="k">if</span> <span class="s1">&#39;ImplementationClassUID&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">file_meta</span><span class="p">:</span>
+            <span class="n">file_meta</span><span class="o">.</span><span class="n">ImplementationClassUID</span> <span class="o">=</span> <span class="n">PYDICOM_IMPLEMENTATION_UID</span>
+
+        <span class="k">if</span> <span class="s1">&#39;ImplementationVersionName&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">file_meta</span><span class="p">:</span>
+            <span class="n">file_meta</span><span class="o">.</span><span class="n">ImplementationVersionName</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s1">&#39;PYDICOM &#39;</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">__version_info__</span><span class="p">))</span>
+
+        <span class="c1"># Check that required File Meta Information elements are present</span>
+        <span class="n">missing</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="p">[</span><span class="mh">0x0002</span><span class="p">,</span> <span class="mh">0x0003</span><span class="p">,</span> <span class="mh">0x0010</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">Tag</span><span class="p">(</span><span class="mh">0x0002</span><span class="p">,</span> <span class="n">element</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">file_meta</span><span class="p">:</span>
+                <span class="n">missing</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Tag</span><span class="p">(</span><span class="mh">0x0002</span><span class="p">,</span> <span class="n">element</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">missing</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Missing required File Meta Information elements from &quot;</span>
+                   <span class="s2">&quot;&#39;file_meta&#39;:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">missing</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="si">{0}</span><span class="s1"> </span><span class="si">{1}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">keyword_for_tag</span><span class="p">(</span><span class="n">tag</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>  <span class="c1"># Remove final newline</span></div>
 </pre></div>
 
            </div>
