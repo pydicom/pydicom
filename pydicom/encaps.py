@@ -1,6 +1,9 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Functions for working with encapsulated (compressed) pixel data."""
 
+from math import floor
+from struct import pack
+
 import pydicom.config
 from pydicom.filebase import DicomBytesIO
 from pydicom.tag import (Tag, ItemTag, SequenceDelimiterTag)
@@ -370,3 +373,131 @@ def read_item(fp):
 
     item_data = fp.read(length)
     return item_data
+
+
+def fragment_frame(frame, no_fragments=1):
+    """Return one or more fragments from `frame`.
+
+    Parameters
+    ----------
+    frame : bytes
+        The data to encapsulated into one or more fragments.
+    no_fragments : int
+        The number of fragments (default 1).
+
+    Returns
+    -------
+    list of bytes
+        The fragmented data, all fragments must be made of an even number of
+        bytes greater than or equal to two.
+    """
+    frame_length = len(frame)
+    if no_fragments > frame_length:
+        raise ValueError('The number of fragments is larger than the '
+                         'number of bytes in the frame.')
+
+    # We use floor to ensure we don't end up with too many fragments
+    length = int(floor(len(frame) / no_fragments))
+
+    output = []
+    start = 0
+    for ii in range(no_fragments):
+        stop = start + length
+
+        _offset = 0
+        if (stop - start) % 2:
+            _offset += 1
+            stop += 1
+
+        if ii < (no_fragments - 1):
+            # 1st to (N-1)th fragment
+            fragment = bytearray(frame[start:stop])
+        else:
+            # Nth fragment
+            fragment = bytearray(frame[start:])
+
+            # Pad the last fragment if it will be odd length
+            if (frame_length - start) % 2:
+                fragment.extend(b'\x00')
+
+        start = stop
+        output.append(bytes(fragment))
+
+    return output
+
+
+def encapsulate_frame(frame, no_fragments=1):
+    """
+
+    Encapsulated pixel data is always little endian.
+
+    Yields
+    ------
+    bytes
+        An itemised fragment
+    """
+    _item_tag = b'\xfe\xff\x00\xe0'
+
+    for fragment in fragment_frame(frame, no_fragments):
+        bytestream = bytearray()
+        # item tag (fffe,e000)
+        bytestream.extend(_item_tag)
+        # fragment length
+        bytestream.extend(pack('<i', len(fragment)))
+        # fragment data
+        bytestream.extend(fragment)
+
+        yield bytestream
+
+
+def encapsulate(frames, fragments_per_frame=1, has_bot=True):
+    """Return encapsulated `frames`.
+
+    Data will be encapsulated with a Basic Offset Table Item at the beginning,
+    then one or more fragment Items. Each item will be of even length and the
+    final fragment of each frame may be padded with 0x00 if required.
+
+    Parameters
+    ----------
+    frames : list of bytes
+        The frame data to encapsulate.
+    fragments_per_frame : int, optional
+        Then number of fragments to use for each frame (default 1).
+    has_bot : bool, optional
+        True to include values in the Basic Offset Table, False otherwise
+        (default True). If `fragments_per_frame` is not 1 then its strongly
+        recommended that this be True.
+
+    Returns
+    -------
+    bytearray
+        The encapsulated data.
+    """
+    bytestream = bytearray()
+
+    # Add the Basic Offset Table Item
+    # Add the tag
+    bytestream.extend(b'\xfe\xff\x00\xe0')
+    if has_bot:
+        # Add the length
+        bytestream.extend(pack('<I', 4 * len(frames)))
+        # Reserve 4 x len(frames) bytes for the offsets
+        bytestream.extend(b'\xFF\xFF\xFF\xFF' * len(frames))
+    else:
+        # Add the length
+        bytestream.extend(pack('<I', 0))
+
+    bot_offset = 0
+    for ii, frame in enumerate(frames):
+        if has_bot:
+            # Go back and write the offset
+            bytestream[8 + ii * 4:12 + ii * 4] = pack('<I', bot_offset)
+
+        frame_length = 0
+        for fragment in encapsulate_frame(frame, fragments_per_frame):
+            frame_length += len(fragment)
+            bytestream.extend(fragment)
+
+        bot_offset += frame_length
+
+    return bytes(bytestream)
