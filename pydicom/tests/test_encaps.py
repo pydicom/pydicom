@@ -884,6 +884,7 @@ class TestEncapsulateFrame(object):
 class TestEncapsulate(object):
     """Test encaps.encapsulate."""
     def test_encapsulate_single_fragment_per_frame_no_bot(self):
+        """Test encapsulating single fragment per frame with not BOT values."""
         ds = dcmread(JP2K_10FRAME_1PERFRAME)
         frames = decode_data_sequence(ds.PixelData)
         assert len(frames) == 10
@@ -893,9 +894,11 @@ class TestEncapsulate(object):
         for a, b in zip(test_frames, frames):
             assert a == b
 
+        # Original data has no BOT values
         assert data == ds.PixelData
 
     def test_encapsulate_single_fragment_per_frame_bot(self):
+        """Test encapsulating single fragment per frame with BOT values."""
         ds = dcmread(JP2K_10FRAME_1PERFRAME)
         frames = decode_data_sequence(ds.PixelData)
         assert len(frames) == 10
@@ -904,3 +907,10 @@ class TestEncapsulate(object):
         test_frames = decode_data_sequence(data)
         for a, b in zip(test_frames, frames):
             assert a == b
+
+        fp = DicomBytesIO(data)
+        fp.is_little_endian = True
+        offsets = get_frame_offsets(fp)
+        assert offsets == [
+            0, 3822, 7670, 11512, 15356, 19166, 22946, 26676, 30434, 34196
+        ]
