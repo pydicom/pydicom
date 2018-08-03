@@ -12,22 +12,26 @@ from pydicom.tag import (Tag, ItemTag, SequenceDelimiterTag)
 def get_frame_offsets(fp):
     """Return a list of the fragment offsets from the Basic Offset Table.
 
-    Basic Offset Table
-    ~~~~~~~~~~~~~~~~~~
+    **Basic Offset Table**
+
     The Basic Offset Table Item must be present and have a tag (FFFE,E000) and
     a length, however it may or may not have a value.
 
     Basic Offset Table with no value
-    Item Tag   | Length    |
-    FE FF 00 E0 00 00 00 00
+    ::
+
+        Item Tag   | Length    |
+        FE FF 00 E0 00 00 00 00
 
     Basic Offset Table with value (2 frames)
-    Item Tag   | Length    | Offset 1  | Offset 2  |
-    FE FF 00 E0 08 00 00 00 00 00 00 00 10 00 00 00
+    ::
+
+        Item Tag   | Length    | Offset 1  | Offset 2  |
+        FE FF 00 E0 08 00 00 00 00 00 00 00 10 00 00 00
 
     For single or multi-frame images with only one frame, the Basic Offset
     Table may or may not have a value. When it has no value then its length
-    shall be 0x00000000.
+    shall be ``0x00000000``.
 
     For multi-frame images with more than one frame, the Basic Offset Table
     should have a value containing concatenated 32-bit unsigned integer values
@@ -42,11 +46,11 @@ def get_frame_offsets(fp):
     ----------
     fp : pydicom.filebase.DicomBytesIO
         The encapsulated pixel data positioned at the start of the Basic Offset
-        Table. `fp.is_little_endian` should be set to True.
+        Table. ``fp.is_little_endian`` should be set to True.
 
     Returns
     -------
-    offsets : list of int
+    list of int
         The byte offsets to the first fragment of each frame, as measured from
         the start of the first item following the Basic Offset Table item.
 
@@ -91,13 +95,13 @@ def generate_pixel_data_fragment(fp):
     For compressed (encapsulated) Transfer Syntaxes, the (7fe0,0010) 'Pixel
     Data' element is encoded in an encapsulated format.
 
-    Encapsulation
-    -------------
+    **Encapsulation**
+
     The encoded pixel data stream is fragmented into one or more Items. The
     stream may represent a single or multi-frame image.
 
-    Each 'Data Stream Fragment' shall have tag of (fffe,e000), followed by a 4
-    byte 'Item Length' field encoding the explicit number of bytes in the Item.
+    Each *Data Stream Fragment* shall have tag of (fffe,e000), followed by a 4
+    byte *Item Length* field encoding the explicit number of bytes in the Item.
     All Items containing an encoded fragment shall have an even number of bytes
     greater than or equal to 2, with the last fragment being padded if
     necessary.
@@ -105,14 +109,14 @@ def generate_pixel_data_fragment(fp):
     The first Item in the Sequence of Items shall be a 'Basic Offset Table',
     however the Basic Offset Table item value is not required to be present.
     It is assumed that the Basic Offset Table item has already been read prior
-    to calling this function (and that `fp` is positioned past this item).
+    to calling this function (and that ``fp`` is positioned past this item).
 
     The remaining items in the Sequence of Items are the pixel data fragments
     and it is these items that will be read and returned by this function.
 
     The Sequence of Items is terminated by a Sequence Delimiter Item with tag
-    (fffe,e0dd) and an Item Length field of value 0x00000000. The presence or
-    absence of the Sequence Delimiter Item in `fp` has no effect on the
+    (fffe,e0dd) and an Item Length field of value ``0x00000000``. The presence
+    or absence of the Sequence Delimiter Item in `fp` has no effect on the
     returned fragments.
 
     Encoding
@@ -122,9 +126,9 @@ def generate_pixel_data_fragment(fp):
     Parameters
     ----------
     fp : pydicom.filebase.DicomBytesIO
-        The encoded (7fe0,0010) 'Pixel Data' element value, positioned at the
+        The encoded (7fe0,0010) *Pixel Data* element value, positioned at the
         start of the item tag for the first item after the Basic Offset Table
-        item. `fp.is_little_endian` should be set to True.
+        item. ``fp.is_little_endian`` should be set to True.
 
     Yields
     ------
@@ -177,7 +181,7 @@ def generate_pixel_data_frame(bytestream):
     Parameters
     ----------
     bytestream : bytes
-        The value of the (7fe0, 0010) 'Pixel Data' element from an encapsulated
+        The value of the (7fe0, 0010) *Pixel Data* element from an encapsulated
         dataset. The Basic Offset Table item should be present and the
         Sequence Delimiter item may or may not be present.
 
@@ -201,28 +205,29 @@ def generate_pixel_data(bytestream):
     data from more than one frame. However data from one frame may span
     multiple fragments.
 
-    1.2.840.10008.1.2.4.50 - JPEG Baseline (Process 1)
-    1.2.840.10008.1.2.4.51 - JPEG Baseline (Process 2 and 4)
-    1.2.840.10008.1.2.4.57 - JPEG Lossless, Non-Hierarchical (Process 14)
-    1.2.840.10008.1.2.4.70 - JPEG Lossless, Non-Hierarchical, First-Order
-        Prediction (Process 14 [Selection Value 1])
-    1.2.840.10008.1.2.4.80 - JPEG-LS Lossless Image Compression
-    1.2.840.10008.1.2.4.81 - JPEG-LS Lossy (Near-Lossless) Image Compression
-    1.2.840.10008.1.2.4.90 - JPEG 2000 Image Compression (Lossless Only)
-    1.2.840.10008.1.2.4.91 - JPEG 2000 Image Compression
-    1.2.840.10008.1.2.4.92 - JPEG 2000 Part 2 Multi-component Image Compression
-        (Lossless Only)
-    1.2.840.10008.1.2.4.93 - JPEG 2000 Part 2 Multi-component Image Compression
+    * 1.2.840.10008.1.2.4.50 - JPEG Baseline (Process 1)
+    * 1.2.840.10008.1.2.4.51 - JPEG Baseline (Process 2 and 4)
+    * 1.2.840.10008.1.2.4.57 - JPEG Lossless, Non-Hierarchical (Process 14)
+    * 1.2.840.10008.1.2.4.70 - JPEG Lossless, Non-Hierarchical, First-Order
+      Prediction (Process 14 [Selection Value 1])
+    * 1.2.840.10008.1.2.4.80 - JPEG-LS Lossless Image Compression
+    * 1.2.840.10008.1.2.4.81 - JPEG-LS Lossy (Near-Lossless) Image Compression
+    * 1.2.840.10008.1.2.4.90 - JPEG 2000 Image Compression (Lossless Only)
+    * 1.2.840.10008.1.2.4.91 - JPEG 2000 Image Compression
+    * 1.2.840.10008.1.2.4.92 - JPEG 2000 Part 2 Multi-component Image
+      Compression (Lossless Only)
+    * 1.2.840.10008.1.2.4.93 - JPEG 2000 Part 2 Multi-component Image
+      Compression
 
     For the following transfer syntaxes, each frame shall be encoded in one and
     only one fragment.
 
-    1.2.840.10008.1.2.5 - RLE Lossless
+    * 1.2.840.10008.1.2.5 - RLE Lossless
 
     Parameters
     ----------
     bytestream : bytes
-        The value of the (7fe0, 0010) 'Pixel Data' element from an encapsulated
+        The value of the (7fe0, 0010) *Pixel Data* element from an encapsulated
         dataset. The Basic Offset Table item should be present and the
         Sequence Delimiter item may or may not be present.
 
@@ -381,73 +386,80 @@ def fragment_frame(frame, no_fragments=1):
     Parameters
     ----------
     frame : bytes
-        The data to encapsulated into one or more fragments.
+        The data to fragment.
     no_fragments : int
         The number of fragments (default 1).
 
     Returns
     -------
     list of bytes
-        The fragmented data, all fragments must be made of an even number of
-        bytes greater than or equal to two.
+        The fragmented data, with all fragments are an even number of bytes
+        greater than or equal to two.
     """
+    # Benchmarking: O(no_fragments)
     frame_length = len(frame)
     if no_fragments > frame_length:
         raise ValueError('The number of fragments is larger than the '
                          'number of bytes in the frame.')
 
     # We use floor to ensure we don't end up with too many fragments
-    length = int(floor(len(frame) / no_fragments))
+    length = floor(frame_length / no_fragments)
+
+    # Each fragment must be of even length
+    if length % 2:
+        length += 1
 
     output = []
-    start = 0
+    offset = 0
     for ii in range(no_fragments):
-        stop = start + length
-
-        _offset = 0
-        if (stop - start) % 2:
-            _offset += 1
-            stop += 1
-
         if ii < (no_fragments - 1):
             # 1st to (N-1)th fragment
-            fragment = bytearray(frame[start:stop])
+            fragment = frame[offset:offset + length]
         else:
             # Nth fragment
-            fragment = bytearray(frame[start:])
+            fragment = bytearray(frame[offset:])
 
             # Pad the last fragment if it will be odd length
-            if (frame_length - start) % 2:
+            if (frame_length - offset) % 2:
                 fragment.extend(b'\x00')
 
-        start = stop
+        offset += length
         output.append(bytes(fragment))
 
     return output
 
 
-def encapsulate_frame(frame, no_fragments=1):
-    """
+def itemise_frame(frame, no_fragments=1):
+    """Yield items generated from `frame`.
 
-    Encapsulated pixel data is always little endian.
+    Parameters
+    ----------
+    frame : bytes
+        The data to fragment and itemise.
+    no_fragments : int
+        The number of fragments/items (default 1).
 
     Yields
     ------
-    bytes
-        An itemised fragment
+    bytearray
+        An itemised fragment, encoded as little endian.
     """
+    # Benchmarking: O(no_fragments)
     _item_tag = b'\xfe\xff\x00\xe0'
 
     for fragment in fragment_frame(frame, no_fragments):
-        bytestream = bytearray()
+        item = bytearray()
         # item tag (fffe,e000)
-        bytestream.extend(_item_tag)
+        item.extend(_item_tag)
         # fragment length
-        bytestream.extend(pack('<i', len(fragment)))
+        item.extend(pack('<I', len(fragment)))
         # fragment data
-        bytestream.extend(fragment)
+        item.extend(fragment)
 
-        yield bytestream
+        yield item
+
+
+itemize_frame = itemise_frame
 
 
 def encapsulate(frames, fragments_per_frame=1, has_bot=True):
@@ -470,9 +482,10 @@ def encapsulate(frames, fragments_per_frame=1, has_bot=True):
 
     Returns
     -------
-    bytearray
+    bytes
         The encapsulated data.
     """
+    # Benchmarking: O(fragments_per_frame)
     bytestream = bytearray()
 
     # Add the Basic Offset Table Item
@@ -494,9 +507,9 @@ def encapsulate(frames, fragments_per_frame=1, has_bot=True):
             bytestream[8 + ii * 4:12 + ii * 4] = pack('<I', bot_offset)
 
         frame_length = 0
-        for fragment in encapsulate_frame(frame, fragments_per_frame):
-            frame_length += len(fragment)
-            bytestream.extend(fragment)
+        for item in itemise_frame(frame, fragments_per_frame):
+            frame_length += len(item)
+            bytestream.extend(item)
 
         bot_offset += frame_length
 

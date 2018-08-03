@@ -14,13 +14,13 @@ from pydicom.encaps import (
     defragment_data,
     read_item,
     fragment_frame,
-    encapsulate_frame,
+    itemise_frame,
     encapsulate
 )
 from pydicom.filebase import DicomBytesIO
 
 
-NOBOT_JP2K_10FRAME_1PERFRAME = get_testdata_files('emri_small_jpeg_2k_lossless.dcm')[0]
+JP2K_10FRAME_1PERFRAME = get_testdata_files('emri_small_jpeg_2k_lossless.dcm')[0]
 
 
 class TestGetFrameOffsets(object):
@@ -844,11 +844,11 @@ class TestFragmentFrame(object):
 
 
 class TestEncapsulateFrame(object):
-    """Test encaps.encapsulate_frame."""
+    """Test encaps.itemise_frame."""
     def test_single_item(self):
         """Test encapsulating into one fragment"""
         bytestream = b'\xFE\xFF\x00\xE1'
-        item_generator = encapsulate_frame(bytestream, no_fragments=1)
+        item_generator = itemise_frame(bytestream, no_fragments=1)
         item = next(item_generator)
 
         assert item == (
@@ -862,7 +862,7 @@ class TestEncapsulateFrame(object):
     def test_two_items(self):
         """Test encapsulating into two fragments"""
         bytestream = b'\xFE\xFF\x00\xE1'
-        item_generator = encapsulate_frame(bytestream, no_fragments=2)
+        item_generator = itemise_frame(bytestream, no_fragments=2)
 
         item = next(item_generator)
         assert item == (
@@ -904,5 +904,3 @@ class TestEncapsulate(object):
         test_frames = decode_data_sequence(data)
         for a, b in zip(test_frames, frames):
             assert a == b
-
-        assert data == ds.PixelData
