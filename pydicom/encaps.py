@@ -483,31 +483,31 @@ def encapsulate(frames, fragments_per_frame=1, has_bot=True):
     bytes
         The encapsulated data.
     """
-    bytestream = bytearray()
+    output = bytearray()
 
     # Add the Basic Offset Table Item
     # Add the tag
-    bytestream.extend(b'\xfe\xff\x00\xe0')
+    output.extend(b'\xfe\xff\x00\xe0')
     if has_bot:
         # Add the length
-        bytestream.extend(pack('<I', 4 * len(frames)))
+        output.extend(pack('<I', 4 * len(frames)))
         # Reserve 4 x len(frames) bytes for the offsets
-        bytestream.extend(b'\xFF\xFF\xFF\xFF' * len(frames))
+        output.extend(b'\xFF\xFF\xFF\xFF' * len(frames))
     else:
         # Add the length
-        bytestream.extend(pack('<I', 0))
+        output.extend(pack('<I', 0))
 
-    bot_offset = 0
+    frame_offset = 0
     for ii, frame in enumerate(frames):
         if has_bot:
             # Go back and write the offset
-            bytestream[8 + ii * 4:12 + ii * 4] = pack('<I', bot_offset)
+            output[8 + ii * 4:12 + ii * 4] = pack('<I', frame_offset)
 
         frame_length = 0
         for item in itemise_frame(frame, fragments_per_frame):
             frame_length += len(item)
-            bytestream.extend(item)
+            output.extend(item)
 
-        bot_offset += frame_length
+        frame_offset += frame_length
 
-    return bytes(bytestream)
+    return bytes(output)

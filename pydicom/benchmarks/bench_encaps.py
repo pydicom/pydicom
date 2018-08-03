@@ -9,13 +9,13 @@ from pydicom.encaps import (
     encapsulate,
     decode_data_sequence
 )
-from pydicom.filebase import DicomBytesIO
 
 
 JP2K_10FRAME = get_testdata_files('emri_small_jpeg_2k_lossless.dcm')[0]
 
 
 class TimeFragmentFrame(object):
+    """Time tests for the encaps.fragment_frame function."""
     def setup(self):
         """Setup the test"""
         ds = dcmread(JP2K_10FRAME)
@@ -35,6 +35,7 @@ class TimeFragmentFrame(object):
 
 
 class TimeItemiseFrame(object):
+    """Time tests for the encaps.itemise_frame function."""
     def setup(self):
         """Setup the test"""
         ds = dcmread(JP2K_10FRAME)
@@ -56,6 +57,7 @@ class TimeItemiseFrame(object):
 
 
 class TimeEncapsulate(object):
+    """Time tests for the encaps.encapsulate function."""
     def setup(self):
         """Setup the test"""
         ds = dcmread(JP2K_10FRAME)
