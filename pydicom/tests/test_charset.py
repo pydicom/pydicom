@@ -3,12 +3,13 @@
 
 import unittest
 
+import pytest
+
 from pydicom.data import get_charset_files
 from pydicom.data import get_testdata_files
 import pydicom.charset
-from pydicom.dataelem import DataElement
-from pydicom import dcmread
-
+from pydicom.dataelem import DataElement, RawDataElement, DataElement_from_raw
+from pydicom import dcmread, Dataset
 
 latin1_file = get_charset_files("chrFren.dcm")[0]
 jp_file = get_charset_files("chrH31.dcm")[0]
@@ -113,6 +114,33 @@ class CharsetTests(unittest.TestCase):
         # default encoding is iso8859
         pydicom.charset.decode(elem, [])
         assert 'iso8859' in elem.value.encodings
+
+    def test_patched_charset(self):
+        """Test some commonly misspelled charset values"""
+        elem = DataElement(0x00100010, 'PN', b'Buc^J\xc3\xa9r\xc3\xb4me')
+        pydicom.charset.decode(elem, ['ISO_IR 192'])
+        # correct encoding
+        assert u'Buc^J\xe9r\xf4me' == elem.value
+
+        # patched encoding shall behave
+        elem = DataElement(0x00100010, 'PN', b'Buc^J\xc3\xa9r\xc3\xb4me')
+        with pytest.warns(UserWarning,
+                          match='Incorrect value for Specific Character Set '
+                                "'ISO IR 192' - assuming 'ISO_IR 192'"):
+            pydicom.charset.decode(elem, ['ISO IR 192'])
+            assert u'Buc^J\xe9r\xf4me' == elem.value
+
+        elem = DataElement(0x00100010, 'PN', b'Buc^J\xc3\xa9r\xc3\xb4me')
+        with pytest.warns(UserWarning,
+                          match='Incorrect value for Specific Character Set '
+                                "'ISO-IR 192' - assuming 'ISO_IR 192'"):
+            pydicom.charset.decode(elem, ['ISO-IR 192'])
+            assert u'Buc^J\xe9r\xf4me' == elem.value
+
+        # not patched incorrect encoding
+        elem = DataElement(0x00100010, 'PN', b'Buc^J\xc3\xa9r\xc3\xb4me')
+        with pytest.raises(LookupError):
+            pydicom.charset.decode(elem, ['ISO=IR 192'])
 
 
 if __name__ == "__main__":
