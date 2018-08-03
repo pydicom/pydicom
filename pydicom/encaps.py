@@ -396,7 +396,6 @@ def fragment_frame(frame, no_fragments=1):
         The fragmented data, with all fragments are an even number of bytes
         greater than or equal to two.
     """
-    # Benchmarking: O(no_fragments)
     frame_length = len(frame)
     if no_fragments > frame_length:
         raise ValueError('The number of fragments is larger than the '
@@ -444,7 +443,6 @@ def itemise_frame(frame, no_fragments=1):
     bytearray
         An itemised fragment, encoded as little endian.
     """
-    # Benchmarking: O(no_fragments)
     _item_tag = b'\xfe\xff\x00\xe0'
 
     for fragment in fragment_frame(frame, no_fragments):
@@ -485,7 +483,6 @@ def encapsulate(frames, fragments_per_frame=1, has_bot=True):
     bytes
         The encapsulated data.
     """
-    # Benchmarking: O(fragments_per_frame)
     bytestream = bytearray()
 
     # Add the Basic Offset Table Item
