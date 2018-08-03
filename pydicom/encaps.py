@@ -403,7 +403,7 @@ def fragment_frame(frame, no_fragments=1):
                          'number of bytes in the frame.')
 
     # We use floor to ensure we don't end up with too many fragments
-    length = floor(frame_length / no_fragments)
+    length = int(floor(frame_length / no_fragments))
 
     # Each fragment must be of even length
     if length % 2:

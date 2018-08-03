@@ -20,7 +20,7 @@ from pydicom.encaps import (
 from pydicom.filebase import DicomBytesIO
 
 
-JP2K_10FRAME_1PERFRAME = get_testdata_files('emri_small_jpeg_2k_lossless.dcm')[0]
+JP2K_10FRAME_NOBOT = get_testdata_files('emri_small_jpeg_2k_lossless.dcm')[0]
 
 
 class TestGetFrameOffsets(object):
@@ -885,7 +885,7 @@ class TestEncapsulate(object):
     """Test encaps.encapsulate."""
     def test_encapsulate_single_fragment_per_frame_no_bot(self):
         """Test encapsulating single fragment per frame with not BOT values."""
-        ds = dcmread(JP2K_10FRAME_1PERFRAME)
+        ds = dcmread(JP2K_10FRAME_NOBOT)
         frames = decode_data_sequence(ds.PixelData)
         assert len(frames) == 10
 
@@ -899,7 +899,7 @@ class TestEncapsulate(object):
 
     def test_encapsulate_single_fragment_per_frame_bot(self):
         """Test encapsulating single fragment per frame with BOT values."""
-        ds = dcmread(JP2K_10FRAME_1PERFRAME)
+        ds = dcmread(JP2K_10FRAME_NOBOT)
         frames = decode_data_sequence(ds.PixelData)
         assert len(frames) == 10
 
