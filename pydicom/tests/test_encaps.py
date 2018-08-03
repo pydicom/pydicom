@@ -914,3 +914,27 @@ class TestEncapsulate(object):
         assert offsets == [
             0, 3822, 7670, 11512, 15356, 19166, 22946, 26676, 30434, 34196
         ]
+
+    def test_encapsulate_bot(self):
+        """Test the Basic Offset Table is correct."""
+        ds = dcmread(JP2K_10FRAME_NOBOT)
+        frames = decode_data_sequence(ds.PixelData)
+        assert len(frames) == 10
+
+        data = encapsulate(frames, fragments_per_frame=1, has_bot=True)
+        assert data[:56] == (
+            b'\xfe\xff\x00\xe0'  # Basic offset table item tag
+            b'\x28\x00\x00\x00'  # Basic offset table length
+            b'\x00\x00\x00\x00'  # First offset
+            b'\xee\x0e\x00\x00'
+            b'\xf6\x1d\x00\x00'
+            b'\xf8\x2c\x00\x00'
+            b'\xfc\x3b\x00\x00'
+            b'\xde\x4a\x00\x00'
+            b'\xa2\x59\x00\x00'
+            b'\x34\x68\x00\x00'
+            b'\xe2\x76\x00\x00'
+            b'\x94\x85\x00\x00'  # Last offset
+            b'\xfe\xff\x00\xe0'  # Next item tag
+            b'\xe6\x0e\x00\x00'  # Next item value
+        )

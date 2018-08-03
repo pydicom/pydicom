@@ -395,6 +395,22 @@ def fragment_frame(frame, no_fragments=1):
     list of bytes
         The fragmented data, with all fragments are an even number of bytes
         greater than or equal to two.
+
+    Notes
+    -----
+
+    * All items containing an encoded fragment shall be made of an even number
+      of bytes greater than or equal to two.
+    * The last fragment of a frame may be padded, if necessary to meet the
+      sequence item format requirements of the DICOM Standard.
+    * Any necessary padding may be appended after the end of image marker
+    * Encapsulated Pixel Data has the Value Representation OB.
+    * Values with a VR of OB shall be padded with a single trailing NULL byte
+      value (0x00) to achieve even length.
+
+    References
+    ----------
+    DICOM Standard, Part 5, Section 6.2 and Annex A.4
     """
     frame_length = len(frame)
     if no_fragments > frame_length:
@@ -404,7 +420,7 @@ def fragment_frame(frame, no_fragments=1):
     # We use floor to ensure we don't end up with too many fragments
     length = int(floor(frame_length / no_fragments))
 
-    # Each fragment must be of even length
+    # Each item shall be an even number of bytes
     if length % 2:
         length += 1
 
@@ -418,7 +434,7 @@ def fragment_frame(frame, no_fragments=1):
             # Nth fragment
             fragment = bytearray(frame[offset:])
 
-            # Pad the last fragment if it will be odd length
+            # Pad last fragment if needed to make even
             if (frame_length - offset) % 2:
                 fragment.extend(b'\x00')
 
@@ -442,14 +458,26 @@ def itemise_frame(frame, no_fragments=1):
     ------
     bytearray
         An itemised fragment, encoded as little endian.
+
+    Notes
+    -----
+
+    * The encoding of the shall be in Little Endian.
+    * Each fragment is encapsulated as a DICOM Item with tag (FFFE,E000), then
+      a 4 byte length.
+
+    References
+    ----------
+    DICOM Standard, Part 5, Section 7.5 and Annex A.4
     """
-    _item_tag = b'\xfe\xff\x00\xe0'
+    # (FFFE,E000)
+    item_tag = b'\xFE\xFF\x00\xE0'
 
     for fragment in fragment_frame(frame, no_fragments):
         item = bytearray()
         # item tag (fffe,e000)
-        item.extend(_item_tag)
-        # fragment length
+        item.extend(item_tag)
+        # fragment length '<I' little endian, 4 byte unsigned int
         item.extend(pack('<I', len(fragment)))
         # fragment data
         item.extend(fragment)
@@ -482,32 +510,53 @@ def encapsulate(frames, fragments_per_frame=1, has_bot=True):
     -------
     bytes
         The encapsulated data.
+
+    Notes
+    -----
+
+    * The encoding shall be in Little Endian.
+    * Each fragment is encapsulated as a DICOM Item with tag (FFFE,E000), then
+      a 4 byte length.
+    * The first item shall be a Basic Offset Table item.
+    * The Basic Offset Table item, however, is not required to have a value.
+    * If no value is present, the Basic Offset Table length is 0.
+    * If the value is present, it shall contain concatenated 32-bit
+      unsigned integer values that are byte offsets to the first byte of the
+      Item tag of the first fragment in each frame as measured from the first
+      byte of the first Item tag following the Basic Offset Table Item.
+
+    References
+    ----------
+    DICOM Standard, Part 5, Section 7.5 and Annex A.4
     """
+    no_frames = len(frames)
     output = bytearray()
 
     # Add the Basic Offset Table Item
     # Add the tag
-    output.extend(b'\xfe\xff\x00\xe0')
+    output.extend(b'\xFE\xFF\x00\xE0')
     if has_bot:
         # Add the length
-        output.extend(pack('<I', 4 * len(frames)))
+        output.extend(pack('<I', 4 * no_frames))
         # Reserve 4 x len(frames) bytes for the offsets
-        output.extend(b'\xFF\xFF\xFF\xFF' * len(frames))
+        output.extend(b'\xFF\xFF\xFF\xFF' * no_frames)
     else:
         # Add the length
         output.extend(pack('<I', 0))
 
-    frame_offset = 0
+    bot_offsets = [0]
     for ii, frame in enumerate(frames):
-        if has_bot:
-            # Go back and write the offset
-            output[8 + ii * 4:12 + ii * 4] = pack('<I', frame_offset)
-
-        frame_length = 0
+        itemised_length = 0
         for item in itemise_frame(frame, fragments_per_frame):
-            frame_length += len(item)
+            itemised_length += len(item)
             output.extend(item)
 
-        frame_offset += frame_length
+        # Update the list of frame offsets
+        bot_offsets.append(bot_offsets[ii] + itemised_length)
+
+    if has_bot:
+        # Go back and write the frame offsets - don't need the last offset
+        output[8:8 + 4 * no_frames] = pack('<{}I'.format(no_frames),
+                                           *bot_offsets[:-1])
 
     return bytes(output)
