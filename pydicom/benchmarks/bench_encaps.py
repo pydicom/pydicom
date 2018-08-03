@@ -24,24 +24,14 @@ class TimeFragmentFrame(object):
         self.no_runs = 1000
 
     def time_fragment_single(self):
-        """Time fragmenting each frame into a single fragment."""
+        """Time fragmenting each frame into 1 fragment."""
         for ii in range(self.no_runs):
             fragment_frame(self.test_data[0], 1)
 
-    def time_fragment_double(self):
-        """Time fragmenting each frame into two fragments."""
-        for ii in range(self.no_runs):
-            fragment_frame(self.test_data[0], 2)
-
-    def time_fragment_triple(self):
-        """Time fragmenting each frame into three fragments."""
-        for ii in range(self.no_runs):
-            fragment_frame(self.test_data[0], 3)
-
     def time_fragment_ten(self):
-        """Time fragmenting each frame into ten fragments."""
+        """Time fragmenting each frame into 10 fragments."""
         for ii in range(self.no_runs):
-            fragment_frame(self.test_data[0], 80)
+            fragment_frame(self.test_data[0], 10)
 
 
 class TimeItemiseFrame(object):
@@ -53,21 +43,15 @@ class TimeItemiseFrame(object):
         self.no_runs = 1000
 
     def time_itemise_single(self):
-        """Time itemising a frame into a single fragment."""
+        """Time itemising a frame into 1 fragment."""
         for ii in range(self.no_runs):
             for item in itemise_frame(self.test_data[0], 1):
                 pass
 
-    def time_itemise_double(self):
-        """Time itemising a frame into two fragments."""
+    def time_itemise_ten(self):
+        """Time itemising a frame into 10 fragments."""
         for ii in range(self.no_runs):
-            for item in itemise_frame(self.test_data[0], 2):
-                pass
-
-    def time_itemise_triple(self):
-        """Time itemising a frame into three fragments."""
-        for ii in range(self.no_runs):
-            for item in itemise_frame(self.test_data[0], 3):
+            for item in itemise_frame(self.test_data[0], 10):
                 pass
 
 
@@ -80,31 +64,21 @@ class TimeEncapsulate(object):
         self.no_runs = 1000
 
     def time_encapsulate_single_bot(self):
-        """Time encapsulating frames with a single fragment per frame."""
+        """Time encapsulating frames with 1 fragment per frame."""
         for ii in range(self.no_runs):
             encapsulate(self.test_data, 1, has_bot=True)
 
-    def time_encapsulate_double_bot(self):
-        """Time encapsulating frames with two fragments per frame."""
+    def time_encapsulate_ten_bot(self):
+        """Time encapsulating frames with 10 fragments per frame."""
         for ii in range(self.no_runs):
-            encapsulate(self.test_data, 2, has_bot=True)
-
-    def time_encapsulate_triple_bot(self):
-        """Time encapsulating frames with three fragments per frame."""
-        for ii in range(self.no_runs):
-            encapsulate(self.test_data, 3, has_bot=True)
+            encapsulate(self.test_data, 10, has_bot=True)
 
     def time_encapsulate_single_nobot(self):
-        """Time encapsulating frames with a single fragment per frame."""
+        """Time encapsulating frames with 1 fragment per frame."""
         for ii in range(self.no_runs):
             encapsulate(self.test_data, 1, has_bot=False)
 
-    def time_encapsulate_double_nobot(self):
-        """Time encapsulating frames with two fragments per frame."""
+    def time_encapsulate_ten_nobot(self):
+        """Time encapsulating frames with 10 fragments per frame."""
         for ii in range(self.no_runs):
-            encapsulate(self.test_data, 2, has_bot=False)
-
-    def time_encapsulate_triple_nobot(self):
-        """Time encapsulating frames with three fragments per frame."""
-        for ii in range(self.no_runs):
-            encapsulate(self.test_data, 3, has_bot=False)
+            encapsulate(self.test_data, 10, has_bot=False)
