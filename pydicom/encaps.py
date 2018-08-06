@@ -381,19 +381,19 @@ def read_item(fp):
 
 
 def fragment_frame(frame, no_fragments=1):
-    """Return one or more fragments from `frame`.
+    """Yield one or more fragments from `frame`.
 
     Parameters
     ----------
     frame : bytes
         The data to fragment.
-    no_fragments : int
+    no_fragments : int, optional
         The number of fragments (default 1).
 
-    Returns
-    -------
-    list of bytes
-        The fragmented data, with all fragments are an even number of bytes
+    Yields
+    ------
+    bytes
+        The fragmented data, with all fragments as an even number of bytes
         greater than or equal to two.
 
     Notes
@@ -403,7 +403,7 @@ def fragment_frame(frame, no_fragments=1):
       of bytes greater than or equal to two.
     * The last fragment of a frame may be padded, if necessary to meet the
       sequence item format requirements of the DICOM Standard.
-    * Any necessary padding may be appended after the end of image marker
+    * Any necessary padding may be appended after the end of image marker.
     * Encapsulated Pixel Data has the Value Representation OB.
     * Values with a VR of OB shall be padded with a single trailing NULL byte
       value (0x00) to achieve even length.
@@ -434,14 +434,12 @@ def fragment_frame(frame, no_fragments=1):
             # Nth fragment
             fragment = bytearray(frame[offset:])
 
-            # Pad last fragment if needed to make even
+            # Pad last fragment if needed to make it even
             if (frame_length - offset) % 2:
                 fragment.extend(b'\x00')
 
         offset += length
-        output.append(bytes(fragment))
-
-    return output
+        yield bytes(fragment)
 
 
 def itemise_frame(frame, no_fragments=1):
@@ -451,7 +449,7 @@ def itemise_frame(frame, no_fragments=1):
     ----------
     frame : bytes
         The data to fragment and itemise.
-    no_fragments : int
+    no_fragments : int, optional
         The number of fragments/items (default 1).
 
     Yields

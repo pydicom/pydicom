@@ -784,28 +784,32 @@ class TestFragmentFrame(object):
         """Test 1 fragment from even data"""
         bytestream = b'\xFE\xFF\x00\xE1'
         fragments = fragment_frame(bytestream, no_fragments=1)
-        assert len(fragments) == 1
-        assert fragments[0] == bytestream
-        assert len(fragments[0]) == 4
+        fragment = next(fragments)
+        assert pytest.raises(StopIteration, next, fragments)
+        assert fragment == bytestream
+        assert len(fragment) == 4
 
-        assert isinstance(fragments[0], bytes)
+        assert isinstance(fragment, bytes)
 
     def test_single_fragment_odd_data(self):
         """Test 1 fragment from odd data"""
         bytestream = b'\xFE\xFF\x00'
         fragments = fragment_frame(bytestream, no_fragments=1)
-        assert len(fragments) == 1
-        assert fragments[0] == b'\xFE\xFF\x00\x00'
-        assert len(fragments[0]) == 4
+        fragment = next(fragments)
+        assert pytest.raises(StopIteration, next, fragments)
+        assert fragment == bytestream + b'\x00'
+        assert len(fragment) == 4
 
     def test_even_fragment_even_data(self):
         """Test even fragments from even data"""
         bytestream = b'\xFE\xFF\x00\xE1'
         # Each fragment should be 2 bytes
         fragments = fragment_frame(bytestream, no_fragments=2)
-        assert len(fragments) == 2
-        assert fragments[0] == bytestream[:2]
-        assert fragments[1] == bytestream[2:]
+        fragment = next(fragments)
+        assert fragment == bytestream[:2]
+        fragment = next(fragments)
+        assert fragment == bytestream[2:]
+        assert pytest.raises(StopIteration, next, fragments)
 
     def test_even_fragment_odd_data(self):
         """Test even fragments from odd data"""
@@ -813,10 +817,11 @@ class TestFragmentFrame(object):
         # First fragment should be 1.5 -> 2 bytes, with the final
         #   fragment 1 byte + 1 byte padding
         fragments = fragment_frame(bytestream, no_fragments=2)
-        assert len(fragments) == 2
-        assert fragments[0] ==  b'\xFE\xFF'
-        assert fragments[1] ==  b'\x00\x00'
-        assert len(fragments[1]) == 2
+        fragment = next(fragments)
+        assert fragment ==  b'\xFE\xFF'
+        fragment = next(fragments)
+        assert fragment ==  b'\x00\x00'
+        assert pytest.raises(StopIteration, next, fragments)
 
     def test_odd_fragments_even_data(self):
         """Test odd fragments from even data"""
@@ -825,10 +830,13 @@ class TestFragmentFrame(object):
         # Each fragment should be 17.7 -> 18 bytes, with the final
         #   fragment 16 bytes
         fragments = fragment_frame(bytestream, no_fragments=7)
-        assert len(fragments) == 7
         for ii in range(6):
-            assert len(fragments[ii]) == 18
-        assert len(fragments[6]) == 16
+            fragment = next(fragments)
+            assert len(fragment) == 18
+
+        fragment = next(fragments)
+        assert len(fragment) == 16
+        assert pytest.raises(StopIteration, next, fragments)
 
     def test_odd_fragments_odd_data(self):
         """Test odd fragments from odd data"""
@@ -837,10 +845,12 @@ class TestFragmentFrame(object):
         # Each fragment should be 13.3 -> 14 bytes, with the final
         #   fragment 9 bytes + 1 byte padding
         fragments = fragment_frame(bytestream, no_fragments=7)
-        assert len(fragments) == 7
         for ii in range(6):
-            assert len(fragments[ii]) == 14
-        assert len(fragments[6]) == 10
+            fragment = next(fragments)
+            assert len(fragment) == 14
+        fragment = next(fragments)
+        assert len(fragment) == 10
+        assert pytest.raises(StopIteration, next, fragments)
 
 
 class TestEncapsulateFrame(object):
