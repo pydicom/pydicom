@@ -426,7 +426,6 @@ def fragment_frame(frame, no_fragments=1):
     if length % 2:
         length += 1
 
-    output = []
     offset = 0
     for ii in range(no_fragments):
         if ii < (no_fragments - 1):
