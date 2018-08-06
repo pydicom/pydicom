@@ -180,6 +180,18 @@ def generate_pixel_data_frame(bytestream,
         dataset. The Basic Offset Table item should be present and the
         Sequence Delimiter item may or may not be present.
 
+    number_of_frames : int
+        The number of frames in the pixel dataset
+        This is only relevant when the pixel data is encoded in a
+        JPEG transfer syntax.
+
+    is_jpeg : bool
+        Set this to True when the pixel data is a JPEG transfer syntax
+        If this is true and the number_of_frames is not None, then if there
+        is no basic offset table in the pixel data sequence, we will
+        search each fragment for the jpeg end-of-frame marker to
+        determine frame boundaries.
+
     Yields
     ------
     bytes
@@ -230,6 +242,18 @@ def generate_pixel_data(bytestream,
         dataset. The Basic Offset Table item should be present and the
         Sequence Delimiter item may or may not be present.
 
+    number_of_frames : int
+        The number of frames in the pixel dataset
+        This is only relevant when the pixel data is encoded in a
+        JPEG transfer syntax.
+
+    is_jpeg : bool
+        Set this to True when the pixel data is a JPEG transfer syntax
+        If this is true and the number_of_frames is not None, then if there
+        is no basic offset table in the pixel data sequence, we will
+        search each fragment for the jpeg end-of-frame marker to
+        determine frame boundaries.
+
     Yields
     -------
     tuple of bytes
@@ -256,11 +280,12 @@ def generate_pixel_data(bytestream,
     frame = []
     frame_length = 0
     frame_number = 0
+    jpeg_end_of_frame_marker = b"\xFF\xD9"
     for fragment in generate_pixel_data_fragment(fp):
         frame.append(fragment)
         frame_length += len(fragment) + 8
         if search_for_end_of_frame_marker and is_jpeg:
-            if b"\xFF\xD9" in fragment[-10:]:
+            if jpeg_end_of_frame_marker in fragment[-10:]:
                 yield tuple(frame)
                 frame = []
                 frame_number += 1
