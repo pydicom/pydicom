@@ -489,7 +489,7 @@ def itemise_frame(frame, no_fragments=1):
 
     Yields
     ------
-    bytearray
+    bytes
         An itemised fragment, encoded as little endian.
 
     Notes
