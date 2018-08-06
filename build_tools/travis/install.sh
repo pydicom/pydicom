@@ -45,8 +45,11 @@ if [[ "$DISTRIB" == "conda" ]]; then
     if [[ "$JPEG2000" == "true" ]]; then
         sudo apt-get install libopenjp2-7 libopenjp2-7-dev
     fi
-    if [[ "$PILLOW" == "true" ]]; then
+    if [[ "$PILLOW" == "both" ]]; then
         conda install --yes pillow jpeg
+    elif [[ "$PILLOW" == "jpeg" ]]; then
+        conda install --yes jpeg
+        pip install pillow --global-option="build_ext" --global-option="--disable-jpeg2000"
     fi
     if [[ "$JPEG_LS" == "true" ]]; then
         conda install --yes cython
