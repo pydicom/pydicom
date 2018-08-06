@@ -1,5 +1,6 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Handle alternate character sets for character strings."""
+import re
 import warnings
 
 from pydicom import compat
@@ -91,14 +92,12 @@ def convert_encodings(encodings):
     try:
         encodings = [python_encoding[x] for x in encodings]
 
-    # Assume that it is already the python encoding
-    # (is there a way to check this?)
     except KeyError:
         # check for some common mistakes in encodings
         patched_encodings = []
         patched = {}
         for x in encodings:
-            if x.startswith('ISO-IR') or x.startswith('ISO IR'):
+            if re.match('^ISO.IR', x):
                 patched[x] = 'ISO_IR' + x[6:]
                 patched_encodings.append(patched[x])
             else:
@@ -110,8 +109,8 @@ def convert_encodings(encodings):
                     warnings.warn("Incorrect value for Specific Character "
                                   "Set '{}' - assuming '{}'".format(old, new))
             except KeyError:
-                # Assume that it is already the python encoding
-                # (is there a way to check this?)
+                # assume that it is already a python encoding
+                # otherwise, a LookupError will be raised in the using code
                 pass
 
     if len(encodings) == 1:

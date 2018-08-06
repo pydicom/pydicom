@@ -122,7 +122,7 @@ class CharsetTests(unittest.TestCase):
         # correct encoding
         assert u'Buc^J\xe9r\xf4me' == elem.value
 
-        # patched encoding shall behave
+        # patched encoding shall behave correctly, but a warning is issued
         elem = DataElement(0x00100010, 'PN', b'Buc^J\xc3\xa9r\xc3\xb4me')
         with pytest.warns(UserWarning,
                           match='Incorrect value for Specific Character Set '
@@ -137,10 +137,15 @@ class CharsetTests(unittest.TestCase):
             pydicom.charset.decode(elem, ['ISO-IR 192'])
             assert u'Buc^J\xe9r\xf4me' == elem.value
 
-        # not patched incorrect encoding
+        # not patched incorrect encoding raises
         elem = DataElement(0x00100010, 'PN', b'Buc^J\xc3\xa9r\xc3\xb4me')
         with pytest.raises(LookupError):
-            pydicom.charset.decode(elem, ['ISO=IR 192'])
+            pydicom.charset.decode(elem, ['ISOIR 192'])
+
+        # Python encoding also can be used directly
+        elem = DataElement(0x00100010, 'PN', b'Buc^J\xc3\xa9r\xc3\xb4me')
+        pydicom.charset.decode(elem, ['utf8'])
+        assert u'Buc^J\xe9r\xf4me' == elem.value
 
 
 if __name__ == "__main__":
