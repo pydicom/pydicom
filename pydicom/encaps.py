@@ -471,7 +471,7 @@ def itemise_fragment(fragment):
     # fragment data
     item.extend(fragment)
 
-    return item
+    return bytes(item)
 
 
 itemize_fragment = itemise_fragment
