@@ -818,9 +818,9 @@ class TestFragmentFrame(object):
         #   fragment 1 byte + 1 byte padding
         fragments = fragment_frame(bytestream, no_fragments=2)
         fragment = next(fragments)
-        assert fragment ==  b'\xFE\xFF'
+        assert fragment == b'\xFE\xFF'
         fragment = next(fragments)
-        assert fragment ==  b'\x00\x00'
+        assert fragment == b'\x00\x00'
         assert pytest.raises(StopIteration, next, fragments)
 
     def test_odd_fragments_even_data(self):
@@ -946,5 +946,5 @@ class TestEncapsulate(object):
             b'\xe2\x76\x00\x00'
             b'\x94\x85\x00\x00'  # Last offset
             b'\xfe\xff\x00\xe0'  # Next item tag
-            b'\xe6\x0e\x00\x00'  # Next item value
+            b'\xe6\x0e\x00\x00'  # Next item length
         )
