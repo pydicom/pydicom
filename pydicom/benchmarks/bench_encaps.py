@@ -26,12 +26,14 @@ class TimeFragmentFrame(object):
     def time_fragment_single(self):
         """Time fragmenting each frame into 1 fragment."""
         for ii in range(self.no_runs):
-            fragment_frame(self.test_data[0], 1)
+            for fragment in fragment_frame(self.test_data[0], 1):
+                pass
 
     def time_fragment_ten(self):
         """Time fragmenting each frame into 10 fragments."""
         for ii in range(self.no_runs):
-            fragment_frame(self.test_data[0], 10)
+            for fragment in fragment_frame(self.test_data[0], 10):
+                pass
 
 
 class TimeItemiseFrame(object):
