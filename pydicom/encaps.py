@@ -9,6 +9,7 @@ from pydicom.filebase import DicomBytesIO
 from pydicom.tag import (Tag, ItemTag, SequenceDelimiterTag)
 
 
+# Functions for parsing encapsulated data
 def get_frame_offsets(fp):
     """Return a list of the fragment offsets from the Basic Offset Table.
 
@@ -380,6 +381,7 @@ def read_item(fp):
     return item_data
 
 
+# Functions for encapsulating data
 def fragment_frame(frame, no_fragments=1):
     """Yield one or more fragments from `frame`.
 
@@ -442,6 +444,40 @@ def fragment_frame(frame, no_fragments=1):
         yield bytes(fragment)
 
 
+def itemise_fragment(fragment):
+    """Return an itemised `fragment`.
+
+    Parameters
+    ----------
+    fragment : bytes
+        The fragment to itemise.
+
+    Returns
+    -------
+    bytes
+        The itemised fragment.
+
+    Notes
+    -----
+
+    * The encoding of the shall be in Little Endian.
+    * Each fragment is encapsulated as a DICOM Item with tag (FFFE,E000), then
+      a 4 byte length.
+    """
+    item = bytearray()
+    # item tag (fffe,e000)
+    item.extend(b'\xFE\xFF\x00\xE0')
+    # fragment length '<I' little endian, 4 byte unsigned int
+    item.extend(pack('<I', len(fragment)))
+    # fragment data
+    item.extend(fragment)
+
+    return item
+
+
+itemize_fragment = itemise_fragment
+
+
 def itemise_frame(frame, no_fragments=1):
     """Yield items generated from `frame`.
 
@@ -468,19 +504,8 @@ def itemise_frame(frame, no_fragments=1):
     ----------
     DICOM Standard, Part 5, Section 7.5 and Annex A.4
     """
-    # (FFFE,E000)
-    item_tag = b'\xFE\xFF\x00\xE0'
-
     for fragment in fragment_frame(frame, no_fragments):
-        item = bytearray()
-        # item tag (fffe,e000)
-        item.extend(item_tag)
-        # fragment length '<I' little endian, 4 byte unsigned int
-        item.extend(pack('<I', len(fragment)))
-        # fragment data
-        item.extend(fragment)
-
-        yield item
+        yield itemise_fragment(fragment)
 
 
 itemize_frame = itemise_frame
@@ -544,6 +569,7 @@ def encapsulate(frames, fragments_per_frame=1, has_bot=True):
 
     bot_offsets = [0]
     for ii, frame in enumerate(frames):
+        # `itemised_length` is the total length of each itemised frame
         itemised_length = 0
         for item in itemise_frame(frame, fragments_per_frame):
             itemised_length += len(item)
