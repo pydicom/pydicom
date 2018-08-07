@@ -858,7 +858,7 @@ class TestEncapsulateFrame(object):
     def test_single_item(self):
         """Test encapsulating into one fragment"""
         bytestream = b'\xFE\xFF\x00\xE1'
-        item_generator = itemise_frame(bytestream, no_fragments=1)
+        item_generator = itemise_frame(bytestream, nr_fragments=1)
         item = next(item_generator)
 
         assert item == (
@@ -872,7 +872,7 @@ class TestEncapsulateFrame(object):
     def test_two_items(self):
         """Test encapsulating into two fragments"""
         bytestream = b'\xFE\xFF\x00\xE1'
-        item_generator = itemise_frame(bytestream, no_fragments=2)
+        item_generator = itemise_frame(bytestream, nr_fragments=2)
 
         item = next(item_generator)
         assert item == (

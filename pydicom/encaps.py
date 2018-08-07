@@ -501,7 +501,7 @@ def itemise_frame(frame, nr_fragments=1):
     ----------
     DICOM Standard, Part 5, Section 7.5 and Annex A.4
     """
-    for fragment in fragment_frame(frame, no_fragments):
+    for fragment in fragment_frame(frame, nr_fragments):
         yield itemise_fragment(fragment)
 
 
