@@ -414,7 +414,8 @@ def fragment_frame(frame, nr_fragments=1):
     DICOM Standard, Part 5, Section 6.2 and Annex A.4
     """
     frame_length = len(frame)
-    if nr_fragments > frame_length:
+    # Add 1 to fix odd length frames not being caught
+    if nr_fragments > (frame_length + 1) / 2.0:
         raise ValueError('The number of fragments is larger than the '
                          'number of bytes in the frame.')
 

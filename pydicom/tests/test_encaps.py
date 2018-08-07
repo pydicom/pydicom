@@ -852,6 +852,17 @@ class TestFragmentFrame(object):
         assert len(fragment) == 10
         assert pytest.raises(StopIteration, next, fragments)
 
+    def test_too_many_fragments_raises(self):
+        """Test exception raised if too many fragments."""
+        bytestream = b'\xFE\xFF\x00' * 31  # 93 bytes
+        # At most we can have 47 fragments
+        for fragment in fragment_frame(bytestream, nr_fragments=47):
+            pass
+
+        with pytest.raises(ValueError):
+            for fragment in fragment_frame(bytestream, nr_fragments=48):
+                pass
+
 
 class TestEncapsulateFrame(object):
     """Test encaps.itemise_frame."""
