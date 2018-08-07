@@ -135,11 +135,11 @@ def get_entry(tag):
     try:
         return DicomDictionary[tag]
     except KeyError:
-        mask_x = mask_match(tag)
-        if mask_x:
-            return RepeatersDictionary[mask_x]
-        else:
-            raise KeyError("Tag {0} not found in DICOM dictionary".format(tag))
+        if not tag.is_private:
+            mask_x = mask_match(tag)
+            if mask_x:
+                return RepeatersDictionary[mask_x]
+        raise KeyError("Tag {0} not found in DICOM dictionary".format(tag))
 
 
 def dictionary_is_retired(tag):
@@ -254,9 +254,11 @@ def get_private_entry(tag, private_creator):
         elem_str = "%04x" % tag.elem
         key = "%sxx%s" % (group_str, elem_str[-2:])
         if key not in private_dict:
-            msg = ("Tag {0} not in private dictionary "
-                   "for private creator {1}".format(key, private_creator))
-            raise KeyError(msg)
+            key = "%sxxxx%s" % (group_str[:2], elem_str[-2:])
+            if key not in private_dict:
+                msg = ("Tag {0} not in private dictionary "
+                       "for private creator {1}".format(key, private_creator))
+                raise KeyError(msg)
         dict_entry = private_dict[key]
     return dict_entry
 

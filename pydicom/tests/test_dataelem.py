@@ -328,6 +328,40 @@ class DataElementTests(unittest.TestCase):
         with pytest.raises(TypeError):
             elem[0]
 
+    def test_private_tag_in_repeater_range(self):
+        """Test that an unknown private tag (e.g. a tag not in the private
+        dictionary) in the repeater range is not handled as a repeater tag
+        if using Implicit Little Endian transfer syntax."""
+        # regression test for #689
+        ds = Dataset()
+        ds[0x50f10010] = RawDataElement(
+            Tag(0x50f10010), None, 8, b'FDMS 1.0', 0, True, True)
+        ds[0x50f1100a] = RawDataElement(
+            Tag(0x50f1100a), None, 6, b'ACC0.6', 0, True, True)
+        private_creator_data_elem = ds[0x50f10010]
+        assert 'Private Creator' == private_creator_data_elem.name
+        assert 'LO' == private_creator_data_elem.VR
+
+        private_data_elem = ds[0x50f1100a]
+        assert '[FNC Parameters]' == private_data_elem.name
+        assert 'UN' == private_data_elem.VR
+
+    def test_private_repeater_tag(self):
+        """Test that a known private tag in the repeater range is correctly
+        handled using Implicit Little Endian transfer syntax."""
+        ds = Dataset()
+        ds[0x60210012] = RawDataElement(
+            Tag(0x60210012), None, 12, b'PAPYRUS 3.0 ', 0, True, True)
+        ds[0x60211200] = RawDataElement(
+            Tag(0x60211200), None, 6, b'123456', 0, True, True)
+        private_creator_data_elem = ds[0x60210012]
+        assert 'Private Creator' == private_creator_data_elem.name
+        assert 'LO' == private_creator_data_elem.VR
+
+        private_data_elem = ds[0x60211200]
+        assert '[Overlay ID]' == private_data_elem.name
+        assert 'UN' == private_data_elem.VR
+
 
 class RawDataElementTests(unittest.TestCase):
     def testKeyError(self):

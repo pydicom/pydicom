@@ -348,9 +348,7 @@ class DataElement(object):
 
     def description(self):
         """Return the DICOM dictionary name for the element."""
-        if dictionary_has_tag(self.tag) or repeater_has_tag(self.tag):
-            name = dictionary_description(self.tag)
-        elif self.tag.is_private:
+        if self.tag.is_private:
             name = "Private tag data"  # default
             if hasattr(self, 'private_creator'):
                 try:
@@ -364,6 +362,8 @@ class DataElement(object):
                     pass
             elif self.tag.elem >> 8 == 0:
                 name = "Private Creator"
+        elif dictionary_has_tag(self.tag) or repeater_has_tag(self.tag):
+            name = dictionary_description(self.tag)
 
         # implied Group Length dicom versions < 3
         elif self.tag.element == 0:
