@@ -1,46 +1,39 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 
-import unittest
 import os
 import sys
+
 import pytest
+
 import pydicom
 from pydicom.filereader import dcmread
 from pydicom.data import get_testdata_files
 from pydicom.tag import Tag
-pillow_missing_message = ("pillow is not available "
-                          "in this test environment")
-pillow_present_message = "pillow is being tested"
-pillow_handler = None
-have_pillow_handler = True
-numpy_handler = None
-have_numpy_handler = True
-have_pillow_jpeg_plugin = False
-have_pillow_jpeg2000_plugin = False
-have_numpy_testing = True
-try:
-    import numpy.testing
-except ImportError as e:
-    have_numpy_testing = False
 
 # Python 3.4 pytest does not have pytest.param?
-have_pytest_param = True
-try:
-    x = pytest.param
-except AttributeError:
-    have_pytest_param = False
+have_pytest_param = hasattr(pytest, 'param')
 
 try:
     import pydicom.pixel_data_handlers.numpy_handler as numpy_handler
+    have_numpy_handler = True
 except ImportError:
     have_numpy_handler = False
+    numpy_handler = None
+
 try:
     import pydicom.pixel_data_handlers.pillow_handler as pillow_handler
+    have_pillow_handler = True
     have_pillow_jpeg_plugin = pillow_handler.have_pillow_jpeg_plugin
-    have_pillow_jpeg2000_plugin = \
-        pillow_handler.have_pillow_jpeg2000_plugin
+    have_pillow_jpeg2000_plugin = pillow_handler.have_pillow_jpeg2000_plugin
 except ImportError:
+    pillow_handler = None
     have_pillow_handler = False
+    have_pillow_jpeg_plugin = False
+    have_pillow_jpeg2000_plugin = False
+
+
+pillow_missing_message = ("pillow is not available "
+                          "in this test environment")
 
 test_pillow_decoder = have_numpy_handler and have_pillow_handler
 test_pillow_jpeg_decoder = (test_pillow_decoder and
@@ -129,159 +122,157 @@ dir_name = os.path.dirname(sys.argv[0])
 save_dir = os.getcwd()
 
 
-class pillow_JPEG_LS_Tests_no_pillow(unittest.TestCase):
-    def setUp(self):
+class Test_JPEGLS_no_pillow(object):
+    """Tests for decoding JPEG LS if pillow pixel handler is missing."""
+    def setup(self):
+        """Setup the test datasets."""
         self.jpeg_ls_lossless = dcmread(jpeg_ls_lossless_name)
-        self.mr_small = dcmread(mr_name)
         self.emri_jpeg_ls_lossless = dcmread(emri_jpeg_ls_lossless)
-        self.emri_small = dcmread(emri_name)
         self.original_handlers = pydicom.config.image_handlers
         pydicom.config.image_handlers = [None, numpy_handler]
 
-    def tearDown(self):
+    def teardown(self):
+        """Reset the pixel data handlers."""
         pydicom.config.image_handlers = self.original_handlers
 
     def test_JPEG_LS_PixelArray(self):
-        with self.assertRaises((NotImplementedError, )):
-            _ = self.jpeg_ls_lossless.pixel_array
+        """Test decoding JPEG LS with only numpy fails."""
+        with pytest.raises(NotImplementedError):
+            self.jpeg_ls_lossless.pixel_array
 
     def test_emri_JPEG_LS_PixelArray(self):
-        with self.assertRaises((NotImplementedError, )):
-            _ = self.emri_jpeg_ls_lossless.pixel_array
+        """Test decoding JPEG LS with only numpy fails."""
+        with pytest.raises(NotImplementedError):
+            self.emri_jpeg_ls_lossless.pixel_array
 
 
-class pillow_JPEG2000Tests_no_pillow(unittest.TestCase):
-    def setUp(self):
+class Test_JPEG2000Tests_no_pillow(object):
+    """Tests for decoding JPEG2K if pillow pixel handler is missing."""
+    def setup(self):
+        """Setup the test datasets."""
         self.jpeg_2k = dcmread(jpeg2000_name)
         self.jpeg_2k_lossless = dcmread(jpeg2000_lossless_name)
-        self.mr_small = dcmread(mr_name)
         self.emri_jpeg_2k_lossless = dcmread(emri_jpeg_2k_lossless)
-        self.emri_small = dcmread(emri_name)
         self.sc_rgb_jpeg2k_gdcm_KY = dcmread(sc_rgb_jpeg2k_gdcm_KY)
         self.original_handlers = pydicom.config.image_handlers
         pydicom.config.image_handlers = [None, numpy_handler]
 
-    def tearDown(self):
+    def teardown(self):
+        """Reset the pixel data handlers."""
         pydicom.config.image_handlers = self.original_handlers
 
     def testJPEG2000(self):
-        """JPEG2000: Returns correct values for sample data elements"""
+        """Test reading element values works OK without Pillow."""
         # XX also tests multiple-valued AT data element
-        expected = [Tag(0x0054, 0x0010), Tag(0x0054, 0x0020)]
-        got = self.jpeg_2k.FrameIncrementPointer
-        self.assertEqual(
-            got,
-            expected,
-            "JPEG2000 file, Frame Increment Pointer: "
-            "expected %s, got %s" % (expected, got))
+        elem = self.jpeg_2k.FrameIncrementPointer
+        assert [Tag(0x0054, 0x0010), Tag(0x0054, 0x0020)] == elem
 
-        got = self.jpeg_2k.DerivationCodeSequence[0].CodeMeaning
-        expected = 'Lossy Compression'
-        self.assertEqual(
-            got,
-            expected,
-            "JPEG200 file, Code Meaning got %s, "
-            "expected %s" % (got, expected))
+        elem = self.jpeg_2k.DerivationCodeSequence[0].CodeMeaning
+        assert 'Lossy Compression' == elem
 
     def testJPEG2000PixelArray(self):
-        with self.assertRaises((NotImplementedError, )):
-            _ = self.jpeg_2k_lossless.pixel_array
+        """Test decoding JPEG2K with only numpy fails."""
+        with pytest.raises(NotImplementedError):
+            self.jpeg_2k_lossless.pixel_array
 
     def test_emri_JPEG2000PixelArray(self):
-        with self.assertRaises((NotImplementedError, )):
-            _ = self.emri_jpeg_2k_lossless.pixel_array
+        """Test decoding JPEG2K with only numpy fails."""
+        with pytest.raises(NotImplementedError):
+            self.emri_jpeg_2k_lossless.pixel_array
 
     def test_jpeg2000_lossy(self):
-        with self.assertRaises((NotImplementedError, )):
-            _ = self.sc_rgb_jpeg2k_gdcm_KY.pixel_array
+        """Test decoding JPEG2K with only numpy fails."""
+        with pytest.raises(NotImplementedError):
+            self.sc_rgb_jpeg2k_gdcm_KY.pixel_array
 
 
-class pillow_JPEGlossyTests_no_pillow(unittest.TestCase):
-
-    def setUp(self):
+class Test_JPEGlossyTests_no_pillow(object):
+    """Tests for decoding JPEG lossy if pillow pixel handler is missing."""
+    def setup(self):
+        """Setup the test datasets."""
         self.jpeg_lossy = dcmread(jpeg_lossy_name)
         self.color_3d_jpeg = dcmread(color_3d_jpeg_baseline)
         self.original_handlers = pydicom.config.image_handlers
         pydicom.config.image_handlers = [None, numpy_handler]
 
-    def tearDown(self):
+    def teardown(self):
+        """Reset the pixel data handlers."""
         pydicom.config.image_handlers = self.original_handlers
 
     def testJPEGlossy(self):
-        """JPEG-lossy: Returns correct values for sample data elements"""
-        got = self.jpeg_lossy.DerivationCodeSequence[0].CodeMeaning
-        expected = 'Lossy Compression'
-        self.assertEqual(
-            got,
-            expected,
-            "JPEG-lossy file, Code Meaning got %s, "
-            "expected %s" % (got, expected))
+        """Test reading element values works OK without Pillow."""
+        elem = self.jpeg_lossy.DerivationCodeSequence[0].CodeMeaning
+        assert 'Lossy Compression' == elem
 
     def testJPEGlossyPixelArray(self):
-        with self.assertRaises((NotImplementedError, )):
-            _ = self.jpeg_lossy.pixel_array
+        """Test decoding JPEG lossy with only numpy fails."""
+        with pytest.raises(NotImplementedError):
+            self.jpeg_lossy.pixel_array
 
     def testJPEGBaselineColor3DPixelArray(self):
-        with self.assertRaises((NotImplementedError, )):
-            _ = self.color_3d_jpeg.pixel_array
+        """Test decoding JPEG lossy with only numpy fails."""
+        with pytest.raises(NotImplementedError):
+            self.color_3d_jpeg.pixel_array
 
 
-class pillow_JPEGlosslessTests_no_pillow(unittest.TestCase):
-    def setUp(self):
+class Test_JPEGlosslessTests_no_pillow(object):
+    """Tests for decoding JPEG lossless if pillow pixel handler is missing."""
+    def setup(self):
+        """Setup the test datasets."""
         self.jpeg_lossless = dcmread(jpeg_lossless_name)
         self.original_handlers = pydicom.config.image_handlers
         pydicom.config.image_handlers = [None, numpy_handler]
 
-    def tearDown(self):
+    def teardown(self):
+        """Reset the pixel data handlers."""
         pydicom.config.image_handlers = self.original_handlers
 
     def testJPEGlossless(self):
-        """JPEGlossless: Returns correct values for sample data elements"""
-        got = self.\
-            jpeg_lossless.\
-            SourceImageSequence[0].\
-            PurposeOfReferenceCodeSequence[0].CodeMeaning
-        expected = 'Uncompressed predecessor'
-        self.assertEqual(
-            got,
-            expected,
-            "JPEG-lossless file, Code Meaning got %s, "
-            "expected %s" % (got, expected))
+        """Test reading element values works OK without Pillow."""
+        elem = self.jpeg_lossless.SourceImageSequence[0]
+        elem = elem.PurposeOfReferenceCodeSequence[0].CodeMeaning
+        assert 'Uncompressed predecessor' == elem
 
     def testJPEGlosslessPixelArray(self):
-        with self.assertRaises((NotImplementedError, )):
-            _ = self.jpeg_lossless.pixel_array
+        """Test decoding JPEG lossless with only numpy fails."""
+        with pytest.raises(NotImplementedError):
+            self.jpeg_lossless.pixel_array
 
 
 @pytest.mark.skipif(
     not test_pillow_decoder,
     reason=pillow_missing_message)
-class pillow_JPEG_LS_Tests_with_pillow(unittest.TestCase):
-    def setUp(self):
+class Test_JPEG_LS_with_pillow(object):
+    """Tests for decoding JPEG LS if pillow pixel handler is available."""
+    def setup(self):
+        """Setup the test datasets."""
         self.jpeg_ls_lossless = dcmread(jpeg_ls_lossless_name)
-        self.mr_small = dcmread(mr_name)
         self.emri_jpeg_ls_lossless = dcmread(emri_jpeg_ls_lossless)
-        self.emri_small = dcmread(emri_name)
         self.original_handlers = pydicom.config.image_handlers
         pydicom.config.image_handlers = [pillow_handler, numpy_handler]
 
-    def tearDown(self):
+    def teardown(self):
+        """Reset the pixel data handlers."""
         pydicom.config.image_handlers = self.original_handlers
 
     def test_JPEG_LS_PixelArray(self):
-        with self.assertRaises((NotImplementedError, )):
-            _ = self.jpeg_ls_lossless.pixel_array
+        """Test decoding JPEG LS with pillow handler fails."""
+        with pytest.raises(NotImplementedError):
+            self.jpeg_ls_lossless.pixel_array
 
     def test_emri_JPEG_LS_PixelArray(self):
-        with self.assertRaises((NotImplementedError, )):
-            _ = self.emri_jpeg_ls_lossless.pixel_array
+        """Test decoding JPEG LS with pillow handler fails."""
+        with pytest.raises(NotImplementedError):
+            self.emri_jpeg_ls_lossless.pixel_array
 
 
 @pytest.mark.skipif(
     not test_pillow_jpeg2000_decoder,
     reason=pillow_missing_message)
-class pillow_JPEG2000Tests_with_pillow(unittest.TestCase):
-    def setUp(self):
+class Test_JPEG2000Tests_with_pillow(object):
+    """Test decoding JPEG2K if pillow JPEG2K plugin is available."""
+    def setup(self):
+        """Setup the test datasets."""
         self.jpeg_2k = dcmread(jpeg2000_name)
         self.jpeg_2k_lossless = dcmread(jpeg2000_lossless_name)
         self.mr_small = dcmread(mr_name)
@@ -293,72 +284,55 @@ class pillow_JPEG2000Tests_with_pillow(unittest.TestCase):
         self.original_handlers = pydicom.config.image_handlers
         pydicom.config.image_handlers = [pillow_handler, numpy_handler]
 
-    def tearDown(self):
+    def teardown(self):
+        """Reset the pixel data handlers."""
         pydicom.config.image_handlers = self.original_handlers
 
     def testJPEG2000(self):
-        """JPEG2000: Returns correct values for sample data elements"""
+        """Test reading element values works OK with pillow pixel handler."""
         # XX also tests multiple-valued AT data element
-        expected = [Tag(0x0054, 0x0010), Tag(0x0054, 0x0020)]
         got = self.jpeg_2k.FrameIncrementPointer
-        self.assertEqual(
-            got,
-            expected,
-            "JPEG2000 file, Frame Increment Pointer: "
-            "expected %s, got %s" % (expected, got))
+        assert [Tag(0x0054, 0x0010), Tag(0x0054, 0x0020)] == got
 
         got = self.jpeg_2k.DerivationCodeSequence[0].CodeMeaning
-        expected = 'Lossy Compression'
-        self.assertEqual(
-            got,
-            expected,
-            "JPEG200 file, Code Meaning got %s, "
-            "expected %s" % (got, expected))
+        assert 'Lossy Compression' == got
 
     def testJPEG2000PixelArray(self):
+        """Test decoding JPEG2K with pillow handler succeeds."""
         a = self.jpeg_2k_lossless.pixel_array
         b = self.mr_small.pixel_array
-        if have_numpy_testing:
-            numpy.testing.assert_array_equal(a, b)
-        else:
-            self.assertEqual(
-                a.mean(),
-                b.mean(),
-                "Decoded pixel data is not all {0} "
-                "(mean == {1})".format(b.mean(), a.mean()))
+        assert (a == b).all()
 
     def test_emri_JPEG2000PixelArray(self):
+        """Test decoding JPEG2K with pillow handler succeeds."""
         a = self.emri_jpeg_2k_lossless.pixel_array
         b = self.emri_small.pixel_array
-        if have_numpy_testing:
-            numpy.testing.assert_array_equal(a, b)
-        else:
-            self.assertEqual(
-                a.mean(),
-                b.mean(),
-                "Decoded pixel data is not all {0} "
-                "(mean == {1})".format(b.mean(), a.mean()))
+        assert (a == b).all()
 
     def test_jpeg2000_lossy(self):
+        """Test decoding JPEG2K lossy with pillow handler fails."""
         with pytest.raises(NotImplementedError):
-            _ = self.sc_rgb_jpeg2k_gdcm_KY.pixel_array
+            self.sc_rgb_jpeg2k_gdcm_KY.pixel_array
 
 
 @pytest.mark.skipif(
     not test_pillow_jpeg_decoder,
     reason=pillow_missing_message)
-class pillow_JPEGlossyTests_with_pillow(unittest.TestCase):
-
-    def setUp(self):
+class Test_JPEGlossyTests_with_pillow(object):
+    """Test decoding JPEG if pillow JPEG plugin is available."""
+    def setup(self):
+        """Setup the test datasets."""
         self.jpeg_lossy = dcmread(jpeg_lossy_name)
         self.color_3d_jpeg = dcmread(color_3d_jpeg_baseline)
         self.original_handlers = pydicom.config.image_handlers
         pydicom.config.image_handlers = [pillow_handler, numpy_handler]
 
-    def tearDown(self):
+    def teardown(self):
+        """Reset the pixel data handlers."""
         pydicom.config.image_handlers = self.original_handlers
 
     def testJPEGlossless_odd_data_size(self):
+        """Test decoding JPEG with pillow handler succeeds."""
         test_file = get_testdata_files('SC_rgb_small_odd_jpeg.dcm')[0]
         ds = dcmread(test_file)
         pixel_data = ds.pixel_array
@@ -366,31 +340,26 @@ class pillow_JPEGlossyTests_with_pillow(unittest.TestCase):
         assert pixel_data.shape == (3, 3, 3)
 
     def testJPEGlossy(self):
-        """JPEG-lossy: Returns correct values for sample data elements"""
+        """Test reading element values works OK with pillow pixel handler."""
         got = self.jpeg_lossy.DerivationCodeSequence[0].CodeMeaning
-        expected = 'Lossy Compression'
-        self.assertEqual(
-            got,
-            expected,
-            "JPEG-lossy file, Code Meaning got %s, "
-            "expected %s" % (got, expected))
+        assert 'Lossy Compression' == got
 
     def testJPEGlossyPixelArray(self):
-        with self.assertRaises((NotImplementedError, )):
-            _ = self.jpeg_lossy.pixel_array
+        """Test decoding JPEG lossy with pillow handler fails."""
+        with pytest.raises(NotImplementedError):
+            self.jpeg_lossy.pixel_array
 
     def testJPEGBaselineColor3DPixelArray(self):
-        self.assertEqual(
-            self.color_3d_jpeg.PhotometricInterpretation,
-            "YBR_FULL_422")
+        """Test decoding JPEG with pillow handler succeeds."""
+        assert "YBR_FULL_422" == self.color_3d_jpeg.PhotometricInterpretation
+
         a = self.color_3d_jpeg.pixel_array
-        self.assertEqual(a.shape, (120, 480, 640, 3))
+        assert (120, 480, 640, 3) == a.shape
         # this test points were manually identified in Osirix viewer
-        self.assertEqual(tuple(a[3, 159, 290, :]), (41, 41, 41))
-        self.assertEqual(tuple(a[3, 169, 290, :]), (57, 57, 57))
-        self.assertEqual(
-            self.color_3d_jpeg.PhotometricInterpretation,
-            "YBR_FULL_422")
+        assert (41, 41, 41) == tuple(a[3, 159, 290, :])
+        assert (57, 57, 57) == tuple(a[3, 169, 290, :])
+
+        assert "YBR_FULL_422" == self.color_3d_jpeg.PhotometricInterpretation
 
 
 @pytest.fixture(scope="module")
@@ -606,28 +575,25 @@ def test_PI_RGB(test_with_pillow,
 @pytest.mark.skipif(
     not test_pillow_jpeg_decoder,
     reason=pillow_missing_message)
-class pillow_JPEGlosslessTests_with_pillow(unittest.TestCase):
-    def setUp(self):
+class Test_JPEGlosslessTests_with_pillow(object):
+    """Test decoding JPEG lossless if pillow JPEG plugin is available."""
+    def setup(self):
+        """Setup the test datasets."""
         self.jpeg_lossless = dcmread(jpeg_lossless_name)
         self.original_handlers = pydicom.config.image_handlers
         pydicom.config.image_handlers = [pillow_handler, numpy_handler]
 
-    def tearDown(self):
+    def teardown(self):
+        """Reset the pixel data handlers."""
         pydicom.config.image_handlers = self.original_handlers
 
     def testJPEGlossless(self):
-        """JPEGlossless: Returns correct values for sample data elements"""
-        got = self.\
-            jpeg_lossless.\
-            SourceImageSequence[0].\
-            PurposeOfReferenceCodeSequence[0].CodeMeaning
-        expected = 'Uncompressed predecessor'
-        self.assertEqual(
-            got,
-            expected,
-            "JPEG-lossless file, Code Meaning got %s, "
-            "expected %s" % (got, expected))
+        """Test reading element values works OK with pillow pixel handler."""
+        got = self.jpeg_lossless.SourceImageSequence[0]
+        got = got.PurposeOfReferenceCodeSequence[0].CodeMeaning
+        assert 'Uncompressed predecessor' == got
 
     def testJPEGlosslessPixelArray(self):
-        with self.assertRaises((NotImplementedError, )):
-            _ = self.jpeg_lossless.pixel_array
+        """Test decoding JPEG lossless with pillow handler fails."""
+        with pytest.raises(NotImplementedError):
+            self.jpeg_lossless.pixel_array
