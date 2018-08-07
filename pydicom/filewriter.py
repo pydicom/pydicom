@@ -57,22 +57,18 @@ def correct_ambiguous_vr_element(elem, ds, is_little_endian):
                 #   If encapsulated, VR is OB and length is undefined
                 if elem.is_undefined_length:
                     elem.VR = 'OB'
+                # Non-compressed Pixel Data - Implicit Little Endian
+                # PS3.5 Annex A1: VR is always OW
+                elif ds.is_implicit_VR:
+                    elem.VR = 'OW'
                 else:
-                    # Non-compressed Pixel Data
-                    # If BitsAllocated is > 8 then OW, else may be OB or OW
-                    #   as per PS3.5 Annex A.2. For BitsAllocated < 8 test the
-                    #    size of each pixel to see if its written in OW or OB
-                    if ds.BitsAllocated > 8:
-                        elem.VR = 'OW'
-                    else:
-                        nr_pixels = ds.Rows * ds.Columns
-                        if 'SamplesPerPixel' in ds:
-                            nr_pixels *= ds.SamplesPerPixel
-                        pixel_size = len(ds.PixelData) / nr_pixels
-                        if pixel_size == 2:
-                            elem.VR = 'OW'
-                        elif pixel_size == 1:
-                            elem.VR = 'OB'
+                    # Non-compressed Pixel Data - Explicit VR
+                    # PS3.5 Annex A.2:
+                    # If BitsAllocated is > 8 then VR shall be OW,
+                    # else may be OB or OW.
+                    # If we get here, the data has not been written before,
+                    # so we default to OB for BitsAllocated 1 or 8
+                    elem.VR = 'OW' if ds.BitsAllocated > 8 else 'OB'
             except AttributeError:
                 pass
 
