@@ -47,9 +47,12 @@ if [[ "$DISTRIB" == "conda" ]]; then
     fi
     if [[ "$PILLOW" == "both" ]]; then
         conda install --yes pillow jpeg
+        python -c "from PIL import _imaging; print('JPEG plugin:', hasattr(_imaging, 'jpeg_decoder'))"
+        python -c "from PIL import _imaging; print('JPEG2k plugin:', hasattr(_imaging, 'jpeg2k_decoder'))"
     elif [[ "$PILLOW" == "jpeg" ]]; then
-        conda install --yes jpeg
         pip install pillow --global-option="build_ext" --global-option="--disable-jpeg2000"
+        python -c "from PIL import _imaging; print('JPEG plugin:', hasattr(_imaging, 'jpeg_decoder'))"
+        python -c "from PIL import _imaging; print('JPEG2k plugin:', hasattr(_imaging, 'jpeg2k_decoder'))"
     fi
     if [[ "$JPEG_LS" == "true" ]]; then
         conda install --yes cython
