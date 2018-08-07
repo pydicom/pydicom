@@ -1,5 +1,7 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Handle alternate character sets for character strings."""
+import re
+import warnings
 
 from pydicom import compat
 from pydicom.valuerep import PersonNameUnicode, text_VRs
@@ -90,10 +92,26 @@ def convert_encodings(encodings):
     try:
         encodings = [python_encoding[x] for x in encodings]
 
-    # Assume that it is already the python encoding
-    # (is there a way to check this?)
     except KeyError:
-        pass
+        # check for some common mistakes in encodings
+        patched_encodings = []
+        patched = {}
+        for x in encodings:
+            if re.match('^ISO.IR', x):
+                patched[x] = 'ISO_IR' + x[6:]
+                patched_encodings.append(patched[x])
+            else:
+                patched_encodings.append(x)
+        if patched:
+            try:
+                encodings = [python_encoding[x] for x in patched_encodings]
+                for old, new in patched.items():
+                    warnings.warn("Incorrect value for Specific Character "
+                                  "Set '{}' - assuming '{}'".format(old, new))
+            except KeyError:
+                # assume that it is already a python encoding
+                # otherwise, a LookupError will be raised in the using code
+                pass
 
     if len(encodings) == 1:
         encodings = [encodings[0]] * 3
