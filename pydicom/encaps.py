@@ -416,8 +416,8 @@ def fragment_frame(frame, nr_fragments=1):
     frame_length = len(frame)
     # Add 1 to fix odd length frames not being caught
     if nr_fragments > (frame_length + 1) / 2.0:
-        raise ValueError('The number of fragments is larger than the '
-                         'number of bytes in the frame.')
+        raise ValueError('Too many fragments requested (the minimum fragment '
+                         'size is 2 bytes)')
 
     length = int(frame_length / nr_fragments)
 
