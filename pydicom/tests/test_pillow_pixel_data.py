@@ -14,17 +14,18 @@ from pydicom.tag import Tag
 have_pytest_param = hasattr(pytest, 'param')
 
 try:
-    import pydicom.pixel_data_handlers.numpy_handler as numpy_handler
+    from pydicom.pixel_data_handlers import numpy_handler
     have_numpy_handler = True
 except ImportError:
     have_numpy_handler = False
     numpy_handler = None
 
 try:
-    import pydicom.pixel_data_handlers.pillow_handler as pillow_handler
+    from pydicom.pixel_data_handlers import pillow_handler
     have_pillow_handler = True
     have_pillow_jpeg_plugin = pillow_handler.have_pillow_jpeg_plugin
     have_pillow_jpeg2000_plugin = pillow_handler.have_pillow_jpeg2000_plugin
+    import numpy as np
 except ImportError:
     pillow_handler = None
     have_pillow_handler = False
@@ -301,13 +302,13 @@ class Test_JPEG2000Tests_with_pillow(object):
         """Test decoding JPEG2K with pillow handler succeeds."""
         a = self.jpeg_2k_lossless.pixel_array
         b = self.mr_small.pixel_array
-        assert (a == b).all()
+        assert np.array_equal(a, b)
 
     def test_emri_JPEG2000PixelArray(self):
         """Test decoding JPEG2K with pillow handler succeeds."""
         a = self.emri_jpeg_2k_lossless.pixel_array
         b = self.emri_small.pixel_array
-        assert (a == b).all()
+        assert np.array_equal(a, b)
 
     def test_jpeg2000_lossy(self):
         """Test decoding JPEG2K lossy with pillow handler fails."""
