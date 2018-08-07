@@ -783,7 +783,7 @@ class TestFragmentFrame(object):
     def test_single_fragment_even_data(self):
         """Test 1 fragment from even data"""
         bytestream = b'\xFE\xFF\x00\xE1'
-        fragments = fragment_frame(bytestream, no_fragments=1)
+        fragments = fragment_frame(bytestream, nr_fragments=1)
         fragment = next(fragments)
         assert pytest.raises(StopIteration, next, fragments)
         assert fragment == bytestream
@@ -794,7 +794,7 @@ class TestFragmentFrame(object):
     def test_single_fragment_odd_data(self):
         """Test 1 fragment from odd data"""
         bytestream = b'\xFE\xFF\x00'
-        fragments = fragment_frame(bytestream, no_fragments=1)
+        fragments = fragment_frame(bytestream, nr_fragments=1)
         fragment = next(fragments)
         assert pytest.raises(StopIteration, next, fragments)
         assert fragment == bytestream + b'\x00'
@@ -804,7 +804,7 @@ class TestFragmentFrame(object):
         """Test even fragments from even data"""
         bytestream = b'\xFE\xFF\x00\xE1'
         # Each fragment should be 2 bytes
-        fragments = fragment_frame(bytestream, no_fragments=2)
+        fragments = fragment_frame(bytestream, nr_fragments=2)
         fragment = next(fragments)
         assert fragment == bytestream[:2]
         fragment = next(fragments)
@@ -816,7 +816,7 @@ class TestFragmentFrame(object):
         bytestream = b'\xFE\xFF\x00'
         # First fragment should be 1.5 -> 2 bytes, with the final
         #   fragment 1 byte + 1 byte padding
-        fragments = fragment_frame(bytestream, no_fragments=2)
+        fragments = fragment_frame(bytestream, nr_fragments=2)
         fragment = next(fragments)
         assert fragment == b'\xFE\xFF'
         fragment = next(fragments)
@@ -829,7 +829,7 @@ class TestFragmentFrame(object):
         assert len(bytestream) % 2 == 0
         # Each fragment should be 17.7 -> 18 bytes, with the final
         #   fragment 16 bytes
-        fragments = fragment_frame(bytestream, no_fragments=7)
+        fragments = fragment_frame(bytestream, nr_fragments=7)
         for ii in range(6):
             fragment = next(fragments)
             assert len(fragment) == 18
@@ -844,7 +844,7 @@ class TestFragmentFrame(object):
         assert len(bytestream) % 2 == 1
         # Each fragment should be 13.3 -> 14 bytes, with the final
         #   fragment 9 bytes + 1 byte padding
-        fragments = fragment_frame(bytestream, no_fragments=7)
+        fragments = fragment_frame(bytestream, nr_fragments=7)
         for ii in range(6):
             fragment = next(fragments)
             assert len(fragment) == 14
@@ -922,7 +922,16 @@ class TestEncapsulate(object):
         fp.is_little_endian = True
         offsets = get_frame_offsets(fp)
         assert offsets == [
-            0, 3822, 7670, 11512, 15356, 19166, 22946, 26676, 30434, 34196
+            0x0000,  # 0
+            0x0eee,  # 3822
+            0x1df6,  # 7670
+            0x2cf8,  # 11512
+            0x3bfc,  # 15356
+            0x4ade,  # 19166
+            0x59a2,  # 22946
+            0x6834,  # 26676
+            0x76e2,  # 30434
+            0x8594  # 34196
         ]
 
     def test_encapsulate_bot(self):

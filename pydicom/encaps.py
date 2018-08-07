@@ -1,7 +1,6 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Functions for working with encapsulated (compressed) pixel data."""
 
-from math import floor
 from struct import pack
 
 import pydicom.config
@@ -382,14 +381,14 @@ def read_item(fp):
 
 
 # Functions for encapsulating data
-def fragment_frame(frame, no_fragments=1):
+def fragment_frame(frame, nr_fragments=1):
     """Yield one or more fragments from `frame`.
 
     Parameters
     ----------
     frame : bytes
         The data to fragment.
-    no_fragments : int, optional
+    nr_fragments : int, optional
         The number of fragments (default 1).
 
     Yields
@@ -415,20 +414,19 @@ def fragment_frame(frame, no_fragments=1):
     DICOM Standard, Part 5, Section 6.2 and Annex A.4
     """
     frame_length = len(frame)
-    if no_fragments > frame_length:
+    if nr_fragments > frame_length:
         raise ValueError('The number of fragments is larger than the '
                          'number of bytes in the frame.')
 
-    # We use floor to ensure we don't end up with too many fragments
-    length = int(floor(frame_length / no_fragments))
+    length = int(frame_length / nr_fragments)
 
     # Each item shall be an even number of bytes
     if length % 2:
         length += 1
 
     offset = 0
-    for ii in range(no_fragments):
-        if ii < (no_fragments - 1):
+    for ii in range(nr_fragments):
+        if ii < (nr_fragments - 1):
             # 1st to (N-1)th fragment
             fragment = frame[offset:offset + length]
         else:
@@ -459,7 +457,7 @@ def itemise_fragment(fragment):
     Notes
     -----
 
-    * The encoding of the shall be in Little Endian.
+    * The encoding of the item shall be in Little Endian.
     * Each fragment is encapsulated as a DICOM Item with tag (FFFE,E000), then
       a 4 byte length.
     """
@@ -477,25 +475,25 @@ def itemise_fragment(fragment):
 itemize_fragment = itemise_fragment
 
 
-def itemise_frame(frame, no_fragments=1):
+def itemise_frame(frame, nr_fragments=1):
     """Yield items generated from `frame`.
 
     Parameters
     ----------
     frame : bytes
         The data to fragment and itemise.
-    no_fragments : int, optional
+    nr_fragments : int, optional
         The number of fragments/items (default 1).
 
     Yields
     ------
     bytes
-        An itemised fragment, encoded as little endian.
+        An itemised fragment of the frame, encoded as little endian.
 
     Notes
     -----
 
-    * The encoding of the shall be in Little Endian.
+    * The encoding of the items shall be in Little Endian.
     * Each fragment is encapsulated as a DICOM Item with tag (FFFE,E000), then
       a 4 byte length.
 
@@ -522,7 +520,7 @@ def encapsulate(frames, fragments_per_frame=1, has_bot=True):
     frames : list of bytes
         The frame data to encapsulate.
     fragments_per_frame : int, optional
-        Then number of fragments to use for each frame (default 1).
+        The number of fragments to use for each frame (default 1).
     has_bot : bool, optional
         True to include values in the Basic Offset Table, False otherwise
         (default True). If `fragments_per_frame` is not 1 then its strongly
