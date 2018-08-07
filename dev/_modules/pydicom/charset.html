@@ -172,6 +172,8 @@
   <h1>Source code for pydicom.charset</h1><div class="highlight"><pre>
 <span></span><span class="c1"># Copyright 2008-2018 pydicom authors. See LICENSE file for details.</span>
 <span class="sd">&quot;&quot;&quot;Handle alternate character sets for character strings.&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
 
 <span class="kn">from</span> <span class="nn">pydicom</span> <span class="k">import</span> <span class="n">compat</span>
 <span class="kn">from</span> <span class="nn">pydicom.valuerep</span> <span class="k">import</span> <span class="n">PersonNameUnicode</span><span class="p">,</span> <span class="n">text_VRs</span>
@@ -262,10 +264,26 @@
     <span class="k">try</span><span class="p">:</span>
         <span class="n">encodings</span> <span class="o">=</span> <span class="p">[</span><span class="n">python_encoding</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">encodings</span><span class="p">]</span>
 
-    <span class="c1"># Assume that it is already the python encoding</span>
-    <span class="c1"># (is there a way to check this?)</span>
     <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-        <span class="k">pass</span>
+        <span class="c1"># check for some common mistakes in encodings</span>
+        <span class="n">patched_encodings</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">patched</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">encodings</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s1">&#39;^ISO.IR&#39;</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+                <span class="n">patched</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;ISO_IR&#39;</span> <span class="o">+</span> <span class="n">x</span><span class="p">[</span><span class="mi">6</span><span class="p">:]</span>
+                <span class="n">patched_encodings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">patched</span><span class="p">[</span><span class="n">x</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">patched_encodings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">patched</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">encodings</span> <span class="o">=</span> <span class="p">[</span><span class="n">python_encoding</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">patched_encodings</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">old</span><span class="p">,</span> <span class="n">new</span> <span class="ow">in</span> <span class="n">patched</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Incorrect value for Specific Character &quot;</span>
+                                  <span class="s2">&quot;Set &#39;</span><span class="si">{}</span><span class="s2">&#39; - assuming &#39;</span><span class="si">{}</span><span class="s2">&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">old</span><span class="p">,</span> <span class="n">new</span><span class="p">))</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="c1"># assume that it is already a python encoding</span>
+                <span class="c1"># otherwise, a LookupError will be raised in the using code</span>
+                <span class="k">pass</span>
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">encodings</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">encodings</span> <span class="o">=</span> <span class="p">[</span><span class="n">encodings</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">*</span> <span class="mi">3</span>
