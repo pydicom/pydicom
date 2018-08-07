@@ -31,9 +31,9 @@ dictionary dynamically.
 
  .. code-block:: none
 
-    (1001, 1001) Test One                            UL: 42
-    (1001, 1002) Test Two                            OB: '12345'
-    (1001, 1003) Test Three                          UI: 1.2.3.4.5
+    (1001, 1001) Private tag data                    UL: 42
+    (1001, 1002) Private tag data                    OB: '12345'
+    (1001, 1003) Private tag data                    UI: 1.2.3.4.5
 
 
 

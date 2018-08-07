@@ -520,9 +520,7 @@
 
 <div class="viewcode-block" id="DataElement.description"><a class="viewcode-back" href="../../api_ref.html#pydicom.dataelem.DataElement.description">[docs]</a>    <span class="k">def</span> <span class="nf">description</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return the DICOM dictionary name for the element.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">dictionary_has_tag</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span> <span class="ow">or</span> <span class="n">repeater_has_tag</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="p">):</span>
-            <span class="n">name</span> <span class="o">=</span> <span class="n">dictionary_description</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">is_private</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">is_private</span><span class="p">:</span>
             <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Private tag data&quot;</span>  <span class="c1"># default</span>
             <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;private_creator&#39;</span><span class="p">):</span>
                 <span class="k">try</span><span class="p">:</span>
@@ -536,6 +534,8 @@
                     <span class="k">pass</span>
             <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">elem</span> <span class="o">&gt;&gt;</span> <span class="mi">8</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Private Creator&quot;</span>
+        <span class="k">elif</span> <span class="n">dictionary_has_tag</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span> <span class="ow">or</span> <span class="n">repeater_has_tag</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="p">):</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">dictionary_description</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>
 
         <span class="c1"># implied Group Length dicom versions &lt; 3</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">element</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>

@@ -307,11 +307,11 @@
     <span class="k">try</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">DicomDictionary</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span>
     <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-        <span class="n">mask_x</span> <span class="o">=</span> <span class="n">mask_match</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">mask_x</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">RepeatersDictionary</span><span class="p">[</span><span class="n">mask_x</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;Tag </span><span class="si">{0}</span><span class="s2"> not found in DICOM dictionary&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tag</span><span class="p">))</span></div>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">tag</span><span class="o">.</span><span class="n">is_private</span><span class="p">:</span>
+            <span class="n">mask_x</span> <span class="o">=</span> <span class="n">mask_match</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">mask_x</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">RepeatersDictionary</span><span class="p">[</span><span class="n">mask_x</span><span class="p">]</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;Tag </span><span class="si">{0}</span><span class="s2"> not found in DICOM dictionary&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tag</span><span class="p">))</span></div>
 
 
 <div class="viewcode-block" id="dictionary_is_retired"><a class="viewcode-back" href="../../api_ref.html#pydicom.datadict.dictionary_is_retired">[docs]</a><span class="k">def</span> <span class="nf">dictionary_is_retired</span><span class="p">(</span><span class="n">tag</span><span class="p">):</span>
@@ -426,9 +426,11 @@
         <span class="n">elem_str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%04x</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">tag</span><span class="o">.</span><span class="n">elem</span>
         <span class="n">key</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">xx</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">group_str</span><span class="p">,</span> <span class="n">elem_str</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:])</span>
         <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">private_dict</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Tag </span><span class="si">{0}</span><span class="s2"> not in private dictionary &quot;</span>
-                   <span class="s2">&quot;for private creator </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">private_creator</span><span class="p">))</span>
-            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">xxxx</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">group_str</span><span class="p">[:</span><span class="mi">2</span><span class="p">],</span> <span class="n">elem_str</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:])</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">private_dict</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Tag </span><span class="si">{0}</span><span class="s2"> not in private dictionary &quot;</span>
+                       <span class="s2">&quot;for private creator </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">private_creator</span><span class="p">))</span>
+                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
         <span class="n">dict_entry</span> <span class="o">=</span> <span class="n">private_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">dict_entry</span></div>
 
