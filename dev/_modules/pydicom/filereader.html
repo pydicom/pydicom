@@ -189,7 +189,8 @@
 <span class="kn">from</span> <span class="nn">pydicom.compat</span> <span class="k">import</span> <span class="n">in_py2</span>
 <span class="kn">from</span> <span class="nn">pydicom.config</span> <span class="k">import</span> <span class="n">logger</span>
 <span class="kn">from</span> <span class="nn">pydicom.datadict</span> <span class="k">import</span> <span class="n">dictionary_VR</span><span class="p">,</span> <span class="n">tag_for_keyword</span>
-<span class="kn">from</span> <span class="nn">pydicom.dataelem</span> <span class="k">import</span> <span class="p">(</span><span class="n">DataElement</span><span class="p">,</span> <span class="n">RawDataElement</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">pydicom.dataelem</span> <span class="k">import</span> <span class="p">(</span><span class="n">DataElement</span><span class="p">,</span> <span class="n">RawDataElement</span><span class="p">,</span>
+                              <span class="n">DataElement_from_raw</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">pydicom.dataset</span> <span class="k">import</span> <span class="p">(</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">FileDataset</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">pydicom.dicomdir</span> <span class="k">import</span> <span class="n">DicomDir</span>
 <span class="kn">from</span> <span class="nn">pydicom.errors</span> <span class="k">import</span> <span class="n">InvalidDicomError</span>
@@ -589,7 +590,14 @@
     <span class="k">except</span> <span class="ne">NotImplementedError</span> <span class="k">as</span> <span class="n">details</span><span class="p">:</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">details</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">Dataset</span><span class="p">(</span><span class="n">raw_data_elements</span><span class="p">)</span></div>
+    <span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">(</span><span class="n">raw_data_elements</span><span class="p">)</span>
+    <span class="k">if</span> <span class="mh">0x00080005</span> <span class="ow">in</span> <span class="n">raw_data_elements</span><span class="p">:</span>
+        <span class="n">char_set</span> <span class="o">=</span> <span class="n">DataElement_from_raw</span><span class="p">(</span><span class="n">raw_data_elements</span><span class="p">[</span><span class="mh">0x00080005</span><span class="p">])</span>
+        <span class="n">encoding</span> <span class="o">=</span> <span class="n">convert_encodings</span><span class="p">(</span><span class="n">char_set</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">encoding</span> <span class="o">=</span> <span class="n">parent_encoding</span>
+    <span class="n">ds</span><span class="o">.</span><span class="n">set_original_encoding</span><span class="p">(</span><span class="n">is_implicit_VR</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">,</span> <span class="n">encoding</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ds</span></div>
 
 
 <div class="viewcode-block" id="read_sequence"><a class="viewcode-back" href="../../api_ref.html#pydicom.filereader.read_sequence">[docs]</a><span class="k">def</span> <span class="nf">read_sequence</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">is_implicit_VR</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">,</span> <span class="n">bytelength</span><span class="p">,</span> <span class="n">encoding</span><span class="p">,</span>
@@ -945,9 +953,8 @@
     <span class="n">new_dataset</span> <span class="o">=</span> <span class="n">dataset_class</span><span class="p">(</span><span class="n">fileobj</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">preamble</span><span class="p">,</span> <span class="n">file_meta_dataset</span><span class="p">,</span>
                                 <span class="n">is_implicit_VR</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">)</span>
     <span class="c1"># save the originally read transfer syntax properties in the dataset</span>
-    <span class="n">new_dataset</span><span class="o">.</span><span class="n">read_little_endian</span> <span class="o">=</span> <span class="n">is_little_endian</span>
-    <span class="n">new_dataset</span><span class="o">.</span><span class="n">read_implicit_vr</span> <span class="o">=</span> <span class="n">is_implicit_VR</span>
-    <span class="n">new_dataset</span><span class="o">.</span><span class="n">read_encoding</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">_character_set</span>
+    <span class="n">new_dataset</span><span class="o">.</span><span class="n">set_original_encoding</span><span class="p">(</span><span class="n">is_implicit_VR</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">,</span>
+                                      <span class="n">dataset</span><span class="o">.</span><span class="n">_character_set</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">new_dataset</span></div>
 
 

@@ -818,11 +818,11 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">tags</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_slice_dataset</span><span class="p">(</span><span class="nb">slice</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="nb">slice</span><span class="o">.</span><span class="n">stop</span><span class="p">,</span> <span class="nb">slice</span><span class="o">.</span><span class="n">step</span><span class="p">)</span>
         <span class="n">dataset</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">({</span><span class="n">tag</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span> <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">tags</span><span class="p">})</span>
-        <span class="n">dataset</span><span class="o">.</span><span class="n">read_implicit_vr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_implicit_vr</span>
-        <span class="n">dataset</span><span class="o">.</span><span class="n">read_little_endian</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_little_endian</span>
         <span class="n">dataset</span><span class="o">.</span><span class="n">is_little_endian</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_little_endian</span>
         <span class="n">dataset</span><span class="o">.</span><span class="n">is_implicit_VR</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_implicit_VR</span>
-        <span class="n">dataset</span><span class="o">.</span><span class="n">read_encoding</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_encoding</span>
+        <span class="n">dataset</span><span class="o">.</span><span class="n">set_original_encoding</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">read_implicit_vr</span><span class="p">,</span>
+                                      <span class="bp">self</span><span class="o">.</span><span class="n">read_little_endian</span><span class="p">,</span>
+                                      <span class="bp">self</span><span class="o">.</span><span class="n">read_encoding</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">dataset</span>
 
     <span class="nd">@property</span>
@@ -837,6 +837,16 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">read_implicit_vr</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_implicit_VR</span> <span class="ow">and</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">read_little_endian</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_little_endian</span> <span class="ow">and</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">read_encoding</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_character_set</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Dataset.set_original_encoding"><a class="viewcode-back" href="../../api_ref.html#pydicom.dataset.Dataset.set_original_encoding">[docs]</a>    <span class="k">def</span> <span class="nf">set_original_encoding</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">is_implicit_vr</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">,</span>
+                              <span class="n">character_encoding</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set the values for the original transfer syntax and encoding.</span>
+<span class="sd">        Can be used for a dataset with raw data elements to enable</span>
+<span class="sd">        optimized writing (e.g. without decoding the data elements).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">read_implicit_vr</span> <span class="o">=</span> <span class="n">is_implicit_vr</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">read_little_endian</span> <span class="o">=</span> <span class="n">is_little_endian</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">read_encoding</span> <span class="o">=</span> <span class="n">character_encoding</span></div>
 
 <div class="viewcode-block" id="Dataset.group_dataset"><a class="viewcode-back" href="../../api_ref.html#pydicom.dataset.Dataset.group_dataset">[docs]</a>    <span class="k">def</span> <span class="nf">group_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return a Dataset containing only DataElements of a certain group.</span>
