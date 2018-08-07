@@ -160,10 +160,8 @@ def get_pixeldata(dicom_dataset):
         if dicom_dataset.BitsAllocated > 8:
             raise NotImplementedError("JPEG Lossy only supported if "
                                       "Bits Allocated = 8")
-        generic_jpeg_file_header = (
-            b'\xff\xd8\xff\xe0\x00\x10'
-            b'JFIF\x00\x01\x01\x01\x00\x01\x00\x01\x00\x00')
-        frame_start_from = 2
+        generic_jpeg_file_header = b''
+        frame_start_from = 0
     elif (dicom_dataset.file_meta.TransferSyntaxUID in
           PillowJPEG2000TransferSyntaxes):
         logger.debug("This is a JPEG 2000 format")
@@ -175,6 +173,7 @@ def get_pixeldata(dicom_dataset):
         logger.debug("This is a another pillow supported format")
         generic_jpeg_file_header = b''
         frame_start_from = 0
+
     try:
         UncompressedPixelData = bytearray()
         if ('NumberOfFrames' in dicom_dataset and
