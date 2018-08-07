@@ -950,9 +950,12 @@ class WriteAmbiguousVRTests(unittest.TestCase):
         file_ds.save_as(fp, write_like_original=True)
         fp.seek(0)
 
-        ds = read_dataset(fp, False, True)
-        self.assertEqual(ds.SmallestValidPixelValue, 256)
-        self.assertEqual(ds[0x00280104].VR, 'US')
+        ds = read_dataset(fp, False, True, parent_encoding='latin1')
+        assert 256 == ds.SmallestValidPixelValue
+        assert 'US' == ds[0x00280104].VR
+        assert not ds.read_implicit_vr
+        assert ds.read_little_endian
+        assert ds.read_encoding == 'latin1'
 
     def test_write_explicit_vr_big_endian(self):
         """Test writing explicit big data for ambiguous elements."""
@@ -960,6 +963,7 @@ class WriteAmbiguousVRTests(unittest.TestCase):
         ref_ds = Dataset()
         ref_ds.PixelRepresentation = 1
         ref_ds.SmallestValidPixelValue = b'\x00\x01'  # Big endian 1
+        ref_ds.SpecificCharacterSet = b'ISO_IR 192'
 
         fp = BytesIO()
         file_ds = FileDataset(fp, ref_ds)
@@ -969,8 +973,11 @@ class WriteAmbiguousVRTests(unittest.TestCase):
         fp.seek(0)
 
         ds = read_dataset(fp, False, False)
-        self.assertEqual(ds.SmallestValidPixelValue, 1)
-        self.assertEqual(ds[0x00280104].VR, 'SS')
+        assert 1 == ds.SmallestValidPixelValue
+        assert 'SS' == ds[0x00280104].VR
+        assert not ds.read_implicit_vr
+        assert not ds.read_little_endian
+        assert ['UTF8', 'UTF8', 'UTF8'] == ds.read_encoding
 
 
 class ScratchWriteTests(unittest.TestCase):
@@ -1755,6 +1762,7 @@ class TestWriteNonStandard(unittest.TestCase):
 
         self.fp.seek(0)
         ds_out = dcmread(self.fp, force=True)
+        self.ensure_no_raw_data_elements(ds)
         self.ensure_no_raw_data_elements(ds_out)
 
         self.assertEqual(ds.file_meta[:], ds_out.file_meta[:])

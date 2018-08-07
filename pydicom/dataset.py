@@ -646,11 +646,11 @@ class Dataset(dict):
         """
         tags = self._slice_dataset(slice.start, slice.stop, slice.step)
         dataset = Dataset({tag: self.get_item(tag) for tag in tags})
-        dataset.read_implicit_vr = self.read_implicit_vr
-        dataset.read_little_endian = self.read_little_endian
         dataset.is_little_endian = self.is_little_endian
         dataset.is_implicit_VR = self.is_implicit_VR
-        dataset.read_encoding = self.read_encoding
+        dataset.set_original_encoding(self.read_implicit_vr,
+                                      self.read_little_endian,
+                                      self.read_encoding)
         return dataset
 
     @property
@@ -665,6 +665,16 @@ class Dataset(dict):
                 self.read_implicit_vr == self.is_implicit_VR and
                 self.read_little_endian == self.is_little_endian and
                 self.read_encoding == self._character_set)
+
+    def set_original_encoding(self, is_implicit_vr, is_little_endian,
+                              character_encoding):
+        """Set the values for the original transfer syntax and encoding.
+        Can be used for a dataset with raw data elements to enable
+        optimized writing (e.g. without decoding the data elements).
+        """
+        self.read_implicit_vr = is_implicit_vr
+        self.read_little_endian = is_little_endian
+        self.read_encoding = character_encoding
 
     def group_dataset(self, group):
         """Return a Dataset containing only DataElements of a certain group.
