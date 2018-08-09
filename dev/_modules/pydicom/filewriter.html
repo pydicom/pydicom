@@ -222,31 +222,23 @@
 
         <span class="c1"># &#39;OB or OW&#39;: 7fe0,0010 PixelData</span>
         <span class="k">if</span> <span class="n">elem</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="mh">0x7fe00010</span><span class="p">:</span>
-
-            <span class="k">try</span><span class="p">:</span>
-                <span class="c1"># Compressed Pixel Data</span>
-                <span class="c1"># PS3.5 Annex A.4</span>
-                <span class="c1">#   If encapsulated, VR is OB and length is undefined</span>
-                <span class="k">if</span> <span class="n">elem</span><span class="o">.</span><span class="n">is_undefined_length</span><span class="p">:</span>
-                    <span class="n">elem</span><span class="o">.</span><span class="n">VR</span> <span class="o">=</span> <span class="s1">&#39;OB&#39;</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="c1"># Non-compressed Pixel Data</span>
-                    <span class="c1"># If BitsAllocated is &gt; 8 then OW, else may be OB or OW</span>
-                    <span class="c1">#   as per PS3.5 Annex A.2. For BitsAllocated &lt; 8 test the</span>
-                    <span class="c1">#    size of each pixel to see if its written in OW or OB</span>
-                    <span class="k">if</span> <span class="n">ds</span><span class="o">.</span><span class="n">BitsAllocated</span> <span class="o">&gt;</span> <span class="mi">8</span><span class="p">:</span>
-                        <span class="n">elem</span><span class="o">.</span><span class="n">VR</span> <span class="o">=</span> <span class="s1">&#39;OW&#39;</span>
-                    <span class="k">else</span><span class="p">:</span>
-                        <span class="n">nr_pixels</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">Rows</span> <span class="o">*</span> <span class="n">ds</span><span class="o">.</span><span class="n">Columns</span>
-                        <span class="k">if</span> <span class="s1">&#39;SamplesPerPixel&#39;</span> <span class="ow">in</span> <span class="n">ds</span><span class="p">:</span>
-                            <span class="n">nr_pixels</span> <span class="o">*=</span> <span class="n">ds</span><span class="o">.</span><span class="n">SamplesPerPixel</span>
-                        <span class="n">pixel_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span><span class="p">)</span> <span class="o">/</span> <span class="n">nr_pixels</span>
-                        <span class="k">if</span> <span class="n">pixel_size</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-                            <span class="n">elem</span><span class="o">.</span><span class="n">VR</span> <span class="o">=</span> <span class="s1">&#39;OW&#39;</span>
-                        <span class="k">elif</span> <span class="n">pixel_size</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-                            <span class="n">elem</span><span class="o">.</span><span class="n">VR</span> <span class="o">=</span> <span class="s1">&#39;OB&#39;</span>
-            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
-                <span class="k">pass</span>
+            <span class="c1"># Compressed Pixel Data</span>
+            <span class="c1"># PS3.5 Annex A.4</span>
+            <span class="c1">#   If encapsulated, VR is OB and length is undefined</span>
+            <span class="k">if</span> <span class="n">elem</span><span class="o">.</span><span class="n">is_undefined_length</span><span class="p">:</span>
+                <span class="n">elem</span><span class="o">.</span><span class="n">VR</span> <span class="o">=</span> <span class="s1">&#39;OB&#39;</span>
+            <span class="c1"># Non-compressed Pixel Data - Implicit Little Endian</span>
+            <span class="c1"># PS3.5 Annex A1: VR is always OW</span>
+            <span class="k">elif</span> <span class="n">ds</span><span class="o">.</span><span class="n">is_implicit_VR</span><span class="p">:</span>
+                <span class="n">elem</span><span class="o">.</span><span class="n">VR</span> <span class="o">=</span> <span class="s1">&#39;OW&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Non-compressed Pixel Data - Explicit VR</span>
+                <span class="c1"># PS3.5 Annex A.2:</span>
+                <span class="c1"># If BitsAllocated is &gt; 8 then VR shall be OW,</span>
+                <span class="c1"># else may be OB or OW.</span>
+                <span class="c1"># If we get here, the data has not been written before,</span>
+                <span class="c1"># so we default to OB for BitsAllocated 1 or 8</span>
+                <span class="n">elem</span><span class="o">.</span><span class="n">VR</span> <span class="o">=</span> <span class="s1">&#39;OW&#39;</span> <span class="k">if</span> <span class="n">ds</span><span class="o">.</span><span class="n">BitsAllocated</span> <span class="o">&gt;</span> <span class="mi">8</span> <span class="k">else</span> <span class="s1">&#39;OB&#39;</span>
 
         <span class="c1"># &#39;US or SS&#39; and dependent on PixelRepresentation</span>
         <span class="k">elif</span> <span class="n">elem</span><span class="o">.</span><span class="n">tag</span> <span class="ow">in</span> <span class="p">[</span>
