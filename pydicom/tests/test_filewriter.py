@@ -716,47 +716,27 @@ class TestCorrectAmbiguousVR(unittest.TestCase):
         ref_ds.BitsAllocated = 16
         ref_ds.PixelData = b'\x00\x01'  # Little endian 256
         ds = correct_ambiguous_vr(deepcopy(ref_ds), True)  # Little endian
-        self.assertEqual(ds.PixelData, b'\x00\x01')
-        self.assertEqual(ds[0x7fe00010].VR, 'OW')
+        assert b'\x00\x01' == ds.PixelData
+        assert 'OW' == ds[0x7fe00010].VR
         ds = correct_ambiguous_vr(deepcopy(ref_ds), False)  # Big endian
-        self.assertEqual(ds.PixelData, b'\x00\x01')
-        self.assertEqual(ds[0x7fe00010].VR, 'OW')
+        assert b'\x00\x01' == ds.PixelData
+        assert 'OW' == ds[0x7fe00010].VR
 
-        # If BitsAllocated <= 8 then VR can be OB or OW: OW
+        # If BitsAllocated <= 8 then VR can be OB or OW: we set it to OB
         ref_ds = Dataset()
         ref_ds.BitsAllocated = 8
         ref_ds.Rows = 2
         ref_ds.Columns = 2
         ref_ds.PixelData = b'\x01\x00\x02\x00\x03\x00\x04\x00'
         ds = correct_ambiguous_vr(deepcopy(ref_ds), True)
-        self.assertEqual(ds.PixelData, b'\x01\x00\x02\x00\x03\x00\x04\x00')
-        self.assertEqual(ds[0x7fe00010].VR, 'OW')
+        assert b'\x01\x00\x02\x00\x03\x00\x04\x00' == ds.PixelData
+        assert 'OB' == ds[0x7fe00010].VR
 
-        # If BitsAllocated <= 8 then VR can be OB or OW: OB
-        ref_ds = Dataset()
-        ref_ds.BitsAllocated = 8
-        ref_ds.Rows = 2
-        ref_ds.Columns = 2
-        ref_ds.PixelData = b'\x01\x02\x03\x04'
-        ds = correct_ambiguous_vr(deepcopy(ref_ds), True)
-        self.assertEqual(ds.PixelData, b'\x01\x02\x03\x04')
-        self.assertEqual(ds[0x7fe00010].VR, 'OB')
-
-        # If no BitsAllocated then VR should be unchanged
+        # If no BitsAllocated set then AttributesError is raised
         ref_ds = Dataset()
         ref_ds.PixelData = b'\x00\x01'  # Big endian 1
-        ds = correct_ambiguous_vr(deepcopy(ref_ds), True)
-        self.assertEqual(ds.PixelData, b'\x00\x01')
-        self.assertEqual(ds[0x7fe00010].VR, 'OB or OW')
-
-        # If required elements missing then VR should be unchanged
-        ref_ds = Dataset()
-        ref_ds.BitsAllocated = 8
-        ref_ds.Rows = 2
-        ref_ds.PixelData = b'\x01\x02\x03\x04'
-        ds = correct_ambiguous_vr(deepcopy(ref_ds), True)
-        self.assertEqual(ds.PixelData, b'\x01\x02\x03\x04')
-        self.assertEqual(ds[0x7fe00010].VR, 'OB or OW')
+        with pytest.raises(AttributeError):
+            correct_ambiguous_vr(deepcopy(ref_ds), True)
 
     def test_waveform_bits_allocated(self):
         """Test correcting elements which require WaveformBitsAllocated."""
@@ -903,18 +883,6 @@ class TestCorrectAmbiguousVRElement(object):
         assert type(out) == DataElement
         assert out.VR == 'US'
         assert out.value == 0xfffe
-
-    def test_pixel_data_not_ow_or_ob(self):
-        """Test no change if can't figure out bit depth"""
-        ds = Dataset()
-        ds.Rows = 1
-        ds.Columns = 1
-        ds.PixelData = b'\x00\x01\x02'
-        ds[0x7fe00010].VR = 'OB or OW'
-        out = correct_ambiguous_vr_element(ds[0x7fe00010], ds, True)
-        assert out.VR == 'OB or OW'
-        assert out.tag == 0x7fe00010
-        assert out.value == b'\x00\x01\x02'
 
 
 class WriteAmbiguousVRTests(unittest.TestCase):
@@ -1340,7 +1308,8 @@ class TestWriteToStandard(object):
         fp.seek(0)
         ds_impl = dcmread(fp)
         for elem_orig, elem_conv in zip(ds_orig, ds_impl):
-            assert elem_orig == elem_conv
+            assert elem_orig.value == elem_conv.value
+        assert 'OW' == ds_impl[0x7fe00010].VR
 
         ds_impl.is_implicit_VR = False
         ds_impl.is_little_endian = True
@@ -1351,7 +1320,7 @@ class TestWriteToStandard(object):
         # used to raise, see #620
         ds_expl = dcmread(fp)
         for elem_orig, elem_conv in zip(ds_orig, ds_expl):
-            assert elem_orig == elem_conv
+            assert elem_orig.value == elem_conv.value
 
     def test_transfer_syntax_not_added(self):
         """Test TransferSyntaxUID is not added if ExplVRLE."""
