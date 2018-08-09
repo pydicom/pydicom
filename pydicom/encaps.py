@@ -425,21 +425,19 @@ def fragment_frame(frame, nr_fragments=1):
     if length % 2:
         length += 1
 
-    offset = 0
-    for ii in range(nr_fragments):
-        if ii < (nr_fragments - 1):
-            # 1st to (N-1)th fragment
-            fragment = frame[offset:offset + length]
-        else:
-            # Nth fragment
-            fragment = bytearray(frame[offset:])
+    # 1st to (N-1)th fragment
+    for offset in range(0, length * (nr_fragments - 1), length):
+        yield frame[offset:offset + length]
 
-            # Pad last fragment if needed to make it even
-            if (frame_length - offset) % 2:
-                fragment.extend(b'\x00')
+    # Nth fragment
+    offset = length * (nr_fragments - 1)
+    fragment = frame[offset:]
 
-        offset += length
-        yield bytes(fragment)
+    # Pad last fragment if needed to make it even
+    if (frame_length - offset) % 2:
+        fragment += b'\x00'
+
+    yield fragment
 
 
 def itemise_fragment(fragment):
@@ -462,15 +460,14 @@ def itemise_fragment(fragment):
     * Each fragment is encapsulated as a DICOM Item with tag (FFFE,E000), then
       a 4 byte length.
     """
-    item = bytearray()
     # item tag (fffe,e000)
-    item.extend(b'\xFE\xFF\x00\xE0')
+    item = bytes(b'\xFE\xFF\x00\xE0')
     # fragment length '<I' little endian, 4 byte unsigned int
-    item.extend(pack('<I', len(fragment)))
+    item += pack('<I', len(fragment))
     # fragment data
-    item.extend(fragment)
+    item += fragment
 
-    return bytes(item)
+    return item
 
 
 itemize_fragment = itemise_fragment

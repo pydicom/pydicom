@@ -905,7 +905,7 @@ class TestEncapsulateFrame(object):
 class TestEncapsulate(object):
     """Test encaps.encapsulate."""
     def test_encapsulate_single_fragment_per_frame_no_bot(self):
-        """Test encapsulating single fragment per frame with not BOT values."""
+        """Test encapsulating single fragment per frame with no BOT values."""
         ds = dcmread(JP2K_10FRAME_NOBOT)
         frames = decode_data_sequence(ds.PixelData)
         assert len(frames) == 10

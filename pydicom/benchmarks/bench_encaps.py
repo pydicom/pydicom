@@ -7,6 +7,7 @@ from pydicom.encaps import (
     fragment_frame,
     itemise_frame,
     encapsulate,
+    _encapsulate,
     decode_data_sequence
 )
 
@@ -76,6 +77,11 @@ class TimeEncapsulate(object):
         """Time encapsulating frames with 10 fragments per frame."""
         for ii in range(self.no_runs):
             encapsulate(self.test_data, 10, has_bot=True)
+
+    def time_xdev_encapsulate_ten_nobot(self):
+        """Time encapsulating frames with 10 fragments per frame."""
+        for ii in range(self.no_runs):
+            _encapsulate(self.test_data, 10, has_bot=False)
 
     def time_encapsulate_single_nobot(self):
         """Time encapsulating frames with 1 fragment per frame."""
