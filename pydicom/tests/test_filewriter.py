@@ -732,12 +732,11 @@ class TestCorrectAmbiguousVR(unittest.TestCase):
         assert b'\x01\x00\x02\x00\x03\x00\x04\x00' == ds.PixelData
         assert 'OB' == ds[0x7fe00010].VR
 
-        # If no BitsAllocated then VR should be unchanged
+        # If no BitsAllocated set then AttributesError is raised
         ref_ds = Dataset()
         ref_ds.PixelData = b'\x00\x01'  # Big endian 1
-        ds = correct_ambiguous_vr(deepcopy(ref_ds), True)
-        assert b'\x00\x01' == ds.PixelData
-        assert 'OB or OW' == ds[0x7fe00010].VR
+        with pytest.raises(AttributeError):
+            correct_ambiguous_vr(deepcopy(ref_ds), True)
 
     def test_waveform_bits_allocated(self):
         """Test correcting elements which require WaveformBitsAllocated."""
@@ -884,18 +883,6 @@ class TestCorrectAmbiguousVRElement(object):
         assert type(out) == DataElement
         assert out.VR == 'US'
         assert out.value == 0xfffe
-
-    def test_pixel_data_not_ow_or_ob(self):
-        """Test no change if can't figure out bit depth"""
-        ds = Dataset()
-        ds.Rows = 1
-        ds.Columns = 1
-        ds.PixelData = b'\x00\x01\x02'
-        ds[0x7fe00010].VR = 'OB or OW'
-        out = correct_ambiguous_vr_element(ds[0x7fe00010], ds, True)
-        assert out.VR == 'OB or OW'
-        assert out.tag == 0x7fe00010
-        assert out.value == b'\x00\x01\x02'
 
 
 class WriteAmbiguousVRTests(unittest.TestCase):

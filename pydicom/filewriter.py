@@ -50,27 +50,23 @@ def correct_ambiguous_vr_element(elem, ds, is_little_endian):
 
         # 'OB or OW': 7fe0,0010 PixelData
         if elem.tag == 0x7fe00010:
-
-            try:
-                # Compressed Pixel Data
-                # PS3.5 Annex A.4
-                #   If encapsulated, VR is OB and length is undefined
-                if elem.is_undefined_length:
-                    elem.VR = 'OB'
-                # Non-compressed Pixel Data - Implicit Little Endian
-                # PS3.5 Annex A1: VR is always OW
-                elif ds.is_implicit_VR:
-                    elem.VR = 'OW'
-                else:
-                    # Non-compressed Pixel Data - Explicit VR
-                    # PS3.5 Annex A.2:
-                    # If BitsAllocated is > 8 then VR shall be OW,
-                    # else may be OB or OW.
-                    # If we get here, the data has not been written before,
-                    # so we default to OB for BitsAllocated 1 or 8
-                    elem.VR = 'OW' if ds.BitsAllocated > 8 else 'OB'
-            except AttributeError:
-                pass
+            # Compressed Pixel Data
+            # PS3.5 Annex A.4
+            #   If encapsulated, VR is OB and length is undefined
+            if elem.is_undefined_length:
+                elem.VR = 'OB'
+            # Non-compressed Pixel Data - Implicit Little Endian
+            # PS3.5 Annex A1: VR is always OW
+            elif ds.is_implicit_VR:
+                elem.VR = 'OW'
+            else:
+                # Non-compressed Pixel Data - Explicit VR
+                # PS3.5 Annex A.2:
+                # If BitsAllocated is > 8 then VR shall be OW,
+                # else may be OB or OW.
+                # If we get here, the data has not been written before,
+                # so we default to OB for BitsAllocated 1 or 8
+                elem.VR = 'OW' if ds.BitsAllocated > 8 else 'OB'
 
         # 'US or SS' and dependent on PixelRepresentation
         elif elem.tag in [
