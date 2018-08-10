@@ -3,10 +3,24 @@
 
 import pytest
 
-from pydicom.encaps import (generate_pixel_data_fragment, get_frame_offsets,
-                            generate_pixel_data_frame, generate_pixel_data,
-                            decode_data_sequence, defragment_data, read_item)
+from pydicom import dcmread
+from pydicom.data import get_testdata_files
+from pydicom.encaps import (
+    generate_pixel_data_fragment,
+    get_frame_offsets,
+    generate_pixel_data_frame,
+    generate_pixel_data,
+    decode_data_sequence,
+    defragment_data,
+    read_item,
+    fragment_frame,
+    itemise_frame,
+    encapsulate
+)
 from pydicom.filebase import DicomBytesIO
+
+
+JP2K_10FRAME_NOBOT = get_testdata_files('emri_small_jpeg_2k_lossless.dcm')[0]
 
 
 class TestGetFrameOffsets(object):
@@ -762,3 +776,195 @@ class TestReadItem(object):
         fp.is_little_endian = True
         assert read_item(fp) == b'\x01\x00\x00\x00'
         assert read_item(fp) == b'\x01\x02\x03\x04\x05\x06'
+
+
+class TestFragmentFrame(object):
+    """Test encaps.fragment_frame."""
+    def test_single_fragment_even_data(self):
+        """Test 1 fragment from even data"""
+        bytestream = b'\xFE\xFF\x00\xE1'
+        fragments = fragment_frame(bytestream, nr_fragments=1)
+        fragment = next(fragments)
+        assert pytest.raises(StopIteration, next, fragments)
+        assert fragment == bytestream
+        assert len(fragment) == 4
+
+        assert isinstance(fragment, bytes)
+
+    def test_single_fragment_odd_data(self):
+        """Test 1 fragment from odd data"""
+        bytestream = b'\xFE\xFF\x00'
+        fragments = fragment_frame(bytestream, nr_fragments=1)
+        fragment = next(fragments)
+        assert pytest.raises(StopIteration, next, fragments)
+        assert fragment == bytestream + b'\x00'
+        assert len(fragment) == 4
+
+    def test_even_fragment_even_data(self):
+        """Test even fragments from even data"""
+        bytestream = b'\xFE\xFF\x00\xE1'
+        # Each fragment should be 2 bytes
+        fragments = fragment_frame(bytestream, nr_fragments=2)
+        fragment = next(fragments)
+        assert fragment == bytestream[:2]
+        fragment = next(fragments)
+        assert fragment == bytestream[2:]
+        assert pytest.raises(StopIteration, next, fragments)
+
+    def test_even_fragment_odd_data(self):
+        """Test even fragments from odd data"""
+        bytestream = b'\xFE\xFF\x00'
+        # First fragment should be 1.5 -> 2 bytes, with the final
+        #   fragment 1 byte + 1 byte padding
+        fragments = fragment_frame(bytestream, nr_fragments=2)
+        fragment = next(fragments)
+        assert fragment == b'\xFE\xFF'
+        fragment = next(fragments)
+        assert fragment == b'\x00\x00'
+        assert pytest.raises(StopIteration, next, fragments)
+
+    def test_odd_fragments_even_data(self):
+        """Test odd fragments from even data"""
+        bytestream = b'\xFE\xFF\x00\xE1' * 31  # 124 bytes
+        assert len(bytestream) % 2 == 0
+        # Each fragment should be 17.7 -> 18 bytes, with the final
+        #   fragment 16 bytes
+        fragments = fragment_frame(bytestream, nr_fragments=7)
+        for ii in range(6):
+            fragment = next(fragments)
+            assert len(fragment) == 18
+
+        fragment = next(fragments)
+        assert len(fragment) == 16
+        assert pytest.raises(StopIteration, next, fragments)
+
+    def test_odd_fragments_odd_data(self):
+        """Test odd fragments from odd data"""
+        bytestream = b'\xFE\xFF\x00' * 31  # 93 bytes
+        assert len(bytestream) % 2 == 1
+        # Each fragment should be 13.3 -> 14 bytes, with the final
+        #   fragment 9 bytes + 1 byte padding
+        fragments = fragment_frame(bytestream, nr_fragments=7)
+        for ii in range(6):
+            fragment = next(fragments)
+            assert len(fragment) == 14
+        fragment = next(fragments)
+        assert len(fragment) == 10
+        assert pytest.raises(StopIteration, next, fragments)
+
+    def test_too_many_fragments_raises(self):
+        """Test exception raised if too many fragments."""
+        bytestream = b'\xFE\xFF\x00' * 31  # 93 bytes
+        # At most we can have 47 fragments
+        for fragment in fragment_frame(bytestream, nr_fragments=47):
+            pass
+
+        with pytest.raises(ValueError):
+            for fragment in fragment_frame(bytestream, nr_fragments=48):
+                pass
+
+
+class TestEncapsulateFrame(object):
+    """Test encaps.itemise_frame."""
+    def test_single_item(self):
+        """Test encapsulating into one fragment"""
+        bytestream = b'\xFE\xFF\x00\xE1'
+        item_generator = itemise_frame(bytestream, nr_fragments=1)
+        item = next(item_generator)
+
+        assert item == (
+            b'\xfe\xff\x00\xe0'
+            b'\x04\x00\x00\x00'
+            b'\xFE\xFF\x00\xE1'
+        )
+
+        pytest.raises(StopIteration, next, item_generator)
+
+    def test_two_items(self):
+        """Test encapsulating into two fragments"""
+        bytestream = b'\xFE\xFF\x00\xE1'
+        item_generator = itemise_frame(bytestream, nr_fragments=2)
+
+        item = next(item_generator)
+        assert item == (
+            b'\xfe\xff\x00\xe0'
+            b'\x02\x00\x00\x00'
+            b'\xFE\xFF'
+        )
+
+        item = next(item_generator)
+        assert item == (
+            b'\xfe\xff\x00\xe0'
+            b'\x02\x00\x00\x00'
+            b'\x00\xe1'
+        )
+
+        pytest.raises(StopIteration, next, item_generator)
+
+
+class TestEncapsulate(object):
+    """Test encaps.encapsulate."""
+    def test_encapsulate_single_fragment_per_frame_no_bot(self):
+        """Test encapsulating single fragment per frame with no BOT values."""
+        ds = dcmread(JP2K_10FRAME_NOBOT)
+        frames = decode_data_sequence(ds.PixelData)
+        assert len(frames) == 10
+
+        data = encapsulate(frames, fragments_per_frame=1, has_bot=False)
+        test_frames = decode_data_sequence(data)
+        for a, b in zip(test_frames, frames):
+            assert a == b
+
+        # Original data has no BOT values
+        assert data == ds.PixelData
+
+    def test_encapsulate_single_fragment_per_frame_bot(self):
+        """Test encapsulating single fragment per frame with BOT values."""
+        ds = dcmread(JP2K_10FRAME_NOBOT)
+        frames = decode_data_sequence(ds.PixelData)
+        assert len(frames) == 10
+
+        data = encapsulate(frames, fragments_per_frame=1, has_bot=True)
+        test_frames = decode_data_sequence(data)
+        for a, b in zip(test_frames, frames):
+            assert a == b
+
+        fp = DicomBytesIO(data)
+        fp.is_little_endian = True
+        offsets = get_frame_offsets(fp)
+        assert offsets == [
+            0x0000,  # 0
+            0x0eee,  # 3822
+            0x1df6,  # 7670
+            0x2cf8,  # 11512
+            0x3bfc,  # 15356
+            0x4ade,  # 19166
+            0x59a2,  # 22946
+            0x6834,  # 26676
+            0x76e2,  # 30434
+            0x8594  # 34196
+        ]
+
+    def test_encapsulate_bot(self):
+        """Test the Basic Offset Table is correct."""
+        ds = dcmread(JP2K_10FRAME_NOBOT)
+        frames = decode_data_sequence(ds.PixelData)
+        assert len(frames) == 10
+
+        data = encapsulate(frames, fragments_per_frame=1, has_bot=True)
+        assert data[:56] == (
+            b'\xfe\xff\x00\xe0'  # Basic offset table item tag
+            b'\x28\x00\x00\x00'  # Basic offset table length
+            b'\x00\x00\x00\x00'  # First offset
+            b'\xee\x0e\x00\x00'
+            b'\xf6\x1d\x00\x00'
+            b'\xf8\x2c\x00\x00'
+            b'\xfc\x3b\x00\x00'
+            b'\xde\x4a\x00\x00'
+            b'\xa2\x59\x00\x00'
+            b'\x34\x68\x00\x00'
+            b'\xe2\x76\x00\x00'
+            b'\x94\x85\x00\x00'  # Last offset
+            b'\xfe\xff\x00\xe0'  # Next item tag
+            b'\xe6\x0e\x00\x00'  # Next item length
+        )

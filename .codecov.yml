@@ -21,3 +21,4 @@ coverage:
         threshold: 1%
 ignore:
   - "pydicom/tests"
+  - "pydicom/benchmarks"
