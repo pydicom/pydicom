@@ -15,6 +15,9 @@ jobs:
       DOC_URL: ""
       # The email is to be used for commits in the Github Page
       EMAIL: g.lemaitre58@gmail.com
+    branches:
+      - ignore:
+        - gh-pages
     steps:
       - checkout
       - run:
