@@ -173,30 +173,37 @@
 <span></span><span class="c1"># Copyright 2008-2018 pydicom authors. See LICENSE file for details.</span>
 <span class="sd">&quot;&quot;&quot;Functions for working with encapsulated (compressed) pixel data.&quot;&quot;&quot;</span>
 
+<span class="kn">from</span> <span class="nn">struct</span> <span class="k">import</span> <span class="n">pack</span>
+
 <span class="kn">import</span> <span class="nn">pydicom.config</span>
 <span class="kn">from</span> <span class="nn">pydicom.filebase</span> <span class="k">import</span> <span class="n">DicomBytesIO</span>
 <span class="kn">from</span> <span class="nn">pydicom.tag</span> <span class="k">import</span> <span class="p">(</span><span class="n">Tag</span><span class="p">,</span> <span class="n">ItemTag</span><span class="p">,</span> <span class="n">SequenceDelimiterTag</span><span class="p">)</span>
 
 
+<span class="c1"># Functions for parsing encapsulated data</span>
 <div class="viewcode-block" id="get_frame_offsets"><a class="viewcode-back" href="../../api_ref.html#pydicom.encaps.get_frame_offsets">[docs]</a><span class="k">def</span> <span class="nf">get_frame_offsets</span><span class="p">(</span><span class="n">fp</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Return a list of the fragment offsets from the Basic Offset Table.</span>
 
-<span class="sd">    Basic Offset Table</span>
-<span class="sd">    ~~~~~~~~~~~~~~~~~~</span>
+<span class="sd">    **Basic Offset Table**</span>
+
 <span class="sd">    The Basic Offset Table Item must be present and have a tag (FFFE,E000) and</span>
 <span class="sd">    a length, however it may or may not have a value.</span>
 
 <span class="sd">    Basic Offset Table with no value</span>
-<span class="sd">    Item Tag   | Length    |</span>
-<span class="sd">    FE FF 00 E0 00 00 00 00</span>
+<span class="sd">    ::</span>
+
+<span class="sd">        Item Tag   | Length    |</span>
+<span class="sd">        FE FF 00 E0 00 00 00 00</span>
 
 <span class="sd">    Basic Offset Table with value (2 frames)</span>
-<span class="sd">    Item Tag   | Length    | Offset 1  | Offset 2  |</span>
-<span class="sd">    FE FF 00 E0 08 00 00 00 00 00 00 00 10 00 00 00</span>
+<span class="sd">    ::</span>
+
+<span class="sd">        Item Tag   | Length    | Offset 1  | Offset 2  |</span>
+<span class="sd">        FE FF 00 E0 08 00 00 00 00 00 00 00 10 00 00 00</span>
 
 <span class="sd">    For single or multi-frame images with only one frame, the Basic Offset</span>
 <span class="sd">    Table may or may not have a value. When it has no value then its length</span>
-<span class="sd">    shall be 0x00000000.</span>
+<span class="sd">    shall be ``0x00000000``.</span>
 
 <span class="sd">    For multi-frame images with more than one frame, the Basic Offset Table</span>
 <span class="sd">    should have a value containing concatenated 32-bit unsigned integer values</span>
@@ -211,11 +218,11 @@
 <span class="sd">    ----------</span>
 <span class="sd">    fp : pydicom.filebase.DicomBytesIO</span>
 <span class="sd">        The encapsulated pixel data positioned at the start of the Basic Offset</span>
-<span class="sd">        Table. `fp.is_little_endian` should be set to True.</span>
+<span class="sd">        Table. ``fp.is_little_endian`` should be set to True.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    offsets : list of int</span>
+<span class="sd">    list of int</span>
 <span class="sd">        The byte offsets to the first fragment of each frame, as measured from</span>
 <span class="sd">        the start of the first item following the Basic Offset Table item.</span>
 
@@ -260,13 +267,13 @@
 <span class="sd">    For compressed (encapsulated) Transfer Syntaxes, the (7fe0,0010) &#39;Pixel</span>
 <span class="sd">    Data&#39; element is encoded in an encapsulated format.</span>
 
-<span class="sd">    Encapsulation</span>
-<span class="sd">    -------------</span>
+<span class="sd">    **Encapsulation**</span>
+
 <span class="sd">    The encoded pixel data stream is fragmented into one or more Items. The</span>
 <span class="sd">    stream may represent a single or multi-frame image.</span>
 
-<span class="sd">    Each &#39;Data Stream Fragment&#39; shall have tag of (fffe,e000), followed by a 4</span>
-<span class="sd">    byte &#39;Item Length&#39; field encoding the explicit number of bytes in the Item.</span>
+<span class="sd">    Each *Data Stream Fragment* shall have tag of (fffe,e000), followed by a 4</span>
+<span class="sd">    byte *Item Length* field encoding the explicit number of bytes in the Item.</span>
 <span class="sd">    All Items containing an encoded fragment shall have an even number of bytes</span>
 <span class="sd">    greater than or equal to 2, with the last fragment being padded if</span>
 <span class="sd">    necessary.</span>
@@ -274,14 +281,14 @@
 <span class="sd">    The first Item in the Sequence of Items shall be a &#39;Basic Offset Table&#39;,</span>
 <span class="sd">    however the Basic Offset Table item value is not required to be present.</span>
 <span class="sd">    It is assumed that the Basic Offset Table item has already been read prior</span>
-<span class="sd">    to calling this function (and that `fp` is positioned past this item).</span>
+<span class="sd">    to calling this function (and that ``fp`` is positioned past this item).</span>
 
 <span class="sd">    The remaining items in the Sequence of Items are the pixel data fragments</span>
 <span class="sd">    and it is these items that will be read and returned by this function.</span>
 
 <span class="sd">    The Sequence of Items is terminated by a Sequence Delimiter Item with tag</span>
-<span class="sd">    (fffe,e0dd) and an Item Length field of value 0x00000000. The presence or</span>
-<span class="sd">    absence of the Sequence Delimiter Item in `fp` has no effect on the</span>
+<span class="sd">    (fffe,e0dd) and an Item Length field of value ``0x00000000``. The presence</span>
+<span class="sd">    or absence of the Sequence Delimiter Item in `fp` has no effect on the</span>
 <span class="sd">    returned fragments.</span>
 
 <span class="sd">    Encoding</span>
@@ -291,9 +298,9 @@
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    fp : pydicom.filebase.DicomBytesIO</span>
-<span class="sd">        The encoded (7fe0,0010) &#39;Pixel Data&#39; element value, positioned at the</span>
+<span class="sd">        The encoded (7fe0,0010) *Pixel Data* element value, positioned at the</span>
 <span class="sd">        start of the item tag for the first item after the Basic Offset Table</span>
-<span class="sd">        item. `fp.is_little_endian` should be set to True.</span>
+<span class="sd">        item. ``fp.is_little_endian`` should be set to True.</span>
 
 <span class="sd">    Yields</span>
 <span class="sd">    ------</span>
@@ -346,7 +353,7 @@
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    bytestream : bytes</span>
-<span class="sd">        The value of the (7fe0, 0010) &#39;Pixel Data&#39; element from an encapsulated</span>
+<span class="sd">        The value of the (7fe0, 0010) *Pixel Data* element from an encapsulated</span>
 <span class="sd">        dataset. The Basic Offset Table item should be present and the</span>
 <span class="sd">        Sequence Delimiter item may or may not be present.</span>
 
@@ -370,28 +377,29 @@
 <span class="sd">    data from more than one frame. However data from one frame may span</span>
 <span class="sd">    multiple fragments.</span>
 
-<span class="sd">    1.2.840.10008.1.2.4.50 - JPEG Baseline (Process 1)</span>
-<span class="sd">    1.2.840.10008.1.2.4.51 - JPEG Baseline (Process 2 and 4)</span>
-<span class="sd">    1.2.840.10008.1.2.4.57 - JPEG Lossless, Non-Hierarchical (Process 14)</span>
-<span class="sd">    1.2.840.10008.1.2.4.70 - JPEG Lossless, Non-Hierarchical, First-Order</span>
-<span class="sd">        Prediction (Process 14 [Selection Value 1])</span>
-<span class="sd">    1.2.840.10008.1.2.4.80 - JPEG-LS Lossless Image Compression</span>
-<span class="sd">    1.2.840.10008.1.2.4.81 - JPEG-LS Lossy (Near-Lossless) Image Compression</span>
-<span class="sd">    1.2.840.10008.1.2.4.90 - JPEG 2000 Image Compression (Lossless Only)</span>
-<span class="sd">    1.2.840.10008.1.2.4.91 - JPEG 2000 Image Compression</span>
-<span class="sd">    1.2.840.10008.1.2.4.92 - JPEG 2000 Part 2 Multi-component Image Compression</span>
-<span class="sd">        (Lossless Only)</span>
-<span class="sd">    1.2.840.10008.1.2.4.93 - JPEG 2000 Part 2 Multi-component Image Compression</span>
+<span class="sd">    * 1.2.840.10008.1.2.4.50 - JPEG Baseline (Process 1)</span>
+<span class="sd">    * 1.2.840.10008.1.2.4.51 - JPEG Baseline (Process 2 and 4)</span>
+<span class="sd">    * 1.2.840.10008.1.2.4.57 - JPEG Lossless, Non-Hierarchical (Process 14)</span>
+<span class="sd">    * 1.2.840.10008.1.2.4.70 - JPEG Lossless, Non-Hierarchical, First-Order</span>
+<span class="sd">      Prediction (Process 14 [Selection Value 1])</span>
+<span class="sd">    * 1.2.840.10008.1.2.4.80 - JPEG-LS Lossless Image Compression</span>
+<span class="sd">    * 1.2.840.10008.1.2.4.81 - JPEG-LS Lossy (Near-Lossless) Image Compression</span>
+<span class="sd">    * 1.2.840.10008.1.2.4.90 - JPEG 2000 Image Compression (Lossless Only)</span>
+<span class="sd">    * 1.2.840.10008.1.2.4.91 - JPEG 2000 Image Compression</span>
+<span class="sd">    * 1.2.840.10008.1.2.4.92 - JPEG 2000 Part 2 Multi-component Image</span>
+<span class="sd">      Compression (Lossless Only)</span>
+<span class="sd">    * 1.2.840.10008.1.2.4.93 - JPEG 2000 Part 2 Multi-component Image</span>
+<span class="sd">      Compression</span>
 
 <span class="sd">    For the following transfer syntaxes, each frame shall be encoded in one and</span>
 <span class="sd">    only one fragment.</span>
 
-<span class="sd">    1.2.840.10008.1.2.5 - RLE Lossless</span>
+<span class="sd">    * 1.2.840.10008.1.2.5 - RLE Lossless</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    bytestream : bytes</span>
-<span class="sd">        The value of the (7fe0, 0010) &#39;Pixel Data&#39; element from an encapsulated</span>
+<span class="sd">        The value of the (7fe0, 0010) *Pixel Data* element from an encapsulated</span>
 <span class="sd">        dataset. The Basic Offset Table item should be present and the</span>
 <span class="sd">        Sequence Delimiter item may or may not be present.</span>
 
@@ -542,6 +550,207 @@
 
     <span class="n">item_data</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">length</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">item_data</span></div>
+
+
+<span class="c1"># Functions for encapsulating data</span>
+<div class="viewcode-block" id="fragment_frame"><a class="viewcode-back" href="../../api_ref.html#pydicom.encaps.fragment_frame">[docs]</a><span class="k">def</span> <span class="nf">fragment_frame</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">nr_fragments</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Yield one or more fragments from `frame`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    frame : bytes</span>
+<span class="sd">        The data to fragment.</span>
+<span class="sd">    nr_fragments : int, optional</span>
+<span class="sd">        The number of fragments (default 1).</span>
+
+<span class="sd">    Yields</span>
+<span class="sd">    ------</span>
+<span class="sd">    bytes</span>
+<span class="sd">        The fragmented data, with all fragments as an even number of bytes</span>
+<span class="sd">        greater than or equal to two.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+
+<span class="sd">    * All items containing an encoded fragment shall be made of an even number</span>
+<span class="sd">      of bytes greater than or equal to two.</span>
+<span class="sd">    * The last fragment of a frame may be padded, if necessary to meet the</span>
+<span class="sd">      sequence item format requirements of the DICOM Standard.</span>
+<span class="sd">    * Any necessary padding may be appended after the end of image marker.</span>
+<span class="sd">    * Encapsulated Pixel Data has the Value Representation OB.</span>
+<span class="sd">    * Values with a VR of OB shall be padded with a single trailing NULL byte</span>
+<span class="sd">      value (0x00) to achieve even length.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    DICOM Standard, Part 5, Section 6.2 and Annex A.4</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">frame_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+    <span class="c1"># Add 1 to fix odd length frames not being caught</span>
+    <span class="k">if</span> <span class="n">nr_fragments</span> <span class="o">&gt;</span> <span class="p">(</span><span class="n">frame_length</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Too many fragments requested (the minimum fragment &#39;</span>
+                         <span class="s1">&#39;size is 2 bytes)&#39;</span><span class="p">)</span>
+
+    <span class="n">length</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">frame_length</span> <span class="o">/</span> <span class="n">nr_fragments</span><span class="p">)</span>
+
+    <span class="c1"># Each item shall be an even number of bytes</span>
+    <span class="k">if</span> <span class="n">length</span> <span class="o">%</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">length</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="c1"># 1st to (N-1)th fragment</span>
+    <span class="k">for</span> <span class="n">offset</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">length</span> <span class="o">*</span> <span class="p">(</span><span class="n">nr_fragments</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span> <span class="n">length</span><span class="p">):</span>
+        <span class="k">yield</span> <span class="n">frame</span><span class="p">[</span><span class="n">offset</span><span class="p">:</span><span class="n">offset</span> <span class="o">+</span> <span class="n">length</span><span class="p">]</span>
+
+    <span class="c1"># Nth fragment</span>
+    <span class="n">offset</span> <span class="o">=</span> <span class="n">length</span> <span class="o">*</span> <span class="p">(</span><span class="n">nr_fragments</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">fragment</span> <span class="o">=</span> <span class="n">frame</span><span class="p">[</span><span class="n">offset</span><span class="p">:]</span>
+
+    <span class="c1"># Pad last fragment if needed to make it even</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">frame_length</span> <span class="o">-</span> <span class="n">offset</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">fragment</span> <span class="o">+=</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">&#39;</span>
+
+    <span class="k">yield</span> <span class="n">fragment</span></div>
+
+
+<div class="viewcode-block" id="itemise_fragment"><a class="viewcode-back" href="../../api_ref.html#pydicom.encaps.itemise_fragment">[docs]</a><span class="k">def</span> <span class="nf">itemise_fragment</span><span class="p">(</span><span class="n">fragment</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return an itemised `fragment`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fragment : bytes</span>
+<span class="sd">        The fragment to itemise.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    bytes</span>
+<span class="sd">        The itemised fragment.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+
+<span class="sd">    * The encoding of the item shall be in Little Endian.</span>
+<span class="sd">    * Each fragment is encapsulated as a DICOM Item with tag (FFFE,E000), then</span>
+<span class="sd">      a 4 byte length.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># item tag (fffe,e000)</span>
+    <span class="n">item</span> <span class="o">=</span> <span class="nb">bytes</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;</span><span class="se">\xFE\xFF\x00\xE0</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="c1"># fragment length &#39;&lt;I&#39; little endian, 4 byte unsigned int</span>
+    <span class="n">item</span> <span class="o">+=</span> <span class="n">pack</span><span class="p">(</span><span class="s1">&#39;&lt;I&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">fragment</span><span class="p">))</span>
+    <span class="c1"># fragment data</span>
+    <span class="n">item</span> <span class="o">+=</span> <span class="n">fragment</span>
+
+    <span class="k">return</span> <span class="n">item</span></div>
+
+
+<span class="n">itemize_fragment</span> <span class="o">=</span> <span class="n">itemise_fragment</span>
+
+
+<div class="viewcode-block" id="itemise_frame"><a class="viewcode-back" href="../../api_ref.html#pydicom.encaps.itemise_frame">[docs]</a><span class="k">def</span> <span class="nf">itemise_frame</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">nr_fragments</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Yield items generated from `frame`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    frame : bytes</span>
+<span class="sd">        The data to fragment and itemise.</span>
+<span class="sd">    nr_fragments : int, optional</span>
+<span class="sd">        The number of fragments/items (default 1).</span>
+
+<span class="sd">    Yields</span>
+<span class="sd">    ------</span>
+<span class="sd">    bytes</span>
+<span class="sd">        An itemised fragment of the frame, encoded as little endian.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+
+<span class="sd">    * The encoding of the items shall be in Little Endian.</span>
+<span class="sd">    * Each fragment is encapsulated as a DICOM Item with tag (FFFE,E000), then</span>
+<span class="sd">      a 4 byte length.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    DICOM Standard, Part 5, Section 7.5 and Annex A.4</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">fragment</span> <span class="ow">in</span> <span class="n">fragment_frame</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">nr_fragments</span><span class="p">):</span>
+        <span class="k">yield</span> <span class="n">itemise_fragment</span><span class="p">(</span><span class="n">fragment</span><span class="p">)</span></div>
+
+
+<span class="n">itemize_frame</span> <span class="o">=</span> <span class="n">itemise_frame</span>
+
+
+<div class="viewcode-block" id="encapsulate"><a class="viewcode-back" href="../../api_ref.html#pydicom.encaps.encapsulate">[docs]</a><span class="k">def</span> <span class="nf">encapsulate</span><span class="p">(</span><span class="n">frames</span><span class="p">,</span> <span class="n">fragments_per_frame</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">has_bot</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return encapsulated `frames`.</span>
+
+<span class="sd">    Data will be encapsulated with a Basic Offset Table Item at the beginning,</span>
+<span class="sd">    then one or more fragment Items. Each item will be of even length and the</span>
+<span class="sd">    final fragment of each frame may be padded with 0x00 if required.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    frames : list of bytes</span>
+<span class="sd">        The frame data to encapsulate.</span>
+<span class="sd">    fragments_per_frame : int, optional</span>
+<span class="sd">        The number of fragments to use for each frame (default 1).</span>
+<span class="sd">    has_bot : bool, optional</span>
+<span class="sd">        True to include values in the Basic Offset Table, False otherwise</span>
+<span class="sd">        (default True). If `fragments_per_frame` is not 1 then its strongly</span>
+<span class="sd">        recommended that this be True.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    bytes</span>
+<span class="sd">        The encapsulated data.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+
+<span class="sd">    * The encoding shall be in Little Endian.</span>
+<span class="sd">    * Each fragment is encapsulated as a DICOM Item with tag (FFFE,E000), then</span>
+<span class="sd">      a 4 byte length.</span>
+<span class="sd">    * The first item shall be a Basic Offset Table item.</span>
+<span class="sd">    * The Basic Offset Table item, however, is not required to have a value.</span>
+<span class="sd">    * If no value is present, the Basic Offset Table length is 0.</span>
+<span class="sd">    * If the value is present, it shall contain concatenated 32-bit</span>
+<span class="sd">      unsigned integer values that are byte offsets to the first byte of the</span>
+<span class="sd">      Item tag of the first fragment in each frame as measured from the first</span>
+<span class="sd">      byte of the first Item tag following the Basic Offset Table Item.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    DICOM Standard, Part 5, Section 7.5 and Annex A.4</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">no_frames</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">frames</span><span class="p">)</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">()</span>
+
+    <span class="c1"># Add the Basic Offset Table Item</span>
+    <span class="c1"># Add the tag</span>
+    <span class="n">output</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;</span><span class="se">\xFE\xFF\x00\xE0</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">has_bot</span><span class="p">:</span>
+        <span class="c1"># Add the length</span>
+        <span class="n">output</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">pack</span><span class="p">(</span><span class="s1">&#39;&lt;I&#39;</span><span class="p">,</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">no_frames</span><span class="p">))</span>
+        <span class="c1"># Reserve 4 x len(frames) bytes for the offsets</span>
+        <span class="n">output</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;</span><span class="se">\xFF\xFF\xFF\xFF</span><span class="s1">&#39;</span> <span class="o">*</span> <span class="n">no_frames</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Add the length</span>
+        <span class="n">output</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">pack</span><span class="p">(</span><span class="s1">&#39;&lt;I&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+
+    <span class="n">bot_offsets</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">ii</span><span class="p">,</span> <span class="n">frame</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">frames</span><span class="p">):</span>
+        <span class="c1"># `itemised_length` is the total length of each itemised frame</span>
+        <span class="n">itemised_length</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">itemise_frame</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">fragments_per_frame</span><span class="p">):</span>
+            <span class="n">itemised_length</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+            <span class="n">output</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+
+        <span class="c1"># Update the list of frame offsets</span>
+        <span class="n">bot_offsets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bot_offsets</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span> <span class="o">+</span> <span class="n">itemised_length</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">has_bot</span><span class="p">:</span>
+        <span class="c1"># Go back and write the frame offsets - don&#39;t need the last offset</span>
+        <span class="n">output</span><span class="p">[</span><span class="mi">8</span><span class="p">:</span><span class="mi">8</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">no_frames</span><span class="p">]</span> <span class="o">=</span> <span class="n">pack</span><span class="p">(</span><span class="s1">&#39;&lt;</span><span class="si">{}</span><span class="s1">I&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">no_frames</span><span class="p">),</span>
+                                           <span class="o">*</span><span class="n">bot_offsets</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">output</span><span class="p">)</span></div>
 </pre></div>
 
            </div>
