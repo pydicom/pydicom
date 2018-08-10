@@ -16,7 +16,7 @@ jobs:
       # The email is to be used for commits in the Github Page
       EMAIL: g.lemaitre58@gmail.com
     branches:
-      - ignore:
+      ignore:
         - gh-pages
     steps:
       - checkout
