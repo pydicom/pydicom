@@ -15,7 +15,8 @@ function doc_clone_commit {
     # Clone the pydicom/$DOC_BRANCH branch, update the $DIR directory
     #   by deleting existing content and copying the most recent version from the
     #   $CIRCLE_BRANCH, then commit the changes with message $MSG
-    MSG="Updating the docs in $DIR/ for branch: $CIRCLE_BRANCH, commit $CIRCLE_SHA1"
+    # Note that we use [skip ci] to tell CircleCI not to build the commit
+    MSG="Updating the docs in $DIR/ for branch: $CIRCLE_BRANCH, commit $CIRCLE_SHA1 [skip ci]"
 
     # CircleCI version 2.0 builds the project in $HOME/project, i.e.:
     #   /home/circleci/project/pydicom/dataset.py
