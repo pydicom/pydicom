@@ -1,6 +1,5 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 
-import sys
 import pydicom.uid
 import pydicom.encaps
 from struct import unpack
@@ -10,8 +9,6 @@ try:
 except ImportError:
     have_numpy = False
     raise
-
-sys_is_little_endian = (sys.byteorder == 'little')
 
 RLESupportedTransferSyntaxes = [
     pydicom.uid.RLELossless,

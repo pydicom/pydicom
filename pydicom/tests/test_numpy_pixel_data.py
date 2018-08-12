@@ -301,6 +301,11 @@ class numpy_LittleEndian_Tests(unittest.TestCase):
     def tearDown(self):
         pydicom.config.image_handlers = self.original_handlers
 
+    def test_raises_if_endianess_not_set(self):
+        self.odd_size_image.is_little_endian = None
+        with pytest.raises(ValueError):
+            _ = self.odd_size_image.pixel_array
+
     def test_little_endian_PixelArray_odd_data_size(self):
         pixel_data = self.odd_size_image.pixel_array
         assert pixel_data.nbytes == 27
