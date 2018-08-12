@@ -22,3 +22,4 @@ coverage:
 ignore:
   - "pydicom/tests"
   - "pydicom/benchmarks"
+  - "pydicom/data"

@@ -16,8 +16,8 @@ There are the following possibilities:
 **Elements affecting the handler**
 
 * BitsAllocated (1, 8, 16, 32, ...)
-* SamplesPerPixel (1, 3)
-* NumberOfFrames (1, 10)
+* SamplesPerPixel (1, 2, 3, ...)
+* NumberOfFrames (1, 2, ...)
 """
 
 import os
@@ -305,6 +305,7 @@ class TestNumpy_RLE(object):
 
         assert np.array_equal(ds.pixel_array, ref)
 
+        # Frame 1
         frame = arr[0]
         assert (255, 0, 0) == tuple(frame[5, 50, :])
         assert (255, 128, 128) == tuple(frame[15, 50, :])
@@ -317,6 +318,7 @@ class TestNumpy_RLE(object):
         assert (192, 192, 192) == tuple(frame[85, 50, :])
         assert (255, 255, 255) == tuple(frame[95, 50, :])
 
+        # Frame 2 is frame 1 inverted
         frame = arr[1]
         assert (0, 255, 255) == tuple(frame[5, 50, :])
         assert (0, 127, 127) == tuple(frame[15, 50, :])
@@ -408,7 +410,7 @@ class TestNumpy_RLE(object):
         assert (49344, 49344, 49344) == tuple(frame[85, 50, :])
         assert (65535, 65535, 65535) == tuple(frame[95, 50, :])
 
-        # Frame 2 in frame 1 but inverted
+        # Frame 2 is frame 1 inverted
         frame = arr[1]
         assert (0, 65535, 65535) == tuple(frame[5, 50, :])
         assert (0, 32639, 32639) == tuple(frame[15, 50, :])
