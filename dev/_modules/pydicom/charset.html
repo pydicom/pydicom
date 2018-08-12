@@ -269,7 +269,7 @@
         <span class="n">patched_encodings</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">patched</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">encodings</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s1">&#39;^ISO.IR&#39;</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s1">&#39;^ISO[^_]IR&#39;</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
                 <span class="n">patched</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;ISO_IR&#39;</span> <span class="o">+</span> <span class="n">x</span><span class="p">[</span><span class="mi">6</span><span class="p">:]</span>
                 <span class="n">patched_encodings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">patched</span><span class="p">[</span><span class="n">x</span><span class="p">])</span>
             <span class="k">else</span><span class="p">:</span>
@@ -278,8 +278,9 @@
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">encodings</span> <span class="o">=</span> <span class="p">[</span><span class="n">python_encoding</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">patched_encodings</span><span class="p">]</span>
                 <span class="k">for</span> <span class="n">old</span><span class="p">,</span> <span class="n">new</span> <span class="ow">in</span> <span class="n">patched</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Incorrect value for Specific Character &quot;</span>
-                                  <span class="s2">&quot;Set &#39;</span><span class="si">{}</span><span class="s2">&#39; - assuming &#39;</span><span class="si">{}</span><span class="s2">&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">old</span><span class="p">,</span> <span class="n">new</span><span class="p">))</span>
+                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Incorrect value for Specific Character Set &quot;</span>
+                                  <span class="s2">&quot;&#39;</span><span class="si">{}</span><span class="s2">&#39; - assuming &#39;</span><span class="si">{}</span><span class="s2">&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">old</span><span class="p">,</span> <span class="n">new</span><span class="p">),</span>
+                                  <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
                 <span class="c1"># assume that it is already a python encoding</span>
                 <span class="c1"># otherwise, a LookupError will be raised in the using code</span>
