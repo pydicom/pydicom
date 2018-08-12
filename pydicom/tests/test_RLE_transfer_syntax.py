@@ -25,21 +25,29 @@ have_pillow_jpeg_plugin = False
 have_pillow_jpeg2000_plugin = False
 try:
     import pydicom.pixel_data_handlers.numpy_handler as numpy_handler
+    if not numpy_handler.is_this_usable:
+        numpy_handler = None
 except ImportError:
-    have_numpy_handler = False
+    numpy_handler = None
 try:
     import pydicom.pixel_data_handlers.pillow_handler as pillow_handler
     have_pillow_jpeg_plugin = pillow_handler.have_pillow_jpeg_plugin
     have_pillow_jpeg2000_plugin = \
         pillow_handler.have_pillow_jpeg2000_plugin
+    if not pillow_handler.is_this_usable:
+        pillow_handler = None
 except ImportError:
-    have_pillow_handler = False
+    pillow_handler = None
 try:
     import pydicom.pixel_data_handlers.jpeg_ls_handler as jpeg_ls_handler
+    if not jpeg_ls_handler.is_this_usable:
+        jpeg_ls_handler = None
 except ImportError:
     jpeg_ls_handler = None
 try:
     import pydicom.pixel_data_handlers.gdcm_handler as gdcm_handler
+    if not gdcm_handler.is_this_usable:
+        gdcm_handler = None
 except ImportError:
     gdcm_handler = None
 

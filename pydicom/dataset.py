@@ -779,7 +779,7 @@ class Dataset(dict):
                 array_of_YBR_pixels, ybr_to_rgb.T.copy()).astype(orig_type)
             return array_of_YBR_pixels
         else:
-            raise NotImplementedError("Numpy is required"
+            raise NotImplementedError("Numpy is required "
                                       "To convert the color space")
 
     # Use by pixel_array property
@@ -807,7 +807,7 @@ class Dataset(dict):
             already_have = False
 
         if not already_have:
-            last_exception = None
+            handler_exceptions = []
             successfully_read_pixel_data = False
             for x in [h for h in pydicom.config.image_handlers
                       if h and h.supports_transfer_syntax(self)]:
@@ -822,7 +822,7 @@ class Dataset(dict):
                     break
                 except Exception as e:
                     logger.debug("Trouble with", exc_info=e)
-                    last_exception = e
+                    handler_exceptions.append(e)
                     continue
             if not successfully_read_pixel_data:
                 handlers_tried = " ".join(
@@ -831,13 +831,18 @@ class Dataset(dict):
                             handlers_tried)
                 self._pixel_array = None
                 self._pixel_id = None
-                if last_exception:
-                    raise last_exception
-                else:
+                exception_messages = []
+                for x in handler_exceptions:
+                    logger.debug("image handler exception", exc_info=x)
+                    exception_messages.append(str(x))
+                if not handler_exceptions:
                     msg = ("No available image handler could "
                            "decode this transfer syntax {}".format(
                                self.file_meta.TransferSyntaxUID.name))
                     raise NotImplementedError(msg)
+                else:
+                    raise NotImplementedError("\n".join(exception_messages))
+
             # is this guaranteed to work if memory is re-used??
             self._pixel_id = id(self.PixelData)
 

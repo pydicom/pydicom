@@ -11,19 +11,21 @@ jpeg_ls_missing_message = ("jpeg_ls is not available "
                            "in this test environment")
 jpeg_ls_present_message = "jpeg_ls is being tested"
 jpeg_ls_handler = None
-have_jpeg_ls_handler = True
 numpy_handler = None
-have_numpy_handler = True
 try:
     import pydicom.pixel_data_handlers.numpy_handler as numpy_handler
+    if not numpy_handler.is_this_usable:
+        numpy_handler = None
 except ImportError:
-    have_numpy_handler = False
+    numpy_handler = None
 try:
     import pydicom.pixel_data_handlers.jpeg_ls_handler as jpeg_ls_handler
+    if not jpeg_ls_handler.is_this_usable:
+        jpeg_ls_handler = None
 except ImportError:
-    have_jpeg_ls_handler = False
+    jpeg_ls_handler = None
 
-test_jpeg_ls_decoder = have_numpy_handler and have_jpeg_ls_handler
+test_jpeg_ls_decoder = not (jpeg_ls_handler is None or numpy_handler is None)
 
 empty_number_tags_name = get_testdata_files(
     "reportsi_with_empty_number_tags.dcm")[0]

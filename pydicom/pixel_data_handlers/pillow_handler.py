@@ -12,7 +12,6 @@ try:
     import numpy
 except ImportError:
     have_numpy = False
-    raise
 
 have_pillow = True
 try:
@@ -24,7 +23,12 @@ except ImportError:
     except ImportError:
         # Neither worked, so it's likely not installed.
         have_pillow = False
-        raise
+
+is_this_usable = have_numpy and have_pillow
+
+what_is_needed_to_use_this = ("Both the numpy module and the pillow module "
+                              "are needed to support pixel data for this "
+                              "transfer syntax:")
 
 PillowSupportedTransferSyntaxes = [
     pydicom.uid.JPEGBaseLineLossy8bit,
@@ -103,10 +107,9 @@ def get_pixeldata(dicom_dataset):
     logger.debug("Trying to use Pillow to read pixel array "
                  "(has pillow = %s)", have_pillow)
     if not have_pillow:
-        msg = ("The pillow package is required to use pixel_array for "
-               "this transfer syntax {0}, and pillow could not be "
-               "imported.".format(
-                   dicom_dataset.file_meta.TransferSyntaxUID.name))
+        msg = "{0} {1}.".format(
+            what_is_needed_to_use_this,
+            dicom_dataset.file_meta.TransferSyntaxUID)
         raise ImportError(msg)
     if (not have_pillow_jpeg_plugin and
             dicom_dataset.file_meta.TransferSyntaxUID in

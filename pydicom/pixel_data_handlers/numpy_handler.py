@@ -9,7 +9,11 @@ try:
     import numpy
 except ImportError:
     have_numpy = False
-    raise
+
+is_this_usable = have_numpy
+
+what_is_needed_to_use_this = ("The numpy module is needed to support "
+                              "pixel data for this transfer syntax:")
 
 sys_is_little_endian = (sys.byteorder == 'little')
 
@@ -72,8 +76,9 @@ def get_pixeldata(dicom_dataset):
                                   "be able to convert the pixel data "
                                   "using GDCM if it is installed.")
     if not have_numpy:
-        msg = ("The Numpy package is required to use pixel_array, and "
-               "numpy could not be imported.")
+        msg = "{0} {1}.".format(
+            what_is_needed_to_use_this,
+            dicom_dataset.file_meta.TransferSyntaxUID)
         raise ImportError(msg)
     if 'PixelData' not in dicom_dataset:
         raise TypeError("No pixel data found in this dataset.")
@@ -138,7 +143,7 @@ def get_pixeldata(dicom_dataset):
         # has to be converted to a binary-valued array (that is 8 times bigger)
         bit = 0
         pixel_array = \
-            numpy.ndarray(shape=(length_of_pixel_array*8), dtype='uint8')
+            numpy.ndarray(shape=(length_of_pixel_array * 8), dtype='uint8')
         # bit-packed pixels are packed from the right; i.e., the first pixel
         #  in the image frame corresponds to the first from the right bit of
         #  the first byte of the packed PixelData!
@@ -148,7 +153,7 @@ def get_pixeldata(dicom_dataset):
         for byte in pixel_bytearray:
             if compat.in_py2:
                 byte = ord(byte)
-            for bit in range(bit, bit+8):
+            for bit in range(bit, bit + 8):
                 pixel_array[bit] = byte & 1
                 byte >>= 1
             bit += 1
