@@ -225,7 +225,7 @@ class TestNumpy_RLE(object):
         assert HAVE_RLE
         assert RLE_HANDLER in pydicom.config.image_handlers
 
-    def test_unsupported_pixel_array_raises(self):
+    def test_unsupported_syntax_raises(self):
         """Test pixel_array raises exception for unsupported syntaxes."""
         ds = dcmread(MR_EXPL_LITTLE_1F)
         for uid in UNSUPPORTED_SYNTAXES:
