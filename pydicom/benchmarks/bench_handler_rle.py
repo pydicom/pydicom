@@ -61,6 +61,7 @@ class TimeRLEDecodeFrame(object):
                                   self.ds.SamplesPerPixel,
                                   self.ds.BitsAllocated)
 
+
 class TimeGetPixelData(object):
     """Time tests for rle_handler.get_pixeldata."""
     def setup(self):

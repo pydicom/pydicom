@@ -155,7 +155,7 @@ class TestNoNumpy_NoRLE(object):
         """Check that the testing environment is as expected."""
         assert not HAVE_NP
         assert not HAVE_RLE
-        assert not RLE_HANDLER in pydicom.config.image_handlers
+        assert RLE_HANDLER not in pydicom.config.image_handlers
 
     def test_can_access_dataset(self):
         """Test that we can read and access elements in an RLE dataset."""
@@ -190,7 +190,7 @@ class TestNumpy_NoRLE(object):
         # The RLE handler should still be available
         assert HAVE_RLE
         # But we don't want to use it
-        assert not RLE_HANDLER in pydicom.config.image_handlers
+        assert RLE_HANDLER not in pydicom.config.image_handlers
 
     def test_can_access_dataset(self):
         """Test that we can read and access elements in an RLE dataset."""
@@ -410,7 +410,7 @@ class TestNumpy_RLE(object):
 
         # Frame 2 in frame 1 but inverted
         frame = arr[1]
-        assert (0, 65535, 65535) == tuple(frame[5, 50, :]) #
+        assert (0, 65535, 65535) == tuple(frame[5, 50, :])
         assert (0, 32639, 32639) == tuple(frame[15, 50, :])
         assert (65535, 0, 65535) == tuple(frame[25, 50, :])
         assert (32639, 0, 32639) == tuple(frame[35, 50, :])
