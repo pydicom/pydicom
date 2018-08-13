@@ -53,49 +53,49 @@ from pydicom.uid import (
 # EXPB: Explicit VR Big Endian
 # 1/1, 1 sample/pixel, 1 frame
 IMPL_1_1_1F = get_testdata_files("liver_1frame.dcm")[0]
-EXPB_1_1_1F = None
+EXPB_1_1_1F = get_testdata_files("liver_expb_1frame.dcm")[0]
 # 1/1, 3 sample/pixel, 1 frame
 IMPL_1_3_1F = None
 EXPB_1_3_1F = None
 # 1/1, 1 sample/pixel, 3 frame
 IMPL_1_1_3F = get_testdata_files("liver.dcm")[0]
-EXPB_1_1_3F = None
+EXPB_1_1_3F = get_testdata_files("liver_expb.dcm")[0]
 # 1/1, 3 sample/pixel, 2 frame
-IMPL_1_3_3F = None
-EXPB_1_3_3F = None
+IMPL_1_3_2F = None
+EXPB_1_3_2F = None
 # 8/8, 1 sample/pixel, 1 frame
 IMPL_8_1_1F = get_testdata_files("OBXXXX1A.dcm")[0]
-EXPB_8_1_1F = None
+EXPB_8_1_1F = get_testdata_files("OBXXXX1A_expb.dcm")[0]
 # 8/8, 3 sample/pixel, 1 frame
 IMPL_8_3_1F = get_testdata_files("SC_rgb.dcm")[0]
-EXPB_8_3_1F = None
+EXPB_8_3_1F = get_testdata_files("SC_rgb_expb.dcm")[0]
 # 8/8, 1 sample/pixel, 2 frame
 IMPL_8_1_2F = get_testdata_files("OBXXXX1A_2frame.dcm")[0]
-EXPB_8_1_2F = None
+EXPB_8_1_2F = get_testdata_files("OBXXXX1A_expb_2frame.dcm")[0]
 # 8/8, 3 sample/pixel, 2 frame
 IMPL_8_3_2F = get_testdata_files("SC_rgb_2frame.dcm")[0]
-EXPB_8_3_2F = None
+EXPB_8_3_2F = get_testdata_files("SC_rgb_expb_2frame.dcm")[0]
 # 16/16, 1 sample/pixel, 1 frame
 IMPL_16_1_1F = get_testdata_files("MR_small.dcm")[0]
-EXPB_16_1_1F = None
+EXPB_16_1_1F = get_testdata_files("MR_small_expb.dcm")[0]
 # 16/16, 3 sample/pixel, 1 frame
 IMPL_16_3_1F = get_testdata_files("SC_rgb_16bit.dcm")[0]
-EXPB_16_3_1F = None
+EXPB_16_3_1F = get_testdata_files("SC_rgb_expb_16bit.dcm")[0]
 # 16/12, 1 sample/pixel, 10 frame
 IMPL_16_1_10F = get_testdata_files("emri_small.dcm")[0]
 EXPB_16_1_10F = get_testdata_files("emri_small_big_endian.dcm")[0]
 # 16/16, 3 sample/pixel, 2 frame
 IMPL_16_3_2F = get_testdata_files("SC_rgb_16bit_2frame.dcm")[0]
-EXPB_16_3_2F = None
+EXPB_16_3_2F = get_testdata_files("SC_rgb_expb_16bit_2frame.dcm")[0]
 # 32/32, 1 sample/pixel, 1 frame
 IMPL_32_1_1F = get_testdata_files("rtdose_1frame.dcm")[0]
-EXPB_32_1_1F = None
+EXPB_32_1_1F = get_testdata_files("rtdose_expb_1frame.dcm")[0]
 # 32/32, 3 sample/pixel, 1 frame
 IMPL_32_3_1F = None
 EXPB_32_3_1F = None
 # 32/32, 1 sample/pixel, 10 frame
 IMPL_32_1_10F = get_testdata_files("rtdose.dcm")[0]
-EXPB_32_1_10F = None
+EXPB_32_1_10F = get_testdata_files("rtdose_expb.dcm")[0]
 # 32/32, 3 sample/pixel, 2 frame
 IMPL_32_3_2F = None
 EXPB_32_3_2F = None
