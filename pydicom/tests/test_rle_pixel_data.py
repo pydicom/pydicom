@@ -41,7 +41,11 @@ except ImportError:
 
 try:
     from pydicom.pixel_data_handlers import rle_handler as RLE_HANDLER
-    from RLE_HANDLER import get_pixeldata, _rle_decode_frame, _rle_decode_plane
+    from pydicom.pixel_data_handlers.rle_handler import (
+        get_pixeldata,
+        _rle_decode_frame,
+        _rle_decode_plane
+    )
     HAVE_RLE = True
 except ImportError:
     RLE_HANDLER = None
@@ -530,17 +534,6 @@ class TestNumpy_RLEHandler(object):
         # Can't generate RLE encoded data for 32-bit 3 samples/pixel
         #   placeholder for future test
         pass
-
-
-# Tests for rle_handler module with Numpy unavailable
-@pytest.mark.skipif(HAVE_NP, reason='Numpy is available')
-class TestNoNumpy_GetPixelData(object):
-    """Tests for rle_handler.get_pixeldata without numpy."""
-    def test_get_pixeldata_raises(self):
-        """Test get_pixeldata raises if numpy not available."""
-        with pytest.raises(NotImplementedError, match='Numpy package is req'):
-            ds = dcmread(MR_RLE_1F)
-            get_pixeldata(ds)
 
 
 # Tests for rle_handler module with Numpy available
