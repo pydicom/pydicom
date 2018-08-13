@@ -216,8 +216,6 @@
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="n">have_numpy</span> <span class="o">=</span> <span class="kc">False</span>
 
-<span class="n">sys_is_little_endian</span> <span class="o">=</span> <span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">byteorder</span> <span class="o">==</span> <span class="s1">&#39;little&#39;</span><span class="p">)</span>
-
 
 <div class="viewcode-block" id="PropertyError"><a class="viewcode-back" href="../../api_ref.html#pydicom.dataset.PropertyError">[docs]</a><span class="k">class</span> <span class="nc">PropertyError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;For AttributeErrors caught in a property, so do not go to __getattr__&quot;&quot;&quot;</span>
