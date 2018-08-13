@@ -596,22 +596,22 @@ class TestNumpy_GetPixelData(object):
 # RLE encodes data by first splitting a frame into 8-bit segments
 BAD_SEGMENT_DATA = [
     # (RLE header, ds.SamplesPerPixel, ds.BitsAllocated)
-    (b'\x00\x00\x00\x00', 1, 8), # 0 segments, 1 expected
-    (b'\x02\x00\x00\x00', 1, 8), # 2 segments, 1 expected
-    (b'\x02\x00\x00\x00', 3, 8), # 2 segments, 3 expected
-    (b'\x04\x00\x00\x00', 3, 8), # 4 segments, 3 expected
-    (b'\x01\x00\x00\x00', 1, 16), # 1 segment, 2 expected
-    (b'\x03\x00\x00\x00', 1, 16), # 3 segments, 2 expected
-    (b'\x05\x00\x00\x00', 3, 16), # 5 segments, 6 expected
-    (b'\x07\x00\x00\x00', 3, 16), # 7 segments, 6 expected
-    (b'\x03\x00\x00\x00', 1, 32), # 3 segments, 4 expected
-    (b'\x05\x00\x00\x00', 1, 32), # 5 segments, 4 expected
-    (b'\x0B\x00\x00\x00', 3, 32), # 11 segments, 12 expected
-    (b'\x0D\x00\x00\x00', 3, 32), # 13 segments, 12 expected
-    (b'\x09\x00\x00\x00', 1, 64), # 9 segments, 8 expected
-    (b'\x07\x00\x00\x00', 1, 64), # 7 segments, 8 expected
-    (b'\x19\x00\x00\x00', 3, 64), # 25 segments, 24 expected
-    (b'\x17\x00\x00\x00', 3, 64), # 23 segments, 24 expected
+    (b'\x00\x00\x00\x00', 1, 8),  # 0 segments, 1 expected
+    (b'\x02\x00\x00\x00', 1, 8),  # 2 segments, 1 expected
+    (b'\x02\x00\x00\x00', 3, 8),  # 2 segments, 3 expected
+    (b'\x04\x00\x00\x00', 3, 8),  # 4 segments, 3 expected
+    (b'\x01\x00\x00\x00', 1, 16),  # 1 segment, 2 expected
+    (b'\x03\x00\x00\x00', 1, 16),  # 3 segments, 2 expected
+    (b'\x05\x00\x00\x00', 3, 16),  # 5 segments, 6 expected
+    (b'\x07\x00\x00\x00', 3, 16),  # 7 segments, 6 expected
+    (b'\x03\x00\x00\x00', 1, 32),  # 3 segments, 4 expected
+    (b'\x05\x00\x00\x00', 1, 32),  # 5 segments, 4 expected
+    (b'\x0B\x00\x00\x00', 3, 32),  # 11 segments, 12 expected
+    (b'\x0D\x00\x00\x00', 3, 32),  # 13 segments, 12 expected
+    (b'\x09\x00\x00\x00', 1, 64),  # 9 segments, 8 expected
+    (b'\x07\x00\x00\x00', 1, 64),  # 7 segments, 8 expected
+    (b'\x19\x00\x00\x00', 3, 64),  # 25 segments, 24 expected
+    (b'\x17\x00\x00\x00', 3, 64),  # 23 segments, 24 expected
 ]
 
 
@@ -628,7 +628,8 @@ class TestNumpy_RLEDecodeFrame(object):
         """Test having too many segments in the data raises exception."""
         # 4 segments when expecting three
         # This should probably be ValueError
-        with pytest.raises(AttributeError, match='Unexpected number of planes'):
+        with pytest.raises(AttributeError,
+                           match='Unexpected number of planes'):
             _rle_decode_frame(header,
                               rows=1,
                               columns=1,
@@ -697,10 +698,11 @@ class TestNumpy_RLEDecodePlane(object):
         assert b'' == bytes(_rle_decode_plane(data))
 
         # noop at start, data after
-        data = (b'\x80\x80'  # No operation
-                b'\x05\x01\x02\x03\x04\x05\x06'  # Literal
-                b'\xFE\x01'  # Copy
-                b'\x80'
+        data = (
+            b'\x80\x80'  # No operation
+            b'\x05\x01\x02\x03\x04\x05\x06'  # Literal
+            b'\xFE\x01'  # Copy
+            b'\x80'
         )
         assert (
             b'\x01\x02\x03\x04\x05\x06'
@@ -708,10 +710,11 @@ class TestNumpy_RLEDecodePlane(object):
         ) == bytes(_rle_decode_plane(data))
 
         # data at start, noop middle, data at end
-        data = (b'\x05\x01\x02\x03\x04\x05\x06'  # Literal
-                b'\x80'  # No operation
-                b'\xFE\x01'  # Copy
-                b'\x80'
+        data = (
+            b'\x05\x01\x02\x03\x04\x05\x06'  # Literal
+            b'\x80'  # No operation
+            b'\xFE\x01'  # Copy
+            b'\x80'
         )
         assert (
             b'\x01\x02\x03\x04\x05\x06'
@@ -720,9 +723,10 @@ class TestNumpy_RLEDecodePlane(object):
 
         # data at start, noop end
         # Copy 6 bytes literally, then 3 x 0x01
-        data = (b'\x05\x01\x02\x03\x04\x05\x06'
-                b'\xFE\x01'
-                b'\x80'
+        data = (
+            b'\x05\x01\x02\x03\x04\x05\x06'
+            b'\xFE\x01'
+            b'\x80'
         )
         assert (
             b'\x01\x02\x03\x04\x05\x06'
