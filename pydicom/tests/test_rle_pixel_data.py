@@ -29,11 +29,6 @@ from pydicom import dcmread
 import pydicom.config
 from pydicom.data import get_testdata_files
 from pydicom.encaps import defragment_data
-from pydicom.pixel_data_handlers.rle_handler import (
-    get_pixeldata,
-    _rle_decode_frame,
-    _rle_decode_plane
-)
 from pydicom.uid import RLELossless
 
 try:
@@ -46,6 +41,7 @@ except ImportError:
 
 try:
     from pydicom.pixel_data_handlers import rle_handler as RLE_HANDLER
+    from RLE_HANDLER import get_pixeldata, _rle_decode_frame, _rle_decode_plane
     HAVE_RLE = True
 except ImportError:
     RLE_HANDLER = None
