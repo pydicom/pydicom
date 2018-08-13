@@ -32,9 +32,6 @@ from pydicom.util.hexutil import bytes2hex
 from pydicom.valuerep import extra_length_VRs
 
 
-sys_is_little_endian = (byteorder == 'little')
-
-
 class DicomIter(object):
     """Iterator over DICOM data elements created from a file-like object"""
 
