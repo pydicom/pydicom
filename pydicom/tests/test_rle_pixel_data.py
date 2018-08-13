@@ -254,7 +254,7 @@ class TestNumpy_RLEHandler(object):
         ds = dcmread(SC_RLE_1F)
         ds.BitsAllocated = 1
         # This should raise NotImplementedError instead
-        with pytest.raises(TypeError):
+        with pytest.raises(TypeError, match="format='uint1'"):
             ds.pixel_array
 
     def test_pixel_array_1_1_2_frame(self):
@@ -262,7 +262,7 @@ class TestNumpy_RLEHandler(object):
         ds = dcmread(SC_RLE_2F)
         ds.BitsAllocated = 1
         # This should raise NotImplementedError instead
-        with pytest.raises(TypeError):
+        with pytest.raises(TypeError, match="format='uint1'"):
             ds.pixel_array
 
     def test_pixel_array_8_1_1_frame(self):
@@ -615,7 +615,6 @@ class TestNumpy_RLEDecodeFrame(object):
     @pytest.mark.parametrize('header,samples,bits', BAD_SEGMENT_DATA)
     def test_invalid_nr_segments_raises(self, header, samples, bits):
         """Test having too many segments in the data raises exception."""
-        # 4 segments when expecting three
         # This should probably be ValueError
         with pytest.raises(AttributeError,
                            match='Unexpected number of planes'):
