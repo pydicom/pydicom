@@ -305,9 +305,7 @@ class TestNumpy_RLEHandler(object):
         assert 0 == arr[0, -1].min() == arr[0, -1].max()
 
         # Frame 2 is frame 1 inverted
-        assert 11 == arr[1, 0].min() == arr[1, 0].max()
-        assert (254, 9, 254) == tuple(arr[1, 300, 491:494])
-        assert 255 == arr[1, -1].min() == arr[1, -1].max()
+        assert np.array_equal((2**ds.BitsAllocated - 1) - arr[1], arr[0])
 
     def test_pixel_array_8_3_1_frame(self):
         """Test pixel_array for 8-bit, 3 sample/pixel, 1 frame."""
@@ -358,17 +356,7 @@ class TestNumpy_RLEHandler(object):
         assert (255, 255, 255) == tuple(frame[95, 50, :])
 
         # Frame 2 is frame 1 inverted
-        frame = arr[1]
-        assert (0, 255, 255) == tuple(frame[5, 50, :])
-        assert (0, 127, 127) == tuple(frame[15, 50, :])
-        assert (255, 0, 255) == tuple(frame[25, 50, :])
-        assert (127, 0, 127) == tuple(frame[35, 50, :])
-        assert (255, 255, 0) == tuple(frame[45, 50, :])
-        assert (127, 127, 0) == tuple(frame[55, 50, :])
-        assert (255, 255, 255) == tuple(frame[65, 50, :])
-        assert (191, 191, 191) == tuple(frame[75, 50, :])
-        assert (63, 63, 63) == tuple(frame[85, 50, :])
-        assert (0, 0, 0) == tuple(frame[95, 50, :])
+        assert np.array_equal((2**ds.BitsAllocated - 1) - arr[1], arr[0])
 
     def test_pixel_array_16_1_1_frame(self):
         """Test pixel_array for 16-bit, 1 sample/pixel, 1 frame."""
@@ -465,17 +453,7 @@ class TestNumpy_RLEHandler(object):
         assert (65535, 65535, 65535) == tuple(frame[95, 50, :])
 
         # Frame 2 is frame 1 inverted
-        frame = arr[1]
-        assert (0, 65535, 65535) == tuple(frame[5, 50, :])
-        assert (0, 32639, 32639) == tuple(frame[15, 50, :])
-        assert (65535, 0, 65535) == tuple(frame[25, 50, :])
-        assert (32639, 0, 32639) == tuple(frame[35, 50, :])
-        assert (65535, 65535, 0) == tuple(frame[45, 50, :])
-        assert (32639, 32639, 0) == tuple(frame[55, 50, :])
-        assert (65535, 65535, 65535) == tuple(frame[65, 50, :])
-        assert (49087, 49087, 49087) == tuple(frame[75, 50, :])
-        assert (16191, 16191, 16191) == tuple(frame[85, 50, :])
-        assert (0, 0, 0) == tuple(frame[95, 50, :])
+        assert np.array_equal((2**ds.BitsAllocated - 1) - arr[1], arr[0])
 
     def test_pixel_array_32_1_1_frame(self):
         """Test pixel_array for 32-bit, 1 sample/pixel, 1 frame."""
@@ -570,16 +548,7 @@ class TestNumpy_RLEHandler(object):
         assert (4294967295, 4294967295, 4294967295) == tuple(arr[0, 95, 50, :])
 
         # Frame 2 is frame 1 inverted
-        assert (0, 4294967295, 4294967295) == tuple(arr[1, 5, 50, :])
-        assert (0, 2139062143, 2139062143) == tuple(arr[1, 15, 50, :])
-        assert (4294967295, 0, 4294967295) == tuple(arr[1, 25, 50, :])
-        assert (2139062143, 0, 2139062143) == tuple(arr[1, 35, 50, :])
-        assert (4294967295, 4294967295, 0) == tuple(arr[1, 45, 50, :])
-        assert (2139062143, 2139062143, 0) == tuple(arr[1, 55, 50, :])
-        assert (4294967295, 4294967295, 4294967295) == tuple(arr[1, 65, 50, :])
-        assert (3217014719, 3217014719, 3217014719) == tuple(arr[1, 75, 50, :])
-        assert (1061109567, 1061109567, 1061109567) == tuple(arr[1, 85, 50, :])
-        assert (0, 0, 0) == tuple(arr[1, 95, 50, :])
+        assert np.array_equal((2**ds.BitsAllocated - 1) - arr[1], arr[0])
 
 
 # Tests for rle_handler module with Numpy available
