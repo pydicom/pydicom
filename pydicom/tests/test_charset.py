@@ -130,12 +130,13 @@ class CharsetTests(unittest.TestCase):
             pydicom.charset.decode(elem, ['ISO IR 192'])
             assert u'Buc^J\xe9r\xf4me' == elem.value
 
-        elem = DataElement(0x00100010, 'PN', b'Buc^J\xc3\xa9r\xc3\xb4me')
+        elem = DataElement(0x00100010, 'PN', b'Buc^J\xe9r\xf4me')
         with pytest.warns(UserWarning,
                           match='Incorrect value for Specific Character Set '
-                                "'ISO-IR 192' - assuming 'ISO_IR 192'"):
-            pydicom.charset.decode(elem, ['ISO-IR 192'])
-            assert u'Buc^J\xe9r\xf4me' == elem.value
+                                "'ISO-IR 144' - assuming 'ISO_IR 144'") as w:
+            pydicom.charset.decode(elem, ['ISO_IR 100', 'ISO-IR 144'])
+            # make sure no warning is issued for the correct value
+            assert 1 == len(w)
 
         # not patched incorrect encoding raises
         elem = DataElement(0x00100010, 'PN', b'Buc^J\xc3\xa9r\xc3\xb4me')

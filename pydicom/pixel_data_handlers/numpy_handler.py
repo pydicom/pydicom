@@ -1,17 +1,16 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Use the numpy package to decode pixel transfer syntaxes."""
 
-import sys
 import pydicom.uid
 from pydicom import compat
+from pydicom.pixel_data_handlers.util import dtype_corrected_for_endianess
+
 have_numpy = True
 try:
     import numpy
 except ImportError:
     have_numpy = False
     raise
-
-sys_is_little_endian = (sys.byteorder == 'little')
 
 NumpySupportedTransferSyntaxes = [
     pydicom.uid.ExplicitVRLittleEndian,
@@ -102,8 +101,8 @@ def get_pixeldata(dicom_dataset):
                    dicom_dataset.BitsAllocated))
         raise TypeError(msg)
 
-    if dicom_dataset.is_little_endian != sys_is_little_endian:
-        numpy_dtype = numpy_dtype.newbyteorder('S')
+    numpy_dtype = dtype_corrected_for_endianess(
+        dicom_dataset.is_little_endian, numpy_dtype)
 
     pixel_bytearray = dicom_dataset.PixelData
 

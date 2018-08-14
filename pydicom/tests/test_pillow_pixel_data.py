@@ -289,6 +289,11 @@ class Test_JPEG2000Tests_with_pillow(object):
         """Reset the pixel data handlers."""
         pydicom.config.image_handlers = self.original_handlers
 
+    def test_raises_if_endianess_not_set(self):
+        self.jpeg_2k_lossless.is_little_endian = None
+        with pytest.raises(ValueError):
+            _ = self.jpeg_2k_lossless.pixel_array
+
     def testJPEG2000(self):
         """Test reading element values works OK with pillow pixel handler."""
         # XX also tests multiple-valued AT data element

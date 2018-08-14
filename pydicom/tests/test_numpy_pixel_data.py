@@ -336,6 +336,14 @@ class TestNumpy_NumpyHandler(object):
         assert (1, -10, 1) == tuple(arr[300, 491:494])
         assert 0 == arr[-1].min() == arr[-1].max()
 
+    def test_raise_if_endianess_not_set(self):
+        """Test pixel_array raises an exception if no endianness set."""
+        # Regression test for #704
+        ds = dcmread(EXPL_8_1_1F)
+        ds.is_little_endian = None
+        with pytest.raises(ValueError, match="'is_little_endian' has to be"):
+            ds.pixel_array
+
     # Little endian datasets
     @pytest.mark.parametrize('fpath, data', REFERENCE_DATA_LITTLE)
     def test_properties(self, fpath, data):

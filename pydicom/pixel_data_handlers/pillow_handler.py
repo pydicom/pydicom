@@ -1,11 +1,13 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Use the pillow python package to decode pixel transfer syntaxes."""
 
-import sys
 import io
 import pydicom.encaps
 import pydicom.uid
 import logging
+
+from pydicom.pixel_data_handlers.util import dtype_corrected_for_endianess
+
 have_numpy = True
 logger = logging.getLogger('pydicom')
 try:
@@ -40,7 +42,6 @@ PillowJPEGTransferSyntaxes = [
     pydicom.uid.JPEGBaseLineLossy12bit,
 ]
 
-sys_is_little_endian = (sys.byteorder == 'little')
 have_pillow_jpeg_plugin = False
 have_pillow_jpeg2000_plugin = False
 try:
@@ -150,8 +151,8 @@ def get_pixeldata(dicom_dataset):
                    dicom_dataset.BitsAllocated))
         raise TypeError(msg)
 
-    if dicom_dataset.is_little_endian != sys_is_little_endian:
-        numpy_format = numpy_format.newbyteorder('S')
+    numpy_format = dtype_corrected_for_endianess(
+        dicom_dataset.is_little_endian, numpy_format)
 
     # decompress here
     if (dicom_dataset.file_meta.TransferSyntaxUID in
