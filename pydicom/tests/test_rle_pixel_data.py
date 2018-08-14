@@ -249,14 +249,6 @@ class TestNumpy_RLEHandler(object):
                                match='image handler could decode'):
                 ds.pixel_array
 
-    def test_pixel_array_1bit_raises(self):
-        """Test pixel_array for 1-bit raises exception."""
-        ds = dcmread(SC_RLE_1F)
-        ds.BitsAllocated = 1
-        # This should raise NotImplementedError instead
-        with pytest.raises(TypeError, match="format='uint1'"):
-            ds.pixel_array
-
     def test_pixel_array_signed(self):
         """Test pixel_array for unsigned -> signed data."""
         ds = dcmread(OB_RLE_1F)
@@ -272,7 +264,15 @@ class TestNumpy_RLEHandler(object):
         assert (1, -10, 1) == tuple(arr[300, 491:494])
         assert 0 == arr[-1].min() == arr[-1].max()
 
-    def test_pixel_array_8_1_1_frame(self):
+    def test_pixel_array_1bit_raises(self):
+        """Test pixel_array for 1-bit raises exception."""
+        ds = dcmread(SC_RLE_1F)
+        ds.BitsAllocated = 1
+        # This should raise NotImplementedError instead
+        with pytest.raises(TypeError, match="format='uint1'"):
+            ds.pixel_array
+
+    def test_pixel_array_8bit_1sample_1f(self):
         """Test pixel_array for 8-bit, 1 sample/pixel, 1 frame."""
         ds = dcmread(OB_RLE_1F)
         assert ds.file_meta.TransferSyntaxUID == RLELossless
@@ -288,7 +288,7 @@ class TestNumpy_RLEHandler(object):
         assert (1, 246, 1) == tuple(arr[300, 491:494])
         assert 0 == arr[-1].min() == arr[-1].max()
 
-    def test_pixel_array_8_1_2_frame(self):
+    def test_pixel_array_8bit_1sample_2f(self):
         """Test pixel_array for 8-bit, 1 sample/pixel, 2 frame."""
         ds = dcmread(OB_RLE_2F)
         assert ds.file_meta.TransferSyntaxUID == RLELossless
@@ -307,7 +307,7 @@ class TestNumpy_RLEHandler(object):
         # Frame 2 is frame 1 inverted
         assert np.array_equal((2**ds.BitsAllocated - 1) - arr[1], arr[0])
 
-    def test_pixel_array_8_3_1_frame(self):
+    def test_pixel_array_8bit_3sample_1f(self):
         """Test pixel_array for 8-bit, 3 sample/pixel, 1 frame."""
         ds = dcmread(SC_RLE_1F)
         assert ds.file_meta.TransferSyntaxUID == RLELossless
@@ -330,7 +330,7 @@ class TestNumpy_RLEHandler(object):
         assert (192, 192, 192) == tuple(arr[85, 50, :])
         assert (255, 255, 255) == tuple(arr[95, 50, :])
 
-    def test_pixel_array_8_3_2_frame(self):
+    def test_pixel_array_8bit_3sample_2f(self):
         """Test pixel_array for 8-bit, 3 sample/pixel, 2 frame."""
         ds = dcmread(SC_RLE_2F)
         assert ds.file_meta.TransferSyntaxUID == RLELossless
@@ -358,7 +358,7 @@ class TestNumpy_RLEHandler(object):
         # Frame 2 is frame 1 inverted
         assert np.array_equal((2**ds.BitsAllocated - 1) - arr[1], arr[0])
 
-    def test_pixel_array_16_1_1_frame(self):
+    def test_pixel_array_16bit_1sample_1f(self):
         """Test pixel_array for 16-bit, 1 sample/pixel, 1 frame."""
         ds = dcmread(MR_RLE_1F)
         assert ds.file_meta.TransferSyntaxUID == RLELossless
@@ -375,7 +375,7 @@ class TestNumpy_RLEHandler(object):
         assert (366, 363, 322) == tuple(arr[31, :3])
         assert (1369, 1129, 862) == tuple(arr[-1, -3:])
 
-    def test_pixel_array_16_1_10_frame(self):
+    def test_pixel_array_16bit_1sample_10f(self):
         """Test pixel_array for 16-bit, 1, sample/pixel, 10 frame."""
         ds = dcmread(EMRI_RLE_10F)
         assert ds.file_meta.TransferSyntaxUID == RLELossless
@@ -404,7 +404,7 @@ class TestNumpy_RLEHandler(object):
         assert (227, 300, 147) == tuple(arr[-1, -1, -3:])
 
     @pytest.mark.skip(reason='Samples/pixel>1, BitsAllocated>8 not supported')
-    def test_pixel_array_16_3_1_frame(self):
+    def test_pixel_array_16bit_3sample_1f(self):
         """Test pixel_array for 16-bit, 3 sample/pixel, 1 frame."""
         ds = dcmread(SC_RLE_16_1F)
         assert ds.file_meta.TransferSyntaxUID == RLELossless
@@ -427,7 +427,7 @@ class TestNumpy_RLEHandler(object):
         assert (49344, 49344, 49344) == tuple(arr[85, 50, :])
         assert (65535, 65535, 65535) == tuple(arr[95, 50, :])
 
-    def test_pixel_array_16_3_2_frame(self):
+    def test_pixel_array_16bit_3sample_2f(self):
         """Test pixel_array for 16-bit, 3, sample/pixel, 10 frame."""
         ds = dcmread(SC_RLE_16_2F)
         assert ds.file_meta.TransferSyntaxUID == RLELossless
@@ -455,7 +455,7 @@ class TestNumpy_RLEHandler(object):
         # Frame 2 is frame 1 inverted
         assert np.array_equal((2**ds.BitsAllocated - 1) - arr[1], arr[0])
 
-    def test_pixel_array_32_1_1_frame(self):
+    def test_pixel_array_32bit_1sample_1f(self):
         """Test pixel_array for 32-bit, 1 sample/pixel, 1 frame."""
         ds = dcmread(RTDOSE_RLE_1F)
         assert ds.file_meta.TransferSyntaxUID == RLELossless
@@ -471,7 +471,7 @@ class TestNumpy_RLEHandler(object):
         assert (1031000, 1029000, 1027000) == tuple(ref[4, 3:6])
         assert (803000, 801000, 798000) == tuple(ref[-1, -3:])
 
-    def test_pixel_array_32_1_15_frame(self):
+    def test_pixel_array_32bit_1sample_15f(self):
         """Test pixel_array for 32-bit, 1, sample/pixel, 15 frame."""
         ds = dcmread(RTDOSE_RLE_15F)
         assert ds.file_meta.TransferSyntaxUID == RLELossless
@@ -500,7 +500,7 @@ class TestNumpy_RLEHandler(object):
         assert (801000, 800000, 799000) == tuple(ref[-1, -1, -3:])
 
     @pytest.mark.skip(reason='Samples/pixel>1, BitsAllocated>8 not supported')
-    def test_pixel_array_32_3_1_frame(self):
+    def test_pixel_array_32bit_3sample_1f(self):
         """Test pixel_array for 32-bit, 3 sample/pixel, 1 frame."""
         ds = dcmread(SC_RLE_32_1F)
         assert ds.file_meta.TransferSyntaxUID == RLELossless
@@ -523,7 +523,7 @@ class TestNumpy_RLEHandler(object):
         assert (3233857728, 3233857728, 3233857728) == tuple(arr[85, 50, :])
         assert (4294967295, 4294967295, 4294967295) == tuple(arr[95, 50, :])
 
-    def test_pixel_array_32_3_2_frame(self):
+    def test_pixel_array_32bit_3sample_2f(self):
         """Test pixel_array for 32-bit, 3, sample/pixel, 2 frame."""
         ds = dcmread(SC_RLE_32_2F)
         assert ds.file_meta.TransferSyntaxUID == RLELossless
