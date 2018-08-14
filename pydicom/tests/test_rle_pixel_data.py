@@ -467,9 +467,9 @@ class TestNumpy_RLEHandler(object):
 
         assert np.array_equal(arr, ref)
         assert (10, 10) == arr.shape
-        assert (1249000, 1249000, 1250000) == tuple(ref[0, :3])
-        assert (1031000, 1029000, 1027000) == tuple(ref[4, 3:6])
-        assert (803000, 801000, 798000) == tuple(ref[-1, -3:])
+        assert (1249000, 1249000, 1250000) == tuple(arr[0, :3])
+        assert (1031000, 1029000, 1027000) == tuple(arr[4, 3:6])
+        assert (803000, 801000, 798000) == tuple(arr[-1, -3:])
 
     def test_pixel_array_32bit_1sample_15f(self):
         """Test pixel_array for 32-bit, 1, sample/pixel, 15 frame."""
@@ -495,9 +495,9 @@ class TestNumpy_RLEHandler(object):
         assert (803000, 803000, 803000) == tuple(arr[7, -1, -3:])
 
         # Frame 15
-        assert (1249000, 1250000, 1251000) == tuple(ref[-1, 0, :3])
-        assert (1031000, 1031000, 1031000) == tuple(ref[-1, 4, 3:6])
-        assert (801000, 800000, 799000) == tuple(ref[-1, -1, -3:])
+        assert (1249000, 1250000, 1251000) == tuple(arr[-1, 0, :3])
+        assert (1031000, 1031000, 1031000) == tuple(arr[-1, 4, 3:6])
+        assert (801000, 800000, 799000) == tuple(arr[-1, -1, -3:])
 
     @pytest.mark.skip(reason='Samples/pixel>1, BitsAllocated>8 not supported')
     def test_pixel_array_32bit_3sample_1f(self):
