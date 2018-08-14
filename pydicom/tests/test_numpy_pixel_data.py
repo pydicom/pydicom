@@ -368,7 +368,7 @@ class TestNumpy_NumpyHandler(object):
             size = ds.Rows * ds.Columns * nr_frames * data[1] / 8 * data[2]
             assert len(ds.PixelData) == size + size % 2
             if size % 2:
-                assert ds.PixelData[-1] == 0
+                assert ds.PixelData[-1] == b'\x00'[0]
 
     def test_little_1bit_1sample_1frame(self):
         """Test pixel_array for little 1-bit, 1 sample/pixel, 1 frame."""
