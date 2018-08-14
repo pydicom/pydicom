@@ -106,7 +106,6 @@ EXPL_32_3_2F = get_testdata_files("SC_rgb_32bit_2frame.dcm")[0]
 EXPB_32_3_2F = get_testdata_files("SC_rgb_expb_32bit_2frame.dcm")[0]
 
 
-
 # Transfer Syntaxes (non-retired + Explicit VR Big Endian)
 SUPPORTED_SYNTAXES = [
     ImplicitVRLittleEndian,
@@ -256,31 +255,34 @@ MATCHING_DATASETS = [
     (EXPL_8_3_2F, EXPB_8_3_2F),
     (EXPL_16_1_1F, EXPB_16_1_1F),
     (EXPL_16_1_10F, EXPB_16_1_10F),
-    #(EXPL_16_3_1F, EXPB_16_3_1F),  # Not supported yet
+    # (EXPL_16_3_1F, EXPB_16_3_1F),  # Not supported yet
     (EXPL_16_3_2F, EXPB_16_3_2F),
     (IMPL_32_1_1F, EXPB_32_1_1F),
     (IMPL_32_1_15F, EXPB_32_1_15F),
-    #(EXPL_32_3_1F, EXPB_32_3_1F),  # Not supported yet
+    # (EXPL_32_3_1F, EXPB_32_3_1F),  # Not supported yet
     (EXPL_32_3_2F, EXPB_32_3_2F)
 ]
 
+
+EXPL = ExplicitVRLittleEndian
+IMPL = ImplicitVRLittleEndian
 REFERENCE_DATA_LITTLE = {
     # fpath, (syntax, bits, nr samples, pixel repr, nr frames, shape, dtype)
-    (EXPL_1_1_1F, (ExplicitVRLittleEndian, 1, 1, 0, 1, (512, 512), 'uint8')),
-    (EXPL_1_1_3F, (ExplicitVRLittleEndian, 1, 1, 0, 3, (3, 512, 512), 'uint8')),
-    (EXPL_8_1_1F, (ExplicitVRLittleEndian, 8, 1, 0, 1, (600, 800), 'uint8')),
-    (EXPL_8_3_1F_ODD, (ExplicitVRLittleEndian, 8, 3, 0, 1, (3, 3, 3), 'uint8')),
-    (EXPL_8_1_2F, (ExplicitVRLittleEndian, 8, 1, 0, 2, (2, 600, 800), 'uint8')),
-    (EXPL_8_3_1F, (ExplicitVRLittleEndian, 8, 3, 0, 1, (100, 100, 3), 'uint8')),
-    (EXPL_8_3_2F, (ExplicitVRLittleEndian, 8, 3, 0, 2, (2, 100, 100, 3), 'uint8')),
-    (EXPL_16_1_1F, (ExplicitVRLittleEndian, 16, 1, 1, 1, (64, 64), 'int16')),
-    (EXPL_16_1_10F, (ExplicitVRLittleEndian, 16, 1, 0, 10, (10, 64, 64), 'uint16')),
-    #(EXPL_16_3_1F, (ExplicitVRLittleEndian, 16, 3, 0, 1, (100, 100, 3), 'uint16')),
-    (EXPL_16_3_2F, (ExplicitVRLittleEndian, 16, 3, 0, 2, (2, 100, 100, 3), 'uint16')),
-    (IMPL_32_1_1F, (ImplicitVRLittleEndian, 32, 1, 0, 1, (10, 10), 'uint32')),
-    (IMPL_32_1_15F, (ImplicitVRLittleEndian, 32, 1, 0, 15, (15, 10, 10), 'uint32')),
-    #(EXPL_32_3_1F, (ExplicitVRLittleEndian, 32, 3, 0, 1, (100, 100, 3), 'uint32')),
-    (EXPL_32_3_2F, (ExplicitVRLittleEndian, 32, 3, 0, 2, (2, 100, 100, 3), 'uint32')),
+    (EXPL_1_1_1F, (EXPL, 1, 1, 0, 1, (512, 512), 'uint8')),
+    (EXPL_1_1_3F, (EXPL, 1, 1, 0, 3, (3, 512, 512), 'uint8')),
+    (EXPL_8_1_1F, (EXPL, 8, 1, 0, 1, (600, 800), 'uint8')),
+    (EXPL_8_3_1F_ODD, (EXPL, 8, 3, 0, 1, (3, 3, 3), 'uint8')),
+    (EXPL_8_1_2F, (EXPL, 8, 1, 0, 2, (2, 600, 800), 'uint8')),
+    (EXPL_8_3_1F, (EXPL, 8, 3, 0, 1, (100, 100, 3), 'uint8')),
+    (EXPL_8_3_2F, (EXPL, 8, 3, 0, 2, (2, 100, 100, 3), 'uint8')),
+    (EXPL_16_1_1F, (EXPL, 16, 1, 1, 1, (64, 64), 'int16')),
+    (EXPL_16_1_10F, (EXPL, 16, 1, 0, 10, (10, 64, 64), 'uint16')),
+    # (EXPL_16_3_1F, (EXPL, 16, 3, 0, 1, (100, 100, 3), 'uint16')),
+    (EXPL_16_3_2F, (EXPL, 16, 3, 0, 2, (2, 100, 100, 3), 'uint16')),
+    (IMPL_32_1_1F, (IMPL, 32, 1, 0, 1, (10, 10), 'uint32')),
+    (IMPL_32_1_15F, (IMPL, 32, 1, 0, 15, (15, 10, 10), 'uint32')),
+    # (EXPL_32_3_1F, (EXPL, 32, 3, 0, 1, (100, 100, 3), 'uint32')),
+    (EXPL_32_3_2F, (EXPL, 32, 3, 0, 2, (2, 100, 100, 3), 'uint32')),
 }
 
 
