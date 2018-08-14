@@ -40,6 +40,7 @@ from pydicom.uid import (
 try:
     import numpy as np
     from pydicom.pixel_data_handlers import numpy_handler as NP_HANDLER
+    from pydicom.pixel_data_handlers.numpy_handler import get_pixeldata
     HAVE_NP = True
 except ImportError:
     HAVE_NP = False
@@ -73,6 +74,8 @@ EXPB_8_1_2F = get_testdata_files("OBXXXX1A_expb_2frame.dcm")[0]
 # 8/8, 3 sample/pixel, 1 frame
 EXPL_8_3_1F = get_testdata_files("SC_rgb.dcm")[0]
 EXPB_8_3_1F = get_testdata_files("SC_rgb_expb.dcm")[0]
+# 8/8, 3 samples/pixel, 1 frame, 3 x 3
+EXPL_8_3_1F_ODD = get_testdata_files('SC_rgb_small_odd.dcm')[0]
 # 8/8, 3 sample/pixel, 2 frame
 EXPL_8_3_2F = get_testdata_files("SC_rgb_2frame.dcm")[0]
 EXPB_8_3_2F = get_testdata_files("SC_rgb_expb_2frame.dcm")[0]
@@ -101,6 +104,8 @@ EXPB_32_3_1F = get_testdata_files("SC_rgb_expb_32bit.dcm")[0]
 # 32/32, 3 sample/pixel, 2 frame
 EXPL_32_3_2F = get_testdata_files("SC_rgb_32bit_2frame.dcm")[0]
 EXPB_32_3_2F = get_testdata_files("SC_rgb_expb_32bit_2frame.dcm")[0]
+
+
 
 # Transfer Syntaxes (non-retired + Explicit VR Big Endian)
 SUPPORTED_SYNTAXES = [
@@ -251,11 +256,11 @@ MATCHING_DATASETS = [
     (EXPL_8_3_2F, EXPB_8_3_2F),
     (EXPL_16_1_1F, EXPB_16_1_1F),
     (EXPL_16_1_10F, EXPB_16_1_10F),
-    (EXPL_16_3_1F, EXPB_16_3_1F),
+    #(EXPL_16_3_1F, EXPB_16_3_1F),  # Not supported yet
     (EXPL_16_3_2F, EXPB_16_3_2F),
     (IMPL_32_1_1F, EXPB_32_1_1F),
     (IMPL_32_1_15F, EXPB_32_1_15F),
-    (EXPL_32_3_1F, EXPB_32_3_1F),
+    #(EXPL_32_3_1F, EXPB_32_3_1F),  # Not supported yet
     (EXPL_32_3_2F, EXPB_32_3_2F)
 ]
 
@@ -264,16 +269,17 @@ REFERENCE_DATA_LITTLE = {
     (EXPL_1_1_1F, (ExplicitVRLittleEndian, 1, 1, 0, 1, (512, 512), 'uint8')),
     (EXPL_1_1_3F, (ExplicitVRLittleEndian, 1, 1, 0, 3, (3, 512, 512), 'uint8')),
     (EXPL_8_1_1F, (ExplicitVRLittleEndian, 8, 1, 0, 1, (600, 800), 'uint8')),
+    (EXPL_8_3_1F_ODD, (ExplicitVRLittleEndian, 8, 3, 0, 1, (3, 3, 3), 'uint8')),
     (EXPL_8_1_2F, (ExplicitVRLittleEndian, 8, 1, 0, 2, (2, 600, 800), 'uint8')),
     (EXPL_8_3_1F, (ExplicitVRLittleEndian, 8, 3, 0, 1, (100, 100, 3), 'uint8')),
     (EXPL_8_3_2F, (ExplicitVRLittleEndian, 8, 3, 0, 2, (2, 100, 100, 3), 'uint8')),
     (EXPL_16_1_1F, (ExplicitVRLittleEndian, 16, 1, 1, 1, (64, 64), 'int16')),
     (EXPL_16_1_10F, (ExplicitVRLittleEndian, 16, 1, 0, 10, (10, 64, 64), 'uint16')),
-    (EXPL_16_3_1F, (ExplicitVRLittleEndian, 16, 3, 0, 1, (100, 100, 3), 'uint16')),
+    #(EXPL_16_3_1F, (ExplicitVRLittleEndian, 16, 3, 0, 1, (100, 100, 3), 'uint16')),
     (EXPL_16_3_2F, (ExplicitVRLittleEndian, 16, 3, 0, 2, (2, 100, 100, 3), 'uint16')),
     (IMPL_32_1_1F, (ImplicitVRLittleEndian, 32, 1, 0, 1, (10, 10), 'uint32')),
     (IMPL_32_1_15F, (ImplicitVRLittleEndian, 32, 1, 0, 15, (15, 10, 10), 'uint32')),
-    (EXPL_32_3_1F, (ExplicitVRLittleEndian, 32, 3, 0, 1, (100, 100, 3), 'uint32')),
+    #(EXPL_32_3_1F, (ExplicitVRLittleEndian, 32, 3, 0, 1, (100, 100, 3), 'uint32')),
     (EXPL_32_3_2F, (ExplicitVRLittleEndian, 32, 3, 0, 2, (2, 100, 100, 3), 'uint32')),
 }
 
@@ -313,6 +319,21 @@ class TestNumpy_NumpyHandler(object):
         #
         pass
 
+    def test_pixel_array_signed(self):
+        """Test pixel_array for unsigned -> signed data."""
+        ds = dcmread(EXPL_8_1_1F)
+        # 0 is unsigned int, 1 is 2's complement
+        assert ds.PixelRepresentation == 0
+        ds.PixelRepresentation = 1
+        arr = ds.pixel_array
+        ref = dcmread(EXPL_8_1_1F)
+
+        assert not np.array_equal(arr, ref.pixel_array)
+        assert (600, 800) == arr.shape
+        assert -12 == arr[0].min() == arr[0].max()
+        assert (1, -10, 1) == tuple(arr[300, 491:494])
+        assert 0 == arr[-1].min() == arr[-1].max()
+
     # Little endian datasets
     @pytest.mark.parametrize('fpath, data', REFERENCE_DATA_LITTLE)
     def test_properties(self, fpath, data):
@@ -322,10 +343,7 @@ class TestNumpy_NumpyHandler(object):
         assert ds.BitsAllocated == data[1]
         assert ds.SamplesPerPixel == data[2]
         assert ds.PixelRepresentation == data[3]
-        if data[4] == 1:
-            assert 'NumberOfFrames' not in ds or ds.NumberOfFrames == 1
-        else:
-            assert ds.NumberOfFrames == data[4]
+        assert getattr(ds, 'NumberOfFrames', 1) == data[4]
 
         # Check all little endian syntaxes
         for uid in SUPPORTED_SYNTAXES[:3]:
@@ -333,6 +351,14 @@ class TestNumpy_NumpyHandler(object):
             arr = ds.pixel_array
             assert data[5] == arr.shape
             assert arr.dtype == data[6]
+
+            # Default to 1 if element not present
+            nr_frames = getattr(ds, 'NumberOfFrames', 1)
+            # Odd sized data is padded by a final 0x00 byte
+            size = ds.Rows * ds.Columns * nr_frames * data[1] / 8 * data[2]
+            assert len(ds.PixelData) == size + size % 2
+            if size % 2:
+                assert ds.PixelData[-1] == 0
 
     def test_little_1bit_1sample_1frame(self):
         """Test pixel_array for little 1-bit, 1 sample/pixel, 1 frame."""
@@ -352,7 +378,7 @@ class TestNumpy_NumpyHandler(object):
             arr = ds.pixel_array
             assert 0 == arr[0][0][0]
             assert 0 == arr[2][511][511]
-            assert 0 == arr[1][256][256]
+            assert 1 == arr[1][256][256]
 
     @pytest.mark.skip(reason='No suitable dataset available')
     def test_little_1bit_3sample_1frame(self):
@@ -374,6 +400,14 @@ class TestNumpy_NumpyHandler(object):
 
     def test_little_8bit_1sample_1frame(self):
         """Test pixel_array for little 8-bit, 1 sample/pixel, 1 frame."""
+        # Check all little endian syntaxes
+        ds = dcmread(EXPL_8_1_1F)
+        for uid in SUPPORTED_SYNTAXES[:3]:
+            ds.file_meta.TransferSyntaxUID = uid
+            arr = ds.pixel_array
+
+    def test_little_8bit_1sample_1frame_odd_size(self):
+        """Test pixel_array for odd sized (3x3) pixel data."""
         # Check all little endian syntaxes
         ds = dcmread(EXPL_8_1_1F)
         for uid in SUPPORTED_SYNTAXES[:3]:
@@ -472,7 +506,7 @@ class TestNumpy_NumpyHandler(object):
 
     # Big endian datasets
     @pytest.mark.parametrize('little,big', MATCHING_DATASETS)
-    def test_big_datasets(self, big, little):
+    def test_big_endian_datasets(self, big, little):
         """Test pixel_array for big endian matches little."""
         ds = dcmread(big)
         assert ds.file_meta.TransferSyntaxUID == ExplicitVRBigEndian
@@ -487,7 +521,7 @@ class TestNumpy_GetPixelData(object):
     """Tests for numpy_handler.get_pixeldata with numpy."""
     def test_no_pixel_data_raises(self):
         """Test get_pixeldata raises if dataset has no PixelData."""
-        ds = dcmread(MR_RLE_1F)
+        ds = dcmread(EXPL_16_1_1F)
         del ds.PixelData
         assert 'PixelData' not in ds
         # Should probably be AttributeError instead
@@ -496,7 +530,7 @@ class TestNumpy_GetPixelData(object):
 
     def test_unknown_pixel_representation_raises(self):
         """Test get_pixeldata raises if unsupported PixelRepresentation."""
-        ds = dcmread(MR_RLE_1F)
+        ds = dcmread(EXPL_16_1_1F)
         ds.PixelRepresentation = 2
         # Should probably be NotImplementedError instead
         with pytest.raises(TypeError, match="format='bad_pixel_repr"):
@@ -504,9 +538,10 @@ class TestNumpy_GetPixelData(object):
 
     def test_unsupported_syntaxes_raises(self):
         """Test get_pixeldata raises if unsupported Transfer Syntax."""
-        ds = dcmread(MR_EXPL_LITTLE_1F)
-        # Typo in exception message
-        with pytest.raises(NotImplementedError, match='RLE decompressordoes'):
+        ds = dcmread(EXPL_16_1_1F)
+        ds.file_meta.TransferSyntaxUID = '1.2.840.10008.1.2.4.50'
+        with pytest.raises(NotImplementedError,
+                           match='in a format pydicom does not yet handle'):
             get_pixeldata(ds)
 
     def test_change_photometric_interpretation(self):
@@ -518,60 +553,10 @@ class TestNumpy_GetPixelData(object):
         orig_fn = NP_HANDLER.should_change_PhotometricInterpretation_to_RGB
         NP_HANDLER.should_change_PhotometricInterpretation_to_RGB = to_rgb
 
-        ds = dcmread(MR_RLE_1F)
+        ds = dcmread(EXPL_16_1_1F)
         assert ds.PhotometricInterpretation == 'MONOCHROME2'
 
         get_pixeldata(ds)
         assert ds.PhotometricInterpretation == 'RGB'
 
         NP_HANDLER.should_change_PhotometricInterpretation_to_RGB = orig_fn
-
-
-## Old tests
-'''
-@pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
-class OneBitAllocatedTests(unittest.TestCase):
-    def setUp(self):
-        self.original_handlers = pydicom.config.image_handlers
-        pydicom.config.image_handlers = [NP_HANDLER]
-
-    def tearDown(self):
-        pydicom.config.image_handlers = self.original_handlers
-
-    def test_unpack_pixel_data(self):
-        dataset = dcmread(one_bit_allocated_name)
-        packed_data = dataset.PixelData
-        assert len(packed_data) == 3 * 512 * 512 / 8
-        unpacked_data = dataset.pixel_array
-        assert len(unpacked_data) == 3
-        assert len(unpacked_data[0]) == 512
-        assert len(unpacked_data[2]) == 512
-        assert len(unpacked_data[0][0]) == 512
-        assert len(unpacked_data[2][511]) == 512
-        assert unpacked_data[0][0][0] == 0
-        assert unpacked_data[2][511][511] == 0
-        assert unpacked_data[1][256][256] == 1
-
-
-@pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
-class numpy_LittleEndian_Tests(unittest.TestCase):
-    def setUp(self):
-        self.original_handlers = pydicom.config.image_handlers
-        pydicom.config.image_handlers = [NP_HANDLER]
-        self.odd_size_image = dcmread(
-            get_testdata_files('SC_rgb_small_odd.dcm')[0])
-        self.emri_small = dcmread(emri_name)
-
-    def tearDown(self):
-        pydicom.config.image_handlers = self.original_handlers
-
-    def test_little_endian_PixelArray_odd_data_size(self):
-        pixel_data = self.odd_size_image.pixel_array
-        assert pixel_data.nbytes == 27
-        assert pixel_data.shape == (3, 3, 3)
-
-    def test_little_endian_PixelArray(self):
-        pixel_data = self.emri_small.pixel_array
-        assert pixel_data.nbytes == 81920
-        assert pixel_data.shape == (10, 64, 64)
-'''
