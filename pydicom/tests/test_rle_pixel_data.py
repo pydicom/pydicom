@@ -15,13 +15,11 @@ There are the following possibilities:
 
 **Elements affecting the handler**
 
+* PixelRepresentation (0, 1)
 * BitsAllocated (1, 8, 16, 32, ...)
 * SamplesPerPixel (1, 2, 3, ...)
 * NumberOfFrames (1, 2, ...)
 """
-
-import os
-import sys
 
 import pytest
 
@@ -46,10 +44,8 @@ try:
         _rle_decode_frame,
         _rle_decode_plane
     )
-    HAVE_RLE = True
 except ImportError:
     RLE_HANDLER = None
-    HAVE_RLE = False
 
 
 # Paths to the test datasets
@@ -83,6 +79,12 @@ RTDOSE_RLE_1F = get_testdata_files("rtdose_rle_1frame.dcm")[0]
 # 32/32-bit, 1 sample/pixel, 15 frame
 RTDOSE_EXPL_LITTLE_15F = get_testdata_files("rtdose.dcm")[0]
 RTDOSE_RLE_15F = get_testdata_files("rtdose_rle.dcm")[0]
+# 32/32-bit, 3 sample/pixel, 1 frame
+SC_EXPL_LITTLE_32_1F = get_testdata_files("SC_rgb_32bit.dcm")[0]
+SC_RLE_32_1F = get_testdata_files("SC_rgb_rle_32bit.dcm")[0]
+# 32/32-bit, 3 sample/pixel, 2 frame
+SC_EXPL_LITTLE_32_2F = get_testdata_files("SC_rgb_32bit_2frame.dcm")[0]
+SC_RLE_32_2F = get_testdata_files("SC_rgb_rle_32bit_2frame.dcm")[0]
 
 # Transfer Syntaxes (non-retired + Explicit VR Big Endian)
 SUPPORTED_SYNTAXES = [RLELossless]
@@ -132,7 +134,9 @@ def _get_pixel_array(fpath):
     numpy.ndarray
     """
     if NP_HANDLER is None:
-        raise RuntimeError('Function only usable with numpy handler')
+        raise RuntimeError(
+            'Function only usable if the numpy handler is available'
+        )
 
     original_handlers = pydicom.config.image_handlers
     pydicom.config.image_handlers = [NP_HANDLER]
@@ -148,9 +152,9 @@ def _get_pixel_array(fpath):
 # Numpy and the RLE handler are unavailable
 @pytest.mark.skipif(HAVE_NP, reason='Numpy is available')
 class TestNoNumpy_NoRLEHandler(object):
-    """Tests for handling RLELossless without numpy and the handler."""
+    """Tests for handling datasets without numpy and the handler."""
     def setup(self):
-        """Setup the test datasets and the environment."""
+        """Setup the environment."""
         self.original_handlers = pydicom.config.image_handlers
         pydicom.config.image_handlers = []
 
@@ -161,8 +165,7 @@ class TestNoNumpy_NoRLEHandler(object):
     def test_environment(self):
         """Check that the testing environment is as expected."""
         assert not HAVE_NP
-        assert not HAVE_RLE
-        assert RLE_HANDLER not in pydicom.config.image_handlers
+        assert RLE_HANDLER is None
 
     def test_can_access_dataset(self):
         """Test that we can read and access elements in an RLE dataset."""
@@ -185,9 +188,9 @@ class TestNoNumpy_NoRLEHandler(object):
 # Numpy is available, the RLE handler is unavailable
 @pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
 class TestNumpy_NoRLEHandler(object):
-    """Tests for handling RLELossless with no handler."""
+    """Tests for handling datasets with no handler."""
     def setup(self):
-        """Setup the test datasets and the environment."""
+        """Setup the environment."""
         self.original_handlers = pydicom.config.image_handlers
         pydicom.config.image_handlers = []
 
@@ -199,9 +202,7 @@ class TestNumpy_NoRLEHandler(object):
         """Check that the testing environment is as expected."""
         assert HAVE_NP
         # The RLE handler should still be available
-        assert HAVE_RLE
-        # But we don't want to use it
-        assert RLE_HANDLER not in pydicom.config.image_handlers
+        assert RLE_HANDLER is not None
 
     def test_can_access_dataset(self):
         """Test that we can read and access elements in an RLE dataset."""
@@ -224,9 +225,9 @@ class TestNumpy_NoRLEHandler(object):
 # Numpy and the RLE handler are available
 @pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
 class TestNumpy_RLEHandler(object):
-    """Tests for handling RLELossless with the handler."""
+    """Tests for handling datasets with the handler."""
     def setup(self):
-        """Setup the test datasets and the environment."""
+        """Setup the environment."""
         self.original_handlers = pydicom.config.image_handlers
         pydicom.config.image_handlers = [RLE_HANDLER]
 
@@ -237,8 +238,7 @@ class TestNumpy_RLEHandler(object):
     def test_environment(self):
         """Check that the testing environment is as expected."""
         assert HAVE_NP
-        assert HAVE_RLE
-        assert RLE_HANDLER in pydicom.config.image_handlers
+        assert RLE_HANDLER is not None
 
     def test_unsupported_syntax_raises(self):
         """Test pixel_array raises exception for unsupported syntaxes."""
@@ -249,25 +249,33 @@ class TestNumpy_RLEHandler(object):
                                match='image handler could decode'):
                 ds.pixel_array
 
-    def test_pixel_array_1_1_1_frame(self):
-        """Test pixel_array for 1-bit, 1 sample/pixel, 1 frame."""
+    def test_pixel_array_1bit_raises(self):
+        """Test pixel_array for 1-bit raises exception."""
         ds = dcmread(SC_RLE_1F)
         ds.BitsAllocated = 1
         # This should raise NotImplementedError instead
         with pytest.raises(TypeError, match="format='uint1'"):
             ds.pixel_array
 
-    def test_pixel_array_1_1_2_frame(self):
-        """Test pixel_array for 1-bit, 1 sample/pixel, 2 frame."""
-        ds = dcmread(SC_RLE_2F)
-        ds.BitsAllocated = 1
-        # This should raise NotImplementedError instead
-        with pytest.raises(TypeError, match="format='uint1'"):
-            ds.pixel_array
+    def test_pixel_array_signed(self):
+        """Test pixel_array for unsigned -> signed data."""
+        ds = dcmread(OB_RLE_1F)
+        # 0 is unsigned int, 1 is 2's complement
+        assert ds.PixelRepresentation == 0
+        ds.PixelRepresentation = 1
+        ref = _get_pixel_array(OB_EXPL_LITTLE_1F)
+        arr = ds.pixel_array
+
+        assert not np.array_equal(arr, ref)
+        assert (600, 800) == arr.shape
+        assert -12 == arr[0].min() == arr[0].max()
+        assert (1, -10, 1) == tuple(arr[300, 491:494])
+        assert 0 == arr[-1].min() == arr[-1].max()
 
     def test_pixel_array_8_1_1_frame(self):
         """Test pixel_array for 8-bit, 1 sample/pixel, 1 frame."""
         ds = dcmread(OB_RLE_1F)
+        assert ds.file_meta.TransferSyntaxUID == RLELossless
         assert ds.BitsAllocated == 8
         assert ds.SamplesPerPixel == 1
         assert 'NumberOfFrames' not in ds
@@ -283,6 +291,7 @@ class TestNumpy_RLEHandler(object):
     def test_pixel_array_8_1_2_frame(self):
         """Test pixel_array for 8-bit, 1 sample/pixel, 2 frame."""
         ds = dcmread(OB_RLE_2F)
+        assert ds.file_meta.TransferSyntaxUID == RLELossless
         assert ds.BitsAllocated == 8
         assert ds.SamplesPerPixel == 1
         assert ds.NumberOfFrames == 2
@@ -303,6 +312,7 @@ class TestNumpy_RLEHandler(object):
     def test_pixel_array_8_3_1_frame(self):
         """Test pixel_array for 8-bit, 3 sample/pixel, 1 frame."""
         ds = dcmread(SC_RLE_1F)
+        assert ds.file_meta.TransferSyntaxUID == RLELossless
         assert ds.BitsAllocated == 8
         assert ds.SamplesPerPixel == 3
         assert 'NumberOfFrames' not in ds
@@ -325,6 +335,7 @@ class TestNumpy_RLEHandler(object):
     def test_pixel_array_8_3_2_frame(self):
         """Test pixel_array for 8-bit, 3 sample/pixel, 2 frame."""
         ds = dcmread(SC_RLE_2F)
+        assert ds.file_meta.TransferSyntaxUID == RLELossless
         assert ds.BitsAllocated == 8
         assert ds.SamplesPerPixel == 3
         assert ds.NumberOfFrames == 2
@@ -362,6 +373,7 @@ class TestNumpy_RLEHandler(object):
     def test_pixel_array_16_1_1_frame(self):
         """Test pixel_array for 16-bit, 1 sample/pixel, 1 frame."""
         ds = dcmread(MR_RLE_1F)
+        assert ds.file_meta.TransferSyntaxUID == RLELossless
         assert ds.BitsAllocated == 16
         assert ds.SamplesPerPixel == 1
         assert 'NumberOfFrames' not in ds
@@ -375,25 +387,10 @@ class TestNumpy_RLEHandler(object):
         assert (366, 363, 322) == tuple(arr[31, :3])
         assert (1369, 1129, 862) == tuple(arr[-1, -3:])
 
-    @pytest.mark.skip(reason='This should be failing?')
-    def test_pixel_array_16_signed(self):
-        """Test pixel_array with PixelRepresentation of 1."""
-        ds = dcmread(MR_RLE_1F)
-        assert ds.PixelRepresentation == 0
-        ds.PixelRepresentation == 1
-        ref = _get_pixel_array(MR_EXPL_LITTLE_1F)
-        arr = ds.pixel_array
-
-        assert np.array_equal(arr, ref)
-        assert (64, 64) == arr.shape
-
-        assert (422, 319, 361) == tuple(arr[0, 31:34])
-        assert (366, 363, 322) == tuple(arr[31, :3])
-        assert (1369, 1129, 862) == tuple(arr[-1, -3:])
-
     def test_pixel_array_16_1_10_frame(self):
         """Test pixel_array for 16-bit, 1, sample/pixel, 10 frame."""
         ds = dcmread(EMRI_RLE_10F)
+        assert ds.file_meta.TransferSyntaxUID == RLELossless
         assert ds.BitsAllocated == 16
         assert ds.SamplesPerPixel == 1
         assert ds.NumberOfFrames == 10
@@ -422,6 +419,7 @@ class TestNumpy_RLEHandler(object):
     def test_pixel_array_16_3_1_frame(self):
         """Test pixel_array for 16-bit, 3 sample/pixel, 1 frame."""
         ds = dcmread(SC_RLE_16_1F)
+        assert ds.file_meta.TransferSyntaxUID == RLELossless
         assert ds.BitsAllocated == 16
         assert ds.SamplesPerPixel == 3
         assert 'NumberOfFrames' not in ds
@@ -441,10 +439,10 @@ class TestNumpy_RLEHandler(object):
         assert (49344, 49344, 49344) == tuple(arr[85, 50, :])
         assert (65535, 65535, 65535) == tuple(arr[95, 50, :])
 
-    @pytest.mark.skip(reason='Samples/pixel>1, BitsAllocated>8 not supported')
     def test_pixel_array_16_3_2_frame(self):
         """Test pixel_array for 16-bit, 3, sample/pixel, 10 frame."""
         ds = dcmread(SC_RLE_16_2F)
+        assert ds.file_meta.TransferSyntaxUID == RLELossless
         assert ds.BitsAllocated == 16
         assert ds.SamplesPerPixel == 3
         assert ds.NumberOfFrames == 2
@@ -482,6 +480,7 @@ class TestNumpy_RLEHandler(object):
     def test_pixel_array_32_1_1_frame(self):
         """Test pixel_array for 32-bit, 1 sample/pixel, 1 frame."""
         ds = dcmread(RTDOSE_RLE_1F)
+        assert ds.file_meta.TransferSyntaxUID == RLELossless
         assert ds.BitsAllocated == 32
         assert ds.SamplesPerPixel == 1
         assert 'NumberOfFrames' not in ds
@@ -497,6 +496,7 @@ class TestNumpy_RLEHandler(object):
     def test_pixel_array_32_1_15_frame(self):
         """Test pixel_array for 32-bit, 1, sample/pixel, 15 frame."""
         ds = dcmread(RTDOSE_RLE_15F)
+        assert ds.file_meta.TransferSyntaxUID == RLELossless
         assert ds.BitsAllocated == 32
         assert ds.SamplesPerPixel == 1
         assert ds.NumberOfFrames == 15
@@ -521,19 +521,65 @@ class TestNumpy_RLEHandler(object):
         assert (1031000, 1031000, 1031000) == tuple(ref[-1, 4, 3:6])
         assert (801000, 800000, 799000) == tuple(ref[-1, -1, -3:])
 
-    @pytest.mark.skip(reason='Missing a suitable RLE encoded dataset')
+    @pytest.mark.skip(reason='Samples/pixel>1, BitsAllocated>8 not supported')
     def test_pixel_array_32_3_1_frame(self):
         """Test pixel_array for 32-bit, 3 sample/pixel, 1 frame."""
-        # Can't generate RLE encoded data for 32-bit 3 samples/pixel
-        #   placeholder for future test
-        pass
+        ds = dcmread(SC_RLE_32_1F)
+        assert ds.file_meta.TransferSyntaxUID == RLELossless
+        assert ds.BitsAllocated == 32
+        assert ds.SamplesPerPixel == 3
+        assert 'NumberOfFrames' not in ds
+        arr = ds.pixel_array
+        ref = _get_pixel_array(SC_EXPL_LITTLE_32_1F)
 
-    @pytest.mark.skip(reason='Missing a suitable RLE encoded dataset')
+        assert np.array_equal(ds.pixel_array, ref)
+
+        assert (4294967295, 0, 0) == tuple(arr[5, 50, :])
+        assert (4294967295, 2155905152, 2155905152) == tuple(arr[15, 50, :])
+        assert (0, 4294967295, 0) == tuple(arr[25, 50, :])
+        assert (2155905152, 4294967295, 2155905152) == tuple(arr[35, 50, :])
+        assert (0, 0, 4294967295) == tuple(arr[45, 50, :])
+        assert (2155905152, 2155905152, 4294967295) == tuple(arr[55, 50, :])
+        assert (0, 0, 0) == tuple(arr[65, 50, :])
+        assert (1077952576, 1077952576, 1077952576) == tuple(arr[75, 50, :])
+        assert (3233857728, 3233857728, 3233857728) == tuple(arr[85, 50, :])
+        assert (4294967295, 4294967295, 4294967295) == tuple(arr[95, 50, :])
+
     def test_pixel_array_32_3_2_frame(self):
         """Test pixel_array for 32-bit, 3, sample/pixel, 2 frame."""
-        # Can't generate RLE encoded data for 32-bit 3 samples/pixel
-        #   placeholder for future test
-        pass
+        ds = dcmread(SC_RLE_32_2F)
+        assert ds.file_meta.TransferSyntaxUID == RLELossless
+        assert ds.BitsAllocated == 32
+        assert ds.SamplesPerPixel == 3
+        assert ds.NumberOfFrames == 2
+        arr = ds.pixel_array
+        ref = _get_pixel_array(SC_EXPL_LITTLE_32_2F)
+
+        assert np.array_equal(ds.pixel_array, ref)
+
+        # Frame 1
+        assert (4294967295, 0, 0) == tuple(arr[0, 5, 50, :])
+        assert (4294967295, 2155905152, 2155905152) == tuple(arr[0, 15, 50, :])
+        assert (0, 4294967295, 0) == tuple(arr[0, 25, 50, :])
+        assert (2155905152, 4294967295, 2155905152) == tuple(arr[0, 35, 50, :])
+        assert (0, 0, 4294967295) == tuple(arr[0, 45, 50, :])
+        assert (2155905152, 2155905152, 4294967295) == tuple(arr[0, 55, 50, :])
+        assert (0, 0, 0) == tuple(arr[0, 65, 50, :])
+        assert (1077952576, 1077952576, 1077952576) == tuple(arr[0, 75, 50, :])
+        assert (3233857728, 3233857728, 3233857728) == tuple(arr[0, 85, 50, :])
+        assert (4294967295, 4294967295, 4294967295) == tuple(arr[0, 95, 50, :])
+
+        # Frame 2 is frame 1 inverted
+        assert (0, 4294967295, 4294967295) == tuple(arr[1, 5, 50, :])
+        assert (0, 2139062143, 2139062143) == tuple(arr[1, 15, 50, :])
+        assert (4294967295, 0, 4294967295) == tuple(arr[1, 25, 50, :])
+        assert (2139062143, 0, 2139062143) == tuple(arr[1, 35, 50, :])
+        assert (4294967295, 4294967295, 0) == tuple(arr[1, 45, 50, :])
+        assert (2139062143, 2139062143, 0) == tuple(arr[1, 55, 50, :])
+        assert (4294967295, 4294967295, 4294967295) == tuple(arr[1, 65, 50, :])
+        assert (3217014719, 3217014719, 3217014719) == tuple(arr[1, 75, 50, :])
+        assert (1061109567, 1061109567, 1061109567) == tuple(arr[1, 85, 50, :])
+        assert (0, 0, 0) == tuple(arr[1, 95, 50, :])
 
 
 # Tests for rle_handler module with Numpy available
@@ -597,10 +643,10 @@ BAD_SEGMENT_DATA = [
     (b'\x05\x00\x00\x00', 1, 32),  # 5 segments, 4 expected
     (b'\x0B\x00\x00\x00', 3, 32),  # 11 segments, 12 expected
     (b'\x0D\x00\x00\x00', 3, 32),  # 13 segments, 12 expected
-    (b'\x09\x00\x00\x00', 1, 64),  # 9 segments, 8 expected
     (b'\x07\x00\x00\x00', 1, 64),  # 7 segments, 8 expected
-    (b'\x19\x00\x00\x00', 3, 64),  # 25 segments, 24 expected
+    (b'\x09\x00\x00\x00', 1, 64),  # 9 segments, 8 expected
     (b'\x17\x00\x00\x00', 3, 64),  # 23 segments, 24 expected
+    (b'\x19\x00\x00\x00', 3, 64),  # 25 segments, 24 expected
 ]
 
 
@@ -650,29 +696,23 @@ class TestNumpy_RLEDecodeFrame(object):
 class TestNumpy_RLEDecodePlane(object):
     """Tests for rle_handler._rle_decode_plane.
 
-    **Segment encoding**
+    Using int8
+    ----------
+    if n >= 0 and n < 127:
+        read next (n + 1) bytes literally
+    elif n <= -1 and n >= -127:
+        copy the next byte (-n + 1) times
+    elif n = -128:
+        do nothing
 
-    *Using int8*
-
-    ::
-
-        if n >= 0 and n < 127:
-            read next (n + 1) bytes literally
-        elif n <= -1 and n >= -127:
-            copy the next byte (-n + 1) times
-        elif n = -128:
-            do nothing
-
-    *Using uint8*
-
-    ::
-
-        if n < 128
-            read next (n + 1) bytes literally
-        elif n > 128
-            copy the next byte (256 - n + 1) times
-        elif n == 128
-            do nothing
+    Using uint8 (as in handler)
+    ---------------------------
+    if n < 128
+        read next (n + 1) bytes literally
+    elif n > 128
+        copy the next byte (256 - n + 1) times
+    elif n == 128
+        do nothing
 
     References
     ----------
