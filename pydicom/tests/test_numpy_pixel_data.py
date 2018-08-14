@@ -321,7 +321,7 @@ class TestNumpy_NumpyHandler(object):
         #
         pass
 
-    def test_pixel_array_signed(self):
+    def test_pixel_array_8bit_signed(self):
         """Test pixel_array for unsigned -> signed data."""
         ds = dcmread(EXPL_8_1_1F)
         # 0 is unsigned int, 1 is 2's complement
@@ -335,6 +335,12 @@ class TestNumpy_NumpyHandler(object):
         assert -12 == arr[0].min() == arr[0].max()
         assert (1, -10, 1) == tuple(arr[300, 491:494])
         assert 0 == arr[-1].min() == arr[-1].max()
+
+    def test_pixel_array_16bit_signed(self):
+        pass
+
+    def test_pixel_array_32bit_signed(self):
+        pass
 
     def test_raise_if_endianess_not_set(self):
         """Test pixel_array raises an exception if no endianness set."""
@@ -370,7 +376,7 @@ class TestNumpy_NumpyHandler(object):
             if size % 2:
                 assert ds.PixelData[-1] == b'\x00'[0]
 
-    def test_little_1bit_1sample_1frame(self):
+    def test_x_little_1bit_1sample_1frame(self):
         """Test pixel_array for little 1-bit, 1 sample/pixel, 1 frame."""
         # Check all little endian syntaxes
         ds = dcmread(EXPL_1_1_1F)
@@ -378,7 +384,7 @@ class TestNumpy_NumpyHandler(object):
             ds.file_meta.TransferSyntaxUID = uid
             arr = ds.pixel_array
 
-    def test_little_1bit_1sample_3frame(self):
+    def test_x_little_1bit_1sample_3frame(self):
         """Test pixel_array for little 1-bit, 1 sample/pixel, 3 frame."""
         # Check all little endian syntaxes
         ds = dcmread(EXPL_1_1_3F)
@@ -391,7 +397,7 @@ class TestNumpy_NumpyHandler(object):
             assert 1 == arr[1][256][256]
 
     @pytest.mark.skip(reason='No suitable dataset available')
-    def test_little_1bit_3sample_1frame(self):
+    def test_x_little_1bit_3sample_1frame(self):
         """Test pixel_array for little 1-bit, 3 sample/pixel, 1 frame."""
         # Check all little endian syntaxes
         ds = dcmread(EXPL_1_3_1F)
@@ -400,7 +406,7 @@ class TestNumpy_NumpyHandler(object):
             arr = ds.pixel_array
 
     @pytest.mark.skip(reason='No suitable dataset available')
-    def test_little_1bit_3sample_10frame(self):
+    def test_x_little_1bit_3sample_10frame(self):
         """Test pixel_array for little 1-bit, 3 sample/pixel, 10 frame."""
         # Check all little endian syntaxes
         ds = dcmread(EXPL_1_3_10F)
@@ -416,18 +422,31 @@ class TestNumpy_NumpyHandler(object):
             ds.file_meta.TransferSyntaxUID = uid
             arr = ds.pixel_array
 
-    def test_little_8bit_1sample_1frame_odd_size(self):
-        """Test pixel_array for odd sized (3x3) pixel data."""
-        # Check all little endian syntaxes
-        ds = dcmread(EXPL_8_1_1F)
-        for uid in SUPPORTED_SYNTAXES[:3]:
-            ds.file_meta.TransferSyntaxUID = uid
-            arr = ds.pixel_array
+            assert (600, 800) == arr.shape
+            assert 244 == arr[0].min() == arr[0].max()
+            assert (1, 246, 1) == tuple(arr[300, 491:494])
+            assert 0 == arr[-1].min() == arr[-1].max()
 
     def test_little_8bit_1sample_2frame(self):
         """Test pixel_array for little 8-bit, 1 sample/pixel, 2 frame."""
         # Check all little endian syntaxes
         ds = dcmread(EXPL_8_1_2F)
+        for uid in SUPPORTED_SYNTAXES[:3]:
+            ds.file_meta.TransferSyntaxUID = uid
+            arr = ds.pixel_array
+
+            assert (2, 600, 800) == arr.shape
+            # Frame 1
+            assert 244 == arr[0, 0].min() == arr[0, 0].max()
+            assert (1, 246, 1) == tuple(arr[0, 300, 491:494])
+            assert 0 == arr[0, -1].min() == arr[0, -1].max()
+            # Frame 2 is frame 1 inverted
+            assert np.array_equal((2**ds.BitsAllocated - 1) - arr[1], arr[0])
+
+    def test_x_little_8bit_3sample_1frame_odd_size(self):
+        """Test pixel_array for odd sized (3x3) pixel data."""
+        # Check all little endian syntaxes
+        ds = dcmread(EXPL_8_3_1F_ODD)
         for uid in SUPPORTED_SYNTAXES[:3]:
             ds.file_meta.TransferSyntaxUID = uid
             arr = ds.pixel_array
@@ -440,6 +459,17 @@ class TestNumpy_NumpyHandler(object):
             ds.file_meta.TransferSyntaxUID = uid
             arr = ds.pixel_array
 
+            assert (255, 0, 0) == tuple(arr[5, 50, :])
+            assert (255, 128, 128) == tuple(arr[15, 50, :])
+            assert (0, 255, 0) == tuple(arr[25, 50, :])
+            assert (128, 255, 128) == tuple(arr[35, 50, :])
+            assert (0, 0, 255) == tuple(arr[45, 50, :])
+            assert (128, 128, 255) == tuple(arr[55, 50, :])
+            assert (0, 0, 0) == tuple(arr[65, 50, :])
+            assert (64, 64, 64) == tuple(arr[75, 50, :])
+            assert (192, 192, 192) == tuple(arr[85, 50, :])
+            assert (255, 255, 255) == tuple(arr[95, 50, :])
+
     def test_little_8bit_3sample_2frame(self):
         """Test pixel_array for little 8-bit, 3 sample/pixel, 2 frame."""
         # Check all little endian syntaxes
@@ -447,6 +477,21 @@ class TestNumpy_NumpyHandler(object):
         for uid in SUPPORTED_SYNTAXES[:3]:
             ds.file_meta.TransferSyntaxUID = uid
             arr = ds.pixel_array
+
+             # Frame 1
+            frame = arr[0]
+            assert (255, 0, 0) == tuple(frame[5, 50, :])
+            assert (255, 128, 128) == tuple(frame[15, 50, :])
+            assert (0, 255, 0) == tuple(frame[25, 50, :])
+            assert (128, 255, 128) == tuple(frame[35, 50, :])
+            assert (0, 0, 255) == tuple(frame[45, 50, :])
+            assert (128, 128, 255) == tuple(frame[55, 50, :])
+            assert (0, 0, 0) == tuple(frame[65, 50, :])
+            assert (64, 64, 64) == tuple(frame[75, 50, :])
+            assert (192, 192, 192) == tuple(frame[85, 50, :])
+            assert (255, 255, 255) == tuple(frame[95, 50, :])
+            # Frame 2 is frame 1 inverted
+            assert np.array_equal((2**ds.BitsAllocated - 1) - arr[1], arr[0])
 
     def test_little_16bit_1sample_1frame(self):
         """Test pixel_array for little 16-bit, 1 sample/pixel, 1 frame."""
@@ -456,6 +501,10 @@ class TestNumpy_NumpyHandler(object):
             ds.file_meta.TransferSyntaxUID = uid
             arr = ds.pixel_array
 
+            assert (422, 319, 361) == tuple(arr[0, 31:34])
+            assert (366, 363, 322) == tuple(arr[31, :3])
+            assert (1369, 1129, 862) == tuple(arr[-1, -3:])
+
     def test_little_16bit_1sample_10frame(self):
         """Test pixel_array for little 16-bit, 1 sample/pixel, 10 frame."""
         # Check all little endian syntaxes
@@ -464,7 +513,20 @@ class TestNumpy_NumpyHandler(object):
             ds.file_meta.TransferSyntaxUID = uid
             arr = ds.pixel_array
 
-    @pytest.mark.skip(reason='Samples/pixel>1, BitsAllocated>8 not supported')
+            # Frame 1
+            assert (206, 197, 159) == tuple(arr[0, 0, 31:34])
+            assert (49, 78, 128) == tuple(arr[0, 31, :3])
+            assert (362, 219, 135) == tuple(arr[0, -1, -3:])
+            # Frame 5
+            assert (67, 82, 44) == tuple(arr[4, 0, 31:34])
+            assert (37, 41, 17) == tuple(arr[4, 31, :3])
+            assert (225, 380, 355) == tuple(arr[4, -1, -3:])
+            # Frame 10
+            assert (72, 86, 69) == tuple(arr[-1, 0, 31:34])
+            assert (25, 4, 9) == tuple(arr[-1, 31, :3])
+            assert (227, 300, 147) == tuple(arr[-1, -1, -3:])
+
+    #@pytest.mark.skip(reason='Samples/pixel>1, BitsAllocated>8 not supported')
     def test_little_16bit_3sample_1frame(self):
         """Test pixel_array for little 16-bit, 3 sample/pixel, 1 frame."""
         # Check all little endian syntaxes
@@ -472,6 +534,17 @@ class TestNumpy_NumpyHandler(object):
         for uid in SUPPORTED_SYNTAXES[:3]:
             ds.file_meta.TransferSyntaxUID = uid
             arr = ds.pixel_array
+
+            assert (65535, 0, 0) == tuple(arr[5, 50, :])
+            assert (65535, 32896, 32896) == tuple(arr[15, 50, :])
+            assert (0, 65535, 0) == tuple(arr[25, 50, :])
+            assert (32896, 65535, 32896) == tuple(arr[35, 50, :])
+            assert (0, 0, 65535) == tuple(arr[45, 50, :])
+            assert (32896, 32896, 65535) == tuple(arr[55, 50, :])
+            assert (0, 0, 0) == tuple(arr[65, 50, :])
+            assert (16448, 16448, 16448) == tuple(arr[75, 50, :])
+            assert (49344, 49344, 49344) == tuple(arr[85, 50, :])
+            assert (65535, 65535, 65535) == tuple(arr[95, 50, :])
 
     def test_little_16bit_3sample_2frame(self):
         """Test pixel_array for little 16-bit, 3 sample/pixel, 2 frame."""
@@ -481,6 +554,20 @@ class TestNumpy_NumpyHandler(object):
             ds.file_meta.TransferSyntaxUID = uid
             arr = ds.pixel_array
 
+            # Frame 1
+            assert (65535, 0, 0) == tuple(arr[0, 5, 50, :])
+            assert (65535, 32896, 32896) == tuple(arr[0, 15, 50, :])
+            assert (0, 65535, 0) == tuple(arr[0, 25, 50, :])
+            assert (32896, 65535, 32896) == tuple(arr[0, 35, 50, :])
+            assert (0, 0, 65535) == tuple(arr[0, 45, 50, :])
+            assert (32896, 32896, 65535) == tuple(arr[0, 55, 50, :])
+            assert (0, 0, 0) == tuple(arr[0, 65, 50, :])
+            assert (16448, 16448, 16448) == tuple(arr[0, 75, 50, :])
+            assert (49344, 49344, 49344) == tuple(arr[0, 85, 50, :])
+            assert (65535, 65535, 65535) == tuple(arr[0, 95, 50, :])
+            # Frame 2 is frame 1 inverted
+            assert np.array_equal((2**ds.BitsAllocated - 1) - arr[1], arr[0])
+
     def test_little_32bit_1sample_1frame(self):
         """Test pixel_array for little 32-bit, 1 sample/pixel, 1 frame."""
         # Check all little endian syntaxes
@@ -488,6 +575,10 @@ class TestNumpy_NumpyHandler(object):
         for uid in SUPPORTED_SYNTAXES[:3]:
             ds.file_meta.TransferSyntaxUID = uid
             arr = ds.pixel_array
+
+            assert (1249000, 1249000, 1250000) == tuple(arr[0, :3])
+            assert (1031000, 1029000, 1027000) == tuple(arr[4, 3:6])
+            assert (803000, 801000, 798000) == tuple(arr[-1, -3:])
 
     def test_little_32bit_1sample_15frame(self):
         """Test pixel_array for little 32-bit, 1 sample/pixel, 15 frame."""
@@ -497,7 +588,20 @@ class TestNumpy_NumpyHandler(object):
             ds.file_meta.TransferSyntaxUID = uid
             arr = ds.pixel_array
 
-    @pytest.mark.skip(reason='Samples/pixel>1, BitsAllocated>8 not supported')
+            # Frame 1
+            assert (1249000, 1249000, 1250000) == tuple(arr[0, 0, :3])
+            assert (1031000, 1029000, 1027000) == tuple(arr[0, 4, 3:6])
+            assert (803000, 801000, 798000) == tuple(arr[0, -1, -3:])
+            # Frame 8
+            assert (1253000, 1253000, 1249000) == tuple(arr[7, 0, :3])
+            assert (1026000, 1023000, 1022000) == tuple(arr[7, 4, 3:6])
+            assert (803000, 803000, 803000) == tuple(arr[7, -1, -3:])
+            # Frame 15
+            assert (1249000, 1250000, 1251000) == tuple(arr[-1, 0, :3])
+            assert (1031000, 1031000, 1031000) == tuple(arr[-1, 4, 3:6])
+            assert (801000, 800000, 799000) == tuple(arr[-1, -1, -3:])
+
+    #@pytest.mark.skip(reason='Samples/pixel>1, BitsAllocated>8 not supported')
     def test_little_32bit_3sample_1frame(self):
         """Test pixel_array for little 32-bit, 3 sample/pixel, 1 frame."""
         # Check all little endian syntaxes
@@ -506,6 +610,17 @@ class TestNumpy_NumpyHandler(object):
             ds.file_meta.TransferSyntaxUID = uid
             arr = ds.pixel_array
 
+            assert (4294967295, 0, 0) == tuple(arr[5, 50, :])
+            assert (4294967295, 2155905152, 2155905152) == tuple(arr[15, 50, :])
+            assert (0, 4294967295, 0) == tuple(arr[25, 50, :])
+            assert (2155905152, 4294967295, 2155905152) == tuple(arr[35, 50, :])
+            assert (0, 0, 4294967295) == tuple(arr[45, 50, :])
+            assert (2155905152, 2155905152, 4294967295) == tuple(arr[55, 50, :])
+            assert (0, 0, 0) == tuple(arr[65, 50, :])
+            assert (1077952576, 1077952576, 1077952576) == tuple(arr[75, 50, :])
+            assert (3233857728, 3233857728, 3233857728) == tuple(arr[85, 50, :])
+            assert (4294967295, 4294967295, 4294967295) == tuple(arr[95, 50, :])
+
     def test_little_32bit_3sample_2frame(self):
         """Test pixel_array for little 32-bit, 3 sample/pixel, 10 frame."""
         # Check all little endian syntaxes
@@ -513,6 +628,32 @@ class TestNumpy_NumpyHandler(object):
         for uid in SUPPORTED_SYNTAXES[:3]:
             ds.file_meta.TransferSyntaxUID = uid
             arr = ds.pixel_array
+
+            # Frame 1
+            assert (4294967295, 0, 0) == tuple(arr[0, 5, 50, :])
+            assert (4294967295, 2155905152, 2155905152) == tuple(
+                arr[0, 15, 50, :]
+            )
+            assert (0, 4294967295, 0) == tuple(arr[0, 25, 50, :])
+            assert (2155905152, 4294967295, 2155905152) == tuple(
+                arr[0, 35, 50, :]
+            )
+            assert (0, 0, 4294967295) == tuple(arr[0, 45, 50, :])
+            assert (2155905152, 2155905152, 4294967295) == tuple(
+                arr[0, 55, 50, :]
+            )
+            assert (0, 0, 0) == tuple(arr[0, 65, 50, :])
+            assert (1077952576, 1077952576, 1077952576) == tuple(
+                arr[0, 75, 50, :]
+            )
+            assert (3233857728, 3233857728, 3233857728) == tuple(
+                arr[0, 85, 50, :]
+            )
+            assert (4294967295, 4294967295, 4294967295) == tuple(
+                arr[0, 95, 50, :]
+            )
+            # Frame 2 is frame 1 inverted
+            assert np.array_equal((2**ds.BitsAllocated - 1) - arr[1], arr[0])
 
     # Big endian datasets
     @pytest.mark.parametrize('little,big', MATCHING_DATASETS)
