@@ -815,11 +815,16 @@ class TestNumpy_GetPixelData(object):
             """Override the original function that returned False"""
             return True
 
-        orig_fn = NP_HANDLER.should_change_PhotometricInterpretation_to_RGB
-        NP_HANDLER.should_change_PhotometricInterpretation_to_RGB = to_rgb
-
+        # Test default
         ds = dcmread(EXPL_16_1_1F)
         assert ds.PhotometricInterpretation == 'MONOCHROME2'
+
+        get_pixeldata(ds)
+        assert ds.PhotometricInterpretation == 'MONOCHROME2'
+
+        # Test modified
+        orig_fn = NP_HANDLER.should_change_PhotometricInterpretation_to_RGB
+        NP_HANDLER.should_change_PhotometricInterpretation_to_RGB = to_rgb
 
         get_pixeldata(ds)
         assert ds.PhotometricInterpretation == 'RGB'
