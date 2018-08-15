@@ -105,6 +105,25 @@ EXPB_32_3_1F = get_testdata_files("SC_rgb_expb_32bit.dcm")[0]
 EXPL_32_3_2F = get_testdata_files("SC_rgb_32bit_2frame.dcm")[0]
 EXPB_32_3_2F = get_testdata_files("SC_rgb_expb_32bit_2frame.dcm")[0]
 
+# Transfer syntaxes supported by other handlers
+# JPEG Baseline (Process 1)
+JPEG_BASELINE_1 = get_testdata_files("SC_rgb_jpeg_dcmtk.dcm")[0]
+# JPEG Baseline (Process 2 and 4)
+JPEG_EXTENDED_2 = get_testdata_files("JPEG-lossy.dcm")[0]
+# JPEG Lossless (Process 14)
+JPEG_LOSSLESS_14 = None
+# JPEG Lossless (Process 14, Selection Value 1)
+JPEG_LOSSLESS_14_1 = get_testdata_files("SC_rgb_jpeg_gdcm.dcm")[0]
+# JPEG-LS Lossless
+JPEG_LS_LOSSLESS = get_testdata_files("MR_small_jpeg_ls_lossless.dcm")[0]
+# JPEG-LS Lossy
+JPEG_LS_LOSSY = None
+# JPEG2k Lossless
+JPEG_2K_LOSSLESS = get_testdata_files("emri_small_jpeg_2k_lossless.dcm")[0]
+# JPEG2k
+JPEG_2K = get_testdata_files("JPEG2000.dcm")[0]
+# RLE Lossless
+RLE = get_testdata_files("MR_small_RLE.dcm")[0]
 
 # Transfer Syntaxes (non-retired + Explicit VR Big Endian)
 SUPPORTED_SYNTAXES = [
@@ -139,6 +158,17 @@ UNSUPPORTED_SYNTAXES = [
 ]
 ALL_SYNTAXES = SUPPORTED_SYNTAXES + UNSUPPORTED_SYNTAXES
 
+REFERENCE_DATA_UNSUPPORTED = [
+    (JPEG_BASELINE_1, ('1.2.840.10008.1.2.4.50', 'Lestrade^G')),
+    (JPEG_EXTENDED_2, ('1.2.840.10008.1.2.4.51', 'CompressedSamples^NM1')),
+    # (JPEG_LOSSLESS_14, ('1.2.840.10008.1.2.4.57')),  # No dataset available
+    (JPEG_LOSSLESS_14_1, ('1.2.840.10008.1.2.4.70', 'Lestrade^G')),
+    (JPEG_LS_LOSSLESS, ('1.2.840.10008.1.2.4.80', 'CompressedSamples^MR1')),
+    # (JPEG_LS_LOSSY, ('1.2.840.10008.1.2.4.81')),  # No dataset available
+    (JPEG_2K_LOSSLESS, ('1.2.840.10008.1.2.4.90', '')),
+    (JPEG_2K, ('1.2.840.10008.1.2.4.91', 'CompressedSamples^NM1')),
+    (RLE, ('1.2.840.10008.1.2.5', 'CompressedSamples^MR1')),
+]
 
 # Numpy and the numpy handler are unavailable
 @pytest.mark.skipif(HAVE_NP, reason='Numpy is available')
@@ -158,7 +188,7 @@ class TestNoNumpy_NoNumpyHandler(object):
         assert not HAVE_NP
         assert NP_HANDLER is None
 
-    def test_can_access_dataset(self):
+    def test_can_access_supported_dataset(self):
         """Test that we can read and access elements in dataset."""
         # Explicit little
         ds = dcmread(EXPL_16_1_1F)
@@ -179,6 +209,13 @@ class TestNoNumpy_NoNumpyHandler(object):
         ds = dcmread(EXPB_16_1_1F)
         assert 'CompressedSamples^MR1' == ds.PatientName
         assert 8192 == len(ds.PixelData)
+
+    @pytest.mark.parametrize("fpath,data", REFERENCE_DATA_UNSUPPORTED)
+    def test_can_access_unsupported_dataset(self, fpath, data):
+        """Test can read and access elements in unsupported datasets."""
+        ds = dcmread(fpath)
+        assert data[0] == ds.file_meta.TransferSyntaxUID
+        assert data[1] == ds.PatientName
 
     def test_pixel_array_raises(self):
         """Test pixel_array raises exception for all syntaxes."""
@@ -211,7 +248,7 @@ class TestNumpy_NoNumpyHandler(object):
         # We numpy handler should still be available
         assert NP_HANDLER is not None
 
-    def test_can_access_dataset(self):
+    def test_can_access_supported_dataset(self):
         """Test that we can read and access elements in dataset."""
         # Explicit little
         ds = dcmread(EXPL_16_1_1F)
@@ -232,6 +269,13 @@ class TestNumpy_NoNumpyHandler(object):
         ds = dcmread(EXPB_16_1_1F)
         assert 'CompressedSamples^MR1' == ds.PatientName
         assert 8192 == len(ds.PixelData)
+
+    @pytest.mark.parametrize("fpath,data", REFERENCE_DATA_UNSUPPORTED)
+    def test_can_access_unsupported_dataset(self, fpath, data):
+        """Test can read and access elements in unsupported datasets."""
+        ds = dcmread(fpath)
+        assert data[0] == ds.file_meta.TransferSyntaxUID
+        assert data[1] == ds.PatientName
 
     def test_pixel_array_raises(self):
         """Test pixel_array raises exception for all syntaxes."""
@@ -263,10 +307,9 @@ MATCHING_DATASETS = [
     (EXPL_32_3_2F, EXPB_32_3_2F)
 ]
 
-
 EXPL = ExplicitVRLittleEndian
 IMPL = ImplicitVRLittleEndian
-REFERENCE_DATA_LITTLE = {
+REFERENCE_DATA_LITTLE = [
     # fpath, (syntax, bits, nr samples, pixel repr, nr frames, shape, dtype)
     (EXPL_1_1_1F, (EXPL, 1, 1, 0, 1, (512, 512), 'uint8')),
     (EXPL_1_1_3F, (EXPL, 1, 1, 0, 3, (3, 512, 512), 'uint8')),
@@ -283,16 +326,12 @@ REFERENCE_DATA_LITTLE = {
     (IMPL_32_1_15F, (IMPL, 32, 1, 0, 15, (15, 10, 10), 'uint32')),
     # (EXPL_32_3_1F, (EXPL, 32, 3, 0, 1, (100, 100, 3), 'uint32')),
     (EXPL_32_3_2F, (EXPL, 32, 3, 0, 2, (2, 100, 100, 3), 'uint32')),
-}
+]
 
 
 @pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
 class TestNumpy_NumpyHandler(object):
-    """Tests for handling Pixel Data with the handler.
-
-    The tests spot check values for little endian pixel data and then uses the
-    little endian pixel aray as the reference for the other transfer syntaxes.
-    """
+    """Tests for handling Pixel Data with the handler."""
     def setup(self):
         """Setup the test datasets and the environment."""
         self.original_handlers = pydicom.config.image_handlers
@@ -316,13 +355,15 @@ class TestNumpy_NumpyHandler(object):
                                match='image handler could decode'):
                 ds.pixel_array
 
-    def test_can_access_dataset(self):
-        """Test that we can read and access elements in dataset."""
-        #
-        pass
+    @pytest.mark.parametrize("fpath, data", REFERENCE_DATA_UNSUPPORTED)
+    def test_can_access_unsupported_dataset(self, fpath, data):
+        """Test can read and access elements in unsupported datasets."""
+        ds = dcmread(fpath)
+        assert data[0] == ds.file_meta.TransferSyntaxUID
+        assert data[1] == ds.PatientName
 
-    def test_pixel_array_8bit_signed(self):
-        """Test pixel_array for unsigned -> signed data."""
+    def test_pixel_array_8bit_un_signed(self):
+        """Test pixel_array for 8-bit unsigned -> signed data."""
         ds = dcmread(EXPL_8_1_1F)
         # 0 is unsigned int, 1 is 2's complement
         assert ds.PixelRepresentation == 0
@@ -336,11 +377,33 @@ class TestNumpy_NumpyHandler(object):
         assert (1, -10, 1) == tuple(arr[300, 491:494])
         assert 0 == arr[-1].min() == arr[-1].max()
 
-    def test_pixel_array_16bit_signed(self):
-        pass
+    def test_pixel_array_16bit_un_signed(self):
+        """Test pixel_array for 16-bit unsigned -> signed."""
+        ds = dcmread(EXPL_16_3_1F)
+        # 0 is unsigned int, 1 is 2's complement
+        assert ds.PixelRepresentation == 0
+        ds.PixelRepresentation = 1
+        arr = ds.pixel_array
+        ref = dcmread(EXPL_16_3_1F)
 
-    def test_pixel_array_32bit_signed(self):
-        pass
+        assert not np.array_equal(arr, ref.pixel_array)
+        assert (100, 100, 3) == arr.shape
+        assert -1 == arr[0, :, 0].min() == arr[0, :, 0].max()
+        assert -32640 == arr[50, :, 0].min() == arr[50, :, 0].max()
+
+    def test_pixel_array_32bit_un_signed(self):
+        """Test pixel_array for 32-bit unsigned -> signed."""
+        ds = dcmread(EXPL_32_3_1F)
+        # 0 is unsigned int, 1 is 2's complement
+        assert ds.PixelRepresentation == 0
+        ds.PixelRepresentation = 1
+        arr = ds.pixel_array
+        ref = dcmread(EXPL_32_3_1F)
+
+        assert not np.array_equal(arr, ref.pixel_array)
+        assert (100, 100, 3) == arr.shape
+        assert -1 == arr[0, :, 0].min() == arr[0, :, 0].max()
+        assert -2139062144 == arr[50, :, 0].min() == arr[50, :, 0].max()
 
     def test_raise_if_endianess_not_set(self):
         """Test pixel_array raises an exception if no endianness set."""
@@ -349,6 +412,96 @@ class TestNumpy_NumpyHandler(object):
         ds.is_little_endian = None
         with pytest.raises(ValueError, match="'is_little_endian' has to be"):
             ds.pixel_array
+
+    # Endian independent datasets
+    def test_8bit_1sample_1frame(self):
+        """Test pixel_array for 8-bit, 1 sample/pixel, 1 frame."""
+        # Check supported syntaxes
+        ds = dcmread(EXPL_8_1_1F)
+        for uid in SUPPORTED_SYNTAXES:
+            ds.file_meta.TransferSyntaxUID = uid
+            arr = ds.pixel_array
+
+            assert (600, 800) == arr.shape
+            assert 244 == arr[0].min() == arr[0].max()
+            assert (1, 246, 1) == tuple(arr[300, 491:494])
+            assert 0 == arr[-1].min() == arr[-1].max()
+
+    def test_8bit_1sample_2frame(self):
+        """Test pixel_array for 8-bit, 1 sample/pixel, 2 frame."""
+        # Check supported syntaxes
+        ds = dcmread(EXPL_8_1_2F)
+        for uid in SUPPORTED_SYNTAXES[:3]:
+            ds.file_meta.TransferSyntaxUID = uid
+            arr = ds.pixel_array
+
+            assert (2, 600, 800) == arr.shape
+            # Frame 1
+            assert 244 == arr[0, 0].min() == arr[0, 0].max()
+            assert (1, 246, 1) == tuple(arr[0, 300, 491:494])
+            assert 0 == arr[0, -1].min() == arr[0, -1].max()
+            # Frame 2 is frame 1 inverted
+            assert np.array_equal((2**ds.BitsAllocated - 1) - arr[1], arr[0])
+
+    def test_8bit_3sample_1frame_odd_size(self):
+        """Test pixel_array for odd sized (3x3) pixel data."""
+        # Check supported syntaxes
+        ds = dcmread(EXPL_8_3_1F_ODD)
+        for uid in SUPPORTED_SYNTAXES:
+            ds.file_meta.TransferSyntaxUID = uid
+            arr = ds.pixel_array
+
+            assert ds.pixel_array[0].tolist() == [
+                [166, 141, 52], [166, 141, 52], [166, 141, 52]
+            ]
+            assert ds.pixel_array[1].tolist() == [
+                [63, 87, 176], [63, 87, 176], [63, 87, 176]
+            ]
+            assert ds.pixel_array[2].tolist() == [
+                [158, 158, 158], [158, 158, 158], [158, 158, 158]
+            ]
+
+    def test_8bit_3sample_1frame(self):
+        """Test pixel_array for 8-bit, 3 sample/pixel, 1 frame."""
+        # Check supported syntaxes
+        ds = dcmread(EXPL_8_3_1F)
+        for uid in SUPPORTED_SYNTAXES:
+            ds.file_meta.TransferSyntaxUID = uid
+            arr = ds.pixel_array
+
+            assert (255, 0, 0) == tuple(arr[5, 50, :])
+            assert (255, 128, 128) == tuple(arr[15, 50, :])
+            assert (0, 255, 0) == tuple(arr[25, 50, :])
+            assert (128, 255, 128) == tuple(arr[35, 50, :])
+            assert (0, 0, 255) == tuple(arr[45, 50, :])
+            assert (128, 128, 255) == tuple(arr[55, 50, :])
+            assert (0, 0, 0) == tuple(arr[65, 50, :])
+            assert (64, 64, 64) == tuple(arr[75, 50, :])
+            assert (192, 192, 192) == tuple(arr[85, 50, :])
+            assert (255, 255, 255) == tuple(arr[95, 50, :])
+
+    def test_8bit_3sample_2frame(self):
+        """Test pixel_array for 8-bit, 3 sample/pixel, 2 frame."""
+        # Check supported syntaxes
+        ds = dcmread(EXPL_8_3_2F)
+        for uid in SUPPORTED_SYNTAXES:
+            ds.file_meta.TransferSyntaxUID = uid
+            arr = ds.pixel_array
+
+             # Frame 1
+            frame = arr[0]
+            assert (255, 0, 0) == tuple(frame[5, 50, :])
+            assert (255, 128, 128) == tuple(frame[15, 50, :])
+            assert (0, 255, 0) == tuple(frame[25, 50, :])
+            assert (128, 255, 128) == tuple(frame[35, 50, :])
+            assert (0, 0, 255) == tuple(frame[45, 50, :])
+            assert (128, 128, 255) == tuple(frame[55, 50, :])
+            assert (0, 0, 0) == tuple(frame[65, 50, :])
+            assert (64, 64, 64) == tuple(frame[75, 50, :])
+            assert (192, 192, 192) == tuple(frame[85, 50, :])
+            assert (255, 255, 255) == tuple(frame[95, 50, :])
+            # Frame 2 is frame 1 inverted
+            assert np.array_equal((2**ds.BitsAllocated - 1) - arr[1], arr[0])
 
     # Little endian datasets
     @pytest.mark.parametrize('fpath, data', REFERENCE_DATA_LITTLE)
@@ -376,7 +529,7 @@ class TestNumpy_NumpyHandler(object):
             if size % 2:
                 assert ds.PixelData[-1] == b'\x00'[0]
 
-    def test_x_little_1bit_1sample_1frame(self):
+    def test_little_1bit_1sample_1frame(self):
         """Test pixel_array for little 1-bit, 1 sample/pixel, 1 frame."""
         # Check all little endian syntaxes
         ds = dcmread(EXPL_1_1_1F)
@@ -384,114 +537,72 @@ class TestNumpy_NumpyHandler(object):
             ds.file_meta.TransferSyntaxUID = uid
             arr = ds.pixel_array
 
-    def test_x_little_1bit_1sample_3frame(self):
+            assert arr.max() == 1
+            assert arr.min() == 0
+
+            assert (0, 1, 1) == tuple(arr[155, 180:183])
+            assert (1, 0, 1, 0) == tuple(arr[155, 310:314])
+            assert (0, 1, 1) == tuple(arr[254, 78:81])
+            assert (1, 0, 0, 1, 1, 0) == tuple(arr[254, 304:310])
+
+    def test_little_1bit_1sample_3frame(self):
         """Test pixel_array for little 1-bit, 1 sample/pixel, 3 frame."""
         # Check all little endian syntaxes
         ds = dcmread(EXPL_1_1_3F)
         for uid in SUPPORTED_SYNTAXES[:3]:
-            # Three frames, 512 x 512, packed to 1 bit
-            assert len(ds.PixelData) == 3 * 512 * 512 / 8
+            ds.file_meta.TransferSyntaxUID = uid
             arr = ds.pixel_array
+
+            assert arr.max() == 1
+            assert arr.min() == 0
+
+            # Frame 1
+            assert (0, 1, 1) == tuple(arr[0, 155, 180:183])
+            assert (1, 0, 1, 0) == tuple(arr[0, 155, 310:314])
+            assert (0, 1, 1) == tuple(arr[0, 254, 78:81])
+            assert (1, 0, 0, 1, 1, 0) == tuple(arr[0, 254, 304:310])
+
             assert 0 == arr[0][0][0]
             assert 0 == arr[2][511][511]
             assert 1 == arr[1][256][256]
 
+            # Frame 2
+            assert 0 == arr[1, 146, :254].max()
+            assert (0, 1, 1, 1, 1, 1, 0, 1) == tuple(arr[1, 146, 253:261])
+            assert 0 == arr[1, 146, 261:].max()
+
+            assert 0 == arr[1, 210, :97].max()
+            assert 1 == arr[1, 210, 97:350].max()
+            assert 0 == arr[1, 210, 350:].max()
+
+            # Frame 3
+            assert 0 == arr[2, 147, :249].max()
+            assert (0, 1, 0, 1, 1, 1) == tuple(arr[2, 147, 248:254])
+            assert (1, 0, 1, 0, 1, 1) == tuple(arr[2, 147, 260:266])
+            assert 0 == arr[2, 147, 283:].max()
+
+            assert 0 == arr[2, 364, :138].max()
+            assert (0, 1, 0, 1, 1, 0, 0, 1) == tuple(arr[2, 364, 137:145])
+            assert (1, 0, 0, 1, 0) == tuple(arr[2, 364, 152:157])
+            assert 0 == arr[2, 364, 157:].max()
+
     @pytest.mark.skip(reason='No suitable dataset available')
-    def test_x_little_1bit_3sample_1frame(self):
+    def test_little_1bit_3sample_1frame(self):
         """Test pixel_array for little 1-bit, 3 sample/pixel, 1 frame."""
         # Check all little endian syntaxes
-        ds = dcmread(EXPL_1_3_1F)
+        ds = dcmread(None)
         for uid in SUPPORTED_SYNTAXES[:3]:
             ds.file_meta.TransferSyntaxUID = uid
             arr = ds.pixel_array
 
     @pytest.mark.skip(reason='No suitable dataset available')
-    def test_x_little_1bit_3sample_10frame(self):
+    def test_little_1bit_3sample_10frame(self):
         """Test pixel_array for little 1-bit, 3 sample/pixel, 10 frame."""
         # Check all little endian syntaxes
-        ds = dcmread(EXPL_1_3_10F)
+        ds = dcmread(None)
         for uid in SUPPORTED_SYNTAXES[:3]:
             ds.file_meta.TransferSyntaxUID = uid
             arr = ds.pixel_array
-
-    def test_little_8bit_1sample_1frame(self):
-        """Test pixel_array for little 8-bit, 1 sample/pixel, 1 frame."""
-        # Check all little endian syntaxes
-        ds = dcmread(EXPL_8_1_1F)
-        for uid in SUPPORTED_SYNTAXES[:3]:
-            ds.file_meta.TransferSyntaxUID = uid
-            arr = ds.pixel_array
-
-            assert (600, 800) == arr.shape
-            assert 244 == arr[0].min() == arr[0].max()
-            assert (1, 246, 1) == tuple(arr[300, 491:494])
-            assert 0 == arr[-1].min() == arr[-1].max()
-
-    def test_little_8bit_1sample_2frame(self):
-        """Test pixel_array for little 8-bit, 1 sample/pixel, 2 frame."""
-        # Check all little endian syntaxes
-        ds = dcmread(EXPL_8_1_2F)
-        for uid in SUPPORTED_SYNTAXES[:3]:
-            ds.file_meta.TransferSyntaxUID = uid
-            arr = ds.pixel_array
-
-            assert (2, 600, 800) == arr.shape
-            # Frame 1
-            assert 244 == arr[0, 0].min() == arr[0, 0].max()
-            assert (1, 246, 1) == tuple(arr[0, 300, 491:494])
-            assert 0 == arr[0, -1].min() == arr[0, -1].max()
-            # Frame 2 is frame 1 inverted
-            assert np.array_equal((2**ds.BitsAllocated - 1) - arr[1], arr[0])
-
-    def test_x_little_8bit_3sample_1frame_odd_size(self):
-        """Test pixel_array for odd sized (3x3) pixel data."""
-        # Check all little endian syntaxes
-        ds = dcmread(EXPL_8_3_1F_ODD)
-        for uid in SUPPORTED_SYNTAXES[:3]:
-            ds.file_meta.TransferSyntaxUID = uid
-            arr = ds.pixel_array
-
-    def test_little_8bit_3sample_1frame(self):
-        """Test pixel_array for little 8-bit, 3 sample/pixel, 1 frame."""
-        # Check all little endian syntaxes
-        ds = dcmread(EXPL_8_3_1F)
-        for uid in SUPPORTED_SYNTAXES[:3]:
-            ds.file_meta.TransferSyntaxUID = uid
-            arr = ds.pixel_array
-
-            assert (255, 0, 0) == tuple(arr[5, 50, :])
-            assert (255, 128, 128) == tuple(arr[15, 50, :])
-            assert (0, 255, 0) == tuple(arr[25, 50, :])
-            assert (128, 255, 128) == tuple(arr[35, 50, :])
-            assert (0, 0, 255) == tuple(arr[45, 50, :])
-            assert (128, 128, 255) == tuple(arr[55, 50, :])
-            assert (0, 0, 0) == tuple(arr[65, 50, :])
-            assert (64, 64, 64) == tuple(arr[75, 50, :])
-            assert (192, 192, 192) == tuple(arr[85, 50, :])
-            assert (255, 255, 255) == tuple(arr[95, 50, :])
-
-    def test_little_8bit_3sample_2frame(self):
-        """Test pixel_array for little 8-bit, 3 sample/pixel, 2 frame."""
-        # Check all little endian syntaxes
-        ds = dcmread(EXPL_8_3_2F)
-        for uid in SUPPORTED_SYNTAXES[:3]:
-            ds.file_meta.TransferSyntaxUID = uid
-            arr = ds.pixel_array
-
-             # Frame 1
-            frame = arr[0]
-            assert (255, 0, 0) == tuple(frame[5, 50, :])
-            assert (255, 128, 128) == tuple(frame[15, 50, :])
-            assert (0, 255, 0) == tuple(frame[25, 50, :])
-            assert (128, 255, 128) == tuple(frame[35, 50, :])
-            assert (0, 0, 255) == tuple(frame[45, 50, :])
-            assert (128, 128, 255) == tuple(frame[55, 50, :])
-            assert (0, 0, 0) == tuple(frame[65, 50, :])
-            assert (64, 64, 64) == tuple(frame[75, 50, :])
-            assert (192, 192, 192) == tuple(frame[85, 50, :])
-            assert (255, 255, 255) == tuple(frame[95, 50, :])
-            # Frame 2 is frame 1 inverted
-            assert np.array_equal((2**ds.BitsAllocated - 1) - arr[1], arr[0])
 
     def test_little_16bit_1sample_1frame(self):
         """Test pixel_array for little 16-bit, 1 sample/pixel, 1 frame."""
@@ -656,8 +767,8 @@ class TestNumpy_NumpyHandler(object):
             assert np.array_equal((2**ds.BitsAllocated - 1) - arr[1], arr[0])
 
     # Big endian datasets
-    @pytest.mark.parametrize('little,big', MATCHING_DATASETS)
-    def test_big_endian_datasets(self, big, little):
+    @pytest.mark.parametrize('little, big', MATCHING_DATASETS)
+    def test_big_endian_datasets(self, little, big):
         """Test pixel_array for big endian matches little."""
         ds = dcmread(big)
         assert ds.file_meta.TransferSyntaxUID == ExplicitVRBigEndian
