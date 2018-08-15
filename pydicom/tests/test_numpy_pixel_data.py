@@ -378,6 +378,7 @@ class TestNumpy_NumpyHandler(object):
         assert (1, -10, 1) == tuple(arr[300, 491:494])
         assert 0 == arr[-1].min() == arr[-1].max()
 
+    @pytest.mark.skip(reason='Samples/pixel>1, BitsAllocated>8 not supported')
     def test_pixel_array_16bit_un_signed(self):
         """Test pixel_array for 16-bit unsigned -> signed."""
         ds = dcmread(EXPL_16_3_1F)
@@ -392,6 +393,7 @@ class TestNumpy_NumpyHandler(object):
         assert -1 == arr[0, :, 0].min() == arr[0, :, 0].max()
         assert -32640 == arr[50, :, 0].min() == arr[50, :, 0].max()
 
+    @pytest.mark.skip(reason='Samples/pixel>1, BitsAllocated>8 not supported')
     def test_pixel_array_32bit_un_signed(self):
         """Test pixel_array for 32-bit unsigned -> signed."""
         ds = dcmread(EXPL_32_3_1F)
