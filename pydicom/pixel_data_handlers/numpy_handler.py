@@ -237,7 +237,7 @@ def _pack_bits(arr):
     pass
 
 
-def _unpack_bits(bytestream):
+def _unpack_bits(bytestream, force=False):
     """Unpack BitsAllocated = 1 packed pixel data.
 
     Parameters
@@ -257,7 +257,7 @@ def _unpack_bits(bytestream):
     ----------
     DICOM Standard, Part 5, Section 8.1.1 and Annex D
     """
-    if 'PyPy' not in python_implementation():
+    if not force and 'PyPy' not in python_implementation():
         # Thanks to @sbrodehl (#643)
         # e.g. b'\xC0\x09' -> [192, 9]
         arr = np.frombuffer(bytestream, dtype='uint8')
@@ -269,12 +269,14 @@ def _unpack_bits(bytestream):
         # -> [[0 0 0 0 0 0 1 1],
         #     [1 0 0 1 0 0 0 0]]
         arr = np.fliplr(arr)
-    else:
+        # -> [0 0 0 0 0 0 1 1 1 0 0 1 0 0 0 0]
+        arr = np.ravel(arr)
+    elif force or 'PyPy' in python_implementation():
         # Slow!
         # if single bits are used for binary representation, a uint8 array
         # has to be converted to a binary-valued array (that is 8 times bigger)
         bit = 0
-        arr = np.ndarray(shape=(actual_length * 8), dtype='uint8')
+        arr = np.ndarray(shape=(len(bytestream) * 8), dtype='uint8')
         # bit-packed pixels are packed from the right; i.e., the first pixel
         #  in the image frame corresponds to the first from the right bit of
         #  the first byte of the packed PixelData!
@@ -286,12 +288,10 @@ def _unpack_bits(bytestream):
                 byte = ord(byte)
 
             for bit in range(bit, bit + 8):
-                pixel_array[bit] = byte & 1
+                arr[bit] = byte & 1
                 byte >>= 1
 
             bit += 1
-
-        arr = arr[:expected_bit_length]
 
     return arr
 
@@ -352,7 +352,7 @@ def get_pixeldata(ds):
     # Unpack the pixel data into an ndarray
     if ds.BitsAllocated > 1 :
         nr_pixels = _get_expected_length(ds, units='pixels')
-        arr = _unpack_bits(ds.PixelData[:nr_pixels])
+        arr = _unpack_bits(ds.PixelData)[:nr_pixels]
     else:
         arr = np.frombuffer(ds.PixelData[:expected_len], dtype=_pixel_dtype(ds))
 
