@@ -170,6 +170,7 @@ REFERENCE_DATA_UNSUPPORTED = [
     (RLE, ('1.2.840.10008.1.2.5', 'CompressedSamples^MR1')),
 ]
 
+
 # Numpy and the numpy handler are unavailable
 @pytest.mark.skipif(HAVE_NP, reason='Numpy is available')
 class TestNoNumpy_NoNumpyHandler(object):
@@ -488,7 +489,7 @@ class TestNumpy_NumpyHandler(object):
             ds.file_meta.TransferSyntaxUID = uid
             arr = ds.pixel_array
 
-             # Frame 1
+            # Frame 1
             frame = arr[0]
             assert (255, 0, 0) == tuple(frame[5, 50, :])
             assert (255, 128, 128) == tuple(frame[15, 50, :])
@@ -637,7 +638,7 @@ class TestNumpy_NumpyHandler(object):
             assert (25, 4, 9) == tuple(arr[-1, 31, :3])
             assert (227, 300, 147) == tuple(arr[-1, -1, -3:])
 
-    #@pytest.mark.skip(reason='Samples/pixel>1, BitsAllocated>8 not supported')
+    @pytest.mark.skip(reason='Samples/pixel>1, BitsAllocated>8 not supported')
     def test_little_16bit_3sample_1frame(self):
         """Test pixel_array for little 16-bit, 3 sample/pixel, 1 frame."""
         # Check all little endian syntaxes
@@ -712,25 +713,25 @@ class TestNumpy_NumpyHandler(object):
             assert (1031000, 1031000, 1031000) == tuple(arr[-1, 4, 3:6])
             assert (801000, 800000, 799000) == tuple(arr[-1, -1, -3:])
 
-    #@pytest.mark.skip(reason='Samples/pixel>1, BitsAllocated>8 not supported')
+    @pytest.mark.skip(reason='Samples/pixel>1, BitsAllocated>8 not supported')
     def test_little_32bit_3sample_1frame(self):
         """Test pixel_array for little 32-bit, 3 sample/pixel, 1 frame."""
         # Check all little endian syntaxes
         ds = dcmread(EXPL_32_3_1F)
         for uid in SUPPORTED_SYNTAXES[:3]:
             ds.file_meta.TransferSyntaxUID = uid
-            arr = ds.pixel_array
+            ar = ds.pixel_array
 
-            assert (4294967295, 0, 0) == tuple(arr[5, 50, :])
-            assert (4294967295, 2155905152, 2155905152) == tuple(arr[15, 50, :])
-            assert (0, 4294967295, 0) == tuple(arr[25, 50, :])
-            assert (2155905152, 4294967295, 2155905152) == tuple(arr[35, 50, :])
-            assert (0, 0, 4294967295) == tuple(arr[45, 50, :])
-            assert (2155905152, 2155905152, 4294967295) == tuple(arr[55, 50, :])
-            assert (0, 0, 0) == tuple(arr[65, 50, :])
-            assert (1077952576, 1077952576, 1077952576) == tuple(arr[75, 50, :])
-            assert (3233857728, 3233857728, 3233857728) == tuple(arr[85, 50, :])
-            assert (4294967295, 4294967295, 4294967295) == tuple(arr[95, 50, :])
+            assert (4294967295, 0, 0) == tuple(ar[5, 50, :])
+            assert (4294967295, 2155905152, 2155905152) == tuple(ar[15, 50, :])
+            assert (0, 4294967295, 0) == tuple(ar[25, 50, :])
+            assert (2155905152, 4294967295, 2155905152) == tuple(ar[35, 50, :])
+            assert (0, 0, 4294967295) == tuple(ar[45, 50, :])
+            assert (2155905152, 2155905152, 4294967295) == tuple(ar[55, 50, :])
+            assert (0, 0, 0) == tuple(ar[65, 50, :])
+            assert (1077952576, 1077952576, 1077952576) == tuple(ar[75, 50, :])
+            assert (3233857728, 3233857728, 3233857728) == tuple(ar[85, 50, :])
+            assert (4294967295, 4294967295, 4294967295) == tuple(ar[95, 50, :])
 
     def test_little_32bit_3sample_2frame(self):
         """Test pixel_array for little 32-bit, 3 sample/pixel, 10 frame."""

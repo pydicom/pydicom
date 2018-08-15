@@ -748,7 +748,7 @@ class Dataset(dict):
                                                   self.Rows, self.Columns)
         else:
             if self.SamplesPerPixel > 1:
-                #if self.BitsAllocated == 8:
+                if self.BitsAllocated == 8:
                     if self.PlanarConfiguration == 0:
                         pixel_array = pixel_array.reshape(
                             self.Rows, self.Columns, self.SamplesPerPixel)
@@ -756,10 +756,10 @@ class Dataset(dict):
                         pixel_array = pixel_array.reshape(
                             self.SamplesPerPixel, self.Rows, self.Columns)
                         pixel_array = pixel_array.transpose(1, 2, 0)
-                #else:
-                #    raise NotImplementedError("This code only handles "
-                #                              "SamplesPerPixel > 1 if Bits "
-                #                              "Allocated = 8")
+                else:
+                    raise NotImplementedError("This code only handles "
+                                              "SamplesPerPixel > 1 if Bits "
+                                              "Allocated = 8")
             else:
                 pixel_array = pixel_array.reshape(self.Rows, self.Columns)
         return pixel_array
