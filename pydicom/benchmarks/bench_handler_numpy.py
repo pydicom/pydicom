@@ -1,10 +1,19 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
-"""Benchmarks for the numpy_handler module."""
+"""Benchmarks for the numpy_handler module.
+
+Requires asv and numpy.
+"""
+
+from tempfile import TemporaryFile
+
+import numpy as np
 
 from pydicom import dcmread
+from pydicom.dataset import Dataset
 from pydicom.data import get_testdata_files
 from pydicom.encaps import decode_data_sequence
 from pydicom.pixel_data_handlers.numpy_handler import get_pixeldata
+from pydicom.uid import ExplicitVRLittleEndian, generate_uid
 
 
 # 1/1, 1 sample/pixel, 1 frame
@@ -37,6 +46,67 @@ EXPL_32_3_1F = get_testdata_files("SC_rgb_32bit.dcm")[0]
 EXPL_32_3_2F = get_testdata_files("SC_rgb_32bit_2frame.dcm")[0]
 
 
+def _create_temporary_dataset(shape=(100, 1024, 1024, 3), bit_depth=16):
+    """Function to create a temporary dataset for use in testing.
+
+    Parameters
+    ----------
+    shape : 4-tuple
+        The (frames, rows, columns, channels) of the test dataset.
+    bit_depth : int
+        The BitsAllocated value to use for the dataset, one of 8, 16, 32, 64.
+
+    Returns
+    -------
+    tempfile.TemporaryFile
+        A created DICOM File Format conformant dataset.
+    """
+    ds = Dataset()
+    ds.is_little_endian = True
+    ds.is_implicit_VR = False
+    ds.file_meta = Dataset()
+    ds.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
+    ds.SOPClassUID = '1.2.3.4'
+    ds.SOPInstanceUID = generate_uid()
+    ds.BitsAllocated = bit_depth
+    ds.PixelRepresentation = 0
+    ds.PlanarConfiguration = 0
+    ds.Rows = shape[1]
+    ds.Columns = shape[2]
+    ds.NumberOfFrames = shape[0]
+    ds.SamplesPerPixel = shape[3]
+    if shape[3] == 1:
+        ds.PhotometricInterpretation = 'MONOCHROME2'
+    elif shape[3] == 3:
+        ds.PhotometricInterpretation = 'RGB'
+
+    arr = np.zeros(shape, dtype='uint{}'.format(bit_depth))
+    ds.PixelData = arr.tobytes()
+
+    if len(ds.PixelData) % 2:
+        ds.PixelData += b'\x00'
+
+    tfile = TemporaryFile(mode='w+b')
+    ds.save_as(tfile, write_like_original=False)
+    tfile.seek(0)
+
+    return tfile
+
+
+class TimeGetPixelData_LargeDataset(object):
+    """Time tests for numpy_handler.get_pixeldata with large datasets."""
+    def setup(self):
+        """Setup the tests."""
+        self.no_runs = 100
+
+        self.ds_16_3_100 = dcmread(_create_temporary_dataset())
+
+    def time_large_dataset(self):
+        """Time reading pixel data from a large dataset."""
+        for ii in range(self.no_runs):
+            get_pixeldata(self.ds_16_3_100)
+
+
 class TimeGetPixelData(object):
     """Time tests for numpy_handler.get_pixeldata."""
     def setup(self):
@@ -60,12 +130,14 @@ class TimeGetPixelData(object):
 
     def time_1bit_1sample_1frame(self):
         """Time retrieval of 1-bit, 1 sample/pixel, 1 frame."""
-        for ii in range(self.no_runs):
+        # Slow!
+        for ii in range(1):
             get_pixeldata(self.ds_1_1_1)
 
     def time_1bit_1sample_3frame(self):
         """Time retrieval of 1-bit, 1 sample/pixel, 3 frame."""
-        for ii in range(self.no_runs):
+        # Slow!
+        for ii in range(1):
             get_pixeldata(self.ds_1_1_3)
 
     def time_8bit_1sample_1frame(self):
