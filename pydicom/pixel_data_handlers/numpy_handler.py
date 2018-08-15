@@ -1,5 +1,5 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
-"""Use the numpy package to decode pixel transfer syntaxes.
+"""Use the numpy package to convert supported pixel data to an ndarray.
 
 **Supported transfer syntaxes**
 
@@ -8,7 +8,7 @@
 * 1.2.840.10008.1.2.1.99 : Deflated Explicit VR Little Endian
 * 1.2.840.10008.1.2.2 : Explicit VR Big Endian
 
-**Supported Data**
+**Supported data**
 
 The numpy handler supports the conversion of data in the (7fe0,0010)
 *Pixel Data* element to a numpy ndarray provided the related Image Pixel module
@@ -48,8 +48,7 @@ from sys import byteorder
 
 import numpy as np
 
-from pydicom import compat
-from pydicom.pixel_data_handlers.util import dtype_corrected_for_endianess
+from pydicom.compat import in_py2 as IN_PYTHON2
 from pydicom.uid import (
     ExplicitVRLittleEndian,
     ImplicitVRLittleEndian,
@@ -238,7 +237,7 @@ def _pack_bits(arr):
     pass
 
 
-def _unpack_bits(bytestream, force=False):
+def _unpack_bits(bytestream):
     """Unpack BitsAllocated = 1 packed pixel data.
 
     Parameters
@@ -259,6 +258,7 @@ def _unpack_bits(bytestream, force=False):
     DICOM Standard, Part 5, Section 8.1.1 and Annex D
     """
     if 'PyPy' not in python_implementation():
+        # Thanks to @sbrodehl (#643)
         # e.g. b'\xC0\x09' -> [192, 9]
         arr = np.frombuffer(bytestream, dtype='uint8')
         # -> [1 1 0 0 0 0 0 0 0 0 0 0 1 0 0 1]
@@ -282,7 +282,7 @@ def _unpack_bits(bytestream, force=False):
         #  * DICOM 3.5 Sect 8.1.1 (explanation of bit ordering)
         #  * DICOM Annex D (examples of encoding)
         for byte in bytestream:
-            if compat.in_py2:
+            if IN_PYTHON2:
                 byte = ord(byte)
 
             for bit in range(bit, bit + 8):
