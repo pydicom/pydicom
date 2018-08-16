@@ -417,14 +417,6 @@ class TestNumpy_NumpyHandler(object):
         assert -1 == arr[0, :, 0].min() == arr[0, :, 0].max()
         assert -2139062144 == arr[50, :, 0].min() == arr[50, :, 0].max()
 
-    def test_raise_if_endianess_not_set(self):
-        """Test pixel_array raises an exception if no endianness set."""
-        # Regression test for #704
-        ds = dcmread(EXPL_8_1_1F)
-        ds.is_little_endian = None
-        ds.pixel_array
-        assert ds.is_little_endian
-
     # Endian independent datasets
     def test_8bit_1sample_1frame(self):
         """Test pixel_array for 8-bit, 1 sample/pixel, 1 frame."""
@@ -950,22 +942,6 @@ class TestNumpy_PixelDtype(object):
         self.ds = Dataset()
         self.ds.file_meta = Dataset()
         self.ds.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
-        self.ds.is_little_endian = True
-
-    def test_endianess_not_set(self):
-        """Test the endianess is set from the transfer syntax if unset."""
-        self.ds.PixelRepresentation = 0
-        self.ds.BitsAllocated = 8
-        self.ds.is_little_endian = None
-        assert self.ds.is_little_endian is None
-        _pixel_dtype(self.ds)
-        assert self.ds.is_little_endian
-
-        self.ds.file_meta.TransferSyntaxUID = ExplicitVRBigEndian
-        self.ds.is_little_endian = None
-        assert self.ds.is_little_endian is None
-        _pixel_dtype(self.ds)
-        assert not self.ds.is_little_endian
 
     def test_missing_element_raises(self):
         """Test that missing required elements raises exception."""
@@ -1041,7 +1017,8 @@ class TestNumpy_PixelDtype(object):
         self.ds.PixelRepresentation = pixel_repr
         # Correct for endianness of system
         ref_dtype = np.dtype(dtype)
-        if self.ds.is_little_endian != (byteorder == 'little'):
+        endianness = self.ds.file_meta.TransferSyntaxUID.is_little_endian
+        if endianness != (byteorder == 'little'):
             ref_dtype = ref_dtype.newbyteorder('S')
 
         assert ref_dtype == _pixel_dtype(self.ds)
@@ -1055,14 +1032,14 @@ class TestNumpy_PixelDtype(object):
 
         # < is little, = is native, > is big
         if byteorder == 'little':
-            self.ds.is_little_endian = True
+            self.ds.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
             assert _pixel_dtype(self.ds).byteorder in ['<', '=']
-            self.ds.is_little_endian = False
+            self.ds.file_meta.TransferSyntaxUID = ExplicitVRBigEndian
             assert _pixel_dtype(self.ds).byteorder == '>'
         elif byteorder == 'big':
-            self.ds.is_little_endian = True
+            self.ds.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
             assert _pixel_dtype(self.ds).byteorder == '<'
-            self.ds.is_little_endian = False
+            self.ds.file_meta.TransferSyntaxUID = ExplicitVRBigEndian
             assert _pixel_dtype(self.ds).byteorder in ['>', '=']
 
 

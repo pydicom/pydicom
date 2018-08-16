@@ -21,20 +21,9 @@ elements have values given in the table below.
 +=============+===========================+=======================+===========+
 | (0028,0102) | PixelRepresentation       | 0, 1                  | Required  |
 +-------------+---------------------------+-----------------------+-----------+
-| (0028,0011) | BitsAllocated             | 1, 8, 16, 32, 64, 128 | Required  |
+| (0028,0011) | BitsAllocated             | 1, 8, 16, 32          | Required  |
 +-------------+---------------------------+-----------------------+-----------+
 | (0028,0002) | SamplesPerPixel           | 1, 2, 3, ..., N       | Required  |
-+-------------+---------------------------+-----------------------+-----------+
-| (0028,0004) | PhotometricInterpretation | MONOCHROME1           | Required  |
-|             |                           | MONOCHROME2           |           |
-|             |                           | PALETTE COLOR         |           |
-|             |                           | RGB                   |           |
-|             |                           | YBR_FULL              |           |
-|             |                           | YBR_FULL_422          |           |
-|             |                           | YBR_PARTIAL_422       |           |
-|             |                           | YBR_PARTIAL_420       |           |
-|             |                           | YBR_ICT               |           |
-|             |                           | YBR_RCT               |           |
 +-------------+---------------------------+-----------------------+-----------+
 | (0028,0008) | NumberOfFrames            | 1, 2, ..., N          | Optional  |
 +-------------+---------------------------+-----------------------+-----------+
@@ -102,18 +91,17 @@ def _get_expected_length(ds, unit='bytes'):
     Parameters
     ----------
     ds : dataset.Dataset
-        The DICOM dataset containing the Image Pixel module to get the length
-        of the Pixel data.
+        The DICOM dataset containing the Image Pixel module and pixel data.
     unit : str, optional
-        If 'bytes' then returns the expected length of the Pixel Data (in
+        If 'bytes' then returns the expected length of the Pixel Data in
         whole bytes and NOT including an odd length trailing NULL padding
-        byte). If 'pixels' then returns the expected length of the Pixel Data
+        byte. If 'pixels' then returns the expected length of the Pixel Data
         in terms of the total number of pixels (default 'bytes').
 
     Returns
     -------
     int
-        The expected length of the Pixel Data in either bytes or pixels.
+        The expected length of the pixel data in either bytes or pixels.
     """
     length = ds.Rows * ds.Columns * ds.SamplesPerPixel
     length *= getattr(ds, 'NumberOfFrames', 1)
@@ -124,9 +112,8 @@ def _get_expected_length(ds, unit='bytes'):
     # Correct for the number of bytes per pixel
     if ds.BitsAllocated == 1:
         # Determine the nearest whole number of bytes needed to contain
-        #   1-bit pixel data
-        # e.g. 10 x 10 1-bit pixels is 100 bits, which are
-        #   packed into 12.5 -> 13 bytes
+        #   1-bit pixel data. e.g. 10 x 10 1-bit pixels is 100 bits, which
+        #   are packed into 12.5 -> 13 bytes
         length = length // 8 + (length % 8 > 0)
     else:
         length *= ds.BitsAllocated // 8
@@ -135,7 +122,7 @@ def _get_expected_length(ds, unit='bytes'):
 
 
 def _pixel_dtype(ds):
-    """Return a numpy dtype for the dataset in `ds`.
+    """Return a numpy dtype for the pixel data in dataset in `ds`.
 
     Suitable for use with IODs containing the Image Pixel module.
 
@@ -157,7 +144,7 @@ def _pixel_dtype(ds):
 
     Returns
     -------
-    np.dtype
+    numpy.dtype
         A numpy dtype suitable for containing the dataset's pixel data.
 
     Raises
@@ -168,10 +155,6 @@ def _pixel_dtype(ds):
         If the pixel data is of a type that isn't supported by either numpy
         or pydicom.
     """
-    # Ensure that the dataset's endianness attribute has been set
-    if ds.is_little_endian is None:
-        ds.is_little_endian = ds.file_meta.TransferSyntaxUID.is_little_endian
-
     # Check that the dataset has the required elements
     keywords = ['BitsAllocated', 'PixelRepresentation']
     missing = [elem for elem in keywords if elem not in ds]
@@ -187,9 +170,9 @@ def _pixel_dtype(ds):
     #   0x0000 - unsigned int
     #   0x0001 - 2's complement (signed int)
     if ds.PixelRepresentation == 0:
-        type_str = 'uint'
+        dtype_str = 'uint'
     elif ds.PixelRepresentation == 1:
-        type_str = 'int'
+        dtype_str = 'int'
     else:
         raise NotImplementedError(
             "Unable to determine the data type to use to contain the "
@@ -202,12 +185,12 @@ def _pixel_dtype(ds):
     #   The number of bits allocated for each pixel sample
     #   PS3.5 8.1.1: Bits Allocated shall either be 1 or a multiple of 8
     #  i.e. 1, 8, 16, 24, 32, 40, ...
-    #   numpy v1.13.0 supports 8, 16, 32, 64, 128, 256
+    #   numpy v1.13.0 supports 8, 16, 32, 64
     # For bit packed data we use uint8
     if ds.BitsAllocated == 1:
-        type_str = 'uint8'
+        dtype_str = 'uint8'
     elif ds.BitsAllocated > 0 and ds.BitsAllocated % 8 == 0:
-        type_str += str(ds.BitsAllocated)
+        dtype_str += str(ds.BitsAllocated)
     else:
         raise NotImplementedError(
             "Unable to determine the data type to use to contain the "
@@ -217,15 +200,16 @@ def _pixel_dtype(ds):
 
     # Check to see if the dtype is valid for numpy
     try:
-        dtype = np.dtype(type_str)
+        dtype = np.dtype(dtype_str)
     except TypeError:
         raise NotImplementedError(
             "The data type '{}' needed to contain the Pixel Data is not "
-            "supported by numpy".format(type_str)
+            "supported by numpy".format(dtype_str)
         )
 
     # Correct for endianness
-    if ds.is_little_endian != (byteorder == 'little'):
+    endianness = ds.file_meta.TransferSyntaxUID.is_little_endian
+    if endianness != (byteorder == 'little'):
         # 'S' swap from current to opposite
         dtype = dtype.newbyteorder('S')
 
@@ -272,23 +256,19 @@ def _pack_bits(arr, force=True):
     if arr.shape[0] % 8:
         arr = np.append(arr, np.zeros(8 - arr.shape[0] % 8))
 
+    # Reshape so each row is 8 bits
+    arr = np.reshape(arr, (-1, 8))
     if 'PyPy' not in python_implementation():
-        arr = np.reshape(arr, (-1, 8))
         arr = np.fliplr(arr)
         arr = np.packbits(arr.astype('uint8'))
         bytestream = arr.tostring()
     else:
         # Implementation for PyPy as it lacks np.packbits
-
         def _convert_to_decimal(x):
             """Return a decimal from the length 8 binary array."""
             return np.sum(x * [1, 2, 4, 8, 16, 32, 64, 128])
 
-        # Reshape so each row is 8 bits
-        arr = np.reshape(arr, (-1, 8))
-        # Convert to an array of decimals
         arr = np.apply_along_axis(_convert_to_decimal, axis=1, arr=arr)
-        # Convert to bytes
         bytestream = arr.astype('uint8').tostring()
 
     return bytestream
