@@ -240,7 +240,10 @@ def _pack_bits(arr):
     ----------
     arr : numpy.ndarray
         The ndarray containing 1-bit data as ints. The array must only contain
-        integer values of 0 and 1 and must have an uint or int dtype.
+        integer values of 0 and 1 and must have an uint or int dtype. For
+        the sake of efficiency its recommended that the array length be a
+        multiple of 8 (i.e. that any empty bit-padding to round out the byte
+        has already been added).
 
     Returns
     -------
@@ -252,24 +255,27 @@ def _pack_bits(arr):
     ValueError
         If `arr` contains anything other than 0 or 1.
     """
+    if arr.shape == (0,):
+        return bytes()
+
     # Test array
     if not np.array_equal(arr, arr.astype(bool)):
         raise ValueError(
-            "Only arrays containing either ones or zeroes can be packed."
+            "Only binary arrays (containing ones or zeroes) can be packed."
         )
 
     if len(arr.shape) > 1:
         raise ValueError("Only 1D arrays are supported.")
 
-    # The array must be a multiple of 8, pad the end
-    #if arr.shape[0] % 8:
-    #    pass
+    # The array length must be a multiple of 8, pad the end
+    if arr.shape[0] % 8:
+        arr = np.append(arr, np.zeros(8 - arr.shape[0] % 8))
 
     bytestream = bytearray()
     if 'PyPy' not in python_implementation():
         arr = np.reshape(arr, (-1, 8))
         arr = np.fliplr(arr)
-        arr = np.packbits(arr)
+        arr = np.packbits(arr.astype('uint8'))
         bytestream.extend(arr.tobytes())
     else:
         raise NotImplementedError(

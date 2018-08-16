@@ -865,6 +865,7 @@ REFERENCE_PACK_UNPACK = [
     (b'\xFF\x80', [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1]),
 ]
 
+
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
 class TestNumpy_UnpackBits(object):
     """Tests for numpy_handler._unpack_bits."""
@@ -874,21 +875,55 @@ class TestNumpy_UnpackBits(object):
         assert np.array_equal(np.asarray(output), _unpack_bits(input))
 
 
+REFERENCE_PACK_PARTIAL = [
+    #              | 1st byte              | 2nd byte
+    (b'\x00\x40', [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]),  # 15-bits
+    (b'\x00\x20', [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]),
+    (b'\x00\x10', [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]),
+    (b'\x00\x08', [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]),
+    (b'\x00\x04', [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]),
+    (b'\x00\x02', [0, 0, 0, 0, 0, 0, 0, 0, 0, 1]),
+    (b'\x00\x01', [0, 0, 0, 0, 0, 0, 0, 0, 1]),  # 9-bits
+    (b'\x80', [0, 0, 0, 0, 0, 0, 0, 1]),  # 8-bits
+    (b'\x40', [0, 0, 0, 0, 0, 0, 1]),
+    (b'\x20', [0, 0, 0, 0, 0, 1]),
+    (b'\x10', [0, 0, 0, 0, 1]),
+    (b'\x08', [0, 0, 0, 1]),
+    (b'\x04', [0, 0, 1]),
+    (b'\x02', [0, 1]),
+    (b'\x01', [1]),
+    (b'', []),
+]
+
+
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
 class TestNumpy_PackBits(object):
     """Tests for numpy_handler._pack_bits."""
-    #@pytest.mark.parametrize('output, input', REFERENCE_PACK_UNPACK)
-    #def test_unpack(self, input, output):
-    #    """Test empty data."""
-    #    assert output == _pack_bits(np.asarray(input))
+    @pytest.mark.parametrize('output, input', REFERENCE_PACK_UNPACK)
+    def test_pack(self, input, output):
+        """Test packing data."""
+        assert output == _pack_bits(np.asarray(input))
 
     def test_non_binary_input(self):
         """Test non-binary input raises exception."""
-        pass
+        with pytest.raises(ValueError,
+                           match="Only binary arrays \(containing ones or"):
+            _pack_bits(np.asarray([0, 0, 2, 0, 0, 0, 0, 0]))
 
     def test_non_array_input(self):
         """Test non 1D input raises exception."""
-        pass
+        with pytest.raises(ValueError, match='Only 1D arrays are supported'):
+            _pack_bits(
+                np.asarray(
+                    [[0, 0, 0, 0, 0, 0, 0, 0],
+                     [1, 0, 1, 0, 1, 0, 1, 0]]
+                )
+            )
+
+    @pytest.mark.parametrize('output, input', REFERENCE_PACK_PARTIAL)
+    def test_pack_partial(self, input, output):
+        """Test packing data that isn't a full byte long."""
+        assert output == _pack_bits(np.asarray(input))
 
 
 REFERENCE_DTYPE_GOOD = [
@@ -1022,8 +1057,6 @@ class TestNumpy_PixelDtype(object):
             assert _pixel_dtype(self.ds).byteorder == '<'
             self.ds.is_little_endian = False
             assert _pixel_dtype(self.ds).byteorder in ['>', '=']
-
-
 
 
 REFERENCE_LENGTH = [
