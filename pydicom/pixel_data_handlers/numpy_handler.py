@@ -233,7 +233,9 @@ def _pixel_dtype(ds):
 
 
 def _pack_bits(arr, force=True):
-    """Pack a 1-bit numpy ndarray into bytes for use with Pixel Data.
+    """Pack a binary numpy ndarray into bytes for use with Pixel Data.
+
+    Should be used in conjunction with (0028,0100) *BitsAllocated* = 1.
 
     Parameters
     ----------
@@ -285,9 +287,9 @@ def _pack_bits(arr, force=True):
         # Reshape so each row is 8 bits
         arr = np.reshape(arr, (-1, 8))
         # Convert to an array of decimals
-        arr = np.apply_along_axis(fn, axis=1, arr=arr).astype('uint8')
+        arr = np.apply_along_axis(_convert_to_decimal, axis=1, arr=arr)
         # Convert to bytes
-        bytestream = arr.tostring()
+        bytestream = arr.astype('uint8').tostring()
 
     return bytestream
 

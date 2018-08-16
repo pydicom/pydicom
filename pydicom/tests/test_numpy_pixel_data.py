@@ -926,14 +926,14 @@ class TestNumpy_PackBits(object):
         assert output == _pack_bits(np.asarray(input))
 
     def test_functional(self):
-        """Test against a real dataset."""
+        """Test against as real dataset."""
         ds = dcmread(EXPL_1_1_3F)
         arr = ds.pixel_array
         arr = arr.ravel()
         assert ds.PixelData == _pack_bits(arr)
 
 
-REFERENCE_DTYPE_GOOD = [
+REFERENCE_DTYPE = [
     # BitsAllocated, PixelRepresentation, numpy dtype string
     (1, 0, 'uint8'), (1, 1, 'uint8'),
     (8, 0, 'uint8'), (8, 1, 'int8'),
@@ -1034,7 +1034,7 @@ class TestNumpy_PixelDtype(object):
                            match="data type 'uint24' needed to contain"):
             _pixel_dtype(self.ds)
 
-    @pytest.mark.parametrize('bits, pixel_repr, dtype', REFERENCE_DTYPE_GOOD)
+    @pytest.mark.parametrize('bits, pixel_repr, dtype', REFERENCE_DTYPE)
     def test_supported_dtypes(self, bits, pixel_repr, dtype):
         """Test supported dtypes."""
         self.ds.BitsAllocated = bits
