@@ -925,6 +925,13 @@ class TestNumpy_PackBits(object):
         """Test packing data that isn't a full byte long."""
         assert output == _pack_bits(np.asarray(input))
 
+    def test_functional(self):
+        """Test against a real dataset."""
+        ds = dcmread(EXPL_1_1_3F)
+        arr = ds.pixel_array
+        arr = arr.ravel()
+        assert ds.PixelData == _pack_bits(arr)
+
 
 REFERENCE_DTYPE_GOOD = [
     # BitsAllocated, PixelRepresentation, numpy dtype string
