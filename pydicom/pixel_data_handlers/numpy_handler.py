@@ -14,21 +14,21 @@ The numpy handler supports the conversion of data in the (7fe0,0010)
 *Pixel Data* element to a numpy ndarray provided the related Image Pixel module
 elements have values given in the table below.
 
-+-----------------------------------------+-----------------------+-----------+
-| Element                                 | Supported Values      |           |
-+-------------+---------------------------+                       |           |
-| Tag         | Keyword                   |                       |           |
-+=============+===========================+=======================+===========+
-| (0028,0102) | PixelRepresentation       | 0, 1                  | Required  |
-+-------------+---------------------------+-----------------------+-----------+
-| (0028,0011) | BitsAllocated             | 1, 8, 16, 32          | Required  |
-+-------------+---------------------------+-----------------------+-----------+
-| (0028,0002) | SamplesPerPixel           | 1, 2, 3, ..., N       | Required  |
-+-------------+---------------------------+-----------------------+-----------+
-| (0028,0008) | NumberOfFrames            | 1, 2, ..., N          | Optional  |
-+-------------+---------------------------+-----------------------+-----------+
-| (0028,0006) | PlanarConfiguration       | 0, 1                  | Optional  |
-+-------------+---------------------------+-----------------------+-----------+
++------------------------------------------------+--------------+----------+
+| Element                                        | Supported    |          |
++-------------+---------------------------+------+ values       |          |
+| Tag         | Keyword                   | Type |              |          |
++=============+===========================+======+==============+==========+
+| (0028,0102) | PixelRepresentation       | 1    | 0, 1         | Required |
++-------------+---------------------------+------+--------------+----------+
+| (0028,0011) | BitsAllocated             | 1    | 1, 8, 16, 32 | Required |
++-------------+---------------------------+------+--------------+----------+
+| (0028,0002) | SamplesPerPixel           | 1    | 1, 2, 3, N   | Required |
++-------------+---------------------------+------+--------------+----------+
+| (0028,0008) | NumberOfFrames            | 1C   | 1, 2, N      | Optional |
++-------------+---------------------------+------+--------------+----------+
+| (0028,0006) | PlanarConfiguration       | 1C   | 0, 1         | Optional |
++-------------+---------------------------+------+--------------+----------+
 
 """
 
@@ -60,16 +60,22 @@ def supports_transfer_syntax(ds):
 
 
 def needs_to_convert_to_RGB(ds):
-    """Return True if FIXME."""
+    """Return True if the pixel data should to be converted from YCbCr to RGB.
+
+    This affects JPEG transfer syntaxes.
+    """
     return False
 
 
 def should_change_PhotometricInterpretation_to_RGB(ds):
-    """Return True if FIXME."""
+    """Return True if the PhotometricInterpretation should be changed to RGB.
+
+    This affects JPEG transfer syntaxes.
+    """
     return False
 
 
-def _get_expected_length(ds, unit='bytes'):
+def get_expected_length(ds, unit='bytes'):
     """Return the expected length (in bytes or pixels) of the pixel data.
 
     +-----------------------------------+------+-------------+
@@ -101,7 +107,8 @@ def _get_expected_length(ds, unit='bytes'):
     Returns
     -------
     int
-        The expected length of the pixel data in either bytes or pixels.
+        The expected length of the pixel data in either whole bytes or pixels,
+        excluding the NULL trailing padding byte for odd length data.
     """
     length = ds.Rows * ds.Columns * ds.SamplesPerPixel
     length *= getattr(ds, 'NumberOfFrames', 1)
@@ -121,20 +128,20 @@ def _get_expected_length(ds, unit='bytes'):
     return length
 
 
-def _pixel_dtype(ds):
+def pixel_dtype(ds):
     """Return a numpy dtype for the pixel data in dataset in `ds`.
 
     Suitable for use with IODs containing the Image Pixel module.
 
-    +-----------------------------------+----------+--------------+
-    | Element                           | Type     | Supported    |
-    +-------------+---------------------+          | values       |
-    | Tag         | Keyword             |          |              |
-    +=============+=====================+==========+==============+
-    | (0028,0101) | BitsAllocated       | Required | 1, 8, 16, 32 |
-    +-------------+---------------------+----------+--------------+
-    | (0028,0103) | PixelRepresentation | Required | 0, 1         |
-    +-------------+---------------------+----------+--------------+
+    +------------------------------------------+--------------+
+    | Element                                  | Supported    |
+    +-------------+---------------------+------+ values       |
+    | Tag         | Keyword             | Type |              |
+    +=============+=====================+======+==============+
+    | (0028,0101) | BitsAllocated       | 1    | 1, 8, 16, 32 |
+    +-------------+---------------------+------+--------------+
+    | (0028,0103) | PixelRepresentation | 1    | 0, 1         |
+    +-------------+---------------------+------+--------------+
 
     Parameters
     ----------
@@ -156,8 +163,8 @@ def _pixel_dtype(ds):
         or pydicom.
     """
     # Check that the dataset has the required elements
-    keywords = ['BitsAllocated', 'PixelRepresentation']
-    missing = [elem for elem in keywords if elem not in ds]
+    required_elements = ['BitsAllocated', 'PixelRepresentation']
+    missing = [elem for elem in required_elements if elem not in ds]
     if missing:
         raise AttributeError(
             'Unable to determine the data type to use to contain the '
@@ -184,9 +191,7 @@ def _pixel_dtype(ds):
     # (0028,0100) Bits Allocated, US, 1
     #   The number of bits allocated for each pixel sample
     #   PS3.5 8.1.1: Bits Allocated shall either be 1 or a multiple of 8
-    #  i.e. 1, 8, 16, 24, 32, 40, ...
-    #   numpy v1.13.0 supports 8, 16, 32, 64
-    # For bit packed data we use uint8
+    #   For bit packed data we use uint8
     if ds.BitsAllocated == 1:
         dtype_str = 'uint8'
     elif ds.BitsAllocated > 0 and ds.BitsAllocated % 8 == 0:
@@ -207,7 +212,7 @@ def _pixel_dtype(ds):
             "supported by numpy".format(dtype_str)
         )
 
-    # Correct for endianness
+    # Correct for endianness of the system vs endianness of the dataset
     endianness = ds.file_meta.TransferSyntaxUID.is_little_endian
     if endianness != (byteorder == 'little'):
         # 'S' swap from current to opposite
@@ -216,7 +221,7 @@ def _pixel_dtype(ds):
     return dtype
 
 
-def _pack_bits(arr, force=True):
+def pack_bits(arr, force=True):
     """Pack a binary numpy ndarray into bytes for use with Pixel Data.
 
     Should be used in conjunction with (0028,0100) *BitsAllocated* = 1.
@@ -225,7 +230,7 @@ def _pack_bits(arr, force=True):
     ----------
     arr : numpy.ndarray
         The ndarray containing 1-bit data as ints. The array must only contain
-        integer values of 0 and 1 and must have an uint or int dtype. For
+        integer values of 0 and 1 and must have an 'uint' or 'int' dtype. For
         the sake of efficiency its recommended that the array length be a
         multiple of 8 (i.e. that any empty bit-padding to round out the byte
         has already been added).
@@ -239,6 +244,10 @@ def _pack_bits(arr, force=True):
     ------
     ValueError
         If `arr` contains anything other than 0 or 1.
+
+    References
+    ----------
+    DICOM Standard, Part 5, Section 8.1.1 and Annex D
     """
     if arr.shape == (0,):
         return bytes()
@@ -274,10 +283,10 @@ def _pack_bits(arr, force=True):
     return bytestream
 
 
-def _unpack_bits(bytestream):
+def unpack_bits(bytestream):
     """Unpack bit packed pixel data into a numpy ndarray.
 
-    Suitable for use when BitsAllocated is 1.
+    Suitable for use when (0028,0011) *Bits Allocated* is 1.
 
     Parameters
     ----------
@@ -287,7 +296,7 @@ def _unpack_bits(bytestream):
     Returns
     -------
     numpy.ndarray
-        The unpacked pixel data as 1D array.
+        The unpacked pixel data as a 1D array.
 
     Notes
     -----
@@ -378,7 +387,7 @@ def get_pixeldata(ds):
 
     # Calculate the expected length of the pixel data (in bytes)
     #   Note: this does NOT include the trailing null byte for odd length data
-    expected_len = _get_expected_length(ds)
+    expected_len = get_expected_length(ds)
 
     # Check that the actual length of the pixel data is as expected
     actual_length = len(ds.PixelData)
@@ -394,12 +403,12 @@ def get_pixeldata(ds):
     # Unpack the pixel data into a 1D ndarray
     if ds.BitsAllocated == 1:
         # Skip any trailing padding bits
-        nr_pixels = _get_expected_length(ds, unit='pixels')
-        arr = _unpack_bits(ds.PixelData)[:nr_pixels]
+        nr_pixels = get_expected_length(ds, unit='pixels')
+        arr = unpack_bits(ds.PixelData)[:nr_pixels]
     else:
         # Skip the trailing padding byte if present
         arr = np.frombuffer(ds.PixelData[:expected_len],
-                            dtype=_pixel_dtype(ds))
+                            dtype=pixel_dtype(ds))
 
     if should_change_PhotometricInterpretation_to_RGB(ds):
         ds.PhotometricInterpretation = "RGB"

@@ -45,10 +45,10 @@ try:
     from pydicom.pixel_data_handlers import numpy_handler as NP_HANDLER
     from pydicom.pixel_data_handlers.numpy_handler import (
         get_pixeldata,
-        _unpack_bits,
-        _pack_bits,
-        _get_expected_length,
-        _pixel_dtype,
+        unpack_bits,
+        pack_bits,
+        get_expected_length,
+        pixel_dtype,
     )
     HAVE_NP = True
 except ImportError:
@@ -860,11 +860,11 @@ REFERENCE_PACK_UNPACK = [
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
 class TestNumpy_UnpackBits(object):
-    """Tests for numpy_handler._unpack_bits."""
+    """Tests for numpy_handler.unpack_bits."""
     @pytest.mark.parametrize('input, output', REFERENCE_PACK_UNPACK)
     def test_unpack(self, input, output):
         """Test empty data."""
-        assert np.array_equal(np.asarray(output), _unpack_bits(input))
+        assert np.array_equal(np.asarray(output), unpack_bits(input))
 
 
 REFERENCE_PACK_PARTIAL = [
@@ -890,22 +890,22 @@ REFERENCE_PACK_PARTIAL = [
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
 class TestNumpy_PackBits(object):
-    """Tests for numpy_handler._pack_bits."""
+    """Tests for numpy_handler.pack_bits."""
     @pytest.mark.parametrize('output, input', REFERENCE_PACK_UNPACK)
     def test_pack(self, input, output):
         """Test packing data."""
-        assert output == _pack_bits(np.asarray(input), True)
+        assert output == pack_bits(np.asarray(input), True)
 
     def test_non_binary_input(self):
         """Test non-binary input raises exception."""
         with pytest.raises(ValueError,
                            match="Only binary arrays \(containing ones or"):
-            _pack_bits(np.asarray([0, 0, 2, 0, 0, 0, 0, 0]))
+            pack_bits(np.asarray([0, 0, 2, 0, 0, 0, 0, 0]))
 
     def test_non_array_input(self):
         """Test non 1D input raises exception."""
         with pytest.raises(ValueError, match='Only 1D arrays are supported'):
-            _pack_bits(
+            pack_bits(
                 np.asarray(
                     [[0, 0, 0, 0, 0, 0, 0, 0],
                      [1, 0, 1, 0, 1, 0, 1, 0]]
@@ -915,14 +915,14 @@ class TestNumpy_PackBits(object):
     @pytest.mark.parametrize('output, input', REFERENCE_PACK_PARTIAL)
     def test_pack_partial(self, input, output):
         """Test packing data that isn't a full byte long."""
-        assert output == _pack_bits(np.asarray(input))
+        assert output == pack_bits(np.asarray(input))
 
     def test_functional(self):
         """Test against as real dataset."""
         ds = dcmread(EXPL_1_1_3F)
         arr = ds.pixel_array
         arr = arr.ravel()
-        assert ds.PixelData == _pack_bits(arr)
+        assert ds.PixelData == pack_bits(arr)
 
 
 REFERENCE_DTYPE = [
@@ -936,7 +936,7 @@ REFERENCE_DTYPE = [
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
 class TestNumpy_PixelDtype(object):
-    """Tests for numpy_handler._pixel_dtype."""
+    """Tests for numpy_handler.pixel_dtype."""
     def setup(self):
         """Setup the test dataset."""
         self.ds = Dataset()
@@ -949,24 +949,24 @@ class TestNumpy_PixelDtype(object):
         # Both missing
         with pytest.raises(AttributeError,
                            match='aset: BitsAllocated, PixelRepresentation'):
-            _pixel_dtype(self.ds)
+            pixel_dtype(self.ds)
 
         # PixelRepresentation missing
         self.ds.BitsAllocated = 16
         with pytest.raises(AttributeError,
                            match='aset: PixelRepresentation'):
-            _pixel_dtype(self.ds)
+            pixel_dtype(self.ds)
 
         # BitsAllocated missing
         del self.ds.BitsAllocated
         self.ds.PixelRepresentation = 0
         with pytest.raises(AttributeError,
                            match='aset: BitsAllocated'):
-            _pixel_dtype(self.ds)
+            pixel_dtype(self.ds)
 
         # Both present
         self.ds.BitsAllocated = 16
-        _pixel_dtype(self.ds)
+        pixel_dtype(self.ds)
 
     def test_unknown_pixel_representation_raises(self):
         """Test an unknown PixelRepresentation value raises exception."""
@@ -975,12 +975,12 @@ class TestNumpy_PixelDtype(object):
         # The bracket needs to be escaped
         with pytest.raises(NotImplementedError,
                            match="value of '-1' for '\(0028,0103"):
-            _pixel_dtype(self.ds)
+            pixel_dtype(self.ds)
 
         self.ds.PixelRepresentation = 2
         with pytest.raises(NotImplementedError,
                            match="value of '2' for '\(0028,0103"):
-            _pixel_dtype(self.ds)
+            pixel_dtype(self.ds)
 
     def test_unknown_bits_allocated_raises(self):
         """Test an unknown BitsAllocated value raises exception."""
@@ -989,17 +989,17 @@ class TestNumpy_PixelDtype(object):
         # The bracket needs to be escaped
         with pytest.raises(NotImplementedError,
                            match="value of '0' for '\(0028,0100"):
-            _pixel_dtype(self.ds)
+            pixel_dtype(self.ds)
 
         self.ds.BitsAllocated = 2
         with pytest.raises(NotImplementedError,
                            match="value of '2' for '\(0028,0100"):
-            _pixel_dtype(self.ds)
+            pixel_dtype(self.ds)
 
         self.ds.BitsAllocated = 15
         with pytest.raises(NotImplementedError,
                            match="value of '15' for '\(0028,0100"):
-            _pixel_dtype(self.ds)
+            pixel_dtype(self.ds)
 
     def test_unsupported_dtypes(self):
         """Test unsupported dtypes raise exception."""
@@ -1008,7 +1008,7 @@ class TestNumpy_PixelDtype(object):
 
         with pytest.raises(NotImplementedError,
                            match="data type 'uint24' needed to contain"):
-            _pixel_dtype(self.ds)
+            pixel_dtype(self.ds)
 
     @pytest.mark.parametrize('bits, pixel_repr, dtype', REFERENCE_DTYPE)
     def test_supported_dtypes(self, bits, pixel_repr, dtype):
@@ -1021,7 +1021,7 @@ class TestNumpy_PixelDtype(object):
         if endianness != (byteorder == 'little'):
             ref_dtype = ref_dtype.newbyteorder('S')
 
-        assert ref_dtype == _pixel_dtype(self.ds)
+        assert ref_dtype == pixel_dtype(self.ds)
 
     def test_byte_swapping(self):
         """Test that the endianess of the system is taken into account."""
@@ -1033,14 +1033,14 @@ class TestNumpy_PixelDtype(object):
         # < is little, = is native, > is big
         if byteorder == 'little':
             self.ds.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
-            assert _pixel_dtype(self.ds).byteorder in ['<', '=']
+            assert pixel_dtype(self.ds).byteorder in ['<', '=']
             self.ds.file_meta.TransferSyntaxUID = ExplicitVRBigEndian
-            assert _pixel_dtype(self.ds).byteorder == '>'
+            assert pixel_dtype(self.ds).byteorder == '>'
         elif byteorder == 'big':
             self.ds.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
-            assert _pixel_dtype(self.ds).byteorder == '<'
+            assert pixel_dtype(self.ds).byteorder == '<'
             self.ds.file_meta.TransferSyntaxUID = ExplicitVRBigEndian
-            assert _pixel_dtype(self.ds).byteorder in ['>', '=']
+            assert pixel_dtype(self.ds).byteorder in ['>', '=']
 
 
 REFERENCE_LENGTH = [
@@ -1117,10 +1117,10 @@ REFERENCE_LENGTH = [
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
 class TestNumpy_GetExpectedLength(object):
-    """Tests for numpy_handler._get_expected_length."""
+    """Tests for numpy_handler.get_expected_length."""
     @pytest.mark.parametrize('shape, bits, length', REFERENCE_LENGTH)
     def test_length_in_bytes(self, shape, bits, length):
-        """Test _get_expected_length(ds, unit='bytes')."""
+        """Test get_expected_length(ds, unit='bytes')."""
         ds = Dataset()
         ds.Rows = shape[1]
         ds.Columns = shape[2]
@@ -1129,11 +1129,11 @@ class TestNumpy_GetExpectedLength(object):
             ds.NumberOfFrames = shape[0]
         ds.SamplesPerPixel = shape[3]
 
-        assert length[0] == _get_expected_length(ds, unit='bytes')
+        assert length[0] == get_expected_length(ds, unit='bytes')
 
     @pytest.mark.parametrize('shape, bits, length', REFERENCE_LENGTH)
     def test_length_in_pixels(self, shape, bits, length):
-        """Test _get_expected_length(ds, unit='pixels')."""
+        """Test get_expected_length(ds, unit='pixels')."""
         ds = Dataset()
         ds.Rows = shape[1]
         ds.Columns = shape[2]
@@ -1142,4 +1142,4 @@ class TestNumpy_GetExpectedLength(object):
             ds.NumberOfFrames = shape[0]
         ds.SamplesPerPixel = shape[3]
 
-        assert length[1] == _get_expected_length(ds, unit='pixels')
+        assert length[1] == get_expected_length(ds, unit='pixels')
