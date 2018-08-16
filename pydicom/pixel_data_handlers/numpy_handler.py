@@ -368,7 +368,7 @@ def get_pixeldata(ds):
     # The check of transfer syntax must be first
     if transfer_syntax not in SUPPORTED_TRANSFER_SYNTAXES:
         raise NotImplementedError(
-            "Unable to convert the Pixel data as the transfer syntax "
+            "Unable to convert the pixel data as the transfer syntax "
             "is not supported by the numpy pixel data handler."
         )
 

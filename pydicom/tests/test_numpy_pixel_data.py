@@ -422,8 +422,8 @@ class TestNumpy_NumpyHandler(object):
         # Regression test for #704
         ds = dcmread(EXPL_8_1_1F)
         ds.is_little_endian = None
-        with pytest.raises(ValueError, match="'is_little_endian' has to be"):
-            ds.pixel_array
+        ds.pixel_array
+        assert ds.is_little_endian
 
     # Endian independent datasets
     def test_8bit_1sample_1frame(self):
@@ -798,16 +798,15 @@ class TestNumpy_GetPixelData(object):
         ds = dcmread(EXPL_16_1_1F)
         del ds.PixelData
         assert 'PixelData' not in ds
-        # Should probably be AttributeError instead
-        with pytest.raises(TypeError, match='No pixel data found'):
+        with pytest.raises(AttributeError, match=' dataset: PixelData'):
             get_pixeldata(ds)
 
     def test_unknown_pixel_representation_raises(self):
         """Test get_pixeldata raises if unsupported PixelRepresentation."""
         ds = dcmread(EXPL_16_1_1F)
         ds.PixelRepresentation = 2
-        # Should probably be NotImplementedError instead
-        with pytest.raises(TypeError, match="format='bad_pixel_repr"):
+        with pytest.raises(NotImplementedError,
+                           match="value of '2' for '\(0028,0103"):
             get_pixeldata(ds)
 
     def test_unsupported_syntaxes_raises(self):
@@ -815,7 +814,7 @@ class TestNumpy_GetPixelData(object):
         ds = dcmread(EXPL_16_1_1F)
         ds.file_meta.TransferSyntaxUID = '1.2.840.10008.1.2.4.50'
         with pytest.raises(NotImplementedError,
-                           match='in a format pydicom does not yet handle'):
+                           match=' the transfer syntax is not supported'):
             get_pixeldata(ds)
 
     def test_change_photometric_interpretation(self):
