@@ -238,7 +238,7 @@ def _pack_bits(arr):
 
 
 def _unpack_bits(bytestream, force=False):
-    """Unpack BitsAllocated = 1 packed pixel data.
+    """Unpack BitsAllocated = 1 packed pixel data into a numpy ndarray.
 
     Parameters
     ----------
@@ -248,16 +248,17 @@ def _unpack_bits(bytestream, force=False):
     Returns
     -------
     numpy.ndarray
+        The unpacked pixel data as 1D array.
 
     Notes
     -----
-    The implementation for PyPy is much slower.
+    The implementation for PyPy is roughly 100 times slower.
 
     References
     ----------
     DICOM Standard, Part 5, Section 8.1.1 and Annex D
     """
-    if not force and 'PyPy' not in python_implementation():
+    if 'PyPy' not in python_implementation():
         # Thanks to @sbrodehl (#643)
         # e.g. b'\xC0\x09' -> [192, 9]
         arr = np.frombuffer(bytestream, dtype='uint8')
@@ -271,7 +272,7 @@ def _unpack_bits(bytestream, force=False):
         arr = np.fliplr(arr)
         # -> [0 0 0 0 0 0 1 1 1 0 0 1 0 0 0 0]
         arr = np.ravel(arr)
-    elif force or 'PyPy' in python_implementation():
+    else:
         # Slow!
         # if single bits are used for binary representation, a uint8 array
         # has to be converted to a binary-valued array (that is 8 times bigger)
@@ -299,6 +300,11 @@ def _unpack_bits(bytestream, force=False):
 def get_pixeldata(ds):
     """If NumPy is available, return an ndarray of the Pixel Data.
 
+    Parameters
+    ----------
+    ds : dataset.Dataset
+        The DICOM dataset containing an Image Pixel module and the Pixel Data
+        to be converted.
 
     Raises
     ------
@@ -314,7 +320,7 @@ def get_pixeldata(ds):
     Returns
     -------
     np.ndarray
-       The contents of the Pixel Data element (7FE0,0010) as an ndarray.
+       The contents of the Pixel Data element (7FE0,0010) as a 1D array.
     """
     transfer_syntax = ds.file_meta.TransferSyntaxUID
     if transfer_syntax not in SUPPORTED_TRANSFER_SYNTAXES:
