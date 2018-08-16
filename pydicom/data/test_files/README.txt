@@ -42,6 +42,7 @@ CT_small.dcm
 MR_small.dcm
   * MR image, Explicit VR, LittleEndian
   * Downsized to 64x64 from 'MR1_UNC', ftp://medical.nema.org/MEDICAL/Dicom/DataSets/WG04/
+  * Explicit VR big endian version created using DCMTK's dcmconv for PR #714
 
 MR_small_implicit.dcm
   * The same dataset as MR_small, saved with Implicit VR using dcmodify
@@ -75,11 +76,16 @@ JPEG-lossy.dcm
 liver.dcm
   * The DICOM SEG example was generated using the dcmqi library: https://github.com/qiicr/dcmqi
   * Provided by Andrey Fedorov (@fedorov)
+  * Explicit VR big endian versions created using DCMTK's dcmconv and a script
+    used to fix the pixel data for PR #714
+  * Single frame versions created using a script for PR #714
 
 Created by a commercial radiotherapy treatment planning system and modified:
 rtplan.dcm       Implicit VR, Little Endian
 rtdose.dcm       Implicit VR, Little Endian
-
+  * Explicit VR big endian version created using DCMTK's dcmconv and the
+    pixel data corrected using script for PR #714
+  * Single frame version created using a script for PR #714
 
 chr*.dcm
   * Character set files for testing (0008,0005) Specific Character Set
@@ -99,11 +105,20 @@ OBXXXX1A.dcm
   * used to check if to pixel_array is interpreted correctly for such a case
   * taken from https://github.com/pydicom/pydicom/issues/205#issuecomment-103329677
   * supposedly from a Philips machine
+  * Explicit VR big endian version created using DCMTK's dcmconv and the
+    pixel data corrected using script for PR #714
+  * 2 frame version created using a script for PR #714
 
 OT-PAL-8-face.dcm
   * a file with a Photometric Interpretation of PALETTE COLOR
   * used to check if to pixel_array is interpreted correctly for such a case
   * taken from http://www.barre.nom.fr/medical/samples/
+
+SC_rgb.dcm
+  * 16 and 32 bit versions created using a script for PR #714
+  * Explicit VR big endian version created using DCMTK's dcmconv and the
+    pixel data corrected using script for PR #714
+  * 2 frame versions created using a script for pR #714
 
 zipMR.gz
   * a gzipped version of MR_small.dcm
@@ -181,4 +196,3 @@ Patient: 98890234: Doe^Peter
              './98892003/MR700/4618',
              './98892003/MR700/4678',
              './98892003/MR700/4648']
-

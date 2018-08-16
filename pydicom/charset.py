@@ -158,10 +158,6 @@ def decode(data_element, dicom_character_set):
                     for value in data_element.value
                 ]
     if data_element.VR in text_VRs:
-        # Remove the first encoding if this is a multi-byte encoding
-        if len(encodings) > 1:
-            del encodings[0]
-
         # You can't re-decode unicode (string literals in py3)
         if data_element.VM == 1:
             if isinstance(data_element.value, compat.text_type):
