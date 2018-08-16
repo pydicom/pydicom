@@ -44,8 +44,6 @@ try:
 except ImportError:
     have_numpy = False
 
-sys_is_little_endian = (sys.byteorder == 'little')
-
 
 class PropertyError(Exception):
     """For AttributeErrors caught in a property, so do not go to __getattr__"""

@@ -97,7 +97,7 @@ def convert_encodings(encodings):
         patched_encodings = []
         patched = {}
         for x in encodings:
-            if re.match('^ISO.IR', x):
+            if re.match('^ISO[^_]IR', x):
                 patched[x] = 'ISO_IR' + x[6:]
                 patched_encodings.append(patched[x])
             else:
@@ -106,8 +106,9 @@ def convert_encodings(encodings):
             try:
                 encodings = [python_encoding[x] for x in patched_encodings]
                 for old, new in patched.items():
-                    warnings.warn("Incorrect value for Specific Character "
-                                  "Set '{}' - assuming '{}'".format(old, new))
+                    warnings.warn("Incorrect value for Specific Character Set "
+                                  "'{}' - assuming '{}'".format(old, new),
+                                  stacklevel=2)
             except KeyError:
                 # assume that it is already a python encoding
                 # otherwise, a LookupError will be raised in the using code
@@ -157,10 +158,6 @@ def decode(data_element, dicom_character_set):
                     for value in data_element.value
                 ]
     if data_element.VR in text_VRs:
-        # Remove the first encoding if this is a multi-byte encoding
-        if len(encodings) > 1:
-            del encodings[0]
-
         # You can't re-decode unicode (string literals in py3)
         if data_element.VM == 1:
             if isinstance(data_element.value, compat.text_type):

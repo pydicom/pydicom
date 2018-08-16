@@ -182,6 +182,11 @@ class jpeg_ls_JPEG_LS_Tests_with_jpeg_ls(unittest.TestCase):
     def tearDown(self):
         pydicom.config.image_handlers = self.original_handlers
 
+    def test_raises_if_endianess_not_set(self):
+        self.jpeg_ls_lossless.is_little_endian = None
+        with pytest.raises(ValueError):
+            _ = self.jpeg_ls_lossless.pixel_array
+
     def test_JPEG_LS_PixelArray(self):
         a = self.jpeg_ls_lossless.pixel_array
         b = self.mr_small.pixel_array

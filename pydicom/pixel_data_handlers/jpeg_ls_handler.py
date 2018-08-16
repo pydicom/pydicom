@@ -4,9 +4,9 @@ Use the jpeg_ls (CharPyLS) python package
 to decode pixel transfer syntaxes.
 """
 
-import sys
 import pydicom
 import pydicom.uid
+from pydicom.pixel_data_handlers.util import dtype_corrected_for_endianess
 
 have_numpy = True
 try:
@@ -21,7 +21,6 @@ try:
 except ImportError:
     have_jpeg_ls = False
     raise
-sys_is_little_endian = (sys.byteorder == 'little')
 
 JPEGLSSupportedTransferSyntaxes = [
     pydicom.uid.JPEGLSLossless,
@@ -108,9 +107,8 @@ def get_pixeldata(dicom_dataset):
                    dicom_dataset.BitsAllocated))
         raise TypeError(msg)
 
-    if (dicom_dataset.is_little_endian !=
-            sys_is_little_endian):
-        numpy_format = numpy_format.newbyteorder('S')
+    numpy_format = dtype_corrected_for_endianess(
+        dicom_dataset.is_little_endian, numpy_format)
 
     # decompress here
     UncompressedPixelData = bytearray()
