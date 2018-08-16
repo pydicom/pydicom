@@ -904,9 +904,6 @@
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">encodings</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
             <span class="n">encodings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">encodings</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
         <span class="n">components</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;=&quot;</span><span class="p">)</span>
-        <span class="c1"># Remove the first encoding if only one component is present</span>
-        <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">components</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
-            <span class="k">del</span> <span class="n">encodings</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
         <span class="n">comps</span> <span class="o">=</span> <span class="p">[</span>
             <span class="n">clean_escseq</span><span class="p">(</span><span class="n">C</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">enc</span><span class="p">),</span> <span class="n">encodings</span><span class="p">)</span>
