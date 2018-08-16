@@ -902,7 +902,7 @@ class TestNumpy_PackBits(object):
     @pytest.mark.parametrize('output, input', REFERENCE_PACK_UNPACK)
     def test_pack(self, input, output):
         """Test packing data."""
-        assert output == _pack_bits(np.asarray(input))
+        assert output == _pack_bits(np.asarray(input), True)
 
     def test_non_binary_input(self):
         """Test non-binary input raises exception."""
@@ -1135,8 +1135,8 @@ REFERENCE_LENGTH = [
 class TestNumpy_GetExpectedLength(object):
     """Tests for numpy_handler._get_expected_length."""
     @pytest.mark.parametrize('shape, bits, length', REFERENCE_LENGTH)
-    def test_length_in_bytes_no_frames(self, shape, bits, length):
-        """Test _get_expected_length(ds, units='bytes')."""
+    def test_length_in_bytes(self, shape, bits, length):
+        """Test _get_expected_length(ds, unit='bytes')."""
         ds = Dataset()
         ds.Rows = shape[1]
         ds.Columns = shape[2]
@@ -1145,11 +1145,11 @@ class TestNumpy_GetExpectedLength(object):
             ds.NumberOfFrames = shape[0]
         ds.SamplesPerPixel = shape[3]
 
-        assert length[0] == _get_expected_length(ds, units='bytes')
+        assert length[0] == _get_expected_length(ds, unit='bytes')
 
     @pytest.mark.parametrize('shape, bits, length', REFERENCE_LENGTH)
     def test_length_in_pixels(self, shape, bits, length):
-        """Test _get_expected_length(ds, units='pixels')."""
+        """Test _get_expected_length(ds, unit='pixels')."""
         ds = Dataset()
         ds.Rows = shape[1]
         ds.Columns = shape[2]
@@ -1158,4 +1158,4 @@ class TestNumpy_GetExpectedLength(object):
             ds.NumberOfFrames = shape[0]
         ds.SamplesPerPixel = shape[3]
 
-        assert length[1] == _get_expected_length(ds, units='pixels')
+        assert length[1] == _get_expected_length(ds, unit='pixels')

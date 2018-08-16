@@ -80,7 +80,7 @@ def should_change_PhotometricInterpretation_to_RGB(ds):
     return False
 
 
-def _get_expected_length(ds, units='bytes'):
+def _get_expected_length(ds, unit='bytes'):
     """Return the expected length (in bytes or pixels) of the pixel data.
 
     +-----------------------------------+------+-------------+
@@ -104,7 +104,7 @@ def _get_expected_length(ds, units='bytes'):
     ds : dataset.Dataset
         The DICOM dataset containing the Image Pixel module to get the length
         of the Pixel data.
-    units : str, optional
+    unit : str, optional
         If 'bytes' then returns the expected length of the Pixel Data (in
         whole bytes and NOT including an odd length trailing NULL padding
         byte). If 'pixels' then returns the expected length of the Pixel Data
@@ -118,7 +118,7 @@ def _get_expected_length(ds, units='bytes'):
     length = ds.Rows * ds.Columns * ds.SamplesPerPixel
     length *= getattr(ds, 'NumberOfFrames', 1)
 
-    if units == 'pixels':
+    if unit == 'pixels':
         return length
 
     # Correct for the number of bytes per pixel
@@ -128,7 +128,7 @@ def _get_expected_length(ds, units='bytes'):
         # e.g. 10 x 10 1-bit pixels is 100 bits, which are
         #   packed into 12.5 -> 13 bytes
         length = length // 8 + (length % 8 > 0)
-    elif ds.BitsAllocated > 8:
+    else:
         length *= ds.BitsAllocated // 8
 
     return length
@@ -145,7 +145,6 @@ def _pixel_dtype(ds):
     | Tag         | Keyword             |          |              |
     +=============+=====================+==========+==============+
     | (0028,0101) | BitsAllocated       | Required | 1, 8, 16, 32 |
-    |             |                     |          | 64, 128, 256 |
     +-------------+---------------------+----------+--------------+
     | (0028,0103) | PixelRepresentation | Required | 0, 1         |
     +-------------+---------------------+----------+--------------+
@@ -233,7 +232,7 @@ def _pixel_dtype(ds):
     return dtype
 
 
-def _pack_bits(arr):
+def _pack_bits(arr, force=True):
     """Pack a 1-bit numpy ndarray into bytes for use with Pixel Data.
 
     Parameters
@@ -271,18 +270,26 @@ def _pack_bits(arr):
     if arr.shape[0] % 8:
         arr = np.append(arr, np.zeros(8 - arr.shape[0] % 8))
 
-    bytestream = bytearray()
     if 'PyPy' not in python_implementation():
         arr = np.reshape(arr, (-1, 8))
         arr = np.fliplr(arr)
         arr = np.packbits(arr.astype('uint8'))
-        bytestream.extend(arr.tobytes())
+        bytestream = arr.tostring()
     else:
-        raise NotImplementedError(
-            "Not yet implemented for PyyPy"
-        )
+        # Implementation for PyPy as it lacks np.packbits
 
-    return bytes(bytestream)
+        def _convert_to_decimal(x):
+            """Return a decimal from the length 8 binary array."""
+            return np.sum(x * [1, 2, 4, 8, 16, 32, 64, 128])
+
+        # Reshape so each row is 8 bits
+        arr = np.reshape(arr, (-1, 8))
+        # Convert to an array of decimals
+        integer = np.apply_along_axis(fn, axis=1, arr=arr).astype('uint8')
+        # Convert to bytes
+        bytestream = integer.tostring()
+
+    return bytestream
 
 
 def _unpack_bits(bytestream):
@@ -346,7 +353,7 @@ def _unpack_bits(bytestream):
 
 
 def get_pixeldata(ds):
-    """If NumPy is available, return an ndarray of the Pixel Data.
+    """Return an ndarray of the Pixel Data.
 
     Parameters
     ----------
@@ -354,21 +361,20 @@ def get_pixeldata(ds):
         The DICOM dataset containing an Image Pixel module and the Pixel Data
         to be converted.
 
-    Raises
-    ------
-    TypeError
-        If there is no Pixel Data or not a supported data type.
-    ImportError
-        If NumPy isn't found
-    NotImplementedError
-        if the transfer syntax is not supported
-    AttributeError
-        if the decoded amount of data does not match the expected amount
-
     Returns
     -------
     np.ndarray
-       The contents of the Pixel Data element (7FE0,0010) as a 1D array.
+        The contents of the Pixel Data element (7FE0,0010) as a 1D array.
+
+    Raises
+    ------
+    AttributeError
+        If the dataset is missing a required element.
+    NotImplementedError
+        If the dataset contains pixel data in an unsupported format.
+    ValueError
+        If the actual length of the pixel data doesn't match the expected
+        length.
     """
     transfer_syntax = ds.file_meta.TransferSyntaxUID
     # The check of transfer syntax must be first
@@ -406,7 +412,7 @@ def get_pixeldata(ds):
     # Unpack the pixel data into a 1D ndarray
     if ds.BitsAllocated == 1:
         # Skip any trailing padding bits
-        nr_pixels = _get_expected_length(ds, units='pixels')
+        nr_pixels = _get_expected_length(ds, unit='pixels')
         arr = _unpack_bits(ds.PixelData)[:nr_pixels]
     else:
         # Skip the trailing padding byte if present
