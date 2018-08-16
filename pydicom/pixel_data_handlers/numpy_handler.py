@@ -106,9 +106,9 @@ def _get_expected_length(ds, units='bytes'):
         of the Pixel data.
     units : str, optional
         If 'bytes' then returns the expected length of the Pixel Data (in
-        bytes and NOT including an odd length trailing NULL padding byte). If
-        'pixels' then returns the expected length of the Pixel Data in terms of
-        the total number of pixels (default 'bytes').
+        whole bytes and NOT including an odd length trailing NULL padding
+        byte). If 'pixels' then returns the expected length of the Pixel Data
+        in terms of the total number of pixels (default 'bytes').
 
     Returns
     -------
@@ -204,9 +204,10 @@ def _pixel_dtype(ds):
     #   PS3.5 8.1.1: Bits Allocated shall either be 1 or a multiple of 8
     #  i.e. 1, 8, 16, 24, 32, 40, ...
     #   numpy v1.13.0 supports 8, 16, 32, 64, 128, 256
+    # For bit packed data we use uint8
     if ds.BitsAllocated == 1:
-        type_str += '8'
-    elif ds.BitsAllocated % 8 == 0:
+        type_str = 'uint8'
+    elif ds.BitsAllocated > 0 and ds.BitsAllocated % 8 == 0:
         type_str += str(ds.BitsAllocated)
     else:
         raise NotImplementedError(
@@ -233,17 +234,63 @@ def _pixel_dtype(ds):
 
 
 def _pack_bits(arr):
-    """Pack a numpy ndarray into 1-bit pixel data."""
-    pass
+    """Pack a 1-bit numpy ndarray into bytes for use with Pixel Data.
+
+    Handles arrays containing up to 4 axes.
+
+    Parameters
+    ----------
+    arr : numpy.ndarray
+        The ndarray containing 1-bit data as ints. The array must only contain
+        integer values of 0 and 1 and must have an uint or int dtype.
+
+    Returns
+    -------
+    bytes
+        The bit packed data.
+
+    Raises
+    ------
+    ValueError
+        If `arr` contains anything other than 0 or 1.
+    """
+    # Test array
+    if not np.array_equal(arr, arr.astype(bool)):
+        raise ValueError(
+            "Only arrays containing either ones or zeroes can be packed."
+        )
+
+    if len(arr.shape) > 4:
+        raise ValueError(
+            "Only arrays containing at most 4 axes (frames, rows, columns, "
+            "samples/pixel) are supported."
+        )
+
+    bytestream = bytearray()
+    if 'PyPy' not in python_implementation():
+        for ii in range(arr.shape[0]):
+            frame = np.ravel(arr[ii])
+            frame = np.reshape(frame, (-1, 8))
+            frame = np.fliplr(frame)
+            frame = np.packbits(frame)
+            bytestream.extend(frame.tobytes())
+    else:
+        raise NotImplementedError(
+            "Not yet implemented for PyyPy"
+        )
+
+    return bytes(bytestream)
 
 
 def _unpack_bits(bytestream, force=False):
-    """Unpack BitsAllocated = 1 packed pixel data into a numpy ndarray.
+    """Unpack bit packed pixel data into a numpy ndarray.
+
+    Suitable for use when BitsAllocated is 1.
 
     Parameters
     ----------
     bytestream : bytes
-        The 1-bit packed pixel data.
+        The bit packed pixel data.
 
     Returns
     -------
@@ -252,7 +299,8 @@ def _unpack_bits(bytestream, force=False):
 
     Notes
     -----
-    The implementation for PyPy is roughly 100 times slower.
+    The implementation for PyPy is roughly 100 times slower than the
+    standard ``numpy.unpackbits`` method.
 
     References
     ----------
@@ -281,9 +329,6 @@ def _unpack_bits(bytestream, force=False):
         # bit-packed pixels are packed from the right; i.e., the first pixel
         #  in the image frame corresponds to the first from the right bit of
         #  the first byte of the packed PixelData!
-        #  See the following for details:
-        #  * DICOM 3.5 Sect 8.1.1 (explanation of bit ordering)
-        #  * DICOM Annex D (examples of encoding)
         for byte in bytestream:
             if IN_PYTHON2:
                 byte = ord(byte)
@@ -323,11 +368,11 @@ def get_pixeldata(ds):
        The contents of the Pixel Data element (7FE0,0010) as a 1D array.
     """
     transfer_syntax = ds.file_meta.TransferSyntaxUID
+    # The check of transfer syntax must be first
     if transfer_syntax not in SUPPORTED_TRANSFER_SYNTAXES:
         raise NotImplementedError(
-            "Pixel Data is compressed in a format pydicom does not yet "
-            "handle. Cannot return array. Pydicom might be able to convert "
-            "the pixel data using GDCM if it is installed."
+            "Unable to convert the Pixel data as the transfer syntax "
+            "is not supported by the numpy pixel data handler."
         )
 
     # Check required elements
@@ -341,7 +386,7 @@ def get_pixeldata(ds):
         )
 
     # Calculate the expected length of the pixel data (in bytes)
-    #   Note: this does not include the trailing null byte for odd length data
+    #   Note: this does NOT include the trailing null byte for odd length data
     expected_len = _get_expected_length(ds)
 
     # Check that the actual length of the pixel data is as expected
@@ -351,16 +396,19 @@ def get_pixeldata(ds):
         raise ValueError(
             "The length of the Pixel Data in the dataset doesn't match the "
             "expected amount ({0} vs. {1} bytes). The dataset may be "
-            "corrupted or there may be an error in the pixel data handler."
+            "corrupted or there may be an issue with the pixel data handler."
             .format(actual_length, expected_len + expected_len % 2)
         )
 
-    # Unpack the pixel data into an ndarray
+    # Unpack the pixel data into a 1D ndarray
     if ds.BitsAllocated > 1 :
+        # Skip any trailing padding bits
         nr_pixels = _get_expected_length(ds, units='pixels')
         arr = _unpack_bits(ds.PixelData)[:nr_pixels]
     else:
-        arr = np.frombuffer(ds.PixelData[:expected_len], dtype=_pixel_dtype(ds))
+        # Skip the trailing padding byte if present
+        arr = np.frombuffer(ds.PixelData[:expected_len],
+                            dtype=_pixel_dtype(ds))
 
     if should_change_PhotometricInterpretation_to_RGB(ds):
         ds.PhotometricInterpretation = "RGB"

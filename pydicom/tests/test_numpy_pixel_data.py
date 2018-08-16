@@ -25,10 +25,13 @@ There are the following possibilities:
 * PlanarConfiguration
 """
 
+from sys import byteorder
+
 import pytest
 
 import pydicom
 from pydicom.data import get_testdata_files
+from pydicom.dataset import Dataset
 from pydicom.filereader import dcmread
 from pydicom.uid import (
     ImplicitVRLittleEndian,
@@ -40,7 +43,13 @@ from pydicom.uid import (
 try:
     import numpy as np
     from pydicom.pixel_data_handlers import numpy_handler as NP_HANDLER
-    from pydicom.pixel_data_handlers.numpy_handler import get_pixeldata
+    from pydicom.pixel_data_handlers.numpy_handler import (
+        get_pixeldata,
+        _unpack_bits,
+        _pack_bits,
+        _get_expected_length,
+        _pixel_dtype,
+    )
     HAVE_NP = True
 except ImportError:
     HAVE_NP = False
@@ -830,3 +839,249 @@ class TestNumpy_GetPixelData(object):
         assert ds.PhotometricInterpretation == 'RGB'
 
         NP_HANDLER.should_change_PhotometricInterpretation_to_RGB = orig_fn
+
+
+@pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
+class TestNumpy_UnpackBits(object):
+    pass
+
+
+@pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
+class TestNumpy_PackBits(object):
+    pass
+
+
+REFERENCE_DTYPE_GOOD = [
+    # BitsAllocated, PixelRepresentation, numpy dtype string
+    (1, 0, 'uint8'), (1, 1, 'uint8'),
+    (8, 0, 'uint8'), (8, 1, 'int8'),
+    (16, 0, 'uint16'), (16, 1, 'int16'),
+    (32, 0, 'uint32'), (32, 1, 'int32'),
+]
+
+
+@pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
+class TestNumpy_PixelDtype(object):
+    """Tests for numpy_handler._pixel_dtype."""
+    def setup(self):
+        self.ds = Dataset()
+        self.ds.file_meta = Dataset()
+        self.ds.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
+        self.ds.is_little_endian = True
+
+    def test_endianess_not_set(self):
+        """Test the endianess is set from the transfer syntax if unset."""
+        self.ds.PixelRepresentation = 0
+        self.ds.BitsAllocated = 8
+        self.ds.is_little_endian = None
+        assert self.ds.is_little_endian is None
+        _pixel_dtype(self.ds)
+        assert self.ds.is_little_endian
+
+        self.ds.file_meta.TransferSyntaxUID = ExplicitVRBigEndian
+        self.ds.is_little_endian = None
+        assert self.ds.is_little_endian is None
+        _pixel_dtype(self.ds)
+        assert not self.ds.is_little_endian
+
+    def test_missing_element_raises(self):
+        """Test that missing required elements raises exception."""
+        # We require PixelRepresentation and BitsAllocated
+        # Both missing
+        with pytest.raises(AttributeError,
+                           match='aset: BitsAllocated, PixelRepresentation'):
+            _pixel_dtype(self.ds)
+
+        # PixelRepresentation missing
+        self.ds.BitsAllocated = 16
+        with pytest.raises(AttributeError,
+                           match='aset: PixelRepresentation'):
+            _pixel_dtype(self.ds)
+
+        # BitsAllocated missing
+        del self.ds.BitsAllocated
+        self.ds.PixelRepresentation = 0
+        with pytest.raises(AttributeError,
+                           match='aset: BitsAllocated'):
+            _pixel_dtype(self.ds)
+
+        # Both present
+        self.ds.BitsAllocated = 16
+        _pixel_dtype(self.ds)
+
+    def test_unknown_pixel_representation_raises(self):
+        """Test an unknown PixelRepresentation value raises exception."""
+        self.ds.BitsAllocated = 16
+        self.ds.PixelRepresentation = -1
+        # The bracket needs to be escaped
+        with pytest.raises(NotImplementedError,
+                           match="value of '-1' for '\(0028,0103"):
+            _pixel_dtype(self.ds)
+
+        self.ds.PixelRepresentation = 2
+        with pytest.raises(NotImplementedError,
+                           match="value of '2' for '\(0028,0103"):
+            _pixel_dtype(self.ds)
+
+    def test_unknown_bits_allocated_raises(self):
+        """Test an unknown BitsAllocated value raises exception."""
+        self.ds.BitsAllocated = 0
+        self.ds.PixelRepresentation = 0
+        # The bracket needs to be escaped
+        with pytest.raises(NotImplementedError,
+                           match="value of '0' for '\(0028,0100"):
+            _pixel_dtype(self.ds)
+
+        self.ds.BitsAllocated = 2
+        with pytest.raises(NotImplementedError,
+                           match="value of '2' for '\(0028,0100"):
+            _pixel_dtype(self.ds)
+
+        self.ds.BitsAllocated = 15
+        with pytest.raises(NotImplementedError,
+                           match="value of '15' for '\(0028,0100"):
+            _pixel_dtype(self.ds)
+
+    def test_unsupported_dtypes(self):
+        """Test unsupported dtypes raise exception."""
+        self.ds.BitsAllocated = 24
+        self.ds.PixelRepresentation = 0
+
+        with pytest.raises(NotImplementedError,
+                           match="data type 'uint24' needed to contain"):
+            _pixel_dtype(self.ds)
+
+    @pytest.mark.parametrize('bits, pixel_repr, dtype', REFERENCE_DTYPE_GOOD)
+    def test_supported_dtypes(self, bits, pixel_repr, dtype):
+        """Test supported dtypes."""
+        self.ds.BitsAllocated = bits
+        self.ds.PixelRepresentation = pixel_repr
+        # Correct for endianness of system
+        ref_dtype = np.dtype(dtype)
+        if self.ds.is_little_endian != (byteorder == 'little'):
+            ref_dtype = ref_dtype.newbyteorder('S')
+
+        assert ref_dtype == _pixel_dtype(self.ds)
+
+    def test_byte_swapping(self):
+        """Test that the endianess of the system is taken into account."""
+        # The main problem is that our testing environments are probably
+        #   all little endian, but we'll try our best
+        self.ds.BitsAllocated = 16
+        self.ds.PixelRepresentation = 0
+
+        # < is little, = is native, > is big
+        if byteorder == 'little':
+            self.ds.is_little_endian = True
+            assert _pixel_dtype(self.ds).byteorder in ['<', '=']
+            self.ds.is_little_endian = False
+            assert _pixel_dtype(self.ds).byteorder == '>'
+        elif byteorder == 'big':
+            self.ds.is_little_endian = True
+            assert _pixel_dtype(self.ds).byteorder == '<'
+            self.ds.is_little_endian = False
+            assert _pixel_dtype(self.ds).byteorder in ['>', '=']
+
+
+
+
+REFERENCE_LENGTH = [
+    # (frames, rows, cols, samples), bit depth, result in (bytes, pixels)
+    # No 'NumberOfFrames' in dataset
+    ((0, 0, 0, 0), 1, (0, 0)),
+    ((0, 1, 1, 1), 1, (1, 1)),  # 1 bit -> 1 byte
+    ((0, 1, 1, 3), 1, (1, 3)),  # 3 bits -> 1 byte
+    ((0, 1, 3, 3), 1, (2, 9)),  # 9 bits -> 2 bytes
+    ((0, 2, 2, 1), 1, (1, 4)),  # 4 bits -> 1 byte
+    ((0, 2, 4, 1), 1, (1, 8)),  # 8 bits -> 1 byte
+    ((0, 3, 3, 1), 1, (2, 9)),  # 9 bits -> 2 bytes
+    ((0, 512, 512, 1), 1, (32768, 262144)),  # Typical length
+    ((0, 512, 512, 3), 1, (98304, 786432)),
+    ((0, 0, 0, 0), 8, (0, 0)),
+    ((0, 1, 1, 1), 8, (1, 1)),  # Odd length
+    ((0, 9, 1, 1), 8, (9, 9)),  # Odd length
+    ((0, 1, 2, 1), 8, (2, 2)),  # Even length
+    ((0, 512, 512, 1), 8, (262144, 262144)),
+    ((0, 512, 512, 3), 8, (786432, 786432)),
+    ((0, 0, 0, 0), 16, (0, 0)),
+    ((0, 1, 1, 1), 16, (2, 1)),  # 16 bit data can't be odd length
+    ((0, 1, 2, 1), 16, (4, 2)),
+    ((0, 512, 512, 1), 16, (524288, 262144)),
+    ((0, 512, 512, 3), 16, (1572864, 786432)),
+    ((0, 0, 0, 0), 32, (0, 0)),
+    ((0, 1, 1, 1), 32, (4, 1)),  # 32 bit data can't be odd length
+    ((0, 1, 2, 1), 32, (8, 2)),
+    ((0, 512, 512, 1), 32, (1048576, 262144)),
+    ((0, 512, 512, 3), 32, (3145728, 786432)),
+    # NumberOfFrames odd
+    ((3, 0, 0, 0), 1, (0, 0)),
+    ((3, 1, 1, 1), 1, (1, 3)),
+    ((3, 1, 1, 3), 1, (2, 9)),
+    ((3, 1, 3, 3), 1, (4, 27)),
+    ((3, 2, 4, 1), 1, (3, 24)),
+    ((3, 2, 2, 1), 1, (2, 12)),
+    ((3, 3, 3, 1), 1, (4, 27)),
+    ((3, 512, 512, 1), 1, (98304, 786432)),
+    ((3, 512, 512, 3), 1, (294912, 2359296)),
+    ((3, 0, 0, 0), 8, (0, 0)),
+    ((3, 1, 1, 1), 8, (3, 3)),
+    ((3, 9, 1, 1), 8, (27, 27)),
+    ((3, 1, 2, 1), 8, (6, 6)),
+    ((3, 512, 512, 1), 8, (786432, 786432)),
+    ((3, 512, 512, 3), 8, (2359296, 2359296)),
+    ((3, 0, 0, 0), 16, (0, 0)),
+    ((3, 512, 512, 1), 16, (1572864, 786432)),
+    ((3, 512, 512, 3), 16, (4718592, 2359296)),
+    ((3, 0, 0, 0), 32, (0, 0)),
+    ((3, 512, 512, 1), 32, (3145728, 786432)),
+    ((3, 512, 512, 3), 32, (9437184, 2359296)),
+    # NumberOfFrames even
+    ((4, 0, 0, 0), 1, (0, 0)),
+    ((4, 1, 1, 1), 1, (1, 4)),
+    ((4, 1, 1, 3), 1, (2, 12)),
+    ((4, 1, 3, 3), 1, (5, 36)),
+    ((4, 2, 4, 1), 1, (4, 32)),
+    ((4, 2, 2, 1), 1, (2, 16)),
+    ((4, 3, 3, 1), 1, (5, 36)),
+    ((4, 512, 512, 1), 1, (131072, 1048576)),
+    ((4, 512, 512, 3), 1, (393216, 3145728)),
+    ((4, 0, 0, 0), 8, (0, 0)),
+    ((4, 512, 512, 1), 8, (1048576, 1048576)),
+    ((4, 512, 512, 3), 8, (3145728, 3145728)),
+    ((4, 0, 0, 0), 16, (0, 0)),
+    ((4, 512, 512, 1), 16, (2097152, 1048576)),
+    ((4, 512, 512, 3), 16, (6291456, 3145728)),
+    ((4, 0, 0, 0), 32, (0, 0)),
+    ((4, 512, 512, 1), 32, (4194304, 1048576)),
+    ((4, 512, 512, 3), 32, (12582912, 3145728)),
+]
+
+
+@pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
+class TestNumpy_GetExpectedLength(object):
+    """Tests for numpy_handler._get_expected_length."""
+    @pytest.mark.parametrize('shape, bits, length', REFERENCE_LENGTH)
+    def test_length_in_bytes_no_frames(self, shape, bits, length):
+        """Test _get_expected_length(ds, units='bytes')."""
+        ds = Dataset()
+        ds.Rows = shape[1]
+        ds.Columns = shape[2]
+        ds.BitsAllocated = bits
+        if shape[0] != 0:
+            ds.NumberOfFrames = shape[0]
+        ds.SamplesPerPixel = shape[3]
+
+        assert length[0] == _get_expected_length(ds, units='bytes')
+
+    @pytest.mark.parametrize('shape, bits, length', REFERENCE_LENGTH)
+    def test_length_in_pixels(self, shape, bits, length):
+        """Test _get_expected_length(ds, units='pixels')."""
+        ds = Dataset()
+        ds.Rows = shape[1]
+        ds.Columns = shape[2]
+        ds.BitsAllocated = bits
+        if shape[0] != 0:
+            ds.NumberOfFrames = shape[0]
+        ds.SamplesPerPixel = shape[3]
+
+        assert length[1] == _get_expected_length(ds, units='pixels')
