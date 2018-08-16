@@ -732,9 +732,6 @@ class PersonNameUnicode(PersonNameBase, compat.text_type):
         if len(encodings) == 2:
             encodings.append(encodings[1])
         components = val.split(b"=")
-        # Remove the first encoding if only one component is present
-        if (len(components) == 1):
-            del encodings[0]
 
         comps = [
             clean_escseq(C.decode(enc), encodings)
