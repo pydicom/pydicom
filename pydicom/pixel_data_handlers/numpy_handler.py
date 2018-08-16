@@ -285,9 +285,9 @@ def _pack_bits(arr, force=True):
         # Reshape so each row is 8 bits
         arr = np.reshape(arr, (-1, 8))
         # Convert to an array of decimals
-        integer = np.apply_along_axis(fn, axis=1, arr=arr).astype('uint8')
+        arr = np.apply_along_axis(fn, axis=1, arr=arr).astype('uint8')
         # Convert to bytes
-        bytestream = integer.tostring()
+        bytestream = arr.tostring()
 
     return bytestream
 
