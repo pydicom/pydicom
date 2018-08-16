@@ -841,14 +841,55 @@ class TestNumpy_GetPixelData(object):
         NP_HANDLER.should_change_PhotometricInterpretation_to_RGB = orig_fn
 
 
+REFERENCE_PACK_UNPACK = [
+    (b'', []),
+    (b'\x00', [0, 0, 0, 0, 0, 0, 0, 0]),
+    (b'\x01', [1, 0, 0, 0, 0, 0, 0, 0]),
+    (b'\x02', [0, 1, 0, 0, 0, 0, 0, 0]),
+    (b'\x04', [0, 0, 1, 0, 0, 0, 0, 0]),
+    (b'\x08', [0, 0, 0, 1, 0, 0, 0, 0]),
+    (b'\x10', [0, 0, 0, 0, 1, 0, 0, 0]),
+    (b'\x20', [0, 0, 0, 0, 0, 1, 0, 0]),
+    (b'\x40', [0, 0, 0, 0, 0, 0, 1, 0]),
+    (b'\x80', [0, 0, 0, 0, 0, 0, 0, 1]),
+    (b'\xAA', [0, 1, 0, 1, 0, 1, 0, 1]),
+    (b'\xF0', [0, 0, 0, 0, 1, 1, 1, 1]),
+    (b'\x0F', [1, 1, 1, 1, 0, 0, 0, 0]),
+    (b'\xFF', [1, 1, 1, 1, 1, 1, 1, 1]),
+    #              | 1st byte              | 2nd byte
+    (b'\x00\x00', [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
+    (b'\x00\x01', [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0]),
+    (b'\x00\x80', [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]),
+    (b'\x00\xFF', [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1]),
+    (b'\x01\x80', [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]),
+    (b'\x80\x80', [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1]),
+    (b'\xFF\x80', [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1]),
+]
+
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
 class TestNumpy_UnpackBits(object):
-    pass
+    """Tests for numpy_handler._unpack_bits."""
+    @pytest.mark.parametrize('input, output', REFERENCE_PACK_UNPACK)
+    def test_unpack(self, input, output):
+        """Test empty data."""
+        assert np.array_equal(np.asarray(output), _unpack_bits(input))
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
 class TestNumpy_PackBits(object):
-    pass
+    """Tests for numpy_handler._pack_bits."""
+    #@pytest.mark.parametrize('output, input', REFERENCE_PACK_UNPACK)
+    #def test_unpack(self, input, output):
+    #    """Test empty data."""
+    #    assert output == _pack_bits(np.asarray(input))
+
+    def test_non_binary_input(self):
+        """Test non-binary input raises exception."""
+        pass
+
+    def test_non_array_input(self):
+        """Test non 1D input raises exception."""
+        pass
 
 
 REFERENCE_DTYPE_GOOD = [
@@ -864,6 +905,7 @@ REFERENCE_DTYPE_GOOD = [
 class TestNumpy_PixelDtype(object):
     """Tests for numpy_handler._pixel_dtype."""
     def setup(self):
+        """Setup the test dataset."""
         self.ds = Dataset()
         self.ds.file_meta = Dataset()
         self.ds.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian

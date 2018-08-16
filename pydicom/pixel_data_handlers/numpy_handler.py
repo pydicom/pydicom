@@ -236,8 +236,6 @@ def _pixel_dtype(ds):
 def _pack_bits(arr):
     """Pack a 1-bit numpy ndarray into bytes for use with Pixel Data.
 
-    Handles arrays containing up to 4 axes.
-
     Parameters
     ----------
     arr : numpy.ndarray
@@ -260,20 +258,19 @@ def _pack_bits(arr):
             "Only arrays containing either ones or zeroes can be packed."
         )
 
-    if len(arr.shape) > 4:
-        raise ValueError(
-            "Only arrays containing at most 4 axes (frames, rows, columns, "
-            "samples/pixel) are supported."
-        )
+    if len(arr.shape) > 1:
+        raise ValueError("Only 1D arrays are supported.")
+
+    # The array must be a multiple of 8, pad the end
+    #if arr.shape[0] % 8:
+    #    pass
 
     bytestream = bytearray()
     if 'PyPy' not in python_implementation():
-        for ii in range(arr.shape[0]):
-            frame = np.ravel(arr[ii])
-            frame = np.reshape(frame, (-1, 8))
-            frame = np.fliplr(frame)
-            frame = np.packbits(frame)
-            bytestream.extend(frame.tobytes())
+        arr = np.reshape(arr, (-1, 8))
+        arr = np.fliplr(arr)
+        arr = np.packbits(arr)
+        bytestream.extend(arr.tobytes())
     else:
         raise NotImplementedError(
             "Not yet implemented for PyyPy"
@@ -282,7 +279,7 @@ def _pack_bits(arr):
     return bytes(bytestream)
 
 
-def _unpack_bits(bytestream, force=False):
+def _unpack_bits(bytestream):
     """Unpack bit packed pixel data into a numpy ndarray.
 
     Suitable for use when BitsAllocated is 1.
@@ -401,7 +398,7 @@ def get_pixeldata(ds):
         )
 
     # Unpack the pixel data into a 1D ndarray
-    if ds.BitsAllocated > 1 :
+    if ds.BitsAllocated == 1:
         # Skip any trailing padding bits
         nr_pixels = _get_expected_length(ds, units='pixels')
         arr = _unpack_bits(ds.PixelData)[:nr_pixels]
