@@ -402,7 +402,7 @@ def write_data_element(fp, data_element, encoding=default_encoding):
         writer_function, writer_param = writers[VR]
         is_undefined_length = data_element.is_undefined_length
         if VR in text_VRs:
-            writer_function(buffer, data_element, encoding=encoding[1])
+            writer_function(buffer, data_element, encoding=encoding[0])
         elif VR in ('PN', 'SQ'):
             writer_function(buffer, data_element, encoding=encoding)
         else:

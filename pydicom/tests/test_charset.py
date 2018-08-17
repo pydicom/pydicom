@@ -9,8 +9,8 @@ import pytest
 from pydicom.data import get_charset_files
 from pydicom.data import get_testdata_files
 import pydicom.charset
-from pydicom.dataelem import DataElement, RawDataElement, DataElement_from_raw
-from pydicom import dcmread, Dataset
+from pydicom.dataelem import DataElement
+from pydicom import dcmread
 
 latin1_file = get_charset_files("chrFren.dcm")[0]
 jp_file = get_charset_files("chrH31.dcm")[0]
@@ -53,13 +53,12 @@ class CharsetTests(unittest.TestCase):
         # Instead, we make sure that it is decoded using the
         # (0008,0005) tag of the dataset
 
-        expected = (u'\uff94\uff8f\uff80\uff9e^\uff80\uff9b\uff73='
-                    u'\u5c71\u7530^\u592a\u90ce='
-                    u'\u3084\u307e\u3060^\u305f\u308d\u3046')
+        expected = (u'ﾔﾏﾀﾞ^ﾀﾛｳ='
+                    u'山田^太郎='
+                    u'やまだ^たろう')
 
         sequence = ds[0x32, 0x1064][0]
-        assert sequence._character_set == [
-            'shift_jis', 'iso2022_jp', 'iso2022_jp']
+        assert ['shift_jis', 'iso2022_jp'] == sequence._character_set
         assert expected == sequence.PatientName
 
     def test_inherited_character_set_in_sequence(self):
@@ -69,13 +68,12 @@ class CharsetTests(unittest.TestCase):
 
         # These datasets inside of the SQ shall be decoded with the parent
         # dataset's encoding
-        expected = (u'\uff94\uff8f\uff80\uff9e^\uff80\uff9b\uff73='
-                    u'\u5c71\u7530^\u592a\u90ce='
-                    u'\u3084\u307e\u3060^\u305f\u308d\u3046')
+        expected = (u'ﾔﾏﾀﾞ^ﾀﾛｳ='
+                    u'山田^太郎='
+                    u'やまだ^たろう')
 
         sequence = ds[0x32, 0x1064][0]
-        assert sequence._character_set == [
-            'shift_jis', 'iso2022_jp', 'iso2022_jp']
+        assert ['shift_jis', 'iso2022_jp'] == sequence._character_set
         assert expected == sequence.PatientName
 
     def test_standard_file(self):
@@ -159,6 +157,13 @@ class CharsetTests(unittest.TestCase):
         elem = DataElement(0x00081039, 'LO', b'R\xf6ntgenaufnahme')
         pydicom.charset.decode(elem, ['ISO 2022 IR 100', 'ISO 2022 IR 144'])
         assert u'Röntgenaufnahme' == elem.value
+
+    def test_single_byte_multi_charset_personname(self):
+        elem = DataElement(0x00100010, 'PN',
+                           b'Dionysios=\x1b\x2d\x46'
+                           b'\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2')
+        pydicom.charset.decode(elem, ['ISO 2022 IR 100', 'ISO 2022 IR 126'])
+        assert u'Dionysios=Διονυσιος' == elem.value
 
 
 if __name__ == "__main__":

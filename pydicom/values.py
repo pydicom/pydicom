@@ -344,10 +344,9 @@ def convert_value(VR, raw_data_element, encoding=default_encoding):
                               is_little_endian,
                               encoding=encoding)
         elif VR in text_VRs:
-            # Text VRs use the 2nd specified encoding
             value = converter(byte_string,
                               is_little_endian,
-                              encoding=encoding[1])
+                              encoding=encoding[0])
         elif VR != "SQ":
             value = converter(byte_string,
                               is_little_endian,

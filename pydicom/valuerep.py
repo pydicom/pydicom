@@ -573,14 +573,12 @@ class PersonName3(object):
     def decode(self, encodings=None):
         encodings = self._verify_encodings(encodings)
 
-        from pydicom.charset import clean_escseq
+        from pydicom.charset import decode_string
         if not isinstance(self.components[0], bytes):
             comps = self.components
         else:
-            comps = [
-                clean_escseq(comp.decode(enc), encodings)
-                for comp, enc in zip(self.components, encodings)
-            ]
+            comps = [decode_string(comp, encodings)
+                     for comp in self.components]
 
         while len(comps) and not comps[-1]:
             comps.pop()
@@ -724,19 +722,18 @@ class PersonNameUnicode(PersonNameBase, compat.text_type):
                  of values in DICOM data element (0008,0005).
         """
         # in here to avoid circular import
-        from pydicom.charset import clean_escseq
+        from pydicom.charset import decode_string
 
-        # Make the possible three character encodings explicit:
         if not isinstance(encodings, list):
-            encodings = [encodings] * 3
-        if len(encodings) == 2:
-            encodings.append(encodings[1])
+            encodings = [encodings]
         components = val.split(b"=")
 
-        comps = [
-            clean_escseq(C.decode(enc), encodings)
-            for C, enc in zip(components, encodings)
-        ]
+        # first component cannot have code extensions
+        comps = [components[0].decode(encodings[0])]
+
+        # handle encoding change in component groups only
+        for comp in components[1:]:
+            comps.append(decode_string(comp, encodings))
         new_val = u"=".join(comps)
 
         return compat.text_type.__new__(cls, new_val)
