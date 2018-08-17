@@ -121,13 +121,14 @@ def get_expected_length(ds, unit='bytes'):
         return length
 
     # Correct for the number of bytes per pixel
-    if ds.BitsAllocated == 1:
+    bits_allocated = ds.BitsAllocated
+    if bits_allocated == 1:
         # Determine the nearest whole number of bytes needed to contain
         #   1-bit pixel data. e.g. 10 x 10 1-bit pixels is 100 bits, which
         #   are packed into 12.5 -> 13 bytes
         length = length // 8 + (length % 8 > 0)
     else:
-        length *= ds.BitsAllocated // 8
+        length *= bits_allocated // 8
 
     return length
 
@@ -171,31 +172,32 @@ def pixel_dtype(ds):
     #   Data representation of the pixel samples
     #   0x0000 - unsigned int
     #   0x0001 - 2's complement (signed int)
-    if ds.PixelRepresentation == 0:
+    pixel_repr = ds.PixelRepresentation
+    if pixel_repr == 0:
         dtype_str = 'uint'
-    elif ds.PixelRepresentation == 1:
+    elif pixel_repr == 1:
         dtype_str = 'int'
     else:
         raise NotImplementedError(
             "Unable to determine the data type to use to contain the "
             "Pixel Data as a value of '{}' for '(0028,0103) Pixel "
-            "Representation' is not supported"
-            .format(ds.PixelRepresentation)
+            "Representation' is not supported".format(pixel_repr)
         )
 
     # (0028,0100) Bits Allocated, US, 1
     #   The number of bits allocated for each pixel sample
     #   PS3.5 8.1.1: Bits Allocated shall either be 1 or a multiple of 8
     #   For bit packed data we use uint8
-    if ds.BitsAllocated == 1:
+    bits_allocated = ds.BitsAllocated
+    if bits_allocated == 1:
         dtype_str = 'uint8'
-    elif ds.BitsAllocated > 0 and ds.BitsAllocated % 8 == 0:
-        dtype_str += str(ds.BitsAllocated)
+    elif bits_allocated > 0 and bits_allocated % 8 == 0:
+        dtype_str += str(bits_allocated)
     else:
         raise NotImplementedError(
             "Unable to determine the data type to use to contain the "
             "Pixel Data as a value of '{}' for '(0028,0100) Bits "
-            "Allocated' is not supported".format(ds.BitsAllocated)
+            "Allocated' is not supported".format(bits_allocated)
         )
 
     # Check to see if the dtype is valid for numpy
