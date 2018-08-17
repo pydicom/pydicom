@@ -911,7 +911,7 @@ class TestNumpy_PackBits(object):
     @pytest.mark.parametrize('output, input', REFERENCE_PACK_UNPACK)
     def test_pack(self, input, output):
         """Test packing data."""
-        assert output == pack_bits(np.asarray(input), True)
+        assert output == pack_bits(np.asarray(input))
 
     def test_non_binary_input(self):
         """Test non-binary input raises exception."""
