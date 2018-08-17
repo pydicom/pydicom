@@ -74,7 +74,7 @@ elif [[ "$DISTRIB" == "ubuntu" ]]; then
     virtualenv --system-site-packages testvenv
     source testvenv/bin/activate
     pip install nose nose-timer pytest pytest-cov codecov setuptools
-    if [[ "NUMPY" == "true "]]; then
+    if [[ "$NUMPY" == "true" ]]; then
         pip install --upgrade --force-reinstall numpy
     fi
 
