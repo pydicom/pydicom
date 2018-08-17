@@ -73,7 +73,7 @@ elif [[ "$DISTRIB" == "ubuntu" ]]; then
     # Create a new virtualenv using system site packages for python, numpy
     virtualenv --system-site-packages testvenv
     source testvenv/bin/activate
-    pip install nose nose-timer pytest pytest-cov codecov setuptools
+    pip install nose nose-timer pytest pytest-cov codecov setuptools numpy
 
 elif [[ "$DISTRIB" == "pypy" ]]; then
     # This is to see if we are supporting pypy. With pypy3, numpypy is not
