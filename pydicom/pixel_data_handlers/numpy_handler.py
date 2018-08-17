@@ -266,7 +266,7 @@ def pack_bits(arr):
     if 'PyPy' not in python_implementation():
         arr = np.fliplr(arr)
         arr = np.packbits(arr.astype('uint8'))
-        bytestream = arr.tostring()
+        bytestream = arr.tobytes()
     else:
         # Implementation for PyPy as it lacks np.packbits
         def _convert_to_decimal(x):
@@ -274,7 +274,7 @@ def pack_bits(arr):
             return np.sum(x * [1, 2, 4, 8, 16, 32, 64, 128])
 
         arr = np.apply_along_axis(_convert_to_decimal, axis=1, arr=arr)
-        bytestream = arr.astype('uint8').tostring()
+        bytestream = arr.astype('uint8').tobytes()
 
     return bytestream
 

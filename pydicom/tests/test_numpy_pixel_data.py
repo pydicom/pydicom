@@ -791,9 +791,8 @@ class TestNumpy_NumpyHandler(object):
         ds.BitsAllocated = 16
         ds.PixelRepresentation = 0
         ds.SamplesPerPixel = 1
-        arr = np.empty((10, 10), dtype='uint16')
-        arr[:, :] = 1
-        ds.PixelData = arr.tostring()
+        arr = np.ones((10, 10), dtype='uint16')
+        ds.PixelData = arr.tobytes()
 
         assert ds.pixel_array.max() == 1
 
