@@ -217,7 +217,7 @@ def pixel_dtype(ds):
     return dtype
 
 
-def pack_bits(arr, force=True):
+def pack_bits(arr):
     """Pack a binary numpy ndarray into bytes for use with Pixel Data.
 
     Should be used in conjunction with (0028,0100) *BitsAllocated* = 1.

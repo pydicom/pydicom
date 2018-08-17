@@ -880,7 +880,7 @@ class TestNumpy_UnpackBits(object):
     """Tests for numpy_handler.unpack_bits."""
     @pytest.mark.parametrize('input, output', REFERENCE_PACK_UNPACK)
     def test_unpack(self, input, output):
-        """Test empty data."""
+        """Test unpacking data."""
         assert np.array_equal(np.asarray(output), unpack_bits(input))
 
 
