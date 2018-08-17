@@ -780,6 +780,23 @@ class TestNumpy_NumpyHandler(object):
         assert ref.file_meta.TransferSyntaxUID != ExplicitVRBigEndian
         assert np.array_equal(ds.pixel_array, ref.pixel_array)
 
+    # Regression tests
+    def test_endianness_not_set(self):
+        """Test for #704, Dataset.is_little_endian unset."""
+        ds = Dataset()
+        ds.file_meta = Dataset()
+        ds.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
+        ds.Rows = 10
+        ds.Columns = 10
+        ds.BitsAllocated = 16
+        ds.PixelRepresentation = 0
+        ds.SamplesPerPixel = 1
+        arr = np.empty((10, 10), dtype='uint16')
+        arr[:, :] = 1
+        ds.PixelData = arr.tostring()
+
+        assert ds.pixel_array.max() == 1
+
 
 # Tests for numpy_handler module with Numpy available
 @pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
@@ -943,31 +960,6 @@ class TestNumpy_PixelDtype(object):
         self.ds.file_meta = Dataset()
         self.ds.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
 
-    def test_missing_element_raises(self):
-        """Test that missing required elements raises exception."""
-        # We require PixelRepresentation and BitsAllocated
-        # Both missing
-        with pytest.raises(AttributeError,
-                           match='aset: BitsAllocated, PixelRepresentation'):
-            pixel_dtype(self.ds)
-
-        # PixelRepresentation missing
-        self.ds.BitsAllocated = 16
-        with pytest.raises(AttributeError,
-                           match='aset: PixelRepresentation'):
-            pixel_dtype(self.ds)
-
-        # BitsAllocated missing
-        del self.ds.BitsAllocated
-        self.ds.PixelRepresentation = 0
-        with pytest.raises(AttributeError,
-                           match='aset: BitsAllocated'):
-            pixel_dtype(self.ds)
-
-        # Both present
-        self.ds.BitsAllocated = 16
-        pixel_dtype(self.ds)
-
     def test_unknown_pixel_representation_raises(self):
         """Test an unknown PixelRepresentation value raises exception."""
         self.ds.BitsAllocated = 16
@@ -1032,14 +1024,14 @@ class TestNumpy_PixelDtype(object):
 
         # < is little, = is native, > is big
         if byteorder == 'little':
-            self.ds.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
+            self.ds.is_little_endian = True
             assert pixel_dtype(self.ds).byteorder in ['<', '=']
-            self.ds.file_meta.TransferSyntaxUID = ExplicitVRBigEndian
+            self.ds.is_little_endian = False
             assert pixel_dtype(self.ds).byteorder == '>'
         elif byteorder == 'big':
-            self.ds.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
+            self.ds.is_little_endian = True
             assert pixel_dtype(self.ds).byteorder == '<'
-            self.ds.file_meta.TransferSyntaxUID = ExplicitVRBigEndian
+            self.ds.is_little_endian = False
             assert pixel_dtype(self.ds).byteorder in ['>', '=']
 
 

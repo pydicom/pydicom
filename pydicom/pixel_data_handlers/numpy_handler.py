@@ -19,15 +19,19 @@ elements have values given in the table below.
 +-------------+---------------------------+------+ values       |          |
 | Tag         | Keyword                   | Type |              |          |
 +=============+===========================+======+==============+==========+
-| (0028,0102) | PixelRepresentation       | 1    | 0, 1         | Required |
-+-------------+---------------------------+------+--------------+----------+
-| (0028,0011) | BitsAllocated             | 1    | 1, 8, 16, 32 | Required |
-+-------------+---------------------------+------+--------------+----------+
 | (0028,0002) | SamplesPerPixel           | 1    | 1, 2, 3, N   | Required |
++-------------+---------------------------+------+--------------+----------+
+| (0028,0006) | PlanarConfiguration       | 1C   | 0, 1         | Optional |
 +-------------+---------------------------+------+--------------+----------+
 | (0028,0008) | NumberOfFrames            | 1C   | 1, 2, N      | Optional |
 +-------------+---------------------------+------+--------------+----------+
-| (0028,0006) | PlanarConfiguration       | 1C   | 0, 1         | Optional |
+| (0028,0010) | Rows                      | 1    | 1, 2, N      | Required |
++-------------+---------------------------+------+--------------+----------+
+| (0028,0011) | Columns                   | 1    | 1, 2, N      | Required |
++-------------+---------------------------+------+--------------+----------+
+| (0028,0100) | BitsAllocated             | 1    | 1, 8, 16, 32 | Required |
++-------------+---------------------------+------+--------------+----------+
+| (0028,0103) | PixelRepresentation       | 1    | 0, 1         | Required |
 +-------------+---------------------------+------+--------------+----------+
 
 """
@@ -156,21 +160,12 @@ def pixel_dtype(ds):
 
     Raises
     ------
-    AttributeError
-        If the dataset is missing elements required to determine the dtype.
     NotImplementedError
         If the pixel data is of a type that isn't supported by either numpy
         or pydicom.
     """
-    # Check that the dataset has the required elements
-    required_elements = ['BitsAllocated', 'PixelRepresentation']
-    missing = [elem for elem in required_elements if elem not in ds]
-    if missing:
-        raise AttributeError(
-            'Unable to determine the data type to use to contain the '
-            'Pixel Data as the following required elements are '
-            'missing from the dataset: ' + ', '.join(missing)
-        )
+    if ds.is_little_endian is None:
+        ds.is_little_endian = ds.file_meta.TransferSyntaxUID.is_little_endian
 
     # (0028,0103) Pixel Representation, US, 1
     #   Data representation of the pixel samples
@@ -213,8 +208,7 @@ def pixel_dtype(ds):
         )
 
     # Correct for endianness of the system vs endianness of the dataset
-    endianness = ds.file_meta.TransferSyntaxUID.is_little_endian
-    if endianness != (byteorder == 'little'):
+    if ds.is_little_endian != (byteorder == 'little'):
         # 'S' swap from current to opposite
         dtype = dtype.newbyteorder('S')
 

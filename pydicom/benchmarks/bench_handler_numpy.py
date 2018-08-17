@@ -4,6 +4,7 @@
 Requires asv and numpy.
 """
 
+from platform import python_implementation
 from tempfile import TemporaryFile
 
 import numpy as np
@@ -130,14 +131,20 @@ class TimeGetPixelData(object):
 
     def time_1bit_1sample_1frame(self):
         """Time retrieval of 1-bit, 1 sample/pixel, 1 frame."""
-        # Slow!
-        for ii in range(1):
+        no_runs = self.no_runs
+        if 'PyPy' in python_implementation():
+            no_runs = 1
+
+        for ii in range(no_runs):
             get_pixeldata(self.ds_1_1_1)
 
     def time_1bit_1sample_3frame(self):
         """Time retrieval of 1-bit, 1 sample/pixel, 3 frame."""
-        # Slow!
-        for ii in range(1):
+        no_runs = self.no_runs
+        if 'PyPy' in python_implementation():
+            no_runs = 1
+
+        for ii in range(no_runs):
             get_pixeldata(self.ds_1_1_3)
 
     def time_8bit_1sample_1frame(self):
