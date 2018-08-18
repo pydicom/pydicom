@@ -306,7 +306,7 @@ def unpack_bits(bytestream):
     if 'PyPy' not in python_implementation():
         # Thanks to @sbrodehl (#643)
         # e.g. b'\xC0\x09' -> [192, 9]
-        arr = np.frombuffer(bytestream, dtype='uint8')
+        arr = np.fromstring(bytestream, dtype='uint8')
         # -> [1 1 0 0 0 0 0 0 0 0 0 0 1 0 0 1]
         arr = np.unpackbits(arr)
         # -> [[1 1 0 0 0 0 0 0],
@@ -377,7 +377,7 @@ def get_pixeldata(ds):
     missing = [elem for elem in required_elements if elem not in ds]
     if missing:
         raise AttributeError(
-            "Unable to convert the Pixel Data as the following required "
+            "Unable to convert the pixel data as the following required "
             "elements are missing from the dataset: " + ", ".join(missing)
         )
 
@@ -390,7 +390,7 @@ def get_pixeldata(ds):
     # Correct for the trailing NULL byte padding for odd length data
     if actual_length != (expected_len + expected_len % 2):
         raise ValueError(
-            "The length of the Pixel Data in the dataset doesn't match the "
+            "The length of the pixel data in the dataset doesn't match the "
             "expected amount ({0} vs. {1} bytes). The dataset may be "
             "corrupted or there may be an issue with the pixel data handler."
             .format(actual_length, expected_len + expected_len % 2)
@@ -403,7 +403,7 @@ def get_pixeldata(ds):
         arr = unpack_bits(ds.PixelData)[:nr_pixels]
     else:
         # Skip the trailing padding byte if present
-        arr = np.frombuffer(ds.PixelData[:expected_len],
+        arr = np.fromstring(ds.PixelData[:expected_len],
                             dtype=pixel_dtype(ds))
 
     if should_change_PhotometricInterpretation_to_RGB(ds):
