@@ -801,12 +801,16 @@ class TestNumpy_NumpyHandler(object):
         # Check BitsAllocated = 1
         ds = dcmread(EXPL_1_1_1F)
         arr = ds.pixel_array
-        arr[0, 0] = 0
+        assert arr[0, 0] == 0
+        arr[0, 0] = 1
+        assert arr[0, 0] == 1
 
         # Check BitsAllocated multiple of 8
         ds = dcmread(EXPL_8_1_1F)
         arr = ds.pixel_array
+        assert arr[0, 0] == 244
         arr[0, 0] = 0
+        assert arr[0, 0] == 0
 
 
 # Tests for numpy_handler module with Numpy available
