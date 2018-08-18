@@ -796,6 +796,17 @@ class TestNumpy_NumpyHandler(object):
 
         assert ds.pixel_array.max() == 1
 
+    def test_pixel_array_writable(self):
+        """Test for #717, pixel array is read-only."""
+        # Check BitsAllocated = 1
+        ds = dcmread(EXPL_1_1_1F)
+        arr = ds.pixel_array
+        arr[0, 0] = 0
+
+        # Check BitsAllocated multiple of 8
+        ds = dcmread(EXPL_8_1_1F)
+        arr = ds.pixel_array
+        arr[0, 0] = 0
 
 # Tests for numpy_handler module with Numpy available
 @pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
