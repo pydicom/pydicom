@@ -198,14 +198,12 @@ def data_element_generator(fp,
     defer_size = size_in_bytes(defer_size)
 
     tag_set = set()
-    has_specific_char_set = True
     if specific_tags is not None:
         for tag in specific_tags:
             if isinstance(tag, (str, compat.text_type)):
                 tag = Tag(tag_for_keyword(tag))
             if isinstance(tag, BaseTag):
                 tag_set.add(tag)
-        has_specific_char_set = Tag(0x08, 0x05) in tag_set
         tag_set.add(Tag(0x08, 0x05))
     has_tag_set = len(tag_set) > 0
 
@@ -293,8 +291,6 @@ def data_element_generator(fp,
                 # Store the encoding value in the generator
                 # for use with future elements (SQs)
                 encoding = convert_encodings(encoding)
-                if not has_specific_char_set:
-                    continue
 
             yield RawDataElement(tag, VR, length, value, value_tell,
                                  is_implicit_VR, is_little_endian)
@@ -346,8 +342,6 @@ def data_element_generator(fp,
                     # Store the encoding value in the generator for use
                     # with future elements (SQs)
                     encoding = convert_encodings(encoding)
-                    if not has_specific_char_set:
-                        continue
 
                 # tags with undefined length are skipped after read
                 if has_tag_set and tag not in tag_set:

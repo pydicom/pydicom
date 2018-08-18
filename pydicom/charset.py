@@ -64,7 +64,7 @@ escape_codes = {
     'iso_ir_144': b'\x1b-L',
     'iso_ir_148': b'\x1b-M',
     'iso_ir_166': b'\x1b-T',
-    'euc_kr': b'\x1b$)C 149',
+    'euc_kr': b'\x1b$)C',
     'iso-2022-jp': b'\x1b$(D',
     'iso_ir_58': b'\x1b$)A 58',
 }

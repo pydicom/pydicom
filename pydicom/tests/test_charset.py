@@ -2,50 +2,42 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """unittest cases for pydicom.charset module"""
 
-import unittest
-
 import pytest
 
-from pydicom.data import get_charset_files
-from pydicom.data import get_testdata_files
 import pydicom.charset
-from pydicom.dataelem import DataElement
 from pydicom import dcmread
+from pydicom.data import get_charset_files, get_testdata_files
+from pydicom.dataelem import DataElement
 
-latin1_file = get_charset_files("chrFren.dcm")[0]
-jp_file = get_charset_files("chrH31.dcm")[0]
-multiPN_file = get_charset_files("chrFrenMulti.dcm")[0]
-sq_encoding_file = get_charset_files("chrSQEncoding.dcm")[0]
-sq_encoding1_file = get_charset_files("chrSQEncoding1.dcm")[0]
-explicit_ir6_file = get_charset_files("chrJapMultiExplicitIR6.dcm")[0]
-normal_file = get_testdata_files("CT_small.dcm")[0]
+PATIENT_NAMES = [
+    # incorrectly decoded data sets are commented out
+    ('chrArab', u'قباني^لنزار'),
+    ('chrFren', u'Buc^Jérôme'),
+    ('chrFrenMulti', u'Buc^Jérôme'),
+    ('chrGerm', u'Äneas^Rüdiger'),
+    ('chrGreek', u'Διονυσιος'),
+    ('chrH31', u'Yamada^Tarou=山田^太郎=やまだ^たろう'),
+    ('chrH32', u'ﾔﾏﾀﾞ^ﾀﾛｳ=山田^太郎=やまだ^たろう'),
+    ('chrHbrw', u'שרון^דבורה'),
+    # ('chrI2', u'Hong^Gildong=洪^C吉洞=홍^C길동'),
+    # ('chrJapMulti', u'やまだ^たろう'),
+    # ('chrJapMultiExplicitIR6', u'やまだ^たろう'),
+    # ('chrKoreanMulti', u'김희중'),
+    ('chrRuss', u'Люкceмбypг'),
+    # ('chrX1', u'Wang^XiaoDong=王^小東'),
+    # ('chrX2', u'Wang^XiaoDong=王^小东'),
+]
 
 
-class CharsetTests(unittest.TestCase):
-    def test_latin1(self):
-        """charset: can read and decode latin_1 file........................"""
-        ds = dcmread(latin1_file)
-        ds.decode()
-        # Make sure don't get unicode encode error on converting to string
-        expected = u'Buc^Jérôme'
-        got = ds.PatientName
-        self.assertEqual(expected, got,
-                         "Expected %r, got %r" % (expected, got))
-
+class TestCharset(object):
     def test_encodings(self):
         test_string = u'Hello World'
         for x in pydicom.charset.python_encoding.items():
-            try:
-                test_string.encode(x[1])
-            except LookupError:
-                found = "(was '%s')" % x[1]
-                term = "Term '%s'" % x[0]
-                message = "%s has invalid python encoding %s" % (found, term)
-                self.fail(msg=message)
+            test_string.encode(x[1])
 
     def test_nested_character_sets(self):
         """charset: can read and decode SQ with different encodings........."""
-        ds = dcmread(sq_encoding_file)
+        ds = dcmread(get_charset_files("chrSQEncoding.dcm")[0])
         ds.decode()
 
         # These datasets inside of the SQ cannot be decoded with
@@ -53,54 +45,35 @@ class CharsetTests(unittest.TestCase):
         # Instead, we make sure that it is decoded using the
         # (0008,0005) tag of the dataset
 
-        expected = (u'ﾔﾏﾀﾞ^ﾀﾛｳ='
-                    u'山田^太郎='
-                    u'やまだ^たろう')
-
         sequence = ds[0x32, 0x1064][0]
         assert ['shift_jis', 'iso2022_jp'] == sequence._character_set
-        assert expected == sequence.PatientName
+        assert u'ﾔﾏﾀﾞ^ﾀﾛｳ=山田^太郎=やまだ^たろう' == sequence.PatientName
 
     def test_inherited_character_set_in_sequence(self):
         """charset: can read and decode SQ with parent encoding............."""
-        ds = dcmread(sq_encoding1_file)
+        ds = dcmread(get_charset_files('chrSQEncoding1.dcm')[0])
         ds.decode()
 
         # These datasets inside of the SQ shall be decoded with the parent
         # dataset's encoding
-        expected = (u'ﾔﾏﾀﾞ^ﾀﾛｳ='
-                    u'山田^太郎='
-                    u'やまだ^たろう')
-
         sequence = ds[0x32, 0x1064][0]
         assert ['shift_jis', 'iso2022_jp'] == sequence._character_set
-        assert expected == sequence.PatientName
+        assert u'ﾔﾏﾀﾞ^ﾀﾛｳ=山田^太郎=やまだ^たろう' == sequence.PatientName
 
     def test_standard_file(self):
         """charset: can read and decode standard file without special char.."""
-        ds = dcmread(normal_file)
+        ds = dcmread(get_testdata_files("CT_small.dcm")[0])
         ds.decode()
-
-    def test_explicit_iso2022_ir6(self):
-        """charset: can decode file with multi-valued data elements........."""
-        ds = dcmread(explicit_ir6_file)
-        ds.decode()
-
-    def test_multi_PN(self):
-        """charset: can decode file with multi-valued data elements........."""
-        ds = dcmread(multiPN_file)
-        ds.decode()
+        assert u'CompressedSamples^CT1' == ds.PatientName
 
     def test_encoding_with_specific_tags(self):
         """Encoding is correctly applied even if  Specific Character Set
         is not in specific tags..."""
-        ds = dcmread(jp_file, specific_tags=['PatientName'])
+        rus_file = get_charset_files("chrRuss.dcm")[0]
+        ds = dcmread(rus_file, specific_tags=['PatientName'])
         ds.decode()
-        self.assertEqual(1, len(ds))
-        expected = ('Yamada^Tarou='
-                    '\033$B;3ED\033(B^\033$BB@O:\033(B='
-                    '\033$B$d$^$@\033(B^\033$B$?$m$&\033(B')
-        self.assertEqual(expected, ds.PatientName)
+        assert 2 == len(ds)  # specific character set is always decoded
+        assert u'Люкceмбypг' == ds.PatientName
 
     def test_bad_charset(self):
         """Test bad charset defaults to ISO IR 6"""
@@ -165,9 +138,10 @@ class CharsetTests(unittest.TestCase):
         pydicom.charset.decode(elem, ['ISO 2022 IR 100', 'ISO 2022 IR 126'])
         assert u'Dionysios=Διονυσιος' == elem.value
 
-
-if __name__ == "__main__":
-    # This is called if run alone, but not if loaded through run_tests.py
-    # If not run from the directory where the sample images are,
-    #   then need to switch there
-    unittest.main()
+    @pytest.mark.parametrize('filename,patient_name', PATIENT_NAMES)
+    def test_charset_patient_names(self, filename, patient_name):
+        """Test pixel_array for big endian matches little."""
+        file_path = get_charset_files(filename + '.dcm')[0]
+        ds = dcmread(file_path)
+        ds.decode()
+        assert patient_name == ds.PatientName
