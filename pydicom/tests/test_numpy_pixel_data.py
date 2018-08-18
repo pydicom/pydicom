@@ -808,6 +808,7 @@ class TestNumpy_NumpyHandler(object):
         arr = ds.pixel_array
         arr[0, 0] = 0
 
+
 # Tests for numpy_handler module with Numpy available
 @pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
 class TestNumpy_GetPixelData(object):
