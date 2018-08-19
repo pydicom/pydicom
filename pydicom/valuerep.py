@@ -527,6 +527,20 @@ def MultiString(val, valtype=str):
         return MultiValue(valtype, splitup)
 
 
+def _decode_personname(components, encodings):
+    from pydicom.charset import decode_string
+
+    if isinstance(components[0], compat.text_type):
+        comps = components
+    else:
+        comps = [decode_string(comp, encodings)
+                 for comp in components]
+    # Remove empty elements from the end to avoid trailing '='
+    while len(comps) and not comps[-1]:
+        comps.pop()
+    return comps
+
+
 class PersonName3(object):
     def __init__(self, val, encodings=default_encoding):
         if isinstance(val, PersonName3):
@@ -572,18 +586,8 @@ class PersonName3(object):
 
     def decode(self, encodings=None):
         encodings = self._verify_encodings(encodings)
-
-        from pydicom.charset import decode_string
-        if not isinstance(self.components[0], bytes):
-            comps = self.components
-        else:
-            comps = [decode_string(comp, encodings)
-                     for comp in self.components]
-
-        while len(comps) and not comps[-1]:
-            comps.pop()
-
-        return PersonName3('='.join(comps), encodings)
+        comps = _decode_personname(self.components, encodings)
+        return PersonName3(u'='.join(comps), encodings)
 
     def encode(self, encodings=None):
         encodings = self._verify_encodings(encodings)
@@ -615,10 +619,7 @@ class PersonName3(object):
             return self.encodings
 
         if not isinstance(encodings, list):
-            encodings = [encodings] * 3
-
-        if len(encodings) == 2:
-            encodings.append(encodings[1])
+            encodings = [encodings]
 
         return encodings
 
@@ -727,13 +728,7 @@ class PersonNameUnicode(PersonNameBase, compat.text_type):
         if not isinstance(encodings, list):
             encodings = [encodings]
         components = val.split(b"=")
-
-        # first component cannot have code extensions
-        comps = [components[0].decode(encodings[0])]
-
-        # handle encoding change in component groups only
-        for comp in components[1:]:
-            comps.append(decode_string(comp, encodings))
+        comps = _decode_personname(components, encodings)
         new_val = u"=".join(comps)
 
         return compat.text_type.__new__(cls, new_val)

@@ -52,6 +52,7 @@ python_encoding = {
 }
 
 escape_codes = {
+    'latin1': b'\x1b(B',
     'iso8859': b'\x1b-A',
     'shift_jis': b'\x1b)I',
     'iso2022_jp': b'\x1b$B',
@@ -80,14 +81,29 @@ def decode_string(value, encodings):
     if b'\x1b' not in value:
         return value.decode(encodings[0])
 
-    for enc in encodings:
-        if enc in escape_codes and value.startswith(escape_codes[enc]):
-            # for some encodings, escape sequences are handled by python
-            if enc in ['iso2022_jp', 'iso-2022-jp', 'iso_ir_58']:
-                return value.decode(enc)
-            return value[len(escape_codes[enc]):].decode(enc)
+    # multi-byte character sets except Korean are handled by Python encodings
+    use_python_handling = value.startswith((escape_codes['iso2022_jp'],
+                                            escape_codes['iso-2022-jp'],
+                                            escape_codes['iso_ir_58']))
+
+    if use_python_handling:
+        parts = [value]
     else:
-        return value.decode(encodings[0])
+        parts = [b'\x1b' + part for part in value.split(b'\x1b') if part]
+    result = u''
+    for part in parts:
+        for enc in encodings + ['latin1']:
+            if enc in escape_codes and part.startswith(escape_codes[enc]):
+                # for some encodings, escape sequences are handled by python
+                if use_python_handling:
+                    val = part.decode(enc)
+                else:
+                    val = part[len(escape_codes[enc]):].decode(enc)
+                break
+        else:
+            val = part.decode(encodings[0])
+        result += val
+    return result
 
 
 # DICOM PS3.5-2008 6.1.1 (p 18) says:

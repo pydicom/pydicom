@@ -19,13 +19,13 @@ PATIENT_NAMES = [
     ('chrH31', u'Yamada^Tarou=山田^太郎=やまだ^たろう'),
     ('chrH32', u'ﾔﾏﾀﾞ^ﾀﾛｳ=山田^太郎=やまだ^たろう'),
     ('chrHbrw', u'שרון^דבורה'),
-    # ('chrI2', u'Hong^Gildong=洪^C吉洞=홍^C길동'),
-    # ('chrJapMulti', u'やまだ^たろう'),
-    # ('chrJapMultiExplicitIR6', u'やまだ^たろう'),
-    # ('chrKoreanMulti', u'김희중'),
+    ('chrI2', u'Hong^Gildong=洪^吉洞=홍^길동'),
+    ('chrJapMulti', u'やまだ^たろう'),
+    ('chrJapMultiExplicitIR6', u'やまだ^たろう'),
+    ('chrKoreanMulti', u'김희중'),
     ('chrRuss', u'Люкceмбypг'),
-    # ('chrX1', u'Wang^XiaoDong=王^小東'),
-    # ('chrX2', u'Wang^XiaoDong=王^小东'),
+    ('chrX1', u'Wang^XiaoDong=王^小東'),
+    ('chrX2', u'Wang^XiaoDong=王^小东'),
 ]
 
 
