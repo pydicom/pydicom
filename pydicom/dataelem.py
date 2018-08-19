@@ -66,7 +66,8 @@ def isStringOrStringList(val):
 
 
 # double '\' because it is used as escape chr in Python
-_backslash = "\\"
+_backslash_str = "\\"
+_backslash_byte = b"\\"
 
 
 class DataElement(object):
@@ -195,12 +196,16 @@ class DataElement(object):
         # Check if is a string with multiple values separated by '\'
         # If so, turn them into a list of separate strings
         #  Last condition covers 'US or SS' etc
-        if isString(val) and self.VR not in \
+        if isinstance(val, compat.char_types) and self.VR not in \
                 ['UT', 'ST', 'LT', 'FL', 'FD', 'AT', 'OB', 'OW', 'OF', 'SL',
                  'SQ', 'SS', 'UL', 'OB/OW', 'OW/OB', 'OB or OW',
                  'OW or OB', 'UN'] and 'US' not in self.VR:
-            if _backslash in val:
-                val = val.split(_backslash)
+            try:
+                if _backslash_str in val:
+                    val = val.split(_backslash_str)
+            except TypeError:
+                if _backslash_byte in val:
+                    val = val.split(_backslash_byte)
         self._value = self._convert_value(val)
 
     @property

@@ -765,10 +765,7 @@ class PersonNameUnicode(PersonNameBase, compat.text_type):
             return self.encodings
 
         if not isinstance(encodings, list):
-            encodings = [encodings] * 3
-
-        if len(encodings) == 2:
-            encodings.append(encodings[1])
+            encodings = [encodings]
 
         return encodings
 

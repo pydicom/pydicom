@@ -330,7 +330,7 @@ def convert_value(VR, raw_data_element, encoding=default_encoding):
 
     # Ensure that encoding is in the proper 3-element format
     if isinstance(encoding, compat.string_types):
-        encoding = [encoding, ] * 3
+        encoding = [encoding]
 
     byte_string = raw_data_element.value
     is_little_endian = raw_data_element.is_little_endian

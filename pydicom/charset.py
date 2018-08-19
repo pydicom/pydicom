@@ -40,7 +40,7 @@ python_encoding = {
     'ISO 2022 IR 138': 'iso_ir_138',
     'ISO 2022 IR 144': 'iso_ir_144',
     'ISO 2022 IR 148': 'iso_ir_148',
-    'ISO 2022 IR 149': 'euc_kr',  # needs cleanup via clean_escseq()
+    'ISO 2022 IR 149': 'euc_kr',
     'ISO 2022 IR 159': 'iso-2022-jp',
     'ISO 2022 IR 166': 'iso_ir_166',
     'ISO 2022 IR 58': 'iso_ir_58',
@@ -52,7 +52,7 @@ python_encoding = {
 }
 
 escape_codes = {
-    'latin1': b'\x1b(B',
+    'latin1': b'\x1b(B',   # used for ASCII character set (G0 of latin1)
     'iso8859': b'\x1b-A',
     'shift_jis': b'\x1b)I',
     'iso2022_jp': b'\x1b$B',
@@ -76,7 +76,6 @@ default_encoding = "iso8859"
 def decode_string(value, encodings):
     """Convert a raw byte string into a unicode string using the given
     list of encodings.
-    Currently only escape codes at the start are taken into account.
     """
     if b'\x1b' not in value:
         return value.decode(encodings[0])
@@ -90,17 +89,23 @@ def decode_string(value, encodings):
         parts = [value]
     else:
         parts = [b'\x1b' + part for part in value.split(b'\x1b') if part]
+        if not value.startswith(b'\x1b'):
+            parts[0] = parts[0][1:]
     result = u''
     for part in parts:
-        for enc in encodings + ['latin1']:
-            if enc in escape_codes and part.startswith(escape_codes[enc]):
-                # for some encodings, escape sequences are handled by python
-                if use_python_handling:
-                    val = part.decode(enc)
-                else:
-                    val = part[len(escape_codes[enc]):].decode(enc)
-                break
+        if part.startswith(b'\x1b'):
+            for enc in encodings + ['latin1']:
+                if enc in escape_codes and part.startswith(escape_codes[enc]):
+                    if use_python_handling:
+                        val = part.decode(enc)
+                    else:
+                        val = part[len(escape_codes[enc]):].decode(enc)
+                    break
+            else:
+                # unknown escape code - use first encoding (probably incorrect)
+                val = part.decode(encodings[0])
         else:
+            # if no escape code is given, the first encoding is used
             val = part.decode(encodings[0])
         result += val
     return result
