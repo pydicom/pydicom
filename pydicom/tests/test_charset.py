@@ -9,8 +9,11 @@ from pydicom import dcmread
 from pydicom.data import get_charset_files, get_testdata_files
 from pydicom.dataelem import DataElement
 
+# The file names (without '.dcm' extension) of most of the character test
+# files, together with the respective decoded PatientName tag values.
+# Most of these (except the Korean file) are taken from David Clunie's
+# charset example files.
 PATIENT_NAMES = [
-    # incorrectly decoded data sets are commented out
     ('chrArab', u'قباني^لنزار'),
     ('chrFren', u'Buc^Jérôme'),
     ('chrFrenMulti', u'Buc^Jérôme'),

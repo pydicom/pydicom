@@ -51,6 +51,8 @@ python_encoding = {
     'GBK': 'GBK',  # from DICOM correction CP1234
 }
 
+# Map Python encodings to escape sequences as defined in PS3.3 in tables
+# C.12-3 (single-byte) and C.12-4 (multi-byte character sets).
 escape_codes = {
     'latin1': b'\x1b(B',   # used for ASCII character set (G0 of latin1)
     'iso8859': b'\x1b-A',
@@ -88,7 +90,11 @@ def decode_string(value, encodings):
     if use_python_handling:
         parts = [value]
     else:
+        # Each part of the value that starts with an escape sequence is
+        # decoded separately using the corresponding encoding.
+        # See PS3.5, 6.2.4 and 6.1.2.5 for the use of code extensions.
         parts = [b'\x1b' + part for part in value.split(b'\x1b') if part]
+        # the first part may not start with an escape sequence
         if not value.startswith(b'\x1b'):
             parts[0] = parts[0][1:]
     result = u''
