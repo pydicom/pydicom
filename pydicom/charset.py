@@ -54,7 +54,7 @@ python_encoding = {
 # Map Python encodings to escape sequences as defined in PS3.3 in tables
 # C.12-3 (single-byte) and C.12-4 (multi-byte character sets).
 escape_codes = {
-    'latin1': b'\x1b(B',   # used for ASCII character set (G0 of latin1)
+    'ascii': b'\x1b(B',  # used to switch to ASCII G0 code element
     'iso8859': b'\x1b-A',
     'shift_jis': b'\x1b)I',
     'iso2022_jp': b'\x1b$B',
@@ -74,12 +74,14 @@ escape_codes = {
 
 default_encoding = "iso8859"
 
+ESCAPE = b'\x1b'
+
 
 def decode_string(value, encodings):
     """Convert a raw byte string into a unicode string using the given
     list of encodings.
     """
-    if b'\x1b' not in value:
+    if ESCAPE not in value:
         return value.decode(encodings[0])
 
     # multi-byte character sets except Korean are handled by Python encodings
@@ -92,15 +94,15 @@ def decode_string(value, encodings):
     else:
         # Each part of the value that starts with an escape sequence is
         # decoded separately using the corresponding encoding.
-        # See PS3.5, 6.2.4 and 6.1.2.5 for the use of code extensions.
-        parts = [b'\x1b' + part for part in value.split(b'\x1b') if part]
+        # See PS3.5, 6.1.2.4 and 6.1.2.5 for the use of code extensions.
+        parts = [ESCAPE + part for part in value.split(ESCAPE) if part]
         # the first part may not start with an escape sequence
-        if not value.startswith(b'\x1b'):
+        if not value.startswith(ESCAPE):
             parts[0] = parts[0][1:]
     result = u''
     for part in parts:
-        if part.startswith(b'\x1b'):
-            for enc in encodings + ['latin1']:
+        if part.startswith(ESCAPE):
+            for enc in list(encodings) + ['ascii']:
                 if enc in escape_codes and part.startswith(escape_codes[enc]):
                     if use_python_handling:
                         val = part.decode(enc)

@@ -25,7 +25,7 @@ extra_length_VRs = ('OB', 'OD', 'OF', 'OL', 'OW', 'SQ', 'UC', 'UN', 'UR', 'UT')
 # in (0008,0005) Specific Character Set
 # See PS-3.5 (2011), section 6.1.2 Graphic Characters
 # and PN, but it is handled separately.
-text_VRs = ('SH', 'LO', 'ST', 'LT', 'UC', 'UR', 'UT')
+text_VRs = ('SH', 'LO', 'ST', 'LT', 'UC', 'UT')
 
 match_string = b''.join([
     b'(?P<single_byte>', br'(?P<family_name>[^=\^]*)',
@@ -528,6 +528,7 @@ def MultiString(val, valtype=str):
 
 
 def _decode_personname(components, encodings):
+    """Return a list of decoded person name components."""
     from pydicom.charset import decode_string
 
     if isinstance(components[0], compat.text_type):

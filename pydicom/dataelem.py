@@ -33,7 +33,7 @@ if not in_py2:
 def isMultiValue(value):
     """Return True if `value` is list-like (iterable),
        False otherwise."""
-    if isString(value) or isinstance(value, bytes):
+    if isinstance(value, compat.char_types):
         return False
     try:
         iter(value)
