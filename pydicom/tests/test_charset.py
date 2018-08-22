@@ -13,7 +13,7 @@ from pydicom.dataelem import DataElement
 # files, together with the respective decoded PatientName tag values.
 # Most of these (except the Korean file) are taken from David Clunie's
 # charset example files.
-PATIENT_NAMES = [
+FILE_PATIENT_NAMES = [
     ('chrArab', u'قباني^لنزار'),
     ('chrFren', u'Buc^Jérôme'),
     ('chrFrenMulti', u'Buc^Jérôme'),
@@ -29,6 +29,31 @@ PATIENT_NAMES = [
     ('chrRuss', u'Люкceмбypг'),
     ('chrX1', u'Wang^XiaoDong=王^小東'),
     ('chrX2', u'Wang^XiaoDong=王^小东'),
+]
+
+# Test data for all single-byte coding extensions.
+# Mostly taken from the same example files.
+ENCODED_NAMES = [
+    ('ISO 2022 IR 13', u'ﾔﾏﾀﾞ^ﾀﾛｳ',
+     b'\x1b\x29\x49\xd4\xcf\xc0\xde\x5e\xc0\xdb\xb3'),
+    ('ISO 2022 IR 100', u'Buc^Jérôme',
+     b'\x1b\x2d\x41\x42\x75\x63\x5e\x4a\xe9\x72\xf4\x6d\x65'),
+    ('ISO 2022 IR 101', u'Wałęsa',
+     b'\x1b\x2d\x42\x57\x61\xb3\xea\x73\x61'),
+    ('ISO 2022 IR 109', u'antaŭnomo',
+     b'\x1b\x2d\x43\x61\x6e\x74\x61\xfd\x6e\x6f\x6d\x6f'),
+    ('ISO 2022 IR 110', u'vārds',
+     b'\x1b\x2d\x44\x76\xe0\x72\x64\x73'),
+    ('ISO 2022 IR 127', u'قباني^لنزار',
+     b'\x1b\x2d\x47\xe2\xc8\xc7\xe6\xea\x5e\xe4\xe6\xd2\xc7\xd1'),
+    ('ISO 2022 IR 126', u'Διονυσιος',
+     b'\x1b\x2d\x46\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2'),
+    ('ISO 2022 IR 138', u'שרון^דבורה',
+     b'\x1b\x2d\x48\xf9\xf8\xe5\xef\x5e\xe3\xe1\xe5\xf8\xe4'),
+    ('ISO 2022 IR 144', u'Люкceмбypг',
+     b'\x1b\x2d\x4c\xbb\xee\xda\x63\x65\xdc\xd1\x79\x70\xd3'),
+    ('ISO 2022 IR 148', u'Çavuşoğlu',
+     b'\x1b\x2d\x4d\xc7\x61\x76\x75\xfe\x6f\xf0\x6c\x75'),
 ]
 
 
@@ -172,7 +197,14 @@ class TestCharset(object):
                                       'ISO 2022 IR 126'])
         assert [u'Buc^Jérôme', u'Διονυσιος', u'Люкceмбypг'] == elem.value
 
-    @pytest.mark.parametrize('filename,patient_name', PATIENT_NAMES)
+    @pytest.mark.parametrize('encoding, decoded, raw_data', ENCODED_NAMES)
+    def test_single_byte_code_extensions(self, encoding, decoded, raw_data):
+        # single-byte encoding as code extension
+        elem = DataElement(0x00081039, 'LO', b'ASCII+' + raw_data)
+        pydicom.charset.decode(elem, ['', encoding])
+        assert u'ASCII+' + decoded == elem.value
+
+    @pytest.mark.parametrize('filename, patient_name', FILE_PATIENT_NAMES)
     def test_charset_patient_names(self, filename, patient_name):
         """Test pixel_array for big endian matches little."""
         file_path = get_charset_files(filename + '.dcm')[0]

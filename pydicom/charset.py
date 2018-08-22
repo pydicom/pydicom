@@ -51,37 +51,38 @@ python_encoding = {
     'GBK': 'GBK',  # from DICOM correction CP1234
 }
 
+# the escape character used to mark the start of escape sequences
+ESC = b'\x1b'
+
 # Map Python encodings to escape sequences as defined in PS3.3 in tables
 # C.12-3 (single-byte) and C.12-4 (multi-byte character sets).
 escape_codes = {
-    'ascii': b'\x1b(B',  # used to switch to ASCII G0 code element
-    'iso8859': b'\x1b-A',
-    'shift_jis': b'\x1b)I',
-    'iso2022_jp': b'\x1b$B',
-    'iso8859_2': b'\x1b-B',
-    'iso8859_3': b'\x1b-C',
-    'iso8859_4': b'\x1b-D',
-    'iso_ir_126': b'\x1b-F',
-    'iso_ir_127': b'\x1b-G',
-    'iso_ir_138': b'\x1b-H',
-    'iso_ir_144': b'\x1b-L',
-    'iso_ir_148': b'\x1b-M',
-    'iso_ir_166': b'\x1b-T',
-    'euc_kr': b'\x1b$)C',
-    'iso-2022-jp': b'\x1b$(D',
-    'iso_ir_58': b'\x1b$)A 58',
+    'iso8859': ESC + b'(B',  # used to switch to ASCII G0 code element
+    'latin_1': ESC + b'-A',
+    'shift_jis': ESC + b')I',
+    'iso2022_jp': ESC + b'$B',
+    'iso8859_2': ESC + b'-B',
+    'iso8859_3': ESC + b'-C',
+    'iso8859_4': ESC + b'-D',
+    'iso_ir_126': ESC + b'-F',
+    'iso_ir_127': ESC + b'-G',
+    'iso_ir_138': ESC + b'-H',
+    'iso_ir_144': ESC + b'-L',
+    'iso_ir_148': ESC + b'-M',
+    'iso_ir_166': ESC + b'-T',
+    'euc_kr': ESC + b'$)C',
+    'iso-2022-jp': ESC + b'$(D',
+    'iso_ir_58': ESC + b'$)A',
 }
 
 default_encoding = "iso8859"
-
-ESCAPE = b'\x1b'
 
 
 def decode_string(value, encodings):
     """Convert a raw byte string into a unicode string using the given
     list of encodings.
     """
-    if ESCAPE not in value:
+    if ESC not in value:
         return value.decode(encodings[0])
 
     # multi-byte character sets except Korean are handled by Python encodings
@@ -95,14 +96,15 @@ def decode_string(value, encodings):
         # Each part of the value that starts with an escape sequence is
         # decoded separately using the corresponding encoding.
         # See PS3.5, 6.1.2.4 and 6.1.2.5 for the use of code extensions.
-        parts = [ESCAPE + part for part in value.split(ESCAPE) if part]
+        parts = [ESC + part for part in value.split(ESC) if part]
         # the first part may not start with an escape sequence
-        if not value.startswith(ESCAPE):
+        if not value.startswith(ESC):
             parts[0] = parts[0][1:]
     result = u''
+
     for part in parts:
-        if part.startswith(ESCAPE):
-            for enc in list(encodings) + ['ascii']:
+        if part.startswith(ESC):
+            for enc in list(encodings) + ['iso8859']:
                 if enc in escape_codes and part.startswith(escape_codes[enc]):
                     if use_python_handling:
                         val = part.decode(enc)
