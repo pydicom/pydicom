@@ -263,7 +263,7 @@ def pack_bits(arr):
 
     # Reshape so each row is 8 bits
     arr = np.reshape(arr, (-1, 8))
-    if 'PyPy' not in python_implementation():
+    if 'PyPy' not in python_implementation() or not IN_PYTHON2:
         arr = np.fliplr(arr)
         arr = np.packbits(arr.astype('uint8'))
         bytestream = arr.tobytes()
@@ -303,7 +303,7 @@ def unpack_bits(bytestream):
     ----------
     DICOM Standard, Part 5, Section 8.1.1 and Annex D
     """
-    if 'PyPy' not in python_implementation():
+    if 'PyPy' not in python_implementation() or not IN_PYTHON2:
         # Thanks to @sbrodehl (#643)
         # e.g. b'\xC0\x09' -> [192, 9]
         arr = np.frombuffer(bytestream, dtype='uint8')
