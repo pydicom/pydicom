@@ -33,16 +33,13 @@ def convert_tag(byte_string, is_little_endian, offset=0):
     return TupleTag(unpack(struct_format, byte_string[offset:offset + 4]))
 
 
-def convert_AE_string(byte_string,
-                      is_little_endian,
-                      struct_format=None,
-                      encoding=default_encoding):
+def convert_AE_string(byte_string, is_little_endian, struct_format=None):
     """Read a byte string for a VR of 'AE'.
 
     Elements with VR of 'AE' have non-significant leading and trailing spaces.
     """
     if not in_py2:
-        byte_string = byte_string.decode(encoding)
+        byte_string = byte_string.decode(default_encoding)
     byte_string = byte_string.strip()
     return byte_string
 
@@ -225,11 +222,10 @@ def convert_PN(byte_string,
 
 def convert_string(byte_string,
                    is_little_endian,
-                   struct_format=None,
-                   encoding=default_encoding):
+                   struct_format=None):
     """Read and return a string or strings"""
     if not in_py2:
-        byte_string = byte_string.decode(encoding)
+        byte_string = byte_string.decode(default_encoding)
     return MultiString(byte_string)
 
 
@@ -304,9 +300,7 @@ def convert_UN(byte_string, is_little_endian, struct_format=None):
     return byte_string
 
 
-def convert_UR_string(byte_string,
-                      is_little_endian,
-                      struct_format=None):
+def convert_UR_string(byte_string, is_little_endian, struct_format=None):
     """Read a byte string for a VR of 'UR'
 
     Elements with VR of 'UR' shall not be multi-valued

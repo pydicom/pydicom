@@ -7,7 +7,7 @@ import pytest
 from pydicom.tag import Tag
 from pydicom.values import (convert_value, converters, convert_tag,
                             convert_ATvalue, convert_DA_string, convert_text,
-                            convert_single_string)
+                            convert_single_string, convert_AE_string)
 
 
 class TestConvertTag(object):
@@ -39,6 +39,11 @@ class TestConvertTag(object):
         bytestring = b'\x10\x00'
         convert_tag(bytestring, True)
 
+
+class TestConvertAE(object):
+    def test_strip_blanks(self):
+        bytestring = b'  AE_TITLE '
+        assert u'AE_TITLE' == convert_AE_string(bytestring, True)
 
 class TestConvertText(object):
     def test_single_value(self):
