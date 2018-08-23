@@ -342,7 +342,7 @@ def convert_value(VR, raw_data_element, encoding=default_encoding):
     is_implicit_VR = raw_data_element.is_implicit_VR
 
     # Not only two cases. Also need extra info if is a raw sequence
-    # Pass all encoding to the converter if needed
+    # Pass all encodings to the converter if needed
     try:
         if VR in text_VRs or VR == 'PN':
             value = converter(byte_string,

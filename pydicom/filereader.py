@@ -808,7 +808,9 @@ def dcmread(fp, defer_size=None, stop_before_pixels=False,
         no File Meta Information header is found.
     specific_tags : list or None
         If not None, only the tags in the list are returned. The list
-        elements can be tags or tag names.
+        elements can be tags or tag names. Note that the tag Specific
+        Character Set is always returned if present - this ensures correct
+        decoding of returned text values.
 
     Returns
     -------
