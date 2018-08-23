@@ -883,12 +883,13 @@ class ReadTruncatedFileTests(unittest.TestCase):
     def testReadFileWithMissingPixelDataArray(self):
         mr = dcmread(truncated_mr_name)
         mr.decode()
-        msg = (r"(Amount of pixel data.*"
-               "does not match the expected data|"
-               "Unexpected end of file. Read.*bytes of.*expected|"
-               "'str' object has no attribute 'reshape'|"
-               "'bytes' object has no attribute 'reshape')")
-        with pytest.raises(AttributeError, match=msg):
+        # Need to escape brackets
+        msg = (
+            "The length of the pixel data in the dataset doesn't match the "
+            "expected amount \(8130 vs. 8192 bytes\). The dataset may be "
+            "corrupted or there may be an issue with the pixel data handler."
+        )
+        with pytest.raises(ValueError, match=msg):
             mr.pixel_array
 
 
