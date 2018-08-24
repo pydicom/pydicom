@@ -232,10 +232,8 @@ class TestNoNumpy_NoNumpyHandler(object):
         ds = dcmread(EXPL_16_1_1F)
         for uid in ALL_SYNTAXES:
             ds.file_meta.TransferSyntaxUID = uid
-            exc_msg = (
-                'No available image handler could decode this transfer syntax'
-            )
-            with pytest.raises(NotImplementedError, match=exc_msg):
+            with pytest.raises(NotImplementedError,
+                               match="UID of '{}'".format(uid)):
                 ds.pixel_array
 
 
@@ -292,10 +290,8 @@ class TestNumpy_NoNumpyHandler(object):
         ds = dcmread(EXPL_16_1_1F)
         for uid in ALL_SYNTAXES:
             ds.file_meta.TransferSyntaxUID = uid
-            exc_msg = (
-                'No available image handler could decode this transfer syntax'
-            )
-            with pytest.raises(NotImplementedError, match=exc_msg):
+            with pytest.raises(NotImplementedError,
+                               match="UID of '{}'".format(uid)):
                 ds.pixel_array
 
 
@@ -359,10 +355,11 @@ class TestNumpy_NumpyHandler(object):
     def test_unsupported_syntax_raises(self):
         """Test pixel_array raises exception for unsupported syntaxes."""
         ds = dcmread(EXPL_16_1_1F)
+
         for uid in UNSUPPORTED_SYNTAXES:
             ds.file_meta.TransferSyntaxUID = uid
             with pytest.raises(NotImplementedError,
-                               match='image handler could decode'):
+                               match="UID of '{0}' ".format(uid)):
                 ds.pixel_array
 
     @pytest.mark.parametrize("fpath, data", REFERENCE_DATA_UNSUPPORTED)

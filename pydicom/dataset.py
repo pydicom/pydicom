@@ -766,9 +766,9 @@ class Dataset(dict):
         # No suitable handlers are available
         if not suitable_handlers:
             raise NotImplementedError(
-                "Unable to decode pixel data with a tranfer syntax UID of "
+                "Unable to decode pixel data with a transfer syntax UID of "
                 "'{0}' ({1}) as there are no suitable pixel data handlers "
-                "available or an additional package is required to use them."
+                "available."
                 .format(self.file_meta.TransferSyntaxUID,
                         self.file_meta.TransferSyntaxUID.name)
             )
@@ -778,7 +778,7 @@ class Dataset(dict):
             try:
                 # Use the handler to get a 1D numpy array of the pixel data
                 arr = handler.get_pixeldata(self)
-                self._pixel_array = reshape_pixel_array(arr)
+                self._pixel_array = reshape_pixel_array(self, arr)
 
                 # Some handler/transfer syntax combinations may need to
                 #   convert the colour space from YCbCr to RGB

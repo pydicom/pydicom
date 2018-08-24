@@ -1002,14 +1002,6 @@ class DatasetTests(unittest.TestCase):
         with pytest.raises(ValueError, match="Random ex message!"):
                     getattr(DSException(), 'test')
 
-    def test_reshape_pixel_array_not_implemented(self):
-        """Test Dataset._reshape_pixel_array raises exception"""
-        ds = Dataset()
-        ds.SamplesPerPixel = 2
-        ds.BitsAllocated = 16
-        with pytest.raises(NotImplementedError):
-            ds._reshape_pixel_array(None)
-
     def test_get_pixel_array_already_have(self):
         """Test Dataset._get_pixel_array when we already have the array"""
         # Test that _pixel_array is returned unchanged unless required
@@ -1017,7 +1009,8 @@ class DatasetTests(unittest.TestCase):
         ds.PixelData = b'\x00'
         ds._pixel_id = id(ds.PixelData)
         ds._pixel_array = 'Test Value'
-        assert ds._get_pixel_array() == 'Test Value'
+        ds.convert_pixel_data()
+        assert ds._pixel_array == 'Test Value'
 
     def test_formatted_lines(self):
         """Test Dataset.formatted_lines"""

@@ -122,6 +122,9 @@ def reshape_pixel_array(ds, arr):
     * DICOM Standard, Part 3, Annex C.7.6.3.1
     * DICOM Standard, Part 4, Sections 8.2.1-4
     """
+    if not HAVE_NP:
+        raise ImportError("Numpy is required to reshape the pixel array.")
+
     nr_frames = getattr(ds, 'NumberOfFrames', 1)
     nr_samples = ds.SamplesPerPixel
 
@@ -204,7 +207,7 @@ def convert_YBR_to_RGB(arr_ybr):
         The ndarray in RGB colour space.
     """
     if not HAVE_NP:
-        raise NotImplementedError(
+        raise ImportError(
             "Numpy is required to convert the color space."
         )
 
@@ -258,6 +261,9 @@ def pixel_dtype(ds):
         If the pixel data is of a type that isn't supported by either numpy
         or pydicom.
     """
+    if not HAVE_NP:
+        raise ImportError("Numpy is required to determine the dtype.")
+
     if ds.is_little_endian is None:
         ds.is_little_endian = ds.file_meta.TransferSyntaxUID.is_little_endian
 
