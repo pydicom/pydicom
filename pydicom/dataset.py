@@ -34,6 +34,8 @@ from pydicom.datadict import dictionary_VR
 from pydicom.datadict import (tag_for_keyword, keyword_for_tag,
                               repeater_has_keyword)
 from pydicom.dataelem import DataElement, DataElement_from_raw, RawDataElement
+from pydicom.pixel_data_handlers.util import (convert_YBR_to_RGB,
+                                              reshape_pixel_array)
 from pydicom.tag import Tag, BaseTag, tag_in_exception
 from pydicom.uid import (ExplicitVRLittleEndian, ImplicitVRLittleEndian,
                          ExplicitVRBigEndian, PYDICOM_IMPLEMENTATION_UID)
@@ -733,58 +735,6 @@ class Dataset(dict):
         """Compare `self` and `other` for inequality."""
         return not self == other
 
-    def _reshape_pixel_array(self, pixel_array):
-        # Note the following reshape operations return a new *view* onto
-        #   pixel_array, but don't copy the data
-        if 'NumberOfFrames' in self and self.NumberOfFrames > 1:
-            if self.SamplesPerPixel > 1:
-                # TODO: Handle Planar Configuration attribute
-                assert self.PlanarConfiguration == 0
-                pixel_array = pixel_array.reshape(self.NumberOfFrames,
-                                                  self.Rows, self.Columns,
-                                                  self.SamplesPerPixel)
-            else:
-                pixel_array = pixel_array.reshape(self.NumberOfFrames,
-                                                  self.Rows, self.Columns)
-        else:
-            if self.SamplesPerPixel > 1:
-                if self.BitsAllocated == 8:
-                    if self.PlanarConfiguration == 0:
-                        pixel_array = pixel_array.reshape(
-                            self.Rows, self.Columns, self.SamplesPerPixel)
-                    else:
-                        pixel_array = pixel_array.reshape(
-                            self.SamplesPerPixel, self.Rows, self.Columns)
-                        pixel_array = pixel_array.transpose(1, 2, 0)
-                else:
-                    raise NotImplementedError("This code only handles "
-                                              "SamplesPerPixel > 1 if Bits "
-                                              "Allocated = 8")
-            else:
-                pixel_array = pixel_array.reshape(self.Rows, self.Columns)
-        return pixel_array
-
-    def _convert_YBR_to_RGB(self, array_of_YBR_pixels):
-        if have_numpy:
-            ybr_to_rgb = numpy.ndarray((3, 3), dtype=numpy.float)
-            ybr_to_rgb[0, :] = [1.0, +0.000000, +1.402000]
-            ybr_to_rgb[1, :] = [1.0, -0.344136, -0.714136]
-            ybr_to_rgb[2, :] = [1.0, +1.772000, +0.000000]
-            orig_type = array_of_YBR_pixels.dtype
-            array_of_YBR_pixels = array_of_YBR_pixels.astype(numpy.float)
-            array_of_YBR_pixels -= [0, 128, 128]
-            array_of_YBR_pixels = numpy.dot(
-                array_of_YBR_pixels, ybr_to_rgb.T.copy()).astype(orig_type)
-            return array_of_YBR_pixels
-        else:
-            raise NotImplementedError("Numpy is required"
-                                      "To convert the color space")
-
-    # Use by pixel_array property
-    def _get_pixel_array(self):
-        self.convert_pixel_data()
-        return self._pixel_array
-
     def convert_pixel_data(self):
         """Convert the Pixel Data to a numpy array internally.
 
@@ -793,8 +743,10 @@ class Dataset(dict):
         None
             Converted pixel data is stored internally in the dataset.
 
-        If a compressed image format, the image is  decompressed,
-        and any related data elements are changed accordingly.
+        Notes
+        -----
+        If the pixel data is in a compressed image format, the data is
+        decompressed and any related data elements are changed accordingly.
         """
         # Check if already have converted to a NumPy array
         # Also check if self.PixelData has changed. If so, get new NumPy array
@@ -804,40 +756,57 @@ class Dataset(dict):
         elif self._pixel_id != id(self.PixelData):
             already_have = False
 
-        if not already_have:
-            last_exception = None
-            successfully_read_pixel_data = False
-            for x in [h for h in pydicom.config.image_handlers
-                      if h and h.supports_transfer_syntax(self)]:
-                try:
-                    pixel_array = x.get_pixeldata(self)
-                    self._pixel_array = self._reshape_pixel_array(pixel_array)
-                    if x.needs_to_convert_to_RGB(self):
-                        self._pixel_array = self._convert_YBR_to_RGB(
-                            self._pixel_array
-                        )
-                    successfully_read_pixel_data = True
-                    break
-                except Exception as e:
-                    logger.debug("Trouble with", exc_info=e)
-                    last_exception = e
-                    continue
-            if not successfully_read_pixel_data:
-                handlers_tried = " ".join(
-                    [str(x) for x in pydicom.config.image_handlers])
-                logger.info("%s did not support this transfer syntax",
-                            handlers_tried)
-                self._pixel_array = None
-                self._pixel_id = None
-                if last_exception:
-                    raise last_exception
-                else:
-                    msg = ("No available image handler could "
-                           "decode this transfer syntax {}".format(
-                               self.file_meta.TransferSyntaxUID.name))
-                    raise NotImplementedError(msg)
-            # is this guaranteed to work if memory is re-used??
-            self._pixel_id = id(self.PixelData)
+        if already_have:
+            return
+
+        # Find all pixel data handlers that support the transfer syntax
+        suitable_handlers = [hh for hh in pydicom.config.image_handlers
+                             if hh and hh.supports_transfer_syntax(self)]
+
+        # No suitable handlers are available
+        if not suitable_handlers:
+            raise NotImplementedError(
+                "Unable to decode pixel data with a tranfer syntax UID of "
+                "'{0}' ({1}) as there are no suitable pixel data handlers "
+                "available or an additional package is required to use them."
+                .format(self.file_meta.TransferSyntaxUID,
+                        self.file_meta.TransferSyntaxUID.name)
+            )
+
+        last_exception = None
+        for handler in suitable_handlers:
+            try:
+                # Use the handler to get a 1D numpy array of the pixel data
+                arr = handler.get_pixeldata(self)
+                self._pixel_array = reshape_pixel_array(arr)
+
+                # Some handler/transfer syntax combinations may need to
+                #   convert the colour space from YCbCr to RGB
+                if handler.needs_to_convert_to_RGB(self):
+                    self._pixel_array = convert_YBR_to_RGB(self._pixel_array)
+
+                # is this guaranteed to work if memory is re-used??
+                self._pixel_id = id(self.PixelData)
+
+                return
+            except Exception as exc:
+                logger.debug(
+                    "Exception raised by pixel data handler", exc_info=exc
+                )
+                last_exception = exc
+                continue
+
+        # The only way to get to this point is if we failed to get the pixel
+        #   array because all suitable handlers raised exceptions
+        self._pixel_array = None
+        self._pixel_id = None
+
+        logger.info(
+            "Unable to decode the pixel data using the following handlers: {}"
+            .format(", ".join([str(hh) for hh in suitable_handlers]))
+        )
+
+        raise last_exception
 
     def decompress(self):
         """Decompresses pixel data and modifies the Dataset in-place
@@ -891,7 +860,8 @@ class Dataset(dict):
         numpy.ndarray
             The Pixel Data (7FE0,0010) as a NumPy ndarray.
         """
-        return self._get_pixel_array()
+        self.convert_pixel_data()
+        return self._pixel_array
 
     # Format strings spec'd according to python string formatting options
     #    See http://docs.python.org/library/stdtypes.html#string-formatting-operations # noqa
