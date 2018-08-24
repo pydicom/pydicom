@@ -7,7 +7,7 @@ from sys import byteorder
 try:
     import numpy as np
     HAVE_NP = True
-except:
+except ImportError:
     HAVE_NP = False
 
 
