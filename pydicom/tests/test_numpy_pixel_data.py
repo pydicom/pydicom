@@ -384,7 +384,6 @@ class TestNumpy_NumpyHandler(object):
         assert (1, -10, 1) == tuple(arr[300, 491:494])
         assert 0 == arr[-1].min() == arr[-1].max()
 
-    @pytest.mark.skip(reason='Samples/pixel>1, BitsAllocated>8 not supported')
     def test_pixel_array_16bit_un_signed(self):
         """Test pixel_array for 16-bit unsigned -> signed."""
         ds = dcmread(EXPL_16_3_1F)
@@ -399,7 +398,6 @@ class TestNumpy_NumpyHandler(object):
         assert -1 == arr[0, :, 0].min() == arr[0, :, 0].max()
         assert -32640 == arr[50, :, 0].min() == arr[50, :, 0].max()
 
-    @pytest.mark.skip(reason='Samples/pixel>1, BitsAllocated>8 not supported')
     def test_pixel_array_32bit_un_signed(self):
         """Test pixel_array for 32-bit unsigned -> signed."""
         ds = dcmread(EXPL_32_3_1F)
@@ -638,7 +636,6 @@ class TestNumpy_NumpyHandler(object):
             assert (25, 4, 9) == tuple(arr[-1, 31, :3])
             assert (227, 300, 147) == tuple(arr[-1, -1, -3:])
 
-    @pytest.mark.skip(reason='Samples/pixel>1, BitsAllocated>8 not supported')
     def test_little_16bit_3sample_1frame(self):
         """Test pixel_array for little 16-bit, 3 sample/pixel, 1 frame."""
         # Check all little endian syntaxes
@@ -713,7 +710,6 @@ class TestNumpy_NumpyHandler(object):
             assert (1031000, 1031000, 1031000) == tuple(arr[-1, 4, 3:6])
             assert (801000, 800000, 799000) == tuple(arr[-1, -1, -3:])
 
-    @pytest.mark.skip(reason='Samples/pixel>1, BitsAllocated>8 not supported')
     def test_little_32bit_3sample_1frame(self):
         """Test pixel_array for little 32-bit, 3 sample/pixel, 1 frame."""
         # Check all little endian syntaxes
@@ -931,7 +927,7 @@ class TestNumpy_PackBits(object):
         assert output == pack_bits(np.asarray(input))
 
     def test_functional(self):
-        """Test against as real dataset."""
+        """Test against a real dataset."""
         ds = dcmread(EXPL_1_1_3F)
         arr = ds.pixel_array
         arr = arr.ravel()

@@ -10,6 +10,7 @@ import pytest
 import pydicom
 from pydicom.filereader import dcmread
 from pydicom.data import get_testdata_files
+from pydicom.pixel_data_handlers import convert_YBR_to_RGB
 from pydicom.tag import Tag
 from pydicom import compat
 gdcm_missing_message = "GDCM is not available in this test environment"
@@ -388,7 +389,7 @@ class GDCM_JPEGlossyTests_with_gdcm(unittest.TestCase):
             "YBR_FULL_422")
         a = self.color_3d_jpeg.pixel_array
         self.assertEqual(a.shape, (120, 480, 640, 3))
-        a = self.color_3d_jpeg._convert_YBR_to_RGB(a)
+        a = convert_YBR_to_RGB(a)
         # this test points were manually identified in Osirix viewer
         self.assertEqual(tuple(a[3, 159, 290, :]), (41, 41, 41))
         self.assertEqual(tuple(a[3, 169, 290, :]), (57, 57, 57))
