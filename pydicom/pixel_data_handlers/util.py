@@ -129,16 +129,16 @@ def reshape_pixel_array(ds, arr):
     nr_samples = ds.SamplesPerPixel
 
     if nr_frames < 1:
-        raise NotImplementedError(
+        raise ValueError(
             "Unable to reshape the pixel array as a value of {} for "
-            "(0028,0008) 'Number of Frames' is not supported."
+            "(0028,0008) 'Number of Frames' is invalid."
             .format(nr_frames)
         )
 
     if nr_samples < 1:
-        raise NotImplementedError(
+        raise ValueError(
             "Unable to reshape the pixel array as a value of {} for "
-            "(0028,0002) 'Samples per Pixel' is not supported."
+            "(0028,0002) 'Samples per Pixel' is invalid."
             .format(nr_samples)
         )
 
@@ -159,9 +159,9 @@ def reshape_pixel_array(ds, arr):
             planar_configuration = ds.PlanarConfiguration
 
         if planar_configuration not in [0, 1]:
-            raise NotImplementedError(
+            raise ValueError(
                 "Unable to reshape the pixel array as a value of {} for "
-                "(0028,0006) 'Planar Configuration' is not supported."
+                "(0028,0006) 'Planar Configuration' is invalid."
                 .format(planar_configuration)
             )
 
@@ -216,15 +216,15 @@ def convert_YBR_to_RGB(arr_ybr):
     # Conversion from PhotometricInterpretation of YBR to RGB
     #   PS3.3 C.7.6.3.1.2
     # https://en.wikipedia.org/wiki/YCbCr#JPEG_conversion
-    ybr_to_rgb = numpy.asarray(
+    ybr_to_rgb = np.asarray(
         [[1.0, +0.000000, +1.402000],
          [1.0, -0.344136, -0.714136],
-         [1.0, +1.772000, +0.000000]], dtype=numpy.float)
+         [1.0, +1.772000, +0.000000]], dtype=np.float)
 
-    arr_ybr = arr_ybr.astype(numpy.float)
+    arr_ybr = arr_ybr.astype(np.float)
     arr_ybr -= [0, 128, 128]
     # Why copy?
-    arr_ybr = numpy.dot(arr_ybr, ybr_to_rgb.T.copy())
+    arr_ybr = np.dot(arr_ybr, ybr_to_rgb.T.copy())
 
     return arr_ybr.astype(orig_dtype)
 

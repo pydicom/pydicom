@@ -98,11 +98,13 @@ class Test_RLE_transfer_syntax():
     @pytest.mark.skipif(pillow_handler is None, reason=pillow_missing_message)
     def test_read_emri_with_pillow(self):
         pydicom.config.image_handlers = [pillow_handler]
+        msg = (
+            "Unable to decode pixel data with a transfer syntax UID of "
+            "'1.2.840.10008.1.2.5' \(RLE Lossless\) as there are no suitable "
+            "pixel data handlers available."
+        )
         with pytest.raises(NotImplementedError, match=msg):
-            _ = self.compressed_emri.pixel_array
-        assert re.match(
-            ".*No available image handler could decode this transfer "
-            "syntax (1.2.840.10008.1.2.5|RLE Lossless).*", str(e))
+            self.compressed_emri.pixel_array
 
     @pytest.mark.skipif(gdcm_handler is None, reason=gdcm_missing_message)
     def test_read_mr_with_gdcm(self):

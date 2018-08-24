@@ -294,7 +294,7 @@ class TestNumpy_ReshapePixelArray(object):
         assert np.array_equal(
             self.ref_1_3[:, :, 1],
             np.asarray(
-                [[ 9, 10, 11, 12, 13],
+                [[9,  10, 11, 12, 13],
                  [10, 11, 12, 13, 14],
                  [11, 12, 13, 14, 15],
                  [12, 13, 14, 15, 16]]
@@ -474,7 +474,7 @@ class TestNumpy_ReshapePixelArray(object):
         self.ds.SamplesPerPixel = 1
         self.ds.NumberOfFrames = 0
         # Need to escape brackets
-        with pytest.raises(NotImplementedError,
+        with pytest.raises(ValueError,
                            match="value of 0 for \(0028,0008\)"):
             reshape_pixel_array(self.ds, RESHAPE_ARRAYS['1frame_1sample'])
 
@@ -482,7 +482,7 @@ class TestNumpy_ReshapePixelArray(object):
         """Test an invalid Samples per Pixel value raises exception."""
         self.ds.SamplesPerPixel = 0
         # Need to escape brackets
-        with pytest.raises(NotImplementedError,
+        with pytest.raises(ValueError,
                            match="value of 0 for \(0028,0002\)"):
             reshape_pixel_array(self.ds, RESHAPE_ARRAYS['1frame_1sample'])
 
@@ -490,7 +490,7 @@ class TestNumpy_ReshapePixelArray(object):
         self.ds.SamplesPerPixel = 3
         self.ds.PlanarConfiguration = 2
         # Need to escape brackets
-        with pytest.raises(NotImplementedError,
+        with pytest.raises(ValueError,
                            match="value of 2 for \(0028,0006\)"):
             reshape_pixel_array(self.ds,
                                 RESHAPE_ARRAYS['1frame_3sample_0config'])
