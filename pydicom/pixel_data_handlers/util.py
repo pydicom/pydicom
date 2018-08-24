@@ -2,6 +2,7 @@
 """Utility functions used in the pixel data handlers."""
 
 import sys
+from sys import byteorder
 
 try:
     import numpy as np
