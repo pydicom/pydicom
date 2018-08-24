@@ -48,7 +48,54 @@ def dtype_corrected_for_endianess(is_little_endian, numpy_dtype):
 
 
 def reshape_pixel_array(ds, arr):
-    """
+    """Return a reshaped ndarray `arr`.
+
+    +------------------------------------------+-----------+----------+
+    | Element                                  | Supported |          |
+    +-------------+---------------------+------+ values    |          |
+    | Tag         | Keyword             | Type |           |          |
+    +=============+=====================+======+===========+==========+
+    | (0028,0002) | SamplesPerPixel     | 1    | N > 0     | Required |
+    +-------------+---------------------+------+-----------+----------+
+    | (0028,0006) | PlanarConfiguration | 1C   | 0, 1      | Optional |
+    +-------------+---------------------+------+-----------+----------+
+    | (0028,0008) | NumberOfFrames      | 1C   | N > 0     | Optional |
+    +-------------+---------------------+------+-----------+----------+
+    | (0028,0010) | Rows                | 1    | N > 0     | Required |
+    +-------------+---------------------+------+-----------+----------+
+    | (0028,0011) | Columns             | 1    | N > 0     | Required |
+    +-------------+---------------------+------+-----------+----------+
+
+    (0028,0008) *Number of Frames* is required when the pixel data contains
+    more than 1 frame. (0028,0006) *Planar Configuration* is required when
+    (0028,0002) *Samples per Pixel* is greater than 1. For certain
+    compressed transfer syntaxes it is always taken to be either 1 or 0 as
+    shown in the table below.
+
+    +---------------------------------------------+-----------------------+
+    | Transfer Syntax                             | Planar Configuration  |
+    +------------------------+--------------------+                       |
+    | UID                    | Name               |                       |
+    +========================+====================+=======================+
+    | 1.2.840.10008.1.2.4.50 | JPEG Baseline      | 0                     |
+    +------------------------+--------------------+-----------------------+
+    | 1.2.840.10008.1.2.4.57 | JPEG Lossless,     | 0                     |
+    |                        | Non-hierarchical   |                       |
+    +------------------------+--------------------+-----------------------+
+    | 1.2.840.10008.1.2.4.70 | JPEG Lossless,     | 0                     |
+    |                        | Non-hierarchical,  |                       |
+    |                        | SV1                |                       |
+    +------------------------+--------------------+-----------------------+
+    | 1.2.840.10008.1.2.4.80 | JPEG-LS Lossless   | 1                     |
+    +------------------------+--------------------+-----------------------+
+    | 1.2.840.10008.1.2.4.81 | JPEG-LS Lossy      | 1                     |
+    +------------------------+--------------------+-----------------------+
+    | 1.2.840.10008.1.2.4.90 | JPEG 2000 Lossless | 0                     |
+    +------------------------+--------------------+-----------------------+
+    | 1.2.840.10008.1.2.4.91 | JPEG 2000 Lossy    | 0                     |
+    +------------------------+--------------------+-----------------------+
+    | 1.2.840.10008.1.2.5    | RLE Lossless       | 1                     |
+    +------------------------+--------------------+-----------------------+
 
     Parameters
     ----------
@@ -61,40 +108,59 @@ def reshape_pixel_array(ds, arr):
     Returns
     -------
     numpy.ndarray
-        A reshaped array containing the pixel data.
+        A reshaped array containing the pixel data. The shape of the array
+        depends on the contents of the dataset:
+
+        * For single frame, single sample data (rows, columns)
+        * For single frame, multi-sample data (rows, columns, planes)
+        * For multi-frame, single sample data (frames, rows, columns)
+        * For multi-frame, multi-sample data (frames, rows, columns, planes)
+
+    References
+    ----------
+
+    * DICOM Standard, Part 3, Annex C.7.6.3.1
+    * DICOM Standard, Part 4, Sections 8.2.1-4
     """
     nr_frames = getattr(ds, 'NumberOfFrames', 1)
-    planar_configuration = getattr(ds, 'PlanarConfiguration', 0)
     nr_samples = ds.SamplesPerPixel
 
-    # With samples per pixel of 1 the pixel data is organised as
-    # Frame 1:
-    #   Plane 1
-    #     1st row, 1st column; 1st row, 2nd column; ...
-    #     2nd row, 1st column; 2nd row, 2nd column; ...
-    #     ...
-    # Frame 2:
-    #   Plane 1 (N rows, M columns)
-    #     (1, 1); (1, 2); ... (1, M)
-    #     (2, 1); (2, 2); ...; (2, M)
-    #     ...
-    #     (N, 1); (N, 2); ...; (N, M)
+    if nr_frames < 1:
+        raise NotImplementedError(
+            "Unable to reshape the pixel array as a value of {} for "
+            "(0028,0008) 'Number of Frames' is not supported."
+            .format(nr_frames)
+        )
 
-    # For Planar Configuration of 0, each plane is organised as (e.g. for RGB)
-    #   R(1, 1); G(1, 1); B(1, 1); R(1, 2); G(1, 2); B(1, 2) ...
-    #   R(2, 1); G(2, 1); B(2, 1); R(2, 2); G(2, 2); B(2, 2) ...
-    # In other words, each colour plane is sent non-contiguously
+    if nr_samples < 1:
+        raise NotImplementedError(
+            "Unable to reshape the pixel array as a value of {} for "
+            "(0028,0002) 'Samples per Pixel' is not supported."
+            .format(nr_samples)
+        )
 
-    # For Planar Configuration of 1, each plane is organised as (e.g. for RGB)
-    #   R(1, 1); R(1, 2); ... R(N, M)
-    #   G(1, 1); G(1, 2); ... G(N, M)
-    #   B(1, 1); B(1, 2); ... B(N, M)
-    # In other words, each colour plane is sent contiguously
+    # Valid values for Planar Configuration are dependent on transfer syntax
+    if nr_samples > 1:
+        transfer_syntax = ds.file_meta.TransferSyntaxUID
+        if transfer_syntax in ['1.2.840.10008.1.2.4.50',
+                               '1.2.840.10008.1.2.4.57',
+                               '1.2.840.10008.1.2.4.70',
+                               '1.2.840.10008.1.2.4.90',
+                               '1.2.840.10008.1.2.4.91']:
+            planar_configuration = 0
+        elif transfer_syntax in ['1.2.840.10008.1.2.4.80',
+                                 '1.2.840.10008.1.2.4.81',
+                                 '1.2.840.10008.1.2.5']:
+            planar_configuration = 1
+        else:
+            planar_configuration = ds.PlanarConfiguration
 
-    # Planar configuration is not meaningful for compressed transfer syntaxes
-
-    if nr_frames < 1 or nr_samples < 1 or planar_configuration not in [0, 1]:
-        raise
+        if planar_configuration not in [0, 1]:
+            raise NotImplementedError(
+                "Unable to reshape the pixel array as a value of {} for "
+                "(0028,0006) 'Planar Configuration' is not supported."
+                .format(planar_configuration)
+            )
 
     if nr_frames > 1:
         # Multi-frame
@@ -106,9 +172,8 @@ def reshape_pixel_array(ds, arr):
             if planar_configuration == 0:
                 arr = arr.reshape(nr_frames, ds.Rows, ds.Columns, nr_samples)
             else:
-                # FIXME
-                arr = arr.reshape(nr_samples, ds.Rows, ds.Columns)
-                arr = arr.transpose(1, 2, 0)
+                arr = arr.reshape(nr_frames, nr_samples, ds.Rows, ds.Columns)
+                arr = arr.transpose(0, 2, 3, 1)
     else:
         # Single frame
         if nr_samples == 1:

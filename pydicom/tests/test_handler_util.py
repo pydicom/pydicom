@@ -31,7 +31,8 @@ except ImportError:
     NP_HANDLER = None
 
 from pydicom.dataset import Dataset
-from pydicom.uid import ExplicitVRLittleEndian
+from pydicom.uid import (ExplicitVRLittleEndian,
+                         UncompressedPixelTransferSyntaxes)
 
 
 # Tests with Numpy unavailable
@@ -181,10 +182,30 @@ RESHAPE_ARRAYS = {
              [32, 40, 48]],
         ]
     ]),
-    '1frame_1sample' : np.asarray([]),
-    '2frame_1sample' : np.asarray([]),
-    '1frame_3sample_0config' : np.asarray([]),
-    '1frame_3sample_1config' : np.asarray([]),
+    '1frame_1sample' : np.asarray(
+        [1, 2, 3, 4, 5, 2, 3, 4, 5, 6, 3, 4, 5, 6, 7, 4, 5, 6, 7, 8]
+    ),
+    '2frame_1sample' : np.asarray(
+        [ 1,  2,  3,  4,  5,  2,  3,  4,  5,  6,  # Frame 1
+          3,  4,  5,  6,  7,  4,  5,  6,  7,  8,
+         25, 26, 27, 28, 29, 26, 27, 28, 29, 30,  # Frame 2
+         27, 28, 29, 30, 31, 28, 29, 30, 31, 32]
+    ),
+    '1frame_3sample_0config' : np.asarray(
+        [ 1,  9, 17,  2, 10, 18,  3, 11, 19,  4, 12, 20,
+          5, 13, 21,  2, 10, 18,  3, 11, 19,  4, 12, 20,
+          5, 13, 21,  6, 14, 22,  3, 11, 19,  4, 12, 20,
+          5, 13, 21,  6, 14, 22,  7, 15, 23,  4, 12, 20,
+          5, 13, 21,  6, 14, 22,  7, 15, 23,  8, 16, 24]
+    ),
+    '1frame_3sample_1config' : np.asarray(
+        [ 1,  2,  3,  4,  5,  2,  3,  4,  5,  6,  # Red
+          3,  4,  5,  6,  7,  4,  5,  6,  7,  8,
+          9, 10, 11, 12, 13, 10, 11, 12, 13, 14,  # Green
+         11, 12, 13, 14, 15, 12, 13, 14, 15, 16,
+         17, 18, 19, 20, 21, 18, 19, 20, 21, 22,  # Blue
+         19, 20, 21, 22, 23, 20, 21, 22, 23, 24]
+    ),
     '2frame_3sample_0config' : np.asarray(
         [ 1,  9, 17,  2, 10, 18,  3, 11, 19,  4, 12, 20,  # Frame 1
           5, 13, 21,  2, 10, 18,  3, 11, 19,  4, 12, 20,
@@ -224,15 +245,96 @@ class TestNumpy_ReshapePixelArray(object):
         self.ds.Rows = 4
         self.ds.Columns = 5
 
-    def test_reference(self):
-        """Test that the reference array is as expected."""
-        arr = RESHAPE_ARRAYS['reference']
-        # (nr frames, row, columns, samples/pixel)
-        assert (2, 4, 5, 3) == arr.shape
+        # Expected output ref_#frames_#samples
+        self.ref_1_1 = RESHAPE_ARRAYS['reference'][0, :, :, 0]
+        self.ref_1_3 = RESHAPE_ARRAYS['reference'][0]
+        self.ref_2_1 = RESHAPE_ARRAYS['reference'][:, :, :, 0]
+        self.ref_2_3 = RESHAPE_ARRAYS['reference']
+
+    def test_reference_1frame_1sample(self):
+        """Test the 1 frame 1 sample/pixel reference array is as expected."""
+        # (rows, columns)
+        assert (4, 5) == self.ref_1_1.shape
+        assert np.array_equal(
+            self.ref_1_1,
+            np.asarray(
+                [[1, 2, 3, 4, 5],
+                 [2, 3, 4, 5, 6],
+                 [3, 4, 5, 6, 7],
+                 [4, 5, 6, 7, 8]]
+            )
+        )
+
+    def test_reference_1frame_3sample(self):
+        """Test the 1 frame 3 sample/pixel reference array is as expected."""
+        # (rows, columns, planes)
+        assert (4, 5, 3) == self.ref_1_3.shape
+
+        # Red channel
+        assert np.array_equal(
+            self.ref_1_3[:, :, 0],
+            np.asarray(
+                [[1, 2, 3, 4, 5],
+                 [2, 3, 4, 5, 6],
+                 [3, 4, 5, 6, 7],
+                 [4, 5, 6, 7, 8]]
+            )
+        )
+        # Green channel
+        assert np.array_equal(
+            self.ref_1_3[:, :, 1],
+            np.asarray(
+                [[ 9, 10, 11, 12, 13],
+                 [10, 11, 12, 13, 14],
+                 [11, 12, 13, 14, 15],
+                 [12, 13, 14, 15, 16]]
+            )
+        )
+        # Blue channel
+        assert np.array_equal(
+            self.ref_1_3[:, :, 2],
+            np.asarray(
+                [[17, 18, 19, 20, 21],
+                 [18, 19, 20, 21, 22],
+                 [19, 20, 21, 22, 23],
+                 [20, 21, 22, 23, 24]]
+            )
+        )
+
+    def test_reference_2frame_1sample(self):
+        """Test the 2 frame 1 sample/pixel reference array is as expected."""
+        # (nr frames, rows, columns)
+        assert (2, 4, 5) == self.ref_2_1.shape
+
+        # Frame 1
+        assert np.array_equal(
+            self.ref_2_1[0, :, :],
+            np.asarray(
+                [[1, 2, 3, 4, 5],
+                 [2, 3, 4, 5, 6],
+                 [3, 4, 5, 6, 7],
+                 [4, 5, 6, 7, 8]]
+            )
+        )
+        # Frame 2
+        assert np.array_equal(
+            self.ref_2_1[1, :, :],
+            np.asarray(
+                [[25, 26, 27, 28, 29],
+                 [26, 27, 28, 29, 30],
+                 [27, 28, 29, 30, 31],
+                 [28, 29, 30, 31, 32]]
+            )
+        )
+
+    def test_reference_2frame_3sample(self):
+        """Test the 2 frame 3 sample/pixel reference array is as expected."""
+        # (nr frames, row, columns, planes)
+        assert (2, 4, 5, 3) == self.ref_2_3.shape
 
         # Red channel, frame 1
         assert np.array_equal(
-            arr[0, :, :, 0],
+            self.ref_2_3[0, :, :, 0],
             np.asarray(
                 [[1, 2, 3, 4, 5],
                  [2, 3, 4, 5, 6],
@@ -242,7 +344,7 @@ class TestNumpy_ReshapePixelArray(object):
         )
         # Green channel, frame 2
         assert np.array_equal(
-            arr[1, :, :, 1],
+            self.ref_2_3[1, :, :, 1],
             np.asarray(
                 [[33, 34, 35, 36, 37],
                  [34, 35, 36, 37, 38],
@@ -250,36 +352,135 @@ class TestNumpy_ReshapePixelArray(object):
                  [36, 37, 38, 39, 40]]
             )
         )
-        #import matplotlib.pyplot as plt
-        #plt.imshow(arr[0, :, :])
-        #plt.show()
 
     def test_1frame_1sample(self):
-        arr = RESHAPE_ARRAYS[]
-
-    def test_1frame_3sample_no_conf(self):
-        pass
+        """Test reshaping 1 frame, 1 sample/pixel."""
+        self.ds.SamplesPerPixel = 1
+        arr = reshape_pixel_array(self.ds, RESHAPE_ARRAYS['1frame_1sample'])
+        assert (4, 5) == arr.shape
+        assert np.array_equal(arr, self.ref_1_1)
 
     def test_1frame_3sample_0conf(self):
-        pass
+        """Test reshaping 1 frame, 3 sample/pixel for 0 planar config."""
+        self.ds.NumberOfFrames = 1
+        self.ds.SamplesPerPixel = 3
+        self.ds.PlanarConfiguration = 0
+        arr = reshape_pixel_array(self.ds,
+                                  RESHAPE_ARRAYS['1frame_3sample_0config'])
+        assert (4, 5, 3) == arr.shape
+        assert np.array_equal(arr, self.ref_1_3)
 
     def test_1frame_3sample_1conf(self):
-        pass
+        """Test reshaping 1 frame, 3 sample/pixel for 1 planar config."""
+        self.ds.NumberOfFrames = 1
+        self.ds.SamplesPerPixel = 3
+        self.ds.PlanarConfiguration = 1
+        arr = reshape_pixel_array(self.ds,
+                                  RESHAPE_ARRAYS['1frame_3sample_1config'])
+        assert (4, 5, 3) == arr.shape
+        assert np.array_equal(arr, self.ref_1_3)
 
     def test_2frame_1sample(self):
-        pass
-
-    def test_2frame_3sample_no_conf(self):
-        pass
+        """Test reshaping 2 frame, 1 sample/pixel."""
+        self.ds.NumberOfFrames = 2
+        self.ds.SamplesPerPixel = 1
+        arr = reshape_pixel_array(self.ds, RESHAPE_ARRAYS['2frame_1sample'])
+        assert (2, 4, 5) == arr.shape
+        assert np.array_equal(arr, self.ref_2_1)
 
     def test_2frame_3sample_0conf(self):
-        pass
+        """Test reshaping 2 frame, 3 sample/pixel for 0 planar config."""
+        self.ds.NumberOfFrames = 2
+        self.ds.SamplesPerPixel = 3
+        self.ds.PlanarConfiguration = 0
+        arr = reshape_pixel_array(self.ds,
+                                  RESHAPE_ARRAYS['2frame_3sample_0config'])
+        assert (2, 4, 5, 3) == arr.shape
+        assert np.array_equal(arr, self.ref_2_3)
 
     def test_2frame_3sample_1conf(self):
-        pass
+        """Test reshaping 2 frame, 3 sample/pixel for 1 planar config."""
+        self.ds.NumberOfFrames = 2
+        self.ds.SamplesPerPixel = 3
+        self.ds.PlanarConfiguration = 1
+        arr = reshape_pixel_array(self.ds,
+                                  RESHAPE_ARRAYS['2frame_3sample_1config'])
+        assert (2, 4, 5, 3) == arr.shape
+        assert np.array_equal(arr, self.ref_2_3)
 
-    def test_3sample_0conf_compressed_syntax(self):
-        pass
+    def test_compressed_syntaxes_0conf(self):
+        """Test the compressed syntaxes that are always 0 planar conf."""
+        for uid in ['1.2.840.10008.1.2.4.50',
+                    '1.2.840.10008.1.2.4.57',
+                    '1.2.840.10008.1.2.4.70',
+                    '1.2.840.10008.1.2.4.90',
+                    '1.2.840.10008.1.2.4.91']:
+            self.ds.file_meta.TransferSyntaxUID = uid
+            self.ds.PlanarConfiguration = 1
+            self.ds.NumberOfFrames = 1
+            self.ds.SamplesPerPixel = 3
 
-    def test_3sample_1conf_compressed_syntax(self):
-        pass
+            arr = reshape_pixel_array(self.ds,
+                                      RESHAPE_ARRAYS['1frame_3sample_0config'])
+            assert (4, 5, 3) == arr.shape
+            assert np.array_equal(arr, self.ref_1_3)
+
+    def test_compressed_syntaxes_1conf(self):
+        """Test the compressed syntaxes that are always 1 planar conf."""
+        for uid in ['1.2.840.10008.1.2.4.80',
+                    '1.2.840.10008.1.2.4.81',
+                    '1.2.840.10008.1.2.5']:
+            self.ds.file_meta.TransferSyntaxUID = uid
+            self.ds.PlanarConfiguration = 0
+            self.ds.NumberOfFrames = 1
+            self.ds.SamplesPerPixel = 3
+
+            arr = reshape_pixel_array(self.ds,
+                                      RESHAPE_ARRAYS['1frame_3sample_1config'])
+            assert (4, 5, 3) == arr.shape
+            assert np.array_equal(arr, self.ref_1_3)
+
+    def test_uncompressed_syntaxes(self):
+        """Test that uncompressed syntaxes use the dataset planar conf."""
+        for uid in UncompressedPixelTransferSyntaxes:
+            self.ds.file_meta.TransferSyntaxUID = uid
+            self.ds.PlanarConfiguration = 0
+            self.ds.NumberOfFrames = 1
+            self.ds.SamplesPerPixel = 3
+
+            arr = reshape_pixel_array(self.ds,
+                                      RESHAPE_ARRAYS['1frame_3sample_0config'])
+            assert (4, 5, 3) == arr.shape
+            assert np.array_equal(arr, self.ref_1_3)
+
+            self.ds.PlanarConfiguration = 1
+            arr = reshape_pixel_array(self.ds,
+                                      RESHAPE_ARRAYS['1frame_3sample_1config'])
+            assert (4, 5, 3) == arr.shape
+            assert np.array_equal(arr, self.ref_1_3)
+
+    def test_invalid_nr_frames_raises(self):
+        """Test an invalid Number of Frames value raises exception."""
+        self.ds.SamplesPerPixel = 1
+        self.ds.NumberOfFrames = 0
+        # Need to escape brackets
+        with pytest.raises(NotImplementedError,
+                           match="value of 0 for \(0028,0008\)"):
+            reshape_pixel_array(self.ds, RESHAPE_ARRAYS['1frame_1sample'])
+
+    def test_invalid_samples_raises(self):
+        """Test an invalid Samples per Pixel value raises exception."""
+        self.ds.SamplesPerPixel = 0
+        # Need to escape brackets
+        with pytest.raises(NotImplementedError,
+                           match="value of 0 for \(0028,0002\)"):
+            reshape_pixel_array(self.ds, RESHAPE_ARRAYS['1frame_1sample'])
+
+    def test_invalid_planar_conf_raises(self):
+        self.ds.SamplesPerPixel = 3
+        self.ds.PlanarConfiguration = 2
+        # Need to escape brackets
+        with pytest.raises(NotImplementedError,
+                           match="value of 2 for \(0028,0006\)"):
+            reshape_pixel_array(self.ds,
+                                RESHAPE_ARRAYS['1frame_3sample_0config'])
