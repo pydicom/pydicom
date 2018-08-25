@@ -250,7 +250,7 @@ if HAVE_NP:
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
 class TestNumpy_ReshapePixelArray(object):
-    """Tests for util.pixel_dtype."""
+    """Tests for util.reshape_pixel_array."""
     def setup(self):
         """Setup the test dataset."""
         self.ds = Dataset()
