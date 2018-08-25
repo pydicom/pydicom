@@ -6,7 +6,7 @@ to decode pixel transfer syntaxes.
 
 import pydicom
 import pydicom.uid
-from pydicom.pixel_data_handlers.util import dtype_corrected_for_endianess
+from pydicom.pixel_data_handlers.util import dtype_corrected_for_endianness
 
 have_numpy = True
 try:
@@ -107,7 +107,7 @@ def get_pixeldata(dicom_dataset):
                    dicom_dataset.BitsAllocated))
         raise TypeError(msg)
 
-    numpy_format = dtype_corrected_for_endianess(
+    numpy_format = dtype_corrected_for_endianness(
         dicom_dataset.is_little_endian, numpy_format)
 
     # decompress here

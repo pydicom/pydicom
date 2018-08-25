@@ -60,7 +60,7 @@ def convert_colour_space(arr, current, desired):
 convert_color_space = convert_colour_space
 
 
-def dtype_corrected_for_endianess(is_little_endian, numpy_dtype):
+def dtype_corrected_for_endianness(is_little_endian, numpy_dtype):
     """Adapts the given numpy data type for changing the endianess of the
     dataset, if needed.
 

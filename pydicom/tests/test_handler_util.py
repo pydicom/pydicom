@@ -9,7 +9,7 @@ Numpy required
 
 Numpy not required
 ------------------
-* dtype_corrected_for_endianess
+* dtype_corrected_for_endianness
 """
 
 from sys import byteorder
@@ -26,7 +26,7 @@ from pydicom import dcmread
 from pydicom.data import get_testdata_files
 from pydicom.dataset import Dataset
 from pydicom.pixel_data_handlers.util import (
-    dtype_corrected_for_endianess,
+    dtype_corrected_for_endianness,
     reshape_pixel_array,
     _convert_YBR_FULL_to_RGB,
     _convert_RGB_to_YBR_FULL,
@@ -655,7 +655,7 @@ class TestNumpy_ConvertColourSpace(object):
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
 class TestNumpy_DtypeCorrectedForEndianness(object):
-    """Tests for util.dtype_corrected_for_endianess."""
+    """Tests for util.dtype_corrected_for_endianness."""
     def test_byte_swapping(self):
         """Test that the endianess of the system is taken into account."""
         # The main problem is that our testing environments are probably
@@ -664,18 +664,18 @@ class TestNumpy_DtypeCorrectedForEndianness(object):
 
         # < is little, = is native, > is big
         if byteorder == 'little':
-            out = dtype_corrected_for_endianess(True, dtype)
+            out = dtype_corrected_for_endianness(True, dtype)
             assert out.byteorder in ['<', '=']
-            out = dtype_corrected_for_endianess(False, dtype)
+            out = dtype_corrected_for_endianness(False, dtype)
             assert out.byteorder == '>'
         elif byteorder == 'big':
-            out = dtype_corrected_for_endianess(True, dtype)
+            out = dtype_corrected_for_endianness(True, dtype)
             assert out.byteorder == '<'
-            out = dtype_corrected_for_endianess(False, dtype)
+            out = dtype_corrected_for_endianness(False, dtype)
             assert out.byteorder in ['>', '=']
 
     def test_no_endian_raises(self):
         """Test that an unset endianness raises exception."""
         with pytest.raises(ValueError,
                            match="attribute 'is_little_endian' has"):
-            dtype_corrected_for_endianess(None, None)
+            dtype_corrected_for_endianness(None, None)
