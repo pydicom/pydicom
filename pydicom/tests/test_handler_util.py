@@ -651,3 +651,31 @@ class TestNumpy_ConvertColourSpace(object):
         assert (191, 191, 191) == tuple(rgb[1, 75, 50, :])
         assert (63, 63, 63) == tuple(rgb[1, 85, 50, :])
         assert (0, 0, 0) == tuple(rgb[1, 95, 50, :])
+
+
+@pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
+class TestNumpy_DtypeCorrectedForEndianness(object):
+    """Tests for util.dtype_corrected_for_endianess."""
+    def test_byte_swapping(self):
+        """Test that the endianess of the system is taken into account."""
+        # The main problem is that our testing environments are probably
+        #   all little endian, but we'll try our best
+        dtype = np.dtype('uint16')
+
+        # < is little, = is native, > is big
+        if byteorder == 'little':
+            out = dtype_corrected_for_endianess(True, dtype)
+            assert out.byteorder in ['<', '=']
+            out = dtype_corrected_for_endianess(False, dtype)
+            assert out.byteorder == '>'
+        elif byteorder == 'big':
+            out = dtype_corrected_for_endianess(True, dtype)
+            assert out.byteorder == '<'
+            out = dtype_corrected_for_endianess(False, dtype)
+            assert out.byteorder in ['>', '=']
+
+    def test_no_endian_raises(self):
+        """Test that an unset endianness raises exception."""
+        with pytest.raises(ValueError,
+                           match="attribute 'is_little_endian' has"):
+            dtype_corrected_for_endianess(None, None)
