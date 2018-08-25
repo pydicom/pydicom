@@ -63,13 +63,13 @@ class TestNoNumpy(object):
         """Test that _convert_YBR_FULL_to_RGB raises exception."""
         with pytest.raises(ImportError,
                            match="Numpy is required to convert"):
-            convert_YBR_FULL_to_RGB(None)
+            _convert_YBR_FULL_to_RGB(None)
 
     def test_convert_RGB_YBRF_raises(self):
         """Test that _convert_RGB_to_YBR_FULL raises exception."""
         with pytest.raises(ImportError,
                            match="Numpy is required to convert"):
-            convert_RGB_to_YBR_FULL(None)
+            _convert_RGB_to_YBR_FULL(None)
 
 
 # Tests with Numpy available
