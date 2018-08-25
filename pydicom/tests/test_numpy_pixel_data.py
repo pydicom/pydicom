@@ -33,6 +33,7 @@ import pydicom
 from pydicom.data import get_testdata_files
 from pydicom.dataset import Dataset
 from pydicom.filereader import dcmread
+from pydicom.pixel_data_handlers.util import convert_colour_space
 from pydicom.uid import (
     ImplicitVRLittleEndian,
     ExplicitVRLittleEndian,
@@ -361,6 +362,32 @@ class TestNumpy_NumpyHandler(object):
             with pytest.raises(NotImplementedError,
                                match="UID of '{0}' ".format(uid)):
                 ds.pixel_array
+
+    def test_dataset_pixel_array_handler_needs_convert(self):
+        """Test Dataset.pixel_array when converting to RGB."""
+        ds = dcmread(EXPL_8_3_1F)
+        # Convert to YBR first
+        arr = convert_colour_space(ds.pixel_array, 'RGB', 'YBR_FULL')
+        ds.PixelData = arr.tobytes()
+        ybr = ds.pixel_array
+
+        # Test normal functioning (False)
+        assert (76, 85, 255) == tuple(ds.pixel_array[5, 50, :])
+
+        def needs_convert(ds):
+            """Change the default return to True"""
+            return True
+
+        # Test modified
+        orig_fn = NP_HANDLER.needs_to_convert_to_RGB
+        NP_HANDLER.needs_to_convert_to_RGB = needs_convert
+
+        # Ensure the pixel array gets updated
+        ds._pixel_id = None
+        assert (254, 0, 0) == tuple(ds.pixel_array[5, 50, :])
+
+        # Reset
+        NP_HANDLER.needs_to_convert_to_RGB = orig_fn
 
     @pytest.mark.parametrize("fpath, data", REFERENCE_DATA_UNSUPPORTED)
     def test_can_access_unsupported_dataset(self, fpath, data):

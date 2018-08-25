@@ -546,7 +546,6 @@ class TestNumpy_ConvertColourSpace(object):
             convert_colour_space(self.blank_arr, 'RGB', 'RGB')
         )
 
-    # Test RGB to YBR_FULL
     def test_single_frame(self):
         """Test round trip conversion of single framed pixel data."""
         ds = dcmread(RGB_8_3_1F)

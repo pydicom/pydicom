@@ -39,11 +39,11 @@ def convert_colour_space(arr, current, desired):
         return arr
 
     _converters = {
-        'YBR_FULL' : {
-            'RGB' : _convert_YBR_FULL_to_RGB
+        'YBR_FULL': {
+            'RGB': _convert_YBR_FULL_to_RGB
         },
-        'RGB' : {
-            'YBR_FULL' : _convert_RGB_to_YBR_FULL
+        'RGB': {
+            'YBR_FULL': _convert_RGB_to_YBR_FULL
         }
     }
     try:
