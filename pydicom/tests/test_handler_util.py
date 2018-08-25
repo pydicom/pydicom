@@ -22,20 +22,31 @@ try:
 except ImportError:
     HAVE_NP = False
 
+from pydicom import dcmread
+from pydicom.data import get_testdata_files
 from pydicom.dataset import Dataset
 from pydicom.pixel_data_handlers.util import (
     dtype_corrected_for_endianess,
     reshape_pixel_array,
-    convert_YBR_to_RGB,
+    _convert_YBR_FULL_to_RGB,
+    _convert_RGB_to_YBR_FULL,
+    convert_colour_space,
     pixel_dtype
 )
 from pydicom.uid import (ExplicitVRLittleEndian,
                          UncompressedPixelTransferSyntaxes)
 
 
+# 8 bit, 3 samples/pixel, 1 and 2 frame datasets
+# RGB colourspace, uncompressed
+RGB_8_3_1F = get_testdata_files("SC_rgb.dcm")[0]
+RGB_8_3_2F = get_testdata_files("SC_rgb_2frame.dcm")[0]
+
+
 # Tests with Numpy unavailable
 @pytest.mark.skipif(HAVE_NP, reason='Numpy is available')
 class TestNoNumpy(object):
+    """Tests for the util functions without numpy."""
     def test_pixel_dtype_raises(self):
         """Test that pixel_dtype raises exception without numpy."""
         with pytest.raises(ImportError,
@@ -47,6 +58,18 @@ class TestNoNumpy(object):
         with pytest.raises(ImportError,
                            match="Numpy is required to reshape"):
             reshape_pixel_array(None, None)
+
+    def test_convert_YBRF_RGB_raises(self):
+        """Test that _convert_YBR_FULL_to_RGB raises exception."""
+        with pytest.raises(ImportError,
+                           match="Numpy is required to convert"):
+            convert_YBR_FULL_to_RGB(None)
+
+    def test_convert_RGB_YBRF_raises(self):
+        """Test that _convert_RGB_to_YBR_FULL raises exception."""
+        with pytest.raises(ImportError,
+                           match="Numpy is required to convert"):
+            convert_RGB_to_YBR_FULL(None)
 
 
 # Tests with Numpy available
@@ -61,7 +84,7 @@ REFERENCE_DTYPE = [
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
 class TestNumpy_PixelDtype(object):
-    """Tests for numpy_handler.pixel_dtype."""
+    """Tests for util.pixel_dtype."""
     def setup(self):
         """Setup the test dataset."""
         self.ds = Dataset()
@@ -246,7 +269,7 @@ if HAVE_NP:
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
 class TestNumpy_ReshapePixelArray(object):
-    """Tests for numpy_handler.pixel_dtype."""
+    """Tests for util.pixel_dtype."""
     def setup(self):
         """Setup the test dataset."""
         self.ds = Dataset()
@@ -494,3 +517,138 @@ class TestNumpy_ReshapePixelArray(object):
                            match="value of 2 for \(0028,0006\)"):
             reshape_pixel_array(self.ds,
                                 RESHAPE_ARRAYS['1frame_3sample_0config'])
+
+
+@pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
+class TestNumpy_ConvertColourSpace(object):
+    """Tests for util.convert_colour_space."""
+    def setup(self):
+        """Setup the test dataset."""
+        self.blank_arr = np.ones((2, 3))
+
+    def test_unknown_current_raises(self):
+        """Test an unknown current colour space raises exception."""
+        with pytest.raises(NotImplementedError,
+                           match="Conversion from TEST to RGB is not suppo"):
+            convert_colour_space(None, 'TEST', 'RGB')
+
+    def test_unknown_desired_raises(self):
+        def test_unknown_current_raises(self):
+            """Test an unknown current colour space raises exception."""
+        with pytest.raises(NotImplementedError,
+                           match="Conversion from RGB to TEST is not suppo"):
+            convert_colour_space(None, 'RGB', 'TEST')
+
+    def test_current_is_desired(self):
+        """Test that the array is unchanged when current matches desired."""
+        assert np.array_equal(
+            self.blank_arr,
+            convert_colour_space(self.blank_arr, 'RGB', 'RGB')
+        )
+
+    # Test RGB to YBR_FULL
+    def test_single_frame(self):
+        """Test round trip conversion of single framed pixel data."""
+        ds = dcmread(RGB_8_3_1F)
+
+        arr = ds.pixel_array
+        assert (255, 0, 0) == tuple(arr[5, 50, :])
+        assert (255, 128, 128) == tuple(arr[15, 50, :])
+        assert (0, 255, 0) == tuple(arr[25, 50, :])
+        assert (128, 255, 128) == tuple(arr[35, 50, :])
+        assert (0, 0, 255) == tuple(arr[45, 50, :])
+        assert (128, 128, 255) == tuple(arr[55, 50, :])
+        assert (0, 0, 0) == tuple(arr[65, 50, :])
+        assert (64, 64, 64) == tuple(arr[75, 50, :])
+        assert (192, 192, 192) == tuple(arr[85, 50, :])
+        assert (255, 255, 255) == tuple(arr[95, 50, :])
+
+        ybr = convert_colour_space(arr, 'RGB', 'YBR_FULL')
+        assert (76, 85, 255) == tuple(ybr[5, 50, :])
+        assert (166, 107, 192) == tuple(ybr[15, 50, :])
+        assert (150, 44, 21) == tuple(ybr[25, 50, :])
+        assert (203, 86, 75) == tuple(ybr[35, 50, :])
+        assert (29, 255, 107) == tuple(ybr[45, 50, :])
+        assert (142, 192, 118) == tuple(ybr[55, 50, :])
+        assert (0, 128, 128) == tuple(ybr[65, 50, :])
+        assert (64, 128, 128) == tuple(ybr[75, 50, :])
+        assert (192, 128, 128) == tuple(ybr[85, 50, :])
+        assert (255, 128, 128) == tuple(ybr[95, 50, :])
+
+        # Round trip -> rounding errors get compounded
+        rgb = convert_colour_space(ybr, 'YBR_FULL', 'RGB')
+        assert (254, 0, 0) == tuple(rgb[5, 50, :])
+        assert (255, 128, 129) == tuple(rgb[15, 50, :])
+        assert (0, 255, 1) == tuple(rgb[25, 50, :])
+        assert (129, 255, 129) == tuple(rgb[35, 50, :])
+        assert (0, 0, 254) == tuple(rgb[45, 50, :])
+        assert (128, 127, 255) == tuple(rgb[55, 50, :])
+        assert (0, 0, 0) == tuple(rgb[65, 50, :])
+        assert (64, 64, 64) == tuple(rgb[75, 50, :])
+        assert (192, 192, 192) == tuple(rgb[85, 50, :])
+        assert (255, 255, 255) == tuple(rgb[95, 50, :])
+
+    def test_multi_frame(self):
+        """Test round trip conversion of multi-framed pixel data."""
+        ds = dcmread(RGB_8_3_2F)
+
+        arr = ds.pixel_array
+        assert (255, 0, 0) == tuple(arr[0, 5, 50, :])
+        assert (255, 128, 128) == tuple(arr[0, 15, 50, :])
+        assert (0, 255, 0) == tuple(arr[0, 25, 50, :])
+        assert (128, 255, 128) == tuple(arr[0, 35, 50, :])
+        assert (0, 0, 255) == tuple(arr[0, 45, 50, :])
+        assert (128, 128, 255) == tuple(arr[0, 55, 50, :])
+        assert (0, 0, 0) == tuple(arr[0, 65, 50, :])
+        assert (64, 64, 64) == tuple(arr[0, 75, 50, :])
+        assert (192, 192, 192) == tuple(arr[0, 85, 50, :])
+        assert (255, 255, 255) == tuple(arr[0, 95, 50, :])
+        # Frame 2 is frame 1 inverted
+        assert np.array_equal((2**ds.BitsAllocated - 1) - arr[1], arr[0])
+
+        ybr = convert_colour_space(arr, 'RGB', 'YBR_FULL')
+        assert (76, 85, 255) == tuple(ybr[0, 5, 50, :])
+        assert (166, 107, 192) == tuple(ybr[0, 15, 50, :])
+        assert (150, 44, 21) == tuple(ybr[0, 25, 50, :])
+        assert (203, 86, 75) == tuple(ybr[0, 35, 50, :])
+        assert (29, 255, 107) == tuple(ybr[0, 45, 50, :])
+        assert (142, 192, 118) == tuple(ybr[0, 55, 50, :])
+        assert (0, 128, 128) == tuple(ybr[0, 65, 50, :])
+        assert (64, 128, 128) == tuple(ybr[0, 75, 50, :])
+        assert (192, 128, 128) == tuple(ybr[0, 85, 50, :])
+        assert (255, 128, 128) == tuple(ybr[0, 95, 50, :])
+        # Frame 2
+        assert (179, 171, 1) == tuple(ybr[1, 5, 50, :])
+        assert (89, 149, 65) == tuple(ybr[1, 15, 50, :])
+        assert (105, 212, 235) == tuple(ybr[1, 25, 50, :])
+        assert (52, 170, 181) == tuple(ybr[1, 35, 50, :])
+        assert (226, 1, 149) == tuple(ybr[1, 45, 50, :])
+        assert (113, 65, 138) == tuple(ybr[1, 55, 50, :])
+        assert (255, 128, 128) == tuple(ybr[1, 65, 50, :])
+        assert (191, 128, 128) == tuple(ybr[1, 75, 50, :])
+        assert (63, 128, 128) == tuple(ybr[1, 85, 50, :])
+        assert (0, 128, 128) == tuple(ybr[1, 95, 50, :])
+
+        # Round trip -> rounding errors get compounded
+        rgb = convert_colour_space(ybr, 'YBR_FULL', 'RGB')
+        assert (254, 0, 0) == tuple(rgb[0, 5, 50, :])
+        assert (255, 128, 129) == tuple(rgb[0, 15, 50, :])
+        assert (0, 255, 1) == tuple(rgb[0, 25, 50, :])
+        assert (129, 255, 129) == tuple(rgb[0, 35, 50, :])
+        assert (0, 0, 254) == tuple(rgb[0, 45, 50, :])
+        assert (128, 127, 255) == tuple(rgb[0, 55, 50, :])
+        assert (0, 0, 0) == tuple(rgb[0, 65, 50, :])
+        assert (64, 64, 64) == tuple(rgb[0, 75, 50, :])
+        assert (192, 192, 192) == tuple(rgb[0, 85, 50, :])
+        assert (255, 255, 255) == tuple(rgb[0, 95, 50, :])
+        # Frame 2
+        assert (1, 255, 255) == tuple(rgb[1, 5, 50, :])
+        assert (1, 127, 126) == tuple(rgb[1, 15, 50, :])
+        assert (255, 0, 254) == tuple(rgb[1, 25, 50, :])
+        assert (126, 0, 126) == tuple(rgb[1, 35, 50, :])
+        assert (255, 255, 1) == tuple(rgb[1, 45, 50, :])
+        assert (127, 128, 1) == tuple(rgb[1, 55, 50, :])
+        assert (255, 255, 255) == tuple(rgb[1, 65, 50, :])
+        assert (191, 191, 191) == tuple(rgb[1, 75, 50, :])
+        assert (63, 63, 63) == tuple(rgb[1, 85, 50, :])
+        assert (0, 0, 0) == tuple(rgb[1, 95, 50, :])

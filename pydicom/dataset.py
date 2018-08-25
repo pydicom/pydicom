@@ -34,7 +34,7 @@ from pydicom.datadict import dictionary_VR
 from pydicom.datadict import (tag_for_keyword, keyword_for_tag,
                               repeater_has_keyword)
 from pydicom.dataelem import DataElement, DataElement_from_raw, RawDataElement
-from pydicom.pixel_data_handlers.util import (convert_YBR_to_RGB,
+from pydicom.pixel_data_handlers.util import (convert_colour_space,
                                               reshape_pixel_array)
 from pydicom.tag import Tag, BaseTag, tag_in_exception
 from pydicom.uid import (ExplicitVRLittleEndian, ImplicitVRLittleEndian,
@@ -768,9 +768,8 @@ class Dataset(dict):
             raise NotImplementedError(
                 "Unable to decode pixel data with a transfer syntax UID of "
                 "'{0}' ({1}) as there are no suitable pixel data handlers "
-                "available."
-                .format(self.file_meta.TransferSyntaxUID,
-                        self.file_meta.TransferSyntaxUID.name)
+                "available.".format(self.file_meta.TransferSyntaxUID,
+                                    self.file_meta.TransferSyntaxUID.name)
             )
 
         last_exception = None
@@ -783,7 +782,9 @@ class Dataset(dict):
                 # Some handler/transfer syntax combinations may need to
                 #   convert the colour space from YCbCr to RGB
                 if handler.needs_to_convert_to_RGB(self):
-                    self._pixel_array = convert_YBR_to_RGB(self._pixel_array)
+                    self._pixel_array = convert_colour_space(self._pixel_array,
+                                                             'YBR_FULL',
+                                                             'RGB')
 
                 # is this guaranteed to work if memory is re-used??
                 self._pixel_id = id(self.PixelData)

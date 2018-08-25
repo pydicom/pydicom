@@ -14,6 +14,52 @@ except ImportError:
 sys_is_little_endian = (sys.byteorder == 'little')
 
 
+def convert_colour_space(arr, current, desired):
+    """Convert the image(s) in `arr` from one colour space to another.
+
+    Parameters
+    ----------
+    arr : numpy.ndarray
+        The image(s) as an ndarray with shape (frames, rows, columns)
+        or (rows, columns).
+    current : str
+        The current colour space, should be a valid value for (0028,0004)
+        *Photometric Interpretation*. One of 'RGB', 'YBR_FULL'.
+    desired : str
+        The desired colour space, should be a valid value for (0028,0004)
+        *Photometric Interpretation*. One of 'RGB', 'YBR_FULL'.
+
+    Returns
+    -------
+    numpy.ndarray
+        The image(s) converted to the desired colour space.
+    """
+    # No change needed
+    if current == desired:
+        return arr
+
+    _converters = {
+        'YBR_FULL' : {
+            'RGB' : _convert_YBR_FULL_to_RGB
+        },
+        'RGB' : {
+            'YBR_FULL' : _convert_RGB_to_YBR_FULL
+        }
+    }
+    try:
+        converter = _converters[current][desired]
+    except KeyError:
+        raise NotImplementedError(
+            "Conversion from {0} to {1} is not supported."
+            .format(current, desired)
+        )
+
+    return converter(arr)
+
+
+convert_color_space = convert_colour_space
+
+
 def dtype_corrected_for_endianess(is_little_endian, numpy_dtype):
     """Adapts the given numpy data type for changing the endianess of the
     dataset, if needed.
@@ -45,6 +91,93 @@ def dtype_corrected_for_endianess(is_little_endian, numpy_dtype):
         return numpy_dtype.newbyteorder('S')
 
     return numpy_dtype
+
+
+def pixel_dtype(ds):
+    """Return a numpy dtype for the pixel data in dataset in `ds`.
+
+    Suitable for use with IODs containing the Image Pixel module.
+
+    +------------------------------------------+--------------+
+    | Element                                  | Supported    |
+    +-------------+---------------------+------+ values       |
+    | Tag         | Keyword             | Type |              |
+    +=============+=====================+======+==============+
+    | (0028,0101) | BitsAllocated       | 1    | 1, 8, 16, 32 |
+    +-------------+---------------------+------+--------------+
+    | (0028,0103) | PixelRepresentation | 1    | 0, 1         |
+    +-------------+---------------------+------+--------------+
+
+    Parameters
+    ----------
+    ds : dataset.Dataset
+        The DICOM dataset containing the pixel data you wish to get the
+        numpy dtype for.
+
+    Returns
+    -------
+    numpy.dtype
+        A numpy dtype suitable for containing the dataset's pixel data.
+
+    Raises
+    ------
+    NotImplementedError
+        If the pixel data is of a type that isn't supported by either numpy
+        or pydicom.
+    """
+    if not HAVE_NP:
+        raise ImportError("Numpy is required to determine the dtype.")
+
+    if ds.is_little_endian is None:
+        ds.is_little_endian = ds.file_meta.TransferSyntaxUID.is_little_endian
+
+    # (0028,0103) Pixel Representation, US, 1
+    #   Data representation of the pixel samples
+    #   0x0000 - unsigned int
+    #   0x0001 - 2's complement (signed int)
+    pixel_repr = ds.PixelRepresentation
+    if pixel_repr == 0:
+        dtype_str = 'uint'
+    elif pixel_repr == 1:
+        dtype_str = 'int'
+    else:
+        raise NotImplementedError(
+            "Unable to determine the data type to use to contain the "
+            "Pixel Data as a value of '{}' for '(0028,0103) Pixel "
+            "Representation' is not supported".format(pixel_repr)
+        )
+
+    # (0028,0100) Bits Allocated, US, 1
+    #   The number of bits allocated for each pixel sample
+    #   PS3.5 8.1.1: Bits Allocated shall either be 1 or a multiple of 8
+    #   For bit packed data we use uint8
+    bits_allocated = ds.BitsAllocated
+    if bits_allocated == 1:
+        dtype_str = 'uint8'
+    elif bits_allocated > 0 and bits_allocated % 8 == 0:
+        dtype_str += str(bits_allocated)
+    else:
+        raise NotImplementedError(
+            "Unable to determine the data type to use to contain the "
+            "Pixel Data as a value of '{}' for '(0028,0100) Bits "
+            "Allocated' is not supported".format(bits_allocated)
+        )
+
+    # Check to see if the dtype is valid for numpy
+    try:
+        dtype = np.dtype(dtype_str)
+    except TypeError:
+        raise NotImplementedError(
+            "The data type '{}' needed to contain the Pixel Data is not "
+            "supported by numpy".format(dtype_str)
+        )
+
+    # Correct for endianness of the system vs endianness of the dataset
+    if ds.is_little_endian != (byteorder == 'little'):
+        # 'S' swap from current to opposite
+        dtype = dtype.newbyteorder('S')
+
+    return dtype
 
 
 def reshape_pixel_array(ds, arr):
@@ -193,124 +326,101 @@ def reshape_pixel_array(ds, arr):
     return arr
 
 
-def convert_YBR_to_RGB(arr_ybr):
-    """Return an ndarray converted from YCbCr to RGB colour space.
+def _convert_RGB_to_YBR_FULL(arr):
+    """Return an ndarray converted from RGB to YBR_FULL colour space.
 
     Parameters
     ----------
-    arr_ybr : numpy.ndarray
-        An ndarray of an image in YCbCr (luminance, chrominance) space.
+    arr : numpy.ndarray
+        An ndarray of an 8-bit per channel image in RGB colour space.
 
     Returns
     -------
     numpy.ndarray
-        The ndarray in RGB colour space.
+        The image in YBR_FULL colour space.
+
+    References
+    ----------
+
+    * DICOM Standard, Part 3, Annex C.7.6.3.1.2
+    * ISO/IEC 10918-5:2012, Section 7
     """
     if not HAVE_NP:
         raise ImportError(
             "Numpy is required to convert the color space."
         )
 
-    orig_dtype = arr_ybr.dtype
+    orig_dtype = arr.dtype
+    arr = arr.astype(np.float)
 
-    # Conversion from PhotometricInterpretation of YBR to RGB
-    #   PS3.3 C.7.6.3.1.2
-    # https://en.wikipedia.org/wiki/YCbCr#JPEG_conversion
-    ybr_to_rgb = np.asarray(
-        [[1.0, +0.000000, +1.402000],
-         [1.0, -0.344136, -0.714136],
-         [1.0, +1.772000, +0.000000]], dtype=np.float)
+    rgb_to_ybr = np.asarray(
+        [[+0.299, +0.587, +0.114],
+         [-0.299, -0.587, +0.886],
+         [+0.701, -0.587, -0.114]], dtype=np.float)
 
-    arr_ybr = arr_ybr.astype(np.float)
-    arr_ybr -= [0, 128, 128]
-    # Why copy?
-    arr_ybr = np.dot(arr_ybr, ybr_to_rgb.T.copy())
+    arr = np.dot(arr, rgb_to_ybr.T)
+    if len(arr.shape) == 4:
+        # Multi-frame
+        arr[:, :, :, 1] /= 1.772
+        arr[:, :, :, 2] /= 1.402
+    else:
+        # Single frame
+        arr[:, :, 1] /= 1.772
+        arr[:, :, 2] /= 1.402
 
-    return arr_ybr.astype(orig_dtype)
+    arr += [0, 128, 128]
+
+    # Round(x) -> floor of (arr + 0.5)
+    arr = np.floor(arr + 0.5)
+    # Max(0, arr) -> 0 if 0 >= arr, arr otherwise
+    arr[np.where(arr < 0)] = 0
+    # Min(arr, 255) -> arr if arr <= 255, 255 otherwise
+    arr[np.where(arr > 255)] = 255
+
+    return arr.astype(orig_dtype)
 
 
-def pixel_dtype(ds):
-    """Return a numpy dtype for the pixel data in dataset in `ds`.
-
-    Suitable for use with IODs containing the Image Pixel module.
-
-    +------------------------------------------+--------------+
-    | Element                                  | Supported    |
-    +-------------+---------------------+------+ values       |
-    | Tag         | Keyword             | Type |              |
-    +=============+=====================+======+==============+
-    | (0028,0101) | BitsAllocated       | 1    | 1, 8, 16, 32 |
-    +-------------+---------------------+------+--------------+
-    | (0028,0103) | PixelRepresentation | 1    | 0, 1         |
-    +-------------+---------------------+------+--------------+
+def _convert_YBR_FULL_to_RGB(arr):
+    """Return an ndarray converted from YBR_FULL to RGB colour space.
 
     Parameters
     ----------
-    ds : dataset.Dataset
-        The DICOM dataset containing the pixel data you wish to get the
-        numpy dtype for.
+    arr : numpy.ndarray
+        An ndarray of an 8-bit per channel image in YBR_FULL colour space.
 
     Returns
     -------
-    numpy.dtype
-        A numpy dtype suitable for containing the dataset's pixel data.
+    numpy.ndarray
+        The image in RGB colour space.
 
-    Raises
-    ------
-    NotImplementedError
-        If the pixel data is of a type that isn't supported by either numpy
-        or pydicom.
+    References
+    ----------
+
+    * DICOM Standard, Part 3, Annex C.7.6.3.1.2
+    * ISO/IEC 10918-5:2012, Section 7
     """
     if not HAVE_NP:
-        raise ImportError("Numpy is required to determine the dtype.")
-
-    if ds.is_little_endian is None:
-        ds.is_little_endian = ds.file_meta.TransferSyntaxUID.is_little_endian
-
-    # (0028,0103) Pixel Representation, US, 1
-    #   Data representation of the pixel samples
-    #   0x0000 - unsigned int
-    #   0x0001 - 2's complement (signed int)
-    pixel_repr = ds.PixelRepresentation
-    if pixel_repr == 0:
-        dtype_str = 'uint'
-    elif pixel_repr == 1:
-        dtype_str = 'int'
-    else:
-        raise NotImplementedError(
-            "Unable to determine the data type to use to contain the "
-            "Pixel Data as a value of '{}' for '(0028,0103) Pixel "
-            "Representation' is not supported".format(pixel_repr)
+        raise ImportError(
+            "Numpy is required to convert the color space."
         )
 
-    # (0028,0100) Bits Allocated, US, 1
-    #   The number of bits allocated for each pixel sample
-    #   PS3.5 8.1.1: Bits Allocated shall either be 1 or a multiple of 8
-    #   For bit packed data we use uint8
-    bits_allocated = ds.BitsAllocated
-    if bits_allocated == 1:
-        dtype_str = 'uint8'
-    elif bits_allocated > 0 and bits_allocated % 8 == 0:
-        dtype_str += str(bits_allocated)
-    else:
-        raise NotImplementedError(
-            "Unable to determine the data type to use to contain the "
-            "Pixel Data as a value of '{}' for '(0028,0100) Bits "
-            "Allocated' is not supported".format(bits_allocated)
-        )
+    orig_dtype = arr.dtype
 
-    # Check to see if the dtype is valid for numpy
-    try:
-        dtype = np.dtype(dtype_str)
-    except TypeError:
-        raise NotImplementedError(
-            "The data type '{}' needed to contain the Pixel Data is not "
-            "supported by numpy".format(dtype_str)
-        )
+    ybr_to_rgb = np.asarray(
+        [[1.0, +0.0, +1.402],
+         [1.0, -0.114 * 1.772 / 0.587, -0.299 * 1.402 / 0.587],
+         [1.0, +1.772, +0.0]], dtype=np.float)
 
-    # Correct for endianness of the system vs endianness of the dataset
-    if ds.is_little_endian != (byteorder == 'little'):
-        # 'S' swap from current to opposite
-        dtype = dtype.newbyteorder('S')
+    arr = arr.astype(np.float)
+    arr -= [0, 128, 128]
+    # Why copy?
+    arr = np.dot(arr, ybr_to_rgb.T)
 
-    return dtype
+    # Round(x) -> floor of (arr + 0.5)
+    arr = np.floor(arr + 0.5)
+    # Max(0, arr) -> 0 if 0 >= arr, arr otherwise
+    arr[np.where(arr < 0)] = 0
+    # Min(arr, 255) -> arr if arr <= 255, 255 otherwise
+    arr[np.where(arr > 255)] = 255
+
+    return arr.astype(orig_dtype)
