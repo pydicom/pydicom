@@ -1,7 +1,6 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Utility functions used in the pixel data handlers."""
 
-import sys
 from sys import byteorder
 
 try:
@@ -11,17 +10,14 @@ except ImportError:
     HAVE_NP = False
 
 
-sys_is_little_endian = (sys.byteorder == 'little')
-
-
 def convert_colour_space(arr, current, desired):
     """Convert the image(s) in `arr` from one colour space to another.
 
     Parameters
     ----------
     arr : numpy.ndarray
-        The image(s) as an ndarray with shape (frames, rows, columns)
-        or (rows, columns).
+        The image(s) as an ndarray with shape (frames, rows, columns, planes)
+        or (rows, columns, planes).
     current : str
         The current colour space, should be a valid value for (0028,0004)
         *Photometric Interpretation*. One of 'RGB', 'YBR_FULL'.
@@ -34,6 +30,11 @@ def convert_colour_space(arr, current, desired):
     numpy.ndarray
         The image(s) converted to the desired colour space.
     """
+    if not HAVE_NP:
+        raise ImportError(
+            "Numpy is required to convert the color space."
+        )
+
     # No change needed
     if current == desired:
         return arr
@@ -43,7 +44,7 @@ def convert_colour_space(arr, current, desired):
             'RGB': _convert_YBR_FULL_to_RGB
         },
         'RGB': {
-            'YBR_FULL': _convert_RGB_to_YBR_FULL
+            'YBR_FULL': _convert_RGB_to_YBR_FULL,
         }
     }
     try:
@@ -61,33 +62,32 @@ convert_color_space = convert_colour_space
 
 
 def dtype_corrected_for_endianness(is_little_endian, numpy_dtype):
-    """Adapts the given numpy data type for changing the endianess of the
-    dataset, if needed.
+    """Return a numpy dtype corrected for system and dataset endianness.
 
-        Parameters
-        ----------
-        is_little_endian : bool
-            The endianess of the affected dataset.
-        numpy_dtype : numpy.dtype
-            The numpy data type used for the pixel data without considering
-            endianess.
+    Parameters
+    ----------
+    is_little_endian : bool
+        The endianess of the affected dataset.
+    numpy_dtype : numpy.dtype
+        The numpy data type used for the pixel data without considering
+        endianess.
 
-        Raises
-        ------
-        ValueError
-            If `is_little_endian` id None, e.g. not initialized.
+    Raises
+    ------
+    ValueError
+        If `is_little_endian` id None, e.g. not initialized.
 
-        Returns
-        -------
-        numpy.dtype
-            The numpy data type to be used for the pixel data, considering
-            the endianess.
+    Returns
+    -------
+    numpy.dtype
+        The numpy data type to be used for the pixel data, considering
+        the endianess.
     """
     if is_little_endian is None:
         raise ValueError("Dataset attribute 'is_little_endian' "
                          "has to be set before writing the dataset")
 
-    if is_little_endian != sys_is_little_endian:
+    if is_little_endian != (byteorder == 'little'):
         return numpy_dtype.newbyteorder('S')
 
     return numpy_dtype
@@ -202,7 +202,7 @@ def reshape_pixel_array(ds, arr):
     (0028,0008) *Number of Frames* is required when the pixel data contains
     more than 1 frame. (0028,0006) *Planar Configuration* is required when
     (0028,0002) *Samples per Pixel* is greater than 1. For certain
-    compressed transfer syntaxes it is always taken to be either 1 or 0 as
+    compressed transfer syntaxes it is always taken to be either 0 or 1 as
     shown in the table below.
 
     +---------------------------------------------+-----------------------+
@@ -332,12 +332,12 @@ def _convert_RGB_to_YBR_FULL(arr):
     Parameters
     ----------
     arr : numpy.ndarray
-        An ndarray of an 8-bit per channel image in RGB colour space.
+        An ndarray of an 8-bit per channel images in RGB colour space.
 
     Returns
     -------
     numpy.ndarray
-        The image in YBR_FULL colour space.
+        The array in YBR_FULL colour space.
 
     References
     ----------
@@ -345,11 +345,6 @@ def _convert_RGB_to_YBR_FULL(arr):
     * DICOM Standard, Part 3, Annex C.7.6.3.1.2
     * ISO/IEC 10918-5:2012, Section 7
     """
-    if not HAVE_NP:
-        raise ImportError(
-            "Numpy is required to convert the color space."
-        )
-
     orig_dtype = arr.dtype
     arr = arr.astype(np.float)
 
@@ -386,12 +381,12 @@ def _convert_YBR_FULL_to_RGB(arr):
     Parameters
     ----------
     arr : numpy.ndarray
-        An ndarray of an 8-bit per channel image in YBR_FULL colour space.
+        An ndarray of an 8-bit per channel images in YBR_FULL colour space.
 
     Returns
     -------
     numpy.ndarray
-        The image in RGB colour space.
+        The array in RGB colour space.
 
     References
     ----------
@@ -399,11 +394,6 @@ def _convert_YBR_FULL_to_RGB(arr):
     * DICOM Standard, Part 3, Annex C.7.6.3.1.2
     * ISO/IEC 10918-5:2012, Section 7
     """
-    if not HAVE_NP:
-        raise ImportError(
-            "Numpy is required to convert the color space."
-        )
-
     orig_dtype = arr.dtype
 
     ybr_to_rgb = np.asarray(
@@ -413,7 +403,6 @@ def _convert_YBR_FULL_to_RGB(arr):
 
     arr = arr.astype(np.float)
     arr -= [0, 128, 128]
-    # Why copy?
     arr = np.dot(arr, ybr_to_rgb.T)
 
     # Round(x) -> floor of (arr + 0.5)

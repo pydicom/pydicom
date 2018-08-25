@@ -1,16 +1,5 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
-"""Tests for the pixel_data_handlers.util module.
-
-Numpy required
---------------
-* reshape_pixel_array
-* convert_YBR_to_RGB
-* pixel_dtype
-
-Numpy not required
-------------------
-* dtype_corrected_for_endianness
-"""
+"""Tests for the pixel_data_handlers.util module."""
 
 from sys import byteorder
 
@@ -28,8 +17,6 @@ from pydicom.dataset import Dataset
 from pydicom.pixel_data_handlers.util import (
     dtype_corrected_for_endianness,
     reshape_pixel_array,
-    _convert_YBR_FULL_to_RGB,
-    _convert_RGB_to_YBR_FULL,
     convert_colour_space,
     pixel_dtype
 )
@@ -59,17 +46,11 @@ class TestNoNumpy(object):
                            match="Numpy is required to reshape"):
             reshape_pixel_array(None, None)
 
-    def test_convert_YBRF_RGB_raises(self):
-        """Test that _convert_YBR_FULL_to_RGB raises exception."""
+    def test_convert_colour_space_raises(self):
+        """Test that convert_colour_space raises exception."""
         with pytest.raises(ImportError,
                            match="Numpy is required to convert"):
-            _convert_YBR_FULL_to_RGB(None)
-
-    def test_convert_RGB_YBRF_raises(self):
-        """Test that _convert_RGB_to_YBR_FULL raises exception."""
-        with pytest.raises(ImportError,
-                           match="Numpy is required to convert"):
-            _convert_RGB_to_YBR_FULL(None)
+            convert_colour_space(None, None, None)
 
 
 # Tests with Numpy available
@@ -522,10 +503,6 @@ class TestNumpy_ReshapePixelArray(object):
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
 class TestNumpy_ConvertColourSpace(object):
     """Tests for util.convert_colour_space."""
-    def setup(self):
-        """Setup the test dataset."""
-        self.blank_arr = np.ones((2, 3))
-
     def test_unknown_current_raises(self):
         """Test an unknown current colour space raises exception."""
         with pytest.raises(NotImplementedError,
@@ -541,10 +518,8 @@ class TestNumpy_ConvertColourSpace(object):
 
     def test_current_is_desired(self):
         """Test that the array is unchanged when current matches desired."""
-        assert np.array_equal(
-            self.blank_arr,
-            convert_colour_space(self.blank_arr, 'RGB', 'RGB')
-        )
+        arr = np.ones((2, 3))
+        assert np.array_equal(arr, convert_colour_space(arr, 'RGB', 'RGB'))
 
     def test_single_frame(self):
         """Test round trip conversion of single framed pixel data."""
