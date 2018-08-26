@@ -367,9 +367,11 @@ class TestNumpy_NumpyHandler(object):
         """Test Dataset.pixel_array when converting to RGB."""
         ds = dcmread(EXPL_8_3_1F)
         # Convert to YBR first
-        arr = convert_colour_space(ds.pixel_array, 'RGB', 'YBR_FULL')
+        arr = ds.pixel_array
+        assert (255, 0, 0) == tuple(arr[5, 50, :])
+        arr = convert_colour_space(arr, 'RGB', 'YBR_FULL')
         ds.PixelData = arr.tobytes()
-        ybr = ds.pixel_array
+        del ds._pixel_array  # Weird PyPy2 issue without this
 
         # Test normal functioning (False)
         assert (76, 85, 255) == tuple(ds.pixel_array[5, 50, :])

@@ -318,6 +318,7 @@ def get_pixeldata(ds):
         arr = unpack_bits(ds.PixelData)[:nr_pixels]
     else:
         # Skip the trailing padding byte if present
+        #print(id(ds.PixelData))
         arr = np.frombuffer(ds.PixelData[:expected_len],
                             dtype=pixel_dtype(ds))
 
