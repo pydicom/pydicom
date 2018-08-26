@@ -521,7 +521,7 @@ class TestNumpy_ConvertColourSpace(object):
         arr = np.ones((2, 3))
         assert np.array_equal(arr, convert_colour_space(arr, 'RGB', 'RGB'))
 
-    def test_single_frame(self):
+    def test_rgb_ybr_rgb_single_frame(self):
         """Test round trip conversion of single framed pixel data."""
         ds = dcmread(RGB_8_3_1F)
 
@@ -562,7 +562,7 @@ class TestNumpy_ConvertColourSpace(object):
         assert (192, 192, 192) == tuple(rgb[85, 50, :])
         assert (255, 255, 255) == tuple(rgb[95, 50, :])
 
-    def test_multi_frame(self):
+    def test_rgb_ybr_rgb_multi_frame(self):
         """Test round trip conversion of multi-framed pixel data."""
         ds = dcmread(RGB_8_3_2F)
 
