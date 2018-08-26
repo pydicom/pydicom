@@ -197,7 +197,7 @@
 <span class="c1"># in (0008,0005) Specific Character Set</span>
 <span class="c1"># See PS-3.5 (2011), section 6.1.2 Graphic Characters</span>
 <span class="c1"># and PN, but it is handled separately.</span>
-<span class="n">text_VRs</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;SH&#39;</span><span class="p">,</span> <span class="s1">&#39;LO&#39;</span><span class="p">,</span> <span class="s1">&#39;ST&#39;</span><span class="p">,</span> <span class="s1">&#39;LT&#39;</span><span class="p">,</span> <span class="s1">&#39;UC&#39;</span><span class="p">,</span> <span class="s1">&#39;UR&#39;</span><span class="p">,</span> <span class="s1">&#39;UT&#39;</span><span class="p">)</span>
+<span class="n">text_VRs</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;SH&#39;</span><span class="p">,</span> <span class="s1">&#39;LO&#39;</span><span class="p">,</span> <span class="s1">&#39;ST&#39;</span><span class="p">,</span> <span class="s1">&#39;LT&#39;</span><span class="p">,</span> <span class="s1">&#39;UC&#39;</span><span class="p">,</span> <span class="s1">&#39;UT&#39;</span><span class="p">)</span>
 
 <span class="n">match_string</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
     <span class="sa">b</span><span class="s1">&#39;(?P&lt;single_byte&gt;&#39;</span><span class="p">,</span> <span class="sa">br</span><span class="s1">&#39;(?P&lt;family_name&gt;[^=\^]*)&#39;</span><span class="p">,</span>
@@ -699,6 +699,21 @@
         <span class="k">return</span> <span class="n">MultiValue</span><span class="p">(</span><span class="n">valtype</span><span class="p">,</span> <span class="n">splitup</span><span class="p">)</span></div>
 
 
+<span class="k">def</span> <span class="nf">_decode_personname</span><span class="p">(</span><span class="n">components</span><span class="p">,</span> <span class="n">encodings</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return a list of decoded person name components.&quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">pydicom.charset</span> <span class="k">import</span> <span class="n">decode_string</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">components</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">compat</span><span class="o">.</span><span class="n">text_type</span><span class="p">):</span>
+        <span class="n">comps</span> <span class="o">=</span> <span class="n">components</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">comps</span> <span class="o">=</span> <span class="p">[</span><span class="n">decode_string</span><span class="p">(</span><span class="n">comp</span><span class="p">,</span> <span class="n">encodings</span><span class="p">)</span>
+                 <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="n">components</span><span class="p">]</span>
+    <span class="c1"># Remove empty elements from the end to avoid trailing &#39;=&#39;</span>
+    <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">comps</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">comps</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+        <span class="n">comps</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">comps</span>
+
+
 <span class="k">class</span> <span class="nc">PersonName3</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">encodings</span><span class="o">=</span><span class="n">default_encoding</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">PersonName3</span><span class="p">):</span>
@@ -744,20 +759,8 @@
 
     <span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">encodings</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">encodings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verify_encodings</span><span class="p">(</span><span class="n">encodings</span><span class="p">)</span>
-
-        <span class="kn">from</span> <span class="nn">pydicom.charset</span> <span class="k">import</span> <span class="n">clean_escseq</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">bytes</span><span class="p">):</span>
-            <span class="n">comps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">components</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">comps</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="n">clean_escseq</span><span class="p">(</span><span class="n">comp</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">enc</span><span class="p">),</span> <span class="n">encodings</span><span class="p">)</span>
-                <span class="k">for</span> <span class="n">comp</span><span class="p">,</span> <span class="n">enc</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">,</span> <span class="n">encodings</span><span class="p">)</span>
-            <span class="p">]</span>
-
-        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">comps</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">comps</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
-            <span class="n">comps</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
-
-        <span class="k">return</span> <span class="n">PersonName3</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">comps</span><span class="p">),</span> <span class="n">encodings</span><span class="p">)</span>
+        <span class="n">comps</span> <span class="o">=</span> <span class="n">_decode_personname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">,</span> <span class="n">encodings</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">PersonName3</span><span class="p">(</span><span class="sa">u</span><span class="s1">&#39;=&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">comps</span><span class="p">),</span> <span class="n">encodings</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">encodings</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">encodings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verify_encodings</span><span class="p">(</span><span class="n">encodings</span><span class="p">)</span>
@@ -789,10 +792,7 @@
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">encodings</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">encodings</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-            <span class="n">encodings</span> <span class="o">=</span> <span class="p">[</span><span class="n">encodings</span><span class="p">]</span> <span class="o">*</span> <span class="mi">3</span>
-
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">encodings</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-            <span class="n">encodings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">encodings</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">encodings</span> <span class="o">=</span> <span class="p">[</span><span class="n">encodings</span><span class="p">]</span>
 
         <span class="k">return</span> <span class="n">encodings</span>
 
@@ -896,19 +896,12 @@
 <span class="sd">                 of values in DICOM data element (0008,0005).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># in here to avoid circular import</span>
-        <span class="kn">from</span> <span class="nn">pydicom.charset</span> <span class="k">import</span> <span class="n">clean_escseq</span>
+        <span class="kn">from</span> <span class="nn">pydicom.charset</span> <span class="k">import</span> <span class="n">decode_string</span>
 
-        <span class="c1"># Make the possible three character encodings explicit:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">encodings</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-            <span class="n">encodings</span> <span class="o">=</span> <span class="p">[</span><span class="n">encodings</span><span class="p">]</span> <span class="o">*</span> <span class="mi">3</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">encodings</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-            <span class="n">encodings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">encodings</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">encodings</span> <span class="o">=</span> <span class="p">[</span><span class="n">encodings</span><span class="p">]</span>
         <span class="n">components</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;=&quot;</span><span class="p">)</span>
-
-        <span class="n">comps</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">clean_escseq</span><span class="p">(</span><span class="n">C</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">enc</span><span class="p">),</span> <span class="n">encodings</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">C</span><span class="p">,</span> <span class="n">enc</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">components</span><span class="p">,</span> <span class="n">encodings</span><span class="p">)</span>
-        <span class="p">]</span>
+        <span class="n">comps</span> <span class="o">=</span> <span class="n">_decode_personname</span><span class="p">(</span><span class="n">components</span><span class="p">,</span> <span class="n">encodings</span><span class="p">)</span>
         <span class="n">new_val</span> <span class="o">=</span> <span class="sa">u</span><span class="s2">&quot;=&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">comps</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">compat</span><span class="o">.</span><span class="n">text_type</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">new_val</span><span class="p">)</span>
@@ -945,10 +938,7 @@
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">encodings</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">encodings</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-            <span class="n">encodings</span> <span class="o">=</span> <span class="p">[</span><span class="n">encodings</span><span class="p">]</span> <span class="o">*</span> <span class="mi">3</span>
-
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">encodings</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-            <span class="n">encodings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">encodings</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">encodings</span> <span class="o">=</span> <span class="p">[</span><span class="n">encodings</span><span class="p">]</span>
 
         <span class="k">return</span> <span class="n">encodings</span>
 

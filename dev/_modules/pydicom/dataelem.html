@@ -205,7 +205,7 @@
 <div class="viewcode-block" id="isMultiValue"><a class="viewcode-back" href="../../api_ref.html#pydicom.dataelem.isMultiValue">[docs]</a><span class="k">def</span> <span class="nf">isMultiValue</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Return True if `value` is list-like (iterable),</span>
 <span class="sd">       False otherwise.&quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">isString</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">compat</span><span class="o">.</span><span class="n">char_types</span><span class="p">):</span>
         <span class="k">return</span> <span class="kc">False</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="nb">iter</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
@@ -238,7 +238,8 @@
 
 
 <span class="c1"># double &#39;\&#39; because it is used as escape chr in Python</span>
-<span class="n">_backslash</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">&quot;</span>
+<span class="n">_backslash_str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">&quot;</span>
+<span class="n">_backslash_byte</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">&quot;</span>
 
 
 <div class="viewcode-block" id="DataElement"><a class="viewcode-back" href="../../api_ref.html#pydicom.dataelem.DataElement">[docs]</a><span class="k">class</span> <span class="nc">DataElement</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -367,12 +368,16 @@
         <span class="c1"># Check if is a string with multiple values separated by &#39;\&#39;</span>
         <span class="c1"># If so, turn them into a list of separate strings</span>
         <span class="c1">#  Last condition covers &#39;US or SS&#39; etc</span>
-        <span class="k">if</span> <span class="n">isString</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">VR</span> <span class="ow">not</span> <span class="ow">in</span> \
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">compat</span><span class="o">.</span><span class="n">char_types</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">VR</span> <span class="ow">not</span> <span class="ow">in</span> \
                 <span class="p">[</span><span class="s1">&#39;UT&#39;</span><span class="p">,</span> <span class="s1">&#39;ST&#39;</span><span class="p">,</span> <span class="s1">&#39;LT&#39;</span><span class="p">,</span> <span class="s1">&#39;FL&#39;</span><span class="p">,</span> <span class="s1">&#39;FD&#39;</span><span class="p">,</span> <span class="s1">&#39;AT&#39;</span><span class="p">,</span> <span class="s1">&#39;OB&#39;</span><span class="p">,</span> <span class="s1">&#39;OW&#39;</span><span class="p">,</span> <span class="s1">&#39;OF&#39;</span><span class="p">,</span> <span class="s1">&#39;SL&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;SQ&#39;</span><span class="p">,</span> <span class="s1">&#39;SS&#39;</span><span class="p">,</span> <span class="s1">&#39;UL&#39;</span><span class="p">,</span> <span class="s1">&#39;OB/OW&#39;</span><span class="p">,</span> <span class="s1">&#39;OW/OB&#39;</span><span class="p">,</span> <span class="s1">&#39;OB or OW&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;OW or OB&#39;</span><span class="p">,</span> <span class="s1">&#39;UN&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="s1">&#39;US&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">VR</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">_backslash</span> <span class="ow">in</span> <span class="n">val</span><span class="p">:</span>
-                <span class="n">val</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">_backslash</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">_backslash_str</span> <span class="ow">in</span> <span class="n">val</span><span class="p">:</span>
+                    <span class="n">val</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">_backslash_str</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">_backslash_byte</span> <span class="ow">in</span> <span class="n">val</span><span class="p">:</span>
+                    <span class="n">val</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">_backslash_byte</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert_value</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
 
     <span class="nd">@property</span>

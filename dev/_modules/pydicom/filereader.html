@@ -370,14 +370,12 @@
     <span class="n">defer_size</span> <span class="o">=</span> <span class="n">size_in_bytes</span><span class="p">(</span><span class="n">defer_size</span><span class="p">)</span>
 
     <span class="n">tag_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-    <span class="n">has_specific_char_set</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="k">if</span> <span class="n">specific_tags</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">specific_tags</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">compat</span><span class="o">.</span><span class="n">text_type</span><span class="p">)):</span>
                 <span class="n">tag</span> <span class="o">=</span> <span class="n">Tag</span><span class="p">(</span><span class="n">tag_for_keyword</span><span class="p">(</span><span class="n">tag</span><span class="p">))</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">BaseTag</span><span class="p">):</span>
                 <span class="n">tag_set</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span>
-        <span class="n">has_specific_char_set</span> <span class="o">=</span> <span class="n">Tag</span><span class="p">(</span><span class="mh">0x08</span><span class="p">,</span> <span class="mh">0x05</span><span class="p">)</span> <span class="ow">in</span> <span class="n">tag_set</span>
         <span class="n">tag_set</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Tag</span><span class="p">(</span><span class="mh">0x08</span><span class="p">,</span> <span class="mh">0x05</span><span class="p">))</span>
     <span class="n">has_tag_set</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">tag_set</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
 
@@ -460,13 +458,10 @@
             <span class="c1"># If the tag is (0008,0005) Specific Character Set, then store it</span>
             <span class="k">if</span> <span class="n">tag</span> <span class="o">==</span> <span class="n">BaseTag</span><span class="p">(</span><span class="mh">0x00080005</span><span class="p">):</span>
                 <span class="kn">from</span> <span class="nn">pydicom.values</span> <span class="k">import</span> <span class="n">convert_string</span>
-                <span class="n">encoding</span> <span class="o">=</span> <span class="n">convert_string</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">,</span>
-                                          <span class="n">encoding</span><span class="o">=</span><span class="n">default_encoding</span><span class="p">)</span>
+                <span class="n">encoding</span> <span class="o">=</span> <span class="n">convert_string</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">)</span>
                 <span class="c1"># Store the encoding value in the generator</span>
                 <span class="c1"># for use with future elements (SQs)</span>
                 <span class="n">encoding</span> <span class="o">=</span> <span class="n">convert_encodings</span><span class="p">(</span><span class="n">encoding</span><span class="p">)</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="n">has_specific_char_set</span><span class="p">:</span>
-                    <span class="k">continue</span>
 
             <span class="k">yield</span> <span class="n">RawDataElement</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">VR</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">value_tell</span><span class="p">,</span>
                                  <span class="n">is_implicit_VR</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">)</span>
@@ -513,13 +508,10 @@
                 <span class="c1"># then store it</span>
                 <span class="k">if</span> <span class="n">tag</span> <span class="o">==</span> <span class="p">(</span><span class="mh">0x08</span><span class="p">,</span> <span class="mh">0x05</span><span class="p">):</span>
                     <span class="kn">from</span> <span class="nn">pydicom.values</span> <span class="k">import</span> <span class="n">convert_string</span>
-                    <span class="n">encoding</span> <span class="o">=</span> <span class="n">convert_string</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">,</span>
-                                              <span class="n">encoding</span><span class="o">=</span><span class="n">default_encoding</span><span class="p">)</span>
+                    <span class="n">encoding</span> <span class="o">=</span> <span class="n">convert_string</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">)</span>
                     <span class="c1"># Store the encoding value in the generator for use</span>
                     <span class="c1"># with future elements (SQs)</span>
                     <span class="n">encoding</span> <span class="o">=</span> <span class="n">convert_encodings</span><span class="p">(</span><span class="n">encoding</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="n">has_specific_char_set</span><span class="p">:</span>
-                        <span class="k">continue</span>
 
                 <span class="c1"># tags with undefined length are skipped after read</span>
                 <span class="k">if</span> <span class="n">has_tag_set</span> <span class="ow">and</span> <span class="n">tag</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">tag_set</span><span class="p">:</span>
@@ -986,7 +978,9 @@
 <span class="sd">        no File Meta Information header is found.</span>
 <span class="sd">    specific_tags : list or None</span>
 <span class="sd">        If not None, only the tags in the list are returned. The list</span>
-<span class="sd">        elements can be tags or tag names.</span>
+<span class="sd">        elements can be tags or tag names. Note that the tag Specific</span>
+<span class="sd">        Character Set is always returned if present - this ensures correct</span>
+<span class="sd">        decoding of returned text values.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>

@@ -212,7 +212,7 @@
     <span class="s1">&#39;ISO 2022 IR 138&#39;</span><span class="p">:</span> <span class="s1">&#39;iso_ir_138&#39;</span><span class="p">,</span>
     <span class="s1">&#39;ISO 2022 IR 144&#39;</span><span class="p">:</span> <span class="s1">&#39;iso_ir_144&#39;</span><span class="p">,</span>
     <span class="s1">&#39;ISO 2022 IR 148&#39;</span><span class="p">:</span> <span class="s1">&#39;iso_ir_148&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;ISO 2022 IR 149&#39;</span><span class="p">:</span> <span class="s1">&#39;euc_kr&#39;</span><span class="p">,</span>  <span class="c1"># needs cleanup via clean_escseq()</span>
+    <span class="s1">&#39;ISO 2022 IR 149&#39;</span><span class="p">:</span> <span class="s1">&#39;euc_kr&#39;</span><span class="p">,</span>
     <span class="s1">&#39;ISO 2022 IR 159&#39;</span><span class="p">:</span> <span class="s1">&#39;iso-2022-jp&#39;</span><span class="p">,</span>
     <span class="s1">&#39;ISO 2022 IR 166&#39;</span><span class="p">:</span> <span class="s1">&#39;iso_ir_166&#39;</span><span class="p">,</span>
     <span class="s1">&#39;ISO 2022 IR 58&#39;</span><span class="p">:</span> <span class="s1">&#39;iso_ir_58&#39;</span><span class="p">,</span>
@@ -223,18 +223,74 @@
     <span class="s1">&#39;GBK&#39;</span><span class="p">:</span> <span class="s1">&#39;GBK&#39;</span><span class="p">,</span>  <span class="c1"># from DICOM correction CP1234</span>
 <span class="p">}</span>
 
+<span class="c1"># the escape character used to mark the start of escape sequences</span>
+<span class="n">ESC</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x1b</span><span class="s1">&#39;</span>
+
+<span class="c1"># Map Python encodings to escape sequences as defined in PS3.3 in tables</span>
+<span class="c1"># C.12-3 (single-byte) and C.12-4 (multi-byte character sets).</span>
+<span class="n">escape_codes</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;iso8859&#39;</span><span class="p">:</span> <span class="n">ESC</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;(B&#39;</span><span class="p">,</span>  <span class="c1"># used to switch to ASCII G0 code element</span>
+    <span class="s1">&#39;latin_1&#39;</span><span class="p">:</span> <span class="n">ESC</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;-A&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;shift_jis&#39;</span><span class="p">:</span> <span class="n">ESC</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;)I&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;iso2022_jp&#39;</span><span class="p">:</span> <span class="n">ESC</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;$B&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;iso8859_2&#39;</span><span class="p">:</span> <span class="n">ESC</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;-B&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;iso8859_3&#39;</span><span class="p">:</span> <span class="n">ESC</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;-C&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;iso8859_4&#39;</span><span class="p">:</span> <span class="n">ESC</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;-D&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;iso_ir_126&#39;</span><span class="p">:</span> <span class="n">ESC</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;-F&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;iso_ir_127&#39;</span><span class="p">:</span> <span class="n">ESC</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;-G&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;iso_ir_138&#39;</span><span class="p">:</span> <span class="n">ESC</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;-H&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;iso_ir_144&#39;</span><span class="p">:</span> <span class="n">ESC</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;-L&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;iso_ir_148&#39;</span><span class="p">:</span> <span class="n">ESC</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;-M&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;iso_ir_166&#39;</span><span class="p">:</span> <span class="n">ESC</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;-T&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;euc_kr&#39;</span><span class="p">:</span> <span class="n">ESC</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;$)C&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;iso-2022-jp&#39;</span><span class="p">:</span> <span class="n">ESC</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;$(D&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;iso_ir_58&#39;</span><span class="p">:</span> <span class="n">ESC</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;$)A&#39;</span><span class="p">,</span>
+<span class="p">}</span>
+
 <span class="n">default_encoding</span> <span class="o">=</span> <span class="s2">&quot;iso8859&quot;</span>
 
 
-<div class="viewcode-block" id="clean_escseq"><a class="viewcode-back" href="../../api_ref.html#pydicom.charset.clean_escseq">[docs]</a><span class="k">def</span> <span class="nf">clean_escseq</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="n">encodings</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Remove escape sequences that Python does not remove from</span>
-<span class="sd">       Korean encoding ISO 2022 IR 149 due to the G1 code element.</span>
+<div class="viewcode-block" id="decode_string"><a class="viewcode-back" href="../../api_ref.html#pydicom.charset.decode_string">[docs]</a><span class="k">def</span> <span class="nf">decode_string</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">encodings</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convert a raw byte string into a unicode string using the given</span>
+<span class="sd">    list of encodings.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="s1">&#39;euc_kr&#39;</span> <span class="ow">in</span> <span class="n">encodings</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">element</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\x1b\x24\x29\x43</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
-            <span class="s2">&quot;</span><span class="se">\x1b\x28\x42</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">ESC</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">encodings</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="c1"># multi-byte character sets except Korean are handled by Python encodings</span>
+    <span class="n">use_python_handling</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">startswith</span><span class="p">((</span><span class="n">escape_codes</span><span class="p">[</span><span class="s1">&#39;iso2022_jp&#39;</span><span class="p">],</span>
+                                            <span class="n">escape_codes</span><span class="p">[</span><span class="s1">&#39;iso-2022-jp&#39;</span><span class="p">],</span>
+                                            <span class="n">escape_codes</span><span class="p">[</span><span class="s1">&#39;iso_ir_58&#39;</span><span class="p">]))</span>
+
+    <span class="k">if</span> <span class="n">use_python_handling</span><span class="p">:</span>
+        <span class="n">parts</span> <span class="o">=</span> <span class="p">[</span><span class="n">value</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">element</span></div>
+        <span class="c1"># Each part of the value that starts with an escape sequence is</span>
+        <span class="c1"># decoded separately using the corresponding encoding.</span>
+        <span class="c1"># See PS3.5, 6.1.2.4 and 6.1.2.5 for the use of code extensions.</span>
+        <span class="n">parts</span> <span class="o">=</span> <span class="p">[</span><span class="n">ESC</span> <span class="o">+</span> <span class="n">part</span> <span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="n">value</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">ESC</span><span class="p">)</span> <span class="k">if</span> <span class="n">part</span><span class="p">]</span>
+        <span class="c1"># the first part may not start with an escape sequence</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">value</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">ESC</span><span class="p">):</span>
+            <span class="n">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">:]</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="sa">u</span><span class="s1">&#39;&#39;</span>
+
+    <span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="n">parts</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">part</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">ESC</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">enc</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">encodings</span><span class="p">)</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;iso8859&#39;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">enc</span> <span class="ow">in</span> <span class="n">escape_codes</span> <span class="ow">and</span> <span class="n">part</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">escape_codes</span><span class="p">[</span><span class="n">enc</span><span class="p">]):</span>
+                    <span class="k">if</span> <span class="n">use_python_handling</span><span class="p">:</span>
+                        <span class="n">val</span> <span class="o">=</span> <span class="n">part</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">enc</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">val</span> <span class="o">=</span> <span class="n">part</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">escape_codes</span><span class="p">[</span><span class="n">enc</span><span class="p">]):]</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">enc</span><span class="p">)</span>
+                    <span class="k">break</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># unknown escape code - use first encoding (probably incorrect)</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="n">part</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">encodings</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># if no escape code is given, the first encoding is used</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="n">part</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">encodings</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">result</span> <span class="o">+=</span> <span class="n">val</span>
+    <span class="k">return</span> <span class="n">result</span></div>
 
 
 <span class="c1"># DICOM PS3.5-2008 6.1.1 (p 18) says:</span>
@@ -286,11 +342,6 @@
                 <span class="c1"># otherwise, a LookupError will be raised in the using code</span>
                 <span class="k">pass</span>
 
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">encodings</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="n">encodings</span> <span class="o">=</span> <span class="p">[</span><span class="n">encodings</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">*</span> <span class="mi">3</span>
-    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">encodings</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-        <span class="n">encodings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">encodings</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-
     <span class="k">return</span> <span class="n">encodings</span></div>
 
 
@@ -334,8 +385,7 @@
         <span class="k">if</span> <span class="n">data_element</span><span class="o">.</span><span class="n">VM</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data_element</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">compat</span><span class="o">.</span><span class="n">text_type</span><span class="p">):</span>
                 <span class="k">return</span>
-            <span class="n">data_element</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">clean_escseq</span><span class="p">(</span>
-                <span class="n">data_element</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">encodings</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">encodings</span><span class="p">)</span>
+            <span class="n">data_element</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">decode_string</span><span class="p">(</span><span class="n">data_element</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">encodings</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
 
             <span class="n">output</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
@@ -344,8 +394,7 @@
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">compat</span><span class="o">.</span><span class="n">text_type</span><span class="p">):</span>
                     <span class="n">output</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">output</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                        <span class="n">clean_escseq</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">encodings</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">encodings</span><span class="p">))</span>
+                    <span class="n">output</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">decode_string</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">encodings</span><span class="p">))</span>
 
             <span class="n">data_element</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">output</span></div>
 </pre></div>
