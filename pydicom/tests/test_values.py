@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Tests for dataset.py"""
 
@@ -5,7 +6,8 @@ import pytest
 
 from pydicom.tag import Tag
 from pydicom.values import (convert_value, converters, convert_tag,
-                            convert_ATvalue, convert_DA_string)
+                            convert_ATvalue, convert_DA_string, convert_text,
+                            convert_single_string, convert_AE_string)
 
 
 class TestConvertTag(object):
@@ -36,6 +38,37 @@ class TestConvertTag(object):
         """Test convert_tag with a bad bytestring"""
         bytestring = b'\x10\x00'
         convert_tag(bytestring, True)
+
+
+class TestConvertAE(object):
+    def test_strip_blanks(self):
+        bytestring = b'  AE_TITLE '
+        assert u'AE_TITLE' == convert_AE_string(bytestring, True)
+
+class TestConvertText(object):
+    def test_single_value(self):
+        bytestring = (b'Dionysios is \x1b\x2d\x46'
+                      b'\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2')
+        encodings = ('latin_1', 'iso_ir_126')
+        assert u'Dionysios is Διονυσιος' == convert_text(bytestring, encodings)
+
+    def test_multi_value(self):
+        bytestring = (b'Buc^J\xe9r\xf4me\\\x1b\x2d\x46'
+                      b'\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2\\'
+                      b'\x1b\x2d\x4C'
+                      b'\xbb\xee\xda\x63\x65\xdc\xd1\x79\x70\xd3')
+        encodings = ('latin_1', 'iso_ir_144', 'iso_ir_126')
+        assert [u'Buc^Jérôme', u'Διονυσιος', u'Люкceмбypг'] == convert_text(
+            bytestring, encodings)
+
+    def test_single_value_with_backslash(self):
+        bytestring = (b'Buc^J\xe9r\xf4me\\\x1b\x2d\x46'
+                      b'\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2\\'
+                      b'\x1b\x2d\x4C'
+                      b'\xbb\xee\xda\x63\x65\xdc\xd1\x79\x70\xd3')
+        encodings = ('latin_1', 'iso_ir_144', 'iso_ir_126')
+        assert u'Buc^Jérôme\\Διονυσιος\\Люкceмбypг' == convert_single_string(
+            bytestring, encodings)
 
 
 class TestConvertAT(object):

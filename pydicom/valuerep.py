@@ -25,7 +25,7 @@ extra_length_VRs = ('OB', 'OD', 'OF', 'OL', 'OW', 'SQ', 'UC', 'UN', 'UR', 'UT')
 # in (0008,0005) Specific Character Set
 # See PS-3.5 (2011), section 6.1.2 Graphic Characters
 # and PN, but it is handled separately.
-text_VRs = ('SH', 'LO', 'ST', 'LT', 'UC', 'UR', 'UT')
+text_VRs = ('SH', 'LO', 'ST', 'LT', 'UC', 'UT')
 
 match_string = b''.join([
     b'(?P<single_byte>', br'(?P<family_name>[^=\^]*)',
@@ -527,6 +527,21 @@ def MultiString(val, valtype=str):
         return MultiValue(valtype, splitup)
 
 
+def _decode_personname(components, encodings):
+    """Return a list of decoded person name components."""
+    from pydicom.charset import decode_string
+
+    if isinstance(components[0], compat.text_type):
+        comps = components
+    else:
+        comps = [decode_string(comp, encodings)
+                 for comp in components]
+    # Remove empty elements from the end to avoid trailing '='
+    while len(comps) and not comps[-1]:
+        comps.pop()
+    return comps
+
+
 class PersonName3(object):
     def __init__(self, val, encodings=default_encoding):
         if isinstance(val, PersonName3):
@@ -572,20 +587,8 @@ class PersonName3(object):
 
     def decode(self, encodings=None):
         encodings = self._verify_encodings(encodings)
-
-        from pydicom.charset import clean_escseq
-        if not isinstance(self.components[0], bytes):
-            comps = self.components
-        else:
-            comps = [
-                clean_escseq(comp.decode(enc), encodings)
-                for comp, enc in zip(self.components, encodings)
-            ]
-
-        while len(comps) and not comps[-1]:
-            comps.pop()
-
-        return PersonName3('='.join(comps), encodings)
+        comps = _decode_personname(self.components, encodings)
+        return PersonName3(u'='.join(comps), encodings)
 
     def encode(self, encodings=None):
         encodings = self._verify_encodings(encodings)
@@ -617,10 +620,7 @@ class PersonName3(object):
             return self.encodings
 
         if not isinstance(encodings, list):
-            encodings = [encodings] * 3
-
-        if len(encodings) == 2:
-            encodings.append(encodings[1])
+            encodings = [encodings]
 
         return encodings
 
@@ -724,19 +724,12 @@ class PersonNameUnicode(PersonNameBase, compat.text_type):
                  of values in DICOM data element (0008,0005).
         """
         # in here to avoid circular import
-        from pydicom.charset import clean_escseq
+        from pydicom.charset import decode_string
 
-        # Make the possible three character encodings explicit:
         if not isinstance(encodings, list):
-            encodings = [encodings] * 3
-        if len(encodings) == 2:
-            encodings.append(encodings[1])
+            encodings = [encodings]
         components = val.split(b"=")
-
-        comps = [
-            clean_escseq(C.decode(enc), encodings)
-            for C, enc in zip(components, encodings)
-        ]
+        comps = _decode_personname(components, encodings)
         new_val = u"=".join(comps)
 
         return compat.text_type.__new__(cls, new_val)
@@ -773,10 +766,7 @@ class PersonNameUnicode(PersonNameBase, compat.text_type):
             return self.encodings
 
         if not isinstance(encodings, list):
-            encodings = [encodings] * 3
-
-        if len(encodings) == 2:
-            encodings.append(encodings[1])
+            encodings = [encodings]
 
         return encodings
 

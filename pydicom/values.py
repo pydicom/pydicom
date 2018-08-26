@@ -10,7 +10,7 @@ from struct import (unpack, calcsize)
 from pydicom import config
 from pydicom import compat
 from pydicom.compat import in_py2
-from pydicom.charset import (default_encoding, text_VRs)
+from pydicom.charset import (default_encoding, text_VRs, decode_string)
 from pydicom.config import logger
 from pydicom.filereader import read_sequence
 from pydicom.multival import MultiValue
@@ -33,16 +33,13 @@ def convert_tag(byte_string, is_little_endian, offset=0):
     return TupleTag(unpack(struct_format, byte_string[offset:offset + 4]))
 
 
-def convert_AE_string(byte_string,
-                      is_little_endian,
-                      struct_format=None,
-                      encoding=default_encoding):
+def convert_AE_string(byte_string, is_little_endian, struct_format=None):
     """Read a byte string for a VR of 'AE'.
 
     Elements with VR of 'AE' have non-significant leading and trailing spaces.
     """
     if not in_py2:
-        byte_string = byte_string.decode(encoding)
+        byte_string = byte_string.decode(default_encoding)
     byte_string = byte_string.strip()
     return byte_string
 
@@ -197,15 +194,13 @@ def convert_OWvalue(byte_string, is_little_endian, struct_format=None):
 
 
 def convert_PN(byte_string,
-               is_little_endian,
-               struct_format=None,
-               encoding=None):
+               encodings=None):
     """Read and return string(s) as PersonName instance(s)"""
 
     def get_valtype(x):
         if not in_py2:
-            if encoding:
-                return PersonName(x, encoding).decode()
+            if encodings:
+                return PersonName(x, encodings).decode()
             return PersonName(x).decode()
         return PersonName(x)
 
@@ -227,25 +222,32 @@ def convert_PN(byte_string,
 
 def convert_string(byte_string,
                    is_little_endian,
-                   struct_format=None,
-                   encoding=default_encoding):
+                   struct_format=None):
     """Read and return a string or strings"""
     if not in_py2:
-        byte_string = byte_string.decode(encoding)
+        byte_string = byte_string.decode(default_encoding)
     return MultiString(byte_string)
 
 
-def convert_single_string(byte_string,
-                          is_little_endian,
-                          struct_format=None,
-                          encoding=default_encoding):
+def convert_text(byte_string, encodings=None):
+    """Read and return a string or strings"""
+    encodings = encodings or [default_encoding]
+    values = byte_string.split(b'\\')
+    values = [convert_single_string(value, encodings) for value in values]
+    if len(values) == 1:
+        return values[0]
+    else:
+        return MultiValue(compat.text_type, values)
+
+
+def convert_single_string(byte_string, encodings=None):
     """Read and return a single string
        (backslash character does not split)"""
-    if not in_py2:
-        byte_string = byte_string.decode(encoding)
-    if byte_string and byte_string.endswith(' '):
-        byte_string = byte_string[:-1]
-    return byte_string
+    encodings = encodings or [default_encoding]
+    value = decode_string(byte_string, encodings)
+    if value and value.endswith(' '):
+        value = value[:-1]
+    return value
 
 
 def convert_SQ(byte_string,
@@ -298,17 +300,14 @@ def convert_UN(byte_string, is_little_endian, struct_format=None):
     return byte_string
 
 
-def convert_UR_string(byte_string,
-                      is_little_endian,
-                      struct_format=None,
-                      encoding=default_encoding):
+def convert_UR_string(byte_string, is_little_endian, struct_format=None):
     """Read a byte string for a VR of 'UR'
 
     Elements with VR of 'UR' shall not be multi-valued
     and trailing spaces shall be ignored.
     """
     if not in_py2:
-        byte_string = byte_string.decode(encoding)
+        byte_string = byte_string.decode(default_encoding)
     byte_string = byte_string.rstrip()
     return byte_string
 
@@ -330,24 +329,18 @@ def convert_value(VR, raw_data_element, encoding=default_encoding):
 
     # Ensure that encoding is in the proper 3-element format
     if isinstance(encoding, compat.string_types):
-        encoding = [encoding, ] * 3
+        encoding = [encoding]
 
     byte_string = raw_data_element.value
     is_little_endian = raw_data_element.is_little_endian
     is_implicit_VR = raw_data_element.is_implicit_VR
 
     # Not only two cases. Also need extra info if is a raw sequence
-    # Pass the encoding to the converter if it is a specific VR
+    # Pass all encodings to the converter if needed
     try:
-        if VR == 'PN':
+        if VR in text_VRs or VR == 'PN':
             value = converter(byte_string,
-                              is_little_endian,
-                              encoding=encoding)
-        elif VR in text_VRs:
-            # Text VRs use the 2nd specified encoding
-            value = converter(byte_string,
-                              is_little_endian,
-                              encoding=encoding[1])
+                              encodings=encoding)
         elif VR != "SQ":
             value = converter(byte_string,
                               is_little_endian,
@@ -403,23 +396,23 @@ converters = {
     'OD': convert_OBvalue,
     'OL': convert_OBvalue,
     'UI': convert_UI,
-    'SH': convert_string,
+    'SH': convert_text,
     'DA': convert_DA_string,
     'TM': convert_TM_string,
     'CS': convert_string,
     'PN': convert_PN,
-    'LO': convert_string,
+    'LO': convert_text,
     'IS': convert_IS_string,
     'DS': convert_DS_string,
     'AE': convert_AE_string,
     'AS': convert_string,
     'LT': convert_single_string,
     'SQ': convert_SQ,
-    'UC': convert_string,
+    'UC': convert_text,
     'UN': convert_UN,
     'UR': convert_UR_string,
     'AT': convert_ATvalue,
-    'ST': convert_string,
+    'ST': convert_single_string,
     'OW': convert_OWvalue,
     'OW/OB': convert_OBvalue,  # note OW/OB depends on other items,
     'OB/OW': convert_OBvalue,  # which we don't know at read time

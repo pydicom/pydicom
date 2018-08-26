@@ -328,9 +328,9 @@ class PersonNametests(unittest.TestCase):
         # Issue 466
         from pydicom.valuerep import PersonName3
         pn = PersonName3("John^Doe", encodings='iso_ir_126')
-        assert pn.encodings == ['iso_ir_126', 'iso_ir_126', 'iso_ir_126']
+        assert pn.encodings == ['iso_ir_126']
         pn2 = PersonName3(pn)
-        assert pn2.encodings == ['iso_ir_126', 'iso_ir_126', 'iso_ir_126']
+        assert pn2.encodings == ['iso_ir_126']
 
 
 class DateTimeTests(unittest.TestCase):

@@ -945,7 +945,7 @@ class WriteAmbiguousVRTests(unittest.TestCase):
         assert 'SS' == ds[0x00280104].VR
         assert not ds.read_implicit_vr
         assert not ds.read_little_endian
-        assert ['UTF8', 'UTF8', 'UTF8'] == ds.read_encoding
+        assert ['UTF8'] == ds.read_encoding
 
 
 class ScratchWriteTests(unittest.TestCase):
