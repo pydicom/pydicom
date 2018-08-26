@@ -510,8 +510,7 @@ class TestNumpy_ConvertColourSpace(object):
             convert_colour_space(None, 'TEST', 'RGB')
 
     def test_unknown_desired_raises(self):
-        def test_unknown_current_raises(self):
-            """Test an unknown current colour space raises exception."""
+        """Test an unknown desdired colour space raises exception."""
         with pytest.raises(NotImplementedError,
                            match="Conversion from RGB to TEST is not suppo"):
             convert_colour_space(None, 'RGB', 'TEST')
