@@ -17,8 +17,8 @@ Enhancements
   (:issue:`291`)
 * Functions for encapsulating frames added to encaps module (:pull_request:`696`)
 * Added ``Dataset.fix_meta_info()`` (:issue:`584`)
-* Add new function for bit packing ``pack_bits`` (:pull_request:`715`) for use
-  with BitsAllocated = 1.
+* Add new function for bit packing ``pack_bits`` for use
+  with BitsAllocated = 1 (:pull_request:`715`) 
 * Added handling of single-byte character set extensions (:pull_request:`718`)
 
 
