@@ -20,13 +20,7 @@ have_pillow = True
 try:
     from PIL import Image as PILImg
 except ImportError:
-    # If that failed, try the alternate import syntax for PIL.
-    try:
-        import Image as PILImg
-    except ImportError:
-        # Neither worked, so it's likely not installed.
-        have_pillow = False
-        raise
+    have_pillow = False
 
 PillowSupportedTransferSyntaxes = [
     pydicom.uid.JPEGBaseLineLossy8bit,
