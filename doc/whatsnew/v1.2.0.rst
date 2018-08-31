@@ -4,6 +4,9 @@ Version 1.2.0
 Changelog
 ---------
 
+* PIL removed as a fallback if Pillow is not available in the pillow pixel data
+  handler (:issue:`722`)
+
 
 Enhancements
 ............
