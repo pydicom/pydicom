@@ -227,10 +227,10 @@
             <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slot</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__reduce__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">DA</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__reduce__</span><span class="p">()</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__getstate__</span><span class="p">(),</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">DA</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__reduce__</span><span class="p">()</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__getstate__</span><span class="p">(),)</span>
 
     <span class="k">def</span> <span class="nf">__reduce_ex__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">protocol</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">DA</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__reduce__</span><span class="p">()</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__getstate__</span><span class="p">(),</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">DA</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__reduce__</span><span class="p">()</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__getstate__</span><span class="p">(),)</span>
 
     <span class="k">def</span> <span class="nf">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Create an instance of DA object.</span>
@@ -302,10 +302,10 @@
             <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slot</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__reduce__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">DT</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__reduce__</span><span class="p">()</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__getstate__</span><span class="p">(),</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">DT</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__reduce__</span><span class="p">()</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__getstate__</span><span class="p">(),)</span>
 
     <span class="k">def</span> <span class="nf">__reduce_ex__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">protocol</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">DT</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__reduce__</span><span class="p">()</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__getstate__</span><span class="p">(),</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">DT</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__reduce__</span><span class="p">()</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__getstate__</span><span class="p">(),)</span>
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_utc_offset</span><span class="p">(</span><span class="n">offset</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
@@ -412,10 +412,10 @@
             <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slot</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__reduce__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">TM</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__reduce__</span><span class="p">()</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__getstate__</span><span class="p">(),</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">TM</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__reduce__</span><span class="p">()</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__getstate__</span><span class="p">(),)</span>
 
     <span class="k">def</span> <span class="nf">__reduce_ex__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">protocol</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">TM</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__reduce__</span><span class="p">()</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__getstate__</span><span class="p">(),</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">TM</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__reduce__</span><span class="p">()</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__getstate__</span><span class="p">(),)</span>
 
     <span class="k">def</span> <span class="nf">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Create an instance of TM object from a string.</span>
@@ -656,7 +656,7 @@
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">Decimal</span><span class="p">))</span> <span class="ow">and</span> <span class="n">newval</span> <span class="o">!=</span> <span class="n">val</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Could not convert value to integer without loss&quot;</span><span class="p">)</span>
         <span class="c1"># Checks in case underlying int is &gt;32 bits, DICOM does not allow this</span>
-        <span class="n">check_newval</span> <span class="o">=</span> <span class="p">(</span><span class="n">newval</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">2</span><span class="o">**</span><span class="mi">31</span> <span class="ow">or</span> <span class="n">newval</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="o">**</span><span class="mi">31</span><span class="p">)</span>
+        <span class="n">check_newval</span> <span class="o">=</span> <span class="p">(</span><span class="n">newval</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">2</span> <span class="o">**</span> <span class="mi">31</span> <span class="ow">or</span> <span class="n">newval</span> <span class="o">&gt;=</span> <span class="mi">2</span> <span class="o">**</span> <span class="mi">31</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">check_newval</span> <span class="ow">and</span> <span class="n">config</span><span class="o">.</span><span class="n">enforce_valid_values</span><span class="p">:</span>
             <span class="n">dcm_limit</span> <span class="o">=</span> <span class="s2">&quot;-2**31 to (2**31 - 1) for IS&quot;</span>
             <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;Value exceeds DICOM limits of </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">dcm_limit</span><span class="p">)</span>
@@ -699,6 +699,14 @@
         <span class="k">return</span> <span class="n">MultiValue</span><span class="p">(</span><span class="n">valtype</span><span class="p">,</span> <span class="n">splitup</span><span class="p">)</span></div>
 
 
+<span class="k">def</span> <span class="nf">_verify_encodings</span><span class="p">(</span><span class="n">encodings</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Checks the encoding to ensure proper format&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">encodings</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">encodings</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">encodings</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">encodings</span>
+
+
 <span class="k">def</span> <span class="nf">_decode_personname</span><span class="p">(</span><span class="n">components</span><span class="p">,</span> <span class="n">encodings</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Return a list of decoded person name components.&quot;&quot;&quot;</span>
     <span class="kn">from</span> <span class="nn">pydicom.charset</span> <span class="k">import</span> <span class="n">decode_string</span>
@@ -714,15 +722,30 @@
     <span class="k">return</span> <span class="n">comps</span>
 
 
+<span class="k">def</span> <span class="nf">_encode_personname</span><span class="p">(</span><span class="n">components</span><span class="p">,</span> <span class="n">encodings</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">compat</span><span class="o">.</span><span class="n">in_py2</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">components</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">bytes</span><span class="p">):</span>
+        <span class="n">comps</span> <span class="o">=</span> <span class="n">components</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">comps</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">C</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">enc</span><span class="p">)</span> <span class="k">for</span> <span class="n">C</span><span class="p">,</span> <span class="n">enc</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">components</span><span class="p">,</span> <span class="n">encodings</span><span class="p">)</span>
+        <span class="p">]</span>
+
+    <span class="c1"># Remove empty elements from the end</span>
+    <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">comps</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">comps</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+        <span class="n">comps</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="sa">b</span><span class="s1">&#39;=&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">comps</span><span class="p">)</span>
+
+
 <span class="k">class</span> <span class="nc">PersonName3</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">encodings</span><span class="o">=</span><span class="n">default_encoding</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">encodings</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">PersonName3</span><span class="p">):</span>
             <span class="n">encodings</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">encodings</span>
             <span class="n">val</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">original_string</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">original_string</span> <span class="o">=</span> <span class="n">val</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">encodings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verify_encodings</span><span class="p">(</span><span class="n">encodings</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encodings</span> <span class="o">=</span> <span class="n">_verify_encodings</span><span class="p">(</span><span class="n">encodings</span><span class="p">)</span> <span class="ow">or</span> <span class="p">[</span><span class="n">default_encoding</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
@@ -758,25 +781,13 @@
     <span class="fm">__hash__</span> <span class="o">=</span> <span class="nb">object</span><span class="o">.</span><span class="fm">__hash__</span>
 
     <span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">encodings</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">encodings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verify_encodings</span><span class="p">(</span><span class="n">encodings</span><span class="p">)</span>
+        <span class="n">encodings</span> <span class="o">=</span> <span class="n">_verify_encodings</span><span class="p">(</span><span class="n">encodings</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">encodings</span>
         <span class="n">comps</span> <span class="o">=</span> <span class="n">_decode_personname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">,</span> <span class="n">encodings</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">PersonName3</span><span class="p">(</span><span class="sa">u</span><span class="s1">&#39;=&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">comps</span><span class="p">),</span> <span class="n">encodings</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">encodings</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">encodings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verify_encodings</span><span class="p">(</span><span class="n">encodings</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">bytes</span><span class="p">):</span>
-            <span class="n">comps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">components</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">comps</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="n">C</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">enc</span><span class="p">)</span> <span class="k">for</span> <span class="n">C</span><span class="p">,</span> <span class="n">enc</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">,</span> <span class="n">encodings</span><span class="p">)</span>
-            <span class="p">]</span>
-
-        <span class="c1"># Remove empty elements from the end</span>
-        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">comps</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">comps</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
-            <span class="n">comps</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
-
-        <span class="k">return</span> <span class="sa">b</span><span class="s1">&#39;=&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">comps</span><span class="p">)</span>
+        <span class="n">encodings</span> <span class="o">=</span> <span class="n">_verify_encodings</span><span class="p">(</span><span class="n">encodings</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">encodings</span>
+        <span class="k">return</span> <span class="n">_encode_personname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">,</span> <span class="n">encodings</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">family_comma_given</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">formatted</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%(family_name)s</span><span class="s1">, </span><span class="si">%(given_name)s</span><span class="s1">&#39;</span><span class="p">)</span>
@@ -786,15 +797,6 @@
             <span class="k">return</span> <span class="n">format_str</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">default_encoding</span><span class="p">)</span><span class="o">.</span><span class="vm">__dict__</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">format_str</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span>
-
-    <span class="k">def</span> <span class="nf">_verify_encodings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">encodings</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">encodings</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">encodings</span>
-
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">encodings</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-            <span class="n">encodings</span> <span class="o">=</span> <span class="p">[</span><span class="n">encodings</span><span class="p">]</span>
-
-        <span class="k">return</span> <span class="n">encodings</span>
 
 
 <div class="viewcode-block" id="PersonNameBase"><a class="viewcode-back" href="../../api_ref.html#pydicom.valuerep.PersonNameBase">[docs]</a><span class="k">class</span> <span class="nc">PersonNameBase</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -895,19 +897,14 @@
 <span class="sd">                 from pydicom.charset.python_encodings mapping</span>
 <span class="sd">                 of values in DICOM data element (0008,0005).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># in here to avoid circular import</span>
-        <span class="kn">from</span> <span class="nn">pydicom.charset</span> <span class="k">import</span> <span class="n">decode_string</span>
-
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">encodings</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-            <span class="n">encodings</span> <span class="o">=</span> <span class="p">[</span><span class="n">encodings</span><span class="p">]</span>
-        <span class="n">components</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;=&quot;</span><span class="p">)</span>
-        <span class="n">comps</span> <span class="o">=</span> <span class="n">_decode_personname</span><span class="p">(</span><span class="n">components</span><span class="p">,</span> <span class="n">encodings</span><span class="p">)</span>
+        <span class="n">encodings</span> <span class="o">=</span> <span class="n">_verify_encodings</span><span class="p">(</span><span class="n">encodings</span><span class="p">)</span>
+        <span class="n">comps</span> <span class="o">=</span> <span class="n">_decode_personname</span><span class="p">(</span><span class="n">val</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;=&quot;</span><span class="p">),</span> <span class="n">encodings</span><span class="p">)</span>
         <span class="n">new_val</span> <span class="o">=</span> <span class="sa">u</span><span class="s2">&quot;=&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">comps</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">compat</span><span class="o">.</span><span class="n">text_type</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">new_val</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">encodings</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">encodings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verify_encodings</span><span class="p">(</span><span class="n">encodings</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encodings</span> <span class="o">=</span> <span class="n">_verify_encodings</span><span class="p">(</span><span class="n">encodings</span><span class="p">)</span>
         <span class="n">PersonNameBase</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__copy__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -932,29 +929,10 @@
             <span class="nb">setattr</span><span class="p">(</span><span class="n">new_person</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">memo</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">new_person</span>
 
-    <span class="k">def</span> <span class="nf">_verify_encodings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">encodings</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Checks the encoding to ensure proper format&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">encodings</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">encodings</span>
-
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">encodings</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-            <span class="n">encodings</span> <span class="o">=</span> <span class="p">[</span><span class="n">encodings</span><span class="p">]</span>
-
-        <span class="k">return</span> <span class="n">encodings</span>
-
 <div class="viewcode-block" id="PersonNameUnicode.encode"><a class="viewcode-back" href="../../api_ref.html#pydicom.valuerep.PersonNameUnicode.encode">[docs]</a>    <span class="k">def</span> <span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">encodings</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Encode the unicode using the specified encoding&quot;&quot;&quot;</span>
-        <span class="n">encodings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verify_encodings</span><span class="p">(</span><span class="n">encodings</span><span class="p">)</span>
-
-        <span class="n">components</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">)</span>
-
-        <span class="n">comps</span> <span class="o">=</span> <span class="p">[</span><span class="n">C</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">enc</span><span class="p">)</span> <span class="k">for</span> <span class="n">C</span><span class="p">,</span> <span class="n">enc</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">components</span><span class="p">,</span> <span class="n">encodings</span><span class="p">)]</span>
-
-        <span class="c1"># Remove empty elements from the end</span>
-        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">comps</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">comps</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
-            <span class="n">comps</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
-
-        <span class="k">return</span> <span class="s1">&#39;=&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">comps</span><span class="p">)</span></div>
+        <span class="n">encodings</span> <span class="o">=</span> <span class="n">_verify_encodings</span><span class="p">(</span><span class="n">encodings</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">encodings</span>
+        <span class="k">return</span> <span class="n">_encode_personname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">),</span> <span class="n">encodings</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="PersonNameUnicode.family_comma_given"><a class="viewcode-back" href="../../api_ref.html#pydicom.valuerep.PersonNameUnicode.family_comma_given">[docs]</a>    <span class="k">def</span> <span class="nf">family_comma_given</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return name as &#39;Family-name, Given-name&#39;&quot;&quot;&quot;</span>
