@@ -175,6 +175,10 @@
 <h1>Version 1.2.0<a class="headerlink" href="#version-1-2-0" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="changelog">
 <h2>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>PIL removed as a fallback if Pillow is not available in the pillow pixel data
+handler (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/722">#722</a>)</li>
+</ul>
 <div class="section" id="enhancements">
 <h3>Enhancements<a class="headerlink" href="#enhancements" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
@@ -184,15 +188,21 @@ default character set (<a class="reference external" href="https://github.com/py
 (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/291">#291</a>)</li>
 <li>Functions for encapsulating frames added to encaps module (<a href="#id1"><span class="problematic" id="id2">:pull_request:`696`</span></a>)</li>
 <li>Added <code class="docutils literal notranslate"><span class="pre">Dataset.fix_meta_info()</span></code> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/584">#584</a>)</li>
+<li>Add new function for bit packing <code class="docutils literal notranslate"><span class="pre">pack_bits</span></code> for use
+with BitsAllocated = 1 (<a href="#id3"><span class="problematic" id="id4">:pull_request:`715`</span></a>)</li>
+<li>Added handling of single-byte character set extensions (<a href="#id5"><span class="problematic" id="id6">:pull_request:`718`</span></a>)</li>
 </ul>
 </div>
 <div class="section" id="fixes">
 <h3>Fixes<a class="headerlink" href="#fixes" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Removed unused <code class="docutils literal notranslate"><span class="pre">original_string</span></code> attribute from the <code class="docutils literal notranslate"><span class="pre">DataElement</span></code> class
-(<a href="#id3"><span class="problematic" id="id4">:pull_request:`660`</span></a>)</li>
+(<a href="#id7"><span class="problematic" id="id8">:pull_request:`660`</span></a>)</li>
 <li>Improve performance for Python 3 when dealing with compressed multi-frame
 Pixel Data with pillow and jpeg-ls (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/682">#682</a>).</li>
+<li>Improve performance of bit unpacking for non-PyPy2 interpreters
+(<a href="#id9"><span class="problematic" id="id10">:pull_request:`715`</span></a>)</li>
+<li>First character set no longer removed (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/707">#707</a>)</li>
 </ul>
 </div>
 </div>
