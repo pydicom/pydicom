@@ -213,3 +213,16 @@ class TestCharset(object):
         ds = dcmread(file_path)
         ds.decode()
         assert patient_name == ds.PatientName
+
+    def test_changed_character_set(self):
+        # Regression test for #629
+        multiPN_name = get_charset_files("chrFrenMulti.dcm")[0]
+        ds = dcmread(multiPN_name)  # is Latin-1
+        ds.SpecificCharacterSet = 'ISO_IR 192'
+        from pydicom.filebase import DicomBytesIO
+        fp = DicomBytesIO()
+        ds.save_as(fp, write_like_original=False)
+        fp.seek(0)
+        ds_out = dcmread(fp)
+        # we expect UTF-8 encoding here
+        assert b'Buc^J\xc3\xa9r\xc3\xb4me' == ds_out.get_item(0x00100010).value

@@ -22,7 +22,7 @@ from pydicom.valuerep import (MultiString, DA, DT, TM)
 if not in_py2:
     from pydicom.valuerep import PersonName3 as PersonName
 else:
-    from pydicom.valuerep import PersonName  # NOQA
+    from pydicom.valuerep import PersonNameUnicode as PersonName
 
 
 def convert_tag(byte_string, is_little_endian, offset=0):
@@ -199,17 +199,13 @@ def convert_PN(byte_string,
 
     def get_valtype(x):
         if not in_py2:
-            if encodings:
-                return PersonName(x, encodings).decode()
-            return PersonName(x).decode()
-        return PersonName(x)
+            return PersonName(x, encodings).decode()
+        return PersonName(x, encodings)
 
     # XXX - We have to replicate MultiString functionality
     # here because we can't decode easily here since that
     # is performed in PersonNameUnicode
-    ends_with1 = byte_string.endswith(b' ')
-    ends_with2 = byte_string.endswith(b'\x00')
-    if byte_string and (ends_with1 or ends_with2):
+    if byte_string.endswith((b' ', b'\x00')):
         byte_string = byte_string[:-1]
 
     splitup = byte_string.split(b"\\")
@@ -425,5 +421,3 @@ converters = {
     'DT': convert_DT_string,
     'UT': convert_single_string,
 }
-if __name__ == "__main__":
-    pass
