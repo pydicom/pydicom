@@ -25,7 +25,7 @@ except ImportError:
 PillowSupportedTransferSyntaxes = [
     pydicom.uid.JPEGBaseline,
     pydicom.uid.JPEGLossless,
-    pydicom.uid.JPEGBaseLineLossy12bit,
+    pydicom.uid.JPEGExtended,
     pydicom.uid.JPEG2000Lossless,
 ]
 PillowJPEG2000TransferSyntaxes = [
@@ -33,7 +33,7 @@ PillowJPEG2000TransferSyntaxes = [
 ]
 PillowJPEGTransferSyntaxes = [
     pydicom.uid.JPEGBaseline,
-    pydicom.uid.JPEGBaseLineLossy12bit,
+    pydicom.uid.JPEGExtended,
 ]
 
 have_pillow_jpeg_plugin = False
