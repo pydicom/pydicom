@@ -23,7 +23,7 @@ except ImportError:
     have_pillow = False
 
 PillowSupportedTransferSyntaxes = [
-    pydicom.uid.JPEGBaseLineLossy8bit,
+    pydicom.uid.JPEGBaseline,
     pydicom.uid.JPEGLossless,
     pydicom.uid.JPEGBaseLineLossy12bit,
     pydicom.uid.JPEG2000Lossless,
@@ -32,7 +32,7 @@ PillowJPEG2000TransferSyntaxes = [
     pydicom.uid.JPEG2000Lossless,
 ]
 PillowJPEGTransferSyntaxes = [
-    pydicom.uid.JPEGBaseLineLossy8bit,
+    pydicom.uid.JPEGBaseline,
     pydicom.uid.JPEGBaseLineLossy12bit,
 ]
 
