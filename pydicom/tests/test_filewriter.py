@@ -666,22 +666,22 @@ class TestCorrectAmbiguousVR(unittest.TestCase):
         ref_ds.PixelRepresentation = 0
         ref_ds.SmallestValidPixelValue = b'\x00\x01'  # Little endian 256
         ds = correct_ambiguous_vr(deepcopy(ref_ds), True)
-        self.assertEqual(ds.SmallestValidPixelValue, 256)
-        self.assertEqual(ds[0x00280104].VR, 'US')
+        assert 256 == ds.SmallestValidPixelValue
+        assert 'US' == ds[0x00280104].VR
 
         # If PixelRepresentation is 1 then VR should be SS
         ref_ds.PixelRepresentation = 1
         ref_ds.SmallestValidPixelValue = b'\x00\x01'  # Big endian 1
         ds = correct_ambiguous_vr(deepcopy(ref_ds), False)
-        self.assertEqual(ds.SmallestValidPixelValue, 1)
-        self.assertEqual(ds[0x00280104].VR, 'SS')
+        assert 1 == ds.SmallestValidPixelValue
+        assert 'SS' == ds[0x00280104].VR
 
-        # If no PixelRepresentation then should be unchanged
+        # If no PixelRepresentation AttributeError shall be raised
         ref_ds = Dataset()
         ref_ds.SmallestValidPixelValue = b'\x00\x01'  # Big endian 1
-        ds = correct_ambiguous_vr(deepcopy(ref_ds), True)
-        self.assertEqual(ds.SmallestValidPixelValue, b'\x00\x01')
-        self.assertEqual(ds[0x00280104].VR, 'US or SS')
+        with pytest.raises(AttributeError,
+                           match="has no attribute 'PixelRepresentation'"):
+            correct_ambiguous_vr(deepcopy(ref_ds), True)
 
     def test_pixel_representation_vm_three(self):
         """Test correcting VM 3 elements which require PixelRepresentation."""
@@ -691,22 +691,22 @@ class TestCorrectAmbiguousVR(unittest.TestCase):
         ref_ds.PixelRepresentation = 0
         ref_ds.LUTDescriptor = b'\x01\x00\x00\x01\x10\x00'  # 1\256\16
         ds = correct_ambiguous_vr(deepcopy(ref_ds), True)
-        self.assertEqual(ds.LUTDescriptor, [1, 256, 16])
-        self.assertEqual(ds[0x00283002].VR, 'US')
+        assert [1, 256, 16] == ds.LUTDescriptor
+        assert 'US' == ds[0x00283002].VR
 
         # If PixelRepresentation is 1 then VR should be SS
         ref_ds.PixelRepresentation = 1
         ref_ds.LUTDescriptor = b'\x01\x00\x00\x01\x00\x10'
         ds = correct_ambiguous_vr(deepcopy(ref_ds), False)
-        self.assertEqual(ds.LUTDescriptor, [256, 1, 16])
-        self.assertEqual(ds[0x00283002].VR, 'SS')
+        assert [256, 1, 16] == ds.LUTDescriptor
+        assert 'SS' == ds[0x00283002].VR
 
-        # If no PixelRepresentation then should be unchanged
+        # If no PixelRepresentation AttributeError shall be raised
         ref_ds = Dataset()
         ref_ds.LUTDescriptor = b'\x01\x00\x00\x01\x00\x10'
-        ds = correct_ambiguous_vr(deepcopy(ref_ds), False)
-        self.assertEqual(ds.LUTDescriptor, b'\x01\x00\x00\x01\x00\x10')
-        self.assertEqual(ds[0x00283002].VR, 'US or SS')
+        with pytest.raises(AttributeError,
+                           match="has no attribute 'PixelRepresentation'"):
+            correct_ambiguous_vr(deepcopy(ref_ds), False)
 
     def test_pixel_data(self):
         """Test correcting PixelData."""
@@ -735,37 +735,45 @@ class TestCorrectAmbiguousVR(unittest.TestCase):
         # If no BitsAllocated set then AttributesError is raised
         ref_ds = Dataset()
         ref_ds.PixelData = b'\x00\x01'  # Big endian 1
-        with pytest.raises(AttributeError):
+        with pytest.raises(AttributeError,
+                           match="has no attribute 'BitsAllocated'"):
             correct_ambiguous_vr(deepcopy(ref_ds), True)
 
     def test_waveform_bits_allocated(self):
         """Test correcting elements which require WaveformBitsAllocated."""
         ref_ds = Dataset()
+        ref_ds.is_implicit_VR = False
 
         # If WaveformBitsAllocated  > 8 then VR must be OW
         ref_ds.WaveformBitsAllocated = 16
         ref_ds.WaveformData = b'\x00\x01'  # Little endian 256
         ds = correct_ambiguous_vr(deepcopy(ref_ds), True)  # Little endian
-        self.assertEqual(ds.WaveformData, b'\x00\x01')
-        self.assertEqual(ds[0x54001010].VR, 'OW')
+        assert b'\x00\x01' == ds.WaveformData
+        assert 'OW' == ds[0x54001010].VR
         ds = correct_ambiguous_vr(deepcopy(ref_ds), False)  # Big endian
-        self.assertEqual(ds.WaveformData, b'\x00\x01')
-        self.assertEqual(ds[0x54001010].VR, 'OW')
+        assert b'\x00\x01' == ds.WaveformData
+        assert 'OW' == ds[0x54001010].VR
 
-        # If WaveformBitsAllocated <= 8 then VR is OB or OW, but not sure which
-        #   so leave VR unchanged
+        # If WaveformBitsAllocated == 8 then VR is OB or OW - set it to OB
         ref_ds.WaveformBitsAllocated = 8
         ref_ds.WaveformData = b'\x01\x02'
         ds = correct_ambiguous_vr(deepcopy(ref_ds), True)
-        self.assertEqual(ds.WaveformData, b'\x01\x02')
-        self.assertEqual(ds[0x54001010].VR, 'OB or OW')
+        assert b'\x01\x02' == ds.WaveformData
+        assert 'OB' == ds[0x54001010].VR
 
-        # If no WaveformBitsAllocated then VR should be unchanged
+        # For implicit VR, VR is always OW
+        ref_ds.is_implicit_VR = True
+        ds = correct_ambiguous_vr(deepcopy(ref_ds), True)
+        assert b'\x01\x02' == ds.WaveformData
+        assert 'OW' == ds[0x54001010].VR
+        ref_ds.is_implicit_VR = False
+
+        # If no WaveformBitsAllocated then AttributeError shall be raised
         ref_ds = Dataset()
         ref_ds.WaveformData = b'\x00\x01'  # Big endian 1
-        ds = correct_ambiguous_vr(deepcopy(ref_ds), True)
-        self.assertEqual(ds.WaveformData, b'\x00\x01')
-        self.assertEqual(ds[0x54001010].VR, 'OB or OW')
+        with pytest.raises(AttributeError,
+                           match="has no attribute 'WaveformBitsAllocated'"):
+            correct_ambiguous_vr(deepcopy(ref_ds), True)
 
     def test_lut_descriptor(self):
         """Test correcting elements which require LUTDescriptor."""
@@ -776,51 +784,44 @@ class TestCorrectAmbiguousVR(unittest.TestCase):
         ref_ds.LUTDescriptor = b'\x01\x00\x00\x01\x10\x00'  # 1\256\16
         ref_ds.LUTData = b'\x00\x01'  # Little endian 256
         ds = correct_ambiguous_vr(deepcopy(ref_ds), True)  # Little endian
-        self.assertEqual(ds.LUTDescriptor[0], 1)
-        self.assertEqual(ds[0x00283002].VR, 'US')
-        self.assertEqual(ds.LUTData, 256)
-        self.assertEqual(ds[0x00283006].VR, 'US')
+        assert 1 == ds.LUTDescriptor[0]
+        assert 'US' == ds[0x00283002].VR
+        assert 256 == ds.LUTData
+        assert 'US' == ds[0x00283006].VR
 
         # If LUTDescriptor[0] is not 1 then LUTData VR is 'OW'
         ref_ds.LUTDescriptor = b'\x02\x00\x00\x01\x10\x00'  # 2\256\16
         ref_ds.LUTData = b'\x00\x01\x00\x02'
         ds = correct_ambiguous_vr(deepcopy(ref_ds), True)  # Little endian
-        self.assertEqual(ds.LUTDescriptor[0], 2)
-        self.assertEqual(ds[0x00283002].VR, 'US')
-        self.assertEqual(ds.LUTData, b'\x00\x01\x00\x02')
-        self.assertEqual(ds[0x00283006].VR, 'OW')
+        assert 2 == ds.LUTDescriptor[0]
+        assert 'US' == ds[0x00283002].VR
+        assert b'\x00\x01\x00\x02' == ds.LUTData
+        assert 'OW' == ds[0x00283006].VR
 
-        # If no LUTDescriptor then VR should be unchanged
+        # If no LUTDescriptor then raise AttributeError
         ref_ds = Dataset()
         ref_ds.LUTData = b'\x00\x01'
-        ds = correct_ambiguous_vr(deepcopy(ref_ds), True)
-        self.assertEqual(ds.LUTData, b'\x00\x01')
-        self.assertEqual(ds[0x00283006].VR, 'US or OW')
+        with pytest.raises(AttributeError,
+                           match="has no attribute 'LUTDescriptor'"):
+            correct_ambiguous_vr(deepcopy(ref_ds), True)
 
     def test_overlay(self):
         """Test correcting OverlayData"""
-        # Implicit VR must be 'OW'
+        # VR must be 'OW'
         ref_ds = Dataset()
         ref_ds.is_implicit_VR = True
         ref_ds.add(DataElement(0x60003000, 'OB or OW', b'\x00'))
         ref_ds.add(DataElement(0x601E3000, 'OB or OW', b'\x00'))
         ds = correct_ambiguous_vr(deepcopy(ref_ds), True)
-        self.assertTrue(ds[0x60003000].VR == 'OW')
-        self.assertTrue(ds[0x601E3000].VR == 'OW')
-        self.assertTrue(ref_ds[0x60003000].VR == 'OB or OW')
-        self.assertTrue(ref_ds[0x601E3000].VR == 'OB or OW')
+        assert 'OW' == ds[0x60003000].VR
+        assert 'OW' == ds[0x601E3000].VR
+        assert 'OB or OW' == ref_ds[0x60003000].VR
+        assert 'OB or OW' == ref_ds[0x601E3000].VR
 
-        # Explicit VR may be 'OB' or 'OW' (leave unchanged)
         ref_ds.is_implicit_VR = False
         ds = correct_ambiguous_vr(deepcopy(ref_ds), True)
-        self.assertTrue(ds[0x60003000].VR == 'OB or OW')
-        self.assertTrue(ref_ds[0x60003000].VR == 'OB or OW')
-
-        # Missing is_implicit_VR (leave unchanged)
-        ref_ds.is_implicit_VR = None
-        ds = correct_ambiguous_vr(deepcopy(ref_ds), True)
-        self.assertTrue(ds[0x60003000].VR == 'OB or OW')
-        self.assertTrue(ref_ds[0x60003000].VR == 'OB or OW')
+        assert 'OW' == ds[0x60003000].VR
+        assert 'OB or OW' == ref_ds[0x60003000].VR
 
     def test_sequence(self):
         """Test correcting elements in a sequence."""
@@ -863,8 +864,9 @@ class TestCorrectAmbiguousVRElement(object):
         """Test correct ambiguous US/SS element"""
         ds = Dataset()
         ds.PixelPaddingValue = b'\xfe\xff'
-        out = correct_ambiguous_vr_element(ds[0x00280120], ds, True)
-        assert out.VR == 'US or SS'
+        with pytest.raises(AttributeError,
+                           match="has no attribute 'PixelRepresentation'"):
+            correct_ambiguous_vr_element(ds[0x00280120], ds, True)
 
         ds.PixelRepresentation = 0
         out = correct_ambiguous_vr_element(ds[0x00280120], ds, True)
