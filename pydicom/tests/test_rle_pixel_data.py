@@ -28,6 +28,7 @@ import pydicom.config
 from pydicom.data import get_testdata_files
 from pydicom.encaps import defragment_data
 from pydicom.uid import RLELossless
+from pydicom.tests._handler_common import ALL_TRANSFER_SYNTAXES
 
 try:
     import numpy as np
@@ -88,34 +89,14 @@ SC_RLE_32_2F = get_testdata_files("SC_rgb_rle_32bit_2frame.dcm")[0]
 
 # Transfer Syntaxes (non-retired + Explicit VR Big Endian)
 SUPPORTED_SYNTAXES = [RLELossless]
-UNSUPPORTED_SYNTAXES = [
-    '1.2.840.10008.1.2',  # Implicit VR Little Endian
-    '1.2.840.10008.1.2.1',  # Explicit VR Little Endian
-    '1.2.840.10008.1.2.1.99',  # Deflated Explicit VR Little Endian
-    '1.2.840.10008.1.2.2',  # Explicit VR Big Endian
-    '1.2.840.10008.1.2.4.50',  # JPEG Baseline (Process 1)
-    '1.2.840.10008.1.2.4.51',  # JPEG Extended (Process 2 and 4)
-    '1.2.840.10008.1.2.4.57',  # JPEG Lossless (Process 14)
-    '1.2.840.10008.1.2.4.70',  # JPEG Lossless (Process 14, Selection Value 1)
-    '1.2.840.10008.1.2.4.80',  # JPEG-LS Lossless
-    '1.2.840.10008.1.2.4.81',  # JPEG-LS Lossy (Near-Lossless)
-    '1.2.840.10008.1.2.4.90',  # JPEG 2000 Image Compression (Lossless Only)
-    '1.2.840.10008.1.2.4.91',  # JPEG 2000 Image Compression
-    '1.2.840.10008.1.2.4.92',  # JPEG 2000 Part 2 Multi-component
-    '1.2.840.10008.1.2.4.93',  # JPEG 2000 Part 2 Multi-component
-    '1.2.840.10008.1.2.4.94',  # JPIP Referenced
-    '1.2.840.10008.1.2.4.95',  # JPIP Referenced Deflate
-    '1.2.840.10008.1.2.4.100',  # MPEG2 Main Profile / Main Level
-    '1.2.840.10008.1.2.4.101',  # MPEG2 Main Profile / High Level
-    '1.2.840.10008.1.2.4.102',  # MPEG-4 AVC/H.264 High Profile / Level 4.1
-    '1.2.840.10008.1.2.4.103',  # MPEG-4 AVC/H.264 BD-compatible High Profile
-    '1.2.840.10008.1.2.4.104',  # MPEG-4 AVC/H.264 High Profile For 2D Video
-    '1.2.840.10008.1.2.4.105',  # MPEG-4 AVC/H.264 High Profile For 3D Video
-    '1.2.840.10008.1.2.4.106',  # MPEG-4 AVC/H.264 Stereo High Profile
-    '1.2.840.10008.1.2.4.107',  # HEVC/H.265 Main Profile / Level 5.1
-    '1.2.840.10008.1.2.4.108',  # HEVC/H.265 Main 10 Profile / Level 5.1
-]
-ALL_SYNTAXES = SUPPORTED_SYNTAXES + UNSUPPORTED_SYNTAXES
+UNSUPPORTED_SYNTAXES = list(
+    set(ALL_TRANSFER_SYNTAXES) ^ set(SUPPORTED_SYNTAXES)
+)
+
+
+def test_unsupported_syntaxes():
+    """Test that UNSUPPORTED_SYNTAXES is as expected."""
+    assert RLELossless not in UNSUPPORTED_SYNTAXES
 
 
 def _get_pixel_array(fpath):
@@ -176,7 +157,7 @@ class TestNoNumpy_NoRLEHandler(object):
     def test_pixel_array_raises(self):
         """Test pixel_array raises exception for all syntaxes."""
         ds = dcmread(MR_EXPL_LITTLE_1F)
-        for uid in ALL_SYNTAXES:
+        for uid in ALL_TRANSFER_SYNTAXES:
             ds.file_meta.TransferSyntaxUID = uid
             exc_msg = (
                 'No available image handler could decode this transfer syntax'
@@ -213,7 +194,7 @@ class TestNumpy_NoRLEHandler(object):
     def test_pixel_array_raises(self):
         """Test pixel_array raises exception for all syntaxes."""
         ds = dcmread(MR_EXPL_LITTLE_1F)
-        for uid in ALL_SYNTAXES:
+        for uid in ALL_TRANSFER_SYNTAXES:
             ds.file_meta.TransferSyntaxUID = uid
             exc_msg = (
                 'No available image handler could decode this transfer syntax'
@@ -565,10 +546,10 @@ class TestNumpy_GetPixelData(object):
             get_pixeldata(ds)
 
     def test_unknown_pixel_representation_raises(self):
-        """Test get_pixeldata raises if unsupported PixelRepresentation."""
+        """Test get_pixeldata raises if invalid PixelRepresentation."""
         ds = dcmread(MR_RLE_1F)
         ds.PixelRepresentation = 2
-        # Should probably be NotImplementedError instead
+        # Should probably be ValueError instead
         with pytest.raises(TypeError, match="format='bad_pixel_repr"):
             get_pixeldata(ds)
 
