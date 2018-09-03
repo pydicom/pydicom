@@ -87,6 +87,36 @@ SC_RLE_32_1F = get_testdata_files("SC_rgb_rle_32bit.dcm")[0]
 SC_EXPL_LITTLE_32_2F = get_testdata_files("SC_rgb_32bit_2frame.dcm")[0]
 SC_RLE_32_2F = get_testdata_files("SC_rgb_rle_32bit_2frame.dcm")[0]
 
+# Transfer syntaxes supported by other handlers
+# Implicit VR Little Endian
+IMPL = get_testdata_files("rtdose_1frame.dcm")[0]
+# Deflated Explicit VR Little Endian
+DELF = get_testdata_files("image_dfl.dcm")[0]
+# Explicit VR Big Endian
+EXPB = get_testdata_files("SC_rgb_expb_2frame.dcm")[0]
+# JPEG Baseline (Process 1)
+JPEG_BASELINE_1 = get_testdata_files("SC_rgb_jpeg_dcmtk.dcm")[0]
+# JPEG Baseline (Process 2 and 4)
+JPEG_EXTENDED_2 = get_testdata_files("JPEG-lossy.dcm")[0]
+# JPEG Lossless (Process 14)
+JPEG_LOSSLESS_14 = None
+# JPEG Lossless (Process 14, Selection Value 1)
+JPEG_LOSSLESS_14_1 = get_testdata_files("SC_rgb_jpeg_gdcm.dcm")[0]
+# JPEG-LS Lossless
+JPEG_LS_LOSSLESS = get_testdata_files("MR_small_jpeg_ls_lossless.dcm")[0]
+# JPEG-LS Lossy
+JPEG_LS_LOSSY = None
+# JPEG2k Lossless
+JPEG_2K_LOSSLESS = get_testdata_files("emri_small_jpeg_2k_lossless.dcm")[0]
+# JPEG2k
+JPEG_2K = get_testdata_files("JPEG2000.dcm")[0]
+# JPEG2k MC Lossless
+JPEG_2K_MC_LOSSLESS = None
+# JPEG2k MC
+JPEG_2K_MC = None
+# RLE Lossless
+RLE = get_testdata_files("MR_small_RLE.dcm")[0]
+
 # Transfer Syntaxes (non-retired + Explicit VR Big Endian)
 SUPPORTED_SYNTAXES = [RLELossless]
 UNSUPPORTED_SYNTAXES = list(
@@ -130,6 +160,24 @@ def _get_pixel_array(fpath):
     return arr
 
 
+REFERENCE_DATA_UNSUPPORTED = [
+    (IMPL, ('1.2.840.10008.1.2', 'Lastname^Firstname')),
+    (SC_EXPL_LITTLE_1F, ('1.2.840.10008.1.2.1', 'Lestrade^G')),
+    (DELF, ('1.2.840.10008.1.2.1.99', '^^^^')),
+    (EXPB, ('1.2.840.10008.1.2.2', 'Lestrade^G')),
+    (JPEG_BASELINE_1, ('1.2.840.10008.1.2.4.50', 'Lestrade^G')),
+    (JPEG_EXTENDED_2, ('1.2.840.10008.1.2.4.51', 'CompressedSamples^NM1')),
+    # (JPEG_LOSSLESS_14, ('1.2.840.10008.1.2.4.57')),  # No dataset available
+    (JPEG_LOSSLESS_14_1, ('1.2.840.10008.1.2.4.70', 'Lestrade^G')),
+    (JPEG_LS_LOSSLESS, ('1.2.840.10008.1.2.4.80', 'CompressedSamples^MR1')),
+    # (JPEG_LS_LOSSY, ('1.2.840.10008.1.2.4.81')),  # No dataset available
+    (JPEG_2K_LOSSLESS, ('1.2.840.10008.1.2.4.90', '')),
+    (JPEG_2K, ('1.2.840.10008.1.2.4.91', 'CompressedSamples^NM1')),
+    # (JPEG_2K_MC_LOSSLESS, ('1.2.840.10008.1.2.4.92')),  # No dataset avail.
+    # (JPEG_2K_MC, ('1.2.840.10008.1.2.4.93')),  # No dataset available
+]
+
+
 # Numpy and the RLE handler are unavailable
 @pytest.mark.skipif(HAVE_NP, reason='Numpy is available')
 class TestNoNumpy_NoRLEHandler(object):
@@ -148,11 +196,18 @@ class TestNoNumpy_NoRLEHandler(object):
         assert not HAVE_NP
         assert RLE_HANDLER is None
 
-    def test_can_access_dataset(self):
+    def test_can_access_supported_dataset(self):
         """Test that we can read and access elements in an RLE dataset."""
         ds = dcmread(MR_RLE_1F)
         assert 'CompressedSamples^MR1' == ds.PatientName
         assert 6128 == len(ds.PixelData)
+
+    @pytest.mark.parametrize("fpath,data", REFERENCE_DATA_UNSUPPORTED)
+    def test_can_access_unsupported_dataset(self, fpath, data):
+        """Test can read and access elements in unsupported datasets."""
+        ds = dcmread(fpath)
+        assert data[0] == ds.file_meta.TransferSyntaxUID
+        assert data[1] == ds.PatientName
 
     def test_pixel_array_raises(self):
         """Test pixel_array raises exception for all syntaxes."""
@@ -185,11 +240,18 @@ class TestNumpy_NoRLEHandler(object):
         # The RLE handler should still be available
         assert RLE_HANDLER is not None
 
-    def test_can_access_dataset(self):
+    def test_can_access_supported_dataset(self):
         """Test that we can read and access elements in an RLE dataset."""
         ds = dcmread(MR_RLE_1F)
         assert 'CompressedSamples^MR1' == ds.PatientName
         assert 6128 == len(ds.PixelData)
+
+    @pytest.mark.parametrize("fpath,data", REFERENCE_DATA_UNSUPPORTED)
+    def test_can_access_unsupported_dataset(self, fpath, data):
+        """Test can read and access elements in unsupported datasets."""
+        ds = dcmread(fpath)
+        assert data[0] == ds.file_meta.TransferSyntaxUID
+        assert data[1] == ds.PatientName
 
     def test_pixel_array_raises(self):
         """Test pixel_array raises exception for all syntaxes."""
@@ -229,6 +291,13 @@ class TestNumpy_RLEHandler(object):
             with pytest.raises(NotImplementedError,
                                match='image handler could decode'):
                 ds.pixel_array
+
+    @pytest.mark.parametrize("fpath,data", REFERENCE_DATA_UNSUPPORTED)
+    def test_can_access_unsupported_dataset(self, fpath, data):
+        """Test can read and access elements in unsupported datasets."""
+        ds = dcmread(fpath)
+        assert data[0] == ds.file_meta.TransferSyntaxUID
+        assert data[1] == ds.PatientName
 
     def test_pixel_array_signed(self):
         """Test pixel_array for unsigned -> signed data."""
