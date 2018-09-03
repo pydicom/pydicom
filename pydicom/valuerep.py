@@ -27,6 +27,11 @@ extra_length_VRs = ('OB', 'OD', 'OF', 'OL', 'OW', 'SQ', 'UC', 'UN', 'UR', 'UT')
 # and PN, but it is handled separately.
 text_VRs = ('SH', 'LO', 'ST', 'LT', 'UC', 'UT')
 
+# Delimiters for text strings and person name that reset the encoding.
+# See PS3.5, Section 6.1.2.5.3
+TEXT_VR_DELIMS = (b'\n', b'\r', b'\t', b'\f')
+PN_DELIMS = (b'^', )
+
 match_string = b''.join([
     b'(?P<single_byte>', br'(?P<family_name>[^=\^]*)',
     br'\^?(?P<given_name>[^=\^]*)', br'\^?(?P<middle_name>[^=\^]*)',
@@ -542,7 +547,7 @@ def _decode_personname(components, encodings):
     if isinstance(components[0], compat.text_type):
         comps = components
     else:
-        comps = [decode_string(comp, encodings)
+        comps = [decode_string(comp, encodings, PN_DELIMS)
                  for comp in components]
     # Remove empty elements from the end to avoid trailing '='
     while len(comps) and not comps[-1]:

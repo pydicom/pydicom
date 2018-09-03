@@ -4,7 +4,7 @@ import re
 import warnings
 
 from pydicom import compat
-from pydicom.valuerep import PersonNameUnicode, text_VRs
+from pydicom.valuerep import PersonNameUnicode, text_VRs, TEXT_VR_DELIMS
 from pydicom.compat import in_py2
 
 # Map DICOM Specific Character Set to python equivalent
@@ -78,7 +78,7 @@ escape_codes = {
 default_encoding = "iso8859"
 
 
-def decode_string(value, encodings):
+def decode_string(value, encodings, delimiters):
     """Convert a raw byte string into a unicode string using the given
     list of encodings.
     """
@@ -91,18 +91,38 @@ def decode_string(value, encodings):
                                             escape_codes['iso_ir_58']))
 
     if use_python_handling:
-        parts = [value]
+        values = [value]
     else:
+        # We handle only the delimiters actually appearing in the value
+        # to avoid too much overhead.
+        delims = []
+        for delim in delimiters:
+            if delim in value:
+                delims.append(delim)
+
         # Each part of the value that starts with an escape sequence is
         # decoded separately using the corresponding encoding.
         # See PS3.5, 6.1.2.4 and 6.1.2.5 for the use of code extensions.
-        parts = [ESC + part for part in value.split(ESC) if part]
+        values = [ESC + part for part in value.split(ESC) if part]
         # the first part may not start with an escape sequence
         if not value.startswith(ESC):
-            parts[0] = parts[0][1:]
+            values[0] = values[0][1:]
+
+        # Each part of the value that starts with one of the delimiters
+        # (defined in PS3.5, section 6.1.2.5.3) is decoded separately.
+        # Each such parts initially uses the first encoding in the list.
+        for delim in delims:
+            elements = []
+            for value in values:
+                parts = [delim + part for part in value.split(delim)]
+                if not value.startswith(delim):
+                    parts[0] = parts[0][1:]
+                elements += parts
+            values = elements
+
     result = u''
 
-    for part in parts:
+    for part in values:
         if part.startswith(ESC):
             for enc in list(encodings) + ['iso8859']:
                 if enc in escape_codes and part.startswith(escape_codes[enc]):
@@ -213,7 +233,8 @@ def decode(data_element, dicom_character_set):
         if data_element.VM == 1:
             if isinstance(data_element.value, compat.text_type):
                 return
-            data_element.value = decode_string(data_element.value, encodings)
+            data_element.value = decode_string(data_element.value, encodings,
+                                               TEXT_VR_DELIMS)
         else:
 
             output = list()
@@ -222,6 +243,7 @@ def decode(data_element, dicom_character_set):
                 if isinstance(value, compat.text_type):
                     output.append(value)
                 else:
-                    output.append(decode_string(value, encodings))
+                    output.append(decode_string(value, encodings,
+                                                TEXT_VR_DELIMS))
 
             data_element.value = output

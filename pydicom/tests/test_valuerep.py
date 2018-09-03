@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Test suite for valuerep.py"""
 
@@ -294,20 +295,38 @@ class TestPersonName(object):
     def test_unicode_kr(self):
         """PN: 3component in unicode works (Korean)..."""
         # Example name from PS3.5-2008 section I.2 p. 101
-        pn = PersonNameUnicode('Hong^Gildong='
-                               '\033$)C\373\363^\033$)C\321\316\324\327='
-                               '\033$)C\310\253^\033$)C\261\346\265\277',
+        pn = PersonNameUnicode(b'Hong^Gildong='
+                               b'\033$)C\373\363^\033$)C\321\316\324\327='
+                               b'\033$)C\310\253^\033$)C\261\346\265\277',
                                [default_encoding, 'euc_kr'])
-        assert ("Hong", "Gildong") == (pn.family_name, pn.given_name)
+        # PersonNameUnicode and PersonName3 behave differently:
+        # PersonName3 does not decode the components automatically
+        if not in_py2:
+            pn = pn.decode()
+        assert (u'Hong', u'Gildong') == (pn.family_name, pn.given_name)
+        assert u'洪^吉洞' == pn.ideographic
+        assert u'홍^길동' == pn.phonetic
 
-    def test_unicode_jp(self):
+    def test_unicode_jp_from_bytes(self):
         """PN: 3component in unicode works (Japanese)..."""
         # Example name from PS3.5-2008 section H  p. 98
-        pn = PersonNameUnicode('Yamada^Tarou='
-                               '\033$B;3ED\033(B^\033$BB@O:\033(B='
-                               '\033$B$d$^$@\033(B^\033$B$?$m$&\033(B',
+        pn = PersonNameUnicode(b'Yamada^Tarou='
+                               b'\033$B;3ED\033(B^\033$BB@O:\033(B='
+                               b'\033$B$d$^$@\033(B^\033$B$?$m$&\033(B',
                                [default_encoding, 'iso2022_jp'])
-        assert ("Yamada", "Tarou") == (pn.family_name, pn.given_name)
+        if not in_py2:
+            pn = pn.decode()
+        assert (u'Yamada', u'Tarou') == (pn.family_name, pn.given_name)
+        assert u'山田^太郎' == pn.ideographic
+        assert u'やまだ^たろう' == pn.phonetic
+
+    def test_unicode_jp_from_unicode(self):
+        """A person name initialized from unicode is already decoded"""
+        pn = PersonNameUnicode(u'Yamada^Tarou=山田^太郎=やまだ^たろう',
+                               [default_encoding, 'iso2022_jp'])
+        assert (u'Yamada', u'Tarou') == (pn.family_name, pn.given_name)
+        assert u'山田^太郎' == pn.ideographic
+        assert u'やまだ^たろう' == pn.phonetic
 
     def test_not_equal(self):
         """PN3: Not equal works correctly (issue 121)..."""
