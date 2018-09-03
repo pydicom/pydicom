@@ -43,7 +43,8 @@ try:
     from pydicom.pixel_data_handlers.rle_handler import (
         get_pixeldata,
         _rle_decode_frame,
-        _rle_decode_plane
+        _rle_decode_plane,
+        _rle_encode_frame,
     )
 except ImportError:
     RLE_HANDLER = None
@@ -741,3 +742,112 @@ class TestNumpy_RLEDecodePlane(object):
         # n = 129, copy x128
         data = b'\x81\x02\x80'
         assert b'\x02' * 128 == bytes(_rle_decode_plane(data))
+
+
+@pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
+class TestNumpy_RLEEncodeFrame(object):
+    """Tests for rle_handler._rle_encode_frame."""
+    def test_1bit_1sample(self):
+        """Test encoding a 1-bit, 1 sample/pixel frame."""
+        pass
+
+    def test_1bit_3sample(self):
+        """Test encoding a 1-bit, 3 sample/pixel frame."""
+        pass
+
+    def test_8bit_1sample(self):
+        """Test encoding an 8-bit, 1 sample/pixel frame."""
+        arr = np.asarray(
+            [[  0,   0,   2,   2],
+             [ 32,  33,  34,  35],
+             [ 64,  64,  64,  64],
+             [127, 128, 129, 130],
+             [252, 255, 255, 255]], dtype='uint8')
+
+        _rle_encode_frame(arr)
+
+    def test_8bit_3sample(self):
+        """Test encoding an 8-bit, 3 sample/pixel frame."""
+        pass
+
+    def test_16bit_1sample(self):
+        """Test encoding a 16-bit, 1 sample/pixel frame."""
+        arr = np.asarray(
+            [[   0,     1,    2,    3],
+             [  32,    33,   34,   35],
+             [  64,    65,   66,   67],
+             [ 127,  1024, 2048, 4096],
+             [8192, 2**14, 2**15, 65535]], dtype='uint16')
+
+        _rle_encode_frame(arr)
+
+    def test_16bit_3sample(self):
+        """Test encoding a 16-bit, 3 sample/pixel frame."""
+        pass
+
+    def test_32bit_1sample(self):
+        """Test encoding a 32-bit, 1 sample/pixel frame."""
+        arr = np.asarray(
+            [[    0,     1,     2,     3],
+             [    4,     8,    32,   128],
+             [  512,  2048,  8192, 2**17],
+             [2**19, 2**23, 2**25, 2**27],
+             [2**29, 2**30, 2**31, 2**32 - 1]], dtype='uint32')
+
+        _rle_encode_frame(arr)
+
+    def test_32bit_3sample(self):
+        """Test encoding a 32-bit, 3 sample/pixel frame."""
+        pass
+
+
+@pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
+class TestNumpy_RLEEncodePlane(object):
+    """Tests for rle_handler._rle_encode_plane."""
+    def test_1bit(self):
+        """Test encoding a 1-bit plane into 1 segment."""
+        pass
+
+    def test_8bit(self):
+        """Test encoding an 8-bit plane into 1 segment."""
+        pass
+
+    def test_16bit(self):
+        """Test encoding a 16-bit plane into 2 segments."""
+        pass
+
+    def test_32bit(self):
+        """Test encoding a 32-bit plane into 4 segments."""
+        pass
+
+
+@pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
+class TestNumpy_RLEEncodeSegment(object):
+    """Tests for rle_handler._rle_encode_segment."""
+    def test_one_row(self):
+        """Test encoding data that contains only a single row."""
+        pass
+
+    def test_odd_length(self):
+        """Test encoding odd length data."""
+        pass
+
+    def test_even_length(self):
+        """Test encoding even length data."""
+        pass
+
+    def test_all_literal(self):
+        """Test when data only needs literal runs."""
+        pass
+
+    def test_all_replicate(self):
+        """Test when data only needs replicate runs."""
+        pass
+
+    def test_long_replicate(self):
+        """Test when a run of replicate values is longer than 128 bytes."""
+        pass
+
+    def test_long_literal(self):
+        """Test when a run of literal values is longer than 128 bytes."""
+        pass

@@ -3,12 +3,8 @@
 import pydicom.uid
 import pydicom.encaps
 from struct import unpack
-have_numpy = True
-try:
-    import numpy
-except ImportError:
-    have_numpy = False
-    raise
+
+import numpy as np
 
 RLESupportedTransferSyntaxes = [
     pydicom.uid.RLELossless,
@@ -226,3 +222,88 @@ def _rle_decode_plane(data):
             pos += header_byte + 1
 
     return result
+
+
+def rle_encode(arr, ds):
+    """Return the contents of `arr` as a list of RLE encoded bytearray."""
+    pass
+
+
+def _rle_encode_frame(arr):
+    """Return an numpy ndarray image frame as RLE encoded bytearray.
+
+    Parameters
+    ----------
+    arr : numpy.ndarray
+        A 2D (if Samples Per Pixel = 1) or 3D (if Samples Per Pixel = 3)
+        ndarray containing a single frame of the image to be RLE encoded.
+
+    Returns
+    -------
+    bytearray
+        The RLE encoded frame, following the format specified by the DICOM
+        Standard, Part 5, Annex G.
+    """
+    out = bytearray()
+    if len(arr.shape) == 3:
+        # Samples Per Pixel = 3
+        for plane in arr:
+            out.extend(_rle_encode_plane(plane))
+    else:
+        # Samples Per Pixel = 1
+        out.extend(_rle_encode_plane(arr))
+
+    return out
+
+
+def _rle_encode_plane(arr):
+    """Return a numpy ndarray image plane as RLE encoded bytearray.
+
+    Parameters
+    ----------
+    arr : numpy.ndarray
+        A 2D ndarray containing a single plane of the image data to be RLE
+        encoded. The dtype of the array should be a multiple of 8 (i.e. uint8,
+        uint32, int16, etc.).
+
+    Returns
+    -------
+    bytearray
+        The RLE encoded plane, following the format specified by the DICOM
+        Standard, Part 5, Annex G.
+    """
+    out = bytearray()
+
+    # Re-view the N-bit array data as N / 8 x 8-bit uints
+    arr8 = arr.view(np.uint8)
+    # Reshape the uint8 array data into 1 or more segments and encode
+    bytes_per_sample = arr8.shape[1] // arr.shape[1]
+    for ii in range(bytes_per_sample):
+        segment = arr8.ravel()[ii::bytes_per_sample].reshape(arr.shape)
+        out.extend(_rle_encode_segment(segment))
+
+    return out
+
+
+def _rle_encode_segment(arr):
+    """Return an numpy ndarray as RLE encoded bytearray.
+
+    Parameters
+    ----------
+    arr : numpy.ndarray
+        A 2D ndarray of 8-bit uint data, representing a Byte Segment as in
+        the DICOM Standard, Part 5, Annex G.2.
+
+    Returns
+    -------
+    bytearray
+        The RLE encoded segment, following the format specified by the DICOM
+        Standard. Odd length encoded segments are padded by a trailing 0x00
+        to be even length.
+    """
+    print(arr)
+    out = bytearray()
+    for row in arr:
+        pass
+
+    return out
