@@ -319,7 +319,7 @@ def _rle_encode_plane(arr):
     bytes_per_sample = arr8.shape[1] // arr.shape[1]
     for ii in range(bytes_per_sample):
         segment = arr8.ravel()[ii::bytes_per_sample].reshape(arr.shape)
-        yield _rle_encode_segment(segment))
+        yield _rle_encode_segment(segment)
 
 
 def _rle_encode_segment(arr):
@@ -343,8 +343,7 @@ def _rle_encode_segment(arr):
         out.extend(_rle_encode_row(row))
 
     # Pad odd length data with a trailing 0x00 byte
-    if len(out) % 2:
-        out.extend(b'\x00')
+    out.extend(b'\x00' * (len(out) % 2))
 
     return out
 
