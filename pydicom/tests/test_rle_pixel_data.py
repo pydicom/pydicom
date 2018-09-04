@@ -21,6 +21,8 @@ There are the following possibilities:
 * NumberOfFrames (1, 2, ...)
 """
 
+from struct import pack, unpack
+
 import pytest
 
 from pydicom import dcmread
@@ -43,13 +45,22 @@ try:
     from pydicom.pixel_data_handlers.rle_handler import (
         get_pixeldata,
         _rle_decode_frame,
-        _rle_decode_plane
+        _rle_decode_segment,
+        _parse_rle_header,
     )
 except ImportError:
     RLE_HANDLER = None
 
 
 # Paths to the test datasets
+# 1-bit, 1 sample/pixel, 1 frame
+RLE_1_1_1F = None
+# 1-bit, 1 sample/pixel, 2 frame
+RLE_1_1_2F = None
+# 1-bit, 3 sample/pixel, 1 frame
+RLE_1_3_1F = None
+# 1-bit, 3 sample/pixel, 2 frame
+RLE_1_3_2F = None
 # 8/8-bit, 1 sample/pixel, 1 frame
 OB_EXPL_LITTLE_1F = get_testdata_files("OBXXXX1A.dcm")[0]
 OB_RLE_1F = get_testdata_files("OBXXXX1A_rle.dcm")[0]
@@ -110,10 +121,6 @@ JPEG_LS_LOSSY = None
 JPEG_2K_LOSSLESS = get_testdata_files("emri_small_jpeg_2k_lossless.dcm")[0]
 # JPEG2k
 JPEG_2K = get_testdata_files("JPEG2000.dcm")[0]
-# JPEG2k MC Lossless
-JPEG_2K_MC_LOSSLESS = None
-# JPEG2k MC
-JPEG_2K_MC = None
 # RLE Lossless
 RLE = get_testdata_files("MR_small_RLE.dcm")[0]
 
@@ -173,8 +180,6 @@ REFERENCE_DATA_UNSUPPORTED = [
     # (JPEG_LS_LOSSY, ('1.2.840.10008.1.2.4.81')),  # No dataset available
     (JPEG_2K_LOSSLESS, ('1.2.840.10008.1.2.4.90', '')),
     (JPEG_2K, ('1.2.840.10008.1.2.4.91', 'CompressedSamples^NM1')),
-    # (JPEG_2K_MC_LOSSLESS, ('1.2.840.10008.1.2.4.92')),  # No dataset avail.
-    # (JPEG_2K_MC, ('1.2.840.10008.1.2.4.93')),  # No dataset available
 ]
 
 
@@ -318,8 +323,8 @@ class TestNumpy_RLEHandler(object):
         """Test pixel_array for 1-bit raises exception."""
         ds = dcmread(SC_RLE_1F)
         ds.BitsAllocated = 1
-        # This should raise NotImplementedError instead
-        with pytest.raises(TypeError, match="format='uint1'"):
+        # XXX: shouldn't raise
+        with pytest.raises(NotImplementedError, match="BitsAllocated"):
             ds.pixel_array
 
     def test_pixel_array_8bit_1sample_1f(self):
@@ -610,23 +615,21 @@ class TestNumpy_GetPixelData(object):
         ds = dcmread(MR_RLE_1F)
         del ds.PixelData
         assert 'PixelData' not in ds
-        # Should probably be AttributeError instead
-        with pytest.raises(TypeError, match='No pixel data found'):
+        with pytest.raises(AttributeError, match=' dataset: PixelData'):
             get_pixeldata(ds)
 
     def test_unknown_pixel_representation_raises(self):
         """Test get_pixeldata raises if invalid PixelRepresentation."""
         ds = dcmread(MR_RLE_1F)
         ds.PixelRepresentation = 2
-        # Should probably be ValueError instead
-        with pytest.raises(TypeError, match="format='bad_pixel_repr"):
+        with pytest.raises(ValueError, match="value of '2' for '\(0028,0103"):
             get_pixeldata(ds)
 
     def test_unsupported_syntaxes_raises(self):
         """Test get_pixeldata raises if unsupported Transfer Syntax."""
         ds = dcmread(MR_EXPL_LITTLE_1F)
-        # Typo in exception message
-        with pytest.raises(NotImplementedError, match='RLE decompressordoes'):
+        with pytest.raises(NotImplementedError,
+                           match='syntax is not supported by the RLE pixel'):
             get_pixeldata(ds)
 
     def test_change_photometric_interpretation(self):
@@ -669,9 +672,47 @@ BAD_SEGMENT_DATA = [
     (b'\x0D\x00\x00\x00', 3, 32),  # 13 segments, 12 expected
     (b'\x07\x00\x00\x00', 1, 64),  # 7 segments, 8 expected
     (b'\x09\x00\x00\x00', 1, 64),  # 9 segments, 8 expected
-    (b'\x17\x00\x00\x00', 3, 64),  # 23 segments, 24 expected
-    (b'\x19\x00\x00\x00', 3, 64),  # 25 segments, 24 expected
+    #(b'\x17\x00\x00\x00', 3, 64),  # 23 segments, 24 expected
+    #(b'\x19\x00\x00\x00', 3, 64),  # 25 segments, 24 expected
 ]
+
+HEADER_DATA = [
+    # (Number of segments, offsets)
+    (0, []),
+    (1, [64]),
+    (2, [64, 16]),
+    (8, [64, 16, 31, 55, 62, 110, 142, 551]),
+    (14, [64, 16, 31, 55, 62, 110, 142, 551, 641, 456, 43, 11, 6, 55]),
+    (15, [64, 16, 31, 55, 62, 110, 142, 551, 641, 456, 43, 11, 6, 55, 9821]),
+]
+
+
+class TestNumpy_RLEParseHeader(object):
+    """Tests for rle_handler._parse_rle_header."""
+    def test_invalid_header_length(self):
+        """Test exception raised if header is not 64 bytes long."""
+        for length in [0, 1, 63, 65]:
+            with pytest.raises(ValueError,
+                               match='RLE header can only be 64 bytes long'):
+                _parse_rle_header(b'\x00' * length)
+
+    def test_invalid_nr_segments_raises(self):
+        """Test that more than 15 segments raises exception."""
+        with pytest.raises(ValueError, match="invalid number of segments"):
+            _parse_rle_header(b'\x10' + b'\x00' * 63)
+
+    @pytest.mark.parametrize('nr_segments, offsets', HEADER_DATA)
+    def test_good_nr_segments(self, nr_segments, offsets):
+        """Test good header data."""
+        # Encode the header
+        header = bytearray()
+        header.extend(pack('<L', nr_segments))
+        header.extend(pack('<{}L'.format(len(offsets)), *offsets))
+        # Add padding
+        header.extend(b'\x00' * (64 - len(header)))
+
+        assert len(header) == 64
+        assert offsets == _parse_rle_header(header)
 
 
 @pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
@@ -686,13 +727,16 @@ class TestNumpy_RLEDecodeFrame(object):
     def test_invalid_nr_segments_raises(self, header, samples, bits):
         """Test having too many segments in the data raises exception."""
         # This should probably be ValueError
-        with pytest.raises(AttributeError,
-                           match='Unexpected number of planes'):
+        expected = samples * bits // 8
+        actual = unpack('<L', header)[0]
+        header += b'\x00' * (64 - len(header))
+        msg = "expected amount \({} vs. {} segments\)".format(expected, actual)
+        with pytest.raises(ValueError, match=msg):
             _rle_decode_frame(header,
                               rows=1,
                               columns=1,
-                              samples_per_pixel=samples,
-                              bits_allocated=bits)
+                              nr_samples=samples,
+                              bits_alloc=bits)
 
     def test_invalid_frame_data_raises(self):
         """Test that invalid segment data raises exception."""
@@ -717,8 +761,8 @@ class TestNumpy_RLEDecodeFrame(object):
 
 
 @pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
-class TestNumpy_RLEDecodePlane(object):
-    """Tests for rle_handler._rle_decode_plane.
+class TestNumpy_RLEDecodeSegment(object):
+    """Tests for rle_handler._rle_decode_segment.
 
     Using int8
     ----------
@@ -747,7 +791,7 @@ class TestNumpy_RLEDecodePlane(object):
         # For n == 128, do nothing
         # data is only noop, 0x80 = 128
         data = b'\x80\x80\x80'
-        assert b'' == bytes(_rle_decode_plane(data))
+        assert b'' == bytes(_rle_decode_segment(data))
 
         # noop at start, data after
         data = (
@@ -759,7 +803,7 @@ class TestNumpy_RLEDecodePlane(object):
         assert (
             b'\x01\x02\x03\x04\x05\x06'
             b'\x01\x01\x01'
-        ) == bytes(_rle_decode_plane(data))
+        ) == bytes(_rle_decode_segment(data))
 
         # data at start, noop middle, data at end
         data = (
@@ -771,7 +815,7 @@ class TestNumpy_RLEDecodePlane(object):
         assert (
             b'\x01\x02\x03\x04\x05\x06'
             b'\x01\x01\x01'
-        ) == bytes(_rle_decode_plane(data))
+        ) == bytes(_rle_decode_segment(data))
 
         # data at start, noop end
         # Copy 6 bytes literally, then 3 x 0x01
@@ -783,30 +827,30 @@ class TestNumpy_RLEDecodePlane(object):
         assert (
             b'\x01\x02\x03\x04\x05\x06'
             b'\x01\x01\x01'
-        ) == bytes(_rle_decode_plane(data))
+        ) == bytes(_rle_decode_segment(data))
 
     def test_literal(self):
         """Test literal output."""
         # For n < 128, read the next (n + 1) bytes literally
         # n = 0 (0x80 is 128 -> no operation)
         data = b'\x00\x02\x80'
-        assert b'\x02' == bytes(_rle_decode_plane(data))
+        assert b'\x02' == bytes(_rle_decode_segment(data))
         # n = 1
         data = b'\x01\x02\x03\x80'
-        assert b'\x02\x03' == bytes(_rle_decode_plane(data))
+        assert b'\x02\x03' == bytes(_rle_decode_segment(data))
         # n = 127
         data = b'\x7f' + b'\x40' * 128 + b'\x80'
-        assert b'\x40' * 128 == bytes(_rle_decode_plane(data))
+        assert b'\x40' * 128 == bytes(_rle_decode_segment(data))
 
     def test_copy(self):
         """Test copy output."""
         # For n > 128, copy the next byte (257 - n) times
         # n = 255, copy x2 (0x80 is 128 -> no operation)
         data = b'\xFF\x02\x80'
-        assert b'\x02\x02' == bytes(_rle_decode_plane(data))
+        assert b'\x02\x02' == bytes(_rle_decode_segment(data))
         # n = 254, copy x3
         data = b'\xFE\x02\x80'
-        assert b'\x02\x02\x02' == bytes(_rle_decode_plane(data))
+        assert b'\x02\x02\x02' == bytes(_rle_decode_segment(data))
         # n = 129, copy x128
         data = b'\x81\x02\x80'
-        assert b'\x02' * 128 == bytes(_rle_decode_plane(data))
+        assert b'\x02' * 128 == bytes(_rle_decode_segment(data))

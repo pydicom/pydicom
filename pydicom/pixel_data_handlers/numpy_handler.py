@@ -19,15 +19,15 @@ elements have values given in the table below.
 +-------------+---------------------------+------+ values       |          |
 | Tag         | Keyword                   | Type |              |          |
 +=============+===========================+======+==============+==========+
-| (0028,0002) | SamplesPerPixel           | 1    | 1, 2, 3, N   | Required |
+| (0028,0002) | SamplesPerPixel           | 1    | N            | Required |
 +-------------+---------------------------+------+--------------+----------+
 | (0028,0006) | PlanarConfiguration       | 1C   | 0, 1         | Optional |
 +-------------+---------------------------+------+--------------+----------+
-| (0028,0008) | NumberOfFrames            | 1C   | 1, 2, N      | Optional |
+| (0028,0008) | NumberOfFrames            | 1C   | N            | Optional |
 +-------------+---------------------------+------+--------------+----------+
-| (0028,0010) | Rows                      | 1    | 1, 2, N      | Required |
+| (0028,0010) | Rows                      | 1    | N            | Required |
 +-------------+---------------------------+------+--------------+----------+
-| (0028,0011) | Columns                   | 1    | 1, 2, N      | Required |
+| (0028,0011) | Columns                   | 1    | N            | Required |
 +-------------+---------------------------+------+--------------+----------+
 | (0028,0100) | BitsAllocated             | 1    | 1, 8, 16, 32 | Required |
 +-------------+---------------------------+------+--------------+----------+
@@ -161,6 +161,8 @@ def pixel_dtype(ds):
 
     Raises
     ------
+    ValueError
+        If the value of *Bits Allocated* or *Pixel Representation* is invalid.
     NotImplementedError
         If the pixel data is of a type that isn't supported by either numpy
         or pydicom.
@@ -178,10 +180,10 @@ def pixel_dtype(ds):
     elif pixel_repr == 1:
         dtype_str = 'int'
     else:
-        raise NotImplementedError(
+        raise ValueError(
             "Unable to determine the data type to use to contain the "
             "Pixel Data as a value of '{}' for '(0028,0103) Pixel "
-            "Representation' is not supported".format(pixel_repr)
+            "Representation' is invalid".format(pixel_repr)
         )
 
     # (0028,0100) Bits Allocated, US, 1
@@ -194,10 +196,10 @@ def pixel_dtype(ds):
     elif bits_allocated > 0 and bits_allocated % 8 == 0:
         dtype_str += str(bits_allocated)
     else:
-        raise NotImplementedError(
+        raise ValueError(
             "Unable to determine the data type to use to contain the "
             "Pixel Data as a value of '{}' for '(0028,0100) Bits "
-            "Allocated' is not supported".format(bits_allocated)
+            "Allocated' is invalid".format(bits_allocated)
         )
 
     # Check to see if the dtype is valid for numpy

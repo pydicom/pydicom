@@ -132,10 +132,6 @@ JPEG_LS_LOSSY = None
 JPEG_2K_LOSSLESS = get_testdata_files("emri_small_jpeg_2k_lossless.dcm")[0]
 # JPEG2k
 JPEG_2K = get_testdata_files("JPEG2000.dcm")[0]
-# JPEG2k MC Lossless
-JPEG_2K_MC_LOSSLESS = None
-# JPEG2k MC
-JPEG_2K_MC = None
 # RLE Lossless
 RLE = get_testdata_files("MR_small_RLE.dcm")[0]
 
@@ -154,7 +150,7 @@ UNSUPPORTED_SYNTAXES = list(
 def test_unsupported_syntaxes():
     """Test that UNSUPPORTED_SYNTAXES is as expected."""
     for syntax in SUPPORTED_SYNTAXES:
-        assert syntax not in  UNSUPPORTED_SYNTAXES
+        assert syntax not in UNSUPPORTED_SYNTAXES
 
 
 REFERENCE_DATA_UNSUPPORTED = [
@@ -166,8 +162,6 @@ REFERENCE_DATA_UNSUPPORTED = [
     # (JPEG_LS_LOSSY, ('1.2.840.10008.1.2.4.81')),  # No dataset available
     (JPEG_2K_LOSSLESS, ('1.2.840.10008.1.2.4.90', '')),
     (JPEG_2K, ('1.2.840.10008.1.2.4.91', 'CompressedSamples^NM1')),
-    #(JPEG_2K_MC_LOSSLESS, ('1.2.840.10008.1.2.4.92')),  # No dataset available
-    #(JPEG_2K_MC, ('1.2.840.10008.1.2.4.93')),  # No dataset available
     (RLE, ('1.2.840.10008.1.2.5', 'CompressedSamples^MR1')),
 ]
 
@@ -805,7 +799,7 @@ class TestNumpy_GetPixelData(object):
         """Test get_pixeldata raises if unsupported PixelRepresentation."""
         ds = dcmread(EXPL_16_1_1F)
         ds.PixelRepresentation = 2
-        with pytest.raises(NotImplementedError,
+        with pytest.raises(ValueError,
                            match="value of '2' for '\(0028,0103"):
             get_pixeldata(ds)
 
@@ -956,12 +950,12 @@ class TestNumpy_PixelDtype(object):
         self.ds.BitsAllocated = 16
         self.ds.PixelRepresentation = -1
         # The bracket needs to be escaped
-        with pytest.raises(NotImplementedError,
+        with pytest.raises(ValueError,
                            match="value of '-1' for '\(0028,0103"):
             pixel_dtype(self.ds)
 
         self.ds.PixelRepresentation = 2
-        with pytest.raises(NotImplementedError,
+        with pytest.raises(ValueError,
                            match="value of '2' for '\(0028,0103"):
             pixel_dtype(self.ds)
 
@@ -970,17 +964,17 @@ class TestNumpy_PixelDtype(object):
         self.ds.BitsAllocated = 0
         self.ds.PixelRepresentation = 0
         # The bracket needs to be escaped
-        with pytest.raises(NotImplementedError,
+        with pytest.raises(ValueError,
                            match="value of '0' for '\(0028,0100"):
             pixel_dtype(self.ds)
 
         self.ds.BitsAllocated = 2
-        with pytest.raises(NotImplementedError,
+        with pytest.raises(ValueError,
                            match="value of '2' for '\(0028,0100"):
             pixel_dtype(self.ds)
 
         self.ds.BitsAllocated = 15
-        with pytest.raises(NotImplementedError,
+        with pytest.raises(ValueError,
                            match="value of '15' for '\(0028,0100"):
             pixel_dtype(self.ds)
 
