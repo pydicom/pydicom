@@ -227,16 +227,16 @@ class TestDicomFileLike(object):
 
         fp = DicomFileLike(IntPlus)
         with pytest.raises(IOError,
-                           match="This DicomFileLike object has no write\(\) "
-                                 "method"):
+                           match=r"This DicomFileLike object has no write\(\) "
+                                 r"method"):
             fp.write(b'')
         with pytest.raises(IOError,
-                           match="This DicomFileLike object has no read\(\) "
-                                 "method"):
+                           match=r"This DicomFileLike object has no read\(\) "
+                                 r"method"):
             fp.parent_read(b'')
         with pytest.raises(IOError,
-                           match="This DicomFileLike object has no seek\(\) "
-                                 "method"):
+                           match=r"This DicomFileLike object has no seek\(\) "
+                                 r"method"):
             fp.seek(0, 1)
         assert fp.name == '<no filename>'
 

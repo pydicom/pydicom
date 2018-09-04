@@ -2113,7 +2113,7 @@ class TestWriteNumbers(object):
         elem = DataElement(0x00100010, 'US', b'\x00')
         fmt = 'H'
         with pytest.raises(IOError,
-                           match="for data_element:\n\(0010, 0010\)"):
+                           match=r"for data_element:\n\(0010, 0010\)"):
             write_numbers(fp, elem, fmt)
 
     def test_write_big_endian(self):
@@ -2265,7 +2265,7 @@ class TestWriteNumbers(object):
         elem = DataElement(0x00100010, 'US', b'\x00')
         fmt = 'H'
         with pytest.raises(IOError,
-                           match="for data_element:\n\(0010, 0010\)"):
+                           match=r"for data_element:\n\(0010, 0010\)"):
             write_numbers(fp, elem, fmt)
 
     def test_write_big_endian(self):
