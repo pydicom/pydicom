@@ -37,9 +37,9 @@ from struct import unpack
 
 import numpy as np
 
-from pydicom.uid import RLELossless
 from pydicom.encaps import decode_data_sequence, defragment_data
 from pydicom.pixel_data_handlers.numpy_handler import pixel_dtype
+from pydicom.uid import RLELossless
 
 
 SUPPORTED_TRANSFER_SYNTAXES = [
@@ -49,8 +49,6 @@ SUPPORTED_TRANSFER_SYNTAXES = [
 
 def supports_transfer_syntax(ds):
     """Return True if the handler supports the transfer syntax used in `ds`."""
-    print('Supported', ds.file_meta.TransferSyntaxUID in SUPPORTED_TRANSFER_SYNTAXES)
-
     return ds.file_meta.TransferSyntaxUID in SUPPORTED_TRANSFER_SYNTAXES
 
 
@@ -441,9 +439,8 @@ def _rle_decode_frame(data, rows, columns, nr_samples, bits_alloc):
     if len(offsets) != nr_samples * bytes_allocated:
         raise ValueError(
             "The number of RLE segments in the pixel data doesn't match the "
-            "expected amount ({0} vs. {1} segments). The dataset may be "
-            "corrupted or there may be an issue with the pixel data handler."
-            .format(nr_samples * bytes_allocated, len(offsets))
+            "expected amount ({0} vs. {1} segments)"
+            .format(len(offsets), nr_samples * bytes_allocated)
         )
 
     # Add the total length of the frame to ensure the last segment gets decoded
@@ -456,8 +453,6 @@ def _rle_decode_frame(data, rows, columns, nr_samples, bits_alloc):
 
             plane_number = byte_number + (sample_number * bytes_allocated)
             out_plane_number = ((sample_number + 1) * bytes_allocated) - byte_number - 1  # noqa
-            #plane_start = plane_start_list[plane_number]
-            #plane_end = plane_end_list[plane_number]
 
             plane_bytes = _rle_decode_segment(
                 data[offsets[plane_number]:offsets[plane_number + 1]]
@@ -489,22 +484,24 @@ def _rle_decode_segment(data):
     data = bytearray(data)
     result = bytearray()
     pos = 0
-    len_data = len(data)
+    result_extend = result.extend
 
-    while pos < len_data:
-        header_byte = data[pos]
-        pos += 1
-        if header_byte > 128:
-            # Extend by copying the next byte (-N + 1) times
-            # however since using uint8 instead of int8 this will be
-            # (256 - N + 1) times
-            result.extend(data[pos:pos + 1] * (257 - header_byte))
+    try:
+        while True:
+            header_byte = data[pos] + 1
             pos += 1
-            continue
+            if header_byte > 129:
+                # Extend by copying the next byte (-N + 1) times
+                # however since using uint8 instead of int8 this will be
+                # (256 - N + 1) times
+                result_extend(data[pos:pos + 1] * (258 - header_byte))
+                pos += 1
+            elif header_byte < 129:
+                # Extend by literally copying the next (N + 1) bytes
+                result_extend(data[pos:pos + header_byte])
+                pos += header_byte
 
-        if header_byte < 128:
-            # Extend by literally copying the next (N + 1) bytes
-            result.extend(data[pos:pos + header_byte + 1])
-            pos += header_byte + 1
+    except IndexError:
+        pass
 
     return result

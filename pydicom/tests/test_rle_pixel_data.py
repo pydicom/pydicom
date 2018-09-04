@@ -730,7 +730,7 @@ class TestNumpy_RLEDecodeFrame(object):
         expected = samples * bits // 8
         actual = unpack('<L', header)[0]
         header += b'\x00' * (64 - len(header))
-        msg = "expected amount \({} vs. {} segments\)".format(expected, actual)
+        msg = "expected amount \({} vs. {} segments\)".format(actual, expected)
         with pytest.raises(ValueError, match=msg):
             _rle_decode_frame(header,
                               rows=1,
