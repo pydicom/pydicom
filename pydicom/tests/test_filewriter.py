@@ -680,7 +680,8 @@ class TestCorrectAmbiguousVR(unittest.TestCase):
         ref_ds = Dataset()
         ref_ds.SmallestValidPixelValue = b'\x00\x01'  # Big endian 1
         with pytest.raises(AttributeError,
-                           match="has no attribute 'PixelRepresentation'"):
+                           match=r"Failed to resolve ambiguous VR for tag "
+                                 r"\(0028, 0104\):.* 'PixelRepresentation'"):
             correct_ambiguous_vr(deepcopy(ref_ds), True)
 
     def test_pixel_representation_vm_three(self):
@@ -705,7 +706,8 @@ class TestCorrectAmbiguousVR(unittest.TestCase):
         ref_ds = Dataset()
         ref_ds.LUTDescriptor = b'\x01\x00\x00\x01\x00\x10'
         with pytest.raises(AttributeError,
-                           match="has no attribute 'PixelRepresentation'"):
+                           match=r"Failed to resolve ambiguous VR for tag "
+                                 r"\(0028, 3002\):.* 'PixelRepresentation'"):
             correct_ambiguous_vr(deepcopy(ref_ds), False)
 
     def test_pixel_data(self):
@@ -736,7 +738,8 @@ class TestCorrectAmbiguousVR(unittest.TestCase):
         ref_ds = Dataset()
         ref_ds.PixelData = b'\x00\x01'  # Big endian 1
         with pytest.raises(AttributeError,
-                           match="has no attribute 'BitsAllocated'"):
+                           match=r"Failed to resolve ambiguous VR for tag "
+                                 r"\(7fe0, 0010\):.* 'BitsAllocated'"):
             correct_ambiguous_vr(deepcopy(ref_ds), True)
 
     def test_waveform_bits_allocated(self):
@@ -772,7 +775,8 @@ class TestCorrectAmbiguousVR(unittest.TestCase):
         ref_ds = Dataset()
         ref_ds.WaveformData = b'\x00\x01'  # Big endian 1
         with pytest.raises(AttributeError,
-                           match="has no attribute 'WaveformBitsAllocated'"):
+                           match=r"Failed to resolve ambiguous VR for tag "
+                                 r"\(5400, 1010\):.* 'WaveformBitsAllocated'"):
             correct_ambiguous_vr(deepcopy(ref_ds), True)
 
     def test_lut_descriptor(self):
@@ -802,7 +806,8 @@ class TestCorrectAmbiguousVR(unittest.TestCase):
         ref_ds = Dataset()
         ref_ds.LUTData = b'\x00\x01'
         with pytest.raises(AttributeError,
-                           match="has no attribute 'LUTDescriptor'"):
+                           match=r"Failed to resolve ambiguous VR for tag "
+                                 r"\(0028, 3006\):.* 'LUTDescriptor'"):
             correct_ambiguous_vr(deepcopy(ref_ds), True)
 
     def test_overlay(self):
@@ -865,7 +870,8 @@ class TestCorrectAmbiguousVRElement(object):
         ds = Dataset()
         ds.PixelPaddingValue = b'\xfe\xff'
         with pytest.raises(AttributeError,
-                           match="has no attribute 'PixelRepresentation'"):
+                           match=r"Failed to resolve ambiguous VR for tag "
+                                 r"\(0028, 0120\):.* 'PixelRepresentation'"):
             correct_ambiguous_vr_element(ds[0x00280120], ds, True)
 
         ds.PixelRepresentation = 0

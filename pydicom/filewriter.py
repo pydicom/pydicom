@@ -18,6 +18,98 @@ from pydicom.valuerep import extra_length_VRs
 from pydicom.values import convert_numbers
 
 
+def _correct_ambiguous_vr_element(elem, ds, is_little_endian):
+    """Implementation for `correct_ambiguous_vr_element`.
+    See `correct_ambiguous_vr_element` for description.
+    """
+    # 'OB or OW': 7fe0,0010 PixelData
+    if elem.tag == 0x7fe00010:
+        # Compressed Pixel Data
+        # PS3.5 Annex A.4
+        #   If encapsulated, VR is OB and length is undefined
+        if elem.is_undefined_length:
+            elem.VR = 'OB'
+        # Non-compressed Pixel Data - Implicit Little Endian
+        # PS3.5 Annex A1: VR is always OW
+        elif ds.is_implicit_VR:
+            elem.VR = 'OW'
+        else:
+            # Non-compressed Pixel Data - Explicit VR
+            # PS3.5 Annex A.2:
+            # If BitsAllocated is > 8 then VR shall be OW,
+            # else may be OB or OW.
+            # If we get here, the data has not been written before
+            # or has been converted from Implicit Little Endian,
+            # so we default to OB for BitsAllocated 1 or 8
+            elem.VR = 'OW' if ds.BitsAllocated > 8 else 'OB'
+
+    # 'US or SS' and dependent on PixelRepresentation
+    # (0018,9810) Zero Velocity Pixel Value
+    # (0022,1452) Mapped Pixel Value
+    # (0028,0104)/(0028,0105) Smallest/Largest Valid Pixel Value
+    # (0028,0106)/(0028,0107) Smallest/Largest Image Pixel Value
+    # (0028,0108)/(0028,0109) Smallest/Largest Pixel Value in Series
+    # (0028,0110)/(0028,0111) Smallest/Largest Image Pixel Value in Plane
+    # (0028,0120) Pixel Padding Value
+    # (0028,0121) Pixel Padding Range Limit
+    # (0028,1101-1103) Red/Green/Blue Palette Color Lookup Table Descriptor
+    # (0028,3002) LUT Descriptor
+    # (0040,9216)/(0040,9211) Real World Value First/Last Value Mapped
+    # (0060,3004)/(0060,3006) Histogram First/Last Bin Value
+    elif elem.tag in [
+            0x00189810, 0x00221452, 0x00280104, 0x00280105, 0x00280106,
+            0x00280107, 0x00280108, 0x00280109, 0x00280110, 0x00280111,
+            0x00280120, 0x00280121, 0x00281101, 0x00281102, 0x00281103,
+            0x00283002, 0x00409211, 0x00409216, 0x00603004, 0x00603006
+    ]:
+        # US if PixelRepresentation value is 0x0000, else SS
+        #   For references, see the list at
+        #   https://github.com/darcymason/pydicom/pull/298
+        if ds.PixelRepresentation == 0:
+            elem.VR = 'US'
+            byte_type = 'H'
+        else:
+            elem.VR = 'SS'
+            byte_type = 'h'
+        elem.value = convert_numbers(elem.value, is_little_endian,
+                                     byte_type)
+
+    # 'OB or OW' and dependent on WaveformBitsAllocated
+    # (5400, 0110) Channel Minimum Value
+    # (5400, 0112) Channel Maximum Value
+    # (5400, 100A) Waveform Padding Data
+    # (5400, 1010) Waveform Data
+    elif elem.tag in [0x54000110, 0x54000112, 0x5400100A, 0x54001010]:
+        # If WaveformBitsAllocated is > 8 then OW, otherwise may be
+        #   OB or OW.
+        #   See PS3.3 C.10.9.1.
+        if ds.is_implicit_VR:
+            elem.VR = 'OW'
+        else:
+            elem.VR = 'OW' if ds.WaveformBitsAllocated > 8 else 'OB'
+
+    # 'US or OW': 0028,3006 LUTData
+    elif elem.tag == 0x00283006:
+        # First value in LUT Descriptor is how many values in
+        #   LUTData, if there's only one value then must be US
+        # As per PS3.3 C.11.1.1.1
+        if ds.LUTDescriptor[0] == 1:
+            elem.VR = 'US'
+            elem.value = convert_numbers(elem.value, is_little_endian,
+                                         'H')
+        else:
+            elem.VR = 'OW'
+
+    # 'OB or OW': 60xx,3000 OverlayData and dependent on Transfer Syntax
+    elif (elem.tag.group in range(0x6000, 0x601F, 2)
+          and elem.tag.elem == 0x3000):
+        # Implicit VR must be OW, explicit VR may be OB or OW
+        #   as per PS3.5 Section 8.1.2 and Annex A
+        elem.VR = 'OW'
+
+    return elem
+
+
 def correct_ambiguous_vr_element(elem, ds, is_little_endian):
     """Attempt to correct the ambiguous VR element `elem`.
 
@@ -48,90 +140,12 @@ def correct_ambiguous_vr_element(elem, ds, is_little_endian):
             elem = DataElement_from_raw(elem)
             ds.__setitem__(elem.tag, elem)
 
-        # 'OB or OW': 7fe0,0010 PixelData
-        if elem.tag == 0x7fe00010:
-            # Compressed Pixel Data
-            # PS3.5 Annex A.4
-            #   If encapsulated, VR is OB and length is undefined
-            if elem.is_undefined_length:
-                elem.VR = 'OB'
-            # Non-compressed Pixel Data - Implicit Little Endian
-            # PS3.5 Annex A1: VR is always OW
-            elif ds.is_implicit_VR:
-                elem.VR = 'OW'
-            else:
-                # Non-compressed Pixel Data - Explicit VR
-                # PS3.5 Annex A.2:
-                # If BitsAllocated is > 8 then VR shall be OW,
-                # else may be OB or OW.
-                # If we get here, the data has not been written before
-                # or has been converted from Implicit Little Endian,
-                # so we default to OB for BitsAllocated 1 or 8
-                elem.VR = 'OW' if ds.BitsAllocated > 8 else 'OB'
-
-        # 'US or SS' and dependent on PixelRepresentation
-        # (0018,9810) Zero Velocity Pixel Value
-        # (0022,1452) Mapped Pixel Value
-        # (0028,0104)/(0028,0105) Smallest/Largest Valid Pixel Value
-        # (0028,0106)/(0028,0107) Smallest/Largest Image Pixel Value
-        # (0028,0108)/(0028,0109) Smallest/Largest Pixel Value in Series
-        # (0028,0110)/(0028,0111) Smallest/Largest Image Pixel Value in Plane
-        # (0028,0120) Pixel Padding Value
-        # (0028,0121) Pixel Padding Range Limit
-        # (0028,1101-1103) Red/Green/Blue Palette Color Lookup Table Descriptor
-        # (0028,3002) LUT Descriptor
-        # (0040,9216)/(0040,9211) Real World Value First/Last Value Mapped
-        # (0060,3004)/(0060,3006) Histogram First/Last Bin Value
-        elif elem.tag in [
-                0x00189810, 0x00221452, 0x00280104, 0x00280105, 0x00280106,
-                0x00280107, 0x00280108, 0x00280109, 0x00280110, 0x00280111,
-                0x00280120, 0x00280121, 0x00281101, 0x00281102, 0x00281103,
-                0x00283002, 0x00409211, 0x00409216, 0x00603004, 0x00603006
-        ]:
-            # US if PixelRepresentation value is 0x0000, else SS
-            #   For references, see the list at
-            #   https://github.com/darcymason/pydicom/pull/298
-            if ds.PixelRepresentation == 0:
-                elem.VR = 'US'
-                byte_type = 'H'
-            else:
-                elem.VR = 'SS'
-                byte_type = 'h'
-            elem.value = convert_numbers(elem.value, is_little_endian,
-                                         byte_type)
-
-        # 'OB or OW' and dependent on WaveformBitsAllocated
-        # (5400, 0110) Channel Minimum Value
-        # (5400, 0112) Channel Maximum Value
-        # (5400, 100A) Waveform Padding Data
-        # (5400, 1010) Waveform Data
-        elif elem.tag in [0x54000110, 0x54000112, 0x5400100A, 0x54001010]:
-            # If WaveformBitsAllocated is > 8 then OW, otherwise may be
-            #   OB or OW.
-            #   See PS3.3 C.10.9.1.
-            if ds.is_implicit_VR:
-                elem.VR = 'OW'
-            else:
-                elem.VR = 'OW' if ds.WaveformBitsAllocated > 8 else 'OB'
-
-        # 'US or OW': 0028,3006 LUTData
-        elif elem.tag == 0x00283006:
-            # First value in LUT Descriptor is how many values in
-            #   LUTData, if there's only one value then must be US
-            # As per PS3.3 C.11.1.1.1
-            if ds.LUTDescriptor[0] == 1:
-                elem.VR = 'US'
-                elem.value = convert_numbers(elem.value, is_little_endian,
-                                             'H')
-            else:
-                elem.VR = 'OW'
-
-        # 'OB or OW': 60xx,3000 OverlayData and dependent on Transfer Syntax
-        elif (elem.tag.group in range(0x6000, 0x601F, 2)
-              and elem.tag.elem == 0x3000):
-            # Implicit VR must be OW, explicit VR may be OB or OW
-            #   as per PS3.5 Section 8.1.2 and Annex A
-            elem.VR = 'OW'
+        try:
+            _correct_ambiguous_vr_element(elem, ds, is_little_endian)
+        except AttributeError as e:
+            reason = ('Failed to resolve ambiguous VR for tag'
+                      ' {}: '.format(elem.tag)) + str(e)
+            raise AttributeError(reason)
 
     return elem
 
@@ -157,6 +171,11 @@ def correct_ambiguous_vr(ds, is_little_endian):
     -------
     ds : pydicom.dataset.Dataset
         The corrected dataset
+
+    Raises
+    ------
+    AttributeError
+        If a tag is missing in `ds` that is required to resolve the ambiguity.
     """
     # Iterate through the elements
     for elem in ds:
@@ -377,7 +396,8 @@ def write_TM(fp, data_element, padding=' '):
 
 
 def write_data_element(fp, data_element, encoding=default_encoding):
-    """Write the data_element to file fp according to dicom media storage rules.
+    """Write the data_element to file fp according to
+    dicom media storage rules.
     """
     # Write element's tag
     fp.write_tag(data_element.tag)
