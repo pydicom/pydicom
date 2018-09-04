@@ -29,8 +29,8 @@ text_VRs = ('SH', 'LO', 'ST', 'LT', 'UC', 'UT')
 
 # Delimiters for text strings and person name that reset the encoding.
 # See PS3.5, Section 6.1.2.5.3
-TEXT_VR_DELIMS = (b'\n', b'\r', b'\t', b'\f')
-PN_DELIMS = (b'^', )
+TEXT_VR_DELIMS = b'\n\r\t\f\x1b'
+PN_DELIMS = b'\\^\x1b'
 
 match_string = b''.join([
     b'(?P<single_byte>', br'(?P<family_name>[^=\^]*)',

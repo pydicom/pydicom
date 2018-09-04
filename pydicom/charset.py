@@ -78,9 +78,25 @@ escape_codes = {
 default_encoding = "iso8859"
 
 
-def decode_string(value, encodings, delimiters):
+def decode_string(value, encodings, delims):
     """Convert a raw byte string into a unicode string using the given
     list of encodings.
+
+    Parameters
+    ----------
+    value : byte string
+        The raw string as encoded in the DICOM tag value.
+    encodings : list
+        The encodings needed to decode the string as a list of Python
+        encodings, converted from the encodings in Specific Character Set.
+    delims : byte string
+        A string containing all characters that may cause the encoding of
+        `value` to change.
+
+    Returns
+    -------
+    text type
+        The decoded string.
     """
     if ESC not in value:
         return value.decode(encodings[0])
@@ -93,32 +109,18 @@ def decode_string(value, encodings, delimiters):
     if use_python_handling:
         values = [value]
     else:
-        # We handle only the delimiters actually appearing in the value
-        # to avoid too much overhead.
-        delims = []
-        for delim in delimiters:
-            if delim in value:
-                delims.append(delim)
-
-        # Each part of the value that starts with an escape sequence is
-        # decoded separately using the corresponding encoding.
+        # Each part of the value that starts with an escape sequence
+        # or a delimiter as defined in PS3.5, section 6.1.2.5.3 is decoded
+        # separately. If it starts with an escape sequence, the
+        # corresponding encoding is used, otherwise the first encoding.
         # See PS3.5, 6.1.2.4 and 6.1.2.5 for the use of code extensions.
-        values = [ESC + part for part in value.split(ESC) if part]
-        # the first part may not start with an escape sequence
-        if not value.startswith(ESC):
-            values[0] = values[0][1:]
-
-        # Each part of the value that starts with one of the delimiters
-        # (defined in PS3.5, section 6.1.2.5.3) is decoded separately.
-        # Each such parts initially uses the first encoding in the list.
-        for delim in delims:
-            elements = []
-            for value in values:
-                parts = [delim + part for part in value.split(delim)]
-                if not value.startswith(delim):
-                    parts[0] = parts[0][1:]
-                elements += parts
-            values = elements
+        #
+        # The following regex splits the value into these parts, by matching
+        # substrings at line start not containing any of the delimiters,
+        # and substrings starting with a delimiter and not containing other
+        # delimiters.
+        regex = b'(^[^' + delims + b']+|[' + delims + b'][^' + delims + b']*)'
+        values = re.findall(regex, value)
 
     result = u''
 
@@ -127,8 +129,11 @@ def decode_string(value, encodings, delimiters):
             for enc in list(encodings) + ['iso8859']:
                 if enc in escape_codes and part.startswith(escape_codes[enc]):
                     if use_python_handling:
+                        # Python strips the escape sequences for this encoding
                         val = part.decode(enc)
                     else:
+                        # Python doesn't know about the escape sequence -
+                        # we have to strip it ourselves
                         val = part[len(escape_codes[enc]):].decode(enc)
                     break
             else:
