@@ -175,10 +175,19 @@
 <h1>Version 1.2.0<a class="headerlink" href="#version-1-2-0" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="changelog">
 <h2>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="changes">
+<h3>Changes<a class="headerlink" href="#changes" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>PIL removed as a fallback if Pillow is not available in the pillow pixel data
 handler (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/722">#722</a>)</li>
+<li><code class="docutils literal notranslate"><span class="pre">uid.JPEGBaseLineLossy8bit</span></code> deprecated and will be removed in v1.3. Use
+<code class="docutils literal notranslate"><span class="pre">uid.JPEGBaseline</span></code> instead. (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/726">#726</a>)</li>
+<li><code class="docutils literal notranslate"><span class="pre">uid.JPEGBaseLineLossy12bit</span></code> deprecated and will be removed in v1.3. Use
+<code class="docutils literal notranslate"><span class="pre">uid.JPEGExtended</span></code> instead. (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/726">#726</a>)</li>
+<li><code class="docutils literal notranslate"><span class="pre">uid.JPEG2000Lossy</span></code> deprecated and will be removed in v1.3. Use
+<code class="docutils literal notranslate"><span class="pre">uid.JPEG2000</span></code> instead. (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/726">#726</a>)</li>
 </ul>
+</div>
 <div class="section" id="enhancements">
 <h3>Enhancements<a class="headerlink" href="#enhancements" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
@@ -188,9 +197,12 @@ default character set (<a class="reference external" href="https://github.com/py
 (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/291">#291</a>)</li>
 <li>Functions for encapsulating frames added to encaps module (<a href="#id1"><span class="problematic" id="id2">:pull_request:`696`</span></a>)</li>
 <li>Added <code class="docutils literal notranslate"><span class="pre">Dataset.fix_meta_info()</span></code> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/584">#584</a>)</li>
-<li>Add new function for bit packing <code class="docutils literal notranslate"><span class="pre">pack_bits</span></code> for use
-with BitsAllocated = 1 (<a href="#id3"><span class="problematic" id="id4">:pull_request:`715`</span></a>)</li>
+<li>Add new function for bit packing <code class="docutils literal notranslate"><span class="pre">pack_bits</span></code> for use with BitsAllocated
+= 1 (<a href="#id3"><span class="problematic" id="id4">:pull_request:`715`</span></a>)</li>
 <li>Added handling of single-byte character set extensions (<a href="#id5"><span class="problematic" id="id6">:pull_request:`718`</span></a>)</li>
+<li>Added <code class="docutils literal notranslate"><span class="pre">uid.JPEGLosslessP14</span></code> for UID 1.2.840.10008.1.2.4.57</li>
+<li>Added <code class="docutils literal notranslate"><span class="pre">uid.JPEG2000MultiComponentLossless</span></code> for UID 1.2.840.10008.1.2.4.92</li>
+<li>Added <code class="docutils literal notranslate"><span class="pre">uid.JPEG2000MultiComponent</span></code> for UID 1.2.840.10008.1.2.4.93</li>
 </ul>
 </div>
 <div class="section" id="fixes">

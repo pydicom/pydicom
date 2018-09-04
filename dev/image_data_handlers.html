@@ -222,73 +222,85 @@ means before you use them for medical purposes.</p>
 handled by the given packages:</p>
 <table border="1" class="docutils">
 <colgroup>
-<col width="29%" />
-<col width="19%" />
-<col width="10%" />
-<col width="15%" />
-<col width="13%" />
-<col width="14%" />
+<col width="35%" />
+<col width="24%" />
+<col width="7%" />
+<col width="9%" />
+<col width="9%" />
+<col width="17%" />
 </colgroup>
 <thead valign="bottom">
-<tr class="row-odd"><th class="head">Transfer Syntax Name</th>
-<th class="head">Transfer Syntax UID</th>
-<th class="head">NumPy only</th>
-<th class="head">JPEG-LS <em>+</em> NumPy</th>
-<th class="head">GDCM <em>+</em> NumPy</th>
-<th class="head">Pillow <em>+</em> NumPy</th>
+<tr class="row-odd"><th class="head" colspan="2">Transfer Syntax</th>
+<th class="head" rowspan="2">NumPy</th>
+<th class="head" rowspan="2">NumPy +
+JPEG-LS</th>
+<th class="head" rowspan="2">NumPy +
+GDCM</th>
+<th class="head" rowspan="2">NumPy +
+Pillow</th>
+</tr>
+<tr class="row-even"><th class="head">Name</th>
+<th class="head">UID</th>
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td>Explicit VR Little Endian</td>
+<tr class="row-odd"><td>Explicit VR Little Endian</td>
 <td>1.2.840.10008.1.2.1</td>
 <td>✓</td>
 <td>✓</td>
 <td>✓</td>
 <td>✓</td>
 </tr>
-<tr class="row-odd"><td>Implicit VR Little Endian</td>
+<tr class="row-even"><td>Implicit VR Little Endian</td>
 <td>1.2.840.10008.1.2</td>
 <td>✓</td>
 <td>✓</td>
 <td>✓</td>
 <td>✓</td>
 </tr>
-<tr class="row-even"><td>Explicit VR Big Endian</td>
+<tr class="row-odd"><td>Explicit VR Big Endian</td>
 <td>1.2.840.10008.1.2.2</td>
 <td>✓</td>
 <td>✓</td>
 <td>✓</td>
 <td>✓</td>
 </tr>
-<tr class="row-odd"><td>Deflated Explicit VR Little Endian</td>
+<tr class="row-even"><td>Deflated Explicit VR Little Endian</td>
 <td>1.2.840.10008.1.2.1.99</td>
 <td>✓</td>
 <td>✓</td>
 <td>✓</td>
 <td>✓</td>
 </tr>
-<tr class="row-even"><td>RLE Lossless</td>
+<tr class="row-odd"><td>RLE Lossless</td>
 <td>1.2.840.10008.1.2.5</td>
 <td>✓</td>
 <td>✓</td>
 <td>✓</td>
 <td>✓</td>
 </tr>
-<tr class="row-odd"><td>JPEG BaseLine Lossy 8bit</td>
+<tr class="row-even"><td>JPEG Baseline (Process 1)</td>
 <td>1.2.840.10008.1.2.4.50</td>
 <td>&#160;</td>
 <td>&#160;</td>
 <td>✓</td>
 <td>✓<sup>1</sup></td>
 </tr>
-<tr class="row-even"><td>JPEG BaseLine Lossy 12bit</td>
+<tr class="row-odd"><td>JPEG Extended (Process 2 and 4)</td>
 <td>1.2.840.10008.1.2.4.51</td>
 <td>&#160;</td>
 <td>&#160;</td>
 <td>✓</td>
 <td>✓<sup>1</sup></td>
 </tr>
-<tr class="row-odd"><td>JPEG Lossless</td>
+<tr class="row-even"><td>JPEG Lossless (Process 14)</td>
+<td>1.2.840.10008.1.2.4.57</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>✓</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>JPEG Lossless (Process 14, SV1)</td>
 <td>1.2.840.10008.1.2.4.70</td>
 <td>&#160;</td>
 <td>&#160;</td>
@@ -316,12 +328,26 @@ handled by the given packages:</p>
 <td>✓</td>
 <td>✓<sup>2</sup></td>
 </tr>
-<tr class="row-odd"><td>JPEG2000 Lossy <sup>4</sup></td>
+<tr class="row-odd"><td>JPEG2000 <sup>4</sup></td>
 <td>1.2.840.10008.1.2.4.91</td>
 <td>&#160;</td>
 <td>&#160;</td>
 <td>&#160;</td>
 <td>✓<sup>5</sup></td>
+</tr>
+<tr class="row-even"><td>JPEG2000 Multi-component Lossless</td>
+<td>1.2.840.10008.1.2.4.92</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>JPEG2000 Multi-component</td>
+<td>1.2.840.10008.1.2.4.93</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
 </tr>
 </tbody>
 </table>
