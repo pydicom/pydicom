@@ -190,6 +190,98 @@
 <span class="kn">from</span> <span class="nn">pydicom.values</span> <span class="k">import</span> <span class="n">convert_numbers</span>
 
 
+<span class="k">def</span> <span class="nf">_correct_ambiguous_vr_element</span><span class="p">(</span><span class="n">elem</span><span class="p">,</span> <span class="n">ds</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Implementation for `correct_ambiguous_vr_element`.</span>
+<span class="sd">    See `correct_ambiguous_vr_element` for description.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># &#39;OB or OW&#39;: 7fe0,0010 PixelData</span>
+    <span class="k">if</span> <span class="n">elem</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="mh">0x7fe00010</span><span class="p">:</span>
+        <span class="c1"># Compressed Pixel Data</span>
+        <span class="c1"># PS3.5 Annex A.4</span>
+        <span class="c1">#   If encapsulated, VR is OB and length is undefined</span>
+        <span class="k">if</span> <span class="n">elem</span><span class="o">.</span><span class="n">is_undefined_length</span><span class="p">:</span>
+            <span class="n">elem</span><span class="o">.</span><span class="n">VR</span> <span class="o">=</span> <span class="s1">&#39;OB&#39;</span>
+        <span class="c1"># Non-compressed Pixel Data - Implicit Little Endian</span>
+        <span class="c1"># PS3.5 Annex A1: VR is always OW</span>
+        <span class="k">elif</span> <span class="n">ds</span><span class="o">.</span><span class="n">is_implicit_VR</span><span class="p">:</span>
+            <span class="n">elem</span><span class="o">.</span><span class="n">VR</span> <span class="o">=</span> <span class="s1">&#39;OW&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Non-compressed Pixel Data - Explicit VR</span>
+            <span class="c1"># PS3.5 Annex A.2:</span>
+            <span class="c1"># If BitsAllocated is &gt; 8 then VR shall be OW,</span>
+            <span class="c1"># else may be OB or OW.</span>
+            <span class="c1"># If we get here, the data has not been written before</span>
+            <span class="c1"># or has been converted from Implicit Little Endian,</span>
+            <span class="c1"># so we default to OB for BitsAllocated 1 or 8</span>
+            <span class="n">elem</span><span class="o">.</span><span class="n">VR</span> <span class="o">=</span> <span class="s1">&#39;OW&#39;</span> <span class="k">if</span> <span class="n">ds</span><span class="o">.</span><span class="n">BitsAllocated</span> <span class="o">&gt;</span> <span class="mi">8</span> <span class="k">else</span> <span class="s1">&#39;OB&#39;</span>
+
+    <span class="c1"># &#39;US or SS&#39; and dependent on PixelRepresentation</span>
+    <span class="c1"># (0018,9810) Zero Velocity Pixel Value</span>
+    <span class="c1"># (0022,1452) Mapped Pixel Value</span>
+    <span class="c1"># (0028,0104)/(0028,0105) Smallest/Largest Valid Pixel Value</span>
+    <span class="c1"># (0028,0106)/(0028,0107) Smallest/Largest Image Pixel Value</span>
+    <span class="c1"># (0028,0108)/(0028,0109) Smallest/Largest Pixel Value in Series</span>
+    <span class="c1"># (0028,0110)/(0028,0111) Smallest/Largest Image Pixel Value in Plane</span>
+    <span class="c1"># (0028,0120) Pixel Padding Value</span>
+    <span class="c1"># (0028,0121) Pixel Padding Range Limit</span>
+    <span class="c1"># (0028,1101-1103) Red/Green/Blue Palette Color Lookup Table Descriptor</span>
+    <span class="c1"># (0028,3002) LUT Descriptor</span>
+    <span class="c1"># (0040,9216)/(0040,9211) Real World Value First/Last Value Mapped</span>
+    <span class="c1"># (0060,3004)/(0060,3006) Histogram First/Last Bin Value</span>
+    <span class="k">elif</span> <span class="n">elem</span><span class="o">.</span><span class="n">tag</span> <span class="ow">in</span> <span class="p">[</span>
+            <span class="mh">0x00189810</span><span class="p">,</span> <span class="mh">0x00221452</span><span class="p">,</span> <span class="mh">0x00280104</span><span class="p">,</span> <span class="mh">0x00280105</span><span class="p">,</span> <span class="mh">0x00280106</span><span class="p">,</span>
+            <span class="mh">0x00280107</span><span class="p">,</span> <span class="mh">0x00280108</span><span class="p">,</span> <span class="mh">0x00280109</span><span class="p">,</span> <span class="mh">0x00280110</span><span class="p">,</span> <span class="mh">0x00280111</span><span class="p">,</span>
+            <span class="mh">0x00280120</span><span class="p">,</span> <span class="mh">0x00280121</span><span class="p">,</span> <span class="mh">0x00281101</span><span class="p">,</span> <span class="mh">0x00281102</span><span class="p">,</span> <span class="mh">0x00281103</span><span class="p">,</span>
+            <span class="mh">0x00283002</span><span class="p">,</span> <span class="mh">0x00409211</span><span class="p">,</span> <span class="mh">0x00409216</span><span class="p">,</span> <span class="mh">0x00603004</span><span class="p">,</span> <span class="mh">0x00603006</span>
+    <span class="p">]:</span>
+        <span class="c1"># US if PixelRepresentation value is 0x0000, else SS</span>
+        <span class="c1">#   For references, see the list at</span>
+        <span class="c1">#   https://github.com/darcymason/pydicom/pull/298</span>
+        <span class="k">if</span> <span class="n">ds</span><span class="o">.</span><span class="n">PixelRepresentation</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">elem</span><span class="o">.</span><span class="n">VR</span> <span class="o">=</span> <span class="s1">&#39;US&#39;</span>
+            <span class="n">byte_type</span> <span class="o">=</span> <span class="s1">&#39;H&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">elem</span><span class="o">.</span><span class="n">VR</span> <span class="o">=</span> <span class="s1">&#39;SS&#39;</span>
+            <span class="n">byte_type</span> <span class="o">=</span> <span class="s1">&#39;h&#39;</span>
+        <span class="n">elem</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">convert_numbers</span><span class="p">(</span><span class="n">elem</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">,</span>
+                                     <span class="n">byte_type</span><span class="p">)</span>
+
+    <span class="c1"># &#39;OB or OW&#39; and dependent on WaveformBitsAllocated</span>
+    <span class="c1"># (5400, 0110) Channel Minimum Value</span>
+    <span class="c1"># (5400, 0112) Channel Maximum Value</span>
+    <span class="c1"># (5400, 100A) Waveform Padding Data</span>
+    <span class="c1"># (5400, 1010) Waveform Data</span>
+    <span class="k">elif</span> <span class="n">elem</span><span class="o">.</span><span class="n">tag</span> <span class="ow">in</span> <span class="p">[</span><span class="mh">0x54000110</span><span class="p">,</span> <span class="mh">0x54000112</span><span class="p">,</span> <span class="mh">0x5400100A</span><span class="p">,</span> <span class="mh">0x54001010</span><span class="p">]:</span>
+        <span class="c1"># If WaveformBitsAllocated is &gt; 8 then OW, otherwise may be</span>
+        <span class="c1">#   OB or OW.</span>
+        <span class="c1">#   See PS3.3 C.10.9.1.</span>
+        <span class="k">if</span> <span class="n">ds</span><span class="o">.</span><span class="n">is_implicit_VR</span><span class="p">:</span>
+            <span class="n">elem</span><span class="o">.</span><span class="n">VR</span> <span class="o">=</span> <span class="s1">&#39;OW&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">elem</span><span class="o">.</span><span class="n">VR</span> <span class="o">=</span> <span class="s1">&#39;OW&#39;</span> <span class="k">if</span> <span class="n">ds</span><span class="o">.</span><span class="n">WaveformBitsAllocated</span> <span class="o">&gt;</span> <span class="mi">8</span> <span class="k">else</span> <span class="s1">&#39;OB&#39;</span>
+
+    <span class="c1"># &#39;US or OW&#39;: 0028,3006 LUTData</span>
+    <span class="k">elif</span> <span class="n">elem</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="mh">0x00283006</span><span class="p">:</span>
+        <span class="c1"># First value in LUT Descriptor is how many values in</span>
+        <span class="c1">#   LUTData, if there&#39;s only one value then must be US</span>
+        <span class="c1"># As per PS3.3 C.11.1.1.1</span>
+        <span class="k">if</span> <span class="n">ds</span><span class="o">.</span><span class="n">LUTDescriptor</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">elem</span><span class="o">.</span><span class="n">VR</span> <span class="o">=</span> <span class="s1">&#39;US&#39;</span>
+            <span class="n">elem</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">convert_numbers</span><span class="p">(</span><span class="n">elem</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">,</span>
+                                         <span class="s1">&#39;H&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">elem</span><span class="o">.</span><span class="n">VR</span> <span class="o">=</span> <span class="s1">&#39;OW&#39;</span>
+
+    <span class="c1"># &#39;OB or OW&#39;: 60xx,3000 OverlayData and dependent on Transfer Syntax</span>
+    <span class="k">elif</span> <span class="p">(</span><span class="n">elem</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">group</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mh">0x6000</span><span class="p">,</span> <span class="mh">0x601F</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+          <span class="ow">and</span> <span class="n">elem</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">elem</span> <span class="o">==</span> <span class="mh">0x3000</span><span class="p">):</span>
+        <span class="c1"># Implicit VR must be OW, explicit VR may be OB or OW</span>
+        <span class="c1">#   as per PS3.5 Section 8.1.2 and Annex A</span>
+        <span class="n">elem</span><span class="o">.</span><span class="n">VR</span> <span class="o">=</span> <span class="s1">&#39;OW&#39;</span>
+
+    <span class="k">return</span> <span class="n">elem</span>
+
+
 <div class="viewcode-block" id="correct_ambiguous_vr_element"><a class="viewcode-back" href="../../api_ref.html#pydicom.filewriter.correct_ambiguous_vr_element">[docs]</a><span class="k">def</span> <span class="nf">correct_ambiguous_vr_element</span><span class="p">(</span><span class="n">elem</span><span class="p">,</span> <span class="n">ds</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Attempt to correct the ambiguous VR element `elem`.</span>
 
@@ -220,75 +312,12 @@
             <span class="n">elem</span> <span class="o">=</span> <span class="n">DataElement_from_raw</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span>
             <span class="n">ds</span><span class="o">.</span><span class="fm">__setitem__</span><span class="p">(</span><span class="n">elem</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="n">elem</span><span class="p">)</span>
 
-        <span class="c1"># &#39;OB or OW&#39;: 7fe0,0010 PixelData</span>
-        <span class="k">if</span> <span class="n">elem</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="mh">0x7fe00010</span><span class="p">:</span>
-            <span class="c1"># Compressed Pixel Data</span>
-            <span class="c1"># PS3.5 Annex A.4</span>
-            <span class="c1">#   If encapsulated, VR is OB and length is undefined</span>
-            <span class="k">if</span> <span class="n">elem</span><span class="o">.</span><span class="n">is_undefined_length</span><span class="p">:</span>
-                <span class="n">elem</span><span class="o">.</span><span class="n">VR</span> <span class="o">=</span> <span class="s1">&#39;OB&#39;</span>
-            <span class="c1"># Non-compressed Pixel Data - Implicit Little Endian</span>
-            <span class="c1"># PS3.5 Annex A1: VR is always OW</span>
-            <span class="k">elif</span> <span class="n">ds</span><span class="o">.</span><span class="n">is_implicit_VR</span><span class="p">:</span>
-                <span class="n">elem</span><span class="o">.</span><span class="n">VR</span> <span class="o">=</span> <span class="s1">&#39;OW&#39;</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="c1"># Non-compressed Pixel Data - Explicit VR</span>
-                <span class="c1"># PS3.5 Annex A.2:</span>
-                <span class="c1"># If BitsAllocated is &gt; 8 then VR shall be OW,</span>
-                <span class="c1"># else may be OB or OW.</span>
-                <span class="c1"># If we get here, the data has not been written before,</span>
-                <span class="c1"># so we default to OB for BitsAllocated 1 or 8</span>
-                <span class="n">elem</span><span class="o">.</span><span class="n">VR</span> <span class="o">=</span> <span class="s1">&#39;OW&#39;</span> <span class="k">if</span> <span class="n">ds</span><span class="o">.</span><span class="n">BitsAllocated</span> <span class="o">&gt;</span> <span class="mi">8</span> <span class="k">else</span> <span class="s1">&#39;OB&#39;</span>
-
-        <span class="c1"># &#39;US or SS&#39; and dependent on PixelRepresentation</span>
-        <span class="k">elif</span> <span class="n">elem</span><span class="o">.</span><span class="n">tag</span> <span class="ow">in</span> <span class="p">[</span>
-                <span class="mh">0x00189810</span><span class="p">,</span> <span class="mh">0x00221452</span><span class="p">,</span> <span class="mh">0x00280104</span><span class="p">,</span> <span class="mh">0x00280105</span><span class="p">,</span> <span class="mh">0x00280106</span><span class="p">,</span>
-                <span class="mh">0x00280107</span><span class="p">,</span> <span class="mh">0x00280108</span><span class="p">,</span> <span class="mh">0x00280109</span><span class="p">,</span> <span class="mh">0x00280110</span><span class="p">,</span> <span class="mh">0x00280111</span><span class="p">,</span>
-                <span class="mh">0x00280120</span><span class="p">,</span> <span class="mh">0x00280121</span><span class="p">,</span> <span class="mh">0x00281101</span><span class="p">,</span> <span class="mh">0x00281102</span><span class="p">,</span> <span class="mh">0x00281103</span><span class="p">,</span>
-                <span class="mh">0x00283002</span><span class="p">,</span> <span class="mh">0x00409211</span><span class="p">,</span> <span class="mh">0x00409216</span><span class="p">,</span> <span class="mh">0x00603004</span><span class="p">,</span> <span class="mh">0x00603006</span>
-        <span class="p">]:</span>
-            <span class="c1"># US if PixelRepresenation value is 0x0000, else SS</span>
-            <span class="c1">#   For references, see the list at</span>
-            <span class="c1">#   https://github.com/darcymason/pydicom/pull/298</span>
-            <span class="k">if</span> <span class="s1">&#39;PixelRepresentation&#39;</span> <span class="ow">in</span> <span class="n">ds</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">ds</span><span class="o">.</span><span class="n">PixelRepresentation</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                    <span class="n">elem</span><span class="o">.</span><span class="n">VR</span> <span class="o">=</span> <span class="s1">&#39;US&#39;</span>
-                    <span class="n">byte_type</span> <span class="o">=</span> <span class="s1">&#39;H&#39;</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">elem</span><span class="o">.</span><span class="n">VR</span> <span class="o">=</span> <span class="s1">&#39;SS&#39;</span>
-                    <span class="n">byte_type</span> <span class="o">=</span> <span class="s1">&#39;h&#39;</span>
-                <span class="n">elem</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">convert_numbers</span><span class="p">(</span><span class="n">elem</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">,</span>
-                                             <span class="n">byte_type</span><span class="p">)</span>
-
-        <span class="c1"># &#39;OB or OW&#39; and dependent on WaveformBitsAllocated</span>
-        <span class="k">elif</span> <span class="n">elem</span><span class="o">.</span><span class="n">tag</span> <span class="ow">in</span> <span class="p">[</span><span class="mh">0x54000100</span><span class="p">,</span> <span class="mh">0x54000112</span><span class="p">,</span> <span class="mh">0x5400100A</span><span class="p">,</span> <span class="mh">0x54001010</span><span class="p">]:</span>
-            <span class="c1"># If WaveformBitsAllocated is &gt; 8 then OW, otherwise may be</span>
-            <span class="c1">#   OB or OW, however not sure how to handle this.</span>
-            <span class="c1">#   See PS3.3 C.10.9.1.</span>
-            <span class="k">if</span> <span class="s1">&#39;WaveformBitsAllocated&#39;</span> <span class="ow">in</span> <span class="n">ds</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">ds</span><span class="o">.</span><span class="n">WaveformBitsAllocated</span> <span class="o">&gt;</span> <span class="mi">8</span><span class="p">:</span>
-                    <span class="n">elem</span><span class="o">.</span><span class="n">VR</span> <span class="o">=</span> <span class="s1">&#39;OW&#39;</span>
-
-        <span class="c1"># &#39;US or OW&#39;: 0028,3006 LUTData</span>
-        <span class="k">elif</span> <span class="n">elem</span><span class="o">.</span><span class="n">tag</span> <span class="ow">in</span> <span class="p">[</span><span class="mh">0x00283006</span><span class="p">]:</span>
-            <span class="k">if</span> <span class="s1">&#39;LUTDescriptor&#39;</span> <span class="ow">in</span> <span class="n">ds</span><span class="p">:</span>
-                <span class="c1"># First value in LUT Descriptor is how many values in</span>
-                <span class="c1">#   LUTData, if there&#39;s only one value then must be US</span>
-                <span class="c1"># As per PS3.3 C.11.1.1.1</span>
-                <span class="k">if</span> <span class="n">ds</span><span class="o">.</span><span class="n">LUTDescriptor</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-                    <span class="n">elem</span><span class="o">.</span><span class="n">VR</span> <span class="o">=</span> <span class="s1">&#39;US&#39;</span>
-                    <span class="n">elem</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">convert_numbers</span><span class="p">(</span><span class="n">elem</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">,</span>
-                                                 <span class="s1">&#39;H&#39;</span><span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">elem</span><span class="o">.</span><span class="n">VR</span> <span class="o">=</span> <span class="s1">&#39;OW&#39;</span>
-
-        <span class="c1"># &#39;OB or OW&#39;: 60xx,3000 OverlayData and dependent on Transfer Syntax</span>
-        <span class="k">elif</span> <span class="p">(</span><span class="n">elem</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">group</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mh">0x6000</span><span class="p">,</span> <span class="mh">0x601F</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-              <span class="ow">and</span> <span class="n">elem</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">elem</span> <span class="o">==</span> <span class="mh">0x3000</span><span class="p">):</span>
-            <span class="c1"># Implicit VR must be OW, explicit VR may be OB or OW</span>
-            <span class="c1">#   as per PS3.5 Section 8.1.2 and Annex A</span>
-            <span class="k">if</span> <span class="n">ds</span><span class="o">.</span><span class="n">is_implicit_VR</span><span class="p">:</span>
-                <span class="n">elem</span><span class="o">.</span><span class="n">VR</span> <span class="o">=</span> <span class="s1">&#39;OW&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">_correct_ambiguous_vr_element</span><span class="p">(</span><span class="n">elem</span><span class="p">,</span> <span class="n">ds</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">reason</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Failed to resolve ambiguous VR for tag&#39;</span>
+                      <span class="s1">&#39; </span><span class="si">{}</span><span class="s1">: &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">elem</span><span class="o">.</span><span class="n">tag</span><span class="p">))</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="n">reason</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">elem</span></div>
 
@@ -314,6 +343,11 @@
 <span class="sd">    -------</span>
 <span class="sd">    ds : pydicom.dataset.Dataset</span>
 <span class="sd">        The corrected dataset</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    AttributeError</span>
+<span class="sd">        If a tag is missing in `ds` that is required to resolve the ambiguity.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Iterate through the elements</span>
     <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">ds</span><span class="p">:</span>
@@ -534,7 +568,8 @@
 
 
 <div class="viewcode-block" id="write_data_element"><a class="viewcode-back" href="../../api_ref.html#pydicom.filewriter.write_data_element">[docs]</a><span class="k">def</span> <span class="nf">write_data_element</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">data_element</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">default_encoding</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Write the data_element to file fp according to dicom media storage rules.</span>
+    <span class="sd">&quot;&quot;&quot;Write the data_element to file fp according to</span>
+<span class="sd">    dicom media storage rules.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Write element&#39;s tag</span>
     <span class="n">fp</span><span class="o">.</span><span class="n">write_tag</span><span class="p">(</span><span class="n">data_element</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>
