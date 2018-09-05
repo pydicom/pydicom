@@ -386,11 +386,7 @@ class TestNumpy_RLEHandler(object):
         ref = _get_pixel_array(SC_EXPL_LITTLE_2F)
         arr = ds.pixel_array
 
-        #print('Ref', ref[0].shape, ref[0])
-        #print(arr.shape, arr[0])
         assert np.array_equal(arr, ref)
-
-        assert np.array_equal(ds.pixel_array, ref)
 
         # Frame 1
         frame = arr[0]
