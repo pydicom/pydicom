@@ -136,8 +136,6 @@ def get_pixeldata(ds, rle_segment_order='>'):
 
         pixel_data.extend(frame)
 
-    print(pixel_data[:16])
-
     # At this point `pixel_data` is ordered as (for 16-bit, 3 sample, 2 frame):
     #    Frame 1           | Frame 2
     #    R1 R2 G1 G2 B1 B2 R1 R2 G1 G2 B1 B2
@@ -263,7 +261,10 @@ def _rle_decode_frame(data, rows, columns, nr_samples, nr_bits):
     Returns
     -------
     bytearray
-        The frame's decompressed and concatenated segment data.
+        The frame's decoded data in big endian and planar configuration 1
+        byte ordering (i.e. for RGB data this is all red pixels then all
+        green then all blue, with the bytes for each pixel ordered from
+        MSB to LSB when reading left to right).
     """
     # XXX: FIXME
     if nr_bits % 8:
@@ -289,33 +290,36 @@ def _rle_decode_frame(data, rows, columns, nr_samples, nr_bits):
 
     # Decode
     decoded = bytearray(rows * columns * nr_samples * bytes_per_sample)
-    # Interleave the segments to make things faster later
-    # For 16 bit, 3 sample data we want
+
+    # Interleave the segments now to make things faster later
+
+    # For 16 bit, 3 sample data we want Planar Configuration 1 ordering
+    # which is all red pixels, then all green, then all blue
     #    Red                         | Green                       | Blue
     #    Pxl 1   Pxl 2   ... Pxl N   | Pxl 1   Pxl 2   ... Pxl N   | ...
     #    MSB LSB MSB LSB ... MSB LSB | MSB LSB MSB LSB ... MSB LSB | ...
-    #for ii in range(nr_segments):
-    for sample_number in range(bytes_per_sample):
-        #for byte_number in range(bytes_per_sample):
-        #for sample_number in range(nr_samples):
-            #for ii, seg_offset in enumerate(offsets[:-1]):
-            #jj = byte_number + (sample_number * bytes_per_sample)
-            #ii = jj * (rows * columns)
-            #ii = (sample_number + 1) * bytes_per_sample - byte_number - 1
-            #print(jj)
-        segment = _rle_decode_segment(data[offsets[ii]:offsets[ii + 1]])
-        # Check that the number of decoded pixels is correct
-        if len(segment) != rows * columns:
-            raise AttributeError(
-                "The amount of decoded RLE segment data doesn't match the "
-                "expected amount ({} vs {} bytes)"
-                .format(len(segment), rows * columns)
-            )
 
-        stride = nr_samples * bytes_per_sample
-        # Should be RRGGBB
-        #print('Seg', segment[:5])
-        decoded[ii::stride] = segment
+    # `stride` is the total number of bytes of each sample plane
+    stride = bytes_per_sample * rows * columns
+    for sample_number in range(nr_samples):
+        for byte_offset in range(bytes_per_sample):
+            # Decode the segment
+            # ii is 0, 1, 2, 3, ... nr_segments
+            ii = sample_number * bytes_per_sample + byte_offset
+            segment = _rle_decode_segment(data[offsets[ii]:offsets[ii + 1]])
+            # Check that the number of decoded pixels is correct
+            if len(segment) != rows * columns:
+                raise AttributeError(
+                    "The amount of decoded RLE segment data doesn't match the "
+                    "expected amount ({} vs {} bytes)"
+                    .format(len(segment), rows * columns)
+                )
+
+            # `start` is where the segment should be inserted
+            # For 100 pixel, 16-bit, 3 sample data this is
+            # 0, 1, 200, 201, 400, 401
+            start = byte_offset + sample_number * stride
+            decoded[start:start + stride:bytes_per_sample] = segment
 
     return decoded
 
