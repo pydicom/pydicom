@@ -74,20 +74,21 @@ def get_pixeldata(ds, rle_segment_order='>'):
     Parameters
     ----------
     ds : dataset.Dataset
-        The DICOM dataset containing an Image Pixel module and the Pixel Data
-        to be converted.
+        The DICOM dataset containing an Image Pixel module and the RLE encoded
+        Pixel Data to be converted.
     rle_segment_order : str
-        The order of segments used by the RLE encoder when dealing with Bits
-        Allocated > 8. Each segment contains 8-bits of the pixel data, which
-        are supposed to be ordered from MSB to LSB. A value of '>' means
+        The order of segments used by the RLE decoder when dealing with Bits
+        Allocated > 8. Each RLE segment contains 8-bits of the pixel data,
+        which are supposed to be ordered from MSB to LSB. A value of '>' means
         interpret the segments as being in big endian order (default) while a
         value of '<' means interpret the segments as being in little endian
-        order.
+        order which may be possible if the encoded data is non-conformant.
 
     Returns
     -------
     np.ndarray
-        The contents of the Pixel Data element (7FE0,0010) as a 1D array.
+        The decoded contents of the Pixel Data element (7FE0,0010) as a 1D
+        array.
 
     Raises
     ------
@@ -136,33 +137,10 @@ def get_pixeldata(ds, rle_segment_order='>'):
 
         pixel_data.extend(frame)
 
-    # At this point `pixel_data` is ordered as (for 16-bit, 3 sample, 2 frame):
-    #    Frame 1           | Frame 2
-    #    R1 R2 G1 G2 B1 B2 R1 R2 G1 G2 B1 B2
-    # Where each of R1, R2, G1, G2, B1, B2 represents a segment and each
-    # segment is half of a 2 byte pixel split into 2 8-bit uints as shown below
-    #
-    #   Segment 1 (R1)       | Segment 2 (R2)     | Segment 3 (G1) ...
-    #   Px 1  Px 2  ... Px N | Px 1 Px 2 ... Px N | Px 1 Px 2 ...
-    #   MSB   MSB   ... MSB  | LSB  LSB  ... LSB  | MSB  MSB  ...
-    # For each 2-byte pixel, R1 is the MSB half and R2 the LSB half
-    # We interpret the data as uint8 because its not yet in the right order
-
     # The segment order should be big endian by default but make it possible
     #   to switch if the RLE is non-conformant
     dtype = pixel_dtype(ds).newbyteorder(rle_segment_order)
     arr = np.frombuffer(pixel_data, dtype)
-
-    # Reshape so the array is ordered as
-    #   Segment 1:  [[R MSB values -> ],
-    #   Segment 2:   [R LSB values -> ], etc
-    #nr_segments = nr_frames * nr_bits // 8 * nr_samples
-
-    #arr = arr.reshape((-1, nr_segments), order='F')
-
-    #dtype =
-    # Apply new view on the array with the correct final dtype
-    #arr = arr.view(dtype)
 
     if should_change_PhotometricInterpretation_to_RGB(ds):
         ds.PhotometricInterpretation = "RGB"
@@ -226,7 +204,6 @@ def _parse_rle_header(header):
     if len(header) != 64:
         raise ValueError('The RLE header can only be 64 bytes long')
 
-    # The number of segments
     nr_segments = unpack('<L', header[:4])[0]
     if nr_segments > 15:
         raise ValueError(
@@ -266,10 +243,10 @@ def _rle_decode_frame(data, rows, columns, nr_samples, nr_bits):
         green then all blue, with the bytes for each pixel ordered from
         MSB to LSB when reading left to right).
     """
-    # XXX: FIXME
     if nr_bits % 8:
         raise NotImplementedError(
-            "Don't know how to handle BitsAllocated not being a multiple of bytes"
+            "Unable to decode RLE encoded pixel data with a (0028,0100) "
+            "'Bits Allocated' value of {}".format(nr_bits)
         )
 
     # Parse the RLE Header
@@ -291,10 +268,14 @@ def _rle_decode_frame(data, rows, columns, nr_samples, nr_bits):
     # Decode
     decoded = bytearray(rows * columns * nr_samples * bytes_per_sample)
 
-    # Interleave the segments now to make things faster later
+    # Example:
+    # RLE encoded data is ordered like this (for 16-bit, 3 sample):
+    #  Segment: 1     | 2     | 3     | 4     | 5     | 6
+    #           R MSB | R LSB | G MSB | G LSB | B MSB | B LSB
+    #    i.e. a segment contains only the MSB or LSB parts of each pixel
 
-    # For 16 bit, 3 sample data we want Planar Configuration 1 ordering
-    # which is all red pixels, then all green, then all blue
+    # To make things faster we interleave each segment in a manner consistent
+    # with a planar configuration of 1 with big endian byte ordering:
     #    Red                         | Green                       | Blue
     #    Pxl 1   Pxl 2   ... Pxl N   | Pxl 1   Pxl 2   ... Pxl N   | ...
     #    MSB LSB MSB LSB ... MSB LSB | MSB LSB MSB LSB ... MSB LSB | ...
@@ -304,7 +285,7 @@ def _rle_decode_frame(data, rows, columns, nr_samples, nr_bits):
     for sample_number in range(nr_samples):
         for byte_offset in range(bytes_per_sample):
             # Decode the segment
-            # ii is 0, 1, 2, 3, ... nr_segments
+            # ii is 0, 1, 2, 3, ..., (nr_segments - 1)
             ii = sample_number * bytes_per_sample + byte_offset
             segment = _rle_decode_segment(data[offsets[ii]:offsets[ii + 1]])
             # Check that the number of decoded pixels is correct
@@ -315,9 +296,8 @@ def _rle_decode_frame(data, rows, columns, nr_samples, nr_bits):
                     .format(len(segment), rows * columns)
                 )
 
-            # `start` is where the segment should be inserted
-            # For 100 pixel, 16-bit, 3 sample data this is
-            # 0, 1, 200, 201, 400, 401
+            # For 100 pixel/plane, 32-bit, 3 sample data `start` will be
+            #   0, 1, 2, 3, 400, 401, 402, 403, 800, 801, 802, 803
             start = byte_offset + sample_number * stride
             decoded[start:start + stride:bytes_per_sample] = segment
 
