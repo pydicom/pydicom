@@ -23,8 +23,8 @@ class TestDicomDir(object):
         """Test exception raised if SOP Class is not Media Storage Directory"""
         ds = read_file(get_testdata_files('CT_small.dcm')[0])
         with pytest.raises(InvalidDicomError,
-                           match="SOP Class is not Media Storage "
-                                 "Directory \(DICOMDIR\)"):
+                           match=r"SOP Class is not Media Storage "
+                                 r"Directory \(DICOMDIR\)"):
             DicomDir("some_name", ds, b'\x00' * 128, ds.file_meta, True, True)
 
     def test_invalid_sop_no_file_meta(self):
