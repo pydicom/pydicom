@@ -28,8 +28,14 @@ extra_length_VRs = ('OB', 'OD', 'OF', 'OL', 'OW', 'SQ', 'UC', 'UN', 'UR', 'UT')
 text_VRs = ('SH', 'LO', 'ST', 'LT', 'UC', 'UT')
 
 # Delimiters for text strings and person name that reset the encoding.
+# The delimiters are collected in a byte string suitable for use in a regex.
 # See PS3.5, Section 6.1.2.5.3
+
+# Delimiters for text VRs: LF, CR, TAB, FF, ESC
 TEXT_VR_DELIMS = b'\n\r\t\f\x1b'
+
+# Delimiters for VR PN : name part separator '^' (escaped for regex), ESC
+# (the component separator '=' is handled separately)
 PN_DELIMS = b'\\^\x1b'
 
 match_string = b''.join([

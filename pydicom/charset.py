@@ -7,14 +7,17 @@ from pydicom import compat
 from pydicom.valuerep import PersonNameUnicode, text_VRs, TEXT_VR_DELIMS
 from pydicom.compat import in_py2
 
+# default encoding if no encoding defined - corresponds to ISO IR 6 / ASCII
+default_encoding = "iso8859"
+
 # Map DICOM Specific Character Set to python equivalent
 python_encoding = {
 
     # default character set for DICOM
-    '': 'iso8859',
+    '': default_encoding,
 
     # alias for latin_1 too (iso_ir_6 exists as an alias to 'ascii')
-    'ISO_IR 6': 'iso8859',
+    'ISO_IR 6': default_encoding,
     'ISO_IR 13': 'shift_jis',
 
     # these also have iso_ir_1XX aliases in python 2.7
@@ -57,25 +60,23 @@ ESC = b'\x1b'
 # Map Python encodings to escape sequences as defined in PS3.3 in tables
 # C.12-3 (single-byte) and C.12-4 (multi-byte character sets).
 escape_codes = {
-    'iso8859': ESC + b'(B',  # used to switch to ASCII G0 code element
-    'latin_1': ESC + b'-A',
-    'shift_jis': ESC + b')I',
-    'iso2022_jp': ESC + b'$B',
-    'iso8859_2': ESC + b'-B',
-    'iso8859_3': ESC + b'-C',
-    'iso8859_4': ESC + b'-D',
-    'iso_ir_126': ESC + b'-F',
-    'iso_ir_127': ESC + b'-G',
-    'iso_ir_138': ESC + b'-H',
-    'iso_ir_144': ESC + b'-L',
-    'iso_ir_148': ESC + b'-M',
-    'iso_ir_166': ESC + b'-T',
-    'euc_kr': ESC + b'$)C',
-    'iso-2022-jp': ESC + b'$(D',
-    'iso_ir_58': ESC + b'$)A',
+    ESC + b'(B': default_encoding,  # used to switch to ASCII G0 code element
+    ESC + b'-A': 'latin_1',
+    ESC + b')I': 'shift_jis',
+    ESC + b'$B': 'iso2022_jp',
+    ESC + b'-B': 'iso8859_2',
+    ESC + b'-C': 'iso8859_3',
+    ESC + b'-D': 'iso8859_4',
+    ESC + b'-F': 'iso_ir_126',
+    ESC + b'-G': 'iso_ir_127',
+    ESC + b'-H': 'iso_ir_138',
+    ESC + b'-L': 'iso_ir_144',
+    ESC + b'-M': 'iso_ir_148',
+    ESC + b'-T': 'iso_ir_166',
+    ESC + b'$)C': 'euc_kr',
+    ESC + b'$(D': 'iso-2022-jp',
+    ESC + b'$)A': 'iso_ir_58',
 }
-
-default_encoding = "iso8859"
 
 
 def decode_string(value, encodings, delims):
@@ -102,9 +103,9 @@ def decode_string(value, encodings, delims):
         return value.decode(encodings[0])
 
     # multi-byte character sets except Korean are handled by Python encodings
-    use_python_handling = value.startswith((escape_codes['iso2022_jp'],
-                                            escape_codes['iso-2022-jp'],
-                                            escape_codes['iso_ir_58']))
+    use_python_handling = value.startswith((ESC + b'$B',  # 'iso2022_jp
+                                            ESC + b'$(D',  # iso-2022-jp
+                                            ESC + b'$)A'))  # iso_ir_58
 
     if use_python_handling:
         values = [value]
@@ -122,28 +123,52 @@ def decode_string(value, encodings, delims):
         regex = b'(^[^' + delims + b']+|[' + delims + b'][^' + delims + b']*)'
         values = re.findall(regex, value)
 
-    result = u''
+    # decode each byte string fragment with it's corresponding encoding
+    # and join them all together
+    return u''.join([decode_fragment(part, encodings, use_python_handling)
+                     for part in values])
 
-    for part in values:
-        if part.startswith(ESC):
-            for enc in list(encodings) + ['iso8859']:
-                if enc in escape_codes and part.startswith(escape_codes[enc]):
-                    if use_python_handling:
-                        # Python strips the escape sequences for this encoding
-                        val = part.decode(enc)
-                    else:
-                        # Python doesn't know about the escape sequence -
-                        # we have to strip it ourselves
-                        val = part[len(escape_codes[enc]):].decode(enc)
-                    break
+
+def decode_fragment(byte_str, encodings, use_python_handling):
+    """Decode a byte string encoded with a single encoding.
+    If `byte_str` starts with an escape sequence, the encoding corresponding
+    to this sequence is used for decoding if present in `encodings`,
+    otherwise the first value in encodings.
+
+    Parameters
+    ----------
+    byte_str : bytes
+        The raw string to be decoded.
+    encodings: list of str
+        The list of Python encodings as converted from the values in the
+        Specific Character Set tag.
+    use_python_handling: Boolean
+        If True, Python removes the escape sequences during decoding.
+
+    Returns
+    -------
+    text type
+        The decoded string.
+
+    Reference
+    ---------
+    DICOM Standard Part 5, Sections 6.1.2.4 and 6.1.2.5
+    DICOM Standard Part 3, Anex C.12.1.1.2
+    """
+    if byte_str.startswith(ESC):
+        # all 4-character escape codes start with one of two character sets
+        seq_length = 4 if byte_str.startswith((b'\x1b$(', b'\x1b$)')) else 3
+        encoding = escape_codes.get(byte_str[:seq_length], '')
+        if encoding in encodings or encoding == default_encoding:
+            if use_python_handling:
+                # Python strips the escape sequences for this encoding
+                return byte_str.decode(encoding)
             else:
-                # unknown escape code - use first encoding (probably incorrect)
-                val = part.decode(encodings[0])
-        else:
-            # if no escape code is given, the first encoding is used
-            val = part.decode(encodings[0])
-        result += val
-    return result
+                # Python doesn't know about the escape sequence -
+                # we have to strip it ourselves
+                return byte_str[seq_length:].decode(encoding)
+    # no or unknown escape code - use first encoding
+    return byte_str.decode(encodings[0])
 
 
 # DICOM PS3.5-2008 6.1.1 (p 18) says:
