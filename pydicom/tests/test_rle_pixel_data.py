@@ -53,14 +53,6 @@ except ImportError:
 
 
 # Paths to the test datasets
-# 1-bit, 1 sample/pixel, 1 frame
-RLE_1_1_1F = None
-# 1-bit, 1 sample/pixel, 2 frame
-RLE_1_1_2F = None
-# 1-bit, 3 sample/pixel, 1 frame
-RLE_1_3_1F = None
-# 1-bit, 3 sample/pixel, 2 frame
-RLE_1_3_2F = None
 # 8/8-bit, 1 sample/pixel, 1 frame
 OB_EXPL_LITTLE_1F = get_testdata_files("OBXXXX1A.dcm")[0]
 OB_RLE_1F = get_testdata_files("OBXXXX1A_rle.dcm")[0]
@@ -323,8 +315,8 @@ class TestNumpy_RLEHandler(object):
         """Test pixel_array for 1-bit raises exception."""
         ds = dcmread(SC_RLE_1F)
         ds.BitsAllocated = 1
-        # XXX: shouldn't raise
-        with pytest.raises(NotImplementedError, match="BitsAllocated"):
+        with pytest.raises(NotImplementedError,
+                           match="Bits Allocated' value of 1"):
             ds.pixel_array
 
     def test_pixel_array_8bit_1sample_1f(self):
@@ -372,14 +364,7 @@ class TestNumpy_RLEHandler(object):
         ref = _get_pixel_array(SC_EXPL_LITTLE_1F)
         arr = ds.pixel_array
 
-        #import matplotlib.pyplot as plt
-        #plt.imshow(ref)
-        #plt.show()
-
-        #print('Ref', ref[0].shape, ref[0])
-        #print(arr.shape, arr[0])
         assert np.array_equal(arr, ref)
-
         assert (255, 0, 0) == tuple(arr[5, 50, :])
         assert (255, 128, 128) == tuple(arr[15, 50, :])
         assert (0, 255, 0) == tuple(arr[25, 50, :])
@@ -633,7 +618,7 @@ class TestNumpy_GetPixelData(object):
         """Test get_pixeldata raises if invalid PixelRepresentation."""
         ds = dcmread(MR_RLE_1F)
         ds.PixelRepresentation = 2
-        with pytest.raises(ValueError, match="value of '2' for '\(0028,0103"):
+        with pytest.raises(ValueError, match=r"value of '2' for '\(0028,0103"):
             get_pixeldata(ds)
 
     def test_unsupported_syntaxes_raises(self):
@@ -665,6 +650,33 @@ class TestNumpy_GetPixelData(object):
 
         RLE_HANDLER.should_change_PhotometricInterpretation_to_RGB = orig_fn
 
+    def test_little_endian_segment_order(self):
+        """Test interpreting segment order as little endian."""
+        ds = dcmread(MR_RLE_1F)
+        assert ds.file_meta.TransferSyntaxUID == RLELossless
+        assert ds.BitsAllocated == 16
+        assert ds.SamplesPerPixel == 1
+        assert 'NumberOfFrames' not in ds
+        assert ds.PixelRepresentation == 1  # signed
+
+        # Big endian
+        arr = get_pixeldata(ds, rle_segment_order='>')
+        arr = ds._reshape_pixel_array(arr)
+
+        assert (64, 64) == arr.shape
+        assert (422, 319, 361) == tuple(arr[0, 31:34])
+        assert (366, 363, 322) == tuple(arr[31, :3])
+        assert (1369, 1129, 862) == tuple(arr[-1, -3:])
+
+        # Little endian
+        arr = get_pixeldata(ds, rle_segment_order='<')
+        arr = ds._reshape_pixel_array(arr)
+
+        assert (64, 64) == arr.shape
+        assert (-23039, 16129, 26881) == tuple(arr[0, 31:34])
+        assert (28161, 27393, 16897) == tuple(arr[31, :3])
+        assert (22789, 26884, 24067) == tuple(arr[-1, -3:])
+
 
 # RLE encodes data by first splitting a frame into 8-bit segments
 BAD_SEGMENT_DATA = [
@@ -683,8 +695,6 @@ BAD_SEGMENT_DATA = [
     (b'\x0D\x00\x00\x00', 3, 32),  # 13 segments, 12 expected
     (b'\x07\x00\x00\x00', 1, 64),  # 7 segments, 8 expected
     (b'\x09\x00\x00\x00', 1, 64),  # 9 segments, 8 expected
-    #(b'\x17\x00\x00\x00', 3, 64),  # 23 segments, 24 expected
-    #(b'\x19\x00\x00\x00', 3, 64),  # 25 segments, 24 expected
 ]
 
 HEADER_DATA = [
@@ -698,6 +708,7 @@ HEADER_DATA = [
 ]
 
 
+@pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
 class TestNumpy_RLEParseHeader(object):
     """Tests for rle_handler._parse_rle_header."""
     def test_invalid_header_length(self):
@@ -713,8 +724,8 @@ class TestNumpy_RLEParseHeader(object):
             _parse_rle_header(b'\x10' + b'\x00' * 63)
 
     @pytest.mark.parametrize('nr_segments, offsets', HEADER_DATA)
-    def test_good_nr_segments(self, nr_segments, offsets):
-        """Test good header data."""
+    def test_parse_header(self, nr_segments, offsets):
+        """Test parsing header data."""
         # Encode the header
         header = bytearray()
         header.extend(pack('<L', nr_segments))
@@ -731,7 +742,11 @@ class TestNumpy_RLEDecodeFrame(object):
     """Tests for rle_handler._rle_decode_frame."""
     def test_unsupported_bits_allocated_raises(self):
         """Test exception raised for BitsAllocated not a multiple of 8."""
-        with pytest.raises(NotImplementedError, match='multiple of bytes'):
+        msg = (
+            r"Unable to decode RLE encoded pixel data with a \(0028,0100\) "
+            r"'Bits Allocated' value of 12"
+        )
+        with pytest.raises(NotImplementedError, match=msg):
             _rle_decode_frame(b'\x00\x00\x00\x00', 1, 1, 1, 12)
 
     @pytest.mark.parametrize('header,samples,bits', BAD_SEGMENT_DATA)
@@ -741,7 +756,9 @@ class TestNumpy_RLEDecodeFrame(object):
         expected = samples * bits // 8
         actual = unpack('<L', header)[0]
         header += b'\x00' * (64 - len(header))
-        msg = "expected amount \({} vs. {} segments\)".format(actual, expected)
+        msg = (
+            r"expected amount \({} vs. {} segments\)".format(actual, expected)
+        )
         with pytest.raises(ValueError, match=msg):
             _rle_decode_frame(header,
                               rows=1,
@@ -754,54 +771,108 @@ class TestNumpy_RLEDecodeFrame(object):
         ds = dcmread(MR_RLE_1F)
         pixel_data = defragment_data(ds.PixelData)
         # Missing byte
-        # This should probably be ValueError
-        with pytest.raises(AttributeError,
-                           match='amount \(4095 vs 4096 bytes\)'):
-            segment_generator = _rle_decode_frame(pixel_data[:-1],
-                                                  ds.Rows,
-                                                  ds.Columns,
-                                                  ds.SamplesPerPixel,
-                                                  ds.BitsAllocated)
-            for segment in segment_generator:
-                pass
+        with pytest.raises(ValueError,
+                           match=r'amount \(4095 vs. 4096 bytes\)'):
+            _rle_decode_frame(pixel_data[:-1],
+                              ds.Rows,
+                              ds.Columns,
+                              ds.SamplesPerPixel,
+                              ds.BitsAllocated)
 
         # Extra byte
-        with pytest.raises(AttributeError,
-                           match='amount \(4097 vs 4096 bytes\)'):
-            segment_generator = _rle_decode_frame(pixel_data + b'\x00\x01',
-                                                  ds.Rows,
-                                                  ds.Columns,
-                                                  ds.SamplesPerPixel,
-                                                  ds.BitsAllocated)
-            for segment in segment_generator:
-                pass
+        with pytest.raises(ValueError,
+                           match=r'amount \(4097 vs. 4096 bytes\)'):
+            _rle_decode_frame(pixel_data + b'\x00\x01',
+                              ds.Rows,
+                              ds.Columns,
+                              ds.SamplesPerPixel,
+                              ds.BitsAllocated)
 
-    def test_8bit_1sample_1f(self):
-        """Test a simple 8-bit, 1 sample/pixel, 1 frame array."""
-        header = b'\x01\x00\x00\x00' + b'\x40\x00\x00\x00' + b'\x00' * 56
+    def test_8bit_1sample(self):
+        """Test decoding 8-bit, 1 sample/pixel."""
+        header = (
+            b'\x01\x00\x00\x00'
+            b'\x40\x00\x00\x00'
+        )
+        header += (64 - len(header)) * b'\x00'
         # 2 x 3 data
         # 0, 64, 128, 160, 192, 255
-        data = b'\x06\x00\x40\x80\xA0\xC0\xFF'
-        arr = _rle_decode_frame(header + data, 2, 3, 1, 8)
+        data = b'\x05\x00\x40\x80\xA0\xC0\xFF'
+        decoded = _rle_decode_frame(header + data, 2, 3, 1, 8)
+        arr = np.frombuffer(decoded, np.dtype('>u1'))
+        assert [0, 64, 128, 160, 192, 255] == arr.tolist()
 
-    def test_16bit_1sample_1f(self):
-        """Test a simple 16-bit, 1 sample/pixel, 1 frame array."""
+    def test_8bit_3sample(self):
+        """Test decoding 8-bit, 3 sample/pixel."""
+        header = (
+            b'\x03\x00\x00\x00'  # 3 segments
+            b'\x40\x00\x00\x00'  # 64
+            b'\x47\x00\x00\x00'  # 71
+            b'\x4E\x00\x00\x00'  # 78
+        )
+        header += (64 - len(header)) * b'\x00'
+        # 2 x 3 data
+        # 0, 64, 128, 160, 192, 255
+        data = (
+            b'\x05\x00\x40\x80\xA0\xC0\xFF'  # R
+            b'\x05\xFF\xC0\x80\x40\x00\xFF'  # B
+            b'\x05\x01\x40\x80\xA0\xC0\xFE'  # G
+        )
+        decoded = _rle_decode_frame(header + data, 2, 3, 3, 8)
+        arr = np.frombuffer(decoded, np.dtype('>u1'))
+        # Ordered all R, all G, all B
+        assert [0, 64, 128, 160, 192, 255] == arr[:6].tolist()
+        assert [255, 192, 128, 64, 0, 255] == arr[6:12].tolist()
+        assert [1, 64, 128, 160, 192, 254] == arr[12:].tolist()
+
+    def test_16bit_1sample(self):
+        """Test decoding 16-bit, 1 sample/pixel."""
         header = (
             b'\x02\x00\x00\x00'
             b'\x40\x00\x00\x00'
             b'\x47\x00\x00\x00'
         )
-        header = header + (64 - len(header)) * b'\x00'
+        header += (64 - len(header)) * b'\x00'
         # 2 x 3 data
         data = (
             # 0, 1, 256, 255, 65280, 65535
-            b'\x06\x00\x00\x01\x00\xFF\xFF' # MSB
-            b'\x06\x00\x01\x00\xFF\x00\xFF' # LSB
+            b'\x05\x00\x00\x01\x00\xFF\xFF'  # MSB
+            b'\x05\x00\x01\x00\xFF\x00\xFF'  # LSB
         )
-        arr = _rle_decode_frame(header + data, 2, 3, 1, 16)
+        decoded = _rle_decode_frame(header + data, 2, 3, 1, 16)
+        arr = np.frombuffer(decoded, np.dtype('>u2'))
+        assert [0, 1, 256, 255, 65280, 65535] == arr.tolist()
 
-    def test_32bit_1sample_1f(self):
-        """Test a simple 32-bit, 1 sample/pixel, 1 frame array."""
+    def test_16bit_3sample(self):
+        """Test decoding 16-bit, 3 sample/pixel."""
+        header = (
+            b'\x06\x00\x00\x00'  # 6 segments
+            b'\x40\x00\x00\x00'  # 64
+            b'\x47\x00\x00\x00'  # 71
+            b'\x4E\x00\x00\x00'  # 78
+            b'\x55\x00\x00\x00'  # 85
+            b'\x5C\x00\x00\x00'  # 92
+            b'\x63\x00\x00\x00'  # 99
+        )
+        header += (64 - len(header)) * b'\x00'
+        # 2 x 3 data
+        data = (
+            # 0, 1, 256, 255, 65280, 65535
+            b'\x05\x00\x00\x01\x00\xFF\xFF'  # MSB
+            b'\x05\x00\x01\x00\xFF\x00\xFF'  # LSB
+            b'\x05\xFF\x00\x01\x00\xFF\x00'  # MSB
+            b'\x05\xFF\x01\x00\xFF\x00\x00'  # LSB
+            b'\x05\x00\x00\x01\x00\xFF\xFF'  # MSB
+            b'\x05\x01\x01\x00\xFF\x00\xFE'  # LSB
+        )
+        decoded = _rle_decode_frame(header + data, 2, 3, 3, 16)
+        arr = np.frombuffer(decoded, np.dtype('>u2'))
+        assert [0, 1, 256, 255, 65280, 65535] == arr[:6].tolist()
+        assert [65535, 1, 256, 255, 65280, 0] == arr[6:12].tolist()
+        assert [1, 1, 256, 255, 65280, 65534] == arr[12:].tolist()
+
+    def test_32bit_1sample(self):
+        """Test decoding 32-bit, 1 sample/pixel."""
         header = (
             b'\x04\x00\x00\x00'  # 4 segments
             b'\x40\x00\x00\x00'  # 64 offset
@@ -809,18 +880,58 @@ class TestNumpy_RLEDecodeFrame(object):
             b'\x4E\x00\x00\x00'  # 78 offset
             b'\x55\x00\x00\x00'  # 85 offset
         )
-        header = header + (64 - len(header)) * b'\x00'
+        header += (64 - len(header)) * b'\x00'
         # 2 x 3 data
         data = (
             # 0, 16777216, 65536, 256, 4294967295
-            b'\x05\x00\x01\x00\x00\x00\xFF' # MSB
+            b'\x05\x00\x01\x00\x00\x00\xFF'  # MSB
             b'\x05\x00\x00\x01\x00\x00\xFF'
             b'\x05\x00\x00\x00\x01\x00\xFF'
-            b'\x05\x00\x00\x00\x00\x01\xFF' # LSB
+            b'\x05\x00\x00\x00\x00\x01\xFF'  # LSB
         )
-        arr = _rle_decode_frame(header + data, 2, 3, 1, 32)
-        #assert [0, 16777216, 65536, 256, 1, 4294967295] == arr.tolist()
+        decoded = _rle_decode_frame(header + data, 2, 3, 1, 32)
+        arr = np.frombuffer(decoded, np.dtype('>u4'))
+        assert [0, 16777216, 65536, 256, 1, 4294967295] == arr.tolist()
 
+    def test_32bit_3sample(self):
+        """Test decoding 32-bit, 3 sample/pixel."""
+        header = (
+            b'\x0C\x00\x00\x00'  # 12 segments
+            b'\x40\x00\x00\x00'  # 64
+            b'\x47\x00\x00\x00'  # 71
+            b'\x4E\x00\x00\x00'  # 78
+            b'\x55\x00\x00\x00'  # 85
+            b'\x5C\x00\x00\x00'  # 92
+            b'\x63\x00\x00\x00'  # 99
+            b'\x6A\x00\x00\x00'  # 106
+            b'\x71\x00\x00\x00'  # 113
+            b'\x78\x00\x00\x00'  # 120
+            b'\x7F\x00\x00\x00'  # 127
+            b'\x86\x00\x00\x00'  # 134
+            b'\x8D\x00\x00\x00'  # 141
+        )
+        header += (64 - len(header)) * b'\x00'
+        # 2 x 3 data
+        data = (
+            # 0, 16777216, 65536, 256, 4294967295
+            b'\x05\x00\x01\x00\x00\x00\xFF'  # MSB
+            b'\x05\x00\x00\x01\x00\x00\xFF'
+            b'\x05\x00\x00\x00\x01\x00\xFF'
+            b'\x05\x00\x00\x00\x00\x01\xFF'  # LSB
+            b'\x05\xFF\x01\x00\x00\x00\x00'  # MSB
+            b'\x05\xFF\x00\x01\x00\x00\x00'
+            b'\x05\xFF\x00\x00\x01\x00\x00'
+            b'\x05\xFF\x00\x00\x00\x01\x00'  # LSB
+            b'\x05\x00\x01\x00\x00\x00\xFF'  # MSB
+            b'\x05\x00\x00\x01\x00\x00\xFF'
+            b'\x05\x00\x00\x00\x01\x00\xFF'
+            b'\x05\x01\x00\x00\x00\x01\xFE'  # LSB
+        )
+        decoded = _rle_decode_frame(header + data, 2, 3, 3, 32)
+        arr = np.frombuffer(decoded, np.dtype('>u4'))
+        assert [0, 16777216, 65536, 256, 1, 4294967295] == arr[:6].tolist()
+        assert [4294967295, 16777216, 65536, 256, 1, 0] == arr[6:12].tolist()
+        assert [1, 16777216, 65536, 256, 1, 4294967294] == arr[12:].tolist()
 
 
 @pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')

@@ -26,7 +26,7 @@ elements have values given in the table below.
 +-------------+---------------------------+------+--------------+----------+
 | (0028,0011) | Columns                   | 1    | N            | Required |
 +-------------+---------------------------+------+--------------+----------+
-| (0028,0100) | BitsAllocated             | 1    | 1, 8, 16, 32 | Required |
+| (0028,0100) | BitsAllocated             | 1    | 8, 16, 32    | Required |
 +-------------+---------------------------+------+--------------+----------+
 | (0028,0103) | PixelRepresentation       | 1    | 0, 1         | Required |
 +-------------+---------------------------+------+--------------+----------+
@@ -79,10 +79,11 @@ def get_pixeldata(ds, rle_segment_order='>'):
     rle_segment_order : str
         The order of segments used by the RLE decoder when dealing with Bits
         Allocated > 8. Each RLE segment contains 8-bits of the pixel data,
-        which are supposed to be ordered from MSB to LSB. A value of '>' means
-        interpret the segments as being in big endian order (default) while a
-        value of '<' means interpret the segments as being in little endian
-        order which may be possible if the encoded data is non-conformant.
+        and segments are supposed to be ordered from MSB to LSB. A value of
+        '>' means interpret the segments as being in big endian order
+        (default) while a value of '<' means interpret the segments as being
+        in little endian order which may be possible if the encoded data is
+        non-conformant.
 
     Returns
     -------
@@ -265,18 +266,19 @@ def _rle_decode_frame(data, rows, columns, nr_samples, nr_bits):
     # Ensure the last segment gets decoded
     offsets.append(len(data))
 
-    # Decode
+    # Preallocate with null bytes
     decoded = bytearray(rows * columns * nr_samples * bytes_per_sample)
 
     # Example:
     # RLE encoded data is ordered like this (for 16-bit, 3 sample):
     #  Segment: 1     | 2     | 3     | 4     | 5     | 6
     #           R MSB | R LSB | G MSB | G LSB | B MSB | B LSB
-    #    i.e. a segment contains only the MSB or LSB parts of each pixel
+    #  A segment contains only the MSB or LSB parts of all the sample pixels
 
-    # To make things faster we interleave each segment in a manner consistent
-    # with a planar configuration of 1 with big endian byte ordering:
-    #    Red                         | Green                       | Blue
+    # To minimise the amount of array manipulation later, and to make things
+    # faster we interleave each segment in a manner consistent with a planar
+    # configuration of 1 (and maintain big endian byte ordering):
+    #    All red samples             | All green samples           | All blue
     #    Pxl 1   Pxl 2   ... Pxl N   | Pxl 1   Pxl 2   ... Pxl N   | ...
     #    MSB LSB MSB LSB ... MSB LSB | MSB LSB MSB LSB ... MSB LSB | ...
 
@@ -290,9 +292,9 @@ def _rle_decode_frame(data, rows, columns, nr_samples, nr_bits):
             segment = _rle_decode_segment(data[offsets[ii]:offsets[ii + 1]])
             # Check that the number of decoded pixels is correct
             if len(segment) != rows * columns:
-                raise AttributeError(
+                raise ValueError(
                     "The amount of decoded RLE segment data doesn't match the "
-                    "expected amount ({} vs {} bytes)"
+                    "expected amount ({} vs. {} bytes)"
                     .format(len(segment), rows * columns)
                 )
 

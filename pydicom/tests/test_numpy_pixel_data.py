@@ -800,7 +800,7 @@ class TestNumpy_GetPixelData(object):
         ds = dcmread(EXPL_16_1_1F)
         ds.PixelRepresentation = 2
         with pytest.raises(ValueError,
-                           match="value of '2' for '\(0028,0103"):
+                           match=r"value of '2' for '\(0028,0103"):
             get_pixeldata(ds)
 
     def test_unsupported_syntaxes_raises(self):
@@ -901,7 +901,7 @@ class TestNumpy_PackBits(object):
     def test_non_binary_input(self):
         """Test non-binary input raises exception."""
         with pytest.raises(ValueError,
-                           match="Only binary arrays \(containing ones or"):
+                           match=r"Only binary arrays \(containing ones or"):
             pack_bits(np.asarray([0, 0, 2, 0, 0, 0, 0, 0]))
 
     def test_non_array_input(self):
@@ -951,12 +951,12 @@ class TestNumpy_PixelDtype(object):
         self.ds.PixelRepresentation = -1
         # The bracket needs to be escaped
         with pytest.raises(ValueError,
-                           match="value of '-1' for '\(0028,0103"):
+                           match=r"value of '-1' for '\(0028,0103"):
             pixel_dtype(self.ds)
 
         self.ds.PixelRepresentation = 2
         with pytest.raises(ValueError,
-                           match="value of '2' for '\(0028,0103"):
+                           match=r"value of '2' for '\(0028,0103"):
             pixel_dtype(self.ds)
 
     def test_unknown_bits_allocated_raises(self):
@@ -965,17 +965,17 @@ class TestNumpy_PixelDtype(object):
         self.ds.PixelRepresentation = 0
         # The bracket needs to be escaped
         with pytest.raises(ValueError,
-                           match="value of '0' for '\(0028,0100"):
+                           match=r"value of '0' for '\(0028,0100"):
             pixel_dtype(self.ds)
 
         self.ds.BitsAllocated = 2
         with pytest.raises(ValueError,
-                           match="value of '2' for '\(0028,0100"):
+                           match=r"value of '2' for '\(0028,0100"):
             pixel_dtype(self.ds)
 
         self.ds.BitsAllocated = 15
         with pytest.raises(ValueError,
-                           match="value of '15' for '\(0028,0100"):
+                           match=r"value of '15' for '\(0028,0100"):
             pixel_dtype(self.ds)
 
     def test_unsupported_dtypes(self):

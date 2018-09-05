@@ -764,59 +764,6 @@ class Dataset(dict):
                 pixel_array = pixel_array.reshape(self.Rows, self.Columns)
         return pixel_array
 
-    def _dev_reshape(self, arr):
-        nr_frames = getattr(self, 'NumberOfFrames', 1)
-        nr_samples = self.SamplesPerPixel
-        if nr_samples > 1:
-            transfer_syntax = self.file_meta.TransferSyntaxUID
-            if transfer_syntax in ['1.2.840.10008.1.2.4.50',
-                                   '1.2.840.10008.1.2.4.57',
-                                   '1.2.840.10008.1.2.4.70',
-                                   '1.2.840.10008.1.2.4.90',
-                                   '1.2.840.10008.1.2.4.91']:
-                planar_configuration = 0
-            elif transfer_syntax in ['1.2.840.10008.1.2.4.80',
-                                     '1.2.840.10008.1.2.4.81',
-                                     '1.2.840.10008.1.2.5']:
-                planar_configuration = 1
-            else:
-                planar_configuration = self.PlanarConfiguration
-
-            if planar_configuration not in [0, 1]:
-                raise ValueError(
-                    "Unable to reshape the pixel array as a value of {} for "
-                    "(0028,0006) 'Planar Configuration' is invalid."
-                    .format(planar_configuration)
-                )
-
-
-        if nr_frames > 1:
-            # Multi-frame
-            if nr_samples == 1:
-                # Single plane
-                arr = arr.reshape(nr_frames, self.Rows, self.Columns)
-            else:
-                # Multiple planes, usually 3
-                if planar_configuration == 0:
-                    arr = arr.reshape(nr_frames, self.Rows, self.Columns, nr_samples)
-                else:
-                    arr = arr.reshape(nr_frames, nr_samples, self.Rows, self.Columns)
-                    arr = arr.transpose(0, 2, 3, 1)
-        else:
-            # Single frame
-            if nr_samples == 1:
-                # Single plane
-                arr = arr.reshape(self.Rows, self.Columns)
-            else:
-                # Multiple planes, usually 3
-                if planar_configuration == 0:
-                    arr = arr.reshape(self.Rows, self.Columns, nr_samples)
-                else:
-                    arr = arr.reshape(nr_samples, self.Rows, self.Columns)
-                    arr = arr.transpose(1, 2, 0)
-
-        return arr
-
     def _convert_YBR_to_RGB(self, array_of_YBR_pixels):
         if have_numpy:
             ybr_to_rgb = numpy.ndarray((3, 3), dtype=numpy.float)
@@ -864,8 +811,7 @@ class Dataset(dict):
                       if h and h.supports_transfer_syntax(self)]:
                 try:
                     pixel_array = x.get_pixeldata(self)
-                    self._pixel_array = self._dev_reshape(pixel_array)
-                    #self._pixel_array = self._reshape_pixel_array(pixel_array)
+                    self._pixel_array = self._reshape_pixel_array(pixel_array)
                     if x.needs_to_convert_to_RGB(self):
                         self._pixel_array = self._convert_YBR_to_RGB(
                             self._pixel_array
