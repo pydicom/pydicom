@@ -67,9 +67,9 @@ class Test_JPEG_LS_Lossless_transfer_syntax():
     def test_read_mr_with_numpy(self):
         pydicom.config.image_handlers = [numpy_handler]
         msg = (
-            "Unable to decode pixel data with a transfer syntax UID of "
-            "'1.2.840.10008.1.2.4.80' \(JPEG-LS Lossless Image Compression\) "
-            "as there are no suitable pixel data handlers available."
+            r"Unable to decode pixel data with a transfer syntax UID of "
+            r"'1.2.840.10008.1.2.4.80' \(JPEG-LS Lossless Image Compression\) "
+            rr"as there are no suitable pixel data handlers available."
         )
         with pytest.raises(NotImplementedError, match=msg):
             self.jpeg_ls_lossless.pixel_array
@@ -78,9 +78,9 @@ class Test_JPEG_LS_Lossless_transfer_syntax():
     def test_read_emri_with_numpy(self):
         pydicom.config.image_handlers = [numpy_handler]
         msg = (
-            "Unable to decode pixel data with a transfer syntax UID of "
-            "'1.2.840.10008.1.2.4.80' \(JPEG-LS Lossless Image Compression\) "
-            "as there are no suitable pixel data handlers available."
+            r"Unable to decode pixel data with a transfer syntax UID of "
+            r"'1.2.840.10008.1.2.4.80' \(JPEG-LS Lossless Image Compression\) "
+            r"as there are no suitable pixel data handlers available."
         )
         with pytest.raises(NotImplementedError, match=msg):
             self.emri_jpeg_ls_lossless.pixel_array
@@ -89,9 +89,9 @@ class Test_JPEG_LS_Lossless_transfer_syntax():
     def test_read_mr_with_pillow(self):
         pydicom.config.image_handlers = [pillow_handler]
         msg = (
-            "Unable to decode pixel data with a transfer syntax UID of "
-            "'1.2.840.10008.1.2.4.80' \(JPEG-LS Lossless Image Compression\) "
-            "as there are no suitable pixel data handlers available."
+            r"Unable to decode pixel data with a transfer syntax UID of "
+            r"'1.2.840.10008.1.2.4.80' \(JPEG-LS Lossless Image Compression\) "
+            r"as there are no suitable pixel data handlers available."
         )
         with pytest.raises(NotImplementedError, match=msg):
             self.jpeg_ls_lossless.pixel_array
@@ -100,9 +100,9 @@ class Test_JPEG_LS_Lossless_transfer_syntax():
     def test_read_emri_with_pillow(self):
         pydicom.config.image_handlers = [pillow_handler]
         msg = (
-            "Unable to decode pixel data with a transfer syntax UID of "
-            "'1.2.840.10008.1.2.4.80' \(JPEG-LS Lossless Image Compression\) "
-            "as there are no suitable pixel data handlers available."
+            r"Unable to decode pixel data with a transfer syntax UID of "
+            r"'1.2.840.10008.1.2.4.80' \(JPEG-LS Lossless Image Compression\) "
+            r"as there are no suitable pixel data handlers available."
         )
         with pytest.raises(NotImplementedError, match=msg):
             self.emri_jpeg_ls_lossless.pixel_array
@@ -150,9 +150,9 @@ class Test_JPEG_LS_Lossless_transfer_syntax():
     def test_read_mr_without_any_handler(self):
         pydicom.config.image_handlers = []
         msg = (
-            "Unable to decode pixel data with a transfer syntax UID of "
-            "'1.2.840.10008.1.2.4.80' \(JPEG-LS Lossless Image Compression\) "
-            "as there are no suitable pixel data handlers available."
+            r"Unable to decode pixel data with a transfer syntax UID of "
+            r"'1.2.840.10008.1.2.4.80' \(JPEG-LS Lossless Image Compression\) "
+            r"as there are no suitable pixel data handlers available."
         )
         with pytest.raises(NotImplementedError, match=msg):
             self.jpeg_ls_lossless.pixel_array
@@ -160,9 +160,9 @@ class Test_JPEG_LS_Lossless_transfer_syntax():
     def test_read_emri_without_any_handler(self):
         pydicom.config.image_handlers = []
         msg = (
-            "Unable to decode pixel data with a transfer syntax UID of "
-            "'1.2.840.10008.1.2.4.80' \(JPEG-LS Lossless Image Compression\) "
-            "as there are no suitable pixel data handlers available."
+            r"Unable to decode pixel data with a transfer syntax UID of "
+            r"'1.2.840.10008.1.2.4.80' \(JPEG-LS Lossless Image Compression\) "
+            r"as there are no suitable pixel data handlers available."
         )
         with pytest.raises(NotImplementedError, match=msg):
             self.emri_jpeg_ls_lossless.pixel_array

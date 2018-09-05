@@ -66,9 +66,9 @@ class Test_RLE_transfer_syntax():
     def test_read_mr_with_numpy(self):
         pydicom.config.image_handlers = [numpy_handler]
         msg = (
-            "Unable to decode pixel data with a transfer syntax UID of "
-            "'1.2.840.10008.1.2.5' \(RLE Lossless\) as there are no suitable "
-            "pixel data handlers available."
+            r"Unable to decode pixel data with a transfer syntax UID of "
+            r"'1.2.840.10008.1.2.5' \(RLE Lossless\) as there are no suitable "
+            r"pixel data handlers available."
         )
         with pytest.raises(NotImplementedError, match=msg):
             self.compressed_mr.pixel_array
@@ -77,9 +77,9 @@ class Test_RLE_transfer_syntax():
     def test_read_emri_with_numpy(self):
         pydicom.config.image_handlers = [numpy_handler]
         msg = (
-            "Unable to decode pixel data with a transfer syntax UID of "
-            "'1.2.840.10008.1.2.5' \(RLE Lossless\) as there are no suitable "
-            "pixel data handlers available."
+            r"Unable to decode pixel data with a transfer syntax UID of "
+            r"'1.2.840.10008.1.2.5' \(RLE Lossless\) as there are no suitable "
+            r"pixel data handlers available."
         )
         with pytest.raises(NotImplementedError, match=msg):
             self.compressed_emri.pixel_array
@@ -88,9 +88,9 @@ class Test_RLE_transfer_syntax():
     def test_read_mr_with_pillow(self):
         pydicom.config.image_handlers = [pillow_handler]
         msg = (
-            "Unable to decode pixel data with a transfer syntax UID of "
-            "'1.2.840.10008.1.2.5' \(RLE Lossless\) as there are no suitable "
-            "pixel data handlers available."
+            r"Unable to decode pixel data with a transfer syntax UID of "
+            r"'1.2.840.10008.1.2.5' \(RLE Lossless\) as there are no suitable "
+            r"pixel data handlers available."
         )
         with pytest.raises(NotImplementedError, match=msg):
             self.compressed_mr.pixel_array
@@ -99,9 +99,9 @@ class Test_RLE_transfer_syntax():
     def test_read_emri_with_pillow(self):
         pydicom.config.image_handlers = [pillow_handler]
         msg = (
-            "Unable to decode pixel data with a transfer syntax UID of "
-            "'1.2.840.10008.1.2.5' \(RLE Lossless\) as there are no suitable "
-            "pixel data handlers available."
+            r"Unable to decode pixel data with a transfer syntax UID of "
+            r"'1.2.840.10008.1.2.5' \(RLE Lossless\) as there are no suitable "
+            r"pixel data handlers available."
         )
         with pytest.raises(NotImplementedError, match=msg):
             self.compressed_emri.pixel_array
@@ -130,9 +130,9 @@ class Test_RLE_transfer_syntax():
     def test_read_mr_with_jpeg_ls(self):
         pydicom.config.image_handlers = [jpeg_ls_handler]
         msg = (
-            "Unable to decode pixel data with a transfer syntax UID of "
-            "'1.2.840.10008.1.2.5' \(RLE Lossless\) as there are no suitable "
-            "pixel data handlers available."
+            r"Unable to decode pixel data with a transfer syntax UID of "
+            r"'1.2.840.10008.1.2.5' \(RLE Lossless\) as there are no suitable "
+            r"pixel data handlers available."
         )
         with pytest.raises(NotImplementedError, match=msg):
             self.compressed_mr.pixel_array
@@ -143,9 +143,9 @@ class Test_RLE_transfer_syntax():
     def test_read_emri_with_jpeg_ls(self):
         pydicom.config.image_handlers = [jpeg_ls_handler]
         msg = (
-            "Unable to decode pixel data with a transfer syntax UID of "
-            "'1.2.840.10008.1.2.5' \(RLE Lossless\) as there are no suitable "
-            "pixel data handlers available."
+            r"Unable to decode pixel data with a transfer syntax UID of "
+            r"'1.2.840.10008.1.2.5' \(RLE Lossless\) as there are no suitable "
+            r"pixel data handlers available."
         )
         with pytest.raises(NotImplementedError, match=msg):
             self.compressed_mr.pixel_array
@@ -153,9 +153,9 @@ class Test_RLE_transfer_syntax():
     def test_read_mr_without_any_handler(self):
         pydicom.config.image_handlers = []
         msg = (
-            "Unable to decode pixel data with a transfer syntax UID of "
-            "'1.2.840.10008.1.2.5' \(RLE Lossless\) as there are no suitable "
-            "pixel data handlers available."
+            r"Unable to decode pixel data with a transfer syntax UID of "
+            r"'1.2.840.10008.1.2.5' \(RLE Lossless\) as there are no suitable "
+            r"pixel data handlers available."
         )
         with pytest.raises(NotImplementedError, match=msg):
             self.compressed_mr.pixel_array
@@ -163,9 +163,9 @@ class Test_RLE_transfer_syntax():
     def test_read_emri_without_any_handler(self):
         pydicom.config.image_handlers = []
         msg = (
-            "Unable to decode pixel data with a transfer syntax UID of "
-            "'1.2.840.10008.1.2.5' \(RLE Lossless\) as there are no suitable "
-            "pixel data handlers available."
+            r"Unable to decode pixel data with a transfer syntax UID of "
+            r"'1.2.840.10008.1.2.5' \(RLE Lossless\) as there are no suitable "
+            r"pixel data handlers available."
         )
         with pytest.raises(NotImplementedError, match=msg):
             self.compressed_emri.pixel_array
