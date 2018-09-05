@@ -836,7 +836,7 @@ class TestNumpy_GetPixelData(object):
         ds = dcmread(EXPL_16_1_1F)
         ds.PixelRepresentation = 2
         with pytest.raises(NotImplementedError,
-                           match="value of '2' for '\(0028,0103"):
+                           match=r"value of '2' for '\(0028,0103"):
             get_pixeldata(ds)
 
     def test_unsupported_syntaxes_raises(self):
@@ -937,7 +937,7 @@ class TestNumpy_PackBits(object):
     def test_non_binary_input(self):
         """Test non-binary input raises exception."""
         with pytest.raises(ValueError,
-                           match="Only binary arrays \(containing ones or"):
+                           match=r"Only binary arrays \(containing ones or"):
             pack_bits(np.asarray([0, 0, 2, 0, 0, 0, 0, 0]))
 
     def test_non_array_input(self):

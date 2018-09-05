@@ -40,7 +40,7 @@ python_encoding = {
     'ISO 2022 IR 138': 'iso_ir_138',
     'ISO 2022 IR 144': 'iso_ir_144',
     'ISO 2022 IR 148': 'iso_ir_148',
-    'ISO 2022 IR 149': 'euc_kr',  # needs cleanup via clean_escseq()
+    'ISO 2022 IR 149': 'euc_kr',
     'ISO 2022 IR 159': 'iso-2022-jp',
     'ISO 2022 IR 166': 'iso_ir_166',
     'ISO 2022 IR 58': 'iso_ir_58',
@@ -51,18 +51,74 @@ python_encoding = {
     'GBK': 'GBK',  # from DICOM correction CP1234
 }
 
+# the escape character used to mark the start of escape sequences
+ESC = b'\x1b'
+
+# Map Python encodings to escape sequences as defined in PS3.3 in tables
+# C.12-3 (single-byte) and C.12-4 (multi-byte character sets).
+escape_codes = {
+    'iso8859': ESC + b'(B',  # used to switch to ASCII G0 code element
+    'latin_1': ESC + b'-A',
+    'shift_jis': ESC + b')I',
+    'iso2022_jp': ESC + b'$B',
+    'iso8859_2': ESC + b'-B',
+    'iso8859_3': ESC + b'-C',
+    'iso8859_4': ESC + b'-D',
+    'iso_ir_126': ESC + b'-F',
+    'iso_ir_127': ESC + b'-G',
+    'iso_ir_138': ESC + b'-H',
+    'iso_ir_144': ESC + b'-L',
+    'iso_ir_148': ESC + b'-M',
+    'iso_ir_166': ESC + b'-T',
+    'euc_kr': ESC + b'$)C',
+    'iso-2022-jp': ESC + b'$(D',
+    'iso_ir_58': ESC + b'$)A',
+}
+
 default_encoding = "iso8859"
 
 
-def clean_escseq(element, encodings):
-    """Remove escape sequences that Python does not remove from
-       Korean encoding ISO 2022 IR 149 due to the G1 code element.
+def decode_string(value, encodings):
+    """Convert a raw byte string into a unicode string using the given
+    list of encodings.
     """
-    if 'euc_kr' in encodings:
-        return element.replace("\x1b\x24\x29\x43", "").replace(
-            "\x1b\x28\x42", "")
+    if ESC not in value:
+        return value.decode(encodings[0])
+
+    # multi-byte character sets except Korean are handled by Python encodings
+    use_python_handling = value.startswith((escape_codes['iso2022_jp'],
+                                            escape_codes['iso-2022-jp'],
+                                            escape_codes['iso_ir_58']))
+
+    if use_python_handling:
+        parts = [value]
     else:
-        return element
+        # Each part of the value that starts with an escape sequence is
+        # decoded separately using the corresponding encoding.
+        # See PS3.5, 6.1.2.4 and 6.1.2.5 for the use of code extensions.
+        parts = [ESC + part for part in value.split(ESC) if part]
+        # the first part may not start with an escape sequence
+        if not value.startswith(ESC):
+            parts[0] = parts[0][1:]
+    result = u''
+
+    for part in parts:
+        if part.startswith(ESC):
+            for enc in list(encodings) + ['iso8859']:
+                if enc in escape_codes and part.startswith(escape_codes[enc]):
+                    if use_python_handling:
+                        val = part.decode(enc)
+                    else:
+                        val = part[len(escape_codes[enc]):].decode(enc)
+                    break
+            else:
+                # unknown escape code - use first encoding (probably incorrect)
+                val = part.decode(encodings[0])
+        else:
+            # if no escape code is given, the first encoding is used
+            val = part.decode(encodings[0])
+        result += val
+    return result
 
 
 # DICOM PS3.5-2008 6.1.1 (p 18) says:
@@ -114,11 +170,6 @@ def convert_encodings(encodings):
                 # otherwise, a LookupError will be raised in the using code
                 pass
 
-    if len(encodings) == 1:
-        encodings = [encodings[0]] * 3
-    elif len(encodings) == 2:
-        encodings.append(encodings[1])
-
     return encodings
 
 
@@ -162,8 +213,7 @@ def decode(data_element, dicom_character_set):
         if data_element.VM == 1:
             if isinstance(data_element.value, compat.text_type):
                 return
-            data_element.value = clean_escseq(
-                data_element.value.decode(encodings[0]), encodings)
+            data_element.value = decode_string(data_element.value, encodings)
         else:
 
             output = list()
@@ -172,7 +222,6 @@ def decode(data_element, dicom_character_set):
                 if isinstance(value, compat.text_type):
                     output.append(value)
                 else:
-                    output.append(
-                        clean_escseq(value.decode(encodings[0]), encodings))
+                    output.append(decode_string(value, encodings))
 
             data_element.value = output

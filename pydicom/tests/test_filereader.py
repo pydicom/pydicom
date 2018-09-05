@@ -300,8 +300,10 @@ class ReaderTests(unittest.TestCase):
             Tag(0x0010, 0x0010), 'PatientID', 'ImageType', 'ViewName'])
         ctspecific_tags = sorted(ctspecific.keys())
         expected = [
+            # SpecificCharacterSet is always added
             # ViewName does not exist in the data set
-            Tag(0x0008, 0x0008), Tag(0x0010, 0x0010), Tag(0x0010, 0x0020)
+            Tag(0x0008, 0x0005), Tag(0x0008, 0x0008),
+            Tag(0x0010, 0x0010), Tag(0x0010, 0x0020)
         ]
         self.assertEqual(expected, ctspecific_tags)
 
@@ -324,7 +326,8 @@ class ReaderTests(unittest.TestCase):
         tags = dcmread(emri_jpeg_2k_lossless, specific_tags=[
             unknown_len_tag])
         tags = sorted(tags.keys())
-        self.assertEqual([unknown_len_tag], tags)
+        # SpecificCharacterSet is always added
+        self.assertEqual([Tag(0x08, 0x05), unknown_len_tag], tags)
 
         tags = dcmread(emri_jpeg_2k_lossless, specific_tags=[
             'SpecificCharacterSet'])
@@ -885,9 +888,9 @@ class ReadTruncatedFileTests(unittest.TestCase):
         mr.decode()
         # Need to escape brackets
         msg = (
-            "The length of the pixel data in the dataset doesn't match the "
-            "expected amount \(8130 vs. 8192 bytes\). The dataset may be "
-            "corrupted or there may be an issue with the pixel data handler."
+            r"The length of the pixel data in the dataset doesn't match the "
+            r"expected amount \(8130 vs. 8192 bytes\). The dataset may be "
+            r"corrupted or there may be an issue with the pixel data handler."
         )
         with pytest.raises(ValueError, match=msg):
             mr.pixel_array

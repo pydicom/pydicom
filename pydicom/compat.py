@@ -15,11 +15,13 @@ in_PyPy = 'PyPy' in sys.version
 if in_py2:
     text_type = unicode
     string_types = (str, unicode)
+    char_types = (str, unicode)
     number_types = (int, long)
     int_type = long
 else:
     text_type = str
     string_types = (str, )
+    char_types = (str, bytes)
     number_types = (int, )
     int_type = int
 

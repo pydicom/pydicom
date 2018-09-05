@@ -25,7 +25,7 @@ extra_length_VRs = ('OB', 'OD', 'OF', 'OL', 'OW', 'SQ', 'UC', 'UN', 'UR', 'UT')
 # in (0008,0005) Specific Character Set
 # See PS-3.5 (2011), section 6.1.2 Graphic Characters
 # and PN, but it is handled separately.
-text_VRs = ('SH', 'LO', 'ST', 'LT', 'UC', 'UR', 'UT')
+text_VRs = ('SH', 'LO', 'ST', 'LT', 'UC', 'UT')
 
 match_string = b''.join([
     b'(?P<single_byte>', br'(?P<family_name>[^=\^]*)',
@@ -55,10 +55,10 @@ class DA(date):
             setattr(self, slot, value)
 
     def __reduce__(self):
-        return super(DA, self).__reduce__() + (self.__getstate__(), )
+        return super(DA, self).__reduce__() + (self.__getstate__(),)
 
     def __reduce_ex__(self, protocol):
-        return super(DA, self).__reduce__() + (self.__getstate__(), )
+        return super(DA, self).__reduce__() + (self.__getstate__(),)
 
     def __new__(cls, val):
         """Create an instance of DA object.
@@ -130,10 +130,10 @@ class DT(datetime):
             setattr(self, slot, value)
 
     def __reduce__(self):
-        return super(DT, self).__reduce__() + (self.__getstate__(), )
+        return super(DT, self).__reduce__() + (self.__getstate__(),)
 
     def __reduce_ex__(self, protocol):
-        return super(DT, self).__reduce__() + (self.__getstate__(), )
+        return super(DT, self).__reduce__() + (self.__getstate__(),)
 
     @staticmethod
     def _utc_offset(offset, name):
@@ -240,10 +240,10 @@ class TM(time):
             setattr(self, slot, value)
 
     def __reduce__(self):
-        return super(TM, self).__reduce__() + (self.__getstate__(), )
+        return super(TM, self).__reduce__() + (self.__getstate__(),)
 
     def __reduce_ex__(self, protocol):
-        return super(TM, self).__reduce__() + (self.__getstate__(), )
+        return super(TM, self).__reduce__() + (self.__getstate__(),)
 
     def __new__(cls, val):
         """Create an instance of TM object from a string.
@@ -484,7 +484,7 @@ class IS(int):
         if isinstance(val, (float, Decimal)) and newval != val:
             raise TypeError("Could not convert value to integer without loss")
         # Checks in case underlying int is >32 bits, DICOM does not allow this
-        check_newval = (newval < -2**31 or newval >= 2**31)
+        check_newval = (newval < -2 ** 31 or newval >= 2 ** 31)
         if check_newval and config.enforce_valid_values:
             dcm_limit = "-2**31 to (2**31 - 1) for IS"
             message = "Value exceeds DICOM limits of %s" % (dcm_limit)
@@ -527,15 +527,53 @@ def MultiString(val, valtype=str):
         return MultiValue(valtype, splitup)
 
 
+def _verify_encodings(encodings):
+    """Checks the encoding to ensure proper format"""
+    if encodings is not None and not isinstance(encodings, list):
+        return [encodings]
+
+    return encodings
+
+
+def _decode_personname(components, encodings):
+    """Return a list of decoded person name components."""
+    from pydicom.charset import decode_string
+
+    if isinstance(components[0], compat.text_type):
+        comps = components
+    else:
+        comps = [decode_string(comp, encodings)
+                 for comp in components]
+    # Remove empty elements from the end to avoid trailing '='
+    while len(comps) and not comps[-1]:
+        comps.pop()
+    return comps
+
+
+def _encode_personname(components, encodings):
+    if not compat.in_py2 and isinstance(components[0], bytes):
+        comps = components
+    else:
+        comps = [
+            C.encode(enc) for C, enc in zip(components, encodings)
+        ]
+
+    # Remove empty elements from the end
+    while len(comps) and not comps[-1]:
+        comps.pop()
+
+    return b'='.join(comps)
+
+
 class PersonName3(object):
-    def __init__(self, val, encodings=default_encoding):
+    def __init__(self, val, encodings=None):
         if isinstance(val, PersonName3):
             encodings = val.encodings
             val = val.original_string
 
         self.original_string = val
 
-        self.encodings = self._verify_encodings(encodings)
+        self.encodings = _verify_encodings(encodings) or [default_encoding]
         self.parse(val)
 
     def parse(self, val):
@@ -571,37 +609,13 @@ class PersonName3(object):
     __hash__ = object.__hash__
 
     def decode(self, encodings=None):
-        encodings = self._verify_encodings(encodings)
-
-        from pydicom.charset import clean_escseq
-        if not isinstance(self.components[0], bytes):
-            comps = self.components
-        else:
-            comps = [
-                clean_escseq(comp.decode(enc), encodings)
-                for comp, enc in zip(self.components, encodings)
-            ]
-
-        while len(comps) and not comps[-1]:
-            comps.pop()
-
-        return PersonName3('='.join(comps), encodings)
+        encodings = _verify_encodings(encodings) or self.encodings
+        comps = _decode_personname(self.components, encodings)
+        return PersonName3(u'='.join(comps), encodings)
 
     def encode(self, encodings=None):
-        encodings = self._verify_encodings(encodings)
-
-        if isinstance(self.components[0], bytes):
-            comps = self.components
-        else:
-            comps = [
-                C.encode(enc) for C, enc in zip(self.components, encodings)
-            ]
-
-        # Remove empty elements from the end
-        while len(comps) and not comps[-1]:
-            comps.pop()
-
-        return b'='.join(comps)
+        encodings = _verify_encodings(encodings) or self.encodings
+        return _encode_personname(self.components, encodings)
 
     def family_comma_given(self):
         return self.formatted('%(family_name)s, %(given_name)s')
@@ -611,18 +625,6 @@ class PersonName3(object):
             return format_str % self.decode(default_encoding).__dict__
         else:
             return format_str % self.__dict__
-
-    def _verify_encodings(self, encodings):
-        if encodings is None:
-            return self.encodings
-
-        if not isinstance(encodings, list):
-            encodings = [encodings] * 3
-
-        if len(encodings) == 2:
-            encodings.append(encodings[1])
-
-        return encodings
 
 
 class PersonNameBase(object):
@@ -723,26 +725,14 @@ class PersonNameUnicode(PersonNameBase, compat.text_type):
                  from pydicom.charset.python_encodings mapping
                  of values in DICOM data element (0008,0005).
         """
-        # in here to avoid circular import
-        from pydicom.charset import clean_escseq
-
-        # Make the possible three character encodings explicit:
-        if not isinstance(encodings, list):
-            encodings = [encodings] * 3
-        if len(encodings) == 2:
-            encodings.append(encodings[1])
-        components = val.split(b"=")
-
-        comps = [
-            clean_escseq(C.decode(enc), encodings)
-            for C, enc in zip(components, encodings)
-        ]
+        encodings = _verify_encodings(encodings)
+        comps = _decode_personname(val.split(b"="), encodings)
         new_val = u"=".join(comps)
 
         return compat.text_type.__new__(cls, new_val)
 
     def __init__(self, val, encodings):
-        self.encodings = self._verify_encodings(encodings)
+        self.encodings = _verify_encodings(encodings)
         PersonNameBase.__init__(self, val)
 
     def __copy__(self):
@@ -767,32 +757,10 @@ class PersonNameUnicode(PersonNameBase, compat.text_type):
             setattr(new_person, k, deepcopy(v, memo))
         return new_person
 
-    def _verify_encodings(self, encodings):
-        """Checks the encoding to ensure proper format"""
-        if encodings is None:
-            return self.encodings
-
-        if not isinstance(encodings, list):
-            encodings = [encodings] * 3
-
-        if len(encodings) == 2:
-            encodings.append(encodings[1])
-
-        return encodings
-
     def encode(self, encodings):
         """Encode the unicode using the specified encoding"""
-        encodings = self._verify_encodings(encodings)
-
-        components = self.split('=')
-
-        comps = [C.encode(enc) for C, enc in zip(components, encodings)]
-
-        # Remove empty elements from the end
-        while len(comps) and not comps[-1]:
-            comps.pop()
-
-        return '='.join(comps)
+        encodings = _verify_encodings(encodings) or self.encodings
+        return _encode_personname(self.split('='), encodings)
 
     def family_comma_given(self):
         """Return name as 'Family-name, Given-name'"""

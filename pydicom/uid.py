@@ -240,14 +240,22 @@ ExplicitVRLittleEndian = UID('1.2.840.10008.1.2.1')
 ImplicitVRLittleEndian = UID('1.2.840.10008.1.2')
 DeflatedExplicitVRLittleEndian = UID('1.2.840.10008.1.2.1.99')
 ExplicitVRBigEndian = UID('1.2.840.10008.1.2.2')
-JPEGBaseLineLossy8bit = UID('1.2.840.10008.1.2.4.50')
-JPEGBaseLineLossy12bit = UID('1.2.840.10008.1.2.4.51')
+JPEGBaseline = UID('1.2.840.10008.1.2.4.50')
+JPEGExtended = UID('1.2.840.10008.1.2.4.51')
+JPEGLosslessP14 = UID('1.2.840.10008.1.2.4.57')
 JPEGLossless = UID('1.2.840.10008.1.2.4.70')
 JPEGLSLossless = UID('1.2.840.10008.1.2.4.80')
 JPEGLSLossy = UID('1.2.840.10008.1.2.4.81')
 JPEG2000Lossless = UID('1.2.840.10008.1.2.4.90')
-JPEG2000Lossy = UID('1.2.840.10008.1.2.4.91')
+JPEG2000 = UID('1.2.840.10008.1.2.4.91')
+JPEG2000MultiComponentLossless = UID('1.2.840.10008.1.2.4.92')
+JPEG2000MultiComponent = UID('1.2.840.10008.1.2.4.93')
 RLELossless = UID('1.2.840.10008.1.2.5')
+
+# Deprecated, to be removed in v1.3
+JPEGBaseLineLossy8bit = JPEGBaseline
+JPEGBaseLineLossy12bit = JPEGExtended
+JPEG2000Lossy = JPEG2000
 
 UncompressedPixelTransferSyntaxes = [
     ExplicitVRLittleEndian,
@@ -262,21 +270,21 @@ JPEGLSSupportedCompressedPixelTransferSyntaxes = [
 ]
 
 PILSupportedCompressedPixelTransferSyntaxes = [
-    JPEGBaseLineLossy8bit,
+    JPEGBaseline,
     JPEGLossless,
-    JPEGBaseLineLossy12bit,
+    JPEGExtended,
     JPEG2000Lossless,
-    JPEG2000Lossy,
+    JPEG2000,
 ]
 
 JPEG2000CompressedPixelTransferSyntaxes = [
     JPEG2000Lossless,
-    JPEG2000Lossy,
+    JPEG2000,
 ]
 
 JPEGLossyCompressedPixelTransferSyntaxes = [
-    JPEGBaseLineLossy8bit,
-    JPEGBaseLineLossy12bit,
+    JPEGBaseline,
+    JPEGExtended,
 ]
 
 

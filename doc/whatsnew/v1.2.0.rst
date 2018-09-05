@@ -4,6 +4,18 @@ Version 1.2.0
 Changelog
 ---------
 
+Changes
+.......
+
+* PIL removed as a fallback if Pillow is not available in the pillow pixel data
+  handler (:issue:`722`)
+* ``uid.JPEGBaseLineLossy8bit`` deprecated and will be removed in v1.3. Use
+  ``uid.JPEGBaseline`` instead. (:issue:`726`)
+* ``uid.JPEGBaseLineLossy12bit`` deprecated and will be removed in v1.3. Use
+  ``uid.JPEGExtended`` instead. (:issue:`726`)
+* ``uid.JPEG2000Lossy`` deprecated and will be removed in v1.3. Use
+  ``uid.JPEG2000`` instead. (:issue:`726`)
+
 
 Enhancements
 ............
@@ -13,8 +25,13 @@ Enhancements
 * ``DeferredDataElement`` class deprecated and will be removed in v1.3
   (:issue:`291`)
 * Functions for encapsulating frames added to encaps module (:pull_request:`696`)
-
 * Added ``Dataset.fix_meta_info()`` (:issue:`584`)
+* Add new function for bit packing ``pack_bits`` for use with BitsAllocated
+  = 1 (:pull_request:`715`)
+* Added handling of single-byte character set extensions (:pull_request:`718`)
+* Added ``uid.JPEGLosslessP14`` for UID 1.2.840.10008.1.2.4.57
+* Added ``uid.JPEG2000MultiComponentLossless`` for UID 1.2.840.10008.1.2.4.92
+* Added ``uid.JPEG2000MultiComponent`` for UID 1.2.840.10008.1.2.4.93
 
 
 Fixes
@@ -24,3 +41,6 @@ Fixes
   (:pull_request:`660`)
 * Improve performance for Python 3 when dealing with compressed multi-frame
   Pixel Data with pillow and jpeg-ls (:issue:`682`).
+* Improve performance of bit unpacking for non-PyPy2 interpreters
+  (:pull_request:`715`)
+* First character set no longer removed (:issue:`707`)

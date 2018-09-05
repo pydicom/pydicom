@@ -86,6 +86,7 @@ rtdose.dcm       Implicit VR, Little Endian
   * Explicit VR big endian version created using DCMTK's dcmconv and the
     pixel data corrected using script for PR #714
   * Single frame version created using a script for PR #714
+  * RLE encoded versions created using GDCM's gdcmconv for PR #708
 
 chr*.dcm
   * Character set files for testing (0008,0005) Specific Character Set
@@ -108,6 +109,7 @@ OBXXXX1A.dcm
   * Explicit VR big endian version created using DCMTK's dcmconv and the
     pixel data corrected using script for PR #714
   * 2 frame version created using a script for PR #714
+  * RLE encoded versions created using GDCM's gdcmconv for PR #708
 
 OT-PAL-8-face.dcm
   * a file with a Photometric Interpretation of PALETTE COLOR
@@ -118,7 +120,8 @@ SC_rgb.dcm
   * 16 and 32 bit versions created using a script for PR #714
   * Explicit VR big endian version created using DCMTK's dcmconv and the
     pixel data corrected using script for PR #714
-  * 2 frame versions created using a script for pR #714
+  * 2 frame versions created using a script for PR #714
+  * RLE encoded versions created using GDCM's gdcmconv for PR #708
 
 zipMR.gz
   * a gzipped version of MR_small.dcm
