@@ -155,7 +155,7 @@ def _parse_rle_header(header):
     **RLE Header Format**
 
     The RLE Header contains the number of segments for the image and the
-    starting offset of each segment. Each of these number is represented as
+    starting offset of each segment. Each of these numbers is represented as
     an unsigned long stored in little-endian. The RLE Header is 16 long words
     in length (i.e. 64 bytes) which allows it to describe a compressed image
     with up to 15 segments. All unused segment offsets shall be set to zero.
