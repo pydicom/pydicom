@@ -910,7 +910,8 @@ class Dataset(dict):
                 yield element_format % elem_dict
 
     def _pretty_str(self, indent=0, top_level_only=False):
-        """Return a string of the DataElements in the Dataset, with indented levels.
+        """Return a string of the DataElements in the Dataset, with indented
+        levels.
 
         This private method is called by the __str__() method for handling
         print statements or str(dataset), and the __repr__() method.
