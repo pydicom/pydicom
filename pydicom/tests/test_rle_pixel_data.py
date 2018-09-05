@@ -372,6 +372,12 @@ class TestNumpy_RLEHandler(object):
         ref = _get_pixel_array(SC_EXPL_LITTLE_1F)
         arr = ds.pixel_array
 
+        #import matplotlib.pyplot as plt
+        #plt.imshow(ref)
+        #plt.show()
+
+        #print('Ref', ref[0].shape, ref[0])
+        #print(arr.shape, arr[0])
         assert np.array_equal(arr, ref)
 
         assert (255, 0, 0) == tuple(arr[5, 50, :])
@@ -394,6 +400,10 @@ class TestNumpy_RLEHandler(object):
         assert ds.NumberOfFrames == 2
         ref = _get_pixel_array(SC_EXPL_LITTLE_2F)
         arr = ds.pixel_array
+
+        #print('Ref', ref[0].shape, ref[0])
+        #print(arr.shape, arr[0])
+        assert np.array_equal(arr, ref)
 
         assert np.array_equal(ds.pixel_array, ref)
 
@@ -420,6 +430,7 @@ class TestNumpy_RLEHandler(object):
         assert ds.BitsAllocated == 16
         assert ds.SamplesPerPixel == 1
         assert 'NumberOfFrames' not in ds
+        assert ds.PixelRepresentation == 1
         ref = _get_pixel_array(MR_EXPL_LITTLE_1F)
         arr = ds.pixel_array
 
@@ -736,7 +747,7 @@ class TestNumpy_RLEDecodeFrame(object):
                               rows=1,
                               columns=1,
                               nr_samples=samples,
-                              bits_alloc=bits)
+                              nr_bits=bits)
 
     def test_invalid_frame_data_raises(self):
         """Test that invalid segment data raises exception."""
@@ -744,20 +755,72 @@ class TestNumpy_RLEDecodeFrame(object):
         pixel_data = defragment_data(ds.PixelData)
         # Missing byte
         # This should probably be ValueError
-        with pytest.raises(AttributeError, match='Different number of bytes'):
-            _rle_decode_frame(pixel_data[:-1],
-                              ds.Rows,
-                              ds.Columns,
-                              ds.SamplesPerPixel,
-                              ds.BitsAllocated)
+        with pytest.raises(AttributeError,
+                           match='amount \(4095 vs 4096 bytes\)'):
+            segment_generator = _rle_decode_frame(pixel_data[:-1],
+                                                  ds.Rows,
+                                                  ds.Columns,
+                                                  ds.SamplesPerPixel,
+                                                  ds.BitsAllocated)
+            for segment in segment_generator:
+                pass
 
         # Extra byte
-        with pytest.raises(AttributeError, match='Different number of bytes'):
-            _rle_decode_frame(pixel_data + b'\x00\x01',
-                              ds.Rows,
-                              ds.Columns,
-                              ds.SamplesPerPixel,
-                              ds.BitsAllocated)
+        with pytest.raises(AttributeError,
+                           match='amount \(4097 vs 4096 bytes\)'):
+            segment_generator = _rle_decode_frame(pixel_data + b'\x00\x01',
+                                                  ds.Rows,
+                                                  ds.Columns,
+                                                  ds.SamplesPerPixel,
+                                                  ds.BitsAllocated)
+            for segment in segment_generator:
+                pass
+
+    def test_8bit_1sample_1f(self):
+        """Test a simple 8-bit, 1 sample/pixel, 1 frame array."""
+        header = b'\x01\x00\x00\x00' + b'\x40\x00\x00\x00' + b'\x00' * 56
+        # 2 x 3 data
+        # 0, 64, 128, 160, 192, 255
+        data = b'\x06\x00\x40\x80\xA0\xC0\xFF'
+        arr = _rle_decode_frame(header + data, 2, 3, 1, 8)
+
+    def test_16bit_1sample_1f(self):
+        """Test a simple 16-bit, 1 sample/pixel, 1 frame array."""
+        header = (
+            b'\x02\x00\x00\x00'
+            b'\x40\x00\x00\x00'
+            b'\x47\x00\x00\x00'
+        )
+        header = header + (64 - len(header)) * b'\x00'
+        # 2 x 3 data
+        data = (
+            # 0, 1, 256, 255, 65280, 65535
+            b'\x06\x00\x00\x01\x00\xFF\xFF' # MSB
+            b'\x06\x00\x01\x00\xFF\x00\xFF' # LSB
+        )
+        arr = _rle_decode_frame(header + data, 2, 3, 1, 16)
+
+    def test_32bit_1sample_1f(self):
+        """Test a simple 32-bit, 1 sample/pixel, 1 frame array."""
+        header = (
+            b'\x04\x00\x00\x00'  # 4 segments
+            b'\x40\x00\x00\x00'  # 64 offset
+            b'\x47\x00\x00\x00'  # 71 offset
+            b'\x4E\x00\x00\x00'  # 78 offset
+            b'\x55\x00\x00\x00'  # 85 offset
+        )
+        header = header + (64 - len(header)) * b'\x00'
+        # 2 x 3 data
+        data = (
+            # 0, 16777216, 65536, 256, 4294967295
+            b'\x05\x00\x01\x00\x00\x00\xFF' # MSB
+            b'\x05\x00\x00\x01\x00\x00\xFF'
+            b'\x05\x00\x00\x00\x01\x00\xFF'
+            b'\x05\x00\x00\x00\x00\x01\xFF' # LSB
+        )
+        arr = _rle_decode_frame(header + data, 2, 3, 1, 32)
+        #assert [0, 16777216, 65536, 256, 1, 4294967295] == arr.tolist()
+
 
 
 @pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')

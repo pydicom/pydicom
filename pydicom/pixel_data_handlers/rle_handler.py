@@ -68,7 +68,7 @@ def should_change_PhotometricInterpretation_to_RGB(ds):
     return False
 
 
-def get_pixeldata(ds):
+def get_pixeldata(ds, rle_segment_order='>'):
     """Return an ndarray of the Pixel Data.
 
     Parameters
@@ -76,6 +76,13 @@ def get_pixeldata(ds):
     ds : dataset.Dataset
         The DICOM dataset containing an Image Pixel module and the Pixel Data
         to be converted.
+    rle_segment_order : str
+        The order of segments used by the RLE encoder when dealing with Bits
+        Allocated > 8. Each segment contains 8-bits of the pixel data, which
+        are supposed to be ordered from MSB to LSB. A value of '>' means
+        interpret the segments as being in big endian order (default) while a
+        value of '<' means interpret the segments as being in little endian
+        order.
 
     Returns
     -------
@@ -110,222 +117,59 @@ def get_pixeldata(ds):
             "elements are missing from the dataset: " + ", ".join(missing)
         )
 
-    # Use a byte array to store the decompressed pixel data
-    pixel_data = bytearray()
+    nr_bits = ds.BitsAllocated
+    nr_samples = ds.SamplesPerPixel
+    nr_frames = getattr(ds, 'NumberOfFrames', 1)
+    rows = ds.Rows
+    cols = ds.Columns
 
     # Decompress each frame of the pixel data
-    if getattr(ds, 'NumberOfFrames', 1) > 1:
+    pixel_data = bytearray()
+    if nr_frames > 1:
         for rle_frame in decode_data_sequence(ds.PixelData):
-            frame = _rle_decode_frame(rle_frame,
-                                      rows=ds.Rows,
-                                      columns=ds.Columns,
-                                      nr_samples=ds.SamplesPerPixel,
-                                      bits_alloc=ds.BitsAllocated)
+            frame = _rle_decode_frame(rle_frame, rows, cols, nr_samples,
+                                      nr_bits)
             pixel_data.extend(frame)
     else:
         frame = _rle_decode_frame(defragment_data(ds.PixelData),
-                                  rows=ds.Rows,
-                                  columns=ds.Columns,
-                                  nr_samples=ds.SamplesPerPixel,
-                                  bits_alloc=ds.BitsAllocated)
+                                  rows, cols, nr_samples, nr_bits)
 
         pixel_data.extend(frame)
 
-    # As pixel_data is mutable the numpy ndarray will be writable
-    arr = np.frombuffer(pixel_data, dtype=pixel_dtype(ds))
+    print(pixel_data[:16])
+
+    # At this point `pixel_data` is ordered as (for 16-bit, 3 sample, 2 frame):
+    #    Frame 1           | Frame 2
+    #    R1 R2 G1 G2 B1 B2 R1 R2 G1 G2 B1 B2
+    # Where each of R1, R2, G1, G2, B1, B2 represents a segment and each
+    # segment is half of a 2 byte pixel split into 2 8-bit uints as shown below
+    #
+    #   Segment 1 (R1)       | Segment 2 (R2)     | Segment 3 (G1) ...
+    #   Px 1  Px 2  ... Px N | Px 1 Px 2 ... Px N | Px 1 Px 2 ...
+    #   MSB   MSB   ... MSB  | LSB  LSB  ... LSB  | MSB  MSB  ...
+    # For each 2-byte pixel, R1 is the MSB half and R2 the LSB half
+    # We interpret the data as uint8 because its not yet in the right order
+
+    # The segment order should be big endian by default but make it possible
+    #   to switch if the RLE is non-conformant
+    dtype = pixel_dtype(ds).newbyteorder(rle_segment_order)
+    arr = np.frombuffer(pixel_data, dtype)
+
+    # Reshape so the array is ordered as
+    #   Segment 1:  [[R MSB values -> ],
+    #   Segment 2:   [R LSB values -> ], etc
+    #nr_segments = nr_frames * nr_bits // 8 * nr_samples
+
+    #arr = arr.reshape((-1, nr_segments), order='F')
+
+    #dtype =
+    # Apply new view on the array with the correct final dtype
+    #arr = arr.view(dtype)
 
     if should_change_PhotometricInterpretation_to_RGB(ds):
         ds.PhotometricInterpretation = "RGB"
 
     return arr
-
-
-def _dev_rle_decode_frame(frame, rows, cols, nr_samples, bits_alloc):
-    """Return the decoded bytes from a single RLE encoded `frame`.
-
-    An RLE compressed frame is stored as a Header, then RLE Segment 1, RLE
-    Segment 2, ..., RLE Segment N.
-
-    As an example, the table below describes the overall structure of an RLE
-    encoded frame with 3 Segments.
-
-    +--------------+--------+----------------+
-    | Byte offset  | Length | Description    |
-    +==============+========+================+
-    | 0            | 64     | RLE Header     |
-    +--------------+--------+----------------+
-    | 64           | N      | Segment 1 data |
-    +--------------+--------+----------------+
-    | 64 + N       | M      | Segment 2 data |
-    +--------------+--------+----------------+
-    | 64 + N + M   | P      | Segment 3 data |
-    +--------------+--------+----------------+
-
-    **Segmentation of pixel data**
-
-    BitsAllocated 8, SamplesPerPixel 1
-    +---------+------------------+
-    | Segment | 0                |
-    +---------+------------------+
-    | bit     | 0 to 7           |
-    +---------+------------------+
-    | Channel | Greyscale        |
-    +---------+------------------+
-
-    BitsAllocated 16, SamplesPerPixel 1
-    +---------+--------+---------+
-    | Segment | 0      | 1       |
-    +---------+--------+---------+
-    | bit     | 0 to 7 | 8 to 15 |
-    +---------+------------------+
-    | Channel | Greyscale        |
-    +---------+------------------+
-
-    BitsAllocated 8, SamplesPerPixel 3
-    +---------+---------+--------+--------+
-    | Segment | 0       | 1      | 2      |
-    +---------+---------+--------+--------+
-    | n-bit   | 0 to 8  | 0 to 8 | 0 to 8 |
-    +---------+---------+--------+--------+
-    | Channel | Red     | Green  | Blue   |
-    +---------+---------+--------+--------+
-
-    BitsAllocated 16, SamplesPerPixel 3
-    +---------+-----+------+-------+-------+-------+-------+
-    | Segment | 0   | 1    | 2     | 3     | 4     | 5     |
-    +---------+-----+------+-------+-------+-------+-------+
-    | k-bit   | 0-7 | 8-15 | 16-23 | 24-31 | 32-39 | 40-47 |
-    +---------+-----+------+-------+-------+-------+-------+
-    | Channel | Red        | Green         | Blue          |
-    +---------+------------+---------------+---------------+
-
-    Parameters
-    ----------
-    frame : bytes
-        The RLE encoded frame data.
-    rows : int
-        The number of output rows.
-    cols : int
-        The number of output columns.
-    nr_samples : int
-        Number of samples per pixel (e.g. 3 for RGB data).
-    bits_alloc : int
-        Number of bits per sample - must be a multiple of 8.
-
-    Returns
-    -------
-    bytearray
-        The decoded data.
-
-    References
-    ----------
-    DICOM Standard, Part 5, Annex G
-    DICOM Standard, Part 3, C.7.6.3.1.1
-    """
-    # XXX: FIXME
-    if bits_alloc > 0 and bits_alloc % 8:
-        raise NotImplementedError(
-            "Don't know how to handle BitsAllocated not being a multiple of bytes"
-        )
-
-    # If BitsAllocated is 16 then bytes_allocated is 2; 2 bytes per pixel
-    bytes_allocated = bits_alloc // 8
-
-    # Parse the RLE Header
-    offsets = _parse_rle_header(frame[:64])
-
-    # Check that the actual number of segments is as expected
-    if len(offsets) != nr_samples * bytes_allocated:
-        raise ValueError(
-            "The number of RLE segments in the pixel data doesn't match the "
-            "expected amount ({0} vs. {1} segments). The dataset may be "
-            "corrupted or there may be an issue with the pixel data handler."
-            .format(nr_samples * bytes_allocated, len(offsets))
-        )
-
-    # Add the total length of the frame to ensure the last segment gets decoded
-    offsets.append(len(frame))
-
-    # Parse and decode the RLE segments
-
-    # Preallocate so can index later
-    #frame_bytes = bytearray(rows * cols * nr_samples * bytes_allocated)
-
-    frame_bytes = bytearray()
-    for ii, offset in enumerate(offsets[:-1]):
-        #segment_data = frame[offset:offsets[ii + 1]]
-        #print(len(segment_data))
-        frame_bytes.extend(_rle_decode_segment(frame[offset:offsets[ii + 1]]))
-
-    #print(len(frame_bytes))
-    return frame_bytes
-
-
-
-    # Annex G.2
-    # A Byte Segment is a series of bytes generated by decomposing the
-    #   Composite Pixel Code (PS3.3 C.7.6.3.1.1).
-    # If the Composite Pixel Code is not an integral number of bytes in size
-    #   sufficient Most Significant zero bits are added to make it so. This
-    #   is known as the Padded Composite Pixel Code (PC2).
-    # The first Segment is generated by stripping off the most significant byte
-    #   of each PC2 and ordering these bytes
-    #   sequentially. The second Segment is generated by repeating this process
-    #   on the stripped PC2 continuing until the last
-    #   Pixel Segment is generated by ordering the least significant byte of
-    #   each PC2 sequentially.
-    #
-    # If PhotometricInterpretation is RGB and BitsStored is 8 then three
-    #   Segments are generated, the first holds all the Red values, the second
-    #   all the Green values and the third all the Blue values.
-
-    # Little endian
-    # LSB 0D 0C 0B 0A MSB
-    # Big endian
-    # MSB 0A 0B 0C 0D LSB
-
-    # Composite Pixel Code
-    #   If SamplesPerPixel == 1, CPC is just the 'n' bit pixel sample, where
-    #   'n' = BitsAllocated. If SamplesPerPixel > 1, CPC is a 'k' bit
-    #   concatenation of samples, where 'k' = BitsAllocated * SamplesPerPixel
-    #   and with the sample representing the vector colour designated first in
-    #   the PhotometricInterpretation name comprising the most significant bits
-    #   of the CPC.
-    # For example, with RGB, the most significant BitsAllocated bits contain
-    #   the Red sample, the next BitsAllocated bits contain the Green and the
-    #   least significant BitsAllocated bits contain the Blue sample.
-
-    '''
-    for segment_nr in range(len(offsets)):
-        # sample_number, 0, ...
-        for byte_number in range(bytes_allocated):
-            # byte_number, 0, 1, ...
-            #
-            # plane_number 0, 1; 2, 3; 4, 5;
-            # plane_number 0, 1; 0, 1; 0, 5;
-            plane_number = byte_number + (segment_nr * bytes_allocated)
-            # 1, 0; 3, 2; 5, 4; little endian?
-            # 1, 0;
-            output_nr = (segment_nr + 1) * bytes_allocated - byte_number - 1
-
-            # Decode the segment
-            print(plane_number)
-            plane_bytes = _rle_decode_segment(
-                frame[offset[plane_number]:offset[plane_number + 1]]
-            )
-
-            # Check the length is correct
-            # TODO: Update exception message
-            if len(plane_bytes) != rows * cols:
-                raise ValueError(
-                    "Different number of bytes unpacked from RLE than expected"
-                )
-
-            # Write the plane data back to frame_bytes
-            frame_bytes[output_nr::nr_samples * bytes_allocated] = plane_bytes
-
-    return frame_bytes
-    '''
 
 
 def _parse_rle_header(header):
@@ -340,7 +184,7 @@ def _parse_rle_header(header):
     with up to 15 segments. All unused segment offsets shall be set to zero.
 
     As an example, the table below describes an RLE Header with 3 segments as
-    would typically be used with RGB or YCbCr data (with 1 Segment per
+    would typically be used with 8-bit RGB or YCbCr data (with 1 segment per
     channel).
 
     +--------------+---------------------------------+------------+
@@ -388,7 +232,8 @@ def _parse_rle_header(header):
     nr_segments = unpack('<L', header[:4])[0]
     if nr_segments > 15:
         raise ValueError(
-            "The RLE header specifies an invalid number of segments"
+            "The RLE header specifies an invalid number of segments ({})"
+            .format(nr_segments)
         )
 
     offsets = unpack('<{}L'.format(nr_segments),
@@ -397,13 +242,10 @@ def _parse_rle_header(header):
     return list(offsets)
 
 
-def _rle_decode_frame(data, rows, columns, nr_samples, bits_alloc):
+def _rle_decode_frame(data, rows, columns, nr_samples, nr_bits):
     """Decodes a single frame of RLE encoded data.
 
-    Reads the plane information at the beginning of the data.
-    If more than pixel size > 1 byte appropriately interleaves the data from
-    the high and low planes. Data is always stored big endian. Output always
-    little endian
+    Each frame may contain up to 15 segments of encoded data.
 
     Parameters
     ----------
@@ -415,70 +257,81 @@ def _rle_decode_frame(data, rows, columns, nr_samples, bits_alloc):
         The number of output columns
     nr_samples : int
         Number of samples per pixel (e.g. 3 for RGB data).
-    bits_alloc : int
+    nr_bits : int
         Number of bits per sample - must be a multiple of 8
 
     Returns
     -------
     bytearray
-        The decompressed data
+        The frame's decompressed and concatenated segment data.
     """
     # XXX: FIXME
-    if bits_alloc > 0 and bits_alloc % 8:
+    if nr_bits % 8:
         raise NotImplementedError(
             "Don't know how to handle BitsAllocated not being a multiple of bytes"
         )
 
-    # If BitsAllocated is 16 then bytes_allocated is 2; 2 bytes per pixel
-    bytes_allocated = bits_alloc // 8
-
     # Parse the RLE Header
     offsets = _parse_rle_header(data[:64])
+    nr_segments = len(offsets)
 
     # Check that the actual number of segments is as expected
-    if len(offsets) != nr_samples * bytes_allocated:
+    bytes_per_sample = nr_bits // 8
+    if nr_segments != nr_samples * bytes_per_sample:
         raise ValueError(
             "The number of RLE segments in the pixel data doesn't match the "
-            "expected amount ({0} vs. {1} segments)"
-            .format(len(offsets), nr_samples * bytes_allocated)
+            "expected amount ({} vs. {} segments)"
+            .format(nr_segments, nr_samples * bytes_per_sample)
         )
 
-    # Add the total length of the frame to ensure the last segment gets decoded
+    # Ensure the last segment gets decoded
     offsets.append(len(data))
 
-    frame_bytes = bytearray(rows * columns * nr_samples * bytes_allocated)  # noqa
-
-    for sample_number in range(nr_samples):
-        for byte_number in range(bytes_allocated):
-
-            plane_number = byte_number + (sample_number * bytes_allocated)
-            out_plane_number = ((sample_number + 1) * bytes_allocated) - byte_number - 1  # noqa
-
-            plane_bytes = _rle_decode_segment(
-                data[offsets[plane_number]:offsets[plane_number + 1]]
+    # Decode
+    decoded = bytearray(rows * columns * nr_samples * bytes_per_sample)
+    # Interleave the segments to make things faster later
+    # For 16 bit, 3 sample data we want
+    #    Red                         | Green                       | Blue
+    #    Pxl 1   Pxl 2   ... Pxl N   | Pxl 1   Pxl 2   ... Pxl N   | ...
+    #    MSB LSB MSB LSB ... MSB LSB | MSB LSB MSB LSB ... MSB LSB | ...
+    #for ii in range(nr_segments):
+    for sample_number in range(bytes_per_sample):
+        #for byte_number in range(bytes_per_sample):
+        #for sample_number in range(nr_samples):
+            #for ii, seg_offset in enumerate(offsets[:-1]):
+            #jj = byte_number + (sample_number * bytes_per_sample)
+            #ii = jj * (rows * columns)
+            #ii = (sample_number + 1) * bytes_per_sample - byte_number - 1
+            #print(jj)
+        segment = _rle_decode_segment(data[offsets[ii]:offsets[ii + 1]])
+        # Check that the number of decoded pixels is correct
+        if len(segment) != rows * columns:
+            raise AttributeError(
+                "The amount of decoded RLE segment data doesn't match the "
+                "expected amount ({} vs {} bytes)"
+                .format(len(segment), rows * columns)
             )
 
-            if len(plane_bytes) != rows * columns:
-                raise AttributeError("Different number of bytes unpacked "
-                                     "from RLE than expected")
+        stride = nr_samples * bytes_per_sample
+        # Should be RRGGBB
+        #print('Seg', segment[:5])
+        decoded[ii::stride] = segment
 
-            frame_bytes[out_plane_number::nr_samples * bytes_allocated] = plane_bytes  # noqa
-
-    return frame_bytes
+    return decoded
 
 
 def _rle_decode_segment(data):
-    """Return a single segment of decoded RLE data.
+    """Return a single segment of decoded RLE data as bytearray.
 
     Parameters
     ----------
     data : bytes
-        The segment data to be decompressed.
+        The segment data to be decoded.
 
     Returns
     -------
     bytearray
-        The decompressed segment.
+        The decoded segment.
     """
 
     data = bytearray(data)
@@ -488,6 +341,7 @@ def _rle_decode_segment(data):
 
     try:
         while True:
+            # header_byte is N + 1
             header_byte = data[pos] + 1
             pos += 1
             if header_byte > 129:
