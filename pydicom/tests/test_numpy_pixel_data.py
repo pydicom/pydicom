@@ -33,6 +33,7 @@ import pydicom
 from pydicom.data import get_testdata_files
 from pydicom.dataset import Dataset
 from pydicom.filereader import dcmread
+from pydicom.pixel_data_handlers.util import convert_color_space
 from pydicom.uid import (
     ImplicitVRLittleEndian,
     ExplicitVRLittleEndian,
@@ -232,10 +233,8 @@ class TestNoNumpy_NoNumpyHandler(object):
         ds = dcmread(EXPL_16_1_1F)
         for uid in ALL_SYNTAXES:
             ds.file_meta.TransferSyntaxUID = uid
-            exc_msg = (
-                'No available image handler could decode this transfer syntax'
-            )
-            with pytest.raises(NotImplementedError, match=exc_msg):
+            with pytest.raises(NotImplementedError,
+                               match="UID of '{}'".format(uid)):
                 ds.pixel_array
 
 
@@ -292,10 +291,8 @@ class TestNumpy_NoNumpyHandler(object):
         ds = dcmread(EXPL_16_1_1F)
         for uid in ALL_SYNTAXES:
             ds.file_meta.TransferSyntaxUID = uid
-            exc_msg = (
-                'No available image handler could decode this transfer syntax'
-            )
-            with pytest.raises(NotImplementedError, match=exc_msg):
+            with pytest.raises(NotImplementedError,
+                               match="UID of '{}'".format(uid)):
                 ds.pixel_array
 
 
@@ -359,11 +356,40 @@ class TestNumpy_NumpyHandler(object):
     def test_unsupported_syntax_raises(self):
         """Test pixel_array raises exception for unsupported syntaxes."""
         ds = dcmread(EXPL_16_1_1F)
+
         for uid in UNSUPPORTED_SYNTAXES:
             ds.file_meta.TransferSyntaxUID = uid
             with pytest.raises(NotImplementedError,
-                               match='image handler could decode'):
+                               match="UID of '{0}' ".format(uid)):
                 ds.pixel_array
+
+    def test_dataset_pixel_array_handler_needs_convert(self):
+        """Test Dataset.pixel_array when converting to RGB."""
+        ds = dcmread(EXPL_8_3_1F)
+        # Convert to YBR first
+        arr = ds.pixel_array
+        assert (255, 0, 0) == tuple(arr[5, 50, :])
+        arr = convert_color_space(arr, 'RGB', 'YBR_FULL')
+        ds.PixelData = arr.tobytes()
+        del ds._pixel_array  # Weird PyPy2 issue without this
+
+        # Test normal functioning (False)
+        assert (76, 85, 255) == tuple(ds.pixel_array[5, 50, :])
+
+        def needs_convert(ds):
+            """Change the default return to True"""
+            return True
+
+        # Test modified
+        orig_fn = NP_HANDLER.needs_to_convert_to_RGB
+        NP_HANDLER.needs_to_convert_to_RGB = needs_convert
+
+        # Ensure the pixel array gets updated
+        ds._pixel_id = None
+        assert (254, 0, 0) == tuple(ds.pixel_array[5, 50, :])
+
+        # Reset
+        NP_HANDLER.needs_to_convert_to_RGB = orig_fn
 
     @pytest.mark.parametrize("fpath, data", REFERENCE_DATA_UNSUPPORTED)
     def test_can_access_unsupported_dataset(self, fpath, data):
@@ -387,7 +413,6 @@ class TestNumpy_NumpyHandler(object):
         assert (1, -10, 1) == tuple(arr[300, 491:494])
         assert 0 == arr[-1].min() == arr[-1].max()
 
-    @pytest.mark.skip(reason='Samples/pixel>1, BitsAllocated>8 not supported')
     def test_pixel_array_16bit_un_signed(self):
         """Test pixel_array for 16-bit unsigned -> signed."""
         ds = dcmread(EXPL_16_3_1F)
@@ -402,7 +427,6 @@ class TestNumpy_NumpyHandler(object):
         assert -1 == arr[0, :, 0].min() == arr[0, :, 0].max()
         assert -32640 == arr[50, :, 0].min() == arr[50, :, 0].max()
 
-    @pytest.mark.skip(reason='Samples/pixel>1, BitsAllocated>8 not supported')
     def test_pixel_array_32bit_un_signed(self):
         """Test pixel_array for 32-bit unsigned -> signed."""
         ds = dcmread(EXPL_32_3_1F)
@@ -641,7 +665,6 @@ class TestNumpy_NumpyHandler(object):
             assert (25, 4, 9) == tuple(arr[-1, 31, :3])
             assert (227, 300, 147) == tuple(arr[-1, -1, -3:])
 
-    @pytest.mark.skip(reason='Samples/pixel>1, BitsAllocated>8 not supported')
     def test_little_16bit_3sample_1frame(self):
         """Test pixel_array for little 16-bit, 3 sample/pixel, 1 frame."""
         # Check all little endian syntaxes
@@ -716,7 +739,6 @@ class TestNumpy_NumpyHandler(object):
             assert (1031000, 1031000, 1031000) == tuple(arr[-1, 4, 3:6])
             assert (801000, 800000, 799000) == tuple(arr[-1, -1, -3:])
 
-    @pytest.mark.skip(reason='Samples/pixel>1, BitsAllocated>8 not supported')
     def test_little_32bit_3sample_1frame(self):
         """Test pixel_array for little 32-bit, 3 sample/pixel, 1 frame."""
         # Check all little endian syntaxes
@@ -813,7 +835,7 @@ class TestNumpy_GetPixelData(object):
         """Test get_pixeldata raises if unsupported PixelRepresentation."""
         ds = dcmread(EXPL_16_1_1F)
         ds.PixelRepresentation = 2
-        with pytest.raises(NotImplementedError,
+        with pytest.raises(ValueError,
                            match=r"value of '2' for '\(0028,0103"):
             get_pixeldata(ds)
 
@@ -934,104 +956,11 @@ class TestNumpy_PackBits(object):
         assert output == pack_bits(np.asarray(input))
 
     def test_functional(self):
-        """Test against as real dataset."""
+        """Test against a real dataset."""
         ds = dcmread(EXPL_1_1_3F)
         arr = ds.pixel_array
         arr = arr.ravel()
         assert ds.PixelData == pack_bits(arr)
-
-
-REFERENCE_DTYPE = [
-    # BitsAllocated, PixelRepresentation, numpy dtype string
-    (1, 0, 'uint8'), (1, 1, 'uint8'),
-    (8, 0, 'uint8'), (8, 1, 'int8'),
-    (16, 0, 'uint16'), (16, 1, 'int16'),
-    (32, 0, 'uint32'), (32, 1, 'int32'),
-]
-
-
-@pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
-class TestNumpy_PixelDtype(object):
-    """Tests for numpy_handler.pixel_dtype."""
-    def setup(self):
-        """Setup the test dataset."""
-        self.ds = Dataset()
-        self.ds.file_meta = Dataset()
-        self.ds.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
-
-    def test_unknown_pixel_representation_raises(self):
-        """Test an unknown PixelRepresentation value raises exception."""
-        self.ds.BitsAllocated = 16
-        self.ds.PixelRepresentation = -1
-        # The bracket needs to be escaped
-        with pytest.raises(NotImplementedError,
-                           match=r"value of '-1' for '\(0028,0103"):
-            pixel_dtype(self.ds)
-
-        self.ds.PixelRepresentation = 2
-        with pytest.raises(NotImplementedError,
-                           match=r"value of '2' for '\(0028,0103"):
-            pixel_dtype(self.ds)
-
-    def test_unknown_bits_allocated_raises(self):
-        """Test an unknown BitsAllocated value raises exception."""
-        self.ds.BitsAllocated = 0
-        self.ds.PixelRepresentation = 0
-        # The bracket needs to be escaped
-        with pytest.raises(NotImplementedError,
-                           match=r"value of '0' for '\(0028,0100"):
-            pixel_dtype(self.ds)
-
-        self.ds.BitsAllocated = 2
-        with pytest.raises(NotImplementedError,
-                           match=r"value of '2' for '\(0028,0100"):
-            pixel_dtype(self.ds)
-
-        self.ds.BitsAllocated = 15
-        with pytest.raises(NotImplementedError,
-                           match=r"value of '15' for '\(0028,0100"):
-            pixel_dtype(self.ds)
-
-    def test_unsupported_dtypes(self):
-        """Test unsupported dtypes raise exception."""
-        self.ds.BitsAllocated = 24
-        self.ds.PixelRepresentation = 0
-
-        with pytest.raises(NotImplementedError,
-                           match="data type 'uint24' needed to contain"):
-            pixel_dtype(self.ds)
-
-    @pytest.mark.parametrize('bits, pixel_repr, dtype', REFERENCE_DTYPE)
-    def test_supported_dtypes(self, bits, pixel_repr, dtype):
-        """Test supported dtypes."""
-        self.ds.BitsAllocated = bits
-        self.ds.PixelRepresentation = pixel_repr
-        # Correct for endianness of system
-        ref_dtype = np.dtype(dtype)
-        endianness = self.ds.file_meta.TransferSyntaxUID.is_little_endian
-        if endianness != (byteorder == 'little'):
-            ref_dtype = ref_dtype.newbyteorder('S')
-
-        assert ref_dtype == pixel_dtype(self.ds)
-
-    def test_byte_swapping(self):
-        """Test that the endianess of the system is taken into account."""
-        # The main problem is that our testing environments are probably
-        #   all little endian, but we'll try our best
-        self.ds.BitsAllocated = 16
-        self.ds.PixelRepresentation = 0
-
-        # < is little, = is native, > is big
-        if byteorder == 'little':
-            self.ds.is_little_endian = True
-            assert pixel_dtype(self.ds).byteorder in ['<', '=']
-            self.ds.is_little_endian = False
-            assert pixel_dtype(self.ds).byteorder == '>'
-        elif byteorder == 'big':
-            self.ds.is_little_endian = True
-            assert pixel_dtype(self.ds).byteorder == '<'
-            self.ds.is_little_endian = False
-            assert pixel_dtype(self.ds).byteorder in ['>', '=']
 
 
 REFERENCE_LENGTH = [
