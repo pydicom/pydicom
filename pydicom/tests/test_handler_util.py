@@ -17,7 +17,7 @@ from pydicom.dataset import Dataset
 from pydicom.pixel_data_handlers.util import (
     dtype_corrected_for_endianness,
     reshape_pixel_array,
-    convert_colour_space,
+    convert_color_space,
     pixel_dtype
 )
 from pydicom.uid import (ExplicitVRLittleEndian,
@@ -25,7 +25,7 @@ from pydicom.uid import (ExplicitVRLittleEndian,
 
 
 # 8 bit, 3 samples/pixel, 1 and 2 frame datasets
-# RGB colourspace, uncompressed
+# RGB colorspace, uncompressed
 RGB_8_3_1F = get_testdata_files("SC_rgb.dcm")[0]
 RGB_8_3_2F = get_testdata_files("SC_rgb_2frame.dcm")[0]
 
@@ -46,11 +46,11 @@ class TestNoNumpy(object):
                            match="Numpy is required to reshape"):
             reshape_pixel_array(None, None)
 
-    def test_convert_colour_space_raises(self):
-        """Test that convert_colour_space raises exception."""
+    def test_convert_color_space_raises(self):
+        """Test that convert_color_space raises exception."""
         with pytest.raises(ImportError,
                            match="Numpy is required to convert"):
-            convert_colour_space(None, None, None)
+            convert_color_space(None, None, None)
 
 
 # Tests with Numpy available
@@ -502,23 +502,23 @@ class TestNumpy_ReshapePixelArray(object):
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
 class TestNumpy_ConvertColourSpace(object):
-    """Tests for util.convert_colour_space."""
+    """Tests for util.convert_color_space."""
     def test_unknown_current_raises(self):
-        """Test an unknown current colour space raises exception."""
+        """Test an unknown current color space raises exception."""
         with pytest.raises(NotImplementedError,
                            match="Conversion from TEST to RGB is not suppo"):
-            convert_colour_space(None, 'TEST', 'RGB')
+            convert_color_space(None, 'TEST', 'RGB')
 
     def test_unknown_desired_raises(self):
-        """Test an unknown desdired colour space raises exception."""
+        """Test an unknown desdired color space raises exception."""
         with pytest.raises(NotImplementedError,
                            match="Conversion from RGB to TEST is not suppo"):
-            convert_colour_space(None, 'RGB', 'TEST')
+            convert_color_space(None, 'RGB', 'TEST')
 
     def test_current_is_desired(self):
         """Test that the array is unchanged when current matches desired."""
         arr = np.ones((2, 3))
-        assert np.array_equal(arr, convert_colour_space(arr, 'RGB', 'RGB'))
+        assert np.array_equal(arr, convert_color_space(arr, 'RGB', 'RGB'))
 
     def test_rgb_ybr_rgb_single_frame(self):
         """Test round trip conversion of single framed pixel data."""
@@ -536,7 +536,7 @@ class TestNumpy_ConvertColourSpace(object):
         assert (192, 192, 192) == tuple(arr[85, 50, :])
         assert (255, 255, 255) == tuple(arr[95, 50, :])
 
-        ybr = convert_colour_space(arr, 'RGB', 'YBR_FULL')
+        ybr = convert_color_space(arr, 'RGB', 'YBR_FULL')
         assert (76, 85, 255) == tuple(ybr[5, 50, :])
         assert (166, 107, 192) == tuple(ybr[15, 50, :])
         assert (150, 44, 21) == tuple(ybr[25, 50, :])
@@ -549,7 +549,7 @@ class TestNumpy_ConvertColourSpace(object):
         assert (255, 128, 128) == tuple(ybr[95, 50, :])
 
         # Round trip -> rounding errors get compounded
-        rgb = convert_colour_space(ybr, 'YBR_FULL', 'RGB')
+        rgb = convert_color_space(ybr, 'YBR_FULL', 'RGB')
         assert (254, 0, 0) == tuple(rgb[5, 50, :])
         assert (255, 128, 129) == tuple(rgb[15, 50, :])
         assert (0, 255, 1) == tuple(rgb[25, 50, :])
@@ -579,7 +579,7 @@ class TestNumpy_ConvertColourSpace(object):
         # Frame 2 is frame 1 inverted
         assert np.array_equal((2**ds.BitsAllocated - 1) - arr[1], arr[0])
 
-        ybr = convert_colour_space(arr, 'RGB', 'YBR_FULL')
+        ybr = convert_color_space(arr, 'RGB', 'YBR_FULL')
         assert (76, 85, 255) == tuple(ybr[0, 5, 50, :])
         assert (166, 107, 192) == tuple(ybr[0, 15, 50, :])
         assert (150, 44, 21) == tuple(ybr[0, 25, 50, :])
@@ -603,7 +603,7 @@ class TestNumpy_ConvertColourSpace(object):
         assert (0, 128, 128) == tuple(ybr[1, 95, 50, :])
 
         # Round trip -> rounding errors get compounded
-        rgb = convert_colour_space(ybr, 'YBR_FULL', 'RGB')
+        rgb = convert_color_space(ybr, 'YBR_FULL', 'RGB')
         assert (254, 0, 0) == tuple(rgb[0, 5, 50, :])
         assert (255, 128, 129) == tuple(rgb[0, 15, 50, :])
         assert (0, 255, 1) == tuple(rgb[0, 25, 50, :])

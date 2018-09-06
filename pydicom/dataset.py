@@ -34,7 +34,7 @@ from pydicom.datadict import dictionary_VR
 from pydicom.datadict import (tag_for_keyword, keyword_for_tag,
                               repeater_has_keyword)
 from pydicom.dataelem import DataElement, DataElement_from_raw, RawDataElement
-from pydicom.pixel_data_handlers.util import (convert_colour_space,
+from pydicom.pixel_data_handlers.util import (convert_color_space,
                                               reshape_pixel_array)
 from pydicom.tag import Tag, BaseTag, tag_in_exception
 from pydicom.uid import (ExplicitVRLittleEndian, ImplicitVRLittleEndian,
@@ -768,8 +768,11 @@ class Dataset(dict):
             raise NotImplementedError(
                 "Unable to decode pixel data with a transfer syntax UID of "
                 "'{0}' ({1}) as there are no suitable pixel data handlers "
-                "available.".format(self.file_meta.TransferSyntaxUID,
-                                    self.file_meta.TransferSyntaxUID.name)
+                "available. Please see the list of supported Transfer "
+                "Syntaxes in the pydicom documentation for information on "
+                "which additional packages might be required"
+                .format(self.file_meta.TransferSyntaxUID,
+                        self.file_meta.TransferSyntaxUID.name)
             )
 
         last_exception = None
@@ -780,13 +783,12 @@ class Dataset(dict):
                 self._pixel_array = reshape_pixel_array(self, arr)
 
                 # Some handler/transfer syntax combinations may need to
-                #   convert the colour space from YCbCr to RGB
+                #   convert the color space from YCbCr to RGB
                 if handler.needs_to_convert_to_RGB(self):
-                    self._pixel_array = convert_colour_space(self._pixel_array,
+                    self._pixel_array = convert_color_space(self._pixel_array,
                                                              'YBR_FULL',
                                                              'RGB')
 
-                # is this guaranteed to work if memory is re-used??
                 self._pixel_id = id(self.PixelData)
 
                 return
@@ -802,7 +804,10 @@ class Dataset(dict):
         self._pixel_id = None
 
         logger.info(
-            "Unable to decode the pixel data using the following handlers: {}"
+            "Unable to decode the pixel data using the following handlers: {}."
+            "Please see the list of supported Transfer Syntaxes in the "
+            "pydicom documentation for alternative packages that might "
+            "be able to decode the data"
             .format(", ".join([str(hh) for hh in suitable_handlers]))
         )
 

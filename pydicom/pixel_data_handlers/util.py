@@ -10,8 +10,8 @@ except ImportError:
     HAVE_NP = False
 
 
-def convert_colour_space(arr, current, desired):
-    """Convert the image(s) in `arr` from one colour space to another.
+def convert_color_space(arr, current, desired):
+    """Convert the image(s) in `arr` from one color space to another.
 
     Parameters
     ----------
@@ -19,16 +19,16 @@ def convert_colour_space(arr, current, desired):
         The image(s) as an ndarray with shape (frames, rows, columns, planes)
         or (rows, columns, planes).
     current : str
-        The current colour space, should be a valid value for (0028,0004)
+        The current color space, should be a valid value for (0028,0004)
         *Photometric Interpretation*. One of 'RGB', 'YBR_FULL'.
     desired : str
-        The desired colour space, should be a valid value for (0028,0004)
+        The desired color space, should be a valid value for (0028,0004)
         *Photometric Interpretation*. One of 'RGB', 'YBR_FULL'.
 
     Returns
     -------
     numpy.ndarray
-        The image(s) converted to the desired colour space.
+        The image(s) converted to the desired color space.
     """
     if not HAVE_NP:
         raise ImportError(
@@ -56,9 +56,6 @@ def convert_colour_space(arr, current, desired):
         )
 
     return converter(arr)
-
-
-convert_color_space = convert_colour_space
 
 
 def dtype_corrected_for_endianness(is_little_endian, numpy_dtype):
@@ -327,17 +324,17 @@ def reshape_pixel_array(ds, arr):
 
 
 def _convert_RGB_to_YBR_FULL(arr):
-    """Return an ndarray converted from RGB to YBR_FULL colour space.
+    """Return an ndarray converted from RGB to YBR_FULL color space.
 
     Parameters
     ----------
     arr : numpy.ndarray
-        An ndarray of an 8-bit per channel images in RGB colour space.
+        An ndarray of an 8-bit per channel images in RGB color space.
 
     Returns
     -------
     numpy.ndarray
-        The array in YBR_FULL colour space.
+        The array in YBR_FULL color space.
 
     References
     ----------
@@ -376,17 +373,17 @@ def _convert_RGB_to_YBR_FULL(arr):
 
 
 def _convert_YBR_FULL_to_RGB(arr):
-    """Return an ndarray converted from YBR_FULL to RGB colour space.
+    """Return an ndarray converted from YBR_FULL to RGB color space.
 
     Parameters
     ----------
     arr : numpy.ndarray
-        An ndarray of an 8-bit per channel images in YBR_FULL colour space.
+        An ndarray of an 8-bit per channel images in YBR_FULL color space.
 
     Returns
     -------
     numpy.ndarray
-        The array in RGB colour space.
+        The array in RGB color space.
 
     References
     ----------

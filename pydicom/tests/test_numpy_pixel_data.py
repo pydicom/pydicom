@@ -33,7 +33,7 @@ import pydicom
 from pydicom.data import get_testdata_files
 from pydicom.dataset import Dataset
 from pydicom.filereader import dcmread
-from pydicom.pixel_data_handlers.util import convert_colour_space
+from pydicom.pixel_data_handlers.util import convert_color_space
 from pydicom.uid import (
     ImplicitVRLittleEndian,
     ExplicitVRLittleEndian,
@@ -369,7 +369,7 @@ class TestNumpy_NumpyHandler(object):
         # Convert to YBR first
         arr = ds.pixel_array
         assert (255, 0, 0) == tuple(arr[5, 50, :])
-        arr = convert_colour_space(arr, 'RGB', 'YBR_FULL')
+        arr = convert_color_space(arr, 'RGB', 'YBR_FULL')
         ds.PixelData = arr.tobytes()
         del ds._pixel_array  # Weird PyPy2 issue without this
 
