@@ -77,12 +77,12 @@ class TestNumpy_PixelDtype(object):
         self.ds.BitsAllocated = 16
         self.ds.PixelRepresentation = -1
         # The bracket needs to be escaped
-        with pytest.raises(NotImplementedError,
+        with pytest.raises(ValueError,
                            match=r"value of '-1' for '\(0028,0103"):
             pixel_dtype(self.ds)
 
         self.ds.PixelRepresentation = 2
-        with pytest.raises(NotImplementedError,
+        with pytest.raises(ValueError,
                            match=r"value of '2' for '\(0028,0103"):
             pixel_dtype(self.ds)
 
@@ -91,17 +91,17 @@ class TestNumpy_PixelDtype(object):
         self.ds.BitsAllocated = 0
         self.ds.PixelRepresentation = 0
         # The bracket needs to be escaped
-        with pytest.raises(NotImplementedError,
+        with pytest.raises(ValueError,
                            match=r"value of '0' for '\(0028,0100"):
             pixel_dtype(self.ds)
 
         self.ds.BitsAllocated = 2
-        with pytest.raises(NotImplementedError,
+        with pytest.raises(ValueError,
                            match=r"value of '2' for '\(0028,0100"):
             pixel_dtype(self.ds)
 
         self.ds.BitsAllocated = 15
-        with pytest.raises(NotImplementedError,
+        with pytest.raises(ValueError,
                            match=r"value of '15' for '\(0028,0100"):
             pixel_dtype(self.ds)
 

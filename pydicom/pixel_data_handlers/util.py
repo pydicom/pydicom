@@ -75,7 +75,7 @@ def dtype_corrected_for_endianness(is_little_endian, numpy_dtype):
     Raises
     ------
     ValueError
-        If `is_little_endian` id None, e.g. not initialized.
+        If `is_little_endian` is None, e.g. not initialized.
 
     Returns
     -------
@@ -141,10 +141,10 @@ def pixel_dtype(ds):
     elif pixel_repr == 1:
         dtype_str = 'int'
     else:
-        raise NotImplementedError(
+        raise ValueError(
             "Unable to determine the data type to use to contain the "
             "Pixel Data as a value of '{}' for '(0028,0103) Pixel "
-            "Representation' is not supported".format(pixel_repr)
+            "Representation' is invalid".format(pixel_repr)
         )
 
     # (0028,0100) Bits Allocated, US, 1
@@ -157,10 +157,10 @@ def pixel_dtype(ds):
     elif bits_allocated > 0 and bits_allocated % 8 == 0:
         dtype_str += str(bits_allocated)
     else:
-        raise NotImplementedError(
+        raise ValueError(
             "Unable to determine the data type to use to contain the "
             "Pixel Data as a value of '{}' for '(0028,0100) Bits "
-            "Allocated' is not supported".format(bits_allocated)
+            "Allocated' is invalid".format(bits_allocated)
         )
 
     # Check to see if the dtype is valid for numpy

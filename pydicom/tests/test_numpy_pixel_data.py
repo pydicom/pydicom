@@ -835,7 +835,7 @@ class TestNumpy_GetPixelData(object):
         """Test get_pixeldata raises if unsupported PixelRepresentation."""
         ds = dcmread(EXPL_16_1_1F)
         ds.PixelRepresentation = 2
-        with pytest.raises(NotImplementedError,
+        with pytest.raises(ValueError,
                            match=r"value of '2' for '\(0028,0103"):
             get_pixeldata(ds)
 

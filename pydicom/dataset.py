@@ -795,7 +795,6 @@ class Dataset(dict):
                     "Exception raised by pixel data handler", exc_info=exc
                 )
                 last_exception = exc
-                continue
 
         # The only way to get to this point is if we failed to get the pixel
         #   array because all suitable handlers raised exceptions
