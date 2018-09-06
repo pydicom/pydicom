@@ -21,7 +21,7 @@ can_use_gdcm = have_gdcm and have_numpy
 
 
 should_convert_these_syntaxes_to_RGB = [
-    pydicom.uid.JPEGBaseLineLossy8bit, ]
+    pydicom.uid.JPEGBaseline, ]
 
 
 def needs_to_convert_to_RGB(dicom_dataset):

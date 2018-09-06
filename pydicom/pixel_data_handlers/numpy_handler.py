@@ -42,6 +42,7 @@ from sys import byteorder
 import numpy as np
 
 from pydicom.compat import in_py2 as IN_PYTHON2
+from pydicom.pixel_data_handlers.util import pixel_dtype
 from pydicom.uid import (
     ExplicitVRLittleEndian,
     ImplicitVRLittleEndian,
@@ -131,92 +132,6 @@ def get_expected_length(ds, unit='bytes'):
         length *= bits_allocated // 8
 
     return length
-
-
-def pixel_dtype(ds):
-    """Return a numpy dtype for the pixel data in dataset in `ds`.
-
-    Suitable for use with IODs containing the Image Pixel module.
-
-    +------------------------------------------+--------------+
-    | Element                                  | Supported    |
-    +-------------+---------------------+------+ values       |
-    | Tag         | Keyword             | Type |              |
-    +=============+=====================+======+==============+
-    | (0028,0101) | BitsAllocated       | 1    | 1, 8, 16, 32 |
-    +-------------+---------------------+------+--------------+
-    | (0028,0103) | PixelRepresentation | 1    | 0, 1         |
-    +-------------+---------------------+------+--------------+
-
-    Parameters
-    ----------
-    ds : dataset.Dataset
-        The DICOM dataset containing the pixel data you wish to get the
-        numpy dtype for.
-
-    Returns
-    -------
-    numpy.dtype
-        A numpy dtype suitable for containing the dataset's pixel data.
-
-    Raises
-    ------
-    ValueError
-        If the value of *Bits Allocated* or *Pixel Representation* is invalid.
-    NotImplementedError
-        If the pixel data is of a type that isn't supported by either numpy
-        or pydicom.
-    """
-    if ds.is_little_endian is None:
-        ds.is_little_endian = ds.file_meta.TransferSyntaxUID.is_little_endian
-
-    # (0028,0103) Pixel Representation, US, 1
-    #   Data representation of the pixel samples
-    #   0x0000 - unsigned int
-    #   0x0001 - 2's complement (signed int)
-    pixel_repr = ds.PixelRepresentation
-    if pixel_repr == 0:
-        dtype_str = 'uint'
-    elif pixel_repr == 1:
-        dtype_str = 'int'
-    else:
-        raise ValueError(
-            "Unable to determine the data type to use to contain the "
-            "Pixel Data as a value of '{}' for '(0028,0103) Pixel "
-            "Representation' is invalid".format(pixel_repr)
-        )
-
-    # (0028,0100) Bits Allocated, US, 1
-    #   The number of bits allocated for each pixel sample
-    #   PS3.5 8.1.1: Bits Allocated shall either be 1 or a multiple of 8
-    #   For bit packed data we use uint8
-    bits_allocated = ds.BitsAllocated
-    if bits_allocated == 1:
-        dtype_str = 'uint8'
-    elif bits_allocated > 0 and bits_allocated % 8 == 0:
-        dtype_str += str(bits_allocated)
-    else:
-        raise ValueError(
-            "Unable to determine the data type to use to contain the "
-            "Pixel Data as a value of '{}' for '(0028,0100) Bits "
-            "Allocated' is invalid".format(bits_allocated)
-        )
-
-    # Check to see if the dtype is valid for numpy
-    try:
-        dtype = np.dtype(dtype_str)
-    except TypeError:
-        raise NotImplementedError(
-            "The data type '{}' needed to contain the Pixel Data is not "
-            "supported by numpy".format(dtype_str)
-        )
-
-    # Correct for endianness of the system vs endianness of the dataset
-    if ds.is_little_endian != (byteorder == 'little'):
-        # 'S' swap from current to opposite
-        dtype = dtype.newbyteorder('S')
-
-    return dtype
 
 
 def pack_bits(arr):
@@ -329,9 +244,7 @@ def unpack_bits(bytestream):
         #  in the image frame corresponds to the first from the right bit of
         #  the first byte of the packed PixelData!
         for byte in bytestream:
-            if IN_PYTHON2:
-                byte = ord(byte)
-
+            byte = ord(byte)
             for bit in range(bit, bit + 8):
                 arr[bit] = byte & 1
                 byte >>= 1

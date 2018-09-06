@@ -38,7 +38,7 @@ from struct import unpack
 import numpy as np
 
 from pydicom.encaps import decode_data_sequence, defragment_data
-from pydicom.pixel_data_handlers.numpy_handler import pixel_dtype
+from pydicom.pixel_data_handlers.util import pixel_dtype
 from pydicom.uid import RLELossless
 
 

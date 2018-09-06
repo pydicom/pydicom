@@ -34,8 +34,8 @@ class TestGetFrameOffsets(object):
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
         with pytest.raises(ValueError,
-                           match="Unexpected tag '\(fffe, e100\)' when "
-                                 "parsing the Basic Table Offset item."):
+                           match=r"Unexpected tag '\(fffe, e100\)' when "
+                                 r"parsing the Basic Table Offset item."):
             get_frame_offsets(fp)
 
     def test_bad_length_multiple(self):
@@ -139,9 +139,10 @@ class TestGeneratePixelDataFragment(object):
         fragments = generate_pixel_data_fragment(fp)
         assert next(fragments) == b'\x01\x00\x00\x00'
         with pytest.raises(ValueError,
-                           match="Unexpected tag '\(0010, 0010\)' at offset "
-                                 "12 when parsing the encapsulated pixel data "
-                                 "fragment items."):
+                           match=r"Unexpected tag '\(0010, 0010\)' at offset "
+                                 r"12 when parsing the encapsulated pixel "
+                                 r"data "
+                                 r"fragment items."):
             next(fragments)
         pytest.raises(StopIteration, next, fragments)
 

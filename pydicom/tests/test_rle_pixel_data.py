@@ -29,12 +29,13 @@ from pydicom import dcmread
 import pydicom.config
 from pydicom.data import get_testdata_files
 from pydicom.encaps import defragment_data
-from pydicom.uid import RLELossless
+from pydicom.uid import RLELossless, UID
 from pydicom.tests._handler_common import ALL_TRANSFER_SYNTAXES
 
 try:
     import numpy as np
     from pydicom.pixel_data_handlers import numpy_handler as NP_HANDLER
+    from pydicom.pixel_data_handlers.util import reshape_pixel_array
     HAVE_NP = True
 except ImportError:
     NP_HANDLER = None
@@ -212,7 +213,8 @@ class TestNoNumpy_NoRLEHandler(object):
         for uid in ALL_TRANSFER_SYNTAXES:
             ds.file_meta.TransferSyntaxUID = uid
             exc_msg = (
-                'No available image handler could decode this transfer syntax'
+                r"Unable to decode pixel data with a transfer syntax UID of "
+                r"'{}'".format(uid)
             )
             with pytest.raises(NotImplementedError, match=exc_msg):
                 ds.pixel_array
@@ -256,7 +258,8 @@ class TestNumpy_NoRLEHandler(object):
         for uid in ALL_TRANSFER_SYNTAXES:
             ds.file_meta.TransferSyntaxUID = uid
             exc_msg = (
-                'No available image handler could decode this transfer syntax'
+                r"Unable to decode pixel data with a transfer syntax UID of "
+                r"'{}'".format(uid)
             )
             with pytest.raises(NotImplementedError, match=exc_msg):
                 ds.pixel_array
@@ -285,8 +288,11 @@ class TestNumpy_RLEHandler(object):
         ds = dcmread(MR_EXPL_LITTLE_1F)
         for uid in UNSUPPORTED_SYNTAXES:
             ds.file_meta.TransferSyntaxUID = uid
-            with pytest.raises(NotImplementedError,
-                               match='image handler could decode'):
+            exc_msg = (
+                r"Unable to decode pixel data with a transfer syntax UID of "
+                r"'{}'".format(uid)
+            )
+            with pytest.raises(NotImplementedError, match=exc_msg):
                 ds.pixel_array
 
     @pytest.mark.parametrize("fpath,data", REFERENCE_DATA_UNSUPPORTED)
@@ -450,7 +456,6 @@ class TestNumpy_RLEHandler(object):
         assert (25, 4, 9) == tuple(arr[-1, 31, :3])
         assert (227, 300, 147) == tuple(arr[-1, -1, -3:])
 
-    @pytest.mark.skip(reason='Samples/pixel>1, BitsAllocated>8 not supported')
     def test_pixel_array_16bit_3sample_1f(self):
         """Test pixel_array for 16-bit, 3 sample/pixel, 1 frame."""
         ds = dcmread(SC_RLE_16_1F)
@@ -546,7 +551,6 @@ class TestNumpy_RLEHandler(object):
         assert (1031000, 1031000, 1031000) == tuple(arr[-1, 4, 3:6])
         assert (801000, 800000, 799000) == tuple(arr[-1, -1, -3:])
 
-    @pytest.mark.skip(reason='Samples/pixel>1, BitsAllocated>8 not supported')
     def test_pixel_array_32bit_3sample_1f(self):
         """Test pixel_array for 32-bit, 3 sample/pixel, 1 frame."""
         ds = dcmread(SC_RLE_32_1F)
@@ -657,7 +661,7 @@ class TestNumpy_GetPixelData(object):
 
         # Big endian
         arr = get_pixeldata(ds, rle_segment_order='>')
-        arr = ds._reshape_pixel_array(arr)
+        arr = reshape_pixel_array(ds, arr)
 
         assert (64, 64) == arr.shape
         assert (422, 319, 361) == tuple(arr[0, 31:34])
@@ -666,7 +670,7 @@ class TestNumpy_GetPixelData(object):
 
         # Little endian
         arr = get_pixeldata(ds, rle_segment_order='<')
-        arr = ds._reshape_pixel_array(arr)
+        arr = reshape_pixel_array(ds, arr)
 
         assert (64, 64) == arr.shape
         assert (-23039, 16129, 26881) == tuple(arr[0, 31:34])
