@@ -31,12 +31,13 @@ text_VRs = ('SH', 'LO', 'ST', 'LT', 'UC', 'UT')
 # The delimiters are collected in a byte string suitable for use in a regex.
 # See PS3.5, Section 6.1.2.5.3
 
-# Character codes for text VR delimiters: LF, CR, TAB, FF
-TEXT_VR_DELIMS = {0x0d, 0x0a, 0x09, 0x0c}
+# Characters/Character codes for text VR delimiters: LF, CR, TAB, FF
+TEXT_VR_DELIMS = ({'\n', '\r', '\t', '\f'} if compat.in_py2
+                  else {0x0d, 0x0a, 0x09, 0x0c})
 
-# Character code for PN delimiter: name part separator '^'
+# Character/Character code for PN delimiter: name part separator '^'
 # (the component separator '=' is handled separately)
-PN_DELIMS = {0x5e}
+PN_DELIMS = {'^'} if compat.in_py2 else {0xe5}
 
 match_string = b''.join([
     b'(?P<single_byte>', br'(?P<family_name>[^=\^]*)',
