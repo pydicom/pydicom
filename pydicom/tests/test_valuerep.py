@@ -320,6 +320,31 @@ class TestPersonName(object):
         assert u'山田^太郎' == pn.ideographic
         assert u'やまだ^たろう' == pn.phonetic
 
+    def test_unicode_jp_from_bytes_comp_delimiter(self):
+        """The example encoding without the escape sequence before '='"""
+        pn = PersonNameUnicode(b'Yamada^Tarou='
+                               b'\033$B;3ED\033(B^\033$BB@O:='
+                               b'\033$B$d$^$@\033(B^\033$B$?$m$&\033(B',
+                               [default_encoding, 'iso2022_jp'])
+        if not in_py2:
+            pn = pn.decode()
+        assert (u'Yamada', u'Tarou') == (pn.family_name, pn.given_name)
+        assert u'山田^太郎' == pn.ideographic
+        assert u'やまだ^たろう' == pn.phonetic
+
+    def test_unicode_jp_from_bytes_caret_delimiter(self):
+        """PN: 3component in unicode works (Japanese)..."""
+        # Example name from PS3.5-2008 section H  p. 98
+        pn = PersonNameUnicode(b'Yamada^Tarou='
+                               b'\033$B;3ED\033(B^\033$BB@O:\033(B='
+                               b'\033$B$d$^$@\033(B^\033$B$?$m$&\033(B',
+                               [default_encoding, 'iso2022_jp'])
+        if not in_py2:
+            pn = pn.decode()
+        assert (u'Yamada', u'Tarou') == (pn.family_name, pn.given_name)
+        assert u'山田^太郎' == pn.ideographic
+        assert u'やまだ^たろう' == pn.phonetic
+
     def test_unicode_jp_from_unicode(self):
         """A person name initialized from unicode is already decoded"""
         pn = PersonNameUnicode(u'Yamada^Tarou=山田^太郎=やまだ^たろう',

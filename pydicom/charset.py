@@ -63,6 +63,7 @@ escape_codes = {
     ESC + b'(B': default_encoding,  # used to switch to ASCII G0 code element
     ESC + b'-A': 'latin_1',
     ESC + b')I': 'shift_jis',
+    ESC + b'(J': 'shift_jis',
     ESC + b'$B': 'iso2022_jp',
     ESC + b'-B': 'iso8859_2',
     ESC + b'-C': 'iso8859_3',
@@ -78,8 +79,15 @@ escape_codes = {
     ESC + b'$)A': 'iso_ir_58',
 }
 
+# Multi-byte character sets except Korean are handled by Python.
+# To decode them, the escape sequence shall be preserved in the input byte
+# string, and will be removed during decoding by Python.
+handled_encodings = ('iso2022_jp',
+                     'iso-2022-jp',
+                     'iso_ir_58')
 
-def decode_string(value, encodings, delims):
+
+def decode_string(value, encodings, delimiters):
     """Convert a raw byte string into a unicode string using the given
     list of encodings.
 
@@ -90,50 +98,43 @@ def decode_string(value, encodings, delims):
     encodings : list
         The encodings needed to decode the string as a list of Python
         encodings, converted from the encodings in Specific Character Set.
-    delims : byte string
-        A string containing all characters that may cause the encoding of
-        `value` to change.
+    delimiters: set of int
+        A set of character codes each of which resets the encoding in
+        `byte_str`.
 
     Returns
     -------
     text type
         The decoded string.
     """
+    # shortcut for the common case - no escape sequences present
     if ESC not in value:
         return value.decode(encodings[0])
 
-    # multi-byte character sets except Korean are handled by Python encodings
-    use_python_handling = value.startswith((ESC + b'$B',  # 'iso2022_jp
-                                            ESC + b'$(D',  # iso-2022-jp
-                                            ESC + b'$)A'))  # iso_ir_58
-
-    if use_python_handling:
-        values = [value]
-    else:
-        # Each part of the value that starts with an escape sequence
-        # or a delimiter as defined in PS3.5, section 6.1.2.5.3 is decoded
-        # separately. If it starts with an escape sequence, the
-        # corresponding encoding is used, otherwise the first encoding.
-        # See PS3.5, 6.1.2.4 and 6.1.2.5 for the use of code extensions.
-        #
-        # The following regex splits the value into these parts, by matching
-        # substrings at line start not containing any of the delimiters,
-        # and substrings starting with a delimiter and not containing other
-        # delimiters.
-        regex = b'(^[^' + delims + b']+|[' + delims + b'][^' + delims + b']*)'
-        values = re.findall(regex, value)
+    # Each part of the value that starts with an escape sequence is decoded
+    # separately. If it starts with an escape sequence, the
+    # corresponding encoding is used, otherwise the first encoding.
+    # See PS3.5, 6.1.2.4 and 6.1.2.5 for the use of code extensions.
+    #
+    # The following regex splits the value into these parts, by matching
+    # the substring until the first escape character, and subsequent
+    # substrings starting with an escape character.
+    regex = b'(^[^\x1b]+|[\x1b][^\x1b]*)'
+    fragments = re.findall(regex, value)
 
     # decode each byte string fragment with it's corresponding encoding
     # and join them all together
-    return u''.join([decode_fragment(part, encodings, use_python_handling)
-                     for part in values])
+    return u''.join([decode_fragment(fragment, encodings, delimiters)
+                     for fragment in fragments])
 
 
-def decode_fragment(byte_str, encodings, use_python_handling):
+def decode_fragment(byte_str, encodings, delimiters):
     """Decode a byte string encoded with a single encoding.
     If `byte_str` starts with an escape sequence, the encoding corresponding
     to this sequence is used for decoding if present in `encodings`,
     otherwise the first value in encodings.
+    If a delimiter occurs inside the string, it resets the encoding to the
+    first encoding.
 
     Parameters
     ----------
@@ -142,8 +143,9 @@ def decode_fragment(byte_str, encodings, use_python_handling):
     encodings: list of str
         The list of Python encodings as converted from the values in the
         Specific Character Set tag.
-    use_python_handling: Boolean
-        If True, Python removes the escape sequences during decoding.
+    delimiters: set of int
+        A set of character codes each of which resets the encoding in
+        `byte_str`.
 
     Returns
     -------
@@ -160,13 +162,23 @@ def decode_fragment(byte_str, encodings, use_python_handling):
         seq_length = 4 if byte_str.startswith((b'\x1b$(', b'\x1b$)')) else 3
         encoding = escape_codes.get(byte_str[:seq_length], '')
         if encoding in encodings or encoding == default_encoding:
-            if use_python_handling:
+            if encoding in handled_encodings:
                 # Python strips the escape sequences for this encoding
+                # Any delimiters must be handled correctly by `byte_str`.
                 return byte_str.decode(encoding)
             else:
                 # Python doesn't know about the escape sequence -
-                # we have to strip it ourselves
-                return byte_str[seq_length:].decode(encoding)
+                # we have to strip it before decoding
+                byte_str = byte_str[seq_length:]
+
+                # if a delimiter occurs in the string, it resets the encoding
+                index = next((index for index, ch in enumerate(byte_str)
+                              if ch in delimiters), None)
+                if index is not None:
+                    return (byte_str[:index].decode(encoding) +
+                            byte_str[index:].decode(encodings[0]))
+                return byte_str.decode(encoding)
+
     # no or unknown escape code - use first encoding
     return byte_str.decode(encodings[0])
 
@@ -240,7 +252,7 @@ def decode(data_element, dicom_character_set):
     encodings = convert_encodings(dicom_character_set)
 
     # decode the string value to unicode
-    # PN is special case as may have 3 components with differenct chr sets
+    # PN is special case as may have 3 components with different chr sets
     if data_element.VR == "PN":
         if not in_py2:
             if data_element.VM == 1:
