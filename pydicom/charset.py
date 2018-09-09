@@ -62,8 +62,8 @@ ESC = b'\x1b'
 escape_codes = {
     ESC + b'(B': default_encoding,  # used to switch to ASCII G0 code element
     ESC + b'-A': 'latin_1',
-    ESC + b')I': 'shift_jis',
-    ESC + b'(J': 'shift_jis',
+    ESC + b')I': 'shift_jis',  # switches to ISO-IR 13
+    ESC + b'(J': 'shift_jis',  # switches to ISO-IR 14 (shift_jis handles both)
     ESC + b'$B': 'iso2022_jp',
     ESC + b'-B': 'iso8859_2',
     ESC + b'-C': 'iso8859_3',
@@ -98,9 +98,9 @@ def decode_string(value, encodings, delimiters):
     encodings : list
         The encodings needed to decode the string as a list of Python
         encodings, converted from the encodings in Specific Character Set.
-    delimiters: set of int
-        A set of character codes each of which resets the encoding in
-        `byte_str`.
+    delimiters: set of int (Python 3) or characters (Python 2)
+        A set of characters or character codes, each of which resets the
+        encoding in `byte_str`.
 
     Returns
     -------
@@ -113,7 +113,8 @@ def decode_string(value, encodings, delimiters):
 
     # Each part of the value that starts with an escape sequence is decoded
     # separately. If it starts with an escape sequence, the
-    # corresponding encoding is used, otherwise the first encoding.
+    # corresponding encoding is used, otherwise (e.g. the first part if it
+    # does not start with an escape sequence) the first encoding.
     # See PS3.5, 6.1.2.4 and 6.1.2.5 for the use of code extensions.
     #
     # The following regex splits the value into these parts, by matching
@@ -134,7 +135,7 @@ def decode_fragment(byte_str, encodings, delimiters):
     to this sequence is used for decoding if present in `encodings`,
     otherwise the first value in encodings.
     If a delimiter occurs inside the string, it resets the encoding to the
-    first encoding.
+    first encoding in case of single-byte encodings.
 
     Parameters
     ----------
@@ -143,9 +144,9 @@ def decode_fragment(byte_str, encodings, delimiters):
     encodings: list of str
         The list of Python encodings as converted from the values in the
         Specific Character Set tag.
-    delimiters: set of int
-        A set of character codes each of which resets the encoding in
-        `byte_str`.
+    delimiters: set of int (Python 3) or characters (Python 2)
+        A set of characters or character codes, each of which resets the
+        encoding in `byte_str`.
 
     Returns
     -------
@@ -154,8 +155,8 @@ def decode_fragment(byte_str, encodings, delimiters):
 
     Reference
     ---------
-    DICOM Standard Part 5, Sections 6.1.2.4 and 6.1.2.5
-    DICOM Standard Part 3, Anex C.12.1.1.2
+    * DICOM Standard Part 5, Sections 6.1.2.4 and 6.1.2.5
+    * DICOM Standard Part 3, Anex C.12.1.1.2
     """
     if byte_str.startswith(ESC):
         # all 4-character escape codes start with one of two character sets
@@ -163,7 +164,7 @@ def decode_fragment(byte_str, encodings, delimiters):
         encoding = escape_codes.get(byte_str[:seq_length], '')
         if encoding in encodings or encoding == default_encoding:
             if encoding in handled_encodings:
-                # Python strips the escape sequences for this encoding
+                # Python strips the escape sequences for this encoding.
                 # Any delimiters must be handled correctly by `byte_str`.
                 return byte_str.decode(encoding)
             else:
@@ -171,12 +172,17 @@ def decode_fragment(byte_str, encodings, delimiters):
                 # we have to strip it before decoding
                 byte_str = byte_str[seq_length:]
 
-                # if a delimiter occurs in the string, it resets the encoding
+                # If a delimiter occurs in the string, it resets the encoding.
+                # The following returns the first occurrence of a delimiter in
+                # the byte string, or None if it does not contain any.
                 index = next((index for index, ch in enumerate(byte_str)
                               if ch in delimiters), None)
                 if index is not None:
+                    # the part of the string after the first delimiter
+                    # is decoded with the first encoding
                     return (byte_str[:index].decode(encoding) +
                             byte_str[index:].decode(encodings[0]))
+                # No delimiter - use the encoding defined by the escape code
                 return byte_str.decode(encoding)
 
     # no or unknown escape code - use first encoding

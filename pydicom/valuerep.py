@@ -28,8 +28,9 @@ extra_length_VRs = ('OB', 'OD', 'OF', 'OL', 'OW', 'SQ', 'UC', 'UN', 'UR', 'UT')
 text_VRs = ('SH', 'LO', 'ST', 'LT', 'UC', 'UT')
 
 # Delimiters for text strings and person name that reset the encoding.
-# The delimiters are collected in a byte string suitable for use in a regex.
 # See PS3.5, Section 6.1.2.5.3
+# Note: We use characters for Python 2 and character codes for Python 3
+# because these are the types yielded if iterating over a byte string.
 
 # Characters/Character codes for text VR delimiters: LF, CR, TAB, FF
 TEXT_VR_DELIMS = ({'\n', '\r', '\t', '\f'} if compat.in_py2
