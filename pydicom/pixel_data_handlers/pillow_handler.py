@@ -6,7 +6,7 @@ import pydicom.encaps
 import pydicom.uid
 import logging
 
-from pydicom.pixel_data_handlers.util import dtype_corrected_for_endianess
+from pydicom.pixel_data_handlers.util import dtype_corrected_for_endianness
 
 have_numpy = True
 logger = logging.getLogger('pydicom')
@@ -23,17 +23,17 @@ except ImportError:
     have_pillow = False
 
 PillowSupportedTransferSyntaxes = [
-    pydicom.uid.JPEGBaseLineLossy8bit,
+    pydicom.uid.JPEGBaseline,
     pydicom.uid.JPEGLossless,
-    pydicom.uid.JPEGBaseLineLossy12bit,
+    pydicom.uid.JPEGExtended,
     pydicom.uid.JPEG2000Lossless,
 ]
 PillowJPEG2000TransferSyntaxes = [
     pydicom.uid.JPEG2000Lossless,
 ]
 PillowJPEGTransferSyntaxes = [
-    pydicom.uid.JPEGBaseLineLossy8bit,
-    pydicom.uid.JPEGBaseLineLossy12bit,
+    pydicom.uid.JPEGBaseline,
+    pydicom.uid.JPEGExtended,
 ]
 
 have_pillow_jpeg_plugin = False
@@ -145,7 +145,7 @@ def get_pixeldata(dicom_dataset):
                    dicom_dataset.BitsAllocated))
         raise TypeError(msg)
 
-    numpy_format = dtype_corrected_for_endianess(
+    numpy_format = dtype_corrected_for_endianness(
         dicom_dataset.is_little_endian, numpy_format)
 
     # decompress here

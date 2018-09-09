@@ -28,6 +28,10 @@ SC_RLE_16_2F = get_testdata_files("SC_rgb_rle_16bit_2frame.dcm")[0]
 EMRI_RLE_10F = get_testdata_files("emri_small_RLE.dcm")[0]
 # 32/32-bit, 1 sample/pixel, 1 frame
 RTDOSE_RLE_1F = get_testdata_files("rtdose_rle_1frame.dcm")[0]
+# 32/32-bit, 3 sample/pixel, 1 frame
+SC_RLE_32_1F = get_testdata_files("SC_rgb_rle_32bit.dcm")[0]
+# 32/32-bit, 3 sample/pixel, 2 frame
+SC_RLE_32_2F = get_testdata_files("SC_rgb_rle_32bit_2frame.dcm")[0]
 # 32/32-bit, 1 sample/pixel, 15 frame
 RTDOSE_RLE_15F = get_testdata_files("rtdose_rle.dcm")[0]
 
@@ -40,7 +44,7 @@ class TimeRLEDecodeFrame(object):
         self.frames = decode_data_sequence(self.ds.PixelData)
         assert len(self.frames) == 10
 
-        self.no_runs = 1
+        self.no_runs = 100
 
     def time_decode_16bit_1sample_1frame(self):
         """Time decoding the pixel data from a single RLE frame."""
@@ -71,15 +75,16 @@ class TimeGetPixelData(object):
         self.ds_16_1_1 = dcmread(MR_RLE_1F)
         self.ds_16_3_1 = dcmread(SC_RLE_16_1F)
         self.ds_32_1_1 = dcmread(RTDOSE_RLE_1F)
+        self.ds_32_3_1 = dcmread(SC_RLE_32_1F)
 
         self.no_runs = 100
 
-    def time_8bit_1sample(self):
+    def time_08bit_1sample(self):
         """Time retrieval of 8-bit, 1 sample/pixel RLE data."""
         for ii in range(self.no_runs):
             get_pixeldata(self.ds_8_1_1)
 
-    def time_8bit_3sample(self):
+    def time_08bit_3sample(self):
         """Time retrieval of 8-bit, 3 sample/pixel RLE data."""
         for ii in range(self.no_runs):
             get_pixeldata(self.ds_8_3_1)
@@ -98,3 +103,8 @@ class TimeGetPixelData(object):
         """Time retrieval of 32-bit, 1 sample/pixel RLE data."""
         for ii in range(self.no_runs):
             get_pixeldata(self.ds_32_1_1)
+
+    def time_32bit_3sample(self):
+        """Time retrieval of 32-bit, 3 sample/pixel RLE data."""
+        for ii in range(self.no_runs):
+            get_pixeldata(self.ds_32_3_1)
