@@ -484,6 +484,7 @@ def _rle_encode_row(arr):
         The RLE encoded row, following the format specified by the DICOM
         Standard, Part 5, Annex G.
     """
+    print('\nInput', arr)
     # Based on an answer by Thomas Browne
     #   On https://stackoverflow.com/questions/1066758
     n = len(arr)
@@ -492,6 +493,32 @@ def _rle_encode_row(arr):
     z = np.diff(np.append(-1, i))
     p = np.cumsum(np.append(0, z))[:-1]
 
-    # Need to split literal runs longer than 127?
-    # Need to split replicate runs longer than 127?
+    #print(y)
+    #print(i)
+    print(z)
+    print(p)
+
+    # replicate runs are where z > 1
+    # Replicate: extend by copying the next byte (256 - N + 1) times
+    # N = 257 - X
+    #print(arr[np.where(z > 1)])
+    #print(z[np.where(z > 1)])
+    replicate_indices = p[np.where(z > 1)]
+    replicate_run = 257 - z[np.where(z > 1)]
+    print('Replicate indices', replicate_indices)
+    print('Replicate run', replicate_run)
+    print('Replicate values', arr[replicate_indices])
+    replicate = np.asarray([replicate_run, arr[replicate_indices]])
+    print(replicate)
+    print(replicate.T.ravel().astype('uint8').tobytes())
+
+    # literal runs are where z == 1, need to combine them
+    # ie.e [1, 1, 1, 1, 4, 1, 1, 1, 3] -> 4l 4r 3l 3e
+    z[np.where(z > 1)] = 0
+    literal_indices = p[np.where(z == 1)]
+    print('Literal indices', literal_indices)
+    print('Literal values', arr[literal_indices])
+
+    # Need to split literal runs longer than 128
+    # Need to split replicate runs longer than 128
     # Need to find literal runs -> continuous 1's

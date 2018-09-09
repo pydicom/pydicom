@@ -48,7 +48,11 @@ try:
         _rle_decode_frame,
         _rle_decode_segment,
         _parse_rle_header,
+        rle_encode,
         _rle_encode_frame,
+        _rle_encode_plane,
+        _rle_encode_segment,
+        _rle_encode_row,
     )
 except ImportError:
     RLE_HANDLER = None
@@ -1031,7 +1035,87 @@ class TestNumpy_RLEDecodeSegment(object):
         assert b'\x02' * 128 == bytes(_rle_decode_segment(data))
 
 
+# Tests for RLE encoding
+REFERENCE_ENCODE_ROW = [
+    # Input, output
+    ([], b''),
+    # Replicate tests
+    ([0] * 2, b'\xff\x00'),  # 1 min replicate
+    ([0] * 3, b'\xfe\x00'),
+    ([0] * 64, b'\xc1\x00'),
+    ([0] * 127, b'\x82\x00'),
+    ([0] * 128, b'\x81\x00'),  # 1 max replicate
+    ([0] * 130, b'\x81\x00\xff\x00'),  # 1 max replicate, 1 min replicate
+    ([0] * 128 * 5, b'\x81\x00' * 5),  # 5 max replicates
+    # Literal tests
+    ([0], b'\x00\x00'),  # 1 min literal
+    ([0, 1], b'\x01\x00\x01'),
+    ([0, 1, 2], b'\x02\x00\x01\x02'),
+    ([0, 1] * 32, b'\x1f' + b'\x00\x01' * 32),
+    ([0, 1] * 63 + [2], b'\x73' + b'\x00\x01' * 63 + b'\x02'),
+    ([0, 1] * 64, b'\x7f' + b'\x00\x01' * 64),  # 1 max literal
+    # 1 max literal, 1 min literal
+    ([0, 1] * 64 + [2], b'\x7f' + b'\x00\x01' * 64 + b'\x00\x02'),
+    # 5 max literals
+    ([0, 1] * 64 * 5, (b'\x7f' + b'\x00\x01' * 64) * 5),
+    # Combination tests
+    # 1 min literal, 1 min replicate
+    ([0, 1, 1], b'\x00\x00\xff\x01'),
+    # 1 min literal, 1 max replicate
+    ([0] + [1] * 128, b'\x00\x00\x81\x01'),
+    # 1 max literal, 1 min replicate
+    ([0, 1] * 64 + [2] * 2, b'\x7f' + b'\x00\x01' * 64 + b'\xff\x02'),
+    # 1 max literal, 1 max replicate
+    ([0, 1] * 64 + [2] * 128, b'\x7f' + b'\x00\x01' * 64 + b'\x81\x02'),
+    # 1 min replicate, 1 min literal
+    ([0, 0, 1], b'\xff\x00\x00\x01'),
+    # 1 min replicate, 1 max literal
+    ([0, 0] + [1, 2] * 64, b'\xff\x00\x7f' + b'\x01\x02' * 64),
+    # 1 max replicate, 1 min literal
+    ([0] * 128 + [1], b'\xff\x00\x00\x01'),
+    # 1 max replicate, 1 max literal
+    ([0] * 128 + [1, 2] * 64, b'\xff\x00\x7f' + b'\x01\x02' * 64),
+    #(b'\x00', b''),  # 1 min literal, 1 min replicate, 1 min literal
+    #(b'\x00', b''),  # 1 max literal, 1 min replicate, 1 min literal
+    #(b'\x00', b''),  # 1 max literal, 1 max replicate, 1 min literal
+    #(b'\x00', b''),  # 1 max literal, 1 max replicate, 1 max literal
+    #(b'\x00', b''),  # 1 min literal, 1 max replicate, 1 min literal
+    #(b'\x00', b''),  # 1 min literal, 1 max replicate, 1 max literal
+    #(b'\x00', b''),  # 1 min literal, 1 min replicate, 1 max literal
+    #(b'\x00', b''),  # 1 max literal, 1 min replicate, 1 max literal
+    #(b'\x00' * 2, b''),  # 1 min replicate, 1 min literal, 1 min replicate
+    #(b'\x00' * 2, b''),  # 1 max replicate, 1 min literal, 1 min replicate
+    #(b'\x00' * 2, b''),  # 1 min replicate, 1 max literal, 1 min replicate
+    #(b'\x00' * 2, b''),  # 1 max replicate, 1 max literal, 1 max replicate
+    #(b'\x00' * 2, b''),  # 1 max replicate, 1 max literal, 1 min replicate
+    #(b'\x00' * 2, b''),  # 1 min replicate, 1 max literal, 1 max replicate
+    #(b'\x00' * 2, b''),  # 1 min replicate, 1 min literal, 1 max replicate
+    #(b'\x00' * 2, b''),  # 1 max replicate, 1 min literal, 1 max replicate
+]
+
+# N > 128
+# Replicate: extend by copying the next byte (256 - N + 1) times
+# Minimum replicate run is 2 bytes, max 128
+# N < 128
+# Literal: extend by copying the next (N + 1) bytes
+# Minimum literal run is 1 byte, max 128
+
 @pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
+class TestNumpy_RLEEncodeRow(object):
+    """Tests for rle_handler._rle_encode_frame."""
+    @pytest.mark.skip()
+    @pytest.mark.parametrize('input, output', REFERENCE_ENCODE_ROW)
+    def test_encode(self, input, output):
+        """Test encoding an empty row."""
+        assert output == _rle_encode_row(np.asarray(input))
+
+    def test_dev(self):
+        """Development testing."""
+        input = [0, 1, 2, 3, 3, 1, 1, 1, 1, 4, 2, 2, 1, 2, 2, 2]
+        output = _rle_encode_row(np.asarray(input))
+
+
+@pytest.mark.skip(not HAVE_NP, reason='Numpy is not available')
 class TestNumpy_RLEEncodeFrame(object):
     """Tests for rle_handler._rle_encode_frame."""
     def test_1bit_1sample(self):
@@ -1088,7 +1172,7 @@ class TestNumpy_RLEEncodeFrame(object):
         pass
 
 
-@pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
+@pytest.mark.skip(not HAVE_NP, reason='Numpy is not available')
 class TestNumpy_RLEEncodePlane(object):
     """Tests for rle_handler._rle_encode_plane."""
     def test_1bit(self):
@@ -1108,7 +1192,7 @@ class TestNumpy_RLEEncodePlane(object):
         pass
 
 
-@pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
+@pytest.mark.skip(not HAVE_NP, reason='Numpy is not available')
 class TestNumpy_RLEEncodeSegment(object):
     """Tests for rle_handler._rle_encode_segment."""
     def test_one_row(self):
