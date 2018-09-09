@@ -33,6 +33,8 @@ import pydicom
 from pydicom.data import get_testdata_files
 from pydicom.dataset import Dataset
 from pydicom.filereader import dcmread
+
+from pydicom.tests._handler_common import ALL_TRANSFER_SYNTAXES
 from pydicom.pixel_data_handlers.util import convert_color_space
 from pydicom.uid import (
     ImplicitVRLittleEndian,
@@ -142,31 +144,16 @@ SUPPORTED_SYNTAXES = [
     DeflatedExplicitVRLittleEndian,
     ExplicitVRBigEndian
 ]
-UNSUPPORTED_SYNTAXES = [
-    '1.2.840.10008.1.2.4.50',  # JPEG Baseline (Process 1)
-    '1.2.840.10008.1.2.4.51',  # JPEG Extended (Process 2 and 4)
-    '1.2.840.10008.1.2.4.57',  # JPEG Lossless (Process 14)
-    '1.2.840.10008.1.2.4.70',  # JPEG Lossless (Process 14, Selection Value 1)
-    '1.2.840.10008.1.2.4.80',  # JPEG-LS Lossless
-    '1.2.840.10008.1.2.4.81',  # JPEG-LS Lossy (Near-Lossless)
-    '1.2.840.10008.1.2.4.90',  # JPEG 2000 Image Compression (Lossless Only)
-    '1.2.840.10008.1.2.4.91',  # JPEG 2000 Image Compression
-    '1.2.840.10008.1.2.4.92',  # JPEG 2000 Part 2 Multi-component
-    '1.2.840.10008.1.2.4.93',  # JPEG 2000 Part 2 Multi-component
-    '1.2.840.10008.1.2.4.94',  # JPIP Referenced
-    '1.2.840.10008.1.2.4.95',  # JPIP Referenced Deflate
-    '1.2.840.10008.1.2.4.100',  # MPEG2 Main Profile / Main Level
-    '1.2.840.10008.1.2.4.101',  # MPEG2 Main Profile / High Level
-    '1.2.840.10008.1.2.4.102',  # MPEG-4 AVC/H.264 High Profile / Level 4.1
-    '1.2.840.10008.1.2.4.103',  # MPEG-4 AVC/H.264 BD-compatible High Profile
-    '1.2.840.10008.1.2.4.104',  # MPEG-4 AVC/H.264 High Profile For 2D Video
-    '1.2.840.10008.1.2.4.105',  # MPEG-4 AVC/H.264 High Profile For 3D Video
-    '1.2.840.10008.1.2.4.106',  # MPEG-4 AVC/H.264 Stereo High Profile
-    '1.2.840.10008.1.2.4.107',  # HEVC/H.265 Main Profile / Level 5.1
-    '1.2.840.10008.1.2.4.108',  # HEVC/H.265 Main 10 Profile / Level 5.1
-    '1.2.840.10008.1.2.5',  # RLE Lossless
-]
-ALL_SYNTAXES = SUPPORTED_SYNTAXES + UNSUPPORTED_SYNTAXES
+UNSUPPORTED_SYNTAXES = list(
+    set(ALL_TRANSFER_SYNTAXES) ^ set(SUPPORTED_SYNTAXES)
+)
+
+
+def test_unsupported_syntaxes():
+    """Test that UNSUPPORTED_SYNTAXES is as expected."""
+    for syntax in SUPPORTED_SYNTAXES:
+        assert syntax not in UNSUPPORTED_SYNTAXES
+
 
 REFERENCE_DATA_UNSUPPORTED = [
     (JPEG_BASELINE_1, ('1.2.840.10008.1.2.4.50', 'Lestrade^G')),
@@ -231,7 +218,7 @@ class TestNoNumpy_NoNumpyHandler(object):
     def test_pixel_array_raises(self):
         """Test pixel_array raises exception for all syntaxes."""
         ds = dcmread(EXPL_16_1_1F)
-        for uid in ALL_SYNTAXES:
+        for uid in ALL_TRANSFER_SYNTAXES:
             ds.file_meta.TransferSyntaxUID = uid
             with pytest.raises(NotImplementedError,
                                match="UID of '{}'".format(uid)):
@@ -289,7 +276,7 @@ class TestNumpy_NoNumpyHandler(object):
     def test_pixel_array_raises(self):
         """Test pixel_array raises exception for all syntaxes."""
         ds = dcmread(EXPL_16_1_1F)
-        for uid in ALL_SYNTAXES:
+        for uid in ALL_TRANSFER_SYNTAXES:
             ds.file_meta.TransferSyntaxUID = uid
             with pytest.raises(NotImplementedError,
                                match="UID of '{}'".format(uid)):
