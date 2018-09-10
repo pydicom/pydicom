@@ -149,13 +149,13 @@ def _get_pixel_array(fpath):
             'Function only usable if the numpy handler is available'
         )
 
-    original_handlers = pydicom.config.image_handlers
-    pydicom.config.image_handlers = [NP_HANDLER]
+    original_handlers = pydicom.config.PIXEL_DATA_HANDLERS
+    pydicom.config.PIXEL_DATA_HANDLERS = [NP_HANDLER]
 
     ds = dcmread(fpath)
     arr = ds.pixel_array
 
-    pydicom.config.image_handlers = original_handlers
+    pydicom.config.PIXEL_DATA_HANDLERS = original_handlers
 
     return arr
 
@@ -182,12 +182,12 @@ class TestNoNumpy_NoRLEHandler(object):
     """Tests for handling datasets without numpy and the handler."""
     def setup(self):
         """Setup the environment."""
-        self.original_handlers = pydicom.config.image_handlers
-        pydicom.config.image_handlers = []
+        self.original_handlers = pydicom.config.PIXEL_DATA_HANDLERS
+        pydicom.config.PIXEL_DATA_HANDLERS = []
 
     def teardown(self):
         """Restore the environment."""
-        pydicom.config.image_handlers = self.original_handlers
+        pydicom.config.PIXEL_DATA_HANDLERS = self.original_handlers
 
     def test_environment(self):
         """Check that the testing environment is as expected."""
@@ -226,12 +226,12 @@ class TestNumpy_NoRLEHandler(object):
     """Tests for handling datasets with no handler."""
     def setup(self):
         """Setup the environment."""
-        self.original_handlers = pydicom.config.image_handlers
-        pydicom.config.image_handlers = []
+        self.original_handlers = pydicom.config.PIXEL_DATA_HANDLERS
+        pydicom.config.PIXEL_DATA_HANDLERS = []
 
     def teardown(self):
         """Restore the environment."""
-        pydicom.config.image_handlers = self.original_handlers
+        pydicom.config.PIXEL_DATA_HANDLERS = self.original_handlers
 
     def test_environment(self):
         """Check that the testing environment is as expected."""
@@ -271,12 +271,12 @@ class TestNumpy_RLEHandler(object):
     """Tests for handling datasets with the handler."""
     def setup(self):
         """Setup the environment."""
-        self.original_handlers = pydicom.config.image_handlers
-        pydicom.config.image_handlers = [RLE_HANDLER]
+        self.original_handlers = pydicom.config.PIXEL_DATA_HANDLERS
+        pydicom.config.PIXEL_DATA_HANDLERS = [RLE_HANDLER]
 
     def teardown(self):
         """Restore the environment."""
-        pydicom.config.image_handlers = self.original_handlers
+        pydicom.config.PIXEL_DATA_HANDLERS = self.original_handlers
 
     def test_environment(self):
         """Check that the testing environment is as expected."""

@@ -35,21 +35,43 @@ elements have values given in the table below.
 
 from struct import unpack
 
-import numpy as np
+try:
+    import numpy as np
+    HAVE_NP = True
+except ImportError:
+    HAVE_NP = False
 
 from pydicom.encaps import decode_data_sequence, defragment_data
 from pydicom.pixel_data_handlers.util import pixel_dtype
-from pydicom.uid import RLELossless
+import pydicom.uid
 
+
+HANDLER_NAME = 'RLE Lossless'
+
+DEPENDENCIES = {
+    'numpy' : ('http://www.numpy.org/', 'NumPy'),
+}
 
 SUPPORTED_TRANSFER_SYNTAXES = [
-    RLELossless
+    pydicom.uid.RLELossless
 ]
 
 
-def supports_transfer_syntax(ds):
-    """Return True if the handler supports the transfer syntax used in `ds`."""
-    return ds.file_meta.TransferSyntaxUID in SUPPORTED_TRANSFER_SYNTAXES
+def is_available(transfer_syntax):
+    """Return True if the handler is available for use.
+
+    Parameters
+    ----------
+    transfer_syntax : UID
+        The Transfer Syntax UID of the Pixel Data that is to be used with
+        the handler.
+    """
+    return transfer_syntax in SUPPORTED_TRANSFER_SYNTAXES and HAVE_NP
+
+
+def supports_transfer_syntax(transfer_syntax):
+    """Return True if the handler supports the `transfer_syntax`."""
+    return transfer_syntax in SUPPORTED_TRANSFER_SYNTAXES
 
 
 def needs_to_convert_to_RGB(ds):

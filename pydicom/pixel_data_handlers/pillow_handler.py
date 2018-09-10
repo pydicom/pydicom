@@ -2,25 +2,34 @@
 """Use the pillow python package to decode pixel transfer syntaxes."""
 
 import io
-import pydicom.encaps
-import pydicom.uid
 import logging
 
-from pydicom.pixel_data_handlers.util import dtype_corrected_for_endianness
-
-have_numpy = True
-logger = logging.getLogger('pydicom')
 try:
     import numpy
+    HAVE_NP = True
 except ImportError:
-    have_numpy = False
-    raise
+    HAVE_NP = False
 
-have_pillow = True
 try:
     from PIL import Image as PILImg
+    HAVE_PIL = True
 except ImportError:
-    have_pillow = False
+    HAVE_PIL = False
+
+try:
+    from PIL import _imaging
+    HAVE_JPEG = getattr(_imaging, "jpeg_decoder", False)
+    HAVE_JPEG2K = getattr(_imaging, "jpeg2k_decoder", False)
+except ImportError:
+    HAVE_JPEG = False
+    HAVE_JPEG2K = False
+
+import pydicom.encaps
+from pydicom.pixel_data_handlers.util import dtype_corrected_for_endianness
+import pydicom.uid
+
+
+logger = logging.getLogger('pydicom')
 
 PillowSupportedTransferSyntaxes = [
     pydicom.uid.JPEGBaseline,
@@ -36,17 +45,34 @@ PillowJPEGTransferSyntaxes = [
     pydicom.uid.JPEGExtended,
 ]
 
-have_pillow_jpeg_plugin = False
-have_pillow_jpeg2000_plugin = False
-try:
-    from PIL import _imaging as pillow_core
-    have_pillow_jpeg_plugin = hasattr(pillow_core, "jpeg_decoder")
-    have_pillow_jpeg2000_plugin = hasattr(pillow_core, "jpeg2k_decoder")
-except Exception:
-    pass
+HANDLER_NAME = 'Pillow'
+
+DEPENDENCIES = {
+    'numpy' : ('http://www.numpy.org/', 'NumPy'),
+    'pillow' : ('https://python-pillow.org/', 'Pillow'),
+}
 
 
-def supports_transfer_syntax(dicom_dataset):
+def is_available(transfer_syntax):
+    """Return True if the handler is available for use.
+
+    Parameters
+    ----------
+    transfer_syntax : UID
+        The Transfer Syntax UID of the Pixel Data that is to be used with
+        the handler.
+    """
+    if HAVE_NP and HAVE_PIL:
+        if transfer_syntax in PillowJPEG2000TransferSyntaxes and HAVE_JPEG2K:
+            return True
+
+        if transfer_syntax in PillowJPEGTransferSyntaxes and HAVE_JPEG:
+            return True
+
+    return False
+
+
+def supports_transfer_syntax(transfer_syntax):
     """
     Returns
     -------
@@ -56,15 +82,7 @@ def supports_transfer_syntax(dicom_dataset):
         False to prevent any attempt to try to use this handler
         to decode the given transfer syntax
     """
-    if (have_pillow_jpeg_plugin and
-            (dicom_dataset.file_meta.TransferSyntaxUID in
-             PillowJPEGTransferSyntaxes)):
-        return True
-    if (have_pillow_jpeg2000_plugin and
-            (dicom_dataset.file_meta.TransferSyntaxUID in
-             PillowJPEG2000TransferSyntaxes)):
-        return True
-    return False
+    return transfer_syntax in PillowSupportedTransferSyntaxes
 
 
 def needs_to_convert_to_RGB(dicom_dataset):
@@ -96,21 +114,21 @@ def get_pixeldata(dicom_dataset):
         if the pixel data type is unsupported
     """
     logger.debug("Trying to use Pillow to read pixel array "
-                 "(has pillow = %s)", have_pillow)
-    if not have_pillow:
+                 "(has pillow = %s)", HAVE_PIL)
+    if not HAVE_PIL:
         msg = ("The pillow package is required to use pixel_array for "
                "this transfer syntax {0}, and pillow could not be "
                "imported.".format(
                    dicom_dataset.file_meta.TransferSyntaxUID.name))
         raise ImportError(msg)
-    if (not have_pillow_jpeg_plugin and
+    if (not HAVE_JPEG and
             dicom_dataset.file_meta.TransferSyntaxUID in
             PillowJPEGTransferSyntaxes):
         msg = ("this transfer syntax {0}, can not be read because "
                "Pillow lacks the jpeg decoder plugin".format(
                    dicom_dataset.file_meta.TransferSyntaxUID.name))
         raise NotImplementedError(msg)
-    if (not have_pillow_jpeg2000_plugin and
+    if (not HAVE_JPEG2K and
             dicom_dataset.file_meta.TransferSyntaxUID in
             PillowJPEG2000TransferSyntaxes):
         msg = ("this transfer syntax {0}, can not be read because "

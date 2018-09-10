@@ -19,6 +19,7 @@ import inspect  # for __dir__
 import io
 import os
 import os.path
+from pkgutil import find_loader
 import sys
 from bisect import bisect_left
 from itertools import takewhile
@@ -759,24 +760,53 @@ class Dataset(dict):
         if already_have:
             return
 
-        # Find all pixel data handlers that support the transfer syntax
-        suitable_handlers = [hh for hh in pydicom.config.image_handlers
-                             if hh and hh.supports_transfer_syntax(self)]
+        # Find all possible handlers that support the transfer syntax
+        transfer_syntax = self.file_meta.TransferSyntaxUID
+        possible_handlers = [hh for hh in pydicom.config.PIXEL_DATA_HANDLERS
+                             if hh.supports_transfer_syntax(transfer_syntax)]
 
-        # No suitable handlers are available
-        if not suitable_handlers:
+        # No handlers support the transfer syntax
+        if not possible_handlers:
             raise NotImplementedError(
                 "Unable to decode pixel data with a transfer syntax UID of "
-                "'{0}' ({1}) as there are no suitable pixel data handlers "
-                "available. Please see the list of supported Transfer "
-                "Syntaxes in the pydicom documentation for information on "
-                "which additional packages might be required"
+                "'{0}' ({1}) as there are no pixel data handlers "
+                "available that support it. Please open a new issue on "
+                "pydicom's github repository so that we may work on "
+                "adding support"
                 .format(self.file_meta.TransferSyntaxUID,
                         self.file_meta.TransferSyntaxUID.name)
             )
 
+        # Handlers that both support the transfer syntax and have their
+        #   dependencies met
+        available_handlers = [hh for hh in possible_handlers if
+                              hh.is_available(transfer_syntax)]
+
+        # There are handlers that support the transfer syntax but none of them
+        #   can be used as missing dependencies
+        if not available_handlers:
+            # For each of the possible handlers we want to find which
+            #   dependencies are missing
+            msg = (
+                "The following handlers are available to decode the pixel "
+                "data however they are missing required dependencies: "
+            )
+            pkg_msg = []
+            for hh in possible_handlers:
+                hh_deps = hh.DEPENDENCIES
+                # Missing packages
+                missing = [dd for dd in hh_deps if find_loader(dd) is None]
+                # Package names
+                names = [hh_deps[name][0] for name in missing]
+                pkg_msg.append(
+                    "{} (req. {})"
+                    .format(hh.HANDLER_NAME, ', '.join(missing))
+                )
+
+            raise RuntimeError(msg + ', '.join(pkg_msg))
+
         last_exception = None
-        for handler in suitable_handlers:
+        for handler in available_handlers:
             try:
                 # Use the handler to get a 1D numpy array of the pixel data
                 arr = handler.get_pixeldata(self)
@@ -808,7 +838,7 @@ class Dataset(dict):
             "Please see the list of supported Transfer Syntaxes in the "
             "pydicom documentation for alternative packages that might "
             "be able to decode the data"
-            .format(", ".join([str(hh) for hh in suitable_handlers]))
+            .format(", ".join([str(hh) for hh in available_handlers]))
         )
 
         raise last_exception

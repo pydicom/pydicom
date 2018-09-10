@@ -16,32 +16,39 @@ numpy_missing_message = ("numpy is not available "
                          "in this test environment")
 jpeg_ls_missing_message = ("jpeg_ls is not available "
                            "in this test environment")
-pillow_handler = None
-numpy_handler = None
-gdcm_handler = None
-jpeg_ls_handler = None
 
-have_pillow_jpeg_plugin = False
-have_pillow_jpeg2000_plugin = False
+
 try:
     import pydicom.pixel_data_handlers.numpy_handler as numpy_handler
+    HAVE_NP = numpy_handler.HAVE_NP
 except ImportError:
-    have_numpy_handler = False
+    HAVE_NP = False
+    numpy_handler = None
+
 try:
     import pydicom.pixel_data_handlers.pillow_handler as pillow_handler
-    have_pillow_jpeg_plugin = pillow_handler.have_pillow_jpeg_plugin
-    have_pillow_jpeg2000_plugin = \
-        pillow_handler.have_pillow_jpeg2000_plugin
+    HAVE_PIL = pillow_handler.HAVE_PIL
+    HAVE_JPEG = pillow_handler.HAVE_JPEG
+    HAVE_JPEG2K = pillow_handler.HAVE_JPEG2K
 except ImportError:
-    have_pillow_handler = False
+    HAVE_PIL = False
+    pillow_handler = None
+    HAVE_JPEG = False
+    HAVE_JPEG2K = False
+
 try:
     import pydicom.pixel_data_handlers.jpeg_ls_handler as jpeg_ls_handler
+    HAVE_JPEGLS = jpeg_ls_handler.HAVE_JPEGLS
 except ImportError:
     jpeg_ls_handler = None
+    HAVE_JPEGLS = False
+
 try:
     import pydicom.pixel_data_handlers.gdcm_handler as gdcm_handler
+    HAVE_GDCM = gdcm_handler.HAVE_GDCM
 except ImportError:
     gdcm_handler = None
+    HAVE_GDCM = False
 
 mr_name = get_testdata_files("MR_small.dcm")[0]
 jpeg_ls_lossless_name = get_testdata_files("MR_small_jpeg_ls_lossless.dcm")[0]
@@ -58,36 +65,36 @@ class Test_JPEG_LS_Lossless_transfer_syntax():
         self.mr_small = dcmread(mr_name)
         self.emri_jpeg_ls_lossless = dcmread(emri_jpeg_ls_lossless)
         self.emri_small = dcmread(emri_name)
-        self.original_handlers = pydicom.config.image_handlers
+        self.original_handlers = pydicom.config.PIXEL_DATA_HANDLERS
 
     def teardown_method(self, method):
-        pydicom.config.image_handlers = self.original_handlers
+        pydicom.config.PIXEL_DATA_HANDLERS = self.original_handlers
 
-    @pytest.mark.skipif(numpy_handler is None, reason=numpy_missing_message)
+    @pytest.mark.skipif(not HAVE_NP, reason=numpy_missing_message)
     def test_read_mr_with_numpy(self):
-        pydicom.config.image_handlers = [numpy_handler]
+        pydicom.config.PIXEL_DATA_HANDLERS = [numpy_handler]
         msg = (
             r"Unable to decode pixel data with a transfer syntax UID of "
             r"'1.2.840.10008.1.2.4.80' \(JPEG-LS Lossless Image Compression\) "
-            r"as there are no suitable pixel data handlers available."
+            r"as there are no pixel data handlers available."
         )
         with pytest.raises(NotImplementedError, match=msg):
             self.jpeg_ls_lossless.pixel_array
 
-    @pytest.mark.skipif(numpy_handler is None, reason=numpy_missing_message)
+    @pytest.mark.skipif(not HAVE_NP, reason=numpy_missing_message)
     def test_read_emri_with_numpy(self):
-        pydicom.config.image_handlers = [numpy_handler]
+        pydicom.config.PIXEL_DATA_HANDLERS = [numpy_handler]
         msg = (
             r"Unable to decode pixel data with a transfer syntax UID of "
             r"'1.2.840.10008.1.2.4.80' \(JPEG-LS Lossless Image Compression\) "
-            r"as there are no suitable pixel data handlers available."
+            r"as there are no pixel data handlers available."
         )
         with pytest.raises(NotImplementedError, match=msg):
             self.emri_jpeg_ls_lossless.pixel_array
 
-    @pytest.mark.skipif(pillow_handler is None, reason=pillow_missing_message)
+    @pytest.mark.skipif(not HAVE_PIL, reason=pillow_missing_message)
     def test_read_mr_with_pillow(self):
-        pydicom.config.image_handlers = [pillow_handler]
+        pydicom.config.PIXEL_DATA_HANDLERS = [pillow_handler]
         msg = (
             r"Unable to decode pixel data with a transfer syntax UID of "
             r"'1.2.840.10008.1.2.4.80' \(JPEG-LS Lossless Image Compression\) "
@@ -96,9 +103,9 @@ class Test_JPEG_LS_Lossless_transfer_syntax():
         with pytest.raises(NotImplementedError, match=msg):
             self.jpeg_ls_lossless.pixel_array
 
-    @pytest.mark.skipif(pillow_handler is None, reason=pillow_missing_message)
+    @pytest.mark.skipif(not HAVE_PIL, reason=pillow_missing_message)
     def test_read_emri_with_pillow(self):
-        pydicom.config.image_handlers = [pillow_handler]
+        pydicom.config.PIXEL_DATA_HANDLERS = [pillow_handler]
         msg = (
             r"Unable to decode pixel data with a transfer syntax UID of "
             r"'1.2.840.10008.1.2.4.80' \(JPEG-LS Lossless Image Compression\) "
@@ -107,40 +114,36 @@ class Test_JPEG_LS_Lossless_transfer_syntax():
         with pytest.raises(NotImplementedError, match=msg):
             self.emri_jpeg_ls_lossless.pixel_array
 
-    @pytest.mark.skipif(gdcm_handler is None, reason=gdcm_missing_message)
+    @pytest.mark.skipif(not HAVE_GDCM, reason=gdcm_missing_message)
     def test_read_mr_with_gdcm(self):
-        pydicom.config.image_handlers = [numpy_handler, gdcm_handler]
+        pydicom.config.PIXEL_DATA_HANDLERS = [numpy_handler, gdcm_handler]
         a = self.jpeg_ls_lossless.pixel_array
         b = self.mr_small.pixel_array
         assert a.mean() == b.mean(), \
             "using GDCM Decoded pixel data is not " \
             "all {0} (mean == {1})".format(b.mean(), a.mean())
 
-    @pytest.mark.skipif(gdcm_handler is None, reason=gdcm_missing_message)
+    @pytest.mark.skipif(not HAVE_GDCM, reason=gdcm_missing_message)
     def test_read_emri_with_gdcm(self):
-        pydicom.config.image_handlers = [numpy_handler, gdcm_handler]
+        pydicom.config.PIXEL_DATA_HANDLERS = [numpy_handler, gdcm_handler]
         a = self.emri_jpeg_ls_lossless.pixel_array
         b = self.emri_small.pixel_array
         assert a.mean() == b.mean(), \
             "using GDCM Decoded pixel data is not " \
             "all {0} (mean == {1})".format(b.mean(), a.mean())
 
-    @pytest.mark.skipif(
-        jpeg_ls_handler is None,
-        reason=jpeg_ls_missing_message)
+    @pytest.mark.skipif(not HAVE_JPEGLS, reason=jpeg_ls_missing_message)
     def test_read_mr_with_jpeg_ls(self):
-        pydicom.config.image_handlers = [numpy_handler, jpeg_ls_handler]
+        pydicom.config.PIXEL_DATA_HANDLERS = [numpy_handler, jpeg_ls_handler]
         a = self.jpeg_ls_lossless.pixel_array
         b = self.mr_small.pixel_array
         assert a.mean() == b.mean(), \
             "using jpeg_ls decoded pixel data is not " \
             "all {0} (mean == {1})".format(b.mean(), a.mean())
 
-    @pytest.mark.skipif(
-        jpeg_ls_handler is None,
-        reason=jpeg_ls_missing_message)
+    @pytest.mark.skipif(not HAVE_JPEGLS, reason=jpeg_ls_missing_message)
     def test_read_emri_with_jpeg_ls(self):
-        pydicom.config.image_handlers = [numpy_handler, jpeg_ls_handler]
+        pydicom.config.PIXEL_DATA_HANDLERS = [numpy_handler, jpeg_ls_handler]
         a = self.emri_jpeg_ls_lossless.pixel_array
         b = self.emri_small.pixel_array
         assert a.mean() == b.mean(), \
@@ -148,21 +151,21 @@ class Test_JPEG_LS_Lossless_transfer_syntax():
             "(mean == {1})".format(b.mean(), a.mean())
 
     def test_read_mr_without_any_handler(self):
-        pydicom.config.image_handlers = []
+        pydicom.config.PIXEL_DATA_HANDLERS = []
         msg = (
             r"Unable to decode pixel data with a transfer syntax UID of "
             r"'1.2.840.10008.1.2.4.80' \(JPEG-LS Lossless Image Compression\) "
-            r"as there are no suitable pixel data handlers available."
+            r"as there are no pixel data handlers available."
         )
         with pytest.raises(NotImplementedError, match=msg):
             self.jpeg_ls_lossless.pixel_array
 
     def test_read_emri_without_any_handler(self):
-        pydicom.config.image_handlers = []
+        pydicom.config.PIXEL_DATA_HANDLERS = []
         msg = (
             r"Unable to decode pixel data with a transfer syntax UID of "
             r"'1.2.840.10008.1.2.4.80' \(JPEG-LS Lossless Image Compression\) "
-            r"as there are no suitable pixel data handlers available."
+            r"as there are no pixel data handlers available."
         )
         with pytest.raises(NotImplementedError, match=msg):
             self.emri_jpeg_ls_lossless.pixel_array

@@ -174,12 +174,12 @@ class TestNoNumpy_NoNumpyHandler(object):
     """Tests for handling datasets without numpy and the handler."""
     def setup(self):
         """Setup the environment."""
-        self.original_handlers = pydicom.config.image_handlers
-        pydicom.config.image_handlers = []
+        self.original_handlers = pydicom.config.PIXEL_DATA_HANDLERS
+        pydicom.config.PIXEL_DATA_HANDLERS = []
 
     def teardown(self):
         """Restore the environment."""
-        pydicom.config.image_handlers = self.original_handlers
+        pydicom.config.PIXEL_DATA_HANDLERS = self.original_handlers
 
     def test_environment(self):
         """Check that the testing environment is as expected."""
@@ -231,12 +231,12 @@ class TestNumpy_NoNumpyHandler(object):
     """Tests for handling datasets without the handler."""
     def setup(self):
         """Setup the environment."""
-        self.original_handlers = pydicom.config.image_handlers
-        pydicom.config.image_handlers = []
+        self.original_handlers = pydicom.config.PIXEL_DATA_HANDLERS
+        pydicom.config.PIXEL_DATA_HANDLERS = []
 
     def teardown(self):
         """Restore the environment."""
-        pydicom.config.image_handlers = self.original_handlers
+        pydicom.config.PIXEL_DATA_HANDLERS = self.original_handlers
 
     def test_environment(self):
         """Check that the testing environment is as expected."""
@@ -278,8 +278,7 @@ class TestNumpy_NoNumpyHandler(object):
         ds = dcmread(EXPL_16_1_1F)
         for uid in ALL_TRANSFER_SYNTAXES:
             ds.file_meta.TransferSyntaxUID = uid
-            with pytest.raises(NotImplementedError,
-                               match="UID of '{}'".format(uid)):
+            with pytest.raises((NotImplementedError, RuntimeError)):
                 ds.pixel_array
 
 
@@ -328,12 +327,12 @@ class TestNumpy_NumpyHandler(object):
     """Tests for handling Pixel Data with the handler."""
     def setup(self):
         """Setup the test datasets and the environment."""
-        self.original_handlers = pydicom.config.image_handlers
-        pydicom.config.image_handlers = [NP_HANDLER]
+        self.original_handlers = pydicom.config.PIXEL_DATA_HANDLERS
+        pydicom.config.PIXEL_DATA_HANDLERS = [NP_HANDLER]
 
     def teardown(self):
         """Restore the environment."""
-        pydicom.config.image_handlers = self.original_handlers
+        pydicom.config.PIXEL_DATA_HANDLERS = self.original_handlers
 
     def test_environment(self):
         """Check that the testing environment is as expected."""
@@ -346,8 +345,7 @@ class TestNumpy_NumpyHandler(object):
 
         for uid in UNSUPPORTED_SYNTAXES:
             ds.file_meta.TransferSyntaxUID = uid
-            with pytest.raises(NotImplementedError,
-                               match="UID of '{0}' ".format(uid)):
+            with pytest.raises((NotImplementedError, RuntimeError)):
                 ds.pixel_array
 
     def test_dataset_pixel_array_handler_needs_convert(self):
