@@ -50,7 +50,10 @@ def is_available(transfer_syntax):
         The Transfer Syntax UID of the Pixel Data that is to be used with
         the handler.
     """
-    return HAVE_NP and HAVE_GDCM
+    if not HAVE_NP or not HAVE_GDCM:
+        return False
+
+    return transfer_syntax in SUPPORTED_TRANSFER_SYNTAXES
 
 
 def needs_to_convert_to_RGB(dicom_dataset):
@@ -108,7 +111,7 @@ def get_pixeldata(dicom_dataset):
     # FIXME this should just use dicom_dataset.PixelData
     # instead of dicom_dataset.filename
     #       but it is unclear how this should be achieved using GDCM
-    if not can_use_gdcm:
+    if not HAVE_GDCM:
         msg = ("GDCM requires both the gdcm package and numpy "
                "and one or more could not be imported")
         raise ImportError(msg)
