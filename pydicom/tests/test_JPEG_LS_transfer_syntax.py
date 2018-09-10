@@ -98,7 +98,7 @@ class Test_JPEG_LS_Lossless_transfer_syntax():
         msg = (
             r"Unable to decode pixel data with a transfer syntax UID of "
             r"'1.2.840.10008.1.2.4.80' \(JPEG-LS Lossless Image Compression\) "
-            r"as there are no suitable pixel data handlers available."
+            r"as there are no pixel data handlers available."
         )
         with pytest.raises(NotImplementedError, match=msg):
             self.jpeg_ls_lossless.pixel_array
@@ -109,7 +109,7 @@ class Test_JPEG_LS_Lossless_transfer_syntax():
         msg = (
             r"Unable to decode pixel data with a transfer syntax UID of "
             r"'1.2.840.10008.1.2.4.80' \(JPEG-LS Lossless Image Compression\) "
-            r"as there are no suitable pixel data handlers available."
+            r"as there are no pixel data handlers available."
         )
         with pytest.raises(NotImplementedError, match=msg):
             self.emri_jpeg_ls_lossless.pixel_array

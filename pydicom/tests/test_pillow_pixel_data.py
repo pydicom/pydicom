@@ -15,20 +15,20 @@ have_pytest_param = hasattr(pytest, 'param')
 
 try:
     from pydicom.pixel_data_handlers import numpy_handler
-    have_numpy_handler = True
+    HAVE_NP = numpy_handler.HAVE_NP
 except ImportError:
-    have_numpy_handler = False
+    HAVE_NP = False
     numpy_handler = None
 
 try:
     from pydicom.pixel_data_handlers import pillow_handler
-    have_pillow_handler = True
+    HAVE_PIL = pillow_handler.HAVE_PIL
     HAVE_JPEG = pillow_handler.HAVE_JPEG
     HAVE_JPEG2K = pillow_handler.HAVE_JPEG2K
     import numpy as np
 except ImportError:
     pillow_handler = None
-    have_pillow_handler = False
+    HAVE_PIL = False
     HAVE_JPEG = False
     HAVE_JPEG2K = False
 
@@ -36,11 +36,9 @@ except ImportError:
 pillow_missing_message = ("pillow is not available "
                           "in this test environment")
 
-test_pillow_decoder = have_numpy_handler and have_pillow_handler
-test_pillow_jpeg_decoder = (test_pillow_decoder and
-                            HAVE_JPEG)
-test_pillow_jpeg2000_decoder = (test_pillow_decoder and
-                                HAVE_JPEG2K)
+TEST_PIL = HAVE_NP and HAVE_PIL
+TEST_JPEG = TEST_PIL and HAVE_JPEG
+TEST_JPEG2K = TEST_PIL and HAVE_JPEG2K
 
 empty_number_tags_name = get_testdata_files(
     "reportsi_with_empty_number_tags.dcm")[0]
@@ -241,7 +239,7 @@ class Test_JPEGlosslessTests_no_pillow(object):
 
 
 @pytest.mark.skipif(
-    not test_pillow_decoder,
+    not TEST_PIL,
     reason=pillow_missing_message)
 class Test_JPEG_LS_with_pillow(object):
     """Tests for decoding JPEG LS if pillow pixel handler is available."""
@@ -268,7 +266,7 @@ class Test_JPEG_LS_with_pillow(object):
 
 
 @pytest.mark.skipif(
-    not test_pillow_jpeg2000_decoder,
+    not TEST_JPEG2K,
     reason=pillow_missing_message)
 class Test_JPEG2000Tests_with_pillow(object):
     """Test decoding JPEG2K if pillow JPEG2K plugin is available."""
@@ -322,7 +320,7 @@ class Test_JPEG2000Tests_with_pillow(object):
 
 
 @pytest.mark.skipif(
-    not test_pillow_jpeg_decoder,
+    not TEST_JPEG,
     reason=pillow_missing_message)
 class Test_JPEGlossyTests_with_pillow(object):
     """Test decoding JPEG if pillow JPEG plugin is available."""
@@ -539,7 +537,7 @@ else:
 
 
 @pytest.mark.skipif(
-    not test_pillow_jpeg_decoder,
+    not TEST_JPEG,
     reason=pillow_missing_message)
 @pytest.mark.parametrize(
     "image,PhotometricInterpretation,results,ground_truth",
@@ -579,7 +577,7 @@ def test_PI_RGB(test_with_pillow,
 
 
 @pytest.mark.skipif(
-    not test_pillow_jpeg_decoder,
+    not TEST_JPEG,
     reason=pillow_missing_message)
 class Test_JPEGlosslessTests_with_pillow(object):
     """Test decoding JPEG lossless if pillow JPEG plugin is available."""
@@ -601,5 +599,5 @@ class Test_JPEGlosslessTests_with_pillow(object):
 
     def testJPEGlosslessPixelArray(self):
         """Test decoding JPEG lossless with pillow handler fails."""
-        with pytest.raises(NotImplementedError):
+        with pytest.raises(RuntimeError):
             self.jpeg_lossless.pixel_array
