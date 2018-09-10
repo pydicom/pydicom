@@ -42,7 +42,7 @@ except ImportError:
     HAVE_NP = False
     numpy_handler = None
 
-test_gdcm_decoder = HAVE_GDCM
+TEST_GDCM = HAVE_GDCM
 
 empty_number_tags_name = get_testdata_files(
     "reportsi_with_empty_number_tags.dcm")[0]
@@ -239,7 +239,7 @@ class GDCM_JPEGlosslessTests_no_gdcm(unittest.TestCase):
             _ = self.jpeg_lossless.pixel_array
 
 
-@pytest.mark.skipif(not test_gdcm_decoder, reason=gdcm_missing_message)
+@pytest.mark.skipif(not TEST_GDCM, reason=gdcm_missing_message)
 class GDCM_JPEG_LS_Tests_with_gdcm(unittest.TestCase):
     def setUp(self):
         if compat.in_py2:
@@ -282,7 +282,7 @@ class GDCM_JPEG_LS_Tests_with_gdcm(unittest.TestCase):
             "(mean == {1})".format(b.mean(), a.mean()))
 
 
-@pytest.mark.skipif(not test_gdcm_decoder, reason=gdcm_missing_message)
+@pytest.mark.skipif(not TEST_GDCM, reason=gdcm_missing_message)
 class GDCM_JPEG2000Tests_with_gdcm(unittest.TestCase):
     def setUp(self):
         self.jpeg_2k = dcmread(jpeg2000_name)
@@ -349,7 +349,7 @@ class GDCM_JPEG2000Tests_with_gdcm(unittest.TestCase):
                 "(mean == {1})".format(b.mean(), a.mean()))
 
 
-@pytest.mark.skipif(not test_gdcm_decoder, reason=gdcm_missing_message)
+@pytest.mark.skipif(not TEST_GDCM, reason=gdcm_missing_message)
 class GDCM_JPEGlossyTests_with_gdcm(unittest.TestCase):
 
     def setUp(self):
@@ -554,7 +554,7 @@ else:
 
 
 @pytest.mark.skipif(
-    not test_gdcm_decoder,
+    not TEST_GDCM,
     reason=gdcm_missing_message)
 @pytest.mark.parametrize(
     "image,PhotometricInterpretation,results,convert_yuv_to_rgb",
@@ -585,7 +585,7 @@ def test_PI_RGB(test_with_gdcm,
     assert t.PhotometricInterpretation == PhotometricInterpretation
 
 
-@pytest.mark.skipif(not test_gdcm_decoder, reason=gdcm_missing_message)
+@pytest.mark.skipif(not TEST_GDCM, reason=gdcm_missing_message)
 class GDCM_JPEGlosslessTests_with_gdcm(unittest.TestCase):
     def setUp(self):
         self.jpeg_lossless = dcmread(jpeg_lossless_name)
