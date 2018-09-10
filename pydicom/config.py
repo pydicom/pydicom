@@ -70,9 +70,9 @@ logger.addHandler(handler)
 
 import pydicom.pixel_data_handlers.numpy_handler as NP_HANDLER
 import pydicom.pixel_data_handlers.rle_handler as RLE_HANDLER
-import pydicom.pixel_data_handlers.gdcm_handler as GDCM_HANDLER
 import pydicom.pixel_data_handlers.pillow_handler as PILLOW_HANDLER
 import pydicom.pixel_data_handlers.jpeg_ls_handler as JPEGLS_HANDLER
+import pydicom.pixel_data_handlers.gdcm_handler as GDCM_HANDLER
 
 PIXEL_DATA_HANDLERS = [
     NP_HANDLER,

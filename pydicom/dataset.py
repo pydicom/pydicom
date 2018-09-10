@@ -19,7 +19,6 @@ import inspect  # for __dir__
 import io
 import os
 import os.path
-from pkgutil import find_loader
 import sys
 from bisect import bisect_left
 from itertools import takewhile
@@ -40,6 +39,11 @@ from pydicom.pixel_data_handlers.util import (convert_color_space,
 from pydicom.tag import Tag, BaseTag, tag_in_exception
 from pydicom.uid import (ExplicitVRLittleEndian, ImplicitVRLittleEndian,
                          ExplicitVRBigEndian, PYDICOM_IMPLEMENTATION_UID)
+
+if compat.in_py2:
+    from pkgutil import find_loader as HAVE_PACKAGE
+else:
+    from importlib.util import find_spec as HAVE_PACKAGE
 
 have_numpy = True
 try:
@@ -795,7 +799,7 @@ class Dataset(dict):
             for hh in possible_handlers:
                 hh_deps = hh.DEPENDENCIES
                 # Missing packages
-                missing = [dd for dd in hh_deps if find_loader(dd) is None]
+                missing = [dd for dd in hh_deps if HAVE_PACKAGE(dd) is None]
                 # Package names
                 names = [hh_deps[name][0] for name in missing]
                 pkg_msg.append(
