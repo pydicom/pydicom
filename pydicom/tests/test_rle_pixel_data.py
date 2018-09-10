@@ -36,7 +36,7 @@ try:
     import numpy as np
     from pydicom.pixel_data_handlers import numpy_handler as NP_HANDLER
     from pydicom.pixel_data_handlers.util import reshape_pixel_array
-    HAVE_NP = True
+    HAVE_NP = NP_HANDLER.HAVE_NP
 except ImportError:
     NP_HANDLER = None
     HAVE_NP = False
@@ -49,7 +49,9 @@ try:
         _rle_decode_segment,
         _parse_rle_header,
     )
+    HAVE_RLE = RLE_HANDLER.HAVE_RLE
 except ImportError:
+    HAVE_RLE = False
     RLE_HANDLER = None
 
 
@@ -144,7 +146,7 @@ def _get_pixel_array(fpath):
     -------
     numpy.ndarray
     """
-    if NP_HANDLER is None:
+    if not HAVE_NP:
         raise RuntimeError(
             'Function only usable if the numpy handler is available'
         )
@@ -192,7 +194,8 @@ class TestNoNumpy_NoRLEHandler(object):
     def test_environment(self):
         """Check that the testing environment is as expected."""
         assert not HAVE_NP
-        assert RLE_HANDLER is None
+        # The RLE handler should still be available
+        assert RLE_HANDLER is not None
 
     def test_can_access_supported_dataset(self):
         """Test that we can read and access elements in an RLE dataset."""

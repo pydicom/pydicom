@@ -37,9 +37,9 @@ from struct import unpack
 
 try:
     import numpy as np
-    HAVE_NP = True
+    HAVE_RLE = True
 except ImportError:
-    HAVE_NP = False
+    HAVE_RLE = False
 
 from pydicom.encaps import decode_data_sequence, defragment_data
 from pydicom.pixel_data_handlers.util import pixel_dtype
