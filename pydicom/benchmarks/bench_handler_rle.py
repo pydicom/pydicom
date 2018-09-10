@@ -1,12 +1,16 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Benchmarks for the rle_handler module."""
 
+import numpy as np
+
 from pydicom import dcmread
 from pydicom.data import get_testdata_files
-from pydicom.encaps import decode_data_sequence
+from pydicom.encaps import decode_data_sequence, defragment_data
 from pydicom.pixel_data_handlers.rle_handler import (
     get_pixeldata,
     _rle_decode_frame,
+    _rle_encode_segment,
+    _rle_decode_segment,
 )
 
 
@@ -108,3 +112,21 @@ class TimeGetPixelData(object):
         """Time retrieval of 32-bit, 3 sample/pixel RLE data."""
         for ii in range(self.no_runs):
             get_pixeldata(self.ds_32_3_1)
+
+
+class TimeRLEEncodeSegment(object):
+    """Time tests for rle_handler._rle_encode_segment."""
+    def setup(self):
+        ds = dcmread(OB_RLE_1F)
+        pixel_data = defragment_data(ds.PixelData)
+        decoded = _rle_decode_segment(pixel_data[64:])
+        assert ds.Rows * ds.Columns == len(decoded)
+        self.arr = np.frombuffer(decoded, 'uint8').reshape(ds.Rows, ds.Columns)
+
+        self.no_runs = 100
+
+    def time_encode(self):
+        """Time encoding a full segment."""
+        # Re-encode the decoded data
+        for ii in range(self.no_runs):
+            _rle_encode_segment(self.arr)
