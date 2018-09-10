@@ -22,8 +22,8 @@ from pydicom import compat
 HANDLER_NAME = 'GDCM'
 
 DEPENDENCIES = {
-    'numpy' : ('http://www.numpy.org/', 'NumPy'),
-    'gdcm' : ('http://gdcm.sourceforge.net/wiki/index.php/Main_Page', 'GDCM'),
+    'numpy': ('http://www.numpy.org/', 'NumPy'),
+    'gdcm': ('http://gdcm.sourceforge.net/wiki/index.php/Main_Page', 'GDCM'),
 }
 
 

@@ -23,8 +23,8 @@ import pydicom.uid
 HANDLER_NAME = 'JPEG-LS'
 
 DEPENDENCIES = {
-    'numpy' : ('http://www.numpy.org/', 'NumPy'),
-    'jpeg_ls' : ('https://github.com/Who8MyLunch/CharPyLS', 'CharPyLS'),
+    'numpy': ('http://www.numpy.org/', 'NumPy'),
+    'jpeg_ls': ('https://github.com/Who8MyLunch/CharPyLS', 'CharPyLS'),
 }
 
 SUPPORTED_TRANSFER_SYNTAXES = [

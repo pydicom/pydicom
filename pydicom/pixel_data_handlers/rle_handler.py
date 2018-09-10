@@ -49,7 +49,7 @@ import pydicom.uid
 HANDLER_NAME = 'RLE Lossless'
 
 DEPENDENCIES = {
-    'numpy' : ('http://www.numpy.org/', 'NumPy'),
+    'numpy': ('http://www.numpy.org/', 'NumPy'),
 }
 
 SUPPORTED_TRANSFER_SYNTAXES = [

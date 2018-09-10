@@ -3,11 +3,12 @@
 
 There are the following possibilities:
 
-* numpy is not available and the numpy handler is not available
+* numpy is not available and
+  * the numpy handler is not available
+  * the numpy handler is not available
 * numpy is available and
-
-  * The numpy handler is not available
-  * The numpy handler is available
+  * the numpy handler is not available
+  * the numpy handler is available
 
 **Supported transfer syntaxes**
 
@@ -45,6 +46,11 @@ from pydicom.uid import (
 
 try:
     import numpy as np
+    HAVE_NP = True
+except ImportError:
+    HAVE_NP = False
+
+try:
     from pydicom.pixel_data_handlers import numpy_handler as NP_HANDLER
     from pydicom.pixel_data_handlers.numpy_handler import (
         get_pixeldata,
@@ -53,9 +59,7 @@ try:
         get_expected_length,
         pixel_dtype,
     )
-    HAVE_NP = True
 except ImportError:
-    HAVE_NP = False
     NP_HANDLER = None
 
 
@@ -184,7 +188,7 @@ class TestNoNumpy_NoNumpyHandler(object):
     def test_environment(self):
         """Check that the testing environment is as expected."""
         assert not HAVE_NP
-        assert NP_HANDLER is None
+        assert NP_HANDLER is not None
 
     def test_can_access_supported_dataset(self):
         """Test that we can read and access elements in dataset."""
@@ -222,6 +226,76 @@ class TestNoNumpy_NoNumpyHandler(object):
             ds.file_meta.TransferSyntaxUID = uid
             with pytest.raises(NotImplementedError,
                                match="UID of '{}'".format(uid)):
+                ds.pixel_array
+
+
+# Numpy unavailable and the numpy handler is available
+@pytest.mark.skipif(HAVE_NP, reason='Numpy is available')
+class TestNoNumpy_NumpyHandler(object):
+    """Tests for handling datasets without numpy and the handler."""
+    def setup(self):
+        """Setup the environment."""
+        self.original_handlers = pydicom.config.PIXEL_DATA_HANDLERS
+        pydicom.config.PIXEL_DATA_HANDLERS = [NP_HANDLER]
+
+    def teardown(self):
+        """Restore the environment."""
+        pydicom.config.PIXEL_DATA_HANDLERS = self.original_handlers
+
+    def test_environment(self):
+        """Check that the testing environment is as expected."""
+        assert not HAVE_NP
+        assert NP_HANDLER is not None
+
+    def test_can_access_supported_dataset(self):
+        """Test that we can read and access elements in dataset."""
+        # Explicit little
+        ds = dcmread(EXPL_16_1_1F)
+        assert 'CompressedSamples^MR1' == ds.PatientName
+        assert 8192 == len(ds.PixelData)
+
+        # Implicit little
+        ds = dcmread(IMPL_16_1_1F)
+        assert 'CompressedSamples^MR1' == ds.PatientName
+        assert 8192 == len(ds.PixelData)
+
+        # Deflated little
+        ds = dcmread(DEFL_8_1_1F)
+        assert '^^^^' == ds.PatientName
+        assert 262144 == len(ds.PixelData)
+
+        # Explicit big
+        ds = dcmread(EXPB_16_1_1F)
+        assert 'CompressedSamples^MR1' == ds.PatientName
+        assert 8192 == len(ds.PixelData)
+
+    @pytest.mark.parametrize("fpath,data", REFERENCE_DATA_UNSUPPORTED)
+    def test_can_access_unsupported_dataset(self, fpath, data):
+        """Test can read and access elements in unsupported datasets."""
+        ds = dcmread(fpath)
+        assert data[0] == ds.file_meta.TransferSyntaxUID
+        assert data[1] == ds.PatientName
+
+    def test_unsupported_pixel_array_raises(self):
+        """Test pixel_array raises exception for unsupported syntaxes."""
+        ds = dcmread(EXPL_16_1_1F)
+        for uid in UNSUPPORTED_SYNTAXES:
+            ds.file_meta.TransferSyntaxUID = uid
+            with pytest.raises(NotImplementedError,
+                               match="UID of '{}'".format(uid)):
+                ds.pixel_array
+
+    def test_supported_pixel_array_raises(self):
+        """Test pixel_array raises exception for supported syntaxes."""
+        ds = dcmread(EXPL_16_1_1F)
+        for uid in SUPPORTED_SYNTAXES:
+            ds.file_meta.TransferSyntaxUID = uid
+            exc_msg = (
+                r"The following handlers are available to decode the pixel "
+                r"data however they are missing required dependencies: "
+                r"Numpy \(req. numpy\)"
+            )
+            with pytest.raises(RuntimeError, match=exc_msg):
                 ds.pixel_array
 
 

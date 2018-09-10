@@ -820,8 +820,8 @@ class Dataset(dict):
                 #   convert the color space from YCbCr to RGB
                 if handler.needs_to_convert_to_RGB(self):
                     self._pixel_array = convert_color_space(self._pixel_array,
-                                                             'YBR_FULL',
-                                                             'RGB')
+                                                            'YBR_FULL',
+                                                            'RGB')
 
                 self._pixel_id = id(self.PixelData)
 

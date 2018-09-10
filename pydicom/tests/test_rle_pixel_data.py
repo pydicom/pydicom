@@ -3,9 +3,10 @@
 
 There are the following possibilities:
 
-* numpy is not available and the RLE handler is not available
+* numpy is not available and
+  * the RLE handler is not available
+  * the RLE handler is available
 * numpy is available and
-
   * The RLE handler is not available
   * The RLE handler is available
 
@@ -220,6 +221,64 @@ class TestNoNumpy_NoRLEHandler(object):
                 r"'{}'".format(uid)
             )
             with pytest.raises(NotImplementedError, match=exc_msg):
+                ds.pixel_array
+
+
+# Numpy unavailable and the RLE handler is available
+@pytest.mark.skipif(HAVE_NP, reason='Numpy is available')
+class TestNoNumpy_RLEHandler(object):
+    """Tests for handling datasets without numpy and the handler."""
+    def setup(self):
+        """Setup the environment."""
+        self.original_handlers = pydicom.config.PIXEL_DATA_HANDLERS
+        pydicom.config.PIXEL_DATA_HANDLERS = [RLE_HANDLER]
+
+    def teardown(self):
+        """Restore the environment."""
+        pydicom.config.PIXEL_DATA_HANDLERS = self.original_handlers
+
+    def test_environment(self):
+        """Check that the testing environment is as expected."""
+        assert not HAVE_NP
+        # The RLE handler should still be available
+        assert RLE_HANDLER is not None
+
+    def test_can_access_supported_dataset(self):
+        """Test that we can read and access elements in an RLE dataset."""
+        ds = dcmread(MR_RLE_1F)
+        assert 'CompressedSamples^MR1' == ds.PatientName
+        assert 6128 == len(ds.PixelData)
+
+    @pytest.mark.parametrize("fpath,data", REFERENCE_DATA_UNSUPPORTED)
+    def test_can_access_unsupported_dataset(self, fpath, data):
+        """Test can read and access elements in unsupported datasets."""
+        ds = dcmread(fpath)
+        assert data[0] == ds.file_meta.TransferSyntaxUID
+        assert data[1] == ds.PatientName
+
+    def test_unsupported_pixel_array_raises(self):
+        """Test pixel_array raises exception for unsupported syntaxes."""
+        ds = dcmread(MR_EXPL_LITTLE_1F)
+        for uid in UNSUPPORTED_SYNTAXES:
+            ds.file_meta.TransferSyntaxUID = uid
+            exc_msg = (
+                r"Unable to decode pixel data with a transfer syntax UID of "
+                r"'{}'".format(uid)
+            )
+            with pytest.raises(RuntimeError, match=exc_msg):
+                ds.pixel_array
+
+    def test_supported_pixel_array_raises(self):
+        """Test pixel_array raises exception for supported syntaxes."""
+        ds = dcmread(MR_EXPL_LITTLE_1F)
+        for uid in SUPPORTED_SYNTAXES:
+            ds.file_meta.TransferSyntaxUID = uid
+            exc_msg = (
+                r"The following handlers are available to decode the pixel "
+                r"data however they are missing required dependencies: "
+                r"RLE Lossless \(req. numpy\)"
+            )
+            with pytest.raises(RuntimeError, match=exc_msg):
                 ds.pixel_array
 
 

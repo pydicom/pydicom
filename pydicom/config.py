@@ -68,11 +68,11 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 
 
-import pydicom.pixel_data_handlers.numpy_handler as NP_HANDLER
-import pydicom.pixel_data_handlers.rle_handler as RLE_HANDLER
-import pydicom.pixel_data_handlers.pillow_handler as PILLOW_HANDLER
-import pydicom.pixel_data_handlers.jpeg_ls_handler as JPEGLS_HANDLER
-import pydicom.pixel_data_handlers.gdcm_handler as GDCM_HANDLER
+import pydicom.pixel_data_handlers.numpy_handler as NP_HANDLER  # noqa
+import pydicom.pixel_data_handlers.rle_handler as RLE_HANDLER  # noqa
+import pydicom.pixel_data_handlers.pillow_handler as PILLOW_HANDLER  # noqa
+import pydicom.pixel_data_handlers.jpeg_ls_handler as JPEGLS_HANDLER  # noqa
+import pydicom.pixel_data_handlers.gdcm_handler as GDCM_HANDLER  # noqa
 
 PIXEL_DATA_HANDLERS = [
     NP_HANDLER,
@@ -108,7 +108,6 @@ exception thrown up.
 If no one throws an exception, but they all refuse to support the transfer
 syntax, then this fact is announced in a NotImplementedError exception.
 """
-
 
 
 def debug(debug_on=True):
