@@ -49,7 +49,7 @@ HANDLER_NAME = 'Pillow'
 
 DEPENDENCIES = {
     'numpy': ('http://www.numpy.org/', 'NumPy'),
-    'pillow': ('https://python-pillow.org/', 'Pillow'),
+    'PIL': ('https://python-pillow.org/', 'Pillow'),
 }
 
 
