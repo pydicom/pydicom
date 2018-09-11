@@ -66,7 +66,7 @@ def is_available(transfer_syntax):
         The Transfer Syntax UID of the Pixel Data that is to be used with
         the handler.
     """
-    return transfer_syntax in SUPPORTED_TRANSFER_SYNTAXES and HAVE_RLE
+    return supports_transfer_syntax(transfer_syntax) and HAVE_RLE
 
 
 def supports_transfer_syntax(transfer_syntax):

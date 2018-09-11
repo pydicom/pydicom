@@ -53,7 +53,7 @@ def is_available(transfer_syntax):
     if not HAVE_NP or not HAVE_GDCM:
         return False
 
-    return transfer_syntax in SUPPORTED_TRANSFER_SYNTAXES
+    return supports_transfer_syntax(transfer_syntax)
 
 
 def needs_to_convert_to_RGB(dicom_dataset):
