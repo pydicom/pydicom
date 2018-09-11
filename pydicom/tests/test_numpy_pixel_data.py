@@ -5,7 +5,7 @@ There are the following possibilities:
 
 * numpy is not available and
   * the numpy handler is not available
-  * the numpy handler is not available
+  * the numpy handler is available
 * numpy is available and
   * the numpy handler is not available
   * the numpy handler is available
@@ -293,7 +293,7 @@ class TestNoNumpy_NumpyHandler(object):
             exc_msg = (
                 r"The following handlers are available to decode the pixel "
                 r"data however they are missing required dependencies: "
-                r"Numpy \(req. numpy\)"
+                r"Numpy \(req. NumPy\)"
             )
             with pytest.raises(RuntimeError, match=exc_msg):
                 ds.pixel_array

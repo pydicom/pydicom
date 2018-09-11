@@ -276,7 +276,7 @@ class TestNoNumpy_RLEHandler(object):
             exc_msg = (
                 r"The following handlers are available to decode the pixel "
                 r"data however they are missing required dependencies: "
-                r"RLE Lossless \(req. numpy\)"
+                r"RLE Lossless \(req. NumPy\)"
             )
             with pytest.raises(RuntimeError, match=exc_msg):
                 ds.pixel_array

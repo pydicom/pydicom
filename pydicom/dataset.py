@@ -799,10 +799,10 @@ class Dataset(dict):
                 # Missing packages
                 missing = [dd for dd in hh_deps if have_package(dd) is None]
                 # Package names
-                names = [hh_deps[name][0] for name in missing]
+                names = [hh_deps[name][1] for name in missing]
                 pkg_msg.append(
                     "{} (req. {})"
-                    .format(hh.HANDLER_NAME, ', '.join(missing))
+                    .format(hh.HANDLER_NAME, ', '.join(names))
                 )
 
             raise RuntimeError(msg + ', '.join(pkg_msg))
