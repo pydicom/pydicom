@@ -16,7 +16,14 @@ Changes
 * ``uid.JPEG2000Lossy`` deprecated and will be removed in v1.3. Use
   ``uid.JPEG2000`` instead. (:issue:`726`)
 * ``config.image_handlers`` deprecated and will be removed in v1.3. use
-  ``config.pixel_data_handlers`` instead.
+  ``config.pixel_data_handlers`` instead. There is also a change in behaviour
+  in that ``image_handlers`` previously used to only contain the pixel data
+  handlers that had their dependencies met. ``pixel_data_handlers`` contains
+  all handlers no matter whether or not their dependencies are met. To check
+  if a handler is available for use (both support the transfer syntax and
+  has its dependency met) then use the handler's ``is_available`` method.
+  * ``DeferredDataElement`` class deprecated and will be removed in v1.3
+    (:issue:`291`)
 
 
 Enhancements
@@ -24,8 +31,6 @@ Enhancements
 
 * Added possibility to set byte strings as value for VRs that use only the
   default character set (:issue:`624`)
-* ``DeferredDataElement`` class deprecated and will be removed in v1.3
-  (:issue:`291`)
 * Functions for encapsulating frames added to encaps module (:pull_request:`696`)
 * Added ``Dataset.fix_meta_info()`` (:issue:`584`)
 * Add new function for bit packing ``pack_bits`` for use with BitsAllocated
@@ -35,7 +40,7 @@ Enhancements
 * Added ``uid.JPEG2000MultiComponentLossless`` for UID 1.2.840.10008.1.2.4.92
 * Added ``uid.JPEG2000MultiComponent`` for UID 1.2.840.10008.1.2.4.93
 * Added full support for Planar Configuration (:issue:`713`)
-* Added support for single pixel data where BitsAllocated >8 and
+* Added support for single frame pixel data where BitsAllocated >8 and
   SamplesPerPixel > 1 (:issue:`713`)
 * Small improvement in RLE decoding speed (~10%).
 * Add support for non-conformant RLE segment ordering (:pull_request:`729`)
