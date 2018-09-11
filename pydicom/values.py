@@ -17,7 +17,7 @@ from pydicom.multival import MultiValue
 from pydicom.tag import (Tag, TupleTag)
 import pydicom.uid
 import pydicom.valuerep  # don't import DS directly as can be changed by config
-from pydicom.valuerep import (MultiString, DA, DT, TM)
+from pydicom.valuerep import (MultiString, DA, DT, TM, TEXT_VR_DELIMS)
 
 if not in_py2:
     from pydicom.valuerep import PersonName3 as PersonName
@@ -240,7 +240,7 @@ def convert_single_string(byte_string, encodings=None):
     """Read and return a single string
        (backslash character does not split)"""
     encodings = encodings or [default_encoding]
-    value = decode_string(byte_string, encodings)
+    value = decode_string(byte_string, encodings, TEXT_VR_DELIMS)
     if value and value.endswith(' '):
         value = value[:-1]
     return value
