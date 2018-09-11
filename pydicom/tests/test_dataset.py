@@ -1037,9 +1037,7 @@ class DatasetTests(unittest.TestCase):
         msg = (
             r"Unable to decode pixel data with a transfer syntax UID of "
             r"'1.2.3.4' \(1.2.3.4\) as there are no pixel data handlers "
-            r"available that support it. Please open a new issue on "
-            r"pydicom's github repository so that we may work on "
-            r"adding support"
+            r"available that support it"
         )
         with pytest.raises(NotImplementedError, match=msg):
             ds.pixel_array

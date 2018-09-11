@@ -774,9 +774,7 @@ class Dataset(dict):
             raise NotImplementedError(
                 "Unable to decode pixel data with a transfer syntax UID of "
                 "'{0}' ({1}) as there are no pixel data handlers "
-                "available that support it. Please open a new issue on "
-                "pydicom's github repository so that we may work on "
-                "adding support"
+                "available that support it"
                 .format(self.file_meta.TransferSyntaxUID,
                         self.file_meta.TransferSyntaxUID.name)
             )
