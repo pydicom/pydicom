@@ -199,6 +199,19 @@
 <span class="c1"># and PN, but it is handled separately.</span>
 <span class="n">text_VRs</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;SH&#39;</span><span class="p">,</span> <span class="s1">&#39;LO&#39;</span><span class="p">,</span> <span class="s1">&#39;ST&#39;</span><span class="p">,</span> <span class="s1">&#39;LT&#39;</span><span class="p">,</span> <span class="s1">&#39;UC&#39;</span><span class="p">,</span> <span class="s1">&#39;UT&#39;</span><span class="p">)</span>
 
+<span class="c1"># Delimiters for text strings and person name that reset the encoding.</span>
+<span class="c1"># See PS3.5, Section 6.1.2.5.3</span>
+<span class="c1"># Note: We use characters for Python 2 and character codes for Python 3</span>
+<span class="c1"># because these are the types yielded if iterating over a byte string.</span>
+
+<span class="c1"># Characters/Character codes for text VR delimiters: LF, CR, TAB, FF</span>
+<span class="n">TEXT_VR_DELIMS</span> <span class="o">=</span> <span class="p">({</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\r</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\f</span><span class="s1">&#39;</span><span class="p">}</span> <span class="k">if</span> <span class="n">compat</span><span class="o">.</span><span class="n">in_py2</span>
+                  <span class="k">else</span> <span class="p">{</span><span class="mh">0x0d</span><span class="p">,</span> <span class="mh">0x0a</span><span class="p">,</span> <span class="mh">0x09</span><span class="p">,</span> <span class="mh">0x0c</span><span class="p">})</span>
+
+<span class="c1"># Character/Character code for PN delimiter: name part separator &#39;^&#39;</span>
+<span class="c1"># (the component separator &#39;=&#39; is handled separately)</span>
+<span class="n">PN_DELIMS</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;^&#39;</span><span class="p">}</span> <span class="k">if</span> <span class="n">compat</span><span class="o">.</span><span class="n">in_py2</span> <span class="k">else</span> <span class="p">{</span><span class="mh">0xe5</span><span class="p">}</span>
+
 <span class="n">match_string</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
     <span class="sa">b</span><span class="s1">&#39;(?P&lt;single_byte&gt;&#39;</span><span class="p">,</span> <span class="sa">br</span><span class="s1">&#39;(?P&lt;family_name&gt;[^=\^]*)&#39;</span><span class="p">,</span>
     <span class="sa">br</span><span class="s1">&#39;\^?(?P&lt;given_name&gt;[^=\^]*)&#39;</span><span class="p">,</span> <span class="sa">br</span><span class="s1">&#39;\^?(?P&lt;middle_name&gt;[^=\^]*)&#39;</span><span class="p">,</span>
@@ -714,7 +727,7 @@
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">components</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">compat</span><span class="o">.</span><span class="n">text_type</span><span class="p">):</span>
         <span class="n">comps</span> <span class="o">=</span> <span class="n">components</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">comps</span> <span class="o">=</span> <span class="p">[</span><span class="n">decode_string</span><span class="p">(</span><span class="n">comp</span><span class="p">,</span> <span class="n">encodings</span><span class="p">)</span>
+        <span class="n">comps</span> <span class="o">=</span> <span class="p">[</span><span class="n">decode_string</span><span class="p">(</span><span class="n">comp</span><span class="p">,</span> <span class="n">encodings</span><span class="p">,</span> <span class="n">PN_DELIMS</span><span class="p">)</span>
                  <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="n">components</span><span class="p">]</span>
     <span class="c1"># Remove empty elements from the end to avoid trailing &#39;=&#39;</span>
     <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">comps</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">comps</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>

@@ -189,7 +189,7 @@
 <span class="kn">from</span> <span class="nn">pydicom.tag</span> <span class="k">import</span> <span class="p">(</span><span class="n">Tag</span><span class="p">,</span> <span class="n">TupleTag</span><span class="p">)</span>
 <span class="kn">import</span> <span class="nn">pydicom.uid</span>
 <span class="kn">import</span> <span class="nn">pydicom.valuerep</span>  <span class="c1"># don&#39;t import DS directly as can be changed by config</span>
-<span class="kn">from</span> <span class="nn">pydicom.valuerep</span> <span class="k">import</span> <span class="p">(</span><span class="n">MultiString</span><span class="p">,</span> <span class="n">DA</span><span class="p">,</span> <span class="n">DT</span><span class="p">,</span> <span class="n">TM</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">pydicom.valuerep</span> <span class="k">import</span> <span class="p">(</span><span class="n">MultiString</span><span class="p">,</span> <span class="n">DA</span><span class="p">,</span> <span class="n">DT</span><span class="p">,</span> <span class="n">TM</span><span class="p">,</span> <span class="n">TEXT_VR_DELIMS</span><span class="p">)</span>
 
 <span class="k">if</span> <span class="ow">not</span> <span class="n">in_py2</span><span class="p">:</span>
     <span class="kn">from</span> <span class="nn">pydicom.valuerep</span> <span class="k">import</span> <span class="n">PersonName3</span> <span class="k">as</span> <span class="n">PersonName</span>
@@ -412,7 +412,7 @@
     <span class="sd">&quot;&quot;&quot;Read and return a single string</span>
 <span class="sd">       (backslash character does not split)&quot;&quot;&quot;</span>
     <span class="n">encodings</span> <span class="o">=</span> <span class="n">encodings</span> <span class="ow">or</span> <span class="p">[</span><span class="n">default_encoding</span><span class="p">]</span>
-    <span class="n">value</span> <span class="o">=</span> <span class="n">decode_string</span><span class="p">(</span><span class="n">byte_string</span><span class="p">,</span> <span class="n">encodings</span><span class="p">)</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">decode_string</span><span class="p">(</span><span class="n">byte_string</span><span class="p">,</span> <span class="n">encodings</span><span class="p">,</span> <span class="n">TEXT_VR_DELIMS</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">value</span> <span class="ow">and</span> <span class="n">value</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">):</span>
         <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">value</span></div>

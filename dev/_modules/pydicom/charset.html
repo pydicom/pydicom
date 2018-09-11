@@ -176,17 +176,20 @@
 <span class="kn">import</span> <span class="nn">warnings</span>
 
 <span class="kn">from</span> <span class="nn">pydicom</span> <span class="k">import</span> <span class="n">compat</span>
-<span class="kn">from</span> <span class="nn">pydicom.valuerep</span> <span class="k">import</span> <span class="n">PersonNameUnicode</span><span class="p">,</span> <span class="n">text_VRs</span>
+<span class="kn">from</span> <span class="nn">pydicom.valuerep</span> <span class="k">import</span> <span class="n">PersonNameUnicode</span><span class="p">,</span> <span class="n">text_VRs</span><span class="p">,</span> <span class="n">TEXT_VR_DELIMS</span>
 <span class="kn">from</span> <span class="nn">pydicom.compat</span> <span class="k">import</span> <span class="n">in_py2</span>
+
+<span class="c1"># default encoding if no encoding defined - corresponds to ISO IR 6 / ASCII</span>
+<span class="n">default_encoding</span> <span class="o">=</span> <span class="s2">&quot;iso8859&quot;</span>
 
 <span class="c1"># Map DICOM Specific Character Set to python equivalent</span>
 <span class="n">python_encoding</span> <span class="o">=</span> <span class="p">{</span>
 
     <span class="c1"># default character set for DICOM</span>
-    <span class="s1">&#39;&#39;</span><span class="p">:</span> <span class="s1">&#39;iso8859&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;&#39;</span><span class="p">:</span> <span class="n">default_encoding</span><span class="p">,</span>
 
     <span class="c1"># alias for latin_1 too (iso_ir_6 exists as an alias to &#39;ascii&#39;)</span>
-    <span class="s1">&#39;ISO_IR 6&#39;</span><span class="p">:</span> <span class="s1">&#39;iso8859&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ISO_IR 6&#39;</span><span class="p">:</span> <span class="n">default_encoding</span><span class="p">,</span>
     <span class="s1">&#39;ISO_IR 13&#39;</span><span class="p">:</span> <span class="s1">&#39;shift_jis&#39;</span><span class="p">,</span>
 
     <span class="c1"># these also have iso_ir_1XX aliases in python 2.7</span>
@@ -229,68 +232,133 @@
 <span class="c1"># Map Python encodings to escape sequences as defined in PS3.3 in tables</span>
 <span class="c1"># C.12-3 (single-byte) and C.12-4 (multi-byte character sets).</span>
 <span class="n">escape_codes</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;iso8859&#39;</span><span class="p">:</span> <span class="n">ESC</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;(B&#39;</span><span class="p">,</span>  <span class="c1"># used to switch to ASCII G0 code element</span>
-    <span class="s1">&#39;latin_1&#39;</span><span class="p">:</span> <span class="n">ESC</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;-A&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;shift_jis&#39;</span><span class="p">:</span> <span class="n">ESC</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;)I&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;iso2022_jp&#39;</span><span class="p">:</span> <span class="n">ESC</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;$B&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;iso8859_2&#39;</span><span class="p">:</span> <span class="n">ESC</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;-B&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;iso8859_3&#39;</span><span class="p">:</span> <span class="n">ESC</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;-C&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;iso8859_4&#39;</span><span class="p">:</span> <span class="n">ESC</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;-D&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;iso_ir_126&#39;</span><span class="p">:</span> <span class="n">ESC</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;-F&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;iso_ir_127&#39;</span><span class="p">:</span> <span class="n">ESC</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;-G&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;iso_ir_138&#39;</span><span class="p">:</span> <span class="n">ESC</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;-H&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;iso_ir_144&#39;</span><span class="p">:</span> <span class="n">ESC</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;-L&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;iso_ir_148&#39;</span><span class="p">:</span> <span class="n">ESC</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;-M&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;iso_ir_166&#39;</span><span class="p">:</span> <span class="n">ESC</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;-T&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;euc_kr&#39;</span><span class="p">:</span> <span class="n">ESC</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;$)C&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;iso-2022-jp&#39;</span><span class="p">:</span> <span class="n">ESC</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;$(D&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;iso_ir_58&#39;</span><span class="p">:</span> <span class="n">ESC</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;$)A&#39;</span><span class="p">,</span>
+    <span class="n">ESC</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;(B&#39;</span><span class="p">:</span> <span class="n">default_encoding</span><span class="p">,</span>  <span class="c1"># used to switch to ASCII G0 code element</span>
+    <span class="n">ESC</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;-A&#39;</span><span class="p">:</span> <span class="s1">&#39;latin_1&#39;</span><span class="p">,</span>
+    <span class="n">ESC</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;)I&#39;</span><span class="p">:</span> <span class="s1">&#39;shift_jis&#39;</span><span class="p">,</span>  <span class="c1"># switches to ISO-IR 13</span>
+    <span class="n">ESC</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;(J&#39;</span><span class="p">:</span> <span class="s1">&#39;shift_jis&#39;</span><span class="p">,</span>  <span class="c1"># switches to ISO-IR 14 (shift_jis handles both)</span>
+    <span class="n">ESC</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;$B&#39;</span><span class="p">:</span> <span class="s1">&#39;iso2022_jp&#39;</span><span class="p">,</span>
+    <span class="n">ESC</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;-B&#39;</span><span class="p">:</span> <span class="s1">&#39;iso8859_2&#39;</span><span class="p">,</span>
+    <span class="n">ESC</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;-C&#39;</span><span class="p">:</span> <span class="s1">&#39;iso8859_3&#39;</span><span class="p">,</span>
+    <span class="n">ESC</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;-D&#39;</span><span class="p">:</span> <span class="s1">&#39;iso8859_4&#39;</span><span class="p">,</span>
+    <span class="n">ESC</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;-F&#39;</span><span class="p">:</span> <span class="s1">&#39;iso_ir_126&#39;</span><span class="p">,</span>
+    <span class="n">ESC</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;-G&#39;</span><span class="p">:</span> <span class="s1">&#39;iso_ir_127&#39;</span><span class="p">,</span>
+    <span class="n">ESC</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;-H&#39;</span><span class="p">:</span> <span class="s1">&#39;iso_ir_138&#39;</span><span class="p">,</span>
+    <span class="n">ESC</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;-L&#39;</span><span class="p">:</span> <span class="s1">&#39;iso_ir_144&#39;</span><span class="p">,</span>
+    <span class="n">ESC</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;-M&#39;</span><span class="p">:</span> <span class="s1">&#39;iso_ir_148&#39;</span><span class="p">,</span>
+    <span class="n">ESC</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;-T&#39;</span><span class="p">:</span> <span class="s1">&#39;iso_ir_166&#39;</span><span class="p">,</span>
+    <span class="n">ESC</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;$)C&#39;</span><span class="p">:</span> <span class="s1">&#39;euc_kr&#39;</span><span class="p">,</span>
+    <span class="n">ESC</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;$(D&#39;</span><span class="p">:</span> <span class="s1">&#39;iso-2022-jp&#39;</span><span class="p">,</span>
+    <span class="n">ESC</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;$)A&#39;</span><span class="p">:</span> <span class="s1">&#39;iso_ir_58&#39;</span><span class="p">,</span>
 <span class="p">}</span>
 
-<span class="n">default_encoding</span> <span class="o">=</span> <span class="s2">&quot;iso8859&quot;</span>
+<span class="c1"># Multi-byte character sets except Korean are handled by Python.</span>
+<span class="c1"># To decode them, the escape sequence shall be preserved in the input byte</span>
+<span class="c1"># string, and will be removed during decoding by Python.</span>
+<span class="n">handled_encodings</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;iso2022_jp&#39;</span><span class="p">,</span>
+                     <span class="s1">&#39;iso-2022-jp&#39;</span><span class="p">,</span>
+                     <span class="s1">&#39;iso_ir_58&#39;</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="decode_string"><a class="viewcode-back" href="../../api_ref.html#pydicom.charset.decode_string">[docs]</a><span class="k">def</span> <span class="nf">decode_string</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">encodings</span><span class="p">):</span>
+<div class="viewcode-block" id="decode_string"><a class="viewcode-back" href="../../api_ref.html#pydicom.charset.decode_string">[docs]</a><span class="k">def</span> <span class="nf">decode_string</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">encodings</span><span class="p">,</span> <span class="n">delimiters</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Convert a raw byte string into a unicode string using the given</span>
 <span class="sd">    list of encodings.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    value : byte string</span>
+<span class="sd">        The raw string as encoded in the DICOM tag value.</span>
+<span class="sd">    encodings : list</span>
+<span class="sd">        The encodings needed to decode the string as a list of Python</span>
+<span class="sd">        encodings, converted from the encodings in Specific Character Set.</span>
+<span class="sd">    delimiters: set of int (Python 3) or characters (Python 2)</span>
+<span class="sd">        A set of characters or character codes, each of which resets the</span>
+<span class="sd">        encoding in `byte_str`.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    text type</span>
+<span class="sd">        The decoded string.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># shortcut for the common case - no escape sequences present</span>
     <span class="k">if</span> <span class="n">ESC</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">encodings</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
-    <span class="c1"># multi-byte character sets except Korean are handled by Python encodings</span>
-    <span class="n">use_python_handling</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">startswith</span><span class="p">((</span><span class="n">escape_codes</span><span class="p">[</span><span class="s1">&#39;iso2022_jp&#39;</span><span class="p">],</span>
-                                            <span class="n">escape_codes</span><span class="p">[</span><span class="s1">&#39;iso-2022-jp&#39;</span><span class="p">],</span>
-                                            <span class="n">escape_codes</span><span class="p">[</span><span class="s1">&#39;iso_ir_58&#39;</span><span class="p">]))</span>
+    <span class="c1"># Each part of the value that starts with an escape sequence is decoded</span>
+    <span class="c1"># separately. If it starts with an escape sequence, the</span>
+    <span class="c1"># corresponding encoding is used, otherwise (e.g. the first part if it</span>
+    <span class="c1"># does not start with an escape sequence) the first encoding.</span>
+    <span class="c1"># See PS3.5, 6.1.2.4 and 6.1.2.5 for the use of code extensions.</span>
+    <span class="c1">#</span>
+    <span class="c1"># The following regex splits the value into these parts, by matching</span>
+    <span class="c1"># the substring until the first escape character, and subsequent</span>
+    <span class="c1"># substrings starting with an escape character.</span>
+    <span class="n">regex</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;(^[^</span><span class="se">\x1b</span><span class="s1">]+|[</span><span class="se">\x1b</span><span class="s1">][^</span><span class="se">\x1b</span><span class="s1">]*)&#39;</span>
+    <span class="n">fragments</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">regex</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">use_python_handling</span><span class="p">:</span>
-        <span class="n">parts</span> <span class="o">=</span> <span class="p">[</span><span class="n">value</span><span class="p">]</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="c1"># Each part of the value that starts with an escape sequence is</span>
-        <span class="c1"># decoded separately using the corresponding encoding.</span>
-        <span class="c1"># See PS3.5, 6.1.2.4 and 6.1.2.5 for the use of code extensions.</span>
-        <span class="n">parts</span> <span class="o">=</span> <span class="p">[</span><span class="n">ESC</span> <span class="o">+</span> <span class="n">part</span> <span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="n">value</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">ESC</span><span class="p">)</span> <span class="k">if</span> <span class="n">part</span><span class="p">]</span>
-        <span class="c1"># the first part may not start with an escape sequence</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">value</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">ESC</span><span class="p">):</span>
-            <span class="n">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">:]</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="sa">u</span><span class="s1">&#39;&#39;</span>
+    <span class="c1"># decode each byte string fragment with it&#39;s corresponding encoding</span>
+    <span class="c1"># and join them all together</span>
+    <span class="k">return</span> <span class="sa">u</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">decode_fragment</span><span class="p">(</span><span class="n">fragment</span><span class="p">,</span> <span class="n">encodings</span><span class="p">,</span> <span class="n">delimiters</span><span class="p">)</span>
+                     <span class="k">for</span> <span class="n">fragment</span> <span class="ow">in</span> <span class="n">fragments</span><span class="p">])</span></div>
 
-    <span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="n">parts</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">part</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">ESC</span><span class="p">):</span>
-            <span class="k">for</span> <span class="n">enc</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">encodings</span><span class="p">)</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;iso8859&#39;</span><span class="p">]:</span>
-                <span class="k">if</span> <span class="n">enc</span> <span class="ow">in</span> <span class="n">escape_codes</span> <span class="ow">and</span> <span class="n">part</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">escape_codes</span><span class="p">[</span><span class="n">enc</span><span class="p">]):</span>
-                    <span class="k">if</span> <span class="n">use_python_handling</span><span class="p">:</span>
-                        <span class="n">val</span> <span class="o">=</span> <span class="n">part</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">enc</span><span class="p">)</span>
-                    <span class="k">else</span><span class="p">:</span>
-                        <span class="n">val</span> <span class="o">=</span> <span class="n">part</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">escape_codes</span><span class="p">[</span><span class="n">enc</span><span class="p">]):]</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">enc</span><span class="p">)</span>
-                    <span class="k">break</span>
+
+<div class="viewcode-block" id="decode_fragment"><a class="viewcode-back" href="../../api_ref.html#pydicom.charset.decode_fragment">[docs]</a><span class="k">def</span> <span class="nf">decode_fragment</span><span class="p">(</span><span class="n">byte_str</span><span class="p">,</span> <span class="n">encodings</span><span class="p">,</span> <span class="n">delimiters</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Decode a byte string encoded with a single encoding.</span>
+<span class="sd">    If `byte_str` starts with an escape sequence, the encoding corresponding</span>
+<span class="sd">    to this sequence is used for decoding if present in `encodings`,</span>
+<span class="sd">    otherwise the first value in encodings.</span>
+<span class="sd">    If a delimiter occurs inside the string, it resets the encoding to the</span>
+<span class="sd">    first encoding in case of single-byte encodings.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    byte_str : bytes</span>
+<span class="sd">        The raw string to be decoded.</span>
+<span class="sd">    encodings: list of str</span>
+<span class="sd">        The list of Python encodings as converted from the values in the</span>
+<span class="sd">        Specific Character Set tag.</span>
+<span class="sd">    delimiters: set of int (Python 3) or characters (Python 2)</span>
+<span class="sd">        A set of characters or character codes, each of which resets the</span>
+<span class="sd">        encoding in `byte_str`.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    text type</span>
+<span class="sd">        The decoded string.</span>
+
+<span class="sd">    Reference</span>
+<span class="sd">    ---------</span>
+<span class="sd">    * DICOM Standard Part 5, Sections 6.1.2.4 and 6.1.2.5</span>
+<span class="sd">    * DICOM Standard Part 3, Anex C.12.1.1.2</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">byte_str</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">ESC</span><span class="p">):</span>
+        <span class="c1"># all 4-character escape codes start with one of two character sets</span>
+        <span class="n">seq_length</span> <span class="o">=</span> <span class="mi">4</span> <span class="k">if</span> <span class="n">byte_str</span><span class="o">.</span><span class="n">startswith</span><span class="p">((</span><span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x1b</span><span class="s1">$(&#39;</span><span class="p">,</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x1b</span><span class="s1">$)&#39;</span><span class="p">))</span> <span class="k">else</span> <span class="mi">3</span>
+        <span class="n">encoding</span> <span class="o">=</span> <span class="n">escape_codes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">byte_str</span><span class="p">[:</span><span class="n">seq_length</span><span class="p">],</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">encoding</span> <span class="ow">in</span> <span class="n">encodings</span> <span class="ow">or</span> <span class="n">encoding</span> <span class="o">==</span> <span class="n">default_encoding</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">encoding</span> <span class="ow">in</span> <span class="n">handled_encodings</span><span class="p">:</span>
+                <span class="c1"># Python strips the escape sequences for this encoding.</span>
+                <span class="c1"># Any delimiters must be handled correctly by `byte_str`.</span>
+                <span class="k">return</span> <span class="n">byte_str</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">encoding</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="c1"># unknown escape code - use first encoding (probably incorrect)</span>
-                <span class="n">val</span> <span class="o">=</span> <span class="n">part</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">encodings</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># if no escape code is given, the first encoding is used</span>
-            <span class="n">val</span> <span class="o">=</span> <span class="n">part</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">encodings</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-        <span class="n">result</span> <span class="o">+=</span> <span class="n">val</span>
-    <span class="k">return</span> <span class="n">result</span></div>
+                <span class="c1"># Python doesn&#39;t know about the escape sequence -</span>
+                <span class="c1"># we have to strip it before decoding</span>
+                <span class="n">byte_str</span> <span class="o">=</span> <span class="n">byte_str</span><span class="p">[</span><span class="n">seq_length</span><span class="p">:]</span>
+
+                <span class="c1"># If a delimiter occurs in the string, it resets the encoding.</span>
+                <span class="c1"># The following returns the first occurrence of a delimiter in</span>
+                <span class="c1"># the byte string, or None if it does not contain any.</span>
+                <span class="n">index</span> <span class="o">=</span> <span class="nb">next</span><span class="p">((</span><span class="n">index</span> <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">ch</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">byte_str</span><span class="p">)</span>
+                              <span class="k">if</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">delimiters</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="c1"># the part of the string after the first delimiter</span>
+                    <span class="c1"># is decoded with the first encoding</span>
+                    <span class="k">return</span> <span class="p">(</span><span class="n">byte_str</span><span class="p">[:</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">encoding</span><span class="p">)</span> <span class="o">+</span>
+                            <span class="n">byte_str</span><span class="p">[</span><span class="n">index</span><span class="p">:]</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">encodings</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+                <span class="c1"># No delimiter - use the encoding defined by the escape code</span>
+                <span class="k">return</span> <span class="n">byte_str</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">encoding</span><span class="p">)</span>
+
+    <span class="c1"># no or unknown escape code - use first encoding</span>
+    <span class="k">return</span> <span class="n">byte_str</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">encodings</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span></div>
 
 
 <span class="c1"># DICOM PS3.5-2008 6.1.1 (p 18) says:</span>
@@ -362,7 +430,7 @@
     <span class="n">encodings</span> <span class="o">=</span> <span class="n">convert_encodings</span><span class="p">(</span><span class="n">dicom_character_set</span><span class="p">)</span>
 
     <span class="c1"># decode the string value to unicode</span>
-    <span class="c1"># PN is special case as may have 3 components with differenct chr sets</span>
+    <span class="c1"># PN is special case as may have 3 components with different chr sets</span>
     <span class="k">if</span> <span class="n">data_element</span><span class="o">.</span><span class="n">VR</span> <span class="o">==</span> <span class="s2">&quot;PN&quot;</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">in_py2</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">data_element</span><span class="o">.</span><span class="n">VM</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
@@ -385,7 +453,8 @@
         <span class="k">if</span> <span class="n">data_element</span><span class="o">.</span><span class="n">VM</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data_element</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">compat</span><span class="o">.</span><span class="n">text_type</span><span class="p">):</span>
                 <span class="k">return</span>
-            <span class="n">data_element</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">decode_string</span><span class="p">(</span><span class="n">data_element</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">encodings</span><span class="p">)</span>
+            <span class="n">data_element</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">decode_string</span><span class="p">(</span><span class="n">data_element</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">encodings</span><span class="p">,</span>
+                                               <span class="n">TEXT_VR_DELIMS</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
 
             <span class="n">output</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
@@ -394,7 +463,8 @@
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">compat</span><span class="o">.</span><span class="n">text_type</span><span class="p">):</span>
                     <span class="n">output</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">output</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">decode_string</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">encodings</span><span class="p">))</span>
+                    <span class="n">output</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">decode_string</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">encodings</span><span class="p">,</span>
+                                                <span class="n">TEXT_VR_DELIMS</span><span class="p">))</span>
 
             <span class="n">data_element</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">output</span></div>
 </pre></div>
