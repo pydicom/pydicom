@@ -41,9 +41,9 @@ from pydicom.uid import (ExplicitVRLittleEndian, ImplicitVRLittleEndian,
                          ExplicitVRBigEndian, PYDICOM_IMPLEMENTATION_UID)
 
 if compat.in_py2:
-    from pkgutil import find_loader as HAVE_PACKAGE
+    from pkgutil import find_loader as have_package
 else:
-    from importlib.util import find_spec as HAVE_PACKAGE
+    from importlib.util import find_spec as have_package
 
 have_numpy = True
 try:
@@ -797,7 +797,7 @@ class Dataset(dict):
             for hh in possible_handlers:
                 hh_deps = hh.DEPENDENCIES
                 # Missing packages
-                missing = [dd for dd in hh_deps if HAVE_PACKAGE(dd) is None]
+                missing = [dd for dd in hh_deps if have_package(dd) is None]
                 # Package names
                 names = [hh_deps[name][0] for name in missing]
                 pkg_msg.append(
