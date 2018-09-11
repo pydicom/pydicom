@@ -127,12 +127,12 @@ class Test_JPEGLS_no_pillow(object):
         """Setup the test datasets."""
         self.jpeg_ls_lossless = dcmread(jpeg_ls_lossless_name)
         self.emri_jpeg_ls_lossless = dcmread(emri_jpeg_ls_lossless)
-        self.original_handlers = pydicom.config.PIXEL_DATA_HANDLERS
-        pydicom.config.PIXEL_DATA_HANDLERS = [numpy_handler]
+        self.original_handlers = pydicom.config.pixel_data_handlers
+        pydicom.config.pixel_data_handlers = [numpy_handler]
 
     def teardown(self):
         """Reset the pixel data handlers."""
-        pydicom.config.PIXEL_DATA_HANDLERS = self.original_handlers
+        pydicom.config.pixel_data_handlers = self.original_handlers
 
     def test_JPEG_LS_PixelArray(self):
         """Test decoding JPEG LS with only numpy fails."""
@@ -153,12 +153,12 @@ class Test_JPEG2000Tests_no_pillow(object):
         self.jpeg_2k_lossless = dcmread(jpeg2000_lossless_name)
         self.emri_jpeg_2k_lossless = dcmread(emri_jpeg_2k_lossless)
         self.sc_rgb_jpeg2k_gdcm_KY = dcmread(sc_rgb_jpeg2k_gdcm_KY)
-        self.original_handlers = pydicom.config.PIXEL_DATA_HANDLERS
-        pydicom.config.PIXEL_DATA_HANDLERS = [numpy_handler]
+        self.original_handlers = pydicom.config.pixel_data_handlers
+        pydicom.config.pixel_data_handlers = [numpy_handler]
 
     def teardown(self):
         """Reset the pixel data handlers."""
-        pydicom.config.PIXEL_DATA_HANDLERS = self.original_handlers
+        pydicom.config.pixel_data_handlers = self.original_handlers
 
     def testJPEG2000(self):
         """Test reading element values works OK without Pillow."""
@@ -191,12 +191,12 @@ class Test_JPEGlossyTests_no_pillow(object):
         """Setup the test datasets."""
         self.jpeg_lossy = dcmread(jpeg_lossy_name)
         self.color_3d_jpeg = dcmread(color_3d_jpeg_baseline)
-        self.original_handlers = pydicom.config.PIXEL_DATA_HANDLERS
-        pydicom.config.PIXEL_DATA_HANDLERS = [numpy_handler]
+        self.original_handlers = pydicom.config.pixel_data_handlers
+        pydicom.config.pixel_data_handlers = [numpy_handler]
 
     def teardown(self):
         """Reset the pixel data handlers."""
-        pydicom.config.PIXEL_DATA_HANDLERS = self.original_handlers
+        pydicom.config.pixel_data_handlers = self.original_handlers
 
     def testJPEGlossy(self):
         """Test reading element values works OK without Pillow."""
@@ -219,12 +219,12 @@ class Test_JPEGlosslessTests_no_pillow(object):
     def setup(self):
         """Setup the test datasets."""
         self.jpeg_lossless = dcmread(jpeg_lossless_name)
-        self.original_handlers = pydicom.config.PIXEL_DATA_HANDLERS
-        pydicom.config.PIXEL_DATA_HANDLERS = [numpy_handler]
+        self.original_handlers = pydicom.config.pixel_data_handlers
+        pydicom.config.pixel_data_handlers = [numpy_handler]
 
     def teardown(self):
         """Reset the pixel data handlers."""
-        pydicom.config.PIXEL_DATA_HANDLERS = self.original_handlers
+        pydicom.config.pixel_data_handlers = self.original_handlers
 
     def testJPEGlossless(self):
         """Test reading element values works OK without Pillow."""
@@ -247,12 +247,12 @@ class Test_JPEG_LS_with_pillow(object):
         """Setup the test datasets."""
         self.jpeg_ls_lossless = dcmread(jpeg_ls_lossless_name)
         self.emri_jpeg_ls_lossless = dcmread(emri_jpeg_ls_lossless)
-        self.original_handlers = pydicom.config.PIXEL_DATA_HANDLERS
-        pydicom.config.PIXEL_DATA_HANDLERS = [pillow_handler, numpy_handler]
+        self.original_handlers = pydicom.config.pixel_data_handlers
+        pydicom.config.pixel_data_handlers = [pillow_handler, numpy_handler]
 
     def teardown(self):
         """Reset the pixel data handlers."""
-        pydicom.config.PIXEL_DATA_HANDLERS = self.original_handlers
+        pydicom.config.pixel_data_handlers = self.original_handlers
 
     def test_JPEG_LS_PixelArray(self):
         """Test decoding JPEG LS with pillow handler fails."""
@@ -280,12 +280,12 @@ class Test_JPEG2000Tests_with_pillow(object):
         self.sc_rgb_jpeg2k_gdcm_KY = dcmread(sc_rgb_jpeg2k_gdcm_KY)
         self.ground_truth_sc_rgb_jpeg2k_gdcm_KY_gdcm = dcmread(
             ground_truth_sc_rgb_jpeg2k_gdcm_KY_gdcm)
-        self.original_handlers = pydicom.config.PIXEL_DATA_HANDLERS
-        pydicom.config.PIXEL_DATA_HANDLERS = [pillow_handler, numpy_handler]
+        self.original_handlers = pydicom.config.pixel_data_handlers
+        pydicom.config.pixel_data_handlers = [pillow_handler, numpy_handler]
 
     def teardown(self):
         """Reset the pixel data handlers."""
-        pydicom.config.PIXEL_DATA_HANDLERS = self.original_handlers
+        pydicom.config.pixel_data_handlers = self.original_handlers
 
     def test_raises_if_endianess_not_set(self):
         self.jpeg_2k_lossless.is_little_endian = None
@@ -328,12 +328,12 @@ class Test_JPEGlossyTests_with_pillow(object):
         """Setup the test datasets."""
         self.jpeg_lossy = dcmread(jpeg_lossy_name)
         self.color_3d_jpeg = dcmread(color_3d_jpeg_baseline)
-        self.original_handlers = pydicom.config.PIXEL_DATA_HANDLERS
-        pydicom.config.PIXEL_DATA_HANDLERS = [pillow_handler, numpy_handler]
+        self.original_handlers = pydicom.config.pixel_data_handlers
+        pydicom.config.pixel_data_handlers = [pillow_handler, numpy_handler]
 
     def teardown(self):
         """Reset the pixel data handlers."""
-        pydicom.config.PIXEL_DATA_HANDLERS = self.original_handlers
+        pydicom.config.pixel_data_handlers = self.original_handlers
 
     def testJPEGlossless_odd_data_size(self):
         """Test decoding JPEG with pillow handler succeeds."""
@@ -368,10 +368,10 @@ class Test_JPEGlossyTests_with_pillow(object):
 
 @pytest.fixture(scope="module")
 def test_with_pillow():
-    original_handlers = pydicom.config.PIXEL_DATA_HANDLERS
-    pydicom.config.PIXEL_DATA_HANDLERS = [pillow_handler, numpy_handler]
+    original_handlers = pydicom.config.pixel_data_handlers
+    pydicom.config.pixel_data_handlers = [pillow_handler, numpy_handler]
     yield original_handlers
-    pydicom.config.PIXEL_DATA_HANDLERS = original_handlers
+    pydicom.config.pixel_data_handlers = original_handlers
 
 
 if have_pytest_param:
@@ -584,12 +584,12 @@ class Test_JPEGlosslessTests_with_pillow(object):
     def setup(self):
         """Setup the test datasets."""
         self.jpeg_lossless = dcmread(jpeg_lossless_name)
-        self.original_handlers = pydicom.config.PIXEL_DATA_HANDLERS
-        pydicom.config.PIXEL_DATA_HANDLERS = [pillow_handler, numpy_handler]
+        self.original_handlers = pydicom.config.pixel_data_handlers
+        pydicom.config.pixel_data_handlers = [pillow_handler, numpy_handler]
 
     def teardown(self):
         """Reset the pixel data handlers."""
-        pydicom.config.PIXEL_DATA_HANDLERS = self.original_handlers
+        pydicom.config.pixel_data_handlers = self.original_handlers
 
     def testJPEGlossless(self):
         """Test reading element values works OK with pillow pixel handler."""

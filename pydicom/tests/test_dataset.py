@@ -1023,12 +1023,12 @@ class DatasetTests(unittest.TestCase):
         assert ds._pixel_id != id(ds.PixelData)
         ds._pixel_array = 'Test Value'
         # If _pixel_id doesn't match then attempt to get new pixel data
-        orig_handlers = pydicom.config.PIXEL_DATA_HANDLERS
-        pydicom.config.PIXEL_DATA_HANDLERS = []
+        orig_handlers = pydicom.config.pixel_data_handlers
+        pydicom.config.pixel_data_handlers = []
         with pytest.raises(NotImplementedError):
             ds.convert_pixel_data()
 
-        pydicom.config.PIXEL_DATA_HANDLERS = orig_handlers
+        pydicom.config.pixel_data_handlers = orig_handlers
 
     def test_pixel_array_unknown_syntax(self):
         """Test that pixel_array for an unknown syntax raises exception."""

@@ -766,7 +766,7 @@ class Dataset(dict):
 
         # Find all possible handlers that support the transfer syntax
         transfer_syntax = self.file_meta.TransferSyntaxUID
-        possible_handlers = [hh for hh in pydicom.config.PIXEL_DATA_HANDLERS
+        possible_handlers = [hh for hh in pydicom.config.pixel_data_handlers
                              if hh.supports_transfer_syntax(transfer_syntax)]
 
         # No handlers support the transfer syntax

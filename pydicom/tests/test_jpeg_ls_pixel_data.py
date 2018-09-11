@@ -75,11 +75,11 @@ class jpeg_ls_JPEG_LS_Tests_no_jpeg_ls(unittest.TestCase):
         self.mr_small = dcmread(mr_name)
         self.emri_jpeg_ls_lossless = dcmread(emri_jpeg_ls_lossless)
         self.emri_small = dcmread(emri_name)
-        self.original_handlers = pydicom.config.PIXEL_DATA_HANDLERS
-        pydicom.config.PIXEL_DATA_HANDLERS = [numpy_handler]
+        self.original_handlers = pydicom.config.pixel_data_handlers
+        pydicom.config.pixel_data_handlers = [numpy_handler]
 
     def tearDown(self):
-        pydicom.config.PIXEL_DATA_HANDLERS = self.original_handlers
+        pydicom.config.pixel_data_handlers = self.original_handlers
 
     def test_JPEG_LS_PixelArray(self):
         with self.assertRaises((RuntimeError, NotImplementedError)):
@@ -93,11 +93,11 @@ class jpeg_ls_JPEG2000Tests_no_jpeg_ls(unittest.TestCase):
         self.mr_small = dcmread(mr_name)
         self.emri_jpeg_2k_lossless = dcmread(emri_jpeg_2k_lossless)
         self.emri_small = dcmread(emri_name)
-        self.original_handlers = pydicom.config.PIXEL_DATA_HANDLERS
-        pydicom.config.PIXEL_DATA_HANDLERS = [numpy_handler]
+        self.original_handlers = pydicom.config.pixel_data_handlers
+        pydicom.config.pixel_data_handlers = [numpy_handler]
 
     def tearDown(self):
-        pydicom.config.PIXEL_DATA_HANDLERS = self.original_handlers
+        pydicom.config.pixel_data_handlers = self.original_handlers
 
     def test_JPEG2000PixelArray(self):
         """JPEG2000: Now works"""
@@ -115,11 +115,11 @@ class jpeg_ls_JPEGlossyTests_no_jpeg_ls(unittest.TestCase):
     def setUp(self):
         self.jpeg_lossy = dcmread(jpeg_lossy_name)
         self.color_3d_jpeg = dcmread(color_3d_jpeg_baseline)
-        self.original_handlers = pydicom.config.PIXEL_DATA_HANDLERS
-        pydicom.config.PIXEL_DATA_HANDLERS = [numpy_handler]
+        self.original_handlers = pydicom.config.pixel_data_handlers
+        pydicom.config.pixel_data_handlers = [numpy_handler]
 
     def tearDown(self):
-        pydicom.config.PIXEL_DATA_HANDLERS = self.original_handlers
+        pydicom.config.pixel_data_handlers = self.original_handlers
 
     def testJPEGlossy(self):
         """JPEG-lossy: Returns correct values for sample data elements"""
@@ -144,11 +144,11 @@ class jpeg_ls_JPEGlossyTests_no_jpeg_ls(unittest.TestCase):
 class jpeg_ls_JPEGlosslessTests_no_jpeg_ls(unittest.TestCase):
     def setUp(self):
         self.jpeg_lossless = dcmread(jpeg_lossless_name)
-        self.original_handlers = pydicom.config.PIXEL_DATA_HANDLERS
-        pydicom.config.PIXEL_DATA_HANDLERS = [numpy_handler]
+        self.original_handlers = pydicom.config.pixel_data_handlers
+        pydicom.config.pixel_data_handlers = [numpy_handler]
 
     def tearDown(self):
-        pydicom.config.PIXEL_DATA_HANDLERS = self.original_handlers
+        pydicom.config.pixel_data_handlers = self.original_handlers
 
     def testJPEGlossless(self):
         """JPEGlossless: Returns correct values for sample data elements"""
@@ -178,11 +178,11 @@ class jpeg_ls_JPEG_LS_Tests_with_jpeg_ls(unittest.TestCase):
         self.mr_small = dcmread(mr_name)
         self.emri_jpeg_ls_lossless = dcmread(emri_jpeg_ls_lossless)
         self.emri_small = dcmread(emri_name)
-        self.original_handlers = pydicom.config.PIXEL_DATA_HANDLERS
-        pydicom.config.PIXEL_DATA_HANDLERS = [jpeg_ls_handler, numpy_handler]
+        self.original_handlers = pydicom.config.pixel_data_handlers
+        pydicom.config.pixel_data_handlers = [jpeg_ls_handler, numpy_handler]
 
     def tearDown(self):
-        pydicom.config.PIXEL_DATA_HANDLERS = self.original_handlers
+        pydicom.config.pixel_data_handlers = self.original_handlers
 
     def test_raises_if_endianess_not_set(self):
         self.jpeg_ls_lossless.is_little_endian = None
@@ -218,11 +218,11 @@ class jpeg_ls_JPEG2000Tests_with_jpeg_ls(unittest.TestCase):
         self.mr_small = dcmread(mr_name)
         self.emri_jpeg_2k_lossless = dcmread(emri_jpeg_2k_lossless)
         self.emri_small = dcmread(emri_name)
-        self.original_handlers = pydicom.config.PIXEL_DATA_HANDLERS
-        pydicom.config.PIXEL_DATA_HANDLERS = [jpeg_ls_handler, numpy_handler]
+        self.original_handlers = pydicom.config.pixel_data_handlers
+        pydicom.config.pixel_data_handlers = [jpeg_ls_handler, numpy_handler]
 
     def tearDown(self):
-        pydicom.config.PIXEL_DATA_HANDLERS = self.original_handlers
+        pydicom.config.pixel_data_handlers = self.original_handlers
 
     def test_JPEG2000PixelArray(self):
         with self.assertRaises((NotImplementedError, )):
@@ -241,11 +241,11 @@ class jpeg_ls_JPEGlossyTests_with_jpeg_ls(unittest.TestCase):
     def setUp(self):
         self.jpeg_lossy = dcmread(jpeg_lossy_name)
         self.color_3d_jpeg = dcmread(color_3d_jpeg_baseline)
-        self.original_handlers = pydicom.config.PIXEL_DATA_HANDLERS
-        pydicom.config.PIXEL_DATA_HANDLERS = [jpeg_ls_handler, numpy_handler]
+        self.original_handlers = pydicom.config.pixel_data_handlers
+        pydicom.config.pixel_data_handlers = [jpeg_ls_handler, numpy_handler]
 
     def tearDown(self):
-        pydicom.config.PIXEL_DATA_HANDLERS = self.original_handlers
+        pydicom.config.pixel_data_handlers = self.original_handlers
 
     def testJPEGlossy(self):
         """JPEG-lossy: Returns correct values for sample data elements"""
@@ -272,11 +272,11 @@ class jpeg_ls_JPEGlossyTests_with_jpeg_ls(unittest.TestCase):
 class jpeg_ls_JPEGlosslessTests_with_jpeg_ls(unittest.TestCase):
     def setUp(self):
         self.jpeg_lossless = dcmread(jpeg_lossless_name)
-        self.original_handlers = pydicom.config.PIXEL_DATA_HANDLERS
-        pydicom.config.PIXEL_DATA_HANDLERS = [jpeg_ls_handler, numpy_handler]
+        self.original_handlers = pydicom.config.pixel_data_handlers
+        pydicom.config.pixel_data_handlers = [jpeg_ls_handler, numpy_handler]
 
     def tearDown(self):
-        pydicom.config.PIXEL_DATA_HANDLERS = self.original_handlers
+        pydicom.config.pixel_data_handlers = self.original_handlers
 
     def testJPEGlossless(self):
         """JPEGlossless: Returns correct values for sample data elements"""

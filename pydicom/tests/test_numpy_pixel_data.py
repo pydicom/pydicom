@@ -178,12 +178,12 @@ class TestNoNumpy_NoNumpyHandler(object):
     """Tests for handling datasets without numpy and the handler."""
     def setup(self):
         """Setup the environment."""
-        self.original_handlers = pydicom.config.PIXEL_DATA_HANDLERS
-        pydicom.config.PIXEL_DATA_HANDLERS = []
+        self.original_handlers = pydicom.config.pixel_data_handlers
+        pydicom.config.pixel_data_handlers = []
 
     def teardown(self):
         """Restore the environment."""
-        pydicom.config.PIXEL_DATA_HANDLERS = self.original_handlers
+        pydicom.config.pixel_data_handlers = self.original_handlers
 
     def test_environment(self):
         """Check that the testing environment is as expected."""
@@ -235,12 +235,12 @@ class TestNoNumpy_NumpyHandler(object):
     """Tests for handling datasets without numpy and the handler."""
     def setup(self):
         """Setup the environment."""
-        self.original_handlers = pydicom.config.PIXEL_DATA_HANDLERS
-        pydicom.config.PIXEL_DATA_HANDLERS = [NP_HANDLER]
+        self.original_handlers = pydicom.config.pixel_data_handlers
+        pydicom.config.pixel_data_handlers = [NP_HANDLER]
 
     def teardown(self):
         """Restore the environment."""
-        pydicom.config.PIXEL_DATA_HANDLERS = self.original_handlers
+        pydicom.config.pixel_data_handlers = self.original_handlers
 
     def test_environment(self):
         """Check that the testing environment is as expected."""
@@ -305,12 +305,12 @@ class TestNumpy_NoNumpyHandler(object):
     """Tests for handling datasets without the handler."""
     def setup(self):
         """Setup the environment."""
-        self.original_handlers = pydicom.config.PIXEL_DATA_HANDLERS
-        pydicom.config.PIXEL_DATA_HANDLERS = []
+        self.original_handlers = pydicom.config.pixel_data_handlers
+        pydicom.config.pixel_data_handlers = []
 
     def teardown(self):
         """Restore the environment."""
-        pydicom.config.PIXEL_DATA_HANDLERS = self.original_handlers
+        pydicom.config.pixel_data_handlers = self.original_handlers
 
     def test_environment(self):
         """Check that the testing environment is as expected."""
@@ -401,12 +401,12 @@ class TestNumpy_NumpyHandler(object):
     """Tests for handling Pixel Data with the handler."""
     def setup(self):
         """Setup the test datasets and the environment."""
-        self.original_handlers = pydicom.config.PIXEL_DATA_HANDLERS
-        pydicom.config.PIXEL_DATA_HANDLERS = [NP_HANDLER]
+        self.original_handlers = pydicom.config.pixel_data_handlers
+        pydicom.config.pixel_data_handlers = [NP_HANDLER]
 
     def teardown(self):
         """Restore the environment."""
-        pydicom.config.PIXEL_DATA_HANDLERS = self.original_handlers
+        pydicom.config.pixel_data_handlers = self.original_handlers
 
     def test_environment(self):
         """Check that the testing environment is as expected."""

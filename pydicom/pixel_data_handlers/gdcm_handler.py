@@ -26,10 +26,10 @@ DEPENDENCIES = {
     'gdcm': ('http://gdcm.sourceforge.net/wiki/index.php/Main_Page', 'GDCM'),
 }
 
-
 SUPPORTED_TRANSFER_SYNTAXES = [
     pydicom.uid.JPEGBaseline,
     pydicom.uid.JPEGExtended,
+    pydicom.uid.JPEGLosslessP14,
     pydicom.uid.JPEGLossless,
     pydicom.uid.JPEGLSLossless,
     pydicom.uid.JPEGLSLossy,

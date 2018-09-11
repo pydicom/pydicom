@@ -68,18 +68,18 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 
 
-import pydicom.pixel_data_handlers.numpy_handler as NP_HANDLER  # noqa
-import pydicom.pixel_data_handlers.rle_handler as RLE_HANDLER  # noqa
-import pydicom.pixel_data_handlers.pillow_handler as PILLOW_HANDLER  # noqa
-import pydicom.pixel_data_handlers.jpeg_ls_handler as JPEGLS_HANDLER  # noqa
-import pydicom.pixel_data_handlers.gdcm_handler as GDCM_HANDLER  # noqa
+import pydicom.pixel_data_handlers.numpy_handler as np_handler  # noqa
+import pydicom.pixel_data_handlers.rle_handler as rle_handler  # noqa
+import pydicom.pixel_data_handlers.pillow_handler as pillow_handler  # noqa
+import pydicom.pixel_data_handlers.jpeg_ls_handler as jpegls_handler  # noqa
+import pydicom.pixel_data_handlers.gdcm_handler as gdcm_handler  # noqa
 
-PIXEL_DATA_HANDLERS = [
-    NP_HANDLER,
-    RLE_HANDLER,
-    GDCM_HANDLER,
-    PILLOW_HANDLER,
-    JPEGLS_HANDLER,
+pixel_data_handlers = [
+    np_handler,
+    rle_handler,
+    gdcm_handler,
+    pillow_handler,
+    jpegls_handler,
 ]
 """Handlers for converting (7fe0,0010) Pixel Data.
 This is an ordered list that the dataset.convert_pixel_data()
