@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """unittest cases for pydicom.filewriter module"""
 
@@ -23,7 +24,7 @@ from pydicom.filereader import dcmread, read_dataset
 from pydicom.filewriter import (write_data_element, write_dataset,
                                 correct_ambiguous_vr, write_file_meta_info,
                                 correct_ambiguous_vr_element, write_numbers,
-                                write_PN, _format_DT)
+                                write_PN, _format_DT, write_text)
 from pydicom.multival import MultiValue
 from pydicom.sequence import Sequence
 from pydicom.uid import (ImplicitVRLittleEndian, ExplicitVRBigEndian,
@@ -31,6 +32,7 @@ from pydicom.uid import (ImplicitVRLittleEndian, ExplicitVRBigEndian,
 from pydicom.util.hexutil import hex2bytes, bytes2hex
 from pydicom.util.fixes import timezone
 from pydicom.valuerep import DA, DT, TM
+from pydicom.values import convert_text
 from ._write_stds import impl_LE_deflen_std_hex
 
 
@@ -1241,8 +1243,6 @@ class TestWriteToStandard(object):
         for elem_in, elem_out in zip(ds_explicit, ds_out):
             assert elem_in == elem_out
 
-    @pytest.mark.skipif(sys.version_info[0] == 2,
-                        reason='Saving with another encoding fails in Python2')
     def test_changed_character_set(self):
         """Make sure that a changed character set is reflected
         in the written data elements."""
@@ -2128,20 +2128,140 @@ class TestWriteNumbers(object):
 
 class TestWritePN(object):
     """Test filewriter.write_PN"""
-    def test_no_encoding_unicode(self):
-        """If PN element has no encoding info, default is used"""
-        fp = DicomBytesIO()
-        fp.is_little_endian = True
-        elem = DataElement(0x00100010, 'PN', u'\u03b8')
-        write_PN(fp, elem)
-
     def test_no_encoding(self):
         """If PN element has no encoding info, default is used"""
         fp = DicomBytesIO()
         fp.is_little_endian = True
+        # data element with encoded value
         elem = DataElement(0x00100010, 'PN', 'Test')
         write_PN(fp, elem)
-        assert fp.getvalue() == b'Test'
+        assert b'Test' == fp.getvalue()
+
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        # data element with decoded value
+        elem = DataElement(0x00100010, 'PN', u'Test')
+        write_PN(fp, elem)
+        assert b'Test' == fp.getvalue()
+
+    @pytest.mark.skipif(sys.version_info[0] == 2,
+                        reason='Not working with PersonNameUnicode')
+    def test_single_byte_multi_charset_groups(self):
+        """Test component groups with different encodings"""
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        encodings = ['latin_1', 'iso_ir_126']
+        # data element with encoded value
+        encoded = (b'Dionysios=\x1b\x2d\x46'                           
+                    b'\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2')
+        elem = DataElement(0x00100010, 'PN', encoded)
+        write_PN(fp, elem, encoding=encodings)
+        assert encoded == fp.getvalue()
+
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        # data element with decoded value
+        elem = DataElement(0x00100010, 'PN', u'Dionysios=Διονυσιος')
+        write_PN(fp, elem, encoding=encodings)
+        assert encoded == fp.getvalue()
+
+    @pytest.mark.skipif(sys.version_info[0] == 2,
+                        reason='Not working with PersonNameUnicode')
+    def test_single_byte_multi_charset_values(self):
+        """Test multiple values with different encodings"""
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        encodings = ['latin_1', 'iso_ir_144', 'iso_ir_126']
+        # data element with encoded value
+        encoded = (b'Buc^J\xe9r\xf4me\\\x1b\x2d\x46'
+                   b'\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2\\'
+                   b'\x1b\x2d\x4C'
+                   b'\xbb\xee\xda\x63\x65\xdc\xd1\x79\x70\xd3 ')
+        elem = DataElement(0x00100060, 'PN', encoded)
+        write_PN(fp, elem, encoding=encodings)
+        assert encoded == fp.getvalue()
+
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        # data element with decoded value
+        elem = DataElement(0x00100060, 'PN', [u'Buc^Jérôme', u'Διονυσιος',
+                                              u'Люкceмбypг'])
+        write_PN(fp, elem, encoding=encodings)
+        assert encoded == fp.getvalue()
+
+
+class TestWriteText(object):
+    """Test filewriter.write_PN"""
+    def test_no_encoding(self):
+        """If text element has no encoding info, default is used"""
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        # data element with encoded value
+        elem = DataElement(0x00081039, 'LO', 'Test')
+        write_text(fp, elem)
+        assert b'Test' == fp.getvalue()
+
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        # data element with decoded value
+        elem = DataElement(0x00081039, 'LO', u'Test')
+        write_text(fp, elem)
+        assert b'Test' == fp.getvalue()
+
+    def test_single_byte_multi_charset_text(self):
+        """Test changed encoding inside the string"""
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        encoded = (b'Dionysios=\x1b\x2d\x46'
+                   b'\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2')
+        # data element with encoded value
+        elem = DataElement(0x00081039, 'LO', encoded)
+        encodings = ['latin_1', 'iso_ir_126']
+        write_text(fp, elem, encoding=encodings)
+        assert encoded == fp.getvalue()
+
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        # data element with decoded value
+        elem = DataElement(0x00081039, 'LO', u'Dionysios is Διονυσιος')
+        write_text(fp, elem, encoding=encodings)
+        # encoding may not be the same, so decode it first
+        encoded = fp.getvalue()
+        assert u'Dionysios is Διονυσιος' == convert_text(encoded, encodings)
+
+    def test_single_byte_multi_charset_text_multivalue(self):
+        """Test multiple values with different encodings"""
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        encoded = (b'Buc^J\xe9r\xf4me\\\x1b\x2d\x46'
+                           b'\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2\\'
+                           b'\x1b\x2d\x4C'
+                           b'\xbb\xee\xda\x63\x65\xdc\xd1\x79\x70\xd3 ')
+        # data element with encoded value
+        elem = DataElement(0x00081039, 'LO', encoded)
+        encodings = ['latin_1', 'iso_ir_144', 'iso_ir_126']
+        write_text(fp, elem, encoding=encodings)
+        assert encoded == fp.getvalue()
+
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        # data element with decoded value
+        decoded = [u'Buc^Jérôme', u'Διονυσιος', u'Люкceмбypг']
+        elem = DataElement(0x00081039, 'LO', decoded)
+        write_text(fp, elem, encoding=encodings)
+        # encoding may not be the same, so decode it first
+        encoded = fp.getvalue()
+        assert decoded == convert_text(encoded, encodings)
+
+    def test_invalid_encoding(self):
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        # data element with decoded value
+        elem = DataElement(0x00081039, 'LO', u'Dionysios Διονυσιος')
+        msg = 'Failed to encode value with encodings: iso-2022-jp'
+        with pytest.warns(UserWarning, match=msg):
+            write_text(fp, elem, encoding=['iso-2022-jp'])
+            assert b'Dionysios \x1b$B&$&I&O&M&T&R&I&O\x1b(B? ' == fp.getvalue()
 
 
 class TestWriteDT(object):
@@ -2227,90 +2347,6 @@ class TestWriteUndefinedLengthPixelData(unittest.TestCase):
         with pytest.raises(ValueError, match='Pixel Data .+ must '
                                              'start with an item tag'):
             write_data_element(self.fp, pixel_data)
-
-
-class TestWriteNumbers(object):
-    """Test filewriter.write_numbers"""
-    def test_write_empty_value(self):
-        """Test writing an empty value does nothing"""
-        fp = DicomBytesIO()
-        fp.is_little_endian = True
-        elem = DataElement(0x00100010, 'US', '')
-        fmt = 'H'
-        write_numbers(fp, elem, fmt)
-        assert fp.getvalue() == b''
-
-    def test_write_list(self):
-        """Test writing an element value with VM > 1"""
-        fp = DicomBytesIO()
-        fp.is_little_endian = True
-        elem = DataElement(0x00100010, 'US', [1, 2, 3, 4])
-        fmt = 'H'
-        write_numbers(fp, elem, fmt)
-        assert fp.getvalue() == b'\x01\x00\x02\x00\x03\x00\x04\x00'
-
-    def test_write_singleton(self):
-        """Test writing an element value with VM = 1"""
-        fp = DicomBytesIO()
-        fp.is_little_endian = True
-        elem = DataElement(0x00100010, 'US', 1)
-        fmt = 'H'
-        write_numbers(fp, elem, fmt)
-        assert fp.getvalue() == b'\x01\x00'
-
-    def test_exception(self):
-        """Test exceptions raise IOError"""
-        fp = DicomBytesIO()
-        fp.is_little_endian = True
-        elem = DataElement(0x00100010, 'US', b'\x00')
-        fmt = 'H'
-        with pytest.raises(IOError,
-                           match=r"for data_element:\n\(0010, 0010\)"):
-            write_numbers(fp, elem, fmt)
-
-    def test_write_big_endian(self):
-        """Test writing big endian"""
-        fp = DicomBytesIO()
-        fp.is_little_endian = False
-        elem = DataElement(0x00100010, 'US', 1)
-        fmt = 'H'
-        write_numbers(fp, elem, fmt)
-        assert fp.getvalue() == b'\x00\x01'
-
-
-class TestWritePN(object):
-    """Test filewriter.write_PN"""
-    def test_no_encoding_unicode(self):
-        """If PN element as no encoding info, default is used"""
-        fp = DicomBytesIO()
-        fp.is_little_endian = True
-        elem = DataElement(0x00100010, 'PN', u'\u00e8')
-        write_PN(fp, elem)
-
-    def test_no_encoding(self):
-        """If PN element as no encoding info, default is used"""
-        fp = DicomBytesIO()
-        fp.is_little_endian = True
-        elem = DataElement(0x00100010, 'PN', 'Test')
-        write_PN(fp, elem)
-        assert fp.getvalue() == b'Test'
-
-
-class TestWriteDT(object):
-    """Test filewriter.write_DT"""
-    def test_format_dt(self):
-        """Test _format_DT"""
-        elem = DataElement(0x00181078, 'DT', DT('20010203123456.123456'))
-        assert hasattr(elem.value, 'original_string')
-        assert _format_DT(elem.value) == '20010203123456.123456'
-        del elem.value.original_string
-        assert not hasattr(elem.value, 'original_string')
-        assert elem.value.microsecond > 0
-        assert _format_DT(elem.value) == '20010203123456.123456'
-
-        elem = DataElement(0x00181078, 'DT', DT('20010203123456'))
-        del elem.value.original_string
-        assert _format_DT(elem.value) == '20010203123456'
 
 
 if __name__ == "__main__":

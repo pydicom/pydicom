@@ -8,6 +8,7 @@ import pydicom.charset
 from pydicom import dcmread
 from pydicom.data import get_charset_files, get_testdata_files
 from pydicom.dataelem import DataElement
+from pydicom.filebase import DicomBytesIO
 
 # The file names (without '.dcm' extension) of most of the character test
 # files, together with the respective decoded PatientName tag values.
@@ -96,8 +97,8 @@ class TestCharset(object):
         ds.decode()
         assert u'CompressedSamples^CT1' == ds.PatientName
 
-    def test_encoding_with_specific_tags(self):
-        """Encoding is correctly applied even if  Specific Character Set
+    def test_decoding_with_specific_tags(self):
+        """Decoding is correctly applied even if  Specific Character Set
         is not in specific tags..."""
         rus_file = get_charset_files("chrRuss.dcm")[0]
         ds = dcmread(rus_file, specific_tags=['PatientName'])
@@ -116,6 +117,36 @@ class TestCharset(object):
         # default encoding is iso8859
         pydicom.charset.decode(elem, [])
         assert 'iso8859' in elem.value.encodings
+
+    def test_bad_encoded_single_encoding(self):
+        """Test handling bad encoding for single encoding"""
+        elem = DataElement(0x00100010, 'PN',
+                           b'\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2')
+
+        with pytest.warns(UserWarning, match='Failed to decode byte string '
+                                             'with encoding UTF8'):
+            pydicom.charset.decode(elem, ['ISO_IR 192'])
+            assert u'���������' == elem.value
+
+    def test_bad_encoded_multi_byte_encoding(self):
+        """Test handling bad encoding for single encoding"""
+        elem = DataElement(0x00100010, 'PN',
+                           b'\x1b$(D\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2')
+
+        with pytest.warns(UserWarning, match='Failed to decode byte string '
+                                             'with encodings: iso-2022-jp'):
+            pydicom.charset.decode(elem, ['ISO 2022 IR 159'])
+            assert u'����������' == elem.value
+
+    def test_unknown_escape_sequence(self):
+        """Test handling bad encoding for single encoding"""
+        elem = DataElement(0x00100010, 'PN',
+                           b'\x1b\x2d\x46\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2')
+
+        with pytest.warns(UserWarning, match='Found unknown escape sequence '
+                                             'in encoded string value'):
+            pydicom.charset.decode(elem, ['ISO_IR 100'])
+            assert u'\x1b-FÄéïíõóéïò' == elem.value
 
     def test_patched_charset(self):
         """Test some commonly misspelled charset values"""
@@ -202,11 +233,11 @@ class TestCharset(object):
         assert u'Dionysios=Διονυσιος' == elem.value
 
         # multiple values with different encodings
-        elem = DataElement(0x00100060, 'PN',
-                           b'Buc^J\xe9r\xf4me\\\x1b\x2d\x46'
+        encoded = (b'Buc^J\xe9r\xf4me\\\x1b\x2d\x46'
                            b'\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2\\'
                            b'\x1b\x2d\x4C'
                            b'\xbb\xee\xda\x63\x65\xdc\xd1\x79\x70\xd3')
+        elem = DataElement(0x00100060, 'PN', encoded)
         pydicom.charset.decode(elem, ['ISO 2022 IR 100',
                                       'ISO 2022 IR 144',
                                       'ISO 2022 IR 126'])
@@ -240,11 +271,33 @@ class TestCharset(object):
 
     @pytest.mark.parametrize('filename, patient_name', FILE_PATIENT_NAMES)
     def test_charset_patient_names(self, filename, patient_name):
-        """Test pixel_array for big endian matches little."""
+        """Test patient names are correctly decoded and encoded."""
+        # check that patient names are correctly read
         file_path = get_charset_files(filename + '.dcm')[0]
         ds = dcmread(file_path)
         ds.decode()
         assert patient_name == ds.PatientName
+
+        # check that patient names are correctly written back
+        fp = DicomBytesIO()
+        fp.is_implicit_VR = False
+        fp.is_little_endian = True
+        ds.save_as(fp, write_like_original=False)
+        fp.seek(0)
+        ds = dcmread(fp)
+        assert patient_name == ds.PatientName
+
+        # check that patient names are correctly written back
+        # without original byte string (PersonName3 only)
+        if hasattr(ds.PatientName, 'original_string'):
+            ds.PatientName.original_string = None
+            fp = DicomBytesIO()
+            fp.is_implicit_VR = False
+            fp.is_little_endian = True
+            ds.save_as(fp, write_like_original=False)
+            fp.seek(0)
+            ds = dcmread(fp)
+            assert patient_name == ds.PatientName
 
     def test_changed_character_set(self):
         # Regression test for #629

@@ -59,7 +59,7 @@ ESC = b'\x1b'
 
 # Map Python encodings to escape sequences as defined in PS3.3 in tables
 # C.12-3 (single-byte) and C.12-4 (multi-byte character sets).
-escape_codes = {
+CODES_TO_ENCODINGS = {
     ESC + b'(B': default_encoding,  # used to switch to ASCII G0 code element
     ESC + b'-A': 'latin_1',
     ESC + b')I': 'shift_jis',  # switches to ISO-IR 13
@@ -78,6 +78,8 @@ escape_codes = {
     ESC + b'$(D': 'iso-2022-jp',
     ESC + b'$)A': 'iso_ir_58',
 }
+
+ENCODINGS_TO_CODES = {v: k for k, v in CODES_TO_ENCODINGS.items()}
 
 # Multi-byte character sets except Korean are handled by Python.
 # To decode them, the escape sequence shall be preserved in the input byte
@@ -109,7 +111,13 @@ def decode_string(value, encodings, delimiters):
     """
     # shortcut for the common case - no escape sequences present
     if ESC not in value:
-        return value.decode(encodings[0])
+        try:
+            return value.decode(encodings[0])
+        except UnicodeError:
+            warnings.warn(u"Failed to decode byte string with encoding {} - "
+                          u"using replacement characters in decoded "
+                          u"string".format(encodings[0]))
+            return value.decode(encodings[0], errors='replace')
 
     # Each part of the value that starts with an escape sequence is decoded
     # separately. If it starts with an escape sequence, the
@@ -125,11 +133,11 @@ def decode_string(value, encodings, delimiters):
 
     # decode each byte string fragment with it's corresponding encoding
     # and join them all together
-    return u''.join([decode_fragment(fragment, encodings, delimiters)
+    return u''.join([_decode_fragment(fragment, encodings, delimiters)
                      for fragment in fragments])
 
 
-def decode_fragment(byte_str, encodings, delimiters):
+def _decode_fragment(byte_str, encodings, delimiters):
     """Decode a byte string encoded with a single encoding.
     If `byte_str` starts with an escape sequence, the encoding corresponding
     to this sequence is used for decoding if present in `encodings`,
@@ -151,42 +159,96 @@ def decode_fragment(byte_str, encodings, delimiters):
     Returns
     -------
     text type
-        The decoded string.
+        The decoded unicode string. If the value could not be decoded,
+        a warning is issued, and the value is decoded using the first
+        encoding with replacement characters, resulting in data loss.
 
     Reference
     ---------
     * DICOM Standard Part 5, Sections 6.1.2.4 and 6.1.2.5
     * DICOM Standard Part 3, Anex C.12.1.1.2
     """
-    if byte_str.startswith(ESC):
-        # all 4-character escape codes start with one of two character sets
-        seq_length = 4 if byte_str.startswith((b'\x1b$(', b'\x1b$)')) else 3
-        encoding = escape_codes.get(byte_str[:seq_length], '')
-        if encoding in encodings or encoding == default_encoding:
-            if encoding in handled_encodings:
-                # Python strips the escape sequences for this encoding.
-                # Any delimiters must be handled correctly by `byte_str`.
-                return byte_str.decode(encoding)
-            else:
-                # Python doesn't know about the escape sequence -
-                # we have to strip it before decoding
-                byte_str = byte_str[seq_length:]
+    try:
+        if byte_str.startswith(ESC):
+            return _decode_escaped_fragment(byte_str, encodings, delimiters)
+        # no escape sequence - use first encoding
+        return byte_str.decode(encodings[0])
+    except UnicodeError:
+        warnings.warn(u"Failed to decode byte string with encodings: {} - "
+                      u"using replacement characters in decoded "
+                      u"string".format(', '.join(encodings)))
+        return byte_str.decode(encodings[0], errors='replace')
 
-                # If a delimiter occurs in the string, it resets the encoding.
-                # The following returns the first occurrence of a delimiter in
-                # the byte string, or None if it does not contain any.
-                index = next((index for index, ch in enumerate(byte_str)
-                              if ch in delimiters), None)
-                if index is not None:
-                    # the part of the string after the first delimiter
-                    # is decoded with the first encoding
-                    return (byte_str[:index].decode(encoding) +
-                            byte_str[index:].decode(encodings[0]))
-                # No delimiter - use the encoding defined by the escape code
-                return byte_str.decode(encoding)
 
-    # no or unknown escape code - use first encoding
-    return byte_str.decode(encodings[0])
+def _decode_escaped_fragment(byte_str, encodings, delimiters):
+    """Decodes a byte string starting with an escape sequence.
+    See `_decode_fragment` for parameter description and more information.
+    """
+    # all 4-character escape codes start with one of two character sets
+    seq_length = 4 if byte_str.startswith((b'\x1b$(', b'\x1b$)')) else 3
+    encoding = CODES_TO_ENCODINGS.get(byte_str[:seq_length], '')
+    if encoding in encodings or encoding == default_encoding:
+        if encoding in handled_encodings:
+            # Python strips the escape sequences for this encoding.
+            # Any delimiters must be handled correctly by `byte_str`.
+            return byte_str.decode(encoding)
+        else:
+            # Python doesn't know about the escape sequence -
+            # we have to strip it before decoding
+            byte_str = byte_str[seq_length:]
+
+            # If a delimiter occurs in the string, it resets the encoding.
+            # The following returns the first occurrence of a delimiter in
+            # the byte string, or None if it does not contain any.
+            index = next((index for index, ch in enumerate(byte_str)
+                          if ch in delimiters), None)
+            if index is not None:
+                # the part of the string after the first delimiter
+                # is decoded with the first encoding
+                return (byte_str[:index].decode(encoding) +
+                        byte_str[index:].decode(encodings[0]))
+            # No delimiter - use the encoding defined by the escape code
+            return byte_str.decode(encoding)
+
+    # unknown escape code - use first encoding
+    warnings.warn(u"Found unknown escape sequence in encoded string value - "
+                  u"using encoding {}".format(encodings[0]))
+    return byte_str.decode(encodings[0], errors='replace')
+
+
+def encode_string(value, encodings):
+    """Convert a unicode string into a byte string using the given
+    list of encodings.
+
+    Parameters
+    ----------
+    value : text type
+        The unicode string as presented to the user.
+    encodings : list
+        The encodings needed to encode the string as a list of Python
+        encodings, converted from the encodings in Specific Character Set.
+
+    Returns
+    -------
+    byte string
+        The encoded string. If the value could not be encoded with any of
+        the given encodings, a warning is issued, and the value is
+        encoded using the first encoding with replacement characters,
+        resulting in data loss.
+    """
+    for i, encoding in enumerate(encodings):
+        try:
+            encoded = value.encode(encoding)
+            if i > 0 and encoding not in handled_encodings:
+                return ENCODINGS_TO_CODES.get(encoding, b'') + encoded
+            return encoded
+        except UnicodeError:
+            continue
+    else:
+        warnings.warn("Failed to encode value with encodings: {} - using "
+                      "replacement characters in encoded string"
+                      .format(', '.join(encodings)))
+        return value.encode(encodings[0], errors='replace')
 
 
 # DICOM PS3.5-2008 6.1.1 (p 18) says:
