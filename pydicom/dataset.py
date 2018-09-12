@@ -782,7 +782,7 @@ class Dataset(dict):
         # Handlers that both support the transfer syntax and have their
         #   dependencies met
         available_handlers = [hh for hh in possible_handlers if
-                              hh.is_available(transfer_syntax)]
+                              hh.is_available()]
 
         # There are handlers that support the transfer syntax but none of them
         #   can be used as missing dependencies

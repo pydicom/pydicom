@@ -33,19 +33,9 @@ SUPPORTED_TRANSFER_SYNTAXES = [
 ]
 
 
-def is_available(transfer_syntax):
-    """Return True if the handler is available for use.
-
-    Parameters
-    ----------
-    transfer_syntax : UID
-        The Transfer Syntax UID of the Pixel Data that is to be used with
-        the handler.
-    """
-    if not HAVE_NP or not HAVE_JPEGLS:
-        return False
-
-    return supports_transfer_syntax(transfer_syntax)
+def is_available():
+    """Return True if the handler has its dependencies met."""
+    return HAVE_NP and HAVE_JPEGLS
 
 
 def needs_to_convert_to_RGB(dicom_dataset):

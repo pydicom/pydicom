@@ -63,16 +63,9 @@ SUPPORTED_TRANSFER_SYNTAXES = [
 ]
 
 
-def is_available(transfer_syntax):
-    """Return True if the handler is available for use.
-
-    Parameters
-    ----------
-    transfer_syntax : UID
-        The Transfer Syntax UID of the Pixel Data that is to be used with
-        the handler.
-    """
-    return supports_transfer_syntax(transfer_syntax) and HAVE_NP
+def is_available():
+    """Return True if the handler has its dependencies met."""
+    return HAVE_NP
 
 
 def supports_transfer_syntax(transfer_syntax):

@@ -81,7 +81,7 @@ pixel_data_handlers = [
     pillow_handler,
     jpegls_handler,
 ]
-image_handlers = pixel_data_handlers
+image_handlers = [hh for hh in pixel_data_handlers if hh.is_available()]
 """Handlers for converting (7fe0,0010) Pixel Data.
 This is an ordered list that the dataset.convert_pixel_data()
 method will try to extract a correctly sized numpy array from the

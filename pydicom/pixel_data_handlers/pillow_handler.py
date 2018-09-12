@@ -53,23 +53,9 @@ DEPENDENCIES = {
 }
 
 
-def is_available(transfer_syntax):
-    """Return True if the handler is available for use.
-
-    Parameters
-    ----------
-    transfer_syntax : UID
-        The Transfer Syntax UID of the Pixel Data that is to be used with
-        the handler.
-    """
-    if HAVE_NP and HAVE_PIL:
-        if transfer_syntax in PillowJPEG2000TransferSyntaxes and HAVE_JPEG2K:
-            return True
-
-        if transfer_syntax in PillowJPEGTransferSyntaxes and HAVE_JPEG:
-            return True
-
-    return False
+def is_available():
+    """Return True if the handler has its dependencies met."""
+    return HAVE_NP and HAVE_PIL
 
 
 def supports_transfer_syntax(transfer_syntax):
