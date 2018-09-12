@@ -221,8 +221,14 @@ def convert_encodings(encodings):
         patched_encodings = []
         patched = {}
         for x in encodings:
-            if re.match('^ISO[^_]IR', x):
+            # check for spelling errors, but exclude the correct spelling
+            # standard encodings
+            if re.match('^ISO[^_]IR', x) is not None:
                 patched[x] = 'ISO_IR' + x[6:]
+                patched_encodings.append(patched[x])
+            # encodings with code extensions
+            elif re.match('^(?=ISO.2022.IR.)(?!ISO 2022 IR )', x) is not None:
+                patched[x] = 'ISO 2022 IR ' + x[12:]
                 patched_encodings.append(patched[x])
             else:
                 patched_encodings.append(x)
