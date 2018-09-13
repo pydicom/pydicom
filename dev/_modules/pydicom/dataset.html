@@ -212,6 +212,11 @@
 <span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="k">import</span> <span class="p">(</span><span class="n">ExplicitVRLittleEndian</span><span class="p">,</span> <span class="n">ImplicitVRLittleEndian</span><span class="p">,</span>
                          <span class="n">ExplicitVRBigEndian</span><span class="p">,</span> <span class="n">PYDICOM_IMPLEMENTATION_UID</span><span class="p">)</span>
 
+<span class="k">if</span> <span class="n">compat</span><span class="o">.</span><span class="n">in_py2</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">pkgutil</span> <span class="k">import</span> <span class="n">find_loader</span> <span class="k">as</span> <span class="n">have_package</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">importlib.util</span> <span class="k">import</span> <span class="n">find_spec</span> <span class="k">as</span> <span class="n">have_package</span>
+
 <span class="n">have_numpy</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">numpy</span>
@@ -931,24 +936,52 @@
         <span class="k">if</span> <span class="n">already_have</span><span class="p">:</span>
             <span class="k">return</span>
 
-        <span class="c1"># Find all pixel data handlers that support the transfer syntax</span>
-        <span class="n">suitable_handlers</span> <span class="o">=</span> <span class="p">[</span><span class="n">hh</span> <span class="k">for</span> <span class="n">hh</span> <span class="ow">in</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">image_handlers</span>
-                             <span class="k">if</span> <span class="n">hh</span> <span class="ow">and</span> <span class="n">hh</span><span class="o">.</span><span class="n">supports_transfer_syntax</span><span class="p">(</span><span class="bp">self</span><span class="p">)]</span>
+        <span class="c1"># Find all possible handlers that support the transfer syntax</span>
+        <span class="n">transfer_syntax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span>
+        <span class="n">possible_handlers</span> <span class="o">=</span> <span class="p">[</span><span class="n">hh</span> <span class="k">for</span> <span class="n">hh</span> <span class="ow">in</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">pixel_data_handlers</span>
+                             <span class="k">if</span> <span class="n">hh</span><span class="o">.</span><span class="n">supports_transfer_syntax</span><span class="p">(</span><span class="n">transfer_syntax</span><span class="p">)]</span>
 
-        <span class="c1"># No suitable handlers are available</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">suitable_handlers</span><span class="p">:</span>
+        <span class="c1"># No handlers support the transfer syntax</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">possible_handlers</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
                 <span class="s2">&quot;Unable to decode pixel data with a transfer syntax UID of &quot;</span>
-                <span class="s2">&quot;&#39;</span><span class="si">{0}</span><span class="s2">&#39; (</span><span class="si">{1}</span><span class="s2">) as there are no suitable pixel data handlers &quot;</span>
-                <span class="s2">&quot;available. Please see the list of supported Transfer &quot;</span>
-                <span class="s2">&quot;Syntaxes in the pydicom documentation for information on &quot;</span>
-                <span class="s2">&quot;which additional packages might be required&quot;</span>
+                <span class="s2">&quot;&#39;</span><span class="si">{0}</span><span class="s2">&#39; (</span><span class="si">{1}</span><span class="s2">) as there are no pixel data handlers &quot;</span>
+                <span class="s2">&quot;available that support it. Please see the pydicom &quot;</span>
+                <span class="s2">&quot;documentation for information on supported transfer syntaxes &quot;</span>
                 <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span><span class="p">,</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
             <span class="p">)</span>
 
+        <span class="c1"># Handlers that both support the transfer syntax and have their</span>
+        <span class="c1">#   dependencies met</span>
+        <span class="n">available_handlers</span> <span class="o">=</span> <span class="p">[</span><span class="n">hh</span> <span class="k">for</span> <span class="n">hh</span> <span class="ow">in</span> <span class="n">possible_handlers</span> <span class="k">if</span>
+                              <span class="n">hh</span><span class="o">.</span><span class="n">is_available</span><span class="p">()]</span>
+
+        <span class="c1"># There are handlers that support the transfer syntax but none of them</span>
+        <span class="c1">#   can be used as missing dependencies</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">available_handlers</span><span class="p">:</span>
+            <span class="c1"># For each of the possible handlers we want to find which</span>
+            <span class="c1">#   dependencies are missing</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s2">&quot;The following handlers are available to decode the pixel &quot;</span>
+                <span class="s2">&quot;data however they are missing required dependencies: &quot;</span>
+            <span class="p">)</span>
+            <span class="n">pkg_msg</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">hh</span> <span class="ow">in</span> <span class="n">possible_handlers</span><span class="p">:</span>
+                <span class="n">hh_deps</span> <span class="o">=</span> <span class="n">hh</span><span class="o">.</span><span class="n">DEPENDENCIES</span>
+                <span class="c1"># Missing packages</span>
+                <span class="n">missing</span> <span class="o">=</span> <span class="p">[</span><span class="n">dd</span> <span class="k">for</span> <span class="n">dd</span> <span class="ow">in</span> <span class="n">hh_deps</span> <span class="k">if</span> <span class="n">have_package</span><span class="p">(</span><span class="n">dd</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">]</span>
+                <span class="c1"># Package names</span>
+                <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">hh_deps</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">missing</span><span class="p">]</span>
+                <span class="n">pkg_msg</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> (req. </span><span class="si">{}</span><span class="s2">)&quot;</span>
+                    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">hh</span><span class="o">.</span><span class="n">HANDLER_NAME</span><span class="p">,</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">names</span><span class="p">))</span>
+                <span class="p">)</span>
+
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span> <span class="o">+</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pkg_msg</span><span class="p">))</span>
+
         <span class="n">last_exception</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">for</span> <span class="n">handler</span> <span class="ow">in</span> <span class="n">suitable_handlers</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">handler</span> <span class="ow">in</span> <span class="n">available_handlers</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="c1"># Use the handler to get a 1D numpy array of the pixel data</span>
                 <span class="n">arr</span> <span class="o">=</span> <span class="n">handler</span><span class="o">.</span><span class="n">get_pixeldata</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -958,8 +991,8 @@
                 <span class="c1">#   convert the color space from YCbCr to RGB</span>
                 <span class="k">if</span> <span class="n">handler</span><span class="o">.</span><span class="n">needs_to_convert_to_RGB</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_pixel_array</span> <span class="o">=</span> <span class="n">convert_color_space</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pixel_array</span><span class="p">,</span>
-                                                             <span class="s1">&#39;YBR_FULL&#39;</span><span class="p">,</span>
-                                                             <span class="s1">&#39;RGB&#39;</span><span class="p">)</span>
+                                                            <span class="s1">&#39;YBR_FULL&#39;</span><span class="p">,</span>
+                                                            <span class="s1">&#39;RGB&#39;</span><span class="p">)</span>
 
                 <span class="bp">self</span><span class="o">.</span><span class="n">_pixel_id</span> <span class="o">=</span> <span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">PixelData</span><span class="p">)</span>
 
@@ -980,7 +1013,7 @@
             <span class="s2">&quot;Please see the list of supported Transfer Syntaxes in the &quot;</span>
             <span class="s2">&quot;pydicom documentation for alternative packages that might &quot;</span>
             <span class="s2">&quot;be able to decode the data&quot;</span>
-            <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">hh</span><span class="p">)</span> <span class="k">for</span> <span class="n">hh</span> <span class="ow">in</span> <span class="n">suitable_handlers</span><span class="p">]))</span>
+            <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">hh</span><span class="p">)</span> <span class="k">for</span> <span class="n">hh</span> <span class="ow">in</span> <span class="n">available_handlers</span><span class="p">]))</span>
         <span class="p">)</span>
 
         <span class="k">raise</span> <span class="n">last_exception</span></div>

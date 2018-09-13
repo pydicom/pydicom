@@ -187,6 +187,15 @@ handler (<a class="reference external" href="https://github.com/pydicom/pydicom/
 <li><code class="docutils literal notranslate"><span class="pre">uid.JPEG2000Lossy</span></code> deprecated and will be removed in v1.3. Use
 <code class="docutils literal notranslate"><span class="pre">uid.JPEG2000</span></code> instead. (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/726">#726</a>)</li>
 <li>Equality and inequality operator overrides removed from <code class="docutils literal notranslate"><span class="pre">UID</span></code>.</li>
+<li><code class="docutils literal notranslate"><span class="pre">config.image_handlers</span></code> deprecated and will be removed in v1.3. use
+<code class="docutils literal notranslate"><span class="pre">config.pixel_data_handlers</span></code> instead. There is also a change in behaviour
+in that <code class="docutils literal notranslate"><span class="pre">image_handlers</span></code> previously used to only contain the pixel data
+handlers that had their dependencies met. <code class="docutils literal notranslate"><span class="pre">pixel_data_handlers</span></code> contains
+all handlers no matter whether or not their dependencies are met. To check
+if a handler is available for use (it has its dependency met) then use the
+handler’s <code class="docutils literal notranslate"><span class="pre">is_available</span></code> method.</li>
+<li><code class="docutils literal notranslate"><span class="pre">DeferredDataElement</span></code> class deprecated and will be removed in v1.3
+(<a class="reference external" href="https://github.com/pydicom/pydicom/issues/291">#291</a>)</li>
 </ul>
 </div>
 <div class="section" id="enhancements">
@@ -194,8 +203,6 @@ handler (<a class="reference external" href="https://github.com/pydicom/pydicom/
 <ul class="simple">
 <li>Added possibility to set byte strings as value for VRs that use only the
 default character set (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/624">#624</a>)</li>
-<li><code class="docutils literal notranslate"><span class="pre">DeferredDataElement</span></code> class deprecated and will be removed in v1.3
-(<a class="reference external" href="https://github.com/pydicom/pydicom/issues/291">#291</a>)</li>
 <li>Functions for encapsulating frames added to encaps module (<a href="#id1"><span class="problematic" id="id2">:pull_request:`696`</span></a>)</li>
 <li>Added <code class="docutils literal notranslate"><span class="pre">Dataset.fix_meta_info()</span></code> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/584">#584</a>)</li>
 <li>Add new function for bit packing <code class="docutils literal notranslate"><span class="pre">pack_bits</span></code> for use with BitsAllocated
@@ -204,18 +211,26 @@ default character set (<a class="reference external" href="https://github.com/py
 <li>Added <code class="docutils literal notranslate"><span class="pre">uid.JPEGLosslessP14</span></code> for UID 1.2.840.10008.1.2.4.57</li>
 <li>Added <code class="docutils literal notranslate"><span class="pre">uid.JPEG2000MultiComponentLossless</span></code> for UID 1.2.840.10008.1.2.4.92</li>
 <li>Added <code class="docutils literal notranslate"><span class="pre">uid.JPEG2000MultiComponent</span></code> for UID 1.2.840.10008.1.2.4.93</li>
+<li>Added full support for Planar Configuration (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/713">#713</a>)</li>
+<li>Added support for single frame pixel data where BitsAllocated &gt;8 and
+SamplesPerPixel &gt; 1 (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/713">#713</a>)</li>
+<li>Small improvement in RLE decoding speed (~10%).</li>
+<li>Add support for non-conformant RLE segment ordering (<a href="#id7"><span class="problematic" id="id8">:pull_request:`729`</span></a>)</li>
 </ul>
 </div>
 <div class="section" id="fixes">
 <h3>Fixes<a class="headerlink" href="#fixes" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Removed unused <code class="docutils literal notranslate"><span class="pre">original_string</span></code> attribute from the <code class="docutils literal notranslate"><span class="pre">DataElement</span></code> class
-(<a href="#id7"><span class="problematic" id="id8">:pull_request:`660`</span></a>)</li>
+(<a href="#id9"><span class="problematic" id="id10">:pull_request:`660`</span></a>)</li>
 <li>Improve performance for Python 3 when dealing with compressed multi-frame
 Pixel Data with pillow and jpeg-ls (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/682">#682</a>).</li>
 <li>Improve performance of bit unpacking for non-PyPy2 interpreters
-(<a href="#id9"><span class="problematic" id="id10">:pull_request:`715`</span></a>)</li>
+(<a href="#id11"><span class="problematic" id="id12">:pull_request:`715`</span></a>)</li>
 <li>First character set no longer removed (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/707">#707</a>)</li>
+<li>Fixed RLE decoded data having the wrong byte order (<a href="#id13"><span class="problematic" id="id14">:pull_request:`729`</span></a>)</li>
+<li>Fixed RLE decoded data having the wrong planar configuration
+(<a href="#id15"><span class="problematic" id="id16">:pull_request:`729`</span></a>)</li>
 </ul>
 </div>
 </div>
