@@ -21,8 +21,8 @@ Changes
   in that ``image_handlers`` previously used to only contain the pixel data
   handlers that had their dependencies met. ``pixel_data_handlers`` contains
   all handlers no matter whether or not their dependencies are met. To check
-  if a handler is available for use (it both supports the transfer syntax and
-  has its dependency met) then use the handler's ``is_available`` method.
+  if a handler is available for use (it has its dependency met) then use the
+  handler's ``is_available`` method.
 * ``DeferredDataElement`` class deprecated and will be removed in v1.3
   (:issue:`291`)
 
