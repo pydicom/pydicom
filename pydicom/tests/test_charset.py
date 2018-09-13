@@ -150,6 +150,38 @@ class TestCharset(object):
         pydicom.charset.decode(elem, ['utf8'])
         assert u'Buc^Jérôme' == elem.value
 
+    def test_patched_code_extension_charset(self):
+        """Test some commonly misspelled charset values for code extensions."""
+        elem = DataElement(0x00100010, 'PN',
+                           b'Dionysios=\x1b\x2d\x46'
+                           b'\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2')
+        # correct encoding
+        pydicom.charset.decode(elem, ['ISO 2022 IR 100', 'ISO 2022 IR 126'])
+        assert u'Dionysios=Διονυσιος' == elem.value
+
+        # patched encoding shall behave correctly, but a warning is issued
+        with pytest.warns(UserWarning,
+                          match='Incorrect value for Specific Character Set '
+                                "'ISO_2022-IR 100' - assuming "
+                                "'ISO 2022 IR 100'"):
+            elem = DataElement(0x00100010, 'PN',
+                               b'Dionysios=\x1b\x2d\x46'
+                               b'\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2')
+            pydicom.charset.decode(elem,
+                                   ['ISO_2022-IR 100', 'ISO 2022 IR 126'])
+            assert u'Dionysios=Διονυσιος' == elem.value
+
+        with pytest.warns(UserWarning,
+                          match=r'Incorrect value for Specific Character Set '
+                                r"'ISO_2022_IR\+126' - assuming "
+                                r"'ISO 2022 IR 126'"):
+            elem = DataElement(0x00100010, 'PN',
+                               b'Dionysios=\x1b\x2d\x46'
+                               b'\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2')
+            pydicom.charset.decode(elem,
+                                   ['ISO 2022 IR 100', 'ISO_2022_IR+126'])
+            assert u'Dionysios=Διονυσιος' == elem.value
+
     def test_multi_charset_default_value(self):
         """Test that the first value is used if no escape code is given"""
         # regression test for #707
