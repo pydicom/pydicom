@@ -63,50 +63,6 @@ class UID(str):
 
         raise TypeError("UID must be a string")
 
-    def __eq__(self, other):
-        """Return True if `self` or `self.name` equals `other`."""
-        # TODO: v1.2 - The __ne__ override is deprecated
-        if isinstance(other, str) and other and '.' not in other:
-            msg = "The equality test for \"UID == '{0}'\" is deprecated and " \
-                  "will be removed in pydicom v1.2. In the future use " \
-                  "\"UID.name == '{0}'\"".format(other)
-            warnings.warn(msg, DeprecationWarning)
-
-        if str.__eq__(self, other) is True:  # 'is True' needed (issue 96)
-            return True
-
-        if str.__eq__(self.name, other) is True:  # 'is True' needed (issue 96)
-            return True
-
-        return False
-
-    def __ne__(self, other):
-        """Return True if `self` or `self.name` does not equal `other`."""
-        # TODO: v1.2 - The __ne__ override is deprecated
-        if isinstance(other, str) and other and '.' not in other:
-            msg = "The equality test for \"UID != '{0}'\" is deprecated and " \
-                  "will be removed in pydicom v1.2. In the future use " \
-                  "\"UID.name != '{0}'\"".format(other)
-            warnings.warn(msg, DeprecationWarning)
-
-        if str.__eq__(self, other) is True:
-            return False
-
-        if str.__eq__(self.name, other) is True:
-            return False
-
-        return True
-
-    def __hash__(self):
-        """Return the hash of `self`."""
-        # TODO: v1.2 - The __hash__ override is deprecated
-        # For python 3, any override of __cmp__ or __eq__
-        #   immutable requires explicit redirect of hash
-        #   function to the parent class
-        #   See http://docs.python.org/dev/3.0/
-        #       reference/datamodel.html#object.__hash__
-        return super(UID, self).__hash__()
-
     @property
     def is_implicit_VR(self):
         """Return True if an implicit VR transfer syntax UID."""
