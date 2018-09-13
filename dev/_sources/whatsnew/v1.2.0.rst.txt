@@ -15,6 +15,7 @@ Changes
   ``uid.JPEGExtended`` instead. (:issue:`726`)
 * ``uid.JPEG2000Lossy`` deprecated and will be removed in v1.3. Use
   ``uid.JPEG2000`` instead. (:issue:`726`)
+* Equality and inequality operator overrides removed from ``UID``.
 
 
 Enhancements

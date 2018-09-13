@@ -235,50 +235,6 @@
 
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;UID must be a string&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Return True if `self` or `self.name` equals `other`.&quot;&quot;&quot;</span>
-        <span class="c1"># TODO: v1.2 - The __ne__ override is deprecated</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">other</span> <span class="ow">and</span> <span class="s1">&#39;.&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">other</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;The equality test for </span><span class="se">\&quot;</span><span class="s2">UID == &#39;</span><span class="si">{0}</span><span class="s2">&#39;</span><span class="se">\&quot;</span><span class="s2"> is deprecated and &quot;</span> \
-                  <span class="s2">&quot;will be removed in pydicom v1.2. In the future use &quot;</span> \
-                  <span class="s2">&quot;</span><span class="se">\&quot;</span><span class="s2">UID.name == &#39;</span><span class="si">{0}</span><span class="s2">&#39;</span><span class="se">\&quot;</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="nb">str</span><span class="o">.</span><span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>  <span class="c1"># &#39;is True&#39; needed (issue 96)</span>
-            <span class="k">return</span> <span class="kc">True</span>
-
-        <span class="k">if</span> <span class="nb">str</span><span class="o">.</span><span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>  <span class="c1"># &#39;is True&#39; needed (issue 96)</span>
-            <span class="k">return</span> <span class="kc">True</span>
-
-        <span class="k">return</span> <span class="kc">False</span>
-
-    <span class="k">def</span> <span class="nf">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Return True if `self` or `self.name` does not equal `other`.&quot;&quot;&quot;</span>
-        <span class="c1"># TODO: v1.2 - The __ne__ override is deprecated</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">other</span> <span class="ow">and</span> <span class="s1">&#39;.&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">other</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;The equality test for </span><span class="se">\&quot;</span><span class="s2">UID != &#39;</span><span class="si">{0}</span><span class="s2">&#39;</span><span class="se">\&quot;</span><span class="s2"> is deprecated and &quot;</span> \
-                  <span class="s2">&quot;will be removed in pydicom v1.2. In the future use &quot;</span> \
-                  <span class="s2">&quot;</span><span class="se">\&quot;</span><span class="s2">UID.name != &#39;</span><span class="si">{0}</span><span class="s2">&#39;</span><span class="se">\&quot;</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="nb">str</span><span class="o">.</span><span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">False</span>
-
-        <span class="k">if</span> <span class="nb">str</span><span class="o">.</span><span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">False</span>
-
-        <span class="k">return</span> <span class="kc">True</span>
-
-    <span class="k">def</span> <span class="nf">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Return the hash of `self`.&quot;&quot;&quot;</span>
-        <span class="c1"># TODO: v1.2 - The __hash__ override is deprecated</span>
-        <span class="c1"># For python 3, any override of __cmp__ or __eq__</span>
-        <span class="c1">#   immutable requires explicit redirect of hash</span>
-        <span class="c1">#   function to the parent class</span>
-        <span class="c1">#   See http://docs.python.org/dev/3.0/</span>
-        <span class="c1">#       reference/datamodel.html#object.__hash__</span>
-        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">UID</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__hash__</span><span class="p">()</span>
-
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">is_implicit_VR</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return True if an implicit VR transfer syntax UID.&quot;&quot;&quot;</span>
