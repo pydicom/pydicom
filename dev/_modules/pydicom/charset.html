@@ -393,8 +393,14 @@
         <span class="n">patched_encodings</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">patched</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">encodings</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s1">&#39;^ISO[^_]IR&#39;</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+            <span class="c1"># check for spelling errors, but exclude the correct spelling</span>
+            <span class="c1"># standard encodings</span>
+            <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s1">&#39;^ISO[^_]IR&#39;</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">patched</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;ISO_IR&#39;</span> <span class="o">+</span> <span class="n">x</span><span class="p">[</span><span class="mi">6</span><span class="p">:]</span>
+                <span class="n">patched_encodings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">patched</span><span class="p">[</span><span class="n">x</span><span class="p">])</span>
+            <span class="c1"># encodings with code extensions</span>
+            <span class="k">elif</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s1">&#39;^(?=ISO.2022.IR.)(?!ISO 2022 IR )&#39;</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">patched</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;ISO 2022 IR &#39;</span> <span class="o">+</span> <span class="n">x</span><span class="p">[</span><span class="mi">12</span><span class="p">:]</span>
                 <span class="n">patched_encodings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">patched</span><span class="p">[</span><span class="n">x</span><span class="p">])</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">patched_encodings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
@@ -512,6 +518,7 @@
       <script type="text/javascript" src="../../_static/jquery.js"></script>
       <script type="text/javascript" src="../../_static/underscore.js"></script>
       <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 
