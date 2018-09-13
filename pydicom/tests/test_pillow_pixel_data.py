@@ -15,32 +15,30 @@ have_pytest_param = hasattr(pytest, 'param')
 
 try:
     from pydicom.pixel_data_handlers import numpy_handler
-    have_numpy_handler = True
+    HAVE_NP = numpy_handler.HAVE_NP
 except ImportError:
-    have_numpy_handler = False
+    HAVE_NP = False
     numpy_handler = None
 
 try:
     from pydicom.pixel_data_handlers import pillow_handler
-    have_pillow_handler = True
-    have_pillow_jpeg_plugin = pillow_handler.have_pillow_jpeg_plugin
-    have_pillow_jpeg2000_plugin = pillow_handler.have_pillow_jpeg2000_plugin
+    HAVE_PIL = pillow_handler.HAVE_PIL
+    HAVE_JPEG = pillow_handler.HAVE_JPEG
+    HAVE_JPEG2K = pillow_handler.HAVE_JPEG2K
     import numpy as np
 except ImportError:
     pillow_handler = None
-    have_pillow_handler = False
-    have_pillow_jpeg_plugin = False
-    have_pillow_jpeg2000_plugin = False
+    HAVE_PIL = False
+    HAVE_JPEG = False
+    HAVE_JPEG2K = False
 
 
 pillow_missing_message = ("pillow is not available "
                           "in this test environment")
 
-test_pillow_decoder = have_numpy_handler and have_pillow_handler
-test_pillow_jpeg_decoder = (test_pillow_decoder and
-                            have_pillow_jpeg_plugin)
-test_pillow_jpeg2000_decoder = (test_pillow_decoder and
-                                have_pillow_jpeg2000_plugin)
+TEST_PIL = HAVE_NP and HAVE_PIL
+TEST_JPEG = TEST_PIL and HAVE_JPEG
+TEST_JPEG2K = TEST_PIL and HAVE_JPEG2K
 
 empty_number_tags_name = get_testdata_files(
     "reportsi_with_empty_number_tags.dcm")[0]
@@ -129,12 +127,12 @@ class Test_JPEGLS_no_pillow(object):
         """Setup the test datasets."""
         self.jpeg_ls_lossless = dcmread(jpeg_ls_lossless_name)
         self.emri_jpeg_ls_lossless = dcmread(emri_jpeg_ls_lossless)
-        self.original_handlers = pydicom.config.image_handlers
-        pydicom.config.image_handlers = [None, numpy_handler]
+        self.original_handlers = pydicom.config.pixel_data_handlers
+        pydicom.config.pixel_data_handlers = [numpy_handler]
 
     def teardown(self):
         """Reset the pixel data handlers."""
-        pydicom.config.image_handlers = self.original_handlers
+        pydicom.config.pixel_data_handlers = self.original_handlers
 
     def test_JPEG_LS_PixelArray(self):
         """Test decoding JPEG LS with only numpy fails."""
@@ -155,12 +153,12 @@ class Test_JPEG2000Tests_no_pillow(object):
         self.jpeg_2k_lossless = dcmread(jpeg2000_lossless_name)
         self.emri_jpeg_2k_lossless = dcmread(emri_jpeg_2k_lossless)
         self.sc_rgb_jpeg2k_gdcm_KY = dcmread(sc_rgb_jpeg2k_gdcm_KY)
-        self.original_handlers = pydicom.config.image_handlers
-        pydicom.config.image_handlers = [None, numpy_handler]
+        self.original_handlers = pydicom.config.pixel_data_handlers
+        pydicom.config.pixel_data_handlers = [numpy_handler]
 
     def teardown(self):
         """Reset the pixel data handlers."""
-        pydicom.config.image_handlers = self.original_handlers
+        pydicom.config.pixel_data_handlers = self.original_handlers
 
     def testJPEG2000(self):
         """Test reading element values works OK without Pillow."""
@@ -193,12 +191,12 @@ class Test_JPEGlossyTests_no_pillow(object):
         """Setup the test datasets."""
         self.jpeg_lossy = dcmread(jpeg_lossy_name)
         self.color_3d_jpeg = dcmread(color_3d_jpeg_baseline)
-        self.original_handlers = pydicom.config.image_handlers
-        pydicom.config.image_handlers = [None, numpy_handler]
+        self.original_handlers = pydicom.config.pixel_data_handlers
+        pydicom.config.pixel_data_handlers = [numpy_handler]
 
     def teardown(self):
         """Reset the pixel data handlers."""
-        pydicom.config.image_handlers = self.original_handlers
+        pydicom.config.pixel_data_handlers = self.original_handlers
 
     def testJPEGlossy(self):
         """Test reading element values works OK without Pillow."""
@@ -221,12 +219,12 @@ class Test_JPEGlosslessTests_no_pillow(object):
     def setup(self):
         """Setup the test datasets."""
         self.jpeg_lossless = dcmread(jpeg_lossless_name)
-        self.original_handlers = pydicom.config.image_handlers
-        pydicom.config.image_handlers = [None, numpy_handler]
+        self.original_handlers = pydicom.config.pixel_data_handlers
+        pydicom.config.pixel_data_handlers = [numpy_handler]
 
     def teardown(self):
         """Reset the pixel data handlers."""
-        pydicom.config.image_handlers = self.original_handlers
+        pydicom.config.pixel_data_handlers = self.original_handlers
 
     def testJPEGlossless(self):
         """Test reading element values works OK without Pillow."""
@@ -241,7 +239,7 @@ class Test_JPEGlosslessTests_no_pillow(object):
 
 
 @pytest.mark.skipif(
-    not test_pillow_decoder,
+    not TEST_PIL,
     reason=pillow_missing_message)
 class Test_JPEG_LS_with_pillow(object):
     """Tests for decoding JPEG LS if pillow pixel handler is available."""
@@ -249,12 +247,12 @@ class Test_JPEG_LS_with_pillow(object):
         """Setup the test datasets."""
         self.jpeg_ls_lossless = dcmread(jpeg_ls_lossless_name)
         self.emri_jpeg_ls_lossless = dcmread(emri_jpeg_ls_lossless)
-        self.original_handlers = pydicom.config.image_handlers
-        pydicom.config.image_handlers = [pillow_handler, numpy_handler]
+        self.original_handlers = pydicom.config.pixel_data_handlers
+        pydicom.config.pixel_data_handlers = [pillow_handler, numpy_handler]
 
     def teardown(self):
         """Reset the pixel data handlers."""
-        pydicom.config.image_handlers = self.original_handlers
+        pydicom.config.pixel_data_handlers = self.original_handlers
 
     def test_JPEG_LS_PixelArray(self):
         """Test decoding JPEG LS with pillow handler fails."""
@@ -268,7 +266,7 @@ class Test_JPEG_LS_with_pillow(object):
 
 
 @pytest.mark.skipif(
-    not test_pillow_jpeg2000_decoder,
+    not TEST_JPEG2K,
     reason=pillow_missing_message)
 class Test_JPEG2000Tests_with_pillow(object):
     """Test decoding JPEG2K if pillow JPEG2K plugin is available."""
@@ -282,12 +280,12 @@ class Test_JPEG2000Tests_with_pillow(object):
         self.sc_rgb_jpeg2k_gdcm_KY = dcmread(sc_rgb_jpeg2k_gdcm_KY)
         self.ground_truth_sc_rgb_jpeg2k_gdcm_KY_gdcm = dcmread(
             ground_truth_sc_rgb_jpeg2k_gdcm_KY_gdcm)
-        self.original_handlers = pydicom.config.image_handlers
-        pydicom.config.image_handlers = [pillow_handler, numpy_handler]
+        self.original_handlers = pydicom.config.pixel_data_handlers
+        pydicom.config.pixel_data_handlers = [pillow_handler, numpy_handler]
 
     def teardown(self):
         """Reset the pixel data handlers."""
-        pydicom.config.image_handlers = self.original_handlers
+        pydicom.config.pixel_data_handlers = self.original_handlers
 
     def test_raises_if_endianess_not_set(self):
         self.jpeg_2k_lossless.is_little_endian = None
@@ -322,7 +320,7 @@ class Test_JPEG2000Tests_with_pillow(object):
 
 
 @pytest.mark.skipif(
-    not test_pillow_jpeg_decoder,
+    not TEST_JPEG,
     reason=pillow_missing_message)
 class Test_JPEGlossyTests_with_pillow(object):
     """Test decoding JPEG if pillow JPEG plugin is available."""
@@ -330,12 +328,12 @@ class Test_JPEGlossyTests_with_pillow(object):
         """Setup the test datasets."""
         self.jpeg_lossy = dcmread(jpeg_lossy_name)
         self.color_3d_jpeg = dcmread(color_3d_jpeg_baseline)
-        self.original_handlers = pydicom.config.image_handlers
-        pydicom.config.image_handlers = [pillow_handler, numpy_handler]
+        self.original_handlers = pydicom.config.pixel_data_handlers
+        pydicom.config.pixel_data_handlers = [pillow_handler, numpy_handler]
 
     def teardown(self):
         """Reset the pixel data handlers."""
-        pydicom.config.image_handlers = self.original_handlers
+        pydicom.config.pixel_data_handlers = self.original_handlers
 
     def testJPEGlossless_odd_data_size(self):
         """Test decoding JPEG with pillow handler succeeds."""
@@ -370,10 +368,10 @@ class Test_JPEGlossyTests_with_pillow(object):
 
 @pytest.fixture(scope="module")
 def test_with_pillow():
-    original_handlers = pydicom.config.image_handlers
-    pydicom.config.image_handlers = [pillow_handler, numpy_handler]
+    original_handlers = pydicom.config.pixel_data_handlers
+    pydicom.config.pixel_data_handlers = [pillow_handler, numpy_handler]
     yield original_handlers
-    pydicom.config.image_handlers = original_handlers
+    pydicom.config.pixel_data_handlers = original_handlers
 
 
 if have_pytest_param:
@@ -539,7 +537,7 @@ else:
 
 
 @pytest.mark.skipif(
-    not test_pillow_jpeg_decoder,
+    not TEST_JPEG,
     reason=pillow_missing_message)
 @pytest.mark.parametrize(
     "image,PhotometricInterpretation,results,ground_truth",
@@ -579,19 +577,19 @@ def test_PI_RGB(test_with_pillow,
 
 
 @pytest.mark.skipif(
-    not test_pillow_jpeg_decoder,
+    not TEST_JPEG,
     reason=pillow_missing_message)
 class Test_JPEGlosslessTests_with_pillow(object):
     """Test decoding JPEG lossless if pillow JPEG plugin is available."""
     def setup(self):
         """Setup the test datasets."""
         self.jpeg_lossless = dcmread(jpeg_lossless_name)
-        self.original_handlers = pydicom.config.image_handlers
-        pydicom.config.image_handlers = [pillow_handler, numpy_handler]
+        self.original_handlers = pydicom.config.pixel_data_handlers
+        pydicom.config.pixel_data_handlers = [pillow_handler, numpy_handler]
 
     def teardown(self):
         """Reset the pixel data handlers."""
-        pydicom.config.image_handlers = self.original_handlers
+        pydicom.config.pixel_data_handlers = self.original_handlers
 
     def testJPEGlossless(self):
         """Test reading element values works OK with pillow pixel handler."""
@@ -601,5 +599,5 @@ class Test_JPEGlosslessTests_with_pillow(object):
 
     def testJPEGlosslessPixelArray(self):
         """Test decoding JPEG lossless with pillow handler fails."""
-        with pytest.raises(NotImplementedError):
+        with pytest.raises(RuntimeError):
             self.jpeg_lossless.pixel_array

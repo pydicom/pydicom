@@ -68,20 +68,32 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 
 
-image_handlers = []
-"""Image handlers for converting pixel data.
-This is an ordered list that the dataset._get_pixel_array()
+import pydicom.pixel_data_handlers.numpy_handler as np_handler  # noqa
+import pydicom.pixel_data_handlers.rle_handler as rle_handler  # noqa
+import pydicom.pixel_data_handlers.pillow_handler as pillow_handler  # noqa
+import pydicom.pixel_data_handlers.jpeg_ls_handler as jpegls_handler  # noqa
+import pydicom.pixel_data_handlers.gdcm_handler as gdcm_handler  # noqa
+
+pixel_data_handlers = [
+    np_handler,
+    rle_handler,
+    gdcm_handler,
+    pillow_handler,
+    jpegls_handler,
+]
+image_handlers = [hh for hh in pixel_data_handlers if hh.is_available()]
+"""Handlers for converting (7fe0,0010) Pixel Data.
+This is an ordered list that the dataset.convert_pixel_data()
 method will try to extract a correctly sized numpy array from the
-PixelData attribute.
-If a handler lacks required dependencies or can not otherwise be loaded,
-it shall throw an ImportError.
+PixelData element.
+
 Handers shall have two methods:
 
-supports_transfer_syntax(dicom_dataset)
+def supports_transfer_syntax(ds)
   This returns True if the handler might support the transfer syntax
   indicated in the dicom_dataset
 
-def get_pixeldata(dicom_dataset):
+def get_pixeldata(ds):
   This shall either throw an exception or return a correctly sized numpy
   array derived from the PixelData.  Reshaping the array to the correct
   dimensions is handled outside the image handler
@@ -97,42 +109,6 @@ exception thrown up.
 If no one throws an exception, but they all refuse to support the transfer
 syntax, then this fact is announced in a NotImplementedError exception.
 """
-
-have_numpy = True
-try:
-    import pydicom.pixel_data_handlers.numpy_handler as numpy_handler
-    image_handlers.append(numpy_handler)
-
-    import pydicom.pixel_data_handlers.rle_handler as rle_handler
-    image_handlers.append(rle_handler)
-
-except ImportError as e:
-    logger.debug("Could not import numpy")
-    have_numpy = False
-
-have_pillow = True
-try:
-    import pydicom.pixel_data_handlers.pillow_handler as pillow_handler
-    image_handlers.append(pillow_handler)
-except ImportError as e:
-    logger.debug("Could not import pillow")
-    have_pillow = False
-
-have_jpeg_ls = True
-try:
-    import pydicom.pixel_data_handlers.jpeg_ls_handler as jpeg_ls_handler
-    image_handlers.append(jpeg_ls_handler)
-except ImportError as e:
-    logger.debug("Could not import jpeg_ls")
-    have_jpeg_ls = False
-
-have_gdcm = True
-try:
-    import pydicom.pixel_data_handlers.gdcm_handler as gdcm_handler
-    image_handlers.append(gdcm_handler)
-except ImportError as e:
-    logger.debug("Could not import gdcm")
-    have_gdcm = False
 
 
 def debug(debug_on=True):

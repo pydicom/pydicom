@@ -2,25 +2,34 @@
 """Use the pillow python package to decode pixel transfer syntaxes."""
 
 import io
-import pydicom.encaps
-import pydicom.uid
 import logging
 
-from pydicom.pixel_data_handlers.util import dtype_corrected_for_endianness
-
-have_numpy = True
-logger = logging.getLogger('pydicom')
 try:
     import numpy
+    HAVE_NP = True
 except ImportError:
-    have_numpy = False
-    raise
+    HAVE_NP = False
 
-have_pillow = True
 try:
-    from PIL import Image as PILImg
+    from PIL import Image
+    HAVE_PIL = True
 except ImportError:
-    have_pillow = False
+    HAVE_PIL = False
+
+try:
+    from PIL import _imaging
+    HAVE_JPEG = getattr(_imaging, "jpeg_decoder", False)
+    HAVE_JPEG2K = getattr(_imaging, "jpeg2k_decoder", False)
+except ImportError:
+    HAVE_JPEG = False
+    HAVE_JPEG2K = False
+
+import pydicom.encaps
+from pydicom.pixel_data_handlers.util import dtype_corrected_for_endianness
+import pydicom.uid
+
+
+logger = logging.getLogger('pydicom')
 
 PillowSupportedTransferSyntaxes = [
     pydicom.uid.JPEGBaseline,
@@ -36,17 +45,20 @@ PillowJPEGTransferSyntaxes = [
     pydicom.uid.JPEGExtended,
 ]
 
-have_pillow_jpeg_plugin = False
-have_pillow_jpeg2000_plugin = False
-try:
-    from PIL import _imaging as pillow_core
-    have_pillow_jpeg_plugin = hasattr(pillow_core, "jpeg_decoder")
-    have_pillow_jpeg2000_plugin = hasattr(pillow_core, "jpeg2k_decoder")
-except Exception:
-    pass
+HANDLER_NAME = 'Pillow'
+
+DEPENDENCIES = {
+    'numpy': ('http://www.numpy.org/', 'NumPy'),
+    'PIL': ('https://python-pillow.org/', 'Pillow'),
+}
 
 
-def supports_transfer_syntax(dicom_dataset):
+def is_available():
+    """Return True if the handler has its dependencies met."""
+    return HAVE_NP and HAVE_PIL
+
+
+def supports_transfer_syntax(transfer_syntax):
     """
     Returns
     -------
@@ -56,15 +68,7 @@ def supports_transfer_syntax(dicom_dataset):
         False to prevent any attempt to try to use this handler
         to decode the given transfer syntax
     """
-    if (have_pillow_jpeg_plugin and
-            (dicom_dataset.file_meta.TransferSyntaxUID in
-             PillowJPEGTransferSyntaxes)):
-        return True
-    if (have_pillow_jpeg2000_plugin and
-            (dicom_dataset.file_meta.TransferSyntaxUID in
-             PillowJPEG2000TransferSyntaxes)):
-        return True
-    return False
+    return transfer_syntax in PillowSupportedTransferSyntaxes
 
 
 def needs_to_convert_to_RGB(dicom_dataset):
@@ -96,32 +100,30 @@ def get_pixeldata(dicom_dataset):
         if the pixel data type is unsupported
     """
     logger.debug("Trying to use Pillow to read pixel array "
-                 "(has pillow = %s)", have_pillow)
-    if not have_pillow:
+                 "(has pillow = %s)", HAVE_PIL)
+    transfer_syntax = dicom_dataset.file_meta.TransferSyntaxUID
+    if not HAVE_PIL:
         msg = ("The pillow package is required to use pixel_array for "
                "this transfer syntax {0}, and pillow could not be "
-               "imported.".format(
-                   dicom_dataset.file_meta.TransferSyntaxUID.name))
+               "imported.".format(transfer_syntax.name))
         raise ImportError(msg)
-    if (not have_pillow_jpeg_plugin and
-            dicom_dataset.file_meta.TransferSyntaxUID in
-            PillowJPEGTransferSyntaxes):
+
+    if not HAVE_JPEG and transfer_syntax in PillowJPEGTransferSyntaxes:
         msg = ("this transfer syntax {0}, can not be read because "
-               "Pillow lacks the jpeg decoder plugin".format(
-                   dicom_dataset.file_meta.TransferSyntaxUID.name))
+               "Pillow lacks the jpeg decoder plugin"
+               .format(transfer_syntax.name))
         raise NotImplementedError(msg)
-    if (not have_pillow_jpeg2000_plugin and
-            dicom_dataset.file_meta.TransferSyntaxUID in
-            PillowJPEG2000TransferSyntaxes):
+
+    if not HAVE_JPEG2K and transfer_syntax in PillowJPEG2000TransferSyntaxes:
         msg = ("this transfer syntax {0}, can not be read because "
-               "Pillow lacks the jpeg 2000 decoder plugin".format(
-                   dicom_dataset.file_meta.TransferSyntaxUID.name))
+               "Pillow lacks the jpeg 2000 decoder plugin"
+               .format(transfer_syntax.name))
         raise NotImplementedError(msg)
-    if (dicom_dataset.file_meta.TransferSyntaxUID not in
-            PillowSupportedTransferSyntaxes):
+
+    if transfer_syntax not in PillowSupportedTransferSyntaxes:
         msg = ("this transfer syntax {0}, can not be read because "
-               "Pillow does not support this syntax".format(
-                   dicom_dataset.file_meta.TransferSyntaxUID.name))
+               "Pillow does not support this syntax"
+               .format(transfer_syntax.name))
         raise NotImplementedError(msg)
 
     # Make NumPy format code, e.g. "uint16", "int32" etc
@@ -149,16 +151,14 @@ def get_pixeldata(dicom_dataset):
         dicom_dataset.is_little_endian, numpy_format)
 
     # decompress here
-    if (dicom_dataset.file_meta.TransferSyntaxUID in
-            PillowJPEGTransferSyntaxes):
+    if transfer_syntax in PillowJPEGTransferSyntaxes:
         logger.debug("This is a JPEG lossy format")
         if dicom_dataset.BitsAllocated > 8:
             raise NotImplementedError("JPEG Lossy only supported if "
                                       "Bits Allocated = 8")
         generic_jpeg_file_header = b''
         frame_start_from = 0
-    elif (dicom_dataset.file_meta.TransferSyntaxUID in
-          PillowJPEG2000TransferSyntaxes):
+    elif transfer_syntax in PillowJPEG2000TransferSyntaxes:
         logger.debug("This is a JPEG 2000 format")
         generic_jpeg_file_header = b''
         # generic_jpeg_file_header = b'\x00\x00\x00\x0C\x6A'
@@ -182,7 +182,7 @@ def get_pixeldata(dicom_dataset):
                     frame[frame_start_from:]
                 fio = io.BytesIO(data)
                 try:
-                    decompressed_image = PILImg.open(fio)
+                    decompressed_image = Image.open(fio)
                 except IOError as e:
                     raise NotImplementedError(e.strerror)
                 UncompressedPixelData.extend(decompressed_image.tobytes())
@@ -194,7 +194,7 @@ def get_pixeldata(dicom_dataset):
                 UncompressedPixelData[frame_start_from:]
             try:
                 fio = io.BytesIO(UncompressedPixelData)
-                decompressed_image = PILImg.open(fio)
+                decompressed_image = Image.open(fio)
             except IOError as e:
                 raise NotImplementedError(e.strerror)
             UncompressedPixelData = decompressed_image.tobytes()
@@ -205,7 +205,7 @@ def get_pixeldata(dicom_dataset):
         len(UncompressedPixelData))
     pixel_array = numpy.copy(
         numpy.frombuffer(UncompressedPixelData, numpy_format))
-    if (dicom_dataset.file_meta.TransferSyntaxUID in
+    if (transfer_syntax in
             PillowJPEG2000TransferSyntaxes and
             dicom_dataset.BitsStored == 16):
         # WHY IS THIS EVEN NECESSARY??
