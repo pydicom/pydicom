@@ -299,7 +299,7 @@ def write_text(fp, data_element, encoding=None):
                 val = encode_string(val, encoding)
 
         if len(val) % 2 != 0:
-            val = val + b' ' # pad to even length
+            val = val + b' '  # pad to even length
         fp.write(val)
 
 

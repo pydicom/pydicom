@@ -8,6 +8,7 @@ from io import BytesIO
 import os
 import sys
 import unittest
+from platform import python_implementation
 
 from struct import unpack
 from tempfile import TemporaryFile
@@ -2152,8 +2153,8 @@ class TestWritePN(object):
         fp.is_little_endian = True
         encodings = ['latin_1', 'iso_ir_126']
         # data element with encoded value
-        encoded = (b'Dionysios=\x1b\x2d\x46'                           
-                    b'\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2')
+        encoded = (b'Dionysios=\x1b\x2d\x46'
+                   b'\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2')
         elem = DataElement(0x00100010, 'PN', encoded)
         write_PN(fp, elem, encoding=encodings)
         assert encoded == fp.getvalue()
@@ -2234,9 +2235,9 @@ class TestWriteText(object):
         fp = DicomBytesIO()
         fp.is_little_endian = True
         encoded = (b'Buc^J\xe9r\xf4me\\\x1b\x2d\x46'
-                           b'\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2\\'
-                           b'\x1b\x2d\x4C'
-                           b'\xbb\xee\xda\x63\x65\xdc\xd1\x79\x70\xd3 ')
+                   b'\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2\\'
+                   b'\x1b\x2d\x4C'
+                   b'\xbb\xee\xda\x63\x65\xdc\xd1\x79\x70\xd3 ')
         # data element with encoded value
         elem = DataElement(0x00081039, 'LO', encoded)
         encodings = ['latin_1', 'iso_ir_144', 'iso_ir_126']
@@ -2261,7 +2262,11 @@ class TestWriteText(object):
         msg = 'Failed to encode value with encodings: iso-2022-jp'
         with pytest.warns(UserWarning, match=msg):
             write_text(fp, elem, encoding=['iso-2022-jp'])
-            assert b'Dionysios \x1b$B&$&I&O&M&T&R&I&O\x1b(B? ' == fp.getvalue()
+            if 'PyPy' in python_implementation():
+                expected = b'Dionysios \x1b$B&$&I&O&M&T&R&I&O?\x1b(B '
+            else:
+                expected = b'Dionysios \x1b$B&$&I&O&M&T&R&I&O\x1b(B? '
+            assert expected == fp.getvalue()
 
 
 class TestWriteDT(object):
