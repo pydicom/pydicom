@@ -2145,8 +2145,6 @@ class TestWritePN(object):
         write_PN(fp, elem)
         assert b'Test' == fp.getvalue()
 
-    @pytest.mark.skipif(sys.version_info[0] == 2,
-                        reason='Not working with PersonNameUnicode')
     def test_single_byte_multi_charset_groups(self):
         """Test component groups with different encodings"""
         fp = DicomBytesIO()
@@ -2166,8 +2164,6 @@ class TestWritePN(object):
         write_PN(fp, elem, encoding=encodings)
         assert encoded == fp.getvalue()
 
-    @pytest.mark.skipif(sys.version_info[0] == 2,
-                        reason='Not working with PersonNameUnicode')
     def test_single_byte_multi_charset_values(self):
         """Test multiple values with different encodings"""
         fp = DicomBytesIO()

@@ -15,7 +15,7 @@ from pydicom.multival import MultiValue
 from pydicom.tag import (Tag, ItemTag, ItemDelimiterTag, SequenceDelimiterTag,
                          tag_in_exception)
 from pydicom.uid import UncompressedPixelTransferSyntaxes
-from pydicom.valuerep import extra_length_VRs
+from pydicom.valuerep import extra_length_VRs, PersonNameUnicode
 from pydicom.values import convert_numbers
 
 
@@ -262,7 +262,9 @@ def write_PN(fp, data_element, encoding=None):
         try:
             val = [elem.encode(encoding) for elem in val]
         except TypeError:
-            val = [elem.encode(encoding[0]) for elem in val]
+            # we get here in Python 2 if val is a unicode string
+            val = [PersonNameUnicode(elem, encoding) for elem in val]
+            val = [elem.encode(encoding) for elem in val]
 
     val = b'\\'.join(val)
 
