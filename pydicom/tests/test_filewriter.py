@@ -2230,6 +2230,20 @@ class TestWriteText(object):
         encoded = fp.getvalue()
         assert u'Dionysios is Διονυσιος' == convert_text(encoded, encodings)
 
+    def test_encode_mixed_charsets_text(self):
+        """Test encodings used inside the string in arbitrary order"""
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        encodings = ['latin_1', 'euc_kr', 'iso-2022-jp', 'iso_ir_127']
+        decoded = u'山田-قباني-吉洞-لنزار'
+
+        # data element with encoded value
+        elem = DataElement(0x00081039, 'LO', decoded)
+        write_text(fp, elem, encoding=encodings)
+        encoded = fp.getvalue()
+        # make sure that the encoded string can be converted back
+        assert decoded == convert_text(encoded, encodings)
+
     def test_single_byte_multi_charset_text_multivalue(self):
         """Test multiple values with different encodings"""
         fp = DicomBytesIO()
@@ -2263,6 +2277,8 @@ class TestWriteText(object):
         with pytest.warns(UserWarning, match=msg):
             write_text(fp, elem, encoding=['iso-2022-jp'])
             if 'PyPy' in python_implementation():
+                # PyPy seems to have a different implementation of
+                # replacement mode with regard to escape sequences
                 expected = b'Dionysios \x1b$B&$&I&O&M&T&R&I&O?\x1b(B '
             else:
                 expected = b'Dionysios \x1b$B&$&I&O&M&T&R&I&O\x1b(B? '

@@ -227,7 +227,6 @@ def convert_string(byte_string,
 
 def convert_text(byte_string, encodings=None):
     """Read and return a string or strings"""
-    encodings = encodings or [default_encoding]
     values = byte_string.split(b'\\')
     values = [convert_single_string(value, encodings) for value in values]
     if len(values) == 1:

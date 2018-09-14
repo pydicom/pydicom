@@ -245,10 +245,80 @@ def encode_string(value, encodings):
         except UnicodeError:
             continue
     else:
+        # if we have more than one encoding, we retry encoding by splitting
+        # `value` into chunks that can be encoded with one of the encodings
+        if len(encodings) > 1:
+            try:
+                return _encode_string_parts(value, encodings)
+            except ValueError:
+                pass
+        # all attempts failed - warn and encode with replacement characters
         warnings.warn("Failed to encode value with encodings: {} - using "
                       "replacement characters in encoded string"
                       .format(', '.join(encodings)))
         return value.encode(encodings[0], errors='replace')
+
+
+def _encode_string_parts(value, encodings):
+    """Convert a unicode string into a byte string using the given
+    list of encodings.
+    This is invoked if `encode_string` failed to encode `value` with a single
+    encoding. We try instead to use different encodings for different parts
+    of the string, using the encoding that can encode the longest part of
+    the rest of the string as we go along.
+
+    Parameters
+    ----------
+    value : text type
+        The unicode string as presented to the user.
+    encodings : list
+        The encodings needed to encode the string as a list of Python
+        encodings, converted from the encodings in Specific Character Set.
+
+    Returns
+    -------
+    byte string
+        The encoded string, including the escape sequences needed to switch
+        between different encodings.
+
+    Raises
+    ------
+    ValueError
+        If `value` could not be encoded with the given encodings.
+
+    """
+    encoded = b''
+    unencoded_part = value
+    while unencoded_part:
+        # find the encoding that can encode the longest part of the rest
+        # of the string still to be encoded
+        max_index = 0
+        best_encoding = None
+        for encoding in encodings:
+            try:
+                unencoded_part.encode(encoding)
+                # if we get here, the whole rest of the value can be encoded
+                best_encoding = encoding
+                max_index = len(unencoded_part)
+                break
+            except UnicodeError as e:
+                if e.start > max_index:
+                    # e.start is the index of first character failed to encode
+                    max_index = e.start
+                    best_encoding = encoding
+        # none of the given encodings can encode the first character - give up
+        if best_encoding is None:
+            raise ValueError()
+
+        # encode the part that can be encoded with the found encoding
+        encoded_part = unencoded_part[:max_index].encode(best_encoding)
+        if best_encoding not in handled_encodings:
+            encoded += ENCODINGS_TO_CODES.get(best_encoding, b'')
+        encoded += encoded_part
+        # set remaining unencoded part of the string and handle that
+        unencoded_part = unencoded_part[max_index:]
+    # unencoded_part is empty - we are done, return the encoded string
+    return encoded
 
 
 # DICOM PS3.5-2008 6.1.1 (p 18) says:
