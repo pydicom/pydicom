@@ -1364,9 +1364,9 @@ class TestWriteToStandard(object):
         out = dcmread(fp)
         assert out.file_meta.MediaStorageSOPClassUID == ds.SOPClassUID
         assert out.file_meta.MediaStorageSOPInstanceUID == ds.SOPInstanceUID
-        assert (
-                out.file_meta.ImplementationClassUID == PYDICOM_IMPLEMENTATION_UID)
-        assert (out.file_meta.ImplementationVersionName == version)
+        assert (out.file_meta.ImplementationClassUID ==
+                PYDICOM_IMPLEMENTATION_UID)
+        assert out.file_meta.ImplementationVersionName == version
         assert out.file_meta.TransferSyntaxUID == transfer_syntax
 
         fp = DicomBytesIO()
@@ -1374,12 +1374,11 @@ class TestWriteToStandard(object):
         ds.save_as(fp, write_like_original=False)
         fp.seek(0)
         out = dcmread(fp)
-        assert (out.file_meta.MediaStorageSOPClassUID == ds.SOPClassUID)
-        assert (
-                out.file_meta.MediaStorageSOPInstanceUID == ds.SOPInstanceUID)
-        assert (
-                out.file_meta.ImplementationClassUID == PYDICOM_IMPLEMENTATION_UID)
-        assert (out.file_meta.ImplementationVersionName == version)
+        assert out.file_meta.MediaStorageSOPClassUID == ds.SOPClassUID
+        assert out.file_meta.MediaStorageSOPInstanceUID == ds.SOPInstanceUID
+        assert (out.file_meta.ImplementationClassUID ==
+                PYDICOM_IMPLEMENTATION_UID)
+        assert out.file_meta.ImplementationVersionName == version
         assert out.file_meta.TransferSyntaxUID == transfer_syntax
 
     def test_raise_no_file_meta(self):
