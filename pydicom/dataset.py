@@ -1344,8 +1344,9 @@ class FileDataset(Dataset):
 
         Parameters
         ----------
-        filename_or_obj : str or None
-            Full path and filename to the file. Use None if is a BytesIO.
+        filename_or_obj : str or BytesIO or None
+            Full path and filename to the file, memory buffer object, or None
+            if is a BytesIO.
         dataset : Dataset or dict
             Some form of dictionary, usually a Dataset from read_dataset().
         preamble : bytes or str, optional

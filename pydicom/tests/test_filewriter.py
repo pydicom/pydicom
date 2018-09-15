@@ -2140,14 +2140,14 @@ class TestWritePN(object):
         encoded = (b'Dionysios=\x1b\x2d\x46'
                    b'\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2')
         elem = DataElement(0x00100010, 'PN', encoded)
-        write_PN(fp, elem, encoding=encodings)
+        write_PN(fp, elem, encodings=encodings)
         assert encoded == fp.getvalue()
 
         fp = DicomBytesIO()
         fp.is_little_endian = True
         # data element with decoded value
         elem = DataElement(0x00100010, 'PN', u'Dionysios=Διονυσιος')
-        write_PN(fp, elem, encoding=encodings)
+        write_PN(fp, elem, encodings=encodings)
         assert encoded == fp.getvalue()
 
     def test_single_byte_multi_charset_values(self):
@@ -2161,7 +2161,7 @@ class TestWritePN(object):
                    b'\x1b\x2d\x4C'
                    b'\xbb\xee\xda\x63\x65\xdc\xd1\x79\x70\xd3 ')
         elem = DataElement(0x00100060, 'PN', encoded)
-        write_PN(fp, elem, encoding=encodings)
+        write_PN(fp, elem, encodings=encodings)
         assert encoded == fp.getvalue()
 
         fp = DicomBytesIO()
@@ -2169,7 +2169,7 @@ class TestWritePN(object):
         # data element with decoded value
         elem = DataElement(0x00100060, 'PN', [u'Buc^Jérôme', u'Διονυσιος',
                                               u'Люкceмбypг'])
-        write_PN(fp, elem, encoding=encodings)
+        write_PN(fp, elem, encodings=encodings)
         assert encoded == fp.getvalue()
 
 
@@ -2201,14 +2201,14 @@ class TestWriteText(object):
         # data element with encoded value
         elem = DataElement(0x00081039, 'LO', encoded)
         encodings = ['latin_1', 'iso_ir_126']
-        write_text(fp, elem, encoding=encodings)
+        write_text(fp, elem, encodings=encodings)
         assert encoded == fp.getvalue()
 
         fp = DicomBytesIO()
         fp.is_little_endian = True
         # data element with decoded value
         elem = DataElement(0x00081039, 'LO', u'Dionysios is Διονυσιος')
-        write_text(fp, elem, encoding=encodings)
+        write_text(fp, elem, encodings=encodings)
         # encoding may not be the same, so decode it first
         encoded = fp.getvalue()
         assert u'Dionysios is Διονυσιος' == convert_text(encoded, encodings)
@@ -2222,7 +2222,7 @@ class TestWriteText(object):
 
         # data element with encoded value
         elem = DataElement(0x00081039, 'LO', decoded)
-        write_text(fp, elem, encoding=encodings)
+        write_text(fp, elem, encodings=encodings)
         encoded = fp.getvalue()
         # make sure that the encoded string can be converted back
         assert decoded == convert_text(encoded, encodings)
@@ -2238,7 +2238,7 @@ class TestWriteText(object):
         # data element with encoded value
         elem = DataElement(0x00081039, 'LO', encoded)
         encodings = ['latin_1', 'iso_ir_144', 'iso_ir_126']
-        write_text(fp, elem, encoding=encodings)
+        write_text(fp, elem, encodings=encodings)
         assert encoded == fp.getvalue()
 
         fp = DicomBytesIO()
@@ -2246,7 +2246,7 @@ class TestWriteText(object):
         # data element with decoded value
         decoded = [u'Buc^Jérôme', u'Διονυσιος', u'Люкceмбypг']
         elem = DataElement(0x00081039, 'LO', decoded)
-        write_text(fp, elem, encoding=encodings)
+        write_text(fp, elem, encodings=encodings)
         # encoding may not be the same, so decode it first
         encoded = fp.getvalue()
         assert decoded == convert_text(encoded, encodings)
@@ -2258,7 +2258,7 @@ class TestWriteText(object):
         elem = DataElement(0x00081039, 'LO', u'Dionysios Διονυσιος')
         msg = 'Failed to encode value with encodings: iso-2022-jp'
         with pytest.warns(UserWarning, match=msg):
-            write_text(fp, elem, encoding=['iso-2022-jp'])
+            write_text(fp, elem, encodings=['iso-2022-jp'])
             if 'PyPy' in python_implementation():
                 # PyPy seems to have a different implementation of
                 # replacement mode with regard to escape sequences
@@ -2274,7 +2274,7 @@ class TestWriteText(object):
         decoded = u'Διονυσιος\r\nJérôme/Люкceмбypг\tJérôme'
         elem = DataElement(0x00081039, 'LO', decoded)
         encodings = ('latin_1', 'iso_ir_144', 'iso_ir_126')
-        write_text(fp, elem, encoding=encodings)
+        write_text(fp, elem, encodings=encodings)
         encoded = fp.getvalue()
         assert decoded == convert_text(encoded, encodings)
 
