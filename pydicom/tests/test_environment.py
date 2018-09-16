@@ -76,11 +76,11 @@ class TestBuilds(object):
         if distrib == 'conda':
             # May not be robust
             assert os.path.exists(os.path.join(sys.prefix, 'conda-meta'))
-            assert "CPython" in platform.python_implementation
+            assert "CPython" in platform.python_implementation()
         elif distrib == 'pypy':
-            assert 'PyPy' in platform.python_implementation
+            assert 'PyPy' in platform.python_implementation()
         elif distrib == 'ubuntu':
-            assert "CPython" in platform.python_implementation
+            assert "CPython" in platform.python_implementation()
         else:
             raise NotImplementedError("Unknown 'DISTRIB' value")
 
