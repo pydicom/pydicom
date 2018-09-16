@@ -143,10 +143,19 @@ class TestCharset(object):
     def test_convert_encodings_warnings(self):
         """Test warning if stand-alone encodings are used as code extension"""
         with pytest.warns(UserWarning, match="Value 'GBK' cannot be used as "
-                                             "code extension, ignoring it"):
+                                "code extension, ignoring it"):
             encodings = pydicom.charset.convert_encodings(
                 ['ISO_IR 126', 'GBK', 'ISO 2022 IR 144', 'ISO_IR 192'])
             assert ['iso_ir_126', 'iso_ir_144'] == encodings
+
+    def test_convert_python_encodings(self):
+        """Test that unknown encodings are returned unchanged by
+        `convert_encodings`"""
+        encodings = ['iso_ir_126', 'iso_ir_144']
+        assert encodings == pydicom.charset.convert_encodings(encodings)
+
+        encodings = ['ISO IR 199', 'ISO_IR 100']
+        assert encodings == pydicom.charset.convert_encodings(encodings)
 
     def test_bad_encoded_multi_byte_encoding(self):
         """Test handling bad encoding for single encoding"""

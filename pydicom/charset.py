@@ -397,7 +397,7 @@ def convert_encodings(encodings):
             except KeyError:
                 pass
         # if patching failed at this point, the original encodings
-        # will be returned, assumimg that they are already Python encodings;
+        # will be returned, assuming that they are already Python encodings;
         # otherwise, a LookupError will be raised in the using code
 
     # handle illegal stand-alone encodings

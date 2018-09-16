@@ -2251,19 +2251,31 @@ class TestWriteText(object):
         assert decoded == convert_text(encoded, encodings)
 
     def test_invalid_encoding(self):
+        """Test encoding text with invalid encodings"""
         fp = DicomBytesIO()
         fp.is_little_endian = True
         # data element with decoded value
         elem = DataElement(0x00081039, 'LO', u'Dionysios Διονυσιος')
         msg = 'Failed to encode value with encodings: iso-2022-jp'
+        if 'PyPy' in python_implementation():
+            # PyPy seems to have a different implementation of
+            # replacement mode with regard to escape sequences
+            expected = b'Dionysios \x1b$B&$&I&O&M&T&R&I&O?\x1b(B '
+        else:
+            expected = b'Dionysios \x1b$B&$&I&O&M&T&R&I&O\x1b(B? '
         with pytest.warns(UserWarning, match=msg):
+            # encode with one invalid encoding
             write_text(fp, elem, encodings=['iso-2022-jp'])
-            if 'PyPy' in python_implementation():
-                # PyPy seems to have a different implementation of
-                # replacement mode with regard to escape sequences
-                expected = b'Dionysios \x1b$B&$&I&O&M&T&R&I&O?\x1b(B '
-            else:
-                expected = b'Dionysios \x1b$B&$&I&O&M&T&R&I&O\x1b(B? '
+            assert expected == fp.getvalue()
+
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        # data element with decoded value
+        elem = DataElement(0x00081039, 'LO', u'Dionysios Διονυσιος')
+        msg = 'Failed to encode value with encodings: iso-2022-jp, iso_ir_58'
+        with pytest.warns(UserWarning, match=msg):
+            # encode with two invalid encodings
+            write_text(fp, elem, encodings=['iso-2022-jp', 'iso_ir_58'])
             assert expected == fp.getvalue()
 
     def test_single_value_with_delimiters(self):
