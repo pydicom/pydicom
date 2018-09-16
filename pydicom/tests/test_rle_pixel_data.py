@@ -398,7 +398,7 @@ class TestNumpy_RLEHandler(object):
         arr = ds.pixel_array
 
         # Returned array is not read-only
-        assert arr.flags.writeable == True
+        assert arr.flags.writeable is True
 
         assert np.array_equal(arr, ref)
         assert (600, 800) == arr.shape
@@ -417,7 +417,7 @@ class TestNumpy_RLEHandler(object):
         arr = ds.pixel_array
 
         # Returned array is not read-only
-        assert arr.flags.writeable == True
+        assert arr.flags.writeable is True
 
         assert np.array_equal(arr, ref)
         assert (2, 600, 800) == arr.shape
@@ -439,7 +439,7 @@ class TestNumpy_RLEHandler(object):
         arr = ds.pixel_array
 
         # Returned array is not read-only
-        assert arr.flags.writeable == True
+        assert arr.flags.writeable is True
 
         assert np.array_equal(arr, ref)
         assert (255, 0, 0) == tuple(arr[5, 50, :])
@@ -464,7 +464,7 @@ class TestNumpy_RLEHandler(object):
         arr = ds.pixel_array
 
         # Returned array is not read-only
-        assert arr.flags.writeable == True
+        assert arr.flags.writeable is True
 
         assert np.array_equal(arr, ref)
 
@@ -496,7 +496,7 @@ class TestNumpy_RLEHandler(object):
         arr = ds.pixel_array
 
         # Returned array is not read-only
-        assert arr.flags.writeable == True
+        assert arr.flags.writeable is True
 
         assert np.array_equal(arr, ref)
         assert (64, 64) == arr.shape
@@ -516,7 +516,7 @@ class TestNumpy_RLEHandler(object):
         arr = ds.pixel_array
 
         # Returned array is not read-only
-        assert arr.flags.writeable == True
+        assert arr.flags.writeable is True
 
         assert np.array_equal(arr, ref)
         assert (10, 64, 64) == arr.shape
@@ -547,7 +547,7 @@ class TestNumpy_RLEHandler(object):
         ref = _get_pixel_array(SC_EXPL_LITTLE_16_1F)
 
         # Returned array is not read-only
-        assert arr.flags.writeable == True
+        assert arr.flags.writeable is True
 
         assert np.array_equal(ds.pixel_array, ref)
 
@@ -573,7 +573,7 @@ class TestNumpy_RLEHandler(object):
         ref = _get_pixel_array(SC_EXPL_LITTLE_16_2F)
 
         # Returned array is not read-only
-        assert arr.flags.writeable == True
+        assert arr.flags.writeable is True
 
         assert np.array_equal(ds.pixel_array, ref)
 
@@ -604,7 +604,7 @@ class TestNumpy_RLEHandler(object):
         arr = ds.pixel_array
 
         # Returned array is not read-only
-        assert arr.flags.writeable == True
+        assert arr.flags.writeable is True
 
         assert np.array_equal(arr, ref)
         assert (10, 10) == arr.shape
@@ -623,7 +623,7 @@ class TestNumpy_RLEHandler(object):
         arr = ds.pixel_array
 
         # Returned array is not read-only
-        assert arr.flags.writeable == True
+        assert arr.flags.writeable is True
 
         assert np.array_equal(arr, ref)
         assert (15, 10, 10) == arr.shape
@@ -654,7 +654,7 @@ class TestNumpy_RLEHandler(object):
         ref = _get_pixel_array(SC_EXPL_LITTLE_32_1F)
 
         # Returned array is not read-only
-        assert arr.flags.writeable == True
+        assert arr.flags.writeable is True
 
         assert np.array_equal(ds.pixel_array, ref)
 
@@ -680,7 +680,7 @@ class TestNumpy_RLEHandler(object):
         ref = _get_pixel_array(SC_EXPL_LITTLE_32_2F)
 
         # Returned array is not read-only
-        assert arr.flags.writeable == True
+        assert arr.flags.writeable is True
 
         assert np.array_equal(ds.pixel_array, ref)
 

@@ -199,7 +199,7 @@ class jpeg_ls_JPEG_LS_Tests_with_jpeg_ls(unittest.TestCase):
             "(mean == {1})".format(b.mean(), a.mean()))
 
         # Returned array is not read-only
-        assert a.flags.writeable == True
+        assert a.flags.writeable is True
 
     def test_emri_JPEG_LS_PixelArray(self):
         a = self.emri_jpeg_ls_lossless.pixel_array
@@ -211,7 +211,7 @@ class jpeg_ls_JPEG_LS_Tests_with_jpeg_ls(unittest.TestCase):
             "(mean == {1})".format(b.mean(), a.mean()))
 
         # Returned array is not read-only
-        assert a.flags.writeable == True
+        assert a.flags.writeable is True
 
 
 @pytest.mark.skipif(

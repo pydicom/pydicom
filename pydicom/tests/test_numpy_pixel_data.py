@@ -510,7 +510,7 @@ class TestNumpy_NumpyHandler(object):
             arr = ds.pixel_array
 
             # Returned array is read-only
-            assert arr.flags.writeable == False
+            assert arr.flags.writeable is False
 
             assert (600, 800) == arr.shape
             assert 244 == arr[0].min() == arr[0].max()
@@ -526,7 +526,7 @@ class TestNumpy_NumpyHandler(object):
             arr = ds.pixel_array
 
             # Returned array is read-only
-            assert arr.flags.writeable == False
+            assert arr.flags.writeable is False
 
             assert (2, 600, 800) == arr.shape
             # Frame 1
@@ -563,7 +563,7 @@ class TestNumpy_NumpyHandler(object):
             arr = ds.pixel_array
 
             # Returned array is read-only
-            assert arr.flags.writeable == False
+            assert arr.flags.writeable is False
 
             assert (255, 0, 0) == tuple(arr[5, 50, :])
             assert (255, 128, 128) == tuple(arr[15, 50, :])
@@ -585,7 +585,7 @@ class TestNumpy_NumpyHandler(object):
             arr = ds.pixel_array
 
             # Returned array is read-only
-            assert arr.flags.writeable == False
+            assert arr.flags.writeable is False
 
             # Frame 1
             frame = arr[0]
@@ -637,7 +637,7 @@ class TestNumpy_NumpyHandler(object):
             arr = ds.pixel_array
 
             # Returned array is not read-only
-            assert arr.flags.writeable == True
+            assert arr.flags.writeable is True
 
             assert arr.max() == 1
             assert arr.min() == 0
@@ -656,7 +656,7 @@ class TestNumpy_NumpyHandler(object):
             arr = ds.pixel_array
 
             # Returned array is not read-only
-            assert arr.flags.writeable == True
+            assert arr.flags.writeable is True
 
             assert arr.max() == 1
             assert arr.min() == 0
@@ -718,7 +718,7 @@ class TestNumpy_NumpyHandler(object):
             arr = ds.pixel_array
 
             # Returned array is read-only
-            assert arr.flags.writeable == False
+            assert arr.flags.writeable is False
 
             assert (422, 319, 361) == tuple(arr[0, 31:34])
             assert (366, 363, 322) == tuple(arr[31, :3])
@@ -733,7 +733,7 @@ class TestNumpy_NumpyHandler(object):
             arr = ds.pixel_array
 
             # Returned array is read-only
-            assert arr.flags.writeable == False
+            assert arr.flags.writeable is False
 
             # Frame 1
             assert (206, 197, 159) == tuple(arr[0, 0, 31:34])
@@ -757,7 +757,7 @@ class TestNumpy_NumpyHandler(object):
             arr = ds.pixel_array
 
             # Returned array is read-only
-            assert arr.flags.writeable == False
+            assert arr.flags.writeable is False
 
             assert (65535, 0, 0) == tuple(arr[5, 50, :])
             assert (65535, 32896, 32896) == tuple(arr[15, 50, :])
@@ -779,7 +779,7 @@ class TestNumpy_NumpyHandler(object):
             arr = ds.pixel_array
 
             # Returned array is read-only
-            assert arr.flags.writeable == False
+            assert arr.flags.writeable is False
 
             # Frame 1
             assert (65535, 0, 0) == tuple(arr[0, 5, 50, :])
@@ -804,7 +804,7 @@ class TestNumpy_NumpyHandler(object):
             arr = ds.pixel_array
 
             # Returned array is read-only
-            assert arr.flags.writeable == False
+            assert arr.flags.writeable is False
 
             assert (1249000, 1249000, 1250000) == tuple(arr[0, :3])
             assert (1031000, 1029000, 1027000) == tuple(arr[4, 3:6])
@@ -819,7 +819,7 @@ class TestNumpy_NumpyHandler(object):
             arr = ds.pixel_array
 
             # Returned array is read-only
-            assert arr.flags.writeable == False
+            assert arr.flags.writeable is False
 
             # Frame 1
             assert (1249000, 1249000, 1250000) == tuple(arr[0, 0, :3])
@@ -865,7 +865,7 @@ class TestNumpy_NumpyHandler(object):
             arr = ds.pixel_array
 
             # Returned array is read-only
-            assert arr.flags.writeable == False
+            assert arr.flags.writeable is False
 
             # Frame 1
             assert (4294967295, 0, 0) == tuple(arr[0, 5, 50, :])
