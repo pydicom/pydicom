@@ -42,9 +42,9 @@ if [[ "$DISTRIB" == "conda" ]]; then
     if [[ "$NUMPY" == "true" ]]; then
         conda install --yes numpy
     fi
-    if [[ "$JPEG2000" == "true" ]]; then
-        sudo apt-get install libopenjp2-7 libopenjp2-7-dev
-    fi
+    #if [[ "$JPEG2000" == "true" ]]; then
+    #    sudo apt-get install libopenjp2-7 libopenjp2-7-dev
+    #fi
     if [[ "$PILLOW" == "both" ]]; then
         conda install --yes pillow jpeg
         python -c "from PIL import _imaging; print('JPEG plugin:', hasattr(_imaging, 'jpeg_decoder'))"
