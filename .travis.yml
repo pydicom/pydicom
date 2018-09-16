@@ -60,10 +60,12 @@ matrix:
           packages:
               - python-numpy
 
-install: source build_tools/travis/install.sh
+install:
+  - source build_tools/travis/install.sh
+  - pip install codecov
 
 script:
   - py.test --cov=pydicom -r sx --pyargs pydicom
 
 after_success:
-  - bash < (curl -s https://codecov.io/bash)
+  - codecov
