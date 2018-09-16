@@ -509,6 +509,9 @@ class TestNumpy_NumpyHandler(object):
             ds.file_meta.TransferSyntaxUID = uid
             arr = ds.pixel_array
 
+            # Returned array is read-only
+            assert arr.flags.writeable == False
+
             assert (600, 800) == arr.shape
             assert 244 == arr[0].min() == arr[0].max()
             assert (1, 246, 1) == tuple(arr[300, 491:494])
@@ -521,6 +524,9 @@ class TestNumpy_NumpyHandler(object):
         for uid in SUPPORTED_SYNTAXES[:3]:
             ds.file_meta.TransferSyntaxUID = uid
             arr = ds.pixel_array
+
+            # Returned array is read-only
+            assert arr.flags.writeable == False
 
             assert (2, 600, 800) == arr.shape
             # Frame 1
@@ -556,6 +562,9 @@ class TestNumpy_NumpyHandler(object):
             ds.file_meta.TransferSyntaxUID = uid
             arr = ds.pixel_array
 
+            # Returned array is read-only
+            assert arr.flags.writeable == False
+
             assert (255, 0, 0) == tuple(arr[5, 50, :])
             assert (255, 128, 128) == tuple(arr[15, 50, :])
             assert (0, 255, 0) == tuple(arr[25, 50, :])
@@ -574,6 +583,9 @@ class TestNumpy_NumpyHandler(object):
         for uid in SUPPORTED_SYNTAXES:
             ds.file_meta.TransferSyntaxUID = uid
             arr = ds.pixel_array
+
+            # Returned array is read-only
+            assert arr.flags.writeable == False
 
             # Frame 1
             frame = arr[0]
@@ -624,6 +636,9 @@ class TestNumpy_NumpyHandler(object):
             ds.file_meta.TransferSyntaxUID = uid
             arr = ds.pixel_array
 
+            # Returned array is not read-only
+            assert arr.flags.writeable == True
+
             assert arr.max() == 1
             assert arr.min() == 0
 
@@ -639,6 +654,9 @@ class TestNumpy_NumpyHandler(object):
         for uid in SUPPORTED_SYNTAXES[:3]:
             ds.file_meta.TransferSyntaxUID = uid
             arr = ds.pixel_array
+
+            # Returned array is not read-only
+            assert arr.flags.writeable == True
 
             assert arr.max() == 1
             assert arr.min() == 0
@@ -699,6 +717,9 @@ class TestNumpy_NumpyHandler(object):
             ds.file_meta.TransferSyntaxUID = uid
             arr = ds.pixel_array
 
+            # Returned array is read-only
+            assert arr.flags.writeable == False
+
             assert (422, 319, 361) == tuple(arr[0, 31:34])
             assert (366, 363, 322) == tuple(arr[31, :3])
             assert (1369, 1129, 862) == tuple(arr[-1, -3:])
@@ -710,6 +731,9 @@ class TestNumpy_NumpyHandler(object):
         for uid in SUPPORTED_SYNTAXES[:3]:
             ds.file_meta.TransferSyntaxUID = uid
             arr = ds.pixel_array
+
+            # Returned array is read-only
+            assert arr.flags.writeable == False
 
             # Frame 1
             assert (206, 197, 159) == tuple(arr[0, 0, 31:34])
@@ -732,6 +756,9 @@ class TestNumpy_NumpyHandler(object):
             ds.file_meta.TransferSyntaxUID = uid
             arr = ds.pixel_array
 
+            # Returned array is read-only
+            assert arr.flags.writeable == False
+
             assert (65535, 0, 0) == tuple(arr[5, 50, :])
             assert (65535, 32896, 32896) == tuple(arr[15, 50, :])
             assert (0, 65535, 0) == tuple(arr[25, 50, :])
@@ -750,6 +777,9 @@ class TestNumpy_NumpyHandler(object):
         for uid in SUPPORTED_SYNTAXES[:3]:
             ds.file_meta.TransferSyntaxUID = uid
             arr = ds.pixel_array
+
+            # Returned array is read-only
+            assert arr.flags.writeable == False
 
             # Frame 1
             assert (65535, 0, 0) == tuple(arr[0, 5, 50, :])
@@ -773,6 +803,9 @@ class TestNumpy_NumpyHandler(object):
             ds.file_meta.TransferSyntaxUID = uid
             arr = ds.pixel_array
 
+            # Returned array is read-only
+            assert arr.flags.writeable == False
+
             assert (1249000, 1249000, 1250000) == tuple(arr[0, :3])
             assert (1031000, 1029000, 1027000) == tuple(arr[4, 3:6])
             assert (803000, 801000, 798000) == tuple(arr[-1, -3:])
@@ -784,6 +817,9 @@ class TestNumpy_NumpyHandler(object):
         for uid in SUPPORTED_SYNTAXES[:3]:
             ds.file_meta.TransferSyntaxUID = uid
             arr = ds.pixel_array
+
+            # Returned array is read-only
+            assert arr.flags.writeable == False
 
             # Frame 1
             assert (1249000, 1249000, 1250000) == tuple(arr[0, 0, :3])
@@ -806,6 +842,9 @@ class TestNumpy_NumpyHandler(object):
             ds.file_meta.TransferSyntaxUID = uid
             ar = ds.pixel_array
 
+            # Returned array is read-only
+            assert ar.flags.writeable == False
+
             assert (4294967295, 0, 0) == tuple(ar[5, 50, :])
             assert (4294967295, 2155905152, 2155905152) == tuple(ar[15, 50, :])
             assert (0, 4294967295, 0) == tuple(ar[25, 50, :])
@@ -824,6 +863,9 @@ class TestNumpy_NumpyHandler(object):
         for uid in SUPPORTED_SYNTAXES[:3]:
             ds.file_meta.TransferSyntaxUID = uid
             arr = ds.pixel_array
+
+            # Returned array is read-only
+            assert arr.flags.writeable == False
 
             # Frame 1
             assert (4294967295, 0, 0) == tuple(arr[0, 5, 50, :])
