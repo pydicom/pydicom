@@ -54,6 +54,9 @@ python_encoding = {
     'GBK': 'GBK',  # from DICOM correction CP1234
 }
 
+# these encodings cannot be used with code extensions
+STAND_ALONE_ENCODINGS = ('ISO_IR 192', 'GBK', 'GB18030')
+
 # the escape character used to mark the start of escape sequences
 ESC = b'\x1b'
 
@@ -335,7 +338,24 @@ def _encode_string_parts(value, encodings):
 
 
 def convert_encodings(encodings):
-    """Converts DICOM encodings into corresponding python encodings"""
+    """Converts DICOM encodings into corresponding python encodings.
+    Handles some common spelling mistakes and issues a warning in this case.
+    Handled stand-alone encodings: if they are the first encodings,
+    additional encodings are ignored, if they are not the first encoding,
+    they are ignored. In both cases, a warning is issued.
+
+    Parameters
+    ----------
+    encodings : list of str
+        The list of encodings as read from Specific Character Set.
+
+    Returns
+    -------
+    list of str
+        The list of Python encodings corresponding to the DICOM encodings.
+        If conversion fails, `encodings` is returned unchanged, assuming
+        that it already has been converted to Python encodings.
+    """
 
     # If a list if passed, we don't want to modify the list in place so copy it
     encodings = encodings[:]
@@ -346,7 +366,7 @@ def convert_encodings(encodings):
         encodings[0] = 'ISO_IR 6'
 
     try:
-        encodings = [python_encoding[x] for x in encodings]
+        py_encodings = [python_encoding[x] for x in encodings]
 
     except KeyError:
         # check for some common mistakes in encodings
@@ -364,19 +384,40 @@ def convert_encodings(encodings):
                 patched_encodings.append(patched[x])
             else:
                 patched_encodings.append(x)
+        # fallback: assume that it is already a python encoding
+        py_encodings = encodings
         if patched:
             try:
-                encodings = [python_encoding[x] for x in patched_encodings]
+                encodings = patched_encodings
+                py_encodings = [python_encoding[x] for x in encodings]
                 for old, new in patched.items():
                     warnings.warn("Incorrect value for Specific Character Set "
                                   "'{}' - assuming '{}'".format(old, new),
                                   stacklevel=2)
             except KeyError:
-                # assume that it is already a python encoding
-                # otherwise, a LookupError will be raised in the using code
                 pass
+        # if patching failed at this point, the original encodings
+        # will be returned, assumimg that they are already Python encodings;
+        # otherwise, a LookupError will be raised in the using code
 
-    return encodings
+    # handle illegal stand-alone encodings
+    if len(encodings) > 1:
+        if encodings[0] in STAND_ALONE_ENCODINGS:
+            warnings.warn("Value '{}' for Specific Character Set does not "
+                          "allow code extensions, ignoring: {}"
+                          .format(encodings[0], ', '.join(encodings[1:])),
+                          stacklevel=2)
+            py_encodings = py_encodings[:1]
+        else:
+            for i, encoding in reversed(list(enumerate(encodings[1:]))):
+                if encoding in STAND_ALONE_ENCODINGS:
+                    warnings.warn(
+                        "Value '{}' cannot be used as code extension, "
+                        "ignoring it".format(encoding),
+                        stacklevel=2)
+                    del py_encodings[i + 1]
+
+    return py_encodings
 
 
 def decode(data_element, dicom_character_set):

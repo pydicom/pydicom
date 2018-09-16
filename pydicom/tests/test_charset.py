@@ -128,6 +128,26 @@ class TestCharset(object):
             pydicom.charset.decode(elem, ['ISO_IR 192'])
             assert u'���������' == elem.value
 
+    def test_code_extensions_not_allowed(self):
+        """Test that UTF8 does not allow code extensions"""
+        elem = DataElement(0x00100010, 'PN', b'Buc^J\xc3\xa9r\xc3\xb4me')
+
+        msg = ("Value 'ISO_IR 192' for Specific Character Set does not "
+                      "allow code extensions, ignoring: ISO 2022 IR 100, "
+                      "ISO 2022 IR 144")
+        with pytest.warns(UserWarning, match=msg):
+            pydicom.charset.decode(elem, ['ISO_IR 192', 'ISO 2022 IR 100',
+                                          'ISO 2022 IR 144'])
+            assert u'Buc^Jérôme' == elem.value
+
+    def test_convert_encodings_warnings(self):
+        """Test warning if stand-alone encodings are used as code extension"""
+        with pytest.warns(UserWarning, match="Value 'GBK' cannot be used as "
+                                             "code extension, ignoring it"):
+            encodings = pydicom.charset.convert_encodings(
+                ['ISO_IR 126', 'GBK', 'ISO 2022 IR 144', 'ISO_IR 192'])
+            assert ['iso_ir_126', 'iso_ir_144'] == encodings
+
     def test_bad_encoded_multi_byte_encoding(self):
         """Test handling bad encoding for single encoding"""
         elem = DataElement(0x00100010, 'PN',
