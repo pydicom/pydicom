@@ -271,6 +271,9 @@ class GDCM_JPEG_LS_Tests_with_gdcm(unittest.TestCase):
             "using GDCM Decoded pixel data is not "
             "all {0} (mean == {1})".format(b.mean(), a.mean()))
 
+        # Returned array is not read-only
+        assert a.flags.writeable == True
+
     def test_emri_JPEG_LS_PixelArray_with_gdcm(self):
         a = self.emri_jpeg_ls_lossless.pixel_array
         b = self.emri_small.pixel_array
@@ -279,6 +282,10 @@ class GDCM_JPEG_LS_Tests_with_gdcm(unittest.TestCase):
             b.mean(),
             "Decoded pixel data is not all {0} "
             "(mean == {1})".format(b.mean(), a.mean()))
+
+        # Returned array is not read-only
+        assert a.flags.writeable == True
+
 
 
 @pytest.mark.skipif(not HAVE_GDCM, reason=gdcm_missing_message)
@@ -326,6 +333,9 @@ class GDCM_JPEG2000Tests_with_gdcm(unittest.TestCase):
             "Decoded pixel data is not all {0} "
             "(mean == {1})".format(b.mean(), a.mean()))
 
+        # Returned array is not read-only
+        assert a.flags.writeable == True
+
     def test_emri_JPEG2000PixelArray(self):
         a = self.emri_jpeg_2k_lossless.pixel_array
         b = self.emri_small.pixel_array
@@ -334,6 +344,9 @@ class GDCM_JPEG2000Tests_with_gdcm(unittest.TestCase):
             b.mean(),
             "Decoded pixel data is not all {0} "
             "(mean == {1})".format(b.mean(), a.mean()))
+
+        # Returned array is not read-only
+        assert a.flags.writeable == True
 
     def test_jpeg2000_lossy(self):
         a = self.sc_rgb_jpeg2k_gdcm_KY.pixel_array
@@ -346,6 +359,9 @@ class GDCM_JPEG2000Tests_with_gdcm(unittest.TestCase):
                 b.mean(),
                 "Decoded pixel data is not all {0} "
                 "(mean == {1})".format(b.mean(), a.mean()))
+
+        # Returned array is not read-only
+        assert a.flags.writeable == True
 
 
 @pytest.mark.skipif(not HAVE_GDCM, reason=gdcm_missing_message)
@@ -384,6 +400,9 @@ class GDCM_JPEGlossyTests_with_gdcm(unittest.TestCase):
         self.assertEqual(a[420, 140], 244)
         self.assertEqual(a[230, 120], 95)
 
+        # Returned array is not read-only
+        assert a.flags.writeable == True
+
     def test_JPEGBaselineColor3DPixelArray(self):
         self.assertEqual(
             self.color_3d_jpeg.PhotometricInterpretation,
@@ -397,6 +416,9 @@ class GDCM_JPEGlossyTests_with_gdcm(unittest.TestCase):
         self.assertEqual(
             self.color_3d_jpeg.PhotometricInterpretation,
             "YBR_FULL_422")
+
+        # Returned array is not read-only
+        assert a.flags.writeable == True
 
 
 @pytest.fixture(scope="module")
@@ -567,6 +589,10 @@ def test_PI_RGB(test_with_gdcm,
     t = dcmread(image)
     assert t.PhotometricInterpretation == PhotometricInterpretation
     a = t.pixel_array
+
+    # Returned array is not read-only
+    assert a.flags.writeable == True
+
     assert a.shape == (100, 100, 3)
     if convert_yuv_to_rgb:
         a = _convert_YBR_FULL_to_RGB(a)
@@ -614,3 +640,6 @@ class GDCM_JPEGlosslessTests_with_gdcm(unittest.TestCase):
         # this test points were manually identified in Osirix viewer
         self.assertEqual(a[420, 140], 227)
         self.assertEqual(a[230, 120], 105)
+
+        # Returned array is not read-only
+        assert a.flags.writeable == True
