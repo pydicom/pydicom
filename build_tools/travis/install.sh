@@ -46,8 +46,8 @@ if [[ "$DISTRIB" == "conda" ]]; then
     #    sudo apt-get install libopenjp2-7 libopenjp2-7-dev
     #fi
     if [[ "$PILLOW" == "both" ]]; then
-        conda install --yes -c conda-forge openjpeg
-        conda install --yes pillow jpeg
+        conda install --yes -c conda-forge openjpeg jpeg
+        pip install pillow --global-option="build_ext" --global-option="--enable-jpeg2000"
         python -c "from PIL import _imaging; print('JPEG plugin:', hasattr(_imaging, 'jpeg_decoder'))"
         python -c "from PIL import _imaging; print('JPEG2k plugin:', hasattr(_imaging, 'jpeg2k_decoder'))"
     elif [[ "$PILLOW" == "jpeg" ]]; then
