@@ -843,7 +843,7 @@ class TestNumpy_NumpyHandler(object):
             ar = ds.pixel_array
 
             # Returned array is read-only
-            assert ar.flags.writeable == False
+            assert ar.flags.writeable is False
 
             assert (4294967295, 0, 0) == tuple(ar[5, 50, :])
             assert (4294967295, 2155905152, 2155905152) == tuple(ar[15, 50, :])

@@ -407,6 +407,10 @@ class GDCM_JPEGlossyTests_with_gdcm(unittest.TestCase):
             self.color_3d_jpeg.PhotometricInterpretation,
             "YBR_FULL_422")
         a = self.color_3d_jpeg.pixel_array
+
+        # Returned array is read-only
+        assert a.flags.writeable is False
+
         self.assertEqual(a.shape, (120, 480, 640, 3))
         a = _convert_YBR_FULL_to_RGB(a)
         # this test points were manually identified in Osirix viewer
@@ -415,9 +419,6 @@ class GDCM_JPEGlossyTests_with_gdcm(unittest.TestCase):
         self.assertEqual(
             self.color_3d_jpeg.PhotometricInterpretation,
             "YBR_FULL_422")
-
-        # Returned array is read-only
-        assert a.flags.writeable is False
 
 
 @pytest.fixture(scope="module")
