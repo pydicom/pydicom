@@ -108,11 +108,13 @@ class TestBuilds(object):
             with pytest.raises(ImportError):
                 import numpy
         else:
-            raise NotImplementedError("Unknown 'NUMPY' value")
+            raise NotImplementedError(
+                "Unknown 'NUMPY' value of '{}'".format(have_np)
+            )
 
     def test_pillow(self):
         """Test that pillow is absent/present with the correct plugins."""
-        have_pillow = get_envar('NUMPY')
+        have_pillow = get_envar('PILLOW')
         if not have_pillow:
             raise RuntimeError("No 'PILLOW' envar has been set")
 
@@ -136,13 +138,15 @@ class TestBuilds(object):
             with pytest.raises(ImportError):
                 import PIL
         else:
-            raise NotImplementedError("Unknown 'PILLOW' value")
+            raise NotImplementedError(
+                "Unknown 'PILLOW' value of '{}'".format(have_pillow)
+            )
 
     def test_jpegls(self):
         """Test that jpeg-ls is absent/present."""
         have_jpegls = get_envar('JPEG_LS')
         if not have_jpegls:
-            raise RuntimeError("No 'NUMPY' envar has been set")
+            raise RuntimeError("No 'JPEG_LS' envar has been set")
 
         if have_jpegls == 'true':
             try:
@@ -153,7 +157,9 @@ class TestBuilds(object):
             with pytest.raises(ImportError):
                 import jpeg_ls
         else:
-            raise NotImplementedError("Unknown 'JPEG_LS' value")
+            raise NotImplementedError(
+                "Unknown 'JPEG_LS' value of '{}'".format(have_jpegls)
+            )
 
     def test_gdcm(self):
         """Test that gdcm is absent/present."""
@@ -170,4 +176,6 @@ class TestBuilds(object):
             with pytest.raises(ImportError):
                 import gdcm
         else:
-            raise NotImplementedError("Unknown 'GDCM' value")
+            raise NotImplementedError(
+                "Unknown 'GDCM' value of '{}'".format(have_gdcm)
+            )
