@@ -31,7 +31,6 @@ DISTRIB: conda, pypy, ubuntu
 PYTHON_VERSION: 2.7, 3.4, 3.5, 3.6, 3.7
 NUMPY: true, false
 PILLOW: jpeg, both, false
-JPEG2000: false
 JPEG_LS: false, true
 GDCM: false, true
 """

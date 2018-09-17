@@ -42,9 +42,6 @@ if [[ "$DISTRIB" == "conda" ]]; then
     if [[ "$NUMPY" == "true" ]]; then
         conda install --yes numpy
     fi
-    #if [[ "$JPEG2000" == "true" ]]; then
-    #    sudo apt-get install libopenjp2-7 libopenjp2-7-dev
-    #fi
     if [[ "$PILLOW" == "both" ]]; then
         conda install --yes -c conda-forge openjpeg jpeg
         pip install pillow --global-option="build_ext" --global-option="--enable-jpeg2000"
@@ -102,10 +99,7 @@ elif [[ "$DISTRIB" == "pypy" ]]; then
     export PATH="$BIN_PATH:$PATH"
     # install pip
     python -m ensurepip --upgrade
-    if [[ "$NUMPY" == "true" ]] && [[ "$PYTHON_VERSION" == "2.7" ]]; then
-        python -m pip install git+https://bitbucket.org/pypy/numpy.git
-    # numpypy does not work with pypy3 so fall back on numpy
-    elif [[ "$NUMPY" == "true" ]]; then
+    if [[ "$NUMPY" == "true" ]]; then
         python -m pip install cython numpy
     fi
     python -m pip install nose nose-timer pytest pytest-cov codecov setuptools
