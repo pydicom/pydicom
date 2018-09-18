@@ -38,6 +38,7 @@ elements have values given in the table below.
 
 from platform import python_implementation
 from sys import byteorder
+import warnings
 
 try:
     import numpy as np
@@ -270,7 +271,7 @@ def unpack_bits(bytestream):
     return arr
 
 
-def get_pixeldata(ds):
+def get_pixeldata(ds, read_only=False):
     """Return an ndarray of the Pixel Data.
 
     Parameters
@@ -278,6 +279,8 @@ def get_pixeldata(ds):
     ds : dataset.Dataset
         The DICOM dataset containing an Image Pixel module and the Pixel Data
         to be converted.
+    read_only : bool, optional
+        T
 
     Returns
     -------
@@ -339,5 +342,14 @@ def get_pixeldata(ds):
 
     if should_change_PhotometricInterpretation_to_RGB(ds):
         ds.PhotometricInterpretation = "RGB"
+
+    if not read_only and ds.BitsAllocated > 1:
+        return arr.copy()
+    elif read_only and ds.BitsAllocated == 1:
+        warnings.warn(
+            "'read_only=True' is not compatible with bit-packed pixel data, "
+            "a writeable array will be returned instead",
+            UserWarning
+        )
 
     return arr
