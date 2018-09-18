@@ -46,7 +46,6 @@ def is_available():
     return HAVE_NP and HAVE_GDCM
 
 
-
 def needs_to_convert_to_RGB(dicom_dataset):
     should_convert = (dicom_dataset.file_meta.TransferSyntaxUID in
                       should_convert_these_syntaxes_to_RGB)

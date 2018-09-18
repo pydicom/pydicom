@@ -1008,7 +1008,6 @@ class TestNumpy_GetPixelData(object):
             assert arr.flags.writeable
 
 
-
 REFERENCE_PACK_UNPACK = [
     (b'', []),
     (b'\x00', [0, 0, 0, 0, 0, 0, 0, 0]),
