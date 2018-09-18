@@ -198,8 +198,7 @@ class jpeg_ls_JPEG_LS_Tests_with_jpeg_ls(unittest.TestCase):
             "Decoded pixel data is not all {0} "
             "(mean == {1})".format(b.mean(), a.mean()))
 
-        # Returned array is read-only as NumberOfFrames == 1
-        assert a.flags.writeable is False
+        assert arr.flags.writeable
 
     def test_emri_JPEG_LS_PixelArray(self):
         a = self.emri_jpeg_ls_lossless.pixel_array
@@ -210,8 +209,7 @@ class jpeg_ls_JPEG_LS_Tests_with_jpeg_ls(unittest.TestCase):
             "Decoded pixel data is not all {0} "
             "(mean == {1})".format(b.mean(), a.mean()))
 
-        # Returned array is not read-only as NumberOfFrames > 1
-        assert a.flags.writeable is True
+        assert arr.flags.writeable
 
 
 @pytest.mark.skipif(
