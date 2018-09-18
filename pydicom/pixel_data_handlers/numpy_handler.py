@@ -280,7 +280,11 @@ def get_pixeldata(ds, read_only=False):
         The DICOM dataset containing an Image Pixel module and the Pixel Data
         to be converted.
     read_only : bool, optional
-        T
+        If False (default) then returns a writeable array that no longer uses
+        the original memory. If True and the value of (0028,0100) *Bits
+        Allocated* > 1 then returns a read-only array that uses the original
+        memory buffer of the pixel data. If *Bits Allocated* = 1 then always
+        returns a writeable array.
 
     Returns
     -------
