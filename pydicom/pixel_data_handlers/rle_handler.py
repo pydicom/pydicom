@@ -35,6 +35,7 @@ elements have values given in the table below.
 
 from itertools import groupby
 from struct import pack, unpack
+import sys
 
 try:
     import numpy as np
@@ -364,32 +365,7 @@ def _rle_decode_segment(data):
 
 
 # RLE encoding functions
-def rle_encode(arr):
-    """Return the contents of `arr` as a list of RLE encoded bytearray.
-
-    Parameters
-    ----------
-    arr : numpy.ndarray
-        A 2D, 3D or 4D numpy ndarray containing one or more frames of image
-        data.
-
-    Returns
-    -------
-    list of bytearray
-        A list of RLE encoded frames ready for encapsulation.
-    """
-    # FIXME: This won't work as is
-    if len(arr.shape) in [2, 3]:
-        return [_rle_encode_frame(arr)]
-
-    out = []
-    for frame in arr:
-        out.append(_rle_encoded_frame(arr))
-
-    return out
-
-
-def _rle_encode_frame(arr):
+def rle_encode_frame(arr):
     """Return an numpy ndarray image frame as RLE encoded bytearray.
 
     Parameters
@@ -409,13 +385,12 @@ def _rle_encode_frame(arr):
     if len(arr.shape) == 3:
         # Samples Per Pixel = 3
         for plane in arr:
-            # Bluh, should use a generator here
             for segment in _rle_encode_plane(plane):
                 rle_data.extend(segment)
                 seg_lengths.append(len(segment))
     else:
         # Samples Per Pixel = 1
-        for segment in _rle_encode_plane(plane):
+        for segment in _rle_encode_plane(arr):
             rle_data.extend(segment)
             seg_lengths.append(len(segment))
 
@@ -441,7 +416,7 @@ def _rle_encode_plane(arr):
     Parameters
     ----------
     arr : numpy.ndarray
-        A 2D ndarray containing a single plane of the image data to be RLE
+        A 1 or 2D ndarray containing a single plane of the image data to be RLE
         encoded. The dtype of the array should be a multiple of 8 (i.e. uint8,
         uint32, int16, etc.).
 
@@ -451,10 +426,12 @@ def _rle_encode_plane(arr):
         An RLE encoded segment of the plane, following the format specified
         by the DICOM Standard, Part 5, Annex G.
     """
+    print(arr)
     # Re-view the N-bit array data as N / 8 x uint8s
     arr8 = arr.view(np.uint8)
+    print(arr8, arr.dtype.byteorder, sys.byteorder)
     # Reshape the uint8 array data into 1 or more segments and encode
-    bytes_per_sample = arr8.shape[1] // arr.shape[1]
+    bytes_per_sample = arr.dtype.itemsize
     for ii in range(bytes_per_sample):
         segment = arr8.ravel()[ii::bytes_per_sample].reshape(arr.shape)
         yield _rle_encode_segment(segment)
@@ -462,6 +439,9 @@ def _rle_encode_plane(arr):
 
 def _rle_encode_segment(arr):
     """Return a 2D numpy ndarray as an RLE encoded bytearray.
+
+    Each row of the image is encoded separately as required by the DICOM
+    Standard.
 
     Parameters
     ----------
@@ -477,8 +457,11 @@ def _rle_encode_segment(arr):
         to be even length.
     """
     out = bytearray()
-    for row in arr:
-        out.extend(_rle_encode_row(row))
+    if len(arr.shape) > 1:
+        for row in arr:
+            out.extend(_rle_encode_row(row))
+    else:
+        out.extend(_rle_encode_row(arr))
 
     # Pad odd length data with a trailing 0x00 byte
     out.extend(b'\x00' * (len(out) % 2))
@@ -499,6 +482,11 @@ def _rle_encode_row(arr):
     bytes
         The RLE encoded row, following the format specified by the DICOM
         Standard, Part 5, Annex G.
+
+    Notes
+    -----
+    * 2-byte repeat runs are always encoded as Replicate Runs rather than
+      only when not preceeded by a Literal Run as suggested by the Standard.
     """
     out = []
     out_append = out.append

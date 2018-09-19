@@ -23,6 +23,7 @@ There are the following possibilities:
 """
 
 from struct import pack, unpack
+import sys
 
 import pytest
 
@@ -49,8 +50,7 @@ try:
         _rle_decode_frame,
         _rle_decode_segment,
         _parse_rle_header,
-        rle_encode,
-        _rle_encode_frame,
+        rle_encode_frame,
         _rle_encode_plane,
         _rle_encode_segment,
         _rle_encode_row,
@@ -1148,33 +1148,19 @@ REFERENCE_ENCODE_ROW = [
     ([0] * 128 + [1, 2] * 64, b'\x81\x00\x7f' + b'\x01\x02' * 64),
 ]
 
+
 @pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
 class TestNumpy_RLEEncodeRow(object):
-    """Tests for rle_handler._rle_encode_frame."""
+    """Tests for rle_handler.rle_encode_frame."""
     @pytest.mark.parametrize('input, output', REFERENCE_ENCODE_ROW)
     def test_encode(self, input, output):
         """Test encoding an empty row."""
         assert output == _rle_encode_row(np.asarray(input))
 
-    def test_cycle(self):
-        """Test the decoded data remains the same after encoding/decoding."""
-        ds = dcmread(OB_RLE_1F)
-        pixel_data = defragment_data(ds.PixelData)
-        decoded = _rle_decode_segment(pixel_data[64:])
-        assert ds.Rows * ds.Columns == len(decoded)
-        arr = np.frombuffer(decoded, 'uint8').reshape(ds.Rows, ds.Columns)
-        # Re-encode the decoded data
-        encoded = _rle_encode_segment(arr)
 
-        # Decoded the re-encoded data and check that it's the same
-        redecoded = _rle_decode_segment(encoded)
-        assert ds.Rows * ds.Columns == len(redecoded)
-        assert decoded == redecoded
-
-
-@pytest.mark.skip(not HAVE_NP, reason='Numpy is not available')
+@pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
 class TestNumpy_RLEEncodeFrame(object):
-    """Tests for rle_handler._rle_encode_frame."""
+    """Tests for rle_handler.rle_encode_frame."""
     def test_1bit_1sample(self):
         """Test encoding a 1-bit, 1 sample/pixel frame."""
         pass
@@ -1192,7 +1178,7 @@ class TestNumpy_RLEEncodeFrame(object):
              [127, 128, 129, 130],
              [252, 255, 255, 255]], dtype='uint8')
 
-        _rle_encode_frame(arr)
+        rle_encode_frame(arr)
 
     def test_8bit_3sample(self):
         """Test encoding an 8-bit, 3 sample/pixel frame."""
@@ -1207,7 +1193,7 @@ class TestNumpy_RLEEncodeFrame(object):
              [ 127,  1024, 2048, 4096],
              [8192, 2**14, 2**15, 65535]], dtype='uint16')
 
-        _rle_encode_frame(arr)
+        rle_encode_frame(arr)
 
     def test_16bit_3sample(self):
         """Test encoding a 16-bit, 3 sample/pixel frame."""
@@ -1222,60 +1208,223 @@ class TestNumpy_RLEEncodeFrame(object):
              [2**19, 2**23, 2**25, 2**27],
              [2**29, 2**30, 2**31, 2**32 - 1]], dtype='uint32')
 
-        _rle_encode_frame(arr)
+        rle_encode_frame(arr)
 
     def test_32bit_3sample(self):
         """Test encoding a 32-bit, 3 sample/pixel frame."""
         pass
 
 
-@pytest.mark.skip(not HAVE_NP, reason='Numpy is not available')
+@pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
 class TestNumpy_RLEEncodePlane(object):
     """Tests for rle_handler._rle_encode_plane."""
-    def test_1bit(self):
-        """Test encoding a 1-bit plane into 1 segment."""
-        pass
-
     def test_8bit(self):
         """Test encoding an 8-bit plane into 1 segment."""
-        pass
+        ds = dcmread(OB_RLE_1F)
+        pixel_data = defragment_data(ds.PixelData)
+        decoded = _rle_decode_frame(pixel_data, ds.Rows, ds.Columns,
+                                    ds.SamplesPerPixel, ds.BitsAllocated)
+        assert ds.Rows * ds.Columns * ds.BitsAllocated // 8 == len(decoded)
+        arr = np.frombuffer(decoded, 'uint8').reshape(ds.Rows, ds.Columns)
+        # Re-encode the decoded data
+        encoded = bytearray()
+        nr_segments = 0
+        for segment in _rle_encode_plane(arr):
+            encoded.extend(segment)
+            nr_segments += 1
+
+        # Add header
+        header = b'\x01\x00\x00\x00\x40\x00\x00\x00'
+        header += b'\x00' * (64 - len(header))
+
+        assert 1 == nr_segments
+
+        # Decoded the re-encoded data and check that it's the same
+        redecoded = _rle_decode_frame(header + encoded,
+                                      ds.Rows, ds.Columns,
+                                      ds.SamplesPerPixel, ds.BitsAllocated)
+        assert ds.Rows * ds.Columns * ds.SamplesPerPixel == len(redecoded)
+        assert decoded == redecoded
 
     def test_16bit(self):
         """Test encoding a 16-bit plane into 2 segments."""
-        pass
+        ds = dcmread(MR_RLE_1F)
+        pixel_data = defragment_data(ds.PixelData)
+        decoded = _rle_decode_frame(pixel_data, ds.Rows, ds.Columns,
+                                    ds.SamplesPerPixel, ds.BitsAllocated)
+        assert ds.Rows * ds.Columns * ds.BitsAllocated // 8 == len(decoded)
+        arr = np.frombuffer(decoded, 'uint16').reshape(ds.Rows, ds.Columns)
+        # Re-encode the decoded data
+        encoded = bytearray()
+        nr_segments = 0
+        offsets = [64]
+        for segment in _rle_encode_plane(arr):
+            offsets.append(offsets[nr_segments] + len(segment))
+            encoded.extend(segment)
+            nr_segments += 1
+
+        assert 2 == nr_segments
+
+        # Add header
+        header = b'\x02\x00\x00\x00'
+        header += pack('<2L', *offsets[:-1])
+        header += b'\x00' * (64 - len(header))
+
+        # Decoded the re-encoded data and check that it's the same
+        redecoded = _rle_decode_frame(header + encoded,
+                                      ds.Rows, ds.Columns,
+                                      ds.SamplesPerPixel, ds.BitsAllocated)
+        assert ds.Rows * ds.Columns * ds.BitsAllocated // 8 == len(redecoded)
+        assert decoded == redecoded
+
+    def test_16bit_segment_order(self):
+        """Test that the segment order per sample is correct."""
+        # Segment 1 should be MSB, segment 2 LSB
+
+        # Little endian
+        data = b'\x00\x00\x01\xFF\xFE\x00\xFF\xFF\x10\x12'
+        dtype = np.dtype('uint16') #.newbyteorder('<')
+        arr = np.frombuffer(data, dtype)
+        # Split we have LSB 0x00 0x01 0xFE 0xFF 0x10
+        #               MSB 0x00 0xFF 0x00 0xFF 0x12
+        segments = []
+        for segment in _rle_encode_plane(arr):
+            segments.append(segment)
+
+        assert 2 == len(segments)
+
+        # Each segment should start with a literal run marker of 0x04
+        # and MSB should be first, then LSB
+        assert b'\x04\x00\xFF\x00\xFF\x12' == segments[0]
+        assert b'\x04\x00\x01\xFE\xFF\x10' == segments[1]
+
+        # Big endian
+        arr = np.frombuffer(data, dtype.newbyteorder('>'))
+        # Split we have LSB 0x00 0xFF 0x00 0xFF 0x12
+        #               MSB 0x00 0x01 0xFE 0xFF 0x10
+        segments = []
+        for segment in _rle_encode_plane(arr):
+            segments.append(segment)
+
+        assert 2 == len(segments)
+
+        assert b'\x04\x00\x01\xFE\xFF\x10' == segments[0]
+        assert b'\x04\x00\xFF\x00\xFF\x12' == segments[1]
 
     def test_32bit(self):
         """Test encoding a 32-bit plane into 4 segments."""
-        pass
+        ds = dcmread(RTDOSE_RLE_1F)
+        pixel_data = defragment_data(ds.PixelData)
+        decoded = _rle_decode_frame(pixel_data, ds.Rows, ds.Columns,
+                                    ds.SamplesPerPixel, ds.BitsAllocated)
+        assert ds.Rows * ds.Columns * ds.BitsAllocated // 8 == len(decoded)
+        arr = np.frombuffer(decoded, 'uint32').reshape(ds.Rows, ds.Columns)
+        # Re-encode the decoded data
+        encoded = bytearray()
+        nr_segments = 0
+        offsets = [64]
+        for segment in _rle_encode_plane(arr):
+            offsets.append(offsets[nr_segments] + len(segment))
+            encoded.extend(segment)
+            nr_segments += 1
+
+        assert 4 == nr_segments
+
+        # Add header
+        header = b'\x04\x00\x00\x00'
+        header += pack('<4L', *offsets[:-1])
+        header += b'\x00' * (64 - len(header))
+
+        # Decoded the re-encoded data and check that it's the same
+        redecoded = _rle_decode_frame(header + encoded,
+                                      ds.Rows, ds.Columns,
+                                      ds.SamplesPerPixel, ds.BitsAllocated)
+        assert ds.Rows * ds.Columns * ds.BitsAllocated // 8 == len(redecoded)
+        assert decoded == redecoded
+
+    def test_32bit_segment_order(self):
+        """Test that the segment order per sample is correct."""
+        # Little endian
+        data = b'\x00\x00\x00\x00\x01\xFF\xFE\x0A\xFF\xFC\x10\x12'
+        arr = np.frombuffer(data, 'uint32').newbyteorder('<')
+        # Split we have LSB 0x00 0x01 0xFF
+        #                   0x00 0xFF 0xFC
+        #                   0x00 0xFE 0x10
+        #               MSB 0x00 0x0A 0x12
+        segments = []
+        for segment in _rle_encode_plane(arr):
+            segments.append(segment)
+
+        assert 4 == len(segments)
+
+        # Each segment should start with a literal run marker of 0x02
+        assert b'\x02\x00\x0A\x12' == segments[0]
+        assert b'\x02\x00\xFE\x10' == segments[1]
+        assert b'\x02\x00\xFF\xFC' == segments[2]
+        assert b'\x02\x00\x01\xFF' == segments[3]
+
+        # Big endian
+        arr = np.frombuffer(data, 'uint32').newbyteorder('>')
+        # Split we have MSB 0x00 0x01 0xFF
+        #                   0x00 0xFF 0xFC
+        #                   0x00 0xFE 0x10
+        #               LSB 0x00 0x0A 0x12
+        segments = []
+        for segment in _rle_encode_plane(arr):
+            segments.append(segment)
+
+        assert 4 == len(segments)
+
+        assert b'\x02\x00\x01\xFF' == segments[0]
+        assert b'\x02\x00\xFF\xFC' == segments[1]
+        assert b'\x02\x00\xFE\x10' == segments[2]
+        assert b'\x02\x00\x0A\x12' == segments[3]
+
+    def test_padding(self):
+        """Test that odd length encoded segments are padded."""
+        data = b'\x00\x04\x01\x15'
+        arr = np.frombuffer(data, 'uint8')
+        segments = []
+        for segment in _rle_encode_plane(arr):
+            segments.append(segment)
+
+        # Each segment should start with a literal run marker of 0x04
+        assert b'\x03\x00\x04\x01\x15\x00' == segments[0]
 
 
-@pytest.mark.skip(not HAVE_NP, reason='Numpy is not available')
+@pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
 class TestNumpy_RLEEncodeSegment(object):
     """Tests for rle_handler._rle_encode_segment."""
     def test_one_row(self):
         """Test encoding data that contains only a single row."""
-        pass
+        ds = dcmread(OB_RLE_1F)
+        pixel_data = defragment_data(ds.PixelData)
+        decoded = _rle_decode_segment(pixel_data[64:])
+        assert ds.Rows * ds.Columns == len(decoded)
+        arr = np.frombuffer(decoded, 'uint8').reshape(ds.Rows, ds.Columns)
 
-    def test_odd_length(self):
-        """Test encoding odd length data."""
-        pass
+        # Re-encode a single row of the decoded data
+        row = arr[0]
+        # Each row contains ds.Columns number of pixels
+        assert (ds.Columns,) == row.shape
+        encoded = _rle_encode_segment(row)
 
-    def test_even_length(self):
-        """Test encoding even length data."""
-        pass
+        # Decoded the re-encoded data and check that it's the same
+        redecoded = _rle_decode_segment(encoded)
+        assert ds.Columns == len(redecoded)
+        assert decoded[:ds.Columns] == redecoded
 
-    def test_all_literal(self):
-        """Test when data only needs literal runs."""
-        pass
+    def test_cycle(self):
+        """Test the decoded data remains the same after encoding/decoding."""
+        ds = dcmread(OB_RLE_1F)
+        pixel_data = defragment_data(ds.PixelData)
+        decoded = _rle_decode_segment(pixel_data[64:])
+        assert ds.Rows * ds.Columns == len(decoded)
+        arr = np.frombuffer(decoded, 'uint8').reshape(ds.Rows, ds.Columns)
+        # Re-encode the decoded data
+        encoded = _rle_encode_segment(arr)
 
-    def test_all_replicate(self):
-        """Test when data only needs replicate runs."""
-        pass
-
-    def test_long_replicate(self):
-        """Test when a run of replicate values is longer than 128 bytes."""
-        pass
-
-    def test_long_literal(self):
-        """Test when a run of literal values is longer than 128 bytes."""
-        pass
+        # Decoded the re-encoded data and check that it's the same
+        redecoded = _rle_decode_segment(encoded)
+        assert ds.Rows * ds.Columns == len(redecoded)
+        assert decoded == redecoded
