@@ -175,7 +175,10 @@
 <span class="sd">or any list of items that must all be the same type.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">MutableSequence</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">collections.abc</span> <span class="k">import</span> <span class="n">MutableSequence</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">MutableSequence</span>
 
 
 <div class="viewcode-block" id="MultiValue"><a class="viewcode-back" href="../../api_ref.html#pydicom.multival.MultiValue">[docs]</a><span class="k">class</span> <span class="nc">MultiValue</span><span class="p">(</span><span class="n">MutableSequence</span><span class="p">):</span>
