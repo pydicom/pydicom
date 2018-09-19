@@ -25,6 +25,7 @@ Changes
   handler's ``is_available`` method.
 * ``DeferredDataElement`` class deprecated and will be removed in v1.3
   (:issue:`291`)
+* The use of numpypy with PyPy is no longer supported, use numpy instead.
 
 
 Enhancements
@@ -54,9 +55,12 @@ Fixes
   (:pull_request:`660`)
 * Improve performance for Python 3 when dealing with compressed multi-frame
   Pixel Data with pillow and jpeg-ls (:issue:`682`).
-* Improve performance of bit unpacking for non-PyPy2 interpreters
-  (:pull_request:`715`)
+* Improve performance of bit unpacking (:pull_request:`715`)
 * First character set no longer removed (:issue:`707`)
 * Fixed RLE decoded data having the wrong byte order (:pull_request:`729`)
 * Fixed RLE decoded data having the wrong planar configuration
   (:pull_request:`729`)
+* Fixed numpy arrays returned by the pixel data handlers sometimes being
+  read-only. Read-only arrays are still available for uncompressed transfer
+  syntaxes via a keyword argument for the numpy pixel data handler.
+  (:issue:`717`)
