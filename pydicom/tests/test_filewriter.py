@@ -2175,6 +2175,9 @@ class TestWritePN(object):
 class TestWriteText(object):
     """Test filewriter.write_PN"""
 
+    def teardown(self):
+        config.enforce_valid_values = False
+
     def test_no_encoding(self):
         """If text element has no encoding info, default is used"""
         fp = DicomBytesIO()
@@ -2277,6 +2280,28 @@ class TestWriteText(object):
             # encode with two invalid encodings
             write_text(fp, elem, encodings=['iso-2022-jp', 'iso_ir_58'])
             assert expected == fp.getvalue()
+
+    def test_invalid_encoding_enforce_standard(self):
+        """Test encoding text with invalid encodings with
+        `config.enforce_valid_values` enabled"""
+        config.enforce_valid_values = True
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        # data element with decoded value
+        elem = DataElement(0x00081039, 'LO', u'Dionysios Διονυσιος')
+        msg = (r"'iso2022_jp' codec can't encode character u?'\\u03c2' in "
+               r"position 18: illegal multibyte sequence")
+        with pytest.raises(UnicodeEncodeError, match=msg):
+            # encode with one invalid encoding
+            write_text(fp, elem, encodings=['iso-2022-jp'])
+
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        # data element with decoded value
+        elem = DataElement(0x00081039, 'LO', u'Dionysios Διονυσιος')
+        with pytest.raises(UnicodeEncodeError, match=msg):
+            # encode with two invalid encodings
+            write_text(fp, elem, encodings=['iso-2022-jp', 'iso_ir_58'])
 
     def test_single_value_with_delimiters(self):
         """Test that text with delimiters encodes correctly"""

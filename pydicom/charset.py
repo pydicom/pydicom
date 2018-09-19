@@ -3,7 +3,7 @@
 import re
 import warnings
 
-from pydicom import compat
+from pydicom import compat, config
 from pydicom.valuerep import PersonNameUnicode, text_VRs, TEXT_VR_DELIMS
 from pydicom.compat import in_py2
 
@@ -110,13 +110,24 @@ def decode_string(value, encodings, delimiters):
     Returns
     -------
     text type
-        The decoded string.
+        The decoded unicode string. If the value could not be decoded,
+        and `config.enforce_valid_values` is not set, a warning is issued,
+        and the value is decoded using the first encoding with replacement
+        characters, resulting in data loss.
+
+    Raises
+    ------
+    UnicodeDecodeError
+        If `config.enforce_valid_values` is set and `value` could not be
+        decoded with the given encodings.
     """
     # shortcut for the common case - no escape sequences present
     if ESC not in value:
         try:
             return value.decode(encodings[0])
         except UnicodeError:
+            if config.enforce_valid_values:
+                raise
             warnings.warn(u"Failed to decode byte string with encoding {} - "
                           u"using replacement characters in decoded "
                           u"string".format(encodings[0]))
@@ -163,8 +174,15 @@ def _decode_fragment(byte_str, encodings, delimiters):
     -------
     text type
         The decoded unicode string. If the value could not be decoded,
-        a warning is issued, and the value is decoded using the first
-        encoding with replacement characters, resulting in data loss.
+        and `config.enforce_valid_values` is not set, a warning is issued,
+        and the value is decoded using the first encoding with replacement
+        characters, resulting in data loss.
+
+    Raises
+    ------
+    UnicodeDecodeError
+        If `config.enforce_valid_values` is set and `value` could not be
+        decoded with the given encodings.
 
     Reference
     ---------
@@ -177,6 +195,8 @@ def _decode_fragment(byte_str, encodings, delimiters):
         # no escape sequence - use first encoding
         return byte_str.decode(encodings[0])
     except UnicodeError:
+        if config.enforce_valid_values:
+            raise
         warnings.warn(u"Failed to decode byte string with encodings: {} - "
                       u"using replacement characters in decoded "
                       u"string".format(', '.join(encodings)))
@@ -214,8 +234,10 @@ def _decode_escaped_fragment(byte_str, encodings, delimiters):
             return byte_str.decode(encoding)
 
     # unknown escape code - use first encoding
-    warnings.warn(u"Found unknown escape sequence in encoded string value - "
-                  u"using encoding {}".format(encodings[0]))
+    msg = u"Found unknown escape sequence in encoded string value"
+    if config.enforce_valid_values:
+        raise ValueError(msg)
+    warnings.warn(msg + u" - using encoding {}".format(encodings[0]))
     return byte_str.decode(encodings[0], errors='replace')
 
 
@@ -235,9 +257,15 @@ def encode_string(value, encodings):
     -------
     byte string
         The encoded string. If the value could not be encoded with any of
-        the given encodings, a warning is issued, and the value is
-        encoded using the first encoding with replacement characters,
-        resulting in data loss.
+        the given encodings, and `config.enforce_valid_values` is not set, a
+        warning is issued, and the value is encoded using the first
+        encoding with replacement characters, resulting in data loss.
+
+    Raises
+    ------
+    UnicodeEncodeError
+        If `config.enforce_valid_values` is set and `value` could not be
+        encoded with the given encodings.
     """
     for i, encoding in enumerate(encodings):
         try:
@@ -255,7 +283,12 @@ def encode_string(value, encodings):
                 return _encode_string_parts(value, encodings)
             except ValueError:
                 pass
-        # all attempts failed - warn and encode with replacement characters
+        # all attempts failed - raise or warn and encode with replacement
+        # characters
+        if config.enforce_valid_values:
+            # force raising a valid UnicodeEncodeError
+            value.encode(encodings[0])
+
         warnings.warn("Failed to encode value with encodings: {} - using "
                       "replacement characters in encoded string"
                       .format(', '.join(encodings)))

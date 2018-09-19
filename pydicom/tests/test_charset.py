@@ -5,7 +5,7 @@
 import pytest
 
 import pydicom.charset
-from pydicom import dcmread
+from pydicom import dcmread, config
 from pydicom.data import get_charset_files, get_testdata_files
 from pydicom.dataelem import DataElement
 from pydicom.filebase import DicomBytesIO
@@ -61,6 +61,9 @@ ENCODED_NAMES = [
 
 
 class TestCharset(object):
+    def teardown(self):
+        config.enforce_valid_values = False
+
     def test_encodings(self):
         test_string = u'Hello World'
         for x in pydicom.charset.python_encoding.items():
@@ -128,6 +131,17 @@ class TestCharset(object):
             pydicom.charset.decode(elem, ['ISO_IR 192'])
             assert u'���������' == elem.value
 
+    def test_bad_encoded_single_encoding_enforce_standard(self):
+        """Test handling bad encoding for single encoding if
+        config.enforce_valid_values is set"""
+        config.enforce_valid_values = True
+        elem = DataElement(0x00100010, 'PN',
+                           b'\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2')
+        msg = ("'utf.?8' codec can't decode byte 0xc4 in position 0: "
+               "invalid continuation byte")
+        with pytest.raises(UnicodeDecodeError, match=msg):
+            pydicom.charset.decode(elem, ['ISO_IR 192'])
+
     def test_code_extensions_not_allowed(self):
         """Test that UTF8 does not allow code extensions"""
         elem = DataElement(0x00100010, 'PN', b'Buc^J\xc3\xa9r\xc3\xb4me')
@@ -157,7 +171,7 @@ class TestCharset(object):
         encodings = ['ISO IR 199', 'ISO_IR 100']
         assert encodings == pydicom.charset.convert_encodings(encodings)
 
-    def test_bad_encoded_multi_byte_encoding(self):
+    def test_bad_decoded_multi_byte_encoding(self):
         """Test handling bad encoding for single encoding"""
         elem = DataElement(0x00100010, 'PN',
                            b'\x1b$(D\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2')
@@ -166,6 +180,17 @@ class TestCharset(object):
                                              'with encodings: iso-2022-jp'):
             pydicom.charset.decode(elem, ['ISO 2022 IR 159'])
             assert u'����������' == elem.value
+
+    def test_bad_decoded_multi_byte_encoding_enforce_standard(self):
+        """Test handling bad encoding for single encoding if
+        `config.enforce_valid_values` is set"""
+        config.enforce_valid_values = True
+        elem = DataElement(0x00100010, 'PN',
+                           b'\x1b$(D\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2')
+        msg = ("'iso2022_jp' codec can't decode bytes in position 0-3: "
+               "illegal multibyte sequence")
+        with pytest.raises(UnicodeDecodeError, match=msg):
+            pydicom.charset.decode(elem, ['ISO 2022 IR 159'])
 
     def test_unknown_escape_sequence(self):
         """Test handling bad encoding for single encoding"""
@@ -176,6 +201,16 @@ class TestCharset(object):
                                              'in encoded string value'):
             pydicom.charset.decode(elem, ['ISO_IR 100'])
             assert u'\x1b-FÄéïíõóéïò' == elem.value
+
+    def test_unknown_escape_sequence_enforce_standard(self):
+        """Test handling bad encoding for single encoding if
+        `config.enforce_valid_values` is set"""
+        config.enforce_valid_values = True
+        elem = DataElement(0x00100010, 'PN',
+                           b'\x1b\x2d\x46\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2')
+        with pytest.raises(ValueError, match='Found unknown escape sequence '
+                                             'in encoded string value'):
+            pydicom.charset.decode(elem, ['ISO_IR 100'])
 
     def test_patched_charset(self):
         """Test some commonly misspelled charset values"""
