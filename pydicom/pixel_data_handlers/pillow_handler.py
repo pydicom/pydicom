@@ -188,12 +188,12 @@ def get_pixeldata(dicom_dataset):
                 UncompressedPixelData.extend(decompressed_image.tobytes())
         else:
             # single compressed frame
-            UncompressedPixelData = pydicom.encaps.defragment_data(
+            pixel_data = pydicom.encaps.defragment_data(
                 dicom_dataset.PixelData)
-            UncompressedPixelData = generic_jpeg_file_header + \
-                UncompressedPixelData[frame_start_from:]
+            pixel_data = generic_jpeg_file_header + \
+                pixel_data[frame_start_from:]
             try:
-                fio = io.BytesIO(UncompressedPixelData)
+                fio = io.BytesIO(pixel_data)
                 decompressed_image = Image.open(fio)
             except IOError as e:
                 raise NotImplementedError(e.strerror)
