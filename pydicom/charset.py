@@ -55,6 +55,7 @@ python_encoding = {
 }
 
 # these encodings cannot be used with code extensions
+# see PS3.5, Section 6.1.2.5.4, item d
 STAND_ALONE_ENCODINGS = ('ISO_IR 192', 'GBK', 'GB18030')
 
 # the escape character used to mark the start of escape sequences
@@ -323,7 +324,7 @@ def _encode_string_parts(value, encodings):
         If `value` could not be encoded with the given encodings.
 
     """
-    encoded = b''
+    encoded = bytearray()
     unencoded_part = value
     while unencoded_part:
         # find the encoding that can encode the longest part of the rest
