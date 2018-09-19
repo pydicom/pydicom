@@ -46,7 +46,6 @@ def is_available():
     return HAVE_NP and HAVE_GDCM
 
 
-
 def needs_to_convert_to_RGB(dicom_dataset):
     should_convert = (dicom_dataset.file_meta.TransferSyntaxUID in
                       should_convert_these_syntaxes_to_RGB)
@@ -174,6 +173,7 @@ def get_pixeldata(dicom_dataset):
         n_bytes *= dicom_dataset.SamplesPerPixel
     except Exception:
         pass
+
     if len(pixel_bytearray) > n_bytes:
         # We make sure that all the bytes after are in fact zeros
         padding = pixel_bytearray[n_bytes:]
@@ -183,7 +183,9 @@ def get_pixeldata(dicom_dataset):
             # We revert to the old behavior which should then result
             #   in a Numpy error later on.
             pass
+
     pixel_array = numpy.frombuffer(pixel_bytearray, dtype=numpy_dtype)
+
     length_of_pixel_array = pixel_array.nbytes
     expected_length = dicom_dataset.Rows * dicom_dataset.Columns
 
@@ -192,10 +194,13 @@ def get_pixeldata(dicom_dataset):
 
     if dicom_dataset.BitsAllocated > 8:
         expected_length *= (dicom_dataset.BitsAllocated // 8)
+
     if length_of_pixel_array != expected_length:
         raise AttributeError("Amount of pixel data %d does "
                              "not match the expected data %d" %
                              (length_of_pixel_array, expected_length))
+
     if should_change_PhotometricInterpretation_to_RGB(dicom_dataset):
         dicom_dataset.PhotometricInterpretation = "RGB"
-    return pixel_array
+
+    return pixel_array.copy()

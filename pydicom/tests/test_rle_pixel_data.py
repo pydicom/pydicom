@@ -397,6 +397,8 @@ class TestNumpy_RLEHandler(object):
         ref = _get_pixel_array(OB_EXPL_LITTLE_1F)
         arr = ds.pixel_array
 
+        assert arr.flags.writeable
+
         assert np.array_equal(arr, ref)
         assert (600, 800) == arr.shape
         assert 244 == arr[0].min() == arr[0].max()
@@ -412,6 +414,8 @@ class TestNumpy_RLEHandler(object):
         assert ds.NumberOfFrames == 2
         ref = _get_pixel_array(OB_EXPL_LITTLE_2F)
         arr = ds.pixel_array
+
+        assert arr.flags.writeable
 
         assert np.array_equal(arr, ref)
         assert (2, 600, 800) == arr.shape
@@ -431,6 +435,8 @@ class TestNumpy_RLEHandler(object):
         assert 'NumberOfFrames' not in ds
         ref = _get_pixel_array(SC_EXPL_LITTLE_1F)
         arr = ds.pixel_array
+
+        assert arr.flags.writeable
 
         assert np.array_equal(arr, ref)
         assert (255, 0, 0) == tuple(arr[5, 50, :])
@@ -453,6 +459,8 @@ class TestNumpy_RLEHandler(object):
         assert ds.NumberOfFrames == 2
         ref = _get_pixel_array(SC_EXPL_LITTLE_2F)
         arr = ds.pixel_array
+
+        assert arr.flags.writeable
 
         assert np.array_equal(arr, ref)
 
@@ -483,6 +491,8 @@ class TestNumpy_RLEHandler(object):
         ref = _get_pixel_array(MR_EXPL_LITTLE_1F)
         arr = ds.pixel_array
 
+        assert arr.flags.writeable
+
         assert np.array_equal(arr, ref)
         assert (64, 64) == arr.shape
 
@@ -499,6 +509,8 @@ class TestNumpy_RLEHandler(object):
         assert ds.NumberOfFrames == 10
         ref = _get_pixel_array(EMRI_EXPL_LITTLE_10F)
         arr = ds.pixel_array
+
+        assert arr.flags.writeable
 
         assert np.array_equal(arr, ref)
         assert (10, 64, 64) == arr.shape
@@ -528,6 +540,8 @@ class TestNumpy_RLEHandler(object):
         arr = ds.pixel_array
         ref = _get_pixel_array(SC_EXPL_LITTLE_16_1F)
 
+        assert arr.flags.writeable
+
         assert np.array_equal(ds.pixel_array, ref)
 
         assert (65535, 0, 0) == tuple(arr[5, 50, :])
@@ -550,6 +564,8 @@ class TestNumpy_RLEHandler(object):
         assert ds.NumberOfFrames == 2
         arr = ds.pixel_array
         ref = _get_pixel_array(SC_EXPL_LITTLE_16_2F)
+
+        assert arr.flags.writeable
 
         assert np.array_equal(ds.pixel_array, ref)
 
@@ -579,6 +595,8 @@ class TestNumpy_RLEHandler(object):
         ref = _get_pixel_array(RTDOSE_EXPL_LITTLE_1F)
         arr = ds.pixel_array
 
+        assert arr.flags.writeable
+
         assert np.array_equal(arr, ref)
         assert (10, 10) == arr.shape
         assert (1249000, 1249000, 1250000) == tuple(arr[0, :3])
@@ -594,6 +612,8 @@ class TestNumpy_RLEHandler(object):
         assert ds.NumberOfFrames == 15
         ref = _get_pixel_array(RTDOSE_EXPL_LITTLE_15F)
         arr = ds.pixel_array
+
+        assert arr.flags.writeable
 
         assert np.array_equal(arr, ref)
         assert (15, 10, 10) == arr.shape
@@ -623,6 +643,8 @@ class TestNumpy_RLEHandler(object):
         arr = ds.pixel_array
         ref = _get_pixel_array(SC_EXPL_LITTLE_32_1F)
 
+        assert arr.flags.writeable
+
         assert np.array_equal(ds.pixel_array, ref)
 
         assert (4294967295, 0, 0) == tuple(arr[5, 50, :])
@@ -645,6 +667,8 @@ class TestNumpy_RLEHandler(object):
         assert ds.NumberOfFrames == 2
         arr = ds.pixel_array
         ref = _get_pixel_array(SC_EXPL_LITTLE_32_2F)
+
+        assert arr.flags.writeable
 
         assert np.array_equal(ds.pixel_array, ref)
 

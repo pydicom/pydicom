@@ -137,7 +137,7 @@ def get_pixeldata(dicom_dataset):
             dicom_dataset.PixelData)
         decompressed_image = jpeg_ls.decode(
             numpy.frombuffer(CompressedPixelData, dtype=numpy.uint8))
-        UncompressedPixelData = decompressed_image.tobytes()
+        UncompressedPixelData.extend(decompressed_image.tobytes())
 
     pixel_array = numpy.frombuffer(UncompressedPixelData, numpy_format)
     if should_change_PhotometricInterpretation_to_RGB(dicom_dataset):

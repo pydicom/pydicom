@@ -307,11 +307,15 @@ class Test_JPEG2000Tests_with_pillow(object):
         b = self.mr_small.pixel_array
         assert np.array_equal(a, b)
 
+        assert a.flags.writeable
+
     def test_emri_JPEG2000PixelArray(self):
         """Test decoding JPEG2K with pillow handler succeeds."""
         a = self.emri_jpeg_2k_lossless.pixel_array
         b = self.emri_small.pixel_array
         assert np.array_equal(a, b)
+
+        assert a.flags.writeable
 
     def test_jpeg2000_lossy(self):
         """Test decoding JPEG2K lossy with pillow handler fails."""
@@ -358,6 +362,9 @@ class Test_JPEGlossyTests_with_pillow(object):
         assert "YBR_FULL_422" == self.color_3d_jpeg.PhotometricInterpretation
 
         a = self.color_3d_jpeg.pixel_array
+
+        assert a.flags.writeable
+
         assert (120, 480, 640, 3) == a.shape
         # this test points were manually identified in Osirix viewer
         assert (41, 41, 41) == tuple(a[3, 159, 290, :])
@@ -552,6 +559,8 @@ def test_PI_RGB(test_with_pillow,
     assert t.PhotometricInterpretation == PhotometricInterpretation
     a = t.pixel_array
     assert a.shape == (100, 100, 3)
+
+    assert a.flags.writeable
     """
     This complete test never gave a different result than
     just the 10 point test below
