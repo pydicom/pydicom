@@ -36,21 +36,36 @@ elements have values given in the table below.
 from itertools import groupby
 from struct import pack, unpack
 
-import numpy as np
+try:
+    import numpy as np
+    HAVE_RLE = True
+except ImportError:
+    HAVE_RLE = False
 
 from pydicom.encaps import decode_data_sequence, defragment_data
 from pydicom.pixel_data_handlers.util import pixel_dtype
-from pydicom.uid import RLELossless
+import pydicom.uid
 
+
+HANDLER_NAME = 'RLE Lossless'
+
+DEPENDENCIES = {
+    'numpy': ('http://www.numpy.org/', 'NumPy'),
+}
 
 SUPPORTED_TRANSFER_SYNTAXES = [
-    RLELossless
+    pydicom.uid.RLELossless
 ]
 
 
-def supports_transfer_syntax(ds):
-    """Return True if the handler supports the transfer syntax used in `ds`."""
-    return ds.file_meta.TransferSyntaxUID in SUPPORTED_TRANSFER_SYNTAXES
+def is_available():
+    """Return True if the handler has its dependencies met."""
+    return HAVE_RLE
+
+
+def supports_transfer_syntax(transfer_syntax):
+    """Return True if the handler supports the `transfer_syntax`."""
+    return transfer_syntax in SUPPORTED_TRANSFER_SYNTAXES
 
 
 def needs_to_convert_to_RGB(ds):

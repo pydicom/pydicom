@@ -27,6 +27,19 @@ extra_length_VRs = ('OB', 'OD', 'OF', 'OL', 'OW', 'SQ', 'UC', 'UN', 'UR', 'UT')
 # and PN, but it is handled separately.
 text_VRs = ('SH', 'LO', 'ST', 'LT', 'UC', 'UT')
 
+# Delimiters for text strings and person name that reset the encoding.
+# See PS3.5, Section 6.1.2.5.3
+# Note: We use characters for Python 2 and character codes for Python 3
+# because these are the types yielded if iterating over a byte string.
+
+# Characters/Character codes for text VR delimiters: LF, CR, TAB, FF
+TEXT_VR_DELIMS = ({'\n', '\r', '\t', '\f'} if compat.in_py2
+                  else {0x0d, 0x0a, 0x09, 0x0c})
+
+# Character/Character code for PN delimiter: name part separator '^'
+# (the component separator '=' is handled separately)
+PN_DELIMS = {'^'} if compat.in_py2 else {0xe5}
+
 match_string = b''.join([
     b'(?P<single_byte>', br'(?P<family_name>[^=\^]*)',
     br'\^?(?P<given_name>[^=\^]*)', br'\^?(?P<middle_name>[^=\^]*)',
@@ -542,7 +555,7 @@ def _decode_personname(components, encodings):
     if isinstance(components[0], compat.text_type):
         comps = components
     else:
-        comps = [decode_string(comp, encodings)
+        comps = [decode_string(comp, encodings, PN_DELIMS)
                  for comp in components]
     # Remove empty elements from the end to avoid trailing '='
     while len(comps) and not comps[-1]:

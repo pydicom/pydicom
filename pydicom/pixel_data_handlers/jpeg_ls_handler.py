@@ -1,31 +1,41 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """
-Use the jpeg_ls (CharPyLS) python package
-to decode pixel transfer syntaxes.
+Use the jpeg_ls (CharPyLS) python package to decode pixel transfer syntaxes.
 """
 
-import pydicom
-import pydicom.uid
-from pydicom.pixel_data_handlers.util import dtype_corrected_for_endianness
-
-have_numpy = True
 try:
     import numpy
+    HAVE_NP = True
 except ImportError:
-    have_numpy = False
-    raise
+    HAVE_NP = False
 
-have_jpeg_ls = True
 try:
     import jpeg_ls
+    HAVE_JPEGLS = True
 except ImportError:
-    have_jpeg_ls = False
-    raise
+    HAVE_JPEGLS = False
 
-JPEGLSSupportedTransferSyntaxes = [
+import pydicom
+from pydicom.pixel_data_handlers.util import dtype_corrected_for_endianness
+import pydicom.uid
+
+
+HANDLER_NAME = 'JPEG-LS'
+
+DEPENDENCIES = {
+    'numpy': ('http://www.numpy.org/', 'NumPy'),
+    'jpeg_ls': ('https://github.com/Who8MyLunch/CharPyLS', 'CharPyLS'),
+}
+
+SUPPORTED_TRANSFER_SYNTAXES = [
     pydicom.uid.JPEGLSLossless,
     pydicom.uid.JPEGLSLossy,
 ]
+
+
+def is_available():
+    """Return True if the handler has its dependencies met."""
+    return HAVE_NP and HAVE_JPEGLS
 
 
 def needs_to_convert_to_RGB(dicom_dataset):
@@ -37,7 +47,7 @@ def should_change_PhotometricInterpretation_to_RGB(dicom_dataset):
     return False
 
 
-def supports_transfer_syntax(dicom_dataset):
+def supports_transfer_syntax(transfer_syntax):
     """
     Returns
     -------
@@ -47,8 +57,7 @@ def supports_transfer_syntax(dicom_dataset):
         False to prevent any attempt to try to use this handler
         to decode the given transfer syntax
     """
-    return (dicom_dataset.file_meta.TransferSyntaxUID
-            in JPEGLSSupportedTransferSyntaxes)
+    return transfer_syntax in SUPPORTED_TRANSFER_SYNTAXES
 
 
 def get_pixeldata(dicom_dataset):
@@ -74,13 +83,13 @@ def get_pixeldata(dicom_dataset):
         if the pixel data type is unsupported
     """
     if (dicom_dataset.file_meta.TransferSyntaxUID
-            not in JPEGLSSupportedTransferSyntaxes):
+            not in SUPPORTED_TRANSFER_SYNTAXES):
         msg = ("The jpeg_ls does not support "
                "this transfer syntax {0}.".format(
                    dicom_dataset.file_meta.TransferSyntaxUID.name))
         raise NotImplementedError(msg)
 
-    if not have_jpeg_ls:
+    if not HAVE_JPEGLS:
         msg = ("The jpeg_ls package is required to use pixel_array "
                "for this transfer syntax {0}, and jpeg_ls could not "
                "be imported.".format(

@@ -2,26 +2,49 @@
 """Use the gdcm python package to decode pixel transfer syntaxes."""
 
 import sys
-from pydicom import compat
-import pydicom
-have_numpy = True
+
 try:
     import numpy
+    HAVE_NP = True
 except ImportError:
-    have_numpy = False
-    raise
+    HAVE_NP = False
 
-have_gdcm = True
 try:
     import gdcm
+    HAVE_GDCM = True
 except ImportError:
-    have_gdcm = False
-    raise
-can_use_gdcm = have_gdcm and have_numpy
+    HAVE_GDCM = False
 
+import pydicom
+from pydicom import compat
+
+
+HANDLER_NAME = 'GDCM'
+
+DEPENDENCIES = {
+    'numpy': ('http://www.numpy.org/', 'NumPy'),
+    'gdcm': ('http://gdcm.sourceforge.net/wiki/index.php/Main_Page', 'GDCM'),
+}
+
+SUPPORTED_TRANSFER_SYNTAXES = [
+    pydicom.uid.JPEGBaseline,
+    pydicom.uid.JPEGExtended,
+    pydicom.uid.JPEGLosslessP14,
+    pydicom.uid.JPEGLossless,
+    pydicom.uid.JPEGLSLossless,
+    pydicom.uid.JPEGLSLossy,
+    pydicom.uid.JPEG2000Lossless,
+    pydicom.uid.JPEG2000,
+]
 
 should_convert_these_syntaxes_to_RGB = [
     pydicom.uid.JPEGBaseline, ]
+
+
+def is_available():
+    """Return True if the handler has its dependencies met."""
+    return HAVE_NP and HAVE_GDCM
+
 
 
 def needs_to_convert_to_RGB(dicom_dataset):
@@ -38,7 +61,7 @@ def should_change_PhotometricInterpretation_to_RGB(dicom_dataset):
     return False
 
 
-def supports_transfer_syntax(dicom_dataset):
+def supports_transfer_syntax(transfer_syntax):
     """
     Returns
     -------
@@ -48,7 +71,7 @@ def supports_transfer_syntax(dicom_dataset):
         False to prevent any attempt to try to use this handler
         to decode the given transfer syntax
     """
-    return True
+    return transfer_syntax in SUPPORTED_TRANSFER_SYNTAXES
 
 
 def get_pixeldata(dicom_dataset):
@@ -79,7 +102,7 @@ def get_pixeldata(dicom_dataset):
     # FIXME this should just use dicom_dataset.PixelData
     # instead of dicom_dataset.filename
     #       but it is unclear how this should be achieved using GDCM
-    if not can_use_gdcm:
+    if not HAVE_GDCM:
         msg = ("GDCM requires both the gdcm package and numpy "
                "and one or more could not be imported")
         raise ImportError(msg)

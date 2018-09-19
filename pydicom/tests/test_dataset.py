@@ -1018,16 +1018,29 @@ class DatasetTests(unittest.TestCase):
         """Test that we try to get new pixel data if the id has changed."""
         fpath = get_testdata_files("CT_small.dcm")[0]
         ds = dcmread(fpath)
+        ds.file_meta.TransferSyntaxUID = '1.2.3.4'
         ds._pixel_id = 1234
         assert ds._pixel_id != id(ds.PixelData)
         ds._pixel_array = 'Test Value'
         # If _pixel_id doesn't match then attempt to get new pixel data
-        orig_handlers = pydicom.config.image_handlers
-        pydicom.config.image_handlers = []
+        orig_handlers = pydicom.config.pixel_data_handlers
+        pydicom.config.pixel_data_handlers = []
         with pytest.raises(NotImplementedError):
             ds.convert_pixel_data()
 
-        pydicom.config.image_handlers = orig_handlers
+        pydicom.config.pixel_data_handlers = orig_handlers
+
+    def test_pixel_array_unknown_syntax(self):
+        """Test that pixel_array for an unknown syntax raises exception."""
+        ds = dcmread(get_testdata_files("CT_small.dcm")[0])
+        ds.file_meta.TransferSyntaxUID = '1.2.3.4'
+        msg = (
+            r"Unable to decode pixel data with a transfer syntax UID of "
+            r"'1.2.3.4' \(1.2.3.4\) as there are no pixel data handlers "
+            r"available that support it"
+        )
+        with pytest.raises(NotImplementedError, match=msg):
+            ds.pixel_array
 
     def test_formatted_lines(self):
         """Test Dataset.formatted_lines"""

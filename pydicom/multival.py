@@ -3,7 +3,10 @@
 or any list of items that must all be the same type.
 """
 
-from collections import MutableSequence
+try:
+    from collections.abc import MutableSequence
+except ImportError:
+    from collections import MutableSequence
 
 
 class MultiValue(MutableSequence):

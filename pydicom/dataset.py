@@ -40,6 +40,11 @@ from pydicom.tag import Tag, BaseTag, tag_in_exception
 from pydicom.uid import (ExplicitVRLittleEndian, ImplicitVRLittleEndian,
                          ExplicitVRBigEndian, PYDICOM_IMPLEMENTATION_UID)
 
+if compat.in_py2:
+    from pkgutil import find_loader as have_package
+else:
+    from importlib.util import find_spec as have_package
+
 have_numpy = True
 try:
     import numpy
@@ -759,24 +764,52 @@ class Dataset(dict):
         if already_have:
             return
 
-        # Find all pixel data handlers that support the transfer syntax
-        suitable_handlers = [hh for hh in pydicom.config.image_handlers
-                             if hh and hh.supports_transfer_syntax(self)]
+        # Find all possible handlers that support the transfer syntax
+        transfer_syntax = self.file_meta.TransferSyntaxUID
+        possible_handlers = [hh for hh in pydicom.config.pixel_data_handlers
+                             if hh.supports_transfer_syntax(transfer_syntax)]
 
-        # No suitable handlers are available
-        if not suitable_handlers:
+        # No handlers support the transfer syntax
+        if not possible_handlers:
             raise NotImplementedError(
                 "Unable to decode pixel data with a transfer syntax UID of "
-                "'{0}' ({1}) as there are no suitable pixel data handlers "
-                "available. Please see the list of supported Transfer "
-                "Syntaxes in the pydicom documentation for information on "
-                "which additional packages might be required"
+                "'{0}' ({1}) as there are no pixel data handlers "
+                "available that support it. Please see the pydicom "
+                "documentation for information on supported transfer syntaxes "
                 .format(self.file_meta.TransferSyntaxUID,
                         self.file_meta.TransferSyntaxUID.name)
             )
 
+        # Handlers that both support the transfer syntax and have their
+        #   dependencies met
+        available_handlers = [hh for hh in possible_handlers if
+                              hh.is_available()]
+
+        # There are handlers that support the transfer syntax but none of them
+        #   can be used as missing dependencies
+        if not available_handlers:
+            # For each of the possible handlers we want to find which
+            #   dependencies are missing
+            msg = (
+                "The following handlers are available to decode the pixel "
+                "data however they are missing required dependencies: "
+            )
+            pkg_msg = []
+            for hh in possible_handlers:
+                hh_deps = hh.DEPENDENCIES
+                # Missing packages
+                missing = [dd for dd in hh_deps if have_package(dd) is None]
+                # Package names
+                names = [hh_deps[name][1] for name in missing]
+                pkg_msg.append(
+                    "{} (req. {})"
+                    .format(hh.HANDLER_NAME, ', '.join(names))
+                )
+
+            raise RuntimeError(msg + ', '.join(pkg_msg))
+
         last_exception = None
-        for handler in suitable_handlers:
+        for handler in available_handlers:
             try:
                 # Use the handler to get a 1D numpy array of the pixel data
                 arr = handler.get_pixeldata(self)
@@ -786,8 +819,8 @@ class Dataset(dict):
                 #   convert the color space from YCbCr to RGB
                 if handler.needs_to_convert_to_RGB(self):
                     self._pixel_array = convert_color_space(self._pixel_array,
-                                                             'YBR_FULL',
-                                                             'RGB')
+                                                            'YBR_FULL',
+                                                            'RGB')
 
                 self._pixel_id = id(self.PixelData)
 
@@ -808,7 +841,7 @@ class Dataset(dict):
             "Please see the list of supported Transfer Syntaxes in the "
             "pydicom documentation for alternative packages that might "
             "be able to decode the data"
-            .format(", ".join([str(hh) for hh in suitable_handlers]))
+            .format(", ".join([str(hh) for hh in available_handlers]))
         )
 
         raise last_exception

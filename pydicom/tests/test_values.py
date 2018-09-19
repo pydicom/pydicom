@@ -45,14 +45,17 @@ class TestConvertAE(object):
         bytestring = b'  AE_TITLE '
         assert u'AE_TITLE' == convert_AE_string(bytestring, True)
 
+
 class TestConvertText(object):
     def test_single_value(self):
+        """Test that encoding can change inside a text string"""
         bytestring = (b'Dionysios is \x1b\x2d\x46'
                       b'\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2')
         encodings = ('latin_1', 'iso_ir_126')
         assert u'Dionysios is Διονυσιος' == convert_text(bytestring, encodings)
 
     def test_multi_value(self):
+        """Test that backslash is handled as value separator"""
         bytestring = (b'Buc^J\xe9r\xf4me\\\x1b\x2d\x46'
                       b'\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2\\'
                       b'\x1b\x2d\x4C'
@@ -62,6 +65,7 @@ class TestConvertText(object):
             bytestring, encodings)
 
     def test_single_value_with_backslash(self):
+        """Test that backslash is handled as character"""
         bytestring = (b'Buc^J\xe9r\xf4me\\\x1b\x2d\x46'
                       b'\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2\\'
                       b'\x1b\x2d\x4C'
@@ -69,6 +73,18 @@ class TestConvertText(object):
         encodings = ('latin_1', 'iso_ir_144', 'iso_ir_126')
         assert u'Buc^Jérôme\\Διονυσιος\\Люкceмбypг' == convert_single_string(
             bytestring, encodings)
+
+    def test_single_value_with_delimiters(self):
+        """Test that delimiters reset the encoding"""
+        bytestring = (b'\x1b\x2d\x46'
+                      b'\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2'
+                      b'\r\nJ\xe9r\xf4me/'
+                      b'\x1b\x2d\x4C'
+                      b'\xbb\xee\xda\x63\x65\xdc\xd1\x79\x70\xd3'
+                      b'\tJ\xe9r\xf4me')
+        encodings = ('latin_1', 'iso_ir_144', 'iso_ir_126')
+        expected = u'Διονυσιος\r\nJérôme/Люкceмбypг\tJérôme'
+        assert expected == convert_single_string(bytestring, encodings)
 
 
 class TestConvertAT(object):
