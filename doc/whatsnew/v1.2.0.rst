@@ -62,5 +62,5 @@ Fixes
   (:pull_request:`729`)
 * Fixed numpy arrays returned by the pixel data handlers sometimes being
   read-only. Read-only arrays are still available for uncompressed transfer
-  syntaxes via a keyword argument for the numpy pixel data handler.
-  (:issue:`717`)
+  syntaxes via a keyword argument for the numpy pixel data handler and should
+  help reduce memory consumption if required. (:issue:`717`)
