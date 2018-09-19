@@ -322,11 +322,5 @@ def get_pixeldata(ds, read_only=False):
 
     if not read_only and ds.BitsAllocated > 1:
         return arr.copy()
-    elif read_only and ds.BitsAllocated == 1:
-        warnings.warn(
-            "'read_only=True' is not compatible with bit-packed pixel data, "
-            "a writeable array will be returned instead",
-            UserWarning
-        )
 
     return arr

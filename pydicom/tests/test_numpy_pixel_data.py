@@ -1003,9 +1003,8 @@ class TestNumpy_GetPixelData(object):
         arr = get_pixeldata(ds, read_only=False)
         assert arr.flags.writeable
 
-        with pytest.warns(UserWarning, match=r"compatible with bit-packed"):
-            arr = get_pixeldata(ds, read_only=True)
-            assert arr.flags.writeable
+        arr = get_pixeldata(ds, read_only=True)
+        assert arr.flags.writeable
 
 
 REFERENCE_PACK_UNPACK = [

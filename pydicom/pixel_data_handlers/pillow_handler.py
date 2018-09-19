@@ -197,19 +197,23 @@ def get_pixeldata(dicom_dataset):
                 decompressed_image = Image.open(fio)
             except IOError as e:
                 raise NotImplementedError(e.strerror)
-            UncompressedPixelData = decompressed_image.tobytes()
+            UncompressedPixelData.extend(decompressed_image.tobytes())
     except Exception:
         raise
+
     logger.debug(
-        "Successfully read %s pixel bytes",
-        len(UncompressedPixelData))
-    pixel_array = numpy.copy(
-        numpy.frombuffer(UncompressedPixelData, numpy_format))
+        "Successfully read %s pixel bytes", len(UncompressedPixelData)
+    )
+
+    pixel_array = numpy.frombuffer(UncompressedPixelData, numpy_format)
+
     if (transfer_syntax in
             PillowJPEG2000TransferSyntaxes and
             dicom_dataset.BitsStored == 16):
         # WHY IS THIS EVEN NECESSARY??
         pixel_array &= 0x7FFF
+
     if should_change_PhotometricInterpretation_to_RGB(dicom_dataset):
         dicom_dataset.PhotometricInterpretation = "RGB"
+
     return pixel_array
