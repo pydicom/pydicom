@@ -196,6 +196,7 @@ if a handler is available for use (it has its dependency met) then use the
 handler’s <code class="docutils literal notranslate"><span class="pre">is_available</span></code> method.</li>
 <li><code class="docutils literal notranslate"><span class="pre">DeferredDataElement</span></code> class deprecated and will be removed in v1.3
 (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/291">#291</a>)</li>
+<li>The use of numpypy with PyPy is no longer supported, use numpy instead.</li>
 </ul>
 </div>
 <div class="section" id="enhancements">
@@ -225,12 +226,15 @@ SamplesPerPixel &gt; 1 (<a class="reference external" href="https://github.com/p
 (<a href="#id9"><span class="problematic" id="id10">:pull_request:`660`</span></a>)</li>
 <li>Improve performance for Python 3 when dealing with compressed multi-frame
 Pixel Data with pillow and jpeg-ls (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/682">#682</a>).</li>
-<li>Improve performance of bit unpacking for non-PyPy2 interpreters
-(<a href="#id11"><span class="problematic" id="id12">:pull_request:`715`</span></a>)</li>
+<li>Improve performance of bit unpacking (<a href="#id11"><span class="problematic" id="id12">:pull_request:`715`</span></a>)</li>
 <li>First character set no longer removed (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/707">#707</a>)</li>
 <li>Fixed RLE decoded data having the wrong byte order (<a href="#id13"><span class="problematic" id="id14">:pull_request:`729`</span></a>)</li>
 <li>Fixed RLE decoded data having the wrong planar configuration
 (<a href="#id15"><span class="problematic" id="id16">:pull_request:`729`</span></a>)</li>
+<li>Fixed numpy arrays returned by the pixel data handlers sometimes being
+read-only. Read-only arrays are still available for uncompressed transfer
+syntaxes via a keyword argument for the numpy pixel data handler and should
+help reduce memory consumption if required. (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/717">#717</a>)</li>
 </ul>
 </div>
 </div>
