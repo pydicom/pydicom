@@ -55,7 +55,8 @@ python_encoding = {
 }
 
 # these encodings cannot be used with code extensions
-# see PS3.5, Section 6.1.2.5.4, item d
+# see DICOM Standard, Part 3, Table C.12-5
+# and DICOM Standard, Part 5, Section 6.1.2.5.4, item d
 STAND_ALONE_ENCODINGS = ('ISO_IR 192', 'GBK', 'GB18030')
 
 # the escape character used to mark the start of escape sequences
