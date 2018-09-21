@@ -25,6 +25,7 @@ This example shows how to read DICOM directory.
  .. code-block:: none
 
     Path to the DICOM directory: /home/circleci/project/pydicom/data/test_files/dicomdirtests/DICOMDIR
+    Patient: 77654033: Doe^Archibald
         Study 2: 20010101: XR C Spine Comp Min 4 Views
             Series 1: CR: N/A (1 image)
                 Reading images...
@@ -58,6 +59,7 @@ This example shows how to read DICOM directory.
                 '/home/circleci/project/pydicom/data/test_files/dicomdirtests/77654033/CT2/17196']
                 Patient Names in images..: {'Doe^Archibald', 'Doe^Archibald', 'Doe^Archibald', 'Doe^Archibald'}
                 Patient IDs in images..: {'77654033'}
+    Patient: 98890234: Doe^Peter
         Study 2: 20010101: 
             Series 4: CT: N/A (2 images)
                 Reading images...
@@ -170,9 +172,9 @@ This example shows how to read DICOM directory.
     # go through the patient record and print information
     for patient_record in dicom_dir.patient_records:
         if (hasattr(patient_record, 'PatientID') and
-                hasattr(patient_record, 'PatientsName')):
+                hasattr(patient_record, 'PatientName')):
             print("Patient: {}: {}".format(patient_record.PatientID,
-                                           patient_record.PatientsName))
+                                           patient_record.PatientName))
         studies = patient_record.children
         # got through each serie
         for study in studies:
@@ -220,7 +222,7 @@ This example shows how to read DICOM directory.
                 print(" " * 12 + "Patient IDs in images..: {}".format(
                     patient_IDs))
 
-**Total running time of the script:** ( 0 minutes  0.102 seconds)
+**Total running time of the script:** ( 0 minutes  0.127 seconds)
 
 
 .. _sphx_glr_download_auto_examples_input_output_plot_read_dicom_directory.py:

@@ -191,6 +191,7 @@
 <p>This example shows how to read DICOM directory.</p>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Path to the DICOM directory: /home/circleci/project/pydicom/data/test_files/dicomdirtests/DICOMDIR
+Patient: 77654033: Doe^Archibald
     Study 2: 20010101: XR C Spine Comp Min 4 Views
         Series 1: CR: N/A (1 image)
             Reading images...
@@ -224,6 +225,7 @@
             &#39;/home/circleci/project/pydicom/data/test_files/dicomdirtests/77654033/CT2/17196&#39;]
             Patient Names in images..: {&#39;Doe^Archibald&#39;, &#39;Doe^Archibald&#39;, &#39;Doe^Archibald&#39;, &#39;Doe^Archibald&#39;}
             Patient IDs in images..: {&#39;77654033&#39;}
+Patient: 98890234: Doe^Peter
     Study 2: 20010101:
         Series 4: CT: N/A (2 images)
             Reading images...
@@ -331,9 +333,9 @@
 <span class="c1"># go through the patient record and print information</span>
 <span class="k">for</span> <span class="n">patient_record</span> <span class="ow">in</span> <span class="n">dicom_dir</span><span class="o">.</span><span class="n">patient_records</span><span class="p">:</span>
     <span class="k">if</span> <span class="p">(</span><span class="nb">hasattr</span><span class="p">(</span><span class="n">patient_record</span><span class="p">,</span> <span class="s1">&#39;PatientID&#39;</span><span class="p">)</span> <span class="ow">and</span>
-            <span class="nb">hasattr</span><span class="p">(</span><span class="n">patient_record</span><span class="p">,</span> <span class="s1">&#39;PatientsName&#39;</span><span class="p">)):</span>
+            <span class="nb">hasattr</span><span class="p">(</span><span class="n">patient_record</span><span class="p">,</span> <span class="s1">&#39;PatientName&#39;</span><span class="p">)):</span>
         <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Patient: {}: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">patient_record</span><span class="o">.</span><span class="n">PatientID</span><span class="p">,</span>
-                                       <span class="n">patient_record</span><span class="o">.</span><span class="n">PatientsName</span><span class="p">))</span>
+                                       <span class="n">patient_record</span><span class="o">.</span><span class="n">PatientName</span><span class="p">))</span>
     <span class="n">studies</span> <span class="o">=</span> <span class="n">patient_record</span><span class="o">.</span><span class="n">children</span>
     <span class="c1"># got through each serie</span>
     <span class="k">for</span> <span class="n">study</span> <span class="ow">in</span> <span class="n">studies</span><span class="p">:</span>
@@ -382,7 +384,7 @@
                 <span class="n">patient_IDs</span><span class="p">))</span>
 </pre></div>
 </div>
-<p><strong>Total running time of the script:</strong> ( 0 minutes  0.102 seconds)</p>
+<p><strong>Total running time of the script:</strong> ( 0 minutes  0.127 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-input-output-plot-read-dicom-directory-py">
 <div class="sphx-glr-download docutils container">
 <a class="reference download internal" download="" href="../../_downloads/c317f444b7e5f97d7fda400e76b361f0/plot_read_dicom_directory.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_read_dicom_directory.py</span></code></a></div>
