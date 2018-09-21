@@ -6,7 +6,9 @@ from struct import pack
 
 from pydicom import compat
 from pydicom.compat import in_py2
-from pydicom.charset import default_encoding, text_VRs, convert_encodings
+from pydicom.charset import (
+    default_encoding, text_VRs, convert_encodings, encode_string
+)
 from pydicom.dataelem import DataElement_from_raw
 from pydicom.dataset import Dataset, validate_file_meta
 from pydicom.filebase import DicomFile, DicomFileLike, DicomBytesIO
@@ -14,7 +16,7 @@ from pydicom.multival import MultiValue
 from pydicom.tag import (Tag, ItemTag, ItemDelimiterTag, SequenceDelimiterTag,
                          tag_in_exception)
 from pydicom.uid import UncompressedPixelTransferSyntaxes
-from pydicom.valuerep import extra_length_VRs
+from pydicom.valuerep import extra_length_VRs, PersonNameUnicode
 from pydicom.values import convert_numbers
 
 
@@ -243,15 +245,14 @@ def _is_multi_value(val):
 def multi_string(val):
     """Put a string together with delimiter if has more than one value"""
     if _is_multi_value(val):
-        # \ is escape chr, so "\\" gives single backslash
         return "\\".join(val)
     else:
         return val
 
 
-def write_PN(fp, data_element, padding=b' ', encoding=None):
-    if not encoding:
-        encoding = [default_encoding] * 3
+def write_PN(fp, data_element, encodings=None):
+    if not encodings:
+        encodings = [default_encoding]
 
     if data_element.VM == 1:
         val = [data_element.value, ]
@@ -260,30 +261,52 @@ def write_PN(fp, data_element, padding=b' ', encoding=None):
 
     if isinstance(val[0], compat.text_type) or not in_py2:
         try:
-            val = [elem.encode(encoding) for elem in val]
+            val = [elem.encode(encodings) for elem in val]
         except TypeError:
-            val = [elem.encode(encoding[0]) for elem in val]
+            # we get here in Python 2 if val is a unicode string
+            val = [PersonNameUnicode(elem, encodings) for elem in val]
+            val = [elem.encode(encodings) for elem in val]
 
     val = b'\\'.join(val)
 
     if len(val) % 2 != 0:
-        val = val + padding
+        val = val + b' '
 
     fp.write(val)
 
 
-def write_string(fp, data_element, padding=' ', encoding=default_encoding):
-    """Write a single or multivalued string."""
+def write_string(fp, data_element, padding=' '):
+    """Write a single or multivalued ASCII string."""
     val = multi_string(data_element.value)
     if val is not None:
         if len(val) % 2 != 0:
             val = val + padding  # pad to even length
         if isinstance(val, compat.text_type):
-            val = val.encode(encoding)
+            val = val.encode(default_encoding)
         fp.write(val)
 
 
-def write_number_string(fp, data_element, padding=' '):
+def write_text(fp, data_element, encodings=None):
+    """Write a single or multivalued text string."""
+    val = data_element.value
+    if val is not None:
+        encodings = encodings or [default_encoding]
+        if _is_multi_value(val):
+            if val and isinstance(val[0], compat.text_type):
+                val = b'\\'.join([encode_string(val, encodings)
+                                  for val in val])
+            else:
+                val = b'\\'.join([val for val in val])
+        else:
+            if isinstance(val, compat.text_type):
+                val = encode_string(val, encodings)
+
+        if len(val) % 2 != 0:
+            val = val + b' '  # pad to even length
+        fp.write(val)
+
+
+def write_number_string(fp, data_element):
     """Handle IS or DS VR - write a number stored as a string of digits."""
     # If the DS or IS has an original_string attribute, use that, so that
     # unchanged data elements are written with exact string as when read from
@@ -301,7 +324,7 @@ def write_number_string(fp, data_element, padding=' '):
             val = str(val)
 
     if len(val) % 2 != 0:
-        val = val + padding  # pad to even length
+        val = val + ' '  # pad to even length
 
     if not in_py2:
         val = bytes(val, default_encoding)
@@ -318,10 +341,10 @@ def _format_DA(val):
         return val.strftime("%Y%m%d")
 
 
-def write_DA(fp, data_element, padding=' '):
+def write_DA(fp, data_element):
     val = data_element.value
     if isinstance(val, (str, compat.string_types)):
-        write_string(fp, data_element, padding)
+        write_string(fp, data_element)
     else:
         if _is_multi_value(val):
             val = "\\".join((x if isinstance(x, (str, compat.string_types))
@@ -329,7 +352,7 @@ def write_DA(fp, data_element, padding=' '):
         else:
             val = _format_DA(val)
         if len(val) % 2 != 0:
-            val = val + padding  # pad to even length
+            val = val + ' '  # pad to even length
 
         if isinstance(val, compat.string_types):
             val = val.encode(default_encoding)
@@ -346,10 +369,10 @@ def _format_DT(val):
         return val.strftime("%Y%m%d%H%M%S%z")
 
 
-def write_DT(fp, data_element, padding=' '):
+def write_DT(fp, data_element):
     val = data_element.value
     if isinstance(val, (str, compat.string_types)):
-        write_string(fp, data_element, padding)
+        write_string(fp, data_element)
     else:
         if _is_multi_value(val):
             val = "\\".join((x if isinstance(x, (str, compat.string_types))
@@ -357,7 +380,7 @@ def write_DT(fp, data_element, padding=' '):
         else:
             val = _format_DT(val)
         if len(val) % 2 != 0:
-            val = val + padding  # pad to even length
+            val = val + ' '  # pad to even length
 
         if isinstance(val, compat.string_types):
             val = val.encode(default_encoding)
@@ -376,10 +399,10 @@ def _format_TM(val):
         return val.strftime("%H%M%S")
 
 
-def write_TM(fp, data_element, padding=' '):
+def write_TM(fp, data_element):
     val = data_element.value
     if isinstance(val, (str, compat.string_types)):
-        write_string(fp, data_element, padding)
+        write_string(fp, data_element)
     else:
         if _is_multi_value(val):
             val = "\\".join((x if isinstance(x, (str, compat.string_types))
@@ -387,7 +410,7 @@ def write_TM(fp, data_element, padding=' '):
         else:
             val = _format_TM(val)
         if len(val) % 2 != 0:
-            val = val + padding  # pad to even length
+            val = val + ' '  # pad to even length
 
         if isinstance(val, compat.string_types):
             val = val.encode(default_encoding)
@@ -395,7 +418,7 @@ def write_TM(fp, data_element, padding=' '):
         fp.write(val)
 
 
-def write_data_element(fp, data_element, encoding=default_encoding):
+def write_data_element(fp, data_element, encodings=None):
     """Write the data_element to file fp according to
     dicom media storage rules.
     """
@@ -433,13 +456,14 @@ def write_data_element(fp, data_element, encoding=default_encoding):
                 "write_data_element: unknown Value Representation "
                 "'{0}'".format(VR))
 
-        encoding = convert_encodings(encoding)
+        encodings = encodings or [default_encoding]
+        encodings = convert_encodings(encodings)
         writer_function, writer_param = writers[VR]
         is_undefined_length = data_element.is_undefined_length
         if VR in text_VRs:
-            writer_function(buffer, data_element, encoding=encoding[0])
+            writer_function(buffer, data_element, encodings=encodings)
         elif VR in ('PN', 'SQ'):
-            writer_function(buffer, data_element, encoding=encoding)
+            writer_function(buffer, data_element, encodings=encodings)
         else:
             # Many numeric types use the same writer but with numeric format
             # parameter
@@ -517,16 +541,16 @@ def _harmonize_properties(dataset, fp):
     fp.is_little_endian = dataset.is_little_endian
 
 
-def write_sequence(fp, data_element, encoding):
+def write_sequence(fp, data_element, encodings):
     """Write a dicom Sequence contained in data_element to the file fp."""
     # write_data_element has already written the VR='SQ' (if needed) and
     #    a placeholder for length"""
     sequence = data_element.value
     for dataset in sequence:
-        write_sequence_item(fp, dataset, encoding)
+        write_sequence_item(fp, dataset, encodings)
 
 
-def write_sequence_item(fp, dataset, encoding):
+def write_sequence_item(fp, dataset, encodings):
     """Write an item (dataset) in a dicom Sequence to the dicom file fp.
 
     This is similar to writing a data_element, but with a specific tag for
@@ -538,7 +562,7 @@ def write_sequence_item(fp, dataset, encoding):
     length_location = fp.tell()  # save location for later.
     # will fill in real value later if not undefined length
     fp.write_UL(0xffffffff)
-    write_dataset(fp, dataset, parent_encoding=encoding)
+    write_dataset(fp, dataset, parent_encoding=encodings)
     if getattr(dataset, "is_undefined_length_sequence_item", False):
         fp.write_tag(ItemDelimiterTag)
         fp.write_UL(0)  # 4-bytes 'length' field for delimiter item
@@ -886,23 +910,23 @@ writers = {
     'OD': (write_OWvalue, None),
     'OL': (write_OWvalue, None),
     'UI': (write_UI, None),
-    'SH': (write_string, None),
+    'SH': (write_text, None),
     'DA': (write_DA, None),
     'TM': (write_TM, None),
     'CS': (write_string, None),
     'PN': (write_PN, None),
-    'LO': (write_string, None),
+    'LO': (write_text, None),
     'IS': (write_number_string, None),
     'DS': (write_number_string, None),
     'AE': (write_string, None),
     'AS': (write_string, None),
-    'LT': (write_string, None),
+    'LT': (write_text, None),
     'SQ': (write_sequence, None),
-    'UC': (write_string, None),
+    'UC': (write_text, None),
     'UN': (write_UN, None),
     'UR': (write_string, None),
     'AT': (write_ATvalue, None),
-    'ST': (write_string, None),
+    'ST': (write_text, None),
     'OW': (write_OWvalue, None),
     'US or SS': (write_OWvalue, None),
     'US or OW': (write_OWvalue, None),
@@ -912,5 +936,5 @@ writers = {
     'OB or OW': (write_OBvalue, None),
     'OW or OB': (write_OBvalue, None),
     'DT': (write_DT, None),
-    'UT': (write_string, None),
+    'UT': (write_text, None),
 }  # note OW/OB depends on other items, which we don't know at write time

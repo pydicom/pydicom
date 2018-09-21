@@ -1,12 +1,12 @@
+# -*- coding: utf-8 -*-
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
-"""unittest cases for pydicom.filewriter module"""
+"""test cases for pydicom.filewriter module"""
 
 from copy import deepcopy
 from datetime import date, datetime, time, timedelta
 from io import BytesIO
 import os
-import sys
-import unittest
+from platform import python_implementation
 
 from struct import unpack
 from tempfile import TemporaryFile
@@ -23,16 +23,16 @@ from pydicom.filereader import dcmread, read_dataset
 from pydicom.filewriter import (write_data_element, write_dataset,
                                 correct_ambiguous_vr, write_file_meta_info,
                                 correct_ambiguous_vr_element, write_numbers,
-                                write_PN, _format_DT)
+                                write_PN, _format_DT, write_text)
 from pydicom.multival import MultiValue
 from pydicom.sequence import Sequence
 from pydicom.uid import (ImplicitVRLittleEndian, ExplicitVRBigEndian,
                          PYDICOM_IMPLEMENTATION_UID)
-from pydicom.util.hexutil import hex2bytes, bytes2hex
+from pydicom.util.hexutil import hex2bytes
 from pydicom.util.fixes import timezone
 from pydicom.valuerep import DA, DT, TM
+from pydicom.values import convert_text
 from ._write_stds import impl_LE_deflen_std_hex
-
 
 rtplan_name = get_testdata_files("rtplan.dcm")[0]
 rtdose_name = get_testdata_files("rtdose.dcm")[0]
@@ -76,11 +76,11 @@ def bytes_identical(a_bytes, b_bytes):
         return False, pos  # False if not identical, position of 1st diff
 
 
-class WriteFileTests(unittest.TestCase):
-    def setUp(self):
+class TestWriteFile(object):
+    def setup(self):
         self.file_out = TemporaryFile('w+b')
 
-    def tearDown(self):
+    def teardown(self):
         self.file_out.close()
 
     def compare(self, in_filename):
@@ -96,14 +96,12 @@ class WriteFileTests(unittest.TestCase):
         bytes_in.seek(0)
         bytes_out.seek(0)
         same, pos = bytes_identical(bytes_in.getvalue(), bytes_out.getvalue())
-        self.assertTrue(same, "Read bytes is not identical to written bytes - "
-                        "first difference at 0x%x" % pos)
+        assert same
 
     def compare_bytes(self, bytes_in, bytes_out):
         """Compare two bytestreams for equality"""
         same, pos = bytes_identical(bytes_in, bytes_out)
-        self.assertTrue(same, "Bytestreams are not identical - first "
-                        "difference at 0x%x" % pos)
+        assert same
 
     def testRTPlan(self):
         """Input file, write back and verify
@@ -154,12 +152,9 @@ class WriteFileTests(unittest.TestCase):
         self.file_out.seek(0)
         # Now read it back in and check that the values were changed
         ds = dcmread(self.file_out)
-        self.assertTrue(ds.ImageType[1] == CS_expected,
-                        "Item in a list not written correctly to file (VR=CS)")
-        self.assertTrue(ds[0x00431012].value[0] == SS_expected,
-                        "Item in a list not written correctly to file (VR=SS)")
-        self.assertTrue(ds.ImagePositionPatient[2] == DS_expected,
-                        "Item in a list not written correctly to file (VR=DS)")
+        assert CS_expected == ds.ImageType[1]
+        assert SS_expected == ds[0x00431012].value[0]
+        assert DS_expected == ds.ImagePositionPatient[2]
 
     def testwrite_short_uid(self):
         ds = dcmread(rtplan_name)
@@ -167,7 +162,7 @@ class WriteFileTests(unittest.TestCase):
         ds.save_as(self.file_out, write_like_original=True)
         self.file_out.seek(0)
         ds = dcmread(self.file_out)
-        self.assertEqual(ds.SOPInstanceUID, "1.2")
+        assert "1.2" == ds.SOPInstanceUID
 
     def test_write_no_ts(self):
         """Test reading a file with no ts and writing it out identically."""
@@ -183,7 +178,8 @@ class WriteFileTests(unittest.TestCase):
         """Test writing file meta from Dataset doesn't work"""
         ds = dcmread(ct_name)
         ds.TransferSyntaxUID = '1.1'
-        self.assertRaises(ValueError, ds.save_as, self.file_out)
+        with pytest.raises(ValueError):
+            ds.save_as(self.file_out)
 
     def test_write_ffff_ffff(self):
         """Test writing element (FFFF, FFFF) to file #92"""
@@ -209,14 +205,14 @@ class WriteFileTests(unittest.TestCase):
         assert 0x00080000 not in ds
 
 
-class ScratchWriteDateTimeTests(WriteFileTests):
+class TestScratchWriteDateTime(TestWriteFile):
     """Write and reread simple or multi-value DA/DT/TM data elements"""
 
-    def setUp(self):
+    def setup(self):
         config.datetime_conversion = True
         self.file_out = TemporaryFile('w+b')
 
-    def tearDown(self):
+    def teardown(self):
         config.datetime_conversion = False
         self.file_out.close()
 
@@ -241,17 +237,20 @@ class ScratchWriteDateTimeTests(WriteFileTests):
         self.file_out.seek(0)
         # Now read it back in and check the values are as expected
         ds = dcmread(self.file_out)
-        self.assertSequenceEqual(multi_DA_expected, ds.CalibrationDate)
-        self.assertEqual(DA_expected, ds.DateOfLastCalibration)
-        self.assertSequenceEqual(multi_DT_expected, ds.ReferencedDateTime)
-        self.assertSequenceEqual(multi_TM_expected, ds.CalibrationTime)
-        self.assertEqual(TM_expected, ds.TimeOfLastCalibration)
+        assert all([a == b
+                    for a, b in zip(ds.CalibrationDate, multi_DA_expected)])
+        assert DA_expected == ds.DateOfLastCalibration
+        assert all([a == b
+                    for a, b in zip(ds.ReferencedDateTime, multi_DT_expected)])
+        assert all([a == b
+                    for a, b in zip(ds.CalibrationTime, multi_TM_expected)])
+        assert TM_expected == ds.TimeOfLastCalibration
 
 
-class WriteDataElementTests(unittest.TestCase):
+class TestWriteDataElement(object):
     """Attempt to write data elements has the expected behaviour"""
 
-    def setUp(self):
+    def setup(self):
         # Create a dummy (in memory) file to write to
         self.f1 = DicomBytesIO()
         self.f1.is_little_endian = True
@@ -290,14 +289,11 @@ class WriteDataElementTests(unittest.TestCase):
             " 00 00 00 00"  # length 0
         ))
         write_data_element(self.f1, data_elem)
-        got = self.f1.getvalue()
-        msg = ("Did not write zero-length AT value correctly. "
-               "Expected %r, got %r") % (bytes2hex(expected), bytes2hex(got))
-        self.assertEqual(expected, got, msg)
+        assert expected == self.f1.getvalue()
 
     def check_data_element(self, data_elem, expected):
         encoded_elem = self.encode_element(data_elem)
-        self.assertEqual(expected, encoded_elem)
+        assert expected == encoded_elem
 
     def test_write_empty_LO(self):
         data_elem = DataElement(0x00080070, 'LO', None)
@@ -412,13 +408,13 @@ class WriteDataElementTests(unittest.TestCase):
         # Length (16): 10 00 00 00
         #             | Tag          |   Length      |    Value ->
         ref_bytes = b'\x70\x00\x0d\x15\x10\x00\x00\x00' + bytestring
-        self.assertEqual(encoded_elem, ref_bytes)
+        assert ref_bytes == encoded_elem
 
         # Empty data
         elem.value = b''
         encoded_elem = self.encode_element(elem)
         ref_bytes = b'\x70\x00\x0d\x15\x00\x00\x00\x00'
-        self.assertEqual(encoded_elem, ref_bytes)
+        assert ref_bytes == encoded_elem
 
     def test_write_OD_explicit_little(self):
         """Test writing elements with VR of OD works correctly.
@@ -439,13 +435,13 @@ class WriteDataElementTests(unittest.TestCase):
         ref_bytes = b'\x70\x00\x0d\x15\x4f\x44' \
                     b'\x00\x00\x10\x00\x00\x00' + bytestring
         #             |Rsrvd |   Length      |    Value ->
-        self.assertEqual(encoded_elem, ref_bytes)
+        assert ref_bytes == encoded_elem
 
         # Empty data
         elem.value = b''
         encoded_elem = self.encode_element(elem, False, True)
         ref_bytes = b'\x70\x00\x0d\x15\x4f\x44\x00\x00\x00\x00\x00\x00'
-        self.assertEqual(encoded_elem, ref_bytes)
+        assert ref_bytes == encoded_elem
 
     def test_write_OL_implicit_little(self):
         """Test writing elements with VR of OL works correctly."""
@@ -458,13 +454,13 @@ class WriteDataElementTests(unittest.TestCase):
         # Length (12): 0c 00 00 00
         #             | Tag          |   Length      |    Value ->
         ref_bytes = b'\x66\x00\x29\x01\x0c\x00\x00\x00' + bytestring
-        self.assertEqual(encoded_elem, ref_bytes)
+        assert ref_bytes == encoded_elem
 
         # Empty data
         elem.value = b''
         encoded_elem = self.encode_element(elem)
         ref_bytes = b'\x66\x00\x29\x01\x00\x00\x00\x00'
-        self.assertEqual(encoded_elem, ref_bytes)
+        assert ref_bytes == encoded_elem
 
     def test_write_OL_explicit_little(self):
         """Test writing elements with VR of OL works correctly.
@@ -485,13 +481,13 @@ class WriteDataElementTests(unittest.TestCase):
         ref_bytes = b'\x66\x00\x29\x01\x4f\x4c' \
                     b'\x00\x00\x0c\x00\x00\x00' + bytestring
         #             |Rsrvd |   Length      |    Value ->
-        self.assertEqual(encoded_elem, ref_bytes)
+        assert ref_bytes == encoded_elem
 
         # Empty data
         elem.value = b''
         encoded_elem = self.encode_element(elem, False, True)
         ref_bytes = b'\x66\x00\x29\x01\x4f\x4c\x00\x00\x00\x00\x00\x00'
-        self.assertEqual(encoded_elem, ref_bytes)
+        assert ref_bytes == encoded_elem
 
     def test_write_UC_implicit_little(self):
         """Test writing elements with VR of UC works correctly."""
@@ -502,31 +498,31 @@ class WriteDataElementTests(unittest.TestCase):
         # Length (4): 04 00 00 00
         # Value: \x54\x65\x73\x74
         ref_bytes = b'\x18\x00\x08\x99\x04\x00\x00\x00\x54\x65\x73\x74'
-        self.assertEqual(encoded_elem, ref_bytes)
+        assert ref_bytes == encoded_elem
 
         # VM 1, odd data - padded to even length
         elem.value = 'Test.'
         encoded_elem = self.encode_element(elem)
         ref_bytes = b'\x18\x00\x08\x99\x06\x00\x00\x00\x54\x65\x73\x74\x2e\x20'
-        self.assertEqual(encoded_elem, ref_bytes)
+        assert ref_bytes == encoded_elem
 
         # VM 3, even data
         elem.value = ['Aa', 'B', 'C']
         encoded_elem = self.encode_element(elem)
         ref_bytes = b'\x18\x00\x08\x99\x06\x00\x00\x00\x41\x61\x5c\x42\x5c\x43'
-        self.assertEqual(encoded_elem, ref_bytes)
+        assert ref_bytes == encoded_elem
 
         # VM 3, odd data - padded to even length
         elem.value = ['A', 'B', 'C']
         encoded_elem = self.encode_element(elem)
         ref_bytes = b'\x18\x00\x08\x99\x06\x00\x00\x00\x41\x5c\x42\x5c\x43\x20'
-        self.assertEqual(encoded_elem, ref_bytes)
+        assert ref_bytes == encoded_elem
 
         # Empty data
         elem.value = ''
         encoded_elem = self.encode_element(elem)
         ref_bytes = b'\x18\x00\x08\x99\x00\x00\x00\x00'
-        self.assertEqual(encoded_elem, ref_bytes)
+        assert ref_bytes == encoded_elem
 
     def test_write_UC_explicit_little(self):
         """Test writing elements with VR of UC works correctly.
@@ -544,34 +540,34 @@ class WriteDataElementTests(unittest.TestCase):
         # Value: \x54\x65\x73\x74
         ref_bytes = b'\x18\x00\x08\x99\x55\x43\x00\x00\x04\x00\x00\x00' \
                     b'\x54\x65\x73\x74'
-        self.assertEqual(encoded_elem, ref_bytes)
+        assert ref_bytes == encoded_elem
 
         # VM 1, odd data - padded to even length
         elem.value = 'Test.'
         encoded_elem = self.encode_element(elem, False, True)
         ref_bytes = b'\x18\x00\x08\x99\x55\x43\x00\x00\x06\x00\x00\x00' \
                     b'\x54\x65\x73\x74\x2e\x20'
-        self.assertEqual(encoded_elem, ref_bytes)
+        assert ref_bytes == encoded_elem
 
         # VM 3, even data
         elem.value = ['Aa', 'B', 'C']
         encoded_elem = self.encode_element(elem, False, True)
         ref_bytes = b'\x18\x00\x08\x99\x55\x43\x00\x00\x06\x00\x00\x00' \
                     b'\x41\x61\x5c\x42\x5c\x43'
-        self.assertEqual(encoded_elem, ref_bytes)
+        assert ref_bytes == encoded_elem
 
         # VM 3, odd data - padded to even length
         elem.value = ['A', 'B', 'C']
         encoded_elem = self.encode_element(elem, False, True)
         ref_bytes = b'\x18\x00\x08\x99\x55\x43\x00\x00\x06\x00\x00\x00' \
                     b'\x41\x5c\x42\x5c\x43\x20'
-        self.assertEqual(encoded_elem, ref_bytes)
+        assert ref_bytes == encoded_elem
 
         # Empty data
         elem.value = ''
         encoded_elem = self.encode_element(elem, False, True)
         ref_bytes = b'\x18\x00\x08\x99\x55\x43\x00\x00\x00\x00\x00\x00'
-        self.assertEqual(encoded_elem, ref_bytes)
+        assert ref_bytes == encoded_elem
 
     def test_write_UR_implicit_little(self):
         """Test writing elements with VR of UR works correctly."""
@@ -587,7 +583,7 @@ class WriteDataElementTests(unittest.TestCase):
                     b'\x62\x2e\x63\x6f\x6d\x2f\x64\x61\x72\x63' \
                     b'\x79\x6d\x61\x73\x6f\x6e\x2f\x70\x79\x64' \
                     b'\x69\x63\x6f\x6d'
-        self.assertEqual(encoded_elem, ref_bytes)
+        assert ref_bytes == encoded_elem
 
         # Odd length URL has trailing \x20 (SPACE) padding
         elem.value = '../test/test.py'
@@ -598,13 +594,12 @@ class WriteDataElementTests(unittest.TestCase):
         ref_bytes = b'\x08\x00\x20\x01\x10\x00\x00\x00\x2e\x2e' \
                     b'\x2f\x74\x65\x73\x74\x2f\x74\x65\x73\x74' \
                     b'\x2e\x70\x79\x20'
-        self.assertEqual(encoded_elem, ref_bytes)
+        assert ref_bytes == encoded_elem
 
         # Empty value
         elem.value = ''
         encoded_elem = self.encode_element(elem)
-        self.assertEqual(encoded_elem,
-                         b'\x08\x00\x20\x01\x00\x00\x00\x00')
+        assert b'\x08\x00\x20\x01\x00\x00\x00\x00' == encoded_elem
 
     def test_write_UR_explicit_little(self):
         """Test writing elements with VR of UR works correctly.
@@ -622,20 +617,20 @@ class WriteDataElementTests(unittest.TestCase):
         # Value: \x66\x74\x70\x3a\x2f\x2f\x62\x69\x74\x73
         ref_bytes = b'\x08\x00\x20\x01\x55\x52\x00\x00\x0a\x00\x00\x00' \
                     b'\x66\x74\x70\x3a\x2f\x2f\x62\x69\x74\x73'
-        self.assertEqual(encoded_elem, ref_bytes)
+        assert ref_bytes == encoded_elem
 
         # Odd length URL has trailing \x20 (SPACE) padding
         elem.value = 'ftp://bit'
         encoded_elem = self.encode_element(elem, False, True)
         ref_bytes = b'\x08\x00\x20\x01\x55\x52\x00\x00\x0a\x00\x00\x00' \
                     b'\x66\x74\x70\x3a\x2f\x2f\x62\x69\x74\x20'
-        self.assertEqual(encoded_elem, ref_bytes)
+        assert ref_bytes == encoded_elem
 
         # Empty value
         elem.value = ''
         encoded_elem = self.encode_element(elem, False, True)
         ref_bytes = b'\x08\x00\x20\x01\x55\x52\x00\x00\x00\x00\x00\x00'
-        self.assertEqual(encoded_elem, ref_bytes)
+        assert ref_bytes == encoded_elem
 
     def test_write_UN_implicit_little(self):
         """Test writing UN VR in implicit little"""
@@ -655,7 +650,7 @@ class WriteDataElementTests(unittest.TestCase):
             write_data_element(fp, elem)
 
 
-class TestCorrectAmbiguousVR(unittest.TestCase):
+class TestCorrectAmbiguousVR(object):
     """Test correct_ambiguous_vr."""
 
     def test_pixel_representation_vm_one(self):
@@ -844,12 +839,14 @@ class TestCorrectAmbiguousVR(unittest.TestCase):
         assert ds.BeamSequence[0].SmallestValidPixelValue == 256
         assert ds.BeamSequence[0][0x00280104].VR == 'US'
         assert (
-            ds.BeamSequence[0].BeamSequence[0].SmallestValidPixelValue == 256)
+                ds.BeamSequence[0].BeamSequence[
+                    0].SmallestValidPixelValue == 256)
         assert ds.BeamSequence[0].BeamSequence[0][0x00280104].VR == 'US'
 
 
 class TestCorrectAmbiguousVRElement(object):
     """Test filewriter.correct_ambiguous_vr_element"""
+
     def test_not_ambiguous(self):
         """Test no change in element if not ambiguous"""
         elem = DataElement(0x60003000, 'OB', b'\x00')
@@ -893,10 +890,10 @@ class TestCorrectAmbiguousVRElement(object):
         assert out.value == 0xfffe
 
 
-class WriteAmbiguousVRTests(unittest.TestCase):
+class TestWriteAmbiguousVR(object):
     """Attempt to write data elements with ambiguous VR."""
 
-    def setUp(self):
+    def setup(self):
         # Create a dummy (in memory) file to write to
         self.fp = DicomBytesIO()
         self.fp.is_implicit_VR = False
@@ -906,11 +903,8 @@ class WriteAmbiguousVRTests(unittest.TestCase):
         """Test writing explicit vr raises exception if unsolved element."""
         ds = Dataset()
         ds.PerimeterValue = b'\x00\x01'
-
-        def test():
+        with pytest.raises(ValueError):
             write_dataset(self.fp, ds)
-
-        self.assertRaises(ValueError, test)
 
     def test_write_explicit_vr_little_endian(self):
         """Test writing explicit little data for ambiguous elements."""
@@ -956,10 +950,10 @@ class WriteAmbiguousVRTests(unittest.TestCase):
         assert ['UTF8'] == ds.read_encoding
 
 
-class ScratchWriteTests(unittest.TestCase):
+class TestScratchWrite(object):
     """Simple dataset from scratch, written in all endian/VR combinations"""
 
-    def setUp(self):
+    def setup(self):
         # Create simple dataset for all tests
         ds = Dataset()
         ds.PatientName = "Name^Patient"
@@ -978,7 +972,7 @@ class ScratchWriteTests(unittest.TestCase):
         sub_ds.ContourSequence = Sequence((subitem1, subitem2))
 
         # Now the top-level sequence
-        ds.ROIContourSequence = Sequence((sub_ds, ))  # Comma to make one-tuple
+        ds.ROIContourSequence = Sequence((sub_ds,))  # Comma to make one-tuple
 
         # Store so each test can use it
         self.ds = ds
@@ -997,9 +991,7 @@ class ScratchWriteTests(unittest.TestCase):
         # print "std    :", bytes2hex(std)
         # print "written:", bytes2hex(bytes_written)
         same, pos = bytes_identical(std, bytes_written)
-        self.assertTrue(same,
-                        "Writing from scratch unexpected result "
-                        "- 1st diff at 0x%x" % pos)
+        assert same
 
         if os.path.exists(out_filename):
             os.remove(out_filename)  # get rid of the file
@@ -1012,6 +1004,7 @@ class ScratchWriteTests(unittest.TestCase):
 
 class TestWriteToStandard(object):
     """Unit tests for writing datasets to the DICOM standard"""
+
     def test_preamble_default(self):
         """Test that the default preamble is written correctly when present."""
         fp = DicomBytesIO()
@@ -1241,8 +1234,6 @@ class TestWriteToStandard(object):
         for elem_in, elem_out in zip(ds_explicit, ds_out):
             assert elem_in == elem_out
 
-    @pytest.mark.skipif(sys.version_info[0] == 2,
-                        reason='Saving with another encoding fails in Python2')
     def test_changed_character_set(self):
         """Make sure that a changed character set is reflected
         in the written data elements."""
@@ -1373,9 +1364,9 @@ class TestWriteToStandard(object):
         out = dcmread(fp)
         assert out.file_meta.MediaStorageSOPClassUID == ds.SOPClassUID
         assert out.file_meta.MediaStorageSOPInstanceUID == ds.SOPInstanceUID
-        assert (
-            out.file_meta.ImplementationClassUID == PYDICOM_IMPLEMENTATION_UID)
-        assert (out.file_meta.ImplementationVersionName == version)
+        assert (out.file_meta.ImplementationClassUID ==
+                PYDICOM_IMPLEMENTATION_UID)
+        assert out.file_meta.ImplementationVersionName == version
         assert out.file_meta.TransferSyntaxUID == transfer_syntax
 
         fp = DicomBytesIO()
@@ -1383,12 +1374,11 @@ class TestWriteToStandard(object):
         ds.save_as(fp, write_like_original=False)
         fp.seek(0)
         out = dcmread(fp)
-        assert (out.file_meta.MediaStorageSOPClassUID == ds.SOPClassUID)
-        assert (
-            out.file_meta.MediaStorageSOPInstanceUID == ds.SOPInstanceUID)
-        assert (
-            out.file_meta.ImplementationClassUID == PYDICOM_IMPLEMENTATION_UID)
-        assert (out.file_meta.ImplementationVersionName == version)
+        assert out.file_meta.MediaStorageSOPClassUID == ds.SOPClassUID
+        assert out.file_meta.MediaStorageSOPInstanceUID == ds.SOPInstanceUID
+        assert (out.file_meta.ImplementationClassUID ==
+                PYDICOM_IMPLEMENTATION_UID)
+        assert out.file_meta.ImplementationVersionName == version
         assert out.file_meta.TransferSyntaxUID == transfer_syntax
 
     def test_raise_no_file_meta(self):
@@ -1451,6 +1441,7 @@ class TestWriteToStandard(object):
 
 class TestWriteFileMetaInfoToStandard(object):
     """Unit tests for writing File Meta Info to the DICOM standard."""
+
     def test_bad_elements(self):
         """Test that non-group 2 elements aren't written to the file meta."""
         fp = DicomBytesIO()
@@ -1608,10 +1599,10 @@ class TestWriteFileMetaInfoToStandard(object):
         assert test_length == 68 + class_length + version_length
 
 
-class TestWriteNonStandard(unittest.TestCase):
+class TestWriteNonStandard(object):
     """Unit tests for writing datasets not to the DICOM standard."""
 
-    def setUp(self):
+    def setup(self):
         """Create an empty file-like for use in testing."""
         self.fp = DicomBytesIO()
         self.fp.is_little_endian = True
@@ -1620,8 +1611,7 @@ class TestWriteNonStandard(unittest.TestCase):
     def compare_bytes(self, bytes_in, bytes_out):
         """Compare two bytestreams for equality"""
         same, pos = bytes_identical(bytes_in, bytes_out)
-        self.assertTrue(same, "Bytestreams are not identical - first "
-                        "difference at 0x%x" % pos)
+        assert same
 
     def ensure_no_raw_data_elements(self, ds):
         for _ in ds.file_meta:
@@ -1635,7 +1625,7 @@ class TestWriteNonStandard(unittest.TestCase):
         ds.preamble = b'\x00' * 128
         ds.save_as(self.fp, write_like_original=True)
         self.fp.seek(0)
-        self.assertEqual(self.fp.read(128), b'\x00' * 128)
+        assert b'\x00' * 128 == self.fp.read(128)
 
     def test_preamble_custom(self):
         """Test that a custom preamble is written correctly when present."""
@@ -1644,8 +1634,7 @@ class TestWriteNonStandard(unittest.TestCase):
         self.fp.seek(0)
         ds.save_as(self.fp, write_like_original=True)
         self.fp.seek(0)
-        self.assertEqual(self.fp.read(128),
-                         b'\x01\x02\x03\x04' + b'\x00' * 124)
+        assert b'\x01\x02\x03\x04' + b'\x00' * 124 == self.fp.read(128)
 
     def test_no_preamble(self):
         """Test no preamble or prefix is written if preamble absent."""
@@ -1654,11 +1643,11 @@ class TestWriteNonStandard(unittest.TestCase):
         del ds.preamble
         ds.save_as(self.fp, write_like_original=True)
         self.fp.seek(0)
-        self.assertNotEqual(self.fp.read(128), b'\x00' * 128)
+        assert b'\x00' * 128 != self.fp.read(128)
         self.fp.seek(0)
-        self.assertNotEqual(self.fp.read(128), preamble)
+        assert preamble != self.fp.read(128)
         self.fp.seek(0)
-        self.assertNotEqual(self.fp.read(4), b'DICM')
+        assert b'DICM' != self.fp.read(4)
 
     def test_ds_unchanged(self):
         """Test writing the dataset doesn't change it."""
@@ -1668,14 +1657,14 @@ class TestWriteNonStandard(unittest.TestCase):
 
         self.ensure_no_raw_data_elements(ds)
         self.ensure_no_raw_data_elements(ref_ds)
-        self.assertTrue(ref_ds == ds)
+        assert ref_ds == ds
 
     def test_file_meta_unchanged(self):
         """Test no file_meta elements are added if missing."""
         ds = dcmread(rtplan_name)
         ds.file_meta = Dataset()
         ds.save_as(self.fp, write_like_original=True)
-        self.assertEqual(ds.file_meta, Dataset())
+        assert Dataset() == ds.file_meta
 
     def test_dataset(self):
         """Test dataset written OK with no preamble or file meta"""
@@ -1684,15 +1673,15 @@ class TestWriteNonStandard(unittest.TestCase):
         del ds.file_meta
         ds.save_as(self.fp, write_like_original=True)
         self.fp.seek(0)
-        self.assertNotEqual(self.fp.read(128), b'\x00' * 128)
+        assert b'\x00' * 128 != self.fp.read(128)
         self.fp.seek(0)
-        self.assertNotEqual(self.fp.read(4), b'DICM')
+        assert b'DICM' != self.fp.read(4)
 
         self.fp.seek(0)
         ds_out = dcmread(self.fp, force=True)
-        self.assertEqual(ds_out.preamble, None)
-        self.assertEqual(ds_out.file_meta, Dataset())
-        self.assertTrue('PatientID' in ds_out)
+        assert ds_out.preamble is None
+        assert Dataset() == ds_out.file_meta
+        assert 'PatientID' in ds_out
 
     def test_preamble_dataset(self):
         """Test dataset written OK with no file meta"""
@@ -1701,13 +1690,13 @@ class TestWriteNonStandard(unittest.TestCase):
         preamble = ds.preamble[:]
         ds.save_as(self.fp, write_like_original=True)
         self.fp.seek(0)
-        self.assertEqual(self.fp.read(128), preamble)
-        self.assertEqual(self.fp.read(4), b'DICM')
+        assert preamble == self.fp.read(128)
+        assert b'DICM' == self.fp.read(4)
 
         self.fp.seek(0)
         ds_out = dcmread(self.fp, force=True)
-        self.assertEqual(ds_out.file_meta, Dataset())
-        self.assertTrue('PatientID' in ds_out)
+        assert Dataset() == ds_out.file_meta
+        assert 'PatientID' in ds_out
 
     def test_filemeta_dataset(self):
         """Test file meta written OK if preamble absent."""
@@ -1716,17 +1705,17 @@ class TestWriteNonStandard(unittest.TestCase):
         del ds.preamble
         ds.save_as(self.fp, write_like_original=True)
         self.fp.seek(0)
-        self.assertNotEqual(self.fp.read(128), b'\x00' * 128)
+        assert b'\x00' * 128 != self.fp.read(128)
         self.fp.seek(0)
-        self.assertNotEqual(self.fp.read(128), preamble)
+        assert preamble != self.fp.read(128)
         self.fp.seek(0)
-        self.assertNotEqual(self.fp.read(4), b'DICM')
+        assert b'DICM' != self.fp.read(4)
 
         self.fp.seek(0)
         ds_out = dcmread(self.fp, force=True)
-        self.assertTrue('ImplementationClassUID' in ds_out.file_meta)
-        self.assertEqual(ds_out.preamble, None)
-        self.assertTrue('PatientID' in ds_out)
+        assert 'ImplementationClassUID' in ds_out.file_meta
+        assert ds_out.preamble is None
+        assert 'PatientID' in ds_out
 
     def test_preamble_filemeta_dataset(self):
         """Test non-standard file meta written with preamble OK"""
@@ -1734,18 +1723,18 @@ class TestWriteNonStandard(unittest.TestCase):
         preamble = ds.preamble[:]
         ds.save_as(self.fp, write_like_original=True)
         self.fp.seek(0)
-        self.assertEqual(self.fp.read(128), preamble)
-        self.assertEqual(self.fp.read(4), b'DICM')
+        assert preamble == self.fp.read(128)
+        assert b'DICM' == self.fp.read(4)
 
         self.fp.seek(0)
         ds_out = dcmread(self.fp, force=True)
         self.ensure_no_raw_data_elements(ds)
         self.ensure_no_raw_data_elements(ds_out)
 
-        self.assertEqual(ds.file_meta[:], ds_out.file_meta[:])
-        self.assertTrue('TransferSyntaxUID' in ds_out.file_meta[:])
-        self.assertEqual(ds_out.preamble, preamble)
-        self.assertTrue('PatientID' in ds_out)
+        assert ds.file_meta[:] == ds_out.file_meta[:]
+        assert 'TransferSyntaxUID' in ds_out.file_meta[:]
+        assert preamble == ds_out.preamble
+        assert 'PatientID' in ds_out
 
     def test_commandset_dataset(self):
         """Test written OK with command set/dataset"""
@@ -1761,21 +1750,21 @@ class TestWriteNonStandard(unittest.TestCase):
         ds.Status = 0x0000
         ds.save_as(self.fp, write_like_original=True)
         self.fp.seek(0)
-        self.assertNotEqual(self.fp.read(128), preamble)
+        assert preamble != self.fp.read(128)
         self.fp.seek(0)
-        self.assertNotEqual(self.fp.read(128), b'\x00' * 128)
+        assert b'\x00' * 128 != self.fp.read(128)
         self.fp.seek(0)
-        self.assertNotEqual(self.fp.read(4), b'DICM')
+        assert b'DICM' != self.fp.read(4)
         # Ensure Command Set Elements written as little endian implicit VRe
         self.fp.seek(0)
-        self.assertEqual(self.fp.read(12),
-                         b'\x00\x00\x00\x00\x04\x00\x00\x00\x08\x00\x00\x00')
+        assert (b'\x00\x00\x00\x00\x04\x00\x00\x00\x08\x00\x00\x00' ==
+                self.fp.read(12))
 
         self.fp.seek(0)
         ds_out = dcmread(self.fp, force=True)
-        self.assertEqual(ds_out.file_meta, Dataset())
-        self.assertTrue('Status' in ds_out)
-        self.assertTrue('PatientID' in ds_out)
+        assert Dataset() == ds_out.file_meta
+        assert 'Status' in ds_out
+        assert 'PatientID' in ds_out
 
     def test_preamble_commandset_dataset(self):
         """Test written OK with preamble/command set/dataset"""
@@ -1788,17 +1777,17 @@ class TestWriteNonStandard(unittest.TestCase):
         ds.Status = 0x0000
         ds.save_as(self.fp, write_like_original=True)
         self.fp.seek(0)
-        self.assertEqual(self.fp.read(128), preamble)
-        self.assertEqual(self.fp.read(4), b'DICM')
+        assert preamble == self.fp.read(128)
+        assert b'DICM' == self.fp.read(4)
         # Ensure Command Set Elements written as little endian implicit VR
-        self.assertEqual(self.fp.read(12),
-                         b'\x00\x00\x00\x00\x04\x00\x00\x00\x08\x00\x00\x00')
+        assert (b'\x00\x00\x00\x00\x04\x00\x00\x00\x08\x00\x00\x00' ==
+                self.fp.read(12))
 
         self.fp.seek(0)
         ds_out = dcmread(self.fp, force=True)
-        self.assertEqual(ds_out.file_meta, Dataset())
-        self.assertTrue('Status' in ds_out)
-        self.assertTrue('PatientID' in ds_out)
+        assert Dataset() == ds_out.file_meta
+        assert 'Status' in ds_out
+        assert 'PatientID' in ds_out
 
     def test_preamble_commandset_filemeta_dataset(self):
         """Test written OK with preamble/command set/file meta/dataset"""
@@ -1810,14 +1799,14 @@ class TestWriteNonStandard(unittest.TestCase):
         ds.Status = 0x0000
         ds.save_as(self.fp, write_like_original=True)
         self.fp.seek(0)
-        self.assertEqual(self.fp.read(128), preamble)
-        self.assertEqual(self.fp.read(4), b'DICM')
+        assert preamble == self.fp.read(128)
+        assert b'DICM' == self.fp.read(4)
 
         self.fp.seek(0)
         ds_out = dcmread(self.fp, force=True)
-        self.assertTrue('TransferSyntaxUID' in ds_out.file_meta)
-        self.assertTrue('Status' in ds_out)
-        self.assertTrue('PatientID' in ds_out)
+        assert 'TransferSyntaxUID' in ds_out.file_meta
+        assert 'Status' in ds_out
+        assert 'PatientID' in ds_out
 
     def test_commandset_filemeta_dataset(self):
         """Test written OK with command set/file meta/dataset"""
@@ -1830,20 +1819,18 @@ class TestWriteNonStandard(unittest.TestCase):
         ds.Status = 0x0000
         ds.save_as(self.fp, write_like_original=True)
         self.fp.seek(0)
-        self.assertNotEqual(self.fp.read(128),
-                            preamble)
+        assert preamble != self.fp.read(128)
         self.fp.seek(0)
-        self.assertNotEqual(self.fp.read(128),
-                            b'\x00' * 128)
+        assert b'\x00' * 128 != self.fp.read(128)
         self.fp.seek(0)
-        self.assertNotEqual(self.fp.read(4), b'DICM')
+        assert b'DICM' != self.fp.read(4)
         # Ensure Command Set Elements written as little endian implicit VR
         self.fp.seek(0)
 
         ds_out = dcmread(self.fp, force=True)
-        self.assertTrue('TransferSyntaxUID' in ds_out.file_meta)
-        self.assertTrue('Status' in ds_out)
-        self.assertTrue('PatientID' in ds_out)
+        assert 'TransferSyntaxUID' in ds_out.file_meta
+        assert 'Status' in ds_out
+        assert 'PatientID' in ds_out
 
     def test_commandset(self):
         """Test written OK with command set"""
@@ -1857,18 +1844,19 @@ class TestWriteNonStandard(unittest.TestCase):
         ds.Status = 0x0000
         ds.save_as(self.fp, write_like_original=True)
         self.fp.seek(0)
-        self.assertRaises(EOFError, self.fp.read, 128, need_exact_length=True)
+        with pytest.raises(EOFError):
+            self.fp.read(128, need_exact_length=True)
         self.fp.seek(0)
-        self.assertNotEqual(self.fp.read(4), b'DICM')
+        assert b'DICM' != self.fp.read(4)
         # Ensure Command Set Elements written as little endian implicit VR
         self.fp.seek(0)
 
         fp = BytesIO(self.fp.getvalue())  # Workaround to avoid #358
         ds_out = dcmread(fp, force=True)
-        self.assertEqual(ds_out.file_meta, Dataset())
-        self.assertTrue('Status' in ds_out)
-        self.assertFalse('PatientID' in ds_out)
-        self.assertEqual(ds_out[0x00010000:], Dataset())
+        assert Dataset() == ds_out.file_meta
+        assert 'Status' in ds_out
+        assert 'PatientID' not in ds_out
+        assert Dataset() == ds_out[0x00010000:]
 
     def test_commandset_filemeta(self):
         """Test dataset written OK with command set/file meta"""
@@ -1882,18 +1870,18 @@ class TestWriteNonStandard(unittest.TestCase):
         ds.Status = 0x0000
         ds.save_as(self.fp, write_like_original=True)
         self.fp.seek(0)
-        self.assertNotEqual(self.fp.read(128), preamble)
+        assert preamble != self.fp.read(128)
         self.fp.seek(0)
-        self.assertNotEqual(self.fp.read(4), b'DICM')
+        assert b'DICM' != self.fp.read(4)
         # Ensure Command Set Elements written as little endian implicit VR
         self.fp.seek(0)
 
         fp = BytesIO(self.fp.getvalue())  # Workaround to avoid #358
         ds_out = dcmread(fp, force=True)
-        self.assertTrue('TransferSyntaxUID' in ds_out.file_meta)
-        self.assertTrue('Status' in ds_out)
-        self.assertFalse('PatientID' in ds_out)
-        self.assertEqual(ds_out[0x00010000:], Dataset())
+        assert 'TransferSyntaxUID' in ds_out.file_meta
+        assert 'Status' in ds_out
+        assert 'PatientID' not in ds_out
+        assert Dataset() == ds_out[0x00010000:]
 
     def test_preamble_commandset(self):
         """Test written OK with preamble/command set"""
@@ -1906,18 +1894,18 @@ class TestWriteNonStandard(unittest.TestCase):
         ds.Status = 0x0000
         ds.save_as(self.fp, write_like_original=True)
         self.fp.seek(0)
-        self.assertEqual(self.fp.read(128), ds.preamble)
-        self.assertEqual(self.fp.read(4), b'DICM')
+        assert ds.preamble == self.fp.read(128)
+        assert b'DICM' == self.fp.read(4)
         # Ensure Command Set Elements written as little endian implicit VR
-        self.assertEqual(self.fp.read(12),
-                         b'\x00\x00\x00\x00\x04\x00\x00\x00\x08\x00\x00\x00')
+        assert (b'\x00\x00\x00\x00\x04\x00\x00\x00\x08\x00\x00\x00' ==
+                self.fp.read(12))
 
         fp = BytesIO(self.fp.getvalue())  # Workaround to avoid #358
         ds_out = dcmread(fp, force=True)
-        self.assertEqual(ds_out.file_meta, Dataset())
-        self.assertTrue('Status' in ds_out)
-        self.assertFalse('PatientID' in ds_out)
-        self.assertEqual(ds_out[0x00010000:], Dataset())
+        assert Dataset() == ds_out.file_meta
+        assert 'Status' in ds_out
+        assert 'PatientID' not in ds_out
+        assert Dataset() == ds_out[0x00010000:]
 
     def test_preamble_commandset_filemeta(self):
         """Test written OK with preamble/command set/file meta"""
@@ -1929,15 +1917,15 @@ class TestWriteNonStandard(unittest.TestCase):
         ds.Status = 0x0000
         ds.save_as(self.fp, write_like_original=True)
         self.fp.seek(0)
-        self.assertEqual(self.fp.read(128), ds.preamble)
-        self.assertEqual(self.fp.read(4), b'DICM')
+        assert ds.preamble == self.fp.read(128)
+        assert b'DICM' == self.fp.read(4)
 
         self.fp.seek(0)
         ds_out = dcmread(self.fp, force=True)
-        self.assertTrue('Status' in ds_out)
-        self.assertTrue('TransferSyntaxUID' in ds_out.file_meta)
-        self.assertFalse('PatientID' in ds_out)
-        self.assertEqual(ds_out[0x00010000:], Dataset())
+        assert 'Status' in ds_out
+        assert 'TransferSyntaxUID' in ds_out.file_meta
+        assert 'PatientID' not in ds_out
+        assert Dataset() == ds_out[0x00010000:]
 
     def test_read_write_identical(self):
         """Test the written bytes matches the read bytes."""
@@ -1951,10 +1939,10 @@ class TestWriteNonStandard(unittest.TestCase):
                 self.compare_bytes(bytes_in.getvalue(), bytes_out.getvalue())
 
 
-class TestWriteFileMetaInfoNonStandard(unittest.TestCase):
+class TestWriteFileMetaInfoNonStandard(object):
     """Unit tests for writing File Meta Info not to the DICOM standard."""
 
-    def setUp(self):
+    def setup(self):
         """Create an empty file-like for use in testing."""
         self.fp = DicomBytesIO()
 
@@ -1962,13 +1950,13 @@ class TestWriteFileMetaInfoNonStandard(unittest.TestCase):
         """Test that the TransferSyntaxUID isn't added if missing"""
         ds = dcmread(no_ts)
         write_file_meta_info(self.fp, ds.file_meta, enforce_standard=False)
-        self.assertFalse('TransferSyntaxUID' in ds.file_meta)
-        self.assertTrue('ImplementationClassUID' in ds.file_meta)
+        assert 'TransferSyntaxUID' not in ds.file_meta
+        assert 'ImplementationClassUID' in ds.file_meta
 
         # Check written meta dataset doesn't contain TransferSyntaxUID
         written_ds = dcmread(self.fp, force=True)
-        self.assertTrue('ImplementationClassUID' in written_ds.file_meta)
-        self.assertFalse('TransferSyntaxUID' in written_ds.file_meta)
+        assert 'ImplementationClassUID' in written_ds.file_meta
+        assert 'TransferSyntaxUID' not in written_ds.file_meta
 
     def test_bad_elements(self):
         """Test that non-group 2 elements aren't written to the file meta."""
@@ -1978,12 +1966,8 @@ class TestWriteFileMetaInfoNonStandard(unittest.TestCase):
         meta.MediaStorageSOPInstanceUID = '1.2'
         meta.TransferSyntaxUID = '1.3'
         meta.ImplementationClassUID = '1.4'
-        self.assertRaises(
-            ValueError,
-            write_file_meta_info,
-            self.fp,
-            meta,
-            enforce_standard=False)
+        with pytest.raises(ValueError):
+            write_file_meta_info(self.fp, meta, enforce_standard=False)
 
     def test_missing_elements(self):
         """Test that missing required elements doesn't raise ValueError."""
@@ -2015,14 +1999,14 @@ class TestWriteFileMetaInfoNonStandard(unittest.TestCase):
         # 8 + 4 bytes ImplementationClassUID
         # 60 bytes total, - 12 for group length = 48
         self.fp.seek(8)
-        self.assertEqual(self.fp.read(4), b'\x30\x00\x00\x00')
+        assert b'\x30\x00\x00\x00' == self.fp.read(4)
         # Check original file meta is unchanged/updated
-        self.assertEqual(meta.FileMetaInformationGroupLength, 48)
-        self.assertFalse('FileMetaInformationVersion' in meta)
-        self.assertEqual(meta.MediaStorageSOPClassUID, '1.1')
-        self.assertEqual(meta.MediaStorageSOPInstanceUID, '1.2')
-        self.assertEqual(meta.TransferSyntaxUID, '1.3')
-        self.assertEqual(meta.ImplementationClassUID, '1.4')
+        assert 48 == meta.FileMetaInformationGroupLength
+        assert 'FileMetaInformationVersion' not in meta
+        assert '1.1' == meta.MediaStorageSOPClassUID
+        assert '1.2' == meta.MediaStorageSOPInstanceUID
+        assert '1.3' == meta.TransferSyntaxUID
+        assert '1.4' == meta.ImplementationClassUID
 
     def test_filelike_position(self):
         """Test that the file-like's ending position is OK."""
@@ -2037,7 +2021,7 @@ class TestWriteFileMetaInfoNonStandard(unittest.TestCase):
         meta.TransferSyntaxUID = '1.3'
         meta.ImplementationClassUID = '1.4'
         write_file_meta_info(self.fp, meta, enforce_standard=False)
-        self.assertEqual(self.fp.tell(), 48)
+        assert 48 == self.fp.tell()
 
         # 8 + 6 bytes ImplementationClassUID
         # 50 bytes total
@@ -2045,14 +2029,14 @@ class TestWriteFileMetaInfoNonStandard(unittest.TestCase):
         meta.ImplementationClassUID = '1.4.1'
         write_file_meta_info(self.fp, meta, enforce_standard=False)
         # Check File Meta length
-        self.assertEqual(self.fp.tell(), 50)
+        assert 50 == self.fp.tell()
 
     def test_meta_unchanged(self):
         """Test that the meta dataset doesn't change when writing it"""
         # Empty
         meta = Dataset()
         write_file_meta_info(self.fp, meta, enforce_standard=False)
-        self.assertEqual(meta, Dataset())
+        assert Dataset() == meta
 
         # Incomplete
         meta = Dataset()
@@ -2062,7 +2046,7 @@ class TestWriteFileMetaInfoNonStandard(unittest.TestCase):
         meta.ImplementationClassUID = '1.4'
         ref_meta = deepcopy(meta)
         write_file_meta_info(self.fp, meta, enforce_standard=False)
-        self.assertEqual(meta, ref_meta)
+        assert ref_meta == meta
 
         # Conformant
         meta = Dataset()
@@ -2074,11 +2058,12 @@ class TestWriteFileMetaInfoNonStandard(unittest.TestCase):
         meta.ImplementationClassUID = '1.4'
         ref_meta = deepcopy(meta)
         write_file_meta_info(self.fp, meta, enforce_standard=False)
-        self.assertEqual(meta, ref_meta)
+        assert ref_meta == meta
 
 
 class TestWriteNumbers(object):
     """Test filewriter.write_numbers"""
+
     def test_write_empty_value(self):
         """Test writing an empty value does nothing"""
         fp = DicomBytesIO()
@@ -2128,24 +2113,211 @@ class TestWriteNumbers(object):
 
 class TestWritePN(object):
     """Test filewriter.write_PN"""
-    def test_no_encoding_unicode(self):
-        """If PN element has no encoding info, default is used"""
-        fp = DicomBytesIO()
-        fp.is_little_endian = True
-        elem = DataElement(0x00100010, 'PN', u'\u03b8')
-        write_PN(fp, elem)
 
     def test_no_encoding(self):
         """If PN element has no encoding info, default is used"""
         fp = DicomBytesIO()
         fp.is_little_endian = True
+        # data element with encoded value
         elem = DataElement(0x00100010, 'PN', 'Test')
         write_PN(fp, elem)
-        assert fp.getvalue() == b'Test'
+        assert b'Test' == fp.getvalue()
+
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        # data element with decoded value
+        elem = DataElement(0x00100010, 'PN', u'Test')
+        write_PN(fp, elem)
+        assert b'Test' == fp.getvalue()
+
+    def test_single_byte_multi_charset_groups(self):
+        """Test component groups with different encodings"""
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        encodings = ['latin_1', 'iso_ir_126']
+        # data element with encoded value
+        encoded = (b'Dionysios=\x1b\x2d\x46'
+                   b'\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2')
+        elem = DataElement(0x00100010, 'PN', encoded)
+        write_PN(fp, elem, encodings=encodings)
+        assert encoded == fp.getvalue()
+
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        # data element with decoded value
+        elem = DataElement(0x00100010, 'PN', u'Dionysios=Διονυσιος')
+        write_PN(fp, elem, encodings=encodings)
+        assert encoded == fp.getvalue()
+
+    def test_single_byte_multi_charset_values(self):
+        """Test multiple values with different encodings"""
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        encodings = ['latin_1', 'iso_ir_144', 'iso_ir_126']
+        # data element with encoded value
+        encoded = (b'Buc^J\xe9r\xf4me\\\x1b\x2d\x46'
+                   b'\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2\\'
+                   b'\x1b\x2d\x4C'
+                   b'\xbb\xee\xda\x63\x65\xdc\xd1\x79\x70\xd3 ')
+        elem = DataElement(0x00100060, 'PN', encoded)
+        write_PN(fp, elem, encodings=encodings)
+        assert encoded == fp.getvalue()
+
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        # data element with decoded value
+        elem = DataElement(0x00100060, 'PN', [u'Buc^Jérôme', u'Διονυσιος',
+                                              u'Люкceмбypг'])
+        write_PN(fp, elem, encodings=encodings)
+        assert encoded == fp.getvalue()
+
+
+class TestWriteText(object):
+    """Test filewriter.write_PN"""
+
+    def teardown(self):
+        config.enforce_valid_values = False
+
+    def test_no_encoding(self):
+        """If text element has no encoding info, default is used"""
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        # data element with encoded value
+        elem = DataElement(0x00081039, 'LO', 'Test')
+        write_text(fp, elem)
+        assert b'Test' == fp.getvalue()
+
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        # data element with decoded value
+        elem = DataElement(0x00081039, 'LO', u'Test')
+        write_text(fp, elem)
+        assert b'Test' == fp.getvalue()
+
+    def test_single_byte_multi_charset_text(self):
+        """Test changed encoding inside the string"""
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        encoded = (b'Dionysios=\x1b\x2d\x46'
+                   b'\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2')
+        # data element with encoded value
+        elem = DataElement(0x00081039, 'LO', encoded)
+        encodings = ['latin_1', 'iso_ir_126']
+        write_text(fp, elem, encodings=encodings)
+        assert encoded == fp.getvalue()
+
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        # data element with decoded value
+        elem = DataElement(0x00081039, 'LO', u'Dionysios is Διονυσιος')
+        write_text(fp, elem, encodings=encodings)
+        # encoding may not be the same, so decode it first
+        encoded = fp.getvalue()
+        assert u'Dionysios is Διονυσιος' == convert_text(encoded, encodings)
+
+    def test_encode_mixed_charsets_text(self):
+        """Test encodings used inside the string in arbitrary order"""
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        encodings = ['latin_1', 'euc_kr', 'iso-2022-jp', 'iso_ir_127']
+        decoded = u'山田-قباني-吉洞-لنزار'
+
+        # data element with encoded value
+        elem = DataElement(0x00081039, 'LO', decoded)
+        write_text(fp, elem, encodings=encodings)
+        encoded = fp.getvalue()
+        # make sure that the encoded string can be converted back
+        assert decoded == convert_text(encoded, encodings)
+
+    def test_single_byte_multi_charset_text_multivalue(self):
+        """Test multiple values with different encodings"""
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        encoded = (b'Buc^J\xe9r\xf4me\\\x1b\x2d\x46'
+                   b'\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2\\'
+                   b'\x1b\x2d\x4C'
+                   b'\xbb\xee\xda\x63\x65\xdc\xd1\x79\x70\xd3 ')
+        # data element with encoded value
+        elem = DataElement(0x00081039, 'LO', encoded)
+        encodings = ['latin_1', 'iso_ir_144', 'iso_ir_126']
+        write_text(fp, elem, encodings=encodings)
+        assert encoded == fp.getvalue()
+
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        # data element with decoded value
+        decoded = [u'Buc^Jérôme', u'Διονυσιος', u'Люкceмбypг']
+        elem = DataElement(0x00081039, 'LO', decoded)
+        write_text(fp, elem, encodings=encodings)
+        # encoding may not be the same, so decode it first
+        encoded = fp.getvalue()
+        assert decoded == convert_text(encoded, encodings)
+
+    def test_invalid_encoding(self):
+        """Test encoding text with invalid encodings"""
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        # data element with decoded value
+        elem = DataElement(0x00081039, 'LO', u'Dionysios Διονυσιος')
+        msg = 'Failed to encode value with encodings: iso-2022-jp'
+        if 'PyPy' in python_implementation():
+            # PyPy seems to have a different implementation of
+            # replacement mode with regard to escape sequences
+            expected = b'Dionysios \x1b$B&$&I&O&M&T&R&I&O?\x1b(B '
+        else:
+            expected = b'Dionysios \x1b$B&$&I&O&M&T&R&I&O\x1b(B? '
+        with pytest.warns(UserWarning, match=msg):
+            # encode with one invalid encoding
+            write_text(fp, elem, encodings=['iso-2022-jp'])
+            assert expected == fp.getvalue()
+
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        # data element with decoded value
+        elem = DataElement(0x00081039, 'LO', u'Dionysios Διονυσιος')
+        msg = 'Failed to encode value with encodings: iso-2022-jp, iso_ir_58'
+        with pytest.warns(UserWarning, match=msg):
+            # encode with two invalid encodings
+            write_text(fp, elem, encodings=['iso-2022-jp', 'iso_ir_58'])
+            assert expected == fp.getvalue()
+
+    def test_invalid_encoding_enforce_standard(self):
+        """Test encoding text with invalid encodings with
+        `config.enforce_valid_values` enabled"""
+        config.enforce_valid_values = True
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        # data element with decoded value
+        elem = DataElement(0x00081039, 'LO', u'Dionysios Διονυσιος')
+        msg = (r"'iso2022_jp' codec can't encode character u?'\\u03c2' in "
+               r"position 18: illegal multibyte sequence")
+        with pytest.raises(UnicodeEncodeError, match=msg):
+            # encode with one invalid encoding
+            write_text(fp, elem, encodings=['iso-2022-jp'])
+
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        # data element with decoded value
+        elem = DataElement(0x00081039, 'LO', u'Dionysios Διονυσιος')
+        with pytest.raises(UnicodeEncodeError, match=msg):
+            # encode with two invalid encodings
+            write_text(fp, elem, encodings=['iso-2022-jp', 'iso_ir_58'])
+
+    def test_single_value_with_delimiters(self):
+        """Test that text with delimiters encodes correctly"""
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        decoded = u'Διονυσιος\r\nJérôme/Люкceмбypг\tJérôme'
+        elem = DataElement(0x00081039, 'LO', decoded)
+        encodings = ('latin_1', 'iso_ir_144', 'iso_ir_126')
+        write_text(fp, elem, encodings=encodings)
+        encoded = fp.getvalue()
+        assert decoded == convert_text(encoded, encodings)
 
 
 class TestWriteDT(object):
     """Test filewriter.write_DT"""
+
     def test_format_dt(self):
         """Test _format_DT"""
         elem = DataElement(0x00181078, 'DT', DT('20010203123456.123456'))
@@ -2161,10 +2333,10 @@ class TestWriteDT(object):
         assert _format_DT(elem.value) == '20010203123456'
 
 
-class TestWriteUndefinedLengthPixelData(unittest.TestCase):
+class TestWriteUndefinedLengthPixelData(object):
     """Test write_data_element() for pixel data with undefined length."""
 
-    def setUp(self):
+    def setup(self):
         self.fp = DicomBytesIO()
 
     def test_little_endian_correct_data(self):
@@ -2227,94 +2399,3 @@ class TestWriteUndefinedLengthPixelData(unittest.TestCase):
         with pytest.raises(ValueError, match='Pixel Data .+ must '
                                              'start with an item tag'):
             write_data_element(self.fp, pixel_data)
-
-
-class TestWriteNumbers(object):
-    """Test filewriter.write_numbers"""
-    def test_write_empty_value(self):
-        """Test writing an empty value does nothing"""
-        fp = DicomBytesIO()
-        fp.is_little_endian = True
-        elem = DataElement(0x00100010, 'US', '')
-        fmt = 'H'
-        write_numbers(fp, elem, fmt)
-        assert fp.getvalue() == b''
-
-    def test_write_list(self):
-        """Test writing an element value with VM > 1"""
-        fp = DicomBytesIO()
-        fp.is_little_endian = True
-        elem = DataElement(0x00100010, 'US', [1, 2, 3, 4])
-        fmt = 'H'
-        write_numbers(fp, elem, fmt)
-        assert fp.getvalue() == b'\x01\x00\x02\x00\x03\x00\x04\x00'
-
-    def test_write_singleton(self):
-        """Test writing an element value with VM = 1"""
-        fp = DicomBytesIO()
-        fp.is_little_endian = True
-        elem = DataElement(0x00100010, 'US', 1)
-        fmt = 'H'
-        write_numbers(fp, elem, fmt)
-        assert fp.getvalue() == b'\x01\x00'
-
-    def test_exception(self):
-        """Test exceptions raise IOError"""
-        fp = DicomBytesIO()
-        fp.is_little_endian = True
-        elem = DataElement(0x00100010, 'US', b'\x00')
-        fmt = 'H'
-        with pytest.raises(IOError,
-                           match=r"for data_element:\n\(0010, 0010\)"):
-            write_numbers(fp, elem, fmt)
-
-    def test_write_big_endian(self):
-        """Test writing big endian"""
-        fp = DicomBytesIO()
-        fp.is_little_endian = False
-        elem = DataElement(0x00100010, 'US', 1)
-        fmt = 'H'
-        write_numbers(fp, elem, fmt)
-        assert fp.getvalue() == b'\x00\x01'
-
-
-class TestWritePN(object):
-    """Test filewriter.write_PN"""
-    def test_no_encoding_unicode(self):
-        """If PN element as no encoding info, default is used"""
-        fp = DicomBytesIO()
-        fp.is_little_endian = True
-        elem = DataElement(0x00100010, 'PN', u'\u00e8')
-        write_PN(fp, elem)
-
-    def test_no_encoding(self):
-        """If PN element as no encoding info, default is used"""
-        fp = DicomBytesIO()
-        fp.is_little_endian = True
-        elem = DataElement(0x00100010, 'PN', 'Test')
-        write_PN(fp, elem)
-        assert fp.getvalue() == b'Test'
-
-
-class TestWriteDT(object):
-    """Test filewriter.write_DT"""
-    def test_format_dt(self):
-        """Test _format_DT"""
-        elem = DataElement(0x00181078, 'DT', DT('20010203123456.123456'))
-        assert hasattr(elem.value, 'original_string')
-        assert _format_DT(elem.value) == '20010203123456.123456'
-        del elem.value.original_string
-        assert not hasattr(elem.value, 'original_string')
-        assert elem.value.microsecond > 0
-        assert _format_DT(elem.value) == '20010203123456.123456'
-
-        elem = DataElement(0x00181078, 'DT', DT('20010203123456'))
-        del elem.value.original_string
-        assert _format_DT(elem.value) == '20010203123456'
-
-
-if __name__ == "__main__":
-    # This is called if run alone, but not if loaded through run_tests.py
-    # If not run from the directory where the sample images are,
-    #    then need to switch there
-    unittest.main()

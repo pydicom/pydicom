@@ -37,7 +37,11 @@ Enhancements
 * Added ``Dataset.fix_meta_info()`` (:issue:`584`)
 * Add new function for bit packing ``pack_bits`` for use with BitsAllocated
   = 1 (:pull_request:`715`)
-* Added handling of single-byte character set extensions (:pull_request:`718`)
+* Added/corrected encoding and decoding of text and person name VRs using
+  character sets with code extensions, added handling of encoding/decoding
+  errors (:issue:`716`)
+* Handle common spelling errors in Specific Character Set values
+  (:pull_request:`695`, :pull_request:`737`)
 * Added ``uid.JPEGLosslessP14`` for UID 1.2.840.10008.1.2.4.57
 * Added ``uid.JPEG2000MultiComponentLossless`` for UID 1.2.840.10008.1.2.4.92
 * Added ``uid.JPEG2000MultiComponent`` for UID 1.2.840.10008.1.2.4.93
@@ -55,6 +59,9 @@ Fixes
   (:pull_request:`660`)
 * Improve performance for Python 3 when dealing with compressed multi-frame
   Pixel Data with pillow and jpeg-ls (:issue:`682`).
+* Fixed handling of private tags in repeater range (:issue:`689`)
+* Fixed handling of elements with ambiguous VR (:pull_request:`700`,
+  :pull_request:`728`)
 * Improve performance of bit unpacking (:pull_request:`715`)
 * First character set no longer removed (:issue:`707`)
 * Fixed RLE decoded data having the wrong byte order (:pull_request:`729`)

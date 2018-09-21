@@ -3,7 +3,7 @@
 import re
 import warnings
 
-from pydicom import compat
+from pydicom import compat, config
 from pydicom.valuerep import PersonNameUnicode, text_VRs, TEXT_VR_DELIMS
 from pydicom.compat import in_py2
 
@@ -54,12 +54,17 @@ python_encoding = {
     'GBK': 'GBK',  # from DICOM correction CP1234
 }
 
+# these encodings cannot be used with code extensions
+# see DICOM Standard, Part 3, Table C.12-5
+# and DICOM Standard, Part 5, Section 6.1.2.5.4, item d
+STAND_ALONE_ENCODINGS = ('ISO_IR 192', 'GBK', 'GB18030')
+
 # the escape character used to mark the start of escape sequences
 ESC = b'\x1b'
 
 # Map Python encodings to escape sequences as defined in PS3.3 in tables
 # C.12-3 (single-byte) and C.12-4 (multi-byte character sets).
-escape_codes = {
+CODES_TO_ENCODINGS = {
     ESC + b'(B': default_encoding,  # used to switch to ASCII G0 code element
     ESC + b'-A': 'latin_1',
     ESC + b')I': 'shift_jis',  # switches to ISO-IR 13
@@ -78,6 +83,8 @@ escape_codes = {
     ESC + b'$(D': 'iso-2022-jp',
     ESC + b'$)A': 'iso_ir_58',
 }
+
+ENCODINGS_TO_CODES = {v: k for k, v in CODES_TO_ENCODINGS.items()}
 
 # Multi-byte character sets except Korean are handled by Python.
 # To decode them, the escape sequence shall be preserved in the input byte
@@ -105,11 +112,28 @@ def decode_string(value, encodings, delimiters):
     Returns
     -------
     text type
-        The decoded string.
+        The decoded unicode string. If the value could not be decoded,
+        and `config.enforce_valid_values` is not set, a warning is issued,
+        and the value is decoded using the first encoding with replacement
+        characters, resulting in data loss.
+
+    Raises
+    ------
+    UnicodeDecodeError
+        If `config.enforce_valid_values` is set and `value` could not be
+        decoded with the given encodings.
     """
     # shortcut for the common case - no escape sequences present
     if ESC not in value:
-        return value.decode(encodings[0])
+        try:
+            return value.decode(encodings[0])
+        except UnicodeError:
+            if config.enforce_valid_values:
+                raise
+            warnings.warn(u"Failed to decode byte string with encoding {} - "
+                          u"using replacement characters in decoded "
+                          u"string".format(encodings[0]))
+            return value.decode(encodings[0], errors='replace')
 
     # Each part of the value that starts with an escape sequence is decoded
     # separately. If it starts with an escape sequence, the
@@ -125,11 +149,11 @@ def decode_string(value, encodings, delimiters):
 
     # decode each byte string fragment with it's corresponding encoding
     # and join them all together
-    return u''.join([decode_fragment(fragment, encodings, delimiters)
+    return u''.join([_decode_fragment(fragment, encodings, delimiters)
                      for fragment in fragments])
 
 
-def decode_fragment(byte_str, encodings, delimiters):
+def _decode_fragment(byte_str, encodings, delimiters):
     """Decode a byte string encoded with a single encoding.
     If `byte_str` starts with an escape sequence, the encoding corresponding
     to this sequence is used for decoding if present in `encodings`,
@@ -151,42 +175,188 @@ def decode_fragment(byte_str, encodings, delimiters):
     Returns
     -------
     text type
-        The decoded string.
+        The decoded unicode string. If the value could not be decoded,
+        and `config.enforce_valid_values` is not set, a warning is issued,
+        and the value is decoded using the first encoding with replacement
+        characters, resulting in data loss.
+
+    Raises
+    ------
+    UnicodeDecodeError
+        If `config.enforce_valid_values` is set and `value` could not be
+        decoded with the given encodings.
 
     Reference
     ---------
     * DICOM Standard Part 5, Sections 6.1.2.4 and 6.1.2.5
     * DICOM Standard Part 3, Anex C.12.1.1.2
     """
-    if byte_str.startswith(ESC):
-        # all 4-character escape codes start with one of two character sets
-        seq_length = 4 if byte_str.startswith((b'\x1b$(', b'\x1b$)')) else 3
-        encoding = escape_codes.get(byte_str[:seq_length], '')
-        if encoding in encodings or encoding == default_encoding:
-            if encoding in handled_encodings:
-                # Python strips the escape sequences for this encoding.
-                # Any delimiters must be handled correctly by `byte_str`.
-                return byte_str.decode(encoding)
-            else:
-                # Python doesn't know about the escape sequence -
-                # we have to strip it before decoding
-                byte_str = byte_str[seq_length:]
+    try:
+        if byte_str.startswith(ESC):
+            return _decode_escaped_fragment(byte_str, encodings, delimiters)
+        # no escape sequence - use first encoding
+        return byte_str.decode(encodings[0])
+    except UnicodeError:
+        if config.enforce_valid_values:
+            raise
+        warnings.warn(u"Failed to decode byte string with encodings: {} - "
+                      u"using replacement characters in decoded "
+                      u"string".format(', '.join(encodings)))
+        return byte_str.decode(encodings[0], errors='replace')
 
-                # If a delimiter occurs in the string, it resets the encoding.
-                # The following returns the first occurrence of a delimiter in
-                # the byte string, or None if it does not contain any.
-                index = next((index for index, ch in enumerate(byte_str)
-                              if ch in delimiters), None)
-                if index is not None:
-                    # the part of the string after the first delimiter
-                    # is decoded with the first encoding
-                    return (byte_str[:index].decode(encoding) +
-                            byte_str[index:].decode(encodings[0]))
-                # No delimiter - use the encoding defined by the escape code
-                return byte_str.decode(encoding)
 
-    # no or unknown escape code - use first encoding
-    return byte_str.decode(encodings[0])
+def _decode_escaped_fragment(byte_str, encodings, delimiters):
+    """Decodes a byte string starting with an escape sequence.
+    See `_decode_fragment` for parameter description and more information.
+    """
+    # all 4-character escape codes start with one of two character sets
+    seq_length = 4 if byte_str.startswith((b'\x1b$(', b'\x1b$)')) else 3
+    encoding = CODES_TO_ENCODINGS.get(byte_str[:seq_length], '')
+    if encoding in encodings or encoding == default_encoding:
+        if encoding in handled_encodings:
+            # Python strips the escape sequences for this encoding.
+            # Any delimiters must be handled correctly by `byte_str`.
+            return byte_str.decode(encoding)
+        else:
+            # Python doesn't know about the escape sequence -
+            # we have to strip it before decoding
+            byte_str = byte_str[seq_length:]
+
+            # If a delimiter occurs in the string, it resets the encoding.
+            # The following returns the first occurrence of a delimiter in
+            # the byte string, or None if it does not contain any.
+            index = next((index for index, ch in enumerate(byte_str)
+                          if ch in delimiters), None)
+            if index is not None:
+                # the part of the string after the first delimiter
+                # is decoded with the first encoding
+                return (byte_str[:index].decode(encoding) +
+                        byte_str[index:].decode(encodings[0]))
+            # No delimiter - use the encoding defined by the escape code
+            return byte_str.decode(encoding)
+
+    # unknown escape code - use first encoding
+    msg = u"Found unknown escape sequence in encoded string value"
+    if config.enforce_valid_values:
+        raise ValueError(msg)
+    warnings.warn(msg + u" - using encoding {}".format(encodings[0]))
+    return byte_str.decode(encodings[0], errors='replace')
+
+
+def encode_string(value, encodings):
+    """Convert a unicode string into a byte string using the given
+    list of encodings.
+
+    Parameters
+    ----------
+    value : text type
+        The unicode string as presented to the user.
+    encodings : list
+        The encodings needed to encode the string as a list of Python
+        encodings, converted from the encodings in Specific Character Set.
+
+    Returns
+    -------
+    byte string
+        The encoded string. If the value could not be encoded with any of
+        the given encodings, and `config.enforce_valid_values` is not set, a
+        warning is issued, and the value is encoded using the first
+        encoding with replacement characters, resulting in data loss.
+
+    Raises
+    ------
+    UnicodeEncodeError
+        If `config.enforce_valid_values` is set and `value` could not be
+        encoded with the given encodings.
+    """
+    for i, encoding in enumerate(encodings):
+        try:
+            encoded = value.encode(encoding)
+            if i > 0 and encoding not in handled_encodings:
+                return ENCODINGS_TO_CODES.get(encoding, b'') + encoded
+            return encoded
+        except UnicodeError:
+            continue
+    else:
+        # if we have more than one encoding, we retry encoding by splitting
+        # `value` into chunks that can be encoded with one of the encodings
+        if len(encodings) > 1:
+            try:
+                return _encode_string_parts(value, encodings)
+            except ValueError:
+                pass
+        # all attempts failed - raise or warn and encode with replacement
+        # characters
+        if config.enforce_valid_values:
+            # force raising a valid UnicodeEncodeError
+            value.encode(encodings[0])
+
+        warnings.warn("Failed to encode value with encodings: {} - using "
+                      "replacement characters in encoded string"
+                      .format(', '.join(encodings)))
+        return value.encode(encodings[0], errors='replace')
+
+
+def _encode_string_parts(value, encodings):
+    """Convert a unicode string into a byte string using the given
+    list of encodings.
+    This is invoked if `encode_string` failed to encode `value` with a single
+    encoding. We try instead to use different encodings for different parts
+    of the string, using the encoding that can encode the longest part of
+    the rest of the string as we go along.
+
+    Parameters
+    ----------
+    value : text type
+        The unicode string as presented to the user.
+    encodings : list
+        The encodings needed to encode the string as a list of Python
+        encodings, converted from the encodings in Specific Character Set.
+
+    Returns
+    -------
+    byte string
+        The encoded string, including the escape sequences needed to switch
+        between different encodings.
+
+    Raises
+    ------
+    ValueError
+        If `value` could not be encoded with the given encodings.
+
+    """
+    encoded = bytearray()
+    unencoded_part = value
+    while unencoded_part:
+        # find the encoding that can encode the longest part of the rest
+        # of the string still to be encoded
+        max_index = 0
+        best_encoding = None
+        for encoding in encodings:
+            try:
+                unencoded_part.encode(encoding)
+                # if we get here, the whole rest of the value can be encoded
+                best_encoding = encoding
+                max_index = len(unencoded_part)
+                break
+            except UnicodeError as e:
+                if e.start > max_index:
+                    # e.start is the index of first character failed to encode
+                    max_index = e.start
+                    best_encoding = encoding
+        # none of the given encodings can encode the first character - give up
+        if best_encoding is None:
+            raise ValueError()
+
+        # encode the part that can be encoded with the found encoding
+        encoded_part = unencoded_part[:max_index].encode(best_encoding)
+        if best_encoding not in handled_encodings:
+            encoded += ENCODINGS_TO_CODES.get(best_encoding, b'')
+        encoded += encoded_part
+        # set remaining unencoded part of the string and handle that
+        unencoded_part = unencoded_part[max_index:]
+    # unencoded_part is empty - we are done, return the encoded string
+    return encoded
 
 
 # DICOM PS3.5-2008 6.1.1 (p 18) says:
@@ -203,7 +373,24 @@ def decode_fragment(byte_str, encodings, delimiters):
 
 
 def convert_encodings(encodings):
-    """Converts DICOM encodings into corresponding python encodings"""
+    """Converts DICOM encodings into corresponding python encodings.
+    Handles some common spelling mistakes and issues a warning in this case.
+    Handled stand-alone encodings: if they are the first encodings,
+    additional encodings are ignored, if they are not the first encoding,
+    they are ignored. In both cases, a warning is issued.
+
+    Parameters
+    ----------
+    encodings : list of str
+        The list of encodings as read from Specific Character Set.
+
+    Returns
+    -------
+    list of str
+        The list of Python encodings corresponding to the DICOM encodings.
+        If conversion fails, `encodings` is returned unchanged, assuming
+        that it already has been converted to Python encodings.
+    """
 
     # If a list if passed, we don't want to modify the list in place so copy it
     encodings = encodings[:]
@@ -214,7 +401,7 @@ def convert_encodings(encodings):
         encodings[0] = 'ISO_IR 6'
 
     try:
-        encodings = [python_encoding[x] for x in encodings]
+        py_encodings = [python_encoding[x] for x in encodings]
 
     except KeyError:
         # check for some common mistakes in encodings
@@ -232,19 +419,40 @@ def convert_encodings(encodings):
                 patched_encodings.append(patched[x])
             else:
                 patched_encodings.append(x)
+        # fallback: assume that it is already a python encoding
+        py_encodings = encodings
         if patched:
             try:
-                encodings = [python_encoding[x] for x in patched_encodings]
+                encodings = patched_encodings
+                py_encodings = [python_encoding[x] for x in encodings]
                 for old, new in patched.items():
                     warnings.warn("Incorrect value for Specific Character Set "
                                   "'{}' - assuming '{}'".format(old, new),
                                   stacklevel=2)
             except KeyError:
-                # assume that it is already a python encoding
-                # otherwise, a LookupError will be raised in the using code
                 pass
+        # if patching failed at this point, the original encodings
+        # will be returned, assuming that they are already Python encodings;
+        # otherwise, a LookupError will be raised in the using code
 
-    return encodings
+    # handle illegal stand-alone encodings
+    if len(encodings) > 1:
+        if encodings[0] in STAND_ALONE_ENCODINGS:
+            warnings.warn("Value '{}' for Specific Character Set does not "
+                          "allow code extensions, ignoring: {}"
+                          .format(encodings[0], ', '.join(encodings[1:])),
+                          stacklevel=2)
+            py_encodings = py_encodings[:1]
+        else:
+            for i, encoding in reversed(list(enumerate(encodings[1:]))):
+                if encoding in STAND_ALONE_ENCODINGS:
+                    warnings.warn(
+                        "Value '{}' cannot be used as code extension, "
+                        "ignoring it".format(encoding),
+                        stacklevel=2)
+                    del py_encodings[i + 1]
+
+    return py_encodings
 
 
 def decode(data_element, dicom_character_set):

@@ -1,6 +1,5 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Special classes for DICOM value representations (VR)"""
-
 from copy import deepcopy
 from decimal import Decimal
 import re
@@ -39,16 +38,6 @@ TEXT_VR_DELIMS = ({'\n', '\r', '\t', '\f'} if compat.in_py2
 # Character/Character code for PN delimiter: name part separator '^'
 # (the component separator '=' is handled separately)
 PN_DELIMS = {'^'} if compat.in_py2 else {0xe5}
-
-match_string = b''.join([
-    b'(?P<single_byte>', br'(?P<family_name>[^=\^]*)',
-    br'\^?(?P<given_name>[^=\^]*)', br'\^?(?P<middle_name>[^=\^]*)',
-    br'\^?(?P<name_prefix>[^=\^]*)', br'\^?(?P<name_suffix>[^=\^]*)', b')',
-    b'=?(?P<ideographic>[^=]*)', b'=?(?P<phonetic>[^=]*)$'
-])
-
-match_string_uni = re.compile(match_string.decode('iso8859'))
-match_string_bytes = re.compile(match_string)
 
 
 class DA(date):
@@ -549,7 +538,23 @@ def _verify_encodings(encodings):
 
 
 def _decode_personname(components, encodings):
-    """Return a list of decoded person name components."""
+    """Return a list of decoded person name components.
+
+    Parameters
+    ----------
+    components : list of byte string
+        The list of the up to three encoded person name components
+    encodings : list of str
+        The Python encodings uses to decode `components`.
+
+    Returns
+    -------
+    text type
+        The unicode string representing the person name.
+        If the decoding of some component parts is not possible using the
+        given encodings, they are decoded with the first encoding using
+        replacement characters for bytes that cannot be decoded.
+    """
     from pydicom.charset import decode_string
 
     if isinstance(components[0], compat.text_type):
@@ -564,55 +569,144 @@ def _decode_personname(components, encodings):
 
 
 def _encode_personname(components, encodings):
-    if not compat.in_py2 and isinstance(components[0], bytes):
-        comps = components
-    else:
-        comps = [
-            C.encode(enc) for C, enc in zip(components, encodings)
-        ]
+    """Encode a list of text string person name components.
+
+    Parameters
+    ----------
+    components : list of text type
+        The list of the up to three unicode person name components
+    encodings : list of str
+        The Python encodings uses to encode `components`.
+
+    Returns
+    -------
+    byte string
+        The byte string that can be written as a PN DICOM tag value.
+        If the encoding of some component parts is not possible using the
+        given encodings, they are encoded with the first encoding using
+        replacement bytes for characters that cannot be encoded.
+    """
+    from pydicom.charset import encode_string
+
+    encoded_comps = []
+    for comp in components:
+        groups = [encode_string(group, encodings)
+                  for group in comp.split('^')]
+        encoded_comps.append(b'^'.join(groups))
 
     # Remove empty elements from the end
-    while len(comps) and not comps[-1]:
-        comps.pop()
-
-    return b'='.join(comps)
+    while len(encoded_comps) and not encoded_comps[-1]:
+        encoded_comps.pop()
+    return b'='.join(encoded_comps)
 
 
 class PersonName3(object):
-    def __init__(self, val, encodings=None):
+    def __init__(self, val, encodings=None, original_string=None):
+        # handle None `val` as empty string
+        val = val or ''
         if isinstance(val, PersonName3):
             encodings = val.encodings
-            val = val.original_string
-
-        self.original_string = val
+            self.original_string = val.original_string
+            self._components = str(val).split('=')
+        elif isinstance(val, bytes):
+            # this is the raw byte string - decode it on demand
+            self.original_string = val
+            self._components = None
+        else:
+            # this is the decoded string - save the original string if
+            # available for easier writing back
+            self.original_string = original_string
+            self._components = val.split('=')
 
         self.encodings = _verify_encodings(encodings) or [default_encoding]
-        self.parse(val)
+        self._dict = {}
 
-    def parse(self, val):
-        if isinstance(val, bytes):
-            matchstr = match_string_bytes
-        else:
-            matchstr = match_string_uni
+    def _create_dict(self):
+        """Creates a dictionary of person name group and component names.
+        Used exclusively for `formatted` for backwards compatibility."""
+        if not self._dict:
+            for name in ('family_name', 'given_name', 'middle_name',
+                         'name_prefix', 'name_suffix',
+                         'ideographic', 'phonetic'):
+                self._dict[name] = getattr(self, name, '')
 
-        matchobj = re.match(matchstr, val)
+    @property
+    def components(self):
+        """Return the up to three decoded person name components, representing
+        the alphabetic, ideographic and phonetic representations as a list
+        of unicode strings.
+        """
+        if self._components is None:
+            groups = self.original_string.split(b'=')
+            self._components = _decode_personname(groups, self.encodings)
 
-        self.__dict__.update(matchobj.groupdict())
+        return self._components
 
-        groups = matchobj.groups()
-        self.components = [groups[i] for i in (0, -2, -1)]
+    def _name_part(self, i):
+        try:
+            return self.components[0].split('^')[i]
+        except IndexError:
+            return ''
+
+    @property
+    def family_name(self):
+        """Return the first (family name) group of the alphabetic person name
+        representation as a unicode string"""
+        return self._name_part(0)
+
+    @property
+    def given_name(self):
+        """Return the second (given name) group of the alphabetic person name
+        representation as a unicode string"""
+        return self._name_part(1)
+
+    @property
+    def middle_name(self):
+        """Return the third (middle name) group of the alphabetic person name
+        representation as a unicode string"""
+        return self._name_part(2)
+
+    @property
+    def name_prefix(self):
+        """Return the fourth (name prefix) group of the alphabetic person name
+        representation as a unicode string"""
+        return self._name_part(3)
+
+    @property
+    def name_suffix(self):
+        """Return the fifth (name suffix) group of the alphabetic person name
+        representation as a unicode string"""
+        return self._name_part(4)
+
+    @property
+    def ideographic(self):
+        """Return the second (ideographic) person name component as a
+        unicode string"""
+        try:
+            return self.components[1]
+        except IndexError:
+            return ''
+
+    @property
+    def phonetic(self):
+        """Return the third (phonetic) person name component as a
+        unicode string"""
+        try:
+            return self.components[2]
+        except IndexError:
+            return ''
 
     def __eq__(self, other):
-        return self.original_string == other
+        return str(self) == other
 
     def __ne__(self, other):
         return not self == other
 
     def __str__(self):
-        return self.original_string.__str__()
+        return '='.join(self.components).__str__()
 
     def __repr__(self):
-        return self.original_string.__repr__()
+        return '='.join(self.components).__repr__()
 
     # For python 3, any override of __cmp__ or __eq__
     # immutable requires explicit redirect of hash
@@ -622,22 +716,63 @@ class PersonName3(object):
     __hash__ = object.__hash__
 
     def decode(self, encodings=None):
-        encodings = _verify_encodings(encodings) or self.encodings
-        comps = _decode_personname(self.components, encodings)
-        return PersonName3(u'='.join(comps), encodings)
+        """Return the patient name decoded by the given encodings.
+
+        Parameters
+        ----------
+        encodings : list of str
+            The list of encodings used for decoding the byte string. If not
+            given, the initial encodings set in the object are used.
+
+        Returns
+        -------
+        PersonName3
+            A person name object that will return the decoded string with
+            the given encodings on demand. If the encodings are not given,
+            the current object is returned.
+        """
+        # in the common case (encoding did not change) we decode on demand
+        if encodings is None or encodings == self.encodings:
+            return self
+        # the encoding was unknown or incorrect - create a new
+        # PersonName object with the changed encoding
+        encodings = _verify_encodings(encodings)
+        return PersonName3(self.original_string, encodings)
 
     def encode(self, encodings=None):
+        """Return the patient name decoded by the given encodings.
+
+        Parameters
+        ----------
+        encodings : list of str
+            The list of encodings used for encoding the unicode string. If
+            not given, the initial encodings set in the object are used.
+
+        Returns
+        -------
+        bytes
+            The person name encoded with the given encodings as a byte string.
+            If no encoding is given, the original byte string is returned, if
+            available, otherwise each group of the patient name is encoded
+            with the first matching of the given encodings.
+        """
         encodings = _verify_encodings(encodings) or self.encodings
-        return _encode_personname(self.components, encodings)
+        # if the encoding is not the original encoding, we have to return
+        # a re-encoded string (without updating the original string)
+        if encodings != self.encodings:
+            return _encode_personname(self.components, encodings)
+        if self.original_string is None:
+            # if the original encoding was not set, we set it now
+            self.original_string = _encode_personname(self.components,
+                                                      encodings)
+        return self.original_string
 
     def family_comma_given(self):
         return self.formatted('%(family_name)s, %(given_name)s')
 
     def formatted(self, format_str):
-        if isinstance(self.original_string, bytes):
-            return format_str % self.decode(default_encoding).__dict__
-        else:
-            return format_str % self.__dict__
+        self._create_dict()
+        return format_str % self._dict
 
 
 class PersonNameBase(object):
@@ -741,7 +876,6 @@ class PersonNameUnicode(PersonNameBase, compat.text_type):
         encodings = _verify_encodings(encodings)
         comps = _decode_personname(val.split(b"="), encodings)
         new_val = u"=".join(comps)
-
         return compat.text_type.__new__(cls, new_val)
 
     def __init__(self, val, encodings):

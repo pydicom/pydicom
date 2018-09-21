@@ -227,7 +227,6 @@ def convert_string(byte_string,
 
 def convert_text(byte_string, encodings=None):
     """Read and return a string or strings"""
-    encodings = encodings or [default_encoding]
     values = byte_string.split(b'\\')
     values = [convert_single_string(value, encodings) for value in values]
     if len(values) == 1:
@@ -308,7 +307,7 @@ def convert_UR_string(byte_string, is_little_endian, struct_format=None):
     return byte_string
 
 
-def convert_value(VR, raw_data_element, encoding=default_encoding):
+def convert_value(VR, raw_data_element, encodings=None):
     """Return the converted value (from raw bytes) for the given VR"""
     if VR not in converters:
         message = "Unknown Value Representation '{0}'".format(VR)
@@ -323,9 +322,10 @@ def convert_value(VR, raw_data_element, encoding=default_encoding):
         converter = converters[VR]
         num_format = None
 
-    # Ensure that encoding is in the proper 3-element format
-    if isinstance(encoding, compat.string_types):
-        encoding = [encoding]
+    # Ensure that encodings is a list
+    encodings = encodings or [default_encoding]
+    if isinstance(encodings, compat.string_types):
+        encodings = [encodings]
 
     byte_string = raw_data_element.value
     is_little_endian = raw_data_element.is_little_endian
@@ -336,7 +336,7 @@ def convert_value(VR, raw_data_element, encoding=default_encoding):
     try:
         if VR in text_VRs or VR == 'PN':
             value = converter(byte_string,
-                              encodings=encoding)
+                              encodings=encodings)
         elif VR != "SQ":
             value = converter(byte_string,
                               is_little_endian,
@@ -345,7 +345,7 @@ def convert_value(VR, raw_data_element, encoding=default_encoding):
             value = convert_SQ(byte_string,
                                is_implicit_VR,
                                is_little_endian,
-                               encoding,
+                               encodings,
                                raw_data_element.value_tell)
     except ValueError:
         if config.enforce_valid_values:
@@ -358,7 +358,7 @@ def convert_value(VR, raw_data_element, encoding=default_encoding):
             if vr == VR:
                 continue
             try:
-                value = convert_value(vr, raw_data_element, encoding)
+                value = convert_value(vr, raw_data_element, encodings)
                 logger.debug('converted value for tag %s with VR %s'
                              % (raw_data_element.tag, vr))
                 break
