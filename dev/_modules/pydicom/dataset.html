@@ -1516,8 +1516,9 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        filename_or_obj : str or None</span>
-<span class="sd">            Full path and filename to the file. Use None if is a BytesIO.</span>
+<span class="sd">        filename_or_obj : str or BytesIO or None</span>
+<span class="sd">            Full path and filename to the file, memory buffer object, or None</span>
+<span class="sd">            if is a BytesIO.</span>
 <span class="sd">        dataset : Dataset or dict</span>
 <span class="sd">            Some form of dictionary, usually a Dataset from read_dataset().</span>
 <span class="sd">        preamble : bytes or str, optional</span>

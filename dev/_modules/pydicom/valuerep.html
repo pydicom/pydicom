@@ -172,7 +172,6 @@
   <h1>Source code for pydicom.valuerep</h1><div class="highlight"><pre>
 <span></span><span class="c1"># Copyright 2008-2018 pydicom authors. See LICENSE file for details.</span>
 <span class="sd">&quot;&quot;&quot;Special classes for DICOM value representations (VR)&quot;&quot;&quot;</span>
-
 <span class="kn">from</span> <span class="nn">copy</span> <span class="k">import</span> <span class="n">deepcopy</span>
 <span class="kn">from</span> <span class="nn">decimal</span> <span class="k">import</span> <span class="n">Decimal</span>
 <span class="kn">import</span> <span class="nn">re</span>
@@ -211,16 +210,6 @@
 <span class="c1"># Character/Character code for PN delimiter: name part separator &#39;^&#39;</span>
 <span class="c1"># (the component separator &#39;=&#39; is handled separately)</span>
 <span class="n">PN_DELIMS</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;^&#39;</span><span class="p">}</span> <span class="k">if</span> <span class="n">compat</span><span class="o">.</span><span class="n">in_py2</span> <span class="k">else</span> <span class="p">{</span><span class="mh">0xe5</span><span class="p">}</span>
-
-<span class="n">match_string</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
-    <span class="sa">b</span><span class="s1">&#39;(?P&lt;single_byte&gt;&#39;</span><span class="p">,</span> <span class="sa">br</span><span class="s1">&#39;(?P&lt;family_name&gt;[^=\^]*)&#39;</span><span class="p">,</span>
-    <span class="sa">br</span><span class="s1">&#39;\^?(?P&lt;given_name&gt;[^=\^]*)&#39;</span><span class="p">,</span> <span class="sa">br</span><span class="s1">&#39;\^?(?P&lt;middle_name&gt;[^=\^]*)&#39;</span><span class="p">,</span>
-    <span class="sa">br</span><span class="s1">&#39;\^?(?P&lt;name_prefix&gt;[^=\^]*)&#39;</span><span class="p">,</span> <span class="sa">br</span><span class="s1">&#39;\^?(?P&lt;name_suffix&gt;[^=\^]*)&#39;</span><span class="p">,</span> <span class="sa">b</span><span class="s1">&#39;)&#39;</span><span class="p">,</span>
-    <span class="sa">b</span><span class="s1">&#39;=?(?P&lt;ideographic&gt;[^=]*)&#39;</span><span class="p">,</span> <span class="sa">b</span><span class="s1">&#39;=?(?P&lt;phonetic&gt;[^=]*)$&#39;</span>
-<span class="p">])</span>
-
-<span class="n">match_string_uni</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">match_string</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;iso8859&#39;</span><span class="p">))</span>
-<span class="n">match_string_bytes</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">match_string</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="DA"><a class="viewcode-back" href="../../api_ref.html#pydicom.valuerep.DA">[docs]</a><span class="k">class</span> <span class="nc">DA</span><span class="p">(</span><span class="n">date</span><span class="p">):</span>
@@ -721,7 +710,23 @@
 
 
 <span class="k">def</span> <span class="nf">_decode_personname</span><span class="p">(</span><span class="n">components</span><span class="p">,</span> <span class="n">encodings</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Return a list of decoded person name components.&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Return a list of decoded person name components.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    components : list of byte string</span>
+<span class="sd">        The list of the up to three encoded person name components</span>
+<span class="sd">    encodings : list of str</span>
+<span class="sd">        The Python encodings uses to decode `components`.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    text type</span>
+<span class="sd">        The unicode string representing the person name.</span>
+<span class="sd">        If the decoding of some component parts is not possible using the</span>
+<span class="sd">        given encodings, they are decoded with the first encoding using</span>
+<span class="sd">        replacement characters for bytes that cannot be decoded.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">from</span> <span class="nn">pydicom.charset</span> <span class="k">import</span> <span class="n">decode_string</span>
 
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">components</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">compat</span><span class="o">.</span><span class="n">text_type</span><span class="p">):</span>
@@ -736,55 +741,144 @@
 
 
 <span class="k">def</span> <span class="nf">_encode_personname</span><span class="p">(</span><span class="n">components</span><span class="p">,</span> <span class="n">encodings</span><span class="p">):</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">compat</span><span class="o">.</span><span class="n">in_py2</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">components</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">bytes</span><span class="p">):</span>
-        <span class="n">comps</span> <span class="o">=</span> <span class="n">components</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">comps</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">C</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">enc</span><span class="p">)</span> <span class="k">for</span> <span class="n">C</span><span class="p">,</span> <span class="n">enc</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">components</span><span class="p">,</span> <span class="n">encodings</span><span class="p">)</span>
-        <span class="p">]</span>
+    <span class="sd">&quot;&quot;&quot;Encode a list of text string person name components.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    components : list of text type</span>
+<span class="sd">        The list of the up to three unicode person name components</span>
+<span class="sd">    encodings : list of str</span>
+<span class="sd">        The Python encodings uses to encode `components`.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    byte string</span>
+<span class="sd">        The byte string that can be written as a PN DICOM tag value.</span>
+<span class="sd">        If the encoding of some component parts is not possible using the</span>
+<span class="sd">        given encodings, they are encoded with the first encoding using</span>
+<span class="sd">        replacement bytes for characters that cannot be encoded.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">pydicom.charset</span> <span class="k">import</span> <span class="n">encode_string</span>
+
+    <span class="n">encoded_comps</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="n">components</span><span class="p">:</span>
+        <span class="n">groups</span> <span class="o">=</span> <span class="p">[</span><span class="n">encode_string</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="n">encodings</span><span class="p">)</span>
+                  <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">comp</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;^&#39;</span><span class="p">)]</span>
+        <span class="n">encoded_comps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;^&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">groups</span><span class="p">))</span>
 
     <span class="c1"># Remove empty elements from the end</span>
-    <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">comps</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">comps</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
-        <span class="n">comps</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
-
-    <span class="k">return</span> <span class="sa">b</span><span class="s1">&#39;=&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">comps</span><span class="p">)</span>
+    <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">encoded_comps</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">encoded_comps</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+        <span class="n">encoded_comps</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+    <span class="k">return</span> <span class="sa">b</span><span class="s1">&#39;=&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">encoded_comps</span><span class="p">)</span>
 
 
 <span class="k">class</span> <span class="nc">PersonName3</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">encodings</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">encodings</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">original_string</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># handle None `val` as empty string</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="n">val</span> <span class="ow">or</span> <span class="s1">&#39;&#39;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">PersonName3</span><span class="p">):</span>
             <span class="n">encodings</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">encodings</span>
-            <span class="n">val</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">original_string</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">original_string</span> <span class="o">=</span> <span class="n">val</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">original_string</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">original_string</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_components</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
+            <span class="c1"># this is the raw byte string - decode it on demand</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">original_string</span> <span class="o">=</span> <span class="n">val</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_components</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># this is the decoded string - save the original string if</span>
+            <span class="c1"># available for easier writing back</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">original_string</span> <span class="o">=</span> <span class="n">original_string</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_components</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">encodings</span> <span class="o">=</span> <span class="n">_verify_encodings</span><span class="p">(</span><span class="n">encodings</span><span class="p">)</span> <span class="ow">or</span> <span class="p">[</span><span class="n">default_encoding</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dict</span> <span class="o">=</span> <span class="p">{}</span>
 
-    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
-            <span class="n">matchstr</span> <span class="o">=</span> <span class="n">match_string_bytes</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">matchstr</span> <span class="o">=</span> <span class="n">match_string_uni</span>
+    <span class="k">def</span> <span class="nf">_create_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Creates a dictionary of person name group and component names.</span>
+<span class="sd">        Used exclusively for `formatted` for backwards compatibility.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dict</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;family_name&#39;</span><span class="p">,</span> <span class="s1">&#39;given_name&#39;</span><span class="p">,</span> <span class="s1">&#39;middle_name&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;name_prefix&#39;</span><span class="p">,</span> <span class="s1">&#39;name_suffix&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;ideographic&#39;</span><span class="p">,</span> <span class="s1">&#39;phonetic&#39;</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_dict</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
 
-        <span class="n">matchobj</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">matchstr</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">components</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the up to three decoded person name components, representing</span>
+<span class="sd">        the alphabetic, ideographic and phonetic representations as a list</span>
+<span class="sd">        of unicode strings.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_components</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">groups</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">original_string</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;=&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_components</span> <span class="o">=</span> <span class="n">_decode_personname</span><span class="p">(</span><span class="n">groups</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">encodings</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">matchobj</span><span class="o">.</span><span class="n">groupdict</span><span class="p">())</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_components</span>
 
-        <span class="n">groups</span> <span class="o">=</span> <span class="n">matchobj</span><span class="o">.</span><span class="n">groups</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">components</span> <span class="o">=</span> <span class="p">[</span><span class="n">groups</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)]</span>
+    <span class="k">def</span> <span class="nf">_name_part</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;^&#39;</span><span class="p">)[</span><span class="n">i</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;&#39;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">family_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the first (family name) group of the alphabetic person name</span>
+<span class="sd">        representation as a unicode string&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name_part</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">given_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the second (given name) group of the alphabetic person name</span>
+<span class="sd">        representation as a unicode string&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name_part</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">middle_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the third (middle name) group of the alphabetic person name</span>
+<span class="sd">        representation as a unicode string&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name_part</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">name_prefix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the fourth (name prefix) group of the alphabetic person name</span>
+<span class="sd">        representation as a unicode string&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name_part</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">name_suffix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the fifth (name suffix) group of the alphabetic person name</span>
+<span class="sd">        representation as a unicode string&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name_part</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ideographic</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the second (ideographic) person name component as a</span>
+<span class="sd">        unicode string&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;&#39;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">phonetic</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the third (phonetic) person name component as a</span>
+<span class="sd">        unicode string&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;&#39;</span>
 
     <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">original_string</span> <span class="o">==</span> <span class="n">other</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">==</span> <span class="n">other</span>
 
     <span class="k">def</span> <span class="nf">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span> <span class="o">==</span> <span class="n">other</span>
 
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">original_string</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span>
+        <span class="k">return</span> <span class="s1">&#39;=&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">)</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">original_string</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">()</span>
+        <span class="k">return</span> <span class="s1">&#39;=&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">)</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">()</span>
 
     <span class="c1"># For python 3, any override of __cmp__ or __eq__</span>
     <span class="c1"># immutable requires explicit redirect of hash</span>
@@ -794,22 +888,63 @@
     <span class="fm">__hash__</span> <span class="o">=</span> <span class="nb">object</span><span class="o">.</span><span class="fm">__hash__</span>
 
     <span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">encodings</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">encodings</span> <span class="o">=</span> <span class="n">_verify_encodings</span><span class="p">(</span><span class="n">encodings</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">encodings</span>
-        <span class="n">comps</span> <span class="o">=</span> <span class="n">_decode_personname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">,</span> <span class="n">encodings</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">PersonName3</span><span class="p">(</span><span class="sa">u</span><span class="s1">&#39;=&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">comps</span><span class="p">),</span> <span class="n">encodings</span><span class="p">)</span>
+        <span class="sd">&quot;&quot;&quot;Return the patient name decoded by the given encodings.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        encodings : list of str</span>
+<span class="sd">            The list of encodings used for decoding the byte string. If not</span>
+<span class="sd">            given, the initial encodings set in the object are used.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        PersonName3</span>
+<span class="sd">            A person name object that will return the decoded string with</span>
+<span class="sd">            the given encodings on demand. If the encodings are not given,</span>
+<span class="sd">            the current object is returned.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># in the common case (encoding did not change) we decode on demand</span>
+        <span class="k">if</span> <span class="n">encodings</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">encodings</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">encodings</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span>
+        <span class="c1"># the encoding was unknown or incorrect - create a new</span>
+        <span class="c1"># PersonName object with the changed encoding</span>
+        <span class="n">encodings</span> <span class="o">=</span> <span class="n">_verify_encodings</span><span class="p">(</span><span class="n">encodings</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">PersonName3</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">original_string</span><span class="p">,</span> <span class="n">encodings</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">encodings</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the patient name decoded by the given encodings.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        encodings : list of str</span>
+<span class="sd">            The list of encodings used for encoding the unicode string. If</span>
+<span class="sd">            not given, the initial encodings set in the object are used.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bytes</span>
+<span class="sd">            The person name encoded with the given encodings as a byte string.</span>
+<span class="sd">            If no encoding is given, the original byte string is returned, if</span>
+<span class="sd">            available, otherwise each group of the patient name is encoded</span>
+<span class="sd">            with the first matching of the given encodings.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">encodings</span> <span class="o">=</span> <span class="n">_verify_encodings</span><span class="p">(</span><span class="n">encodings</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">encodings</span>
-        <span class="k">return</span> <span class="n">_encode_personname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">,</span> <span class="n">encodings</span><span class="p">)</span>
+        <span class="c1"># if the encoding is not the original encoding, we have to return</span>
+        <span class="c1"># a re-encoded string (without updating the original string)</span>
+        <span class="k">if</span> <span class="n">encodings</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encodings</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">_encode_personname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">,</span> <span class="n">encodings</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">original_string</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># if the original encoding was not set, we set it now</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">original_string</span> <span class="o">=</span> <span class="n">_encode_personname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">,</span>
+                                                      <span class="n">encodings</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">original_string</span>
 
     <span class="k">def</span> <span class="nf">family_comma_given</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">formatted</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%(family_name)s</span><span class="s1">, </span><span class="si">%(given_name)s</span><span class="s1">&#39;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">formatted</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">format_str</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">original_string</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">format_str</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">default_encoding</span><span class="p">)</span><span class="o">.</span><span class="vm">__dict__</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">format_str</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_create_dict</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">format_str</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dict</span>
 
 
 <div class="viewcode-block" id="PersonNameBase"><a class="viewcode-back" href="../../api_ref.html#pydicom.valuerep.PersonNameBase">[docs]</a><span class="k">class</span> <span class="nc">PersonNameBase</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -913,7 +1048,6 @@
         <span class="n">encodings</span> <span class="o">=</span> <span class="n">_verify_encodings</span><span class="p">(</span><span class="n">encodings</span><span class="p">)</span>
         <span class="n">comps</span> <span class="o">=</span> <span class="n">_decode_personname</span><span class="p">(</span><span class="n">val</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;=&quot;</span><span class="p">),</span> <span class="n">encodings</span><span class="p">)</span>
         <span class="n">new_val</span> <span class="o">=</span> <span class="sa">u</span><span class="s2">&quot;=&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">comps</span><span class="p">)</span>
-
         <span class="k">return</span> <span class="n">compat</span><span class="o">.</span><span class="n">text_type</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">new_val</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">encodings</span><span class="p">):</span>

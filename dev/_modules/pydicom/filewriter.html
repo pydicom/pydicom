@@ -178,7 +178,9 @@
 
 <span class="kn">from</span> <span class="nn">pydicom</span> <span class="k">import</span> <span class="n">compat</span>
 <span class="kn">from</span> <span class="nn">pydicom.compat</span> <span class="k">import</span> <span class="n">in_py2</span>
-<span class="kn">from</span> <span class="nn">pydicom.charset</span> <span class="k">import</span> <span class="n">default_encoding</span><span class="p">,</span> <span class="n">text_VRs</span><span class="p">,</span> <span class="n">convert_encodings</span>
+<span class="kn">from</span> <span class="nn">pydicom.charset</span> <span class="k">import</span> <span class="p">(</span>
+    <span class="n">default_encoding</span><span class="p">,</span> <span class="n">text_VRs</span><span class="p">,</span> <span class="n">convert_encodings</span><span class="p">,</span> <span class="n">encode_string</span>
+<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">pydicom.dataelem</span> <span class="k">import</span> <span class="n">DataElement_from_raw</span>
 <span class="kn">from</span> <span class="nn">pydicom.dataset</span> <span class="k">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">validate_file_meta</span>
 <span class="kn">from</span> <span class="nn">pydicom.filebase</span> <span class="k">import</span> <span class="n">DicomFile</span><span class="p">,</span> <span class="n">DicomFileLike</span><span class="p">,</span> <span class="n">DicomBytesIO</span>
@@ -186,7 +188,7 @@
 <span class="kn">from</span> <span class="nn">pydicom.tag</span> <span class="k">import</span> <span class="p">(</span><span class="n">Tag</span><span class="p">,</span> <span class="n">ItemTag</span><span class="p">,</span> <span class="n">ItemDelimiterTag</span><span class="p">,</span> <span class="n">SequenceDelimiterTag</span><span class="p">,</span>
                          <span class="n">tag_in_exception</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="k">import</span> <span class="n">UncompressedPixelTransferSyntaxes</span>
-<span class="kn">from</span> <span class="nn">pydicom.valuerep</span> <span class="k">import</span> <span class="n">extra_length_VRs</span>
+<span class="kn">from</span> <span class="nn">pydicom.valuerep</span> <span class="k">import</span> <span class="n">extra_length_VRs</span><span class="p">,</span> <span class="n">PersonNameUnicode</span>
 <span class="kn">from</span> <span class="nn">pydicom.values</span> <span class="k">import</span> <span class="n">convert_numbers</span>
 
 
@@ -415,15 +417,14 @@
 <div class="viewcode-block" id="multi_string"><a class="viewcode-back" href="../../api_ref.html#pydicom.filewriter.multi_string">[docs]</a><span class="k">def</span> <span class="nf">multi_string</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Put a string together with delimiter if has more than one value&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">_is_multi_value</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
-        <span class="c1"># \ is escape chr, so &quot;\\&quot; gives single backslash</span>
         <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">val</span></div>
 
 
-<span class="k">def</span> <span class="nf">write_PN</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">data_element</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="sa">b</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">encoding</span><span class="p">:</span>
-        <span class="n">encoding</span> <span class="o">=</span> <span class="p">[</span><span class="n">default_encoding</span><span class="p">]</span> <span class="o">*</span> <span class="mi">3</span>
+<span class="k">def</span> <span class="nf">write_PN</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">data_element</span><span class="p">,</span> <span class="n">encodings</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">encodings</span><span class="p">:</span>
+        <span class="n">encodings</span> <span class="o">=</span> <span class="p">[</span><span class="n">default_encoding</span><span class="p">]</span>
 
     <span class="k">if</span> <span class="n">data_element</span><span class="o">.</span><span class="n">VM</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">val</span> <span class="o">=</span> <span class="p">[</span><span class="n">data_element</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="p">]</span>
@@ -432,30 +433,52 @@
 
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">compat</span><span class="o">.</span><span class="n">text_type</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">in_py2</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">val</span> <span class="o">=</span> <span class="p">[</span><span class="n">elem</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">encoding</span><span class="p">)</span> <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">val</span><span class="p">]</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="p">[</span><span class="n">elem</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">encodings</span><span class="p">)</span> <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">val</span><span class="p">]</span>
         <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
-            <span class="n">val</span> <span class="o">=</span> <span class="p">[</span><span class="n">elem</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">encoding</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">val</span><span class="p">]</span>
+            <span class="c1"># we get here in Python 2 if val is a unicode string</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="p">[</span><span class="n">PersonNameUnicode</span><span class="p">(</span><span class="n">elem</span><span class="p">,</span> <span class="n">encodings</span><span class="p">)</span> <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">val</span><span class="p">]</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="p">[</span><span class="n">elem</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">encodings</span><span class="p">)</span> <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">val</span><span class="p">]</span>
 
     <span class="n">val</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">val</span> <span class="o">=</span> <span class="n">val</span> <span class="o">+</span> <span class="n">padding</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="n">val</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39; &#39;</span>
 
     <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="write_string"><a class="viewcode-back" href="../../api_ref.html#pydicom.filewriter.write_string">[docs]</a><span class="k">def</span> <span class="nf">write_string</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">data_element</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">default_encoding</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Write a single or multivalued string.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="write_string"><a class="viewcode-back" href="../../api_ref.html#pydicom.filewriter.write_string">[docs]</a><span class="k">def</span> <span class="nf">write_string</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">data_element</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Write a single or multivalued ASCII string.&quot;&quot;&quot;</span>
     <span class="n">val</span> <span class="o">=</span> <span class="n">multi_string</span><span class="p">(</span><span class="n">data_element</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">val</span> <span class="o">=</span> <span class="n">val</span> <span class="o">+</span> <span class="n">padding</span>  <span class="c1"># pad to even length</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">compat</span><span class="o">.</span><span class="n">text_type</span><span class="p">):</span>
-            <span class="n">val</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">encoding</span><span class="p">)</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">default_encoding</span><span class="p">)</span>
         <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">val</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="write_number_string"><a class="viewcode-back" href="../../api_ref.html#pydicom.filewriter.write_number_string">[docs]</a><span class="k">def</span> <span class="nf">write_number_string</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">data_element</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="write_text"><a class="viewcode-back" href="../../api_ref.html#pydicom.filewriter.write_text">[docs]</a><span class="k">def</span> <span class="nf">write_text</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">data_element</span><span class="p">,</span> <span class="n">encodings</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Write a single or multivalued text string.&quot;&quot;&quot;</span>
+    <span class="n">val</span> <span class="o">=</span> <span class="n">data_element</span><span class="o">.</span><span class="n">value</span>
+    <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">encodings</span> <span class="o">=</span> <span class="n">encodings</span> <span class="ow">or</span> <span class="p">[</span><span class="n">default_encoding</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">_is_multi_value</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">val</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">compat</span><span class="o">.</span><span class="n">text_type</span><span class="p">):</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">encode_string</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">encodings</span><span class="p">)</span>
+                                  <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">val</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">val</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">val</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">compat</span><span class="o">.</span><span class="n">text_type</span><span class="p">):</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="n">encode_string</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">encodings</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="n">val</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39; &#39;</span>  <span class="c1"># pad to even length</span>
+        <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">val</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="write_number_string"><a class="viewcode-back" href="../../api_ref.html#pydicom.filewriter.write_number_string">[docs]</a><span class="k">def</span> <span class="nf">write_number_string</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">data_element</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Handle IS or DS VR - write a number stored as a string of digits.&quot;&quot;&quot;</span>
     <span class="c1"># If the DS or IS has an original_string attribute, use that, so that</span>
     <span class="c1"># unchanged data elements are written with exact string as when read from</span>
@@ -473,7 +496,7 @@
             <span class="n">val</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">val</span> <span class="o">=</span> <span class="n">val</span> <span class="o">+</span> <span class="n">padding</span>  <span class="c1"># pad to even length</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="n">val</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span>  <span class="c1"># pad to even length</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">in_py2</span><span class="p">:</span>
         <span class="n">val</span> <span class="o">=</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">default_encoding</span><span class="p">)</span>
@@ -490,10 +513,10 @@
         <span class="k">return</span> <span class="n">val</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">write_DA</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">data_element</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">write_DA</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">data_element</span><span class="p">):</span>
     <span class="n">val</span> <span class="o">=</span> <span class="n">data_element</span><span class="o">.</span><span class="n">value</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">compat</span><span class="o">.</span><span class="n">string_types</span><span class="p">)):</span>
-        <span class="n">write_string</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">data_element</span><span class="p">,</span> <span class="n">padding</span><span class="p">)</span>
+        <span class="n">write_string</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">data_element</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">_is_multi_value</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
             <span class="n">val</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="n">x</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">compat</span><span class="o">.</span><span class="n">string_types</span><span class="p">))</span>
@@ -501,7 +524,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">val</span> <span class="o">=</span> <span class="n">_format_DA</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">val</span> <span class="o">=</span> <span class="n">val</span> <span class="o">+</span> <span class="n">padding</span>  <span class="c1"># pad to even length</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="n">val</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span>  <span class="c1"># pad to even length</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">compat</span><span class="o">.</span><span class="n">string_types</span><span class="p">):</span>
             <span class="n">val</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">default_encoding</span><span class="p">)</span>
@@ -518,10 +541,10 @@
         <span class="k">return</span> <span class="n">val</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">%H%M%S%z&quot;</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">write_DT</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">data_element</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">write_DT</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">data_element</span><span class="p">):</span>
     <span class="n">val</span> <span class="o">=</span> <span class="n">data_element</span><span class="o">.</span><span class="n">value</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">compat</span><span class="o">.</span><span class="n">string_types</span><span class="p">)):</span>
-        <span class="n">write_string</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">data_element</span><span class="p">,</span> <span class="n">padding</span><span class="p">)</span>
+        <span class="n">write_string</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">data_element</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">_is_multi_value</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
             <span class="n">val</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="n">x</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">compat</span><span class="o">.</span><span class="n">string_types</span><span class="p">))</span>
@@ -529,7 +552,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">val</span> <span class="o">=</span> <span class="n">_format_DT</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">val</span> <span class="o">=</span> <span class="n">val</span> <span class="o">+</span> <span class="n">padding</span>  <span class="c1"># pad to even length</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="n">val</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span>  <span class="c1"># pad to even length</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">compat</span><span class="o">.</span><span class="n">string_types</span><span class="p">):</span>
             <span class="n">val</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">default_encoding</span><span class="p">)</span>
@@ -548,10 +571,10 @@
         <span class="k">return</span> <span class="n">val</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%H%M%S&quot;</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">write_TM</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">data_element</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">write_TM</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">data_element</span><span class="p">):</span>
     <span class="n">val</span> <span class="o">=</span> <span class="n">data_element</span><span class="o">.</span><span class="n">value</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">compat</span><span class="o">.</span><span class="n">string_types</span><span class="p">)):</span>
-        <span class="n">write_string</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">data_element</span><span class="p">,</span> <span class="n">padding</span><span class="p">)</span>
+        <span class="n">write_string</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">data_element</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">_is_multi_value</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
             <span class="n">val</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="n">x</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">compat</span><span class="o">.</span><span class="n">string_types</span><span class="p">))</span>
@@ -559,7 +582,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">val</span> <span class="o">=</span> <span class="n">_format_TM</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">val</span> <span class="o">=</span> <span class="n">val</span> <span class="o">+</span> <span class="n">padding</span>  <span class="c1"># pad to even length</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="n">val</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span>  <span class="c1"># pad to even length</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">compat</span><span class="o">.</span><span class="n">string_types</span><span class="p">):</span>
             <span class="n">val</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">default_encoding</span><span class="p">)</span>
@@ -567,7 +590,7 @@
         <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="write_data_element"><a class="viewcode-back" href="../../api_ref.html#pydicom.filewriter.write_data_element">[docs]</a><span class="k">def</span> <span class="nf">write_data_element</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">data_element</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">default_encoding</span><span class="p">):</span>
+<div class="viewcode-block" id="write_data_element"><a class="viewcode-back" href="../../api_ref.html#pydicom.filewriter.write_data_element">[docs]</a><span class="k">def</span> <span class="nf">write_data_element</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">data_element</span><span class="p">,</span> <span class="n">encodings</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Write the data_element to file fp according to</span>
 <span class="sd">    dicom media storage rules.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -605,13 +628,14 @@
                 <span class="s2">&quot;write_data_element: unknown Value Representation &quot;</span>
                 <span class="s2">&quot;&#39;</span><span class="si">{0}</span><span class="s2">&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">VR</span><span class="p">))</span>
 
-        <span class="n">encoding</span> <span class="o">=</span> <span class="n">convert_encodings</span><span class="p">(</span><span class="n">encoding</span><span class="p">)</span>
+        <span class="n">encodings</span> <span class="o">=</span> <span class="n">encodings</span> <span class="ow">or</span> <span class="p">[</span><span class="n">default_encoding</span><span class="p">]</span>
+        <span class="n">encodings</span> <span class="o">=</span> <span class="n">convert_encodings</span><span class="p">(</span><span class="n">encodings</span><span class="p">)</span>
         <span class="n">writer_function</span><span class="p">,</span> <span class="n">writer_param</span> <span class="o">=</span> <span class="n">writers</span><span class="p">[</span><span class="n">VR</span><span class="p">]</span>
         <span class="n">is_undefined_length</span> <span class="o">=</span> <span class="n">data_element</span><span class="o">.</span><span class="n">is_undefined_length</span>
         <span class="k">if</span> <span class="n">VR</span> <span class="ow">in</span> <span class="n">text_VRs</span><span class="p">:</span>
-            <span class="n">writer_function</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span> <span class="n">data_element</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">writer_function</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span> <span class="n">data_element</span><span class="p">,</span> <span class="n">encodings</span><span class="o">=</span><span class="n">encodings</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">VR</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;PN&#39;</span><span class="p">,</span> <span class="s1">&#39;SQ&#39;</span><span class="p">):</span>
-            <span class="n">writer_function</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span> <span class="n">data_element</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">)</span>
+            <span class="n">writer_function</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span> <span class="n">data_element</span><span class="p">,</span> <span class="n">encodings</span><span class="o">=</span><span class="n">encodings</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># Many numeric types use the same writer but with numeric format</span>
             <span class="c1"># parameter</span>
@@ -689,16 +713,16 @@
     <span class="n">fp</span><span class="o">.</span><span class="n">is_little_endian</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">is_little_endian</span>
 
 
-<div class="viewcode-block" id="write_sequence"><a class="viewcode-back" href="../../api_ref.html#pydicom.filewriter.write_sequence">[docs]</a><span class="k">def</span> <span class="nf">write_sequence</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">data_element</span><span class="p">,</span> <span class="n">encoding</span><span class="p">):</span>
+<div class="viewcode-block" id="write_sequence"><a class="viewcode-back" href="../../api_ref.html#pydicom.filewriter.write_sequence">[docs]</a><span class="k">def</span> <span class="nf">write_sequence</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">data_element</span><span class="p">,</span> <span class="n">encodings</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Write a dicom Sequence contained in data_element to the file fp.&quot;&quot;&quot;</span>
     <span class="c1"># write_data_element has already written the VR=&#39;SQ&#39; (if needed) and</span>
     <span class="c1">#    a placeholder for length&quot;&quot;&quot;</span>
     <span class="n">sequence</span> <span class="o">=</span> <span class="n">data_element</span><span class="o">.</span><span class="n">value</span>
     <span class="k">for</span> <span class="n">dataset</span> <span class="ow">in</span> <span class="n">sequence</span><span class="p">:</span>
-        <span class="n">write_sequence_item</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">encoding</span><span class="p">)</span></div>
+        <span class="n">write_sequence_item</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">encodings</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="write_sequence_item"><a class="viewcode-back" href="../../api_ref.html#pydicom.filewriter.write_sequence_item">[docs]</a><span class="k">def</span> <span class="nf">write_sequence_item</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">encoding</span><span class="p">):</span>
+<div class="viewcode-block" id="write_sequence_item"><a class="viewcode-back" href="../../api_ref.html#pydicom.filewriter.write_sequence_item">[docs]</a><span class="k">def</span> <span class="nf">write_sequence_item</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">encodings</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Write an item (dataset) in a dicom Sequence to the dicom file fp.</span>
 
 <span class="sd">    This is similar to writing a data_element, but with a specific tag for</span>
@@ -710,7 +734,7 @@
     <span class="n">length_location</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>  <span class="c1"># save location for later.</span>
     <span class="c1"># will fill in real value later if not undefined length</span>
     <span class="n">fp</span><span class="o">.</span><span class="n">write_UL</span><span class="p">(</span><span class="mh">0xffffffff</span><span class="p">)</span>
-    <span class="n">write_dataset</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">parent_encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">)</span>
+    <span class="n">write_dataset</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">parent_encoding</span><span class="o">=</span><span class="n">encodings</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="s2">&quot;is_undefined_length_sequence_item&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
         <span class="n">fp</span><span class="o">.</span><span class="n">write_tag</span><span class="p">(</span><span class="n">ItemDelimiterTag</span><span class="p">)</span>
         <span class="n">fp</span><span class="o">.</span><span class="n">write_UL</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># 4-bytes &#39;length&#39; field for delimiter item</span>
@@ -1058,23 +1082,23 @@
     <span class="s1">&#39;OD&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">write_OWvalue</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
     <span class="s1">&#39;OL&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">write_OWvalue</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
     <span class="s1">&#39;UI&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">write_UI</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
-    <span class="s1">&#39;SH&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">write_string</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+    <span class="s1">&#39;SH&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">write_text</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
     <span class="s1">&#39;DA&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">write_DA</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
     <span class="s1">&#39;TM&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">write_TM</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
     <span class="s1">&#39;CS&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">write_string</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
     <span class="s1">&#39;PN&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">write_PN</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
-    <span class="s1">&#39;LO&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">write_string</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+    <span class="s1">&#39;LO&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">write_text</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
     <span class="s1">&#39;IS&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">write_number_string</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
     <span class="s1">&#39;DS&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">write_number_string</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
     <span class="s1">&#39;AE&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">write_string</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
     <span class="s1">&#39;AS&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">write_string</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
-    <span class="s1">&#39;LT&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">write_string</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+    <span class="s1">&#39;LT&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">write_text</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
     <span class="s1">&#39;SQ&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">write_sequence</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
-    <span class="s1">&#39;UC&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">write_string</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+    <span class="s1">&#39;UC&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">write_text</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
     <span class="s1">&#39;UN&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">write_UN</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
     <span class="s1">&#39;UR&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">write_string</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
     <span class="s1">&#39;AT&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">write_ATvalue</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
-    <span class="s1">&#39;ST&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">write_string</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+    <span class="s1">&#39;ST&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">write_text</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
     <span class="s1">&#39;OW&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">write_OWvalue</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
     <span class="s1">&#39;US or SS&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">write_OWvalue</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
     <span class="s1">&#39;US or OW&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">write_OWvalue</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
@@ -1084,7 +1108,7 @@
     <span class="s1">&#39;OB or OW&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">write_OBvalue</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
     <span class="s1">&#39;OW or OB&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">write_OBvalue</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
     <span class="s1">&#39;DT&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">write_DT</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
-    <span class="s1">&#39;UT&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">write_string</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+    <span class="s1">&#39;UT&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">write_text</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
 <span class="p">}</span>  <span class="c1"># note OW/OB depends on other items, which we don&#39;t know at write time</span>
 </pre></div>
 

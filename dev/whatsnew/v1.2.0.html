@@ -208,7 +208,11 @@ default character set (<a class="reference external" href="https://github.com/py
 <li>Added <code class="docutils literal notranslate"><span class="pre">Dataset.fix_meta_info()</span></code> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/584">#584</a>)</li>
 <li>Add new function for bit packing <code class="docutils literal notranslate"><span class="pre">pack_bits</span></code> for use with BitsAllocated
 = 1 (<a href="#id3"><span class="problematic" id="id4">:pull_request:`715`</span></a>)</li>
-<li>Added handling of single-byte character set extensions (<a href="#id5"><span class="problematic" id="id6">:pull_request:`718`</span></a>)</li>
+<li>Added/corrected encoding and decoding of text and person name VRs using
+character sets with code extensions, added handling of encoding/decoding
+errors (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/716">#716</a>)</li>
+<li>Handle common spelling errors in Specific Character Set values
+(<a href="#id5"><span class="problematic" id="id6">:pull_request:`695`</span></a>, <a href="#id7"><span class="problematic" id="id8">:pull_request:`737`</span></a>)</li>
 <li>Added <code class="docutils literal notranslate"><span class="pre">uid.JPEGLosslessP14</span></code> for UID 1.2.840.10008.1.2.4.57</li>
 <li>Added <code class="docutils literal notranslate"><span class="pre">uid.JPEG2000MultiComponentLossless</span></code> for UID 1.2.840.10008.1.2.4.92</li>
 <li>Added <code class="docutils literal notranslate"><span class="pre">uid.JPEG2000MultiComponent</span></code> for UID 1.2.840.10008.1.2.4.93</li>
@@ -216,21 +220,24 @@ default character set (<a class="reference external" href="https://github.com/py
 <li>Added support for single frame pixel data where BitsAllocated &gt;8 and
 SamplesPerPixel &gt; 1 (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/713">#713</a>)</li>
 <li>Small improvement in RLE decoding speed (~10%).</li>
-<li>Add support for non-conformant RLE segment ordering (<a href="#id7"><span class="problematic" id="id8">:pull_request:`729`</span></a>)</li>
+<li>Add support for non-conformant RLE segment ordering (<a href="#id9"><span class="problematic" id="id10">:pull_request:`729`</span></a>)</li>
 </ul>
 </div>
 <div class="section" id="fixes">
 <h3>Fixes<a class="headerlink" href="#fixes" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Removed unused <code class="docutils literal notranslate"><span class="pre">original_string</span></code> attribute from the <code class="docutils literal notranslate"><span class="pre">DataElement</span></code> class
-(<a href="#id9"><span class="problematic" id="id10">:pull_request:`660`</span></a>)</li>
+(<a href="#id11"><span class="problematic" id="id12">:pull_request:`660`</span></a>)</li>
 <li>Improve performance for Python 3 when dealing with compressed multi-frame
 Pixel Data with pillow and jpeg-ls (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/682">#682</a>).</li>
-<li>Improve performance of bit unpacking (<a href="#id11"><span class="problematic" id="id12">:pull_request:`715`</span></a>)</li>
+<li>Fixed handling of private tags in repeater range (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/689">#689</a>)</li>
+<li>Fixed handling of elements with ambiguous VR (<a href="#id13"><span class="problematic" id="id14">:pull_request:`700`</span></a>,
+<a href="#id15"><span class="problematic" id="id16">:pull_request:`728`</span></a>)</li>
+<li>Improve performance of bit unpacking (<a href="#id17"><span class="problematic" id="id18">:pull_request:`715`</span></a>)</li>
 <li>First character set no longer removed (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/707">#707</a>)</li>
-<li>Fixed RLE decoded data having the wrong byte order (<a href="#id13"><span class="problematic" id="id14">:pull_request:`729`</span></a>)</li>
+<li>Fixed RLE decoded data having the wrong byte order (<a href="#id19"><span class="problematic" id="id20">:pull_request:`729`</span></a>)</li>
 <li>Fixed RLE decoded data having the wrong planar configuration
-(<a href="#id15"><span class="problematic" id="id16">:pull_request:`729`</span></a>)</li>
+(<a href="#id21"><span class="problematic" id="id22">:pull_request:`729`</span></a>)</li>
 <li>Fixed numpy arrays returned by the pixel data handlers sometimes being
 read-only. Read-only arrays are still available for uncompressed transfer
 syntaxes via a keyword argument for the numpy pixel data handler and should
