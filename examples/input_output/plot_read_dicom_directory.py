@@ -27,9 +27,9 @@ base_dir = dirname(filepath)
 # go through the patient record and print information
 for patient_record in dicom_dir.patient_records:
     if (hasattr(patient_record, 'PatientID') and
-            hasattr(patient_record, 'PatientsName')):
+            hasattr(patient_record, 'PatientName')):
         print("Patient: {}: {}".format(patient_record.PatientID,
-                                       patient_record.PatientsName))
+                                       patient_record.PatientName))
     studies = patient_record.children
     # got through each serie
     for study in studies:
