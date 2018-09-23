@@ -380,11 +380,17 @@ def rle_encode_frame(arr):
         An RLE encoded frame, including the RLE header, following the format
         specified by the DICOM Standard, Part 5, Annex G.
     """
+    if len(arr.shape) > 3:
+        raise ValueError(
+            "Only a single frame of data can be encoded FIXME"
+        )
+
     rle_data = bytearray()
     seg_lengths = []
     if len(arr.shape) == 3:
-        # Samples Per Pixel = 3
-        for plane in arr:
+        # Samples Per Pixel > 1
+        for plane in arr.T:
+            print(plane)
             for segment in _rle_encode_plane(plane):
                 rle_data.extend(segment)
                 seg_lengths.append(len(segment))
@@ -407,11 +413,17 @@ def rle_encode_frame(arr):
     # Add trailing padding to make up the rest of the header (if required)
     rle_header.extend(b'\x00' * (64 - len(rle_header)))
 
-    return rle_header.extend(rle_data)
+    return rle_header + rle_data
 
 
 def _rle_encode_plane(arr):
     """Yield RLE encoded segments from an image plane as bytearray.
+
+    A plane of N-byte samples must be split into N segments, with each segment
+    containing the same byte of the N-byte samples. For example, in a plane
+    containing 16 bits per sample, the first segment will contain the most
+    significant 8 bits of the samples and the second segment the 8 least
+    significant bits. Each segment is RLE encoded prior to being yielded.
 
     Parameters
     ----------
@@ -424,16 +436,24 @@ def _rle_encode_plane(arr):
     ------
     bytearray
         An RLE encoded segment of the plane, following the format specified
-        by the DICOM Standard, Part 5, Annex G.
+        by the DICOM Standard, Part 5, Annex G. The segments are yielded in
+        order from most significant to least.
     """
-    print(arr)
     # Re-view the N-bit array data as N / 8 x uint8s
     arr8 = arr.view(np.uint8)
-    print(arr8, arr.dtype.byteorder, sys.byteorder)
+    byte_order = arr.dtype.byteorder
+    if byte_order == '=':
+        byte_order = '<' if sys.byteorder == 'little' else '>'
+
     # Reshape the uint8 array data into 1 or more segments and encode
     bytes_per_sample = arr.dtype.itemsize
     for ii in range(bytes_per_sample):
+        # If the original byte order is little endian we need to segment
+        #   in reverse order
+        if byte_order == '<':
+            ii = bytes_per_sample - ii - 1
         segment = arr8.ravel()[ii::bytes_per_sample].reshape(arr.shape)
+
         yield _rle_encode_segment(segment)
 
 

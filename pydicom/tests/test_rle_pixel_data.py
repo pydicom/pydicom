@@ -1161,16 +1161,8 @@ class TestNumpy_RLEEncodeRow(object):
 @pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
 class TestNumpy_RLEEncodeFrame(object):
     """Tests for rle_handler.rle_encode_frame."""
-    def test_1bit_1sample(self):
-        """Test encoding a 1-bit, 1 sample/pixel frame."""
-        pass
-
-    def test_1bit_3sample(self):
-        """Test encoding a 1-bit, 3 sample/pixel frame."""
-        pass
-
-    def test_8bit_1sample(self):
-        """Test encoding an 8-bit, 1 sample/pixel frame."""
+    def test_simple_8bit_1sample(self):
+        """Test encoding a simple 8-bit, 1 sample/pixel frame."""
         arr = np.asarray(
             [[  0,   0,   2,   2],
              [ 32,  33,  34,  35],
@@ -1178,41 +1170,232 @@ class TestNumpy_RLEEncodeFrame(object):
              [127, 128, 129, 130],
              [252, 255, 255, 255]], dtype='uint8')
 
-        rle_encode_frame(arr)
+        out = rle_encode_frame(arr)
 
-    def test_8bit_3sample(self):
+        offsets = _parse_rle_header(out[:64])
+        assert [64] == offsets
+
+        assert out[64:] == (
+            b'\xFF\x00\xFF\x02'
+            b'\x03\x20\x21\x22\x23'
+            b'\xFD\x40'
+            b'\x03\x7f\x80\x81\x82'
+            b'\x00\xfc\xfe\xff'
+        )
+
+    @pytest.mark.skip('WIP')
+    def test_simple_8bit_3sample(self):
         """Test encoding an 8-bit, 3 sample/pixel frame."""
-        pass
+        # 2 rows, 4 columns, 3 samples
+        arr = np.asarray(
+            #    R    G    B
+            [[[  0,   0,   2],
+              [ 32,  33,  34],
+              [127, 128, 129],
+              [251, 252, 255]],
+             [[  0,   0, 2],
+              [ 32,  32, 2],
+              [127, 129, 2],
+              [  0,   0, 0]]], dtype='uint8')
 
-    def test_16bit_1sample(self):
-        """Test encoding a 16-bit, 1 sample/pixel frame."""
+        out = rle_encode_frame(arr)
+
+        offsets = _parse_rle_header(out[:64])
+        #assert [64, 80, 0] == offsets
+
+        assert out == (
+            # Red
+            b'\x02\x20\x7f\xfb'
+            b'\x02\x20\x7f\x00'
+            # Green
+            b''
+            b''
+            # Blue
+            b''
+            b''
+        )
+
+    def test_simple_16bit_1sample(self):
+        """Test encoding a simple 16-bit, 1 sample/pixel frame."""
         arr = np.asarray(
             [[   0,     1,    2,    3],
              [  32,    33,   34,   35],
-             [  64,    65,   66,   67],
+             [  64,    64,   64,   64],
              [ 127,  1024, 2048, 4096],
              [8192, 2**14, 2**15, 65535]], dtype='uint16')
 
-        rle_encode_frame(arr)
+        # In big endian byte ordering
+        # 0x00 0x00, 0x00 0x01, 0x00 0x02, 0x00 0x03
+        # 0x00 0x20, 0x00 0x21, 0x00 0x22, 0x00 0x23
+        # 0x00 0x40, 0x00 0x40, 0x00 0x40, 0x00 0x40,
+        # 0x00 0x7f, 0x04 0x00, 0x08 0x00, 0x10 0x00
+        # 0x20 0x00, 0x40 0x00, 0x80 0x00, 0xFF 0xFF
 
-    def test_16bit_3sample(self):
+        out = rle_encode_frame(arr)
+        offsets = _parse_rle_header(out[:64])
+        assert [64, 80] == offsets
+
+        assert out[64:] == (
+            # First segment -> MSB
+            b'\xfd\x00'
+            b'\xfd\x00'
+            b'\xfd\x00'
+            b'\x03\x00\x04\x08\x10'
+            b'\x03\x20\x40\x80\xFF'
+            # Second segment -> LSB
+            b'\x03\x00\x01\x02\x03'
+            b'\x03\x20\x21\x22\x23'
+            b'\xfd\x40'
+            b'\x00\x7f\xfe\x00'
+            b'\xfe\x00\x00\xff'
+        )
+
+    @pytest.mark.skip('WIP')
+    def test_simple_16bit_3sample(self):
         """Test encoding a 16-bit, 3 sample/pixel frame."""
         pass
 
-    def test_32bit_1sample(self):
+    def test_simple_32bit_1sample(self):
         """Test encoding a 32-bit, 1 sample/pixel frame."""
         arr = np.asarray(
-            [[    0,     1,     2,     3],
-             [    4,     8,    32,   128],
-             [  512,  2048,  8192, 2**17],
-             [2**19, 2**23, 2**25, 2**27],
-             [2**29, 2**30, 2**31, 2**32 - 1]], dtype='uint32')
+            [[       0,         1,          2,          3],
+             [    4096,      4097,      41729,      33281],
+             [  107265,   1048745,    8978593,   16777215],
+             [16777216, 151060995, 2684420611, 4294967295],
+             [16909060,  16909060,   16909060,   16909060]], dtype='uint32')
 
-        rle_encode_frame(arr)
+        # In big endian byte ordering
+        # 00 00 00 00, 00 00 00 01, 00 00 00 02, 00 00 00 03
+        # 00 00 10 00, 00 00 10 01, 00 00 a3 01, 00 00 82 01
+        # 00 01 a3 01, 00 10 00 a9, 00 89 00 a1, 00 ff ff ff
+        # 01 00 00 00, 09 01 02 03, a0 01 02 03, ff ff ff ff
+        # 01 02 03 04, 01 02 03 04, 01 02 03 04, 01 02 03 04
 
-    def test_32bit_3sample(self):
+        out = rle_encode_frame(arr)
+        offsets = _parse_rle_header(out[:64])
+        assert [64, 78, 96, 118] == offsets
+
+        assert out[64:] == (
+            # First segment -> MSB
+            b'\xfd\x00'
+            b'\xfd\x00'
+            b'\xfd\x00'
+            b'\x03\x01\x09\xa0\xff'
+            b'\xfd\x01'
+            b'\x00'  # Padding
+            # Second segment
+            b'\xfd\x00'
+            b'\xfd\x00'
+            b'\x03\x01\x10\x89\xff'
+            b'\x00\x00\xff\x01\x00\xff'
+            b'\xfd\x02'
+            b'\x00'  # Padding
+            # Second segment
+            b'\xfd\x00'
+            b'\xff\x10\x01\xa3\x82'
+            b'\x00\xa3\xff\x00\x00\xff'
+            b'\x00\x00\xff\x02\x00\xff'
+            b'\xfd\x03'
+            b'\x00'  # Padding
+            # Fourth segment
+            b'\x03\x00\x01\x02\x03'
+            b'\x00\x00\xfe\x01'
+            b'\x03\x01\xa9\xa1\xff'
+            b'\x00\x00\xff\x03\x00\xff'
+            b'\xfd\x04'
+        )
+
+    @pytest.mark.skip('WIP')
+    def test_simple_32bit_3sample(self):
         """Test encoding a 32-bit, 3 sample/pixel frame."""
         pass
+
+    def test_cycle_8bit_1sample(self):
+        """Test an encode/decode cycle for 8-bit 1 sample/pixel."""
+        ds = dcmread(OB_EXPL_LITTLE_1F)
+        ref = ds.pixel_array
+
+        encoded = rle_encode_frame(ref)
+        decoded = _rle_decode_frame(encoded, ds.Rows, ds.Columns,
+                                    ds.SamplesPerPixel, ds.BitsAllocated)
+        dtype = np.dtype('uint8').newbyteorder('>')
+        arr = np.frombuffer(decoded, dtype)
+        arr = reshape_pixel_array(ds, arr)
+
+        assert np.array_equal(ref, arr)
+
+    @pytest.mark.skip('WIP')
+    def test_cycle_8bit_3sample(self):
+        """Test an encode/decode cycle for 8-bit 3 sample/pixel."""
+        ds = dcmread(SC_EXPL_LITTLE_1F)
+        ref = ds.pixel_array
+
+        encoded = rle_encode_frame(ref)
+        decoded = _rle_decode_frame(encoded, ds.Rows, ds.Columns,
+                                    ds.SamplesPerPixel, ds.BitsAllocated)
+        dtype = np.dtype('uint8').newbyteorder('>')
+        arr = np.frombuffer(decoded, dtype)
+        arr = reshape_pixel_array(ds, arr)
+
+        assert np.array_equal(ref, arr)
+
+    def test_cycle_16bit_1sample(self):
+        """Test an encode/decode cycle for 16-bit 1 sample/pixel."""
+        ds = dcmread(MR_EXPL_LITTLE_1F)
+        ref = ds.pixel_array
+
+        encoded = rle_encode_frame(ref)
+        decoded = _rle_decode_frame(encoded, ds.Rows, ds.Columns,
+                                    ds.SamplesPerPixel, ds.BitsAllocated)
+        dtype = np.dtype('uint16').newbyteorder('>')
+        arr = np.frombuffer(decoded, dtype)
+        arr = reshape_pixel_array(ds, arr)
+
+        assert np.array_equal(ref, arr)
+
+    @pytest.mark.skip('WIP')
+    def test_cycle_16bit_3sample(self):
+        """Test an encode/decode cycle for 16-bit 3 sample/pixel."""
+        ds = dcmread(SC_EXPL_LITTLE_16_1F)
+        ref = ds.pixel_array
+
+        encoded = rle_encode_frame(ref)
+        decoded = _rle_decode_frame(encoded, ds.Rows, ds.Columns,
+                                    ds.SamplesPerPixel, ds.BitsAllocated)
+        dtype = np.dtype('uint16').newbyteorder('>')
+        arr = np.frombuffer(decoded, dtype)
+        arr = reshape_pixel_array(ds, arr)
+
+        assert np.array_equal(ref, arr)
+
+    def test_cycle_32bit_1sample(self):
+        """Test an encode/decode cycle for 32-bit 1 sample/pixel."""
+        ds = dcmread(RTDOSE_EXPL_LITTLE_1F)
+        ref = ds.pixel_array
+
+        encoded = rle_encode_frame(ref)
+        decoded = _rle_decode_frame(encoded, ds.Rows, ds.Columns,
+                                    ds.SamplesPerPixel, ds.BitsAllocated)
+        dtype = np.dtype('uint32').newbyteorder('>')
+        arr = np.frombuffer(decoded, dtype)
+        arr = reshape_pixel_array(ds, arr)
+
+        assert np.array_equal(ref, arr)
+
+    @pytest.mark.skip('WIP')
+    def test_cycle_32bit_3sample(self):
+        """Test an encode/decode cycle for 32-bit 3 sample/pixel."""
+        ds = dcmread(SC_EXPL_LITTLE_32_1F)
+        ref = ds.pixel_array
+
+        encoded = rle_encode_frame(ref)
+        decoded = _rle_decode_frame(encoded, ds.Rows, ds.Columns,
+                                    ds.SamplesPerPixel, ds.BitsAllocated)
+        dtype = np.dtype('uint32').newbyteorder('>')
+        arr = np.frombuffer(decoded, dtype)
+        arr = reshape_pixel_array(ds, arr)
+
+        assert np.array_equal(ref, arr)
 
 
 @pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
@@ -1253,7 +1436,11 @@ class TestNumpy_RLEEncodePlane(object):
         decoded = _rle_decode_frame(pixel_data, ds.Rows, ds.Columns,
                                     ds.SamplesPerPixel, ds.BitsAllocated)
         assert ds.Rows * ds.Columns * ds.BitsAllocated // 8 == len(decoded)
-        arr = np.frombuffer(decoded, 'uint16').reshape(ds.Rows, ds.Columns)
+
+        # `decoded` is in big endian byte ordering
+        dtype = np.dtype('uint16').newbyteorder('>')
+        arr = np.frombuffer(decoded, dtype).reshape(ds.Rows, ds.Columns)
+
         # Re-encode the decoded data
         encoded = bytearray()
         nr_segments = 0
@@ -1278,15 +1465,12 @@ class TestNumpy_RLEEncodePlane(object):
         assert decoded == redecoded
 
     def test_16bit_segment_order(self):
-        """Test that the segment order per sample is correct."""
-        # Segment 1 should be MSB, segment 2 LSB
-
-        # Little endian
+        """Test that the segment order per 16-bit sample is correct."""
+        # Native byte ordering
         data = b'\x00\x00\x01\xFF\xFE\x00\xFF\xFF\x10\x12'
-        dtype = np.dtype('uint16') #.newbyteorder('<')
+        dtype = np.dtype('uint16')
         arr = np.frombuffer(data, dtype)
-        # Split we have LSB 0x00 0x01 0xFE 0xFF 0x10
-        #               MSB 0x00 0xFF 0x00 0xFF 0x12
+
         segments = []
         for segment in _rle_encode_plane(arr):
             segments.append(segment)
@@ -1294,20 +1478,35 @@ class TestNumpy_RLEEncodePlane(object):
         assert 2 == len(segments)
 
         # Each segment should start with a literal run marker of 0x04
-        # and MSB should be first, then LSB
-        assert b'\x04\x00\xFF\x00\xFF\x12' == segments[0]
-        assert b'\x04\x00\x01\xFE\xFF\x10' == segments[1]
+        # and MSB should be first segment, then LSB in second
+        if sys.byteorder == 'little':
+            assert b'\x04\x00\xFF\x00\xFF\x12' == segments[0]
+            assert b'\x04\x00\x01\xFE\xFF\x10' == segments[1]
+        else:
+            assert b'\x04\x00\x01\xFE\xFF\x10' == segments[0]
+            assert b'\x04\x00\xFF\x00\xFF\x12' == segments[1]
 
-        # Big endian
-        arr = np.frombuffer(data, dtype.newbyteorder('>'))
-        # Split we have LSB 0x00 0xFF 0x00 0xFF 0x12
-        #               MSB 0x00 0x01 0xFE 0xFF 0x10
+        # Little endian
+        arr = np.frombuffer(data, dtype.newbyteorder('<'))
+        assert [0, 65281, 254, 65535, 4624] == arr.tolist()
+
         segments = []
         for segment in _rle_encode_plane(arr):
             segments.append(segment)
 
         assert 2 == len(segments)
+        assert b'\x04\x00\xFF\x00\xFF\x12' == segments[0]
+        assert b'\x04\x00\x01\xFE\xFF\x10' == segments[1]
 
+        # Big endian
+        arr = np.frombuffer(data, dtype.newbyteorder('>'))
+        assert [0, 511, 65024, 65535, 4114] == arr.tolist()
+
+        segments = []
+        for segment in _rle_encode_plane(arr):
+            segments.append(segment)
+
+        assert 2 == len(segments)
         assert b'\x04\x00\x01\xFE\xFF\x10' == segments[0]
         assert b'\x04\x00\xFF\x00\xFF\x12' == segments[1]
 
@@ -1318,7 +1517,11 @@ class TestNumpy_RLEEncodePlane(object):
         decoded = _rle_decode_frame(pixel_data, ds.Rows, ds.Columns,
                                     ds.SamplesPerPixel, ds.BitsAllocated)
         assert ds.Rows * ds.Columns * ds.BitsAllocated // 8 == len(decoded)
-        arr = np.frombuffer(decoded, 'uint32').reshape(ds.Rows, ds.Columns)
+
+        # `decoded` is in big endian byte ordering
+        dtype = np.dtype('uint32').newbyteorder('>')
+        arr = np.frombuffer(decoded, dtype).reshape(ds.Rows, ds.Columns)
+
         # Re-encode the decoded data
         encoded = bytearray()
         nr_segments = 0
@@ -1343,14 +1546,12 @@ class TestNumpy_RLEEncodePlane(object):
         assert decoded == redecoded
 
     def test_32bit_segment_order(self):
-        """Test that the segment order per sample is correct."""
-        # Little endian
+        """Test that the segment order per 32-bit sample is correct."""
+        # Native byte ordering
         data = b'\x00\x00\x00\x00\x01\xFF\xFE\x0A\xFF\xFC\x10\x12'
-        arr = np.frombuffer(data, 'uint32').newbyteorder('<')
-        # Split we have LSB 0x00 0x01 0xFF
-        #                   0x00 0xFF 0xFC
-        #                   0x00 0xFE 0x10
-        #               MSB 0x00 0x0A 0x12
+        dtype = np.dtype('uint32')
+        arr = np.frombuffer(data, dtype)
+
         segments = []
         for segment in _rle_encode_plane(arr):
             segments.append(segment)
@@ -1358,23 +1559,40 @@ class TestNumpy_RLEEncodePlane(object):
         assert 4 == len(segments)
 
         # Each segment should start with a literal run marker of 0x02
+        if sys.byteorder == 'little':
+            assert b'\x02\x00\x0A\x12' == segments[0]
+            assert b'\x02\x00\xFE\x10' == segments[1]
+            assert b'\x02\x00\xFF\xFC' == segments[2]
+            assert b'\x02\x00\x01\xFF' == segments[3]
+        else:
+            assert b'\x02\x00\x01\xFF' == segments[0]
+            assert b'\x02\x00\xFF\xFC' == segments[1]
+            assert b'\x02\x00\xFE\x10' == segments[2]
+            assert b'\x02\x00\x0A\x12' == segments[3]
+
+        # Little endian
+        arr = np.frombuffer(data, dtype.newbyteorder('<'))
+        assert [0, 184483585, 303103231] == arr.tolist()
+
+        segments = []
+        for segment in _rle_encode_plane(arr):
+            segments.append(segment)
+
+        assert 4 == len(segments)
         assert b'\x02\x00\x0A\x12' == segments[0]
         assert b'\x02\x00\xFE\x10' == segments[1]
         assert b'\x02\x00\xFF\xFC' == segments[2]
         assert b'\x02\x00\x01\xFF' == segments[3]
 
         # Big endian
-        arr = np.frombuffer(data, 'uint32').newbyteorder('>')
-        # Split we have MSB 0x00 0x01 0xFF
-        #                   0x00 0xFF 0xFC
-        #                   0x00 0xFE 0x10
-        #               LSB 0x00 0x0A 0x12
+        arr = np.frombuffer(data, dtype.newbyteorder('>'))
+        assert [0, 33553930, 4294709266] == arr.tolist()
+
         segments = []
         for segment in _rle_encode_plane(arr):
             segments.append(segment)
 
         assert 4 == len(segments)
-
         assert b'\x02\x00\x01\xFF' == segments[0]
         assert b'\x02\x00\xFF\xFC' == segments[1]
         assert b'\x02\x00\xFE\x10' == segments[2]
@@ -1388,7 +1606,7 @@ class TestNumpy_RLEEncodePlane(object):
         for segment in _rle_encode_plane(arr):
             segments.append(segment)
 
-        # Each segment should start with a literal run marker of 0x04
+        # Each segment should start with a literal run marker of 0x03
         assert b'\x03\x00\x04\x01\x15\x00' == segments[0]
 
 
