@@ -718,6 +718,20 @@ class DatasetTests(unittest.TestCase):
         assert 0xFFFFFFFF not in ds[0x1000:0xFFFFFFFF]
         assert 0xFFFFFFFF not in ds[(0x1000):(0xFFFF, 0xFFFF)]
 
+    def testCopy(self):
+        """Dataset: copy correctly copies the dataset"""
+        d = Dataset()
+        d.SOPInstanceUID = '1.2.3.4'
+        d.BeamSequence = []
+        beam_seq = Dataset()
+        beam_seq.PatientID = '1234'
+        beam_seq.PatientName = 'ANON'
+        d.BeamSequence.append(beam_seq)
+
+        e = d.copy()
+        self.assertTrue(d.SOPInstanceUID == e.SOPInstanceUID)
+        self.assertTrue(d.BeamSequence == e.BeamSequence)
+
     def test_delitem_slice(self):
         """Test Dataset.__delitem__ using slices."""
         ds = Dataset()
