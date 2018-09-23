@@ -27,7 +27,7 @@ import sys
 
 import pytest
 
-from pydicom import dcmread
+from pydicom import dcmread, Dataset
 import pydicom.config
 from pydicom.data import get_testdata_files
 from pydicom.encaps import defragment_data
@@ -1161,159 +1161,24 @@ class TestNumpy_RLEEncodeRow(object):
 @pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
 class TestNumpy_RLEEncodeFrame(object):
     """Tests for rle_handler.rle_encode_frame."""
-    def test_simple_8bit_1sample(self):
-        """Test encoding a simple 8-bit, 1 sample/pixel frame."""
-        arr = np.asarray(
-            [[  0,   0,   2,   2],
-             [ 32,  33,  34,  35],
-             [ 64,  64,  64,  64],
-             [127, 128, 129, 130],
-             [252, 255, 255, 255]], dtype='uint8')
-
-        out = rle_encode_frame(arr)
-
-        offsets = _parse_rle_header(out[:64])
-        assert [64] == offsets
-
-        assert out[64:] == (
-            b'\xFF\x00\xFF\x02'
-            b'\x03\x20\x21\x22\x23'
-            b'\xFD\x40'
-            b'\x03\x7f\x80\x81\x82'
-            b'\x00\xfc\xfe\xff'
-        )
-
-    @pytest.mark.skip('WIP')
-    def test_simple_8bit_3sample(self):
-        """Test encoding an 8-bit, 3 sample/pixel frame."""
-        # 2 rows, 4 columns, 3 samples
-        arr = np.asarray(
-            #    R    G    B
-            [[[  0,   0,   2],
-              [ 32,  33,  34],
-              [127, 128, 129],
-              [251, 252, 255]],
-             [[  0,   0, 2],
-              [ 32,  32, 2],
-              [127, 129, 2],
-              [  0,   0, 0]]], dtype='uint8')
-
-        out = rle_encode_frame(arr)
-
-        offsets = _parse_rle_header(out[:64])
-        #assert [64, 80, 0] == offsets
-
-        assert out == (
-            # Red
-            b'\x02\x20\x7f\xfb'
-            b'\x02\x20\x7f\x00'
-            # Green
-            b''
-            b''
-            # Blue
-            b''
-            b''
-        )
-
-    def test_simple_16bit_1sample(self):
-        """Test encoding a simple 16-bit, 1 sample/pixel frame."""
-        arr = np.asarray(
-            [[   0,     1,    2,    3],
-             [  32,    33,   34,   35],
-             [  64,    64,   64,   64],
-             [ 127,  1024, 2048, 4096],
-             [8192, 2**14, 2**15, 65535]], dtype='uint16')
-
-        # In big endian byte ordering
-        # 0x00 0x00, 0x00 0x01, 0x00 0x02, 0x00 0x03
-        # 0x00 0x20, 0x00 0x21, 0x00 0x22, 0x00 0x23
-        # 0x00 0x40, 0x00 0x40, 0x00 0x40, 0x00 0x40,
-        # 0x00 0x7f, 0x04 0x00, 0x08 0x00, 0x10 0x00
-        # 0x20 0x00, 0x40 0x00, 0x80 0x00, 0xFF 0xFF
-
-        out = rle_encode_frame(arr)
-        offsets = _parse_rle_header(out[:64])
-        assert [64, 80] == offsets
-
-        assert out[64:] == (
-            # First segment -> MSB
-            b'\xfd\x00'
-            b'\xfd\x00'
-            b'\xfd\x00'
-            b'\x03\x00\x04\x08\x10'
-            b'\x03\x20\x40\x80\xFF'
-            # Second segment -> LSB
-            b'\x03\x00\x01\x02\x03'
-            b'\x03\x20\x21\x22\x23'
-            b'\xfd\x40'
-            b'\x00\x7f\xfe\x00'
-            b'\xfe\x00\x00\xff'
-        )
-
-    @pytest.mark.skip('WIP')
-    def test_simple_16bit_3sample(self):
-        """Test encoding a 16-bit, 3 sample/pixel frame."""
-        pass
-
-    def test_simple_32bit_1sample(self):
-        """Test encoding a 32-bit, 1 sample/pixel frame."""
-        arr = np.asarray(
-            [[       0,         1,          2,          3],
-             [    4096,      4097,      41729,      33281],
-             [  107265,   1048745,    8978593,   16777215],
-             [16777216, 151060995, 2684420611, 4294967295],
-             [16909060,  16909060,   16909060,   16909060]], dtype='uint32')
-
-        # In big endian byte ordering
-        # 00 00 00 00, 00 00 00 01, 00 00 00 02, 00 00 00 03
-        # 00 00 10 00, 00 00 10 01, 00 00 a3 01, 00 00 82 01
-        # 00 01 a3 01, 00 10 00 a9, 00 89 00 a1, 00 ff ff ff
-        # 01 00 00 00, 09 01 02 03, a0 01 02 03, ff ff ff ff
-        # 01 02 03 04, 01 02 03 04, 01 02 03 04, 01 02 03 04
-
-        out = rle_encode_frame(arr)
-        offsets = _parse_rle_header(out[:64])
-        assert [64, 78, 96, 118] == offsets
-
-        assert out[64:] == (
-            # First segment -> MSB
-            b'\xfd\x00'
-            b'\xfd\x00'
-            b'\xfd\x00'
-            b'\x03\x01\x09\xa0\xff'
-            b'\xfd\x01'
-            b'\x00'  # Padding
-            # Second segment
-            b'\xfd\x00'
-            b'\xfd\x00'
-            b'\x03\x01\x10\x89\xff'
-            b'\x00\x00\xff\x01\x00\xff'
-            b'\xfd\x02'
-            b'\x00'  # Padding
-            # Second segment
-            b'\xfd\x00'
-            b'\xff\x10\x01\xa3\x82'
-            b'\x00\xa3\xff\x00\x00\xff'
-            b'\x00\x00\xff\x02\x00\xff'
-            b'\xfd\x03'
-            b'\x00'  # Padding
-            # Fourth segment
-            b'\x03\x00\x01\x02\x03'
-            b'\x00\x00\xfe\x01'
-            b'\x03\x01\xa9\xa1\xff'
-            b'\x00\x00\xff\x03\x00\xff'
-            b'\xfd\x04'
-        )
-
-    @pytest.mark.skip('WIP')
-    def test_simple_32bit_3sample(self):
-        """Test encoding a 32-bit, 3 sample/pixel frame."""
-        pass
+    def setup(self):
+        """Setup the tests."""
+        # Create a dataset skeleton for use in the cycle tests
+        ds = Dataset()
+        ds.file_meta = Dataset()
+        ds.file_meta.TransferSyntaxUID = '1.2.840.10008.1.2'
+        ds.Rows = 2
+        ds.Columns = 4
+        ds.SamplesPerPixel = 3
+        ds.PlanarConfiguration = 1
+        self.ds = ds
 
     def test_cycle_8bit_1sample(self):
         """Test an encode/decode cycle for 8-bit 1 sample/pixel."""
         ds = dcmread(OB_EXPL_LITTLE_1F)
         ref = ds.pixel_array
+        assert 8 == ds.BitsAllocated
+        assert 1 == ds.SamplesPerPixel
 
         encoded = rle_encode_frame(ref)
         decoded = _rle_decode_frame(encoded, ds.Rows, ds.Columns,
@@ -1324,17 +1189,19 @@ class TestNumpy_RLEEncodeFrame(object):
 
         assert np.array_equal(ref, arr)
 
-    @pytest.mark.skip('WIP')
     def test_cycle_8bit_3sample(self):
         """Test an encode/decode cycle for 8-bit 3 sample/pixel."""
         ds = dcmread(SC_EXPL_LITTLE_1F)
         ref = ds.pixel_array
+        assert 8 == ds.BitsAllocated
+        assert 3 == ds.SamplesPerPixel
 
         encoded = rle_encode_frame(ref)
         decoded = _rle_decode_frame(encoded, ds.Rows, ds.Columns,
                                     ds.SamplesPerPixel, ds.BitsAllocated)
-        dtype = np.dtype('uint8').newbyteorder('>')
-        arr = np.frombuffer(decoded, dtype)
+        arr = np.frombuffer(decoded, 'uint8')
+        # The decoded data is planar configuration 1
+        ds.PlanarConfiguration = 1
         arr = reshape_pixel_array(ds, arr)
 
         assert np.array_equal(ref, arr)
@@ -1343,6 +1210,8 @@ class TestNumpy_RLEEncodeFrame(object):
         """Test an encode/decode cycle for 16-bit 1 sample/pixel."""
         ds = dcmread(MR_EXPL_LITTLE_1F)
         ref = ds.pixel_array
+        assert 16 == ds.BitsAllocated
+        assert 1 == ds.SamplesPerPixel
 
         encoded = rle_encode_frame(ref)
         decoded = _rle_decode_frame(encoded, ds.Rows, ds.Columns,
@@ -1353,17 +1222,20 @@ class TestNumpy_RLEEncodeFrame(object):
 
         assert np.array_equal(ref, arr)
 
-    @pytest.mark.skip('WIP')
     def test_cycle_16bit_3sample(self):
         """Test an encode/decode cycle for 16-bit 3 sample/pixel."""
         ds = dcmread(SC_EXPL_LITTLE_16_1F)
         ref = ds.pixel_array
+        assert 16 == ds.BitsAllocated
+        assert 3 == ds.SamplesPerPixel
 
         encoded = rle_encode_frame(ref)
         decoded = _rle_decode_frame(encoded, ds.Rows, ds.Columns,
                                     ds.SamplesPerPixel, ds.BitsAllocated)
         dtype = np.dtype('uint16').newbyteorder('>')
         arr = np.frombuffer(decoded, dtype)
+        # The decoded data is planar configuration 1
+        ds.PlanarConfiguration = 1
         arr = reshape_pixel_array(ds, arr)
 
         assert np.array_equal(ref, arr)
@@ -1372,6 +1244,8 @@ class TestNumpy_RLEEncodeFrame(object):
         """Test an encode/decode cycle for 32-bit 1 sample/pixel."""
         ds = dcmread(RTDOSE_EXPL_LITTLE_1F)
         ref = ds.pixel_array
+        assert 32 == ds.BitsAllocated
+        assert 1 == ds.SamplesPerPixel
 
         encoded = rle_encode_frame(ref)
         decoded = _rle_decode_frame(encoded, ds.Rows, ds.Columns,
@@ -1382,17 +1256,20 @@ class TestNumpy_RLEEncodeFrame(object):
 
         assert np.array_equal(ref, arr)
 
-    @pytest.mark.skip('WIP')
     def test_cycle_32bit_3sample(self):
         """Test an encode/decode cycle for 32-bit 3 sample/pixel."""
         ds = dcmread(SC_EXPL_LITTLE_32_1F)
         ref = ds.pixel_array
+        assert 32 == ds.BitsAllocated
+        assert 3 == ds.SamplesPerPixel
 
         encoded = rle_encode_frame(ref)
         decoded = _rle_decode_frame(encoded, ds.Rows, ds.Columns,
                                     ds.SamplesPerPixel, ds.BitsAllocated)
         dtype = np.dtype('uint32').newbyteorder('>')
         arr = np.frombuffer(decoded, dtype)
+        # The decoded data is planar configuration 1
+        ds.PlanarConfiguration = 1
         arr = reshape_pixel_array(ds, arr)
 
         assert np.array_equal(ref, arr)

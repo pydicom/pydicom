@@ -166,6 +166,7 @@ def get_pixeldata(ds, rle_segment_order='>'):
     return arr
 
 
+# RLE decoding functions
 def _parse_rle_header(header):
     """Return a list of byte offsets for the segments in RLE data.
 
@@ -389,9 +390,10 @@ def rle_encode_frame(arr):
     seg_lengths = []
     if len(arr.shape) == 3:
         # Samples Per Pixel > 1
-        for plane in arr.T:
-            print(plane)
-            for segment in _rle_encode_plane(plane):
+        for ii in range(arr.shape[-1]):
+            # Need a contiguous array in order to be able to split it up
+            # into byte segments
+            for segment in _rle_encode_plane(arr[..., ii].copy()):
                 rle_data.extend(segment)
                 seg_lengths.append(len(segment))
     else:
