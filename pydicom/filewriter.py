@@ -460,9 +460,7 @@ def write_data_element(fp, data_element, encodings=None):
         encodings = convert_encodings(encodings)
         writer_function, writer_param = writers[VR]
         is_undefined_length = data_element.is_undefined_length
-        if VR in text_VRs:
-            writer_function(buffer, data_element, encodings=encodings)
-        elif VR in ('PN', 'SQ'):
+        if VR in text_VRs or VR in ('PN', 'SQ'):
             writer_function(buffer, data_element, encodings=encodings)
         else:
             # Many numeric types use the same writer but with numeric format

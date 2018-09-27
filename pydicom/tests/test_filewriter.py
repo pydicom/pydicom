@@ -2139,7 +2139,7 @@ class TestWritePN(object):
         encoded = (b'Dionysios=\x1b\x2d\x46'
                    b'\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2')
         elem = DataElement(0x00100010, 'PN', encoded)
-        write_PN(fp, elem, encodings=encodings)
+        write_PN(fp, elem)
         assert encoded == fp.getvalue()
 
         fp = DicomBytesIO()
@@ -2160,7 +2160,7 @@ class TestWritePN(object):
                    b'\x1b\x2d\x4C'
                    b'\xbb\xee\xda\x63\x65\xdc\xd1\x79\x70\xd3 ')
         elem = DataElement(0x00100060, 'PN', encoded)
-        write_PN(fp, elem, encodings=encodings)
+        write_PN(fp, elem)
         assert encoded == fp.getvalue()
 
         fp = DicomBytesIO()
@@ -2203,7 +2203,7 @@ class TestWriteText(object):
         # data element with encoded value
         elem = DataElement(0x00081039, 'LO', encoded)
         encodings = ['latin_1', 'iso_ir_126']
-        write_text(fp, elem, encodings=encodings)
+        write_text(fp, elem)
         assert encoded == fp.getvalue()
 
         fp = DicomBytesIO()
