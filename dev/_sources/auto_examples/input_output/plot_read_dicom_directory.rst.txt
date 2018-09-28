@@ -222,7 +222,7 @@ This example shows how to read DICOM directory.
                 print(" " * 12 + "Patient IDs in images..: {}".format(
                     patient_IDs))
 
-**Total running time of the script:** ( 0 minutes  0.107 seconds)
+**Total running time of the script:** ( 0 minutes  0.103 seconds)
 
 
 .. _sphx_glr_download_auto_examples_input_output_plot_read_dicom_directory.py:
