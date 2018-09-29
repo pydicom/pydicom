@@ -618,7 +618,8 @@ class PersonName3(object):
             self.original_string = original_string
             self._components = val.split('=')
 
-        self.encodings = _verify_encodings(encodings) or [default_encoding]
+        # if the encoding is not given, leave it as undefined (None)
+        self.encodings = _verify_encodings(encodings)
         self._dict = {}
 
     def _create_dict(self):
@@ -638,7 +639,8 @@ class PersonName3(object):
         """
         if self._components is None:
             groups = self.original_string.split(b'=')
-            self._components = _decode_personname(groups, self.encodings)
+            encodings = self.encodings or [default_encoding]
+            self._components = _decode_personname(groups, encodings)
 
         return self._components
 
@@ -757,14 +759,15 @@ class PersonName3(object):
             with the first matching of the given encodings.
         """
         encodings = _verify_encodings(encodings) or self.encodings
+
         # if the encoding is not the original encoding, we have to return
         # a re-encoded string (without updating the original string)
-        if encodings != self.encodings:
+        if encodings != self.encodings and self.encodings is not None:
             return _encode_personname(self.components, encodings)
         if self.original_string is None:
             # if the original encoding was not set, we set it now
-            self.original_string = _encode_personname(self.components,
-                                                      encodings)
+            self.original_string = _encode_personname(
+                self.components, encodings or [default_encoding])
         return self.original_string
 
     def family_comma_given(self):

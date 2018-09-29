@@ -2142,6 +2142,15 @@ class TestWritePN(object):
         write_PN(fp, elem)
         assert encoded == fp.getvalue()
 
+        # regression test: make sure no warning is issued, e.g. the
+        # PersonName3 value has not saved the default encoding
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        with pytest.warns(None) as warnings:
+            write_PN(fp, elem, encodings)
+        assert not warnings
+        assert encoded == fp.getvalue()
+
         fp = DicomBytesIO()
         fp.is_little_endian = True
         # data element with decoded value
