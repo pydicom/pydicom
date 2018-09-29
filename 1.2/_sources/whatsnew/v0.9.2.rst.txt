@@ -1,0 +1,53 @@
+Version 0.9.2
+=============
+
+Changelog
+---------
+
+Major changes
+.............
+
+* Renamed Attribute class and related modules to !DataElement. Old code will
+  continue to work until pydicom 1.0, but with a !DeprecationWarning (issue22,
+  r72, r73)
+* Added support for character sets through Specific Character Set (0008,0005),
+  using Python unicode. Thus foreign languages can display names in Greek,
+  Japanese, Chinese etc characters in environments which support unicode
+  (demonstrated in dicomtree.py example using Tkinter GUI) (r64, r65)
+
+Other Enhancements
+..................
+
+* Added support for auto-completion of dataset elements in ipython; also all
+  environments using Python 2.6 (r69, r70)
+* Added __iter__() to Dataset so returns data elements in DICOM order with "for
+  data_elem in dataset:" (r68)
+* Added dicomtree.py example program showing a DICOM file in a GUI window
+  (Tkinter/Tix).
+* Added !PersonName class to parse components of names more easily (r55)
+* Added UID class to handle UID values. Name rather than UID number shown,
+  UID_dictionary used (r51).
+* Code tested under Python 2.6
+* Added !DataElement.name property; synonym for !DataElement.description()
+  function
+
+Bug Fixes
+.........
+
+* Fixed issue27, sequence with a single empty item read incorrectly
+* Fixed bug that read_OW did not handle !UndefinedLength (r50)
+* Fixed bugs in example files anonymize.py, !DicomInfo.py, and dicomtree.py
+  (r51)
+* Fixed issue33, VR=UN being split on backslash (r70)
+* Fixed issue18, util directory not installed (r45)
+
+Other
+.....
+
+* Added example file myprint.py -- shows how to custom format DICOM file
+  information (r67)
+* Reorganized test files and added various new tests
+* added preliminary work on encapsulated data (r50)
+* added some simple files to view or work with pixel data (r46)
+* Dataset.!PixelDataArray() NumPy array changed to property Dataset.!PixelArray
+* changed to setuptools for packaging rather than distutils

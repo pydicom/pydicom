@@ -1,0 +1,487 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pydicom.fileutil &mdash; pydicom 1.2.0rc1 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> pydicom
+          
+
+          
+            
+            <img src="../../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.2.0rc1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started with pydicom</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../pydicom_user_guide.html">Pydicom User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ref_guide.html">Reading and writing DICOM files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api_ref.html">Pydicom Complete API Reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">General examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#image-processing">Image processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#input-output">Input-output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../release-notes.html">Release history</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pydicom</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>pydicom.fileutil</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for pydicom.fileutil</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2008-2018 pydicom authors. See LICENSE file for details.</span>
+<span class="sd">&quot;&quot;&quot;Functions for reading to certain bytes, e.g. delimiters.&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">struct</span> <span class="k">import</span> <span class="n">pack</span><span class="p">,</span> <span class="n">unpack</span>
+
+<span class="kn">from</span> <span class="nn">pydicom.misc</span> <span class="k">import</span> <span class="n">size_in_bytes</span>
+<span class="kn">from</span> <span class="nn">pydicom.tag</span> <span class="k">import</span> <span class="n">TupleTag</span><span class="p">,</span> <span class="n">Tag</span>
+<span class="kn">from</span> <span class="nn">pydicom.datadict</span> <span class="k">import</span> <span class="n">dictionary_description</span>
+
+<span class="kn">from</span> <span class="nn">pydicom.config</span> <span class="k">import</span> <span class="n">logger</span>
+
+
+<div class="viewcode-block" id="absorb_delimiter_item"><a class="viewcode-back" href="../../api_ref.html#pydicom.fileutil.absorb_delimiter_item">[docs]</a><span class="k">def</span> <span class="nf">absorb_delimiter_item</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">,</span> <span class="n">delimiter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Read (and ignore) undefined length sequence or item terminators.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">is_little_endian</span><span class="p">:</span>
+        <span class="n">struct_format</span> <span class="o">=</span> <span class="s2">&quot;&lt;HHL&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">struct_format</span> <span class="o">=</span> <span class="s2">&quot;&gt;HHL&quot;</span>
+    <span class="n">group</span><span class="p">,</span> <span class="n">elem</span><span class="p">,</span> <span class="n">length</span> <span class="o">=</span> <span class="n">unpack</span><span class="p">(</span><span class="n">struct_format</span><span class="p">,</span> <span class="n">fp</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">8</span><span class="p">))</span>
+    <span class="n">tag</span> <span class="o">=</span> <span class="n">TupleTag</span><span class="p">((</span><span class="n">group</span><span class="p">,</span> <span class="n">elem</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">tag</span> <span class="o">!=</span> <span class="n">delimiter</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Did not find expected delimiter &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span>
+               <span class="n">dictionary_description</span><span class="p">(</span><span class="n">delimiter</span><span class="p">))</span>
+        <span class="n">msg</span> <span class="o">+=</span> <span class="s2">&quot;, instead found </span><span class="si">%s</span><span class="s2"> at file position 0x</span><span class="si">%x</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span>
+            <span class="nb">str</span><span class="p">(</span><span class="n">tag</span><span class="p">),</span> <span class="n">fp</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span> <span class="o">-</span> <span class="mi">8</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="n">fp</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">fp</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span> <span class="o">-</span> <span class="mi">8</span><span class="p">)</span>
+        <span class="k">return</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%04x</span><span class="s2">: Found Delimiter &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span><span class="p">,</span> <span class="n">fp</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span> <span class="o">-</span> <span class="mi">8</span><span class="p">,</span>
+                 <span class="n">dictionary_description</span><span class="p">(</span><span class="n">delimiter</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">length</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%04x</span><span class="s2">: Read 0 bytes after delimiter&quot;</span><span class="p">,</span> <span class="n">fp</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span> <span class="o">-</span> <span class="mi">4</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%04x</span><span class="s2">: Expected 0x00000000 after delimiter, found 0x</span><span class="si">%x</span><span class="s2">&quot;</span><span class="p">,</span>
+                     <span class="n">fp</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span> <span class="o">-</span> <span class="mi">4</span><span class="p">,</span> <span class="n">length</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="find_bytes"><a class="viewcode-back" href="../../api_ref.html#pydicom.fileutil.find_bytes">[docs]</a><span class="k">def</span> <span class="nf">find_bytes</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">bytes_to_find</span><span class="p">,</span> <span class="n">read_size</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">rewind</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Read in the file until a specific byte sequence found.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fp : file-like object</span>
+<span class="sd">    bytes_to_find : str</span>
+<span class="sd">        Contains the bytes to find. Must be in correct</span>
+<span class="sd">        endian order already.</span>
+<span class="sd">    read_size : int</span>
+<span class="sd">        Number of bytes to read at a time.</span>
+<span class="sd">    rewind : boolean</span>
+<span class="sd">        Flag to rewind file reading position.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    found_at : byte, None</span>
+<span class="sd">        Position where byte sequence was found, else None.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">data_start</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
+    <span class="n">search_rewind</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">bytes_to_find</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+
+    <span class="n">found</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">eof</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">while</span> <span class="ow">not</span> <span class="n">found</span><span class="p">:</span>
+        <span class="n">chunk_start</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
+        <span class="n">bytes_read</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">read_size</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">bytes_read</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">read_size</span><span class="p">:</span>
+            <span class="c1"># try again - if still don&#39;t get required amount,</span>
+            <span class="c1"># this is the last block</span>
+            <span class="n">new_bytes</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">read_size</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">bytes_read</span><span class="p">))</span>
+            <span class="n">bytes_read</span> <span class="o">+=</span> <span class="n">new_bytes</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">bytes_read</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">read_size</span><span class="p">:</span>
+                <span class="n">eof</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># but will still check whatever we did get</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="n">bytes_read</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">bytes_to_find</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">index</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="n">found</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">elif</span> <span class="n">eof</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">rewind</span><span class="p">:</span>
+                <span class="n">fp</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">data_start</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># rewind a bit in case delimiter crossed read_size boundary</span>
+            <span class="n">fp</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">fp</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span> <span class="o">-</span> <span class="n">search_rewind</span><span class="p">)</span>
+    <span class="c1"># if get here then have found the byte string</span>
+    <span class="n">found_at</span> <span class="o">=</span> <span class="n">chunk_start</span> <span class="o">+</span> <span class="n">index</span>
+    <span class="k">if</span> <span class="n">rewind</span><span class="p">:</span>
+        <span class="n">fp</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">data_start</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">fp</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">found_at</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">bytes_to_find</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">found_at</span></div>
+
+
+<div class="viewcode-block" id="read_undefined_length_value"><a class="viewcode-back" href="../../api_ref.html#pydicom.fileutil.read_undefined_length_value">[docs]</a><span class="k">def</span> <span class="nf">read_undefined_length_value</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span>
+                                <span class="n">is_little_endian</span><span class="p">,</span>
+                                <span class="n">delimiter_tag</span><span class="p">,</span>
+                                <span class="n">defer_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                <span class="n">read_size</span><span class="o">=</span><span class="mi">1024</span><span class="o">*</span><span class="mi">8</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Read until the delimiter tag found and return the value;</span>
+<span class="sd">     ignore the delimiter.</span>
+
+<span class="sd">    On completion, the file will be set to the first byte after the delimiter</span>
+<span class="sd">    and its following four zero bytes.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fp : a file-like object</span>
+<span class="sd">    is_little_endian : boolean</span>
+<span class="sd">        True if file transfer syntax is little endian, else False.</span>
+<span class="sd">    delimiter_tag : BaseTag</span>
+<span class="sd">        tag used as and marker for reading</span>
+<span class="sd">    defer_size : int, None, optional</span>
+<span class="sd">        Size to avoid loading large elements in memory.</span>
+<span class="sd">        See ``filereader.dcmread`` for more parameter info.</span>
+<span class="sd">    read_size : int</span>
+<span class="sd">        Number of bytes to read at one time.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    delimiter : str, None</span>
+<span class="sd">        The file delimiter</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    EOFError</span>
+<span class="sd">        If EOF is reached before delimiter found.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">data_start</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
+    <span class="n">search_rewind</span> <span class="o">=</span> <span class="mi">3</span>
+
+    <span class="k">if</span> <span class="n">is_little_endian</span><span class="p">:</span>
+        <span class="n">bytes_format</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;&lt;HH&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">bytes_format</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;&gt;HH&quot;</span>
+    <span class="n">bytes_to_find</span> <span class="o">=</span> <span class="n">pack</span><span class="p">(</span><span class="n">bytes_format</span><span class="p">,</span> <span class="n">delimiter_tag</span><span class="o">.</span><span class="n">group</span><span class="p">,</span> <span class="n">delimiter_tag</span><span class="o">.</span><span class="n">elem</span><span class="p">)</span>
+
+    <span class="n">found</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">eof</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">value_chunks</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">defer_size</span> <span class="o">=</span> <span class="n">size_in_bytes</span><span class="p">(</span><span class="n">defer_size</span><span class="p">)</span>
+    <span class="n">byte_count</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># for defer_size checks</span>
+    <span class="k">while</span> <span class="ow">not</span> <span class="n">found</span><span class="p">:</span>
+        <span class="n">chunk_start</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
+        <span class="n">bytes_read</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">read_size</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">bytes_read</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">read_size</span><span class="p">:</span>
+            <span class="c1"># try again - if still don&#39;t get required amount,</span>
+            <span class="c1"># this is the last block</span>
+            <span class="n">new_bytes</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">read_size</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">bytes_read</span><span class="p">))</span>
+            <span class="n">bytes_read</span> <span class="o">+=</span> <span class="n">new_bytes</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">bytes_read</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">read_size</span><span class="p">:</span>
+                <span class="n">eof</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># but will still check whatever we did get</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="n">bytes_read</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">bytes_to_find</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">index</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="n">found</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">new_bytes</span> <span class="o">=</span> <span class="n">bytes_read</span><span class="p">[:</span><span class="n">index</span><span class="p">]</span>
+            <span class="n">byte_count</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_bytes</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">defer_size</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">byte_count</span> <span class="o">&lt;</span> <span class="n">defer_size</span><span class="p">:</span>
+                <span class="n">value_chunks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bytes_read</span><span class="p">[:</span><span class="n">index</span><span class="p">])</span>
+            <span class="n">fp</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">chunk_start</span> <span class="o">+</span> <span class="n">index</span> <span class="o">+</span> <span class="mi">4</span><span class="p">)</span>  <span class="c1"># rewind to end of delimiter</span>
+            <span class="n">length</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">length</span> <span class="o">!=</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\0\0\0\0</span><span class="s2">&quot;</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Expected 4 zero bytes after undefined length delimiter&quot;</span>
+                       <span class="s2">&quot; at pos </span><span class="si">{0:04x}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fp</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span> <span class="o">-</span> <span class="mi">4</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">eof</span><span class="p">:</span>
+            <span class="n">fp</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">data_start</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">EOFError</span><span class="p">(</span><span class="s2">&quot;End of file reached before delimiter </span><span class="si">{0!r}</span><span class="s2"> found&quot;</span><span class="o">.</span>
+                           <span class="nb">format</span><span class="p">(</span><span class="n">delimiter_tag</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># rewind a bit in case delimiter crossed read_size boundary</span>
+            <span class="n">fp</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">fp</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span> <span class="o">-</span> <span class="n">search_rewind</span><span class="p">)</span>
+            <span class="c1"># accumulate the bytes read (not including the rewind)</span>
+            <span class="n">new_bytes</span> <span class="o">=</span> <span class="n">bytes_read</span><span class="p">[:</span><span class="o">-</span><span class="n">search_rewind</span><span class="p">]</span>
+            <span class="n">byte_count</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_bytes</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">defer_size</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">byte_count</span> <span class="o">&lt;</span> <span class="n">defer_size</span><span class="p">:</span>
+                <span class="n">value_chunks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_bytes</span><span class="p">)</span>
+    <span class="c1"># if get here then have found the byte string</span>
+    <span class="k">if</span> <span class="n">defer_size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">byte_count</span> <span class="o">&gt;=</span> <span class="n">defer_size</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">b</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">value_chunks</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="find_delimiter"><a class="viewcode-back" href="../../api_ref.html#pydicom.fileutil.find_delimiter">[docs]</a><span class="k">def</span> <span class="nf">find_delimiter</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">delimiter</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">,</span> <span class="n">read_size</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span>
+                   <span class="n">rewind</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return file position where 4-byte delimiter is located.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    delimiter :</span>
+<span class="sd">    is_little_endian : boolean</span>
+<span class="sd">    read_size : int</span>
+<span class="sd">        See ``find_bytes`` for parameter info.</span>
+<span class="sd">    rewind : boolean</span>
+<span class="sd">        Flag to rewind to initial position after searching.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    file position of delimiter, None</span>
+<span class="sd">        Returns None if end of file is reached without finding the delimiter.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">struct_format</span> <span class="o">=</span> <span class="s2">&quot;&lt;H&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">is_little_endian</span><span class="p">:</span>
+        <span class="n">struct_format</span> <span class="o">=</span> <span class="s2">&quot;&gt;H&quot;</span>
+    <span class="n">delimiter</span> <span class="o">=</span> <span class="n">Tag</span><span class="p">(</span><span class="n">delimiter</span><span class="p">)</span>
+    <span class="n">bytes_to_find</span> <span class="o">=</span> <span class="n">pack</span><span class="p">(</span><span class="n">struct_format</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">.</span><span class="n">group</span><span class="p">)</span> <span class="o">+</span> <span class="n">pack</span><span class="p">(</span>
+        <span class="n">struct_format</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">.</span><span class="n">elem</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">find_bytes</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">bytes_to_find</span><span class="p">,</span> <span class="n">read_size</span><span class="o">=</span><span class="n">read_size</span><span class="p">,</span> <span class="n">rewind</span><span class="o">=</span><span class="n">rewind</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="length_of_undefined_length"><a class="viewcode-back" href="../../api_ref.html#pydicom.fileutil.length_of_undefined_length">[docs]</a><span class="k">def</span> <span class="nf">length_of_undefined_length</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span>
+                               <span class="n">delimiter</span><span class="p">,</span>
+                               <span class="n">is_little_endian</span><span class="p">,</span>
+                               <span class="n">read_size</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span>
+                               <span class="n">rewind</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Search through the file to find the delimiter and return the length</span>
+<span class="sd">    of the data element.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fp : file-like object</span>
+<span class="sd">    delimiter :</span>
+<span class="sd">        See ``find_delimiter`` for parameter info.</span>
+<span class="sd">    is_little_endian : boolean</span>
+<span class="sd">    read_size : int</span>
+<span class="sd">        See ``find_bytes`` for parameter info.</span>
+<span class="sd">    rewind : boolean</span>
+<span class="sd">        Flag to rewind to initial position after searching.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    length to delimiter</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Note the data element that the delimiter starts is not read here,</span>
+<span class="sd">    the calling routine must handle that. Delimiter must be 4 bytes long.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">data_start</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
+    <span class="n">delimiter_pos</span> <span class="o">=</span> <span class="n">find_delimiter</span><span class="p">(</span>
+        <span class="n">fp</span><span class="p">,</span> <span class="n">delimiter</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">,</span> <span class="n">rewind</span><span class="o">=</span><span class="n">rewind</span><span class="p">)</span>
+    <span class="n">length</span> <span class="o">=</span> <span class="n">delimiter_pos</span> <span class="o">-</span> <span class="n">data_start</span>
+    <span class="k">return</span> <span class="n">length</span></div>
+
+
+<div class="viewcode-block" id="read_delimiter_item"><a class="viewcode-back" href="../../api_ref.html#pydicom.fileutil.read_delimiter_item">[docs]</a><span class="k">def</span> <span class="nf">read_delimiter_item</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">delimiter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Read and ignore an expected delimiter.</span>
+
+<span class="sd">    If the delimiter is not found or correctly formed, a warning is logged.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">found</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">found</span> <span class="o">!=</span> <span class="n">delimiter</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Expected delimitor </span><span class="si">%s</span><span class="s2">, got </span><span class="si">%s</span><span class="s2"> at file position 0x</span><span class="si">%x</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="n">Tag</span><span class="p">(</span><span class="n">delimiter</span><span class="p">),</span> <span class="n">Tag</span><span class="p">(</span><span class="n">found</span><span class="p">),</span> <span class="n">fp</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span> <span class="o">-</span> <span class="mi">4</span><span class="p">)</span>
+    <span class="n">length</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">read_UL</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">length</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Expected delimiter item to have length 0, &quot;</span>
+                    <span class="s2">&quot;got </span><span class="si">%d</span><span class="s2"> at file position 0x</span><span class="si">%x</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">fp</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span> <span class="o">-</span> <span class="mi">4</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2018, Darcy Mason and pydicom contributors.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'1.2.0rc1',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
