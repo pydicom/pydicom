@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """test cases for pydicom.filewriter module"""
-
+import tempfile
 from copy import deepcopy
 from datetime import date, datetime, time, timedelta
 from io import BytesIO
@@ -2408,3 +2408,14 @@ class TestWriteUndefinedLengthPixelData(object):
         with pytest.raises(ValueError, match='Pixel Data .+ must '
                                              'start with an item tag'):
             write_data_element(self.fp, pixel_data)
+
+    def test_writing_to_gzip(self):
+        file_path = tempfile.NamedTemporaryFile(suffix='.dcm').name
+        ds = dcmread(rtplan_name)
+        import gzip
+        with gzip.open(file_path, 'w') as fp:
+            ds.save_as(fp, write_like_original=False)
+        with gzip.open(file_path, 'r') as fp:
+            ds_unzipped = dcmread(fp)
+            for elem_in, elem_out in zip(ds, ds_unzipped):
+                assert elem_in == elem_out
