@@ -20,6 +20,8 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
+
+Slightly adapted to add support for pull requests.
 """
 
 from docutils import nodes, utils
@@ -34,21 +36,20 @@ def user_role(name, rawtext, text, lineno,
               inliner, options=None, content=None):
     """Sphinx role for linking to a user profile. Defaults to linking to
     Github profiles, but the profile URIS can be configured via the
-    ``issues_user_uri`` config value.
+    ``ref_user_uri`` config value.
 
     Example: ::
 
         :user:`sloria`
     """
     options = options or {}
-    content = content or []
     has_explicit_title, title, target = split_explicit_title(text)
 
     target = utils.unescape(target).strip()
     title = utils.unescape(title).strip()
     config = inliner.document.settings.env.app.config
     if config.issues_user_uri:
-        ref = config.issues_user_uri.format(user=target)
+        ref = config.ref_user_uri.format(user=target)
     else:
         ref = 'https://github.com/{0}'.format(target)
     if has_explicit_title:
@@ -60,54 +61,74 @@ def user_role(name, rawtext, text, lineno,
     return [link], []
 
 
-def _make_issue_node(issue_no, config, options=None):
+def _make_ref_node(ref_type, ref_no, config, uri=None, options=None):
     options = options or {}
-    if issue_no not in ('-', '0'):
-        if config.issues_uri:
-            ref = config.issues_uri.format(issue=issue_no)
-        elif config.issues_github_path:
-            ref = 'https://github.com/{0}/issues/{1}'.format(
-                config.issues_github_path, issue_no
+    if ref_no not in ('-', '0'):
+        if uri:
+            ref = uri.format(ref_type=ref_type, ref_no=ref_no)
+        elif config.ref_github_path:
+            ref = 'https://github.com/{0}/{1}/{2}'.format(
+                config.ref_github_path, ref_type, ref_no
             )
-        issue_text = '#{0}'.format(issue_no)
-        link = nodes.reference(text=issue_text, refuri=ref, **options)
+        ref_text = '#{0}'.format(ref_no)
+        link = nodes.reference(text=ref_text, refuri=ref, **options)
     else:
         link = None
     return link
 
 
+def _ref_role(ref_type, text, inliner, options=None):
+    """Sphinx role for linking to a pull request. Must have
+    `pr_uri` or `issues_github_path` configured in ``conf.py``.
+    """
+    options = options or {}
+    ref_nos = [each.strip() for each in utils.unescape(text).split(',')]
+    config = inliner.document.settings.env.app.config
+    ret = []
+    for i, ref_no in enumerate(ref_nos):
+        node = _make_ref_node(ref_type, ref_no, config, options=options)
+        ret.append(node)
+        if i != len(ref_nos) - 1:
+            sep = nodes.raw(text=', ', format='html')
+            ret.append(sep)
+    return ret, []
+
+
 def issue_role(name, rawtext, text, lineno,
                inliner, options=None, content=None):
     """Sphinx role for linking to an issue. Must have
-    `issues_uri` or `issues_github_path` configured in ``conf.py``.
+    `ref_uri` or `ref_github_path` configured in ``conf.py``.
 
     Examples: ::
 
         :issue:`123`
         :issue:`42,45`
     """
-    options = options or {}
-    content = content or []
-    issue_nos = [each.strip() for each in utils.unescape(text).split(',')]
-    config = inliner.document.settings.env.app.config
-    ret = []
-    for i, issue_no in enumerate(issue_nos):
-        node = _make_issue_node(issue_no, config, options=options)
-        ret.append(node)
-        if i != len(issue_nos) - 1:
-            sep = nodes.raw(text=', ', format='html')
-            ret.append(sep)
-    return ret, []
+    return _ref_role('issues', text, inliner, options)
+
+
+def pull_request_role(name, rawtext, text, lineno,
+                      inliner, options=None, content=None):
+    """Sphinx role for linking to a pull request. Must have
+    `ref_uri` or `ref_github_path` configured in ``conf.py``.
+
+    Examples: ::
+
+        :pull_request:`123`
+        :pull_request:`42,45`
+    """
+    return _ref_role('pull', text, inliner, options)
 
 
 def setup(app):
-    # Format template for issues URI
-    # e.g. 'https://github.com/sloria/marshmallow/issues/{issue}
-    app.add_config_value('issues_uri', default=None, rebuild='html')
+    # Format template for issues/pull request URI
+    # e.g. 'https://github.com/sloria/marshmallow/{ref_type}/{ref_no}
+    app.add_config_value('ref_uri', default=None, rebuild='html')
     # Shortcut for Github, e.g. 'sloria/marshmallow'
-    app.add_config_value('issues_github_path', default=None, rebuild='html')
+    app.add_config_value('ref_github_path', default=None, rebuild='html')
     # Format template for user profile URI
     # e.g. 'https://github.com/{user}'
-    app.add_config_value('issues_user_uri', default=None, rebuild='html')
+    app.add_config_value('ref_user_uri', default=None, rebuild='html')
     app.add_role('issue', issue_role)
+    app.add_role('pull_request', pull_request_role)
     app.add_role('user', user_role)
