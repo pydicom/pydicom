@@ -1,0 +1,306 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Display unicode person names &mdash; pydicom 1.2.0.dev0 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Show a dicom file using hierarchical tree" href="dicomtree.html" />
+    <link rel="prev" title="Analyse differences between DICOM files" href="plot_dicom_difference.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> pydicom
+          
+
+          
+            
+            <img src="../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.2.0.dev0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started with pydicom</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../pydicom_user_guide.html">Pydicom User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ref_guide.html">Reading and writing DICOM files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api_ref.html">Pydicom Complete API Reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Examples</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">General examples</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="plot_dicom_difference.html">Analyse differences between DICOM files</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Display unicode person names</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dicomtree.html">Show a dicom file using hierarchical tree</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#image-processing">Image processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#input-output">Input-output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#metadata-processing">Metadata processing</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../release-notes.html">Release history</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pydicom</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">General examples</a> &raquo;</li>
+        
+      <li>Display unicode person names</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/auto_examples/show_charset_name.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Click <a class="reference internal" href="#sphx-glr-download-auto-examples-show-charset-name-py"><span class="std std-ref">here</span></a> to download the full example code</p>
+</div>
+<div class="sphx-glr-example-title section" id="display-unicode-person-names">
+<span id="sphx-glr-auto-examples-show-charset-name-py"></span><h1>Display unicode person names<a class="headerlink" href="#display-unicode-person-names" title="Permalink to this headline">¶</a></h1>
+<p>Very simple app to display unicode person names.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># authors : Guillaume Lemaitre &lt;g.lemaitre58@gmail.com&gt;</span>
+<span class="c1"># license : MIT</span>
+
+<span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">compat</span>
+<span class="kn">from</span> <span class="nn">pydicom.valuerep</span> <span class="kn">import</span> <a href="../api_ref.html#pydicom.valuerep.PersonNameUnicode" title="View documentation for pydicom.valuerep.PersonNameUnicode"><span class="n">PersonNameUnicode</span></a>
+
+<span class="k">if</span> <span class="n">compat</span><span class="o">.</span><span class="n">in_py2</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">Tkinter</span> <span class="kn">as</span> <span class="nn">tkinter</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">tkinter</span>
+
+<span class="k">print</span><span class="p">(</span><span class="vm">__doc__</span><span class="p">)</span>
+
+<span class="n">default_encoding</span> <span class="o">=</span> <span class="s1">&#39;iso8859&#39;</span>
+
+<span class="n">root</span> <span class="o">=</span> <span class="n">tkinter</span><span class="o">.</span><span class="n">Tk</span><span class="p">()</span>
+<span class="c1"># root.geometry(&quot;%dx%d%+d%+d&quot; % (800, 600, 0, 0))</span>
+
+<span class="n">person_names</span> <span class="o">=</span> <span class="p">[</span>
+    <a href="../api_ref.html#pydicom.valuerep.PersonNameUnicode" title="View documentation for pydicom.valuerep.PersonNameUnicode"><span class="n">PersonNameUnicode</span></a><span class="p">(</span>
+        <span class="sa">b</span><span class="s2">&quot;Yamada^Tarou=</span><span class="se">\033</span><span class="s2">$B;3ED</span><span class="se">\033</span><span class="s2">(B^</span><span class="se">\033</span><span class="s2">$BB@O:&quot;</span>
+        <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\033</span><span class="s2">(B=</span><span class="se">\033</span><span class="s2">$B$d$^$@</span><span class="se">\033</span><span class="s2">(B^</span><span class="se">\033</span><span class="s2">$B$?$m$&amp;</span><span class="se">\033</span><span class="s2">(B&quot;</span><span class="p">,</span>
+        <span class="p">[</span><span class="n">default_encoding</span><span class="p">,</span> <span class="s1">&#39;iso2022_jp&#39;</span><span class="p">]),</span>  <span class="c1"># DICOM standard 2008-PS3.5 H.3 p98</span>
+    <a href="../api_ref.html#pydicom.valuerep.PersonNameUnicode" title="View documentation for pydicom.valuerep.PersonNameUnicode"><span class="n">PersonNameUnicode</span></a><span class="p">(</span>
+        <span class="sa">b</span><span class="s2">&quot;Wang^XiaoDong=</span><span class="se">\xcd\xf5\x5e\xd0\xa1\xb6\xab</span><span class="s2">=&quot;</span><span class="p">,</span>
+        <span class="p">[</span><span class="n">default_encoding</span><span class="p">,</span> <span class="s1">&#39;GB18030&#39;</span><span class="p">]),</span>  <span class="c1"># DICOM standard 2008-PS3.5 J.3 p 105</span>
+    <a href="../api_ref.html#pydicom.valuerep.PersonNameUnicode" title="View documentation for pydicom.valuerep.PersonNameUnicode"><span class="n">PersonNameUnicode</span></a><span class="p">(</span>
+        <span class="sa">b</span><span class="s2">&quot;Wang^XiaoDong=</span><span class="se">\xe7\x8e\x8b\x5e\xe5\xb0\x8f\xe6\x9d\xb1</span><span class="s2">=&quot;</span><span class="p">,</span>
+        <span class="p">[</span><span class="n">default_encoding</span><span class="p">,</span> <span class="s1">&#39;UTF-8&#39;</span><span class="p">]),</span>  <span class="c1"># DICOM standard 2008-PS3.5 J.1 p 104</span>
+    <a href="../api_ref.html#pydicom.valuerep.PersonNameUnicode" title="View documentation for pydicom.valuerep.PersonNameUnicode"><span class="n">PersonNameUnicode</span></a><span class="p">(</span>
+        <span class="sa">b</span><span class="s2">&quot;Hong^Gildong=</span><span class="se">\033</span><span class="s2">$)C</span><span class="se">\373\363</span><span class="s2">^</span><span class="se">\033</span><span class="s2">$)C</span><span class="se">\321\316\324\327</span><span class="s2">=&quot;</span>
+        <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\033</span><span class="s2">$)C</span><span class="se">\310\253</span><span class="s2">^</span><span class="se">\033</span><span class="s2">$)C</span><span class="se">\261\346\265\277</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="p">[</span><span class="n">default_encoding</span><span class="p">,</span> <span class="s1">&#39;euc_kr&#39;</span><span class="p">]),</span>  <span class="c1"># DICOM standard 2008-PS3.5 I.2 p 101</span>
+<span class="p">]</span>
+<span class="k">for</span> <span class="n">person_name</span> <span class="ow">in</span> <span class="n">person_names</span><span class="p">:</span>
+    <span class="n">label</span> <span class="o">=</span> <span class="n">tkinter</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">person_name</span><span class="p">)</span>
+    <span class="n">label</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
+<span class="n">root</span><span class="o">.</span><span class="n">mainloop</span><span class="p">()</span>
+</pre></div>
+</div>
+<p><strong>Total running time of the script:</strong> ( 0 minutes  0.000 seconds)</p>
+<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-show-charset-name-py">
+<div class="sphx-glr-download docutils container">
+<a class="reference download internal" download="" href="../_downloads/82fd028afb03e357569ba63bc8d583f0/show_charset_name.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">show_charset_name.py</span></code></a></div>
+<div class="sphx-glr-download docutils container">
+<a class="reference download internal" download="" href="../_downloads/e4179a09796a2ebea6efe913292cc78d/show_charset_name.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">show_charset_name.ipynb</span></code></a></div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="dicomtree.html" class="btn btn-neutral float-right" title="Show a dicom file using hierarchical tree" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="plot_dicom_difference.html" class="btn btn-neutral" title="Analyse differences between DICOM files" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2018, Darcy Mason and pydicom contributors.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'1.2.0.dev0',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

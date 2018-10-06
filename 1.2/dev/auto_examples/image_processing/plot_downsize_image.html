@@ -1,0 +1,383 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Downsize MRI image using pydicom &mdash; pydicom 1.2.0.dev0 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Read RTPLAN DICOM and list information" href="../input_output/plot_read_rtplan.html" />
+    <link rel="prev" title="Show a dicom file using hierarchical tree" href="../dicomtree.html" /> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> pydicom
+          
+
+          
+            
+            <img src="../../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.2.0.dev0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started with pydicom</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../pydicom_user_guide.html">Pydicom User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ref_guide.html">Reading and writing DICOM files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api_ref.html">Pydicom Complete API Reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Examples</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../index.html">General examples</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html#image-processing">Image processing</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Downsize MRI image using pydicom</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../index.html#input-output">Input-output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../index.html#metadata-processing">Metadata processing</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../release-notes.html">Release history</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pydicom</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">General examples</a> &raquo;</li>
+        
+      <li>Downsize MRI image using pydicom</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/auto_examples/image_processing/plot_downsize_image.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Click <a class="reference internal" href="#sphx-glr-download-auto-examples-image-processing-plot-downsize-image-py"><span class="std std-ref">here</span></a> to download the full example code</p>
+</div>
+<div class="sphx-glr-example-title section" id="downsize-mri-image-using-pydicom">
+<span id="sphx-glr-auto-examples-image-processing-plot-downsize-image-py"></span><h1>Downsize MRI image using pydicom<a class="headerlink" href="#downsize-mri-image-using-pydicom" title="Permalink to this headline">¶</a></h1>
+<p>This example shows how to downsize an MR image from <img class="math" src="../../_images/math/cd9e50a863e7b2639b0afb3dc81597e506eca3d2.png" alt="512  imes 512"/> to
+<img class="math" src="../../_images/math/5913dfc6081655e97fa07b78f7e5f60f3b491b94.png" alt="64       imes 64"/>. The downsizing is performed by taking the central section
+instead of averagin the pixels. Finally, the image is store as a dicom image.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This example requires the Numpy library to manipulate the pixel data.</p>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>The image has 64 x 64 voxels
+The downsampled image has 8 x 8 voxels
+The information of the data set after downsampling:
+
+(0008, 0008) Image Type                          CS: [&#39;DERIVED&#39;, &#39;SECONDARY&#39;, &#39;OTHER&#39;]
+(0008, 0012) Instance Creation Date              DA: &#39;20040826&#39;
+(0008, 0013) Instance Creation Time              TM: &#39;185434&#39;
+(0008, 0014) Instance Creator UID                UI: 1.3.6.1.4.1.5962.3
+(0008, 0016) SOP Class UID                       UI: MR Image Storage
+(0008, 0018) SOP Instance UID                    UI: 1.3.6.1.4.1.5962.1.1.4.1.1.20040826185059.5457
+(0008, 0020) Study Date                          DA: &#39;20040826&#39;
+(0008, 0021) Series Date                         DA: &#39;&#39;
+(0008, 0022) Acquisition Date                    DA: &#39;&#39;
+(0008, 0030) Study Time                          TM: &#39;185059&#39;
+(0008, 0031) Series Time                         TM: &#39;&#39;
+(0008, 0032) Acquisition Time                    TM: &#39;&#39;
+(0008, 0050) Accession Number                    SH: &#39;&#39;
+(0008, 0060) Modality                            CS: &#39;MR&#39;
+(0008, 0070) Manufacturer                        LO: &#39;TOSHIBA_MEC&#39;
+(0008, 0080) Institution Name                    LO: &#39;TOSHIBA&#39;
+(0008, 0090) Referring Physician&#39;s Name          PN: &#39;&#39;
+(0008, 0201) Timezone Offset From UTC            SH: &#39;-0400&#39;
+(0008, 1010) Station Name                        SH: &#39;000000000&#39;
+(0008, 1060) Name of Physician(s) Reading Study  PN: &#39;----&#39;
+(0008, 1070) Operators&#39; Name                     PN: &#39;----&#39;
+(0008, 1090) Manufacturer&#39;s Model Name           LO: &#39;MRT50H1&#39;
+(0010, 0010) Patient&#39;s Name                      PN: &#39;CompressedSamples^MR1&#39;
+(0010, 0020) Patient ID                          LO: &#39;4MR1&#39;
+(0010, 0030) Patient&#39;s Birth Date                DA: &#39;&#39;
+(0010, 0040) Patient&#39;s Sex                       CS: &#39;F&#39;
+(0010, 1020) Patient&#39;s Size                      DS: &#39;&#39;
+(0010, 1030) Patient&#39;s Weight                    DS: &quot;80.0000&quot;
+(0018, 0010) Contrast/Bolus Agent                LO: &#39;&#39;
+(0018, 0020) Scanning Sequence                   CS: &#39;SE&#39;
+(0018, 0021) Sequence Variant                    CS: &#39;NONE&#39;
+(0018, 0022) Scan Options                        CS: &#39;&#39;
+(0018, 0023) MR Acquisition Type                 CS: &#39;3D&#39;
+(0018, 0050) Slice Thickness                     DS: &quot;0.8000&quot;
+(0018, 0080) Repetition Time                     DS: &quot;4000.0000&quot;
+(0018, 0081) Echo Time                           DS: &quot;240.0000&quot;
+(0018, 0083) Number of Averages                  DS: &quot;1.0000&quot;
+(0018, 0084) Imaging Frequency                   DS: &quot;63.92433900&quot;
+(0018, 0085) Imaged Nucleus                      SH: &#39;H&#39;
+(0018, 0086) Echo Number(s)                      IS: &quot;1&quot;
+(0018, 0091) Echo Train Length                   IS: &#39;&#39;
+(0018, 1000) Device Serial Number                LO: &#39;-0000200&#39;
+(0018, 1020) Software Version(s)                 LO: &#39;V3.51*P25&#39;
+(0018, 1314) Flip Angle                          DS: &quot;90&quot;
+(0018, 5100) Patient Position                    CS: &#39;HFS&#39;
+(0020, 000d) Study Instance UID                  UI: 1.3.6.1.4.1.5962.1.2.4.20040826185059.5457
+(0020, 000e) Series Instance UID                 UI: 1.3.6.1.4.1.5962.1.3.4.1.20040826185059.5457
+(0020, 0010) Study ID                            SH: &#39;4MR1&#39;
+(0020, 0011) Series Number                       IS: &quot;1&quot;
+(0020, 0012) Acquisition Number                  IS: &quot;0&quot;
+(0020, 0013) Instance Number                     IS: &quot;1&quot;
+(0020, 0032) Image Position (Patient)            DS: [&#39;-83.9063&#39;, &#39;-91.2000&#39;, &#39;6.6406&#39;]
+(0020, 0037) Image Orientation (Patient)         DS: [&#39;1.0000&#39;, &#39;0.0000&#39;, &#39;0.0000&#39;, &#39;0.0000&#39;, &#39;1.0000&#39;, &#39;0.0000&#39;]
+(0020, 0052) Frame of Reference UID              UI: 1.3.6.1.4.1.5962.1.4.4.1.20040826185059.5457
+(0020, 0060) Laterality                          CS: &#39;&#39;
+(0020, 1040) Position Reference Indicator        LO: &#39;&#39;
+(0020, 1041) Slice Location                      DS: &quot;0.0000&quot;
+(0020, 4000) Image Comments                      LT: &#39;Uncompressed&#39;
+(0028, 0002) Samples per Pixel                   US: 1
+(0028, 0004) Photometric Interpretation          CS: &#39;MONOCHROME2&#39;
+(0028, 0010) Rows                                US: 8
+(0028, 0011) Columns                             US: 8
+(0028, 0030) Pixel Spacing                       DS: [&#39;0.3125&#39;, &#39;0.3125&#39;]
+(0028, 0100) Bits Allocated                      US: 16
+(0028, 0101) Bits Stored                         US: 16
+(0028, 0102) High Bit                            US: 15
+(0028, 0103) Pixel Representation                US: 1
+(0028, 0106) Smallest Image Pixel Value          SS: 0
+(0028, 0107) Largest Image Pixel Value           SS: 4000
+(0028, 1050) Window Center                       DS: &quot;600&quot;
+(0028, 1051) Window Width                        DS: &quot;1600&quot;
+(7fe0, 0010) Pixel Data                          OW: Array of 128 bytes
+(fffc, fffc) Data Set Trailing Padding           OB: Array of 126 bytes
+</pre></div>
+</div>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># authors : Guillaume Lemaitre &lt;g.lemaitre58@gmail.com&gt;</span>
+<span class="c1"># license : MIT</span>
+
+<span class="kn">import</span> <span class="nn">pydicom</span>
+<span class="kn">from</span> <span class="nn">pydicom.data</span> <span class="kn">import</span> <span class="n">get_testdata_files</span>
+
+<span class="k">print</span><span class="p">(</span><span class="vm">__doc__</span><span class="p">)</span>
+
+<span class="c1"># FIXME: add a full-sized MR image in the testing data</span>
+<span class="n">filename</span> <span class="o">=</span> <span class="n">get_testdata_files</span><span class="p">(</span><span class="s1">&#39;MR_small.dcm&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">ds</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">dcmread</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+
+<span class="c1"># get the pixel information into a numpy array</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">pixel_array</span>
+<span class="k">print</span><span class="p">(</span><span class="s1">&#39;The image has {} x {} voxels&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                            <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+<span class="n">data_downsampling</span> <span class="o">=</span> <span class="n">data</span><span class="p">[::</span><span class="mi">8</span><span class="p">,</span> <span class="p">::</span><span class="mi">8</span><span class="p">]</span>
+<span class="k">print</span><span class="p">(</span><span class="s1">&#39;The downsampled image has {} x {} voxels&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+    <span class="n">data_downsampling</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_downsampling</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+<span class="c1"># copy the data back to the original data set</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span> <span class="o">=</span> <span class="n">data_downsampling</span><span class="o">.</span><span class="n">tobytes</span><span class="p">()</span>
+<span class="c1"># update the information regarding the shape of the data array</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">Rows</span><span class="p">,</span> <span class="n">ds</span><span class="o">.</span><span class="n">Columns</span> <span class="o">=</span> <span class="n">data_downsampling</span><span class="o">.</span><span class="n">shape</span>
+
+<span class="c1"># print the image information given in the dataset</span>
+<span class="k">print</span><span class="p">(</span><span class="s1">&#39;The information of the data set after downsampling: </span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Total running time of the script:</strong> ( 0 minutes  0.012 seconds)</p>
+<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-image-processing-plot-downsize-image-py">
+<div class="sphx-glr-download docutils container">
+<a class="reference download internal" download="" href="../../_downloads/a648406d1f15207f386e683b7bba0f68/plot_downsize_image.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_downsize_image.py</span></code></a></div>
+<div class="sphx-glr-download docutils container">
+<a class="reference download internal" download="" href="../../_downloads/d7f0b830966488568cd3442f766003f9/plot_downsize_image.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_downsize_image.ipynb</span></code></a></div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../input_output/plot_read_rtplan.html" class="btn btn-neutral float-right" title="Read RTPLAN DICOM and list information" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../dicomtree.html" class="btn btn-neutral" title="Show a dicom file using hierarchical tree" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2018, Darcy Mason and pydicom contributors.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'1.2.0.dev0',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

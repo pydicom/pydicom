@@ -1,0 +1,463 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Read DICOM directory &mdash; pydicom 1.2.0.dev0 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Working with sequences" href="../metadata_processing/plot_sequences.html" />
+    <link rel="prev" title="Write DICOM data" href="plot_write_dicom.html" /> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> pydicom
+          
+
+          
+            
+            <img src="../../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.2.0.dev0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started with pydicom</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../pydicom_user_guide.html">Pydicom User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ref_guide.html">Reading and writing DICOM files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api_ref.html">Pydicom Complete API Reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Examples</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../index.html">General examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../index.html#image-processing">Image processing</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html#input-output">Input-output</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="plot_read_rtplan.html">Read RTPLAN DICOM and list information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_read_dicom.html">Read DICOM and ploting using matplotlib</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_printing_dataset.html">Format the output of the data set printing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_write_dicom.html">Write DICOM data</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Read DICOM directory</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../index.html#metadata-processing">Metadata processing</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../release-notes.html">Release history</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pydicom</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">General examples</a> &raquo;</li>
+        
+      <li>Read DICOM directory</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/auto_examples/input_output/plot_read_dicom_directory.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Click <a class="reference internal" href="#sphx-glr-download-auto-examples-input-output-plot-read-dicom-directory-py"><span class="std std-ref">here</span></a> to download the full example code</p>
+</div>
+<div class="sphx-glr-example-title section" id="read-dicom-directory">
+<span id="sphx-glr-auto-examples-input-output-plot-read-dicom-directory-py"></span><h1>Read DICOM directory<a class="headerlink" href="#read-dicom-directory" title="Permalink to this headline">¶</a></h1>
+<p>This example shows how to read DICOM directory.</p>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Path to the DICOM directory: /home/circleci/project/pydicom/data/test_files/dicomdirtests/DICOMDIR
+Patient: 77654033: Doe^Archibald
+    Study 2: 20010101: XR C Spine Comp Min 4 Views
+        Series 1: CR: N/A (1 image)
+            Reading images...
+
+            Image filenames:
+             [           &#39;/home/circleci/project/pydicom/data/test_files/dicomdirtests/77654033/CR1/6154&#39;]
+            Patient Names in images..: {&#39;Doe^Archibald&#39;}
+            Patient IDs in images..: {&#39;77654033&#39;}
+        Series 2: CR: N/A (1 image)
+            Reading images...
+
+            Image filenames:
+             [           &#39;/home/circleci/project/pydicom/data/test_files/dicomdirtests/77654033/CR2/6247&#39;]
+            Patient Names in images..: {&#39;Doe^Archibald&#39;}
+            Patient IDs in images..: {&#39;77654033&#39;}
+        Series 3: CR: N/A (1 image)
+            Reading images...
+
+            Image filenames:
+             [           &#39;/home/circleci/project/pydicom/data/test_files/dicomdirtests/77654033/CR3/6278&#39;]
+            Patient Names in images..: {&#39;Doe^Archibald&#39;}
+            Patient IDs in images..: {&#39;77654033&#39;}
+    Study 2: 19950903: CT, HEAD/BRAIN WO CONTRAST
+        Series 2: CT: N/A (4 images)
+            Reading images...
+
+            Image filenames:
+             [           &#39;/home/circleci/project/pydicom/data/test_files/dicomdirtests/77654033/CT2/17106&#39;,
+            &#39;/home/circleci/project/pydicom/data/test_files/dicomdirtests/77654033/CT2/17136&#39;,
+            &#39;/home/circleci/project/pydicom/data/test_files/dicomdirtests/77654033/CT2/17166&#39;,
+            &#39;/home/circleci/project/pydicom/data/test_files/dicomdirtests/77654033/CT2/17196&#39;]
+            Patient Names in images..: {&#39;Doe^Archibald&#39;, &#39;Doe^Archibald&#39;, &#39;Doe^Archibald&#39;, &#39;Doe^Archibald&#39;}
+            Patient IDs in images..: {&#39;77654033&#39;}
+Patient: 98890234: Doe^Peter
+    Study 2: 20010101:
+        Series 4: CT: N/A (2 images)
+            Reading images...
+
+            Image filenames:
+             [           &#39;/home/circleci/project/pydicom/data/test_files/dicomdirtests/98892001/CT2N/6293&#39;,
+            &#39;/home/circleci/project/pydicom/data/test_files/dicomdirtests/98892001/CT2N/6924&#39;]
+            Patient Names in images..: {&#39;Doe^Peter&#39;, &#39;Doe^Peter&#39;}
+            Patient IDs in images..: {&#39;98890234&#39;}
+        Series 5: CT: N/A (5 images)
+            Reading images...
+
+            Image filenames:
+             [           &#39;/home/circleci/project/pydicom/data/test_files/dicomdirtests/98892001/CT5N/2062&#39;,
+            &#39;/home/circleci/project/pydicom/data/test_files/dicomdirtests/98892001/CT5N/2392&#39;,
+            &#39;/home/circleci/project/pydicom/data/test_files/dicomdirtests/98892001/CT5N/2693&#39;,
+            &#39;/home/circleci/project/pydicom/data/test_files/dicomdirtests/98892001/CT5N/3023&#39;,
+            &#39;/home/circleci/project/pydicom/data/test_files/dicomdirtests/98892001/CT5N/3353&#39;]
+            Patient Names in images..: {&#39;Doe^Peter&#39;, &#39;Doe^Peter&#39;, &#39;Doe^Peter&#39;, &#39;Doe^Peter&#39;, &#39;Doe^Peter&#39;}
+            Patient IDs in images..: {&#39;98890234&#39;}
+    Study 428: 20030505: Carotids
+        Series 1: MR: N/A (1 image)
+            Reading images...
+
+            Image filenames:
+             [           &#39;/home/circleci/project/pydicom/data/test_files/dicomdirtests/98892003/MR1/15820&#39;]
+            Patient Names in images..: {&#39;Doe^Peter&#39;}
+            Patient IDs in images..: {&#39;98890234&#39;}
+        Series 2: MR: N/A (1 image)
+            Reading images...
+
+            Image filenames:
+             [           &#39;/home/circleci/project/pydicom/data/test_files/dicomdirtests/98892003/MR2/15970&#39;]
+            Patient Names in images..: {&#39;Doe^Peter&#39;}
+            Patient IDs in images..: {&#39;98890234&#39;}
+    Study 134: 20030505: Brain
+        Series 1: MR: N/A (1 image)
+            Reading images...
+
+            Image filenames:
+             [           &#39;/home/circleci/project/pydicom/data/test_files/dicomdirtests/98892003/MR1/4919&#39;]
+            Patient Names in images..: {&#39;Doe^Peter&#39;}
+            Patient IDs in images..: {&#39;98890234&#39;}
+        Series 2: MR: N/A (3 images)
+            Reading images...
+
+            Image filenames:
+             [           &#39;/home/circleci/project/pydicom/data/test_files/dicomdirtests/98892003/MR2/4950&#39;,
+            &#39;/home/circleci/project/pydicom/data/test_files/dicomdirtests/98892003/MR2/5011&#39;,
+            &#39;/home/circleci/project/pydicom/data/test_files/dicomdirtests/98892003/MR2/4981&#39;]
+            Patient Names in images..: {&#39;Doe^Peter&#39;, &#39;Doe^Peter&#39;, &#39;Doe^Peter&#39;}
+            Patient IDs in images..: {&#39;98890234&#39;}
+    Study 2: 20030505: Brain-MRA
+        Series 1: MR: N/A (1 image)
+            Reading images...
+
+            Image filenames:
+             [           &#39;/home/circleci/project/pydicom/data/test_files/dicomdirtests/98892003/MR1/5641&#39;]
+            Patient Names in images..: {&#39;Doe^Peter&#39;}
+            Patient IDs in images..: {&#39;98890234&#39;}
+        Series 2: MR: N/A (3 images)
+            Reading images...
+
+            Image filenames:
+             [           &#39;/home/circleci/project/pydicom/data/test_files/dicomdirtests/98892003/MR2/6935&#39;,
+            &#39;/home/circleci/project/pydicom/data/test_files/dicomdirtests/98892003/MR2/6605&#39;,
+            &#39;/home/circleci/project/pydicom/data/test_files/dicomdirtests/98892003/MR2/6273&#39;]
+            Patient Names in images..: {&#39;Doe^Peter&#39;, &#39;Doe^Peter&#39;, &#39;Doe^Peter&#39;}
+            Patient IDs in images..: {&#39;98890234&#39;}
+        Series 700: MR: N/A (7 images)
+            Reading images...
+
+            Image filenames:
+             [           &#39;/home/circleci/project/pydicom/data/test_files/dicomdirtests/98892003/MR700/4558&#39;,
+            &#39;/home/circleci/project/pydicom/data/test_files/dicomdirtests/98892003/MR700/4528&#39;,
+            &#39;/home/circleci/project/pydicom/data/test_files/dicomdirtests/98892003/MR700/4588&#39;,
+            &#39;/home/circleci/project/pydicom/data/test_files/dicomdirtests/98892003/MR700/4467&#39;,
+            &#39;/home/circleci/project/pydicom/data/test_files/dicomdirtests/98892003/MR700/4618&#39;,
+            &#39;/home/circleci/project/pydicom/data/test_files/dicomdirtests/98892003/MR700/4678&#39;,
+            &#39;/home/circleci/project/pydicom/data/test_files/dicomdirtests/98892003/MR700/4648&#39;]
+            Patient Names in images..: {&#39;Doe^Peter&#39;, &#39;Doe^Peter&#39;, &#39;Doe^Peter&#39;, &#39;Doe^Peter&#39;, &#39;Doe^Peter&#39;, &#39;Doe^Peter&#39;, &#39;Doe^Peter&#39;}
+            Patient IDs in images..: {&#39;98890234&#39;}
+</pre></div>
+</div>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># authors : Guillaume Lemaitre &lt;g.lemaitre58@gmail.com&gt;</span>
+<span class="c1"># license : MIT</span>
+
+<span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">dirname</span><span class="p">,</span> <span class="n">join</span>
+<span class="kn">from</span> <span class="nn">pprint</span> <span class="kn">import</span> <span class="n">pprint</span>
+
+<span class="kn">import</span> <span class="nn">pydicom</span>
+<span class="kn">from</span> <span class="nn">pydicom.data</span> <span class="kn">import</span> <span class="n">get_testdata_files</span>
+<span class="kn">from</span> <span class="nn">pydicom.filereader</span> <span class="kn">import</span> <a href="../../api_ref.html#pydicom.filereader.read_dicomdir" title="View documentation for pydicom.filereader.read_dicomdir"><span class="n">read_dicomdir</span></a>
+
+<span class="c1"># fetch the path to the test data</span>
+<span class="n">filepath</span> <span class="o">=</span> <span class="n">get_testdata_files</span><span class="p">(</span><span class="s1">&#39;DICOMDIR&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="k">print</span><span class="p">(</span><span class="s1">&#39;Path to the DICOM directory: {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filepath</span><span class="p">))</span>
+<span class="c1"># load the data</span>
+<span class="n">dicom_dir</span> <span class="o">=</span> <a href="../../api_ref.html#pydicom.filereader.read_dicomdir" title="View documentation for pydicom.filereader.read_dicomdir"><span class="n">read_dicomdir</span></a><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+<span class="n">base_dir</span> <span class="o">=</span> <span class="n">dirname</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+
+<span class="c1"># go through the patient record and print information</span>
+<span class="k">for</span> <span class="n">patient_record</span> <span class="ow">in</span> <span class="n">dicom_dir</span><span class="o">.</span><span class="n">patient_records</span><span class="p">:</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">hasattr</span><span class="p">(</span><span class="n">patient_record</span><span class="p">,</span> <span class="s1">&#39;PatientID&#39;</span><span class="p">)</span> <span class="ow">and</span>
+            <span class="nb">hasattr</span><span class="p">(</span><span class="n">patient_record</span><span class="p">,</span> <span class="s1">&#39;PatientName&#39;</span><span class="p">)):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Patient: {}: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">patient_record</span><span class="o">.</span><span class="n">PatientID</span><span class="p">,</span>
+                                       <span class="n">patient_record</span><span class="o">.</span><span class="n">PatientName</span><span class="p">))</span>
+    <span class="n">studies</span> <span class="o">=</span> <span class="n">patient_record</span><span class="o">.</span><span class="n">children</span>
+    <span class="c1"># got through each serie</span>
+    <span class="k">for</span> <span class="n">study</span> <span class="ow">in</span> <span class="n">studies</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot; &quot;</span> <span class="o">*</span> <span class="mi">4</span> <span class="o">+</span> <span class="s2">&quot;Study {}: {}: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">study</span><span class="o">.</span><span class="n">StudyID</span><span class="p">,</span>
+                                                  <span class="n">study</span><span class="o">.</span><span class="n">StudyDate</span><span class="p">,</span>
+                                                  <span class="n">study</span><span class="o">.</span><span class="n">StudyDescription</span><span class="p">))</span>
+        <span class="n">all_series</span> <span class="o">=</span> <span class="n">study</span><span class="o">.</span><span class="n">children</span>
+        <span class="c1"># go through each serie</span>
+        <span class="k">for</span> <span class="n">series</span> <span class="ow">in</span> <span class="n">all_series</span><span class="p">:</span>
+            <span class="n">image_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">children</span><span class="p">)</span>
+            <span class="n">plural</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;s&#39;</span><span class="p">)[</span><span class="n">image_count</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">]</span>
+
+            <span class="c1"># Write basic series info and image count</span>
+
+            <span class="c1"># Put N/A in if no Series Description</span>
+            <span class="k">if</span> <span class="s1">&#39;SeriesDescription&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">series</span><span class="p">:</span>
+                <span class="n">series</span><span class="o">.</span><span class="n">SeriesDescription</span> <span class="o">=</span> <span class="s2">&quot;N/A&quot;</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot; &quot;</span> <span class="o">*</span> <span class="mi">8</span> <span class="o">+</span> <span class="s2">&quot;Series {}: {}: {} ({} image{})&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">series</span><span class="o">.</span><span class="n">SeriesNumber</span><span class="p">,</span> <span class="n">series</span><span class="o">.</span><span class="n">Modality</span><span class="p">,</span> <span class="n">series</span><span class="o">.</span><span class="n">SeriesDescription</span><span class="p">,</span>
+                <span class="n">image_count</span><span class="p">,</span> <span class="n">plural</span><span class="p">))</span>
+
+            <span class="c1"># Open and read something from each image, for demonstration</span>
+            <span class="c1"># purposes. For simple quick overview of DICOMDIR, leave the</span>
+            <span class="c1"># following out</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot; &quot;</span> <span class="o">*</span> <span class="mi">12</span> <span class="o">+</span> <span class="s2">&quot;Reading images...&quot;</span><span class="p">)</span>
+            <span class="n">image_records</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">children</span>
+            <span class="n">image_filenames</span> <span class="o">=</span> <span class="p">[</span><span class="n">join</span><span class="p">(</span><span class="n">base_dir</span><span class="p">,</span> <span class="o">*</span><span class="n">image_rec</span><span class="o">.</span><span class="n">ReferencedFileID</span><span class="p">)</span>
+                               <span class="k">for</span> <span class="n">image_rec</span> <span class="ow">in</span> <span class="n">image_records</span><span class="p">]</span>
+
+            <span class="n">datasets</span> <span class="o">=</span> <span class="p">[</span><span class="n">pydicom</span><span class="o">.</span><span class="n">dcmread</span><span class="p">(</span><span class="n">image_filename</span><span class="p">)</span>
+                        <span class="k">for</span> <span class="n">image_filename</span> <span class="ow">in</span> <span class="n">image_filenames</span><span class="p">]</span>
+
+            <span class="n">patient_names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">PatientName</span> <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="n">datasets</span><span class="p">)</span>
+            <span class="n">patient_IDs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">PatientID</span> <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="n">datasets</span><span class="p">)</span>
+
+            <span class="c1"># List the image filenames</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">*</span> <span class="mi">12</span> <span class="o">+</span> <span class="s2">&quot;Image filenames:&quot;</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot; &quot;</span> <span class="o">*</span> <span class="mi">12</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+            <span class="n">pprint</span><span class="p">(</span><span class="n">image_filenames</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+
+            <span class="c1"># Expect all images to have same patient name, id</span>
+            <span class="c1"># Show the set of all names, IDs found (should each have one)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot; &quot;</span> <span class="o">*</span> <span class="mi">12</span> <span class="o">+</span> <span class="s2">&quot;Patient Names in images..: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">patient_names</span><span class="p">))</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot; &quot;</span> <span class="o">*</span> <span class="mi">12</span> <span class="o">+</span> <span class="s2">&quot;Patient IDs in images..: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">patient_IDs</span><span class="p">))</span>
+</pre></div>
+</div>
+<p><strong>Total running time of the script:</strong> ( 0 minutes  0.103 seconds)</p>
+<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-input-output-plot-read-dicom-directory-py">
+<div class="sphx-glr-download docutils container">
+<a class="reference download internal" download="" href="../../_downloads/c317f444b7e5f97d7fda400e76b361f0/plot_read_dicom_directory.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_read_dicom_directory.py</span></code></a></div>
+<div class="sphx-glr-download docutils container">
+<a class="reference download internal" download="" href="../../_downloads/83928bb766a6b0e382651e9084e9bfd5/plot_read_dicom_directory.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_read_dicom_directory.ipynb</span></code></a></div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../metadata_processing/plot_sequences.html" class="btn btn-neutral float-right" title="Working with sequences" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="plot_write_dicom.html" class="btn btn-neutral" title="Write DICOM data" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2018, Darcy Mason and pydicom contributors.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'1.2.0.dev0',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

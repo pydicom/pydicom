@@ -1,0 +1,417 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Transition to pydicom 1.x &mdash; pydicom 1.2.0.dev0 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/pydicom.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Core elements in pydicom" href="base_element.html" />
+    <link rel="prev" title="Pydicom User Guide" href="pydicom_user_guide.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> pydicom
+          
+
+          
+            
+            <img src="_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.2.0.dev0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started with pydicom</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="pydicom_user_guide.html">Pydicom User Guide</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Transition to pydicom 1.x</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#introduction">Introduction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#for-authors-of-packages-requiring-pydicom-1-0">For authors of packages requiring pydicom &lt; 1.0</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#error-messages-relating-to-the-pydicom-transition">Error messages relating to the pydicom transition</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#api-changes-in-version-1-0">API Changes in version 1.0</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#changed-module-names">Changed module names</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#changed-function-and-variable-names">Changed function and variable names</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#removed-functions-and-names">Removed functions and names</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#changed-behavior">Changed behavior</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="base_element.html">Core elements in pydicom</a></li>
+<li class="toctree-l2"><a class="reference internal" href="writing_files.html">Writing DICOM Files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="working_with_pixel_data.html">Working with Pixel Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="image_data_handlers.html">Handling of compressed image data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="viewing_images.html">Viewing Images</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ref_guide.html">Reading and writing DICOM files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_ref.html">Pydicom Complete API Reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html">General examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html#image-processing">Image processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html#input-output">Input-output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html#metadata-processing">Metadata processing</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="release-notes.html">Release history</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">pydicom</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="pydicom_user_guide.html">Pydicom User Guide</a> &raquo;</li>
+        
+      <li>Transition to pydicom 1.x</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/transition_to_pydicom1.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="transition-to-pydicom-1-x">
+<span id="transition-to-pydicom1"></span><h1>Transition to pydicom 1.x<a class="headerlink" href="#transition-to-pydicom-1-x" title="Permalink to this headline">¶</a></h1>
+<p class="rubric">Important information on differences in pydicom post 1.0 vs pre-1.0</p>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>As is often the case for major software version number changes, pydicom 1.0
+breaks with the previous release of pydicom (0.9.9) in several ways.  These
+require changes to user code to target the pydicom &gt;= 1.0 package, or to check
+and deal with the differences between the versions.</p>
+<p>Backwards-incompatible changes post 1.0</p>
+<blockquote>
+<div><ul class="simple">
+<li>the library is no longer <code class="docutils literal notranslate"><span class="pre">dicom</span></code> but is <code class="docutils literal notranslate"><span class="pre">pydicom</span></code>, to match the package
+name</li>
+<li>short-form names such as <code class="docutils literal notranslate"><span class="pre">Beams</span></code> are no longer allowed; use the full
+keyword e.g. <code class="docutils literal notranslate"><span class="pre">BeamSequence</span></code></li>
+<li>some less-used modules within pydicom have been renamed, e.g. <code class="docutils literal notranslate"><span class="pre">dicom.UID</span></code>
+is now <code class="docutils literal notranslate"><span class="pre">pydicom.uid</span></code></li>
+</ul>
+</div></blockquote>
+<p>Why was the package name changed?  There are several reasons for this change:</p>
+<blockquote>
+<div><ul class="simple">
+<li>it is standard Python practice for the package and the installed library to
+have the same name</li>
+<li>first-time users expect to be able to type <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">pydicom</span></code> rather than
+<code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">dicom</span></code>, which has caused confusion</li>
+<li>it makes sense for search engines - with the correct name it is much easier
+to find relevant questions and example code online</li>
+</ul>
+</div></blockquote>
+<p>The decision wasn’t taken lightly, but with a great deal of discussion on the
+GitHub issues list.  Having made the leap, the rest of this guide should help
+smooth the way…</p>
+</div>
+<div class="section" id="for-authors-of-packages-requiring-pydicom-1-0">
+<h2>For authors of packages requiring pydicom &lt; 1.0<a class="headerlink" href="#for-authors-of-packages-requiring-pydicom-1-0" title="Permalink to this headline">¶</a></h2>
+<p>The old pydicom releases have been split off into their own package, called
+<code class="docutils literal notranslate"><span class="pre">dicom</span></code>, which is now hosted on PyPI. This allows the old library <code class="docutils literal notranslate"><span class="pre">dicom</span></code>
+to co-exist alongside the new library <code class="docutils literal notranslate"><span class="pre">pydicom</span></code>.</p>
+<p>The main things to do, to ensure your old pydicom code will remain functional,
+are:</p>
+<blockquote>
+<div><ol class="loweralpha simple">
+<li>you should <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">uninstall</span> <span class="pre">pydicom</span></code> and <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">dicom</span></code> in your
+existing pydicom installs</li>
+<li>If you have <code class="docutils literal notranslate"><span class="pre">requirements.txt</span></code> files, change the pydicom line from
+“pydicom” to “dicom” e.g.  <code class="docutils literal notranslate"><span class="pre">pydicom==0.9.9</span></code> becomes <code class="docutils literal notranslate"><span class="pre">dicom==0.9.9</span></code></li>
+<li>Change your instructions to users to <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">dicom</span></code> rather than
+<code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">pydicom</span></code></li>
+</ol>
+</div></blockquote>
+</div>
+<div class="section" id="error-messages-relating-to-the-pydicom-transition">
+<h2>Error messages relating to the pydicom transition<a class="headerlink" href="#error-messages-relating-to-the-pydicom-transition" title="Permalink to this headline">¶</a></h2>
+<p>This section is here in the hopes of people getting directed to this page on
+searches. If that’s you, then welcome! Hopefully the information here can get
+things going quickly for you.</p>
+<p>For those with pydicom &lt; 1.0 installed, on trying to import pydicom, they will
+get an ImportError message:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pydicom</span> 
+<span class="gt">Traceback (most recent call last):</span>
+  File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n">&lt;module&gt;</span>
+<span class="gr">ImportError</span>: <span class="n">No module named pydicom</span>
+</pre></div>
+</div>
+<p>Your choice then is to update to pydicom &gt;=1.0 (see Installing pydicom
+section), or to instead use <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">dicom</span></code> and follow the old-style pydicom
+syntax.</p>
+<p>Conversely, if pydicom &gt;= 1.0 is installed, the error message for <code class="docutils literal notranslate"><span class="pre">import</span>
+<span class="pre">dicom</span></code> will look like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">dicom</span> 
+<span class="gt">Traceback (most recent call last):</span>
+  File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n">&lt;module&gt;</span>
+<span class="gr">ImportError</span>: <span class="n">No module named dicom</span>
+</pre></div>
+</div>
+<p>In this case you likely have installed pydicom &gt;= 1.0, and so the <code class="docutils literal notranslate"><span class="pre">dicom</span></code> library
+does not exist.  You can simply <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">pydicom</span></code> instead, and continue with
+the new pydicom, or, if you really need the old pydicom, then you should:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">dicom</span>
+</pre></div>
+</div>
+<p>and you should be good to go.</p>
+</div>
+</div>
+<div class="section" id="api-changes-in-version-1-0">
+<h1>API Changes in version 1.0<a class="headerlink" href="#api-changes-in-version-1-0" title="Permalink to this headline">¶</a></h1>
+<p>Apart from the change of the package name, there are some changes in
+module names, class names, and behavior that may require some code changes.</p>
+<div class="section" id="changed-module-names">
+<h2>Changed module names<a class="headerlink" href="#changed-module-names" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li>module <code class="docutils literal notranslate"><span class="pre">UID</span></code> is now <code class="docutils literal notranslate"><span class="pre">uid</span></code></li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="changed-function-and-variable-names">
+<h2>Changed function and variable names<a class="headerlink" href="#changed-function-and-variable-names" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li>in module <code class="docutils literal notranslate"><span class="pre">datadict</span></code>:<ul>
+<li><code class="docutils literal notranslate"><span class="pre">dictionaryVM()</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">dictionary_VM</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">dictionaryVR()</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">dictionary_VR</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">private_dictionaryVM()</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">private_dictionary_VM</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">private_dictionaryVR()</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">private_dictionary_VR</span></code></li>
+</ul>
+</li>
+<li>in module <code class="docutils literal notranslate"><span class="pre">filereader</span></code>:<ul>
+<li><code class="docutils literal notranslate"><span class="pre">read_file()</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">dcmread()</span></code> (but old name remains for compatibility)</li>
+</ul>
+</li>
+<li>in module <code class="docutils literal notranslate"><span class="pre">filewriter</span></code>:<ul>
+<li><code class="docutils literal notranslate"><span class="pre">write_file()</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">dcmwrite()</span></code> (but old name remains for compatibility)</li>
+</ul>
+</li>
+<li>module <code class="docutils literal notranslate"><span class="pre">tagtools</span></code>:<ul>
+<li><code class="docutils literal notranslate"><span class="pre">tag_in_exception()</span></code> has been moved to <code class="docutils literal notranslate"><span class="pre">tag</span></code> module</li>
+</ul>
+</li>
+<li>module <code class="docutils literal notranslate"><span class="pre">uid</span></code>:<ul>
+<li><code class="docutils literal notranslate"><span class="pre">UID.is_valid()</span></code> is now a property</li>
+<li><code class="docutils literal notranslate"><span class="pre">NotCompressedPixelTransferSyntaxes</span></code> -&gt;  <code class="docutils literal notranslate"><span class="pre">UncompressedPixelTransferSyntaxes</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">pydicom_root_UID</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">PYDICOM_ROOT_UID</span></code></li>
+</ul>
+</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="removed-functions-and-names">
+<h2>Removed functions and names<a class="headerlink" href="#removed-functions-and-names" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li>support for old names (before DICOM keywords) in module <code class="docutils literal notranslate"><span class="pre">datadict</span></code> is
+gone (<code class="docutils literal notranslate"><span class="pre">CleanName()</span></code>, <code class="docutils literal notranslate"><span class="pre">short_name()</span></code>, <code class="docutils literal notranslate"><span class="pre">long_name()</span></code>,
+<code class="docutils literal notranslate"><span class="pre">all_names_for_tag()</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">filereader.not_group2()</span></code> is no longer available</li>
+<li><code class="docutils literal notranslate"><span class="pre">uid.pydicom_UIDs</span></code> has been removed</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="changed-behavior">
+<h2>Changed behavior<a class="headerlink" href="#changed-behavior" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">dataset.save_as()</span></code>:  <code class="docutils literal notranslate"><span class="pre">TransferSyntaxUID</span></code> not added automatically to <code class="docutils literal notranslate"><span class="pre">dataset.file_meta</span></code> if
+missing</li>
+</ul>
+</div></blockquote>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="base_element.html" class="btn btn-neutral float-right" title="Core elements in pydicom" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="pydicom_user_guide.html" class="btn btn-neutral" title="Pydicom User Guide" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2018, Darcy Mason and pydicom contributors.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'1.2.0.dev0',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
