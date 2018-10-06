@@ -790,7 +790,8 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">original_string</span> <span class="o">=</span> <span class="n">original_string</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_components</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">encodings</span> <span class="o">=</span> <span class="n">_verify_encodings</span><span class="p">(</span><span class="n">encodings</span><span class="p">)</span> <span class="ow">or</span> <span class="p">[</span><span class="n">default_encoding</span><span class="p">]</span>
+        <span class="c1"># if the encoding is not given, leave it as undefined (None)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encodings</span> <span class="o">=</span> <span class="n">_verify_encodings</span><span class="p">(</span><span class="n">encodings</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_dict</span> <span class="o">=</span> <span class="p">{}</span>
 
     <span class="k">def</span> <span class="nf">_create_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -810,7 +811,8 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_components</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">groups</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">original_string</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;=&#39;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_components</span> <span class="o">=</span> <span class="n">_decode_personname</span><span class="p">(</span><span class="n">groups</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">encodings</span><span class="p">)</span>
+            <span class="n">encodings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encodings</span> <span class="ow">or</span> <span class="p">[</span><span class="n">default_encoding</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_components</span> <span class="o">=</span> <span class="n">_decode_personname</span><span class="p">(</span><span class="n">groups</span><span class="p">,</span> <span class="n">encodings</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_components</span>
 
@@ -929,14 +931,15 @@
 <span class="sd">            with the first matching of the given encodings.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">encodings</span> <span class="o">=</span> <span class="n">_verify_encodings</span><span class="p">(</span><span class="n">encodings</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">encodings</span>
+
         <span class="c1"># if the encoding is not the original encoding, we have to return</span>
         <span class="c1"># a re-encoded string (without updating the original string)</span>
-        <span class="k">if</span> <span class="n">encodings</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encodings</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">encodings</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encodings</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">encodings</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">_encode_personname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">,</span> <span class="n">encodings</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">original_string</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># if the original encoding was not set, we set it now</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">original_string</span> <span class="o">=</span> <span class="n">_encode_personname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">,</span>
-                                                      <span class="n">encodings</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">original_string</span> <span class="o">=</span> <span class="n">_encode_personname</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">,</span> <span class="n">encodings</span> <span class="ow">or</span> <span class="p">[</span><span class="n">default_encoding</span><span class="p">])</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">original_string</span>
 
     <span class="k">def</span> <span class="nf">family_comma_given</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
