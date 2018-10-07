@@ -276,9 +276,9 @@ def generate_example_rst(app, what, name, obj, options, lines):
 
 # Config for sphinx_issues
 
-issues_uri = 'https://github.com/pydicom/pydicom/issues/{issue}'
-issues_github_path = 'pydicom/pydicom'
-issues_user_uri = 'https://github.com/{user}'
+ref_uri = 'https://github.com/pydicom/pydicom/{ref_type}/{ref_no}'
+ref_github_path = 'pydicom/pydicom'
+ref_user_uri = 'https://github.com/{user}'
 
 
 def setup(app):
