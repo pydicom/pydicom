@@ -14,8 +14,11 @@ from pydicom import dcmread
 from pydicom.filebase import DicomBytesIO
 from pydicom.sequence import Sequence
 from pydicom.tag import Tag
-from pydicom.uid import ImplicitVRLittleEndian, JPEGBaseLineLossy8bit, \
-    ExplicitVRBigEndian, ExplicitVRLittleEndian, PYDICOM_IMPLEMENTATION_UID
+from pydicom.uid import (
+    ImplicitVRLittleEndian,
+    ExplicitVRBigEndian,
+    PYDICOM_IMPLEMENTATION_UID
+)
 
 
 class DatasetTests(unittest.TestCase):
