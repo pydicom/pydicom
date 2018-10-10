@@ -372,7 +372,7 @@ def rle_encode_frame(arr):
     Parameters
     ----------
     arr : numpy.ndarray
-        A 2D (if Samples Per Pixel = 1) or 3D (if Samples Per Pixel = 3)
+        A 1/2D (if Samples Per Pixel = 1) or 3D (if Samples Per Pixel = 3)
         ndarray containing a single frame of the image to be RLE encoded.
 
     Returns
@@ -381,14 +381,29 @@ def rle_encode_frame(arr):
         An RLE encoded frame, including the RLE header, following the format
         specified by the DICOM Standard, Part 5, Annex G.
     """
-    if len(arr.shape) > 3:
+    shape = arr.shape
+    if len(shape) > 3:
+        # Note: only raises if multi-sample pixel data with multiple frames
         raise ValueError(
-            "Only a single frame of data can be encoded FIXME"
+            "Unable to encode multiple frames at once, please encode one "
+            "frame at a time"
+        )
+
+    # Check the expected number of segments
+    nr_segments = arr.dtype.itemsize
+    if len(shape) == 3:
+        # Number of samples * bytes per sample
+        nr_segments *= shape[-1]
+
+    if nr_segments > 15:
+        raise ValueError(
+            "Unable to encode as the DICOM standard only allows "
+            "a maximum of 15 segments in RLE encoded data"
         )
 
     rle_data = bytearray()
     seg_lengths = []
-    if len(arr.shape) == 3:
+    if len(shape) == 3:
         # Samples Per Pixel > 1
         for ii in range(arr.shape[-1]):
             # Need a contiguous array in order to be able to split it up
@@ -441,11 +456,13 @@ def _rle_encode_plane(arr):
         by the DICOM Standard, Part 5, Annex G. The segments are yielded in
         order from most significant to least.
     """
-    # Re-view the N-bit array data as N / 8 x uint8s
-    arr8 = arr.view(np.uint8)
+    # Determine the byte order of the array
     byte_order = arr.dtype.byteorder
     if byte_order == '=':
         byte_order = '<' if sys.byteorder == 'little' else '>'
+
+    # Re-view the N-bit array data as N / 8 x uint8s
+    arr8 = arr.view(np.uint8)
 
     # Reshape the uint8 array data into 1 or more segments and encode
     bytes_per_sample = arr.dtype.itemsize
@@ -460,7 +477,7 @@ def _rle_encode_plane(arr):
 
 
 def _rle_encode_segment(arr):
-    """Return a 2D numpy ndarray as an RLE encoded bytearray.
+    """Return a 1 or 2D numpy ndarray as an RLE encoded bytearray.
 
     Each row of the image is encoded separately as required by the DICOM
     Standard.
@@ -468,7 +485,7 @@ def _rle_encode_segment(arr):
     Parameters
     ----------
     arr : numpy.ndarray
-        A 2D ndarray of 8-bit uint data, representing a Byte Segment as in
+        A 1 or 2D ndarray of 8-bit uint data, representing a Byte Segment as in
         the DICOM Standard, Part 5, Annex G.2.
 
     Returns
