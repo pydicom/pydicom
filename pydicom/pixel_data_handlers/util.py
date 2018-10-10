@@ -323,6 +323,60 @@ def reshape_pixel_array(ds, arr):
     return arr
 
 
+def get_expected_length(ds, unit='bytes'):
+    """Return the expected length (in bytes or pixels) of the pixel data.
+
+    +-----------------------------------+------+-------------+
+    | Element                           | Type | Required or |
+    +-------------+---------------------+      | optional    |
+    | Tag         | Keyword             |      |             |
+    +=============+=====================+======+=============+
+    | (0028,0002) | SamplesPerPixel     | 1    | Required    |
+    +-------------+---------------------+------+-------------+
+    | (0028,0008) | NumberOfFrames      | 1C   | Optional    |
+    +-------------+---------------------+------+-------------+
+    | (0028,0010) | Rows                | 1    | Required    |
+    +-------------+---------------------+------+-------------+
+    | (0028,0011) | Columns             | 1    | Required    |
+    +-------------+---------------------+------+-------------+
+    | (0028,0100) | BitsAllocated       | 1    | Required    |
+    +-------------+---------------------+------+-------------+
+
+    Parameters
+    ----------
+    ds : dataset.Dataset
+        The DICOM dataset containing the Image Pixel module and pixel data.
+    unit : str, optional
+        If 'bytes' then returns the expected length of the Pixel Data in
+        whole bytes and NOT including an odd length trailing NULL padding
+        byte. If 'pixels' then returns the expected length of the Pixel Data
+        in terms of the total number of pixels (default 'bytes').
+
+    Returns
+    -------
+    int
+        The expected length of the pixel data in either whole bytes or pixels,
+        excluding the NULL trailing padding byte for odd length data.
+    """
+    length = ds.Rows * ds.Columns * ds.SamplesPerPixel
+    length *= getattr(ds, 'NumberOfFrames', 1)
+
+    if unit == 'pixels':
+        return length
+
+    # Correct for the number of bytes per pixel
+    bits_allocated = ds.BitsAllocated
+    if bits_allocated == 1:
+        # Determine the nearest whole number of bytes needed to contain
+        #   1-bit pixel data. e.g. 10 x 10 1-bit pixels is 100 bits, which
+        #   are packed into 12.5 -> 13 bytes
+        length = length // 8 + (length % 8 > 0)
+    else:
+        length *= bits_allocated // 8
+
+    return length
+
+
 def _convert_RGB_to_YBR_FULL(arr):
     """Return an ndarray converted from RGB to YBR_FULL color space.
 
