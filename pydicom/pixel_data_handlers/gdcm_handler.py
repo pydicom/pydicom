@@ -15,7 +15,7 @@ try:
 except ImportError:
     HAVE_GDCM = False
 
-from pydicom.pixel_data_handlers.util import get_expected_length
+from pydicom.pixel_data_handlers.util import get_expected_length, pixel_dtype
 import pydicom
 
 
@@ -125,30 +125,6 @@ def _create_image(dicom_dataset, data_element, number_of_frames):
     return image
 
 
-def _determine_numpy_dtype(dicom_dataset, gdcm_image):
-    gdcm_numpy_typemap = {
-        gdcm.PixelFormat.INT8:     numpy.int8,
-        gdcm.PixelFormat.UINT8:    numpy.uint8,
-        gdcm.PixelFormat.UINT16:   numpy.uint16,
-        gdcm.PixelFormat.INT16:    numpy.int16,
-        gdcm.PixelFormat.UINT32:   numpy.uint32,
-        gdcm.PixelFormat.INT32:    numpy.int32,
-        gdcm.PixelFormat.FLOAT32:  numpy.float32,
-        gdcm.PixelFormat.FLOAT64:  numpy.float64
-    }
-    gdcm_scalar_type = gdcm_image.GetPixelFormat().GetScalarType()
-    if gdcm_scalar_type in gdcm_numpy_typemap:
-        numpy_dtype = numpy.dtype(gdcm_numpy_typemap[gdcm_scalar_type])
-    else:
-        raise TypeError('{0} is not a GDCM supported '
-                        'pixel format'.format(gdcm_scalar_type))
-
-    if not dicom_dataset.is_little_endian:
-        numpy_dtype = numpy_dtype.newbyteorder()
-
-    return numpy_dtype
-
-
 def get_pixeldata(dicom_dataset):
     """
     Use the GDCM package to decode the PixelData attribute
@@ -208,7 +184,7 @@ def get_pixeldata(dicom_dataset):
             #   in a Numpy error later on.
             pass
 
-    numpy_dtype = _determine_numpy_dtype(dicom_dataset, gdcm_image)
+    numpy_dtype = pixel_dtype(dicom_dataset)
     pixel_array = numpy.frombuffer(pixel_bytearray, dtype=numpy_dtype)
 
     expected_length_pixels = get_expected_length(dicom_dataset, 'pixels')
