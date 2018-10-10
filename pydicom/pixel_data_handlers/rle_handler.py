@@ -372,7 +372,7 @@ def rle_encode_frame(arr):
     Parameters
     ----------
     arr : numpy.ndarray
-        A 1/2D (if Samples Per Pixel = 1) or 3D (if Samples Per Pixel = 3)
+        A 2D (if Samples Per Pixel = 1) or 3D (if Samples Per Pixel = 3)
         ndarray containing a single frame of the image to be RLE encoded.
 
     Returns
@@ -445,7 +445,7 @@ def _rle_encode_plane(arr):
     Parameters
     ----------
     arr : numpy.ndarray
-        A 1 or 2D ndarray containing a single plane of the image data to be RLE
+        A 2D ndarray containing a single plane of the image data to be RLE
         encoded. The dtype of the array should be a multiple of 8 (i.e. uint8,
         uint32, int16, etc.).
 
@@ -477,7 +477,7 @@ def _rle_encode_plane(arr):
 
 
 def _rle_encode_segment(arr):
-    """Return a 1 or 2D numpy ndarray as an RLE encoded bytearray.
+    """Return a 2D numpy ndarray as an RLE encoded bytearray.
 
     Each row of the image is encoded separately as required by the DICOM
     Standard.
@@ -485,7 +485,7 @@ def _rle_encode_segment(arr):
     Parameters
     ----------
     arr : numpy.ndarray
-        A 1 or 2D ndarray of 8-bit uint data, representing a Byte Segment as in
+        A 2D ndarray of 8-bit uint data, representing a Byte Segment as in
         the DICOM Standard, Part 5, Annex G.2.
 
     Returns
@@ -553,11 +553,11 @@ def _rle_encode_row(arr):
                     out_append(257 - len(group[ii:ii + 128]))
                     out_append(group[0])
                 else:
-                    # Literal run only if last replicate is all alone
+                    # Literal run only if last replicate part is length 1
                     out_append(0)
                     out_append(group[0])
 
-    # Finally literal run if literal isn't followed by a replicate run
+    # Final literal run if literal isn't followed by a replicate run
     for ii in range(0, len(literal), 128):
         _run = literal[ii:ii + 128]
         out_append(len(_run) - 1)

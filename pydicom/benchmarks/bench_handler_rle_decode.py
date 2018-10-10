@@ -1,15 +1,12 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Decoding benchmarks for the rle_handler module."""
 
-import numpy as np
-
 from pydicom import dcmread
 from pydicom.data import get_testdata_files
-from pydicom.encaps import decode_data_sequence, defragment_data
+from pydicom.encaps import decode_data_sequence
 from pydicom.pixel_data_handlers.rle_handler import (
     get_pixeldata,
     _rle_decode_frame,
-    _rle_decode_segment,
 )
 
 
