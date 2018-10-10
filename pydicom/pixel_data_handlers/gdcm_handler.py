@@ -15,6 +15,7 @@ try:
 except ImportError:
     HAVE_GDCM = False
 
+from pydicom.pixel_data_handlers.util import get_expected_length
 import pydicom
 
 
@@ -196,35 +197,25 @@ def get_pixeldata(dicom_dataset):
     # Here we need to be careful because in some cases, GDCM reads a
     # buffer that is too large, so we need to make sure we only include
     # the first n_rows * n_columns * dtype_size bytes.
-    numpy_dtype = _determine_numpy_dtype(dicom_dataset, gdcm_image)
-    samples_per_pixel = dicom_dataset.get("SamplesPerPixel", 1)
-    n_bytes = (dicom_dataset.Rows * dicom_dataset.Columns
-               * numpy.dtype(numpy_dtype).itemsize * number_of_frames
-               * samples_per_pixel)
-
-    if len(pixel_bytearray) > n_bytes:
+    expected_length_bytes = get_expected_length(dicom_dataset)
+    if len(pixel_bytearray) > expected_length_bytes:
         # We make sure that all the bytes after are in fact zeros
-        padding = pixel_bytearray[n_bytes:]
+        padding = pixel_bytearray[expected_length_bytes:]
         if numpy.any(numpy.frombuffer(padding, numpy.byte)):
-            pixel_bytearray = pixel_bytearray[:n_bytes]
+            pixel_bytearray = pixel_bytearray[:expected_length_bytes]
         else:
             # We revert to the old behavior which should then result
             #   in a Numpy error later on.
             pass
 
+    numpy_dtype = _determine_numpy_dtype(dicom_dataset, gdcm_image)
     pixel_array = numpy.frombuffer(pixel_bytearray, dtype=numpy_dtype)
 
-    length_of_pixel_array = pixel_array.nbytes
-    expected_length = (dicom_dataset.Rows * dicom_dataset.Columns
-                       * number_of_frames * samples_per_pixel)
-
-    if dicom_dataset.BitsAllocated > 8:
-        expected_length *= (dicom_dataset.BitsAllocated // 8)
-
-    if length_of_pixel_array != expected_length:
+    expected_length_pixels = get_expected_length(dicom_dataset, 'pixels')
+    if pixel_array.size != expected_length_pixels:
         raise AttributeError("Amount of pixel data %d does "
                              "not match the expected data %d" %
-                             (length_of_pixel_array, expected_length))
+                             (pixel_array.size, expected_length_pixels))
 
     if should_change_PhotometricInterpretation_to_RGB(dicom_dataset):
         dicom_dataset.PhotometricInterpretation = "RGB"
