@@ -658,36 +658,28 @@ def write_file_meta_info(fp, file_meta, enforce_standard=True):
         # Will be updated with the actual length later
         file_meta.FileMetaInformationGroupLength = 0
 
-    # Only used if FileMetaInformationGroupLength is present.
-    #   FileMetaInformationGroupLength has a VR of 'UL' and so has a value that
-    #   is 4 bytes fixed. The total length of when encoded as Explicit VR must
-    #   therefore be 12 bytes.
-    end_group_length_elem = fp.tell() + 12
-
-    # The 'is_little_endian' and 'is_implicit_VR' attributes will need to be
-    #   set correctly after the File Meta Info has been written.
-    fp.is_little_endian = True
-    fp.is_implicit_VR = False
-
-    # Write the File Meta Information Group elements to `fp`
-    write_dataset(fp, file_meta)
+    # Write the File Meta Information Group elements
+    # first write into a buffer to avoid seeking back, that can be
+    # expansive and is not allowed if writing into a zip file
+    buffer = DicomBytesIO()
+    buffer.is_little_endian = True
+    buffer.is_implicit_VR = False
+    write_dataset(buffer, file_meta)
 
     # If FileMetaInformationGroupLength is present it will be the first written
     #   element and we must update its value to the correct length.
     if 'FileMetaInformationGroupLength' in file_meta:
-        # Save end of file meta to go back to
-        end_of_file_meta = fp.tell()
-
         # Update the FileMetaInformationGroupLength value, which is the number
         #   of bytes from the end of the FileMetaInformationGroupLength element
-        #   to the end of all the File Meta Information elements
-        group_length = int(end_of_file_meta - end_group_length_elem)
-        file_meta.FileMetaInformationGroupLength = group_length
-        fp.seek(end_group_length_elem - 12)
-        write_data_element(fp, file_meta[0x00020000])
+        #   to the end of all the File Meta Information elements.
+        # FileMetaInformationGroupLength has a VR of 'UL' and so has a value
+        #   that is 4 bytes fixed. The total length of when encoded as
+        #   Explicit VR must therefore be 12 bytes.
+        file_meta.FileMetaInformationGroupLength = buffer.tell() - 12
+        buffer.seek(0)
+        write_data_element(buffer, file_meta[0x00020000])
 
-        # Return to end of the file meta, ready to write remainder of the file
-        fp.seek(end_of_file_meta)
+    fp.write(buffer.getvalue())
 
 
 def dcmwrite(filename, dataset, write_like_original=True):
