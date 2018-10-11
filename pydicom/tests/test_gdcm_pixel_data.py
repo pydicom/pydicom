@@ -14,6 +14,8 @@ from pydicom.pixel_data_handlers.util import _convert_YBR_FULL_to_RGB
 from pydicom.tag import Tag
 from pydicom import compat
 gdcm_missing_message = "GDCM is not available in this test environment"
+gdcm_im_missing_message = "GDCM is not available or in-memory decoding"\
+    " not supported with this GDCM version"
 gdcm_present_message = "GDCM is being tested"
 have_numpy_testing = True
 try:
@@ -31,8 +33,10 @@ except AttributeError:
 try:
     import pydicom.pixel_data_handlers.gdcm_handler as gdcm_handler
     HAVE_GDCM = gdcm_handler.HAVE_GDCM
+    HAVE_GDCM_IN_MEMORY_SUPPORT = gdcm_handler.HAVE_GDCM_IN_MEMORY_SUPPORT
 except ImportError as e:
     HAVE_GDCM = False
+    HAVE_GDCM_IN_MEMORY_SUPPORT = False
     gdcm_handler = None
 
 try:
@@ -387,14 +391,24 @@ else:
 
 @pytest.mark.skipif(not HAVE_GDCM, reason=gdcm_missing_message)
 class TestsWithGDCM():
-    @pytest.fixture(autouse=True)
-    def with_gdcm(self):
+    @pytest.fixture(params=[
+        pytest.param('f', marks=pytest.mark.skipif(
+            not HAVE_GDCM, 0, reason=gdcm_missing_message), id='File'),
+        pytest.param('m', marks=pytest.mark.skipif(
+            not HAVE_GDCM_IN_MEMORY_SUPPORT, reason=gdcm_im_missing_message),
+                     id='InMemory')
+    ], scope='class', autouse=True)
+    def with_gdcm(self, request):
+        original_value = HAVE_GDCM_IN_MEMORY_SUPPORT
+        if request.param == 'f':
+            gdcm_handler.HAVE_GDCM_IN_MEMORY_SUPPORT = False
         original_handlers = pydicom.config.pixel_data_handlers
         pydicom.config.pixel_data_handlers = [numpy_handler, gdcm_handler]
         yield
+        gdcm_handler.HAVE_GDCM_IN_MEMORY_SUPPORT = original_value
         pydicom.config.pixel_data_handlers = original_handlers
 
-    @pytest.fixture(scope='module')
+    @pytest.fixture(scope='class')
     def unicode_filename(self):
         if compat.in_py2:
             utf8_filename = os.path.join(tempfile.gettempdir(), "ДИКОМ.dcm")
@@ -408,55 +422,55 @@ class TestsWithGDCM():
         yield unicode_filename
         os.remove(unicode_filename)
 
-    @pytest.fixture(scope='module')
+    @pytest.fixture
     def jpeg_ls_lossless(self, unicode_filename):
         return dcmread(unicode_filename)
 
-    @pytest.fixture(scope='module')
+    @pytest.fixture
     def sc_rgb_jpeg2k_gdcm_KY(self):
         return dcmread(sc_rgb_jpeg2k_gdcm_KY)
 
-    @pytest.fixture(scope='module')
+    @pytest.fixture(scope='class')
     def ground_truth_sc_rgb_jpeg2k_gdcm_KY_gdcm(self):
         return dcmread(ground_truth_sc_rgb_jpeg2k_gdcm_KY_gdcm)
 
-    @pytest.fixture(scope='module')
+    @pytest.fixture
     def jpeg_2k(self):
         return dcmread(jpeg2000_name)
 
-    @pytest.fixture(scope='module')
+    @pytest.fixture
     def jpeg_2k_lossless(self):
         return dcmread(jpeg2000_lossless_name)
 
-    @pytest.fixture(scope='module')
+    @pytest.fixture(scope='class')
     def mr_small(self):
         return dcmread(mr_name)
 
-    @pytest.fixture(scope='module')
+    @pytest.fixture(scope='class')
     def emri_small(self):
         return dcmread(emri_name)
 
-    @pytest.fixture(scope='module')
+    @pytest.fixture
     def emri_jpeg_ls_lossless(self):
         return dcmread(emri_jpeg_ls_lossless)
 
-    @pytest.fixture(scope='module')
+    @pytest.fixture
     def emri_jpeg_2k_lossless(self):
         return dcmread(emri_jpeg_2k_lossless)
 
-    @pytest.fixture(scope='module')
+    @pytest.fixture
     def color_3d_jpeg(self):
         return dcmread(color_3d_jpeg_baseline)
 
-    @pytest.fixture(scope='module')
+    @pytest.fixture
     def jpeg_lossy(self):
         return dcmread(jpeg_lossy_name)
 
-    @pytest.fixture(scope='module')
+    @pytest.fixture
     def jpeg_lossless(self):
         return dcmread(jpeg_lossless_name)
 
-    @pytest.fixture(scope='module')
+    @pytest.fixture
     def jpeg_lossless_odd_data_size(self):
         return dcmread(jpeg_lossless_odd_data_size_name)
 

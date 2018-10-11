@@ -12,11 +12,18 @@ except ImportError:
 try:
     import gdcm
     HAVE_GDCM = True
+    try:
+        getattr(gdcm.DataElement, 'SetByteStringValue')
+        HAVE_GDCM_IN_MEMORY_SUPPORT = True
+    except AttributeError:
+        HAVE_GDCM_IN_MEMORY_SUPPORT = False
 except ImportError:
     HAVE_GDCM = False
+    HAVE_GDCM_IN_MEMORY_SUPPORT = False
 
-from pydicom.pixel_data_handlers.util import get_expected_length, pixel_dtype
 import pydicom
+from pydicom import compat
+from pydicom.pixel_data_handlers.util import get_expected_length, pixel_dtype
 
 
 HANDLER_NAME = 'GDCM'
@@ -125,6 +132,22 @@ def _create_image(dicom_dataset, data_element, number_of_frames):
     return image
 
 
+def _create_image_reader(filename):
+    image_reader = gdcm.ImageReader()
+    if compat.in_py2:
+        if isinstance(filename, unicode):
+            image_reader.SetFileName(
+                filename.encode(sys.getfilesystemencoding()))
+        else:
+            image_reader.SetFileName(filename)
+    else:
+        image_reader.SetFileName(filename)
+
+    if not image_reader.Read():
+        raise TypeError("GDCM could not read DICOM image")
+    return image_reader
+
+
 def get_pixeldata(dicom_dataset):
     """
     Use the GDCM package to decode the PixelData attribute
@@ -154,9 +177,14 @@ def get_pixeldata(dicom_dataset):
                "and one or more could not be imported")
         raise ImportError(msg)
 
-    gdcm_data_element, number_of_frames = _create_data_element(dicom_dataset)
-    gdcm_image = _create_image(dicom_dataset, gdcm_data_element,
-                               number_of_frames)
+    if HAVE_GDCM_IN_MEMORY_SUPPORT:
+        gdcm_data_element, number_of_frames = _create_data_element(
+            dicom_dataset)
+        gdcm_image = _create_image(dicom_dataset, gdcm_data_element,
+                                   number_of_frames)
+    else:
+        gdcm_image_reader = _create_image_reader(dicom_dataset.filename)
+        gdcm_image = gdcm_image_reader.GetImage()
 
     # GDCM returns char* as type str. Under Python 2 `str` are
     # byte arrays by default. Python 3 decodes this to
@@ -166,9 +194,11 @@ def get_pixeldata(dicom_dataset):
     # error handler configured.
     # Therefore, we can encode them back to their original bytearray
     # representation on Python 3 by using the same parameters.
-    pixel_bytearray = gdcm_image.GetBuffer()
-    if sys.version_info >= (3, 0):
-        pixel_bytearray = pixel_bytearray.encode("utf-8", "surrogateescape")
+    if compat.in_py2:
+        pixel_bytearray = gdcm_image.GetBuffer()
+    else:
+        pixel_bytearray = gdcm_image.GetBuffer().encode(
+            "utf-8", "surrogateescape")
 
     # Here we need to be careful because in some cases, GDCM reads a
     # buffer that is too large, so we need to make sure we only include
