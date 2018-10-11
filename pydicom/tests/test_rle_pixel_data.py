@@ -23,10 +23,11 @@ There are the following possibilities:
 """
 
 from struct import pack, unpack
+import sys
 
 import pytest
 
-from pydicom import dcmread
+from pydicom import dcmread, Dataset
 import pydicom.config
 from pydicom.data import get_testdata_files
 from pydicom.encaps import defragment_data
@@ -49,6 +50,10 @@ try:
         _rle_decode_frame,
         _rle_decode_segment,
         _parse_rle_header,
+        rle_encode_frame,
+        _rle_encode_plane,
+        _rle_encode_segment,
+        _rle_encode_row,
     )
     HAVE_RLE = RLE_HANDLER.HAVE_RLE
 except ImportError:
@@ -57,42 +62,44 @@ except ImportError:
 
 
 # Paths to the test datasets
+# EXPL: Explicit VR Little Endian
+# RLE: RLE Lossless
 # 8/8-bit, 1 sample/pixel, 1 frame
-OB_EXPL_LITTLE_1F = get_testdata_files("OBXXXX1A.dcm")[0]
-OB_RLE_1F = get_testdata_files("OBXXXX1A_rle.dcm")[0]
+EXPL_8_1_1F = get_testdata_files("OBXXXX1A.dcm")[0]
+RLE_8_1_1F = get_testdata_files("OBXXXX1A_rle.dcm")[0]
 # 8/8-bit, 1 sample/pixel, 2 frame
-OB_EXPL_LITTLE_2F = get_testdata_files("OBXXXX1A_2frame.dcm")[0]
-OB_RLE_2F = get_testdata_files("OBXXXX1A_rle_2frame.dcm")[0]
+EXPL_8_1_2F = get_testdata_files("OBXXXX1A_2frame.dcm")[0]
+RLE_8_1_2F = get_testdata_files("OBXXXX1A_rle_2frame.dcm")[0]
 # 8/8-bit, 3 sample/pixel, 1 frame
-SC_EXPL_LITTLE_1F = get_testdata_files("SC_rgb.dcm")[0]
-SC_RLE_1F = get_testdata_files("SC_rgb_rle.dcm")[0]
+EXPL_8_3_1F = get_testdata_files("SC_rgb.dcm")[0]
+RLE_8_3_1F = get_testdata_files("SC_rgb_rle.dcm")[0]
 # 8/8-bit, 3 sample/pixel, 2 frame
-SC_EXPL_LITTLE_2F = get_testdata_files("SC_rgb_2frame.dcm")[0]
-SC_RLE_2F = get_testdata_files("SC_rgb_rle_2frame.dcm")[0]
+EXPL_8_3_2F = get_testdata_files("SC_rgb_2frame.dcm")[0]
+RLE_8_3_2F = get_testdata_files("SC_rgb_rle_2frame.dcm")[0]
 # 16/16-bit, 1 sample/pixel, 1 frame
-MR_EXPL_LITTLE_1F = get_testdata_files("MR_small.dcm")[0]
-MR_RLE_1F = get_testdata_files("MR_small_RLE.dcm")[0]
+EXPL_16_1_1F = get_testdata_files("MR_small.dcm")[0]
+RLE_16_1_1F = get_testdata_files("MR_small_RLE.dcm")[0]
 # 16/12-bit, 1 sample/pixel, 10 frame
-EMRI_EXPL_LITTLE_10F = get_testdata_files("emri_small.dcm")[0]
-EMRI_RLE_10F = get_testdata_files("emri_small_RLE.dcm")[0]
+EXPL_16_1_10F = get_testdata_files("emri_small.dcm")[0]
+RLE_16_1_10F = get_testdata_files("emri_small_RLE.dcm")[0]
 # 16/16-bit, 3 sample/pixel, 1 frame
-SC_EXPL_LITTLE_16_1F = get_testdata_files("SC_rgb_16bit.dcm")[0]
-SC_RLE_16_1F = get_testdata_files("SC_rgb_rle_16bit.dcm")[0]
+EXPL_16_3_1F = get_testdata_files("SC_rgb_16bit.dcm")[0]
+RLE_16_3_1F = get_testdata_files("SC_rgb_rle_16bit.dcm")[0]
 # 16/16-bit, 3 sample/pixel, 2 frame
-SC_EXPL_LITTLE_16_2F = get_testdata_files("SC_rgb_16bit_2frame.dcm")[0]
-SC_RLE_16_2F = get_testdata_files("SC_rgb_rle_16bit_2frame.dcm")[0]
+EXPL_16_3_2F = get_testdata_files("SC_rgb_16bit_2frame.dcm")[0]
+RLE_16_3_2F = get_testdata_files("SC_rgb_rle_16bit_2frame.dcm")[0]
 # 32/32-bit, 1 sample/pixel, 1 frame
-RTDOSE_EXPL_LITTLE_1F = get_testdata_files("rtdose_1frame.dcm")[0]
-RTDOSE_RLE_1F = get_testdata_files("rtdose_rle_1frame.dcm")[0]
+EXPL_32_1_1F = get_testdata_files("rtdose_1frame.dcm")[0]
+RLE_32_1_1F = get_testdata_files("rtdose_rle_1frame.dcm")[0]
 # 32/32-bit, 1 sample/pixel, 15 frame
-RTDOSE_EXPL_LITTLE_15F = get_testdata_files("rtdose.dcm")[0]
-RTDOSE_RLE_15F = get_testdata_files("rtdose_rle.dcm")[0]
+EXPL_32_1_15F = get_testdata_files("rtdose.dcm")[0]
+RLE_32_1_15F = get_testdata_files("rtdose_rle.dcm")[0]
 # 32/32-bit, 3 sample/pixel, 1 frame
-SC_EXPL_LITTLE_32_1F = get_testdata_files("SC_rgb_32bit.dcm")[0]
-SC_RLE_32_1F = get_testdata_files("SC_rgb_rle_32bit.dcm")[0]
+EXPL_32_3_1F = get_testdata_files("SC_rgb_32bit.dcm")[0]
+RLE_32_3_1F = get_testdata_files("SC_rgb_rle_32bit.dcm")[0]
 # 32/32-bit, 3 sample/pixel, 2 frame
-SC_EXPL_LITTLE_32_2F = get_testdata_files("SC_rgb_32bit_2frame.dcm")[0]
-SC_RLE_32_2F = get_testdata_files("SC_rgb_rle_32bit_2frame.dcm")[0]
+EXPL_32_3_2F = get_testdata_files("SC_rgb_32bit_2frame.dcm")[0]
+RLE_32_3_2F = get_testdata_files("SC_rgb_rle_32bit_2frame.dcm")[0]
 
 # Transfer syntaxes supported by other handlers
 # Implicit VR Little Endian
@@ -165,7 +172,7 @@ def _get_pixel_array(fpath):
 
 REFERENCE_DATA_UNSUPPORTED = [
     (IMPL, ('1.2.840.10008.1.2', 'Lastname^Firstname')),
-    (SC_EXPL_LITTLE_1F, ('1.2.840.10008.1.2.1', 'Lestrade^G')),
+    (EXPL_8_3_1F, ('1.2.840.10008.1.2.1', 'Lestrade^G')),
     (DELF, ('1.2.840.10008.1.2.1.99', '^^^^')),
     (EXPB, ('1.2.840.10008.1.2.2', 'Lestrade^G')),
     (JPEG_BASELINE_1, ('1.2.840.10008.1.2.4.50', 'Lestrade^G')),
@@ -200,7 +207,7 @@ class TestNoNumpy_NoRLEHandler(object):
 
     def test_can_access_supported_dataset(self):
         """Test that we can read and access elements in an RLE dataset."""
-        ds = dcmread(MR_RLE_1F)
+        ds = dcmread(RLE_16_1_1F)
         assert 'CompressedSamples^MR1' == ds.PatientName
         assert 6128 == len(ds.PixelData)
 
@@ -213,7 +220,7 @@ class TestNoNumpy_NoRLEHandler(object):
 
     def test_pixel_array_raises(self):
         """Test pixel_array raises exception for all syntaxes."""
-        ds = dcmread(MR_EXPL_LITTLE_1F)
+        ds = dcmread(EXPL_16_1_1F)
         for uid in ALL_TRANSFER_SYNTAXES:
             ds.file_meta.TransferSyntaxUID = uid
             exc_msg = (
@@ -245,7 +252,7 @@ class TestNoNumpy_RLEHandler(object):
 
     def test_can_access_supported_dataset(self):
         """Test that we can read and access elements in an RLE dataset."""
-        ds = dcmread(MR_RLE_1F)
+        ds = dcmread(RLE_16_1_1F)
         assert 'CompressedSamples^MR1' == ds.PatientName
         assert 6128 == len(ds.PixelData)
 
@@ -258,7 +265,7 @@ class TestNoNumpy_RLEHandler(object):
 
     def test_unsupported_pixel_array_raises(self):
         """Test pixel_array raises exception for unsupported syntaxes."""
-        ds = dcmread(MR_EXPL_LITTLE_1F)
+        ds = dcmread(EXPL_16_1_1F)
         for uid in UNSUPPORTED_SYNTAXES:
             ds.file_meta.TransferSyntaxUID = uid
             exc_msg = (
@@ -270,7 +277,7 @@ class TestNoNumpy_RLEHandler(object):
 
     def test_supported_pixel_array_raises(self):
         """Test pixel_array raises exception for supported syntaxes."""
-        ds = dcmread(MR_EXPL_LITTLE_1F)
+        ds = dcmread(EXPL_16_1_1F)
         for uid in SUPPORTED_SYNTAXES:
             ds.file_meta.TransferSyntaxUID = uid
             exc_msg = (
@@ -303,7 +310,7 @@ class TestNumpy_NoRLEHandler(object):
 
     def test_can_access_supported_dataset(self):
         """Test that we can read and access elements in an RLE dataset."""
-        ds = dcmread(MR_RLE_1F)
+        ds = dcmread(RLE_16_1_1F)
         assert 'CompressedSamples^MR1' == ds.PatientName
         assert 6128 == len(ds.PixelData)
 
@@ -316,7 +323,7 @@ class TestNumpy_NoRLEHandler(object):
 
     def test_pixel_array_raises(self):
         """Test pixel_array raises exception for all syntaxes."""
-        ds = dcmread(MR_EXPL_LITTLE_1F)
+        ds = dcmread(EXPL_16_1_1F)
         for uid in ALL_TRANSFER_SYNTAXES:
             ds.file_meta.TransferSyntaxUID = uid
             exc_msg = (
@@ -347,7 +354,7 @@ class TestNumpy_RLEHandler(object):
 
     def test_unsupported_syntax_raises(self):
         """Test pixel_array raises exception for unsupported syntaxes."""
-        ds = dcmread(MR_EXPL_LITTLE_1F)
+        ds = dcmread(EXPL_16_1_1F)
         for uid in UNSUPPORTED_SYNTAXES:
             ds.file_meta.TransferSyntaxUID = uid
             exc_msg = (
@@ -366,11 +373,11 @@ class TestNumpy_RLEHandler(object):
 
     def test_pixel_array_signed(self):
         """Test pixel_array for unsigned -> signed data."""
-        ds = dcmread(OB_RLE_1F)
+        ds = dcmread(RLE_8_1_1F)
         # 0 is unsigned int, 1 is 2's complement
         assert ds.PixelRepresentation == 0
         ds.PixelRepresentation = 1
-        ref = _get_pixel_array(OB_EXPL_LITTLE_1F)
+        ref = _get_pixel_array(EXPL_8_1_1F)
         arr = ds.pixel_array
 
         assert not np.array_equal(arr, ref)
@@ -381,7 +388,7 @@ class TestNumpy_RLEHandler(object):
 
     def test_pixel_array_1bit_raises(self):
         """Test pixel_array for 1-bit raises exception."""
-        ds = dcmread(SC_RLE_1F)
+        ds = dcmread(RLE_8_3_1F)
         ds.BitsAllocated = 1
         with pytest.raises(NotImplementedError,
                            match="Bits Allocated' value of 1"):
@@ -389,12 +396,12 @@ class TestNumpy_RLEHandler(object):
 
     def test_pixel_array_8bit_1sample_1f(self):
         """Test pixel_array for 8-bit, 1 sample/pixel, 1 frame."""
-        ds = dcmread(OB_RLE_1F)
+        ds = dcmread(RLE_8_1_1F)
         assert ds.file_meta.TransferSyntaxUID == RLELossless
         assert ds.BitsAllocated == 8
         assert ds.SamplesPerPixel == 1
         assert 'NumberOfFrames' not in ds
-        ref = _get_pixel_array(OB_EXPL_LITTLE_1F)
+        ref = _get_pixel_array(EXPL_8_1_1F)
         arr = ds.pixel_array
 
         assert arr.flags.writeable
@@ -407,12 +414,12 @@ class TestNumpy_RLEHandler(object):
 
     def test_pixel_array_8bit_1sample_2f(self):
         """Test pixel_array for 8-bit, 1 sample/pixel, 2 frame."""
-        ds = dcmread(OB_RLE_2F)
+        ds = dcmread(RLE_8_1_2F)
         assert ds.file_meta.TransferSyntaxUID == RLELossless
         assert ds.BitsAllocated == 8
         assert ds.SamplesPerPixel == 1
         assert ds.NumberOfFrames == 2
-        ref = _get_pixel_array(OB_EXPL_LITTLE_2F)
+        ref = _get_pixel_array(EXPL_8_1_2F)
         arr = ds.pixel_array
 
         assert arr.flags.writeable
@@ -428,12 +435,12 @@ class TestNumpy_RLEHandler(object):
 
     def test_pixel_array_8bit_3sample_1f(self):
         """Test pixel_array for 8-bit, 3 sample/pixel, 1 frame."""
-        ds = dcmread(SC_RLE_1F)
+        ds = dcmread(RLE_8_3_1F)
         assert ds.file_meta.TransferSyntaxUID == RLELossless
         assert ds.BitsAllocated == 8
         assert ds.SamplesPerPixel == 3
         assert 'NumberOfFrames' not in ds
-        ref = _get_pixel_array(SC_EXPL_LITTLE_1F)
+        ref = _get_pixel_array(EXPL_8_3_1F)
         arr = ds.pixel_array
 
         assert arr.flags.writeable
@@ -452,12 +459,12 @@ class TestNumpy_RLEHandler(object):
 
     def test_pixel_array_8bit_3sample_2f(self):
         """Test pixel_array for 8-bit, 3 sample/pixel, 2 frame."""
-        ds = dcmread(SC_RLE_2F)
+        ds = dcmread(RLE_8_3_2F)
         assert ds.file_meta.TransferSyntaxUID == RLELossless
         assert ds.BitsAllocated == 8
         assert ds.SamplesPerPixel == 3
         assert ds.NumberOfFrames == 2
-        ref = _get_pixel_array(SC_EXPL_LITTLE_2F)
+        ref = _get_pixel_array(EXPL_8_3_2F)
         arr = ds.pixel_array
 
         assert arr.flags.writeable
@@ -482,13 +489,13 @@ class TestNumpy_RLEHandler(object):
 
     def test_pixel_array_16bit_1sample_1f(self):
         """Test pixel_array for 16-bit, 1 sample/pixel, 1 frame."""
-        ds = dcmread(MR_RLE_1F)
+        ds = dcmread(RLE_16_1_1F)
         assert ds.file_meta.TransferSyntaxUID == RLELossless
         assert ds.BitsAllocated == 16
         assert ds.SamplesPerPixel == 1
         assert 'NumberOfFrames' not in ds
         assert ds.PixelRepresentation == 1
-        ref = _get_pixel_array(MR_EXPL_LITTLE_1F)
+        ref = _get_pixel_array(EXPL_16_1_1F)
         arr = ds.pixel_array
 
         assert arr.flags.writeable
@@ -502,12 +509,12 @@ class TestNumpy_RLEHandler(object):
 
     def test_pixel_array_16bit_1sample_10f(self):
         """Test pixel_array for 16-bit, 1, sample/pixel, 10 frame."""
-        ds = dcmread(EMRI_RLE_10F)
+        ds = dcmread(RLE_16_1_10F)
         assert ds.file_meta.TransferSyntaxUID == RLELossless
         assert ds.BitsAllocated == 16
         assert ds.SamplesPerPixel == 1
         assert ds.NumberOfFrames == 10
-        ref = _get_pixel_array(EMRI_EXPL_LITTLE_10F)
+        ref = _get_pixel_array(EXPL_16_1_10F)
         arr = ds.pixel_array
 
         assert arr.flags.writeable
@@ -532,13 +539,13 @@ class TestNumpy_RLEHandler(object):
 
     def test_pixel_array_16bit_3sample_1f(self):
         """Test pixel_array for 16-bit, 3 sample/pixel, 1 frame."""
-        ds = dcmread(SC_RLE_16_1F)
+        ds = dcmread(RLE_16_3_1F)
         assert ds.file_meta.TransferSyntaxUID == RLELossless
         assert ds.BitsAllocated == 16
         assert ds.SamplesPerPixel == 3
         assert 'NumberOfFrames' not in ds
         arr = ds.pixel_array
-        ref = _get_pixel_array(SC_EXPL_LITTLE_16_1F)
+        ref = _get_pixel_array(EXPL_16_3_1F)
 
         assert arr.flags.writeable
 
@@ -557,13 +564,13 @@ class TestNumpy_RLEHandler(object):
 
     def test_pixel_array_16bit_3sample_2f(self):
         """Test pixel_array for 16-bit, 3, sample/pixel, 10 frame."""
-        ds = dcmread(SC_RLE_16_2F)
+        ds = dcmread(RLE_16_3_2F)
         assert ds.file_meta.TransferSyntaxUID == RLELossless
         assert ds.BitsAllocated == 16
         assert ds.SamplesPerPixel == 3
         assert ds.NumberOfFrames == 2
         arr = ds.pixel_array
-        ref = _get_pixel_array(SC_EXPL_LITTLE_16_2F)
+        ref = _get_pixel_array(EXPL_16_3_2F)
 
         assert arr.flags.writeable
 
@@ -587,12 +594,12 @@ class TestNumpy_RLEHandler(object):
 
     def test_pixel_array_32bit_1sample_1f(self):
         """Test pixel_array for 32-bit, 1 sample/pixel, 1 frame."""
-        ds = dcmread(RTDOSE_RLE_1F)
+        ds = dcmread(RLE_32_1_1F)
         assert ds.file_meta.TransferSyntaxUID == RLELossless
         assert ds.BitsAllocated == 32
         assert ds.SamplesPerPixel == 1
         assert 'NumberOfFrames' not in ds
-        ref = _get_pixel_array(RTDOSE_EXPL_LITTLE_1F)
+        ref = _get_pixel_array(EXPL_32_1_1F)
         arr = ds.pixel_array
 
         assert arr.flags.writeable
@@ -605,12 +612,12 @@ class TestNumpy_RLEHandler(object):
 
     def test_pixel_array_32bit_1sample_15f(self):
         """Test pixel_array for 32-bit, 1, sample/pixel, 15 frame."""
-        ds = dcmread(RTDOSE_RLE_15F)
+        ds = dcmread(RLE_32_1_15F)
         assert ds.file_meta.TransferSyntaxUID == RLELossless
         assert ds.BitsAllocated == 32
         assert ds.SamplesPerPixel == 1
         assert ds.NumberOfFrames == 15
-        ref = _get_pixel_array(RTDOSE_EXPL_LITTLE_15F)
+        ref = _get_pixel_array(EXPL_32_1_15F)
         arr = ds.pixel_array
 
         assert arr.flags.writeable
@@ -635,13 +642,13 @@ class TestNumpy_RLEHandler(object):
 
     def test_pixel_array_32bit_3sample_1f(self):
         """Test pixel_array for 32-bit, 3 sample/pixel, 1 frame."""
-        ds = dcmread(SC_RLE_32_1F)
+        ds = dcmread(RLE_32_3_1F)
         assert ds.file_meta.TransferSyntaxUID == RLELossless
         assert ds.BitsAllocated == 32
         assert ds.SamplesPerPixel == 3
         assert 'NumberOfFrames' not in ds
         arr = ds.pixel_array
-        ref = _get_pixel_array(SC_EXPL_LITTLE_32_1F)
+        ref = _get_pixel_array(EXPL_32_3_1F)
 
         assert arr.flags.writeable
 
@@ -660,13 +667,13 @@ class TestNumpy_RLEHandler(object):
 
     def test_pixel_array_32bit_3sample_2f(self):
         """Test pixel_array for 32-bit, 3, sample/pixel, 2 frame."""
-        ds = dcmread(SC_RLE_32_2F)
+        ds = dcmread(RLE_32_3_2F)
         assert ds.file_meta.TransferSyntaxUID == RLELossless
         assert ds.BitsAllocated == 32
         assert ds.SamplesPerPixel == 3
         assert ds.NumberOfFrames == 2
         arr = ds.pixel_array
-        ref = _get_pixel_array(SC_EXPL_LITTLE_32_2F)
+        ref = _get_pixel_array(EXPL_32_3_2F)
 
         assert arr.flags.writeable
 
@@ -694,7 +701,7 @@ class TestNumpy_GetPixelData(object):
     """Tests for rle_handler.get_pixeldata with numpy."""
     def test_no_pixel_data_raises(self):
         """Test get_pixeldata raises if dataset has no PixelData."""
-        ds = dcmread(MR_RLE_1F)
+        ds = dcmread(RLE_16_1_1F)
         del ds.PixelData
         assert 'PixelData' not in ds
         with pytest.raises(AttributeError, match=' dataset: PixelData'):
@@ -702,14 +709,14 @@ class TestNumpy_GetPixelData(object):
 
     def test_unknown_pixel_representation_raises(self):
         """Test get_pixeldata raises if invalid PixelRepresentation."""
-        ds = dcmread(MR_RLE_1F)
+        ds = dcmread(RLE_16_1_1F)
         ds.PixelRepresentation = 2
         with pytest.raises(ValueError, match=r"value of '2' for '\(0028,0103"):
             get_pixeldata(ds)
 
     def test_unsupported_syntaxes_raises(self):
         """Test get_pixeldata raises if unsupported Transfer Syntax."""
-        ds = dcmread(MR_EXPL_LITTLE_1F)
+        ds = dcmread(EXPL_16_1_1F)
         with pytest.raises(NotImplementedError,
                            match='syntax is not supported by the RLE pixel'):
             get_pixeldata(ds)
@@ -721,7 +728,7 @@ class TestNumpy_GetPixelData(object):
             return True
 
         # Test default
-        ds = dcmread(MR_RLE_1F)
+        ds = dcmread(RLE_16_1_1F)
         assert ds.PhotometricInterpretation == 'MONOCHROME2'
 
         get_pixeldata(ds)
@@ -738,7 +745,7 @@ class TestNumpy_GetPixelData(object):
 
     def test_little_endian_segment_order(self):
         """Test interpreting segment order as little endian."""
-        ds = dcmread(MR_RLE_1F)
+        ds = dcmread(RLE_16_1_1F)
         assert ds.file_meta.TransferSyntaxUID == RLELossless
         assert ds.BitsAllocated == 16
         assert ds.SamplesPerPixel == 1
@@ -854,7 +861,7 @@ class TestNumpy_RLEDecodeFrame(object):
 
     def test_invalid_frame_data_raises(self):
         """Test that invalid segment data raises exception."""
-        ds = dcmread(MR_RLE_1F)
+        ds = dcmread(RLE_16_1_1F)
         pixel_data = defragment_data(ds.PixelData)
         # Missing byte
         with pytest.raises(ValueError,
@@ -1114,3 +1121,526 @@ class TestNumpy_RLEDecodeSegment(object):
         # n = 129, copy x128
         data = b'\x81\x02\x80'
         assert b'\x02' * 128 == bytes(_rle_decode_segment(data))
+
+
+# Tests for RLE encoding
+REFERENCE_ENCODE_ROW = [
+    # Input, output
+    ([], b''),
+    # Replicate run tests
+    # 2 (min) replicate
+    ([0] * 2, b'\xff\x00'),
+    ([0] * 3, b'\xfe\x00'),
+    ([0] * 64, b'\xc1\x00'),
+    ([0] * 127, b'\x82\x00'),
+    # 128 (max) replicate
+    ([0] * 128, b'\x81\x00'),
+    # 128 (max) replicate, 1 (min) literal
+    ([0] * 129, b'\x81\x00\x00\x00'),
+    # 128 (max) replicate, 2 (min) replicate
+    ([0] * 130, b'\x81\x00\xff\x00'),
+    # 128 (max) x 5 replicates
+    ([0] * 128 * 5, b'\x81\x00' * 5),
+    # Literal run tests
+    # 1 (min) literal
+    ([0], b'\x00\x00'),
+    ([0, 1], b'\x01\x00\x01'),
+    ([0, 1, 2], b'\x02\x00\x01\x02'),
+    ([0, 1] * 32, b'\x3f' + b'\x00\x01' * 32),
+    # 127 literal
+    ([0, 1] * 63 + [2], b'\x7e' + b'\x00\x01' * 63 + b'\x02'),
+    # 128 literal (max)
+    ([0, 1] * 64, b'\x7f' + b'\x00\x01' * 64),
+    # 128 (max) literal, 1 (min) literal
+    ([0, 1] * 64 + [2], b'\x7f' + b'\x00\x01' * 64 + b'\x00\x02'),
+    # 128 (max) x 5 literals
+    ([0, 1] * 64 * 5, (b'\x7f' + b'\x00\x01' * 64) * 5),
+    # Combination run tests
+    # 1 (min) literal, 1 (min) replicate
+    ([0, 1, 1], b'\x00\x00\xff\x01'),
+    # 1 (min) literal, 128 (max) replicate
+    ([0] + [1] * 128, b'\x00\x00\x81\x01'),
+    # 128 (max) literal, 2 (min) replicate
+    ([0, 1] * 64 + [2] * 2, b'\x7f' + b'\x00\x01' * 64 + b'\xff\x02'),
+    # 128 (max) literal, 128 (max) replicate
+    ([0, 1] * 64 + [2] * 128, b'\x7f' + b'\x00\x01' * 64 + b'\x81\x02'),
+    # 2 (min) replicate, 1 (min) literal
+    ([0, 0, 1], b'\xff\x00\x00\x01'),
+    # 2 (min) replicate, 128 (max) literal
+    ([0, 0] + [1, 2] * 64, b'\xff\x00\x7f' + b'\x01\x02' * 64),
+    # 128 (max) replicate, 1 (min) literal
+    ([0] * 128 + [1], b'\x81\x00\x00\x01'),
+    # 128 (max) replicate, 128 (max) literal
+    ([0] * 128 + [1, 2] * 64, b'\x81\x00\x7f' + b'\x01\x02' * 64),
+]
+
+
+@pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
+class TestNumpy_RLEEncodeRow(object):
+    """Tests for rle_handler._rle_encode_row."""
+    @pytest.mark.parametrize('input, output', REFERENCE_ENCODE_ROW)
+    def test_encode(self, input, output):
+        """Test encoding an empty row."""
+        assert output == _rle_encode_row(np.asarray(input))
+
+
+@pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
+class TestNumpy_RLEEncodeFrame(object):
+    """Tests for rle_handler.rle_encode_frame."""
+    def setup(self):
+        """Setup the tests."""
+        # Create a dataset skeleton for use in the cycle tests
+        ds = Dataset()
+        ds.file_meta = Dataset()
+        ds.file_meta.TransferSyntaxUID = '1.2.840.10008.1.2'
+        ds.Rows = 2
+        ds.Columns = 4
+        ds.SamplesPerPixel = 3
+        ds.PlanarConfiguration = 1
+        self.ds = ds
+
+    def test_cycle_8bit_1sample(self):
+        """Test an encode/decode cycle for 8-bit 1 sample/pixel."""
+        ds = dcmread(EXPL_8_1_1F)
+        ref = ds.pixel_array
+        assert 8 == ds.BitsAllocated
+        assert 1 == ds.SamplesPerPixel
+
+        encoded = rle_encode_frame(ref)
+        decoded = _rle_decode_frame(encoded, ds.Rows, ds.Columns,
+                                    ds.SamplesPerPixel, ds.BitsAllocated)
+        dtype = np.dtype('uint8').newbyteorder('>')
+        arr = np.frombuffer(decoded, dtype)
+        arr = reshape_pixel_array(ds, arr)
+
+        assert np.array_equal(ref, arr)
+
+    def test_cycle_8bit_3sample(self):
+        """Test an encode/decode cycle for 8-bit 3 sample/pixel."""
+        ds = dcmread(EXPL_8_3_1F)
+        ref = ds.pixel_array
+        assert 8 == ds.BitsAllocated
+        assert 3 == ds.SamplesPerPixel
+
+        encoded = rle_encode_frame(ref)
+        decoded = _rle_decode_frame(encoded, ds.Rows, ds.Columns,
+                                    ds.SamplesPerPixel, ds.BitsAllocated)
+        arr = np.frombuffer(decoded, 'uint8')
+        # The decoded data is planar configuration 1
+        ds.PlanarConfiguration = 1
+        arr = reshape_pixel_array(ds, arr)
+
+        assert np.array_equal(ref, arr)
+
+    def test_cycle_16bit_1sample(self):
+        """Test an encode/decode cycle for 16-bit 1 sample/pixel."""
+        ds = dcmread(EXPL_16_1_1F)
+        ref = ds.pixel_array
+        assert 16 == ds.BitsAllocated
+        assert 1 == ds.SamplesPerPixel
+
+        encoded = rle_encode_frame(ref)
+        decoded = _rle_decode_frame(encoded, ds.Rows, ds.Columns,
+                                    ds.SamplesPerPixel, ds.BitsAllocated)
+        dtype = np.dtype('uint16').newbyteorder('>')
+        arr = np.frombuffer(decoded, dtype)
+        arr = reshape_pixel_array(ds, arr)
+
+        assert np.array_equal(ref, arr)
+
+    def test_cycle_16bit_3sample(self):
+        """Test an encode/decode cycle for 16-bit 3 sample/pixel."""
+        ds = dcmread(EXPL_16_3_1F)
+        ref = ds.pixel_array
+        assert 16 == ds.BitsAllocated
+        assert 3 == ds.SamplesPerPixel
+
+        encoded = rle_encode_frame(ref)
+        decoded = _rle_decode_frame(encoded, ds.Rows, ds.Columns,
+                                    ds.SamplesPerPixel, ds.BitsAllocated)
+        dtype = np.dtype('uint16').newbyteorder('>')
+        arr = np.frombuffer(decoded, dtype)
+        # The decoded data is planar configuration 1
+        ds.PlanarConfiguration = 1
+        arr = reshape_pixel_array(ds, arr)
+
+        assert np.array_equal(ref, arr)
+
+    def test_cycle_32bit_1sample(self):
+        """Test an encode/decode cycle for 32-bit 1 sample/pixel."""
+        ds = dcmread(EXPL_32_1_1F)
+        ref = ds.pixel_array
+        assert 32 == ds.BitsAllocated
+        assert 1 == ds.SamplesPerPixel
+
+        encoded = rle_encode_frame(ref)
+        decoded = _rle_decode_frame(encoded, ds.Rows, ds.Columns,
+                                    ds.SamplesPerPixel, ds.BitsAllocated)
+        dtype = np.dtype('uint32').newbyteorder('>')
+        arr = np.frombuffer(decoded, dtype)
+        arr = reshape_pixel_array(ds, arr)
+
+        assert np.array_equal(ref, arr)
+
+    def test_cycle_32bit_3sample(self):
+        """Test an encode/decode cycle for 32-bit 3 sample/pixel."""
+        ds = dcmread(EXPL_32_3_1F)
+        ref = ds.pixel_array
+        assert 32 == ds.BitsAllocated
+        assert 3 == ds.SamplesPerPixel
+
+        encoded = rle_encode_frame(ref)
+        decoded = _rle_decode_frame(encoded, ds.Rows, ds.Columns,
+                                    ds.SamplesPerPixel, ds.BitsAllocated)
+        dtype = np.dtype('uint32').newbyteorder('>')
+        arr = np.frombuffer(decoded, dtype)
+        # The decoded data is planar configuration 1
+        ds.PlanarConfiguration = 1
+        arr = reshape_pixel_array(ds, arr)
+
+        assert np.array_equal(ref, arr)
+
+    def test_16_segments_raises(self):
+        """Test that trying to encode 16-segments raises exception."""
+        arr = np.asarray([[[1, 2, 3, 4]]], dtype='uint32')
+        assert (1, 1, 4) == arr.shape
+        assert 4 == arr.dtype.itemsize
+
+        msg = (
+            r"Unable to encode as the DICOM standard only allows "
+            r"a maximum of 15 segments in RLE encoded data"
+        )
+        with pytest.raises(ValueError, match=msg):
+            rle_encode_frame(arr)
+
+    def test_15_segment(self):
+        """Test encoding 15-segments works as expected."""
+        arr = np.asarray(
+            [[[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]]],
+            dtype='uint8'
+        )
+        assert (1, 1, 15) == arr.shape
+        assert 1 == arr.dtype.itemsize
+
+        encoded = rle_encode_frame(arr)
+        header = (
+            b'\x0f\x00\x00\x00'
+            b'\x40\x00\x00\x00'
+            b'\x42\x00\x00\x00'
+            b'\x44\x00\x00\x00'
+            b'\x46\x00\x00\x00'
+            b'\x48\x00\x00\x00'
+            b'\x4a\x00\x00\x00'
+            b'\x4c\x00\x00\x00'
+            b'\x4e\x00\x00\x00'
+            b'\x50\x00\x00\x00'
+            b'\x52\x00\x00\x00'
+            b'\x54\x00\x00\x00'
+            b'\x56\x00\x00\x00'
+            b'\x58\x00\x00\x00'
+            b'\x5a\x00\x00\x00'
+            b'\x5c\x00\x00\x00'
+        )
+        assert header == encoded[:64]
+        assert (
+            b'\x00\x01\x00\x02\x00\x03\x00\x04\x00\x05\x00\x06'
+            b'\x00\x07\x00\x08\x00\x09\x00\x0a\x00\x0b\x00\x0c'
+            b'\x00\x0d\x00\x0e\x00\x0f'
+        ) == encoded[64:]
+
+    def test_encoding_multiple_frames_raises(self):
+        """Test encoding multiple framed pixel data raises exception."""
+        # Note: only works with multi-sample data
+        ds = dcmread(EXPL_8_3_2F)
+        arr = ds.pixel_array
+        assert ds.NumberOfFrames > 1
+        assert len(arr.shape) == 4
+        msg = (
+            r"Unable to encode multiple frames at once, please encode one "
+            r"frame at a time"
+        )
+        with pytest.raises(ValueError, match=msg):
+            rle_encode_frame(arr)
+
+    def test_single_row_1sample(self):
+        """Test encoding a single row of 1 sample/pixel data."""
+        # Rows 1, Columns 5, SamplesPerPixel 1
+        arr = np.asarray([[0, 1, 2, 3, 4]], dtype='uint8')
+        assert (1, 5) == arr.shape
+        encoded = rle_encode_frame(arr)
+        header = b'\x01\x00\x00\x00\x40\x00\x00\x00' + b'\x00' * 56
+        assert header == encoded[:64]
+        assert b'\x04\x00\x01\x02\x03\x04' == encoded[64:]
+
+    def test_single_row_3sample(self):
+        """Test encoding a single row of 3 samples/pixel data."""
+        # Rows 1, Columns 5, SamplesPerPixel 3
+        arr = np.asarray(
+            [[[0, 0, 0], [1, 1, 1], [2, 2, 2], [3, 3, 3], [4, 4, 4]]],
+            dtype='uint8'
+        )
+        assert (1, 5, 3) == arr.shape
+        encoded = rle_encode_frame(arr)
+        header = (
+            b'\x03\x00\x00\x00'
+            b'\x40\x00\x00\x00'
+            b'\x46\x00\x00\x00'
+            b'\x4c\x00\x00\x00'
+        )
+        header += b'\x00' * (64 - len(header))
+        assert header == encoded[:64]
+        assert (
+            b'\x04\x00\x01\x02\x03\x04'
+            b'\x04\x00\x01\x02\x03\x04'
+            b'\x04\x00\x01\x02\x03\x04'
+        ) == encoded[64:]
+
+
+@pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
+class TestNumpy_RLEEncodePlane(object):
+    """Tests for rle_handler._rle_encode_plane."""
+    def test_8bit(self):
+        """Test encoding an 8-bit plane into 1 segment."""
+        ds = dcmread(RLE_8_1_1F)
+        pixel_data = defragment_data(ds.PixelData)
+        decoded = _rle_decode_frame(pixel_data, ds.Rows, ds.Columns,
+                                    ds.SamplesPerPixel, ds.BitsAllocated)
+        assert ds.Rows * ds.Columns * ds.BitsAllocated // 8 == len(decoded)
+        arr = np.frombuffer(decoded, 'uint8').reshape(ds.Rows, ds.Columns)
+        # Re-encode the decoded data
+        encoded = bytearray()
+        nr_segments = 0
+        for segment in _rle_encode_plane(arr):
+            encoded.extend(segment)
+            nr_segments += 1
+
+        # Add header
+        header = b'\x01\x00\x00\x00\x40\x00\x00\x00'
+        header += b'\x00' * (64 - len(header))
+
+        assert 1 == nr_segments
+
+        # Decode the re-encoded data and check that it's the same
+        redecoded = _rle_decode_frame(header + encoded,
+                                      ds.Rows, ds.Columns,
+                                      ds.SamplesPerPixel, ds.BitsAllocated)
+        assert ds.Rows * ds.Columns * ds.SamplesPerPixel == len(redecoded)
+        assert decoded == redecoded
+
+    def test_16bit(self):
+        """Test encoding a 16-bit plane into 2 segments."""
+        ds = dcmread(RLE_16_1_1F)
+        pixel_data = defragment_data(ds.PixelData)
+        decoded = _rle_decode_frame(pixel_data, ds.Rows, ds.Columns,
+                                    ds.SamplesPerPixel, ds.BitsAllocated)
+        assert ds.Rows * ds.Columns * ds.BitsAllocated // 8 == len(decoded)
+
+        # `decoded` is in big endian byte ordering
+        dtype = np.dtype('uint16').newbyteorder('>')
+        arr = np.frombuffer(decoded, dtype).reshape(ds.Rows, ds.Columns)
+
+        # Re-encode the decoded data
+        encoded = bytearray()
+        nr_segments = 0
+        offsets = [64]
+        for segment in _rle_encode_plane(arr):
+            offsets.append(offsets[nr_segments] + len(segment))
+            encoded.extend(segment)
+            nr_segments += 1
+
+        assert 2 == nr_segments
+
+        # Add header
+        header = b'\x02\x00\x00\x00'
+        header += pack('<2L', *offsets[:-1])
+        header += b'\x00' * (64 - len(header))
+
+        # Decode the re-encoded data and check that it's the same
+        redecoded = _rle_decode_frame(header + encoded,
+                                      ds.Rows, ds.Columns,
+                                      ds.SamplesPerPixel, ds.BitsAllocated)
+        assert ds.Rows * ds.Columns * ds.BitsAllocated // 8 == len(redecoded)
+        assert decoded == redecoded
+
+    def test_16bit_segment_order(self):
+        """Test that the segment order per 16-bit sample is correct."""
+        # Native byte ordering
+        data = b'\x00\x00\x01\xFF\xFE\x00\xFF\xFF\x10\x12'
+        dtype = np.dtype('uint16')
+        arr = np.frombuffer(data, dtype)
+
+        segments = []
+        for segment in _rle_encode_plane(arr):
+            segments.append(segment)
+
+        assert 2 == len(segments)
+
+        # Each segment should start with a literal run marker of 0x04
+        # and MSB should be first segment, then LSB in second
+        if sys.byteorder == 'little':
+            assert b'\x04\x00\xFF\x00\xFF\x12' == segments[0]
+            assert b'\x04\x00\x01\xFE\xFF\x10' == segments[1]
+        else:
+            assert b'\x04\x00\x01\xFE\xFF\x10' == segments[0]
+            assert b'\x04\x00\xFF\x00\xFF\x12' == segments[1]
+
+        # Little endian
+        arr = np.frombuffer(data, dtype.newbyteorder('<'))
+        assert [0, 65281, 254, 65535, 4624] == arr.tolist()
+
+        segments = []
+        for segment in _rle_encode_plane(arr):
+            segments.append(segment)
+
+        assert 2 == len(segments)
+        assert b'\x04\x00\xFF\x00\xFF\x12' == segments[0]
+        assert b'\x04\x00\x01\xFE\xFF\x10' == segments[1]
+
+        # Big endian
+        arr = np.frombuffer(data, dtype.newbyteorder('>'))
+        assert [0, 511, 65024, 65535, 4114] == arr.tolist()
+
+        segments = []
+        for segment in _rle_encode_plane(arr):
+            segments.append(segment)
+
+        assert 2 == len(segments)
+        assert b'\x04\x00\x01\xFE\xFF\x10' == segments[0]
+        assert b'\x04\x00\xFF\x00\xFF\x12' == segments[1]
+
+    def test_32bit(self):
+        """Test encoding a 32-bit plane into 4 segments."""
+        ds = dcmread(RLE_32_1_1F)
+        pixel_data = defragment_data(ds.PixelData)
+        decoded = _rle_decode_frame(pixel_data, ds.Rows, ds.Columns,
+                                    ds.SamplesPerPixel, ds.BitsAllocated)
+        assert ds.Rows * ds.Columns * ds.BitsAllocated // 8 == len(decoded)
+
+        # `decoded` is in big endian byte ordering
+        dtype = np.dtype('uint32').newbyteorder('>')
+        arr = np.frombuffer(decoded, dtype).reshape(ds.Rows, ds.Columns)
+
+        # Re-encode the decoded data
+        encoded = bytearray()
+        nr_segments = 0
+        offsets = [64]
+        for segment in _rle_encode_plane(arr):
+            offsets.append(offsets[nr_segments] + len(segment))
+            encoded.extend(segment)
+            nr_segments += 1
+
+        assert 4 == nr_segments
+
+        # Add header
+        header = b'\x04\x00\x00\x00'
+        header += pack('<4L', *offsets[:-1])
+        header += b'\x00' * (64 - len(header))
+
+        # Decode the re-encoded data and check that it's the same
+        redecoded = _rle_decode_frame(header + encoded,
+                                      ds.Rows, ds.Columns,
+                                      ds.SamplesPerPixel, ds.BitsAllocated)
+        assert ds.Rows * ds.Columns * ds.BitsAllocated // 8 == len(redecoded)
+        assert decoded == redecoded
+
+    def test_32bit_segment_order(self):
+        """Test that the segment order per 32-bit sample is correct."""
+        # Native byte ordering
+        data = b'\x00\x00\x00\x00\x01\xFF\xFE\x0A\xFF\xFC\x10\x12'
+        dtype = np.dtype('uint32')
+        arr = np.frombuffer(data, dtype)
+
+        segments = []
+        for segment in _rle_encode_plane(arr):
+            segments.append(segment)
+
+        assert 4 == len(segments)
+
+        # Each segment should start with a literal run marker of 0x02
+        if sys.byteorder == 'little':
+            assert b'\x02\x00\x0A\x12' == segments[0]
+            assert b'\x02\x00\xFE\x10' == segments[1]
+            assert b'\x02\x00\xFF\xFC' == segments[2]
+            assert b'\x02\x00\x01\xFF' == segments[3]
+        else:
+            assert b'\x02\x00\x01\xFF' == segments[0]
+            assert b'\x02\x00\xFF\xFC' == segments[1]
+            assert b'\x02\x00\xFE\x10' == segments[2]
+            assert b'\x02\x00\x0A\x12' == segments[3]
+
+        # Little endian
+        arr = np.frombuffer(data, dtype.newbyteorder('<'))
+        assert [0, 184483585, 303103231] == arr.tolist()
+
+        segments = []
+        for segment in _rle_encode_plane(arr):
+            segments.append(segment)
+
+        assert 4 == len(segments)
+        assert b'\x02\x00\x0A\x12' == segments[0]
+        assert b'\x02\x00\xFE\x10' == segments[1]
+        assert b'\x02\x00\xFF\xFC' == segments[2]
+        assert b'\x02\x00\x01\xFF' == segments[3]
+
+        # Big endian
+        arr = np.frombuffer(data, dtype.newbyteorder('>'))
+        assert [0, 33553930, 4294709266] == arr.tolist()
+
+        segments = []
+        for segment in _rle_encode_plane(arr):
+            segments.append(segment)
+
+        assert 4 == len(segments)
+        assert b'\x02\x00\x01\xFF' == segments[0]
+        assert b'\x02\x00\xFF\xFC' == segments[1]
+        assert b'\x02\x00\xFE\x10' == segments[2]
+        assert b'\x02\x00\x0A\x12' == segments[3]
+
+    def test_padding(self):
+        """Test that odd length encoded segments are padded."""
+        data = b'\x00\x04\x01\x15'
+        arr = np.frombuffer(data, 'uint8')
+        segments = []
+        for segment in _rle_encode_plane(arr):
+            segments.append(segment)
+
+        # The segment should start with a literal run marker of 0x03
+        #   then 4 bytes of RLE encoded data, then 0x00 padding
+        assert b'\x03\x00\x04\x01\x15\x00' == segments[0]
+
+
+@pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
+class TestNumpy_RLEEncodeSegment(object):
+    """Tests for rle_handler._rle_encode_segment."""
+    def test_one_row(self):
+        """Test encoding data that contains only a single row."""
+        ds = dcmread(RLE_8_1_1F)
+        pixel_data = defragment_data(ds.PixelData)
+        decoded = _rle_decode_segment(pixel_data[64:])
+        assert ds.Rows * ds.Columns == len(decoded)
+        arr = np.frombuffer(decoded, 'uint8').reshape(ds.Rows, ds.Columns)
+
+        # Re-encode a single row of the decoded data
+        row = arr[0]
+        assert (ds.Columns,) == row.shape
+        encoded = _rle_encode_segment(row)
+
+        # Decode the re-encoded data and check that it's the same
+        redecoded = _rle_decode_segment(encoded)
+        assert ds.Columns == len(redecoded)
+        assert decoded[:ds.Columns] == redecoded
+
+    def test_cycle(self):
+        """Test the decoded data remains the same after encoding/decoding."""
+        ds = dcmread(RLE_8_1_1F)
+        pixel_data = defragment_data(ds.PixelData)
+        decoded = _rle_decode_segment(pixel_data[64:])
+        assert ds.Rows * ds.Columns == len(decoded)
+        arr = np.frombuffer(decoded, 'uint8').reshape(ds.Rows, ds.Columns)
+        # Re-encode the decoded data
+        encoded = _rle_encode_segment(arr)
+
+        # Decode the re-encoded data and check that it's the same
+        redecoded = _rle_decode_segment(encoded)
+        assert ds.Rows * ds.Columns == len(redecoded)
+        assert decoded == redecoded

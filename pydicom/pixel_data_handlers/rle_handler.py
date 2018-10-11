@@ -33,7 +33,9 @@ elements have values given in the table below.
 
 """
 
-from struct import unpack
+from itertools import groupby
+from struct import pack, unpack
+import sys
 
 try:
     import numpy as np
@@ -164,6 +166,7 @@ def get_pixeldata(ds, rle_segment_order='>'):
     return arr
 
 
+# RLE decoding functions
 def _parse_rle_header(header):
     """Return a list of byte offsets for the segments in RLE data.
 
@@ -360,3 +363,204 @@ def _rle_decode_segment(data):
         pass
 
     return result
+
+
+# RLE encoding functions
+def rle_encode_frame(arr):
+    """Return an numpy ndarray image frame as RLE encoded bytearray.
+
+    Parameters
+    ----------
+    arr : numpy.ndarray
+        A 2D (if Samples Per Pixel = 1) or 3D (if Samples Per Pixel = 3)
+        ndarray containing a single frame of the image to be RLE encoded.
+
+    Returns
+    -------
+    bytearray
+        An RLE encoded frame, including the RLE header, following the format
+        specified by the DICOM Standard, Part 5, Annex G.
+    """
+    shape = arr.shape
+    if len(shape) > 3:
+        # Note: only raises if multi-sample pixel data with multiple frames
+        raise ValueError(
+            "Unable to encode multiple frames at once, please encode one "
+            "frame at a time"
+        )
+
+    # Check the expected number of segments
+    nr_segments = arr.dtype.itemsize
+    if len(shape) == 3:
+        # Number of samples * bytes per sample
+        nr_segments *= shape[-1]
+
+    if nr_segments > 15:
+        raise ValueError(
+            "Unable to encode as the DICOM standard only allows "
+            "a maximum of 15 segments in RLE encoded data"
+        )
+
+    rle_data = bytearray()
+    seg_lengths = []
+    if len(shape) == 3:
+        # Samples Per Pixel > 1
+        for ii in range(arr.shape[-1]):
+            # Need a contiguous array in order to be able to split it up
+            # into byte segments
+            for segment in _rle_encode_plane(arr[..., ii].copy()):
+                rle_data.extend(segment)
+                seg_lengths.append(len(segment))
+    else:
+        # Samples Per Pixel = 1
+        for segment in _rle_encode_plane(arr):
+            rle_data.extend(segment)
+            seg_lengths.append(len(segment))
+
+    # Add the number of segments to the header
+    rle_header = bytearray(pack('<L', len(seg_lengths)))
+
+    # Add the segment offsets, starting at 64 for the first segment
+    # We don't need an offset to any data at the end of the last segment
+    offsets = [64]
+    for ii, length in enumerate(seg_lengths[:-1]):
+        offsets.append(offsets[ii] + length)
+    rle_header.extend(pack('<{}L'.format(len(offsets)), *offsets))
+
+    # Add trailing padding to make up the rest of the header (if required)
+    rle_header.extend(b'\x00' * (64 - len(rle_header)))
+
+    return rle_header + rle_data
+
+
+def _rle_encode_plane(arr):
+    """Yield RLE encoded segments from an image plane as bytearray.
+
+    A plane of N-byte samples must be split into N segments, with each segment
+    containing the same byte of the N-byte samples. For example, in a plane
+    containing 16 bits per sample, the first segment will contain the most
+    significant 8 bits of the samples and the second segment the 8 least
+    significant bits. Each segment is RLE encoded prior to being yielded.
+
+    Parameters
+    ----------
+    arr : numpy.ndarray
+        A 2D ndarray containing a single plane of the image data to be RLE
+        encoded. The dtype of the array should be a multiple of 8 (i.e. uint8,
+        uint32, int16, etc.).
+
+    Yields
+    ------
+    bytearray
+        An RLE encoded segment of the plane, following the format specified
+        by the DICOM Standard, Part 5, Annex G. The segments are yielded in
+        order from most significant to least.
+    """
+    # Determine the byte order of the array
+    byte_order = arr.dtype.byteorder
+    if byte_order == '=':
+        byte_order = '<' if sys.byteorder == 'little' else '>'
+
+    # Re-view the N-bit array data as N / 8 x uint8s
+    arr8 = arr.view(np.uint8)
+
+    # Reshape the uint8 array data into 1 or more segments and encode
+    bytes_per_sample = arr.dtype.itemsize
+    for ii in range(bytes_per_sample):
+        # If the original byte order is little endian we need to segment
+        #   in reverse order
+        if byte_order == '<':
+            ii = bytes_per_sample - ii - 1
+        segment = arr8.ravel()[ii::bytes_per_sample].reshape(arr.shape)
+
+        yield _rle_encode_segment(segment)
+
+
+def _rle_encode_segment(arr):
+    """Return a 2D numpy ndarray as an RLE encoded bytearray.
+
+    Each row of the image is encoded separately as required by the DICOM
+    Standard.
+
+    Parameters
+    ----------
+    arr : numpy.ndarray
+        A 2D ndarray of 8-bit uint data, representing a Byte Segment as in
+        the DICOM Standard, Part 5, Annex G.2.
+
+    Returns
+    -------
+    bytearray
+        The RLE encoded segment, following the format specified by the DICOM
+        Standard. Odd length encoded segments are padded by a trailing 0x00
+        to be even length.
+    """
+    out = bytearray()
+    if len(arr.shape) > 1:
+        for row in arr:
+            out.extend(_rle_encode_row(row))
+    else:
+        out.extend(_rle_encode_row(arr))
+
+    # Pad odd length data with a trailing 0x00 byte
+    out.extend(b'\x00' * (len(out) % 2))
+
+    return out
+
+
+def _rle_encode_row(arr):
+    """Return a numpy array as an RLE encoded bytearray.
+
+    Parameters
+    ----------
+    arr : numpy.ndarray
+        A 1D ndarray of 8-bit uint data.
+
+    Returns
+    -------
+    bytes
+        The RLE encoded row, following the format specified by the DICOM
+        Standard, Part 5, Annex G.
+
+    Notes
+    -----
+    * 2-byte repeat runs are always encoded as Replicate Runs rather than
+      only when not preceeded by a Literal Run as suggested by the Standard.
+    """
+    out = []
+    out_append = out.append
+    out_extend = out.extend
+
+    literal = []
+    for key, group in groupby(arr.astype('uint8').tolist()):
+        group = list(group)
+        if len(group) == 1:
+            literal.append(group[0])
+        else:
+            if literal:
+                # Literal runs
+                for ii in range(0, len(literal), 128):
+                    _run = literal[ii:ii + 128]
+                    out_append(len(_run) - 1)
+                    out_extend(_run)
+
+                literal = []
+
+            # Replicate run
+            for ii in range(0, len(group), 128):
+                if len(group[ii:ii + 128]) > 1:
+                    # Replicate run
+                    out_append(257 - len(group[ii:ii + 128]))
+                    out_append(group[0])
+                else:
+                    # Literal run only if last replicate part is length 1
+                    out_append(0)
+                    out_append(group[0])
+
+    # Final literal run if literal isn't followed by a replicate run
+    for ii in range(0, len(literal), 128):
+        _run = literal[ii:ii + 128]
+        out_append(len(_run) - 1)
+        out_extend(_run)
+
+    return pack('{}B'.format(len(out)), *out)
