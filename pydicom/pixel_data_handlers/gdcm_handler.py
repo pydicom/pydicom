@@ -81,7 +81,7 @@ def supports_transfer_syntax(transfer_syntax):
 
 
 def create_data_element(dicom_dataset):
-    """Create a gdcm.DataElement containing PixelData from a pydicom FileDataset
+    """Create a gdcm.DataElement containing PixelData from a FileDataset
 
     Parameters
     ----------
