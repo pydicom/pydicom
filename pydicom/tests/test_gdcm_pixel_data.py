@@ -715,11 +715,13 @@ class TestSupportFunctions():
         assert image.GetPlanarConfiguration() ==\
             dataset_3d.PlanarConfiguration
 
+    @pytest.mark.skipif(not HAVE_GDCM, reason=gdcm_missing_message)
     def test_create_image_reader_with_string(self):
         image_reader = gdcm_handler.create_image_reader(mr_name)
         assert image_reader is not None
         assert image_reader.Read()
 
+    @pytest.mark.skipif(not HAVE_GDCM, reason=gdcm_missing_message)
     @pytest.mark.skipif(not compat.in_py2, reason='Python2 specific')
     def test_create_image_reader_with_py2_unicode_string(self):
         filename = mr_name.decode('utf-8')
