@@ -367,6 +367,12 @@ if have_pytest_param:
             marks=pytest.mark.xfail(
                 reason="GDCM does not support "
                 "non default jpeg lossy colorspaces"))]
+
+    with_gdcm_params = [
+        pytest.param('File', marks=pytest.mark.skipif(
+            not HAVE_GDCM, reason=gdcm_missing_message)),
+        pytest.param('InMemory', marks=pytest.mark.skipif(
+            not HAVE_GDCM_IN_MEMORY_SUPPORT, reason=gdcm_im_missing_message))]
 else:
     # python 3.4 can't parameterize with xfails...
     pi_rgb_test_ids = [
@@ -390,19 +396,19 @@ else:
          False),
     ]
 
+    if HAVE_GDCM_IN_MEMORY_SUPPORT:
+        with_gdcm_params = ['File', 'InMemory']
+    elif HAVE_GDCM:
+        with_gdcm_params = ['File']
+    else:
+        with_gdcm_params = []
 
-@pytest.mark.skipif(not HAVE_GDCM, reason=gdcm_missing_message)
+
 class TestsWithGDCM():
-    @pytest.fixture(params=[
-        pytest.param('f', marks=pytest.mark.skipif(
-            not HAVE_GDCM, 0, reason=gdcm_missing_message), id='File'),
-        pytest.param('m', marks=pytest.mark.skipif(
-            not HAVE_GDCM_IN_MEMORY_SUPPORT, reason=gdcm_im_missing_message),
-                     id='InMemory')
-    ], scope='class', autouse=True)
+    @pytest.fixture(params=with_gdcm_params, scope='class', autouse=True)
     def with_gdcm(self, request):
         original_value = HAVE_GDCM_IN_MEMORY_SUPPORT
-        if request.param == 'f':
+        if request.param == 'File':
             gdcm_handler.HAVE_GDCM_IN_MEMORY_SUPPORT = False
         original_handlers = pydicom.config.pixel_data_handlers
         pydicom.config.pixel_data_handlers = [numpy_handler, gdcm_handler]
