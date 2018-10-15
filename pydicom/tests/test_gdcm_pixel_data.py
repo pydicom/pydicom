@@ -34,6 +34,8 @@ try:
     import pydicom.pixel_data_handlers.gdcm_handler as gdcm_handler
     HAVE_GDCM = gdcm_handler.HAVE_GDCM
     HAVE_GDCM_IN_MEMORY_SUPPORT = gdcm_handler.HAVE_GDCM_IN_MEMORY_SUPPORT
+    if HAVE_GDCM:
+        import gdcm
 except ImportError as e:
     HAVE_GDCM = False
     HAVE_GDCM_IN_MEMORY_SUPPORT = False
@@ -612,3 +614,115 @@ class TestsWithGDCM():
         assert tuple(a[85, 50, :]) == results[8]
         assert tuple(a[95, 50, :]) == results[9]
         assert t.PhotometricInterpretation == PhotometricInterpretation
+
+
+class TestSupportFunctions():
+    @pytest.fixture(scope='class')
+    def dataset_2d(self):
+        return dcmread(mr_name)
+
+    @pytest.fixture(scope='class')
+    def dataset_2d_compressed(self):
+        return dcmread(jpeg2000_name)
+
+    @pytest.fixture(scope='class')
+    def dataset_3d(self):
+        return dcmread(color_3d_jpeg_baseline)
+
+    @pytest.mark.skipif(not HAVE_GDCM_IN_MEMORY_SUPPORT,
+                        reason=gdcm_im_missing_message)
+    def test_create_data_element_from_uncompressed_2d_dataset(
+            self, dataset_2d):
+        data_element, number_of_frames = gdcm_handler.create_data_element(
+            dataset_2d)
+
+        assert number_of_frames == 1
+        assert data_element.GetTag().GetGroup() == 0x7fe0
+        assert data_element.GetTag().GetElement() == 0x0010
+        assert data_element.GetSequenceOfFragments() is None
+        assert data_element.GetByteValue() is not None
+
+    @pytest.mark.skipif(not HAVE_GDCM_IN_MEMORY_SUPPORT,
+                        reason=gdcm_im_missing_message)
+    def test_create_data_element_from_compressed_2d_dataset(
+            self, dataset_2d_compressed):
+        data_element, number_of_frames = gdcm_handler.create_data_element(
+            dataset_2d_compressed)
+
+        assert number_of_frames == 1
+        assert data_element.GetTag().GetGroup() == 0x7fe0
+        assert data_element.GetTag().GetElement() == 0x0010
+        assert data_element.GetSequenceOfFragments() is not None
+        assert data_element.GetByteValue() is None
+
+    @pytest.mark.skipif(not HAVE_GDCM_IN_MEMORY_SUPPORT,
+                        reason=gdcm_im_missing_message)
+    def test_create_data_element_from_3d_dataset(self, dataset_3d):
+        data_element, number_of_frames = gdcm_handler.create_data_element(
+            dataset_3d)
+
+        assert number_of_frames == dataset_3d.NumberOfFrames
+        assert data_element.GetTag().GetGroup() == 0x7fe0
+        assert data_element.GetTag().GetElement() == 0x0010
+        assert data_element.GetSequenceOfFragments() is not None
+        assert data_element.GetByteValue() is None
+
+    @pytest.mark.skipif(not HAVE_GDCM_IN_MEMORY_SUPPORT,
+                        reason=gdcm_im_missing_message)
+    def test_create_image_from_2d_dataset(self, dataset_2d):
+        data_element, number_of_frames = gdcm_handler.create_data_element(
+            dataset_2d)
+        image = gdcm_handler.create_image(dataset_2d, data_element,
+                                          number_of_frames)
+        assert image.GetNumberOfDimensions() == 2
+        assert image.GetDimensions() == [dataset_2d.Rows, dataset_2d.Columns]
+        assert image.GetPhotometricInterpretation().GetType() == \
+            gdcm.PhotometricInterpretation.GetPIType(
+                dataset_2d.PhotometricInterpretation)
+        assert image.GetTransferSyntax().GetString() == str.__str__(
+            dataset_2d.file_meta.TransferSyntaxUID)
+        pixel_format = image.GetPixelFormat()
+        assert pixel_format.GetSamplesPerPixel() == dataset_2d.SamplesPerPixel
+        assert pixel_format.GetBitsAllocated() == dataset_2d.BitsAllocated
+        assert pixel_format.GetBitsStored() == dataset_2d.BitsStored
+        assert pixel_format.GetHighBit() == dataset_2d.HighBit
+        assert pixel_format.GetPixelRepresentation() ==\
+            dataset_2d.PixelRepresentation
+
+    @pytest.mark.skipif(not HAVE_GDCM_IN_MEMORY_SUPPORT,
+                        reason=gdcm_im_missing_message)
+    def test_create_image_from_3d_dataset(self, dataset_3d):
+        data_element, number_of_frames = gdcm_handler.create_data_element(
+            dataset_3d)
+        image = gdcm_handler.create_image(dataset_3d, data_element,
+                                          number_of_frames)
+        assert image.GetNumberOfDimensions() == 3
+        assert image.GetDimensions() == [
+            dataset_3d.Columns, dataset_3d.Rows,
+            int(dataset_3d.NumberOfFrames)]
+        assert image.GetPhotometricInterpretation().GetType() == \
+            gdcm.PhotometricInterpretation.GetPIType(
+                dataset_3d.PhotometricInterpretation)
+        assert image.GetTransferSyntax().GetString() == str.__str__(
+            dataset_3d.file_meta.TransferSyntaxUID)
+        pixel_format = image.GetPixelFormat()
+        assert pixel_format.GetSamplesPerPixel() == dataset_3d.SamplesPerPixel
+        assert pixel_format.GetBitsAllocated() == dataset_3d.BitsAllocated
+        assert pixel_format.GetBitsStored() == dataset_3d.BitsStored
+        assert pixel_format.GetHighBit() == dataset_3d.HighBit
+        assert pixel_format.GetPixelRepresentation() ==\
+            dataset_3d.PixelRepresentation
+        assert image.GetPlanarConfiguration() ==\
+            dataset_3d.PlanarConfiguration
+
+    def test_create_image_reader_with_string(self):
+        image_reader = gdcm_handler.create_image_reader(mr_name)
+        assert image_reader is not None
+        assert image_reader.Read()
+
+    @pytest.mark.skipif(not compat.in_py2, reason='Python2 specific')
+    def test_create_image_reader_with_py2_unicode_string(self):
+        filename = mr_name.decode('utf-8')
+        image_reader = gdcm_handler.create_image_reader(filename)
+        assert image_reader is not None
+        assert image_reader.Read()

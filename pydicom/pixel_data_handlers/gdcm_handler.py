@@ -80,7 +80,21 @@ def supports_transfer_syntax(transfer_syntax):
     return transfer_syntax in SUPPORTED_TRANSFER_SYNTAXES
 
 
-def _create_data_element(dicom_dataset):
+def create_data_element(dicom_dataset):
+    """Create a gdcm.DataElement containing PixelData from a pydicom FileDataset
+
+    Parameters
+    ----------
+    dicom_dataset : FileDataset
+
+
+    Returns
+    -------
+    gdcm.DataElement
+        Converted PixelData element
+    int
+        Number of frames in the PixelData
+    """
     data_element = gdcm.DataElement(gdcm.Tag(0x7fe0, 0x0010))
     if dicom_dataset.file_meta.TransferSyntaxUID.is_compressed:
         if ('NumberOfFrames' in dicom_dataset
@@ -107,11 +121,26 @@ def _create_data_element(dicom_dataset):
     return data_element, number_of_frames
 
 
-def _create_image(dicom_dataset, data_element, number_of_frames):
+def create_image(dicom_dataset, data_element, number_of_frames):
+    """Create a gdcm.Image from a FileDataset and a gdcm.DataElement containing
+    PixelData (0x7fe0, 0x0010)
+
+    Parameters
+    ----------
+    dicom_dataset : FileDataset
+    data_element : gdcm.DataElement
+        DataElement containing PixelData
+    number_of_frames : int
+        Number of frames in the PixelData
+
+    Returns
+    -------
+    gdcm.Image
+    """
     image = gdcm.Image()
     image.SetNumberOfDimensions(2 if number_of_frames == 1 else 3)
     image.SetDimensions(
-        (dicom_dataset.Rows, dicom_dataset.Columns, number_of_frames))
+        (dicom_dataset.Columns, dicom_dataset.Rows, number_of_frames))
     image.SetDataElement(data_element)
     pi_type = gdcm.PhotometricInterpretation.GetPIType(
         dicom_dataset.PhotometricInterpretation)
@@ -125,14 +154,22 @@ def _create_image(dicom_dataset, data_element, number_of_frames):
         dicom_dataset.BitsStored, dicom_dataset.HighBit,
         dicom_dataset.PixelRepresentation)
     image.SetPixelFormat(pixel_format)
-    image.SetRows(dicom_dataset.Rows)
-    image.SetColumns(dicom_dataset.Columns)
     if 'PlanarConfiguration' in dicom_dataset:
         image.SetPlanarConfiguration(dicom_dataset.PlanarConfiguration)
     return image
 
 
-def _create_image_reader(filename):
+def create_image_reader(filename):
+    """Create a gdcm.ImageReader
+
+    Parameters
+    ----------
+    filename: str or unicode (Python 2)
+
+    Returns
+    -------
+    gdcm.ImageReader
+    """
     image_reader = gdcm.ImageReader()
     if compat.in_py2:
         if isinstance(filename, unicode):
@@ -142,9 +179,6 @@ def _create_image_reader(filename):
             image_reader.SetFileName(filename)
     else:
         image_reader.SetFileName(filename)
-
-    if not image_reader.Read():
-        raise TypeError("GDCM could not read DICOM image")
     return image_reader
 
 
@@ -178,12 +212,14 @@ def get_pixeldata(dicom_dataset):
         raise ImportError(msg)
 
     if HAVE_GDCM_IN_MEMORY_SUPPORT:
-        gdcm_data_element, number_of_frames = _create_data_element(
+        gdcm_data_element, number_of_frames = create_data_element(
             dicom_dataset)
-        gdcm_image = _create_image(dicom_dataset, gdcm_data_element,
-                                   number_of_frames)
+        gdcm_image = create_image(dicom_dataset, gdcm_data_element,
+                                  number_of_frames)
     else:
-        gdcm_image_reader = _create_image_reader(dicom_dataset.filename)
+        gdcm_image_reader = create_image_reader(dicom_dataset.filename)
+        if not gdcm_image_reader.Read():
+            raise TypeError("GDCM could not read DICOM image")
         gdcm_image = gdcm_image_reader.GetImage()
 
     # GDCM returns char* as type str. Under Python 2 `str` are
