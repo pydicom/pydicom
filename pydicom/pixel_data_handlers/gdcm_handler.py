@@ -89,13 +89,10 @@ def create_data_element(dicom_dataset):
     -------
     gdcm.DataElement
         Converted PixelData element
-    int
-        Number of frames in the PixelData
     """
     data_element = gdcm.DataElement(gdcm.Tag(0x7fe0, 0x0010))
     if dicom_dataset.file_meta.TransferSyntaxUID.is_compressed:
-        if ('NumberOfFrames' in dicom_dataset
-                and dicom_dataset.NumberOfFrames > 1):
+        if getattr(dicom_dataset, 'NumberOfFrames', 1) > 1:
             pixel_data_sequence = pydicom.encaps.decode_data_sequence(
                 dicom_dataset.PixelData)
         else:
@@ -109,16 +106,13 @@ def create_data_element(dicom_dataset):
             fragment.SetByteStringValue(pixel_data)
             fragments.AddFragment(fragment)
         data_element.SetValue(fragments.__ref__())
-
-        number_of_frames = len(pixel_data_sequence)
     else:
         data_element.SetByteStringValue(dicom_dataset.PixelData)
-        number_of_frames = 1
 
-    return data_element, number_of_frames
+    return data_element
 
 
-def create_image(dicom_dataset, data_element, number_of_frames):
+def create_image(dicom_dataset, data_element):
     """Create a gdcm.Image from a FileDataset and a gdcm.DataElement containing
     PixelData (0x7fe0, 0x0010)
 
@@ -127,14 +121,13 @@ def create_image(dicom_dataset, data_element, number_of_frames):
     dicom_dataset : FileDataset
     data_element : gdcm.DataElement
         DataElement containing PixelData
-    number_of_frames : int
-        Number of frames in the PixelData
 
     Returns
     -------
     gdcm.Image
     """
     image = gdcm.Image()
+    number_of_frames = getattr(dicom_dataset, 'NumberOfFrames', 1)
     image.SetNumberOfDimensions(2 if number_of_frames == 1 else 3)
     image.SetDimensions(
         (dicom_dataset.Columns, dicom_dataset.Rows, number_of_frames))
@@ -209,10 +202,8 @@ def get_pixeldata(dicom_dataset):
         raise ImportError(msg)
 
     if HAVE_GDCM_IN_MEMORY_SUPPORT:
-        gdcm_data_element, number_of_frames = create_data_element(
-            dicom_dataset)
-        gdcm_image = create_image(dicom_dataset, gdcm_data_element,
-                                  number_of_frames)
+        gdcm_data_element = create_data_element(dicom_dataset)
+        gdcm_image = create_image(dicom_dataset, gdcm_data_element)
     else:
         gdcm_image_reader = create_image_reader(dicom_dataset.filename)
         if not gdcm_image_reader.Read():

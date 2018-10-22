@@ -639,10 +639,8 @@ class TestSupportFunctions():
                         reason=gdcm_im_missing_message)
     def test_create_data_element_from_uncompressed_2d_dataset(
             self, dataset_2d):
-        data_element, number_of_frames = gdcm_handler.create_data_element(
-            dataset_2d)
+        data_element = gdcm_handler.create_data_element(dataset_2d)
 
-        assert number_of_frames == 1
         assert data_element.GetTag().GetGroup() == 0x7fe0
         assert data_element.GetTag().GetElement() == 0x0010
         assert data_element.GetSequenceOfFragments() is None
@@ -652,10 +650,8 @@ class TestSupportFunctions():
                         reason=gdcm_im_missing_message)
     def test_create_data_element_from_compressed_2d_dataset(
             self, dataset_2d_compressed):
-        data_element, number_of_frames = gdcm_handler.create_data_element(
-            dataset_2d_compressed)
+        data_element = gdcm_handler.create_data_element(dataset_2d_compressed)
 
-        assert number_of_frames == 1
         assert data_element.GetTag().GetGroup() == 0x7fe0
         assert data_element.GetTag().GetElement() == 0x0010
         assert data_element.GetSequenceOfFragments() is not None
@@ -664,10 +660,8 @@ class TestSupportFunctions():
     @pytest.mark.skipif(not HAVE_GDCM_IN_MEMORY_SUPPORT,
                         reason=gdcm_im_missing_message)
     def test_create_data_element_from_3d_dataset(self, dataset_3d):
-        data_element, number_of_frames = gdcm_handler.create_data_element(
-            dataset_3d)
+        data_element = gdcm_handler.create_data_element(dataset_3d)
 
-        assert number_of_frames == dataset_3d.NumberOfFrames
         assert data_element.GetTag().GetGroup() == 0x7fe0
         assert data_element.GetTag().GetElement() == 0x0010
         assert data_element.GetSequenceOfFragments() is not None
@@ -676,10 +670,8 @@ class TestSupportFunctions():
     @pytest.mark.skipif(not HAVE_GDCM_IN_MEMORY_SUPPORT,
                         reason=gdcm_im_missing_message)
     def test_create_image_from_2d_dataset(self, dataset_2d):
-        data_element, number_of_frames = gdcm_handler.create_data_element(
-            dataset_2d)
-        image = gdcm_handler.create_image(dataset_2d, data_element,
-                                          number_of_frames)
+        data_element = gdcm_handler.create_data_element(dataset_2d)
+        image = gdcm_handler.create_image(dataset_2d, data_element)
         assert image.GetNumberOfDimensions() == 2
         assert image.GetDimensions() == [dataset_2d.Rows, dataset_2d.Columns]
         assert image.GetPhotometricInterpretation().GetType() == \
@@ -698,10 +690,8 @@ class TestSupportFunctions():
     @pytest.mark.skipif(not HAVE_GDCM_IN_MEMORY_SUPPORT,
                         reason=gdcm_im_missing_message)
     def test_create_image_from_3d_dataset(self, dataset_3d):
-        data_element, number_of_frames = gdcm_handler.create_data_element(
-            dataset_3d)
-        image = gdcm_handler.create_image(dataset_3d, data_element,
-                                          number_of_frames)
+        data_element = gdcm_handler.create_data_element(dataset_3d)
+        image = gdcm_handler.create_image(dataset_3d, data_element)
         assert image.GetNumberOfDimensions() == 3
         assert image.GetDimensions() == [
             dataset_3d.Columns, dataset_3d.Rows,
