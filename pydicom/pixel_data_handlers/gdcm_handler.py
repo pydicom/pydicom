@@ -12,11 +12,8 @@ except ImportError:
 try:
     import gdcm
     HAVE_GDCM = True
-    try:
-        getattr(gdcm.DataElement, 'SetByteStringValue')
-        HAVE_GDCM_IN_MEMORY_SUPPORT = True
-    except AttributeError:
-        HAVE_GDCM_IN_MEMORY_SUPPORT = False
+    HAVE_GDCM_IN_MEMORY_SUPPORT = hasattr(gdcm.DataElement,
+                                          'SetByteStringValue')
 except ImportError:
     HAVE_GDCM = False
     HAVE_GDCM_IN_MEMORY_SUPPORT = False
