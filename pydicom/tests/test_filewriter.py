@@ -2419,3 +2419,34 @@ class TestWriteUndefinedLengthPixelData(object):
             ds_unzipped = dcmread(fp)
             for elem_in, elem_out in zip(ds, ds_unzipped):
                 assert elem_in == elem_out
+
+    def test_writing_too_big_data_in_explicit_encoding(self):
+        """Data too large to be written in explicit transfer syntax."""
+        self.fp.is_little_endian = True
+        self.fp.is_implicit_VR = True
+        # make a multi-value larger than 64kB
+        single_value = b'123456.789012345'
+        large_value = b'\\'.join([single_value] * 4500)
+        # can be written with implicit transfer syntax,
+        # where the length field is 4 bytes long
+        pixel_data = DataElement(0x30040058, 'DS',
+                                 large_value,
+                                 is_undefined_length=False)
+        write_data_element(self.fp, pixel_data)
+
+        self.fp = DicomBytesIO()
+        self.fp.is_little_endian = True
+        self.fp.is_implicit_VR = False
+        # shall raise if trying to write it with explicit transfer syntax,
+        # where the length field is 2 bytes long
+        expected_message = (r'The value for the data element \(3004, 0058\) '
+                            r'exceeds the size of 64 kByte ')
+        with pytest.raises(ValueError, match=expected_message):
+            write_data_element(self.fp, pixel_data)
+
+        self.fp = DicomBytesIO()
+        self.fp.is_little_endian = False
+        self.fp.is_implicit_VR = False
+        # we expect the same behavior in Big Endian transfer syntax
+        with pytest.raises(ValueError, match=expected_message):
+            write_data_element(self.fp, pixel_data)

@@ -2,6 +2,8 @@
 """Functions related to writing DICOM data."""
 
 from __future__ import absolute_import
+
+import struct
 from struct import pack
 
 from pydicom import compat
@@ -484,7 +486,16 @@ def write_data_element(fp, data_element, encodings=None):
     value_length = buffer.tell()
     if (not fp.is_implicit_VR and VR not in extra_length_VRs and
             not is_undefined_length):
-        fp.write_US(value_length)  # Explicit VR length field is only 2 bytes
+        try:
+            fp.write_US(value_length)  # Explicit VR length field is 2 bytes
+        except struct.error:
+            msg = ('The value for the data element {} exceeds the size '
+                   'of 64 kByte and cannot be written in an explicit transfer '
+                   'syntax. You can save it using Implicit Little Endian '
+                   'transfer syntax, or you have to truncate the value to not '
+                   'exceed the maximum size of 64 kByte.'
+                   .format(data_element.tag))
+            raise ValueError(msg)
     else:
         # write the proper length of the data_element in the length slot,
         # unless is SQ with undefined length.
