@@ -180,13 +180,42 @@ class DatasetTests(unittest.TestCase):
         # Random non-existent property
         assert 'random name' not in ds
 
+    def test_clear(self):
+        ds = self.dummy_dataset()
+        assert 1 == len(ds)
+        ds.clear()
+        assert 0 == len(ds)
+
+    def test_pop(self):
+        ds = self.dummy_dataset()
+        assert 'default' == ds.pop('dummy', 'default')
+        elem = ds.pop(0x300a00b2)
+        assert 'unit001' == elem.value
+        with pytest.raises(KeyError):
+            ds.pop(0x300a00b2)
+
+    def test_popitem(self):
+        ds = self.dummy_dataset()
+        elem = ds.popitem()
+        assert 0x300a00b2 == elem[0]
+        assert 'unit001' == elem[1].value
+        with pytest.raises(KeyError):
+            ds.popitem()
+
+    def test_setdefault(self):
+        ds = self.dummy_dataset()
+        elem = ds.setdefault(0x300a00b2, 'foo')
+        assert 'unit001' == elem.value
+        elem = ds.setdefault(0x00100010, DataElement(0x00100010, 'PN', "Test"))
+        assert elem.value == 'Test'
+        assert 2 == len(ds)
+
     def testGetExists1(self):
         """Dataset: dataset.get() returns an existing item by name.........."""
         ds = self.dummy_dataset()
         unit = ds.get('TreatmentMachineName', None)
         self.assertEqual(
-            unit,
-            'unit001',
+            'unit001', unit,
             "dataset.get() did not return existing member by name")
 
     def testGetExists2(self):

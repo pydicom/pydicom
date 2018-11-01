@@ -181,7 +181,7 @@ class Dataset(object):
         elif isinstance(args[0], Dataset):
             self.tags = args[0].tags
         else:
-            self.tags = dict(*args)
+            self.tags = args[0]
         self.is_decompressed = False
 
         # the following read_XXX attributes are used internally to store
@@ -754,6 +754,19 @@ class Dataset(object):
     def __ne__(self, other):
         """Compare `self` and `other` for inequality."""
         return not self == other
+
+    def clear(self):
+        """Delete all data elements."""
+        self.tags.clear()
+
+    def pop(self, *args, **kwargs):
+        return self.tags.pop(*args, **kwargs)
+
+    def popitem(self):
+        return self.tags.popitem()
+
+    def setdefault(self,  *args, **kwargs):
+        return self.tags.setdefault(*args, **kwargs)
 
     def convert_pixel_data(self):
         """Convert the Pixel Data to a numpy array internally.
