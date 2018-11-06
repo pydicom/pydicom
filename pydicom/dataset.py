@@ -19,7 +19,6 @@ import inspect  # for __dir__
 import io
 import os
 import os.path
-import sys
 from bisect import bisect_left
 from itertools import takewhile
 
@@ -58,8 +57,9 @@ class PropertyError(Exception):
     pass
 
 
-class Dataset(dict):
-    """A collection (dictionary) of DICOM DataElements.
+class Dataset(object):
+    """Contains a collection (dictionary) of DICOM DataElements.
+    Behaves like a dictionary.
 
     Examples
     --------
@@ -102,6 +102,8 @@ class Dataset(dict):
     Retrieving DataElements:
 
     >>> elem = ds[0x00100010]
+    >>> elem
+    (0010, 0010) Patient's Name                      PN: 'CITIZEN^Joan'
     >>> elem = ds.data_element('PatientName')
     >>> elem
     (0010, 0010) Patient's Name                      PN: 'CITIZEN^Joan'
@@ -174,7 +176,12 @@ class Dataset(dict):
     def __init__(self, *args, **kwargs):
         """Create a new Dataset instance."""
         self._parent_encoding = kwargs.get('parent_encoding', default_encoding)
-        dict.__init__(self, *args)
+        if not args:
+            self.tags = {}
+        elif isinstance(args[0], Dataset):
+            self.tags = args[0].tags
+        else:
+            self.tags = args[0]
         self.is_decompressed = False
 
         # the following read_XXX attributes are used internally to store
@@ -232,7 +239,7 @@ class Dataset(dict):
         """
         data_element = DataElement(tag, VR, value)
         # use data_element.tag since DataElement verified it
-        self[data_element.tag] = data_element
+        self.tags[data_element.tag] = data_element
 
     def data_element(self, name):
         """Return the DataElement corresponding to the element keyword `name`.
@@ -255,7 +262,7 @@ class Dataset(dict):
         return None
 
     def __contains__(self, name):
-        """Extend dict.__contains__() to handle DICOM keywords.
+        """Simulate dict.__contains__() to handle DICOM keywords.
 
         This is called for code like:
         >>> 'SliceLocation' in ds
@@ -280,10 +287,9 @@ class Dataset(dict):
                 return False
         # Test against None as (0000,0000) is a possible tag
         if tag is not None:
-            return dict.__contains__(self, tag)
+            return tag in self.tags
         else:
-            return dict.__contains__(self,
-                                     name)  # will no doubt raise an exception
+            return name in self.tags  # will no doubt raise an exception
 
     def decode(self):
         """Apply character set decoding to all DataElements in the Dataset.
@@ -327,9 +333,8 @@ class Dataset(dict):
         """
         # First check if a valid DICOM keyword and if we have that data element
         tag = tag_for_keyword(name)
-        if tag is not None and tag in self:
-            dict.__delitem__(self,
-                             tag)  # direct to dict as we know we have key
+        if tag is not None and tag in self.tags:
+            del self.tags[tag]
         # If not a DICOM name in this dataset, check for regular instance name
         #   can't do delete directly, that will call __delattr__ again
         elif name in self.__dict__:
@@ -369,15 +374,15 @@ class Dataset(dict):
         # If passed a slice, delete the corresponding DataElements
         if isinstance(key, slice):
             for tag in self._slice_dataset(key.start, key.stop, key.step):
-                del self[tag]
+                del self.tags[tag]
         else:
             # Assume is a standard tag (for speed in common case)
             try:
-                dict.__delitem__(self, key)
+                del self.tags[key]
             # If not a standard tag, than convert to Tag and try again
             except KeyError:
                 tag = Tag(key)
-                dict.__delitem__(self, tag)
+                del self.tags[tag]
 
     def __dir__(self):
         """Give a list of attributes available in the Dataset.
@@ -414,7 +419,7 @@ class Dataset(dict):
             The matching DataElement keywords in the dataset. If no filters are
             used then all DataElement keywords are returned.
         """
-        allnames = [keyword_for_tag(tag) for tag in self.keys()]
+        allnames = [keyword_for_tag(tag) for tag in self.tags.keys()]
         # remove blanks - tags without valid names (e.g. private tags)
         allnames = [x for x in allnames if x]
         # Store found names in a dict, so duplicate names appear only once
@@ -449,14 +454,14 @@ class Dataset(dict):
             # Convert values() to a list for compatibility between
             #   python 2 and 3
             # Sort values() by element tag
-            self_elem = sorted(list(self.values()), key=lambda x: x.tag)
-            other_elem = sorted(list(other.values()), key=lambda x: x.tag)
+            self_elem = sorted(list(self.tags.values()), key=lambda x: x.tag)
+            other_elem = sorted(list(other.tags.values()), key=lambda x: x.tag)
             return self_elem == other_elem
 
         return NotImplemented
 
     def get(self, key, default=None):
-        """Extend dict.get() to handle DICOM DataElement keywords.
+        """Simulate dict.get() to handle DICOM DataElement tags and keywords.
 
         Parameters
         ----------
@@ -491,10 +496,17 @@ class Dataset(dict):
                 except Exception:
                     raise TypeError("Dataset.get key must be a string or tag")
         try:
-            return_val = self.__getitem__(key)
+            return self.__getitem__(key)
         except KeyError:
-            return_val = default
-        return return_val
+            return default
+
+    def keys(self):
+        """Return the DICOM tag keys to simulate dict."""
+        return self.tags.keys()
+
+    def values(self):
+        """Return the DICOM tag values to simulate dict."""
+        return self.tags.values()
 
     def __getattr__(self, name):
         """Intercept requests for Dataset attribute names.
@@ -519,7 +531,7 @@ class Dataset(dict):
             # Try the base class attribute getter (fix for issue 332)
             return super(Dataset, self).__getattribute__(name)
         tag = Tag(tag)
-        if tag not in self:  # DICOM DataElement not in the Dataset
+        if tag not in self.tags:  # DICOM DataElement not in the Dataset
             # Try the base class attribute getter (fix for issue 332)
             return super(Dataset, self).__getattribute__(name)
         else:
@@ -585,7 +597,7 @@ class Dataset(dict):
             tag = key
         else:
             tag = Tag(key)
-        data_elem = dict.__getitem__(self, tag)
+        data_elem = self.tags[tag]
 
         if isinstance(data_elem, DataElement):
             return data_elem
@@ -610,7 +622,7 @@ class Dataset(dict):
                 self[tag] = correct_ambiguous_vr_element(
                     self[tag], self, data_elem[6])
 
-        return dict.__getitem__(self, tag)
+        return self.tags.get(tag)
 
     def get_item(self, key):
         """Return the raw data element if possible.
@@ -637,7 +649,7 @@ class Dataset(dict):
             tag = key
         else:
             tag = Tag(key)
-        data_elem = dict.__getitem__(self, tag)
+        data_elem = self.tags.get(tag)
         # If a deferred read, return using __getitem__ to read and convert it
         if isinstance(data_elem, tuple) and data_elem.value is None:
             return self[key]
@@ -714,7 +726,7 @@ class Dataset(dict):
         # Note this is different than the underlying dict class,
         #        which returns the key of the key:value mapping.
         #   Here the value is returned (but data_element.tag has the key)
-        taglist = sorted(self.keys())
+        taglist = sorted(self.tags.keys())
         for tag in taglist:
             yield self[tag]
 
@@ -732,13 +744,29 @@ class Dataset(dict):
         pydicom.dataelem.DataElement or pydicom.dataelem.RawDataElement
             The Dataset's DataElements, sorted by increasing tag order.
         """
-        taglist = sorted(self.keys())
+        taglist = sorted(self.tags.keys())
         for tag in taglist:
             yield self.get_item(tag)
+
+    def __len__(self):
+        return len(self.tags)
 
     def __ne__(self, other):
         """Compare `self` and `other` for inequality."""
         return not self == other
+
+    def clear(self):
+        """Delete all data elements."""
+        self.tags.clear()
+
+    def pop(self, *args, **kwargs):
+        return self.tags.pop(*args, **kwargs)
+
+    def popitem(self):
+        return self.tags.popitem()
+
+    def setdefault(self,  *args, **kwargs):
+        return self.tags.setdefault(*args, **kwargs)
 
     def convert_pixel_data(self):
         """Convert the Pixel Data to a numpy array internally.
@@ -957,7 +985,7 @@ class Dataset(dict):
 
         Parameters
         ----------
-        index : int
+        indent : int
             The indent level offset (default 0)
         top_level_only : bool
             When True, only create a string for the top level elements, i.e.
@@ -1179,7 +1207,7 @@ class Dataset(dict):
                     data_element = DataElement_from_raw(
                         data_element, self._character_set)
                 data_element.private_creator = self[private_creator_tag].value
-        dict.__setitem__(self, tag, data_element)
+        self.tags[tag] = data_element
 
     def _slice_dataset(self, start, stop, step):
         """Return the element tags in the Dataset that match the slice.
@@ -1206,7 +1234,7 @@ class Dataset(dict):
         if stop is not None:
             stop = Tag(stop)
 
-        all_tags = sorted(self.keys())
+        all_tags = sorted(self.tags.keys())
         # If the Dataset is empty, return an empty list
         if not all_tags:
             return []
@@ -1292,7 +1320,7 @@ class Dataset(dict):
         recursive : bool
             Flag to indicate whether to recurse into Sequences.
         """
-        taglist = sorted(self.keys())
+        taglist = sorted(self.tags.keys())
         for tag in taglist:
 
             with tag_in_exception(tag):

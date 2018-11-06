@@ -14,3 +14,6 @@ Enhancements
 
 Fixes
 .....
+
+* Do not derive `Dataset` from `dict` - fixes behavior in newer Python versions
+  (:issue:`765`)
