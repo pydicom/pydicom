@@ -195,12 +195,18 @@
 <p class="rubric">pydicom object model, description of classes, examples</p>
 <div class="section" id="dataset">
 <h2>Dataset<a class="headerlink" href="#dataset" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference internal" href="api_ref.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">dataset.Dataset</span></code></a> is the main object you will work with
-directly. Dataset is derived from Python’s <code class="docutils literal notranslate"><span class="pre">dict</span></code>, so it inherits (and
-overrides some of) the methods of <code class="docutils literal notranslate"><span class="pre">dict</span></code>. In other words, it is a collection
-of key:value pairs, where the key is the DICOM (group,element) tag (as a
-Tag object, described below), and the value is a DataElement instance (also
-described below).</p>
+<p><a class="reference internal" href="api_ref.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">dataset.Dataset</span></code></a> is the main object you will work with directly.
+Dataset wraps a dictionary, where the key is the DICOM (group,element)
+tag (as a Tag object, described below), and the value is a DataElement instance
+(also described below). It implements most of the methods of <code class="docutils literal notranslate"><span class="pre">dict</span></code>, so
+that it mostly behaves like the wrapped <code class="docutils literal notranslate"><span class="pre">dict</span></code>. This allows direct access
+to the data elements via the the tags, as shown below.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The iterator of a <code class="docutils literal notranslate"><span class="pre">DataSet</span></code> yields <code class="docutils literal notranslate"><span class="pre">DataElement</span></code> values, e.g. the
+values of the dictionary, as opposed to the keys yielded by a <code class="docutils literal notranslate"><span class="pre">dict</span></code>
+iterator.</p>
+</div>
 <p>A dataset could be created directly, but you will usually get one by reading
 an existing DICOM file:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pydicom</span>
@@ -255,7 +261,7 @@ usage example of data elements removal and assignation.</p>
 <p class="first admonition-title">Note</p>
 <p>To understand using <code class="xref py py-class docutils literal notranslate"><span class="pre">sequence.Sequences</span></code> in pydicom, please refer to
 this object model:
-<a class="reference internal" href="api_ref.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">dataset.Dataset</span></code></a> (derived from Python’s <code class="docutils literal notranslate"><span class="pre">dict</span></code>)</p>
+<a class="reference internal" href="api_ref.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">dataset.Dataset</span></code></a> (wraps a Python <code class="docutils literal notranslate"><span class="pre">dict</span></code>)</p>
 <blockquote class="last">
 <div><dl class="docutils">
 <dt>—&gt; contains DataElement instances</dt>
