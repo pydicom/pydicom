@@ -196,6 +196,10 @@ class TestBadValueRead(object):
         self.tag.is_little_endian = True
         self.tag.is_implicit_VR = False
         self.tag.tag = Tag(0x0010, 0x0020)
+        self.default_retry_order = pydicom.values.convert_retry_VR_order
+
+    def teardown(self):
+        pydicom.values.convert_retry_VR_order = self.default_retry_order
 
     def test_read_bad_value_in_VR_default(self):
         # found a conversion
