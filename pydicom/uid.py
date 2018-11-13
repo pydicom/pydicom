@@ -6,7 +6,6 @@ import uuid
 import random
 import hashlib
 import re
-import warnings
 
 from pydicom._uid_dict import UID_dictionary
 from pydicom import compat

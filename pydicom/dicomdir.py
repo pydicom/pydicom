@@ -24,7 +24,7 @@ class DicomDir(FileDataset):
         Carries forward all the initialization from
         FileDataset class
 
-        :param filename: full path and filename to the file.
+        :param filename_or_obj: full path and filename to the file.
         Use None if is a BytesIO.
         :param dataset: some form of dictionary, usually
                         a Dataset from read_dataset()

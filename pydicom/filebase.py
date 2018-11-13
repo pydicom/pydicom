@@ -141,7 +141,8 @@ class DicomIO(object):
 
 
 class DicomFileLike(DicomIO):
-    def __init__(self, file_like_obj):
+    def __init__(self, file_like_obj, *args, **kwargs):
+        super(DicomFileLike, self).__init__(*args, **kwargs)
         self.parent = file_like_obj
         self.parent_read = getattr(file_like_obj, "read", self.no_read)
         self.write = getattr(file_like_obj, "write", self.no_write)

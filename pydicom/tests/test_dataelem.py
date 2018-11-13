@@ -13,21 +13,11 @@ from pydicom.dataelem import (
     DataElement,
     RawDataElement,
     DataElement_from_raw,
-    isStringOrStringList,
 )
 from pydicom.dataset import Dataset
-from pydicom.filebase import DicomBytesIO
 from pydicom.tag import Tag
 from pydicom.uid import UID
 from pydicom.valuerep import DSfloat
-
-
-def test_is_string_like():
-    """Test isStringOrStringList"""
-    assert isStringOrStringList('some str')
-    assert not isStringOrStringList(1234)
-    assert isStringOrStringList(['some str', 'list'])
-    assert not isStringOrStringList(['some str', 1234])
 
 
 class DataElementTests(unittest.TestCase):
