@@ -8,6 +8,8 @@ A DataElement has a tag,
 """
 
 from __future__ import absolute_import
+
+import warnings
 from collections import namedtuple
 
 from pydicom import config  # don't import datetime_conversion directly
@@ -26,6 +28,20 @@ import pydicom.valuerep  # don't import DS directly as can be changed by config
 if not in_py2:
     from pydicom.valuerep import PersonName3 as PersonNameUnicode
     PersonName = PersonNameUnicode
+
+
+def isMultiValue(value):
+    """Return True if `value` is list-like (iterable),
+       False otherwise."""
+    msg = 'isMultiValue is deprecated.  Use DataElement.VM instead'
+    warnings.warn(msg, DeprecationWarning)
+    if isinstance(value, compat.char_types):
+        return False
+    try:
+        iter(value)
+    except TypeError:
+        return False
+    return True
 
 
 def _is_bytes(val):
