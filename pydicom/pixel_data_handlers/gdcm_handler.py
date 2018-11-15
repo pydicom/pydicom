@@ -15,7 +15,7 @@ try:
 except ImportError:
     HAVE_GDCM = False
 
-import pydicom
+import pydicom.uid
 from pydicom import compat
 
 

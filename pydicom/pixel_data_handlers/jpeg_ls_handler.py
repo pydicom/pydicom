@@ -15,7 +15,7 @@ try:
 except ImportError:
     HAVE_JPEGLS = False
 
-import pydicom
+import pydicom.encaps
 from pydicom.pixel_data_handlers.util import dtype_corrected_for_endianness
 import pydicom.uid
 

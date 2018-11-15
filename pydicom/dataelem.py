@@ -8,8 +8,9 @@ A DataElement has a tag,
 """
 
 from __future__ import absolute_import
-from collections import namedtuple
+
 import warnings
+from collections import namedtuple
 
 from pydicom import config  # don't import datetime_conversion directly
 from pydicom import compat
@@ -29,10 +30,11 @@ if not in_py2:
     PersonName = PersonNameUnicode
 
 
-# Helper functions:
 def isMultiValue(value):
     """Return True if `value` is list-like (iterable),
        False otherwise."""
+    msg = 'isMultiValue is deprecated.  Use DataElement.VM instead'
+    warnings.warn(msg, DeprecationWarning)
     if isinstance(value, compat.char_types):
         return False
     try:
@@ -42,27 +44,9 @@ def isMultiValue(value):
     return True
 
 
-def isString(val):
-    """Return True if `val` is string-like,
-       False otherwise."""
-    return isinstance(val, compat.string_types)
-
-
 def _is_bytes(val):
     """Return True only in Python 3 if `val` is of type `bytes`."""
     return False if in_py2 else isinstance(val, bytes)
-
-
-def isStringOrStringList(val):
-    """Return True if `val` is a str or an iterable
-       containing only strings."""
-    if isMultiValue(val):
-        for item in val:
-            if not isString(item):
-                return False
-        return True
-    else:  # single value - test for a string
-        return isString(val)
 
 
 # double '\' because it is used as escape chr in Python
@@ -211,10 +195,13 @@ class DataElement(object):
     @property
     def VM(self):
         """Return the value multiplicity (as an int) of the element."""
-        if isMultiValue(self.value):
-            return len(self.value)
-        else:
+        if isinstance(self.value, compat.char_types):
             return 1
+        try:
+            iter(self.value)
+        except TypeError:
+            return 1
+        return len(self.value)
 
     def _convert_value(self, val):
         """Convert `val` to an appropriate type and return the result.

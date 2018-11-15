@@ -7,7 +7,6 @@ from __future__ import absolute_import
 from io import BytesIO
 import os
 from struct import (Struct, unpack)
-from sys import byteorder
 import warnings
 import zlib
 

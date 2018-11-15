@@ -6,6 +6,10 @@ Changelog
 
 Changes
 .......
+* ``dataelem.isMultiValue`` is deprecated and will be removed in v1.4.
+  Use ``dataelem.DataElement.VM`` instead.
+* ``dataelem.isStringOrStringList`` and ``dataelem.isString`` functions are
+  removed
 
 Enhancements
 ............
