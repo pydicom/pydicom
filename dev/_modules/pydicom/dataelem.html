@@ -180,8 +180,9 @@
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">namedtuple</span>
+
 <span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">namedtuple</span>
 
 <span class="kn">from</span> <span class="nn">pydicom</span> <span class="k">import</span> <span class="n">config</span>  <span class="c1"># don&#39;t import datetime_conversion directly</span>
 <span class="kn">from</span> <span class="nn">pydicom</span> <span class="k">import</span> <span class="n">compat</span>
@@ -201,10 +202,11 @@
     <span class="n">PersonName</span> <span class="o">=</span> <span class="n">PersonNameUnicode</span>
 
 
-<span class="c1"># Helper functions:</span>
 <div class="viewcode-block" id="isMultiValue"><a class="viewcode-back" href="../../api_ref.html#pydicom.dataelem.isMultiValue">[docs]</a><span class="k">def</span> <span class="nf">isMultiValue</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Return True if `value` is list-like (iterable),</span>
 <span class="sd">       False otherwise.&quot;&quot;&quot;</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;isMultiValue is deprecated.  Use DataElement.VM instead&#39;</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">compat</span><span class="o">.</span><span class="n">char_types</span><span class="p">):</span>
         <span class="k">return</span> <span class="kc">False</span>
     <span class="k">try</span><span class="p">:</span>
@@ -214,27 +216,9 @@
     <span class="k">return</span> <span class="kc">True</span></div>
 
 
-<div class="viewcode-block" id="isString"><a class="viewcode-back" href="../../api_ref.html#pydicom.dataelem.isString">[docs]</a><span class="k">def</span> <span class="nf">isString</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Return True if `val` is string-like,</span>
-<span class="sd">       False otherwise.&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">compat</span><span class="o">.</span><span class="n">string_types</span><span class="p">)</span></div>
-
-
 <span class="k">def</span> <span class="nf">_is_bytes</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Return True only in Python 3 if `val` is of type `bytes`.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="kc">False</span> <span class="k">if</span> <span class="n">in_py2</span> <span class="k">else</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)</span>
-
-
-<div class="viewcode-block" id="isStringOrStringList"><a class="viewcode-back" href="../../api_ref.html#pydicom.dataelem.isStringOrStringList">[docs]</a><span class="k">def</span> <span class="nf">isStringOrStringList</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Return True if `val` is a str or an iterable</span>
-<span class="sd">       containing only strings.&quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">isMultiValue</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
-        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">val</span><span class="p">:</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">isString</span><span class="p">(</span><span class="n">item</span><span class="p">):</span>
-                <span class="k">return</span> <span class="kc">False</span>
-        <span class="k">return</span> <span class="kc">True</span>
-    <span class="k">else</span><span class="p">:</span>  <span class="c1"># single value - test for a string</span>
-        <span class="k">return</span> <span class="n">isString</span><span class="p">(</span><span class="n">val</span><span class="p">)</span></div>
 
 
 <span class="c1"># double &#39;\&#39; because it is used as escape chr in Python</span>
@@ -383,10 +367,13 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">VM</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return the value multiplicity (as an int) of the element.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">isMultiValue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">):</span>
-            <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">compat</span><span class="o">.</span><span class="n">char_types</span><span class="p">):</span>
             <span class="k">return</span> <span class="mi">1</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_convert_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Convert `val` to an appropriate type and return the result.</span>
