@@ -1,0 +1,19 @@
+Version 1.3.0
+=================================
+
+Changelog
+---------
+
+Changes
+.......
+
+Enhancements
+............
+
+* Added possibility to write into zip file using gzip (:issue:`753`)
+
+Fixes
+.....
+
+* Do not derive `Dataset` from `dict` - fixes behavior in newer Python versions
+  (:issue:`765`)
