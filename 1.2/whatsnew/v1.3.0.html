@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Version 0.9.9 &mdash; pydicom 1.2.0.dev0 documentation</title>
+  <title>Version 1.3.0 &mdash; pydicom 1.2.0 documentation</title>
   
 
   
@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                1.2.0.dev0
+                1.2.0
               </div>
             
           
@@ -152,13 +152,13 @@
     
       <li><a href="../index.html">Docs</a> &raquo;</li>
         
-      <li>Version 0.9.9</li>
+      <li>Version 1.3.0</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../_sources/whatsnew/v0.9.9.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/whatsnew/v1.3.0.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -171,39 +171,25 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="version-0-9-9">
-<h1>Version 0.9.9<a class="headerlink" href="#version-0-9-9" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="version-1-3-0">
+<h1>Version 1.3.0<a class="headerlink" href="#version-1-3-0" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="changelog">
 <h2>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h2>
-<p>In addition to bug fixes, pydicom 0.9.9 contains updates for all DICOM
-dictionaries.  New features include DICOMDIR handling, and a utility module
-which produces python/pydicom source code to recreate a DICOM file.</p>
+<div class="section" id="changes">
+<h3>Changes<a class="headerlink" href="#changes" title="Permalink to this headline">¶</a></h3>
+</div>
 <div class="section" id="enhancements">
 <h3>Enhancements<a class="headerlink" href="#enhancements" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li>All DICOM dictionaries updated (standard dictionary, UID dictionary, and
-private dictionaries)</li>
-<li>Dicom commands also added to dictionary</li>
-<li>Ability to work with DICOMDIR: <code class="docutils literal notranslate"><span class="pre">read_dicomdir()</span></code> function and <code class="docutils literal notranslate"><span class="pre">DicomDir</span></code>
-class. Example file <code class="docutils literal notranslate"><span class="pre">show_dicomdir.py</span></code> file added to examples subdirectory.</li>
-<li><code class="docutils literal notranslate"><span class="pre">codify.py</span></code>: Produce python/pydicom source code from a DICOM file.</li>
-<li>a number of Python 3 compatibility enhancements</li>
-<li>setup.py uses ez_setup only if setuptools not already installed</li>
-<li>exceptions carry tag info with them, to aid in debugging</li>
+<li>Added possibility to write into zip file using gzip (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/753">#753</a>)</li>
 </ul>
 </div>
-<div class="section" id="contrib-file-changes">
-<h3>Contrib file changes<a class="headerlink" href="#contrib-file-changes" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="fixes">
+<h3>Fixes<a class="headerlink" href="#fixes" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li>pydicom_series:  force parameter added (Nil Goyette)</li>
-<li>dcm_qt_tree: switch to OrderedDict to preserve ordering of tags (Padraig Looney)</li>
+<li>Do not derive <cite>Dataset</cite> from <cite>dict</cite> - fixes behavior in newer Python versions
+(<a class="reference external" href="https://github.com/pydicom/pydicom/issues/765">#765</a>)</li>
 </ul>
-</div>
-<div class="section" id="other-contributors">
-<h3>Other Contributors<a class="headerlink" href="#other-contributors" title="Permalink to this headline">¶</a></h3>
-<p>Other than Jonathan and myself, other contributors were: Rickard Holmberg,
-Julien Lamy, Yaroslav Halchenko, Mark White, Matthew Brett, Dimitri
-Papadopoulos, videan42 …(sorry if I’ve missed anyone).</p>
 </div>
 </div>
 </div>
@@ -219,7 +205,7 @@ Papadopoulos, videan42 …(sorry if I’ve missed anyone).</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2008-2018, Darcy Mason and pydicom contributors.
+        &copy; Copyright 2008-2018, Darcy Mason and pydicom contributors
 
     </p>
   </div>
@@ -238,21 +224,13 @@ Papadopoulos, videan42 …(sorry if I’ve missed anyone).</p>
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../',
-            VERSION:'1.2.0.dev0',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../_static/jquery.js"></script>
-      <script type="text/javascript" src="../_static/underscore.js"></script>
-      <script type="text/javascript" src="../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+    
 
   
 
