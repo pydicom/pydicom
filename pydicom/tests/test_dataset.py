@@ -1152,6 +1152,14 @@ class DatasetTests(unittest.TestCase):
         assert ds.BeamSequence[1].PatientID == 'FIXED'
         assert ds.BeamSequence[1].PatientName == 'Other^Name'
 
+    def test_update_with_dataset(self):
+        """Regression test for #779"""
+        ds = Dataset()
+        ds.PatientName = "Test"
+        ds2 = Dataset()
+        ds2.update(ds)
+        assert ds2.PatientName == 'Test'
+
 
 class DatasetElementsTests(unittest.TestCase):
     """Test valid assignments of data elements"""
