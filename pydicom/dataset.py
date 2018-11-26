@@ -500,6 +500,16 @@ class Dataset(object):
         except KeyError:
             return default
 
+    def items(self):
+        """Return the elements in the Dataset as a list of tuple.
+
+        Returns
+        -------
+        list of tuple
+            The top-level (element tag, element) for the Dataset.
+        """
+        return [(kk, self[kk]) for kk in self.tags]
+
     def keys(self):
         """Return the DICOM tag keys to simulate dict."""
         return self.tags.keys()
@@ -1276,7 +1286,13 @@ class Dataset(object):
         return dir(self)  # only valid python >=2.6, else use self.__dir__()
 
     def update(self, dictionary):
-        """Extend dict.update() to handle DICOM keywords."""
+        """Extend dict.update() to handle DICOM keywords.
+
+        Parameters
+        ----------
+        dictionary : dict or Dataset
+            The dict or Dataset to use when updating the current object.
+        """
         for key, value in list(dictionary.items()):
             if isinstance(key, (str, compat.text_type)):
                 setattr(self, key, value)

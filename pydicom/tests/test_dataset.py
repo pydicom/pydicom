@@ -1160,6 +1160,21 @@ class DatasetTests(unittest.TestCase):
         ds2.update(ds)
         assert ds2.PatientName == 'Test'
 
+        # Test sequences
+        ds2 = Dataset()
+        ds.BeamSequence = [Dataset(), Dataset()]
+        ds.BeamSequence[0].PatientName = 'TestA'
+        ds.BeamSequence[1].PatientName = 'TestB'
+
+        ds2.update(ds)
+        assert ds2.BeamSequence[0].PatientName == 'TestA'
+        assert ds2.BeamSequence[1].PatientName == 'TestB'
+
+        # Test overwrite
+        ds.PatientName = 'TestC'
+        ds2.update(ds)
+        assert ds2.PatientName == 'TestC'
+
 
 class DatasetElementsTests(unittest.TestCase):
     """Test valid assignments of data elements"""
