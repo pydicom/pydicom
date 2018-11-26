@@ -508,7 +508,7 @@ class Dataset(object):
         list of tuple
             The top-level (element tag, element) for the Dataset.
         """
-        return [(kk, self[kk]) for kk in self.tags]
+        return self.tags.items()
 
     def keys(self):
         """Return the DICOM tag keys to simulate dict."""
