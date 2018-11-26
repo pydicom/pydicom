@@ -518,6 +518,16 @@ class Dataset(object):
         """Return the DICOM tag values to simulate dict."""
         return self.tags.values()
 
+    if compat.in_py2:
+        def iterkeys(self):
+            return self.tags.iterkeys()
+
+        def itervalues(self):
+            return self.tags.itervalues()
+
+        def iteritems(self):
+            return self.tags.iteritems()
+
     def __getattr__(self, name):
         """Intercept requests for Dataset attribute names.
 
