@@ -539,7 +539,7 @@ def _read_file_meta_info(fp):
     start_file_meta = fp.tell()
     file_meta = read_dataset(fp, is_implicit_VR=False, is_little_endian=True,
                              stop_when=_not_group_0002)
-    if not file_meta.tags:
+    if not file_meta._dict:
         return file_meta
 
     # Test the file meta for correct interpretation by requesting the first
@@ -759,7 +759,7 @@ def read_partial(fileobj, stop_when=None, defer_size=None,
         pass  # error already logged in read_dataset
 
     # Add the command set elements to the dataset (if any)
-    dataset.update(command_set.tags)
+    dataset.update(command_set._dict)
 
     class_uid = file_meta_dataset.get("MediaStorageSOPClassUID", None)
     if class_uid and class_uid.name == "Media Storage Directory Storage":
