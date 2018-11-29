@@ -75,8 +75,10 @@ def _correct_ambiguous_vr_element(elem, ds, is_little_endian):
         else:
             elem.VR = 'SS'
             byte_type = 'h'
-        elem.value = convert_numbers(elem.value, is_little_endian,
-                                     byte_type)
+
+        if not isinstance(elem.value, int):
+            elem.value = convert_numbers(elem.value, is_little_endian,
+                                         byte_type)
 
     # 'OB or OW' and dependent on WaveformBitsAllocated
     # (5400, 0110) Channel Minimum Value
@@ -515,7 +517,7 @@ def write_dataset(fp, dataset, parent_encoding=default_encoding):
     """
     _harmonize_properties(dataset, fp)
 
-    if not fp.is_implicit_VR and not dataset.is_original_encoding:
+    if not dataset.is_original_encoding:
         dataset = correct_ambiguous_vr(dataset, fp.is_little_endian)
 
     dataset_encoding = dataset.get('SpecificCharacterSet', parent_encoding)
