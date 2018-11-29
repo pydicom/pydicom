@@ -865,7 +865,6 @@ class TestCorrectAmbiguousVR(object):
         assert ds.LUTDescriptor == [1, 0]
 
 
-
 class TestCorrectAmbiguousVRElement(object):
     """Test filewriter.correct_ambiguous_vr_element"""
 
