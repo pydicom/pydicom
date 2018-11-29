@@ -851,8 +851,19 @@ class TestCorrectAmbiguousVR(object):
         ds.SmallestImagePixelValue = 0
         assert ds[0x00280106].VR == 'US or SS'
         ds.PixelRepresentation = 0
+        ds.LUTDescriptor = [1, 0]
+        assert ds[0x00283002].VR == 'US or SS'
+        ds.LUTData = 0
+        assert ds[0x00283006].VR == 'US or OW'
         ds.save_as(DicomBytesIO())
+
         assert ds[0x00280106].VR == 'US'
+        assert ds.SmallestImagePixelValue == 0
+        assert ds[0x00283006].VR == 'US'
+        assert ds.LUTData == 0
+        assert ds[0x00283002].VR == 'US'
+        assert ds.LUTDescriptor == [1, 0]
+
 
 
 class TestCorrectAmbiguousVRElement(object):
