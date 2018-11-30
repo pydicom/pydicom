@@ -247,8 +247,12 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">elem</span><span class="o">.</span><span class="n">VR</span> <span class="o">=</span> <span class="s1">&#39;SS&#39;</span>
             <span class="n">byte_type</span> <span class="o">=</span> <span class="s1">&#39;h&#39;</span>
-        <span class="n">elem</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">convert_numbers</span><span class="p">(</span><span class="n">elem</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">,</span>
-                                     <span class="n">byte_type</span><span class="p">)</span>
+
+        <span class="c1"># Need to handle type check for elements with VM &gt; 1</span>
+        <span class="n">elem_value</span> <span class="o">=</span> <span class="n">elem</span><span class="o">.</span><span class="n">value</span> <span class="k">if</span> <span class="n">elem</span><span class="o">.</span><span class="n">VM</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">elem</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">elem_value</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="n">elem</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">convert_numbers</span><span class="p">(</span><span class="n">elem</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">,</span>
+                                         <span class="n">byte_type</span><span class="p">)</span>
 
     <span class="c1"># &#39;OB or OW&#39; and dependent on WaveformBitsAllocated</span>
     <span class="c1"># (5400, 0110) Channel Minimum Value</span>
@@ -271,8 +275,10 @@
         <span class="c1"># As per PS3.3 C.11.1.1.1</span>
         <span class="k">if</span> <span class="n">ds</span><span class="o">.</span><span class="n">LUTDescriptor</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">elem</span><span class="o">.</span><span class="n">VR</span> <span class="o">=</span> <span class="s1">&#39;US&#39;</span>
-            <span class="n">elem</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">convert_numbers</span><span class="p">(</span><span class="n">elem</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">,</span>
-                                         <span class="s1">&#39;H&#39;</span><span class="p">)</span>
+            <span class="n">elem_value</span> <span class="o">=</span> <span class="n">elem</span><span class="o">.</span><span class="n">value</span> <span class="k">if</span> <span class="n">elem</span><span class="o">.</span><span class="n">VM</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">elem</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">elem_value</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+                <span class="n">elem</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">convert_numbers</span><span class="p">(</span><span class="n">elem</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">,</span>
+                                             <span class="s1">&#39;H&#39;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">elem</span><span class="o">.</span><span class="n">VR</span> <span class="o">=</span> <span class="s1">&#39;OW&#39;</span>
 
@@ -681,13 +687,10 @@
 
 <div class="viewcode-block" id="write_dataset"><a class="viewcode-back" href="../../api_ref.html#pydicom.filewriter.write_dataset">[docs]</a><span class="k">def</span> <span class="nf">write_dataset</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">parent_encoding</span><span class="o">=</span><span class="n">default_encoding</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Write a Dataset dictionary to the file. Return the total length written.</span>
-
-<span class="sd">    Attempt to correct ambiguous VR elements when explicit little/big</span>
-<span class="sd">      encoding Elements that can&#39;t be corrected will be returned unchanged.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">_harmonize_properties</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">fp</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">fp</span><span class="o">.</span><span class="n">is_implicit_VR</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">dataset</span><span class="o">.</span><span class="n">is_original_encoding</span><span class="p">:</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">dataset</span><span class="o">.</span><span class="n">is_original_encoding</span><span class="p">:</span>
         <span class="n">dataset</span> <span class="o">=</span> <span class="n">correct_ambiguous_vr</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">fp</span><span class="o">.</span><span class="n">is_little_endian</span><span class="p">)</span>
 
     <span class="n">dataset_encoding</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;SpecificCharacterSet&#39;</span><span class="p">,</span> <span class="n">parent_encoding</span><span class="p">)</span>
