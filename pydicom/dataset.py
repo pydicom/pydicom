@@ -1415,7 +1415,7 @@ class FileDataset(Dataset):
             True (default) if little-endian transfer syntax used; False if
             big-endian.
         """
-        Dataset.__init__(self, dataset)
+        super(FileDataset, self).__init__(dataset)
         self.preamble = preamble
         self.file_meta = file_meta
         self.is_implicit_VR = is_implicit_VR
