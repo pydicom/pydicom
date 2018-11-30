@@ -75,8 +75,12 @@ def _correct_ambiguous_vr_element(elem, ds, is_little_endian):
         else:
             elem.VR = 'SS'
             byte_type = 'h'
-        elem.value = convert_numbers(elem.value, is_little_endian,
-                                     byte_type)
+
+        # Need to handle type check for elements with VM > 1
+        elem_value = elem.value if elem.VM == 1 else elem.value[0]
+        if not isinstance(elem_value, int):
+            elem.value = convert_numbers(elem.value, is_little_endian,
+                                         byte_type)
 
     # 'OB or OW' and dependent on WaveformBitsAllocated
     # (5400, 0110) Channel Minimum Value
@@ -99,8 +103,10 @@ def _correct_ambiguous_vr_element(elem, ds, is_little_endian):
         # As per PS3.3 C.11.1.1.1
         if ds.LUTDescriptor[0] == 1:
             elem.VR = 'US'
-            elem.value = convert_numbers(elem.value, is_little_endian,
-                                         'H')
+            elem_value = elem.value if elem.VM == 1 else elem.value[0]
+            if not isinstance(elem_value, int):
+                elem.value = convert_numbers(elem.value, is_little_endian,
+                                             'H')
         else:
             elem.VR = 'OW'
 
@@ -509,13 +515,10 @@ def write_data_element(fp, data_element, encodings=None):
 
 def write_dataset(fp, dataset, parent_encoding=default_encoding):
     """Write a Dataset dictionary to the file. Return the total length written.
-
-    Attempt to correct ambiguous VR elements when explicit little/big
-      encoding Elements that can't be corrected will be returned unchanged.
     """
     _harmonize_properties(dataset, fp)
 
-    if not fp.is_implicit_VR and not dataset.is_original_encoding:
+    if not dataset.is_original_encoding:
         dataset = correct_ambiguous_vr(dataset, fp.is_little_endian)
 
     dataset_encoding = dataset.get('SpecificCharacterSet', parent_encoding)

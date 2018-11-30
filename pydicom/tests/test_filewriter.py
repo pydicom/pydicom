@@ -843,6 +843,27 @@ class TestCorrectAmbiguousVR(object):
                     0].SmallestValidPixelValue == 256)
         assert ds.BeamSequence[0].BeamSequence[0][0x00280104].VR == 'US'
 
+    def test_write_new_ambiguous(self):
+        """Regression test for #781"""
+        ds = Dataset()
+        ds.is_little_endian = True
+        ds.is_implicit_VR = True
+        ds.SmallestImagePixelValue = 0
+        assert ds[0x00280106].VR == 'US or SS'
+        ds.PixelRepresentation = 0
+        ds.LUTDescriptor = [1, 0]
+        assert ds[0x00283002].VR == 'US or SS'
+        ds.LUTData = 0
+        assert ds[0x00283006].VR == 'US or OW'
+        ds.save_as(DicomBytesIO())
+
+        assert ds[0x00280106].VR == 'US'
+        assert ds.SmallestImagePixelValue == 0
+        assert ds[0x00283006].VR == 'US'
+        assert ds.LUTData == 0
+        assert ds[0x00283002].VR == 'US'
+        assert ds.LUTDescriptor == [1, 0]
+
 
 class TestCorrectAmbiguousVRElement(object):
     """Test filewriter.correct_ambiguous_vr_element"""
