@@ -278,9 +278,9 @@ class TestPersonName(object):
         pn_copy = copy.deepcopy(pn)
         assert pn == pn_copy
         assert pn.components == pn_copy.components
-        # deepcopy() shall have made a copy of components
-        assert pn_copy.components is not pn.components
-        assert pn.encodings == pn_copy.encodings
+        # deepcopy() returns the same immutable objects (tuples)
+        assert pn_copy.components is pn.components
+        assert pn.encodings is pn_copy.encodings
 
     def test_three_component(self):
         """PN: 3component (single-byte, ideographic,
@@ -369,9 +369,24 @@ class TestPersonName(object):
         # Issue 466
         from pydicom.valuerep import PersonName3
         pn = PersonName3("John^Doe", encodings='iso_ir_126')
-        assert pn.encodings == ['iso_ir_126']
+        assert pn.encodings == ('iso_ir_126',)
         pn2 = PersonName3(pn)
-        assert pn2.encodings == ['iso_ir_126']
+        assert pn2.encodings == ('iso_ir_126',)
+
+    def test_hash(self):
+        """Test that the same name creates the same hash."""
+        # Regression test for #785 in Python 3
+        pn1 = PersonNameUnicode("John^Doe^^Dr", encodings=default_encoding)
+        pn2 = PersonNameUnicode("John^Doe^^Dr", encodings=default_encoding)
+        assert hash(pn1) == hash(pn2)
+        pn3 = PersonNameUnicode("John^Doe", encodings=default_encoding)
+        assert hash(pn1) != hash(pn3)
+
+        pn1 = PersonNameUnicode(u'Yamada^Tarou=山田^太郎=やまだ^たろう',
+                                [default_encoding, 'iso2022_jp'])
+        pn2 = PersonNameUnicode(u'Yamada^Tarou=山田^太郎=やまだ^たろう',
+                                [default_encoding, 'iso2022_jp'])
+        assert hash(pn1) == hash(pn2)
 
 
 class TestDateTime(object):
