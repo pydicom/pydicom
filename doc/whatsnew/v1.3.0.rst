@@ -23,3 +23,5 @@ Fixes
   in explicit transfer syntax (:issue:`757`)
 * Do not derive `Dataset` from `dict` - fixes behavior in newer Python versions
   (:issue:`765`)
+* Make hash for `PersonName3` behave as expected, make `PersonName` objects
+  immutable (:issue:`785`)
