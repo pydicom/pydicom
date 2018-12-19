@@ -712,7 +712,7 @@
     <span class="n">start_file_meta</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
     <span class="n">file_meta</span> <span class="o">=</span> <span class="n">read_dataset</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">is_implicit_VR</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                              <span class="n">stop_when</span><span class="o">=</span><span class="n">_not_group_0002</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">file_meta</span><span class="o">.</span><span class="n">tags</span><span class="p">:</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">file_meta</span><span class="o">.</span><span class="n">_dict</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">file_meta</span>
 
     <span class="c1"># Test the file meta for correct interpretation by requesting the first</span>
@@ -932,7 +932,7 @@
         <span class="k">pass</span>  <span class="c1"># error already logged in read_dataset</span>
 
     <span class="c1"># Add the command set elements to the dataset (if any)</span>
-    <span class="n">dataset</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">command_set</span><span class="o">.</span><span class="n">tags</span><span class="p">)</span>
+    <span class="n">dataset</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">command_set</span><span class="o">.</span><span class="n">_dict</span><span class="p">)</span>
 
     <span class="n">class_uid</span> <span class="o">=</span> <span class="n">file_meta_dataset</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;MediaStorageSOPClassUID&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">class_uid</span> <span class="ow">and</span> <span class="n">class_uid</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;Media Storage Directory Storage&quot;</span><span class="p">:</span>
