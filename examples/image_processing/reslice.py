@@ -3,6 +3,9 @@
 Load CT slices and plot axial, sagittal and coronal images
 ==========================================================
 
+This example illustrates loading multiple files, sorting them by slice
+location, building a 3D image and reslicing it in different planes.
+
 .. usage:
 
    reslice.py <glob>
