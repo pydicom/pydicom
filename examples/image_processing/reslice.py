@@ -16,7 +16,7 @@ import sys
 import glob
 
 # load the DICOM files
-files=[]
+files = []
 print('glob: {}'.format(sys.argv[1]))
 for fname in glob.glob(sys.argv[1], recursive=False):
     print("loading: {}".format(fname))
@@ -25,8 +25,8 @@ for fname in glob.glob(sys.argv[1], recursive=False):
 print("file count: {}".format(len(files)))
 
 # skip files with no SliceLocation (eg scout views)
-slices=[]
-skipcount=0
+slices = []
+skipcount = 0
 for f in files:
     if hasattr(f, 'SliceLocation'):
         slices.append(f)
@@ -48,24 +48,24 @@ cor_aspect = ss/ps[0]
 # create 3D array
 img_shape = list(slices[0].pixel_array.shape)
 img_shape.append(len(slices))
-img3d=np.zeros(img_shape)
+img3d = np.zeros(img_shape)
 
 # fill 3D array with the images from the files
 for i, s in enumerate(slices):
     img2d = s.pixel_array
-    img3d[:,:,i] = img2d
+    img3d[: ,:, i] = img2d
 
 # plot 3 orthogonal slices
 a1 = plt.subplot(2,2,1)
-plt.imshow(img3d[:,:,img_shape[2]//2])
+plt.imshow(img3d[:, :, img_shape[2]//2])
 a1.set_aspect(ax_aspect)
 
 a2 = plt.subplot(2,2,2)
-plt.imshow(img3d[:,img_shape[1]//2,:])
+plt.imshow(img3d[:, img_shape[1]//2, :])
 a2.set_aspect(sag_aspect)
 
 a3 = plt.subplot(2,2,3)
-plt.imshow(img3d[img_shape[0]//2,:,:].T)
+plt.imshow(img3d[img_shape[0]//2, :, :].T)
 a3.set_aspect(cor_aspect)
 
 plt.show()
