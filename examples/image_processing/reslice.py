@@ -53,18 +53,18 @@ img3d = np.zeros(img_shape)
 # fill 3D array with the images from the files
 for i, s in enumerate(slices):
     img2d = s.pixel_array
-    img3d[: ,:, i] = img2d
+    img3d[:, :, i] = img2d
 
 # plot 3 orthogonal slices
-a1 = plt.subplot(2,2,1)
+a1 = plt.subplot(2, 2, 1)
 plt.imshow(img3d[:, :, img_shape[2]//2])
 a1.set_aspect(ax_aspect)
 
-a2 = plt.subplot(2,2,2)
+a2 = plt.subplot(2, 2, 2)
 plt.imshow(img3d[:, img_shape[1]//2, :])
 a2.set_aspect(sag_aspect)
 
-a3 = plt.subplot(2,2,3)
+a3 = plt.subplot(2, 2, 3)
 plt.imshow(img3d[img_shape[0]//2, :, :].T)
 a3.set_aspect(cor_aspect)
 
