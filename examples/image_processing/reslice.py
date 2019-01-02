@@ -1,12 +1,23 @@
-"""Loads CT slices and plots axial, sagittal and coronal images.
-usage: reslice.py <glob>
-where <glob> refers to a set of DICOM image files.
 
-Example: python reslice.py "*.dcm". The quotes are needed to protect the glob
-from your system and leave it for the script.
+"""
+==========================================================
+Load CT slices and plot axial, sagittal and coronal images
+==========================================================
 
-Tested using series 2 from here
-http://www.pcir.org/researchers/54879843_20060101.html
+.. usage:
+
+   reslice.py <glob>
+   where <glob> refers to a set of DICOM image files.
+
+   Example: python reslice.py "*.dcm". The quotes are needed to protect the glob
+   from your system and leave it for the script.
+
+.. note:
+
+   Uses numpy and matplotlib.
+
+   Tested using series 2 from here
+   http://www.pcir.org/researchers/54879843_20060101.html
 """
 
 import pydicom
