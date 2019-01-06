@@ -101,6 +101,26 @@ be applied to DICOM images.
    :hidden:
 
    /auto_examples/image_processing/plot_downsize_image
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example illustrates loading multiple files, sorting them by slice location, building a 3D ...">
+
+.. only:: html
+
+    .. figure:: /auto_examples/image_processing/images/thumb/sphx_glr_reslice_thumb.png
+
+        :ref:`sphx_glr_auto_examples_image_processing_reslice.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_examples/image_processing/reslice
 .. raw:: html
 
     <div style='clear:both'></div>
