@@ -445,5 +445,6 @@ def DataElement_from_raw(raw_data_element, encoding=None):
         value = convert_value(VR, raw, encoding)
     except NotImplementedError as e:
         raise NotImplementedError("{0:s} in tag {1!r}".format(str(e), raw.tag))
+
     return DataElement(raw.tag, VR, value, raw.value_tell,
                        raw.length == 0xFFFFFFFF, already_converted=True)
