@@ -310,7 +310,12 @@ def convert_UR_string(byte_string, is_little_endian, struct_format=None):
 def convert_value(VR, raw_data_element, encodings=None):
     """Return the converted value (from raw bytes) for the given VR"""
     if VR not in converters:
-        message = "Unknown Value Representation '{0}'".format(VR)
+        # `VR` characters are in the ascii alphabet ranges 65 - 90, 97 - 122
+        char_range = list(range(65, 91)) + list(range(97, 123))
+        # If the VR characters are outside that range then print hex values
+        if ord(VR[0]) not in char_range or ord(VR[1]) not in char_range:
+            VR = ' '.join(['0x{:02x}'.format(ord(ch)) for ch in VR])
+        message = "Unknown Value Representation '{}'".format(VR)
         raise NotImplementedError(message)
 
     # Look up the function to convert that VR
