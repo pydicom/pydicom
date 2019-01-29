@@ -36,17 +36,12 @@ elements have values given in the table below.
 
 """
 
-from platform import python_implementation
-from sys import byteorder
-import warnings
-
 try:
     import numpy as np
     HAVE_NP = True
 except ImportError:
     HAVE_NP = False
 
-from pydicom.compat import in_py2 as IN_PYTHON2
 from pydicom.pixel_data_handlers.util import pixel_dtype, get_expected_length
 import pydicom.uid
 

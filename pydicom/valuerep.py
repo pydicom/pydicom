@@ -531,9 +531,10 @@ def MultiString(val, valtype=str):
 
 def _verify_encodings(encodings):
     """Checks the encoding to ensure proper format"""
-    if encodings is not None and not isinstance(encodings, list):
-        return [encodings]
-
+    if encodings is not None:
+        if not isinstance(encodings, (list, tuple)):
+            return encodings,
+        return tuple(encodings)
     return encodings
 
 
@@ -565,7 +566,7 @@ def _decode_personname(components, encodings):
     # Remove empty elements from the end to avoid trailing '='
     while len(comps) and not comps[-1]:
         comps.pop()
-    return comps
+    return tuple(comps)
 
 
 def _encode_personname(components, encodings):
@@ -607,7 +608,7 @@ class PersonName3(object):
         if isinstance(val, PersonName3):
             encodings = val.encodings
             self.original_string = val.original_string
-            self._components = str(val).split('=')
+            self._components = tuple(str(val).split('='))
         elif isinstance(val, bytes):
             # this is the raw byte string - decode it on demand
             self.original_string = val
@@ -616,7 +617,7 @@ class PersonName3(object):
             # this is the decoded string - save the original string if
             # available for easier writing back
             self.original_string = original_string
-            self._components = val.split('=')
+            self._components = tuple(val.split('='))
 
         # if the encoding is not given, leave it as undefined (None)
         self.encodings = _verify_encodings(encodings)
@@ -710,12 +711,8 @@ class PersonName3(object):
     def __repr__(self):
         return '='.join(self.components).__repr__()
 
-    # For python 3, any override of __cmp__ or __eq__
-    # immutable requires explicit redirect of hash
-    # function to the parent class See
-    # See http://docs.python.org/
-    #  dev/3.0/reference/datamodel.html#object.__hash__
-    __hash__ = object.__hash__
+    def __hash__(self):
+        return hash(self.components)
 
     def decode(self, encodings=None):
         """Return the patient name decoded by the given encodings.
@@ -807,7 +804,7 @@ class PersonNameBase(object):
 
     def parse(self):
         """Break down the components and name parts"""
-        self.components = self.split("=")
+        self.components = tuple(self.split("="))
         nComponents = len(self.components)
         self.single_byte = self.components[0]
         self.ideographic = ''
@@ -903,8 +900,8 @@ class PersonNameUnicode(PersonNameBase, compat.text_type):
         name = compat.text_type(self).encode('utf8')
         new_person = PersonNameUnicode(name, 'utf8')
         memo[id(self)] = new_person
-        for k, v in self.__dict__.items():
-            setattr(new_person, k, deepcopy(v, memo))
+        # no need for deepcopy call - all attributes are immutable
+        new_person.__dict__.update(self.__dict__)
         return new_person
 
     def encode(self, encodings):

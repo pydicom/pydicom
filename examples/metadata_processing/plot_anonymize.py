@@ -79,7 +79,7 @@ if 'OtherPatientIDsSequence' in dataset:
 
 tag = 'PatientBirthDate'
 if tag in dataset:
-    dataset.data_element(tag).value = '01011900'
+    dataset.data_element(tag).value = '19000101'
 
 ##############################################################################
 # Finally, this is possible to store the image

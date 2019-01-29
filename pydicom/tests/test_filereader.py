@@ -15,7 +15,7 @@ import pytest
 import pydicom.config
 from pydicom.dataset import Dataset, FileDataset
 from pydicom.data import get_testdata_files
-from pydicom.filereader import dcmread
+from pydicom.filereader import dcmread, read_dataset
 from pydicom.dataelem import DataElement, DataElement_from_raw
 from pydicom.errors import InvalidDicomError
 from pydicom.filebase import DicomBytesIO
@@ -687,6 +687,67 @@ class ReaderTests(unittest.TestCase):
             pass
         except EOFError:
             self.fail('Unexpected EOFError raised')
+
+
+class TestUnknownVR(object):
+    @pytest.mark.parametrize(
+        'vr_bytes, str_output',
+        [
+            # Test limits of char values
+            (b'\x00\x41', '0x00 0x41'),  # 000/A
+            (b'\x40\x41', '0x40 0x41'),  # 064/A
+            (b'\x5B\x41', '0x5b 0x41'),  # 091/A
+            (b'\x60\x41', '0x60 0x41'),  # 096/A
+            (b'\x7B\x41', '0x7b 0x41'),  # 123/A
+            (b'\xFF\x41', '0xff 0x41'),  # 255/A
+            # Test good/bad
+            (b'\x41\x00', '0x41 0x00'),  # A/-
+            (b'\x5A\x00', '0x5a 0x00'),  # Z/-
+            # Test not quite good/bad
+            (b'\x61\x00', '0x61 0x00'),  # a/-
+            (b'\x7A\x00', '0x7a 0x00'),  # z/-
+            # Test bad/good
+            (b'\x00\x41', '0x00 0x41'),  # -/A
+            (b'\x00\x5A', '0x00 0x5a'),  # -/Z
+            # Test bad/not quite good
+            (b'\x00\x61', '0x00 0x61'),  # -/a
+            (b'\x00\x7A', '0x00 0x7a'),  # -/z
+            # Test good/good
+            (b'\x41\x41', 'AA'),  # A/A
+            (b'\x41\x5A', 'AZ'),  # A/Z
+            (b'\x5A\x41', 'ZA'),  # Z/A
+            (b'\x5A\x5A', 'ZZ'),  # Z/Z
+            # Test not quite good
+            (b'\x41\x61', 'Aa'),  # A/a
+            (b'\x41\x7A', 'Az'),  # A/z
+            (b'\x61\x41', 'aA'),  # a/A
+            (b'\x61\x5A', 'aZ'),  # a/Z
+            (b'\x61\x61', 'aa'),  # a/a
+            (b'\x61\x7A', 'az'),  # a/z
+            (b'\x5A\x61', 'Za'),  # Z/a
+            (b'\x5A\x7A', 'Zz'),  # Z/z
+            (b'\x7A\x41', 'zA'),  # z/A
+            (b'\x7A\x5A', 'zZ'),  # z/Z
+            (b'\x7A\x61', 'za'),  # z/a
+            (b'\x7A\x7A', 'zz'),  # z/z
+        ]
+    )
+    def test_fail_decode_msg(self, vr_bytes, str_output):
+        """Regression test for #791."""
+        ds = read_dataset(
+            BytesIO(
+                b'\x08\x00\x01\x00' +
+                vr_bytes +
+                b'\x00\x00\x00\x08\x00\x49'
+            ),
+            False, True
+        )
+        msg = (
+            r"Unknown Value Representation '{}' in tag \(0008, 0001\)"
+            .format(str_output)
+        )
+        with pytest.raises(NotImplementedError, match=msg):
+            print(ds)
 
 
 class ReadDataElementTests(unittest.TestCase):

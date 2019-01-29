@@ -6,7 +6,6 @@ import uuid
 import random
 import hashlib
 import re
-import warnings
 
 from pydicom._uid_dict import UID_dictionary
 from pydicom import compat
@@ -207,11 +206,6 @@ JPEG2000 = UID('1.2.840.10008.1.2.4.91')
 JPEG2000MultiComponentLossless = UID('1.2.840.10008.1.2.4.92')
 JPEG2000MultiComponent = UID('1.2.840.10008.1.2.4.93')
 RLELossless = UID('1.2.840.10008.1.2.5')
-
-# Deprecated, to be removed in v1.3
-JPEGBaseLineLossy8bit = JPEGBaseline
-JPEGBaseLineLossy12bit = JPEGExtended
-JPEG2000Lossy = JPEG2000
 
 UncompressedPixelTransferSyntaxes = [
     ExplicitVRLittleEndian,

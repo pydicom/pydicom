@@ -1,5 +1,5 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
-"""Benchmarks for the rle_handler module."""
+"""Decoding benchmarks for the rle_handler module."""
 
 from pydicom import dcmread
 from pydicom.data import get_testdata_files

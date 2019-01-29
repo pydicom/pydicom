@@ -8,8 +8,9 @@ A DataElement has a tag,
 """
 
 from __future__ import absolute_import
-from collections import namedtuple
+
 import warnings
+from collections import namedtuple
 
 from pydicom import config  # don't import datetime_conversion directly
 from pydicom import compat
@@ -29,10 +30,11 @@ if not in_py2:
     PersonName = PersonNameUnicode
 
 
-# Helper functions:
 def isMultiValue(value):
     """Return True if `value` is list-like (iterable),
        False otherwise."""
+    msg = 'isMultiValue is deprecated.  Use DataElement.VM instead'
+    warnings.warn(msg, DeprecationWarning)
     if isinstance(value, compat.char_types):
         return False
     try:
@@ -42,27 +44,9 @@ def isMultiValue(value):
     return True
 
 
-def isString(val):
-    """Return True if `val` is string-like,
-       False otherwise."""
-    return isinstance(val, compat.string_types)
-
-
 def _is_bytes(val):
     """Return True only in Python 3 if `val` is of type `bytes`."""
     return False if in_py2 else isinstance(val, bytes)
-
-
-def isStringOrStringList(val):
-    """Return True if `val` is a str or an iterable
-       containing only strings."""
-    if isMultiValue(val):
-        for item in val:
-            if not isString(item):
-                return False
-        return True
-    else:  # single value - test for a string
-        return isString(val)
 
 
 # double '\' because it is used as escape chr in Python
@@ -211,10 +195,13 @@ class DataElement(object):
     @property
     def VM(self):
         """Return the value multiplicity (as an int) of the element."""
-        if isMultiValue(self.value):
-            return len(self.value)
-        else:
+        if isinstance(self.value, compat.char_types):
             return 1
+        try:
+            iter(self.value)
+        except TypeError:
+            return 1
+        return len(self.value)
 
     def _convert_value(self, val):
         """Convert `val` to an appropriate type and return the result.
@@ -399,60 +386,6 @@ class DataElement(object):
             return repr(self.value)
         else:
             return str(self)
-
-
-class DeferredDataElement(DataElement):
-    """Subclass of DataElement where value is not read
-       into memory until needed"""
-
-    def __init__(self, tag, VR, fp, file_mtime, data_element_tell, length):
-        """Store basic info for the data element but value
-           will be read later
-
-        fp -- DicomFile object representing the dicom file being read
-        file_mtime -- last modification time on file, used to make sure
-           it has not changed since original read
-        data_element_tell -- file position at start of data element,
-           (not the start of the value part, but start of whole element)
-        """
-        warnings.warn(
-            "DeferredDataElement is deprecated and will be removed in "
-            "pydicom v1.3",
-            DeprecationWarning
-        )
-
-        if not isinstance(tag, BaseTag):
-            tag = Tag(tag)
-        self.tag = tag
-        self.VR = VR
-        self._value = None  # flag as unread
-
-        # Check current file object and save info needed for read later
-        self.fp_is_implicit_VR = fp.is_implicit_VR
-        self.fp_is_little_endian = fp.is_little_endian
-        self.filepath = fp.name
-        self.file_mtime = file_mtime
-        self.data_element_tell = data_element_tell
-        self.length = length
-
-    @property
-    def repval(self):
-        if self._value is None:
-            return "Deferred read: length %d" % self.length
-        else:
-            return DataElement.repval.fget(self)
-
-    @property
-    def value(self):
-        """Get method for 'value' property"""
-        # Must now read the value if haven't already
-        if self._value is None:
-            self.read_value()
-        return DataElement.value.fget(self)
-
-    @value.setter
-    def value(self, val):
-        DataElement.value.fset(self, val)
 
 
 msg = 'tag VR length value value_tell is_implicit_VR is_little_endian'

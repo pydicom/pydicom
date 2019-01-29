@@ -2,6 +2,8 @@
 """Functions related to writing DICOM data."""
 
 from __future__ import absolute_import
+
+import struct
 from struct import pack
 
 from pydicom import compat
@@ -73,8 +75,12 @@ def _correct_ambiguous_vr_element(elem, ds, is_little_endian):
         else:
             elem.VR = 'SS'
             byte_type = 'h'
-        elem.value = convert_numbers(elem.value, is_little_endian,
-                                     byte_type)
+
+        # Need to handle type check for elements with VM > 1
+        elem_value = elem.value if elem.VM == 1 else elem.value[0]
+        if not isinstance(elem_value, int):
+            elem.value = convert_numbers(elem.value, is_little_endian,
+                                         byte_type)
 
     # 'OB or OW' and dependent on WaveformBitsAllocated
     # (5400, 0110) Channel Minimum Value
@@ -97,8 +103,10 @@ def _correct_ambiguous_vr_element(elem, ds, is_little_endian):
         # As per PS3.3 C.11.1.1.1
         if ds.LUTDescriptor[0] == 1:
             elem.VR = 'US'
-            elem.value = convert_numbers(elem.value, is_little_endian,
-                                         'H')
+            elem_value = elem.value if elem.VM == 1 else elem.value[0]
+            if not isinstance(elem_value, int):
+                elem.value = convert_numbers(elem.value, is_little_endian,
+                                             'H')
         else:
             elem.VR = 'OW'
 
@@ -484,7 +492,16 @@ def write_data_element(fp, data_element, encodings=None):
     value_length = buffer.tell()
     if (not fp.is_implicit_VR and VR not in extra_length_VRs and
             not is_undefined_length):
-        fp.write_US(value_length)  # Explicit VR length field is only 2 bytes
+        try:
+            fp.write_US(value_length)  # Explicit VR length field is 2 bytes
+        except struct.error:
+            msg = ('The value for the data element {} exceeds the size '
+                   'of 64 kByte and cannot be written in an explicit transfer '
+                   'syntax. You can save it using Implicit Little Endian '
+                   'transfer syntax, or you have to truncate the value to not '
+                   'exceed the maximum size of 64 kByte.'
+                   .format(data_element.tag))
+            raise ValueError(msg)
     else:
         # write the proper length of the data_element in the length slot,
         # unless is SQ with undefined length.
@@ -498,13 +515,10 @@ def write_data_element(fp, data_element, encodings=None):
 
 def write_dataset(fp, dataset, parent_encoding=default_encoding):
     """Write a Dataset dictionary to the file. Return the total length written.
-
-    Attempt to correct ambiguous VR elements when explicit little/big
-      encoding Elements that can't be corrected will be returned unchanged.
     """
     _harmonize_properties(dataset, fp)
 
-    if not fp.is_implicit_VR and not dataset.is_original_encoding:
+    if not dataset.is_original_encoding:
         dataset = correct_ambiguous_vr(dataset, fp.is_little_endian)
 
     dataset_encoding = dataset.get('SpecificCharacterSet', parent_encoding)
@@ -658,36 +672,28 @@ def write_file_meta_info(fp, file_meta, enforce_standard=True):
         # Will be updated with the actual length later
         file_meta.FileMetaInformationGroupLength = 0
 
-    # Only used if FileMetaInformationGroupLength is present.
-    #   FileMetaInformationGroupLength has a VR of 'UL' and so has a value that
-    #   is 4 bytes fixed. The total length of when encoded as Explicit VR must
-    #   therefore be 12 bytes.
-    end_group_length_elem = fp.tell() + 12
-
-    # The 'is_little_endian' and 'is_implicit_VR' attributes will need to be
-    #   set correctly after the File Meta Info has been written.
-    fp.is_little_endian = True
-    fp.is_implicit_VR = False
-
-    # Write the File Meta Information Group elements to `fp`
-    write_dataset(fp, file_meta)
+    # Write the File Meta Information Group elements
+    # first write into a buffer to avoid seeking back, that can be
+    # expansive and is not allowed if writing into a zip file
+    buffer = DicomBytesIO()
+    buffer.is_little_endian = True
+    buffer.is_implicit_VR = False
+    write_dataset(buffer, file_meta)
 
     # If FileMetaInformationGroupLength is present it will be the first written
     #   element and we must update its value to the correct length.
     if 'FileMetaInformationGroupLength' in file_meta:
-        # Save end of file meta to go back to
-        end_of_file_meta = fp.tell()
-
         # Update the FileMetaInformationGroupLength value, which is the number
         #   of bytes from the end of the FileMetaInformationGroupLength element
-        #   to the end of all the File Meta Information elements
-        group_length = int(end_of_file_meta - end_group_length_elem)
-        file_meta.FileMetaInformationGroupLength = group_length
-        fp.seek(end_group_length_elem - 12)
-        write_data_element(fp, file_meta[0x00020000])
+        #   to the end of all the File Meta Information elements.
+        # FileMetaInformationGroupLength has a VR of 'UL' and so has a value
+        #   that is 4 bytes fixed. The total length of when encoded as
+        #   Explicit VR must therefore be 12 bytes.
+        file_meta.FileMetaInformationGroupLength = buffer.tell() - 12
+        buffer.seek(0)
+        write_data_element(buffer, file_meta[0x00020000])
 
-        # Return to end of the file meta, ready to write remainder of the file
-        fp.seek(end_of_file_meta)
+    fp.write(buffer.getvalue())
 
 
 def dcmwrite(filename, dataset, write_like_original=True):

@@ -18,7 +18,7 @@ except ImportError:
     HAVE_GDCM = False
     HAVE_GDCM_IN_MEMORY_SUPPORT = False
 
-import pydicom
+import pydicom.uid
 from pydicom import compat
 from pydicom.pixel_data_handlers.util import get_expected_length, pixel_dtype
 

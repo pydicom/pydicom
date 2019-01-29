@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """test cases for pydicom.filewriter module"""
-
+import tempfile
 from copy import deepcopy
 from datetime import date, datetime, time, timedelta
 from io import BytesIO
@@ -842,6 +842,27 @@ class TestCorrectAmbiguousVR(object):
                 ds.BeamSequence[0].BeamSequence[
                     0].SmallestValidPixelValue == 256)
         assert ds.BeamSequence[0].BeamSequence[0][0x00280104].VR == 'US'
+
+    def test_write_new_ambiguous(self):
+        """Regression test for #781"""
+        ds = Dataset()
+        ds.is_little_endian = True
+        ds.is_implicit_VR = True
+        ds.SmallestImagePixelValue = 0
+        assert ds[0x00280106].VR == 'US or SS'
+        ds.PixelRepresentation = 0
+        ds.LUTDescriptor = [1, 0]
+        assert ds[0x00283002].VR == 'US or SS'
+        ds.LUTData = 0
+        assert ds[0x00283006].VR == 'US or OW'
+        ds.save_as(DicomBytesIO())
+
+        assert ds[0x00280106].VR == 'US'
+        assert ds.SmallestImagePixelValue == 0
+        assert ds[0x00283006].VR == 'US'
+        assert ds.LUTData == 0
+        assert ds[0x00283002].VR == 'US'
+        assert ds.LUTDescriptor == [1, 0]
 
 
 class TestCorrectAmbiguousVRElement(object):
@@ -2407,4 +2428,46 @@ class TestWriteUndefinedLengthPixelData(object):
                                  is_undefined_length=True)
         with pytest.raises(ValueError, match='Pixel Data .+ must '
                                              'start with an item tag'):
+            write_data_element(self.fp, pixel_data)
+
+    def test_writing_to_gzip(self):
+        file_path = tempfile.NamedTemporaryFile(suffix='.dcm').name
+        ds = dcmread(rtplan_name)
+        import gzip
+        with gzip.open(file_path, 'w') as fp:
+            ds.save_as(fp, write_like_original=False)
+        with gzip.open(file_path, 'r') as fp:
+            ds_unzipped = dcmread(fp)
+            for elem_in, elem_out in zip(ds, ds_unzipped):
+                assert elem_in == elem_out
+
+    def test_writing_too_big_data_in_explicit_encoding(self):
+        """Data too large to be written in explicit transfer syntax."""
+        self.fp.is_little_endian = True
+        self.fp.is_implicit_VR = True
+        # make a multi-value larger than 64kB
+        single_value = b'123456.789012345'
+        large_value = b'\\'.join([single_value] * 4500)
+        # can be written with implicit transfer syntax,
+        # where the length field is 4 bytes long
+        pixel_data = DataElement(0x30040058, 'DS',
+                                 large_value,
+                                 is_undefined_length=False)
+        write_data_element(self.fp, pixel_data)
+
+        self.fp = DicomBytesIO()
+        self.fp.is_little_endian = True
+        self.fp.is_implicit_VR = False
+        # shall raise if trying to write it with explicit transfer syntax,
+        # where the length field is 2 bytes long
+        expected_message = (r'The value for the data element \(3004, 0058\) '
+                            r'exceeds the size of 64 kByte ')
+        with pytest.raises(ValueError, match=expected_message):
+            write_data_element(self.fp, pixel_data)
+
+        self.fp = DicomBytesIO()
+        self.fp.is_little_endian = False
+        self.fp.is_implicit_VR = False
+        # we expect the same behavior in Big Endian transfer syntax
+        with pytest.raises(ValueError, match=expected_message):
             write_data_element(self.fp, pixel_data)

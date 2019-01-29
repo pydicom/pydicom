@@ -100,7 +100,8 @@ elif [[ "$DISTRIB" == "pypy" ]]; then
     # install pip
     python -m ensurepip --upgrade
     if [[ "$NUMPY" == "true" ]]; then
-        python -m pip install cython numpy
+        # see #794 - avoid PyPy bug with newer NumPy versions
+        python -m pip install cython numpy==1.15.4
     fi
     python -m pip install nose nose-timer pytest pytest-cov codecov setuptools
 fi

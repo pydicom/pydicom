@@ -8,12 +8,18 @@ Dataset
 
 .. currentmodule:: pydicom
 
-:class:`dataset.Dataset` is the main object you will work with
-directly. Dataset is derived from Python's ``dict``, so it inherits (and
-overrides some of) the methods of ``dict``. In other words, it is a collection
-of key:value pairs, where the key is the DICOM (group,element) tag (as a
-Tag object, described below), and the value is a DataElement instance (also
-described below).
+:class:`dataset.Dataset` is the main object you will work with directly.
+Dataset wraps a dictionary, where the key is the DICOM (group,element)
+tag (as a Tag object, described below), and the value is a DataElement instance
+(also described below). It implements most of the methods of ``dict``, so
+that it mostly behaves like the wrapped ``dict``. This allows direct access
+to the data elements via the the tags, as shown below.
+
+.. note::
+
+  The iterator of a ``DataSet`` yields ``DataElement`` values, e.g. the
+  values of the dictionary, as opposed to the keys yielded by a ``dict``
+  iterator.
 
 A dataset could be created directly, but you will usually get one by reading
 an existing DICOM file::
@@ -73,7 +79,7 @@ usage example of data elements removal and assignation.
 
    To understand using :class:`sequence.Sequences` in pydicom, please refer to
    this object model:
-   :class:`dataset.Dataset` (derived from Python's ``dict``)
+   :class:`dataset.Dataset` (wraps a Python ``dict``)
        ---> contains DataElement instances
           --> the value of the data element can be one of:
 

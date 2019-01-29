@@ -1,0 +1,27 @@
+Version 1.3.0
+=================================
+
+Changelog
+---------
+
+Changes
+.......
+* ``dataelem.isMultiValue`` is deprecated and will be removed in v1.4.
+  Use ``dataelem.DataElement.VM`` instead.
+* ``dataelem.isStringOrStringList`` and ``dataelem.isString`` functions are
+  removed
+
+Enhancements
+............
+
+* Added possibility to write into zip file using gzip (:issue:`753`)
+
+Fixes
+.....
+
+* Raise exception with specific message if value is too large to be written
+  in explicit transfer syntax (:issue:`757`)
+* Do not derive `Dataset` from `dict` - fixes behavior in newer Python versions
+  (:issue:`765`)
+* Make hash for `PersonName3` behave as expected, make `PersonName` objects
+  immutable (:issue:`785`)
