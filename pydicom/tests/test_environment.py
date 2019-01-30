@@ -7,7 +7,7 @@ The current pydicom testing environments are as follows:
   * Python 2.7:
     * no additional packages
     * numpy
-    * numpy, gdcm
+    * numpy, gdcm (newest and v2.8.4)
     * numpy, pillow (jpg, jpg2k)
     * numpy, jpeg-ls
     * numpy, pillow (jpg, jpg2k), jpeg-ls
@@ -32,7 +32,7 @@ PYTHON_VERSION: 2.7, 3.4, 3.5, 3.6, 3.7
 NUMPY: true, false
 PILLOW: jpeg, both, false
 JPEG_LS: false, true
-GDCM: false, true
+GDCM: false, true, old
 """
 import os
 import platform
@@ -174,6 +174,12 @@ class TestBuilds(object):
         elif have_gdcm == 'false':
             with pytest.raises(ImportError):
                 import gdcm
+        elif have_gdcm == 'old':
+            try:
+                import gdcm
+            except ImportError:
+                pytest.fail("GDCM is 'old' but gdcm is not importable")
+            assert gdcm.Version_GetVersion() == '2.8.4'
         else:
             raise NotImplementedError(
                 "Unknown 'GDCM' value of '{}'".format(have_gdcm)

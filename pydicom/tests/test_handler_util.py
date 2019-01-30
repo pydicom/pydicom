@@ -18,7 +18,8 @@ from pydicom.pixel_data_handlers.util import (
     dtype_corrected_for_endianness,
     reshape_pixel_array,
     convert_color_space,
-    pixel_dtype
+    pixel_dtype,
+    get_expected_length
 )
 from pydicom.uid import (ExplicitVRLittleEndian,
                          UncompressedPixelTransferSyntaxes)
@@ -653,3 +654,105 @@ class TestNumpy_DtypeCorrectedForEndianness(object):
         with pytest.raises(ValueError,
                            match="attribute 'is_little_endian' has"):
             dtype_corrected_for_endianness(None, None)
+
+
+REFERENCE_LENGTH = [
+    # (frames, rows, cols, samples), bit depth, result in (bytes, pixels)
+    # No 'NumberOfFrames' in dataset
+    ((0, 0, 0, 0), 1, (0, 0)),
+    ((0, 1, 1, 1), 1, (1, 1)),  # 1 bit -> 1 byte
+    ((0, 1, 1, 3), 1, (1, 3)),  # 3 bits -> 1 byte
+    ((0, 1, 3, 3), 1, (2, 9)),  # 9 bits -> 2 bytes
+    ((0, 2, 2, 1), 1, (1, 4)),  # 4 bits -> 1 byte
+    ((0, 2, 4, 1), 1, (1, 8)),  # 8 bits -> 1 byte
+    ((0, 3, 3, 1), 1, (2, 9)),  # 9 bits -> 2 bytes
+    ((0, 512, 512, 1), 1, (32768, 262144)),  # Typical length
+    ((0, 512, 512, 3), 1, (98304, 786432)),
+    ((0, 0, 0, 0), 8, (0, 0)),
+    ((0, 1, 1, 1), 8, (1, 1)),  # Odd length
+    ((0, 9, 1, 1), 8, (9, 9)),  # Odd length
+    ((0, 1, 2, 1), 8, (2, 2)),  # Even length
+    ((0, 512, 512, 1), 8, (262144, 262144)),
+    ((0, 512, 512, 3), 8, (786432, 786432)),
+    ((0, 0, 0, 0), 16, (0, 0)),
+    ((0, 1, 1, 1), 16, (2, 1)),  # 16 bit data can't be odd length
+    ((0, 1, 2, 1), 16, (4, 2)),
+    ((0, 512, 512, 1), 16, (524288, 262144)),
+    ((0, 512, 512, 3), 16, (1572864, 786432)),
+    ((0, 0, 0, 0), 32, (0, 0)),
+    ((0, 1, 1, 1), 32, (4, 1)),  # 32 bit data can't be odd length
+    ((0, 1, 2, 1), 32, (8, 2)),
+    ((0, 512, 512, 1), 32, (1048576, 262144)),
+    ((0, 512, 512, 3), 32, (3145728, 786432)),
+    # NumberOfFrames odd
+    ((3, 0, 0, 0), 1, (0, 0)),
+    ((3, 1, 1, 1), 1, (1, 3)),
+    ((3, 1, 1, 3), 1, (2, 9)),
+    ((3, 1, 3, 3), 1, (4, 27)),
+    ((3, 2, 4, 1), 1, (3, 24)),
+    ((3, 2, 2, 1), 1, (2, 12)),
+    ((3, 3, 3, 1), 1, (4, 27)),
+    ((3, 512, 512, 1), 1, (98304, 786432)),
+    ((3, 512, 512, 3), 1, (294912, 2359296)),
+    ((3, 0, 0, 0), 8, (0, 0)),
+    ((3, 1, 1, 1), 8, (3, 3)),
+    ((3, 9, 1, 1), 8, (27, 27)),
+    ((3, 1, 2, 1), 8, (6, 6)),
+    ((3, 512, 512, 1), 8, (786432, 786432)),
+    ((3, 512, 512, 3), 8, (2359296, 2359296)),
+    ((3, 0, 0, 0), 16, (0, 0)),
+    ((3, 512, 512, 1), 16, (1572864, 786432)),
+    ((3, 512, 512, 3), 16, (4718592, 2359296)),
+    ((3, 0, 0, 0), 32, (0, 0)),
+    ((3, 512, 512, 1), 32, (3145728, 786432)),
+    ((3, 512, 512, 3), 32, (9437184, 2359296)),
+    # NumberOfFrames even
+    ((4, 0, 0, 0), 1, (0, 0)),
+    ((4, 1, 1, 1), 1, (1, 4)),
+    ((4, 1, 1, 3), 1, (2, 12)),
+    ((4, 1, 3, 3), 1, (5, 36)),
+    ((4, 2, 4, 1), 1, (4, 32)),
+    ((4, 2, 2, 1), 1, (2, 16)),
+    ((4, 3, 3, 1), 1, (5, 36)),
+    ((4, 512, 512, 1), 1, (131072, 1048576)),
+    ((4, 512, 512, 3), 1, (393216, 3145728)),
+    ((4, 0, 0, 0), 8, (0, 0)),
+    ((4, 512, 512, 1), 8, (1048576, 1048576)),
+    ((4, 512, 512, 3), 8, (3145728, 3145728)),
+    ((4, 0, 0, 0), 16, (0, 0)),
+    ((4, 512, 512, 1), 16, (2097152, 1048576)),
+    ((4, 512, 512, 3), 16, (6291456, 3145728)),
+    ((4, 0, 0, 0), 32, (0, 0)),
+    ((4, 512, 512, 1), 32, (4194304, 1048576)),
+    ((4, 512, 512, 3), 32, (12582912, 3145728)),
+]
+
+
+@pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
+class TestNumpy_GetExpectedLength(object):
+    """Tests for numpy_handler.get_expected_length."""
+    @pytest.mark.parametrize('shape, bits, length', REFERENCE_LENGTH)
+    def test_length_in_bytes(self, shape, bits, length):
+        """Test get_expected_length(ds, unit='bytes')."""
+        ds = Dataset()
+        ds.Rows = shape[1]
+        ds.Columns = shape[2]
+        ds.BitsAllocated = bits
+        if shape[0] != 0:
+            ds.NumberOfFrames = shape[0]
+        ds.SamplesPerPixel = shape[3]
+
+        assert length[0] == get_expected_length(ds, unit='bytes')
+
+    @pytest.mark.parametrize('shape, bits, length', REFERENCE_LENGTH)
+    def test_length_in_pixels(self, shape, bits, length):
+        """Test get_expected_length(ds, unit='pixels')."""
+        ds = Dataset()
+        ds.Rows = shape[1]
+        ds.Columns = shape[2]
+        ds.BitsAllocated = bits
+        if shape[0] != 0:
+            ds.NumberOfFrames = shape[0]
+        ds.SamplesPerPixel = shape[3]
+
+        assert length[1] == get_expected_length(ds, unit='pixels')

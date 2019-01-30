@@ -12,11 +12,15 @@ except ImportError:
 try:
     import gdcm
     HAVE_GDCM = True
+    HAVE_GDCM_IN_MEMORY_SUPPORT = hasattr(gdcm.DataElement,
+                                          'SetByteStringValue')
 except ImportError:
     HAVE_GDCM = False
+    HAVE_GDCM_IN_MEMORY_SUPPORT = False
 
 import pydicom.uid
 from pydicom import compat
+from pydicom.pixel_data_handlers.util import get_expected_length, pixel_dtype
 
 
 HANDLER_NAME = 'GDCM'
@@ -73,6 +77,101 @@ def supports_transfer_syntax(transfer_syntax):
     return transfer_syntax in SUPPORTED_TRANSFER_SYNTAXES
 
 
+def create_data_element(dicom_dataset):
+    """Create a gdcm.DataElement containing PixelData from a FileDataset
+
+    Parameters
+    ----------
+    dicom_dataset : FileDataset
+
+
+    Returns
+    -------
+    gdcm.DataElement
+        Converted PixelData element
+    """
+    data_element = gdcm.DataElement(gdcm.Tag(0x7fe0, 0x0010))
+    if dicom_dataset.file_meta.TransferSyntaxUID.is_compressed:
+        if getattr(dicom_dataset, 'NumberOfFrames', 1) > 1:
+            pixel_data_sequence = pydicom.encaps.decode_data_sequence(
+                dicom_dataset.PixelData)
+        else:
+            pixel_data_sequence = [
+                pydicom.encaps.defragment_data(dicom_dataset.PixelData)
+            ]
+
+        fragments = gdcm.SequenceOfFragments.New()
+        for pixel_data in pixel_data_sequence:
+            fragment = gdcm.Fragment()
+            fragment.SetByteStringValue(pixel_data)
+            fragments.AddFragment(fragment)
+        data_element.SetValue(fragments.__ref__())
+    else:
+        data_element.SetByteStringValue(dicom_dataset.PixelData)
+
+    return data_element
+
+
+def create_image(dicom_dataset, data_element):
+    """Create a gdcm.Image from a FileDataset and a gdcm.DataElement containing
+    PixelData (0x7fe0, 0x0010)
+
+    Parameters
+    ----------
+    dicom_dataset : FileDataset
+    data_element : gdcm.DataElement
+        DataElement containing PixelData
+
+    Returns
+    -------
+    gdcm.Image
+    """
+    image = gdcm.Image()
+    number_of_frames = getattr(dicom_dataset, 'NumberOfFrames', 1)
+    image.SetNumberOfDimensions(2 if number_of_frames == 1 else 3)
+    image.SetDimensions(
+        (dicom_dataset.Columns, dicom_dataset.Rows, number_of_frames))
+    image.SetDataElement(data_element)
+    pi_type = gdcm.PhotometricInterpretation.GetPIType(
+        dicom_dataset.PhotometricInterpretation)
+    image.SetPhotometricInterpretation(
+        gdcm.PhotometricInterpretation(pi_type))
+    ts_type = gdcm.TransferSyntax.GetTSType(
+        str.__str__(dicom_dataset.file_meta.TransferSyntaxUID))
+    image.SetTransferSyntax(gdcm.TransferSyntax(ts_type))
+    pixel_format = gdcm.PixelFormat(
+        dicom_dataset.SamplesPerPixel, dicom_dataset.BitsAllocated,
+        dicom_dataset.BitsStored, dicom_dataset.HighBit,
+        dicom_dataset.PixelRepresentation)
+    image.SetPixelFormat(pixel_format)
+    if 'PlanarConfiguration' in dicom_dataset:
+        image.SetPlanarConfiguration(dicom_dataset.PlanarConfiguration)
+    return image
+
+
+def create_image_reader(filename):
+    """Create a gdcm.ImageReader
+
+    Parameters
+    ----------
+    filename: str or unicode (Python 2)
+
+    Returns
+    -------
+    gdcm.ImageReader
+    """
+    image_reader = gdcm.ImageReader()
+    if compat.in_py2:
+        if isinstance(filename, unicode):
+            image_reader.SetFileName(
+                filename.encode(sys.getfilesystemencoding()))
+        else:
+            image_reader.SetFileName(filename)
+    else:
+        image_reader.SetFileName(filename)
+    return image_reader
+
+
 def get_pixeldata(dicom_dataset):
     """
     Use the GDCM package to decode the PixelData attribute
@@ -97,48 +196,19 @@ def get_pixeldata(dicom_dataset):
         if the decoded amount of data does not match the expected amount
     """
 
-    # read the file using GDCM
-    # FIXME this should just use dicom_dataset.PixelData
-    # instead of dicom_dataset.filename
-    #       but it is unclear how this should be achieved using GDCM
     if not HAVE_GDCM:
         msg = ("GDCM requires both the gdcm package and numpy "
                "and one or more could not be imported")
         raise ImportError(msg)
 
-    gdcm_image_reader = gdcm.ImageReader()
-    if compat.in_py2:
-        if isinstance(dicom_dataset.filename, unicode):
-            gdcm_image_reader.SetFileName(
-                dicom_dataset.filename.encode(sys.getfilesystemencoding()))
-        else:
-            gdcm_image_reader.SetFileName(dicom_dataset.filename)
+    if HAVE_GDCM_IN_MEMORY_SUPPORT:
+        gdcm_data_element = create_data_element(dicom_dataset)
+        gdcm_image = create_image(dicom_dataset, gdcm_data_element)
     else:
-        # python 3
-        gdcm_image_reader.SetFileName(dicom_dataset.filename)
-
-    if not gdcm_image_reader.Read():
-        raise TypeError("GDCM could not read DICOM image")
-
-    gdcm_image = gdcm_image_reader.GetImage()
-
-    # determine the correct numpy datatype
-    gdcm_numpy_typemap = {
-        gdcm.PixelFormat.INT8:     numpy.int8,
-        gdcm.PixelFormat.UINT8:    numpy.uint8,
-        gdcm.PixelFormat.UINT16:   numpy.uint16,
-        gdcm.PixelFormat.INT16:    numpy.int16,
-        gdcm.PixelFormat.UINT32:   numpy.uint32,
-        gdcm.PixelFormat.INT32:    numpy.int32,
-        gdcm.PixelFormat.FLOAT32:  numpy.float32,
-        gdcm.PixelFormat.FLOAT64:  numpy.float64
-    }
-    gdcm_pixel_format = gdcm_image.GetPixelFormat().GetScalarType()
-    if gdcm_pixel_format in gdcm_numpy_typemap:
-        numpy_dtype = gdcm_numpy_typemap[gdcm_pixel_format]
-    else:
-        raise TypeError('{0} is not a GDCM supported '
-                        'pixel format'.format(gdcm_pixel_format))
+        gdcm_image_reader = create_image_reader(dicom_dataset.filename)
+        if not gdcm_image_reader.Read():
+            raise TypeError("GDCM could not read DICOM image")
+        gdcm_image = gdcm_image_reader.GetImage()
 
     # GDCM returns char* as type str. Under Python 2 `str` are
     # byte arrays by default. Python 3 decodes this to
@@ -148,57 +218,34 @@ def get_pixeldata(dicom_dataset):
     # error handler configured.
     # Therefore, we can encode them back to their original bytearray
     # representation on Python 3 by using the same parameters.
-    pixel_bytearray = gdcm_image.GetBuffer()
-    if sys.version_info >= (3, 0):
-        pixel_bytearray = pixel_bytearray.encode("utf-8",
-                                                 "surrogateescape")
-
-    # if GDCM indicates that a byte swap is in order, make
-    #   sure to inform numpy as well
-    if gdcm_image.GetNeedByteSwap():
-        numpy_dtype = numpy_dtype.newbyteorder('S')
+    if compat.in_py2:
+        pixel_bytearray = gdcm_image.GetBuffer()
+    else:
+        pixel_bytearray = gdcm_image.GetBuffer().encode(
+            "utf-8", "surrogateescape")
 
     # Here we need to be careful because in some cases, GDCM reads a
     # buffer that is too large, so we need to make sure we only include
     # the first n_rows * n_columns * dtype_size bytes.
-
-    n_bytes = (dicom_dataset.Rows *
-               dicom_dataset.Columns *
-               numpy.dtype(numpy_dtype).itemsize)
-    try:
-        n_bytes *= dicom_dataset.NumberOfFrames
-    except Exception:
-        pass
-    try:
-        n_bytes *= dicom_dataset.SamplesPerPixel
-    except Exception:
-        pass
-
-    if len(pixel_bytearray) > n_bytes:
+    expected_length_bytes = get_expected_length(dicom_dataset)
+    if len(pixel_bytearray) > expected_length_bytes:
         # We make sure that all the bytes after are in fact zeros
-        padding = pixel_bytearray[n_bytes:]
+        padding = pixel_bytearray[expected_length_bytes:]
         if numpy.any(numpy.frombuffer(padding, numpy.byte)):
-            pixel_bytearray = pixel_bytearray[:n_bytes]
+            pixel_bytearray = pixel_bytearray[:expected_length_bytes]
         else:
             # We revert to the old behavior which should then result
             #   in a Numpy error later on.
             pass
 
+    numpy_dtype = pixel_dtype(dicom_dataset)
     pixel_array = numpy.frombuffer(pixel_bytearray, dtype=numpy_dtype)
 
-    length_of_pixel_array = pixel_array.nbytes
-    expected_length = dicom_dataset.Rows * dicom_dataset.Columns
-
-    expected_length *= dicom_dataset.get("NumberOfFrames", 1)
-    expected_length *= dicom_dataset.get("SamplesPerPixel", 1)
-
-    if dicom_dataset.BitsAllocated > 8:
-        expected_length *= (dicom_dataset.BitsAllocated // 8)
-
-    if length_of_pixel_array != expected_length:
+    expected_length_pixels = get_expected_length(dicom_dataset, 'pixels')
+    if pixel_array.size != expected_length_pixels:
         raise AttributeError("Amount of pixel data %d does "
                              "not match the expected data %d" %
-                             (length_of_pixel_array, expected_length))
+                             (pixel_array.size, expected_length_pixels))
 
     if should_change_PhotometricInterpretation_to_RGB(dicom_dataset):
         dicom_dataset.PhotometricInterpretation = "RGB"

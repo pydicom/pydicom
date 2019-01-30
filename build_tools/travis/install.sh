@@ -59,6 +59,8 @@ if [[ "$DISTRIB" == "conda" ]]; then
     fi
     if [[ "$GDCM" == "true" ]]; then
         conda install --yes -c conda-forge gdcm
+    elif [[ "$GDCM" == "old" ]]; then
+        conda install --yes -c conda-forge gdcm=2.8.4
     fi
     # Install nose-timer via pip
     pip install nose-timer codecov
