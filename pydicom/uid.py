@@ -250,9 +250,9 @@ def generate_uid(prefix=PYDICOM_ROOT_UID, entropy_srcs=None):
     ----------
     prefix : str or None
         The UID prefix to use when creating the UID. Default is the pydicom
-        root UID '1.2.826.0.1.3680043.8.498.'. If None then a value of '2.25.'
-        will be used (as described on `David Clunie's website
-        <http://www.dclunie.com/medical-image-faq/html/part2.html#UID>`_).
+        root UID '1.2.826.0.1.3680043.8.498.'. If None then a prefix of '2.25.'
+        will be used with the integer form of a UUID generated using the
+        UUID4 algorithm.
     entropy_srcs : list of str or None
         If a list of str, the prefix will be appended with a SHA512 hash of the
         list which means the result is deterministic and should make the
@@ -284,7 +284,9 @@ def generate_uid(prefix=PYDICOM_ROOT_UID, entropy_srcs=None):
     max_uid_len = 64
 
     if prefix is None:
-        prefix = '2.25.'
+        # UUID -> as 128-bit int -> max 39 characters long
+        return UID('2.25.{}'.format(uuid.uuid4().int))
+
 
     if len(prefix) > max_uid_len - 1:
         raise ValueError("The prefix must be less than 63 chars")

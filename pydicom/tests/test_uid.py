@@ -1,6 +1,8 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Test suite for uid.py"""
 
+import uuid
+
 import pytest
 
 from pydicom.uid import UID, generate_uid, PYDICOM_ROOT_UID, JPEGLSLossy
@@ -56,6 +58,17 @@ class TestGenerateUID(object):
         rf = '1.2.826.0.1.3680043.8.498.87507166259346337659265156363895084463'
         assert uid == rf
         assert len(uid) == 64
+
+    def test_none(self):
+        """Test generate_uid() with None as a prefix."""
+        uid = generate_uid(prefix=None)
+        # Check prefix
+        assert '2.25.' == uid[:5]
+        # Check UUID suffix
+        as_uuid = uuid.UUID(int=int(uid[5:]))
+        assert isinstance(as_uuid, uuid.UUID)
+        assert as_uuid.version == 4
+        assert as_uuid.variant == uuid.RFC_4122
 
 
 class TestUID(object):
