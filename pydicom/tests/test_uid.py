@@ -60,7 +60,7 @@ class TestGenerateUID(object):
         assert len(uid) == 64
 
     def test_none(self):
-        """Test generate_uid() with None as a prefix."""
+        """Test generate_uid(None)."""
         uid = generate_uid(prefix=None)
         # Check prefix
         assert '2.25.' == uid[:5]
@@ -69,6 +69,13 @@ class TestGenerateUID(object):
         assert isinstance(as_uuid, uuid.UUID)
         assert as_uuid.version == 4
         assert as_uuid.variant == uuid.RFC_4122
+
+    def test_none_iterate(self):
+        """Test generate_uid(None) generates valid UIDs."""
+        # Generate random UIDs, if a bad method then should eventually fail
+        for ii in range(100000):
+            uid = generate_uid(None)
+            assert uid.is_valid
 
 
 class TestUID(object):
