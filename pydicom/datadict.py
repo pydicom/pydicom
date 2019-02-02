@@ -38,7 +38,7 @@ def add_dict_entry(tag, VR, keyword, description, VM='1', is_retired=''):
 
     Notes
     ----
-    Dose not permanently update the dictionary,
+    Does not permanently update the dictionary,
     but only during run-time. Will replace an existing
     entry if the tag already exists in the dictionary.
 
@@ -57,6 +57,11 @@ def add_dict_entry(tag, VR, keyword, description, VM='1', is_retired=''):
         Usually leave as blank string (default).
         Set to 'Retired' if is a retired data element.
 
+    Raises
+    ------
+    ValueError
+        If the tag is a private tag.
+
     See Also
     --------
     pydicom.examples.add_dict_entry
@@ -67,8 +72,8 @@ def add_dict_entry(tag, VR, keyword, description, VM='1', is_retired=''):
     Examples
     --------
     >>> from pydicom import Dataset
-    >>> add_dict_entry(0x10011001, "UL", "TestOne", "Test One")
-    >>> add_dict_entry(0x10011002, "DS", "TestTwo", "Test Two", VM='3')
+    >>> add_dict_entry(0x10021001, "UL", "TestOne", "Test One")
+    >>> add_dict_entry(0x10021002, "DS", "TestTwo", "Test Two", VM='3')
     >>> ds = Dataset()
     >>> ds.TestOne = 'test'
     >>> ds.TestTwo = ['1', '2', '3']
@@ -79,7 +84,7 @@ def add_dict_entry(tag, VR, keyword, description, VM='1', is_retired=''):
 
 
 def add_dict_entries(new_entries_dict):
-    """Update pydicom's DICOM dictionary with new entries.
+    """Update pydicom's DICOM dictionary with new non-private entries.
 
     Parameters
     ----------
@@ -87,6 +92,11 @@ def add_dict_entries(new_entries_dict):
         Dictionary of form:
         {tag: (VR, VM, description, is_retired, keyword),...}
         where parameters are as described in add_dict_entry
+
+    Raises
+    ------
+    ValueError
+        If one of the entries is a private tag.
 
     See Also
     --------
@@ -97,18 +107,23 @@ def add_dict_entries(new_entries_dict):
     --------
     >>> from pydicom import Dataset
     >>> new_dict_items = {
-    ...        0x10011001: ('UL', '1', "Test One", '', 'TestOne'),
-    ...        0x10011002: ('DS', '3', "Test Two", '', 'TestTwo'),
+    ...        0x10021001: ('UL', '1', "Test One", '', 'TestOne'),
+    ...        0x10021002: ('DS', '3', "Test Two", '', 'TestTwo'),
     ... }
     >>> add_dict_entries(new_dict_items)
     >>> ds = Dataset()
     >>> ds.TestOne = 'test'
     >>> ds.TestTwo = ['1', '2', '3']
 
-    >>> add_dict_entry(0x10011001, "UL", "TestOne", "Test One")
+    >>> add_dict_entry(0x10021001, "UL", "TestOne", "Test One")
     >>> ds = Dataset()
     >>> ds.TestOne = 'test'
     """
+
+    if any([BaseTag(tag).is_private for tag in new_entries_dict]):
+        raise ValueError(
+            'Private tags cannot be added using "add_dict_entries" - '
+            'use "add_private_dict_entries" instead')
 
     # Update the dictionary itself
     DicomDictionary.update(new_entries_dict)
@@ -117,6 +132,84 @@ def add_dict_entries(new_entries_dict):
     new_names_dict = dict([(val[4], tag)
                            for tag, val in new_entries_dict.items()])
     keyword_dict.update(new_names_dict)
+
+
+def add_private_dict_entry(private_creator, tag, VR, description, VM='1'):
+    """Update pydicom's private DICOM tag dictionary with a new entry.
+
+    Notes
+    ----
+    Behaves like `add_dict_entry`, only for a private tag entry.
+
+    Parameters
+    ----------
+    private_creator : str
+        The private creator for the new entry.
+    tag : int
+        The tag number for the new dictionary entry. Note that the
+        2 high bytes of the element part of the tag are ignored.
+    VR : str
+        DICOM value representation
+    description : str
+        The descriptive name used in printing the entry.
+    VM : str, optional
+        DICOM value multiplicity. If not specified, then '1' is used.
+
+    Raises
+    ------
+    ValueError
+        If the tag is a non-private tag.
+
+    See Also
+    --------
+    add_private_dict_entries
+        Update multiple values at once.
+    """
+    new_dict_val = (VR, VM, description)
+    add_private_dict_entries(private_creator, {tag: new_dict_val})
+
+
+def add_private_dict_entries(private_creator, new_entries_dict):
+    """Update pydicom's private DICOM tag dictionary with new entries.
+
+    Parameters
+    ----------
+    private_creator: str
+        The private creator for all entries in new_entries_dict
+    new_entries_dict : dict
+        Dictionary of form:
+        {tag: (VR, VM, description),...}
+        where parameters are as described in add_private_dict_entry
+
+    Raises
+    ------
+    ValueError
+        If one of the entries is a non-private tag.
+
+    See Also
+    --------
+    add_private_dict_entry
+        Function to add a single entry to the private tag dictionary.
+
+    Examples
+    --------
+    >>> new_dict_items = {
+    ...        0x00410001: ('UL', '1', "Test One"),
+    ...        0x00410002: ('DS', '3', "Test Two", '3'),
+    ... }
+    >>> add_private_dict_entries("ACME LTD 1.2", new_dict_items)
+    >>> add_private_dict_entry("ACME LTD 1.3", 0x00410001, "US", "Test Three")
+    """
+
+    if not all([BaseTag(tag).is_private for tag in new_entries_dict]):
+        raise ValueError(
+            'Non-private tags cannot be added using "add_private_dict_entries"'
+            ' - use "add_dict_entries" instead')
+
+    new_entries = {'{:04x}xx{:02x}'.format(tag >> 16, tag & 0xff): value
+                   for tag, value in new_entries_dict.items()}
+    private_dictionaries.setdefault(
+        private_creator, {}).update(new_entries)
 
 
 def get_entry(tag):
