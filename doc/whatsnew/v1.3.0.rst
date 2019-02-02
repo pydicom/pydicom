@@ -25,3 +25,5 @@ Fixes
   (:issue:`765`)
 * Make hash for `PersonName3` behave as expected, make `PersonName` objects
   immutable (:issue:`785`)
+* Fixed `generate_uid()` returning non-conformant UIDs when `prefix=None`
+  (:issue:`788`)

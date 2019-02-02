@@ -250,19 +250,19 @@ def generate_uid(prefix=PYDICOM_ROOT_UID, entropy_srcs=None):
     ----------
     prefix : str or None
         The UID prefix to use when creating the UID. Default is the pydicom
-        root UID '1.2.826.0.1.3680043.8.498.'. If None then a value of '2.25.'
-        will be used (as described on `David Clunie's website
-        <http://www.dclunie.com/medical-image-faq/html/part2.html#UID>`_).
+        root UID '1.2.826.0.1.3680043.8.498.'. If None then a prefix of '2.25.'
+        will be used with the integer form of a UUID generated using the
+        UUID4 algorithm.
     entropy_srcs : list of str or None
-        If a list of str, the prefix will be appended with a SHA512 hash of the
-        list which means the result is deterministic and should make the
-        original data unrecoverable. If None random data will be used
-        (default).
+        If `prefix` is not None, then the prefix will be appended with a
+        SHA512 hash of the list which means the result is deterministic and
+        should make the original data unrecoverable. If None random data will
+        be used (default).
 
     Returns
     -------
     pydicom.uid.UID
-        A 64 character DICOM UID.
+        A DICOM UID of up to 64 characters.
 
     Raises
     ------
@@ -275,17 +275,17 @@ def generate_uid(prefix=PYDICOM_ROOT_UID, entropy_srcs=None):
     >>> generate_uid()
     1.2.826.0.1.3680043.8.498.22463838056059845879389038257786771680
     >>> generate_uid(prefix=None)
-    2.25.12586835699909622925962004639368649121731805922235633382942
+    2.25.167161297070865690102504091919570542144
     >>> generate_uid(entropy_srcs=['lorem', 'ipsum'])
     1.2.826.0.1.3680043.8.498.87507166259346337659265156363895084463
     >>> generate_uid(entropy_srcs=['lorem', 'ipsum'])
     1.2.826.0.1.3680043.8.498.87507166259346337659265156363895084463
     """
-    max_uid_len = 64
-
     if prefix is None:
-        prefix = '2.25.'
+        # UUID -> as 128-bit int -> max 39 characters long
+        return UID('2.25.{}'.format(uuid.uuid4().int))
 
+    max_uid_len = 64
     if len(prefix) > max_uid_len - 1:
         raise ValueError("The prefix must be less than 63 chars")
     if not re.match(RE_VALID_UID_PREFIX, prefix):
