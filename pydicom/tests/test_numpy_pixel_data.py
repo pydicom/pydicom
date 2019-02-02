@@ -98,6 +98,8 @@ EXPB_8_3_2F = get_testdata_files("SC_rgb_expb_2frame.dcm")[0]
 IMPL_16_1_1F = get_testdata_files("MR_small_implicit.dcm")[0]
 EXPL_16_1_1F = get_testdata_files("MR_small.dcm")[0]
 EXPB_16_1_1F = get_testdata_files("MR_small_expb.dcm")[0]
+# Pixel Data with 128 bytes trailing padding
+EXPL_16_1_1F_PAD = get_testdata_files("MR_small_padded.dcm")[0]
 # 16/12, 1 sample/pixel, 10 frame
 EXPL_16_1_10F = get_testdata_files("emri_small.dcm")[0]
 EXPB_16_1_10F = get_testdata_files("emri_small_big_endian.dcm")[0]
@@ -715,6 +717,45 @@ class TestNumpy_NumpyHandler(object):
             assert (422, 319, 361) == tuple(arr[0, 31:34])
             assert (366, 363, 322) == tuple(arr[31, :3])
             assert (1369, 1129, 862) == tuple(arr[-1, -3:])
+            # Last pixel
+            assert 862 == arr[-1, -1]
+
+    def test_little_16bit_1sample_1frame_padded(self):
+        """Test with padded little 16-bit, 1 sample/pixel, 1 frame."""
+        # Check all little endian syntaxes
+        ds = dcmread(EXPL_16_1_1F_PAD)
+        assert ds.file_meta.TransferSyntaxUID == ExplicitVRLittleEndian
+        assert ds.BitsAllocated == 16
+        assert ds.SamplesPerPixel == 1
+        assert ds.PixelRepresentation == 1
+        nr_frames = getattr(ds, 'NumberOfFrames', 1)
+        assert nr_frames == 1
+
+        # Default to 1 if element not present
+
+        # Odd sized data is padded by a final 0x00 byte
+        size = ds.Rows * ds.Columns * nr_frames * 16 / 8 * ds.SamplesPerPixel
+        # Has excess padding
+        assert len(ds.PixelData) > size + size % 2
+
+        msg = (
+            r"The length of the pixel data in the dataset \(8320 bytes\) "
+            r"indicates it contains excess padding. 128 bytes will be "
+            r"removed from the end of the data"
+        )
+        with pytest.warns(UserWarning, match=msg):
+            arr = ds.pixel_array
+
+        assert (64, 64) == arr.shape
+        assert arr.dtype == 'int16'
+
+        assert arr.flags.writeable
+
+        assert (422, 319, 361) == tuple(arr[0, 31:34])
+        assert (366, 363, 322) == tuple(arr[31, :3])
+        assert (1369, 1129, 862) == tuple(arr[-1, -3:])
+        # Last pixel
+        assert 862 == arr[-1, -1]
 
     def test_little_16bit_1sample_10frame(self):
         """Test pixel_array for little 16-bit, 1 sample/pixel, 10 frame."""
@@ -953,11 +994,6 @@ class TestNumpy_GetPixelData(object):
             r"corrupted or there may be an issue with the pixel data handler."
         )
         with pytest.raises(ValueError, match=msg):
-            get_pixeldata(ds)
-
-        # Too long
-        ds.PixelData += b'\x00\x00'
-        with pytest.raises(ValueError, match=r"480001 vs. 480000 bytes"):
             get_pixeldata(ds)
 
     def test_change_photometric_interpretation(self):
