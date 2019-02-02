@@ -722,7 +722,6 @@ class TestNumpy_NumpyHandler(object):
 
     def test_little_16bit_1sample_1frame_padded(self):
         """Test with padded little 16-bit, 1 sample/pixel, 1 frame."""
-        # Check all little endian syntaxes
         ds = dcmread(EXPL_16_1_1F_PAD)
         assert ds.file_meta.TransferSyntaxUID == ExplicitVRLittleEndian
         assert ds.BitsAllocated == 16
@@ -730,8 +729,6 @@ class TestNumpy_NumpyHandler(object):
         assert ds.PixelRepresentation == 1
         nr_frames = getattr(ds, 'NumberOfFrames', 1)
         assert nr_frames == 1
-
-        # Default to 1 if element not present
 
         # Odd sized data is padded by a final 0x00 byte
         size = ds.Rows * ds.Columns * nr_frames * 16 / 8 * ds.SamplesPerPixel
