@@ -10,10 +10,15 @@ Changes
   Use ``dataelem.DataElement.VM`` instead.
 * ``dataelem.isStringOrStringList`` and ``dataelem.isString`` functions are
   removed
+* ``datadict.add_dict_entry`` and ``datadict.add_dict_entries`` now raise if
+  trying to add a private tag
 
 Enhancements
 ............
 
+* Added ``datadict.add_private_dict_entry`` and
+  ``datadict.add_private_dict_entries`` to add custom private tags
+  (:issue:`799`)
 * Added possibility to write into zip file using gzip (:issue:`753`)
 
 Fixes

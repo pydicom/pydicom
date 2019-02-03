@@ -291,11 +291,16 @@
 Use <code class="docutils literal notranslate"><span class="pre">dataelem.DataElement.VM</span></code> instead.</li>
 <li><code class="docutils literal notranslate"><span class="pre">dataelem.isStringOrStringList</span></code> and <code class="docutils literal notranslate"><span class="pre">dataelem.isString</span></code> functions are
 removed</li>
+<li><code class="docutils literal notranslate"><span class="pre">datadict.add_dict_entry</span></code> and <code class="docutils literal notranslate"><span class="pre">datadict.add_dict_entries</span></code> now raise if
+trying to add a private tag</li>
 </ul>
 </div>
 <div class="section" id="enhancements">
 <h4>Enhancements<a class="headerlink" href="#enhancements" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
+<li>Added <code class="docutils literal notranslate"><span class="pre">datadict.add_private_dict_entry</span></code> and
+<code class="docutils literal notranslate"><span class="pre">datadict.add_private_dict_entries</span></code> to add custom private tags
+(<a class="reference external" href="https://github.com/pydicom/pydicom/issues/799">#799</a>)</li>
 <li>Added possibility to write into zip file using gzip (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/753">#753</a>)</li>
 </ul>
 </div>
