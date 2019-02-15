@@ -52,8 +52,8 @@ class DicomDir(FileDataset):
             dataset,
             preamble,
             file_meta,
-            is_implicit_VR=True,
-            is_little_endian=True)
+            is_implicit_VR=is_implicit_VR,
+            is_little_endian=is_little_endian)
         self.parse_records()
 
     def parse_records(self):
