@@ -197,6 +197,9 @@ class Dataset(object):
         self.is_little_endian = None
         self.is_implicit_VR = None
 
+        # the parent data set, if this dataset is a sequence item
+        self.parent_dataset = None
+
     def __enter__(self):
         """Method invoked on entry to a with statement."""
         return self
@@ -555,7 +558,11 @@ class Dataset(object):
             # Try the base class attribute getter (fix for issue 332)
             return super(Dataset, self).__getattribute__(name)
         else:
-            return self[tag].value
+            data_elem = self[tag]
+            value = data_elem.value
+            if data_elem.VR == 'SQ':
+                value.dataset = self
+            return value
 
     @property
     def _character_set(self):
@@ -1165,6 +1172,8 @@ class Dataset(object):
                 # don't have this tag yet->create the data_element instance
                 VR = dictionary_VR(tag)
                 data_element = DataElement(tag, VR, value)
+                if VR == 'SQ':
+                    data_element.dataset = self
             else:
                 # already have this data_element, just changing its value
                 data_element = self[tag]

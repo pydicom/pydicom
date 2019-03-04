@@ -69,6 +69,9 @@ def _correct_ambiguous_vr_element(elem, ds, is_little_endian):
         # US if PixelRepresentation value is 0x0000, else SS
         #   For references, see the list at
         #   https://github.com/darcymason/pydicom/pull/298
+        # PixelRepresentation is usually set in the root dataset
+        while 'PixelRepresentation' not in ds and ds.parent_dataset:
+            ds = ds.parent_dataset
         if ds.PixelRepresentation == 0:
             elem.VR = 'US'
             byte_type = 'H'

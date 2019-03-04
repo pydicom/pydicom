@@ -33,3 +33,4 @@ Fixes
 * Fixed `generate_uid()` returning non-conformant UIDs when `prefix=None`
   (:issue:`788`)
 * Avoid exception if reading from empty file (:issue:`810`)
+* Correctly handle elements with ambiguous VR in sequence items (:issue:`804`)
