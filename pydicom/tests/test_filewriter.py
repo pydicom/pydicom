@@ -874,7 +874,7 @@ class TestCorrectAmbiguousVR(object):
         ds.ModalityLUTSequence[0].LUTDescriptor = [0, 0, 16]
         ds.ModalityLUTSequence[0].LUTExplanation = None
         ds.ModalityLUTSequence[0].ModalityLUTType = 'US'  # US = unspecified
-        ds.ModalityLUTSequence[0].LUTData = b'\x0000\x149a\x1f1c\c2637'
+        ds.ModalityLUTSequence[0].LUTData = b'\x0000\x149a\x1f1c\xc2637'
 
         ds.is_little_endian = True
         ds.is_implicit_VR = False
@@ -894,7 +894,7 @@ class TestCorrectAmbiguousVR(object):
         ds.ModalityLUTSequence[0].LUTDescriptor = [0, 0, 16]
         ds.ModalityLUTSequence[0].LUTExplanation = None
         ds.ModalityLUTSequence[0].ModalityLUTType = 'US'  # US = unspecified
-        ds.ModalityLUTSequence[0].LUTData = b'\x0000\x149a\x1f1c\c2637'
+        ds.ModalityLUTSequence[0].LUTData = b'\x0000\x149a\x1f1c\xc2637'
 
         ds.is_little_endian = True
         ds.is_implicit_VR = True
