@@ -32,3 +32,4 @@ Fixes
   immutable (:issue:`785`)
 * Fixed `generate_uid()` returning non-conformant UIDs when `prefix=None`
   (:issue:`788`)
+* Avoid exception if reading from empty file (:issue:`810`)

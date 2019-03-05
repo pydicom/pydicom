@@ -689,7 +689,8 @@ def read_partial(fileobj, stop_when=None, defer_size=None,
 
     # Check to see if there's anything left to read
     peek = fileobj.read(1)
-    fileobj.seek(-1, 1)
+    if peek != b'':
+        fileobj.seek(-1, 1)
 
     # `filobj` should be positioned at the start of the dataset by this point.
     # Ensure we have appropriate values for `is_implicit_VR` and
