@@ -672,6 +672,14 @@ class ReaderTests(unittest.TestCase):
         self.assertEqual(ds.file_meta, Dataset())
         self.assertEqual(ds[:], Dataset())
 
+    def test_empty_file(self):
+        """Test reading no elements from file produces empty Dataset"""
+        with tempfile.NamedTemporaryFile() as f:
+            ds = dcmread(f, force=True)
+            self.assertTrue(ds.preamble is None)
+            self.assertEqual(ds.file_meta, Dataset())
+            self.assertEqual(ds[:], Dataset())
+
     def test_dcmread_does_not_raise(self):
         """Test that reading from DicomBytesIO does not raise on EOF.
         Regression test for #358."""
