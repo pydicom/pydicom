@@ -33,3 +33,5 @@ Fixes
 * Fixed `generate_uid()` returning non-conformant UIDs when `prefix=None`
   (:issue:`788`)
 * Avoid exception if reading from empty file (:issue:`810`)
+* An invalid encoding is now replaced by the default encoding, if
+  ``config.enforce_valid_values`` is not set (:issue:`815`)
