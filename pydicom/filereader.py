@@ -347,6 +347,59 @@ def data_element_generator(fp,
                                      is_implicit_VR, is_little_endian)
 
 
+def _is_implicit_vr(fp, implicit_vr_is_assumed, is_little_endian, stop_when):
+    """Check if the real VR is explicit or implicit.
+
+    Parameters
+    ----------
+    fp : an opened file object
+    implicit_vr_is_assumed : boolean
+        True if implicit VR is assumed.
+        If this does not match with the real transfer syntax, a user warning
+        will be issued.
+    is_little_endian : boolean
+        True if file has little endian transfer syntax.
+        Needed to interpret the first tag.
+    stop_when : None, optional
+        Optional call_back function which can terminate reading.
+        Needed to check if the next tag still belongs to the read dataset.
+
+    Returns
+    -------
+    True if implicit VR is used, False otherwise.
+    """
+    tag_bytes = fp.read(4)
+    vr = fp.read(2)
+    if len(vr) < 2:
+        return implicit_vr_is_assumed
+
+    # it is sufficient to check if the VR is in valid ASCII range, as it is
+    # extremely unlikely that the tag length accidentally has such a
+    # representation - this would need the first tag to be longer than 16kB
+    # (e.g. it should be > 0x4141 = 16705 bytes)
+    vr1 = ord(vr[0]) if in_py2 else vr[0]
+    vr2 = ord(vr[1]) if in_py2 else vr[1]
+    found_implicit = not (0x40 < vr1 < 0x5B and 0x40 < vr2 < 0x5B)
+
+    if found_implicit != implicit_vr_is_assumed:
+        # first check if the tag still belongs to the dataset if stop_when
+        # is given - if not, the dataset is empty and we just return
+        endian_chr = "<" if is_little_endian else ">"
+        tag = TupleTag(unpack(endian_chr + "HH", tag_bytes))
+        if stop_when is not None and stop_when(tag, vr, 0):
+            return found_implicit
+
+        # got to the real problem - warn or raise depending on config
+        found_vr = 'implicit' if found_implicit else 'explicit'
+        expected_vr = 'implicit' if not found_implicit else 'explicit'
+        message = ('Expected {0} VR, but found {1} VR - using {1} VR for '
+                   'reading'.format(expected_vr, found_vr))
+        if config.enforce_valid_values:
+            raise InvalidDicomError(message)
+        warnings.warn(message, UserWarning)
+    return found_implicit
+
+
 def read_dataset(fp, is_implicit_VR, is_little_endian, bytelength=None,
                  stop_when=None, defer_size=None,
                  parent_encoding=default_encoding, specific_tags=None):
@@ -384,12 +437,15 @@ def read_dataset(fp, is_implicit_VR, is_little_endian, bytelength=None,
         A collection (dictionary) of Dicom `DataElement` instances.
     """
     raw_data_elements = dict()
-    fpStart = fp.tell()
+    fp_start = fp.tell()
+    is_implicit_VR = _is_implicit_vr(
+        fp, is_implicit_VR, is_little_endian, stop_when)
+    fp.seek(fp_start)
     de_gen = data_element_generator(fp, is_implicit_VR, is_little_endian,
                                     stop_when, defer_size, parent_encoding,
                                     specific_tags)
     try:
-        while (bytelength is None) or (fp.tell() - fpStart < bytelength):
+        while (bytelength is None) or (fp.tell() - fp_start < bytelength):
             raw_data_element = next(de_gen)
             # Read data elements. Stop on some errors, but return what was read
             tag = raw_data_element.tag

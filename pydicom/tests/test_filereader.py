@@ -13,6 +13,7 @@ import unittest
 import pytest
 
 import pydicom.config
+from pydicom import config
 from pydicom.dataset import Dataset, FileDataset
 from pydicom.data import get_testdata_files
 from pydicom.filereader import dcmread, read_dataset
@@ -660,8 +661,9 @@ class ReaderTests(unittest.TestCase):
                       b'\x31\x30\x30\x30\x38\x2e\x31\x2e'
                       b'\x32\x00')
         fp = BytesIO(bytestream)
-        ds = dcmread(fp, force=True)
-        self.assertTrue('TransferSyntaxUID' in ds.file_meta)
+        with pytest.warns(UserWarning):
+            ds = dcmread(fp, force=True)
+        assert 'TransferSyntaxUID' in ds.file_meta
 
     def test_no_dataset(self):
         """Test reading no elements or preamble produces empty Dataset"""
@@ -695,6 +697,62 @@ class ReaderTests(unittest.TestCase):
             pass
         except EOFError:
             self.fail('Unexpected EOFError raised')
+
+
+class TestIncorrectVR(object):
+    def setup(self):
+        config.enforce_valid_values = False
+        self.ds_explicit = BytesIO(
+            b'\x08\x00\x05\x00CS\x0a\x00ISO_IR 100'  # SpecificCharacterSet
+            b'\x08\x00\x20\x00DA\x08\x0020000101'  # StudyDate
+        )
+        self.ds_implicit = BytesIO(
+            b'\x08\x00\x05\x00\x0a\x00\x00\x00ISO_IR 100'
+            b'\x08\x00\x20\x00\x08\x00\x00\x0020000101'
+        )
+
+    def teardown(self):
+        config.enforce_valid_values = False
+
+    def test_implicit_vr_expected_explicit_used(self):
+        msg = ('Expected implicit VR, but found explicit VR - '
+               'using explicit VR for reading')
+
+        with pytest.warns(UserWarning, match=msg):
+            ds = read_dataset(
+                self.ds_explicit, is_implicit_VR=True, is_little_endian=True
+            )
+        assert ds.SpecificCharacterSet == 'ISO_IR 100'
+        assert ds.StudyDate == '20000101'
+
+    def test_implicit_vr_expected_explicit_used_strict(self):
+        config.enforce_valid_values = True
+        msg = ('Expected implicit VR, but found explicit VR - '
+               'using explicit VR for reading')
+
+        with pytest.raises(InvalidDicomError, match=msg):
+            read_dataset(
+                self.ds_explicit, is_implicit_VR=True, is_little_endian=True)
+
+    def test_explicit_vr_expected_implicit_used(self):
+        msg = ('Expected explicit VR, but found implicit VR - '
+               'using implicit VR for reading')
+
+        with pytest.warns(UserWarning, match=msg):
+            ds = read_dataset(
+                self.ds_implicit, is_implicit_VR=False, is_little_endian=True
+            )
+        assert ds.SpecificCharacterSet == 'ISO_IR 100'
+        assert ds.StudyDate == '20000101'
+
+    def test_explicit_vr_expected_implicit_used_strict(self):
+        config.enforce_valid_values = True
+        msg = ('Expected explicit VR, but found implicit VR - '
+               'using implicit VR for reading')
+        with pytest.raises(InvalidDicomError, match=msg):
+            read_dataset(
+                self.ds_implicit, is_implicit_VR=False, is_little_endian=True
+            )
 
 
 class TestUnknownVR(object):
@@ -742,16 +800,19 @@ class TestUnknownVR(object):
     )
     def test_fail_decode_msg(self, vr_bytes, str_output):
         """Regression test for #791."""
+        # start the dataset with a valid tag (SpecificCharacterSet),
+        # as the first tag is used to check the VR
         ds = read_dataset(
             BytesIO(
-                b'\x08\x00\x01\x00' +
+                b'\x08\x00\x05\x00CS\x0a\x00ISO_IR 100'
+                b'\x08\x00\x06\x00' +
                 vr_bytes +
                 b'\x00\x00\x00\x08\x00\x49'
             ),
             False, True
         )
         msg = (
-            r"Unknown Value Representation '{}' in tag \(0008, 0001\)"
+            r"Unknown Value Representation '{}' in tag \(0008, 0006\)"
             .format(str_output)
         )
         with pytest.raises(NotImplementedError, match=msg):
