@@ -43,7 +43,8 @@ class Sequence(MultiValue):
         if isinstance(iterable, Dataset):
             raise TypeError('The Sequence constructor requires an iterable')
 
-        self._dataset = None
+        # the parent dataset
+        self._parent = None
 
         # If no inputs are provided, we create an empty Sequence
         if not iterable:
@@ -53,22 +54,22 @@ class Sequence(MultiValue):
         super(Sequence, self).__init__(validate_dataset, iterable)
 
     @property
-    def dataset(self):
+    def parent(self):
         """Return the parent dataset."""
-        return self._dataset
+        return self._parent
 
-    @dataset.setter
-    def dataset(self, value):
+    @parent.setter
+    def parent(self, value):
         """Set the parent dataset and pass it to all items."""
-        if value != self._dataset:
-            self._dataset = value
+        if value != self._parent:
+            self._parent = value
             for item in self._list:
-                item.parent_dataset = self._dataset
+                item.parent = self._parent
 
     def __setitem__(self, i, val):
         """Set the parent dataset to the new sequence item"""
         super(Sequence, self).__setitem__(i, val)
-        val.parent_dataset = self._dataset
+        val.parent = self._parent
 
     def __str__(self):
         """String description of the Sequence."""

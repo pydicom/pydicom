@@ -198,7 +198,7 @@ class Dataset(object):
         self.is_implicit_VR = None
 
         # the parent data set, if this dataset is a sequence item
-        self.parent_dataset = None
+        self.parent = None
 
     def __enter__(self):
         """Method invoked on entry to a with statement."""
@@ -561,7 +561,9 @@ class Dataset(object):
             data_elem = self[tag]
             value = data_elem.value
             if data_elem.VR == 'SQ':
-                value.dataset = self
+                # let a sequence know its parent dataset, as sequence items
+                # may need parent dataset tags to resolve ambiguous tags
+                value.parent = self
             return value
 
     @property
@@ -1173,7 +1175,7 @@ class Dataset(object):
                 VR = dictionary_VR(tag)
                 data_element = DataElement(tag, VR, value)
                 if VR == 'SQ':
-                    data_element.dataset = self
+                    data_element.parent = self
             else:
                 # already have this data_element, just changing its value
                 data_element = self[tag]
