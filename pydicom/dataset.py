@@ -1175,6 +1175,9 @@ class Dataset(object):
                 VR = dictionary_VR(tag)
                 data_element = DataElement(tag, VR, value)
                 if VR == 'SQ':
+                    # let a sequence know its parent dataset to pass it
+                    # to its items, who may need parent dataset tags
+                    # to resolve ambiguous tags
                     data_element.parent = self
             else:
                 # already have this data_element, just changing its value
