@@ -864,6 +864,47 @@ class TestCorrectAmbiguousVR(object):
         assert ds[0x00283002].VR == 'US'
         assert ds.LUTDescriptor == [1, 0]
 
+    def test_ambiguous_element_in_sequence_explicit(self):
+        """Test that writing a sequence with an ambiguous element
+        as explicit transfer syntax works."""
+        # regression test for #804
+        ds = Dataset()
+        ds.PixelRepresentation = 0
+        ds.ModalityLUTSequence = [Dataset()]
+        ds.ModalityLUTSequence[0].LUTDescriptor = [0, 0, 16]
+        ds.ModalityLUTSequence[0].LUTExplanation = None
+        ds.ModalityLUTSequence[0].ModalityLUTType = 'US'  # US = unspecified
+        ds.ModalityLUTSequence[0].LUTData = b'\x0000\x149a\x1f1c\xc2637'
+
+        ds.is_little_endian = True
+        ds.is_implicit_VR = False
+        fp = BytesIO()
+        ds.save_as(fp, write_like_original=True)
+
+        ds = dcmread(fp, force=True)
+        assert 'US' == ds.ModalityLUTSequence[0][0x00283002].VR
+
+    def test_ambiguous_element_in_sequence_implicit(self):
+        """Test that reading a sequence with an ambiguous element
+        from a file with implicit transfer syntax works."""
+        # regression test for #804
+        ds = Dataset()
+        ds.PixelRepresentation = 0
+        ds.ModalityLUTSequence = [Dataset()]
+        ds.ModalityLUTSequence[0].LUTDescriptor = [0, 0, 16]
+        ds.ModalityLUTSequence[0].LUTExplanation = None
+        ds.ModalityLUTSequence[0].ModalityLUTType = 'US'  # US = unspecified
+        ds.ModalityLUTSequence[0].LUTData = b'\x0000\x149a\x1f1c\xc2637'
+
+        ds.is_little_endian = True
+        ds.is_implicit_VR = True
+        fp = BytesIO()
+        ds.save_as(fp, write_like_original=True)
+        ds = dcmread(fp, force=True)
+        # we first have to access the value to trigger correcting the VR
+        assert 16 == ds.ModalityLUTSequence[0].LUTDescriptor[2]
+        assert 'US' == ds.ModalityLUTSequence[0][0x00283002].VR
+
 
 class TestCorrectAmbiguousVRElement(object):
     """Test filewriter.correct_ambiguous_vr_element"""
