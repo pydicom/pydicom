@@ -949,6 +949,44 @@ class DatasetTests(unittest.TestCase):
         assert 'SOPInstanceUID' in ds.get_item(slice('0x00080018',
                                                      '0x00080019'))
 
+    def test_get_private_item(self):
+        ds = Dataset()
+        ds.add_new(0x00080005, 'CS', 'ISO_IR 100')
+        ds.add_new(0x00090010, 'LO', 'ACME Ltd 1.0')
+        ds.add_new(0x00091001, 'SH', 'Version1')
+        ds.add_new(0x00090011, 'LO', 'ACME Ltd 2.0')
+        ds.add_new(0x00091101, 'SH', 'Version2')
+        ds.add_new(0x00091102, 'US', 2)
+
+        with pytest.raises(ValueError, match='Tag must be private'):
+            ds.get_private_item(0x00080005, 'ACME Ltd 1.0')
+        with pytest.raises(ValueError,
+                           match='Private creator must have a value'):
+            ds.get_private_item(0x00090010, '')
+        item = ds.get_private_item(0x00090001, 'ACME Ltd 1.0')
+        assert 'Version1' == item.value
+        item = ds.get_private_item(0x00090001, 'ACME Ltd 2.0')
+        assert 'Version2' == item.value
+
+        with pytest.raises(KeyError):
+            ds.get_private_item(0x00090002, 'ACME Ltd 1.0')
+        item = ds.get_private_item(0x00090002, 'ACME Ltd 2.0')
+        assert 2 == item.value
+
+    def test_add_new_private_tag(self):
+        ds = Dataset()
+        ds.add_new(0x00080005, 'CS', 'ISO_IR 100')
+        ds.add_new(0x00090010, 'LO', 'ACME Ltd 1.0')
+        ds.add_new(0x00090011, 'LO', 'ACME Ltd 2.0')
+
+        with pytest.raises(ValueError, match='Tag must be private'):
+            ds.add_new(0x00080005, 'CS', 'ISO_IR 101', 'ACME Ltd 1.0')
+        ds.add_new(0x00090001, 'SH', 'Version2', 'ACME Ltd 2.0')
+        assert 'Version2' == ds[0x00091101].value
+        ds.add_new(0x00090001, 'SH', 'Version3', 'ACME Ltd 3.0')
+        assert 'ACME Ltd 3.0' == ds[0x00090012].value
+        assert 'Version3' == ds[0x00091201].value
+
     def test_is_original_encoding(self):
         """Test Dataset.write_like_original"""
         ds = Dataset()

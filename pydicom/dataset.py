@@ -221,7 +221,7 @@ class Dataset(object):
         """
         self[data_element.tag] = data_element
 
-    def add_new(self, tag, VR, value):
+    def add_new(self, tag, VR, value, private_creator=None):
         """Add a DataElement to the Dataset.
 
         Parameters
@@ -239,7 +239,28 @@ class Dataset(object):
             * a list or tuple with all strings or all numbers
             * a multi-value string with backslash separator
             * for a sequence DataElement, an empty list or list of Dataset
+        private_creator : str or None
+            The private creator for the tag. If given, the tag must be a
+            private tag. If the private creator tag does not exist,
+            a new one is created.
+            Note that the 2 high order digits of the element are ignored if
+            `private_creator` is given - they will be replaced by the correct
+            value for the private slot.
+
+        Raises
+        ------
+        ValueError
+            If `private_creator` is not empty and `tag` is not a private tag.
         """
+        if private_creator is not None:
+            tag = Tag(tag)
+            if not tag.is_private:
+                raise ValueError(
+                    'Tag must be private if private creator is given')
+            slot = self._get_private_slot(
+                tag.group, private_creator, create=True)
+            tag = Tag(tag.group, (tag.element & 0xff) | slot)
+
         data_element = DataElement(tag, VR, value)
         # use data_element.tag since DataElement verified it
         self._dict[data_element.tag] = data_element
@@ -652,6 +673,99 @@ class Dataset(object):
                     self[tag], self, data_elem[6])
 
         return self._dict.get(tag)
+
+    def _get_private_slot(self, group, private_creator, create=False):
+        """Return the slot for the given tag and private creator.
+
+        If `create` is set an the private creator does not exist,
+        the private creator tag is added.
+        Note: We ignore the unrealistic case that no free slot is
+        available.
+
+        Parameters
+        ----------
+        group : 32 bit int
+            The group of the private tag to be found.
+
+        private_creator : str
+            The private creator string associated with the tag.
+
+        create : bool
+            If `True` and `private_creator` does not exist, a new private
+            creator tag is added at the next free slot.
+
+        Returns
+        -------
+        32 bit int
+            Element base for the given tag (the last 2 digits are always 0)
+
+        Raises
+        ------
+        KeyError
+            If the private creator tag is not found in the given group and
+            the `create` parameter is not set.
+        """
+        for element in range(0x10, 0x100):
+            private_creator_tag = Tag(group, element)
+            if private_creator_tag not in self._dict:
+                if create:
+                    self.add_new(private_creator_tag, 'LO', private_creator)
+                    return element << 8
+                else:
+                    break
+            if self._dict[private_creator_tag].value == private_creator:
+                return element << 8
+        raise KeyError('Private creator {} not found'.format(private_creator))
+
+    def get_private_item(self, key, private_creator):
+        """Return the data element for the given private tag.
+
+        This is analogous to `__getitem__`, but only for private tags.
+        This allows to find the private tag for the correct private creator
+        without the need to add the tag to the private dictionary first.
+
+        Parameters
+        ----------
+        key
+            The DICOM (group, element) tag in any form accepted by
+            `pydicom.tag.Tag` such as [0x0009, 0x0010], (0x9, 0x10),
+            0x00090010, etc.
+            Note that the 2 high order digits of the element are ignored -
+            they will be replaced by the correct value for the private slot.
+
+        private_creator : str
+            The private creator for the tag. Must match the private creator
+            for the tag to be returned.
+
+        vr : str
+            The value representation of the private tag, or 'UN' if not given.
+
+        Returns
+        -------
+        pydicom.dataelem.DataElement
+
+        Raises
+        ------
+        ValueError
+            If `tag` is not a private tag or `private_creator` is empty.
+        KeyError
+            If the private creator tag is not found in the given group.
+            If the private tag is not found.
+        """
+        if isinstance(key, BaseTag):
+            tag = key
+        else:
+            tag = Tag(key)
+
+        if not tag.is_private:
+            raise ValueError('Tag must be private')
+
+        if not private_creator:
+            raise ValueError('Private creator must have a value')
+
+        slot = self._get_private_slot(tag.group, private_creator)
+        real_tag = Tag(tag.group, (tag.element & 0xff) | slot)
+        return self.__getitem__(real_tag)
 
     def get_item(self, key):
         """Return the raw data element if possible.
