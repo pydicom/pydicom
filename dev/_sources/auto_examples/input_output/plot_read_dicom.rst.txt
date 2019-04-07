@@ -15,9 +15,6 @@ This example illustrates how to open a DICOM file, print some dataset
 information, and show it using matplotlib.
 
 
-
-
-
 .. image:: /auto_examples/input_output/images/sphx_glr_plot_read_dicom_001.png
     :class: sphx-glr-single-img
 
@@ -45,7 +42,7 @@ information, and show it using matplotlib.
 |
 
 
-.. code-block:: python
+.. code-block:: default
 
 
     # authors : Guillaume Lemaitre <g.lemaitre58@gmail.com>
@@ -88,7 +85,10 @@ information, and show it using matplotlib.
     plt.imshow(dataset.pixel_array, cmap=plt.cm.bone)
     plt.show()
 
-**Total running time of the script:** ( 0 minutes  0.015 seconds)
+
+.. rst-class:: sphx-glr-timing
+
+   **Total running time of the script:** ( 0 minutes  0.112 seconds)
 
 
 .. _sphx_glr_download_auto_examples_input_output_plot_read_dicom.py:

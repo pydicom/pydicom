@@ -13,10 +13,7 @@ Show a dicom file using hierarchical tree
 
 Show a dicom file using a hierarchical tree in a graphical window.
 
-
-
-
-.. code-block:: python
+.. code-block:: default
 
 
     # authors : Guillaume Lemaitre <g.lemaitre58@gmail.com>
@@ -96,7 +93,10 @@ Show a dicom file using a hierarchical tree in a graphical window.
         RunTree(root, sys.argv[1])
         root.mainloop()
 
-**Total running time of the script:** ( 0 minutes  0.000 seconds)
+
+.. rst-class:: sphx-glr-timing
+
+   **Total running time of the script:** ( 0 minutes  0.000 seconds)
 
 
 .. _sphx_glr_download_auto_examples_dicomtree.py:

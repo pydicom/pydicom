@@ -185,8 +185,8 @@
            <div itemprop="articleBody">
             
   <div class="sphx-glr-download-link-note admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">Click <a class="reference internal" href="#sphx-glr-download-auto-examples-input-output-plot-printing-dataset-py"><span class="std std-ref">here</span></a> to download the full example code</p>
+<p class="admonition-title">Note</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-input-output-plot-printing-dataset-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
 <div class="sphx-glr-example-title section" id="format-the-output-of-the-data-set-printing">
 <span id="sphx-glr-auto-examples-input-output-plot-printing-dataset-py"></span><h1>Format the output of the data set printing<a class="headerlink" href="#format-the-output-of-the-data-set-printing" title="Permalink to this headline">¶</a></h1>
@@ -270,15 +270,15 @@
 <div class="line-block">
 <div class="line"><br /></div>
 </div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># authors : Guillaume Lemaitre &lt;g.lemaitre58@gmail.com&gt;</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># authors : Guillaume Lemaitre &lt;g.lemaitre58@gmail.com&gt;</span>
 <span class="c1"># license : MIT</span>
 
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">print_function</span>
 
 <span class="kn">import</span> <span class="nn">pydicom</span>
-<span class="kn">from</span> <span class="nn">pydicom.data</span> <span class="kn">import</span> <span class="n">get_testdata_files</span>
+<span class="kn">from</span> <span class="nn">pydicom.data</span> <span class="k">import</span> <span class="n">get_testdata_files</span>
 
-<span class="k">print</span><span class="p">(</span><span class="vm">__doc__</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="vm">__doc__</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">myprint</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
@@ -293,18 +293,18 @@
 
     <span class="k">for</span> <span class="n">data_element</span> <span class="ow">in</span> <span class="n">dataset</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">data_element</span><span class="o">.</span><span class="n">VR</span> <span class="o">==</span> <span class="s2">&quot;SQ&quot;</span><span class="p">:</span>   <span class="c1"># a sequence</span>
-            <span class="k">print</span><span class="p">(</span><span class="n">indent_string</span><span class="p">,</span> <span class="n">data_element</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">indent_string</span><span class="p">,</span> <span class="n">data_element</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">sequence_item</span> <span class="ow">in</span> <span class="n">data_element</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
                 <span class="n">myprint</span><span class="p">(</span><span class="n">sequence_item</span><span class="p">,</span> <span class="n">indent</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-                <span class="k">print</span><span class="p">(</span><span class="n">next_indent_string</span> <span class="o">+</span> <span class="s2">&quot;---------&quot;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">next_indent_string</span> <span class="o">+</span> <span class="s2">&quot;---------&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">data_element</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">dont_print</span><span class="p">:</span>
-                <span class="k">print</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;&lt;item not printed -- in the &quot;don&#39;t print&quot; list&gt;&quot;&quot;&quot;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;&lt;item not printed -- in the &quot;don&#39;t print&quot; list&gt;&quot;&quot;&quot;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">repr_value</span> <span class="o">=</span> <span class="nb">repr</span><span class="p">(</span><span class="n">data_element</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">repr_value</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">50</span><span class="p">:</span>
                     <span class="n">repr_value</span> <span class="o">=</span> <span class="n">repr_value</span><span class="p">[:</span><span class="mi">50</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;...&quot;</span>
-                <span class="k">print</span><span class="p">(</span><span class="s2">&quot;{0:s} {1:s} = {2:s}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">indent_string</span><span class="p">,</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0:s}</span><span class="s2"> </span><span class="si">{1:s}</span><span class="s2"> = </span><span class="si">{2:s}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">indent_string</span><span class="p">,</span>
                                                    <span class="n">data_element</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
                                                    <span class="n">repr_value</span><span class="p">))</span>
 
@@ -315,12 +315,14 @@
 <span class="n">myprint</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
 </pre></div>
 </div>
-<p><strong>Total running time of the script:</strong> ( 0 minutes  0.005 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.029 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-input-output-plot-printing-dataset-py">
 <div class="sphx-glr-download docutils container">
-<a class="reference download internal" download="" href="../../_downloads/5e72d065ba444186bca97bca3a66e74d/plot_printing_dataset.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_printing_dataset.py</span></code></a></div>
+<p><a class="reference download internal" download="" href="../../_downloads/5e72d065ba444186bca97bca3a66e74d/plot_printing_dataset.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_printing_dataset.py</span></code></a></p>
+</div>
 <div class="sphx-glr-download docutils container">
-<a class="reference download internal" download="" href="../../_downloads/2d703d7c09b673bc43ff1a7a53b4c9dc/plot_printing_dataset.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_printing_dataset.ipynb</span></code></a></div>
+<p><a class="reference download internal" download="" href="../../_downloads/2d703d7c09b673bc43ff1a7a53b4c9dc/plot_printing_dataset.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_printing_dataset.ipynb</span></code></a></p>
+</div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
 </div>

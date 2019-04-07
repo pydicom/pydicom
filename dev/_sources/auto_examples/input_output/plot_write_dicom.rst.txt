@@ -17,9 +17,6 @@ have to change UIDs to valid values and add all required DICOM data elements.
 
 
 
-
-
-
 .. rst-class:: sphx-glr-script-out
 
  Out:
@@ -28,21 +25,21 @@ have to change UIDs to valid values and add all required DICOM data elements.
 
     Setting file meta information...
     Setting dataset values...
-    Writing test file /tmp/tmpk2pwo53o.dcm
+    Writing test file /tmp/tmpr0btxu40.dcm
     File saved.
-    Writing test file as Big Endian Explicit VR /tmp/tmp5y55zj1i.dcm
-    Load file /tmp/tmpk2pwo53o.dcm ...
-    (0008, 0023) Content Date                        DA: '20190307'
-    (0008, 0033) Content Time                        TM: '005008.137350'
+    Writing test file as Big Endian Explicit VR /tmp/tmpc2eox2qh.dcm
+    Load file /tmp/tmpr0btxu40.dcm ...
+    (0008, 0023) Content Date                        DA: '20190407'
+    (0008, 0033) Content Time                        TM: '215433.971069'
     (0010, 0010) Patient's Name                      PN: 'Test^Firstname'
     (0010, 0020) Patient ID                          LO: '123456'
-    Remove file /tmp/tmpk2pwo53o.dcm ...
-    Load file /tmp/tmp5y55zj1i.dcm ...
-    (0008, 0023) Content Date                        DA: '20190307'
-    (0008, 0033) Content Time                        TM: '005008.137350'
+    Remove file /tmp/tmpr0btxu40.dcm ...
+    Load file /tmp/tmpc2eox2qh.dcm ...
+    (0008, 0023) Content Date                        DA: '20190407'
+    (0008, 0033) Content Time                        TM: '215433.971069'
     (0010, 0010) Patient's Name                      PN: 'Test^Firstname'
     (0010, 0020) Patient ID                          LO: '123456'
-    Remove file /tmp/tmp5y55zj1i.dcm ...
+    Remove file /tmp/tmpc2eox2qh.dcm ...
 
 
 
@@ -50,7 +47,7 @@ have to change UIDs to valid values and add all required DICOM data elements.
 |
 
 
-.. code-block:: python
+.. code-block:: default
 
 
     # authors : Guillaume Lemaitre <g.lemaitre58@gmail.com>
@@ -119,7 +116,10 @@ have to change UIDs to valid values and add all required DICOM data elements.
         print('Remove file {} ...'.format(filename))
         os.remove(filename)
 
-**Total running time of the script:** ( 0 minutes  0.005 seconds)
+
+.. rst-class:: sphx-glr-timing
+
+   **Total running time of the script:** ( 0 minutes  0.027 seconds)
 
 
 .. _sphx_glr_download_auto_examples_input_output_plot_write_dicom.py:

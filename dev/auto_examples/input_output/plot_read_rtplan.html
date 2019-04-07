@@ -185,8 +185,8 @@
            <div itemprop="articleBody">
             
   <div class="sphx-glr-download-link-note admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">Click <a class="reference internal" href="#sphx-glr-download-auto-examples-input-output-plot-read-rtplan-py"><span class="std std-ref">here</span></a> to download the full example code</p>
+<p class="admonition-title">Note</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-input-output-plot-read-rtplan-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
 <div class="sphx-glr-example-title section" id="read-rtplan-dicom-and-list-information">
 <span id="sphx-glr-auto-examples-input-output-plot-read-rtplan-py"></span><h1>Read RTPLAN DICOM and list information<a class="headerlink" href="#read-rtplan-dicom-and-list-information" title="Permalink to this headline">¶</a></h1>
@@ -199,26 +199,26 @@
 <div class="line-block">
 <div class="line"><br /></div>
 </div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># authors : Guillaume Lemaitre &lt;g.lemaitre58@gmail.com&gt;</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># authors : Guillaume Lemaitre &lt;g.lemaitre58@gmail.com&gt;</span>
 <span class="c1"># license : MIT</span>
 
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">print_function</span>
 
 <span class="kn">import</span> <span class="nn">pydicom</span>
-<span class="kn">from</span> <span class="nn">pydicom.data</span> <span class="kn">import</span> <span class="n">get_testdata_files</span>
+<span class="kn">from</span> <span class="nn">pydicom.data</span> <span class="k">import</span> <span class="n">get_testdata_files</span>
 
-<span class="k">print</span><span class="p">(</span><span class="vm">__doc__</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="vm">__doc__</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">list_beams</span><span class="p">(</span><span class="n">plan_dataset</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Summarizes the RTPLAN beam information in the dataset.&quot;&quot;&quot;</span>
-    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;{name:^13s} {num:^8s} {gantry:^8s} {ssd:^11s}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;</span><span class="si">{name:^13s}</span><span class="s2"> </span><span class="si">{num:^8s}</span><span class="s2"> </span><span class="si">{gantry:^8s}</span><span class="s2"> </span><span class="si">{ssd:^11s}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
         <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Beam name&quot;</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="s2">&quot;Number&quot;</span><span class="p">,</span> <span class="n">gantry</span><span class="o">=</span><span class="s2">&quot;Gantry&quot;</span><span class="p">,</span> <span class="n">ssd</span><span class="o">=</span><span class="s2">&quot;SSD (cm)&quot;</span><span class="p">)]</span>
     <span class="k">for</span> <span class="n">beam</span> <span class="ow">in</span> <span class="n">plan_dataset</span><span class="o">.</span><span class="n">BeamSequence</span><span class="p">:</span>
         <span class="n">cp0</span> <span class="o">=</span> <span class="n">beam</span><span class="o">.</span><span class="n">ControlPointSequence</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">SSD</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">cp0</span><span class="o">.</span><span class="n">SourceToSurfaceDistance</span> <span class="o">/</span> <span class="mi">10</span><span class="p">)</span>
-        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;{b.BeamName:^13s} {b.BeamNumber:8d} &quot;</span>
-                     <span class="s2">&quot;{gantry:8.1f} {ssd:8.1f}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">b</span><span class="o">=</span><span class="n">beam</span><span class="p">,</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{b.BeamName:^13s}</span><span class="s2"> </span><span class="si">{b.BeamNumber:8d}</span><span class="s2"> &quot;</span>
+                     <span class="s2">&quot;</span><span class="si">{gantry:8.1f}</span><span class="s2"> </span><span class="si">{ssd:8.1f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">b</span><span class="o">=</span><span class="n">beam</span><span class="p">,</span>
                                                        <span class="n">gantry</span><span class="o">=</span><span class="n">cp0</span><span class="o">.</span><span class="n">GantryAngle</span><span class="p">,</span>
                                                        <span class="n">ssd</span><span class="o">=</span><span class="n">SSD</span><span class="p">))</span>
     <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
@@ -226,15 +226,17 @@
 
 <span class="n">filename</span> <span class="o">=</span> <span class="n">get_testdata_files</span><span class="p">(</span><span class="s1">&#39;rtplan.dcm&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 <span class="n">dataset</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">dcmread</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="n">list_beams</span><span class="p">(</span><span class="n">dataset</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">list_beams</span><span class="p">(</span><span class="n">dataset</span><span class="p">))</span>
 </pre></div>
 </div>
-<p><strong>Total running time of the script:</strong> ( 0 minutes  0.002 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.023 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-input-output-plot-read-rtplan-py">
 <div class="sphx-glr-download docutils container">
-<a class="reference download internal" download="" href="../../_downloads/59f45ce68dc890cbdf6aa01b3ef7a4f4/plot_read_rtplan.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_read_rtplan.py</span></code></a></div>
+<p><a class="reference download internal" download="" href="../../_downloads/59f45ce68dc890cbdf6aa01b3ef7a4f4/plot_read_rtplan.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_read_rtplan.py</span></code></a></p>
+</div>
 <div class="sphx-glr-download docutils container">
-<a class="reference download internal" download="" href="../../_downloads/41f69db51ce2447a6b0b6e11e741570a/plot_read_rtplan.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_read_rtplan.ipynb</span></code></a></div>
+<p><a class="reference download internal" download="" href="../../_downloads/41f69db51ce2447a6b0b6e11e741570a/plot_read_rtplan.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_read_rtplan.ipynb</span></code></a></p>
+</div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
 </div>

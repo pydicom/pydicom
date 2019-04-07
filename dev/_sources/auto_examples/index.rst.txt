@@ -1,5 +1,9 @@
 :orphan:
 
+
+
+.. _sphx_glr_auto_examples:
+
 .. _general_examples:
 
 General examples
@@ -72,6 +76,10 @@ Somewhere to start
 
     <div style='clear:both'></div>
 
+
+
+.. _sphx_glr_auto_examples_image_processing:
+
 .. _image_processing_examples:
 
 Image processing
@@ -84,7 +92,7 @@ be applied to DICOM images.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example shows how to downsize an MR image from :math:`512 	imes 512` to :math:`64 	imes 64...">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example shows how to downsize an MR image from :math:`512  imes 512` to :math:`64       im...">
 
 .. only:: html
 
@@ -124,6 +132,10 @@ be applied to DICOM images.
 .. raw:: html
 
     <div style='clear:both'></div>
+
+
+
+.. _sphx_glr_auto_examples_input_output:
 
 .. _input_ouput_examples:
 
@@ -236,6 +248,10 @@ These examples illustrate the use of pydicom to read DICOM data.
 .. raw:: html
 
     <div style='clear:both'></div>
+
+
+
+.. _sphx_glr_auto_examples_metadata_processing:
 
 .. _metadata_processing_examples:
 

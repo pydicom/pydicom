@@ -180,53 +180,53 @@
 <div class="section" id="major-changes">
 <h3>Major changes<a class="headerlink" href="#major-changes" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li>Renamed Attribute class and related modules to !DataElement. Old code will
+<li><p>Renamed Attribute class and related modules to !DataElement. Old code will
 continue to work until pydicom 1.0, but with a !DeprecationWarning (issue22,
-r72, r73)</li>
-<li>Added support for character sets through Specific Character Set (0008,0005),
+r72, r73)</p></li>
+<li><p>Added support for character sets through Specific Character Set (0008,0005),
 using Python unicode. Thus foreign languages can display names in Greek,
 Japanese, Chinese etc characters in environments which support unicode
-(demonstrated in dicomtree.py example using Tkinter GUI) (r64, r65)</li>
+(demonstrated in dicomtree.py example using Tkinter GUI) (r64, r65)</p></li>
 </ul>
 </div>
 <div class="section" id="other-enhancements">
 <h3>Other Enhancements<a class="headerlink" href="#other-enhancements" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li>Added support for auto-completion of dataset elements in ipython; also all
-environments using Python 2.6 (r69, r70)</li>
-<li>Added __iter__() to Dataset so returns data elements in DICOM order with “for
-data_elem in dataset:” (r68)</li>
-<li>Added dicomtree.py example program showing a DICOM file in a GUI window
-(Tkinter/Tix).</li>
-<li>Added !PersonName class to parse components of names more easily (r55)</li>
-<li>Added UID class to handle UID values. Name rather than UID number shown,
-UID_dictionary used (r51).</li>
-<li>Code tested under Python 2.6</li>
-<li>Added !DataElement.name property; synonym for !DataElement.description()
-function</li>
+<li><p>Added support for auto-completion of dataset elements in ipython; also all
+environments using Python 2.6 (r69, r70)</p></li>
+<li><p>Added __iter__() to Dataset so returns data elements in DICOM order with “for
+data_elem in dataset:” (r68)</p></li>
+<li><p>Added dicomtree.py example program showing a DICOM file in a GUI window
+(Tkinter/Tix).</p></li>
+<li><p>Added !PersonName class to parse components of names more easily (r55)</p></li>
+<li><p>Added UID class to handle UID values. Name rather than UID number shown,
+UID_dictionary used (r51).</p></li>
+<li><p>Code tested under Python 2.6</p></li>
+<li><p>Added !DataElement.name property; synonym for !DataElement.description()
+function</p></li>
 </ul>
 </div>
 <div class="section" id="bug-fixes">
 <h3>Bug Fixes<a class="headerlink" href="#bug-fixes" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li>Fixed issue27, sequence with a single empty item read incorrectly</li>
-<li>Fixed bug that read_OW did not handle !UndefinedLength (r50)</li>
-<li>Fixed bugs in example files anonymize.py, !DicomInfo.py, and dicomtree.py
-(r51)</li>
-<li>Fixed issue33, VR=UN being split on backslash (r70)</li>
-<li>Fixed issue18, util directory not installed (r45)</li>
+<li><p>Fixed issue27, sequence with a single empty item read incorrectly</p></li>
+<li><p>Fixed bug that read_OW did not handle !UndefinedLength (r50)</p></li>
+<li><p>Fixed bugs in example files anonymize.py, !DicomInfo.py, and dicomtree.py
+(r51)</p></li>
+<li><p>Fixed issue33, VR=UN being split on backslash (r70)</p></li>
+<li><p>Fixed issue18, util directory not installed (r45)</p></li>
 </ul>
 </div>
 <div class="section" id="other">
 <h3>Other<a class="headerlink" href="#other" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li>Added example file myprint.py – shows how to custom format DICOM file
-information (r67)</li>
-<li>Reorganized test files and added various new tests</li>
-<li>added preliminary work on encapsulated data (r50)</li>
-<li>added some simple files to view or work with pixel data (r46)</li>
-<li>Dataset.!PixelDataArray() NumPy array changed to property Dataset.!PixelArray</li>
-<li>changed to setuptools for packaging rather than distutils</li>
+<li><p>Added example file myprint.py – shows how to custom format DICOM file
+information (r67)</p></li>
+<li><p>Reorganized test files and added various new tests</p></li>
+<li><p>added preliminary work on encapsulated data (r50)</p></li>
+<li><p>added some simple files to view or work with pixel data (r46)</p></li>
+<li><p>Dataset.!PixelDataArray() NumPy array changed to property Dataset.!PixelArray</p></li>
+<li><p>changed to setuptools for packaging rather than distutils</p></li>
 </ul>
 </div>
 </div>

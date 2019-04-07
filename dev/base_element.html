@@ -204,8 +204,8 @@ tag (as a Tag object, described below), and the value is a DataElement instance
 that it mostly behaves like the wrapped <code class="docutils literal notranslate"><span class="pre">dict</span></code>. This allows direct access
 to the data elements via the the tags, as shown below.</p>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">The iterator of a <code class="docutils literal notranslate"><span class="pre">DataSet</span></code> yields <code class="docutils literal notranslate"><span class="pre">DataElement</span></code> values, e.g. the
+<p class="admonition-title">Note</p>
+<p>The iterator of a <code class="docutils literal notranslate"><span class="pre">DataSet</span></code> yields <code class="docutils literal notranslate"><span class="pre">DataElement</span></code> values, e.g. the
 values of the dictionary, as opposed to the keys yielded by a <code class="docutils literal notranslate"><span class="pre">dict</span></code>
 iterator.</p>
 </div>
@@ -233,8 +233,8 @@ an existing DICOM file:</p>
 </pre></div>
 </div>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">You can also view DICOM files in a collapsible tree using
+<p class="admonition-title">Note</p>
+<p>You can also view DICOM files in a collapsible tree using
 the example program <a class="reference external" href="https://github.com/pydicom/contrib-pydicom/blob/master/plotting-visualization/dcm_qt_tree.py">dcm_qt_tree.py</a>.</p>
 </div>
 <p>You can access specific data elements by name (DICOM ‘keyword’) or by DICOM tag
@@ -260,22 +260,21 @@ that key if it exists.</p>
 <p>See <a class="reference internal" href="auto_examples/metadata_processing/plot_anonymize.html#sphx-glr-auto-examples-metadata-processing-plot-anonymize-py"><span class="std std-ref">Anonymize DICOM data</span></a> for a
 usage example of data elements removal and assignation.</p>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
+<p class="admonition-title">Note</p>
 <p>To understand using <code class="xref py py-class docutils literal notranslate"><span class="pre">sequence.Sequences</span></code> in pydicom, please refer to
 this object model:
 <a class="reference internal" href="api_ref.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">dataset.Dataset</span></code></a> (wraps a Python <code class="docutils literal notranslate"><span class="pre">dict</span></code>)</p>
-<blockquote class="last">
-<div><dl class="docutils">
-<dt>—&gt; contains DataElement instances</dt>
-<dd><blockquote class="first">
+<blockquote>
+<div><dl>
+<dt>—&gt; contains DataElement instances</dt><dd><blockquote>
 <div><p>–&gt; the value of the data element can be one of:</p>
 <ul class="simple">
-<li>a regular value like a number, string, etc.</li>
-<li>a list of regular values (e.g. a 3-D coordinate)</li>
-<li>a Sequence instance</li>
+<li><p>a regular value like a number, string, etc.</p></li>
+<li><p>a list of regular values (e.g. a 3-D coordinate)</p></li>
+<li><p>a Sequence instance</p></li>
 </ul>
 </div></blockquote>
-<p class="last">–&gt; a Sequence is a list of <a class="reference internal" href="api_ref.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">dataset.Dataset</span></code></a> (and so we come full circle)</p>
+<p>–&gt; a Sequence is a list of <a class="reference internal" href="api_ref.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">dataset.Dataset</span></code></a> (and so we come full circle)</p>
 </dd>
 </dl>
 </div></blockquote>
@@ -309,8 +308,8 @@ sessions at the Python prompt:</p>
 <p><a class="reference internal" href="api_ref.html#pydicom.dataset.Dataset.dir" title="pydicom.dataset.Dataset.dir"><code class="xref py py-func docutils literal notranslate"><span class="pre">dataset.Dataset.dir()</span></code></a> will return any DICOM tag names in the dataset that
 have the specified string anywhere in the name (case insensitive).</p>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">Calling <a class="reference internal" href="api_ref.html#pydicom.dataset.Dataset.dir" title="pydicom.dataset.Dataset.dir"><code class="xref py py-func docutils literal notranslate"><span class="pre">dataset.Dataset.dir()</span></code></a> with no string will list all tag names
+<p class="admonition-title">Note</p>
+<p>Calling <a class="reference internal" href="api_ref.html#pydicom.dataset.Dataset.dir" title="pydicom.dataset.Dataset.dir"><code class="xref py py-func docutils literal notranslate"><span class="pre">dataset.Dataset.dir()</span></code></a> with no string will list all tag names
 available in the dataset.</p>
 </div>
 <p>You can also see all the names that pydicom knows about by viewing the
@@ -373,13 +372,13 @@ code, but is used extensively by
 which stores the following things:</p>
 <blockquote>
 <div><ul class="simple">
-<li>tag – a DICOM tag (as a Tag object)</li>
-<li>VR – DICOM value representation – various number and string formats, etc</li>
-<li>VM – value multiplicity. This is 1 for most DICOM tags, but
+<li><p>tag – a DICOM tag (as a Tag object)</p></li>
+<li><p>VR – DICOM value representation – various number and string formats, etc</p></li>
+<li><p>VM – value multiplicity. This is 1 for most DICOM tags, but
 can be multiple, e.g. for coordinates. You do not have to specify this,
-the DataElement class keeps track of it based on value.</li>
-<li>value – the actual value. A regular value like a number or string
-(or list of them), or a Sequence.</li>
+the DataElement class keeps track of it based on value.</p></li>
+<li><p>value – the actual value. A regular value like a number or string
+(or list of them), or a Sequence.</p></li>
 </ul>
 </div></blockquote>
 </div>
@@ -389,9 +388,8 @@ the DataElement class keeps track of it based on value.</li>
 a number with some extra behaviour:</p>
 <blockquote>
 <div><ul>
-<li><p class="first">Tag enforces that the DICOM tag fits in the expected 4-byte (group,element)</p>
-</li>
-<li><p class="first">A Tag instance can be created from an int or from a tuple containing
+<li><p>Tag enforces that the DICOM tag fits in the expected 4-byte (group,element)</p></li>
+<li><p>A Tag instance can be created from an int or from a tuple containing
 the (group,element) separately:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.tag</span> <span class="k">import</span> <span class="n">Tag</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">t1</span><span class="o">=</span><span class="n">Tag</span><span class="p">(</span><span class="mh">0x00100010</span><span class="p">)</span> <span class="c1"># all of these are equivalent</span>
@@ -404,12 +402,10 @@ the (group,element) separately:</p>
 </pre></div>
 </div>
 </li>
-<li><p class="first">Tag has properties group and element (or elem) to return the group and
-element portions</p>
-</li>
-<li><p class="first">The <code class="docutils literal notranslate"><span class="pre">is_private</span></code> property checks whether the tag represents
-a private tag (i.e. if group number is odd).</p>
-</li>
+<li><p>Tag has properties group and element (or elem) to return the group and
+element portions</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">is_private</span></code> property checks whether the tag represents
+a private tag (i.e. if group number is odd).</p></li>
 </ul>
 </div></blockquote>
 </div>

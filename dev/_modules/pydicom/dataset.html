@@ -371,6 +371,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">is_little_endian</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_implicit_VR</span> <span class="o">=</span> <span class="kc">None</span>
 
+        <span class="c1"># the parent data set, if this dataset is a sequence item</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="kc">None</span>
+
     <span class="k">def</span> <span class="nf">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Method invoked on entry to a with statement.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span>
@@ -729,7 +732,13 @@
             <span class="c1"># Try the base class attribute getter (fix for issue 332)</span>
             <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">Dataset</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+            <span class="n">data_elem</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">data_elem</span><span class="o">.</span><span class="n">value</span>
+            <span class="k">if</span> <span class="n">data_elem</span><span class="o">.</span><span class="n">VR</span> <span class="o">==</span> <span class="s1">&#39;SQ&#39;</span><span class="p">:</span>
+                <span class="c1"># let a sequence know its parent dataset, as sequence items</span>
+                <span class="c1"># may need parent dataset tags to resolve ambiguous tags</span>
+                <span class="n">value</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span>
+            <span class="k">return</span> <span class="n">value</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">_character_set</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1339,6 +1348,11 @@
                 <span class="c1"># don&#39;t have this tag yet-&gt;create the data_element instance</span>
                 <span class="n">VR</span> <span class="o">=</span> <span class="n">dictionary_VR</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span>
                 <span class="n">data_element</span> <span class="o">=</span> <span class="n">DataElement</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">VR</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">VR</span> <span class="o">==</span> <span class="s1">&#39;SQ&#39;</span><span class="p">:</span>
+                    <span class="c1"># let a sequence know its parent dataset to pass it</span>
+                    <span class="c1"># to its items, who may need parent dataset tags</span>
+                    <span class="c1"># to resolve ambiguous tags</span>
+                    <span class="n">data_element</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="c1"># already have this data_element, just changing its value</span>
                 <span class="n">data_element</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span>

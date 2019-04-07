@@ -224,6 +224,7 @@
 <span class="sd">    * Tag(0x10, 0x15)</span>
 <span class="sd">    * Tag(2341, 0x10)</span>
 <span class="sd">    * Tag(&#39;0xFE&#39;, &#39;0x0010&#39;)</span>
+<span class="sd">    * Tag(&quot;PatientName&quot;)</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -268,11 +269,19 @@
 
     <span class="c1"># Single str parameter</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">compat</span><span class="o">.</span><span class="n">text_type</span><span class="p">)):</span>
-        <span class="n">long_value</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">long_value</span> <span class="o">&gt;</span> <span class="mh">0xFFFFFFFF</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">OverflowError</span><span class="p">(</span><span class="s2">&quot;Tags are limited to 32-bit length; tag </span><span class="si">{0!r}</span><span class="s2">&quot;</span>
-                                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">long_value</span><span class="p">))</span>
-
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">long_value</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">long_value</span> <span class="o">&gt;</span> <span class="mh">0xFFFFFFFF</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">OverflowError</span><span class="p">(</span><span class="s2">&quot;Tags are limited to 32-bit length; &quot;</span>
+                                    <span class="s2">&quot;tag </span><span class="si">{0!r}</span><span class="s2">&quot;</span>
+                                    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">long_value</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="c1"># Try a DICOM keyword</span>
+            <span class="kn">from</span> <span class="nn">pydicom.datadict</span> <span class="k">import</span> <span class="n">tag_for_keyword</span>
+            <span class="n">long_value</span> <span class="o">=</span> <span class="n">tag_for_keyword</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">long_value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;</span><span class="si">{}</span><span class="s2">&#39; is not a valid int or DICOM keyword&quot;</span>
+                                 <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arg</span><span class="p">))</span>
     <span class="c1"># Single int parameter</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">long_value</span> <span class="o">=</span> <span class="n">arg</span>

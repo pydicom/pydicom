@@ -15,9 +15,6 @@ This examples illustrates how to work with sequences.
 
 
 
-
-
-
 .. rst-class:: sphx-glr-script-out
 
  Out:
@@ -34,7 +31,7 @@ This examples illustrates how to work with sequences.
 |
 
 
-.. code-block:: python
+.. code-block:: default
 
 
     from pydicom.sequence import Sequence
@@ -68,7 +65,10 @@ This examples illustrates how to work with sequences.
     beam0.BlockSequence.append(block_ds3)
     del plan_ds.BeamSequence[0].BlockSequence[1]
 
-**Total running time of the script:** ( 0 minutes  0.001 seconds)
+
+.. rst-class:: sphx-glr-timing
+
+   **Total running time of the script:** ( 0 minutes  0.024 seconds)
 
 
 .. _sphx_glr_download_auto_examples_metadata_processing_plot_sequences.py:

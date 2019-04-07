@@ -218,7 +218,7 @@ head-first-prone, and save to a new file:</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><span class="s2">&quot;rtplan2.dcm&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Pydicom is not a DICOM server <a class="footnote-reference" href="#id3" id="id1">[1]</a>, and is not primarily about viewing
+<p>Pydicom is not a DICOM server <a class="footnote-reference brackets" href="#id3" id="id1">1</a>, and is not primarily about viewing
 images. It is designed to let you manipulate data elements in DICOM files with
 Python code.</p>
 <p>Pydicom is easy to install and use, and because it is a pure Python package, it
@@ -240,16 +240,15 @@ required if manipulating pixel data).</p>
 <div class="section" id="prerequisites">
 <h3>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li>Python 2.7, 3.4 or later</li>
-<li><dl class="first docutils">
-<dt>Optional dependencies:</dt>
-<dd><ul class="first last">
-<li>numpy</li>
-<li>pillow</li>
-<li>gdcm</li>
-<li>jpeg_ls</li>
-<li>jpeg2000</li>
-<li>pytest (if running pydicom’s test suite)</li>
+<li><p>Python 2.7, 3.4 or later</p></li>
+<li><dl class="simple">
+<dt>Optional dependencies:</dt><dd><ul>
+<li><p>numpy</p></li>
+<li><p>pillow</p></li>
+<li><p>gdcm</p></li>
+<li><p>jpeg_ls</p></li>
+<li><p>jpeg2000</p></li>
+<li><p>pytest (if running pydicom’s test suite)</p></li>
 </ul>
 </dd>
 </dl>
@@ -339,23 +338,19 @@ cookbook recipes are encouraged to be posted on the <a class="reference external
 <h2>Next Steps<a class="headerlink" href="#next-steps" title="Permalink to this headline">¶</a></h2>
 <p>To start learning how to use pydicom, see the <a class="reference internal" href="pydicom_user_guide.html"><span class="doc">Pydicom User Guide</span></a>.</p>
 <p class="rubric">Footnotes::</p>
-<table class="docutils footnote" frame="void" id="id3" rules="none">
-<colgroup><col class="label" /><col /></colgroup>
-<tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>For DICOM network capabilities, see the
+<dl class="footnote brackets">
+<dt class="label" id="id3"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p>For DICOM network capabilities, see the
 <a class="reference external" href="https://github.com/patmun/pynetdicom">pynetdicom</a> and the newer
-<a class="reference external" href="https://github.com/pydicom/pynetdicom3">pynetdicom3</a> projects.</td></tr>
-</tbody>
-</table>
-<table class="docutils footnote" frame="void" id="id4" rules="none">
-<colgroup><col class="label" /><col /></colgroup>
-<tbody valign="top">
-<tr><td class="label">[2]</td><td>If using python(x,y), other packages you might be interested in include IPython
+<a class="reference external" href="https://github.com/pydicom/pynetdicom3">pynetdicom3</a> projects.</p>
+</dd>
+<dt class="label" id="id4"><span class="brackets">2</span></dt>
+<dd><p>If using python(x,y), other packages you might be interested in include IPython
 (an indispensable interactive shell with auto-completion, history etc),
 NumPy (optionally used by pydicom for pixel data), and ITK/VTK or PIL
-(image processing and visualization).</td></tr>
-</tbody>
-</table>
+(image processing and visualization).</p>
+</dd>
+</dl>
 </div>
 </div>
 

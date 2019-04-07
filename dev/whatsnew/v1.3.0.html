@@ -180,35 +180,37 @@
 <div class="section" id="changes">
 <h3>Changes<a class="headerlink" href="#changes" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">dataelem.isMultiValue</span></code> is deprecated and will be removed in v1.4.
-Use <code class="docutils literal notranslate"><span class="pre">dataelem.DataElement.VM</span></code> instead.</li>
-<li><code class="docutils literal notranslate"><span class="pre">dataelem.isStringOrStringList</span></code> and <code class="docutils literal notranslate"><span class="pre">dataelem.isString</span></code> functions are
-removed</li>
-<li><code class="docutils literal notranslate"><span class="pre">datadict.add_dict_entry</span></code> and <code class="docutils literal notranslate"><span class="pre">datadict.add_dict_entries</span></code> now raise if
-trying to add a private tag</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dataelem.isMultiValue</span></code> is deprecated and will be removed in v1.4.
+Use <code class="docutils literal notranslate"><span class="pre">dataelem.DataElement.VM</span></code> instead.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dataelem.isStringOrStringList</span></code> and <code class="docutils literal notranslate"><span class="pre">dataelem.isString</span></code> functions are
+removed</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">datadict.add_dict_entry</span></code> and <code class="docutils literal notranslate"><span class="pre">datadict.add_dict_entries</span></code> now raise if
+trying to add a private tag</p></li>
 </ul>
 </div>
 <div class="section" id="enhancements">
 <h3>Enhancements<a class="headerlink" href="#enhancements" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li>Added <code class="docutils literal notranslate"><span class="pre">datadict.add_private_dict_entry</span></code> and
+<li><p>Added <code class="docutils literal notranslate"><span class="pre">datadict.add_private_dict_entry</span></code> and
 <code class="docutils literal notranslate"><span class="pre">datadict.add_private_dict_entries</span></code> to add custom private tags
-(<a class="reference external" href="https://github.com/pydicom/pydicom/issues/799">#799</a>)</li>
-<li>Added possibility to write into zip file using gzip (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/753">#753</a>)</li>
+(<a class="reference external" href="https://github.com/pydicom/pydicom/issues/799">#799</a>)</p></li>
+<li><p>Added possibility to write into zip file using gzip (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/753">#753</a>)</p></li>
+<li><p>Added creation of Tag instances by DICOM keyword, e.g Tag(“PatientName”)</p></li>
 </ul>
 </div>
 <div class="section" id="fixes">
 <h3>Fixes<a class="headerlink" href="#fixes" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li>Raise exception with specific message if value is too large to be written
-in explicit transfer syntax (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/757">#757</a>)</li>
-<li>Do not derive <cite>Dataset</cite> from <cite>dict</cite> - fixes behavior in newer Python versions
-(<a class="reference external" href="https://github.com/pydicom/pydicom/issues/765">#765</a>)</li>
-<li>Make hash for <cite>PersonName3</cite> behave as expected, make <cite>PersonName</cite> objects
-immutable (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/785">#785</a>)</li>
-<li>Fixed <cite>generate_uid()</cite> returning non-conformant UIDs when <cite>prefix=None</cite>
-(<a class="reference external" href="https://github.com/pydicom/pydicom/issues/788">#788</a>)</li>
-<li>Avoid exception if reading from empty file (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/810">#810</a>)</li>
+<li><p>Raise exception with specific message if value is too large to be written
+in explicit transfer syntax (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/757">#757</a>)</p></li>
+<li><p>Do not derive <cite>Dataset</cite> from <cite>dict</cite> - fixes behavior in newer Python versions
+(<a class="reference external" href="https://github.com/pydicom/pydicom/issues/765">#765</a>)</p></li>
+<li><p>Make hash for <cite>PersonName3</cite> behave as expected, make <cite>PersonName</cite> objects
+immutable (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/785">#785</a>)</p></li>
+<li><p>Fixed <cite>generate_uid()</cite> returning non-conformant UIDs when <cite>prefix=None</cite>
+(<a class="reference external" href="https://github.com/pydicom/pydicom/issues/788">#788</a>)</p></li>
+<li><p>Avoid exception if reading from empty file (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/810">#810</a>)</p></li>
+<li><p>Correctly handle elements with ambiguous VR in sequence items (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/804">#804</a>)</p></li>
 </ul>
 </div>
 </div>

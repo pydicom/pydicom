@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Version 0.9.8 &mdash; pydicom 1.3.0.dev0 documentation</title>
+  <title>Computation times &mdash; pydicom 1.3.0.dev0 documentation</title>
   
 
   
@@ -101,10 +101,10 @@
 </ul>
 <p class="caption"><span class="caption-text">Examples</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">General examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#image-processing">Image processing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#input-output">Input-output</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html">General examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#image-processing">Image processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#input-output">Input-output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#metadata-processing">Metadata processing</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Additional Information</span></p>
 <ul>
@@ -154,13 +154,13 @@
     
       <li><a href="../index.html">Docs</a> &raquo;</li>
         
-      <li>Version 0.9.8</li>
+      <li>Computation times</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../_sources/whatsnew/v0.9.8.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/auto_examples/sg_execution_times.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -173,57 +173,14 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="version-0-9-8">
-<h1>Version 0.9.8<a class="headerlink" href="#version-0-9-8" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="changelog">
-<h2>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h2>
-<p>pydicom 0.9.8 is mainly a consolidation step before moving to official Python 3
-compatibility in pydicom 1.0.  It also reverts the change to using Decimal for
-VR of DS (in pydicom 0.9.7), due to performance issues. DS as Decimal is still
-available, but is off by default.</p>
-<div class="section" id="major-changes">
-<h3>Major changes<a class="headerlink" href="#major-changes" title="Permalink to this headline">¶</a></h3>
+  <div class="section" id="computation-times">
+<span id="sphx-glr-auto-examples-sg-execution-times"></span><h1>Computation times<a class="headerlink" href="#computation-times" title="Permalink to this headline">¶</a></h1>
+<p><strong>00:00.128</strong> total execution time for <strong>auto_examples</strong> files:</p>
 <ul class="simple">
-<li><p>Requires Python 2.6 or later, in preparation for Python 3 compatibility</p></li>
-<li><p>experimental Python 3 compatibility (unofficial at this point) – uncomment
-the two indicated lines in setup.py to use it. Please provide feedback to the
-issues list.</p></li>
-<li><p>DS values reverted to using float as default (issue 114) due to slow
-performance using Python Decimal. Speed tests show approx factor of 10
-improvement compared with pydicom 0.9.7 (several revisions up to
-r78ba350a3eb8)</p></li>
-<li><p>streamlined much code internally taking advantage of modern Python
-constructs: decorators, generators, etc</p></li>
+<li><p><strong>00:00.128</strong>: <a class="reference internal" href="plot_dicom_difference.html#sphx-glr-auto-examples-plot-dicom-difference-py"><span class="std std-ref">Analyse differences between DICOM files</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_dicom_difference.py</span></code>)</p></li>
+<li><p><strong>00:00.000</strong>: <a class="reference internal" href="dicomtree.html#sphx-glr-auto-examples-dicomtree-py"><span class="std std-ref">Show a dicom file using hierarchical tree</span></a> (<code class="docutils literal notranslate"><span class="pre">dicomtree.py</span></code>)</p></li>
+<li><p><strong>00:00.000</strong>: <a class="reference internal" href="show_charset_name.html#sphx-glr-auto-examples-show-charset-name-py"><span class="std std-ref">Display unicode person names</span></a> (<code class="docutils literal notranslate"><span class="pre">show_charset_name.py</span></code>)</p></li>
 </ul>
-</div>
-<div class="section" id="bug-fixes">
-<h3>Bug fixes<a class="headerlink" href="#bug-fixes" title="Permalink to this headline">¶</a></h3>
-<ul class="simple">
-<li><p>Fix for duplicate logger from Gunnar Schaefer. Fixes issue 107 (revision
-774b7a55db33)</p></li>
-<li><p>Fix rewind behavior in find_bytes (issue 60, revision 6b949a5b925b)</p></li>
-<li><p>Fix error in nested private sequences (issue 113, revision 84af4b240add)</p></li>
-</ul>
-</div>
-<div class="section" id="enhancements">
-<h3>Enhancements<a class="headerlink" href="#enhancements" title="Permalink to this headline">¶</a></h3>
-<ul class="simple">
-<li><p>UID generator added (Félix C. Morency) (revisions 0197b5846bb5 and
-3678b1be6aca, tests in f1ae573d9de5, 0411bab7c985)</p></li>
-<li><p>new PersonName3 class for Python 3: (revision 9b92b336e7d4)</p></li>
-</ul>
-</div>
-<div class="section" id="contrib-file-changes">
-<h3>Contrib file changes<a class="headerlink" href="#contrib-file-changes" title="Permalink to this headline">¶</a></h3>
-<ul class="simple">
-<li><p>Fix for pydicom_series for DS decimal (revision e830f30b6781)</p></li>
-<li><p>new dcm_qt_tree.py module - tree display of DICOM files using PySide and
-Qt. Contributed by Padraig Looney.</p></li>
-</ul>
-<p>Special acknowledgement to Jonathan Suever who contributed most of the Python 3
-work and many bug fixes.</p>
-</div>
-</div>
 </div>
 
 

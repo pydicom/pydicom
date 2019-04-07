@@ -15,9 +15,6 @@ This example illustrates how to print the data set in your own format.
 
 
 
-
-
-
 .. rst-class:: sphx-glr-script-out
 
  Out:
@@ -104,7 +101,7 @@ This example illustrates how to print the data set in your own format.
 |
 
 
-.. code-block:: python
+.. code-block:: default
 
 
     # authors : Guillaume Lemaitre <g.lemaitre58@gmail.com>
@@ -151,7 +148,10 @@ This example illustrates how to print the data set in your own format.
 
     myprint(ds)
 
-**Total running time of the script:** ( 0 minutes  0.005 seconds)
+
+.. rst-class:: sphx-glr-timing
+
+   **Total running time of the script:** ( 0 minutes  0.029 seconds)
 
 
 .. _sphx_glr_download_auto_examples_input_output_plot_printing_dataset.py:
