@@ -20,6 +20,7 @@ Enhancements
   ``datadict.add_private_dict_entries`` to add custom private tags
   (:issue:`799`)
 * Added possibility to write into zip file using gzip (:issue:`753`)
+* Added creation of Tag instances by DICOM keyword, e.g Tag("PatientName")
 
 Fixes
 .....
