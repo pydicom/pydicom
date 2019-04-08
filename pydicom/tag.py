@@ -50,6 +50,7 @@ def Tag(arg, arg2=None):
     * Tag(0x10, 0x15)
     * Tag(2341, 0x10)
     * Tag('0xFE', '0x0010')
+    * Tag("PatientName")
 
     Parameters
     ----------
@@ -94,11 +95,19 @@ def Tag(arg, arg2=None):
 
     # Single str parameter
     elif isinstance(arg, (str, compat.text_type)):
-        long_value = int(arg, 16)
-        if long_value > 0xFFFFFFFF:
-            raise OverflowError("Tags are limited to 32-bit length; tag {0!r}"
-                                .format(long_value))
-
+        try:
+            long_value = int(arg, 16)
+            if long_value > 0xFFFFFFFF:
+                raise OverflowError("Tags are limited to 32-bit length; "
+                                    "tag {0!r}"
+                                    .format(long_value))
+        except ValueError:
+            # Try a DICOM keyword
+            from pydicom.datadict import tag_for_keyword
+            long_value = tag_for_keyword(arg)
+            if long_value is None:
+                raise ValueError("'{}' is not a valid int or DICOM keyword"
+                                 .format(arg))
     # Single int parameter
     else:
         long_value = arg

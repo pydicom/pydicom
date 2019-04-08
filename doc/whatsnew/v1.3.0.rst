@@ -20,6 +20,7 @@ Enhancements
   ``datadict.add_private_dict_entries`` to add custom private tags
   (:issue:`799`)
 * Added possibility to write into zip file using gzip (:issue:`753`)
+* Added creation of Tag instances by DICOM keyword, e.g Tag("PatientName")
 
 Fixes
 .....
@@ -35,3 +36,4 @@ Fixes
 * Avoid exception if reading from empty file (:issue:`810`)
 * An invalid encoding is now replaced by the default encoding, if
   ``config.enforce_valid_values`` is not set (:issue:`815`)
+* Correctly handle elements with ambiguous VR in sequence items (:issue:`804`)
