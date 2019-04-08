@@ -333,12 +333,13 @@ class TestTag(object):
         assert Tag('0x2000') == BaseTag(0x00002000)
         assert Tag('15') == BaseTag(0x00000015)
         assert Tag('0xF') == BaseTag(0x0000000F)
+        assert Tag("PatientName") == BaseTag(0x00100010)
 
         # Must be 32-bit
         pytest.raises(OverflowError, Tag, '0xFFFFFFFF1')
         # Must be positive
         pytest.raises(ValueError, Tag, '-0x01')
-        # Must be numeric str
+        # Must be numeric str or DICOM keyword
         pytest.raises(ValueError, Tag, 'hello')
 
     def test_tag_double_str(self):
