@@ -715,7 +715,8 @@ class Dataset(object):
                     break
             if self._dict[private_creator_tag].value == private_creator:
                 return element << 8
-        raise KeyError('Private creator {} not found'.format(private_creator))
+        raise KeyError(
+            "Private creator '{}' not found".format(private_creator))
 
     def get_private_item(self, key, private_creator):
         """Return the data element for the given private tag.
