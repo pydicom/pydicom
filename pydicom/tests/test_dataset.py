@@ -964,11 +964,11 @@ class DatasetTests(unittest.TestCase):
                            match='Private creator must have a value'):
             ds.get_private_item(0x00090010, '')
         with pytest.raises(KeyError,
-                           match="Private creator 'ACME Ltd 3.0' not found"):
-            ds.get_private_item(0x00090010, 'ACME Ltd 3.0')
-        item = ds.get_private_item(0x00090001, 'ACME Ltd 1.0')
+                           match="Private creator 'Creator 3.0' not found"):
+            ds.get_private_item(0x00090010, 'Creator 3.0')
+        item = ds.get_private_item(0x00090001, 'Creator 1.0')
         assert 'Version1' == item.value
-        item = ds.get_private_item(Tag(0x00090001), 'ACME Ltd 2.0')
+        item = ds.get_private_item(Tag(0x00090001), 'Creator 2.0')
         assert 'Version2' == item.value
 
         with pytest.raises(KeyError):
