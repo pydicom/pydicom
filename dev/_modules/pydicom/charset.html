@@ -299,15 +299,24 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># shortcut for the common case - no escape sequences present</span>
     <span class="k">if</span> <span class="n">ESC</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
+        <span class="n">first_encoding</span> <span class="o">=</span> <span class="n">encodings</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">encodings</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">first_encoding</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">LookupError</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">enforce_valid_values</span><span class="p">:</span>
+                <span class="k">raise</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;Unknown encoding &#39;</span><span class="si">{}</span><span class="s2">&#39; - &quot;</span>
+                          <span class="sa">u</span><span class="s2">&quot;using default encoding instead&quot;</span>
+                          <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">first_encoding</span><span class="p">))</span>
+            <span class="n">first_encoding</span> <span class="o">=</span> <span class="n">default_encoding</span>
+            <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">first_encoding</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">UnicodeError</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">enforce_valid_values</span><span class="p">:</span>
                 <span class="k">raise</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;Failed to decode byte string with encoding </span><span class="si">{}</span><span class="s2"> - &quot;</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;Failed to decode byte string with encoding &#39;</span><span class="si">{}</span><span class="s2">&#39; - &quot;</span>
                           <span class="sa">u</span><span class="s2">&quot;using replacement characters in decoded &quot;</span>
-                          <span class="sa">u</span><span class="s2">&quot;string&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">encodings</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
-            <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">encodings</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;replace&#39;</span><span class="p">)</span>
+                          <span class="sa">u</span><span class="s2">&quot;string&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">first_encoding</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">first_encoding</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;replace&#39;</span><span class="p">)</span>
 
     <span class="c1"># Each part of the value that starts with an escape sequence is decoded</span>
     <span class="c1"># separately. If it starts with an escape sequence, the</span>

@@ -212,6 +212,8 @@ immutable (<a class="reference external" href="https://github.com/pydicom/pydico
 <li><p>Fixed <cite>generate_uid()</cite> returning non-conformant UIDs when <cite>prefix=None</cite>
 (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/788">#788</a>)</p></li>
 <li><p>Avoid exception if reading from empty file (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/810">#810</a>)</p></li>
+<li><p>An invalid encoding is now replaced by the default encoding, if
+<code class="docutils literal notranslate"><span class="pre">config.enforce_valid_values</span></code> is not set (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/815">#815</a>)</p></li>
 <li><p>Correctly handle elements with ambiguous VR in sequence items (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/804">#804</a>)</p></li>
 </ul>
 </div>
