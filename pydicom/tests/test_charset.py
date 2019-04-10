@@ -100,6 +100,26 @@ class TestCharset(object):
         ds.decode()
         assert u'CompressedSamples^CT1' == ds.PatientName
 
+    def test_invalid_character_set(self):
+        """charset: replace invalid encoding with default encoding"""
+        ds = dcmread(get_testdata_files("CT_small.dcm")[0])
+        ds.read_encoding = None
+        ds.SpecificCharacterSet = 'Unsupported'
+        with pytest.warns(UserWarning,
+                          match=u"Unknown encoding 'Unsupported' "
+                                u"- using default encoding instead"):
+            ds.decode()
+            assert u'CompressedSamples^CT1' == ds.PatientName
+
+    def test_invalid_character_set_enforce_valid(self):
+        """charset: raise on invalid encoding"""
+        config.enforce_valid_values = True
+        ds = dcmread(get_testdata_files("CT_small.dcm")[0])
+        ds.read_encoding = None
+        ds.SpecificCharacterSet = 'Unsupported'
+        with pytest.raises(LookupError, match='unknown encoding: Unsupported'):
+            ds.decode()
+
     def test_decoding_with_specific_tags(self):
         """Decoding is correctly applied even if  Specific Character Set
         is not in specific tags..."""
@@ -126,8 +146,8 @@ class TestCharset(object):
         elem = DataElement(0x00100010, 'PN',
                            b'\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2')
 
-        with pytest.warns(UserWarning, match='Failed to decode byte string '
-                                             'with encoding UTF8'):
+        with pytest.warns(UserWarning, match="Failed to decode byte string "
+                                             "with encoding 'UTF8'"):
             pydicom.charset.decode(elem, ['ISO_IR 192'])
             assert u'���������' == elem.value
 
@@ -235,9 +255,11 @@ class TestCharset(object):
             # make sure no warning is issued for the correct value
             assert 1 == len(w)
 
-        # not patched incorrect encoding raises
+        # not patched incorrect encoding is replaced by default encoding
         elem = DataElement(0x00100010, 'PN', b'Buc^J\xc3\xa9r\xc3\xb4me')
-        with pytest.raises(LookupError):
+        with pytest.warns(UserWarning,
+                          match=u"Unknown encoding 'ISOIR 192' - "
+                                u"using default encoding instead"):
             pydicom.charset.decode(elem, ['ISOIR 192'])
 
         # Python encoding also can be used directly

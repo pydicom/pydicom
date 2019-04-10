@@ -125,15 +125,24 @@ def decode_string(value, encodings, delimiters):
     """
     # shortcut for the common case - no escape sequences present
     if ESC not in value:
+        first_encoding = encodings[0]
         try:
-            return value.decode(encodings[0])
+            return value.decode(first_encoding)
+        except LookupError:
+            if config.enforce_valid_values:
+                raise
+            warnings.warn(u"Unknown encoding '{}' - "
+                          u"using default encoding instead"
+                          .format(first_encoding))
+            first_encoding = default_encoding
+            return value.decode(first_encoding)
         except UnicodeError:
             if config.enforce_valid_values:
                 raise
-            warnings.warn(u"Failed to decode byte string with encoding {} - "
+            warnings.warn(u"Failed to decode byte string with encoding '{}' - "
                           u"using replacement characters in decoded "
-                          u"string".format(encodings[0]))
-            return value.decode(encodings[0], errors='replace')
+                          u"string".format(first_encoding))
+            return value.decode(first_encoding, errors='replace')
 
     # Each part of the value that starts with an escape sequence is decoded
     # separately. If it starts with an escape sequence, the
