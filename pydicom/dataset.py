@@ -92,20 +92,45 @@ class PrivateBlock(object):
         self.dataset = dataset
         self.block_start = private_creator_element << 8
 
-    def real_tag(self, tag):
-        """Return the real private tag ID for the given tag.
-        Note that the 2 high order hex digits of the tag element are ignored
-        and replaced by the digits defined by the block start.
-        """
-        tag = Tag(tag)
-        return Tag(tag.group, (tag.element & 0xff) | self.block_start)
+    def get_tag(self, element_offset):
+        """Return the private tag ID for the given element offset.
 
-    def add_new(self, tag, VR, value):
-        """Adds the given tag to the parent dataset - see
-        `pydicom.Dataset.add_tag` for parameter description.
-        The tag is replaced by the correct private tag for the given block.
+        Parameters
+        ----------
+        element_offset : 16 bit int
+            The lower 16 bit (e.g. 2 hex numbers) of the element tag.
+
+        Returns
+        -------
+            The tag ID defined by the private block location and the
+            given element offset.
+
+        Raises
+        ------
+        ValueError
+            If `element_offset` is too large.
         """
-        self.dataset.add_new(self.real_tag(tag), VR, value)
+        if element_offset > 0xff:
+            raise ValueError('Element offset must be less than 256')
+        return Tag(self.group, self.block_start + element_offset)
+
+    def add_new(self, element_offset, VR, value):
+        """Adds the private tag with the given VR and value to the
+         parent dataset at the tag ID defined by the private block
+         and the given element offset.
+
+        Parameters
+        ----------
+        element_offset : 16 bit int
+            The lower 16 bit (e.g. 2 hex numbers) of the element tag
+            to be added.
+        VR : str
+            The 2 character DICOM value representation.
+        value
+            The value of the data element.
+            See `pydicom.Dataset.add_tag` for a description.
+        """
+        self.dataset.add_new(self.get_tag(element_offset), VR, value)
 
 
 class Dataset(object):
@@ -121,12 +146,6 @@ class Dataset(object):
     >>> ds.add_new(0x00100020, 'LO', '12345')
     >>> ds[0x0010, 0x0030] = DataElement(0x00100030, 'DA', '20010101')
 
-    Add private DataElements to the Dataset:
-
-    >>> ds = Dataset()
-    >>> block = ds.private_block(0x0041, 'My Creator')
-    >>> block.add_new(0x00410001, 'LO', '12345')
-
     Add Sequence DataElement to the Dataset:
 
     >>> ds.BeamSequence = [Dataset(), Dataset(), Dataset()]
@@ -136,9 +155,8 @@ class Dataset(object):
 
     Add private DataElements to the Dataset:
 
-    >>> ds.add(DataElement(0x0043102b, 'SS', [4, 4, 0, 0]))
-    >>> ds.add_new(0x0043102b, 'SS', [4, 4, 0, 0])
-    >>> ds[0x0043, 0x102b] = DataElement(0x0043102b, 'SS', [4, 4, 0, 0])
+    >>> block = ds.private_block(0x0043, 'My Creator')
+    >>> block.add_new(0x2b, 'SS', [4, 4, 0, 0])
 
     Updating and retrieving DataElement values:
 
@@ -727,10 +745,8 @@ class Dataset(object):
         group : 32 bit int
             The group of the private tag to be found. Must be an odd number
             (e.g. a private group).
-
         private_creator : str
             The private creator string associated with the tag.
-
         create : bool
             If `True` and `private_creator` does not exist, a new private
             creator tag is added at the next free block.
@@ -793,13 +809,9 @@ class Dataset(object):
             0x00090010, etc.
             Note that the 2 high order hex digits of the element are ignored -
             they will be replaced by the correct value for the private block.
-
         private_creator : str
             The private creator for the tag. Must match the private creator
             for the tag to be returned.
-
-        vr : str
-            The value representation of the private tag, or 'UN' if not given.
 
         Returns
         -------
@@ -819,7 +831,7 @@ class Dataset(object):
             tag = Tag(key)
 
         block = self.private_block(tag.group, private_creator, create=False)
-        return self.__getitem__(block.real_tag(tag))
+        return self.__getitem__(block.get_tag(tag.element & 0xff))
 
     def get_item(self, key):
         """Return the raw data element if possible.

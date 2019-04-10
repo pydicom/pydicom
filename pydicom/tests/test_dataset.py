@@ -985,10 +985,10 @@ class DatasetTests(unittest.TestCase):
         with pytest.raises(ValueError, match='Tag must be private'):
             ds.private_block(0x0008, 'Creator 1.0')
         block = ds.private_block(0x0009, 'Creator 2.0')
-        block.add_new(0x00090001, 'SH', 'Version2')
+        block.add_new(0x01, 'SH', 'Version2')
         assert 'Version2' == ds[0x00091101].value
         block = ds.private_block(0x0009, 'Creator 3.0')
-        block.add_new(0x00090001, 'SH', 'Version3')
+        block.add_new(0x01, 'SH', 'Version3')
         assert 'Creator 3.0' == ds[0x00090012].value
         assert 'Version3' == ds[0x00091201].value
 
