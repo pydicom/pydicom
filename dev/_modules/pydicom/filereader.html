@@ -521,6 +521,59 @@
                                      <span class="n">is_implicit_VR</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">)</span></div>
 
 
+<span class="k">def</span> <span class="nf">_is_implicit_vr</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">implicit_vr_is_assumed</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">,</span> <span class="n">stop_when</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Check if the real VR is explicit or implicit.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fp : an opened file object</span>
+<span class="sd">    implicit_vr_is_assumed : boolean</span>
+<span class="sd">        True if implicit VR is assumed.</span>
+<span class="sd">        If this does not match with the real transfer syntax, a user warning</span>
+<span class="sd">        will be issued.</span>
+<span class="sd">    is_little_endian : boolean</span>
+<span class="sd">        True if file has little endian transfer syntax.</span>
+<span class="sd">        Needed to interpret the first tag.</span>
+<span class="sd">    stop_when : None, optional</span>
+<span class="sd">        Optional call_back function which can terminate reading.</span>
+<span class="sd">        Needed to check if the next tag still belongs to the read dataset.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    True if implicit VR is used, False otherwise.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">tag_bytes</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+    <span class="n">vr</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">vr</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">implicit_vr_is_assumed</span>
+
+    <span class="c1"># it is sufficient to check if the VR is in valid ASCII range, as it is</span>
+    <span class="c1"># extremely unlikely that the tag length accidentally has such a</span>
+    <span class="c1"># representation - this would need the first tag to be longer than 16kB</span>
+    <span class="c1"># (e.g. it should be &gt; 0x4141 = 16705 bytes)</span>
+    <span class="n">vr1</span> <span class="o">=</span> <span class="nb">ord</span><span class="p">(</span><span class="n">vr</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">if</span> <span class="n">in_py2</span> <span class="k">else</span> <span class="n">vr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">vr2</span> <span class="o">=</span> <span class="nb">ord</span><span class="p">(</span><span class="n">vr</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="k">if</span> <span class="n">in_py2</span> <span class="k">else</span> <span class="n">vr</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">found_implicit</span> <span class="o">=</span> <span class="ow">not</span> <span class="p">(</span><span class="mh">0x40</span> <span class="o">&lt;</span> <span class="n">vr1</span> <span class="o">&lt;</span> <span class="mh">0x5B</span> <span class="ow">and</span> <span class="mh">0x40</span> <span class="o">&lt;</span> <span class="n">vr2</span> <span class="o">&lt;</span> <span class="mh">0x5B</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">found_implicit</span> <span class="o">!=</span> <span class="n">implicit_vr_is_assumed</span><span class="p">:</span>
+        <span class="c1"># first check if the tag still belongs to the dataset if stop_when</span>
+        <span class="c1"># is given - if not, the dataset is empty and we just return</span>
+        <span class="n">endian_chr</span> <span class="o">=</span> <span class="s2">&quot;&lt;&quot;</span> <span class="k">if</span> <span class="n">is_little_endian</span> <span class="k">else</span> <span class="s2">&quot;&gt;&quot;</span>
+        <span class="n">tag</span> <span class="o">=</span> <span class="n">TupleTag</span><span class="p">(</span><span class="n">unpack</span><span class="p">(</span><span class="n">endian_chr</span> <span class="o">+</span> <span class="s2">&quot;HH&quot;</span><span class="p">,</span> <span class="n">tag_bytes</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">stop_when</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">stop_when</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">vr</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">found_implicit</span>
+
+        <span class="c1"># got to the real problem - warn or raise depending on config</span>
+        <span class="n">found_vr</span> <span class="o">=</span> <span class="s1">&#39;implicit&#39;</span> <span class="k">if</span> <span class="n">found_implicit</span> <span class="k">else</span> <span class="s1">&#39;explicit&#39;</span>
+        <span class="n">expected_vr</span> <span class="o">=</span> <span class="s1">&#39;implicit&#39;</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">found_implicit</span> <span class="k">else</span> <span class="s1">&#39;explicit&#39;</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Expected </span><span class="si">{0}</span><span class="s1"> VR, but found </span><span class="si">{1}</span><span class="s1"> VR - using </span><span class="si">{1}</span><span class="s1"> VR for &#39;</span>
+                   <span class="s1">&#39;reading&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">expected_vr</span><span class="p">,</span> <span class="n">found_vr</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">enforce_valid_values</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidDicomError</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">found_implicit</span>
+
+
 <div class="viewcode-block" id="read_dataset"><a class="viewcode-back" href="../../api_ref.html#pydicom.filereader.read_dataset">[docs]</a><span class="k">def</span> <span class="nf">read_dataset</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">is_implicit_VR</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">,</span> <span class="n">bytelength</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">stop_when</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">defer_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">parent_encoding</span><span class="o">=</span><span class="n">default_encoding</span><span class="p">,</span> <span class="n">specific_tags</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -558,12 +611,15 @@
 <span class="sd">        A collection (dictionary) of Dicom `DataElement` instances.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">raw_data_elements</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">fpStart</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
+    <span class="n">fp_start</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
+    <span class="n">is_implicit_VR</span> <span class="o">=</span> <span class="n">_is_implicit_vr</span><span class="p">(</span>
+        <span class="n">fp</span><span class="p">,</span> <span class="n">is_implicit_VR</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">,</span> <span class="n">stop_when</span><span class="p">)</span>
+    <span class="n">fp</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">fp_start</span><span class="p">)</span>
     <span class="n">de_gen</span> <span class="o">=</span> <span class="n">data_element_generator</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">is_implicit_VR</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">,</span>
                                     <span class="n">stop_when</span><span class="p">,</span> <span class="n">defer_size</span><span class="p">,</span> <span class="n">parent_encoding</span><span class="p">,</span>
                                     <span class="n">specific_tags</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="k">while</span> <span class="p">(</span><span class="n">bytelength</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">fp</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span> <span class="o">-</span> <span class="n">fpStart</span> <span class="o">&lt;</span> <span class="n">bytelength</span><span class="p">):</span>
+        <span class="k">while</span> <span class="p">(</span><span class="n">bytelength</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">fp</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span> <span class="o">-</span> <span class="n">fp_start</span> <span class="o">&lt;</span> <span class="n">bytelength</span><span class="p">):</span>
             <span class="n">raw_data_element</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">de_gen</span><span class="p">)</span>
             <span class="c1"># Read data elements. Stop on some errors, but return what was read</span>
             <span class="n">tag</span> <span class="o">=</span> <span class="n">raw_data_element</span><span class="o">.</span><span class="n">tag</span>
