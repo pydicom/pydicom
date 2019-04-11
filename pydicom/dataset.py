@@ -826,6 +826,42 @@ class Dataset(object):
         raise KeyError(
             "Private creator '{}' not found".format(private_creator))
 
+    def private_creators(self, group):
+        """Return a list of private creator names in the given group.
+
+        This can be used to check if a given private creator exists in
+        the group of the dataset:
+        >>> ds = Dataset()
+        >>> ...
+        >>> if 'My Creator' in ds.private_creators(group):
+        >>>     block = ds.private_block(group, 'My Creator')
+
+        Parameters
+        ----------
+        group : 32 bit int
+            The private group. Must be an odd number.
+
+        Returns
+        -------
+        list of str
+            List of all private creator names for private blocks in the group.
+
+        Raises
+        ------
+        ValueError
+            If `group` is not a private group.
+        """
+        if group % 2 == 0:
+            raise ValueError('Group must be an odd number')
+
+        private_creators = []
+        for element in range(0x10, 0x100):
+            private_creator_tag = Tag(group, element)
+            if private_creator_tag not in self._dict:
+                break
+            private_creators.append(self._dict[private_creator_tag].value)
+        return private_creators
+
     def get_private_item(self, group, element_offset, private_creator):
         """Return the data element for the given private tag.
 

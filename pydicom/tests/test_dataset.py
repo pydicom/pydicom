@@ -1024,6 +1024,17 @@ class DatasetTests(unittest.TestCase):
         assert 'Creator 3.0' == ds[0x00090012].value
         assert 'Version3' == ds[0x00091201].value
 
+    def test_private_creators(self):
+        ds = Dataset()
+        ds.add_new(0x00080005, 'CS', 'ISO_IR 100')
+        ds.add_new(0x00090010, 'LO', 'Creator 1.0')
+        ds.add_new(0x00090011, 'LO', 'Creator 2.0')
+
+        with pytest.raises(ValueError, match='Group must be an odd number'):
+            ds.private_creators(0x0008)
+        assert ['Creator 1.0', 'Creator 2.0'] == ds.private_creators(0x0009)
+        assert not ds.private_creators(0x0011)
+
     def test_is_original_encoding(self):
         """Test Dataset.write_like_original"""
         ds = Dataset()
