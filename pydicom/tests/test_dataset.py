@@ -994,7 +994,6 @@ class DatasetTests(unittest.TestCase):
                            match="Private creator 'Creator 3.0' not found"):
             ds.private_block(0x0009, 'Creator 3.0')
         block = ds.private_block(0x0009, 'Creator 1.0')
-        print 1 in block, 2 in block
         assert 1 in block
         assert 2 not in block
         item = block[0x01]
