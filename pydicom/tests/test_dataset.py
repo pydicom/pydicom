@@ -959,21 +959,53 @@ class DatasetTests(unittest.TestCase):
         ds.add_new(0x00091102, 'US', 2)
 
         with pytest.raises(ValueError, match='Tag must be private'):
-            ds.get_private_item(0x00080005, 'Creator 1.0')
+            ds.get_private_item(0x0008, 0x05, 'Creator 1.0')
         with pytest.raises(ValueError,
                            match='Private creator must have a value'):
-            ds.get_private_item(0x00090010, '')
+            ds.get_private_item(0x0009, 0x10, '')
         with pytest.raises(KeyError,
                            match="Private creator 'Creator 3.0' not found"):
-            ds.get_private_item(0x00090010, 'Creator 3.0')
-        item = ds.get_private_item(0x00090001, 'Creator 1.0')
+            ds.get_private_item(0x0009, 0x10, 'Creator 3.0')
+        item = ds.get_private_item(0x0009, 0x01, 'Creator 1.0')
         assert 'Version1' == item.value
-        item = ds.get_private_item(Tag(0x00090001), 'Creator 2.0')
+        item = ds.get_private_item(0x0009, 0x01, 'Creator 2.0')
         assert 'Version2' == item.value
 
         with pytest.raises(KeyError):
-            ds.get_private_item(0x00090002, 'Creator 1.0')
-        item = ds.get_private_item(0x00090002, 'Creator 2.0')
+            ds.get_private_item(0x0009, 0x02, 'Creator 1.0')
+        item = ds.get_private_item(0x0009, 0x02, 'Creator 2.0')
+        assert 2 == item.value
+
+    def test_private_block(self):
+        ds = Dataset()
+        ds.add_new(0x00080005, 'CS', 'ISO_IR 100')
+        ds.add_new(0x00090010, 'LO', 'Creator 1.0')
+        ds.add_new(0x00091001, 'SH', 'Version1')
+        ds.add_new(0x00090011, 'LO', 'Creator 2.0')
+        ds.add_new(0x00091101, 'SH', 'Version2')
+        ds.add_new(0x00091102, 'US', 2)
+
+        with pytest.raises(ValueError, match='Tag must be private'):
+            ds.private_block(0x0008, 'Creator 1.0')
+        with pytest.raises(ValueError,
+                           match='Private creator must have a value'):
+            ds.private_block(0x0009, '')
+        with pytest.raises(KeyError,
+                           match="Private creator 'Creator 3.0' not found"):
+            ds.private_block(0x0009, 'Creator 3.0')
+        block = ds.private_block(0x0009, 'Creator 1.0')
+        item = block.get_item(0x01)
+        assert 'Version1' == item.value
+        block = ds.private_block(0x0009, 'Creator 2.0')
+        with pytest.raises(ValueError,
+                           match='Element offset must be less than 256'):
+            block.get_item(0x0101)
+        item = block.get_item(0x01)
+        assert 'Version2' == item.value
+
+        with pytest.raises(KeyError):
+            ds.get_private_item(0x0009, 0x02, 'Creator 1.0')
+        item = ds.get_private_item(0x0009, 0x02, 'Creator 2.0')
         assert 2 == item.value
 
     def test_add_new_private_tag(self):
@@ -984,10 +1016,10 @@ class DatasetTests(unittest.TestCase):
 
         with pytest.raises(ValueError, match='Tag must be private'):
             ds.private_block(0x0008, 'Creator 1.0')
-        block = ds.private_block(0x0009, 'Creator 2.0')
+        block = ds.private_block(0x0009, 'Creator 2.0', create=True)
         block.add_new(0x01, 'SH', 'Version2')
         assert 'Version2' == ds[0x00091101].value
-        block = ds.private_block(0x0009, 'Creator 3.0')
+        block = ds.private_block(0x0009, 'Creator 3.0', create=True)
         block.add_new(0x01, 'SH', 'Version3')
         assert 'Creator 3.0' == ds[0x00090012].value
         assert 'Version3' == ds[0x00091201].value

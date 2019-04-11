@@ -114,6 +114,29 @@ class PrivateBlock(object):
             raise ValueError('Element offset must be less than 256')
         return Tag(self.group, self.block_start + element_offset)
 
+    def get_item(self, element_offset):
+        """Return the data element in the parent dataset for the given element
+        offset.
+
+        Parameters
+        ----------
+        element_offset : 16 bit int
+            The lower 16 bit (e.g. 2 hex numbers) of the element tag.
+
+        Returns
+        -------
+            The data element of the tag in the parent dataset defined by the
+            private block location and the given element offset.
+
+        Raises
+        ------
+        ValueError
+            If `element_offset` is too large.
+        KeyError
+            If no data element exists at that offset.
+        """
+        return self.dataset.__getitem__(self.get_tag(element_offset))
+
     def add_new(self, element_offset, VR, value):
         """Adds the private tag with the given VR and value to the
          parent dataset at the tag ID defined by the private block
@@ -155,8 +178,8 @@ class Dataset(object):
 
     Add private DataElements to the Dataset:
 
-    >>> block = ds.private_block(0x0043, 'My Creator')
-    >>> block.add_new(0x2b, 'SS', [4, 4, 0, 0])
+    >>> block = ds.private_block(0x0041, 'My Creator', create=True)
+    >>> block.add_new(0x00410001, 'LO', '12345')
 
     Updating and retrieving DataElement values:
 
@@ -182,6 +205,13 @@ class Dataset(object):
     >>> elem = ds.data_element('PatientName')
     >>> elem
     (0010, 0010) Patient's Name                      PN: 'CITIZEN^Joan'
+
+    Retrieving a private DataElement:
+
+    >>> block = ds.private_block(0x0041, 'My Creator')
+    >>> elem = block.get_item(0x01)
+    >>> # alternatively:
+    >>> elem = ds.get_private_item()
 
     Deleting a DataElement from the Dataset:
 
@@ -732,7 +762,7 @@ class Dataset(object):
 
         return self._dict.get(tag)
 
-    def private_block(self, group, private_creator, create=True):
+    def private_block(self, group, private_creator, create=False):
         """Return the block for the given tag and private creator.
 
         If `create` is set and the private creator does not exist,
@@ -750,6 +780,8 @@ class Dataset(object):
         create : bool
             If `True` and `private_creator` does not exist, a new private
             creator tag is added at the next free block.
+            If `False` (the default) and `private_creator` does not exist,
+            `KeyError` is raised instead.
 
         Returns
         -------
@@ -794,7 +826,7 @@ class Dataset(object):
         raise KeyError(
             "Private creator '{}' not found".format(private_creator))
 
-    def get_private_item(self, key, private_creator):
+    def get_private_item(self, group, element_offset, private_creator):
         """Return the data element for the given private tag.
 
         This is analogous to `__getitem__`, but only for private tags.
@@ -803,12 +835,10 @@ class Dataset(object):
 
         Parameters
         ----------
-        key
-            The DICOM (group, element) tag in any form accepted by
-            `pydicom.tag.Tag` such as [0x0009, 0x0010], (0x9, 0x10),
-            0x00090010, etc.
-            Note that the 2 high order hex digits of the element are ignored -
-            they will be replaced by the correct value for the private block.
+        group : 32 bit int
+            The private group where the item is located.
+        element_offset : 16 bit int
+            The lower 16 bit (e.g. 2 hex numbers) of the element tag.
         private_creator : str
             The private creator for the tag. Must match the private creator
             for the tag to be returned.
@@ -825,13 +855,8 @@ class Dataset(object):
             If the private creator tag is not found in the given group.
             If the private tag is not found.
         """
-        if isinstance(key, BaseTag):
-            tag = key
-        else:
-            tag = Tag(key)
-
-        block = self.private_block(tag.group, private_creator, create=False)
-        return self.__getitem__(block.get_tag(tag.element & 0xff))
+        block = self.private_block(group, private_creator)
+        return self.__getitem__(block.get_tag(element_offset))
 
     def get_item(self, key):
         """Return the raw data element if possible.
