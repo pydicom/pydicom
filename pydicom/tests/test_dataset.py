@@ -994,13 +994,16 @@ class DatasetTests(unittest.TestCase):
                            match="Private creator 'Creator 3.0' not found"):
             ds.private_block(0x0009, 'Creator 3.0')
         block = ds.private_block(0x0009, 'Creator 1.0')
-        item = block.get_item(0x01)
+        print 1 in block, 2 in block
+        assert 1 in block
+        assert 2 not in block
+        item = block[0x01]
         assert 'Version1' == item.value
         block = ds.private_block(0x0009, 'Creator 2.0')
         with pytest.raises(ValueError,
                            match='Element offset must be less than 256'):
-            block.get_item(0x0101)
-        item = block.get_item(0x01)
+            _ = block[0x0101]
+        item = block[0x01]
         assert 'Version2' == item.value
 
         with pytest.raises(KeyError):

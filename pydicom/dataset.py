@@ -114,7 +114,12 @@ class PrivateBlock(object):
             raise ValueError('Element offset must be less than 256')
         return Tag(self.group, self.block_start + element_offset)
 
-    def get_item(self, element_offset):
+    def __contains__(self, element_offset):
+        """Return True if the tag with given element offset is contained in
+        the parent dataset."""
+        return self.get_tag(element_offset) in self.dataset
+
+    def __getitem__(self, element_offset):
         """Return the data element in the parent dataset for the given element
         offset.
 
@@ -209,7 +214,7 @@ class Dataset(object):
     Retrieving a private DataElement:
 
     >>> block = ds.private_block(0x0041, 'My Creator')
-    >>> elem = block.get_item(0x01)
+    >>> elem = block[0x01]
     >>> # alternatively:
     >>> elem = ds.get_private_item()
 
