@@ -142,6 +142,24 @@ class PrivateBlock(object):
         """
         return self.dataset.__getitem__(self.get_tag(element_offset))
 
+    def __delitem__(self, element_offset):
+        """Delete the tag with the given element offset from the dataset.
+
+        Parameters
+        ----------
+        element_offset : 16 bit int
+            The lower 16 bit (e.g. 2 hex numbers) of the element tag
+            to be deleted.
+
+        Raises
+        ------
+        ValueError
+            If `element_offset` is too large.
+        KeyError
+            If no data element exists at that offset.
+        """
+        del self.dataset[self.get_tag(element_offset)]
+
     def add_new(self, element_offset, VR, value):
         """Adds the private tag with the given VR and value to the
          parent dataset at the tag ID defined by the private block
@@ -216,7 +234,7 @@ class Dataset(object):
     >>> block = ds.private_block(0x0041, 'My Creator')
     >>> elem = block[0x01]
     >>> # alternatively:
-    >>> elem = ds.get_private_item()
+    >>> elem = ds.get_private_item(0x0041, 0x01, 'My Creator')
 
     Deleting a DataElement from the Dataset:
 
@@ -226,7 +244,9 @@ class Dataset(object):
 
     Deleting a private DataElement from the Dataset:
 
-    >>> del ds[0x0043, 0x102b]
+    >>> block = ds.private_block(0x0041, 'My Creator')
+    >>> if 0x01 in block
+    >>> del block[0x01]
 
     Determining if a DataElement is present in the Dataset:
 

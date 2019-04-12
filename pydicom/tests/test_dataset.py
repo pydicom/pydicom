@@ -2,7 +2,6 @@
 """Tests for dataset.py"""
 
 import unittest
-from collections import OrderedDict
 
 import pytest
 
@@ -985,6 +984,7 @@ class DatasetTests(unittest.TestCase):
         ds.add_new(0x00091101, 'SH', 'Version2')
         ds.add_new(0x00091102, 'US', 2)
 
+        # Dataset.private_block
         with pytest.raises(ValueError, match='Tag must be private'):
             ds.private_block(0x0008, 'Creator 1.0')
         with pytest.raises(ValueError,
@@ -994,8 +994,12 @@ class DatasetTests(unittest.TestCase):
                            match="Private creator 'Creator 3.0' not found"):
             ds.private_block(0x0009, 'Creator 3.0')
         block = ds.private_block(0x0009, 'Creator 1.0')
+
+        # test for containment
         assert 1 in block
         assert 2 not in block
+
+        # get item from private block
         item = block[0x01]
         assert 'Version1' == item.value
         block = ds.private_block(0x0009, 'Creator 2.0')
@@ -1005,6 +1009,7 @@ class DatasetTests(unittest.TestCase):
         item = block[0x01]
         assert 'Version2' == item.value
 
+        # Dataset.get_private_item
         with pytest.raises(KeyError):
             ds.get_private_item(0x0009, 0x02, 'Creator 1.0')
         item = ds.get_private_item(0x0009, 0x02, 'Creator 2.0')
@@ -1025,6 +1030,23 @@ class DatasetTests(unittest.TestCase):
         block.add_new(0x01, 'SH', 'Version3')
         assert 'Creator 3.0' == ds[0x00090012].value
         assert 'Version3' == ds[0x00091201].value
+
+    def test_delete_private_tag(self):
+        ds = Dataset()
+        ds.add_new(0x00080005, 'CS', 'ISO_IR 100')
+        ds.add_new(0x00090010, 'LO', 'Creator 1.0')
+        ds.add_new(0x00090011, 'LO', 'Creator 2.0')
+        ds.add_new(0x00091101, 'SH', 'Version2')
+
+        block = ds.private_block(0x0009, 'Creator 2.0')
+        with pytest.raises(ValueError,
+                           match='Element offset must be less than 256'):
+            del block[0x1001]
+        assert 1 in block
+        del block[0x01]
+        assert 1 not in block
+        with pytest.raises(KeyError):
+            del block[0x01]
 
     def test_private_creators(self):
         ds = Dataset()
