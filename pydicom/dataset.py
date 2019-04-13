@@ -245,8 +245,8 @@ class Dataset(object):
     Deleting a private DataElement from the Dataset:
 
     >>> block = ds.private_block(0x0041, 'My Creator')
-    >>> if 0x01 in block
-    >>> del block[0x01]
+    >>> if 0x01 in block:
+    >>>     del block[0x01]
 
     Determining if a DataElement is present in the Dataset:
 
