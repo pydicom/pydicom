@@ -174,7 +174,7 @@ class PrivateBlock(object):
             The 2 character DICOM value representation.
         value
             The value of the data element.
-            See `pydicom.Dataset.add_tag` for a description.
+            See `pydicom.Dataset.add_new` for a description.
         """
         self.dataset.add_new(self.get_tag(element_offset), VR, value)
 
@@ -202,13 +202,13 @@ class Dataset(object):
     Add private DataElements to the Dataset:
 
     >>> block = ds.private_block(0x0041, 'My Creator', create=True)
-    >>> block.add_new(0x00410001, 'LO', '12345')
+    >>> block.add_new(0x01, 'LO', '12345')
 
     Updating and retrieving DataElement values:
 
     >>> ds.PatientName = "CITIZEN^Joan"
     >>> ds.PatientName
-    'CITIZEN^Joan"
+    'CITIZEN^Joan'
     >>> ds.PatientName = "CITIZEN^John"
     >>> ds.PatientName
     'CITIZEN^John'
@@ -224,17 +224,24 @@ class Dataset(object):
 
     >>> elem = ds[0x00100010]
     >>> elem
-    (0010, 0010) Patient's Name                      PN: 'CITIZEN^Joan'
+    (0010, 0010) Patient's Name                      PN: 'CITIZEN^John'
     >>> elem = ds.data_element('PatientName')
     >>> elem
-    (0010, 0010) Patient's Name                      PN: 'CITIZEN^Joan'
+    (0010, 0010) Patient's Name                      PN: 'CITIZEN^John'
 
     Retrieving a private DataElement:
 
     >>> block = ds.private_block(0x0041, 'My Creator')
     >>> elem = block[0x01]
-    >>> # alternatively:
-    >>> elem = ds.get_private_item(0x0041, 0x01, 'My Creator')
+    >>> elem
+    (0041, 1001) Private tag data                    LO: '12345'
+
+    >>> elem.value
+    '12345'
+
+    Alternatively:
+    >>> ds.get_private_item(0x0041, 0x01, 'My Creator').value
+    '12345'
 
     Deleting a DataElement from the Dataset:
 
@@ -246,7 +253,7 @@ class Dataset(object):
 
     >>> block = ds.private_block(0x0041, 'My Creator')
     >>> if 0x01 in block:
-    >>>     del block[0x01]
+    ...     del block[0x01]
 
     Determining if a DataElement is present in the Dataset:
 
@@ -262,21 +269,23 @@ class Dataset(object):
     Iterating through the top level of a Dataset only (excluding Sequences):
 
     >>> for elem in ds:
-    >>>    print(elem)
+    ...    print(elem)   #doctest: +ELLIPSIS
+    (0010, 0010) Patient's Name                      PN: 'CITIZEN^John'...
 
     Iterating through the entire Dataset (including Sequences):
 
     >>> for elem in ds.iterall():
-    >>>     print(elem)
+    ...     print(elem)  #doctest: +ELLIPSIS
+    (0010, 0010) Patient's Name                      PN: 'CITIZEN^John'...
 
     Recursively iterate through a Dataset (including Sequences):
 
     >>> def recurse(ds):
-    >>>     for elem in ds:
-    >>>         if elem.VR == 'SQ':
-    >>>             [recurse(item) for item in elem]
-    >>>         else:
-    >>>             # Do something useful with each DataElement
+    ...     for elem in ds:
+    ...         if elem.VR == 'SQ':
+    ...             [recurse(item) for item in elem]
+    ...         else:
+    ...             # Do something useful with each DataElement
 
     Attributes
     ----------
@@ -402,6 +411,8 @@ class Dataset(object):
         """Simulate dict.__contains__() to handle DICOM keywords.
 
         This is called for code like:
+        >>> ds = Dataset()
+        >>> ds.SliceLocation = '2'
         >>> 'SliceLocation' in ds
         True
 
@@ -456,12 +467,19 @@ class Dataset(object):
     def __delattr__(self, name):
         """Intercept requests to delete an attribute by `name`.
 
-        If `name` is a DICOM keyword:
-            Delete the corresponding DataElement from the Dataset.
-            >>> del ds.PatientName
-        Else:
-            Delete the class attribute as any other class would do.
-            >>> del ds._is_some_attribute
+        >>> ds = Dataset()
+        >>> ds.PatientName = 'foo'
+        >>> ds.some_attribute = True
+
+        If `name` is a DICOM keyword - delete the corresponding DataElement
+        >>> del ds.PatientName
+        >>> 'PatientName' in ds
+        False
+
+        If `name` is another attribute - delete it
+        >>> del ds.some_attribute
+        >>> hasattr(ds, 'some_attribute')
+        False
 
         Parameters
         ----------
@@ -725,17 +743,18 @@ class Dataset(object):
         >>> ds.SOPInstanceUID = '1.2.3'
         >>> ds.PatientName = 'CITIZEN^Jan'
         >>> ds.PatientID = '12345'
-        >>> ds[0x00100010]
+        >>> ds[0x00100010].value
         'CITIZEN^Jan'
 
         Slicing using DataElement tag
         All group 0x0010 elements in the dataset
-        >>> ds[0x00100000:0x0011000]
+        >>> ds[0x00100000:0x00110000]
         (0010, 0010) Patient's Name                      PN: 'CITIZEN^Jan'
         (0010, 0020) Patient ID                          LO: '12345'
 
         All group 0x0002 elements in the dataset
         >>> ds[(0x0002, 0x0000):(0x0003, 0x0000)]
+        <BLANKLINE>
 
         Parameters
         ----------
@@ -857,9 +876,8 @@ class Dataset(object):
         This can be used to check if a given private creator exists in
         the group of the dataset:
         >>> ds = Dataset()
-        >>> ...
-        >>> if 'My Creator' in ds.private_creators(group):
-        >>>     block = ds.private_block(group, 'My Creator')
+        >>> if 'My Creator' in ds.private_creators(0x0041):
+        ...     block = ds.private_block(0x0041, 'My Creator')
 
         Parameters
         ----------
@@ -1006,8 +1024,9 @@ class Dataset(object):
     def __iter__(self):
         """Iterate through the top-level of the Dataset, yielding DataElements.
 
+        >>> ds = Dataset()
         >>> for elem in ds:
-        >>>     print(elem)
+        ...     print(elem)
 
         The DataElements are returned in increasing tag value order.
         Sequence items are returned as a single DataElement, so it is up to the
@@ -1029,8 +1048,9 @@ class Dataset(object):
         """Iterate through the top-level of the Dataset, yielding DataElements
         or RawDataElements (no conversion done).
 
+        >>> ds = Dataset()
         >>> for elem in ds.elements():
-        >>>     print(elem)
+        ...     print(elem)
 
         The elements are returned in the same way as in __getitem__.
 
