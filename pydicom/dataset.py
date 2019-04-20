@@ -57,6 +57,128 @@ class PropertyError(Exception):
     pass
 
 
+class PrivateBlock(object):
+    """Helper class for a private block in the dataset.
+    (See PS3.5, Section 7.8.1 - Private Data Element Tags)
+
+    Attributes
+    ----------
+    group : 32 bit int
+        The private group where the private block is located.
+    private_creator : str
+        The private creator string related to the block.
+    dataset : Dataset
+        The parent dataset.
+    block_start : 32 bit int
+        The start element of the private block.
+        Note that the 2 low order hex digits of the element are always 0.
+    """
+
+    def __init__(self, key, dataset, private_creator_element):
+        """Initializes an object corresponding to a private tag block.
+
+        Parameters
+        ----------
+        key : tuple (int, str)
+            The private group and private creator. The group must be an odd
+            number.
+        dataset : Dataset
+            The parent dataset.
+        private_creator_element : 32 bit int
+            The element of the private creator tag.
+        """
+        self.group = key[0]
+        self.private_creator = key[1]
+        self.dataset = dataset
+        self.block_start = private_creator_element << 8
+
+    def get_tag(self, element_offset):
+        """Return the private tag ID for the given element offset.
+
+        Parameters
+        ----------
+        element_offset : 16 bit int
+            The lower 16 bit (e.g. 2 hex numbers) of the element tag.
+
+        Returns
+        -------
+            The tag ID defined by the private block location and the
+            given element offset.
+
+        Raises
+        ------
+        ValueError
+            If `element_offset` is too large.
+        """
+        if element_offset > 0xff:
+            raise ValueError('Element offset must be less than 256')
+        return Tag(self.group, self.block_start + element_offset)
+
+    def __contains__(self, element_offset):
+        """Return True if the tag with given element offset is contained in
+        the parent dataset."""
+        return self.get_tag(element_offset) in self.dataset
+
+    def __getitem__(self, element_offset):
+        """Return the data element in the parent dataset for the given element
+        offset.
+
+        Parameters
+        ----------
+        element_offset : 16 bit int
+            The lower 16 bit (e.g. 2 hex numbers) of the element tag.
+
+        Returns
+        -------
+            The data element of the tag in the parent dataset defined by the
+            private block location and the given element offset.
+
+        Raises
+        ------
+        ValueError
+            If `element_offset` is too large.
+        KeyError
+            If no data element exists at that offset.
+        """
+        return self.dataset.__getitem__(self.get_tag(element_offset))
+
+    def __delitem__(self, element_offset):
+        """Delete the tag with the given element offset from the dataset.
+
+        Parameters
+        ----------
+        element_offset : 16 bit int
+            The lower 16 bit (e.g. 2 hex numbers) of the element tag
+            to be deleted.
+
+        Raises
+        ------
+        ValueError
+            If `element_offset` is too large.
+        KeyError
+            If no data element exists at that offset.
+        """
+        del self.dataset[self.get_tag(element_offset)]
+
+    def add_new(self, element_offset, VR, value):
+        """Adds the private tag with the given VR and value to the
+         parent dataset at the tag ID defined by the private block
+         and the given element offset.
+
+        Parameters
+        ----------
+        element_offset : 16 bit int
+            The lower 16 bit (e.g. 2 hex numbers) of the element tag
+            to be added.
+        VR : str
+            The 2 character DICOM value representation.
+        value
+            The value of the data element.
+            See `pydicom.Dataset.add_new` for a description.
+        """
+        self.dataset.add_new(self.get_tag(element_offset), VR, value)
+
+
 class Dataset(object):
     """Contains a collection (dictionary) of DICOM DataElements.
     Behaves like a dictionary.
@@ -79,15 +201,14 @@ class Dataset(object):
 
     Add private DataElements to the Dataset:
 
-    >>> ds.add(DataElement(0x0043102b, 'SS', [4, 4, 0, 0]))
-    >>> ds.add_new(0x0043102b, 'SS', [4, 4, 0, 0])
-    >>> ds[0x0043, 0x102b] = DataElement(0x0043102b, 'SS', [4, 4, 0, 0])
+    >>> block = ds.private_block(0x0041, 'My Creator', create=True)
+    >>> block.add_new(0x01, 'LO', '12345')
 
     Updating and retrieving DataElement values:
 
     >>> ds.PatientName = "CITIZEN^Joan"
     >>> ds.PatientName
-    'CITIZEN^Joan"
+    'CITIZEN^Joan'
     >>> ds.PatientName = "CITIZEN^John"
     >>> ds.PatientName
     'CITIZEN^John'
@@ -103,10 +224,24 @@ class Dataset(object):
 
     >>> elem = ds[0x00100010]
     >>> elem
-    (0010, 0010) Patient's Name                      PN: 'CITIZEN^Joan'
+    (0010, 0010) Patient's Name                      PN: 'CITIZEN^John'
     >>> elem = ds.data_element('PatientName')
     >>> elem
-    (0010, 0010) Patient's Name                      PN: 'CITIZEN^Joan'
+    (0010, 0010) Patient's Name                      PN: 'CITIZEN^John'
+
+    Retrieving a private DataElement:
+
+    >>> block = ds.private_block(0x0041, 'My Creator')
+    >>> elem = block[0x01]
+    >>> elem
+    (0041, 1001) Private tag data                    LO: '12345'
+
+    >>> elem.value
+    '12345'
+
+    Alternatively:
+    >>> ds.get_private_item(0x0041, 0x01, 'My Creator').value
+    '12345'
 
     Deleting a DataElement from the Dataset:
 
@@ -116,7 +251,9 @@ class Dataset(object):
 
     Deleting a private DataElement from the Dataset:
 
-    >>> del ds[0x0043, 0x102b]
+    >>> block = ds.private_block(0x0041, 'My Creator')
+    >>> if 0x01 in block:
+    ...     del block[0x01]
 
     Determining if a DataElement is present in the Dataset:
 
@@ -132,21 +269,23 @@ class Dataset(object):
     Iterating through the top level of a Dataset only (excluding Sequences):
 
     >>> for elem in ds:
-    >>>    print(elem)
+    ...    print(elem)   #doctest: +ELLIPSIS
+    (0010, 0010) Patient's Name                      PN: 'CITIZEN^John'...
 
     Iterating through the entire Dataset (including Sequences):
 
     >>> for elem in ds.iterall():
-    >>>     print(elem)
+    ...     print(elem)  #doctest: +ELLIPSIS
+    (0010, 0010) Patient's Name                      PN: 'CITIZEN^John'...
 
     Recursively iterate through a Dataset (including Sequences):
 
     >>> def recurse(ds):
-    >>>     for elem in ds:
-    >>>         if elem.VR == 'SQ':
-    >>>             [recurse(item) for item in elem]
-    >>>         else:
-    >>>             # Do something useful with each DataElement
+    ...     for elem in ds:
+    ...         if elem.VR == 'SQ':
+    ...             [recurse(item) for item in elem]
+    ...         else:
+    ...             # Do something useful with each DataElement
 
     Attributes
     ----------
@@ -200,6 +339,9 @@ class Dataset(object):
         # the parent data set, if this dataset is a sequence item
         self.parent = None
 
+        # known private creator blocks
+        self._private_blocks = {}
+
     def __enter__(self):
         """Method invoked on entry to a with statement."""
         return self
@@ -240,6 +382,7 @@ class Dataset(object):
             * a multi-value string with backslash separator
             * for a sequence DataElement, an empty list or list of Dataset
         """
+
         data_element = DataElement(tag, VR, value)
         # use data_element.tag since DataElement verified it
         self._dict[data_element.tag] = data_element
@@ -268,6 +411,8 @@ class Dataset(object):
         """Simulate dict.__contains__() to handle DICOM keywords.
 
         This is called for code like:
+        >>> ds = Dataset()
+        >>> ds.SliceLocation = '2'
         >>> 'SliceLocation' in ds
         True
 
@@ -322,12 +467,19 @@ class Dataset(object):
     def __delattr__(self, name):
         """Intercept requests to delete an attribute by `name`.
 
-        If `name` is a DICOM keyword:
-            Delete the corresponding DataElement from the Dataset.
-            >>> del ds.PatientName
-        Else:
-            Delete the class attribute as any other class would do.
-            >>> del ds._is_some_attribute
+        >>> ds = Dataset()
+        >>> ds.PatientName = 'foo'
+        >>> ds.some_attribute = True
+
+        If `name` is a DICOM keyword - delete the corresponding DataElement
+        >>> del ds.PatientName
+        >>> 'PatientName' in ds
+        False
+
+        If `name` is another attribute - delete it
+        >>> del ds.some_attribute
+        >>> hasattr(ds, 'some_attribute')
+        False
 
         Parameters
         ----------
@@ -591,17 +743,18 @@ class Dataset(object):
         >>> ds.SOPInstanceUID = '1.2.3'
         >>> ds.PatientName = 'CITIZEN^Jan'
         >>> ds.PatientID = '12345'
-        >>> ds[0x00100010]
+        >>> ds[0x00100010].value
         'CITIZEN^Jan'
 
         Slicing using DataElement tag
         All group 0x0010 elements in the dataset
-        >>> ds[0x00100000:0x0011000]
+        >>> ds[0x00100000:0x00110000]
         (0010, 0010) Patient's Name                      PN: 'CITIZEN^Jan'
         (0010, 0020) Patient ID                          LO: '12345'
 
         All group 0x0002 elements in the dataset
         >>> ds[(0x0002, 0x0000):(0x0003, 0x0000)]
+        <BLANKLINE>
 
         Parameters
         ----------
@@ -652,6 +805,137 @@ class Dataset(object):
                     self[tag], self, data_elem[6])
 
         return self._dict.get(tag)
+
+    def private_block(self, group, private_creator, create=False):
+        """Return the block for the given tag and private creator.
+
+        If `create` is set and the private creator does not exist,
+        the private creator tag is added.
+        Note: We ignore the unrealistic case that no free block is
+        available.
+
+        Parameters
+        ----------
+        group : 32 bit int
+            The group of the private tag to be found. Must be an odd number
+            (e.g. a private group).
+        private_creator : str
+            The private creator string associated with the tag.
+        create : bool
+            If `True` and `private_creator` does not exist, a new private
+            creator tag is added at the next free block.
+            If `False` (the default) and `private_creator` does not exist,
+            `KeyError` is raised instead.
+
+        Returns
+        -------
+        32 bit int
+            Element base for the given tag (the last 2 hex digits are always 0)
+
+        Raises
+        ------
+        ValueError
+            If `tag` is not a private tag or `private_creator` is empty.
+        KeyError
+            If the private creator tag is not found in the given group and
+            the `create` parameter is not set.
+        """
+        def new_block():
+            block = PrivateBlock(key, self, element)
+            self._private_blocks[key] = block
+            return block
+
+        key = (group, private_creator)
+        if key in self._private_blocks:
+            return self._private_blocks[key]
+
+        if not private_creator:
+            raise ValueError('Private creator must have a value')
+
+        if group % 2 == 0:
+            raise ValueError(
+                'Tag must be private if private creator is given')
+
+        for element in range(0x10, 0x100):
+            private_creator_tag = Tag(group, element)
+            if private_creator_tag not in self._dict:
+                if create:
+                    self.add_new(private_creator_tag, 'LO', private_creator)
+                    return new_block()
+                else:
+                    break
+            if self._dict[private_creator_tag].value == private_creator:
+                return new_block()
+
+        raise KeyError(
+            "Private creator '{}' not found".format(private_creator))
+
+    def private_creators(self, group):
+        """Return a list of private creator names in the given group.
+
+        This can be used to check if a given private creator exists in
+        the group of the dataset:
+        >>> ds = Dataset()
+        >>> if 'My Creator' in ds.private_creators(0x0041):
+        ...     block = ds.private_block(0x0041, 'My Creator')
+
+        Parameters
+        ----------
+        group : 32 bit int
+            The private group. Must be an odd number.
+
+        Returns
+        -------
+        list of str
+            List of all private creator names for private blocks in the group.
+
+        Raises
+        ------
+        ValueError
+            If `group` is not a private group.
+        """
+        if group % 2 == 0:
+            raise ValueError('Group must be an odd number')
+
+        private_creators = []
+        for element in range(0x10, 0x100):
+            private_creator_tag = Tag(group, element)
+            if private_creator_tag not in self._dict:
+                break
+            private_creators.append(self._dict[private_creator_tag].value)
+        return private_creators
+
+    def get_private_item(self, group, element_offset, private_creator):
+        """Return the data element for the given private tag.
+
+        This is analogous to `__getitem__`, but only for private tags.
+        This allows to find the private tag for the correct private creator
+        without the need to add the tag to the private dictionary first.
+
+        Parameters
+        ----------
+        group : 32 bit int
+            The private group where the item is located.
+        element_offset : 16 bit int
+            The lower 16 bit (e.g. 2 hex numbers) of the element tag.
+        private_creator : str
+            The private creator for the tag. Must match the private creator
+            for the tag to be returned.
+
+        Returns
+        -------
+        pydicom.dataelem.DataElement
+
+        Raises
+        ------
+        ValueError
+            If `tag` is not a private tag or `private_creator` is empty.
+        KeyError
+            If the private creator tag is not found in the given group.
+            If the private tag is not found.
+        """
+        block = self.private_block(group, private_creator)
+        return self.__getitem__(block.get_tag(element_offset))
 
     def get_item(self, key):
         """Return the raw data element if possible.
@@ -740,8 +1024,9 @@ class Dataset(object):
     def __iter__(self):
         """Iterate through the top-level of the Dataset, yielding DataElements.
 
+        >>> ds = Dataset()
         >>> for elem in ds:
-        >>>     print(elem)
+        ...     print(elem)
 
         The DataElements are returned in increasing tag value order.
         Sequence items are returned as a single DataElement, so it is up to the
@@ -763,8 +1048,9 @@ class Dataset(object):
         """Iterate through the top-level of the Dataset, yielding DataElements
         or RawDataElements (no conversion done).
 
+        >>> ds = Dataset()
         >>> for elem in ds.elements():
-        >>>     print(elem)
+        ...     print(elem)
 
         The elements are returned in the same way as in __getitem__.
 

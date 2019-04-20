@@ -23,6 +23,8 @@ Enhancements
 * Added handling of incorrect transfer syntax (explicit vs implicit)
   (:issue:`820`)
 * Added creation of Tag instances by DICOM keyword, e.g Tag("PatientName")
+* Added possibility to get and add private tags without adding them to the
+  private dictionary
 
 Fixes
 .....
