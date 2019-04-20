@@ -231,6 +231,128 @@
     <span class="k">pass</span></div>
 
 
+<div class="viewcode-block" id="PrivateBlock"><a class="viewcode-back" href="../../api_ref.html#pydicom.dataset.PrivateBlock">[docs]</a><span class="k">class</span> <span class="nc">PrivateBlock</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Helper class for a private block in the dataset.</span>
+<span class="sd">    (See PS3.5, Section 7.8.1 - Private Data Element Tags)</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    group : 32 bit int</span>
+<span class="sd">        The private group where the private block is located.</span>
+<span class="sd">    private_creator : str</span>
+<span class="sd">        The private creator string related to the block.</span>
+<span class="sd">    dataset : Dataset</span>
+<span class="sd">        The parent dataset.</span>
+<span class="sd">    block_start : 32 bit int</span>
+<span class="sd">        The start element of the private block.</span>
+<span class="sd">        Note that the 2 low order hex digits of the element are always 0.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">private_creator_element</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initializes an object corresponding to a private tag block.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key : tuple (int, str)</span>
+<span class="sd">            The private group and private creator. The group must be an odd</span>
+<span class="sd">            number.</span>
+<span class="sd">        dataset : Dataset</span>
+<span class="sd">            The parent dataset.</span>
+<span class="sd">        private_creator_element : 32 bit int</span>
+<span class="sd">            The element of the private creator tag.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">group</span> <span class="o">=</span> <span class="n">key</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">private_creator</span> <span class="o">=</span> <span class="n">key</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">block_start</span> <span class="o">=</span> <span class="n">private_creator_element</span> <span class="o">&lt;&lt;</span> <span class="mi">8</span>
+
+<div class="viewcode-block" id="PrivateBlock.get_tag"><a class="viewcode-back" href="../../api_ref.html#pydicom.dataset.PrivateBlock.get_tag">[docs]</a>    <span class="k">def</span> <span class="nf">get_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element_offset</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the private tag ID for the given element offset.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        element_offset : 16 bit int</span>
+<span class="sd">            The lower 16 bit (e.g. 2 hex numbers) of the element tag.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">            The tag ID defined by the private block location and the</span>
+<span class="sd">            given element offset.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If `element_offset` is too large.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">element_offset</span> <span class="o">&gt;</span> <span class="mh">0xff</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Element offset must be less than 256&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Tag</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">block_start</span> <span class="o">+</span> <span class="n">element_offset</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element_offset</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return True if the tag with given element offset is contained in</span>
+<span class="sd">        the parent dataset.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_tag</span><span class="p">(</span><span class="n">element_offset</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span>
+
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element_offset</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the data element in the parent dataset for the given element</span>
+<span class="sd">        offset.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        element_offset : 16 bit int</span>
+<span class="sd">            The lower 16 bit (e.g. 2 hex numbers) of the element tag.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">            The data element of the tag in the parent dataset defined by the</span>
+<span class="sd">            private block location and the given element offset.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If `element_offset` is too large.</span>
+<span class="sd">        KeyError</span>
+<span class="sd">            If no data element exists at that offset.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_tag</span><span class="p">(</span><span class="n">element_offset</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">__delitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element_offset</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Delete the tag with the given element offset from the dataset.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        element_offset : 16 bit int</span>
+<span class="sd">            The lower 16 bit (e.g. 2 hex numbers) of the element tag</span>
+<span class="sd">            to be deleted.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If `element_offset` is too large.</span>
+<span class="sd">        KeyError</span>
+<span class="sd">            If no data element exists at that offset.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_tag</span><span class="p">(</span><span class="n">element_offset</span><span class="p">)]</span>
+
+<div class="viewcode-block" id="PrivateBlock.add_new"><a class="viewcode-back" href="../../api_ref.html#pydicom.dataset.PrivateBlock.add_new">[docs]</a>    <span class="k">def</span> <span class="nf">add_new</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element_offset</span><span class="p">,</span> <span class="n">VR</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Adds the private tag with the given VR and value to the</span>
+<span class="sd">         parent dataset at the tag ID defined by the private block</span>
+<span class="sd">         and the given element offset.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        element_offset : 16 bit int</span>
+<span class="sd">            The lower 16 bit (e.g. 2 hex numbers) of the element tag</span>
+<span class="sd">            to be added.</span>
+<span class="sd">        VR : str</span>
+<span class="sd">            The 2 character DICOM value representation.</span>
+<span class="sd">        value</span>
+<span class="sd">            The value of the data element.</span>
+<span class="sd">            See `pydicom.Dataset.add_new` for a description.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">add_new</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_tag</span><span class="p">(</span><span class="n">element_offset</span><span class="p">),</span> <span class="n">VR</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div></div>
+
+
 <div class="viewcode-block" id="Dataset"><a class="viewcode-back" href="../../api_ref.html#pydicom.dataset.Dataset">[docs]</a><span class="k">class</span> <span class="nc">Dataset</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Contains a collection (dictionary) of DICOM DataElements.</span>
 <span class="sd">    Behaves like a dictionary.</span>
@@ -253,15 +375,14 @@
 
 <span class="sd">    Add private DataElements to the Dataset:</span>
 
-<span class="sd">    &gt;&gt;&gt; ds.add(DataElement(0x0043102b, &#39;SS&#39;, [4, 4, 0, 0]))</span>
-<span class="sd">    &gt;&gt;&gt; ds.add_new(0x0043102b, &#39;SS&#39;, [4, 4, 0, 0])</span>
-<span class="sd">    &gt;&gt;&gt; ds[0x0043, 0x102b] = DataElement(0x0043102b, &#39;SS&#39;, [4, 4, 0, 0])</span>
+<span class="sd">    &gt;&gt;&gt; block = ds.private_block(0x0041, &#39;My Creator&#39;, create=True)</span>
+<span class="sd">    &gt;&gt;&gt; block.add_new(0x01, &#39;LO&#39;, &#39;12345&#39;)</span>
 
 <span class="sd">    Updating and retrieving DataElement values:</span>
 
 <span class="sd">    &gt;&gt;&gt; ds.PatientName = &quot;CITIZEN^Joan&quot;</span>
 <span class="sd">    &gt;&gt;&gt; ds.PatientName</span>
-<span class="sd">    &#39;CITIZEN^Joan&quot;</span>
+<span class="sd">    &#39;CITIZEN^Joan&#39;</span>
 <span class="sd">    &gt;&gt;&gt; ds.PatientName = &quot;CITIZEN^John&quot;</span>
 <span class="sd">    &gt;&gt;&gt; ds.PatientName</span>
 <span class="sd">    &#39;CITIZEN^John&#39;</span>
@@ -277,10 +398,24 @@
 
 <span class="sd">    &gt;&gt;&gt; elem = ds[0x00100010]</span>
 <span class="sd">    &gt;&gt;&gt; elem</span>
-<span class="sd">    (0010, 0010) Patient&#39;s Name                      PN: &#39;CITIZEN^Joan&#39;</span>
+<span class="sd">    (0010, 0010) Patient&#39;s Name                      PN: &#39;CITIZEN^John&#39;</span>
 <span class="sd">    &gt;&gt;&gt; elem = ds.data_element(&#39;PatientName&#39;)</span>
 <span class="sd">    &gt;&gt;&gt; elem</span>
-<span class="sd">    (0010, 0010) Patient&#39;s Name                      PN: &#39;CITIZEN^Joan&#39;</span>
+<span class="sd">    (0010, 0010) Patient&#39;s Name                      PN: &#39;CITIZEN^John&#39;</span>
+
+<span class="sd">    Retrieving a private DataElement:</span>
+
+<span class="sd">    &gt;&gt;&gt; block = ds.private_block(0x0041, &#39;My Creator&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; elem = block[0x01]</span>
+<span class="sd">    &gt;&gt;&gt; elem</span>
+<span class="sd">    (0041, 1001) Private tag data                    LO: &#39;12345&#39;</span>
+
+<span class="sd">    &gt;&gt;&gt; elem.value</span>
+<span class="sd">    &#39;12345&#39;</span>
+
+<span class="sd">    Alternatively:</span>
+<span class="sd">    &gt;&gt;&gt; ds.get_private_item(0x0041, 0x01, &#39;My Creator&#39;).value</span>
+<span class="sd">    &#39;12345&#39;</span>
 
 <span class="sd">    Deleting a DataElement from the Dataset:</span>
 
@@ -290,7 +425,9 @@
 
 <span class="sd">    Deleting a private DataElement from the Dataset:</span>
 
-<span class="sd">    &gt;&gt;&gt; del ds[0x0043, 0x102b]</span>
+<span class="sd">    &gt;&gt;&gt; block = ds.private_block(0x0041, &#39;My Creator&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; if 0x01 in block:</span>
+<span class="sd">    ...     del block[0x01]</span>
 
 <span class="sd">    Determining if a DataElement is present in the Dataset:</span>
 
@@ -306,21 +443,23 @@
 <span class="sd">    Iterating through the top level of a Dataset only (excluding Sequences):</span>
 
 <span class="sd">    &gt;&gt;&gt; for elem in ds:</span>
-<span class="sd">    &gt;&gt;&gt;    print(elem)</span>
+<span class="sd">    ...    print(elem)   #doctest: +ELLIPSIS</span>
+<span class="sd">    (0010, 0010) Patient&#39;s Name                      PN: &#39;CITIZEN^John&#39;...</span>
 
 <span class="sd">    Iterating through the entire Dataset (including Sequences):</span>
 
 <span class="sd">    &gt;&gt;&gt; for elem in ds.iterall():</span>
-<span class="sd">    &gt;&gt;&gt;     print(elem)</span>
+<span class="sd">    ...     print(elem)  #doctest: +ELLIPSIS</span>
+<span class="sd">    (0010, 0010) Patient&#39;s Name                      PN: &#39;CITIZEN^John&#39;...</span>
 
 <span class="sd">    Recursively iterate through a Dataset (including Sequences):</span>
 
 <span class="sd">    &gt;&gt;&gt; def recurse(ds):</span>
-<span class="sd">    &gt;&gt;&gt;     for elem in ds:</span>
-<span class="sd">    &gt;&gt;&gt;         if elem.VR == &#39;SQ&#39;:</span>
-<span class="sd">    &gt;&gt;&gt;             [recurse(item) for item in elem]</span>
-<span class="sd">    &gt;&gt;&gt;         else:</span>
-<span class="sd">    &gt;&gt;&gt;             # Do something useful with each DataElement</span>
+<span class="sd">    ...     for elem in ds:</span>
+<span class="sd">    ...         if elem.VR == &#39;SQ&#39;:</span>
+<span class="sd">    ...             [recurse(item) for item in elem]</span>
+<span class="sd">    ...         else:</span>
+<span class="sd">    ...             # Do something useful with each DataElement</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
@@ -374,6 +513,9 @@
         <span class="c1"># the parent data set, if this dataset is a sequence item</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="kc">None</span>
 
+        <span class="c1"># known private creator blocks</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_private_blocks</span> <span class="o">=</span> <span class="p">{}</span>
+
     <span class="k">def</span> <span class="nf">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Method invoked on entry to a with statement.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span>
@@ -414,6 +556,7 @@
 <span class="sd">            * a multi-value string with backslash separator</span>
 <span class="sd">            * for a sequence DataElement, an empty list or list of Dataset</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="n">data_element</span> <span class="o">=</span> <span class="n">DataElement</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">VR</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
         <span class="c1"># use data_element.tag since DataElement verified it</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_dict</span><span class="p">[</span><span class="n">data_element</span><span class="o">.</span><span class="n">tag</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_element</span></div>
@@ -442,6 +585,8 @@
         <span class="sd">&quot;&quot;&quot;Simulate dict.__contains__() to handle DICOM keywords.</span>
 
 <span class="sd">        This is called for code like:</span>
+<span class="sd">        &gt;&gt;&gt; ds = Dataset()</span>
+<span class="sd">        &gt;&gt;&gt; ds.SliceLocation = &#39;2&#39;</span>
 <span class="sd">        &gt;&gt;&gt; &#39;SliceLocation&#39; in ds</span>
 <span class="sd">        True</span>
 
@@ -496,12 +641,19 @@
     <span class="k">def</span> <span class="nf">__delattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Intercept requests to delete an attribute by `name`.</span>
 
-<span class="sd">        If `name` is a DICOM keyword:</span>
-<span class="sd">            Delete the corresponding DataElement from the Dataset.</span>
-<span class="sd">            &gt;&gt;&gt; del ds.PatientName</span>
-<span class="sd">        Else:</span>
-<span class="sd">            Delete the class attribute as any other class would do.</span>
-<span class="sd">            &gt;&gt;&gt; del ds._is_some_attribute</span>
+<span class="sd">        &gt;&gt;&gt; ds = Dataset()</span>
+<span class="sd">        &gt;&gt;&gt; ds.PatientName = &#39;foo&#39;</span>
+<span class="sd">        &gt;&gt;&gt; ds.some_attribute = True</span>
+
+<span class="sd">        If `name` is a DICOM keyword - delete the corresponding DataElement</span>
+<span class="sd">        &gt;&gt;&gt; del ds.PatientName</span>
+<span class="sd">        &gt;&gt;&gt; &#39;PatientName&#39; in ds</span>
+<span class="sd">        False</span>
+
+<span class="sd">        If `name` is another attribute - delete it</span>
+<span class="sd">        &gt;&gt;&gt; del ds.some_attribute</span>
+<span class="sd">        &gt;&gt;&gt; hasattr(ds, &#39;some_attribute&#39;)</span>
+<span class="sd">        False</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -765,17 +917,18 @@
 <span class="sd">        &gt;&gt;&gt; ds.SOPInstanceUID = &#39;1.2.3&#39;</span>
 <span class="sd">        &gt;&gt;&gt; ds.PatientName = &#39;CITIZEN^Jan&#39;</span>
 <span class="sd">        &gt;&gt;&gt; ds.PatientID = &#39;12345&#39;</span>
-<span class="sd">        &gt;&gt;&gt; ds[0x00100010]</span>
+<span class="sd">        &gt;&gt;&gt; ds[0x00100010].value</span>
 <span class="sd">        &#39;CITIZEN^Jan&#39;</span>
 
 <span class="sd">        Slicing using DataElement tag</span>
 <span class="sd">        All group 0x0010 elements in the dataset</span>
-<span class="sd">        &gt;&gt;&gt; ds[0x00100000:0x0011000]</span>
+<span class="sd">        &gt;&gt;&gt; ds[0x00100000:0x00110000]</span>
 <span class="sd">        (0010, 0010) Patient&#39;s Name                      PN: &#39;CITIZEN^Jan&#39;</span>
 <span class="sd">        (0010, 0020) Patient ID                          LO: &#39;12345&#39;</span>
 
 <span class="sd">        All group 0x0002 elements in the dataset</span>
 <span class="sd">        &gt;&gt;&gt; ds[(0x0002, 0x0000):(0x0003, 0x0000)]</span>
+<span class="sd">        &lt;BLANKLINE&gt;</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -826,6 +979,137 @@
                     <span class="bp">self</span><span class="p">[</span><span class="n">tag</span><span class="p">],</span> <span class="bp">self</span><span class="p">,</span> <span class="n">data_elem</span><span class="p">[</span><span class="mi">6</span><span class="p">])</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Dataset.private_block"><a class="viewcode-back" href="../../api_ref.html#pydicom.dataset.Dataset.private_block">[docs]</a>    <span class="k">def</span> <span class="nf">private_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group</span><span class="p">,</span> <span class="n">private_creator</span><span class="p">,</span> <span class="n">create</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the block for the given tag and private creator.</span>
+
+<span class="sd">        If `create` is set and the private creator does not exist,</span>
+<span class="sd">        the private creator tag is added.</span>
+<span class="sd">        Note: We ignore the unrealistic case that no free block is</span>
+<span class="sd">        available.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        group : 32 bit int</span>
+<span class="sd">            The group of the private tag to be found. Must be an odd number</span>
+<span class="sd">            (e.g. a private group).</span>
+<span class="sd">        private_creator : str</span>
+<span class="sd">            The private creator string associated with the tag.</span>
+<span class="sd">        create : bool</span>
+<span class="sd">            If `True` and `private_creator` does not exist, a new private</span>
+<span class="sd">            creator tag is added at the next free block.</span>
+<span class="sd">            If `False` (the default) and `private_creator` does not exist,</span>
+<span class="sd">            `KeyError` is raised instead.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        32 bit int</span>
+<span class="sd">            Element base for the given tag (the last 2 hex digits are always 0)</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If `tag` is not a private tag or `private_creator` is empty.</span>
+<span class="sd">        KeyError</span>
+<span class="sd">            If the private creator tag is not found in the given group and</span>
+<span class="sd">            the `create` parameter is not set.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">def</span> <span class="nf">new_block</span><span class="p">():</span>
+            <span class="n">block</span> <span class="o">=</span> <span class="n">PrivateBlock</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_private_blocks</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">block</span>
+            <span class="k">return</span> <span class="n">block</span>
+
+        <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="n">private_creator</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_private_blocks</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_private_blocks</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">private_creator</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Private creator must have a value&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">group</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s1">&#39;Tag must be private if private creator is given&#39;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mh">0x10</span><span class="p">,</span> <span class="mh">0x100</span><span class="p">):</span>
+            <span class="n">private_creator_tag</span> <span class="o">=</span> <span class="n">Tag</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="n">element</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">private_creator_tag</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dict</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">create</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">add_new</span><span class="p">(</span><span class="n">private_creator_tag</span><span class="p">,</span> <span class="s1">&#39;LO&#39;</span><span class="p">,</span> <span class="n">private_creator</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="n">new_block</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">break</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dict</span><span class="p">[</span><span class="n">private_creator_tag</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="n">private_creator</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">new_block</span><span class="p">()</span>
+
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
+            <span class="s2">&quot;Private creator &#39;</span><span class="si">{}</span><span class="s2">&#39; not found&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">private_creator</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Dataset.private_creators"><a class="viewcode-back" href="../../api_ref.html#pydicom.dataset.Dataset.private_creators">[docs]</a>    <span class="k">def</span> <span class="nf">private_creators</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a list of private creator names in the given group.</span>
+
+<span class="sd">        This can be used to check if a given private creator exists in</span>
+<span class="sd">        the group of the dataset:</span>
+<span class="sd">        &gt;&gt;&gt; ds = Dataset()</span>
+<span class="sd">        &gt;&gt;&gt; if &#39;My Creator&#39; in ds.private_creators(0x0041):</span>
+<span class="sd">        ...     block = ds.private_block(0x0041, &#39;My Creator&#39;)</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        group : 32 bit int</span>
+<span class="sd">            The private group. Must be an odd number.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list of str</span>
+<span class="sd">            List of all private creator names for private blocks in the group.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If `group` is not a private group.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">group</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Group must be an odd number&#39;</span><span class="p">)</span>
+
+        <span class="n">private_creators</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mh">0x10</span><span class="p">,</span> <span class="mh">0x100</span><span class="p">):</span>
+            <span class="n">private_creator_tag</span> <span class="o">=</span> <span class="n">Tag</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="n">element</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">private_creator_tag</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dict</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="n">private_creators</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dict</span><span class="p">[</span><span class="n">private_creator_tag</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">private_creators</span></div>
+
+<div class="viewcode-block" id="Dataset.get_private_item"><a class="viewcode-back" href="../../api_ref.html#pydicom.dataset.Dataset.get_private_item">[docs]</a>    <span class="k">def</span> <span class="nf">get_private_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group</span><span class="p">,</span> <span class="n">element_offset</span><span class="p">,</span> <span class="n">private_creator</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the data element for the given private tag.</span>
+
+<span class="sd">        This is analogous to `__getitem__`, but only for private tags.</span>
+<span class="sd">        This allows to find the private tag for the correct private creator</span>
+<span class="sd">        without the need to add the tag to the private dictionary first.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        group : 32 bit int</span>
+<span class="sd">            The private group where the item is located.</span>
+<span class="sd">        element_offset : 16 bit int</span>
+<span class="sd">            The lower 16 bit (e.g. 2 hex numbers) of the element tag.</span>
+<span class="sd">        private_creator : str</span>
+<span class="sd">            The private creator for the tag. Must match the private creator</span>
+<span class="sd">            for the tag to be returned.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        pydicom.dataelem.DataElement</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If `tag` is not a private tag or `private_creator` is empty.</span>
+<span class="sd">        KeyError</span>
+<span class="sd">            If the private creator tag is not found in the given group.</span>
+<span class="sd">            If the private tag is not found.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">block</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">private_block</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="n">private_creator</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span><span class="n">block</span><span class="o">.</span><span class="n">get_tag</span><span class="p">(</span><span class="n">element_offset</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="Dataset.get_item"><a class="viewcode-back" href="../../api_ref.html#pydicom.dataset.Dataset.get_item">[docs]</a>    <span class="k">def</span> <span class="nf">get_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return the raw data element if possible.</span>
@@ -914,8 +1198,9 @@
     <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Iterate through the top-level of the Dataset, yielding DataElements.</span>
 
+<span class="sd">        &gt;&gt;&gt; ds = Dataset()</span>
 <span class="sd">        &gt;&gt;&gt; for elem in ds:</span>
-<span class="sd">        &gt;&gt;&gt;     print(elem)</span>
+<span class="sd">        ...     print(elem)</span>
 
 <span class="sd">        The DataElements are returned in increasing tag value order.</span>
 <span class="sd">        Sequence items are returned as a single DataElement, so it is up to the</span>
@@ -937,8 +1222,9 @@
         <span class="sd">&quot;&quot;&quot;Iterate through the top-level of the Dataset, yielding DataElements</span>
 <span class="sd">        or RawDataElements (no conversion done).</span>
 
+<span class="sd">        &gt;&gt;&gt; ds = Dataset()</span>
 <span class="sd">        &gt;&gt;&gt; for elem in ds.elements():</span>
-<span class="sd">        &gt;&gt;&gt;     print(elem)</span>
+<span class="sd">        ...     print(elem)</span>
 
 <span class="sd">        The elements are returned in the same way as in __getitem__.</span>
 
