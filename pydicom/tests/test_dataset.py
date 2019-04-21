@@ -69,15 +69,15 @@ class DatasetTests(unittest.TestCase):
             ds.pixel_array
 
     def test_for_stray_raw_data_element(self):
-        import os
         dataset = Dataset()
         dataset.PatientName = 'MacDonald^George'
-        filename = 'test.dcm'
+        fp = DicomBytesIO()
         try:
-            pydicom.write_file(filename, dataset)
-
-            ds1 = pydicom.dcmread(filename, force=True)
-            ds2 = pydicom.dcmread(filename, force=True)
+            pydicom.write_file(fp, dataset)
+            fp.seek(0)
+            ds1 = pydicom.dcmread(fp, force=True)
+            fp.seek(0)
+            ds2 = pydicom.dcmread(fp, force=True)
 
             self.assertEqual(ds1, ds2)
 
@@ -87,7 +87,7 @@ class DatasetTests(unittest.TestCase):
             ds2.PatientName
             self.assertEqual(ds1, ds2)
         finally:
-            os.remove(filename)
+            fp.close()
 
     def test_attribute_error_in_property_correct_debug(self):
         """Test AttributeError in property raises correctly."""
