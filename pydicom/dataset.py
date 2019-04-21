@@ -342,6 +342,12 @@ class Dataset(object):
         # known private creator blocks
         self._private_blocks = {}
 
+        for tag, data_elem in self._dict.items():
+            if not isinstance(data_elem, DataElement):
+                # Don't load the element if it has been deferred
+                if data_elem.value is not None:
+                    self._initial_dataelement_handling(tag, data_elem)
+
     def __enter__(self):
         """Method invoked on entry to a with statement."""
         return self
@@ -791,20 +797,23 @@ class Dataset(object):
                     self.fileobj_type, self.filename, self.timestamp,
                     data_elem)
 
-            if tag != BaseTag(0x00080005):
-                character_set = self.read_encoding or self._character_set
-            else:
-                character_set = default_encoding
-            # Not converted from raw form read from file yet; do so now
-            self[tag] = DataElement_from_raw(data_elem, character_set)
-
-            # If the Element has an ambiguous VR, try to correct it
-            if 'or' in self[tag].VR:
-                from pydicom.filewriter import correct_ambiguous_vr_element
-                self[tag] = correct_ambiguous_vr_element(
-                    self[tag], self, data_elem[6])
+            self._initial_dataelement_handling(tag, data_elem)
 
         return self._dict.get(tag)
+
+    def _initial_dataelement_handling(self, tag, data_elem):
+        if tag != BaseTag(0x00080005):
+            character_set = self.read_encoding or self._character_set
+        else:
+            character_set = default_encoding
+        # Not converted from raw form read from file yet; do so now
+        self[tag] = DataElement_from_raw(data_elem, character_set)
+
+        # If the Element has an ambiguous VR, try to correct it
+        if 'or' in self[tag].VR:
+            from pydicom.filewriter import correct_ambiguous_vr_element
+            self[tag] = correct_ambiguous_vr_element(
+                self[tag], self, data_elem[6])
 
     def private_block(self, group, private_creator, create=False):
         """Return the block for the given tag and private creator.
