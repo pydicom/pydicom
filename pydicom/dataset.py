@@ -342,12 +342,6 @@ class Dataset(object):
         # known private creator blocks
         self._private_blocks = {}
 
-        # for tag, data_elem in self._dict.items():
-        #     if not isinstance(data_elem, DataElement):
-        #         # Don't load the element if it has been deferred
-        #         if data_elem.value is not None:
-        #             self._initial_dataelement_handling(tag, data_elem)
-
     def __enter__(self):
         """Method invoked on entry to a with statement."""
         return self
