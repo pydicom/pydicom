@@ -1,6 +1,7 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Tests for dataset.py"""
 
+import os
 import unittest
 
 import pytest
@@ -67,6 +68,26 @@ class DatasetTests(unittest.TestCase):
             [msg_from_gdcm, msg_from_numpy, msg_from_pillow]) + ")"
         with pytest.raises(AttributeError, match=msg):
             ds.pixel_array
+
+    def test_for_stray_raw_data_element(self):
+        dataset = Dataset()
+        dataset.PatientName = 'MacDonald^George'
+        filename = 'test.dcm'
+        try:
+            pydicom.write_file(filename, dataset)
+
+            ds1 = pydicom.dcmread(filename, force=True)
+            ds2 = pydicom.dcmread(filename, force=True)
+
+            self.assertEqual(ds1, ds2)
+
+            ds1.PatientName
+            self.assertEqual(ds1, ds2)
+
+            ds2.PatientName
+            self.assertEqual(ds1, ds2)
+        finally:
+            os.remove(filename)
 
     def test_attribute_error_in_property_correct_debug(self):
         """Test AttributeError in property raises correctly."""
