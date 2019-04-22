@@ -5,6 +5,8 @@ import unittest
 
 import pytest
 
+import numpy as np
+
 import pydicom
 from pydicom import compat
 from pydicom.data import get_testdata_files
@@ -67,6 +69,28 @@ class DatasetTests(unittest.TestCase):
             [msg_from_gdcm, msg_from_numpy, msg_from_pillow]) + ")"
         with pytest.raises(AttributeError, match=msg):
             ds.pixel_array
+
+    def test_works_as_expected_within_numpy_array(self):
+        """Test Dataset within a numpy array"""
+        dataset = Dataset()
+        patient_name = 'MacDonald^George'
+
+        dataset.PatientName = patient_name
+
+        filepaths = [
+            DicomBytesIO()
+            for _ in range(2)
+        ]
+
+        for filepath in filepaths:
+            pydicom.dcmwrite(filepath, dataset)
+
+        array_of_datasets = np.array([
+            pydicom.dcmread(filepath, force=True)
+            for filepath in filepaths
+        ])
+
+        self.assertEqual(array_of_datasets[0].PatientName, patient_name)
 
     def test_attribute_error_in_property_correct_debug(self):
         """Test AttributeError in property raises correctly."""
