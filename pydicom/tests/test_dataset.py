@@ -82,15 +82,19 @@ class DatasetTests(unittest.TestCase):
             for _ in range(2)
         ]
 
-        for filepath in filepaths:
-            pydicom.dcmwrite(filepath, dataset)
+        try:
+            for filepath in filepaths:
+                pydicom.dcmwrite(filepath, dataset)
 
-        array_of_datasets = np.array([
-            pydicom.dcmread(filepath, force=True)
-            for filepath in filepaths
-        ])
+            array_of_datasets = np.array([
+                pydicom.dcmread(filepath, force=True)
+                for filepath in filepaths
+            ])
 
-        self.assertEqual(array_of_datasets[0].PatientName, patient_name)
+            self.assertEqual(array_of_datasets[0].PatientName, patient_name)
+        finally:
+            for filepath in filepaths:
+                filepath.close()
 
     def test_attribute_error_in_property_correct_debug(self):
         """Test AttributeError in property raises correctly."""
