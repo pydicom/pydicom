@@ -72,7 +72,10 @@ def _correct_ambiguous_vr_element(elem, ds, is_little_endian):
         # PixelRepresentation is usually set in the root dataset
         while 'PixelRepresentation' not in ds and ds.parent:
             ds = ds.parent
-        if ds.PixelRepresentation == 0:
+        # if no pixel data is present, none if these tags is used,
+        # so we can just ignore a missing PixelRepresentation in this case
+        if ('PixelRepresentation' not in ds and 'PixelData' not in ds or
+                ds.PixelRepresentation == 0):
             elem.VR = 'US'
             byte_type = 'H'
         else:

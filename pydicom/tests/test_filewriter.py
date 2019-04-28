@@ -671,9 +671,15 @@ class TestCorrectAmbiguousVR(object):
         assert 1 == ds.SmallestValidPixelValue
         assert 'SS' == ds[0x00280104].VR
 
-        # If no PixelRepresentation AttributeError shall be raised
+        # If no PixelRepresentation and no PixelData is present 'US' is set
         ref_ds = Dataset()
         ref_ds.SmallestValidPixelValue = b'\x00\x01'  # Big endian 1
+        ds = correct_ambiguous_vr(deepcopy(ref_ds), True)
+        assert 'US' == ds[0x00280104].VR
+
+        # If no PixelRepresentation but PixelData is present
+        # AttributeError shall be raised
+        ref_ds.PixelData = b'123'
         with pytest.raises(AttributeError,
                            match=r"Failed to resolve ambiguous VR for tag "
                                  r"\(0028, 0104\):.* 'PixelRepresentation'"):
@@ -697,9 +703,14 @@ class TestCorrectAmbiguousVR(object):
         assert [256, 1, 16] == ds.LUTDescriptor
         assert 'SS' == ds[0x00283002].VR
 
-        # If no PixelRepresentation AttributeError shall be raised
+        # If no PixelRepresentation and no PixelData is present 'US' is set
         ref_ds = Dataset()
         ref_ds.LUTDescriptor = b'\x01\x00\x00\x01\x00\x10'
+        ds = correct_ambiguous_vr(deepcopy(ref_ds), True)
+        assert 'US' == ds[0x00283002].VR
+
+        # If no PixelRepresentation AttributeError shall be raised
+        ref_ds.PixelData = b'123'
         with pytest.raises(AttributeError,
                            match=r"Failed to resolve ambiguous VR for tag "
                                  r"\(0028, 3002\):.* 'PixelRepresentation'"):
@@ -928,6 +939,13 @@ class TestCorrectAmbiguousVRElement(object):
         """Test correct ambiguous US/SS element"""
         ds = Dataset()
         ds.PixelPaddingValue = b'\xfe\xff'
+        out = correct_ambiguous_vr_element(ds[0x00280120], ds, True)
+        # assume US if PixelData is not set
+        assert 'US' == out.VR
+
+        ds = Dataset()
+        ds.PixelPaddingValue = b'\xfe\xff'
+        ds.PixelData = b'3456'
         with pytest.raises(AttributeError,
                            match=r"Failed to resolve ambiguous VR for tag "
                                  r"\(0028, 0120\):.* 'PixelRepresentation'"):

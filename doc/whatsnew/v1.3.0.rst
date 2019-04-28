@@ -28,7 +28,9 @@ Enhancements
 
 Fixes
 .....
-
+* Do not raise while resolving an ambiguous VR dependent on
+  `PixelRepresentation` if both `PixelRepresentation` and `PixelData` are
+  not present (:issue:`838`)
 * Raise exception with specific message if value is too large to be written
   in explicit transfer syntax (:issue:`757`)
 * Do not derive `Dataset` from `dict` - fixes behavior in newer Python versions
