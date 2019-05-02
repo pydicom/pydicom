@@ -1455,3 +1455,20 @@ class FileDatasetTests(unittest.TestCase):
         ds.PatientName = "CITIZEN^Jan"
         fds = FileDataset(Dummy(), ds)
         assert fds.filename == '/some/path/to/test'
+
+    def test_works_as_expected_within_numpy_array(self):
+        """Test Dataset within a numpy array"""
+        try:
+            import numpy as np
+        except ImportError:
+            np = None
+
+        if np is None:
+            pytest.skip('No numpy installed')
+
+        # see PR #836
+        dataset = Dataset()
+        patient_name = 'MacDonald^George'
+        dataset.PatientName = patient_name
+        array_of_datasets = np.array([dataset])
+        assert patient_name == array_of_datasets[0].PatientName

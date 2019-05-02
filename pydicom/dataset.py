@@ -179,9 +179,14 @@ class PrivateBlock(object):
         self.dataset.add_new(self.get_tag(element_offset), VR, value)
 
 
-class Dataset(object):
+class Dataset(dict):
     """Contains a collection (dictionary) of DICOM DataElements.
     Behaves like a dictionary.
+
+    .. note::
+
+        `Dataset` is derived from `dict` only to make it work in a NumPy
+        array. No `dict` functionality is used.
 
     Examples
     --------

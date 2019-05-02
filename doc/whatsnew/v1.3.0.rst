@@ -25,6 +25,7 @@ Enhancements
 * Added creation of Tag instances by DICOM keyword, e.g Tag("PatientName")
 * Added possibility to get and add private tags without adding them to the
   private dictionary
+* Added possibility to use a ``Dataset`` in a ``NumPy`` array
 
 Fixes
 .....
