@@ -68,6 +68,27 @@ class DatasetTests(unittest.TestCase):
         with pytest.raises(AttributeError, match=msg):
             ds.pixel_array
 
+    def test_for_stray_raw_data_element(self):
+        dataset = Dataset()
+        dataset.PatientName = 'MacDonald^George'
+        fp = DicomBytesIO()
+        try:
+            pydicom.write_file(fp, dataset)
+            fp.seek(0)
+            ds1 = pydicom.dcmread(fp, force=True)
+            fp.seek(0)
+            ds2 = pydicom.dcmread(fp, force=True)
+
+            self.assertEqual(ds1, ds2)
+
+            ds1.PatientName
+            self.assertEqual(ds1, ds2)
+
+            ds2.PatientName
+            self.assertEqual(ds1, ds2)
+        finally:
+            fp.close()
+
     def test_attribute_error_in_property_correct_debug(self):
         """Test AttributeError in property raises correctly."""
         class Foo(Dataset):

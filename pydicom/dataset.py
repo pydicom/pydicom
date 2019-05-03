@@ -605,13 +605,10 @@ class Dataset(object):
             return True
 
         if isinstance(other, self.__class__):
-            # Compare Elements using values()
-            # Convert values() to a list for compatibility between
-            #   python 2 and 3
-            # Sort values() by element tag
-            self_elem = sorted(list(self._dict.values()), key=lambda x: x.tag)
-            other_elem = sorted(list(other._dict.values()), key=lambda x: x.tag)
-            return self_elem == other_elem
+            return (set(self.keys()) == set(other.keys()) and
+                    all(self[key] == other[key]
+                        for key in self.keys())
+                    )
 
         return NotImplemented
 
@@ -1760,13 +1757,11 @@ class FileDataset(Dataset):
             return True
 
         if isinstance(other, self.__class__):
-            # Compare Elements using values() and class members using __dict__
-            # Convert values() to a list for compatibility between
-            #   python 2 and 3
-            # Sort values() by element tag
-            self_elem = sorted(list(self.values()), key=lambda x: x.tag)
-            other_elem = sorted(list(other.values()), key=lambda x: x.tag)
-            return self_elem == other_elem and self.__dict__ == other.__dict__
+            return (set(self.keys()) == set(other.keys()) and
+                    all(self[key] == other[key]
+                        for key in self.keys()) and
+                    self.__dict__ == other.__dict__
+                    )
 
         return NotImplemented
 
