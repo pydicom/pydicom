@@ -179,6 +179,19 @@ class PrivateBlock(object):
         self.dataset.add_new(self.get_tag(element_offset), VR, value)
 
 
+def _dict_equal(a, b, exclude=[]):
+    """Common method for Dataset.__eq__ and FileDataset.__eq__
+
+    Uses .keys() as needed because Dataset iter return items not keys
+    `exclude` is used in FileDataset__eq__ ds.__dict__ compare, which
+    would also compare the wrapped _dict member (entire dataset) again.
+    """
+    return (len(a) == len(b) and
+            all(key in b for key in a.keys()) and
+            all(a[key] == b[key] for key in a.keys() if key not in exclude)
+            )
+
+
 class Dataset(object):
     """Contains a collection (dictionary) of DICOM DataElements.
     Behaves like a dictionary.
@@ -605,10 +618,7 @@ class Dataset(object):
             return True
 
         if isinstance(other, self.__class__):
-            return (set(self.keys()) == set(other.keys()) and
-                    all(self[key] == other[key]
-                        for key in self.keys())
-                    )
+            return _dict_equal(self, other)
 
         return NotImplemented
 
@@ -1757,10 +1767,9 @@ class FileDataset(Dataset):
             return True
 
         if isinstance(other, self.__class__):
-            return (set(self.keys()) == set(other.keys()) and
-                    all(self[key] == other[key]
-                        for key in self.keys()) and
-                    self.__dict__ == other.__dict__
+            return (_dict_equal(self, other) and
+                    _dict_equal(self.__dict__, other.__dict__,
+                                exclude=['_dict'])
                     )
 
         return NotImplemented
