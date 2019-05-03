@@ -353,9 +353,15 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">add_new</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_tag</span><span class="p">(</span><span class="n">element_offset</span><span class="p">),</span> <span class="n">VR</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="Dataset"><a class="viewcode-back" href="../../api_ref.html#pydicom.dataset.Dataset">[docs]</a><span class="k">class</span> <span class="nc">Dataset</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="Dataset"><a class="viewcode-back" href="../../api_ref.html#pydicom.dataset.Dataset">[docs]</a><span class="k">class</span> <span class="nc">Dataset</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Contains a collection (dictionary) of DICOM DataElements.</span>
 <span class="sd">    Behaves like a dictionary.</span>
+
+<span class="sd">    .. note::</span>
+
+<span class="sd">        `Dataset` is derived from `dict` only to make it work in a NumPy</span>
+<span class="sd">        array. The parent dict class is never called, as all `dict` methods</span>
+<span class="sd">        are overridden.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
@@ -878,11 +884,11 @@
         <span class="n">tag</span> <span class="o">=</span> <span class="n">tag_for_keyword</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">tag</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># `name` isn&#39;t a DICOM element keyword</span>
             <span class="c1"># Try the base class attribute getter (fix for issue 332)</span>
-            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">Dataset</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">object</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
         <span class="n">tag</span> <span class="o">=</span> <span class="n">Tag</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">tag</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dict</span><span class="p">:</span>  <span class="c1"># DICOM DataElement not in the Dataset</span>
             <span class="c1"># Try the base class attribute getter (fix for issue 332)</span>
-            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">Dataset</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">object</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">data_elem</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span>
             <span class="n">value</span> <span class="o">=</span> <span class="n">data_elem</span><span class="o">.</span><span class="n">value</span>
@@ -1248,14 +1254,14 @@
         <span class="sd">&quot;&quot;&quot;Delete all data elements.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_dict</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span></div>
 
-    <span class="k">def</span> <span class="nf">pop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<div class="viewcode-block" id="Dataset.pop"><a class="viewcode-back" href="../../api_ref.html#pydicom.dataset.Dataset.pop">[docs]</a>    <span class="k">def</span> <span class="nf">pop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">popitem</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dict</span><span class="o">.</span><span class="n">popitem</span><span class="p">()</span>
+<div class="viewcode-block" id="Dataset.popitem"><a class="viewcode-back" href="../../api_ref.html#pydicom.dataset.Dataset.popitem">[docs]</a>    <span class="k">def</span> <span class="nf">popitem</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dict</span><span class="o">.</span><span class="n">popitem</span><span class="p">()</span></div>
 
-    <span class="k">def</span> <span class="nf">setdefault</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>  <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dict</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<div class="viewcode-block" id="Dataset.setdefault"><a class="viewcode-back" href="../../api_ref.html#pydicom.dataset.Dataset.setdefault">[docs]</a>    <span class="k">def</span> <span class="nf">setdefault</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>  <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dict</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Dataset.convert_pixel_data"><a class="viewcode-back" href="../../api_ref.html#pydicom.dataset.Dataset.convert_pixel_data">[docs]</a>    <span class="k">def</span> <span class="nf">convert_pixel_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Convert the Pixel Data to a numpy array internally.</span>
@@ -1655,7 +1661,7 @@
             <span class="c1"># name not in dicom dictionary - setting a non-dicom instance</span>
             <span class="c1"># attribute</span>
             <span class="c1"># XXX note if user mis-spells a dicom data_element - no error!!!</span>
-            <span class="nb">super</span><span class="p">(</span><span class="n">Dataset</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+            <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Operator for Dataset[key] = value.</span>
