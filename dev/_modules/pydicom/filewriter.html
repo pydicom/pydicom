@@ -246,7 +246,10 @@
         <span class="c1"># PixelRepresentation is usually set in the root dataset</span>
         <span class="k">while</span> <span class="s1">&#39;PixelRepresentation&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ds</span> <span class="ow">and</span> <span class="n">ds</span><span class="o">.</span><span class="n">parent</span><span class="p">:</span>
             <span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">parent</span>
-        <span class="k">if</span> <span class="n">ds</span><span class="o">.</span><span class="n">PixelRepresentation</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># if no pixel data is present, none if these tags is used,</span>
+        <span class="c1"># so we can just ignore a missing PixelRepresentation in this case</span>
+        <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;PixelRepresentation&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ds</span> <span class="ow">and</span> <span class="s1">&#39;PixelData&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ds</span> <span class="ow">or</span>
+                <span class="n">ds</span><span class="o">.</span><span class="n">PixelRepresentation</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
             <span class="n">elem</span><span class="o">.</span><span class="n">VR</span> <span class="o">=</span> <span class="s1">&#39;US&#39;</span>
             <span class="n">byte_type</span> <span class="o">=</span> <span class="s1">&#39;H&#39;</span>
         <span class="k">else</span><span class="p">:</span>
