@@ -1472,3 +1472,10 @@ class FileDatasetTests(unittest.TestCase):
         dataset.PatientName = patient_name
         array_of_datasets = np.array([dataset])
         assert patient_name == array_of_datasets[0].PatientName
+
+    def test_dataset_overrides_all_dict_attributes(self):
+        """Ensure that we don't use inherited dict functionality"""
+        ds = Dataset()
+        di = dict()
+        expected_diff = {'__class__', '__doc__', '__hash__'}
+        assert expected_diff == set(dir(di)) - set(dir(ds))
