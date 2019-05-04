@@ -179,6 +179,21 @@ class PrivateBlock(object):
         self.dataset.add_new(self.get_tag(element_offset), VR, value)
 
 
+
+def _dict_equal(a, b, exclude=None):
+    """Common method for Dataset.__eq__ and FileDataset.__eq__
+
+    Uses .keys() as needed because Dataset iter return items not keys
+    `exclude` is used in FileDataset__eq__ ds.__dict__ compare, which
+    would also compare the wrapped _dict member (entire dataset) again.
+    """
+    return (len(a) == len(b) and
+            all(key in b for key in a.keys()) and
+            all(a[key] == b[key] for key in a.keys()
+                if exclude is None or key not in exclude)
+            )
+
+
 class Dataset(dict):
     """Contains a collection (dictionary) of DICOM DataElements.
     Behaves like a dictionary.
@@ -611,13 +626,7 @@ class Dataset(dict):
             return True
 
         if isinstance(other, self.__class__):
-            # Compare Elements using values()
-            # Convert values() to a list for compatibility between
-            #   python 2 and 3
-            # Sort values() by element tag
-            self_elem = sorted(list(self._dict.values()), key=lambda x: x.tag)
-            other_elem = sorted(list(other._dict.values()), key=lambda x: x.tag)
-            return self_elem == other_elem
+            return _dict_equal(self, other)
 
         return NotImplemented
 
@@ -1766,13 +1775,10 @@ class FileDataset(Dataset):
             return True
 
         if isinstance(other, self.__class__):
-            # Compare Elements using values() and class members using __dict__
-            # Convert values() to a list for compatibility between
-            #   python 2 and 3
-            # Sort values() by element tag
-            self_elem = sorted(list(self.values()), key=lambda x: x.tag)
-            other_elem = sorted(list(other.values()), key=lambda x: x.tag)
-            return self_elem == other_elem and self.__dict__ == other.__dict__
+            return (_dict_equal(self, other) and
+                    _dict_equal(self.__dict__, other.__dict__,
+                                exclude=['_dict'])
+                    )
 
         return NotImplemented
 

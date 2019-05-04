@@ -68,6 +68,53 @@ class DatasetTests(unittest.TestCase):
         with pytest.raises(AttributeError, match=msg):
             ds.pixel_array
 
+    def test_for_stray_raw_data_element(self):
+        dataset = Dataset()
+        dataset.PatientName = 'MacDonald^George'
+        sub_ds = Dataset()
+        sub_ds.BeamNumber = '1'
+        dataset.BeamSequence = Sequence([sub_ds])
+        fp = DicomBytesIO()
+        pydicom.write_file(fp, dataset)
+
+        def _reset():
+            fp.seek(0)
+            ds1 = pydicom.dcmread(fp, force=True)
+            fp.seek(0)
+            ds2 = pydicom.dcmread(fp, force=True)
+            return ds1, ds2
+
+        ds1, ds2 = _reset()
+        assert ds1 == ds2
+
+        ds1, ds2 = _reset()
+        ds1.PatientName  # convert from raw
+        assert ds1 == ds2
+
+        ds1, ds2 = _reset()
+        ds2.PatientName
+        assert ds1 == ds2
+
+        ds1, ds2 = _reset()
+        ds2.PatientName
+        assert ds2 == ds1  # compare in other order
+
+        ds1, ds2 = _reset()
+        ds2.BeamSequence[0].BeamNumber
+        assert ds1 == ds2
+
+        # add a new element to one ds sequence item
+        ds1, ds2 = _reset()
+        ds2.BeamSequence[0].BeamName = '1'
+        assert ds1 != ds2
+
+        # change a value in a sequence item
+        ds1, ds2 = _reset()
+        ds2.BeamSequence[0].BeamNumber = '2'
+        assert ds2 != ds1
+
+        fp.close()
+
     def test_attribute_error_in_property_correct_debug(self):
         """Test AttributeError in property raises correctly."""
         class Foo(Dataset):
@@ -888,9 +935,6 @@ class DatasetTests(unittest.TestCase):
         ds.BeamSequence = [Dataset()]  # 300A,00B0
         ds.BeamSequence[0].PatientName = 'ANON'
 
-        # Slice all items - should return original dataset
-        assert ds.get_item(slice(None, None)) == ds
-
         # Slice starting from and including (0008,0001)
         test_ds = ds.get_item(slice(0x00080001, None))
         assert 'CommandGroupLength' not in test_ds
@@ -947,6 +991,9 @@ class DatasetTests(unittest.TestCase):
                                                      (0x0008, 0x0019)))
         assert 'SOPInstanceUID' in ds.get_item(slice('0x00080018',
                                                      '0x00080019'))
+
+        # Slice all items - should return original dataset
+        assert ds.get_item(slice(None, None)) == ds
 
     def test_get_private_item(self):
         ds = Dataset()
@@ -1177,7 +1224,7 @@ class DatasetTests(unittest.TestCase):
                 raise ValueError("Random ex message!")
 
         with pytest.raises(ValueError, match="Random ex message!"):
-                    getattr(DSException(), 'test')
+            getattr(DSException(), 'test')
 
     def test_pixel_array_already_have(self):
         """Test Dataset._get_pixel_array when we already have the array"""
