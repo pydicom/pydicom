@@ -179,7 +179,7 @@ class PrivateBlock(object):
         self.dataset.add_new(self.get_tag(element_offset), VR, value)
 
 
-def _dict_equal(a, b, exclude=[]):
+def _dict_equal(a, b, exclude=None):
     """Common method for Dataset.__eq__ and FileDataset.__eq__
 
     Uses .keys() as needed because Dataset iter return items not keys
@@ -188,7 +188,8 @@ def _dict_equal(a, b, exclude=[]):
     """
     return (len(a) == len(b) and
             all(key in b for key in a.keys()) and
-            all(a[key] == b[key] for key in a.keys() if key not in exclude)
+            all(a[key] == b[key] for key in a.keys()
+                if exclude is None or key not in exclude)
             )
 
 

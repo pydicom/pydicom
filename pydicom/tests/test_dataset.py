@@ -108,7 +108,7 @@ class DatasetTests(unittest.TestCase):
         ds2.BeamSequence[0].BeamName = '1'
         assert ds1 != ds2
 
-        # change an value in a sequence item
+        # change a value in a sequence item
         ds1, ds2 = _reset()
         ds2.BeamSequence[0].BeamNumber = '2'
         assert ds2 != ds1
