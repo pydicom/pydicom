@@ -179,6 +179,7 @@ class PrivateBlock(object):
         self.dataset.add_new(self.get_tag(element_offset), VR, value)
 
 
+
 def _dict_equal(a, b, exclude=None):
     """Common method for Dataset.__eq__ and FileDataset.__eq__
 
@@ -193,9 +194,15 @@ def _dict_equal(a, b, exclude=None):
             )
 
 
-class Dataset(object):
+class Dataset(dict):
     """Contains a collection (dictionary) of DICOM DataElements.
     Behaves like a dictionary.
+
+    .. note::
+
+        `Dataset` is derived from `dict` only to make it work in a NumPy
+        array. The parent dict class is never called, as all `dict` methods
+        are overridden.
 
     Examples
     --------
@@ -712,11 +719,11 @@ class Dataset(object):
         tag = tag_for_keyword(name)
         if tag is None:  # `name` isn't a DICOM element keyword
             # Try the base class attribute getter (fix for issue 332)
-            return super(Dataset, self).__getattribute__(name)
+            return object.__getattribute__(self, name)
         tag = Tag(tag)
         if tag not in self._dict:  # DICOM DataElement not in the Dataset
             # Try the base class attribute getter (fix for issue 332)
-            return super(Dataset, self).__getattribute__(name)
+            return object.__getattribute__(self, name)
         else:
             data_elem = self[tag]
             value = data_elem.value
@@ -1489,7 +1496,7 @@ class Dataset(object):
             # name not in dicom dictionary - setting a non-dicom instance
             # attribute
             # XXX note if user mis-spells a dicom data_element - no error!!!
-            super(Dataset, self).__setattr__(name, value)
+            object.__setattr__(self, name, value)
 
     def __setitem__(self, key, value):
         """Operator for Dataset[key] = value.
