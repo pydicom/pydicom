@@ -117,7 +117,8 @@ class TestCharset(object):
         ds = dcmread(get_testdata_files("CT_small.dcm")[0])
         ds.read_encoding = None
         ds.SpecificCharacterSet = 'Unsupported'
-        with pytest.raises(LookupError, match='unknown encoding: Unsupported'):
+        with pytest.raises(LookupError,
+                           match=u"Unknown encoding 'Unsupported'"):
             ds.decode()
 
     def test_decoding_with_specific_tags(self):
@@ -186,9 +187,6 @@ class TestCharset(object):
         """Test that unknown encodings are returned unchanged by
         `convert_encodings`"""
         encodings = ['iso_ir_126', 'iso_ir_144']
-        assert encodings == pydicom.charset.convert_encodings(encodings)
-
-        encodings = ['ISO IR 199', 'ISO_IR 100']
         assert encodings == pydicom.charset.convert_encodings(encodings)
 
     def test_bad_decoded_multi_byte_encoding(self):
@@ -397,3 +395,12 @@ class TestCharset(object):
         ds_out = dcmread(fp)
         # we expect UTF-8 encoding here
         assert b'Buc^J\xc3\xa9r\xc3\xb4me' == ds_out.get_item(0x00100010).value
+
+    def test_invalid_second_encoding(self):
+        # regression test for #850
+        elem = DataElement(0x00100010, 'PN', 'CITIZEN')
+        with pytest.warns(UserWarning,
+                          match=u"Unknown encoding 'ISO 2022 IR 146' "
+                                u"- using default encoding instead"):
+            pydicom.charset.decode(
+                elem, ['ISO 2022 IR 100', 'ISO 2022 IR 146'])

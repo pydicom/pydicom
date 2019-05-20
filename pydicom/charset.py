@@ -1,5 +1,6 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Handle alternate character sets for character strings."""
+import codecs
 import re
 import warnings
 
@@ -387,6 +388,9 @@ def convert_encodings(encodings):
     Handled stand-alone encodings: if they are the first encodings,
     additional encodings are ignored, if they are not the first encoding,
     they are ignored. In both cases, a warning is issued.
+    Invalid encodings are replaced with the default encoding with a
+    respective warning issued, if `config.enforce_valid_values` is `False`,
+    otherwise an exception is raised.
 
     Parameters
     ----------
@@ -397,8 +401,15 @@ def convert_encodings(encodings):
     -------
     list of str
         The list of Python encodings corresponding to the DICOM encodings.
-        If conversion fails, `encodings` is returned unchanged, assuming
-        that it already has been converted to Python encodings.
+        If an encoding is already a Python encoding, it is returned unchanged.
+        Encodings with common spelling errors are replaced by the correct
+        encoding, and invalid encodings are replaced with the default
+        encoding if `config.enforce_valid_values` is `False`.
+
+    Raises
+    ------
+    LookupError
+        In case of an invalid encoding if `config.enforce_valid_values` is set.
     """
 
     # If a list if passed, we don't want to modify the list in place so copy it
@@ -409,40 +420,48 @@ def convert_encodings(encodings):
     elif not encodings[0]:
         encodings[0] = 'ISO_IR 6'
 
-    try:
-        py_encodings = [python_encoding[x] for x in encodings]
-
-    except KeyError:
-        # check for some common mistakes in encodings
-        patched_encodings = []
-        patched = {}
-        for x in encodings:
+    py_encodings = []
+    for encoding in encodings:
+        try:
+            py_encodings.append(python_encoding[encoding])
+        except KeyError:
             # check for spelling errors, but exclude the correct spelling
             # standard encodings
-            if re.match('^ISO[^_]IR', x) is not None:
-                patched[x] = 'ISO_IR' + x[6:]
-                patched_encodings.append(patched[x])
+            patched = None
+            if re.match('^ISO[^_]IR', encoding) is not None:
+                patched = 'ISO_IR' + encoding[6:]
             # encodings with code extensions
-            elif re.match('^(?=ISO.2022.IR.)(?!ISO 2022 IR )', x) is not None:
-                patched[x] = 'ISO 2022 IR ' + x[12:]
-                patched_encodings.append(patched[x])
+            elif re.match('^(?=ISO.2022.IR.)(?!ISO 2022 IR )',
+                          encoding) is not None:
+                patched = 'ISO 2022 IR ' + encoding[12:]
+            use_default = False
+            patched_encoding = None
+            if patched:
+                try:
+                    patched_encoding = python_encoding[patched]
+                except KeyError:
+                    patched_encoding = default_encoding
+                    use_default = True
             else:
-                patched_encodings.append(x)
-        # fallback: assume that it is already a python encoding
-        py_encodings = encodings
-        if patched:
-            try:
-                encodings = patched_encodings
-                py_encodings = [python_encoding[x] for x in encodings]
-                for old, new in patched.items():
-                    warnings.warn("Incorrect value for Specific Character Set "
-                                  "'{}' - assuming '{}'".format(old, new),
-                                  stacklevel=2)
-            except KeyError:
-                pass
-        # if patching failed at this point, the original encodings
-        # will be returned, assuming that they are already Python encodings;
-        # otherwise, a LookupError will be raised in the using code
+                try:
+                    # fallback: assume that it is already a python encoding
+                    codecs.lookup(encoding)
+                    py_encodings.append(encoding)
+                except LookupError:
+                    patched_encoding = default_encoding
+                    use_default = True
+            if patched_encoding:
+                py_encodings.append(patched_encoding)
+                if use_default:
+                    if config.enforce_valid_values:
+                        raise LookupError(
+                            "Unknown encoding '{}'".format(encoding))
+                    msg = ("Unknown encoding '{}' - using default encoding "
+                           "instead".format(encoding))
+                else:
+                    msg = ("Incorrect value for Specific Character Set "
+                           "'{}' - assuming '{}'".format(encoding, patched))
+                warnings.warn(msg, stacklevel=2)
 
     # handle illegal stand-alone encodings
     if len(encodings) > 1:
