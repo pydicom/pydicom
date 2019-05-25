@@ -315,6 +315,8 @@ private dictionary</p></li>
 <div class="section" id="fixes">
 <h4>Fixes<a class="headerlink" href="#fixes" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
+<li><p>Correctly handle encoding errors when any of the encodings are invalid
+(not just the first) (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/850">#850</a>)</p></li>
 <li><p>Do not raise while resolving an ambiguous VR dependent on
 <cite>PixelRepresentation</cite> if both <cite>PixelRepresentation</cite> and <cite>PixelData</cite> are
 not present (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/838">#838</a>)</p></li>

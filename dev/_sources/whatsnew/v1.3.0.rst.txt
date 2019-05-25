@@ -29,6 +29,8 @@ Enhancements
 
 Fixes
 .....
+* Correctly handle encoding errors when any of the encodings are invalid
+  (not just the first) (:issue:`850`)
 * Do not raise while resolving an ambiguous VR dependent on
   `PixelRepresentation` if both `PixelRepresentation` and `PixelData` are
   not present (:issue:`838`)

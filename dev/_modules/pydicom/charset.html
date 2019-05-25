@@ -174,12 +174,13 @@
   <h1>Source code for pydicom.charset</h1><div class="highlight"><pre>
 <span></span><span class="c1"># Copyright 2008-2018 pydicom authors. See LICENSE file for details.</span>
 <span class="sd">&quot;&quot;&quot;Handle alternate character sets for character strings.&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">codecs</span>
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 
 <span class="kn">from</span> <span class="nn">pydicom</span> <span class="k">import</span> <span class="n">compat</span><span class="p">,</span> <span class="n">config</span>
-<span class="kn">from</span> <span class="nn">pydicom.valuerep</span> <span class="k">import</span> <span class="n">PersonNameUnicode</span><span class="p">,</span> <span class="n">text_VRs</span><span class="p">,</span> <span class="n">TEXT_VR_DELIMS</span>
 <span class="kn">from</span> <span class="nn">pydicom.compat</span> <span class="k">import</span> <span class="n">in_py2</span>
+<span class="kn">from</span> <span class="nn">pydicom.valuerep</span> <span class="k">import</span> <span class="n">PersonNameUnicode</span><span class="p">,</span> <span class="n">text_VRs</span><span class="p">,</span> <span class="n">TEXT_VR_DELIMS</span>
 
 <span class="c1"># default encoding if no encoding defined - corresponds to ISO IR 6 / ASCII</span>
 <span class="n">default_encoding</span> <span class="o">=</span> <span class="s2">&quot;iso8859&quot;</span>
@@ -558,9 +559,12 @@
 <div class="viewcode-block" id="convert_encodings"><a class="viewcode-back" href="../../api_ref.html#pydicom.charset.convert_encodings">[docs]</a><span class="k">def</span> <span class="nf">convert_encodings</span><span class="p">(</span><span class="n">encodings</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Converts DICOM encodings into corresponding python encodings.</span>
 <span class="sd">    Handles some common spelling mistakes and issues a warning in this case.</span>
-<span class="sd">    Handled stand-alone encodings: if they are the first encodings,</span>
+<span class="sd">    Handles stand-alone encodings: if they are the first encodings,</span>
 <span class="sd">    additional encodings are ignored, if they are not the first encoding,</span>
 <span class="sd">    they are ignored. In both cases, a warning is issued.</span>
+<span class="sd">    Invalid encodings are replaced with the default encoding with a</span>
+<span class="sd">    respective warning issued, if `config.enforce_valid_values` is `False`,</span>
+<span class="sd">    otherwise an exception is raised.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -571,8 +575,16 @@
 <span class="sd">    -------</span>
 <span class="sd">    list of str</span>
 <span class="sd">        The list of Python encodings corresponding to the DICOM encodings.</span>
-<span class="sd">        If conversion fails, `encodings` is returned unchanged, assuming</span>
-<span class="sd">        that it already has been converted to Python encodings.</span>
+<span class="sd">        If an encoding is already a Python encoding, it is returned unchanged.</span>
+<span class="sd">        Encodings with common spelling errors are replaced by the correct</span>
+<span class="sd">        encoding, and invalid encodings are replaced with the default</span>
+<span class="sd">        encoding if `config.enforce_valid_values` is `False`.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    LookupError</span>
+<span class="sd">        In case of an invalid encoding that could not be corrected if</span>
+<span class="sd">        `config.enforce_valid_values` is set.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># If a list if passed, we don&#39;t want to modify the list in place so copy it</span>
@@ -583,59 +595,97 @@
     <span class="k">elif</span> <span class="ow">not</span> <span class="n">encodings</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
         <span class="n">encodings</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;ISO_IR 6&#39;</span>
 
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">py_encodings</span> <span class="o">=</span> <span class="p">[</span><span class="n">python_encoding</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">encodings</span><span class="p">]</span>
+    <span class="n">py_encodings</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">encoding</span> <span class="ow">in</span> <span class="n">encodings</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">py_encodings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">python_encoding</span><span class="p">[</span><span class="n">encoding</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="n">py_encodings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">_python_encoding_for_corrected_encoding</span><span class="p">(</span><span class="n">encoding</span><span class="p">))</span>
 
-    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-        <span class="c1"># check for some common mistakes in encodings</span>
-        <span class="n">patched_encodings</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">patched</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">encodings</span><span class="p">:</span>
-            <span class="c1"># check for spelling errors, but exclude the correct spelling</span>
-            <span class="c1"># standard encodings</span>
-            <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s1">&#39;^ISO[^_]IR&#39;</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">patched</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;ISO_IR&#39;</span> <span class="o">+</span> <span class="n">x</span><span class="p">[</span><span class="mi">6</span><span class="p">:]</span>
-                <span class="n">patched_encodings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">patched</span><span class="p">[</span><span class="n">x</span><span class="p">])</span>
-            <span class="c1"># encodings with code extensions</span>
-            <span class="k">elif</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s1">&#39;^(?=ISO.2022.IR.)(?!ISO 2022 IR )&#39;</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">patched</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;ISO 2022 IR &#39;</span> <span class="o">+</span> <span class="n">x</span><span class="p">[</span><span class="mi">12</span><span class="p">:]</span>
-                <span class="n">patched_encodings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">patched</span><span class="p">[</span><span class="n">x</span><span class="p">])</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">patched_encodings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="c1"># fallback: assume that it is already a python encoding</span>
-        <span class="n">py_encodings</span> <span class="o">=</span> <span class="n">encodings</span>
-        <span class="k">if</span> <span class="n">patched</span><span class="p">:</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">encodings</span> <span class="o">=</span> <span class="n">patched_encodings</span>
-                <span class="n">py_encodings</span> <span class="o">=</span> <span class="p">[</span><span class="n">python_encoding</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">encodings</span><span class="p">]</span>
-                <span class="k">for</span> <span class="n">old</span><span class="p">,</span> <span class="n">new</span> <span class="ow">in</span> <span class="n">patched</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Incorrect value for Specific Character Set &quot;</span>
-                                  <span class="s2">&quot;&#39;</span><span class="si">{}</span><span class="s2">&#39; - assuming &#39;</span><span class="si">{}</span><span class="s2">&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">old</span><span class="p">,</span> <span class="n">new</span><span class="p">),</span>
-                                  <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-                <span class="k">pass</span>
-        <span class="c1"># if patching failed at this point, the original encodings</span>
-        <span class="c1"># will be returned, assuming that they are already Python encodings;</span>
-        <span class="c1"># otherwise, a LookupError will be raised in the using code</span>
-
-    <span class="c1"># handle illegal stand-alone encodings</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">encodings</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">encodings</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="n">STAND_ALONE_ENCODINGS</span><span class="p">:</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Value &#39;</span><span class="si">{}</span><span class="s2">&#39; for Specific Character Set does not &quot;</span>
-                          <span class="s2">&quot;allow code extensions, ignoring: </span><span class="si">{}</span><span class="s2">&quot;</span>
-                          <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">encodings</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">encodings</span><span class="p">[</span><span class="mi">1</span><span class="p">:])),</span>
-                          <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-            <span class="n">py_encodings</span> <span class="o">=</span> <span class="n">py_encodings</span><span class="p">[:</span><span class="mi">1</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">encoding</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">enumerate</span><span class="p">(</span><span class="n">encodings</span><span class="p">[</span><span class="mi">1</span><span class="p">:]))):</span>
-                <span class="k">if</span> <span class="n">encoding</span> <span class="ow">in</span> <span class="n">STAND_ALONE_ENCODINGS</span><span class="p">:</span>
-                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                        <span class="s2">&quot;Value &#39;</span><span class="si">{}</span><span class="s2">&#39; cannot be used as code extension, &quot;</span>
-                        <span class="s2">&quot;ignoring it&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">encoding</span><span class="p">),</span>
-                        <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-                    <span class="k">del</span> <span class="n">py_encodings</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
-
+        <span class="n">py_encodings</span> <span class="o">=</span> <span class="n">_handle_illegal_standalone_encodings</span><span class="p">(</span><span class="n">encodings</span><span class="p">,</span>
+                                                            <span class="n">py_encodings</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">py_encodings</span></div>
+
+
+<span class="k">def</span> <span class="nf">_python_encoding_for_corrected_encoding</span><span class="p">(</span><span class="n">encoding</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Try to replace the given invalid encoding with a valid encoding by</span>
+<span class="sd">    checking for common spelling errors, and return the correct Python</span>
+<span class="sd">    encoding for that encoding. Otherwise check if the</span>
+<span class="sd">    encoding is already a valid Python encoding, and return that. If both</span>
+<span class="sd">    attempts fail, return the default encoding.</span>
+<span class="sd">    Issue a warning for the invalid encoding except for the case where it is</span>
+<span class="sd">    already converted.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># standard encodings</span>
+    <span class="n">patched</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s1">&#39;^ISO[^_]IR&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">patched</span> <span class="o">=</span> <span class="s1">&#39;ISO_IR&#39;</span> <span class="o">+</span> <span class="n">encoding</span><span class="p">[</span><span class="mi">6</span><span class="p">:]</span>
+    <span class="c1"># encodings with code extensions</span>
+    <span class="k">elif</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s1">&#39;^(?=ISO.2022.IR.)(?!ISO 2022 IR )&#39;</span><span class="p">,</span>
+                  <span class="n">encoding</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">patched</span> <span class="o">=</span> <span class="s1">&#39;ISO 2022 IR &#39;</span> <span class="o">+</span> <span class="n">encoding</span><span class="p">[</span><span class="mi">12</span><span class="p">:]</span>
+
+    <span class="k">if</span> <span class="n">patched</span><span class="p">:</span>
+        <span class="c1"># handle encoding patched for common spelling errors</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">py_encoding</span> <span class="o">=</span> <span class="n">python_encoding</span><span class="p">[</span><span class="n">patched</span><span class="p">]</span>
+            <span class="n">_warn_about_invalid_encoding</span><span class="p">(</span><span class="n">encoding</span><span class="p">,</span> <span class="n">patched</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">py_encoding</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="n">_warn_about_invalid_encoding</span><span class="p">(</span><span class="n">encoding</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">default_encoding</span>
+
+    <span class="c1"># fallback: assume that it is already a python encoding</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">codecs</span><span class="o">.</span><span class="n">lookup</span><span class="p">(</span><span class="n">encoding</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">encoding</span>
+    <span class="k">except</span> <span class="ne">LookupError</span><span class="p">:</span>
+        <span class="n">_warn_about_invalid_encoding</span><span class="p">(</span><span class="n">encoding</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">default_encoding</span>
+
+
+<span class="k">def</span> <span class="nf">_warn_about_invalid_encoding</span><span class="p">(</span><span class="n">encoding</span><span class="p">,</span> <span class="n">patched_encoding</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Issue a warning for the given invalid encoding.</span>
+<span class="sd">    If patched_encoding is given, it is mentioned as the</span>
+<span class="sd">    replacement encoding, other the default encoding.</span>
+<span class="sd">    If no replacement encoding is given, and config.enforce_valid_values</span>
+<span class="sd">    is set, LookupError is raised.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">patched_encoding</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">enforce_valid_values</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">LookupError</span><span class="p">(</span>
+                <span class="s2">&quot;Unknown encoding &#39;</span><span class="si">{}</span><span class="s2">&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">encoding</span><span class="p">))</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Unknown encoding &#39;</span><span class="si">{}</span><span class="s2">&#39; - using default encoding &quot;</span>
+               <span class="s2">&quot;instead&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">encoding</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Incorrect value for Specific Character Set &quot;</span>
+               <span class="s2">&quot;&#39;</span><span class="si">{}</span><span class="s2">&#39; - assuming &#39;</span><span class="si">{}</span><span class="s2">&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">encoding</span><span class="p">,</span> <span class="n">patched_encoding</span><span class="p">))</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_handle_illegal_standalone_encodings</span><span class="p">(</span><span class="n">encodings</span><span class="p">,</span> <span class="n">py_encodings</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Check for stand-alone encodings in multi-valued encodings.</span>
+<span class="sd">    If the first encoding is a stand-alone encoding, the rest of the</span>
+<span class="sd">    encodings is removed. If any other encoding is a stand-alone encoding,</span>
+<span class="sd">    it is removed from the encodings.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">encodings</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="n">STAND_ALONE_ENCODINGS</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Value &#39;</span><span class="si">{}</span><span class="s2">&#39; for Specific Character Set does not &quot;</span>
+                      <span class="s2">&quot;allow code extensions, ignoring: </span><span class="si">{}</span><span class="s2">&quot;</span>
+                      <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">encodings</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">encodings</span><span class="p">[</span><span class="mi">1</span><span class="p">:])),</span>
+                      <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">py_encodings</span> <span class="o">=</span> <span class="n">py_encodings</span><span class="p">[:</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">encoding</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">enumerate</span><span class="p">(</span><span class="n">encodings</span><span class="p">[</span><span class="mi">1</span><span class="p">:]))):</span>
+            <span class="k">if</span> <span class="n">encoding</span> <span class="ow">in</span> <span class="n">STAND_ALONE_ENCODINGS</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                    <span class="s2">&quot;Value &#39;</span><span class="si">{}</span><span class="s2">&#39; cannot be used as code extension, &quot;</span>
+                    <span class="s2">&quot;ignoring it&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">encoding</span><span class="p">),</span>
+                    <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+                <span class="k">del</span> <span class="n">py_encodings</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">py_encodings</span>
 
 
 <div class="viewcode-block" id="decode"><a class="viewcode-back" href="../../api_ref.html#pydicom.charset.decode">[docs]</a><span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="n">data_element</span><span class="p">,</span> <span class="n">dicom_character_set</span><span class="p">):</span>
