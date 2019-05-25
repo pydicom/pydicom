@@ -1,11 +1,12 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Handle alternate character sets for character strings."""
+import codecs
 import re
 import warnings
 
 from pydicom import compat, config
-from pydicom.valuerep import PersonNameUnicode, text_VRs, TEXT_VR_DELIMS
 from pydicom.compat import in_py2
+from pydicom.valuerep import PersonNameUnicode, text_VRs, TEXT_VR_DELIMS
 
 # default encoding if no encoding defined - corresponds to ISO IR 6 / ASCII
 default_encoding = "iso8859"
@@ -384,9 +385,12 @@ def _encode_string_parts(value, encodings):
 def convert_encodings(encodings):
     """Converts DICOM encodings into corresponding python encodings.
     Handles some common spelling mistakes and issues a warning in this case.
-    Handled stand-alone encodings: if they are the first encodings,
+    Handles stand-alone encodings: if they are the first encodings,
     additional encodings are ignored, if they are not the first encoding,
     they are ignored. In both cases, a warning is issued.
+    Invalid encodings are replaced with the default encoding with a
+    respective warning issued, if `config.enforce_valid_values` is `False`,
+    otherwise an exception is raised.
 
     Parameters
     ----------
@@ -397,8 +401,16 @@ def convert_encodings(encodings):
     -------
     list of str
         The list of Python encodings corresponding to the DICOM encodings.
-        If conversion fails, `encodings` is returned unchanged, assuming
-        that it already has been converted to Python encodings.
+        If an encoding is already a Python encoding, it is returned unchanged.
+        Encodings with common spelling errors are replaced by the correct
+        encoding, and invalid encodings are replaced with the default
+        encoding if `config.enforce_valid_values` is `False`.
+
+    Raises
+    ------
+    LookupError
+        In case of an invalid encoding that could not be corrected if
+        `config.enforce_valid_values` is set.
     """
 
     # If a list if passed, we don't want to modify the list in place so copy it
@@ -409,58 +421,96 @@ def convert_encodings(encodings):
     elif not encodings[0]:
         encodings[0] = 'ISO_IR 6'
 
-    try:
-        py_encodings = [python_encoding[x] for x in encodings]
+    py_encodings = []
+    for encoding in encodings:
+        try:
+            py_encodings.append(python_encoding[encoding])
+        except KeyError:
+            py_encodings.append(
+                _python_encoding_for_corrected_encoding(encoding))
 
-    except KeyError:
-        # check for some common mistakes in encodings
-        patched_encodings = []
-        patched = {}
-        for x in encodings:
-            # check for spelling errors, but exclude the correct spelling
-            # standard encodings
-            if re.match('^ISO[^_]IR', x) is not None:
-                patched[x] = 'ISO_IR' + x[6:]
-                patched_encodings.append(patched[x])
-            # encodings with code extensions
-            elif re.match('^(?=ISO.2022.IR.)(?!ISO 2022 IR )', x) is not None:
-                patched[x] = 'ISO 2022 IR ' + x[12:]
-                patched_encodings.append(patched[x])
-            else:
-                patched_encodings.append(x)
-        # fallback: assume that it is already a python encoding
-        py_encodings = encodings
-        if patched:
-            try:
-                encodings = patched_encodings
-                py_encodings = [python_encoding[x] for x in encodings]
-                for old, new in patched.items():
-                    warnings.warn("Incorrect value for Specific Character Set "
-                                  "'{}' - assuming '{}'".format(old, new),
-                                  stacklevel=2)
-            except KeyError:
-                pass
-        # if patching failed at this point, the original encodings
-        # will be returned, assuming that they are already Python encodings;
-        # otherwise, a LookupError will be raised in the using code
-
-    # handle illegal stand-alone encodings
     if len(encodings) > 1:
-        if encodings[0] in STAND_ALONE_ENCODINGS:
-            warnings.warn("Value '{}' for Specific Character Set does not "
-                          "allow code extensions, ignoring: {}"
-                          .format(encodings[0], ', '.join(encodings[1:])),
-                          stacklevel=2)
-            py_encodings = py_encodings[:1]
-        else:
-            for i, encoding in reversed(list(enumerate(encodings[1:]))):
-                if encoding in STAND_ALONE_ENCODINGS:
-                    warnings.warn(
-                        "Value '{}' cannot be used as code extension, "
-                        "ignoring it".format(encoding),
-                        stacklevel=2)
-                    del py_encodings[i + 1]
+        py_encodings = _handle_illegal_standalone_encodings(encodings,
+                                                            py_encodings)
+    return py_encodings
 
+
+def _python_encoding_for_corrected_encoding(encoding):
+    """Try to replace the given invalid encoding with a valid encoding by
+    checking for common spelling errors, and return the correct Python
+    encoding for that encoding. Otherwise check if the
+    encoding is already a valid Python encoding, and return that. If both
+    attempts fail, return the default encoding.
+    Issue a warning for the invalid encoding except for the case where it is
+    already converted.
+    """
+    # standard encodings
+    patched = None
+    if re.match('^ISO[^_]IR', encoding) is not None:
+        patched = 'ISO_IR' + encoding[6:]
+    # encodings with code extensions
+    elif re.match('^(?=ISO.2022.IR.)(?!ISO 2022 IR )',
+                  encoding) is not None:
+        patched = 'ISO 2022 IR ' + encoding[12:]
+
+    if patched:
+        # handle encoding patched for common spelling errors
+        try:
+            py_encoding = python_encoding[patched]
+            _warn_about_invalid_encoding(encoding, patched)
+            return py_encoding
+        except KeyError:
+            _warn_about_invalid_encoding(encoding)
+            return default_encoding
+
+    # fallback: assume that it is already a python encoding
+    try:
+        codecs.lookup(encoding)
+        return encoding
+    except LookupError:
+        _warn_about_invalid_encoding(encoding)
+        return default_encoding
+
+
+def _warn_about_invalid_encoding(encoding, patched_encoding=None):
+    """Issue a warning for the given invalid encoding.
+    If patched_encoding is given, it is mentioned as the
+    replacement encoding, other the default encoding.
+    If no replacement encoding is given, and config.enforce_valid_values
+    is set, LookupError is raised.
+    """
+    if patched_encoding is None:
+        if config.enforce_valid_values:
+            raise LookupError(
+                "Unknown encoding '{}'".format(encoding))
+        msg = ("Unknown encoding '{}' - using default encoding "
+               "instead".format(encoding))
+    else:
+        msg = ("Incorrect value for Specific Character Set "
+               "'{}' - assuming '{}'".format(encoding, patched_encoding))
+    warnings.warn(msg, stacklevel=2)
+
+
+def _handle_illegal_standalone_encodings(encodings, py_encodings):
+    """Check for stand-alone encodings in multi-valued encodings.
+    If the first encoding is a stand-alone encoding, the rest of the
+    encodings is removed. If any other encoding is a stand-alone encoding,
+    it is removed from the encodings.
+    """
+    if encodings[0] in STAND_ALONE_ENCODINGS:
+        warnings.warn("Value '{}' for Specific Character Set does not "
+                      "allow code extensions, ignoring: {}"
+                      .format(encodings[0], ', '.join(encodings[1:])),
+                      stacklevel=2)
+        py_encodings = py_encodings[:1]
+    else:
+        for i, encoding in reversed(list(enumerate(encodings[1:]))):
+            if encoding in STAND_ALONE_ENCODINGS:
+                warnings.warn(
+                    "Value '{}' cannot be used as code extension, "
+                    "ignoring it".format(encoding),
+                    stacklevel=2)
+                del py_encodings[i + 1]
     return py_encodings
 
 
