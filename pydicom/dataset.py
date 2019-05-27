@@ -1089,14 +1089,30 @@ class Dataset(dict):
         """Delete all data elements."""
         self._dict.clear()
 
-    def pop(self, *args, **kwargs):
-        return self._dict.pop(*args, **kwargs)
+    @staticmethod
+    def _handle_tuple_and_keyword(fct, key, *args):
+        if isinstance(key, (str, compat.text_type)):
+            tag = tag_for_keyword(key)
+        else:
+            try:
+                tag = Tag(key)
+            except (ValueError, OverflowError):
+                return fct(key, *args)
+        return fct(tag, *args)
+
+    def pop(self, key, *args):
+        """Emulate dictionary `pop`, but additionally support tag ID tuple
+        and DICOM keyword."""
+        return self._handle_tuple_and_keyword(self._dict.pop, key, *args)
 
     def popitem(self):
         return self._dict.popitem()
 
-    def setdefault(self,  *args, **kwargs):
-        return self._dict.setdefault(*args, **kwargs)
+    def setdefault(self, key, *args):
+        """Emulate dictionary `setdefault`, but additionally support tag ID
+        tuple and DICOM keyword."""
+        return self._handle_tuple_and_keyword(
+            self._dict.setdefault, key, *args)
 
     def convert_pixel_data(self):
         """Convert the Pixel Data to a numpy array internally.
