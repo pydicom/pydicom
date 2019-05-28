@@ -447,18 +447,14 @@ class Dataset(dict):
         bool
             True if the DataElement is in the Dataset, False otherwise.
         """
-        if isinstance(name, (str, compat.text_type)):
-            tag = tag_for_keyword(name)
-        else:
-            try:
-                tag = Tag(name)
-            except Exception:
-                return False
+        try:
+            tag = Tag(name)
+        except (ValueError, OverflowError):
+            return False
         # Test against None as (0000,0000) is a possible tag
         if tag is not None:
             return tag in self._dict
-        else:
-            return name in self._dict  # will no doubt raise an exception
+        return name in self._dict  # will no doubt raise an exception
 
     def decode(self):
         """Apply character set decoding to all DataElements in the Dataset.
@@ -1091,13 +1087,10 @@ class Dataset(dict):
 
     @staticmethod
     def _handle_tuple_and_keyword(fct, key, *args):
-        if isinstance(key, (str, compat.text_type)):
-            tag = tag_for_keyword(key)
-        else:
-            try:
-                tag = Tag(key)
-            except (ValueError, OverflowError):
-                return fct(key, *args)
+        try:
+            tag = Tag(key)
+        except (ValueError, OverflowError):
+            return fct(key, *args)
         return fct(tag, *args)
 
     def pop(self, key, *args):

@@ -235,6 +235,8 @@ class DatasetTests(unittest.TestCase):
 
     def test_pop(self):
         ds = self.dummy_dataset()
+        with pytest.raises(KeyError):
+            ds.pop(0x300a00b244)
         assert 'default' == ds.pop('dummy', 'default')
         elem = ds.pop(0x300a00b2)
         assert 'unit001' == elem.value
@@ -246,14 +248,16 @@ class DatasetTests(unittest.TestCase):
         elem = ds.pop((0x300a, 0x00b2))
         assert 'unit001' == elem.value
         with pytest.raises(KeyError):
-            ds.pop(0x300a00b2)
+            ds.pop((0x300a, 0x00b2))
 
     def test_pop_using_keyword(self):
         ds = self.dummy_dataset()
+        with pytest.raises(KeyError):
+            ds.pop('InvalidName')
         elem = ds.pop('TreatmentMachineName')
         assert 'unit001' == elem.value
         with pytest.raises(KeyError):
-            ds.pop(0x300a00b2)
+            ds.pop('TreatmentMachineName')
 
     def test_popitem(self):
         ds = self.dummy_dataset()
