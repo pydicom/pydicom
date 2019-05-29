@@ -199,7 +199,7 @@
 <span class="kn">import</span> <span class="nn">pydicom</span>  <span class="c1"># for dcmwrite</span>
 <span class="kn">import</span> <span class="nn">pydicom.charset</span>
 <span class="kn">import</span> <span class="nn">pydicom.config</span>
-<span class="kn">from</span> <span class="nn">pydicom</span> <span class="k">import</span> <span class="n">compat</span>
+<span class="kn">from</span> <span class="nn">pydicom</span> <span class="k">import</span> <span class="n">compat</span><span class="p">,</span> <span class="n">datadict</span>
 <span class="kn">from</span> <span class="nn">pydicom._version</span> <span class="k">import</span> <span class="n">__version_info__</span>
 <span class="kn">from</span> <span class="nn">pydicom.charset</span> <span class="k">import</span> <span class="n">default_encoding</span><span class="p">,</span> <span class="n">convert_encodings</span>
 <span class="kn">from</span> <span class="nn">pydicom.config</span> <span class="k">import</span> <span class="n">logger</span>
@@ -621,18 +621,14 @@
 <span class="sd">        bool</span>
 <span class="sd">            True if the DataElement is in the Dataset, False otherwise.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">compat</span><span class="o">.</span><span class="n">text_type</span><span class="p">)):</span>
-            <span class="n">tag</span> <span class="o">=</span> <span class="n">tag_for_keyword</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">tag</span> <span class="o">=</span> <span class="n">Tag</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-                <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">tag</span> <span class="o">=</span> <span class="n">Tag</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">OverflowError</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
         <span class="c1"># Test against None as (0000,0000) is a possible tag</span>
         <span class="k">if</span> <span class="n">tag</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">tag</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dict</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dict</span>  <span class="c1"># will no doubt raise an exception</span>
+        <span class="k">return</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dict</span>  <span class="c1"># will no doubt raise an exception</span>
 
 <div class="viewcode-block" id="Dataset.decode"><a class="viewcode-back" href="../../api_ref.html#pydicom.dataset.Dataset.decode">[docs]</a>    <span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Apply character set decoding to all DataElements in the Dataset.</span>
@@ -1263,14 +1259,98 @@
         <span class="sd">&quot;&quot;&quot;Delete all data elements.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_dict</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="Dataset.pop"><a class="viewcode-back" href="../../api_ref.html#pydicom.dataset.Dataset.pop">[docs]</a>    <span class="k">def</span> <span class="nf">pop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+<div class="viewcode-block" id="Dataset.pop"><a class="viewcode-back" href="../../api_ref.html#pydicom.dataset.Dataset.pop">[docs]</a>    <span class="k">def</span> <span class="nf">pop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Emulate dictionary `pop`, but additionally support tag ID tuple</span>
+<span class="sd">        and DICOM keyword.</span>
+
+<span class="sd">        Removes the data element for `key` if it exists and returns it,</span>
+<span class="sd">        otherwise returns a default value if given or raises `KeyError`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key: int or str or 2-tuple</span>
+<span class="sd">            if tuple - the group and element number of the DICOM tag</span>
+<span class="sd">            if int - the combined group/element number</span>
+<span class="sd">            if str - the DICOM keyword of the tag</span>
+
+<span class="sd">        *args: zero or one argument</span>
+<span class="sd">            defines the behavior if no tag exists for `key`: if given,</span>
+<span class="sd">            it defines the return value, if not given, `KeyError` is raised</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        The data element for `key` if it exists, or the default value if given.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        KeyError</span>
+<span class="sd">            If the key is not a valid tag ID or keyword.</span>
+<span class="sd">            If the tag does not exist and no default is given.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">tag</span> <span class="o">=</span> <span class="n">Tag</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">OverflowError</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Dataset.popitem"><a class="viewcode-back" href="../../api_ref.html#pydicom.dataset.Dataset.popitem">[docs]</a>    <span class="k">def</span> <span class="nf">popitem</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dict</span><span class="o">.</span><span class="n">popitem</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="Dataset.setdefault"><a class="viewcode-back" href="../../api_ref.html#pydicom.dataset.Dataset.setdefault">[docs]</a>    <span class="k">def</span> <span class="nf">setdefault</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>  <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dict</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+<div class="viewcode-block" id="Dataset.setdefault"><a class="viewcode-back" href="../../api_ref.html#pydicom.dataset.Dataset.setdefault">[docs]</a>    <span class="k">def</span> <span class="nf">setdefault</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Emulate dictionary `setdefault`, but additionally support</span>
+<span class="sd">        tag ID tuple and DICOM keyword for `key`, and data element value</span>
+<span class="sd">        for `default`.</span>
+
+<span class="sd">        .. usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; ds = Dataset()</span>
+<span class="sd">        &gt;&gt;&gt; pname = ds.setdefault((0x0010, 0x0010), &quot;Test&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; pname</span>
+<span class="sd">        (0010, 0010) Patient&#39;s Name                      PN: &#39;Test&#39;</span>
+<span class="sd">        &gt;&gt;&gt; pname.value</span>
+<span class="sd">        &#39;Test&#39;</span>
+<span class="sd">        &gt;&gt;&gt; psex = ds.setdefault(&#39;PatientSex&#39;,</span>
+<span class="sd">        ...     DataElement(0x00100040, &#39;CS&#39;, &#39;F&#39;))</span>
+<span class="sd">        &gt;&gt;&gt; psex.value</span>
+<span class="sd">        &#39;F&#39;</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key: int or str or 2-tuple</span>
+<span class="sd">            if tuple - the group and element number of the DICOM tag</span>
+<span class="sd">            if int - the combined group/element number</span>
+<span class="sd">            if str - the DICOM keyword of the tag</span>
+
+<span class="sd">        default: DataElement or value type or None</span>
+<span class="sd">            The default value that is inserted and returned if no data</span>
+<span class="sd">            element exists for the given key.</span>
+<span class="sd">            If it is not of type DataElement, a DataElement is constructed</span>
+<span class="sd">            instead for the given tag ID and default as value. This is only</span>
+<span class="sd">            possible for known tags (e.g. tags found via the dictionary</span>
+<span class="sd">            lookup).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        The data element for `key` if it exists, or the default value if</span>
+<span class="sd">        it is a DataElement or None, or a DataElement constructed with</span>
+<span class="sd">        `default` as value.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        KeyError</span>
+<span class="sd">            If the key is not a valid tag ID or keyword.</span>
+<span class="sd">            If no tag exists for `key`, default is not a DataElement</span>
+<span class="sd">            and not None, and key is not a known DICOM tag.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">default</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">default</span><span class="p">,</span> <span class="n">DataElement</span><span class="p">):</span>
+                <span class="n">tag</span> <span class="o">=</span> <span class="n">Tag</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+                <span class="n">vr</span> <span class="o">=</span> <span class="n">datadict</span><span class="o">.</span><span class="n">dictionary_VR</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span>
+                <span class="n">default</span> <span class="o">=</span> <span class="n">DataElement</span><span class="p">(</span><span class="n">Tag</span><span class="p">(</span><span class="n">key</span><span class="p">),</span> <span class="n">vr</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span>
+            <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">default</span>
+        <span class="k">return</span> <span class="n">default</span></div>
 
 <div class="viewcode-block" id="Dataset.convert_pixel_data"><a class="viewcode-back" href="../../api_ref.html#pydicom.dataset.Dataset.convert_pixel_data">[docs]</a>    <span class="k">def</span> <span class="nf">convert_pixel_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Convert the Pixel Data to a numpy array internally.</span>

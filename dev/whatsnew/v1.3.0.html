@@ -206,6 +206,8 @@ private dictionary</p></li>
 <div class="section" id="fixes">
 <h3>Fixes<a class="headerlink" href="#fixes" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
+<li><p>Correctly handle <cite>Dataset.pop</cite> and <cite>Dataset.setdefault</cite> for tuple and
+keyword arguments (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/852">#852</a>)</p></li>
 <li><p>Correctly handle encoding errors when any of the encodings are invalid
 (not just the first) (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/850">#850</a>)</p></li>
 <li><p>Do not raise while resolving an ambiguous VR dependent on
