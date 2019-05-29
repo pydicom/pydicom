@@ -235,11 +235,29 @@ class DatasetTests(unittest.TestCase):
 
     def test_pop(self):
         ds = self.dummy_dataset()
+        with pytest.raises(KeyError):
+            ds.pop(0x300a00b244)
         assert 'default' == ds.pop('dummy', 'default')
         elem = ds.pop(0x300a00b2)
         assert 'unit001' == elem.value
         with pytest.raises(KeyError):
             ds.pop(0x300a00b2)
+
+    def test_pop_using_tuple(self):
+        ds = self.dummy_dataset()
+        elem = ds.pop((0x300a, 0x00b2))
+        assert 'unit001' == elem.value
+        with pytest.raises(KeyError):
+            ds.pop((0x300a, 0x00b2))
+
+    def test_pop_using_keyword(self):
+        ds = self.dummy_dataset()
+        with pytest.raises(KeyError):
+            ds.pop('InvalidName')
+        elem = ds.pop('TreatmentMachineName')
+        assert 'unit001' == elem.value
+        with pytest.raises(KeyError):
+            ds.pop('TreatmentMachineName')
 
     def test_popitem(self):
         ds = self.dummy_dataset()
@@ -254,6 +272,33 @@ class DatasetTests(unittest.TestCase):
         elem = ds.setdefault(0x300a00b2, 'foo')
         assert 'unit001' == elem.value
         elem = ds.setdefault(0x00100010, DataElement(0x00100010, 'PN', "Test"))
+        assert elem.value == 'Test'
+        assert 2 == len(ds)
+
+    def test_setdefault_tuple(self):
+        ds = self.dummy_dataset()
+        elem = ds.setdefault((0x300a, 0x00b2), 'foo')
+        assert 'unit001' == elem.value
+        elem = ds.setdefault((0x0010, 0x0010), DataElement(
+            0x00100010, 'PN', "Test"))
+        assert elem.value == 'Test'
+        assert 2 == len(ds)
+
+    def test_setdefault_use_value(self):
+        ds = self.dummy_dataset()
+        elem = ds.setdefault((0x0010, 0x0010), "Test")
+        assert elem.value == 'Test'
+        assert 2 == len(ds)
+        with pytest.raises(KeyError, match=r'Tag \(0011, 0010\) not found '
+                                           r'in DICOM dictionary'):
+            ds.setdefault((0x0011, 0x0010), "Test")
+
+    def test_setdefault_keyword(self):
+        ds = self.dummy_dataset()
+        elem = ds.setdefault('TreatmentMachineName', 'foo')
+        assert 'unit001' == elem.value
+        elem = ds.setdefault('PatientName',
+                             DataElement(0x00100010, 'PN', "Test"))
         assert elem.value == 'Test'
         assert 2 == len(ds)
 
