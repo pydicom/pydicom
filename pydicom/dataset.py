@@ -25,7 +25,7 @@ from itertools import takewhile
 import pydicom  # for dcmwrite
 import pydicom.charset
 import pydicom.config
-from pydicom import compat
+from pydicom import compat, datadict
 from pydicom._version import __version_info__
 from pydicom.charset import default_encoding, convert_encodings
 from pydicom.config import logger
@@ -1085,27 +1085,98 @@ class Dataset(dict):
         """Delete all data elements."""
         self._dict.clear()
 
-    @staticmethod
-    def _handle_tuple_and_keyword(fct, key, *args):
+    def pop(self, key, *args):
+        """Emulate dictionary `pop`, but additionally support tag ID tuple
+        and DICOM keyword.
+
+        Removes the data element for `key` if it exists and returns it,
+        otherwise returns a default value if given or raises `KeyError`.
+
+        Parameters
+        ----------
+        key: int or str or 2-tuple
+            if tuple - the group and element number of the DICOM tag
+            if int - the combined group/element number
+            if str - the DICOM keyword of the tag
+
+        *args: zero or one argument
+            defines the behavior if no tag exists for `key`: if given,
+            it defines the return value, if not given, `KeyError` is raised
+
+        Returns
+        -------
+        The data element for `key` if it exists, or the default value if given.
+
+        Raises
+        ------
+        KeyError
+            If the key is not a valid tag ID or keyword.
+            If the tag does not exist and no default is given.
+        """
         try:
             tag = Tag(key)
         except (ValueError, OverflowError):
-            return fct(key, *args)
-        return fct(tag, *args)
-
-    def pop(self, key, *args):
-        """Emulate dictionary `pop`, but additionally support tag ID tuple
-        and DICOM keyword."""
-        return self._handle_tuple_and_keyword(self._dict.pop, key, *args)
+            return self._dict.pop(key, *args)
+        return self._dict.pop(tag, *args)
 
     def popitem(self):
         return self._dict.popitem()
 
-    def setdefault(self, key, *args):
-        """Emulate dictionary `setdefault`, but additionally support tag ID
-        tuple and DICOM keyword."""
-        return self._handle_tuple_and_keyword(
-            self._dict.setdefault, key, *args)
+    def setdefault(self, key, default=None):
+        """Emulate dictionary `setdefault`, but additionally support
+        tag ID tuple and DICOM keyword for `key`, and data element value
+        for `default`.
+
+        .. usage:
+
+        >>> ds = Dataset()
+        >>> pname = ds.setdefault((0x0010, 0x0010), "Test")
+        >>> pname
+        (0010, 0010) Patient's Name                      PN: 'Test'
+        >>> pname.value
+        'Test'
+        >>> psex = ds.setdefault('PatientSex',
+        ...     DataElement(0x00100040, 'CS', 'F'))
+        >>> psex.value
+        'F'
+
+        Parameters
+        ----------
+        key: int or str or 2-tuple
+            if tuple - the group and element number of the DICOM tag
+            if int - the combined group/element number
+            if str - the DICOM keyword of the tag
+
+        default: DataElement or value type or None
+            The default value that is inserted and returned if no data
+            element exists for the given key.
+            If it is not of type DataElement, a DataElement is constructed
+            instead for the given tag ID and default as value. This is only
+            possible for known tags (e.g. tags found via the dictionary
+            lookup).
+
+        Returns
+        -------
+        The tag for key if it exists, or the default value if it is a
+        DataElement or None, or a DataElement constructed with `default`
+        as value.
+
+        Raises
+        ------
+        KeyError
+            If the key is not a valid tag ID or keyword.
+            If the no tag exists for `key`, default is not a DataElement
+            and not None, and key is not a known DICOM tag.
+        """
+        if key in self:
+            return self[key]
+        if default is not None:
+            if not isinstance(default, DataElement):
+                tag = Tag(key)
+                vr = datadict.dictionary_VR(tag)
+                default = DataElement(Tag(key), vr, default)
+            self[key] = default
+        return default
 
     def convert_pixel_data(self):
         """Convert the Pixel Data to a numpy array internally.

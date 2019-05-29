@@ -284,6 +284,15 @@ class DatasetTests(unittest.TestCase):
         assert elem.value == 'Test'
         assert 2 == len(ds)
 
+    def test_setdefault_use_value(self):
+        ds = self.dummy_dataset()
+        elem = ds.setdefault((0x0010, 0x0010), "Test")
+        assert elem.value == 'Test'
+        assert 2 == len(ds)
+        with pytest.raises(KeyError, match=r'Tag \(0011, 0010\) not found '
+                                           r'in DICOM dictionary'):
+            ds.setdefault((0x0011, 0x0010), "Test")
+
     def test_setdefault_keyword(self):
         ds = self.dummy_dataset()
         elem = ds.setdefault('TreatmentMachineName', 'foo')
