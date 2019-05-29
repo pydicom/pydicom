@@ -1157,7 +1157,7 @@ class Dataset(dict):
 
         Returns
         -------
-        The data element for `key` if it exists, or the default value if 
+        The data element for `key` if it exists, or the default value if
         it is a DataElement or None, or a DataElement constructed with
         `default` as value.
 
