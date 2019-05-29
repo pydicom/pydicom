@@ -1157,15 +1157,15 @@ class Dataset(dict):
 
         Returns
         -------
-        The tag for key if it exists, or the default value if it is a
-        DataElement or None, or a DataElement constructed with `default`
-        as value.
+        The data element for `key` if it exists, or the default value if 
+        it is a DataElement or None, or a DataElement constructed with
+        `default` as value.
 
         Raises
         ------
         KeyError
             If the key is not a valid tag ID or keyword.
-            If the no tag exists for `key`, default is not a DataElement
+            If no tag exists for `key`, default is not a DataElement
             and not None, and key is not a known DICOM tag.
         """
         if key in self:
