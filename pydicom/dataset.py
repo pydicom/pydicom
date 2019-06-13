@@ -1937,15 +1937,15 @@ class Dataset(dict):
         return json_element
 
     def _json_serializer(self, o):
-       # TODO: this seems to be required to be able to dump json
-       # of a MultiValue.  There might be a way for MultiValue
-       # itself to expose the correctly overloaded accessor
-       try:
-           iterable = iter(o)
-       except TypeError:
-           pass  # TODO: will this miss other errors?
-       else:
-           return list(iterable)
+        # TODO: this seems to be required to be able to dump json
+        # of a MultiValue.  There might be a way for MultiValue
+        # itself to expose the correctly overloaded accessor
+        try:
+            iterable = iter(o)
+        except TypeError:
+            pass  # TODO: will this miss other errors?
+        else:
+            return list(iterable)
 
     def to_json(self, element_handler=None):
         """
@@ -1979,7 +1979,8 @@ class Dataset(dict):
             dataElement = dataset[key]
             jobj = self._data_element_to_json(dataElement, element_handler)
             json_dataset_object[jkey] = jobj
-        json_dataset = json.dumps(json_dataset_object, default=self._json_serializer)
+        json_dataset = json.dumps(json_dataset_object,
+                                  default=self._json_serializer)
         return json_dataset
 
     __repr__ = __str__
