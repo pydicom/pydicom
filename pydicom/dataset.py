@@ -1976,6 +1976,10 @@ class Dataset(dict):
         json_dataset_object = {}
         for key in dataset.keys():
             jkey = "%04X%04X" % (key.group, key.element)
+            if jkey == '00081140':
+                # TODO: with pydicom 1.x the referenced image sequence
+                # causes a recursion error
+                continue
             dataElement = dataset[key]
             jobj = self._data_element_to_json(dataElement, element_handler)
             json_dataset_object[jkey] = jobj
