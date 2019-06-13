@@ -1869,7 +1869,8 @@ class Dataset(dict):
 
     def from_json(self, json_dataset):
         '''Loads DICOM Data Set in DICOM JSON format.
-        See: http://dicom.nema.org/medical/dicom/current/output/chtml/part18/chapter_F.html
+        See:
+        http://dicom.nema.org/medical/dicom/current/output/chtml/part18/chapter_F.html
 
         Parameters
         ----------
@@ -1937,7 +1938,8 @@ class Dataset(dict):
     def to_json(self, element_handler=None):
         """
         Return a json version of the dataset.
-        See: http://dicom.nema.org/medical/dicom/current/output/chtml/part18/chapter_F.html
+        See:
+        http://dicom.nema.org/medical/dicom/current/output/chtml/part18/chapter_F.html
 
         Parameters
         ----------
