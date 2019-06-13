@@ -1411,6 +1411,20 @@ class DatasetTests(unittest.TestCase):
         ds2.update(ds)
         assert ds2.PatientName == 'TestC'
 
+    def test_json(self):
+        ds = Dataset()
+        ds.add_new(0x00080005, 'CS', 'ISO_IR 100')
+        ds.add_new(0x00090010, 'LO', 'Creator 1.0')
+        ds.add_new(0x00091001, 'SH', 'Version1')
+        ds.add_new(0x00090011, 'LO', 'Creator 2.0')
+        ds.add_new(0x00091101, 'SH', 'Version2')
+        ds.add_new(0x00091102, 'US', 2)
+
+        jsonmodel = ds.to_json()
+        ds2 = Dataset()
+        ds2.from_json(jsonmodel)
+
+        assert ds2.SpecificCharacterSet == ['ISO_IR 100']
 
 class DatasetElementsTests(unittest.TestCase):
     """Test valid assignments of data elements"""

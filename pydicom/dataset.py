@@ -21,6 +21,11 @@ import os
 import os.path
 from bisect import bisect_left
 from itertools import takewhile
+import json
+# TODO: use six? This appears to be the only use in pydicom,
+# but with it we can be python 2 and 3 compatible (only used
+# in one spot below)
+import six
 
 import pydicom  # for dcmwrite
 import pydicom.charset
@@ -29,7 +34,7 @@ from pydicom import compat, datadict
 from pydicom._version import __version_info__
 from pydicom.charset import default_encoding, convert_encodings
 from pydicom.config import logger
-from pydicom.datadict import dictionary_VR
+from pydicom.datadict import dictionary_VR, dictionary_VM
 from pydicom.datadict import (tag_for_keyword, keyword_for_tag,
                               repeater_has_keyword)
 from pydicom.dataelem import DataElement, DataElement_from_raw, RawDataElement
@@ -179,7 +184,6 @@ class PrivateBlock(object):
         self.dataset.add_new(self.get_tag(element_offset), VR, value)
 
 
-
 def _dict_equal(a, b, exclude=None):
     """Common method for Dataset.__eq__ and FileDataset.__eq__
 
@@ -308,6 +312,15 @@ class Dataset(dict):
     ...         else:
     ...             # Do something useful with each DataElement
 
+    Converting a dataset to and from json:
+
+    >>> ds = Dataset()
+    >>> ds.PatientName = "Some^Name"
+    >>> jsonmodel = ds.to_json()
+    >>> ds2 = Dataset()
+    >>> ds2.from_json(jsonmodel)
+    (0010, 0010) Patient's Name                      PN: u'Some^Name'
+
     Attributes
     ----------
     default_element_format : str
@@ -329,6 +342,9 @@ class Dataset(dict):
         `is_little_endian`) if False.
     """
     indent_chars = "   "
+    # TODO: is this the whole list?
+    _BINARY_VR_VALUES = ['OW', 'OB', 'OD', 'OF', 'OL', 'UN',
+                         'OW/OB', 'OW or OB', 'OB or OW', 'US or SS']
 
     # Python 2: Classes defining __eq__ should flag themselves as unhashable
     __hash__ = None
@@ -1753,6 +1769,204 @@ class Dataset(dict):
                     sequence = data_element.value
                     for dataset in sequence:
                         dataset.walk(callback)
+
+    def _create_dataelement(self, tag, vr, value):
+        '''Creates a DICOM Data Element.
+        Parameters
+        ----------
+        tag: pydicom.tag.Tag
+            data element tag
+        vr: str
+            data element value representation
+        value: list
+            data element value(s)
+        Returns
+        -------
+        DataElement
+        '''
+        try:
+            vm = dictionary_VM(tag)
+        except KeyError:
+            # Private tag
+            vm = str(len(value))
+        if vr not in Dataset._BINARY_VR_VALUES:
+            if not(isinstance(value, list)):
+                fmt = '"Value" of data element "{}" must be an array.'
+                raise ValueError(fmt.format(tag))
+        if vr == 'SQ':
+            elem_value = []
+            for value_item in value:
+                ds = Dataset()
+                if value_item is not None:
+                    for key, val in value_item.items():
+                        if 'vr' not in val:
+                            fmt = 'Data element "{}" must have key "vr".'
+                            raise KeyError(fmt.format(tag))
+                        supported_keys = {'Value', 'BulkDataURI',
+                                          'InlineBinary'}
+                        val_key = None
+                        for k in supported_keys:
+                            if k in val:
+                                val_key = k
+                                break
+                        if val_key is None:
+                            logger.debug(
+                                'data element has neither key "{}".'.format(
+                                    '" nor "'.join(supported_keys)
+                                )
+                            )
+                            e = DataElement(tag=tag, value=None, VR=vr)
+                        else:
+                            e = self._create_dataelement(key,
+                                                         val['vr'],
+                                                         val[val_key])
+                        ds.add(e)
+                elem_value.append(ds)
+        elif vr == 'PN':
+            # Special case, see DICOM Part 18 Annex F2.2
+            elem_value = []
+            for v in value:
+                if not isinstance(v, dict):
+                    # Some DICOMweb services get this wrong, so we
+                    # workaround the the issue and warn the user
+                    # rather than raising an error.
+                    logger.warning(
+                        'attribute with VR Person Name (PN) is not '
+                        'formatted correctly'
+                    )
+                    elem_value.append(v)
+                else:
+                    elem_value.extend(list(v.values()))
+            if vm == '1':
+                try:
+                    elem_value = elem_value[0]
+                except IndexError:
+                    elem_value = None
+        else:
+            if vm == '1':
+                if vr in Dataset._BINARY_VR_VALUES:
+                    elem_value = value
+                else:
+                    if value:
+                        elem_value = value[0]
+                    else:
+                        elem_value = value
+            else:
+                if len(value) == 1 and isinstance(value[0], six.string_types):
+                    elem_value = value[0].split('\\')
+                else:
+                    elem_value = value
+        if value is None:
+            logger.warning('missing value for data element "{}"'.format(tag))
+        try:
+            return DataElement(tag=tag, value=elem_value, VR=vr)
+        except Exception:
+            raise ValueError(
+                'Data element "{}" could not be loaded from JSON: {}'.format(
+                    tag, elem_value
+                )
+            )
+
+    def from_json(self, json_dataset):
+        '''Loads DICOM Data Set in DICOM JSON format.
+        See: http://dicom.nema.org/medical/dicom/current/output/chtml/part18/chapter_F.html
+
+        Parameters
+        ----------
+        json_dataset: json string that uses the DICOM JSON Model
+                      (Annex F format)
+        Returns
+        -------
+        nothing
+        '''
+
+        dataset = self
+
+        json_dataset_object = json.loads(json_dataset)
+        for tag, mapping in json_dataset_object.items():
+            vr = mapping['vr']
+            try:
+                value = mapping['Value']
+            except KeyError:
+                # TODO: don't catch?
+                fmt = 'mapping for data element "{}" has no "Value" key'
+                logger.debug(fmt.format(tag))
+                value = [None]
+            group, element = "0x"+tag[0:4], "0x"+tag[5:9]
+            data_element = self._create_dataelement((group, element),
+                                                    vr, value)
+            dataset.add(data_element)
+
+    def _data_element_to_json(self, data_element, element_handler):
+        """Returns a json dictionary which is either a single
+        element or a dictionary of elements representing a sequnce.
+        """
+        # TODO: these don't get auto-quoted by json for some reason
+        _VRs_TO_QUOTE = ['DS', 'AT']
+        json_element = None
+        if data_element.VR in Dataset._BINARY_VR_VALUES:
+            if element_handler:
+                # TODO: provide some example element_handler implementations
+                value = element_handler(data_element)
+            else:
+                value = "Binary Omitted"  # TODO
+        elif data_element.VR == "SQ":
+            values = []
+            for subelement in data_element:
+                # recursive call to co-routine to format sequence contents
+                values.append(self.to_json(subelement))
+            value = values
+        elif data_element.VR in _VRs_TO_QUOTE:
+            # TODO: switch to " from ' - why doesn't json do this?
+            value = ["%s" % data_element.value]
+        elif data_element.VR == "PN":
+            value = data_element.value
+            if value is not None:
+                value = [{"Alphabetic": value}]
+        else:
+            value = data_element.value
+            if value is not None:
+                value = [value]
+        json_element = {
+            "vr": data_element.VR,
+        }
+        if value is not None:
+            json_element["Value"] = value
+        return json_element
+
+    def to_json(self, element_handler=None):
+        """
+        Return a json version of the dataset.
+        See: http://dicom.nema.org/medical/dicom/current/output/chtml/part18/chapter_F.html
+
+        Parameters
+        ----------
+        element_handler: callable that accepts a binary element
+                         and returns json
+
+        Returns
+        -------
+        A json string of the DICOM JSON Model of the datset
+        will convert into json of the form documented here:
+        ftp://medical.nema.org/medical/dicom/final/sup166_ft5.pdf
+        Note this is a co-routine with _data_element_to_json and they
+        can call each other recursively since SQ (sequence) data elements
+        are implemented as nested datasets.
+
+        Raises
+        ------
+        UnboundLocalError
+            On some kinds of bad input (#TODO: clarify when)
+        """
+        dataset = self
+        json_dataset_object = {}
+        for key in dataset.keys():
+            jkey = "%04X%04X" % (key.group, key.element)
+            dataElement = dataset[key]
+            jobj = self._data_element_to_json(dataElement, element_handler)
+            json_dataset_object[jkey] = jobj
+        json_dataset = json.dumps(json_dataset_object)
+        return json_dataset
 
     __repr__ = __str__
 
