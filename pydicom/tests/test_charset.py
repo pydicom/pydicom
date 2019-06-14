@@ -404,3 +404,19 @@ class TestCharset(object):
                                 u"- using default encoding instead"):
             pydicom.charset.decode(
                 elem, ['ISO 2022 IR 100', 'ISO 2022 IR 146'])
+
+    def test_japanese_multi_byte_encoding(self):
+        """Test japanese multi byte strings are correctly encoded."""
+        file_path = get_charset_files('chrH32.dcm')[0]
+        ds = dcmread(file_path)
+        ds.decode()
+
+        original_string = ds.PatientName.original_string
+        ds.PatientName.original_string = None
+        fp = DicomBytesIO()
+        fp.is_implicit_VR = False
+        fp.is_little_endian = True
+        ds.save_as(fp, write_like_original=False)
+        fp.seek(0)
+        ds_out = dcmread(fp)
+        assert original_string == ds_out.PatientName.original_string

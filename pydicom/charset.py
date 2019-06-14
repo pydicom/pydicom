@@ -95,6 +95,44 @@ handled_encodings = ('iso2022_jp',
                      'iso_ir_58')
 
 
+# shift_jis is a superset of jis_x_0201. So we can regard the encoded value
+# as jis_x_0201 if it is single byte character.
+def _encode_to_jis_x_0201(input, errors='strict'):
+    buf = b''
+    start = len(input)
+    end = 0
+    for i, c in enumerate(input):
+        encoded = c.encode('shift_jis', errors=errors)
+        if len(encoded) != 1:
+            start = min(start, i)
+            end = max(end, i+1)
+            encoded = b'?'
+        buf += encoded
+    if start < len(input) and 0 < end and errors == 'strict':
+        raise UnicodeEncodeError('shift_jis', input, start, end, 'illegal multibyte sequence')
+    return buf
+
+
+# The escape sequence which is located at the end of the encoded value have
+# to vary depends on the value 1 of SpecificCharacterSet.
+# So we have to trim it and append correct escape sequence manually.
+def _encode_to_jis_x_0208(input, errors='strict'):
+    encoded_with_escape_sequence = input.encode('iso2022_jp', errors=errors)
+    encoded = encoded_with_escape_sequence[:-3]
+    return encoded
+
+
+# These encodings need escape sequence to handle ASCII characters.
+need_tail_escape_sequence_encodings = ('iso2022_jp', 'iso-2022-jp')
+
+
+custom_encoders = {
+    'shift_jis': _encode_to_jis_x_0201,
+    'iso2022_jp': _encode_to_jis_x_0208,
+    'iso-2022-jp': _encode_to_jis_x_0208
+}
+
+
 def decode_string(value, encodings, delimiters):
     """Convert a raw byte string into a unicode string using the given
     list of encodings.
@@ -281,9 +319,15 @@ def encode_string(value, encodings):
     """
     for i, encoding in enumerate(encodings):
         try:
-            encoded = value.encode(encoding)
+            if encoding in custom_encoders:
+                encoded = custom_encoders[encoding](value)
+            else:
+                encoded = value.encode(encoding)
+
             if i > 0 and encoding not in handled_encodings:
-                return ENCODINGS_TO_CODES.get(encoding, b'') + encoded
+                encoded = ENCODINGS_TO_CODES.get(encoding, b'') + encoded
+            if encoding in need_tail_escape_sequence_encodings:
+                encoded += ENCODINGS_TO_CODES.get(encodings[0], b'')
             return encoded
         except UnicodeError:
             continue
@@ -337,14 +381,17 @@ def _encode_string_parts(value, encodings):
     """
     encoded = bytearray()
     unencoded_part = value
+    best_encoding = None
     while unencoded_part:
         # find the encoding that can encode the longest part of the rest
         # of the string still to be encoded
         max_index = 0
-        best_encoding = None
         for encoding in encodings:
             try:
-                unencoded_part.encode(encoding)
+                if encoding in custom_encoders:
+                    custom_encoders[encoding](unencoded_part)
+                else:
+                    unencoded_part.encode(encoding)
                 # if we get here, the whole rest of the value can be encoded
                 best_encoding = encoding
                 max_index = len(unencoded_part)
@@ -366,6 +413,8 @@ def _encode_string_parts(value, encodings):
         # set remaining unencoded part of the string and handle that
         unencoded_part = unencoded_part[max_index:]
     # unencoded_part is empty - we are done, return the encoded string
+    if best_encoding in need_tail_escape_sequence_encodings:
+        encoded += ENCODINGS_TO_CODES.get(encodings[0], b'')
     return encoded
 
 
