@@ -109,7 +109,8 @@ def _encode_to_jis_x_0201(input, errors='strict'):
             encoded = b'?'
         buf += encoded
     if start < len(input) and 0 < end and errors == 'strict':
-        raise UnicodeEncodeError('shift_jis', input, start, end, 'illegal multibyte sequence')
+        raise UnicodeEncodeError(
+            'shift_jis', input, start, end, 'illegal multibyte sequence')
     return buf
 
 
