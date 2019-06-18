@@ -22,10 +22,6 @@ import os
 import os.path
 from bisect import bisect_left
 from itertools import takewhile
-# TODO: use six? This appears to be the only use in pydicom,
-# but with it we can be python 2 and 3 compatible (only used
-# in one spot below)
-import six
 
 import pydicom  # for dcmwrite
 import pydicom.charset
@@ -1792,7 +1788,7 @@ class Dataset(dict):
             (options: ``{"Value", "InlineBinary", "BulkDataURI"}``)
         bulk_data_uri_handler: Union[Callable, None]
             callable that accepts the "BulkDataURI" of the JSON representation
-            of a data element and returns the actual value of data element
+            of a data element and returns the actual value of that data element
             (retrieved via DICOMweb WADO-RS)
 
         Returns
@@ -1800,6 +1796,7 @@ class Dataset(dict):
         pydicom.dataelem.DataElement
 
         """
+        # TODO: test wado-rs retrieve wrapper
         try:
             vm = dictionary_VM(tag)
         except KeyError:
@@ -1810,7 +1807,7 @@ class Dataset(dict):
                 fmt = '"{}" of data element "{}" must be an list.'
                 raise TypeError(fmt.format(value_key, tag))
         elif value_key in {'InlineBinary', 'BulkDataURI'}:
-            if not(isinstance(value, six.string_types)):
+            if isinstance(value, list):
                 fmt = '"{}" of data element "{}" must be a string.'
                 raise TypeError(fmt.format(value_key, tag))
         if vr == 'SQ':
@@ -1843,7 +1840,7 @@ class Dataset(dict):
                     # Some DICOMweb services get this wrong, so we
                     # workaround the the issue and warn the user
                     # rather than raising an error.
-                    logger.warning(
+                    logger.error(
                         'value of data element "{}" with VR Person Name (PN) '
                         'is not formatted correctly'.format(tag)
                     )
@@ -1861,11 +1858,13 @@ class Dataset(dict):
                     elem_value = base64.b64decode(value)
                 elif value_key == 'BulkDataURI':
                     if bulk_data_uri_handler is None:
-                        raise ValueError(
-                            'No bulk data URI handler provided for retrieval '
-                            'of value of data element "{}".'.format(tag)
+                        logger.warning(
+                            'no bulk data URI handler provided for retrieval '
+                            'of value of data element "{}"'.format(tag)
                         )
-                    elem_value = bulk_data_uri_handler(value)
+                        elem_value = None
+                    else:
+                        elem_value = bulk_data_uri_handler(value)
                 else:
                     if value:
                         elem_value = value[0]
@@ -1892,15 +1891,21 @@ class Dataset(dict):
 
         Parameters
         ----------
-        json_dataset: dict
-            dictionary representing a DICOM Data Set formatted based on the
-            DICOM JSON Model (Annex F)
+        json_dataset: Union[dict, str]
+            dictionary or string representing a DICOM Data Set formatted based
+            on the DICOM JSON Model (Annex F)
         bulk_data_uri_handler: Union[Callable, None]
             callable that accepts the "BulkDataURI" of the JSON representation
             of a data element and returns the actual value of data element
             (retrieved via DICOMweb WADO-RS)
 
+        Returns
+        -------
+        pydicom.dataset.Dataset
+
         """
+        if not is_instance(json_dataset, dict):
+            json_dataset = json.loads(json_dataset)
         dataset = cls()
         for tag, mapping in json_dataset.items():
             vr = mapping['vr']
@@ -1916,7 +1921,8 @@ class Dataset(dict):
             dataset.add(data_element)
         return dataset
 
-    def _data_element_to_json(self, data_element, bulk_data_element_handler=None):
+    def _data_element_to_json(self, data_element,
+                              bulk_data_element_handler=None):
         """Converts a DataElement to JSON representation.
 
         Parameters
@@ -1934,7 +1940,7 @@ class Dataset(dict):
             mapping representing a JSON encoded data element
 
         """
-        # TODO: these don't get auto-quoted by json for some reason
+        # TODO: Determine whether more VRs need to be converted to strings
         _VRs_TO_QUOTE = ['DS', 'AT', ]
         json_element = {'vr': data_element.VR, }
         if data_element.VR in Dataset._BINARY_VR_VALUES:
@@ -1947,7 +1953,6 @@ class Dataset(dict):
                             data_element.name
                         )
                     )
-                # TODO: provide some example element_handler implementations
                 json_element['BulkDataURI'] = bulk_data_element_handler(
                     data_element
                 )
@@ -1963,7 +1968,6 @@ class Dataset(dict):
                 # recursive call to co-routine to format sequence contents
                 json_element['Value'] = [e.to_json() for e in data_element]
             elif data_element.VR in _VRs_TO_QUOTE:
-                # TODO: switch to " from ' - why doesn't json do this?
                 json_element['Value'] = [str(data_element.value), ]
             elif data_element.VR == 'PN':
                 if data_element.value is not None:
@@ -1990,7 +1994,8 @@ class Dataset(dict):
                         json_element['Value'] = [data_element.value, ]
         return json_element
 
-    def to_json(self, bulk_data_threshold=1, bulk_data_element_handler=None):
+    def to_json(self, bulk_data_threshold=1, bulk_data_element_handler=None,
+                dumps=None):
         """Converts the data set into JSON representation based on the
         `DICOM JSON Model <http://dicom.nema.org/medical/dicom/current/output/chtml/part18/chapter_F.html>`_.
 
@@ -2004,26 +2009,42 @@ class Dataset(dict):
             callable that accepts a bulk data element and returns a JSON
             representation of the data element (dictionary including the "vr"
             key and either the "InlineBinary" or the "BulkDataURI" key)
+        dumps: Union[Callable, None], optional
+            callable that accepts a dict and returns the serialized (dumped)
+            JSON string (by default uses ``json.dumps()``)
 
         Returns
         -------
-        dict
-            data set formatted according to the DICOM JSON Model
+        str
+            data set serialized into a string based on the DICOM JSON Model
+
+        Examples
+        --------
+        >>> def my_json_dumps(data):
+        ...     return json.dumps(data, indent=4)
+        >>> dataset.to_json(dumps=my_json_dumps)
 
         """
         json_dataset = {}
         for key in self.keys():
-            json_key = "%04X%04X" % (key.group, key.element)
+            json_key = '{0:04x}{1:04x}'.format(key.group, key.element).upper()
+            # FIXME: with pydicom 1.x the referenced image sequence
+            # causes a recursion error
             if json_key == '00081140':
-                # TODO: with pydicom 1.x the referenced image sequence
-                # causes a recursion error
+                logger.warning(
+                    'currently can\'t serialize data element "{}"'.format(key)
+                )
                 continue
             data_element = self[key]
             json_value = self._data_element_to_json(
                 data_element, bulk_data_element_handler
             )
             json_dataset[json_key] = json_value
-        return json_dataset
+        if dumps is not None:
+            logger.debug('using default json.dumps function')
+            dumps = json.dumps
+        return dumps(json_dataset)
+
 
     __repr__ = __str__
 
