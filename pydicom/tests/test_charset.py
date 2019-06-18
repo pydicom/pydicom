@@ -411,12 +411,13 @@ class TestCharset(object):
         ds = dcmread(file_path)
         ds.decode()
 
-        original_string = ds.PatientName.original_string
-        ds.PatientName.original_string = None
-        fp = DicomBytesIO()
-        fp.is_implicit_VR = False
-        fp.is_little_endian = True
-        ds.save_as(fp, write_like_original=False)
-        fp.seek(0)
-        ds_out = dcmread(fp)
-        assert original_string == ds_out.PatientName.original_string
+        if hasattr(ds.PatientName, 'original_string'):
+            original_string = ds.PatientName.original_string
+            ds.PatientName.original_string = None
+            fp = DicomBytesIO()
+            fp.is_implicit_VR = False
+            fp.is_little_endian = True
+            ds.save_as(fp, write_like_original=False)
+            fp.seek(0)
+            ds_out = dcmread(fp)
+            assert original_string == ds_out.PatientName.original_string

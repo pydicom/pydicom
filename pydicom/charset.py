@@ -95,31 +95,81 @@ handled_encodings = ('iso2022_jp',
                      'iso_ir_58')
 
 
-# shift_jis is a superset of jis_x_0201. So we can regard the encoded value
-# as jis_x_0201 if it is single byte character.
-def _encode_to_jis_x_0201(input, errors='strict'):
+def _encode_to_jis_x_0201(value, errors='strict'):
+    """Convert a unicode string into JIX X 0201 byte string using shift_jis
+    encodings.
+    shift_jis is a superset of jis_x_0201. So we can regard the encoded value
+    as jis_x_0201 if it is single byte character.
+
+    Parameters
+    ----------
+    value : text type
+        The unicode string as presented to the user.
+    errors : str
+        The behavior of a character which could not be encoded. If 'strict' is
+        passed, raise an UnicodeEncodeError. If others are passed, replace
+        illegal character to '?'.
+
+    Returns
+    -------
+    byte string
+        The encoded string. If some characters in value could not be encoded to
+        JIS X 0201, and `errors` is not set to 'strict', they are replaced to
+        '?'.
+
+    Raises
+    ------
+    UnicodeEncodeError
+        If errors is set to 'strict' and `value` could not be encoded with
+        JIX X 0201.
+    """
+
     buf = b''
-    start = len(input)
+    start = len(value)
     end = 0
-    for i, c in enumerate(input):
+    for i, c in enumerate(value):
         encoded = c.encode('shift_jis', errors=errors)
         if len(encoded) != 1:
             start = min(start, i)
             end = max(end, i+1)
             encoded = b'?'
         buf += encoded
-    if start < len(input) and 0 < end and errors == 'strict':
+    if start < len(value) and 0 < end and errors == 'strict':
         raise UnicodeEncodeError(
-            'shift_jis', input, start, end, 'illegal multibyte sequence')
+            'shift_jis', value, start, end, 'illegal multibyte sequence')
     return buf
 
 
-# The escape sequence which is located at the end of the encoded value have
-# to vary depends on the value 1 of SpecificCharacterSet.
-# So we have to trim it and append correct escape sequence manually.
-def _encode_to_jis_x_0208(input, errors='strict'):
-    encoded_with_escape_sequence = input.encode('iso2022_jp', errors=errors)
-    encoded = encoded_with_escape_sequence[:-3]
+def _encode_to_jis_x_0208(value, errors='strict'):
+    """Convert a unicode string into JIX X 0208 byte string using iso2022_jp
+    encodings.
+    The escape sequence which is located at the end of the encoded value have
+    to vary depends on the value 1 of SpecificCharacterSet. So we have to
+    trim it and append correct escape sequence manually.
+
+    Parameters
+    ----------
+    value : text type
+        The unicode string as presented to the user.
+    errors : str
+        The behavior of a character which could not be encoded. This value
+        is passed to errors argument of encode funcdtion of str.
+
+    Returns
+    -------
+    byte string
+        The encoded string. If some characters in value could not be encoded to
+        JIS X 0208, it depends on the behavior of iso2022_jp encoder.
+
+    Raises
+    ------
+    UnicodeEncodeError
+        If errors is set to 'strict' and `value` could not be encoded with
+        JIX X 0208.
+    """
+    encoded = value.encode('iso2022_jp', errors=errors)
+    if encoded[-3:] == ENCODINGS_TO_CODES[default_encoding]:
+        encoded = encoded[:-3]
     return encoded
 
 
@@ -320,10 +370,7 @@ def encode_string(value, encodings):
     """
     for i, encoding in enumerate(encodings):
         try:
-            if encoding in custom_encoders:
-                encoded = custom_encoders[encoding](value)
-            else:
-                encoded = value.encode(encoding)
+            encoded = _encode_string_impl(value, encoding)
 
             if i > 0 and encoding not in handled_encodings:
                 encoded = ENCODINGS_TO_CODES.get(encoding, b'') + encoded
@@ -349,7 +396,7 @@ def encode_string(value, encodings):
         warnings.warn("Failed to encode value with encodings: {} - using "
                       "replacement characters in encoded string"
                       .format(', '.join(encodings)))
-        return value.encode(encodings[0], errors='replace')
+        return _encode_string_impl(value, encodings[0], errors='replace')
 
 
 def _encode_string_parts(value, encodings):
@@ -389,10 +436,7 @@ def _encode_string_parts(value, encodings):
         max_index = 0
         for encoding in encodings:
             try:
-                if encoding in custom_encoders:
-                    custom_encoders[encoding](unencoded_part)
-                else:
-                    unencoded_part.encode(encoding)
+                _encode_string_impl(unencoded_part, encoding)
                 # if we get here, the whole rest of the value can be encoded
                 best_encoding = encoding
                 max_index = len(unencoded_part)
@@ -403,11 +447,12 @@ def _encode_string_parts(value, encodings):
                     max_index = e.start
                     best_encoding = encoding
         # none of the given encodings can encode the first character - give up
-        if best_encoding is None:
+        if max_index == 0:
             raise ValueError()
 
         # encode the part that can be encoded with the found encoding
-        encoded_part = unencoded_part[:max_index].encode(best_encoding)
+        encoded_part = _encode_string_impl(unencoded_part[:max_index],
+                                           best_encoding)
         if best_encoding not in handled_encodings:
             encoded += ENCODINGS_TO_CODES.get(best_encoding, b'')
         encoded += encoded_part
@@ -417,6 +462,17 @@ def _encode_string_parts(value, encodings):
     if best_encoding in need_tail_escape_sequence_encodings:
         encoded += ENCODINGS_TO_CODES.get(encodings[0], b'')
     return encoded
+
+
+def _encode_string_impl(value, encoding, errors='strict'):
+    """Convert a unicode string into a byte string. If given encoding is in
+    custom_encoders, use a corresponding custom_encoder. If given encoding
+    is not in custom_encoders, use a corresponding python handled encoder.
+    """
+    if encoding in custom_encoders:
+        return custom_encoders[encoding](value, errors=errors)
+    else:
+        return value.encode(encoding, errors=errors)
 
 
 # DICOM PS3.5-2008 6.1.1 (p 18) says:
