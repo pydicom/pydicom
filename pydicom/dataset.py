@@ -2040,6 +2040,7 @@ class Dataset(dict):
                 data_element, bulk_data_element_handler
             )
             json_dataset[json_key] = json_value
+        if dumps is None:
         if dumps is not None:
             logger.debug('using default json.dumps function')
             dumps = json.dumps
