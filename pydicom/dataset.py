@@ -18,6 +18,7 @@ Dataset (dict subclass)
 import base64
 import inspect  # for __dir__
 import io
+import json
 import os
 import os.path
 from bisect import bisect_left
@@ -340,8 +341,12 @@ class Dataset(dict):
     """
     indent_chars = "   "
 
+    # TODO: this the correct list?
     _BINARY_VR_VALUES = ['OW', 'OB', 'OD', 'OF', 'OL', 'UN',
                          'OW/OB', 'OW or OB', 'OB or OW', 'US or SS']
+
+    _VRs_TO_BE_FLOATS = ["DS", "FL", "FD", ]
+    _VRs_TO_BE_INTS = ["IS", "SL", "SS", "UL", "US", ]
 
     # Order of keys is significant!
     _JSON_VALUE_KEYS = ('BulkDataURI', 'InlineBinary', 'Value' )
@@ -1770,6 +1775,38 @@ class Dataset(dict):
                     for dataset in sequence:
                         dataset.walk(callback)
 
+    def _convert_to_python_number(self, value, vr):
+        """Makes sure that values are either ints or floats
+        based on their value representation.
+
+        Parameters
+        ----------
+        value: single value or list of numbers
+        vr: str
+            data element value representation
+
+        Returns
+        -------
+        list or single value of either float or int
+
+        """
+        if value is None:
+            return None
+        if isinstance(value, list) and len(value) == 0:
+            return value
+        numberConverter = None
+        if vr in self._VRs_TO_BE_INTS:
+            numberConverter = int
+        if vr in self._VRs_TO_BE_FLOATS:
+            numberConverter = float
+        if numberConverter is not None:
+            if isinstance(value, list):
+                value = [numberConverter(e) for e in value]
+            else:
+                value = numberConverter(value)
+        return value
+
+
     @classmethod
     def _data_element_from_json(cls, tag, vr, value, value_key,
                                 bulk_data_uri_handler=None):
@@ -1804,7 +1841,7 @@ class Dataset(dict):
             vm = str(len(value))
         if value_key == 'Value':
             if not(isinstance(value, list)):
-                fmt = '"{}" of data element "{}" must be an list.'
+                fmt = '"{}" of data element "{}" must be a list.'
                 raise TypeError(fmt.format(value_key, tag))
         elif value_key in {'InlineBinary', 'BulkDataURI'}:
             if isinstance(value, list):
@@ -1874,6 +1911,9 @@ class Dataset(dict):
                 elem_value = value
         if value is None:
             logger.warning('missing value for data element "{}"'.format(tag))
+
+        elem_value = Dataset()._convert_to_python_number(elem_value, vr)
+
         try:
             return DataElement(tag=tag, value=elem_value, VR=vr)
         except Exception:
@@ -1904,7 +1944,7 @@ class Dataset(dict):
         pydicom.dataset.Dataset
 
         """
-        if not is_instance(json_dataset, dict):
+        if not isinstance(json_dataset, dict):
             json_dataset = json.loads(json_dataset)
         dataset = cls()
         for tag, mapping in json_dataset.items():
@@ -1922,17 +1962,15 @@ class Dataset(dict):
         return dataset
 
     def _data_element_to_json(self, data_element,
-                              bulk_data_element_handler=None):
+                              bulk_data_element_handler,
+                              bulk_data_threshold
+                              ):
         """Converts a DataElement to JSON representation.
 
         Parameters
         ----------
         data_element: pydicom.dataelem.DataElement
             data element
-        bulk_data_element_handler: Union[Callable, None], optional
-            callable that accepts a bulk data element and returns the
-            "BulkDataURI" for retrieving the value of the data element
-            via DICOMweb WADO-RS
 
         Returns
         -------
@@ -1941,32 +1979,41 @@ class Dataset(dict):
 
         """
         # TODO: Determine whether more VRs need to be converted to strings
-        _VRs_TO_QUOTE = ['DS', 'AT', ]
+        _VRs_TO_QUOTE = ['AT', ]
         json_element = {'vr': data_element.VR, }
         if data_element.VR in Dataset._BINARY_VR_VALUES:
-            encoded_value = base64.b64encode(value)
-            if len(encoded_value) > bulk_data_threshold:
-                if bulk_data_element_handler is None:
-                    raise ValueError(
-                        'No bulk data element handler provided to generate '
-                        'URL for value of data element "{}".'.format(
+            if data_element.value is not None:
+                encoded_value = base64.b64encode(data_element.value)
+                if len(encoded_value) > bulk_data_threshold:
+                    if bulk_data_element_handler is None:
+                        logger.warning(
+                            'No bulk data element handler provided to generate '
+                            'URL for value of data element "{}".'.format(
+                                data_element.name
+                            )
+                        )
+                        encoded_value = "No bulk data element handler provided"
+                    else:
+                        json_element['BulkDataURI'] = bulk_data_element_handler(
+                            data_element
+                    )
+                else:
+                    logger.info(
+                        'encode bulk data element "{}" inline'.format(
                             data_element.name
                         )
                     )
-                json_element['BulkDataURI'] = bulk_data_element_handler(
-                    data_element
-                )
-            else:
-                logger.info(
-                    'encode bulk data element "{}" inline'.format(
-                        data_element.name
-                    )
-                )
-                json_element['InlineBinary'] = encoded_value
+                    json_element['InlineBinary'] = encoded_value
         else:
             if data_element.VR == 'SQ':
                 # recursive call to co-routine to format sequence contents
-                json_element['Value'] = [e.to_json() for e in data_element]
+                def to_json_with_params(e):
+                    return e.to_json(bulk_data_element_handler,
+                                     bulk_data_threshold,
+                                     dumps=lambda e: e
+                                     )
+                value = [to_json_with_params(e) for e in data_element]
+                json_element['Value'] = value
             elif data_element.VR in _VRs_TO_QUOTE:
                 json_element['Value'] = [str(data_element.value), ]
             elif data_element.VR == 'PN':
@@ -1992,12 +2039,17 @@ class Dataset(dict):
                         json_element['Value'] = list(data_element.value)
                     else:
                         json_element['Value'] = [data_element.value, ]
+        if hasattr(json_element, 'Value'):
+            numberValue = self._convert_to_python_number(json_element['Value'],
+                                                         data_element.VR)
+            json_element['Value'] = numberValue
         return json_element
 
     def to_json(self, bulk_data_threshold=1, bulk_data_element_handler=None,
                 dumps=None):
         """Converts the data set into JSON representation based on the
-        `DICOM JSON Model <http://dicom.nema.org/medical/dicom/current/output/chtml/part18/chapter_F.html>`_.
+        DICOM JSON Model
+        http://dicom.nema.org/medical/dicom/current/output/chtml/part18/chapter_F.html.
 
         Parameters
         ----------
@@ -2037,15 +2089,13 @@ class Dataset(dict):
                 continue
             data_element = self[key]
             json_value = self._data_element_to_json(
-                data_element, bulk_data_element_handler
+                data_element, bulk_data_element_handler, bulk_data_threshold
             )
             json_dataset[json_key] = json_value
         if dumps is None:
-        if dumps is not None:
             logger.debug('using default json.dumps function')
             dumps = json.dumps
         return dumps(json_dataset)
-
 
     __repr__ = __str__
 
