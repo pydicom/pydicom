@@ -2113,7 +2113,7 @@ class DatasetTests(unittest.TestCase):
     },
     "7FE00010": {
         "vr": "OW",
-        "Value": []
+        "BulkDataURI": ""
     },
     "04000561": {
         "vr": "SQ",
@@ -2437,7 +2437,7 @@ class DatasetTests(unittest.TestCase):
 """
         ds = Dataset.from_json(jsonmodel)
         import json
-        jsonmodel2 = ds.to_json(dumps=lambda d: json.dumps(d, indent=2))
+        jsonmodel2 = ds.to_json(dump_handler=lambda d: json.dumps(d, indent=2))
         ds2 = Dataset.from_json(jsonmodel2)
 
         assert ds.PatientIdentityRemoved == 'YES'
