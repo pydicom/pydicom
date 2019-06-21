@@ -993,6 +993,15 @@ class TestNumpy_GetPixelData(object):
         with pytest.raises(ValueError, match=msg):
             get_pixeldata(ds)
 
+    def test_missing_padding_warns(self):
+        """A warning shall be issued if the padding for odd data is missing."""
+        ds = dcmread(EXPL_8_3_1F_ODD)
+        # remove the padding byte
+        ds.PixelData = ds.PixelData[:-1]
+        msg = "The pixel data length is odd and misses a padding byte."
+        with pytest.warns(UserWarning, match=msg):
+            get_pixeldata(ds)
+
     def test_change_photometric_interpretation(self):
         """Test get_pixeldata changes PhotometricInterpretation if required."""
         def to_rgb(ds):

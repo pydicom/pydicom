@@ -242,14 +242,20 @@ def get_pixeldata(ds, read_only=False):
     # Check that the actual length of the pixel data is as expected
     actual_length = len(ds.PixelData)
     # Correct for the trailing NULL byte padding for odd length data
+
     padded_expected_len = expected_len + expected_len % 2
     if actual_length < padded_expected_len:
-        raise ValueError(
-            "The length of the pixel data in the dataset doesn't match the "
-            "expected amount ({0} vs. {1} bytes). The dataset may be "
-            "corrupted or there may be an issue with the pixel data handler."
-            .format(actual_length, padded_expected_len)
-        )
+        if actual_length == expected_len:
+            warnings.warn(
+                "The pixel data length is odd and misses a padding byte.")
+        else:
+            raise ValueError(
+                "The length of the pixel data in the dataset doesn't match "
+                "the expected amount ({0} vs. {1} bytes). "
+                "The dataset may be corrupted or there may be an issue "
+                "with the pixel data handler."
+                .format(actual_length, padded_expected_len)
+            )
     elif actual_length > padded_expected_len:
         # PS 3.5, Section 8.1.1
         msg = (
