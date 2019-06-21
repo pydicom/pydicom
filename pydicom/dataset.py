@@ -2003,7 +2003,8 @@ class Dataset(dict):
         json_element = {'vr': data_element.VR, }
         if data_element.VR in Dataset._BINARY_VR_VALUES:
             if data_element.value is not None:
-                encoded_value = base64.b64encode(data_element.value)
+                binary_value = data_element.value.encode('utf-8')
+                encoded_value = base64.b64encode(binary_value).decode('utf-8')
                 if len(encoded_value) > bulk_data_threshold:
                     if bulk_data_element_handler is None:
                         raise TypeError(
