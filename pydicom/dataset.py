@@ -35,6 +35,7 @@ from pydicom.datadict import dictionary_VR, dictionary_VM
 from pydicom.datadict import (tag_for_keyword, keyword_for_tag,
                               repeater_has_keyword)
 from pydicom.dataelem import DataElement, DataElement_from_raw, RawDataElement
+from pydicom.multival import MultiValue
 from pydicom.pixel_data_handlers.util import (convert_color_space,
                                               reshape_pixel_array)
 from pydicom.tag import Tag, BaseTag, tag_in_exception
@@ -349,7 +350,7 @@ class Dataset(dict):
     _VRs_TO_BE_INTS = ["IS", "SL", "SS", "UL", "US", ]
 
     # Order of keys is significant!
-    _JSON_VALUE_KEYS = ('BulkDataURI', 'InlineBinary', 'Value' )
+    _JSON_VALUE_KEYS = ('Value', 'BulkDataURI', 'InlineBinary', )
 
     # Python 2: Classes defining __eq__ should flag themselves as unhashable
     __hash__ = None
@@ -1965,19 +1966,31 @@ class Dataset(dict):
 
     def _data_element_to_json(self, data_element,
                               bulk_data_element_handler,
-                              bulk_data_threshold
-                              ):
+                              bulk_data_threshold, dump_handler):
         """Converts a DataElement to JSON representation.
 
         Parameters
         ----------
         data_element: pydicom.dataelem.DataElement
             data element
+        bulk_data_element_handler: Union[Callable, None]
+            callable that accepts a bulk data element and returns the
+            "BulkDataURI" for retrieving the value of the data element
+            via DICOMweb WADO-RS
+        bulk_data_threshold: int
+            size of base64 encoded data element above which a value will be
+            provided in form of a "BulkDataURI" rather than "InlineBinary"
 
         Returns
         -------
         dict
             mapping representing a JSON encoded data element
+
+        Raises
+        ------
+        TypeError
+            when size of encoded data element exceeds `bulk_data_threshold`
+            but `bulk_data_element_handler` is ``None`` and hence not callable
 
         """
         # TODO: Determine whether more VRs need to be converted to strings
@@ -1988,16 +2001,14 @@ class Dataset(dict):
                 encoded_value = base64.b64encode(data_element.value)
                 if len(encoded_value) > bulk_data_threshold:
                     if bulk_data_element_handler is None:
-                        logger.warning(
+                        raise TypeError(
                             'No bulk data element handler provided to generate '
                             'URL for value of data element "{}".'.format(
                                 data_element.name
                             )
                         )
-                        encoded_value = "No bulk data element handler provided"
-                    else:
-                        json_element['BulkDataURI'] = bulk_data_element_handler(
-                            data_element
+                    json_element['BulkDataURI'] = bulk_data_element_handler(
+                        data_element
                     )
                 else:
                     logger.info(
@@ -2006,41 +2017,44 @@ class Dataset(dict):
                         )
                     )
                     json_element['InlineBinary'] = encoded_value
+        elif data_element.VR == 'SQ':
+            # recursive call to co-routine to format sequence contents
+            value = [
+                json.loads(e.to_json(
+                    bulk_data_element_handler=bulk_data_element_handler,
+                    bulk_data_threshold=bulk_data_threshold,
+                    dump_handler=dump_handler
+                ))
+                for e in data_element
+            ]
+            json_element['Value'] = value
+        elif data_element.VR == 'PN':
+            if data_element.value is not None:
+                if len(data_element.value.components) > 2:
+                    json_element['Value'] = [
+                        {'Phonetic': data_element.value.components[2], },
+                    ]
+                elif len(data_element.value.components) > 1:
+                    json_element['Value'] = [
+                        {'Ideographic': data_element.value.components[1], },
+                    ]
+                else:
+                    json_element['Value'] = [
+                        {'Alphabetic': data_element.value.components[0], },
+                    ]
         else:
-            if data_element.VR == 'SQ':
-                # recursive call to co-routine to format sequence contents
-                def to_json_with_params(e):
-                    return e.to_json(bulk_data_element_handler,
-                                     bulk_data_threshold,
-                                     dumps=lambda e: e
-                                     )
-                value = [to_json_with_params(e) for e in data_element]
-                json_element['Value'] = value
-            elif data_element.VR in _VRs_TO_QUOTE:
-                json_element['Value'] = [str(data_element.value), ]
-            elif data_element.VR == 'PN':
-                if data_element.value is not None:
-                    if len(data_element.value.components) > 2:
-                        json_element['Value'] = [
-                            {'Phonetic': data_element.value.components[2], },
-                        ]
-                    elif len(data_element.value.components) > 1:
-                        json_element['Value'] = [
-                            {'Ideographic': data_element.value.components[1], },
-                        ]
-                    else:
-                        json_element['Value'] = [
-                            {'Alphabetic': data_element.value.components[0], },
-                        ]
-            else:
-                value = data_element.value
-                if data_element.value is not None:
-                    if data_element.VM > 1:
-                        # ensure it's a list and not another iterable
-                        # (e.g. tuple), which would not be JSON serializable
-                        json_element['Value'] = list(data_element.value)
-                    else:
-                        json_element['Value'] = [data_element.value, ]
+            if data_element.value is not None:
+                is_multivalue = isinstance(data_element.value, MultiValue)
+                if data_element.VM > 1 or is_multivalue:
+                    value = data_element.value
+                else:
+                    value = [data_element.value]
+                # ensure it's a list and not another iterable
+                # (e.g. tuple), which would not be JSON serializable
+                if data_element.VR in _VRs_TO_QUOTE:
+                    json_element['Value'] = [str(v) for v in value]
+                else:
+                    json_element['Value'] = [v for v in value]
         if hasattr(json_element, 'Value'):
             json_element['Value'] = self._convert_to_python_number(
                 json_element['Value'], data_element.VR
@@ -2048,7 +2062,7 @@ class Dataset(dict):
         return json_element
 
     def to_json(self, bulk_data_threshold=1, bulk_data_element_handler=None,
-                dumps=None):
+                dump_handler=None):
         """Converts the data set into JSON representation based on the
         DICOM JSON Model
         http://dicom.nema.org/medical/dicom/current/output/chtml/part18/chapter_F.html.
@@ -2063,7 +2077,7 @@ class Dataset(dict):
             callable that accepts a bulk data element and returns a JSON
             representation of the data element (dictionary including the "vr"
             key and either the "InlineBinary" or the "BulkDataURI" key)
-        dumps: Union[Callable, None], optional
+        dump_handler: Union[Callable, None], optional
             callable that accepts a dict and returns the serialized (dumped)
             JSON string (by default uses ``json.dumps()``)
 
@@ -2076,9 +2090,12 @@ class Dataset(dict):
         --------
         >>> def my_json_dumps(data):
         ...     return json.dumps(data, indent=4)
-        >>> dataset.to_json(dumps=my_json_dumps)
+        >>> dataset.to_json(dump_handler=my_json_dumps)
 
         """
+        if dump_handler is None:
+            logger.debug('using default json.dumps function')
+            dump_handler = json.dumps
         json_dataset = {}
         for key in self.keys():
             json_key = '{0:04x}{1:04x}'.format(key.group, key.element).upper()
@@ -2090,14 +2107,13 @@ class Dataset(dict):
                 )
                 continue
             data_element = self[key]
-            json_value = self._data_element_to_json(
-                data_element, bulk_data_element_handler, bulk_data_threshold
+            json_dataset[json_key] = self._data_element_to_json(
+                data_element,
+                bulk_data_element_handler=bulk_data_element_handler,
+                bulk_data_threshold=bulk_data_threshold,
+                dump_handler=dump_handler
             )
-            json_dataset[json_key] = json_value
-        if dumps is None:
-            logger.debug('using default json.dumps function')
-            dumps = json.dumps
-        return dumps(json_dataset)
+        return dump_handler(json_dataset)
 
     __repr__ = __str__
 
