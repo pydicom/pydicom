@@ -986,9 +986,10 @@ class TestNumpy_GetPixelData(object):
         # Too short
         ds.PixelData = ds.PixelData[:-1]
         msg = (
-            r"The length of the pixel data in the dataset doesn't match the "
-            r"expected amount \(479999 vs. 480000 bytes\). The dataset may be "
-            r"corrupted or there may be an issue with the pixel data handler."
+            r"The length of the pixel data in the dataset \(479999 bytes\) "
+            r"doesn't match the expected length \(480000 bytes\). "
+            r"The dataset may be corrupted or there may be an issue "
+            r"with the pixel data handler."
         )
         with pytest.raises(ValueError, match=msg):
             get_pixeldata(ds)

@@ -250,11 +250,11 @@ def get_pixeldata(ds, read_only=False):
                 "The pixel data length is odd and misses a padding byte.")
         else:
             raise ValueError(
-                "The length of the pixel data in the dataset doesn't match "
-                "the expected amount ({0} vs. {1} bytes). "
+                "The length of the pixel data in the dataset ({} bytes) "
+                "doesn't match the expected length ({} bytes). "
                 "The dataset may be corrupted or there may be an issue "
                 "with the pixel data handler."
-                .format(actual_length, padded_expected_len)
+                    .format(actual_length, padded_expected_len)
             )
     elif actual_length > padded_expected_len:
         # PS 3.5, Section 8.1.1
