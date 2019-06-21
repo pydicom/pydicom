@@ -1775,37 +1775,36 @@ class Dataset(dict):
                     for dataset in sequence:
                         dataset.walk(callback)
 
-    def _convert_to_python_number(self, value, vr):
+    @classmethod
+    def _convert_to_python_number(cls, value, vr):
         """Makes sure that values are either ints or floats
         based on their value representation.
 
         Parameters
         ----------
-        value: single value or list of numbers
+        value: Union[Union[str, int, float], List[Union[str, int, float]]]
+            value of data element
         vr: str
-            data element value representation
+            value representation of data element
 
         Returns
         -------
-        list or single value of either float or int
+        Union[Union[str, int, float], List[Union[str, int, float]]]
 
         """
         if value is None:
             return None
-        if isinstance(value, list) and len(value) == 0:
-            return value
-        numberConverter = None
-        if vr in self._VRs_TO_BE_INTS:
-            numberConverter = int
-        if vr in self._VRs_TO_BE_FLOATS:
-            numberConverter = float
-        if numberConverter is not None:
-            if isinstance(value, list):
-                value = [numberConverter(e) for e in value]
+        number_type = None
+        if vr in cls._VRs_TO_BE_INTS:
+            number_type = int
+        if vr in cls._VRs_TO_BE_FLOATS:
+            number_type = float
+        if number_type is not None:
+            if isinstance(value, (list, tuple, )):
+                value = [number_type(e) for e in value]
             else:
-                value = numberConverter(value)
+                value = number_type(value)
         return value
-
 
     @classmethod
     def _data_element_from_json(cls, tag, vr, value, value_key,
@@ -1911,8 +1910,11 @@ class Dataset(dict):
                 elem_value = value
         if value is None:
             logger.warning('missing value for data element "{}"'.format(tag))
+        if value == []:
+            logger.error('wrong value for data element "{}"'.format(tag))
+            elem_value = None
 
-        elem_value = Dataset()._convert_to_python_number(elem_value, vr)
+        elem_value = cls._convert_to_python_number(elem_value, vr)
 
         try:
             return DataElement(tag=tag, value=elem_value, VR=vr)
@@ -2040,9 +2042,9 @@ class Dataset(dict):
                     else:
                         json_element['Value'] = [data_element.value, ]
         if hasattr(json_element, 'Value'):
-            numberValue = self._convert_to_python_number(json_element['Value'],
-                                                         data_element.VR)
-            json_element['Value'] = numberValue
+            json_element['Value'] = self._convert_to_python_number(
+                json_element['Value'], data_element.VR
+            )
         return json_element
 
     def to_json(self, bulk_data_threshold=1, bulk_data_element_handler=None,
