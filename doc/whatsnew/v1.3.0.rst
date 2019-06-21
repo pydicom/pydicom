@@ -26,6 +26,8 @@ Enhancements
 * Added possibility to get and add private tags without adding them to the
   private dictionary
 * Added possibility to use a ``Dataset`` in a ``NumPy`` array
+* Allow missing padding byte in Pixel Data, issue a warning in this case
+  (:issue:`864`)
 
 Fixes
 .....
