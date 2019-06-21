@@ -1856,7 +1856,10 @@ class Dataset(dict):
                         if 'vr' not in val:
                             fmt = 'Data element "{}" must have key "vr".'
                             raise KeyError(fmt.format(tag))
-                        if value_key is None:
+                        unique_value_keys = tuple(
+                            set(val.keys()) & set(cls._JSON_VALUE_KEYS)
+                        )
+                        if len(unique_value_keys) == 0:
                             logger.debug(
                                 'data element has neither key "{}".'.format(
                                     '" nor "'.join(supported_keys)
@@ -1864,6 +1867,7 @@ class Dataset(dict):
                             )
                             e = DataElement(tag=tag, value=None, VR=vr)
                         else:
+                            value_key = unique_value_keys[0]
                             e = cls._data_element_from_json(
                                 key, val['vr'], val[value_key], value_key
                             )
@@ -1952,19 +1956,15 @@ class Dataset(dict):
         dataset = cls()
         for tag, mapping in json_dataset.items():
             vr = mapping['vr']
-            try:
-                value_key = 'InlineBinary'
+            unique_value_keys = tuple(
+                set(mapping.keys()) & set(cls._JSON_VALUE_KEYS)
+            )
+            if len(unique_value_keys) == 0:
+                value_key = None
+                value = [None]
+            else:
+                value_key = unique_value_keys[0]
                 value = mapping[value_key]
-            except KeyError:
-                try:
-                    value_key = 'BulkDataURI'
-                    value = mapping[value_key]
-                except KeyError:
-                    try:
-                        value_key = 'Value'
-                        value = mapping[value_key]
-                    except KeyError:
-                        value = [None]
             data_element = cls._data_element_from_json(
                 tag, vr, value, value_key
             )
