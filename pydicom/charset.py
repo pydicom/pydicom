@@ -86,6 +86,7 @@ CODES_TO_ENCODINGS = {
 }
 
 ENCODINGS_TO_CODES = {v: k for k, v in CODES_TO_ENCODINGS.items()}
+ENCODINGS_TO_CODES['shift_jis'] = ESC + b')I'
 
 # Multi-byte character sets except Korean are handled by Python.
 # To decode them, the escape sequence shall be preserved in the input byte
@@ -173,7 +174,30 @@ def _encode_to_jis_x_0208(value, errors='strict'):
     return encoded
 
 
-# These encodings need escape sequence to handle ASCII characters.
+def _get_escape_sequence_to_alphanumeric(encodings):
+    """Return a escape sequence to handle alphanumeric characters.
+    In general, it is escape sequence corresponding to 0th value of encodings.
+    But if 0th value of encodings is shift_jis, return not ESC)I but ESC(J.
+
+    Parameters
+    ----------
+    encodings : list
+        The encodings are converted from the encodings in Specific Character
+        Set.
+
+    Returns
+    -------
+    string
+        Escape sequence to handle alphanumeric characters.
+    """
+
+    if encodings[0] == 'shift_jis':
+        return ESC + b'(J'
+    else:
+        return ENCODINGS_TO_CODES.get(encodings[0], b'')
+
+
+# These encodings need escape sequence to handle alphanumeric characters.
 need_tail_escape_sequence_encodings = ('iso2022_jp', 'iso-2022-jp')
 
 
@@ -375,7 +399,7 @@ def encode_string(value, encodings):
             if i > 0 and encoding not in handled_encodings:
                 encoded = ENCODINGS_TO_CODES.get(encoding, b'') + encoded
             if encoding in need_tail_escape_sequence_encodings:
-                encoded += ENCODINGS_TO_CODES.get(encodings[0], b'')
+                encoded += _get_escape_sequence_to_alphanumeric(encodings)
             return encoded
         except UnicodeError:
             continue
@@ -460,7 +484,7 @@ def _encode_string_parts(value, encodings):
         unencoded_part = unencoded_part[max_index:]
     # unencoded_part is empty - we are done, return the encoded string
     if best_encoding in need_tail_escape_sequence_encodings:
-        encoded += ENCODINGS_TO_CODES.get(encodings[0], b'')
+        encoded += _get_escape_sequence_to_alphanumeric(encodings)
     return encoded
 
 
