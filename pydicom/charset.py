@@ -168,8 +168,12 @@ def _encode_to_jis_x_0208(value, errors='strict'):
         If errors is set to 'strict' and `value` could not be encoded with
         JIX X 0208.
     """
+
     encoded = value.encode('iso2022_jp', errors=errors)
-    if encoded[-3:] == ENCODINGS_TO_CODES[default_encoding]:
+
+    # If errors is not strict, this function is used in fallback.
+    # So keep the tail escape sequence of encoded for backward compatibility.
+    if encoded[-3:] == ENCODINGS_TO_CODES[default_encoding] and errors == 'strict':
         encoded = encoded[:-3]
     return encoded
 
