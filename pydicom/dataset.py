@@ -1851,7 +1851,7 @@ class Dataset(dict):
             elem_value = []
             for value_item in value:
                 ds = cls()
-                if value_item is not None:
+                if value_item:
                     for key, val in value_item.items():
                         if 'vr' not in val:
                             fmt = 'Data element "{}" must have key "vr".'
@@ -1865,7 +1865,7 @@ class Dataset(dict):
                                     '" nor "'.join(supported_keys)
                                 )
                             )
-                            e = DataElement(tag=tag, value=None, VR=vr)
+                            e = DataElement(tag=tag, value='', VR=vr)
                         else:
                             value_key = unique_value_keys[0]
                             e = cls._data_element_from_json(
@@ -1892,7 +1892,7 @@ class Dataset(dict):
                 try:
                     elem_value = elem_value[0]
                 except IndexError:
-                    elem_value = None
+                    elem_value = ''
         else:
             if vm == '1':
                 if value_key == 'InlineBinary':
@@ -1903,7 +1903,7 @@ class Dataset(dict):
                             'no bulk data URI handler provided for retrieval '
                             'of value of data element "{}"'.format(tag)
                         )
-                        elem_value = None
+                        elem_value = ''
                     else:
                         elem_value = bulk_data_uri_handler(value)
                 else:
@@ -1913,11 +1913,9 @@ class Dataset(dict):
                         elem_value = value
             else:
                 elem_value = value
-        if value is None:
+        if not value:
             logger.warning('missing value for data element "{}"'.format(tag))
-        if value == []:
-            logger.error('wrong value for data element "{}"'.format(tag))
-            elem_value = None
+            elem_value = ''
 
         elem_value = cls._convert_to_python_number(elem_value, vr)
 
@@ -1961,7 +1959,7 @@ class Dataset(dict):
             )
             if len(unique_value_keys) == 0:
                 value_key = None
-                value = [None]
+                value = ['']
             else:
                 value_key = unique_value_keys[0]
                 value = mapping[value_key]
