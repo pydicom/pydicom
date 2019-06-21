@@ -1952,12 +1952,19 @@ class Dataset(dict):
         dataset = cls()
         for tag, mapping in json_dataset.items():
             vr = mapping['vr']
-            value = [None]
-            for value_key in cls._JSON_VALUE_KEYS:
+            try:
+                value_key = 'InlineBinary'
+                value = mapping[value_key]
+            except KeyError:
                 try:
+                    value_key = 'BulkDataURI'
                     value = mapping[value_key]
                 except KeyError:
-                    continue
+                    try:
+                        value_key = 'Value'
+                        value = mapping[value_key]
+                    except KeyError:
+                        value = [None]
             data_element = cls._data_element_from_json(
                 tag, vr, value, value_key
             )
