@@ -125,20 +125,29 @@ def _encode_to_jis_x_0201(value, errors='strict'):
         JIX X 0201.
     """
 
-    buf = b''
-    start = len(value)
-    end = 0
-    for i, c in enumerate(value):
-        encoded = c.encode('shift_jis', errors=errors)
-        if len(encoded) != 1:
-            start = min(start, i)
-            end = max(end, i+1)
-            encoded = b'?'
-        buf += encoded
-    if start < len(value) and 0 < end and errors == 'strict':
+    # If errors is not strict, this function is used in fallback.
+    # So keep the tail escape sequence of encoded for backward compatibility.
+    if errors != 'strict' or value == '':
+        return value.encode('shift_jis', errors=errors)
+
+    Encoder = codecs.getincrementalencoder('shift_jis')
+    encoder = Encoder()
+
+    encoded = encoder.encode(value[0])
+    if len(encoded) != 1:
         raise UnicodeEncodeError(
-            'shift_jis', value, start, end, 'illegal multibyte sequence')
-    return buf
+            'shift_jis', value, 0, len(value), 'illegal multibyte sequence')
+
+    msb = ord(encoded) & 0x80
+    for i, c in enumerate(value[1:], 1):
+        b = encoder.encode(c)
+        if len(b) != 1 or ((ord(b) & 0x80) ^ msb) != 0:
+            character_set = 'ISO IR 14' if msb == 0 else 'ISO IR 13'
+            msg = 'Given character is out of {}'.format(character_set)
+            raise UnicodeEncodeError('shift_jis', value, i, len(value), msg)
+        encoded += b
+
+    return encoded
 
 
 def _encode_to_jis_x_0208(value, errors='strict'):
@@ -169,36 +178,62 @@ def _encode_to_jis_x_0208(value, errors='strict'):
         JIX X 0208.
     """
 
-    encoded = value.encode('iso2022_jp', errors=errors)
-
     # If errors is not strict, this function is used in fallback.
     # So keep the tail escape sequence of encoded for backward compatibility.
-    if encoded[-3:] == ENCODINGS_TO_CODES[default_encoding] and errors == 'strict':
-        encoded = encoded[:-3]
+    if errors != 'strict':
+        return value.encode('iso2022_jp', errors=errors)
+
+    Encoder = codecs.getincrementalencoder('iso2022-jp')
+    encoder = Encoder()
+
+    encoded = encoder.encode(value[0])
+    if encoded[:3] != ENCODINGS_TO_CODES['iso2022_jp']:
+        raise UnicodeEncodeError(
+            'iso2022_jp', value, 0, len(value),
+            'Given character is out of ISO IR 87')
+
+    for i, c in enumerate(value[1:], 1):
+        b = encoder.encode(c)
+        if b[:3] == ENCODINGS_TO_CODES['iso8859']:
+            raise UnicodeEncodeError(
+                'iso2022_jp', value, i, len(value),
+                'Given character is out of ISO IR 87')
+        encoded += b
     return encoded
 
 
-def _get_escape_sequence_to_alphanumeric(encodings):
-    """Return a escape sequence to handle alphanumeric characters.
-    In general, it is escape sequence corresponding to 0th value of encodings.
-    But if 0th value of encodings is shift_jis, return not ESC)I but ESC(J.
+def _get_escape_sequence_for_encoding(encoding, encoded=None):
+    """Return a escape sequence corresponding to given encoding.  If encoding
+    is shift_jis, return ESC)I or ESC(J depends on thefirst byte of given
+    encoeed.
 
     Parameters
     ----------
-    encodings : list
-        The encodings are converted from the encodings in Specific Character
-        Set.
+    encoding : str
+        An encoding is used to specify  an escape sequence.
+
+    encoded : bytes or str
+        The encoded value is used to choose escase sequence if encoding is
+        shift_jis
 
     Returns
     -------
     string
-        Escape sequence to handle alphanumeric characters.
+        Escape sequence for encoded value.
     """
 
-    if encodings[0] == 'shift_jis':
+    if encoding == 'shift_jis':
+        if encoded is None:
+            return ESC + b'(J'
+
+        first_byte = encoded[0]
+        if isinstance(encoded, str):
+            first_byte = ord(first_byte)
+        if 0x80 <= first_byte:
+            return ESC + b')I'
+
         return ESC + b'(J'
-    else:
-        return ENCODINGS_TO_CODES.get(encodings[0], b'')
+    return ENCODINGS_TO_CODES.get(encoding, b'')
 
 
 # These encodings need escape sequence to handle alphanumeric characters.
@@ -401,9 +436,11 @@ def encode_string(value, encodings):
             encoded = _encode_string_impl(value, encoding)
 
             if i > 0 and encoding not in handled_encodings:
-                encoded = ENCODINGS_TO_CODES.get(encoding, b'') + encoded
+                escape_sequence = _get_escape_sequence_for_encoding(
+                        encoding, encoded=encoded)
+                encoded = escape_sequence + encoded
             if encoding in need_tail_escape_sequence_encodings:
-                encoded += _get_escape_sequence_to_alphanumeric(encodings)
+                encoded += _get_escape_sequence_for_encoding(encodings[0])
             return encoded
         except UnicodeError:
             continue
@@ -482,13 +519,14 @@ def _encode_string_parts(value, encodings):
         encoded_part = _encode_string_impl(unencoded_part[:max_index],
                                            best_encoding)
         if best_encoding not in handled_encodings:
-            encoded += ENCODINGS_TO_CODES.get(best_encoding, b'')
+            encoded += _get_escape_sequence_for_encoding(
+                    best_encoding, encoded=encoded_part)
         encoded += encoded_part
         # set remaining unencoded part of the string and handle that
         unencoded_part = unencoded_part[max_index:]
     # unencoded_part is empty - we are done, return the encoded string
     if best_encoding in need_tail_escape_sequence_encodings:
-        encoded += _get_escape_sequence_to_alphanumeric(encodings)
+        encoded += _get_escape_sequence_for_encoding(encodings[0])
     return encoded
 
 
