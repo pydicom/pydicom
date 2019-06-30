@@ -405,8 +405,9 @@ class TestCharset(object):
             pydicom.charset.decode(
                 elem, ['ISO 2022 IR 100', 'ISO 2022 IR 146'])
 
-    def test_japanese_multi_byte_encoding(self):
-        """Test japanese multi byte strings are correctly encoded."""
+    def test_japanese_multi_byte_personname(self):
+        """Test japanese person name which has multi byte strings are
+        correctly encoded."""
         file_path = get_charset_files('chrH32.dcm')[0]
         ds = dcmread(file_path)
         ds.decode()
@@ -421,3 +422,9 @@ class TestCharset(object):
             fp.seek(0)
             ds_out = dcmread(fp)
             assert original_string == ds_out.PatientName.original_string
+
+    def test_japanese_multi_byte_encoding(self):
+        """Test japanese multi byte strings are correctly encoded."""
+        encoded = pydicom.charset.encode_string('あaｱア',
+                                                ['shift_jis', 'iso2022_jp'])
+        assert encoded == b'\x1b$B$"\x1b(Ja\x1b)I\xb1\x1b$B%"\x1b(J'
