@@ -126,8 +126,9 @@ have the specified string anywhere in the name (case insensitive).
    available in the dataset.
 
 You can also see all the names that pydicom knows about by viewing the
-``_dicom_dict.py`` file. You could modify that file to add tags that pydicom
-doesn't already know about.
+``_dicom_dict.py`` file. You can add your own entries to the dataset (for e.g.
+DICOM private data elements) using :func:`datadict.add_dict_entries` or 
+:func:`datadict.add_dict_entry`.
 
 Under the hood, :class:`dataset.Dataset` stores a DataElement object for each
 item, but when accessed by name (e.g. ``ds.PatientName``) only the ``value`` of
