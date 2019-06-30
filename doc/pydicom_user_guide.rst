@@ -12,4 +12,5 @@ Pydicom User Guide
    working_with_pixel_data.rst
    image_data_handlers.rst
    viewing_images.rst
+   private_data_elements.rst
    transition_to_pydicom1.rst
