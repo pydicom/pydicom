@@ -140,7 +140,12 @@ def _encode_to_jis_x_0201(value, errors='strict'):
 
     msb = ord(encoded) & 0x80
     for i, c in enumerate(value[1:], 1):
-        b = encoder.encode(c)
+        try:
+            b = encoder.encode(c)
+        except UnicodeEncodeError as e:
+            e.start = i
+            e.end = len(value)
+            raise e
         if len(b) != 1 or ((ord(b) & 0x80) ^ msb) != 0:
             character_set = 'ISO IR 14' if msb == 0 else 'ISO IR 13'
             msg = 'Given character is out of {}'.format(character_set)
@@ -193,7 +198,12 @@ def _encode_to_jis_x_0208(value, errors='strict'):
             'Given character is out of ISO IR 87')
 
     for i, c in enumerate(value[1:], 1):
-        b = encoder.encode(c)
+        try:
+            b = encoder.encode(c)
+        except UnicodeEncodeError as e:
+            e.start = i
+            e.end = len(value)
+            raise e
         if b[:3] == ENCODINGS_TO_CODES['iso8859']:
             raise UnicodeEncodeError(
                 'iso2022_jp', value, i, len(value),
