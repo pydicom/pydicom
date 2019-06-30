@@ -425,6 +425,6 @@ class TestCharset(object):
 
     def test_japanese_multi_byte_encoding(self):
         """Test japanese multi byte strings are correctly encoded."""
-        encoded = pydicom.charset.encode_string('あaｱア',
+        encoded = pydicom.charset.encode_string(u'あaｱア',
                                                 ['shift_jis', 'iso2022_jp'])
         assert encoded == b'\x1b$B$"\x1b(Ja\x1b)I\xb1\x1b$B%"\x1b(J'
