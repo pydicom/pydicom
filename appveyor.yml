@@ -33,7 +33,7 @@ install:
 
   # Installed prebuilt dependencies from conda
   - "conda install pip numpy nose wheel pytest matplotlib -y -q"
-  - "conda install -y -q setuptools"
+  - "conda --version"
   - "pip install nose-timer nose-exclude"
 
   # Install other pydicom dependencies
