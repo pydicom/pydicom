@@ -5,7 +5,7 @@ Private Data Elements
 
 .. rubric:: Accessing or creating private data elements
 
-.. currentmodule:: pydicom
+.. currentmodule:: pydicom.dataset
 
 Introduction
 ------------
@@ -63,7 +63,7 @@ attribute is needed to get the value::
     >>> ds[0x00091001].value
     'GE_GENESIS_FF'
 
-You can also create a :class:`Dataset.PrivateBlock` instance and access elements through it::
+You can also create a :class:`PrivateBlock` instance and access elements through it::
 
     >>> block = ds.private_block(0x0009, 'GEMS_IDEN_01')
     >>> block[0x01]
@@ -77,14 +77,15 @@ elements, as shown in the next section.
 Setting Private Data Elements with pydicom
 ------------------------------------------
 
-The DICOM standard requires a private creator data element to reserve a section
-of private tags.  Pydicom (since v1.3) provides convenient functions to manage this::
+The DICOM standard requires a private creator data element to identify and reserve a section
+of private tags. That name should be unique, and usually has the company name as the first part 
+to accomplish that.  Pydicom (since v1.3) provides convenient functions to manage this::
 
-    >>> block = ds.private_block(0x000b, "My Block", create=True)
+    >>> block = ds.private_block(0x000b, "My company 001", create=True)
     >>> block.add_new(0x01, "SH", "my value")
     >>> ds
     ...
-    (000b, 0010) Private Creator                     LO: 'My Block'
+    (000b, 0010) Private Creator                     LO: 'My company 001'
     (000b, 1001) Private tag data                    SH: 'my value'
     ...
 
@@ -109,6 +110,6 @@ might be contained in them.  Pydicom provides a convenient function
 
     >>> ds.remove_private_tags()
 
-This can also be helpful during interactive sessions, to remove a large
-number of lines from the display of a dataset, lines which may not provide
-useful information.
+This can also be helpful during interactive sessions when exploring DICOM files,
+to remove a large number of lines from the display of a dataset --
+lines which may not provide useful information.
