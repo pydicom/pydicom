@@ -14,3 +14,4 @@ Pydicom User Guide
    viewing_images.rst
    private_data_elements.rst
    transition_to_pydicom1.rst
+   python2_support.rst
