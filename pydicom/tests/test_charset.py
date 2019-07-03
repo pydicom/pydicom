@@ -431,5 +431,9 @@ class TestCharset(object):
 
     def test_bad_japanese_encoding(self):
         """Test japanese multi byte strings are not correctly encoded."""
-        encoded = pydicom.charset.encode_string(u'あaｱア', ['shift_jis'])
-        assert encoded == b'?a??'
+        with pytest.warns(UserWarning,
+                          match=u"Failed to encode value with encodings"
+                                u": shift_jis - using replacement character"
+                                u"s in encoded string"):
+            encoded = pydicom.charset.encode_string(u'あaｱア', ['shift_jis'])
+            assert encoded == b'?a??'
