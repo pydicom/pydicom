@@ -250,9 +250,10 @@ def _get_escape_sequence_for_encoding(encoding, encoded=None):
         if encoded is None:
             return ESC_ISO_IR_14
 
-        first_byte = encoded[0]
-        if isinstance(encoded, str):
-            first_byte = ord(first_byte)
+        if not in_py2:
+            first_byte = encoded[0]
+        else:
+            first_byte = ord(encoded[0])
         if 0x80 <= first_byte:
             return ESC_ISO_IR_13
 
@@ -537,7 +538,8 @@ def _encode_string_parts(value, encodings):
                     best_encoding = encoding
         # none of the given encodings can encode the first character - give up
         if max_index == 0:
-            raise ValueError()
+            raise ValueError("None of the given encodings can encode the "
+                             "first character")
 
         # encode the part that can be encoded with the found encoding
         encoded_part = _encode_string_impl(unencoded_part[:max_index],
