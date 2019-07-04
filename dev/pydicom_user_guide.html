@@ -39,7 +39,7 @@
   <link rel="stylesheet" href="_static/css/pydicom.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Transition to pydicom 1.x" href="transition_to_pydicom1.html" />
+    <link rel="next" title="For users of pydicom &lt; 1.0" href="warn_transition_to_pydicom1.html" />
     <link rel="prev" title="Getting Started with pydicom" href="getting_started.html" /> 
 </head>
 
@@ -98,13 +98,16 @@
 <p class="caption"><span class="caption-text">Documentation</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Pydicom User Guide</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="transition_to_pydicom1.html">Transition to pydicom 1.x</a></li>
-<li class="toctree-l2"><a class="reference internal" href="transition_to_pydicom1.html#api-changes-in-version-1-0">API Changes in version 1.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="warn_transition_to_pydicom1.html">For users of pydicom &lt; 1.0</a></li>
 <li class="toctree-l2"><a class="reference internal" href="base_element.html">Core elements in pydicom</a></li>
 <li class="toctree-l2"><a class="reference internal" href="writing_files.html">Writing DICOM Files</a></li>
 <li class="toctree-l2"><a class="reference internal" href="working_with_pixel_data.html">Working with Pixel Data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="image_data_handlers.html">Handling of compressed image data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viewing_images.html">Viewing Images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="private_data_elements.html">Private Data Elements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="transition_to_pydicom1.html">Transition to pydicom 1.x</a></li>
+<li class="toctree-l2"><a class="reference internal" href="transition_to_pydicom1.html#api-changes-in-version-1-0">API Changes in version 1.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python2_support.html">Python 2 Support Plan for Pydicom</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="ref_guide.html">Reading and writing DICOM files</a></li>
@@ -188,17 +191,8 @@
 <span id="id1"></span><h1>Pydicom User Guide<a class="headerlink" href="#pydicom-user-guide" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="transition_to_pydicom1.html">Transition to pydicom 1.x</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="transition_to_pydicom1.html#introduction">Introduction</a></li>
-<li class="toctree-l2"><a class="reference internal" href="transition_to_pydicom1.html#for-authors-of-packages-requiring-pydicom-1-0">For authors of packages requiring pydicom &lt; 1.0</a></li>
-<li class="toctree-l2"><a class="reference internal" href="transition_to_pydicom1.html#error-messages-relating-to-the-pydicom-transition">Error messages relating to the pydicom transition</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="transition_to_pydicom1.html#api-changes-in-version-1-0">API Changes in version 1.0</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="transition_to_pydicom1.html#changed-module-names">Changed module names</a></li>
-<li class="toctree-l2"><a class="reference internal" href="transition_to_pydicom1.html#changed-function-and-variable-names">Changed function and variable names</a></li>
-<li class="toctree-l2"><a class="reference internal" href="transition_to_pydicom1.html#removed-functions-and-names">Removed functions and names</a></li>
-<li class="toctree-l2"><a class="reference internal" href="transition_to_pydicom1.html#changed-behavior">Changed behavior</a></li>
+<li class="toctree-l1"><a class="reference internal" href="warn_transition_to_pydicom1.html">For users of pydicom &lt; 1.0</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="warn_transition_to_pydicom1.html#pydicom-1">Pydicom &lt; 1</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="base_element.html">Core elements in pydicom</a><ul>
@@ -233,6 +227,27 @@
 <li class="toctree-l2"><a class="reference internal" href="viewing_images.html#using-pydicom-with-wxpython">Using pydicom with wxPython</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="private_data_elements.html">Private Data Elements</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="private_data_elements.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="private_data_elements.html#displaying-private-data-elements-in-pydicom">Displaying Private Data Elements in pydicom</a></li>
+<li class="toctree-l2"><a class="reference internal" href="private_data_elements.html#setting-private-data-elements-with-pydicom">Setting Private Data Elements with pydicom</a></li>
+<li class="toctree-l2"><a class="reference internal" href="private_data_elements.html#removing-all-private-data-elements">Removing All Private Data Elements</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="transition_to_pydicom1.html">Transition to pydicom 1.x</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="transition_to_pydicom1.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="transition_to_pydicom1.html#for-authors-of-packages-requiring-pydicom-1-0">For authors of packages requiring pydicom &lt; 1.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="transition_to_pydicom1.html#error-messages-relating-to-the-pydicom-transition">Error messages relating to the pydicom transition</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="transition_to_pydicom1.html#api-changes-in-version-1-0">API Changes in version 1.0</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="transition_to_pydicom1.html#changed-module-names">Changed module names</a></li>
+<li class="toctree-l2"><a class="reference internal" href="transition_to_pydicom1.html#changed-function-and-variable-names">Changed function and variable names</a></li>
+<li class="toctree-l2"><a class="reference internal" href="transition_to_pydicom1.html#removed-functions-and-names">Removed functions and names</a></li>
+<li class="toctree-l2"><a class="reference internal" href="transition_to_pydicom1.html#changed-behavior">Changed behavior</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="python2_support.html">Python 2 Support Plan for Pydicom</a></li>
 </ul>
 </div>
 </div>
@@ -245,7 +260,7 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="transition_to_pydicom1.html" class="btn btn-neutral float-right" title="Transition to pydicom 1.x" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="warn_transition_to_pydicom1.html" class="btn btn-neutral float-right" title="For users of pydicom &lt; 1.0" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="getting_started.html" class="btn btn-neutral float-left" title="Getting Started with pydicom" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
