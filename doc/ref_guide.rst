@@ -27,10 +27,10 @@ File Writing
 ============
 
 DICOM files can also be written using pydicom. There are two ways to do this.
-The first is to use ``write_file`` with a prexisting FileDataset (derived from Dataset) instance.
+The first is to use ``dcmwrite`` with a prexisting FileDataset (derived from Dataset) instance.
 The second is to use the ``save_as`` method on an Dataset instance.
 
-.. autofunction:: pydicom.filewriter.write_file
+.. autofunction:: pydicom.filewriter.dcmwrite
 
 .. automethod:: pydicom.dataset.Dataset.save_as
 

@@ -61,6 +61,13 @@ number::
 In the latter case (using the tag number directly) a DataElement instance is
 returned, so the ``.value`` must be used to get the value.
 
+.. note::
+
+    In pydicom, private data elements are displayed with square brackets
+    around the name (if the name is known to pydicom).  These are shown for convenience only;
+    the descriptive name in brackets cannot be used to retrieve data elements.
+    See details in :doc:`private_data_elements`.
+
 You can also set values by name (DICOM keyword) or tag number::
 
   >>> ds.PatientID = "12345"
@@ -95,22 +102,22 @@ convention::
 
   >>> ds.BeamSequence[0].BeamName
   'Field 1'
+  >>> # Or, set an intermediate variable to a dataset in the list
+  >>> beam1 = ds.BeamSequence[0]  # First dataset in the sequence
+  >>> beam1.BeamName
+  'Field 1'
 
 See :ref:`sphx_glr_auto_examples_metadata_processing_plot_sequences.py`.
 
 Using DICOM keywords is the recommended way to access data elements, but you
 can also use the tag numbers directly, such as::
 
-  >>> # Same thing with tag numbers:
+  >>> # Same thing with tag numbers - much harder to read:
+  >>> # Really should only be used if DICOM keyword not in pydicom dictionary
   >>> ds[0x300a,0xb0][0][0x300a,0xc2].value
   'Field 1'
-  >>> # yet another way, using another variable
-  >>> beam1=ds[0x300a,0xb0][0]
-  >>> beam1.BeamName, beam1[0x300a,0xc2].value
-  ('Field 1', 'Field 1')
 
-
-If you don't remember or know the exact tag name, :class:`dataset.Dataset`
+If you don't remember or know the exact tag name (aka DICOM keyword), :class:`dataset.Dataset`
 provides a handy :func:`dataset.Dataset.dir` method, useful during interactive
 sessions at the Python prompt::
 
@@ -126,8 +133,11 @@ have the specified string anywhere in the name (case insensitive).
    available in the dataset.
 
 You can also see all the names that pydicom knows about by viewing the
-``_dicom_dict.py`` file. You could modify that file to add tags that pydicom
-doesn't already know about.
+``_dicom_dict.py`` file. It should not normally be necessary, but you can add
+your own entries to the DICOM dictionary at run time using :func:`datadict.add_dict_entries`
+or :func:`datadict.add_dict_entry`.  Similarly, you can add private data elements
+to the private dictionary using :func:`datadict.add_private_dict_entries` or
+:func:`datadict.add_private_dict_entries`.
 
 Under the hood, :class:`dataset.Dataset` stores a DataElement object for each
 item, but when accessed by name (e.g. ``ds.PatientName``) only the ``value`` of
@@ -152,7 +162,7 @@ use the `in` keyword::
   >>> "PatientName" in ds
   True
 
-To remove a data element from the dataset,  use :func:`dataset.Dataset.del`::
+To remove a data element from the dataset,  use python's `del` statement::
 
   >>> del ds.SoftwareVersions   # or del ds[0x0018, 0x1020]
 
@@ -163,7 +173,7 @@ To work with pixel data, the raw bytes are available through the usual tag::
   >>> ds = pydicom.dcmread(filename)
   >>> pixel_bytes = ds.PixelData
 
-but to work with them in a more intelligent way, use ``pixel_array``
+but to work with them in a more intelligent way, use :func:`Dataset.pixel_array`
 (requires the `NumPy library <http://numpy.org>`_)::
 
   >>> pix = ds.pixel_array
@@ -197,21 +207,26 @@ which stores the following things:
 Tag
 ---
 
+Tag is not generally used directly in user code, as Tags are automatically created 
+when you assign or read data elements using the DICOM keywords as illustrated in
+sections above.
+
 The Tag class is derived from Python's ``int``, so in effect, it is just
 a number with some extra behaviour:
 
   * Tag enforces that the DICOM tag fits in the expected 4-byte (group,element)
-  * A Tag instance can be created from an int or from a tuple containing
-    the (group,element) separately::
+  * A Tag instance can be created from an int or a tuple containing
+    the (group,element), or from the DICOM keyword::
 
       >>> from pydicom.tag import Tag
-      >>> t1=Tag(0x00100010) # all of these are equivalent
-      >>> t2=Tag(0x10,0x10)
-      >>> t3=Tag((0x10, 0x10))
+      >>> t1 = Tag(0x00100010) # all of these are equivalent
+      >>> t2 = Tag(0x10,0x10)
+      >>> t3 = Tag((0x10, 0x10))
+      >>> t4 = Tag("PatientName")
       >>> t1
       (0010, 0010)
-      >>> t1==t2, t1==t3
-      (True, True)
+      >>> t1==t2, t1==t3, t1==t4
+      (True, True, True)
 
   * Tag has properties group and element (or elem) to return the group and
     element portions
@@ -224,3 +239,6 @@ Sequence
 Sequence is derived from Python's ``list``. The only added functionality is
 to make string representations prettier. Otherwise all the usual methods of
 ``list`` like item selection, append, etc. are available.
+
+For examples of accessing data nested in sequences, see
+:ref:`sphx_glr_auto_examples_metadata_processing_plot_sequences.py`.
