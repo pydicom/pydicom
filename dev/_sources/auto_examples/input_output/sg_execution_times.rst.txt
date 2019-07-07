@@ -5,10 +5,10 @@
 
 Computation times
 =================
-**00:00.328** total execution time for **auto_examples_input_output** files:
+**00:00.305** total execution time for **auto_examples_input_output** files:
 
-- **00:00.134**: :ref:`sphx_glr_auto_examples_input_output_plot_read_dicom.py` (``plot_read_dicom.py``)
-- **00:00.088**: :ref:`sphx_glr_auto_examples_input_output_plot_read_dicom_directory.py` (``plot_read_dicom_directory.py``)
-- **00:00.037**: :ref:`sphx_glr_auto_examples_input_output_plot_read_rtplan.py` (``plot_read_rtplan.py``)
-- **00:00.036**: :ref:`sphx_glr_auto_examples_input_output_plot_write_dicom.py` (``plot_write_dicom.py``)
+- **00:00.135**: :ref:`sphx_glr_auto_examples_input_output_plot_read_dicom.py` (``plot_read_dicom.py``)
+- **00:00.075**: :ref:`sphx_glr_auto_examples_input_output_plot_read_dicom_directory.py` (``plot_read_dicom_directory.py``)
 - **00:00.033**: :ref:`sphx_glr_auto_examples_input_output_plot_printing_dataset.py` (``plot_printing_dataset.py``)
+- **00:00.032**: :ref:`sphx_glr_auto_examples_input_output_plot_write_dicom.py` (``plot_write_dicom.py``)
+- **00:00.029**: :ref:`sphx_glr_auto_examples_input_output_plot_read_rtplan.py` (``plot_read_rtplan.py``)

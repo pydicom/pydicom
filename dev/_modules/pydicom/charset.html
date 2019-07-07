@@ -260,6 +260,7 @@
 <span class="p">}</span>
 
 <span class="n">ENCODINGS_TO_CODES</span> <span class="o">=</span> <span class="p">{</span><span class="n">v</span><span class="p">:</span> <span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">CODES_TO_ENCODINGS</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+<span class="n">ENCODINGS_TO_CODES</span><span class="p">[</span><span class="s1">&#39;shift_jis&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ESC</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;)I&#39;</span>
 
 <span class="c1"># Multi-byte character sets except Korean are handled by Python.</span>
 <span class="c1"># To decode them, the escape sequence shall be preserved in the input byte</span>
@@ -267,6 +268,182 @@
 <span class="n">handled_encodings</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;iso2022_jp&#39;</span><span class="p">,</span>
                      <span class="s1">&#39;iso-2022-jp&#39;</span><span class="p">,</span>
                      <span class="s1">&#39;iso_ir_58&#39;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_encode_to_jis_x_0201</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;strict&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convert a unicode string into JIS X 0201 byte string using shift_jis</span>
+<span class="sd">    encodings.</span>
+<span class="sd">    shift_jis is a superset of jis_x_0201. So we can regard the encoded value</span>
+<span class="sd">    as jis_x_0201 if it is single byte character.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    value : text type</span>
+<span class="sd">        The unicode string as presented to the user.</span>
+<span class="sd">    errors : str</span>
+<span class="sd">        The behavior of a character which could not be encoded. If &#39;strict&#39; is</span>
+<span class="sd">        passed, raise an UnicodeEncodeError. If any other value is passed,</span>
+<span class="sd">        non ISO IR 14 characters are replaced by the ASCII &#39;?&#39;.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    byte string</span>
+<span class="sd">        The encoded string. If some characters in value could not be encoded to</span>
+<span class="sd">        JIS X 0201, and `errors` is not set to &#39;strict&#39;, they are replaced to</span>
+<span class="sd">        &#39;?&#39;.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    UnicodeEncodeError</span>
+<span class="sd">        If errors is set to &#39;strict&#39; and `value` could not be encoded with</span>
+<span class="sd">        JIS X 0201.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">Encoder</span> <span class="o">=</span> <span class="n">codecs</span><span class="o">.</span><span class="n">getincrementalencoder</span><span class="p">(</span><span class="s1">&#39;shift_jis&#39;</span><span class="p">)</span>
+    <span class="n">encoder</span> <span class="o">=</span> <span class="n">Encoder</span><span class="p">()</span>
+
+    <span class="c1"># If errors is not strict, this function is used as fallback.</span>
+    <span class="c1"># In this case, we use only ISO IR 14 to encode given value</span>
+    <span class="c1"># without escape sequence.</span>
+    <span class="k">if</span> <span class="n">errors</span> <span class="o">!=</span> <span class="s1">&#39;strict&#39;</span> <span class="ow">or</span> <span class="n">value</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+        <span class="n">encoded</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">b</span> <span class="o">=</span> <span class="n">encoder</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">UnicodeEncodeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">b</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;?&#39;</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span> <span class="ow">or</span> <span class="mh">0x80</span> <span class="o">&lt;=</span> <span class="nb">ord</span><span class="p">(</span><span class="n">b</span><span class="p">):</span>
+                <span class="n">b</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;?&#39;</span>
+            <span class="n">encoded</span> <span class="o">+=</span> <span class="n">b</span>
+        <span class="k">return</span> <span class="n">encoded</span>
+
+    <span class="n">encoded</span> <span class="o">=</span> <span class="n">encoder</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">encoded</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">UnicodeEncodeError</span><span class="p">(</span>
+            <span class="s1">&#39;shift_jis&#39;</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">),</span> <span class="s1">&#39;illegal multibyte sequence&#39;</span><span class="p">)</span>
+
+    <span class="n">msb</span> <span class="o">=</span> <span class="nb">ord</span><span class="p">(</span><span class="n">encoded</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0x80</span>  <span class="c1"># msb is 1 for ISO IR 13, 0 for ISO IR 14</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">value</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">b</span> <span class="o">=</span> <span class="n">encoder</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">UnicodeEncodeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">e</span><span class="o">.</span><span class="n">start</span> <span class="o">=</span> <span class="n">i</span>
+            <span class="n">e</span><span class="o">.</span><span class="n">end</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">e</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span> <span class="ow">or</span> <span class="p">((</span><span class="nb">ord</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0x80</span><span class="p">)</span> <span class="o">^</span> <span class="n">msb</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">character_set</span> <span class="o">=</span> <span class="s1">&#39;ISO IR 14&#39;</span> <span class="k">if</span> <span class="n">msb</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="s1">&#39;ISO IR 13&#39;</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Given character is out of </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">character_set</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">UnicodeEncodeError</span><span class="p">(</span><span class="s1">&#39;shift_jis&#39;</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">),</span> <span class="n">msg</span><span class="p">)</span>
+        <span class="n">encoded</span> <span class="o">+=</span> <span class="n">b</span>
+
+    <span class="k">return</span> <span class="n">encoded</span>
+
+
+<span class="k">def</span> <span class="nf">_encode_to_jis_x_0208</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;strict&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convert a unicode string into JIS X 0208 byte string using iso2022_jp</span>
+<span class="sd">    encodings.</span>
+<span class="sd">    The escape sequence which is located at the end of the encoded value has</span>
+<span class="sd">    to vary depending on the value 1 of SpecificCharacterSet. So we have to</span>
+<span class="sd">    trim it and append the correct escape sequence manually.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    value : text type</span>
+<span class="sd">        The unicode string as presented to the user.</span>
+<span class="sd">    errors : str</span>
+<span class="sd">        The behavior of a character which could not be encoded. This value</span>
+<span class="sd">        is passed to errors argument of str.encode().</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    byte string</span>
+<span class="sd">        The encoded string. If some characters in value could not be encoded to</span>
+<span class="sd">        JIS X 0208, it depends on the behavior of iso2022_jp encoder.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    UnicodeEncodeError</span>
+<span class="sd">        If errors is set to &#39;strict&#39; and `value` could not be encoded with</span>
+<span class="sd">        JIS X 0208.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># If errors is not strict, this function is used as fallback.</span>
+    <span class="c1"># So keep the tail escape sequence of encoded for backward compatibility.</span>
+    <span class="k">if</span> <span class="n">errors</span> <span class="o">!=</span> <span class="s1">&#39;strict&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;iso2022_jp&#39;</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="n">errors</span><span class="p">)</span>
+
+    <span class="n">Encoder</span> <span class="o">=</span> <span class="n">codecs</span><span class="o">.</span><span class="n">getincrementalencoder</span><span class="p">(</span><span class="s1">&#39;iso2022-jp&#39;</span><span class="p">)</span>
+    <span class="n">encoder</span> <span class="o">=</span> <span class="n">Encoder</span><span class="p">()</span>
+
+    <span class="n">encoded</span> <span class="o">=</span> <span class="n">encoder</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">encoded</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span> <span class="o">!=</span> <span class="n">ENCODINGS_TO_CODES</span><span class="p">[</span><span class="s1">&#39;iso2022_jp&#39;</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">UnicodeEncodeError</span><span class="p">(</span>
+            <span class="s1">&#39;iso2022_jp&#39;</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">),</span>
+            <span class="s1">&#39;Given character is out of ISO IR 87&#39;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">value</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">b</span> <span class="o">=</span> <span class="n">encoder</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">UnicodeEncodeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">e</span><span class="o">.</span><span class="n">start</span> <span class="o">=</span> <span class="n">i</span>
+            <span class="n">e</span><span class="o">.</span><span class="n">end</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">e</span>
+        <span class="k">if</span> <span class="n">b</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span> <span class="o">==</span> <span class="n">ENCODINGS_TO_CODES</span><span class="p">[</span><span class="s1">&#39;iso8859&#39;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">UnicodeEncodeError</span><span class="p">(</span>
+                <span class="s1">&#39;iso2022_jp&#39;</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">),</span>
+                <span class="s1">&#39;Given character is out of ISO IR 87&#39;</span><span class="p">)</span>
+        <span class="n">encoded</span> <span class="o">+=</span> <span class="n">b</span>
+    <span class="k">return</span> <span class="n">encoded</span>
+
+
+<span class="k">def</span> <span class="nf">_get_escape_sequence_for_encoding</span><span class="p">(</span><span class="n">encoding</span><span class="p">,</span> <span class="n">encoded</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Return an escape sequence corresponding to the given encoding. If</span>
+<span class="sd">    encoding is &#39;shift_jis&#39;, return &#39;ESC)I&#39; or &#39;ESC(J&#39; depending on the first</span>
+<span class="sd">    byte of encoded.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    encoding : str</span>
+<span class="sd">        An encoding is used to specify  an escape sequence.</span>
+
+<span class="sd">    encoded : bytes or str</span>
+<span class="sd">        The encoded value is used to chose an escape sequence if encoding is</span>
+<span class="sd">        &#39;shift_jis&#39;</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    string</span>
+<span class="sd">        Escape sequence for encoded value.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">ESC_ISO_IR_14</span> <span class="o">=</span> <span class="n">ESC</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;(J&#39;</span>
+    <span class="n">ESC_ISO_IR_13</span> <span class="o">=</span> <span class="n">ESC</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;)I&#39;</span>
+
+    <span class="k">if</span> <span class="n">encoding</span> <span class="o">==</span> <span class="s1">&#39;shift_jis&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">encoded</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">ESC_ISO_IR_14</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">in_py2</span><span class="p">:</span>
+            <span class="n">first_byte</span> <span class="o">=</span> <span class="n">encoded</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">first_byte</span> <span class="o">=</span> <span class="nb">ord</span><span class="p">(</span><span class="n">encoded</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">if</span> <span class="mh">0x80</span> <span class="o">&lt;=</span> <span class="n">first_byte</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">ESC_ISO_IR_13</span>
+
+        <span class="k">return</span> <span class="n">ESC_ISO_IR_14</span>
+    <span class="k">return</span> <span class="n">ENCODINGS_TO_CODES</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">encoding</span><span class="p">,</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+
+<span class="c1"># These encodings need escape sequence to handle alphanumeric characters.</span>
+<span class="n">need_tail_escape_sequence_encodings</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;iso2022_jp&#39;</span><span class="p">,</span> <span class="s1">&#39;iso-2022-jp&#39;</span><span class="p">)</span>
+
+
+<span class="n">custom_encoders</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;shift_jis&#39;</span><span class="p">:</span> <span class="n">_encode_to_jis_x_0201</span><span class="p">,</span>
+    <span class="s1">&#39;iso2022_jp&#39;</span><span class="p">:</span> <span class="n">_encode_to_jis_x_0208</span><span class="p">,</span>
+    <span class="s1">&#39;iso-2022-jp&#39;</span><span class="p">:</span> <span class="n">_encode_to_jis_x_0208</span>
+<span class="p">}</span>
 
 
 <div class="viewcode-block" id="decode_string"><a class="viewcode-back" href="../../api_ref.html#pydicom.charset.decode_string">[docs]</a><span class="k">def</span> <span class="nf">decode_string</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">encodings</span><span class="p">,</span> <span class="n">delimiters</span><span class="p">):</span>
@@ -455,9 +632,14 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">encoding</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">encodings</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">encoded</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">encoding</span><span class="p">)</span>
+            <span class="n">encoded</span> <span class="o">=</span> <span class="n">_encode_string_impl</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">encoding</span><span class="p">)</span>
+
             <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">encoding</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">handled_encodings</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">ENCODINGS_TO_CODES</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">encoding</span><span class="p">,</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">encoded</span>
+                <span class="n">escape_sequence</span> <span class="o">=</span> <span class="n">_get_escape_sequence_for_encoding</span><span class="p">(</span>
+                        <span class="n">encoding</span><span class="p">,</span> <span class="n">encoded</span><span class="o">=</span><span class="n">encoded</span><span class="p">)</span>
+                <span class="n">encoded</span> <span class="o">=</span> <span class="n">escape_sequence</span> <span class="o">+</span> <span class="n">encoded</span>
+            <span class="k">if</span> <span class="n">encoding</span> <span class="ow">in</span> <span class="n">need_tail_escape_sequence_encodings</span><span class="p">:</span>
+                <span class="n">encoded</span> <span class="o">+=</span> <span class="n">_get_escape_sequence_for_encoding</span><span class="p">(</span><span class="n">encodings</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
             <span class="k">return</span> <span class="n">encoded</span>
         <span class="k">except</span> <span class="ne">UnicodeError</span><span class="p">:</span>
             <span class="k">continue</span>
@@ -478,7 +660,7 @@
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Failed to encode value with encodings: </span><span class="si">{}</span><span class="s2"> - using &quot;</span>
                       <span class="s2">&quot;replacement characters in encoded string&quot;</span>
                       <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">encodings</span><span class="p">)))</span>
-        <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">encodings</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;replace&#39;</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">_encode_string_impl</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">encodings</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;replace&#39;</span><span class="p">)</span></div>
 
 
 <span class="k">def</span> <span class="nf">_encode_string_parts</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">encodings</span><span class="p">):</span>
@@ -511,14 +693,14 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">encoded</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">()</span>
     <span class="n">unencoded_part</span> <span class="o">=</span> <span class="n">value</span>
+    <span class="n">best_encoding</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">while</span> <span class="n">unencoded_part</span><span class="p">:</span>
         <span class="c1"># find the encoding that can encode the longest part of the rest</span>
         <span class="c1"># of the string still to be encoded</span>
         <span class="n">max_index</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="n">best_encoding</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">for</span> <span class="n">encoding</span> <span class="ow">in</span> <span class="n">encodings</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">unencoded_part</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">encoding</span><span class="p">)</span>
+                <span class="n">_encode_string_impl</span><span class="p">(</span><span class="n">unencoded_part</span><span class="p">,</span> <span class="n">encoding</span><span class="p">)</span>
                 <span class="c1"># if we get here, the whole rest of the value can be encoded</span>
                 <span class="n">best_encoding</span> <span class="o">=</span> <span class="n">encoding</span>
                 <span class="n">max_index</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">unencoded_part</span><span class="p">)</span>
@@ -529,18 +711,34 @@
                     <span class="n">max_index</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">start</span>
                     <span class="n">best_encoding</span> <span class="o">=</span> <span class="n">encoding</span>
         <span class="c1"># none of the given encodings can encode the first character - give up</span>
-        <span class="k">if</span> <span class="n">best_encoding</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">max_index</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;None of the given encodings can encode the &quot;</span>
+                             <span class="s2">&quot;first character&quot;</span><span class="p">)</span>
 
         <span class="c1"># encode the part that can be encoded with the found encoding</span>
-        <span class="n">encoded_part</span> <span class="o">=</span> <span class="n">unencoded_part</span><span class="p">[:</span><span class="n">max_index</span><span class="p">]</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">best_encoding</span><span class="p">)</span>
+        <span class="n">encoded_part</span> <span class="o">=</span> <span class="n">_encode_string_impl</span><span class="p">(</span><span class="n">unencoded_part</span><span class="p">[:</span><span class="n">max_index</span><span class="p">],</span>
+                                           <span class="n">best_encoding</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">best_encoding</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">handled_encodings</span><span class="p">:</span>
-            <span class="n">encoded</span> <span class="o">+=</span> <span class="n">ENCODINGS_TO_CODES</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">best_encoding</span><span class="p">,</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+            <span class="n">encoded</span> <span class="o">+=</span> <span class="n">_get_escape_sequence_for_encoding</span><span class="p">(</span>
+                    <span class="n">best_encoding</span><span class="p">,</span> <span class="n">encoded</span><span class="o">=</span><span class="n">encoded_part</span><span class="p">)</span>
         <span class="n">encoded</span> <span class="o">+=</span> <span class="n">encoded_part</span>
         <span class="c1"># set remaining unencoded part of the string and handle that</span>
         <span class="n">unencoded_part</span> <span class="o">=</span> <span class="n">unencoded_part</span><span class="p">[</span><span class="n">max_index</span><span class="p">:]</span>
     <span class="c1"># unencoded_part is empty - we are done, return the encoded string</span>
+    <span class="k">if</span> <span class="n">best_encoding</span> <span class="ow">in</span> <span class="n">need_tail_escape_sequence_encodings</span><span class="p">:</span>
+        <span class="n">encoded</span> <span class="o">+=</span> <span class="n">_get_escape_sequence_for_encoding</span><span class="p">(</span><span class="n">encodings</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
     <span class="k">return</span> <span class="n">encoded</span>
+
+
+<span class="k">def</span> <span class="nf">_encode_string_impl</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">encoding</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;strict&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convert a unicode string into a byte string. If given encoding is in</span>
+<span class="sd">    custom_encoders, use a corresponding custom_encoder. If given encoding</span>
+<span class="sd">    is not in custom_encoders, use a corresponding python handled encoder.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">encoding</span> <span class="ow">in</span> <span class="n">custom_encoders</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">custom_encoders</span><span class="p">[</span><span class="n">encoding</span><span class="p">](</span><span class="n">value</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="n">errors</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">encoding</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="n">errors</span><span class="p">)</span>
 
 
 <span class="c1"># DICOM PS3.5-2008 6.1.1 (p 18) says:</span>
