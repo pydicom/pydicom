@@ -20,6 +20,8 @@ Changes
   removed
 * ``datadict.add_dict_entry`` and ``datadict.add_dict_entries`` now raise if
   trying to add a private tag
+* ``dataset.Dataset.maxBytesToDisplay`` also limits display length for
+  non-binary VRs (by number of items) (:issue:`666`)
 
 Enhancements
 ............
