@@ -404,3 +404,36 @@ class TestCharset(object):
                                 u"- using default encoding instead"):
             pydicom.charset.decode(
                 elem, ['ISO 2022 IR 100', 'ISO 2022 IR 146'])
+
+    def test_japanese_multi_byte_personname(self):
+        """Test japanese person name which has multi byte strings are
+        correctly encoded."""
+        file_path = get_charset_files('chrH32.dcm')[0]
+        ds = dcmread(file_path)
+        ds.decode()
+
+        if hasattr(ds.PatientName, 'original_string'):
+            original_string = ds.PatientName.original_string
+            ds.PatientName.original_string = None
+            fp = DicomBytesIO()
+            fp.is_implicit_VR = False
+            fp.is_little_endian = True
+            ds.save_as(fp, write_like_original=False)
+            fp.seek(0)
+            ds_out = dcmread(fp)
+            assert original_string == ds_out.PatientName.original_string
+
+    def test_japanese_multi_byte_encoding(self):
+        """Test japanese multi byte strings are correctly encoded."""
+        encoded = pydicom.charset.encode_string(u'あaｱア',
+                                                ['shift_jis', 'iso2022_jp'])
+        assert b'\x1b$B$"\x1b(Ja\x1b)I\xb1\x1b$B%"\x1b(J' == encoded
+
+    def test_bad_japanese_encoding(self):
+        """Test japanese multi byte strings are not correctly encoded."""
+        with pytest.warns(UserWarning,
+                          match=u"Failed to encode value with encodings"
+                                u": shift_jis - using replacement character"
+                                u"s in encoded string"):
+            encoded = pydicom.charset.encode_string(u'あaｱア', ['shift_jis'])
+            assert b'?a??' == encoded
