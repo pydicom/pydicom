@@ -248,7 +248,7 @@ required if manipulating pixel data).</p>
 <li><p>gdcm</p></li>
 <li><p>jpeg_ls</p></li>
 <li><p>jpeg2000</p></li>
-<li><p>pytest (if running pydicom’s test suite)</p></li>
+<li><p>pytest (if running pydicom’s test suite). pytest&lt;5 if in Python 2.</p></li>
 </ul>
 </dd>
 </dl>
@@ -310,6 +310,7 @@ pydicom’s setup.py file and:</p>
 </div>
 <p>This will install <a class="reference external" href="https://pytest.org">pytest</a> if it is not
 already installed.</p>
+<p>In v1.3 run under Python 2, if pytest is not found, please <cite>python2 -m pip install “pytest&lt;5”</cite></p>
 <p>Or, in linux you can also use:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">test</span><span class="o">-</span><span class="n">code</span>
 </pre></div>
