@@ -91,14 +91,52 @@ def should_change_PhotometricInterpretation_to_RGB(ds):
     return False
 
 
-def get_pixeldata(ds):
-    """Return a :class:`numpy.ndarray` of the *Pixel Data*.
+def _decompress_single_frame(data, transfer_syntax, photometric_interpretation):
+    """Decompresses a single frame of an encapsulated Pixel Data element.
 
     Parameters
     ----------
-    ds : Dataset
-        The :class:`Dataset` containing an Image Pixel module and the
-        *Pixel Data* to be decompressed and returned.
+    data: bytes
+        Compressed pixel data
+    transfer_syntax: str
+        Transfer Syntax UID
+    photometric_interpretation: str
+        Photometric Interpretation
+
+    Returns
+    -------
+    bytes
+        Decompressed pixel data
+
+    """
+    fio = io.BytesIO(data)
+    try:
+        image = Image.open(fio)
+        # This hack ensures that RGB color images, which were not
+        # color transformed (i.e. not transformed into YCbCr color space)
+        # upon JPEG compression are decompressed correctly.
+        # Since Pillow assumes that images were transformed into YCbCr color
+        # space prior to compression, setting the value of "mode" to YCbCr
+        # signals Pillow to not apply any color transformation upon
+        # decompression.
+        if (transfer_syntax in PillowJPEGTransferSyntaxes and
+            photometric_interpretation == 'RGB'):
+            color_mode = 'YCbCr'
+            image.tile = [(
+                'jpeg',
+                image.tile[0][1],
+                image.tile[0][2],
+                (color_mode, ''),
+            )]
+            image.mode = color_mode
+            image.rawmode = color_mode
+    except IOError as e:
+        raise NotImplementedError(e.strerror)
+    return image.tobytes()
+
+
+def get_pixeldata(dicom_dataset):
+    """Use Pillow to decompress compressed Pixel Data.
 
     Returns
     -------
@@ -218,21 +256,50 @@ def _get_j2k_precision(bs):
         ``None`` otherwise.
     """
     try:
-        # First 2 bytes must be the SOC marker - if not then wrong format
-        if bs[0:2] != b'\xff\x4f':
-            return
-
-        # SIZ is required to be the second marker - Figure A-3 in 15444-1
-        if bs[2:4] != b'\xff\x51':
-            return
-
-        # See 15444-1 A.5.1 for format of the SIZ box and contents
-        ssiz = ord(bs[42:43])
-        if ssiz & 0x80:
-            # Signed
-            return (ssiz & 0x7F) + 1
+        UncompressedPixelData = bytearray()
+        if ('NumberOfFrames' in dicom_dataset and
+                dicom_dataset.NumberOfFrames > 1):
+            # multiple compressed frames
+            CompressedPixelDataSeq = \
+                pydicom.encaps.decode_data_sequence(
+                    dicom_dataset.PixelData)
+            for frame in CompressedPixelDataSeq:
+                data = generic_jpeg_file_header + \
+                    frame[frame_start_from:]
+                uncompressed_data = _decompress_single_frame(
+                    data,
+                    transfer_syntax,
+                    dicom_dataset.PhotometricInterpretation
+                )
+                UncompressedPixelData.extend(uncompressed_data)
         else:
-            # Unsigned
-            return ssiz + 1
-    except (IndexError, TypeError):
-        return
+            # single compressed frame
+            pixel_data = pydicom.encaps.defragment_data(
+                dicom_dataset.PixelData)
+            pixel_data = generic_jpeg_file_header + \
+                pixel_data[frame_start_from:]
+            uncompressed_data = _decompress_single_frame(
+                pixel_data,
+                transfer_syntax,
+                dicom_dataset.PhotometricInterpretation
+            )
+            UncompressedPixelData.extend(uncompressed_data)
+    except Exception:
+        raise
+
+    logger.debug(
+        "Successfully read %s pixel bytes", len(UncompressedPixelData)
+    )
+
+    pixel_array = numpy.frombuffer(UncompressedPixelData, numpy_format)
+
+    if (transfer_syntax in
+            PillowJPEG2000TransferSyntaxes and
+            dicom_dataset.BitsStored == 16):
+        # WHY IS THIS EVEN NECESSARY??
+        pixel_array &= 0x7FFF
+
+    if should_change_PhotometricInterpretation_to_RGB(dicom_dataset):
+        dicom_dataset.PhotometricInterpretation = "RGB"
+
+    return pixel_array
