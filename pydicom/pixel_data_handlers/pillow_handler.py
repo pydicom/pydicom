@@ -80,6 +80,33 @@ def should_change_PhotometricInterpretation_to_RGB(dicom_dataset):
     return False
 
 
+def _decompress_single_frame(data, transfer_syntax, photometric_interpretation):
+    fio = io.BytesIO(data)
+    try:
+        image = Image.open(fio)
+        # This hack ensures that RGB color images, which were not
+        # color transformed (i.e. not transformed into YCbCr color space)
+        # upon JPEG compression are decompressed correctly.
+        # Since Pillow assumes that images were transformed into YCbCr color
+        # space prior to compression, setting the value of "mode" to YCbCr
+        # signals Pillow to not apply any color transformation upon
+        # decompression.
+        if (transfer_syntax in PillowJPEGTransferSyntaxes and
+            photometric_interpretation == 'RGB'):
+            color_mode = 'YCbCr'
+            image.tile = [(
+                'jpeg',
+                image.tile[0][1],
+                image.tile[0][2],
+                (color_mode, ''),
+            )]
+            image.mode = color_mode
+            image.rawmode = color_mode
+    except IOError as e:
+        raise NotImplementedError(e.strerror)
+    return image.tobytes()
+
+
 def get_pixeldata(dicom_dataset):
     """Use Pillow to decompress compressed Pixel Data.
 
@@ -180,24 +207,24 @@ def get_pixeldata(dicom_dataset):
             for frame in CompressedPixelDataSeq:
                 data = generic_jpeg_file_header + \
                     frame[frame_start_from:]
-                fio = io.BytesIO(data)
-                try:
-                    decompressed_image = Image.open(fio)
-                except IOError as e:
-                    raise NotImplementedError(e.strerror)
-                UncompressedPixelData.extend(decompressed_image.tobytes())
+                uncompressed_data = _decompress_single_frame(
+                    data,
+                    transfer_syntax,
+                    dicom_dataset.PhotometricInterpretation
+                )
+                UncompressedPixelData.extend(uncompressed_data)
         else:
             # single compressed frame
             pixel_data = pydicom.encaps.defragment_data(
                 dicom_dataset.PixelData)
             pixel_data = generic_jpeg_file_header + \
                 pixel_data[frame_start_from:]
-            try:
-                fio = io.BytesIO(pixel_data)
-                decompressed_image = Image.open(fio)
-            except IOError as e:
-                raise NotImplementedError(e.strerror)
-            UncompressedPixelData.extend(decompressed_image.tobytes())
+            uncompressed_data = _decompress_single_frame(
+                data,
+                transfer_syntax,
+                dicom_dataset.PhotometricInterpretation
+            )
+            UncompressedPixelData.extend(uncompressed_data)
     except Exception:
         raise
 
