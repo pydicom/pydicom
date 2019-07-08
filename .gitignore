@@ -46,5 +46,5 @@ tests/test_pixel.py
 # mypy
 pydicom/.mypy_cache/*
 
-# vdcode
+# vscode
 .vscode/*

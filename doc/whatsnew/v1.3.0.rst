@@ -68,4 +68,5 @@ Fixes
 * Remove excess padding in Pixel Data 
 * Fix wrong date format in anonymize example
 * Fix unknown VR exception message when VR isn't ASCII (:issue:`791`)
+* Fix jis-x-0201 characters encoding (:issue:`856`)
 
