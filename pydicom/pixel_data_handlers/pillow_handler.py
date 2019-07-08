@@ -91,7 +91,11 @@ def should_change_PhotometricInterpretation_to_RGB(ds):
     return False
 
 
-def _decompress_single_frame(data, transfer_syntax, photometric_interpretation):
+def _decompress_single_frame(
+    data: bytes,
+    transfer_syntax: str,
+    photometric_interpretation: str
+) -> Image:
     """Decompresses a single frame of an encapsulated Pixel Data element.
 
     Parameters
