@@ -28,6 +28,7 @@ Quick Start
 
 """
 
+
 from pydicom.dataelem import DataElement
 from pydicom.dataset import Dataset, FileDataset
 from pydicom.filereader import dcmread, read_file
@@ -50,5 +51,5 @@ __all__ = ['DataElement',
 from pydicom.compat import in_py2
 if in_py2:
     import warnings
-    msg = 'Python 2 will no longer be supported after the pydicom v1.4 release.'
+    msg = 'Python 2 will no longer be supported after the pydicom v1.4 release'
     warnings.warn(msg, DeprecationWarning)

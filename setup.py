@@ -22,7 +22,9 @@ description = "Pure python package for DICOM medical file reading and writing"
 
 needs_pytest = {'pytest', 'test', 'ptr'}.intersection(sys.argv)
 pytest_runner = ['pytest-runner'] if needs_pytest else []
-TESTS_REQUIRE = ['pytest<5'] if sys.version_info[0] == 2 else ['pytest'] # in_py2
+
+# in_py2 check in next line - pytest>=5 requires Python 3
+TESTS_REQUIRE = ['pytest<5'] if sys.version_info[0] == 2 else ['pytest']
 _py_modules = []
 if not have_dicom:
     _py_modules = ['dicom']
