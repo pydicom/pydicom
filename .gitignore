@@ -42,3 +42,9 @@ doc/_build/*
 *.ipynb
 .ipynb_checkpoints/*
 tests/test_pixel.py
+
+# mypy
+pydicom/.mypy_cache/*
+
+# vscode
+.vscode/*
