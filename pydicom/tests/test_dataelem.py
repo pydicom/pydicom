@@ -317,6 +317,23 @@ class DataElementTests(unittest.TestCase):
         with pytest.raises(TypeError):
             elem[0]
 
+    def test_repval_large_elem(self):
+        """Test DataElement.repval doesn't return a huge string for a large
+        value"""
+        elem = DataElement(0x00820003, 'UT', 'a'*1000)
+        assert len(elem.repval) < 100
+
+    def test_repval_large_vm(self):
+        """Test DataElement.repval doesn't return a huge string for a large
+        vm"""
+        elem = DataElement(0x00080054, 'AE', 'a\\'*1000+'a')
+        assert len(elem.repval) < 100
+
+    def test_repval_strange_type(self):
+        """Test DataElement.repval doesn't break with bad types"""
+        elem = DataElement(0x00020001, 'OB', 0)
+        assert len(elem.repval) < 100
+
     def test_private_tag_in_repeater_range(self):
         """Test that an unknown private tag (e.g. a tag not in the private
         dictionary) in the repeater range is not handled as a repeater tag
