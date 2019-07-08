@@ -24,18 +24,12 @@ After some discussion on github, the proposed plan for pydicom and Python 2 supp
 * pydicom v1.3 (July 2019) - no changes to Python versions supported. Adds a deprecation
   warning (to be deprecated in v1.5) when run under Python 2
 
-* pydicom v1.4 (planned for release in December 2019) will support Python 2.7,
+* pydicom v1.4 (planned for release ~December 2019) will support Python 2.7,
   with deprecation warning as above.
 
-* pydicom v1.5 (planned for ~April 2020) officially will not support Python 2.7,
-  but no compatibility code will be removed from pydicom; it will include a stronger 
-  'deprecated' (past tense) message.  It will not install using pip, but those who
-  choose to do so could download and install themselves; however, we make no guarantees
-  that it will function correctly.
+* pydicom v1.5 (planned for ~April 2020) will be Python 3.5+ only
 
-* pydicom v1.6 (no date set) will remove Python 2 code from pydicom, and officially
-  drop Python 3.4 support as well. Any new pydicom code afterwards can target
-  Python 3.5+ features. 
+* pydicom v1.6 (no date set) will be Python 3.6+
 
 We may consider the possibility of backporting some fixes to pydicom v1.4 for very serious issues,
 if users make the case for it.  Generally speaking, however, we encourage all pydicom users to make
