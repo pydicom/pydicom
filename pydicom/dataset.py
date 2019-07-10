@@ -42,8 +42,10 @@ from pydicom.tag import Tag, BaseTag, tag_in_exception
 from pydicom.uid import (ExplicitVRLittleEndian, ImplicitVRLittleEndian,
                          ExplicitVRBigEndian, PYDICOM_IMPLEMENTATION_UID)
 
+
 if compat.in_py2:
     from pkgutil import find_loader as have_package
+    from pydicom.valuerep import PersonNameUnicode
 else:
     from importlib.util import find_spec as have_package
 
@@ -52,7 +54,6 @@ try:
     import numpy
 except ImportError:
     have_numpy = False
-
 
 
 class PropertyError(Exception):
@@ -1887,6 +1888,7 @@ class Dataset(dict):
                     )
                     elem_value.append(v)
                 else:
+                    # import pdb;pdb.set_trace()
                     elem_value.extend(list(v.values()))
             if vm == '1':
                 try:
@@ -1920,12 +1922,14 @@ class Dataset(dict):
         elem_value = cls._convert_to_python_number(elem_value, vr)
 
         try:
+            if compat.in_py2 and vr == "PN":
+                elem_value = PersonNameUnicode(elem_value, None)
             return DataElement(tag=tag, value=elem_value, VR=vr)
         except Exception:
             raise ValueError(
                 'Data element "{}" could not be loaded from JSON: {}'.format(
                     tag, elem_value
-                )
+                    )
             )
 
     @classmethod
