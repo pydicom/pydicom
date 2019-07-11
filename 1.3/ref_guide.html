@@ -1,0 +1,490 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Reading and writing DICOM files &mdash; pydicom 1.3.0.dev0 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/pydicom.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Pydicom Complete API Reference" href="api_ref.html" />
+    <link rel="prev" title="Python 2 Support Plan for Pydicom" href="python2_support.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> pydicom
+          
+
+          
+            
+            <img src="_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.3.0.dev0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started with pydicom</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="pydicom_user_guide.html">Pydicom User Guide</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Reading and writing DICOM files</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#file-reading-parsing">File Reading/Parsing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#file-writing">File Writing</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api_ref.html">Pydicom Complete API Reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html">General examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html#image-processing">Image processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html#input-output">Input-output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html#metadata-processing">Metadata processing</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="release-notes.html">Release history</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">pydicom</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Reading and writing DICOM files</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/ref_guide.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="reading-and-writing-dicom-files">
+<span id="api-filereader"></span><h1>Reading and writing DICOM files<a class="headerlink" href="#reading-and-writing-dicom-files" title="Permalink to this headline">¶</a></h1>
+<p class="rubric">Common pydicom functions called by user code</p>
+<div class="section" id="file-reading-parsing">
+<h2>File Reading/Parsing<a class="headerlink" href="#file-reading-parsing" title="Permalink to this headline">¶</a></h2>
+<p>The main function to read and parse DICOM files using pydicom is <code class="docutils literal notranslate"><span class="pre">dcmread</span></code>. It is coded in the module
+dicom.filereader, but is also imported when the pydicom package is imported:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pydicom</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">dcmread</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If you need fine control over the reading, you can either call <code class="docutils literal notranslate"><span class="pre">read_partial</span></code> or use <code class="docutils literal notranslate"><span class="pre">open_dicom</span></code>.
+All are documented below:</p>
+<dl class="function">
+<dt id="pydicom.filereader.dcmread">
+<code class="sig-prename descclassname">pydicom.filereader.</code><code class="sig-name descname">dcmread</code><span class="sig-paren">(</span><em class="sig-param">fp</em>, <em class="sig-param">defer_size=None</em>, <em class="sig-param">stop_before_pixels=False</em>, <em class="sig-param">force=False</em>, <em class="sig-param">specific_tags=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/filereader.html#dcmread"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/1c6efcee/pydicom/filereader.py#L748"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filereader.dcmread" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read and parse a DICOM dataset stored in the DICOM File Format.</p>
+<p>Read a DICOM dataset stored in accordance with the DICOM File Format
+(DICOM Standard Part 10 Section 7). If the dataset is not stored in
+accordance with the File Format (i.e. the preamble and prefix are missing,
+there are missing required Type 1 File Meta Information Group elements
+or the entire File Meta Information is missing) then you will have to
+set <cite>force</cite> to True.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>fp</strong><span class="classifier">str or file-like</span></dt><dd><p>Either a file-like object, or a string containing the file name. If a
+file-like object, the caller is responsible for closing it.</p>
+</dd>
+<dt><strong>defer_size</strong><span class="classifier">int or str or None</span></dt><dd><p>If None (default), all elements read into memory. If specified, then if
+a data element’s stored value is larger than <cite>defer_size</cite>, the value is
+not read into memory until it is accessed in code. Specify an integer
+(bytes), or a string value with units, e.g. “512 KB”, “2 MB”.</p>
+</dd>
+<dt><strong>stop_before_pixels</strong><span class="classifier">bool</span></dt><dd><p>If False (default), the full file will be read and parsed. Set True to
+stop before reading (7FE0,0010) ‘Pixel Data’ (and all subsequent
+elements).</p>
+</dd>
+<dt><strong>force</strong><span class="classifier">bool</span></dt><dd><p>If False (default), raises an InvalidDicomError if the file is missing
+the File Meta Information header. Set to True to force reading even if
+no File Meta Information header is found.</p>
+</dd>
+<dt><strong>specific_tags</strong><span class="classifier">list or None</span></dt><dd><p>If not None, only the tags in the list are returned. The list
+elements can be tags or tag names. Note that the tag Specific
+Character Set is always returned if present - this ensures correct
+decoding of returned text values.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>FileDataset</dt><dd><p>An instance of FileDataset that represents a parsed DICOM file.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>InvalidDicomError</dt><dd><p>If <cite>force</cite> is True and the file is not a valid DICOM file.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="api_ref.html#pydicom.dataset.FileDataset" title="pydicom.dataset.FileDataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pydicom.dataset.FileDataset</span></code></a></dt><dd><p>Data class that is returned.</p>
+</dd>
+<dt><a class="reference internal" href="#pydicom.filereader.read_partial" title="pydicom.filereader.read_partial"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pydicom.filereader.read_partial</span></code></a></dt><dd><p>Only read part of a DICOM file, stopping on given conditions.</p>
+</dd>
+</dl>
+</div>
+<p class="rubric">Examples</p>
+<p>Read and return a dataset stored in accordance with the DICOM File Format:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">dcmread</span><span class="p">(</span><span class="s2">&quot;rtplan.dcm&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">PatientName</span>
+</pre></div>
+</div>
+<p>Read and return a dataset not in accordance with the DICOM File Format:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">dcmread</span><span class="p">(</span><span class="s2">&quot;rtplan.dcm&quot;</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">PatientName</span>
+</pre></div>
+</div>
+<p>Use within a context manager:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">dcmread</span><span class="p">(</span><span class="s2">&quot;rtplan.dcm&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ds</span><span class="p">:</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="n">ds</span><span class="o">.</span><span class="n">PatientName</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="pydicom.filereader.read_partial">
+<code class="sig-prename descclassname">pydicom.filereader.</code><code class="sig-name descname">read_partial</code><span class="sig-paren">(</span><em class="sig-param">fileobj</em>, <em class="sig-param">stop_when=None</em>, <em class="sig-param">defer_size=None</em>, <em class="sig-param">force=False</em>, <em class="sig-param">specific_tags=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/filereader.html#read_partial"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/1c6efcee/pydicom/filereader.py#L617"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filereader.read_partial" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse a DICOM file until a condition is met.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>fileobj</strong><span class="classifier">a file-like object</span></dt><dd><p>Note that the file will not close when the function returns.</p>
+</dd>
+<dt><strong>stop_when :</strong></dt><dd><p>Stop condition. See <code class="docutils literal notranslate"><span class="pre">read_dataset</span></code> for more info.</p>
+</dd>
+<dt><strong>defer_size</strong><span class="classifier">int, str, None, optional</span></dt><dd><p>See <code class="docutils literal notranslate"><span class="pre">dcmread</span></code> for parameter info.</p>
+</dd>
+<dt><strong>force</strong><span class="classifier">boolean</span></dt><dd><p>See <code class="docutils literal notranslate"><span class="pre">dcmread</span></code> for parameter info.</p>
+</dd>
+<dt><strong>specific_tags</strong><span class="classifier">list or None</span></dt><dd><p>See <code class="docutils literal notranslate"><span class="pre">dcmread</span></code> for parameter info.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>FileDataset instance or DicomDir instance.</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#pydicom.filereader.dcmread" title="pydicom.filereader.dcmread"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dcmread</span></code></a></dt><dd><p>More generic file reading function.</p>
+</dd>
+</dl>
+</div>
+<p class="rubric">Notes</p>
+<p>Use <code class="docutils literal notranslate"><span class="pre">dcmread</span></code> unless you need to stop on some condition other than
+reaching pixel data.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="file-writing">
+<h2>File Writing<a class="headerlink" href="#file-writing" title="Permalink to this headline">¶</a></h2>
+<p>DICOM files can also be written using pydicom. There are two ways to do this.
+The first is to use <code class="docutils literal notranslate"><span class="pre">dcmwrite</span></code> with a prexisting FileDataset (derived from Dataset) instance.
+The second is to use the <code class="docutils literal notranslate"><span class="pre">save_as</span></code> method on an Dataset instance.</p>
+<dl class="function">
+<dt id="pydicom.filewriter.dcmwrite">
+<code class="sig-prename descclassname">pydicom.filewriter.</code><code class="sig-name descname">dcmwrite</code><span class="sig-paren">(</span><em class="sig-param">filename</em>, <em class="sig-param">dataset</em>, <em class="sig-param">write_like_original=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/filewriter.html#dcmwrite"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/1c6efcee/pydicom/filewriter.py#L705"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filewriter.dcmwrite" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write <cite>dataset</cite> to the <cite>filename</cite> specified.</p>
+<p>If <cite>write_like_original</cite> is True then <cite>dataset</cite> will be written as is
+(after minimal validation checking) and may or may not contain all or parts
+of the File Meta Information (and hence may or may not be conformant with
+the DICOM File Format).
+If <cite>write_like_original</cite> is False, <cite>dataset</cite> will be stored in the DICOM
+File Format in accordance with DICOM Standard Part 10 Section 7. The byte
+stream of the <cite>dataset</cite> will be placed into the file after the DICOM File
+Meta Information.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>filename</strong><span class="classifier">str or file-like</span></dt><dd><p>Name of file or the file-like to write the new DICOM file to.</p>
+</dd>
+<dt><strong>dataset</strong><span class="classifier">pydicom.dataset.FileDataset</span></dt><dd><p>Dataset holding the DICOM information; e.g. an object read with
+pydicom.dcmread().</p>
+</dd>
+<dt><strong>write_like_original</strong><span class="classifier">bool</span></dt><dd><p>If True (default), preserves the following information from
+the Dataset (and may result in a non-conformant file):
+- preamble – if the original file has no preamble then none will be</p>
+<blockquote>
+<div><p>written.</p>
+</div></blockquote>
+<ul class="simple">
+<li><dl class="simple">
+<dt>file_meta – if the original file was missing any required File Meta</dt><dd><p>Information Group elements then they will not be added or written.
+If (0002,0000) ‘File Meta Information Group Length’ is present then
+it may have its value updated.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>seq.is_undefined_length – if original had delimiters, write them now</dt><dd><p>too, instead of the more sensible length characters</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>is_undefined_length_sequence_item – for datasets that belong to a</dt><dd><p>sequence, write the undefined length delimiters if that is
+what the original had.</p>
+</dd>
+</dl>
+</li>
+</ul>
+<p>If False, produces a file conformant with the DICOM File Format, with
+explicit lengths for all elements.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="api_ref.html#pydicom.dataset.FileDataset" title="pydicom.dataset.FileDataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pydicom.dataset.FileDataset</span></code></a></dt><dd><p>Dataset class with relevant attributes and information.</p>
+</dd>
+<dt><a class="reference internal" href="#pydicom.dataset.Dataset.save_as" title="pydicom.dataset.Dataset.save_as"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pydicom.dataset.Dataset.save_as</span></code></a></dt><dd><p>Write a DICOM file from a dataset that was read in with dcmread(). save_as wraps dcmwrite.</p>
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="pydicom.dataset.Dataset.save_as">
+<code class="sig-prename descclassname">Dataset.</code><code class="sig-name descname">save_as</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">filename</em>, <em class="sig-param">write_like_original=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydicom/dataset.html#Dataset.save_as"><span class="viewcode-link">[source]</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/1c6efcee/pydicom/dataset.py#L1462"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.save_as" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write the Dataset to <cite>filename</cite>.</p>
+<p>Saving a Dataset requires that the Dataset.is_implicit_VR and
+Dataset.is_little_endian attributes exist and are set appropriately. If
+Dataset.file_meta.TransferSyntaxUID is present then it should be set to
+a consistent value to ensure conformance.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>filename</strong><span class="classifier">str or file-like</span></dt><dd><p>Name of file or the file-like to write the new DICOM file to.</p>
+</dd>
+<dt><strong>write_like_original</strong><span class="classifier">bool</span></dt><dd><p>If True (default), preserves the following information from
+the Dataset (and may result in a non-conformant file):
+- preamble – if the original file has no preamble then none will</p>
+<blockquote>
+<div><p>be written.</p>
+</div></blockquote>
+<ul class="simple">
+<li><dl class="simple">
+<dt>file_meta – if the original file was missing any required File</dt><dd><p>Meta Information Group elements then they will not be added or
+written.
+If (0002,0000) ‘File Meta Information Group Length’ is present
+then it may have its value updated.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>seq.is_undefined_length – if original had delimiters, write them</dt><dd><p>now too, instead of the more sensible length characters</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>is_undefined_length_sequence_item – for datasets that belong to</dt><dd><p>a sequence, write the undefined length delimiters if that is
+what the original had.</p>
+</dd>
+</dl>
+</li>
+</ul>
+<p>If False, produces a file conformant with the DICOM File Format,
+with explicit lengths for all elements.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="api_ref.html#pydicom.filewriter.write_dataset" title="pydicom.filewriter.write_dataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pydicom.filewriter.write_dataset</span></code></a></dt><dd><p>Write a DICOM Dataset to a file.</p>
+</dd>
+<dt><a class="reference internal" href="api_ref.html#pydicom.filewriter.write_file_meta_info" title="pydicom.filewriter.write_file_meta_info"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pydicom.filewriter.write_file_meta_info</span></code></a></dt><dd><p>Write the DICOM File Meta Information Group elements to a file.</p>
+</dd>
+<dt><a class="reference internal" href="#pydicom.filewriter.dcmwrite" title="pydicom.filewriter.dcmwrite"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pydicom.filewriter.dcmwrite</span></code></a></dt><dd><p>Write a DICOM file from a FileDataset instance.</p>
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<p>You can find the complete API documentation for <code class="docutils literal notranslate"><span class="pre">Dataset</span></code> and other
+classes in the following section.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="api_ref.html" class="btn btn-neutral float-right" title="Pydicom Complete API Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="python2_support.html" class="btn btn-neutral float-left" title="Python 2 Support Plan for Pydicom" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2019, Darcy Mason and pydicom contributors
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

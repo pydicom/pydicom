@@ -1,0 +1,455 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pydicom.tag &mdash; pydicom 1.3.0.dev0 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> pydicom
+          
+
+          
+            
+            <img src="../../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.3.0.dev0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started with pydicom</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../pydicom_user_guide.html">Pydicom User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ref_guide.html">Reading and writing DICOM files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api_ref.html">Pydicom Complete API Reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">General examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#image-processing">Image processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#input-output">Input-output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../release-notes.html">Release history</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pydicom</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>pydicom.tag</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for pydicom.tag</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2008-2018 pydicom authors. See LICENSE file for details.</span>
+<span class="sd">&quot;&quot;&quot;Define Tag class to hold a DICOM (group, element) tag and related functions.</span>
+
+<span class="sd">The 4 bytes of the DICOM tag are stored as an arbitrary length &#39;long&#39; for</span>
+<span class="sd">Python 2 and as an &#39;int&#39; for Python 3. Tags are stored as a single number and</span>
+<span class="sd">separated to (group, element) as required.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="c1"># NOTE: Tags must be not be stored as a tuple internally, as some code logic</span>
+<span class="c1">#       (e.g. in filewriter.write_AT) checks if a value is a multi-value</span>
+<span class="c1">#       element</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
+<span class="kn">from</span> <span class="nn">contextlib</span> <span class="k">import</span> <span class="n">contextmanager</span>
+
+<span class="kn">from</span> <span class="nn">pydicom</span> <span class="k">import</span> <span class="n">compat</span>
+
+
+<div class="viewcode-block" id="tag_in_exception"><a class="viewcode-back" href="../../api_ref.html#pydicom.tag.tag_in_exception">[docs]</a><span class="nd">@contextmanager</span>
+<span class="k">def</span> <span class="nf">tag_in_exception</span><span class="p">(</span><span class="n">tag</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Use `tag` within a context.</span>
+
+<span class="sd">    Used to include the tag details in the traceback message when an exception</span>
+<span class="sd">    is raised within the context.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    tag : pydicom.tag.Tag</span>
+<span class="sd">        The tag to use in the context.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">yield</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+        <span class="n">stack_trace</span> <span class="o">=</span> <span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">()</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;With tag </span><span class="si">{0}</span><span class="s1"> got exception: </span><span class="si">{1}</span><span class="se">\n</span><span class="si">{2}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">tag</span><span class="p">,</span>
+            <span class="nb">str</span><span class="p">(</span><span class="n">ex</span><span class="p">),</span>
+            <span class="n">stack_trace</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="nb">type</span><span class="p">(</span><span class="n">ex</span><span class="p">)(</span><span class="n">msg</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Tag"><a class="viewcode-back" href="../../api_ref.html#pydicom.tag.Tag">[docs]</a><span class="k">def</span> <span class="nf">Tag</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">arg2</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create a Tag.</span>
+
+<span class="sd">    General function for creating a Tag in any of the standard forms:</span>
+
+<span class="sd">    * Tag(0x00100015)</span>
+<span class="sd">    * Tag(&#39;0x00100015&#39;)</span>
+<span class="sd">    * Tag((0x10, 0x50))</span>
+<span class="sd">    * Tag((&#39;0x10&#39;, &#39;0x50&#39;))</span>
+<span class="sd">    * Tag(0x0010, 0x0015)</span>
+<span class="sd">    * Tag(0x10, 0x15)</span>
+<span class="sd">    * Tag(2341, 0x10)</span>
+<span class="sd">    * Tag(&#39;0xFE&#39;, &#39;0x0010&#39;)</span>
+<span class="sd">    * Tag(&quot;PatientName&quot;)</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    arg : int or str or 2-tuple/list</span>
+<span class="sd">        If int or str, then either the group or the combined</span>
+<span class="sd">        group/element number of the DICOM tag. If 2-tuple/list</span>
+<span class="sd">        then the (group, element) numbers as int or str.</span>
+<span class="sd">    arg2 : int or str, optional</span>
+<span class="sd">        The element number of the DICOM tag, required when</span>
+<span class="sd">        `arg` only contains the group number of the tag.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    pydicom.tag.BaseTag</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">BaseTag</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">arg</span>
+
+    <span class="k">if</span> <span class="n">arg2</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">arg</span> <span class="o">=</span> <span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">arg2</span><span class="p">)</span>  <span class="c1"># act as if was passed a single tuple</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="nb">list</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Tag must be an int or a 2-tuple&quot;</span><span class="p">)</span>
+
+        <span class="n">valid</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">compat</span><span class="o">.</span><span class="n">string_types</span><span class="p">):</span>
+            <span class="n">valid</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">compat</span><span class="o">.</span><span class="n">string_types</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">valid</span><span class="p">:</span>
+                <span class="n">arg</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">arg</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">16</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">arg</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">16</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">compat</span><span class="o">.</span><span class="n">number_types</span><span class="p">):</span>
+            <span class="n">valid</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">compat</span><span class="o">.</span><span class="n">number_types</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">valid</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Both arguments for Tag must be the same type, &quot;</span>
+                             <span class="s2">&quot;either string or int.&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">arg</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mh">0xFFFF</span> <span class="ow">or</span> <span class="n">arg</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mh">0xFFFF</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">OverflowError</span><span class="p">(</span><span class="s2">&quot;Groups and elements of tags must each &quot;</span>
+                                <span class="s2">&quot;be &lt;=2 byte integers&quot;</span><span class="p">)</span>
+
+        <span class="n">long_value</span> <span class="o">=</span> <span class="p">(</span><span class="n">arg</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;&lt;</span> <span class="mi">16</span><span class="p">)</span> <span class="o">|</span> <span class="n">arg</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="c1"># Single str parameter</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">compat</span><span class="o">.</span><span class="n">text_type</span><span class="p">)):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">long_value</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">long_value</span> <span class="o">&gt;</span> <span class="mh">0xFFFFFFFF</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">OverflowError</span><span class="p">(</span><span class="s2">&quot;Tags are limited to 32-bit length; &quot;</span>
+                                    <span class="s2">&quot;tag </span><span class="si">{0!r}</span><span class="s2">&quot;</span>
+                                    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">long_value</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="c1"># Try a DICOM keyword</span>
+            <span class="kn">from</span> <span class="nn">pydicom.datadict</span> <span class="k">import</span> <span class="n">tag_for_keyword</span>
+            <span class="n">long_value</span> <span class="o">=</span> <span class="n">tag_for_keyword</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">long_value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;</span><span class="si">{}</span><span class="s2">&#39; is not a valid int or DICOM keyword&quot;</span>
+                                 <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arg</span><span class="p">))</span>
+    <span class="c1"># Single int parameter</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">long_value</span> <span class="o">=</span> <span class="n">arg</span>
+        <span class="k">if</span> <span class="n">long_value</span> <span class="o">&gt;</span> <span class="mh">0xFFFFFFFF</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">OverflowError</span><span class="p">(</span><span class="s2">&quot;Tags are limited to 32-bit length; tag </span><span class="si">{0!r}</span><span class="s2">&quot;</span>
+                                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">long_value</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">long_value</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Tags must be positive.&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">BaseTag</span><span class="p">(</span><span class="n">long_value</span><span class="p">)</span></div>
+
+
+<span class="k">if</span> <span class="n">compat</span><span class="o">.</span><span class="n">in_py2</span><span class="p">:</span>
+    <span class="c1"># May get an overflow error with int if sys.maxsize &lt; 0xFFFFFFFF</span>
+    <span class="n">BaseTag_base_class</span> <span class="o">=</span> <span class="n">long</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">BaseTag_base_class</span> <span class="o">=</span> <span class="nb">int</span>
+
+
+<div class="viewcode-block" id="BaseTag"><a class="viewcode-back" href="../../api_ref.html#pydicom.tag.BaseTag">[docs]</a><span class="k">class</span> <span class="nc">BaseTag</span><span class="p">(</span><span class="n">BaseTag_base_class</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represents a DICOM element (group, element) tag.</span>
+
+<span class="sd">    If using python 2.7 then tags are represented as a long, while for python</span>
+<span class="sd">    3 they are represented as an int.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    element : int</span>
+<span class="sd">        The element number of the tag.</span>
+<span class="sd">    group : int</span>
+<span class="sd">        The group number of the tag.</span>
+<span class="sd">    is_private : bool</span>
+<span class="sd">        Returns True if the corresponding element is private, False otherwise.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Override comparisons so can convert &quot;other&quot; to Tag as necessary</span>
+    <span class="c1">#   See Ordering Comparisons at:</span>
+    <span class="c1">#   http://docs.python.org/dev/3.0/whatsnew/3.0.html</span>
+    <span class="k">def</span> <span class="nf">__le__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return True if `self`  is less than or equal to `other`.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span> <span class="o">==</span> <span class="n">other</span> <span class="ow">or</span> <span class="bp">self</span> <span class="o">&lt;</span> <span class="n">other</span>
+
+    <span class="k">def</span> <span class="nf">__lt__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return True if `self` is less than `other`.&quot;&quot;&quot;</span>
+        <span class="c1"># Check if comparing with another Tag object; if not, create a temp one</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">BaseTag</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">other</span> <span class="o">=</span> <span class="n">Tag</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Cannot compare Tag with non-Tag item&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">BaseTag_base_class</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">BaseTag_base_class</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__ge__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return True if `self` is greater than or equal to `other`.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span> <span class="o">==</span> <span class="n">other</span> <span class="ow">or</span> <span class="bp">self</span> <span class="o">&gt;</span> <span class="n">other</span>
+
+    <span class="k">def</span> <span class="nf">__gt__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return True if `self` is greater than `other`.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span> <span class="o">==</span> <span class="n">other</span> <span class="ow">or</span> <span class="bp">self</span> <span class="o">&lt;</span> <span class="n">other</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return True if `self` equals `other`.&quot;&quot;&quot;</span>
+        <span class="c1"># Check if comparing with another Tag object; if not, create a temp one</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">BaseTag_base_class</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">other</span> <span class="o">=</span> <span class="n">Tag</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Cannot compare Tag with non-Tag item&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">BaseTag_base_class</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">==</span> <span class="n">BaseTag_base_class</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return True if `self` does not equal `other`.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span> <span class="o">==</span> <span class="n">other</span>
+
+    <span class="c1"># For python 3, any override of __cmp__ or __eq__</span>
+    <span class="c1"># immutable requires explicit redirect of hash function</span>
+    <span class="c1"># to the parent class</span>
+    <span class="c1">#   See http://docs.python.org/dev/3.0/reference/</span>
+    <span class="c1">#              datamodel.html#object.__hash__</span>
+    <span class="fm">__hash__</span> <span class="o">=</span> <span class="n">BaseTag_base_class</span><span class="o">.</span><span class="fm">__hash__</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the tag value as a hex string &#39;(gggg, eeee)&#39;.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot;(</span><span class="si">{0:04x}</span><span class="s2">, </span><span class="si">{1:04x}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">element</span><span class="p">)</span>
+
+    <span class="fm">__repr__</span> <span class="o">=</span> <span class="fm">__str__</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">group</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the tag&#39;s group number.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span> <span class="o">&gt;&gt;</span> <span class="mi">16</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">element</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the tag&#39;s element number.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span> <span class="o">&amp;</span> <span class="mh">0xffff</span>
+
+    <span class="n">elem</span> <span class="o">=</span> <span class="n">element</span>  <span class="c1"># alternate syntax</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">is_private</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return True if the tag is private (has an odd group number).&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">is_private_creator</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return True if the tag is a private creator.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_private</span> <span class="ow">and</span> <span class="mh">0x0010</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">element</span> <span class="o">&lt;</span> <span class="mh">0x0100</span></div>
+
+
+<div class="viewcode-block" id="TupleTag"><a class="viewcode-back" href="../../api_ref.html#pydicom.tag.TupleTag">[docs]</a><span class="k">def</span> <span class="nf">TupleTag</span><span class="p">(</span><span class="n">group_elem</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Fast factory for BaseTag object with known safe (group, elem) tuple&quot;&quot;&quot;</span>
+    <span class="n">long_value</span> <span class="o">=</span> <span class="n">group_elem</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;&lt;</span> <span class="mi">16</span> <span class="o">|</span> <span class="n">group_elem</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">BaseTag</span><span class="p">(</span><span class="n">long_value</span><span class="p">)</span></div>
+
+
+<span class="c1"># Define some special tags:</span>
+<span class="c1"># See DICOM Standard Part 5, Section 7.5</span>
+
+<span class="c1"># start of Sequence Item</span>
+<span class="n">ItemTag</span> <span class="o">=</span> <span class="n">TupleTag</span><span class="p">((</span><span class="mh">0xFFFE</span><span class="p">,</span> <span class="mh">0xE000</span><span class="p">))</span>
+
+<span class="c1"># end of Sequence Item</span>
+<span class="n">ItemDelimiterTag</span> <span class="o">=</span> <span class="n">TupleTag</span><span class="p">((</span><span class="mh">0xFFFE</span><span class="p">,</span> <span class="mh">0xE00D</span><span class="p">))</span>
+
+<span class="c1"># end of Sequence of undefined length</span>
+<span class="n">SequenceDelimiterTag</span> <span class="o">=</span> <span class="n">TupleTag</span><span class="p">((</span><span class="mh">0xFFFE</span><span class="p">,</span> <span class="mh">0xE0DD</span><span class="p">))</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2019, Darcy Mason and pydicom contributors
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

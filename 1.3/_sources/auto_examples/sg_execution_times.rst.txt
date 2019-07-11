@@ -1,0 +1,12 @@
+
+:orphan:
+
+.. _sphx_glr_auto_examples_sg_execution_times:
+
+Computation times
+=================
+**00:00.134** total execution time for **auto_examples** files:
+
+- **00:00.134**: :ref:`sphx_glr_auto_examples_plot_dicom_difference.py` (``plot_dicom_difference.py``)
+- **00:00.000**: :ref:`sphx_glr_auto_examples_dicomtree.py` (``dicomtree.py``)
+- **00:00.000**: :ref:`sphx_glr_auto_examples_show_charset_name.py` (``show_charset_name.py``)
