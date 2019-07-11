@@ -189,8 +189,10 @@
 <span class="sd">            contains its own DataElements, and so on in a recursive manner.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
+<span class="kn">import</span> <span class="nn">base64</span>
 <span class="kn">import</span> <span class="nn">inspect</span>  <span class="c1"># for __dir__</span>
 <span class="kn">import</span> <span class="nn">io</span>
+<span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">os.path</span>
 <span class="kn">from</span> <span class="nn">bisect</span> <span class="k">import</span> <span class="n">bisect_left</span>
@@ -207,14 +209,17 @@
 <span class="kn">from</span> <span class="nn">pydicom.datadict</span> <span class="k">import</span> <span class="p">(</span><span class="n">tag_for_keyword</span><span class="p">,</span> <span class="n">keyword_for_tag</span><span class="p">,</span>
                               <span class="n">repeater_has_keyword</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">pydicom.dataelem</span> <span class="k">import</span> <span class="n">DataElement</span><span class="p">,</span> <span class="n">DataElement_from_raw</span><span class="p">,</span> <span class="n">RawDataElement</span>
+<span class="kn">from</span> <span class="nn">pydicom.multival</span> <span class="k">import</span> <span class="n">MultiValue</span>
 <span class="kn">from</span> <span class="nn">pydicom.pixel_data_handlers.util</span> <span class="k">import</span> <span class="p">(</span><span class="n">convert_color_space</span><span class="p">,</span>
                                               <span class="n">reshape_pixel_array</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">pydicom.tag</span> <span class="k">import</span> <span class="n">Tag</span><span class="p">,</span> <span class="n">BaseTag</span><span class="p">,</span> <span class="n">tag_in_exception</span>
 <span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="k">import</span> <span class="p">(</span><span class="n">ExplicitVRLittleEndian</span><span class="p">,</span> <span class="n">ImplicitVRLittleEndian</span><span class="p">,</span>
                          <span class="n">ExplicitVRBigEndian</span><span class="p">,</span> <span class="n">PYDICOM_IMPLEMENTATION_UID</span><span class="p">)</span>
 
+
 <span class="k">if</span> <span class="n">compat</span><span class="o">.</span><span class="n">in_py2</span><span class="p">:</span>
     <span class="kn">from</span> <span class="nn">pkgutil</span> <span class="k">import</span> <span class="n">find_loader</span> <span class="k">as</span> <span class="n">have_package</span>
+    <span class="kn">from</span> <span class="nn">pydicom.valuerep</span> <span class="k">import</span> <span class="n">PersonNameUnicode</span>
 <span class="k">else</span><span class="p">:</span>
     <span class="kn">from</span> <span class="nn">importlib.util</span> <span class="k">import</span> <span class="n">find_spec</span> <span class="k">as</span> <span class="n">have_package</span>
 
@@ -353,7 +358,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">add_new</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_tag</span><span class="p">(</span><span class="n">element_offset</span><span class="p">),</span> <span class="n">VR</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div></div>
 
 
-
 <span class="k">def</span> <span class="nf">_dict_equal</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">exclude</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Common method for Dataset.__eq__ and FileDataset.__eq__</span>
 
@@ -482,6 +486,15 @@
 <span class="sd">    ...         else:</span>
 <span class="sd">    ...             # Do something useful with each DataElement</span>
 
+<span class="sd">    Converting a dataset to and from json:</span>
+
+<span class="sd">    &gt;&gt;&gt; ds = Dataset()</span>
+<span class="sd">    &gt;&gt;&gt; ds.PatientName = &quot;Some^Name&quot;</span>
+<span class="sd">    &gt;&gt;&gt; jsonmodel = ds.to_json()</span>
+<span class="sd">    &gt;&gt;&gt; ds2 = Dataset()</span>
+<span class="sd">    &gt;&gt;&gt; ds2.from_json(jsonmodel)</span>
+<span class="sd">    (0010, 0010) Patient&#39;s Name                      PN: u&#39;Some^Name&#39;</span>
+
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
 <span class="sd">    default_element_format : str</span>
@@ -503,6 +516,16 @@
 <span class="sd">        `is_little_endian`) if False.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">indent_chars</span> <span class="o">=</span> <span class="s2">&quot;   &quot;</span>
+
+    <span class="c1"># TODO: this the correct list?</span>
+    <span class="n">_BINARY_VR_VALUES</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;OW&#39;</span><span class="p">,</span> <span class="s1">&#39;OB&#39;</span><span class="p">,</span> <span class="s1">&#39;OD&#39;</span><span class="p">,</span> <span class="s1">&#39;OF&#39;</span><span class="p">,</span> <span class="s1">&#39;OL&#39;</span><span class="p">,</span> <span class="s1">&#39;UN&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;OW/OB&#39;</span><span class="p">,</span> <span class="s1">&#39;OW or OB&#39;</span><span class="p">,</span> <span class="s1">&#39;OB or OW&#39;</span><span class="p">,</span> <span class="s1">&#39;US or SS&#39;</span><span class="p">]</span>
+
+    <span class="n">_VRs_TO_BE_FLOATS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;DS&quot;</span><span class="p">,</span> <span class="s2">&quot;FL&quot;</span><span class="p">,</span> <span class="s2">&quot;FD&quot;</span><span class="p">,</span> <span class="p">]</span>
+    <span class="n">_VRs_TO_BE_INTS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;IS&quot;</span><span class="p">,</span> <span class="s2">&quot;SL&quot;</span><span class="p">,</span> <span class="s2">&quot;SS&quot;</span><span class="p">,</span> <span class="s2">&quot;UL&quot;</span><span class="p">,</span> <span class="s2">&quot;US&quot;</span><span class="p">,</span> <span class="p">]</span>
+
+    <span class="c1"># Order of keys is significant!</span>
+    <span class="n">_JSON_VALUE_KEYS</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Value&#39;</span><span class="p">,</span> <span class="s1">&#39;BulkDataURI&#39;</span><span class="p">,</span> <span class="s1">&#39;InlineBinary&#39;</span><span class="p">,</span> <span class="p">)</span>
 
     <span class="c1"># Python 2: Classes defining __eq__ should flag themselves as unhashable</span>
     <span class="fm">__hash__</span> <span class="o">=</span> <span class="kc">None</span>
@@ -1552,7 +1575,8 @@
                                <span class="k">if</span> <span class="n">callable</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">data_element</span><span class="p">,</span> <span class="n">x</span><span class="p">))</span> <span class="k">else</span>
                                <span class="nb">getattr</span><span class="p">(</span><span class="n">data_element</span><span class="p">,</span> <span class="n">x</span><span class="p">))</span>
                               <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="n">data_element</span><span class="p">)</span>
-                              <span class="k">if</span> <span class="ow">not</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)])</span>
+                              <span class="k">if</span> <span class="ow">not</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)</span>
+                              <span class="ow">and</span> <span class="n">x</span> <span class="o">!=</span> <span class="s2">&quot;from_json&quot;</span><span class="p">])</span>
             <span class="k">if</span> <span class="n">data_element</span><span class="o">.</span><span class="n">VR</span> <span class="o">==</span> <span class="s2">&quot;SQ&quot;</span><span class="p">:</span>
                 <span class="k">yield</span> <span class="n">sequence_element_format</span> <span class="o">%</span> <span class="n">elem_dict</span>
             <span class="k">else</span><span class="p">:</span>
@@ -1927,6 +1951,232 @@
                     <span class="n">sequence</span> <span class="o">=</span> <span class="n">data_element</span><span class="o">.</span><span class="n">value</span>
                     <span class="k">for</span> <span class="n">dataset</span> <span class="ow">in</span> <span class="n">sequence</span><span class="p">:</span>
                         <span class="n">dataset</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">callback</span><span class="p">)</span></div>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_convert_to_python_number</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">vr</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Makes sure that values are either ints or floats</span>
+<span class="sd">        based on their value representation.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        value: Union[Union[str, int, float], List[Union[str, int, float]]]</span>
+<span class="sd">            value of data element</span>
+<span class="sd">        vr: str</span>
+<span class="sd">            value representation of data element</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Union[Union[str, int, float], List[Union[str, int, float]]]</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="n">number_type</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">vr</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_VRs_TO_BE_INTS</span><span class="p">:</span>
+            <span class="n">number_type</span> <span class="o">=</span> <span class="nb">int</span>
+        <span class="k">if</span> <span class="n">vr</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_VRs_TO_BE_FLOATS</span><span class="p">:</span>
+            <span class="n">number_type</span> <span class="o">=</span> <span class="nb">float</span>
+        <span class="k">if</span> <span class="n">number_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="p">)):</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="p">[</span><span class="n">number_type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">value</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">number_type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">value</span>
+
+<div class="viewcode-block" id="Dataset.from_json"><a class="viewcode-back" href="../../api_ref.html#pydicom.dataset.Dataset.from_json">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_json</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">json_dataset</span><span class="p">,</span> <span class="n">bulk_data_uri_handler</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                  <span class="n">encodings</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Loads DICOM Data Set in DICOM JSON format.</span>
+<span class="sd">        See:</span>
+<span class="sd">        http://dicom.nema.org/medical/dicom/current/output/chtml/part18/chapter_F.html</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        json_dataset: Union[dict, str]</span>
+<span class="sd">            dictionary or string representing a DICOM Data Set formatted based</span>
+<span class="sd">            on the DICOM JSON Model (Annex F)</span>
+<span class="sd">        bulk_data_uri_handler: Union[Callable, None]</span>
+<span class="sd">            callable that accepts the &quot;BulkDataURI&quot; of the JSON representation</span>
+<span class="sd">            of a data element and returns the actual value of data element</span>
+<span class="sd">            (retrieved via DICOMweb WADO-RS)</span>
+<span class="sd">        encodings: Union[list, None]</span>
+<span class="sd">            encodings from SpecificCharacterSet, or None for default</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        pydicom.dataset.Dataset</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">json_dataset</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">json_dataset</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">json_dataset</span><span class="p">)</span>
+        <span class="n">dataset</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">tag</span><span class="p">,</span> <span class="n">mapping</span> <span class="ow">in</span> <span class="n">json_dataset</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">vr</span> <span class="o">=</span> <span class="n">mapping</span><span class="p">[</span><span class="s1">&#39;vr&#39;</span><span class="p">]</span>
+            <span class="n">unique_value_keys</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span>
+                <span class="nb">set</span><span class="p">(</span><span class="n">mapping</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">&amp;</span> <span class="nb">set</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_JSON_VALUE_KEYS</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_value_keys</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">value_key</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;&#39;</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">value_key</span> <span class="o">=</span> <span class="n">unique_value_keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">mapping</span><span class="p">[</span><span class="n">value_key</span><span class="p">]</span>
+            <span class="n">data_element</span> <span class="o">=</span> <span class="n">DataElement</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span>
+                <span class="bp">cls</span><span class="p">,</span> <span class="n">tag</span><span class="p">,</span> <span class="n">vr</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">value_key</span>
+            <span class="p">)</span>
+            <span class="n">dataset</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">data_element</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dataset</span></div>
+
+    <span class="k">def</span> <span class="nf">_data_element_to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_element</span><span class="p">,</span>
+                              <span class="n">bulk_data_element_handler</span><span class="p">,</span>
+                              <span class="n">bulk_data_threshold</span><span class="p">,</span> <span class="n">dump_handler</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Converts a DataElement to JSON representation.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data_element: pydicom.dataelem.DataElement</span>
+<span class="sd">            data element</span>
+<span class="sd">        bulk_data_element_handler: Union[Callable, None]</span>
+<span class="sd">            callable that accepts a bulk data element and returns the</span>
+<span class="sd">            &quot;BulkDataURI&quot; for retrieving the value of the data element</span>
+<span class="sd">            via DICOMweb WADO-RS</span>
+<span class="sd">        bulk_data_threshold: int</span>
+<span class="sd">            size of base64 encoded data element above which a value will be</span>
+<span class="sd">            provided in form of a &quot;BulkDataURI&quot; rather than &quot;InlineBinary&quot;</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict</span>
+<span class="sd">            mapping representing a JSON encoded data element</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        TypeError</span>
+<span class="sd">            when size of encoded data element exceeds `bulk_data_threshold`</span>
+<span class="sd">            but `bulk_data_element_handler` is ``None`` and hence not callable</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># TODO: Determine whether more VRs need to be converted to strings</span>
+        <span class="n">_VRs_TO_QUOTE</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;AT&#39;</span><span class="p">,</span> <span class="p">]</span>
+        <span class="n">json_element</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;vr&#39;</span><span class="p">:</span> <span class="n">data_element</span><span class="o">.</span><span class="n">VR</span><span class="p">,</span> <span class="p">}</span>
+        <span class="k">if</span> <span class="n">data_element</span><span class="o">.</span><span class="n">VR</span> <span class="ow">in</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">_BINARY_VR_VALUES</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">data_element</span><span class="o">.</span><span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">binary_value</span> <span class="o">=</span> <span class="n">data_element</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+                <span class="n">encoded_value</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">binary_value</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">encoded_value</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">bulk_data_threshold</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">bulk_data_element_handler</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                            <span class="s1">&#39;No bulk data element handler provided to generate &#39;</span>
+                            <span class="s1">&#39;URL for value of data element &quot;</span><span class="si">{}</span><span class="s1">&quot;.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                                <span class="n">data_element</span><span class="o">.</span><span class="n">name</span>
+                            <span class="p">)</span>
+                        <span class="p">)</span>
+                    <span class="n">json_element</span><span class="p">[</span><span class="s1">&#39;BulkDataURI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bulk_data_element_handler</span><span class="p">(</span>
+                        <span class="n">data_element</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                        <span class="s1">&#39;encode bulk data element &quot;</span><span class="si">{}</span><span class="s1">&quot; inline&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                            <span class="n">data_element</span><span class="o">.</span><span class="n">name</span>
+                        <span class="p">)</span>
+                    <span class="p">)</span>
+                    <span class="n">json_element</span><span class="p">[</span><span class="s1">&#39;InlineBinary&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">encoded_value</span>
+        <span class="k">elif</span> <span class="n">data_element</span><span class="o">.</span><span class="n">VR</span> <span class="o">==</span> <span class="s1">&#39;SQ&#39;</span><span class="p">:</span>
+            <span class="c1"># recursive call to co-routine to format sequence contents</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">to_json</span><span class="p">(</span>
+                    <span class="n">bulk_data_element_handler</span><span class="o">=</span><span class="n">bulk_data_element_handler</span><span class="p">,</span>
+                    <span class="n">bulk_data_threshold</span><span class="o">=</span><span class="n">bulk_data_threshold</span><span class="p">,</span>
+                    <span class="n">dump_handler</span><span class="o">=</span><span class="n">dump_handler</span>
+                <span class="p">))</span>
+                <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">data_element</span>
+            <span class="p">]</span>
+            <span class="n">json_element</span><span class="p">[</span><span class="s1">&#39;Value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">elif</span> <span class="n">data_element</span><span class="o">.</span><span class="n">VR</span> <span class="o">==</span> <span class="s1">&#39;PN&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">data_element</span><span class="o">.</span><span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_element</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">components</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="n">json_element</span><span class="p">[</span><span class="s1">&#39;Value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+                        <span class="p">{</span><span class="s1">&#39;Phonetic&#39;</span><span class="p">:</span> <span class="n">data_element</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">components</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="p">},</span>
+                    <span class="p">]</span>
+                <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_element</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">components</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">json_element</span><span class="p">[</span><span class="s1">&#39;Value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+                        <span class="p">{</span><span class="s1">&#39;Ideographic&#39;</span><span class="p">:</span> <span class="n">data_element</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">components</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="p">},</span>
+                    <span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">json_element</span><span class="p">[</span><span class="s1">&#39;Value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+                        <span class="p">{</span><span class="s1">&#39;Alphabetic&#39;</span><span class="p">:</span> <span class="n">data_element</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">components</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">},</span>
+                    <span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">data_element</span><span class="o">.</span><span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">is_multivalue</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data_element</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">MultiValue</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">data_element</span><span class="o">.</span><span class="n">VM</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">is_multivalue</span><span class="p">:</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="n">data_element</span><span class="o">.</span><span class="n">value</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="p">[</span><span class="n">data_element</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
+                <span class="c1"># ensure it&#39;s a list and not another iterable</span>
+                <span class="c1"># (e.g. tuple), which would not be JSON serializable</span>
+                <span class="k">if</span> <span class="n">data_element</span><span class="o">.</span><span class="n">VR</span> <span class="ow">in</span> <span class="n">_VRs_TO_QUOTE</span><span class="p">:</span>
+                    <span class="n">json_element</span><span class="p">[</span><span class="s1">&#39;Value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">json_element</span><span class="p">[</span><span class="s1">&#39;Value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">json_element</span><span class="p">,</span> <span class="s1">&#39;Value&#39;</span><span class="p">):</span>
+            <span class="n">json_element</span><span class="p">[</span><span class="s1">&#39;Value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert_to_python_number</span><span class="p">(</span>
+                <span class="n">json_element</span><span class="p">[</span><span class="s1">&#39;Value&#39;</span><span class="p">],</span> <span class="n">data_element</span><span class="o">.</span><span class="n">VR</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">json_element</span>
+
+<div class="viewcode-block" id="Dataset.to_json"><a class="viewcode-back" href="../../api_ref.html#pydicom.dataset.Dataset.to_json">[docs]</a>    <span class="k">def</span> <span class="nf">to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bulk_data_threshold</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">bulk_data_element_handler</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">dump_handler</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Converts the data set into JSON representation based on the</span>
+<span class="sd">        DICOM JSON Model</span>
+<span class="sd">        http://dicom.nema.org/medical/dicom/current/output/chtml/part18/chapter_F.html.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        bulk_data_threshold: int, optional</span>
+<span class="sd">            threshold for the length of a base64-encoded binary data element</span>
+<span class="sd">            above which the element should be considered bulk data and the value</span>
+<span class="sd">            provided as a URI rather than included inline (default: ``1``)</span>
+<span class="sd">        bulk_data_element_handler: Union[Callable, None], optional</span>
+<span class="sd">            callable that accepts a bulk data element and returns a JSON</span>
+<span class="sd">            representation of the data element (dictionary including the &quot;vr&quot;</span>
+<span class="sd">            key and either the &quot;InlineBinary&quot; or the &quot;BulkDataURI&quot; key)</span>
+<span class="sd">        dump_handler: Union[Callable, None], optional</span>
+<span class="sd">            callable that accepts a dict and returns the serialized (dumped)</span>
+<span class="sd">            JSON string (by default uses ``json.dumps()``)</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            data set serialized into a string based on the DICOM JSON Model</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; def my_json_dumps(data):</span>
+<span class="sd">        ...     return json.dumps(data, indent=4)</span>
+<span class="sd">        &gt;&gt;&gt; dataset.to_json(dump_handler=my_json_dumps)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">dump_handler</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;using default json.dumps function&#39;</span><span class="p">)</span>
+            <span class="n">dump_handler</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span>
+        <span class="n">json_dataset</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">json_key</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{0:04x}{1:04x}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="o">.</span><span class="n">group</span><span class="p">,</span> <span class="n">key</span><span class="o">.</span><span class="n">element</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+            <span class="c1"># FIXME: with pydicom 1.x the referenced image sequence</span>
+            <span class="c1"># causes a recursion error</span>
+            <span class="k">if</span> <span class="n">json_key</span> <span class="o">==</span> <span class="s1">&#39;00081140&#39;</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="s1">&#39;currently can</span><span class="se">\&#39;</span><span class="s1">t serialize data element &quot;</span><span class="si">{}</span><span class="s1">&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+                <span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="n">data_element</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="n">json_dataset</span><span class="p">[</span><span class="n">json_key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_element_to_json</span><span class="p">(</span>
+                <span class="n">data_element</span><span class="p">,</span>
+                <span class="n">bulk_data_element_handler</span><span class="o">=</span><span class="n">bulk_data_element_handler</span><span class="p">,</span>
+                <span class="n">bulk_data_threshold</span><span class="o">=</span><span class="n">bulk_data_threshold</span><span class="p">,</span>
+                <span class="n">dump_handler</span><span class="o">=</span><span class="n">dump_handler</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">dump_handler</span><span class="p">(</span><span class="n">json_dataset</span><span class="p">)</span></div>
 
     <span class="fm">__repr__</span> <span class="o">=</span> <span class="fm">__str__</span></div>
 

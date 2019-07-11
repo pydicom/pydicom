@@ -183,6 +183,7 @@
 
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
 
+<span class="kn">import</span> <span class="nn">base64</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">namedtuple</span>
 
@@ -190,15 +191,18 @@
 <span class="kn">from</span> <span class="nn">pydicom</span> <span class="k">import</span> <span class="n">compat</span>
 <span class="kn">from</span> <span class="nn">pydicom.charset</span> <span class="k">import</span> <span class="n">default_encoding</span>
 <span class="kn">from</span> <span class="nn">pydicom.compat</span> <span class="k">import</span> <span class="n">in_py2</span>
+<span class="kn">from</span> <span class="nn">pydicom.config</span> <span class="k">import</span> <span class="n">logger</span>
 <span class="kn">from</span> <span class="nn">pydicom.datadict</span> <span class="k">import</span> <span class="p">(</span><span class="n">dictionary_has_tag</span><span class="p">,</span> <span class="n">dictionary_description</span><span class="p">,</span>
                               <span class="n">dictionary_keyword</span><span class="p">,</span> <span class="n">dictionary_is_retired</span><span class="p">,</span>
                               <span class="n">private_dictionary_description</span><span class="p">,</span> <span class="n">dictionary_VR</span><span class="p">,</span>
-                              <span class="n">repeater_has_tag</span><span class="p">)</span>
+                              <span class="n">dictionary_VM</span><span class="p">,</span> <span class="n">repeater_has_tag</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">pydicom.multival</span> <span class="k">import</span> <span class="n">MultiValue</span>
 <span class="kn">from</span> <span class="nn">pydicom.tag</span> <span class="k">import</span> <span class="n">Tag</span><span class="p">,</span> <span class="n">BaseTag</span>
 <span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="k">import</span> <span class="n">UID</span>
+<span class="kn">from</span> <span class="nn">pydicom</span> <span class="k">import</span> <span class="n">jsonrep</span>
 <span class="kn">import</span> <span class="nn">pydicom.valuerep</span>  <span class="c1"># don&#39;t import DS directly as can be changed by config</span>
 
+<span class="kn">from</span> <span class="nn">pydicom.valuerep</span> <span class="k">import</span> <span class="n">PersonNameUnicode</span>
 <span class="k">if</span> <span class="ow">not</span> <span class="n">in_py2</span><span class="p">:</span>
     <span class="kn">from</span> <span class="nn">pydicom.valuerep</span> <span class="k">import</span> <span class="n">PersonName3</span> <span class="k">as</span> <span class="n">PersonNameUnicode</span>
     <span class="n">PersonName</span> <span class="o">=</span> <span class="n">PersonNameUnicode</span>
@@ -342,6 +346,133 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>  <span class="c1"># calls property setter which will convert</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">file_tell</span> <span class="o">=</span> <span class="n">file_value_tell</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_undefined_length</span> <span class="o">=</span> <span class="n">is_undefined_length</span>
+
+<div class="viewcode-block" id="DataElement.from_json"><a class="viewcode-back" href="../../api_ref.html#pydicom.dataelem.DataElement.from_json">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_json</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">dataset_class</span><span class="p">,</span> <span class="n">tag</span><span class="p">,</span> <span class="n">vr</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">value_key</span><span class="p">,</span>
+                                <span class="n">bulk_data_uri_handler</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                <span class="n">encodings</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Creates a DataElement from JSON.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        tag: pydicom.tag.Tag</span>
+<span class="sd">            data element tag</span>
+<span class="sd">        vr: str</span>
+<span class="sd">            data element value representation</span>
+<span class="sd">        value: list</span>
+<span class="sd">            data element value(s)</span>
+<span class="sd">        value_key: Union[str, None]</span>
+<span class="sd">            key of the data element that contains the value</span>
+<span class="sd">            (options: ``{&quot;Value&quot;, &quot;InlineBinary&quot;, &quot;BulkDataURI&quot;}``)</span>
+<span class="sd">        bulk_data_uri_handler: Union[Callable, None]</span>
+<span class="sd">            callable that accepts the &quot;BulkDataURI&quot; of the JSON representation</span>
+<span class="sd">            of a data element and returns the actual value of that data element</span>
+<span class="sd">            (retrieved via DICOMweb WADO-RS)</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        pydicom.dataelem.DataElement</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># TODO: test wado-rs retrieve wrapper</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">vm</span> <span class="o">=</span> <span class="n">dictionary_VM</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="c1"># Private tag</span>
+            <span class="n">vm</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">value_key</span> <span class="o">==</span> <span class="s1">&#39;Value&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">list</span><span class="p">)):</span>
+                <span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;&quot;</span><span class="si">{}</span><span class="s1">&quot; of data element &quot;</span><span class="si">{}</span><span class="s1">&quot; must be a list.&#39;</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">fmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value_key</span><span class="p">,</span> <span class="n">tag</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">value_key</span> <span class="ow">in</span> <span class="p">{</span><span class="s1">&#39;InlineBinary&#39;</span><span class="p">,</span> <span class="s1">&#39;BulkDataURI&#39;</span><span class="p">}:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;&quot;</span><span class="si">{}</span><span class="s1">&quot; of data element &quot;</span><span class="si">{}</span><span class="s1">&quot; must be a string.&#39;</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">fmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value_key</span><span class="p">,</span> <span class="n">tag</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">vr</span> <span class="o">==</span> <span class="s1">&#39;SQ&#39;</span><span class="p">:</span>
+            <span class="n">elem_value</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">value_item</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
+                <span class="n">ds</span> <span class="o">=</span> <span class="n">dataset_class</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">value_item</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">value_item</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                        <span class="k">if</span> <span class="s1">&#39;vr&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">val</span><span class="p">:</span>
+                            <span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;Data element &quot;</span><span class="si">{}</span><span class="s1">&quot; must have key &quot;vr&quot;.&#39;</span>
+                            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">fmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tag</span><span class="p">))</span>
+                        <span class="n">unique_value_keys</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span>
+                            <span class="nb">set</span><span class="p">(</span><span class="n">val</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">&amp;</span> <span class="nb">set</span><span class="p">(</span><span class="n">jsonrep</span><span class="o">.</span><span class="n">JSON_VALUE_KEYS</span><span class="p">)</span>
+                        <span class="p">)</span>
+                        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_value_keys</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                                <span class="s1">&#39;data element has neither key &quot;</span><span class="si">{}</span><span class="s1">&quot;.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                                    <span class="s1">&#39;&quot; nor &quot;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">supported_keys</span><span class="p">)</span>
+                                <span class="p">)</span>
+                            <span class="p">)</span>
+                            <span class="n">elem</span> <span class="o">=</span> <span class="n">DataElement</span><span class="p">(</span><span class="n">tag</span><span class="o">=</span><span class="n">tag</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">VR</span><span class="o">=</span><span class="n">vr</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">value_key</span> <span class="o">=</span> <span class="n">unique_value_keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                            <span class="n">elem</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span>
+                                <span class="n">dataset_class</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">[</span><span class="s1">&#39;vr&#39;</span><span class="p">],</span>
+                                <span class="n">val</span><span class="p">[</span><span class="n">value_key</span><span class="p">],</span> <span class="n">value_key</span>
+                            <span class="p">)</span>
+                        <span class="n">ds</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span>
+                <span class="n">elem_value</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">vr</span> <span class="o">==</span> <span class="s1">&#39;PN&#39;</span><span class="p">:</span>
+            <span class="c1"># Special case, see DICOM Part 18 Annex F2.2</span>
+            <span class="n">elem_value</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                    <span class="c1"># Some DICOMweb services get this wrong, so we</span>
+                    <span class="c1"># workaround the issue and warn the user</span>
+                    <span class="c1"># rather than raising an error.</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                        <span class="s1">&#39;value of data element &quot;</span><span class="si">{}</span><span class="s1">&quot; with VR Person Name (PN) &#39;</span>
+                        <span class="s1">&#39;is not formatted correctly&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span>
+                    <span class="p">)</span>
+                    <span class="n">elem_value</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">elem_value</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
+            <span class="k">if</span> <span class="n">vm</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">elem_value</span> <span class="o">=</span> <span class="n">elem_value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+                    <span class="n">elem_value</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">vm</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">value_key</span> <span class="o">==</span> <span class="s1">&#39;InlineBinary&#39;</span><span class="p">:</span>
+                    <span class="n">elem_value</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64decode</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">value_key</span> <span class="o">==</span> <span class="s1">&#39;BulkDataURI&#39;</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">bulk_data_uri_handler</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                            <span class="s1">&#39;no bulk data URI handler provided for retrieval &#39;</span>
+                            <span class="s1">&#39;of value of data element &quot;</span><span class="si">{}</span><span class="s1">&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span>
+                        <span class="p">)</span>
+                        <span class="n">elem_value</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">elem_value</span> <span class="o">=</span> <span class="n">bulk_data_uri_handler</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">value</span><span class="p">:</span>
+                        <span class="n">elem_value</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">elem_value</span> <span class="o">=</span> <span class="n">value</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">elem_value</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">value</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;missing value for data element &quot;</span><span class="si">{}</span><span class="s1">&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tag</span><span class="p">))</span>
+            <span class="n">elem_value</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+
+        <span class="n">elem_value</span> <span class="o">=</span> <span class="n">jsonrep</span><span class="o">.</span><span class="n">_convert_to_python_number</span><span class="p">(</span><span class="n">elem_value</span><span class="p">,</span> <span class="n">vr</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">compat</span><span class="o">.</span><span class="n">in_py2</span> <span class="ow">and</span> <span class="n">vr</span> <span class="o">==</span> <span class="s2">&quot;PN&quot;</span><span class="p">:</span>
+
+                <span class="n">elem_value</span> <span class="o">=</span> <span class="n">PersonNameUnicode</span><span class="p">(</span><span class="n">elem_value</span><span class="p">,</span> <span class="s1">&#39;UTF8&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">DataElement</span><span class="p">(</span><span class="n">tag</span><span class="o">=</span><span class="n">tag</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">elem_value</span><span class="p">,</span> <span class="n">VR</span><span class="o">=</span><span class="n">vr</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">raise</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s1">&#39;Data element &quot;</span><span class="si">{}</span><span class="s1">&quot; could not be loaded from JSON: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">tag</span><span class="p">,</span> <span class="n">elem_value</span>
+                    <span class="p">)</span>
+            <span class="p">)</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
