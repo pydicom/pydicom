@@ -42,6 +42,7 @@ Enhancements
 * Add in-memory image decoding with GDCM
 * Check really used implicit/explicit VR before reading a
   data set (:issue:`819`, :issue:`820`)
+* Added alpha conversion of Datasets to/from JSON format (Python 3 only)
 
 
 Fixes
