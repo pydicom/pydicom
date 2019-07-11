@@ -247,7 +247,7 @@ class DataElement(object):
             for v in value:
                 if not isinstance(v, dict):
                     # Some DICOMweb services get this wrong, so we
-                    # workaround the the issue and warn the user
+                    # workaround the issue and warn the user
                     # rather than raising an error.
                     logger.error(
                         'value of data element "{}" with VR Person Name (PN) '
@@ -255,7 +255,6 @@ class DataElement(object):
                     )
                     elem_value.append(v)
                 else:
-                    # import pdb;pdb.set_trace()
                     elem_value.extend(list(v.values()))
             if vm == '1':
                 try:
@@ -291,7 +290,7 @@ class DataElement(object):
         try:
             if compat.in_py2 and vr == "PN":
 
-                elem_value = PersonNameUnicode(elem_value, None)
+                elem_value = PersonNameUnicode(elem_value, 'UTF8')
             return DataElement(tag=tag, value=elem_value, VR=vr)
         except Exception:
             raise
