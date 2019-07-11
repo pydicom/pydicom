@@ -7,7 +7,7 @@ pydicom
 [![codecov](https://codecov.io/gh/pydicom/pydicom/branch/master/graph/badge.svg)](https://codecov.io/gh/pydicom/pydicom)
 [![Python version](https://img.shields.io/pypi/pyversions/pydicom.svg)](https://img.shields.io/pypi/pyversions/pydicom.svg)
 [![PyPI version](https://badge.fury.io/py/pydicom.svg)](https://badge.fury.io/py/pydicom)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2541240.svg)](https://doi.org/10.5281/zenodo.2541240)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3332998.svg)](https://doi.org/10.5281/zenodo.3332998)
 
 pydicom is a pure python package for working with [DICOM](http://medical.nema.org/) files.
 It was made for inspecting and modifying DICOM data in an easy "pythonic" way.
