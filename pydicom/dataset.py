@@ -1430,7 +1430,10 @@ class Dataset(dict):
         str
             A string representation of the Dataset.
         """
-        strings = []
+        if hasattr(self, "file_meta"):
+            strings = [self.file_meta._pretty_str()]
+        else:
+            strings = []
         indent_str = self.indent_chars * indent
         nextindent_str = self.indent_chars * (indent + 1)
         for data_element in self:

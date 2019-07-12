@@ -1591,6 +1591,21 @@ class FileDatasetTests(unittest.TestCase):
         expected_diff = {'__class__', '__doc__', '__hash__'}
         assert expected_diff == set(dir(di)) - set(dir(ds))
 
+    def test_repr_shows_group2(self):
+        """Starting in v1.4, Dataset.__repr__ shows file meta"""
+        ds = Dataset()
+        ds.file_meta = Dataset()
+        ds.file_meta.FileMetaInformationVersion = b'\x00\x01'
+        ds.file_meta.SourceApplicationEntityTitle = "test"
+
+        ds.PatientName = "Test this"
+        s = repr(ds)
+        print(s)
+        lines = s.splitlines()
+        assert lines[0].startswith("(0002, 0001) File Meta Information Vers")
+        assert lines[1].startswith("(0002, 0016) Source Application Entity")
+        assert lines[2].startswith("(0010, 0010) Patient's Name")
+
 
 class BadRepr(object):
     def __repr__(self):
