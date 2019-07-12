@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Getting Started with pydicom &mdash; pydicom 1.2.0rc1 documentation</title>
+  <title>Getting Started with pydicom &mdash; pydicom 1.3.0 documentation</title>
   
 
   
@@ -19,13 +19,20 @@
   
 
   
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="_static/gallery.css" type="text/css" />
@@ -34,21 +41,16 @@
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Pydicom User Guide" href="pydicom_user_guide.html" />
     <link rel="prev" title="pydicom documentation" href="index.html" /> 
-
-  
-  <script src="_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -65,7 +67,7 @@
             
             
               <div class="version">
-                1.2.0rc1
+                1.3.0
               </div>
             
           
@@ -216,7 +218,7 @@ head-first-prone, and save to a new file:</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><span class="s2">&quot;rtplan2.dcm&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Pydicom is not a DICOM server <a class="footnote-reference" href="#id3" id="id1">[1]</a>, and is not primarily about viewing
+<p>Pydicom is not a DICOM server <a class="footnote-reference brackets" href="#id3" id="id1">1</a>, and is not primarily about viewing
 images. It is designed to let you manipulate data elements in DICOM files with
 Python code.</p>
 <p>Pydicom is easy to install and use, and because it is a pure Python package, it
@@ -238,16 +240,15 @@ required if manipulating pixel data).</p>
 <div class="section" id="prerequisites">
 <h3>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li>Python 2.7, 3.4 or later</li>
-<li><dl class="first docutils">
-<dt>Optional dependencies:</dt>
-<dd><ul class="first last">
-<li>numpy</li>
-<li>pillow</li>
-<li>gdcm</li>
-<li>jpeg_ls</li>
-<li>jpeg2000</li>
-<li>pytest (if running pydicom’s test suite)</li>
+<li><p>Python 2.7, 3.4 or later</p></li>
+<li><dl class="simple">
+<dt>Optional dependencies:</dt><dd><ul>
+<li><p>numpy</p></li>
+<li><p>pillow</p></li>
+<li><p>gdcm</p></li>
+<li><p>jpeg_ls</p></li>
+<li><p>jpeg2000</p></li>
+<li><p>pytest (if running pydicom’s test suite). pytest&lt;5 if in Python 2.</p></li>
 </ul>
 </dd>
 </dl>
@@ -309,6 +310,7 @@ pydicom’s setup.py file and:</p>
 </div>
 <p>This will install <a class="reference external" href="https://pytest.org">pytest</a> if it is not
 already installed.</p>
+<p>In v1.3 run under Python 2, if pytest is not found, please <cite>python2 -m pip install “pytest&lt;5”</cite></p>
 <p>Or, in linux you can also use:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">test</span><span class="o">-</span><span class="n">code</span>
 </pre></div>
@@ -337,23 +339,19 @@ cookbook recipes are encouraged to be posted on the <a class="reference external
 <h2>Next Steps<a class="headerlink" href="#next-steps" title="Permalink to this headline">¶</a></h2>
 <p>To start learning how to use pydicom, see the <a class="reference internal" href="pydicom_user_guide.html"><span class="doc">Pydicom User Guide</span></a>.</p>
 <p class="rubric">Footnotes::</p>
-<table class="docutils footnote" frame="void" id="id3" rules="none">
-<colgroup><col class="label" /><col /></colgroup>
-<tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>For DICOM network capabilities, see the
+<dl class="footnote brackets">
+<dt class="label" id="id3"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p>For DICOM network capabilities, see the
 <a class="reference external" href="https://github.com/patmun/pynetdicom">pynetdicom</a> and the newer
-<a class="reference external" href="https://github.com/pydicom/pynetdicom3">pynetdicom3</a> projects.</td></tr>
-</tbody>
-</table>
-<table class="docutils footnote" frame="void" id="id4" rules="none">
-<colgroup><col class="label" /><col /></colgroup>
-<tbody valign="top">
-<tr><td class="label">[2]</td><td>If using python(x,y), other packages you might be interested in include IPython
+<a class="reference external" href="https://github.com/pydicom/pynetdicom3">pynetdicom3</a> projects.</p>
+</dd>
+<dt class="label" id="id4"><span class="brackets">2</span></dt>
+<dd><p>If using python(x,y), other packages you might be interested in include IPython
 (an indispensable interactive shell with auto-completion, history etc),
 NumPy (optionally used by pydicom for pixel data), and ITK/VTK or PIL
-(image processing and visualization).</td></tr>
-</tbody>
-</table>
+(image processing and visualization).</p>
+</dd>
+</dl>
 </div>
 </div>
 
@@ -368,7 +366,7 @@ NumPy (optionally used by pydicom for pixel data), and ITK/VTK or PIL
         <a href="pydicom_user_guide.html" class="btn btn-neutral float-right" title="Pydicom User Guide" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="index.html" class="btn btn-neutral" title="pydicom documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="index.html" class="btn btn-neutral float-left" title="pydicom documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -377,7 +375,7 @@ NumPy (optionally used by pydicom for pixel data), and ITK/VTK or PIL
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2008-2018, Darcy Mason and pydicom contributors.
+        &copy; Copyright 2008-2019, Darcy Mason and pydicom contributors
 
     </p>
   </div>
@@ -394,33 +392,16 @@ NumPy (optionally used by pydicom for pixel data), and ITK/VTK or PIL
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'1.2.0rc1',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-  
-
-  <script type="text/javascript" src="_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

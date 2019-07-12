@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pydicom.filereader &mdash; pydicom 1.2.0rc1 documentation</title>
+  <title>pydicom.filereader &mdash; pydicom 1.3.0 documentation</title>
   
 
   
@@ -19,34 +19,36 @@
   
 
   
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
-
-  
-  <script src="../../_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -63,7 +65,7 @@
             
             
               <div class="version">
-                1.2.0rc1
+                1.3.0
               </div>
             
           
@@ -179,7 +181,6 @@
 <span class="kn">from</span> <span class="nn">io</span> <span class="k">import</span> <span class="n">BytesIO</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">struct</span> <span class="k">import</span> <span class="p">(</span><span class="n">Struct</span><span class="p">,</span> <span class="n">unpack</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">sys</span> <span class="k">import</span> <span class="n">byteorder</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">import</span> <span class="nn">zlib</span>
 
@@ -202,92 +203,6 @@
 <span class="kn">import</span> <span class="nn">pydicom.uid</span>
 <span class="kn">from</span> <span class="nn">pydicom.util.hexutil</span> <span class="k">import</span> <span class="n">bytes2hex</span>
 <span class="kn">from</span> <span class="nn">pydicom.valuerep</span> <span class="k">import</span> <span class="n">extra_length_VRs</span>
-
-
-<div class="viewcode-block" id="DicomIter"><a class="viewcode-back" href="../../api_ref.html#pydicom.filereader.DicomIter">[docs]</a><span class="k">class</span> <span class="nc">DicomIter</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Iterator over DICOM data elements created from a file-like object&quot;&quot;&quot;</span>
-
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fp</span><span class="p">,</span> <span class="n">stop_when</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Read the preamble and meta info and prepare</span>
-<span class="sd">           iterator for remainder of file.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        fp : an open DicomFileLike object, at start of file</span>
-<span class="sd">        force : boolean</span>
-<span class="sd">            Force reading of data. See ``read_file`` for</span>
-<span class="sd">             more parameter info.</span>
-
-<span class="sd">        Adds flags to fp: Big/Little-endian &amp; Implicit/Explicit VR</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fp</span> <span class="o">=</span> <span class="n">fp</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">stop_when</span> <span class="o">=</span> <span class="n">stop_when</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">preamble</span> <span class="o">=</span> <span class="n">preamble</span> <span class="o">=</span> <span class="n">read_preamble</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">force</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">has_header</span> <span class="o">=</span> <span class="n">has_header</span> <span class="o">=</span> <span class="p">(</span><span class="n">preamble</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">file_meta_info</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">()</span>
-
-        <span class="k">if</span> <span class="n">has_header</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">file_meta_info</span> <span class="o">=</span> <span class="n">file_meta_info</span> <span class="o">=</span> <span class="n">_read_file_meta_info</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
-            <span class="n">transfer_syntax</span> <span class="o">=</span> <span class="n">file_meta_info</span><span class="o">.</span><span class="n">TransferSyntaxUID</span>
-
-            <span class="k">if</span> <span class="n">transfer_syntax</span> <span class="o">==</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">uid</span><span class="o">.</span><span class="n">ExplicitVRLittleEndian</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_is_implicit_VR</span> <span class="o">=</span> <span class="kc">False</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_is_little_endian</span> <span class="o">=</span> <span class="kc">True</span>
-
-            <span class="k">elif</span> <span class="n">transfer_syntax</span> <span class="o">==</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">uid</span><span class="o">.</span><span class="n">ImplicitVRLittleEndian</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_is_implicit_VR</span> <span class="o">=</span> <span class="kc">True</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_is_little_endian</span> <span class="o">=</span> <span class="kc">True</span>
-
-            <span class="k">elif</span> <span class="n">transfer_syntax</span> <span class="o">==</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">uid</span><span class="o">.</span><span class="n">ExplicitVRBigEndian</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_is_implicit_VR</span> <span class="o">=</span> <span class="kc">False</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_is_little_endian</span> <span class="o">=</span> <span class="kc">False</span>
-
-            <span class="k">elif</span> <span class="n">transfer_syntax</span> <span class="o">==</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">uid</span><span class="o">.</span><span class="n">DeflatedExplicitVRLittleEndian</span><span class="p">:</span>
-                <span class="c1"># See PS3.6-2008 A.5 (p 71) -- when written, the entire dataset</span>
-                <span class="c1"># following the file metadata was prepared the normal way,</span>
-                <span class="c1"># then &quot;deflate&quot; compression applied.</span>
-                <span class="c1"># All that is needed here is to decompress and then</span>
-                <span class="c1"># use as normal in a file-like object</span>
-                <span class="n">zipped</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
-
-                <span class="c1"># -MAX_WBITS part is from comp.lang.python answer:</span>
-                <span class="c1"># groups.google.com/group/comp.lang.python/msg/e95b3b38a71e6799</span>
-                <span class="n">unzipped</span> <span class="o">=</span> <span class="n">zlib</span><span class="o">.</span><span class="n">decompress</span><span class="p">(</span><span class="n">zipped</span><span class="p">,</span> <span class="o">-</span><span class="n">zlib</span><span class="o">.</span><span class="n">MAX_WBITS</span><span class="p">)</span>
-
-                <span class="c1"># a file-like object</span>
-                <span class="n">fp</span> <span class="o">=</span> <span class="n">BytesIO</span><span class="p">(</span><span class="n">unzipped</span><span class="p">)</span>
-
-                <span class="c1"># point to new object</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">fp</span> <span class="o">=</span> <span class="n">fp</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_is_implicit_VR</span> <span class="o">=</span> <span class="kc">False</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_is_little_endian</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="c1"># Any other syntax should be Explicit VR Little Endian,</span>
-                <span class="c1"># e.g. all Encapsulated (JPEG etc) are ExplVR-LE</span>
-                <span class="c1"># by Standard PS 3.5-2008 A.4 (p63)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_is_implicit_VR</span> <span class="o">=</span> <span class="kc">False</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_is_little_endian</span> <span class="o">=</span> <span class="kc">True</span>
-
-        <span class="k">else</span><span class="p">:</span>  <span class="c1"># no header -- make assumptions</span>
-            <span class="n">fp</span><span class="o">.</span><span class="n">TransferSyntaxUID</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">uid</span><span class="o">.</span><span class="n">ImplicitVRLittleEndian</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_is_little_endian</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_is_implicit_VR</span> <span class="o">=</span> <span class="kc">True</span>
-
-        <span class="n">impl_expl</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Explicit&quot;</span><span class="p">,</span> <span class="s2">&quot;Implicit&quot;</span><span class="p">)[</span><span class="bp">self</span><span class="o">.</span><span class="n">_is_implicit_VR</span><span class="p">]</span>
-        <span class="n">big_little</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Big&quot;</span><span class="p">,</span> <span class="s2">&quot;Little&quot;</span><span class="p">)[</span><span class="bp">self</span><span class="o">.</span><span class="n">_is_little_endian</span><span class="p">]</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Using </span><span class="si">{0:s}</span><span class="s2"> VR, </span><span class="si">{1:s}</span><span class="s2"> Endian transfer syntax&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                     <span class="n">impl_expl</span><span class="p">,</span> <span class="n">big_little</span><span class="p">))</span>
-
-    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">tags</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_meta_info</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-        <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">tags</span><span class="p">:</span>
-            <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_meta_info</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span>
-
-        <span class="k">for</span> <span class="n">data_element</span> <span class="ow">in</span> <span class="n">data_element_generator</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="p">,</span>
-                                                   <span class="bp">self</span><span class="o">.</span><span class="n">_is_implicit_VR</span><span class="p">,</span>
-                                                   <span class="bp">self</span><span class="o">.</span><span class="n">_is_little_endian</span><span class="p">,</span>
-                                                   <span class="n">stop_when</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">stop_when</span><span class="p">):</span>
-            <span class="k">yield</span> <span class="n">data_element</span></div>
 
 
 <div class="viewcode-block" id="data_element_generator"><a class="viewcode-back" href="../../api_ref.html#pydicom.filereader.data_element_generator">[docs]</a><span class="k">def</span> <span class="nf">data_element_generator</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span>
@@ -520,6 +435,59 @@
                                      <span class="n">is_implicit_VR</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">)</span></div>
 
 
+<span class="k">def</span> <span class="nf">_is_implicit_vr</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">implicit_vr_is_assumed</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">,</span> <span class="n">stop_when</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Check if the real VR is explicit or implicit.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fp : an opened file object</span>
+<span class="sd">    implicit_vr_is_assumed : boolean</span>
+<span class="sd">        True if implicit VR is assumed.</span>
+<span class="sd">        If this does not match with the real transfer syntax, a user warning</span>
+<span class="sd">        will be issued.</span>
+<span class="sd">    is_little_endian : boolean</span>
+<span class="sd">        True if file has little endian transfer syntax.</span>
+<span class="sd">        Needed to interpret the first tag.</span>
+<span class="sd">    stop_when : None, optional</span>
+<span class="sd">        Optional call_back function which can terminate reading.</span>
+<span class="sd">        Needed to check if the next tag still belongs to the read dataset.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    True if implicit VR is used, False otherwise.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">tag_bytes</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+    <span class="n">vr</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">vr</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">implicit_vr_is_assumed</span>
+
+    <span class="c1"># it is sufficient to check if the VR is in valid ASCII range, as it is</span>
+    <span class="c1"># extremely unlikely that the tag length accidentally has such a</span>
+    <span class="c1"># representation - this would need the first tag to be longer than 16kB</span>
+    <span class="c1"># (e.g. it should be &gt; 0x4141 = 16705 bytes)</span>
+    <span class="n">vr1</span> <span class="o">=</span> <span class="nb">ord</span><span class="p">(</span><span class="n">vr</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">if</span> <span class="n">in_py2</span> <span class="k">else</span> <span class="n">vr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">vr2</span> <span class="o">=</span> <span class="nb">ord</span><span class="p">(</span><span class="n">vr</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="k">if</span> <span class="n">in_py2</span> <span class="k">else</span> <span class="n">vr</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">found_implicit</span> <span class="o">=</span> <span class="ow">not</span> <span class="p">(</span><span class="mh">0x40</span> <span class="o">&lt;</span> <span class="n">vr1</span> <span class="o">&lt;</span> <span class="mh">0x5B</span> <span class="ow">and</span> <span class="mh">0x40</span> <span class="o">&lt;</span> <span class="n">vr2</span> <span class="o">&lt;</span> <span class="mh">0x5B</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">found_implicit</span> <span class="o">!=</span> <span class="n">implicit_vr_is_assumed</span><span class="p">:</span>
+        <span class="c1"># first check if the tag still belongs to the dataset if stop_when</span>
+        <span class="c1"># is given - if not, the dataset is empty and we just return</span>
+        <span class="n">endian_chr</span> <span class="o">=</span> <span class="s2">&quot;&lt;&quot;</span> <span class="k">if</span> <span class="n">is_little_endian</span> <span class="k">else</span> <span class="s2">&quot;&gt;&quot;</span>
+        <span class="n">tag</span> <span class="o">=</span> <span class="n">TupleTag</span><span class="p">(</span><span class="n">unpack</span><span class="p">(</span><span class="n">endian_chr</span> <span class="o">+</span> <span class="s2">&quot;HH&quot;</span><span class="p">,</span> <span class="n">tag_bytes</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">stop_when</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">stop_when</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">vr</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">found_implicit</span>
+
+        <span class="c1"># got to the real problem - warn or raise depending on config</span>
+        <span class="n">found_vr</span> <span class="o">=</span> <span class="s1">&#39;implicit&#39;</span> <span class="k">if</span> <span class="n">found_implicit</span> <span class="k">else</span> <span class="s1">&#39;explicit&#39;</span>
+        <span class="n">expected_vr</span> <span class="o">=</span> <span class="s1">&#39;implicit&#39;</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">found_implicit</span> <span class="k">else</span> <span class="s1">&#39;explicit&#39;</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Expected </span><span class="si">{0}</span><span class="s1"> VR, but found </span><span class="si">{1}</span><span class="s1"> VR - using </span><span class="si">{1}</span><span class="s1"> VR for &#39;</span>
+                   <span class="s1">&#39;reading&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">expected_vr</span><span class="p">,</span> <span class="n">found_vr</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">enforce_valid_values</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidDicomError</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">found_implicit</span>
+
+
 <div class="viewcode-block" id="read_dataset"><a class="viewcode-back" href="../../api_ref.html#pydicom.filereader.read_dataset">[docs]</a><span class="k">def</span> <span class="nf">read_dataset</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">is_implicit_VR</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">,</span> <span class="n">bytelength</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">stop_when</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">defer_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">parent_encoding</span><span class="o">=</span><span class="n">default_encoding</span><span class="p">,</span> <span class="n">specific_tags</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -557,12 +525,15 @@
 <span class="sd">        A collection (dictionary) of Dicom `DataElement` instances.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">raw_data_elements</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">fpStart</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
+    <span class="n">fp_start</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
+    <span class="n">is_implicit_VR</span> <span class="o">=</span> <span class="n">_is_implicit_vr</span><span class="p">(</span>
+        <span class="n">fp</span><span class="p">,</span> <span class="n">is_implicit_VR</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">,</span> <span class="n">stop_when</span><span class="p">)</span>
+    <span class="n">fp</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">fp_start</span><span class="p">)</span>
     <span class="n">de_gen</span> <span class="o">=</span> <span class="n">data_element_generator</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">is_implicit_VR</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">,</span>
                                     <span class="n">stop_when</span><span class="p">,</span> <span class="n">defer_size</span><span class="p">,</span> <span class="n">parent_encoding</span><span class="p">,</span>
                                     <span class="n">specific_tags</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="k">while</span> <span class="p">(</span><span class="n">bytelength</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">fp</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span> <span class="o">-</span> <span class="n">fpStart</span> <span class="o">&lt;</span> <span class="n">bytelength</span><span class="p">):</span>
+        <span class="k">while</span> <span class="p">(</span><span class="n">bytelength</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">fp</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span> <span class="o">-</span> <span class="n">fp_start</span> <span class="o">&lt;</span> <span class="n">bytelength</span><span class="p">):</span>
             <span class="n">raw_data_element</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">de_gen</span><span class="p">)</span>
             <span class="c1"># Read data elements. Stop on some errors, but return what was read</span>
             <span class="n">tag</span> <span class="o">=</span> <span class="n">raw_data_element</span><span class="o">.</span><span class="n">tag</span>
@@ -712,7 +683,7 @@
     <span class="n">start_file_meta</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
     <span class="n">file_meta</span> <span class="o">=</span> <span class="n">read_dataset</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">is_implicit_VR</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                              <span class="n">stop_when</span><span class="o">=</span><span class="n">_not_group_0002</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">file_meta</span><span class="p">:</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">file_meta</span><span class="o">.</span><span class="n">_dict</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">file_meta</span>
 
     <span class="c1"># Test the file meta for correct interpretation by requesting the first</span>
@@ -862,7 +833,8 @@
 
     <span class="c1"># Check to see if there&#39;s anything left to read</span>
     <span class="n">peek</span> <span class="o">=</span> <span class="n">fileobj</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">fileobj</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">peek</span> <span class="o">!=</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span><span class="p">:</span>
+        <span class="n">fileobj</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
     <span class="c1"># `filobj` should be positioned at the start of the dataset by this point.</span>
     <span class="c1"># Ensure we have appropriate values for `is_implicit_VR` and</span>
@@ -932,7 +904,7 @@
         <span class="k">pass</span>  <span class="c1"># error already logged in read_dataset</span>
 
     <span class="c1"># Add the command set elements to the dataset (if any)</span>
-    <span class="n">dataset</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">command_set</span><span class="p">)</span>
+    <span class="n">dataset</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">command_set</span><span class="o">.</span><span class="n">_dict</span><span class="p">)</span>
 
     <span class="n">class_uid</span> <span class="o">=</span> <span class="n">file_meta_dataset</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;MediaStorageSOPClassUID&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">class_uid</span> <span class="ow">and</span> <span class="n">class_uid</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;Media Storage Directory Storage&quot;</span><span class="p">:</span>
@@ -1158,7 +1130,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2008-2018, Darcy Mason and pydicom contributors.
+        &copy; Copyright 2008-2019, Darcy Mason and pydicom contributors
 
     </p>
   </div>
@@ -1175,33 +1147,16 @@
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../',
-            VERSION:'1.2.0rc1',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-  
-
-  <script type="text/javascript" src="../../_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

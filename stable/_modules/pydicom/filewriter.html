@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pydicom.filewriter &mdash; pydicom 1.2.0rc1 documentation</title>
+  <title>pydicom.filewriter &mdash; pydicom 1.3.0 documentation</title>
   
 
   
@@ -19,34 +19,36 @@
   
 
   
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
-
-  
-  <script src="../../_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -63,7 +65,7 @@
             
             
               <div class="version">
-                1.2.0rc1
+                1.3.0
               </div>
             
           
@@ -174,6 +176,8 @@
 <span class="sd">&quot;&quot;&quot;Functions related to writing DICOM data.&quot;&quot;&quot;</span>
 
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
+
+<span class="kn">import</span> <span class="nn">struct</span>
 <span class="kn">from</span> <span class="nn">struct</span> <span class="k">import</span> <span class="n">pack</span>
 
 <span class="kn">from</span> <span class="nn">pydicom</span> <span class="k">import</span> <span class="n">compat</span>
@@ -239,14 +243,24 @@
         <span class="c1"># US if PixelRepresentation value is 0x0000, else SS</span>
         <span class="c1">#   For references, see the list at</span>
         <span class="c1">#   https://github.com/darcymason/pydicom/pull/298</span>
-        <span class="k">if</span> <span class="n">ds</span><span class="o">.</span><span class="n">PixelRepresentation</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># PixelRepresentation is usually set in the root dataset</span>
+        <span class="k">while</span> <span class="s1">&#39;PixelRepresentation&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ds</span> <span class="ow">and</span> <span class="n">ds</span><span class="o">.</span><span class="n">parent</span><span class="p">:</span>
+            <span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">parent</span>
+        <span class="c1"># if no pixel data is present, none if these tags is used,</span>
+        <span class="c1"># so we can just ignore a missing PixelRepresentation in this case</span>
+        <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;PixelRepresentation&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ds</span> <span class="ow">and</span> <span class="s1">&#39;PixelData&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ds</span> <span class="ow">or</span>
+                <span class="n">ds</span><span class="o">.</span><span class="n">PixelRepresentation</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
             <span class="n">elem</span><span class="o">.</span><span class="n">VR</span> <span class="o">=</span> <span class="s1">&#39;US&#39;</span>
             <span class="n">byte_type</span> <span class="o">=</span> <span class="s1">&#39;H&#39;</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">elem</span><span class="o">.</span><span class="n">VR</span> <span class="o">=</span> <span class="s1">&#39;SS&#39;</span>
             <span class="n">byte_type</span> <span class="o">=</span> <span class="s1">&#39;h&#39;</span>
-        <span class="n">elem</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">convert_numbers</span><span class="p">(</span><span class="n">elem</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">,</span>
-                                     <span class="n">byte_type</span><span class="p">)</span>
+
+        <span class="c1"># Need to handle type check for elements with VM &gt; 1</span>
+        <span class="n">elem_value</span> <span class="o">=</span> <span class="n">elem</span><span class="o">.</span><span class="n">value</span> <span class="k">if</span> <span class="n">elem</span><span class="o">.</span><span class="n">VM</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">elem</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">elem_value</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="n">elem</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">convert_numbers</span><span class="p">(</span><span class="n">elem</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">,</span>
+                                         <span class="n">byte_type</span><span class="p">)</span>
 
     <span class="c1"># &#39;OB or OW&#39; and dependent on WaveformBitsAllocated</span>
     <span class="c1"># (5400, 0110) Channel Minimum Value</span>
@@ -269,8 +283,10 @@
         <span class="c1"># As per PS3.3 C.11.1.1.1</span>
         <span class="k">if</span> <span class="n">ds</span><span class="o">.</span><span class="n">LUTDescriptor</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">elem</span><span class="o">.</span><span class="n">VR</span> <span class="o">=</span> <span class="s1">&#39;US&#39;</span>
-            <span class="n">elem</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">convert_numbers</span><span class="p">(</span><span class="n">elem</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">,</span>
-                                         <span class="s1">&#39;H&#39;</span><span class="p">)</span>
+            <span class="n">elem_value</span> <span class="o">=</span> <span class="n">elem</span><span class="o">.</span><span class="n">value</span> <span class="k">if</span> <span class="n">elem</span><span class="o">.</span><span class="n">VM</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">elem</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">elem_value</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+                <span class="n">elem</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">convert_numbers</span><span class="p">(</span><span class="n">elem</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">is_little_endian</span><span class="p">,</span>
+                                             <span class="s1">&#39;H&#39;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">elem</span><span class="o">.</span><span class="n">VR</span> <span class="o">=</span> <span class="s1">&#39;OW&#39;</span>
 
@@ -656,7 +672,16 @@
     <span class="n">value_length</span> <span class="o">=</span> <span class="n">buffer</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
     <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">fp</span><span class="o">.</span><span class="n">is_implicit_VR</span> <span class="ow">and</span> <span class="n">VR</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">extra_length_VRs</span> <span class="ow">and</span>
             <span class="ow">not</span> <span class="n">is_undefined_length</span><span class="p">):</span>
-        <span class="n">fp</span><span class="o">.</span><span class="n">write_US</span><span class="p">(</span><span class="n">value_length</span><span class="p">)</span>  <span class="c1"># Explicit VR length field is only 2 bytes</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">fp</span><span class="o">.</span><span class="n">write_US</span><span class="p">(</span><span class="n">value_length</span><span class="p">)</span>  <span class="c1"># Explicit VR length field is 2 bytes</span>
+        <span class="k">except</span> <span class="n">struct</span><span class="o">.</span><span class="n">error</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;The value for the data element </span><span class="si">{}</span><span class="s1"> exceeds the size &#39;</span>
+                   <span class="s1">&#39;of 64 kByte and cannot be written in an explicit transfer &#39;</span>
+                   <span class="s1">&#39;syntax. You can save it using Implicit Little Endian &#39;</span>
+                   <span class="s1">&#39;transfer syntax, or you have to truncate the value to not &#39;</span>
+                   <span class="s1">&#39;exceed the maximum size of 64 kByte.&#39;</span>
+                   <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">data_element</span><span class="o">.</span><span class="n">tag</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># write the proper length of the data_element in the length slot,</span>
         <span class="c1"># unless is SQ with undefined length.</span>
@@ -670,13 +695,10 @@
 
 <div class="viewcode-block" id="write_dataset"><a class="viewcode-back" href="../../api_ref.html#pydicom.filewriter.write_dataset">[docs]</a><span class="k">def</span> <span class="nf">write_dataset</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">parent_encoding</span><span class="o">=</span><span class="n">default_encoding</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Write a Dataset dictionary to the file. Return the total length written.</span>
-
-<span class="sd">    Attempt to correct ambiguous VR elements when explicit little/big</span>
-<span class="sd">      encoding Elements that can&#39;t be corrected will be returned unchanged.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">_harmonize_properties</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">fp</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">fp</span><span class="o">.</span><span class="n">is_implicit_VR</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">dataset</span><span class="o">.</span><span class="n">is_original_encoding</span><span class="p">:</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">dataset</span><span class="o">.</span><span class="n">is_original_encoding</span><span class="p">:</span>
         <span class="n">dataset</span> <span class="o">=</span> <span class="n">correct_ambiguous_vr</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">fp</span><span class="o">.</span><span class="n">is_little_endian</span><span class="p">)</span>
 
     <span class="n">dataset_encoding</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;SpecificCharacterSet&#39;</span><span class="p">,</span> <span class="n">parent_encoding</span><span class="p">)</span>
@@ -830,39 +852,31 @@
         <span class="c1"># Will be updated with the actual length later</span>
         <span class="n">file_meta</span><span class="o">.</span><span class="n">FileMetaInformationGroupLength</span> <span class="o">=</span> <span class="mi">0</span>
 
-    <span class="c1"># Only used if FileMetaInformationGroupLength is present.</span>
-    <span class="c1">#   FileMetaInformationGroupLength has a VR of &#39;UL&#39; and so has a value that</span>
-    <span class="c1">#   is 4 bytes fixed. The total length of when encoded as Explicit VR must</span>
-    <span class="c1">#   therefore be 12 bytes.</span>
-    <span class="n">end_group_length_elem</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span> <span class="o">+</span> <span class="mi">12</span>
-
-    <span class="c1"># The &#39;is_little_endian&#39; and &#39;is_implicit_VR&#39; attributes will need to be</span>
-    <span class="c1">#   set correctly after the File Meta Info has been written.</span>
-    <span class="n">fp</span><span class="o">.</span><span class="n">is_little_endian</span> <span class="o">=</span> <span class="kc">True</span>
-    <span class="n">fp</span><span class="o">.</span><span class="n">is_implicit_VR</span> <span class="o">=</span> <span class="kc">False</span>
-
-    <span class="c1"># Write the File Meta Information Group elements to `fp`</span>
-    <span class="n">write_dataset</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">file_meta</span><span class="p">)</span>
+    <span class="c1"># Write the File Meta Information Group elements</span>
+    <span class="c1"># first write into a buffer to avoid seeking back, that can be</span>
+    <span class="c1"># expansive and is not allowed if writing into a zip file</span>
+    <span class="n">buffer</span> <span class="o">=</span> <span class="n">DicomBytesIO</span><span class="p">()</span>
+    <span class="n">buffer</span><span class="o">.</span><span class="n">is_little_endian</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">buffer</span><span class="o">.</span><span class="n">is_implicit_VR</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">write_dataset</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span> <span class="n">file_meta</span><span class="p">)</span>
 
     <span class="c1"># If FileMetaInformationGroupLength is present it will be the first written</span>
     <span class="c1">#   element and we must update its value to the correct length.</span>
     <span class="k">if</span> <span class="s1">&#39;FileMetaInformationGroupLength&#39;</span> <span class="ow">in</span> <span class="n">file_meta</span><span class="p">:</span>
-        <span class="c1"># Save end of file meta to go back to</span>
-        <span class="n">end_of_file_meta</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
-
         <span class="c1"># Update the FileMetaInformationGroupLength value, which is the number</span>
         <span class="c1">#   of bytes from the end of the FileMetaInformationGroupLength element</span>
-        <span class="c1">#   to the end of all the File Meta Information elements</span>
-        <span class="n">group_length</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">end_of_file_meta</span> <span class="o">-</span> <span class="n">end_group_length_elem</span><span class="p">)</span>
-        <span class="n">file_meta</span><span class="o">.</span><span class="n">FileMetaInformationGroupLength</span> <span class="o">=</span> <span class="n">group_length</span>
-        <span class="n">fp</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">end_group_length_elem</span> <span class="o">-</span> <span class="mi">12</span><span class="p">)</span>
-        <span class="n">write_data_element</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">file_meta</span><span class="p">[</span><span class="mh">0x00020000</span><span class="p">])</span>
+        <span class="c1">#   to the end of all the File Meta Information elements.</span>
+        <span class="c1"># FileMetaInformationGroupLength has a VR of &#39;UL&#39; and so has a value</span>
+        <span class="c1">#   that is 4 bytes fixed. The total length of when encoded as</span>
+        <span class="c1">#   Explicit VR must therefore be 12 bytes.</span>
+        <span class="n">file_meta</span><span class="o">.</span><span class="n">FileMetaInformationGroupLength</span> <span class="o">=</span> <span class="n">buffer</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span> <span class="o">-</span> <span class="mi">12</span>
+        <span class="n">buffer</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">write_data_element</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span> <span class="n">file_meta</span><span class="p">[</span><span class="mh">0x00020000</span><span class="p">])</span>
 
-        <span class="c1"># Return to end of the file meta, ready to write remainder of the file</span>
-        <span class="n">fp</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">end_of_file_meta</span><span class="p">)</span></div>
+    <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">buffer</span><span class="o">.</span><span class="n">getvalue</span><span class="p">())</span></div>
 
 
-<div class="viewcode-block" id="dcmwrite"><a class="viewcode-back" href="../../api_ref.html#pydicom.filewriter.dcmwrite">[docs]</a><span class="k">def</span> <span class="nf">dcmwrite</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">write_like_original</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="dcmwrite"><a class="viewcode-back" href="../../ref_guide.html#pydicom.filewriter.dcmwrite">[docs]</a><span class="k">def</span> <span class="nf">dcmwrite</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">write_like_original</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Write `dataset` to the `filename` specified.</span>
 
 <span class="sd">    If `write_like_original` is True then `dataset` will be written as is</span>
@@ -1120,7 +1134,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2008-2018, Darcy Mason and pydicom contributors.
+        &copy; Copyright 2008-2019, Darcy Mason and pydicom contributors
 
     </p>
   </div>
@@ -1137,33 +1151,16 @@
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../',
-            VERSION:'1.2.0rc1',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-  
-
-  <script type="text/javascript" src="../../_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

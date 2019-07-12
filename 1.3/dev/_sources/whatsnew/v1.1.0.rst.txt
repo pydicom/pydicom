@@ -1,0 +1,48 @@
+Version 1.1.0
+=================================
+
+Changelog
+---------
+
+Enhancements
+............
+
+* ``UID.__str__`` no longer returns the UID name (when known). The UID name is
+  still available using the ``UID.name`` property.
+* ``Dataset`` equality now only compares the dataset's ``DataElements``
+  (:issue:`464`)
+* the ``codify`` script now supports VRs OD and OL, and works in Python 3
+  (:issue:`498`); documentation has been added for ``codify``
+* the performance for reading and writing datasets has been improved to
+  be better than in pydicom 0.9.9 (:issue:`605`, :issue:`512`)
+* added support for bit-packed pixel data (:issue:`292`)
+* updated DICOM dictionary for 2018b edition
+* added full API documentation to pydicom documentation (:issue:`649`)
+
+Fixes
+.....
+
+* ``UID`` should behave as expected for a python ``str`` subclass
+  (:issue:`256`)
+* group length elements in groups above 0x0006 removed on writing
+  (:issue:`32`)
+* fixed ``write_PN`` raising a ``TypeError`` when called with a non-iterable
+  encoding parameter (:issue:`489`)
+* fixed padding for some odd-sized image data (:issue:`599`)
+* removed unneeded warning for incorrect date string length (:issue:`597`)
+* fixed ``Dataset`` not slicing correctly when an (0xFFFF,0xFFFF) element is
+  present (:issue:`92`)
+* use correct VR for unknown private tags and private creators (:issue:`620`)
+* fixed crash on reading RGB data with implicit VR (:issue:`620`)
+* parent encoding was not used in sequences without own encoding (:issue:`625`)
+* fixed error handling for values too large to fit in VR IS (:issue:`640`)
+
+Other
+-----
+
+* A deprecation warning has been added for UID.__eq__ and UID.__ne__ when
+  comparing ``UID == [UID name]`` and ``UID != [UID name]``. Starting in v1.2,
+  ``UID`` equality and inequality comparisons will return ``False`` when
+  performing the equivalent of ``UID == [UID name]`` and ``UID != [UID name]``,
+  respectively. E.g. UID('1.2.840.10008.1.1') == 'Verification SOP Class' will
+  return False. Use ``UID.name == [UID name]`` instead.

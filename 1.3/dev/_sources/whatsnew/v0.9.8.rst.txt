@@ -1,0 +1,50 @@
+Version 0.9.8
+=============
+
+Changelog
+---------
+
+pydicom 0.9.8 is mainly a consolidation step before moving to official Python 3
+compatibility in pydicom 1.0.  It also reverts the change to using Decimal for
+VR of DS (in pydicom 0.9.7), due to performance issues. DS as Decimal is still
+available, but is off by default.
+
+Major changes
+.............
+
+* Requires Python 2.6 or later, in preparation for Python 3 compatibility
+* experimental Python 3 compatibility (unofficial at this point) -- uncomment
+  the two indicated lines in setup.py to use it. Please provide feedback to the
+  issues list.
+* DS values reverted to using float as default (issue 114) due to slow
+  performance using Python Decimal. Speed tests show approx factor of 10
+  improvement compared with pydicom 0.9.7 (several revisions up to
+  r78ba350a3eb8)
+* streamlined much code internally taking advantage of modern Python
+  constructs: decorators, generators, etc
+
+Bug fixes
+.........
+
+* Fix for duplicate logger from Gunnar Schaefer. Fixes issue 107 (revision
+  774b7a55db33)
+* Fix rewind behavior in find_bytes (issue 60, revision 6b949a5b925b)
+* Fix error in nested private sequences (issue 113, revision 84af4b240add)
+
+
+Enhancements
+............
+
+* UID generator added (Félix C. Morency) (revisions 0197b5846bb5 and
+  3678b1be6aca, tests in f1ae573d9de5, 0411bab7c985)
+* new PersonName3 class for Python 3: (revision 9b92b336e7d4)
+
+Contrib file changes
+....................
+
+* Fix for pydicom_series for DS decimal (revision e830f30b6781)
+* new dcm_qt_tree.py module - tree display of DICOM files using PySide and
+  Qt. Contributed by Padraig Looney.
+
+Special acknowledgement to Jonathan Suever who contributed most of the Python 3
+work and many bug fixes.

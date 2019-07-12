@@ -1,0 +1,49 @@
+Version 0.9.3
+=============
+
+Changelog
+---------
+
+Major changes
+.............
+
+* changed to MIT-style license
+* option to defer reading of large data element values using read_file()'s new
+  defer_size argument (r102, r103)
+* dictionary of private tags added -- descriptive text shown when available
+  (issue36, r97, r110)
+* more conversion to PEP-8 style. Should now use read_file(), save_as(),
+  pixel_array rather than !ReadFile(), !SaveAs(), !PixelArray. Old names kept
+  for now as aliases.
+
+Other Enhancements
+..................
+
+* added DicomFileLike class to simplify and generalize access. Any object that
+  has read, write, seek, tell, and close can now be used. (r105)
+* added dataset.iterall() function to iterate through all items (including
+  inside sequences) (r105)
+* added dataset.formatted_lines() generator to allow custom formatting (r91,
+  r113)
+* made reading tolerant of truncated files -- gives a warning, but returns
+  dataset read to that point (r95)
+
+Bug Fixes
+.........
+
+* fixed issue38, name collision for 'Other Patient Ids' as both data element
+  and sequence name in DICOM standard (r95, r96)
+* fixed issue40, blank VRs in some DICOM dictionary entries caused
+  NotImplementError on reading (r100)
+* fixed issue41, reading VRs of 'US or SS' and similar split on backslash
+  character (r104)
+* fixed bug where TransferSyntaxUID not present when reading file without DICOM
+  header (r109)
+* fixed print recursion bug when printing a UID (r111)
+
+Other
+.....
+
+* many of the example files updated
+* updated anonymize example file to also deal with 'OtherPatientIDs' and
+  'PatientsBirthDate' (r98)

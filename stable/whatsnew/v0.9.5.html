@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Version 0.9.5 &mdash; pydicom 1.2.0rc1 documentation</title>
+  <title>Version 0.9.5 &mdash; pydicom 1.3.0 documentation</title>
   
 
   
@@ -19,34 +19,36 @@
   
 
   
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" /> 
-
-  
-  <script src="../_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -63,7 +65,7 @@
             
             
               <div class="version">
-                1.2.0rc1
+                1.3.0
               </div>
             
           
@@ -180,40 +182,40 @@ also.</p>
 <div class="section" id="major-fixes-in-this-release">
 <h3>Major fixes in this release<a class="headerlink" href="#major-fixes-in-this-release" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li>fix for incorrect pixel integer types which could lead to numeric errors
-(issue 79)</li>
-<li>By default an InvalidDicomError will be raised when trying to read a
+<li><p>fix for incorrect pixel integer types which could lead to numeric errors
+(issue 79)</p></li>
+<li><p>By default an InvalidDicomError will be raised when trying to read a
 non-DICOM file (unless read_file keyword arg {{{force}}} is True) (revision
-fc790f01f5)</li>
-<li>fix recursion error on private data elements (issue 81, issue 84)</li>
+fc790f01f5)</p></li>
+<li><p>fix recursion error on private data elements (issue 81, issue 84)</p></li>
 </ul>
 </div>
 <div class="section" id="other-fixes-in-this-release">
 <h3>Other fixes in this release<a class="headerlink" href="#other-fixes-in-this-release" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li>Fix for unicode decode failing with VM &gt; 1 (issue 78)</li>
-<li>fix for fail of DicomIter on files with Explicit VR Transfer Syntax UID
-(issue 82)</li>
-<li>Fix for Python 2.5 and ‘with’ statement (revision 1c32791bf0)</li>
-<li>Handle ‘OB/OW’ VR as well as ‘OW/OB’ (revision e3ee934bbc)</li>
-<li>Fix dataset.get(tag) so returns same as dataset[tag] (issue 88)</li>
+<li><p>Fix for unicode decode failing with VM &gt; 1 (issue 78)</p></li>
+<li><p>fix for fail of DicomIter on files with Explicit VR Transfer Syntax UID
+(issue 82)</p></li>
+<li><p>Fix for Python 2.5 and ‘with’ statement (revision 1c32791bf0)</p></li>
+<li><p>Handle ‘OB/OW’ VR as well as ‘OW/OB’ (revision e3ee934bbc)</p></li>
+<li><p>Fix dataset.get(tag) so returns same as dataset[tag] (issue 88)</p></li>
 </ul>
 </div>
 <div class="section" id="new-contrib-files">
 <h3>New ‘Contrib’ files<a class="headerlink" href="#new-contrib-files" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li>dicom_dao.py by Mike Wallace – CouchDB storage of DICOM info and binary data</li>
-<li>pydicom_series.py by Almar Klein – Reads files and separates into distinct
-series.</li>
+<li><p>dicom_dao.py by Mike Wallace – CouchDB storage of DICOM info and binary data</p></li>
+<li><p>pydicom_series.py by Almar Klein – Reads files and separates into distinct
+series.</p></li>
 </ul>
 </div>
 <div class="section" id="other">
 <h3>Other<a class="headerlink" href="#other" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li>switch to Distribute for packaging</li>
-<li>preliminary work on Python 3 compatiblity</li>
-<li>preliminary work on using sphinx for documentation</li>
-<li>preliminary work on better writing of files from scratch</li>
+<li><p>switch to Distribute for packaging</p></li>
+<li><p>preliminary work on Python 3 compatiblity</p></li>
+<li><p>preliminary work on using sphinx for documentation</p></li>
+<li><p>preliminary work on better writing of files from scratch</p></li>
 </ul>
 </div>
 </div>
@@ -230,7 +232,7 @@ series.</li>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2008-2018, Darcy Mason and pydicom contributors.
+        &copy; Copyright 2008-2019, Darcy Mason and pydicom contributors
 
     </p>
   </div>
@@ -247,33 +249,16 @@ series.</li>
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../',
-            VERSION:'1.2.0rc1',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../_static/jquery.js"></script>
-      <script type="text/javascript" src="../_static/underscore.js"></script>
-      <script type="text/javascript" src="../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-  
-
-  <script type="text/javascript" src="../_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

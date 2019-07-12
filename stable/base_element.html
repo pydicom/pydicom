@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Core elements in pydicom &mdash; pydicom 1.2.0rc1 documentation</title>
+  <title>Core elements in pydicom &mdash; pydicom 1.3.0 documentation</title>
   
 
   
@@ -19,13 +19,20 @@
   
 
   
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="_static/gallery.css" type="text/css" />
@@ -33,22 +40,17 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Writing DICOM Files" href="writing_files.html" />
-    <link rel="prev" title="Transition to pydicom 1.x" href="transition_to_pydicom1.html" /> 
-
-  
-  <script src="_static/js/modernizr.min.js"></script>
-
+    <link rel="prev" title="For users of pydicom &lt; 1.0" href="warn_transition_to_pydicom1.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -65,7 +67,7 @@
             
             
               <div class="version">
-                1.2.0rc1
+                1.3.0
               </div>
             
           
@@ -96,8 +98,7 @@
 <p class="caption"><span class="caption-text">Documentation</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="pydicom_user_guide.html">Pydicom User Guide</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="transition_to_pydicom1.html">Transition to pydicom 1.x</a></li>
-<li class="toctree-l2"><a class="reference internal" href="transition_to_pydicom1.html#api-changes-in-version-1-0">API Changes in version 1.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="warn_transition_to_pydicom1.html">For users of pydicom &lt; 1.0</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Core elements in pydicom</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#dataset">Dataset</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#dataelement">DataElement</a></li>
@@ -109,6 +110,10 @@
 <li class="toctree-l2"><a class="reference internal" href="working_with_pixel_data.html">Working with Pixel Data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="image_data_handlers.html">Handling of compressed image data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viewing_images.html">Viewing Images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="private_data_elements.html">Private Data Elements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="transition_to_pydicom1.html">Transition to pydicom 1.x</a></li>
+<li class="toctree-l2"><a class="reference internal" href="transition_to_pydicom1.html#api-changes-in-version-1-0">API Changes in version 1.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python2_support.html">Python 2 Support Plan for Pydicom</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="ref_guide.html">Reading and writing DICOM files</a></li>
@@ -195,12 +200,18 @@
 <p class="rubric">pydicom object model, description of classes, examples</p>
 <div class="section" id="dataset">
 <h2>Dataset<a class="headerlink" href="#dataset" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference internal" href="api_ref.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">dataset.Dataset</span></code></a> is the main object you will work with
-directly. Dataset is derived from Python’s <code class="docutils literal notranslate"><span class="pre">dict</span></code>, so it inherits (and
-overrides some of) the methods of <code class="docutils literal notranslate"><span class="pre">dict</span></code>. In other words, it is a collection
-of key:value pairs, where the key is the DICOM (group,element) tag (as a
-Tag object, described below), and the value is a DataElement instance (also
-described below).</p>
+<p><a class="reference internal" href="api_ref.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">dataset.Dataset</span></code></a> is the main object you will work with directly.
+Dataset wraps a dictionary, where the key is the DICOM (group,element)
+tag (as a Tag object, described below), and the value is a DataElement instance
+(also described below). It implements most of the methods of <code class="docutils literal notranslate"><span class="pre">dict</span></code>, so
+that it mostly behaves like the wrapped <code class="docutils literal notranslate"><span class="pre">dict</span></code>. This allows direct access
+to the data elements via the the tags, as shown below.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The iterator of a <code class="docutils literal notranslate"><span class="pre">DataSet</span></code> yields <code class="docutils literal notranslate"><span class="pre">DataElement</span></code> values, e.g. the
+values of the dictionary, as opposed to the keys yielded by a <code class="docutils literal notranslate"><span class="pre">dict</span></code>
+iterator.</p>
+</div>
 <p>A dataset could be created directly, but you will usually get one by reading
 an existing DICOM file:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pydicom</span>
@@ -225,8 +236,8 @@ an existing DICOM file:</p>
 </pre></div>
 </div>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">You can also view DICOM files in a collapsible tree using
+<p class="admonition-title">Note</p>
+<p>You can also view DICOM files in a collapsible tree using
 the example program <a class="reference external" href="https://github.com/pydicom/contrib-pydicom/blob/master/plotting-visualization/dcm_qt_tree.py">dcm_qt_tree.py</a>.</p>
 </div>
 <p>You can access specific data elements by name (DICOM ‘keyword’) or by DICOM tag
@@ -239,6 +250,13 @@ number:</p>
 </div>
 <p>In the latter case (using the tag number directly) a DataElement instance is
 returned, so the <code class="docutils literal notranslate"><span class="pre">.value</span></code> must be used to get the value.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In pydicom, private data elements are displayed with square brackets
+around the name (if the name is known to pydicom).  These are shown for convenience only;
+the descriptive name in brackets cannot be used to retrieve data elements.
+See details in <a class="reference internal" href="private_data_elements.html"><span class="doc">Private Data Elements</span></a>.</p>
+</div>
 <p>You can also set values by name (DICOM keyword) or tag number:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">PatientID</span> <span class="o">=</span> <span class="s2">&quot;12345&quot;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">SeriesNumber</span> <span class="o">=</span> <span class="mi">5</span>
@@ -252,22 +270,21 @@ that key if it exists.</p>
 <p>See <a class="reference internal" href="auto_examples/metadata_processing/plot_anonymize.html#sphx-glr-auto-examples-metadata-processing-plot-anonymize-py"><span class="std std-ref">Anonymize DICOM data</span></a> for a
 usage example of data elements removal and assignation.</p>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
+<p class="admonition-title">Note</p>
 <p>To understand using <code class="xref py py-class docutils literal notranslate"><span class="pre">sequence.Sequences</span></code> in pydicom, please refer to
 this object model:
-<a class="reference internal" href="api_ref.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">dataset.Dataset</span></code></a> (derived from Python’s <code class="docutils literal notranslate"><span class="pre">dict</span></code>)</p>
-<blockquote class="last">
-<div><dl class="docutils">
-<dt>—&gt; contains DataElement instances</dt>
-<dd><blockquote class="first">
+<a class="reference internal" href="api_ref.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">dataset.Dataset</span></code></a> (wraps a Python <code class="docutils literal notranslate"><span class="pre">dict</span></code>)</p>
+<blockquote>
+<div><dl>
+<dt>—&gt; contains DataElement instances</dt><dd><blockquote>
 <div><p>–&gt; the value of the data element can be one of:</p>
 <ul class="simple">
-<li>a regular value like a number, string, etc.</li>
-<li>a list of regular values (e.g. a 3-D coordinate)</li>
-<li>a Sequence instance</li>
+<li><p>a regular value like a number, string, etc.</p></li>
+<li><p>a list of regular values (e.g. a 3-D coordinate)</p></li>
+<li><p>a Sequence instance</p></li>
 </ul>
 </div></blockquote>
-<p class="last">–&gt; a Sequence is a list of <a class="reference internal" href="api_ref.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">dataset.Dataset</span></code></a> (and so we come full circle)</p>
+<p>–&gt; a Sequence is a list of <a class="reference internal" href="api_ref.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">dataset.Dataset</span></code></a> (and so we come full circle)</p>
 </dd>
 </dl>
 </div></blockquote>
@@ -277,21 +294,22 @@ the sequence are referenced by number, beginning at index 0 as per Python
 convention:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">BeamSequence</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">BeamName</span>
 <span class="go">&#39;Field 1&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Or, set an intermediate variable to a dataset in the list</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">beam1</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">BeamSequence</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># First dataset in the sequence</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">beam1</span><span class="o">.</span><span class="n">BeamName</span>
+<span class="go">&#39;Field 1&#39;</span>
 </pre></div>
 </div>
 <p>See <a class="reference internal" href="auto_examples/metadata_processing/plot_sequences.html#sphx-glr-auto-examples-metadata-processing-plot-sequences-py"><span class="std std-ref">Working with sequences</span></a>.</p>
 <p>Using DICOM keywords is the recommended way to access data elements, but you
 can also use the tag numbers directly, such as:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Same thing with tag numbers:</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Same thing with tag numbers - much harder to read:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Really should only be used if DICOM keyword not in pydicom dictionary</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">[</span><span class="mh">0x300a</span><span class="p">,</span><span class="mh">0xb0</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mh">0x300a</span><span class="p">,</span><span class="mh">0xc2</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
 <span class="go">&#39;Field 1&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># yet another way, using another variable</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">beam1</span><span class="o">=</span><span class="n">ds</span><span class="p">[</span><span class="mh">0x300a</span><span class="p">,</span><span class="mh">0xb0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">beam1</span><span class="o">.</span><span class="n">BeamName</span><span class="p">,</span> <span class="n">beam1</span><span class="p">[</span><span class="mh">0x300a</span><span class="p">,</span><span class="mh">0xc2</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
-<span class="go">(&#39;Field 1&#39;, &#39;Field 1&#39;)</span>
 </pre></div>
 </div>
-<p>If you don’t remember or know the exact tag name, <a class="reference internal" href="api_ref.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">dataset.Dataset</span></code></a>
+<p>If you don’t remember or know the exact tag name (aka DICOM keyword), <a class="reference internal" href="api_ref.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">dataset.Dataset</span></code></a>
 provides a handy <a class="reference internal" href="api_ref.html#pydicom.dataset.Dataset.dir" title="pydicom.dataset.Dataset.dir"><code class="xref py py-func docutils literal notranslate"><span class="pre">dataset.Dataset.dir()</span></code></a> method, useful during interactive
 sessions at the Python prompt:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">dir</span><span class="p">(</span><span class="s2">&quot;pat&quot;</span><span class="p">)</span>
@@ -301,13 +319,16 @@ sessions at the Python prompt:</p>
 <p><a class="reference internal" href="api_ref.html#pydicom.dataset.Dataset.dir" title="pydicom.dataset.Dataset.dir"><code class="xref py py-func docutils literal notranslate"><span class="pre">dataset.Dataset.dir()</span></code></a> will return any DICOM tag names in the dataset that
 have the specified string anywhere in the name (case insensitive).</p>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">Calling <a class="reference internal" href="api_ref.html#pydicom.dataset.Dataset.dir" title="pydicom.dataset.Dataset.dir"><code class="xref py py-func docutils literal notranslate"><span class="pre">dataset.Dataset.dir()</span></code></a> with no string will list all tag names
+<p class="admonition-title">Note</p>
+<p>Calling <a class="reference internal" href="api_ref.html#pydicom.dataset.Dataset.dir" title="pydicom.dataset.Dataset.dir"><code class="xref py py-func docutils literal notranslate"><span class="pre">dataset.Dataset.dir()</span></code></a> with no string will list all tag names
 available in the dataset.</p>
 </div>
 <p>You can also see all the names that pydicom knows about by viewing the
-<code class="docutils literal notranslate"><span class="pre">_dicom_dict.py</span></code> file. You could modify that file to add tags that pydicom
-doesn’t already know about.</p>
+<code class="docutils literal notranslate"><span class="pre">_dicom_dict.py</span></code> file. It should not normally be necessary, but you can add
+your own entries to the DICOM dictionary at run time using <a class="reference internal" href="api_ref.html#pydicom.datadict.add_dict_entries" title="pydicom.datadict.add_dict_entries"><code class="xref py py-func docutils literal notranslate"><span class="pre">datadict.add_dict_entries()</span></code></a>
+or <a class="reference internal" href="api_ref.html#pydicom.datadict.add_dict_entry" title="pydicom.datadict.add_dict_entry"><code class="xref py py-func docutils literal notranslate"><span class="pre">datadict.add_dict_entry()</span></code></a>.  Similarly, you can add private data elements
+to the private dictionary using <a class="reference internal" href="api_ref.html#pydicom.datadict.add_private_dict_entries" title="pydicom.datadict.add_private_dict_entries"><code class="xref py py-func docutils literal notranslate"><span class="pre">datadict.add_private_dict_entries()</span></code></a> or
+<a class="reference internal" href="api_ref.html#pydicom.datadict.add_private_dict_entries" title="pydicom.datadict.add_private_dict_entries"><code class="xref py py-func docutils literal notranslate"><span class="pre">datadict.add_private_dict_entries()</span></code></a>.</p>
 <p>Under the hood, <a class="reference internal" href="api_ref.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">dataset.Dataset</span></code></a> stores a DataElement object for each
 item, but when accessed by name (e.g. <code class="docutils literal notranslate"><span class="pre">ds.PatientName</span></code>) only the <code class="docutils literal notranslate"><span class="pre">value</span></code> of
 that <a class="reference internal" href="api_ref.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement"><code class="xref py py-class docutils literal notranslate"><span class="pre">dataelem.DataElement</span></code></a> is returned. If you need the whole
@@ -331,7 +352,7 @@ use the <cite>in</cite> keyword:</p>
 <span class="go">True</span>
 </pre></div>
 </div>
-<p>To remove a data element from the dataset,  use <code class="xref py py-func docutils literal notranslate"><span class="pre">dataset.Dataset.del()</span></code>:</p>
+<p>To remove a data element from the dataset,  use python’s <cite>del</cite> statement:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">del</span> <span class="n">ds</span><span class="o">.</span><span class="n">SoftwareVersions</span>   <span class="c1"># or del ds[0x0018, 0x1020]</span>
 </pre></div>
 </div>
@@ -342,7 +363,7 @@ use the <cite>in</cite> keyword:</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pixel_bytes</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span>
 </pre></div>
 </div>
-<p>but to work with them in a more intelligent way, use <code class="docutils literal notranslate"><span class="pre">pixel_array</span></code>
+<p>but to work with them in a more intelligent way, use <code class="xref py py-func docutils literal notranslate"><span class="pre">Dataset.pixel_array()</span></code>
 (requires the <a class="reference external" href="http://numpy.org">NumPy library</a>):</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pix</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">pixel_array</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pix</span> 
@@ -365,43 +386,44 @@ code, but is used extensively by
 which stores the following things:</p>
 <blockquote>
 <div><ul class="simple">
-<li>tag – a DICOM tag (as a Tag object)</li>
-<li>VR – DICOM value representation – various number and string formats, etc</li>
-<li>VM – value multiplicity. This is 1 for most DICOM tags, but
+<li><p>tag – a DICOM tag (as a Tag object)</p></li>
+<li><p>VR – DICOM value representation – various number and string formats, etc</p></li>
+<li><p>VM – value multiplicity. This is 1 for most DICOM tags, but
 can be multiple, e.g. for coordinates. You do not have to specify this,
-the DataElement class keeps track of it based on value.</li>
-<li>value – the actual value. A regular value like a number or string
-(or list of them), or a Sequence.</li>
+the DataElement class keeps track of it based on value.</p></li>
+<li><p>value – the actual value. A regular value like a number or string
+(or list of them), or a Sequence.</p></li>
 </ul>
 </div></blockquote>
 </div>
 <div class="section" id="tag">
 <h2>Tag<a class="headerlink" href="#tag" title="Permalink to this headline">¶</a></h2>
+<p>Tag is not generally used directly in user code, as Tags are automatically created
+when you assign or read data elements using the DICOM keywords as illustrated in
+sections above.</p>
 <p>The Tag class is derived from Python’s <code class="docutils literal notranslate"><span class="pre">int</span></code>, so in effect, it is just
 a number with some extra behaviour:</p>
 <blockquote>
 <div><ul>
-<li><p class="first">Tag enforces that the DICOM tag fits in the expected 4-byte (group,element)</p>
-</li>
-<li><p class="first">A Tag instance can be created from an int or from a tuple containing
-the (group,element) separately:</p>
+<li><p>Tag enforces that the DICOM tag fits in the expected 4-byte (group,element)</p></li>
+<li><p>A Tag instance can be created from an int or a tuple containing
+the (group,element), or from the DICOM keyword:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.tag</span> <span class="k">import</span> <span class="n">Tag</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">t1</span><span class="o">=</span><span class="n">Tag</span><span class="p">(</span><span class="mh">0x00100010</span><span class="p">)</span> <span class="c1"># all of these are equivalent</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">t2</span><span class="o">=</span><span class="n">Tag</span><span class="p">(</span><span class="mh">0x10</span><span class="p">,</span><span class="mh">0x10</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">t3</span><span class="o">=</span><span class="n">Tag</span><span class="p">((</span><span class="mh">0x10</span><span class="p">,</span> <span class="mh">0x10</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t1</span> <span class="o">=</span> <span class="n">Tag</span><span class="p">(</span><span class="mh">0x00100010</span><span class="p">)</span> <span class="c1"># all of these are equivalent</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t2</span> <span class="o">=</span> <span class="n">Tag</span><span class="p">(</span><span class="mh">0x10</span><span class="p">,</span><span class="mh">0x10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t3</span> <span class="o">=</span> <span class="n">Tag</span><span class="p">((</span><span class="mh">0x10</span><span class="p">,</span> <span class="mh">0x10</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t4</span> <span class="o">=</span> <span class="n">Tag</span><span class="p">(</span><span class="s2">&quot;PatientName&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">t1</span>
 <span class="go">(0010, 0010)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">t1</span><span class="o">==</span><span class="n">t2</span><span class="p">,</span> <span class="n">t1</span><span class="o">==</span><span class="n">t3</span>
-<span class="go">(True, True)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t1</span><span class="o">==</span><span class="n">t2</span><span class="p">,</span> <span class="n">t1</span><span class="o">==</span><span class="n">t3</span><span class="p">,</span> <span class="n">t1</span><span class="o">==</span><span class="n">t4</span>
+<span class="go">(True, True, True)</span>
 </pre></div>
 </div>
 </li>
-<li><p class="first">Tag has properties group and element (or elem) to return the group and
-element portions</p>
-</li>
-<li><p class="first">The <code class="docutils literal notranslate"><span class="pre">is_private</span></code> property checks whether the tag represents
-a private tag (i.e. if group number is odd).</p>
-</li>
+<li><p>Tag has properties group and element (or elem) to return the group and
+element portions</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">is_private</span></code> property checks whether the tag represents
+a private tag (i.e. if group number is odd).</p></li>
 </ul>
 </div></blockquote>
 </div>
@@ -410,6 +432,8 @@ a private tag (i.e. if group number is odd).</p>
 <p>Sequence is derived from Python’s <code class="docutils literal notranslate"><span class="pre">list</span></code>. The only added functionality is
 to make string representations prettier. Otherwise all the usual methods of
 <code class="docutils literal notranslate"><span class="pre">list</span></code> like item selection, append, etc. are available.</p>
+<p>For examples of accessing data nested in sequences, see
+<a class="reference internal" href="auto_examples/metadata_processing/plot_sequences.html#sphx-glr-auto-examples-metadata-processing-plot-sequences-py"><span class="std std-ref">Working with sequences</span></a>.</p>
 </div>
 </div>
 
@@ -424,7 +448,7 @@ to make string representations prettier. Otherwise all the usual methods of
         <a href="writing_files.html" class="btn btn-neutral float-right" title="Writing DICOM Files" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="transition_to_pydicom1.html" class="btn btn-neutral" title="Transition to pydicom 1.x" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="warn_transition_to_pydicom1.html" class="btn btn-neutral float-left" title="For users of pydicom &lt; 1.0" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -433,7 +457,7 @@ to make string representations prettier. Otherwise all the usual methods of
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2008-2018, Darcy Mason and pydicom contributors.
+        &copy; Copyright 2008-2019, Darcy Mason and pydicom contributors
 
     </p>
   </div>
@@ -450,33 +474,16 @@ to make string representations prettier. Otherwise all the usual methods of
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'1.2.0rc1',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-  
-
-  <script type="text/javascript" src="_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

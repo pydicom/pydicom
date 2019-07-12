@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pydicom.uid &mdash; pydicom 1.2.0rc1 documentation</title>
+  <title>pydicom.uid &mdash; pydicom 1.3.0 documentation</title>
   
 
   
@@ -19,34 +19,36 @@
   
 
   
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
-
-  
-  <script src="../../_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -63,7 +65,7 @@
             
             
               <div class="version">
-                1.2.0rc1
+                1.3.0
               </div>
             
           
@@ -178,7 +180,6 @@
 <span class="kn">import</span> <span class="nn">random</span>
 <span class="kn">import</span> <span class="nn">hashlib</span>
 <span class="kn">import</span> <span class="nn">re</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
 
 <span class="kn">from</span> <span class="nn">pydicom._uid_dict</span> <span class="k">import</span> <span class="n">UID_dictionary</span>
 <span class="kn">from</span> <span class="nn">pydicom</span> <span class="k">import</span> <span class="n">compat</span>
@@ -380,11 +381,6 @@
 <span class="n">JPEG2000MultiComponent</span> <span class="o">=</span> <span class="n">UID</span><span class="p">(</span><span class="s1">&#39;1.2.840.10008.1.2.4.93&#39;</span><span class="p">)</span>
 <span class="n">RLELossless</span> <span class="o">=</span> <span class="n">UID</span><span class="p">(</span><span class="s1">&#39;1.2.840.10008.1.2.5&#39;</span><span class="p">)</span>
 
-<span class="c1"># Deprecated, to be removed in v1.3</span>
-<span class="n">JPEGBaseLineLossy8bit</span> <span class="o">=</span> <span class="n">JPEGBaseline</span>
-<span class="n">JPEGBaseLineLossy12bit</span> <span class="o">=</span> <span class="n">JPEGExtended</span>
-<span class="n">JPEG2000Lossy</span> <span class="o">=</span> <span class="n">JPEG2000</span>
-
 <span class="n">UncompressedPixelTransferSyntaxes</span> <span class="o">=</span> <span class="p">[</span>
     <span class="n">ExplicitVRLittleEndian</span><span class="p">,</span>
     <span class="n">ImplicitVRLittleEndian</span><span class="p">,</span>
@@ -428,19 +424,19 @@
 <span class="sd">    ----------</span>
 <span class="sd">    prefix : str or None</span>
 <span class="sd">        The UID prefix to use when creating the UID. Default is the pydicom</span>
-<span class="sd">        root UID &#39;1.2.826.0.1.3680043.8.498.&#39;. If None then a value of &#39;2.25.&#39;</span>
-<span class="sd">        will be used (as described on `David Clunie&#39;s website</span>
-<span class="sd">        &lt;http://www.dclunie.com/medical-image-faq/html/part2.html#UID&gt;`_).</span>
+<span class="sd">        root UID &#39;1.2.826.0.1.3680043.8.498.&#39;. If None then a prefix of &#39;2.25.&#39;</span>
+<span class="sd">        will be used with the integer form of a UUID generated using the</span>
+<span class="sd">        UUID4 algorithm.</span>
 <span class="sd">    entropy_srcs : list of str or None</span>
-<span class="sd">        If a list of str, the prefix will be appended with a SHA512 hash of the</span>
-<span class="sd">        list which means the result is deterministic and should make the</span>
-<span class="sd">        original data unrecoverable. If None random data will be used</span>
-<span class="sd">        (default).</span>
+<span class="sd">        If `prefix` is not None, then the prefix will be appended with a</span>
+<span class="sd">        SHA512 hash of the list which means the result is deterministic and</span>
+<span class="sd">        should make the original data unrecoverable. If None random data will</span>
+<span class="sd">        be used (default).</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    pydicom.uid.UID</span>
-<span class="sd">        A 64 character DICOM UID.</span>
+<span class="sd">        A DICOM UID of up to 64 characters.</span>
 
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
@@ -453,17 +449,17 @@
 <span class="sd">    &gt;&gt;&gt; generate_uid()</span>
 <span class="sd">    1.2.826.0.1.3680043.8.498.22463838056059845879389038257786771680</span>
 <span class="sd">    &gt;&gt;&gt; generate_uid(prefix=None)</span>
-<span class="sd">    2.25.12586835699909622925962004639368649121731805922235633382942</span>
+<span class="sd">    2.25.167161297070865690102504091919570542144</span>
 <span class="sd">    &gt;&gt;&gt; generate_uid(entropy_srcs=[&#39;lorem&#39;, &#39;ipsum&#39;])</span>
 <span class="sd">    1.2.826.0.1.3680043.8.498.87507166259346337659265156363895084463</span>
 <span class="sd">    &gt;&gt;&gt; generate_uid(entropy_srcs=[&#39;lorem&#39;, &#39;ipsum&#39;])</span>
 <span class="sd">    1.2.826.0.1.3680043.8.498.87507166259346337659265156363895084463</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">max_uid_len</span> <span class="o">=</span> <span class="mi">64</span>
-
     <span class="k">if</span> <span class="n">prefix</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">prefix</span> <span class="o">=</span> <span class="s1">&#39;2.25.&#39;</span>
+        <span class="c1"># UUID -&gt; as 128-bit int -&gt; max 39 characters long</span>
+        <span class="k">return</span> <span class="n">UID</span><span class="p">(</span><span class="s1">&#39;2.25.</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">int</span><span class="p">))</span>
 
+    <span class="n">max_uid_len</span> <span class="o">=</span> <span class="mi">64</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">max_uid_len</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The prefix must be less than 63 chars&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">RE_VALID_UID_PREFIX</span><span class="p">,</span> <span class="n">prefix</span><span class="p">):</span>
@@ -495,7 +491,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2008-2018, Darcy Mason and pydicom contributors.
+        &copy; Copyright 2008-2019, Darcy Mason and pydicom contributors
 
     </p>
   </div>
@@ -512,33 +508,16 @@
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../',
-            VERSION:'1.2.0rc1',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-  
-
-  <script type="text/javascript" src="../../_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

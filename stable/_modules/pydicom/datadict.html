@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pydicom.datadict &mdash; pydicom 1.2.0rc1 documentation</title>
+  <title>pydicom.datadict &mdash; pydicom 1.3.0 documentation</title>
   
 
   
@@ -19,34 +19,36 @@
   
 
   
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
-
-  
-  <script src="../../_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -63,7 +65,7 @@
             
             
               <div class="version">
-                1.2.0rc1
+                1.3.0
               </div>
             
           
@@ -210,7 +212,7 @@
 
 <span class="sd">    Notes</span>
 <span class="sd">    ----</span>
-<span class="sd">    Dose not permanently update the dictionary,</span>
+<span class="sd">    Does not permanently update the dictionary,</span>
 <span class="sd">    but only during run-time. Will replace an existing</span>
 <span class="sd">    entry if the tag already exists in the dictionary.</span>
 
@@ -229,6 +231,11 @@
 <span class="sd">        Usually leave as blank string (default).</span>
 <span class="sd">        Set to &#39;Retired&#39; if is a retired data element.</span>
 
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If the tag is a private tag.</span>
+
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
 <span class="sd">    pydicom.examples.add_dict_entry</span>
@@ -239,8 +246,8 @@
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 <span class="sd">    &gt;&gt;&gt; from pydicom import Dataset</span>
-<span class="sd">    &gt;&gt;&gt; add_dict_entry(0x10011001, &quot;UL&quot;, &quot;TestOne&quot;, &quot;Test One&quot;)</span>
-<span class="sd">    &gt;&gt;&gt; add_dict_entry(0x10011002, &quot;DS&quot;, &quot;TestTwo&quot;, &quot;Test Two&quot;, VM=&#39;3&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; add_dict_entry(0x10021001, &quot;UL&quot;, &quot;TestOne&quot;, &quot;Test One&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; add_dict_entry(0x10021002, &quot;DS&quot;, &quot;TestTwo&quot;, &quot;Test Two&quot;, VM=&#39;3&#39;)</span>
 <span class="sd">    &gt;&gt;&gt; ds = Dataset()</span>
 <span class="sd">    &gt;&gt;&gt; ds.TestOne = &#39;test&#39;</span>
 <span class="sd">    &gt;&gt;&gt; ds.TestTwo = [&#39;1&#39;, &#39;2&#39;, &#39;3&#39;]</span>
@@ -251,7 +258,7 @@
 
 
 <div class="viewcode-block" id="add_dict_entries"><a class="viewcode-back" href="../../api_ref.html#pydicom.datadict.add_dict_entries">[docs]</a><span class="k">def</span> <span class="nf">add_dict_entries</span><span class="p">(</span><span class="n">new_entries_dict</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Update pydicom&#39;s DICOM dictionary with new entries.</span>
+    <span class="sd">&quot;&quot;&quot;Update pydicom&#39;s DICOM dictionary with new non-private entries.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -259,6 +266,11 @@
 <span class="sd">        Dictionary of form:</span>
 <span class="sd">        {tag: (VR, VM, description, is_retired, keyword),...}</span>
 <span class="sd">        where parameters are as described in add_dict_entry</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If one of the entries is a private tag.</span>
 
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
@@ -269,18 +281,23 @@
 <span class="sd">    --------</span>
 <span class="sd">    &gt;&gt;&gt; from pydicom import Dataset</span>
 <span class="sd">    &gt;&gt;&gt; new_dict_items = {</span>
-<span class="sd">    ...        0x10011001: (&#39;UL&#39;, &#39;1&#39;, &quot;Test One&quot;, &#39;&#39;, &#39;TestOne&#39;),</span>
-<span class="sd">    ...        0x10011002: (&#39;DS&#39;, &#39;3&#39;, &quot;Test Two&quot;, &#39;&#39;, &#39;TestTwo&#39;),</span>
+<span class="sd">    ...        0x10021001: (&#39;UL&#39;, &#39;1&#39;, &quot;Test One&quot;, &#39;&#39;, &#39;TestOne&#39;),</span>
+<span class="sd">    ...        0x10021002: (&#39;DS&#39;, &#39;3&#39;, &quot;Test Two&quot;, &#39;&#39;, &#39;TestTwo&#39;),</span>
 <span class="sd">    ... }</span>
 <span class="sd">    &gt;&gt;&gt; add_dict_entries(new_dict_items)</span>
 <span class="sd">    &gt;&gt;&gt; ds = Dataset()</span>
 <span class="sd">    &gt;&gt;&gt; ds.TestOne = &#39;test&#39;</span>
 <span class="sd">    &gt;&gt;&gt; ds.TestTwo = [&#39;1&#39;, &#39;2&#39;, &#39;3&#39;]</span>
 
-<span class="sd">    &gt;&gt;&gt; add_dict_entry(0x10011001, &quot;UL&quot;, &quot;TestOne&quot;, &quot;Test One&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; add_dict_entry(0x10021001, &quot;UL&quot;, &quot;TestOne&quot;, &quot;Test One&quot;)</span>
 <span class="sd">    &gt;&gt;&gt; ds = Dataset()</span>
 <span class="sd">    &gt;&gt;&gt; ds.TestOne = &#39;test&#39;</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="nb">any</span><span class="p">([</span><span class="n">BaseTag</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span><span class="o">.</span><span class="n">is_private</span> <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">new_entries_dict</span><span class="p">]):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s1">&#39;Private tags cannot be added using &quot;add_dict_entries&quot; - &#39;</span>
+            <span class="s1">&#39;use &quot;add_private_dict_entries&quot; instead&#39;</span><span class="p">)</span>
 
     <span class="c1"># Update the dictionary itself</span>
     <span class="n">DicomDictionary</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">new_entries_dict</span><span class="p">)</span>
@@ -289,6 +306,84 @@
     <span class="n">new_names_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">([(</span><span class="n">val</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">tag</span><span class="p">)</span>
                            <span class="k">for</span> <span class="n">tag</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">new_entries_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span>
     <span class="n">keyword_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">new_names_dict</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="add_private_dict_entry"><a class="viewcode-back" href="../../api_ref.html#pydicom.datadict.add_private_dict_entry">[docs]</a><span class="k">def</span> <span class="nf">add_private_dict_entry</span><span class="p">(</span><span class="n">private_creator</span><span class="p">,</span> <span class="n">tag</span><span class="p">,</span> <span class="n">VR</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="n">VM</span><span class="o">=</span><span class="s1">&#39;1&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Update pydicom&#39;s private DICOM tag dictionary with a new entry.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    ----</span>
+<span class="sd">    Behaves like `add_dict_entry`, only for a private tag entry.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    private_creator : str</span>
+<span class="sd">        The private creator for the new entry.</span>
+<span class="sd">    tag : int</span>
+<span class="sd">        The tag number for the new dictionary entry. Note that the</span>
+<span class="sd">        2 high bytes of the element part of the tag are ignored.</span>
+<span class="sd">    VR : str</span>
+<span class="sd">        DICOM value representation</span>
+<span class="sd">    description : str</span>
+<span class="sd">        The descriptive name used in printing the entry.</span>
+<span class="sd">    VM : str, optional</span>
+<span class="sd">        DICOM value multiplicity. If not specified, then &#39;1&#39; is used.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If the tag is a non-private tag.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    add_private_dict_entries</span>
+<span class="sd">        Update multiple values at once.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">new_dict_val</span> <span class="o">=</span> <span class="p">(</span><span class="n">VR</span><span class="p">,</span> <span class="n">VM</span><span class="p">,</span> <span class="n">description</span><span class="p">)</span>
+    <span class="n">add_private_dict_entries</span><span class="p">(</span><span class="n">private_creator</span><span class="p">,</span> <span class="p">{</span><span class="n">tag</span><span class="p">:</span> <span class="n">new_dict_val</span><span class="p">})</span></div>
+
+
+<div class="viewcode-block" id="add_private_dict_entries"><a class="viewcode-back" href="../../api_ref.html#pydicom.datadict.add_private_dict_entries">[docs]</a><span class="k">def</span> <span class="nf">add_private_dict_entries</span><span class="p">(</span><span class="n">private_creator</span><span class="p">,</span> <span class="n">new_entries_dict</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Update pydicom&#39;s private DICOM tag dictionary with new entries.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    private_creator: str</span>
+<span class="sd">        The private creator for all entries in new_entries_dict</span>
+<span class="sd">    new_entries_dict : dict</span>
+<span class="sd">        Dictionary of form:</span>
+<span class="sd">        {tag: (VR, VM, description),...}</span>
+<span class="sd">        where parameters are as described in add_private_dict_entry</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If one of the entries is a non-private tag.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    add_private_dict_entry</span>
+<span class="sd">        Function to add a single entry to the private tag dictionary.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; new_dict_items = {</span>
+<span class="sd">    ...        0x00410001: (&#39;UL&#39;, &#39;1&#39;, &quot;Test One&quot;),</span>
+<span class="sd">    ...        0x00410002: (&#39;DS&#39;, &#39;3&#39;, &quot;Test Two&quot;, &#39;3&#39;),</span>
+<span class="sd">    ... }</span>
+<span class="sd">    &gt;&gt;&gt; add_private_dict_entries(&quot;ACME LTD 1.2&quot;, new_dict_items)</span>
+<span class="sd">    &gt;&gt;&gt; add_private_dict_entry(&quot;ACME LTD 1.3&quot;, 0x00410001, &quot;US&quot;, &quot;Test Three&quot;)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">([</span><span class="n">BaseTag</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span><span class="o">.</span><span class="n">is_private</span> <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">new_entries_dict</span><span class="p">]):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s1">&#39;Non-private tags cannot be added using &quot;add_private_dict_entries&quot;&#39;</span>
+            <span class="s1">&#39; - use &quot;add_dict_entries&quot; instead&#39;</span><span class="p">)</span>
+
+    <span class="n">new_entries</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;</span><span class="si">{:04x}</span><span class="s1">xx</span><span class="si">{:02x}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tag</span> <span class="o">&gt;&gt;</span> <span class="mi">16</span><span class="p">,</span> <span class="n">tag</span> <span class="o">&amp;</span> <span class="mh">0xff</span><span class="p">):</span> <span class="n">value</span>
+                   <span class="k">for</span> <span class="n">tag</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">new_entries_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+    <span class="n">private_dictionaries</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span>
+        <span class="n">private_creator</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">new_entries</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="get_entry"><a class="viewcode-back" href="../../api_ref.html#pydicom.datadict.get_entry">[docs]</a><span class="k">def</span> <span class="nf">get_entry</span><span class="p">(</span><span class="n">tag</span><span class="p">):</span>
@@ -463,7 +558,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2008-2018, Darcy Mason and pydicom contributors.
+        &copy; Copyright 2008-2019, Darcy Mason and pydicom contributors
 
     </p>
   </div>
@@ -480,33 +575,16 @@
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../',
-            VERSION:'1.2.0rc1',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-  
-
-  <script type="text/javascript" src="../../_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

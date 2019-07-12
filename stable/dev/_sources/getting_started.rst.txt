@@ -77,7 +77,7 @@ Prerequisites
    * gdcm
    * jpeg_ls
    * jpeg2000
-   * pytest (if running pydicom's test suite)
+   * pytest (if running pydicom's test suite). pytest<5 if in Python 2.
 
 
 Installing pydicom
@@ -139,6 +139,8 @@ pydicom's setup.py file and::
 
 This will install `pytest <https://pytest.org>`_ if it is not 
 already installed.
+
+In v1.3 run under Python 2, if pytest is not found, please `python2 -m pip install "pytest<5"`
   
 Or, in linux you can also use::
 
