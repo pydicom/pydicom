@@ -1,0 +1,9 @@
+Version 1.4.0
+=================================
+
+Changelog
+---------
+
+Fixes
+.....
+* Fixed handling of binary values in json encoding (:issue:`887`)

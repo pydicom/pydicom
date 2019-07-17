@@ -212,7 +212,7 @@ class DataElement(object):
                 raise TypeError(fmt.format(value_key, tag))
         elif value_key in {'InlineBinary', 'BulkDataURI'}:
             if isinstance(value, list):
-                fmt = '"{}" of data element "{}" must be a string.'
+                fmt = '"{}" of data element "{}" must be a bytes-like object.'
                 raise TypeError(fmt.format(value_key, tag))
         if vr == 'SQ':
             elem_value = []
@@ -271,7 +271,7 @@ class DataElement(object):
                             'no bulk data URI handler provided for retrieval '
                             'of value of data element "{}"'.format(tag)
                         )
-                        elem_value = ''
+                        elem_value = b''
                     else:
                         elem_value = bulk_data_uri_handler(value)
                 else:
@@ -281,7 +281,7 @@ class DataElement(object):
                         elem_value = value
             else:
                 elem_value = value
-        if not value:
+        if elem_value is None:
             logger.warning('missing value for data element "{}"'.format(tag))
             elem_value = ''
 

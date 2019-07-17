@@ -344,11 +344,9 @@ class Dataset(dict):
     indent_chars = "   "
 
     # TODO: this the correct list?
-    _BINARY_VR_VALUES = ['OW', 'OB', 'OD', 'OF', 'OL', 'UN',
-                         'OW/OB', 'OW or OB', 'OB or OW', 'US or SS']
-
-    _VRs_TO_BE_FLOATS = ["DS", "FL", "FD", ]
-    _VRs_TO_BE_INTS = ["IS", "SL", "SS", "UL", "US", ]
+    _BINARY_VR_VALUES = ['OW', 'OB', 'OD', 'OF', 'OL', 'UN', 'OB or OW']
+    _VRs_TO_BE_FLOATS = ['DS', 'FL', 'FD', ]
+    _VRs_TO_BE_INTS = ['IS', 'SL', 'SS', 'UL', 'US', 'US or SS']
 
     # Order of keys is significant!
     _JSON_VALUE_KEYS = ('Value', 'BulkDataURI', 'InlineBinary', )
@@ -1886,7 +1884,7 @@ class Dataset(dict):
         json_element = {'vr': data_element.VR, }
         if data_element.VR in Dataset._BINARY_VR_VALUES:
             if data_element.value is not None:
-                binary_value = data_element.value.encode('utf-8')
+                binary_value = data_element.value
                 encoded_value = base64.b64encode(binary_value).decode('utf-8')
                 if len(encoded_value) > bulk_data_threshold:
                     if bulk_data_element_handler is None:
