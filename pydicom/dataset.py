@@ -1916,18 +1916,21 @@ class Dataset(dict):
             ]
             json_element['Value'] = value
         elif data_element.VR == 'PN':
-            if data_element.value is not None:
-                if len(data_element.value.components) > 2:
+            elem_value = data_element.value
+            if elem_value is not None:
+                if compat.in_py2:
+                    elem_value = PersonNameUnicode(elem_value, 'UTF8')
+                if len(elem_value.components) > 2:
                     json_element['Value'] = [
-                        {'Phonetic': data_element.value.components[2], },
+                        {'Phonetic': elem_value.components[2], },
                     ]
-                elif len(data_element.value.components) > 1:
+                elif len(elem_value.components) > 1:
                     json_element['Value'] = [
-                        {'Ideographic': data_element.value.components[1], },
+                        {'Ideographic': elem_value.components[1], },
                     ]
                 else:
                     json_element['Value'] = [
-                        {'Alphabetic': data_element.value.components[0], },
+                        {'Alphabetic': elem_value.components[0], },
                     ]
         else:
             if data_element.value is not None:
