@@ -343,8 +343,8 @@ class Dataset(dict):
     """
     indent_chars = "   "
 
-    # TODO: this the correct list?
-    _BINARY_VR_VALUES = ['OW', 'OB', 'OD', 'OF', 'OL', 'UN', 'OB or OW']
+    _BINARY_VR_VALUES = ['OW', 'OB', 'OD', 'OF', 'OL', 'UN',
+                         'OB or OW', 'US or OW', 'US or SS or OW']
     _VRs_TO_BE_FLOATS = ['DS', 'FL', 'FD', ]
     _VRs_TO_BE_INTS = ['IS', 'SL', 'SS', 'UL', 'US', 'US or SS']
 

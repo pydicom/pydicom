@@ -212,8 +212,10 @@ class DataElement(object):
                 raise TypeError(fmt.format(value_key, tag))
         elif value_key in {'InlineBinary', 'BulkDataURI'}:
             if isinstance(value, list):
-                fmt = '"{}" of data element "{}" must be a bytes-like object.'
-                raise TypeError(fmt.format(value_key, tag))
+                fmt = '"{}" of data element "{}" must be a {}.'
+                expected_type = ('string' if value_key == 'BulkDataURI'
+                                 else 'bytes-like object')
+                raise TypeError(fmt.format(value_key, tag, expected_type))
         if vr == 'SQ':
             elem_value = []
             for value_item in value:
@@ -229,7 +231,7 @@ class DataElement(object):
                         if len(unique_value_keys) == 0:
                             logger.debug(
                                 'data element has neither key "{}".'.format(
-                                    '" nor "'.join(supported_keys)
+                                    '" nor "'.join(jsonrep.JSON_VALUE_KEYS)
                                 )
                             )
                             elem = DataElement(tag=tag, value='', VR=vr)
