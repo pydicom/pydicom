@@ -48,3 +48,8 @@ pydicom/.mypy_cache/*
 
 # vscode
 .vscode/*
+
+# Other
+.pytest_cache/*
+pydicom/pydicom.egg-info/*
+pydicom/.eggs

@@ -417,7 +417,7 @@ class Dataset(dict):
 
         data_element = DataElement(tag, VR, value)
         # use data_element.tag since DataElement verified it
-        self._dict[data_element.tag] = data_element
+        self.add(data_element)
 
     def data_element(self, name):
         """Return the DataElement corresponding to the element keyword `name`.
@@ -1627,7 +1627,11 @@ class Dataset(dict):
             raise ValueError("DataElement.tag must match the dictionary key")
 
         data_element = value
-        if tag.is_private:
+        if isinstance(self, FileMetaDataset) and tag.group != 2:
+            msg = ("File Meta Dataset can only hold group 2 items."
+                   "Use regular Dataset or FileDataset")
+            raise KeyError(msg)
+        elif tag.is_private:
             # See PS 3.5-2008 section 7.8.1 (p. 44) for how blocks are reserved
             logger.debug("Setting private tag %r" % tag)
             private_block = tag.elem >> 8
@@ -1637,6 +1641,7 @@ class Dataset(dict):
                     data_element = DataElement_from_raw(
                         data_element, self._character_set)
                 data_element.private_creator = self[private_creator_tag].value
+
         self._dict[tag] = data_element
 
     def _slice_dataset(self, start, stop, step):
@@ -1865,6 +1870,11 @@ class Dataset(dict):
         return dump_handler(json_dataset)
 
     __repr__ = __str__
+
+
+class FileMetaDataset(Dataset):
+    """Subclass of Dataset to hold group 2 data elements"""
+    pass
 
 
 class FileDataset(Dataset):
