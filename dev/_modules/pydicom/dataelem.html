@@ -386,8 +386,10 @@
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">fmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value_key</span><span class="p">,</span> <span class="n">tag</span><span class="p">))</span>
         <span class="k">elif</span> <span class="n">value_key</span> <span class="ow">in</span> <span class="p">{</span><span class="s1">&#39;InlineBinary&#39;</span><span class="p">,</span> <span class="s1">&#39;BulkDataURI&#39;</span><span class="p">}:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-                <span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;&quot;</span><span class="si">{}</span><span class="s1">&quot; of data element &quot;</span><span class="si">{}</span><span class="s1">&quot; must be a string.&#39;</span>
-                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">fmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value_key</span><span class="p">,</span> <span class="n">tag</span><span class="p">))</span>
+                <span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;&quot;</span><span class="si">{}</span><span class="s1">&quot; of data element &quot;</span><span class="si">{}</span><span class="s1">&quot; must be a </span><span class="si">{}</span><span class="s1">.&#39;</span>
+                <span class="n">expected_type</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;string&#39;</span> <span class="k">if</span> <span class="n">value_key</span> <span class="o">==</span> <span class="s1">&#39;BulkDataURI&#39;</span>
+                                 <span class="k">else</span> <span class="s1">&#39;bytes-like object&#39;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">fmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value_key</span><span class="p">,</span> <span class="n">tag</span><span class="p">,</span> <span class="n">expected_type</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">vr</span> <span class="o">==</span> <span class="s1">&#39;SQ&#39;</span><span class="p">:</span>
             <span class="n">elem_value</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">for</span> <span class="n">value_item</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
@@ -403,7 +405,7 @@
                         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_value_keys</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                             <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
                                 <span class="s1">&#39;data element has neither key &quot;</span><span class="si">{}</span><span class="s1">&quot;.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                                    <span class="s1">&#39;&quot; nor &quot;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">supported_keys</span><span class="p">)</span>
+                                    <span class="s1">&#39;&quot; nor &quot;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">jsonrep</span><span class="o">.</span><span class="n">JSON_VALUE_KEYS</span><span class="p">)</span>
                                 <span class="p">)</span>
                             <span class="p">)</span>
                             <span class="n">elem</span> <span class="o">=</span> <span class="n">DataElement</span><span class="p">(</span><span class="n">tag</span><span class="o">=</span><span class="n">tag</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">VR</span><span class="o">=</span><span class="n">vr</span><span class="p">)</span>
@@ -445,7 +447,7 @@
                             <span class="s1">&#39;no bulk data URI handler provided for retrieval &#39;</span>
                             <span class="s1">&#39;of value of data element &quot;</span><span class="si">{}</span><span class="s1">&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span>
                         <span class="p">)</span>
-                        <span class="n">elem_value</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+                        <span class="n">elem_value</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="n">elem_value</span> <span class="o">=</span> <span class="n">bulk_data_uri_handler</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
@@ -455,7 +457,7 @@
                         <span class="n">elem_value</span> <span class="o">=</span> <span class="n">value</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">elem_value</span> <span class="o">=</span> <span class="n">value</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">value</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">elem_value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;missing value for data element &quot;</span><span class="si">{}</span><span class="s1">&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tag</span><span class="p">))</span>
             <span class="n">elem_value</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
 
