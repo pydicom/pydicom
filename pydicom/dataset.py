@@ -730,6 +730,9 @@ class Dataset(dict):
         tag = Tag(tag)
         if tag not in self._dict:  # DICOM DataElement not in the Dataset
             # Try the base class attribute getter (fix for issue 332)
+            if hasattr(self, 'file_meta') and self.file_meta is not None:
+                if tag in self.file_meta:
+                    return self.file_meta[tag].value
             return object.__getattribute__(self, name)
         else:
             data_elem = self[tag]
@@ -801,8 +804,17 @@ class Dataset(dict):
             tag = key
         else:
             tag = Tag(key)
-        data_elem = self._dict[tag]
-
+        try:
+            data_elem = self._dict[tag]
+        except KeyError:
+            if tag.group == 2:
+                if hasattr(self, "file_meta") and tag in self.file_meta:
+                    return self.file_meta[tag]
+                else:
+                    msg = "tag {} not found in Dataset or file_meta"
+                    raise KeyError(msg.format(tag))
+            else:
+                raise  # re-raise KeyError
         if isinstance(data_elem, DataElement):
             return data_elem
         elif isinstance(data_elem, tuple):
