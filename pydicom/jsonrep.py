@@ -2,11 +2,15 @@
 """Methods for converting Datasets and DataElements to/from json"""
 
 # Order of keys is significant!
-JSON_VALUE_KEYS = ('Value', 'BulkDataURI', 'InlineBinary', )
-VRs_TO_BE_FLOATS = ["DS", "FL", "FD", ]
-VRs_TO_BE_INTS = ["IS", "SL", "SS", "UL", "US", ]
+JSON_VALUE_KEYS = ('Value', 'BulkDataURI', 'InlineBinary',)
 
-def _convert_to_python_number(value, vr):
+BINARY_VR_VALUES = ['OW', 'OB', 'OD', 'OF', 'OL', 'UN',
+                    'OB or OW', 'US or OW', 'US or SS or OW']
+VRs_TO_BE_FLOATS = ['DS', 'FL', 'FD', ]
+VRs_TO_BE_INTS = ['IS', 'SL', 'SS', 'UL', 'US', 'US or SS']
+
+
+def convert_to_python_number(value, vr):
     """Makes sure that values are either ints or floats
     based on their value representation.
 
@@ -30,7 +34,7 @@ def _convert_to_python_number(value, vr):
     if vr in VRs_TO_BE_FLOATS:
         number_type = float
     if number_type is not None:
-        if isinstance(value, (list, tuple, )):
+        if isinstance(value, (list, tuple,)):
             value = [number_type(e) for e in value]
         else:
             value = number_type(value)
