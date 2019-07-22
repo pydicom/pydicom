@@ -30,9 +30,16 @@ from pydicom import jsonrep
 import pydicom.valuerep  # don't import DS directly as can be changed by config
 
 from pydicom.valuerep import PersonNameUnicode
+
 if not in_py2:
     from pydicom.valuerep import PersonName3 as PersonNameUnicode
-    PersonName = PersonNameUnicode
+
+PersonName = PersonNameUnicode
+
+BINARY_VR_VALUES = [
+    'US', 'SS', 'UL', 'SL', 'OW', 'OB', 'OL', 'UN',
+    'OB or OW', 'US or OW', 'US or SS or OW', 'FL', 'FD', 'OF', 'OD'
+]
 
 
 def isMultiValue(value):
@@ -70,6 +77,7 @@ class DataElement(object):
     While its possible to create a new :class:`DataElement` directly and add
     it to a :class:`~pydicom.dataset.Dataset`:
 
+    >>> from pydicom import Dataset
     >>> elem = DataElement(0x00100010, 'PN', 'CITIZEN^Joan')
     >>> ds = Dataset()
     >>> ds.add(elem)
@@ -80,6 +88,20 @@ class DataElement(object):
 
     >>> ds = Dataset()
     >>> ds.PatientName = 'CITIZEN^Joan'
+
+    Empty DataElement objects (e.g. with VM = 0) show an empty string as
+    value for text VRs and `None` for non-text (binary) VRs:
+
+    >>> ds = Dataset()
+    >>> ds.PatientName = None
+    >>> ds.PatientName
+    ''
+
+    >>> ds.BitsAllocated = None
+    >>> ds.BitsAllocated
+
+    >>> str(ds.BitsAllocated)
+    'None'
 
     Attributes
     ----------
@@ -183,8 +205,13 @@ class DataElement(object):
             except KeyError:
                 pass
 
-        self.VR = VR  # Note!: you must set VR before setting value
-        if already_converted:
+        self.VR = VR  # Note: you must set VR before setting value
+        if not value and (value is None or value in ([], ())) and VR != 'SQ':
+            if VR in BINARY_VR_VALUES:
+                self._value = None
+            else:
+                self._value = ''
+        elif already_converted:
             self._value = value
         else:
             self.value = value  # calls property setter which will convert
@@ -436,18 +463,36 @@ class DataElement(object):
             except TypeError:
                 if _backslash_byte in val:
                     val = val.split(_backslash_byte)
-        self._value = self._convert_value(val)
+        # make sure empty values are represented by 0-length value
+        if not val and (val is None or val in ([], ())) and self.VR != 'SQ':
+            if self.VR in BINARY_VR_VALUES:
+                self._value = None
+            else:
+                self._value = ''
+        else:
+            self._value = self._convert_value(val)
 
     @property
     def VM(self):
         """Return the value multiplicity of the element as :class:`int`."""
-        if isinstance(self.value, compat.char_types):
-            return 1
+        if self.value is None:
+            return 0
+        if isinstance(self.value, (compat.char_types, PersonName)):
+            return 1 if self.value else 0
         try:
             iter(self.value)
         except TypeError:
             return 1
         return len(self.value)
+
+    @property
+    def is_empty(self):
+        """Return `True` if the element has no value."""
+        return self.VM == 0
+
+    def clear(self):
+        """Clears the value, e.g. sets it to `None`."""
+        self._value = None
 
     def _convert_value(self, val):
         """Convert `val` to an appropriate type and return the result.

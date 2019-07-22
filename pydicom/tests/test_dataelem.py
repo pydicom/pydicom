@@ -8,6 +8,7 @@ import sys
 
 import pytest
 
+from pydicom import in_py2
 from pydicom.charset import default_encoding
 from pydicom.dataelem import (
     DataElement,
@@ -403,6 +404,11 @@ class TestDataElement(object):
             setattr(ds, tag_name, value)
             elem = ds[tag_name]
             assert bool(elem.value) is False
+            assert 0 == elem.VM
+            if in_py2:
+                assert str(elem.value) in ('', b'')
+            else:
+                assert elem.value in ('', b'')
 
         text_vrs = {
             'AE': 'Receiver',
@@ -451,6 +457,8 @@ class TestDataElement(object):
             setattr(ds, tag_name, value)
             elem = ds[tag_name]
             assert bool(elem.value) is False
+            assert 0 == elem.VM
+            assert elem.value is None
 
         non_text_vrs = {
             'SL': 'RationalNumeratorValue',

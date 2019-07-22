@@ -1481,7 +1481,7 @@ class Dataset(dict):
                                getattr(data_element, x))
                               for x in dir(data_element)
                               if not x.startswith("_")
-                              and x not in ('from_json', 'to_json')])
+                              and x not in ('from_json', 'to_json', 'clear')])
             if data_element.VR == "SQ":
                 yield sequence_element_format % elem_dict
             else:
