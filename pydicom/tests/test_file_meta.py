@@ -1,20 +1,22 @@
 import pytest
 from pydicom.dataset import Dataset, FileMetaDataset
 
+
 def test_group2_only():
     """FileMetaDataset class allows only group 2 tags"""
     meta = FileMetaDataset()
-    
+
     # Group !=2 raises exception
     with pytest.raises(KeyError):
         meta.PatientName = "test"
-    
+
     with pytest.raises(KeyError):
-        meta.add_new(0x30001, "OB", "test")   
-    
+        meta.add_new(0x30001, "OB", "test")
+
     # But group 2 is allowed
     meta.ImplementationVersionName = "abc"
     meta.add_new(0x20016, "AE", "ae")
+
 
 def test_file_meta_binding():
     """File_meta reference remains bound in parent Dataset"""
@@ -27,6 +29,7 @@ def test_file_meta_binding():
     meta.ImplementationVersionName = "implem"
     assert ds.file_meta.ImplementationVersionName == "implem"
 
+
 def test_access_file_meta_from_parent():
     """Accessing group2 tag in dataset gets from file_meta if exists"""
     # New in v1.4
@@ -34,10 +37,11 @@ def test_access_file_meta_from_parent():
     meta = Dataset()
     ds.file_meta = meta
     meta.ImplementationVersionName = "abc"
-    
+
     # direct from ds, not through ds.file_meta
     assert ds.ImplementationVersionName == "abc"
     assert ds[0x00020013].value == "abc"
+
 
 def test_assign_file_meta_existing_tags():
     """Dataset raises if assigning file_meta with tags already in dataset"""
@@ -49,17 +53,18 @@ def test_assign_file_meta_existing_tags():
     ds.ImplementationVersionName = "already here"
 
     # Now also in meta
-    meta.ImplementationVersionName ="new one"
+    meta.ImplementationVersionName = "new one"
 
     # conflict raises
     with pytest.raises(KeyError):
         ds.file_meta = meta
 
+
 def test_assign_file_meta_moves_existing_group2():
     """Setting file_meta in a dataset moves existing group 2 elements"""
     meta = FileMetaDataset()
-    ds = Dataset() 
-    
+    ds = Dataset()
+
     # Set ds up with some group 2
     ds.ImplementationVersionName = "main ds"
     ds.MediaStorageSOPClassUID = "4.5.6"
