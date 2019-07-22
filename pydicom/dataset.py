@@ -1599,6 +1599,21 @@ class Dataset(dict):
                              'element and must be added using '
                              'the add() or add_new() methods.'
                              .format(name))
+        elif name == "file_meta":
+            # If any elements of file meta already in this Dataset
+            #    then raise errors
+            if value is not None:
+                common_tags = set(self._dict.keys()) & set(value._dict.keys())
+                if common_tags:
+                    msg = "Duplicate keys {} in file_meta and main dataset"
+                    raise KeyError(msg.format(common_tags))
+                
+            # Create self.file_meta
+            object.__setattr__(self, name, value)
+
+            # Move any existing group 2 to the new file_meta
+            for tag in self.group_dataset(2).keys():
+                self.file_meta[tag] = self.pop(tag)
         else:
             # name not in dicom dictionary - setting a non-dicom instance
             # attribute
