@@ -4,7 +4,7 @@
 import unittest
 from pydicom.multival import MultiValue
 from pydicom.valuerep import DS, DSfloat, DSdecimal, IS
-from pydicom import config
+from pydicom import config, compat
 from copy import deepcopy
 
 import sys
@@ -30,6 +30,9 @@ class MultiValuetests(unittest.TestCase):
         multival = MultiValue(DSdecimal, ['1', ''])
         self.assertEqual(1, multival[0])
         self.assertEqual('', multival[1])
+        multival = MultiValue(IS, [])
+        self.assertFalse(multival)
+        self.assertEqual(0, len(multival))
 
     def testLimits(self):
         """MultiValue: Raise error if any item outside DICOM limits...."""
@@ -128,6 +131,17 @@ class MultiValuetests(unittest.TestCase):
         multival3 = MultiValue(str, ['b', 'c', 'a'])
         self.assertFalse(multival != multival2)
         self.assertTrue(multival != multival3)
+
+    def test_str_rep(self):
+        """MultiValue: test print output"""
+        multival = MultiValue(IS, [])
+        self.assertEqual('', str(multival))
+        multival = MultiValue(compat.text_type, [1, 2, 3])
+        self.assertEqual("['1', '2', '3']", str(multival))
+        multival = MultiValue(int, [1, 2, 3])
+        self.assertEqual('[1, 2, 3]', str(multival))
+        multival = MultiValue(float, [1.1, 2.2, 3.3])
+        self.assertEqual('[1.1, 2.2, 3.3]', str(multival))
 
 
 if __name__ == "__main__":

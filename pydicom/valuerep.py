@@ -603,8 +603,6 @@ def _encode_personname(components, encodings):
 
 class PersonName3(object):
     def __init__(self, val, encodings=None, original_string=None):
-        # handle None `val` as empty string
-        val = val or ''
         if isinstance(val, PersonName3):
             encodings = val.encodings
             self.original_string = val.original_string
@@ -614,6 +612,9 @@ class PersonName3(object):
             self.original_string = val
             self._components = None
         else:
+            # handle None `val` as empty string
+            val = val or ''
+
             # this is the decoded string - save the original string if
             # available for easier writing back
             self.original_string = original_string
@@ -773,6 +774,12 @@ class PersonName3(object):
     def formatted(self, format_str):
         self._create_dict()
         return format_str % self._dict
+
+    def __bool__(self):
+        if self.original_string is None:
+            return (self._components is not None and
+                    (len(self._components) > 1 or bool(self._components[0])))
+        return bool(self.original_string)
 
 
 class PersonNameBase(object):

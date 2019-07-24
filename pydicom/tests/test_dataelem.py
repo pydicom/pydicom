@@ -9,12 +9,14 @@ import unittest
 import pytest
 
 from pydicom.charset import default_encoding
+from pydicom.datadict import tag_for_keyword
 from pydicom.dataelem import (
     DataElement,
     RawDataElement,
     DataElement_from_raw,
 )
 from pydicom.dataset import Dataset
+from pydicom.multival import MultiValue
 from pydicom.tag import Tag
 from pydicom.uid import UID
 from pydicom.valuerep import DSfloat
@@ -367,6 +369,92 @@ class DataElementTests(unittest.TestCase):
         private_data_elem = ds[0x60211200]
         assert '[Overlay ID]' == private_data_elem.name
         assert 'UN' == private_data_elem.VR
+
+    def test_empty_text_values(self):
+        """Test that assigning an empty value behaves as expected."""
+        def check_empty_text_element(value):
+            setattr(ds, kw, value)
+            elem = ds[tag_for_keyword(kw)]
+            assert bool(elem.value) is False
+
+        text_vrs = {
+            'AE': 'Receiver',
+            'AS': 'PatientAge',
+            'AT': 'OffendingElement',
+            'CS': 'QualityControlSubject',
+            'DA': 'PatientBirthDate',
+            'DS': 'PatientWeight',
+            'DT': 'AcquisitionDateTime',
+            'IS': 'BeamNumber',
+            'LO': 'DataSetSubtype',
+            'LT': 'ExtendedCodeMeaning',
+            'PN': 'PatientName',
+            'SH': 'CodeValue',
+            'ST': 'InstitutionAddress',
+            'TM': 'StudyTime',
+            'UC': 'LongCodeValue',
+            'UI': 'SOPClassUID',
+            'UR': 'CodingSchemeURL',
+            'UT': 'StrainAdditionalInformation',
+        }
+        ds = Dataset()
+        # set value to new element
+        for vr, kw in text_vrs.items():
+            check_empty_text_element(None)
+            del ds[kw]
+            check_empty_text_element(b'')
+            del ds[kw]
+            check_empty_text_element(u'')
+            del ds[kw]
+            check_empty_text_element([])
+            del ds[kw]
+
+        # set value to existing element
+        for vr, kw in text_vrs.items():
+            check_empty_text_element(None)
+            check_empty_text_element(b'')
+            check_empty_text_element(u'')
+            check_empty_text_element([])
+            check_empty_text_element(None)
+
+    def test_empty_binary_values(self):
+        """Test that assigning an empty value behaves as expected for
+        non-text VRs."""
+        def check_empty_binary_element(value):
+            setattr(ds, kw, value)
+            elem = ds[tag_for_keyword(kw)]
+            assert bool(elem.value) is False
+
+        non_text_vrs = {
+            'SL': 'RationalNumeratorValue',
+            'SS': 'SelectorSSValue',
+            'UL': 'SimpleFrameList',
+            'US': 'SourceAcquisitionBeamNumber',
+            'FD': 'RealWorldValueLUTData',
+            'FL': 'VectorAccuracy',
+            'OB': 'FillPattern',
+            'OD': 'DoubleFloatPixelData',
+            'OF': 'UValueData',
+            'OL': 'TrackPointIndexList',
+            'OW': 'TrianglePointIndexList',
+            'UN': 'SelectorUNValue',
+        }
+        ds = Dataset()
+        # set value to new element
+        for vr, kw in non_text_vrs.items():
+            check_empty_binary_element(None)
+            del ds[kw]
+            check_empty_binary_element([])
+            del ds[kw]
+            check_empty_binary_element(MultiValue(int, []))
+            del ds[kw]
+
+        # set value to existing element
+        for vr, kw in non_text_vrs.items():
+            check_empty_binary_element(None)
+            check_empty_binary_element([])
+            check_empty_binary_element(MultiValue(int, []))
+            check_empty_binary_element(None)
 
 
 class RawDataElementTests(unittest.TestCase):
