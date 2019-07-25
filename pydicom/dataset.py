@@ -729,10 +729,11 @@ class Dataset(dict):
             return object.__getattribute__(self, name)
         tag = Tag(tag)
         if tag not in self._dict:  # DICOM DataElement not in the Dataset
-            # Try the base class attribute getter (fix for issue 332)
+            # Try file meta (only will have group 2 items)
             if hasattr(self, 'file_meta') and self.file_meta is not None:
                 if tag in self.file_meta:
                     return self.file_meta[tag].value
+            # Try the base class attribute getter (fix for issue 332)
             return object.__getattribute__(self, name)
         else:
             data_elem = self[tag]
@@ -1526,7 +1527,7 @@ class Dataset(dict):
 
     def ensure_file_meta(self):
         """Create an empty file meta dataset if none exists."""
-        self.file_meta = getattr(self, 'file_meta', Dataset())
+        self.file_meta = getattr(self, 'file_meta', FileMetaDataset())
 
     def fix_meta_info(self, enforce_standard=True):
         """Ensure the file meta info exists and has the correct values
@@ -1607,7 +1608,7 @@ class Dataset(dict):
                 if common_tags:
                     msg = "Duplicate keys {} in file_meta and main dataset"
                     raise KeyError(msg.format(common_tags))
-                
+
             # Create self.file_meta
             object.__setattr__(self, name, value)
 
