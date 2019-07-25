@@ -9,8 +9,6 @@ import shutil
 import sys
 import tempfile
 
-import unittest
-
 import pytest
 
 import pydicom.config
