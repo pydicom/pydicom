@@ -3,7 +3,6 @@
 
 from io import BytesIO
 import os
-import unittest
 
 import pytest
 
@@ -225,8 +224,8 @@ class TestHexUtil(object):
         assert bytes2hex(bytestring) == hexstring
 
 
-class DataElementCallbackTests(unittest.TestCase):
-    def setUp(self):
+class TestDataElementCallbackTests(object):
+    def setup(self):
         # Set up a dataset with commas in one item instead of backslash
         config.enforce_valid_values = True
         namespace = {}
@@ -238,7 +237,7 @@ class DataElementCallbackTests(unittest.TestCase):
 
         self.bytesio = BytesIO(ds_bytes)
 
-    def tearDown(self):
+    def teardown(self):
         config.enforce_valid_values = False
 
     def testBadSeparator(self):
@@ -246,7 +245,8 @@ class DataElementCallbackTests(unittest.TestCase):
         ds = filereader.read_dataset(self.bytesio, is_little_endian=True,
                                      is_implicit_VR=True)
         contour = ds.ROIContourSequence[0].ContourSequence[0]
-        self.assertRaises(ValueError, getattr, contour, "ContourData")
+        with pytest.raises(ValueError):
+            getattr(contour, "ContourData")
 
     def testImplVRcomma(self):
         """util.fix_separator:
@@ -259,9 +259,4 @@ class DataElementCallbackTests(unittest.TestCase):
         got = ds.ROIContourSequence[0].ContourSequence[0].ContourData
         config.reset_data_element_callback()
 
-        msg = "Expected {0}, got {1}".format(expected, got)
-        self.assertEqual(expected, got, msg)
-
-
-if __name__ == "__main__":
-    unittest.main()
+        assert expected == got

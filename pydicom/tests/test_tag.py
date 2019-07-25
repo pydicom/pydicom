@@ -1,7 +1,5 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
-"""Test suite for tag.py"""
-
-import unittest
+"""Unit tests for the pydicom.tag module."""
 
 import pytest
 
@@ -321,7 +319,7 @@ class TestTag(object):
         pytest.raises(ValueError, Tag, ['0x01', '0x02'], '0x01')
         pytest.raises(ValueError, Tag, ['0x01', '0x02'], 0x01)
 
-    @unittest.skipIf(not in_py2, 'Long type only exists in Python 2')
+    @pytest.mark.skipif(not in_py2, reason='Long type only exists in Python 2')
     def test_mixed_long_int(self):
         assert Tag([0x1000, long(0x2000)]) == BaseTag(0x10002000)
         assert Tag([long(0x1000), 0x2000]) == BaseTag(0x10002000)
@@ -394,7 +392,3 @@ class TestTagInException(object):
             with tag_in_exception(tag) as tag:
                 raise ValueError('Test message.')
         pytest.raises(ValueError, test)
-
-
-if __name__ == "__main__":
-    unittest.main()

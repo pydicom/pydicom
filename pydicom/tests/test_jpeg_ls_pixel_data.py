@@ -1,12 +1,15 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
+"""Unit tests for the JPEG-LS Pixel Data handler."""
 
-import unittest
 import os
 import sys
+
 import pytest
+
 import pydicom
 from pydicom.filereader import dcmread
 from pydicom.data import get_testdata_files
+
 jpeg_ls_missing_message = ("jpeg_ls is not available "
                            "in this test environment")
 jpeg_ls_present_message = "jpeg_ls is being tested"
@@ -69,8 +72,8 @@ dir_name = os.path.dirname(sys.argv[0])
 save_dir = os.getcwd()
 
 
-class jpeg_ls_JPEG_LS_Tests_no_jpeg_ls(unittest.TestCase):
-    def setUp(self):
+class Testjpeg_ls_JPEG_LS_no_jpeg_ls(object):
+    def setup(self):
         self.jpeg_ls_lossless = dcmread(jpeg_ls_lossless_name)
         self.mr_small = dcmread(mr_name)
         self.emri_jpeg_ls_lossless = dcmread(emri_jpeg_ls_lossless)
@@ -78,16 +81,16 @@ class jpeg_ls_JPEG_LS_Tests_no_jpeg_ls(unittest.TestCase):
         self.original_handlers = pydicom.config.pixel_data_handlers
         pydicom.config.pixel_data_handlers = [numpy_handler]
 
-    def tearDown(self):
+    def teardown(self):
         pydicom.config.pixel_data_handlers = self.original_handlers
 
     def test_JPEG_LS_PixelArray(self):
-        with self.assertRaises((RuntimeError, NotImplementedError)):
-            _ = self.jpeg_ls_lossless.pixel_array
+        with pytest.raises((RuntimeError, NotImplementedError)):
+            self.jpeg_ls_lossless.pixel_array
 
 
-class jpeg_ls_JPEG2000Tests_no_jpeg_ls(unittest.TestCase):
-    def setUp(self):
+class Testjpeg_ls_JPEG2000_no_jpeg_ls(object):
+    def setup(self):
         self.jpeg_2k = dcmread(jpeg2000_name)
         self.jpeg_2k_lossless = dcmread(jpeg2000_lossless_name)
         self.mr_small = dcmread(mr_name)
@@ -96,58 +99,53 @@ class jpeg_ls_JPEG2000Tests_no_jpeg_ls(unittest.TestCase):
         self.original_handlers = pydicom.config.pixel_data_handlers
         pydicom.config.pixel_data_handlers = [numpy_handler]
 
-    def tearDown(self):
+    def teardown(self):
         pydicom.config.pixel_data_handlers = self.original_handlers
 
     def test_JPEG2000PixelArray(self):
         """JPEG2000: Now works"""
-        with self.assertRaises((NotImplementedError, )):
-            _ = self.jpeg_2k.pixel_array
+        with pytest.raises(NotImplementedError):
+            self.jpeg_2k.pixel_array
 
     def test_emri_JPEG2000PixelArray(self):
         """JPEG2000: Now works"""
-        with self.assertRaises((NotImplementedError, )):
-            _ = self.emri_jpeg_2k_lossless.pixel_array
+        with pytest.raises(NotImplementedError):
+            self.emri_jpeg_2k_lossless.pixel_array
 
 
-class jpeg_ls_JPEGlossyTests_no_jpeg_ls(unittest.TestCase):
-
-    def setUp(self):
+class Testjpeg_ls_JPEGlossy_no_jpeg_ls(object):
+    def setup(self):
         self.jpeg_lossy = dcmread(jpeg_lossy_name)
         self.color_3d_jpeg = dcmread(color_3d_jpeg_baseline)
         self.original_handlers = pydicom.config.pixel_data_handlers
         pydicom.config.pixel_data_handlers = [numpy_handler]
 
-    def tearDown(self):
+    def teardown(self):
         pydicom.config.pixel_data_handlers = self.original_handlers
 
     def testJPEGlossy(self):
         """JPEG-lossy: Returns correct values for sample data elements"""
         got = self.jpeg_lossy.DerivationCodeSequence[0].CodeMeaning
         expected = 'Lossy Compression'
-        self.assertEqual(
-            got,
-            expected,
-            "JPEG-lossy file, Code Meaning got %s, "
-            "expected %s" % (got, expected))
+        assert got == expected
 
     def testJPEGlossyPixelArray(self):
         """JPEG-lossy: Fails gracefully when uncompressed data is asked for"""
-        with self.assertRaises((NotImplementedError, )):
-            _ = self.jpeg_lossy.pixel_array
+        with pytest.raises(NotImplementedError):
+            self.jpeg_lossy.pixel_array
 
     def testJPEGBaselineColor3DPixelArray(self):
-        with self.assertRaises((NotImplementedError, )):
-            _ = self.color_3d_jpeg.pixel_array
+        with pytest.raises(NotImplementedError):
+            self.color_3d_jpeg.pixel_array
 
 
-class jpeg_ls_JPEGlosslessTests_no_jpeg_ls(unittest.TestCase):
-    def setUp(self):
+class Testjpeg_ls_JPEGlossless_no_jpeg_ls(object):
+    def setup(self):
         self.jpeg_lossless = dcmread(jpeg_lossless_name)
         self.original_handlers = pydicom.config.pixel_data_handlers
         pydicom.config.pixel_data_handlers = [numpy_handler]
 
-    def tearDown(self):
+    def teardown(self):
         pydicom.config.pixel_data_handlers = self.original_handlers
 
     def testJPEGlossless(self):
@@ -157,23 +155,17 @@ class jpeg_ls_JPEGlosslessTests_no_jpeg_ls(unittest.TestCase):
             SourceImageSequence[0].\
             PurposeOfReferenceCodeSequence[0].CodeMeaning
         expected = 'Uncompressed predecessor'
-        self.assertEqual(
-            got,
-            expected,
-            "JPEG-lossless file, Code Meaning got %s, "
-            "expected %s" % (got, expected))
+        assert got == expected
 
     def testJPEGlosslessPixelArray(self):
         """JPEGlossless: Fails gracefully when uncompressed data asked for"""
-        with self.assertRaises((NotImplementedError, )):
-            _ = self.jpeg_lossless.pixel_array
+        with pytest.raises(NotImplementedError):
+            self.jpeg_lossless.pixel_array
 
 
-@pytest.mark.skipif(
-    not test_jpeg_ls_decoder,
-    reason=jpeg_ls_missing_message)
-class jpeg_ls_JPEG_LS_Tests_with_jpeg_ls(unittest.TestCase):
-    def setUp(self):
+@pytest.mark.skipif(not test_jpeg_ls_decoder, reason=jpeg_ls_missing_message)
+class Testjpeg_ls_JPEG_LS_with_jpeg_ls(object):
+    def setup(self):
         self.jpeg_ls_lossless = dcmread(jpeg_ls_lossless_name)
         self.mr_small = dcmread(mr_name)
         self.emri_jpeg_ls_lossless = dcmread(emri_jpeg_ls_lossless)
@@ -181,42 +173,30 @@ class jpeg_ls_JPEG_LS_Tests_with_jpeg_ls(unittest.TestCase):
         self.original_handlers = pydicom.config.pixel_data_handlers
         pydicom.config.pixel_data_handlers = [jpeg_ls_handler, numpy_handler]
 
-    def tearDown(self):
+    def teardown(self):
         pydicom.config.pixel_data_handlers = self.original_handlers
 
     def test_raises_if_endianess_not_set(self):
         self.jpeg_ls_lossless.is_little_endian = None
         with pytest.raises(ValueError):
-            _ = self.jpeg_ls_lossless.pixel_array
+            self.jpeg_ls_lossless.pixel_array
 
     def test_JPEG_LS_PixelArray(self):
         a = self.jpeg_ls_lossless.pixel_array
         b = self.mr_small.pixel_array
-        self.assertEqual(
-            a.mean(),
-            b.mean(),
-            "Decoded pixel data is not all {0} "
-            "(mean == {1})".format(b.mean(), a.mean()))
-
+        assert a.mean() == b.mean()
         assert a.flags.writeable
 
     def test_emri_JPEG_LS_PixelArray(self):
         a = self.emri_jpeg_ls_lossless.pixel_array
         b = self.emri_small.pixel_array
-        self.assertEqual(
-            a.mean(),
-            b.mean(),
-            "Decoded pixel data is not all {0} "
-            "(mean == {1})".format(b.mean(), a.mean()))
-
+        assert a.mean() == b.mean()
         assert a.flags.writeable
 
 
-@pytest.mark.skipif(
-    not test_jpeg_ls_decoder,
-    reason=jpeg_ls_missing_message)
-class jpeg_ls_JPEG2000Tests_with_jpeg_ls(unittest.TestCase):
-    def setUp(self):
+@pytest.mark.skipif(not test_jpeg_ls_decoder, reason=jpeg_ls_missing_message)
+class Testjpeg_ls_JPEG2000_with_jpeg_ls(object):
+    def setup(self):
         self.jpeg_2k = dcmread(jpeg2000_name)
         self.jpeg_2k_lossless = dcmread(jpeg2000_lossless_name)
         self.mr_small = dcmread(mr_name)
@@ -225,61 +205,52 @@ class jpeg_ls_JPEG2000Tests_with_jpeg_ls(unittest.TestCase):
         self.original_handlers = pydicom.config.pixel_data_handlers
         pydicom.config.pixel_data_handlers = [jpeg_ls_handler, numpy_handler]
 
-    def tearDown(self):
+    def teardown(self):
         pydicom.config.pixel_data_handlers = self.original_handlers
 
     def test_JPEG2000PixelArray(self):
-        with self.assertRaises((NotImplementedError, )):
-            _ = self.jpeg_2k.pixel_array
+        with pytest.raises(NotImplementedError):
+            self.jpeg_2k.pixel_array
 
     def test_emri_JPEG2000PixelArray(self):
-        with self.assertRaises((NotImplementedError, )):
-            _ = self.emri_jpeg_2k_lossless.pixel_array
+        with pytest.raises(NotImplementedError):
+            self.emri_jpeg_2k_lossless.pixel_array
 
 
-@pytest.mark.skipif(
-    not test_jpeg_ls_decoder,
-    reason=jpeg_ls_missing_message)
-class jpeg_ls_JPEGlossyTests_with_jpeg_ls(unittest.TestCase):
-
-    def setUp(self):
+@pytest.mark.skipif(not test_jpeg_ls_decoder, reason=jpeg_ls_missing_message)
+class Testjpeg_ls_JPEGlossy_with_jpeg_ls(object):
+    def setup(self):
         self.jpeg_lossy = dcmread(jpeg_lossy_name)
         self.color_3d_jpeg = dcmread(color_3d_jpeg_baseline)
         self.original_handlers = pydicom.config.pixel_data_handlers
         pydicom.config.pixel_data_handlers = [jpeg_ls_handler, numpy_handler]
 
-    def tearDown(self):
+    def teardown(self):
         pydicom.config.pixel_data_handlers = self.original_handlers
 
     def testJPEGlossy(self):
         """JPEG-lossy: Returns correct values for sample data elements"""
         got = self.jpeg_lossy.DerivationCodeSequence[0].CodeMeaning
         expected = 'Lossy Compression'
-        self.assertEqual(
-            got,
-            expected,
-            "JPEG-lossy file, Code Meaning got %s, "
-            "expected %s" % (got, expected))
+        assert got == expected
 
     def testJPEGlossyPixelArray(self):
-        with self.assertRaises((NotImplementedError, )):
-            _ = self.jpeg_lossy.pixel_array
+        with pytest.raises(NotImplementedError):
+            self.jpeg_lossy.pixel_array
 
     def testJPEGBaselineColor3DPixelArray(self):
-        with self.assertRaises((NotImplementedError, )):
-            _ = self.color_3d_jpeg.pixel_array
+        with pytest.raises(NotImplementedError):
+            self.color_3d_jpeg.pixel_array
 
 
-@pytest.mark.skipif(
-    not test_jpeg_ls_decoder,
-    reason=jpeg_ls_missing_message)
-class jpeg_ls_JPEGlosslessTests_with_jpeg_ls(unittest.TestCase):
-    def setUp(self):
+@pytest.mark.skipif(not test_jpeg_ls_decoder, reason=jpeg_ls_missing_message)
+class Testjpeg_ls_JPEGlossless_with_jpeg_ls(object):
+    def setup(self):
         self.jpeg_lossless = dcmread(jpeg_lossless_name)
         self.original_handlers = pydicom.config.pixel_data_handlers
         pydicom.config.pixel_data_handlers = [jpeg_ls_handler, numpy_handler]
 
-    def tearDown(self):
+    def teardown(self):
         pydicom.config.pixel_data_handlers = self.original_handlers
 
     def testJPEGlossless(self):
@@ -289,13 +260,9 @@ class jpeg_ls_JPEGlosslessTests_with_jpeg_ls(unittest.TestCase):
             SourceImageSequence[0].\
             PurposeOfReferenceCodeSequence[0].CodeMeaning
         expected = 'Uncompressed predecessor'
-        self.assertEqual(
-            got,
-            expected,
-            "JPEG-lossless file, Code Meaning got %s, "
-            "expected %s" % (got, expected))
+        assert got == expected
 
     def testJPEGlosslessPixelArray(self):
         """JPEGlossless: Fails gracefully when uncompressed data asked for"""
-        with self.assertRaises((NotImplementedError, )):
-            _ = self.jpeg_lossless.pixel_array
+        with pytest.raises(NotImplementedError):
+            self.jpeg_lossless.pixel_array

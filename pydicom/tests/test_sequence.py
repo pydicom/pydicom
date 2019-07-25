@@ -1,16 +1,17 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
-"""unittest cases for Sequence class"""
+"""Unit tests for the pydicom.sequence module."""
 
-import unittest
+import pytest
+
 from pydicom.dataset import Dataset
 from pydicom.sequence import Sequence
 
 
-class SequenceTests(unittest.TestCase):
+class TestSequence(object):
     def testDefaultInitialization(self):
         """Sequence: Ensure a valid Sequence is created"""
         empty = Sequence()
-        self.assertTrue(len(empty) == 0, "Non-empty Sequence created")
+        assert len(empty) == 0
 
     def testValidInitialization(self):
         """Sequence: Ensure valid creation of Sequences using Dataset inputs"""
@@ -22,23 +23,26 @@ class SequenceTests(unittest.TestCase):
 
         # Construct the sequence
         seq = Sequence((patientSetups,))
-        self.assertTrue(isinstance(seq[0], Dataset),
-                        "Dataset modified during Sequence creation")
+        assert isinstance(seq[0], Dataset)
 
     def testInvalidInitialization(self):
         """Sequence: Raise error if inputs are not iterables or Datasets"""
         # Error on construction with single Dataset
-        self.assertRaises(TypeError, Sequence, Dataset())
+        with pytest.raises(TypeError):
+            Sequence(Dataset())
         # Test for non-iterable
-        self.assertRaises(TypeError, Sequence, 1)
+        with pytest.raises(TypeError):
+            Sequence(1)
         # Test for invalid iterable contents
-        self.assertRaises(TypeError, Sequence, [1, 2])
+        with pytest.raises(TypeError):
+            Sequence([1, 2])
 
     def testInvalidAssignment(self):
         """Sequence: validate exception for invalid assignment"""
         seq = Sequence([Dataset(), ])
         # Attempt to assign an integer to the first element
-        self.assertRaises(TypeError, seq.__setitem__, 0, 1)
+        with pytest.raises(TypeError):
+            seq.__setitem__(0, 1)
 
     def testValidAssignment(self):
         """Sequence: ensure ability to assign a Dataset to a Sequence item"""
@@ -49,7 +53,7 @@ class SequenceTests(unittest.TestCase):
         seq = Sequence([Dataset(), ])
         seq[0] = ds
 
-        self.assertEqual(seq[0], ds, "Dataset modified during assignment")
+        assert seq[0] == ds
 
     def test_str(self):
         """Test string output of the sequence"""
@@ -63,7 +67,3 @@ class SequenceTests(unittest.TestCase):
         assert "PN: 'TEST'" in out
         assert "(0010, 0020) Patient ID" in out
         assert "LO: '12345']" in out
-
-
-if __name__ == "__main__":
-    unittest.main()
