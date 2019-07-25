@@ -654,9 +654,9 @@ class TestDataset(object):
 
         # Slice starting from and including (0008,0001)
         test_ds = ds[0x00080001:]
-        assert not 'CommandGroupLength' in test_ds
-        assert not 'CommandLengthToEnd' in test_ds
-        assert not 'Overlays' in test_ds
+        assert 'CommandGroupLength' not in test_ds
+        assert 'CommandLengthToEnd' not in test_ds
+        assert 'Overlays' not in test_ds
         assert 'LengthToEnd' in test_ds
         assert 'BeamSequence' in test_ds
 
@@ -667,35 +667,35 @@ class TestDataset(object):
         assert 'Overlays' in test_ds
         assert 'LengthToEnd' in test_ds
         assert 0x00090001 in test_ds
-        assert not 0x00090002 in test_ds
-        assert not 'BeamSequence' in test_ds
+        assert 0x00090002 not in test_ds
+        assert 'BeamSequence' not in test_ds
 
         # Slice with a step - every second tag
         # Should return zeroth tag, then second, fourth, etc...
         test_ds = ds[::2]
         assert 'CommandGroupLength' in test_ds
-        assert not 'CommandLengthToEnd' in test_ds
+        assert 'CommandLengthToEnd' not in test_ds
         assert 0x00090001 in test_ds
-        assert not 0x00090002 in test_ds
+        assert 0x00090002 not in test_ds
 
         # Slice starting at and including (0008,0018) and ending at and not
         #   including (0009,0008)
         test_ds = ds[0x00080018:0x00090008]
         assert 'SOPInstanceUID' in test_ds
         assert 0x00090007 in test_ds
-        assert not 0x00090008 in test_ds
+        assert 0x00090008 not in test_ds
 
         # Slice starting at and including (0008,0018) and ending at and not
         #   including (0009,0008), every third element
         test_ds = ds[0x00080018:0x00090008:3]
         assert 'SOPInstanceUID' in test_ds
-        assert not 0x00090001 in test_ds
+        assert 0x00090001 not in test_ds
         assert 0x00090002 in test_ds
-        assert not 0x00090003 in test_ds
-        assert not 0x00090004 in test_ds
+        assert 0x00090003 not in test_ds
+        assert 0x00090004 not in test_ds
         assert 0x00090005 in test_ds
-        assert not 0x00090006 in test_ds
-        assert not 0x00090008 in test_ds
+        assert 0x00090006 not in test_ds
+        assert 0x00090008 not in test_ds
 
         # Slice starting and ending (and not including) (0008,0018)
         assert ds[(0x0008, 0x0018):(0x0008, 0x0018)] == Dataset()
@@ -753,8 +753,8 @@ class TestDataset(object):
         # Delete the 0x0009 group
         del ds[0x00090000:0x00100000]
         assert 'SkipFrameRangeFlag' in ds
-        assert not 0x00090001 in ds
-        assert not 0x00090010 in ds
+        assert 0x00090001 not in ds
+        assert 0x00090010 not in ds
         assert 'PatientName' in ds
 
     @pytest.mark.skipif(not compat.in_py2, reason='Python 2 only iterators')
@@ -805,15 +805,15 @@ class TestDataset(object):
         assert 'CommandGroupLength' in group0000
         assert 'CommandLengthToEnd' in group0000
         assert 'Overlays' in group0000
-        assert not 'LengthToEnd' in group0000
-        assert not 'SOPInstanceUID' in group0000
-        assert not 'SkipFrameRangeFlag' in group0000
+        assert 'LengthToEnd' not in group0000
+        assert 'SOPInstanceUID' not in group0000
+        assert 'SkipFrameRangeFlag' not in group0000
 
         # Test getting group 0x0008
         group0000 = ds.group_dataset(0x0008)
-        assert not 'CommandGroupLength' in group0000
-        assert not 'CommandLengthToEnd' in group0000
-        assert not 'Overlays' in group0000
+        assert 'CommandGroupLength' not in group0000
+        assert 'CommandLengthToEnd' not in group0000
+        assert 'Overlays' not in group0000
         assert 'LengthToEnd' in group0000
         assert 'SOPInstanceUID' in group0000
         assert 'SkipFrameRangeFlag' in group0000

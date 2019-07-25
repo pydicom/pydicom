@@ -33,7 +33,7 @@ class TestDataElement(object):
 
     def testVM1(self):
         """DataElement: return correct value multiplicity for VM > 1"""
-        assert 3 ==  self.data_elementMulti.VM
+        assert 3 == self.data_elementMulti.VM
 
     def testVM2(self):
         """DataElement: return correct value multiplicity for VM = 1"""
