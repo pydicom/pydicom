@@ -152,8 +152,8 @@ class ReaderTests(object):
         """Returns correct values for sample data elements in test CT file."""
         ct = dcmread(ct_name)
         assert ct.file_meta.ImplementationClassUID == '1.3.6.1.4.1.5962.2'
-        assert (ct.file_meta.ImplementationClassUID
-            == ct.file_meta[0x2, 0x12].value)
+        value = ct.file_meta[0x2, 0x12].value
+        assert ct.file_meta.ImplementationClassUID == value
 
         # (0020, 0032) Image Position (Patient)
         # [-158.13580300000001, -179.035797, -75.699996999999996]
@@ -484,8 +484,8 @@ class ReaderTests(object):
                       b'\x20\x00\x06\x00\x00\x00\x4e\x4f\x52\x4d\x41\x4c')
         fp = BytesIO(bytestream)
         ds = dcmread(fp, force=True)
-        assert not (len(bytestream) - 12 ==
-            ds.file_meta.FileMetaInformationGroupLength)
+        value = ds.file_meta.FileMetaInformationGroupLength
+        assert not len(bytestream) - 12 == value
         assert ds.file_meta.FileMetaInformationGroupLength == 10
         assert 'MediaStorageSOPClassUID' in ds.file_meta
         assert ds.file_meta.TransferSyntaxUID == ImplicitVRLittleEndian
@@ -955,8 +955,8 @@ class FileLikeTests(object):
         expected = [DS('-158.135803'), DS('-179.035797'), DS('-75.699997')]
         assert got == expected
         assert ct.file_meta.ImplementationClassUID == '1.3.6.1.4.1.5962.2'
-        assert (ct.file_meta.ImplementationClassUID ==
-            ct.file_meta[0x2, 0x12].value)
+        value = ct.file_meta[0x2, 0x12].value
+        assert ct.file_meta.ImplementationClassUID == value
 
         # (0020, 0032) Image Position (Patient)
         # [-158.13580300000001, -179.035797, -75.699996999999996]
