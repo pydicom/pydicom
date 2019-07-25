@@ -9,10 +9,11 @@ from pydicom import config, compat
 from copy import deepcopy
 
 import sys
+
 python_version = sys.version_info
 
 
-class MultiValueTests():
+class TestMultiValue(object):
     def testMultiDS(self):
         """MultiValue: Multi-valued data elements can be created........"""
         multival = MultiValue(DS, ['11.1', '22.2', '33.3'])
@@ -118,7 +119,7 @@ class MultiValueTests():
         multival = MultiValue(DS, [12, 33, 5, 7, 1])
         multival2 = MultiValue(DS, [12, 33, 5, 7, 1])
         multival3 = MultiValue(DS, [33, 12, 5, 7, 1])
-        assert multival != multival2
+        assert not multival != multival2
         assert multival != multival3
         multival = MultiValue(str, ['a', 'b', 'c'])
         multival2 = MultiValue(str, ['a', 'b', 'c'])
