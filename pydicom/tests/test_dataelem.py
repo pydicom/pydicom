@@ -392,7 +392,6 @@ class TestRawDataElement(object):
         element = DataElement_from_raw(raw)
         assert element.name == 'Patient Comments'
 
-    @pytest.mark.skip(reason="Not testing what is claimed")
     @pytest.mark.skipif(sys.version_info < (3, ), reason='Python 3 behavior')
     def testTagWithoutEncodingPython3(self):
         """RawDataElement: raises if no encoding given in Python 3."""
