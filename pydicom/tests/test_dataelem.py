@@ -9,7 +9,6 @@ import unittest
 import pytest
 
 from pydicom.charset import default_encoding
-from pydicom.datadict import tag_for_keyword
 from pydicom.dataelem import (
     DataElement,
     RawDataElement,
@@ -373,8 +372,8 @@ class DataElementTests(unittest.TestCase):
     def test_empty_text_values(self):
         """Test that assigning an empty value behaves as expected."""
         def check_empty_text_element(value):
-            setattr(ds, kw, value)
-            elem = ds[tag_for_keyword(kw)]
+            setattr(ds, tag_name, value)
+            elem = ds[tag_name]
             assert bool(elem.value) is False
 
         text_vrs = {
@@ -399,18 +398,18 @@ class DataElementTests(unittest.TestCase):
         }
         ds = Dataset()
         # set value to new element
-        for vr, kw in text_vrs.items():
+        for tag_name in text_vrs.values():
             check_empty_text_element(None)
-            del ds[kw]
+            del ds[tag_name]
             check_empty_text_element(b'')
-            del ds[kw]
+            del ds[tag_name]
             check_empty_text_element(u'')
-            del ds[kw]
+            del ds[tag_name]
             check_empty_text_element([])
-            del ds[kw]
+            del ds[tag_name]
 
         # set value to existing element
-        for vr, kw in text_vrs.items():
+        for tag_name in text_vrs.values():
             check_empty_text_element(None)
             check_empty_text_element(b'')
             check_empty_text_element(u'')
@@ -421,8 +420,8 @@ class DataElementTests(unittest.TestCase):
         """Test that assigning an empty value behaves as expected for
         non-text VRs."""
         def check_empty_binary_element(value):
-            setattr(ds, kw, value)
-            elem = ds[tag_for_keyword(kw)]
+            setattr(ds, tag_name, value)
+            elem = ds[tag_name]
             assert bool(elem.value) is False
 
         non_text_vrs = {
@@ -441,16 +440,16 @@ class DataElementTests(unittest.TestCase):
         }
         ds = Dataset()
         # set value to new element
-        for vr, kw in non_text_vrs.items():
+        for tag_name in non_text_vrs.values():
             check_empty_binary_element(None)
-            del ds[kw]
+            del ds[tag_name]
             check_empty_binary_element([])
-            del ds[kw]
+            del ds[tag_name]
             check_empty_binary_element(MultiValue(int, []))
-            del ds[kw]
+            del ds[tag_name]
 
         # set value to existing element
-        for vr, kw in non_text_vrs.items():
+        for tag_name in non_text_vrs.values():
             check_empty_binary_element(None)
             check_empty_binary_element([])
             check_empty_binary_element(MultiValue(int, []))
