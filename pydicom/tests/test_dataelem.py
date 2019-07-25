@@ -383,25 +383,13 @@ class TestRawDataElement(object):
         elem = DataElement_from_raw(raw, default_encoding)
         assert elem.VR == 'UL'
 
-    @pytest.mark.skipif(sys.version_info >= (3, ), reason='Python 2 behavior')
-    def testTagWithoutEncodingPython2(self):
-        """RawDataElement: no encoding needed in Python 2."""
+    def test_data_element_without_encoding(self):
+        """RawDataElement: no encoding needed."""
         raw = RawDataElement(Tag(0x00104000), 'LT', 23,
                              b'comment\\comment2\\comment3',
                              0, False, True)
         element = DataElement_from_raw(raw)
         assert element.name == 'Patient Comments'
-
-    @pytest.mark.skip(reason="Not testing what is claimed")
-    @pytest.mark.skipif(sys.version_info < (3, ), reason='Python 3 behavior')
-    def testTagWithoutEncodingPython3(self):
-        """RawDataElement: raises if no encoding given in Python 3."""
-        with pytest.raises(TypeError):
-            raw = RawDataElement(
-                Tag(0x00104000), 'LT', 14,
-                b'comment1\\comment2', 0, False, True
-            )
-            elem = DataElement_from_raw(raw)
 
     def test_unknown_vr(self):
         """Test converting a raw element with unknown VR"""
