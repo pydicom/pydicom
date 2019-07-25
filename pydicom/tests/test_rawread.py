@@ -1,19 +1,20 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
-"""unittest tests for pydicom.filereader module -- simple raw data elements"""
+"""Unit tests for the pydicom.filereader module using raw data elements."""
 
 from io import BytesIO
-import unittest
+
+import pytest
+
 from pydicom.filereader import data_element_generator
 from pydicom.values import convert_value
 from pydicom.sequence import Sequence
 from pydicom.util.hexutil import hex2bytes
 
 
-class RawReaderExplVRTests(unittest.TestCase):
+class TestRawReaderExplVRTests(object):
     # See comments in data_element_generator
     # summary of DICOM data element formats
     # Here we are trying to test all those variations
-
     def testExplVRLittleEndianLongLength(self):
         """Raw read: Explicit VR Little Endian long length..."""
         # (0002,0001) OB 2-byte-reserved 4-byte-length, value 0x00 0x01
@@ -26,12 +27,7 @@ class RawReaderExplVRTests(unittest.TestCase):
         de_gen = data_element_generator(infile,
                                         is_implicit_VR=False,
                                         is_little_endian=True)
-        got = next(de_gen)
-        msg_loc = "in read of Explicit VR='OB'"
-        msg_loc = "%s data element (long length format)" % (msg_loc)
-        self.assertEqual(got, expected,
-                         "Expected: %r, got %r in %s"
-                         % (expected, got, msg_loc))
+        assert next(de_gen) == expected
         # (0002,0002) OB 2-byte-reserved 4-byte-length,
         # value 0x00 0x01
 
@@ -47,12 +43,7 @@ class RawReaderExplVRTests(unittest.TestCase):
         de_gen = data_element_generator(infile,
                                         is_implicit_VR=False,
                                         is_little_endian=True)
-        got = next(de_gen)
-        msg_loc = "in read of Explicit VR='IS'"
-        msg_loc = "%s data element (short length format)" % (msg_loc)
-        self.assertEqual(got, expected,
-                         "Expected: %r, got %r in %s"
-                         % (expected, got, msg_loc))
+        assert next(de_gen) == expected
 
     def testExplVRLittleEndianUndefLength(self):
         """Raw read: Expl VR Little Endian with undefined length..."""
@@ -69,11 +60,7 @@ class RawReaderExplVRTests(unittest.TestCase):
         de_gen = data_element_generator(infile,
                                         is_implicit_VR=False,
                                         is_little_endian=True)
-        got = next(de_gen)
-        msg_loc = "in read of undefined length Explicit VR ='OB' short value)"
-        self.assertEqual(got, expected,
-                         "Expected: %r, got %r in %s"
-                         % (expected, got, msg_loc))
+        assert next(de_gen) == expected
 
         # Test again such that delimiter crosses default 128-byte "chunks"
         for multiplier in (116, 117, 118, 120):
@@ -87,17 +74,11 @@ class RawReaderExplVRTests(unittest.TestCase):
                                             is_little_endian=True)
             got = next(de_gen)
             got_len = len(got.value)
-            msg_loc = "in read of undefined length Explicit VR ='OB'"
-            msg_loc = "%s with 'multiplier' %d" % (msg_loc, multiplier)
-            self.assertEqual(expected, got_len,
-                             "Expected value length %d, got %d in %s"
-                             % (expected, got_len, msg_loc))
-            msg = "Unexpected value start with multiplier %d" % (multiplier)
-            msg = "%s on Expl VR undefined length" % (msg)
-            self.assertTrue(got.value.startswith(b'ABCDEFGHIJ\0'), msg)
+            assert expected == got_len
+            assert got.value.startswith(b'ABCDEFGHIJ\0')
 
 
-class RawReaderImplVRTests(unittest.TestCase):
+class TestRawReaderImplVR(object):
     # See comments in data_element_generator
     # summary of DICOM data element formats
     # Here we are trying to test all those variations
@@ -114,12 +95,7 @@ class RawReaderImplVRTests(unittest.TestCase):
         de_gen = data_element_generator(infile,
                                         is_implicit_VR=True,
                                         is_little_endian=True)
-        got = next(de_gen)
-        msg_loc = "in read of Implicit VR='IS'"
-        msg_loc = "%s data element (short length format)" % (msg_loc)
-        self.assertEqual(got, expected,
-                         "Expected: %r, got %r in %s"
-                         % (expected, got, msg_loc))
+        assert next(de_gen) == expected
 
     def testImplVRLittleEndianUndefLength(self):
         """Raw read: Impl VR Little Endian with undefined length..."""
@@ -135,12 +111,7 @@ class RawReaderImplVRTests(unittest.TestCase):
         de_gen = data_element_generator(infile,
                                         is_implicit_VR=True,
                                         is_little_endian=True)
-        got = next(de_gen)
-        msg_loc = "in read of undefined length Implicit VR ='OB' short value)"
-        self.assertEqual(got, expected,
-                         "Expected: %r, got %r in %s" % (expected,
-                                                         got,
-                                                         msg_loc))
+        assert next(de_gen) == expected
 
         # Test again such that delimiter crosses default 128-byte "chunks"
         for multiplier in (116, 117, 118, 120):
@@ -153,19 +124,11 @@ class RawReaderImplVRTests(unittest.TestCase):
                                             is_implicit_VR=True,
                                             is_little_endian=True)
             got = next(de_gen)
-            got_len = len(got.value)
-            msg_loc = "in read of undefined length Implicit VR"
-            msg_loc = "%s with 'multiplier' %d" % (msg_loc, multiplier)
-            self.assertEqual(expected, got_len,
-                             "Expected value length %d, got %d in %s"
-                             % (expected, got_len, msg_loc))
-
-            msg = "Unexpected value start with multiplier %d" % (multiplier)
-            msg = "%s on Implicit VR undefined length" % (msg)
-            self.assertTrue(got.value.startswith(b'ABCDEFGHIJ\0'), msg)
+            assert expected == len(got.value)
+            assert got.value.startswith(b'ABCDEFGHIJ\0')
 
 
-class RawSequenceTests(unittest.TestCase):
+class TestRawSequence(object):
     # See DICOM standard PS3.5-2008 section 7.5 for sequence syntax
     def testEmptyItem(self):
         """Read sequence with a single empty item..."""
@@ -192,19 +155,11 @@ class RawSequenceTests(unittest.TestCase):
                                      is_little_endian=True)
         raw_seq = next(gen)
         seq = convert_value("SQ", raw_seq)
-
-        got_type = "got type {0}".format(str(type(seq)))
-        self.assertTrue(isinstance(seq, Sequence),
-                        "Did not get Sequence, %s" % got_type)
-        expected = "Expected Sequence with single (empty) item"
-        got = "got {0:d} item(s)".format(len(seq))
-        self.assertTrue(len(seq) == 1, "%s, %s" % (expected, got))
-        msg = "Expected the sequence item (dataset) to be empty"
-        self.assertTrue(len(seq[0]) == 0, msg)
+        assert isinstance(seq, Sequence)
+        assert len(seq) == 1
+        assert len(seq[0]) == 0
         elem2 = next(gen)
-        self.assertEqual(elem2.tag,
-                         0x0008103e,
-                         "Expected a data element after empty sequence item")
+        assert elem2.tag == 0x0008103e
 
     def testImplVRLittleEndian_ExplicitLengthSeq(self):
         """Raw read: ImplVR Little Endian SQ with explicit lengths..."""
@@ -242,11 +197,9 @@ class RawSequenceTests(unittest.TestCase):
         # The sequence is parsed, but only into raw data elements.
         # They will be converted when asked for. Check some:
         got = seq[0].BeamNumber
-        self.assertTrue(got == 1,
-                        "Expected Beam Number 1, got {0!r}".format(got))
+        assert got == 1
         got = seq[1].BeamName
-        self.assertTrue(got == 'Beam 2',
-                        "Expected Beam Name 'Beam 2', got {0:s}".format(got))
+        assert got == 'Beam 2'
 
     def testImplVRBigEndian_ExplicitLengthSeq(self):
         """Raw read: ImplVR BigEndian SQ with explicit lengths..."""
@@ -284,11 +237,9 @@ class RawSequenceTests(unittest.TestCase):
         # The sequence is parsed, but only into raw data elements.
         # They will be converted when asked for. Check some:
         got = seq[0].BeamNumber
-        self.assertTrue(got == 1,
-                        "Expected Beam Number 1, got {0!r}".format(got))
+        assert got == 1
         got = seq[1].BeamName
-        self.assertTrue(got == 'Beam 2',
-                        "Expected Beam Name 'Beam 2', got {0:s}".format(got))
+        assert got == 'Beam 2'
 
     def testExplVRBigEndian_UndefinedLengthSeq(self):
         """Raw read: ExplVR BigEndian Undefined Length SQ..."""
@@ -335,14 +286,6 @@ class RawSequenceTests(unittest.TestCase):
         # The sequence is parsed, but only into raw data elements.
         # They will be converted when asked for. Check some:
         got = seq[0].BeamNumber
-        self.assertTrue(got == 1,
-                        "Expected Beam Number 1, got {0!r}".format(got))
+        assert got == 1
         got = seq[1].BeamName
-        self.assertTrue(got == 'Beam 2',
-                        "Expected Beam Name 'Beam 2', got {0:s}".format(got))
-
-
-if __name__ == "__main__":
-    # import pydicom
-    # pydicom.debug()
-    unittest.main()
+        assert got == 'Beam 2'
