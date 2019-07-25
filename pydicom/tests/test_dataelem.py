@@ -252,9 +252,9 @@ class TestDataElement(object):
         ee[0].PatientName = 'ANONA'
         assert dd != ee
 
-    def testHash(self):
+    def test_hash(self):
         """Test hash(DataElement) raises TypeError"""
-        with pytest.raises(TypeError, match=r"unhashable type: 'DataElement'"):
+        with pytest.raises(TypeError, match=r"unhashable"):
             hash(DataElement(0x00100010, 'PN', 'ANON'))
 
     def test_repeater_str(self):
