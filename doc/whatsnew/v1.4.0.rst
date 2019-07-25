@@ -11,3 +11,9 @@ Fixes
 * Fixed print output for numeric multi-value elements (:issue:`892`)
 * Fixed testing PN values for truthiness (:issue:`891`)
 * Fixed handling of known tags with VR UN (:issue:`899`)
+
+Enhancements
+............
+* New FileMetaDataset for integrating file meta into Datasets
+* File meta (Group 2) data elements can now be written and read directly from main dataset (internally kept in file_meta)
+
