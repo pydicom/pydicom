@@ -40,6 +40,8 @@ have_numpy_handler = numpy_handler.is_available()
 from pydicom.pixel_data_handlers import gdcm_handler
 HAVE_GDCM = gdcm_handler.is_available()
 HAVE_GDCM_IN_MEMORY_SUPPORT = gdcm_handler.HAVE_GDCM_IN_MEMORY_SUPPORT
+if HAVE_GDCM:
+    import gdcm
 
 
 empty_number_tags_name = get_testdata_files(
