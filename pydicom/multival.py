@@ -2,6 +2,7 @@
 """Code for multi-value data elements values,
 or any list of items that must all be the same type.
 """
+from pydicom import compat
 
 try:
     from collections.abc import MutableSequence
@@ -30,7 +31,7 @@ class MultiValue(MutableSequence):
         :param type_constructor: a constructor for the required
                            type for all list items. Could be the
                            class, or a factory function. For DICOM
-                           mult-value data elements, this will be the
+                           multi-value data elements, this will be the
                            class or type corresponding to the VR.
         :param iterable: an iterable (e.g. list, tuple) of items
                         to initialize the MultiValue list
@@ -59,8 +60,11 @@ class MultiValue(MutableSequence):
             self._list.__setitem__(i, self.type_constructor(val))
 
     def __str__(self):
-        lines = [str(x) for x in self]
-        return "['" + "', '".join(lines) + "']"
+        if not self:
+            return ''
+        lines = ["'{}'".format(x) if isinstance(x, compat.char_types)
+                 else str(x) for x in self]
+        return "[" + ", ".join(lines) + "]"
 
     __repr__ = __str__
 

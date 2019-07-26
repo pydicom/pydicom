@@ -378,7 +378,7 @@ class DataElement(object):
         elif self.VR == 'TM' and config.datetime_conversion:
             return pydicom.valuerep.TM(val)
         elif self.VR == "UI":
-            return UID(val)
+            return UID(val if val else '')
         elif not in_py2 and self.VR == "PN":
             return PersonName(val)
         # Later may need this for PersonName as for UI,

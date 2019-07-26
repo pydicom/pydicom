@@ -2,13 +2,13 @@
 """Unit tests for the pydicom.multival module."""
 
 import pytest
-
 from pydicom.multival import MultiValue
 from pydicom.valuerep import DS, DSfloat, DSdecimal, IS
-from pydicom import config
+from pydicom import config, compat
 from copy import deepcopy
 
 import sys
+
 python_version = sys.version_info
 
 
@@ -30,6 +30,10 @@ class TestMultiValue(object):
         multival = MultiValue(DSdecimal, ['1', ''])
         assert 1 == multival[0]
         assert '' == multival[1]
+
+        multival = MultiValue(IS, [])
+        assert not multival
+        assert 0 == len(multival)
 
     def testLimits(self):
         """MultiValue: Raise error if any item outside DICOM limits...."""
@@ -76,7 +80,7 @@ class TestMultiValue(object):
         multival[2:7:2] = [4, 16, 36]
         for val in multival:
             assert isinstance(val, IS)
-        assert multival[4] == 16
+            assert multival[4] == 16
 
     def testIssue236DeepCopy(self):
         """MultiValue: deepcopy of MultiValue does not generate an error"""
@@ -103,12 +107,12 @@ class TestMultiValue(object):
         multival2 = MultiValue(DS, [12, 33, 5, 7, 1])
         multival3 = MultiValue(DS, [33, 12, 5, 7, 1])
         assert multival == multival2
-        assert not multival == multival3
+        assert not (multival == multival3)
         multival = MultiValue(str, ['a', 'b', 'c'])
         multival2 = MultiValue(str, ['a', 'b', 'c'])
         multival3 = MultiValue(str, ['b', 'c', 'a'])
         assert multival == multival2
-        assert not multival == multival3
+        assert not (multival == multival3)
 
     def test_not_equal(self):
         """MultiValue: test equality operator"""
@@ -120,5 +124,17 @@ class TestMultiValue(object):
         multival = MultiValue(str, ['a', 'b', 'c'])
         multival2 = MultiValue(str, ['a', 'b', 'c'])
         multival3 = MultiValue(str, ['b', 'c', 'a'])
-        assert not multival != multival2
+        assert not (multival != multival2)
         assert multival != multival3
+
+    def test_str_rep(self):
+        """MultiValue: test print output"""
+        multival = MultiValue(IS, [])
+        assert '' == str(multival)
+        multival = MultiValue(compat.text_type, [1, 2, 3])
+        assert "['1', '2', '3']" == str(multival)
+        multival = MultiValue(int, [1, 2, 3])
+        assert '[1, 2, 3]' == str(multival)
+        multival = MultiValue(float, [1.1, 2.2, 3.3])
+        assert '[1.1, 2.2, 3.3]' == str(multival)
+
