@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
-"""unittest cases for pydicom.charset module"""
+"""Unit tests for the pydicom.charset module."""
 
 import pytest
 

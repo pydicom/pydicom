@@ -1,7 +1,5 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
-"""Test suite for tag.py"""
-
-import unittest
+"""Unit tests for the pydicom.tag module."""
 
 import pytest
 
@@ -146,6 +144,7 @@ class TestBaseTag(object):
 
     def test_eq_diff_class(self):
         """Test __eq__ of two classes with different type."""
+        # Make sure to test BaseTag.__eq__() not int.__eq__()
         assert BaseTag(0x00000000) == 0
         assert not BaseTag(0x00000001) == 0
 
@@ -158,6 +157,7 @@ class TestBaseTag(object):
 
     def test_eq_tuple(self):
         """Test __eq__ of tuple with BaseTag."""
+        # Make sure to test BaseTag.__eq__() not tuple.__eq__()
         assert BaseTag(0x00010002) == (0x0001, 0x0002)
         assert not BaseTag(0x00010001) == (0x0001, 0x0002)
 
@@ -174,6 +174,7 @@ class TestBaseTag(object):
 
     def test_ne_diff_class(self):
         """Test __ne__ of two classes with different type."""
+        # Make sure to test BaseTag.__ne__() not int.__ne__()
         assert not BaseTag(0x00000000) != 0
         assert BaseTag(0x00000001) != 0
 
@@ -186,6 +187,7 @@ class TestBaseTag(object):
 
     def test_ne_tuple(self):
         """Test __ne__ of tuple with BaseTag."""
+        # Make sure to test BaseTag.__ne__() not tuple.__ne__()
         assert not BaseTag(0x00010002) != (0x0001, 0x0002)
         assert BaseTag(0x00010001) != (0x0001, 0x0002)
 
@@ -203,22 +205,22 @@ class TestBaseTag(object):
 
     def test_str(self):
         """Test str(BaseTag) produces correct value."""
-        assert str(BaseTag(0x00000000)) == '(0000, 0000)'
-        assert str(BaseTag(0x00010002)) == '(0001, 0002)'
-        assert str(BaseTag(0x10002000)) == '(1000, 2000)'
-        assert str(BaseTag(0xFFFFFFFE)) == '(ffff, fffe)'
+        assert '(0000, 0000)' == str(BaseTag(0x00000000))
+        assert '(0001, 0002)' == str(BaseTag(0x00010002))
+        assert '(1000, 2000)' == str(BaseTag(0x10002000))
+        assert '(ffff, fffe)' == str(BaseTag(0xFFFFFFFE))
 
     def test_group(self):
         """Test BaseTag.group returns correct values."""
-        assert BaseTag(0x00000001).group == 0x0000
-        assert BaseTag(0x00020001).group == 0x0002
-        assert BaseTag(0xFFFF0001).group == 0xFFFF
+        assert 0x0000 == BaseTag(0x00000001).group
+        assert 0x0002 == BaseTag(0x00020001).group
+        assert 0xFFFF == BaseTag(0xFFFF0001).group
 
     def test_element(self):
         """Test BaseTag.element returns correct values."""
-        assert BaseTag(0x00010000).element == 0x0000
-        assert BaseTag(0x00010002).element == 0x0002
-        assert BaseTag(0x0001FFFF).element == 0xFFFF
+        assert 0x0000 == BaseTag(0x00010000).element
+        assert 0x0002 == BaseTag(0x00010002).element
+        assert 0xFFFF == BaseTag(0x0001FFFF).element
 
     def test_private(self):
         """Test BaseTag.is_private returns correct values."""
@@ -321,7 +323,7 @@ class TestTag(object):
         pytest.raises(ValueError, Tag, ['0x01', '0x02'], '0x01')
         pytest.raises(ValueError, Tag, ['0x01', '0x02'], 0x01)
 
-    @unittest.skipIf(not in_py2, 'Long type only exists in Python 2')
+    @pytest.mark.skipif(not in_py2, reason='Long type only exists in Python 2')
     def test_mixed_long_int(self):
         assert Tag([0x1000, long(0x2000)]) == BaseTag(0x10002000)
         assert Tag([long(0x1000), 0x2000]) == BaseTag(0x10002000)
@@ -394,7 +396,3 @@ class TestTagInException(object):
             with tag_in_exception(tag) as tag:
                 raise ValueError('Test message.')
         pytest.raises(ValueError, test)
-
-
-if __name__ == "__main__":
-    unittest.main()

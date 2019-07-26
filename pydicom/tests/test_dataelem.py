@@ -1,10 +1,9 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
-"""unittest cases for pydicom.dataelem module"""
+"""Unit tests for the pydicom.dataelem module."""
 
 # Many tests of DataElement class are implied in test_dataset also
 
 import sys
-import unittest
 
 import pytest
 
@@ -21,8 +20,9 @@ from pydicom.uid import UID
 from pydicom.valuerep import DSfloat
 
 
-class DataElementTests(unittest.TestCase):
-    def setUp(self):
+class TestDataElement(object):
+    """Tests for dataelem.DataElement."""
+    def setup(self):
         self.data_elementSH = DataElement((1, 2), "SH", "hello")
         self.data_elementIS = DataElement((1, 2), "IS", "42")
         self.data_elementDS = DataElement((1, 2), "DS", "42.00001")
@@ -32,179 +32,170 @@ class DataElementTests(unittest.TestCase):
         self.data_elementPrivate = DataElement(0x00090000, 'UL', 101)
         self.data_elementRetired = DataElement(0x00080010, 'SH', 102)
 
-    def testVM1(self):
-        """DataElement: return correct value multiplicity for VM > 1........"""
-        VM = self.data_elementMulti.VM
-        self.assertEqual(VM, 3,
-                         "Wrong Value Multiplicity, expected 3, got %i" % VM)
+    def test_VM_1(self):
+        """DataElement: return correct value multiplicity for VM > 1"""
+        assert 3 == self.data_elementMulti.VM
 
-    def testVM2(self):
-        """DataElement: return correct value multiplicity for VM = 1........"""
-        VM = self.data_elementIS.VM
-        self.assertEqual(VM, 1,
-                         "Wrong Value Multiplicity, expected 1, got %i" % VM)
+    def test_VM_2(self):
+        """DataElement: return correct value multiplicity for VM = 1"""
+        assert 1 == self.data_elementIS.VM
 
-    def testDSFloatConversion(self):
+    def test_DSFloat_conversion(self):
         """Test that strings are correctly converted if changing the value."""
-        self.assertTrue(isinstance(self.data_elementDS.value, DSfloat))
-        self.assertTrue(isinstance(self.data_elementMulti.value[0], DSfloat))
-        self.assertEqual(DSfloat('42.1'), self.data_elementMulti.value[0])
+        assert isinstance(self.data_elementDS.value, DSfloat)
+        assert isinstance(self.data_elementMulti.value[0], DSfloat)
+        assert DSfloat('42.1') == self.data_elementMulti.value[0]
 
         # multi-value append/insert
         self.data_elementMulti.value.append('42.4')
-        self.assertTrue(isinstance(self.data_elementMulti.value[3], DSfloat))
-        self.assertEqual(DSfloat('42.4'), self.data_elementMulti.value[3])
+        assert isinstance(self.data_elementMulti.value[3], DSfloat)
+        assert DSfloat('42.4') == self.data_elementMulti.value[3]
 
         self.data_elementMulti.value.insert(0, '42.0')
-        self.assertTrue(isinstance(self.data_elementMulti.value[0], DSfloat))
-        self.assertEqual(DSfloat('42.0'), self.data_elementMulti.value[0])
+        assert isinstance(self.data_elementMulti.value[0], DSfloat)
+        assert DSfloat('42.0') == self.data_elementMulti.value[0]
 
         # change single value of multi-value
         self.data_elementMulti.value[3] = '123.4'
-        self.assertTrue(isinstance(self.data_elementMulti.value[3], DSfloat))
-        self.assertEqual(DSfloat('123.4'), self.data_elementMulti.value[3])
+        assert isinstance(self.data_elementMulti.value[3], DSfloat)
+        assert DSfloat('123.4') == self.data_elementMulti.value[3]
 
-    def testBackslash(self):
+    def test_backslash(self):
         """DataElement: String with '\\' sets multi-valued data_element."""
         data_element = DataElement((1, 2), "DS", r"42.1\42.2\42.3")
-        self.assertEqual(data_element.VM, 3, "Did not get a mult-valued value")
+        assert 3 == data_element.VM
 
-    def testUID(self):
-        """DataElement: setting or changing UID results in UID type........."""
+    def test_UID(self):
+        """DataElement: setting or changing UID results in UID type."""
         ds = Dataset()
         ds.TransferSyntaxUID = "1.2.3"
-        self.assertTrue(isinstance(ds.TransferSyntaxUID, UID),
-                        "Assignment to UID did not create UID class")
+        assert isinstance(ds.TransferSyntaxUID, UID)
         ds.TransferSyntaxUID += ".4.5.6"
-        self.assertTrue(isinstance(ds.TransferSyntaxUID, UID),
-                        "+= to UID did not keep as UID class")
+        assert isinstance(ds.TransferSyntaxUID, UID)
 
-    def testKeyword(self):
+    def test_keyword(self):
         """DataElement: return correct keyword"""
-        self.assertEqual(self.data_elementCommand.keyword,
-                         'CommandGroupLength')
+        assert 'CommandGroupLength' == self.data_elementCommand.keyword
+        assert '' == self.data_elementPrivate.keyword
 
-        self.assertEqual(self.data_elementPrivate.keyword,
-                         '')
-
-    def testRetired(self):
+    def test_retired(self):
         """DataElement: return correct is_retired"""
-        self.assertEqual(self.data_elementCommand.is_retired, False)
-        self.assertEqual(self.data_elementRetired.is_retired, True)
-        self.assertEqual(self.data_elementPrivate.is_retired, False)
+        assert self.data_elementCommand.is_retired is False
+        assert self.data_elementRetired.is_retired is True
+        assert self.data_elementPrivate.is_retired is False
 
     def test_description_group_length(self):
         """Test DataElement.description for Group Length element"""
         elem = DataElement(0x00100000, 'LO', 12345)
-        assert elem.description() == 'Group Length'
+        assert 'Group Length' == elem.description()
 
     def test_description_unknown_private(self):
         """Test DataElement.description with an unknown private element"""
         elem = DataElement(0x00110010, 'LO', 12345)
         elem.private_creator = 'TEST'
-        assert elem.description() == 'Private tag data'
+        assert 'Private tag data' == elem.description()
         elem = DataElement(0x00110F00, 'LO', 12345)
         assert elem.tag.is_private
         assert not hasattr(elem, 'private_creator')
-        assert elem.description() == 'Private tag data'
+        assert 'Private tag data' == elem.description()
 
     def test_description_unknown(self):
         """Test DataElement.description with an unknown element"""
         elem = DataElement(0x00000004, 'LO', 12345)
-        assert elem.description() == ''
+        assert '' == elem.description()
 
-    def testEqualityStandardElement(self):
+    def test_equality_standard_element(self):
         """DataElement: equality returns correct value for simple elements"""
         dd = DataElement(0x00100010, 'PN', 'ANON')
-        self.assertTrue(dd == dd)
+        assert dd == dd
         ee = DataElement(0x00100010, 'PN', 'ANON')
-        self.assertTrue(dd == ee)
+        assert dd == ee
 
         # Check value
         ee.value = 'ANAN'
-        self.assertFalse(dd == ee)
+        assert not dd == ee
 
         # Check tag
         ee = DataElement(0x00100011, 'PN', 'ANON')
-        self.assertFalse(dd == ee)
+        assert not dd == ee
 
         # Check VR
         ee = DataElement(0x00100010, 'SH', 'ANON')
-        self.assertFalse(dd == ee)
+        assert not dd == ee
 
         dd = DataElement(0x00080018, 'UI', '1.2.3.4')
         ee = DataElement(0x00080018, 'UI', '1.2.3.4')
-        self.assertTrue(dd == ee)
+        assert dd == ee
 
         ee = DataElement(0x00080018, 'PN', '1.2.3.4')
-        self.assertFalse(dd == ee)
+        assert not dd == ee
 
-    def testEqualityPrivateElement(self):
+    def test_equality_private_element(self):
         """DataElement: equality returns correct value for private elements"""
         dd = DataElement(0x01110001, 'PN', 'ANON')
-        self.assertTrue(dd == dd)
+        assert dd == dd
         ee = DataElement(0x01110001, 'PN', 'ANON')
-        self.assertTrue(dd == ee)
+        assert dd == ee
 
         # Check value
         ee.value = 'ANAN'
-        self.assertFalse(dd == ee)
+        assert not dd == ee
 
         # Check tag
         ee = DataElement(0x01110002, 'PN', 'ANON')
-        self.assertFalse(dd == ee)
+        assert not dd == ee
 
         # Check VR
         ee = DataElement(0x01110001, 'SH', 'ANON')
-        self.assertFalse(dd == ee)
+        assert not dd == ee
 
-    def testEqualitySequenceElement(self):
+    def test_equality_sequence_element(self):
         """DataElement: equality returns correct value for sequence elements"""
         dd = DataElement(0x300A00B0, 'SQ', [])
-        self.assertTrue(dd == dd)
+        assert dd == dd
         ee = DataElement(0x300A00B0, 'SQ', [])
-        self.assertTrue(dd == ee)
+        assert dd == ee
 
         # Check value
         e = Dataset()
         e.PatientName = 'ANON'
         ee.value = [e]
-        self.assertFalse(dd == ee)
+        assert not dd == ee
 
         # Check tag
         ee = DataElement(0x01110002, 'SQ', [])
-        self.assertFalse(dd == ee)
+        assert not dd == ee
 
         # Check VR
         ee = DataElement(0x300A00B0, 'SH', [])
-        self.assertFalse(dd == ee)
+        assert not dd == ee
 
         # Check with dataset
         dd = DataElement(0x300A00B0, 'SQ', [Dataset()])
         dd.value[0].PatientName = 'ANON'
         ee = DataElement(0x300A00B0, 'SQ', [Dataset()])
         ee.value[0].PatientName = 'ANON'
-        self.assertTrue(dd == ee)
+        assert dd == ee
 
         # Check uneven sequences
         dd.value.append(Dataset())
         dd.value[1].PatientName = 'ANON'
-        self.assertFalse(dd == ee)
+        assert not dd == ee
 
         ee.value.append(Dataset())
         ee.value[1].PatientName = 'ANON'
-        self.assertTrue(dd == ee)
+        assert dd == ee
         ee.value.append(Dataset())
         ee.value[2].PatientName = 'ANON'
-        self.assertFalse(dd == ee)
+        assert not dd == ee
 
-    def testEqualityNotElement(self):
+    def test_equality_not_rlement(self):
         """DataElement: equality returns correct value when not same class"""
         dd = DataElement(0x00100010, 'PN', 'ANON')
         ee = {'0x00100010': 'ANON'}
-        self.assertFalse(dd == ee)
+        assert not dd == ee
 
-    def testEqualityInheritance(self):
+    def test_equality_inheritance(self):
         """DataElement: equality returns correct value for subclasses"""
 
         class DataElementPlus(DataElement):
@@ -212,13 +203,13 @@ class DataElementTests(unittest.TestCase):
 
         dd = DataElement(0x00100010, 'PN', 'ANON')
         ee = DataElementPlus(0x00100010, 'PN', 'ANON')
-        self.assertTrue(ee == ee)
-        self.assertTrue(dd == ee)
-        self.assertTrue(ee == dd)
+        assert ee == ee
+        assert dd == ee
+        assert ee == dd
 
         ee = DataElementPlus(0x00100010, 'PN', 'ANONY')
-        self.assertFalse(dd == ee)
-        self.assertFalse(ee == dd)
+        assert not dd == ee
+        assert not ee == dd
 
     def test_equality_class_members(self):
         """Test equality is correct when ignored class members differ."""
@@ -227,54 +218,45 @@ class DataElementTests(unittest.TestCase):
         dd.file_tell = 10
         dd.maxBytesToDisplay = 0
         dd.descripWidth = 0
-        ee = DataElement(0x00100010, 'PN', 'ANON')
-        self.assertTrue(dd == ee)
+        assert DataElement(0x00100010, 'PN', 'ANON') == dd
 
     def test_inequality_standard(self):
         """Test DataElement.__ne__ for standard element"""
         dd = DataElement(0x00100010, 'PN', 'ANON')
         assert not dd != dd
-        ee = DataElement(0x00100010, 'PN', 'ANONA')
-        assert dd != ee
+        assert DataElement(0x00100010, 'PN', 'ANONA') != dd
 
         # Check tag
-        ee = DataElement(0x00100011, 'PN', 'ANON')
-        assert dd != ee
+        assert DataElement(0x00100011, 'PN', 'ANON') != dd
 
         # Check VR
-        ee = DataElement(0x00100010, 'SH', 'ANON')
-        assert dd != ee
+        assert DataElement(0x00100010, 'SH', 'ANON') != dd
 
     def test_inequality_sequence(self):
         """Test DataElement.__ne__ for sequence element"""
         dd = DataElement(0x300A00B0, 'SQ', [])
         assert not dd != dd
-        ee = DataElement(0x300A00B0, 'SQ', [])
-        assert not dd != ee
+        assert not DataElement(0x300A00B0, 'SQ', []) != dd
         ee = DataElement(0x300A00B0, 'SQ', [Dataset()])
-        assert dd != ee
+        assert ee != dd
 
         # Check value
         dd.value = [Dataset()]
         dd[0].PatientName = 'ANON'
         ee[0].PatientName = 'ANON'
-        assert not dd != ee
+        assert not ee != dd
         ee[0].PatientName = 'ANONA'
-        assert dd != ee
+        assert ee != dd
 
-    def testHash(self):
-        """DataElement: hash returns TypeErrpr"""
-        dd = DataElement(0x00100010, 'PN', 'ANON')
-
-        def test_hash():
-            hash(dd)
-
-        self.assertRaises(TypeError, test_hash)
+    def test_hash(self):
+        """Test hash(DataElement) raises TypeError"""
+        with pytest.raises(TypeError, match=r"unhashable"):
+            hash(DataElement(0x00100010, 'PN', 'ANON'))
 
     def test_repeater_str(self):
         """Test a repeater group element displays the element name."""
         elem = DataElement(0x60023000, 'OB', b'\x00')
-        self.assertTrue('Overlay Data' in elem.__str__())
+        assert 'Overlay Data' in elem.__str__()
 
     def test_str_no_vr(self):
         """Test DataElement.__str__ output with no VR"""
@@ -291,15 +273,15 @@ class DataElementTests(unittest.TestCase):
         elem[0].PatientID = '1234'
         assert repr(elem) == repr(elem.value)
 
-    @unittest.skipIf(sys.version_info >= (3, ), 'Testing Python 2 behavior')
+    @pytest.mark.skipif(sys.version_info >= (3, ), reason='Python 2 behavior')
     def test_unicode(self):
         """Test unicode representation of the DataElement"""
         elem = DataElement(0x00100010, 'PN', u'ANON')
         # Make sure elem.value is actually unicode
         assert isinstance(elem.value, unicode)
-        assert unicode(elem) == (
+        assert (
             u"(0010, 0010) Patient's Name                      PN: ANON"
-        )
+        ) == unicode(elem)
         assert isinstance(unicode(elem), unicode)
         assert not isinstance(unicode(elem), str)
         # Make sure elem.value is still unicode
@@ -308,9 +290,9 @@ class DataElementTests(unittest.TestCase):
         # When value is not in compat.text_type
         elem = DataElement(0x00100010, 'LO', 12345)
         assert isinstance(unicode(elem), unicode)
-        assert unicode(elem) == (
+        assert (
             u"(0010, 0010) Patient's Name                      LO: 12345"
-        )
+        ) == unicode(elem)
 
     def test_getitem_raises(self):
         """Test DataElement.__getitem__ raise if value not indexable"""
@@ -456,45 +438,40 @@ class DataElementTests(unittest.TestCase):
             check_empty_binary_element(None)
 
 
-class RawDataElementTests(unittest.TestCase):
-    def testKeyError(self):
+class TestRawDataElement(object):
+    """Tests for dataelem.RawDataElement."""
+    def test_key_error(self):
         """RawDataElement: conversion of unknown tag throws KeyError..."""
         # raw data element -> tag VR length value
         #                       value_tell is_implicit_VR is_little_endian'
         # Unknown (not in DICOM dict), non-private, non-group 0 for this test
         raw = RawDataElement(Tag(0x88880002), None, 4, 0x1111,
                              0, True, True)
-        self.assertRaises(KeyError, DataElement_from_raw, raw)
 
-    def testValidTag(self):
+        with pytest.raises(KeyError, match=r"\(8888, 0002\)"):
+            DataElement_from_raw(raw)
+
+    def test_valid_tag(self):
         """RawDataElement: conversion of known tag succeeds..."""
         raw = RawDataElement(Tag(0x00080020), 'DA', 8, b'20170101',
                              0, False, True)
         element = DataElement_from_raw(raw, default_encoding)
-        self.assertEqual(element.name, 'Study Date')
-        self.assertEqual(element.VR, 'DA')
-        self.assertEqual(element.value, '20170101')
+        assert 'Study Date' == element.name
+        assert 'DA' == element.VR
+        assert '20170101' == element.value
 
         raw = RawDataElement(Tag(0x00080000), None, 4, b'\x02\x00\x00\x00',
                              0, True, True)
         elem = DataElement_from_raw(raw, default_encoding)
-        assert elem.VR == 'UL'
+        assert 'UL' == elem.VR
 
-    @unittest.skipIf(sys.version_info >= (3, ), 'Testing Python 2 behavior')
-    def testTagWithoutEncodingPython2(self):
-        """RawDataElement: no encoding needed in Python 2."""
+    def test_data_element_without_encoding(self):
+        """RawDataElement: no encoding needed."""
         raw = RawDataElement(Tag(0x00104000), 'LT', 23,
                              b'comment\\comment2\\comment3',
                              0, False, True)
         element = DataElement_from_raw(raw)
-        self.assertEqual(element.name, 'Patient Comments')
-
-    @unittest.skipIf(sys.version_info < (3, ), 'Testing Python 3 behavior')
-    def testTagWithoutEncodingPython3(self):
-        """RawDataElement: raises if no encoding given in Python 3."""
-        self.assertRaises(TypeError, RawDataElement(Tag(0x00104000), 'LT', 14,
-                                                    b'comment1\\comment2',
-                                                    0, False, True))
+        assert 'Patient Comments' == element.name
 
     def test_unknown_vr(self):
         """Test converting a raw element with unknown VR"""

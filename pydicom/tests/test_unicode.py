@@ -1,13 +1,16 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 # -*- coding: utf-8 -*-
+"""Unit tests for unicode."""
 
 import sys
-import unittest
+
+import pytest
+
 from pydicom import dcmread
 
 
-class UnicodeFilenames(unittest.TestCase):
-    def testRead(self):
+class TestUnicodeFilenames(object):
+    def test_read(self):
         """Unicode: Can read a file with unicode characters in name..."""
         uni_name = u'test°'
 
@@ -25,7 +28,3 @@ class UnicodeFilenames(unittest.TestCase):
         # ignore file doesn't exist error
         except IOError:
             pass
-
-
-if __name__ == "__main__":
-    unittest.main()
