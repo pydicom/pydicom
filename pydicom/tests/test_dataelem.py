@@ -15,6 +15,7 @@ from pydicom.dataelem import (
     DataElement_from_raw,
 )
 from pydicom.dataset import Dataset
+from pydicom.multival import MultiValue
 from pydicom.tag import Tag
 from pydicom.uid import UID
 from pydicom.valuerep import DSfloat
@@ -367,6 +368,92 @@ class DataElementTests(unittest.TestCase):
         private_data_elem = ds[0x60211200]
         assert '[Overlay ID]' == private_data_elem.name
         assert 'UN' == private_data_elem.VR
+
+    def test_empty_text_values(self):
+        """Test that assigning an empty value behaves as expected."""
+        def check_empty_text_element(value):
+            setattr(ds, tag_name, value)
+            elem = ds[tag_name]
+            assert bool(elem.value) is False
+
+        text_vrs = {
+            'AE': 'Receiver',
+            'AS': 'PatientAge',
+            'AT': 'OffendingElement',
+            'CS': 'QualityControlSubject',
+            'DA': 'PatientBirthDate',
+            'DS': 'PatientWeight',
+            'DT': 'AcquisitionDateTime',
+            'IS': 'BeamNumber',
+            'LO': 'DataSetSubtype',
+            'LT': 'ExtendedCodeMeaning',
+            'PN': 'PatientName',
+            'SH': 'CodeValue',
+            'ST': 'InstitutionAddress',
+            'TM': 'StudyTime',
+            'UC': 'LongCodeValue',
+            'UI': 'SOPClassUID',
+            'UR': 'CodingSchemeURL',
+            'UT': 'StrainAdditionalInformation',
+        }
+        ds = Dataset()
+        # set value to new element
+        for tag_name in text_vrs.values():
+            check_empty_text_element(None)
+            del ds[tag_name]
+            check_empty_text_element(b'')
+            del ds[tag_name]
+            check_empty_text_element(u'')
+            del ds[tag_name]
+            check_empty_text_element([])
+            del ds[tag_name]
+
+        # set value to existing element
+        for tag_name in text_vrs.values():
+            check_empty_text_element(None)
+            check_empty_text_element(b'')
+            check_empty_text_element(u'')
+            check_empty_text_element([])
+            check_empty_text_element(None)
+
+    def test_empty_binary_values(self):
+        """Test that assigning an empty value behaves as expected for
+        non-text VRs."""
+        def check_empty_binary_element(value):
+            setattr(ds, tag_name, value)
+            elem = ds[tag_name]
+            assert bool(elem.value) is False
+
+        non_text_vrs = {
+            'SL': 'RationalNumeratorValue',
+            'SS': 'SelectorSSValue',
+            'UL': 'SimpleFrameList',
+            'US': 'SourceAcquisitionBeamNumber',
+            'FD': 'RealWorldValueLUTData',
+            'FL': 'VectorAccuracy',
+            'OB': 'FillPattern',
+            'OD': 'DoubleFloatPixelData',
+            'OF': 'UValueData',
+            'OL': 'TrackPointIndexList',
+            'OW': 'TrianglePointIndexList',
+            'UN': 'SelectorUNValue',
+        }
+        ds = Dataset()
+        # set value to new element
+        for tag_name in non_text_vrs.values():
+            check_empty_binary_element(None)
+            del ds[tag_name]
+            check_empty_binary_element([])
+            del ds[tag_name]
+            check_empty_binary_element(MultiValue(int, []))
+            del ds[tag_name]
+
+        # set value to existing element
+        for tag_name in non_text_vrs.values():
+            check_empty_binary_element(None)
+            check_empty_binary_element([])
+            check_empty_binary_element(MultiValue(int, []))
+            check_empty_binary_element(None)
 
 
 class RawDataElementTests(unittest.TestCase):
