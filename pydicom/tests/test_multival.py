@@ -45,22 +45,22 @@ class TestMultiValue(object):
         multival = MultiValue(IS, [1, 5, 10])
         multival.append('5')
         assert isinstance(multival[-1], IS)
-        assert multival[-1] == 5
+        assert 5 == multival[-1]
 
     def testSetIndex(self):
         """MultiValue: Setting list item converts it to required type"""
         multival = MultiValue(IS, [1, 5, 10])
         multival[1] = '7'
         assert isinstance(multival[1], IS)
-        assert multival[1] == 7
+        assert 7 == multival[1]
 
     def testDeleteIndex(self):
         """MultiValue: Deleting item at index behaves as expected..."""
         multival = MultiValue(IS, [1, 5, 10])
         del multival[1]
         assert 2 == len(multival)
-        assert multival[0] == 1
-        assert multival[1] == 10
+        assert 1 == multival[0]
+        assert 10 == multival[1]
 
     def testExtend(self):
         """MultiValue: Extending a list converts all to required type"""
@@ -68,7 +68,7 @@ class TestMultiValue(object):
         multival.extend(['7', 42])
         assert isinstance(multival[-2], IS)
         assert isinstance(multival[-1], IS)
-        assert multival[-2] == 7
+        assert 7 == multival[-2]
 
     def testSlice(self):
         """MultiValue: Setting slice converts items to required type."""
@@ -76,7 +76,7 @@ class TestMultiValue(object):
         multival[2:7:2] = [4, 16, 36]
         for val in multival:
             assert isinstance(val, IS)
-        assert multival[4] == 16
+        assert 16 == multival[4]
 
     def testIssue236DeepCopy(self):
         """MultiValue: deepcopy of MultiValue does not generate an error"""

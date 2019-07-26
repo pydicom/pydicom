@@ -11,7 +11,7 @@ class TestSequence(object):
     def testDefaultInitialization(self):
         """Sequence: Ensure a valid Sequence is created"""
         empty = Sequence()
-        assert len(empty) == 0
+        assert 0 == len(empty)
 
     def testValidInitialization(self):
         """Sequence: Ensure valid creation of Sequences using Dataset inputs"""
@@ -53,7 +53,7 @@ class TestSequence(object):
         seq = Sequence([Dataset(), ])
         seq[0] = ds
 
-        assert seq[0] == ds
+        assert ds == seq[0]
 
     def test_str(self):
         """Test string output of the sequence"""

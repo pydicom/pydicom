@@ -10,7 +10,7 @@ from pydicom import dcmread
 
 
 class TestUnicodeFilenames(object):
-    def testRead(self):
+    def test_read(self):
         """Unicode: Can read a file with unicode characters in name..."""
         uni_name = u'test°'
 

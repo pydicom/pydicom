@@ -72,7 +72,7 @@ dir_name = os.path.dirname(sys.argv[0])
 save_dir = os.getcwd()
 
 
-class Testjpeg_ls_JPEG_LS_no_jpeg_ls(object):
+class TestJPEGLS_no_jpeg_ls(object):
     def setup(self):
         self.jpeg_ls_lossless = dcmread(jpeg_ls_lossless_name)
         self.mr_small = dcmread(mr_name)
@@ -89,7 +89,7 @@ class Testjpeg_ls_JPEG_LS_no_jpeg_ls(object):
             self.jpeg_ls_lossless.pixel_array
 
 
-class Testjpeg_ls_JPEG2000_no_jpeg_ls(object):
+class TestJPEGLS_JPEG2000_no_jpeg_ls(object):
     def setup(self):
         self.jpeg_2k = dcmread(jpeg2000_name)
         self.jpeg_2k_lossless = dcmread(jpeg2000_lossless_name)
@@ -113,7 +113,7 @@ class Testjpeg_ls_JPEG2000_no_jpeg_ls(object):
             self.emri_jpeg_2k_lossless.pixel_array
 
 
-class Testjpeg_ls_JPEGlossy_no_jpeg_ls(object):
+class TestJPEGLS_JPEGlossy_no_jpeg_ls(object):
     def setup(self):
         self.jpeg_lossy = dcmread(jpeg_lossy_name)
         self.color_3d_jpeg = dcmread(color_3d_jpeg_baseline)
@@ -126,8 +126,7 @@ class Testjpeg_ls_JPEGlossy_no_jpeg_ls(object):
     def testJPEGlossy(self):
         """JPEG-lossy: Returns correct values for sample data elements"""
         got = self.jpeg_lossy.DerivationCodeSequence[0].CodeMeaning
-        expected = 'Lossy Compression'
-        assert got == expected
+        assert 'Lossy Compression' == got
 
     def testJPEGlossyPixelArray(self):
         """JPEG-lossy: Fails gracefully when uncompressed data is asked for"""
@@ -139,7 +138,7 @@ class Testjpeg_ls_JPEGlossy_no_jpeg_ls(object):
             self.color_3d_jpeg.pixel_array
 
 
-class Testjpeg_ls_JPEGlossless_no_jpeg_ls(object):
+class TestJPEGLS_JPEGlossless_no_jpeg_ls(object):
     def setup(self):
         self.jpeg_lossless = dcmread(jpeg_lossless_name)
         self.original_handlers = pydicom.config.pixel_data_handlers
@@ -154,8 +153,7 @@ class Testjpeg_ls_JPEGlossless_no_jpeg_ls(object):
             jpeg_lossless.\
             SourceImageSequence[0].\
             PurposeOfReferenceCodeSequence[0].CodeMeaning
-        expected = 'Uncompressed predecessor'
-        assert got == expected
+        assert 'Uncompressed predecessor' == got
 
     def testJPEGlosslessPixelArray(self):
         """JPEGlossless: Fails gracefully when uncompressed data asked for"""
@@ -164,7 +162,7 @@ class Testjpeg_ls_JPEGlossless_no_jpeg_ls(object):
 
 
 @pytest.mark.skipif(not test_jpeg_ls_decoder, reason=jpeg_ls_missing_message)
-class Testjpeg_ls_JPEG_LS_with_jpeg_ls(object):
+class TestJPEGLS_JPEG_LS_with_jpeg_ls(object):
     def setup(self):
         self.jpeg_ls_lossless = dcmread(jpeg_ls_lossless_name)
         self.mr_small = dcmread(mr_name)
@@ -184,18 +182,18 @@ class Testjpeg_ls_JPEG_LS_with_jpeg_ls(object):
     def test_JPEG_LS_PixelArray(self):
         a = self.jpeg_ls_lossless.pixel_array
         b = self.mr_small.pixel_array
-        assert a.mean() == b.mean()
+        assert b.mean() == a.mean()
         assert a.flags.writeable
 
     def test_emri_JPEG_LS_PixelArray(self):
         a = self.emri_jpeg_ls_lossless.pixel_array
         b = self.emri_small.pixel_array
-        assert a.mean() == b.mean()
+        assert b.mean() == a.mean()
         assert a.flags.writeable
 
 
 @pytest.mark.skipif(not test_jpeg_ls_decoder, reason=jpeg_ls_missing_message)
-class Testjpeg_ls_JPEG2000_with_jpeg_ls(object):
+class TestJPEGLS_JPEG2000_with_jpeg_ls(object):
     def setup(self):
         self.jpeg_2k = dcmread(jpeg2000_name)
         self.jpeg_2k_lossless = dcmread(jpeg2000_lossless_name)
@@ -218,7 +216,7 @@ class Testjpeg_ls_JPEG2000_with_jpeg_ls(object):
 
 
 @pytest.mark.skipif(not test_jpeg_ls_decoder, reason=jpeg_ls_missing_message)
-class Testjpeg_ls_JPEGlossy_with_jpeg_ls(object):
+class TestJPEGLS_JPEGlossy_with_jpeg_ls(object):
     def setup(self):
         self.jpeg_lossy = dcmread(jpeg_lossy_name)
         self.color_3d_jpeg = dcmread(color_3d_jpeg_baseline)
@@ -231,8 +229,7 @@ class Testjpeg_ls_JPEGlossy_with_jpeg_ls(object):
     def testJPEGlossy(self):
         """JPEG-lossy: Returns correct values for sample data elements"""
         got = self.jpeg_lossy.DerivationCodeSequence[0].CodeMeaning
-        expected = 'Lossy Compression'
-        assert got == expected
+        assert 'Lossy Compression' == got
 
     def testJPEGlossyPixelArray(self):
         with pytest.raises(NotImplementedError):
@@ -244,7 +241,7 @@ class Testjpeg_ls_JPEGlossy_with_jpeg_ls(object):
 
 
 @pytest.mark.skipif(not test_jpeg_ls_decoder, reason=jpeg_ls_missing_message)
-class Testjpeg_ls_JPEGlossless_with_jpeg_ls(object):
+class TestJPEGLS_JPEGlossless_with_jpeg_ls(object):
     def setup(self):
         self.jpeg_lossless = dcmread(jpeg_lossless_name)
         self.original_handlers = pydicom.config.pixel_data_handlers
@@ -259,8 +256,7 @@ class Testjpeg_ls_JPEGlossless_with_jpeg_ls(object):
             jpeg_lossless.\
             SourceImageSequence[0].\
             PurposeOfReferenceCodeSequence[0].CodeMeaning
-        expected = 'Uncompressed predecessor'
-        assert got == expected
+        assert 'Uncompressed predecessor' == got
 
     def testJPEGlosslessPixelArray(self):
         """JPEGlossless: Fails gracefully when uncompressed data asked for"""

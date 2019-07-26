@@ -27,7 +27,7 @@ class TestRawReaderExplVRTests(object):
         de_gen = data_element_generator(infile,
                                         is_implicit_VR=False,
                                         is_little_endian=True)
-        assert next(de_gen) == expected
+        assert expected == next(de_gen)
         # (0002,0002) OB 2-byte-reserved 4-byte-length,
         # value 0x00 0x01
 
@@ -43,7 +43,7 @@ class TestRawReaderExplVRTests(object):
         de_gen = data_element_generator(infile,
                                         is_implicit_VR=False,
                                         is_little_endian=True)
-        assert next(de_gen) == expected
+        assert expected == next(de_gen)
 
     def testExplVRLittleEndianUndefLength(self):
         """Raw read: Expl VR Little Endian with undefined length..."""
@@ -60,7 +60,7 @@ class TestRawReaderExplVRTests(object):
         de_gen = data_element_generator(infile,
                                         is_implicit_VR=False,
                                         is_little_endian=True)
-        assert next(de_gen) == expected
+        assert expected == next(de_gen)
 
         # Test again such that delimiter crosses default 128-byte "chunks"
         for multiplier in (116, 117, 118, 120):
@@ -95,7 +95,7 @@ class TestRawReaderImplVR(object):
         de_gen = data_element_generator(infile,
                                         is_implicit_VR=True,
                                         is_little_endian=True)
-        assert next(de_gen) == expected
+        assert expected == next(de_gen)
 
     def testImplVRLittleEndianUndefLength(self):
         """Raw read: Impl VR Little Endian with undefined length..."""
@@ -111,7 +111,7 @@ class TestRawReaderImplVR(object):
         de_gen = data_element_generator(infile,
                                         is_implicit_VR=True,
                                         is_little_endian=True)
-        assert next(de_gen) == expected
+        assert expected == next(de_gen)
 
         # Test again such that delimiter crosses default 128-byte "chunks"
         for multiplier in (116, 117, 118, 120):
@@ -156,10 +156,10 @@ class TestRawSequence(object):
         raw_seq = next(gen)
         seq = convert_value("SQ", raw_seq)
         assert isinstance(seq, Sequence)
-        assert len(seq) == 1
-        assert len(seq[0]) == 0
+        assert 1 == len(seq)
+        assert 0 == len(seq[0])
         elem2 = next(gen)
-        assert elem2.tag == 0x0008103e
+        assert 0x0008103e == elem2.tag
 
     def testImplVRLittleEndian_ExplicitLengthSeq(self):
         """Raw read: ImplVR Little Endian SQ with explicit lengths..."""
@@ -196,10 +196,8 @@ class TestRawSequence(object):
 
         # The sequence is parsed, but only into raw data elements.
         # They will be converted when asked for. Check some:
-        got = seq[0].BeamNumber
-        assert got == 1
-        got = seq[1].BeamName
-        assert got == 'Beam 2'
+        assert 1 == seq[0].BeamNumber
+        assert 'Beam 2' == seq[1].BeamName
 
     def testImplVRBigEndian_ExplicitLengthSeq(self):
         """Raw read: ImplVR BigEndian SQ with explicit lengths..."""
@@ -236,10 +234,8 @@ class TestRawSequence(object):
 
         # The sequence is parsed, but only into raw data elements.
         # They will be converted when asked for. Check some:
-        got = seq[0].BeamNumber
-        assert got == 1
-        got = seq[1].BeamName
-        assert got == 'Beam 2'
+        assert 1 == seq[0].BeamNumber
+        assert 'Beam 2' == seq[1].BeamName
 
     def testExplVRBigEndian_UndefinedLengthSeq(self):
         """Raw read: ExplVR BigEndian Undefined Length SQ..."""
@@ -285,7 +281,5 @@ class TestRawSequence(object):
 
         # The sequence is parsed, but only into raw data elements.
         # They will be converted when asked for. Check some:
-        got = seq[0].BeamNumber
-        assert got == 1
-        got = seq[1].BeamName
-        assert got == 'Beam 2'
+        assert 1 == seq[0].BeamNumber
+        assert 'Beam 2' == seq[1].BeamName

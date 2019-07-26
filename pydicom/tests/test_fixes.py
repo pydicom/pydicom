@@ -101,7 +101,7 @@ class TestTimeZone(object):
     def test_str(self):
         for tz in [self.ACDT, self.EST, timezone.utc,
                    timezone.min, timezone.max]:
-            assert str(tz) == tz.tzname(None)
+            assert tz.tzname(None) == str(tz)
 
     def test_repr(self):
         datetime = datetime_module
@@ -114,14 +114,14 @@ class TestTimeZone(object):
 
     def test_class_members(self):
         limit = timedelta(hours=23, minutes=59)
-        assert timezone.utc.utcoffset(None) == ZERO
-        assert timezone.min.utcoffset(None) == -limit
-        assert timezone.max.utcoffset(None) == limit
+        assert ZERO == timezone.utc.utcoffset(None)
+        assert -limit == timezone.min.utcoffset(None)
+        assert limit == timezone.max.utcoffset(None)
 
     def test_constructor(self):
         assert timezone.utc is timezone(timedelta(0))
         assert timezone.utc is not timezone(timedelta(0), 'UTC')
-        assert timezone.utc == timezone(timedelta(0), 'UTC')
+        assert timezone(timedelta(0), 'UTC') == timezone.utc
         # invalid offsets
         for invalid in [timedelta(microseconds=1), timedelta(1, 1),
                         timedelta(seconds=1), timedelta(1), -timedelta(1)]:
@@ -199,22 +199,22 @@ class TestTimeZone(object):
         assert timezone(ZERO) in {timezone(ZERO)}
         assert timezone(ZERO) is not None
         assert not timezone(ZERO) is None
-        assert timezone(ZERO) != 'random'
+        assert 'random' != timezone(ZERO)
 
     def test_aware_datetime(self):
         # test that timezone instances can be used by datetime
         t = datetime(1, 1, 1)
         for tz in [timezone.min, timezone.max, timezone.utc]:
             print(tz.tzname(t))
-            assert tz.tzname(t) == t.replace(tzinfo=tz).tzname()
-            assert tz.utcoffset(t) == t.replace(tzinfo=tz).utcoffset()
-            assert tz.dst(t) == t.replace(tzinfo=tz).dst()
+            assert t.replace(tzinfo=tz).tzname() == tz.tzname(t)
+            assert t.replace(tzinfo=tz).utcoffset() == tz.utcoffset(t)
+            assert t.replace(tzinfo=tz).dst() == tz.dst(t)
 
     def test_pickle(self):
         for tz in self.ACDT, self.EST, timezone.min, timezone.max:
             for pickler, unpickler, proto in pickle_choices:
                 tz_copy = unpickler.loads(pickler.dumps(tz, proto))
-                assert tz_copy == tz
+                assert tz == tz_copy
         tz = timezone.utc
         for pickler, unpickler, proto in pickle_choices:
             tz_copy = unpickler.loads(pickler.dumps(tz, proto))
@@ -223,7 +223,7 @@ class TestTimeZone(object):
     def test_copy(self):
         for tz in self.ACDT, self.EST, timezone.min, timezone.max:
             tz_copy = copy.copy(tz)
-            assert tz_copy == tz
+            assert tz == tz_copy
         tz = timezone.utc
         tz_copy = copy.copy(tz)
         assert tz_copy is tz
@@ -231,7 +231,7 @@ class TestTimeZone(object):
     def test_deepcopy(self):
         for tz in self.ACDT, self.EST, timezone.min, timezone.max:
             tz_copy = copy.deepcopy(tz)
-            assert tz_copy == tz
+            assert tz == tz_copy
         tz = timezone.utc
         tz_copy = copy.deepcopy(tz)
         assert tz_copy is tz

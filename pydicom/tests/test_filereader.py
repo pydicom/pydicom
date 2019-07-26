@@ -93,27 +93,27 @@ dir_name = os.path.dirname(sys.argv[0])
 save_dir = os.getcwd()
 
 
-class ReaderTests(object):
-    def testEmptyNumbersTag(self):
+class TestReader(object):
+    def test_empty_numbers_tag(self):
         """Tests that an empty tag with a number VR (FL, UL, SL, US,
         SS, FL, FD, OF) reads as an empty string"""
         empty_number_tags_ds = dcmread(empty_number_tags_name)
-        assert empty_number_tags_ds.ExaminedBodyThickness == ''
-        assert empty_number_tags_ds.SimpleFrameList == ''
-        assert empty_number_tags_ds.ReferencePixelX0 == ''
-        assert empty_number_tags_ds.PhysicalUnitsXDirection == ''
-        assert empty_number_tags_ds.TagAngleSecondAxis == ''
-        assert empty_number_tags_ds.TagSpacingSecondDimension == ''
-        assert empty_number_tags_ds.VectorGridData == ''
+        assert '' == empty_number_tags_ds.ExaminedBodyThickness
+        assert '' == empty_number_tags_ds.SimpleFrameList
+        assert '' == empty_number_tags_ds.ReferencePixelX0
+        assert '' == empty_number_tags_ds.PhysicalUnitsXDirection
+        assert '' == empty_number_tags_ds.TagAngleSecondAxis
+        assert '' == empty_number_tags_ds.TagSpacingSecondDimension
+        assert '' == empty_number_tags_ds.VectorGridData
 
-    def testUTF8FileName(self):
+    def test_UTF8_filename(self):
         utf8_filename = os.path.join(tempfile.gettempdir(), "ДИКОМ.dcm")
         shutil.copyfile(rtdose_name, utf8_filename)
         ds = dcmread(utf8_filename)
         os.remove(utf8_filename)
         assert ds is not None
 
-    def testRTPlan(self):
+    def test_RTPlan(self):
         """Returns correct values for sample data elements in test
         RT Plan file.
         """
@@ -122,69 +122,68 @@ class ReaderTests(object):
         # if not two controlpoints, then this would raise exception
         cp0, cp1 = beam.ControlPointSequence
 
-        assert beam.TreatmentMachineName == "unit001"
-        assert beam.TreatmentMachineName == beam[0x300a, 0x00b2].value
+        assert "unit001" == beam.TreatmentMachineName
+        assert beam[0x300a, 0x00b2].value == beam.TreatmentMachineName
 
         got = cp1.ReferencedDoseReferenceSequence[
             0].CumulativeDoseReferenceCoefficient
         DS = pydicom.valuerep.DS
         expected = DS('0.9990268')
-        assert got == expected
+        assert expected == got
         got = cp0.BeamLimitingDevicePositionSequence[0].LeafJawPositions
-        assert got[0] == DS('-100') and got[1] == DS('100.0')
+        assert [DS('-100'), DS('100.0')] == got
 
-    def testRTDose(self):
+    def test_RTDose(self):
         """Returns correct values for sample data elements in test
         RT Dose file"""
         dose = dcmread(rtdose_name)
-        assert dose.FrameIncrementPointer == Tag((0x3004, 0x000c))
-        assert dose.FrameIncrementPointer == dose[0x28, 9].value
+        assert Tag((0x3004, 0x000c)) == dose.FrameIncrementPointer
+        assert dose[0x28, 9].value == dose.FrameIncrementPointer
 
         # try a value that is nested the deepest
         # (so deep I break it into two steps!)
         fract = (
             dose.ReferencedRTPlanSequence[0].ReferencedFractionGroupSequence[0]
         )
-        beamnum = fract.ReferencedBeamSequence[0].ReferencedBeamNumber
-        assert beamnum == 1
+        assert 1 == fract.ReferencedBeamSequence[0].ReferencedBeamNumber
 
-    def testCT(self):
+    def test_CT(self):
         """Returns correct values for sample data elements in test CT file."""
         ct = dcmread(ct_name)
-        assert ct.file_meta.ImplementationClassUID == '1.3.6.1.4.1.5962.2'
+        assert '1.3.6.1.4.1.5962.2' == ct.file_meta.ImplementationClassUID
         value = ct.file_meta[0x2, 0x12].value
-        assert ct.file_meta.ImplementationClassUID == value
+        assert value == ct.file_meta.ImplementationClassUID
 
         # (0020, 0032) Image Position (Patient)
         # [-158.13580300000001, -179.035797, -75.699996999999996]
         got = ct.ImagePositionPatient
         DS = pydicom.valuerep.DS
         expected = [DS('-158.135803'), DS('-179.035797'), DS('-75.699997')]
-        assert got == expected
+        assert expected == got
 
-        assert ct.Rows == 128
-        assert ct.Columns == 128
-        assert ct.BitsStored == 16
-        assert len(ct.PixelData) == 128 * 128 * 2
+        assert 128 == ct.Rows
+        assert 128 == ct.Columns
+        assert 16 == ct.BitsStored
+        assert 128 * 128 * 2 == len(ct.PixelData)
 
         # Also test private elements name can be resolved:
         got = ct[(0x0043, 0x104e)].name
         assert "[Duration of X-ray on]" == got
 
-    @pytest.mark.skipif(not have_numpy, "Numpy not installed")
-    def testCTPixelData(self):
+    @pytest.mark.skipif(not have_numpy, reason="Numpy not installed")
+    def test_CT_PixelData(self):
         """Check that we can read pixel data.
         Tests that we get last one in array.
         """
         ct = dcmread(ct_name)
         assert 909 == ct.pixel_array[-1][-1]
 
-    def testNoForce(self):
+    def test_no_force(self):
         """Raises exception if missing DICOM header and force==False."""
         with pytest.raises(InvalidDicomError):
             dcmread(rtstruct_name)
 
-    def testRTstruct(self):
+    def test_RTStruct(self):
         """Returns correct values for sample elements in test RTSTRUCT file."""
         # RTSTRUCT test file has complex nested sequences
         # -- see rtstruct.dump file
@@ -203,7 +202,7 @@ class ReaderTests(object):
         got = obs_seq0.ROIPhysicalPropertiesSequence[0].ROIPhysicalProperty
         assert 'REL_ELEC_DENSITY' == got
 
-    def testDir(self):
+    def test_dir(self):
         """Returns correct dir attributes for both Dataset and DICOM names
         (python >= 2.6).."""
         # Only python >= 2.6 calls __dir__ for dir() call
@@ -223,19 +222,18 @@ class ReaderTests(object):
         for name in expect_in_dir:
             assert name in got_dir
 
-    def testMR(self):
+    def test_MR(self):
         """Returns correct values for sample data elements in test MR file."""
         mr = dcmread(mr_name)
         # (0010, 0010) Patient's Name           'CompressedSamples^MR1'
         mr.decode()
-        assert mr.PatientName == 'CompressedSamples^MR1'
-        assert mr.PatientName == mr[0x10, 0x10].value
+        assert 'CompressedSamples^MR1' == mr.PatientName
+        assert mr[0x10, 0x10].value == mr.PatientName
 
-        got = mr.PixelSpacing
         DS = pydicom.valuerep.DS
-        assert [DS('0.3125'), DS('0.3125')] == expected
+        assert [DS('0.3125'), DS('0.3125')] == mr.PixelSpacing
 
-    def testDeflate(self):
+    def test_deflate(self):
         """Returns correct values for sample data elements in test compressed
          (zlib deflate) file
          """
@@ -244,7 +242,7 @@ class ReaderTests(object):
         ds = dcmread(deflate_name)
         assert "WSD" == ds.ConversionType
 
-    def testNoPixelsRead(self):
+    def test_no_pixels_read(self):
         """Returns all data elements before pixels using
         stop_before_pixels=False.
         """
@@ -256,7 +254,7 @@ class ReaderTests(object):
         missing = [Tag(0x7fe0, 0x10), Tag(0xfffc, 0xfffc)]
         assert ctfull_tags == ctpartial_tags + missing
 
-    def testSpecificTags(self):
+    def test_specific_tags(self):
         """Returns only tags specified by user."""
         ctspecific = dcmread(ct_name, specific_tags=[
             Tag(0x0010, 0x0010), 'PatientID', 'ImageType', 'ViewName'])
@@ -269,7 +267,7 @@ class ReaderTests(object):
         ]
         assert expected == ctspecific_tags
 
-    def testSpecificTagsWithUnknownLengthSQ(self):
+    def test_specific_tags_with_unknown_length_SQ(self):
         """Returns only tags specified by user."""
         unknown_len_sq_tag = Tag(0x3f03, 0x1001)
         tags = dcmread(priv_SQ_name, specific_tags=[unknown_len_sq_tag])
@@ -280,7 +278,7 @@ class ReaderTests(object):
         tags = sorted(tags.keys())
         assert [] == tags
 
-    def testSpecificTagsWithUnknownLengthTag(self):
+    def test_specific_tags_with_unknown_length_tag(self):
         """Returns only tags specified by user."""
         unknown_len_tag = Tag(0x7fe0, 0x0010)  # Pixel Data
         tags = dcmread(emri_jpeg_2k_lossless, specific_tags=[unknown_len_tag])
@@ -294,7 +292,7 @@ class ReaderTests(object):
         tags = sorted(tags.keys())
         assert [Tag(0x08, 0x05)] == tags
 
-    def testPrivateSQ(self):
+    def test_private_SQ(self):
         """Can read private undefined length SQ without error."""
         # From issues 91, 97, 98. Bug introduced by fast reading, due to
         #    VR=None in raw data elements, then an undefined length private
@@ -304,7 +302,7 @@ class ReaderTests(object):
         # Simply read the file, in 0.9.5 this generated an exception
         dcmread(priv_SQ_name)
 
-    def testNestedPrivateSQ(self):
+    def test_nested_private_SQ(self):
         """Can successfully read a private SQ which contains additional SQs."""
         # From issue 113. When a private SQ of undefined length is used, the
         #   sequence is read in and the length of the SQ is determined upon
@@ -320,16 +318,18 @@ class ReaderTests(object):
 
         # Check that the DataElement is indeed a Sequence
         tag = TupleTag((0x01, 0x01))
-        assert 'SQ' == ds[tag].VR
+        seq0 = ds[tag]
+        assert 'SQ' == seq0.VR
 
         # Now verify the presence of the nested private SQ
-        assert 'SQ' == seq0[0][tag].VR
+        seq1 = seq0[0][tag]
+        assert 'SQ' == seq1.VR
 
         # Now make sure the values that are parsed are correct
         assert b'Double Nested SQ' == seq1[0][tag].value
         assert b'Nested SQ' == seq0[0][0x01, 0x02].value
 
-    def testNoMetaGroupLength(self):
+    def test_no_meta_group_length(self):
         """Read file with no group length in file meta."""
         # Issue 108 -- iView example file with no group length (0002,0002)
         # Originally crashed, now check no exception, but also check one item
@@ -337,7 +337,7 @@ class ReaderTests(object):
         ds = dcmread(no_meta_group_length)
         assert "20111130" == ds.InstanceCreationDate
 
-    def testNoTransferSyntaxInMeta(self):
+    def test_no_transfer_syntax_in_meta(self):
         """Read file with file_meta, but has no TransferSyntaxUID in it."""
         # From issue 258: if file has file_meta but no TransferSyntaxUID in it,
         #   should assume default transfer syntax
@@ -348,7 +348,7 @@ class ReaderTests(object):
         pixel_data_tag = TupleTag((0x7fe0, 0x10))
         assert pixel_data_tag in ds
 
-    def testExplicitVRLittleEndianNoMeta(self):
+    def test_explicit_VR_little_endian_no_meta(self):
         """Read file without file meta with Little Endian Explicit VR dataset.
         """
         # Example file from CMS XiO 5.0 and above
@@ -356,14 +356,14 @@ class ReaderTests(object):
         ds = dcmread(explicit_vr_le_no_meta, force=True)
         assert "20150529" == ds.InstanceCreationDate
 
-    def testExplicitVRBigEndianNoMeta(self):
+    def test_explicit_VR_big_endian_no_meta(self):
         """Read file without file meta with Big Endian Explicit VR dataset."""
         # Example file from CMS XiO 5.0 and above
         # Still need to force read data since there is no 'DICM' marker present
         ds = dcmread(explicit_vr_be_no_meta, force=True)
         assert "20150529" == ds.InstanceCreationDate
 
-    def testPlanarConfig(self):
+    def test_planar_config(self):
         px_data_ds = dcmread(color_px_name)
         pl_data_ds = dcmread(color_pl_name)
         assert px_data_ds.PlanarConfiguration != pl_data_ds.PlanarConfiguration
@@ -386,8 +386,8 @@ class ReaderTests(object):
         file_ds.save_as(fp, write_like_original=True)
 
         ds = dcmread(fp, force=True)
-        assert ds[0x00280108].VR == 'US'
-        assert ds.SmallestPixelValueInSeries == 10
+        assert 'US' == ds[0x00280108].VR
+        assert 10 == ds.SmallestPixelValueInSeries
 
     def test_correct_ambiguous_explicit_vr(self):
         """Test correcting ambiguous VR elements read from file"""
@@ -403,8 +403,8 @@ class ReaderTests(object):
         file_ds.save_as(fp, write_like_original=True)
 
         ds = dcmread(fp, force=True)
-        assert ds[0x00280108].VR == 'US'
-        assert ds.SmallestPixelValueInSeries == 10
+        assert 'US' == ds[0x00280108].VR
+        assert 10 == ds.SmallestPixelValueInSeries
 
     def test_correct_ambiguous_vr_compressed(self):
         """Test correcting compressed Pixel Data read from file"""
@@ -417,7 +417,7 @@ class ReaderTests(object):
         file_ds.save_as(fp, write_like_original=True)
 
         ds = dcmread(fp, force=True)
-        assert ds[0x7fe00010].VR == 'OB'
+        assert 'OB' == ds[0x7fe00010].VR
 
     def test_long_specific_char_set(self):
         """Test that specific character set is read even if it is longer
@@ -432,7 +432,7 @@ class ReaderTests(object):
         file_ds.save_as(fp, write_like_original=True)
 
         ds = dcmread(fp, defer_size=65, force=True)
-        assert ds[0x00080005].value == long_specific_char_set_value
+        assert long_specific_char_set_value == ds[0x00080005].value
 
     def test_no_preamble_file_meta_dataset(self):
         """Test correct read of group 2 elements with no preamble."""
@@ -447,9 +447,9 @@ class ReaderTests(object):
         fp = BytesIO(bytestream)
         ds = dcmread(fp, force=True)
         assert 'MediaStorageSOPClassUID' in ds.file_meta
-        assert ds.file_meta.TransferSyntaxUID == ImplicitVRLittleEndian
-        assert ds.Polarity == 'NORMAL'
-        assert ds.ImageBoxPosition == 1
+        assert ImplicitVRLittleEndian == ds.file_meta.TransferSyntaxUID
+        assert 'NORMAL' == ds.Polarity
+        assert 1 == ds.ImageBoxPosition
 
     def test_no_preamble_command_group_dataset(self):
         """Test correct read of group 0 and 2 elements with no preamble."""
@@ -465,10 +465,10 @@ class ReaderTests(object):
         fp = BytesIO(bytestream)
         ds = dcmread(fp, force=True)
         assert 'MediaStorageSOPClassUID' in ds.file_meta
-        assert ds.file_meta.TransferSyntaxUID == ImplicitVRLittleEndian
-        assert ds.Polarity == 'NORMAL'
-        assert ds.ImageBoxPosition == 1
-        assert ds.MessageID == 3
+        assert ImplicitVRLittleEndian == ds.file_meta.TransferSyntaxUID
+        assert 'NORMAL' == ds.Polarity
+        assert 1 == ds.ImageBoxPosition
+        assert 3 == ds.MessageID
 
     def test_group_length_wrong(self):
         """Test file is read correctly even if FileMetaInformationGroupLength
@@ -486,11 +486,11 @@ class ReaderTests(object):
         ds = dcmread(fp, force=True)
         value = ds.file_meta.FileMetaInformationGroupLength
         assert not len(bytestream) - 12 == value
-        assert ds.file_meta.FileMetaInformationGroupLength == 10
+        assert 10 == ds.file_meta.FileMetaInformationGroupLength
         assert 'MediaStorageSOPClassUID' in ds.file_meta
-        assert ds.file_meta.TransferSyntaxUID == ImplicitVRLittleEndian
-        assert ds.Polarity == 'NORMAL'
-        assert ds.ImageBoxPosition == 1
+        assert ImplicitVRLittleEndian == ds.file_meta.TransferSyntaxUID
+        assert 'NORMAL' == ds.Polarity
+        assert 1 == ds.ImageBoxPosition
 
     def test_preamble_command_meta_no_dataset(self):
         """Test reading only preamble, command and meta elements"""
@@ -530,9 +530,9 @@ class ReaderTests(object):
         bytestream = preamble + prefix + meta
         fp = BytesIO(bytestream)
         ds = dcmread(fp, force=True)
-        assert ds.preamble == b'\x00' * 128
+        assert b'\x00' * 128 == ds.preamble
         assert 'TransferSyntaxUID' in ds.file_meta
-        assert ds[:] == Dataset()
+        assert Dataset() == ds[:]
 
     def test_preamble_commandset_no_dataset(self):
         """Test reading only preamble and command set"""
@@ -550,7 +550,7 @@ class ReaderTests(object):
         fp = BytesIO(bytestream)
         ds = dcmread(fp, force=True)
         assert 'MessageID' in ds
-        assert ds.file_meta == Dataset()
+        assert Dataset() == ds.file_meta
 
     def test_meta_no_dataset(self):
         """Test reading only meta elements"""
@@ -563,7 +563,7 @@ class ReaderTests(object):
         fp = BytesIO(bytestream)
         ds = dcmread(fp, force=True)
         assert 'TransferSyntaxUID' in ds.file_meta
-        assert ds[:] == Dataset()
+        assert Dataset() == ds[:]
 
     def test_commandset_no_dataset(self):
         """Test reading only command set elements"""
@@ -578,7 +578,7 @@ class ReaderTests(object):
         ds = dcmread(fp, force=True)
         assert 'MessageID' in ds
         assert ds.preamble is None
-        assert ds.file_meta == Dataset()
+        assert Dataset() == ds.file_meta
 
     def test_file_meta_dataset_implicit_vr(self):
         """Test reading a file meta dataset that is implicit VR"""
@@ -598,16 +598,16 @@ class ReaderTests(object):
         fp = BytesIO(bytestream)
         ds = dcmread(fp, force=True)
         assert ds.preamble is None
-        assert ds.file_meta == Dataset()
-        assert ds[:] == Dataset()
+        assert Dataset() == ds.file_meta
+        assert Dataset() == ds[:]
 
     def test_empty_file(self):
         """Test reading no elements from file produces empty Dataset"""
         with tempfile.NamedTemporaryFile() as f:
             ds = dcmread(f, force=True)
             assert ds.preamble is None
-            assert ds.file_meta == Dataset()
-            assert ds[:] == Dataset()
+            assert Dataset() == ds.file_meta
+            assert Dataset() == ds[:]
 
     def test_dcmread_does_not_raise(self):
         """Test that reading from DicomBytesIO does not raise on EOF.
@@ -649,8 +649,8 @@ class TestIncorrectVR(object):
             ds = read_dataset(
                 self.ds_explicit, is_implicit_VR=True, is_little_endian=True
             )
-        assert ds.SpecificCharacterSet == 'ISO_IR 100'
-        assert ds.StudyDate == '20000101'
+        assert 'ISO_IR 100' == ds.SpecificCharacterSet
+        assert '20000101' == ds.StudyDate
 
     def test_implicit_vr_expected_explicit_used_strict(self):
         config.enforce_valid_values = True
@@ -659,7 +659,8 @@ class TestIncorrectVR(object):
 
         with pytest.raises(InvalidDicomError, match=msg):
             read_dataset(
-                self.ds_explicit, is_implicit_VR=True, is_little_endian=True)
+                self.ds_explicit, is_implicit_VR=True, is_little_endian=True
+            )
 
     def test_explicit_vr_expected_implicit_used(self):
         msg = ('Expected explicit VR, but found implicit VR - '
@@ -669,8 +670,8 @@ class TestIncorrectVR(object):
             ds = read_dataset(
                 self.ds_implicit, is_implicit_VR=False, is_little_endian=True
             )
-        assert ds.SpecificCharacterSet == 'ISO_IR 100'
-        assert ds.StudyDate == '20000101'
+        assert 'ISO_IR 100' == ds.SpecificCharacterSet
+        assert '20000101' == ds.StudyDate
 
     def test_explicit_vr_expected_implicit_used_strict(self):
         config.enforce_valid_values = True
@@ -746,7 +747,7 @@ class TestUnknownVR(object):
             print(ds)
 
 
-class ReadDataElementTests(object):
+class TestReadDataElement(object):
     def setup(self):
         ds = Dataset()
         ds.DoubleFloatPixelData = (b'\x00\x01\x02\x03\x04\x05\x06\x07'
@@ -859,10 +860,10 @@ class ReadDataElementTests(object):
     def test_read_AE(self):
         """Check creation of AE DataElement from byte data works correctly."""
         ds = dcmread(self.fp, force=True)
-        assert ds.DestinationAE == 'TEST  12'
+        assert 'TEST  12' == ds.DestinationAE
 
 
-class DeferredReadTests(object):
+class TestDeferredRead(object):
     """Test that deferred data element reading (for large size)
     works as expected
     """
@@ -875,7 +876,7 @@ class DeferredReadTests(object):
         if os.path.exists(self.testfile_name):
             os.remove(self.testfile_name)
 
-    def testTimeCheck(self):
+    def test_time_check(self):
         """Deferred read warns if file has been modified"""
         ds = dcmread(self.testfile_name, defer_size='2 kB')
         from time import sleep
@@ -883,21 +884,18 @@ class DeferredReadTests(object):
         with open(self.testfile_name, "r+") as f:
             f.write('\0')  # "touch" the file
 
-        def read_value():
-            ds.PixelData
-
         msg = r"Deferred read warning -- file modification time has changed"
         with pytest.warns(UserWarning, match=msg):
-            read_value()
+            ds.PixelData
 
-    def testFileExists(self):
+    def test_file_exists(self):
         """Deferred read raises error if file no longer exists."""
         ds = dcmread(self.testfile_name, defer_size=2000)
         os.remove(self.testfile_name)
         with pytest.raises(IOError):
             ds.PixelData
 
-    def testValuesIdentical(self):
+    def test_values_identical(self):
         """Deferred values exactly matches normal read."""
         ds_norm = dcmread(self.testfile_name)
         ds_defer = dcmread(self.testfile_name, defer_size=2000)
@@ -905,7 +903,7 @@ class DeferredReadTests(object):
             tag = data_elem.tag
             assert data_elem.value == ds_defer[tag].value
 
-    def testZippedDeferred(self):
+    def test_zipped_deferred(self):
         """Deferred values from a gzipped file works."""
         # Arose from issue 103 "Error for defer_size read of gzip file object"
         fobj = gzip.open(gzip_name)
@@ -916,11 +914,11 @@ class DeferredReadTests(object):
         ds.InstanceNumber
 
 
-class ReadTruncatedFileTests(object):
+class TestReadTruncatedFile(object):
     def testReadFileWithMissingPixelData(self):
         mr = dcmread(truncated_mr_name)
         mr.decode()
-        assert mr.PatientName == 'CompressedSamples^MR1'
+        assert 'CompressedSamples^MR1' == mr.PatientName
         assert mr.PatientName == mr[0x10, 0x10].value
         DS = pydicom.valuerep.DS
         assert [DS('0.3125'), DS('0.3125')] == mr.PixelSpacing
@@ -940,11 +938,11 @@ class ReadTruncatedFileTests(object):
             mr.pixel_array
 
 
-class FileLikeTests(object):
+class TestFileLike(object):
     """Test that can read DICOM files with file-like object rather than
     filename
     """
-    def testReadFileGivenFileObject(self):
+    def test_read_file_given_file_object(self):
         """filereader: can read using already opened file............"""
         f = open(ct_name, 'rb')
         ct = dcmread(f)
@@ -953,8 +951,8 @@ class FileLikeTests(object):
         got = ct.ImagePositionPatient
         DS = pydicom.valuerep.DS
         expected = [DS('-158.135803'), DS('-179.035797'), DS('-75.699997')]
-        assert got == expected
-        assert ct.file_meta.ImplementationClassUID == '1.3.6.1.4.1.5962.2'
+        assert expected == got
+        assert '1.3.6.1.4.1.5962.2' == ct.file_meta.ImplementationClassUID
         value = ct.file_meta[0x2, 0x12].value
         assert ct.file_meta.ImplementationClassUID == value
 
@@ -962,17 +960,17 @@ class FileLikeTests(object):
         # [-158.13580300000001, -179.035797, -75.699996999999996]
         got = ct.ImagePositionPatient
         expected = [DS('-158.135803'), DS('-179.035797'), DS('-75.699997')]
-        assert got == expected
-        assert ct.Rows == 128
-        assert ct.Columns == 128
-        assert ct.BitsStored == 16
-        assert len(ct.PixelData) == 128 * 128 * 2
+        assert expected == got
+        assert 128 == ct.Rows
+        assert 128 == ct.Columns
+        assert 16 == ct.BitsStored
+        assert 128 * 128 * 2 == len(ct.PixelData)
 
         # Should also be able to close the file ourselves without
         # exception raised:
         f.close()
 
-    def testReadFileGivenFileLikeObject(self):
+    def test_read_file_given_file_like_object(self):
         """filereader: can read using a file-like (BytesIO) file...."""
         with open(ct_name, 'rb') as f:
             file_like = BytesIO(f.read())
@@ -981,8 +979,8 @@ class FileLikeTests(object):
         got = ct.ImagePositionPatient
         DS = pydicom.valuerep.DS
         expected = [DS('-158.135803'), DS('-179.035797'), DS('-75.699997')]
-        assert got == expected
-        assert len(ct.PixelData) == 128 * 128 * 2
+        assert expected == got
+        assert 128 * 128 * 2 == len(ct.PixelData)
         # Should also be able to close the file ourselves without
         # exception raised:
         file_like.close()
