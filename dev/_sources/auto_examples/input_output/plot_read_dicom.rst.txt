@@ -36,7 +36,7 @@ information, and show it using matplotlib.
     Modality.........: CT
     Study Date.......: 20040119
     Image size.......: 128 x 128, 32768 bytes
-    Pixel spacing....: ['0.661468', '0.661468']
+    Pixel spacing....: [0.661468, 0.661468]
     Slice location...: -77.2040634155
 
 
@@ -92,7 +92,7 @@ information, and show it using matplotlib.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.112 seconds)
+   **Total running time of the script:** ( 0 minutes  0.130 seconds)
 
 
 .. _sphx_glr_download_auto_examples_input_output_plot_read_dicom.py:

@@ -552,7 +552,7 @@
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">VR</span> <span class="o">==</span> <span class="s1">&#39;TM&#39;</span> <span class="ow">and</span> <span class="n">config</span><span class="o">.</span><span class="n">datetime_conversion</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">valuerep</span><span class="o">.</span><span class="n">TM</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">VR</span> <span class="o">==</span> <span class="s2">&quot;UI&quot;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">UID</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">UID</span><span class="p">(</span><span class="n">val</span> <span class="k">if</span> <span class="n">val</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
         <span class="k">elif</span> <span class="ow">not</span> <span class="n">in_py2</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">VR</span> <span class="o">==</span> <span class="s2">&quot;PN&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">PersonName</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
         <span class="c1"># Later may need this for PersonName as for UI,</span>

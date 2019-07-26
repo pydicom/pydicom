@@ -7,3 +7,6 @@ Changelog
 Fixes
 .....
 * Fixed handling of binary values in json encoding (:issue:`887`)
+* Prevent exception if assigning `None` to UI element (:issue:`894`)
+* Fixed print output for numeric multi-value elements (:issue:`892`)
+* Fixed testing PN values for truthiness (:issue:`891`)
