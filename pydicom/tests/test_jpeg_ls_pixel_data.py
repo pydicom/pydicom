@@ -14,19 +14,11 @@ jpeg_ls_missing_message = ("jpeg_ls is not available "
                            "in this test environment")
 jpeg_ls_present_message = "jpeg_ls is being tested"
 
-try:
-    import pydicom.pixel_data_handlers.numpy_handler as numpy_handler
-    have_numpy_handler = numpy_handler.HAVE_NP
-except ImportError:
-    have_numpy_handler = False
-    numpy_handler = None
+from pydicom.pixel_data_handlers import numpy_handler
+have_numpy_handler = numpy_handler.is_available()
 
-try:
-    import pydicom.pixel_data_handlers.jpeg_ls_handler as jpeg_ls_handler
-    have_jpeg_ls_handler = jpeg_ls_handler.HAVE_JPEGLS
-except ImportError:
-    have_jpeg_ls_handler = False
-    jpeg_ls_handler = None
+from pydicom.pixel_data_handlers import jpeg_ls_handler
+have_jpeg_ls_handler = jpeg_ls_handler.is_available()
 
 test_jpeg_ls_decoder = have_numpy_handler and have_jpeg_ls_handler
 

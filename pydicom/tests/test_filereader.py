@@ -24,11 +24,9 @@ from pydicom.tag import Tag, TupleTag
 from pydicom.uid import ImplicitVRLittleEndian
 import pydicom.valuerep
 
-have_gdcm_handler = True
-try:
-    import pydicom.pixel_data_handlers.gdcm_handler as gdcm_handler
-except ImportError as e:
-    have_gdcm_handler = False
+
+from pydicom.pixel_data_handlers import gdcm_handler
+have_gdcm_handler = gdcm_handler.is_available()
 
 try:
     import numpy  # NOQA
@@ -923,16 +921,17 @@ class TestReadTruncatedFile(object):
         DS = pydicom.valuerep.DS
         assert [DS('0.3125'), DS('0.3125')] == mr.PixelSpacing
 
-    @pytest.mark.skipif(not have_numpy or not have_gdcm_handler,
-                        reason="Missing numpy and/or GDCM")
+    @pytest.mark.skipif(not have_numpy or have_gdcm_handler,
+                        reason="Missing numpy or GDCM present")
     def testReadFileWithMissingPixelDataArray(self):
         mr = dcmread(truncated_mr_name)
         mr.decode()
         # Need to escape brackets
         msg = (
-            r"The length of the pixel data in the dataset doesn't match the "
-            r"expected amount \(8130 vs. 8192 bytes\). The dataset may be "
-            r"corrupted or there may be an issue with the pixel data handler."
+            r"The length of the pixel data in the dataset \(8130 bytes\) "
+            r"doesn't match the expected length \(8192 bytes\). "
+            r"The dataset may be corrupted or there may be an issue with "
+            r"the pixel data handler."
         )
         with pytest.raises(ValueError, match=msg):
             mr.pixel_array

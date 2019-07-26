@@ -34,23 +34,12 @@ try:
 except AttributeError:
     have_pytest_param = False
 
-try:
-    import pydicom.pixel_data_handlers.gdcm_handler as gdcm_handler
-    HAVE_GDCM = gdcm_handler.HAVE_GDCM
-    HAVE_GDCM_IN_MEMORY_SUPPORT = gdcm_handler.HAVE_GDCM_IN_MEMORY_SUPPORT
-    if HAVE_GDCM:
-        import gdcm
-except ImportError as e:
-    HAVE_GDCM = False
-    HAVE_GDCM_IN_MEMORY_SUPPORT = False
-    gdcm_handler = None
+from pydicom.pixel_data_handlers import numpy_handler
+have_numpy_handler = numpy_handler.is_available()
 
-try:
-    import pydicom.pixel_data_handlers.numpy_handler as numpy_handler
-    HAVE_NP = numpy_handler.HAVE_NP
-except ImportError:
-    HAVE_NP = False
-    numpy_handler = None
+from pydicom.pixel_data_handlers import gdcm_handler
+HAVE_GDCM = gdcm_handler.is_available()
+HAVE_GDCM_IN_MEMORY_SUPPORT = gdcm_handler.HAVE_GDCM_IN_MEMORY_SUPPORT
 
 
 empty_number_tags_name = get_testdata_files(
