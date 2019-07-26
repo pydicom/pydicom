@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Unit tests for the pydicom.dataelem module."""
 
@@ -350,6 +351,50 @@ class TestDataElement(object):
         private_data_elem = ds[0x60211200]
         assert '[Overlay ID]' == private_data_elem.name
         assert 'UN' == private_data_elem.VR
+
+    def test_known_tags_with_UN_VR(self):
+        """Known tags with VR UN are correctly decoded."""
+        ds = Dataset()
+        ds[0x00080005] = DataElement(0x00080005, 'UN', b'ISO_IR 126')
+        ds[0x00100010] = DataElement(0x00100010, 'UN',
+                                     u'Διονυσιος'.encode('iso_ir_126'))
+        ds.decode()
+        assert u'Διονυσιος' == ds[0x00100010].value
+
+        ds = Dataset()
+        ds[0x00080005] = DataElement(0x00080005, 'UN',
+                                     b'ISO 2022 IR 100\\ISO 2022 IR 126')
+        ds[0x00100010] = DataElement(0x00100010, 'UN',
+                                     b'Dionysios=\x1b\x2d\x46'
+                                     + u'Διονυσιος'.encode('iso_ir_126'))
+        ds.decode()
+        assert u'Dionysios=Διονυσιος' == ds[0x00100010].value
+
+    def test_unknown_tags_with_UN_VR(self):
+        """Unknown tags with VR UN are not decoded."""
+        ds = Dataset()
+        ds[0x00080005] = DataElement(0x00080005, 'CS', b'ISO_IR 126')
+        ds[0x00111010] = DataElement(0x00111010, 'UN',
+                                     u'Διονυσιος'.encode('iso_ir_126'))
+        ds.decode()
+        assert u'Διονυσιος'.encode('iso_ir_126') == ds[0x00111010].value
+
+    def test_patient_name_with_UN_VR(self):
+        ds = Dataset()
+        ds[0x00080005] = DataElement(0x00080005, 'CS', b'ISO_IR 126')
+        ds[0x00100010] = DataElement(0x00100010, 'UN',
+                                     u'Διονυσιος'.encode('iso_ir_126'))
+        ds.decode()
+        assert u'Διονυσιος' == ds[0x00100010].value
+
+        ds = Dataset()
+        ds[0x00080005] = DataElement(0x00080005, 'CS',
+                                     b'ISO 2022 IR 100\\ISO 2022 IR 126')
+        ds[0x00100010] = DataElement(0x00100010, 'UN',
+                                     b'Dionysios=\x1b\x2d\x46'
+                                     + u'Διονυσιος'.encode('iso_ir_126'))
+        ds.decode()
+        assert u'Dionysios=Διονυσιος' == ds[0x00100010].value
 
     def test_empty_text_values(self):
         """Test that assigning an empty value behaves as expected."""

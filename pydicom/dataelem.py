@@ -166,6 +166,14 @@ class DataElement(object):
             tag = Tag(tag)
         self.tag = tag
         self.VR = VR  # Note!: you must set VR before setting value
+        self.VR = VR
+        if self.VR == 'UN':
+            try:
+                self.VR = dictionary_VR(tag)
+            except KeyError:
+                pass
+
+        # Note: you must set VR before setting value
         if already_converted:
             self._value = value
         else:
