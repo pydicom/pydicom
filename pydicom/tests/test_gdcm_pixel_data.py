@@ -639,7 +639,7 @@ class TestSupportFunctions(object):
         assert pi_type == image.GetPhotometricInterpretation().GetType()
 
         uid = str.__str__(dataset_2d.file_meta.TransferSyntaxUID)
-        assert  uid == image.GetTransferSyntax().GetString()
+        assert uid == image.GetTransferSyntax().GetString()
         pixel_format = image.GetPixelFormat()
         assert dataset_2d.SamplesPerPixel == pixel_format.GetSamplesPerPixel()
         assert dataset_2d.BitsAllocated == pixel_format.GetBitsAllocated()

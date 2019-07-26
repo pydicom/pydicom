@@ -146,7 +146,7 @@ class TestDump(object):
         """Test utils.dump.print_character"""
         # assert print_character(0x30) == '0'  # Missing!
         assert '1' == print_character(0x31)
-        assert '9' ==  print_character(0x39)
+        assert '9' == print_character(0x39)
         assert 'A' == print_character(0x41)
         assert 'Z' == print_character(0x5A)
         assert 'a' == print_character(0x61)
