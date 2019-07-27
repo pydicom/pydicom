@@ -165,15 +165,18 @@ class DataElement(object):
         if not isinstance(tag, BaseTag):
             tag = Tag(tag)
         self.tag = tag
-        self.VR = VR  # Note!: you must set VR before setting value
-        self.VR = VR
-        if self.VR == 'UN':
+
+        # a known tag shall only have the VR 'UN' if it has a length that
+        # exceeds the size that can be encoded in 16 bit - all other cases
+        # can be seen as an encoding error and can be corrected
+        if VR == 'UN' and (is_undefined_length or value is None or
+                           len(value) < 0xffff):
             try:
-                self.VR = dictionary_VR(tag)
+                VR = dictionary_VR(tag)
             except KeyError:
                 pass
 
-        # Note: you must set VR before setting value
+        self.VR = VR  # Note!: you must set VR before setting value
         if already_converted:
             self._value = value
         else:
