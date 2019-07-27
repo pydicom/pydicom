@@ -61,7 +61,8 @@ and datetime.time respectively. Default: False
 """
 
 # Logging system and debug function to change logging level
-logger = logging.getLogger('pydicom').addHandler(logging.NullHandler())
+logger = logging.getLogger('pydicom')
+logger.addHandler(logging.NullHandler())
 
 
 import pydicom.pixel_data_handlers.numpy_handler as np_handler  # noqa
@@ -122,7 +123,6 @@ def debug(debug_on=True, default_handler=True):
         for log messages.
     """
     global logger, debugging
-    logger = logging.getLogger('pydicom')
 
     if default_handler:
         handler = logging.StreamHandler()
