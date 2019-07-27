@@ -392,8 +392,8 @@ class TestDataElement(object):
         single_value = b'123456.789012345'
         large_value = b'\\'.join([single_value] * 4500)
         ds[0x30040058] = DataElement(0x30040058, 'UN',
-                                 large_value,
-                                 is_undefined_length=False)
+                                     large_value,
+                                     is_undefined_length=False)
         ds.decode()
         assert 'UN' == ds[0x30040058].VR
 
