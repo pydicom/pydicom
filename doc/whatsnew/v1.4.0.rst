@@ -10,3 +10,5 @@ Fixes
 * Prevent exception if assigning `None` to UI element (:issue:`894`)
 * Fixed print output for numeric multi-value elements (:issue:`892`)
 * Fixed testing PN values for truthiness (:issue:`891`)
+* Fixed handling of data too large to written in explicit transfer syntax
+  (:issue:`757`)
