@@ -12,9 +12,10 @@ from pydicom.data import get_testdata_files
 
 
 DS_PATH = get_testdata_files("CT_small.dcm")[0]
+PYTEST = [int(x) for x in pytest.__version__.split('.')]
 
 
-@pytest.mark.skipif(sys.version_info[:2] == (3, 4), reason='no caplog')
+@pytest.mark.skipif(PYTEST[:2] < [3, 4], reason='no caplog')
 class TestDebug(object):
     """Tests for config.debug()."""
     def setup(self):
