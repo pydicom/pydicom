@@ -87,14 +87,16 @@ usage example of data elements removal and assignation.
    To understand using :class:`sequence.Sequences` in pydicom, please refer to
    this object model:
    :class:`dataset.Dataset` (wraps a Python ``dict``)
-       ---> contains DataElement instances
-          --> the value of the data element can be one of:
+
+    * ---> contains DataElement instances
+
+      * --> the value of the data element can be one of:
 
           * a regular value like a number, string, etc.
           * a list of regular values (e.g. a 3-D coordinate)
           * a Sequence instance
 
-         --> a Sequence is a list of :class:`dataset.Dataset` (and so we come full circle)
+          * --> a Sequence is a list of :class:`dataset.Dataset` (and so we come full circle)
 
 DICOM :class:`sequence.Sequences` are turned into Python ``list`` s. Items in
 the sequence are referenced by number, beginning at index 0 as per Python
@@ -207,7 +209,7 @@ which stores the following things:
 Tag
 ---
 
-Tag is not generally used directly in user code, as Tags are automatically created 
+Tag is not generally used directly in user code, as Tags are automatically created
 when you assign or read data elements using the DICOM keywords as illustrated in
 sections above.
 

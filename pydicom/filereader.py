@@ -752,43 +752,43 @@ def dcmread(fp, defer_size=None, stop_before_pixels=False,
     Read a DICOM dataset stored in accordance with the DICOM File Format
     (DICOM Standard Part 10 Section 7). If the dataset is not stored in
     accordance with the File Format (i.e. the preamble and prefix are missing,
-    there are missing required Type 1 File Meta Information Group elements
-    or the entire File Meta Information is missing) then you will have to
-    set `force` to True.
+    there are missing required Type 1 *File Meta Information Group* elements
+    or the entire *File Meta Information* is missing) then you will have to
+    set `force` to ``True``.
 
     Parameters
     ----------
     fp : str or file-like
         Either a file-like object, or a string containing the file name. If a
         file-like object, the caller is responsible for closing it.
-    defer_size : int or str or None
-        If None (default), all elements read into memory. If specified, then if
-        a data element's stored value is larger than `defer_size`, the value is
-        not read into memory until it is accessed in code. Specify an integer
-        (bytes), or a string value with units, e.g. "512 KB", "2 MB".
-    stop_before_pixels : bool
-        If False (default), the full file will be read and parsed. Set True to
-        stop before reading (7FE0,0010) 'Pixel Data' (and all subsequent
-        elements).
-    force : bool
-        If False (default), raises an InvalidDicomError if the file is missing
-        the File Meta Information header. Set to True to force reading even if
-        no File Meta Information header is found.
-    specific_tags : list or None
-        If not None, only the tags in the list are returned. The list
-        elements can be tags or tag names. Note that the tag Specific
-        Character Set is always returned if present - this ensures correct
-        decoding of returned text values.
+    defer_size : int or str or None, optional
+        If ``None`` (default), all elements read into memory. If specified,
+        then if a data element's stored value is larger than `defer_size`, the
+        value is not read into memory until it is accessed in code. Specify an
+        integer (bytes), or a string value with units, e.g. "512 KB", "2 MB".
+    stop_before_pixels : bool, optional
+        If ``False`` (default), the full file will be read and parsed. Set
+        ``True`` to stop before reading (7FE0,0010) *Pixel Data* (and all
+        subsequent elements).
+    force : bool, optional
+        If ``False`` (default), raises an ``InvalidDicomError`` if the file is
+        missing the *File Meta Information* header. Set to ``True`` to force
+        reading even if no *File Meta Information* header is found.
+    specific_tags : list or None, optional
+        If not ``None``, only the tags in the list are returned. The list
+        elements can be tags or tag names. Note that the element (0008,0008)
+        *Specific Character Set* is always returned if present - this ensures
+        correct decoding of returned text values.
 
     Returns
     -------
     FileDataset
-        An instance of FileDataset that represents a parsed DICOM file.
+        An instance of ``FileDataset`` that represents a parsed DICOM file.
 
     Raises
     ------
     InvalidDicomError
-        If `force` is True and the file is not a valid DICOM file.
+        If `force` is ``True`` and the file is not a valid DICOM file.
 
     See Also
     --------

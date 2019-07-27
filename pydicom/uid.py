@@ -22,10 +22,11 @@ RE_VALID_UID_PREFIX = r'^(0|[1-9][0-9]*)(\.(0|[1-9][0-9]*))*\.$'
 
 
 class UID(str):
-    """Subclass python string so have human-friendly UIDs.
+    """Subclasses python str to have human-friendly UIDs.
 
-    Example
-    -------
+    Examples
+    --------
+
     >>> from pydicom.uid import UID
     >>> uid = UID('1.2.840.10008.1.2.4.50')
     >>> uid
@@ -269,8 +270,9 @@ def generate_uid(prefix=PYDICOM_ROOT_UID, entropy_srcs=None):
     ValueError
         If `prefix` is invalid or greater than 63 characters.
 
-    Example
-    -------
+    Examples
+    --------
+    
     >>> from pydicom.uid import generate_uid
     >>> generate_uid()
     1.2.826.0.1.3680043.8.498.22463838056059845879389038257786771680

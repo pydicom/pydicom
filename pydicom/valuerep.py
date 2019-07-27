@@ -802,10 +802,18 @@ class PersonNameBase(object):
     def formatted(self, format_str):
         """Return a formatted string according to the format pattern
 
-        Use "...%(property)...%(property)..." where property
-        is one of family_name, given_name,
-                  middle_name, name_prefix,
-                  name_suffix
+        Parameters
+        ----------
+        format_str : str
+            The string to use for formatting the PN element value. Use
+            "...%(property)...%(property)..." where property is one of
+            `family_name`, `given_name`, `middle_name`, `name_prefix`, or
+            `name_suffix`.
+
+        Returns
+        -------
+        str
+            The formatted PN element value.
         """
         return format_str % self.__dict__
 

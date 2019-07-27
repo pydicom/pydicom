@@ -68,6 +68,6 @@ A set of examples illustrating the use of the different core elements. It
 complements the `User Guide <pydicom_user_guide.html>`_.
 
 `What's new <release-notes.html>`_
-------------------------------
+----------------------------------
 
 Log of the pydicom history.

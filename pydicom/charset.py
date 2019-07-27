@@ -715,13 +715,14 @@ def _handle_illegal_standalone_encodings(encodings, py_encodings):
 def decode(data_element, dicom_character_set):
     """Apply the DICOM character encoding to the data element
 
-    data_element -- DataElement instance containing a value to convert
-    dicom_character_set -- the value of Specific Character Set (0008,0005),
-                    which may be a single value,
-                    a multiple value (code extension), or
-                    may also be '' or None.
-                    If blank or None, ISO_IR 6 is used.
-
+    Parameters
+    ----------
+    data_element : dataelem.DataElement
+        The DataElement instance containing a value to convert
+    dicom_character_set : str or list of str or None
+        The value of (0008,0005) *Specific Character Set*, which may be a
+        single value, a multiple value (code extension), or may also be '' or
+        None. If a blank str or None, ISO_IR 6 is used.
     """
     if not dicom_character_set:
         dicom_character_set = ['ISO_IR 6']

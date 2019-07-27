@@ -1,10 +1,10 @@
 For users of pydicom < 1.0
-========================
+==========================
 
 .. rubric:: Warning about pydicom < 1.0 and reference to Transition to Pydicom 1 section
 
 Pydicom < 1
--------
+-----------
 
 .. warning::
 

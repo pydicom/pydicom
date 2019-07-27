@@ -8,7 +8,7 @@ Handling of compressed image data
 .. |chk|   unicode:: U+02713 .. CHECK MARK
 
 Preconditions
-............
+.............
 To be able to decompress compressed DICOM image data, you need to have
 one or more packages installed that are able to handle this kind of data.
 ``pydicom`` detects the installed packages and provides image data handlers

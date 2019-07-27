@@ -4,6 +4,8 @@
 Release history
 ===============
 
+.. include:: whatsnew/v1.4.0.rst
+
 .. include:: whatsnew/v1.3.0.rst
 
 .. include:: whatsnew/v1.2.0.rst

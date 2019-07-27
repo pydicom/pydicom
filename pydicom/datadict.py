@@ -36,12 +36,6 @@ def mask_match(tag):
 def add_dict_entry(tag, VR, keyword, description, VM='1', is_retired=''):
     """Update pydicom's DICOM dictionary with a new entry.
 
-    Notes
-    ----
-    Does not permanently update the dictionary,
-    but only during run-time. Will replace an existing
-    entry if the tag already exists in the dictionary.
-
     Parameters
     ----------
     tag : int
@@ -62,6 +56,11 @@ def add_dict_entry(tag, VR, keyword, description, VM='1', is_retired=''):
     ValueError
         If the tag is a private tag.
 
+    Notes
+    -----
+    Does not permanently update the dictionary, but only during run-time.
+    Will replace an existing entry if the tag already exists in the dictionary.
+
     See Also
     --------
     pydicom.examples.add_dict_entry
@@ -71,6 +70,7 @@ def add_dict_entry(tag, VR, keyword, description, VM='1', is_retired=''):
 
     Examples
     --------
+
     >>> from pydicom import Dataset
     >>> add_dict_entry(0x10021001, "UL", "TestOne", "Test One")
     >>> add_dict_entry(0x10021002, "DS", "TestTwo", "Test Two", VM='3')
@@ -137,10 +137,6 @@ def add_dict_entries(new_entries_dict):
 def add_private_dict_entry(private_creator, tag, VR, description, VM='1'):
     """Update pydicom's private DICOM tag dictionary with a new entry.
 
-    Notes
-    ----
-    Behaves like `add_dict_entry`, only for a private tag entry.
-
     Parameters
     ----------
     private_creator : str
@@ -159,6 +155,10 @@ def add_private_dict_entry(private_creator, tag, VR, description, VM='1'):
     ------
     ValueError
         If the tag is a non-private tag.
+
+    Notes
+    -----
+    Behaves like `add_dict_entry`, only for a private tag entry.
 
     See Also
     --------

@@ -1313,8 +1313,10 @@ class Dataset(dict):
 
         If compressed pixel data, then is decompressed using an image handler,
         and internal state is updated appropriately:
-            - TransferSyntax is updated to non-compressed form
-            - is_undefined_length for pixel data is set False
+
+        - ``Dataset.file_meta.TransferSyntaxUID`` is updated to non-compressed
+          form
+        - `is_undefined_length` for (7fe0,0010) *Pixel Data* is set ``False``
 
         Returns
         -------
@@ -1324,7 +1326,7 @@ class Dataset(dict):
         ------
         NotImplementedError
             If the pixel data was originally compressed but file is not
-            ExplicitVR LittleEndian as required by Dicom standard
+            *Explicit VR Little Endian* as required by the DICOM standard.
         """
         self.convert_pixel_data()
         self.is_decompressed = True
@@ -1460,55 +1462,57 @@ class Dataset(dict):
     def save_as(self, filename, write_like_original=True):
         """Write the Dataset to `filename`.
 
-        Saving a Dataset requires that the Dataset.is_implicit_VR and
-        Dataset.is_little_endian attributes exist and are set appropriately. If
-        Dataset.file_meta.TransferSyntaxUID is present then it should be set to
-        a consistent value to ensure conformance.
+        Saving a Dataset requires that the ``Dataset.is_implicit_VR`` and
+        ``Dataset.is_little_endian`` attributes exist and are set
+        appropriately. If ``Dataset.file_meta.TransferSyntaxUID`` is present
+        then it should be set to a consistent value to ensure conformance.
 
-        Conformance with DICOM File Format
-        ----------------------------------
-        If `write_like_original` is False, the Dataset will be stored in the
-        DICOM File Format in accordance with DICOM Standard Part 10 Section 7.
-        To do so requires that the `Dataset.file_meta` attribute exists and
-        contains a Dataset with the required (Type 1) File Meta Information
-        Group elements (see pydicom.filewriter.dcmwrite and
-        pydicom.filewriter.write_file_meta_info for more information).
+        **Conformance with DICOM File Format**
 
-        If `write_like_original` is True then the Dataset will be written as is
-        (after minimal validation checking) and may or may not contain all or
-        parts of the File Meta Information (and hence may or may not be
-        conformant with the DICOM File Format).
+        If `write_like_original` is ``False``, the dataset will be stored
+        in the DICOM File Format in accordance with DICOM Standard Part 10
+        Section 7. To do so requires that the ``Dataset.file_meta`` attribute
+        exists and contains a ``Dataset`` with the required (Type 1) *File
+        Meta Information Group* elements (see ``pydicom.filewriter.dcmwrite``
+        and ``pydicom.filewriter.write_file_meta_info`` for more information).
+
+        If `write_like_original` is ``True`` then the dataset will be
+        written as is (after minimal validation checking) and may or may not
+        contain all or parts of the *File Meta Information* (and hence may or
+        may not be conformant with the DICOM File Format).
 
         Parameters
         ----------
         filename : str or file-like
             Name of file or the file-like to write the new DICOM file to.
-        write_like_original : bool
-            If True (default), preserves the following information from
+        write_like_original : bool, optional
+            If ``True`` (default), preserves the following information from
             the Dataset (and may result in a non-conformant file):
+
             - preamble -- if the original file has no preamble then none will
-                be written.
-            - file_meta -- if the original file was missing any required File
-                Meta Information Group elements then they will not be added or
-                written.
-                If (0002,0000) 'File Meta Information Group Length' is present
-                then it may have its value updated.
+              be written.
+            - file_meta -- if the original file was missing any required *File
+              Meta Information Group* elements then they will not be added or
+              written.
+              If (0002,0000) *File Meta Information Group Length* is present
+              then it may have its value updated.
             - seq.is_undefined_length -- if original had delimiters, write them
-                now too, instead of the more sensible length characters
+              now too, instead of the more sensible length characters
             - is_undefined_length_sequence_item -- for datasets that belong to
-                a sequence, write the undefined length delimiters if that is
-                what the original had.
-            If False, produces a file conformant with the DICOM File Format,
-            with explicit lengths for all elements.
+              a sequence, write the undefined length delimiters if that is
+              what the original had.
+
+            If ``False``, produces a file conformant with the DICOM File
+            Format, with explicit lengths for all elements.
 
         See Also
         --------
         pydicom.filewriter.write_dataset
-            Write a DICOM Dataset to a file.
+            Write a ``Dataset`` to a file.
         pydicom.filewriter.write_file_meta_info
-            Write the DICOM File Meta Information Group elements to a file.
+            Write the *File Meta Information Group* elements to a file.
         pydicom.filewriter.dcmwrite
-            Write a DICOM file from a FileDataset instance.
+            Write a DICOM file from a ``FileDataset`` instance.
         """
         # Ensure is_little_endian and is_implicit_VR are set
         if self.is_little_endian is None or self.is_implicit_VR is None:
@@ -1745,23 +1749,27 @@ class Dataset(dict):
                         yield elem
 
     def walk(self, callback, recursive=True):
-        """Iterate through the DataElements and run `callback` on each.
+        """Iterate through the Dataset's elements and run `callback` on each.
 
-        Visit all DataElements, possibly recursing into sequences and their
-        datasets. The callback function is called for each DataElement
-        (including SQ element). Can be used to perform an operation on certain
-        types of DataElements. E.g., `remove_private_tags`() finds all private
-        tags and deletes them. DataElement`s will come back in DICOM order (by
-        increasing tag number within their dataset).
+        Visit all elements in the Dataset, possibly recursing into sequences
+        and their datasets. The callback function is called for each
+        ``DataElement`` (including elements with a VR of 'SQ'). Can be used
+        to perform an operation on certain types of Data Elements. E.g.,
+        ``remove_private_tags()`` finds all elements with private tags and
+        deletes them. The elements will be returned in order of increasing
+        tag number within their current dataset.
 
         Parameters
         ----------
         callback
             A callable that takes two arguments:
-                * a Dataset
-                * a DataElement belonging to that Dataset
-        recursive : bool
-            Flag to indicate whether to recurse into Sequences.
+
+            * a Dataset
+            * a DataElement belonging to that Dataset
+
+        recursive : bool, optional
+            Flag to indicate whether to recurse into Sequences (default
+            ``True``).
         """
         taglist = sorted(self._dict.keys())
         for tag in taglist:
@@ -2115,29 +2123,32 @@ class FileDataset(Dataset):
 
 
 def validate_file_meta(file_meta, enforce_standard=True):
-    """Validates the File Meta Information elements in `file_meta` and
-    adds some tags if missing and `enforce_standard` is True.
+    """Validate the File Meta Information elements in `file_meta`.
 
     Parameters
     ----------
     file_meta : pydicom.dataset.Dataset
-        The File Meta Information data elements.
-    enforce_standard : bool
-        If False, then only a check for invalid elements is performed.
-        If True, the following elements will be added if not already present:
-            * (0002,0001) FileMetaInformationVersion
-            * (0002,0012) ImplementationClassUID
-            * (0002,0013) ImplementationVersionName
+        The *File Meta Information* data elements.
+    enforce_standard : bool, optional
+        If ``False``, then only a check for invalid elements is performed.
+        If ``True`` (default), the following elements will be added if not
+        already present:
+
+        * (0002,0001) *File Meta Information Version*
+        * (0002,0012) *Implementation Class UID*
+        * (0002,0013) *Implementation Version Name*
+
         and the following elements will be checked:
-            * (0002,0002) MediaStorageSOPClassUID
-            * (0002,0003) MediaStorageSOPInstanceUID
-            * (0002,0010) TransferSyntaxUID
+
+        * (0002,0002) *Media Storage SOP Class UID*
+        * (0002,0003) *Media Storage SOP Instance UID*
+        * (0002,0010) *Transfer Syntax UID*
 
     Raises
     ------
     ValueError
-        If `enforce_standard` is True and any of the checked File Meta
-        Information elements are missing from `file_meta`.
+        If `enforce_standard` is True and any of the checked *File Meta
+        Information* elements are missing from `file_meta`.
     ValueError
         If any non-Group 2 Elements are present in `file_meta`.
     """

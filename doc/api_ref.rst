@@ -41,7 +41,7 @@ DICOM data dictionary - the datadict module
 .. automodule:: pydicom.datadict
 
 DICOM data elements - the dataelem module
-----------------
+-----------------------------------------
 .. automodule:: pydicom.dataelem
 
 DICOM sequences - the sequence module
@@ -65,7 +65,7 @@ Handling of DICOM VRs - the valuerep module
 .. automodule:: pydicom.valuerep
 
 Handling of character encoding - the charset module
---------------------------------------------------
+---------------------------------------------------
 .. automodule:: pydicom.charset
 
 DICOM UIDs - the uid module

@@ -119,8 +119,8 @@ def generate_pixel_data_fragment(fp):
     or absence of the Sequence Delimiter Item in `fp` has no effect on the
     returned fragments.
 
-    Encoding
-    ~~~~~~~~
+    *Encoding*
+
     The encoding of the data shall be little endian.
 
     Parameters
