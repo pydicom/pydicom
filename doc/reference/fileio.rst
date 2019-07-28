@@ -9,7 +9,7 @@ Reading and writing DICOM datasets and support classes and functions.
    :maxdepth: 2
    :includehidden:
 
-   fileio.base
    fileio.read
    fileio.write
+   fileio.base
    fileio.util

@@ -46,7 +46,7 @@ def get_frame_offsets(fp):
     ----------
     fp : pydicom.filebase.DicomBytesIO
         The encapsulated pixel data positioned at the start of the Basic Offset
-        Table. ``fp.is_little_endian`` should be set to True.
+        Table. ``fp.is_little_endian`` should be set to ``True``.
 
     Returns
     -------
@@ -109,7 +109,7 @@ def generate_pixel_data_fragment(fp):
     The first Item in the Sequence of Items shall be a 'Basic Offset Table',
     however the Basic Offset Table item value is not required to be present.
     It is assumed that the Basic Offset Table item has already been read prior
-    to calling this function (and that ``fp`` is positioned past this item).
+    to calling this function (and that `fp` is positioned past this item).
 
     The remaining items in the Sequence of Items are the pixel data fragments
     and it is these items that will be read and returned by this function.
@@ -274,13 +274,13 @@ def decode_data_sequence(data):
 
     Parameters
     ----------
-    data : str
-        String of encapsulated data, typically dataset.PixelData
+    data : bytes or str
+        The encapsulated data, typically the value from ``Dataset.PixelData``.
 
     Returns
     -------
     list of bytes
-        All fragments in a list of byte strings
+        All fragments as a list of ``bytes``.
     """
     # Convert data into a memory-mapped file
     with DicomBytesIO(data) as fp:
@@ -303,7 +303,7 @@ def decode_data_sequence(data):
 
 
 def defragment_data(data):
-    """Read encapsulated data and return the fragments as one continuous string.
+    """Read encapsulated data and return the fragments as one continuous bytes.
 
     Parameters
     ----------
@@ -330,7 +330,7 @@ def read_item(fp):
     Returns
     -------
     bytes
-        The Item's raw bytes (value?).
+        The Item's raw bytes.
     """
 
     logger = pydicom.config.logger
@@ -389,7 +389,7 @@ def fragment_frame(frame, nr_fragments=1):
     frame : bytes
         The data to fragment.
     nr_fragments : int, optional
-        The number of fragments (default 1).
+        The number of fragments (default ``1``).
 
     Yields
     ------
@@ -518,11 +518,11 @@ def encapsulate(frames, fragments_per_frame=1, has_bot=True):
     frames : list of bytes
         The frame data to encapsulate.
     fragments_per_frame : int, optional
-        The number of fragments to use for each frame (default 1).
+        The number of fragments to use for each frame (default ``1``).
     has_bot : bool, optional
-        True to include values in the Basic Offset Table, False otherwise
-        (default True). If `fragments_per_frame` is not 1 then its strongly
-        recommended that this be True.
+        ``True`` to include values in the Basic Offset Table, ``False``
+        otherwise (default ``True``). If `fragments_per_frame` is not ``1``
+        then its strongly recommended that this be ``True``.
 
     Returns
     -------

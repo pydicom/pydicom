@@ -19,10 +19,10 @@ def validate_dataset(elem):
 class Sequence(MultiValue):
     """Class to hold multiple Datasets in a list.
 
-    This class is derived from MultiValue and as such enforces that all items
-    added to the list are Dataset instances. In order to due this, a validator
-    is substituted for type_constructor when constructing the MultiValue
-    super class.
+    This class is derived from :class:`MultiValue<pydicom.multival.MultiValue>`
+    and as such enforces that all items added to the list are ``Dataset``
+    instances. In order to due this, a validator is substituted for
+    type_constructor when constructing the ``MultiValue`` super class.
     """
 
     def __init__(self, iterable=None):
@@ -30,9 +30,9 @@ class Sequence(MultiValue):
 
         Parameters
         ----------
-        iterable : list-like of pydicom.dataset.Dataset, optional
+        iterable : list-like of dataset.Dataset, optional
             An iterable object (e.g. list, tuple) containing
-            Datasets. If not used then an empty Sequence is generated.
+            ``Datasets``. If not used then an empty ``Sequence`` is generated.
         """
         # We add this extra check to throw a relevant error. Without it, the
         # error will be simply that a Sequence must contain Datasets (since a

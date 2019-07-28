@@ -89,34 +89,30 @@ def find_bytes(fp, bytes_to_find, read_size=128, rewind=True):
     return found_at
 
 
-def read_undefined_length_value(fp,
-                                is_little_endian,
-                                delimiter_tag,
-                                defer_size=None,
-                                read_size=1024*8):
-    """Read until the delimiter tag found and return the value;
-     ignore the delimiter.
+def read_undefined_length_value(fp, is_little_endian, delimiter_tag,
+                                defer_size=None, read_size=1024*8):
+    """Read until `delimiter_tag` and return the value up to that point.
 
     On completion, the file will be set to the first byte after the delimiter
     and its following four zero bytes.
 
     Parameters
     ----------
-    fp : a file-like object
+    fp : file-like
     is_little_endian : boolean
-        True if file transfer syntax is little endian, else False.
+        ``True`` if file transfer syntax is little endian, else ``False``.
     delimiter_tag : BaseTag
-        tag used as and marker for reading
+        Tag used as and marker for reading
     defer_size : int, None, optional
-        Size to avoid loading large elements in memory.
-        See ``filereader.dcmread`` for more parameter info.
+        Size to avoid loading large elements in memory. See
+        ``filereader.dcmread`` for more parameter info.
     read_size : int
         Number of bytes to read at one time.
 
     Returns
     -------
-    delimiter : str, None
-        The file delimiter
+    delimiter : str or None
+        The file delimiter.
 
     Raises
     ------
@@ -194,8 +190,9 @@ def find_delimiter(fp, delimiter, is_little_endian, read_size=128,
 
     Returns
     -------
-    file position of delimiter, None
-        Returns None if end of file is reached without finding the delimiter.
+    int or None
+        Returns ``None`` if end of file is reached without finding the
+        delimiter, otherwise the byte offset to the delimiter.
     """
     struct_format = "<H"
     if not is_little_endian:
@@ -216,7 +213,8 @@ def length_of_undefined_length(fp,
 
     Parameters
     ----------
-    fp : file-like object
+    fp : file-like
+        The file-like to read.
     delimiter :
         See ``find_delimiter`` for parameter info.
     is_little_endian : boolean
@@ -227,7 +225,8 @@ def length_of_undefined_length(fp,
 
     Returns
     -------
-    length to delimiter
+    int
+        Byte offset to the delimiter.
 
     Notes
     -----

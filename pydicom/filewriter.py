@@ -138,16 +138,16 @@ def correct_ambiguous_vr_element(elem, ds, is_little_endian):
 
     Parameters
     ----------
-    elem : pydicom.dataelem.DataElement
+    elem : dataelem.DataElement
         The element with an ambiguous VR.
-    ds : pydicom.dataset.Dataset
+    ds : dataset.Dataset
         The dataset containing `elem`.
     is_little_endian : bool
         The byte ordering of the values in the dataset.
 
     Returns
     -------
-    elem : pydicom.dataelem.DataElement
+    dataelem.DataElement
         The corrected element
     """
     if 'or' in elem.VR:
@@ -210,8 +210,14 @@ def write_numbers(fp, data_element, struct_format):
 
     "Value" can be more than one number.
 
-    struct_format -- the character format as used by the struct module.
-
+    Parameters
+    ----------
+    fp : file-like
+        The file-like to write the encoded data to.
+    data_element : dataelem.DataElement
+        The element to encode.
+    struct_format : str
+        The character format as used by the struct module.
     """
     endianChar = '><' [fp.is_little_endian]
     value = data_element.value
@@ -615,9 +621,9 @@ def write_ATvalue(fp, data_element):
 def write_file_meta_info(fp, file_meta, enforce_standard=True):
     """Write the File Meta Information elements in `file_meta` to `fp`.
 
-    If `enforce_standard` is True then the file-like `fp` should be positioned
-    past the 128 byte preamble + 4 byte prefix (which should already have been
-    written).
+    If `enforce_standard` is ``True`` then the file-like `fp` should be
+    positioned past the 128 byte preamble + 4 byte prefix (which should
+    already have been written).
 
     **DICOM File Meta Information Group Elements**
 
@@ -632,11 +638,11 @@ def write_file_meta_info(fp, file_meta, enforce_standard=True):
     * (0002,0010) *Transfer Syntax UID*, UI, N
     * (0002,0012) *Implementation Class UID*, UI, N
 
-    If `enforce_standard` is True then (0002,0000) will be added/updated,
+    If `enforce_standard` is ``True`` then (0002,0000) will be added/updated,
     (0002,0001) and (0002,0012) will be added if not already present and the
     other required elements will be checked to see if they exist. If
-    `enforce_standard` is False then `file_meta` will be written as is after
-    minimal validation checking.
+    `enforce_standard` is ``False`` then `file_meta` will be written as is
+    after minimal validation checking.
 
     The following Type 3/1C Elements may also be present:
 
@@ -647,7 +653,7 @@ def write_file_meta_info(fp, file_meta, enforce_standard=True):
     * (0002,0102) *Private Information*, OB, N
     * (0002,0100) *Private Information Creator UID*, UI, N
 
-    If `enforce_standard` is True then (0002,0013) will be added/updated.
+    If `enforce_standard` is ``True`` then (0002,0013) will be added/updated.
 
     *Encoding*
 
@@ -659,16 +665,16 @@ def write_file_meta_info(fp, file_meta, enforce_standard=True):
     fp : file-like
         The file-like to write the File Meta Information to.
     file_meta : pydicom.dataset.Dataset
-        The File Meta Information DataElements.
+        The File Meta Information elements.
     enforce_standard : bool
-        If False, then only the *File Meta Information* elements already in
-        `file_meta` will be written to `fp`. If True (default) then a DICOM
+        If ``False``, then only the *File Meta Information* elements already in
+        `file_meta` will be written to `fp`. If ``True`` (default) then a DICOM
         Standards conformant File Meta will be written to `fp`.
 
     Raises
     ------
     ValueError
-        If `enforce_standard` is True and any of the required *File Meta
+        If `enforce_standard` is ``True`` and any of the required *File Meta
         Information* elements are missing from `file_meta`, with the
         exception of (0002,0000), (0002,0001) and (0002,0012).
     ValueError
@@ -738,7 +744,7 @@ def dcmwrite(filename, dataset, write_like_original=True):
     | dataset.preamble | True        | False          |
     +==================+=============+================+
     | None             | no preamble | 128 0x00 bytes |
-    +------------------+------------------------------+
+    +------------------+-------------+----------------+
     | 128 bytes        | dataset.preamble             |
     +------------------+------------------------------+
 

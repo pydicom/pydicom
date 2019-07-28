@@ -10,5 +10,6 @@ Representation of Data Elements
    elem.dataelem
    elem.tag
    elem.values
+   elem.multival
    elem.sequence
    elem.valuerep

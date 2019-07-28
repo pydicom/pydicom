@@ -10,8 +10,8 @@ from io import BytesIO
 
 
 class DicomIO(object):
-    """File object which holds transfer syntax info
-       and anything else we need."""
+    """File object which holds transfer syntax info and anything else we need.
+    """
 
     # number of times to read if don't get requested bytes
     max_read_attempts = 3
@@ -24,14 +24,13 @@ class DicomIO(object):
         self._implicit_VR = True
 
     def read_le_tag(self):
-        """Read and return two unsigned shorts (little endian)
-           from the file."""
+        """Read and return two unsigned shorts (little endian) from the file.
+        """
         bytes_read = self.read(4, need_exact_length=True)
         return unpack(b"<HH", bytes_read)
 
     def read_be_tag(self):
-        """Read and return two unsigned shorts (big endian)
-           from the file."""
+        """Read and return two unsigned shorts (big endian) from the file."""
         bytes_read = self.read(4, need_exact_length=True)
         return unpack(b">HH", bytes_read)
 
@@ -44,25 +43,22 @@ class DicomIO(object):
         self.write_US(tag.element)
 
     def read_leUS(self):
-        """Return an unsigned short from the file
-           with little endian byte order"""
+        """Return an unsigned short from the file with little endian byte order
+        """
         return unpack(b"<H", self.read(2))[0]
 
     def read_beUS(self):
-        """Return an unsigned short from the file
-           with big endian byte order"""
+        """Return an unsigned short from the file with big endian byte order"""
         return unpack(b">H", self.read(2))[0]
 
     def read_leUL(self):
-        """Return an unsigned long read with
-           little endian byte order"""
+        """Return an unsigned long read with little endian byte order"""
         return unpack(b"<L", self.read(4))[0]
 
     def read(self, length=None, need_exact_length=False):
-        """Reads the required length, returns
-        EOFError if gets less
+        """Reads the required length, returns EOFError if gets less
 
-        If length is None, then read all bytes
+        If length is ``None``, then read all bytes
         """
         parent_read = self.parent_read  # super(DicomIO, self).read
         if length is None:

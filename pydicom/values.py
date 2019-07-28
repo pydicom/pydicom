@@ -33,13 +33,13 @@ def convert_tag(byte_string, is_little_endian, offset=0):
     byte_string : bytes
         The encoded tag.
     is_little_endian : bool
-        True if the encoding is little endian, False otherwise.
+        ``True`` if the encoding is little endian, ``False`` otherwise.
     offset : int, optional
         The byte offset in `byte_string` to the start of the tag.
 
     Returns
     -------
-    tag.Tag
+    tag.BaseTag
         The tag as a Tag.
     """
     if is_little_endian:
@@ -59,7 +59,7 @@ def convert_AE_string(byte_string, is_little_endian, struct_format=None):
     byte_string : bytes or str
         The encoded 'AE' element value.
     is_little_endian : bool
-        True if the value is encoded as little endian, False otherwise.
+        ``True`` if the value is encoded as little endian, ``False`` otherwise.
     struct_format : str, optional
         Not used.
 
@@ -82,13 +82,13 @@ def convert_ATvalue(byte_string, is_little_endian, struct_format=None):
     byte_string : bytes or str
         The encoded 'AT' element value.
     is_little_endian : bool
-        True if the value is encoded as little endian, False otherwise.
+        ``True`` if the value is encoded as little endian, ``False`` otherwise.
     struct_format : str, optional
         Not used.
 
     Returns
     -------
-    tag.Tag or list of tag.Tag
+    tag.BaseTag or list of tag.BaseTag
         The decoded value(s).
     """
     length = len(byte_string)
@@ -117,15 +117,17 @@ def convert_DA_string(byte_string, is_little_endian, struct_format=None):
     byte_string : bytes or str
         The encoded 'DA' element value.
     is_little_endian : bool
-        True if the value is encoded as little endian, False otherwise.
+        ``True`` if the value is encoded as little endian, ``False`` otherwise.
     struct_format : str, optional
         Not used.
 
     Returns
     -------
     str or list of str or valuerep.DA or list of valuerep.DA
-        If ``config.datetime_conversion`` is True then returns either DA or a
-        list of DA, otherwise returns str or list of str.
+        If
+        :mod:`config.datetime_conversion <pydicom.config.datetime_conversion>`
+        is ``True`` then returns either ``DA`` or a list of ``DA``, otherwise
+        returns ``str`` or list of ``str``.
     """
     if config.datetime_conversion:
         if not in_py2:
@@ -147,15 +149,17 @@ def convert_DS_string(byte_string, is_little_endian, struct_format=None):
     byte_string : bytes or str
         The encoded 'DS' element value.
     is_little_endian : bool
-        True if the value is encoded as little endian, False otherwise.
+        ``True`` if the value is encoded as little endian, ``False`` otherwise.
     struct_format : str, optional
         Not used.
 
     Returns
     -------
-    DSfloat or list of DSfloat or DSdecimal or list of DSdecimal
-        If ``config.use_DS_decimal`` is True then returns DSdecimal or a list
-        of DSdecimal, otherwise returns DSfloat or a list of DSfloat.
+    valuerep.DSfloat or list of DSfloat or valuerep.DSdecimal or list of DSdecimal
+        If :mod:`config.use_DS_decimal <pydicom.config.use_DS_decimal>`
+        is ``True`` then returns ``DSdecimal`` or
+        a list of ``DSdecimal``, otherwise returns ``DSfloat`` or a list of
+        ``DSfloat``.
     """
     if not in_py2:
         byte_string = byte_string.decode(default_encoding)
@@ -182,15 +186,17 @@ def convert_DT_string(byte_string, is_little_endian, struct_format=None):
     byte_string : bytes or str
         The encoded 'DT' element value.
     is_little_endian : bool
-        True if the value is encoded as little endian, False otherwise.
+        ``True`` if the value is encoded as little endian, ``False`` otherwise.
     struct_format : str, optional
         Not used.
 
     Returns
     -------
-    str or list of str or DT or list of DT
-        if ``config.datetime_conversion`` is True then returns DT or a list
-        of DT, otherwise returns str or list of str.
+    str or list of str or valuerep.DT or list of DT
+        if
+        :mod:`config.datetime_conversion <pydicom.config.datetime_conversion>`
+        is ``True`` then returns ``DT`` or a list of ``DT``, otherwise
+        returns ``str`` or list of ``str``.
     """
     if config.datetime_conversion:
         if not in_py2:
@@ -212,13 +218,13 @@ def convert_IS_string(byte_string, is_little_endian, struct_format=None):
     byte_string : bytes or str
         The encoded 'IS' element value.
     is_little_endian : bool
-        True if the value is encoded as little endian, False otherwise.
+        ``True`` if the value is encoded as little endian, ``False`` otherwise.
     struct_format : str, optional
         Not used.
 
     Returns
     -------
-    IS or list of IS
+    valuerep.IS or list of IS
         The decoded value(s).
     """
     if not in_py2:
@@ -237,7 +243,7 @@ def convert_numbers(byte_string, is_little_endian, struct_format):
     byte_string : bytes or str
         The encoded numerical VR element value.
     is_little_endian : bool
-        True if the value is encoded as little endian, False otherwise.
+        ``True`` if the value is encoded as little endian, ``False`` otherwise.
     struct_format : str
         The format of the numerical data encoded in `byte_string`. Should be a
         valid format for ``struct.unpack()`` without the endianness.
@@ -304,9 +310,9 @@ def convert_PN(byte_string, encodings=None):
 
     Returns
     -------
-    valuerep.PersonName3 or list of valuerep.PersonName3
+    valuerep.PersonName3 or list of PersonName3
         The decoded 'PN' value(s) if using Python 3.
-    valuerep.PersonNameUnicode or list of valuerep.PersonNameUnicode
+    valuerep.PersonNameUnicode or list of PersonNameUnicode
         The decoded 'PN' value(s) if using Python 2.
     """
     def get_valtype(x):
@@ -331,15 +337,15 @@ def convert_PN(byte_string, encodings=None):
 def convert_string(byte_string, is_little_endian, struct_format=None):
     """Return a decoded string VR value as str.
 
-    String VRs are 'AS', 'CS' and optionally (depending on pydicom.config)
-    'DA', 'DT', and 'TM'.
+    String VRs are 'AS', 'CS' and optionally (depending on
+    :ref:`pydicom.config <api_config>`) 'DA', 'DT', and 'TM'.
 
     Parameters
     ----------
     byte_string : bytes or str
         The encoded text VR element value.
     is_little_endian : bool
-        True if the value is encoded as little endian, False otherwise.
+        ``True`` if the value is encoded as little endian, ``False`` otherwise.
     struct_format : str, optional
         Not used.
 
@@ -413,9 +419,9 @@ def convert_SQ(byte_string, is_implicit_VR, is_little_endian,
     byte_string : bytes or str
         The encoded 'SQ' element value.
     is_implicit_VR : bool
-        True if the value is encoded as implicit VR, False otherwise.
+        ``True`` if the value is encoded as implicit VR, ``False`` otherwise.
     is_little_endian : bool
-        True if the value is encoded as little endian, False otherwise.
+        ``True`` if the value is encoded as little endian, ``False`` otherwise.
     encoding : list of str, optional
         The character encoding scheme(s) used to encoded any text VR elements
         within the sequence value. `'iso8859'` is used by default.
@@ -449,15 +455,17 @@ def convert_TM_string(byte_string, is_little_endian, struct_format=None):
     byte_string : bytes or str
         The encoded 'TM' element value.
     is_little_endian : bool
-        True if the value is encoded as little endian, False otherwise.
+        ``True`` if the value is encoded as little endian, ``False`` otherwise.
     struct_format : str, optional
         Not used.
 
     Returns
     -------
     str or list of str or valuerep.TM or list of valuerep.TM
-        If ``config.datetime_conversion`` is True then returns either TM or a
-        list of TM, otherwise returns str or list of str.
+        If
+        :mod:`config.datetime_conversion <pydicom.config.datetime_conversion>`
+        is ``True`` then returns either ``TM`` or a list of ``TM``, otherwise
+        returns ``str`` or list of ``str``.
     """
     if config.datetime_conversion:
         if not in_py2:
@@ -481,7 +489,7 @@ def convert_UI(byte_string, is_little_endian, struct_format=None):
     byte_string : bytes or str
         The encoded 'UI' element value.
     is_little_endian : bool
-        True if the value is encoded as little endian, False otherwise.
+        ``True`` if the value is encoded as little endian, ``False`` otherwise.
     struct_format : str, optional
         Not used.
 
@@ -514,7 +522,7 @@ def convert_UR_string(byte_string, is_little_endian, struct_format=None):
     byte_string : bytes or str
         The encoded 'UR' element value.
     is_little_endian : bool
-        True if the value is encoded as little endian, False otherwise.
+        ``True`` if the value is encoded as little endian, ``False`` otherwise.
     struct_format : str, optional
         Not used.
 
@@ -600,7 +608,7 @@ def convert_value(VR, raw_data_element, encodings=None):
                 continue
             try:
                 value = convert_value(vr, raw_data_element, encodings)
-                logger.debug('converted value for tag %s with VR %s'
+                logger.debug('conveconfig.rted value for tag %s with VR %s'
                              % (raw_data_element.tag, vr))
                 break
             except Exception:

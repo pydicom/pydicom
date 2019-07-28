@@ -23,7 +23,7 @@ def tag_in_exception(tag):
 
     Parameters
     ----------
-    tag : pydicom.tag.Tag
+    tag : tag.BaseTag
         The tag to use in the context.
     """
     try:
@@ -42,29 +42,29 @@ def Tag(arg, arg2=None):
 
     General function for creating a Tag in any of the standard forms:
 
-    * Tag(0x00100015)
-    * Tag('0x00100015')
-    * Tag((0x10, 0x50))
-    * Tag(('0x10', '0x50'))
-    * Tag(0x0010, 0x0015)
-    * Tag(0x10, 0x15)
-    * Tag(2341, 0x10)
-    * Tag('0xFE', '0x0010')
-    * Tag("PatientName")
+    * ``Tag(0x00100015)``
+    * ``Tag('0x00100015')``
+    * ``Tag((0x10, 0x50))``
+    * ``Tag(('0x10', '0x50'))``
+    * ``Tag(0x0010, 0x0015)``
+    * ``Tag(0x10, 0x15)``
+    * ``Tag(2341, 0x10)``
+    * ``Tag('0xFE', '0x0010')``
+    * ``Tag("PatientName")``
 
     Parameters
     ----------
     arg : int or str or 2-tuple/list
-        If int or str, then either the group or the combined
-        group/element number of the DICOM tag. If 2-tuple/list
-        then the (group, element) numbers as int or str.
+        If ``int`` or ``str``, then either the group or the combined
+        group/element number of the DICOM tag. If ``2-tuple/list``
+        then the (group, element) numbers as ``int`` or ``str``.
     arg2 : int or str, optional
-        The element number of the DICOM tag, required when
-        `arg` only contains the group number of the tag.
+        The element number of the DICOM tag, required when `arg` only contains
+        the group number of the tag.
 
     Returns
     -------
-    pydicom.tag.BaseTag
+    tag.BaseTag
     """
     if isinstance(arg, BaseTag):
         return arg
@@ -131,8 +131,8 @@ else:
 class BaseTag(BaseTag_base_class):
     """Represents a DICOM element (group, element) tag.
 
-    If using python 2.7 then tags are represented as a long, while for python
-    3 they are represented as an int.
+    If using Python 2.7 then tags are represented as a ``long``, while for
+    Python 3 they are represented as an ``int``.
 
     Attributes
     ----------
@@ -141,7 +141,8 @@ class BaseTag(BaseTag_base_class):
     group : int
         The group number of the tag.
     is_private : bool
-        Returns True if the corresponding element is private, False otherwise.
+        Returns ``True`` if the corresponding element is private, ``False``
+        otherwise.
     """
     # Override comparisons so can convert "other" to Tag as necessary
     #   See Ordering Comparisons at:

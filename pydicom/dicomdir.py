@@ -8,9 +8,8 @@ from pydicom.dataset import FileDataset
 class DicomDir(FileDataset):
     """Hold a DICOMDIR dataset read from file.
 
-    Derived from FileDataset, but additional
-    methods are available,
-    specific to the Directory structure
+    Derived from :class:`FileDataset <pydicom.dataset.FileDataset>`, but
+    additional methods are available, specific to the Directory structure
     """
 
     def __init__(self, filename_or_obj, dataset, preamble=None, file_meta=None,
@@ -22,20 +21,21 @@ class DicomDir(FileDataset):
         Parameters
         ----------
         filename_or_obj : str or None
-            Full path and filename to the file of None if io.BytesIO.\
+            Full path and filename to the file of ``None`` if ``io.BytesIO``.
         dataset : dataset.Dataset
-            Some form of dictionary, usually a Dataset from read_dataset().
+            Some form of dictionary, usually a ``FileDataset`` from
+            :meth:`dcmread()<pydicom.filereader.dcmread>`.
         preamble : bytes
             The 128-byte DICOM preamble.
         file_meta : dataset.Dataset
-            The file meta info dataset, as returned by _read_file_meta,
+            The file meta info dataset, as returned by ``_read_file_meta``,
             or an empty dataset if no file meta information is in the file.
         is_implicit_VR : bool
-            True if implicit VR transfer syntax used; False if explicit VR.
-            Default is True.
+            ``True`` if implicit VR transfer syntax used (default); ``False``
+            if explicit VR.
         is_little_endian : bool
-            True if little-endian transfer syntax used; False if big-endian.
-            Default is True.
+            ``True`` if little endian transfer syntax used (default); ``False``
+            if big endian.
         """
         # Usually this class is created through filereader.read_partial,
         # and it checks class SOP, but in case of direct creation,

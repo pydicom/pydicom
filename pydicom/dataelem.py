@@ -60,16 +60,18 @@ _backslash_byte = b"\\"
 class DataElement(object):
     """Contain and manipulate a DICOM Element.
 
-    While its possible to create a new DataElement
-    directly and add it to a Dataset:
+    Examples
+    --------
+
+    While its possible to create a new ``DataElement`` directly and add it to
+    a ``Dataset``:
 
     >>> elem = DataElement(0x00100010, 'PN', 'CITIZEN^Joan')
     >>> ds = Dataset()
     >>> ds.add(elem)
 
-    Its far more convenient to use a Dataset to add a new
-    DataElement, as the VR and tag are determined
-    automatically from the DICOM dictionary:
+    Its far more convenient to use a ``Dataset`` to add a new ``DataElement``,
+    as the VR and tag are determined automatically from the DICOM dictionary:
 
     >>> ds = Dataset()
     >>> ds.PatientName = 'CITIZEN^Joan'
@@ -77,45 +79,41 @@ class DataElement(object):
     Attributes
     ----------
     descripWidth : int
-        For string display, this is the maximum width of
-        the description field (default 35 characters).
+        For string display, this is the maximum width of the description
+        field (default 35 characters).
     file_tell : int or None
     is_retired : bool
-        For officially registered DICOM Data Elements this
-        will be True if the retired status as given in PS3.6
-        Table 6-1 is 'RET'. For private or unknown Elements
-        this will always be False
+        For officially registered DICOM Data Elements this will be ``True`` if
+        the retired status as given in PS3.6 Table 6-1 is 'RET'. For private
+        or unknown Elements this will always be ``False``.
     is_undefined_length : bool
-        Indicates whether the length field for the element
-        was 0xFFFFFFFFL (ie undefined).
+        Indicates whether the length field for the element was ``0xFFFFFFFFL``
+        (ie undefined).
     keyword : str
-        For officially registered DICOM Data Elements this
-        will be the Keyword as given in PS3.6 Table 6-1.
-        For private or unknown Elements this will return
-        an empty string.
+        For officially registered DICOM Data Elements this will be the
+        *Keyword* as given in PS3.6 Table 6-1. For private or unknown
+        elements this will return an empty string ``''``.
     maxBytesToDisplay : int
-        For string display, elements with values containing
-        data which is longer than this value will display
-        "array of # bytes" (default 16 bytes).
+        For string display, elements with values containing data which is
+        longer than this value will display ``"array of # bytes"``
+        (default 16).
     name : str
-        For officially registered DICOM Data Elements this
-        will be the Name as given in PS3.6 Table 6-1.
-        For private Elements known to pydicom this will be
-        the Name in the format '[name]'. For unknown
-        private Elements this will be 'Private Creator'.
-        For unknown Elements this will return an empty string.
+        For officially registered DICOM Data Elements this will be the *Name*
+        as given in PS3.6 Table 6-1. For private elements known to *pydicom*
+        this will be the *Name* in the format ``'[name]'``. For unknown
+        private elements this will be ``'Private Creator'``. For unknown
+        elements this will return an empty string ``''``.
     showVR : bool
-        For string display, include the Element's VR
-        just before it's `value` (default True)
+        For string display, include the element's VR just before it's `value`
+        (default ``True``).
     tag : pydicom.tag.Tag
-        The DICOM Tag for the Data Element
+        The DICOM Tag for the Data Element.
     value
-        The Data Element's stored value(s)
+        The Data Element's stored value(s).
     VM : int
-        The Value Multiplicity of the Data Element's
-        stored value(s)
+        The Value Multiplicity of the Data Element's stored value(s).
     VR : str
-        The Data Element's Value Representation value
+        The Data Element's Value Representation value.
     """
 
     descripWidth = 35
@@ -127,39 +125,36 @@ class DataElement(object):
     # should flag themselves as unhashable
     __hash__ = None
 
-    def __init__(self,
-                 tag,
-                 VR,
-                 value,
-                 file_value_tell=None,
-                 is_undefined_length=False,
-                 already_converted=False):
+    def __init__(self, tag, VR, value, file_value_tell=None,
+                 is_undefined_length=False, already_converted=False):
         """Create a new DataElement.
 
         Parameters
         ----------
         tag
             The DICOM (group, element) tag in any form accepted by
-            pydicom.tag.Tag such as [0x0010, 0x0010], (0x10, 0x10), 0x00100010,
-            etc.
+            :meth:`Tag <pydicom.tag.Tag>` such as ``[0x0010, 0x0010]``,
+            ``(0x10, 0x10)``, ``0x00100010``, etc.
         VR : str
             The 2 character DICOM value representation (see DICOM standard part
             5, Section 6.2).
         value
             The value of the data element. One of the following:
+
             * a single string value
             * a number
             * a list or tuple with all strings or all numbers
             * a multi-value string with backslash separator
+
         file_value_tell : int or None
-            Used internally by Dataset to store the write position for the
-            ReplaceDataElementValue() method. Default is None.
+            Used internally by ``Dataset`` to store the write position for the
+            ``ReplaceDataElementValue()`` method. Default is ``None``.
         is_undefined_length : bool
             Used internally to store whether the length field for this element
-            was 0xFFFFFFFFL, i.e. 'undefined length'. Default is False.
+            was ``0xFFFFFFFFL``, i.e. 'undefined length'. Default is ``False``.
         already_converted : bool
             Used to determine whether or not `value` requires conversion to a
-            value with VM > 1. Default is False.
+            value with VM > 1. Default is ``False``.
         """
         if not isinstance(tag, BaseTag):
             tag = Tag(tag)
@@ -174,30 +169,28 @@ class DataElement(object):
 
     @classmethod
     def from_json(cls, dataset_class, tag, vr, value, value_key,
-                                bulk_data_uri_handler=None,
-                                encodings=None):
-        """Creates a DataElement from JSON.
+                  bulk_data_uri_handler=None, encodings=None):
+        """Return a DataElement from JSON.
 
         Parameters
         ----------
-        tag: pydicom.tag.Tag
-            data element tag
-        vr: str
-            data element value representation
-        value: list
-            data element value(s)
-        value_key: Union[str, None]
-            key of the data element that contains the value
-            (options: ``{"Value", "InlineBinary", "BulkDataURI"}``)
-        bulk_data_uri_handler: Union[Callable, None]
-            callable that accepts the "BulkDataURI" of the JSON representation
-            of a data element and returns the actual value of that data element
-            (retrieved via DICOMweb WADO-RS)
+        tag : pydicom.tag.Tag
+            The element's tag.
+        vr : str
+            The element's value representation.
+        value : list
+            The element's value(s).
+        value_key : Union[str, None]
+            A key of the element that contains the value (options:
+            ``{"Value", "InlineBinary", "BulkDataURI"}``)`.
+        bulk_data_uri_handler : Union[Callable, None], optional
+            A callable that accepts the *BulkDataURI* of the JSON
+            representation of the element and returns the actual value of that
+            data element (retrieved via DICOMweb WADO-RS).
 
         Returns
         -------
-        pydicom.dataelem.DataElement
-
+        dataelem.DataElement
         """
         # TODO: test wado-rs retrieve wrapper
         try:
@@ -326,7 +319,7 @@ class DataElement(object):
 
     @property
     def VM(self):
-        """Return the value multiplicity (as an int) of the element."""
+        """Return the value multiplicity of the element as an int."""
         if isinstance(self.value, compat.char_types):
             return 1
         try:
@@ -402,7 +395,8 @@ class DataElement(object):
             The result if `self` and `other` are the same class
         NotImplemented
             If `other` is not the same class as `self` then returning
-            NotImplemented delegates the result to superclass.__eq__(subclass)
+            ``NotImplemented`` delegates the result to
+            ``superclass.__eq__(subclass)``.
         """
         # Faster result if same object
         if other is self:
@@ -464,8 +458,7 @@ class DataElement(object):
             return compat.text_type(str(self))
 
     def __getitem__(self, key):
-        """Return the value at `key` if the element's
-           `value` is indexable."""
+        """Return the value at `key` if the element's `value` is indexable."""
         try:
             return self.value[key]
         except TypeError:
@@ -474,11 +467,11 @@ class DataElement(object):
 
     @property
     def name(self):
-        """Return the DICOM dictionary name for the element."""
+        """Return the DICOM dictionary name for the element as str."""
         return self.description()
 
     def description(self):
-        """Return the DICOM dictionary name for the element."""
+        """Return the DICOM dictionary name for the element as str."""
         if self.tag.is_private:
             name = "Private tag data"  # default
             if hasattr(self, 'private_creator'):
@@ -505,7 +498,7 @@ class DataElement(object):
 
     @property
     def is_retired(self):
-        """The element's retired status."""
+        """Return the element's retired status as bool."""
         if dictionary_has_tag(self.tag):
             return dictionary_is_retired(self.tag)
         else:
@@ -513,7 +506,7 @@ class DataElement(object):
 
     @property
     def keyword(self):
-        """The element's keyword (if known)."""
+        """Return the element's keyword (if known) as str."""
         if dictionary_has_tag(self.tag):
             return dictionary_keyword(self.tag)
         else:

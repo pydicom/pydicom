@@ -272,14 +272,14 @@ def generate_uid(prefix=PYDICOM_ROOT_UID, entropy_srcs=None):
     ----------
     prefix : str or None
         The UID prefix to use when creating the UID. Default is the pydicom
-        root UID '1.2.826.0.1.3680043.8.498.'. If None then a prefix of '2.25.'
-        will be used with the integer form of a UUID generated using the
-        UUID4 algorithm.
+        root UID '1.2.826.0.1.3680043.8.498.'. If ``None`` then a prefix of
+        '2.25.' will be used with the integer form of a UUID generated using
+        the UUID4 algorithm.
     entropy_srcs : list of str or None
-        If `prefix` is not None, then the prefix will be appended with a
+        If `prefix` is not ``None``, then the prefix will be appended with a
         SHA512 hash of the list which means the result is deterministic and
-        should make the original data unrecoverable. If None random data will
-        be used (default).
+        should make the original data unrecoverable. If ``None`` random data
+        will be used (default).
 
     Returns
     -------

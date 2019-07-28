@@ -22,5 +22,7 @@ pydicom.
    dataset
    dicomdir
    encaps
+   errors
    fileio
+   misc
    uid

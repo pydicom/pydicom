@@ -41,10 +41,9 @@ PN_DELIMS = {'^'} if compat.in_py2 else {0xe5}
 
 
 class DA(date):
-    """Store value for DICOM VR DA (Date) as datetime.date.
+    """Store value for an element with VR 'DA' as datetime.date.
 
-    Note that the datetime.date base class is immutable.
-
+    Note that the ``datetime.date`` base class is immutable.
     """
     __slots__ = ['original_string']
 
@@ -68,8 +67,11 @@ class DA(date):
         Raise an exception if the string cannot be parsed or the argument
         is otherwise incompatible.
 
-        :param val: val must be a string conformant to the DA definition
-        in the DICOM Standard PS 3.5-2011
+        Parameters
+        ----------
+        val : str
+            A string conformant to the DA definition in the DICOM Standard
+            PS 3.5-2011
         """
         if isinstance(val, (str, compat.string_types)):
             if len(val) == 8:
@@ -115,10 +117,9 @@ class DA(date):
 
 
 class DT(datetime):
-    """Store value for DICOM VR DT (DateTime) as datetime.datetime.
+    """Store value for an element with VR 'DT' as datetime.datetime.
 
-    Note that the datetime.datetime base class is immutable.
-
+    Note that the ``datetime.datetime`` base class is immutable.
     """
     __slots__ = ['original_string']
     _regex_dt = re.compile(r"((\d{4,14})(\.(\d{1,6}))?)([+-]\d{4})?")
@@ -147,8 +148,11 @@ class DT(datetime):
         Raise an exception if the string cannot be parsed or the argument
         is otherwise incompatible.
 
-        :param val: val must be a string conformant to the DT definition
-        in the DICOM Standard PS 3.5-2011
+        Parameters
+        ----------
+        val : str
+            A string conformant to the DT definition in the DICOM Standard
+            PS 3.5-2011.
         """
         if isinstance(val, (str, compat.string_types)):
             match = DT._regex_dt.match(val)
@@ -225,10 +229,9 @@ class DT(datetime):
 
 
 class TM(time):
-    """Store value for DICOM VR of TM (Time) as datetime.time.
+    """Store value for an element with VR 'TM' as datetime.time.
 
-    Note that the datetime.time base class is immutable.
-
+    Note that the ``datetime.time`` base class is immutable.
     """
     __slots__ = ['original_string']
     _regex_tm = re.compile(r"(\d{2,6})(\.(\d{1,6}))?")
@@ -253,8 +256,11 @@ class TM(time):
         Raise an exception if the string cannot be parsed or the argument
         is otherwise incompatible.
 
-        :param val: val must be a string conformant to the TM definition
-        in the DICOM Standard PS 3.5-2011
+        Parameters
+        ----------
+        val : str
+            A string conformant to the TM definition in the DICOM Standard
+            PS 3.5-2011.
         """
         if isinstance(val, (str, compat.string_types)):
             match = TM._regex_tm.match(val)
@@ -308,7 +314,7 @@ class TM(time):
 
 
 class DSfloat(float):
-    """Store values for DICOM VR of DS (Decimal String) as a float.
+    """Store value for an element with VR 'DS' as float.
 
     If constructed from an empty string, return the empty string,
     not an instance of this class.
@@ -348,9 +354,12 @@ class DSfloat(float):
 
 
 class DSdecimal(Decimal):
-    """Store values for DICOM VR of DS (Decimal String).
-    Note: if constructed by an empty string, returns the empty string,
-    not an instance of this class.
+    """Store value for an element with VR 'DS' as decimal.Decimal.
+
+    Notes
+    -----
+    If constructed by an empty string, returns the empty string, not an
+    instance of this class.
     """
     __slots__ = ['original_string']
 
@@ -366,8 +375,10 @@ class DSdecimal(Decimal):
         """Create an instance of DS object, or return a blank string if one is
         passed in, e.g. from a type 2 DICOM blank value.
 
-        :param val: val must be a string or a number type which can be
-                   converted to a decimal
+        Parameters
+        ----------
+        val : str or numeric
+            A string or a number type which can be converted to a decimal.
         """
         # Store this value here so that if the input string is actually a valid
         # string but decimal.Decimal transforms it to an invalid string it will
@@ -432,13 +443,14 @@ else:
 
 def DS(val):
     """Factory function for creating DS class instances.
-    Checks for blank string; if so, return that.
-    Else calls DSfloat or DSdecimal to create the class
-    instance. This avoids overriding __new__ in DSfloat
-    (which carries a time penalty for large arrays of DS).
-    Similarly the string clean and check can be avoided
-    and DSfloat called directly if a string has already
-    been processed.
+
+    Checks for blank string; if so, return that, else calls ``DSfloat`` or
+    ``DSdecimal`` to create the class instance. This avoids overriding
+    ``DSfloat.__new__()`` (which carries a time penalty for large arrays of
+    DS).
+
+    Similarly the string clean and check can be avoided and ``DSfloat`` called
+    directly if a string has already been processed.
     """
     if isinstance(val, (str, compat.text_type)):
         val = val.strip()
@@ -448,9 +460,10 @@ def DS(val):
 
 
 class IS(int):
-    """Derived class of int. Stores original integer
-    string for exact rewriting
-    of the string originally read or stored.
+    """Store value for an element with VR 'IS' as int.
+
+    Stores original integer string for exact rewriting of the string
+    originally read or stored.
     """
     if compat.in_py2:
         __slots__ = ['original_string']
@@ -515,7 +528,8 @@ def MultiString(val, valtype=str):
     val : bytes
         DICOM bytestring to split up.
     valtype
-        Default str, but can be e.g. UID to overwrite to a specific type.
+        Default ``str``, but can be e.g. ``UID`` to overwrite to a specific
+        type.
 
     Returns
     -------
@@ -634,7 +648,9 @@ class PersonName3(object):
 
     def _create_dict(self):
         """Creates a dictionary of person name group and component names.
-        Used exclusively for `formatted` for backwards compatibility."""
+
+        Used exclusively for `formatted` for backwards compatibility.
+        """
         if not self._dict:
             for name in ('family_name', 'given_name', 'middle_name',
                          'name_prefix', 'name_suffix',
@@ -643,9 +659,10 @@ class PersonName3(object):
 
     @property
     def components(self):
-        """Return the up to three decoded person name components, representing
-        the alphabetic, ideographic and phonetic representations as a list
-        of unicode strings.
+        """Return the up to three decoded person name components.
+
+        Representing the alphabetic, ideographic and phonetic representations
+        as a list of unicode strings.
         """
         if self._components is None:
             groups = self.original_string.split(b'=')
@@ -734,7 +751,7 @@ class PersonName3(object):
 
         Returns
         -------
-        PersonName3
+        valuerep.PersonName3
             A person name object that will return the decoded string with
             the given encodings on demand. If the encodings are not given,
             the current object is returned.
@@ -849,17 +866,12 @@ class PersonNameBase(object):
 
 
 class PersonName(PersonNameBase, bytes):
-    """Human-friendly class to hold VR of Person Name (PN)
+    """Human-friendly class to hold the value of elements with VR  of 'PN'.
 
-    Name is parsed into the following properties:
-    single-byte, ideographic, and phonetic components
-    (PS3.5-2008 6.2.1)
-    family_name,
-    given_name,
-    middle_name,
-    name_prefix,
-    name_suffix
+    The value is parsed into the following properties:
 
+    * single-byte, ideographic, and phonetic components (PS3.5-2008 6.2.1)
+    * family_name, given_name, middle_name, name_prefix, name_suffix
     """
 
     def __new__(cls, val):
@@ -891,10 +903,15 @@ class PersonNameUnicode(PersonNameBase, compat.text_type):
 
     def __new__(cls, val, encodings):
         """Return unicode string after conversion of each part
-        val -- the PN value to store
-        encodings -- a list of python encodings, generally found
-                 from pydicom.charset.python_encodings mapping
-                 of values in DICOM data element (0008,0005).
+
+        Parameters
+        ----------
+        val : bytes or str
+            The PN value to store
+        encodings : list of str
+            A list of python encodings, generally found from
+            ``pydicom.charset.python_encodings`` mapping of values in DICOM
+            data element (0008,0005) *Specific Character Set*.
         """
         encodings = _verify_encodings(encodings)
         comps = _decode_personname(val.split(b"="), encodings)
@@ -907,6 +924,7 @@ class PersonNameUnicode(PersonNameBase, compat.text_type):
 
     def __copy__(self):
         """Correctly copy object.
+
         Needed because of the overwritten __new__.
         """
         # no need to use the original encoding here - we just encode and
@@ -918,6 +936,7 @@ class PersonNameUnicode(PersonNameBase, compat.text_type):
 
     def __deepcopy__(self, memo):
         """Make correctly a deep copy of the object.
+
         Needed because of the overwritten __new__.
         """
         name = compat.text_type(self).encode('utf8')

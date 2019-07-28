@@ -43,14 +43,16 @@ def data_element_generator(fp,
 
     Parameters
     ----------
-    fp : file-like object
-    is_implicit_VR : boolean
-    is_little_endian : boolean
+    fp : file-like
+        The file like to read from.
+    is_implicit_VR : bool
+        ``True`` if the data is encoded as implicit VR, ``False`` otherwise.
+    is_little_endian : bool
+        ``True`` if the data is encoded as little endian, ``False`` otherwise.
     stop_when : None, callable, optional
-        If None (default), then the whole file is read.
-        A callable which takes tag, VR, length,
-        and returns True or False. If it returns True,
-        read_data_element will just return.
+        If ``None`` (default), then the whole file is read. A callable which
+        takes tag, VR, length, and returns ``True`` or ``False``. If it
+        returns ``True``, ``read_data_element`` will just return.
     defer_size : int, str, None, optional
         See ``dcmread`` for parameter info.
     encoding :
@@ -60,15 +62,15 @@ def data_element_generator(fp,
 
     Returns
     -------
-    VR : None if implicit VR, otherwise the VR read from the file
-    length :
-        the length as in the DICOM data element (could be
-        DICOM "undefined length" 0xffffffffL)
-    value_bytes :
-        the raw bytes from the DICOM file
-        (not parsed into python types)
-    is_little_endian : boolean
-        True if transfer syntax is little endian; else False.
+    VR : str or None
+        ``None`` if implicit VR, otherwise the VR read from the file.
+    length : int
+        The length as in the DICOM data element (could be DICOM "undefined
+        length" ``0xffffffffL``)
+    value_bytes : bytes or str
+        The raw bytes from the DICOM file (not parsed into python types)
+    is_little_endian : bool
+        ``True`` if transfer syntax is little endian; else ``False``.
     """
     # Summary of DICOM standard PS3.5-2008 chapter 7:
     # If Implicit VR, data element is:
@@ -321,34 +323,36 @@ def read_dataset(fp, is_implicit_VR, is_little_endian, bytelength=None,
 
     Parameters
     ----------
-    fp : an opened file object
+    fp : file-like
+        An opened file-like object.
     is_implicit_VR : boolean
-        True if file transfer syntax is implicit VR.
+        ``True`` if file transfer syntax is implicit VR.
     is_little_endian : boolean
-        True if file has little endian transfer syntax.
+        ``True`` if file has little endian transfer syntax.
     bytelength : int, None, optional
-        None to read until end of file or ItemDeliterTag, else
-        a fixed number of bytes to read
+        ``None`` to read until end of file or ItemDeliterTag, else a fixed
+        number of bytes to read
     stop_when : None, optional
-        optional call_back function which can terminate reading.
-        See help for data_element_generator for details
+        Optional call_back function which can terminate reading. See help for
+        ``data_element_generator`` for details
     defer_size : int, None, optional
-        Size to avoid loading large elements in memory.
-        See ``dcmread`` for more parameter info.
+        Size to avoid loading large elements in memory. See ``dcmread`` for
+        more parameter info.
     parent_encoding :
-        optional encoding to use as a default in case
-        a Specific Character Set (0008,0005) isn't specified
+        Optional encoding to use as a default in case (0008,0005) *Specific
+        Character Set* isn't specified.
     specific_tags : list or None
         See ``dcmread`` for parameter info.
 
     Returns
     -------
-    a Dataset instance
+    dataset.Dataset
+        A Dataset instance.
 
     See Also
     --------
-    pydicom.dataset.Dataset
-        A collection (dictionary) of Dicom `DataElement` instances.
+    dataset.Dataset
+        A collection (dictionary) of DICOM ``DataElement`` instances.
     """
     raw_data_elements = dict()
     fp_start = fp.tell()
@@ -558,7 +562,7 @@ def read_preamble(fp, force):
     `fp` should be positioned at the start of the file-like. If the preamble
     and prefix are found then after reading `fp` will be positioned at the
     first byte after the prefix (byte offset 133). If either the preamble or
-    prefix are missing and `force` is True then after reading `fp` will be
+    prefix are missing and `force` is ``True`` then after reading `fp` will be
     positioned at the start of the file-like.
 
     Parameters
@@ -572,13 +576,13 @@ def read_preamble(fp, force):
     -------
     preamble : str/bytes or None
         The 128-byte DICOM preamble will be returned if the appropriate prefix
-        ('DICM') is found at byte offset 128. Returns None if the 'DICM' prefix
-        is not found and `force` is True.
+        ('DICM') is found at byte offset 128. Returns ``None`` if the 'DICM'
+        prefix is not found and `force` is ``True``.
 
     Raises
     ------
     InvalidDicomError
-        If `force` is False and no appropriate header information found.
+        If `force` is ``False`` and no appropriate header information found.
 
     Notes
     -----
@@ -638,7 +642,8 @@ def read_partial(fileobj, stop_when=None, defer_size=None,
 
     Returns
     -------
-    FileDataset instance or DicomDir instance.
+    dataset.FileDataset or dicomdir.DicomDir
+        The read dataset.
 
     See Also
     --------
