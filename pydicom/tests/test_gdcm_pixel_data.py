@@ -1,23 +1,27 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 # -*- coding: utf-8 -*-
+"""Unit tests for the GDCM Pixel Data handler."""
 
-import unittest
 import os
 import sys
 import tempfile
 import shutil
+
 import pytest
+
 import pydicom
 from pydicom.filereader import dcmread
 from pydicom.data import get_testdata_files
 from pydicom.pixel_data_handlers.util import _convert_YBR_FULL_to_RGB
 from pydicom.tag import Tag
 from pydicom import compat
+
 gdcm_missing_message = "GDCM is not available in this test environment"
 gdcm_im_missing_message = "GDCM is not available or in-memory decoding"\
     " not supported with this GDCM version"
 gdcm_present_message = "GDCM is being tested"
 have_numpy_testing = True
+
 try:
     import numpy.testing
 except ImportError as e:
@@ -30,23 +34,14 @@ try:
 except AttributeError:
     have_pytest_param = False
 
-try:
-    import pydicom.pixel_data_handlers.gdcm_handler as gdcm_handler
-    HAVE_GDCM = gdcm_handler.HAVE_GDCM
-    HAVE_GDCM_IN_MEMORY_SUPPORT = gdcm_handler.HAVE_GDCM_IN_MEMORY_SUPPORT
-    if HAVE_GDCM:
-        import gdcm
-except ImportError as e:
-    HAVE_GDCM = False
-    HAVE_GDCM_IN_MEMORY_SUPPORT = False
-    gdcm_handler = None
+from pydicom.pixel_data_handlers import numpy_handler
+have_numpy_handler = numpy_handler.is_available()
 
-try:
-    import pydicom.pixel_data_handlers.numpy_handler as numpy_handler
-    HAVE_NP = numpy_handler.HAVE_NP
-except ImportError:
-    HAVE_NP = False
-    numpy_handler = None
+from pydicom.pixel_data_handlers import gdcm_handler
+HAVE_GDCM = gdcm_handler.is_available()
+HAVE_GDCM_IN_MEMORY_SUPPORT = gdcm_handler.HAVE_GDCM_IN_MEMORY_SUPPORT
+if HAVE_GDCM:
+    import gdcm
 
 
 empty_number_tags_name = get_testdata_files(
@@ -110,8 +105,8 @@ dir_name = os.path.dirname(sys.argv[0])
 save_dir = os.getcwd()
 
 
-class GDCM_JPEG_LS_Tests_no_gdcm(unittest.TestCase):
-    def setUp(self):
+class TestGDCM_JPEG_LS_no_gdcm(object):
+    def setup(self):
         if compat.in_py2:
             self.utf8_filename = os.path.join(
                 tempfile.gettempdir(), "ДИКОМ.dcm")
@@ -129,21 +124,21 @@ class GDCM_JPEG_LS_Tests_no_gdcm(unittest.TestCase):
         self.original_handlers = pydicom.config.pixel_data_handlers
         pydicom.config.pixel_data_handlers = []
 
-    def tearDown(self):
+    def teardown(self):
         pydicom.config.pixel_data_handlers = self.original_handlers
         os.remove(self.unicode_filename)
 
     def test_JPEG_LS_PixelArray(self):
-        with self.assertRaises((NotImplementedError, )):
-            _ = self.jpeg_ls_lossless.pixel_array
+        with pytest.raises(NotImplementedError):
+            self.jpeg_ls_lossless.pixel_array
 
     def test_emri_JPEG_LS_PixelArray(self):
-        with self.assertRaises((NotImplementedError, )):
-            _ = self.emri_jpeg_ls_lossless.pixel_array
+        with pytest.raises(NotImplementedError):
+            self.emri_jpeg_ls_lossless.pixel_array
 
 
-class GDCM_JPEG2000Tests_no_gdcm(unittest.TestCase):
-    def setUp(self):
+class TestGDCM_JPEG2000_no_gdcm(object):
+    def setup(self):
         self.jpeg_2k = dcmread(jpeg2000_name)
         self.jpeg_2k_lossless = dcmread(jpeg2000_lossless_name)
         self.mr_small = dcmread(mr_name)
@@ -153,7 +148,7 @@ class GDCM_JPEG2000Tests_no_gdcm(unittest.TestCase):
         self.original_handlers = pydicom.config.pixel_data_handlers
         pydicom.config.pixel_data_handlers = []
 
-    def tearDown(self):
+    def teardown(self):
         pydicom.config.pixel_data_handlers = self.original_handlers
 
     def test_JPEG2000(self):
@@ -161,70 +156,57 @@ class GDCM_JPEG2000Tests_no_gdcm(unittest.TestCase):
         # XX also tests multiple-valued AT data element
         expected = [Tag(0x0054, 0x0010), Tag(0x0054, 0x0020)]
         got = self.jpeg_2k.FrameIncrementPointer
-        self.assertEqual(
-            got,
-            expected,
-            "JPEG2000 file, Frame Increment Pointer: "
-            "expected %s, got %s" % (expected, got))
+        assert expected == got
 
         got = self.jpeg_2k.DerivationCodeSequence[0].CodeMeaning
         expected = 'Lossy Compression'
-        self.assertEqual(
-            got,
-            expected,
-            "JPEG200 file, Code Meaning got %s, "
-            "expected %s" % (got, expected))
+        assert expected == got
 
-    def test_JPEG2000PixelArray(self):
-        with self.assertRaises((NotImplementedError, )):
-            _ = self.jpeg_2k_lossless.pixel_array
+    def test_JPEG2000_pixel_array(self):
+        with pytest.raises(NotImplementedError):
+            self.jpeg_2k_lossless.pixel_array
 
-    def test_emri_JPEG2000PixelArray(self):
-        with self.assertRaises((NotImplementedError, )):
-            _ = self.emri_jpeg_2k_lossless.pixel_array
+    def test_emri_JPEG2000_pixel_array(self):
+        with pytest.raises(NotImplementedError):
+            self.emri_jpeg_2k_lossless.pixel_array
 
     def test_jpeg2000_lossy(self):
-        with self.assertRaises((NotImplementedError, )):
-            _ = self.sc_rgb_jpeg2k_gdcm_KY.pixel_array
+        with pytest.raises(NotImplementedError):
+            self.sc_rgb_jpeg2k_gdcm_KY.pixel_array
 
 
-class GDCM_JPEGlossyTests_no_gdcm(unittest.TestCase):
-
-    def setUp(self):
+class TestGDCM_JPEGlossy_no_gdcm(object):
+    def setup(self):
         self.jpeg_lossy = dcmread(jpeg_lossy_name)
         self.color_3d_jpeg = dcmread(color_3d_jpeg_baseline)
         self.original_handlers = pydicom.config.pixel_data_handlers
         pydicom.config.pixel_data_handlers = []
 
-    def tearDown(self):
+    def teardown(self):
         pydicom.config.pixel_data_handlers = self.original_handlers
 
     def test_JPEGlossy(self):
         """JPEG-lossy: Returns correct values for sample data elements"""
         got = self.jpeg_lossy.DerivationCodeSequence[0].CodeMeaning
         expected = 'Lossy Compression'
-        self.assertEqual(
-            got,
-            expected,
-            "JPEG-lossy file, Code Meaning got %s, "
-            "expected %s" % (got, expected))
+        assert expected == got
 
-    def test_JPEGlossyPixelArray(self):
-        with self.assertRaises((NotImplementedError, )):
-            _ = self.jpeg_lossy.pixel_array
+    def test_JPEGlossy_pixel_array(self):
+        with pytest.raises(NotImplementedError):
+            self.jpeg_lossy.pixel_array
 
-    def test_JPEGBaselineColor3DPixelArray(self):
-        with self.assertRaises((NotImplementedError, )):
-            _ = self.color_3d_jpeg.pixel_array
+    def test_JPEGBaseline_color_3D_pixel_array(self):
+        with pytest.raises(NotImplementedError):
+            self.color_3d_jpeg.pixel_array
 
 
-class GDCM_JPEGlosslessTests_no_gdcm(unittest.TestCase):
-    def setUp(self):
+class TestGDCM_JPEGlossless_no_gdcm(object):
+    def setup(self):
         self.jpeg_lossless = dcmread(jpeg_lossless_name)
         self.original_handlers = pydicom.config.pixel_data_handlers
         pydicom.config.pixel_data_handlers = []
 
-    def tearDown(self):
+    def teardown(self):
         pydicom.config.pixel_data_handlers = self.original_handlers
 
     def testJPEGlossless(self):
@@ -234,16 +216,12 @@ class GDCM_JPEGlosslessTests_no_gdcm(unittest.TestCase):
             SourceImageSequence[0].\
             PurposeOfReferenceCodeSequence[0].CodeMeaning
         expected = 'Uncompressed predecessor'
-        self.assertEqual(
-            got,
-            expected,
-            "JPEG-lossless file, Code Meaning got %s, "
-            "expected %s" % (got, expected))
+        assert expected == got
 
-    def testJPEGlosslessPixelArray(self):
+    def testJPEGlossless_pixel_array(self):
         """JPEGlossless: Fails gracefully when uncompressed data asked for"""
-        with self.assertRaises((NotImplementedError, )):
-            _ = self.jpeg_lossless.pixel_array
+        with pytest.raises(NotImplementedError):
+            self.jpeg_lossless.pixel_array
 
 
 if have_pytest_param:
@@ -404,7 +382,7 @@ else:
         with_gdcm_params = []
 
 
-class TestsWithGDCM():
+class TestsWithGDCM(object):
     @pytest.fixture(params=with_gdcm_params, scope='class', autouse=True)
     def with_gdcm(self, request):
         original_value = HAVE_GDCM_IN_MEMORY_SUPPORT
@@ -485,18 +463,14 @@ class TestsWithGDCM():
     def test_JPEG_LS_PixelArray(self, jpeg_ls_lossless, mr_small):
         a = jpeg_ls_lossless.pixel_array
         b = mr_small.pixel_array
-        assert a.mean() == b.mean(), "using GDCM Decoded pixel data is not "\
-            "all {0} (mean == {1})".format(b.mean(), a.mean())
-
+        assert a.mean() == b.mean()
         assert a.flags.writeable
 
     def test_emri_JPEG_LS_PixelArray_with_gdcm(self, emri_jpeg_ls_lossless,
                                                emri_small):
         a = emri_jpeg_ls_lossless.pixel_array
         b = emri_small.pixel_array
-        assert a.mean() == b.mean(), "Decoded pixel data is not all {0} "\
-            "(mean == {1})".format(b.mean(), a.mean())
-
+        assert a.mean() == b.mean()
         assert a.flags.writeable
 
     def test_JPEG2000(self, jpeg_2k):
@@ -504,28 +478,21 @@ class TestsWithGDCM():
         # XX also tests multiple-valued AT data element
         expected = [Tag(0x0054, 0x0010), Tag(0x0054, 0x0020)]
         got = jpeg_2k.FrameIncrementPointer
-        assert got == expected, "JPEG2000 file, Frame Increment Pointer: "\
-            "expected %s, got %s" % (expected, got)
+        assert expected == got
 
         got = jpeg_2k.DerivationCodeSequence[0].CodeMeaning
-        expected = 'Lossy Compression'
-        assert got == expected, "JPEG200 file, Code Meaning got %s, "\
-            "expected %s" % (got, expected)
+        assert 'Lossy Compression' == got
 
     def test_JPEG2000PixelArray(self, jpeg_2k_lossless, mr_small):
         a = jpeg_2k_lossless.pixel_array
         b = mr_small.pixel_array
-        assert a.mean() == b.mean(), "Decoded pixel data is not all {0} "\
-            "(mean == {1})".format(b.mean(), a.mean())
-
+        assert a.mean() == b.mean()
         assert a.flags.writeable
 
     def test_emri_JPEG2000PixelArray(self, emri_jpeg_2k_lossless, emri_small):
         a = emri_jpeg_2k_lossless.pixel_array
         b = emri_small.pixel_array
-        assert a.mean() == b.mean(), "Decoded pixel data is not all {0} "\
-            "(mean == {1})".format(b.mean(), a.mean())
-
+        assert a.mean() == b.mean()
         assert a.flags.writeable
 
     def test_JPEG2000_lossy(self, sc_rgb_jpeg2k_gdcm_KY,
@@ -535,8 +502,7 @@ class TestsWithGDCM():
         if have_numpy_testing:
             numpy.testing.assert_array_equal(a, b)
         else:
-            assert a.mean() == b.mean(), "Decoded pixel data is not all {0} "\
-                "(mean == {1})".format(b.mean(), a.mean())
+            assert a.mean() == b.mean()
 
         assert a.flags.writeable
 
@@ -545,53 +511,46 @@ class TestsWithGDCM():
         got = jpeg_lossless.\
             SourceImageSequence[0].\
             PurposeOfReferenceCodeSequence[0].CodeMeaning
-        expected = 'Uncompressed predecessor'
-        assert got == expected, "JPEG-lossless file, Code Meaning got %s, "\
-            "expected %s" % (got, expected)
+        assert 'Uncompressed predecessor' == got
 
     def test_JPEGlosslessPixelArray(self, jpeg_lossless):
         """JPEGlossless: Fails gracefully when uncompressed data asked for"""
         a = jpeg_lossless.pixel_array
-        assert a.shape, (1024, 256)
+        assert (1024, 256) == a.shape
         # this test points were manually identified in Osirix viewer
-        assert a[420, 140], 227
-        assert a[230, 120], 105
-
+        assert 227 == a[420, 140]
+        assert 105 == a[230, 120]
         assert a.flags.writeable
 
     def test_JPEGlossless_odd_data_size(self, jpeg_lossless_odd_data_size):
         pixel_data = jpeg_lossless_odd_data_size.pixel_array
-        assert pixel_data.nbytes == 27
-        assert pixel_data.shape == (3, 3, 3)
+        assert 27 == pixel_data.nbytes
+        assert (3, 3, 3) == pixel_data.shape
 
     def test_JPEGlossy(self, jpeg_lossy):
         """JPEG-lossy: Returns correct values for sample data elements"""
         got = jpeg_lossy.DerivationCodeSequence[0].CodeMeaning
-        expected = 'Lossy Compression'
-        assert got == expected, "JPEG-lossy file, Code Meaning got %s, "\
-            "expected %s" % (got, expected)
+        assert 'Lossy Compression' == got
 
     def test_JPEGlossyPixelArray(self, jpeg_lossy):
         a = jpeg_lossy.pixel_array
-        assert a.shape == (1024, 256)
+        assert (1024, 256) == a.shape
         # this test points were manually identified in Osirix viewer
-        assert a[420, 140] == 244
-        assert a[230, 120] == 95
-
+        assert 244 == a[420, 140]
+        assert 95 == a[230, 120]
         assert a.flags.writeable
 
     def test_JPEGBaselineColor3DPixelArray(self, color_3d_jpeg):
-        assert color_3d_jpeg.PhotometricInterpretation == "YBR_FULL_422"
+        assert "YBR_FULL_422" == color_3d_jpeg.PhotometricInterpretation
         a = color_3d_jpeg.pixel_array
 
         assert a.flags.writeable
-
-        assert a.shape == (120, 480, 640, 3)
+        assert (120, 480, 640, 3) == a.shape
         a = _convert_YBR_FULL_to_RGB(a)
         # this test points were manually identified in Osirix viewer
-        assert tuple(a[3, 159, 290, :]) == (41, 41, 41)
-        assert tuple(a[3, 169, 290, :]) == (57, 57, 57)
-        assert color_3d_jpeg.PhotometricInterpretation == "YBR_FULL_422"
+        assert (41, 41, 41) == tuple(a[3, 159, 290, :])
+        assert (57, 57, 57) == tuple(a[3, 169, 290, :])
+        assert "YBR_FULL_422" == color_3d_jpeg.PhotometricInterpretation
 
     @pytest.mark.parametrize(
         "image,PhotometricInterpretation,results,convert_yuv_to_rgb",
@@ -605,24 +564,24 @@ class TestsWithGDCM():
 
         assert a.flags.writeable
 
-        assert a.shape == (100, 100, 3)
+        assert (100, 100, 3) == a.shape
         if convert_yuv_to_rgb:
             a = _convert_YBR_FULL_to_RGB(a)
         # this test points are from the ImageComments tag
-        assert tuple(a[5, 50, :]) == results[0]
-        assert tuple(a[15, 50, :]) == results[1]
-        assert tuple(a[25, 50, :]) == results[2]
-        assert tuple(a[35, 50, :]) == results[3]
-        assert tuple(a[45, 50, :]) == results[4]
-        assert tuple(a[55, 50, :]) == results[5]
-        assert tuple(a[65, 50, :]) == results[6]
-        assert tuple(a[75, 50, :]) == results[7]
-        assert tuple(a[85, 50, :]) == results[8]
-        assert tuple(a[95, 50, :]) == results[9]
-        assert t.PhotometricInterpretation == PhotometricInterpretation
+        assert results[0] == tuple(a[5, 50, :])
+        assert results[1] == tuple(a[15, 50, :])
+        assert results[2] == tuple(a[25, 50, :])
+        assert results[3] == tuple(a[35, 50, :])
+        assert results[4] == tuple(a[45, 50, :])
+        assert results[5] == tuple(a[55, 50, :])
+        assert results[6] == tuple(a[65, 50, :])
+        assert results[7] == tuple(a[75, 50, :])
+        assert results[8] == tuple(a[85, 50, :])
+        assert results[9] == tuple(a[95, 50, :])
+        assert PhotometricInterpretation == t.PhotometricInterpretation
 
 
-class TestSupportFunctions():
+class TestSupportFunctions(object):
     @pytest.fixture(scope='class')
     def dataset_2d(self):
         return dcmread(mr_name)
@@ -641,8 +600,8 @@ class TestSupportFunctions():
             self, dataset_2d):
         data_element = gdcm_handler.create_data_element(dataset_2d)
 
-        assert data_element.GetTag().GetGroup() == 0x7fe0
-        assert data_element.GetTag().GetElement() == 0x0010
+        assert 0x7fe0 == data_element.GetTag().GetGroup()
+        assert 0x0010 == data_element.GetTag().GetElement()
         assert data_element.GetSequenceOfFragments() is None
         assert data_element.GetByteValue() is not None
 
@@ -652,8 +611,8 @@ class TestSupportFunctions():
             self, dataset_2d_compressed):
         data_element = gdcm_handler.create_data_element(dataset_2d_compressed)
 
-        assert data_element.GetTag().GetGroup() == 0x7fe0
-        assert data_element.GetTag().GetElement() == 0x0010
+        assert 0x7fe0 == data_element.GetTag().GetGroup()
+        assert 0x0010 == data_element.GetTag().GetElement()
         assert data_element.GetSequenceOfFragments() is not None
         assert data_element.GetByteValue() is None
 
@@ -662,8 +621,8 @@ class TestSupportFunctions():
     def test_create_data_element_from_3d_dataset(self, dataset_3d):
         data_element = gdcm_handler.create_data_element(dataset_3d)
 
-        assert data_element.GetTag().GetGroup() == 0x7fe0
-        assert data_element.GetTag().GetElement() == 0x0010
+        assert 0x7fe0 == data_element.GetTag().GetGroup()
+        assert 0x0010 == data_element.GetTag().GetElement()
         assert data_element.GetSequenceOfFragments() is not None
         assert data_element.GetByteValue() is None
 
@@ -672,44 +631,48 @@ class TestSupportFunctions():
     def test_create_image_from_2d_dataset(self, dataset_2d):
         data_element = gdcm_handler.create_data_element(dataset_2d)
         image = gdcm_handler.create_image(dataset_2d, data_element)
-        assert image.GetNumberOfDimensions() == 2
-        assert image.GetDimensions() == [dataset_2d.Rows, dataset_2d.Columns]
-        assert image.GetPhotometricInterpretation().GetType() == \
-            gdcm.PhotometricInterpretation.GetPIType(
-                dataset_2d.PhotometricInterpretation)
-        assert image.GetTransferSyntax().GetString() == str.__str__(
-            dataset_2d.file_meta.TransferSyntaxUID)
+        assert 2 == image.GetNumberOfDimensions()
+        assert [dataset_2d.Rows, dataset_2d.Columns] == image.GetDimensions()
+        pi_type = gdcm.PhotometricInterpretation.GetPIType(
+            dataset_2d.PhotometricInterpretation
+        )
+        assert pi_type == image.GetPhotometricInterpretation().GetType()
+
+        uid = str.__str__(dataset_2d.file_meta.TransferSyntaxUID)
+        assert uid == image.GetTransferSyntax().GetString()
         pixel_format = image.GetPixelFormat()
-        assert pixel_format.GetSamplesPerPixel() == dataset_2d.SamplesPerPixel
-        assert pixel_format.GetBitsAllocated() == dataset_2d.BitsAllocated
-        assert pixel_format.GetBitsStored() == dataset_2d.BitsStored
-        assert pixel_format.GetHighBit() == dataset_2d.HighBit
-        assert pixel_format.GetPixelRepresentation() ==\
-            dataset_2d.PixelRepresentation
+        assert dataset_2d.SamplesPerPixel == pixel_format.GetSamplesPerPixel()
+        assert dataset_2d.BitsAllocated == pixel_format.GetBitsAllocated()
+        assert dataset_2d.BitsStored == pixel_format.GetBitsStored()
+        assert dataset_2d.HighBit == pixel_format.GetHighBit()
+        px_repr = dataset_2d.PixelRepresentation
+        assert px_repr == pixel_format.GetPixelRepresentation()
 
     @pytest.mark.skipif(not HAVE_GDCM_IN_MEMORY_SUPPORT,
                         reason=gdcm_im_missing_message)
     def test_create_image_from_3d_dataset(self, dataset_3d):
         data_element = gdcm_handler.create_data_element(dataset_3d)
         image = gdcm_handler.create_image(dataset_3d, data_element)
-        assert image.GetNumberOfDimensions() == 3
-        assert image.GetDimensions() == [
+        assert 3 == image.GetNumberOfDimensions()
+        assert [
             dataset_3d.Columns, dataset_3d.Rows,
-            int(dataset_3d.NumberOfFrames)]
-        assert image.GetPhotometricInterpretation().GetType() == \
-            gdcm.PhotometricInterpretation.GetPIType(
-                dataset_3d.PhotometricInterpretation)
-        assert image.GetTransferSyntax().GetString() == str.__str__(
-            dataset_3d.file_meta.TransferSyntaxUID)
+            int(dataset_3d.NumberOfFrames)
+        ] == image.GetDimensions()
+        pi = gdcm.PhotometricInterpretation.GetPIType(
+            dataset_3d.PhotometricInterpretation
+        )
+        assert pi == image.GetPhotometricInterpretation().GetType()
+        uid = str.__str__(dataset_3d.file_meta.TransferSyntaxUID)
+        assert uid == image.GetTransferSyntax().GetString()
         pixel_format = image.GetPixelFormat()
-        assert pixel_format.GetSamplesPerPixel() == dataset_3d.SamplesPerPixel
-        assert pixel_format.GetBitsAllocated() == dataset_3d.BitsAllocated
-        assert pixel_format.GetBitsStored() == dataset_3d.BitsStored
-        assert pixel_format.GetHighBit() == dataset_3d.HighBit
-        assert pixel_format.GetPixelRepresentation() ==\
-            dataset_3d.PixelRepresentation
-        assert image.GetPlanarConfiguration() ==\
-            dataset_3d.PlanarConfiguration
+        assert dataset_3d.SamplesPerPixel == pixel_format.GetSamplesPerPixel()
+        assert dataset_3d.BitsAllocated == pixel_format.GetBitsAllocated()
+        assert dataset_3d.BitsStored == pixel_format.GetBitsStored()
+        assert dataset_3d.HighBit == pixel_format.GetHighBit()
+        px_repr = dataset_3d.PixelRepresentation
+        assert px_repr == pixel_format.GetPixelRepresentation()
+        planar = dataset_3d.PlanarConfiguration
+        assert planar == image.GetPlanarConfiguration()
 
     @pytest.mark.skipif(not HAVE_GDCM, reason=gdcm_missing_message)
     def test_create_image_reader_with_string(self):

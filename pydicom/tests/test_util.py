@@ -3,7 +3,6 @@
 
 from io import BytesIO
 import os
-import unittest
 
 import pytest
 
@@ -35,7 +34,7 @@ class TestCodify(object):
         input_str = ['TheNameToConvert', 'Some12Variable_Name']
         output_str = ['the_name_to_convert', 'some12_variable__name']
         for in_str, out_str in zip(input_str, output_str):
-            assert camel_to_underscore(in_str) == out_str
+            assert out_str == camel_to_underscore(in_str)
 
     def test_tag_repr(self):
         """Test utils.codify.tag_repr"""
@@ -43,7 +42,7 @@ class TestCodify(object):
         output_str = ['(0x0000, 0x0000)', '(0x0010, 0x0010)',
                       '(0x7fe0, 0x0010)', '(0x1111, 0x0001)']
         for tag, out_str in zip(input_tag, output_str):
-            assert tag_repr(Tag(tag)) == out_str
+            assert out_str == tag_repr(Tag(tag))
 
     def test_default_name_filter(self):
         """Test utils.codify.default_name_filter"""
@@ -51,7 +50,7 @@ class TestCodify(object):
                          'FractionGroupThing']
         output_str = ['cp_set', 'ref_data_set', 'frxn_gp_thing']
         for in_str, out_str in zip(input_keyword, output_str):
-            assert default_name_filter(in_str) == out_str
+            assert out_str == default_name_filter(in_str)
 
     def test_code_imports(self):
         """Test utils.codify.code_imports"""
@@ -60,7 +59,7 @@ class TestCodify(object):
         out += 'import pydicom\n'
         out += 'from pydicom.dataset import Dataset\n'
         out += 'from pydicom.sequence import Sequence'
-        assert code_imports() == out
+        assert out == code_imports()
 
     def test_code_dataelem_standard(self):
         """Test utils.codify.code_dataelem for standard element"""
@@ -72,7 +71,7 @@ class TestCodify(object):
                    "ds.CodingSchemeUID = '1.1.2.3.4.5'",
                    "ds.PrivateGroupReference = 1200"]
         for elem, out in zip(input_elem, out_str):
-            assert code_dataelem(elem) == out
+            assert out == code_dataelem(elem)
 
     def test_code_dataelem_exclude_size(self):
         """Test utils.codify.code_dataelem exclude_size param"""
@@ -87,7 +86,7 @@ class TestCodify(object):
         # Fails
         # "ds.PrivateGroupReference = 1200"]
         for elem, out in zip(input_elem, out_str):
-            assert code_dataelem(elem, exclude_size=4) == out
+            assert out == code_dataelem(elem, exclude_size=4)
 
     def test_code_dataelem_private(self):
         """Test utils.codify.code_dataelem"""
@@ -99,7 +98,7 @@ class TestCodify(object):
                    "ds.add_new((0x0081, 0x010c), 'UI', '1.1.2.3.4.5')",
                    "ds.add_new((0x1111, 0x0301), 'US', 1200)"]
         for elem, out in zip(input_elem, out_str):
-            assert code_dataelem(elem) == out
+            assert out == code_dataelem(elem)
 
     def test_code_dataelem_sequence(self):
         """Test utils.codify.code_dataelem"""
@@ -108,7 +107,7 @@ class TestCodify(object):
         out = "\n# Control Point Sequence\n"
         out += "cp_sequence = Sequence()\n"
         out += "ds.ControlPointSequence = cp_sequence"
-        assert code_dataelem(elem) == out
+        assert out == code_dataelem(elem)
 
     def test_code_sequence(self):
         """Test utils.codify.code_dataelem"""
@@ -126,7 +125,7 @@ class TestCodify(object):
         out += "cp1.PatientID = '1234'\n"
         out += "cp_sequence.append(cp1)"
 
-        assert code_dataelem(elem) == out
+        assert out == code_dataelem(elem)
 
     def test_code_dataset(self):
         """Test utils.codify.code_dataset"""
@@ -146,13 +145,13 @@ class TestDump(object):
     def test_print_character(self):
         """Test utils.dump.print_character"""
         # assert print_character(0x30) == '0'  # Missing!
-        assert print_character(0x31) == '1'
-        assert print_character(0x39) == '9'
-        assert print_character(0x41) == 'A'
-        assert print_character(0x5A) == 'Z'
-        assert print_character(0x61) == 'a'
-        assert print_character(0x7A) == 'z'
-        assert print_character(0x00) == '.'
+        assert '1' == print_character(0x31)
+        assert '9' == print_character(0x39)
+        assert 'A' == print_character(0x41)
+        assert 'Z' == print_character(0x5A)
+        assert 'a' == print_character(0x61)
+        assert 'z' == print_character(0x7A)
+        assert '.' == print_character(0x00)
 
     def test_filedump(self):
         """Test utils.dump.filedump"""
@@ -217,16 +216,16 @@ class TestHexUtil(object):
         hexstring = "00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f"
         bytestring = b'\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09' \
                      b'\x0A\x0B\x0C\x0D\x0E\x0F'
-        assert bytes2hex(bytestring) == hexstring
+        assert hexstring == bytes2hex(bytestring)
 
         hexstring = "00 10 20 30 40 50 60 70 80 90 a0 b0 c0 d0 e0 f0"
         bytestring = b'\x00\x10\x20\x30\x40\x50\x60\x70\x80\x90' \
                      b'\xA0\xB0\xC0\xD0\xE0\xF0'
-        assert bytes2hex(bytestring) == hexstring
+        assert hexstring == bytes2hex(bytestring)
 
 
-class DataElementCallbackTests(unittest.TestCase):
-    def setUp(self):
+class TestDataElementCallbackTests(object):
+    def setup(self):
         # Set up a dataset with commas in one item instead of backslash
         config.enforce_valid_values = True
         namespace = {}
@@ -238,7 +237,7 @@ class DataElementCallbackTests(unittest.TestCase):
 
         self.bytesio = BytesIO(ds_bytes)
 
-    def tearDown(self):
+    def teardown(self):
         config.enforce_valid_values = False
 
     def testBadSeparator(self):
@@ -246,7 +245,8 @@ class DataElementCallbackTests(unittest.TestCase):
         ds = filereader.read_dataset(self.bytesio, is_little_endian=True,
                                      is_implicit_VR=True)
         contour = ds.ROIContourSequence[0].ContourSequence[0]
-        self.assertRaises(ValueError, getattr, contour, "ContourData")
+        with pytest.raises(ValueError):
+            getattr(contour, "ContourData")
 
     def testImplVRcomma(self):
         """util.fix_separator:
@@ -259,9 +259,4 @@ class DataElementCallbackTests(unittest.TestCase):
         got = ds.ROIContourSequence[0].ContourSequence[0].ContourData
         config.reset_data_element_callback()
 
-        msg = "Expected {0}, got {1}".format(expected, got)
-        self.assertEqual(expected, got, msg)
-
-
-if __name__ == "__main__":
-    unittest.main()
+        assert expected == got
