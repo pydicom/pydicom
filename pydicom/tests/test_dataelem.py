@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Unit tests for the pydicom.dataelem module."""
 
@@ -350,6 +351,51 @@ class TestDataElement(object):
         private_data_elem = ds[0x60211200]
         assert '[Overlay ID]' == private_data_elem.name
         assert 'UN' == private_data_elem.VR
+
+    def test_known_tags_with_UN_VR(self):
+        """Known tags with VR UN are correctly decoded."""
+        ds = Dataset()
+        ds[0x00080005] = DataElement(0x00080005, 'UN', b'ISO_IR 126')
+        ds[0x00100010] = DataElement(0x00100010, 'UN',
+                                     u'Διονυσιος'.encode('iso_ir_126'))
+        ds.decode()
+        assert 'CS' == ds[0x00080005].VR
+        assert 'PN' == ds[0x00100010].VR
+        assert u'Διονυσιος' == ds[0x00100010].value
+
+        ds = Dataset()
+        ds[0x00080005] = DataElement(0x00080005, 'UN',
+                                     b'ISO 2022 IR 100\\ISO 2022 IR 126')
+        ds[0x00100010] = DataElement(0x00100010, 'UN',
+                                     b'Dionysios=\x1b\x2d\x46'
+                                     + u'Διονυσιος'.encode('iso_ir_126'))
+        ds.decode()
+        assert 'CS' == ds[0x00080005].VR
+        assert 'PN' == ds[0x00100010].VR
+        assert u'Dionysios=Διονυσιος' == ds[0x00100010].value
+
+    def test_unknown_tags_with_UN_VR(self):
+        """Unknown tags with VR UN are not decoded."""
+        ds = Dataset()
+        ds[0x00080005] = DataElement(0x00080005, 'CS', b'ISO_IR 126')
+        ds[0x00111010] = DataElement(0x00111010, 'UN',
+                                     u'Διονυσιος'.encode('iso_ir_126'))
+        ds.decode()
+        assert 'UN' == ds[0x00111010].VR
+        assert u'Διονυσιος'.encode('iso_ir_126') == ds[0x00111010].value
+
+    def test_tag_with_long_value_UN_VR(self):
+        """Tag with length > 64kb with VR UN is not changed."""
+        ds = Dataset()
+        ds[0x00080005] = DataElement(0x00080005, 'CS', b'ISO_IR 126')
+
+        single_value = b'123456.789012345'
+        large_value = b'\\'.join([single_value] * 4500)
+        ds[0x30040058] = DataElement(0x30040058, 'UN',
+                                     large_value,
+                                     is_undefined_length=False)
+        ds.decode()
+        assert 'UN' == ds[0x30040058].VR
 
     def test_empty_text_values(self):
         """Test that assigning an empty value behaves as expected."""
