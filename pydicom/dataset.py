@@ -613,6 +613,9 @@ class Dataset(dict):
             used then all DataElement keywords are returned.
         """
         allnames = [keyword_for_tag(tag) for tag in self._dict.keys()]
+        if hasattr(self, "file_meta"):
+            allnames.extend([keyword_for_tag(tag)
+                            for tag in self.file_meta._dict.keys()])
         # remove blanks - tags without valid names (e.g. private tags)
         allnames = [x for x in allnames if x]
         # Store found names in a dict, so duplicate names appear only once
