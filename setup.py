@@ -107,7 +107,7 @@ opts = dict(
     setup_requires=SETUP_REQUIRES,
     tests_require=TESTS_REQUIRE,
     zip_safe=False,
-    entry_points={"console_scripts": ["pydicom=pydicom.util.cli:main"]},
+    entry_points={"console_scripts": ["pydicom=pydicom.cli.main:main"]},
 )
 
 if __name__ == "__main__":

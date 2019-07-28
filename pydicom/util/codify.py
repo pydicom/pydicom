@@ -16,6 +16,7 @@ or import and use specific functions to provide code for pydicom DICOM classes
 
 import sys
 import os.path
+import argparse
 import pydicom
 from pydicom.datadict import dictionary_keyword
 from pydicom.compat import int_type
@@ -281,34 +282,7 @@ def code_file(filename, exclude_size=None, include_private=False):
     # Return the complete code string
     return line_term.join(lines)
 
-
-def main(default_exclude_size, args=None):
-    """Create python code according to user options
-
-    Parameters:
-    -----------
-    default_exclude_size:  int
-        Values longer than this will be coded as a commented syntax error
-
-    args: list
-        Command-line arguments to parse.  If None, then sys.argv is used
-    """
-
-    try:
-        import argparse
-    except ImportError:
-        print("The argparse module is required to run this script")
-        print("argparse is standard in python >= 2.7,")
-        print("   or can be installed with 'pip install argparse'")
-        sys.exit(-1)
-
-    parser = argparse.ArgumentParser(
-        description="Produce python/pydicom code from a DICOM file",
-        epilog="Binary data (e.g. pixels) larger than --exclude-size "
-        "(default %d bytes) is not included. A dummy line "
-        "with a syntax error is produced. "
-        "Private data elements are not included "
-        "by default." % default_exclude_size)
+def set_parser_arguments(parser, default_exclude_size):
     parser.add_argument(
         'infile', help="DICOM file from which to produce code lines")
     parser.add_argument(
@@ -338,8 +312,7 @@ def main(default_exclude_size, args=None):
         help=("Specify the filename for ds.save_as(save_filename); "
               "otherwise the input name + '_from_codify' will be used"))
 
-    args = parser.parse_args(args)
-
+def do_codify(args):
     # Read the requested file and convert to python/pydicom code lines
     filename = args.infile  # name
     code_lines = code_file(filename, args.exclude_size, args.include_private)
@@ -362,6 +335,29 @@ def main(default_exclude_size, args=None):
     except AttributeError:
         pass
     args.outfile.write(code_lines)
+
+
+def main(default_exclude_size, args=None):
+    """Create python code according to user options
+
+    Parameters:
+    -----------
+    default_exclude_size:  int
+        Values longer than this will be coded as a commented syntax error
+
+    args: list
+        Command-line arguments to parse.  If None, then sys.argv is used
+    """
+    parser = argparse.ArgumentParser(
+        description="Produce python/pydicom code from a DICOM file",
+        epilog="Binary data (e.g. pixels) larger than --exclude-size "
+        "(default %d bytes) is not included. A dummy line "
+        "with a syntax error is produced. "
+        "Private data elements are not included "
+        "by default." % default_exclude_size)
+    set_parser_arguments(parser, default_exclude_size)
+    args = parser.parse_args(args)
+    do_codify(args)
 
 
 if __name__ == "__main__":
