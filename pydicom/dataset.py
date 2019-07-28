@@ -518,8 +518,13 @@ class Dataset(dict):
         """
         # First check if a valid DICOM keyword and if we have that data element
         tag = tag_for_keyword(name)
-        if tag is not None and tag in self._dict:
-            del self._dict[tag]
+        if tag is not None:
+            if tag in self._dict:
+                del self._dict[tag]
+            elif self.tag_in_file_meta(tag):
+                del self.file_meta._dict[tag]
+            else:
+                raise AttributeError(name)
         # If not a DICOM name in this dataset, check for regular instance name
         #   can't do delete directly, that will call __delattr__ again
         elif name in self.__dict__:
@@ -559,7 +564,7 @@ class Dataset(dict):
         # If passed a slice, delete the corresponding DataElements
         if isinstance(key, slice):
             for tag in self._slice_dataset(key.start, key.stop, key.step):
-                del self._dict[tag]
+                del self[tag] # will recurse into else below
         else:
             # Assume is a standard tag (for speed in common case)
             try:
@@ -567,7 +572,10 @@ class Dataset(dict):
             # If not a standard tag, than convert to Tag and try again
             except KeyError:
                 tag = Tag(key)
-                del self._dict[tag]
+                if self.tag_in_file_meta(tag):
+                    del self.file_meta._dict[tag]
+                else:
+                    del self._dict[tag]
 
     def __dir__(self):
         """Give a list of attributes available in the Dataset.

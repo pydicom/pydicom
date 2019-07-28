@@ -110,6 +110,21 @@ def test_file_meta_contains():
     assert "ImplementationVersionName" in ds
 
 
+def test_file_meta_del():
+    meta = FileMetaDataset()
+    ds = Dataset()
+    ds.file_meta = meta
+    ds.file_meta.ImplementationVersionName = "implem"
+    del ds.file_meta.ImplementationVersionName
+    assert "ImplementationVersionName" not in ds    
+    assert "ImplementationVersionName" not in ds
+
+    ds.file_meta.ImplementationVersionName = "implem2"
+    del ds.ImplementationVersionName
+    assert "ImplementationVersionName" not in ds    
+    assert "ImplementationVersionName" not in ds
+
+
 class TestFileMetaDataset(object):
     """Test valid file meta behavior"""
 
