@@ -21,7 +21,7 @@ import json
 import os
 import os.path
 from bisect import bisect_left
-from itertools import takewhile
+from itertools import takewhile, chain
 
 import pydicom  # for dcmwrite
 import pydicom.charset
@@ -702,11 +702,22 @@ class Dataset(dict):
 
     def keys(self):
         """Return the DICOM tag keys to simulate dict."""
+        meta_keys = []
+        if hasattr(self, "file_meta") and self.file_meta is not None:
+            meta_keys = self.file_meta._dict.keys()
+        return chain(meta_keys, self._dict.keys())
+    
+    def non_file_meta_keys(self):
+        if not hasattr(self, "file_meta") or  self.file_meta is None:
+            return self.keys()
         return self._dict.keys()
 
     def values(self):
         """Return the DICOM tag values to simulate dict."""
-        return self._dict.values()
+        meta_values = []
+        if hasattr(self, "file_meta") and self.file_meta is not None:
+            meta_values = self.file_meta._dict.values()  
+        return chain(meta_values, self._dict.values())
 
     if compat.in_py2:
         def iterkeys(self):

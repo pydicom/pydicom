@@ -7,133 +7,148 @@ from pydicom.uid import (
 )
 
 
-def test_group2_only():
-    """FileMetaDataset class allows only group 2 tags"""
-    meta = FileMetaDataset()
+class TestFileMetaDataset1(object):
+    """Test valid file meta behavior"""
 
-    # Group !=2 raises exception
-    with pytest.raises(KeyError):
-        meta.PatientName = "test"
+    def setup(self):
+        self.ds = Dataset()
+        self.meta = FileMetaDataset()
+        self.ds.file_meta = self.meta
+        self.meta.ImplementationVersionName = "Implem"
 
-    with pytest.raises(KeyError):
-        meta.add_new(0x30001, "OB", "test")
+    def test_group2_only(self):
+        """FileMetaDataset class allows only group 2 tags"""
+        # Group !=2 raises exception
+        with pytest.raises(KeyError):
+            self.meta.PatientName = "test"
 
-    # But group 2 is allowed
-    meta.ImplementationVersionName = "abc"
-    meta.add_new(0x20016, "AE", "ae")
+        with pytest.raises(KeyError):
+            self.meta.add_new(0x30001, "OB", "test")
 
+        # But group 2 is allowed
+        self.meta.ImplementationVersionName = "abc"
+        self.meta.add_new(0x20016, "AE", "ae")
 
-def test_file_meta_binding():
-    """File_meta reference remains bound in parent Dataset"""
-    # Test exists to show new FileMetaDataset still
-    #   allows old-style, does not get re-bound to new FileMetaDataset
-    # This ensures old code using file_meta = Dataset() will still work
-    ds = Dataset()
-    meta = Dataset()  # old style
-    ds.file_meta = meta
-    meta.ImplementationVersionName = "implem"
-    assert ds.file_meta.ImplementationVersionName == "implem"
+    def test_file_meta_binding(self):
+        """File_meta reference remains bound in parent Dataset"""
+        # Test exists to show new FileMetaDataset still
+        #   allows old-style, does not get re-bound to new FileMetaDataset
+        # This ensures old code using file_meta = Dataset() will still work
+        assert self.ds.file_meta.ImplementationVersionName == "Implem"
 
+    def test_access_file_meta_from_parent(self):
+        """Accessing group2 tag in dataset gets from file_meta if exists"""
+        # direct from ds, not through ds.file_meta
+        assert self.ds.ImplementationVersionName == "Implem"
+        assert self.ds[0x00020013].value == "Implem"
 
-def test_access_file_meta_from_parent():
-    """Accessing group2 tag in dataset gets from file_meta if exists"""
-    # New in v1.4
-    ds = Dataset()
-    meta = Dataset()
-    ds.file_meta = meta
-    meta.ImplementationVersionName = "abc"
+    def test_assign_file_meta_existing_tags(self):
+        """Dataset raises if assigning file_meta with tags already in dataset"""
+        # New in v1.4
+        # Note: not using self.ds etc.
+        meta = FileMetaDataset()
+        ds = Dataset()
 
-    # direct from ds, not through ds.file_meta
-    assert ds.ImplementationVersionName == "abc"
-    assert ds[0x00020013].value == "abc"
+        # store element in main dataset, no file_meta for it
+        ds.ImplementationVersionName = "already here"
 
+        # Now also in meta
+        meta.ImplementationVersionName = "new one"
 
-def test_assign_file_meta_existing_tags():
-    """Dataset raises if assigning file_meta with tags already in dataset"""
-    # New in v1.4
-    meta = FileMetaDataset()
-    ds = Dataset()
+        # conflict raises
+        with pytest.raises(KeyError):
+            ds.file_meta = meta
 
-    # store element in main dataset, no file_meta for it
-    ds.ImplementationVersionName = "already here"
+    def test_assign_file_meta_moves_existing_group2(self):
+        """Setting file_meta in a dataset moves existing group 2 elements"""
+        meta = FileMetaDataset()
+        ds = Dataset()
 
-    # Now also in meta
-    meta.ImplementationVersionName = "new one"
+        # Set ds up with some group 2
+        ds.ImplementationVersionName = "main ds"
+        ds.MediaStorageSOPClassUID = "4.5.6"
 
-    # conflict raises
-    with pytest.raises(KeyError):
+        # also have something in meta
+        meta.TransferSyntaxUID = "1.2.3"
+
         ds.file_meta = meta
+        assert meta.ImplementationVersionName == "main ds"
+        assert meta.MediaStorageSOPClassUID == "4.5.6"
+        # and existing one unharmed
+        assert meta.TransferSyntaxUID == "1.2.3"
+
+        # And elements are no longer in main dataset
+        assert "MediaStorageSOPClassUID" not in ds._dict
+        assert "ImplementationVersionName" not in ds._dict
+
+    def test_assign_ds_already_in_meta_overwrites(self):
+        self.ds.ImplementationVersionName = "last set"
+        assert "last set" == self.ds.file_meta.ImplementationVersionName
+        assert "last set" == self.ds.ImplementationVersionName
+
+    def test_file_meta_contains(self):
+        assert "ImplementationVersionName" in self.ds.file_meta
+        assert "ImplementationVersionName" in self.ds
+
+    def test_file_meta_del(self):
+        del self.ds.file_meta.ImplementationVersionName
+        assert "ImplementationVersionName" not in self.ds    
+        assert "ImplementationVersionName" not in self.meta
+
+        self.ds.file_meta.ImplementationVersionName = "Implem2"
+        del self.ds.ImplementationVersionName
+        assert "ImplementationVersionName" not in self.ds    
+        assert "ImplementationVersionName" not in self.ds.file_meta
+
+    def test_dir(self):
+        assert "ImplementationVersionName" in self.ds.dir()
+        assert "ImplementationVersionName" in self.ds.dir("version")
+
+    def test_eq_with_file_meta(self):
+        ds2 = Dataset()
+        self.ds.PatientName = "Test"
+        ds2.PatientName = "Test"
+
+        # self.ds has file_meta, other does not
+        assert not (self.ds == ds2)
+
+        # test with same file meta
+        ds2.file_meta = FileMetaDataset()
+        ds2.file_meta.ImplementationVersionName = "Implem"
+        assert self.ds == ds2
+
+        # change same item in file meta
+        ds2.file_meta.ImplementationVersionName = "other"
+        assert not (self.ds == ds2)
+    
+    def test_file_meta_through_data_element(self):
+        data_elem = self.ds.data_element("ImplementationVersionName")
+        assert data_elem.value == "Implem"
+
+    def test_meta_keys_and_values(self):
+        meta2 = FileMetaDataset()
+        meta2.ImplementationVersionName = "Implem"
+        expected_values = [meta2.data_element("ImplementationVersionName")]
+        expected_keys = [(0x0002, 0x0013)]
+
+        assert expected_values == list(self.ds.values())
+        assert expected_keys == list(self.ds.keys())
+
+        self.ds.PatientName = "test"
+        self.ds.PatientID = "123"
+
+        ds2 = Dataset()
+        ds2.PatientName = "test"
+        ds2.PatientID = "123"
+        expected_values.append(ds2.data_element("PatientName"))
+        expected_values.append(ds2.data_element("PatientID"))
+        assert expected_values == list(self.ds.values())
+
+        expected_keys.extend([0x00100010, 0x00100020])
+        assert expected_keys == list(self.ds.keys())
 
 
-def test_assign_file_meta_moves_existing_group2():
-    """Setting file_meta in a dataset moves existing group 2 elements"""
-    meta = FileMetaDataset()
-    ds = Dataset()
-
-    # Set ds up with some group 2
-    ds.ImplementationVersionName = "main ds"
-    ds.MediaStorageSOPClassUID = "4.5.6"
-
-    # also have something in meta
-    meta.TransferSyntaxUID = "1.2.3"
-
-    ds.file_meta = meta
-    assert meta.ImplementationVersionName == "main ds"
-    assert meta.MediaStorageSOPClassUID == "4.5.6"
-    # and existing one unharmed
-    assert meta.TransferSyntaxUID == "1.2.3"
-
-    # And elements are no longer in main dataset
-    assert "MediaStorageSOPClassUID" not in ds._dict
-    assert "ImplementationVersionName" not in ds._dict
-
-
-def test_assign_ds_already_in_meta_overwrites():
-    meta = FileMetaDataset()
-    ds = Dataset()
-    ds.file_meta = meta
-    # First assign in meta
-    ds.file_meta.ImplementationVersionName = "imp-meta"
-    ds.ImplementationVersionName = "last set"
-
-    assert "last set" == ds.file_meta.ImplementationVersionName
-    assert "last set" == ds.ImplementationVersionName
-
-
-def test_file_meta_contains():
-    meta = FileMetaDataset()
-    ds = Dataset()
-    ds.file_meta = meta
-
-    ds.file_meta.ImplementationVersionName = "implem"
-    assert "ImplementationVersionName" in ds.file_meta
-    assert "ImplementationVersionName" in ds
-
-
-def test_file_meta_del():
-    meta = FileMetaDataset()
-    ds = Dataset()
-    ds.file_meta = meta
-    ds.file_meta.ImplementationVersionName = "implem"
-    del ds.file_meta.ImplementationVersionName
-    assert "ImplementationVersionName" not in ds    
-    assert "ImplementationVersionName" not in ds
-
-    ds.file_meta.ImplementationVersionName = "implem2"
-    del ds.ImplementationVersionName
-    assert "ImplementationVersionName" not in ds    
-    assert "ImplementationVersionName" not in ds
-
-
-def test_dir():
-    meta = FileMetaDataset()
-    ds = Dataset()
-    ds.file_meta = meta
-    ds.file_meta.ImplementationVersionName = "implem"
-    assert "ImplementationVersionName" in ds.dir()
-    assert "ImplementationVersionName" in ds.dir("version")
-
-class TestFileMetaDataset(object):
+class TestFileMetaDataset2(object):
     """Test valid file meta behavior"""
 
     def setup(self):

@@ -256,7 +256,7 @@ class TestReader(object):
         """Returns only tags specified by user."""
         ctspecific = dcmread(ct_name, specific_tags=[
             Tag(0x0010, 0x0010), 'PatientID', 'ImageType', 'ViewName'])
-        ctspecific_tags = sorted(ctspecific.keys())
+        ctspecific_tags = sorted(ctspecific.non_file_meta_keys())
         expected = [
             # SpecificCharacterSet is always added
             # ViewName does not exist in the data set
@@ -268,26 +268,26 @@ class TestReader(object):
     def test_specific_tags_with_unknown_length_SQ(self):
         """Returns only tags specified by user."""
         unknown_len_sq_tag = Tag(0x3f03, 0x1001)
-        tags = dcmread(priv_SQ_name, specific_tags=[unknown_len_sq_tag])
-        tags = sorted(tags.keys())
+        ds = dcmread(priv_SQ_name, specific_tags=[unknown_len_sq_tag])
+        tags = sorted(ds.non_file_meta_keys())
         assert [unknown_len_sq_tag] == tags
 
-        tags = dcmread(priv_SQ_name, specific_tags=['PatientName'])
-        tags = sorted(tags.keys())
+        ds = dcmread(priv_SQ_name, specific_tags=['PatientName'])
+        tags = sorted(ds.non_file_meta_keys())
         assert [] == tags
 
     def test_specific_tags_with_unknown_length_tag(self):
         """Returns only tags specified by user."""
         unknown_len_tag = Tag(0x7fe0, 0x0010)  # Pixel Data
-        tags = dcmread(emri_jpeg_2k_lossless, specific_tags=[unknown_len_tag])
-        tags = sorted(tags.keys())
+        ds = dcmread(emri_jpeg_2k_lossless, specific_tags=[unknown_len_tag])
+        tags = sorted(ds.non_file_meta_keys())
         # SpecificCharacterSet is always added
         assert [Tag(0x08, 0x05), unknown_len_tag] == tags
 
-        tags = dcmread(
+        ds = dcmread(
             emri_jpeg_2k_lossless, specific_tags=['SpecificCharacterSet']
         )
-        tags = sorted(tags.keys())
+        tags = sorted(ds.non_file_meta_keys())
         assert [Tag(0x08, 0x05)] == tags
 
     def test_private_SQ(self):

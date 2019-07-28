@@ -531,7 +531,7 @@ def write_dataset(fp, dataset, parent_encoding=default_encoding):
 
     fpStart = fp.tell()
     # data_elements must be written in tag order
-    tags = sorted(dataset.keys())
+    tags = sorted(dataset.non_file_meta_keys())
 
     for tag in tags:
         # do not write retired Group Length (see PS3.5, 7.2)
