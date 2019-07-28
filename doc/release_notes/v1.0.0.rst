@@ -1,13 +1,9 @@
+
 Version 1.0.0
-=================================
+=============
 
 This is a major release, with major changes, including backwards-incompatible
 changes.
-
-.. warning::
-     We urge you to review the
-     :doc:`Transition Guide </transition_to_pydicom1>` if you have previously
-     used a pydicom version less than 1.0.
 
 
 Changelog
@@ -19,12 +15,13 @@ Major changes
 * full Python 3 compatibility - one code base for both Python 2 and Python 3
 * package name and import name now match -- use ``import pydicom``
   rather than ``import dicom``.
-* added :doc:`image_data_handlers`:
-   * optional GDCM support for reading files with compressed pixel data
-     (:issue:`18`)
-   * optional Pillow and jpeg_ls support for reading some compressed pixel data
-     files
-   * support for decompressing a compressed dataset in-place
+* added handlers for converting (7fe0,0010) *Pixel Data* to a `numpy.ndarray`
+
+  * optional GDCM support for reading files with compressed pixel data
+    (:issue:`18`)
+  * optional Pillow and jpeg_ls support for reading some compressed pixel data
+    files
+  * support for decompressing a compressed dataset in-place
 * DICOM dictionary updated to 2017c
 * cleaned up DICOM dictionary code, old non-DICOM-keyword code removed
 

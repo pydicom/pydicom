@@ -510,9 +510,17 @@ class IS(int):
 def MultiString(val, valtype=str):
     """Split a bytestring by delimiters if there are any
 
-    val -- DICOM bytestring to split up
-    valtype -- default str, but can be e.g.
-    UID to overwrite to a specific type
+    Parameters
+    ----------
+    val : bytes
+        DICOM bytestring to split up.
+    valtype
+        Default str, but can be e.g. UID to overwrite to a specific type.
+
+    Returns
+    -------
+    valtype or list of valtype
+        The split value as `valtype` or a list of `valtype`.
     """
     # Remove trailing blank used to pad to even length
     # 2005.05.25: also check for trailing 0, error made

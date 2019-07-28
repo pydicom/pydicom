@@ -13,30 +13,29 @@ class DicomDir(FileDataset):
     specific to the Directory structure
     """
 
-    def __init__(self,
-                 filename_or_obj,
-                 dataset,
-                 preamble=None,
-                 file_meta=None,
-                 is_implicit_VR=True,
-                 is_little_endian=True):
-        """Initialize a DICOMDIR dataset read from a DICOM file
-        Carries forward all the initialization from
-        FileDataset class
+    def __init__(self, filename_or_obj, dataset, preamble=None, file_meta=None,
+                 is_implicit_VR=True, is_little_endian=True):
+        """Initialize a DICOMDIR dataset read from a DICOM file.
 
-        :param filename_or_obj: full path and filename to the file.
-        Use None if is a BytesIO.
-        :param dataset: some form of dictionary, usually
-                        a Dataset from read_dataset()
-        :param preamble: the 128-byte DICOM preamble
-        :param file_meta: the file meta info dataset,
-                          as returned by _read_file_meta,
-                          or an empty dataset if no file meta
-                          information is in the file
-        :param is_implicit_VR: True if implicit VR transfer syntax used;
-                               False if explicit VR. Default is True.
-        :param is_little_endian: True if little-endian transfer syntax used;
-                                 False if big-endian. Default is True.
+        Carries forward all the initialization from FileDataset class
+
+        Parameters
+        ----------
+        filename_or_obj : str or None
+            Full path and filename to the file of None if io.BytesIO.\
+        dataset : dataset.Dataset
+            Some form of dictionary, usually a Dataset from read_dataset().
+        preamble : bytes
+            The 128-byte DICOM preamble.
+        file_meta : dataset.Dataset
+            The file meta info dataset, as returned by _read_file_meta,
+            or an empty dataset if no file meta information is in the file.
+        is_implicit_VR : bool
+            True if implicit VR transfer syntax used; False if explicit VR.
+            Default is True.
+        is_little_endian : bool
+            True if little-endian transfer syntax used; False if big-endian.
+            Default is True.
         """
         # Usually this class is created through filereader.read_partial,
         # and it checks class SOP, but in case of direct creation,
@@ -62,8 +61,6 @@ class DicomDir(FileDataset):
 
         This is intended for initial read of file only,
         it will not reorganize correctly if records are changed.
-
-        :return: None
         """
 
         # Define a helper function for organizing the records

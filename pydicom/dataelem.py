@@ -35,8 +35,7 @@ if not in_py2:
 
 
 def isMultiValue(value):
-    """Return True if `value` is list-like (iterable),
-       False otherwise."""
+    """Return True if `value` is list-like (iterable), False otherwise."""
     msg = 'isMultiValue is deprecated.  Use DataElement.VM instead'
     warnings.warn(msg, DeprecationWarning)
     if isinstance(value, compat.char_types):
@@ -539,9 +538,9 @@ def DataElement_from_raw(raw_data_element, encoding=None):
     Parameters
     ----------
     raw_data_element : RawDataElement namedtuple
-        The raw data to convert to a DataElement
-    encoding : str
-        The encoding of the raw data
+        The raw data to convert to a DataElement.
+    encoding : str, optional
+        The character encoding of the raw data.
 
     Returns
     -------

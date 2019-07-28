@@ -14,15 +14,21 @@ from pydicom import compat
 # valid UIDs (http://www.medicalconnections.co.uk/FreeUID.html)
 # Their service was used to obtain the following root UID for pydicom:
 PYDICOM_ROOT_UID = '1.2.826.0.1.3680043.8.498.'
+"""pydicom's root UID '1.2.826.0.1.3680043.8.498.'"""
 PYDICOM_IMPLEMENTATION_UID = PYDICOM_ROOT_UID + '1'
+"""
+pydicom's (0002,0012) *Implementation Class UID* '1.2.826.0.1.3680043.8.498.1'
+"""
 
 # Regexes for valid UIDs and valid UID prefixes
 RE_VALID_UID = r'^(0|[1-9][0-9]*)(\.(0|[1-9][0-9]*))*$'
+"""Regex for a valid UID"""
 RE_VALID_UID_PREFIX = r'^(0|[1-9][0-9]*)(\.(0|[1-9][0-9]*))*\.$'
+"""Regex for a valid UID prefix"""
 
 
 class UID(str):
-    """Subclasses python str to have human-friendly UIDs.
+    """Human friendly UIDs as a python str subclass.
 
     Examples
     --------
@@ -192,21 +198,36 @@ class UID(str):
 
 
 # Pre-defined Transfer Syntax UIDs (for convenience)
-ExplicitVRLittleEndian = UID('1.2.840.10008.1.2.1')
 ImplicitVRLittleEndian = UID('1.2.840.10008.1.2')
+"""1.2.840.10008.1.2"""
+ExplicitVRLittleEndian = UID('1.2.840.10008.1.2.1')
+"""1.2.840.10008.1.2.1"""
 DeflatedExplicitVRLittleEndian = UID('1.2.840.10008.1.2.1.99')
+"""1.2.840.10008.1.2.1.99"""
 ExplicitVRBigEndian = UID('1.2.840.10008.1.2.2')
+"""1.2.840.10008.1.2.2"""
 JPEGBaseline = UID('1.2.840.10008.1.2.4.50')
+"""1.2.840.10008.1.2.4.50"""
 JPEGExtended = UID('1.2.840.10008.1.2.4.51')
+"""1.2.840.10008.1.2.4.51"""
 JPEGLosslessP14 = UID('1.2.840.10008.1.2.4.57')
+"""1.2.840.10008.1.2.4.57"""
 JPEGLossless = UID('1.2.840.10008.1.2.4.70')
+"""1.2.840.10008.1.2.4.70"""
 JPEGLSLossless = UID('1.2.840.10008.1.2.4.80')
+"""1.2.840.10008.1.2.4.80"""
 JPEGLSLossy = UID('1.2.840.10008.1.2.4.81')
+"""1.2.840.10008.1.2.4.81"""
 JPEG2000Lossless = UID('1.2.840.10008.1.2.4.90')
+"""1.2.840.10008.1.2.4.90"""
 JPEG2000 = UID('1.2.840.10008.1.2.4.91')
+"""1.2.840.10008.1.2.4.91"""
 JPEG2000MultiComponentLossless = UID('1.2.840.10008.1.2.4.92')
+"""1.2.840.10008.1.2.4.92"""
 JPEG2000MultiComponent = UID('1.2.840.10008.1.2.4.93')
+"""1.2.840.10008.1.2.4.93"""
 RLELossless = UID('1.2.840.10008.1.2.5')
+"""1.2.840.10008.1.2.5"""
 
 UncompressedPixelTransferSyntaxes = [
     ExplicitVRLittleEndian,
@@ -272,7 +293,7 @@ def generate_uid(prefix=PYDICOM_ROOT_UID, entropy_srcs=None):
 
     Examples
     --------
-    
+
     >>> from pydicom.uid import generate_uid
     >>> generate_uid()
     1.2.826.0.1.3680043.8.498.22463838056059845879389038257786771680

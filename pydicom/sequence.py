@@ -19,11 +19,10 @@ def validate_dataset(elem):
 class Sequence(MultiValue):
     """Class to hold multiple Datasets in a list.
 
-    This class is derived from MultiValue and as such
-    enforces that all items added to the list are Dataset
-    instances. In order to due this, a validator is
-    substituted for type_constructor when constructing
-    the MultiValue super class
+    This class is derived from MultiValue and as such enforces that all items
+    added to the list are Dataset instances. In order to due this, a validator
+    is substituted for type_constructor when constructing the MultiValue
+    super class.
     """
 
     def __init__(self, iterable=None):
@@ -55,19 +54,19 @@ class Sequence(MultiValue):
 
     @property
     def parent(self):
-        """Return the parent dataset."""
+        """Return the parent Dataset."""
         return self._parent
 
     @parent.setter
     def parent(self, value):
-        """Set the parent dataset and pass it to all items."""
+        """Set the parent Dataset and pass it to all items."""
         if value != self._parent:
             self._parent = value
             for item in self._list:
                 item.parent = self._parent
 
     def __setitem__(self, i, val):
-        """Set the parent dataset to the new sequence item"""
+        """Set the parent Dataset to the new sequence item"""
         super(Sequence, self).__setitem__(i, val)
         val.parent = self._parent
 

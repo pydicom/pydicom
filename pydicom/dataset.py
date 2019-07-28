@@ -64,6 +64,7 @@ class PropertyError(Exception):
 
 class PrivateBlock(object):
     """Helper class for a private block in the dataset.
+
     (See PS3.5, Section 7.8.1 - Private Data Element Tags)
 
     Attributes
@@ -75,8 +76,8 @@ class PrivateBlock(object):
     dataset : Dataset
         The parent dataset.
     block_start : 32 bit int
-        The start element of the private block.
-        Note that the 2 low order hex digits of the element are always 0.
+        The start element of the private block. Note that the 2 low order
+        hex digits of the element are always 0.
     """
 
     def __init__(self, key, dataset, private_creator_element):
@@ -179,7 +180,7 @@ class PrivateBlock(object):
             The 2 character DICOM value representation.
         value
             The value of the data element.
-            See `pydicom.Dataset.add_new` for a description.
+            See ``pydicom.Dataset.add_new`` for a description.
         """
         self.dataset.add_new(self.get_tag(element_offset), VR, value)
 
@@ -260,11 +261,11 @@ class Dataset(dict):
     >>> elem = block[0x01]
     >>> elem
     (0041, 1001) Private tag data                    LO: '12345'
-
     >>> elem.value
     '12345'
 
     Alternatively:
+
     >>> ds.get_private_item(0x0041, 0x01, 'My Creator').value
     '12345'
 
@@ -294,14 +295,14 @@ class Dataset(dict):
     Iterating through the top level of a Dataset only (excluding Sequences):
 
     >>> for elem in ds:
-    ...    print(elem)   #doctest: +ELLIPSIS
-    (0010, 0010) Patient's Name                      PN: 'CITIZEN^John'...
+    ...    print(elem)
+    (0010, 0010) Patient's Name                      PN: 'CITIZEN^John'
 
     Iterating through the entire Dataset (including Sequences):
 
     >>> for elem in ds.iterall():
-    ...     print(elem)  #doctest: +ELLIPSIS
-    (0010, 0010) Patient's Name                      PN: 'CITIZEN^John'...
+    ...     print(elem)
+    (0010, 0010) Patient's Name                      PN: 'CITIZEN^John'
 
     Recursively iterate through a Dataset (including Sequences):
 
@@ -312,7 +313,7 @@ class Dataset(dict):
     ...         else:
     ...             # Do something useful with each DataElement
 
-    Converting a dataset to and from json:
+    Converting a dataset to and from JSON:
 
     >>> ds = Dataset()
     >>> ds.PatientName = "Some^Name"
@@ -335,11 +336,11 @@ class Dataset(dict):
         The written dataset (excluding the pixel data) will be written using
         the given endianess.
     is_implicit_VR : bool
-        Shall be set before writing with `write_like_original=False`.
+        Shall be set before writing with ``write_like_original=False``.
         The written dataset will be written using the transfer syntax with
-        the given VR handling, e.g LittleEndianImplicit if True,
-        and LittleEndianExplicit or BigEndianExplicit (depending on
-        `is_little_endian`) if False.
+        the given VR handling, e.g *Little Endian Implicit VR* if ``True``,
+        and *Little Endian Explicit VR* or *Big Endian Explicit VR* (depending
+        on `is_little_endian`) if ``False``.
     """
     indent_chars = "   "
 
