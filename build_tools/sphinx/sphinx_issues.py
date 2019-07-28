@@ -1,0 +1,134 @@
+# -*- coding: utf-8 -*-
+"""A Sphinx extension for linking to your project's issue tracker.
+
+Copyright 2014 Steven Loria
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+Slightly adapted to add support for pull requests.
+"""
+
+from docutils import nodes, utils
+from sphinx.util.nodes import split_explicit_title
+
+__version__ = '0.2.0'
+__author__ = 'Steven Loria'
+__license__ = 'MIT'
+
+
+def user_role(name, rawtext, text, lineno,
+              inliner, options=None, content=None):
+    """Sphinx role for linking to a user profile. Defaults to linking to
+    Github profiles, but the profile URIS can be configured via the
+    ``ref_user_uri`` config value.
+
+    Example: ::
+
+        :user:`sloria`
+    """
+    options = options or {}
+    has_explicit_title, title, target = split_explicit_title(text)
+
+    target = utils.unescape(target).strip()
+    title = utils.unescape(title).strip()
+    config = inliner.document.settings.env.app.config
+    if config.issues_user_uri:
+        ref = config.ref_user_uri.format(user=target)
+    else:
+        ref = 'https://github.com/{0}'.format(target)
+    if has_explicit_title:
+        text = title
+    else:
+        text = '@{0}'.format(target)
+
+    link = nodes.reference(text=text, refuri=ref, **options)
+    return [link], []
+
+
+def _make_ref_node(ref_type, ref_no, config, uri=None, options=None):
+    options = options or {}
+    if ref_no not in ('-', '0'):
+        if uri:
+            ref = uri.format(ref_type=ref_type, ref_no=ref_no)
+        elif config.ref_github_path:
+            ref = 'https://github.com/{0}/{1}/{2}'.format(
+                config.ref_github_path, ref_type, ref_no
+            )
+        ref_text = '#{0}'.format(ref_no)
+        link = nodes.reference(text=ref_text, refuri=ref, **options)
+    else:
+        link = None
+    return link
+
+
+def _ref_role(ref_type, text, inliner, options=None):
+    """Sphinx role for linking to a pull request. Must have
+    `pr_uri` or `issues_github_path` configured in ``conf.py``.
+    """
+    options = options or {}
+    ref_nos = [each.strip() for each in utils.unescape(text).split(',')]
+    config = inliner.document.settings.env.app.config
+    ret = []
+    for i, ref_no in enumerate(ref_nos):
+        node = _make_ref_node(ref_type, ref_no, config, options=options)
+        ret.append(node)
+        if i != len(ref_nos) - 1:
+            sep = nodes.raw(text=', ', format='html')
+            ret.append(sep)
+    return ret, []
+
+
+def issue_role(name, rawtext, text, lineno,
+               inliner, options=None, content=None):
+    """Sphinx role for linking to an issue. Must have
+    `ref_uri` or `ref_github_path` configured in ``conf.py``.
+
+    Examples: ::
+
+        :issue:`123`
+        :issue:`42,45`
+    """
+    return _ref_role('issues', text, inliner, options)
+
+
+def pull_request_role(name, rawtext, text, lineno,
+                      inliner, options=None, content=None):
+    """Sphinx role for linking to a pull request. Must have
+    `ref_uri` or `ref_github_path` configured in ``conf.py``.
+
+    Examples: ::
+
+        :pull_request:`123`
+        :pull_request:`42,45`
+    """
+    return _ref_role('pull', text, inliner, options)
+
+
+def setup(app):
+    # Format template for issues/pull request URI
+    # e.g. 'https://github.com/sloria/marshmallow/{ref_type}/{ref_no}
+    app.add_config_value('ref_uri', default=None, rebuild='html')
+    # Shortcut for Github, e.g. 'sloria/marshmallow'
+    app.add_config_value('ref_github_path', default=None, rebuild='html')
+    # Format template for user profile URI
+    # e.g. 'https://github.com/{user}'
+    app.add_config_value('ref_user_uri', default=None, rebuild='html')
+    app.add_role('issue', issue_role)
+    app.add_role('pull_request', pull_request_role)
+    app.add_role('user', user_role)
