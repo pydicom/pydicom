@@ -18,7 +18,7 @@ from pydicom.config import logger
 from pydicom.datadict import dictionary_VR, tag_for_keyword
 from pydicom.dataelem import (DataElement, RawDataElement,
                               DataElement_from_raw)
-from pydicom.dataset import (Dataset, FileDataset)
+from pydicom.dataset import (Dataset, FileDataset, FileMetaDataset)
 from pydicom.dicomdir import DicomDir
 from pydicom.errors import InvalidDicomError
 from pydicom.filebase import DicomFile
@@ -507,8 +507,9 @@ def _read_file_meta_info(fp):
         return tag.group != 2
 
     start_file_meta = fp.tell()
-    file_meta = read_dataset(fp, is_implicit_VR=False, is_little_endian=True,
-                             stop_when=_not_group_0002)
+    file_meta = FileMetaDataset(read_dataset(fp, is_implicit_VR=False,
+                                is_little_endian=True,
+                                stop_when=_not_group_0002))
     if not file_meta._dict:
         return file_meta
 
@@ -519,9 +520,9 @@ def _read_file_meta_info(fp):
         file_meta[list(file_meta.elements())[0].tag]
     except NotImplementedError:
         fp.seek(start_file_meta)
-        file_meta = read_dataset(fp, is_implicit_VR=True,
+        file_meta = FileMetaDataset(read_dataset(fp, is_implicit_VR=True,
                                  is_little_endian=True,
-                                 stop_when=_not_group_0002)
+                                 stop_when=_not_group_0002))
 
     # Log if the Group Length doesn't match actual length
     if 'FileMetaInformationGroupLength' in file_meta:

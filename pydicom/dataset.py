@@ -1657,7 +1657,7 @@ class Dataset(dict):
         data_element = value
         if isinstance(self, FileMetaDataset) and tag.group != 2:
             msg = ("File Meta Dataset can only hold group 2 items."
-                   "Use regular Dataset or FileDataset")
+                   " Use regular Dataset or FileDataset")
             raise KeyError(msg)
         elif tag.is_private:
             # See PS 3.5-2008 section 7.8.1 (p. 44) for how blocks are reserved
