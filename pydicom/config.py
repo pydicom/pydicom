@@ -8,29 +8,30 @@ import logging
 # Set the type used to hold DS values
 #    default False; was decimal-based in pydicom 0.9.7
 use_DS_decimal = False
-"""Set to ``True`` to use ``decimal.Decimals`` to hold DS values.
+"""Set to ``True`` to use ``decimal.Decimals`` to hold the value for elements
+with a VR of 'DS'.
 
 Default ``False``.
 """
 
 data_element_callback = None
-"""Set data_element_callback to a function to be called from ``dcmread()``
-every time a ``RawDataElement`` has been returned, before it is added
-to the dataset.
+"""Set to a callable function to be called from
+:meth:`dcmread() <pydicom.filereader.dcmread>` every time a ``RawDataElement``
+has been returned, before it is added to the dataset.
 
 Default ``None``.
 """
 
 data_element_callback_kwargs = {}
-"""Set this to use as keyword arguments passed to the ``data_element_callback``
-function.
+"""Set this to use as keyword arguments passed to the
+``config.data_element_callback`` function.
 
 Default ``{}``.
 """
 
 
 def reset_data_element_callback():
-    """Reset the data_element_callback function to the default."""
+    """Reset the ``config.data_element_callback`` function to the default."""
     global data_element_callback
     global data_element_callback_kwargs
     data_element_callback = None
@@ -52,9 +53,10 @@ def DS_decimal(use_Decimal_boolean=True):
 
 # Configuration flags
 allow_DS_float = False
-"""Set `allow_DS_float` to ``True`` to allow ``DSdecimal`` instances to be
-created with floats; otherwise, they must be explicitly converted to strings,
-with the user explicity setting the precision of digits and rounding.
+"""Set to ``True`` to allow  :class:`DSdecimal <pydicom.valuerep.DSdecimal>`
+instances to be created using ``float``; otherwise, they must be explicitly
+converted to ``str``, with the user explicity setting the precision of
+digits and rounding.
 
 Default ``False``.
 """
@@ -69,7 +71,7 @@ Default ``False``.
 """
 
 datetime_conversion = False
-"""Set ``datetime_conversion`` to convert DA, DT and TM data elements to
+"""Set to ``True`` to convert elements with a VR of DA, DT and TM to
 ``datetime.date``, ``datetime.datetime`` and ``datetime.time`` respectively.
 
 Default ``False``
@@ -99,14 +101,15 @@ pixel_data_handlers = [
 """Handlers for converting (7fe0,0010) *Pixel Data*.
 
 This is an ordered list of *Pixel Data* handlers that the
-``Dataset.convert_pixel_data()`` method will use to try to extract a
-correctly sized numpy array from the *Pixel Data* element.
+:meth:`Dataset.convert_pixel_data() <pydicom.dataset.Dataset.convert_pixel_data>`
+method will use to try to extract a correctly sized numpy array from the
+*Pixel Data* element.
 
 Handlers shall have four methods:
 
 def supports_transfer_syntax(ds)
     Returns ``True`` if the handler might support the transfer syntax
-    indicated in the Dataset `ds`.
+    indicated in the ``Dataset`` `ds`.
 
 def is_available():
     Returns ``True`` if the handler's dependencies are installed, ``False``
@@ -114,11 +117,11 @@ def is_available():
 
 def get_pixeldata(ds):
     This shall either throw an exception or return a correctly sized numpy
-    1D array derived from the *Pixel Data* in Dataset `ds`. Reshaping the
+    1D array derived from the *Pixel Data* in ``Dataset`` `ds`. Reshaping the
     1D array to the correct dimensions is handled automatically.
 
 def needs_to_convert_to_RGB(ds):
-    Returns ``True`` if the *Pixel Data* in the Dataset `ds` needs to be
+    Returns ``True`` if the *Pixel Data* in the ``Dataset`` `ds` needs to be
     converted to the RGB colourspace, ``False`` otherwise.
 
 The first handler that both announces that it supports the transfer syntax
@@ -130,7 +133,7 @@ If they all fail, the last one to throw an exception gets to see its
 exception thrown up.
 
 If no one throws an exception, but they all refuse to support the transfer
-syntax, then this fact is announced in a NotImplementedError exception.
+syntax, then this fact is announced in a ``NotImplementedError`` exception.
 """
 
 

@@ -3,7 +3,7 @@
 Data Elements (:mod:`pydicom.dataelem`)
 =======================================
 
-.. currentmodule:: pydicom.dataset
+.. currentmodule:: pydicom.dataelem
 
 Representation of DICOM data elements and utilities
 

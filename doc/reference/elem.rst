@@ -3,7 +3,6 @@
 Representation of Data Elements
 ===============================
 
-
 .. toctree::
    :maxdepth: 2
    :includehidden:

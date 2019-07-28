@@ -180,9 +180,8 @@ To start learning how to use pydicom, see the :doc:`pydicom_user_guide`.
 
 .. rubric:: Footnotes::
 
-.. [#] For DICOM network capabilities, see the
-   `pynetdicom <https://github.com/patmun/pynetdicom>`_ and the newer
-   `pynetdicom3 <https://github.com/pydicom/pynetdicom3>`_ projects.
+.. [#] For DICOM network capabilities see the
+   `pynetdicom <https://github.com/pydicom/pynetdicom>`_ project.
 .. [#] If using python(x,y), other packages you might be interested in include IPython
    (an indispensable interactive shell with auto-completion, history etc),
    NumPy (optionally used by pydicom for pixel data), and ITK/VTK or PIL

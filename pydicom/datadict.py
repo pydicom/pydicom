@@ -38,7 +38,7 @@ def mask_match(tag):
     -------
     int or None
         If the tag is in the repeaters dictionary then returns the
-        corresponding masked tag, otherwise returns None.
+        corresponding masked tag, otherwise returns ``None``.
     """
     for mask_x, (mask1, mask2) in masks.items():
         if (tag ^ mask1) & mask2 == 0:
@@ -59,15 +59,15 @@ def add_dict_entry(tag, VR, keyword, description, VM='1', is_retired=''):
         The descriptive name used in printing the entry. Often the same as the
         keyword, but with spaces between words.
     VM : str, optional
-        DICOM value multiplicity. If not specified, then '1' is used.
+        DICOM value multiplicity. If not specified, then ``'1'`` is used.
     is_retired : str, optional
-        Usually leave as blank string (default). Set to 'Retired' if is a
+        Usually leave as blank string (default). Set to ``'Retired'`` if is a
         retired data element.
 
     Raises
     ------
     ValueError
-        If the tag is a private tag (the group number is odd).
+        If the tag is a private tag.
 
     Notes
     -----
@@ -104,7 +104,8 @@ def add_dict_entries(new_entries_dict):
     new_entries_dict : dict
         Dictionary of form:
         ``{tag: (VR, VM, description, is_retired, keyword), ...}``
-        where parameters are as described in ``add_dict_entry()``
+        where parameters are as described in
+        :meth:`add_dict_entry()<add_dict_entry>`.
 
     Raises
     ------
@@ -114,7 +115,7 @@ def add_dict_entries(new_entries_dict):
     See Also
     --------
     add_dict_entry
-        Simpler function to add a single entry to the dictionary.
+        Add a single entry to the dictionary.
 
     Examples
     --------
@@ -160,7 +161,7 @@ def add_private_dict_entry(private_creator, tag, VR, description, VM='1'):
     description : str
         The descriptive name used in printing the entry.
     VM : str, optional
-        DICOM value multiplicity. If not specified, then '1' is used.
+        DICOM value multiplicity. If not specified, then ``'1'`` is used.
 
     Raises
     ------
@@ -169,12 +170,13 @@ def add_private_dict_entry(private_creator, tag, VR, description, VM='1'):
 
     Notes
     -----
-    Behaves like ``add_dict_entry()``, only for a private tag entry.
+    Behaves like :meth:`add_dict_entry()<add_dict_entry>`, only for a private
+    tag entry.
 
     See Also
     --------
     add_private_dict_entries
-        Update multiple values at once.
+        Add oe update multiple entries at once.
     """
     new_dict_val = (VR, VM, description)
     add_private_dict_entries(private_creator, {tag: new_dict_val})
@@ -188,9 +190,9 @@ def add_private_dict_entries(private_creator, new_entries_dict):
     private_creator: str
         The private creator for all entries in `new_entries_dict`.
     new_entries_dict : dict
-        Dictionary of form:
-        ``{tag: (VR, VM, description), ...}``
-        where parameters are as described in ``add_private_dict_entry()``.
+        ``dict`` of form ``{tag: (VR, VM, description), ...}`` where
+        parameters are as described in
+        :meth:`add_private_dict_entry()<add_private_dict_entry>`.
 
     Raises
     ------
@@ -238,7 +240,7 @@ def get_entry(tag):
 
     Returns
     -------
-    tuple
+    tuple of str
         The (VR, VM, name, is_retired, keyword) from the DICOM dictionary.
 
     Raises
@@ -280,7 +282,8 @@ def dictionary_is_retired(tag):
     Returns
     -------
     bool
-        True if the element's retirement status is 'Retired', False otherwise.
+        ``True`` if the element's retirement status is 'Retired', ``False``
+        otherwise.
 
     Raises
     ------
@@ -397,8 +400,8 @@ def dictionary_has_tag(tag):
     Returns
     -------
     bool
-        True if the tagcorresponds to an element present in the official
-        DICOM data dictionary, False otherwise.
+        ``True`` if the tag corresponds to an element present in the official
+        DICOM data dictionary, ``False`` otherwise.
     """
     return (tag in DicomDictionary)
 
@@ -454,7 +457,7 @@ def tag_for_name(name):
 
     Only performs the lookup for official DICOM elements.
 
-    This function is deprecated and will be removed in v1.4.
+    **This function is deprecated and will be removed in v1.4.**
 
     Parameters
     ----------
@@ -484,8 +487,8 @@ def repeater_has_tag(tag):
     Returns
     -------
     bool
-        True if the tag is a non-private element tag present in the official
-        DICOM repeaters data dictionary, False otherwise.
+        ``True`` if the tag is a non-private element tag present in the
+        official DICOM repeaters data dictionary, ``False`` otherwise.
     """
     return (mask_match(tag) in RepeatersDictionary)
 
@@ -504,8 +507,8 @@ def repeater_has_keyword(keyword):
     Returns
     -------
     bool
-        True if the keyword corresponding to an element present in the
-        official DICOM repeaters data dictionary, False otherwise.
+        ``True`` if the keyword corresponding to an element present in the
+        official DICOM repeaters data dictionary, ``False`` otherwise.
     """
     return keyword in REPEATER_KEYWORDS
 
@@ -525,8 +528,8 @@ def get_private_entry(tag, private_creator):
 
     Returns
     -------
-    tuple
-        The (VR, VM, name, is_retired) from the private dictionary.
+    tuple of str
+        The ``(VR, VM, name, is_retired)`` from the private dictionary.
 
     Raises
     ------

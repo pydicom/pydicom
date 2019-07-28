@@ -8,20 +8,21 @@ Dataset
 
 .. currentmodule:: pydicom
 
-:class:`dataset.Dataset` is the main object you will work with directly.
-Dataset wraps a dictionary, where the key is the DICOM (group,element)
-tag (as a Tag object, described below), and the value is a DataElement instance
+:class:`Dataset <dataset.Dataset>` is the main object you will work with
+directly. Dataset wraps a dictionary, where the key is the DICOM
+(group,element) tag (as a :class:`Tag <tag.BaseTag>` object, described below),
+and the value is a :class:`DataElement <dataelem.DataElement>` instance
 (also described below). It implements most of the methods of ``dict``, so
-that it mostly behaves like the wrapped ``dict``. This allows direct access
+that it mostly behaves like a wrapped ``dict``. This allows direct access
 to the data elements via the the tags, as shown below.
 
 .. note::
 
-  The iterator of a ``DataSet`` yields ``DataElement`` values, e.g. the
+  The iterator of a ``Dataset`` yields ``DataElement`` values, e.g. the
   values of the dictionary, as opposed to the keys yielded by a ``dict``
   iterator.
 
-A dataset could be created directly, but you will usually get one by reading
+A ``Dataset`` could be created directly, but you will usually get one by reading
 an existing DICOM file::
 
   >>> import pydicom

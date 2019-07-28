@@ -273,32 +273,32 @@ custom_encoders = {
 
 
 def decode_string(value, encodings, delimiters):
-    """Convert a raw byte string into a unicode string using the given
-    list of encodings.
+    """Convert an encoded byte `value` into a unicode string using `encodings`.
 
     Parameters
     ----------
-    value : byte string
-        The raw string as encoded in the DICOM tag value.
-    encodings : list
+    value : bytes or str
+        The encoded byte string in the DICOM element value.
+    encodings : list of str
         The encodings needed to decode the string as a list of Python
-        encodings, converted from the encodings in Specific Character Set.
-    delimiters: set of int (Python 3) or characters (Python 2)
+        encodings, converted from the encodings in (0008,0005) *Specific
+        Character Set*.
+    delimiters : set of int (Python 3) or characters (Python 2)
         A set of characters or character codes, each of which resets the
-        encoding in `byte_str`.
+        encoding in `value`.
 
     Returns
     -------
-    text type
+    str or unicode
         The decoded unicode string. If the value could not be decoded,
-        and `config.enforce_valid_values` is not set, a warning is issued,
+        and ```config.enforce_valid_values`` is ``False``, a warning is issued,
         and the value is decoded using the first encoding with replacement
         characters, resulting in data loss.
 
     Raises
     ------
     UnicodeDecodeError
-        If `config.enforce_valid_values` is set and `value` could not be
+        If ``config.enforce_valid_values`` is ``True`` and `value` could not be
         decoded with the given encodings.
     """
     # shortcut for the common case - no escape sequences present
@@ -431,30 +431,30 @@ def _decode_escaped_fragment(byte_str, encodings, delimiters):
 
 
 def encode_string(value, encodings):
-    """Convert a unicode string into a byte string using the given
-    list of encodings.
+    """Convert a unicode string `value` into a bytes using `encodings`.
 
     Parameters
     ----------
-    value : text type
+    value : str or unicode
         The unicode string as presented to the user.
-    encodings : list
+    encodings : list of str
         The encodings needed to encode the string as a list of Python
-        encodings, converted from the encodings in Specific Character Set.
+        encodings, converted from the encodings in (0008,0005) *Specific
+        Character Set*.
 
     Returns
     -------
-    byte string
+    bytes or str
         The encoded string. If the value could not be encoded with any of
-        the given encodings, and `config.enforce_valid_values` is not set, a
-        warning is issued, and the value is encoded using the first
+        the given encodings, and ``config.enforce_valid_values`` is ``False``,
+        a warning is issued, and the value is encoded using the first
         encoding with replacement characters, resulting in data loss.
 
     Raises
     ------
     UnicodeEncodeError
-        If `config.enforce_valid_values` is set and `value` could not be
-        encoded with the given encodings.
+        If ``config.enforce_valid_values`` is ``True`` and `value` could not be
+        encoded with the supplied encodings.
     """
     for i, encoding in enumerate(encodings):
         try:
@@ -581,19 +581,22 @@ def _encode_string_impl(value, encoding, errors='strict'):
 
 
 def convert_encodings(encodings):
-    """Converts DICOM encodings into corresponding python encodings.
+    """Converts DICOM encodings into corresponding Python encodings.
+
     Handles some common spelling mistakes and issues a warning in this case.
+
     Handles stand-alone encodings: if they are the first encodings,
     additional encodings are ignored, if they are not the first encoding,
     they are ignored. In both cases, a warning is issued.
+
     Invalid encodings are replaced with the default encoding with a
-    respective warning issued, if `config.enforce_valid_values` is `False`,
+    respective warning issued, if ``config.enforce_valid_values`` is ``False``,
     otherwise an exception is raised.
 
     Parameters
     ----------
     encodings : list of str
-        The list of encodings as read from Specific Character Set.
+        The list of encodings as read from (0008,0005) *Specific Character Set*.
 
     Returns
     -------
@@ -602,13 +605,13 @@ def convert_encodings(encodings):
         If an encoding is already a Python encoding, it is returned unchanged.
         Encodings with common spelling errors are replaced by the correct
         encoding, and invalid encodings are replaced with the default
-        encoding if `config.enforce_valid_values` is `False`.
+        encoding if ``config.enforce_valid_values`` is ``False``.
 
     Raises
     ------
     LookupError
         In case of an invalid encoding that could not be corrected if
-        `config.enforce_valid_values` is set.
+        ``config.enforce_valid_values`` is set.
     """
 
     # If a list if passed, we don't want to modify the list in place so copy it
@@ -718,11 +721,11 @@ def decode(data_element, dicom_character_set):
     Parameters
     ----------
     data_element : dataelem.DataElement
-        The DataElement instance containing a value to convert
+        The ``DataElement`` instance containing a value to convert
     dicom_character_set : str or list of str or None
         The value of (0008,0005) *Specific Character Set*, which may be a
-        single value, a multiple value (code extension), or may also be '' or
-        None. If a blank str or None, ISO_IR 6 is used.
+        single value, a multiple value (code extension), or may also be ``''``
+        or ``None``, in which case ``'ISO_IR 6'`` will be used.
     """
     if not dicom_character_set:
         dicom_character_set = ['ISO_IR 6']
