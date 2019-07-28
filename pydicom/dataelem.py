@@ -10,6 +10,7 @@ A DataElement has a tag,
 from __future__ import absolute_import
 
 import base64
+import json
 import warnings
 from collections import namedtuple
 
@@ -159,6 +160,17 @@ class DataElement(object):
         if not isinstance(tag, BaseTag):
             tag = Tag(tag)
         self.tag = tag
+
+        # a known tag shall only have the VR 'UN' if it has a length that
+        # exceeds the size that can be encoded in 16 bit - all other cases
+        # can be seen as an encoding error and can be corrected
+        if VR == 'UN' and (is_undefined_length or value is None or
+                           len(value) < 0xffff):
+            try:
+                VR = dictionary_VR(tag)
+            except KeyError:
+                pass
+
         self.VR = VR  # Note!: you must set VR before setting value
         if already_converted:
             self._value = value
@@ -174,19 +186,21 @@ class DataElement(object):
 
         Parameters
         ----------
-        tag : pydicom.tag.Tag
-            The element's tag.
+        dataset_class : Dataset derived class
+            Class used to create sequence items.
+        tag : tag.Tag
+            The data element tag.
         vr : str
-            The element's value representation.
+            The data element value representation.
         value : list
-            The element's value(s).
+            The data element's value(s).
         value_key : Union[str, None]
-            A key of the element that contains the value (options:
-            ``{"Value", "InlineBinary", "BulkDataURI"}``)`.
-        bulk_data_uri_handler : Union[Callable, None], optional
-            A callable that accepts the *BulkDataURI* of the JSON
-            representation of the element and returns the actual value of that
-            data element (retrieved via DICOMweb WADO-RS).
+            Key of the data element that contains the value
+            (options: ``{"Value", "InlineBinary", "BulkDataURI"}``)
+        bulk_data_uri_handler: Union[Callable, None]
+            Callable that accepts the "BulkDataURI" of the JSON representation
+            of a data element and returns the actual value of that data element
+            (retrieved via DICOMweb WADO-RS)
 
         Returns
         -------
@@ -279,20 +293,115 @@ class DataElement(object):
             logger.warning('missing value for data element "{}"'.format(tag))
             elem_value = ''
 
-        elem_value = jsonrep._convert_to_python_number(elem_value, vr)
+        elem_value = jsonrep.convert_to_python_number(elem_value, vr)
 
         try:
             if compat.in_py2 and vr == "PN":
-
                 elem_value = PersonNameUnicode(elem_value, 'UTF8')
             return DataElement(tag=tag, value=elem_value, VR=vr)
         except Exception:
-            raise
             raise ValueError(
                 'Data element "{}" could not be loaded from JSON: {}'.format(
                     tag, elem_value
                     )
             )
+
+    def to_json(self, bulk_data_element_handler,
+                bulk_data_threshold, dump_handler):
+        """Converts a DataElement to JSON representation.
+
+        Parameters
+        ----------
+        bulk_data_element_handler: Union[Callable, None]
+            callable that accepts a bulk data element and returns the
+            "BulkDataURI" for retrieving the value of the data element
+            via DICOMweb WADO-RS
+        bulk_data_threshold: int
+            size of base64 encoded data element above which a value will be
+            provided in form of a "BulkDataURI" rather than "InlineBinary"
+
+        Returns
+        -------
+        dict
+            mapping representing a JSON encoded data element
+
+        Raises
+        ------
+        TypeError
+            when size of encoded data element exceeds `bulk_data_threshold`
+            but `bulk_data_element_handler` is ``None`` and hence not callable
+
+        """
+        # TODO: Determine whether more VRs need to be converted to strings
+        _VRs_TO_QUOTE = ['AT', ]
+        json_element = {'vr': self.VR, }
+        if self.VR in jsonrep.BINARY_VR_VALUES:
+            if self.value is not None:
+                binary_value = self.value
+                encoded_value = base64.b64encode(binary_value).decode('utf-8')
+                if len(encoded_value) > bulk_data_threshold:
+                    if bulk_data_element_handler is None:
+                        raise TypeError(
+                            'No bulk data element handler provided to '
+                            'generate URL for value of data element "{}".'
+                            .format(self.name)
+                        )
+                    json_element['BulkDataURI'] = bulk_data_element_handler(
+                        self
+                    )
+                else:
+                    logger.info(
+                        'encode bulk data element "{}" inline'.format(
+                            self.name
+                        )
+                    )
+                    json_element['InlineBinary'] = encoded_value
+        elif self.VR == 'SQ':
+            # recursive call to co-routine to format sequence contents
+            value = [
+                json.loads(e.to_json(
+                    bulk_data_element_handler=bulk_data_element_handler,
+                    bulk_data_threshold=bulk_data_threshold,
+                    dump_handler=dump_handler
+                ))
+                for e in self
+            ]
+            json_element['Value'] = value
+        elif self.VR == 'PN':
+            elem_value = self.value
+            if elem_value is not None:
+                if compat.in_py2:
+                    elem_value = PersonNameUnicode(elem_value, 'UTF8')
+                if len(elem_value.components) > 2:
+                    json_element['Value'] = [
+                        {'Phonetic': elem_value.components[2], },
+                    ]
+                elif len(elem_value.components) > 1:
+                    json_element['Value'] = [
+                        {'Ideographic': elem_value.components[1], },
+                    ]
+                else:
+                    json_element['Value'] = [
+                        {'Alphabetic': elem_value.components[0], },
+                    ]
+        else:
+            if self.value is not None:
+                is_multivalue = isinstance(self.value, MultiValue)
+                if self.VM > 1 or is_multivalue:
+                    value = self.value
+                else:
+                    value = [self.value]
+                # ensure it's a list and not another iterable
+                # (e.g. tuple), which would not be JSON serializable
+                if self.VR in _VRs_TO_QUOTE:
+                    json_element['Value'] = [str(v) for v in value]
+                else:
+                    json_element['Value'] = [v for v in value]
+        if hasattr(json_element, 'Value'):
+            json_element['Value'] = jsonrep.convert_to_python_number(
+                json_element['Value'], self.VR
+            )
+        return json_element
 
     @property
     def value(self):

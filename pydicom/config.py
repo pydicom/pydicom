@@ -79,10 +79,7 @@ Default ``False``
 
 # Logging system and debug function to change logging level
 logger = logging.getLogger('pydicom')
-handler = logging.StreamHandler()
-formatter = logging.Formatter("%(message)s")
-handler.setFormatter(formatter)
-logger.addHandler(handler)
+logger.addHandler(logging.NullHandler())
 
 
 import pydicom.pixel_data_handlers.numpy_handler as np_handler  # noqa
@@ -137,18 +134,29 @@ syntax, then this fact is announced in a ``NotImplementedError`` exception.
 """
 
 
-def debug(debug_on=True):
-    """Turn debugging of DICOM file reading and writing on or off.
-    When debugging is on, file location and details about the
-    elements read at that location are logged to the 'pydicom'
-    logger using python's logging module.
+def debug(debug_on=True, default_handler=True):
+    """Turn on/off debugging of DICOM file reading and writing.
+
+    When debugging is on, file location and details about the elements read at
+    that location are logged to the 'pydicom' logger using python's ``logging``
+    module.
 
     Parameters
     ----------
     debug_on : bool, optional
-        True (default) to turn on debugging, False to turn off.
+        If ``True`` (default) then turn on debugging, ``False`` to turn off.
+    default_handler : bool, optional
+        If ``True`` (default) then use ``logging.StreamHandler()`` as the
+        handler for log messages.
     """
     global logger, debugging
+
+    if default_handler:
+        handler = logging.StreamHandler()
+        formatter = logging.Formatter("%(message)s")
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+
     if debug_on:
         logger.setLevel(logging.DEBUG)
         debugging = True
@@ -158,4 +166,4 @@ def debug(debug_on=True):
 
 
 # force level=WARNING, in case logging default is set differently (issue 103)
-debug(False)
+debug(False, False)
