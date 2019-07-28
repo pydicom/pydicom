@@ -464,6 +464,8 @@ class Dataset(dict):
             return False
         # Test against None as (0000,0000) is a possible tag
         if tag is not None:
+            if tag.group == 2 and hasattr(self, "file_meta"):
+                return tag in self.file_meta
             return tag in self._dict
         return name in self._dict  # will no doubt raise an exception
 
@@ -1138,10 +1140,13 @@ class Dataset(dict):
             If the tag does not exist and no default is given.
         """
         try:
-            tag = Tag(key)
+            key = Tag(key)
         except (ValueError, OverflowError):
-            return self._dict.pop(key, *args)
-        return self._dict.pop(tag, *args)
+            pass
+
+        if self.tag_in_file_meta(key):
+             return self.file_meta._dict.pop(key, *args)
+        return self._dict.pop(key, *args)
 
     def popitem(self):
         return self._dict.popitem()
@@ -1562,6 +1567,11 @@ class Dataset(dict):
         if enforce_standard:
             validate_file_meta(self.file_meta, enforce_standard=True)
 
+    def tag_in_file_meta(self, tag):
+        return (hasattr(self, "file_meta") and
+                self.file_meta is not None and
+                tag in self.file_meta._dict)
+
     def __setattr__(self, name, value):
         """Intercept any attempts to set a value for an instance attribute.
 
@@ -1579,7 +1589,7 @@ class Dataset(dict):
         """
         tag = tag_for_keyword(name)
         if tag is not None:  # successfully mapped name to a tag
-            if tag not in self:
+            if tag not in self and not self.tag_in_file_meta(tag):
                 # don't have this tag yet->create the data_element instance
                 VR = dictionary_VR(tag)
                 data_element = DataElement(tag, VR, value)
@@ -1588,12 +1598,14 @@ class Dataset(dict):
                     # to its items, who may need parent dataset tags
                     # to resolve ambiguous tags
                     data_element.parent = self
+                self[tag] = data_element
             else:
                 # already have this data_element, just changing its value
-                data_element = self[tag]
+                if self.tag_in_file_meta(tag):
+                    data_element = self.file_meta[tag]
+                else:
+                    data_element = self[tag]
                 data_element.value = value
-            # Now have data_element - store it in this dict
-            self[tag] = data_element
         elif repeater_has_keyword(name):
             # Check if `name` is repeaters element
             raise ValueError('{} is a DICOM repeating group '

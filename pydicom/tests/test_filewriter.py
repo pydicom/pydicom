@@ -163,7 +163,6 @@ class TestWriteFile(object):
         self.file_out.seek(0)
         ds = dcmread(self.file_out)
         assert "1.2" == ds.SOPInstanceUID
-
     def test_write_no_ts(self):
         """Test reading a file with no ts and writing it out identically."""
         ds = dcmread(no_ts)
@@ -173,14 +172,6 @@ class TestWriteFile(object):
             written_bytes = self.file_out.read()
             read_bytes = ref_file.read()
             self.compare_bytes(read_bytes, written_bytes)
-
-    def test_write_double_filemeta(self):
-        """Test writing file meta from Dataset doesn't work"""
-        ds = dcmread(ct_name)
-        ds.TransferSyntaxUID = '1.1'
-        with pytest.raises(ValueError):
-            ds.save_as(self.file_out)
-
     def test_write_ffff_ffff(self):
         """Test writing element (FFFF, FFFF) to file #92"""
         fp = DicomBytesIO()

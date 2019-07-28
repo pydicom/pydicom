@@ -3,7 +3,7 @@ from pydicom.dataset import Dataset, FileMetaDataset, validate_file_meta
 from pydicom.uid import (
     ImplicitVRLittleEndian,
     ExplicitVRBigEndian,
-    PYDICOM_IMPLEMENTATION_UID
+    PYDICOM_IMPLEMENTATION_UID,
 )
 
 
@@ -84,21 +84,44 @@ def test_assign_file_meta_moves_existing_group2():
     assert meta.TransferSyntaxUID == "1.2.3"
 
     # And elements are no longer in main dataset
-    assert 'MediaStorageSOPClassUID' not in ds
-    assert 'ImplementationVersionName' not in ds
+    assert "MediaStorageSOPClassUID" not in ds._dict
+    assert "ImplementationVersionName" not in ds._dict
+
+
+def test_assign_ds_already_in_meta_overwrites():
+    meta = FileMetaDataset()
+    ds = Dataset()
+    ds.file_meta = meta
+    # First assign in meta
+    ds.file_meta.ImplementationVersionName = "imp-meta"
+    ds.ImplementationVersionName = "last set"
+
+    assert "last set" == ds.file_meta.ImplementationVersionName
+    assert "last set" == ds.ImplementationVersionName
+
+
+def test_file_meta_contains():
+    meta = FileMetaDataset()
+    ds = Dataset()
+    ds.file_meta = meta
+
+    ds.file_meta.ImplementationVersionName = "implem"
+    assert "ImplementationVersionName" in ds.file_meta
+    assert "ImplementationVersionName" in ds
 
 
 class TestFileMetaDataset(object):
     """Test valid file meta behavior"""
+
     def setup(self):
         self.ds = Dataset()
         self.sub_ds1 = Dataset()
         self.sub_ds2 = Dataset()
 
     def test_ensure_file_meta(self):
-        assert not hasattr(self.ds, 'file_meta')
+        assert not hasattr(self.ds, "file_meta")
         self.ds.ensure_file_meta()
-        assert hasattr(self.ds, 'file_meta')
+        assert hasattr(self.ds, "file_meta")
         assert not self.ds.file_meta
 
     def test_fix_meta_info(self):
@@ -121,17 +144,16 @@ class TestFileMetaDataset(object):
         self.ds.fix_meta_info(enforce_standard=False)
         assert ExplicitVRBigEndian == self.ds.file_meta.TransferSyntaxUID
 
-        assert 'MediaStorageSOPClassUID' not in self.ds.file_meta
-        assert 'MediaStorageSOPInstanceUID ' not in self.ds.file_meta
-        with pytest.raises(ValueError,
-                           match='Missing required File Meta .*'):
+        assert "MediaStorageSOPClassUID" not in self.ds.file_meta
+        assert "MediaStorageSOPInstanceUID " not in self.ds.file_meta
+        with pytest.raises(ValueError, match="Missing required File Meta .*"):
             self.ds.fix_meta_info(enforce_standard=True)
 
-        self.ds.SOPClassUID = '1.2.3'
-        self.ds.SOPInstanceUID = '4.5.6'
+        self.ds.SOPClassUID = "1.2.3"
+        self.ds.SOPInstanceUID = "4.5.6"
         self.ds.fix_meta_info(enforce_standard=False)
-        assert '1.2.3' == self.ds.file_meta.MediaStorageSOPClassUID
-        assert '4.5.6' == self.ds.file_meta.MediaStorageSOPInstanceUID
+        assert "1.2.3" == self.ds.file_meta.MediaStorageSOPClassUID
+        assert "4.5.6" == self.ds.file_meta.MediaStorageSOPInstanceUID
         self.ds.fix_meta_info(enforce_standard=True)
 
     def test_validate_and_correct_file_meta(self):
@@ -141,8 +163,8 @@ class TestFileMetaDataset(object):
             validate_file_meta(file_meta, enforce_standard=True)
 
         file_meta = FileMetaDataset()
-        file_meta.MediaStorageSOPClassUID = '1.2.3'
-        file_meta.MediaStorageSOPInstanceUID = '1.2.4'
+        file_meta.MediaStorageSOPClassUID = "1.2.3"
+        file_meta.MediaStorageSOPInstanceUID = "1.2.4"
         # still missing TransferSyntaxUID
         with pytest.raises(ValueError):
             validate_file_meta(file_meta, enforce_standard=True)
@@ -151,13 +173,13 @@ class TestFileMetaDataset(object):
         validate_file_meta(file_meta, enforce_standard=True)
 
         # check the default created values
-        assert b'\x00\x01' == file_meta.FileMetaInformationVersion
+        assert b"\x00\x01" == file_meta.FileMetaInformationVersion
         assert PYDICOM_IMPLEMENTATION_UID == file_meta.ImplementationClassUID
-        assert file_meta.ImplementationVersionName.startswith('PYDICOM ')
+        assert file_meta.ImplementationVersionName.startswith("PYDICOM ")
 
-        file_meta.ImplementationClassUID = '1.2.3.4'
-        file_meta.ImplementationVersionName = 'ACME LTD'
+        file_meta.ImplementationClassUID = "1.2.3.4"
+        file_meta.ImplementationVersionName = "ACME LTD"
         validate_file_meta(file_meta, enforce_standard=True)
         # check that existing values are left alone
-        assert '1.2.3.4' == file_meta.ImplementationClassUID
-        assert 'ACME LTD' == file_meta.ImplementationVersionName
+        assert "1.2.3.4" == file_meta.ImplementationClassUID
+        assert "ACME LTD" == file_meta.ImplementationVersionName
