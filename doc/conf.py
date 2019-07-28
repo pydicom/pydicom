@@ -62,7 +62,7 @@ extensions = [
     'sphinx.ext.todo',
     'sphinx.ext.imgmath',
     'sphinx.ext.ifconfig',
-    #'sphinx.ext.viewcode',
+    # 'sphinx.ext.viewcode',
     'sphinx_gallery.gen_gallery',
     'sphinx.ext.autosummary',
     'sphinx.ext.napoleon',  # Numpy style docstrings
@@ -74,8 +74,8 @@ extensions = [
 autosummary_generate = True
 
 autodoc_default_options = {
-    'members' : None,
-    'no-inherited-members' : None,
+    'members': None,
+    'no-inherited-members': None,
 }
 
 # intersphinx configuration

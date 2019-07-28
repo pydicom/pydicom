@@ -292,7 +292,8 @@ class Dataset(dict):
     >>> 'Manufacturer' in ds.BeamSequence[0]
     True
 
-    Iterating through the top level of a ``Dataset`` only (excluding Sequences):
+    Iterating through the top level of a ``Dataset`` only (excluding
+    Sequences):
 
     >>> for elem in ds:
     ...    print(elem)

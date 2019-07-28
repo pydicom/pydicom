@@ -596,7 +596,8 @@ def convert_encodings(encodings):
     Parameters
     ----------
     encodings : list of str
-        The list of encodings as read from (0008,0005) *Specific Character Set*.
+        The list of encodings as read from (0008,0005) *Specific Character
+        Set*.
 
     Returns
     -------
