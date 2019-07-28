@@ -698,7 +698,10 @@ class Dataset(dict):
         list of tuple
             The top-level (element tag, element) for the Dataset.
         """
-        return self._dict.items()
+        meta_items = []
+        if hasattr(self, "file_meta") and self.file_meta is not None:
+            meta_items = self.file_meta._dict.items()
+        return chain(meta_items, self._dict.items())
 
     def keys(self):
         """Return the DICOM tag keys to simulate dict."""
@@ -721,13 +724,13 @@ class Dataset(dict):
 
     if compat.in_py2:
         def iterkeys(self):
-            return self._dict.iterkeys()
+            return self.keys()
 
         def itervalues(self):
-            return self._dict.itervalues()
+            return self.values()
 
         def iteritems(self):
-            return self._dict.iteritems()
+            return self.items()
 
     def __getattr__(self, name):
         """Intercept requests for Dataset attribute names.

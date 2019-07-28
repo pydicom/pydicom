@@ -125,14 +125,15 @@ class TestFileMetaDataset1(object):
         data_elem = self.ds.data_element("ImplementationVersionName")
         assert data_elem.value == "Implem"
 
-    def test_meta_keys_and_values(self):
+    def test_meta_keys_values_items(self):
         meta2 = FileMetaDataset()
         meta2.ImplementationVersionName = "Implem"
         expected_values = [meta2.data_element("ImplementationVersionName")]
         expected_keys = [(0x0002, 0x0013)]
-
+        expected_items = list(zip(expected_keys, expected_values))
         assert expected_values == list(self.ds.values())
         assert expected_keys == list(self.ds.keys())
+        assert expected_items == list(self.ds.items())
 
         self.ds.PatientName = "test"
         self.ds.PatientID = "123"
@@ -146,6 +147,9 @@ class TestFileMetaDataset1(object):
 
         expected_keys.extend([0x00100010, 0x00100020])
         assert expected_keys == list(self.ds.keys())
+
+        expected_items = list(zip(expected_keys, expected_values))
+        assert expected_items == list(self.ds.items())
 
 
 class TestFileMetaDataset2(object):
