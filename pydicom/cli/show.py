@@ -2,9 +2,51 @@
 """Pydicom command line interface program for `pydicom show`"""
 
 from pydicom import dcmread
-from pydicom.compat import int_type
 
-default_exclude_size = 100
+
+def add_subparser(subparsers):
+    subparser = subparsers.add_parser(
+        "show", description="Display all or part of a DICOM file"
+    )
+    subparser.add_argument("filename", help="DICOM file to show")
+    subparser.add_argument(
+        "-x",
+        "--exclude-private",
+        help="Don't show private data elements",
+        action="store_true",
+    )
+    subparser.add_argument(
+        "-t", "--top", help="Only show top level", action="store_true"
+    )
+    subparser.add_argument(
+        "-q",
+        "--quiet",
+        help="Only show basic information",
+        action="store_true",
+    )
+    subparser.add_argument("-c", "--code", help="Execute code snippet on ds")
+
+    subparser.set_defaults(func=do_command)
+
+
+def do_command(args):
+    try:
+        ds = dcmread(args.filename, force=True)
+    except:
+        print("Unable to read file {}".format(args.filename))
+        return
+
+    if args.exclude_private:
+        ds.remove_private_tags()
+
+    if args.code:
+        exec(args.code, {}, {"ds": ds})
+    elif args.quiet:
+        show_quiet(ds)
+    elif args.top:
+        print(ds.top())
+    else:
+        print(repr(ds))
 
 
 def SOPClassname(ds):
@@ -13,61 +55,75 @@ def SOPClassname(ds):
         return None
     return "SOPClassUID: {}".format(class_uid.name)
 
-def num_beams(ds):
-    if 'BeamSequence' not in ds:
+
+def quiet_rtplan(ds):
+    if "BeamSequence" not in ds:
         return None
-    return "Number of beams: {}".format(len(ds.BeamSequence))
 
-# Items to show for different verbosity levels
+    lines = []
+    lines.append("Plan name: {}".format(ds.get("RTPlanName", "N/A")))
+
+    for beam in ds.BeamSequence:
+        s = "Beam {} '{}' {}"
+        results = [
+            beam.get(kywd) for kywd in ["BeamNumber", "BeamName", "BeamType"]
+        ]
+        beam_type = beam.get("BeamType")
+        if beam_type == "STATIC":
+            cp = beam.ControlPointSequence[0]
+            if cp:
+                more_results = [
+                    cp.get(kywd)
+                    for kywd in [
+                        "GantryAngle",
+                        "BeamLimitingDeviceAngle",
+                        "PatientSupportAngle",
+                    ]
+                ]
+                s += " gantry {}, coll {}, couch {}"
+                results.extend(more_results)
+        lines.append(s.format(*results))
+    return "\n".join(lines)
+
+
+def quiet_image(ds):
+    if "Image Storage" not in ds.SOPClassUID.name:
+        return None
+    s = "Image: {}-bit {} {}x{} pixels Slice location: {}"
+    results = [
+        ds.get(name, "N/A")
+        for name in [
+            "BitsStored",
+            "Modality",
+            "Rows",
+            "Columns",
+            "SliceLocation",
+        ]
+    ]
+    return s.format(*results)
+
+
+# Items to show in quiet mode
 # Item can be a callable or a DICOM keyword
-verbosity_items = {
-    0: [SOPClassname, "Modality", "PatientName", "PatientID"],
-    1: [
-        # Images
-        "StudyID",
-        "StudyDate",
-        "StudyTime",
-        "StudyDescription",
-        "SliceThickness",
-        "SliceLocation",
-        "Rows",
-        "Columns",
-        "BitsStored",
-        # Radiotherapy
-        "RTPlanName",
-        "RTPlanLabel",
-        num_beams,
-    ],
-}
+quiet_items = [
+    SOPClassname,
+    "PatientName",
+    "PatientID",
+    # Images
+    "StudyID",
+    "StudyDate",
+    "StudyTime",
+    "StudyDescription",
+    quiet_image,
+    quiet_rtplan,
+]
 
 
-def add_subparser(subparsers):
-    subparser = subparsers.add_parser(
-        "show",
-        description="Display all or part of a DICOM file's data elements",
-    )
-    subparser.add_argument("filename", help="DICOM file to show")
-    subparser.add_argument(
-        "-v", "--verbosity", nargs="?", type=int_type, default=1,
-        choices=[0, 1],
-    )
-    subparser.set_defaults(func=show)
-
-
-def show(args):
-    try:
-        ds = dcmread(args.filename, force=True)
-    except:
-        print("Unable to read file {}".format(args.filename))
-        return
-
-    i = 0
-    while i <= args.verbosity:
-        for item in verbosity_items[i]:
-            if callable(item):
-                result = item(ds)
-                if result:
-                    print(result)
-            else:
-                print("{}: {}".format(item, ds.get(item, "N/A")))
-        i += 1
+def show_quiet(ds):
+    for item in quiet_items:
+        if callable(item):
+            result = item(ds)
+            if result:
+                print(result)
+        else:
+            print("{}: {}".format(item, ds.get(item, "N/A")))
