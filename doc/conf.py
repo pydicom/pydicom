@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# pydicom documentation build configuration file, created by
-# sphinx-quickstart on Sat Feb 20 23:28:19 2010.
+# pydicom documentation build configuration file
 #
 # This file is execfile()d with the current
 #  directory set to its containing dir.
@@ -63,12 +62,12 @@ extensions = [
     'sphinx.ext.todo',
     'sphinx.ext.imgmath',
     'sphinx.ext.ifconfig',
-    'sphinx.ext.viewcode',
+    #'sphinx.ext.viewcode',
     'sphinx_gallery.gen_gallery',
     'sphinx.ext.autosummary',
-    #'numpydoc',
     'sphinx.ext.napoleon',  # Numpy style docstrings
     'sphinx.ext.linkcode',
+    # Custom
     'sphinx_issues',
 ]
 
