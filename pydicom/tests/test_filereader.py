@@ -94,15 +94,16 @@ save_dir = os.getcwd()
 class TestReader(object):
     def test_empty_numbers_tag(self):
         """Tests that an empty tag with a number VR (FL, UL, SL, US,
-        SS, FL, FD, OF) reads as an empty string"""
+        SS, FL, FD, OF) reads as the default empty value"""
         empty_number_tags_ds = dcmread(empty_number_tags_name)
-        assert '' == empty_number_tags_ds.ExaminedBodyThickness
-        assert '' == empty_number_tags_ds.SimpleFrameList
-        assert '' == empty_number_tags_ds.ReferencePixelX0
-        assert '' == empty_number_tags_ds.PhysicalUnitsXDirection
-        assert '' == empty_number_tags_ds.TagAngleSecondAxis
-        assert '' == empty_number_tags_ds.TagSpacingSecondDimension
-        assert '' == empty_number_tags_ds.VectorGridData
+        expected = config.empty_value
+        assert expected == empty_number_tags_ds.ExaminedBodyThickness
+        assert expected == empty_number_tags_ds.SimpleFrameList
+        assert expected == empty_number_tags_ds.ReferencePixelX0
+        assert expected == empty_number_tags_ds.PhysicalUnitsXDirection
+        assert expected == empty_number_tags_ds.TagAngleSecondAxis
+        assert expected == empty_number_tags_ds.TagSpacingSecondDimension
+        assert expected == empty_number_tags_ds.VectorGridData
 
     def test_UTF8_filename(self):
         utf8_filename = os.path.join(tempfile.gettempdir(), "ДИКОМ.dcm")

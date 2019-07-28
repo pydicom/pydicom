@@ -187,16 +187,13 @@ def data_element_generator(fp,
                              "Skipping forward to next data element.")
                 fp.seek(fp_tell() + length)
             else:
-                value = fp_read(length)
+                value = fp_read(length) if length > 0 else config.empty_value
                 if debugging:
-                    dotdot = "   "
-                    if length > 12:
-                        dotdot = "..."
-                    logger_debug("%08x: %-34s %s %r %s" % (value_tell,
-                                                           bytes2hex(
-                                                               value[:12]),
-                                                           dotdot,
-                                                           value[:12], dotdot))
+                    dotdot = "..." if length > 12 else "   "
+                    displayed_value = value[:12] if value else b''
+                    logger_debug("%08x: %-34s %s %r %s" %
+                                 (value_tell, bytes2hex(displayed_value),
+                                  dotdot, displayed_value, dotdot))
 
             # If the tag is (0008,0005) Specific Character Set, then store it
             if tag == BaseTag(0x00080005):

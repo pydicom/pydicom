@@ -563,6 +563,9 @@ def convert_value(VR, raw_data_element, encodings=None):
         message = "Unknown Value Representation '{}'".format(VR)
         raise NotImplementedError(message)
 
+    if raw_data_element.length == 0:
+        return config.empty_value
+
     # Look up the function to convert that VR
     # Dispatch two cases: a plain converter,
     # or a number one which needs a format string

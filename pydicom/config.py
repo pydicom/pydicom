@@ -86,6 +86,10 @@ TM to :class:`datetime.date`, :class:`datetime.datetime` and
 Default ``False``
 """
 
+empty_value = None
+"""Defines the value that an empty data element is set to
+after decoding."""
+
 # Logging system and debug function to change logging level
 logger = logging.getLogger('pydicom')
 logger.addHandler(logging.NullHandler())

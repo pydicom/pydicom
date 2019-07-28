@@ -8,7 +8,7 @@ import sys
 
 import pytest
 
-from pydicom import in_py2
+from pydicom import filewriter, config, dcmread
 from pydicom.charset import default_encoding
 from pydicom.dataelem import (
     DataElement,
@@ -16,6 +16,7 @@ from pydicom.dataelem import (
     DataElement_from_raw,
 )
 from pydicom.dataset import Dataset
+from pydicom.filebase import DicomBytesIO
 from pydicom.multival import MultiValue
 from pydicom.tag import Tag
 from pydicom.uid import UID
@@ -405,15 +406,15 @@ class TestDataElement(object):
             elem = ds[tag_name]
             assert bool(elem.value) is False
             assert 0 == elem.VM
-            if in_py2:
-                assert str(elem.value) in ('', b'')
-            else:
-                assert elem.value in ('', b'')
+            assert elem.value == value
+            fp = DicomBytesIO()
+            filewriter.write_dataset(fp, ds)
+            ds_read = dcmread(fp, force=True)
+            assert config.empty_value == ds_read[tag_name].value
 
         text_vrs = {
-            'AE': 'Receiver',
+            'AE': 'RetrieveAETitle',
             'AS': 'PatientAge',
-            'AT': 'OffendingElement',
             'CS': 'QualityControlSubject',
             'DA': 'PatientBirthDate',
             'DS': 'PatientWeight',
@@ -431,13 +432,12 @@ class TestDataElement(object):
             'UT': 'StrainAdditionalInformation',
         }
         ds = Dataset()
+        ds.is_little_endian = True
         # set value to new element
         for tag_name in text_vrs.values():
             check_empty_text_element(None)
             del ds[tag_name]
-            check_empty_text_element(b'')
-            del ds[tag_name]
-            check_empty_text_element(u'')
+            check_empty_text_element('')
             del ds[tag_name]
             check_empty_text_element([])
             del ds[tag_name]
@@ -445,8 +445,7 @@ class TestDataElement(object):
         # set value to existing element
         for tag_name in text_vrs.values():
             check_empty_text_element(None)
-            check_empty_text_element(b'')
-            check_empty_text_element(u'')
+            check_empty_text_element('')
             check_empty_text_element([])
             check_empty_text_element(None)
 
@@ -458,9 +457,14 @@ class TestDataElement(object):
             elem = ds[tag_name]
             assert bool(elem.value) is False
             assert 0 == elem.VM
-            assert elem.value is None
+            assert elem.value == value
+            fp = DicomBytesIO()
+            filewriter.write_dataset(fp, ds)
+            ds_read = dcmread(fp, force=True)
+            assert config.empty_value == ds_read[tag_name].value
 
         non_text_vrs = {
+            'AT': 'OffendingElement',
             'SL': 'RationalNumeratorValue',
             'SS': 'SelectorSSValue',
             'UL': 'SimpleFrameList',
@@ -475,6 +479,7 @@ class TestDataElement(object):
             'UN': 'SelectorUNValue',
         }
         ds = Dataset()
+        ds.is_little_endian = True
         # set value to new element
         for tag_name in non_text_vrs.values():
             check_empty_binary_element(None)

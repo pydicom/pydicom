@@ -861,7 +861,7 @@ class Dataset(dict):
             return data_elem
         elif isinstance(data_elem, tuple):
             # If a deferred read, then go get the value now
-            if data_elem.value is None:
+            if data_elem.value is None and data_elem.length != 0:
                 from pydicom.filereader import read_deferred_data_element
                 data_elem = read_deferred_data_element(
                     self.fileobj_type, self.filename, self.timestamp,

@@ -742,6 +742,8 @@ def decode(data_element, dicom_character_set):
         single value, a multiple value (code extension), or may also be ``''``
         or ``None``, in which case ``'ISO_IR 6'`` will be used.
     """
+    if data_element.is_empty:
+        return config.empty_value
     if not dicom_character_set:
         dicom_character_set = ['ISO_IR 6']
 

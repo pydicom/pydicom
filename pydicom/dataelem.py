@@ -206,12 +206,7 @@ class DataElement(object):
                 pass
 
         self.VR = VR  # Note: you must set VR before setting value
-        if not value and (value is None or value in ([], ())) and VR != 'SQ':
-            if VR in BINARY_VR_VALUES:
-                self._value = None
-            else:
-                self._value = ''
-        elif already_converted:
+        if already_converted:
             self._value = value
         else:
             self.value = value  # calls property setter which will convert
@@ -463,14 +458,7 @@ class DataElement(object):
             except TypeError:
                 if _backslash_byte in val:
                     val = val.split(_backslash_byte)
-        # make sure empty values are represented by 0-length value
-        if not val and (val is None or val in ([], ())) and self.VR != 'SQ':
-            if self.VR in BINARY_VR_VALUES:
-                self._value = None
-            else:
-                self._value = ''
-        else:
-            self._value = self._convert_value(val)
+        self._value = self._convert_value(val)
 
     @property
     def VM(self):
@@ -536,7 +524,7 @@ class DataElement(object):
         elif self.VR == 'TM' and config.datetime_conversion:
             return pydicom.valuerep.TM(val)
         elif self.VR == "UI":
-            return UID(val if val else '')
+            return UID(val) if val is not None else None
         elif not in_py2 and self.VR == "PN":
             return PersonName(val)
         # Later may need this for PersonName as for UI,
@@ -581,7 +569,7 @@ class DataElement(object):
 
     def __str__(self):
         """Return :class:`str` representation of the element."""
-        repVal = self.repval
+        repVal = self.repval or ''
         if self.showVR:
             s = "%s %-*s %s: %s" % (str(self.tag), self.descripWidth,
                                     self.description()[:self.descripWidth],
