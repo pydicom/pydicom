@@ -282,6 +282,7 @@ def code_file(filename, exclude_size=None, include_private=False):
     # Return the complete code string
     return line_term.join(lines)
 
+
 def set_parser_arguments(parser, default_exclude_size):
     parser.add_argument(
         'infile', help="DICOM file from which to produce code lines")
@@ -311,6 +312,7 @@ def set_parser_arguments(parser, default_exclude_size):
         '--save-as',
         help=("Specify the filename for ds.save_as(save_filename); "
               "otherwise the input name + '_from_codify' will be used"))
+
 
 def do_codify(args):
     # Read the requested file and convert to python/pydicom code lines

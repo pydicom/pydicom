@@ -32,7 +32,7 @@ def add_subparser(subparsers):
 def do_command(args):
     try:
         ds = dcmread(args.filename, force=True)
-    except:
+    except Exception:
         print("Unable to read file {}".format(args.filename))
         return
 
