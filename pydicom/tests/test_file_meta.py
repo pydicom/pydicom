@@ -1,5 +1,10 @@
 import pytest
-from pydicom.dataset import Dataset, FileMetaDataset
+from pydicom.dataset import Dataset, FileMetaDataset, validate_file_meta
+from pydicom.uid import (
+    ImplicitVRLittleEndian,
+    ExplicitVRBigEndian,
+    PYDICOM_IMPLEMENTATION_UID
+)
 
 
 def test_group2_only():
@@ -81,3 +86,78 @@ def test_assign_file_meta_moves_existing_group2():
     # And elements are no longer in main dataset
     assert 'MediaStorageSOPClassUID' not in ds
     assert 'ImplementationVersionName' not in ds
+
+
+class TestFileMetaDataset(object):
+    """Test valid file meta behavior"""
+    def setup(self):
+        self.ds = Dataset()
+        self.sub_ds1 = Dataset()
+        self.sub_ds2 = Dataset()
+
+    def test_ensure_file_meta(self):
+        assert not hasattr(self.ds, 'file_meta')
+        self.ds.ensure_file_meta()
+        assert hasattr(self.ds, 'file_meta')
+        assert not self.ds.file_meta
+
+    def test_fix_meta_info(self):
+        self.ds.is_little_endian = True
+        self.ds.is_implicit_VR = True
+        self.ds.fix_meta_info(enforce_standard=False)
+        assert ImplicitVRLittleEndian == self.ds.file_meta.TransferSyntaxUID
+
+        self.ds.is_implicit_VR = False
+        self.ds.fix_meta_info(enforce_standard=False)
+        # transfer syntax does not change because of ambiguity
+        assert ImplicitVRLittleEndian == self.ds.file_meta.TransferSyntaxUID
+
+        self.ds.is_little_endian = False
+        self.ds.is_implicit_VR = True
+        with pytest.raises(NotImplementedError):
+            self.ds.fix_meta_info()
+
+        self.ds.is_implicit_VR = False
+        self.ds.fix_meta_info(enforce_standard=False)
+        assert ExplicitVRBigEndian == self.ds.file_meta.TransferSyntaxUID
+
+        assert 'MediaStorageSOPClassUID' not in self.ds.file_meta
+        assert 'MediaStorageSOPInstanceUID ' not in self.ds.file_meta
+        with pytest.raises(ValueError,
+                           match='Missing required File Meta .*'):
+            self.ds.fix_meta_info(enforce_standard=True)
+
+        self.ds.SOPClassUID = '1.2.3'
+        self.ds.SOPInstanceUID = '4.5.6'
+        self.ds.fix_meta_info(enforce_standard=False)
+        assert '1.2.3' == self.ds.file_meta.MediaStorageSOPClassUID
+        assert '4.5.6' == self.ds.file_meta.MediaStorageSOPInstanceUID
+        self.ds.fix_meta_info(enforce_standard=True)
+
+    def test_validate_and_correct_file_meta(self):
+        file_meta = FileMetaDataset()
+        validate_file_meta(file_meta, enforce_standard=False)
+        with pytest.raises(ValueError):
+            validate_file_meta(file_meta, enforce_standard=True)
+
+        file_meta = FileMetaDataset()
+        file_meta.MediaStorageSOPClassUID = '1.2.3'
+        file_meta.MediaStorageSOPInstanceUID = '1.2.4'
+        # still missing TransferSyntaxUID
+        with pytest.raises(ValueError):
+            validate_file_meta(file_meta, enforce_standard=True)
+
+        file_meta.TransferSyntaxUID = ImplicitVRLittleEndian
+        validate_file_meta(file_meta, enforce_standard=True)
+
+        # check the default created values
+        assert b'\x00\x01' == file_meta.FileMetaInformationVersion
+        assert PYDICOM_IMPLEMENTATION_UID == file_meta.ImplementationClassUID
+        assert file_meta.ImplementationVersionName.startswith('PYDICOM ')
+
+        file_meta.ImplementationClassUID = '1.2.3.4'
+        file_meta.ImplementationVersionName = 'ACME LTD'
+        validate_file_meta(file_meta, enforce_standard=True)
+        # check that existing values are left alone
+        assert '1.2.3.4' == file_meta.ImplementationClassUID
+        assert 'ACME LTD' == file_meta.ImplementationVersionName

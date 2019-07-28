@@ -14,7 +14,7 @@ Fixes
 
 Enhancements
 ............
-* New FileMetaDataset for integrating file meta into Datasets
+* New FileMetaDataset for integrating file meta into Datasets, accepts only group 2 items
 * File meta (Group 2) data elements can now be written and read directly from main dataset (internally kept in file_meta)
 
 Changes

@@ -74,7 +74,7 @@ def code_imports():
     line0 = "from __future__ import unicode_literals"
     line0 += "  # Only for python2.7 and save_as unicode filename"
     line1 = "import pydicom"
-    line2 = "from pydicom.dataset import Dataset"
+    line2 = "from pydicom.dataset import Dataset, FileMetaDataset"
     line3 = "from pydicom.sequence import Sequence"
     return line_term.join((line0, line1, line2, line3))
 
@@ -202,7 +202,8 @@ def code_sequence(dataelem,
 def code_dataset(ds,
                  dataset_name="ds",
                  exclude_size=None,
-                 include_private=False):
+                 include_private=False,
+                 is_file_meta=False):
     """Return python code lines for import statements needed by other code
 
     :arg exclude_size: if specified, values longer than this (in bytes)
@@ -211,11 +212,16 @@ def code_dataset(ds,
                        and thus prompting the user to remove or fix that line.
     :arg include_private: If True, private data elements will be coded.
                           If False, private elements are skipped
+    :arg is_file_meta: If True, generate code for FileMetaDataset.
+                       If False, generate code for Dataset.
     :return: a list of code lines containing import statements
 
     """
     lines = []
-    lines.append(dataset_name + " = Dataset()")
+    if is_file_meta:
+        lines.append(dataset_name + " = FileMetaDataset()")
+    else:
+        lines.append(dataset_name + " = Dataset()")
     for dataelem in ds:
         # If a private data element and flag says so, skip it and go to next
         if not include_private and dataelem.tag.is_private:
@@ -262,7 +268,7 @@ def code_file(filename, exclude_size=None, include_private=False):
     # Code the file_meta information
     lines.append("# File meta info data elements")
     code_meta = code_dataset(ds.file_meta, "file_meta", exclude_size,
-                             include_private)
+                             include_private, is_file_meta=True)
     lines.append(code_meta)
     lines.append('')
 

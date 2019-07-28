@@ -7,16 +7,11 @@ import pydicom
 from pydicom import compat
 from pydicom.data import get_testdata_files
 from pydicom.dataelem import DataElement, RawDataElement
-from pydicom.dataset import Dataset, FileDataset, validate_file_meta
+from pydicom.dataset import Dataset, FileDataset, FileMetaDataset
 from pydicom import dcmread
 from pydicom.filebase import DicomBytesIO
 from pydicom.sequence import Sequence
 from pydicom.tag import Tag
-from pydicom.uid import (
-    ImplicitVRLittleEndian,
-    ExplicitVRBigEndian,
-    PYDICOM_IMPLEMENTATION_UID
-)
 
 
 class BadRepr(object):
@@ -35,12 +30,12 @@ class TestDataset(object):
         # This comes from bug fix for issue 42
         # First, fake enough to try the pixel_array property
         ds = Dataset()
-        ds.file_meta = Dataset()
+        ds.file_meta = FileMetaDataset()
         ds.PixelData = 'xyzlmnop'
         msg_from_gdcm = r"'Dataset' object has no attribute 'filename'"
-        msg_from_numpy = (r"'Dataset' object has no attribute "
+        msg_from_numpy = (r"'FileMetaDataset' object has no attribute "
                           "'TransferSyntaxUID'")
-        msg_from_pillow = (r"'Dataset' object has no attribute "
+        msg_from_pillow = (r"'FileMetaDataset' object has no attribute "
                            "'PixelRepresentation'")
         msg = "(" + "|".join(
             [msg_from_gdcm, msg_from_numpy, msg_from_pillow]) + ")"
@@ -1113,7 +1108,7 @@ class TestDataset(object):
             ds.save_as(fp, write_like_original=False)
 
         ds.is_implicit_VR = True
-        ds.file_meta = Dataset()
+        ds.file_meta = FileMetaDataset()
         ds.file_meta.MediaStorageSOPClassUID = '1.1'
         ds.file_meta.MediaStorageSOPInstanceUID = '1.2'
         ds.file_meta.TransferSyntaxUID = '1.3'
@@ -1294,89 +1289,8 @@ class TestDatasetElements(object):
         self.ds.ConceptCodeSequence = [self.sub_ds1, self.sub_ds2]
         assert isinstance(self.ds.ConceptCodeSequence, Sequence)
 
-    def test_ensure_file_meta(self):
-        assert not hasattr(self.ds, 'file_meta')
-        self.ds.ensure_file_meta()
-        assert hasattr(self.ds, 'file_meta')
-        assert not self.ds.file_meta
 
-    def test_fix_meta_info(self):
-        self.ds.is_little_endian = True
-        self.ds.is_implicit_VR = True
-        self.ds.fix_meta_info(enforce_standard=False)
-        assert ImplicitVRLittleEndian == self.ds.file_meta.TransferSyntaxUID
 
-        self.ds.is_implicit_VR = False
-        self.ds.fix_meta_info(enforce_standard=False)
-        # transfer syntax does not change because of ambiguity
-        assert ImplicitVRLittleEndian == self.ds.file_meta.TransferSyntaxUID
-
-        self.ds.is_little_endian = False
-        self.ds.is_implicit_VR = True
-        with pytest.raises(NotImplementedError):
-            self.ds.fix_meta_info()
-
-        self.ds.is_implicit_VR = False
-        self.ds.fix_meta_info(enforce_standard=False)
-        assert ExplicitVRBigEndian == self.ds.file_meta.TransferSyntaxUID
-
-        assert 'MediaStorageSOPClassUID' not in self.ds.file_meta
-        assert 'MediaStorageSOPInstanceUID ' not in self.ds.file_meta
-        with pytest.raises(ValueError,
-                           match='Missing required File Meta .*'):
-            self.ds.fix_meta_info(enforce_standard=True)
-
-        self.ds.SOPClassUID = '1.2.3'
-        self.ds.SOPInstanceUID = '4.5.6'
-        self.ds.fix_meta_info(enforce_standard=False)
-        assert '1.2.3' == self.ds.file_meta.MediaStorageSOPClassUID
-        assert '4.5.6' == self.ds.file_meta.MediaStorageSOPInstanceUID
-        self.ds.fix_meta_info(enforce_standard=True)
-
-        # Ensure file_meta is not FileMetaDataset for next test
-        self.ds.file_meta = Dataset()
-        self.ds.file_meta.PatientID = 'PatientID'
-        with pytest.raises(ValueError,
-                           match=r'Only File Meta Information Group '
-                                 r'\(0002,eeee\) elements must be present .*'):
-            self.ds.fix_meta_info(enforce_standard=True)
-
-    def test_validate_and_correct_file_meta(self):
-        file_meta = Dataset()
-        validate_file_meta(file_meta, enforce_standard=False)
-        with pytest.raises(ValueError):
-            validate_file_meta(file_meta, enforce_standard=True)
-
-        file_meta.PatientID = 'PatientID'
-        for enforce_standard in (True, False):
-            with pytest.raises(
-                    ValueError,
-                    match=r'Only File Meta Information Group '
-                          r'\(0002,eeee\) elements must be present .*'):
-                validate_file_meta(
-                    file_meta, enforce_standard=enforce_standard)
-
-        file_meta = Dataset()
-        file_meta.MediaStorageSOPClassUID = '1.2.3'
-        file_meta.MediaStorageSOPInstanceUID = '1.2.4'
-        # still missing TransferSyntaxUID
-        with pytest.raises(ValueError):
-            validate_file_meta(file_meta, enforce_standard=True)
-
-        file_meta.TransferSyntaxUID = ImplicitVRLittleEndian
-        validate_file_meta(file_meta, enforce_standard=True)
-
-        # check the default created values
-        assert b'\x00\x01' == file_meta.FileMetaInformationVersion
-        assert PYDICOM_IMPLEMENTATION_UID == file_meta.ImplementationClassUID
-        assert file_meta.ImplementationVersionName.startswith('PYDICOM ')
-
-        file_meta.ImplementationClassUID = '1.2.3.4'
-        file_meta.ImplementationVersionName = 'ACME LTD'
-        validate_file_meta(file_meta, enforce_standard=True)
-        # check that existing values are left alone
-        assert '1.2.3.4' == file_meta.ImplementationClassUID
-        assert 'ACME LTD' == file_meta.ImplementationVersionName
 
 
 class TestFileDataset(object):
@@ -1439,7 +1353,7 @@ class TestFileDataset(object):
     def test_repr_shows_group2(self):
         """Starting in v1.4, Dataset.__repr__ shows file meta"""
         ds = Dataset()
-        ds.file_meta = Dataset()
+        ds.file_meta = FileMetaDataset()
         ds.file_meta.FileMetaInformationVersion = b'\x00\x01'
         ds.file_meta.SourceApplicationEntityTitle = "test"
 

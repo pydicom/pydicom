@@ -27,7 +27,8 @@ import sys
 
 import pytest
 
-from pydicom import dcmread, Dataset
+from pydicom import dcmread
+from pydicom.dataset import Dataset, FileMetaDataset
 import pydicom.config
 from pydicom.data import get_testdata_files
 from pydicom.encaps import defragment_data
@@ -1191,7 +1192,7 @@ class TestNumpy_RLEEncodeFrame(object):
         """Setup the tests."""
         # Create a dataset skeleton for use in the cycle tests
         ds = Dataset()
-        ds.file_meta = Dataset()
+        ds.file_meta = FileMetaDataset()
         ds.file_meta.TransferSyntaxUID = '1.2.840.10008.1.2'
         ds.Rows = 2
         ds.Columns = 4

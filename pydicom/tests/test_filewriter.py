@@ -16,7 +16,7 @@ import pytest
 from pydicom._storage_sopclass_uids import CTImageStorage
 from pydicom import config, __version_info__, uid
 from pydicom.data import get_testdata_files, get_charset_files
-from pydicom.dataset import Dataset, FileDataset
+from pydicom.dataset import Dataset, FileDataset, FileMetaDataset
 from pydicom.dataelem import DataElement, RawDataElement
 from pydicom.filebase import DicomBytesIO
 from pydicom.filereader import dcmread, read_dataset
@@ -185,7 +185,7 @@ class TestWriteFile(object):
         """Test writing element (FFFF, FFFF) to file #92"""
         fp = DicomBytesIO()
         ds = Dataset()
-        ds.file_meta = Dataset()
+        ds.file_meta = FileMetaDataset()
         ds.is_little_endian = True
         ds.is_implicit_VR = True
         ds.add_new(0xFFFFFFFF, 'LO', '123456')
@@ -1438,7 +1438,7 @@ class TestWriteToStandard(object):
         version = 'PYDICOM ' + base_version
         ds = dcmread(rtplan_name)
         transfer_syntax = ds.file_meta.TransferSyntaxUID
-        ds.file_meta = Dataset()
+        ds.file_meta = FileMetaDataset()
         ds.save_as(fp, write_like_original=False)
         fp.seek(0)
         out = dcmread(fp)
@@ -1465,7 +1465,7 @@ class TestWriteToStandard(object):
         """Test exception is raised if trying to write with no file_meta."""
         ds = dcmread(rtplan_name)
         del ds.SOPInstanceUID
-        ds.file_meta = Dataset()
+        ds.file_meta = FileMetaDataset()
         with pytest.raises(ValueError):
             ds.save_as(DicomBytesIO(), write_like_original=False)
         del ds.file_meta
@@ -1742,7 +1742,7 @@ class TestWriteNonStandard(object):
     def test_file_meta_unchanged(self):
         """Test no file_meta elements are added if missing."""
         ds = dcmread(rtplan_name)
-        ds.file_meta = Dataset()
+        ds.file_meta = FileMetaDataset()
         ds.save_as(self.fp, write_like_original=True)
         assert Dataset() == ds.file_meta
 

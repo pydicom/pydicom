@@ -13,7 +13,7 @@ except ImportError:
 
 from pydicom import dcmread
 from pydicom.data import get_testdata_files
-from pydicom.dataset import Dataset
+from pydicom.dataset import Dataset, FileMetaDataset
 from pydicom.pixel_data_handlers.util import (
     dtype_corrected_for_endianness,
     reshape_pixel_array,
@@ -70,7 +70,7 @@ class TestNumpy_PixelDtype(object):
     def setup(self):
         """Setup the test dataset."""
         self.ds = Dataset()
-        self.ds.file_meta = Dataset()
+        self.ds.file_meta = FileMetaDataset()
         self.ds.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
 
     def test_unknown_pixel_representation_raises(self):
@@ -255,7 +255,7 @@ class TestNumpy_ReshapePixelArray(object):
     def setup(self):
         """Setup the test dataset."""
         self.ds = Dataset()
-        self.ds.file_meta = Dataset()
+        self.ds.file_meta = FileMetaDataset()
         self.ds.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
         self.ds.Rows = 4
         self.ds.Columns = 5

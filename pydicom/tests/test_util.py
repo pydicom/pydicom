@@ -57,7 +57,7 @@ class TestCodify(object):
         out = "from __future__ import unicode_literals"
         out += "  # Only for python2.7 and save_as unicode filename\n"
         out += 'import pydicom\n'
-        out += 'from pydicom.dataset import Dataset\n'
+        out += 'from pydicom.dataset import Dataset, FileMetaDataset\n'
         out += 'from pydicom.sequence import Sequence'
         assert out == code_imports()
 
