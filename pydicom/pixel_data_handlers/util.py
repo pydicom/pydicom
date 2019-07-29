@@ -249,8 +249,9 @@ def reshape_pixel_array(ds, arr):
     References
     ----------
 
-    * DICOM Standard, Part 3, Annex C.7.6.3.1
-    * DICOM Standard, Part 4, Sections 8.2.1-4
+    * DICOM Standard, Part 3,
+      :dcm:`Annex C.7.6.3.1<part03/sect_C.7.6.3.html#sect_C.7.6.3.1>`
+    * DICOM Standard, Part 5, :dcm:`Section 8.2<part05/sect_8.2.html>`
     """
     if not HAVE_NP:
         raise ImportError("Numpy is required to reshape the pixel array.")
@@ -326,10 +327,10 @@ def reshape_pixel_array(ds, arr):
 def get_expected_length(ds, unit='bytes'):
     """Return the expected length (in bytes or pixels) of the pixel data.
 
-    +-----------------------------------+------+-------------+
-    | Element                           | Type | Required or |
-    +-------------+---------------------+      | optional    |
-    | Tag         | Keyword             |      |             |
+    +------------------------------------------+-------------+
+    | Element                                  | Required or |
+    +-------------+---------------------+------+ optional    |
+    | Tag         | Keyword             | Type |             |
     +=============+=====================+======+=============+
     | (0028,0002) | SamplesPerPixel     | 1    | Required    |
     +-------------+---------------------+------+-------------+
@@ -347,10 +348,10 @@ def get_expected_length(ds, unit='bytes'):
     ds : dataset.Dataset
         The DICOM dataset containing the Image Pixel module and pixel data.
     unit : str, optional
-        If 'bytes' then returns the expected length of the Pixel Data in
+        If ``'bytes'`` then returns the expected length of the *Pixel Data* in
         whole bytes and NOT including an odd length trailing NULL padding
-        byte. If 'pixels' then returns the expected length of the Pixel Data
-        in terms of the total number of pixels (default 'bytes').
+        byte. If ``'pixels'`` then returns the expected length of the *Pixel
+        Data* in terms of the total number of pixels (default ``'bytes'``).
 
     Returns
     -------
@@ -393,7 +394,8 @@ def _convert_RGB_to_YBR_FULL(arr):
     References
     ----------
 
-    * DICOM Standard, Part 3, Annex C.7.6.3.1.2
+    * DICOM Standard, Part 3,
+      :dcm:`Annex C.7.6.3.1.2<part03/sect_C.7.6.3.html#sect_C.7.6.3.1.2>`
     * ISO/IEC 10918-5:2012, Section 7
     """
     orig_dtype = arr.dtype
@@ -442,7 +444,8 @@ def _convert_YBR_FULL_to_RGB(arr):
     References
     ----------
 
-    * DICOM Standard, Part 3, Annex C.7.6.3.1.2
+    * DICOM Standard, Part 3,
+      :dcm:`Annex C.7.6.3.1.2<part03/sect_C.7.6.3.html#sect_C.7.6.3.1.2>`
     * ISO/IEC 10918-5:2012, Section 7
     """
     orig_dtype = arr.dtype

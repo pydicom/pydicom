@@ -85,22 +85,25 @@ class DataElement(object):
     file_tell : int or None
     is_retired : bool
         For officially registered DICOM Data Elements this will be ``True`` if
-        the retired status as given in PS3.6 Table 6-1 is 'RET'. For private
+        the retired status as given in the DICOM Standard, Part 6,
+        :dcm:`Table 6-1<part06/chapter_6.html#table_6-1>` is 'RET'. For private
         or unknown Elements this will always be ``False``.
     is_undefined_length : bool
         Indicates whether the length field for the element was ``0xFFFFFFFFL``
         (ie undefined).
     keyword : str
         For officially registered DICOM Data Elements this will be the
-        *Keyword* as given in PS3.6 Table 6-1. For private or unknown
-        elements this will return an empty string ``''``.
+        *Keyword* as given in
+        :dcm:`Table 6-1<part06/chapter_6.html#table_6-1>`. For private or
+        unknown elements this will return an empty string ``''``.
     maxBytesToDisplay : int
         For string display, elements with values containing data which is
         longer than this value will display ``"array of # bytes"``
         (default 16).
     name : str
         For officially registered DICOM Data Elements this will be the *Name*
-        as given in PS3.6 Table 6-1. For private elements known to *pydicom*
+        as given in :dcm:`Table 6-1<part06/chapter_6.html#table_6-1>`.
+        For private elements known to *pydicom*
         this will be the *Name* in the format ``'[name]'``. For unknown
         private elements this will be ``'Private Creator'``. For unknown
         elements this will return an empty string ``''``.

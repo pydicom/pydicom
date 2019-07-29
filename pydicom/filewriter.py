@@ -719,7 +719,7 @@ def dcmwrite(filename, dataset, write_like_original=True):
     the DICOM File Format).
 
     If `write_like_original` is ``False``, `dataset` will be stored in the
-    DICOM File Format in accordance with DICOM Standard Part 10 Section 7. The
+    :dcm:`DICOM File Format <part10/chapter_7.html>`. The
     byte stream of the `dataset` will be placed into the file after the
     DICOM *File Meta Information*.
 

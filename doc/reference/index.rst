@@ -20,6 +20,7 @@ pydicom.
    datadict
    elem
    dataset
+   handlers
    dicomdir
    encaps
    errors

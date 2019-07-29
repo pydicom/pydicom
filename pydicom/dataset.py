@@ -62,7 +62,9 @@ class PropertyError(Exception):
 class PrivateBlock(object):
     """Helper class for a private block in the dataset.
 
-    (See PS3.5, Section 7.8.1 - Private Data Element Tags)
+    See the DICOM Standard, Part 5,
+    :dcm:`Section 7.8.1<part05/sect_7.8.html#sect_7.8.1>` - Private Data
+    Element Tags
 
     Attributes
     ----------
@@ -479,7 +481,8 @@ class Dataset(dict):
     def decode(self):
         """Apply character set decoding to all DataElements in the Dataset.
 
-        See DICOM PS3.5-2008 6.1.1.
+        See DICOM Standard, Part 5,
+        :dcm:`Section 6.1.1<part05/chapter_6.html#sect_6.1.1>`.
         """
         # Find specific character set. 'ISO_IR 6' is default
         # May be multi-valued, but let pydicom.charset handle all logic on that
@@ -1508,8 +1511,8 @@ class Dataset(dict):
         **Conformance with DICOM File Format**
 
         If `write_like_original` is ``False``, the dataset will be stored
-        in the DICOM File Format in accordance with DICOM Standard Part 10
-        Section 7. To do so requires that the ``Dataset.file_meta`` attribute
+        in the :dcm:`DICOM File Format <part10/chapter_7.html>`. To do so
+        requires that the ``Dataset.file_meta`` attribute
         exists and contains a ``Dataset`` with the required (Type 1) *File
         Meta Information Group* elements (see ``pydicom.filewriter.dcmwrite``
         and ``pydicom.filewriter.write_file_meta_info`` for more information).
@@ -1831,7 +1834,7 @@ class Dataset(dict):
                   encodings=None):
         """Adds elements to the Dataset from DICOM JSON format.
 
-        See PS 3.18, Annex F.
+        See the DICOM Standard, Part 18, :dcm:`Annex F<part18/chapter_F.html>`.
 
         Parameters
         ----------
@@ -1875,7 +1878,7 @@ class Dataset(dict):
         """Converts the data set into JSON representation based on the
         DICOM JSON Model
 
-        See PS3.18, Annex F
+        See the DICOM Standard, Part 18, :dcm:`Annex F<part18/chapter_F.html>`.
 
         Parameters
         ----------

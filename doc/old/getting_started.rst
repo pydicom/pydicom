@@ -29,7 +29,7 @@ head-first-prone, and save to a new file::
   >>> ds = pydicom.dcmread(filename)  # plan dataset
   >>> ds.PatientName
   'Last^First^mid^pre'
-  >>> ds.dir("setup")    # get a list of tags with "setup" somewhere in the name
+  >>> ds.dir("setup")  # get a list of tags with "setup" somewhere in the name
   ['PatientSetupSequence']
   >>> ds.PatientSetupSequence[0]
   (0018, 5100) Patient Position                    CS: 'HFS'
@@ -83,13 +83,14 @@ Prerequisites
 Installing pydicom
 ------------------
 
-Pydicom is currently available on `PyPi <https://pypi.python.org/pypi/pydicom/>`_
-. The simplest way to install pydicom alone is using ``pip`` at a command line::
+Pydicom is currently available on
+`PyPi <https://pypi.python.org/pypi/pydicom/>`_. The simplest way to install
+pydicom alone is using ``pip`` at a command line::
 
   pip install -U pydicom
 
-which installs the latest release.  To install the latest code from the repository
-(usually stable, but may have undocumented changes or bugs)::
+which installs the latest release.  To install the latest code from the
+repository (usually stable, but may have undocumented changes or bugs)::
 
   pip install -U git+https://github.com/pydicom/pydicom.git
 
@@ -140,7 +141,8 @@ pydicom's setup.py file and::
 This will install `pytest <https://pytest.org>`_ if it is not
 already installed.
 
-In v1.3 run under Python 2, if pytest is not found, please `python2 -m pip install "pytest<5"`
+In v1.3 run under Python 2, if pytest is not found, please `python2 -m pip
+install "pytest<5"`
 
 Or, in linux you can also use::
 
@@ -182,7 +184,7 @@ To start learning how to use pydicom, see the :doc:`pydicom_user_guide`.
 
 .. [#] For DICOM network capabilities see the
    `pynetdicom <https://github.com/pydicom/pynetdicom>`_ project.
-.. [#] If using python(x,y), other packages you might be interested in include IPython
-   (an indispensable interactive shell with auto-completion, history etc),
-   NumPy (optionally used by pydicom for pixel data), and ITK/VTK or PIL
+.. [#] If using python(x,y), other packages you might be interested in include
+   IPython (an indispensable interactive shell with auto-completion, history
+   etc), NumPy (optionally used by pydicom for pixel data), and ITK/VTK or PIL
    (image processing and visualization).

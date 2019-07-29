@@ -22,8 +22,8 @@ to the data elements via the the tags, as shown below.
   values of the dictionary, as opposed to the keys yielded by a ``dict``
   iterator.
 
-A ``Dataset`` could be created directly, but you will usually get one by reading
-an existing DICOM file::
+A ``Dataset`` could be created directly, but you will usually get one by
+reading an existing DICOM file::
 
   >>> import pydicom
   >>> from pydicom.data import get_testdata_files
@@ -65,9 +65,9 @@ returned, so the ``.value`` must be used to get the value.
 .. note::
 
     In pydicom, private data elements are displayed with square brackets
-    around the name (if the name is known to pydicom).  These are shown for convenience only;
-    the descriptive name in brackets cannot be used to retrieve data elements.
-    See details in :doc:`private_data_elements`.
+    around the name (if the name is known to pydicom).  These are shown for
+    convenience only; the descriptive name in brackets cannot be used to
+    retrieve data elements. See details in :doc:`private_data_elements`.
 
 You can also set values by name (DICOM keyword) or tag number::
 
@@ -120,9 +120,9 @@ can also use the tag numbers directly, such as::
   >>> ds[0x300a,0xb0][0][0x300a,0xc2].value
   'Field 1'
 
-If you don't remember or know the exact tag name (aka DICOM keyword), :class:`dataset.Dataset`
-provides a handy :func:`dataset.Dataset.dir` method, useful during interactive
-sessions at the Python prompt::
+If you don't remember or know the exact tag name (aka DICOM keyword),
+:class:`dataset.Dataset` provides a handy :func:`dataset.Dataset.dir` method,
+useful during interactive sessions at the Python prompt::
 
   >>> ds.dir("pat")
   ['PatientBirthDate', 'PatientID', 'PatientName', 'PatientSetupSequence', 'PatientSex']
@@ -137,9 +137,10 @@ have the specified string anywhere in the name (case insensitive).
 
 You can also see all the names that pydicom knows about by viewing the
 ``_dicom_dict.py`` file. It should not normally be necessary, but you can add
-your own entries to the DICOM dictionary at run time using :func:`datadict.add_dict_entries`
-or :func:`datadict.add_dict_entry`.  Similarly, you can add private data elements
-to the private dictionary using :func:`datadict.add_private_dict_entries` or
+your own entries to the DICOM dictionary at run time using
+:func:`datadict.add_dict_entries` or :func:`datadict.add_dict_entry`.
+Similarly, you can add private data elements to the private dictionary using
+:func:`datadict.add_private_dict_entries` or
 :func:`datadict.add_private_dict_entries`.
 
 Under the hood, :class:`dataset.Dataset` stores a DataElement object for each
@@ -176,8 +177,9 @@ To work with pixel data, the raw bytes are available through the usual tag::
   >>> ds = pydicom.dcmread(filename)
   >>> pixel_bytes = ds.PixelData
 
-but to work with them in a more intelligent way, use :func:`Dataset.pixel_array`
-(requires the `NumPy library <http://numpy.org>`_)::
+but to work with them in a more intelligent way, use
+:func:`Dataset.pixel_array` (requires the `NumPy library
+<http://numpy.org>`_)::
 
   >>> pix = ds.pixel_array
   >>> pix # doctest: +NORMALIZE_WHITESPACE
@@ -210,9 +212,9 @@ which stores the following things:
 Tag
 ---
 
-Tag is not generally used directly in user code, as Tags are automatically created
-when you assign or read data elements using the DICOM keywords as illustrated in
-sections above.
+Tag is not generally used directly in user code, as Tags are automatically
+created when you assign or read data elements using the DICOM keywords as
+illustrated in sections above.
 
 The Tag class is derived from Python's ``int``, so in effect, it is just
 a number with some extra behaviour:

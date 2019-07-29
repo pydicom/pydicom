@@ -870,7 +870,8 @@ class PersonName(PersonNameBase, bytes):
 
     The value is parsed into the following properties:
 
-    * single-byte, ideographic, and phonetic components (PS3.5-2008 6.2.1)
+    * single-byte, ideographic, and phonetic components (DICOM Standard, Part
+      5, :dcm:`Section 6.2.1<part05/sect_6.2.html#sect_6.2.1>`)
     * family_name, given_name, middle_name, name_prefix, name_suffix
     """
 

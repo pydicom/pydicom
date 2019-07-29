@@ -62,7 +62,7 @@ def get_frame_offsets(fp):
 
     References
     ----------
-    DICOM Standard Part 5, Annex A.4
+    DICOM Standard Part 5, :dcm:`Annex A.4 <part05/sect_A.4.html>`
     """
     if not fp.is_little_endian:
         raise ValueError("'fp.is_little_endian' must be True")
@@ -143,7 +143,7 @@ def generate_pixel_data_fragment(fp):
 
     References
     ----------
-    DICOM Standard Part 5, Annex A.4
+    DICOM Standard Part 5, :dcm:`Annex A.4 <part05/sect_A.4.html>`
     """
     if not fp.is_little_endian:
         raise ValueError("'fp.is_little_endian' must be True")
@@ -192,7 +192,7 @@ def generate_pixel_data_frame(bytestream):
 
     References
     ----------
-    DICOM Standard Part 5, Annex A
+    DICOM Standard Part 5, :dcm:`Annex A <part05/chapter_A.html>`
     """
     for fragmented_frame in generate_pixel_data(bytestream):
         yield b''.join(fragmented_frame)
@@ -239,7 +239,7 @@ def generate_pixel_data(bytestream):
 
     References
     ----------
-    DICOM Standard Part 5, Annex A
+    DICOM Standard Part 5, :dcm:`Annex A <part05/chapter_A.html>`
     """
     fp = DicomBytesIO(bytestream)
     fp.is_little_endian = True
@@ -411,7 +411,8 @@ def fragment_frame(frame, nr_fragments=1):
 
     References
     ----------
-    DICOM Standard, Part 5, Section 6.2 and Annex A.4
+    DICOM Standard, Part 5, :dcm:`Section 6.2 <part05/sect_6.2.html>` and
+    :dcm:`Annex A.4 <part05/sect_A.4.html>`
     """
     frame_length = len(frame)
     # Add 1 to fix odd length frames not being caught
@@ -497,7 +498,8 @@ def itemise_frame(frame, nr_fragments=1):
 
     References
     ----------
-    DICOM Standard, Part 5, Section 7.5 and Annex A.4
+    DICOM Standard, Part 5, :dcm:`Section 7.5 <part05/sect_7.5.html>` and
+    :dcm:`Annex A.4 <part05/sect_A.4.html>`
     """
     for fragment in fragment_frame(frame, nr_fragments):
         yield itemise_fragment(fragment)
@@ -545,7 +547,8 @@ def encapsulate(frames, fragments_per_frame=1, has_bot=True):
 
     References
     ----------
-    DICOM Standard, Part 5, Section 7.5 and Annex A.4
+    DICOM Standard, Part 5, :dcm:`Section 7.5 <part05/sect_7.5.html>` and
+    :dcm:`Annex A.4 <part05/sect_A.4.html>`
     """
     no_frames = len(frames)
     output = bytearray()

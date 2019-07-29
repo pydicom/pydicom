@@ -754,8 +754,8 @@ def dcmread(fp, defer_size=None, stop_before_pixels=False,
             force=False, specific_tags=None):
     """Read and parse a DICOM dataset stored in the DICOM File Format.
 
-    Read a DICOM dataset stored in accordance with the DICOM File Format
-    (DICOM Standard Part 10 Section 7). If the dataset is not stored in
+    Read a DICOM dataset stored in accordance with the :dcm:`DICOM File
+    Format <part10/chapter_7.html>`. If the dataset is not stored in
     accordance with the File Format (i.e. the preamble and prefix are missing,
     there are missing required Type 1 *File Meta Information Group* elements
     or the entire *File Meta Information* is missing) then you will have to

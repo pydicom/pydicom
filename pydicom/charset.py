@@ -373,8 +373,8 @@ def _decode_fragment(byte_str, encodings, delimiters):
         If `config.enforce_valid_values` is set and `value` could not be
         decoded with the given encodings.
 
-    Reference
-    ---------
+    References
+    ----------
     * DICOM Standard Part 5, Sections 6.1.2.4 and 6.1.2.5
     * DICOM Standard Part 3, Anex C.12.1.1.2
     """

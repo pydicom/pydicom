@@ -80,9 +80,10 @@ dicom`` will look like::
     File "<stdin>", line 1, in <module>
   ImportError: No module named dicom
 
-In this case you likely have installed pydicom >= 1.0, and so the ``dicom`` library
-does not exist.  You can simply ``import pydicom`` instead, and continue with
-the new pydicom, or, if you really need the old pydicom, then you should::
+In this case you likely have installed pydicom >= 1.0, and so the ``dicom``
+library does not exist.  You can simply ``import pydicom`` instead, and
+continue with the new pydicom, or, if you really need the old pydicom, then
+you should::
 
   pip install dicom
 
@@ -136,5 +137,5 @@ Removed functions and names
 Changed behavior
 ----------------
 
-  * ``dataset.save_as()``:  ``TransferSyntaxUID`` not added automatically to ``dataset.file_meta`` if
-    missing
+  * ``dataset.save_as()``:  ``TransferSyntaxUID`` not added automatically to
+    ``dataset.file_meta`` if missing
