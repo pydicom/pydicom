@@ -32,8 +32,11 @@ if [[ "$DISTRIB" == "conda" ]]; then
     MINICONDA_PATH=/home/travis/miniconda
     chmod +x miniconda.sh && ./miniconda.sh -b -p $MINICONDA_PATH
     export PATH=$MINICONDA_PATH/bin:$PATH
+    conda update --yes conda
     conda --version
-    # conda update --yes conda
+    # the free channel is needed for Python 3.4 and can probably be skipped
+    # after Python 3.4 is no longer used
+    conda config --set restore_free_channel true
 
     # Configure the conda environment and put it in the path using the
     # provided versions
