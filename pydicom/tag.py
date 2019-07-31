@@ -92,7 +92,7 @@ class Tag(TAG_CLASS):
         elif arg2:
             raise ValueError("`arg2` is not allowed with `fast=True`")
 
-        return int.__new__(cls, value)
+        return TAG_CLASS.__new__(cls, value)
 
     @staticmethod
     def _check_value(arg, arg2):
