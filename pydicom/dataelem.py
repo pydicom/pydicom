@@ -133,8 +133,13 @@ class DataElement(object):
     # should flag themselves as unhashable
     __hash__ = None
 
-    def __init__(self, tag, VR, value, file_value_tell=None,
-                 is_undefined_length=False, already_converted=False):
+    def __init__(self,
+                 tag,
+                 VR,
+                 value,
+                 file_value_tell=None,
+                 is_undefined_length=False,
+                 already_converted=False):
         """Create a new :class:`DataElement`.
 
         Parameters

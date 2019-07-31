@@ -12,7 +12,7 @@ Data* to an :class:`numpy.ndarray`.
 **Supported data**
 
 The numpy handler supports the conversion of data in the (7fe0,0010)
-*Pixel Data* element to an :class:`~numpy.ndarray` provided the
+*Pixel Data* element to a :class:`~numpy.ndarray` provided the
 related Image Pixel module elements have values given in the table below.
 
 +------------------------------------------------+--------------+----------+

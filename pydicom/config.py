@@ -48,7 +48,7 @@ def DS_decimal(use_Decimal_boolean=True):
     Parameters
     ----------
     use_Decimal_boolean : bool
-        ``True`` to derive :class:`DS<pydicom.valuerep.DS>` from
+        ``True`` to derive :class:`~pydicom.valuerep.DS` from
         :class:`decimal.Decimal`, ``False`` to derive it from :class:`float`.
     """
     use_DS_decimal = use_Decimal_boolean
@@ -109,7 +109,7 @@ pixel_data_handlers = [
 .. currentmodule:: pydicom.dataset
 
 This is an ordered list of *Pixel Data* handlers that the
-:meth:`~Dataset.convert_pixel_data()` method will use to try to extract a
+:meth:`~Dataset.convert_pixel_data` method will use to try to extract a
 correctly sized numpy array from the *Pixel Data* element.
 
 Handlers shall have four methods:

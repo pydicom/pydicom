@@ -104,7 +104,7 @@ class PrivateBlock(object):
         Parameters
         ----------
         element_offset : int
-            The lower 16-bit (e.g. 2 hex numbers) of the element tag.
+            The lower 16-bits (e.g. 2 hex numbers) of the element tag.
 
         Returns
         -------
@@ -133,7 +133,7 @@ class PrivateBlock(object):
         Parameters
         ----------
         element_offset : int
-            The lower 16-bit (e.g. 2 hex numbers) of the element tag.
+            The lower 16-bits (e.g. 2 hex numbers) of the element tag.
 
         Returns
         -------
@@ -155,7 +155,7 @@ class PrivateBlock(object):
         Parameters
         ----------
         element_offset : int
-            The lower 16-bit (e.g. 2 hex numbers) of the element tag
+            The lower 16-bits (e.g. 2 hex numbers) of the element tag
             to be deleted.
 
         Raises
@@ -177,7 +177,7 @@ class PrivateBlock(object):
         Parameters
         ----------
         element_offset : int
-            The lower 16-bit (e.g. 2 hex numbers) of the element tag
+            The lower 16-bits (e.g. 2 hex numbers) of the element tag
             to be added.
         VR : str
             The 2 character DICOM value representation.
@@ -209,7 +209,7 @@ class Dataset(dict):
 
     .. note::
 
-        :class:`Dataset` is derived from :class:`dict` only to make it work in
+        :class:`Dataset` is only derived from :class:`dict` to make it work in
         a NumPy :class:`~numpy.ndarray`. The parent :class:`dict` class
         is never called, as all :class:`dict` methods are overridden.
 
@@ -446,8 +446,8 @@ class Dataset(dict):
         -------
         dataelem.DataElement or None
             For the given DICOM element `keyword`, return the corresponding
-            :class:`~pydicom.dataelem.DataElement` if present,
-            ``None`` otherwise.
+            :class:`~pydicom.dataelem.DataElement` if present, ``None``
+            otherwise.
         """
         tag = tag_for_keyword(name)
         # Test against None as (0000,0000) is a possible tag
@@ -1621,7 +1621,7 @@ class Dataset(dict):
         ----------
         enforce_standard : bool, optional
             If ``True``, a check for incorrect and missing elements is
-            performed (see :func:`validate_file_meta()<validate_file_meta>`).
+            performed (see :func:`~validate_file_meta`).
         """
         self.ensure_file_meta()
 
@@ -1841,8 +1841,8 @@ class Dataset(dict):
         types of elements.
 
         For example,
-        :meth:`remove_private_tags()<Dataset.remove_private_tags>` finds all
-        elements with private tags and deletes them.
+        :meth:`~Dataset.remove_private_tags` finds all elements with private
+        tags and deletes them.
 
         The elements will be returned in order of increasing tag number within
         their current :class:`Dataset`.
@@ -2004,8 +2004,13 @@ class FileDataset(Dataset):
         from, ``None`` if the modification time is not available.
     """
 
-    def __init__(self, filename_or_obj, dataset, preamble=None, file_meta=None,
-                 is_implicit_VR=True, is_little_endian=True):
+    def __init__(self,
+                 filename_or_obj,
+                 dataset,
+                 preamble=None,
+                 file_meta=None,
+                 is_implicit_VR=True,
+                 is_little_endian=True):
         """Initialize a :class:`FileDataset` read from a DICOM file.
 
         Parameters

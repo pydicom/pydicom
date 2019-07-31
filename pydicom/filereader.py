@@ -65,7 +65,7 @@ def data_element_generator(fp,
     VR : str or None
         ``None`` if implicit VR, otherwise the VR read from the file.
     length : int
-        The length as in the DICOM data element (could be DICOM "undefined
+        The length of the DICOM data element (could be DICOM "undefined
         length" ``0xffffffffL``)
     value_bytes : bytes or str
         The raw bytes from the DICOM file (not parsed into python types)

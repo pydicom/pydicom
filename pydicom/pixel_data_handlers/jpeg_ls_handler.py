@@ -1,7 +1,7 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """
 Use the `jpeg_ls (CharPyLS) <https://github.com/Who8MyLunch/CharPyLS>`_ Python
-package to decode pixel transfer syntaxes.
+package to decode *Pixel Data*.
 """
 
 try:

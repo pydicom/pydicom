@@ -8,12 +8,17 @@ from pydicom.dataset import FileDataset
 class DicomDir(FileDataset):
     """Hold a DICOMDIR dataset read from file.
 
-    Derived from :class:`FileDataset <pydicom.dataset.FileDataset>`, but
-    additional methods are available, specific to the Directory structure
+    Derived from :class:`~pydicom.dataset.FileDataset`, but additional methods
+    are available, specific to the Directory structure
     """
 
-    def __init__(self, filename_or_obj, dataset, preamble=None, file_meta=None,
-                 is_implicit_VR=True, is_little_endian=True):
+    def __init__(self,
+                 filename_or_obj,
+                 dataset,
+                 preamble=None,
+                 file_meta=None,
+                 is_implicit_VR=True,
+                 is_little_endian=True):
         """Initialize a DICOMDIR dataset read from a DICOM file.
 
         Carries forward all the initialization from

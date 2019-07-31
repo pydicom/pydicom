@@ -87,6 +87,10 @@ extlinks = {
         'http://dicom.nema.org/medical/dicom/current/output/chtml/%s',
         None
     ),
+    'gh': (
+        'https://github.com/pydicom/%s',
+        None
+    ),
 }
 
 # intersphinx configuration

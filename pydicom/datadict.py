@@ -300,7 +300,7 @@ def dictionary_VR(tag):
     Parameters
     ----------
     tag : int
-        The tag for the element whose value represenation (VR) is being
+        The tag for the element whose value representation (VR) is being
         retrieved.
 
     Returns
@@ -575,7 +575,7 @@ def private_dictionary_VR(tag, private_creator):
     Parameters
     ----------
     tag : int
-        The tag for the element whose value represenation (VR) is being
+        The tag for the element whose value representation (VR) is being
         retrieved.
     private_creator : str
         The name of the private creator.

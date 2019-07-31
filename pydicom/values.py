@@ -609,7 +609,7 @@ def convert_value(VR, raw_data_element, encodings=None):
                 continue
             try:
                 value = convert_value(vr, raw_data_element, encodings)
-                logger.debug('conveconfig.rted value for tag %s with VR %s'
+                logger.debug('converted value for tag %s with VR %s'
                              % (raw_data_element.tag, vr))
                 break
             except Exception:

@@ -89,8 +89,11 @@ def find_bytes(fp, bytes_to_find, read_size=128, rewind=True):
     return found_at
 
 
-def read_undefined_length_value(fp, is_little_endian, delimiter_tag,
-                                defer_size=None, read_size=1024*8):
+def read_undefined_length_value(fp,
+                                is_little_endian,
+                                delimiter_tag,
+                                defer_size=None,
+                                read_size=1024*8):
     """Read until `delimiter_tag` and return the value up to that point.
 
     On completion, the file will be set to the first byte after the delimiter
