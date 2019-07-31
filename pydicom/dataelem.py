@@ -36,7 +36,10 @@ if not in_py2:
 
 
 def isMultiValue(value):
-    """Return True if `value` is list-like (iterable), False otherwise."""
+    """Return True if `value` is list-like (iterable), False otherwise.
+
+    **This function is deprecated and will be removed in v1.4**
+    """
     msg = 'isMultiValue is deprecated.  Use DataElement.VM instead'
     warnings.warn(msg, DeprecationWarning)
     if isinstance(value, compat.char_types):
@@ -65,13 +68,13 @@ class DataElement(object):
     --------
 
     While its possible to create a new :class:`DataElement` directly and add
-    it to a :class:`Dataset<pydicom.dataset.Dataset>`:
+    it to a :class:`~pydicom.dataset.Dataset`:
 
     >>> elem = DataElement(0x00100010, 'PN', 'CITIZEN^Joan')
     >>> ds = Dataset()
     >>> ds.add(elem)
 
-    Its far more convenient to use a :class:`Dataset<pydicom.dataset.Dataset>`
+    Its far more convenient to use a :class:`~pydicom.dataset.Dataset`
     to add a new :class:`DataElement`, as the VR and tag are determined
     automatically from the DICOM dictionary:
 
@@ -111,7 +114,7 @@ class DataElement(object):
     showVR : bool
         For string display, include the element's VR just before it's value
         (default ``True``).
-    tag : pydicom.tag.BaseTag
+    tag : BaseTag
         The element's tag.
     value
         The element's stored value(s).
@@ -136,9 +139,9 @@ class DataElement(object):
 
         Parameters
         ----------
-        tag
+        tag : int or or str or list or tuple
             The DICOM (group, element) tag in any form accepted by
-            :func:`Tag()<pydicom.tag.Tag>` such as ``[0x0010, 0x0010]``,
+            :func:`~pydicom.tag.Tag` such as ``[0x0010, 0x0010]``,
             ``(0x10, 0x10)``, ``0x00100010``, etc.
         VR : str
             The 2 character DICOM value representation (see DICOM Standard,
@@ -152,7 +155,7 @@ class DataElement(object):
             * a multi-value string with backslash separator
 
         file_value_tell : int or None
-            Used internally by :class:`Dataset<pydicom.dataset.Dataset>` to
+            Used internally by :class:`~pydicom.dataset.Dataset` to
             store the write position for the ``ReplaceDataElementValue()``
             method. Default is ``None``.
         is_undefined_length : bool
@@ -193,7 +196,7 @@ class DataElement(object):
         ----------
         dataset_class : Dataset derived class
             Class used to create sequence items.
-        tag : tag.BaseTag
+        tag : BaseTag
             The data element tag.
         vr : str
             The data element value representation.
@@ -209,7 +212,7 @@ class DataElement(object):
 
         Returns
         -------
-        dataelem.DataElement
+        DataElement
         """
         # TODO: test wado-rs retrieve wrapper
         try:
@@ -651,7 +654,7 @@ def DataElement_from_raw(raw_data_element, encoding=None):
 
     Returns
     -------
-    dataelem.DataElement
+    DataElement
     """
     # XXX buried here to avoid circular import
     # filereader->Dataset->convert_value->filereader

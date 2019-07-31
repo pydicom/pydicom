@@ -44,7 +44,7 @@ def get_frame_offsets(fp):
 
     Parameters
     ----------
-    fp : pydicom.filebase.DicomBytesIO
+    fp : filebase.DicomBytesIO
         The encapsulated pixel data positioned at the start of the Basic Offset
         Table. ``fp.is_little_endian`` should be set to ``True``.
 
@@ -62,7 +62,7 @@ def get_frame_offsets(fp):
 
     References
     ----------
-    DICOM Standard Part 5, :dcm:`Annex A.4 <part05/sect_A.4.html>`
+    DICOM Standard, Part 5, :dcm:`Annex A.4 <part05/sect_A.4.html>`
     """
     if not fp.is_little_endian:
         raise ValueError("'fp.is_little_endian' must be True")
@@ -125,7 +125,7 @@ def generate_pixel_data_fragment(fp):
 
     Parameters
     ----------
-    fp : pydicom.filebase.DicomBytesIO
+    fp : filebase.DicomBytesIO
         The encoded (7fe0,0010) *Pixel Data* element value, positioned at the
         start of the item tag for the first item after the Basic Offset Table
         item. ``fp.is_little_endian`` should be set to ``True``.
@@ -324,7 +324,7 @@ def read_item(fp):
 
     Parameters
     ----------
-    fp : pydicom.filebase.DicomIO
+    fp : filebase.DicomIO
         The file-like to read the item from.
 
     Returns

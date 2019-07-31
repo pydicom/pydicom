@@ -88,7 +88,7 @@ Short code should use the double-apostrophe markup:
 
 If ``True`` then the value is determined from ``a + b = c``.
 
-Elements should follow the DICOM convention of *Name of Element* (gggg,eeee)
+Elements should follow the style (gggg,eeee) *Name of Element* 
 
 Tags should follow the DICOM convention of (gggg,eeee), i.e. as (0010,0020)
 not as (0010, 0020)
@@ -102,7 +102,7 @@ Short code should use the double-apostrophe markup:
 
 If ``True`` then the value is determined from ``a + b = c``.
 
-Elements should follow the style (gggg,eeee) *Name of Element* 
+Elements should follow the style (gggg,eeee) *Name of Element*
 
 Tags should follow the DICOM convention of (gggg,eeee), i.e. as (0010,0020)
 not as (0010, 0020)

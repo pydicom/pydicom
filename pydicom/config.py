@@ -16,26 +16,22 @@ Default ``False``.
 
 data_element_callback = None
 """Set to a callable function to be called from
-:meth:`dcmread()<pydicom.filereader.dcmread>` every time a
-:class:`RawDataElement<pydicom.dataelem.RawDataElement>` has been returned,
-before it is added to the dataset.
+:func:`~pydicom.filereader.dcmread` every time a
+:class:`~pydicom.dataelem.RawDataElement` has been returned,
+before it is added to the :class:`~pydicom.dataset.Dataset`.
 
 Default ``None``.
 """
 
 data_element_callback_kwargs = {}
-"""Set this to use as keyword arguments passed to
-:func:`data_element_callback()<pydicom.config.data_element_callback>`.
+"""Set the keyword arguments passed to :func:`data_element_callback`.
 
 Default ``{}``.
 """
 
 
 def reset_data_element_callback():
-    """Reset the
-    :func:`data_element_callback()<pydicom.config.data_element_callback>`
-    function to the default.
-    """
+    """Reset the :func:`data_element_callback` function to the default."""
     global data_element_callback
     global data_element_callback_kwargs
     data_element_callback = None
@@ -43,7 +39,8 @@ def reset_data_element_callback():
 
 
 def DS_decimal(use_Decimal_boolean=True):
-    """Set DS class to be derived from Decimal or :class:`float`.
+    """Set DS class to be derived from :class:`decimal.Decimal` or
+    class:`float`.
 
     If this function is never called, the default in *pydicom* >= 0.9.8
     is for DS to be based on :class:`float`.
@@ -64,7 +61,7 @@ def DS_decimal(use_Decimal_boolean=True):
 
 # Configuration flags
 allow_DS_float = False
-"""Set to ``True`` to allow  :class:`DSdecimal <pydicom.valuerep.DSdecimal>`
+"""Set to ``True`` to allow :class:`~pydicom.valuerep.DSdecimal`
 instances to be created using :class:`floats<float>`; otherwise, they must be
 explicitly converted to :class:`str`, with the user explicity setting the
 precision of digits and rounding.
@@ -73,7 +70,7 @@ Default ``False``.
 """
 
 enforce_valid_values = False
-"""Raise exceptions if any value is not allowed by DICOM standard.
+"""Raise exceptions if any value is not allowed by DICOM Standard.
 
 e.g. DS strings that are longer than 16 characters; IS strings outside
 the allowed range.
@@ -112,9 +109,8 @@ pixel_data_handlers = [
 .. currentmodule:: pydicom.dataset
 
 This is an ordered list of *Pixel Data* handlers that the
-:meth:`Dataset.convert_pixel_data()<Dataset.convert_pixel_data>`
-method will use to try to extract a correctly sized numpy array from the
-*Pixel Data* element.
+:meth:`~Dataset.convert_pixel_data()` method will use to try to extract a
+correctly sized numpy array from the *Pixel Data* element.
 
 Handlers shall have four methods:
 
@@ -127,7 +123,7 @@ def is_available():
     otherwise.
 
 def get_pixeldata(ds):
-    Return a correctly sized numpy 1D :class:`numpy.ndarray` derived from the
+    Return a correctly sized 1D :class:`numpy.ndarray` derived from the
     *Pixel Data* in :class:`Dataset` `ds` or raise an exception. Reshaping the
     returned array to the correct dimensions is handled automatically.
 

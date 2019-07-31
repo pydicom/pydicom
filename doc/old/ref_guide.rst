@@ -12,7 +12,7 @@ File Reading/Parsing
 The main function to read and parse DICOM files using *pydicom* is
 :meth:`dcmread() <pydicom.filereader.dcmread>`.
 It is coded in the module ``pydicom.filereader``, but is also imported when
-the pydicom package is imported
+the ``pydicom`` package is imported
 
   ::
 

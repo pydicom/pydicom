@@ -17,7 +17,7 @@ def convert_color_space(arr, current, desired):
     ----------
     arr : numpy.ndarray
         The image(s) as a :class:`numpy.ndarray` with
-        :attr:`shape<numpy.ndarray.shape>` (frames, rows, columns, planes)
+        :attr:`~numpy.ndarray.shape` (frames, rows, columns, planes)
         or (rows, columns, planes).
     current : str
         The current color space, should be a valid value for (0028,0004)
@@ -66,7 +66,7 @@ def dtype_corrected_for_endianness(is_little_endian, numpy_dtype):
     Parameters
     ----------
     is_little_endian : bool
-        The endianess of the affected :class:`Dataset`.
+        The endianess of the affected :class:`~pydicom.dataset.Dataset`.
     numpy_dtype : numpy.dtype
         The numpy data type used for the *Pixel Data* without considering
         endianess.
@@ -109,9 +109,9 @@ def pixel_dtype(ds):
 
     Parameters
     ----------
-    ds : dataset.Dataset
-        The :class:`Dataset` containing the *Pixel Data* you wish to get the
-        data type for.
+    ds : Dataset
+        The :class:`~pydicom.dataset.Dataset` containing the *Pixel Data* you
+        wish to get the data type for.
 
     Returns
     -------
@@ -232,8 +232,8 @@ def reshape_pixel_array(ds, arr):
     Parameters
     ----------
     ds : dataset.Dataset
-        The :class:`Dataset` containing the Image Pixel module corresponding
-        to the data in `arr`.
+        The :class:`~pydicom.dataset.Dataset` containing the Image Pixel module
+        corresponding to the data in `arr`.
     arr : numpy.ndarray
         The 1D array containing the pixel data.
 
@@ -348,9 +348,9 @@ def get_expected_length(ds, unit='bytes'):
 
     Parameters
     ----------
-    ds : dataset.Dataset
-        The :class:`Dataset` containing the Image Pixel module and *Pixel
-        Data*.
+    ds : Dataset
+        The :class:`~pydicom.dataset.Dataset` containing the Image Pixel module
+        and *Pixel Data*.
     unit : str, optional
         If ``'bytes'`` then returns the expected length of the *Pixel Data* in
         whole bytes and NOT including an odd length trailing NULL padding

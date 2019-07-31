@@ -94,7 +94,7 @@ def create_data_element(dicom_dataset):
     Parameters
     ----------
     dicom_dataset : dataset.Dataset
-        The :class:`Dataset<pydicom.dataset.Dataset>` containing the *Pixel
+        The :class:`~pydicom.dataset.Dataset` containing the *Pixel
         Data*.
 
     Returns
@@ -130,7 +130,7 @@ def create_image(dicom_dataset, data_element):
     Parameters
     ----------
     dicom_dataset : dataset.Dataset
-        The :class:`Dataset<pydicom.dataset.Dataset>` containing the Image
+        The :class:`~pydicom.dataset.Dataset` containing the Image
         Pixel module.
     data_element : gdcm.DataElement
         The ``gdcm.DataElement`` *Pixel Data* element.

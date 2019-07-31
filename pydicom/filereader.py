@@ -319,7 +319,8 @@ def _is_implicit_vr(fp, implicit_vr_is_assumed, is_little_endian, stop_when):
 def read_dataset(fp, is_implicit_VR, is_little_endian, bytelength=None,
                  stop_when=None, defer_size=None,
                  parent_encoding=default_encoding, specific_tags=None):
-    """Return a Dataset instance containing the next dataset in the file.
+    """Return a :class:`~pydicom.dataset.Dataset` instance containing the next
+    dataset in the file.
 
     Parameters
     ----------
@@ -334,7 +335,7 @@ def read_dataset(fp, is_implicit_VR, is_little_endian, bytelength=None,
         number of bytes to read
     stop_when : None, optional
         Optional call_back function which can terminate reading. See help for
-        ``data_element_generator`` for details
+        :func:`data_element_generator` for details
     defer_size : int, None, optional
         Size to avoid loading large elements in memory. See :func:`dcmread` for
         more parameter info.
@@ -420,7 +421,7 @@ def read_sequence(fp, is_implicit_VR, is_little_endian, bytelength, encoding,
 def read_sequence_item(fp, is_implicit_VR, is_little_endian, encoding,
                        offset=0):
     """Read and return a single sequence item, i.e. a
-    :class:`Dataset<pydicom.dataset.Dataset>`.
+    :class:`~pydicom.dataset.Dataset`.
     """
     seq_item_tell = fp.tell() + offset
     if is_little_endian:
@@ -477,7 +478,7 @@ def _read_command_set_elements(fp):
 
     Returns
     -------
-    pydicom.dataset.Dataset
+    dataset.Dataset
         The command set elements as a Dataset instance. May be empty if no
         command set elements are present.
     """
@@ -507,7 +508,7 @@ def _read_file_meta_info(fp):
 
     Returns
     -------
-    pydicom.dataset.Dataset
+    dataset.Dataset
         The File Meta elements as a Dataset instance. May be empty if no
         File Meta are present.
     """
@@ -794,8 +795,8 @@ def dcmread(fp, defer_size=None, stop_before_pixels=False,
     Returns
     -------
     FileDataset
-        An instance of :class:`FileDataset<pydicom.dataset.FileDataset>` that
-        represents a parsed DICOM file.
+        An instance of :class:`~pydicom.dataset.FileDataset` that represents
+        a parsed DICOM file.
 
     Raises
     ------
@@ -871,9 +872,9 @@ read_file = dcmread  # used read_file until pydicom 1.0. Kept for compatibility
 
 
 def read_dicomdir(filename="DICOMDIR"):
-    """Read a DICOMDIR file and return a DicomDir instance.
+    """Read a DICOMDIR file and return a :class:`~pydicom.dicomdir.DicomDir`.
 
-    This is a wrapper around dcmread, which gives a default file name.
+    This is a wrapper around :func:`dcmread` which gives a default file name.
 
     Parameters
     ----------

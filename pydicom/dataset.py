@@ -210,7 +210,7 @@ class Dataset(dict):
     .. note::
 
         :class:`Dataset` is derived from :class:`dict` only to make it work in
-        a NumPy :class:`ndarray<numpy.ndarray>`. The parent :class:`dict` class
+        a NumPy :class:`~numpy.ndarray`. The parent :class:`dict` class
         is never called, as all :class:`dict` methods are overridden.
 
     Examples
@@ -251,7 +251,7 @@ class Dataset(dict):
     >>> ds.BeamSequence[1].Manufacturer
     'Linac and Sons, co.'
 
-    Accessing the :class:`DataElement<pydicom.dataelem.DataElement>` items:
+    Accessing the :class:`~pydicom.dataelem.DataElement` items:
 
     >>> elem = ds['PatientName']
     >>> elem
@@ -263,7 +263,7 @@ class Dataset(dict):
     >>> elem
     (0010, 0010) Patient's Name                      PN: 'CITIZEN^John'
 
-    Accessing a private :class:`DataElement<pydicom.dataelem.DataElement>`
+    Accessing a private :class:`~pydicom.dataelem.DataElement`
     item:
 
     >>> block = ds.private_block(0x0041, 'My Creator')
@@ -404,7 +404,7 @@ class Dataset(dict):
         Parameters
         ----------
         data_element : dataelem.DataElement
-            The :class:`DataElement<pydicom.dataelem.DataElement>` to add.
+            The :class:`~pydicom.dataelem.DataElement` to add.
         """
         self[data_element.tag] = data_element
 
@@ -415,7 +415,7 @@ class Dataset(dict):
         ----------
         tag
             The DICOM (group, element) tag in any form accepted by
-            :func:`Tag()<pydicom.tag.Tag>` such as ``[0x0010, 0x0010]``,
+            :func:`~pydicom.tag.Tag` such as ``[0x0010, 0x0010]``,
             ``(0x10, 0x10)``, ``0x00100010``, etc.
         VR : str
             The 2 character DICOM value representation (see DICOM Standard,
@@ -446,7 +446,7 @@ class Dataset(dict):
         -------
         dataelem.DataElement or None
             For the given DICOM element `keyword`, return the corresponding
-            :class:`DataElement<pydicom.dataelem.DataElement>` if present,
+            :class:`~pydicom.dataelem.DataElement` if present,
             ``None`` otherwise.
         """
         tag = tag_for_keyword(name)
@@ -524,7 +524,7 @@ class Dataset(dict):
         >>> ds.some_attribute = True
 
         If `name` is a DICOM keyword - delete the corresponding
-        :class:`DataElement<pydicom.dataelem.DataElement>`
+        :class:`~pydicom.dataelem.DataElement`
 
         >>> del ds.PatientName
         >>> 'PatientName' in ds
@@ -558,7 +558,7 @@ class Dataset(dict):
 
         Examples
         --------
-        Indexing using :class:`DataElement<pydicom.dataelem.DataElement>` tag
+        Indexing using :class:`~pydicom.dataelem.DataElement` tag
 
         >>> ds = Dataset()
         >>> ds.CommandGroupLength = 100
@@ -567,7 +567,7 @@ class Dataset(dict):
         >>> ds
         (0010, 0010) Patient's Name                      PN: 'CITIZEN^Jan'
 
-        Slicing using :class:`DataElement<pydicom.dataelem.DataElement>` tag
+        Slicing using :class:`~pydicom.dataelem.DataElement` tag
 
         >>> ds = Dataset()
         >>> ds.CommandGroupLength = 100
@@ -673,7 +673,7 @@ class Dataset(dict):
 
         Parameters
         ----------
-        key : str or pydicom.tag.Tag
+        key : str or int or BaseTag
             The element keyword or tag or the class attribute name to get.
         default : obj or None, optional
             If the element or class attribute is not present, return
@@ -686,7 +686,7 @@ class Dataset(dict):
             then return the element's value.
         dataelem.DataElement
             If `key` is a tag for a element in the :class:`Dataset` then
-            return the :class:`DataElement<pydicom.dataelem.DataElement>`
+            return the :class:`~pydicom.dataelem.DataElement`
             instance.
         value
             If `key` is a class attribute then return its value.
@@ -715,8 +715,8 @@ class Dataset(dict):
         Returns
         -------
         dict_items
-            The top-level (:class:`BaseTag<pydicom.tag.BaseTag>`,
-            :class:`DataElement<pydicom.dataelem.DataElement>`) items for the
+            The top-level (:class:`~pydicom.tag.BaseTag`,
+            :class:`~pydicom.dataelem.DataElement`) items for the
             :class:`Dataset`.
         """
         return self._dict.items()
@@ -727,7 +727,7 @@ class Dataset(dict):
         Returns
         -------
         dict_keys
-            The :class:`BaseTags<pydicom.tag.BaseTag>` of all the elements in
+            The :class:`~pydicom.tag.BaseTag` of all the elements in
             the :class:`Dataset`.
         """
         return self._dict.keys()
@@ -808,7 +808,7 @@ class Dataset(dict):
 
         Examples
         --------
-        Indexing using :class:`DataElement<pydicom.dataelem.DataElement>` tag
+        Indexing using :class:`~pydicom.dataelem.DataElement` tag
 
         >>> ds = Dataset()
         >>> ds.SOPInstanceUID = '1.2.3'
@@ -833,15 +833,15 @@ class Dataset(dict):
         ----------
         key
             The DICOM (group, element) tag in any form accepted by
-            :meth:`Tag()<pydicom.tag.Tag>` such as ``[0x0010, 0x0010]``,
+            :func:`~pydicom.tag.Tag` such as ``[0x0010, 0x0010]``,
             ``(0x10, 0x10)``, ``0x00100010``, etc. May also be a :class:`slice`
             made up of DICOM tags.
 
         Returns
         -------
-        pydicom.dataelem.DataElement or pydicom.dataset.Dataset
+        dataelem.DataElement or Dataset
             If a single DICOM element tag is used then returns the
-            corresponding :class:`DataElement<pydicom.dataelem.DataElement>`.
+            corresponding :class:`~pydicom.dataelem.DataElement`.
             If a :class:`slice` is used then returns a :class:`Dataset` object
             containing the corresponding
             :class:`DataElements<pydicom.dataelem.DataElement>`.
@@ -1034,7 +1034,7 @@ class Dataset(dict):
         ----------
         key
             The DICOM (group, element) tag in any form accepted by
-            :func:`Tag()<pydicom.tag.Tag>` such as ``[0x0010, 0x0010]``,
+            :func:`~pydicom.tag.Tag` such as ``[0x0010, 0x0010]``,
             ``(0x10, 0x10)``, ``0x00100010``, etc. May also be a :class:`slice`
             made up of DICOM tags.
 
@@ -1108,7 +1108,7 @@ class Dataset(dict):
 
         Returns
         -------
-        dataset.Dataset
+        Dataset
             A :class:`Dataset` containing elements of the group specified.
         """
         return self[(group, 0x0000):(group + 1, 0x0000)]
@@ -1125,7 +1125,7 @@ class Dataset(dict):
 
         The :class:`DataElements<pydicom.dataelem.DataElement>` are returned in
         increasing tag value order. Sequence items are returned as a single
-        :class:`DataElement<pydicom.dataelem.DataElement>`, so it is up
+        :class:`~pydicom.dataelem.DataElement`, so it is up
         to the calling code to recurse into the Sequence items if desired.
 
         Yields
@@ -1241,7 +1241,7 @@ class Dataset(dict):
         default : type, optional
             The default value that is inserted and returned if no data
             element exists for the given key. If it is not of type
-            :class:`DataElement<pydicom.dataelem.DataElement>`, one will be
+            :class:`~pydicom.dataelem.DataElement`, one will be
             constructed instead for the given tag and `default` as value.
             This is only possible for known tags (e.g. tags found via the
             dictionary lookup).
@@ -1250,8 +1250,8 @@ class Dataset(dict):
         -------
         type
             The data element for `key` if it exists, or the default value if
-            it is a :class:`DataElement<pydicom.dataelem.DataElement>` or
-            ``None``, or a :class:`DataElement<pydicom.dataelem.DataElement>`
+            it is a :class:`~pydicom.dataelem.DataElement` or
+            ``None``, or a :class:`~pydicom.dataelem.DataElement`
             constructed with `default` as value.
 
         Raises
@@ -1259,7 +1259,7 @@ class Dataset(dict):
         KeyError
             If the `key` is not a valid tag or keyword.
             If no tag exists for `key`, default is not a
-            :class:`DataElement<pydicom.dataelem.DataElement>` and not
+            :class:`~pydicom.dataelem.DataElement` and not
             ``None``, and `key` is not a known DICOM tag.
         """
         if key in self:
@@ -1391,8 +1391,7 @@ class Dataset(dict):
 
         - ``Dataset.file_meta.TransferSyntaxUID`` is updated to non-compressed
           form
-        - :func:`is_undefined_length
-          <pydicom.dataelem.DataElement.is_undefined_length>`
+        - :func:`~pydicom.dataelem.DataElement.is_undefined_length`
           is ``False`` for the (7fe0,0010) *Pixel Data* element.
 
         Returns
@@ -1457,12 +1456,12 @@ class Dataset(dict):
         element_format : str
             The string format to use for non-sequence elements. Formatting uses
             the attributes of
-            :class:`DataElement<pydicom.dataelem.DataElement>`. Default is
+            :class:`~pydicom.dataelem.DataElement`. Default is
             ``"%(tag)s %(name)-35.35s %(VR)s: %(repval)s"``.
         sequence_element_format : str
             The string format to use for sequence elements. Formatting uses
             the attributes of
-            :class:`DataElement<pydicom.dataelem.DataElement>`. Default is
+            :class:`~pydicom.dataelem.DataElement`. Default is
             ``"%(tag)s %(name)-35.35s %(VR)s: %(repval)s"``
         indent_format : str or None
             Placeholder for future functionality.
@@ -1554,9 +1553,8 @@ class Dataset(dict):
         so requires that the ``Dataset.file_meta`` attribute
         exists and contains a :class:`Dataset` with the required (Type 1) *File
         Meta Information Group* elements (see
-        :func:`dcmwrite()<pydicom.filewriter.dcmwrite>` and
-        :func:`write_file_meta_info()<pydicom.filewriter.write_file_meta_info>`
-        for more information).
+        :func:`~pydicom.filewriter.dcmwrite` and
+        :func:`~pydicom.filewriter.write_file_meta_info` for more information).
 
         If `write_like_original` is ``True`` then the :class:`Dataset` will be
         written as is (after minimal validation checking) and may or may not
@@ -1739,16 +1737,16 @@ class Dataset(dict):
         ----------
         start : int or 2-tuple of int or None
             The slice's starting element tag value, in any format accepted by
-            :meth:`Tag <pydicom.tag.Tag>`.
+            :func:`~pydicom.tag.Tag`.
         stop : int or 2-tuple of int or None
             The slice's stopping element tag value, in any format accepted by
-            :meth:`Tag <pydicom.tag.Tag>`.
+            :func:`~pydicom.tag.Tag`.
         step : int or None
             The slice's step size.
 
         Returns
         ------
-        list of tag.BaseTag
+        list of BaseTag
             The tags in the :class:`Dataset` that meet the conditions of the
             slice.
         """
@@ -1838,7 +1836,7 @@ class Dataset(dict):
 
         Visit all elements in the :class:`Dataset`, possibly recursing into
         sequences and their items. The `callback` function is called for each
-        :class:`DataElement<pydicom.dataelem.DataElement>` (including elements
+        :class:`~pydicom.dataelem.DataElement` (including elements
         with a VR of 'SQ'). Can be used to perform an operation on certain
         types of elements.
 
@@ -1855,7 +1853,7 @@ class Dataset(dict):
             A callable function that takes two arguments:
 
             * a :class:`Dataset`
-            * a :class:`DataElement<pydicom.dataelem.DataElement>` belonging
+            * a :class:`~pydicom.dataelem.DataElement` belonging
               to that :class:`Dataset`
 
         recursive : bool, optional
@@ -1897,7 +1895,7 @@ class Dataset(dict):
 
         Returns
         -------
-        dataset.Dataset
+        Dataset
         """
         if not isinstance(json_dataset, dict):
             json_dataset = json.loads(json_dataset)
@@ -1938,7 +1936,8 @@ class Dataset(dict):
             "vr" key and either the "InlineBinary" or the "BulkDataURI" key).
         dump_handler : callable, optional
             Callable function that accepts a :class:`dict` and returns the
-            serialized (dumped) JSON string (by default uses ``json.dumps()``).
+            serialized (dumped) JSON string (by default uses
+            :func:`json.dumps`).
 
         Returns
         -------
@@ -1985,7 +1984,7 @@ class FileDataset(Dataset):
     preamble : str or bytes or None
         The optional DICOM preamble prepended to the :class:`FileDataset`, if
         available.
-    file_meta : pydicom.dataset.Dataset or None
+    file_meta : Dataset or None
         The Dataset's file meta information as a :class:`Dataset`, if available
         (``None`` if not present). Consists of group ``0x0002`` elements.
     filename : str or None
@@ -2016,13 +2015,12 @@ class FileDataset(Dataset):
             ``None`` if is a :class:`io.BytesIO`.
         dataset : Dataset or dict
             Some form of dictionary, usually a :class:`Dataset` returned from
-            :func:`dcmread()<pydicom.filereader.dcmread>`.
+            :func:`~pydicom.filereader.dcmread`.
         preamble : bytes or str, optional
             The 128-byte DICOM preamble.
         file_meta : Dataset, optional
             The file meta :class:`Dataset`, such as the one returned by
-            :func:`read_file_meta_info()
-            <pydicom.filereader.read_file_meta_info>`, or an empty
+            :func:`~pydicom.filereader.read_file_meta_info`, or an empty
             :class:`Dataset` if no file meta information is in the file.
         is_implicit_VR : bool, optional
             ``True`` (default) if implicit VR transfer syntax used; ``False``
@@ -2090,7 +2088,7 @@ def validate_file_meta(file_meta, enforce_standard=True):
 
     Parameters
     ----------
-    file_meta : pydicom.dataset.Dataset
+    file_meta : Dataset
         The *File Meta Information* data elements.
     enforce_standard : bool, optional
         If ``False``, then only a check for invalid elements is performed.

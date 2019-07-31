@@ -134,8 +134,7 @@ def correct_ambiguous_vr_element(elem, ds, is_little_endian):
     all retired or part of DICONDE.
 
     If the VR is corrected and is 'US' or 'SS' then the value will be updated
-    using the :func:`convert_numbers()<pydicom.values.convert_numbers>`
-    function.
+    using the :func:`~pydicom.values.convert_numbers` function.
 
     Parameters
     ----------
@@ -175,8 +174,7 @@ def correct_ambiguous_vr(ds, is_little_endian):
     all retired or part of DICONDE.
 
     If the VR is corrected and is 'US' or 'SS' then the value will be updated
-    using the :func:`convert_numbers()<pydicom.values.convert_numbers>`
-    function.
+    using the :func:`~pydicom.values.convert_numbers` function.
 
     Parameters
     ----------
@@ -187,7 +185,7 @@ def correct_ambiguous_vr(ds, is_little_endian):
 
     Returns
     -------
-    ds : pydicom.dataset.Dataset
+    ds : dataset.Dataset
         The corrected dataset
 
     Raises
@@ -780,11 +778,11 @@ def dcmwrite(filename, dataset, write_like_original=True):
     (0002,eeee) group. Some of these elements are required (Type 1) while
     others are optional (Type 3/1C). If `write_like_original` is ``True``
     then the *File Meta Information Group* elements are all optional. See
-    :func:`write_file_meta_info()<pydicom.filewriter.write_file_meta_info>` for
-    more information on which elements are required.
+    :func:`~pydicom.filewriter.write_file_meta_info` for more information on
+    which elements are required.
 
     The *File Meta Information Group* elements should be included within their
-    own :class:`Dataset<pydicom.dataset.Dataset>` in the ``dataset.file_meta``
+    own :class:`~pydicom.dataset.Dataset` in the ``dataset.file_meta``
     attribute.
 
     If (0002,0010) *Transfer Syntax UID* is included then the user must ensure
@@ -821,7 +819,7 @@ def dcmwrite(filename, dataset, write_like_original=True):
         Name of file or the file-like to write the new DICOM file to.
     dataset : pydicom.dataset.FileDataset
         Dataset holding the DICOM information; e.g. an object read with
-        :func:`dcmread()<pydicom.filereader.dcmread>`.
+        :func:`~pydicom.filereader.dcmread`.
     write_like_original : bool, optional
         If ``True`` (default), preserves the following information from
         the Dataset (and may result in a non-conformant file):

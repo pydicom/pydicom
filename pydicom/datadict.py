@@ -31,7 +31,7 @@ def mask_match(tag):
 
     Parameters
     ----------
-    tag : int or tag.Tag
+    tag : int
         The tag to check.
 
     Returns
@@ -47,7 +47,7 @@ def mask_match(tag):
 
 
 def add_dict_entry(tag, VR, keyword, description, VM='1', is_retired=''):
-    """Update pydicom's DICOM dictionary with a new non-private entry.
+    """Update the DICOM dictionary with a new non-private entry.
 
     Parameters
     ----------
@@ -97,15 +97,14 @@ def add_dict_entry(tag, VR, keyword, description, VM='1', is_retired=''):
 
 
 def add_dict_entries(new_entries_dict):
-    """Update pydicom's DICOM dictionary with new non-private entries.
+    """Update the DICOM dictionary with new non-private entries.
 
     Parameters
     ----------
     new_entries_dict : dict
         :class:`dict` of form:
         ``{tag: (VR, VM, description, is_retired, keyword), ...}``
-        where parameters are as described in
-        :func:`add_dict_entry()<add_dict_entry>`.
+        where parameters are as described in :func:`add_dict_entry`.
 
     Raises
     ------
@@ -147,7 +146,7 @@ def add_dict_entries(new_entries_dict):
 
 
 def add_private_dict_entry(private_creator, tag, VR, description, VM='1'):
-    """Update pydicom's private DICOM dictionary with a new entry.
+    """Update the private DICOM dictionary with a new entry.
 
     Parameters
     ----------
@@ -170,13 +169,12 @@ def add_private_dict_entry(private_creator, tag, VR, description, VM='1'):
 
     Notes
     -----
-    Behaves like :func:`add_dict_entry()<add_dict_entry>`, only for a private
-    tag entry.
+    Behaves like :func:`add_dict_entry`, only for a private tag entry.
 
     See Also
     --------
     add_private_dict_entries
-        Add oe update multiple entries at once.
+        Add or update multiple entries at once.
     """
     new_dict_val = (VR, VM, description)
     add_private_dict_entries(private_creator, {tag: new_dict_val})
@@ -191,8 +189,7 @@ def add_private_dict_entries(private_creator, new_entries_dict):
         The private creator for all entries in `new_entries_dict`.
     new_entries_dict : dict
         :class:`dict` of form ``{tag: (VR, VM, description), ...}`` where
-        parameters are as described in
-        :func:`add_private_dict_entry()<add_private_dict_entry>`.
+        parameters are as described in :func:`add_private_dict_entry`.
 
     Raises
     ------
@@ -233,7 +230,7 @@ def get_entry(tag):
 
     Parameters
     ----------
-    tag : int or tag.Tag
+    tag : int
         The tag for the element whose entry is to be retrieved. Only entries
         in the official DICOM dictionary will be checked, not entries in the
         private dictionary.
@@ -270,13 +267,13 @@ def get_entry(tag):
 
 
 def dictionary_is_retired(tag):
-    """Return ``True`` if the element corresponding to `tag` is retired..
+    """Return ``True`` if the element corresponding to `tag` is retired.
 
     Only performs the lookup for official DICOM elements.
 
     Parameters
     ----------
-    tag : int or tag.Tag
+    tag : int
         The tag for the element whose retirement status is being checked.
 
     Returns
@@ -302,7 +299,7 @@ def dictionary_VR(tag):
 
     Parameters
     ----------
-    tag : int or tag.Tag
+    tag : int
         The tag for the element whose value represenation (VR) is being
         retrieved.
 
@@ -326,7 +323,7 @@ def dictionary_VM(tag):
 
     Parameters
     ----------
-    tag : int or tag.Tag
+    tag : int
         The tag for the element whose value multiplicity (VM) is being
         retrieved.
 
@@ -350,7 +347,7 @@ def dictionary_description(tag):
 
     Parameters
     ----------
-    tag : int or tag.Tag
+    tag : int
         The tag for the element whose description is being retrieved.
 
     Returns
@@ -373,7 +370,7 @@ def dictionary_keyword(tag):
 
     Parameters
     ----------
-    tag : int or tag.Tag
+    tag : int
         The tag for the element whose keyword is being retrieved.
 
     Returns
@@ -394,7 +391,7 @@ def dictionary_has_tag(tag):
 
     Parameters
     ----------
-    tag : int or tag.Tag
+    tag : int
         The tag to check.
 
     Returns
@@ -411,7 +408,7 @@ def keyword_for_tag(tag):
 
     Parameters
     ----------
-    tag : int or tag.Tag
+    tag : int
         The tag for the element whose keyword is being retrieved.
 
     Returns
@@ -481,7 +478,7 @@ def repeater_has_tag(tag):
 
     Parameters
     ----------
-    tag : int or tag.Tag
+    tag : int
         The tag to check.
 
     Returns
@@ -520,7 +517,7 @@ def get_private_entry(tag, private_creator):
 
     Parameters
     ----------
-    tag : int or tag.Tag
+    tag : int
         The tag for the element whose entry is to be retrieved. Only entries
         in the private dictionary will be checked.
     private_creator : str
@@ -577,7 +574,7 @@ def private_dictionary_VR(tag, private_creator):
 
     Parameters
     ----------
-    tag : int or tag.Tag
+    tag : int
         The tag for the element whose value represenation (VR) is being
         retrieved.
     private_creator : str
@@ -601,7 +598,7 @@ def private_dictionary_VM(tag, private_creator):
 
     Parameters
     ----------
-    tag : int or tag.Tag
+    tag : int
         The tag for the element whose value multiplicity (VM) is being
         retrieved.
     private_creator : str
@@ -625,7 +622,7 @@ def private_dictionary_description(tag, private_creator):
 
     Parameters
     ----------
-    tag : int or tag.Tag
+    tag : int
         The tag for the element whose description is being retrieved.
     private_creator : str
         The name of the private createor.

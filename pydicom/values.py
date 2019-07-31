@@ -40,7 +40,7 @@ def convert_tag(byte_string, is_little_endian, offset=0):
 
     Returns
     -------
-    tag.BaseTag
+    BaseTag
         The decoded tag.
     """
     if is_little_endian:
@@ -89,7 +89,7 @@ def convert_ATvalue(byte_string, is_little_endian, struct_format=None):
 
     Returns
     -------
-    tag.BaseTag or list of tag.BaseTag
+    BaseTag or list of BaseTag
         The decoded value(s).
     """
     length = len(byte_string)
@@ -126,10 +126,9 @@ def convert_DA_string(byte_string, is_little_endian, struct_format=None):
     -------
     str or list of str or valuerep.DA or list of valuerep.DA
         If
-        :mod:`config.datetime_conversion<pydicom.config.datetime_conversion>`
-        is ``True`` then returns either :class:`DA<pydicom.valuerep.DA>` or a
-        :class:`list` of ``DA``, otherwise returns :class:`str` or ``list``
-        of ``str``.
+        :attr:`~pydicom.config.datetime_conversion` is ``True`` then returns
+        either :class:`~pydicom.valuerep.DA` or a :class:`list` of ``DA``,
+        otherwise returns :class:`str` or ``list`` of ``str``.
     """
     if config.datetime_conversion:
         if not in_py2:
@@ -158,11 +157,10 @@ def convert_DS_string(byte_string, is_little_endian, struct_format=None):
     Returns
     -------
     valuerep.DSfloat or valuerep.DSdecimal or list of DSfloat/DSdecimal
-        If :mod:`config.use_DS_decimal<pydicom.config.use_DS_decimal>`
-        is ``True`` then returns :class:`DSdecimal<pydicom.valuerep.DSdecimal>`
-        or a :class:`list` of ``DSdecimal``, otherwise returns
-        :class:`DSfloat<pydicom.valuerep.DSfloat>` or a ``list`` of
-        ``DSfloat``.
+        If :attr:`~pydicom.config.use_DS_decimal` is ``True`` then returns
+        :class:`~pydicom.valuerep.DSdecimal` or a :class:`list` of
+        ``DSdecimal``, otherwise returns :class:`~pydicom.valuerep.DSfloat` or
+        a ``list`` of ``DSfloat``.
     """
     if not in_py2:
         byte_string = byte_string.decode(default_encoding)
@@ -197,10 +195,9 @@ def convert_DT_string(byte_string, is_little_endian, struct_format=None):
     -------
     str or list of str or valuerep.DT or list of DT
         if
-        :mod:`config.datetime_conversion <pydicom.config.datetime_conversion>`
-        is ``True`` then returns :class:`DT<pydicom.valuerep.DT>` or a
-        :class:`list` of ``DT``, otherwise returns :class:`str` or ``list`` of
-        ``str``.
+        :attr:`~pydicom.config.datetime_conversion` is ``True`` then returns
+        :class:`~pydicom.valuerep.DT` or a :class:`list` of ``DT``, otherwise
+        returns :class:`str` or ``list`` of ``str``.
     """
     if config.datetime_conversion:
         if not in_py2:
@@ -467,10 +464,9 @@ def convert_TM_string(byte_string, is_little_endian, struct_format=None):
     -------
     str or list of str or valuerep.TM or list of valuerep.TM
         If
-        :mod:`config.datetime_conversion <pydicom.config.datetime_conversion>`
-        is ``True`` then returns either :class:`TM<pydicom.valuerep.TM>` or a
-        :class:`list` of ``TM``, otherwise returns :class:`str` or ``list`` of
-        ``str``.
+        :attr:`~pydicom.config.datetime_conversion` is ``True`` then returns
+        either :class:`~pydicom.valuerep.TM` or a :class:`list` of ``TM``,
+        otherwise returns :class:`str` or ``list`` of ``str``.
     """
     if config.datetime_conversion:
         if not in_py2:

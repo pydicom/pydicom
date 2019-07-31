@@ -414,8 +414,8 @@ class DSdecimal(Decimal):
 
     def __init__(self, val):
         """Store the original string if one given, for exact write-out of same
-        value later. E.g. if set '1.23e2', Decimal would write '123', but DS
-        will use the original
+        value later. E.g. if set ``'1.23e2'``, :class:`~decimal.Decimal` would
+        write ``'123'``, but :class:`DS` will use the original.
         """
         # ... also if user changes a data element value, then will get
         # a different Decimal, as Decimal is immutable.
@@ -528,8 +528,8 @@ def MultiString(val, valtype=str):
     val : bytes or str
         DICOM byte string to split up.
     valtype
-        Default :class:`str`, but can be e.g. :class:`UID<pydicom.uid.UID>`
-        to overwrite to a specific type.
+        Default :class:`str`, but can be e.g. :class:`~pydicom.uid.UID` to
+        overwrite to a specific type.
 
     Returns
     -------

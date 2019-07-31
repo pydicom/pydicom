@@ -23,7 +23,7 @@ def tag_in_exception(tag):
 
     Parameters
     ----------
-    tag : tag.BaseTag
+    tag : BaseTag
         The tag to use in the context.
     """
     try:
@@ -56,17 +56,17 @@ def Tag(arg, arg2=None):
     Parameters
     ----------
     arg : int or str or 2-tuple/list
-        If :class:`int` or :class`str`, then either the group or the combined
+        If :class:`int` or :class:`str`, then either the group or the combined
         group/element number of the DICOM tag. If :class:`tuple` or
-        :class:`list` then the (group, element) numbers as :class:`int` or
-        :class:`str`.
+        :class:`list` then the (group, element) numbers as :class:`!int` or
+        :class:`!str`.
     arg2 : int or str, optional
         The element number of the DICOM tag, required when `arg` only contains
         the group number of the tag.
 
     Returns
     -------
-    tag.BaseTag
+    BaseTag
     """
     if isinstance(arg, BaseTag):
         return arg
@@ -202,12 +202,12 @@ class BaseTag(BaseTag_base_class):
 
     @property
     def group(self):
-        """Return the tag's group number."""
+        """Return the tag's group number as :class:`int`."""
         return self >> 16
 
     @property
     def element(self):
-        """Return the tag's element number."""
+        """Return the tag's element number as :class:`int`."""
         return self & 0xffff
 
     elem = element  # alternate syntax

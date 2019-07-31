@@ -9,9 +9,7 @@ from pydicom.multival import MultiValue
 
 
 def validate_dataset(elem):
-    """Check that `elem` is a :class:`Dataset<pydicom.dataset.Dataset>`
-    instance.
-    """
+    """Check that `elem` is a :class:`~pydicom.dataset.Dataset` instance."""
     if not isinstance(elem, Dataset):
         raise TypeError('Sequence contents must be Dataset instances.')
 
@@ -19,25 +17,25 @@ def validate_dataset(elem):
 
 
 class Sequence(MultiValue):
-    """Class to hold multiple :class:`Datasets<pydicom.dataset.Dataset>` in a
+    """Class to hold multiple :class:`~pydicom.dataset.Dataset` in a
     :class:`list`.
 
-    This class is derived from :class:`MultiValue<pydicom.multival.MultiValue>`
+    This class is derived from :class:`~pydicom.multival.MultiValue`
     and as such enforces that all items added to the list are
-    :class:`Dataset<pydicom.dataset.Dataset>` instances. In order to do this,
+    :class:`~pydicom.dataset.Dataset` instances. In order to do this,
     a validator is substituted for `type_constructor` when constructing the
-    :class:`MultiValue<pydicom.multival.MultiValue>` super class.
+    :class:`~pydicom.multival.MultiValue` super class.
     """
 
     def __init__(self, iterable=None):
-        """Initialize a list of :class:`Datasets<pydicom.dataset.Dataset>`.
+        """Initialize a list of :class:`~pydicom.dataset.Dataset`.
 
         Parameters
         ----------
         iterable : list-like of dataset.Dataset, optional
             An iterable object (e.g. :class:`list`, :class:`tuple`) containing
-            :class:`Datasets<pydicom.dataset.Dataset>`. If not used then an
-            empty :class:`Sequence` is generated.
+            :class:`~pydicom.dataset.Dataset`. If not used then an empty
+            :class:`Sequence` is generated.
         """
         # We add this extra check to throw a relevant error. Without it, the
         # error will be simply that a Sequence must contain Datasets (since a
@@ -59,13 +57,13 @@ class Sequence(MultiValue):
 
     @property
     def parent(self):
-        """Return the parent :class:`Dataset<pydicom.dataset.Dataset>`."""
+        """Return the parent :class:`~pydicom.dataset.Dataset`."""
         return self._parent
 
     @parent.setter
     def parent(self, value):
-        """Set the parent :class:`Dataset<pydicom.dataset.Dataset>` and pass
-        it to all items.
+        """Set the parent :class:`~pydicom.dataset.Dataset` and pass it to all
+        :class:`Sequence` items.
         """
         if value != self._parent:
             self._parent = value
@@ -73,8 +71,8 @@ class Sequence(MultiValue):
                 item.parent = self._parent
 
     def __setitem__(self, i, val):
-        """Set the parent :class:`Dataset<pydicom.dataset.Dataset>` to the new
-        sequence item
+        """Set the parent :class:`~pydicom.dataset.Dataset` to the new
+        :class:`Sequence` item
         """
         super(Sequence, self).__setitem__(i, val)
         val.parent = self._parent

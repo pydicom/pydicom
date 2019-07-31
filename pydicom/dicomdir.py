@@ -17,7 +17,7 @@ class DicomDir(FileDataset):
         """Initialize a DICOMDIR dataset read from a DICOM file.
 
         Carries forward all the initialization from
-        :class:`FileDataset<pydicom.dataset.FileDataset>`
+        :class:`~pydicom.dataset.FileDataset`
 
         Parameters
         ----------
@@ -26,16 +26,16 @@ class DicomDir(FileDataset):
             :class:`io.BytesIO`.
         dataset : dataset.Dataset
             Some form of dictionary, usually a
-            :class:`FileDataset<pydicom.dataset.FileDataset>` from
-            :meth:`dcmread()<pydicom.filereader.dcmread>`.
+            :class:`~pydicom.dataset.FileDataset` from
+            :func:`~pydicom.filereader.dcmread`.
         preamble : bytes
             The 128-byte DICOM preamble.
         file_meta : dataset.Dataset
-            The file meta :class:`Dataset<pydicom.dataset.Dataset>`, such as
-            the one returned by :func:`read_file_meta_info()
-            <pydicom.filereader.read_file_meta_info>`, or an empty
-            :class:`Dataset<pydicom.dataset.Dataset>` if no file meta
-            information is in the file.
+            The file meta :class:`~pydicom.dataset.Dataset`, such as
+            the one returned by
+            :func:`~pydicom.filereader.read_file_meta_info`, or an empty
+            :class:`~pydicom.dataset.Dataset` if no file meta information is
+            in the file.
         is_implicit_VR : bool
             ``True`` if implicit VR transfer syntax used (default); ``False``
             if explicit VR.

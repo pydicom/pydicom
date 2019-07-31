@@ -106,7 +106,7 @@ def read_undefined_length_value(fp, is_little_endian, delimiter_tag,
         Tag used as and marker for reading
     defer_size : int or None, optional
         Size to avoid loading large elements in memory. See
-        :func:`dcmread()<pydicom.filereader.dcmread>` for more parameter info.
+        :func:`~pydicom.filereader.dcmread` for more parameter info.
     read_size : int, optional
         Number of bytes to read at one time.
 

@@ -176,7 +176,7 @@ element use the ``in`` operator with the element's keyword or tag::
   >>> "PatientName" in ds  # or (0x0010,0x0010) in ds
   True
 
-To remove an element from the :class:`Dataset<dataset.Dataset>`,  use the
+To remove an element from the :class:`Dataset<dataset.Dataset>`  use the
 ``del`` operator::
 
   >>> del ds.SoftwareVersions  # or del ds[0x0018, 0x1020]
@@ -233,8 +233,8 @@ Tag
 elements using their keywords as illustrated in sections above.
 
 The :class:`BaseTag<tag.BaseTag>` class is derived from :class:`int` in
-Python 3 and :class:`long` in Python 2, so in effect, it is just a number
-with some extra behaviour:
+Python 3 and `long <https://docs.python.org/2/library/functions.html#long>`_
+in Python 2, so in effect, it is just a number with some extra behaviour:
 
   * :func:`Tag()<tag.Tag>` is used to create instances of
     :class:`BaseTag<tag.BaseTag>` and enforces that the DICOM tag fits in the
