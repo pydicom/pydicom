@@ -102,10 +102,10 @@ def add_dict_entries(new_entries_dict):
     Parameters
     ----------
     new_entries_dict : dict
-        Dictionary of form:
+        :class:`dict` of form:
         ``{tag: (VR, VM, description, is_retired, keyword), ...}``
         where parameters are as described in
-        :meth:`add_dict_entry()<add_dict_entry>`.
+        :func:`add_dict_entry()<add_dict_entry>`.
 
     Raises
     ------
@@ -170,7 +170,7 @@ def add_private_dict_entry(private_creator, tag, VR, description, VM='1'):
 
     Notes
     -----
-    Behaves like :meth:`add_dict_entry()<add_dict_entry>`, only for a private
+    Behaves like :func:`add_dict_entry()<add_dict_entry>`, only for a private
     tag entry.
 
     See Also
@@ -190,9 +190,9 @@ def add_private_dict_entries(private_creator, new_entries_dict):
     private_creator: str
         The private creator for all entries in `new_entries_dict`.
     new_entries_dict : dict
-        ``dict`` of form ``{tag: (VR, VM, description), ...}`` where
+        :class:`dict` of form ``{tag: (VR, VM, description), ...}`` where
         parameters are as described in
-        :meth:`add_private_dict_entry()<add_private_dict_entry>`.
+        :func:`add_private_dict_entry()<add_private_dict_entry>`.
 
     Raises
     ------
@@ -270,7 +270,7 @@ def get_entry(tag):
 
 
 def dictionary_is_retired(tag):
-    """Return True if the element corresponding to `tag` is retired..
+    """Return ``True`` if the element corresponding to `tag` is retired..
 
     Only performs the lookup for official DICOM elements.
 
@@ -296,7 +296,7 @@ def dictionary_is_retired(tag):
 
 
 def dictionary_VR(tag):
-    """Return the VR of the element corresponding to `tag` as str.
+    """Return the VR of the element corresponding to `tag`.
 
     Only performs the lookup for official DICOM elements.
 
@@ -320,7 +320,7 @@ def dictionary_VR(tag):
 
 
 def dictionary_VM(tag):
-    """Return the VM of the element corresponding to `tag` as str.
+    """Return the VM of the element corresponding to `tag`.
 
     Only performs the lookup for official DICOM elements.
 
@@ -344,7 +344,7 @@ def dictionary_VM(tag):
 
 
 def dictionary_description(tag):
-    """Return the description of the element corresponding to `tag` as str.
+    """Return the description of the element corresponding to `tag`.
 
     Only performs the lookup for official DICOM elements.
 
@@ -367,7 +367,7 @@ def dictionary_description(tag):
 
 
 def dictionary_keyword(tag):
-    """Return the keyword of the element corresponding to `tag` as str.
+    """Return the keyword of the element corresponding to `tag`.
 
     Only performs the lookup for official DICOM elements.
 
@@ -390,7 +390,7 @@ def dictionary_keyword(tag):
 
 
 def dictionary_has_tag(tag):
-    """Return True if `tag` is in the official DICOM data dictionary.
+    """Return ``True`` if `tag` is in the official DICOM data dictionary.
 
     Parameters
     ----------
@@ -407,7 +407,7 @@ def dictionary_has_tag(tag):
 
 
 def keyword_for_tag(tag):
-    """Return the keyword of the element corresponding to `tag` as str.
+    """Return the keyword of the element corresponding to `tag`.
 
     Parameters
     ----------
@@ -434,7 +434,7 @@ keyword_dict = dict([(dictionary_keyword(tag), tag)
 
 
 def tag_for_keyword(keyword):
-    """Return the tag of the element corresponding to `keyword` as int.
+    """Return the tag of the element corresponding to `keyword`.
 
     Only performs the lookup for official DICOM elements.
 
@@ -453,7 +453,7 @@ def tag_for_keyword(keyword):
 
 
 def tag_for_name(name):
-    """Return the tag of the element corresponding to `name` as int.
+    """Return the tag of the element corresponding to `name`.
 
     Only performs the lookup for official DICOM elements.
 
@@ -477,7 +477,7 @@ def tag_for_name(name):
 
 
 def repeater_has_tag(tag):
-    """Return True if `tag` is in the DICOM repeaters data dictionary.
+    """Return ``True`` if `tag` is in the DICOM repeaters data dictionary.
 
     Parameters
     ----------
@@ -497,7 +497,7 @@ REPEATER_KEYWORDS = [val[4] for val in RepeatersDictionary.values()]
 
 
 def repeater_has_keyword(keyword):
-    """Return True if `keyword` is in the DICOM repeaters data dictionary.
+    """Return ``True`` if `keyword` is in the DICOM repeaters data dictionary.
 
     Parameters
     ----------
@@ -516,7 +516,7 @@ def repeater_has_keyword(keyword):
 # PRIVATE DICTIONARY handling
 # functions in analogy with those of main DICOM dict
 def get_private_entry(tag, private_creator):
-    """Return an entry from the private dictionary as a tuple.
+    """Return an entry from the private dictionary corresponding to `tag`.
 
     Parameters
     ----------
@@ -529,7 +529,7 @@ def get_private_entry(tag, private_creator):
     Returns
     -------
     tuple of str
-        The ``(VR, VM, name, is_retired)`` from the private dictionary.
+        The (VR, VM, name, is_retired) from the private dictionary.
 
     Raises
     ------
@@ -573,7 +573,7 @@ def get_private_entry(tag, private_creator):
 
 
 def private_dictionary_VR(tag, private_creator):
-    """Return the VR of the private element corresponding to `tag` as str.
+    """Return the VR of the private element corresponding to `tag`.
 
     Parameters
     ----------
@@ -597,7 +597,7 @@ def private_dictionary_VR(tag, private_creator):
 
 
 def private_dictionary_VM(tag, private_creator):
-    """Return the VM of the private element corresponding to `tag` as str.
+    """Return the VM of the private element corresponding to `tag`.
 
     Parameters
     ----------
@@ -621,8 +621,7 @@ def private_dictionary_VM(tag, private_creator):
 
 
 def private_dictionary_description(tag, private_creator):
-    """Return the description of the private element corresponding to `tag`
-    as str.
+    """Return the description of the private element corresponding to `tag`.
 
     Parameters
     ----------

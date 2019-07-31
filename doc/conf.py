@@ -82,7 +82,7 @@ autodoc_default_options = {
 # Shortcuts for sphinx.ext.extlinks
 extlinks = {
     # 'alias' : (url_prefix, caption)
-    # Usage :dicom:`link text <part05/sect_6.2.html>`
+    # Usage :dcm:`link text <part05/sect_6.2.html>`
     'dcm': (
         'http://dicom.nema.org/medical/dicom/current/output/chtml/%s',
         None

@@ -41,9 +41,9 @@ PN_DELIMS = {'^'} if compat.in_py2 else {0xe5}
 
 
 class DA(date):
-    """Store value for an element with VR 'DA' as datetime.date.
+    """Store value for an element with VR 'DA' as :class:`datetime.date`.
 
-    Note that the ``datetime.date`` base class is immutable.
+    Note that the :class:`datetime.date` base class is immutable.
     """
     __slots__ = ['original_string']
 
@@ -70,8 +70,8 @@ class DA(date):
         Parameters
         ----------
         val : str
-            A string conformant to the DA definition in the DICOM Standard
-            PS 3.5-2011
+            A string conformant to the DA definition in the DICOM Standard,
+            Part 5, :dcm:`Table 6.2-1<part05/sect_6.2.html#table_6.2-1>`.
         """
         if isinstance(val, (str, compat.string_types)):
             if len(val) == 8:
@@ -117,9 +117,9 @@ class DA(date):
 
 
 class DT(datetime):
-    """Store value for an element with VR 'DT' as datetime.datetime.
+    """Store value for an element with VR 'DT' as :class:`datetime.datetime`.
 
-    Note that the ``datetime.datetime`` base class is immutable.
+    Note that the :class:`datetime.datetime` base class is immutable.
     """
     __slots__ = ['original_string']
     _regex_dt = re.compile(r"((\d{4,14})(\.(\d{1,6}))?)([+-]\d{4})?")
@@ -151,8 +151,8 @@ class DT(datetime):
         Parameters
         ----------
         val : str
-            A string conformant to the DT definition in the DICOM Standard
-            PS 3.5-2011.
+            A string conformant to the DT definition in the DICOM Standard,
+            Part 5, :dcm:`Table 6.2-1<part05/sect_6.2.html#table_6.2-1>`.
         """
         if isinstance(val, (str, compat.string_types)):
             match = DT._regex_dt.match(val)
@@ -229,9 +229,9 @@ class DT(datetime):
 
 
 class TM(time):
-    """Store value for an element with VR 'TM' as datetime.time.
+    """Store value for an element with VR 'TM' as :class:`datetime.time`.
 
-    Note that the ``datetime.time`` base class is immutable.
+    Note that the :class:`datetime.time` base class is immutable.
     """
     __slots__ = ['original_string']
     _regex_tm = re.compile(r"(\d{2,6})(\.(\d{1,6}))?")
@@ -259,8 +259,8 @@ class TM(time):
         Parameters
         ----------
         val : str
-            A string conformant to the TM definition in the DICOM Standard
-            PS 3.5-2011.
+            A string conformant to the TM definition in the DICOM Standard,
+            Part 5, :dcm:`Table 6.2-1<part05/sect_6.2.html#table_6.2-1>`.
         """
         if isinstance(val, (str, compat.string_types)):
             match = TM._regex_tm.match(val)
@@ -314,7 +314,7 @@ class TM(time):
 
 
 class DSfloat(float):
-    """Store value for an element with VR 'DS' as float.
+    """Store value for an element with VR 'DS' as :class:`float`.
 
     If constructed from an empty string, return the empty string,
     not an instance of this class.
@@ -354,7 +354,7 @@ class DSfloat(float):
 
 
 class DSdecimal(Decimal):
-    """Store value for an element with VR 'DS' as decimal.Decimal.
+    """Store value for an element with VR 'DS' as :class:`decimal.Decimal`.
 
     Notes
     -----
@@ -444,13 +444,13 @@ else:
 def DS(val):
     """Factory function for creating DS class instances.
 
-    Checks for blank string; if so, return that, else calls ``DSfloat`` or
-    ``DSdecimal`` to create the class instance. This avoids overriding
+    Checks for blank string; if so, return that, else calls :class:`DSfloat` or
+    :class:`DSdecimal` to create the class instance. This avoids overriding
     ``DSfloat.__new__()`` (which carries a time penalty for large arrays of
     DS).
 
-    Similarly the string clean and check can be avoided and ``DSfloat`` called
-    directly if a string has already been processed.
+    Similarly the string clean and check can be avoided and :class:`DSfloat`
+    called directly if a string has already been processed.
     """
     if isinstance(val, (str, compat.text_type)):
         val = val.strip()
@@ -460,7 +460,7 @@ def DS(val):
 
 
 class IS(int):
-    """Store value for an element with VR 'IS' as int.
+    """Store value for an element with VR 'IS' as :class:`int`.
 
     Stores original integer string for exact rewriting of the string
     originally read or stored.
@@ -525,16 +525,16 @@ def MultiString(val, valtype=str):
 
     Parameters
     ----------
-    val : bytes
-        DICOM bytestring to split up.
+    val : bytes or str
+        DICOM byte string to split up.
     valtype
-        Default ``str``, but can be e.g. ``UID`` to overwrite to a specific
-        type.
+        Default :class:`str`, but can be e.g. :class:`UID<pydicom.uid.UID>`
+        to overwrite to a specific type.
 
     Returns
     -------
     valtype or list of valtype
-        The split value as `valtype` or a list of `valtype`.
+        The split value as `valtype` or a :class:`list` of `valtype`.
     """
     # Remove trailing blank used to pad to even length
     # 2005.05.25: also check for trailing 0, error made
@@ -741,7 +741,7 @@ class PersonName3(object):
         return hash(self.components)
 
     def decode(self, encodings=None):
-        """Return the patient name decoded by the given encodings.
+        """Return the patient name decoded by the given `encodings`.
 
         Parameters
         ----------
@@ -765,7 +765,7 @@ class PersonName3(object):
         return PersonName3(self.original_string, encodings)
 
     def encode(self, encodings=None):
-        """Return the patient name decoded by the given encodings.
+        """Return the patient name decoded by the given `encodings`.
 
         Parameters
         ----------

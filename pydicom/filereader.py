@@ -54,11 +54,11 @@ def data_element_generator(fp,
         takes tag, VR, length, and returns ``True`` or ``False``. If it
         returns ``True``, ``read_data_element`` will just return.
     defer_size : int, str, None, optional
-        See ``dcmread`` for parameter info.
+        See :func:`dcmread` for parameter info.
     encoding :
         Encoding scheme
     specific_tags : list or None
-        See ``dcmread`` for parameter info.
+        See :func:`dcmread` for parameter info.
 
     Returns
     -------
@@ -336,13 +336,13 @@ def read_dataset(fp, is_implicit_VR, is_little_endian, bytelength=None,
         Optional call_back function which can terminate reading. See help for
         ``data_element_generator`` for details
     defer_size : int, None, optional
-        Size to avoid loading large elements in memory. See ``dcmread`` for
+        Size to avoid loading large elements in memory. See :func:`dcmread` for
         more parameter info.
     parent_encoding :
         Optional encoding to use as a default in case (0008,0005) *Specific
         Character Set* isn't specified.
     specific_tags : list or None
-        See ``dcmread`` for parameter info.
+        See :func:`dcmread` for parameter info.
 
     Returns
     -------
@@ -392,7 +392,9 @@ def read_dataset(fp, is_implicit_VR, is_little_endian, bytelength=None,
 
 def read_sequence(fp, is_implicit_VR, is_little_endian, bytelength, encoding,
                   offset=0):
-    """Read and return a Sequence -- i.e. a list of Datasets"""
+    """Read and return a Sequence -- i.e. a :class:`list` of
+    :class:`Datasets<pydicom.dataset.Dataset>`.
+    """
 
     seq = []  # use builtin list to start for speed, convert to Sequence at end
     is_undefined_length = False
@@ -417,7 +419,9 @@ def read_sequence(fp, is_implicit_VR, is_little_endian, bytelength, encoding,
 
 def read_sequence_item(fp, is_implicit_VR, is_little_endian, encoding,
                        offset=0):
-    """Read and return a single sequence item, i.e. a Dataset"""
+    """Read and return a single sequence item, i.e. a
+    :class:`Dataset<pydicom.dataset.Dataset>`.
+    """
     seq_item_tell = fp.tell() + offset
     if is_little_endian:
         tag_length_format = "<HHL"
@@ -461,9 +465,10 @@ def _read_command_set_elements(fp):
     """Return a Dataset containing any Command Set (0000,eeee) elements
     in `fp`.
 
-    Command Set elements are always Implicit VR Little Endian (as per PS3.7
-    Section 6.3). Once any Command Set elements are read `fp` will be
-    positioned at the start of the next group of elements.
+    Command Set elements are always Implicit VR Little Endian (DICOM Standard,
+    Part 7, :dcm:`Section 6.3<part07/sect_6.3.html>`). Once any Command Set
+    elements are read `fp` will be positioned at the start of the next group
+    of elements.
 
     Parameters
     ----------
@@ -489,9 +494,10 @@ def _read_command_set_elements(fp):
 def _read_file_meta_info(fp):
     """Return a Dataset containing any File Meta (0002,eeee) elements in `fp`.
 
-    File Meta elements are always Explicit VR Little Endian (as per PS3.10
-    Section 7). Once any File Meta elements are read `fp` will be positioned
-    at the start of the next group of elements.
+    File Meta elements are always Explicit VR Little Endian (DICOM Standard,
+    Part 10, :dcm:`Section 7<part10/chapter_7.html>`). Once any File Meta
+    elements are read `fp` will be positioned at the start of the next group
+    of elements.
 
     Parameters
     ----------
@@ -627,17 +633,17 @@ def read_partial(fileobj, stop_when=None, defer_size=None,
     fileobj : a file-like object
         Note that the file will not close when the function returns.
     stop_when :
-        Stop condition. See ``read_dataset`` for more info.
+        Stop condition. See :func:`read_dataset` for more info.
     defer_size : int, str, None, optional
-        See ``dcmread`` for parameter info.
+        See :func:`dcmread` for parameter info.
     force : boolean
-        See ``dcmread`` for parameter info.
+        See :func:`dcmread` for parameter info.
     specific_tags : list or None
-        See ``dcmread`` for parameter info.
+        See :func:`dcmread` for parameter info.
 
     Notes
     -----
-    Use ``dcmread`` unless you need to stop on some condition other than
+    Use :func:`dcmread` unless you need to stop on some condition other than
     reaching pixel data.
 
     Returns
@@ -781,14 +787,15 @@ def dcmread(fp, defer_size=None, stop_before_pixels=False,
         reading even if no *File Meta Information* header is found.
     specific_tags : list or None, optional
         If not ``None``, only the tags in the list are returned. The list
-        elements can be tags or tag names. Note that the element (0008,0008)
+        elements can be tags or tag names. Note that the element (0008,0005)
         *Specific Character Set* is always returned if present - this ensures
         correct decoding of returned text values.
 
     Returns
     -------
     FileDataset
-        An instance of ``FileDataset`` that represents a parsed DICOM file.
+        An instance of :class:`FileDataset<pydicom.dataset.FileDataset>` that
+        represents a parsed DICOM file.
 
     Raises
     ------

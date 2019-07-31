@@ -1,5 +1,6 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
-"""Use the numpy package to convert RLE lossless pixel data to an ndarray.
+"""Use the `numpy <https://numpy.org/>`_ package to convert RLE lossless *Pixel 
+Data* to an ndarray.
 
 **Supported transfer syntaxes**
 
@@ -60,17 +61,25 @@ SUPPORTED_TRANSFER_SYNTAXES = [
 
 
 def is_available():
-    """Return True if the handler has its dependencies met."""
+    """Return ``True`` if the handler has its dependencies met."""
     return HAVE_RLE
 
 
 def supports_transfer_syntax(transfer_syntax):
-    """Return True if the handler supports the `transfer_syntax`."""
+    """Return ``True`` if the handler supports the `transfer_syntax`.
+
+    Parameters
+    ----------
+    transfer_syntax : uid.UID
+        The Transfer Syntax UID of the *Pixel Data* that is to be used with
+        the handler.
+    """
     return transfer_syntax in SUPPORTED_TRANSFER_SYNTAXES
 
 
 def needs_to_convert_to_RGB(ds):
-    """Return True if the pixel data should to be converted from YCbCr to RGB.
+    """Return ``True`` if the *Pixel Data* should to be converted from YCbCr to
+    RGB.
 
     This affects JPEG transfer syntaxes.
     """
@@ -78,7 +87,8 @@ def needs_to_convert_to_RGB(ds):
 
 
 def should_change_PhotometricInterpretation_to_RGB(ds):
-    """Return True if the PhotometricInterpretation should be changed to RGB.
+    """Return ``True`` if the *Photometric Interpretation* should be changed
+    to RGB.
 
     This affects JPEG transfer syntaxes.
     """
@@ -86,13 +96,13 @@ def should_change_PhotometricInterpretation_to_RGB(ds):
 
 
 def get_pixeldata(ds, rle_segment_order='>'):
-    """Return an ndarray of the Pixel Data.
+    """Return an :class:`numpy.ndarray` of the *Pixel Data*.
 
     Parameters
     ----------
     ds : dataset.Dataset
-        The DICOM dataset containing an Image Pixel module and the RLE encoded
-        *Pixel Data* to be converted.
+        The :class:`Dataset` containing an Image Pixel module and the RLE
+        encoded *Pixel Data* to be converted.
     rle_segment_order : str
         The order of segments used by the RLE decoder when dealing with *Bits
         Allocated* > 8. Each RLE segment contains 8-bits of the pixel data,
@@ -104,15 +114,15 @@ def get_pixeldata(ds, rle_segment_order='>'):
 
     Returns
     -------
-    np.ndarray
+    numpy.ndarray
         The decoded contents of (7fe0,0010) *Pixel Data* as a 1D array.
 
     Raises
     ------
     AttributeError
-        If the dataset is missing a required element.
+        If `ds` is missing a required element.
     NotImplementedError
-        If the dataset contains pixel data in an unsupported format.
+        If `ds` contains pixel data in an unsupported format.
     ValueError
         If the actual length of the pixel data doesn't match the expected
         length.
@@ -366,7 +376,8 @@ def _rle_decode_segment(data):
 
 # RLE encoding functions
 def rle_encode_frame(arr):
-    """Return an numpy ndarray image frame as RLE encoded bytearray.
+    """Return an :class:`numpy.ndarray` image frame as RLE encoded
+    :class:`bytearray`.
 
     Parameters
     ----------

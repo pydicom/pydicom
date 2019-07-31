@@ -1,11 +1,11 @@
 .. _api_dicomdir:
 
-DICOMDIR Utilities (:mod:`pydicom.dicomdir`)
-============================================
+DICOMDIR (:mod:`pydicom.dicomdir`)
+==================================
 
 .. currentmodule:: pydicom.dicomdir
 
-DICOMDIR utilities.
+Representation of DICOMDIR.
 
 .. autosummary::
    :toctree: generated/

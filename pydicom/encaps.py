@@ -90,10 +90,10 @@ def get_frame_offsets(fp):
 
 
 def generate_pixel_data_fragment(fp):
-    """Yield the encapsulated pixel data fragments as bytes.
+    """Yield the encapsulated pixel data fragments.
 
-    For compressed (encapsulated) Transfer Syntaxes, the (7fe0,0010) 'Pixel
-    Data' element is encoded in an encapsulated format.
+    For compressed (encapsulated) Transfer Syntaxes, the (7fe0,0010) *Pixel
+    Data* element is encoded in an encapsulated format.
 
     **Encapsulation**
 
@@ -114,9 +114,9 @@ def generate_pixel_data_fragment(fp):
     The remaining items in the Sequence of Items are the pixel data fragments
     and it is these items that will be read and returned by this function.
 
-    The Sequence of Items is terminated by a Sequence Delimiter Item with tag
-    (fffe,e0dd) and an Item Length field of value ``0x00000000``. The presence
-    or absence of the Sequence Delimiter Item in `fp` has no effect on the
+    The Sequence of Items is terminated by a (fffe,e0dd) *Sequence Delimiter
+    Item* with an Item Length field of value ``0x00000000``. The presence
+    or absence of the *Sequence Delimiter Item* in `fp` has no effect on the
     returned fragments.
 
     *Encoding*
@@ -128,7 +128,7 @@ def generate_pixel_data_fragment(fp):
     fp : pydicom.filebase.DicomBytesIO
         The encoded (7fe0,0010) *Pixel Data* element value, positioned at the
         start of the item tag for the first item after the Basic Offset Table
-        item. ``fp.is_little_endian`` should be set to True.
+        item. ``fp.is_little_endian`` should be set to ``True``.
 
     Yields
     ------
@@ -176,7 +176,7 @@ def generate_pixel_data_fragment(fp):
 
 
 def generate_pixel_data_frame(bytestream):
-    """Yield an encapsulated pixel data frame as bytes.
+    """Yield an encapsulated pixel data frame.
 
     Parameters
     ----------
@@ -199,7 +199,7 @@ def generate_pixel_data_frame(bytestream):
 
 
 def generate_pixel_data(bytestream):
-    """Yield an encapsulated pixel data frame as a tuples of bytes.
+    """Yield an encapsulated pixel data frame.
 
     For the following transfer syntaxes, a fragment may not contain encoded
     data from more than one frame. However data from one frame may span
@@ -234,8 +234,8 @@ def generate_pixel_data(bytestream):
     Yields
     -------
     tuple of bytes
-        A tuple representing an encapsulated pixel data frame, with the
-        contents of the tuple the frame's fragmented data.
+        An encapsulated pixel data frame, with the contents of the
+        :class:`tuple` the frame's fragmented data.
 
     References
     ----------

@@ -5,7 +5,7 @@ Representation of Datasets (:mod:`pydicom.dataset`)
 
 .. currentmodule:: pydicom.dataset
 
-A representation of a DICOM dataset.
+Representation of DICOM datasets and related functions.
 
 .. autosummary::
    :toctree: generated/

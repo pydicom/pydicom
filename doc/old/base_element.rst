@@ -8,22 +8,23 @@ Dataset
 
 .. currentmodule:: pydicom
 
-:class:`Dataset <dataset.Dataset>` is the main object you will work with
-directly. Dataset wraps a dictionary, where the key is the DICOM
-(group,element) tag (as a :class:`Tag <tag.BaseTag>` object, described below),
-and the value is a :class:`DataElement <dataelem.DataElement>` instance
-(also described below). It implements most of the methods of ``dict``, so
-that it mostly behaves like a wrapped ``dict``. This allows direct access
-to the data elements via the the tags, as shown below.
+:class:`Dataset<dataset.Dataset>` is the main object you will work with
+directly. :class:`Dataset<dataset.Dataset>` wraps a dictionary, where the key
+is the DICOM tag (as a :class:`BaseTag<tag.BaseTag>` object,
+described below), and the value is the corresponding
+:class:`DataElement<dataelem.DataElement>` instance (also described below).
+It implements most of the methods of :class:`dict`, so that it mostly behaves
+like a wrapped :class:`dict`. This allows direct access to the data elements
+via their tags, as shown below.
 
-.. note::
+.. warning::
 
-  The iterator of a ``Dataset`` yields ``DataElement`` values, e.g. the
-  values of the dictionary, as opposed to the keys yielded by a ``dict``
-  iterator.
+  The iterator of a :class:`Dataset<dataset.Dataset>` yields
+  :class:`DataElement<dataelem.DataElement>` instances, e.g. the values of the
+  dictionary instead of the keys normally yielded by iterating a :class:`dict`.
 
-A ``Dataset`` could be created directly, but you will usually get one by
-reading an existing DICOM file::
+A :class:`Dataset<dataset.Dataset>` could be created directly, but you will
+usually get one by reading an existing DICOM file::
 
   >>> import pydicom
   >>> from pydicom.data import get_testdata_files
@@ -32,7 +33,7 @@ reading an existing DICOM file::
   >>> ds = pydicom.dcmread(filename)
 
 You can display the entire dataset by simply printing its string
-(str or repr) value::
+(:class:`str()<str>` or :func:`repr`) value::
 
   >>> ds # doctest: +ELLIPSIS
   (0008, 0012) Instance Creation Date              DA: '20030903'
@@ -51,57 +52,62 @@ You can display the entire dataset by simply printing its string
     the example program `dcm_qt_tree.py
     <https://github.com/pydicom/contrib-pydicom/blob/master/plotting-visualization/dcm_qt_tree.py>`_.
 
-You can access specific data elements by name (DICOM 'keyword') or by DICOM tag
-number::
+You can access specific elements by their DICOM keyword or tag number::
 
   >>> ds.PatientName
   'Last^First^mid^pre'
   >>> ds[0x10,0x10].value
   'Last^First^mid^pre'
 
-In the latter case (using the tag number directly) a DataElement instance is
-returned, so the ``.value`` must be used to get the value.
+When using the tag number directly a :class:`DataElement<dataelem.DataElement>`
+instance is returned, so :class:`DataElement.value<dataelem.DataElement.value>`
+must be used to get the value.
 
-.. note::
+.. warning::
 
-    In pydicom, private data elements are displayed with square brackets
-    around the name (if the name is known to pydicom).  These are shown for
+    In *pydicom*, private data elements are displayed with square brackets
+    around the name (if the name is known to *pydicom*).  These are shown for
     convenience only; the descriptive name in brackets cannot be used to
     retrieve data elements. See details in :doc:`private_data_elements`.
 
-You can also set values by name (DICOM keyword) or tag number::
+You can also set an element's value by using the element's keyword or tag
+number::
 
   >>> ds.PatientID = "12345"
   >>> ds.SeriesNumber = 5
   >>> ds[0x10,0x10].value = 'Test'
 
-The use of names is possible because pydicom intercepts requests for member
+The use of names is possible because *pydicom* intercepts requests for member
 variables, and checks if they are in the DICOM dictionary. It translates the
-keyword to a (group,element) number and returns the corresponding value for
-that key if it exists.
+keyword to a (group,element) tag and returns the corresponding value for
+that tag if it exists in the dataset.
 
 See :ref:`sphx_glr_auto_examples_metadata_processing_plot_anonymize.py` for a
 usage example of data elements removal and assignation.
 
 .. note::
 
-   To understand using :class:`sequence.Sequences` in pydicom, please refer to
-   this object model:
-   :class:`dataset.Dataset` (wraps a Python ``dict``)
+   To understand using :class:`Sequence<sequence.Sequence>` in *pydicom*,
+   please refer to this object model:
 
-    * ---> contains DataElement instances
+   * :class:`Dataset<dataset.Dataset>` (wraps a Python :class:`dict`)
 
-      * --> the value of the data element can be one of:
+     * Contains :class:`DataElement<dataelem.DataElement>` instances,
+       the value of each element can be one of:
 
-          * a regular value like a number, string, etc.
-          * a list of regular values (e.g. a 3-D coordinate)
-          * a Sequence instance
+       * a regular numeric, string or text value as an :class:`int`,
+         :class:`float`, :class:`str`, :class:`bytes`, etc
+       * a :class:`list` of regular values (e.g. a 3-D coordinate)
+       * a :class:`Sequence<sequence.Sequence>` instance, where
+         :class:`Sequence<sequence.Sequence>` is a :class:`list` of
+         :class:`Dataset<dataset.Dataset>` instances
 
-          * --> a Sequence is a list of :class:`dataset.Dataset` (and so we come full circle)
+         * Where each :class:`Dataset<dataset.Dataset>` contains
+           :class:`DataElement<dataelem.DataElement>` instances, and so on...
 
-DICOM :class:`sequence.Sequences` are turned into Python ``list`` s. Items in
-the sequence are referenced by number, beginning at index 0 as per Python
-convention::
+The value of sequence elements is a :class:`Sequence<sequence.Sequence>`
+instance, which wraps a Python :class:`list<list>`. Items in the sequence are
+referenced by number, beginning at index ``0`` as per Python convention::
 
   >>> ds.BeamSequence[0].BeamName
   'Field 1'
@@ -120,69 +126,75 @@ can also use the tag numbers directly, such as::
   >>> ds[0x300a,0xb0][0][0x300a,0xc2].value
   'Field 1'
 
-If you don't remember or know the exact tag name (aka DICOM keyword),
-:class:`dataset.Dataset` provides a handy :func:`dataset.Dataset.dir` method,
-useful during interactive sessions at the Python prompt::
+If you don't remember or know the exact element tag or keyword,
+:class:`Dataset<dataset.Dataset>` provides a handy
+:func:`Dataset.dir()<dataset.Dataset.dir>` method, useful during interactive
+sessions at the Python prompt::
 
   >>> ds.dir("pat")
   ['PatientBirthDate', 'PatientID', 'PatientName', 'PatientSetupSequence', 'PatientSex']
 
-:func:`dataset.Dataset.dir` will return any DICOM tag names in the dataset that
-have the specified string anywhere in the name (case insensitive).
+:func:`Dataset.dir()<dataset.Dataset.dir>` will return any non-private element
+keywords in the dataset that have the specified string anywhere in the
+keyword (case insensitive).
 
 .. note::
 
-   Calling :func:`dataset.Dataset.dir` with no string will list all tag names
-   available in the dataset.
+   Calling :func:`Dataset.dir()<dataset.Dataset.dir>` without passing it an
+   argument will return a :class:`list` of all non-private element keywords in
+   the dataset.
 
-You can also see all the names that pydicom knows about by viewing the
+You can also see all the names that *pydicom* knows about by viewing the
 ``_dicom_dict.py`` file. It should not normally be necessary, but you can add
 your own entries to the DICOM dictionary at run time using
-:func:`datadict.add_dict_entries` or :func:`datadict.add_dict_entry`.
+:func:`add_dict_entry()<datadict.add_dict_entry>` or
+:func:`add_dict_entries()<datadict.add_dict_entries>`.
 Similarly, you can add private data elements to the private dictionary using
-:func:`datadict.add_private_dict_entries` or
-:func:`datadict.add_private_dict_entries`.
+:func:`add_private_dict_entry()<datadict.add_private_dict_entry>` or
+:func:`add_private_dict_entries()<datadict.add_private_dict_entries>`.
 
-Under the hood, :class:`dataset.Dataset` stores a DataElement object for each
-item, but when accessed by name (e.g. ``ds.PatientName``) only the ``value`` of
-that :class:`dataelem.DataElement` is returned. If you need the whole
-:mod:`dataelem` (see the :class:`dataelem.DataElement` discussion), you can
-use the :func:`dataset.Dataset.data_element` method or access the item using
-the tag number::
+Under the hood, :class:`Dataset<dataset.Dataset>` stores a
+:class:`DataElement<dataelem.DataElement>` object for each item, but when
+accessed by keyword (e.g. ``ds.PatientName``) only the value of
+that :class:`DataElement<dataelem.DataElement>` is returned. If you need the
+object itself, you can use the access the item using either the keyword (for
+official DICOM elements) or tag number::
 
   >>> # reload the data
   >>> ds = pydicom.dcmread(filename)
-  >>> data_element = ds.data_element("PatientName")
-  >>> data_element.VR, data_element.value
+  >>> elem = ds['PatientName']
+  >>> elem.VR, elem.value
   ('PN', 'Last^First^mid^pre')
   >>> # an alternative is to use:
-  >>> data_element = ds[0x10,0x10]
-  >>> data_element.VR, data_element.value
+  >>> elem = ds[0x0010,0x0010]
+  >>> elem.VR, elem.value
   ('PN', 'Last^First^mid^pre')
 
-To check for the existence of a particular tag before using it,
-use the `in` keyword::
+To see whether the :class:`Dataset<dataset.Dataset>` contains a particular
+element use the ``in`` operator with the element's keyword or tag::
 
-  >>> "PatientName" in ds
+  >>> "PatientName" in ds  # or (0x0010,0x0010) in ds
   True
 
-To remove a data element from the dataset,  use python's `del` statement::
+To remove an element from the :class:`Dataset<dataset.Dataset>`,  use the
+``del`` operator::
 
-  >>> del ds.SoftwareVersions   # or del ds[0x0018, 0x1020]
+  >>> del ds.SoftwareVersions  # or del ds[0x0018, 0x1020]
 
-To work with pixel data, the raw bytes are available through the usual tag::
+To work with (7FE0,0010) *Pixel Data*, the raw :class:`bytes` are available
+through the `PixelData` keyword::
 
   >>> # read data with actual pixel data
   >>> filename = get_testdata_files("CT_small.dcm")[0]
   >>> ds = pydicom.dcmread(filename)
   >>> pixel_bytes = ds.PixelData
 
-but to work with them in a more intelligent way, use
-:func:`Dataset.pixel_array` (requires the `NumPy library
-<http://numpy.org>`_)::
+However its much more convenient to use
+:func:`Dataset.pixel_array<dataset.Dataset.pixel_array>` to return a
+:class:`numpy.ndarray` (requires the `NumPy library <http://numpy.org>`_)::
 
-  >>> pix = ds.pixel_array
-  >>> pix # doctest: +NORMALIZE_WHITESPACE
+  >>> arr = ds.pixel_array
+  >>> arr # doctest: +NORMALIZE_WHITESPACE
   array([[175, 180, 166, ..., 203, 207, 216],
          [186, 183, 157, ..., 181, 190, 239],
          [184, 180, 171, ..., 152, 164, 235],
@@ -196,32 +208,40 @@ For more details, see :doc:`working_with_pixel_data`.
 DataElement
 -----------
 
-The :class:`dataelem.DataElement` class is not usually used directly in user
-code, but is used extensively by
-:class:`dataset.Dataset`. :class:`dataelem.DataElement` is a simple object
-which stores the following things:
+The :class:`DataElement<dataelem.DataElement>` class is not usually used
+directly in user code, but is used extensively by
+:class:`Dataset<dataset.Dataset>`. :class:`DataElement<dataelem.DataElement>`
+is a simple object which stores the following things:
 
-  * tag -- a DICOM tag (as a Tag object)
-  * VR -- DICOM value representation -- various number and string formats, etc
-  * VM -- value multiplicity. This is 1 for most DICOM tags, but
-    can be multiple, e.g. for coordinates. You do not have to specify this,
-    the DataElement class keeps track of it based on value.
-  * value -- the actual value. A regular value like a number or string
-    (or list of them), or a Sequence.
+  * :meth:`tag<dataelem.DataElement.tag>` -- the element's tag (as a
+    :class:`BaseTag<tag.BaseTag>` object)
+  * :meth:`VR<dataelem.DataElement.VR>` -- the element's Value Representation
+    -- a two letter :class:`str` that describes to the format of the stored
+    value
+  * :meth:`VM<dataelem.DataElement.VM>` -- the element's Value Multiplicity as
+    an :class:`int`. This is automatically determined from the contents of
+    the :meth:`value<dataelem.DataElement.value>`.
+  * :meth:`value<dataelem.DataElement.value>` -- the element's actual value.
+    A regular value like a number or string (or :class:`list` of them if the
+    VM > 1), or a :class:`Sequence<sequence.Sequence>`.
 
 Tag
 ---
 
-Tag is not generally used directly in user code, as Tags are automatically
-created when you assign or read data elements using the DICOM keywords as
-illustrated in sections above.
+:func:`Tag()<tag.Tag>` is not generally used directly in user code, as
+:func:`BaseTags<tag.BaseTag>` are automatically created when you assign or read
+elements using their keywords as illustrated in sections above.
 
-The Tag class is derived from Python's ``int``, so in effect, it is just
-a number with some extra behaviour:
+The :class:`BaseTag<tag.BaseTag>` class is derived from :class:`int` in
+Python 3 and :class:`long` in Python 2, so in effect, it is just a number
+with some extra behaviour:
 
-  * Tag enforces that the DICOM tag fits in the expected 4-byte (group,element)
-  * A Tag instance can be created from an int or a tuple containing
-    the (group,element), or from the DICOM keyword::
+  * :func:`Tag()<tag.Tag>` is used to create instances of
+    :class:`BaseTag<tag.BaseTag>` and enforces that the DICOM tag fits in the
+    expected 4-byte (group,element)
+  * A :class:`BaseTag<tag.BaseTag>` instance can be created from an
+    :class:`int` or a :class:`tuple` containing the (group,element), or
+    from the DICOM keyword::
 
       >>> from pydicom.tag import Tag
       >>> t1 = Tag(0x00100010) # all of these are equivalent
@@ -230,20 +250,24 @@ a number with some extra behaviour:
       >>> t4 = Tag("PatientName")
       >>> t1
       (0010, 0010)
+      >>> type(t1)
+      <class `pydicom.tag.BaseTag`>
       >>> t1==t2, t1==t3, t1==t4
       (True, True, True)
 
-  * Tag has properties group and element (or elem) to return the group and
-    element portions
-  * The ``is_private`` property checks whether the tag represents
-    a private tag (i.e. if group number is odd).
+  * :class:`BaseTag.group<tag.BaseTag.group>` and
+    :class:`BaseTag.elem<tag.BaseTag.elem>` to return the group and element
+    portions of the tag.
+  * The :class:`BaseTag.is_private<tag.BaseTag.is_private>` property checks
+    whether the tag represents a private tag (i.e. if group number is odd).
 
 Sequence
 --------
 
-Sequence is derived from Python's ``list``. The only added functionality is
-to make string representations prettier. Otherwise all the usual methods of
-``list`` like item selection, append, etc. are available.
+:class:`Sequence<sequence.Sequence>` is derived from Python's :class:`list`.
+The only added functionality is to make string representations prettier.
+Otherwise all the usual methods of :class:`list` like item selection, append,
+etc. are available.
 
 For examples of accessing data nested in sequences, see
 :ref:`sphx_glr_auto_examples_metadata_processing_plot_sequences.py`.

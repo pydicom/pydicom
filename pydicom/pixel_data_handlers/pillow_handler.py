@@ -1,5 +1,7 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
-"""Use the pillow python package to decode pixel transfer syntaxes."""
+"""Use the `pillow <https://python-pillow.org/>`_ Python package
+to decode *Pixel Data*.
+"""
 
 import io
 import logging
@@ -54,48 +56,55 @@ DEPENDENCIES = {
 
 
 def is_available():
-    """Return True if the handler has its dependencies met."""
+    """Return ``True`` if the handler has its dependencies met."""
     return HAVE_NP and HAVE_PIL
 
 
 def supports_transfer_syntax(transfer_syntax):
-    """
-    Returns
-    -------
-    bool
-        True if this pixel data handler might support this transfer syntax.
+    """Return ``True`` if the handler supports the `transfer_syntax`.
 
-        False to prevent any attempt to try to use this handler
-        to decode the given transfer syntax
+    Parameters
+    ----------
+    transfer_syntax : uid.UID
+        The Transfer Syntax UID of the *Pixel Data* that is to be used with
+        the handler.
     """
     return transfer_syntax in PillowSupportedTransferSyntaxes
 
 
 def needs_to_convert_to_RGB(dicom_dataset):
+    """Return ``True`` if the *Pixel Data* should to be converted from YCbCr to
+    RGB.
+
+    This affects JPEG transfer syntaxes.
+    """
     return False
 
 
 def should_change_PhotometricInterpretation_to_RGB(dicom_dataset):
+    """Return ``True`` if the *Photometric Interpretation* should be changed
+    to RGB.
+
+    This affects JPEG transfer syntaxes.
+    """
     should_change = dicom_dataset.SamplesPerPixel == 3
     return False
 
 
 def get_pixeldata(dicom_dataset):
-    """Use Pillow to decompress compressed Pixel Data.
+    """Use Pillow to decompress compressed *Pixel Data*.
 
     Returns
     -------
     numpy.ndarray
-       The contents of the Pixel Data element (7FE0,0010) as an ndarray.
+       The *Pixel Data* as a :class:`numpy.ndarray`.
 
     Raises
     ------
     ImportError
-        If PIL is not available.
-
+        If Pillow is not available.
     NotImplementedError
         if the transfer syntax is not supported
-
     TypeError
         if the pixel data type is unsupported
     """

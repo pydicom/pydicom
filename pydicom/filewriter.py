@@ -134,7 +134,8 @@ def correct_ambiguous_vr_element(elem, ds, is_little_endian):
     all retired or part of DICONDE.
 
     If the VR is corrected and is 'US' or 'SS' then the value will be updated
-    using the pydicom.values.convert_numbers() method.
+    using the :func:`convert_numbers()<pydicom.values.convert_numbers>`
+    function.
 
     Parameters
     ----------
@@ -174,7 +175,8 @@ def correct_ambiguous_vr(ds, is_little_endian):
     all retired or part of DICONDE.
 
     If the VR is corrected and is 'US' or 'SS' then the value will be updated
-    using the pydicom.values.convert_numbers() method.
+    using the :func:`convert_numbers()<pydicom.values.convert_numbers>`
+    function.
 
     Parameters
     ----------
@@ -566,7 +568,17 @@ def _harmonize_properties(dataset, fp):
 
 
 def write_sequence(fp, data_element, encodings):
-    """Write a dicom Sequence contained in data_element to the file fp."""
+    """Write a sequence contained in `data_element` to the file-like `fp`.
+
+    Parameters
+    ----------
+    fp : file-like
+        The file-like to write the encoded data to.
+    data_element : dataelem.DataElement
+        The sequence element to write to `fp`.
+    encodings : list of str
+        The character encodings to use on text values.
+    """
     # write_data_element has already written the VR='SQ' (if needed) and
     #    a placeholder for length"""
     sequence = data_element.value
@@ -575,12 +587,21 @@ def write_sequence(fp, data_element, encodings):
 
 
 def write_sequence_item(fp, dataset, encodings):
-    """Write an item (dataset) in a dicom Sequence to the dicom file fp.
+    """Write a `dataset` in a sequence to the file-like `fp`.
 
     This is similar to writing a data_element, but with a specific tag for
-    Sequence Item
+    Sequence Item.
 
-    see Dicom standard Part 5, p. 39 ('03 version)
+    See DICOM Standard, Part 5, :dcm:`Section 7.5<sect_7.5.html>`.
+
+    Parameters
+    ----------
+    fp : file-like
+        The file-like to write the encoded data to.
+    dataset : Dataset
+        The :class:`Dataset<pydicom.dataset.Dataset>` to write to `fp`.
+    encodings : list of str
+        The character encodings to use on text values.
     """
     fp.write_tag(ItemTag)  # marker for start of Sequence Item
     length_location = fp.tell()  # save location for later.
@@ -627,9 +648,11 @@ def write_file_meta_info(fp, file_meta, enforce_standard=True):
 
     **DICOM File Meta Information Group Elements**
 
-    From the DICOM standard, Part 10 Section 7.1, any DICOM file shall contain
-    a 128-byte preamble, a 4-byte DICOM prefix 'DICM' and (at a minimum) the
-    following Type 1 DICOM Elements (from Table 7.1-1):
+    From the DICOM standard, Part 10,
+    :dcm:`Section 7.1<part10/chapter_7.html#sect_7.1>`,  any DICOM file shall
+    contain a 128-byte preamble, a 4-byte DICOM prefix 'DICM' and (at a
+    minimum) the following Type 1 DICOM Elements (from
+    :dcm:`Table 7.1-1<part10/chapter_7.html#table_7.1-1>`):
 
     * (0002,0000) *File Meta Information Group Length*, UL, 4
     * (0002,0001) *File Meta Information Version*, OB, 2
@@ -757,35 +780,37 @@ def dcmwrite(filename, dataset, write_like_original=True):
     (0002,eeee) group. Some of these elements are required (Type 1) while
     others are optional (Type 3/1C). If `write_like_original` is ``True``
     then the *File Meta Information Group* elements are all optional. See
-    ``pydicom.filewriter.write_file_meta_info()`` for more information on which
-    elements are required.
+    :func:`write_file_meta_info()<pydicom.filewriter.write_file_meta_info>` for
+    more information on which elements are required.
 
     The *File Meta Information Group* elements should be included within their
-    own ``Dataset`` in the ``dataset.file_meta`` attribute.
+    own :class:`Dataset<pydicom.dataset.Dataset>` in the ``dataset.file_meta``
+    attribute.
 
     If (0002,0010) *Transfer Syntax UID* is included then the user must ensure
     it's value is compatible with the values for the
     ``dataset.is_little_endian`` and ``dataset.is_implicit_VR`` attributes.
     For example, if ``is_little_endian`` and ``is_implicit_VR`` are both
     ``True`` then the Transfer Syntax UID must be 1.2.840.10008.1.2 *Implicit
-    VR Little Endian*. See the DICOM standard Part 5 Section 10 for more
-    information on Transfer Syntaxes.
+    VR Little Endian*. See the DICOM Standard, Part 5,
+    :dcm:`Section 10<part05/chapter_10.html>` for more information on Transfer
+    Syntaxes.
 
     *Encoding*
 
     The preamble and prefix are encoding independent. The File Meta elements
     are encoded as *Explicit VR Little Endian* as required by the DICOM
-    standard.
+    Standard.
 
     **Dataset**
 
     A DICOM Dataset representing a SOP Instance related to a DICOM Information
-    Object Definition. It is up to the user to ensure the ``dataset`` conforms
-    to the DICOM standard.
+    Object Definition. It is up to the user to ensure the `dataset` conforms
+    to the DICOM Standard.
 
     *Encoding*
 
-    The ``dataset`` is encoded as specified by the ``dataset.is_little_endian``
+    The `dataset` is encoded as specified by the ``dataset.is_little_endian``
     and ``dataset.is_implicit_VR`` attributes. It's up to the user to ensure
     these attributes are set correctly (as well as setting an appropriate
     value for ``dataset.file_meta.TransferSyntaxUID`` if present).
@@ -796,7 +821,7 @@ def dcmwrite(filename, dataset, write_like_original=True):
         Name of file or the file-like to write the new DICOM file to.
     dataset : pydicom.dataset.FileDataset
         Dataset holding the DICOM information; e.g. an object read with
-        ``pydicom.dcmread()``.
+        :func:`dcmread()<pydicom.filereader.dcmread>`.
     write_like_original : bool, optional
         If ``True`` (default), preserves the following information from
         the Dataset (and may result in a non-conformant file):

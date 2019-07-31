@@ -16,14 +16,15 @@ def convert_color_space(arr, current, desired):
     Parameters
     ----------
     arr : numpy.ndarray
-        The image(s) as an ndarray with shape (frames, rows, columns, planes)
+        The image(s) as a :class:`numpy.ndarray` with
+        :attr:`shape<numpy.ndarray.shape>` (frames, rows, columns, planes)
         or (rows, columns, planes).
     current : str
         The current color space, should be a valid value for (0028,0004)
-        *Photometric Interpretation*. One of 'RGB', 'YBR_FULL'.
+        *Photometric Interpretation*. One of ``'RGB'``, ``'YBR_FULL'``.
     desired : str
         The desired color space, should be a valid value for (0028,0004)
-        *Photometric Interpretation*. One of 'RGB', 'YBR_FULL'.
+        *Photometric Interpretation*. One of ``'RGB'``, ``'YBR_FULL'``.
 
     Returns
     -------
@@ -59,26 +60,27 @@ def convert_color_space(arr, current, desired):
 
 
 def dtype_corrected_for_endianness(is_little_endian, numpy_dtype):
-    """Return a numpy dtype corrected for system and dataset endianness.
+    """Return a :class:`numpy.dtype` corrected for system and :class:`Dataset`
+    endianness.
 
     Parameters
     ----------
     is_little_endian : bool
-        The endianess of the affected dataset.
+        The endianess of the affected :class:`Dataset`.
     numpy_dtype : numpy.dtype
-        The numpy data type used for the pixel data without considering
+        The numpy data type used for the *Pixel Data* without considering
         endianess.
 
     Raises
     ------
     ValueError
-        If `is_little_endian` is None, e.g. not initialized.
+        If `is_little_endian` is ``None``, e.g. not initialized.
 
     Returns
     -------
     numpy.dtype
-        The numpy data type to be used for the pixel data, considering
-        the endianess.
+        The numpy data type used for the *Pixel Data* without considering
+        endianess.
     """
     if is_little_endian is None:
         raise ValueError("Dataset attribute 'is_little_endian' "
@@ -91,7 +93,7 @@ def dtype_corrected_for_endianness(is_little_endian, numpy_dtype):
 
 
 def pixel_dtype(ds):
-    """Return a numpy dtype for the pixel data in dataset in `ds`.
+    """Return a :class:`numpy.dtype` for the *Pixel Data* in `ds`.
 
     Suitable for use with IODs containing the Image Pixel module.
 
@@ -108,19 +110,19 @@ def pixel_dtype(ds):
     Parameters
     ----------
     ds : dataset.Dataset
-        The DICOM dataset containing the pixel data you wish to get the
-        numpy dtype for.
+        The :class:`Dataset` containing the *Pixel Data* you wish to get the
+        data type for.
 
     Returns
     -------
     numpy.dtype
-        A numpy dtype suitable for containing the dataset's pixel data.
+        A :class:`numpy.dtype` suitable for containing the *Pixel Data*.
 
     Raises
     ------
     NotImplementedError
         If the pixel data is of a type that isn't supported by either numpy
-        or pydicom.
+        or *pydicom*.
     """
     if not HAVE_NP:
         raise ImportError("Numpy is required to determine the dtype.")
@@ -178,7 +180,7 @@ def pixel_dtype(ds):
 
 
 def reshape_pixel_array(ds, arr):
-    """Return a reshaped ndarray `arr`.
+    """Return a reshaped :class:`numpy.ndarray` `arr`.
 
     +------------------------------------------+-----------+----------+
     | Element                                  | Supported |          |
@@ -196,7 +198,7 @@ def reshape_pixel_array(ds, arr):
     | (0028,0011) | Columns             | 1    | N > 0     | Required |
     +-------------+---------------------+------+-----------+----------+
 
-    (0028,0008) *Number of Frames* is required when the pixel data contains
+    (0028,0008) *Number of Frames* is required when *Pixel Data* contains
     more than 1 frame. (0028,0006) *Planar Configuration* is required when
     (0028,0002) *Samples per Pixel* is greater than 1. For certain
     compressed transfer syntaxes it is always taken to be either 0 or 1 as
@@ -230,8 +232,8 @@ def reshape_pixel_array(ds, arr):
     Parameters
     ----------
     ds : dataset.Dataset
-        The dataset containing the Image Pixel module corresponding to the
-        pixel data in `arr`.
+        The :class:`Dataset` containing the Image Pixel module corresponding
+        to the data in `arr`.
     arr : numpy.ndarray
         The 1D array containing the pixel data.
 
@@ -325,7 +327,8 @@ def reshape_pixel_array(ds, arr):
 
 
 def get_expected_length(ds, unit='bytes'):
-    """Return the expected length (in bytes or pixels) of the pixel data.
+    """Return the expected length (in terms of bytes or pixels) of the *Pixel
+    Data*.
 
     +------------------------------------------+-------------+
     | Element                                  | Required or |
@@ -346,7 +349,8 @@ def get_expected_length(ds, unit='bytes'):
     Parameters
     ----------
     ds : dataset.Dataset
-        The DICOM dataset containing the Image Pixel module and pixel data.
+        The :class:`Dataset` containing the Image Pixel module and *Pixel
+        Data*.
     unit : str, optional
         If ``'bytes'`` then returns the expected length of the *Pixel Data* in
         whole bytes and NOT including an odd length trailing NULL padding
@@ -356,8 +360,8 @@ def get_expected_length(ds, unit='bytes'):
     Returns
     -------
     int
-        The expected length of the pixel data in either whole bytes or pixels,
-        excluding the NULL trailing padding byte for odd length data.
+        The expected length of the *Pixel Data* in either whole bytes or
+        pixels, excluding the NULL trailing padding byte for odd length data.
     """
     length = ds.Rows * ds.Columns * ds.SamplesPerPixel
     length *= getattr(ds, 'NumberOfFrames', 1)

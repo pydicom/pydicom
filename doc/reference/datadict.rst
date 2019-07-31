@@ -5,7 +5,7 @@ Data Dictionary Utilities (:mod:`pydicom.datadict`)
 
 .. currentmodule:: pydicom.datadict
 
-Data dictionary utilities
+Data dictionary functions
 
 DICOM Data Dictionary
 ---------------------
@@ -32,12 +32,12 @@ DICOM Data Dictionary
 Private Data Dictionary
 -----------------------
 
-   .. autosummary::
-      :toctree: generated/
+.. autosummary::
+   :toctree: generated/
 
-      add_private_dict_entries
-      add_private_dict_entry
-      get_private_entry
-      private_dictionary_description
-      private_dictionary_VM
-      private_dictionary_VR
+   add_private_dict_entries
+   add_private_dict_entry
+   get_private_entry
+   private_dictionary_description
+   private_dictionary_VM
+   private_dictionary_VR

@@ -1,6 +1,7 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """
-Use the jpeg_ls (CharPyLS) python package to decode pixel transfer syntaxes.
+Use the `jpeg_ls (CharPyLS) <https://github.com/Who8MyLunch/CharPyLS>`_ Python
+package to decode pixel transfer syntaxes.
 """
 
 try:
@@ -34,53 +35,57 @@ SUPPORTED_TRANSFER_SYNTAXES = [
 
 
 def is_available():
-    """Return True if the handler has its dependencies met."""
+    """Return ``True`` if the handler has its dependencies met."""
     return HAVE_NP and HAVE_JPEGLS
 
 
 def needs_to_convert_to_RGB(dicom_dataset):
+    """Return ``True`` if the *Pixel Data* should to be converted from YCbCr to
+    RGB.
+
+    This affects JPEG transfer syntaxes.
+    """
     return False
 
 
 def should_change_PhotometricInterpretation_to_RGB(dicom_dataset):
+    """Return ``True`` if the *Photometric Interpretation* should be changed
+    to RGB.
+
+    This affects JPEG transfer syntaxes.
+    """
     should_change = dicom_dataset.SamplesPerPixel == 3
     return False
 
 
 def supports_transfer_syntax(transfer_syntax):
-    """
-    Returns
-    -------
-    bool
-        True if this pixel data handler might support this transfer syntax.
+    """Return ``True`` if the handler supports the `transfer_syntax`.
 
-        False to prevent any attempt to try to use this handler
-        to decode the given transfer syntax
+    Parameters
+    ----------
+    transfer_syntax : uid.UID
+        The Transfer Syntax UID of the *Pixel Data* that is to be used with
+        the handler.
     """
     return transfer_syntax in SUPPORTED_TRANSFER_SYNTAXES
 
 
 def get_pixeldata(dicom_dataset):
-    """
-    Use the jpeg_ls package to decode the PixelData attribute
+    """Return the *Pixel Data* as a :class:`numpy.ndarray`.
 
     Returns
     -------
     numpy.ndarray
-
-        A correctly sized (but not shaped) numpy array
-        of the entire data volume
+        A correctly sized (but not shaped) numpy array of the *Pixel Data*.
 
     Raises
     ------
     ImportError
-        if the required packages are not available
-
+        If the required packages are not available.
     NotImplementedError
-        if the transfer syntax is not supported
-
+        If the transfer syntax is not supported.
     TypeError
-        if the pixel data type is unsupported
+        If the pixel data type is unsupported.
     """
     if (dicom_dataset.file_meta.TransferSyntaxUID
             not in SUPPORTED_TRANSFER_SYNTAXES):

@@ -9,7 +9,7 @@ API Reference
 .. module:: pydicom
 
 This API reference guide details the functions, modules and objects included in
-pydicom.
+*pydicom*.
 
 .. toctree::
    :maxdepth: 2

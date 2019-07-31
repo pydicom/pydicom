@@ -48,8 +48,8 @@ def _linkcode_resolve(domain, info, package, url_fmt, revision):
     try:
         obj = attrgetter(info['fullname'])(module)
     except AttributeError as exc:
-        #print(module, attrgetter(info['fullname']))
-        #raise exc
+        # print(module, attrgetter(info['fullname']))
+        # raise exc
         pass
 
     try:

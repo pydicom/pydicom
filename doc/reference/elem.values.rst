@@ -10,7 +10,6 @@ Element value decoding.
 .. autosummary::
    :toctree: generated/
 
-   convert_tag
    convert_AE_string
    convert_ATvalue
    convert_DA_string
@@ -24,6 +23,7 @@ Element value decoding.
    convert_single_string
    convert_SQ
    convert_string
+   convert_tag
    convert_text
    convert_TM_string
    convert_UI

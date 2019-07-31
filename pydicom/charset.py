@@ -273,7 +273,7 @@ custom_encoders = {
 
 
 def decode_string(value, encodings, delimiters):
-    """Convert an encoded byte `value` into a unicode string using `encodings`.
+    """Decode an encoded byte `value` into a unicode string using `encodings`.
 
     Parameters
     ----------
@@ -291,15 +291,15 @@ def decode_string(value, encodings, delimiters):
     -------
     str or unicode
         The decoded unicode string. If the value could not be decoded,
-        and ```config.enforce_valid_values`` is ``False``, a warning is issued,
-        and the value is decoded using the first encoding with replacement
-        characters, resulting in data loss.
+        and :func:`enforce_valid_values<pydicom.config.enforce_valid_values>`
+        is ``False``, a warning is issued, and `value` is decoded using the
+        first encoding with replacement characters, resulting in data loss.
 
     Raises
     ------
     UnicodeDecodeError
-        If ``config.enforce_valid_values`` is ``True`` and `value` could not be
-        decoded with the given encodings.
+        If :func:`enforce_valid_values<pydicom.config.enforce_valid_values>`
+        is ``True`` and `value` could not be decoded with the given encodings.
     """
     # shortcut for the common case - no escape sequences present
     if ESC not in value:
@@ -375,8 +375,11 @@ def _decode_fragment(byte_str, encodings, delimiters):
 
     References
     ----------
-    * DICOM Standard Part 5, Sections 6.1.2.4 and 6.1.2.5
-    * DICOM Standard Part 3, Anex C.12.1.1.2
+    * DICOM Standard, Part 5,
+      :dcm:`Sections 6.1.2.4<part05/chapter_6.html#sect_6.1.2.4>` and
+      :dcm:`6.1.2.5<part05/chapter_6.html#sect_6.1.2.5>`
+    * DICOM Standard, Part 3,
+      :dcm:`Annex C.12.1.1.2<part03/sect_C.12.html#sect_C.12.1.1.2>`
     """
     try:
         if byte_str.startswith(ESC):
@@ -431,7 +434,7 @@ def _decode_escaped_fragment(byte_str, encodings, delimiters):
 
 
 def encode_string(value, encodings):
-    """Convert a unicode string `value` into a bytes using `encodings`.
+    """Encode a unicode string `value` into :class:`bytes` using `encodings`.
 
     Parameters
     ----------
@@ -445,16 +448,18 @@ def encode_string(value, encodings):
     Returns
     -------
     bytes or str
-        The encoded string. If the value could not be encoded with any of
-        the given encodings, and ``config.enforce_valid_values`` is ``False``,
-        a warning is issued, and the value is encoded using the first
+        The encoded string. If `value` could not be encoded with any of
+        the given encodings, and
+        :func:`enforce_valid_values<pydicom.config.enforce_valid_values>` is
+        ``False``, a warning is issued, and `value` is encoded using the first
         encoding with replacement characters, resulting in data loss.
 
     Raises
     ------
     UnicodeEncodeError
-        If ``config.enforce_valid_values`` is ``True`` and `value` could not be
-        encoded with the supplied encodings.
+        If  :func:`enforce_valid_values<pydicom.config.enforce_valid_values>`
+        is ``True`` and `value` could not be encoded with the supplied
+        encodings.
     """
     for i, encoding in enumerate(encodings):
         try:
@@ -581,7 +586,7 @@ def _encode_string_impl(value, encoding, errors='strict'):
 
 
 def convert_encodings(encodings):
-    """Converts DICOM encodings into corresponding Python encodings.
+    """Convert DICOM `encodings` into corresponding Python encodings.
 
     Handles some common spelling mistakes and issues a warning in this case.
 
@@ -590,8 +595,9 @@ def convert_encodings(encodings):
     they are ignored. In both cases, a warning is issued.
 
     Invalid encodings are replaced with the default encoding with a
-    respective warning issued, if ``config.enforce_valid_values`` is ``False``,
-    otherwise an exception is raised.
+    respective warning issued, if
+    :func:`enforce_valid_values<pydicom.config.enforce_valid_values>` is
+    ``False``, otherwise an exception is raised.
 
     Parameters
     ----------
@@ -602,17 +608,20 @@ def convert_encodings(encodings):
     Returns
     -------
     list of str
-        The list of Python encodings corresponding to the DICOM encodings.
-        If an encoding is already a Python encoding, it is returned unchanged.
-        Encodings with common spelling errors are replaced by the correct
-        encoding, and invalid encodings are replaced with the default
-        encoding if ``config.enforce_valid_values`` is ``False``.
+        A :class:`list` of Python encodings corresponding to the DICOM
+        encodings. If an encoding is already a Python encoding, it is returned
+        unchanged. Encodings with common spelling errors are replaced by the
+        correct encoding, and invalid encodings are replaced with the default
+        encoding if
+        :func:`enforce_valid_values<pydicom.config.enforce_valid_values>` is
+        ``False``.
 
     Raises
     ------
     LookupError
-        In case of an invalid encoding that could not be corrected if
-        ``config.enforce_valid_values`` is set.
+        If `encodings` contains a value that could not be converted and
+        :func:`enforce_valid_values<pydicom.config.enforce_valid_values>` is
+        ``True``.
     """
 
     # If a list if passed, we don't want to modify the list in place so copy it
@@ -717,12 +726,13 @@ def _handle_illegal_standalone_encodings(encodings, py_encodings):
 
 
 def decode(data_element, dicom_character_set):
-    """Apply the DICOM character encoding to the data element
+    """Apply the DICOM character encoding to a data element
 
     Parameters
     ----------
     data_element : dataelem.DataElement
-        The ``DataElement`` instance containing a value to convert
+        The :class:`DataElement<pydicom.dataelem.DataElement>` instance
+        containing an encoded byte string value to decode.
     dicom_character_set : str or list of str or None
         The value of (0008,0005) *Specific Character Set*, which may be a
         single value, a multiple value (code extension), or may also be ``''``

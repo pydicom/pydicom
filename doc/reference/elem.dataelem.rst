@@ -5,7 +5,7 @@ Data Elements (:mod:`pydicom.dataelem`)
 
 .. currentmodule:: pydicom.dataelem
 
-Representation of DICOM data elements and utilities
+Representation of DICOM data elements
 
 .. autosummary::
    :toctree: generated/

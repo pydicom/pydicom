@@ -1,5 +1,5 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
-"""Module for DicomDir class"""
+"""Module for DicomDir class."""
 
 from pydicom.errors import InvalidDicomError
 from pydicom.dataset import FileDataset
@@ -16,20 +16,26 @@ class DicomDir(FileDataset):
                  is_implicit_VR=True, is_little_endian=True):
         """Initialize a DICOMDIR dataset read from a DICOM file.
 
-        Carries forward all the initialization from FileDataset class
+        Carries forward all the initialization from
+        :class:`FileDataset<pydicom.dataset.FileDataset>`
 
         Parameters
         ----------
         filename_or_obj : str or None
-            Full path and filename to the file of ``None`` if ``io.BytesIO``.
+            Full path and filename to the file of ``None`` if
+            :class:`io.BytesIO`.
         dataset : dataset.Dataset
-            Some form of dictionary, usually a ``FileDataset`` from
+            Some form of dictionary, usually a
+            :class:`FileDataset<pydicom.dataset.FileDataset>` from
             :meth:`dcmread()<pydicom.filereader.dcmread>`.
         preamble : bytes
             The 128-byte DICOM preamble.
         file_meta : dataset.Dataset
-            The file meta info dataset, as returned by ``_read_file_meta``,
-            or an empty dataset if no file meta information is in the file.
+            The file meta :class:`Dataset<pydicom.dataset.Dataset>`, such as
+            the one returned by :func:`read_file_meta_info()
+            <pydicom.filereader.read_file_meta_info>`, or an empty
+            :class:`Dataset<pydicom.dataset.Dataset>` if no file meta
+            information is in the file.
         is_implicit_VR : bool
             ``True`` if implicit VR transfer syntax used (default); ``False``
             if explicit VR.

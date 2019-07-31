@@ -9,5 +9,4 @@ Functions for handling bulk data elements such as (7fe0,0010) *Pixel Data*.
    :maxdepth: 2
    :includehidden:
 
-
    handlers.pixel_data

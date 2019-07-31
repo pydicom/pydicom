@@ -10,7 +10,7 @@ File Reading/Parsing
 ====================
 
 The main function to read and parse DICOM files using *pydicom* is
-:py:meth:`dcmread() <pydicom.filereader.dcmread>`.
+:meth:`dcmread() <pydicom.filereader.dcmread>`.
 It is coded in the module ``pydicom.filereader``, but is also imported when
 the pydicom package is imported
 
@@ -20,8 +20,8 @@ the pydicom package is imported
     >>> dataset = pydicom.dcmread('path/to/file')
 
 If you need fine control over the reading, you can either call
-:py:meth:`read_partial() <pydicom.filereader.read_partial>` or use
-:py:meth:`dcmread() <pydicom.filereader.dcmread>`.
+:meth:`read_partial() <pydicom.filereader.read_partial>` or use
+:meth:`dcmread() <pydicom.filereader.dcmread>`.
 
 
 File Writing
@@ -30,12 +30,12 @@ File Writing
 DICOM files can also be written using *pydicom*. There are two ways to do this.
 
 * The first is to use
-  :py:meth:`dcmwrite() <pydicom.filewriter.dcmwrite>`
+  :meth:`dcmwrite() <pydicom.filewriter.dcmwrite>`
   with a prexisting
-  :py:class:`fileDataset <pydicom.dataset.FileDataset>` (derived from
-  :py:class:`Dataset <pydicom.dataset.Dataset>`) instance.
+  :class:`FileDataset <pydicom.dataset.FileDataset>` (derived from
+  :class:`Dataset <pydicom.dataset.Dataset>`) instance.
 * The second is to use the
-  :py:meth:`Dataset.save_as() <pydicom.dataset.Dataset.save_as>`
+  :meth:`Dataset.save_as() <pydicom.dataset.Dataset.save_as>`
   method on a ``FileDataset`` or ``Dataset`` instance.
 
 

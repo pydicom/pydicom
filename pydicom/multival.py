@@ -17,7 +17,7 @@ class MultiValue(MutableSequence):
     This class enforces that any items added to the list are of the correct
     type, by calling the constructor on any items that are added. Therefore,
     the constructor must behave nicely if passed an object that is already its
-    type. The constructor should raise ``TypeError`` if the item cannot be
+    type. The constructor should raise :class:`TypeError` if the item cannot be
     converted.
 
     Note, however, that DS and IS types can be a blank string ``''`` rather
@@ -34,8 +34,8 @@ class MultiValue(MutableSequence):
             the class, or a factory function. For DICOM multi-value data
             elements, this will be the class or type corresponding to the VR.
         iterable : iterable
-            An iterable (e.g. list, tuple) of items to initialize the
-            ``MultiValue`` list.
+            An iterable (e.g. :class:`list`, :class:`tuple`) of items to
+            initialize the :class:`MultiValue` list.
         """
         from pydicom.valuerep import DSfloat, DSdecimal, IS
 

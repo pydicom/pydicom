@@ -22,9 +22,8 @@ Parsing Encapsulated Data
    get_frame_offsets
    read_item
 
-Encapsulating Data
-------------------
-
+Creating Encapsulated Data
+--------------------------
 
 .. autosummary::
    :toctree: generated/

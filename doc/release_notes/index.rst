@@ -1,5 +1,3 @@
-.. currentmodule:: pydicom
-
 ===============
 Release history
 ===============
