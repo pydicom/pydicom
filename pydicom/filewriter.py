@@ -3,7 +3,7 @@
 
 from __future__ import absolute_import
 
-import struct
+import warnings
 from struct import pack
 
 from pydicom import compat
@@ -445,26 +445,18 @@ def write_data_element(fp, data_element, encodings=None):
     # Write element's tag
     fp.write_tag(data_element.tag)
 
-    # If explicit VR, write the VR
-    VR = data_element.VR
-    if not fp.is_implicit_VR:
-        if len(VR) != 2:
-            msg = ("Cannot write ambiguous VR of '{}' for data element with "
-                   "tag {}.\nSet the correct VR before writing, or use an "
-                   "implicit VR transfer syntax".format(
-                       VR, repr(data_element.tag)))
-            raise ValueError(msg)
-        if not in_py2:
-            fp.write(bytes(VR, default_encoding))
-        else:
-            fp.write(VR)
-        if VR in extra_length_VRs:
-            fp.write_US(0)  # reserved 2 bytes
-
     # write into a buffer to avoid seeking back which can be expansive
     buffer = DicomBytesIO()
     buffer.is_little_endian = fp.is_little_endian
     buffer.is_implicit_VR = fp.is_implicit_VR
+
+    VR = data_element.VR
+    if not fp.is_implicit_VR and len(VR) != 2:
+        msg = ("Cannot write ambiguous VR of '{}' for data element with "
+               "tag {}.\nSet the correct VR before writing, or use an "
+               "implicit VR transfer syntax".format(
+                   VR, repr(data_element.tag)))
+        raise ValueError(msg)
 
     if data_element.is_raw:
         # raw data element values can be written as they are
@@ -503,17 +495,28 @@ def write_data_element(fp, data_element, encodings=None):
 
     value_length = buffer.tell()
     if (not fp.is_implicit_VR and VR not in extra_length_VRs and
+            not is_undefined_length and value_length > 0xffff):
+        # see PS 3.5, section 6.2.2 for handling of this case
+        msg = ('The value for the data element {} exceeds the size '
+               'of 64 kByte and cannot be written in an explicit transfer '
+               'syntax. The data element VR is changed from "{}" to "UN" '
+               'to allow saving the data.'
+               .format(data_element.tag, VR))
+        warnings.warn(msg)
+        VR = 'UN'
+
+    # write the VR for explicit transfer syntax
+    if not fp.is_implicit_VR:
+        if not in_py2:
+            fp.write(bytes(VR, default_encoding))
+        else:
+            fp.write(VR)
+        if VR in extra_length_VRs:
+            fp.write_US(0)  # reserved 2 bytes
+
+    if (not fp.is_implicit_VR and VR not in extra_length_VRs and
             not is_undefined_length):
-        try:
-            fp.write_US(value_length)  # Explicit VR length field is 2 bytes
-        except struct.error:
-            msg = ('The value for the data element {} exceeds the size '
-                   'of 64 kByte and cannot be written in an explicit transfer '
-                   'syntax. You can save it using Implicit Little Endian '
-                   'transfer syntax, or you have to truncate the value to not '
-                   'exceed the maximum size of 64 kByte.'
-                   .format(data_element.tag))
-            raise ValueError(msg)
+        fp.write_US(value_length)  # Explicit VR length field is 2 bytes
     else:
         # write the proper length of the data_element in the length slot,
         # unless is SQ with undefined length.

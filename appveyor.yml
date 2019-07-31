@@ -27,13 +27,19 @@ install:
   # https://github.com/conda/conda/issues/1753
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PYTHON%\\Library\\bin;%PATH%"
 
+
   # Check that we have the expected version and architecture for Python
   - "python --version"
   - "python -c \"import struct; print(struct.calcsize('P') * 8)\""
 
   # Installed prebuilt dependencies from conda
-  - "conda install pip numpy nose wheel pytest matplotlib -y -q"
+  - "conda install -y -q setuptools"
   - "conda --version"
+
+  # the free channel is only needed for conda 4.7 and Python 2.7
+  # Miniconda 34 and 35 use an earlier version of conda (4.3)
+  - "IF '%PYTHON_VERSION%'=='2.7.x' conda config --set restore_free_channel true"
+  - "conda install pip numpy nose wheel pytest matplotlib -y -q"
   - "pip install nose-timer nose-exclude"
 
   # Install other pydicom dependencies
