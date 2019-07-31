@@ -38,7 +38,7 @@ from pydicom.dataelem import DataElement, DataElement_from_raw, RawDataElement
 from pydicom.multival import MultiValue
 from pydicom.pixel_data_handlers.util import (convert_color_space,
                                               reshape_pixel_array)
-from pydicom.tag import Tag, BaseTag, tag_in_exception
+from pydicom.tag import Tag, tag_in_exception
 from pydicom.uid import (ExplicitVRLittleEndian, ImplicitVRLittleEndian,
                          ExplicitVRBigEndian, PYDICOM_IMPLEMENTATION_UID)
 
@@ -677,7 +677,7 @@ class Dataset(dict):
         else:
             # is not a string, try to make it into a tag and then hand it
             # off to the underlying dict
-            if not isinstance(key, BaseTag):
+            if not isinstance(key, Tag):
                 try:
                     key = Tag(key)
                 except Exception:
@@ -753,7 +753,7 @@ class Dataset(dict):
     @property
     def _character_set(self):
         """The Dataset's SpecificCharacterSet value (if present)."""
-        char_set = self.get(BaseTag(0x00080005), None)
+        char_set = self.get(Tag(0x00080005), None)
 
         if not char_set:
             char_set = self._parent_encoding
@@ -807,7 +807,7 @@ class Dataset(dict):
         if isinstance(key, slice):
             return self._dataset_slice(key)
 
-        if isinstance(key, BaseTag):
+        if isinstance(key, Tag):
             tag = key
         else:
             tag = Tag(key)
@@ -823,7 +823,7 @@ class Dataset(dict):
                     self.fileobj_type, self.filename, self.timestamp,
                     data_elem)
 
-            if tag != BaseTag(0x00080005):
+            if tag != Tag(0x00080005):
                 character_set = self.read_encoding or self._character_set
             else:
                 character_set = default_encoding
@@ -990,7 +990,7 @@ class Dataset(dict):
         if isinstance(key, slice):
             return self._dataset_slice(key)
 
-        if isinstance(key, BaseTag):
+        if isinstance(key, Tag):
             tag = key
         else:
             tag = Tag(key)
@@ -1626,7 +1626,7 @@ class Dataset(dict):
         # OK if is subclass, e.g. DeferredDataElement
         if not isinstance(value, (DataElement, RawDataElement)):
             raise TypeError("Dataset contents must be DataElement instances.")
-        if isinstance(value.tag, BaseTag):
+        if isinstance(value.tag, Tag):
             tag = value.tag
         else:
             tag = Tag(value.tag)

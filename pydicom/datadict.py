@@ -3,7 +3,7 @@
 """Access dicom dictionary information"""
 
 from pydicom.config import logger
-from pydicom.tag import Tag, BaseTag
+from pydicom.tag import Tag
 
 # the actual dict of {tag: (VR, VM, name, is_retired, keyword), ...}
 from pydicom._dicom_dict import DicomDictionary
@@ -120,7 +120,7 @@ def add_dict_entries(new_entries_dict):
     >>> ds.TestOne = 'test'
     """
 
-    if any([BaseTag(tag).is_private for tag in new_entries_dict]):
+    if any([Tag(tag).is_private for tag in new_entries_dict]):
         raise ValueError(
             'Private tags cannot be added using "add_dict_entries" - '
             'use "add_private_dict_entries" instead')
@@ -201,7 +201,7 @@ def add_private_dict_entries(private_creator, new_entries_dict):
     >>> add_private_dict_entry("ACME LTD 1.3", 0x00410001, "US", "Test Three")
     """
 
-    if not all([BaseTag(tag).is_private for tag in new_entries_dict]):
+    if not all([Tag(tag).is_private for tag in new_entries_dict]):
         raise ValueError(
             'Non-private tags cannot be added using "add_private_dict_entries"'
             ' - use "add_dict_entries" instead')
@@ -223,7 +223,7 @@ def get_entry(tag):
     # and with DicomDictionary.get, instead of try/except
     # Try/except was fastest using timeit if tag is valid (usual case)
     # My test had 5.2 usec vs 8.2 for 'contains' test, vs 5.32 for dict.get
-    if not isinstance(tag, BaseTag):
+    if not isinstance(tag, Tag):
         tag = Tag(tag)
     try:
         return DicomDictionary[tag]
@@ -325,7 +325,7 @@ def repeater_has_keyword(keyword):
 def get_private_entry(tag, private_creator):
     """Return the tuple (VR, VM, name, is_retired)
        from a private dictionary"""
-    if not isinstance(tag, BaseTag):
+    if not isinstance(tag, Tag):
         tag = Tag(tag)
     try:
         private_dict = private_dictionaries[private_creator]

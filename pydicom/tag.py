@@ -37,98 +37,14 @@ def tag_in_exception(tag):
         raise type(ex)(msg)
 
 
-def Tag(arg, arg2=None):
-    """Create a Tag.
-
-    General function for creating a Tag in any of the standard forms:
-
-    * Tag(0x00100015)
-    * Tag('0x00100015')
-    * Tag((0x10, 0x50))
-    * Tag(('0x10', '0x50'))
-    * Tag(0x0010, 0x0015)
-    * Tag(0x10, 0x15)
-    * Tag(2341, 0x10)
-    * Tag('0xFE', '0x0010')
-    * Tag("PatientName")
-
-    Parameters
-    ----------
-    arg : int or str or 2-tuple/list
-        If int or str, then either the group or the combined
-        group/element number of the DICOM tag. If 2-tuple/list
-        then the (group, element) numbers as int or str.
-    arg2 : int or str, optional
-        The element number of the DICOM tag, required when
-        `arg` only contains the group number of the tag.
-
-    Returns
-    -------
-    pydicom.tag.BaseTag
-    """
-    if isinstance(arg, BaseTag):
-        return arg
-
-    if arg2 is not None:
-        arg = (arg, arg2)  # act as if was passed a single tuple
-
-    if isinstance(arg, (tuple, list)):
-        if len(arg) != 2:
-            raise ValueError("Tag must be an int or a 2-tuple")
-
-        valid = False
-        if isinstance(arg[0], compat.string_types):
-            valid = isinstance(arg[1], (str, compat.string_types))
-            if valid:
-                arg = (int(arg[0], 16), int(arg[1], 16))
-        elif isinstance(arg[0], compat.number_types):
-            valid = isinstance(arg[1], compat.number_types)
-        if not valid:
-            raise ValueError("Both arguments for Tag must be the same type, "
-                             "either string or int.")
-
-        if arg[0] > 0xFFFF or arg[1] > 0xFFFF:
-            raise OverflowError("Groups and elements of tags must each "
-                                "be <=2 byte integers")
-
-        long_value = (arg[0] << 16) | arg[1]
-
-    # Single str parameter
-    elif isinstance(arg, (str, compat.text_type)):
-        try:
-            long_value = int(arg, 16)
-            if long_value > 0xFFFFFFFF:
-                raise OverflowError("Tags are limited to 32-bit length; "
-                                    "tag {0!r}"
-                                    .format(long_value))
-        except ValueError:
-            # Try a DICOM keyword
-            from pydicom.datadict import tag_for_keyword
-            long_value = tag_for_keyword(arg)
-            if long_value is None:
-                raise ValueError("'{}' is not a valid int or DICOM keyword"
-                                 .format(arg))
-    # Single int parameter
-    else:
-        long_value = arg
-        if long_value > 0xFFFFFFFF:
-            raise OverflowError("Tags are limited to 32-bit length; tag {0!r}"
-                                .format(long_value))
-
-    if long_value < 0:
-        raise ValueError("Tags must be positive.")
-
-    return BaseTag(long_value)
-
-
 if compat.in_py2:
     # May get an overflow error with int if sys.maxsize < 0xFFFFFFFF
-    BaseTag_base_class = long
+    TAG_CLASS = long
 else:
-    BaseTag_base_class = int
+    TAG_CLASS = int
 
 
-class BaseTag(BaseTag_base_class):
+class Tag(TAG_CLASS):
     """Represents a DICOM element (group, element) tag.
 
     If using python 2.7 then tags are represented as a long, while for python
@@ -143,64 +59,111 @@ class BaseTag(BaseTag_base_class):
     is_private : bool
         Returns True if the corresponding element is private, False otherwise.
     """
+    def __new__(cls, value, arg2=None, fast=False):
+        """Create a Tag.
+
+        General function for creating a Tag in any of the standard forms:
+
+        * Tag(0x00100015)
+        * Tag('0x00100015')
+        * Tag((0x10, 0x50))
+        * Tag(('0x10', '0x50'))
+        * Tag(0x0010, 0x0015)
+        * Tag(0x10, 0x15)
+        * Tag(2341, 0x10)
+        * Tag('0xFE', '0x0010')
+        * Tag("PatientName")
+
+        Parameters
+        ----------
+        arg : int or str or 2-tuple/list
+            If int or str, then either the group or the combined
+            group/element number of the DICOM tag. If 2-tuple/list
+            then the (group, element) numbers as int or str.
+        arg2 : int or str, optional
+            The element number of the DICOM tag, required when
+            `arg` only contains the group number of the tag.
+        fast : bool
+            If ``True`` then skip the verification check of `value`, only
+            allowed if `arg2` is ``None``. Default ``False``.
+        """
+        if not fast:
+            value = cls._check_value(value, arg2)
+        elif arg2:
+            raise ValueError("`arg2` is not allowed with `fast=True`")
+
+        return int.__new__(cls, value)
+
+    @staticmethod
+    def _check_value(arg, arg2):
+        """Check that the supplied objects can be used to make a valid tag."""
+        if isinstance(arg, Tag):
+            return arg
+
+        if arg2 is not None:
+            arg = (arg, arg2)  # act as if was passed a single tuple
+
+        if isinstance(arg, (tuple, list)):
+            if len(arg) != 2:
+                raise ValueError("Tag must be an int or a 2-tuple")
+
+            valid = False
+            if isinstance(arg[0], compat.string_types):
+                valid = isinstance(arg[1], (str, compat.string_types))
+                if valid:
+                    arg = (int(arg[0], 16), int(arg[1], 16))
+            elif isinstance(arg[0], compat.number_types):
+                valid = isinstance(arg[1], compat.number_types)
+            if not valid:
+                raise ValueError("Both arguments for Tag must be the same type, "
+                                 "either string or int.")
+
+            if arg[0] > 0xFFFF or arg[1] > 0xFFFF:
+                raise OverflowError("Groups and elements of tags must each "
+                                    "be <=2 byte integers")
+
+            long_value = (arg[0] << 16) | arg[1]
+
+        # Single str parameter
+        elif isinstance(arg, (str, compat.text_type)):
+            try:
+                long_value = int(arg, 16)
+                if long_value > 0xFFFFFFFF:
+                    raise OverflowError("Tags are limited to 32-bit length; "
+                                        "tag {0!r}"
+                                        .format(long_value))
+            except ValueError:
+                # Try a DICOM keyword
+                from pydicom.datadict import tag_for_keyword
+                long_value = tag_for_keyword(arg)
+                if long_value is None:
+                    raise ValueError("'{}' is not a valid int or DICOM keyword"
+                                     .format(arg))
+        # Single int parameter
+        else:
+            long_value = arg
+            if long_value > 0xFFFFFFFF:
+                raise OverflowError("Tags are limited to 32-bit length; tag {0!r}"
+                                    .format(long_value))
+
+        if long_value < 0:
+            raise ValueError("Tags must be positive.")
+
+        return long_value
+
     # Override comparisons so can convert "other" to Tag as necessary
     #   See Ordering Comparisons at:
     #   http://docs.python.org/dev/3.0/whatsnew/3.0.html
-    def __le__(self, other):
-        """Return True if `self`  is less than or equal to `other`."""
-        return self == other or self < other
-
-    def __lt__(self, other):
-        """Return True if `self` is less than `other`."""
-        # Check if comparing with another Tag object; if not, create a temp one
-        if not isinstance(other, BaseTag):
-            try:
-                other = Tag(other)
-            except Exception:
-                raise TypeError("Cannot compare Tag with non-Tag item")
-
-        return BaseTag_base_class(self) < BaseTag_base_class(other)
-
-    def __ge__(self, other):
-        """Return True if `self` is greater than or equal to `other`."""
-        return self == other or self > other
-
-    def __gt__(self, other):
-        """Return True if `self` is greater than `other`."""
-        return not (self == other or self < other)
-
     def __eq__(self, other):
         """Return True if `self` equals `other`."""
         # Check if comparing with another Tag object; if not, create a temp one
-        if not isinstance(other, BaseTag_base_class):
+        if not isinstance(other, TAG_CLASS):
             try:
                 other = Tag(other)
             except Exception:
                 raise TypeError("Cannot compare Tag with non-Tag item")
 
-        return BaseTag_base_class(self) == BaseTag_base_class(other)
-
-    def __ne__(self, other):
-        """Return True if `self` does not equal `other`."""
-        return not self == other
-
-    # For python 3, any override of __cmp__ or __eq__
-    # immutable requires explicit redirect of hash function
-    # to the parent class
-    #   See http://docs.python.org/dev/3.0/reference/
-    #              datamodel.html#object.__hash__
-    __hash__ = BaseTag_base_class.__hash__
-
-    def __str__(self):
-        """Return the tag value as a hex string '(gggg, eeee)'."""
-        return "({0:04x}, {1:04x})".format(self.group, self.element)
-
-    __repr__ = __str__
-
-    @property
-    def group(self):
-        """Return the tag's group number."""
-        return self >> 16
+        return TAG_CLASS(self) == TAG_CLASS(other)
 
     @property
     def element(self):
@@ -208,6 +171,26 @@ class BaseTag(BaseTag_base_class):
         return self & 0xffff
 
     elem = element  # alternate syntax
+
+    def __ge__(self, other):
+        """Return True if `self` is greater than or equal to `other`."""
+        return self == other or self > other
+
+    @property
+    def group(self):
+        """Return the tag's group number."""
+        return self >> 16
+
+    # For python 3, any override of __cmp__ or __eq__
+    # immutable requires explicit redirect of hash function
+    # to the parent class
+    #   See http://docs.python.org/dev/3.0/reference/
+    #              datamodel.html#object.__hash__
+    __hash__ = TAG_CLASS.__hash__
+
+    def __gt__(self, other):
+        """Return True if `self` is greater than `other`."""
+        return not (self == other or self < other)
 
     @property
     def is_private(self):
@@ -219,11 +202,40 @@ class BaseTag(BaseTag_base_class):
         """Return True if the tag is a private creator."""
         return self.is_private and 0x0010 <= self.element < 0x0100
 
+    def __le__(self, other):
+        """Return True if `self`  is less than or equal to `other`."""
+        return self == other or self < other
+
+    def __lt__(self, other):
+        """Return True if `self` is less than `other`."""
+        # Check if comparing with another Tag object; if not, create a temp one
+        if not isinstance(other, Tag):
+            try:
+                other = Tag(other)
+            except Exception:
+                raise TypeError("Cannot compare Tag with non-Tag item")
+
+        return TAG_CLASS(self) < TAG_CLASS(other)
+
+    def __ne__(self, other):
+        """Return True if `self` does not equal `other`."""
+        return not self == other
+
+    def __str__(self):
+        """Return the tag value as a hex string '(gggg, eeee)'."""
+        return "({0:04x}, {1:04x})".format(self.group, self.element)
+
+    __repr__ = __str__
+
+
+# Compatibility
+BaseTag = Tag
+
 
 def TupleTag(group_elem):
-    """Fast factory for BaseTag object with known safe (group, elem) tuple"""
+    """Fast factory for Tag object with known safe (group, elem) tuple"""
     long_value = group_elem[0] << 16 | group_elem[1]
-    return BaseTag(long_value)
+    return Tag(long_value, fast=True)
 
 
 # Define some special tags:

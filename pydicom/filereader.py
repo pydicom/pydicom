@@ -25,7 +25,7 @@ from pydicom.filebase import DicomFile
 from pydicom.fileutil import read_undefined_length_value
 from pydicom.misc import size_in_bytes
 from pydicom.sequence import Sequence
-from pydicom.tag import (ItemTag, SequenceDelimiterTag, TupleTag, Tag, BaseTag)
+from pydicom.tag import ItemTag, SequenceDelimiterTag, TupleTag, Tag
 import pydicom.uid
 from pydicom.util.hexutil import bytes2hex
 from pydicom.valuerep import extra_length_VRs
@@ -115,7 +115,7 @@ def data_element_generator(fp,
         for tag in specific_tags:
             if isinstance(tag, (str, compat.text_type)):
                 tag = Tag(tag_for_keyword(tag))
-            if isinstance(tag, BaseTag):
+            if isinstance(tag, Tag):
                 tag_set.add(tag)
         tag_set.add(Tag(0x08, 0x05))
     has_tag_set = len(tag_set) > 0
@@ -178,7 +178,7 @@ def data_element_generator(fp,
                 continue
 
             if (defer_size is not None and length > defer_size and
-                    tag != BaseTag(0x00080005)):
+                    tag != Tag(0x00080005)):
                 # Flag as deferred by setting value to None, and skip bytes
                 value = None
                 logger_debug("Defer size exceeded. "
@@ -197,7 +197,7 @@ def data_element_generator(fp,
                                                            value[:12], dotdot))
 
             # If the tag is (0008,0005) Specific Character Set, then store it
-            if tag == BaseTag(0x00080005):
+            if tag == Tag(0x00080005):
                 from pydicom.values import convert_string
                 encoding = convert_string(value, is_little_endian)
                 # Store the encoding value in the generator
@@ -364,7 +364,7 @@ def read_dataset(fp, is_implicit_VR, is_little_endian, bytelength=None,
             # Read data elements. Stop on some errors, but return what was read
             tag = raw_data_element.tag
             # Check for ItemDelimiterTag --dataset is an item in a sequence
-            if tag == BaseTag(0xFFFEE00D):
+            if tag == Tag(0xFFFEE00D):
                 break
             raw_data_elements[tag] = raw_data_element
     except StopIteration:

@@ -105,7 +105,7 @@ def read_undefined_length_value(fp,
     fp : a file-like object
     is_little_endian : boolean
         True if file transfer syntax is little endian, else False.
-    delimiter_tag : BaseTag
+    delimiter_tag : Tag
         tag used as and marker for reading
     defer_size : int, None, optional
         Size to avoid loading large elements in memory.

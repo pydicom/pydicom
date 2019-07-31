@@ -23,7 +23,7 @@ from pydicom.datadict import (dictionary_has_tag, dictionary_description,
                               private_dictionary_description, dictionary_VR,
                               dictionary_VM, repeater_has_tag)
 from pydicom.multival import MultiValue
-from pydicom.tag import Tag, BaseTag
+from pydicom.tag import Tag
 from pydicom.uid import UID
 from pydicom import jsonrep
 import pydicom.valuerep  # don't import DS directly as can be changed by config
@@ -162,7 +162,7 @@ class DataElement(object):
             Used to determine whether or not `value` requires conversion to a
             value with VM > 1. Default is False.
         """
-        if not isinstance(tag, BaseTag):
+        if not isinstance(tag, Tag):
             tag = Tag(tag)
         self.tag = tag
         self.VR = VR  # Note!: you must set VR before setting value
