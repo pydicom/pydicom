@@ -115,8 +115,10 @@ class Tag(TAG_CLASS):
             elif isinstance(arg[0], compat.number_types):
                 valid = isinstance(arg[1], compat.number_types)
             if not valid:
-                raise ValueError("Both arguments for Tag must be the same type, "
-                                 "either string or int.")
+                raise ValueError(
+                    "Both arguments for Tag must be the same type, "
+                    "either string or int."
+                )
 
             if arg[0] > 0xFFFF or arg[1] > 0xFFFF:
                 raise OverflowError("Groups and elements of tags must each "
@@ -143,8 +145,10 @@ class Tag(TAG_CLASS):
         else:
             long_value = arg
             if long_value > 0xFFFFFFFF:
-                raise OverflowError("Tags are limited to 32-bit length; tag {0!r}"
-                                    .format(long_value))
+                raise OverflowError(
+                    "Tags are limited to 32-bit length; tag {0!r}"
+                    .format(long_value)
+                )
 
         if long_value < 0:
             raise ValueError("Tags must be positive.")
