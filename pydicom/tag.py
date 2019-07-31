@@ -59,10 +59,10 @@ class Tag(TAG_CLASS):
     is_private : bool
         Returns True if the corresponding element is private, False otherwise.
     """
-    def __new__(cls, value, arg2=None, fast=False):
+    def __new__(cls, arg, arg2=None, fast=False):
         """Create a Tag.
 
-        General function for creating a Tag in any of the standard forms:
+        Tags can be created using any of the standard forms:
 
         * Tag(0x00100015)
         * Tag('0x00100015')
@@ -82,17 +82,16 @@ class Tag(TAG_CLASS):
             then the (group, element) numbers as int or str.
         arg2 : int or str, optional
             The element number of the DICOM tag, required when
-            `arg` only contains the group number of the tag.
+            `arg` only contains the group number of the tag. Only used when
+            `fast` is ``False``.
         fast : bool
-            If ``True`` then skip the verification check of `value`, only
-            allowed if `arg2` is ``None``. Default ``False``.
+            If ``True`` then skip the verification check of `value`. Default
+            ``False``.
         """
-        if not fast:
-            value = cls._check_value(value, arg2)
-        elif arg2:
-            raise ValueError("`arg2` is not allowed with `fast=True`")
+        if fast:
+            return TAG_CLASS.__new__(cls, arg)
 
-        return TAG_CLASS.__new__(cls, value)
+        return TAG_CLASS.__new__(cls, cls._check_value(arg, arg2))
 
     @staticmethod
     def _check_value(arg, arg2):
@@ -232,7 +231,7 @@ class Tag(TAG_CLASS):
     __repr__ = __str__
 
 
-# Compatibility
+# Backwards compatibility
 BaseTag = Tag
 
 
