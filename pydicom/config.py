@@ -8,8 +8,8 @@ import logging
 # Set the type used to hold DS values
 #    default False; was decimal-based in pydicom 0.9.7
 use_DS_decimal = False
-"""Set to ``True`` to use :class:`decimal.Decimal` to hold the value for elements
-with a VR of 'DS'.
+"""Set to ``True`` to use :class:`decimal.Decimal` to hold the value for
+elements with a VR of 'DS'.
 
 Default ``False``.
 """

@@ -1250,9 +1250,9 @@ class Dataset(dict):
         -------
         type
             The data element for `key` if it exists, or the default value if
-            it is a :class:`DataElement<pydicom.dataelem.DataElement>` or ``None``,
-            or a :class:`DataElement<pydicom.dataelem.DataElement>` constructed
-            with `default` as value.
+            it is a :class:`DataElement<pydicom.dataelem.DataElement>` or
+            ``None``, or a :class:`DataElement<pydicom.dataelem.DataElement>`
+            constructed with `default` as value.
 
         Raises
         ------
@@ -1749,7 +1749,8 @@ class Dataset(dict):
         Returns
         ------
         list of tag.BaseTag
-            The tags in the :class:`Dataset` that meet the conditions of the slice.
+            The tags in the :class:`Dataset` that meet the conditions of the
+            slice.
         """
         # Check the starting/stopping Tags are valid when used
         if start is not None:

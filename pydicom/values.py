@@ -157,7 +157,7 @@ def convert_DS_string(byte_string, is_little_endian, struct_format=None):
 
     Returns
     -------
-    valuerep.DSfloat or list of DSfloat or valuerep.DSdecimal or list of DSdecimal
+    valuerep.DSfloat or valuerep.DSdecimal or list of DSfloat/DSdecimal
         If :mod:`config.use_DS_decimal<pydicom.config.use_DS_decimal>`
         is ``True`` then returns :class:`DSdecimal<pydicom.valuerep.DSdecimal>`
         or a :class:`list` of ``DSdecimal``, otherwise returns
