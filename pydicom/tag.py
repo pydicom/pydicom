@@ -75,7 +75,7 @@ class Tag(TAG_CLASS):
         `arg` only contains the group number of the tag. Only used when
         `fast` is ``False``.
     fast : bool, optional
-        If ``True`` then skip the verification check of `value`. Default
+        If ``True`` then skip the tag validation check of `arg`. Default
         ``False``.
     """
     def __new__(cls, arg, arg2=None, fast=False):
@@ -105,6 +105,7 @@ class Tag(TAG_CLASS):
                     arg = (int(arg[0], 16), int(arg[1], 16))
             elif isinstance(arg[0], compat.number_types):
                 valid = isinstance(arg[1], compat.number_types)
+
             if not valid:
                 raise ValueError(
                     "Both arguments for Tag must be the same type, "
@@ -231,7 +232,7 @@ def TupleTag(group_elem):
     Parameters
     ----------
     group_elem : 2-tuple of int
-        The (group, element) values of the tag to create. No validity checks
+        The (group, element) values of the tag to create. No validation checks
         are performed on the values.
 
     Returns
