@@ -4,6 +4,14 @@ Version 1.4.0
 Changelog
 ---------
 
+Changes
+.......
+* The default logging handler is now `logging.NullHandler` (:issue:`611`)
+* The `tag.Tag()` function and `tag.BaseTag` class unified as the `tag.Tag`
+  class. `BaseTag` is deprecated and will be removed in v1.5
+  (:pull_request:`910`).
+
+
 Fixes
 .....
 * Fixed handling of binary values in json encoding (:issue:`887`)

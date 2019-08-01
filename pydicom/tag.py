@@ -23,7 +23,7 @@ def tag_in_exception(tag):
 
     Parameters
     ----------
-    tag : pydicom.tag.Tag
+    tag : Tag
         The tag to use in the context.
     """
     try:
@@ -47,47 +47,39 @@ else:
 class Tag(TAG_CLASS):
     """Represents a DICOM element (group, element) tag.
 
-    If using python 2.7 then tags are represented as a long, while for python
-    3 they are represented as an int.
+    If using Python 2.7 then tags are represented as a
+    `long<https://docs.python.org/2/library/functions.html#long>`_, while for
+    Python 3 they are represented as an :class:`int`.
 
-    Attributes
+    A :class:`Tag` can be created using any of the standard forms:
+
+    * ``Tag(0x00100015)``
+    * ``Tag('0x00100015')``
+    * ``Tag((0x10, 0x50))``
+    * ``Tag(('0x10', '0x50'))``
+    * ``Tag(0x0010, 0x0015)``
+    * ``Tag(0x10, 0x15)``
+    * ``Tag(2341, 0x10)``
+    * ``Tag('0xFE', '0x0010')``
+    * ``Tag("PatientName")``
+
+    Parameters
     ----------
-    element : int
-        The element number of the tag.
-    group : int
-        The group number of the tag.
-    is_private : bool
-        Returns True if the corresponding element is private, False otherwise.
+    arg : int or str or 2-tuple/list
+        If :class:`int` or :class:`str`, then either the group, the combined
+        group/element number, or the keyword of the DICOM tag. If
+        :class:`tuple` or :class:`list` then the (group, element) values as
+        :class:`int` or :class:`str`.
+    arg2 : int or str, optional
+        The element number of the DICOM tag, required when
+        `arg` only contains the group number of the tag. Only used when
+        `fast` is ``False``.
+    fast : bool, optional
+        If ``True`` then skip the verification check of `value`. Default
+        ``False``.
     """
     def __new__(cls, arg, arg2=None, fast=False):
-        """Create a Tag.
-
-        Tags can be created using any of the standard forms:
-
-        * Tag(0x00100015)
-        * Tag('0x00100015')
-        * Tag((0x10, 0x50))
-        * Tag(('0x10', '0x50'))
-        * Tag(0x0010, 0x0015)
-        * Tag(0x10, 0x15)
-        * Tag(2341, 0x10)
-        * Tag('0xFE', '0x0010')
-        * Tag("PatientName")
-
-        Parameters
-        ----------
-        arg : int or str or 2-tuple/list
-            If int or str, then either the group or the combined
-            group/element number of the DICOM tag. If 2-tuple/list
-            then the (group, element) numbers as int or str.
-        arg2 : int or str, optional
-            The element number of the DICOM tag, required when
-            `arg` only contains the group number of the tag. Only used when
-            `fast` is ``False``.
-        fast : bool
-            If ``True`` then skip the verification check of `value`. Default
-            ``False``.
-        """
+        """Create a :class:`Tag`."""
         if fast:
             return TAG_CLASS.__new__(cls, arg)
 
@@ -138,8 +130,9 @@ class Tag(TAG_CLASS):
                 from pydicom.datadict import tag_for_keyword
                 long_value = tag_for_keyword(arg)
                 if long_value is None:
-                    raise ValueError("'{}' is not a valid int or DICOM keyword"
-                                     .format(arg))
+                    raise ValueError(
+                        "'{}' is not a valid int or DICOM keyword".format(arg)
+                    )
         # Single int parameter
         else:
             long_value = arg
@@ -154,11 +147,8 @@ class Tag(TAG_CLASS):
 
         return long_value
 
-    # Override comparisons so can convert "other" to Tag as necessary
-    #   See Ordering Comparisons at:
-    #   http://docs.python.org/dev/3.0/whatsnew/3.0.html
     def __eq__(self, other):
-        """Return True if `self` equals `other`."""
+        """Return ``True`` if `self` equals `other`."""
         # Check if comparing with another Tag object; if not, create a temp one
         if not isinstance(other, TAG_CLASS):
             try:
@@ -170,47 +160,46 @@ class Tag(TAG_CLASS):
 
     @property
     def element(self):
-        """Return the tag's element number."""
+        """Return the :class:`Tag`'s element number."""
         return self & 0xffff
 
-    elem = element  # alternate syntax
+    elem = element
 
     def __ge__(self, other):
-        """Return True if `self` is greater than or equal to `other`."""
+        """Return ``True`` if `self` is greater than or equal to `other`."""
         return self == other or self > other
 
     @property
     def group(self):
-        """Return the tag's group number."""
+        """Return the :class:`Tag`'s group number."""
         return self >> 16
 
-    # For python 3, any override of __cmp__ or __eq__
-    # immutable requires explicit redirect of hash function
-    # to the parent class
-    #   See http://docs.python.org/dev/3.0/reference/
-    #              datamodel.html#object.__hash__
-    __hash__ = TAG_CLASS.__hash__
-
     def __gt__(self, other):
-        """Return True if `self` is greater than `other`."""
+        """Return ``True`` if `self` is greater than `other`."""
         return not (self == other or self < other)
+
+    # If you override __eq__ then point __hash__ to the parent implementation
+    # https://docs.python.org/3/reference/datamodel.html#object.__hash__
+    __hash__ = TAG_CLASS.__hash__
 
     @property
     def is_private(self):
-        """Return True if the tag is private (has an odd group number)."""
+        """Return ``True`` if the :class:`Tag` is private (has an odd group
+        number).
+        """
         return self.group % 2 == 1
 
     @property
     def is_private_creator(self):
-        """Return True if the tag is a private creator."""
+        """Return ``True`` if the :class:`Tag` has a private creator."""
         return self.is_private and 0x0010 <= self.element < 0x0100
 
     def __le__(self, other):
-        """Return True if `self`  is less than or equal to `other`."""
+        """Return ``True`` if `self`  is less than or equal to `other`."""
         return self == other or self < other
 
     def __lt__(self, other):
-        """Return True if `self` is less than `other`."""
+        """Return ``True`` if `self` is less than `other`."""
         # Check if comparing with another Tag object; if not, create a temp one
         if not isinstance(other, Tag):
             try:
@@ -221,22 +210,35 @@ class Tag(TAG_CLASS):
         return TAG_CLASS(self) < TAG_CLASS(other)
 
     def __ne__(self, other):
-        """Return True if `self` does not equal `other`."""
+        """Return ``True`` if `self` does not equal `other`."""
         return not self == other
 
     def __str__(self):
-        """Return the tag value as a hex string '(gggg, eeee)'."""
+        """Return the :class:`Tag` as a hex string '(gggg, eeee)'."""
         return "({0:04x}, {1:04x})".format(self.group, self.element)
 
     __repr__ = __str__
 
 
 # Backwards compatibility
+# TODO: Deprecated in v1.4, removal in v1.5
 BaseTag = Tag
 
 
 def TupleTag(group_elem):
-    """Fast factory for Tag object with known safe (group, elem) tuple"""
+    """Fast factory for :class:`Tag` objects using safe values.
+
+    Parameters
+    ----------
+    group_elem : 2-tuple of int
+        The (group, element) values of the tag to create. No validity checks
+        are performed on the values.
+
+    Returns
+    -------
+    Tag
+        The created :class:`Tag`.
+    """
     long_value = group_elem[0] << 16 | group_elem[1]
     return Tag(long_value, fast=True)
 
