@@ -41,4 +41,4 @@ Enhancements
   (:issue:`277`)
 * Added user warning, or exception in strict mode, if a DICOMDIR has an
   unexpected transfer syntax (:issue:`848`)
-  
+* Handle missing offset tags in DICOMDIR (:issue:`981`)
