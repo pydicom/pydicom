@@ -16,8 +16,9 @@ cd doc
 ```
 
 However, if you have need to test locally you may not want to use a virtualenv
-or install dependencies. We have provided a [Docker container](https://hub.docker.com/r/pydicom/pydicom-docs/) that will let you
-do this.
+or install dependencies. We have provided a
+[Docker container](https://hub.docker.com/r/pydicom/pydicom-docs/) that will
+let you do this.
 
 To build the documentation run:
 
@@ -35,7 +36,7 @@ make clean
 
 Whether you use the local approach or the Docker container, when you
 finish you should then be able to cd into `_build/html` on your local machine
-and preview with your webserver of choice:
+and preview with your browser of choice:
 
 ```
 cd doc/_build/html

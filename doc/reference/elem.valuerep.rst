@@ -1,6 +1,6 @@
 .. _api_elem_valuerep:
 
-Specialised Element Value Representation (:mod:`pydicom.valuerep`)
+Specialized Element Value Representation (:mod:`pydicom.valuerep`)
 ==================================================================
 
 .. currentmodule:: pydicom.valuerep

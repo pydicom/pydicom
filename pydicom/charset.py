@@ -232,10 +232,10 @@ def _get_escape_sequence_for_encoding(encoding, encoded=None):
     ----------
     encoding : str
         An encoding is used to specify  an escape sequence.
-
     encoded : bytes or str
         The encoded value is used to chose an escape sequence if encoding is
-        'shift_jis'
+        'shift_jis'. Should be :class:`bytes` for Python 3 and :class:`str`
+        for Python 2.
 
     Returns
     -------
@@ -278,7 +278,8 @@ def decode_string(value, encodings, delimiters):
     Parameters
     ----------
     value : bytes or str
-        The encoded byte string in the DICOM element value.
+        The encoded byte string in the DICOM element value. Should be
+        :class:`bytes` for Python 3 and :class:`str` for Python 2.
     encodings : list of str
         The encodings needed to decode the string as a list of Python
         encodings, converted from the encodings in (0008,0005) *Specific
@@ -294,6 +295,7 @@ def decode_string(value, encodings, delimiters):
         and :func:`enforce_valid_values<pydicom.config.enforce_valid_values>`
         is ``False``, a warning is issued, and `value` is decoded using the
         first encoding with replacement characters, resulting in data loss.
+        Returns :class:`str` for Python 3 and :class:`unicode` for Python 2.
 
     Raises
     ------
@@ -439,7 +441,8 @@ def encode_string(value, encodings):
     Parameters
     ----------
     value : str or unicode
-        The unicode string as presented to the user.
+        The unicode string as presented to the user. Should be :class:`str`
+        for Python 3 and :class:`unicode` for Python 2.
     encodings : list of str
         The encodings needed to encode the string as a list of Python
         encodings, converted from the encodings in (0008,0005) *Specific
@@ -452,7 +455,8 @@ def encode_string(value, encodings):
         the given encodings, and
         :func:`enforce_valid_values<pydicom.config.enforce_valid_values>` is
         ``False``, a warning is issued, and `value` is encoded using the first
-        encoding with replacement characters, resulting in data loss.
+        encoding with replacement characters, resulting in data loss. Should
+        be :class:`bytes` for Python 3 and :class:`str` for Python 2.
 
     Raises
     ------

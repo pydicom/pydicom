@@ -85,9 +85,9 @@ class PrivateBlock(object):
 
         Parameters
         ----------
-        key : tuple of int or tuple of str
-            The private group and private creator. The group must be an odd
-            number.
+        key : tuple
+            The private (tag group, creator) as ``(int, str)``. The group
+            must be an odd number.
         dataset : Dataset
             The parent :class:`Dataset`.
         private_creator_element : int
@@ -104,7 +104,7 @@ class PrivateBlock(object):
         Parameters
         ----------
         element_offset : int
-            The lower 16-bits (e.g. 2 hex numbers) of the element tag.
+            The lower 16 bits (e.g. 2 hex numbers) of the element tag.
 
         Returns
         -------
@@ -133,7 +133,7 @@ class PrivateBlock(object):
         Parameters
         ----------
         element_offset : int
-            The lower 16-bits (e.g. 2 hex numbers) of the element tag.
+            The lower 16 bits (e.g. 2 hex numbers) of the element tag.
 
         Returns
         -------
@@ -155,7 +155,7 @@ class PrivateBlock(object):
         Parameters
         ----------
         element_offset : int
-            The lower 16-bits (e.g. 2 hex numbers) of the element tag
+            The lower 16 bits (e.g. 2 hex numbers) of the element tag
             to be deleted.
 
         Raises
@@ -177,7 +177,7 @@ class PrivateBlock(object):
         Parameters
         ----------
         element_offset : int
-            The lower 16-bits (e.g. 2 hex numbers) of the element tag
+            The lower 16 bits (e.g. 2 hex numbers) of the element tag
             to be added.
         VR : str
             The 2 character DICOM value representation.
@@ -817,7 +817,7 @@ class Dataset(dict):
         >>> ds[0x00100010].value
         'CITIZEN^Jan'
 
-        Slicing using element tags;  All group ``0x0010`` elements in
+        Slicing using element tags; all group ``0x0010`` elements in
         the  dataset
 
         >>> ds[0x00100000:0x00110000]
@@ -1001,7 +1001,7 @@ class Dataset(dict):
         group : int
             The private tag group where the item is located as a 32-bit int.
         element_offset : int
-            The lower 16-bits (e.g. 2 hex numbers) of the element tag.
+            The lower 16 bits (e.g. 2 hex numbers) of the element tag.
         private_creator : str
             The private creator for the tag. Must match the private creator
             for the tag to be returned.
@@ -1383,7 +1383,7 @@ class Dataset(dict):
         """Decompresses *Pixel Data* and modifies the :class:`Dataset`
         in-place.
 
-        If not a compressed tranfer syntax, then pixel data is converted
+        If not a compressed transfer syntax, then pixel data is converted
         to a :class:`numpy.ndarray` internally, but not returned.
 
         If compressed pixel data, then is decompressed using an image handler,

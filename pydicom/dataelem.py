@@ -86,7 +86,6 @@ class DataElement(object):
     descripWidth : int
         For string display, this is the maximum width of the description
         field (default ``35``).
-    file_tell : int or None
     is_retired : bool
         For officially registered DICOM Data Elements this will be ``True`` if
         the retired status as given in the DICOM Standard, Part 6,

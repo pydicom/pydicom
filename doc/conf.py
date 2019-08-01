@@ -39,7 +39,6 @@ except ImportError:
 # is relative to the documentation root, use os.path.abspath to make it
 # absolute, like shown here.
 sys.path.insert(0, os.path.abspath('../build_tools/sphinx'))  # noqa
-print('Sphinx extensions:', os.path.abspath('../build_tools/sphinx'))
 from github_link import make_linkcode_resolve
 
 # If your documentation needs a minimal Sphinx version, state it here.
