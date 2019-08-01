@@ -45,11 +45,11 @@ def _linkcode_resolve(domain, info, package, url_fmt, revision):
         class_name = class_name.encode('utf-8')
     module = __import__(info['module'], fromlist=[class_name])
 
-    #try:
-    obj = attrgetter(info['fullname'])(module)
-    #except AttributeError as exc:
-        # For some reason Dataset.file_meta causes an exception here
-    #    pass
+    try:
+        obj = attrgetter(info['fullname'])(module)
+    except AttributeError as exc:
+        # For some reason DataElement.is_undefined_length causes an exception
+        pass
 
     try:
         fn = inspect.getsourcefile(obj)
