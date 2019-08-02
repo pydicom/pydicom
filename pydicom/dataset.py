@@ -53,12 +53,6 @@ except ImportError:
     have_numpy = False
 
 
-class PropertyError(Exception):
-    """For AttributeErrors caught in a property, so do not go to __getattr__"""
-    #  http://docs.python.org/release/3.1.3/tutorial/errors.html#tut-userexceptions
-    pass
-
-
 class PrivateBlock(object):
     """Helper class for a private block in the :class:`Dataset`.
 
@@ -498,10 +492,10 @@ class Dataset(dict):
         dicom_character_set = self._character_set
 
         # Shortcut to the decode function in pydicom.charset
-        decode_data_element = pydicom.charset.decode
+        decode_data_element = pydicom.charset.decode_element
 
         # Callback for walk(), to decode the chr strings if necessary
-        # This simply calls the pydicom.charset.decode function
+        # This simply calls the pydicom.charset.decode_element function
         def decode_callback(ds, data_element):
             """Callback to decode `data_element`."""
             if data_element.VR == 'SQ':

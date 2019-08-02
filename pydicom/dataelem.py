@@ -35,22 +35,6 @@ if not in_py2:
     PersonName = PersonNameUnicode
 
 
-def isMultiValue(value):
-    """Return True if `value` is list-like (iterable), False otherwise.
-
-    **This function is deprecated and will be removed in v1.4**
-    """
-    msg = 'isMultiValue is deprecated.  Use DataElement.VM instead'
-    warnings.warn(msg, DeprecationWarning)
-    if isinstance(value, compat.char_types):
-        return False
-    try:
-        iter(value)
-    except TypeError:
-        return False
-    return True
-
-
 def _is_bytes(val):
     """Return True only in Python 3 if `val` is of type `bytes`."""
     return False if in_py2 else isinstance(val, bytes)

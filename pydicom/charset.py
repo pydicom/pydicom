@@ -729,7 +729,7 @@ def _handle_illegal_standalone_encodings(encodings, py_encodings):
     return py_encodings
 
 
-def decode(data_element, dicom_character_set):
+def decode_element(data_element, dicom_character_set):
     """Apply the DICOM character encoding to a data element
 
     Parameters
@@ -785,3 +785,27 @@ def decode(data_element, dicom_character_set):
                                                 TEXT_VR_DELIMS))
 
             data_element.value = output
+
+
+def decode(data_element, dicom_character_set):
+    """Apply the DICOM character encoding to a data element
+
+    .. deprecated:: 1.4
+       Will be removed in v1.5, use :func:`decode_element` instead.
+
+    Parameters
+    ----------
+    data_element : dataelem.DataElement
+        The :class:`DataElement<pydicom.dataelem.DataElement>` instance
+        containing an encoded byte string value to decode.
+    dicom_character_set : str or list of str or None
+        The value of (0008,0005) *Specific Character Set*, which may be a
+        single value, a multiple value (code extension), or may also be ``''``
+        or ``None``, in which case ``'ISO_IR 6'`` will be used.
+    """
+    warnings.warn(
+        "'charset.decode_element()' is deprecated and will be removed in "
+        "v1.5, use 'charset.decode_element()' instead",
+        DeprecationWarning
+    )
+    return decode_element(data_element, dicom_character_set)
