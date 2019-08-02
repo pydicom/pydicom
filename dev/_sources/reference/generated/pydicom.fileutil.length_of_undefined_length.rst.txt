@@ -1,0 +1,6 @@
+pydicom.fileutil.length\_of\_undefined\_length
+==============================================
+
+.. currentmodule:: pydicom.fileutil
+
+.. autofunction:: length_of_undefined_length

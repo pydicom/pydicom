@@ -1,0 +1,6 @@
+pydicom.encaps.read\_item
+=========================
+
+.. currentmodule:: pydicom.encaps
+
+.. autofunction:: read_item

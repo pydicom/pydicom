@@ -1,0 +1,6 @@
+pydicom.filereader.read\_sequence\_item
+=======================================
+
+.. currentmodule:: pydicom.filereader
+
+.. autofunction:: read_sequence_item

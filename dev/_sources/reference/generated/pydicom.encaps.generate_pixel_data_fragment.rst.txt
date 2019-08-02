@@ -1,0 +1,6 @@
+pydicom.encaps.generate\_pixel\_data\_fragment
+==============================================
+
+.. currentmodule:: pydicom.encaps
+
+.. autofunction:: generate_pixel_data_fragment

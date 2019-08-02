@@ -1,0 +1,6 @@
+pydicom.datadict.add\_private\_dict\_entry
+==========================================
+
+.. currentmodule:: pydicom.datadict
+
+.. autofunction:: add_private_dict_entry

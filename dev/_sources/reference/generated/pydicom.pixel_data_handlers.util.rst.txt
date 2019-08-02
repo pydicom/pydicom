@@ -1,0 +1,26 @@
+pydicom.pixel\_data\_handlers.util
+==================================
+
+.. automodule:: pydicom.pixel_data_handlers.util
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      convert_color_space
+      dtype_corrected_for_endianness
+      get_expected_length
+      pixel_dtype
+      reshape_pixel_array
+   
+   
+
+   
+   
+   
+
+   
+   
+   

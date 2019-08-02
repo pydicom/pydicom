@@ -1,0 +1,604 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pydicom.pixel_data_handlers.util &mdash; pydicom 1.4.0.dev0 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="DICOMDIR (pydicom.dicomdir)" href="../dicomdir.html" />
+    <link rel="prev" title="pydicom.pixel_data_handlers.rle_handler" href="pydicom.pixel_data_handlers.rle_handler.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> pydicom
+          
+
+          
+            
+            <img src="../../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.4.0.dev0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../old/getting_started.html">Getting Started with pydicom</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../old/pydicom_user_guide.html">Pydicom User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../old/ref_guide.html">Reading and writing DICOM files</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../charset.html">Character Encoding and Decoding (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.charset</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../config.html">Configuration Options (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.config</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datadict.html">Data Dictionary Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.datadict</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../elem.html">Representation of Data Elements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../dataset.html">Representation of Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dataset</span></code>)</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../handlers.html">Bulk Data Handlers</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../handlers.pixel_data.html">Pixel Data Handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixel_data_handlers</span></code>)</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="pydicom.pixel_data_handlers.gdcm_handler.html">pydicom.pixel_data_handlers.gdcm_handler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.pixel_data_handlers.jpeg_ls_handler.html">pydicom.pixel_data_handlers.jpeg_ls_handler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.pixel_data_handlers.numpy_handler.html">pydicom.pixel_data_handlers.numpy_handler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.pixel_data_handlers.pillow_handler.html">pydicom.pixel_data_handlers.pillow_handler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.pixel_data_handlers.rle_handler.html">pydicom.pixel_data_handlers.rle_handler</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">pydicom.pixel_data_handlers.util</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../dicomdir.html">DICOMDIR (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dicomdir</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../encaps.html">Bulk Data Encapsulation Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.encaps</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../errors.html">Exceptions (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.errors</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../fileio.html">Dataset IO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../misc.html">Miscellaneous (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.misc</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../uid.html">UID Definitions and Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.uid</span></code>)</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">General examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#image-processing">Image processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#input-output">Input-output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../release_notes/index.html">Release history</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pydicom</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">API Reference</a> &raquo;</li>
+        
+          <li><a href="../handlers.html">Bulk Data Handlers</a> &raquo;</li>
+        
+          <li><a href="../handlers.pixel_data.html">Pixel Data Handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixel_data_handlers</span></code>)</a> &raquo;</li>
+        
+      <li>pydicom.pixel_data_handlers.util</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-pydicom.pixel_data_handlers.util">
+<span id="pydicom-pixel-data-handlers-util"></span><h1>pydicom.pixel_data_handlers.util<a class="headerlink" href="#module-pydicom.pixel_data_handlers.util" title="Permalink to this headline">¶</a></h1>
+<p>Utility functions used in the pixel data handlers.</p>
+<p class="rubric">Functions</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.pixel_data_handlers.util.convert_color_space" title="pydicom.pixel_data_handlers.util.convert_color_space"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_color_space</span></code></a>(arr, current, desired)</p></td>
+<td><p>Convert the image(s) in <cite>arr</cite> from one color space to another.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.pixel_data_handlers.util.dtype_corrected_for_endianness" title="pydicom.pixel_data_handlers.util.dtype_corrected_for_endianness"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dtype_corrected_for_endianness</span></code></a>(…)</p></td>
+<td><p>Return a <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v1.17)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.dtype</span></code></a> corrected for system and <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code> endianness.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.pixel_data_handlers.util.get_expected_length" title="pydicom.pixel_data_handlers.util.get_expected_length"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_expected_length</span></code></a>(ds[, unit])</p></td>
+<td><p>Return the expected length (in terms of bytes or pixels) of the <em>Pixel Data</em>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.pixel_data_handlers.util.pixel_dtype" title="pydicom.pixel_data_handlers.util.pixel_dtype"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pixel_dtype</span></code></a>(ds)</p></td>
+<td><p>Return a <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v1.17)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.dtype</span></code></a> for the <em>Pixel Data</em> in <cite>ds</cite>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.pixel_data_handlers.util.reshape_pixel_array" title="pydicom.pixel_data_handlers.util.reshape_pixel_array"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reshape_pixel_array</span></code></a>(ds, arr)</p></td>
+<td><p>Return a reshaped <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> <cite>arr</cite>.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="function">
+<dt id="pydicom.pixel_data_handlers.util.convert_color_space">
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.util.</code><code class="sig-name descname">convert_color_space</code><span class="sig-paren">(</span><em class="sig-param">arr</em>, <em class="sig-param">current</em>, <em class="sig-param">desired</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/482e6853/pydicom/pixel_data_handlers/util.py#L13"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.util.convert_color_space" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert the image(s) in <cite>arr</cite> from one color space to another.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>arr</strong> (<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><em>numpy.ndarray</em></a>) – The image(s) as a <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> with
+<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.shape.html#numpy.ndarray.shape" title="(in NumPy v1.17)"><code class="xref py py-attr docutils literal notranslate"><span class="pre">shape</span></code></a> (frames, rows, columns, planes)
+or (rows, columns, planes).</p></li>
+<li><p><strong>current</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The current color space, should be a valid value for (0028,0004)
+<em>Photometric Interpretation</em>. One of <code class="docutils literal notranslate"><span class="pre">'RGB'</span></code>, <code class="docutils literal notranslate"><span class="pre">'YBR_FULL'</span></code>.</p></li>
+<li><p><strong>desired</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The desired color space, should be a valid value for (0028,0004)
+<em>Photometric Interpretation</em>. One of <code class="docutils literal notranslate"><span class="pre">'RGB'</span></code>, <code class="docutils literal notranslate"><span class="pre">'YBR_FULL'</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The image(s) converted to the desired color space.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)">numpy.ndarray</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="pydicom.pixel_data_handlers.util.dtype_corrected_for_endianness">
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.util.</code><code class="sig-name descname">dtype_corrected_for_endianness</code><span class="sig-paren">(</span><em class="sig-param">is_little_endian</em>, <em class="sig-param">numpy_dtype</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/482e6853/pydicom/pixel_data_handlers/util.py#L62"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.util.dtype_corrected_for_endianness" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v1.17)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.dtype</span></code></a> corrected for system and <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code>
+endianness.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>is_little_endian</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – The endianess of the affected <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>.</p></li>
+<li><p><strong>numpy_dtype</strong> (<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v1.17)"><em>numpy.dtype</em></a>) – The numpy data type used for the <em>Pixel Data</em> without considering
+endianess.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><strong>ValueError</strong></a> – If <cite>is_little_endian</cite> is <code class="docutils literal notranslate"><span class="pre">None</span></code>, e.g. not initialized.</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The numpy data type used for the <em>Pixel Data</em> without considering
+endianess.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v1.17)">numpy.dtype</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="pydicom.pixel_data_handlers.util.get_expected_length">
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.util.</code><code class="sig-name descname">get_expected_length</code><span class="sig-paren">(</span><em class="sig-param">ds</em>, <em class="sig-param">unit='bytes'</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/482e6853/pydicom/pixel_data_handlers/util.py#L329"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.util.get_expected_length" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the expected length (in terms of bytes or pixels) of the <em>Pixel
+Data</em>.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 40%" />
+<col style="width: 11%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head" colspan="3"><p>Element</p></th>
+<th class="head" rowspan="2"><p>Required or
+optional</p></th>
+</tr>
+<tr class="row-even"><th class="head"><p>Tag</p></th>
+<th class="head"><p>Keyword</p></th>
+<th class="head"><p>Type</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-odd"><td><p>(0028,0002)</p></td>
+<td><p>SamplesPerPixel</p></td>
+<td><p>1</p></td>
+<td><p>Required</p></td>
+</tr>
+<tr class="row-even"><td><p>(0028,0008)</p></td>
+<td><p>NumberOfFrames</p></td>
+<td><p>1C</p></td>
+<td><p>Optional</p></td>
+</tr>
+<tr class="row-odd"><td><p>(0028,0010)</p></td>
+<td><p>Rows</p></td>
+<td><p>1</p></td>
+<td><p>Required</p></td>
+</tr>
+<tr class="row-even"><td><p>(0028,0011)</p></td>
+<td><p>Columns</p></td>
+<td><p>1</p></td>
+<td><p>Required</p></td>
+</tr>
+<tr class="row-odd"><td><p>(0028,0100)</p></td>
+<td><p>BitsAllocated</p></td>
+<td><p>1</p></td>
+<td><p>Required</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ds</strong> (<a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><em>Dataset</em></a>) – The <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> containing the Image Pixel module
+and <em>Pixel Data</em>.</p></li>
+<li><p><strong>unit</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">'bytes'</span></code> then returns the expected length of the <em>Pixel Data</em> in
+whole bytes and NOT including an odd length trailing NULL padding
+byte. If <code class="docutils literal notranslate"><span class="pre">'pixels'</span></code> then returns the expected length of the <em>Pixel
+Data</em> in terms of the total number of pixels (default <code class="docutils literal notranslate"><span class="pre">'bytes'</span></code>).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The expected length of the <em>Pixel Data</em> in either whole bytes or
+pixels, excluding the NULL trailing padding byte for odd length data.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="pydicom.pixel_data_handlers.util.pixel_dtype">
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.util.</code><code class="sig-name descname">pixel_dtype</code><span class="sig-paren">(</span><em class="sig-param">ds</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/482e6853/pydicom/pixel_data_handlers/util.py#L95"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.util.pixel_dtype" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v1.17)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.dtype</span></code></a> for the <em>Pixel Data</em> in <cite>ds</cite>.</p>
+<p>Suitable for use with IODs containing the Image Pixel module.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 24%" />
+<col style="width: 39%" />
+<col style="width: 11%" />
+<col style="width: 26%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head" colspan="3"><p>Element</p></th>
+<th class="head" rowspan="2"><p>Supported
+values</p></th>
+</tr>
+<tr class="row-even"><th class="head"><p>Tag</p></th>
+<th class="head"><p>Keyword</p></th>
+<th class="head"><p>Type</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-odd"><td><p>(0028,0101)</p></td>
+<td><p>BitsAllocated</p></td>
+<td><p>1</p></td>
+<td><p>1, 8, 16, 32</p></td>
+</tr>
+<tr class="row-even"><td><p>(0028,0103)</p></td>
+<td><p>PixelRepresentation</p></td>
+<td><p>1</p></td>
+<td><p>0, 1</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>ds</strong> (<a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><em>Dataset</em></a>) – The <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> containing the <em>Pixel Data</em> you
+wish to get the data type for.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v1.17)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.dtype</span></code></a> suitable for containing the <em>Pixel Data</em>.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v1.17)">numpy.dtype</a></p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#NotImplementedError" title="(in Python v3.7)"><strong>NotImplementedError</strong></a> – If the pixel data is of a type that isn’t supported by either numpy
+    or <em>pydicom</em>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="pydicom.pixel_data_handlers.util.reshape_pixel_array">
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.util.</code><code class="sig-name descname">reshape_pixel_array</code><span class="sig-paren">(</span><em class="sig-param">ds</em>, <em class="sig-param">arr</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/482e6853/pydicom/pixel_data_handlers/util.py#L182"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.util.reshape_pixel_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a reshaped <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> <cite>arr</cite>.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 21%" />
+<col style="width: 34%" />
+<col style="width: 10%" />
+<col style="width: 18%" />
+<col style="width: 16%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head" colspan="3"><p>Element</p></th>
+<th class="head" rowspan="2"><p>Supported
+values</p></th>
+<th class="head" rowspan="2"></th>
+</tr>
+<tr class="row-even"><th class="head"><p>Tag</p></th>
+<th class="head"><p>Keyword</p></th>
+<th class="head"><p>Type</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-odd"><td><p>(0028,0002)</p></td>
+<td><p>SamplesPerPixel</p></td>
+<td><p>1</p></td>
+<td><p>N &gt; 0</p></td>
+<td><p>Required</p></td>
+</tr>
+<tr class="row-even"><td><p>(0028,0006)</p></td>
+<td><p>PlanarConfiguration</p></td>
+<td><p>1C</p></td>
+<td><p>0, 1</p></td>
+<td><p>Optional</p></td>
+</tr>
+<tr class="row-odd"><td><p>(0028,0008)</p></td>
+<td><p>NumberOfFrames</p></td>
+<td><p>1C</p></td>
+<td><p>N &gt; 0</p></td>
+<td><p>Optional</p></td>
+</tr>
+<tr class="row-even"><td><p>(0028,0010)</p></td>
+<td><p>Rows</p></td>
+<td><p>1</p></td>
+<td><p>N &gt; 0</p></td>
+<td><p>Required</p></td>
+</tr>
+<tr class="row-odd"><td><p>(0028,0011)</p></td>
+<td><p>Columns</p></td>
+<td><p>1</p></td>
+<td><p>N &gt; 0</p></td>
+<td><p>Required</p></td>
+</tr>
+</tbody>
+</table>
+<p>(0028,0008) <em>Number of Frames</em> is required when <em>Pixel Data</em> contains
+more than 1 frame. (0028,0006) <em>Planar Configuration</em> is required when
+(0028,0002) <em>Samples per Pixel</em> is greater than 1. For certain
+compressed transfer syntaxes it is always taken to be either 0 or 1 as
+shown in the table below.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 36%" />
+<col style="width: 30%" />
+<col style="width: 34%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head" colspan="2"><p>Transfer Syntax</p></th>
+<th class="head" rowspan="2"><p>Planar Configuration</p></th>
+</tr>
+<tr class="row-even"><th class="head"><p>UID</p></th>
+<th class="head"><p>Name</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-odd"><td><p>1.2.840.10008.1.2.4.50</p></td>
+<td><p>JPEG Baseline</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>1.2.840.10008.1.2.4.57</p></td>
+<td><p>JPEG Lossless,
+Non-hierarchical</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>1.2.840.10008.1.2.4.70</p></td>
+<td><p>JPEG Lossless,
+Non-hierarchical,
+SV1</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>1.2.840.10008.1.2.4.80</p></td>
+<td><p>JPEG-LS Lossless</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-odd"><td><p>1.2.840.10008.1.2.4.81</p></td>
+<td><p>JPEG-LS Lossy</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-even"><td><p>1.2.840.10008.1.2.4.90</p></td>
+<td><p>JPEG 2000 Lossless</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>1.2.840.10008.1.2.4.91</p></td>
+<td><p>JPEG 2000 Lossy</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>1.2.840.10008.1.2.5</p></td>
+<td><p>RLE Lossless</p></td>
+<td><p>1</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ds</strong> (<a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><em>dataset.Dataset</em></a>) – The <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> containing the Image Pixel module
+corresponding to the data in <cite>arr</cite>.</p></li>
+<li><p><strong>arr</strong> (<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><em>numpy.ndarray</em></a>) – The 1D array containing the pixel data.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>A reshaped array containing the pixel data. The shape of the array
+depends on the contents of the dataset:</p>
+<ul class="simple">
+<li><p>For single frame, single sample data (rows, columns)</p></li>
+<li><p>For single frame, multi-sample data (rows, columns, planes)</p></li>
+<li><p>For multi-frame, single sample data (frames, rows, columns)</p></li>
+<li><p>For multi-frame, multi-sample data (frames, rows, columns, planes)</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)">numpy.ndarray</a></p>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<ul class="simple">
+<li><p>DICOM Standard, Part 3,
+<a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html#sect_C.7.6.3.1">Annex C.7.6.3.1</a></p></li>
+<li><p>DICOM Standard, Part 5, <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_8.2.html">Section 8.2</a></p></li>
+</ul>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../dicomdir.html" class="btn btn-neutral float-right" title="DICOMDIR (pydicom.dicomdir)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="pydicom.pixel_data_handlers.rle_handler.html" class="btn btn-neutral float-left" title="pydicom.pixel_data_handlers.rle_handler" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2019, Darcy Mason and pydicom contributors
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,6 @@
+pydicom.filewriter.write\_numbers
+=================================
+
+.. currentmodule:: pydicom.filewriter
+
+.. autofunction:: write_numbers

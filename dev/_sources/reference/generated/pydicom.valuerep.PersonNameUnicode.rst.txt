@@ -1,0 +1,70 @@
+pydicom.valuerep.PersonNameUnicode
+==================================
+
+.. currentmodule:: pydicom.valuerep
+
+.. autoclass:: PersonNameUnicode
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~PersonNameUnicode.__init__
+      ~PersonNameUnicode.capitalize
+      ~PersonNameUnicode.casefold
+      ~PersonNameUnicode.center
+      ~PersonNameUnicode.count
+      ~PersonNameUnicode.encode
+      ~PersonNameUnicode.endswith
+      ~PersonNameUnicode.expandtabs
+      ~PersonNameUnicode.family_comma_given
+      ~PersonNameUnicode.find
+      ~PersonNameUnicode.format
+      ~PersonNameUnicode.format_map
+      ~PersonNameUnicode.formatted
+      ~PersonNameUnicode.index
+      ~PersonNameUnicode.isalnum
+      ~PersonNameUnicode.isalpha
+      ~PersonNameUnicode.isascii
+      ~PersonNameUnicode.isdecimal
+      ~PersonNameUnicode.isdigit
+      ~PersonNameUnicode.isidentifier
+      ~PersonNameUnicode.islower
+      ~PersonNameUnicode.isnumeric
+      ~PersonNameUnicode.isprintable
+      ~PersonNameUnicode.isspace
+      ~PersonNameUnicode.istitle
+      ~PersonNameUnicode.isupper
+      ~PersonNameUnicode.join
+      ~PersonNameUnicode.ljust
+      ~PersonNameUnicode.lower
+      ~PersonNameUnicode.lstrip
+      ~PersonNameUnicode.maketrans
+      ~PersonNameUnicode.parse
+      ~PersonNameUnicode.partition
+      ~PersonNameUnicode.replace
+      ~PersonNameUnicode.rfind
+      ~PersonNameUnicode.rindex
+      ~PersonNameUnicode.rjust
+      ~PersonNameUnicode.rpartition
+      ~PersonNameUnicode.rsplit
+      ~PersonNameUnicode.rstrip
+      ~PersonNameUnicode.split
+      ~PersonNameUnicode.splitlines
+      ~PersonNameUnicode.startswith
+      ~PersonNameUnicode.strip
+      ~PersonNameUnicode.swapcase
+      ~PersonNameUnicode.title
+      ~PersonNameUnicode.translate
+      ~PersonNameUnicode.upper
+      ~PersonNameUnicode.zfill
+   
+   
+
+   
+   
+   

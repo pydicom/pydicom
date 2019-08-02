@@ -1,0 +1,366 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pydicom.dataelem.RawDataElement &mdash; pydicom 1.4.0.dev0 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Element Tags (pydicom.tag)" href="../elem.tag.html" />
+    <link rel="prev" title="pydicom.dataelem.DataElement_from_raw" href="pydicom.dataelem.DataElement_from_raw.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> pydicom
+          
+
+          
+            
+            <img src="../../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.4.0.dev0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../old/getting_started.html">Getting Started with pydicom</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../old/pydicom_user_guide.html">Pydicom User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../old/ref_guide.html">Reading and writing DICOM files</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../charset.html">Character Encoding and Decoding (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.charset</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../config.html">Configuration Options (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.config</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datadict.html">Data Dictionary Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.datadict</span></code>)</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../elem.html">Representation of Data Elements</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../elem.dataelem.html">Data Elements (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dataelem</span></code>)</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="pydicom.dataelem.DataElement.html">pydicom.dataelem.DataElement</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.dataelem.DataElement_from_raw.html">pydicom.dataelem.DataElement_from_raw</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">pydicom.dataelem.RawDataElement</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../elem.tag.html">Element Tags (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.tag</span></code>)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../elem.values.html">Element Value Decoding (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.values</span></code>)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../elem.multival.html">Element Multi-value Representation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.multival</span></code>)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../elem.sequence.html">Sequence Element Value Representation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.sequence</span></code>)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../elem.valuerep.html">Specialized Element Value Representation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.valuerep</span></code>)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../dataset.html">Representation of Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dataset</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../handlers.html">Bulk Data Handlers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../dicomdir.html">DICOMDIR (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dicomdir</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../encaps.html">Bulk Data Encapsulation Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.encaps</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../errors.html">Exceptions (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.errors</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../fileio.html">Dataset IO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../misc.html">Miscellaneous (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.misc</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../uid.html">UID Definitions and Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.uid</span></code>)</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">General examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#image-processing">Image processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#input-output">Input-output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../release_notes/index.html">Release history</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pydicom</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">API Reference</a> &raquo;</li>
+        
+          <li><a href="../elem.html">Representation of Data Elements</a> &raquo;</li>
+        
+          <li><a href="../elem.dataelem.html">Data Elements (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dataelem</span></code>)</a> &raquo;</li>
+        
+      <li>pydicom.dataelem.RawDataElement</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="pydicom-dataelem-rawdataelement">
+<h1>pydicom.dataelem.RawDataElement<a class="headerlink" href="#pydicom-dataelem-rawdataelement" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="pydicom.dataelem.RawDataElement">
+<em class="property">class </em><code class="sig-prename descclassname">pydicom.dataelem.</code><code class="sig-name descname">RawDataElement</code><span class="sig-paren">(</span><em class="sig-param">tag</em>, <em class="sig-param">VR</em>, <em class="sig-param">length</em>, <em class="sig-param">value</em>, <em class="sig-param">value_tell</em>, <em class="sig-param">is_implicit_VR</em>, <em class="sig-param">is_little_endian</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/482e6853/pydicom/dataelem.py#L"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataelem.RawDataElement" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="pydicom.dataelem.RawDataElement.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.dataelem.RawDataElement.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.dataelem.RawDataElement.__init__" title="pydicom.dataelem.RawDataElement.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a></p></td>
+<td><p>Initialize self.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">count</span></code></p></td>
+<td><p>Return number of occurrences of value.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">index</span></code></p></td>
+<td><p>Return first index of value.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.dataelem.RawDataElement.VR" title="pydicom.dataelem.RawDataElement.VR"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VR</span></code></a></p></td>
+<td><p>Alias for field number 1</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.dataelem.RawDataElement.is_implicit_VR" title="pydicom.dataelem.RawDataElement.is_implicit_VR"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_implicit_VR</span></code></a></p></td>
+<td><p>Alias for field number 5</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.dataelem.RawDataElement.is_little_endian" title="pydicom.dataelem.RawDataElement.is_little_endian"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_little_endian</span></code></a></p></td>
+<td><p>Alias for field number 6</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_raw</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.dataelem.RawDataElement.length" title="pydicom.dataelem.RawDataElement.length"><code class="xref py py-obj docutils literal notranslate"><span class="pre">length</span></code></a></p></td>
+<td><p>Alias for field number 2</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.dataelem.RawDataElement.tag" title="pydicom.dataelem.RawDataElement.tag"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tag</span></code></a></p></td>
+<td><p>Alias for field number 0</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.dataelem.RawDataElement.value" title="pydicom.dataelem.RawDataElement.value"><code class="xref py py-obj docutils literal notranslate"><span class="pre">value</span></code></a></p></td>
+<td><p>Alias for field number 3</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.dataelem.RawDataElement.value_tell" title="pydicom.dataelem.RawDataElement.value_tell"><code class="xref py py-obj docutils literal notranslate"><span class="pre">value_tell</span></code></a></p></td>
+<td><p>Alias for field number 4</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="pydicom.dataelem.RawDataElement.VR">
+<em class="property">property </em><code class="sig-name descname">VR</code><a class="headerlink" href="#pydicom.dataelem.RawDataElement.VR" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pydicom.dataelem.RawDataElement.is_implicit_VR">
+<em class="property">property </em><code class="sig-name descname">is_implicit_VR</code><a class="headerlink" href="#pydicom.dataelem.RawDataElement.is_implicit_VR" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 5</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pydicom.dataelem.RawDataElement.is_little_endian">
+<em class="property">property </em><code class="sig-name descname">is_little_endian</code><a class="headerlink" href="#pydicom.dataelem.RawDataElement.is_little_endian" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 6</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pydicom.dataelem.RawDataElement.length">
+<em class="property">property </em><code class="sig-name descname">length</code><a class="headerlink" href="#pydicom.dataelem.RawDataElement.length" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 2</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pydicom.dataelem.RawDataElement.tag">
+<em class="property">property </em><code class="sig-name descname">tag</code><a class="headerlink" href="#pydicom.dataelem.RawDataElement.tag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pydicom.dataelem.RawDataElement.value">
+<em class="property">property </em><code class="sig-name descname">value</code><a class="headerlink" href="#pydicom.dataelem.RawDataElement.value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 3</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pydicom.dataelem.RawDataElement.value_tell">
+<em class="property">property </em><code class="sig-name descname">value_tell</code><a class="headerlink" href="#pydicom.dataelem.RawDataElement.value_tell" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 4</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../elem.tag.html" class="btn btn-neutral float-right" title="Element Tags (pydicom.tag)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="pydicom.dataelem.DataElement_from_raw.html" class="btn btn-neutral float-left" title="pydicom.dataelem.DataElement_from_raw" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2019, Darcy Mason and pydicom contributors
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

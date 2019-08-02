@@ -1,0 +1,6 @@
+pydicom.datadict.tag\_for\_name
+===============================
+
+.. currentmodule:: pydicom.datadict
+
+.. autofunction:: tag_for_name

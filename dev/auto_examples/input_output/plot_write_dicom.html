@@ -93,13 +93,13 @@
             
               <p class="caption"><span class="caption-text">Getting started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started with pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../old/getting_started.html">Getting Started with pydicom</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Documentation</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../pydicom_user_guide.html">Pydicom User Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../ref_guide.html">Reading and writing DICOM files</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../api_ref.html">Pydicom Complete API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../old/pydicom_user_guide.html">Pydicom User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../old/ref_guide.html">Reading and writing DICOM files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/index.html">API Reference</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Examples</span></p>
 <ul class="current">
@@ -117,7 +117,7 @@
 </ul>
 <p class="caption"><span class="caption-text">Additional Information</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../release-notes.html">Release history</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release_notes/index.html">Release history</a></li>
 </ul>
 
             
@@ -171,8 +171,6 @@
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../../_sources/auto_examples/input_output/plot_write_dicom.rst.txt" rel="nofollow"> View page source</a>
-          
         
       </li>
     
@@ -196,21 +194,21 @@ have to change UIDs to valid values and add all required DICOM data elements.</p
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Setting file meta information...
 Setting dataset values...
-Writing test file /tmp/tmpj1qs7vd1.dcm
+Writing test file /tmp/tmp6q6wo50y.dcm
 File saved.
-Writing test file as Big Endian Explicit VR /tmp/tmpiybruo8o.dcm
-Load file /tmp/tmpj1qs7vd1.dcm ...
-(0008, 0023) Content Date                        DA: &#39;20190731&#39;
-(0008, 0033) Content Time                        TM: &#39;022512.352747&#39;
+Writing test file as Big Endian Explicit VR /tmp/tmpzn_ht98f.dcm
+Load file /tmp/tmp6q6wo50y.dcm ...
+(0008, 0023) Content Date                        DA: &#39;20190802&#39;
+(0008, 0033) Content Time                        TM: &#39;010149.088923&#39;
 (0010, 0010) Patient&#39;s Name                      PN: &#39;Test^Firstname&#39;
 (0010, 0020) Patient ID                          LO: &#39;123456&#39;
-Remove file /tmp/tmpj1qs7vd1.dcm ...
-Load file /tmp/tmpiybruo8o.dcm ...
-(0008, 0023) Content Date                        DA: &#39;20190731&#39;
-(0008, 0033) Content Time                        TM: &#39;022512.352747&#39;
+Remove file /tmp/tmp6q6wo50y.dcm ...
+Load file /tmp/tmpzn_ht98f.dcm ...
+(0008, 0023) Content Date                        DA: &#39;20190802&#39;
+(0008, 0033) Content Time                        TM: &#39;010149.088923&#39;
 (0010, 0010) Patient&#39;s Name                      PN: &#39;Test^Firstname&#39;
 (0010, 0020) Patient ID                          LO: &#39;123456&#39;
-Remove file /tmp/tmpiybruo8o.dcm ...
+Remove file /tmp/tmpzn_ht98f.dcm ...
 </pre></div>
 </div>
 <div class="line-block">
@@ -265,7 +263,7 @@ Remove file /tmp/tmpiybruo8o.dcm ...
 
 <span class="c1"># Write as a different transfer syntax XXX shouldn&#39;t need this but pydicom</span>
 <span class="c1"># 0.9.5 bug not recognizing transfer syntax</span>
-<span class="n">ds</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">uid</span><span class="o">.</span><span class="n">ExplicitVRBigEndian</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span> <span class="o">=</span> <a href="../../reference/generated/pydicom.uid.ExplicitVRBigEndian.html#pydicom.uid.ExplicitVRBigEndian" title="View documentation for pydicom.uid.ExplicitVRBigEndian"><span class="n">pydicom</span><span class="o">.</span><span class="n">uid</span><span class="o">.</span><span class="n">ExplicitVRBigEndian</span></a>
 <span class="n">ds</span><span class="o">.</span><span class="n">is_little_endian</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="n">ds</span><span class="o">.</span><span class="n">is_implicit_VR</span> <span class="o">=</span> <span class="kc">False</span>
 
@@ -283,7 +281,7 @@ Remove file /tmp/tmpiybruo8o.dcm ...
     <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.031 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.027 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-input-output-plot-write-dicom-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/7202b1ab5a1c728ed4a1c0af8512f3f2/plot_write_dicom.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_write_dicom.py</span></code></a></p>

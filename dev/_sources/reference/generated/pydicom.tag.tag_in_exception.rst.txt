@@ -1,0 +1,6 @@
+pydicom.tag.tag\_in\_exception
+==============================
+
+.. currentmodule:: pydicom.tag
+
+.. autofunction:: tag_in_exception

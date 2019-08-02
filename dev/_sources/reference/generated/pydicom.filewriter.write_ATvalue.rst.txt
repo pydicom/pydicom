@@ -1,0 +1,6 @@
+pydicom.filewriter.write\_ATvalue
+=================================
+
+.. currentmodule:: pydicom.filewriter
+
+.. autofunction:: write_ATvalue

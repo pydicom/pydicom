@@ -1,0 +1,6 @@
+pydicom.filereader.data\_element\_offset\_to\_value
+===================================================
+
+.. currentmodule:: pydicom.filereader
+
+.. autofunction:: data_element_offset_to_value
