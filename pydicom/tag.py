@@ -48,7 +48,7 @@ class Tag(TAG_CLASS):
     """Represents a DICOM element (group, element) tag.
 
     If using Python 2.7 then tags are represented as a
-    `long<https://docs.python.org/2/library/functions.html#long>`_, while for
+    `long <https://docs.python.org/2/library/functions.html#long>`_, while for
     Python 3 they are represented as an :class:`int`.
 
     A :class:`Tag` can be created using any of the standard forms:

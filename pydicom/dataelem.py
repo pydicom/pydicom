@@ -113,7 +113,7 @@ class DataElement(object):
     showVR : bool
         For string display, include the element's VR just before it's value
         (default ``True``).
-    tag : BaseTag
+    tag : Tag
         The element's tag.
     value
         The element's stored value(s).
@@ -200,7 +200,7 @@ class DataElement(object):
         ----------
         dataset_class : Dataset derived class
             Class used to create sequence items.
-        tag : BaseTag
+        tag : Tag
             The data element tag.
         vr : str
             The data element value representation.

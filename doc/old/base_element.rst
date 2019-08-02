@@ -75,7 +75,7 @@ number::
 
   >>> ds.PatientID = "12345"
   >>> ds.SeriesNumber = 5
-  >>> ds[0x10,0x10].value = 'Test'
+  >>> ds[0x10, 0x10].value = 'Test'
 
 The use of names is possible because *pydicom* intercepts requests for member
 variables, and checks if they are in the DICOM dictionary. It translates the
@@ -123,7 +123,7 @@ can also use the tag numbers directly, such as::
 
   >>> # Same thing with tag numbers - much harder to read:
   >>> # Really should only be used if DICOM keyword not in pydicom dictionary
-  >>> ds[0x300a,0xb0][0][0x300a,0xc2].value
+  >>> ds[0x300a, 0xb0][0][0x300a, 0xc2].value
   'Field 1'
 
 If you don't remember or know the exact element tag or keyword,
@@ -166,14 +166,14 @@ elements) or tag number::
   >>> elem.VR, elem.value
   ('PN', 'Last^First^mid^pre')
   >>> # an alternative is to use:
-  >>> elem = ds[0x0010,0x0010]
+  >>> elem = ds[0x0010, 0x0010]
   >>> elem.VR, elem.value
   ('PN', 'Last^First^mid^pre')
 
 To see whether the :class:`~dataset.Dataset` contains a particular element use
 the ``in`` operator with the element's keyword or tag::
 
-  >>> "PatientName" in ds  # or (0x0010,0x0010) in ds
+  >>> "PatientName" in ds  # or (0x0010, 0x0010) in ds
   True
 
 To remove an element from the :class:`~dataset.Dataset`  use the ``del``
@@ -228,36 +228,34 @@ things:
 Tag
 ---
 
-:func:`~tag.Tag` is not generally used directly in user code, as
-:func:`BaseTags<tag.BaseTag>` are automatically created when you assign or read
+:class:`~tag.Tag` is not generally used directly in user code, as
+they're automatically created when you assign or read
 elements using their keywords as illustrated in sections above.
 
-The :class:`~tag.BaseTag` class is derived from :class:`int` in Python 3 and
+The :class:`~tag.Tag` class is derived from :class:`int` in Python 3 and
 `long <https://docs.python.org/2/library/functions.html#long>`_ in Python 2,
-so in effect, it is just a number with some extra behaviour:
+so in effect, it is just a number with some extra behaviour.
 
-  * :func:`~tag.Tag` is used to create instances of :class:`~tag.BaseTag` and
-    enforces that the DICOM tag fits in the expected 4-byte (group,element)
-  * A :class:`~tag.BaseTag` instance can be created from an :class:`int` or a
-    :class:`tuple` containing the (group,element), or from the DICOM keyword::
+* A :class:`~tag.Tag` instance can be created from an :class:`int` or a
+  :class:`tuple` containing the (group, element), or from the DICOM keyword::
 
-      >>> from pydicom.tag import Tag
-      >>> t1 = Tag(0x00100010) # all of these are equivalent
-      >>> t2 = Tag(0x10,0x10)
-      >>> t3 = Tag((0x10, 0x10))
-      >>> t4 = Tag("PatientName")
-      >>> t1
-      (0010, 0010)
-      >>> type(t1)
-      <class `pydicom.tag.BaseTag`>
-      >>> t1==t2, t1==t3, t1==t4
-      (True, True, True)
+    >>> from pydicom.tag import Tag
+    >>> t1 = Tag(0x00100010) # all of these are equivalent
+    >>> t2 = Tag(0x10, 0x10)
+    >>> t3 = Tag((0x0010, 0x0010))
+    >>> t4 = Tag("PatientName")
+    >>> t1
+    (0010, 0010)
+    >>> t1==t2, t1==t3, t1==t4
+    (True, True, True)
 
-  * :attr:`BaseTag.group<tag.BaseTag.group>` and
-    :attr:`BaseTag.elem<tag.BaseTag.elem>` to return the group and element
-    portions of the tag.
-  * The :attr:`BaseTag.is_private<tag.BaseTag.is_private>` property checks
-    whether the tag represents a private tag (i.e. if group number is odd).
+* When a :class:`~tag.Tag` is created it checks to ensure that the supplied
+  value(s) conform to the expected 4-byte integer (2-byte group, 2-byte
+  element).
+* :attr:`Tag.group<tag.Tag.group>` and :attr:`Tag.elem<tag.Tag.elem>` to
+  return the group and element portions of the tag.
+* The :attr:`Tag.is_private<tag.Tag.is_private>` property checks
+  whether the tag represents a private tag (i.e. if group number is odd).
 
 Sequence
 --------

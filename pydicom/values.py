@@ -26,7 +26,7 @@ else:
 
 
 def convert_tag(byte_string, is_little_endian, offset=0):
-    """Return a decoded :class:`BaseTag<pydicom.tag.BaseTag>` from the encoded
+    """Return a decoded :class:`~pydicom.tag.Tag` from the encoded
     `byte_string`.
 
     Parameters
@@ -40,7 +40,7 @@ def convert_tag(byte_string, is_little_endian, offset=0):
 
     Returns
     -------
-    BaseTag
+    Tag
         The decoded tag.
     """
     if is_little_endian:
@@ -89,7 +89,7 @@ def convert_ATvalue(byte_string, is_little_endian, struct_format=None):
 
     Returns
     -------
-    BaseTag or list of BaseTag
+    Tag or list of Tag
         The decoded value(s).
     """
     length = len(byte_string)

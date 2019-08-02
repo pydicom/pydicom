@@ -673,7 +673,7 @@ class Dataset(dict):
 
         Parameters
         ----------
-        key : str or int or BaseTag
+        key : str or int or Tag
             The element keyword or tag or the class attribute name to get.
         default : obj or None, optional
             If the element or class attribute is not present, return
@@ -715,7 +715,7 @@ class Dataset(dict):
         Returns
         -------
         dict_items
-            The top-level (:class:`~pydicom.tag.BaseTag`,
+            The top-level (:class:`~pydicom.tag.Tag`,
             :class:`~pydicom.dataelem.DataElement`) items for the
             :class:`Dataset`.
         """
@@ -727,7 +727,7 @@ class Dataset(dict):
         Returns
         -------
         dict_keys
-            The :class:`~pydicom.tag.BaseTag` of all the elements in
+            The :class:`~pydicom.tag.Tag` of all the elements in
             the :class:`Dataset`.
         """
         return self._dict.keys()
@@ -1746,7 +1746,7 @@ class Dataset(dict):
 
         Returns
         ------
-        list of BaseTag
+        list of Tag
             The tags in the :class:`Dataset` that meet the conditions of the
             slice.
         """
