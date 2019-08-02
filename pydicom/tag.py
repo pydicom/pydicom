@@ -83,11 +83,6 @@ class Tag(TAG_CLASS):
         if fast:
             return TAG_CLASS.__new__(cls, arg)
 
-        return TAG_CLASS.__new__(cls, cls._check_value(arg, arg2))
-
-    @staticmethod
-    def _check_value(arg, arg2):
-        """Check that the supplied objects can be used to make a valid tag."""
         if isinstance(arg, Tag):
             return arg
 
@@ -146,7 +141,7 @@ class Tag(TAG_CLASS):
         if long_value < 0:
             raise ValueError("Tags must be positive.")
 
-        return long_value
+        return TAG_CLASS.__new__(cls, long_value)
 
     def __eq__(self, other):
         """Return ``True`` if `self` equals `other`."""
