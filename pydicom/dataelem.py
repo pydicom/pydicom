@@ -42,6 +42,42 @@ BINARY_VR_VALUES = [
 ]
 
 
+def empty_value_for_VR(VR, raw=False):
+    """Return the value for an empty element for `VR`.
+
+    The behavior of this property depends on the setting of
+    :attr:`config.use_none_as_empty_value`. If that is set to ``True``,
+    an empty value is always represented by ``None``, otherwise it depends
+    on `VR`. For text VRs (not including VRs that represent a number in
+    textual representation) an empty string is used as empty value
+    representation, for all other VRs, ``None``.
+    Note that this is used only if decoding the element - it is always
+    possible to set the value to another empty value representation,
+    which will be preserved during the element object lifetime.
+
+    Parameters
+    ----------
+    VR : str
+        The VR of the corresponding element.
+
+    raw : bool
+        If ``True``, returns the value for a :class:`RawDataElement`,
+        otherwise for a :class:`DataElement`
+
+    Returns
+    -------
+    str or None
+        The value a data element with `VR` is assigned on decoding
+        if it is empty.
+    """
+    if config.use_none_as_empty_value:
+        return None
+    if VR in ('AE', 'AS', 'CS', 'DA', 'DT', 'LO', 'LT',
+              'PN', 'SH', 'ST', 'TM', 'UC', 'UI', 'UR', 'UT'):
+        return b'' if raw else ''
+    return None
+
+
 def isMultiValue(value):
     """Return True if `value` is list-like (iterable), False otherwise.
 
@@ -477,6 +513,19 @@ class DataElement(object):
     def is_empty(self):
         """Return `True` if the element has no value."""
         return self.VM == 0
+
+    @property
+    def empty_value(self):
+        """Return the value for an empty element.
+
+        See :func:`empty_value_for_VR` for more information.
+
+        Returns
+        -------
+        str or None
+            The value this data element is assigned on decoding if it is empty.
+        """
+        return empty_value_for_VR(self.VR)
 
     def clear(self):
         """Clears the value, e.g. sets it to `None`."""

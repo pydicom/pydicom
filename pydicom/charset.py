@@ -743,7 +743,7 @@ def decode(data_element, dicom_character_set):
         or ``None``, in which case ``'ISO_IR 6'`` will be used.
     """
     if data_element.is_empty:
-        return config.empty_value
+        return data_element.empty_value
     if not dicom_character_set:
         dicom_character_set = ['ISO_IR 6']
 

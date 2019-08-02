@@ -17,7 +17,7 @@ from pydicom.compat import in_py2
 from pydicom.config import logger
 from pydicom.datadict import dictionary_VR, tag_for_keyword
 from pydicom.dataelem import (DataElement, RawDataElement,
-                              DataElement_from_raw)
+                              DataElement_from_raw, empty_value_for_VR)
 from pydicom.dataset import (Dataset, FileDataset)
 from pydicom.dicomdir import DicomDir
 from pydicom.errors import InvalidDicomError
@@ -187,7 +187,8 @@ def data_element_generator(fp,
                              "Skipping forward to next data element.")
                 fp.seek(fp_tell() + length)
             else:
-                value = fp_read(length) if length > 0 else config.empty_value
+                value = (fp_read(length) if length > 0
+                         else empty_value_for_VR(VR, raw=True))
                 if debugging:
                     dotdot = "..." if length > 12 else "   "
                     displayed_value = value[:12] if value else b''

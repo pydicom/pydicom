@@ -168,7 +168,7 @@ REFERENCE_DATA_UNSUPPORTED = [
     (JPEG_LOSSLESS_14_1, ('1.2.840.10008.1.2.4.70', 'Lestrade^G')),
     (JPEG_LS_LOSSLESS, ('1.2.840.10008.1.2.4.80', 'CompressedSamples^MR1')),
     # (JPEG_LS_LOSSY, ('1.2.840.10008.1.2.4.81')),  # No dataset available
-    (JPEG_2K_LOSSLESS, ('1.2.840.10008.1.2.4.90', config.empty_value)),
+    (JPEG_2K_LOSSLESS, ('1.2.840.10008.1.2.4.90', '')),
     (JPEG_2K, ('1.2.840.10008.1.2.4.91', 'CompressedSamples^NM1')),
     (RLE, ('1.2.840.10008.1.2.5', 'CompressedSamples^MR1')),
 ]
