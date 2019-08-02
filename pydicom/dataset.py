@@ -15,7 +15,6 @@ Dataset (dict subclass)
             contains its own DataElements, and so on in a recursive manner.
 """
 
-import base64
 import inspect  # for __dir__
 import io
 import json
@@ -27,7 +26,7 @@ from itertools import takewhile
 import pydicom  # for dcmwrite
 import pydicom.charset
 import pydicom.config
-from pydicom import compat, datadict
+from pydicom import compat, datadict, jsonrep
 from pydicom._version import __version_info__
 from pydicom.charset import default_encoding, convert_encodings
 from pydicom.config import logger
@@ -35,7 +34,6 @@ from pydicom.datadict import dictionary_VR
 from pydicom.datadict import (tag_for_keyword, keyword_for_tag,
                               repeater_has_keyword)
 from pydicom.dataelem import DataElement, DataElement_from_raw, RawDataElement
-from pydicom.multival import MultiValue
 from pydicom.pixel_data_handlers.util import (convert_color_space,
                                               reshape_pixel_array)
 from pydicom.tag import Tag, tag_in_exception
@@ -45,7 +43,6 @@ from pydicom.uid import (ExplicitVRLittleEndian, ImplicitVRLittleEndian,
 
 if compat.in_py2:
     from pkgutil import find_loader as have_package
-    from pydicom.valuerep import PersonNameUnicode
 else:
     from importlib.util import find_spec as have_package
 
@@ -63,20 +60,24 @@ class PropertyError(Exception):
 
 
 class PrivateBlock(object):
-    """Helper class for a private block in the dataset.
-    (See PS3.5, Section 7.8.1 - Private Data Element Tags)
+    """Helper class for a private block in the :class:`Dataset`.
+
+    See the DICOM Standard, Part 5,
+    :dcm:`Section 7.8.1<part05/sect_7.8.html#sect_7.8.1>` - Private Data
+    Element Tags
 
     Attributes
     ----------
-    group : 32 bit int
-        The private group where the private block is located.
+    group : int
+        The private group where the private block is located as a 32-bit
+        :class:`int`.
     private_creator : str
         The private creator string related to the block.
     dataset : Dataset
         The parent dataset.
-    block_start : 32 bit int
-        The start element of the private block.
-        Note that the 2 low order hex digits of the element are always 0.
+    block_start : int
+        The start element of the private block as a 32-bit :class:`int`. Note
+        that the 2 low order hex digits of the element are always 0.
     """
 
     def __init__(self, key, dataset, private_creator_element):
@@ -84,13 +85,13 @@ class PrivateBlock(object):
 
         Parameters
         ----------
-        key : tuple (int, str)
-            The private group and private creator. The group must be an odd
-            number.
+        key : tuple
+            The private (tag group, creator) as ``(int, str)``. The group
+            must be an odd number.
         dataset : Dataset
-            The parent dataset.
-        private_creator_element : 32 bit int
-            The element of the private creator tag.
+            The parent :class:`Dataset`.
+        private_creator_element : int
+            The element of the private creator tag as a 32-bit :class:`int`.
         """
         self.group = key[0]
         self.private_creator = key[1]
@@ -98,12 +99,12 @@ class PrivateBlock(object):
         self.block_start = private_creator_element << 8
 
     def get_tag(self, element_offset):
-        """Return the private tag ID for the given element offset.
+        """Return the private tag ID for the given `element_offset`.
 
         Parameters
         ----------
-        element_offset : 16 bit int
-            The lower 16 bit (e.g. 2 hex numbers) of the element tag.
+        element_offset : int
+            The lower 16 bits (e.g. 2 hex numbers) of the element tag.
 
         Returns
         -------
@@ -120,8 +121,9 @@ class PrivateBlock(object):
         return Tag(self.group, self.block_start + element_offset)
 
     def __contains__(self, element_offset):
-        """Return True if the tag with given element offset is contained in
-        the parent dataset."""
+        """Return ``True`` if the tag with given `element_offset` is in
+        the parent :class:`Dataset`.
+        """
         return self.get_tag(element_offset) in self.dataset
 
     def __getitem__(self, element_offset):
@@ -130,8 +132,8 @@ class PrivateBlock(object):
 
         Parameters
         ----------
-        element_offset : 16 bit int
-            The lower 16 bit (e.g. 2 hex numbers) of the element tag.
+        element_offset : int
+            The lower 16 bits (e.g. 2 hex numbers) of the element tag.
 
         Returns
         -------
@@ -148,12 +150,12 @@ class PrivateBlock(object):
         return self.dataset.__getitem__(self.get_tag(element_offset))
 
     def __delitem__(self, element_offset):
-        """Delete the tag with the given element offset from the dataset.
+        """Delete the tag with the given `element_offset` from the dataset.
 
         Parameters
         ----------
-        element_offset : 16 bit int
-            The lower 16 bit (e.g. 2 hex numbers) of the element tag
+        element_offset : int
+            The lower 16 bits (e.g. 2 hex numbers) of the element tag
             to be deleted.
 
         Raises
@@ -166,20 +168,22 @@ class PrivateBlock(object):
         del self.dataset[self.get_tag(element_offset)]
 
     def add_new(self, element_offset, VR, value):
-        """Adds the private tag with the given VR and value to the
-         parent dataset at the tag ID defined by the private block
-         and the given element offset.
+        """Add a private element to the parent :class:`Dataset`.
+
+        Adds the private tag with the given `VR` and `value` to the parent
+        :class:`Dataset` at the tag ID defined by the private block and the
+        given `element_offset`.
 
         Parameters
         ----------
-        element_offset : 16 bit int
-            The lower 16 bit (e.g. 2 hex numbers) of the element tag
+        element_offset : int
+            The lower 16 bits (e.g. 2 hex numbers) of the element tag
             to be added.
         VR : str
             The 2 character DICOM value representation.
         value
-            The value of the data element.
-            See `pydicom.Dataset.add_new` for a description.
+            The value of the data element. See :meth:`Dataset.add_new()`
+            for a description.
         """
         self.dataset.add_new(self.get_tag(element_offset), VR, value)
 
@@ -199,37 +203,39 @@ def _dict_equal(a, b, exclude=None):
 
 
 class Dataset(dict):
-    """Contains a collection (dictionary) of DICOM DataElements.
-    Behaves like a dictionary.
+    """Contains a collection (dictionary) of DICOM Data Elements.
+
+    Behaves like a :class:`dict`.
 
     .. note::
 
-        `Dataset` is derived from `dict` only to make it work in a NumPy
-        array. The parent dict class is never called, as all `dict` methods
-        are overridden.
+        :class:`Dataset` is only derived from :class:`dict` to make it work in
+        a NumPy :class:`~numpy.ndarray`. The parent :class:`dict` class
+        is never called, as all :class:`dict` methods are overridden.
 
     Examples
     --------
-    Add DataElements to the Dataset (for elements in the DICOM dictionary):
+    Add an element to the :class:`Dataset` (for elements in the DICOM
+    dictionary):
 
     >>> ds = Dataset()
     >>> ds.PatientName = "CITIZEN^Joan"
     >>> ds.add_new(0x00100020, 'LO', '12345')
     >>> ds[0x0010, 0x0030] = DataElement(0x00100030, 'DA', '20010101')
 
-    Add Sequence DataElement to the Dataset:
+    Add a sequence element to the :class:`Dataset`
 
     >>> ds.BeamSequence = [Dataset(), Dataset(), Dataset()]
     >>> ds.BeamSequence[0].Manufacturer = "Linac, co."
     >>> ds.BeamSequence[1].Manufacturer = "Linac and Sons, co."
     >>> ds.BeamSequence[2].Manufacturer = "Linac and Daughters, co."
 
-    Add private DataElements to the Dataset:
+    Add private elements to the :class:`Dataset`
 
     >>> block = ds.private_block(0x0041, 'My Creator', create=True)
     >>> block.add_new(0x01, 'LO', '12345')
 
-    Updating and retrieving DataElement values:
+    Updating and retrieving element values:
 
     >>> ds.PatientName = "CITIZEN^Joan"
     >>> ds.PatientName
@@ -238,15 +244,18 @@ class Dataset(dict):
     >>> ds.PatientName
     'CITIZEN^John'
 
-    Retrieving a DataElement's value from a Sequence:
+    Retrieving an element's value from a Sequence:
 
     >>> ds.BeamSequence[0].Manufacturer
     'Linac, co.'
     >>> ds.BeamSequence[1].Manufacturer
     'Linac and Sons, co.'
 
-    Retrieving DataElements:
+    Accessing the :class:`~pydicom.dataelem.DataElement` items:
 
+    >>> elem = ds['PatientName']
+    >>> elem
+    (0010, 0010) Patient's Name                      PN: 'CITIZEN^John'
     >>> elem = ds[0x00100010]
     >>> elem
     (0010, 0010) Patient's Name                      PN: 'CITIZEN^John'
@@ -254,33 +263,34 @@ class Dataset(dict):
     >>> elem
     (0010, 0010) Patient's Name                      PN: 'CITIZEN^John'
 
-    Retrieving a private DataElement:
+    Accessing a private :class:`~pydicom.dataelem.DataElement`
+    item:
 
     >>> block = ds.private_block(0x0041, 'My Creator')
     >>> elem = block[0x01]
     >>> elem
     (0041, 1001) Private tag data                    LO: '12345'
-
     >>> elem.value
     '12345'
 
     Alternatively:
+
     >>> ds.get_private_item(0x0041, 0x01, 'My Creator').value
     '12345'
 
-    Deleting a DataElement from the Dataset:
+    Deleting an element from the :class:`Dataset`
 
     >>> del ds.PatientID
     >>> del ds.BeamSequence[1].Manufacturer
     >>> del ds.BeamSequence[2]
 
-    Deleting a private DataElement from the Dataset:
+    Deleting a private element from the :class:`Dataset`
 
     >>> block = ds.private_block(0x0041, 'My Creator')
     >>> if 0x01 in block:
     ...     del block[0x01]
 
-    Determining if a DataElement is present in the Dataset:
+    Determining if an element is present in the :class:`Dataset`
 
     >>> 'PatientName' in ds
     True
@@ -291,19 +301,20 @@ class Dataset(dict):
     >>> 'Manufacturer' in ds.BeamSequence[0]
     True
 
-    Iterating through the top level of a Dataset only (excluding Sequences):
+    Iterating through the top level of a :class:`Dataset` only (excluding
+    Sequences):
 
     >>> for elem in ds:
-    ...    print(elem)   #doctest: +ELLIPSIS
-    (0010, 0010) Patient's Name                      PN: 'CITIZEN^John'...
+    ...    print(elem)
+    (0010, 0010) Patient's Name                      PN: 'CITIZEN^John'
 
-    Iterating through the entire Dataset (including Sequences):
+    Iterating through the entire :class:`Dataset` (including Sequences):
 
     >>> for elem in ds.iterall():
-    ...     print(elem)  #doctest: +ELLIPSIS
-    (0010, 0010) Patient's Name                      PN: 'CITIZEN^John'...
+    ...     print(elem)
+    (0010, 0010) Patient's Name                      PN: 'CITIZEN^John'
 
-    Recursively iterate through a Dataset (including Sequences):
+    Recursively iterate through a :class:`Dataset` (including Sequences):
 
     >>> def recurse(ds):
     ...     for elem in ds:
@@ -312,7 +323,7 @@ class Dataset(dict):
     ...         else:
     ...             # Do something useful with each DataElement
 
-    Converting a dataset to and from json:
+    Converting the :class:`Dataset` to and from JSON:
 
     >>> ds = Dataset()
     >>> ds.PatientName = "Some^Name"
@@ -329,33 +340,25 @@ class Dataset(dict):
         The default formatting for string display of sequences.
     indent_chars : str
         For string display, the characters used to indent nested Sequences.
-        Default is "   ".
+        Default is ``"   "``.
     is_little_endian : bool
-        Shall be set before writing with `write_like_original=False`.
-        The written dataset (excluding the pixel data) will be written using
+        Shall be set before writing with ``write_like_original=False``.
+        The :class:`Dataset` (excluding the pixel data) will be written using
         the given endianess.
     is_implicit_VR : bool
-        Shall be set before writing with `write_like_original=False`.
-        The written dataset will be written using the transfer syntax with
-        the given VR handling, e.g LittleEndianImplicit if True,
-        and LittleEndianExplicit or BigEndianExplicit (depending on
-        `is_little_endian`) if False.
+        Shall be set before writing with ``write_like_original=False``.
+        The :class:`Dataset` will be written using the transfer syntax with
+        the given VR handling, e.g *Little Endian Implicit VR* if ``True``,
+        and *Little Endian Explicit VR* or *Big Endian Explicit VR* (depending
+        on ``Dataset.is_little_endian``) if ``False``.
     """
     indent_chars = "   "
-
-    _BINARY_VR_VALUES = ['OW', 'OB', 'OD', 'OF', 'OL', 'UN',
-                         'OB or OW', 'US or OW', 'US or SS or OW']
-    _VRs_TO_BE_FLOATS = ['DS', 'FL', 'FD', ]
-    _VRs_TO_BE_INTS = ['IS', 'SL', 'SS', 'UL', 'US', 'US or SS']
-
-    # Order of keys is significant!
-    _JSON_VALUE_KEYS = ('Value', 'BulkDataURI', 'InlineBinary', )
 
     # Python 2: Classes defining __eq__ should flag themselves as unhashable
     __hash__ = None
 
     def __init__(self, *args, **kwargs):
-        """Create a new Dataset instance."""
+        """Create a new :class:`Dataset` instance."""
         self._parent_encoding = kwargs.get('parent_encoding', default_encoding)
         if not args:
             self._dict = {}
@@ -394,35 +397,37 @@ class Dataset(dict):
         return False
 
     def add(self, data_element):
-        """Add a DataElement to the Dataset.
+        """Add an element to the :class:`Dataset`.
 
-        Equivalent to ds[data_element.tag] = data_element
+        Equivalent to ``ds[data_element.tag] = data_element``
 
         Parameters
         ----------
-        data_element : pydicom.dataelem.DataElement
-            The DataElement to add to the Dataset.
+        data_element : dataelem.DataElement
+            The :class:`~pydicom.dataelem.DataElement` to add.
         """
         self[data_element.tag] = data_element
 
     def add_new(self, tag, VR, value):
-        """Add a DataElement to the Dataset.
+        """Create a new element and add it to the :class:`Dataset`.
 
         Parameters
         ----------
         tag
             The DICOM (group, element) tag in any form accepted by
-            pydicom.tag.Tag such as [0x0010, 0x0010], (0x10, 0x10), 0x00100010,
-            etc.
+            :func:`~pydicom.tag.Tag` such as ``[0x0010, 0x0010]``,
+            ``(0x10, 0x10)``, ``0x00100010``, etc.
         VR : str
-            The 2 character DICOM value representation (see DICOM standard part
-            5, Section 6.2).
+            The 2 character DICOM value representation (see DICOM Standard,
+            Part 5, :dcm:`Section 6.2<part05/sect_6.2.html>`).
         value
             The value of the data element. One of the following:
+
             * a single string or number
-            * a list or tuple with all strings or all numbers
+            * a :class:`list` or :class:`tuple` with all strings or all numbers
             * a multi-value string with backslash separator
-            * for a sequence DataElement, an empty list or list of Dataset
+            * for a sequence element, an empty :class:`list` or ``list`` of
+              :class:`Dataset`
         """
 
         data_element = DataElement(tag, VR, value)
@@ -430,7 +435,7 @@ class Dataset(dict):
         self._dict[data_element.tag] = data_element
 
     def data_element(self, name):
-        """Return the DataElement corresponding to the element keyword `name`.
+        """Return the element corresponding to the element keyword `name`.
 
         Parameters
         ----------
@@ -439,9 +444,10 @@ class Dataset(dict):
 
         Returns
         -------
-        pydicom.dataelem.DataElement or None
+        dataelem.DataElement or None
             For the given DICOM element `keyword`, return the corresponding
-            Dataset DataElement if present, None otherwise.
+            :class:`~pydicom.dataelem.DataElement` if present, ``None``
+            otherwise.
         """
         tag = tag_for_keyword(name)
         # Test against None as (0000,0000) is a possible tag
@@ -452,7 +458,9 @@ class Dataset(dict):
     def __contains__(self, name):
         """Simulate dict.__contains__() to handle DICOM keywords.
 
-        This is called for code like:
+        Examples
+        --------
+
         >>> ds = Dataset()
         >>> ds.SliceLocation = '2'
         >>> 'SliceLocation' in ds
@@ -461,12 +469,13 @@ class Dataset(dict):
         Parameters
         ----------
         name : str or int or 2-tuple
-            The Element keyword or tag to search for.
+            The element keyword or tag to search for.
 
         Returns
         -------
         bool
-            True if the DataElement is in the Dataset, False otherwise.
+            ``True`` if the corresponding element is in the :class:`Dataset`,
+            ``False`` otherwise.
         """
         try:
             tag = Tag(name)
@@ -478,9 +487,11 @@ class Dataset(dict):
         return name in self._dict  # will no doubt raise an exception
 
     def decode(self):
-        """Apply character set decoding to all DataElements in the Dataset.
+        """Apply character set decoding to the elements in the
+        :class:`Dataset`.
 
-        See DICOM PS3.5-2008 6.1.1.
+        See DICOM Standard, Part 5,
+        :dcm:`Section 6.1.1<part05/chapter_6.html#sect_6.1.1>`.
         """
         # Find specific character set. 'ISO_IR 6' is default
         # May be multi-valued, but let pydicom.charset handle all logic on that
@@ -505,16 +516,22 @@ class Dataset(dict):
     def __delattr__(self, name):
         """Intercept requests to delete an attribute by `name`.
 
+        Examples
+        --------
+
         >>> ds = Dataset()
         >>> ds.PatientName = 'foo'
         >>> ds.some_attribute = True
 
-        If `name` is a DICOM keyword - delete the corresponding DataElement
+        If `name` is a DICOM keyword - delete the corresponding
+        :class:`~pydicom.dataelem.DataElement`
+
         >>> del ds.PatientName
         >>> 'PatientName' in ds
         False
 
         If `name` is another attribute - delete it
+
         >>> del ds.some_attribute
         >>> hasattr(ds, 'some_attribute')
         False
@@ -541,7 +558,8 @@ class Dataset(dict):
 
         Examples
         --------
-        Indexing using DataElement tag
+        Indexing using :class:`~pydicom.dataelem.DataElement` tag
+
         >>> ds = Dataset()
         >>> ds.CommandGroupLength = 100
         >>> ds.PatientName = 'CITIZEN^Jan'
@@ -549,7 +567,8 @@ class Dataset(dict):
         >>> ds
         (0010, 0010) Patient's Name                      PN: 'CITIZEN^Jan'
 
-        Slicing using DataElement tag
+        Slicing using :class:`~pydicom.dataelem.DataElement` tag
+
         >>> ds = Dataset()
         >>> ds.CommandGroupLength = 100
         >>> ds.SOPInstanceUID = '1.2.3'
@@ -561,8 +580,8 @@ class Dataset(dict):
         Parameters
         ----------
         key
-            The key for the attribute to be deleted. If a slice is used then
-            the tags matching the slice conditions will be deleted.
+            The key for the attribute to be deleted. If a ``slice`` is used
+            then the tags matching the slice conditions will be deleted.
         """
         # If passed a slice, delete the corresponding DataElements
         if isinstance(key, slice):
@@ -578,7 +597,7 @@ class Dataset(dict):
                 del self._dict[tag]
 
     def __dir__(self):
-        """Give a list of attributes available in the Dataset.
+        """Give a list of attributes available in the :class:`Dataset`.
 
         List of attributes is used, for example, in auto-completion in editors
         or command-line environments.
@@ -594,11 +613,12 @@ class Dataset(dict):
         return alldir
 
     def dir(self, *filters):
-        """Return an alphabetical list of DataElement keywords in the Dataset.
+        """Return an alphabetical list of element keywords in the
+        :class:`Dataset`.
 
         Intended mainly for use in interactive Python sessions. Only lists the
-        DataElement keywords in the current level of the Dataset (i.e. the
-        contents of any Sequence elements are ignored).
+        element keywords in the current level of the :class:`Dataset` (i.e.
+        the contents of any sequence elements are ignored).
 
         Parameters
         ----------
@@ -609,8 +629,8 @@ class Dataset(dict):
         Returns
         -------
         list of str
-            The matching DataElement keywords in the dataset. If no filters are
-            used then all DataElement keywords are returned.
+            The matching element keywords in the dataset. If no
+            filters are used then all element keywords are returned.
         """
         allnames = [keyword_for_tag(tag) for tag in self._dict.keys()]
         # remove blanks - tags without valid names (e.g. private tags)
@@ -636,7 +656,8 @@ class Dataset(dict):
             The result if `self` and `other` are the same class
         NotImplemented
             If `other` is not the same class as `self` then returning
-            NotImplemented delegates the result to superclass.__eq__(subclass)
+            :class:`NotImplemented` delegates the result to
+            ``superclass.__eq__(subclass)``.
         """
         # When comparing against self this will be faster
         if other is self:
@@ -648,24 +669,25 @@ class Dataset(dict):
         return NotImplemented
 
     def get(self, key, default=None):
-        """Simulate dict.get() to handle DICOM DataElement tags and keywords.
+        """Simulate ``dict.get()`` to handle element tags and keywords.
 
         Parameters
         ----------
-        key : str or pydicom.tag.Tag
-            The element keyword or Tag or the class attribute name to get.
-        default : obj or None
-            If the DataElement or class attribute is not present, return
-            `default` (default None).
+        key : str or int or BaseTag
+            The element keyword or tag or the class attribute name to get.
+        default : obj or None, optional
+            If the element or class attribute is not present, return
+            `default` (default ``None``).
 
         Returns
         -------
         value
-            If `key` is the keyword for a DataElement in the Dataset then
-            return the DataElement's value.
-        pydicom.dataelem.DataElement
-            If `key` is a tag for a DataElement in the Dataset then return the
-            DataElement instance.
+            If `key` is the keyword for an element in the :class:`Dataset`
+            then return the element's value.
+        dataelem.DataElement
+            If `key` is a tag for a element in the :class:`Dataset` then
+            return the :class:`~pydicom.dataelem.DataElement`
+            instance.
         value
             If `key` is a class attribute then return its value.
         """
@@ -688,21 +710,37 @@ class Dataset(dict):
             return default
 
     def items(self):
-        """Return the elements in the Dataset as a list of tuple.
+        """Return the :class:`Dataset` items to simulate :meth:`dict.items`.
 
         Returns
         -------
-        list of tuple
-            The top-level (element tag, element) for the Dataset.
+        dict_items
+            The top-level (:class:`~pydicom.tag.BaseTag`,
+            :class:`~pydicom.dataelem.DataElement`) items for the
+            :class:`Dataset`.
         """
         return self._dict.items()
 
     def keys(self):
-        """Return the DICOM tag keys to simulate dict."""
+        """Return the :class:`Dataset` keys to simulate :meth:`dict.keys`.
+
+        Returns
+        -------
+        dict_keys
+            The :class:`~pydicom.tag.BaseTag` of all the elements in
+            the :class:`Dataset`.
+        """
         return self._dict.keys()
 
     def values(self):
-        """Return the DICOM tag values to simulate dict."""
+        """Return the :class:`Dataset` values to simulate :meth:`dict.values`.
+
+        Returns
+        -------
+        dict_keys
+            The :class:`DataElements<pydicom.dataelem.DataElement>` that make
+            up the values of the :class:`Dataset`.
+        """
         return self._dict.values()
 
     if compat.in_py2:
@@ -716,21 +754,21 @@ class Dataset(dict):
             return self._dict.iteritems()
 
     def __getattr__(self, name):
-        """Intercept requests for Dataset attribute names.
+        """Intercept requests for :class:`Dataset` attribute names.
 
         If `name` matches a DICOM keyword, return the value for the
-        DataElement with the corresponding tag.
+        element with the corresponding tag.
 
         Parameters
         ----------
         name
-            A DataElement keyword or tag or a class attribute name.
+            An element keyword or tag or a class attribute name.
 
         Returns
         -------
         value
               If `name` matches a DICOM keyword, returns the corresponding
-              DataElement's value. Otherwise returns the class attribute's
+              element's value. Otherwise returns the class attribute's
               value (if present).
         """
         tag = tag_for_keyword(name)
@@ -752,7 +790,7 @@ class Dataset(dict):
 
     @property
     def _character_set(self):
-        """The Dataset's SpecificCharacterSet value (if present)."""
+        """The character set used to encode text values."""
         char_set = self.get(Tag(0x00080005), None)
 
         if not char_set:
@@ -763,14 +801,15 @@ class Dataset(dict):
         return char_set
 
     def __getitem__(self, key):
-        """Operator for Dataset[key] request.
+        """Operator for ``Dataset[key]`` request.
 
         Any deferred data elements will be read in and an attempt will be made
         to correct any elements with ambiguous VRs.
 
         Examples
         --------
-        Indexing using DataElement tag
+        Indexing using :class:`~pydicom.dataelem.DataElement` tag
+
         >>> ds = Dataset()
         >>> ds.SOPInstanceUID = '1.2.3'
         >>> ds.PatientName = 'CITIZEN^Jan'
@@ -778,13 +817,15 @@ class Dataset(dict):
         >>> ds[0x00100010].value
         'CITIZEN^Jan'
 
-        Slicing using DataElement tag
-        All group 0x0010 elements in the dataset
+        Slicing using element tags; all group ``0x0010`` elements in
+        the  dataset
+
         >>> ds[0x00100000:0x00110000]
         (0010, 0010) Patient's Name                      PN: 'CITIZEN^Jan'
         (0010, 0020) Patient ID                          LO: '12345'
 
-        All group 0x0002 elements in the dataset
+        All group ``0x0002`` elements in the dataset
+
         >>> ds[(0x0002, 0x0000):(0x0003, 0x0000)]
         <BLANKLINE>
 
@@ -792,15 +833,18 @@ class Dataset(dict):
         ----------
         key
             The DICOM (group, element) tag in any form accepted by
-            pydicom.tag.Tag such as [0x0010, 0x0010], (0x10, 0x10), 0x00100010,
-            etc. May also be a slice made up of DICOM tags.
+            :func:`~pydicom.tag.Tag` such as ``[0x0010, 0x0010]``,
+            ``(0x10, 0x10)``, ``0x00100010``, etc. May also be a :class:`slice`
+            made up of DICOM tags.
 
         Returns
         -------
-        pydicom.dataelem.DataElement or pydicom.dataset.Dataset
+        dataelem.DataElement or Dataset
             If a single DICOM element tag is used then returns the
-            corresponding DataElement. If a slice is used then returns a
-            Dataset object containing the corresponding DataElements.
+            corresponding :class:`~pydicom.dataelem.DataElement`.
+            If a :class:`slice` is used then returns a :class:`Dataset` object
+            containing the corresponding
+            :class:`DataElements<pydicom.dataelem.DataElement>`.
         """
         # If passed a slice, return a Dataset containing the corresponding
         #   DataElements
@@ -839,38 +883,42 @@ class Dataset(dict):
         return self._dict.get(tag)
 
     def private_block(self, group, private_creator, create=False):
-        """Return the block for the given tag and private creator.
+        """Return the block for the given tag `group` and `private_creator`.
 
-        If `create` is set and the private creator does not exist,
+        If `create` is ``True`` and the `private_creator` does not exist,
         the private creator tag is added.
-        Note: We ignore the unrealistic case that no free block is
-        available.
+
+        Notes
+        -----
+        We ignore the unrealistic case that no free block is available.
 
         Parameters
         ----------
-        group : 32 bit int
-            The group of the private tag to be found. Must be an odd number
-            (e.g. a private group).
+        group : int
+            The group of the private tag to be found as a 32-bit :class:`int`.
+            Must be an odd number (e.g. a private group).
         private_creator : str
             The private creator string associated with the tag.
-        create : bool
-            If `True` and `private_creator` does not exist, a new private
-            creator tag is added at the next free block.
-            If `False` (the default) and `private_creator` does not exist,
-            `KeyError` is raised instead.
+        create : bool, optional
+            If ``True`` and `private_creator` does not exist, a new private
+            creator tag is added at the next free block. If ``False``
+            (the default) and `private_creator` does not exist,
+            :class:`KeyError` is raised instead.
 
         Returns
         -------
-        32 bit int
+        int
             Element base for the given tag (the last 2 hex digits are always 0)
+            as a 32-bit :class:`int`.
 
         Raises
         ------
         ValueError
-            If `tag` is not a private tag or `private_creator` is empty.
+            If `group` doesn't belong to a private tag or `private_creator`
+            is empty.
         KeyError
             If the private creator tag is not found in the given group and
-            the `create` parameter is not set.
+            the `create` parameter is ``False``.
         """
         def new_block():
             block = PrivateBlock(key, self, element)
@@ -905,21 +953,24 @@ class Dataset(dict):
     def private_creators(self, group):
         """Return a list of private creator names in the given group.
 
+        Examples
+        --------
         This can be used to check if a given private creator exists in
         the group of the dataset:
+
         >>> ds = Dataset()
         >>> if 'My Creator' in ds.private_creators(0x0041):
         ...     block = ds.private_block(0x0041, 'My Creator')
 
         Parameters
         ----------
-        group : 32 bit int
-            The private group. Must be an odd number.
+        group : int
+            The private group as a 32-bit :class:`int`. Must be an odd number.
 
         Returns
         -------
         list of str
-            List of all private creator names for private blocks in the group.
+            All private creator names for private blocks in the group.
 
         Raises
         ------
@@ -938,30 +989,33 @@ class Dataset(dict):
         return private_creators
 
     def get_private_item(self, group, element_offset, private_creator):
-        """Return the data element for the given private tag.
+        """Return the data element for the given private tag `group`.
 
-        This is analogous to `__getitem__`, but only for private tags.
-        This allows to find the private tag for the correct private creator
-        without the need to add the tag to the private dictionary first.
+        This is analogous to ``Dataset.__getitem__()``, but only for private
+        tags. This allows to find the private tag for the correct private
+        creator without the need to add the tag to the private dictionary
+        first.
 
         Parameters
         ----------
-        group : 32 bit int
-            The private group where the item is located.
-        element_offset : 16 bit int
-            The lower 16 bit (e.g. 2 hex numbers) of the element tag.
+        group : int
+            The private tag group where the item is located as a 32-bit int.
+        element_offset : int
+            The lower 16 bits (e.g. 2 hex numbers) of the element tag.
         private_creator : str
             The private creator for the tag. Must match the private creator
             for the tag to be returned.
 
         Returns
         -------
-        pydicom.dataelem.DataElement
+        dataelem.DataElement
+            The corresponding element.
 
         Raises
         ------
         ValueError
-            If `tag` is not a private tag or `private_creator` is empty.
+            If `group` is not part of a private tag or `private_creator` is
+            empty.
         KeyError
             If the private creator tag is not found in the given group.
             If the private tag is not found.
@@ -980,12 +1034,14 @@ class Dataset(dict):
         ----------
         key
             The DICOM (group, element) tag in any form accepted by
-            pydicom.tag.Tag such as [0x0010, 0x0010], (0x10, 0x10), 0x00100010,
-            etc. May also be a slice made up of DICOM tags.
+            :func:`~pydicom.tag.Tag` such as ``[0x0010, 0x0010]``,
+            ``(0x10, 0x10)``, ``0x00100010``, etc. May also be a :class:`slice`
+            made up of DICOM tags.
 
         Returns
         -------
-        pydicom.dataelem.DataElement
+        dataelem.DataElement
+            The corresponding element.
         """
         if isinstance(key, slice):
             return self._dataset_slice(key)
@@ -1001,10 +1057,11 @@ class Dataset(dict):
         return data_elem
 
     def _dataset_slice(self, slice):
-        """Return a slice that has the same properties as the original
-        dataset. That includes properties related to endianess and VR handling,
+        """Return a slice that has the same properties as the original dataset.
+
+        That includes properties related to endianess and VR handling,
         and the specific character set. No element conversion is done, e.g.
-        elements of type RawDataElement are kept.
+        elements of type ``RawDataElement`` are kept.
         """
         tags = self._slice_dataset(slice.start, slice.stop, slice.step)
         dataset = Dataset({tag: self.get_item(tag) for tag in tags})
@@ -1017,10 +1074,11 @@ class Dataset(dict):
 
     @property
     def is_original_encoding(self):
-        """Return True if the properties to be used for writing are set and
-        have the same value as the ones in the dataset after reading it.
+        """Return ``True`` if the encoding to be used for writing is set and
+        is the same as that used to originally encode the  :class:`Dataset`.
+
         This includes properties related to endianess, VR handling and the
-        specific character set.
+        (0008,0005) *Specific Character Set*.
         """
         return (self.is_implicit_VR is not None and
                 self.is_little_endian is not None and
@@ -1031,7 +1089,8 @@ class Dataset(dict):
     def set_original_encoding(self, is_implicit_vr, is_little_endian,
                               character_encoding):
         """Set the values for the original transfer syntax and encoding.
-        Can be used for a dataset with raw data elements to enable
+
+        Can be used for a :class:`Dataset` with raw data elements to enable
         optimized writing (e.g. without decoding the data elements).
         """
         self.read_implicit_vr = is_implicit_vr
@@ -1039,7 +1098,8 @@ class Dataset(dict):
         self.read_encoding = character_encoding
 
     def group_dataset(self, group):
-        """Return a Dataset containing only DataElements of a certain group.
+        """Return a :class:`Dataset` containing only elements of a certain
+        group.
 
         Parameters
         ----------
@@ -1048,26 +1108,32 @@ class Dataset(dict):
 
         Returns
         -------
-        pydicom.dataset.Dataset
-            A dataset instance containing elements of the group specified.
+        Dataset
+            A :class:`Dataset` containing elements of the group specified.
         """
         return self[(group, 0x0000):(group + 1, 0x0000)]
 
     def __iter__(self):
         """Iterate through the top-level of the Dataset, yielding DataElements.
 
+        Examples
+        --------
+
         >>> ds = Dataset()
         >>> for elem in ds:
         ...     print(elem)
 
-        The DataElements are returned in increasing tag value order.
-        Sequence items are returned as a single DataElement, so it is up to the
-        calling code to recurse into the Sequence items if desired.
+        The :class:`DataElements<pydicom.dataelem.DataElement>` are returned in
+        increasing tag value order. Sequence items are returned as a single
+        :class:`~pydicom.dataelem.DataElement`, so it is up
+        to the calling code to recurse into the Sequence items if desired.
 
         Yields
         ------
-        pydicom.dataelem.DataElement
-            The Dataset's DataElements, sorted by increasing tag order.
+        dataelem.DataElement
+            The :class:`Dataset`'s
+            :class:`DataElements<pydicom.dataelem.DataElement>`, sorted by
+            increasing tag order.
         """
         # Note this is different than the underlying dict class,
         #        which returns the key of the key:value mapping.
@@ -1077,19 +1143,22 @@ class Dataset(dict):
             yield self[tag]
 
     def elements(self):
-        """Iterate through the top-level of the Dataset, yielding DataElements
-        or RawDataElements (no conversion done).
+        """Yield the top-level elements of the :class:`Dataset`.
+
+        Examples
+        --------
 
         >>> ds = Dataset()
         >>> for elem in ds.elements():
         ...     print(elem)
 
-        The elements are returned in the same way as in __getitem__.
+        The elements are returned in the same way as in
+        ``Dataset.__getitem__()``.
 
         Yields
         ------
-        pydicom.dataelem.DataElement or pydicom.dataelem.RawDataElement
-            The Dataset's DataElements, sorted by increasing tag order.
+        dataelem.DataElement or dataelem.RawDataElement
+            The unconverted elements sorted by increasing tag order.
         """
         taglist = sorted(self._dict.keys())
         for tag in taglist:
@@ -1103,35 +1172,36 @@ class Dataset(dict):
         return not self == other
 
     def clear(self):
-        """Delete all data elements."""
+        """Delete all the elements from the :class:`Dataset`."""
         self._dict.clear()
 
     def pop(self, key, *args):
-        """Emulate dictionary `pop`, but additionally support tag ID tuple
-        and DICOM keyword.
+        """Emulate :meth:`dict.pop` with support for tags and keywords.
 
-        Removes the data element for `key` if it exists and returns it,
-        otherwise returns a default value if given or raises `KeyError`.
+        Removes the element for `key` if it exists and returns it,
+        otherwise returns a default value if given or raises :class:`KeyError`.
 
         Parameters
         ----------
-        key: int or str or 2-tuple
-            if tuple - the group and element number of the DICOM tag
-            if int - the combined group/element number
-            if str - the DICOM keyword of the tag
+        key : int or str or 2-tuple
 
-        *args: zero or one argument
-            defines the behavior if no tag exists for `key`: if given,
-            it defines the return value, if not given, `KeyError` is raised
+            * If :class:`tuple` - the group and element number of the DICOM tag
+            * If :class:`int` - the combined group/element number
+            * If :class:`str` - the DICOM keyword of the tag
+
+        *args : zero or one argument
+            Defines the behavior if no tag exists for `key`: if given,
+            it defines the return value, if not given, :class:`KeyError` is
+            raised
 
         Returns
         -------
-        The data element for `key` if it exists, or the default value if given.
+        The element for `key` if it exists, or the default value if given.
 
         Raises
         ------
         KeyError
-            If the key is not a valid tag ID or keyword.
+            If the `key` is not a valid tag or keyword.
             If the tag does not exist and no default is given.
         """
         try:
@@ -1144,50 +1214,53 @@ class Dataset(dict):
         return self._dict.popitem()
 
     def setdefault(self, key, default=None):
-        """Emulate dictionary `setdefault`, but additionally support
-        tag ID tuple and DICOM keyword for `key`, and data element value
-        for `default`.
+        """Emulate :meth:`dict.setdefault` with support for tags and keywords.
 
-        .. usage:
+        Examples
+        --------
 
         >>> ds = Dataset()
-        >>> pname = ds.setdefault((0x0010, 0x0010), "Test")
-        >>> pname
+        >>> elem = ds.setdefault((0x0010, 0x0010), "Test")
+        >>> elem
         (0010, 0010) Patient's Name                      PN: 'Test'
-        >>> pname.value
+        >>> elem.value
         'Test'
-        >>> psex = ds.setdefault('PatientSex',
+        >>> elem = ds.setdefault('PatientSex',
         ...     DataElement(0x00100040, 'CS', 'F'))
-        >>> psex.value
+        >>> elem.value
         'F'
 
         Parameters
         ----------
-        key: int or str or 2-tuple
-            if tuple - the group and element number of the DICOM tag
-            if int - the combined group/element number
-            if str - the DICOM keyword of the tag
+        key : int or str or 2-tuple
 
-        default: DataElement or value type or None
+            * If :class:`tuple` - the group and element number of the DICOM tag
+            * If :class:`int` - the combined group/element number
+            * If :class:`str` - the DICOM keyword of the tag
+
+        default : type, optional
             The default value that is inserted and returned if no data
-            element exists for the given key.
-            If it is not of type DataElement, a DataElement is constructed
-            instead for the given tag ID and default as value. This is only
-            possible for known tags (e.g. tags found via the dictionary
-            lookup).
+            element exists for the given key. If it is not of type
+            :class:`~pydicom.dataelem.DataElement`, one will be
+            constructed instead for the given tag and `default` as value.
+            This is only possible for known tags (e.g. tags found via the
+            dictionary lookup).
 
         Returns
         -------
-        The data element for `key` if it exists, or the default value if
-        it is a DataElement or None, or a DataElement constructed with
-        `default` as value.
+        type
+            The data element for `key` if it exists, or the default value if
+            it is a :class:`~pydicom.dataelem.DataElement` or
+            ``None``, or a :class:`~pydicom.dataelem.DataElement`
+            constructed with `default` as value.
 
         Raises
         ------
         KeyError
-            If the key is not a valid tag ID or keyword.
-            If no tag exists for `key`, default is not a DataElement
-            and not None, and key is not a known DICOM tag.
+            If the `key` is not a valid tag or keyword.
+            If no tag exists for `key`, default is not a
+            :class:`~pydicom.dataelem.DataElement` and not
+            ``None``, and `key` is not a known DICOM tag.
         """
         if key in self:
             return self[key]
@@ -1200,7 +1273,8 @@ class Dataset(dict):
         return default
 
     def convert_pixel_data(self):
-        """Convert the Pixel Data to a numpy array internally.
+        """Convert the (7fe0,0010) *Pixel Data* to a :class:`numpy.ndarray`
+        internally.
 
         Returns
         -------
@@ -1306,15 +1380,19 @@ class Dataset(dict):
         raise last_exception
 
     def decompress(self):
-        """Decompresses pixel data and modifies the Dataset in-place
+        """Decompresses *Pixel Data* and modifies the :class:`Dataset`
+        in-place.
 
-        If not a compressed tranfer syntax, then pixel data is converted
-        to a numpy array internally, but not returned.
+        If not a compressed transfer syntax, then pixel data is converted
+        to a :class:`numpy.ndarray` internally, but not returned.
 
         If compressed pixel data, then is decompressed using an image handler,
         and internal state is updated appropriately:
-            - TransferSyntax is updated to non-compressed form
-            - is_undefined_length for pixel data is set False
+
+        - ``Dataset.file_meta.TransferSyntaxUID`` is updated to non-compressed
+          form
+        - :func:`~pydicom.dataelem.DataElement.is_undefined_length`
+          is ``False`` for the (7fe0,0010) *Pixel Data* element.
 
         Returns
         -------
@@ -1324,7 +1402,7 @@ class Dataset(dict):
         ------
         NotImplementedError
             If the pixel data was originally compressed but file is not
-            ExplicitVR LittleEndian as required by Dicom standard
+            *Explicit VR Little Endian* as required by the DICOM Standard.
         """
         self.convert_pixel_data()
         self.is_decompressed = True
@@ -1350,12 +1428,12 @@ class Dataset(dict):
 
     @property
     def pixel_array(self):
-        """Return the Pixel Data as a NumPy array.
+        """Return the *Pixel Data* as a :class:`numpy.ndarray`.
 
         Returns
         -------
         numpy.ndarray
-            The Pixel Data (7FE0,0010) as a NumPy ndarray.
+            The (7fe0,0010) *Pixel Data* converted to a :class:`numpy.ndarray`.
         """
         self.convert_pixel_data()
         return self._pixel_array
@@ -1370,25 +1448,28 @@ class Dataset(dict):
             element_format=default_element_format,
             sequence_element_format=default_sequence_element_format,
             indent_format=None):
-        """Iterate through the Dataset yielding formatted str for each element.
+        """Iterate through the :class:`Dataset` yielding formatted :class:`str`
+        for each element.
 
         Parameters
         ----------
         element_format : str
             The string format to use for non-sequence elements. Formatting uses
-            the attributes of DataElement. Default is
-            "%(tag)s %(name)-35.35s %(VR)s: %(repval)s".
+            the attributes of
+            :class:`~pydicom.dataelem.DataElement`. Default is
+            ``"%(tag)s %(name)-35.35s %(VR)s: %(repval)s"``.
         sequence_element_format : str
             The string format to use for sequence elements. Formatting uses
-            the attributes of DataElement. Default is
-            "%(tag)s %(name)-35.35s %(VR)s: %(repval)s"
+            the attributes of
+            :class:`~pydicom.dataelem.DataElement`. Default is
+            ``"%(tag)s %(name)-35.35s %(VR)s: %(repval)s"``
         indent_format : str or None
             Placeholder for future functionality.
 
         Yields
         ------
         str
-            A string representation of a DataElement.
+            A string representation of an element.
         """
         for data_element in self.iterall():
             # Get all the attributes possible for this data element (e.g.
@@ -1400,7 +1481,7 @@ class Dataset(dict):
                                getattr(data_element, x))
                               for x in dir(data_element)
                               if not x.startswith("_")
-                              and x != "from_json"])
+                              and x not in ('from_json', 'to_json')])
             if data_element.VR == "SQ":
                 yield sequence_element_format % elem_dict
             else:
@@ -1410,18 +1491,18 @@ class Dataset(dict):
         """Return a string of the DataElements in the Dataset, with indented
         levels.
 
-        This private method is called by the __str__() method for handling
-        print statements or str(dataset), and the __repr__() method.
-        It is also used by top(), therefore the top_level_only flag.
+        This private method is called by the ``__str__()`` method for handling
+        print statements or ``str(dataset)``, and the ``__repr__()`` method.
+        It is also used by ``top()``, therefore the `top_level_only` flag.
         This function recurses, with increasing indentation levels.
 
         Parameters
         ----------
-        indent : int
-            The indent level offset (default 0)
-        top_level_only : bool
+        indent : int, optional
+            The indent level offset (default ``0``).
+        top_level_only : bool, optional
             When True, only create a string for the top level elements, i.e.
-            exclude elements within any Sequences (default False).
+            exclude elements within any Sequences (default ``False``).
 
         Returns
         -------
@@ -1447,7 +1528,7 @@ class Dataset(dict):
         return "\n".join(strings)
 
     def remove_private_tags(self):
-        """Remove all private DataElements in the Dataset."""
+        """Remove all private elements from the :class:`Dataset`."""
 
         def RemoveCallback(dataset, data_element):
             """Internal method to use as callback to walk() method."""
@@ -1458,57 +1539,60 @@ class Dataset(dict):
         self.walk(RemoveCallback)
 
     def save_as(self, filename, write_like_original=True):
-        """Write the Dataset to `filename`.
+        """Write the :class:`Dataset` to `filename`.
 
-        Saving a Dataset requires that the Dataset.is_implicit_VR and
-        Dataset.is_little_endian attributes exist and are set appropriately. If
-        Dataset.file_meta.TransferSyntaxUID is present then it should be set to
-        a consistent value to ensure conformance.
+        Saving requires that the ``Dataset.is_implicit_VR`` and
+        ``Dataset.is_little_endian`` attributes exist and are set
+        appropriately. If ``Dataset.file_meta.TransferSyntaxUID`` is present
+        then it should be set to a consistent value to ensure conformance.
 
-        Conformance with DICOM File Format
-        ----------------------------------
-        If `write_like_original` is False, the Dataset will be stored in the
-        DICOM File Format in accordance with DICOM Standard Part 10 Section 7.
-        To do so requires that the `Dataset.file_meta` attribute exists and
-        contains a Dataset with the required (Type 1) File Meta Information
-        Group elements (see pydicom.filewriter.dcmwrite and
-        pydicom.filewriter.write_file_meta_info for more information).
+        **Conformance with DICOM File Format**
 
-        If `write_like_original` is True then the Dataset will be written as is
-        (after minimal validation checking) and may or may not contain all or
-        parts of the File Meta Information (and hence may or may not be
-        conformant with the DICOM File Format).
+        If `write_like_original` is ``False``, the :class:`Dataset` will be
+        stored in the :dcm:`DICOM File Format <part10/chapter_7.html>`. To do
+        so requires that the ``Dataset.file_meta`` attribute
+        exists and contains a :class:`Dataset` with the required (Type 1) *File
+        Meta Information Group* elements (see
+        :func:`~pydicom.filewriter.dcmwrite` and
+        :func:`~pydicom.filewriter.write_file_meta_info` for more information).
+
+        If `write_like_original` is ``True`` then the :class:`Dataset` will be
+        written as is (after minimal validation checking) and may or may not
+        contain all or parts of the *File Meta Information* (and hence may or
+        may not be conformant with the DICOM File Format).
 
         Parameters
         ----------
         filename : str or file-like
             Name of file or the file-like to write the new DICOM file to.
-        write_like_original : bool
-            If True (default), preserves the following information from
-            the Dataset (and may result in a non-conformant file):
+        write_like_original : bool, optional
+            If ``True`` (default), preserves the following information from
+            the :class:`Dataset` (and may result in a non-conformant file):
+
             - preamble -- if the original file has no preamble then none will
-                be written.
-            - file_meta -- if the original file was missing any required File
-                Meta Information Group elements then they will not be added or
-                written.
-                If (0002,0000) 'File Meta Information Group Length' is present
-                then it may have its value updated.
+              be written.
+            - file_meta -- if the original file was missing any required *File
+              Meta Information Group* elements then they will not be added or
+              written.
+              If (0002,0000) *File Meta Information Group Length* is present
+              then it may have its value updated.
             - seq.is_undefined_length -- if original had delimiters, write them
-                now too, instead of the more sensible length characters
+              now too, instead of the more sensible length characters
             - is_undefined_length_sequence_item -- for datasets that belong to
-                a sequence, write the undefined length delimiters if that is
-                what the original had.
-            If False, produces a file conformant with the DICOM File Format,
-            with explicit lengths for all elements.
+              a sequence, write the undefined length delimiters if that is
+              what the original had.
+
+            If ``False``, produces a file conformant with the DICOM File
+            Format, with explicit lengths for all elements.
 
         See Also
         --------
         pydicom.filewriter.write_dataset
-            Write a DICOM Dataset to a file.
+            Write a :class:`Dataset` to a file.
         pydicom.filewriter.write_file_meta_info
-            Write the DICOM File Meta Information Group elements to a file.
+            Write the *File Meta Information Group* elements to a file.
         pydicom.filewriter.dcmwrite
-            Write a DICOM file from a FileDataset instance.
+            Write a DICOM file from a :class:`FileDataset` instance.
         """
         # Ensure is_little_endian and is_implicit_VR are set
         if self.is_little_endian is None or self.is_implicit_VR is None:
@@ -1520,24 +1604,24 @@ class Dataset(dict):
         pydicom.dcmwrite(filename, self, write_like_original)
 
     def ensure_file_meta(self):
-        """Create an empty file meta dataset if none exists."""
+        """Create an empty ``Dataset.file_meta`` if none exists."""
         self.file_meta = getattr(self, 'file_meta', Dataset())
 
     def fix_meta_info(self, enforce_standard=True):
         """Ensure the file meta info exists and has the correct values
-        for transfer syntax and media storage uids.
+        for transfer syntax and media storage UIDs.
 
         .. warning::
 
-            The transfer syntax for is_implicit_VR = False and
-            is_little_endian = True is ambiguous and will therefore not be set.
+            The transfer syntax for ``is_implicit_VR = False`` and
+            ``is_little_endian = True`` is ambiguous and will therefore not
+            be set.
 
         Parameters
         ----------
-        enforce_standard : boolean
-            If True, a check for incorrect and missing elements is performed.
-            (see pydicom.filewriter.validate_file_meta)
-
+        enforce_standard : bool, optional
+            If ``True``, a check for incorrect and missing elements is
+            performed (see :func:`~validate_file_meta`).
         """
         self.ensure_file_meta()
 
@@ -1565,7 +1649,7 @@ class Dataset(dict):
         Parameters
         ----------
         name : str
-            The element keyword for the DataElement you wish to add/change. If
+            The keyword for the element you wish to add/change. If
             `name` is not a DICOM element keyword then this will be the
             name of the attribute to be added/changed.
         value
@@ -1609,15 +1693,15 @@ class Dataset(dict):
         ----------
         key : int
             The tag for the element to be added to the Dataset.
-        value : pydicom.dataelem.DataElement or pydicom.dataelem.RawDataElement
-            The element to add to the Dataset.
+        value : dataelem.DataElement or dataelem.RawDataElement
+            The element to add to the :class:`Dataset`.
 
         Raises
         ------
         NotImplementedError
-            If `key` is a slice.
+            If `key` is a ``slice``.
         ValueError
-            If the `key` value doesn't match DataElement.tag.
+            If the `key` value doesn't match ``DataElement.tag``.
         """
         if isinstance(key, slice):
             raise NotImplementedError('Slicing is not supported for setting '
@@ -1653,17 +1737,18 @@ class Dataset(dict):
         ----------
         start : int or 2-tuple of int or None
             The slice's starting element tag value, in any format accepted by
-            pydicom.tag.Tag.
+            :func:`~pydicom.tag.Tag`.
         stop : int or 2-tuple of int or None
             The slice's stopping element tag value, in any format accepted by
-            pydicom.tag.Tag.
+            :func:`~pydicom.tag.Tag`.
         step : int or None
             The slice's step size.
 
         Returns
         ------
-        list of pydicom.tag.Tag
-            The tags in the Dataset that meet the conditions of the slice.
+        list of BaseTag
+            The tags in the :class:`Dataset` that meet the conditions of the
+            slice.
         """
         # Check the starting/stopping Tags are valid when used
         if start is not None:
@@ -1701,11 +1786,11 @@ class Dataset(dict):
         return self._pretty_str()
 
     def top(self):
-        """Return a str of the Dataset's top level DataElements only."""
+        """Return a :class:`str` representation of the top level elements. """
         return self._pretty_str(top_level_only=True)
 
     def trait_names(self):
-        """Return a list of valid names for auto-completion code.
+        """Return a :class:`list` of valid names for auto-completion code.
 
         Used in IPython, so that data element names can be found and offered
         for autocompletion on the IPython command line.
@@ -1713,12 +1798,13 @@ class Dataset(dict):
         return dir(self)  # only valid python >=2.6, else use self.__dir__()
 
     def update(self, dictionary):
-        """Extend dict.update() to handle DICOM keywords.
+        """Extend :meth:`dict.update` to handle DICOM tags and keywords.
 
         Parameters
         ----------
         dictionary : dict or Dataset
-            The dict or Dataset to use when updating the current object.
+            The :class:`dict` or :class:`Dataset` to use when updating the
+            current object.
         """
         for key, value in list(dictionary.items()):
             if isinstance(key, (str, compat.text_type)):
@@ -1727,14 +1813,14 @@ class Dataset(dict):
                 self[Tag(key)] = value
 
     def iterall(self):
-        """Iterate through the Dataset, yielding all DataElements.
+        """Iterate through the :class:`Dataset`, yielding all the elements.
 
-        Unlike Dataset.__iter__, this *does* recurse into sequences,
-        and so returns all data elements as if the file were "flattened".
+        Unlike ``Dataset.__iter__()``, this *does* recurse into sequences,
+        and so yields all elements as if the file were "flattened".
 
         Yields
         ------
-        pydicom.dataelem.DataElement
+        dataelem.DataElement
         """
         for data_element in self:
             yield data_element
@@ -1745,23 +1831,34 @@ class Dataset(dict):
                         yield elem
 
     def walk(self, callback, recursive=True):
-        """Iterate through the DataElements and run `callback` on each.
+        """Iterate through the :class:`Dataset's<Dataset>` elements and run
+        `callback` on each.
 
-        Visit all DataElements, possibly recursing into sequences and their
-        datasets. The callback function is called for each DataElement
-        (including SQ element). Can be used to perform an operation on certain
-        types of DataElements. E.g., `remove_private_tags`() finds all private
-        tags and deletes them. DataElement`s will come back in DICOM order (by
-        increasing tag number within their dataset).
+        Visit all elements in the :class:`Dataset`, possibly recursing into
+        sequences and their items. The `callback` function is called for each
+        :class:`~pydicom.dataelem.DataElement` (including elements
+        with a VR of 'SQ'). Can be used to perform an operation on certain
+        types of elements.
+
+        For example,
+        :meth:`~Dataset.remove_private_tags` finds all elements with private
+        tags and deletes them.
+
+        The elements will be returned in order of increasing tag number within
+        their current :class:`Dataset`.
 
         Parameters
         ----------
         callback
-            A callable that takes two arguments:
-                * a Dataset
-                * a DataElement belonging to that Dataset
-        recursive : bool
-            Flag to indicate whether to recurse into Sequences.
+            A callable function that takes two arguments:
+
+            * a :class:`Dataset`
+            * a :class:`~pydicom.dataelem.DataElement` belonging
+              to that :class:`Dataset`
+
+        recursive : bool, optional
+            Flag to indicate whether to recurse into sequences (default
+            ``True``).
         """
         taglist = sorted(self._dict.keys())
         for tag in taglist:
@@ -1777,58 +1874,28 @@ class Dataset(dict):
                         dataset.walk(callback)
 
     @classmethod
-    def _convert_to_python_number(cls, value, vr):
-        """Makes sure that values are either ints or floats
-        based on their value representation.
-
-        Parameters
-        ----------
-        value: Union[Union[str, int, float], List[Union[str, int, float]]]
-            value of data element
-        vr: str
-            value representation of data element
-
-        Returns
-        -------
-        Union[Union[str, int, float], List[Union[str, int, float]]]
-
-        """
-        if value is None:
-            return None
-        number_type = None
-        if vr in cls._VRs_TO_BE_INTS:
-            number_type = int
-        if vr in cls._VRs_TO_BE_FLOATS:
-            number_type = float
-        if number_type is not None:
-            if isinstance(value, (list, tuple, )):
-                value = [number_type(e) for e in value]
-            else:
-                value = number_type(value)
-        return value
-
-    @classmethod
     def from_json(cls, json_dataset, bulk_data_uri_handler=None,
                   encodings=None):
-        """Loads DICOM Data Set in DICOM JSON format.
-        See:
-        http://dicom.nema.org/medical/dicom/current/output/chtml/part18/chapter_F.html
+        """Add elements to the :class:`Dataset` from DICOM JSON format.
+
+        See the DICOM Standard, Part 18, :dcm:`Annex F<part18/chapter_F.html>`.
 
         Parameters
         ----------
-        json_dataset: Union[dict, str]
-            dictionary or string representing a DICOM Data Set formatted based
-            on the DICOM JSON Model (Annex F)
-        bulk_data_uri_handler: Union[Callable, None]
-            callable that accepts the "BulkDataURI" of the JSON representation
-            of a data element and returns the actual value of data element
-            (retrieved via DICOMweb WADO-RS)
-        encodings: Union[list, None]
-            encodings from SpecificCharacterSet, or None for default
+        json_dataset : dict or str
+            :class:`dict` or :class:`str` representing a DICOM Data Set
+            formatted based on the DICOM JSON Model.
+        bulk_data_uri_handler : callable, optional
+            Callable function that accepts the "BulkDataURI" of the JSON
+            representation of a data element and returns the actual value of
+            data element (retrieved via DICOMweb WADO-RS).
+        encodings : list of str, optional
+            Encodings from (0008,0005) *Specific Character Set*, or ``None``
+            (default).
+
         Returns
         -------
-        pydicom.dataset.Dataset
-
+        Dataset
         """
         if not isinstance(json_dataset, dict):
             json_dataset = json.loads(json_dataset)
@@ -1836,7 +1903,7 @@ class Dataset(dict):
         for tag, mapping in json_dataset.items():
             vr = mapping['vr']
             unique_value_keys = tuple(
-                set(mapping.keys()) & set(cls._JSON_VALUE_KEYS)
+                set(mapping.keys()) & set(jsonrep.JSON_VALUE_KEYS)
             )
             if len(unique_value_keys) == 0:
                 value_key = None
@@ -1850,138 +1917,39 @@ class Dataset(dict):
             dataset.add(data_element)
         return dataset
 
-    def _data_element_to_json(self, data_element,
-                              bulk_data_element_handler,
-                              bulk_data_threshold, dump_handler):
-        """Converts a DataElement to JSON representation.
-
-        Parameters
-        ----------
-        data_element: pydicom.dataelem.DataElement
-            data element
-        bulk_data_element_handler: Union[Callable, None]
-            callable that accepts a bulk data element and returns the
-            "BulkDataURI" for retrieving the value of the data element
-            via DICOMweb WADO-RS
-        bulk_data_threshold: int
-            size of base64 encoded data element above which a value will be
-            provided in form of a "BulkDataURI" rather than "InlineBinary"
-
-        Returns
-        -------
-        dict
-            mapping representing a JSON encoded data element
-
-        Raises
-        ------
-        TypeError
-            when size of encoded data element exceeds `bulk_data_threshold`
-            but `bulk_data_element_handler` is ``None`` and hence not callable
-
-        """
-        # TODO: Determine whether more VRs need to be converted to strings
-        _VRs_TO_QUOTE = ['AT', ]
-        json_element = {'vr': data_element.VR, }
-        if data_element.VR in Dataset._BINARY_VR_VALUES:
-            if data_element.value is not None:
-                binary_value = data_element.value
-                encoded_value = base64.b64encode(binary_value).decode('utf-8')
-                if len(encoded_value) > bulk_data_threshold:
-                    if bulk_data_element_handler is None:
-                        raise TypeError(
-                            'No bulk data element handler provided to generate '
-                            'URL for value of data element "{}".'.format(
-                                data_element.name
-                            )
-                        )
-                    json_element['BulkDataURI'] = bulk_data_element_handler(
-                        data_element
-                    )
-                else:
-                    logger.info(
-                        'encode bulk data element "{}" inline'.format(
-                            data_element.name
-                        )
-                    )
-                    json_element['InlineBinary'] = encoded_value
-        elif data_element.VR == 'SQ':
-            # recursive call to co-routine to format sequence contents
-            value = [
-                json.loads(e.to_json(
-                    bulk_data_element_handler=bulk_data_element_handler,
-                    bulk_data_threshold=bulk_data_threshold,
-                    dump_handler=dump_handler
-                ))
-                for e in data_element
-            ]
-            json_element['Value'] = value
-        elif data_element.VR == 'PN':
-            elem_value = data_element.value
-            if elem_value is not None:
-                if compat.in_py2:
-                    elem_value = PersonNameUnicode(elem_value, 'UTF8')
-                if len(elem_value.components) > 2:
-                    json_element['Value'] = [
-                        {'Phonetic': elem_value.components[2], },
-                    ]
-                elif len(elem_value.components) > 1:
-                    json_element['Value'] = [
-                        {'Ideographic': elem_value.components[1], },
-                    ]
-                else:
-                    json_element['Value'] = [
-                        {'Alphabetic': elem_value.components[0], },
-                    ]
-        else:
-            if data_element.value is not None:
-                is_multivalue = isinstance(data_element.value, MultiValue)
-                if data_element.VM > 1 or is_multivalue:
-                    value = data_element.value
-                else:
-                    value = [data_element.value]
-                # ensure it's a list and not another iterable
-                # (e.g. tuple), which would not be JSON serializable
-                if data_element.VR in _VRs_TO_QUOTE:
-                    json_element['Value'] = [str(v) for v in value]
-                else:
-                    json_element['Value'] = [v for v in value]
-        if hasattr(json_element, 'Value'):
-            json_element['Value'] = self._convert_to_python_number(
-                json_element['Value'], data_element.VR
-            )
-        return json_element
-
     def to_json(self, bulk_data_threshold=1, bulk_data_element_handler=None,
                 dump_handler=None):
-        """Converts the data set into JSON representation based on the
-        DICOM JSON Model
-        http://dicom.nema.org/medical/dicom/current/output/chtml/part18/chapter_F.html.
+        """Return a JSON representation of the :class:`Dataset`.
+
+        See the DICOM Standard, Part 18, :dcm:`Annex F<part18/chapter_F.html>`.
 
         Parameters
         ----------
-        bulk_data_threshold: int, optional
-            threshold for the length of a base64-encoded binary data element
-            above which the element should be considered bulk data and the value
-            provided as a URI rather than included inline (default: ``1``)
-        bulk_data_element_handler: Union[Callable, None], optional
-            callable that accepts a bulk data element and returns a JSON
-            representation of the data element (dictionary including the "vr"
-            key and either the "InlineBinary" or the "BulkDataURI" key)
-        dump_handler: Union[Callable, None], optional
-            callable that accepts a dict and returns the serialized (dumped)
-            JSON string (by default uses ``json.dumps()``)
+        bulk_data_threshold : int, optional
+            Threshold for the length of a base64-encoded binary data element
+            above which the element should be considered bulk data and the
+            value provided as a URI rather than included inline (default:
+            ``1``).
+        bulk_data_element_handler : callable, optional
+            Callable function that accepts a bulk data element and returns a
+            JSON representation of the data element (dictionary including the
+            "vr" key and either the "InlineBinary" or the "BulkDataURI" key).
+        dump_handler : callable, optional
+            Callable function that accepts a :class:`dict` and returns the
+            serialized (dumped) JSON string (by default uses
+            :func:`json.dumps`).
 
         Returns
         -------
         str
-            data set serialized into a string based on the DICOM JSON Model
+            :class:`Dataset` serialized into a string based on the DICOM JSON
+            Model.
 
         Examples
         --------
         >>> def my_json_dumps(data):
         ...     return json.dumps(data, indent=4)
-        >>> dataset.to_json(dump_handler=my_json_dumps)
-
+        >>> ds.to_json(dump_handler=my_json_dumps)
         """
         if dump_handler is None:
             logger.debug('using default json.dumps function')
@@ -1997,8 +1965,7 @@ class Dataset(dict):
                 )
                 continue
             data_element = self[key]
-            json_dataset[json_key] = self._data_element_to_json(
-                data_element,
+            json_dataset[json_key] = data_element.to_json(
                 bulk_data_element_handler=bulk_data_element_handler,
                 bulk_data_threshold=bulk_data_threshold,
                 dump_handler=dump_handler
@@ -2009,28 +1976,32 @@ class Dataset(dict):
 
 
 class FileDataset(Dataset):
-    """An extension of Dataset to make reading and writing to file-like easier.
+    """An extension of :class:`Dataset` to make reading and writing to
+    file-like easier.
 
     Attributes
     ----------
     preamble : str or bytes or None
-        The optional DICOM preamble prepended to the dataset, if available.
-    file_meta : pydicom.dataset.Dataset or None
-        The Dataset's file meta information as a Dataset, if available (None if
-        not present). Consists of group 0002 elements.
+        The optional DICOM preamble prepended to the :class:`FileDataset`, if
+        available.
+    file_meta : Dataset or None
+        The Dataset's file meta information as a :class:`Dataset`, if available
+        (``None`` if not present). Consists of group ``0x0002`` elements.
     filename : str or None
-        The filename that the dataset was read from (if read from file) or None
-        if the filename is not available (if read from a BytesIO or similar).
+        The filename that the :class:`FileDataset` was read from (if read from
+        file) or ``None`` if the filename is not available (if read from a
+        :class:`io.BytesIO` or  similar).
     fileobj_type
-        The object type of the file-like the Dataset was read from.
+        The object type of the file-like the :class:`FileDataset` was read
+        from.
     is_implicit_VR : bool
-        True if the dataset encoding is implicit VR, False otherwise.
+        ``True`` if the dataset encoding is implicit VR, ``False`` otherwise.
     is_little_endian : bool
-        True if the dataset encoding is little endian byte ordering, False
-        otherwise.
+        ``True`` if the dataset encoding is little endian byte ordering,
+        ``False`` otherwise.
     timestamp : float or None
-        The modification time of the file the dataset was read from, None if
-        the modification time is not available.
+        The modification time of the file the :class:`FileDataset` was read
+        from, ``None`` if the modification time is not available.
     """
 
     def __init__(self,
@@ -2040,26 +2011,28 @@ class FileDataset(Dataset):
                  file_meta=None,
                  is_implicit_VR=True,
                  is_little_endian=True):
-        """Initialize a Dataset read from a DICOM file.
+        """Initialize a :class:`FileDataset` read from a DICOM file.
 
         Parameters
         ----------
         filename_or_obj : str or BytesIO or None
-            Full path and filename to the file, memory buffer object, or None
-            if is a BytesIO.
+            Full path and filename to the file, memory buffer object, or
+            ``None`` if is a :class:`io.BytesIO`.
         dataset : Dataset or dict
-            Some form of dictionary, usually a Dataset from read_dataset().
+            Some form of dictionary, usually a :class:`Dataset` returned from
+            :func:`~pydicom.filereader.dcmread`.
         preamble : bytes or str, optional
             The 128-byte DICOM preamble.
         file_meta : Dataset, optional
-            The file meta info dataset, as returned by _read_file_meta,
-            or an empty dataset if no file meta information is in the file.
+            The file meta :class:`Dataset`, such as the one returned by
+            :func:`~pydicom.filereader.read_file_meta_info`, or an empty
+            :class:`Dataset` if no file meta information is in the file.
         is_implicit_VR : bool, optional
-            True (default) if implicit VR transfer syntax used; False if
-            explicit VR.
-        is_little_endian : boolean
-            True (default) if little-endian transfer syntax used; False if
-            big-endian.
+            ``True`` (default) if implicit VR transfer syntax used; ``False``
+            if explicit VR.
+        is_little_endian : bool
+            ``True`` (default) if little-endian transfer syntax used; ``False``
+            if big-endian.
         """
         Dataset.__init__(self, dataset)
         self.preamble = preamble
@@ -2099,7 +2072,8 @@ class FileDataset(Dataset):
             The result if `self` and `other` are the same class
         NotImplemented
             If `other` is not the same class as `self` then returning
-            NotImplemented delegates the result to superclass.__eq__(subclass)
+            :class:`NotImplemented` delegates the result to
+            ``superclass.__eq__(subclass)``.
         """
         # When comparing against self this will be faster
         if other is self:
@@ -2115,29 +2089,32 @@ class FileDataset(Dataset):
 
 
 def validate_file_meta(file_meta, enforce_standard=True):
-    """Validates the File Meta Information elements in `file_meta` and
-    adds some tags if missing and `enforce_standard` is True.
+    """Validate the *File Meta Information* elements in `file_meta`.
 
     Parameters
     ----------
-    file_meta : pydicom.dataset.Dataset
-        The File Meta Information data elements.
-    enforce_standard : bool
-        If False, then only a check for invalid elements is performed.
-        If True, the following elements will be added if not already present:
-            * (0002,0001) FileMetaInformationVersion
-            * (0002,0012) ImplementationClassUID
-            * (0002,0013) ImplementationVersionName
+    file_meta : Dataset
+        The *File Meta Information* data elements.
+    enforce_standard : bool, optional
+        If ``False``, then only a check for invalid elements is performed.
+        If ``True`` (default), the following elements will be added if not
+        already present:
+
+        * (0002,0001) *File Meta Information Version*
+        * (0002,0012) *Implementation Class UID*
+        * (0002,0013) *Implementation Version Name*
+
         and the following elements will be checked:
-            * (0002,0002) MediaStorageSOPClassUID
-            * (0002,0003) MediaStorageSOPInstanceUID
-            * (0002,0010) TransferSyntaxUID
+
+        * (0002,0002) *Media Storage SOP Class UID*
+        * (0002,0003) *Media Storage SOP Instance UID*
+        * (0002,0010) *Transfer Syntax UID*
 
     Raises
     ------
     ValueError
-        If `enforce_standard` is True and any of the checked File Meta
-        Information elements are missing from `file_meta`.
+        If `enforce_standard` is ``True`` and any of the checked *File Meta
+        Information* elements are missing from `file_meta`.
     ValueError
         If any non-Group 2 Elements are present in `file_meta`.
     """

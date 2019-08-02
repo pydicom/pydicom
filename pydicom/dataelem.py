@@ -10,6 +10,7 @@ A DataElement has a tag,
 from __future__ import absolute_import
 
 import base64
+import json
 import warnings
 from collections import namedtuple
 
@@ -35,8 +36,10 @@ if not in_py2:
 
 
 def isMultiValue(value):
-    """Return True if `value` is list-like (iterable),
-       False otherwise."""
+    """Return True if `value` is list-like (iterable), False otherwise.
+
+    **This function is deprecated and will be removed in v1.4**
+    """
     msg = 'isMultiValue is deprecated.  Use DataElement.VM instead'
     warnings.warn(msg, DeprecationWarning)
     if isinstance(value, compat.char_types):
@@ -61,15 +64,18 @@ _backslash_byte = b"\\"
 class DataElement(object):
     """Contain and manipulate a DICOM Element.
 
-    While its possible to create a new DataElement
-    directly and add it to a Dataset:
+    Examples
+    --------
+
+    While its possible to create a new :class:`DataElement` directly and add
+    it to a :class:`~pydicom.dataset.Dataset`:
 
     >>> elem = DataElement(0x00100010, 'PN', 'CITIZEN^Joan')
     >>> ds = Dataset()
     >>> ds.add(elem)
 
-    Its far more convenient to use a Dataset to add a new
-    DataElement, as the VR and tag are determined
+    Its far more convenient to use a :class:`~pydicom.dataset.Dataset`
+    to add a new :class:`DataElement`, as the VR and tag are determined
     automatically from the DICOM dictionary:
 
     >>> ds = Dataset()
@@ -78,45 +84,43 @@ class DataElement(object):
     Attributes
     ----------
     descripWidth : int
-        For string display, this is the maximum width of
-        the description field (default 35 characters).
-    file_tell : int or None
+        For string display, this is the maximum width of the description
+        field (default ``35``).
     is_retired : bool
-        For officially registered DICOM Data Elements this
-        will be True if the retired status as given in PS3.6
-        Table 6-1 is 'RET'. For private or unknown Elements
-        this will always be False
+        For officially registered DICOM Data Elements this will be ``True`` if
+        the retired status as given in the DICOM Standard, Part 6,
+        :dcm:`Table 6-1<part06/chapter_6.html#table_6-1>` is 'RET'. For private
+        or unknown elements this will always be ``False``.
     is_undefined_length : bool
-        Indicates whether the length field for the element
-        was 0xFFFFFFFFL (ie undefined).
+        Indicates whether the length field for the element was ``0xFFFFFFFFL``
+        (ie undefined).
     keyword : str
-        For officially registered DICOM Data Elements this
-        will be the Keyword as given in PS3.6 Table 6-1.
-        For private or unknown Elements this will return
-        an empty string.
+        For officially registered DICOM Data Elements this will be the
+        *Keyword* as given in
+        :dcm:`Table 6-1<part06/chapter_6.html#table_6-1>`. For private or
+        unknown elements this will return an empty string ``''``.
     maxBytesToDisplay : int
-        For string display, elements with values containing
-        data which is longer than this value will display
-        "array of # bytes" (default 16 bytes).
+        For string display, elements with values containing data which is
+        longer than this value will display ``"array of # bytes"``
+        (default ``16``).
     name : str
-        For officially registered DICOM Data Elements this
-        will be the Name as given in PS3.6 Table 6-1.
-        For private Elements known to pydicom this will be
-        the Name in the format '[name]'. For unknown
-        private Elements this will be 'Private Creator'.
-        For unknown Elements this will return an empty string.
+        For officially registered DICOM Data Elements this will be the *Name*
+        as given in :dcm:`Table 6-1<part06/chapter_6.html#table_6-1>`.
+        For private elements known to *pydicom*
+        this will be the *Name* in the format ``'[name]'``. For unknown
+        private elements this will be ``'Private Creator'``. For unknown
+        elements this will return an empty string ``''``.
     showVR : bool
-        For string display, include the Element's VR
-        just before it's `value` (default True)
-    tag : pydicom.tag.Tag
-        The DICOM Tag for the Data Element
+        For string display, include the element's VR just before it's value
+        (default ``True``).
+    tag : BaseTag
+        The element's tag.
     value
-        The Data Element's stored value(s)
+        The element's stored value(s).
     VM : int
-        The Value Multiplicity of the Data Element's
-        stored value(s)
+        The Value Multiplicity of the element's stored value(s).
     VR : str
-        The Data Element's Value Representation value
+        The element's Value Representation.
     """
 
     descripWidth = 35
@@ -135,36 +139,50 @@ class DataElement(object):
                  file_value_tell=None,
                  is_undefined_length=False,
                  already_converted=False):
-        """Create a new DataElement.
+        """Create a new :class:`DataElement`.
 
         Parameters
         ----------
-        tag
+        tag : int or or str or list or tuple
             The DICOM (group, element) tag in any form accepted by
-            pydicom.tag.Tag such as [0x0010, 0x0010], (0x10, 0x10), 0x00100010,
-            etc.
+            :func:`~pydicom.tag.Tag` such as ``[0x0010, 0x0010]``,
+            ``(0x10, 0x10)``, ``0x00100010``, etc.
         VR : str
-            The 2 character DICOM value representation (see DICOM standard part
-            5, Section 6.2).
+            The 2 character DICOM value representation (see DICOM Standard,
+            Part 5, :dcm:`Section 6.2<part05/sect_6.2.html>`).
         value
             The value of the data element. One of the following:
+
             * a single string value
             * a number
-            * a list or tuple with all strings or all numbers
+            * a :class:`list` or :class:`tuple` with all strings or all numbers
             * a multi-value string with backslash separator
+
         file_value_tell : int or None
-            Used internally by Dataset to store the write position for the
-            ReplaceDataElementValue() method. Default is None.
+            Used internally by :class:`~pydicom.dataset.Dataset` to
+            store the write position for the ``ReplaceDataElementValue()``
+            method. Default is ``None``.
         is_undefined_length : bool
             Used internally to store whether the length field for this element
-            was 0xFFFFFFFFL, i.e. 'undefined length'. Default is False.
+            was ``0xFFFFFFFFL``, i.e. 'undefined length'. Default is ``False``.
         already_converted : bool
-            Used to determine whether or not `value` requires conversion to a
-            value with VM > 1. Default is False.
+            Used to determine whether or not the element's value requires
+            conversion to a value with VM > 1. Default is ``False``.
         """
         if not isinstance(tag, Tag):
             tag = Tag(tag)
         self.tag = tag
+
+        # a known tag shall only have the VR 'UN' if it has a length that
+        # exceeds the size that can be encoded in 16 bit - all other cases
+        # can be seen as an encoding error and can be corrected
+        if VR == 'UN' and (is_undefined_length or value is None or
+                           len(value) < 0xffff):
+            try:
+                VR = dictionary_VR(tag)
+            except KeyError:
+                pass
+
         self.VR = VR  # Note!: you must set VR before setting value
         if already_converted:
             self._value = value
@@ -175,30 +193,30 @@ class DataElement(object):
 
     @classmethod
     def from_json(cls, dataset_class, tag, vr, value, value_key,
-                                bulk_data_uri_handler=None,
-                                encodings=None):
-        """Creates a DataElement from JSON.
+                  bulk_data_uri_handler=None, encodings=None):
+        """Return a :class:`DataElement` from JSON.
 
         Parameters
         ----------
-        tag: pydicom.tag.Tag
-            data element tag
-        vr: str
-            data element value representation
-        value: list
-            data element value(s)
-        value_key: Union[str, None]
-            key of the data element that contains the value
+        dataset_class : Dataset derived class
+            Class used to create sequence items.
+        tag : BaseTag
+            The data element tag.
+        vr : str
+            The data element value representation.
+        value : list
+            The data element's value(s).
+        value_key : str or None
+            Key of the data element that contains the value
             (options: ``{"Value", "InlineBinary", "BulkDataURI"}``)
-        bulk_data_uri_handler: Union[Callable, None]
-            callable that accepts the "BulkDataURI" of the JSON representation
-            of a data element and returns the actual value of that data element
-            (retrieved via DICOMweb WADO-RS)
+        bulk_data_uri_handler: callable or None
+            Callable function that accepts the "BulkDataURI" of the JSON
+            representation of a data element and returns the actual value of
+            that data element (retrieved via DICOMweb WADO-RS)
 
         Returns
         -------
-        pydicom.dataelem.DataElement
-
+        DataElement
         """
         # TODO: test wado-rs retrieve wrapper
         try:
@@ -287,29 +305,124 @@ class DataElement(object):
             logger.warning('missing value for data element "{}"'.format(tag))
             elem_value = ''
 
-        elem_value = jsonrep._convert_to_python_number(elem_value, vr)
+        elem_value = jsonrep.convert_to_python_number(elem_value, vr)
 
         try:
             if compat.in_py2 and vr == "PN":
-
                 elem_value = PersonNameUnicode(elem_value, 'UTF8')
             return DataElement(tag=tag, value=elem_value, VR=vr)
         except Exception:
-            raise
             raise ValueError(
                 'Data element "{}" could not be loaded from JSON: {}'.format(
                     tag, elem_value
                     )
             )
 
+    def to_json(self, bulk_data_element_handler,
+                bulk_data_threshold, dump_handler):
+        """Converts a :class:`DataElement` to JSON representation.
+
+        Parameters
+        ----------
+        bulk_data_element_handler: callable or None
+            Callable that accepts a bulk data element and returns the
+            "BulkDataURI" for retrieving the value of the data element
+            via DICOMweb WADO-RS
+        bulk_data_threshold: int
+            Size of base64 encoded data element above which a value will be
+            provided in form of a "BulkDataURI" rather than "InlineBinary"
+
+        Returns
+        -------
+        dict
+            Mapping representing a JSON encoded data element
+
+        Raises
+        ------
+        TypeError
+            When size of encoded data element exceeds `bulk_data_threshold`
+            but `bulk_data_element_handler` is ``None`` and hence not callable
+
+        """
+        # TODO: Determine whether more VRs need to be converted to strings
+        _VRs_TO_QUOTE = ['AT', ]
+        json_element = {'vr': self.VR, }
+        if self.VR in jsonrep.BINARY_VR_VALUES:
+            if self.value is not None:
+                binary_value = self.value
+                encoded_value = base64.b64encode(binary_value).decode('utf-8')
+                if len(encoded_value) > bulk_data_threshold:
+                    if bulk_data_element_handler is None:
+                        raise TypeError(
+                            'No bulk data element handler provided to '
+                            'generate URL for value of data element "{}".'
+                            .format(self.name)
+                        )
+                    json_element['BulkDataURI'] = bulk_data_element_handler(
+                        self
+                    )
+                else:
+                    logger.info(
+                        'encode bulk data element "{}" inline'.format(
+                            self.name
+                        )
+                    )
+                    json_element['InlineBinary'] = encoded_value
+        elif self.VR == 'SQ':
+            # recursive call to co-routine to format sequence contents
+            value = [
+                json.loads(e.to_json(
+                    bulk_data_element_handler=bulk_data_element_handler,
+                    bulk_data_threshold=bulk_data_threshold,
+                    dump_handler=dump_handler
+                ))
+                for e in self
+            ]
+            json_element['Value'] = value
+        elif self.VR == 'PN':
+            elem_value = self.value
+            if elem_value is not None:
+                if compat.in_py2:
+                    elem_value = PersonNameUnicode(elem_value, 'UTF8')
+                if len(elem_value.components) > 2:
+                    json_element['Value'] = [
+                        {'Phonetic': elem_value.components[2], },
+                    ]
+                elif len(elem_value.components) > 1:
+                    json_element['Value'] = [
+                        {'Ideographic': elem_value.components[1], },
+                    ]
+                else:
+                    json_element['Value'] = [
+                        {'Alphabetic': elem_value.components[0], },
+                    ]
+        else:
+            if self.value is not None:
+                is_multivalue = isinstance(self.value, MultiValue)
+                if self.VM > 1 or is_multivalue:
+                    value = self.value
+                else:
+                    value = [self.value]
+                # ensure it's a list and not another iterable
+                # (e.g. tuple), which would not be JSON serializable
+                if self.VR in _VRs_TO_QUOTE:
+                    json_element['Value'] = [str(v) for v in value]
+                else:
+                    json_element['Value'] = [v for v in value]
+        if hasattr(json_element, 'Value'):
+            json_element['Value'] = jsonrep.convert_to_python_number(
+                json_element['Value'], self.VR
+            )
+        return json_element
+
     @property
     def value(self):
-        """Return the element's `value`."""
+        """Return the element's value."""
         return self._value
 
     @value.setter
     def value(self, val):
-        """Convert (if necessary) and set the `value` of the element."""
+        """Convert (if necessary) and set the value of the element."""
         # Check if is a string with multiple values separated by '\'
         # If so, turn them into a list of separate strings
         #  Last condition covers 'US or SS' etc
@@ -327,7 +440,7 @@ class DataElement(object):
 
     @property
     def VM(self):
-        """Return the value multiplicity (as an int) of the element."""
+        """Return the value multiplicity of the element as :class:`int`."""
         if isinstance(self.value, compat.char_types):
             return 1
         try:
@@ -403,7 +516,8 @@ class DataElement(object):
             The result if `self` and `other` are the same class
         NotImplemented
             If `other` is not the same class as `self` then returning
-            NotImplemented delegates the result to superclass.__eq__(subclass)
+            :class:`NotImplemented` delegates the result to
+            ``superclass.__eq__(subclass)``.
         """
         # Faster result if same object
         if other is self:
@@ -421,7 +535,7 @@ class DataElement(object):
         return not (self == other)
 
     def __str__(self):
-        """Return str representation of the element."""
+        """Return :class:`str` representation of the element."""
         repVal = self.repval
         if self.showVR:
             s = "%s %-*s %s: %s" % (str(self.tag), self.descripWidth,
@@ -434,7 +548,7 @@ class DataElement(object):
 
     @property
     def repval(self):
-        """Return a str representation of the element's `value`."""
+        """Return a :class:`str` representation of the element's value."""
         long_VRs = {"OB", "OD", "OF", "OW", "UN", "UT"}
         if set(self.VR.split(" or ")) & long_VRs:
             try:
@@ -465,8 +579,7 @@ class DataElement(object):
             return compat.text_type(str(self))
 
     def __getitem__(self, key):
-        """Return the value at `key` if the element's
-           `value` is indexable."""
+        """Return the item at `key` if the element's value is indexable."""
         try:
             return self.value[key]
         except TypeError:
@@ -475,11 +588,11 @@ class DataElement(object):
 
     @property
     def name(self):
-        """Return the DICOM dictionary name for the element."""
+        """Return the DICOM dictionary name for the element as :class:`str`."""
         return self.description()
 
     def description(self):
-        """Return the DICOM dictionary name for the element."""
+        """Return the DICOM dictionary name for the element as :class:`str`."""
         if self.tag.is_private:
             name = "Private tag data"  # default
             if hasattr(self, 'private_creator'):
@@ -506,7 +619,7 @@ class DataElement(object):
 
     @property
     def is_retired(self):
-        """The element's retired status."""
+        """Return the element's retired status as :class:`bool`."""
         if dictionary_has_tag(self.tag):
             return dictionary_is_retired(self.tag)
         else:
@@ -514,7 +627,7 @@ class DataElement(object):
 
     @property
     def keyword(self):
-        """The element's keyword (if known)."""
+        """Return the element's keyword (if known) as :class:`str`."""
         if dictionary_has_tag(self.tag):
             return dictionary_keyword(self.tag)
         else:
@@ -534,18 +647,18 @@ RawDataElement.is_raw = True
 
 
 def DataElement_from_raw(raw_data_element, encoding=None):
-    """Return a DataElement created from the data in `raw_data_element`.
+    """Return a :class:`DataElement` created from `raw_data_element`.
 
     Parameters
     ----------
     raw_data_element : RawDataElement namedtuple
-        The raw data to convert to a DataElement
-    encoding : str
-        The encoding of the raw data
+        The raw data to convert to a :class:`DataElement`.
+    encoding : str, optional
+        The character encoding of the raw data.
 
     Returns
     -------
-    pydicom.dataelem.DataElement
+    DataElement
     """
     # XXX buried here to avoid circular import
     # filereader->Dataset->convert_value->filereader

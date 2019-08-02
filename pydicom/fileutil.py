@@ -40,19 +40,19 @@ def find_bytes(fp, bytes_to_find, read_size=128, rewind=True):
 
     Parameters
     ----------
-    fp : file-like object
+    fp : file-like
+        The file-like to search.
     bytes_to_find : str
-        Contains the bytes to find. Must be in correct
-        endian order already.
+        Contains the bytes to find. Must be in correct endian order already.
     read_size : int
         Number of bytes to read at a time.
-    rewind : boolean
+    rewind : bool
         Flag to rewind file reading position.
 
     Returns
     -------
-    found_at : byte, None
-        Position where byte sequence was found, else None.
+    found_at : int or None
+        Position where byte sequence was found, else ``None``.
     """
 
     data_start = fp.tell()
@@ -94,29 +94,29 @@ def read_undefined_length_value(fp,
                                 delimiter_tag,
                                 defer_size=None,
                                 read_size=1024*8):
-    """Read until the delimiter tag found and return the value;
-     ignore the delimiter.
+    """Read until `delimiter_tag` and return the value up to that point.
 
     On completion, the file will be set to the first byte after the delimiter
     and its following four zero bytes.
 
     Parameters
     ----------
-    fp : a file-like object
-    is_little_endian : boolean
-        True if file transfer syntax is little endian, else False.
+    fp : file-like
+        The file-like to read.
+    is_little_endian : bool
+        ``True`` if file transfer syntax is little endian, else ``False``.
     delimiter_tag : Tag
-        tag used as and marker for reading
-    defer_size : int, None, optional
-        Size to avoid loading large elements in memory.
-        See ``filereader.dcmread`` for more parameter info.
-    read_size : int
+        Tag used as end marker for reading
+    defer_size : int or None, optional
+        Size to avoid loading large elements in memory. See
+        :func:`~pydicom.filereader.dcmread` for more parameter info.
+    read_size : int, optional
         Number of bytes to read at one time.
 
     Returns
     -------
-    delimiter : str, None
-        The file delimiter
+    delimiter : str or None
+        The file delimiter.
 
     Raises
     ------
@@ -185,17 +185,20 @@ def find_delimiter(fp, delimiter, is_little_endian, read_size=128,
 
     Parameters
     ----------
-    delimiter :
-    is_little_endian : boolean
+    delimiter : int
+        The delimiter to search for.
+    is_little_endian : bool
+        ``True`` if little endian, ``False`` otherwise.
     read_size : int
-        See ``find_bytes`` for parameter info.
-    rewind : boolean
+        See :func:`find_bytes` for parameter info.
+    rewind : bool
         Flag to rewind to initial position after searching.
 
     Returns
     -------
-    file position of delimiter, None
-        Returns None if end of file is reached without finding the delimiter.
+    int or None
+        Returns ``None`` if end of file is reached without finding the
+        delimiter, otherwise the byte offset to the delimiter.
     """
     struct_format = "<H"
     if not is_little_endian:
@@ -216,18 +219,21 @@ def length_of_undefined_length(fp,
 
     Parameters
     ----------
-    fp : file-like object
+    fp : file-like
+        The file-like to read.
     delimiter :
-        See ``find_delimiter`` for parameter info.
-    is_little_endian : boolean
+        See :func:`find_delimiter` for parameter info.
+    is_little_endian : bool
+        ``True`` if little endian, ``False`` otherwise.
     read_size : int
-        See ``find_bytes`` for parameter info.
-    rewind : boolean
+        See :func:`find_bytes` for parameter info.
+    rewind : bool
         Flag to rewind to initial position after searching.
 
     Returns
     -------
-    length to delimiter
+    int
+        Byte offset to the delimiter.
 
     Notes
     -----

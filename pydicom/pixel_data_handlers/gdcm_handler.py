@@ -1,5 +1,7 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
-"""Use the gdcm python package to decode pixel transfer syntaxes."""
+"""Use the `GDCM <http://gdcm.sourceforge.net/>`_ Python package to decode
+pixel transfer syntaxes.
+"""
 
 import sys
 
@@ -46,11 +48,16 @@ should_convert_these_syntaxes_to_RGB = [
 
 
 def is_available():
-    """Return True if the handler has its dependencies met."""
+    """Return ``True`` if the handler has its dependencies met."""
     return HAVE_NP and HAVE_GDCM
 
 
 def needs_to_convert_to_RGB(dicom_dataset):
+    """Return ``True`` if the *Pixel Data* should to be converted from YCbCr to
+    RGB.
+
+    This affects JPEG transfer syntaxes.
+    """
     should_convert = (dicom_dataset.file_meta.TransferSyntaxUID in
                       should_convert_these_syntaxes_to_RGB)
     should_convert &= dicom_dataset.SamplesPerPixel == 3
@@ -58,6 +65,11 @@ def needs_to_convert_to_RGB(dicom_dataset):
 
 
 def should_change_PhotometricInterpretation_to_RGB(dicom_dataset):
+    """Return ``True`` if the *Photometric Interpretation* should be changed
+    to RGB.
+
+    This affects JPEG transfer syntaxes.
+    """
     should_change = (dicom_dataset.file_meta.TransferSyntaxUID in
                      should_convert_these_syntaxes_to_RGB)
     should_change &= dicom_dataset.SamplesPerPixel == 3
@@ -65,30 +77,30 @@ def should_change_PhotometricInterpretation_to_RGB(dicom_dataset):
 
 
 def supports_transfer_syntax(transfer_syntax):
-    """
-    Returns
-    -------
-    bool
-        True if this pixel data handler might support this transfer syntax.
+    """Return ``True`` if the handler supports the `transfer_syntax`.
 
-        False to prevent any attempt to try to use this handler
-        to decode the given transfer syntax
+    Parameters
+    ----------
+    transfer_syntax : uid.UID
+        The Transfer Syntax UID of the *Pixel Data* that is to be used with
+        the handler.
     """
     return transfer_syntax in SUPPORTED_TRANSFER_SYNTAXES
 
 
 def create_data_element(dicom_dataset):
-    """Create a gdcm.DataElement containing PixelData from a FileDataset
+    """Return a ``gdcm.DataElement`` for the *Pixel Data*.
 
     Parameters
     ----------
-    dicom_dataset : FileDataset
-
+    dicom_dataset : dataset.Dataset
+        The :class:`~pydicom.dataset.Dataset` containing the *Pixel
+        Data*.
 
     Returns
     -------
     gdcm.DataElement
-        Converted PixelData element
+        The converted *Pixel Data* element.
     """
     data_element = gdcm.DataElement(gdcm.Tag(0x7fe0, 0x0010))
     if dicom_dataset.file_meta.TransferSyntaxUID.is_compressed:
@@ -113,14 +125,15 @@ def create_data_element(dicom_dataset):
 
 
 def create_image(dicom_dataset, data_element):
-    """Create a gdcm.Image from a FileDataset and a gdcm.DataElement containing
-    PixelData (0x7fe0, 0x0010)
+    """Return a ``gdcm.Image``.
 
     Parameters
     ----------
-    dicom_dataset : FileDataset
+    dicom_dataset : dataset.Dataset
+        The :class:`~pydicom.dataset.Dataset` containing the Image
+        Pixel module.
     data_element : gdcm.DataElement
-        DataElement containing PixelData
+        The ``gdcm.DataElement`` *Pixel Data* element.
 
     Returns
     -------
@@ -150,11 +163,12 @@ def create_image(dicom_dataset, data_element):
 
 
 def create_image_reader(filename):
-    """Create a gdcm.ImageReader
+    """Return a ``gdcm.ImageReader``.
 
     Parameters
     ----------
-    filename: str or unicode (Python 2)
+    filename: str or unicode
+        The path to the DICOM dataset.
 
     Returns
     -------
@@ -173,27 +187,22 @@ def create_image_reader(filename):
 
 
 def get_pixeldata(dicom_dataset):
-    """
-    Use the GDCM package to decode the PixelData attribute
+    """Use the GDCM package to decode *Pixel Data*.
 
     Returns
     -------
     numpy.ndarray
-
-        A correctly sized (but not shaped) numpy array
-        of the entire data volume
+        A correctly sized (but not shaped) array of the entire data volume
 
     Raises
     ------
     ImportError
-        if the required packages are not available
-
+        If the required packages are not available.
     TypeError
-        if the image could not be read by GDCM
-        if the pixel data type is unsupported
-
+        If the image could not be read by GDCM or if the *Pixel Data* type is
+        unsupported.
     AttributeError
-        if the decoded amount of data does not match the expected amount
+        If the decoded amount of data does not match the expected amount.
     """
 
     if not HAVE_GDCM:

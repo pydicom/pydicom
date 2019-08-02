@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# pydicom documentation build configuration file, created by
-# sphinx-quickstart on Sat Feb 20 23:28:19 2010.
+# pydicom documentation build configuration file
 #
 # This file is execfile()d with the current
 #  directory set to its containing dir.
@@ -39,7 +38,7 @@ except ImportError:
 # directory, add these directories to sys.path here. If the directory
 # is relative to the documentation root, use os.path.abspath to make it
 # absolute, like shown here.
-sys.path.insert(0, os.path.abspath('sphinxext'))  # noqa
+sys.path.insert(0, os.path.abspath('../build_tools/sphinx'))  # noqa
 from github_link import make_linkcode_resolve
 
 # If your documentation needs a minimal Sphinx version, state it here.
@@ -56,16 +55,42 @@ from github_link import make_linkcode_resolve
 # They can be extensions coming with Sphinx
 # (named 'sphinx.ext.*') or your custom ones.
 extensions = [
-    'sphinx.ext.autodoc', 'sphinx.ext.doctest', 'sphinx.ext.intersphinx',
-    'sphinx.ext.todo', 'sphinx.ext.imgmath', 'sphinx.ext.ifconfig',
-    'sphinx.ext.viewcode', 'sphinx_gallery.gen_gallery',
-    'sphinx.ext.autosummary', 'numpydoc',
-    'sphinx_issues', 'sphinx.ext.linkcode'
+    'sphinx.ext.autodoc',
+    'sphinx.ext.doctest',
+    'sphinx.ext.intersphinx',
+    'sphinx.ext.todo',
+    'sphinx.ext.imgmath',
+    'sphinx.ext.ifconfig',
+    # 'sphinx.ext.viewcode',
+    'sphinx_gallery.gen_gallery',
+    'sphinx.ext.autosummary',
+    'sphinx.ext.napoleon',  # Numpy style docstrings
+    'sphinx.ext.linkcode',
+    'sphinx.ext.extlinks',
+    # Custom
+    'sphinx_issues',
 ]
 
 autosummary_generate = True
 
-autodoc_default_flags = ['members', 'no-inherited-members']
+autodoc_default_options = {
+    'members': None,
+    'no-inherited-members': None,
+}
+
+# Shortcuts for sphinx.ext.extlinks
+extlinks = {
+    # 'alias' : (url_prefix, caption)
+    # Usage :dcm:`link text <part05/sect_6.2.html>`
+    'dcm': (
+        'http://dicom.nema.org/medical/dicom/current/output/chtml/%s',
+        None
+    ),
+    'gh': (
+        'https://github.com/pydicom/%s',
+        None
+    ),
+}
 
 # intersphinx configuration
 intersphinx_mapping = {
@@ -89,6 +114,9 @@ sphinx_gallery_conf = {
         'pydicom': None
     }
 }
+
+napoleon_google_docstring = False
+napoleon_numpy_docstring = True
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -216,7 +244,7 @@ html_static_path = ['_static']
 # html_split_index = False
 
 # If true, links to the reST sources are added to the pages.
-# html_show_sourcelink = True
+html_show_sourcelink = False
 
 # If true, an OpenSearch description file will be output, and all pages will
 # contain a <link> tag referring to it.  The value of this option must be the
