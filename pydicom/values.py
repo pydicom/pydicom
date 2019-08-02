@@ -483,7 +483,7 @@ def convert_TM_string(byte_string, is_little_endian, struct_format=None):
 def convert_UI(byte_string, is_little_endian, struct_format=None):
     """Return a decoded 'UI' value.
 
-    Elements with VR of 'UI' may have a non-significant padding null ``0x00``.
+    Elements with VR of 'UI' may have a non-significant trailing null ``0x00``.
 
     Parameters
     ----------

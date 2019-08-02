@@ -269,11 +269,11 @@ def _is_implicit_vr(fp, implicit_vr_is_assumed, is_little_endian, stop_when):
     Parameters
     ----------
     fp : an opened file object
-    implicit_vr_is_assumed : boolean
+    implicit_vr_is_assumed : bool
         True if implicit VR is assumed.
         If this does not match with the real transfer syntax, a user warning
         will be issued.
-    is_little_endian : boolean
+    is_little_endian : bool
         True if file has little endian transfer syntax.
         Needed to interpret the first tag.
     stop_when : None, optional
@@ -326,9 +326,9 @@ def read_dataset(fp, is_implicit_VR, is_little_endian, bytelength=None,
     ----------
     fp : file-like
         An opened file-like object.
-    is_implicit_VR : boolean
+    is_implicit_VR : bool
         ``True`` if file transfer syntax is implicit VR.
-    is_little_endian : boolean
+    is_little_endian : bool
         ``True`` if file has little endian transfer syntax.
     bytelength : int, None, optional
         ``None`` to read until end of file or ItemDeliterTag, else a fixed
@@ -637,7 +637,7 @@ def read_partial(fileobj, stop_when=None, defer_size=None,
         Stop condition. See :func:`read_dataset` for more info.
     defer_size : int, str, None, optional
         See :func:`dcmread` for parameter info.
-    force : boolean
+    force : bool
         See :func:`dcmread` for parameter info.
     specific_tags : list or None
         See :func:`dcmread` for parameter info.
@@ -774,7 +774,7 @@ def dcmread(fp, defer_size=None, stop_before_pixels=False,
         Either a file-like object, or a string containing the file name. If a
         file-like object, the caller is responsible for closing it.
     defer_size : int or str or None, optional
-        If ``None`` (default), all elements read into memory. If specified,
+        If ``None`` (default), all elements are read into memory. If specified,
         then if a data element's stored value is larger than `defer_size`, the
         value is not read into memory until it is accessed in code. Specify an
         integer (bytes), or a string value with units, e.g. "512 KB", "2 MB".

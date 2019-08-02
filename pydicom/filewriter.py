@@ -789,7 +789,7 @@ def dcmwrite(filename, dataset, write_like_original=True):
     attribute.
 
     If (0002,0010) *Transfer Syntax UID* is included then the user must ensure
-    it's value is compatible with the values for the
+    its value is compatible with the values for the
     ``dataset.is_little_endian`` and ``dataset.is_implicit_VR`` attributes.
     For example, if ``is_little_endian`` and ``is_implicit_VR`` are both
     ``True`` then the Transfer Syntax UID must be 1.2.840.10008.1.2 *Implicit

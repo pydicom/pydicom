@@ -2030,7 +2030,7 @@ class FileDataset(Dataset):
         is_implicit_VR : bool, optional
             ``True`` (default) if implicit VR transfer syntax used; ``False``
             if explicit VR.
-        is_little_endian : boolean
+        is_little_endian : bool
             ``True`` (default) if little-endian transfer syntax used; ``False``
             if big-endian.
         """

@@ -46,7 +46,7 @@ def find_bytes(fp, bytes_to_find, read_size=128, rewind=True):
         Contains the bytes to find. Must be in correct endian order already.
     read_size : int
         Number of bytes to read at a time.
-    rewind : boolean
+    rewind : bool
         Flag to rewind file reading position.
 
     Returns
@@ -106,7 +106,7 @@ def read_undefined_length_value(fp,
     is_little_endian : bool
         ``True`` if file transfer syntax is little endian, else ``False``.
     delimiter_tag : BaseTag
-        Tag used as and marker for reading
+        Tag used as end marker for reading
     defer_size : int or None, optional
         Size to avoid loading large elements in memory. See
         :func:`~pydicom.filereader.dcmread` for more parameter info.
@@ -227,7 +227,7 @@ def length_of_undefined_length(fp,
         ``True`` if little endian, ``False`` otherwise.
     read_size : int
         See :func:`find_bytes` for parameter info.
-    rewind : boolean
+    rewind : bool
         Flag to rewind to initial position after searching.
 
     Returns

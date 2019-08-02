@@ -524,7 +524,7 @@ def encapsulate(frames, fragments_per_frame=1, has_bot=True):
     has_bot : bool, optional
         ``True`` to include values in the Basic Offset Table, ``False``
         otherwise (default ``True``). If `fragments_per_frame` is not ``1``
-        then its strongly recommended that this be ``True``.
+        then it's strongly recommended that this be ``True``.
 
     Returns
     -------

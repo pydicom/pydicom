@@ -358,7 +358,7 @@ class DSdecimal(Decimal):
 
     Notes
     -----
-    If constructed by an empty string, returns the empty string, not an
+    If constructed from an empty string, returns the empty string, not an
     instance of this class.
     """
     __slots__ = ['original_string']
@@ -444,8 +444,8 @@ else:
 def DS(val):
     """Factory function for creating DS class instances.
 
-    Checks for blank string; if so, return that, else calls :class:`DSfloat` or
-    :class:`DSdecimal` to create the class instance. This avoids overriding
+    Checks for blank string; if so, returns that, else calls :class:`DSfloat`
+    or :class:`DSdecimal` to create the class instance. This avoids overriding
     ``DSfloat.__new__()`` (which carries a time penalty for large arrays of
     DS).
 
@@ -659,10 +659,10 @@ class PersonName3(object):
 
     @property
     def components(self):
-        """Return the up to three decoded person name components.
+        """Returns up to three decoded person name components.
 
-        Representing the alphabetic, ideographic and phonetic representations
-        as a list of unicode strings.
+        The returned components represent the alphabetic, ideographic and
+        phonetic representations as a list of unicode strings.
         """
         if self._components is None:
             groups = self.original_string.split(b'=')

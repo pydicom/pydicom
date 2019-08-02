@@ -107,7 +107,7 @@ def pack_bits(arr):
     arr : numpy.ndarray
         The :class:`numpy.ndarray` containing 1-bit data as ints. `arr` must
         only contain integer values of 0 and 1 and must have an 'uint'  or
-        'int' :class:`numpy.dtype`. For the sake of efficiency its recommended
+        'int' :class:`numpy.dtype`. For the sake of efficiency it's recommended
         that the length of `arr` be a multiple of 8 (i.e. that any empty
         bit-padding to round out the byte has already been added).
 
