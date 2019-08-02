@@ -10,7 +10,7 @@ Dataset
 
 :class:`~dataset.Dataset` is the main object you will work with
 directly. :class:`~dataset.Dataset` wraps a dictionary, where the key
-is the DICOM tag (as a :class:`~pydicom.tag.BaseTag` object,
+is the DICOM tag (as a :class:`~tag.Tag` object,
 described below), and the value is the corresponding
 :class:`~dataelem.DataElement` instance (also described below).
 It implements most of the methods of :class:`dict`, so that it mostly behaves
@@ -214,7 +214,7 @@ code, but is used extensively by :class:`~dataset.Dataset`.
 things:
 
   * :attr:`~dataelem.DataElement.tag` -- the element's tag (as a
-    :class:`~pydicom.tag.BaseTag` object)
+    :class:`~tag.Tag` object)
   * :attr:`~dataelem.DataElement.VR` -- the element's Value Representation
     -- a two letter :class:`str` that describes to the format of the stored
     value
