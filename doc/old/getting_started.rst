@@ -29,7 +29,7 @@ head-first-prone, and save to a new file::
   >>> ds = pydicom.dcmread(filename)  # plan dataset
   >>> ds.PatientName
   'Last^First^mid^pre'
-  >>> ds.dir("setup")    # get a list of tags with "setup" somewhere in the name
+  >>> ds.dir("setup")  # get a list of tags with "setup" somewhere in the name
   ['PatientSetupSequence']
   >>> ds.PatientSetupSequence[0]
   (0018, 5100) Patient Position                    CS: 'HFS'
@@ -49,7 +49,7 @@ Pydicom is easy to install and use, and because it is a pure Python package, it
 should run wherever Python runs.
 
 One limitation of pydicom: compressed pixel data (e.g. JPEG) can only be
-altered in an intelligent way if :doc:`decompressing </image_data_handlers>`
+altered in an intelligent way if :doc:`decompressing <image_data_handlers>`
 them first. Once decompressed, they can be altered and written back to a
 DICOM file the same way as initially uncompressed data.
 
@@ -83,13 +83,14 @@ Prerequisites
 Installing pydicom
 ------------------
 
-Pydicom is currently available on `PyPi <https://pypi.python.org/pypi/pydicom/>`_
-. The simplest way to install pydicom alone is using ``pip`` at a command line::
+Pydicom is currently available on
+`PyPi <https://pypi.python.org/pypi/pydicom/>`_. The simplest way to install
+pydicom alone is using ``pip`` at a command line::
 
   pip install -U pydicom
 
-which installs the latest release.  To install the latest code from the repository
-(usually stable, but may have undocumented changes or bugs)::
+which installs the latest release.  To install the latest code from the
+repository (usually stable, but may have undocumented changes or bugs)::
 
   pip install -U git+https://github.com/pydicom/pydicom.git
 
@@ -98,23 +99,23 @@ Pydicom is also available on conda-forge::
 
   conda install pydicom --channel conda-forge
 
-To install pydicom along with image handlers for compressed pixel data, 
+To install pydicom along with image handlers for compressed pixel data,
 we encourage you to use `Miniconda <https://conda.io/miniconda.html>`_ or
 `Anaconda <https://docs.continuum.io/anaconda/>`_.  For example::
 
   conda create --name pydicomenv python=3.6 pip numpy
   conda install pydicom --channel conda-forge
 
-will install pip, pydicom, and numpy in an environment called pydicomenv.  
+will install pip, pydicom, and numpy in an environment called pydicomenv.
 To add gdcm after activating the environment::
 
   conda install -c conda-forge gdcm
 
-The environment is optional; see the conda software for details of its setup 
+The environment is optional; see the conda software for details of its setup
 and use of environments.
 
-For developers, you can clone the pydicom repository and run 
-the ``setup.py`` file. Use the following commands to get a copy 
+For developers, you can clone the pydicom repository and run
+the ``setup.py`` file. Use the following commands to get a copy
 from GitHub and install all dependencies::
 
   git clone https://github.com/pydicom/pydicom.git
@@ -132,16 +133,17 @@ local working code and Python will use the updated pydicom code.
 Test and coverage
 =================
 
-To test the installed code on any platform, change to the directory of 
+To test the installed code on any platform, change to the directory of
 pydicom's setup.py file and::
 
   python setup.py test
 
-This will install `pytest <https://pytest.org>`_ if it is not 
+This will install `pytest <https://pytest.org>`_ if it is not
 already installed.
 
-In v1.3 run under Python 2, if pytest is not found, please `python2 -m pip install "pytest<5"`
-  
+In v1.3 run under Python 2, if pytest is not found, please `python2 -m pip
+install "pytest<5"`
+
 Or, in linux you can also use::
 
   make test-code
@@ -158,7 +160,7 @@ Once installed, the package can be imported at a Python command line or used
 in your own Python program with ``import pydicom``.
 See the `examples directory
 <https://github.com/pydicom/pydicom/tree/master/examples>`_
-for both kinds of uses. Also see the :doc:`User Guide </pydicom_user_guide>`
+for both kinds of uses. Also see the :doc:`User Guide <pydicom_user_guide>`
 for more details of how to use the package.
 
 Support
@@ -180,10 +182,9 @@ To start learning how to use pydicom, see the :doc:`pydicom_user_guide`.
 
 .. rubric:: Footnotes::
 
-.. [#] For DICOM network capabilities, see the
-   `pynetdicom <https://github.com/patmun/pynetdicom>`_ and the newer
-   `pynetdicom3 <https://github.com/pydicom/pynetdicom3>`_ projects.
-.. [#] If using python(x,y), other packages you might be interested in include IPython
-   (an indispensable interactive shell with auto-completion, history etc),
-   NumPy (optionally used by pydicom for pixel data), and ITK/VTK or PIL
+.. [#] For DICOM network capabilities see the
+   `pynetdicom <https://github.com/pydicom/pynetdicom>`_ project.
+.. [#] If using python(x,y), other packages you might be interested in include
+   IPython (an indispensable interactive shell with auto-completion, history
+   etc), NumPy (optionally used by pydicom for pixel data), and ITK/VTK or PIL
    (image processing and visualization).

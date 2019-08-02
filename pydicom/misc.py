@@ -6,7 +6,8 @@ _size_factors = dict(KB=1024, MB=1024 * 1024, GB=1024 * 1024 * 1024)
 
 
 def size_in_bytes(expr):
-    """Return the number of bytes for a defer_size argument to dcmread()
+    """Return the number of bytes for `defer_size` argument in
+    :func:`~pydicom.filereader.dcmread`.
     """
     if expr is None or expr == float('inf'):
         return None
@@ -23,12 +24,12 @@ def size_in_bytes(expr):
 
 
 def is_dicom(file_path):
-    """Boolean specifying if file is a proper DICOM file.
+    """Return ``True`` if the file at `file_path` is a DICOM file.
 
-    This function is a pared down version of read_preamble meant for a
-    fast return.
-    The file is read for a proper preamble ('DICM'), returning True if so,
-    and False otherwise. This is a conservative approach.
+    This function is a pared down version of
+    :func:`~pydicom.filereader.read_preamble` meant for a fast return. The
+    file is read for a conformant preamble ('DICM'), returning
+    ``True`` if so, and ``False`` otherwise. This is a conservative approach.
 
     Parameters
     ----------

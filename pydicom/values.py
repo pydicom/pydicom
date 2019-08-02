@@ -26,6 +26,23 @@ else:
 
 
 def convert_tag(byte_string, is_little_endian, offset=0):
+    """Return a decoded :class:`BaseTag<pydicom.tag.BaseTag>` from the encoded
+    `byte_string`.
+
+    Parameters
+    ----------
+    byte_string : bytes
+        The encoded tag.
+    is_little_endian : bool
+        ``True`` if the encoding is little endian, ``False`` otherwise.
+    offset : int, optional
+        The byte offset in `byte_string` to the start of the tag.
+
+    Returns
+    -------
+    BaseTag
+        The decoded tag.
+    """
     if is_little_endian:
         struct_format = "<HH"
     else:
@@ -34,9 +51,23 @@ def convert_tag(byte_string, is_little_endian, offset=0):
 
 
 def convert_AE_string(byte_string, is_little_endian, struct_format=None):
-    """Read a byte string for a VR of 'AE'.
+    """Return a decoded 'AE' value.
 
     Elements with VR of 'AE' have non-significant leading and trailing spaces.
+
+    Parameters
+    ----------
+    byte_string : bytes or str
+        The encoded 'AE' element value.
+    is_little_endian : bool
+        ``True`` if the value is encoded as little endian, ``False`` otherwise.
+    struct_format : str, optional
+        Not used.
+
+    Returns
+    -------
+    str
+        The decoded 'AE' value without non-significant spaces.
     """
     if not in_py2:
         byte_string = byte_string.decode(default_encoding)
@@ -45,7 +76,22 @@ def convert_AE_string(byte_string, is_little_endian, struct_format=None):
 
 
 def convert_ATvalue(byte_string, is_little_endian, struct_format=None):
-    """Read and return AT (tag) data_element value(s)"""
+    """Return a decoded 'AT' value.
+
+    Parameters
+    ----------
+    byte_string : bytes or str
+        The encoded 'AT' element value.
+    is_little_endian : bool
+        ``True`` if the value is encoded as little endian, ``False`` otherwise.
+    struct_format : str, optional
+        Not used.
+
+    Returns
+    -------
+    BaseTag or list of BaseTag
+        The decoded value(s).
+    """
     length = len(byte_string)
     if length == 4:
         return convert_tag(byte_string, is_little_endian)
@@ -65,8 +111,25 @@ def _DA_from_byte_string(byte_string):
 
 
 def convert_DA_string(byte_string, is_little_endian, struct_format=None):
-    """Read and return a DA value"""
+    """Return a decoded 'DA' value.
 
+    Parameters
+    ----------
+    byte_string : bytes or str
+        The encoded 'DA' element value.
+    is_little_endian : bool
+        ``True`` if the value is encoded as little endian, ``False`` otherwise.
+    struct_format : str, optional
+        Not used.
+
+    Returns
+    -------
+    str or list of str or valuerep.DA or list of valuerep.DA
+        If
+        :attr:`~pydicom.config.datetime_conversion` is ``True`` then returns
+        either :class:`~pydicom.valuerep.DA` or a :class:`list` of ``DA``,
+        otherwise returns :class:`str` or ``list`` of ``str``.
+    """
     if config.datetime_conversion:
         if not in_py2:
             byte_string = byte_string.decode(default_encoding)
@@ -80,8 +143,25 @@ def convert_DA_string(byte_string, is_little_endian, struct_format=None):
 
 
 def convert_DS_string(byte_string, is_little_endian, struct_format=None):
-    """Read and return a DS value or list of values"""
+    """Return a decoded 'DS' value.
 
+    Parameters
+    ----------
+    byte_string : bytes or str
+        The encoded 'DS' element value.
+    is_little_endian : bool
+        ``True`` if the value is encoded as little endian, ``False`` otherwise.
+    struct_format : str, optional
+        Not used.
+
+    Returns
+    -------
+    valuerep.DSfloat or valuerep.DSdecimal or list of DSfloat/DSdecimal
+        If :attr:`~pydicom.config.use_DS_decimal` is ``True`` then returns
+        :class:`~pydicom.valuerep.DSdecimal` or a :class:`list` of
+        ``DSdecimal``, otherwise returns :class:`~pydicom.valuerep.DSfloat` or
+        a ``list`` of ``DSfloat``.
+    """
     if not in_py2:
         byte_string = byte_string.decode(default_encoding)
     # Below, go directly to DS class instance
@@ -100,8 +180,25 @@ def _DT_from_byte_string(byte_string):
 
 
 def convert_DT_string(byte_string, is_little_endian, struct_format=None):
-    """Read and return a DT value"""
+    """Return a decoded 'DT' value.
 
+    Parameters
+    ----------
+    byte_string : bytes or str
+        The encoded 'DT' element value.
+    is_little_endian : bool
+        ``True`` if the value is encoded as little endian, ``False`` otherwise.
+    struct_format : str, optional
+        Not used.
+
+    Returns
+    -------
+    str or list of str or valuerep.DT or list of DT
+        if
+        :attr:`~pydicom.config.datetime_conversion` is ``True`` then returns
+        :class:`~pydicom.valuerep.DT` or a :class:`list` of ``DT``, otherwise
+        returns :class:`str` or ``list`` of ``str``.
+    """
     if config.datetime_conversion:
         if not in_py2:
             byte_string = byte_string.decode(default_encoding)
@@ -115,42 +212,52 @@ def convert_DT_string(byte_string, is_little_endian, struct_format=None):
 
 
 def convert_IS_string(byte_string, is_little_endian, struct_format=None):
-    """Read and return an IS value or list of values"""
+    """Return a decoded 'IS' value.
 
+    Parameters
+    ----------
+    byte_string : bytes or str
+        The encoded 'IS' element value.
+    is_little_endian : bool
+        ``True`` if the value is encoded as little endian, ``False`` otherwise.
+    struct_format : str, optional
+        Not used.
+
+    Returns
+    -------
+    valuerep.IS or list of IS
+        The decoded value(s).
+    """
     if not in_py2:
         byte_string = byte_string.decode(default_encoding)
     return MultiString(byte_string, valtype=pydicom.valuerep.IS)
 
 
 def convert_numbers(byte_string, is_little_endian, struct_format):
-    """Convert `byte_string` to a value,
-       depending on `struct_format`.
+    """Return a decoded numerical VR value.
 
-    Given an encoded DICOM Element value,
-    use `struct_format` and the endianness
-    of the data to decode it.
+    Given an encoded DICOM Element value, use `struct_format` and the
+    endianness of the data to decode it.
 
     Parameters
     ----------
-    byte_string : bytes
-        The raw byte data to decode.
+    byte_string : bytes or str
+        The encoded numerical VR element value.
     is_little_endian : bool
-        The encoding of `byte_string`.
+        ``True`` if the value is encoded as little endian, ``False`` otherwise.
     struct_format : str
-        The type of data encoded in `byte_string`.
+        The format of the numerical data encoded in `byte_string`. Should be a
+        valid format for :func:`struct.unpack()` without the endianness.
 
     Returns
     -------
     str
-        If there is no encoded data in `byte_string`
-        then an empty string will
+        If there is no encoded data in `byte_string` then an empty string will
         be returned.
     value
-        If `byte_string` encodes a single value
-         then it will be returned.
+        If `byte_string` encodes a single value then it will be returned.
     list
-        If `byte_string` encodes multiple values
-        then a list of the decoded
+        If `byte_string` encodes multiple values then a list of the decoded
         values will be returned.
     """
     endianChar = '><' [is_little_endian]
@@ -179,24 +286,36 @@ def convert_numbers(byte_string, is_little_endian, struct_format):
 
 
 def convert_OBvalue(byte_string, is_little_endian, struct_format=None):
-    """Return the raw bytes from reading an OB value"""
+    """Return encoded 'OB' value as :class:`bytes` or :class:`str`."""
     return byte_string
 
 
 def convert_OWvalue(byte_string, is_little_endian, struct_format=None):
-    """Return the raw bytes from reading an OW value rep
+    """Return the encoded 'OW' value as :class:`bytes` or :class:`str`.
 
-    Note: pydicom does NOT do byte swapping, except in
-    dataset.pixel_array function
+    No byte swapping will be performed.
     """
     # for now, Maybe later will have own routine
     return convert_OBvalue(byte_string, is_little_endian)
 
 
-def convert_PN(byte_string,
-               encodings=None):
-    """Read and return string(s) as PersonName instance(s)"""
+def convert_PN(byte_string, encodings=None):
+    """Return a decoded 'PN' value.
 
+    Parameters
+    ----------
+    byte_string : bytes or str
+        The encoded 'IS' element value.
+    encodings : list of str, optional
+        A list of the character encoding schemes used to encode the 'PN' value.
+
+    Returns
+    -------
+    valuerep.PersonName3 or list of PersonName3
+        The decoded 'PN' value(s) if using Python 3.
+    valuerep.PersonNameUnicode or list of PersonNameUnicode
+        The decoded 'PN' value(s) if using Python 2.
+    """
     def get_valtype(x):
         if not in_py2:
             return PersonName(x, encodings).decode()
@@ -216,17 +335,50 @@ def convert_PN(byte_string,
         return MultiValue(get_valtype, splitup)
 
 
-def convert_string(byte_string,
-                   is_little_endian,
-                   struct_format=None):
-    """Read and return a string or strings"""
+def convert_string(byte_string, is_little_endian, struct_format=None):
+    """Return a decoded string VR value.
+
+    String VRs are 'AS', 'CS' and optionally (depending on
+    :ref:`pydicom.config <api_config>`) 'DA', 'DT', and 'TM'.
+
+    Parameters
+    ----------
+    byte_string : bytes or str
+        The encoded text VR element value.
+    is_little_endian : bool
+        ``True`` if the value is encoded as little endian, ``False`` otherwise.
+    struct_format : str, optional
+        Not used.
+
+    Returns
+    -------
+    str or list of str
+        The decoded value(s).
+    """
     if not in_py2:
         byte_string = byte_string.decode(default_encoding)
     return MultiString(byte_string)
 
 
 def convert_text(byte_string, encodings=None):
-    """Read and return a string or strings"""
+    """Return a decoded text VR value, ignoring backslashes.
+
+    Text VRs are 'SH', 'LO' and 'UC'.
+
+    Parameters
+    ----------
+    byte_string : bytes or str
+        The encoded text VR element value.
+    encodings : list of str, optional
+        A list of the character encoding schemes used to encode the value.
+
+    Returns
+    -------
+    unicode or list of unicode
+        The decoded value(s) if in Python 2.
+    str or list of str
+        The decoded value(s) if in Python 3.
+    """
     values = byte_string.split(b'\\')
     values = [convert_single_string(value, encodings) for value in values]
     if len(values) == 1:
@@ -236,8 +388,22 @@ def convert_text(byte_string, encodings=None):
 
 
 def convert_single_string(byte_string, encodings=None):
-    """Read and return a single string
-       (backslash character does not split)"""
+    """Return decoded text, ignoring backslashes.
+
+    Parameters
+    ----------
+    byte_string : bytes or str
+        The encoded text.
+    encodings : list of str, optional
+        A list of the character encoding schemes used to encode the text.
+
+    Returns
+    -------
+    unicode or list of unicode
+        The decoded text if in Python 2.
+    str or list of str
+        The decoded text if in Python 3.
+    """
     encodings = encodings or [default_encoding]
     value = decode_string(byte_string, encodings, TEXT_VR_DELIMS)
     if value and value.endswith(' '):
@@ -245,13 +411,29 @@ def convert_single_string(byte_string, encodings=None):
     return value
 
 
-def convert_SQ(byte_string,
-               is_implicit_VR,
-               is_little_endian,
-               encoding=default_encoding,
-               offset=0):
-    """Convert a sequence that has been read
-       as bytes but not yet parsed."""
+def convert_SQ(byte_string, is_implicit_VR, is_little_endian,
+               encoding=default_encoding, offset=0):
+    """Return a decoded 'SQ' value.
+
+    Parameters
+    ----------
+    byte_string : bytes or str
+        The encoded 'SQ' element value.
+    is_implicit_VR : bool
+        ``True`` if the value is encoded as implicit VR, ``False`` otherwise.
+    is_little_endian : bool
+        ``True`` if the value is encoded as little endian, ``False`` otherwise.
+    encoding : list of str, optional
+        The character encoding scheme(s) used to encoded any text VR elements
+        within the sequence value. ``'iso8859'`` is used by default.
+    offset : int, optional
+        The byte offset in `byte_string` to the start of the sequence value.
+
+    Returns
+    -------
+    sequence.Sequence
+        The decoded sequence.
+    """
     fp = BytesIO(byte_string)
     seq = read_sequence(fp, is_implicit_VR, is_little_endian,
                         len(byte_string), encoding, offset)
@@ -267,7 +449,25 @@ def _TM_from_byte_string(byte_string):
 
 
 def convert_TM_string(byte_string, is_little_endian, struct_format=None):
-    """Read and return a TM value"""
+    """Return a decoded 'TM' value.
+
+    Parameters
+    ----------
+    byte_string : bytes or str
+        The encoded 'TM' element value.
+    is_little_endian : bool
+        ``True`` if the value is encoded as little endian, ``False`` otherwise.
+    struct_format : str, optional
+        Not used.
+
+    Returns
+    -------
+    str or list of str or valuerep.TM or list of valuerep.TM
+        If
+        :attr:`~pydicom.config.datetime_conversion` is ``True`` then returns
+        either :class:`~pydicom.valuerep.TM` or a :class:`list` of ``TM``,
+        otherwise returns :class:`str` or ``list`` of ``str``.
+    """
     if config.datetime_conversion:
         if not in_py2:
             byte_string = byte_string.decode(default_encoding)
@@ -281,7 +481,24 @@ def convert_TM_string(byte_string, is_little_endian, struct_format=None):
 
 
 def convert_UI(byte_string, is_little_endian, struct_format=None):
-    """Read and return a UI values or values"""
+    """Return a decoded 'UI' value.
+
+    Elements with VR of 'UI' may have a non-significant trailing null ``0x00``.
+
+    Parameters
+    ----------
+    byte_string : bytes or str
+        The encoded 'UI' element value.
+    is_little_endian : bool
+        ``True`` if the value is encoded as little endian, ``False`` otherwise.
+    struct_format : str, optional
+        Not used.
+
+    Returns
+    -------
+    uid.UID or list of uid.UID
+        The decoded 'UI' element value without a trailing null.
+    """
     # Strip off 0-byte padding for even length (if there)
     if not in_py2:
         byte_string = byte_string.decode(default_encoding)
@@ -291,15 +508,29 @@ def convert_UI(byte_string, is_little_endian, struct_format=None):
 
 
 def convert_UN(byte_string, is_little_endian, struct_format=None):
-    """Return a byte string for a VR of 'UN' (unknown)"""
+    """Return encoded 'UN' value as :class:`bytes` or :class:`str`."""
     return byte_string
 
 
 def convert_UR_string(byte_string, is_little_endian, struct_format=None):
-    """Read a byte string for a VR of 'UR'
+    """Return encoded 'UR' value.
 
-    Elements with VR of 'UR' shall not be multi-valued
-    and trailing spaces shall be ignored.
+    Elements with VR of 'UR' may not be multi-valued and trailing spaces are
+    non-significant.
+
+    Parameters
+    ----------
+    byte_string : bytes or str
+        The encoded 'UR' element value.
+    is_little_endian : bool
+        ``True`` if the value is encoded as little endian, ``False`` otherwise.
+    struct_format : str, optional
+        Not used.
+
+    Returns
+    -------
+    bytes or str
+        The encoded 'UR' element value without any trailing spaces.
     """
     if not in_py2:
         byte_string = byte_string.decode(default_encoding)
@@ -308,7 +539,21 @@ def convert_UR_string(byte_string, is_little_endian, struct_format=None):
 
 
 def convert_value(VR, raw_data_element, encodings=None):
-    """Return the converted value (from raw bytes) for the given VR"""
+    """Return encoded element value using the appropriate decoder.
+
+    Parameters
+    ----------
+    raw_data_element : bytes or str
+        The encoded element value.
+    encodings : list of str, optional
+        A list of the character encoding schemes used to encode any text
+        elements.
+
+    Returns
+    -------
+    type or list of type
+        The element value decoded using the appropriate decoder.
+    """
     if VR not in converters:
         # `VR` characters are in the ascii alphabet ranges 65 - 90, 97 - 122
         char_range = list(range(65, 91)) + list(range(97, 123))

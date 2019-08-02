@@ -1,5 +1,6 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
-"""Use the numpy package to convert supported pixel data to an ndarray.
+"""Use the `numpy <https://numpy.org/>`_ package to convert supported *Pixel
+Data* to an :class:`numpy.ndarray`.
 
 **Supported transfer syntaxes**
 
@@ -11,8 +12,8 @@
 **Supported data**
 
 The numpy handler supports the conversion of data in the (7fe0,0010)
-*Pixel Data* element to a numpy ndarray provided the related Image Pixel module
-elements have values given in the table below.
+*Pixel Data* element to a :class:`~numpy.ndarray` provided the
+related Image Pixel module elements have values given in the table below.
 
 +------------------------------------------------+--------------+----------+
 | Element                                        | Supported    |          |
@@ -62,24 +63,25 @@ SUPPORTED_TRANSFER_SYNTAXES = [
 
 
 def is_available():
-    """Return True if the handler has its dependencies met."""
+    """Return ``True`` if the handler has its dependencies met."""
     return HAVE_NP
 
 
 def supports_transfer_syntax(transfer_syntax):
-    """Return True if the handler supports the `transfer_syntax`.
+    """Return ``True`` if the handler supports the `transfer_syntax`.
 
     Parameters
     ----------
-    transfer_syntax : UID
-        The Transfer Syntax UID of the Pixel Data that is to be used with
+    transfer_syntax : uid.UID
+        The Transfer Syntax UID of the *Pixel Data* that is to be used with
         the handler.
     """
     return transfer_syntax in SUPPORTED_TRANSFER_SYNTAXES
 
 
 def needs_to_convert_to_RGB(ds):
-    """Return True if the pixel data should to be converted from YCbCr to RGB.
+    """Return ``True`` if the *Pixel Data* should to be converted from YCbCr to
+    RGB.
 
     This affects JPEG transfer syntaxes.
     """
@@ -87,7 +89,8 @@ def needs_to_convert_to_RGB(ds):
 
 
 def should_change_PhotometricInterpretation_to_RGB(ds):
-    """Return True if the PhotometricInterpretation should be changed to RGB.
+    """Return ``True`` if the *Photometric Interpretation* should be changed
+    to RGB.
 
     This affects JPEG transfer syntaxes.
     """
@@ -95,18 +98,18 @@ def should_change_PhotometricInterpretation_to_RGB(ds):
 
 
 def pack_bits(arr):
-    """Pack a binary numpy ndarray into bytes for use with Pixel Data.
+    """Pack a binary :class:`numpy.ndarray` for use with *Pixel Data*.
 
-    Should be used in conjunction with (0028,0100) *BitsAllocated* = 1.
+    Should be used in conjunction with (0028,0100) *Bits Allocated* = 1.
 
     Parameters
     ----------
     arr : numpy.ndarray
-        The ndarray containing 1-bit data as ints. The array must only contain
-        integer values of 0 and 1 and must have an 'uint' or 'int' dtype. For
-        the sake of efficiency its recommended that the array length be a
-        multiple of 8 (i.e. that any empty bit-padding to round out the byte
-        has already been added).
+        The :class:`numpy.ndarray` containing 1-bit data as ints. `arr` must
+        only contain integer values of 0 and 1 and must have an 'uint'  or
+        'int' :class:`numpy.dtype`. For the sake of efficiency it's recommended
+        that the length of `arr` be a multiple of 8 (i.e. that any empty
+        bit-padding to round out the byte has already been added).
 
     Returns
     -------
@@ -120,7 +123,9 @@ def pack_bits(arr):
 
     References
     ----------
-    DICOM Standard, Part 5, Section 8.1.1 and Annex D
+    DICOM Standard, Part 5,
+    :dcm:`Section 8.1.1<part05/chapter_8.html#sect_8.1.1>` and
+    :dcm:`Annex D<part05/chapter_D.html>`
     """
     if arr.shape == (0,):
         return bytes()
@@ -147,7 +152,7 @@ def pack_bits(arr):
 
 
 def unpack_bits(bytestream):
-    """Unpack bit packed pixel data into a numpy ndarray.
+    """Unpack bit packed *Pixel Data* into a :class:`numpy.ndarray`.
 
     Suitable for use when (0028,0011) *Bits Allocated* is 1.
 
@@ -159,16 +164,13 @@ def unpack_bits(bytestream):
     Returns
     -------
     numpy.ndarray
-        The unpacked pixel data as a 1D array.
-
-    Notes
-    -----
-    The implementation for PyPy is roughly 100 times slower than the
-    standard ``numpy.unpackbits`` method.
+        The unpacked *Pixel Data* as a 1D array.
 
     References
     ----------
-    DICOM Standard, Part 5, Section 8.1.1 and Annex D
+    DICOM Standard, Part 5,
+    :dcm:`Section 8.1.1<part05/chapter_8.html#sect_8.1.1>` and
+    :dcm:`Annex D<part05/chapter_D.html>`
     """
     # Thanks to @sbrodehl (#643)
     # e.g. b'\xC0\x09' -> [192, 9]
@@ -188,31 +190,31 @@ def unpack_bits(bytestream):
 
 
 def get_pixeldata(ds, read_only=False):
-    """Return an ndarray of the Pixel Data.
+    """Return a :class:`numpy.ndarray` of the *Pixel Data*.
 
     Parameters
     ----------
-    ds : dataset.Dataset
-        The DICOM dataset containing an Image Pixel module and the Pixel Data
-        to be converted.
+    ds : Dataset
+        The :class:`Dataset` containing an Image Pixel module and the
+        *Pixel Data* to be converted.
     read_only : bool, optional
-        If False (default) then returns a writeable array that no longer uses
-        the original memory. If True and the value of (0028,0100) *Bits
-        Allocated* > 1 then returns a read-only array that uses the original
-        memory buffer of the pixel data. If *Bits Allocated* = 1 then always
-        returns a writeable array.
+        If ``False`` (default) then returns a writeable array that no longer
+        uses the original memory. If ``True`` and the value of (0028,0100)
+        *Bits Allocated* > 1 then returns a read-only array that uses the
+        original memory buffer of the pixel data. If *Bits Allocated* = 1 then
+        always returns a writeable array.
 
     Returns
     -------
     np.ndarray
-        The contents of the Pixel Data element (7FE0,0010) as a 1D array.
+        The contents of (7FE0,0010) *Pixel Data* as a 1D array.
 
     Raises
     ------
     AttributeError
-        If the dataset is missing a required element.
+        If `ds` is missing a required element.
     NotImplementedError
-        If the dataset contains pixel data in an unsupported format.
+        If `ds` contains pixel data in an unsupported format.
     ValueError
         If the actual length of the pixel data doesn't match the expected
         length.

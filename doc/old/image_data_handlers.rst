@@ -8,7 +8,7 @@ Handling of compressed image data
 .. |chk|   unicode:: U+02713 .. CHECK MARK
 
 Preconditions
-............
+.............
 To be able to decompress compressed DICOM image data, you need to have
 one or more packages installed that are able to handle this kind of data.
 ``pydicom`` detects the installed packages and provides image data handlers
@@ -22,8 +22,8 @@ The following packages can be used with ``pydicom``:
   ``jpeg`` and ``jpeg2000`` plugins
 * `jpeg_ls <https://github.com/Who8MyLunch/CharPyLS>`_
 
-Note that you always need the `NumPy <http://numpy.org/>`_ package to be able to handle image
-data.
+Note that you always need the `NumPy <http://numpy.org/>`_ package to be able
+to handle image data.
 
 .. caution:: We rely on the image handling capacity of the mentioned
    packages and cannot guarantee the correctness of the generated uncompressed
@@ -79,10 +79,14 @@ handled by the given packages:
 
 Usage
 .....
-To use decompressed image data from compressed DICOM images, you have two options:
+To use decompressed image data from compressed DICOM images, you have two
+options:
 
-* use ``decompress()`` on the dataset to convert it in-place and work with the pixel data as described before
-* get an uncompressed copy of the pixel data as a NumPy array using ``Dataset.pixel_array`` without touching the original dataset
+* use ``decompress()`` on the dataset to convert it in-place and work with the
+  pixel data as described before
+* get an uncompressed copy of the pixel data as a NumPy array using
+  ``Dataset.pixel_array`` without touching the original dataset
 
-.. note:: Using ``decompress()`` adapts the transfer syntax of the data set, but not the Photometric Interpretation.
-   The Photometric Interpretation may not match the pixel data, depending on the used decompression handler.
+.. note:: Using ``decompress()`` adapts the transfer syntax of the data set,
+   but not the Photometric Interpretation. The Photometric Interpretation may
+   not match the pixel data, depending on the used decompression handler.

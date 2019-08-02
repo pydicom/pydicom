@@ -1,5 +1,6 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
-"""Use the numpy package to convert RLE lossless pixel data to an ndarray.
+"""Use the `numpy <https://numpy.org/>`_ package to convert RLE lossless *Pixel
+Data* to an ndarray.
 
 **Supported transfer syntaxes**
 
@@ -60,17 +61,25 @@ SUPPORTED_TRANSFER_SYNTAXES = [
 
 
 def is_available():
-    """Return True if the handler has its dependencies met."""
+    """Return ``True`` if the handler has its dependencies met."""
     return HAVE_RLE
 
 
 def supports_transfer_syntax(transfer_syntax):
-    """Return True if the handler supports the `transfer_syntax`."""
+    """Return ``True`` if the handler supports the `transfer_syntax`.
+
+    Parameters
+    ----------
+    transfer_syntax : uid.UID
+        The Transfer Syntax UID of the *Pixel Data* that is to be used with
+        the handler.
+    """
     return transfer_syntax in SUPPORTED_TRANSFER_SYNTAXES
 
 
 def needs_to_convert_to_RGB(ds):
-    """Return True if the pixel data should to be converted from YCbCr to RGB.
+    """Return ``True`` if the *Pixel Data* should to be converted from YCbCr to
+    RGB.
 
     This affects JPEG transfer syntaxes.
     """
@@ -78,7 +87,8 @@ def needs_to_convert_to_RGB(ds):
 
 
 def should_change_PhotometricInterpretation_to_RGB(ds):
-    """Return True if the PhotometricInterpretation should be changed to RGB.
+    """Return ``True`` if the *Photometric Interpretation* should be changed
+    to RGB.
 
     This affects JPEG transfer syntaxes.
     """
@@ -86,34 +96,33 @@ def should_change_PhotometricInterpretation_to_RGB(ds):
 
 
 def get_pixeldata(ds, rle_segment_order='>'):
-    """Return an ndarray of the Pixel Data.
+    """Return an :class:`numpy.ndarray` of the *Pixel Data*.
 
     Parameters
     ----------
     ds : dataset.Dataset
-        The DICOM dataset containing an Image Pixel module and the RLE encoded
-        Pixel Data to be converted.
+        The :class:`Dataset` containing an Image Pixel module and the RLE
+        encoded *Pixel Data* to be converted.
     rle_segment_order : str
-        The order of segments used by the RLE decoder when dealing with Bits
-        Allocated > 8. Each RLE segment contains 8-bits of the pixel data,
+        The order of segments used by the RLE decoder when dealing with *Bits
+        Allocated* > 8. Each RLE segment contains 8-bits of the pixel data,
         and segments are supposed to be ordered from MSB to LSB. A value of
-        '>' means interpret the segments as being in big endian order
-        (default) while a value of '<' means interpret the segments as being
-        in little endian order which may be possible if the encoded data is
-        non-conformant.
+        ``'>'`` means interpret the segments as being in big endian order
+        (default) while a value of ``'<'`` means interpret the segments as
+        being in little endian order which may be possible if the encoded data
+        is non-conformant.
 
     Returns
     -------
-    np.ndarray
-        The decoded contents of the Pixel Data element (7FE0,0010) as a 1D
-        array.
+    numpy.ndarray
+        The decoded contents of (7fe0,0010) *Pixel Data* as a 1D array.
 
     Raises
     ------
     AttributeError
-        If the dataset is missing a required element.
+        If `ds` is missing a required element.
     NotImplementedError
-        If the dataset contains pixel data in an unsupported format.
+        If `ds` contains pixel data in an unsupported format.
     ValueError
         If the actual length of the pixel data doesn't match the expected
         length.
@@ -218,7 +227,7 @@ def _parse_rle_header(header):
 
     References
     ----------
-    DICOM Standard, Part 5, Annex G
+    DICOM Standard, Part 5, :dcm:`Annex G<part05/chapter_G.html>`
     """
     if len(header) != 64:
         raise ValueError('The RLE header can only be 64 bytes long')
@@ -367,19 +376,21 @@ def _rle_decode_segment(data):
 
 # RLE encoding functions
 def rle_encode_frame(arr):
-    """Return an numpy ndarray image frame as RLE encoded bytearray.
+    """Return an :class:`numpy.ndarray` image frame as RLE encoded
+    :class:`bytearray`.
 
     Parameters
     ----------
     arr : numpy.ndarray
-        A 2D (if Samples Per Pixel = 1) or 3D (if Samples Per Pixel = 3)
+        A 2D (if *Samples Per Pixel* = 1) or 3D (if *Samples Per Pixel* = 3)
         ndarray containing a single frame of the image to be RLE encoded.
 
     Returns
     -------
     bytearray
         An RLE encoded frame, including the RLE header, following the format
-        specified by the DICOM Standard, Part 5, Annex G.
+        specified by the DICOM Standard, Part 5,
+        :dcm:`Annex G<part05/chapter_G.html>`.
     """
     shape = arr.shape
     if len(shape) > 3:
@@ -453,8 +464,8 @@ def _rle_encode_plane(arr):
     ------
     bytearray
         An RLE encoded segment of the plane, following the format specified
-        by the DICOM Standard, Part 5, Annex G. The segments are yielded in
-        order from most significant to least.
+        by the DICOM Standard, Part 5, :dcm:`Annex G<part05/chapter_G.html>`.
+        The segments are yielded in order from most significant to least.
     """
     # Determine the byte order of the array
     byte_order = arr.dtype.byteorder
@@ -486,13 +497,13 @@ def _rle_encode_segment(arr):
     ----------
     arr : numpy.ndarray
         A 2D ndarray of 8-bit uint data, representing a Byte Segment as in
-        the DICOM Standard, Part 5, Annex G.2.
+        the DICOM Standard, Part 5, :dcm:`Annex G.2<part05/sect_G.2.html>`.
 
     Returns
     -------
     bytearray
         The RLE encoded segment, following the format specified by the DICOM
-        Standard. Odd length encoded segments are padded by a trailing 0x00
+        Standard. Odd length encoded segments are padded by a trailing ``0x00``
         to be even length.
     """
     out = bytearray()
@@ -520,7 +531,7 @@ def _rle_encode_row(arr):
     -------
     bytes
         The RLE encoded row, following the format specified by the DICOM
-        Standard, Part 5, Annex G.
+        Standard, Part 5, :dcm:`Annex G<part05/chapter_G.html>`
 
     Notes
     -----

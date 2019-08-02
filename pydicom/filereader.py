@@ -43,32 +43,34 @@ def data_element_generator(fp,
 
     Parameters
     ----------
-    fp : file-like object
-    is_implicit_VR : boolean
-    is_little_endian : boolean
+    fp : file-like
+        The file like to read from.
+    is_implicit_VR : bool
+        ``True`` if the data is encoded as implicit VR, ``False`` otherwise.
+    is_little_endian : bool
+        ``True`` if the data is encoded as little endian, ``False`` otherwise.
     stop_when : None, callable, optional
-        If None (default), then the whole file is read.
-        A callable which takes tag, VR, length,
-        and returns True or False. If it returns True,
-        read_data_element will just return.
+        If ``None`` (default), then the whole file is read. A callable which
+        takes tag, VR, length, and returns ``True`` or ``False``. If it
+        returns ``True``, ``read_data_element`` will just return.
     defer_size : int, str, None, optional
-        See ``dcmread`` for parameter info.
+        See :func:`dcmread` for parameter info.
     encoding :
         Encoding scheme
     specific_tags : list or None
-        See ``dcmread`` for parameter info.
+        See :func:`dcmread` for parameter info.
 
     Returns
     -------
-    VR : None if implicit VR, otherwise the VR read from the file
-    length :
-        the length as in the DICOM data element (could be
-        DICOM "undefined length" 0xffffffffL)
-    value_bytes :
-        the raw bytes from the DICOM file
-        (not parsed into python types)
-    is_little_endian : boolean
-        True if transfer syntax is little endian; else False.
+    VR : str or None
+        ``None`` if implicit VR, otherwise the VR read from the file.
+    length : int
+        The length of the DICOM data element (could be DICOM "undefined
+        length" ``0xffffffffL``)
+    value_bytes : bytes or str
+        The raw bytes from the DICOM file (not parsed into python types)
+    is_little_endian : bool
+        ``True`` if transfer syntax is little endian; else ``False``.
     """
     # Summary of DICOM standard PS3.5-2008 chapter 7:
     # If Implicit VR, data element is:
@@ -267,11 +269,11 @@ def _is_implicit_vr(fp, implicit_vr_is_assumed, is_little_endian, stop_when):
     Parameters
     ----------
     fp : an opened file object
-    implicit_vr_is_assumed : boolean
+    implicit_vr_is_assumed : bool
         True if implicit VR is assumed.
         If this does not match with the real transfer syntax, a user warning
         will be issued.
-    is_little_endian : boolean
+    is_little_endian : bool
         True if file has little endian transfer syntax.
         Needed to interpret the first tag.
     stop_when : None, optional
@@ -317,38 +319,41 @@ def _is_implicit_vr(fp, implicit_vr_is_assumed, is_little_endian, stop_when):
 def read_dataset(fp, is_implicit_VR, is_little_endian, bytelength=None,
                  stop_when=None, defer_size=None,
                  parent_encoding=default_encoding, specific_tags=None):
-    """Return a Dataset instance containing the next dataset in the file.
+    """Return a :class:`~pydicom.dataset.Dataset` instance containing the next
+    dataset in the file.
 
     Parameters
     ----------
-    fp : an opened file object
-    is_implicit_VR : boolean
-        True if file transfer syntax is implicit VR.
-    is_little_endian : boolean
-        True if file has little endian transfer syntax.
+    fp : file-like
+        An opened file-like object.
+    is_implicit_VR : bool
+        ``True`` if file transfer syntax is implicit VR.
+    is_little_endian : bool
+        ``True`` if file has little endian transfer syntax.
     bytelength : int, None, optional
-        None to read until end of file or ItemDeliterTag, else
-        a fixed number of bytes to read
+        ``None`` to read until end of file or ItemDeliterTag, else a fixed
+        number of bytes to read
     stop_when : None, optional
-        optional call_back function which can terminate reading.
-        See help for data_element_generator for details
+        Optional call_back function which can terminate reading. See help for
+        :func:`data_element_generator` for details
     defer_size : int, None, optional
-        Size to avoid loading large elements in memory.
-        See ``dcmread`` for more parameter info.
+        Size to avoid loading large elements in memory. See :func:`dcmread` for
+        more parameter info.
     parent_encoding :
-        optional encoding to use as a default in case
-        a Specific Character Set (0008,0005) isn't specified
+        Optional encoding to use as a default in case (0008,0005) *Specific
+        Character Set* isn't specified.
     specific_tags : list or None
-        See ``dcmread`` for parameter info.
+        See :func:`dcmread` for parameter info.
 
     Returns
     -------
-    a Dataset instance
+    dataset.Dataset
+        A Dataset instance.
 
     See Also
     --------
-    pydicom.dataset.Dataset
-        A collection (dictionary) of Dicom `DataElement` instances.
+    dataset.Dataset
+        A collection (dictionary) of DICOM ``DataElement`` instances.
     """
     raw_data_elements = dict()
     fp_start = fp.tell()
@@ -388,7 +393,9 @@ def read_dataset(fp, is_implicit_VR, is_little_endian, bytelength=None,
 
 def read_sequence(fp, is_implicit_VR, is_little_endian, bytelength, encoding,
                   offset=0):
-    """Read and return a Sequence -- i.e. a list of Datasets"""
+    """Read and return a Sequence -- i.e. a :class:`list` of
+    :class:`Datasets<pydicom.dataset.Dataset>`.
+    """
 
     seq = []  # use builtin list to start for speed, convert to Sequence at end
     is_undefined_length = False
@@ -413,7 +420,9 @@ def read_sequence(fp, is_implicit_VR, is_little_endian, bytelength, encoding,
 
 def read_sequence_item(fp, is_implicit_VR, is_little_endian, encoding,
                        offset=0):
-    """Read and return a single sequence item, i.e. a Dataset"""
+    """Read and return a single sequence item, i.e. a
+    :class:`~pydicom.dataset.Dataset`.
+    """
     seq_item_tell = fp.tell() + offset
     if is_little_endian:
         tag_length_format = "<HHL"
@@ -457,9 +466,10 @@ def _read_command_set_elements(fp):
     """Return a Dataset containing any Command Set (0000,eeee) elements
     in `fp`.
 
-    Command Set elements are always Implicit VR Little Endian (as per PS3.7
-    Section 6.3). Once any Command Set elements are read `fp` will be
-    positioned at the start of the next group of elements.
+    Command Set elements are always Implicit VR Little Endian (DICOM Standard,
+    Part 7, :dcm:`Section 6.3<part07/sect_6.3.html>`). Once any Command Set
+    elements are read `fp` will be positioned at the start of the next group
+    of elements.
 
     Parameters
     ----------
@@ -468,7 +478,7 @@ def _read_command_set_elements(fp):
 
     Returns
     -------
-    pydicom.dataset.Dataset
+    dataset.Dataset
         The command set elements as a Dataset instance. May be empty if no
         command set elements are present.
     """
@@ -485,9 +495,10 @@ def _read_command_set_elements(fp):
 def _read_file_meta_info(fp):
     """Return a Dataset containing any File Meta (0002,eeee) elements in `fp`.
 
-    File Meta elements are always Explicit VR Little Endian (as per PS3.10
-    Section 7). Once any File Meta elements are read `fp` will be positioned
-    at the start of the next group of elements.
+    File Meta elements are always Explicit VR Little Endian (DICOM Standard,
+    Part 10, :dcm:`Section 7<part10/chapter_7.html>`). Once any File Meta
+    elements are read `fp` will be positioned at the start of the next group
+    of elements.
 
     Parameters
     ----------
@@ -497,7 +508,7 @@ def _read_file_meta_info(fp):
 
     Returns
     -------
-    pydicom.dataset.Dataset
+    dataset.Dataset
         The File Meta elements as a Dataset instance. May be empty if no
         File Meta are present.
     """
@@ -558,7 +569,7 @@ def read_preamble(fp, force):
     `fp` should be positioned at the start of the file-like. If the preamble
     and prefix are found then after reading `fp` will be positioned at the
     first byte after the prefix (byte offset 133). If either the preamble or
-    prefix are missing and `force` is True then after reading `fp` will be
+    prefix are missing and `force` is ``True`` then after reading `fp` will be
     positioned at the start of the file-like.
 
     Parameters
@@ -572,13 +583,13 @@ def read_preamble(fp, force):
     -------
     preamble : str/bytes or None
         The 128-byte DICOM preamble will be returned if the appropriate prefix
-        ('DICM') is found at byte offset 128. Returns None if the 'DICM' prefix
-        is not found and `force` is True.
+        ('DICM') is found at byte offset 128. Returns ``None`` if the 'DICM'
+        prefix is not found and `force` is ``True``.
 
     Raises
     ------
     InvalidDicomError
-        If `force` is False and no appropriate header information found.
+        If `force` is ``False`` and no appropriate header information found.
 
     Notes
     -----
@@ -623,22 +634,23 @@ def read_partial(fileobj, stop_when=None, defer_size=None,
     fileobj : a file-like object
         Note that the file will not close when the function returns.
     stop_when :
-        Stop condition. See ``read_dataset`` for more info.
+        Stop condition. See :func:`read_dataset` for more info.
     defer_size : int, str, None, optional
-        See ``dcmread`` for parameter info.
-    force : boolean
-        See ``dcmread`` for parameter info.
+        See :func:`dcmread` for parameter info.
+    force : bool
+        See :func:`dcmread` for parameter info.
     specific_tags : list or None
-        See ``dcmread`` for parameter info.
+        See :func:`dcmread` for parameter info.
 
     Notes
     -----
-    Use ``dcmread`` unless you need to stop on some condition other than
+    Use :func:`dcmread` unless you need to stop on some condition other than
     reaching pixel data.
 
     Returns
     -------
-    FileDataset instance or DicomDir instance.
+    dataset.FileDataset or dicomdir.DicomDir
+        The read dataset.
 
     See Also
     --------
@@ -749,46 +761,47 @@ def dcmread(fp, defer_size=None, stop_before_pixels=False,
             force=False, specific_tags=None):
     """Read and parse a DICOM dataset stored in the DICOM File Format.
 
-    Read a DICOM dataset stored in accordance with the DICOM File Format
-    (DICOM Standard Part 10 Section 7). If the dataset is not stored in
+    Read a DICOM dataset stored in accordance with the :dcm:`DICOM File
+    Format <part10/chapter_7.html>`. If the dataset is not stored in
     accordance with the File Format (i.e. the preamble and prefix are missing,
-    there are missing required Type 1 File Meta Information Group elements
-    or the entire File Meta Information is missing) then you will have to
-    set `force` to True.
+    there are missing required Type 1 *File Meta Information Group* elements
+    or the entire *File Meta Information* is missing) then you will have to
+    set `force` to ``True``.
 
     Parameters
     ----------
     fp : str or file-like
         Either a file-like object, or a string containing the file name. If a
         file-like object, the caller is responsible for closing it.
-    defer_size : int or str or None
-        If None (default), all elements read into memory. If specified, then if
-        a data element's stored value is larger than `defer_size`, the value is
-        not read into memory until it is accessed in code. Specify an integer
-        (bytes), or a string value with units, e.g. "512 KB", "2 MB".
-    stop_before_pixels : bool
-        If False (default), the full file will be read and parsed. Set True to
-        stop before reading (7FE0,0010) 'Pixel Data' (and all subsequent
-        elements).
-    force : bool
-        If False (default), raises an InvalidDicomError if the file is missing
-        the File Meta Information header. Set to True to force reading even if
-        no File Meta Information header is found.
-    specific_tags : list or None
-        If not None, only the tags in the list are returned. The list
-        elements can be tags or tag names. Note that the tag Specific
-        Character Set is always returned if present - this ensures correct
-        decoding of returned text values.
+    defer_size : int or str or None, optional
+        If ``None`` (default), all elements are read into memory. If specified,
+        then if a data element's stored value is larger than `defer_size`, the
+        value is not read into memory until it is accessed in code. Specify an
+        integer (bytes), or a string value with units, e.g. "512 KB", "2 MB".
+    stop_before_pixels : bool, optional
+        If ``False`` (default), the full file will be read and parsed. Set
+        ``True`` to stop before reading (7FE0,0010) *Pixel Data* (and all
+        subsequent elements).
+    force : bool, optional
+        If ``False`` (default), raises an ``InvalidDicomError`` if the file is
+        missing the *File Meta Information* header. Set to ``True`` to force
+        reading even if no *File Meta Information* header is found.
+    specific_tags : list or None, optional
+        If not ``None``, only the tags in the list are returned. The list
+        elements can be tags or tag names. Note that the element (0008,0005)
+        *Specific Character Set* is always returned if present - this ensures
+        correct decoding of returned text values.
 
     Returns
     -------
     FileDataset
-        An instance of FileDataset that represents a parsed DICOM file.
+        An instance of :class:`~pydicom.dataset.FileDataset` that represents
+        a parsed DICOM file.
 
     Raises
     ------
     InvalidDicomError
-        If `force` is True and the file is not a valid DICOM file.
+        If `force` is ``True`` and the file is not a valid DICOM file.
 
     See Also
     --------
@@ -859,9 +872,9 @@ read_file = dcmread  # used read_file until pydicom 1.0. Kept for compatibility
 
 
 def read_dicomdir(filename="DICOMDIR"):
-    """Read a DICOMDIR file and return a DicomDir instance.
+    """Read a DICOMDIR file and return a :class:`~pydicom.dicomdir.DicomDir`.
 
-    This is a wrapper around dcmread, which gives a default file name.
+    This is a wrapper around :func:`dcmread` which gives a default file name.
 
     Parameters
     ----------

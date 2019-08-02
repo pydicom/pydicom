@@ -36,8 +36,8 @@ Here is an example::
   >>> plt.imshow(ds.pixel_array, cmap=plt.cm.bone) # doctest: +ELLIPSIS
   <matplotlib.image.AxesImage object at ...>
 
-.. image:: ./auto_examples/input_output/images/sphx_glr_plot_read_dicom_001.png
-   :target: ./auto_examples/input_output/plot_printing_dataset.html
+.. image:: ./../auto_examples/input_output/images/sphx_glr_plot_read_dicom_001.png
+   :target: ./../auto_examples/input_output/plot_printing_dataset.html
    :scale: 60
    :align: center
 

@@ -1,26 +1,42 @@
 # Docs with Sphinx
 
+## Building
+
 This documentation will be automatically built and generated with continuous
- integration, via the [circle.yml](../.circleci/config.yml). You can also 
- generate them locally by installing dependencies (you may need the below):
+ integration, via the [circle.yml](../.circleci/config.yml).
+
+To get started, create a new virtualenv using Python 3:
 
 ```
-pip install Sphinx==1.4
-pip install sphinx_rtd_theme
-pip install alabaster 
-pip install sphinx_bootstrap_theme
+mkvirtualenv -p /path/to/python3.X pydicom-sphinx
+cd pydicom/
+pip install -e .
+pip install sphinx sphinx_rtd_theme sphinx_gallery
+cd doc
 ```
 
-and then to generate:
+However, if you have need to test locally you may not want to use a virtualenv
+or install dependencies. We have provided a
+[Docker container](https://hub.docker.com/r/pydicom/pydicom-docs/) that will
+let you do this.
+
+To build the documentation run:
 
 ```
-cd pydicom/doc
 make html
 ```
 
-However, if you have need to test locally, you may not want to install dependencies. We have provided a [Docker container](https://hub.docker.com/r/pydicom/pydicom-docs/) that will let you do this.
+Cleaning up the generated documentation files is sometimes necessary before
+changes are apparent such as when new reStructuredText files are added, this
+can be done with:
 
-Whether you use the above local approach or the Docker container, when you finish you should then be able to cd into `_build/html` on your local machine and preview with your webserver of choice
+```
+make clean
+```
+
+Whether you use the local approach or the Docker container, when you
+finish you should then be able to cd into `_build/html` on your local machine
+and preview with your browser of choice:
 
 ```
 cd doc/_build/html

@@ -38,7 +38,7 @@ them ...
 
 A property of :class:`dataset.Dataset` called ``pixel_array`` provides more
 useful pixel data for uncompressed and compressed images
-(:doc:`decompressing compressed images if supported </image_data_handlers>`).
+(:doc:`decompressing compressed images if supported <image_data_handlers>`).
 The ``pixel_array`` property returns a NumPy array::
 
   >>> ds.pixel_array # doctest: +NORMALIZE_WHITESPACE

@@ -23,7 +23,7 @@ def tag_in_exception(tag):
 
     Parameters
     ----------
-    tag : pydicom.tag.Tag
+    tag : BaseTag
         The tag to use in the context.
     """
     try:
@@ -38,33 +38,35 @@ def tag_in_exception(tag):
 
 
 def Tag(arg, arg2=None):
-    """Create a Tag.
+    """Create a :class:`BaseTag`.
 
-    General function for creating a Tag in any of the standard forms:
+    General function for creating a :class:`BaseTag` in any of the standard
+    forms:
 
-    * Tag(0x00100015)
-    * Tag('0x00100015')
-    * Tag((0x10, 0x50))
-    * Tag(('0x10', '0x50'))
-    * Tag(0x0010, 0x0015)
-    * Tag(0x10, 0x15)
-    * Tag(2341, 0x10)
-    * Tag('0xFE', '0x0010')
-    * Tag("PatientName")
+    * ``Tag(0x00100015)``
+    * ``Tag('0x00100015')``
+    * ``Tag((0x10, 0x50))``
+    * ``Tag(('0x10', '0x50'))``
+    * ``Tag(0x0010, 0x0015)``
+    * ``Tag(0x10, 0x15)``
+    * ``Tag(2341, 0x10)``
+    * ``Tag('0xFE', '0x0010')``
+    * ``Tag("PatientName")``
 
     Parameters
     ----------
     arg : int or str or 2-tuple/list
-        If int or str, then either the group or the combined
-        group/element number of the DICOM tag. If 2-tuple/list
-        then the (group, element) numbers as int or str.
+        If :class:`int` or :class:`str`, then either the group or the combined
+        group/element number of the DICOM tag. If :class:`tuple` or
+        :class:`list` then the (group, element) numbers as :class:`!int` or
+        :class:`!str`.
     arg2 : int or str, optional
-        The element number of the DICOM tag, required when
-        `arg` only contains the group number of the tag.
+        The element number of the DICOM tag, required when `arg` only contains
+        the group number of the tag.
 
     Returns
     -------
-    pydicom.tag.BaseTag
+    BaseTag
     """
     if isinstance(arg, BaseTag):
         return arg
@@ -131,8 +133,8 @@ else:
 class BaseTag(BaseTag_base_class):
     """Represents a DICOM element (group, element) tag.
 
-    If using python 2.7 then tags are represented as a long, while for python
-    3 they are represented as an int.
+    If using Python 2.7 then tags are represented as a :class:`long`, while for
+    Python 3 they are represented as an :class:`int`.
 
     Attributes
     ----------
@@ -141,17 +143,18 @@ class BaseTag(BaseTag_base_class):
     group : int
         The group number of the tag.
     is_private : bool
-        Returns True if the corresponding element is private, False otherwise.
+        Returns ``True`` if the corresponding element is private, ``False``
+        otherwise.
     """
     # Override comparisons so can convert "other" to Tag as necessary
     #   See Ordering Comparisons at:
     #   http://docs.python.org/dev/3.0/whatsnew/3.0.html
     def __le__(self, other):
-        """Return True if `self`  is less than or equal to `other`."""
+        """Return ``True`` if `self`  is less than or equal to `other`."""
         return self == other or self < other
 
     def __lt__(self, other):
-        """Return True if `self` is less than `other`."""
+        """Return ``True`` if `self` is less than `other`."""
         # Check if comparing with another Tag object; if not, create a temp one
         if not isinstance(other, BaseTag):
             try:
@@ -162,15 +165,15 @@ class BaseTag(BaseTag_base_class):
         return BaseTag_base_class(self) < BaseTag_base_class(other)
 
     def __ge__(self, other):
-        """Return True if `self` is greater than or equal to `other`."""
+        """Return ``True`` if `self` is greater than or equal to `other`."""
         return self == other or self > other
 
     def __gt__(self, other):
-        """Return True if `self` is greater than `other`."""
+        """Return ``True`` if `self` is greater than `other`."""
         return not (self == other or self < other)
 
     def __eq__(self, other):
-        """Return True if `self` equals `other`."""
+        """Return ``True`` if `self` equals `other`."""
         # Check if comparing with another Tag object; if not, create a temp one
         if not isinstance(other, BaseTag_base_class):
             try:
@@ -181,7 +184,7 @@ class BaseTag(BaseTag_base_class):
         return BaseTag_base_class(self) == BaseTag_base_class(other)
 
     def __ne__(self, other):
-        """Return True if `self` does not equal `other`."""
+        """Return ``True`` if `self` does not equal `other`."""
         return not self == other
 
     # For python 3, any override of __cmp__ or __eq__
@@ -199,29 +202,31 @@ class BaseTag(BaseTag_base_class):
 
     @property
     def group(self):
-        """Return the tag's group number."""
+        """Return the tag's group number as :class:`int`."""
         return self >> 16
 
     @property
     def element(self):
-        """Return the tag's element number."""
+        """Return the tag's element number as :class:`int`."""
         return self & 0xffff
 
     elem = element  # alternate syntax
 
     @property
     def is_private(self):
-        """Return True if the tag is private (has an odd group number)."""
+        """Return ``True`` if the tag is private (has an odd group number)."""
         return self.group % 2 == 1
 
     @property
     def is_private_creator(self):
-        """Return True if the tag is a private creator."""
+        """Return ``True`` if the tag is a private creator."""
         return self.is_private and 0x0010 <= self.element < 0x0100
 
 
 def TupleTag(group_elem):
-    """Fast factory for BaseTag object with known safe (group, elem) tuple"""
+    """Fast factory for :class:`BaseTag` object with known safe (group, elem)
+    :class:`tuple`
+    """
     long_value = group_elem[0] << 16 | group_elem[1]
     return BaseTag(long_value)
 

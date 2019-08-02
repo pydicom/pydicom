@@ -44,7 +44,12 @@ def _linkcode_resolve(domain, info, package, url_fmt, revision):
         # Python 2 only
         class_name = class_name.encode('utf-8')
     module = __import__(info['module'], fromlist=[class_name])
-    obj = attrgetter(info['fullname'])(module)
+
+    try:
+        obj = attrgetter(info['fullname'])(module)
+    except AttributeError as exc:
+        # For some reason DataElement.is_undefined_length causes an exception
+        pass
 
     try:
         fn = inspect.getsourcefile(obj)

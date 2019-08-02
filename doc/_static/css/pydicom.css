@@ -68,3 +68,38 @@ div.sphx-glr-download a:hover {
 .section {
     padding-bottom:20px !important;
 }
+
+
+/* pydicom custom */
+
+a:hover {
+    text-decoration: underline;
+}
+
+div.rst-content a:hover {
+    color: #00b0e4 !important;
+}
+
+a.reference code.xref {
+    color: #2980B9 !important;
+    background: none;
+    font-size: 95%;
+}
+
+a.reference code.xref:hover {
+    color: #00b0e4 !important;
+    text-decoration: underline;
+}
+
+code.literal {
+    color: #000000 !important;
+    border: none !important;
+    background: #f2f2f2;
+    font-size: 90%;
+    font-weight: 500 !important;
+    padding: 2px 3px 2px 3px;
+}
+
+ul p {
+    margin-bottom: 0px !important;
+}
