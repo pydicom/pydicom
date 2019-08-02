@@ -171,8 +171,10 @@ class TestCharset(object):
                "allow code extensions, ignoring: ISO 2022 IR 100, "
                "ISO 2022 IR 144")
         with pytest.warns(UserWarning, match=msg):
-            pydicom.charset.decode_element(elem, ['ISO_IR 192', 'ISO 2022 IR 100',
-                                          'ISO 2022 IR 144'])
+            pydicom.charset.decode_element(
+                elem,
+                ['ISO_IR 192', 'ISO 2022 IR 100', 'ISO 2022 IR 144']
+            )
             assert u'Buc^Jérôme' == elem.value
 
     def test_convert_encodings_warnings(self):
@@ -271,7 +273,9 @@ class TestCharset(object):
                            b'Dionysios=\x1b\x2d\x46'
                            b'\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2')
         # correct encoding
-        pydicom.charset.decode_element(elem, ['ISO 2022 IR 100', 'ISO 2022 IR 126'])
+        pydicom.charset.decode_element(
+            elem, ['ISO 2022 IR 100', 'ISO 2022 IR 126']
+        )
         assert u'Dionysios=Διονυσιος' == elem.value
 
         # patched encoding shall behave correctly, but a warning is issued
@@ -301,11 +305,15 @@ class TestCharset(object):
         """Test that the first value is used if no escape code is given"""
         # regression test for #707
         elem = DataElement(0x00100010, 'PN', b'Buc^J\xe9r\xf4me')
-        pydicom.charset.decode_element(elem, ['ISO 2022 IR 100', 'ISO 2022 IR 144'])
+        pydicom.charset.decode_element(
+            elem, ['ISO 2022 IR 100', 'ISO 2022 IR 144']
+        )
         assert u'Buc^Jérôme' == elem.value
 
         elem = DataElement(0x00081039, 'LO', b'R\xf6ntgenaufnahme')
-        pydicom.charset.decode_element(elem, ['ISO 2022 IR 100', 'ISO 2022 IR 144'])
+        pydicom.charset.decode_element(
+            elem, ['ISO 2022 IR 100', 'ISO 2022 IR 144']
+        )
         assert u'Röntgenaufnahme' == elem.value
 
     def test_single_byte_multi_charset_personname(self):
@@ -313,7 +321,9 @@ class TestCharset(object):
         elem = DataElement(0x00100010, 'PN',
                            b'Dionysios=\x1b\x2d\x46'
                            b'\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2')
-        pydicom.charset.decode_element(elem, ['ISO 2022 IR 100', 'ISO 2022 IR 126'])
+        pydicom.charset.decode_element(
+            elem, ['ISO 2022 IR 100', 'ISO 2022 IR 126']
+        )
         assert u'Dionysios=Διονυσιος' == elem.value
 
         # multiple values with different encodings
@@ -332,7 +342,9 @@ class TestCharset(object):
         elem = DataElement(0x00081039, 'LO',
                            b'Dionysios is \x1b\x2d\x46'
                            b'\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2')
-        pydicom.charset.decode_element(elem, ['ISO 2022 IR 100', 'ISO 2022 IR 126'])
+        pydicom.charset.decode_element(
+            elem, ['ISO 2022 IR 100', 'ISO 2022 IR 126']
+        )
         assert u'Dionysios is Διονυσιος' == elem.value
 
         # multiple values with different encodings
