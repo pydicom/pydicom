@@ -454,6 +454,6 @@ class TestCharset(object):
         """Test we get a deprecation warning when using charset.decode()."""
         # Python 3: elem.value is PersonName3, Python 2: elem.value is str
         elem = DataElement(0x00100010, 'PN', 'CITIZEN')
-        msg = r"'charset.decode_element\(\)' is deprecated"
+        msg = r"'charset.decode\(\)' is deprecated"
         with pytest.warns(DeprecationWarning, match=msg):
             pydicom.charset.decode(elem, ['ISO 2022 IR 126'])

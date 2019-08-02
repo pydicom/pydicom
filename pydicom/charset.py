@@ -804,7 +804,7 @@ def decode(data_element, dicom_character_set):
         or ``None``, in which case ``'ISO_IR 6'`` will be used.
     """
     warnings.warn(
-        "'charset.decode_element()' is deprecated and will be removed in "
+        "'charset.decode()' is deprecated and will be removed in "
         "v1.5, use 'charset.decode_element()' instead",
         DeprecationWarning
     )
