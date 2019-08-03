@@ -12,4 +12,5 @@ Representation of DICOM data elements
 
    DataElement
    DataElement_from_raw
+   isMultiValue
    RawDataElement

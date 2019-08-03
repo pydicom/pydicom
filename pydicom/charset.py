@@ -791,7 +791,7 @@ def decode(data_element, dicom_character_set):
     """Apply the DICOM character encoding to a data element
 
     .. deprecated:: 1.4
-       Will be removed in v1.5, use :func:`decode_element` instead.
+       This function is deprecated, use :func:`decode_element` instead.
 
     Parameters
     ----------
