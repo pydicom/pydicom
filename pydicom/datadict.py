@@ -11,7 +11,7 @@ from pydicom._dicom_dict import DicomDictionary
 # those with tags like "(50xx, 0005)"
 from pydicom._dicom_dict import RepeatersDictionary
 from pydicom._private_dict import private_dictionaries
-import warnings
+
 
 # Generate mask dict for checking repeating groups etc.
 # Map a true bitwise mask to the DICOM mask with "x"'s in it.
@@ -447,30 +447,6 @@ def tag_for_keyword(keyword):
         corresponding element's tag, otherwise returns ``None``.
     """
     return keyword_dict.get(keyword)
-
-
-def tag_for_name(name):
-    """Return the tag of the element corresponding to `name`.
-
-    Only performs the lookup for official DICOM elements.
-
-    **This function is deprecated and will be removed in v1.4.**
-
-    Parameters
-    ----------
-    name : str
-        The keyword for the element whose tag is being retrieved.
-
-    Returns
-    -------
-    int or None
-        If the element is in the DICOM data dictionary then returns the
-        corresponding element's tag, otherwise returns ``None``.
-    """
-    msg = "tag_for_name is deprecated.  Use tag_for_keyword instead"
-    warnings.warn(msg, DeprecationWarning)
-
-    return tag_for_keyword(name)
 
 
 def repeater_has_tag(tag):

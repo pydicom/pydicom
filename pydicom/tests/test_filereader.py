@@ -425,12 +425,19 @@ class TestReader(object):
         long_specific_char_set_value = ['ISO 2022IR 100'] * 9
         ds.add(DataElement(0x00080005, 'CS', long_specific_char_set_value))
 
+        msg = (
+            r"Unknown encoding 'ISO 2022IR 100' - using default encoding "
+            r"instead"
+        )
+
         fp = BytesIO()
         file_ds = FileDataset(fp, ds)
-        file_ds.save_as(fp, write_like_original=True)
+        with pytest.warns(UserWarning, match=msg):
+            file_ds.save_as(fp, write_like_original=True)
 
-        ds = dcmread(fp, defer_size=65, force=True)
-        assert long_specific_char_set_value == ds[0x00080005].value
+        with pytest.warns(UserWarning, match=msg):
+            ds = dcmread(fp, defer_size=65, force=True)
+            assert long_specific_char_set_value == ds[0x00080005].value
 
     def test_no_preamble_file_meta_dataset(self):
         """Test correct read of group 2 elements with no preamble."""
