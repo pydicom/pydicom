@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pydicom.datadict.tag_for_name &mdash; pydicom 1.4.0.dev0 documentation</title>
+  <title>pydicom.dataelem.isMultiValue &mdash; pydicom 1.4.0.dev0 documentation</title>
   
 
   
@@ -39,8 +39,8 @@
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="pydicom.datadict.add_private_dict_entries" href="pydicom.datadict.add_private_dict_entries.html" />
-    <link rel="prev" title="pydicom.datadict.tag_for_keyword" href="pydicom.datadict.tag_for_keyword.html" /> 
+    <link rel="next" title="pydicom.dataelem.RawDataElement" href="pydicom.dataelem.RawDataElement.html" />
+    <link rel="prev" title="pydicom.dataelem.DataElement_from_raw" href="pydicom.dataelem.DataElement_from_raw.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -102,29 +102,22 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">API Reference</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../charset.html">Character Encoding and Decoding (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.charset</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../config.html">Configuration Options (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.config</span></code>)</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="../datadict.html">Data Dictionary Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.datadict</span></code>)</a><ul class="current">
-<li class="toctree-l3 current"><a class="reference internal" href="../datadict.html#dicom-data-dictionary">DICOM Data Dictionary</a><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="pydicom.datadict.add_dict_entries.html">pydicom.datadict.add_dict_entries</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.datadict.add_dict_entry.html">pydicom.datadict.add_dict_entry</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.datadict.dictionary_description.html">pydicom.datadict.dictionary_description</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.datadict.dictionary_has_tag.html">pydicom.datadict.dictionary_has_tag</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.datadict.dictionary_is_retired.html">pydicom.datadict.dictionary_is_retired</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.datadict.dictionary_keyword.html">pydicom.datadict.dictionary_keyword</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.datadict.dictionary_VM.html">pydicom.datadict.dictionary_VM</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.datadict.dictionary_VR.html">pydicom.datadict.dictionary_VR</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.datadict.get_entry.html">pydicom.datadict.get_entry</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.datadict.keyword_for_tag.html">pydicom.datadict.keyword_for_tag</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.datadict.mask_match.html">pydicom.datadict.mask_match</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.datadict.repeater_has_keyword.html">pydicom.datadict.repeater_has_keyword</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.datadict.repeater_has_tag.html">pydicom.datadict.repeater_has_tag</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.datadict.tag_for_keyword.html">pydicom.datadict.tag_for_keyword</a></li>
-<li class="toctree-l4 current"><a class="current reference internal" href="#">pydicom.datadict.tag_for_name</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datadict.html">Data Dictionary Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.datadict</span></code>)</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../elem.html">Representation of Data Elements</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../elem.dataelem.html">Data Elements (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dataelem</span></code>)</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="pydicom.dataelem.DataElement.html">pydicom.dataelem.DataElement</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.dataelem.DataElement_from_raw.html">pydicom.dataelem.DataElement_from_raw</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">pydicom.dataelem.isMultiValue</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.dataelem.RawDataElement.html">pydicom.dataelem.RawDataElement</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../datadict.html#private-data-dictionary">Private Data Dictionary</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../elem.tag.html">Element Tags (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.tag</span></code>)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../elem.values.html">Element Value Decoding (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.values</span></code>)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../elem.multival.html">Element Multi-value Representation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.multival</span></code>)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../elem.sequence.html">Sequence Element Value Representation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.sequence</span></code>)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../elem.valuerep.html">Specialized Element Value Representation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.valuerep</span></code>)</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../elem.html">Representation of Data Elements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../dataset.html">Representation of Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dataset</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../handlers.html">Bulk Data Handlers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../dicomdir.html">DICOMDIR (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dicomdir</span></code>)</a></li>
@@ -193,9 +186,11 @@
         
           <li><a href="../index.html">API Reference</a> &raquo;</li>
         
-          <li><a href="../datadict.html">Data Dictionary Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.datadict</span></code>)</a> &raquo;</li>
+          <li><a href="../elem.html">Representation of Data Elements</a> &raquo;</li>
         
-      <li>pydicom.datadict.tag_for_name</li>
+          <li><a href="../elem.dataelem.html">Data Elements (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dataelem</span></code>)</a> &raquo;</li>
+        
+      <li>pydicom.dataelem.isMultiValue</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -212,26 +207,12 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="pydicom-datadict-tag-for-name">
-<h1>pydicom.datadict.tag_for_name<a class="headerlink" href="#pydicom-datadict-tag-for-name" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="pydicom-dataelem-ismultivalue">
+<h1>pydicom.dataelem.isMultiValue<a class="headerlink" href="#pydicom-dataelem-ismultivalue" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
-<dt id="pydicom.datadict.tag_for_name">
-<code class="sig-prename descclassname">pydicom.datadict.</code><code class="sig-name descname">tag_for_name</code><span class="sig-paren">(</span><em class="sig-param">name</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/b5af7824/pydicom/datadict.py#L452"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.datadict.tag_for_name" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the tag of the element corresponding to <cite>name</cite>.</p>
-<p>Only performs the lookup for official DICOM elements.</p>
-<p><strong>This function is deprecated and will be removed in v1.4.</strong></p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The keyword for the element whose tag is being retrieved.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>If the element is in the DICOM data dictionary then returns the
-corresponding element’s tag, otherwise returns <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a> or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)">None</a></p>
-</dd>
-</dl>
+<dt id="pydicom.dataelem.isMultiValue">
+<code class="sig-prename descclassname">pydicom.dataelem.</code><code class="sig-name descname">isMultiValue</code><span class="sig-paren">(</span><em class="sig-param">value</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/e8f42a25/pydicom/dataelem.py#L38"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataelem.isMultiValue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if <cite>value</cite> is list-like (iterable).</p>
 </dd></dl>
 
 </div>
@@ -244,10 +225,10 @@ corresponding element’s tag, otherwise returns <code class="docutils literal n
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="pydicom.datadict.add_private_dict_entries.html" class="btn btn-neutral float-right" title="pydicom.datadict.add_private_dict_entries" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="pydicom.dataelem.RawDataElement.html" class="btn btn-neutral float-right" title="pydicom.dataelem.RawDataElement" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="pydicom.datadict.tag_for_keyword.html" class="btn btn-neutral float-left" title="pydicom.datadict.tag_for_keyword" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="pydicom.dataelem.DataElement_from_raw.html" class="btn btn-neutral float-left" title="pydicom.dataelem.DataElement_from_raw" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
