@@ -34,10 +34,10 @@ class TestDataElement(object):
         self.data_elementCommand = DataElement(0x00000000, 'UL', 100)
         self.data_elementPrivate = DataElement(0x00090000, 'UL', 101)
         self.data_elementRetired = DataElement(0x00080010, 'SH', 102)
-        config.use_none_as_empty_value = False
+        config.use_none_as_empty_text_VR_value = False
 
     def teardown(self):
-        config.use_none_as_empty_value = False
+        config.use_none_as_empty_text_VR_value = False
 
     def test_VM_1(self):
         """DataElement: return correct value multiplicity for VM > 1"""
@@ -435,7 +435,7 @@ class TestDataElement(object):
             'UR': 'CodingSchemeURL',
             'UT': 'StrainAdditionalInformation',
         }
-        config.use_none_as_empty_value = use_none
+        config.use_none_as_empty_text_VR_value = use_none
         ds = Dataset()
         ds.is_little_endian = True
         # set value to new element

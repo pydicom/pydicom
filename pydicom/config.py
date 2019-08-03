@@ -86,11 +86,11 @@ TM to :class:`datetime.date`, :class:`datetime.datetime` and
 Default ``False``
 """
 
-use_none_as_empty_value = False
+use_none_as_empty_text_VR_value = False
 """ If ``True``, the value of decoded empty data element is always ``None``.
-If ``False`` (the default), the value of an empty data element with 
+If ``False`` (the default), the value of an empty data element with
 a text VR is an empty string, for all other VRs it is also ``None``.
-Note that the default of this value will change to ``True`` in version 1.5.
+Note that the default of this value will change to ``True`` in version 2.0.
 """
 
 # Logging system and debug function to change logging level

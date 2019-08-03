@@ -66,11 +66,11 @@ def empty_value_for_VR(VR, raw=False):
 
     Returns
     -------
-    str or None
+    str or bytes or None
         The value a data element with `VR` is assigned on decoding
         if it is empty.
     """
-    if config.use_none_as_empty_value:
+    if config.use_none_as_empty_text_VR_value:
         return None
     if VR in ('AE', 'AS', 'CS', 'DA', 'DT', 'LO', 'LT',
               'PN', 'SH', 'ST', 'TM', 'UC', 'UI', 'UR', 'UT'):
@@ -528,8 +528,11 @@ class DataElement(object):
         return empty_value_for_VR(self.VR)
 
     def clear(self):
-        """Clears the value, e.g. sets it to `None`."""
-        self._value = None
+        """Clears the value, e.g. sets it to the configured empty value.
+
+        See :func:`empty_value_for_VR`.
+        """
+        self._value = self.empty_value
 
     def _convert_value(self, val):
         """Convert `val` to an appropriate type and return the result.
