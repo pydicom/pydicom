@@ -1420,6 +1420,87 @@ class Dataset(dict):
             # All is as expected, updated the Transfer Syntax
             self.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
 
+    def overlay_array(self, group):
+        """Return the *Overlay Data* in `group` as a :class:`numpy.ndarray`.
+
+        Returns
+        -------
+        numpy.ndarray
+            The (`group`,3000) *Overylay Data* converted to a
+            :class:`numpy.ndarray`.
+        """
+        if group < 0x6000 or group > 0x60FF:
+            raise ValueError(
+                "The group part of the 'Overlay Data' element tag must be "
+                "between 0x6000 and 0x60FF (inclusive)"
+            )
+
+        # Find all possible handlers that support the transfer syntax
+        transfer_syntax = self.file_meta.TransferSyntaxUID
+        possible_handlers = [hh for hh in pydicom.config.overlay_data_handlers
+                             if hh.supports_transfer_syntax(transfer_syntax)]
+
+        # No handlers support the transfer syntax
+        if not possible_handlers:
+            raise NotImplementedError(
+                "Unable to decode overlay data with a transfer syntax UID of "
+                "'{0}' ({1}) as there are no overlay data handlers "
+                "available that support it. Please see the pydicom "
+                "documentation for information on supported transfer syntaxes "
+                .format(self.file_meta.TransferSyntaxUID,
+                        self.file_meta.TransferSyntaxUID.name)
+            )
+
+        # Handlers that both support the transfer syntax and have their
+        #   dependencies met
+        available_handlers = [
+            hh for hh in possible_handlers if hh.is_available()
+        ]
+
+        # There are handlers that support the transfer syntax but none of them
+        #   can be used as missing dependencies
+        if not available_handlers:
+            # For each of the possible handlers we want to find which
+            #   dependencies are missing
+            msg = (
+                "The following handlers are available to decode the overlay "
+                "data however they are missing required dependencies: "
+            )
+            pkg_msg = []
+            for hh in possible_handlers:
+                hh_deps = hh.DEPENDENCIES
+                # Missing packages
+                missing = [dd for dd in hh_deps if have_package(dd) is None]
+                # Package names
+                names = [hh_deps[name][1] for name in missing]
+                pkg_msg.append(
+                    "{} (req. {})"
+                    .format(hh.HANDLER_NAME, ', '.join(names))
+                )
+
+            raise RuntimeError(msg + ', '.join(pkg_msg))
+
+        last_exception = None
+        for handler in available_handlers:
+            try:
+                # Use the handler to get a 1D numpy array of the pixel data
+                return handler.get_overlay_array(self, group)
+            except Exception as exc:
+                logger.debug(
+                    "Exception raised by overlay data handler", exc_info=exc
+                )
+                last_exception = exc
+
+        logger.info(
+            "Unable to decode the overlay data using the following handlers: "
+            "{}. Please see the list of supported Transfer Syntaxes in the "
+            "pydicom documentation for alternative packages that might "
+            "be able to decode the data"
+            .format(", ".join([str(hh) for hh in available_handlers]))
+        )
+
+        raise last_exception
+
     @property
     def pixel_array(self):
         """Return the *Pixel Data* as a :class:`numpy.ndarray`.
