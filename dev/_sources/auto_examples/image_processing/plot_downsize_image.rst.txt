@@ -59,7 +59,7 @@ instead of averagin the pixels. Finally, the image is store as a dicom image.
     (0010, 0020) Patient ID                          LO: '4MR1'
     (0010, 0030) Patient's Birth Date                DA: ''
     (0010, 0040) Patient's Sex                       CS: 'F'
-    (0010, 1020) Patient's Size                      DS: ''
+    (0010, 1020) Patient's Size                      DS: None
     (0010, 1030) Patient's Weight                    DS: "80.0000"
     (0018, 0010) Contrast/Bolus Agent                LO: ''
     (0018, 0020) Scanning Sequence                   CS: 'SE'
@@ -73,7 +73,7 @@ instead of averagin the pixels. Finally, the image is store as a dicom image.
     (0018, 0084) Imaging Frequency                   DS: "63.92433900"
     (0018, 0085) Imaged Nucleus                      SH: 'H'
     (0018, 0086) Echo Number(s)                      IS: "1"
-    (0018, 0091) Echo Train Length                   IS: ''
+    (0018, 0091) Echo Train Length                   IS: None
     (0018, 1000) Device Serial Number                LO: '-0000200'
     (0018, 1020) Software Version(s)                 LO: 'V3.51*P25'
     (0018, 1314) Flip Angle                          DS: "90"
@@ -149,7 +149,7 @@ instead of averagin the pixels. Finally, the image is store as a dicom image.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.056 seconds)
+   **Total running time of the script:** ( 0 minutes  0.036 seconds)
 
 
 .. _sphx_glr_download_auto_examples_image_processing_plot_downsize_image.py:

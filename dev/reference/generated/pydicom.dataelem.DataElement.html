@@ -211,12 +211,13 @@
 <h1>pydicom.dataelem.DataElement<a class="headerlink" href="#pydicom-dataelem-dataelement" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="pydicom.dataelem.DataElement">
-<em class="property">class </em><code class="sig-prename descclassname">pydicom.dataelem.</code><code class="sig-name descname">DataElement</code><span class="sig-paren">(</span><em class="sig-param">tag</em>, <em class="sig-param">VR</em>, <em class="sig-param">value</em>, <em class="sig-param">file_value_tell=None</em>, <em class="sig-param">is_undefined_length=False</em>, <em class="sig-param">already_converted=False</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/e8f42a25/pydicom/dataelem.py#L66"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataelem.DataElement" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">pydicom.dataelem.</code><code class="sig-name descname">DataElement</code><span class="sig-paren">(</span><em class="sig-param">tag</em>, <em class="sig-param">VR</em>, <em class="sig-param">value</em>, <em class="sig-param">file_value_tell=None</em>, <em class="sig-param">is_undefined_length=False</em>, <em class="sig-param">already_converted=False</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/89ce6d7e/pydicom/dataelem.py#L109"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataelem.DataElement" title="Permalink to this definition">¶</a></dt>
 <dd><p>Contain and manipulate a DICOM Element.</p>
 <p class="rubric">Examples</p>
 <p>While its possible to create a new <a class="reference internal" href="#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataElement</span></code></a> directly and add
 it to a <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">elem</span> <span class="o">=</span> <span class="n">DataElement</span><span class="p">(</span><span class="mh">0x00100010</span><span class="p">,</span> <span class="s1">&#39;PN&#39;</span><span class="p">,</span> <span class="s1">&#39;CITIZEN^Joan&#39;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="k">import</span> <span class="n">Dataset</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">elem</span> <span class="o">=</span> <span class="n">DataElement</span><span class="p">(</span><span class="mh">0x00100010</span><span class="p">,</span> <span class="s1">&#39;PN&#39;</span><span class="p">,</span> <span class="s1">&#39;CITIZEN^Joan&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span>
 </pre></div>
@@ -226,6 +227,22 @@ to add a new <a class="reference internal" href="#pydicom.dataelem.DataElement" 
 automatically from the DICOM dictionary:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">PatientName</span> <span class="o">=</span> <span class="s1">&#39;CITIZEN^Joan&#39;</span>
+</pre></div>
+</div>
+<p>Empty DataElement objects (e.g. with VM = 0) show an empty string as
+value for text VRs and <cite>None</cite> for non-text (binary) VRs:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">PatientName</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">PatientName</span>
+<span class="go">&#39;&#39;</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">BitsAllocated</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">BitsAllocated</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">BitsAllocated</span><span class="p">)</span>
+<span class="go">&#39;None&#39;</span>
 </pre></div>
 </div>
 <dl class="attribute">
@@ -362,7 +379,7 @@ elements this will return an empty string <code class="docutils literal notransl
 
 <dl class="method">
 <dt id="pydicom.dataelem.DataElement.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">tag</em>, <em class="sig-param">VR</em>, <em class="sig-param">value</em>, <em class="sig-param">file_value_tell=None</em>, <em class="sig-param">is_undefined_length=False</em>, <em class="sig-param">already_converted=False</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/e8f42a25/pydicom/dataelem.py#L137"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataelem.DataElement.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">tag</em>, <em class="sig-param">VR</em>, <em class="sig-param">value</em>, <em class="sig-param">file_value_tell=None</em>, <em class="sig-param">is_undefined_length=False</em>, <em class="sig-param">already_converted=False</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/89ce6d7e/pydicom/dataelem.py#L195"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataelem.DataElement.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a new <a class="reference internal" href="#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataElement</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -402,13 +419,16 @@ conversion to a value with VM &gt; 1. Default is <code class="docutils literal n
 <tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.dataelem.DataElement.__init__" title="pydicom.dataelem.DataElement.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(tag, VR, value[, file_value_tell, …])</p></td>
 <td><p>Create a new <a class="reference internal" href="#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataElement</span></code></a>.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.dataelem.DataElement.description" title="pydicom.dataelem.DataElement.description"><code class="xref py py-obj docutils literal notranslate"><span class="pre">description</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.dataelem.DataElement.clear" title="pydicom.dataelem.DataElement.clear"><code class="xref py py-obj docutils literal notranslate"><span class="pre">clear</span></code></a>()</p></td>
+<td><p>Clears the value, e.g.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.dataelem.DataElement.description" title="pydicom.dataelem.DataElement.description"><code class="xref py py-obj docutils literal notranslate"><span class="pre">description</span></code></a>()</p></td>
 <td><p>Return the DICOM dictionary name for the element as <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.dataelem.DataElement.from_json" title="pydicom.dataelem.DataElement.from_json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_json</span></code></a>(dataset_class, tag, vr, value, …)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.dataelem.DataElement.from_json" title="pydicom.dataelem.DataElement.from_json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_json</span></code></a>(dataset_class, tag, vr, value, …)</p></td>
 <td><p>Return a <a class="reference internal" href="#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataElement</span></code></a> from JSON.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.dataelem.DataElement.to_json" title="pydicom.dataelem.DataElement.to_json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_json</span></code></a>(bulk_data_element_handler, …)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.dataelem.DataElement.to_json" title="pydicom.dataelem.DataElement.to_json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_json</span></code></a>(bulk_data_element_handler, …)</p></td>
 <td><p>Converts a <a class="reference internal" href="#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataElement</span></code></a> to JSON representation.</p></td>
 </tr>
 </tbody>
@@ -425,6 +445,12 @@ conversion to a value with VM &gt; 1. Default is <code class="docutils literal n
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pydicom.dataelem.DataElement.descripWidth" title="pydicom.dataelem.DataElement.descripWidth"><code class="xref py py-obj docutils literal notranslate"><span class="pre">descripWidth</span></code></a></p></td>
 <td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.dataelem.DataElement.empty_value" title="pydicom.dataelem.DataElement.empty_value"><code class="xref py py-obj docutils literal notranslate"><span class="pre">empty_value</span></code></a></p></td>
+<td><p>Return the value for an empty element.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.dataelem.DataElement.is_empty" title="pydicom.dataelem.DataElement.is_empty"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_empty</span></code></a></p></td>
+<td><p>Return <cite>True</cite> if the element has no value.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_raw</span></code></p></td>
 <td><p></p></td>
@@ -459,14 +485,36 @@ conversion to a value with VM &gt; 1. Default is <code class="docutils literal n
 </dd></dl>
 
 <dl class="method">
+<dt id="pydicom.dataelem.DataElement.clear">
+<code class="sig-name descname">clear</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/89ce6d7e/pydicom/dataelem.py#L532"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataelem.DataElement.clear" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clears the value, e.g. sets it to the configured empty value.</p>
+<p>See <code class="xref py py-func docutils literal notranslate"><span class="pre">empty_value_for_VR()</span></code>.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="pydicom.dataelem.DataElement.description">
-<code class="sig-name descname">description</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/e8f42a25/pydicom/dataelem.py#L596"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataelem.DataElement.description" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">description</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/89ce6d7e/pydicom/dataelem.py#L681"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataelem.DataElement.description" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the DICOM dictionary name for the element as <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="pydicom.dataelem.DataElement.empty_value">
+<em class="property">property </em><code class="sig-name descname">empty_value</code><a class="headerlink" href="#pydicom.dataelem.DataElement.empty_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the value for an empty element.</p>
+<p>See <code class="xref py py-func docutils literal notranslate"><span class="pre">empty_value_for_VR()</span></code> for more information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The value this data element is assigned on decoding if it is empty.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a> or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)">None</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
 <dt id="pydicom.dataelem.DataElement.from_json">
-<em class="property">classmethod </em><code class="sig-name descname">from_json</code><span class="sig-paren">(</span><em class="sig-param">dataset_class</em>, <em class="sig-param">tag</em>, <em class="sig-param">vr</em>, <em class="sig-param">value</em>, <em class="sig-param">value_key</em>, <em class="sig-param">bulk_data_uri_handler=None</em>, <em class="sig-param">encodings=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/e8f42a25/pydicom/dataelem.py#L196"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataelem.DataElement.from_json" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">from_json</code><span class="sig-paren">(</span><em class="sig-param">dataset_class</em>, <em class="sig-param">tag</em>, <em class="sig-param">vr</em>, <em class="sig-param">value</em>, <em class="sig-param">value_key</em>, <em class="sig-param">bulk_data_uri_handler=None</em>, <em class="sig-param">encodings=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/89ce6d7e/pydicom/dataelem.py#L254"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataelem.DataElement.from_json" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a <a class="reference internal" href="#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataElement</span></code></a> from JSON.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -489,6 +537,12 @@ that data element (retrieved via DICOMweb WADO-RS)</p></li>
 <dd class="field-odd"><p><a class="reference internal" href="#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement">DataElement</a></p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pydicom.dataelem.DataElement.is_empty">
+<em class="property">property </em><code class="sig-name descname">is_empty</code><a class="headerlink" href="#pydicom.dataelem.DataElement.is_empty" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return <cite>True</cite> if the element has no value.</p>
 </dd></dl>
 
 <dl class="method">
@@ -517,7 +571,7 @@ that data element (retrieved via DICOMweb WADO-RS)</p></li>
 
 <dl class="method">
 <dt id="pydicom.dataelem.DataElement.to_json">
-<code class="sig-name descname">to_json</code><span class="sig-paren">(</span><em class="sig-param">bulk_data_element_handler</em>, <em class="sig-param">bulk_data_threshold</em>, <em class="sig-param">dump_handler</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/e8f42a25/pydicom/dataelem.py#L323"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataelem.DataElement.to_json" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">to_json</code><span class="sig-paren">(</span><em class="sig-param">bulk_data_element_handler</em>, <em class="sig-param">bulk_data_threshold</em>, <em class="sig-param">dump_handler</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/89ce6d7e/pydicom/dataelem.py#L381"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataelem.DataElement.to_json" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts a <a class="reference internal" href="#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataElement</span></code></a> to JSON representation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>

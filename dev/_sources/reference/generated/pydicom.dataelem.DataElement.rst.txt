@@ -14,6 +14,7 @@ pydicom.dataelem.DataElement
    .. autosummary::
    
       ~DataElement.__init__
+      ~DataElement.clear
       ~DataElement.description
       ~DataElement.from_json
       ~DataElement.to_json
@@ -28,6 +29,8 @@ pydicom.dataelem.DataElement
    
       ~DataElement.VM
       ~DataElement.descripWidth
+      ~DataElement.empty_value
+      ~DataElement.is_empty
       ~DataElement.is_raw
       ~DataElement.is_retired
       ~DataElement.keyword

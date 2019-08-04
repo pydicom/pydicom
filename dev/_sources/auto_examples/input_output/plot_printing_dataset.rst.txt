@@ -49,7 +49,7 @@ This example illustrates how to print the data set in your own format.
      Patient ID = '4MR1'
      Patient's Birth Date = ''
      Patient's Sex = 'F'
-     Patient's Size = ''
+     Patient's Size = None
      Patient's Weight = "80.0000"
      Contrast/Bolus Agent = ''
      Scanning Sequence = 'SE'
@@ -63,7 +63,7 @@ This example illustrates how to print the data set in your own format.
      Imaging Frequency = "63.92433900"
      Imaged Nucleus = 'H'
      Echo Number(s) = "1"
-     Echo Train Length = ''
+     Echo Train Length = None
      Device Serial Number = '-0000200'
      Software Version(s) = 'V3.51*P25'
      Flip Angle = "90"
@@ -154,7 +154,7 @@ This example illustrates how to print the data set in your own format.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.054 seconds)
+   **Total running time of the script:** ( 0 minutes  0.039 seconds)
 
 
 .. _sphx_glr_download_auto_examples_input_output_plot_printing_dataset.py:
