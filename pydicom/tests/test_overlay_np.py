@@ -431,10 +431,8 @@ class TestNumpy_NumpyHandler(object):
             arr = ds.overlay_array(0x6000)
 
             assert arr.flags.writeable
-
             assert arr.max() == 1
             assert arr.min() == 0
-
             assert 29 == sum(arr[422, 393:422])
 
     @pytest.mark.skip(reason='No dataset available')
@@ -447,7 +445,6 @@ class TestNumpy_NumpyHandler(object):
             arr = ds.pixel_array
 
             assert arr.flags.writeable
-
             assert arr.max() == 1
             assert arr.min() == 0
 
@@ -501,6 +498,16 @@ class TestNumpy_NumpyHandler(object):
             arr = ds.overlay_array(0x5FFF)
         with pytest.raises(ValueError, match=msg):
             arr = ds.overlay_array(0x6100)
+
+    def test_no_frames(self):
+        """Test handler with no NumberOfFramesInOverlay element."""
+        ds = dcmread(EXPL_1_1_1F)
+        del ds[0x6000, 0x0015]
+        arr = ds.overlay_array(0x6000)
+
+        assert arr.max() == 1
+        assert arr.min() == 0
+        assert 29 == sum(arr[422, 393:422])
 
 
 # Tests for numpy_handler module with Numpy available

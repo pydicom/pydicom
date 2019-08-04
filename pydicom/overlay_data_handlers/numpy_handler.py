@@ -223,7 +223,6 @@ def get_overlay_array(ds, group):
         'OverlayBitsAllocated': ds.get((group, 0x0100), None),
         'OverlayRows': ds.get((group, 0x0010), None),
         'OverlayColumns': ds.get((group, 0x0011), None),
-        'NumberOfFramesInOverlay': ds.get((group, 0x0015), 1),
     }
 
     missing = [kk for kk, vv in elem.items() if vv is None]
@@ -235,6 +234,13 @@ def get_overlay_array(ds, group):
 
     # Grab the element values
     elem = {kk: vv.value for kk, vv in elem.items()}
+
+    # Add in if not present
+    nr_frames = ds.get((group, 0x0015), None)
+    if nr_frames is None:
+        elem['NumberOfFramesInOverlay'] = 1
+    else:
+        elem['NumberOfFramesInOverlay'] = nr_frames.value
 
     # Calculate the expected length of the pixel data (in bytes)
     #   Note: this does NOT include the trailing null byte for odd length data
