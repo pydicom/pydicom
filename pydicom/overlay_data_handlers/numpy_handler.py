@@ -219,14 +219,14 @@ def get_overlay_array(ds, group):
 
     # Check required elements
     elem = {
-        'OverlayData' : ds.get((group, 0x3000), None),
-        'OverlayBitsAllocated' : ds.get((group, 0x0100), None),
-        'OverlayRows' : ds.get((group, 0x0010), None),
-        'OverlayColumns' : ds.get((group, 0x0011), None),
-        'NumberOfFramesInOverlay' : ds.get((group, 0x0015), None),
+        'OverlayData': ds.get((group, 0x3000), None),
+        'OverlayBitsAllocated': ds.get((group, 0x0100), None),
+        'OverlayRows': ds.get((group, 0x0010), None),
+        'OverlayColumns': ds.get((group, 0x0011), None),
+        'NumberOfFramesInOverlay': ds.get((group, 0x0015), None),
     }
 
-    missing = [kk for kk,vv in elem.items() if vv is None]
+    missing = [kk for kk, vv in elem.items() if vv is None]
     if missing:
         raise AttributeError(
             "Unable to convert the overlay data as the following required "
@@ -234,7 +234,7 @@ def get_overlay_array(ds, group):
         )
 
     # Grab the element values
-    elem = {kk:vv.value for kk,vv in elem.items()}
+    elem = {kk: vv.value for kk, vv in elem.items()}
 
     # Calculate the expected length of the pixel data (in bytes)
     #   Note: this does NOT include the trailing null byte for odd length data

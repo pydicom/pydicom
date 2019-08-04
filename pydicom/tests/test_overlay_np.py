@@ -289,6 +289,13 @@ class TestNoNumpy_NumpyHandler(object):
                 ds.overlay_array(0x6000)
 
 
+@pytest.mark.skipif(HAVE_NP, reason='Numpy is available')
+def test_reshape_pixel_array_raises():
+    """Test that reshape_overlay_array raises exception without numpy."""
+    with pytest.raises(ImportError, match="Numpy is required to reshape"):
+        reshape_overlay_array(None, None)
+
+
 # Numpy is available, the numpy handler is unavailable
 @pytest.mark.skipif(not HAVE_NP, reason='Numpy is unavailable')
 class TestNumpy_NoNumpyHandler(object):
@@ -353,7 +360,7 @@ REFERENCE_DATA_LITTLE = [
     # fpath, (syntax, bits, nr samples, pixel repr, nr frames, shape, dtype,
     #   group)
     (EXPL_1_1_1F, (EXPL, 1, 1, 0, 1, (484, 484), 'uint8', 0x6000)),
-    #(EXPL_1_1_3F, (EXPL, 1, 1, 0, 3, (3, 512, 512), 'uint8', 0x6000)),
+    # (EXPL_1_1_3F, (EXPL, 1, 1, 0, 3, (3, 512, 512), 'uint8', 0x6000)),
 ]
 
 
@@ -406,8 +413,6 @@ class TestNumpy_NumpyHandler(object):
             assert data[5] == arr.shape
             assert arr.dtype == data[6]
 
-            # Default to 1 if element not present
-            #nr_frames = getattr(ds, 'NumberOfFrames', 1)
             # Odd sized data is padded by a final 0x00 byte
             rows = ds[group, 0x0010].value
             columns = ds[group, 0x0011].value
@@ -505,9 +510,9 @@ class TestNumpy_GetOverlayArray(object):
     def test_no_overlay_data_raises(self):
         """Test get_overlay_array raises if dataset has no OverlayData."""
         ds = dcmread(EXPL_1_1_1F)
-        del ds[0x6000,0x3000]
-        assert (0x6000,0x3000) not in ds
-        with pytest.raises(AttributeError, match=' dataset: OverlayData'):
+        del ds[0x6000, 0x3000]
+        assert (0x6000, 0x3000) not in ds
+        with pytest.raises(AttributeError, match=r' dataset: OverlayData'):
             get_overlay_array(ds, 0x6000)
 
     def test_unsupported_syntax_raises(self):
@@ -515,14 +520,14 @@ class TestNumpy_GetOverlayArray(object):
         ds = dcmread(EXPL_1_1_1F)
         ds.file_meta.TransferSyntaxUID = '1.2.840.10008.1.2.4.50'
         with pytest.raises(NotImplementedError,
-                           match=' the transfer syntax is not supported'):
+                           match=r' the transfer syntax is not supported'):
             get_overlay_array(ds, 0x6000)
 
     def test_bad_length_raises(self):
         """Test bad pixel data length raises exception."""
         ds = dcmread(EXPL_1_1_1F)
         # Too short
-        ds[0x6000,0x3000].value = ds[0x6000,0x3000][:-1]
+        ds[0x6000, 0x3000].value = ds[0x6000, 0x3000][:-1]
         msg = (
             r"The length of the overlay data in the dataset \(29281 bytes\) "
             r"doesn't match the expected length \(29282 bytes\). "
@@ -538,8 +543,23 @@ class TestNumpy_GetOverlayArray(object):
         # Edit shape
         ds[0x6000, 0x0010].value = 15  # OverlayRows
         ds[0x6000, 0x0011].value = 14  # OverlayColumns
-        ds[0x6000, 0x3000].value = ds[0x6000, 0x3000].value[:27] # 15 * 14 / 8
-        msg = "The overlay data length is odd and misses a padding byte."
+        ds[0x6000, 0x3000].value = ds[0x6000, 0x3000].value[:27]  # 15 * 14 / 8
+        msg = r"The overlay data length is odd and misses a padding byte."
+        with pytest.warns(UserWarning, match=msg):
+            get_overlay_array(ds, 0x6000)
+
+    def test_excess_padding(self):
+        """A warning shall be issued excess padding present."""
+        ds = dcmread(EXPL_1_1_1F)
+        # Edit shape
+        ds[0x6000, 0x0010].value = 15  # OverlayRows
+        ds[0x6000, 0x0011].value = 14  # OverlayColumns
+        overlay_data = ds[0x6000, 0x3000].value[:27] + b'\x00\x00\x00'
+        ds[0x6000, 0x3000].value = overlay_data
+        msg = (
+            r"overlay data in the dataset \(30 bytes\) indicates it contains "
+            r"excess padding. 3 bytes will be removed"
+        )
         with pytest.warns(UserWarning, match=msg):
             get_overlay_array(ds, 0x6000)
 
@@ -716,10 +736,10 @@ class TestNumpy_GetExpectedLength(object):
     def test_length_in_bytes(self, shape, bits, length):
         """Test get_expected_length(ds, unit='bytes')."""
         elem = {
-            'OverlayRows' : shape[1],
-            'OverlayColumns' : shape[2],
-            'OverlayBitsAllocated' : bits,
-            'NumberOfFramesInOverlay' : shape[0],
+            'OverlayRows': shape[1],
+            'OverlayColumns': shape[2],
+            'OverlayBitsAllocated': bits,
+            'NumberOfFramesInOverlay': shape[0],
         }
 
         assert length[0] == get_expected_length(elem, unit='bytes')
@@ -728,10 +748,10 @@ class TestNumpy_GetExpectedLength(object):
     def test_length_in_pixels(self, shape, bits, length):
         """Test get_expected_length(ds, unit='pixels')."""
         elem = {
-            'OverlayRows' : shape[1],
-            'OverlayColumns' : shape[2],
-            'OverlayBitsAllocated' : bits,
-            'NumberOfFramesInOverlay' : shape[0],
+            'OverlayRows': shape[1],
+            'OverlayColumns': shape[2],
+            'OverlayBitsAllocated': bits,
+            'NumberOfFramesInOverlay': shape[0],
         }
 
         assert length[1] == get_expected_length(elem, unit='pixels')
