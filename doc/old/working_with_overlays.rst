@@ -16,16 +16,15 @@ Overlays in DICOM are present in what's called a :dcm:`Repeating Group
 over a range rather than a specific value. For example, the group number of
 (60xx,3000) *Overlay Data* may be 6000, 6002, or any even value up to 601E.
 This allows a dataset to include multiple overlays, where the related elements
-for each overlay use the same group number.
-
-Because of this, the only way to access a particular element from an overlay
-is to use the ``Dataset[group, elem]`` method:
+for each overlay use the same group number. Because of this, the only way to
+access a particular element from an overlay is to use the
+``Dataset[group, elem]`` method:
 
 >>> import pydicom
 >>> from pydicom.data import get_testdata_files
 >>> fpath = get_testdata_files("MR-SIEMENS-DICOM-WithOverlays.dcm")[0]
 >>> ds = pydicom.dcmread(fpath)
->>> elem = ds[0x6000, 0x3000]  # returns the DataElement
+>>> elem = ds[0x6000, 0x3000]  # returns a DataElement
 >>> print(elem)
 (6000, 3000) Overlay Data                        OW: Array of 29282 elements
 
@@ -36,18 +35,17 @@ it doesn't do anything with overlay data except read in the raw bytes::
   >>> ds[0x6000, 0x3000].value # doctest: +ELLIPSIS
   b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00...
 
-``Dataset.overlay_array``
--------------------------
+``Dataset.overlay_array()``
+---------------------------
 
 .. warning::
 
-   :meth:`Dataset.overlay_array <pydicom.dataset.Dataset.overlay_array>`
+   :meth:`Dataset.overlay_array()<pydicom.dataset.Dataset.overlay_array>`
    requires `NumPy <http://numpy.org/>`_.
 
 The *Overlay Data* element contains the raw bytes exactly as found in the file
 as bit-packed data. To unpack and get an overlay in a more useful form you
-can use the :meth:`Dataset.overlay_array
-<pydicom.dataset.Dataset.overlay_array>` method to return a
+can use the :meth:`~pydicom.dataset.Dataset.overlay_array` method to return a
 :class:`numpy.ndarray`. To use it you simply pass the group number of the
 overlay elements you're interested in::
 
@@ -81,6 +79,6 @@ they must be bit-packed and written back to the correct element:
 
 Some changes may require other DICOM tags to be modified. For example, if the
 overlay data is reduced (e.g. a :math:`512 \times 512` image is collapsed to
-:math:`256 \times 256`) then the corresponding (60xx,0010) * Overlay Rows* and
+:math:`256 \times 256`) then the corresponding (60xx,0010) *Overlay Rows* and
 (60xx,0011) *Overlay Columns* should be set appropriately. You must explicitly
 set these yourself; pydicom does not do so automatically.
