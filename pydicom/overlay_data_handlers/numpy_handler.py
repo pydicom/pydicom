@@ -223,7 +223,7 @@ def get_overlay_array(ds, group):
         'OverlayBitsAllocated': ds.get((group, 0x0100), None),
         'OverlayRows': ds.get((group, 0x0010), None),
         'OverlayColumns': ds.get((group, 0x0011), None),
-        'NumberOfFramesInOverlay': ds.get((group, 0x0015), None),
+        'NumberOfFramesInOverlay': ds.get((group, 0x0015), 1),
     }
 
     missing = [kk for kk, vv in elem.items() if vv is None]
