@@ -1,6 +1,6 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Use the `numpy <https://numpy.org/>`_ package to convert supported *Pixel
-Data* to an :class:`numpy.ndarray`.
+Data* to a :class:`numpy.ndarray`.
 
 **Supported transfer syntaxes**
 

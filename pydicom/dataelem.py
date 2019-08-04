@@ -38,7 +38,7 @@ if not in_py2:
 def isMultiValue(value):
     """Return ``True`` if `value` is list-like (iterable).
 
-    .. deprecation:: 1.3
+    .. deprecated:: 1.3
        This function is deprecated, use :attr:`DataElement.VM` instead.
 
     """

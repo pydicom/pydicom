@@ -100,7 +100,7 @@ overlay_data_handlers = [
 .. currentmodule:: pydicom.dataset
 
 This is an ordered list of *Overlay Data* handlers that the
-:meth:'~Dataset.overlay_array' method will use to try to extract a correctly
+:meth:`~Dataset.overlay_array` method will use to try to extract a correctly
 sized numpy array from an *Overlay Data* element.
 
 Handlers shall have three methods:
@@ -113,20 +113,20 @@ def is_available():
     Return ``True`` if the handler's dependencies are installed, ``False``
     otherwise.
 
-def get_overlay_array(ds):
+def get_overlay_array(ds, group):
     Return a correctly dimensioned :class:`numpy.ndarray` derived from the
-    *Overlay Data* in :class:`Dataset` `ds` or raise an exception.
+    *Overlay Data* with element tag `group`, in :class:`Dataset` `ds` or raise
+    an exception.
 
 
 The first handler that both announces that it supports the transfer syntax
 and does not raise an exception is the handler that will provide the
 data.
 
-If they all fail only the last exception is raised.
+If all handlers fail to convert the data only the last exception is raised.
 
 If none raise an exception, but they all refuse to support the transfer
-syntax, then this fact is announced in a :class:`NotImplementedError`
-exception.
+syntax, then a :class:`NotImplementedError` is raised.
 """
 
 import pydicom.pixel_data_handlers.numpy_handler as np_handler  # noqa

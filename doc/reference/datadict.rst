@@ -27,7 +27,6 @@ DICOM Data Dictionary
    repeater_has_keyword
    repeater_has_tag
    tag_for_keyword
-   tag_for_name
 
 Private Data Dictionary
 -----------------------

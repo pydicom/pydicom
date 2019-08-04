@@ -13,3 +13,8 @@ Fixes
 * Fixed handling of data too large to written in explicit transfer syntax
 * Fixed handling of known tags with VR UN (:issue:`899`)
 
+Enhancements
+............
+
+* Added support for converting (60xx,3000) *Overlay Data* to a numpy ndarray
+  using `Dataset.overlay_array()` (issue:`912`).

@@ -1,6 +1,6 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Use the `numpy <https://numpy.org/>`_ package to convert RLE lossless *Pixel
-Data* to an ndarray.
+Data* to a :class:`numpy.ndarray`.
 
 **Supported transfer syntaxes**
 

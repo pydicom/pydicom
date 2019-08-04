@@ -1,6 +1,6 @@
 # Copyright 2008-2019 pydicom authors. See LICENSE file for details.
 """Use the `numpy <https://numpy.org/>`_ package to convert supported *Overlay
-Data* to an :class:`numpy.ndarray`.
+Data* to a :class:`numpy.ndarray`.
 
 **Supported transfer syntaxes**
 
@@ -22,11 +22,11 @@ table below.
 +-------------+---------------------------+------+ values       |
 | Tag         | Keyword                   | Type |              |
 +=============+===========================+======+==============+
-| (60xx,0015) | NumberOfFramesInOverlay   | 1    | N            |
+| (60xx,0010) | OverlayRows               | 1    | N > 0        |
 +-------------+---------------------------+------+--------------+
-| (60xx,0010) | OverlayRows               | 1    | N            |
+| (60xx,0011) | OverlayColumns            | 1    | N > 0        |
 +-------------+---------------------------+------+--------------+
-| (60xx,0011) | OverlayColumns            | 1    | N            |
+| (60xx,0015) | NumberOfFramesInOverlay   | 1    | N > 0        |
 +-------------+---------------------------+------+--------------+
 | (60xx,0100) | OverlayBitsAllocated      | 1    | 1            |
 +-------------+---------------------------+------+--------------+
@@ -87,17 +87,17 @@ def get_expected_length(elem, unit='bytes'):
     +-------------+---------------------------+------+ optional    |
     | Tag         | Keyword                   | Type |             |
     +=============+===========================+======+=============+
-    | (60xx,0015) | NumberOfFramesInOverlay   | 1    | Required    |
-    +-------------+---------------------------+------+-------------+
     | (60xx,0010) | OverlayRows               | 1    | Required    |
     +-------------+---------------------------+------+-------------+
     | (60xx,0011) | OverlayColumns            | 1    | Required    |
+    +-------------+---------------------------+------+-------------+
+    | (60xx,0015) | NumberOfFramesInOverlay   | 1    | Required    |
     +-------------+---------------------------+------+-------------+
 
     Parameters
     ----------
     elem : dict
-        A dict with the keys as the element keywords and values the
+        A :class:`dict` with the keys as the element keywords and values the
         corresponding element values (such as ``{'OverlayRows': 512, ...}``)
         for the elements listed in the table above.
     unit : str, optional
@@ -132,17 +132,17 @@ def reshape_overlay_array(elem, arr):
     +-------------+---------------------------+------+ values       |
     | Tag         | Keyword                   | Type |              |
     +=============+===========================+======+==============+
-    | (60xx,0015) | NumberOfFramesInOverlay   | 1    | N > 0        |
-    +-------------+---------------------------+------+--------------+
     | (60xx,0010) | OverlayRows               | 1    | N > 0        |
     +-------------+---------------------------+------+--------------+
     | (60xx,0011) | OverlayColumns            | 1    | N > 0        |
+    +-------------+---------------------------+------+--------------+
+    | (60xx,0015) | NumberOfFramesInOverlay   | 1    | N > 0        |
     +-------------+---------------------------+------+--------------+
 
     Parameters
     ----------
     elem : dict
-        A dict with the keys as the element keywords and values the
+        A :class:`dict` with the keys as the element keywords and values the
         corresponding element values (such as ``{'OverlayRows': 512, ...}``)
         for the elements listed in the table above.
     arr : numpy.ndarray
@@ -154,14 +154,14 @@ def reshape_overlay_array(elem, arr):
         A reshaped array containing the overlay data. The shape of the array
         depends on the contents of the dataset:
 
-        * For single frame, single sample data (rows, columns)
-        * For multi-frame, single sample data (frames, rows, columns)
+        * For single frame data (rows, columns)
+        * For multi-frame data (frames, rows, columns)
 
     References
     ----------
 
-    * DICOM Standard, Part 3,
-      :dcm:`Annex C.7.6.3.1<part03/sect_C.7.6.3.html#sect_C.7.6.3.1>`
+    * DICOM Standard, Part 3, Sections :dcm:`C.9.2<part03/sect_C.9.2.html>`
+      and :dcm:`C.9.3<part03/sect_C.9.3.html>`
     * DICOM Standard, Part 5, :dcm:`Section 8.2<part05/sect_8.2.html>`
     """
     if not HAVE_NP:

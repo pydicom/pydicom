@@ -1426,7 +1426,7 @@ class Dataset(dict):
         Returns
         -------
         numpy.ndarray
-            The (`group`,3000) *Overylay Data* converted to a
+            The (`group`,3000) *Overlay Data* converted to a
             :class:`numpy.ndarray`.
         """
         if group < 0x6000 or group > 0x60FF:
