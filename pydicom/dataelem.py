@@ -30,9 +30,52 @@ from pydicom import jsonrep
 import pydicom.valuerep  # don't import DS directly as can be changed by config
 
 from pydicom.valuerep import PersonNameUnicode
+
 if not in_py2:
     from pydicom.valuerep import PersonName3 as PersonNameUnicode
-    PersonName = PersonNameUnicode
+
+PersonName = PersonNameUnicode
+
+BINARY_VR_VALUES = [
+    'US', 'SS', 'UL', 'SL', 'OW', 'OB', 'OL', 'UN',
+    'OB or OW', 'US or OW', 'US or SS or OW', 'FL', 'FD', 'OF', 'OD'
+]
+
+
+def empty_value_for_VR(VR, raw=False):
+    """Return the value for an empty element for `VR`.
+
+    The behavior of this property depends on the setting of
+    :attr:`config.use_none_as_empty_value`. If that is set to ``True``,
+    an empty value is always represented by ``None``, otherwise it depends
+    on `VR`. For text VRs (not including VRs that represent a number in
+    textual representation) an empty string is used as empty value
+    representation, for all other VRs, ``None``.
+    Note that this is used only if decoding the element - it is always
+    possible to set the value to another empty value representation,
+    which will be preserved during the element object lifetime.
+
+    Parameters
+    ----------
+    VR : str
+        The VR of the corresponding element.
+
+    raw : bool
+        If ``True``, returns the value for a :class:`RawDataElement`,
+        otherwise for a :class:`DataElement`
+
+    Returns
+    -------
+    str or bytes or None
+        The value a data element with `VR` is assigned on decoding
+        if it is empty.
+    """
+    if config.use_none_as_empty_text_VR_value:
+        return None
+    if VR in ('AE', 'AS', 'CS', 'DA', 'DT', 'LO', 'LT',
+              'PN', 'SH', 'ST', 'TM', 'UC', 'UI', 'UR', 'UT'):
+        return b'' if raw else ''
+    return None
 
 
 def isMultiValue(value):
@@ -72,6 +115,7 @@ class DataElement(object):
     While its possible to create a new :class:`DataElement` directly and add
     it to a :class:`~pydicom.dataset.Dataset`:
 
+    >>> from pydicom import Dataset
     >>> elem = DataElement(0x00100010, 'PN', 'CITIZEN^Joan')
     >>> ds = Dataset()
     >>> ds.add(elem)
@@ -82,6 +126,20 @@ class DataElement(object):
 
     >>> ds = Dataset()
     >>> ds.PatientName = 'CITIZEN^Joan'
+
+    Empty DataElement objects (e.g. with VM = 0) show an empty string as
+    value for text VRs and `None` for non-text (binary) VRs:
+
+    >>> ds = Dataset()
+    >>> ds.PatientName = None
+    >>> ds.PatientName
+    ''
+
+    >>> ds.BitsAllocated = None
+    >>> ds.BitsAllocated
+
+    >>> str(ds.BitsAllocated)
+    'None'
 
     Attributes
     ----------
@@ -185,7 +243,7 @@ class DataElement(object):
             except KeyError:
                 pass
 
-        self.VR = VR  # Note!: you must set VR before setting value
+        self.VR = VR  # Note: you must set VR before setting value
         if already_converted:
             self._value = value
         else:
@@ -443,13 +501,40 @@ class DataElement(object):
     @property
     def VM(self):
         """Return the value multiplicity of the element as :class:`int`."""
-        if isinstance(self.value, compat.char_types):
-            return 1
+        if self.value is None:
+            return 0
+        if isinstance(self.value, (compat.char_types, PersonName)):
+            return 1 if self.value else 0
         try:
             iter(self.value)
         except TypeError:
             return 1
         return len(self.value)
+
+    @property
+    def is_empty(self):
+        """Return `True` if the element has no value."""
+        return self.VM == 0
+
+    @property
+    def empty_value(self):
+        """Return the value for an empty element.
+
+        See :func:`empty_value_for_VR` for more information.
+
+        Returns
+        -------
+        str or None
+            The value this data element is assigned on decoding if it is empty.
+        """
+        return empty_value_for_VR(self.VR)
+
+    def clear(self):
+        """Clears the value, e.g. sets it to the configured empty value.
+
+        See :func:`empty_value_for_VR`.
+        """
+        self._value = self.empty_value
 
     def _convert_value(self, val):
         """Convert `val` to an appropriate type and return the result.
@@ -493,7 +578,7 @@ class DataElement(object):
         elif self.VR == 'TM' and config.datetime_conversion:
             return pydicom.valuerep.TM(val)
         elif self.VR == "UI":
-            return UID(val if val else '')
+            return UID(val) if val is not None else None
         elif not in_py2 and self.VR == "PN":
             return PersonName(val)
         # Later may need this for PersonName as for UI,
@@ -538,7 +623,7 @@ class DataElement(object):
 
     def __str__(self):
         """Return :class:`str` representation of the element."""
-        repVal = self.repval
+        repVal = self.repval or ''
         if self.showVR:
             s = "%s %-*s %s: %s" % (str(self.tag), self.descripWidth,
                                     self.description()[:self.descripWidth],

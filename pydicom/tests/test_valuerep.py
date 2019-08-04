@@ -92,7 +92,7 @@ class TestDS(object):
     """Unit tests for DS values"""
 
     def test_empty_value(self):
-        assert '' == DS(None)
+        assert DS(None) is None
         assert '' == DS('')
 
     def test_float_values(self):
@@ -144,7 +144,7 @@ class TestIS(object):
     """Unit tests for IS"""
 
     def test_empty_value(self):
-        assert '' == IS(None)
+        assert IS(None) is None
         assert '' == IS('')
 
     def test_valid_value(self):
@@ -196,6 +196,7 @@ class TestBadValueRead(object):
         self.tag.is_little_endian = True
         self.tag.is_implicit_VR = False
         self.tag.tag = Tag(0x0010, 0x0020)
+        self.tag.length = 2
         self.default_retry_order = pydicom.values.convert_retry_VR_order
 
     def teardown(self):

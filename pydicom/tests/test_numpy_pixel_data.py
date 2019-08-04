@@ -31,6 +31,7 @@ from sys import byteorder
 import pytest
 
 import pydicom
+from pydicom import config
 from pydicom.data import get_testdata_files
 from pydicom.dataset import Dataset
 from pydicom.filereader import dcmread

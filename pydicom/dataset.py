@@ -855,7 +855,7 @@ class Dataset(dict):
             return data_elem
         elif isinstance(data_elem, tuple):
             # If a deferred read, then go get the value now
-            if data_elem.value is None:
+            if data_elem.value is None and data_elem.length != 0:
                 from pydicom.filereader import read_deferred_data_element
                 data_elem = read_deferred_data_element(
                     self.fileobj_type, self.filename, self.timestamp,
@@ -1475,7 +1475,7 @@ class Dataset(dict):
                                getattr(data_element, x))
                               for x in dir(data_element)
                               if not x.startswith("_")
-                              and x not in ('from_json', 'to_json')])
+                              and x not in ('from_json', 'to_json', 'clear')])
             if data_element.VR == "SQ":
                 yield sequence_element_format % elem_dict
             else:

@@ -742,6 +742,8 @@ def decode_element(data_element, dicom_character_set):
         single value, a multiple value (code extension), or may also be ``''``
         or ``None``, in which case ``'ISO_IR 6'`` will be used.
     """
+    if data_element.is_empty:
+        return data_element.empty_value
     if not dicom_character_set:
         dicom_character_set = ['ISO_IR 6']
 
@@ -751,14 +753,14 @@ def decode_element(data_element, dicom_character_set):
     # PN is special case as may have 3 components with different chr sets
     if data_element.VR == "PN":
         if not in_py2:
-            if data_element.VM == 1:
+            if data_element.VM <= 1:
                 data_element.value = data_element.value.decode(encodings)
             else:
                 data_element.value = [
                     val.decode(encodings) for val in data_element.value
                 ]
         else:
-            if data_element.VM == 1:
+            if data_element.VM <= 1:
                 data_element.value = PersonNameUnicode(data_element.value,
                                                        encodings)
             else:

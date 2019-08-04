@@ -12,6 +12,7 @@ from pydicom import compat
 from pydicom.compat import in_py2
 from pydicom.charset import (default_encoding, text_VRs, decode_string)
 from pydicom.config import logger
+from pydicom.dataelem import empty_value_for_VR
 from pydicom.filereader import read_sequence
 from pydicom.multival import MultiValue
 from pydicom.tag import (Tag, TupleTag)
@@ -562,6 +563,9 @@ def convert_value(VR, raw_data_element, encodings=None):
             VR = ' '.join(['0x{:02x}'.format(ord(ch)) for ch in VR])
         message = "Unknown Value Representation '{}'".format(VR)
         raise NotImplementedError(message)
+
+    if raw_data_element.length == 0:
+        return empty_value_for_VR(VR)
 
     # Look up the function to convert that VR
     # Dispatch two cases: a plain converter,

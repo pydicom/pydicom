@@ -279,7 +279,7 @@ def write_PN(fp, data_element, encodings=None):
     else:
         val = data_element.value
 
-    if isinstance(val[0], compat.text_type) or not in_py2:
+    if val and isinstance(val[0], compat.text_type) or not in_py2:
         try:
             val = [elem.encode(encodings) for elem in val]
         except TypeError:
@@ -472,15 +472,16 @@ def write_data_element(fp, data_element, encodings=None):
         encodings = convert_encodings(encodings)
         writer_function, writer_param = writers[VR]
         is_undefined_length = data_element.is_undefined_length
-        if VR in text_VRs or VR in ('PN', 'SQ'):
-            writer_function(buffer, data_element, encodings=encodings)
-        else:
-            # Many numeric types use the same writer but with numeric format
-            # parameter
-            if writer_param is not None:
-                writer_function(buffer, data_element, writer_param)
+        if not data_element.is_empty:
+            if VR in text_VRs or VR in ('PN', 'SQ'):
+                writer_function(buffer, data_element, encodings=encodings)
             else:
-                writer_function(buffer, data_element)
+                # Many numeric types use the same writer but with
+                # numeric format parameter
+                if writer_param is not None:
+                    writer_function(buffer, data_element, writer_param)
+                else:
+                    writer_function(buffer, data_element)
 
     # valid pixel data with undefined length shall contain encapsulated
     # data, e.g. sequence items - raise ValueError otherwise (see #238)
