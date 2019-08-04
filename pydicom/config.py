@@ -114,7 +114,7 @@ def is_available():
     otherwise.
 
 def get_overlay_array(ds, group):
-    Return a correctly dimensioned :class:`numpy.ndarray` derived from the
+    Return a correctly shaped :class:`numpy.ndarray` derived from the
     *Overlay Data* with element tag `group`, in :class:`Dataset` `ds` or raise
     an exception.
 

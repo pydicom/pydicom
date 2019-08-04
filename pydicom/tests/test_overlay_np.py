@@ -485,6 +485,18 @@ class TestNumpy_NumpyHandler(object):
         assert 1 == arr[0, 0]
         assert arr.flags.writeable
 
+    def test_bad_group_raises(self):
+        """Test that using a bad group raises exception."""
+        ds = dcmread(EXPL_1_1_1F)
+        msg = (
+            r"The group part of the 'Overlay Data' element tag must be "
+            r"between 0x6000 and 0x60FF \(inclusive\)"
+        )
+        with pytest.raises(ValueError, match=msg):
+            arr = ds.overlay_array(0x5FFF)
+        with pytest.raises(ValueError, match=msg):
+            arr = ds.overlay_array(0x6100)
+
 
 # Tests for numpy_handler module with Numpy available
 @pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
