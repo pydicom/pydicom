@@ -90,7 +90,7 @@ Default ``False``
 logger = logging.getLogger('pydicom')
 logger.addHandler(logging.NullHandler())
 
-import pydicom.overlay_data_handlers.numpy_handler as overlay_np
+import pydicom.overlay_data_handlers.numpy_handler as overlay_np  # noqa
 
 overlay_data_handlers = [
     overlay_np,
