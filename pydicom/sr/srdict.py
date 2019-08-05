@@ -9,9 +9,6 @@ from pydicom.sr._concepts_dict import concepts
 from pydicom.sr._cid_dict import name_for_cid, cid_concepts
 from pydicom.sr.coding import Code, CodedConcept
 
-# Reverse lookup for cid names
-cid_for_name = {v:k for k,v in name_for_cid.items()}
-
 
 # Reverse lookup for cid names
 cid_for_name = {v:k for k,v in name_for_cid.items()}
