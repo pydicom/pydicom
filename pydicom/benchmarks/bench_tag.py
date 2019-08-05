@@ -8,7 +8,7 @@ class TimeTag(object):
     """Time tests for tag.Tag."""
     def setup(self):
         """Setup the test"""
-        self.no_runs = 1000000
+        self.no_runs = 100000
 
         self.int = 0x00100010
         self.str = '0x00100010'
