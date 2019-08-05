@@ -89,18 +89,16 @@ class Tag(TAG_CLASS):
             return arg
 
         # Single int parameter
-        if arg2 is None:
-            if isinstance(arg, (TAG_CLASS, int)):
-                if arg > 0xFFFFFFFF:
-                    raise OverflowError(
-                        "Tags are limited to 32-bit length; tag {0!r}"
-                        .format(arg)
-                    )
+        if arg2 is None and isinstance(arg, (TAG_CLASS, int)):
+            if arg > 0xFFFFFFFF:
+                raise OverflowError(
+                    "Tags are limited to 32-bit length; tag {0!r}".format(arg)
+                )
 
-                if arg < 0:
-                        raise ValueError("Tags must be positive.")
+            if arg < 0:
+                    raise ValueError("Tags must be positive.")
 
-                return TAG_CLASS.__new__(cls, arg)
+            return TAG_CLASS.__new__(cls, arg)
 
         if arg2 is not None:
             arg = (arg, arg2)  # act as if was passed a single tuple
