@@ -11,7 +11,6 @@ Concept = namedtuple('Concept', "value scheme_designator meaning ".split())
 
 
 class ValueTypes(Enum):
-
     CODE = 'CODE'
     COMPOSITE = 'COMPOSITE'
     CONTAINER = 'CONTAINER'
@@ -30,7 +29,6 @@ class ValueTypes(Enum):
 
 
 class GraphicTypes(Enum):
-
     CIRCLE = 'CIRCLE'
     ELLIPSE = 'ELLIPSE'
     ELLIPSOID = 'ELLIPSOID'
@@ -40,7 +38,6 @@ class GraphicTypes(Enum):
 
 
 class GraphicTypes3D(Enum):
-
     ELLIPSE = 'ELLIPSE'
     ELLIPSOID = 'ELLIPSOID'
     MULTIPOINT = 'MULTIPOINT'
@@ -50,7 +47,6 @@ class GraphicTypes3D(Enum):
 
 
 class TemporalRangeTypes(Enum):
-
     BEGIN = 'BEGIN'
     END = 'END'
     MULTIPOINT = 'MULTIPOINT'
@@ -60,7 +56,6 @@ class TemporalRangeTypes(Enum):
 
 
 class RelationshipTypes(Enum):
-
     CONTAINS = 'CONTAINS'
     HAS_ACQ_CONTENT = 'HAS ACQ CONTENT'
     HAS_CONCEPT_MOD = 'HAS CONCEPT MOD'
@@ -71,7 +66,6 @@ class RelationshipTypes(Enum):
 
 
 class PixelOriginInterpretations(Enum):
-
     FRAME = 'FRAME'
     VOLUME = 'VOLUME'
 
