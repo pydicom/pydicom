@@ -1481,7 +1481,7 @@ class TestDatasetOverlayArray(object):
             self.ds.overlay_array(0x6000)
 
     def test_possible_not_available(self):
-        """Test with no possible handlers available."""
+        """Test with possible but not available handlers."""
         self.dummy.has_dependencies = False
         pydicom.config.overlay_data_handlers = [self.dummy]
         msg = (
@@ -1492,7 +1492,7 @@ class TestDatasetOverlayArray(object):
             self.ds.overlay_array(0x6000)
 
     def test_possible_available(self):
-        """Test with no available handlers available."""
+        """Test with possible and available handlers."""
         pydicom.config.overlay_data_handlers = [self.dummy]
         assert 'Success' == self.ds.overlay_array(0x6000)
 

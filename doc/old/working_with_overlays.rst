@@ -71,7 +71,7 @@ they must be bit-packed and written back to the correct element:
 
   # Pack the data
   from pydicom.pixel_data_handlers.numpy_handler import pack_bits
-  packed_bytes = pack_bits(arr.ravel())
+  packed_bytes = pack_bits(arr)
 
   # Update the element value
   ds[0x6000, 0x3000].value = packed_bytes
