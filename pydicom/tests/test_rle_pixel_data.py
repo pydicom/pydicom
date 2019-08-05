@@ -27,7 +27,7 @@ import sys
 
 import pytest
 
-from pydicom import dcmread, Dataset
+from pydicom import dcmread, Dataset, config
 import pydicom.config
 from pydicom.data import get_testdata_files
 from pydicom.encaps import defragment_data

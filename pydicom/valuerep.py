@@ -455,7 +455,7 @@ def DS(val):
     if isinstance(val, (str, compat.text_type)):
         val = val.strip()
     if val == '' or val is None:
-        return ''
+        return val
     return DSclass(val)
 
 
@@ -483,7 +483,7 @@ class IS(int):
     def __new__(cls, val):
         """Create instance if new integer string"""
         if val is None:
-            return ''
+            return val
         if isinstance(val, (str, compat.text_type)) and val.strip() == '':
             return ''
         # Overflow error in Python 2 for integers too large
@@ -624,6 +624,12 @@ def _encode_personname(components, encodings):
 
 
 class PersonName3(object):
+    def __new__(cls, *args, **kwargs):
+        # Handle None value by returning None instead of a PersonName3 object
+        if len(args) and args[0] is None:
+            return None
+        return super(PersonName3, cls).__new__(cls)
+
     def __init__(self, val, encodings=None, original_string=None):
         if isinstance(val, PersonName3):
             encodings = val.encodings
@@ -762,6 +768,10 @@ class PersonName3(object):
         # the encoding was unknown or incorrect - create a new
         # PersonName object with the changed encoding
         encodings = _verify_encodings(encodings)
+        if self.original_string is None:
+            # if the original encoding was not set, we set it now
+            self.original_string = _encode_personname(
+                self.components, self.encodings or [default_encoding])
         return PersonName3(self.original_string, encodings)
 
     def encode(self, encodings=None):

@@ -162,9 +162,8 @@ REFERENCE_DATA_UNSUPPORTED = [
 ]
 
 
-# Numpy and the numpy handler are unavailable
-@pytest.mark.skipif(HAVE_NP, reason='Numpy is available')
-class TestNoNumpy_NoNumpyHandler(object):
+# Numpy is/isn't available, numpy handler is unavailable
+class TestNoNumpyHandler(object):
     """Tests for handling datasets without numpy and the handler."""
     def setup(self):
         """Setup the environment."""
@@ -174,40 +173,6 @@ class TestNoNumpy_NoNumpyHandler(object):
     def teardown(self):
         """Restore the environment."""
         pydicom.config.overlay_data_handlers = self.original_handlers
-
-    def test_environment(self):
-        """Check that the testing environment is as expected."""
-        assert not HAVE_NP
-        assert NP_HANDLER is not None
-
-    def test_can_access_supported_dataset(self):
-        """Test that we can read and access elements in dataset."""
-        # Explicit little
-        ds = dcmread(EXPL_16_1_1F)
-        assert 'CompressedSamples^MR1' == ds.PatientName
-        assert 8192 == len(ds.PixelData)
-
-        # Implicit little
-        ds = dcmread(IMPL_16_1_1F)
-        assert 'CompressedSamples^MR1' == ds.PatientName
-        assert 8192 == len(ds.PixelData)
-
-        # Deflated little
-        ds = dcmread(DEFL_8_1_1F)
-        assert '^^^^' == ds.PatientName
-        assert 262144 == len(ds.PixelData)
-
-        # Explicit big
-        ds = dcmread(EXPB_16_1_1F)
-        assert 'CompressedSamples^MR1' == ds.PatientName
-        assert 8192 == len(ds.PixelData)
-
-    @pytest.mark.parametrize("fpath,data", REFERENCE_DATA_UNSUPPORTED)
-    def test_can_access_unsupported_dataset(self, fpath, data):
-        """Test can read and access elements in unsupported datasets."""
-        ds = dcmread(fpath)
-        assert data[0] == ds.file_meta.TransferSyntaxUID
-        assert data[1] == ds.PatientName
 
     def test_overlay_array_raises(self):
         """Test overlay_array raises exception for all syntaxes."""
@@ -237,35 +202,6 @@ class TestNoNumpy_NumpyHandler(object):
         assert not HAVE_NP
         assert NP_HANDLER is not None
 
-    def test_can_access_supported_dataset(self):
-        """Test that we can read and access elements in dataset."""
-        # Explicit little
-        ds = dcmread(EXPL_16_1_1F)
-        assert 'CompressedSamples^MR1' == ds.PatientName
-        assert 8192 == len(ds.PixelData)
-
-        # Implicit little
-        ds = dcmread(IMPL_16_1_1F)
-        assert 'CompressedSamples^MR1' == ds.PatientName
-        assert 8192 == len(ds.PixelData)
-
-        # Deflated little
-        ds = dcmread(DEFL_8_1_1F)
-        assert '^^^^' == ds.PatientName
-        assert 262144 == len(ds.PixelData)
-
-        # Explicit big
-        ds = dcmread(EXPB_16_1_1F)
-        assert 'CompressedSamples^MR1' == ds.PatientName
-        assert 8192 == len(ds.PixelData)
-
-    @pytest.mark.parametrize("fpath,data", REFERENCE_DATA_UNSUPPORTED)
-    def test_can_access_unsupported_dataset(self, fpath, data):
-        """Test can read and access elements in unsupported datasets."""
-        ds = dcmread(fpath)
-        assert data[0] == ds.file_meta.TransferSyntaxUID
-        assert data[1] == ds.PatientName
-
     def test_unsupported_overlay_array_raises(self):
         """Test overlay_array raises exception for unsupported syntaxes."""
         ds = dcmread(EXPL_1_1_1F)
@@ -294,63 +230,6 @@ def test_reshape_pixel_array_raises():
     """Test that reshape_overlay_array raises exception without numpy."""
     with pytest.raises(ImportError, match="Numpy is required to reshape"):
         reshape_overlay_array(None, None)
-
-
-# Numpy is available, the numpy handler is unavailable
-@pytest.mark.skipif(not HAVE_NP, reason='Numpy is unavailable')
-class TestNumpy_NoNumpyHandler(object):
-    """Tests for handling datasets without the handler."""
-    def setup(self):
-        """Setup the environment."""
-        self.original_handlers = pydicom.config.overlay_data_handlers
-        pydicom.config.overlay_data_handlers = []
-
-    def teardown(self):
-        """Restore the environment."""
-        pydicom.config.overlay_data_handlers = self.original_handlers
-
-    def test_environment(self):
-        """Check that the testing environment is as expected."""
-        assert HAVE_NP
-        # We numpy handler should still be available
-        assert NP_HANDLER is not None
-
-    def test_can_access_supported_dataset(self):
-        """Test that we can read and access elements in dataset."""
-        # Explicit little
-        ds = dcmread(EXPL_16_1_1F)
-        assert 'CompressedSamples^MR1' == ds.PatientName
-        assert 8192 == len(ds.PixelData)
-
-        # Implicit little
-        ds = dcmread(IMPL_16_1_1F)
-        assert 'CompressedSamples^MR1' == ds.PatientName
-        assert 8192 == len(ds.PixelData)
-
-        # Deflated little
-        ds = dcmread(DEFL_8_1_1F)
-        assert '^^^^' == ds.PatientName
-        assert 262144 == len(ds.PixelData)
-
-        # Explicit big
-        ds = dcmread(EXPB_16_1_1F)
-        assert 'CompressedSamples^MR1' == ds.PatientName
-        assert 8192 == len(ds.PixelData)
-
-    @pytest.mark.parametrize("fpath,data", REFERENCE_DATA_UNSUPPORTED)
-    def test_can_access_unsupported_dataset(self, fpath, data):
-        """Test can read and access elements in unsupported datasets."""
-        ds = dcmread(fpath)
-        assert data[0] == ds.file_meta.TransferSyntaxUID
-        assert data[1] == ds.PatientName
-
-    def test_overlay_array_raises(self):
-        """Test overlay_array raises exception for all syntaxes."""
-        ds = dcmread(EXPL_1_1_1F)
-        for uid in ALL_TRANSFER_SYNTAXES:
-            ds.file_meta.TransferSyntaxUID = uid
-            with pytest.raises((NotImplementedError, RuntimeError)):
-                ds.overlay_array(0x6000)
 
 
 # Numpy and the numpy handler are available
@@ -442,41 +321,7 @@ class TestNumpy_NumpyHandler(object):
         ds = dcmread(EXPL_1_1_3F)
         for uid in SUPPORTED_SYNTAXES[:3]:
             ds.file_meta.TransferSyntaxUID = uid
-            arr = ds.pixel_array
-
-            assert arr.flags.writeable
-            assert arr.max() == 1
-            assert arr.min() == 0
-
-            # Frame 1
-            assert (0, 1, 1) == tuple(arr[0, 155, 180:183])
-            assert (1, 0, 1, 0) == tuple(arr[0, 155, 310:314])
-            assert (0, 1, 1) == tuple(arr[0, 254, 78:81])
-            assert (1, 0, 0, 1, 1, 0) == tuple(arr[0, 254, 304:310])
-
-            assert 0 == arr[0][0][0]
-            assert 0 == arr[2][511][511]
-            assert 1 == arr[1][256][256]
-
-            # Frame 2
-            assert 0 == arr[1, 146, :254].max()
-            assert (0, 1, 1, 1, 1, 1, 0, 1) == tuple(arr[1, 146, 253:261])
-            assert 0 == arr[1, 146, 261:].max()
-
-            assert 0 == arr[1, 210, :97].max()
-            assert 1 == arr[1, 210, 97:350].max()
-            assert 0 == arr[1, 210, 350:].max()
-
-            # Frame 3
-            assert 0 == arr[2, 147, :249].max()
-            assert (0, 1, 0, 1, 1, 1) == tuple(arr[2, 147, 248:254])
-            assert (1, 0, 1, 0, 1, 1) == tuple(arr[2, 147, 260:266])
-            assert 0 == arr[2, 147, 283:].max()
-
-            assert 0 == arr[2, 364, :138].max()
-            assert (0, 1, 0, 1, 1, 0, 0, 1) == tuple(arr[2, 364, 137:145])
-            assert (1, 0, 0, 1, 0) == tuple(arr[2, 364, 152:157])
-            assert 0 == arr[2, 364, 157:].max()
+            arr = ds.overlay_array(0x6000)
 
     def test_read_only(self):
         """Test for #717, returned array read-only."""
