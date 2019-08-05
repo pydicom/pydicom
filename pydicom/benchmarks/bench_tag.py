@@ -1,7 +1,7 @@
 # Copyright 2008-2019 pydicom authors. See LICENSE file for details.
 """Benchmarks for the encaps module."""
 
-from pydicom.tag import Tag
+from pydicom.tag import Tag, TupleTag
 
 
 class TimeTag(object):
@@ -68,3 +68,26 @@ class TimeTag(object):
         """Time creation of Tag from a tuple of str."""
         for ii in range(self.no_runs):
             Tag(self.tuple_str)
+
+
+class TimeTupleTag(object):
+    """Time tests for tag.TupleTag."""
+    def setup(self):
+        """Setup the test"""
+        self.no_runs = 100000
+        self.tuple_int = (0x0010, 0x0010)
+
+    def time_tag_tuple(self):
+        """Time creation of Tag from a tuple of int."""
+        for ii in range(self.no_runs):
+            Tag(self.tuple_int)
+
+    def time_tag_double_int(self):
+        """Time creation of Tag from two ints."""
+        for ii in range(self.no_runs):
+            Tag(*self.tuple_int)
+
+    def time_tuple_tag(self):
+        """Time creation of Tag using TupleTag."""
+        for ii in range(self.no_runs):
+            TupleTag(self.tuple_int)

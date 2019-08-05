@@ -96,7 +96,7 @@ class Tag(TAG_CLASS):
                 )
 
             if arg < 0:
-                    raise ValueError("Tags must be positive.")
+                raise ValueError("Tags must be positive.")
 
             return TAG_CLASS.__new__(cls, arg)
 
@@ -224,7 +224,7 @@ class Tag(TAG_CLASS):
 
 
 # Backwards compatibility
-# TODO: Deprecated in v1.4, removal in v1.5
+# TODO: Deprecated in v1.4
 BaseTag = Tag
 
 
