@@ -29,9 +29,7 @@ import pytest
 
 import pydicom
 from pydicom.data import get_testdata_files
-from pydicom.dataset import Dataset
 from pydicom.filereader import dcmread
-
 from pydicom.tests._handler_common import ALL_TRANSFER_SYNTAXES
 from pydicom.uid import (
     ImplicitVRLittleEndian,
@@ -58,58 +56,15 @@ except ImportError:
 
 
 # Paths to the test datasets
-# IMPL: Implicit VR Little Endian
 # EXPL: Explicit VR Little Endian
-# DEFL: Deflated Explicit VR Little Endian
-# EXPB: Explicit VR Big Endian
 # Overlay Data
 # 1/1, 1 sample/pixel, 1 frame
 EXPL_1_1_1F = get_testdata_files("MR-SIEMENS-DICOM-WithOverlays.dcm")[0]
 # 1/1, 1 sample/pixel, N frame
 EXPL_1_1_3F = None
-
-# 8/8, 1 sample/pixel, 1 frame
-DEFL_8_1_1F = get_testdata_files("image_dfl.dcm")[0]
-EXPL_8_1_1F = get_testdata_files("OBXXXX1A.dcm")[0]
-EXPB_8_1_1F = get_testdata_files("OBXXXX1A_expb.dcm")[0]
-# 8/8, 1 sample/pixel, 2 frame
-EXPL_8_1_2F = get_testdata_files("OBXXXX1A_2frame.dcm")[0]
-EXPB_8_1_2F = get_testdata_files("OBXXXX1A_expb_2frame.dcm")[0]
-# 8/8, 3 sample/pixel, 1 frame
-EXPL_8_3_1F = get_testdata_files("SC_rgb.dcm")[0]
-EXPB_8_3_1F = get_testdata_files("SC_rgb_expb.dcm")[0]
-# 8/8, 3 samples/pixel, 1 frame, 3 x 3
-EXPL_8_3_1F_ODD = get_testdata_files('SC_rgb_small_odd.dcm')[0]
-# 8/8, 3 sample/pixel, 2 frame
-EXPL_8_3_2F = get_testdata_files("SC_rgb_2frame.dcm")[0]
-EXPB_8_3_2F = get_testdata_files("SC_rgb_expb_2frame.dcm")[0]
+# No Overlay Data
 # 16/16, 1 sample/pixel, 1 frame
-IMPL_16_1_1F = get_testdata_files("MR_small_implicit.dcm")[0]
 EXPL_16_1_1F = get_testdata_files("MR_small.dcm")[0]
-EXPB_16_1_1F = get_testdata_files("MR_small_expb.dcm")[0]
-# Pixel Data with 128 bytes trailing padding
-EXPL_16_1_1F_PAD = get_testdata_files("MR_small_padded.dcm")[0]
-# 16/12, 1 sample/pixel, 10 frame
-EXPL_16_1_10F = get_testdata_files("emri_small.dcm")[0]
-EXPB_16_1_10F = get_testdata_files("emri_small_big_endian.dcm")[0]
-# 16/16, 3 sample/pixel, 1 frame
-EXPL_16_3_1F = get_testdata_files("SC_rgb_16bit.dcm")[0]
-EXPB_16_3_1F = get_testdata_files("SC_rgb_expb_16bit.dcm")[0]
-# 16/16, 3 sample/pixel, 2 frame
-EXPL_16_3_2F = get_testdata_files("SC_rgb_16bit_2frame.dcm")[0]
-EXPB_16_3_2F = get_testdata_files("SC_rgb_expb_16bit_2frame.dcm")[0]
-# 32/32, 1 sample/pixel, 1 frame
-IMPL_32_1_1F = get_testdata_files("rtdose_1frame.dcm")[0]
-EXPB_32_1_1F = get_testdata_files("rtdose_expb_1frame.dcm")[0]
-# 32/32, 1 sample/pixel, 15 frame
-IMPL_32_1_15F = get_testdata_files("rtdose.dcm")[0]
-EXPB_32_1_15F = get_testdata_files("rtdose_expb.dcm")[0]
-# 32/32, 3 sample/pixel, 1 frame
-EXPL_32_3_1F = get_testdata_files("SC_rgb_32bit.dcm")[0]
-EXPB_32_3_1F = get_testdata_files("SC_rgb_expb_32bit.dcm")[0]
-# 32/32, 3 sample/pixel, 2 frame
-EXPL_32_3_2F = get_testdata_files("SC_rgb_32bit_2frame.dcm")[0]
-EXPB_32_3_2F = get_testdata_files("SC_rgb_expb_32bit_2frame.dcm")[0]
 
 # Transfer syntaxes supported by other handlers
 # JPEG Baseline (Process 1)
@@ -340,9 +295,9 @@ class TestNumpy_NumpyHandler(object):
             r"between 0x6000 and 0x60FF \(inclusive\)"
         )
         with pytest.raises(ValueError, match=msg):
-            arr = ds.overlay_array(0x5FFF)
+            ds.overlay_array(0x5FFF)
         with pytest.raises(ValueError, match=msg):
-            arr = ds.overlay_array(0x6100)
+            ds.overlay_array(0x6100)
 
     def test_no_frames(self):
         """Test handler with no NumberOfFramesInOverlay element."""
