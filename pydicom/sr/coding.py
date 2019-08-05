@@ -89,11 +89,11 @@ class CodedConcept(Dataset):
                 scheme_designator=other.scheme_designator,
                 scheme_version=other.scheme_version
             )
-        return all([
-            self_mapped.value == other_mapped.value,
-            self_mapped.scheme_designator == other_mapped.scheme_designator,
-            self_mapped.scheme_version == other_mapped.scheme_version,
-        ])
+        return (
+            self_mapped.value == other_mapped.value and
+            self_mapped.scheme_designator == other_mapped.scheme_designator and
+            self_mapped.scheme_version == other_mapped.scheme_version
+        )
 
     def __ne__(self, other):
         """Compares `self` and `other` for inequality.
