@@ -10,6 +10,7 @@ Pydicom User Guide
    base_element.rst
    writing_files.rst
    working_with_pixel_data.rst
+   working_with_overlays.rst
    image_data_handlers.rst
    viewing_images.rst
    private_data_elements.rst

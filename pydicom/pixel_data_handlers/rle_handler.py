@@ -1,6 +1,6 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Use the `numpy <https://numpy.org/>`_ package to convert RLE lossless *Pixel
-Data* to an ndarray.
+Data* to a :class:`numpy.ndarray`.
 
 **Supported transfer syntaxes**
 
@@ -9,8 +9,9 @@ Data* to an ndarray.
 **Supported data**
 
 The RLE handler supports the conversion of data in the (7fe0,0010)
-*Pixel Data* element to a numpy ndarray provided the related Image Pixel module
-elements have values given in the table below.
+*Pixel Data* element to a numpy ndarray provided the related
+:dcm:`Image Pixel<part03/sect_C.7.6.3.html>` module elements have values given
+in the table below.
 
 +------------------------------------------------+--------------+----------+
 | Element                                        | Supported    |          |

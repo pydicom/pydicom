@@ -1,6 +1,6 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Use the `numpy <https://numpy.org/>`_ package to convert supported *Pixel
-Data* to an :class:`numpy.ndarray`.
+Data* to a :class:`numpy.ndarray`.
 
 **Supported transfer syntaxes**
 
@@ -13,7 +13,8 @@ Data* to an :class:`numpy.ndarray`.
 
 The numpy handler supports the conversion of data in the (7fe0,0010)
 *Pixel Data* element to a :class:`~numpy.ndarray` provided the
-related Image Pixel module elements have values given in the table below.
+related :dcm:`Image Pixel<part03/sect_C.7.6.3.html>` module elements have
+values given in the table below.
 
 +------------------------------------------------+--------------+----------+
 | Element                                        | Supported    |          |
@@ -152,9 +153,11 @@ def pack_bits(arr):
 
 
 def unpack_bits(bytestream):
-    """Unpack bit packed *Pixel Data* into a :class:`numpy.ndarray`.
+    """Unpack bit packed *Pixel Data* or *Overlay Data* into a
+    :class:`numpy.ndarray`.
 
-    Suitable for use when (0028,0011) *Bits Allocated* is 1.
+    Suitable for use when (0028,0011) *Bits Allocated* or (60xx,0100) *Overlay
+    Bits Allocated* is 1.
 
     Parameters
     ----------

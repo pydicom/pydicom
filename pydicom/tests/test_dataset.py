@@ -10,6 +10,7 @@ from pydicom.dataelem import DataElement, RawDataElement
 from pydicom.dataset import Dataset, FileDataset, validate_file_meta
 from pydicom import dcmread
 from pydicom.filebase import DicomBytesIO
+from pydicom.overlay_data_handlers import numpy_handler as NP_HANDLER
 from pydicom.sequence import Sequence
 from pydicom.tag import Tag
 from pydicom.uid import (
@@ -1433,3 +1434,71 @@ class TestFileDataset(object):
         di = dict()
         expected_diff = {'__class__', '__doc__', '__hash__'}
         assert expected_diff == set(dir(di)) - set(dir(ds))
+
+
+class TestDatasetOverlayArray(object):
+    """Tests for Dataset.overlay_array()."""
+    def setup(self):
+        """Setup the test datasets and the environment."""
+        self.original_handlers = pydicom.config.overlay_data_handlers
+        pydicom.config.overlay_data_handlers = [NP_HANDLER]
+
+        self.ds = dcmread(
+            get_testdata_files("MR-SIEMENS-DICOM-WithOverlays.dcm")[0]
+        )
+
+        class DummyHandler(object):
+            def __init__(self):
+                self.raise_exc = False
+                self.has_dependencies = True
+                self.DEPENDENCIES = {
+                    'numpy': ('http://www.numpy.org/', 'NumPy'),
+                }
+                self.HANDLER_NAME = 'Dummy'
+
+            def supports_transfer_syntax(self, syntax):
+                return True
+
+            def is_available(self):
+                return self.has_dependencies
+
+            def get_overlay_array(self, ds, group):
+                if self.raise_exc:
+                    raise ValueError("Dummy error message")
+
+                return 'Success'
+
+        self.dummy = DummyHandler()
+
+    def teardown(self):
+        """Restore the environment."""
+        pydicom.config.overlay_data_handlers = self.original_handlers
+
+    def test_no_possible(self):
+        """Test with no possible handlers available."""
+        pydicom.config.overlay_data_handlers = []
+        with pytest.raises((NotImplementedError, RuntimeError)):
+            self.ds.overlay_array(0x6000)
+
+    def test_possible_not_available(self):
+        """Test with possible but not available handlers."""
+        self.dummy.has_dependencies = False
+        pydicom.config.overlay_data_handlers = [self.dummy]
+        msg = (
+            r"The following handlers are available to decode the overlay "
+            r"data however they are missing required dependencies: "
+        )
+        with pytest.raises(RuntimeError, match=msg):
+            self.ds.overlay_array(0x6000)
+
+    def test_possible_available(self):
+        """Test with possible and available handlers."""
+        pydicom.config.overlay_data_handlers = [self.dummy]
+        assert 'Success' == self.ds.overlay_array(0x6000)
+
+    def test_handler_raises(self):
+        """Test the handler raising an exception."""
+        self.dummy.raise_exc = True
+        pydicom.config.overlay_data_handlers = [self.dummy]
+        with pytest.raises(ValueError, match=r"Dummy error message"):
+            self.ds.overlay_array(0x6000)

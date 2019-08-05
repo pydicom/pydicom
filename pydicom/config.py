@@ -97,6 +97,44 @@ Note that the default of this value will change to ``True`` in version 2.0.
 logger = logging.getLogger('pydicom')
 logger.addHandler(logging.NullHandler())
 
+import pydicom.overlay_data_handlers.numpy_handler as overlay_np  # noqa
+
+overlay_data_handlers = [
+    overlay_np,
+]
+"""Handlers for converting (60xx,3000) *Overlay Data*
+
+.. currentmodule:: pydicom.dataset
+
+This is an ordered list of *Overlay Data* handlers that the
+:meth:`~Dataset.overlay_array` method will use to try to extract a correctly
+sized numpy array from an *Overlay Data* element.
+
+Handlers shall have three methods:
+
+def supports_transfer_syntax(ds)
+    Return ``True`` if the handler supports the transfer syntax indicated in
+    :class:`Dataset` `ds`, ``False`` otherwise.
+
+def is_available():
+    Return ``True`` if the handler's dependencies are installed, ``False``
+    otherwise.
+
+def get_overlay_array(ds, group):
+    Return a correctly shaped :class:`numpy.ndarray` derived from the
+    *Overlay Data* with element tag `group`, in :class:`Dataset` `ds` or raise
+    an exception.
+
+
+The first handler that both announces that it supports the transfer syntax
+and does not raise an exception is the handler that will provide the
+data.
+
+If all handlers fail to convert the data only the last exception is raised.
+
+If none raise an exception, but they all refuse to support the transfer
+syntax, then a :class:`NotImplementedError` is raised.
+"""
 
 import pydicom.pixel_data_handlers.numpy_handler as np_handler  # noqa
 import pydicom.pixel_data_handlers.rle_handler as rle_handler  # noqa
@@ -139,14 +177,13 @@ def needs_to_convert_to_RGB(ds):
     be converted to the RGB colourspace, ``False`` otherwise.
 
 The first handler that both announces that it supports the transfer syntax
-and does not throw an exception, either in getting the data or when the data
+and does not raise an exception, either in getting the data or when the data
 is reshaped to the correct dimensions, is the handler that will provide the
 data.
 
-If they all fail, the last one to throw an exception gets to see its
-exception thrown up.
+If they all fail only the last exception is raised.
 
-If no one throws an exception, but they all refuse to support the transfer
+If none raise an exception, but they all refuse to support the transfer
 syntax, then this fact is announced in a :class:`NotImplementedError`
 exception.
 """
