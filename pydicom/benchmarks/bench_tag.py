@@ -8,7 +8,7 @@ class TimeTag(object):
     """Time tests for tag.Tag."""
     def setup(self):
         """Setup the test"""
-        self.no_runs = 100000
+        self.no_runs = 1000000
 
         self.int = 0x00100010
         self.str = '0x00100010'
@@ -29,10 +29,20 @@ class TimeTag(object):
         for ii in range(self.no_runs):
             Tag(self.int)
 
+    def time_double_int(self):
+        """Time creation of Tag from two ints."""
+        for ii in range(self.no_runs):
+            Tag(*self.tuple_int)
+
     def time_single_str(self):
         """Time creation of Tag from a str."""
         for ii in range(self.no_runs):
             Tag(self.str)
+
+    def time_double_str(self):
+        """Time creation of Tag from two str."""
+        for ii in range(self.no_runs):
+            Tag(*self.tuple_str)
 
     def time_keyword(self):
         """Time creation of Tag from a keyword."""

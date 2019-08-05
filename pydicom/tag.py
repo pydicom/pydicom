@@ -51,16 +51,17 @@ class Tag(TAG_CLASS):
     `long <https://docs.python.org/2/library/functions.html#long>`_, while for
     Python 3 they are represented as an :class:`int`.
 
-    A :class:`Tag` can be created using any of the standard forms:
+    A :class:`Tag` can be created using any of the standard forms (ordered
+    from fastest to slowest):
 
     * ``Tag(0x00100015)``
-    * ``Tag('0x00100015')``
-    * ``Tag((0x10, 0x50))``
-    * ``Tag(('0x10', '0x50'))``
     * ``Tag(0x0010, 0x0015)``
-    * ``Tag(0x10, 0x15)``
-    * ``Tag(2341, 0x10)``
+    * ``Tag('0x00100015')``
+    * ``Tag([0x10, 0x50])``
+    * ``Tag((0x10, 0x50))``
     * ``Tag('0xFE', '0x0010')``
+    * ``Tag(('0x10', '0x50'))``
+    * ``Tag(['0x10', '0x50'])``
     * ``Tag("PatientName")``
 
     Parameters
@@ -83,23 +84,39 @@ class Tag(TAG_CLASS):
         if fast:
             return TAG_CLASS.__new__(cls, arg)
 
+        # Need to do this first as Tag is a subclass of TAG_CLASS
         if isinstance(arg, Tag):
             return arg
+
+        # Single int parameter
+        if arg2 is None:
+            if isinstance(arg, (TAG_CLASS, int)):
+                if arg > 0xFFFFFFFF:
+                    raise OverflowError(
+                        "Tags are limited to 32-bit length; tag {0!r}"
+                        .format(arg)
+                    )
+
+                if arg < 0:
+                        raise ValueError("Tags must be positive.")
+
+                return TAG_CLASS.__new__(cls, arg)
 
         if arg2 is not None:
             arg = (arg, arg2)  # act as if was passed a single tuple
 
+        # List/tuple of str or int
         if isinstance(arg, (tuple, list)):
             if len(arg) != 2:
                 raise ValueError("Tag must be an int or a 2-tuple")
 
             valid = False
-            if isinstance(arg[0], compat.string_types):
+            if isinstance(arg[0], compat.number_types):
+                valid = isinstance(arg[1], compat.number_types)
+            elif isinstance(arg[0], compat.string_types):
                 valid = isinstance(arg[1], (str, compat.string_types))
                 if valid:
                     arg = (int(arg[0], 16), int(arg[1], 16))
-            elif isinstance(arg[0], compat.number_types):
-                valid = isinstance(arg[1], compat.number_types)
 
             if not valid:
                 raise ValueError(
@@ -129,14 +146,6 @@ class Tag(TAG_CLASS):
                     raise ValueError(
                         "'{}' is not a valid int or DICOM keyword".format(arg)
                     )
-        # Single int parameter
-        else:
-            long_value = arg
-            if long_value > 0xFFFFFFFF:
-                raise OverflowError(
-                    "Tags are limited to 32-bit length; tag {0!r}"
-                    .format(long_value)
-                )
 
         if long_value < 0:
             raise ValueError("Tags must be positive.")
