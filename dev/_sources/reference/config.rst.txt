@@ -16,6 +16,7 @@ Configuration Options (:mod:`pydicom.config`)
    datetime_conversion
    debug
    enforce_valid_values
+   overlay_data_handlers
    pixel_data_handlers
    reset_data_element_callback
    use_DS_decimal

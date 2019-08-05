@@ -36,6 +36,7 @@ pydicom.dicomdir.DicomDir
       ~DicomDir.items
       ~DicomDir.iterall
       ~DicomDir.keys
+      ~DicomDir.overlay_array
       ~DicomDir.parse_records
       ~DicomDir.pop
       ~DicomDir.popitem

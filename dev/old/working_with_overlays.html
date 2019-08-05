@@ -1,0 +1,319 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Working with Overlay Data &mdash; pydicom 1.4.0.dev0 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Handling of compressed image data" href="image_data_handlers.html" />
+    <link rel="prev" title="Working with Pixel Data" href="working_with_pixel_data.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> pydicom
+          
+
+          
+            
+            <img src="../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.4.0.dev0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started with pydicom</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="pydicom_user_guide.html">Pydicom User Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="warn_transition_to_pydicom1.html">For users of pydicom &lt; 1.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="base_element.html">Core elements in pydicom</a></li>
+<li class="toctree-l2"><a class="reference internal" href="writing_files.html">Writing DICOM Files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="working_with_pixel_data.html">Working with Pixel Data</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Working with Overlay Data</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#introduction">Introduction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dataset-overlay-array"><code class="docutils literal notranslate"><span class="pre">Dataset.overlay_array()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="image_data_handlers.html">Handling of compressed image data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="viewing_images.html">Viewing Images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="private_data_elements.html">Private Data Elements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="transition_to_pydicom1.html">Transition to pydicom 1.x</a></li>
+<li class="toctree-l2"><a class="reference internal" href="transition_to_pydicom1.html#api-changes-in-version-1-0">API Changes in version 1.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python2_support.html">Python 2 Support Plan for Pydicom</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ref_guide.html">Reading and writing DICOM files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">API Reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">General examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#image-processing">Image processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#input-output">Input-output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../release_notes/index.html">Release history</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pydicom</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="pydicom_user_guide.html">Pydicom User Guide</a> &raquo;</li>
+        
+      <li>Working with Overlay Data</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="working-with-overlay-data">
+<span id="id1"></span><h1>Working with Overlay Data<a class="headerlink" href="#working-with-overlay-data" title="Permalink to this headline">¶</a></h1>
+<p class="rubric">How to work with overlay data in pydicom.</p>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>Overlays in DICOM are present in what’s called a <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_7.6.html">Repeating Group</a>, where the group number of the element tags are defined
+over a range rather than a specific value. For example, the group number of
+(60xx,3000) <em>Overlay Data</em> may be 6000, 6002, or any even value up to 601E.
+This allows a dataset to include multiple overlays, where the related elements
+for each overlay use the same group number. Because of this, the only way to
+access a particular element from an overlay is to use the
+<code class="docutils literal notranslate"><span class="pre">Dataset[group,</span> <span class="pre">elem]</span></code> method:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pydicom</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.data</span> <span class="k">import</span> <span class="n">get_testdata_files</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fpath</span> <span class="o">=</span> <span class="n">get_testdata_files</span><span class="p">(</span><span class="s2">&quot;MR-SIEMENS-DICOM-WithOverlays.dcm&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">dcmread</span><span class="p">(</span><span class="n">fpath</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">elem</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="mh">0x6000</span><span class="p">,</span> <span class="mh">0x3000</span><span class="p">]</span>  <span class="c1"># returns a DataElement</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span>
+<span class="go">(6000, 3000) Overlay Data                        OW: Array of 29282 elements</span>
+</pre></div>
+</div>
+<p>pydicom tends to be “lazy” in interpreting DICOM data. For example, by default
+it doesn’t do anything with overlay data except read in the raw bytes:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">[</span><span class="mh">0x6000</span><span class="p">,</span> <span class="mh">0x3000</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> 
+<span class="go">b&#39;\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00...</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="dataset-overlay-array">
+<h2><code class="docutils literal notranslate"><span class="pre">Dataset.overlay_array()</span></code><a class="headerlink" href="#dataset-overlay-array" title="Permalink to this headline">¶</a></h2>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.overlay_array" title="pydicom.dataset.Dataset.overlay_array"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.overlay_array()</span></code></a>
+requires <a class="reference external" href="http://numpy.org/">NumPy</a>.</p>
+</div>
+<p>The <em>Overlay Data</em> element contains the raw bytes exactly as found in the file
+as bit-packed data. To unpack and get an overlay in a more useful form you
+can use the <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.overlay_array" title="pydicom.dataset.Dataset.overlay_array"><code class="xref py py-meth docutils literal notranslate"><span class="pre">overlay_array()</span></code></a> method to return a
+<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>. To use it you simply pass the group number of the
+overlay elements you’re interested in:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">overlay_array</span><span class="p">(</span><span class="mh">0x6000</span><span class="p">)</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span>
+<span class="go">array([[ 0, 0, 0, ...,  0,  0,  0],</span>
+<span class="go">       [ 0, 0, 0, ...,  0,  0,  0],</span>
+<span class="go">       [ 0, 0, 0, ...,  0,  0,  0],</span>
+<span class="go">       ...,</span>
+<span class="go">       [ 0, 0, 0, ...,  0,  0,  0],</span>
+<span class="go">       [ 0, 0, 0, ...,  0,  0,  0],</span>
+<span class="go">       [ 0, 0, 0, ...,  0,  0,  0],], dtype=uint8)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(484, 484)</span>
+</pre></div>
+</div>
+<p>NumPy can be used to modify the pixels, but if the changes are to be saved,
+they must be bit-packed and written back to the correct element:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Add a line</span>
+<span class="n">arr</span><span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mi">1</span>
+
+<span class="c1"># Pack the data</span>
+<span class="kn">from</span> <span class="nn">pydicom.pixel_data_handlers.numpy_handler</span> <span class="kn">import</span> <span class="n">pack_bits</span>
+<span class="n">packed_bytes</span> <span class="o">=</span> <span class="n">pack_bits</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+
+<span class="c1"># Update the element value</span>
+<span class="n">ds</span><span class="p">[</span><span class="mh">0x6000</span><span class="p">,</span> <span class="mh">0x3000</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">packed_bytes</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><span class="s2">&quot;temp.dcm&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Some changes may require other DICOM tags to be modified. For example, if the
+overlay data is reduced (e.g. a <img class="math" src="../_images/math/7d9a4c31bd7e28259b65b267fd21a6311b05ca0f.png" alt="512 \times 512"/> image is collapsed to
+<img class="math" src="../_images/math/343aa0d15ca79bd1c1b7837e6b3a5828812dbe77.png" alt="256 \times 256"/>) then the corresponding (60xx,0010) <em>Overlay Rows</em> and
+(60xx,0011) <em>Overlay Columns</em> should be set appropriately. You must explicitly
+set these yourself; pydicom does not do so automatically.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="image_data_handlers.html" class="btn btn-neutral float-right" title="Handling of compressed image data" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="working_with_pixel_data.html" class="btn btn-neutral float-left" title="Working with Pixel Data" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2019, Darcy Mason and pydicom contributors
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -39,7 +39,7 @@
   <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Pixel Data Handlers (pydicom.pixel_data_handlers)" href="handlers.pixel_data.html" />
+    <link rel="next" title="Overlay Data Handlers (pydicom.overlay_data_handlers)" href="handlers.overlay_data.html" />
     <link rel="prev" title="pydicom.dataset.validate_file_meta" href="generated/pydicom.dataset.validate_file_meta.html" /> 
 </head>
 
@@ -106,6 +106,7 @@
 <li class="toctree-l2"><a class="reference internal" href="elem.html">Representation of Data Elements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dataset.html">Representation of Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dataset</span></code>)</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Bulk Data Handlers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="handlers.overlay_data.html">Overlay Data Handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.overlay_data_handlers</span></code>)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="handlers.pixel_data.html">Pixel Data Handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixel_data_handlers</span></code>)</a></li>
 </ul>
 </li>
@@ -194,9 +195,14 @@
             
   <div class="section" id="bulk-data-handlers">
 <span id="api-handlers"></span><h1>Bulk Data Handlers<a class="headerlink" href="#bulk-data-handlers" title="Permalink to this headline">¶</a></h1>
-<p>Functions for handling bulk data elements such as (7fe0,0010) <em>Pixel Data</em>.</p>
+<p>Functions for handling bulk data elements such as (7fe0,0010) <em>Pixel Data</em> and
+(60xx,3000) <em>Overlay Data</em>.</p>
 <div class="toctree-wrapper compound">
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="handlers.overlay_data.html">Overlay Data Handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.overlay_data_handlers</span></code>)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="generated/pydicom.overlay_data_handlers.numpy_handler.html">pydicom.overlay_data_handlers.numpy_handler</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="handlers.pixel_data.html">Pixel Data Handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixel_data_handlers</span></code>)</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="generated/pydicom.pixel_data_handlers.gdcm_handler.html">pydicom.pixel_data_handlers.gdcm_handler</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/pydicom.pixel_data_handlers.jpeg_ls_handler.html">pydicom.pixel_data_handlers.jpeg_ls_handler</a></li>
@@ -218,7 +224,7 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="handlers.pixel_data.html" class="btn btn-neutral float-right" title="Pixel Data Handlers (pydicom.pixel_data_handlers)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="handlers.overlay_data.html" class="btn btn-neutral float-right" title="Overlay Data Handlers (pydicom.overlay_data_handlers)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="generated/pydicom.dataset.validate_file_meta.html" class="btn btn-neutral float-left" title="pydicom.dataset.validate_file_meta" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

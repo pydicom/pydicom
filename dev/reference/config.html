@@ -108,6 +108,7 @@
 <li class="toctree-l3"><a class="reference internal" href="generated/pydicom.config.datetime_conversion.html">pydicom.config.datetime_conversion</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/pydicom.config.debug.html">pydicom.config.debug</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/pydicom.config.enforce_valid_values.html">pydicom.config.enforce_valid_values</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pydicom.config.overlay_data_handlers.html">pydicom.config.overlay_data_handlers</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/pydicom.config.pixel_data_handlers.html">pydicom.config.pixel_data_handlers</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/pydicom.config.reset_data_element_callback.html">pydicom.config.reset_data_element_callback</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/pydicom.config.use_DS_decimal.html">pydicom.config.use_DS_decimal</a></li>
@@ -227,13 +228,16 @@
 <tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.config.enforce_valid_values.html#pydicom.config.enforce_valid_values" title="pydicom.config.enforce_valid_values"><code class="xref py py-obj docutils literal notranslate"><span class="pre">enforce_valid_values</span></code></a></p></td>
 <td><p>Raise exceptions if any value is not allowed by DICOM Standard.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.config.pixel_data_handlers.html#pydicom.config.pixel_data_handlers" title="pydicom.config.pixel_data_handlers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pixel_data_handlers</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.config.overlay_data_handlers.html#pydicom.config.overlay_data_handlers" title="pydicom.config.overlay_data_handlers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">overlay_data_handlers</span></code></a></p></td>
+<td><p>Handlers for converting (60xx,3000) <em>Overlay Data</em></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.config.pixel_data_handlers.html#pydicom.config.pixel_data_handlers" title="pydicom.config.pixel_data_handlers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pixel_data_handlers</span></code></a></p></td>
 <td><p>Handlers for converting (7fe0,0010) <em>Pixel Data</em>.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.config.reset_data_element_callback.html#pydicom.config.reset_data_element_callback" title="pydicom.config.reset_data_element_callback"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reset_data_element_callback</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.config.reset_data_element_callback.html#pydicom.config.reset_data_element_callback" title="pydicom.config.reset_data_element_callback"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reset_data_element_callback</span></code></a>()</p></td>
 <td><p>Reset the <a class="reference internal" href="generated/pydicom.config.data_element_callback.html#pydicom.config.data_element_callback" title="pydicom.config.data_element_callback"><code class="xref py py-func docutils literal notranslate"><span class="pre">data_element_callback()</span></code></a> function to the default.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.config.use_DS_decimal.html#pydicom.config.use_DS_decimal" title="pydicom.config.use_DS_decimal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">use_DS_decimal</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.config.use_DS_decimal.html#pydicom.config.use_DS_decimal" title="pydicom.config.use_DS_decimal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">use_DS_decimal</span></code></a></p></td>
 <td><p>Set to <code class="docutils literal notranslate"><span class="pre">True</span></code> to use <a class="reference external" href="https://docs.python.org/3/library/decimal.html#decimal.Decimal" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">decimal.Decimal</span></code></a> to hold the value for elements with a VR of ‘DS’.</p></td>
 </tr>
 </tbody>

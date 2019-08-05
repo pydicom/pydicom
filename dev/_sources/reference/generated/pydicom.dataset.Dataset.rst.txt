@@ -36,6 +36,7 @@ pydicom.dataset.Dataset
       ~Dataset.items
       ~Dataset.iterall
       ~Dataset.keys
+      ~Dataset.overlay_array
       ~Dataset.pop
       ~Dataset.popitem
       ~Dataset.private_block

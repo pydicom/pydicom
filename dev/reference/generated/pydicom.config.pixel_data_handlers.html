@@ -40,7 +40,7 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="pydicom.config.reset_data_element_callback" href="pydicom.config.reset_data_element_callback.html" />
-    <link rel="prev" title="pydicom.config.enforce_valid_values" href="pydicom.config.enforce_valid_values.html" /> 
+    <link rel="prev" title="pydicom.config.overlay_data_handlers" href="pydicom.config.overlay_data_handlers.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -108,6 +108,7 @@
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.datetime_conversion.html">pydicom.config.datetime_conversion</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.debug.html">pydicom.config.debug</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.enforce_valid_values.html">pydicom.config.enforce_valid_values</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.overlay_data_handlers.html">pydicom.config.overlay_data_handlers</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">pydicom.config.pixel_data_handlers</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.reset_data_element_callback.html">pydicom.config.reset_data_element_callback</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.use_DS_decimal.html">pydicom.config.use_DS_decimal</a></li>
@@ -228,12 +229,11 @@ be converted to the RGB colourspace, <code class="docutils literal notranslate">
 </dd>
 </dl>
 <p>The first handler that both announces that it supports the transfer syntax
-and does not throw an exception, either in getting the data or when the data
+and does not raise an exception, either in getting the data or when the data
 is reshaped to the correct dimensions, is the handler that will provide the
 data.</p>
-<p>If they all fail, the last one to throw an exception gets to see its
-exception thrown up.</p>
-<p>If no one throws an exception, but they all refuse to support the transfer
+<p>If they all fail only the last exception is raised.</p>
+<p>If none raise an exception, but they all refuse to support the transfer
 syntax, then this fact is announced in a <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#NotImplementedError" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">NotImplementedError</span></code></a>
 exception.</p>
 </dd></dl>
@@ -251,7 +251,7 @@ exception.</p>
         <a href="pydicom.config.reset_data_element_callback.html" class="btn btn-neutral float-right" title="pydicom.config.reset_data_element_callback" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="pydicom.config.enforce_valid_values.html" class="btn btn-neutral float-left" title="pydicom.config.enforce_valid_values" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="pydicom.config.overlay_data_handlers.html" class="btn btn-neutral float-left" title="pydicom.config.overlay_data_handlers" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
