@@ -4,7 +4,7 @@ import pytest
 from pydicom.data import get_testdata_files
 from pydicom.dataelem import DataElement
 from pydicom.dataset import Dataset
-from pydicom import compat
+from pydicom import compat, dcmread
 
 from pydicom.valuerep import PersonNameUnicode, PersonName3
 
@@ -19,6 +19,14 @@ def test_json_PN():
     inner_seq = ds[0x04000561].value[0][0x04000550]
     dataelem = inner_seq[0][0x00100010]
     assert isinstance(dataelem.value, (PersonNameUnicode, PersonName3))
+
+
+def test_json_from_dicom_file():
+    ds1 = Dataset(dcmread(get_testdata_files("CT_small.dcm")[0]))
+    del ds1['PixelData']
+    ds_json = ds1.to_json(bulk_data_threshold=10000)
+    ds2 = Dataset.from_json(ds_json)
+    assert ds1 == ds2
 
 
 @pytest.mark.skipif(compat.in_py2,
@@ -74,7 +82,11 @@ def test_json_roundtrip():
     jsonmodel = ds.to_json(bulk_data_threshold=100)
     ds2 = Dataset.from_json(jsonmodel)
 
-    assert ds2.SpecificCharacterSet == ['ISO_IR 100']
+    for e1, e2 in zip(ds, ds2):
+        if e1 != e2:
+            print(e1, e2)
+    # assert ds == ds2
+    assert ds2.SpecificCharacterSet == 'ISO_IR 100'
 
 
 def test_json_private_DS_VM():
