@@ -188,7 +188,7 @@ class ContentSequence(Sequence):
         self.insert(position, item)
 
     def __contains__(self, item):
-        return any([item == contained_item for contained_item in self])
+        return any(item == contained_item for contained_item in self)
 
     def get_nodes(self):
         """Gets content items that represent nodes in the content tree, i.e.
@@ -693,10 +693,10 @@ class ScoordContentItem(ContentItem):
                 float(coordinate) for coordinate in graphic_data
             ]
         else:
-            # TODO: This may be expensive for large lists.
-            are_all_points = all([
-                is_point(coordinates) for coordinates in graphic_data
-            ])
+            are_all_points = all(
+                is_point(coordinates)
+                for coordinates in graphic_data
+            )
             if graphic_type == GraphicTypes.CIRCLE:
                 if len(graphic_data) != 2 or not(are_all_points):
                     raise ValueError(
