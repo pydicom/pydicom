@@ -176,13 +176,12 @@ class ContentSequence(Sequence):
 
     def __init__(self, iterable=None):
         if iterable is not None:
-            for item in iterable:
-                if not isinstance(item, ContentItem):
-                    raise TypeError(
-                        'Items of "{}" must have type ContentItem.'.format(
-                            self.__class__.__name__
-                        )
+            if not all(isinstance(item, ContentItem) for item in iterable):
+                raise TypeError(
+                    'Items of "{}" must have type ContentItem.'.format(
+                        self.__class__.__name__
                     )
+                )
         super(ContentSequence, self).__init__(iterable)
 
     def __setitem__(self, position, item):
