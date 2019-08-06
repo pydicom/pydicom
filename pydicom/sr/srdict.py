@@ -85,7 +85,7 @@ class _CID_Dict(object):
     @property
     def concepts(self):
         if not self._concepts:
-            return {name: getattr(self, name) for name in self.dir()}
+            self._concepts = {name: getattr(self, name) for name in self.dir()}
         return self._concepts
 
     def __repr__(self):
