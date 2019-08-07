@@ -329,7 +329,7 @@ class DataElement(object):
                     # Some DICOMweb services get this wrong, so we
                     # workaround the issue and warn the user
                     # rather than raising an error.
-                    logger.error(
+                    logger.warn(
                         'value of data element "{}" with VR Person Name (PN) '
                         'is not formatted correctly'.format(tag)
                     )
@@ -347,6 +347,19 @@ class DataElement(object):
                 elem_value = elem_value[0]
             elif not elem_value:
                 elem_value = empty_value_for_VR(vr)
+        elif vr == 'AT':
+            elem_value = []
+            for v in value:
+                try:
+                    elem_value.append(int(v, 16))
+                except ValueError:
+                    logger.warn('Invalid value "{}" for AT element - '
+                                'ignoring it'.format(v))
+                value = value[0]
+            if not elem_value:
+                elem_value = empty_value_for_VR(vr)
+            elif len(elem_value) == 1:
+                elem_value = elem_value[0]
         else:
             if isinstance(value, list) and len(value) == 1:
                 value = value[0]
@@ -408,7 +421,7 @@ class DataElement(object):
         """
         json_element = {'vr': self.VR, }
         if self.VR in jsonrep.BINARY_VR_VALUES:
-            if self.value is not None:
+            if not self.is_empty:
                 binary_value = self.value
                 encoded_value = base64.b64encode(binary_value).decode('utf-8')
                 if len(encoded_value) > bulk_data_threshold:
@@ -450,10 +463,15 @@ class DataElement(object):
                 if len(elem_value.components) > 2:
                     comps['Phonetic'] = elem_value.components[2]
                 json_element['Value'] = [comps]
+        elif self.VR == 'AT':
+            if not self.is_empty:
+                value = self.value
+                if self.VM == 1:
+                    value = [value]
+                json_element['Value'] = [format(v, '08X') for v in value]
         else:
-            if self.value is not None:
-                is_multivalue = isinstance(self.value, MultiValue)
-                if self.VM > 1 or is_multivalue:
+            if not self.is_empty:
+                if self.VM > 1:
                     value = self.value
                 else:
                     value = [self.value]

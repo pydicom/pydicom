@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 # Copyright 2008-2019 pydicom authors. See LICENSE file for details.
-import pytest
+import json
+
+from pydicom import dcmread
 from pydicom.data import get_testdata_files
 from pydicom.dataelem import DataElement
 from pydicom.dataset import Dataset
-from pydicom import compat, dcmread
-
+from pydicom.tag import Tag
 from pydicom.valuerep import PersonNameUnicode, PersonName3
 
 
@@ -29,9 +30,7 @@ def test_json_from_dicom_file():
     assert ds1 == ds2
 
 
-@pytest.mark.skipif(compat.in_py2,
-                    reason='JSON conversion not yet working in Python 2')
-def test_dataelem_from_json():
+def test_pn_dataelem_from_json():
     tag = 0x0080090
     vr = "PN"
     value = [{"Alphabetic": ""}]
@@ -72,21 +71,32 @@ def test_json_roundtrip():
     ds.add_new(0x00091019, 'UC', 'LONG CODE VALUE')
     ds.add_new(0x0009101a, 'UN', b'\x0102\x3040\x5060')
     ds.add_new(0x0009101b, 'UR', 'https://example.com')
-    ds.add_new(0x0009101c, 'AT', b'\x10\x00\x20\x00\x10\x00\x30\x00\x10')
-    ds.add_new(0x0009101d, 'ST', 100 * u'علي بابا')
-    ds.add_new(0x0009101e, 'SH', u'Διονυσιος')
+    ds.add_new(0x0009101c, 'AT', [0x00100010, 0x00100020])
+    ds.add_new(0x0009101d, 'AT', Tag(0x28, 0x02))
+    ds.add_new(0x0009101e, 'ST', 100 * u'علي بابا')
+    ds.add_new(0x0009101f, 'SH', u'Διονυσιος')
     ds.add_new(0x00090011, 'LO', 'Creator 2.0')
     ds.add_new(0x00091101, 'SH', 'Version2')
     ds.add_new(0x00091102, 'US', 2)
 
-    jsonmodel = ds.to_json(bulk_data_threshold=100)
-    ds2 = Dataset.from_json(jsonmodel)
+    json_string = ds.to_json(bulk_data_threshold=100)
+    json_model = json.loads(json_string)
+    assert json_model['00080005']['Value'] == ['ISO_IR 100']
+    assert json_model['00091007']['Value'] == ['1.2.3.4.5.6']
+    assert json_model['0009100A']['Value'] == ['20200101115500.000000']
+    assert json_model['0009100B']['Value'] == [3000000000]
+    assert json_model['0009100C']['Value'] == [-2000000000]
+    assert json_model['0009100D']['Value'] == [40000]
+    assert json_model['0009100F']['Value'] == [3.14]
+    assert json_model['00091010']['Value'] == [3.14159265]
+    assert json_model['00091013']['Value'] == [{'Alphabetic': 'Yamada^Tarou',
+                                                'Ideographic': u'山田^太郎',
+                                                'Phonetic': u'やまだ^たろう'}]
+    assert json_model['00091018']['Value'] == [50 * u'Калинка,']
+    assert json_model['0009101C']['Value'] == ['00100010', '00100020']
 
-    for e1, e2 in zip(ds, ds2):
-        if e1 != e2:
-            print(e1, e2)
-    # assert ds == ds2
-    assert ds2.SpecificCharacterSet == 'ISO_IR 100'
+    ds2 = Dataset.from_json(json_string)
+    assert ds == ds2
 
 
 def test_json_private_DS_VM():

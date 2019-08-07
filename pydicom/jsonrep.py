@@ -7,7 +7,7 @@ from pydicom.compat import int_type
 JSON_VALUE_KEYS = ('Value', 'BulkDataURI', 'InlineBinary',)
 
 BINARY_VR_VALUES = ['OW', 'OB', 'OD', 'OF', 'OL', 'UN',
-                    'OB or OW', 'US or OW', 'US or SS or OW', 'AT']
+                    'OB or OW', 'US or OW', 'US or SS or OW']
 VRs_TO_BE_FLOATS = ['DS', 'FL', 'FD', ]
 VRs_TO_BE_INTS = ['IS', 'SL', 'SS', 'UL', 'US', 'US or SS']
 
