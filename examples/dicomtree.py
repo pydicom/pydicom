@@ -1,10 +1,12 @@
 """
+sudo apt install tix-dev
+sudo pip install -U pydicom
+python3 dicomtree.py file.dcm
+
 =========================================
 Show a dicom file using hierarchical tree
 =========================================
-
 Show a dicom file using a hierarchical tree in a graphical window.
-
 """
 
 # authors : Guillaume Lemaitre <g.lemaitre58@gmail.com>
@@ -38,6 +40,10 @@ def RunTree(w, filename):
     box.add('exit', text='Exit', underline=0, command=w.destroy, width=6)
     box.pack(side=tkinter_tix.BOTTOM, fill=tkinter_tix.X)
     top.pack(side=tkinter_tix.TOP, fill=tkinter_tix.BOTH, expand=1)
+    #https://stackoverflow.com/questions/17355902/python-tkinter-binding-mousewheel-to-scrollbar
+    tree.bind_all('<MouseWheel>', lambda event: tree.hlist.yview_scroll(int(-1*event.delta/120.), "units"))  # Wheel in Windows
+    tree.bind_all('<Button-4>', lambda event: tree.hlist.yview_scroll(int(-1), "units"))  # Wheel up in Linux
+    tree.bind_all('<Button-5>', lambda event: tree.hlist.yview_scroll(int(+1), "units"))  # Wheel down in Linux
 
     show_file(filename, tree)
 
@@ -79,7 +85,7 @@ if __name__ == '__main__':
         print(usage)
         sys.exit(-1)
     root = tkinter_tix.Tk()
-    root.geometry("{0:d}x{1:d}+{2:d}+{3:d}".format(800, 600, 0, 0))
+    root.geometry("{0:d}x{1:d}+{2:d}+{3:d}".format(1200, 900, 0, 0))
 
     RunTree(root, sys.argv[1])
     root.mainloop()
