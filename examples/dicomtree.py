@@ -1,3 +1,4 @@
+# Copyright pydicom authors 2019. See LICENSE file for details
 """
 sudo apt install tix-dev
 sudo pip install -U pydicom
@@ -8,9 +9,6 @@ Show a dicom file using hierarchical tree
 =========================================
 Show a dicom file using a hierarchical tree in a graphical window.
 """
-
-# authors : Guillaume Lemaitre <g.lemaitre58@gmail.com>
-# license : MIT
 
 from __future__ import print_function
 
