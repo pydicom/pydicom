@@ -329,19 +329,24 @@ class DataElement(object):
                     # Some DICOMweb services get this wrong, so we
                     # workaround the issue and warn the user
                     # rather than raising an error.
-                    logger.warn(
+                    logger.warning(
                         'value of data element "{}" with VR Person Name (PN) '
                         'is not formatted correctly'.format(tag)
                     )
                     elem_value.append(v)
                 else:
-                    comps = []
-                    if 'Alphabetic' in v:
-                        comps.append(v['Alphabetic'])
-                    if 'Ideographic' in v:
-                        comps.append(v['Ideographic'])
                     if 'Phonetic' in v:
-                        comps.append(v['Phonetic'])
+                        comps = ['', '', '']
+                    elif 'Ideographic' in v:
+                        comps = ['', '']
+                    else:
+                        comps = ['']
+                    if 'Alphabetic' in v:
+                        comps[0] = v['Alphabetic']
+                    if 'Ideographic' in v:
+                        comps[1] = v['Ideographic']
+                    if 'Phonetic' in v:
+                        comps[2] = v['Phonetic']
                     elem_value.append('='.join(comps))
             if len(elem_value) == 1:
                 elem_value = elem_value[0]
@@ -353,8 +358,8 @@ class DataElement(object):
                 try:
                     elem_value.append(int(v, 16))
                 except ValueError:
-                    logger.warn('Invalid value "{}" for AT element - '
-                                'ignoring it'.format(v))
+                    warnings.warn('Invalid value "{}" for AT element - '
+                                  'ignoring it'.format(v))
                 value = value[0]
             if not elem_value:
                 elem_value = empty_value_for_VR(vr)
@@ -377,7 +382,6 @@ class DataElement(object):
             else:
                 elem_value = value
         if elem_value is None:
-            logger.warning('missing value for data element "{}"'.format(tag))
             elem_value = empty_value_for_VR(vr)
 
         elem_value = jsonrep.convert_to_python_number(elem_value, vr)
@@ -453,16 +457,22 @@ class DataElement(object):
             ]
             json_element['Value'] = value
         elif self.VR == 'PN':
-            elem_value = self.value
             if not self.is_empty:
-                if compat.in_py2:
-                    elem_value = PersonNameUnicode(elem_value, 'UTF8')
-                comps = {'Alphabetic': elem_value.components[0]}
-                if len(elem_value.components) > 1:
-                    comps['Ideographic'] = elem_value.components[1]
-                if len(elem_value.components) > 2:
-                    comps['Phonetic'] = elem_value.components[2]
-                json_element['Value'] = [comps]
+                elem_value = []
+                if self.VM > 1:
+                    value = self.value
+                else:
+                    value = [self.value]
+                for v in value:
+                    if compat.in_py2:
+                        v = PersonNameUnicode(v, 'UTF8')
+                    comps = {'Alphabetic': v.components[0]}
+                    if len(v.components) > 1:
+                        comps['Ideographic'] = v.components[1]
+                    if len(v.components) > 2:
+                        comps['Phonetic'] = v.components[2]
+                    elem_value.append(comps)
+                json_element['Value'] = elem_value
         elif self.VR == 'AT':
             if not self.is_empty:
                 value = self.value

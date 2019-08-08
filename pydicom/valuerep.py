@@ -646,9 +646,13 @@ class PersonName3(object):
             # this is the decoded string - save the original string if
             # available for easier writing back
             self.original_string = original_string
-            self._components = tuple(val.split('='))
+            components = val.split('=')
+            # Remove empty elements from the end to avoid trailing '='
+            while len(components) and not components[-1]:
+                components.pop()
+            self._components = tuple(components)
 
-        # if the encoding is not given, leave it as undefined (None)
+            # if the encoding is not given, leave it as undefined (None)
         self.encodings = _verify_encodings(encodings)
         self._dict = {}
 
@@ -812,7 +816,7 @@ class PersonName3(object):
 
     def __bool__(self):
         if self.original_string is None:
-            return (self._components is not None and
+            return (bool(self._components) and
                     (len(self._components) > 1 or bool(self._components[0])))
         return bool(self.original_string)
 
