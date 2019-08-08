@@ -39,9 +39,12 @@ def RunTree(w, filename):
     box.pack(side=tkinter_tix.BOTTOM, fill=tkinter_tix.X)
     top.pack(side=tkinter_tix.TOP, fill=tkinter_tix.BOTH, expand=1)
     # https://stackoverflow.com/questions/17355902/python-tkinter-binding-mousewheel-to-scrollbar
-    tree.bind_all('<MouseWheel>', lambda event: tree.hlist.yview_scroll(int(-1*event.delta/120.), "units"))  # Wheel in Windows
-    tree.bind_all('<Button-4>', lambda event: tree.hlist.yview_scroll(int(-1), "units"))  # Wheel up in Linux
-    tree.bind_all('<Button-5>', lambda event: tree.hlist.yview_scroll(int(+1), "units"))  # Wheel down in Linux
+    tree.bind_all('<MouseWheel>', lambda event: \
+                  tree.hlist.yview_scroll(int(-1*event.delta/120.), "units"))  # Wheel in Windows
+    tree.bind_all('<Button-4>', lambda event: \
+                  tree.hlist.yview_scroll(int(-1), "units"))  # Wheel up in Linux
+    tree.bind_all('<Button-5>', lambda event: \
+                  tree.hlist.yview_scroll(int(+1), "units"))  # Wheel down in Linux
 
     show_file(filename, tree)
 
