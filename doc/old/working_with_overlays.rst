@@ -11,14 +11,14 @@ Working with Overlay Data
 Introduction
 ------------
 
-Overlays in DICOM are present in what's called a :dcm:`Repeating Group
-<part05/sect_7.6.html>`, where the group number of the element tags are defined
-over a range rather than a specific value. For example, the group number of
-(60xx,3000) *Overlay Data* may be 6000, 6002, or any even value up to 601E.
-This allows a dataset to include multiple overlays, where the related elements
-for each overlay use the same group number. Because of this, the only way to
-access a particular element from an overlay is to use the
-``Dataset[group, elem]`` method:
+:dcm:`Overlays<part03/sect_C.9.2.html>` in DICOM are present in what's called
+a :dcm:`Repeating Group<part05/sect_7.6.html>`, where the group number of the
+element tags are defined over a range rather than a specific value. For
+example, the tag's group number for (60xx,3000) *Overlay Data* may be (in hex)
+``6000``, ``6002``, or any even value up to ``601E``. This allows a dataset to
+include multiple overlays, where the related elements for each overlay use the
+same group number. Because of this, the only way to access a particular
+element from an overlay is to use the ``Dataset[group, elem]`` method:
 
 >>> import pydicom
 >>> from pydicom.data import get_testdata_files
@@ -32,7 +32,7 @@ access a particular element from an overlay is to use the
 pydicom tends to be "lazy" in interpreting DICOM data. For example, by default
 it doesn't do anything with overlay data except read in the raw bytes::
 
-  >>> ds[0x6000, 0x3000].value # doctest: +ELLIPSIS
+  >>> elem.value # doctest: +ELLIPSIS
   b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00...
 
 ``Dataset.overlay_array()``
@@ -61,6 +61,13 @@ overlay elements you're interested in::
   >>> arr.shape
   (484, 484)
 
+One thing to remember when dealing with *Overlay Data* is that the top left
+of the overlay doesn't necessarily have to line up with the top left of the
+related *Pixel Data*. The actual offset between them can be determined from
+(60xx,0050) *Overlay Origin*, where a value of ``[1, 1]`` indicates that
+the top left pixels are aligned and a value of ``[0, 0]`` indicates that the
+overlay pixels start 1 row above and 1 row to the left of the image pixels.
+
 NumPy can be used to modify the pixels, but if the changes are to be saved,
 they must be bit-packed and written back to the correct element:
 
@@ -73,12 +80,16 @@ they must be bit-packed and written back to the correct element:
   from pydicom.pixel_data_handlers.numpy_handler import pack_bits
   packed_bytes = pack_bits(arr)
 
+  # Pad the value if odd-length
+  if len(packed_bytes) % 2:
+      packed_bytes += b'\x00'
+
   # Update the element value
   ds[0x6000, 0x3000].value = packed_bytes
   ds.save_as("temp.dcm")
 
-Some changes may require other DICOM tags to be modified. For example, if the
-overlay data is reduced (e.g. a :math:`512 \times 512` image is collapsed to
-:math:`256 \times 256`) then the corresponding (60xx,0010) *Overlay Rows* and
-(60xx,0011) *Overlay Columns* should be set appropriately. You must explicitly
-set these yourself; pydicom does not do so automatically.
+Some changes may require other DICOM elements to be modified. For example, if
+the overlay data is reduced (e.g. a :math:`512 \times 512` image is collapsed
+to :math:`256 \times 256`) then the corresponding (60xx,0010) *Overlay Rows*
+and (60xx,0011) *Overlay Columns* should be set appropriately. You must
+explicitly set these yourself; pydicom does not do so automatically.

@@ -22,9 +22,11 @@ def convert_color_space(arr, current, desired):
     current : str
         The current color space, should be a valid value for (0028,0004)
         *Photometric Interpretation*. One of ``'RGB'``, ``'YBR_FULL'``.
+        For ``YBR_FULL_422`` use ``'YBR_FULL'``.
     desired : str
         The desired color space, should be a valid value for (0028,0004)
         *Photometric Interpretation*. One of ``'RGB'``, ``'YBR_FULL'``.
+        For ``YBR_FULL_422`` use ``'YBR_FULL'``.
 
     Returns
     -------

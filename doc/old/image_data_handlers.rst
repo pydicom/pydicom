@@ -82,11 +82,36 @@ Usage
 To use decompressed image data from compressed DICOM images, you have two
 options:
 
-* use ``decompress()`` on the dataset to convert it in-place and work with the
-  pixel data as described before
+* use :meth:`~pydicom.dataset.Dataset.decompress` on the dataset to convert
+  it in-place and work with the pixel data as described before
 * get an uncompressed copy of the pixel data as a NumPy array using
-  ``Dataset.pixel_array`` without touching the original dataset
+  :attr:`Dataset.pixel_array<pydicom.dataset.Dataset.pixel_array>` without
+  touching the original dataset
 
-.. note:: Using ``decompress()`` adapts the transfer syntax of the data set,
-   but not the Photometric Interpretation. The Photometric Interpretation may
-   not match the pixel data, depending on the used decompression handler.
+.. note:: Using :meth:`~pydicom.dataset.Dataset.decompress` adapts the
+   transfer syntax of the data set, but not the *Photometric Interpretation*.
+   The *Photometric Interpretation* may not match the pixel data, depending on
+   the used decompression handler.
+
+Color space
+...........
+
+When using :attr:`Dataset.pixel_array<pydicom.dataset.Dataset.pixel_array>`
+with *Pixel Data* that has an (0028,0002) *Samples per Pixel* value
+of ``3`` and a (0028,0004) *Photometric Interpretation* which is non-RGB (i.e.
+``YBR_FULL``, ``YBR_FULL_422``, etc) then the returned pixel data may be in
+a different color space depending on the package used to decompress the data.
+
+* For GDCM the data will be in the color space listed in *Photometric
+  Interpretation*
+* For Pillow, YBR data will be converted automatically to RGB
+
+*pydicom* offers a limited ability to convert between RGB and YBR color spaces
+through the :func:`~pydicom.pixel_data_handlers.util.convert_color_space`
+function. When changing the color space you will also need to change the value
+of the *Photometric Interpretation*.
+
+
+.. note:: See the DICOM Standard, Part 3,
+   :dcm:`Section C.7.6.3.1<part03/sect_C.7.6.3.html#sect_C.7.6.3.1>` for more
+   information about color spaces.
