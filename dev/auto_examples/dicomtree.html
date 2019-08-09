@@ -186,7 +186,9 @@
 </div>
 <p class="sphx-glr-example-title" id="sphx-glr-auto-examples-dicomtree-py">sudo apt install tix-dev
 sudo pip install -U pydicom
-python3 dicomtree.py file.dcm</p>
+python3 dicomtree.py file.dcm
+Or in file browser, right click on file.dcm, open with custom command:
+python3 dicomtree.py</p>
 <div class="section" id="show-a-dicom-file-using-hierarchical-tree">
 <h1>Show a dicom file using hierarchical tree<a class="headerlink" href="#show-a-dicom-file-using-hierarchical-tree" title="Permalink to this headline">¶</a></h1>
 <p>Show a dicom file using a hierarchical tree in a graphical window.</p>
@@ -267,6 +269,7 @@ python3 dicomtree.py file.dcm</p>
         <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">root</span> <span class="o">=</span> <span class="n">tkinter_tix</span><span class="o">.</span><span class="n">Tk</span><span class="p">()</span>
     <span class="n">root</span><span class="o">.</span><span class="n">geometry</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0:d}</span><span class="s2">x</span><span class="si">{1:d}</span><span class="s2">+</span><span class="si">{2:d}</span><span class="s2">+</span><span class="si">{3:d}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="mi">1200</span><span class="p">,</span> <span class="mi">900</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="n">root</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;DICOM tree viewer - &quot;</span><span class="o">+</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 
     <span class="n">RunTree</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
     <span class="n">root</span><span class="o">.</span><span class="n">mainloop</span><span class="p">()</span>
