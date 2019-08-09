@@ -234,7 +234,7 @@
 </table>
 <dl class="function">
 <dt id="pydicom.pixel_data_handlers.util.convert_color_space">
-<code class="sig-prename descclassname">pydicom.pixel_data_handlers.util.</code><code class="sig-name descname">convert_color_space</code><span class="sig-paren">(</span><em class="sig-param">arr</em>, <em class="sig-param">current</em>, <em class="sig-param">desired</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/48f02442/pydicom/pixel_data_handlers/util.py#L13"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.util.convert_color_space" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.util.</code><code class="sig-name descname">convert_color_space</code><span class="sig-paren">(</span><em class="sig-param">arr</em>, <em class="sig-param">current</em>, <em class="sig-param">desired</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8ea77f4e/pydicom/pixel_data_handlers/util.py#L13"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.util.convert_color_space" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert the image(s) in <cite>arr</cite> from one color space to another.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -243,9 +243,11 @@
 <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.shape.html#numpy.ndarray.shape" title="(in NumPy v1.17)"><code class="xref py py-attr docutils literal notranslate"><span class="pre">shape</span></code></a> (frames, rows, columns, planes)
 or (rows, columns, planes).</p></li>
 <li><p><strong>current</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The current color space, should be a valid value for (0028,0004)
-<em>Photometric Interpretation</em>. One of <code class="docutils literal notranslate"><span class="pre">'RGB'</span></code>, <code class="docutils literal notranslate"><span class="pre">'YBR_FULL'</span></code>.</p></li>
+<em>Photometric Interpretation</em>. One of <code class="docutils literal notranslate"><span class="pre">'RGB'</span></code>, <code class="docutils literal notranslate"><span class="pre">'YBR_FULL'</span></code>.
+For <code class="docutils literal notranslate"><span class="pre">YBR_FULL_422</span></code> use <code class="docutils literal notranslate"><span class="pre">'YBR_FULL'</span></code>.</p></li>
 <li><p><strong>desired</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The desired color space, should be a valid value for (0028,0004)
-<em>Photometric Interpretation</em>. One of <code class="docutils literal notranslate"><span class="pre">'RGB'</span></code>, <code class="docutils literal notranslate"><span class="pre">'YBR_FULL'</span></code>.</p></li>
+<em>Photometric Interpretation</em>. One of <code class="docutils literal notranslate"><span class="pre">'RGB'</span></code>, <code class="docutils literal notranslate"><span class="pre">'YBR_FULL'</span></code>.
+For <code class="docutils literal notranslate"><span class="pre">YBR_FULL_422</span></code> use <code class="docutils literal notranslate"><span class="pre">'YBR_FULL'</span></code>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -259,7 +261,7 @@ or (rows, columns, planes).</p></li>
 
 <dl class="function">
 <dt id="pydicom.pixel_data_handlers.util.dtype_corrected_for_endianness">
-<code class="sig-prename descclassname">pydicom.pixel_data_handlers.util.</code><code class="sig-name descname">dtype_corrected_for_endianness</code><span class="sig-paren">(</span><em class="sig-param">is_little_endian</em>, <em class="sig-param">numpy_dtype</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/48f02442/pydicom/pixel_data_handlers/util.py#L62"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.util.dtype_corrected_for_endianness" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.util.</code><code class="sig-name descname">dtype_corrected_for_endianness</code><span class="sig-paren">(</span><em class="sig-param">is_little_endian</em>, <em class="sig-param">numpy_dtype</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8ea77f4e/pydicom/pixel_data_handlers/util.py#L64"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.util.dtype_corrected_for_endianness" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v1.17)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.dtype</span></code></a> corrected for system and <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code>
 endianness.</p>
 <dl class="field-list simple">
@@ -285,7 +287,7 @@ endianess.</p>
 
 <dl class="function">
 <dt id="pydicom.pixel_data_handlers.util.get_expected_length">
-<code class="sig-prename descclassname">pydicom.pixel_data_handlers.util.</code><code class="sig-name descname">get_expected_length</code><span class="sig-paren">(</span><em class="sig-param">ds</em>, <em class="sig-param">unit='bytes'</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/48f02442/pydicom/pixel_data_handlers/util.py#L329"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.util.get_expected_length" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.util.</code><code class="sig-name descname">get_expected_length</code><span class="sig-paren">(</span><em class="sig-param">ds</em>, <em class="sig-param">unit='bytes'</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8ea77f4e/pydicom/pixel_data_handlers/util.py#L331"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.util.get_expected_length" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the expected length (in terms of bytes or pixels) of the <em>Pixel
 Data</em>.</p>
 <table class="docutils align-default">
@@ -356,7 +358,7 @@ pixels, excluding the NULL trailing padding byte for odd length data.</p>
 
 <dl class="function">
 <dt id="pydicom.pixel_data_handlers.util.pixel_dtype">
-<code class="sig-prename descclassname">pydicom.pixel_data_handlers.util.</code><code class="sig-name descname">pixel_dtype</code><span class="sig-paren">(</span><em class="sig-param">ds</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/48f02442/pydicom/pixel_data_handlers/util.py#L95"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.util.pixel_dtype" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.util.</code><code class="sig-name descname">pixel_dtype</code><span class="sig-paren">(</span><em class="sig-param">ds</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8ea77f4e/pydicom/pixel_data_handlers/util.py#L97"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.util.pixel_dtype" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v1.17)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.dtype</span></code></a> for the <em>Pixel Data</em> in <cite>ds</cite>.</p>
 <p>Suitable for use with IODs containing the Image Pixel module.</p>
 <table class="docutils align-default">
@@ -409,7 +411,7 @@ wish to get the data type for.</p>
 
 <dl class="function">
 <dt id="pydicom.pixel_data_handlers.util.reshape_pixel_array">
-<code class="sig-prename descclassname">pydicom.pixel_data_handlers.util.</code><code class="sig-name descname">reshape_pixel_array</code><span class="sig-paren">(</span><em class="sig-param">ds</em>, <em class="sig-param">arr</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/48f02442/pydicom/pixel_data_handlers/util.py#L182"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.util.reshape_pixel_array" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.util.</code><code class="sig-name descname">reshape_pixel_array</code><span class="sig-paren">(</span><em class="sig-param">ds</em>, <em class="sig-param">arr</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8ea77f4e/pydicom/pixel_data_handlers/util.py#L184"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.util.reshape_pixel_array" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a reshaped <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> <cite>arr</cite>.</p>
 <table class="docutils align-default">
 <colgroup>

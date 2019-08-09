@@ -317,7 +317,7 @@ values</p></th>
 </table>
 <dl class="function">
 <dt id="pydicom.pixel_data_handlers.numpy_handler.get_pixeldata">
-<code class="sig-prename descclassname">pydicom.pixel_data_handlers.numpy_handler.</code><code class="sig-name descname">get_pixeldata</code><span class="sig-paren">(</span><em class="sig-param">ds</em>, <em class="sig-param">read_only=False</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/48f02442/pydicom/pixel_data_handlers/numpy_handler.py#L195"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.numpy_handler.get_pixeldata" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.numpy_handler.</code><code class="sig-name descname">get_pixeldata</code><span class="sig-paren">(</span><em class="sig-param">ds</em>, <em class="sig-param">read_only=False</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8ea77f4e/pydicom/pixel_data_handlers/numpy_handler.py#L195"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.numpy_handler.get_pixeldata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> of the <em>Pixel Data</em>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -350,13 +350,13 @@ always returns a writeable array.</p></li>
 
 <dl class="function">
 <dt id="pydicom.pixel_data_handlers.numpy_handler.is_available">
-<code class="sig-prename descclassname">pydicom.pixel_data_handlers.numpy_handler.</code><code class="sig-name descname">is_available</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/48f02442/pydicom/pixel_data_handlers/numpy_handler.py#L66"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.numpy_handler.is_available" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.numpy_handler.</code><code class="sig-name descname">is_available</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8ea77f4e/pydicom/pixel_data_handlers/numpy_handler.py#L66"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.numpy_handler.is_available" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the handler has its dependencies met.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="pydicom.pixel_data_handlers.numpy_handler.needs_to_convert_to_RGB">
-<code class="sig-prename descclassname">pydicom.pixel_data_handlers.numpy_handler.</code><code class="sig-name descname">needs_to_convert_to_RGB</code><span class="sig-paren">(</span><em class="sig-param">ds</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/48f02442/pydicom/pixel_data_handlers/numpy_handler.py#L83"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.numpy_handler.needs_to_convert_to_RGB" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.numpy_handler.</code><code class="sig-name descname">needs_to_convert_to_RGB</code><span class="sig-paren">(</span><em class="sig-param">ds</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8ea77f4e/pydicom/pixel_data_handlers/numpy_handler.py#L83"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.numpy_handler.needs_to_convert_to_RGB" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the <em>Pixel Data</em> should to be converted from YCbCr to
 RGB.</p>
 <p>This affects JPEG transfer syntaxes.</p>
@@ -364,7 +364,7 @@ RGB.</p>
 
 <dl class="function">
 <dt id="pydicom.pixel_data_handlers.numpy_handler.pack_bits">
-<code class="sig-prename descclassname">pydicom.pixel_data_handlers.numpy_handler.</code><code class="sig-name descname">pack_bits</code><span class="sig-paren">(</span><em class="sig-param">arr</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/48f02442/pydicom/pixel_data_handlers/numpy_handler.py#L101"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.numpy_handler.pack_bits" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.numpy_handler.</code><code class="sig-name descname">pack_bits</code><span class="sig-paren">(</span><em class="sig-param">arr</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8ea77f4e/pydicom/pixel_data_handlers/numpy_handler.py#L101"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.numpy_handler.pack_bits" title="Permalink to this definition">¶</a></dt>
 <dd><p>Pack a binary <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> for use with <em>Pixel Data</em>.</p>
 <p>Should be used in conjunction with (0028,0100) <em>Bits Allocated</em> = 1.</p>
 <dl class="field-list simple">
@@ -393,7 +393,7 @@ bit-padding to round out the byte has already been added).</p>
 
 <dl class="function">
 <dt id="pydicom.pixel_data_handlers.numpy_handler.should_change_PhotometricInterpretation_to_RGB">
-<code class="sig-prename descclassname">pydicom.pixel_data_handlers.numpy_handler.</code><code class="sig-name descname">should_change_PhotometricInterpretation_to_RGB</code><span class="sig-paren">(</span><em class="sig-param">ds</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/48f02442/pydicom/pixel_data_handlers/numpy_handler.py#L92"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.numpy_handler.should_change_PhotometricInterpretation_to_RGB" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.numpy_handler.</code><code class="sig-name descname">should_change_PhotometricInterpretation_to_RGB</code><span class="sig-paren">(</span><em class="sig-param">ds</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8ea77f4e/pydicom/pixel_data_handlers/numpy_handler.py#L92"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.numpy_handler.should_change_PhotometricInterpretation_to_RGB" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the <em>Photometric Interpretation</em> should be changed
 to RGB.</p>
 <p>This affects JPEG transfer syntaxes.</p>
@@ -401,7 +401,7 @@ to RGB.</p>
 
 <dl class="function">
 <dt id="pydicom.pixel_data_handlers.numpy_handler.supports_transfer_syntax">
-<code class="sig-prename descclassname">pydicom.pixel_data_handlers.numpy_handler.</code><code class="sig-name descname">supports_transfer_syntax</code><span class="sig-paren">(</span><em class="sig-param">transfer_syntax</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/48f02442/pydicom/pixel_data_handlers/numpy_handler.py#L71"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.numpy_handler.supports_transfer_syntax" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.numpy_handler.</code><code class="sig-name descname">supports_transfer_syntax</code><span class="sig-paren">(</span><em class="sig-param">transfer_syntax</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8ea77f4e/pydicom/pixel_data_handlers/numpy_handler.py#L71"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.numpy_handler.supports_transfer_syntax" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the handler supports the <cite>transfer_syntax</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -413,7 +413,7 @@ the handler.</p>
 
 <dl class="function">
 <dt id="pydicom.pixel_data_handlers.numpy_handler.unpack_bits">
-<code class="sig-prename descclassname">pydicom.pixel_data_handlers.numpy_handler.</code><code class="sig-name descname">unpack_bits</code><span class="sig-paren">(</span><em class="sig-param">bytestream</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/48f02442/pydicom/pixel_data_handlers/numpy_handler.py#L155"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.numpy_handler.unpack_bits" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.numpy_handler.</code><code class="sig-name descname">unpack_bits</code><span class="sig-paren">(</span><em class="sig-param">bytestream</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8ea77f4e/pydicom/pixel_data_handlers/numpy_handler.py#L155"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.numpy_handler.unpack_bits" title="Permalink to this definition">¶</a></dt>
 <dd><p>Unpack bit packed <em>Pixel Data</em> or <em>Overlay Data</em> into a
 <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>.</p>
 <p>Suitable for use when (0028,0011) <em>Bits Allocated</em> or (60xx,0100) <em>Overlay

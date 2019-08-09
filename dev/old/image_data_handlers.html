@@ -107,6 +107,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#preconditions">Preconditions</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#supported-transfer-syntaxes">Supported Transfer Syntaxes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#usage">Usage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#color-space">Color space</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="viewing_images.html">Viewing Images</a></li>
@@ -368,16 +369,41 @@ Pillow</p></th>
 <p>To use decompressed image data from compressed DICOM images, you have two
 options:</p>
 <ul class="simple">
-<li><p>use <code class="docutils literal notranslate"><span class="pre">decompress()</span></code> on the dataset to convert it in-place and work with the
-pixel data as described before</p></li>
+<li><p>use <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.decompress" title="pydicom.dataset.Dataset.decompress"><code class="xref py py-meth docutils literal notranslate"><span class="pre">decompress()</span></code></a> on the dataset to convert
+it in-place and work with the pixel data as described before</p></li>
 <li><p>get an uncompressed copy of the pixel data as a NumPy array using
-<code class="docutils literal notranslate"><span class="pre">Dataset.pixel_array</span></code> without touching the original dataset</p></li>
+<a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.pixel_array" title="pydicom.dataset.Dataset.pixel_array"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Dataset.pixel_array</span></code></a> without
+touching the original dataset</p></li>
 </ul>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Using <code class="docutils literal notranslate"><span class="pre">decompress()</span></code> adapts the transfer syntax of the data set,
-but not the Photometric Interpretation. The Photometric Interpretation may
-not match the pixel data, depending on the used decompression handler.</p>
+<p>Using <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.decompress" title="pydicom.dataset.Dataset.decompress"><code class="xref py py-meth docutils literal notranslate"><span class="pre">decompress()</span></code></a> adapts the
+transfer syntax of the data set, but not the <em>Photometric Interpretation</em>.
+The <em>Photometric Interpretation</em> may not match the pixel data, depending on
+the used decompression handler.</p>
+</div>
+</div>
+<div class="section" id="color-space">
+<h2>Color space<a class="headerlink" href="#color-space" title="Permalink to this headline">¶</a></h2>
+<p>When using <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.pixel_array" title="pydicom.dataset.Dataset.pixel_array"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Dataset.pixel_array</span></code></a>
+with <em>Pixel Data</em> that has an (0028,0002) <em>Samples per Pixel</em> value
+of <code class="docutils literal notranslate"><span class="pre">3</span></code> and a (0028,0004) <em>Photometric Interpretation</em> which is non-RGB (i.e.
+<code class="docutils literal notranslate"><span class="pre">YBR_FULL</span></code>, <code class="docutils literal notranslate"><span class="pre">YBR_FULL_422</span></code>, etc) then the returned pixel data may be in
+a different color space depending on the package used to decompress the data.</p>
+<ul class="simple">
+<li><p>For GDCM the data will be in the color space listed in <em>Photometric
+Interpretation</em></p></li>
+<li><p>For Pillow, YBR data will be converted automatically to RGB</p></li>
+</ul>
+<p><em>pydicom</em> offers a limited ability to convert between RGB and YBR color spaces
+through the <a class="reference internal" href="../reference/generated/pydicom.pixel_data_handlers.util.html#pydicom.pixel_data_handlers.util.convert_color_space" title="pydicom.pixel_data_handlers.util.convert_color_space"><code class="xref py py-func docutils literal notranslate"><span class="pre">convert_color_space()</span></code></a>
+function. When changing the color space you will also need to change the value
+of the <em>Photometric Interpretation</em>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>See the DICOM Standard, Part 3,
+<a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html#sect_C.7.6.3.1">Section C.7.6.3.1</a> for more
+information about color spaces.</p>
 </div>
 </div>
 </div>
