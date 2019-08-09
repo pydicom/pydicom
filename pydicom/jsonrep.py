@@ -2,6 +2,8 @@
 """Methods for converting Datasets and DataElements to/from json"""
 
 # Order of keys is significant!
+from pydicom.compat import int_type
+
 JSON_VALUE_KEYS = ('Value', 'BulkDataURI', 'InlineBinary',)
 
 BINARY_VR_VALUES = ['OW', 'OB', 'OD', 'OF', 'OL', 'UN',
@@ -30,7 +32,7 @@ def convert_to_python_number(value, vr):
         return None
     number_type = None
     if vr in VRs_TO_BE_INTS:
-        number_type = int
+        number_type = int_type
     if vr in VRs_TO_BE_FLOATS:
         number_type = float
     if number_type is not None:

@@ -329,41 +329,60 @@ class DataElement(object):
                     # Some DICOMweb services get this wrong, so we
                     # workaround the issue and warn the user
                     # rather than raising an error.
-                    logger.error(
+                    logger.warning(
                         'value of data element "{}" with VR Person Name (PN) '
                         'is not formatted correctly'.format(tag)
                     )
                     elem_value.append(v)
                 else:
-                    elem_value.extend(list(v.values()))
-            if vm == '1':
+                    if 'Phonetic' in v:
+                        comps = ['', '', '']
+                    elif 'Ideographic' in v:
+                        comps = ['', '']
+                    else:
+                        comps = ['']
+                    if 'Alphabetic' in v:
+                        comps[0] = v['Alphabetic']
+                    if 'Ideographic' in v:
+                        comps[1] = v['Ideographic']
+                    if 'Phonetic' in v:
+                        comps[2] = v['Phonetic']
+                    elem_value.append('='.join(comps))
+            if len(elem_value) == 1:
+                elem_value = elem_value[0]
+            elif not elem_value:
+                elem_value = empty_value_for_VR(vr)
+        elif vr == 'AT':
+            elem_value = []
+            for v in value:
                 try:
-                    elem_value = elem_value[0]
-                except IndexError:
-                    elem_value = ''
+                    elem_value.append(int(v, 16))
+                except ValueError:
+                    warnings.warn('Invalid value "{}" for AT element - '
+                                  'ignoring it'.format(v))
+                value = value[0]
+            if not elem_value:
+                elem_value = empty_value_for_VR(vr)
+            elif len(elem_value) == 1:
+                elem_value = elem_value[0]
         else:
-            if vm == '1':
-                if value_key == 'InlineBinary':
-                    elem_value = base64.b64decode(value)
-                elif value_key == 'BulkDataURI':
-                    if bulk_data_uri_handler is None:
-                        logger.warning(
-                            'no bulk data URI handler provided for retrieval '
-                            'of value of data element "{}"'.format(tag)
-                        )
-                        elem_value = b''
-                    else:
-                        elem_value = bulk_data_uri_handler(value)
+            if isinstance(value, list) and len(value) == 1:
+                value = value[0]
+            if value_key == 'InlineBinary':
+                elem_value = base64.b64decode(value)
+            elif value_key == 'BulkDataURI':
+                if bulk_data_uri_handler is None:
+                    logger.warning(
+                        'no bulk data URI handler provided for retrieval '
+                        'of value of data element "{}"'.format(tag)
+                    )
+                    elem_value = empty_value_for_VR(vr, raw=True)
                 else:
-                    if value:
-                        elem_value = value[0]
-                    else:
-                        elem_value = value
+                    elem_value = bulk_data_uri_handler(value)
             else:
                 elem_value = value
         if elem_value is None:
-            logger.warning('missing value for data element "{}"'.format(tag))
-            elem_value = ''
+            elem_value = empty_value_for_VR(vr)
 
         elem_value = jsonrep.convert_to_python_number(elem_value, vr)
 
@@ -404,11 +423,9 @@ class DataElement(object):
             but `bulk_data_element_handler` is ``None`` and hence not callable
 
         """
-        # TODO: Determine whether more VRs need to be converted to strings
-        _VRs_TO_QUOTE = ['AT', ]
         json_element = {'vr': self.VR, }
         if self.VR in jsonrep.BINARY_VR_VALUES:
-            if self.value is not None:
+            if not self.is_empty:
                 binary_value = self.value
                 encoded_value = base64.b64encode(binary_value).decode('utf-8')
                 if len(encoded_value) > bulk_data_threshold:
@@ -440,35 +457,35 @@ class DataElement(object):
             ]
             json_element['Value'] = value
         elif self.VR == 'PN':
-            elem_value = self.value
-            if elem_value is not None:
-                if compat.in_py2:
-                    elem_value = PersonNameUnicode(elem_value, 'UTF8')
-                if len(elem_value.components) > 2:
-                    json_element['Value'] = [
-                        {'Phonetic': elem_value.components[2], },
-                    ]
-                elif len(elem_value.components) > 1:
-                    json_element['Value'] = [
-                        {'Ideographic': elem_value.components[1], },
-                    ]
-                else:
-                    json_element['Value'] = [
-                        {'Alphabetic': elem_value.components[0], },
-                    ]
-        else:
-            if self.value is not None:
-                is_multivalue = isinstance(self.value, MultiValue)
-                if self.VM > 1 or is_multivalue:
+            if not self.is_empty:
+                elem_value = []
+                if self.VM > 1:
                     value = self.value
                 else:
                     value = [self.value]
-                # ensure it's a list and not another iterable
-                # (e.g. tuple), which would not be JSON serializable
-                if self.VR in _VRs_TO_QUOTE:
-                    json_element['Value'] = [str(v) for v in value]
+                for v in value:
+                    if compat.in_py2:
+                        v = PersonNameUnicode(v, 'UTF8')
+                    comps = {'Alphabetic': v.components[0]}
+                    if len(v.components) > 1:
+                        comps['Ideographic'] = v.components[1]
+                    if len(v.components) > 2:
+                        comps['Phonetic'] = v.components[2]
+                    elem_value.append(comps)
+                json_element['Value'] = elem_value
+        elif self.VR == 'AT':
+            if not self.is_empty:
+                value = self.value
+                if self.VM == 1:
+                    value = [value]
+                json_element['Value'] = [format(v, '08X') for v in value]
+        else:
+            if not self.is_empty:
+                if self.VM > 1:
+                    value = self.value
                 else:
-                    json_element['Value'] = [v for v in value]
+                    value = [self.value]
+                json_element['Value'] = [v for v in value]
         if hasattr(json_element, 'Value'):
             json_element['Value'] = jsonrep.convert_to_python_number(
                 json_element['Value'], self.VR
