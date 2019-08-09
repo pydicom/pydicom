@@ -55,7 +55,7 @@ Somewhere to start
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Show a dicom file using a hierarchical tree in a graphical window.">
+    <div class="sphx-glr-thumbcontainer" tooltip="========================================= Show a dicom file using hierarchical tree ===========...">
 
 .. only:: html
 

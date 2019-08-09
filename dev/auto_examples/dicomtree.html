@@ -184,13 +184,13 @@
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-dicomtree-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
-<div class="sphx-glr-example-title section" id="show-a-dicom-file-using-hierarchical-tree">
-<span id="sphx-glr-auto-examples-dicomtree-py"></span><h1>Show a dicom file using hierarchical tree<a class="headerlink" href="#show-a-dicom-file-using-hierarchical-tree" title="Permalink to this headline">¶</a></h1>
+<p class="sphx-glr-example-title" id="sphx-glr-auto-examples-dicomtree-py">sudo apt install tix-dev
+sudo pip install -U pydicom
+python3 dicomtree.py file.dcm</p>
+<div class="section" id="show-a-dicom-file-using-hierarchical-tree">
+<h1>Show a dicom file using hierarchical tree<a class="headerlink" href="#show-a-dicom-file-using-hierarchical-tree" title="Permalink to this headline">¶</a></h1>
 <p>Show a dicom file using a hierarchical tree in a graphical window.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># authors : Guillaume Lemaitre &lt;g.lemaitre58@gmail.com&gt;</span>
-<span class="c1"># license : MIT</span>
-
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">print_function</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">print_function</span>
 
 <span class="kn">from</span> <span class="nn">pydicom</span> <span class="k">import</span> <span class="n">compat</span>
 
@@ -218,6 +218,13 @@
     <span class="n">box</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s1">&#39;exit&#39;</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s1">&#39;Exit&#39;</span><span class="p">,</span> <span class="n">underline</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">command</span><span class="o">=</span><span class="n">w</span><span class="o">.</span><span class="n">destroy</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
     <span class="n">box</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">side</span><span class="o">=</span><span class="n">tkinter_tix</span><span class="o">.</span><span class="n">BOTTOM</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="n">tkinter_tix</span><span class="o">.</span><span class="n">X</span><span class="p">)</span>
     <span class="n">top</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">side</span><span class="o">=</span><span class="n">tkinter_tix</span><span class="o">.</span><span class="n">TOP</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="n">tkinter_tix</span><span class="o">.</span><span class="n">BOTH</span><span class="p">,</span> <span class="n">expand</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="c1"># https://stackoverflow.com/questions/17355902/python-tkinter-binding-mousewheel-to-scrollbar</span>
+    <span class="n">tree</span><span class="o">.</span><span class="n">bind_all</span><span class="p">(</span><span class="s1">&#39;&lt;MouseWheel&gt;&#39;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">event</span><span class="p">:</span>  <span class="c1"># Wheel in Windows</span>
+                  <span class="n">tree</span><span class="o">.</span><span class="n">hlist</span><span class="o">.</span><span class="n">yview_scroll</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="o">*</span><span class="n">event</span><span class="o">.</span><span class="n">delta</span><span class="o">/</span><span class="mf">120.</span><span class="p">),</span> <span class="s2">&quot;units&quot;</span><span class="p">))</span>
+    <span class="n">tree</span><span class="o">.</span><span class="n">bind_all</span><span class="p">(</span><span class="s1">&#39;&lt;Button-4&gt;&#39;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">event</span><span class="p">:</span>  <span class="c1"># Wheel up in Linux</span>
+                  <span class="n">tree</span><span class="o">.</span><span class="n">hlist</span><span class="o">.</span><span class="n">yview_scroll</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="s2">&quot;units&quot;</span><span class="p">))</span>
+    <span class="n">tree</span><span class="o">.</span><span class="n">bind_all</span><span class="p">(</span><span class="s1">&#39;&lt;Button-5&gt;&#39;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">event</span><span class="p">:</span>  <span class="c1"># Wheel down in Linux</span>
+                  <span class="n">tree</span><span class="o">.</span><span class="n">hlist</span><span class="o">.</span><span class="n">yview_scroll</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span> <span class="s2">&quot;units&quot;</span><span class="p">))</span>
 
     <span class="n">show_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">tree</span><span class="p">)</span>
 
@@ -259,7 +266,7 @@
         <span class="nb">print</span><span class="p">(</span><span class="n">usage</span><span class="p">)</span>
         <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">root</span> <span class="o">=</span> <span class="n">tkinter_tix</span><span class="o">.</span><span class="n">Tk</span><span class="p">()</span>
-    <span class="n">root</span><span class="o">.</span><span class="n">geometry</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0:d}</span><span class="s2">x</span><span class="si">{1:d}</span><span class="s2">+</span><span class="si">{2:d}</span><span class="s2">+</span><span class="si">{3:d}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="mi">800</span><span class="p">,</span> <span class="mi">600</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="n">root</span><span class="o">.</span><span class="n">geometry</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0:d}</span><span class="s2">x</span><span class="si">{1:d}</span><span class="s2">+</span><span class="si">{2:d}</span><span class="s2">+</span><span class="si">{3:d}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="mi">1200</span><span class="p">,</span> <span class="mi">900</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
 
     <span class="n">RunTree</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
     <span class="n">root</span><span class="o">.</span><span class="n">mainloop</span><span class="p">()</span>
