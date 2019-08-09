@@ -6,6 +6,7 @@ Changelog
 
 Fixes
 .....
+* Fixed handling of VRs AT and PN in json encoding (:issue:`915`)
 * Fixed handling of binary values in json encoding (:issue:`887`)
 * Prevent exception if assigning `None` to UI element (:issue:`894`)
 * Fixed print output for numeric multi-value elements (:issue:`892`)
