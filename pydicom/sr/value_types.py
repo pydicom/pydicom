@@ -1,5 +1,6 @@
 """DICOM structured reporting content item value types."""
 from enum import Enum
+from collections import namedtuple
 
 from pydicom.dataset import Dataset
 from pydicom.sequence import Sequence
