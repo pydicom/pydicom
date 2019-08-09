@@ -75,7 +75,7 @@ class ContentItem(Dataset):
     """Abstract base class for a collection of attributes contained in the
     DICOM SR Document Content Module."""
 
-    def __init__(self, value_type, name, relationship_type):
+    def __init__(self, value_type, name, relationship_type=None):
         """
         Parameters
         ----------
@@ -83,7 +83,7 @@ class ContentItem(Dataset):
             type of value encoded in a content item
         name: Union[pydicom.sr.coding.CodedConcept, pydicom.sr.coding.Code]
             coded name or an enumerated item representing a coded name
-        relationship_type: Union[str, None]
+        relationship_type: str, optional
             type of relationship with parent content item
 
         """  #noqa
@@ -135,12 +135,12 @@ class ContentItem(Dataset):
 
         Parameters
         ----------
-        name: Union[pydicom.sr.coding.CodedConcept, pydicom.sr.coding.Code, None]
+        name: Union[pydicom.sr.coding.CodedConcept, pydicom.sr.coding.Code], optional
             coded name that items should have
-        value_type: Union[pydicom.sr.value_types.ValueTypes, None]
+        value_type: Union[pydicom.sr.value_types.ValueTypes, str], optional
             type of value that items should have
             (e.g. ``pydicom.sr.value_types.ValueTypes.CONTAINER``)
-        relationship_type: Union[pydicom.sr.value_types.RelationshipTypes, None]
+        relationship_type: Union[pydicom.sr.value_types.RelationshipTypes, str], optional
             type of relationship that items should have with its parent
             (e.g. ``pydicom.sr.value_types.RelationshipTypes.CONTAINS``)
 
@@ -210,12 +210,12 @@ class ContentSequence(Sequence):
 
         Parameters
         ----------
-        name: Union[pydicom.sr.coding.CodedConcept, pydicom.sr.coding.Code, None], optional
+        name: Union[pydicom.sr.coding.CodedConcept, pydicom.sr.coding.Code], optional
             coded name that items should have
-        value_type: Union[pydicom.sr.value_types.ValueTypes, None], optional
+        value_type: Union[pydicom.sr.value_types.ValueTypes, str], optional
             type of value that items should have
             (e.g. ``pydicom.sr.value_types.ValueTypes.CONTAINER``)
-        relationship_type: Union[pydicom.sr.value_types.RelationshipTypes, None], optional
+        relationship_type: Union[pydicom.sr.value_types.RelationshipTypes, str], optional
             type of relationship that items should have with its parent
             (e.g. ``pydicom.sr.value_types.RelationshipTypes.CONTAINS``)
 
@@ -310,7 +310,7 @@ class CodeContentItem(ContentItem):
             concept name
         value: Union[pydicom.sr.coding.CodedConcept, pydicom.sr.coding.Code]
             coded value or an enumerated item representing a coded value
-        relationship_type: Union[pydicom.sr.value_types.RelationshipTypes, str, None]
+        relationship_type: Union[pydicom.sr.value_types.RelationshipTypes, str], optional
             type of relationship with parent content item
 
         """  # noqa
@@ -338,7 +338,7 @@ class PnameContentItem(ContentItem):
             concept name
         value: str
             name of the person
-        relationship_type: Union[pydicom.sr.value_types.RelationshipTypes, str, None]
+        relationship_type: Union[pydicom.sr.value_types.RelationshipTypes, str], optional
             type of relationship with parent content item
 
         """  # noqa
@@ -360,7 +360,7 @@ class TextContentItem(ContentItem):
             concept name
         value: str
             description of the concept in free text
-        relationship_type: Union[pydicom.sr.value_types.RelationshipTypes, str]
+        relationship_type: Union[pydicom.sr.value_types.RelationshipTypes, str], optional
             type of relationship with parent content item
 
         """
@@ -382,7 +382,7 @@ class TimeContentItem(ContentItem):
             concept name
         value: pydicom.valuerep.TM
             time
-        relationship_type: Union[pydicom.sr.value_types.RelationshipTypes, str, None]
+        relationship_type: Union[pydicom.sr.value_types.RelationshipTypes, str], optional
             type of relationship with parent content item
 
         """  # noqa
@@ -404,7 +404,7 @@ class DateContentItem(ContentItem):
             concept name
         value: Union[pydicom.valuerep.DA, str]
             date
-        relationship_type: Union[pydicom.sr.value_types.RelationshipTypes, str, None]
+        relationship_type: Union[pydicom.sr.value_types.RelationshipTypes, str], optional
             type of relationship with parent content item
 
         """  # noqa
@@ -426,7 +426,7 @@ class DateTimeContentItem(ContentItem):
             concept name
         value: Union[pydicom.valuerep.DT, str]
             datetime
-        relationship_type: Union[pydicom.sr.value_types.RelationshipTypes, str, None]
+        relationship_type: Union[pydicom.sr.value_types.RelationshipTypes, str], optional
             type of relationship with parent content item
 
         """  # noqa
@@ -448,7 +448,7 @@ class UIDRefContentItem(ContentItem):
             concept name
         value: Union[pydicom.uid.UID, str]
             unique identifier
-        relationship_type: Union[pydicom.sr.value_types.RelationshipTypes, str, None]
+        relationship_type: Union[pydicom.sr.value_types.RelationshipTypes, str], optional
             type of relationship with parent content item
 
         """  # noqa
@@ -471,14 +471,14 @@ class NumContentItem(ContentItem):
             concept name
         value: Union[int, float], optional
             numeric value
-        unit: Union[pydicom.sr.coding.CodedConcept, pydicom.sr.coding.Code, None], optional
+        unit: Union[pydicom.sr.coding.CodedConcept, pydicom.sr.coding.Code], optional
             coded units of measurement (see CID 7181 "Abstract Multi-dimensional
             Image Model Component Units")
-        qualifier: Union[pydicom.sr.coding.CodedConcept, pydicom.sr.coding.Code, None], optional
+        qualifier: Union[pydicom.sr.coding.CodedConcept, pydicom.sr.coding.Code], optional
             qualification of numeric value or as an alternative to
             numeric value, e.g., reason for absence of numeric value
             (see CID 42 "Numeric Value Qualifier" for options)
-        relationship_type: Union[pydicom.sr.value_types.RelationshipTypes, str, None], optional
+        relationship_type: Union[pydicom.sr.value_types.RelationshipTypes, str], optional
             type of relationship with parent content item
 
         Note
@@ -534,12 +534,12 @@ class ContainerContentItem(ContentItem):
         ----------
         name: Union[pydicom.sr.coding.CodedConcept, pydicom.sr.coding.Code]
             concept name
-        relationship_type: Union[str, None], optional
+        relationship_type: str, optional
             type of relationship with parent content item
         is_content_continous: bool, optional
             whether contained content items are logically linked in a
             continuous manner or separate items (default: ``True``)
-        template_id: Union[str, None], optional
+        template_id: str, optional
             SR template identifier
 
         """
@@ -575,7 +575,7 @@ class CompositeContentItem(ContentItem):
             SOP Class UID of the referenced object
         referenced_sop_instance_uid: Union[pydicom.uid.UID, str]
             SOP Instance UID of the referenced object
-        relationship_type: Union[pydicom.sr.value_types.RelationshipTypes, str, None], optional
+        relationship_type: Union[pydicom.sr.value_types.RelationshipTypes, str], optional
             type of relationship with parent content item
 
         """  # noqa
@@ -605,13 +605,13 @@ class ImageContentItem(ContentItem):
             SOP Class UID of the referenced image object
         referenced_sop_instance_uid: Union[pydicom.uid.UID, str]
             SOP Instance UID of the referenced image object
-        referenced_frame_numbers: Union[int, List[int], None], optional
+        referenced_frame_numbers: Union[int, Sequence[int]], optional
             number of frame(s) to which the reference applies in case of a
             multi-frame image
-        referenced_segment_numbers: Union[int, List[int], None], optional
+        referenced_segment_numbers: Union[int, Sequence[int]], optional
             number of segment(s) to which the refernce applies in case of a
             segmentation image
-        relationship_type: Union[pydicom.sr.value_types.RelationshipTypes, str, None], optional
+        relationship_type: Union[pydicom.sr.value_types.RelationshipTypes, str], optional
             type of relationship with parent content item
 
         """  # noqa
@@ -648,7 +648,7 @@ class ScoordContentItem(ContentItem):
             concept name
         graphic_type: Union[pydicom.sr.value_types.GraphicTypes, str]
             name of the graphic type
-        graphic_data: Union[List[List[Union[int, float]]], List[Union[int, float]]]
+        graphic_data: Union[Sequence[Sequence[Union[int, float]]], Sequence[Union[int, float]]]
             ordered (column, row) coordinate pairs
         pixel_origin_interpretation: Union[pydicom.sr.value_types.PixelOriginInterpretations, str]
             whether pixel coordinates specified by `graphic_data` are defined
@@ -658,7 +658,7 @@ class ScoordContentItem(ContentItem):
             (``pydicom.sr.value_types.PixelOriginInterpretations.FRAME``)
         fiducial_uid: Union[pydicom.uid.UID, str, None], optional
             unique identifier for the content item
-        relationship_type: Union[pydicom.sr.value_types.RelationshipTypes, str, None], optional
+        relationship_type: Union[pydicom.sr.value_types.RelationshipTypes, str], optional
             type of relationship with parent content item
 
         """  # noqa
@@ -756,14 +756,14 @@ class Scoord3DContentItem(ContentItem):
             concept name
         graphic_type: Union[pydicom.sr.value_types.GraphicTypes, str]
             name of the graphic type
-        graphic_data: List[List[int, float]]
+        graphic_data: Sequence[Sequence[int, float]]
             ordered set of (x, y, z) coordinate triplets
         frame_of_reference_uid: Union[pydicom.uid.UID, str]
             unique identifier of the frame of reference within which the
             coordinates are defined
-        fiducial_uid: Union[str, None], optional
+        fiducial_uid: str, optional
             unique identifier for the content item
-        relationship_type: Union[pydicom.sr.value_types.RelationshipTypes, str, None], optional
+        relationship_type: Union[pydicom.sr.value_types.RelationshipTypes, str], optional
             type of relationship with parent content item
 
         """  # noqa
@@ -842,14 +842,14 @@ class TcoordContentItem(ContentItem):
             concept name
         temporal_range_type: Union[pydicom.sr.value_types.TemporalRangeTypes, str]
             name of the temporal range type
-        referenced_sample_positions: Union[List[int], None], optional
+        referenced_sample_positions: Sequence[int], optional
             one-based relative sample position of acquired time points
             within the time series
-        referenced_time_offsets: Union[List[float], None], optional
+        referenced_time_offsets: Sequence[float], optional
             seconds after start of the acquisition of the time series
-        referenced_date_time: Union[List[datetime.datetime], None], optional
+        referenced_date_time: Sequence[datetime.datetime], optional
             absolute time points
-        relationship_type: Union[pydicom.sr.value_types.RelationshipTypes, str, None], optional
+        relationship_type: Union[pydicom.sr.value_types.RelationshipTypes, str], optional
             type of relationship with parent content item
 
         """  # noqa

@@ -27,7 +27,7 @@ class CodedConcept(Dataset):
             meaning of the code
         scheme_designator: str
             designator of coding scheme
-        scheme_version: Union[str, None], optional
+        scheme_version: str, optional
             version of coding scheme
 
         """
@@ -173,23 +173,23 @@ class CodingSchemeIdentificationItem(Dataset):
         ----------
         designator: str
             value of the Coding Scheme Designator attribute of a `CodedConcept`
-        name: Union[str, None], optional
+        name: str, optional
             name of the scheme
-        version: Union[str, None], optional
+        version: str, optional
             version of the scheme
-        registry: Union[str, None], optional
+        registry: str, optional
             name of an external registry where scheme may be obtained from;
             required if scheme is registered
-        uid: Union[str, None], optional
+        uid: str, optional
             unique identifier of the scheme; required if the scheme is
             registered by an ISO 8824 object identifier compatible with the
             UI value representation (VR)
-        external_id: Union[str, None], optional
+        external_id: str, optional
             external identifier of the scheme; required if the scheme is
             registered and `uid` is not available
-        responsible_organization: Union[str, None], optional
+        responsible_organization: str, optional
             name of the organization that is responsible for the scheme
-        resources: Union[List[pydicom.sr.coding.CodingSchemeResource], None], optional
+        resources: Sequence[pydicom.sr.coding.CodingSchemeResource], optional
             one or more resources related to the scheme
 
         """
