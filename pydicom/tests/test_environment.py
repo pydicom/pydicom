@@ -123,16 +123,16 @@ class TestBuilds(object):
             except ImportError:
                 pytest.fail("PILLOW is both but PIL is not importable")
 
-            assert features.check_code("jpg")
-            assert features.check_code("jpg_2000")
+            assert features.check_codec("jpg")
+            assert features.check_codec("jpg_2000")
         elif have_pillow == 'jpeg':
             try:
                 from PIL import features
             except ImportError:
                 pytest.fail("PILLOW is both but PIL is not importable")
 
-            assert features.check_code("jpg")
-            assert not features.check_code("jpg_2000")
+            assert features.check_codec("jpg")
+            assert not features.check_codec("jpg_2000")
         elif have_pillow == 'false':
             with pytest.raises(ImportError):
                 import PIL
