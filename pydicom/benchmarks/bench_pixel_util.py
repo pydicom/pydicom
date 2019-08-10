@@ -25,4 +25,4 @@ class TimeConvertColorSpace(object):
     def time_ybr_rgb(self):
         """Time converting from YBR to RGB color space."""
         for ii in range(self.no_runs):
-            convert_color_space(self.rgb, 'YBR_FULL', 'RGB')
+            convert_color_space(self.ybr_full, 'YBR_FULL', 'RGB')
