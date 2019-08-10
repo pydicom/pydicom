@@ -49,12 +49,12 @@ if [[ "$DISTRIB" == "conda" ]]; then
     if [[ "$PILLOW" == "both" ]]; then
         conda install --yes -c conda-forge openjpeg jpeg
         pip install pillow --global-option="build_ext" --global-option="--enable-jpeg2000"
-        python -c "from PIL import _imaging; print('JPEG plugin:', hasattr(_imaging, 'jpeg_decoder'))"
-        python -c "from PIL import _imaging; print('JPEG2k plugin:', hasattr(_imaging, 'jpeg2k_decoder'))"
+        python -c "import PIL; print('JPEG plugin:', hasattr(PIL, 'JpegImagePlugin'))"
+        python -c "import PIL; print('JPEG2k plugin:', hasattr(PIL, 'Jpeg2KImagePlugin'))"
     elif [[ "$PILLOW" == "jpeg" ]]; then
         pip install pillow --global-option="build_ext" --global-option="--disable-jpeg2000"
-        python -c "from PIL import _imaging; print('JPEG plugin:', hasattr(_imaging, 'jpeg_decoder'))"
-        python -c "from PIL import _imaging; print('JPEG2k plugin:', hasattr(_imaging, 'jpeg2k_decoder'))"
+        python -c "import PIL; print('JPEG plugin:', hasattr(PIL, 'JpegImagePlugin'))"
+        python -c "import PIL; print('JPEG2k plugin:', hasattr(PIL, 'Jpeg2KImagePlugin'))"
     fi
     if [[ "$JPEG_LS" == "true" ]]; then
         conda install --yes cython

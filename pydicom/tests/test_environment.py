@@ -119,20 +119,20 @@ class TestBuilds(object):
 
         if have_pillow == 'both':
             try:
-                from PIL import _imaging
+                import PIL
             except ImportError:
                 pytest.fail("PILLOW is both but PIL is not importable")
 
-            assert getattr(_imaging, "jpeg_decoder", False)
-            assert getattr(_imaging, "jpeg2k_decoder", False)
+            assert getattr(PIL, "jpeg_decoder", False)
+            assert getattr(PIL, "jpeg2k_decoder", False)
         elif have_pillow == 'jpeg':
             try:
-                from PIL import _imaging
+                import PIL
             except ImportError:
                 pytest.fail("PILLOW is both but PIL is not importable")
 
-            assert getattr(_imaging, "jpeg_decoder", False)
-            assert not getattr(_imaging, "jpeg2k_decoder", False)
+            assert getattr(PIL, "jpeg_decoder", False)
+            assert not getattr(PIL, "jpeg2k_decoder", False)
         elif have_pillow == 'false':
             with pytest.raises(ImportError):
                 import PIL

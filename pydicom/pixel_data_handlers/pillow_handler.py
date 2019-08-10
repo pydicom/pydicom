@@ -13,16 +13,13 @@ except ImportError:
     HAVE_NP = False
 
 try:
+    import PIL
     from PIL import Image
     HAVE_PIL = True
+    HAVE_JPEG = getattr(PIL, "JpegImagePlugin", False)
+    HAVE_JPEG2K = getattr(PIL, "Jpeg2KImagePlugin", False)
 except ImportError:
     HAVE_PIL = False
-
-try:
-    from PIL import _imaging
-    HAVE_JPEG = getattr(_imaging, "jpeg_decoder", False)
-    HAVE_JPEG2K = getattr(_imaging, "jpeg2k_decoder", False)
-except ImportError:
     HAVE_JPEG = False
     HAVE_JPEG2K = False
 
