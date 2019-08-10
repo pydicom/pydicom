@@ -235,7 +235,7 @@ to decode <em>Pixel Data</em>.</p>
 </table>
 <dl class="function">
 <dt id="pydicom.pixel_data_handlers.pillow_handler.get_pixeldata">
-<code class="sig-prename descclassname">pydicom.pixel_data_handlers.pillow_handler.</code><code class="sig-name descname">get_pixeldata</code><span class="sig-paren">(</span><em class="sig-param">dicom_dataset</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/26749eeb/pydicom/pixel_data_handlers/pillow_handler.py#L94"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.pillow_handler.get_pixeldata" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.pillow_handler.</code><code class="sig-name descname">get_pixeldata</code><span class="sig-paren">(</span><em class="sig-param">dicom_dataset</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/b8fba1db/pydicom/pixel_data_handlers/pillow_handler.py#L94"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.pillow_handler.get_pixeldata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Use Pillow to decompress compressed <em>Pixel Data</em>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -256,13 +256,13 @@ to decode <em>Pixel Data</em>.</p>
 
 <dl class="function">
 <dt id="pydicom.pixel_data_handlers.pillow_handler.is_available">
-<code class="sig-prename descclassname">pydicom.pixel_data_handlers.pillow_handler.</code><code class="sig-name descname">is_available</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/26749eeb/pydicom/pixel_data_handlers/pillow_handler.py#L58"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.pillow_handler.is_available" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.pillow_handler.</code><code class="sig-name descname">is_available</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/b8fba1db/pydicom/pixel_data_handlers/pillow_handler.py#L58"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.pillow_handler.is_available" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the handler has its dependencies met.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="pydicom.pixel_data_handlers.pillow_handler.needs_to_convert_to_RGB">
-<code class="sig-prename descclassname">pydicom.pixel_data_handlers.pillow_handler.</code><code class="sig-name descname">needs_to_convert_to_RGB</code><span class="sig-paren">(</span><em class="sig-param">dicom_dataset</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/26749eeb/pydicom/pixel_data_handlers/pillow_handler.py#L75"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.pillow_handler.needs_to_convert_to_RGB" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.pillow_handler.</code><code class="sig-name descname">needs_to_convert_to_RGB</code><span class="sig-paren">(</span><em class="sig-param">dicom_dataset</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/b8fba1db/pydicom/pixel_data_handlers/pillow_handler.py#L75"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.pillow_handler.needs_to_convert_to_RGB" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the <em>Pixel Data</em> should to be converted from YCbCr to
 RGB.</p>
 <p>This affects JPEG transfer syntaxes.</p>
@@ -270,7 +270,7 @@ RGB.</p>
 
 <dl class="function">
 <dt id="pydicom.pixel_data_handlers.pillow_handler.should_change_PhotometricInterpretation_to_RGB">
-<code class="sig-prename descclassname">pydicom.pixel_data_handlers.pillow_handler.</code><code class="sig-name descname">should_change_PhotometricInterpretation_to_RGB</code><span class="sig-paren">(</span><em class="sig-param">dicom_dataset</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/26749eeb/pydicom/pixel_data_handlers/pillow_handler.py#L84"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.pillow_handler.should_change_PhotometricInterpretation_to_RGB" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.pillow_handler.</code><code class="sig-name descname">should_change_PhotometricInterpretation_to_RGB</code><span class="sig-paren">(</span><em class="sig-param">dicom_dataset</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/b8fba1db/pydicom/pixel_data_handlers/pillow_handler.py#L84"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.pillow_handler.should_change_PhotometricInterpretation_to_RGB" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the <em>Photometric Interpretation</em> should be changed
 to RGB.</p>
 <p>This affects JPEG transfer syntaxes.</p>
@@ -278,7 +278,7 @@ to RGB.</p>
 
 <dl class="function">
 <dt id="pydicom.pixel_data_handlers.pillow_handler.supports_transfer_syntax">
-<code class="sig-prename descclassname">pydicom.pixel_data_handlers.pillow_handler.</code><code class="sig-name descname">supports_transfer_syntax</code><span class="sig-paren">(</span><em class="sig-param">transfer_syntax</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/26749eeb/pydicom/pixel_data_handlers/pillow_handler.py#L63"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.pillow_handler.supports_transfer_syntax" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.pillow_handler.</code><code class="sig-name descname">supports_transfer_syntax</code><span class="sig-paren">(</span><em class="sig-param">transfer_syntax</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/b8fba1db/pydicom/pixel_data_handlers/pillow_handler.py#L63"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.pillow_handler.supports_transfer_syntax" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the handler supports the <cite>transfer_syntax</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
