@@ -1949,8 +1949,7 @@ class Dataset(dict):
                         dataset.walk(callback)
 
     @classmethod
-    def from_json(cls, json_dataset, bulk_data_uri_handler=None,
-                  encodings=None):
+    def from_json(cls, json_dataset, bulk_data_uri_handler=None):
         """Add elements to the :class:`Dataset` from DICOM JSON format.
 
         See the DICOM Standard, Part 18, :dcm:`Annex F<part18/chapter_F.html>`.
@@ -1964,9 +1963,6 @@ class Dataset(dict):
             Callable function that accepts the "BulkDataURI" of the JSON
             representation of a data element and returns the actual value of
             data element (retrieved via DICOMweb WADO-RS).
-        encodings : list of str, optional
-            Encodings from (0008,0005) *Specific Character Set*, or ``None``
-            (default).
 
         Returns
         -------
@@ -2032,13 +2028,6 @@ class Dataset(dict):
         json_dataset = {}
         for key in self.keys():
             json_key = '{0:04x}{1:04x}'.format(key.group, key.element).upper()
-            # FIXME: with pydicom 1.x the referenced image sequence
-            # causes a recursion error
-            if json_key == '00081140':
-                logger.warning(
-                    'currently can\'t serialize data element "{}"'.format(key)
-                )
-                continue
             data_element = self[key]
             json_dataset[json_key] = data_element.to_json(
                 bulk_data_element_handler=bulk_data_element_handler,

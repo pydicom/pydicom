@@ -215,12 +215,12 @@ class TestDataSetToJson(object):
         ds2 = Dataset.from_json(json_string)
         assert ds == ds2
 
-    def test_json_private_DS_VM(self):
-        test1_json = get_testdata_files("test1.json")[0]
-        jsonmodel = open(test1_json, 'r').read()
-        ds = Dataset.from_json(jsonmodel)
-        jsonmodel2 = ds.to_json(dump_handler=lambda d: json.dumps(d, indent=2))
-        ds2 = Dataset.from_json(jsonmodel2)
 
-        assert ds.PatientIdentityRemoved == 'YES'
-        assert ds2.PatientIdentityRemoved == 'YES'
+class TestSequence(object):
+    def test_nested_sequences(self):
+        test1_json = get_testdata_files("test1.json")[0]
+        with open(test1_json) as f:
+            ds = Dataset.from_json(f.read())
+            del ds.PixelData
+        ds2 = Dataset.from_json(ds.to_json())
+        assert ds == ds2
