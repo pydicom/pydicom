@@ -516,10 +516,17 @@ class TestNumpy_ConvertColourSpace(object):
                            match="Conversion from RGB to TEST is not suppo"):
             convert_color_space(None, 'RGB', 'TEST')
 
-    def test_current_is_desired(self):
+    @pytest.mark.parametrize(
+        'current, desired',
+        [('RGB', 'RGB'),
+         ('YBR_FULL', 'YBR_FULL'), ('YBR_FULL', 'YBR_FULL_422'),
+         ('YBR_FULL_422', 'YBR_FULL_422'), ('YBR_FULL_422', 'YBR_FULL'),
+        ]
+    )
+    def test_current_is_desired(self, current, desired):
         """Test that the array is unchanged when current matches desired."""
         arr = np.ones((2, 3))
-        assert np.array_equal(arr, convert_color_space(arr, 'RGB', 'RGB'))
+        assert np.array_equal(arr, convert_color_space(arr, current, desired))
 
     def test_rgb_ybr_rgb_single_frame(self):
         """Test round trip conversion of single framed pixel data."""
