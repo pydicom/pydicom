@@ -90,7 +90,7 @@ class TestBuilds(object):
             raise RuntimeError("No 'PYTHON_VERSION' envar has been set")
 
         version = tuple([int(vv) for vv in version.split('.')])
-        assert version == sys.version_info[:2]
+        assert version[:2] == sys.version_info[:2]
 
     def test_numpy(self):
         """Test that numpy is absent/present."""
