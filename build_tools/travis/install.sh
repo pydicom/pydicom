@@ -67,7 +67,7 @@ if [[ "$DISTRIB" == "conda" ]]; then
         conda install --yes -c conda-forge gdcm=2.8.4
     fi
     # Install nose-timer via pip
-    pip install nose-timer codecov
+    pip install nose-timer
 
 elif [[ "$DISTRIB" == "ubuntu" ]]; then
     # At the time of writing numpy 1.9.1 is included in the travis
@@ -77,7 +77,7 @@ elif [[ "$DISTRIB" == "ubuntu" ]]; then
     # Create a new virtualenv using system site packages for python, numpy
     virtualenv --system-site-packages testvenv
     source testvenv/bin/activate
-    pip install nose nose-timer pytest pytest-cov codecov setuptools
+    pip install nose nose-timer pytest pytest-cov setuptools
     if [[ "$NUMPY" == "true" ]]; then
         pip install --upgrade --force-reinstall numpy
     fi
@@ -109,7 +109,7 @@ elif [[ "$DISTRIB" == "pypy" ]]; then
         # see #794 - avoid PyPy bug with newer NumPy versions
         python -m pip install cython numpy==1.15.4
     fi
-    python -m pip install nose nose-timer pytest pytest-cov codecov setuptools
+    python -m pip install nose nose-timer pytest pytest-cov setuptools
 fi
 
 python --version
