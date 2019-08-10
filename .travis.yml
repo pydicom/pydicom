@@ -64,4 +64,5 @@ script:
   - py.test --cov=pydicom -r sx --pyargs pydicom
 
 after_success:
-  - bash <(curl -s https://codecov.io/bash --connect-timeout 240)
+  # curl times out sometimes, so try try again...
+  - bash <(curl -s https://codecov.io/bash) || (sleep 5 && bash <(curl -s https://codecov.io/bash))

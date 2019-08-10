@@ -43,6 +43,7 @@ if [[ "$DISTRIB" == "conda" ]]; then
     conda create -n testenv --yes python=$PYTHON_VERSION pip
     source activate testenv
     conda install --yes nose pytest pytest-cov setuptools
+    conda list
     if [[ "$NUMPY" == "true" ]]; then
         conda install --yes numpy
     fi
