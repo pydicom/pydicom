@@ -12,7 +12,6 @@ class TimeConvertColorSpace(object):
         """Setup the benchmark."""
         self.no_runs = 1000
 
-        # Little endian explicit
         ds = dcmread(get_testdata_files('SC_rgb_gdcm2k_uncompressed.dcm')[0])
         self.rgb = ds.pixel_array
         ds = dcmread(get_testdata_files('SC_ybr_full_uncompressed.dcm')[0])
@@ -20,12 +19,10 @@ class TimeConvertColorSpace(object):
 
     def time_rgb_ybr(self):
         """Time converting from RGB to YBR color space."""
-        # 1.79 s
         for ii in range(self.no_runs):
             convert_color_space(self.rgb, 'RGB', 'YBR_FULL')
 
     def time_ybr_rgb(self):
         """Time converting from YBR to RGB color space."""
-        # 1.86 s
         for ii in range(self.no_runs):
             convert_color_space(self.rgb, 'YBR_FULL', 'RGB')
