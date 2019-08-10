@@ -119,20 +119,20 @@ class TestBuilds(object):
 
         if have_pillow == 'both':
             try:
-                import PIL
+                from PIL import features
             except ImportError:
                 pytest.fail("PILLOW is both but PIL is not importable")
 
-            assert getattr(PIL, "JpegImagePlugin", False)
-            assert getattr(PIL, "Jpeg2KImagePlugin", False)
+            assert features.check_code("jpg")
+            assert features.check_code("jpg_2000")
         elif have_pillow == 'jpeg':
             try:
-                import PIL
+                from PIL import features
             except ImportError:
                 pytest.fail("PILLOW is both but PIL is not importable")
 
-            assert getattr(PIL, "JpegImagePlugin", False)
-            assert not getattr(PIL, "Jpeg2KImagePlugin", False)
+            assert features.check_code("jpg")
+            assert not features.check_code("jpg_2000")
         elif have_pillow == 'false':
             with pytest.raises(ImportError):
                 import PIL

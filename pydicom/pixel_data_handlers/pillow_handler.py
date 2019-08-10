@@ -14,10 +14,10 @@ except ImportError:
 
 try:
     import PIL
-    from PIL import Image
+    from PIL import Image, features
     HAVE_PIL = True
-    HAVE_JPEG = getattr(PIL, "JpegImagePlugin", False)
-    HAVE_JPEG2K = getattr(PIL, "Jpeg2KImagePlugin", False)
+    HAVE_JPEG = features.check_codec("jpg")
+    HAVE_JPEG2K = features.check_codec("jpg_2000")
 except ImportError:
     HAVE_PIL = False
     HAVE_JPEG = False
