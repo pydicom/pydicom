@@ -520,8 +520,7 @@ class TestNumpy_ConvertColourSpace(object):
         'current, desired',
         [('RGB', 'RGB'),
          ('YBR_FULL', 'YBR_FULL'), ('YBR_FULL', 'YBR_FULL_422'),
-         ('YBR_FULL_422', 'YBR_FULL_422'), ('YBR_FULL_422', 'YBR_FULL'),
-        ]
+         ('YBR_FULL_422', 'YBR_FULL_422'), ('YBR_FULL_422', 'YBR_FULL')]
     )
     def test_current_is_desired(self, current, desired):
         """Test that the array is unchanged when current matches desired."""
