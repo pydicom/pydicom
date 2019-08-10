@@ -47,12 +47,6 @@ class TestNoNumpy(object):
                            match="Numpy is required to reshape"):
             reshape_pixel_array(None, None)
 
-    def test_convert_color_space_raises(self):
-        """Test that convert_color_space raises exception."""
-        with pytest.raises(ImportError,
-                           match="Numpy is required to convert"):
-            convert_color_space(None, None, None)
-
 
 # Tests with Numpy available
 REFERENCE_DTYPE = [
