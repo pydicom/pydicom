@@ -13,16 +13,13 @@ except ImportError:
     HAVE_NP = False
 
 try:
-    from PIL import Image
+    import PIL
+    from PIL import Image, features
     HAVE_PIL = True
+    HAVE_JPEG = features.check_codec("jpg")
+    HAVE_JPEG2K = features.check_codec("jpg_2000")
 except ImportError:
     HAVE_PIL = False
-
-try:
-    from PIL import _imaging
-    HAVE_JPEG = getattr(_imaging, "jpeg_decoder", False)
-    HAVE_JPEG2K = getattr(_imaging, "jpeg2k_decoder", False)
-except ImportError:
     HAVE_JPEG = False
     HAVE_JPEG2K = False
 
