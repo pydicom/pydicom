@@ -224,3 +224,50 @@ class TestSequence(object):
             del ds.PixelData
         ds2 = Dataset.from_json(ds.to_json())
         assert ds == ds2
+
+
+class TestBinary(object):
+    def test_inline_binary(self):
+        ds = Dataset()
+        ds.add_new(0x00091002, 'OB', b'BinaryContent')
+        ds_json = json.loads(ds.to_json(bulk_data_threshold=20))
+        assert "00091002" in ds_json
+        assert "QmluYXJ5Q29udGVudA==" == ds_json["00091002"]["InlineBinary"]
+        ds1 = Dataset.from_json(ds_json)
+        assert ds == ds1
+        # also test if the binary is enclosed in a list
+        ds_json["00091002"]["InlineBinary"] = ["QmluYXJ5Q29udGVudA=="]
+        ds1 = Dataset.from_json(ds_json)
+        assert ds == ds1
+
+    def test_invalid_inline_binary(self):
+        msg = ('"InlineBinary" of data element "00091002" '
+               'must be a bytes-like object.')
+        ds_json = '{"00091002": {"vr": "OB", "InlineBinary": 42}}'
+        with pytest.raises(TypeError, match=msg):
+            Dataset.from_json(ds_json)
+
+        ds_json = '{"00091002": {"vr": "OB", "InlineBinary": [42]}}'
+        with pytest.raises(TypeError, match=msg):
+            Dataset.from_json(ds_json)
+
+    def test_valid_bulkdata_uri(self):
+        ds_json = ('{"00091002": {"vr": "OB", "BulkDataURI": '
+                   '"http://example.com/bulkdatahandler"}}')
+        ds = Dataset.from_json(ds_json)
+        assert 0x00091002 in ds
+        ds_json = ('{"00091002": {"vr": "OB", "BulkDataURI": '
+                   '["http://example.com/bulkdatahandler"]}}')
+        ds = Dataset.from_json(ds_json)
+        assert 0x00091002 in ds
+
+    def test_invalid_bulkdata_uri(self):
+        msg = ('"BulkDataURI" of data element "00091002" '
+               'must be a string.')
+        ds_json = '{"00091002": {"vr": "OB", "BulkDataURI": 42}}'
+        with pytest.raises(TypeError, match=msg):
+            Dataset.from_json(ds_json)
+
+        ds_json = '{"00091002": {"vr": "OB", "BulkDataURI": [42]}}'
+        with pytest.raises(TypeError, match=msg):
+            Dataset.from_json(ds_json)

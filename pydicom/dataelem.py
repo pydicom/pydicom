@@ -337,9 +337,10 @@ class DataElement(object):
             return element_value
 
         if value_key == 'InlineBinary':
-            # the value shall be encoded as a list judging by the example
-            # in PS3.18, Annex F.4; we also support a non-list representation
-            # should we warn here, or is this a common variant?
+            # The value shall be encoded as a base64 encoded string, as shown
+            # in PS3.18, Table F.3.1-1, but the example in PS3.18, Annex F.4
+            # shows the string enclosed in an array.
+            # We support both variants, as the standard is ambiguous here.
             if isinstance(value, list):
                 value = value[0]
             if not isinstance(value, compat.char_types):
@@ -348,6 +349,10 @@ class DataElement(object):
             return base64.b64decode(value)
 
         if value_key == 'BulkDataURI':
+            # given the ambiguous definition of "InlineBinary" we also
+            # allow for a list in "BulkDataURI"
+            if isinstance(value, list):
+                value = value[0]
             if not isinstance(value, compat.string_types):
                 fmt = '"{}" of data element "{}" must be a string.'
                 raise TypeError(fmt.format(value_key, tag))
@@ -536,7 +541,7 @@ class DataElement(object):
                             self.name
                         )
                     )
-                    json_element['InlineBinary'] = [encoded_value]
+                    json_element['InlineBinary'] = encoded_value
         elif self.VR == 'SQ':
             # recursive call to co-routine to format sequence contents
             value = [
