@@ -65,5 +65,5 @@ script:
 
 after_success:
   # curl times out sometimes, so drop the connection timeout but retry more often
-  - bash <(curl --connect-timeout 30 --retry 10 --retry-max-time 0 https://codecov.io/bash) ||
-    (sleep 30 && bash <(curl --connect-timeout 30 --retry 10 --retry-max-time 0 https://codecov.io/bash))
+  - bash <(curl --connect-timeout 10 --retry 10 --retry-max-time 0 https://codecov.io/bash) ||
+    (sleep 30 && bash <(curl --connect-timeout 10 --retry 10 --retry-max-time 0 https://codecov.io/bash))
