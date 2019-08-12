@@ -46,16 +46,6 @@ if [[ "$DISTRIB" == "conda" ]]; then
     if [[ "$NUMPY" == "true" ]]; then
         conda install --yes numpy
     fi
-    if [[ "$PILLOW" == "both" ]]; then
-        conda install --yes -c conda-forge openjpeg jpeg
-        pip install pillow --global-option="build_ext" --global-option="--enable-jpeg2000"
-        python -c "from PIL.features import check_codec; print('JPEG plugin:', check_codec('jpg'))"
-        python -c "from PIL.features import check_codec; print('JPEG2k plugin:', check_codec('jpg_2000'))"
-    elif [[ "$PILLOW" == "jpeg" ]]; then
-        pip install pillow --global-option="build_ext" --global-option="--disable-jpeg2000"
-        python -c "from PIL.features import check_codec; print('JPEG plugin:', check_codec('jpg'))"
-        python -c "from PIL.features import check_codec; print('JPEG2k plugin:', check_codec('jpg_2000'))"
-    fi
     if [[ "$JPEG_LS" == "true" ]]; then
         conda install --yes cython
         export MSCV=False
@@ -84,7 +74,7 @@ elif [[ "$DISTRIB" == "ubuntu" ]]; then
         pip install --upgrade --force-reinstall numpy
     fi
     if [[ "$PILLOW" == "both" ]]; then
-        sudo apt install libopenjpeg
+        sudo apt install libopenjp2-7
         pip install pillow --global-option="build_ext" --global-option="--enable-jpeg2000"
         python -c "from PIL.features import check_codec; print('JPEG plugin:', check_codec('jpg'))"
         python -c "from PIL.features import check_codec; print('JPEG2k plugin:', check_codec('jpg_2000'))"
