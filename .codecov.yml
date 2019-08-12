@@ -36,7 +36,3 @@ comment:
   require_head: no
   # Post comment even if no coverage report for base exists
   require_base: no
-
-fixes:
-  # codecov needs to match the repo files to the path in the coverage report
-  - "::/home/travis/build/pydicom/"
