@@ -67,12 +67,13 @@ elif [[ "$DISTRIB" == "ubuntu" ]]; then
     # Create a new virtualenv using system site packages for python, numpy
     #virtualenv --system-site-packages testvenv
     #source testvenv/bin/activate
-    pip install nose nose-timer coverage pytest pytest-cov setuptools
+    pip install --upgrade pytest
+    pip install nose nose-timer pytest-cov setuptools
     if [[ "$NUMPY" == "true" ]]; then
         pip install --upgrade --force-reinstall numpy
     fi
     if [[ "$PILLOW" == "both" ]]; then
-        sudo apt install libopenjp2-7
+        sudo apt install libopenjpeg2
         pip install pillow --global-option="build_ext" --global-option="--enable-jpeg2000"
         python -c "from PIL.features import check_codec; print('JPEG plugin:', check_codec('jpg'))"
         python -c "from PIL.features import check_codec; print('JPEG2k plugin:', check_codec('jpg_2000'))"
