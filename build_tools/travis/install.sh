@@ -63,16 +63,16 @@ elif [[ "$DISTRIB" == "ubuntu" ]]; then
     # At the time of writing numpy 1.9.1 is included in the travis
     # virtualenv but we want to use the numpy installed through apt-get
     # install.
-    deactivate
+    #deactivate
     # Create a new virtualenv using system site packages for python, numpy
-    virtualenv --system-site-packages testvenv
-    source testvenv/bin/activate
+    #virtualenv --system-site-packages testvenv
+    #source testvenv/bin/activate
     pip install nose nose-timer pytest pytest-cov setuptools
     if [[ "$NUMPY" == "true" ]]; then
         pip install --upgrade --force-reinstall numpy
     fi
     if [[ "$PILLOW" == "both" ]]; then
-        apt install openjpeg
+        sudo apt install openjpeg
         pip install pillow --global-option="build_ext" --global-option="--enable-jpeg2000"
         python -c "from PIL.features import check_codec; print('JPEG plugin:', check_codec('jpg'))"
         python -c "from PIL.features import check_codec; print('JPEG2k plugin:', check_codec('jpg_2000'))"
