@@ -11,9 +11,59 @@ cache:
 
 matrix:
   include:
+    # Ubuntu builds: no numpy, numpy, numpy + pillow (both), numpy + pillow(jpeg)
+    - name: "Python 2.7"
+      python: 2.7
+      env: DISTRIB="ubuntu" PYTHON_VERSION="2.7" NUMPY=false PILLOW=false JPEG_LS=false GDCM=false
+    - name: "Python 2.7 with numpy"
+      python: 2.7
+      env: DISTRIB="ubuntu" PYTHON_VERSION="2.7" NUMPY=true PILLOW=false JPEG_LS=false GDCM=false
+    - name: "Python 2.7 with numpy and pillow (both)"
+      python: 2.7
+      env: DISTRIB="ubuntu" PYTHON_VERSION="2.7" NUMPY=true  PILLOW=both JPEG_LS=false GDCM=false
+    - name: "Python 2.7 with numpy and pillow (jpeg)"
+      python: 2.7
+      env: DISTRIB="ubuntu" PYTHON_VERSION="2.7" NUMPY=true  PILLOW=jpeg JPEG_LS=false GDCM=false
+    - name: "Python 3.4"
+      python: 3.4
+      env: DISTRIB="ubuntu" PYTHON_VERSION="3.4" NUMPY=false PILLOW=false JPEG_LS=false GDCM=false
+    - name: "Python 3.4 with numpy"
+      python: 3.4
+      env: DISTRIB="ubuntu" PYTHON_VERSION="3.4" NUMPY=true PILLOW=false JPEG_LS=false GDCM=false
+    - name: "Python 3.4 with numpy and pillow (both)"
+      python: 3.4
+      env: DISTRIB="ubuntu" PYTHON_VERSION="3.4" NUMPY=true  PILLOW=both JPEG_LS=false GDCM=false
+    - name: "Python 3.5"
+      python: 3.5
+      env: DISTRIB="ubuntu" PYTHON_VERSION="3.5" NUMPY=false PILLOW=false JPEG_LS=false GDCM=false
+    - name: "Python 3.5 with numpy"
+      python: 3.5
+      env: DISTRIB="ubuntu" PYTHON_VERSION="3.5" NUMPY=true PILLOW=false JPEG_LS=false GDCM=false
+    - name: "Python 3.5 with numpy and pillow (both)"
+      python: 3.5
+      env: DISTRIB="ubuntu" PYTHON_VERSION="3.5" NUMPY=true  PILLOW=both JPEG_LS=false GDCM=false
+    - name: "Python 3.6"
+      python: 3.6
+      env: DISTRIB="ubuntu" PYTHON_VERSION="3.6" NUMPY=false PILLOW=false JPEG_LS=false GDCM=false
+    - name: "Python 3.6 with numpy"
+      python: 3.6
+      env: DISTRIB="ubuntu" PYTHON_VERSION="3.6" NUMPY=true PILLOW=false JPEG_LS=false GDCM=false
+    - name: "Python 3.6 with numpy and pillow (both)"
+      python: 3.6
+      env: DISTRIB="ubuntu" PYTHON_VERSION="3.6" NUMPY=true  PILLOW=both JPEG_LS=false GDCM=false
+    - name: "Python 3.7"
+      python: 3.7
+      env: DISTRIB="ubuntu" PYTHON_VERSION="3.7" NUMPY=false PILLOW=false JPEG_LS=false GDCM=false
+    - name: "Python 3.7 with numpy"
+      python: 3.7
+      env: DISTRIB="ubuntu" PYTHON_VERSION="3.7" NUMPY=true PILLOW=false JPEG_LS=false GDCM=false
+    - name: "Python 3.7 with numpy and pillow (both)"
+      python: 3.7
+      env: DISTRIB="ubuntu" PYTHON_VERSION="3.7" NUMPY=true  PILLOW=both JPEG_LS=false GDCM=false
+    # PyPy with numpy
     - env: DISTRIB="pypy" PYTHON_VERSION="2.7" NUMPY=true PILLOW=false JPEG_LS=false GDCM=false
     - env: DISTRIB="pypy" PYTHON_VERSION="3.5" NUMPY=true PILLOW=false JPEG_LS=false GDCM=false
-    # Tests for numpy + JPEGLS, numpy + GDCM
+    # Conda with numpy + JPEGLS, numpy + GDCM
     - env: DISTRIB="conda" PYTHON_VERSION="2.7" NUMPY=true  PILLOW=false JPEG_LS=true GDCM=false
     - env: DISTRIB="conda" PYTHON_VERSION="2.7" NUMPY=true  PILLOW=false JPEG_LS=false GDCM=true
     - env: DISTRIB="conda" PYTHON_VERSION="3.4" NUMPY=true  PILLOW=false JPEG_LS=true GDCM=false
@@ -24,26 +74,10 @@ matrix:
     - env: DISTRIB="conda" PYTHON_VERSION="3.6" NUMPY=true  PILLOW=false JPEG_LS=false  GDCM=true
     # Test old version of GDCM for `HAVE_GDCM_IN_MEMORY_SUPPORT = False`, only for Python 3.6
     - env: DISTRIB="conda" PYTHON_VERSION="3.6" NUMPY=true  PILLOW=false JPEG_LS=false GDCM=old
-    - env: DISTRIB="conda" PYTHON_VERSION="3.7" NUMPY=true  PILLOW=false JPEG_LS=true GDCM=false
+    #- env: DISTRIB="conda" PYTHON_VERSION="3.7" NUMPY=true  PILLOW=false JPEG_LS=true GDCM=false
     - env: DISTRIB="conda" PYTHON_VERSION="3.7" NUMPY=true  PILLOW=false JPEG_LS=false GDCM=true
-    # Ubuntu builds: no numpy, numpy, numpy + pillow (both), numpy + pillow(jpeg)
-    - env: DISTRIB="ubuntu" PYTHON_VERSION="2.7" NUMPY=false PILLOW=false JPEG_LS=false GDCM=false
-    - env: DISTRIB="ubuntu" PYTHON_VERSION="2.7" NUMPY=true PILLOW=false JPEG_LS=false GDCM=false
-    - env: DISTRIB="ubuntu" PYTHON_VERSION="2.7" NUMPY=true  PILLOW=both JPEG_LS=false GDCM=false
-    - env: DISTRIB="ubuntu" PYTHON_VERSION="2.7" NUMPY=true  PILLOW=jpeg JPEG_LS=false GDCM=false
-    - env: DISTRIB="ubuntu" PYTHON_VERSION="3.4" NUMPY=false PILLOW=false JPEG_LS=false GDCM=false
-    - env: DISTRIB="ubuntu" PYTHON_VERSION="3.4" NUMPY=true PILLOW=false JPEG_LS=false GDCM=false
-    - env: DISTRIB="ubuntu" PYTHON_VERSION="3.4" NUMPY=true PILLOW=both JPEG_LS=false GDCM=false
-    - env: DISTRIB="ubuntu" PYTHON_VERSION="3.5" NUMPY=false PILLOW=false JPEG_LS=false GDCM=false
-    - env: DISTRIB="ubuntu" PYTHON_VERSION="3.5" NUMPY=true PILLOW=false JPEG_LS=false GDCM=false
-    - env: DISTRIB="ubuntu" PYTHON_VERSION="3.5" NUMPY=true PILLOW=both JPEG_LS=false GDCM=false
-    - env: DISTRIB="ubuntu" PYTHON_VERSION="3.6" NUMPY=false PILLOW=false JPEG_LS=false GDCM=false
-    - env: DISTRIB="ubuntu" PYTHON_VERSION="3.6" NUMPY=true PILLOW=false JPEG_LS=false GDCM=false
-    - env: DISTRIB="ubuntu" PYTHON_VERSION="3.6" NUMPY=true PILLOW=both JPEG_LS=false GDCM=false
-    - env: DISTRIB="ubuntu" PYTHON_VERSION="3.7" NUMPY=false PILLOW=false JPEG_LS=false GDCM=false
-    - env: DISTRIB="ubuntu" PYTHON_VERSION="3.7" NUMPY=true PILLOW=false JPEG_LS=false GDCM=false
-    - env: DISTRIB="ubuntu" PYTHON_VERSION="3.7" NUMPY=true  PILLOW=jpeg JPEG_LS=false GDCM=false
-    - env: DISTRIB="ubuntu" PYTHON_VERSION="3.7" NUMPY=true  PILLOW=both JPEG_LS=false GDCM=false
+
+
 
 install: source build_tools/travis/install.sh
 

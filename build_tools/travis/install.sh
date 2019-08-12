@@ -72,6 +72,7 @@ elif [[ "$DISTRIB" == "ubuntu" ]]; then
         pip install --upgrade --force-reinstall numpy
     fi
     if [[ "$PILLOW" == "both" ]]; then
+        apt install openjpeg
         pip install pillow --global-option="build_ext" --global-option="--enable-jpeg2000"
         python -c "from PIL.features import check_codec; print('JPEG plugin:', check_codec('jpg'))"
         python -c "from PIL.features import check_codec; print('JPEG2k plugin:', check_codec('jpg_2000'))"
