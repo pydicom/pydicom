@@ -65,4 +65,7 @@ script:
 
 after_success:
   # curl times out sometimes, so try try again... ugly but it works
-  - bash <(curl -s https://codecov.io/bash) || (sleep 5 && bash <(curl -s https://codecov.io/bash)) || (sleep 5 && bash <(curl -s https://codecov.io/bash))
+  - bash <(curl -s https://codecov.io/bash) ||
+    (sleep 30 && bash <(curl -s https://codecov.io/bash)) || 
+    (sleep 30 && bash <(curl -s https://codecov.io/bash)) ||
+    (sleep 30 && bash <(curl -s https://codecov.io/bash))
