@@ -22,7 +22,7 @@ matrix:
       python: 2.7
       env: DISTRIB="ubuntu" PYTHON_VERSION="2.7" NUMPY=true  PILLOW=jpeg JPEG_LS=false GDCM=false
     - name: "Python 2.7 with numpy and pillow (both)"
-      python: 2.8
+      python: 2.7
       env: DISTRIB="ubuntu" PYTHON_VERSION="2.7" NUMPY=true  PILLOW=both JPEG_LS=false GDCM=false
     - name: "Python 3.4"
       python: 3.4
