@@ -22,10 +22,10 @@ matrix:
     - env: DISTRIB="conda" PYTHON_VERSION="3.5" NUMPY=true  PILLOW=false JPEG_LS=false GDCM=true
     - env: DISTRIB="conda" PYTHON_VERSION="3.6" NUMPY=true  PILLOW=false JPEG_LS=true  GDCM=false
     - env: DISTRIB="conda" PYTHON_VERSION="3.6" NUMPY=true  PILLOW=false JPEG_LS=false  GDCM=true
+    # Test old version of GDCM for `HAVE_GDCM_IN_MEMORY_SUPPORT = False`, only for Python 3.6
+    - env: DISTRIB="conda" PYTHON_VERSION="3.6" NUMPY=true  PILLOW=false JPEG_LS=false GDCM=old
     - env: DISTRIB="conda" PYTHON_VERSION="3.7" NUMPY=true  PILLOW=false JPEG_LS=true GDCM=false
     - env: DISTRIB="conda" PYTHON_VERSION="3.7" NUMPY=true  PILLOW=false JPEG_LS=false GDCM=true
-    # Test old version of GDCM for `HAVE_GDCM_IN_MEMORY_SUPPORT = False`
-    - env: DISTRIB="conda" PYTHON_VERSION="3.7" NUMPY=true  PILLOW=false JPEG_LS=false GDCM=old
     # Ubuntu builds: no numpy, numpy, numpy + pillow (both), numpy + pillow(jpeg)
     - env: DISTRIB="ubuntu" PYTHON_VERSION="2.7" NUMPY=false PILLOW=false JPEG_LS=false GDCM=false
     - env: DISTRIB="ubuntu" PYTHON_VERSION="2.7" NUMPY=true PILLOW=false JPEG_LS=false GDCM=false
