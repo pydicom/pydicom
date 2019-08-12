@@ -11,52 +11,39 @@ cache:
 
 matrix:
   include:
-    - env: DISTRIB="pypy" PYTHON_VERSION="2.7" NUMPY=false PILLOW=false JPEG_LS=false GDCM=false
     - env: DISTRIB="pypy" PYTHON_VERSION="2.7" NUMPY=true PILLOW=false JPEG_LS=false GDCM=false
-    - env: DISTRIB="pypy" PYTHON_VERSION="3.5" NUMPY=false PILLOW=false JPEG_LS=false GDCM=false
     - env: DISTRIB="pypy" PYTHON_VERSION="3.5" NUMPY=true PILLOW=false JPEG_LS=false GDCM=false
-
-    - env: DISTRIB="conda" PYTHON_VERSION="2.7" NUMPY=false PILLOW=false JPEG_LS=false GDCM=false
-    - env: DISTRIB="conda" PYTHON_VERSION="2.7" NUMPY=true  PILLOW=false JPEG_LS=false GDCM=false
+    # Tests for numpy + JPEGLS, numpy + GDCM
+    - env: DISTRIB="conda" PYTHON_VERSION="2.7" NUMPY=true  PILLOW=false JPEG_LS=true GDCM=false
     - env: DISTRIB="conda" PYTHON_VERSION="2.7" NUMPY=true  PILLOW=false JPEG_LS=false GDCM=true
-    - env: DISTRIB="conda" PYTHON_VERSION="2.7" NUMPY=true  PILLOW=both JPEG_LS=false GDCM=false
-    - env: DISTRIB="conda" PYTHON_VERSION="2.7" NUMPY=true  PILLOW=both JPEG_LS=true  GDCM=false
-    - env: DISTRIB="conda" PYTHON_VERSION="2.7" NUMPY=true  PILLOW=both JPEG_LS=true  GDCM=true
-
-    - env: DISTRIB="conda" PYTHON_VERSION="3.4" NUMPY=false PILLOW=false JPEG_LS=false GDCM=false
-    - env: DISTRIB="conda" PYTHON_VERSION="3.4" NUMPY=true  PILLOW=false JPEG_LS=false GDCM=false
+    - env: DISTRIB="conda" PYTHON_VERSION="3.4" NUMPY=true  PILLOW=false JPEG_LS=true GDCM=false
     - env: DISTRIB="conda" PYTHON_VERSION="3.4" NUMPY=true  PILLOW=false JPEG_LS=false GDCM=true
-    - env: DISTRIB="conda" PYTHON_VERSION="3.4" NUMPY=true  PILLOW=both JPEG_LS=false GDCM=false
-    - env: DISTRIB="conda" PYTHON_VERSION="3.4" NUMPY=true  PILLOW=both JPEG_LS=true  GDCM=false
-    - env: DISTRIB="conda" PYTHON_VERSION="3.4" NUMPY=true  PILLOW=both JPEG_LS=true  GDCM=true
-
-    - env: DISTRIB="conda" PYTHON_VERSION="3.5" NUMPY=false PILLOW=false JPEG_LS=false GDCM=false
-    - env: DISTRIB="conda" PYTHON_VERSION="3.5" NUMPY=true  PILLOW=false JPEG_LS=false GDCM=false
+    - env: DISTRIB="conda" PYTHON_VERSION="3.5" NUMPY=true  PILLOW=false JPEG_LS=true GDCM=false
     - env: DISTRIB="conda" PYTHON_VERSION="3.5" NUMPY=true  PILLOW=false JPEG_LS=false GDCM=true
-    - env: DISTRIB="conda" PYTHON_VERSION="3.5" NUMPY=true  PILLOW=both JPEG_LS=false GDCM=false
-    - env: DISTRIB="conda" PYTHON_VERSION="3.5" NUMPY=true  PILLOW=both JPEG_LS=true  GDCM=false
-    - env: DISTRIB="conda" PYTHON_VERSION="3.5" NUMPY=true  PILLOW=both JPEG_LS=true  GDCM=true
-
-    - env: DISTRIB="conda" PYTHON_VERSION="3.6" NUMPY=false PILLOW=false JPEG_LS=false GDCM=false
-    - env: DISTRIB="conda" PYTHON_VERSION="3.6" NUMPY=true  PILLOW=false JPEG_LS=false GDCM=false
-    - env: DISTRIB="conda" PYTHON_VERSION="3.6" NUMPY=true  PILLOW=false JPEG_LS=false GDCM=true
-    - env: DISTRIB="conda" PYTHON_VERSION="3.6" NUMPY=true  PILLOW=both JPEG_LS=false GDCM=false
-    - env: DISTRIB="conda" PYTHON_VERSION="3.6" NUMPY=true  PILLOW=both JPEG_LS=true  GDCM=false
-    - env: DISTRIB="conda" PYTHON_VERSION="3.6" NUMPY=true  PILLOW=both JPEG_LS=true  GDCM=true
-    - env: DISTRIB="conda" PYTHON_VERSION="3.6" NUMPY=true  PILLOW=false JPEG_LS=false GDCM=old
-
-    - env: DISTRIB="conda" PYTHON_VERSION="3.7" NUMPY=false PILLOW=false JPEG_LS=false GDCM=false
-    - env: DISTRIB="conda" PYTHON_VERSION="3.7" NUMPY=true  PILLOW=false JPEG_LS=false GDCM=false
-    #- env: DISTRIB="conda" PYTHON_VERSION="3.7" NUMPY=true  PILLOW=false JPEG_LS=false GDCM=true
-    - env: DISTRIB="conda" PYTHON_VERSION="3.7.3" NUMPY=true  PILLOW=both JPEG_LS=false GDCM=false
-    - env: DISTRIB="conda" PYTHON_VERSION="3.7.3" NUMPY=true  PILLOW=both JPEG_LS=true  GDCM=false
-    #- env: DISTRIB="conda" PYTHON_VERSION="3.7" NUMPY=true  PILLOW=both JPEG_LS=true  GDCM=true
-
-    - env: DISTRIB="conda" PYTHON_VERSION="2.7" NUMPY=true  PILLOW=jpeg JPEG_LS=false GDCM=false
-    - env: DISTRIB="conda" PYTHON_VERSION="3.7.3" NUMPY=true  PILLOW=jpeg JPEG_LS=false GDCM=false
-
+    - env: DISTRIB="conda" PYTHON_VERSION="3.6" NUMPY=true  PILLOW=false JPEG_LS=true  GDCM=false
+    - env: DISTRIB="conda" PYTHON_VERSION="3.6" NUMPY=true  PILLOW=false JPEG_LS=false  GDCM=true
+    - env: DISTRIB="conda" PYTHON_VERSION="3.7" NUMPY=true  PILLOW=false JPEG_LS=true GDCM=false
+    - env: DISTRIB="conda" PYTHON_VERSION="3.7" NUMPY=true  PILLOW=false JPEG_LS=false GDCM=true
+    # Test old version of GDCM for `HAVE_GDCM_IN_MEMORY_SUPPORT = False`
+    - env: DISTRIB="conda" PYTHON_VERSION="3.7" NUMPY=true  PILLOW=false JPEG_LS=false GDCM=old
+    # Ubuntu builds: no numpy, numpy, numpy + pillow (both), numpy + pillow(jpeg)
     - env: DISTRIB="ubuntu" PYTHON_VERSION="2.7" NUMPY=false PILLOW=false JPEG_LS=false GDCM=false
     - env: DISTRIB="ubuntu" PYTHON_VERSION="2.7" NUMPY=true PILLOW=false JPEG_LS=false GDCM=false
+    - env: DISTRIB="ubuntu" PYTHON_VERSION="2.7" NUMPY=true  PILLOW=both JPEG_LS=false GDCM=false
+    - env: DISTRIB="ubuntu" PYTHON_VERSION="2.7" NUMPY=true  PILLOW=jpeg JPEG_LS=false GDCM=false
+    - env: DISTRIB="ubuntu" PYTHON_VERSION="3.4" NUMPY=false PILLOW=false JPEG_LS=false GDCM=false
+    - env: DISTRIB="ubuntu" PYTHON_VERSION="3.4" NUMPY=true PILLOW=false JPEG_LS=false GDCM=false
+    - env: DISTRIB="ubuntu" PYTHON_VERSION="3.4" NUMPY=true PILLOW=both JPEG_LS=false GDCM=false
+    - env: DISTRIB="ubuntu" PYTHON_VERSION="3.5" NUMPY=false PILLOW=false JPEG_LS=false GDCM=false
+    - env: DISTRIB="ubuntu" PYTHON_VERSION="3.5" NUMPY=true PILLOW=false JPEG_LS=false GDCM=false
+    - env: DISTRIB="ubuntu" PYTHON_VERSION="3.5" NUMPY=true PILLOW=both JPEG_LS=false GDCM=false
+    - env: DISTRIB="ubuntu" PYTHON_VERSION="3.6" NUMPY=false PILLOW=false JPEG_LS=false GDCM=false
+    - env: DISTRIB="ubuntu" PYTHON_VERSION="3.6" NUMPY=true PILLOW=false JPEG_LS=false GDCM=false
+    - env: DISTRIB="ubuntu" PYTHON_VERSION="3.6" NUMPY=true PILLOW=both JPEG_LS=false GDCM=false
+    - env: DISTRIB="ubuntu" PYTHON_VERSION="3.7" NUMPY=false PILLOW=false JPEG_LS=false GDCM=false
+    - env: DISTRIB="ubuntu" PYTHON_VERSION="3.7" NUMPY=true PILLOW=false JPEG_LS=false GDCM=false
+    - env: DISTRIB="ubuntu" PYTHON_VERSION="3.7" NUMPY=true  PILLOW=jpeg JPEG_LS=false GDCM=false
+    - env: DISTRIB="ubuntu" PYTHON_VERSION="3.7" NUMPY=true  PILLOW=both JPEG_LS=false GDCM=false
 
 install: source build_tools/travis/install.sh
 
