@@ -18,11 +18,12 @@ from pydicom import config  # don't import datetime_conversion directly
 from pydicom import compat
 from pydicom.charset import default_encoding
 from pydicom.compat import in_py2
-from pydicom.config import logger
+from pydicom.config import logger, empty_value_for_VR
 from pydicom.datadict import (dictionary_has_tag, dictionary_description,
                               dictionary_keyword, dictionary_is_retired,
                               private_dictionary_description, dictionary_VR,
                               repeater_has_tag)
+from pydicom.jsonrep import JsonDataElementConverter
 from pydicom.multival import MultiValue
 from pydicom.tag import Tag, BaseTag
 from pydicom.uid import UID
@@ -40,42 +41,6 @@ BINARY_VR_VALUES = [
     'US', 'SS', 'UL', 'SL', 'OW', 'OB', 'OL', 'UN',
     'OB or OW', 'US or OW', 'US or SS or OW', 'FL', 'FD', 'OF', 'OD'
 ]
-
-
-def empty_value_for_VR(VR, raw=False):
-    """Return the value for an empty element for `VR`.
-
-    The behavior of this property depends on the setting of
-    :attr:`config.use_none_as_empty_value`. If that is set to ``True``,
-    an empty value is always represented by ``None``, otherwise it depends
-    on `VR`. For text VRs (not including VRs that represent a number in
-    textual representation) an empty string is used as empty value
-    representation, for all other VRs, ``None``.
-    Note that this is used only if decoding the element - it is always
-    possible to set the value to another empty value representation,
-    which will be preserved during the element object lifetime.
-
-    Parameters
-    ----------
-    VR : str
-        The VR of the corresponding element.
-
-    raw : bool
-        If ``True``, returns the value for a :class:`RawDataElement`,
-        otherwise for a :class:`DataElement`
-
-    Returns
-    -------
-    str or bytes or None
-        The value a data element with `VR` is assigned on decoding
-        if it is empty.
-    """
-    if config.use_none_as_empty_text_VR_value:
-        return None
-    if VR in ('AE', 'AS', 'CS', 'DA', 'DT', 'LO', 'LT',
-              'PN', 'SH', 'ST', 'TM', 'UC', 'UI', 'UR', 'UT'):
-        return b'' if raw else ''
-    return None
 
 
 def isMultiValue(value):
@@ -279,11 +244,9 @@ class DataElement(object):
         DataElement
         """
         # TODO: test wado-rs retrieve wrapper
-        elem_value = cls._get_element_values(dataset_class, tag, vr, value,
+        converter = JsonDataElementConverter(dataset_class, tag, vr, value,
                                              value_key, bulk_data_uri_handler)
-
-        elem_value = jsonrep.convert_to_python_number(elem_value, vr)
-
+        elem_value = converter.get_element_values()
         try:
             return DataElement(tag=tag, value=elem_value, VR=vr)
         except Exception:
@@ -292,207 +255,6 @@ class DataElement(object):
                     tag, elem_value
                 )
             )
-
-    @classmethod
-    def _get_element_values(cls, dataset_class, tag, vr, value, value_key,
-                            bulk_data_uri_handler):
-        """Return a the data element value or list of values.
-
-        Parameters
-        ----------
-        dataset_class : Dataset derived class
-            Class used to create sequence items.
-        tag : BaseTag
-            The data element tag.
-        vr : str
-            The data element value representation.
-        value : list
-            The data element's value(s).
-        value_key : str or None
-            Key of the data element that contains the value
-            (options: ``{"Value", "InlineBinary", "BulkDataURI"}``)
-        bulk_data_uri_handler: callable or None
-            Callable function that accepts the "BulkDataURI" of the JSON
-            representation of a data element and returns the actual value of
-            that data element (retrieved via DICOMweb WADO-RS)
-
-        Returns
-        -------
-        str or bytes or int or float or dataset_class
-        or PersonName3 or PersonNameUnicode or list of any of these types
-            The value or value list of the newly created data element.
-        """
-        if value_key == 'Value':
-            if not isinstance(value, list):
-                fmt = '"{}" of data element "{}" must be a list.'
-                raise TypeError(fmt.format(value_key, tag))
-            if not value:
-                return empty_value_for_VR(vr)
-            element_value = []
-            for v in value:
-                element_value.append(cls._get_regular_element_value(
-                    dataset_class, tag, v, vr))
-            if len(element_value) == 1 and vr != 'SQ':
-                return element_value[0]
-            return element_value
-
-        if value_key == 'InlineBinary':
-            # The value shall be encoded as a base64 encoded string, as shown
-            # in PS3.18, Table F.3.1-1, but the example in PS3.18, Annex F.4
-            # shows the string enclosed in an array.
-            # We support both variants, as the standard is ambiguous here.
-            if isinstance(value, list):
-                value = value[0]
-            if not isinstance(value, compat.char_types):
-                fmt = '"{}" of data element "{}" must be a bytes-like object.'
-                raise TypeError(fmt.format(value_key, tag))
-            return base64.b64decode(value)
-
-        if value_key == 'BulkDataURI':
-            # given the ambiguous definition of "InlineBinary" we also
-            # allow for a list in "BulkDataURI"
-            if isinstance(value, list):
-                value = value[0]
-            if not isinstance(value, compat.string_types):
-                fmt = '"{}" of data element "{}" must be a string.'
-                raise TypeError(fmt.format(value_key, tag))
-            if bulk_data_uri_handler is None:
-                logger.warning(
-                    'no bulk data URI handler provided for retrieval '
-                    'of value of data element "{}"'.format(tag)
-                )
-                return empty_value_for_VR(vr, raw=True)
-            return bulk_data_uri_handler(value)
-        return empty_value_for_VR(vr)
-
-    @classmethod
-    def _get_regular_element_value(cls, dataset_class, tag, value, vr):
-        """Return a the data element value created from a json "Value" entry.
-
-        Parameters
-        ----------
-        dataset_class : Dataset derived class
-            Class used to create sequence items.
-        tag : BaseTag
-            The data element tag.
-        value : str or int or float
-            The data element's value from the json entry.
-        vr : str
-            The data element value representation.
-
-        Returns
-        -------
-        dataset_class or PersonName3 or PersonNameUnicode
-        or str or int or float
-            A single value of the corresponding :class:`DataElement`.
-        """
-        if vr == 'SQ':
-            return cls._get_sequence_item(dataset_class, tag, value)
-
-        if vr == 'PN':
-            return cls._get_pn_element_value(tag, value)
-
-        if vr == 'AT':
-            try:
-                return int(value, 16)
-            except ValueError:
-                warnings.warn('Invalid value "{}" for AT element - '
-                              'ignoring it'.format(value))
-            return
-        return value
-
-    @classmethod
-    def _get_sequence_item(cls, dataset_class, tag, value):
-        """Return a sequence item as a `dataset_class` instance.
-
-        Parameters
-        ----------
-        dataset_class : Dataset derived class
-            Class used to create the sequence item.
-        tag : BaseTag
-            The data element tag.
-        value : list
-            The sequence item from the JSON entry.
-
-        Returns
-        -------
-        dataset_class
-            The decoded dataset item.
-
-        Raises
-        ------
-        KeyError
-            If the "vr" key is missing for a contained element
-        """
-        ds = dataset_class()
-        if value:
-            for key, val in value.items():
-                if 'vr' not in val:
-                    fmt = 'Data element "{}" must have key "vr".'
-                    raise KeyError(fmt.format(tag))
-                vr = val['vr']
-                unique_value_keys = tuple(
-                    set(val.keys()) & set(jsonrep.JSON_VALUE_KEYS)
-                )
-                if len(unique_value_keys) == 0:
-                    # data element with no value
-                    elem = DataElement(tag=int(key, 16),
-                                       value=empty_value_for_VR(vr),
-                                       VR=vr)
-                else:
-                    value_key = unique_value_keys[0]
-                    elem = cls.from_json(
-                        dataset_class, key, vr,
-                        val[value_key], value_key
-                    )
-                ds.add(elem)
-        return ds
-
-    @classmethod
-    def _get_pn_element_value(cls, tag, value):
-        """Return PersonName value from JSON value.
-
-        Values with VR PN have a special JSON encoding, see the DICOM Standard,
-        Part 18, :dcm:`Annex F.2.2<part18/sect_F.2.2.html>`.
-
-        Parameters
-        ----------
-        tag : BaseTag
-            The data element tag.
-        value : dict
-            The person name components in the JSON entry.
-
-        Returns
-        -------
-        PersonName3 or PersonNameUnicode or str
-            The decoded PersonName object or an empty string.
-        """
-        if not isinstance(value, dict):
-            # Some DICOMweb services get this wrong, so we
-            # workaround the issue and warn the user
-            # rather than raising an error.
-            logger.warning(
-                'value of data element "{}" with VR Person Name (PN) '
-                'is not formatted correctly'.format(tag)
-            )
-            return value
-        else:
-            if 'Phonetic' in value:
-                comps = ['', '', '']
-            elif 'Ideographic' in value:
-                comps = ['', '']
-            else:
-                comps = ['']
-            if 'Alphabetic' in value:
-                comps[0] = value['Alphabetic']
-            if 'Ideographic' in value:
-                comps[1] = value['Ideographic']
-            if 'Phonetic' in value:
-                comps[2] = value['Phonetic']
-            elem_value = '='.join(comps)
-            if compat.in_py2:
-                elem_value = PersonNameUnicode(elem_value, 'UTF8')
-            return elem_value
 
     def to_json(self, bulk_data_element_handler,
                 bulk_data_threshold, dump_handler):
