@@ -68,7 +68,7 @@ elif [[ "$DISTRIB" == "ubuntu" ]]; then
     #virtualenv --system-site-packages testvenv
     #source testvenv/bin/activate
     pip install --upgrade pytest
-    pip uninstall numpy
+    pip uninstall -y numpy
     pip install nose nose-timer pytest-cov setuptools
     if [[ "$NUMPY" == "true" ]]; then
         pip install --upgrade --force-reinstall numpy
