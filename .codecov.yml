@@ -25,14 +25,4 @@ ignore:
   - "pydicom/benchmarks"
 
 # Pull request comments, use `comment: off` to disable
-comment:
-  # header: default message header?, diff: the coverage diff of the PR
-  layout: "header, diff"
-  # update the PR comment if it exists, otherwise post a new comment
-  behavior: default
-  # Always post a comment even if the coverage doesn't change
-  require_changes: no
-  # Post comment even if no coverage report for head exists
-  require_head: no
-  # Post comment even if no coverage report for base exists
-  require_base: no
+comment: off
