@@ -76,7 +76,8 @@ elif [[ "$DISTRIB" == "ubuntu" ]]; then
         pip uninstall -y numpy
     fi
     if [[ "$PILLOW" == "both" ]]; then
-        sudo apt install -y libopenjp2-7
+        sudo apt-get update
+        sudo apt-get install -y libopenjp2-7
         pip install pillow --global-option="build_ext" --global-option="--enable-jpeg2000"
         python -c "from PIL.features import check_codec; print('JPEG plugin:', check_codec('jpg'))"
         python -c "from PIL.features import check_codec; print('JPEG2k plugin:', check_codec('jpg_2000'))"
