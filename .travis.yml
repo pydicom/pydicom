@@ -1,4 +1,4 @@
-dist: trusty
+dist: bionic
 sudo: true
 
 language: python
@@ -45,51 +45,46 @@ matrix:
     - name: "Python 3.7 with numpy"
       python: 3.7
       env: DISTRIB="ubuntu" PYTHON_VERSION="3.7" NUMPY=true PILLOW=false JPEG_LS=false GDCM=false
-    - name: "Python 3.7 with numpy and pillow (jpeg)"
-      python: 3.7
-      env: DISTRIB="ubuntu" PYTHON_VERSION="3.7" NUMPY=true  PILLOW=jpeg29 JPEG_LS=false GDCM=false
 
     # PyPy builds" numpy
-    - env: DISTRIB="pypy" PYTHON_VERSION="2.7" NUMPY=true PILLOW=false JPEG_LS=false GDCM=false
-      name: "PyPy 2.7 with numpy"
-    - env: DISTRIB="pypy" PYTHON_VERSION="3.5" NUMPY=true PILLOW=false JPEG_LS=false GDCM=false
-      name: "PyPy 3.5 with numpy"
+    - name: "PyPy 2.7 with numpy"
+      env: DISTRIB="pypy" PYTHON_VERSION="2.7" NUMPY=true PILLOW=false JPEG_LS=false GDCM=false
+    - name: "PyPy 3.5 with numpy"
+      env: DISTRIB="pypy" PYTHON_VERSION="3.5" NUMPY=true PILLOW=false JPEG_LS=false GDCM=false
 
     # Conda builds: numpy + pillow (both), numpy + JPEG-LS, numpy + GDCM
-    - env: DISTRIB="ubuntu" PYTHON_VERSION="2.7" NUMPY=true  PILLOW=both JPEG_LS=false GDCM=false
-      name: "Python 2.7 with numpy and pillow (both)"
-    - env: DISTRIB="conda" PYTHON_VERSION="2.7" NUMPY=true  PILLOW=false JPEG_LS=true GDCM=false
-      name: "Conda 2.7 with numpy and JPEG-LS"
-    - env: DISTRIB="conda" PYTHON_VERSION="2.7" NUMPY=true  PILLOW=false JPEG_LS=false GDCM=true
-      name: "Conda 2.7 with numpy and GDCM"
-    - env: DISTRIB="ubuntu" PYTHON_VERSION="3.4" NUMPY=true  PILLOW=both JPEG_LS=false GDCM=false
-      name: "Python 3.4 with numpy and pillow (both)"
-    - env: DISTRIB="conda" PYTHON_VERSION="3.4" NUMPY=true  PILLOW=false JPEG_LS=true GDCM=false
-      name: "Conda 3.4 with numpy and JPEG-LS"
-    - env: DISTRIB="conda" PYTHON_VERSION="3.4" NUMPY=true  PILLOW=false JPEG_LS=false GDCM=true
-      name: "Conda 3.4 with numpy and GDCM"
-    - env: DISTRIB="ubuntu" PYTHON_VERSION="3.5" NUMPY=true  PILLOW=both JPEG_LS=false GDCM=false
-      name: "Python 3.5 with numpy and pillow (both)"
-    - env: DISTRIB="conda" PYTHON_VERSION="3.5" NUMPY=true  PILLOW=false JPEG_LS=true GDCM=false
-      name: "Conda 3.5 with numpy and JPEG-LS"
-    - env: DISTRIB="conda" PYTHON_VERSION="3.5" NUMPY=true  PILLOW=false JPEG_LS=false GDCM=true
-      name: "Conda 3.5 with numpy and GDCM"
-    - env: DISTRIB="ubuntu" PYTHON_VERSION="3.6" NUMPY=true  PILLOW=both JPEG_LS=false GDCM=false
-      name: "Python 3.6 with numpy and pillow (both)"
-    - env: DISTRIB="conda" PYTHON_VERSION="3.6" NUMPY=true  PILLOW=false JPEG_LS=true  GDCM=false
-      name: "Conda 3.6 with numpy and JPEG-LS"
-    - env: DISTRIB="conda" PYTHON_VERSION="3.6" NUMPY=true  PILLOW=false JPEG_LS=false  GDCM=true
-      name: "Conda 3.6 with numpy and GDCM"
+    - name: "Python 2.7 with numpy and pillow (both)"
+      env: DISTRIB="ubuntu" PYTHON_VERSION="2.7" NUMPY=true  PILLOW=both JPEG_LS=false GDCM=false
+    - name: "Conda 2.7 with numpy and JPEG-LS"
+      env: DISTRIB="conda" PYTHON_VERSION="2.7" NUMPY=true  PILLOW=false JPEG_LS=true GDCM=false
+    - name: "Conda 2.7 with numpy and GDCM"
+      env: DISTRIB="conda" PYTHON_VERSION="2.7" NUMPY=true  PILLOW=false JPEG_LS=false GDCM=true
+    - name: "Python 3.4 with numpy and pillow (both)"
+      env: DISTRIB="ubuntu" PYTHON_VERSION="3.4" NUMPY=true  PILLOW=both JPEG_LS=false GDCM=false
+    - name: "Conda 3.4 with numpy and JPEG-LS"
+      env: DISTRIB="conda" PYTHON_VERSION="3.4" NUMPY=true  PILLOW=false JPEG_LS=true GDCM=false
+    - name: "Conda 3.4 with numpy and GDCM"
+      env: DISTRIB="conda" PYTHON_VERSION="3.4" NUMPY=true  PILLOW=false JPEG_LS=false GDCM=true
+    - name: "Python 3.5 with numpy and pillow (both)"
+      env: DISTRIB="ubuntu" PYTHON_VERSION="3.5" NUMPY=true  PILLOW=both JPEG_LS=false GDCM=false
+    - name: "Conda 3.5 with numpy and JPEG-LS"
+      env: DISTRIB="conda" PYTHON_VERSION="3.5" NUMPY=true  PILLOW=false JPEG_LS=true GDCM=false
+    - name: "Conda 3.5 with numpy and GDCM"
+      env: DISTRIB="conda" PYTHON_VERSION="3.5" NUMPY=true  PILLOW=false JPEG_LS=false GDCM=true
+    - name: "Python 3.6 with numpy and pillow (both)"
+      env: DISTRIB="ubuntu" PYTHON_VERSION="3.6" NUMPY=true  PILLOW=both JPEG_LS=false GDCM=false
+    - name: "Conda 3.6 with numpy and JPEG-LS"
+      env: DISTRIB="conda" PYTHON_VERSION="3.6" NUMPY=true  PILLOW=false JPEG_LS=true  GDCM=false
+    - name: "Conda 3.6 with numpy and GDCM"
+      env: DISTRIB="conda" PYTHON_VERSION="3.6" NUMPY=true  PILLOW=false JPEG_LS=false  GDCM=true
     # Test old version of GDCM for `HAVE_GDCM_IN_MEMORY_SUPPORT = False`, only for Python 3.6
-    - env: DISTRIB="conda" PYTHON_VERSION="3.6" NUMPY=true  PILLOW=false JPEG_LS=false GDCM=old
-      name: "Conda 3.6 with numpy and GDCM 2.8.4"
-    - env: DISTRIB="ubuntu" PYTHON_VERSION="3.7" NUMPY=true  PILLOW=both JPEG_LS=false GDCM=false
-      name: "Python 3.7 with numpy and pillow (both)"
+    - name: "Conda 3.6 with numpy and GDCM 2.8.4"
+      env: DISTRIB="conda" PYTHON_VERSION="3.6" NUMPY=true  PILLOW=false JPEG_LS=false GDCM=old
+    - name: "Python 3.7 with numpy and pillow (jpeg)"
+      env: DISTRIB="conda" PYTHON_VERSION="3.7" NUMPY=true  PILLOW=jpeg29 JPEG_LS=false GDCM=false
     #- env: DISTRIB="conda" PYTHON_VERSION="3.7" NUMPY=true  PILLOW=false JPEG_LS=true GDCM=false
-    - env: DISTRIB="conda" PYTHON_VERSION="3.7" NUMPY=true  PILLOW=false JPEG_LS=false GDCM=true
-      name: "Conda 3.7 with numpy and GDCM"
-
-
+    - name: "Conda 3.7 with numpy and GDCM"
+      env: DISTRIB="conda" PYTHON_VERSION="3.7" NUMPY=true  PILLOW=false JPEG_LS=false GDCM=true
 
 install: source build_tools/travis/install.sh
 
