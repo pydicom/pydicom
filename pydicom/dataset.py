@@ -2027,7 +2027,7 @@ class Dataset(dict):
             logger.debug('using default json.dumps function')
             dump_handler = json.dumps
         json_dataset = {}
-        for key in self.keys():
+        for key in sorted(self.keys()):
             json_key = '{0:04x}{1:04x}'.format(key.group, key.element).upper()
             data_element = self[key]
             json_dataset[json_key] = data_element.to_json(
