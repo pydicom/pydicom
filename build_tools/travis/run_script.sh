@@ -7,7 +7,7 @@ if [[ "$DISTRIB" == "ubuntu" ]]; then
     bash <(curl --connect-timeout 10 --retry 10 --retry-max-time 0 https://codecov.io/bash) ||
         (sleep 30 && bash <(curl --connect-timeout 10 --retry 10 --retry-max-time 0 https://codecov.io/bash))
 
-    pip install -y --force-reinstall numpy
+    pip install --force-reinstall numpy
 
     py.test --cov=pydicom -r sx --pyargs pydicom
     bash <(curl --connect-timeout 10 --retry 10 --retry-max-time 0 https://codecov.io/bash) ||
