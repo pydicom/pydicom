@@ -23,7 +23,7 @@ if [[ "$DISTRIB" == "ubuntu" ]]; then
     bash <(curl --connect-timeout 10 --retry 10 --retry-max-time 0 https://codecov.io/bash) ||
         (sleep 30 && bash <(curl --connect-timeout 10 --retry 10 --retry-max-time 0 https://codecov.io/bash))
 
-    pip uninstall pillow
+    pip uninstall -y pillow
 
     PILLOW="both"
     sudo apt-get update
