@@ -92,6 +92,7 @@ class TestBuilds(object):
         version = tuple([int(vv) for vv in version.split('.')])
         assert version[:2] == sys.version_info[:2]
 
+    @pytest.mark.skipif(get_envar('DISTRIB') == 'ubuntu', reason="exp")
     def test_numpy(self):
         """Test that numpy is absent/present."""
         have_np = get_envar('NUMPY')
@@ -111,6 +112,7 @@ class TestBuilds(object):
                 "Unknown 'NUMPY' value of '{}'".format(have_np)
             )
 
+    @pytest.mark.skipif(get_envar('DISTRIB') == 'ubuntu', reason="exp")
     def test_pillow(self):
         """Test that pillow is absent/present with the correct plugins."""
         have_pillow = get_envar('PILLOW')
