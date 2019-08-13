@@ -12,57 +12,21 @@ cache:
 matrix:
   include:
     # Ubuntu builds: no numpy, numpy, numpy + pillow (both), numpy + pillow(jpeg)
-    - name: "Python 2.7"
+    - name: "Python 2.7 -> numpy -> numpy + pillow (jpeg) -> numpy + pillow (both)"
       python: 2.7
       env: DISTRIB="ubuntu" PYTHON_VERSION="2.7" NUMPY=false PILLOW=false JPEG_LS=false GDCM=false
-    - name: "Python 2.7 with numpy"
-      python: 2.7
-      env: DISTRIB="ubuntu" PYTHON_VERSION="2.7" NUMPY=true PILLOW=false JPEG_LS=false GDCM=false
-    - name: "Python 2.7 with numpy and pillow (jpeg)"
-      python: 2.7
-      env: DISTRIB="ubuntu" PYTHON_VERSION="2.7" NUMPY=true  PILLOW=jpeg JPEG_LS=false GDCM=false
-    - name: "Python 2.7 with numpy and pillow (both)"
-      python: 2.7
-      env: DISTRIB="ubuntu" PYTHON_VERSION="2.7" NUMPY=true  PILLOW=both JPEG_LS=false GDCM=false
-    - name: "Python 3.4"
+    - name: "Python 3.4 -> numpy -> numpy + pillow (jpeg) -> numpy + pillow (both)"
       python: 3.4
       env: DISTRIB="ubuntu" PYTHON_VERSION="3.4" NUMPY=false PILLOW=false JPEG_LS=false GDCM=false
-    - name: "Python 3.4 with numpy"
-      python: 3.4
-      env: DISTRIB="ubuntu" PYTHON_VERSION="3.4" NUMPY=true PILLOW=false JPEG_LS=false GDCM=false
-    - name: "Python 3.4 with numpy and pillow (both)"
-      python: 3.4
-      env: DISTRIB="ubuntu" PYTHON_VERSION="3.4" NUMPY=true  PILLOW=both JPEG_LS=false GDCM=false
-    - name: "Python 3.5"
+    - name: "Python 3.5 -> numpy -> numpy + pillow (jpeg) -> numpy + pillow (both)"
       python: 3.5
       env: DISTRIB="ubuntu" PYTHON_VERSION="3.5" NUMPY=false PILLOW=false JPEG_LS=false GDCM=false
-    - name: "Python 3.5 with numpy"
-      python: 3.5
-      env: DISTRIB="ubuntu" PYTHON_VERSION="3.5" NUMPY=true PILLOW=false JPEG_LS=false GDCM=false
-    - name: "Python 3.5 with numpy and pillow (both)"
-      python: 3.5
-      env: DISTRIB="ubuntu" PYTHON_VERSION="3.5" NUMPY=true  PILLOW=both JPEG_LS=false GDCM=false
-    - name: "Python 3.6"
+    - name: "Python 3.6 -> numpy -> numpy + pillow (jpeg) -> numpy + pillow (both)"
       python: 3.6
       env: DISTRIB="ubuntu" PYTHON_VERSION="3.6" NUMPY=false PILLOW=false JPEG_LS=false GDCM=false
-    - name: "Python 3.6 with numpy"
-      python: 3.6
-      env: DISTRIB="ubuntu" PYTHON_VERSION="3.6" NUMPY=true PILLOW=false JPEG_LS=false GDCM=false
-    - name: "Python 3.6 with numpy and pillow (both)"
-      python: 3.6
-      env: DISTRIB="ubuntu" PYTHON_VERSION="3.6" NUMPY=true  PILLOW=both JPEG_LS=false GDCM=false
-    - name: "Python 3.7"
+    - name: "Python 3.7 -> numpy -> numpy + pillow (jpeg) -> numpy + pillow (both)"
       python: 3.7
       env: DISTRIB="ubuntu" PYTHON_VERSION="3.7" NUMPY=false PILLOW=false JPEG_LS=false GDCM=false
-    - name: "Python 3.7 with numpy"
-      python: 3.7
-      env: DISTRIB="ubuntu" PYTHON_VERSION="3.7" NUMPY=true PILLOW=false JPEG_LS=false GDCM=false
-    - name: "Python 3.7 with numpy and pillow (jpeg)"
-      python: 3.7
-      env: DISTRIB="ubuntu" PYTHON_VERSION="3.7" NUMPY=true  PILLOW=jpeg JPEG_LS=false GDCM=false
-    - name: "Python 3.7 with numpy and pillow (both)"
-      python: 3.7
-      env: DISTRIB="ubuntu" PYTHON_VERSION="3.7" NUMPY=true  PILLOW=both JPEG_LS=false GDCM=false
 
     # PyPy builds" numpy
     - name: "PyPy 2.7 with numpy"
@@ -96,9 +60,4 @@ matrix:
 
 install: source build_tools/travis/install.sh
 
-script:
-  - py.test --cov=pydicom -r sx --pyargs pydicom
-
-after_success:
-  # curl times out sometimes, so try try again... ugly but it works
-  - bash <(curl -s https://codecov.io/bash) || (sleep 5 && bash <(curl -s https://codecov.io/bash)) || (sleep 5 && bash <(curl -s https://codecov.io/bash))
+script: source build_tools/travis/run_script.sh

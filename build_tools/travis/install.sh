@@ -60,21 +60,18 @@ if [[ "$DISTRIB" == "conda" ]]; then
     pip install nose-timer
 
 elif [[ "$DISTRIB" == "ubuntu" ]]; then
-    # At the time of writing numpy 1.9.1 is included in the travis
-    # virtualenv but we want to use the numpy installed through apt-get
-    # install.
-    #deactivate
-    # Create a new virtualenv using system site packages for python, numpy
-    #virtualenv --system-site-packages testvenv
-    #source testvenv/bin/activate
     pip install --upgrade pytest
-
     pip install nose nose-timer pytest-cov setuptools
-    if [[ "$NUMPY" == "true" ]]; then
-        pip install --upgrade --force-reinstall numpy
-    else
-        pip uninstall -y numpy
-    fi
+
+    # 1. If ubuntu we first run with no numpy (needs to be removed)
+    pip uninstall -y numpy
+
+
+    #if [[ "$NUMPY" == "true" ]]; then
+    #    pip install --upgrade --force-reinstall numpy
+    #else
+
+    #fi
     if [[ "$PILLOW" == "both" ]]; then
         sudo apt-get update
         sudo apt-get install -y libopenjp2-7 libopenjp2-7-dev
