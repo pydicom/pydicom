@@ -2008,7 +2008,8 @@ class Dataset(dict):
         dump_handler : callable, optional
             Callable function that accepts a :class:`dict` and returns the
             serialized (dumped) JSON string (by default uses
-            :func:`json.dumps`).
+            :func:`json.dumps`). Use ``dump_handler=lambda d: d`` to return
+            non-serialized :class:`dict` object.
 
         Returns
         -------
@@ -2031,8 +2032,7 @@ class Dataset(dict):
             data_element = self[key]
             json_dataset[json_key] = data_element.to_json(
                 bulk_data_element_handler=bulk_data_element_handler,
-                bulk_data_threshold=bulk_data_threshold,
-                dump_handler=dump_handler
+                bulk_data_threshold=bulk_data_threshold
             )
         return dump_handler(json_dataset)
 

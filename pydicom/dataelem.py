@@ -256,9 +256,9 @@ class DataElement(object):
                 )
             )
 
-    def to_json(self, bulk_data_element_handler,
-                bulk_data_threshold, dump_handler):
-        """Converts a :class:`DataElement` to JSON representation.
+    def to_json(self, bulk_data_element_handler, bulk_data_threshold):
+        """Converts a :class:`DataElement` to a :class:`dict` that will used
+        for the JSON serialization.
 
         Parameters
         ----------
@@ -305,14 +305,14 @@ class DataElement(object):
                     )
                     json_element['InlineBinary'] = encoded_value
         elif self.VR == 'SQ':
-            # recursive call to co-routine to format sequence contents
+            # recursive call to get sequence item JSON dicts
             value = [
-                json.loads(e.to_json(
+                ds.to_json(
                     bulk_data_element_handler=bulk_data_element_handler,
                     bulk_data_threshold=bulk_data_threshold,
-                    dump_handler=dump_handler
-                ))
-                for e in self
+                    dump_handler=lambda d: d
+                )
+                for ds in self
             ]
             json_element['Value'] = value
         elif self.VR == 'PN':
