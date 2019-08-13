@@ -1,24 +1,28 @@
-comment: off
-
 coverage:
+  # number of digits after decimal point
+  precision: 2
+  # round coverage value down to `precision`
+  round: down
+
   status:
+    # master coverage
     project:
       default:
-        # Commits pushed to master should not make the overall
-        # project coverage decrease by more than 1%:
+        # auto: use coverage from base commit
         target: auto
+        # Allow coverage to drop by the following and still be success
         threshold: 1%
+
+    # PR coverage
     patch:
       default:
-        # Be tolerant on slight code coverage diff on PRs to limit
-        # noisy red coverage status on github PRs.
-        # Note The coverage stats are still uploaded
-        # to codecov so that PR reviewers can see uncovered lines
-        # in the github diff if they install the codecov browser
-        # extension:
-        # https://github.com/codecov/browser-extension
         target: auto
         threshold: 1%
+
+# Ignore these paths when calculating the coverage
 ignore:
   - "pydicom/tests"
   - "pydicom/benchmarks"
+
+# Pull request comments, use `comment: off` to disable
+comment: off
