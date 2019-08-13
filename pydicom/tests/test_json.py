@@ -223,26 +223,6 @@ class TestDataSetToJson(object):
                 '"Jane^Doe"}]}, "00100020": {"vr": "LO", "Value": ['
                 '"0017"]}}') == ds.to_json()
 
-        expected = ('{\n'
-                    '  "00100010": {\n'
-                    '    "vr": "PN",\n'
-                    '    "Value": [\n'
-                    '      {\n'
-                    '        "Alphabetic": "Jane^Doe"\n'
-                    '      }\n'
-                    '    ]\n'
-                    '  },\n'
-                    '  "00100020": {\n'
-                    '    "vr": "LO",\n'
-                    '    "Value": [\n'
-                    '      "0017"\n'
-                    '    ]\n'
-                    '  }\n'
-                    '}')
-        # account for slightly different output in Python 2 and 3
-        assert expected == ds.to_json(
-            dump_handler=lambda d: json.dumps(d, indent=2)).replace(', ', ',')
-
         assert {
                    "00100010": {"vr": "PN", "Value": [{"Alphabetic":
                                                        "Jane^Doe"}]},
