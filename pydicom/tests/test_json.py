@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # Copyright 2008-2019 pydicom authors. See LICENSE file for details.
 import json
+import sys
 
 import pytest
 
@@ -206,7 +207,10 @@ class TestDataSetToJson(object):
 
         json_string = ds.to_json(bulk_data_threshold=100)
         json_model = json.loads(json_string)
-        assert json_model == ds.to_json_dict(bulk_data_threshold=100)
+        if sys.version_info > (2, 7, 6):
+            # in older Python 2.7 versions, the serialization of
+            # float values was inconsistent - we ignore this case
+            assert json_model == ds.to_json_dict(bulk_data_threshold=100)
 
         assert json_model['00080005']['Value'] == ['ISO_IR 100']
         assert json_model['00091007']['Value'] == ['1.2.3.4.5.6']
@@ -214,8 +218,9 @@ class TestDataSetToJson(object):
         assert json_model['0009100B']['Value'] == [3000000000]
         assert json_model['0009100C']['Value'] == [-2000000000]
         assert json_model['0009100D']['Value'] == [40000]
-        assert json_model['0009100F']['Value'] == [3.14]
-        assert json_model['00091010']['Value'] == [3.14159265]
+        if sys.version_info > (2, 7, 6):
+            assert json_model['0009100F']['Value'] == [3.14]
+            assert json_model['00091010']['Value'] == [3.14159265]
         assert json_model['00091018']['Value'] == [50 * u'Калинка,']
 
         ds2 = Dataset.from_json(json_string)
