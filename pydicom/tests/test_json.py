@@ -207,10 +207,6 @@ class TestDataSetToJson(object):
 
         json_string = ds.to_json(bulk_data_threshold=100)
         json_model = json.loads(json_string)
-        if sys.version_info > (2, 7, 6):
-            # in older Python 2.7 versions, the serialization of
-            # float values was inconsistent - we ignore this case
-            assert json_model == ds.to_json_dict(bulk_data_threshold=100)
 
         assert json_model['00080005']['Value'] == ['ISO_IR 100']
         assert json_model['00091007']['Value'] == ['1.2.3.4.5.6']
@@ -218,15 +214,23 @@ class TestDataSetToJson(object):
         assert json_model['0009100B']['Value'] == [3000000000]
         assert json_model['0009100C']['Value'] == [-2000000000]
         assert json_model['0009100D']['Value'] == [40000]
-        if sys.version_info > (2, 7, 6):
-            assert json_model['0009100F']['Value'] == [3.14]
-            assert json_model['00091010']['Value'] == [3.14159265]
+        assert json_model['0009100F']['Value'] == [3.14]
+        assert json_model['00091010']['Value'] == [3.14159265]
         assert json_model['00091018']['Value'] == [50 * u'Калинка,']
 
         ds2 = Dataset.from_json(json_string)
         assert ds == ds2
         ds2 = Dataset.from_json(json_model)
         assert ds == ds2
+
+        json_model2 = ds.to_json_dict(bulk_data_threshold=100)
+        if compat.in_py2:
+            # in Python 2, the encoding of this is slightly different
+            # (single vs double quotation marks)
+            del json_model['00091015']
+            del json_model2['00091015']
+
+        assert json_model == json_model2
 
     def test_dataset_dumphandler(self):
         ds = Dataset()
