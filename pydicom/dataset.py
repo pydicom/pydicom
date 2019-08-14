@@ -2011,6 +2011,11 @@ class Dataset(dict):
             :func:`json.dumps`). Use ``dump_handler=lambda d: d`` to return
             non-serialized :class:`dict` object.
 
+            .. note:
+
+                Make sure to use a dump handler that sorts the keys (see
+                example below) do create DICOM-conform JSON.
+
         Returns
         -------
         str
@@ -2020,14 +2025,14 @@ class Dataset(dict):
         Examples
         --------
         >>> def my_json_dumps(data):
-        ...     return json.dumps(data, indent=4)
+        ...     return json.dumps(data, indent=4, sort_keys=True)
         >>> ds.to_json(dump_handler=my_json_dumps)
         """
         if dump_handler is None:
             logger.debug('using default json.dumps function')
-            dump_handler = json.dumps
+            dump_handler = lambda d: json.dumps(d, sort_keys=True)
         json_dataset = {}
-        for key in sorted(self.keys()):
+        for key in self.keys():
             json_key = '{0:04x}{1:04x}'.format(key.group, key.element).upper()
             data_element = self[key]
             json_dataset[json_key] = data_element.to_json(

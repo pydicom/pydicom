@@ -218,16 +218,29 @@ class TestDataSetToJson(object):
     def test_dumphandler(self):
         ds = Dataset()
         ds.add_new(0x00100010, 'PN', 'Jane^Doe')
-        ds.add_new(0x00100020, 'LO', '0017')
-        assert ('{"00100010": {"vr": "PN", "Value": [{"Alphabetic": '
-                '"Jane^Doe"}]}, "00100020": {"vr": "LO", "Value": ['
-                '"0017"]}}') == ds.to_json()
+        # as the order of the keys is not defined, we have to check both
+        assert ds.to_json() in ('{"00100010": {"vr": "PN", "Value": [{'
+                                '"Alphabetic": "Jane^Doe"}]}}',
+                                '{"00100010": {"Value": [{'
+                                '"Alphabetic": "Jane^Doe"}], "vr": "PN"}}')
 
         assert {
                    "00100010": {"vr": "PN", "Value": [{"Alphabetic":
-                                                       "Jane^Doe"}]},
-                   "00100020": {"vr": "LO", "Value": ["0017"]}
+                                                           "Jane^Doe"}]}
                } == ds.to_json(dump_handler=lambda d: d)
+
+    def test_sort_order(self):
+        """Test that tags are serialized in ascending order."""
+        ds = Dataset()
+        ds.add_new(0x00100040, 'CS', 'F')
+        ds.add_new(0x00100030, 'DA', '20000101')
+        ds.add_new(0x00100020, 'LO', '0017')
+        ds.add_new(0x00100010, 'PN', 'Jane^Doe')
+
+        ds_json = ds.to_json()
+        assert ds_json.index('"00100010"') < ds_json.index('"00100020"')
+        assert ds_json.index('"00100020"') < ds_json.index('"00100030"')
+        assert ds_json.index('"00100030"') < ds_json.index('"00100040"')
 
 
 class TestSequence(object):
