@@ -2029,8 +2029,11 @@ class Dataset(dict):
         >>> ds.to_json(dump_handler=my_json_dumps)
         """
         if dump_handler is None:
+            def json_dump(d):
+                return json.dumps(d, sort_keys=True)
+
             logger.debug('using default json.dumps function')
-            dump_handler = lambda d: json.dumps(d, sort_keys=True)
+            dump_handler = json_dump
         json_dataset = {}
         for key in self.keys():
             json_key = '{0:04x}{1:04x}'.format(key.group, key.element).upper()

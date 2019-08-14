@@ -225,7 +225,7 @@ class DataElement(object):
         ----------
         dataset_class : Dataset derived class
             Class used to create sequence items.
-        tag : BaseTag
+        tag : BaseTag or int
             The data element tag.
         vr : str
             The data element value representation.

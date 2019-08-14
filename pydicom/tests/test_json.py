@@ -225,8 +225,8 @@ class TestDataSetToJson(object):
                                 '"Alphabetic": "Jane^Doe"}], "vr": "PN"}}')
 
         assert {
-                   "00100010": {"vr": "PN", "Value": [{"Alphabetic":
-                                                           "Jane^Doe"}]}
+                   "00100010": {
+                       "vr": "PN", "Value": [{"Alphabetic": "Jane^Doe"}]}
                } == ds.to_json(dump_handler=lambda d: d)
 
     def test_sort_order(self):
